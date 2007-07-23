@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-23 09:17:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,10 +31,16 @@ class mafVME;
 class mafMatrix;
 
 //----------------------------------------------------------------------------
-/** transform gui
+/** text entries gui component for transform operations 
+
+  plug it into an operation to allow vme transformation through text entries.
+  scaling gui can be disabled through a bool flag in the constructor; default is
+  scaling set to on.
 
   @sa
- 
+  mmoMAFTransform for an example on how to use this component into a transform
+  operation
+
   @todo
 
 */
@@ -42,7 +48,7 @@ class mafGuiTransformTextEntries : public mafGuiTransformInterface
 {
 public:
 
-  mafGuiTransformTextEntries(mafVME *input, mafObserver *listener = NULL);
+  mafGuiTransformTextEntries(mafVME *input, mafObserver *listener = NULL, bool enableScaling = true);
 	~mafGuiTransformTextEntries(); 
 
   void OnEvent(mafEventBase *maf_event);
@@ -85,9 +91,10 @@ protected:
   /** override superclass */ 
   void CreateGui();
 
-  double Position[3];
-  double Orientation[3];
-  double Scaling[3];
+  double m_Position[3];
+  double m_Orientation[3];
+  double m_Scaling[3];
 
+  bool m_EnableScaling;
 };
 #endif

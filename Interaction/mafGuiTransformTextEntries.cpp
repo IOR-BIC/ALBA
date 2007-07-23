@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-23 09:17:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,26 +39,27 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGuiTransformTextEntries::mafGuiTransformTextEntries(mafVME *input, mafObserver *listener)
+mafGuiTransformTextEntries::mafGuiTransformTextEntries(mafVME *input, mafObserver *listener, bool enableScaling /* = true */)
 //----------------------------------------------------------------------------
 {
   assert(input);
 
-  CurrentTime = -1;
+  m_EnableScaling = enableScaling;
+  m_CurrentTime = -1;
   m_Listener = listener;
-  InputVME = input;
+  m_InputVME = input;
   m_Gui = NULL;
   
-  RefSysVME = InputVME;
+  m_RefSysVME = m_InputVME;
 
-  Position[0] = Position[1] = Position[2] = 0;
-  Orientation[0] = Orientation[1] = Orientation[2] = 0;
-  Scaling[0] = Scaling[1] = Scaling[2] = 1; 
+  m_Position[0] = m_Position[1] = m_Position[2] = 0;
+  m_Orientation[0] = m_Orientation[1] = m_Orientation[2] = 0;
+  m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1; 
 
-  CurrentTime = InputVME->GetTimeStamp();
+  m_CurrentTime = m_InputVME->GetTimeStamp();
 
   CreateGui();
-  SetAbsPose(InputVME->GetOutput()->GetAbsMatrix());
+  SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
 mafGuiTransformTextEntries::~mafGuiTransformTextEntries() 
@@ -76,17 +77,25 @@ void mafGuiTransformTextEntries::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Label("vme pose", true);
-  m_Gui->Double(ID_TRANSLATE_X, "Translate X", &Position[0]);
-  m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &Position[1]);
-  m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &Position[2]);
-  m_Gui->Double(ID_ROTATE_X, "Rotate X", &Orientation[0]);
-  m_Gui->Double(ID_ROTATE_Y, "Rotate Y", &Orientation[1]);
-  m_Gui->Double(ID_ROTATE_Z, "Rotate Z", &Orientation[2]);
-  m_Gui->Double(ID_SCALE_X, "Scale X", &Scaling[0], 0);
-  m_Gui->Double(ID_SCALE_Y, "Scale Y", &Scaling[1], 0);
-  m_Gui->Double(ID_SCALE_Z, "Scale Z", &Scaling[2], 0);
+  m_Gui->Double(ID_TRANSLATE_X, "Translate X", &m_Position[0]);
+  m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
+  m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &m_Position[2]);
+  m_Gui->Double(ID_ROTATE_X, "Rotate X", &m_Orientation[0]);
+  m_Gui->Double(ID_ROTATE_Y, "Rotate Y", &m_Orientation[1]);
+  m_Gui->Double(ID_ROTATE_Z, "Rotate Z", &m_Orientation[2]);
 
-	m_Gui->Divider();
+  if (m_EnableScaling == true)
+  {
+    m_Gui->Double(ID_SCALE_X, "Scale X", &m_Scaling[0], 0);
+    m_Gui->Double(ID_SCALE_Y, "Scale Y", &m_Scaling[1], 0);
+    m_Gui->Double(ID_SCALE_Z, "Scale Z", &m_Scaling[2], 0);
+  }
+  else
+  {
+    mafLogMessage("scaling not enabled, not building scaling gui");
+  }
+
+  m_Gui->Divider();
 
   m_Gui->Update();
 }
@@ -139,9 +148,9 @@ void mafGuiTransformTextEntries::EnableWidgets(bool enable)
 void mafGuiTransformTextEntries::Reset()
 //----------------------------------------------------------------------------
 {
-  SetRefSys(InputVME);
-  SetAbsPose(InputVME->GetOutput()->GetAbsMatrix());
-  Scaling[0] = Scaling[1] = Scaling[2] = 1;
+  SetRefSys(m_InputVME);
+  SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
+  m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1;
   m_Gui->Update();
 }
 
@@ -149,7 +158,7 @@ void mafGuiTransformTextEntries::Reset()
 void mafGuiTransformTextEntries::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
-  this->SetAbsPose(InputVME->GetOutput()->GetAbsMatrix());
+  this->SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
 }
 
 //----------------------------------------------------------------------------
@@ -165,17 +174,17 @@ void mafGuiTransformTextEntries::TextEntriesChanged()
   */
 
   mafSmartPointer<mafTransform> tran;
-  tran->Scale(Scaling[0], Scaling[1], Scaling[2],POST_MULTIPLY);
-  tran->RotateY(Orientation[1], POST_MULTIPLY);
-  tran->RotateX(Orientation[0], POST_MULTIPLY);
-  tran->RotateZ(Orientation[2], POST_MULTIPLY);
-  tran->SetPosition(Position);
+  tran->Scale(m_Scaling[0], m_Scaling[1], m_Scaling[2],POST_MULTIPLY);
+  tran->RotateY(m_Orientation[1], POST_MULTIPLY);
+  tran->RotateX(m_Orientation[0], POST_MULTIPLY);
+  tran->RotateZ(m_Orientation[2], POST_MULTIPLY);
+  tran->SetPosition(m_Position);
 
   // premultiply to ref sys abs matrix
-  tran->Concatenate(RefSysVME->GetOutput()->GetAbsTransform(), POST_MULTIPLY);
-  InputVME->SetAbsMatrix(tran->GetMatrix(), CurrentTime);
+  tran->Concatenate(m_RefSysVME->GetOutput()->GetAbsTransform(), POST_MULTIPLY);
+  m_InputVME->SetAbsMatrix(tran->GetMatrix(), m_CurrentTime);
   
-  this->SetAbsPose(InputVME->GetOutput()->GetAbsMatrix());
+  this->SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
   
   // notify the listener about the new abs pose
   mafEvent e2s;
@@ -192,14 +201,14 @@ void mafGuiTransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp tim
   // express absPose in RefSysVME refsys
   mafTransformFrame *mflTr = mafTransformFrame::New();
   mflTr->SetInput(absPose);
-  mflTr->SetTargetFrame(RefSysVME->GetOutput()->GetAbsMatrix());
+  mflTr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
   mflTr->Update();
 
   
   // update gui with new pose: Position, Orientation, Scale
-  mafTransform::GetPosition(mflTr->GetMatrix(), Position);
-  mafTransform::GetOrientation(mflTr->GetMatrix(), Orientation);
-  mafTransform::GetScale(mflTr->GetMatrix(), Scaling);
+  mafTransform::GetPosition(mflTr->GetMatrix(), m_Position);
+  mafTransform::GetOrientation(mflTr->GetMatrix(), m_Orientation);
+  mafTransform::GetScale(mflTr->GetMatrix(), m_Scaling);
 
   m_Gui->Update();
 }

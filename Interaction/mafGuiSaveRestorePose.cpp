@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-23 09:17:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listene
   assert(input);
 
   m_Listener = listener;
-  InputVME = input;
+  m_InputVME = input;
   m_Gui = NULL;
   
   CreateGui();
@@ -83,7 +83,7 @@ void mafGuiSaveRestorePose::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_SAVE:
-        SavePose(InputVME->GetOutput()->GetAbsMatrix());
+        SavePose(m_InputVME->GetOutput()->GetAbsMatrix());
         m_Gui->Enable(ID_APPLY, true);
       break;
       case ID_REMOVE:
@@ -125,7 +125,7 @@ void mafGuiSaveRestorePose::EnableWidgets(bool enable)
 void mafGuiSaveRestorePose::ReadSavedPoses()
 //----------------------------------------------------------------------------
 {
-	mafTagArray *tag_array = InputVME->GetTagArray();
+	mafTagArray *tag_array = m_InputVME->GetTagArray();
   int n = tag_array->GetNumberOfTags();
   std::vector<std::string> tag_list;
   tag_array->GetTagList(tag_list);
@@ -158,7 +158,7 @@ void mafGuiSaveRestorePose::SavePose(mafMatrix *abs_pose)
 
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
 
-  mafTagArray *tagArray = InputVME->GetTagArray();
+  mafTagArray *tagArray = m_InputVME->GetTagArray();
   if(tagArray->IsTagPresent(AbsPos_tagName.c_str())) 
   {
 		wxString msg = "this name is already used, do you want to to overwrite it ?";
@@ -199,8 +199,8 @@ void mafGuiSaveRestorePose::RemovePose(int sel_pose)
 {
   wxString pose_name = m_PositionsList->GetString(sel_pose);
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
-  if (InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.c_str()))
-    InputVME->GetTagArray()->DeleteTag(AbsPos_tagName.c_str());
+  if (m_InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.c_str()))
+    m_InputVME->GetTagArray()->DeleteTag(AbsPos_tagName.c_str());
   m_PositionsList->Delete(sel_pose);
 }
 //----------------------------------------------------------------------------
@@ -211,9 +211,9 @@ void mafGuiSaveRestorePose::RestorePose(int sel_pose)
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
   int comp = 0;
   mafMatrix abs_pose;
-  if (InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.c_str()))
+  if (m_InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.c_str()))
   {
-    mafTagItem *item = InputVME->GetTagArray()->GetTag(AbsPos_tagName.c_str());
+    mafTagItem *item = m_InputVME->GetTagArray()->GetTag(AbsPos_tagName.c_str());
     for (int r=0; r<4; r++)
       for (int c=0; c<4; c++)
         abs_pose.SetElement(r,c,item->GetComponentAsDouble(comp++));
@@ -223,7 +223,7 @@ void mafGuiSaveRestorePose::RestorePose(int sel_pose)
     return;
   }
 
-  InputVME->SetAbsMatrix(abs_pose);
+  m_InputVME->SetAbsMatrix(abs_pose);
 
   mafEvent e2s;
   e2s.SetSender(this);

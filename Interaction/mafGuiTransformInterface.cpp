@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-23 09:17:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,11 +39,11 @@
 mafGuiTransformInterface::mafGuiTransformInterface()
 //----------------------------------------------------------------------------
 {
-  CurrentTime = -1;
+  m_CurrentTime = -1;
   m_Listener = NULL;
-  InputVME = NULL;
+  m_InputVME = NULL;
   m_Gui = NULL;
-  RefSysVME = InputVME;
+  m_RefSysVME = m_InputVME;
 }
 //----------------------------------------------------------------------------
 mafGuiTransformInterface::~mafGuiTransformInterface() 
@@ -59,6 +59,6 @@ void mafGuiTransformInterface::SetRefSys(mafVME* refSysVme)
   if (refSysVme == NULL)
   return;
 
-  RefSysVME = refSysVme;
+  m_RefSysVME = refSysVme;
   RefSysVmeChanged();
 }

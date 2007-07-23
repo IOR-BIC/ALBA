@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-23 09:17:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,7 +48,7 @@ public:
 
   /** Set the vme to be used as reference system, the vme is referenced; default ref sys is vme abs matrix */
   void SetRefSys(mafVME *refSysVme); 
-  mafVME* GetRefSys() {return RefSysVME;};
+  mafVME* GetRefSys() {return m_RefSysVME;};
 
   /** Reset the gui component to initial state */
   virtual void Reset() {};
@@ -64,17 +64,17 @@ protected:
   /** Create the GUI */
   virtual void CreateGui() {};
 
-  mafVME *InputVME;
+  mafVME *m_InputVME;
 
   mafObserver *m_Listener;
   mmgGui      *m_Gui;
    
   /** Vme to be used as reference system */
-  mafVME *RefSysVME;
+  mafVME *m_RefSysVME;
 
   /** Internal actions to be performed when RefSys vme has changed */
   virtual void RefSysVmeChanged() {};
 
-  mafTimeStamp CurrentTime;
+  mafTimeStamp m_CurrentTime;
 };
 #endif

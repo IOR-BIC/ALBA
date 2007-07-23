@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-22 10:54:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-23 09:17:16 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ mafGuiTransformMouse::mafGuiTransformMouse(mafVME *input, mafObserver *listener)
   assert(input);
 
   m_Listener = listener;
-  InputVME = input;
+  m_InputVME = input;
   m_Gui = NULL;
   
   IsaRotate = NULL;
@@ -55,7 +55,7 @@ mafGuiTransformMouse::mafGuiTransformMouse(mafVME *input, mafObserver *listener)
   RotationConstraintId = VIEW_PLANE;
   TranslationConstraintId = VIEW_PLANE;
   
-  RefSysVME = InputVME;
+  m_RefSysVME = m_InputVME;
   OldInteractor = NULL;
 
   CreateISA();
@@ -113,25 +113,25 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       // set rotation constraint;
       if (RotationConstraintId == X_AXIS)
       {
-        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
       }
       else if (RotationConstraintId == Y_AXIS)
       {
-        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
       }
       else if (RotationConstraintId == Z_AXIS)
       {
-        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
       }
       else if (RotationConstraintId == VIEW_PLANE)
       {
-        IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaRotate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 				//Modified by Matteo 30-05-2006
 				//IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
@@ -140,7 +140,7 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       }
 			else if (RotationConstraintId == NORMAL_VIEW_PLANE)
 			{
-				IsaRotate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaRotate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         //IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 				//Modified by Matteo 30-05-2006
 				IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
@@ -155,22 +155,22 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       if (TranslationConstraintId == X_AXIS)
       {
         IsaTranslate->SurfaceSnapOff(); 
-        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);   
       }
       else if (TranslationConstraintId == Y_AXIS)
       {
         IsaTranslate->SurfaceSnapOff();
-        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);        
       }
       else if (TranslationConstraintId == Z_AXIS)
       {                                             
         IsaTranslate->SurfaceSnapOff(); 
-        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);        
       }      
       else if (TranslationConstraintId == VIEW_PLANE)
@@ -188,8 +188,8 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
         IsaTranslate->SurfaceSnapOff();
         IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 				//Modified by Matteo 30-05-2006
-				IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-				IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
 				IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 				//End Matteo
 			}
@@ -197,22 +197,22 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
       if (TranslationConstraintId == XY_PLANE)
       {
         IsaTranslate->SurfaceSnapOff();             
-        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
       }
       else if (TranslationConstraintId == XZ_PLANE)  
       {
         IsaTranslate->SurfaceSnapOff(); 
-        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);       
       }
       else if (TranslationConstraintId == YZ_PLANE)
       {               
         IsaTranslate->SurfaceSnapOff();
-        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
-        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
+        IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
         IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::FREE);   
       }
       // isa gen is sending matrix to the operation
@@ -221,8 +221,8 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
         IsaTranslate->SurfaceSnapOn();
         IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 				//Modified by Matteo 30-05-2006
-				IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-				IsaTranslate->GetPivotRefSys()->SetTypeToCustom(RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+				IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_RefSysVME->GetOutput()->GetAbsMatrix());
 				IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 				//End Matteo
       }
@@ -249,16 +249,16 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
 void mafGuiTransformMouse::CreateISA()
 //----------------------------------------------------------------------------
 {
-  OldInteractor = InputVME->GetBehavior();
+  OldInteractor = m_InputVME->GetBehavior();
 
   // Create the isa compositor:
   IsaCompositor = mmiCompositorMouse::New();
 
   // default aux ref sys is the vme ref sys
-  RefSysVME = InputVME;
+  m_RefSysVME = m_InputVME;
 
   mafMatrix *absMatrix;
-  absMatrix = RefSysVME->GetOutput()->GetAbsMatrix();
+  absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
   //----------------------------------------------------------------------------
 	// create the rotate behavior
 	//----------------------------------------------------------------------------
@@ -266,12 +266,12 @@ void mafGuiTransformMouse::CreateISA()
   IsaRotate = IsaCompositor->CreateBehavior(MOUSE_LEFT);
   
   IsaRotate->SetListener(this); 
-  IsaRotate->SetVME(InputVME);
+  IsaRotate->SetVME(m_InputVME);
   IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
   IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(absMatrix);
   
   IsaRotate->GetPivotRefSys()->SetTypeToView();
-  IsaRotate->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetMatrix());
+  IsaRotate->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetMatrix());
   
   //IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 	//Modified by Matteo 30-05-2006
@@ -286,7 +286,7 @@ void mafGuiTransformMouse::CreateISA()
   IsaTranslate = IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
   
   IsaTranslate->SetListener(this);
-  IsaTranslate->SetVME(InputVME);
+  IsaTranslate->SetVME(m_InputVME);
   IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   // set the pivot point
   IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(absMatrix);
@@ -303,7 +303,7 @@ void mafGuiTransformMouse::CreateISA()
   
   // isa gen is sending matrix to the operation
   IsaRoll->SetListener(this);
-  IsaRoll->SetVME(InputVME);
+  IsaRoll->SetVME(m_InputVME);
   IsaRoll->GetRotationConstraint()->GetRefSys()->SetTypeToView();
   IsaRoll->GetRotationConstraint()->GetRefSys()->SetMatrix(absMatrix);
   
@@ -335,26 +335,26 @@ void mafGuiTransformMouse::EnableWidgets(bool enable)
 void mafGuiTransformMouse::AttachInteractorToVme()
 //----------------------------------------------------------------------------
 {
-  InputVME->SetBehavior(IsaCompositor);
+  m_InputVME->SetBehavior(IsaCompositor);
 }
 
 //----------------------------------------------------------------------------
 void mafGuiTransformMouse::DetachInteractorFromVme()
 //----------------------------------------------------------------------------
 {
-  InputVME->SetBehavior(OldInteractor);
+  m_InputVME->SetBehavior(OldInteractor);
 }
 
 //----------------------------------------------------------------------------
 void mafGuiTransformMouse::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
-  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-  IsaTranslate->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaTranslate->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-  IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-  IsaRotate->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRotate->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-  IsaRoll->GetRotationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-  IsaRoll->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRoll->GetRotationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+  IsaRoll->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
 }
