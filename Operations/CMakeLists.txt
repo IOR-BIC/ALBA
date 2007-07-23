@@ -50,6 +50,10 @@ SET(PROJECT_SRCS
   medOpCreateEditSkeleton.h
   medOpCreateSurface.cpp
   medOpCreateSurface.h
+  medOpMove.cpp
+  medOpMove.h
+  medOpScaleDataset.cpp
+  medOpScaleDataset.h
 )
 
 IF (MAF_USE_ITK)
