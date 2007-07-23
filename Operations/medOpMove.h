@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 08:50:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-23 13:45:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoMAFTransform_H__
-#define __mmoMAFTransform_H__
+#ifndef __medOpMove_H__
+#define __medOpMove_H__
 
 //----------------------------------------------------------------------------
 // includes :
