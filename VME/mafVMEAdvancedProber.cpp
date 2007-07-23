@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-18 09:29:32 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-07-23 10:13:51 $
+  Version:   $Revision: 1.14 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1652,7 +1652,7 @@ bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme)
   else
     return true;
 
-  if(m_ControlPoints->GetNumberOfPoints() == 0) return true;
+  if(m_ControlPoints->GetNumberOfPoints() == 0 || m_ControlPoints->GetNumberOfPoints() != tempPoints->GetNumberOfPoints()) return true;
 
   bool result = false;
   if(m_ControlPoints && tempPoints)
