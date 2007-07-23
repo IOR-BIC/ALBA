@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-18 12:08:27 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-07-23 10:12:36 $
+  Version:   $Revision: 1.17 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -537,6 +537,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 					}
 				}
 			}
+      mafEventMacro(mafEvent(this,ID_POSITION,m_Position));
 		break;
 		case ID_PLANE_SELECT:
 		{
@@ -656,6 +657,22 @@ void mafViewSingleSlice::SetSlice(double origin[3])
 	}
   // update text
   this->UpdateText();
+  if(m_Gui)
+  {
+    if(m_PlaneSelect == XY)
+    {
+      m_Position = origin[2];
+    }
+    else if(m_PlaneSelect == YZ)
+    {
+      m_Position = origin[0];
+    }
+    else if(m_PlaneSelect == ZX)
+    {
+      m_Position = origin[1];
+    }
+    m_Gui->Update();
+  }
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
