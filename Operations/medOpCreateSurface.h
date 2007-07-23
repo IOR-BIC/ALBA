@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-07-12 14:26:53 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-23 10:04:24 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -70,6 +70,9 @@ public:
 
 	/** Builds operation's interface by calling CreateOpDialog() method. */
 	void OpRun();
+
+	/** Execute the operation. */
+	virtual void OpDo();
 
 protected:
 
