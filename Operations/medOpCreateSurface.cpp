@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-23 10:04:24 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-07-23 11:13:53 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -102,7 +102,7 @@ void medOpCreateSurface::OpRun()
 	OpStop(OP_RUN_OK);
 }
 //----------------------------------------------------------------------------
-void mafOp::OpDo()   
+void medOpCreateSurface::OpDo()   
 //----------------------------------------------------------------------------
 {
 	if (m_Output)
