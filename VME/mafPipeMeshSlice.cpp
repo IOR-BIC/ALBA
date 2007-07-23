@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-17 10:17:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-23 14:21:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkPointData.h"
-#include "vtkFixedCutter.h"
+#include "vtkMAFMeshCutter.h"
 #include "vtkPlane.h"
 #include "vtkDelaunay2D.h"
 #include "vtkUnstructuredGrid.h"
@@ -113,7 +113,7 @@ void mafPipeMeshSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   double sr[2] = {0,1};
 
 	m_Plane	= vtkPlane::New();
-	m_Cutter = vtkFixedCutter::New();
+	m_Cutter = vtkMAFMeshCutter::New();
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);

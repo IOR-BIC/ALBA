@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeshSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-17 10:17:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-23 14:21:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class vtkPolyData;
 class vtkActor;
 class vtkProperty;
 class mafAxes;
-class vtkFixedCutter;
+class vtkMAFMeshCutter;
 class vtkPlane;
 class vtkDelaunay2D;
 
@@ -81,7 +81,7 @@ protected:
   vtkActor                *m_OutlineActor;
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;
-  vtkFixedCutter		      *m_Cutter;
+  vtkMAFMeshCutter		    *m_Cutter;
 
   double				           m_Border;
 
