@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-17 13:50:44 $
-Version:   $Revision: 1.22 $
+Date:      $Date: 2007-07-23 10:13:23 $
+Version:   $Revision: 1.23 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmaVolumeMaterial.h"
 #include "mafTransform.h"
 #include "mafTagArray.h"
+#include "mafViewSingleSlice.h"
 
 #include "vtkProbeFilter.h"
 #include "vtkPlaneSource.h"
@@ -198,7 +199,11 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
         for(int i=0; i< CT_CHILD_VIEWS_NUMBER; i++)
         {
           mafPipePolylineSlice *pipeSlice = (mafPipePolylineSlice*)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(i)->GetNodePipe(node);
-          if(pipeSlice) pipeSlice->SplineModeOn();
+          if(pipeSlice) 
+          {
+            pipeSlice->SplineModeOn();
+            pipeSlice->FillOn();
+          }
         }
 
 			  CameraUpdate();
@@ -276,6 +281,12 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 				}
 			}
 			break;
+      case mafViewSingleSlice::ID_POSITION:
+        {
+          SetCurrentZ(e->GetDouble());
+          ProbeVolume();
+        }
+        break;
 		default:
 			mafEventMacro(*maf_event);
 		}
