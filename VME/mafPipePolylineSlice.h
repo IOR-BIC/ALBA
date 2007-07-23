@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 10:52:46 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-07-23 10:27:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,7 @@ class vtkFixedCutter;
 class vtkPlane;
 class vtkTubeFilter;
 class vtkPolyData;
+class vtkDelaunay2D;
 
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
@@ -71,6 +72,13 @@ public:
   void SplineModeOn(){SetSplineMode(1);UpdateProperty();};
   void SplineModeOff(){SetSplineMode(0);UpdateProperty();};
 
+  /** Set spline mode of the polyline */
+  void SetFill(int flag){m_Fill = flag;};
+  int GetFill(){return m_Fill;};
+
+  void FillOn(){SetFill(1);UpdateProperty();};
+  void FillOff(){SetFill(0);UpdateProperty();};
+
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
   /** IDs for the GUI */
@@ -82,6 +90,7 @@ public:
     ID_TEXTURE_MAPPING_MODE,
     ID_BORDER_CHANGE,
     ID_SPLINE,
+    ID_FILL,
     ID_LAST,
   };
 
@@ -101,9 +110,11 @@ protected:
   vtkPlane				        *m_Plane;
   vtkFixedCutter		      *m_Cutter;
   vtkPolyData             *m_PolySpline;
+  vtkDelaunay2D           *m_Delaunay;
   double				           m_Border;
   double                   m_Radius;
-  int                     m_SplineMode;
+  int                      m_SplineMode;
+  int                      m_Fill;
 
   double	m_Origin[3];
   double	m_Normal[3];

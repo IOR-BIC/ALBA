@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 10:52:46 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-23 10:27:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,6 +47,9 @@
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
+#include "vtkDelaunay2D.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkTransform.h"
 
 #include <vector>
 
@@ -85,6 +88,8 @@ mafPipePolylineSlice::mafPipePolylineSlice()
 
   m_SplineMode = 0;
   m_SplineCoefficient = 10.0;
+
+  m_Fill = 0;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::Create(mafSceneNode *n)
@@ -112,6 +117,8 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
 
+  
+
 	//////////////////////////////////
   vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOn();
@@ -121,7 +128,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 	m_Tube->SetNumberOfSides(16);
 	m_Tube->Update();
 	
-	data = m_Tube->GetOutput();
+	//data = m_Tube->GetOutput();
 	//////////////////////////////////
 
 	m_Plane	= vtkPlane::New();
@@ -133,7 +140,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
 
-	m_Cutter->SetInput(data);
+	m_Cutter->SetInput(m_Tube->GetOutput());
 	m_Cutter->SetCutFunction(m_Plane);
 	m_Cutter->Update();
 
@@ -145,7 +152,15 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 
   m_Mapper = vtkPolyDataMapper::New();
 
-  m_Mapper->SetInput(m_Cutter->GetOutput());
+  vtkNEW(m_Delaunay);
+  m_Delaunay->SetInput(m_Cutter->GetOutput());
+	m_Delaunay->SetTolerance(0);
+  m_Delaunay->Update();
+
+  if(m_Fill)
+    m_Mapper->SetInput(m_Delaunay->GetOutput());
+  else
+    m_Mapper->SetInput(m_Cutter->GetOutput());
  
   
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
@@ -241,6 +256,7 @@ mmgGui *mafPipePolylineSlice::CreateGui()
   m_Gui = new mmgGui(this);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
   m_Gui->Bool(ID_SPLINE,_("spline"),&m_SplineMode);
+  m_Gui->Bool(ID_FILL,_("Fill"),&m_Fill);
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -262,8 +278,17 @@ void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
       {
         UpdateProperty();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-        break;
       }
+      break;
+    case ID_FILL:
+      {
+        if(m_Fill)
+          m_Mapper->SetInput(m_Delaunay->GetOutput());
+        else
+          m_Mapper->SetInput(m_Cutter->GetOutput());
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
       default:
         mafEventMacro(*e);
       break;
@@ -283,6 +308,7 @@ void mafPipePolylineSlice::SetSlice(double *Origin)
 		m_Plane->SetOrigin(m_Origin);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
+        UpdateProperty();
 	}
   if(m_Vme != NULL)
     m_Actor->GetProperty()->SetColor(((mafVMEPolyline *)m_Vme)->GetMaterial()->m_Diffuse);
@@ -301,6 +327,7 @@ void mafPipePolylineSlice::SetNormal(double *Normal)
 		m_Plane->SetNormal(m_Normal);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
+        UpdateProperty();
 	}
 }
 //----------------------------------------------------------------------------
@@ -345,8 +372,10 @@ void mafPipePolylineSlice::UpdateProperty()
 //----------------------------------------------------------------------------
 {
   mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
+  if(out_polyline == NULL) return;
   out_polyline->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+  if(data == NULL) return;
   data->Update();
 
   if(m_SplineMode)
@@ -354,7 +383,35 @@ void mafPipePolylineSlice::UpdateProperty()
 
   data->Modified();
   data->Update();
+
+  m_Tube->SetInput(data);
+  m_Tube->Update();
+  m_Cutter->SetInput(m_Tube->GetOutput());
   m_Cutter->Update();
+  
+  vtkMAFSmartPointer<vtkTransform> transform;
+	double alphaZ = acos(m_Normal[2]);
+	double alphaY = acos(m_Normal[1]);
+	double alphaX = acos(m_Normal[0]);
+	
+  const double pi = 3.14159;
+
+	transform->RotateX(alphaX*180/pi);
+	transform->RotateY(alphaY*180/pi);
+	transform->RotateZ(alphaZ*180/pi);
+	  
+	transform->Update();
+
+  m_Delaunay->SetInput(m_Cutter->GetOutput());
+	if(m_Normal[0] == 0 && m_Normal[1] == 0 && m_Normal[2] == 1);
+	else
+	  m_Delaunay->SetTransform(transform);
+  m_Delaunay->Update();
+
+  if(m_Fill)
+    m_Mapper->SetInput(m_Delaunay->GetOutput());
+  else
+    m_Mapper->SetInput(m_Cutter->GetOutput());
 
 }
 //----------------------------------------------------------------------------
