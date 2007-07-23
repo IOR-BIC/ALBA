@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 09:18:23 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-23 15:23:55 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ public:
   /**
   Enable/disable scaling. If scaling is enable scaling part of the transformation matrix is applied to vme 
   data while roto-translation is applied to vme pose matrix. If Disabled only roto-translation is applied 
-  while scaling is discarded (default is apply to data)*/
+  while scaling is discarded (default is enable)*/
   void EnableScalingOn(int enable) {m_EnableScaling = enable;};
   int GetEnableScaling() {return m_EnableScaling;};
 

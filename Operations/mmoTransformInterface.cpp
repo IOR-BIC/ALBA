@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-11 13:17:19 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-07-23 15:23:55 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -144,7 +144,11 @@ void mmoTransformInterface::OpDo()
 
   if (m_EnableScaling == 1 && 
       // group has no dataset
-      !m_Input->IsA("mafVMEGroup"))
+      !m_Input->IsA("mafVMEGroup") &&
+      //  landmarks do not scale
+      !m_Input->IsA("mafVMELandmark")
+     )
+
   {
     // apply scale to data
     
@@ -168,7 +172,6 @@ void mmoTransformInterface::OpDo()
       wxString progress_string("Applying scaling to data...");
       wxBusyInfo wait(progress_string.c_str());
 
-      //mafProgressMacro(tPDF.GetPointer(), progress_string.c_str());
       mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,tPDF.GetPointer()));
       tPDF->Update();
 
