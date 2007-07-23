@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-07-23 09:18:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,8 @@ class mafTransform;
 
   This class defines the basic structure to assemble components for vme transformations.
   Typical object that can be plugged in mmoTransformInterface concrete descendants are
-  gizmos and transform controls. See mmoMAFTransform for a concrete implementation.
+  gizmos (mafGizmoXXX)and gui transform components (mafGuiTransformXXX). See mmoMAFTransform
+  for a concrete implementation.
 
   @sa
   mmoMAFTransform, mafGuiTransformInterface, mafGizmoInterface
@@ -74,7 +75,7 @@ public:
   /**
   Enable/disable scaling. If scaling is enable scaling part of the transformation matrix is applied to vme 
   data while roto-translation is applied to vme pose matrix. If Disabled only roto-translation is applied 
-  while scaling is discarded */
+  while scaling is discarded (default is apply to data)*/
   void EnableScalingOn(int enable) {m_EnableScaling = enable;};
   int GetEnableScaling() {return m_EnableScaling;};
 
