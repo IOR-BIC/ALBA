@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-23 08:57:40 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2007-07-23 09:00:20 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -120,8 +120,8 @@ MafMedical is partially based on OpenMAF.
 	#include "mmoEditNormals.h"
 	#include "mmoCreateSurfaceParametric.h"
 	#include "mmoVOIDensity.h"
-        #include "medOpScaleDataset.h"
-        #include "medOpMove.h"
+  #include "medOpScaleDataset.h"
+  #include "medOpMove.h"
 #ifdef MAF_USE_ITK
 		#include "mmoClassicICPRegistration.h"
 #endif
@@ -262,8 +262,8 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mmoFlipNormals("Flip Normals"),"Modify");
 	m_Logic->Plug(new mmoRemoveCells("Remove Cells"),"Modify");
 	m_Logic->Plug(new mmoExtrusionHoles(),"Modify");
-        m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),"Modify");
-        m_Logic->Plug(new medOpMove("Move"),"Modify");    
+  m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),"Modify");
+  m_Logic->Plug(new medOpMove("Move"),"Modify");    
 	m_Logic->Plug(new mmoRegisterClusters("Clusters"),"Register");
 #ifdef MAF_USE_ITK
 		m_Logic->Plug(new mmoClassicICPRegistration("Surface"),"Register");
