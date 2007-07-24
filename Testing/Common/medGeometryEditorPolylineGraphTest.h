@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraphTest.h,v $
 Language:  C++
-Date:      $Date: 2007-07-24 08:40:54 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-24 10:09:22 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,6 +78,8 @@ public:
 	CPPUNIT_TEST( TestAddBranch );
 	CPPUNIT_TEST( TestSelectPoint );
 	CPPUNIT_TEST( TestDeletePoint );
+	CPPUNIT_TEST( TestSelectBranch );
+	CPPUNIT_TEST( TestInsertPoint );
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -90,6 +92,8 @@ protected:
 	void TestAddBranch();
 	void TestSelectPoint();
 	void TestDeletePoint();
+	void TestSelectBranch();
+	void TestInsertPoint();
 
 	void CreateExampleGraph();
 

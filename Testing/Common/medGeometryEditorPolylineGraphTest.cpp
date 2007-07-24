@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-24 08:40:54 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-24 10:09:22 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -282,11 +282,11 @@ void medGeometryEditorPolylineGraphTest::TestSelectPoint()
 	medGeometryEditorPolylineGraph *PolylineGraph = new medGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
 	double selectPointIn[3]={0.5,0.5,0.0};
 	PolylineGraph->SelectPoint(selectPointIn);
-	int id=PolylineGraph->GetVtkIdSelectedPoint();
+	int pointId=PolylineGraph->GetVtkIdSelectedPoint();
 
 	double selectPointOut[3];
 	vtkPolyData *output=PolylineGraph->GetOutput();
-	output->GetPoints()->GetPoint(id,selectPointOut);
+	output->GetPoints()->GetPoint(pointId,selectPointOut);
 	CPPUNIT_ASSERT(selectPointOut[0]==0.0 && selectPointOut[1]==0.0 && selectPointOut[2]==0.0);
 
 	vtkDEL(output);
@@ -310,6 +310,54 @@ void medGeometryEditorPolylineGraphTest::TestDeletePoint()
 
 	vtkPolyData *output=PolylineGraph->GetOutput();
 	CPPUNIT_ASSERT(output->GetNumberOfPoints()==m_NumberOfPointsGraph-1);
+
+	vtkDEL(output);
+	cppDEL(PolylineGraph);
+	mafDEL(polyline);
+}
+//----------------------------------------------------------------------------
+void medGeometryEditorPolylineGraphTest::TestSelectBranch()
+//----------------------------------------------------------------------------
+{
+	medVMEPolylineGraph *polyline;
+	mafNEW(polyline);
+	polyline->SetData(m_Graph,0.0);
+	polyline->GetOutput()->GetVTKData()->Update();
+	polyline->Update();
+
+	medGeometryEditorPolylineGraph *PolylineGraph = new medGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
+	double selectPoint[3]={12.5,11.0,0.0};
+	PolylineGraph->SelectBranch(selectPoint);
+	vtkIdType ID=PolylineGraph->GetVtkIdSelectBranch();
+	CPPUNIT_ASSERT(ID==5);
+
+	cppDEL(PolylineGraph);
+	mafDEL(polyline);
+}
+//----------------------------------------------------------------------------
+void medGeometryEditorPolylineGraphTest::TestInsertPoint()
+//----------------------------------------------------------------------------
+{
+	medVMEPolylineGraph *polyline;
+	mafNEW(polyline);
+	polyline->SetData(m_Graph,0.0);
+	polyline->GetOutput()->GetVTKData()->Update();
+	polyline->Update();
+
+	medGeometryEditorPolylineGraph *PolylineGraph = new medGeometryEditorPolylineGraph(NULL,NULL,polyline,true);
+	double insertPoint[3]={4.5,1.5,0.0};
+	double selectPoint[3]={5,2,0};
+	PolylineGraph->SelectPoint(selectPoint);
+	CPPUNIT_ASSERT(PolylineGraph->InsertPoint(insertPoint)==MAF_OK);
+
+	vtkPolyData *output=PolylineGraph->GetOutput();
+	CPPUNIT_ASSERT(output->GetCell(4)->GetNumberOfPoints()==10);
+	vtkIdList *pointList=output->GetCell(4)->GetPointIds();
+	for(int i=0;i<output->GetCell(4)->GetNumberOfPoints();i++)
+	{
+		if(pointList->GetId(i)==7)
+			CPPUNIT_ASSERT(pointList->GetId(i+1)==output->GetNumberOfPoints()-1);
+	}
 
 	vtkDEL(output);
 	cppDEL(PolylineGraph);
