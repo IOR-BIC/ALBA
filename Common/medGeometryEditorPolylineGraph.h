@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-20 14:14:33 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-07-24 09:17:44 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -45,6 +45,7 @@ MafMedical is partially based on OpenMAF.
 // Include:
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
+#include "mafPolylineGraph.h"
 #include "vtkSystemIncludes.h"
 
 //----------------------------------------------------------------------------
@@ -69,7 +70,7 @@ class vtkPolyData;
 class medGeometryEditorPolylineGraph: public mafObserver 
 {
 public:
-	medGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener = NULL, medVMEPolylineGraph *polyline=NULL);
+	medGeometryEditorPolylineGraph(mafVME *input=NULL, mafObserver *listener = NULL, medVMEPolylineGraph *polyline=NULL,bool testMode=false);
 	virtual ~medGeometryEditorPolylineGraph(); 
 
 	/** Set the event receiver object*/
@@ -101,21 +102,29 @@ public:
 
 	/** Select Point with the ID */
 	void SelectPoint(int pointID);
+
+	/** Return VTK ID of the point selected */
+	int GetVtkIdSelectedPoint(){return m_SelectedPointVTK;};
 	
 	/** Delete the nearest point to position */
-	void DeletePoint(double position[3]);
+	int DeletePoint(double position[3]);
 
 	/** Delete pointID-th point */
-	void DeletePoint(int pointID);
+	int DeletePoint(int pointID=UNDEFINED_POINT_ID);
 
 	/** Select the nearest branch to position */
 	void SelectBranch(double position[3]);
 
+	vtkIdType GetVtkIdSelectBranch(){vtkIdType cellID;m_PolylineGraph->GetOutputCellCorrespondingToBranch(m_SelectedBranch,&cellID);return cellID;};
+
 	/** Attach a new branch to the selected point and add a point (defined by position) to the new branch */
-	void AddBranch(double position[3]);
+	int AddBranch(double position[3]);
 
 	/** Insert a point defined by position between two points selected before */
 	void InsertPoint(double position[3]);
+
+	void SetTestModeOn(){m_TestMode=true;};
+	void SetTestModeOff(){m_TestMode=false;};
 
 protected:
 
@@ -169,5 +178,7 @@ protected:
 	vtkGlyph3D				*m_Glyph;
 	vtkTubeFilter			*m_Tube;
 	vtkAppendPolyData	*m_AppendPolydata;
+
+	bool m_TestMode;
 };
 #endif

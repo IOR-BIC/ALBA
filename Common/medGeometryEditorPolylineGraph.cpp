@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-20 14:14:33 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-07-24 09:17:44 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -51,7 +51,6 @@ MafMedical is partially based on OpenMAF.
 #include "mafDecl.h"
 
 #include "mmgGui.h"
-#include "mafPolylineGraph.h"
 #include "medVMEPolylineEditor.h"
 #include "medVMEPolylineGraph.h"
 #include "mmiPicker.h"
@@ -69,8 +68,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkCellData.h"
 #include "vtkCellLocator.h"
 #include "vtkOBBTree.h"
-#include "vtkCell.h"
 #include "vtkCellArray.h"
+#include "vtkCell.h"
 
 enum POINT_TOOL_ID
 {
@@ -91,10 +90,12 @@ enum ACTION_ID
 };
 
 //----------------------------------------------------------------------------
-medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener,medVMEPolylineGraph *polyline)
+medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, mafObserver *listener,medVMEPolylineGraph *polyline,bool testMode)
 //----------------------------------------------------------------------------
 {
 	m_PolylineGraph = new mafPolylineGraph;
+
+	m_TestMode = testMode;
 	
 	if(polyline)
 		m_PolylineGraph->CopyFromPolydata(vtkPolyData::SafeDownCast(polyline->GetOutput()->GetVTKData()));
@@ -104,7 +105,8 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 
 	mafNEW(m_VMEPolylineEditor);
 	m_VMEPolylineEditor->SetName("VME Editor");
-	m_VMEPolylineEditor->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
+	if(input)
+		m_VMEPolylineEditor->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
 
 	m_InputVME	=	input;
 	m_Listener	= listener;
@@ -120,15 +122,23 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 	m_SelectedPointVTK = UNDEFINED_POINT_ID;
 	m_SelectedBranch = UNDEFINED_BRANCH_ID;
 
-	CreateGui();
-	CreateISA();
+	m_OldBehavior = NULL;
+	m_Picker			= NULL;
+
+	if(!m_TestMode)
+	{
+		CreateGui();
+		CreateISA();
+	}
+
 	CreatePipe();
 
-	this->UpdateVMEEditorData(data);
+	UpdateVMEEditorData(data);
 	//m_VMEPolylineEditor->SetData(m_AppendPolydata->GetOutput(),0.0);
 
 	mafNEW(m_VMEPolylineSelection);
-	m_VMEPolylineSelection->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
+	if(input)
+		m_VMEPolylineSelection->ReparentTo(mafVME::SafeDownCast(input->GetRoot()));
 
 	m_SelectedPoint1ForInserting = UNDEFINED_POINT_ID;
 	m_SelectedPoint2ForInserting = UNDEFINED_POINT_ID; 
@@ -168,7 +178,8 @@ void medGeometryEditorPolylineGraph::CreatePipe()
 medGeometryEditorPolylineGraph::~medGeometryEditorPolylineGraph() 
 //----------------------------------------------------------------------------
 {
-	m_InputVME->SetBehavior(m_OldBehavior);
+	if(m_InputVME)
+		m_InputVME->SetBehavior(m_OldBehavior);
 
 	m_VMEPolylineEditor->SetBehavior(NULL);
 	m_VMEPolylineEditor->ReparentTo(NULL);
@@ -238,11 +249,15 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 				break;
 			case ID_BUTTON_POINT_DELETE:
 				{
-					DeletePoint(m_SelectedPoint);
-
-					m_SelectedPoint = UNDEFINED_POINT_ID;
-
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+					if(DeletePoint(m_SelectedPoint)==MAF_OK)
+					{
+						m_SelectedPoint = UNDEFINED_POINT_ID;
+						
+						if(!m_TestMode)
+							mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+					}
+					else
+						mafLogMessage("It's impossible to delete a point of degree > 2");
 				}
 				break;
 			case ID_BUTTON_BRANCH_DELETE:
@@ -454,7 +469,8 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 				AddNewVertex(pos);
 
-				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+				if(!m_TestMode)
+					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
 			}
 			else if(m_PointTool==ID_MOVE_POINT)
 			{
@@ -478,6 +494,12 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				pts->GetPoint(0,vertexCoord);
 
 				SelectPoint(vertexCoord);
+
+				if(!m_TestMode)
+				{
+					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+					mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
+				}
 
 				m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
 			}
@@ -519,9 +541,9 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 					vtkPoints *pts = NULL; 
 					pts = (vtkPoints *)e->GetVtkObj();
 					pts->GetPoint(0,pos);
-					if(m_PolylineGraph->GetConstVertexPtr(m_SelectedPoint)->GetDegree()>1)
+					
+					if(AddBranch(pos)==MAF_OK)
 					{
-						AddBranch(pos);
 
 						m_Action = ID_POINT_ACTION;
 						m_PointTool = ID_ADD_POINT;
@@ -530,9 +552,14 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 						m_Gui->Enable(ID_BRANCH_TOOL,m_Action==ID_BRANCH_ACTION);
 
 						m_Gui->Update();
+
+						if(!m_TestMode)
+							mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
 					}
 					else
+					{
 						mafLogMessage("Point must have degree > 1");
+					}
 				}
 			}
 		}
@@ -681,13 +708,14 @@ void medGeometryEditorPolylineGraph::SelectPoint(int pointID)
 
 	//VME Selection data are composed by sphere
 	m_VMEPolylineSelection->SetData(m_Glyph->GetOutput(),0.0);
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
 }
 //----------------------------------------------------------------------------
-void medGeometryEditorPolylineGraph::DeletePoint(int pointID)
+int medGeometryEditorPolylineGraph::DeletePoint(int pointID)
 //----------------------------------------------------------------------------
 {
+	if(pointID==UNDEFINED_POINT_ID)
+		pointID=m_SelectedPoint;
+
 	if(m_PolylineGraph->GetConstVertexPtr(pointID)->GetDegree()<3)//a point could be delete only if has degree < 3
 	{
 		vtkMAFSmartPointer<vtkIdList> vList;
@@ -702,68 +730,70 @@ void medGeometryEditorPolylineGraph::DeletePoint(int pointID)
 					branch=i;
 					branchFound=true;
 				}
-				if(!branchFound)
-					return;
+		if(!branchFound)
+			return MAF_ERROR;
 
-				bool branchMin=false;//check if in the branch there are only 2 vertices
-				if(m_PolylineGraph->GetConstBranchPtr(branch)->GetNumberOfVertices()<=2)
-					branchMin=true;
+		bool branchMin=false;//check if in the branch there are only 2 vertices
+		if(m_PolylineGraph->GetConstBranchPtr(branch)->GetNumberOfVertices()<=2)
+			branchMin=true;
 
-				while (m_PolylineGraph->GetConstVertexPtr(pointID)->GetDegree()>0)
-				{
-					m_PolylineGraph->DeleteEdge(m_PolylineGraph->GetConstVertexPtr(pointID)->GetEdgeId(0));
-				}
+		while (m_PolylineGraph->GetConstVertexPtr(pointID)->GetDegree()>0)
+		{
+			m_PolylineGraph->DeleteEdge(m_PolylineGraph->GetConstVertexPtr(pointID)->GetEdgeId(0));
+		}
 
-				if(!branchMin)
-					m_PolylineGraph->AddNewEdge(vList->GetId(0),vList->GetId(1));
+		if(!branchMin)
+			m_PolylineGraph->AddNewEdge(vList->GetId(0),vList->GetId(1));
 
-				m_PolylineGraph->DeleteVertex(pointID);
+		m_PolylineGraph->DeleteVertex(pointID);
 
-				if(!branchMin)
-				{
-					m_PolylineGraph->AddExistingEdgeToBranch(branch,m_PolylineGraph->GetMaxEdgeId());
+		if(!branchMin)
+		{
+			m_PolylineGraph->AddExistingEdgeToBranch(branch,m_PolylineGraph->GetMaxEdgeId());
 
-					int num=m_PolylineGraph->GetConstBranchPtr(m_PolylineGraph->GetMaxBranchId())->GetNumberOfEdges();
-					int *eList=new int[num];
+			int num=m_PolylineGraph->GetConstBranchPtr(m_PolylineGraph->GetMaxBranchId())->GetNumberOfEdges();
+			int *eList=new int[num];
 
-					for(int i=0;i<num;i++)
-						eList[i]=m_PolylineGraph->GetConstBranchPtr(m_PolylineGraph->GetMaxBranchId())->GetEdgeId(i);
+			for(int i=0;i<num;i++)
+				eList[i]=m_PolylineGraph->GetConstBranchPtr(m_PolylineGraph->GetMaxBranchId())->GetEdgeId(i);
 
-					//when a point is deleted 2 new branch are created because a branch should be connected.
-					m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
-					m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
+			//when a point is deleted 2 new branch are created because a branch should be connected.
+			m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
+			m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
 
-					//attach to the original branch the edge no connected
-					for(int i=0;i<num;i++)
-						m_PolylineGraph->AddExistingEdgeToBranch(branch,eList[i]);
-				}
-				else
-				{
-					m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
-				}
+			//attach to the original branch the edge no connected
+			for(int i=0;i<num;i++)
+				m_PolylineGraph->AddExistingEdgeToBranch(branch,eList[i]);
 
-				vtkMAFSmartPointer<vtkPolyData> poly;
-				m_PolylineGraph->CopyToPolydata(poly);
-				vtkMAFSmartPointer<vtkCharArray> scalar;
-				scalar->SetNumberOfComponents(1);
-				scalar->SetNumberOfTuples(m_PolylineGraph->GetNumberOfVertices());
-				for (int i=0;i<m_PolylineGraph->GetNumberOfVertices();i++)
-				{
-					scalar->SetTuple1(i,0);
-				}
-				poly->GetPointData()->SetScalars(scalar);
+			delete eList;
+		}
+		else
+		{
+			m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());
+		}
 
-				UpdateVMEEditorData(poly);
+		vtkMAFSmartPointer<vtkPolyData> poly;
+		m_PolylineGraph->CopyToPolydata(poly);
+		vtkMAFSmartPointer<vtkCharArray> scalar;
+		scalar->SetNumberOfComponents(1);
+		scalar->SetNumberOfTuples(m_PolylineGraph->GetNumberOfVertices());
+		for (int i=0;i<m_PolylineGraph->GetNumberOfVertices();i++)
+		{
+			scalar->SetTuple1(i,0);
+		}
+		poly->GetPointData()->SetScalars(scalar);
 
-				mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+		UpdateVMEEditorData(poly);
+		
+		return MAF_OK;
 	}
 	else
-	{
-		mafLogMessage("It's impossible to delete a point of degree > 2");
+	{		
+		return MAF_ERROR;
 	}
 }
 //----------------------------------------------------------------------------
-void medGeometryEditorPolylineGraph::DeletePoint(double position[3])
+int medGeometryEditorPolylineGraph::DeletePoint(double position[3])
 //----------------------------------------------------------------------------
 {
 	double minDistance=VTK_DOUBLE_MAX;
@@ -780,7 +810,7 @@ void medGeometryEditorPolylineGraph::DeletePoint(double position[3])
 		}
 	}
 	
-	DeletePoint(iMin);
+	return DeletePoint(iMin);
 }
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
@@ -861,17 +891,24 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,true));
 }
 //----------------------------------------------------------------------------
-void medGeometryEditorPolylineGraph::AddBranch(double position[3])
+int medGeometryEditorPolylineGraph::AddBranch(double position[3])
 //----------------------------------------------------------------------------
 {
-	m_PolylineGraph->AddNewBranch(m_SelectedPoint);
-	m_CurrentBranch = m_PolylineGraph->GetNumberOfBranches()-1;
+	if(m_PolylineGraph->GetConstVertexPtr(m_SelectedPoint)->GetDegree()>1)
+	{
+		if(m_PolylineGraph->AddNewBranch(m_SelectedPoint))
+		{
+			m_CurrentBranch = m_PolylineGraph->GetNumberOfBranches()-1;
 
-	AddNewVertex(position);
+			AddNewVertex(position);
 
-	m_VMEPolylineSelection->SetData(m_Tube->GetOutput(),0.0);
+			m_VMEPolylineSelection->SetData(m_Tube->GetOutput(),0.0);
 
-	m_SelectedPoint = UNDEFINED_POINT_ID;
+			m_SelectedPoint = UNDEFINED_POINT_ID;
 
-	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+			return MAF_OK;
+		}
+	}
+
+	return MAF_ERROR;
 }
