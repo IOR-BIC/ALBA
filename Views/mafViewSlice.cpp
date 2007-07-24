@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-18 12:08:14 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-07-24 08:15:00 $
+  Version:   $Revision: 1.38 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,7 @@
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipePolylineSlice.h"
+#include "mafPipeMeshSlice.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
@@ -74,6 +75,7 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
 
   m_CurrentSurface.clear();
 	m_CurrentPolyline.clear();
+  m_CurrentMesh.clear();
 
 	m_ShowVolumeTICKs =showTICKs;
 }
@@ -86,6 +88,7 @@ mafViewSlice::~mafViewSlice()
   vtkDEL(m_TextActor);
   m_CurrentSurface.clear();
 	m_CurrentPolyline.clear();
+  m_CurrentMesh.clear();
 }
 //----------------------------------------------------------------------------
 mafView *mafViewSlice::Copy(mafObserver *Listener)
@@ -342,6 +345,43 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
 			}
+      else if(pipe_name.Equals("mafPipeMeshSlice"))
+      {
+        double normal[3];
+        switch(m_CameraPosition)
+        {
+        case CAMERA_OS_X:
+          normal[0] = 1;
+          normal[1] = 0;
+          normal[2] = 0;
+          break;
+        case CAMERA_OS_Y:
+          normal[0] = 0;
+          normal[1] = 1;
+          normal[2] = 0;
+          break;
+        case CAMERA_OS_Z:
+          normal[0] = 0;
+          normal[1] = 0;
+          normal[2] = 1;
+          break;
+        case CAMERA_OS_P:
+          break;
+        case CAMERA_ARB:
+          this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+          break;
+        case CAMERA_PERSPECTIVE:
+          //this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+          break;
+        default:
+          normal[0] = 0;
+          normal[1] = 0;
+          normal[2] = 1;
+        }
+        m_CurrentMesh.push_back(n);
+        ((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice);
+        ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
+      }
 			pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
     }
@@ -498,6 +538,23 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 		}
 	}
 
+
+  if(!m_CurrentMesh.empty())
+  {
+    for(int i=0;i<m_CurrentMesh.size();i++)
+    {
+      if(m_CurrentMesh.at(i) && m_CurrentMesh.at(i)->m_Pipe)
+      {
+        mafString pipe_name = m_CurrentMesh.at(i)->m_Pipe->GetTypeName();
+        if (pipe_name.Equals("mafPipeMeshSlice"))
+        {
+          mafPipeMeshSlice *pipe = (mafPipeMeshSlice *)m_CurrentMesh[i]->m_Pipe;
+          pipe->SetSlice(origin); 
+        }
+      }
+    }
+  }
+
   // update text
   this->UpdateText();
 }
@@ -585,6 +642,15 @@ void mafViewSlice::UpdateSurfacesList(mafNode *node)
 			m_CurrentPolyline.erase(m_CurrentPolyline.begin()+i);
 		}
 	}
+
+  for(int i=0;i<m_CurrentMesh.size();i++)
+  {
+    if (m_CurrentMesh[i]==m_Sg->Vme2Node(node))
+    {
+      std::vector<mafSceneNode*>::iterator startIterator;
+      m_CurrentMesh.erase(m_CurrentMesh.begin()+i);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -695,4 +761,20 @@ void mafViewSlice::SetNormal(double normal[3])
 			}
 		}
 	}
+
+  if(!m_CurrentMesh.empty())
+  {
+    for(int i=0;i<m_CurrentMesh.size();i++)
+    {
+      if(m_CurrentMesh.at(i) && m_CurrentMesh.at(i)->m_Pipe)
+      {
+        mafString pipe_name = m_CurrentMesh.at(i)->m_Pipe->GetTypeName();
+        if (pipe_name.Equals("mafPipeMeshSlice"))
+        {
+          mafPipeMeshSlice *pipe = (mafPipeMeshSlice *)m_CurrentMesh[i]->m_Pipe;
+          pipe->SetNormal(normal); 
+        }
+      }
+    }
+  }
 }
