@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-24 09:17:44 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-07-24 10:08:45 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -512,10 +512,11 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 				m_Picker->EnableContinuousPicking(true);
 
-				InsertPoint(vertexCoord);
-
-				m_PointTool = ID_MOVE_POINT;
-				m_Gui->Update();
+				if(InsertPoint(vertexCoord)==MAF_OK)
+				{
+					m_PointTool = ID_MOVE_POINT;
+					m_Gui->Update();
+				}
 			}
 		}
 		else if(m_Action==ID_BRANCH_ACTION)
@@ -567,7 +568,7 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 	//mafLogMessage(wxString::Format("current branch %d di %d",m_CurrentBranch,m_PolylineGraph->GetNumberOfBranches()));
 }
 //----------------------------------------------------------------------------
-void medGeometryEditorPolylineGraph::InsertPoint(double position[3])
+int medGeometryEditorPolylineGraph::InsertPoint(double position[3])
 //----------------------------------------------------------------------------
 {
 	for(int i=0;i<m_PolylineGraph->GetNumberOfEdges();i++)
@@ -609,9 +610,12 @@ void medGeometryEditorPolylineGraph::InsertPoint(double position[3])
 
 			UpdateVMEEditorData(poly);
 
-			return;
+			delete eList;
+
+			return MAF_OK;
 		}
 	}
+	return MAF_ERROR;
 
 }
 //----------------------------------------------------------------------------

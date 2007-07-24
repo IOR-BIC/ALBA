@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-24 09:17:44 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-07-24 10:08:45 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -121,7 +121,7 @@ public:
 	int AddBranch(double position[3]);
 
 	/** Insert a point defined by position between two points selected before */
-	void InsertPoint(double position[3]);
+	int InsertPoint(double position[3]);
 
 	void SetTestModeOn(){m_TestMode=true;};
 	void SetTestModeOff(){m_TestMode=false;};
