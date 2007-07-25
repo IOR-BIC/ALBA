@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkTriangleQualityRatio.cxx,v $
 Language:  C++
-Date:      $Date: 2007-04-17 11:04:26 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-07-25 09:41:03 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -130,11 +130,10 @@ void vtkTriangleQualityRatio::Update()
 
 		double area = vtkTriangle::TriangleArea(vertex1,vertex2,vertex3);
 		double qualityLocal;
-		if(area>0.000001)
+		qualityLocal = 0.5 * perimeter * longestEdge / area;
+		qualityLocal = qualityRatioNormalize/qualityLocal;
+		if(qualityLocal>0.00001)
 		{
-			
-			qualityLocal = 0.5 * perimeter * longestEdge / area;
-			qualityLocal = qualityRatioNormalize/qualityLocal;
 			qualitySum += qualityLocal;
 			if(qualityLocal>m_MaxRatio)
 				m_MaxRatio = qualityLocal;
