@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-11 08:50:09 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-07-25 10:15:27 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -58,6 +58,8 @@ MafMedical is partially based on OpenMAF.
 #include "mmiSelectPoint.h"
 #include "mafVMESurface.h"
 
+#include "vtkMAFSmartPointer.h"
+
 #include "vtkRenderWindow.h"
 #include "vtkHoleConnectivity.h"
 #include "vtkPolyDataMapper.h"
@@ -69,6 +71,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkTextureMapToPlane.h"
 #include "vtkLinearExtrusionFilter.h"
 #include "vtkCleanPolyData.h"
+#include "vtkTriangleFilter.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoExtrusionHoles);
@@ -241,7 +244,10 @@ void mmoExtrusionHoles::SaveExtrusion()
 	vtkNEW(clean);
 	clean->SetInput(m_ResultAfterExtrusion->GetOutput());
 	clean->Update();
-	m_ResultPolydata->DeepCopy(clean->GetOutput());
+	vtkMAFSmartPointer<vtkTriangleFilter> triangle;
+	triangle->SetInput(clean->GetOutput());
+	triangle->Update();
+	m_ResultPolydata->DeepCopy(triangle->GetOutput());
 	m_ResultPolydata->Update();
 	if(!m_TestMode)
 	{
