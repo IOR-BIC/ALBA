@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-26 09:11:11 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-07-25 14:06:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -539,8 +539,8 @@ char** mafVMESurfaceParametric::GetIcon()
 //-------------------------------------------------------------------------
 {
 
-  #include "mafVMESurface.xpm"
-  return mafVMESurface_xpm;
+  #include "mafVMEProcedural.xpm"
+  return mafVMEProcedural_xpm;
 
 
 
