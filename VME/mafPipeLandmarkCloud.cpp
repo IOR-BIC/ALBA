@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 11:41:35 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-07-25 11:38:16 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -141,16 +141,20 @@ void mafPipeLandmarkCloud::Select(bool sel)
 mmgGui *mafPipeLandmarkCloud::CreateGui()
 //----------------------------------------------------------------------------
 {
-  assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
-  m_Gui->Bool(ID_SCALAR_VISIBILITY,_("scalar vis."), &m_ScalarVisibility,0,_("turn on/off the scalar visibility"));
-  m_Gui->Divider();
-  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
-  m_Gui->AddGui(m_MaterialButton->GetGui());
-  m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,_("display list"),&m_RenderingDisplayListFlag,0,_("turn on/off \nrendering displaylist calculation"));
-	m_Gui->Divider();
+	assert(m_Gui == NULL);
+	m_Gui = new mmgGui(this);
+	if(m_Landmark)
+	{
+		
+		m_Gui->Bool(ID_SCALAR_VISIBILITY,_("scalar vis."), &m_ScalarVisibility,0,_("turn on/off the scalar visibility"));
+		m_Gui->Divider();
+		m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+		m_Gui->AddGui(m_MaterialButton->GetGui());
+		m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,_("display list"),&m_RenderingDisplayListFlag,0,_("turn on/off \nrendering displaylist calculation"));
+		m_Gui->Divider();
+	}
 
-  return m_Gui;
+	return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::UpdateProperty(bool fromTag)
