@@ -55,8 +55,6 @@ IF (MAF_USE_VTK)
     mmoImageImporter.h
     mmoMAFTransform.cpp
     mmoMAFTransform.h
-    mmoMAFTransformScale.cpp
-    mmoMAFTransformScale.h
     mmoMSFExporter.cpp
     mmoMSFExporter.h
     mmoMSF1xImporter.cpp
