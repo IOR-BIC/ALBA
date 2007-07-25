@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-11 13:53:26 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-07-25 13:08:03 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -149,7 +149,7 @@ void mmoFlipNormals::OpRun()
 //----------------------------------------------------------------------------
 {
 
-	if(!(vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCellData()->GetNormals())
+	if(!((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCellData()->GetNormals()))
 	{
 		vtkMAFSmartPointer<vtkPolyDataNormals> normalFilter;
 		normalFilter->SetInput((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
