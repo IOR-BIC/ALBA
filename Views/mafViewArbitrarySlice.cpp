@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-25 12:21:42 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-07-25 12:55:59 $
+  Version:   $Revision: 1.20 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -308,8 +308,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		if(Vme->IsA("mafVMEVolumeGray"))
 		{
 			//this->GetSceneGraph()->VmeRemove(m_Slicer);
-			m_Slicer->ReparentTo(NULL);
 			m_AttachCamera->SetVme(NULL);
+			m_Slicer->ReparentTo(NULL);
 
 			//remove gizmos
 			m_Gui->Remove(m_GuiGizmos);
@@ -345,7 +345,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
 	}
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
