@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-25 13:00:55 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-07-25 12:21:42 $
+  Version:   $Revision: 1.19 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -534,6 +534,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
           int low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
+					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
       }
 			break;
