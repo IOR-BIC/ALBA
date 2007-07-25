@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkClipSurfaceBoundingBox.h,v $
 Language:  C++
-Date:      $Date: 2007-05-25 14:31:41 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-25 11:41:26 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,9 +32,9 @@ class VTK_vtkMAF_EXPORT vtkClipSurfaceBoundingBox : public vtkPolyDataToPolyData
 
 public:
 
-	static vtkClipSurfaceBoundingBox *New() {return new vtkClipSurfaceBoundingBox;};
+	static vtkClipSurfaceBoundingBox *New();
 
-	vtkTypeMacro(vtkClipSurfaceBoundingBox,vtkObject);
+	vtkTypeRevisionMacro(vtkClipSurfaceBoundingBox,vtkObject);
 
 	void SetMask(vtkPolyData *mask) {this->SetNthInput(1, mask);};
 	vtkPolyData *GetMask() { return (vtkPolyData *)(this->Inputs[1]);};

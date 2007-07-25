@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkClipSurfaceBoundingBox.cxx,v $
 Language:  C++
-Date:      $Date: 2007-05-25 14:31:41 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-07-25 11:41:26 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -19,6 +19,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkImplicitPolyData.h"
 #include "vtkLinearSubdivisionFilter.h"
 #include "vtkClipPolyData.h"
+
+vtkCxxRevisionMacro(vtkClipSurfaceBoundingBox, "$Revision: 1.2 $");  
+vtkStandardNewMacro(vtkClipSurfaceBoundingBox);
+
 //-------------------------------------------------------------------------
 vtkClipSurfaceBoundingBox::vtkClipSurfaceBoundingBox()
 //-------------------------------------------------------------------------
