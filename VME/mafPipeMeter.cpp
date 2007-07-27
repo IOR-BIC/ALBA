@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 10:51:35 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-07-27 11:02:52 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -170,9 +170,9 @@ void mafPipeMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Caption->SetHeight(0.05);
   m_Caption->SetWidth(0.35);
   m_Caption->BorderOff();
-  mafString dis;
-  dis << m_MeterVME->GetDistance();
-  m_Caption->SetCaption(dis.GetCStr());
+  wxString dis;
+  dis = wxString::Format("%.2f",m_MeterVME->GetDistance());
+  m_Caption->SetCaption(dis.c_str());
 
   if(m_MeterVME->GetMeterMode() == mafVMEMeter::LINE_ANGLE)
     m_Caption->SetVisibility((m_MeterVME->GetAngle() != 0) && m_MeterVME->GetMeterAttributes()->m_LabelVisibility);

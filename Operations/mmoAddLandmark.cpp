@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 15:16:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-07-27 11:05:21 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,7 @@
 
 #include "vtkDataSet.h"
 #include "vtkPoints.h"
+
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoAddLandmark);
@@ -162,47 +163,7 @@ void mmoAddLandmark::OpRun()
 		m_OldBehavior = m_PickedVme->GetBehavior();
 		m_PickedVme->SetBehavior(m_LandmarkPicker);
 
-		mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
-
-		// setup gui_panel
-		m_GuiPanel = new mmgNamedPanel(mafGetFrame(),-1);
-		m_GuiPanel->SetTitle(_("Add Landmark:"));
-
-		// setup splitter
-		mmgSplittedPanel *sp = new mmgSplittedPanel(m_GuiPanel,-1);
-		m_GuiPanel->Add(sp,1,wxEXPAND);
-
-		// setup dictionary
-		m_Dict = new mmgDictionaryWidget(sp,-1);
-		m_Dict->SetListener(this);
-		m_Dict->SetCloud(m_Cloud);
-		sp->PutOnTop(m_Dict->GetWidget());
-
-		// setup GuiHolder
-		m_Guih = new mmgGuiHolder(sp,-1,false,true);
-		sp->PutOnBottom(m_Guih);
-	  
-		// setup Gui
-		m_Gui = new mmgGui(this);
-		m_Gui->SetListener(this);
-		m_Gui->Button(ID_LOAD,_("load dictionary"));
-		m_Gui->Divider();
-		m_Gui->Label(_("landmark name"));
-		m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
-    m_Gui->Divider();
-		m_Gui->Bool(ID_ADD_TO_CURRENT_TIME, _("current time"),&m_AddToCurrentTime,0,tooltip);
-    m_Gui->Divider();
-		m_Gui->Label(_("choose a name from the dictionary"));
-		m_Gui->Label(_("and place landmark by"));
-		m_Gui->Label(_("clicking on the parent surface"));
-    m_Gui->Divider();
-		m_Gui->Vector(ID_CHANGE_POSITION, _("Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
-		m_Gui->OkCancel();
-		m_Gui->Enable(wxOK, false);
 		
-		// Show Gui
-		m_Guih->Put(m_Gui);
-		mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_GuiPanel));
 	}
 	else
 	{
@@ -224,31 +185,54 @@ void mmoAddLandmark::OpRun()
 			mafEventMacro(mafEvent(this,VME_SHOW,m_Cloud,true));
 			m_CloudCreatedFlag = true;
 		}
-
-		mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
-
-		m_Gui = new mmgGui(this);
-		m_Gui->SetListener(this);
-    m_Gui->Divider();
-		m_Gui->Label(_("landmark name"));
-		m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
-    m_Gui->Divider();
-		m_Gui->Button(ID_ADD_LANDMARK,_("add landmark"));
-    m_Gui->Divider();
-		m_Gui->Bool(ID_ADD_TO_CURRENT_TIME,_("current time"),&m_AddToCurrentTime,0,tooltip);
-    m_Gui->Divider();
-		m_Gui->Label(_("After Add landmark"));
-		m_Gui->Label(_("Change its position using"));
-		m_Gui->Label(_("the following boxes"));
-    m_Gui->Divider();
-		m_Gui->Vector(ID_CHANGE_POSITION, _("Set Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
-		m_Gui->OkCancel();
-		m_Gui->Enable(wxOK, false);
-
-		m_Gui->Divider();
-
-		ShowGui();
 	}
+  
+  mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
+
+  // setup gui_panel
+  m_GuiPanel = new mmgNamedPanel(mafGetFrame(),-1);
+  m_GuiPanel->SetTitle(_("Add Landmark:"));
+
+  // setup splitter
+  mmgSplittedPanel *sp = new mmgSplittedPanel(m_GuiPanel,-1);
+  m_GuiPanel->Add(sp,1,wxEXPAND);
+
+  // setup dictionary
+  m_Dict = new mmgDictionaryWidget(sp,-1);
+  m_Dict->SetListener(this);
+  m_Dict->SetCloud(m_Cloud);
+  sp->PutOnTop(m_Dict->GetWidget());
+
+  // setup GuiHolder
+  m_Guih = new mmgGuiHolder(sp,-1,false,true);
+  
+
+  // setup Gui
+  m_Gui = new mmgGui(this);
+  m_Gui->SetListener(this);
+  m_Gui->Button(ID_LOAD,_("load dictionary"));
+  m_Gui->Divider();
+  m_Gui->Label(_("landmark name"));
+  m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
+  m_Gui->Divider();
+  m_Gui->Button(ID_ADD_LANDMARK,_("add landmark"));
+  m_Gui->Divider();
+  m_Gui->Bool(ID_ADD_TO_CURRENT_TIME, _("current time"),&m_AddToCurrentTime,1,tooltip);
+  m_Gui->Divider();
+  m_Gui->Label(_("choose a name from the dictionary"));
+  m_Gui->Label(_("and place landmark by"));
+  m_Gui->Label(_("clicking on the parent surface"));
+  m_Gui->Divider();
+  m_Gui->Vector(ID_CHANGE_POSITION, _("Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
+  m_Gui->OkCancel();
+  m_Gui->Enable(wxOK, false);
+
+  // Show Gui
+  m_Guih->Put(m_Gui);
+
+  sp->PutOnBottom(m_Guih);
+  mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_GuiPanel));
+
 }
 //----------------------------------------------------------------------------
 void mmoAddLandmark::OpDo()

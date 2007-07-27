@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDictionaryWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 16:52:24 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-07-27 11:02:28 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@
 #include "mafXMLStorage.h"
 #include "mafStorageElement.h"
 
-wxString mmgDictionaryWidget::m_File = "";
+
 
 enum DICTIONARY_WIDGET_ID
 {
@@ -53,6 +53,7 @@ mmgDictionaryWidget::mmgDictionaryWidget(wxWindow *parent, int id)
   m_NumItem = 0;
   m_Items = NULL;
   m_Vme   = NULL;
+  m_File = "";
 
   m_List = new mmgListCtrl(parent,id,false,true);
   m_List->Show(false);

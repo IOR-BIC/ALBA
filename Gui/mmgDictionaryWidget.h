@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDictionaryWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-07-27 11:02:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,6 +55,9 @@ public:
 	/** Return dictionary gui. */
   wxWindow *GetWidget() {return (wxWindow *)m_List;};
 
+  /** Return file name dictionary */
+  const char* GetDictionaryFileName(){return m_File;};
+
 protected:
 	/** Set the icon of the item to red or gray according to valid. */
   void ValidateItem(wxString item, bool valid = true);
@@ -63,7 +66,7 @@ protected:
   void ValidateAllItem(bool valid = true);
 
   mafObserver   *m_Listener;
-	static wxString			m_File;
+	wxString			m_File;
   int									m_NumItem;
 	wxString					**m_Items;
   mmgListCtrl				 *m_List;

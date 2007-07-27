@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-11 14:15:08 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-07-27 11:05:05 $
+  Version:   $Revision: 1.15 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,13 +81,15 @@ bool mmoCrop::Accept(mafNode* node)
 {
 	mafEvent e(this,VIEW_SELECTED);
 	mafEventMacro(e);
-	return (node && node->IsA("mafVMEVolumeGray") && e.GetBool());
+	return (node && node->IsA("mafVMEVolumeGray") /*&& e.GetBool()*/);
 }
 //----------------------------------------------------------------------------
 void mmoCrop::OpRun()   
 //----------------------------------------------------------------------------
 {
 	//m_Input->Modified();
+  mafEvent e(this,VIEW_SELECTED);
+  mafEventMacro(e);
 
 	mafVME* volume = mafVME::SafeDownCast(m_Input);
 	volume->Update();
@@ -95,7 +97,7 @@ void mmoCrop::OpRun()
 	if(!m_TestMode)
 	{
 		m_GizmoROI = new mafGizmoROI(volume, this,mafGizmoHandle::BOUNDS);
-		m_GizmoROI->Show(true);
+		m_GizmoROI->Show(e.GetBool());
 	}
 
 	if (volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
