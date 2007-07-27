@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-24 08:15:00 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-07-27 12:53:11 $
+  Version:   $Revision: 1.39 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
 #include "mafVMEAdvancedSlicer.h"
+#include "medPipePolylineGraphEditor.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -75,6 +76,7 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
 
   m_CurrentSurface.clear();
 	m_CurrentPolyline.clear();
+	m_CurrentPolylineGraphEditor.clear();
   m_CurrentMesh.clear();
 
 	m_ShowVolumeTICKs =showTICKs;
@@ -88,6 +90,7 @@ mafViewSlice::~mafViewSlice()
   vtkDEL(m_TextActor);
   m_CurrentSurface.clear();
 	m_CurrentPolyline.clear();
+	m_CurrentPolylineGraphEditor.clear();
   m_CurrentMesh.clear();
 }
 //----------------------------------------------------------------------------
@@ -345,6 +348,45 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
 			}
+			else if(pipe_name.Equals("medPipePolylineGraphEditor"))
+			{
+				double normal[3];
+				switch(m_CameraPosition)
+				{
+				case CAMERA_OS_X:
+					normal[0] = 1;
+					normal[1] = 0;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Y:
+					normal[0] = 0;
+					normal[1] = 1;
+					normal[2] = 0;
+					break;
+				case CAMERA_OS_Z:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+					break;
+				case CAMERA_OS_P:
+					break;
+					//case CAMERA_OS_REP:
+					//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+				case CAMERA_PERSPECTIVE:
+					break;
+				default:
+					normal[0] = 0;
+					normal[1] = 0;
+					normal[2] = 1;
+				}
+				m_CurrentPolylineGraphEditor.push_back(n);
+				if(m_CameraPosition==CAMERA_OS_P)
+					((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
+				else
+					((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();
+				((medPipePolylineGraphEditor *)pipe)->SetSlice(m_Slice);
+				((medPipePolylineGraphEditor *)pipe)->SetNormal(normal);
+			}
       else if(pipe_name.Equals("mafPipeMeshSlice"))
       {
         double normal[3];
@@ -538,6 +580,16 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 		}
 	}
 
+	for(int i=0;i<m_CurrentPolylineGraphEditor.size();i++)
+	{
+		mafString pipe_name = m_CurrentPolylineGraphEditor.at(i)->m_Pipe->GetTypeName();
+		if (pipe_name.Equals("medPipePolylineGraphEditor"))
+		{
+			medPipePolylineGraphEditor *pipe = (medPipePolylineGraphEditor *)m_CurrentPolylineGraphEditor[i]->m_Pipe;
+			pipe->SetSlice(origin); 
+		}
+	}
+
 
   if(!m_CurrentMesh.empty())
   {
@@ -643,6 +695,15 @@ void mafViewSlice::UpdateSurfacesList(mafNode *node)
 		}
 	}
 
+	for(int i=0;i<m_CurrentPolylineGraphEditor.size();i++)
+	{
+		if (m_CurrentPolylineGraphEditor[i]==m_Sg->Vme2Node(node))
+		{
+			std::vector<mafSceneNode*>::iterator startIterator;
+			m_CurrentPolylineGraphEditor.erase(m_CurrentPolylineGraphEditor.begin()+i);
+		}
+	}
+
   for(int i=0;i<m_CurrentMesh.size();i++)
   {
     if (m_CurrentMesh[i]==m_Sg->Vme2Node(node))
@@ -692,6 +753,10 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     m_Rwi->CameraReset(node);
     m_Rwi->CameraUpdate();
   }
+	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor"))
+	{
+		this->UpdateSurfacesList(node);
+	}
   
 	Superclass::VmeShow(node, show);
 }
@@ -756,6 +821,22 @@ void mafViewSlice::SetNormal(double normal[3])
 				if (pipe_name.Equals("mafPipePolylineSlice"))
 				{
 					mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
+					pipe->SetNormal(normal); 
+				}
+			}
+		}
+	}
+
+	if(!m_CurrentPolylineGraphEditor.empty())
+	{
+		for(int i=0;i<m_CurrentPolylineGraphEditor.size();i++)
+		{
+			if(m_CurrentPolylineGraphEditor.at(i) && m_CurrentPolylineGraphEditor.at(i)->m_Pipe)
+			{
+				mafString pipe_name = m_CurrentPolylineGraphEditor.at(i)->m_Pipe->GetTypeName();
+				if (pipe_name.Equals("medPipePolylineGraphEditor"))
+				{
+					medPipePolylineGraphEditor *pipe = (medPipePolylineGraphEditor *)m_CurrentPolylineGraphEditor[i]->m_Pipe;
 					pipe->SetNormal(normal); 
 				}
 			}
