@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 08:50:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-07-27 09:31:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,9 +101,9 @@ medOpMove::~medOpMove()
 bool medOpMove::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
-	mafEvent e(this,VIEW_SELECTED);
-	mafEventMacro(e);
-	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData") && e.GetBool());
+	/*mafEvent e(this,VIEW_SELECTED);
+	mafEventMacro(e);*/
+	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData") /*&& e.GetBool()*/);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpMove::Copy()   
@@ -230,17 +230,20 @@ void medOpMove::OnEventThis(mafEventBase *maf_event)
       {
         m_GuiTransformMouse->EnableWidgets(false);
 
+        mafEvent e(this,VIEW_SELECTED);
+        mafEventMacro(e);
+
         if (m_ActiveGizmo == TR_GIZMO)
         {
           m_GizmoRotate->Show(false);
           m_GizmoTranslate->SetRefSys(m_RefSysVME);
-          m_GizmoTranslate->Show(true);
+          m_GizmoTranslate->Show(true && e.GetBool());
         }
         else if (m_ActiveGizmo == ROT_GIZMO)
         {
           m_GizmoTranslate->Show(false);
           m_GizmoRotate->SetRefSys(m_RefSysVME);
-          m_GizmoRotate->Show(true);
+          m_GizmoRotate->Show(true && e.GetBool());
         }
       }
       mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -249,17 +252,20 @@ void medOpMove::OnEventThis(mafEventBase *maf_event)
     
     case ID_CHOOSE_GIZMO_COMBO:
     {
+      mafEvent e(this,VIEW_SELECTED);
+      mafEventMacro(e);
+
       if (m_ActiveGizmo == TR_GIZMO)
       {
         m_GizmoRotate->Show(false);
         m_GizmoTranslate->SetRefSys(m_RefSysVME);
-        m_GizmoTranslate->Show(true);
+        m_GizmoTranslate->Show(true && e.GetBool());
       }
       else if (m_ActiveGizmo == ROT_GIZMO)
       {
         m_GizmoTranslate->Show(false);
         m_GizmoRotate->SetRefSys(m_RefSysVME);
-        m_GizmoRotate->Show(true);
+        m_GizmoRotate->Show(true && e.GetBool());
       }
       else if (m_ActiveGizmo == SCAL_GIZMO)
       {

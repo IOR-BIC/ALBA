@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-20 10:48:39 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-07-27 09:31:45 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -114,7 +114,7 @@ bool medOpVolumeResample::Accept(mafNode* vme)
 {
 	mafEvent e(this,VIEW_SELECTED);
 	mafEventMacro(e);
-  return (vme && vme->IsMAFType(mafVMEVolumeGray) && e.GetBool());
+  return (vme && vme->IsMAFType(mafVMEVolumeGray) /*&& e.GetBool()*/);
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
@@ -157,8 +157,11 @@ void medOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
 void medOpVolumeResample::CreateGizmos()
 //----------------------------------------------------------------------------
 {
+  mafEvent e(this,VIEW_SELECTED);
+  mafEventMacro(e);
+
 	m_GizmoROI = new mafGizmoROI(mafVME::SafeDownCast(m_Input), this, mafGizmoHandle::FREE,m_VMEDummy);
-	m_GizmoROI->Show(true);
+	m_GizmoROI->Show(true && e.GetBool());
 	m_GizmoROI->GetBounds(m_VolumeBounds);
 
 	SetBoundsToVMELocalBounds();
@@ -201,7 +204,7 @@ void medOpVolumeResample::CreateGizmos()
 		m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_Input), this);
 		m_GizmoTranslate->SetRefSys(mafVME::SafeDownCast(m_Input));
 		m_GizmoTranslate->SetAbsPose(m_CenterVolumeRefSysMatrix);
-		m_GizmoTranslate->Show(true);
+		m_GizmoTranslate->Show(true && e.GetBool());
 		m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_Input), this);
 		m_GizmoRotate->SetRefSys(mafVME::SafeDownCast(m_Input));
 		m_GizmoRotate->SetAbsPose(m_CenterVolumeRefSysMatrix);
