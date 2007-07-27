@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 10:10:33 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-07-27 09:33:00 $
+  Version:   $Revision: 1.32 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,7 +91,7 @@ mafViewRXCT::mafViewRXCT(wxString label)
 
   m_RightOrLeft=1;
   m_MoveAllSlices = 0; 
-  m_Snap=1;
+  m_Snap=0;
   m_CurrentSurface.clear();
   m_AllSurface=0;
   m_Border=1;
@@ -538,6 +538,13 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
         OnEventSetThickness();
       }
       break;
+
+      case ID_RESET_SLICES:
+        {
+          assert(m_CurrentVolume);
+          this->ResetSlicesPosition(m_CurrentVolume);
+        }
+        break;
       
       case ID_ALL_SURFACE:
       {
@@ -602,6 +609,7 @@ mmgGui* mafViewRXCT::CreateGui()
 	for(int i=0;i<=CT_CHILD_VIEWS_NUMBER;i++)
 		(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetGui());
 
+  m_Gui->Button(ID_RESET_SLICES,"reset slices","");
 	m_Gui->Divider();
   EnableWidgets(m_CurrentVolume != NULL);
 
@@ -662,6 +670,7 @@ void mafViewRXCT::EnableWidgets(bool enable)
   if (m_Gui)
   {
     m_Gui->Enable(ID_LUT_WIDGET,enable);
+    m_Gui->Enable(ID_RESET_SLICES, enable);
   }
 }
 //----------------------------------------------------------------------------
@@ -811,4 +820,12 @@ void mafViewRXCT::BoundsValidate(double *pos)
 				pos[i]=b[i*2+1];
 		}
 	}
+}
+void mafViewRXCT::ResetSlicesPosition( mafNode *node )
+{
+  // workaround... :(
+  // maybe we need some mechanism to execute view code from op?
+  this->VmeShow(node, false);
+  this->VmeShow(node, true);
+  CameraUpdate();
 }

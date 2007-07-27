@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 14:56:58 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-07-27 09:33:00 $
+  Version:   $Revision: 1.12 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,6 +66,7 @@ public:
     ID_ADJUST_SLICES,
     ID_BORDER_CHANGE,
     ID_ALL_SURFACE,
+    ID_RESET_SLICES,
     ID_LAST
   };
 
@@ -103,6 +104,9 @@ protected:
   /**
   Sort the slice */
   void SortSlices();
+
+  /** Reset slice positions  */
+  void ResetSlicesPosition(mafNode *node);
 
 	/**
 	Check if the gizmo posiztion is inside the bounding box*/
