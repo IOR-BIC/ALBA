@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-07 14:29:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-08-07 14:32:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,6 @@
 
 #include "mafOpImporterMSF.h"
 
-#include <wx/busyinfo.h>
 #include <wx/zipstrm.h>
 #include <wx/zstream.h>
 #include <wx/fs_zip.h>
