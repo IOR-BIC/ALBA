@@ -13,6 +13,8 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
+    mafOpImporterMSF.cpp
+    mafOpImporterMSF.h
     mmo2DMeasure.cpp
     mmo2DMeasure.h
     mmoAddLandmark.cpp
