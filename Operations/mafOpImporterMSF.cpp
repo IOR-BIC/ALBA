@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-07 10:19:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-08-07 14:29:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,11 +64,10 @@ mafOp* mafOpImporterMSF::Copy()
 void mafOpImporterMSF::OpRun()   
 //----------------------------------------------------------------------------
 {
-  mafString fileDir = mafGetApplicationDirectory().c_str();
-  mafString wildc  = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
-
   if (!m_TestMode)
   {
+    mafString fileDir = mafGetApplicationDirectory().c_str();
+    mafString wildc  = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
     m_File = mafGetOpenFile(fileDir, wildc, _("Choose MSF file")).c_str();
   }
 
@@ -95,7 +94,8 @@ int mafOpImporterMSF::ImportMSF()
     unixname = ZIPOpen(m_File);
     if(unixname.IsEmpty())
     {
-      mafMessage("Bad or corrupted zmsf file!");
+      if (!m_TestMode)
+        mafMessage(_("Bad or corrupted zmsf file!"));
       return MAF_ERROR;
     }
     wxSetWorkingDirectory(m_TmpDir.GetCStr());
@@ -126,7 +126,8 @@ int mafOpImporterMSF::ImportMSF()
   if (res != MAF_OK)
   {
     // if some problems occurred during import give feedback to the user
-    mafErrorMessage(_("Errors during file parsing! Look the log area for error messages."));
+    if (!m_TestMode)
+      mafErrorMessage(_("Errors during file parsing! Look the log area for error messages."));
     //return MAF_ERROR;
   }
       
@@ -264,7 +265,8 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
 
   if (m_MSFFile == "")
   {
-    mafMessage(_("compressed archive is not a valid msf file!"), _("Error"));
+    if (!m_TestMode)
+      mafMessage(_("compressed archive is not a valid msf file!"), _("Error"));
     return "";
   }
 
