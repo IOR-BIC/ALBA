@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:22:02 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-08-10 09:01:53 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ class mafVMEItem;
   obtain the 3D bounds for any time.
   @sa mflDataPipe mafVMEGeneric
 */
-class MAF_EXPORT mafDataInterpolator:public mafDataPipe
+class MAF_EXPORT mafDataInterpolator : public mafDataPipe
 {
 public:
   mafAbstractTypeMacro(mafDataInterpolator,mafDataPipe);
