@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgScrolledPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-08-13 14:57:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,6 +87,13 @@ bool mmgScrolledPanel::Remove(wxSizer*  sizer )
 void mmgScrolledPanel::FitInside()
 //----------------------------------------------------------------------------
 {
-  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10);
+  // Paolo 13-08-2007: fix resizing scrollbars to start from the
+  // scrolled position and not from 0; this avoid jumps to the
+  // scrollbar.
+  int pos_old = GetScrollPos(wxVERTICAL);
+  int range_old = GetScrollRange(wxVERTICAL);
+  int range_new = m_sizer->GetMinSize().GetHeight()/10;
+  int pos_new = (pos_old * range_new) / range_old;
+  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10,0,pos_new);
   wxScrolledWindow::Layout();    
 }
