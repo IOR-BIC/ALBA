@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkClipSurfaceBoundingBox.cxx,v $
 Language:  C++
-Date:      $Date: 2007-07-25 11:41:26 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-08-13 09:54:34 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,7 +20,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLinearSubdivisionFilter.h"
 #include "vtkClipPolyData.h"
 
-vtkCxxRevisionMacro(vtkClipSurfaceBoundingBox, "$Revision: 1.2 $");  
+vtkCxxRevisionMacro(vtkClipSurfaceBoundingBox, "$Revision: 1.3 $");  
 vtkStandardNewMacro(vtkClipSurfaceBoundingBox);
 
 //-------------------------------------------------------------------------
@@ -51,7 +51,7 @@ void vtkClipSurfaceBoundingBox::Execute()
 		p1[i]=bounds[i*2];
 		p2[i]=bounds[i*2+1];
 	}
-	double scale_factor=sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
+	double scale_factor=2*sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
 
 	vtkLinearExtrusionFilter *extrusionFilter = vtkLinearExtrusionFilter::New();
 	extrusionFilter->SetInput(mask);
@@ -64,6 +64,7 @@ void vtkClipSurfaceBoundingBox::Execute()
 
 	vtkClipPolyData *clipFilter = vtkClipPolyData::New();
 	clipFilter->SetInput(input);
+	clipFilter->SetGenerateClipScalars(0);
 	clipFilter->SetClipFunction(implicitPolyData);
 	clipFilter->SetInsideOut(ClipInside);
 	clipFilter->SetValue(0);
