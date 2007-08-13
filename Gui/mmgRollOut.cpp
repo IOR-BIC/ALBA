@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRollOut.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 13:33:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-08-13 14:56:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -83,6 +83,13 @@ void mmgRollOut::RollOut(bool open)
   m_RollGui->Show(open);
   b = m_RollGui->IsShown() ? "ROLLOUT_OPEN": "ROLLOUT_CLOSE";
   m_RollOutButton->SetBitmap(b, ID_CLOSE_SASH);
-  m_MainGui->FitGui();
   m_MainGui->Update();
+  m_MainGui->FitGui();
+  wxWindow *parent = m_MainGui->GetParent();
+  if (parent)
+  {
+    // Refresh the scrollbar (if exists) when open/close
+    // the roll out GUI.
+    parent->FitInside();
+  }
 }
