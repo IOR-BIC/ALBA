@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:01:30 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-08-13 10:46:46 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -110,19 +110,29 @@ void mafVMERoot::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    if (e->GetId() == ID_APPLICATION_STAMP)
+    if (e->GetSender() == m_Gui)
     {
-      if(GetTagArray()->IsTagPresent("APP_STAMP"))
+      if (e->GetId() == ID_APPLICATION_STAMP)
       {
-        GetTagArray()->GetTag("APP_STAMP")->SetValue(m_ApplicationStamp);
+        if(GetTagArray()->IsTagPresent("APP_STAMP"))
+        {
+          GetTagArray()->GetTag("APP_STAMP")->SetValue(m_ApplicationStamp);
+        }
+        else
+        {
+          mafTagItem app_stamp_item;
+          app_stamp_item.SetName("APP_STAMP");
+          app_stamp_item.SetValue(m_ApplicationStamp);
+          GetTagArray()->SetTag(app_stamp_item);
+        }
       }
       else
       {
-        mafTagItem app_stamp_item;
-        app_stamp_item.SetName("APP_STAMP");
-        app_stamp_item.SetValue(m_ApplicationStamp);
-        GetTagArray()->SetTag(app_stamp_item);
+        // Bug Fixing for the root GUI event management
+        mafVME::OnEvent(maf_event);
       }
+      mafEvent ev(this,VME_MODIFIED,this);
+      mafRoot::OnRootEvent(&ev);
     }
     else
     {
