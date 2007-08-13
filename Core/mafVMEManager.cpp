@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 14:11:27 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-08-13 12:58:37 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -533,8 +533,18 @@ void mafVMEManager::MSFSave()
 			file = file_dir + "/" + name + "." + ext;
 		}
 
-    // convert to unix format
-    file.ParsePathName();
+    mafString sub_unixname;
+    if (file.StartsWith("\\\\"))
+    {
+      sub_unixname = file;
+      sub_unixname.Erase(0,1);
+      sub_unixname.ParsePathName();
+      file = "\\\\";
+      file += sub_unixname;
+    }
+    else
+      file.ParsePathName(); // convert to unix format
+
     m_MSFFile = file.GetCStr();
   }
   if(wxFileExists(m_MSFFile.GetCStr()) && m_MakeBakFile)
