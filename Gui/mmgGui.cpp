@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-14 11:05:58 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2007-08-14 11:44:59 $
+  Version:   $Revision: 1.49 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -94,7 +94,7 @@ const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label 
 
 static wxPoint dp = wxDefaultPosition; 
 
-int m_MAFWidgetId = MINID;
+int MAFWidgetId = MINID;
 
 //----------------------------------------------------------------------------
 // mmgGui
@@ -111,7 +111,6 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 //----------------------------------------------------------------------------
 {
 	 m_Listener = listener;
-   //m_MAFWidgetId = MINID;
 
    m_UseBackgroundColor = false;  
    m_BackgroundColor = wxColour(251,251,253); 
@@ -132,7 +131,6 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 #endif
    m_BoldFont.SetWeight(wxBOLD);
 
-   //for(int i=0; i<MAXWIDGET; i++) m_WidgetTableID[i] = 0;
    m_WidgetTableID.clear();
 
 	 this->Show(false);
@@ -219,7 +217,7 @@ void mmgGui::Enable(int mod_id, bool enable)
   }
   else
   {
-    for(int i = MINID; i <= m_MAFWidgetId; i++) 
+    for(int i = MINID; i <= MAFWidgetId; i++) 
     {
       if(m_WidgetTableID[i - MINID] == mod_id)   
       {
