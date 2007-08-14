@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 14:55:16 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-08-14 11:05:58 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -19,6 +19,7 @@
 #include "mmgPanel.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include <map>
 
 //----------------------------------------------------------------------------
 // class forward :
@@ -31,6 +32,9 @@ class mmgRollOut;
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 class vtkLookupTable;
 #endif             //:::::::::::::::::::::::::::::::::
+
+
+extern int m_MAFWidgetId;
 
 //----------------------------------------------------------------------------
 // Constants :
@@ -75,8 +79,8 @@ used by the widget when sending notification back.
 One command may cause the creation of more than one widget, ex:
 the Vector create 3 wxTextCtrl, and I can't use the same ID for every widget.
 So user-ID are translated into widgets-ID using 
-two member functions : GetModuleID and GetId. GetId increments an internal ID_counter.
-\sa GetId GetModuleId m_Id m_WidgetTableID
+two member functions : GetModuleID and GetWidgetId. GetWidgetId increments an internal ID_counter.
+\sa GetWidgetId GetModuleId m_MAFWidgetId m_WidgetTableID
 */
 //----------------------------------------------------------------------------
 class mmgGui: public mmgPanel, public mafObserver
@@ -248,11 +252,11 @@ public:
   void OnEvent(mafEventBase *maf_event);
 
   /**  \par implementation details:
-  GetId is used to obtain a new/unique widget_ID. 
+  GetWidgetId is used to obtain a new/unique widget_ID. 
   As a side effect a new pair widget_ID->module_ID is stored in m_WidgetTableID
-  \sa GetId GetModuleId m_Id m_WidgetTableID
+  \sa GetWidgetId GetModuleId m_MAFWidgetId m_WidgetTableID
   */
-  int GetId(int mod_id) {m_Id++; assert(m_Id<MAXID); m_WidgetTableID[m_Id-MINID]=mod_id; return m_Id;}; 
+  int GetWidgetId(int mod_id) {m_MAFWidgetId++; /*assert(m_MAFWidgetId < MAXID);*/ m_WidgetTableID[m_MAFWidgetId - MINID] = mod_id; return m_MAFWidgetId;}; 
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};
@@ -278,28 +282,29 @@ protected:
   wxFont m_Font;
 
   /**  \par implementation details:
-  m_Id is a counter that holds the last generated widget_ID.
-  It is used and incremented by GetId.
-  \sa GetId GetModuleId m_Id m_WidgetTableID
+  m_MAFWidgetId is a counter that holds the last generated widget_ID.
+  It is used and incremented by GetWidgetId.
+  \sa GetWidgetId GetModuleId m_MAFWidgetId m_WidgetTableID
   */
-  int m_Id;
+  //int m_MAFWidgetId;
 
   /**  \par implementation details:
   m_WidgetTableID is an array holding a table of conversion widget_id -> user_id.
-  The range of widget_IDs is between MINID and MAXID (created widget_IDs are <= then m_Id)    
+  The range of widget_IDs is between MINID and MAXID (created widget_IDs are <= then m_MAFWidgetId)    
   To obtain the Module ID, widget_ID are shifted by MINID and used to index the array
-  \sa GetId GetModuleId m_Id m_WidgetTableID
+  \sa GetWidgetId GetModuleId m_MAFWidgetId m_WidgetTableID
   */
-  int m_WidgetTableID[MAXWIDGET];     //table widget ids -> module ids
+  //int m_WidgetTableID[MAXWIDGET];     //table widget ids -> module ids
+  std::map<int,int> m_WidgetTableID;
 
   /**
   \par implementation details:
   translate a widget_ID in it's module_ID, accessing m_WidgetTableID
-  \sa GetId GetModuleId m_Id m_WidgetTableID
+  \sa GetWidgetId GetModuleId m_MAFWidgetId m_WidgetTableID
   */
-  int GetModuleId(int w_id)   {assert(w_id>0 && w_id<= m_Id); return  m_WidgetTableID[w_id-MINID];};
+  int GetModuleId(int w_id)   {assert(w_id > 0 && w_id <= m_MAFWidgetId); return  m_WidgetTableID[w_id - MINID];};
 
-  void OnSlider			  (wxCommandEvent &event) { }//@@@ this->OnEvent(mafEvent(this, GetModuleId(event.GetId()))); }
+  void OnSlider			  (wxCommandEvent &event) { }//@@@ this->OnEvent(mafEvent(this, GetModuleId(event.GetWidgetId()))); }
 	void OnListBox      (wxCommandEvent &event);
   void OnCheckListBox (wxCommandEvent &event);
 
@@ -307,4 +312,5 @@ protected:
 
 DECLARE_EVENT_TABLE()
 };
+
 #endif

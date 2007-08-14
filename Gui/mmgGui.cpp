@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-02 14:55:16 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2007-08-14 11:05:58 $
+  Version:   $Revision: 1.48 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -93,6 +93,9 @@ const int FW	= LW+LM+EW+HM+EW+HM+EW;		// full width               (304)
 const int DW	= EW+HM+EW+HM+EW;					// Data Width - Full Width without the Label (184)
 
 static wxPoint dp = wxDefaultPosition; 
+
+int m_MAFWidgetId = MINID;
+
 //----------------------------------------------------------------------------
 // mmgGui
 //----------------------------------------------------------------------------
@@ -108,7 +111,7 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 //----------------------------------------------------------------------------
 {
 	 m_Listener = listener;
-   m_Id= MINID;
+   //m_MAFWidgetId = MINID;
 
    m_UseBackgroundColor = false;  
    m_BackgroundColor = wxColour(251,251,253); 
@@ -129,7 +132,8 @@ mmgPanel(mafGetFrame(),-1,dp,wxDefaultSize,wxNO_BORDER | wxCLIP_CHILDREN | wxTAB
 #endif
    m_BoldFont.SetWeight(wxBOLD);
 
-   for(int i=0; i<MAXWIDGET; i++) m_WidgetTableID[i] = 0;
+   //for(int i=0; i<MAXWIDGET; i++) m_WidgetTableID[i] = 0;
+   m_WidgetTableID.clear();
 
 	 this->Show(false);
 
@@ -145,7 +149,7 @@ void mmgGui::FitGui()
 //----------------------------------------------------------------------------
 {
   this->SetMinSize( wxSize(FW+M+M , m_Sizer->GetMinSize().GetHeight() ));  //SIL. 22-may-2006 : 
-  this->SetSize( wxSize(FW+M+M , m_Sizer->GetMinSize().GetHeight() )); 
+  this->SetSize( wxSize(FW+M+M , m_Sizer->GetMinSize().GetHeight() ));
 }
 //----------------------------------------------------------------------------
 int mmgGui::GetMetrics(int id)
@@ -215,9 +219,9 @@ void mmgGui::Enable(int mod_id, bool enable)
   }
   else
   {
-    for(int i=MINID; i<=m_Id; i++) 
+    for(int i = MINID; i <= m_MAFWidgetId; i++) 
     {
-      if(m_WidgetTableID[i-MINID] == mod_id)   
+      if(m_WidgetTableID[i - MINID] == mod_id)   
       {
         wxWindow* win = FindWindow(i);
         if (win)
@@ -239,13 +243,13 @@ void mmgGui::Divider (long style)
 {
   if(style == 0) //simple empty space
   {
-    wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW,2), 0);
-    Add(div,0,wxALL, M);
+    wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW, 2), 0);
+    Add(div, 0, wxALL, M);
   }
   else
   {
-    wxStaticLine *div = new wxStaticLine(this,-1,dp,wxSize(FW,1));
-    Add(div,0,wxALL, 2*M);
+    wxStaticLine *div = new wxStaticLine(this, -1, dp, wxSize(FW, 1));
+    Add(div, 0, wxALL, 2 * M);
   }
 
 
@@ -353,8 +357,8 @@ void mmgGui::Button(int id,mafString button_text,mafString label, mafString tool
 {
 	if(label.IsEmpty())
 	{
-    int w_id = GetId(id);
-		mmgButton    *butt = new mmgButton(this, w_id, button_text.GetCStr(),dp, wxSize(FW,BH) );
+    int w_id = GetWidgetId(id);
+		mmgButton *butt = new mmgButton(this, w_id, button_text.GetCStr(),dp, wxSize(FW,BH) );
 		butt->SetValidator( mmgValidator(this,w_id, butt) );
     butt->SetFont(m_Font);
     if(!tooltip.IsEmpty()) 
@@ -363,11 +367,11 @@ void mmgGui::Button(int id,mafString button_text,mafString label, mafString tool
 	}
   else
 	{
-		wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		mmgButton    *butt = new mmgButton   (this, w_id, button_text.GetCStr(),dp, wxSize(EW, BH) );
 		butt->SetValidator( mmgValidator(this,w_id,butt) );
     butt->SetFont(m_Font);
@@ -384,13 +388,13 @@ void mmgGui::Button(int id,mafString button_text,mafString label, mafString tool
 void mmgGui::Button  (int id,mafString *label,mafString button_text, mafString tooltip)
 //----------------------------------------------------------------------------
 {
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
 	wxStaticText *lab  = new wxStaticText(this, w_id, label->GetCStr(), dp, wxSize(LW, LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   lab->SetValidator( mmgValidator(this,w_id,lab,label) );
   lab->SetFont(m_Font);
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
   //mmgButton    *butt = new mmgButton   (this, w_id, button_text.GetCStr(), dp, wxSize(FW-LW-2*HM, BH) );
   mmgButton    *butt = new mmgButton   (this, w_id, button_text.GetCStr(), dp, wxSize(DW, BH) );
 	butt->SetValidator( mmgValidator(this,w_id,butt) );
@@ -409,19 +413,19 @@ void mmgGui::Vector(int id,wxString label,int var[3],int min, int max, wxString 
 //----------------------------------------------------------------------------
 {
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text1->SetValidator( mmgValidator(this,w_id,text1,var,      min,max) );
   text1->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text2 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text2->SetValidator( mmgValidator(this,w_id,text2,&(var[1]),min,max) );
   text2->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text3 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
 	text3->SetValidator( mmgValidator(this,w_id,text3,&(var[2]),min,max) );
   text3->SetFont(m_Font);
@@ -444,18 +448,18 @@ void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,
 //----------------------------------------------------------------------------
 {
 	int w_id;
-  wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+  wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
-	w_id = GetId(id);
+	w_id = GetWidgetId(id);
   wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text1->SetValidator( mmgValidator(this,w_id,text1,var,      minx,maxx) );
   text1->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text2 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text2->SetValidator( mmgValidator(this,w_id,text2,&(var[1]),miny,maxy) );
   text2->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text3 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
 	text3->SetValidator( mmgValidator(this,w_id,text3,&(var[2]),minz,maxz) );
   text3->SetFont(m_Font);
@@ -478,17 +482,17 @@ void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int
 //----------------------------------------------------------------------------
 {   
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text1->SetValidator( mmgValidator(this,w_id,text1,var,      min,max, decimal_digit) );
   text1->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
   wxTextCtrl  *text2 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text2->SetValidator( mmgValidator(this,w_id,text2,&(var[1]),min,max, decimal_digit) );
   text2->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
   wxTextCtrl  *text3 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text3->SetValidator( mmgValidator(this,w_id,text3,&(var[2]),min,max, decimal_digit) );
   text3->SetFont(m_Font);
@@ -511,19 +515,19 @@ void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,flo
 //----------------------------------------------------------------------------
 {
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text1->SetValidator( mmgValidator(this,w_id,text1,var,      minx,maxx, decimal_digit) );
   text1->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text2 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text2->SetValidator( mmgValidator(this,w_id,text2,&(var[1]),miny,maxy, decimal_digit) );
   text2->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text3 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
 	text3->SetValidator( mmgValidator(this,w_id,text3,&(var[2]),minz,maxz, decimal_digit) );
   text3->SetFont(m_Font);
@@ -546,19 +550,19 @@ void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, 
 //----------------------------------------------------------------------------
 {   
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text1->SetValidator( mmgValidator(this,w_id,text1,var,      min,max, decimal_digit) );
   text1->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
   wxTextCtrl  *text2 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text2->SetValidator( mmgValidator(this,w_id,text2,&(var[1]),min,max, decimal_digit) );
   text2->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
   wxTextCtrl  *text3 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text3->SetValidator( mmgValidator(this,w_id,text3,&(var[2]),min,max, decimal_digit) );
   text3->SetFont(m_Font);
@@ -581,19 +585,19 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
 //----------------------------------------------------------------------------
 {
   int w_id;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text1 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text1->SetValidator( mmgValidator(this,w_id,text1,var,      minx,maxx, decimal_digit) );
   text1->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text2 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
   text2->SetValidator( mmgValidator(this,w_id,text2,&(var[1]),miny,maxy, decimal_digit) );
   text2->SetFont(m_Font);
-  w_id = GetId(id);
+  w_id = GetWidgetId(id);
 	wxTextCtrl  *text3 = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(EW,LH), m_EntryStyle );
 	text3->SetValidator( mmgValidator(this,w_id,text3,&(var[2]),minz,maxz, decimal_digit) );
   text3->SetFont(m_Font);
@@ -626,7 +630,7 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool 
 
   if(label == "")
 	{
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
 
     text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,sw), e_style);
@@ -637,11 +641,11 @@ void mmgGui::String(int id,wxString label,wxString* var, wxString tooltip, bool 
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		wxTextCtrl *text = NULL;
     
     text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,sw), e_style  );
@@ -671,7 +675,7 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, b
 
   if(label.IsEmpty())
 	{
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
     text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,sw), e_style );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
@@ -682,11 +686,11 @@ void mmgGui::String(int id,mafString label, mafString *var, mafString tooltip, b
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		wxTextCtrl  *text = NULL;
     text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,sw), e_style );
 		text->SetValidator( mmgValidator(this,w_id,text,var) );
@@ -706,7 +710,7 @@ void mmgGui::Integer(int id,mafString label,int* var,int min, int max, mafString
   int w_id;
 	if(label.IsEmpty())
 	{
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var,min,max) );
     text->SetFont(m_Font);
@@ -716,11 +720,11 @@ void mmgGui::Integer(int id,mafString label,int* var,int min, int max, mafString
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var,min,max) );
     text->SetFont(m_Font);
@@ -739,7 +743,7 @@ void mmgGui::Float(int id,mafString label,float* var,float min, float max, int f
   int w_id;
 	if(label.IsEmpty())
 	{
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var,min,max, decimal_digit) );
     text->SetFont(m_Font);
@@ -749,11 +753,11 @@ void mmgGui::Float(int id,mafString label,float* var,float min, float max, int f
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var,min,max, decimal_digit) );
     text->SetFont(m_Font);
@@ -773,7 +777,7 @@ void mmgGui::Double(int id,mafString label,double* var,double min, double max, i
   int w_id;
 	if(label.IsEmpty())
 	{
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, "", dp, wxSize(FW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var,min,max,decimal_digit) );
     text->SetFont(m_Font);
@@ -783,11 +787,11 @@ void mmgGui::Double(int id,mafString label,double* var,double min, double max, i
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxTextCtrl  *text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,LH), m_EntryStyle  );
 		text->SetValidator( mmgValidator(this,w_id,text,var,min,max,decimal_digit) );
     text->SetFont(m_Font);
@@ -806,7 +810,7 @@ void mmgGui::Bool(int id,mafString label,int* var, int flag, mafString tooltip) 
   int w_id;
   if (flag) // text on left
   {
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxCheckBox *check = new wxCheckBox(this, w_id, label.GetCStr(), dp, wxSize(-1,BH), 0 );
     check->SetValidator( mmgValidator(this,w_id,check,var) );
     check->SetFont(m_Font);
@@ -818,11 +822,11 @@ void mmgGui::Bool(int id,mafString label,int* var, int flag, mafString tooltip) 
   } 
 	else      // text on right
 	{
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 		wxCheckBox *check = new wxCheckBox  (this, w_id, "",    dp, wxSize(DW,LH), m_EntryStyle );
     check->SetValidator( mmgValidator(this,w_id,check,var) );
     check->SetFont(m_Font);
@@ -851,10 +855,10 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 	{
     int text_w   = EW*0.8;
     int slider_w = FW-text_w;
-    w_id_text = GetId(id);
+    w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle);
     text->SetFont(m_Font);
-    w_id_sli = GetId(id);
+    w_id_sli = GetWidgetId(id);
 		sli = new wxSlider(this, w_id_sli,min,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
@@ -868,14 +872,14 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 	{
     int text_w   = EW*0.8;
 		int slider_w = DW-text_w;
-		lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id_text = GetId(id);
+    w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl  (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle);
     text->SetFont(m_Font);
-    w_id_sli  = GetId(id);
+    w_id_sli  = GetWidgetId(id);
 		sli = new wxSlider(this, w_id_sli,min,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
@@ -905,10 +909,10 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	{
     int text_w   = EW*0.8;
     int slider_w = FW-text_w;
-    w_id_text = GetId(id);
+    w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
-    w_id_sli  = GetId(id);
+    w_id_sli  = GetWidgetId(id);
 		sli  = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
@@ -921,14 +925,14 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	{
     int text_w   = EW*0.8;
 		int slider_w = DW-text_w;
-		lab = new wxStaticText  (this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		lab = new wxStaticText  (this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id_text = GetId(id);
+    w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
-    w_id_sli = GetId(id);
+    w_id_sli = GetWidgetId(id);
 		sli = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
@@ -960,11 +964,11 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
   {
     wxBoxSizer *sizer = NULL;
     sizer = new wxBoxSizer(wxHORIZONTAL);
-    wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+    wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
 
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
     radio = new wxRadioBox  (this, w_id, "",dp, wxSize(DW,-1), numchoices, choices,dim,style|m_EntryStyle|wxTAB_TRAVERSAL );
 
     sizer->Add( lab,  0, wxRIGHT, LM);
@@ -973,7 +977,7 @@ void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
   }
   else
   {
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
     radio = new wxRadioBox  (this, w_id, "",dp, wxSize(FW,-1), numchoices, choices,dim,style|m_EntryStyle|wxTAB_TRAVERSAL );
     Add(radio,0, wxRIGHT, HM);
   }
@@ -993,11 +997,11 @@ void mmgGui::Combo(int id,mafString label,int* var,int numchoices, const wxStrin
 
   if(!label.IsEmpty())
   {
-    wxStaticText *lab = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+    wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,-1), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 	  combo = new wxComboBox  (this, w_id, "", dp, wxSize(DW,-1), numchoices, choices,wxCB_READONLY);
 	  combo->SetFont(m_Font);
     sizer->Add( lab,  0, wxRIGHT, LM);
@@ -1005,7 +1009,7 @@ void mmgGui::Combo(int id,mafString label,int* var,int numchoices, const wxStrin
   }
   else
   {
-    w_id = GetId(id);
+    w_id = GetWidgetId(id);
 	  combo = new wxComboBox  (this, w_id, "", dp, wxSize(FW,-1), numchoices, choices,wxCB_READONLY);
 	  combo->SetFont(m_Font);
     sizer->Add( combo,0, wxRIGHT, HM);
@@ -1022,11 +1026,11 @@ void mmgGui::FileOpen(int id,mafString label,mafString* var, const mafString wil
 {
   int text_w = EW+HM+EW;
   int butt_w;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(), dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
   if (label.IsEmpty())
   {
     butt_w = FW - text_w - HM;
@@ -1036,7 +1040,7 @@ void mmgGui::FileOpen(int id,mafString label,mafString* var, const mafString wil
     butt_w = EW;
   }
   mmgButton  *butt = new mmgButton(this, w_id, "open",dp, wxSize(butt_w,BH));
-  wxTextCtrl *text = new wxTextCtrl  (this, GetId(id), ""   , dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle);
+  wxTextCtrl *text = new wxTextCtrl  (this, GetWidgetId(id), ""   , dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle);
   text->SetFont(m_Font);
   butt->SetValidator( mmgValidator(this,w_id,butt,var,text,true,wildcard) );
   butt->SetFont(m_Font);
@@ -1060,11 +1064,11 @@ void mmgGui::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
 {
   int text_w = EW+HM+EW;
   int butt_w;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label.GetCStr(),   dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
   if (label.IsEmpty())
   {
     butt_w = FW - text_w - HM;
@@ -1074,7 +1078,7 @@ void mmgGui::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
     butt_w = EW;
   }
   mmgButton    *butt = new mmgButton   (this, w_id, "browse",dp, wxSize(butt_w,BH));
-  wxTextCtrl   *text = new wxTextCtrl  (this, GetId(id), "", dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
+  wxTextCtrl   *text = new wxTextCtrl  (this, GetWidgetId(id), "", dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
   text->SetFont(m_Font);
 	butt->SetValidator( mmgValidator(this,w_id,butt,var,text) );
   butt->SetFont(m_Font);
@@ -1098,11 +1102,11 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 {
   int text_w = EW+HM+EW;
   int butt_w;
-	wxStaticText *lab  = new wxStaticText(this, GetId(id), label.GetCStr(),   dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label.GetCStr(),   dp, wxSize(LW,BH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
   if (label.IsEmpty())
   {
     butt_w = FW - text_w - HM;
@@ -1112,7 +1116,7 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
     butt_w = EW;
   }
   mmgButton    *butt = new mmgButton   (this, w_id, "save",  dp, wxSize(butt_w,BH));
-  wxTextCtrl   *text = new wxTextCtrl  (this, GetId(id), "",      dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
+  wxTextCtrl   *text = new wxTextCtrl  (this, GetWidgetId(id), "",      dp, wxSize(text_w,BH),wxTE_READONLY|m_EntryStyle  );
   text->SetFont(m_Font);
 	butt->SetValidator( mmgValidator(this,w_id,butt,var,text,false,wildcard) );
   butt->SetFont(m_Font);
@@ -1134,13 +1138,13 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 //----------------------------------------------------------------------------
 {
-	wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+	wxStaticText	*lab  = new wxStaticText(this, GetWidgetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
-	wxTextCtrl		*text = new wxTextCtrl  (this, GetId(id), ""   ,dp, wxSize(EW,LH),wxTE_READONLY|m_EntryStyle );
+	wxTextCtrl		*text = new wxTextCtrl  (this, GetWidgetId(id), ""   ,dp, wxSize(EW,LH),wxTE_READONLY|m_EntryStyle );
   text->SetFont(m_Font);
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
   mmgButton    *butt = new mmgButton   (this, w_id, "...",  dp, wxSize(BH,BH));
   butt->SetValidator( mmgValidator(this,w_id,butt,var,text) );
 	butt->SetFont(m_Font);
@@ -1157,12 +1161,12 @@ void mmgGui::Color(int id,wxString label,wxColour* var, wxString tooltip)
 mmgLutSwatch *mmgGui::Lut(int id,wxString label,vtkLookupTable *lut)
 //----------------------------------------------------------------------------
 {
-  wxStaticText	*lab  = new wxStaticText(this, GetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+  wxStaticText	*lab  = new wxStaticText(this, GetWidgetId(id), label,dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
   if(m_UseBackgroundColor) 
     lab->SetBackgroundColour(m_BackgroundColor);
   lab->SetFont(m_Font);
 
-  mmgLutSwatch *luts = new mmgLutSwatch (this,GetId(id), dp, wxSize(DW,18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
+  mmgLutSwatch *luts = new mmgLutSwatch (this,GetWidgetId(id), dp, wxSize(DW,18), wxTAB_TRAVERSAL | wxSIMPLE_BORDER );
   luts->SetLut(lut);
   luts->SetEditable(true);
   luts->SetListener(this);
@@ -1197,7 +1201,7 @@ wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, l
 {
 	if(width<0)
 		width = (label == "") ? FW : DW;
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
 	wxListBox *lb = new wxListBox(this, w_id,dp,wxSize(width ,height),0, NULL,lbox_style | m_EntryStyle);  // wxSUNKEN_BORDER non funzia - aggiunge anche il bordino nero
   lb->SetValidator( mmgValidator(this,w_id,lb) );
 	lb->SetFont(m_Font);
@@ -1208,7 +1212,7 @@ wxListBox *mmgGui::ListBox(int id,wxString label,int height, wxString tooltip, l
 	}
 	else
   {
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1225,7 +1229,7 @@ wxGrid *mmgGui::Grid(int id, wxString label,int height, int row, int cols, wxStr
 //----------------------------------------------------------------------------//    inoltre ListBox,CheckListBoz e Grid possono avere le scrollbar   
 {                                                                             //    che stanno male quando anche il GuiHolder ha la scrollbar
   int width = (label == "") ? FW : DW;
-	wxGrid *grid = new wxGrid(this, GetId(id),dp, wxSize(width,height));
+	wxGrid *grid = new wxGrid(this, GetWidgetId(id),dp, wxSize(width,height));
 	grid->CreateGrid(row, cols);
 	grid->SetFont(m_Font);
   if(tooltip != "") grid->SetToolTip(tooltip);
@@ -1247,7 +1251,7 @@ wxGrid *mmgGui::Grid(int id, wxString label,int height, int row, int cols, wxStr
 	}
 	else
   {
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1266,7 +1270,7 @@ mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString to
 {
   int width = (label == "") ? FW : DW;
 	// mmgCheckListBox *clb =  new mmgCheckListBox(this, id ,dp,wxSize(width,height));      //SIL: 13-07-05 removed
-	mmgCheckListBox *clb =  new mmgCheckListBox(this, GetId(id) ,dp,wxSize(width,height));  //SIL: 13-07-05 added
+	mmgCheckListBox *clb =  new mmgCheckListBox(this, GetWidgetId(id) ,dp,wxSize(width,height));  //SIL: 13-07-05 added
   
   clb->SetListener(this);
 	if(tooltip != "") clb->SetToolTip(tooltip);
@@ -1277,7 +1281,7 @@ mmgCheckListBox* mmgGui::CheckList(int id,wxString label,int height, wxString to
 	}
 	else
   {
-		wxStaticText *lab = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1305,7 +1309,7 @@ void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min,
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label != "")
 	{
-		wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1313,7 +1317,7 @@ void mmgGui::VectorN(int id,wxString label, double *var,int num_elem,double min,
 	}
 	for(int i=0;i<num_elem;i++)
 	{
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		wxTextCtrl *tex = new wxTextCtrl  (this, w_id,"",dp,wxSize(w,LH), m_EntryStyle );
     tex->SetFont(m_Font);
 		tex->SetValidator( mmgValidator(this,w_id,tex,&var[i],min,max,decimal_digit));
@@ -1337,7 +1341,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if(label != "")
 	{
-		wxStaticText *lab  = new wxStaticText(this, GetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+		wxStaticText *lab  = new wxStaticText(this, GetWidgetId(id), label, dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);
@@ -1345,7 +1349,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 	}
 	for(int i=0;i<num_elem;i++)
 	{
-    int w_id = GetId(id);
+    int w_id = GetWidgetId(id);
 		wxTextCtrl *tex = new wxTextCtrl  (this, w_id,"",dp,wxSize(w,LH), m_EntryStyle );
     tex->SetFont(m_Font);
 		tex->SetValidator( mmgValidator(this,w_id,tex,&var[i],min,max));
@@ -1358,7 +1362,7 @@ void mmgGui::VectorN(int id,wxString label, int *var,int num_elem,int min, int m
 mmgRollOut *mmgGui::RollOut(int id, mafString title, mmgGui *roll_gui, bool rollOutOpen)
 //----------------------------------------------------------------------------
 {
-  int w_id = GetId(id);
+  int w_id = GetWidgetId(id);
   mmgRollOut *roll = new mmgRollOut(this, title, roll_gui, w_id, rollOutOpen);
   return roll;
 }
@@ -1369,14 +1373,14 @@ void mmgGui::OnListBox (wxCommandEvent &event)
   wxListBox *lb = (wxListBox *)event.GetEventObject();
   ((mmgValidator *)lb->GetValidator())->TransferFromWindow();
   OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
-  //mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),(long) event.m_commandInt)); 
+  //mafEventMacro(mafEvent(this, GetModuleId(event.GetWidgetId()),(long) event.m_commandInt)); 
 }
 //----------------------------------------------------------------------------
 void mmgGui::OnCheckListBox (wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
   OnEvent(&mafEvent(this, event.GetId(),(long) event.GetInt()));
-  //mafEventMacro(mafEvent(this, GetModuleId(event.GetId()),event.GetInt()));
+  //mafEventMacro(mafEvent(this, GetModuleId(event.GetWidgetId()),event.GetInt()));
 }
 //----------------------------------------------------------------------------
 void mmgGui::Reparent(wxWindow *parent)
