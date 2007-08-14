@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-25 11:44:09 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-08-14 11:03:18 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,27 +31,27 @@ typedef std::map<std::string,wxImage> mafPicMap;
 
 struct mafPictureFactory_Pimpl
 {
-   public:
-   mafPicMap map;
-   mafPicMap vme_map; //here are kept the vme icons
+  public:
+  mafPicMap map;
+  mafPicMap vme_map; //here are kept the vme icons
 };
 //----------------------------------------------------------------------------
 // the mafPic Singleton
 //----------------------------------------------------------------------------
 mafPictureFactory mafPics;
-bool mafPics_Initialized=false;
+bool mafPics_Initialized = false;
 
 //----------------------------------------------------------------------------
 mafPictureFactory::mafPictureFactory()
 //----------------------------------------------------------------------------
 {
-    m_p = new mafPictureFactory_Pimpl();
+  m_PictureMaps = new mafPictureFactory_Pimpl();
 }
 //----------------------------------------------------------------------------
 void mafPictureFactory::Initialize()
 //----------------------------------------------------------------------------
 {
-  mafPics_Initialized=true;
+  mafPics_Initialized = true;
    #include <pic/FRAME_ICON16x16.xpm>
     mafADDPIC(FRAME_ICON16x16);
     #include <pic/FRAME_ICON32x32.xpm>
@@ -148,20 +148,20 @@ void mafPictureFactory::Initialize()
 mafPictureFactory::~mafPictureFactory()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_p);
+  cppDEL(m_PictureMaps);
 }
 //----------------------------------------------------------------------------
 void mafPictureFactory::Add(wxString id,char** xpm)
 //----------------------------------------------------------------------------
 {
-  m_p->map[id.c_str()]= wxImage(xpm);
+  m_PictureMaps->map[id.c_str()] = wxImage(xpm);
 }
 //----------------------------------------------------------------------------
 wxBitmap mafPictureFactory::GetBmp(wxString id)
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=m_p->map.find(id.c_str());
-  if (it!= m_p->map.end())
+  mafPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+  if (it != m_PictureMaps->map.end())
     return wxBitmap((*it).second);
   else
   {
@@ -173,8 +173,8 @@ wxBitmap mafPictureFactory::GetBmp(wxString id)
 wxImage mafPictureFactory::GetImg(wxString id)
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=m_p->map.find(id.c_str());
-  if (it!= m_p->map.end())
+  mafPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+  if (it != m_PictureMaps->map.end())
     return (*it).second;
   else
   {
@@ -186,8 +186,8 @@ wxImage mafPictureFactory::GetImg(wxString id)
 wxIcon mafPictureFactory::GetIcon(wxString id)
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=m_p->map.find(id.c_str());
-  if (it!= m_p->map.end())
+  mafPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+  if (it != m_PictureMaps->map.end())
   {
     wxBitmap bmp = wxBitmap((*it).second);
     wxIcon icon;
@@ -204,14 +204,14 @@ wxIcon mafPictureFactory::GetIcon(wxString id)
 void mafPictureFactory::AddVmePic(wxString id,char** xpm)
 //----------------------------------------------------------------------------
 {
-  m_p->vme_map[id.c_str()]= wxImage(xpm);
+  m_PictureMaps->vme_map[id.c_str()] = wxImage(xpm);
 }
 //----------------------------------------------------------------------------
 wxBitmap mafPictureFactory::GetVmePic(wxString id)
 //----------------------------------------------------------------------------
 {
-  mafPicMap::iterator it=m_p->vme_map.find(id.c_str());
-  if (it!= m_p->vme_map.end())
+  mafPicMap::iterator it = m_PictureMaps->vme_map.find(id.c_str());
+  if (it != m_PictureMaps->vme_map.end())
     return wxBitmap((*it).second);
   else
   {
@@ -224,7 +224,7 @@ void mafPictureFactory::GetVmeNames( std::vector<wxString>& v )
 //----------------------------------------------------------------------------
 {
   v.clear();
-  for (mafPicMap::iterator it=m_p->vme_map.begin(); it!=m_p->vme_map.end(); it++)
+  for (mafPicMap::iterator it = m_PictureMaps->vme_map.begin(); it != m_PictureMaps->vme_map.end(); it++)
   {
     wxString s = ((*it).first).c_str();
     v.push_back(s);
@@ -247,8 +247,8 @@ int foo = mafAddPic(vme_xpm);  //correct, but will be called before ThePicMap ha
     vtkImageData* mafPictureFactory::GetVTKImg(wxString id)
     //----------------------------------------------------------------------------
     {
-      mafPicMap::iterator it=m_p->map.find(id.c_str());
-      if (it == m_p->map.end())
+      mafPicMap::iterator it = m_PictureMaps->map.find(id.c_str());
+      if (it == m_PictureMaps->map.end())
       {
         mafLogMessage("mafPictureFactory: icon with id = %s not found",id.c_str());
         return NULL;

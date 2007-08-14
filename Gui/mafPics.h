@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-23 15:42:58 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-08-14 11:03:18 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,7 +101,7 @@ public:
 
 
 protected:
-  mafPictureFactory_Pimpl *m_p;
+  mafPictureFactory_Pimpl *m_PictureMaps;
 };
 //----------------------------------------------------------------------------
 // macro
