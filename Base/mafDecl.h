@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:20:01 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-08-14 11:08:11 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,8 @@ class wxWindow;
 // constant
 //----------------------------------------------------------------------------
 // MAX number of widgets that mmgGUI can hold - used also by mmgGuiValidator
-const int MAXWIDGET = 200; 
+//const int MAXWIDGET = 200; 
+const int MAXWIDGET = 4096;
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
 
