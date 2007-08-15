@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-13 11:15:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-08-15 20:17:50 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ medPipeSurfaceEditor::medPipeSurfaceEditor()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-
+	m_LUT = NULL;
 	m_Actor = NULL;
 	m_Mapper = NULL;
 }
