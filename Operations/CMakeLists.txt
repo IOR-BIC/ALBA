@@ -54,6 +54,8 @@ SET(PROJECT_SRCS
   medOpMove.h
   medOpScaleDataset.cpp
   medOpScaleDataset.h
+  medOpLabelizeSurface.cpp
+  medOpLabelizeSurface.h
 )
 
 IF (MAF_USE_ITK)
