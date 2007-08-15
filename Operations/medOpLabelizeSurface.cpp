@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-15 20:14:29 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-08-15 20:58:03 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -167,7 +167,7 @@ void medOpLabelizeSurface::OpRun()
 	m_OriginalPolydata->Modified();
 	m_OriginalPolydata->Update();
 
-	if(!inputPolydata->GetCellData()->GetScalars())
+	if(!inputPolydata->GetCellData()->GetArray("CELL_LABEL"))
 	{
 
 		vtkMAFSmartPointer<vtkFloatArray> pointScalar;
@@ -191,6 +191,12 @@ void medOpLabelizeSurface::OpRun()
 		inputPolydata->GetCellData()->SetScalars(cellScalar);
 		inputPolydata->GetCellData()->Update();
 
+		inputPolydata->Modified();
+		inputPolydata->Update();
+	}
+	else
+	{
+		inputPolydata->GetCellData()->SetActiveScalars("CELL_LABEL");
 		inputPolydata->Modified();
 		inputPolydata->Update();
 	}
