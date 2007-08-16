@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 10:16:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-08-16 09:44:58 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,23 +13,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mmoGRFImporterWS_H__
 #define __mmoGRFImporterWS_H__
 
-
-
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
-#include <vnl\vnl_matrix.h>
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafEvent;
 class mafVMEVector;
-class vtkCubeSource;
 class mafVMESurface;
-//class mafVMELandmarkCloud;
-
 
 //----------------------------------------------------------------------------
 // mmoGRFImporterWS :
@@ -45,9 +38,7 @@ public:
 
   void mmoGRFImporterWS::OpUndo();
 
-
 	mafOp* Copy();
-  virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* node) {return true;};
@@ -67,7 +58,6 @@ protected:
   mafVMESurface       *m_PlatformRight;
   mafVMEVector        *m_VectorLeft;
   mafVMEVector        *m_VectorRight;
-//  mafVMELandmarkCloud *m_AlCop;
 
   wxString             m_FileDir;
 	wxString             m_File;

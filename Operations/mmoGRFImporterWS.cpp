@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 10:16:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-08-16 09:44:58 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,46 +18,29 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "mmoGRFImporterWS.h"
+
 #include <wx/busyinfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
+
+#include "mafVMEVector.h"
+#include "mafVMESurface.h"
+
+#include "mmgGui.h"
 
 #include <vtkCubeSource.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
 #include "vtkMAFSmartPointer.h"
 #include "vtkCellArray.h"
-//#include "mafVMELandmark.h"
-//#include "mafVMELandmarkCloud.h"
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 
-#include "mmoGRFImporterWS.h"
-
-#include "mafDecl.h"
-#include "mafEvent.h"
-#include "mmgGui.h"
-
-#include "mafVME.h"
-#include "mafVMEScalar.h"
-#include "mafVMEVector.h"
-#include "mafVMESurface.h"
-#include "mafTagArray.h"
-#include "mafSmartPointer.h"
-
 #include <iostream>
-#include <fstream>
 
 #define DELTA 5.0
-
-
-
-//----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoGRFImporterWS::mmoGRFImporterWS(wxString label) :
@@ -137,19 +120,7 @@ void mmoGRFImporterWS::OpRun()
   }
   mafEventMacro(mafEvent(this,result));
 }
-//----------------------------------------------------------------------------
-void mmoGRFImporterWS::	OnEvent(mafEventBase *maf_event) 
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-    default:
-      mafEventMacro(*e);
-    }
-  }
-}
+
 //----------------------------------------------------------------------------
 void mmoGRFImporterWS::Read()   
 //----------------------------------------------------------------------------
@@ -195,7 +166,6 @@ void mmoGRFImporterWS::Read()
     platform1[i] = atof(platform1St[i]);
   }
   
-
   //Get values of the corners of the second platforms
   line = text.ReadLine();
   wxStringTokenizer corners2(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
