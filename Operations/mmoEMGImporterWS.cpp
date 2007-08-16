@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 09:21:51 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-08-16 09:57:15 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,30 +17,17 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+#include "mmoEMGImporterWS.h"
 
 #include <wx/busyinfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 
-#include "mmoEMGImporterWS.h"
-
-#include "mafDecl.h"
-#include "mafEvent.h"
+#include "medVMEEmg.h"
 #include "mmgGui.h"
 
-#include "mafVME.h"
-#include "medVMEEmg.h"
-#include "mafTagArray.h"
-
 #include <iostream>
-#include <fstream>
-
-//----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoEMGImporterWS::mmoEMGImporterWS(wxString label) :
@@ -89,19 +76,6 @@ void mmoEMGImporterWS::OpRun()
     result = OP_RUN_OK;
   }
   mafEventMacro(mafEvent(this,result));
-}
-//----------------------------------------------------------------------------
-void mmoEMGImporterWS::	OnEvent(mafEventBase *maf_event) 
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-      default:
-        mafEventMacro(*e);
-    }
-  }
 }
 
 //----------------------------------------------------------------------------

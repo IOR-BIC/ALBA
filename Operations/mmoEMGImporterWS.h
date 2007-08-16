@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 13:44:31 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-08-16 09:57:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafEvent;
+
 class medVMEEmg;
 
 //----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ public:
 	mmoEMGImporterWS(wxString label);
 	~mmoEMGImporterWS(); 
 	mafOp* Copy();
-  virtual void OnEvent(mafEventBase *maf_event);
+
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* node) {return true;};
