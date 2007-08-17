@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-08-17 11:28:47 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,8 +29,6 @@
 #include "mafVMEItem.h"
 
 #include "vtkMAFSmartPointer.h"
-#include "vtkImageToStructuredPoints.h"
-#include "vtkStructuredPoints.h"
 #include "vtkImageData.h"
 #include "vtkBMPReader.h"
 #include "vtkJPEGReader.h"
@@ -306,18 +304,17 @@ void mmoImageImporter::BuildVolume()
   wxString prefix  = m_FileDirectory + "\\" + m_FilePrefix;
   prefix.Replace("/", "\\");
   wxString pattern = m_FilePattern  + "."  + m_FileExtension;
-  int dim[3];
+  int extent[6];
 
-  vtkImageToStructuredPoints *convert = NULL;
+  mafNEW(m_ImportedImageAsVolume);
+  m_ImportedImageAsVolume->SetName("Imported Volume");
 
-  //mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  
   if(m_FileExtension.Upper() == "BMP")
 	{
     vtkBMPReader *r = vtkBMPReader::New();
     r->SetFileName(m_Files[0].c_str());
-    r->Update();
-    r->GetOutput()->GetDimensions(dim);
+    r->UpdateInformation();
+    r->GetDataExtent(extent);
     r->Delete();
     r = vtkBMPReader::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,r));
@@ -326,15 +323,13 @@ void mmoImageImporter::BuildVolume()
     r->SetFilePattern(pattern);
     r->SetFileNameSliceSpacing(m_FileSpacing);
     r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, m_NumFiles - 1);
-    r->SetDataVOI(0, dim[0] - 1, 0, dim[1] - 1, 0, m_NumFiles - 1);
+    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
+    r->SetDataVOI(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
     r->SetDataOrigin(0, 0, m_FileOffset);
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    convert = vtkImageToStructuredPoints::New();
-    convert->SetInput(r->GetOutput());
-    convert->Update();
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
     
     r->Delete();
 	} 
@@ -342,8 +337,8 @@ void mmoImageImporter::BuildVolume()
 	{
 		vtkJPEGReader *r = vtkJPEGReader::New();
     r->SetFileName(m_Files[0].c_str());
-    r->Update();
-    r->GetOutput()->GetDimensions(dim);
+    r->UpdateInformation();
+    r->GetDataExtent(extent);
     r->Delete();
 		r = vtkJPEGReader::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,r));
@@ -352,14 +347,12 @@ void mmoImageImporter::BuildVolume()
     r->SetFilePattern(pattern);
     r->SetFileNameSliceSpacing(m_FileSpacing);
     r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, m_NumFiles - 1);
+    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
     r->SetDataOrigin(0, 0, m_FileOffset);
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    convert = vtkImageToStructuredPoints::New();
-    convert->SetInput(r->GetOutput());
-    convert->Update();
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
     
     r->Delete();
 	}
@@ -367,8 +360,8 @@ void mmoImageImporter::BuildVolume()
 	{
 		vtkPNGReader *r = vtkPNGReader::New();
     r->SetFileName(m_Files[0].c_str());
-    r->Update();
-    r->GetOutput()->GetDimensions(dim);
+    r->UpdateInformation();
+    r->GetDataExtent(extent);
     r->Delete();
 		r = vtkPNGReader::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,r));
@@ -377,14 +370,12 @@ void mmoImageImporter::BuildVolume()
     r->SetFilePattern(pattern);
     r->SetFileNameSliceSpacing(m_FileSpacing);
     r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, m_NumFiles - 1);
+    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
     r->SetDataOrigin(0, 0, m_FileOffset);
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
 
-    convert = vtkImageToStructuredPoints::New();
-    convert->SetInput(r->GetOutput());
-    convert->Update();
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
     
     r->Delete();
 	}
@@ -392,8 +383,8 @@ void mmoImageImporter::BuildVolume()
 	{
 		vtkTIFFReader *r = vtkTIFFReader::New();
     r->SetFileName(m_Files[0].c_str());
-    r->Update();
-    r->GetOutput()->GetDimensions(dim);
+    r->UpdateInformation();
+    r->GetDataExtent(extent);
     r->Delete();
 		r = vtkTIFFReader::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,r));
@@ -402,29 +393,22 @@ void mmoImageImporter::BuildVolume()
     r->SetFilePattern(pattern);
     r->SetFileNameSliceSpacing(m_FileSpacing);
     r->SetFileNameSliceOffset(m_FileOffset);
-    r->SetDataExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, m_NumFiles - 1);
+    r->SetDataExtent(extent[0], extent[1], extent[2], extent[3], extent[4], m_NumFiles - 1);
     r->SetDataOrigin(0, 0, m_FileOffset);
     r->SetDataSpacing(1.0,1.0,m_ImageZSpacing);
     r->Update();
     
-    convert = vtkImageToStructuredPoints::New();
-    convert->SetInput(r->GetOutput());
-    convert->Update();
+    m_ImportedImageAsVolume->SetData(r->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
 
     r->Delete();
 	}
 	else
-		mafLogMessage("unable to import %s, unrecognized type", m_Files[0].c_str());
-  
-  //mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-  if(convert)
   {
-    mafNEW(m_ImportedImageAsVolume);
-    m_ImportedImageAsVolume->SetName("Imported Volume");
-    m_ImportedImageAsVolume->SetData(convert->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
-    m_Output = m_ImportedImageAsVolume;
+		mafLogMessage("unable to import %s, unrecognized type", m_Files[0].c_str());
+    mafDEL(m_ImportedImageAsVolume);
   }
-  vtkDEL(convert);
+  
+  m_Output = m_ImportedImageAsVolume;
 }
 //----------------------------------------------------------------------------
 void mmoImageImporter::SetFileName(const char *file_name)
