@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoBmpExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 12:58:20 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-08-17 13:07:54 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -411,8 +411,8 @@ bool mmoBmpExporter::WriteImageDataAsMonocromeBitmap(vtkImageData *img, mafStrin
   bih->biBitCount		    = 8;      // 8 bit per pixel ( using palette )
   bih->biCompression	  = BI_RGB; // no compression
   bih->biSizeImage		  = BytePerRow * img_h;  // image-body size in file
-  bih->biXPelsPerMeter	= spacing_x;
-  bih->biYPelsPerMeter	= spacing_y;
+  bih->biXPelsPerMeter	= 1000/spacing_x;  // Number of pixels per meter in X direction (width)
+  bih->biYPelsPerMeter	= 1000/spacing_y;  // Number of pixels per meter in Y direction (height)
   bih->biClrUsed		    = 256;
   bih->biClrImportant	  = 0;
 
