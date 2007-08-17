@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeRGB.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-17 11:24:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-08-17 11:31:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,19 +59,21 @@ mafVMEOutput *mafVMEVolumeRGB::GetOutput()
 int mafVMEVolumeRGB::SetData(vtkRectilinearGrid *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  return Superclass::SetData(data,t,mode);
+  data->Update();
+  if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==3)
+    return Superclass::SetData(data,t,mode);
+
+  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
 int mafVMEVolumeRGB::SetData(vtkImageData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid"))
-  {
-    data->Update();
-    if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==3)
-      return Superclass::SetData(data,t,mode);
-  }
+  data->Update();
+  if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==3)
+    return Superclass::SetData(data,t,mode);
 
   mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;

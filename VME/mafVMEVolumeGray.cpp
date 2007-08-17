@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-08-17 11:31:55 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,14 +59,24 @@ mafVMEOutput *mafVMEVolumeGray::GetOutput()
 int mafVMEVolumeGray::SetData(vtkRectilinearGrid *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  return Superclass::SetData(data,t,mode);
+  data->Update();
+  if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==1)
+    return Superclass::SetData(data,t,mode);
+
+  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
 int mafVMEVolumeGray::SetData(vtkImageData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  return Superclass::SetData(data,t,mode);
+  data->Update();
+  if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==1)
+    return Superclass::SetData(data,t,mode);
+
+  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
+  return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
 int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
@@ -75,11 +85,11 @@ int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   assert(data);
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid"))
   {
-    data->UpdateInformation();
+    data->Update();
     if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==1)
       return Superclass::SetData(data,t,mode);
   }
   
-  mafErrorMacro("Trying to set the wrong type of fata inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
+  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
 }
