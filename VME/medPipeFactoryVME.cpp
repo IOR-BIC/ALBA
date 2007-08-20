@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-13 11:15:43 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-08-20 13:48:38 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,10 @@
 #include "medPipeVolumeDRR.h"
 #include "medPipeVolumeVR.h"
 #include "medPipeTrajectories.h"
+
+#include "medPipeWrappedMeter.h"
 #include "medPipeSurfaceEditor.h"
+
 
 
 #include "medPipeDensityDistance.h"
@@ -88,7 +91,10 @@ medPipeFactoryVME::medPipeFactoryVME()
 
   mafPlugPipeMacro(medPipeTrajectories, "Pipe to render animated Landmark trajectories in a time interval.");
 	mafPlugPipeMacro(medPipePolylineGraphEditor, "Pipe to Visualize Polyline/Graph in way to edit them.");
+
+	mafPlugPipeMacro(medPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");
 	mafPlugPipeMacro(medPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
+
 
 #ifdef MAF_USE_ITK  
 
