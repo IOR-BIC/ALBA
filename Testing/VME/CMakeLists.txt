@@ -17,6 +17,9 @@ ADD_TEST(mafVMEAdvancedProberTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEAdvancedProbe
 ADD_EXECUTABLE(mafPolylineGraphTest mafPolylineGraphTest.h mafPolylineGraphTest.cpp)
 ADD_TEST(mafPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphTest)
 
+ADD_EXECUTABLE(medVMEWrappedMeterTest medVMEWrappedMeterTest.h medVMEWrappedMeterTest.cpp)
+ADD_TEST(medVMEWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEWrappedMeterTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
