@@ -38,12 +38,21 @@ SET(PROJECT_SRCS
   medPipePolylineGraphEditor.h
   medVMEOutputPolylineEditor.cpp
   medVMEOutputPolylineEditor.h
+  
+  medVMEWrappedMeter.cpp
+  medVMEWrappedMeter.h
+  medVMEOutputWrappedMeter.cpp
+  medVMEOutputWrappedMeter.h
+  medPipeWrappedMeter.cpp
+  medPipeWrappedMeter.h
+
   medVMESurfaceEditor.cpp
   medVMESurfaceEditor.h
   medPipeSurfaceEditor.cpp
   medPipeSurfaceEditor.h
   medVMEOutputSurfaceEditor.cpp
   medVMEOutputSurfaceEditor.h
+
 )
 
 IF (MAF_USE_ITK)
