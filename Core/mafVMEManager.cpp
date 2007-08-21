@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-13 12:58:37 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-08-21 14:39:00 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,8 @@
 //----------------------------------------------------------------------------
 
 
+#include "mafVMEManager.h"
+
 #include <wx/busyinfo.h>
 #include <wx/zipstrm.h>
 #include <wx/zstream.h>
@@ -27,14 +29,13 @@
 #include <wx/wfstream.h>
 #include <wx/fs_zip.h>
 #include <wx/dir.h>
+#include <wx/filename.h>
 
 #include "mafDecl.h"
-#include "mafVMEManager.h"
 #include "mafNode.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
-#include "mafRemoteFileManager.h"
-#include "mmgApplicationSettings.h"
+#include "mmdRemoteFileManager.h"
 
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
@@ -51,7 +52,6 @@ mafVMEManager::mafVMEManager()
 	m_Storage     = NULL;
   m_Crypting    = false;
   m_LoadingFlag = false;
-  m_SingleFileAccess = false;
   m_FileHistoryIdx = -1;
 
   mafString msfDir = mafGetApplicationDirectory().c_str();
@@ -120,6 +120,15 @@ mafVMEStorage *mafVMEManager::GetStorage()
   return m_Storage;
 }
 //----------------------------------------------------------------------------
+void mafVMEManager::SetLocalCacheFolder(mafString cache_folder)
+//----------------------------------------------------------------------------
+{
+  if (m_Storage)
+  {
+    m_Storage->SetTmpFolder(cache_folder.GetCStr());
+  }
+}
+//----------------------------------------------------------------------------
 void mafVMEManager::RemoveTempDirectory()
 //----------------------------------------------------------------------------
 {
@@ -151,8 +160,6 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 
   m_Modified = false;
 
-  m_SingleFileAccess = false; // Reset the flag for the file access as single file
-  
   m_LoadingFlag = true;
   mafEvent e(this,CREATE_STORAGE,m_Storage);
   mafEventMacro(e);
@@ -171,6 +178,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 	}
 
   m_MSFFile = ""; //next MSFSave will ask for a filename
+  m_ZipFile = ""; 
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFOpen(int file_id)
@@ -223,14 +231,13 @@ void mafVMEManager::MSFOpen(mafString filename)
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
   if(ext == "zmsf")
   {
-    m_SingleFileAccess = true;
     if (remote_file)
     {
       // Download the file if it is not present into the cache
       // we are using the remote storage!!
       mafString local_filename, remote_filename;
       remote_filename = filename;
-      local_filename = m_LocalCacheFolder;
+      local_filename = m_Storage->GetTmpFolder();
       local_filename += "\\";
       local_filename += name;
       local_filename += ".zmsf";
@@ -240,7 +247,7 @@ void mafVMEManager::MSFOpen(mafString filename)
     unixname = ZIPOpen(filename);
     if(unixname.IsEmpty())
     {
-    	mafMessage("Bad or corrupted zmsf file!");
+    	mafMessage(_("Bad or corrupted zmsf file!"));
       m_Modified = false;
       m_Storage->Delete();
       m_Storage = NULL;
@@ -327,18 +334,27 @@ void mafVMEManager::MSFOpen(mafString filename)
 const char *mafVMEManager::ZIPOpen(mafString filename)
 //----------------------------------------------------------------------------
 {
+  wxString path, name, ext;
+  
   m_ZipFile = filename;
   mafString zip_cache = wxPathOnly(filename.GetCStr());
   if (zip_cache.IsEmpty())
   {
-    zip_cache = ::wxGetCwd();
+    zip_cache = m_Storage->GetTmpFolder();
   }
-  zip_cache = zip_cache + "\\~TmpData";
+  
+  zip_cache += "/";
+  zip_cache = wxFileName::CreateTempFileName(zip_cache.GetCStr());
+  wxRemoveFile(zip_cache.GetCStr());
+  wxSplitPath(zip_cache.GetCStr(),&path,&name,&ext);
+  zip_cache = path + "/" + name + ext;
+  zip_cache.ParsePathName();
+  
   if (!wxDirExists(zip_cache.GetCStr()))
     wxMkdir(zip_cache.GetCStr());
   m_TmpDir = zip_cache;
 
-  wxString path, name, ext, complete_name, zfile, out_file;
+  wxString complete_name, zfile, out_file;
   wxSplitPath(m_ZipFile.GetCStr(),&path,&name,&ext);
   complete_name = name + "." + ext;
   
@@ -555,11 +571,11 @@ void mafVMEManager::MSFSave()
 	
 	wxBusyInfo wait(_("Saving MSF: Please wait"));
   m_Storage->SetURL(m_MSFFile.GetCStr());
-  if (m_Storage->Store()!=0)
+  if (m_Storage->Store() != MAF_OK)
   {
     mafLogMessage(_("Error during MSF saving"));
   }
-  if (m_TmpDir != "")
+  if (!m_ZipFile.IsEmpty())
   {
     ZIPSave(m_ZipFile);
     m_FileHistory.AddFileToHistory(m_ZipFile.GetCStr());
@@ -576,6 +592,7 @@ void mafVMEManager::MSFSaveAs()
 //----------------------------------------------------------------------------
 {
    m_MSFFile = "";
+   m_ZipFile = "";
    m_MakeBakFile = false;
    MSFSave();
 }
@@ -700,7 +717,7 @@ bool mafVMEManager::AskConfirmAndSave()
   bool go = true;
 	if (m_Modified)
 	{
-		int answer = wxMessageBox("your work is modified, would you like to save it?","Confirm",
+		int answer = wxMessageBox(_("your work is modified, would you like to save it?"),_("Confirm"),
 			                     wxYES_NO|wxCANCEL|wxICON_QUESTION , mafGetFrame());
 		if(answer == wxCANCEL) go = false;
 		if(answer == wxYES)    MSFSave();
