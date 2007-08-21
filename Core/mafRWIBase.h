@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-05 18:45:35 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-08-21 15:24:30 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,7 +58,7 @@ class mafRWIBase : public wxWindow, virtual public vtkRenderWindowInteractor
   DECLARE_DYNAMIC_CLASS(mafRWIBase)
 
 protected:
-  wxTimer timer;
+  wxTimer m_Timer;
 
 public:
   mafRWIBase();

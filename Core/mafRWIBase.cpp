@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-05 18:46:36 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2007-08-21 15:24:30 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,7 +92,7 @@ BEGIN_EVENT_TABLE(mafRWIBase, wxWindow)
   EVT_IDLE(mafRWIBase::OnIdle)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
-mafRWIBase::mafRWIBase() : wxWindow(), vtkRenderWindowInteractor(), timer(this, ID_mafRWIBase_TIMER)
+mafRWIBase::mafRWIBase() : wxWindow(), vtkRenderWindowInteractor(), m_Timer(this, ID_mafRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
 }
@@ -100,7 +100,7 @@ mafRWIBase::mafRWIBase() : wxWindow(), vtkRenderWindowInteractor(), timer(this, 
 mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 			 const wxSize &size, long style, const wxString &name)
   : wxWindow(parent, id, pos, size, style, name), vtkRenderWindowInteractor(), 
-    timer(this, ID_mafRWIBase_TIMER)
+    m_Timer(this, ID_mafRWIBase_TIMER)
 //----------------------------------------------------------------------------
 {
   m_Hidden = true;
@@ -243,7 +243,7 @@ int mafRWIBase::CreateTimer(int timertype)
 //----------------------------------------------------------------------------
 {
   // it's a one shot timer
-  if (!timer.Start(10, TRUE))
+  if (!m_Timer.Start(10, TRUE))
     assert(false);
   return 1;
 }
