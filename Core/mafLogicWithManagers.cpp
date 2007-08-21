@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 10:55:29 $
-  Version:   $Revision: 1.107 $
+  Date:      $Date: 2007-08-21 14:43:03 $
+  Version:   $Revision: 1.108 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
   #include "mmoVTKImporter.h"
   #include "mmoSTLImporter.h"
   #include "mafInteractionManager.h"
-  
+  #include "mafInteractionFactory.h"
   #include "mafInteractor.h"
   #include "mafDeviceManager.h"
   #include "mafAction.h"
@@ -72,10 +72,11 @@
   #include "mmdClientMAF.h"
 #endif
 
-
+#include "mmdRemoteFileManager.h"
 
 #include "mmaApplicationLayout.h"
 
+#include "mafDataVector.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
 //#include "vtkCamera.h"
@@ -168,7 +169,7 @@ void mafLogicWithManagers::Configure()
   {
     m_InteractionManager = new mafInteractionManager();
     m_InteractionManager->SetListener(this);
-    
+    mafPlugDevice<mmdRemoteFileManager>("mmdRemoteFileManager");
 
     m_Mouse = m_InteractionManager->GetMouseDevice();
     //SIL m_InteractionManager->GetClientDevice()->AddObserver(this, MCH_INPUT);
@@ -477,6 +478,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
+    if (e->GetId() == mafDataVector::SINGLE_FILE_DATA)
+    {
+      e->SetBool(m_ApplicationSettings->GetSingleFileStatus()!= 0);
+      return;
+    }
     switch(e->GetId())
     {
       // ###############################################################
@@ -901,6 +907,14 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 #ifdef MAF_USE_VTK
         if(m_InteractionManager) m_InteractionManager->PopPER();
 #endif
+      break;
+      case DEVICE_ADD:
+        m_InteractionManager->AddDeviceToTree((mafDevice *)e->GetMafObject());
+      break;
+      case DEVICE_REMOVE:
+        m_InteractionManager->RemoveDeviceFromTree((mafDevice *)e->GetMafObject());
+      break;
+      case DEVICE_GET:
       break;
       case CREATE_STORAGE:
         CreateStorage(e);
@@ -1521,7 +1535,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
       storage->Delete();
     }
     storage = mafRemoteStorage::New();
-    storage->SetLocalCacheFolder(cache_folder);
+    storage->SetTmpFolder(cache_folder.GetCStr());
     
     //set default values for remote connection
     storage->SetHostName(m_ApplicationSettings->GetRemoteHostName());
@@ -1531,7 +1545,7 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
     
     storage->GetRoot()->SetName("root");
     storage->SetListener(m_VMEManager);
-    
+    storage->Initialize();
     storage->GetRoot()->Initialize();
     e->SetMafObject(storage);
   }
