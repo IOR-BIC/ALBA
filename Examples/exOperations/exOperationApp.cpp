@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 09:13:14 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2007-08-21 16:13:10 $
+  Version:   $Revision: 1.44 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
+#include "mafInteractionFactory.h"
 
 #include "mmo2DMeasure.h"
 #include "mmoAddLandmark.h"
@@ -85,6 +86,9 @@ bool exOperationApp::OnInit()
   
   // Initialize and Fill of PipeFactory -- could be a SideEffect of the node plug
   result = mafPipeFactoryVME::Initialize();
+  assert(result==MAF_OK);
+
+  result = mafInteractionFactory::Initialize();
   assert(result==MAF_OK);
 
   m_Logic = new mafLogicWithManagers();
