@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-04 12:48:09 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-08-21 14:43:27 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,6 +37,8 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_VerboseLog  = 0;
   m_LogFolder = wxGetCwd().c_str();
 
+  m_SingleFileFlag = 1;
+
 	m_ImageTypeId = 0;
 
   m_WarnUserFlag = true;
@@ -62,6 +64,12 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_Gui->Bool(ID_USE_DEFAULT_PASSPHRASE,_("use default passphrase"),&m_UseDefaultPasPhrase,1);
   m_Gui->String(ID_PASSPHRASE,_("passphrase"),&m_PassPhrase,"",false,true);
   m_Gui->Divider(2);
+  m_Gui->Bool(ID_LOG_TO_FILE,_("log to file"),&m_LogToFile,1);
+  m_Gui->Bool(ID_LOG_VERBOSE,_("log verbose"),&m_VerboseLog,1);
+  m_Gui->DirOpen(ID_LOG_DIR,_("log dir"),&m_LogFolder);
+  m_Gui->Divider(2);
+  m_Gui->Bool(ID_SINGLE_FILE, _("single file mode"), &m_SingleFileFlag,1);
+  m_Gui->Divider(2);
   m_Gui->Label(_("Default settings for remote storage"));
   m_Gui->Bool(ID_STORAGE_TYPE,_("remote storage"),&m_UseRemoteStorage,1,_("Check if you want to use remote storage instead the local one."));
   m_Gui->Bool(ID_ANONYMOUS_USER,_("anonymous connection"),&m_AnonymousFalg,1);
@@ -70,10 +78,6 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_Gui->String(ID_USERNAME,_("user"),&m_UserName);
   //m_Gui->String(ID_PASSWORD,_("pwd"),&m_Password,"",false,true);
   m_Gui->DirOpen(ID_CACHE_FOLDER,_("cache"),&m_CacheFolder,_("set the local cache folder \nin which put downloaded files"));
-  m_Gui->Divider(2);
-  m_Gui->Bool(ID_LOG_TO_FILE,_("log to file"),&m_LogToFile,1);
-  m_Gui->Bool(ID_LOG_VERBOSE,_("log verbose"),&m_VerboseLog,1);
-  m_Gui->DirOpen(ID_LOG_DIR,_("log dir"),&m_LogFolder);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_WARN_UNDO, _("warn on undoable"), &m_WarnUserFlag, 1, _("If checked the use is warned when an operation \nthat not support the undo is executed."));
   EnableItems();
@@ -121,6 +125,9 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
     case ID_LOG_DIR:
       m_Config->Write("LogFolder",m_LogFolder.GetCStr());
     break;
+    case ID_SINGLE_FILE:
+      m_Config->Write("SingleFileMode",m_SingleFileFlag);
+    break;
     case ID_WARN_UNDO:
       m_Config->Write("WarnUser",m_WarnUserFlag);
       mafEventMacro(mafEvent(this,MENU_OPTION_APPLICATION_SETTINGS));
@@ -141,9 +148,7 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("PortConnection",m_Port);
     break;
     case ID_USERNAME:
-    {
       m_Config->Write("User",m_UserName.GetCStr());
-    }
     break;
     case ID_PASSWORD:
     break;
@@ -204,6 +209,14 @@ void mmgApplicationSettings::InitializeApplicationSettings()
   else
   {
     m_Config->Write("LogFolder",m_LogFolder.GetCStr());
+  }
+  if(m_Config->Read("SingleFileMode", &long_item))
+  {
+    m_SingleFileFlag = long_item;
+  }
+  else
+  {
+    m_Config->Write("SingleFileMode", m_SingleFileFlag);
   }
   if (m_Config->Read("WarnUser", &long_item))
   {
@@ -282,4 +295,141 @@ void mmgApplicationSettings::InitializeApplicationSettings()
     m_Config->Write("ImageType", m_ImageTypeId);
   }
   m_Config->Flush();
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetSingleFileStatus(int single_file)
+//----------------------------------------------------------------------------
+{
+  if (m_SingleFileFlag != single_file)
+  {
+    m_SingleFileFlag = single_file;
+    m_Config->Write("SingleFileMode", m_SingleFileFlag);
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetLogFolder(mafString log_folder)
+//----------------------------------------------------------------------------
+{
+  if (m_LogFolder != log_folder)
+  {
+    m_LogFolder = log_folder;
+    m_Config->Write("LogFolder",m_LogFolder.GetCStr());
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetLogFileStatus(int log_status)
+//----------------------------------------------------------------------------
+{
+  if (m_LogToFile != log_status)
+  {
+    m_LogToFile = log_status;
+    m_Config->Write("LogToFile",m_LogToFile);
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetLogVerboseStatus(int log_verbose)
+//----------------------------------------------------------------------------
+{
+  if (m_VerboseLog != log_verbose)
+  {
+    m_VerboseLog = log_verbose;
+    m_Config->Write("LogVerbose",m_VerboseLog);
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetUseRemoteStorage(int use_remote)
+//----------------------------------------------------------------------------
+{
+  if (m_UseRemoteStorage != use_remote)
+  {
+    m_UseRemoteStorage = use_remote;
+    m_Config->Write("UseRemoteStorage",m_UseRemoteStorage);
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetCacheFolder(mafString cache_folder)
+//----------------------------------------------------------------------------
+{
+  if (m_CacheFolder != cache_folder)
+  {
+    m_CacheFolder = cache_folder;
+    m_Config->Write("CacheFolder",m_CacheFolder.GetCStr());
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetRemoteHostName(mafString host)
+//----------------------------------------------------------------------------
+{
+  if (m_RemoteHostName != host)
+  {
+    m_RemoteHostName = host;
+    m_Config->Write("RemoteHost",m_RemoteHostName.GetCStr());
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetRemotePort(long port)
+//----------------------------------------------------------------------------
+{
+  if (m_Port != port)
+  {
+    m_Port = port;
+    m_Config->Write("PortConnection",m_Port);
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetUserName(mafString user)
+//----------------------------------------------------------------------------
+{
+  if (m_UserName != user)
+  {
+    m_UserName = user;
+    m_Config->Write("User",m_UserName.GetCStr());
+    m_Config->Flush();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetPassword(mafString pwd)
+//----------------------------------------------------------------------------
+{
+  m_Password = pwd;
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetUseDefaultPassPhrase(int use_default, mafString passphrase)
+//----------------------------------------------------------------------------
+{
+  if (m_UseDefaultPasPhrase != use_default)
+  {
+    m_UseDefaultPasPhrase = use_default;
+    m_Config->Write("UseDefaultPassphrase",m_UseDefaultPasPhrase);
+    m_Config->Flush();
+    if (m_UseDefaultPasPhrase != 0)
+    {
+      m_PassPhrase = mafDefaultPassPhrase();
+    }
+    else
+    {
+      if (passphrase.IsEmpty())
+      {
+        m_PassPhrase = wxGetPasswordFromUser(_("Insert passphrase"),_("Passphrase"),wxEmptyString).c_str();
+      }
+      else
+      {
+        m_PassPhrase = passphrase;
+      }
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::SetPassPhrase(mafString pass_phrase)
+//----------------------------------------------------------------------------
+{
+  m_PassPhrase = pass_phrase;
 }

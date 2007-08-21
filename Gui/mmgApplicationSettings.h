@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-06-12 11:12:19 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-08-21 14:43:27 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,6 +37,7 @@ public:
     ID_LOG_TO_FILE = MINID,
     ID_LOG_VERBOSE,
     ID_LOG_DIR,
+    ID_SINGLE_FILE,
     ID_WARN_UNDO,
     ID_STORAGE_TYPE,
     ID_CACHE_FOLDER,
@@ -66,17 +67,26 @@ public:
   /** Return true if Log To File is enabled.*/
   bool GetLogToFileStatus() {return m_LogToFile != 0;};
 
-  void SetLogFileStatus(int log_status) {m_LogToFile = log_status;};
+  /** Set the log status flag.*/
+  void SetLogFileStatus(int log_status);
 
   /** Return true if Verbose Log is enabled.*/
   bool GetLogVerboseStatus() {return m_VerboseLog != 0;};
   
-  void SetLogVerboseStatus(int log_verbose) {m_VerboseLog = log_verbose;};
+  /** Set the log verbose status flag.*/
+  void SetLogVerboseStatus(int log_verbose);
 
   /** Return the folder in which store the log files.*/
   mafString &GetLogFolder() {return m_LogFolder;};
 
-  void SetLogFolder(mafString log_folder) {m_LogFolder = log_folder;};
+  /** Set a folder name for the log file.*/
+  void SetLogFolder(mafString log_folder);
+
+  /** Return the status for the single file storing animated VMEs.*/
+  int GetSingleFileStatus() {return m_SingleFileFlag;};
+
+  /** Set the flag for storing animated VMEs as single file.*/
+  void SetSingleFileStatus(int single_file);
 
   /** Return the status of the WarnUser flag.*/
   bool GetWarnUserFlag() {return m_WarnUserFlag != 0;};
@@ -84,42 +94,51 @@ public:
   /** Return true if Remote Storage flag is enabled.*/
   bool UseRemoteStorage() {return m_UseRemoteStorage != 0;};
 
-  void SetUseRemoteStorage(int use_remote) {m_UseRemoteStorage = use_remote;};
+  /** Set the flag for remote storage usage.*/
+  void SetUseRemoteStorage(int use_remote);
 
   /** Return the path for the local cache in which download remote VMEs.*/
   mafString &GetCacheFolder() {return m_CacheFolder;};
 
-  void SetCacheFolder(mafString cache_folder) {m_CacheFolder = cache_folder;};
+  /** Set the cache folder.*/
+  void SetCacheFolder(mafString cache_folder);
 
   /** Return the path for the remote host name.*/
   mafString &GetRemoteHostName() {return m_RemoteHostName;};
 
-  void SetRemoteHostName(mafString host) {m_RemoteHostName = host;};
+  /** Set the remote host-name to which connect with remote storage.*/
+  void SetRemoteHostName(mafString host);
 
   /** Return the port for the connection.*/
   long GetRemotePort() {return m_Port;};
 
-  void SetRemotePort(long port) {m_Port = port;};
+  /** Set the remote storage port through which connect.*/
+  void SetRemotePort(long port);
 
   /** Return the username for the connection.*/
   mafString &GetUserName() {return m_UserName;};
 
-  void SetUserName(mafString user) {m_UserName = user;};
+  /** Set the User name with which connect to the remote storage.*/
+  void SetUserName(mafString user);
 
   /** Return the password for the connection.*/
   mafString &GetPassword() {return m_Password;};
 
-  void SetPassword(mafString pwd) {m_Password = pwd;};
+  /** Set the user password with which access the remote storage.*/
+  void SetPassword(mafString pwd);
 
   /** Return the status of the default pass phrase usage.*/
   bool UseDefaultPassPhrase() {return m_UseDefaultPasPhrase != 0;};
 
-  void SetUseDefaultPassPhrase(int use_default) {m_UseDefaultPasPhrase = use_default;};
+  /** Set the flag to use the default passphrase with which encrypt saved data.
+  If the flag is '0' means that no default passphrase is used, so the second optional argument has to be set.*/
+  void SetUseDefaultPassPhrase(int use_default, mafString passphrase = "");
 
   /** Return the Pass phrase used to encrypt/decrypt files.*/
   mafString &GetPassPhrase() {return m_PassPhrase;};
 
-  void SetPassPhrase(mafString pass_phrase) {m_PassPhrase = pass_phrase;};
+  /** Set the custom passphrase to encrypt data.*/
+  void SetPassPhrase(mafString pass_phrase);
 
 	/**select image type during saving of the views*/
 	int GetImageTypeId(){return m_ImageTypeId;};
@@ -135,15 +154,18 @@ protected:
 
   wxConfig *m_Config;
   
+  // Single file variable
+  int m_SingleFileFlag; ///< Flag used to turn On-Off single file mode for storing animated or not items.
+
   // Log variables
-  int     m_LogToFile;
-  int     m_VerboseLog;
-  mafString m_LogFolder;
+  int     m_LogToFile; ///< Flag used to store the On-Off state of log to file mechanism.
+  int     m_VerboseLog;///< Flag used to store the On-Off state of verbose logging to file.
+  mafString m_LogFolder;///< Flag used to store the log folder. 
 
   int m_WarnUserFlag; ///< Warn user flag on not supported undo operations
 
   // Remote storage variables
-  int       m_UseRemoteStorage;
+  int       m_UseRemoteStorage; ///< Flag used to store the using or not of remote storage
   int       m_AnonymousFalg;
   int       m_Port;
   mafString m_CacheFolder;
