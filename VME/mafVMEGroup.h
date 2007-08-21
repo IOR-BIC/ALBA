@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 09:48:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-08-21 15:27:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,6 +31,9 @@ class MAF_EXPORT mafVMEGroup : public mafVMEGenericAbstract
 {
 public:
   mafTypeMacro(mafVMEGroup,mafVMEGenericAbstract);
+
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** Return the right type of output.*/  
   mafVMEOutputNULL *GetVTKOutput() {return (mafVMEOutputNULL *)GetOutput();}

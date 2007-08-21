@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-08-21 15:27:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,6 +65,53 @@ mmgGui* mafVMEGroup::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->Divider();
 	return m_Gui;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEGroup::OnEvent(mafEventBase *maf_event)
+//-------------------------------------------------------------------------
+{
+  if (maf_event->GetChannel()==MCH_UP)
+  {
+    switch (maf_event->GetId())
+    {
+      case NODE_ATTACHED_TO_TREE:
+      {
+        mafNode *n = mafNode::SafeDownCast((mafObject *)maf_event->GetSender());
+        if (n)
+        {
+          mafNode *parent = n->GetParent();
+          if (parent == this)
+          {
+            //mafMessage("Ask for shared GUI!!");
+          }
+        }
+        Superclass::OnEvent(maf_event);
+      }
+      break;
+      case NODE_DETACHED_FROM_TREE:
+      {
+        mafNode *n = mafNode::SafeDownCast((mafObject *)maf_event->GetSender());
+        if (n)
+        {
+          mafNode *parent = n->GetParent();
+          if (parent == this)
+          {
+            //mafMessage("Remove shared GUI!!");
+          }
+        }
+        Superclass::OnEvent(maf_event);
+      }
+      break;
+      default:
+        ForwardUpEvent(maf_event);
+    }
+  }
+  else if (maf_event->GetChannel()==MCH_DOWN)
+  {
+    ForwardDownEvent(maf_event);
+    return;
+  }
 }
 
 //-------------------------------------------------------------------------
