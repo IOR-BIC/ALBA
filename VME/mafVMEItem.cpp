@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:26:56 $
-  Version:   $Revision: 1.11 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-08-21 14:47:20 $
+  Version:   $Revision: 1.12 $
+  Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -21,6 +21,11 @@
 
 
 #include "mafVMEItem.h"
+#include <wx/zipstrm.h>
+#include <wx/zstream.h>
+#include <wx/wfstream.h>
+#include <wx/fs_zip.h>
+
 #include "mafTagArray.h"
 #include "mafIndent.h"
 #include "mafStorageElement.h"
@@ -56,14 +61,20 @@ mafVMEItem::mafVMEItem()
   m_InputMemory     = NULL;
   m_InputMemorySize = 0;
 
+  m_DataObserver= new mafVMEItemAsynchObserver();
+
   m_ReleaseOldFile  = true;
   m_IsLoadingData   = false;
+
+  m_ArchiveFileName = "";
+  m_TmpFileName     = "";
 }
 
 //-------------------------------------------------------------------------
 mafVMEItem::~mafVMEItem()
 //-------------------------------------------------------------------------
 {
+  cppDEL(m_DataObserver);
   SetURL(""); // this simply force to garbage collect the linked URL when the item is destroyed
   mafDEL(m_TagArray);
 }
@@ -259,8 +270,7 @@ int mafVMEItem::InternalRestore(mafStorageElement *node)
   {
     m_Crypting = (crypting=="true"||crypting=="True"||crypting=="TRUE")?true:false;
 
-    // DATA is restored only on demand
-
+    // DATA is restored only on demand when is on Default mode
     return MAF_OK;
   }
 
@@ -278,10 +288,58 @@ int mafVMEItem::RestoreData()
 //-------------------------------------------------------------------------
 {
   m_IsLoadingData = true;
+
+  // To prevent errors when saving in different way of loaded data
+  // archive file name have to be tested. It is not set before item is written
+  // into the archive, so we have to switch into the DEFAULT mode to read correctly
+  // the item and then restore the IO Mode.
+  int old_mode = m_IOMode;
+  if (m_ArchiveFileName.IsEmpty())
+  {
+    SetIOMode(DEFAULT);
+  }
   int ret = InternalRestoreData();
+  SetIOMode(old_mode);
   //m_IsLoadingData = false;
   m_IsLoadingData = ret != MAF_OK;
   return ret;
+}
+
+//-------------------------------------------------------------------------
+int mafVMEItem::ExtractFileFromArchive(mafString &archive_fullname, mafString &item_file)
+//-------------------------------------------------------------------------
+{
+  wxFileInputStream in(archive_fullname.GetCStr());
+  wxZipInputStream zip(in);
+  if (!in || !zip)
+    return MAF_ERROR;
+  wxZipEntry *entry = NULL;
+  // convert the local name we are looking for into the internal format
+  wxString name = wxZipEntry::GetInternalName(item_file.GetCStr());
+
+  // call GetNextEntry() until the required internal name is found
+  // to be re-factored for efficiency reasons.
+  do 
+  {
+    if (entry)
+    {
+      delete entry;
+      entry = NULL;
+    }
+    entry = zip.GetNextEntry();
+  } while(entry != NULL && entry->GetInternalName() != name);
+
+  if (entry != NULL) 
+  {
+    // read the entry's data...
+    m_InputMemorySize = entry->GetSize();
+    m_InputMemory = new char[m_InputMemorySize];
+    zip.Read((char *)m_InputMemory, m_InputMemorySize);
+    delete entry;
+    entry = NULL;
+  }
+  
+  return MAF_OK;
 }
 
 //-------------------------------------------------------------------------

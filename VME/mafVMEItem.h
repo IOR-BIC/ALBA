@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:26:45 $
-  Version:   $Revision: 1.17 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-08-21 14:47:20 $
+  Version:   $Revision: 1.18 $
+  Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -14,6 +14,12 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include <wx/zipstrm.h>
+#include <wx/zstream.h>
+#include <wx/sstream.h>
+#include <wx/wfstream.h>
+#include <wx/fs_zip.h>
+
 #include "mafReferenceCounted.h"
 #include "mafTimeStamped.h"
 #include "mafEventSender.h"
@@ -32,6 +38,7 @@ class mafOBB;
 class mafStorageElement;
 class mafTagArray;
 class vtkDataSet;
+class mafVMEItemAsynchObserver;
 
 /** mafVMEItem - store the single dataset stored into a mafDataVector
   mafVMEItem is an object that stores the single time stamped dataset of a
@@ -129,6 +136,9 @@ public:
   void SetIOModeToTmpFile() {SetIOMode(TMP_FILE);}
   void SetIOModeToMemory() {SetIOMode(MEMORY);}
 
+  /** Extract the item filename from the archive and copy the string into the m_InputMemory*/
+  int ExtractFileFromArchive(mafString &archive_fullname, mafString &item_file);
+
   /** 
     Set the memory pointer from where the data should be read. Also memory
     size should be provided. */
@@ -220,6 +230,19 @@ public:
   /** Read the data file and update the item's data.*/
   virtual int ReadData(mafString &filename, int resolvedURL = MAF_OK) = 0;
 
+  /** Set the archive file name.
+  The Archive filename is needed to restore archived items when data is stored into a single file mode.*/
+  void SetArchiveFileName(mafString &archive) {m_ArchiveFileName = archive;};
+
+  /** Serialize the data into the compressed archive.*/
+  virtual bool StoreToArchive(wxZipOutputStream &zip) = 0;
+
+  /** Set temp file name for the item.*/
+  void SetTempFileName(mafString &tmp) {m_TmpFileName = tmp;};
+
+  /** Return the temp file name used by the item.*/
+  const char *GetTempFileName() {return m_TmpFileName.GetCStr();};
+
 protected:
   mafVMEItem(); // to be allocated with New()
   ~mafVMEItem(); // to be deleted with Delete()
@@ -263,6 +286,7 @@ protected:
   int           m_Id;         ///< the id assigned to the dataset/file to be stored in the MSF
   bool          m_Crypting;   ///< this flags specify if encryption should be used when saving data
 
+  std::string   m_DecryptedFileString; ///< String containing the decrypted file in memory
   mafString     m_URL;        ///< the URL of the data file for this dataset
   mafTimeStamp  m_TimeStamp;  ///< time stamp of this dataset
   mafString     m_DataType;   ///< the dataset type expressed as a string 
@@ -270,12 +294,14 @@ protected:
   mafMTime      m_UpdateTime; ///< store modification timestamp for last update
   bool          m_IsLoadingData; ///< Set when item is loading data to prevent setting DataModified to true
 
+  mafString     m_ArchiveFileName; ///< Filename of the archive if single file mode is enabled
   mafString     m_TmpFileName;///< file name used for local cache
   int           m_IOMode;     ///< IO modality to be used for store/restore data
   const char *  m_InputMemory;///< pointer to memory storing data to be read
   unsigned long m_InputMemorySize;  ///< size of memory storing data to be read
   const char *  m_OutputMemory;     ///< pointer to memory storing the data to be written
   unsigned long m_OutputMemorySize; ///< size of the block of memory where data has been stored
+  mafVMEItemAsynchObserver *m_DataObserver; ///< observer used to update the item's data when downloaded
 };
 
 /** mafVMEItemAsynchObserver - used by the mafVMEItem to synchronize the asynchronous
