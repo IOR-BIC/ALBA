@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-20 15:46:57 $
-  Version:   $Revision: 1.6 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-08-21 14:50:27 $
+  Version:   $Revision: 1.7 $
+  Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "mmuIdFactory.h"
 #include "mafTimeMap.h"
 #include "mafTimeMap.txx"
 #include "mafStorable.h"
@@ -39,6 +40,9 @@ class MAF_EXPORT mafDataVector : public mafTimeMap<mafVMEItem>, public mafObserv
 public:
   mafDataVector();  
   virtual ~mafDataVector();
+
+  /** Event ID used to know if the VME should serialize itself as a single or multiple binary files.*/
+  MAF_ID_DEC(SINGLE_FILE_DATA);
 
   mafTypeMacro(mafDataVector,mafTimeMap<mafVMEItem>);
 
@@ -88,15 +92,17 @@ public:
   
   /** internally used by mafMSFWriter/Reader to remember this is a encrypted data */
   void SetCrypting(bool flag);
+
 protected:
  
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
 
+  mafString m_ArchiveName;///< Name of the archive if the items are stored in single file mode
   bool  m_SingleFileMode; ///< flag for storing Items as a single file
   mafID m_VectorID;       ///< an Id used to identify the single file when
   bool  m_DataModified;   ///< flag set when a new item is inserted/removed
-  bool  m_Crypting;       ///< this flags specify if crypting should be used when saving data
+  bool  m_Crypting;       ///< this flags specify if encryption should be used when saving data
   mafString m_LastBaseURL;///< used to store the base URL of the last storing, to know when need to write again
   bool  m_JustRestored;   ///< flag set when data has just been restored (to be used by InternalStore)
 };
