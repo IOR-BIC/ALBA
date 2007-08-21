@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:29:21 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-08-21 14:48:43 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -21,6 +21,7 @@
 
 
 #include "mafVMEItemVTK.h"
+
 #include "mafEventIO.h"
 #include "mafIndent.h"
 #include "mafStorage.h"
@@ -58,14 +59,12 @@ mafVMEItemVTK::mafVMEItemVTK()
   m_Data        = NULL;
   m_DataReader  = NULL;
   m_DataWriter  = NULL;
-  m_DataObserver= new mafVMEItemAsynchObserver();
 }
 
 //-------------------------------------------------------------------------
 mafVMEItemVTK::~mafVMEItemVTK()
 //-------------------------------------------------------------------------
 {
-  cppDEL(m_DataObserver);
   vtkDEL(m_DataWriter);
   vtkDEL(m_DataReader);
 }
@@ -292,12 +291,19 @@ int mafVMEItemVTK::InternalRestoreData()
     
     mafEventIO e(this,NODE_GET_STORAGE);
     mafEventMacro(e);
-    mafStorage *storage=e.GetStorage();
+    mafStorage *storage = e.GetStorage();
     assert(storage);
     
+    int resolvedURL = MAF_OK;
     mafString filename;
-    int resolvedURL = storage->ResolveInputURL(m_URL, filename, m_DataObserver);
-    
+    if (m_IOMode != MEMORY)
+    {
+      resolvedURL = storage->ResolveInputURL(m_URL, filename, m_DataObserver);
+    }
+    else
+    {
+      resolvedURL = storage->ResolveInputURL(m_ArchiveFileName, filename, m_DataObserver);
+    }
     if (resolvedURL == MAF_WAIT)
     {
       return MAF_WAIT;
@@ -313,83 +319,68 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
   vtkDataSet *data;
   vtkDataReader *reader;
 
-  mafCString datatype=GetDataType();
+  mafCString datatype = GetDataType();
 
   if (resolvedURL == MAF_OK)
   {
-    #ifdef MAF_USE_CRYPTO
-    std::string file_string;
-    if (GetCrypting())
+    m_DecryptedFileString.clear();
+    if (GetCrypting() && m_IOMode != MEMORY)
     {
-      mafDefaultDecryptFileInMemory(filename, file_string);
+#ifdef MAF_USE_CRYPTO
+      mafDefaultDecryptFileInMemory(filename, m_DecryptedFileString);
+#else
+      mafErrorMacro("Encrypted data not supported: MAF not linked to Crypto library.");
+      return MAF_ERROR;
+#endif
     }
-    #endif
 
     // Workaround for double read bug of the vtkDataSetReader class
     // Read immediately the data and destroy the reader to close the input file
-    if (datatype=="vtkPolyData")
+    if (datatype == "vtkPolyData")
     {
-      reader=vtkPolyDataReader::New();
-      if (GetCrypting())
-      {
-      #ifdef MAF_USE_CRYPTO
-        reader->ReadFromInputStringOn();
-        reader->SetInputString(file_string.c_str(),file_string.size());
-      #else
-        mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
-        reader->Delete();
-        return MAF_ERROR;
-      #endif
-      }
-      else
-        reader->SetFileName(filename);
-      reader->Update();
-      data=((vtkPolyDataReader *)reader)->GetOutput();
+      reader = vtkPolyDataReader::New();
+      UpdateReader(reader, filename);
+      data = ((vtkPolyDataReader *)reader)->GetOutput();
     }
-    else if (datatype=="vtkStructuredPoints" || datatype=="vtkImageData")
+    else if (datatype == "vtkStructuredPoints" || datatype == "vtkImageData")
     {
-      reader=vtkStructuredPointsReader::New();
-      reader->SetFileName(filename);
-      reader->Update();
-      data=((vtkStructuredPointsReader *)reader)->GetOutput();
+      reader = vtkStructuredPointsReader::New();
+      UpdateReader(reader, filename);
+      data = ((vtkStructuredPointsReader *)reader)->GetOutput();
     }
-    else if (datatype=="vtkStructuredGrid")
+    else if (datatype == "vtkStructuredGrid")
     {
-      reader=vtkStructuredGridReader::New();
-      reader->SetFileName(filename);
-      reader->Update();
-      data=((vtkStructuredGridReader *)reader)->GetOutput();
+      reader = vtkStructuredGridReader::New();
+      UpdateReader(reader, filename);
+      data = ((vtkStructuredGridReader *)reader)->GetOutput();
     }
-    else if (datatype=="vtkRectilinearGrid")
+    else if (datatype == "vtkRectilinearGrid")
     {
-      reader=vtkRectilinearGridReader::New();
-      reader->SetFileName(filename);
-      reader->Update();
-      data=((vtkRectilinearGridReader *)reader)->GetOutput();
+      reader = vtkRectilinearGridReader::New();
+      UpdateReader(reader, filename);
+      data = ((vtkRectilinearGridReader *)reader)->GetOutput();
     }
-    else if (datatype=="vtkUnstructuredGrid")
+    else if (datatype == "vtkUnstructuredGrid")
     {
-      reader=vtkUnstructuredGridReader::New();
-      reader->SetFileName(filename);
-      reader->Update();
-      data=((vtkUnstructuredGridReader *)reader)->GetOutput();
+      reader = vtkUnstructuredGridReader::New();
+      UpdateReader(reader, filename);
+      data = ((vtkUnstructuredGridReader *)reader)->GetOutput();
     }
     else
     {
       // using generic vtkDataSet reader...
       mafWarningMacro("Unknown data type, using generic VTK dataset reader");
-      reader=vtkDataSetReader::New();
-      reader->SetFileName(filename);
-      reader->Update();
-      data=((vtkDataSetReader *)reader)->GetOutput();
+      reader = vtkDataSetReader::New();
+      UpdateReader(reader, filename);
+      data = ((vtkDataSetReader *)reader)->GetOutput();
     }
 
-    m_DataReader=reader;
+    m_DataReader = reader;
     m_DataReader->Register(NULL);
 
     if (data==NULL)
     {
-      mafErrorMacro("Cannot read data file "<<filename);
+      mafErrorMacro("Cannot read data file " << filename);
       return MAF_ERROR;
     }
     else
@@ -407,12 +398,53 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
 }
 
 //-------------------------------------------------------------------------
+int mafVMEItemVTK::UpdateReader(vtkDataReader *reader, mafString &filename)
+//-------------------------------------------------------------------------
+{
+  if (m_IOMode != MEMORY)
+  {
+    if (GetCrypting())
+    {
+#ifdef MAF_USE_CRYPTO
+      reader->ReadFromInputStringOn();
+      reader->SetInputString(m_DecryptedFileString.c_str(),m_DecryptedFileString.size());
+#else
+      mafErrorMacro("Encrypted data not supported: MAF not linked to Crypto library.");
+      reader->Delete();
+      return MAF_ERROR;
+#endif
+    }
+    else
+    {
+      reader->SetFileName(filename);
+    }
+    reader->Update();
+  }
+  else
+  {
+    // Extract the file from the archive before passing the string to the reader and get the VTK dataset.
+    int res = ExtractFileFromArchive(filename, m_URL);
+    if (res != MAF_OK)
+    {
+      mafErrorMacro("Error extracting item from the archive!");
+      return MAF_ERROR;
+    }
+    reader->ReadFromInputStringOn();
+    reader->SetInputString(m_InputMemory, m_InputMemorySize);
+    reader->Update();
+    delete m_InputMemory;
+    m_InputMemory = NULL;
+    m_InputMemorySize = 0;
+  }
+  return MAF_OK;
+}
+//-------------------------------------------------------------------------
 int mafVMEItemVTK::InternalStoreData(const char *url)
 //-------------------------------------------------------------------------
 {
   if (GetData())
   {
-    bool found=false;
+    bool found = false;
     mafString filename;
           
     mafEventIO e(this,NODE_GET_STORAGE);
@@ -424,8 +456,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
     {
     case MEMORY:
       found = false;
-      mafErrorMacro("Unsupported I/O Mode");
-      return MAF_ERROR;
+      break;
     case TMP_FILE:
       found = false;
       filename = url; // use directly the url as a tmp file
@@ -445,14 +476,6 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
     };
-
-    assert(!(m_IOMode!=MEMORY&&filename.IsEmpty()));
-
-    if (m_IOMode!=MEMORY&&filename.IsEmpty())
-    {
-      mafErrorMacro("Unsupported I/O Mode");
-      return MAF_ERROR;
-    }
 
     /*********************************
     // Possible cases for writing DATA
@@ -494,54 +517,68 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
 
       // this is to catch possible I/O errors
       //unsigned long tag=mflAgent::PlugEventSource(writer,mflMSFWriter::ErrorHandler,this,vtkCommand::ErrorEvent);
-
       writer->SetInput(data);
+      writer->SetFileTypeToBinary();
+      writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
 
-      if (GetCrypting())
+      if (m_IOMode == MEMORY || GetCrypting())
       {
-#ifdef MAF_USE_CRYPTO
         writer->WriteToOutputStringOn();
-        writer->SetFileTypeToBinary();
-        writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
         writer->Write();
-
-        mafDefaultEncryptFileFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(),filename);
-#else
-        mafErrorMacro("Crypted data is not supported: Crypto library not linked to MAF!");
-        return MAF_ERROR;
-#endif
       }
-      else if ( m_IOMode == MEMORY)
+
+      if (m_IOMode == MEMORY)
       {
-        // not yet supported
-        writer->WriteToOutputStringOn();
-        writer->SetFileTypeToBinary();
-        writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
-        writer->Write();
-        m_OutputMemory = writer->GetOutputString();
-        m_OutputMemorySize = writer->GetOutputStringLength();
+        if (GetCrypting())
+        {
+#ifdef MAF_USE_CRYPTO
+          std::string encrypted_output;
+          mafDefaultEncryptFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(), encrypted_output);
+          m_OutputMemory = encrypted_output.c_str();
+          m_OutputMemorySize = encrypted_output.size();
+#else
+          mafErrorMacro("Encrypted data is not supported: Crypto library not linked to MAF!");
+          return MAF_ERROR;
+#endif
+        }
+        else
+        {
+          m_OutputMemory = writer->GetOutputString();
+          m_OutputMemorySize = writer->GetOutputStringLength();
+        }
         m_DataWriter = writer;
         m_DataWriter->Register(NULL);
+        return MAF_OK;
       }
       else
       {
-        writer->SetFileName(filename);
-        writer->SetFileTypeToBinary();
-        writer->SetHeader("# MAF data file - mafVMEItemVTK output\n");
-        writer->Write();
+        if (GetCrypting())
+        {
+#ifdef MAF_USE_CRYPTO
+          mafDefaultEncryptFileFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(),filename);
+#else
+          mafErrorMacro("Encrypted data is not supported: Crypto library not linked to MAF!");
+          return MAF_ERROR;
+#endif
+        }
+        else
+        {
+          writer->SetFileName(filename);
+          writer->Write();
+        }
       }
-
       //writer->RemoveObserver(tag);
 
-      if (m_IOMode==DEFAULT)
+      if (m_IOMode == DEFAULT)
+      {
         SetURL(url);
-
-      ret=storage->StoreToURL(filename,m_URL);
+        ret = storage->StoreToURL(filename, m_URL);
+      }
     }
     else
     {
       // if data has been set to NULL reset the filename
-      if ((!IsDataPresent()&&!found)||(!IsDataPresent()&&found&&IsDataModified()))
+      if ((!IsDataPresent() && !found) || (!IsDataPresent() && found && IsDataModified()))
       {
         if (found)
           storage->ReleaseURL(m_URL); // delete the file from the storage
@@ -551,15 +588,13 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       UpdateBounds(); // force updating the bounds
     }
 
-    if (m_IOStatus!=MAF_OK)
+    if (m_IOStatus != MAF_OK)
       return MAF_ERROR;
 
     // reset modified data flag
     SetDataModified(false);
-
     return ret;
   }
-  
   return MAF_NO_IO;
 }
 
@@ -596,22 +631,23 @@ void mafVMEItemVTK::GetOutputMemory(const char *&out_str, int &size)
     size = 0;
   }
 }
-
+//-------------------------------------------------------------------------
+bool mafVMEItemVTK::StoreToArchive(wxZipOutputStream &zip)
+//-------------------------------------------------------------------------
+{
+  if (!zip.PutNextEntry(m_URL.GetCStr(), wxDateTime::Now(), m_OutputMemorySize) || !zip.Write(m_OutputMemory, m_OutputMemorySize))
+    return false;
+  return true;
+}
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::ReleaseOutputMemory()
 //-------------------------------------------------------------------------
 {
+  vtkDEL(m_DataWriter);
+  vtkDEL(m_DataReader);
+
   m_OutputMemory = NULL;
-
-  if (m_DataWriter) // release also the writer
-  {
-    vtkDEL(m_DataWriter);
-  }
-
-  if (m_DataReader) // release also the writer
-  {
-    vtkDEL(m_DataReader);
-  }
+  m_OutputMemorySize = 0;
 }
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::Print(std::ostream& os, const int tabs) const

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:29:47 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-08-21 14:48:43 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -21,6 +21,7 @@
 
 
 #include "mafVMEItemScalar.h"
+
 #include "mafEventIO.h"
 #include "mafIndent.h"
 #include "mafStorage.h"
@@ -42,8 +43,8 @@ mafCxxTypeMacro(mafVMEItemScalar)
 mafVMEItemScalar::mafVMEItemScalar()
 //-------------------------------------------------------------------------
 {
-  m_IOStatus    = MAF_OK;
-  m_DataString  = "";
+  m_IOStatus   = MAF_OK;
+  m_DataString = "";
 }
 
 //-------------------------------------------------------------------------
@@ -247,62 +248,21 @@ int mafVMEItemScalar::InternalRestoreData()
     mafStorage *storage = e.GetStorage();
     assert(storage);
     
+    int resolvedURL = MAF_OK;
     mafString filename;
-    int resolvedURL = storage->ResolveInputURL(m_URL,filename);
-    
-    vnl_matrix<double> data;
-
-    mafTagItem *item = m_TagArray->GetTag("SCALAR_MATRIX_DIMENSIONS");
-    if (item) 
+    if (m_IOMode != MEMORY)
     {
-      int r,c;
-      r = (int)item->GetComponentAsDouble(0);
-      c = (int)item->GetComponentAsDouble(1);
-      data.set_size(r,c);
+      resolvedURL = storage->ResolveInputURL(m_URL, filename, m_DataObserver);
     }
-
-    if (resolvedURL == MAF_OK)
+    else
     {
-      if (GetCrypting())
-      {
-      #ifdef MAF_USE_CRYPTO
-        std::string file_string;
-        mafDefaultDecryptFileInMemory(filename, file_string);
-        //data.read_ascii(file_string); //------------------------------------------------------------------- <--
-      #else
-        mafErrorMacro("Crypted data not supported: MAF not linked to Crypto library.");
-        return MAF_ERROR;
-      #endif
-      }
-      else
-      {
-        vcl_ifstream v_raw_matrix(filename, std::ios::in);
-        if(v_raw_matrix.is_open() != 0)
-        {
-          data.read_ascii(v_raw_matrix);
-        }
-        else
-        {
-          mafErrorMacro("Error accessing scalar data file.");
-          return MAF_ERROR;
-        }
-      }
-
-      if (data.empty())
-      {
-        mafErrorMacro("Cannot read data file " << filename);
-        return MAF_ERROR;
-      }
-      else
-      {
-        SetData(data);
-      }
+      resolvedURL = storage->ResolveInputURL(m_ArchiveFileName, filename, m_DataObserver);
     }
-    else if (resolvedURL == MAF_ERROR)
+    if (resolvedURL == MAF_WAIT)
     {
-      return MAF_NO_IO;
+      return MAF_WAIT;
     }
-    return MAF_OK;
+    return ReadData(filename, resolvedURL);
   } 
   return MAF_NO_IO;
 }
@@ -310,7 +270,95 @@ int mafVMEItemScalar::InternalRestoreData()
 int mafVMEItemScalar::ReadData(mafString &filename, int resolvedURL)
 //-------------------------------------------------------------------------
 {
-  // to be changed as in mafVMEItemVTK
+  if (resolvedURL == MAF_OK)
+  {
+    m_DecryptedFileString.clear();
+    if (GetCrypting() && m_IOMode != MEMORY)
+    {
+#ifdef MAF_USE_CRYPTO
+      mafDefaultDecryptFileInMemory(filename, m_DecryptedFileString);
+#else
+      mafErrorMacro(_("Encrypted data not supported: MAF not linked to Crypto library."));
+      return MAF_ERROR;
+#endif
+    }
+    
+    return UpdateReader(filename);
+  }
+  else if (resolvedURL == MAF_ERROR)
+  {
+    return MAF_NO_IO;
+  }
+  return MAF_OK;
+}
+//-------------------------------------------------------------------------
+int mafVMEItemScalar::UpdateReader(mafString &filename)
+//-------------------------------------------------------------------------
+{
+  vnl_matrix<double> data;
+
+  mafTagItem *item = m_TagArray->GetTag("SCALAR_MATRIX_DIMENSIONS");
+  if (item) 
+  {
+    int r,c;
+    r = (int)item->GetComponentAsDouble(0);
+    c = (int)item->GetComponentAsDouble(1);
+    data.set_size(r,c);
+  }
+
+  if (m_IOMode != MEMORY)
+  {
+    if (GetCrypting())
+    {
+#ifdef MAF_USE_CRYPTO
+      vcl_stringstream decrypted_raw_matrix;
+      decrypted_raw_matrix << m_DecryptedFileString.c_str();
+      data.read_ascii(decrypted_raw_matrix);
+#else
+      mafErrorMacro(_("Encrypted data not supported: MAF not linked to Crypto library."));
+      return MAF_ERROR;
+#endif
+    }
+    else
+    {
+      vcl_ifstream v_raw_matrix(filename, std::ios::in);
+      if(v_raw_matrix.is_open() != 0)
+      {
+        data.read_ascii(v_raw_matrix);
+      }
+      else
+      {
+        mafErrorMacro("Error accessing scalar data file.");
+        return MAF_ERROR;
+      }
+    }
+  }
+  else
+  {
+    // Extract the file from the archive before passing the string to the reader and get the VTK dataset.
+    int res = ExtractFileFromArchive(filename, m_URL);
+    if (res != MAF_OK)
+    {
+      mafErrorMacro("Error extracting item from the archive!");
+      return MAF_ERROR;
+    }
+    vcl_stringstream raw_matrix_string;
+    raw_matrix_string << m_InputMemory << std::endl;
+    data.read_ascii(raw_matrix_string);
+    delete m_InputMemory;
+    m_InputMemory = NULL;
+    m_InputMemorySize = 0;
+  }
+
+  if (data.empty())
+  {
+    mafErrorMacro("Cannot read data file " << filename);
+    return MAF_ERROR;
+  }
+  else
+  {
+    SetData(data);
+  }
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
@@ -331,8 +379,7 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
     {
       case MEMORY:
         found = false;
-        mafErrorMacro("Unsupported I/O Mode");
-      return MAF_ERROR;
+      break;
       case TMP_FILE:
         found = false;
         filename = url; // use directly the url as a tmp file
@@ -350,14 +397,6 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
       break;
       default:
         mafErrorMacro("Unsupported I/O Mode");
-      return MAF_ERROR;
-    }
-
-    assert(!(m_IOMode!=MEMORY&&filename.IsEmpty()));
-
-    if (m_IOMode != MEMORY && filename.IsEmpty())
-    {
-      mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
     }
 
@@ -381,7 +420,7 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
 
     m_IOStatus = 0;
     int ret = MAF_OK; // value returned by StoreToURL() function at the end of saving to file
-    if ((IsDataPresent()&&(!found||(m_URL!=url)))||((IsDataPresent()==found)&&(found==IsDataModified())))
+    if ((IsDataPresent() && (!found || (m_URL != url))) || ((IsDataPresent() == found) && (found == IsDataModified())))
     {       
       vnl_matrix<double> data = GetData();
 
@@ -391,6 +430,9 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
         return 0;
       }
       
+      // force release old writer if present
+      ReleaseOutputMemory();
+
       int r,c;
       r = data.rows();
       c = data.columns();
@@ -401,33 +443,36 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
       item.SetComponent(c,1);
       m_TagArray->SetTag(item);
 
-      // force release old writer if present
-      ReleaseOutputMemory();
       unsigned data_size = data.size();
       double *s = new double[data_size];
       data.copy_out(s);
       m_DataString << s[0];
-      for (int i=1; i<data_size;i++)
+      for (int i = 1; i < data_size; i++)
       {
         m_DataString << " ";
         m_DataString << s[i];
       }
       delete s;
 
-      if (m_Crypting)
+      if ( m_IOMode == MEMORY)
       {
+        if (m_Crypting)
+        {
 #ifdef MAF_USE_CRYPTO
-        mafDefaultEncryptFileFromMemory(m_DataString.GetCStr(), data_size, filename);
+          std::string encrypted_output;
+          mafDefaultEncryptFromMemory(m_DataString.GetCStr(), m_DataString.Length(), encrypted_output);
+          m_OutputMemory = encrypted_output.c_str();
+          m_OutputMemorySize = encrypted_output.size();
 #else
-        mafErrorMacro("Crypted data is not supported: Crypto library not linked to MAF!");
-        return MAF_ERROR;
+          mafErrorMacro("Encrypted data is not supported: Crypto library not linked to MAF!");
+          return MAF_ERROR;
 #endif
-      }
-      else if ( m_IOMode == MEMORY)
-      {
-        // not yet supported
-        m_OutputMemory = m_DataString.GetCStr();
-        m_OutputMemorySize = data_size;
+        }
+        else
+        {
+          m_OutputMemory = m_DataString.GetCStr();
+          m_OutputMemorySize = m_DataString.Length();
+        }
       }
       else
       {
@@ -443,15 +488,16 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
           return MAF_ERROR;
         }
       }
-      if (m_IOMode==DEFAULT)
+      if (m_IOMode == DEFAULT)
+      {
         SetURL(url);
-
-      ret = storage->StoreToURL(filename,m_URL);
+        ret = storage->StoreToURL(filename,m_URL);
+      }
     }
     else
     {
       // if data has been set to NULL reset the filename
-      if ((!IsDataPresent()&&!found)||(!IsDataPresent()&&found&&IsDataModified()))
+      if ((!IsDataPresent() && !found) || (!IsDataPresent() && found && IsDataModified()))
       {
         if (found)
           storage->ReleaseURL(m_URL); // delete the file from the storage
@@ -503,12 +549,21 @@ void mafVMEItemScalar::GetOutputMemory(const char *&out_str, int &size)
     size = 0;
   }
 }
-
+//-------------------------------------------------------------------------
+bool mafVMEItemScalar::StoreToArchive(wxZipOutputStream &zip)
+//-------------------------------------------------------------------------
+{
+  wxStringInputStream data_stream(m_OutputMemory);
+  if (!zip.PutNextEntry(m_URL.GetCStr(), wxDateTime::Now(), m_OutputMemorySize) || !zip.Write(data_stream))
+    return false;
+  return true;
+}
 //-------------------------------------------------------------------------
 void mafVMEItemScalar::ReleaseOutputMemory()
 //-------------------------------------------------------------------------
 {
   m_OutputMemory = NULL;
+  m_OutputMemorySize = 0;
 }
 //-------------------------------------------------------------------------
 void mafVMEItemScalar::Print(std::ostream& os, const int tabs) const

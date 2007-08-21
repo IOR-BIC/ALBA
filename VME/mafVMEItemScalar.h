@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:29:47 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-08-21 14:48:43 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,9 +102,15 @@ public:
     be used in MEMORY mode where data is written into memory */
   virtual void ReleaseOutputMemory();
 
+  /** Serialize the data into the compressed archive.*/
+  bool StoreToArchive(wxZipOutputStream &zip);
+
 protected:
   mafVMEItemScalar(); // to be allocated with New()
   ~mafVMEItemScalar(); // to be deleted with Delete()
+
+  /** Update the vnl reader to read from memory or file from disk (encrypted or not).*/
+  int UpdateReader(mafString &filename);
 
   /** Restore data stored in this object. This function asks the storage
     for the filename corresponding to the URL.

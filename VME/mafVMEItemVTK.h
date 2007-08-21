@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:29:21 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-08-21 14:48:43 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -107,9 +107,15 @@ public:
     be used in MEMORY mode where data is written into memory */
   virtual void ReleaseOutputMemory();
 
+  /** Serialize the data into the compressed archive.*/
+  bool StoreToArchive(wxZipOutputStream &zip);
+
 protected:
   mafVMEItemVTK(); // to be allocated with New()
   ~mafVMEItemVTK(); // to be deleted with Delete()
+
+  /** Update the vtk reader to read from memory or file from disk (encrypted or not).*/
+  int UpdateReader(vtkDataReader *reader, mafString &filename);
 
   /**
     Restore data stored in this object. This function asks the storage
@@ -126,7 +132,6 @@ protected:
   vtkDataReader *             m_DataReader; ///< the reader used to read VTK data
   vtkDataSetWriter *          m_DataWriter; ///< the writer used to write VTK data
   int                         m_IOStatus;   ///< internally used to store the IO status
-  mafVMEItemAsynchObserver   *m_DataObserver; ///< observer used to update the item's data when downloaded
   
 private:
   mafVMEItemVTK(const mafVMEItemVTK&);
