@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 13:57:06 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-08-21 14:37:06 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,7 +130,7 @@ public:
   void SetRemotePort(int port) {m_Port = port;};
 
   /** Set the local cache folder in which will be downloaded remote files.*/
-  void SetLocalCacheFolder(mafString cache_folder) {m_LocalCacheFolder = cache_folder;};
+  void SetLocalCacheFolder(mafString cache_folder);
 
   /** Remove temporary directory used for compressed msf files.*/
   void RemoveTempDirectory();
@@ -146,22 +146,20 @@ protected:
   mmgFileHistory	  m_FileHistory;
   int               m_FileHistoryIdx;
 
-  bool              m_MakeBakFile;
-  mafString         m_MSFDir;
-  mafString         m_AppStamp;     ///< the application stamp for our application
-  mafString         m_MSFFile;
-  mafString         m_ZipFile;
+  bool              m_MakeBakFile; ///< Flag used to create or not the backup file of the saved msf.
+  mafString         m_MSFDir; ///< Directory name in which is present the msf file.
+  mafString         m_AppStamp; ///< Application stamp for our application.
+  mafString         m_MSFFile; ///< File name of the data associated to the tree.
+  mafString         m_ZipFile; ///< File name of compressed archive in which save the data associated to the tree.
   mafString         m_TmpDir;
 
-  mafString         m_LocalCacheFolder;
   mafString         m_Host;
   mafString         m_User;
   mafString         m_Pwd;
   int               m_Port;
   
-  bool              m_SingleFileAccess; ///< flag used to manage the access to the single compressed file
   bool              m_LoadingFlag;  ///< used when an MSF is being loaded
-  bool              m_Crypting;     ///< used to enable the Crypting in the MSF
+  bool              m_Crypting;     ///< used to enable the Encryption for the MSF
   mafVMEStorage*    m_Storage;      
 };
 #endif
