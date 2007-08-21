@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:14:52 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-08-21 14:40:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include <wx/tokenzr.h>
 
 #include "mafRemoteStorage.h"
-#include "mafRemoteFileManager.h"
+#include "mmdRemoteFileManager.h"
 
 #include "mafDirectory.h"
 #include "mafCurlUtility.h"
@@ -36,50 +36,46 @@ mafRemoteStorage::mafRemoteStorage()
 //------------------------------------------------------------------------------
 {
   m_HostName = "";
-  m_LocalCacheFolder = wxGetCwd();
   m_LocalMSFFolder = "";
   m_RemoteRepository = "";
   m_RemoteMSF = "";
   m_IsRemoteMSF = false;
-
   mafNEW(m_RemoteFileManager);
-  m_RemoteFileManager->Start();
 }
-
+//------------------------------------------------------------------------------
+void mafRemoteStorage::Initialize()
+//------------------------------------------------------------------------------
+{
+  mafEventMacro(mafEvent(this,DEVICE_ADD,m_RemoteFileManager));
+}
 //------------------------------------------------------------------------------
 mafRemoteStorage::~mafRemoteStorage()
 //------------------------------------------------------------------------------
 {
-  m_RemoteFileManager->Stop();
+  mafEventMacro(mafEvent(this,DEVICE_REMOVE,m_RemoteFileManager));
   mafSleep(100);
   mafDEL(m_RemoteFileManager);
 }
 //------------------------------------------------------------------------------
-void mafRemoteStorage::SetLocalCacheFolder(mafString cache)
-//------------------------------------------------------------------------------
-{
-  m_LocalCacheFolder = cache;
-}
-//------------------------------------------------------------------------------
-void mafRemoteStorage::SetUsername(mafString usr)
+void mafRemoteStorage::SetUsername(const mafString &usr)
 //------------------------------------------------------------------------------
 {
   m_RemoteFileManager->SetUsername(usr);
 }
 //------------------------------------------------------------------------------
-void mafRemoteStorage::SetPassword(mafString pwd)
+void mafRemoteStorage::SetPassword(const mafString &pwd)
 //------------------------------------------------------------------------------
 {
   m_RemoteFileManager->SetPassword(pwd);
 }
 //------------------------------------------------------------------------------
-void mafRemoteStorage::SetHostName(mafString host)
+void mafRemoteStorage::SetHostName(const mafString &host)
 //------------------------------------------------------------------------------
 {
   m_HostName = host;
 }
 //------------------------------------------------------------------------------
-void mafRemoteStorage::SetRemotePort(int port)
+void mafRemoteStorage::SetRemotePort(const int &port)
 //------------------------------------------------------------------------------
 {
   m_RemoteFileManager->SetRemotePort(port);
@@ -125,7 +121,7 @@ int mafRemoteStorage::ResolveInputURL(const char *url, mafString &filename, mafO
     if (ext == "msf")
     {
       m_RemoteMSF = filename;
-      tmpFolder = m_LocalCacheFolder;
+      tmpFolder = GetTmpFolder();//m_LocalCacheFolder;
       tmpFolder += "\\";
       tmpFolder += name.c_str();
 

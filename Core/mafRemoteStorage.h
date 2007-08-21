@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRemoteStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:14:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-08-21 14:40:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mafRemoteFileManager;
+class mmdRemoteFileManager;
 
 /** A storage class for MSF remote files.
   This is an implementation of remote storage object for storing MSF remote files.
@@ -38,6 +38,9 @@ public:
   mafRemoteStorage();
   virtual ~mafRemoteStorage();
   
+  /** Add the mmdRemoteFileManager device and initialize it.*/
+  void Initialize();
+
   /** resolve an URL download remote file and provide local filename to be used as input */
   virtual int ResolveInputURL(const char *url, mafString &filename, mafObserver *observer = NULL);
 
@@ -51,21 +54,18 @@ public:
 
   /** Set the user name to be used to connect through a given protocol. 
   If no user name is set, anonymous is used.*/
-  void SetUsername(mafString usr);
+  void SetUsername(const mafString &usr);
 
   /** Set the password for the user name required for connection.*/
-  void SetPassword(mafString pwd);
+  void SetPassword(const mafString &pwd);
 
   /** Set the address of the remote host.*/
-  void SetHostName(mafString host);
+  void SetHostName(const mafString &host);
 
   /** Set the address of the remote host.*/
-  void SetRemotePort(int port);
+  void SetRemotePort(const int &port);
 
-  /** Set the folder in which download the remote VME.*/
-  void SetLocalCacheFolder(mafString cache);
-
-  mafRemoteFileManager *GetRemoteFileManager() {return m_RemoteFileManager;};
+  mmdRemoteFileManager *GetRemoteFileManager() {return m_RemoteFileManager;};
 
 protected:
   /** Create a filename list of the local MSF directory. */
@@ -75,7 +75,6 @@ protected:
   bool IsFileInLocalDirectory(const char *filename);
 
   mafString m_HostName;
-  mafString m_LocalCacheFolder;
   mafString m_LocalMSFFolder;
   mafString m_RemoteRepository;
   mafString m_RemoteMSF;
@@ -83,6 +82,6 @@ protected:
 
   bool m_IsRemoteMSF;
 
-  mafRemoteFileManager *m_RemoteFileManager;
+  mmdRemoteFileManager *m_RemoteFileManager;
 };
 #endif // _mafRemoteStorage_h_
