@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 17:11:26 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-08-21 14:35:13 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ class vtkSimpleRulerActor2D;
 //----------------------------------------------------------------------------
 enum RWI_LAYERS
 {
-	ONE_LAYER =0,
+	ONE_LAYER = 0,
   TWO_LAYER
 };
 //----------------------------------------------------------------------------
@@ -47,14 +47,18 @@ enum RWI_LAYERS
 class mafRWI : public mafObserver
 {
 public:
-										mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
-	virtual					 ~mafRWI();
+  				 mafRWI();
+           mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
+	virtual	~mafRWI();
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   virtual void OnEvent(mafEventBase *maf_event);
 
-	/** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
+	/** Create all the elements necessary to build the rendering scene.*/
+  void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
+
+  /** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL);
 
 	/** Reset the camera position according to the bounds. */

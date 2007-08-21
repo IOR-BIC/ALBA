@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 17:11:26 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-08-21 14:35:13 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,13 +51,21 @@
 #define DEFAULT_BG_COLOR 0.28
 
 //----------------------------------------------------------------------------
-mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo)
+mafRWI::mafRWI()
 //----------------------------------------------------------------------------
 {
   m_Listener= NULL;
   m_Sg      = NULL;
   m_RenBack = NULL;
+  m_RenFront= NULL;
   m_Gui     = NULL;
+  m_Light   = NULL;
+  m_Camera  = NULL;
+  m_RwiBase = NULL;
+  m_RenderWindow = NULL;
+  m_Ruler   = NULL;
+  m_Grid    = NULL;
+  m_Axes    = NULL;
   for (int b=0; b<6; b++)
   {
     m_CameraButtons[b] = NULL;
@@ -71,6 +79,47 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
+}
+//----------------------------------------------------------------------------
+mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo)
+//----------------------------------------------------------------------------
+{
+  m_Listener= NULL;
+  m_Sg      = NULL;
+  m_RenBack = NULL;
+  m_RenFront= NULL;
+  m_Gui     = NULL;
+  m_Light   = NULL;
+  m_Camera  = NULL;
+  m_RwiBase = NULL;
+  m_RenderWindow = NULL;
+  m_Ruler   = NULL;
+  m_Grid    = NULL;
+  m_Axes    = NULL;
+  for (int b=0; b<6; b++)
+  {
+    m_CameraButtons[b] = NULL;
+  }
+  m_Sizer = NULL;
+
+  m_LinkCamera   = 0;
+  m_GridPosition = 0;
+  m_BGColour  = wxColour(DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255,DEFAULT_BG_COLOR * 255);
+  m_GridColour= wxColour(DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255,DEFAULT_GRID_COLOR * 255);
+
+  m_StereoMovieDir    = "";
+  m_StereoMovieEnable = 0;
+
+  CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo);
+}
+//----------------------------------------------------------------------------
+void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo)
+//----------------------------------------------------------------------------
+{
+  if (m_Light != NULL)
+  {
+    return;
+  }
 
   m_StereoType = stereo;
 
