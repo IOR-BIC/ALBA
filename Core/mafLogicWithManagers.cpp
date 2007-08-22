@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:43:03 $
-  Version:   $Revision: 1.108 $
+  Date:      $Date: 2007-08-22 10:58:00 $
+  Version:   $Revision: 1.109 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -161,6 +161,7 @@ void mafLogicWithManagers::Configure()
     m_VMEManager->SetPassword(m_ApplicationSettings->GetPassword());
     m_VMEManager->SetLocalCacheFolder(m_ApplicationSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
+    m_VMEManager->SetSingleBinaryFile(m_ApplicationSettings->GetSingleFileStatus()!= 0);
   }
 
 // currently mafInteraction is strictly dependent on VTK (marco)
