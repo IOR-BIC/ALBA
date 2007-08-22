@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:39:00 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-08-22 10:57:28 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,8 @@
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
 #include "mmdRemoteFileManager.h"
+#include "mafVMEGenericAbstract.h"
+#include "mafDataVector.h"
 
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
@@ -61,6 +63,8 @@ mafVMEManager::mafVMEManager()
 	m_ZipFile  = "";
   m_TmpDir   = "";
 
+  m_SingleBinaryFile = false;
+
   m_Config = wxConfigBase::Get();
 }
 //----------------------------------------------------------------------------
@@ -75,11 +79,22 @@ mafVMEManager::~mafVMEManager()
   cppDEL(m_Config);
 }
 //----------------------------------------------------------------------------
+void mafVMEManager::SetSingleBinaryFile(bool singleFile)
+//----------------------------------------------------------------------------
+{
+  m_SingleBinaryFile = singleFile;
+}
+//----------------------------------------------------------------------------
 void mafVMEManager::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (maf_event->GetChannel()==MCH_UP)
   {
+    if (maf_event->GetId() == mafDataVector::SINGLE_FILE_DATA)
+    {
+      ((mafEvent *)maf_event)->SetBool(m_SingleBinaryFile);
+      return;
+    }
     // events coming from the tree...
     switch (maf_event->GetId())
     {
@@ -527,6 +542,13 @@ void mafVMEManager::MSFSave()
 {
   if(m_MSFFile.IsEmpty()) 
   {
+    // new file to save: ask to the application which is the default
+    // modality to save binary files.
+    mafEvent e(this,mafDataVector::SINGLE_FILE_DATA);
+    mafEventMacro(e);
+    SetSingleBinaryFile(e.GetBool());
+    
+    // ask for the new file name.
     wxString wildc = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
     mafString file = mafGetSaveFile(m_MSFDir, wildc.c_str()).c_str();
     if(file.IsEmpty())
@@ -549,9 +571,11 @@ void mafVMEManager::MSFSave()
 			file = file_dir + "/" + name + "." + ext;
 		}
 
+    // convert to unix format
     mafString sub_unixname;
     if (file.StartsWith("\\\\"))
     {
+      // prevent to revert the remote mounted disk back slash characters.
       sub_unixname = file;
       sub_unixname.Erase(0,1);
       sub_unixname.ParsePathName();
@@ -559,7 +583,7 @@ void mafVMEManager::MSFSave()
       file += sub_unixname;
     }
     else
-      file.ParsePathName(); // convert to unix format
+      file.ParsePathName();
 
     m_MSFFile = file.GetCStr();
   }
@@ -697,10 +721,29 @@ void mafVMEManager::NotifyRemove(mafNode *n)
 void mafVMEManager::NotifyAdd(mafNode *n)
 //----------------------------------------------------------------------------
 {
+  bool checkSingleFile = n->IsMAFType(mafVMERoot);
+  
   mafNodeIterator *iter = n->NewIterator();
   iter->IgnoreVisibleToTraverse(true);
   for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  {
     mafEventMacro(mafEvent(this,VME_ADDED,node));
+    if (checkSingleFile)
+    {
+      // if checkSingleFile == true this method is called by the MSFOpen
+      // so we have to check if the msf has been saved in single binary file or not.
+      mafVMEGenericAbstract *vmeWithDataVector = mafVMEGenericAbstract::SafeDownCast(node);
+      if (vmeWithDataVector)
+      {
+        mafDataVector *dv = vmeWithDataVector->GetDataVector();
+        if (dv != NULL)
+        {
+          SetSingleBinaryFile(dv->GetSingleFileMode());
+          checkSingleFile = false;
+        }
+      }
+    }
+  }
   iter->Delete();
 }
 //----------------------------------------------------------------------------
