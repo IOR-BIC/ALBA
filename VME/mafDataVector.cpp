@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 10:56:14 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-08-22 16:38:39 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -174,8 +174,8 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   // The case when data has just been loaded is avoided, since in that case
   // there is not yet an old filename to which the file was saved.
   DataMap::iterator it;
-  bool base_name_changed = m_LastBaseURL != base_url; //&& !m_JustRestored;
-  bool release_old_files = base_name_changed && !m_JustRestored;
+  bool base_name_changed = m_LastBaseURL != base_url && !m_JustRestored;
+  bool release_old_files = !base_name_changed && !m_LastBaseURL.IsEmpty();
   
   // now check if the filename is (really) changed or if something has changed.
   // Notice that in mafVMEAbstractGaneric, when the storage URL is changed the 
@@ -183,7 +183,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   // thus in case the MSF has just been loaded (m_JustReastored is true) but the
   // storage object's URL has been changed, the DataVector appears as being Modified
   // and data save to the new place is forced!
-  if ((base_name_changed || IsDataModified()) && !m_JustRestored) // if some data added or removed...
+  if ((base_name_changed || IsDataModified())) // if some data added or removed...
   {
     if (base_name_changed)
     {
