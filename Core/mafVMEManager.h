@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:37:06 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-08-22 10:57:11 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -135,6 +135,9 @@ public:
   /** Remove temporary directory used for compressed msf files.*/
   void RemoveTempDirectory();
 
+  /** Set the flag for saving binary files associated to time varying VMEs.*/
+  void SetSingleBinaryFile(bool singleFile);
+
 protected:
   /** Create a compressed msf file: zmsf.*/
   bool MakeZip(const mafString &zipname, wxArrayString *files);
@@ -160,6 +163,7 @@ protected:
   
   bool              m_LoadingFlag;  ///< used when an MSF is being loaded
   bool              m_Crypting;     ///< used to enable the Encryption for the MSF
+  bool              m_SingleBinaryFile; ///< used to store binary files associated to time varying VMEs as multiple files or not.
   mafVMEStorage*    m_Storage;      
 };
 #endif
