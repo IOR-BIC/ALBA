@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 16:38:39 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-08-22 16:57:52 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -183,9 +183,9 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   // thus in case the MSF has just been loaded (m_JustReastored is true) but the
   // storage object's URL has been changed, the DataVector appears as being Modified
   // and data save to the new place is forced!
-  if ((base_name_changed || IsDataModified())) // if some data added or removed...
+  if (base_name_changed || IsDataModified()) // if some data added or removed...
   {
-    if (base_name_changed)
+    if (m_LastBaseURL != base_url)
     {
       // ask how to save the binary file (as setting of the application):
       // single file or multi file.
