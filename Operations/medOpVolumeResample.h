@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 10:04:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-08-22 15:26:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -121,5 +121,7 @@ protected:
 	double	m_MaxBoundX;
 	double	m_MaxBoundY;
 	double	m_MaxBoundZ;
+
+  bool    m_ViewSelectedMessage;
 };
 #endif

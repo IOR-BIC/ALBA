@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 09:31:45 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-08-22 15:26:14 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -159,10 +159,16 @@ void medOpVolumeResample::CreateGizmos()
 {
   mafEvent e(this,VIEW_SELECTED);
   mafEventMacro(e);
+  m_ViewSelectedMessage = e.GetBool();
 
 	m_GizmoROI = new mafGizmoROI(mafVME::SafeDownCast(m_Input), this, mafGizmoHandle::FREE,m_VMEDummy);
-	m_GizmoROI->Show(true && e.GetBool());
-	m_GizmoROI->GetBounds(m_VolumeBounds);
+	m_GizmoROI->Show(true && m_ViewSelectedMessage);
+	
+  if(m_ViewSelectedMessage)
+    m_GizmoROI->GetBounds(m_VolumeBounds);
+  else
+    mafVME::SafeDownCast(m_Input)->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
+
 
 	SetBoundsToVMELocalBounds();
 
@@ -271,7 +277,10 @@ void medOpVolumeResample::UpdateGui()
 	m_MaxBoundY = m_VolumeBounds[3] - m_VolumeBounds[2];
 	m_MaxBoundZ = m_VolumeBounds[5] - m_VolumeBounds[4];
 
-	m_GizmoROI->GetBounds(m_VolumeBounds);
+  if(m_ViewSelectedMessage)
+    m_GizmoROI->GetBounds(m_VolumeBounds);
+  else
+    mafVME::SafeDownCast(m_Input)->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
 	if(m_Gui)
 		m_Gui->Update();
 }
@@ -714,7 +723,10 @@ void medOpVolumeResample::OnEvent(mafEventBase *maf_event)
 			switch(e->GetId())
 			{
 			case ID_TRANSFORM:
-					m_GizmoROI->GetBounds(this->m_VolumeBounds);
+        if(m_ViewSelectedMessage)
+          m_GizmoROI->GetBounds(m_VolumeBounds);
+        else
+          mafVME::SafeDownCast(m_Input)->GetOutput()->GetVMELocalBounds(m_VolumeBounds);
 					m_Gui->Update();
 					mafEventMacro(*e);
 					break;
