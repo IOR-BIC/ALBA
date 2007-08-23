@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdRemoteFileManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:33:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-08-23 08:51:11 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -140,6 +140,7 @@ int mmdRemoteFileManager::DownloadRemoteFile(mafString remote_filename, mafStrin
     if (m_EnableCertificateAuthentication)
     {
       curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYHOST, 0);
+      curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYPEER, FALSE);
     }
 
     m_Result = curl_easy_perform(m_Curl);
@@ -220,6 +221,7 @@ int mmdRemoteFileManager::UploadLocalFile(mafString local_filename, mafString re
         if (m_EnableCertificateAuthentication)
         {
           curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYHOST, 0);
+          curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         }
         curl_easy_setopt(m_Curl, CURLOPT_PUT, TRUE);
       }
