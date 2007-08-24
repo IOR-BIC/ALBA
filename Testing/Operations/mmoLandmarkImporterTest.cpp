@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkImporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-10-06 09:10:58 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-08-24 13:58:07 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -36,12 +36,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 void mmoLandmarkImporterTest::Test() 
 //-----------------------------------------------------------
 {
-  mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
 	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
 	importer->TestModeOn();
-  importer->SetInput(storage->GetRoot());
+
 	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_to_be_imported";
 	importer->SetFileName(filename.GetCStr());
@@ -62,17 +59,15 @@ void mmoLandmarkImporterTest::Test()
   CPPUNIT_ASSERT( fabs(xyz[0] - x) < 0.01 &&
                   fabs(xyz[1] - y) < 0.01 &&
                   fabs(xyz[2] - z) < 0.01 );
+
+  cppDEL(importer);
 }
 //-----------------------------------------------------------
 void mmoLandmarkImporterTest::TestTimeVariant() 
 //-----------------------------------------------------------
 {
-  mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
 	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
 	importer->TestModeOn();
-  importer->SetInput(storage->GetRoot());
 	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/Export.txt";
 	importer->SetFileName(filename.GetCStr());
@@ -95,17 +90,17 @@ void mmoLandmarkImporterTest::TestTimeVariant()
   CPPUNIT_ASSERT( fabs(xyz[0] - x) < 0.01 &&
                   fabs(xyz[1] - y) < 0.01 &&
                   fabs(xyz[2] - z) < 0.01 );
+
+
+  cppDEL(importer);
+
 }
 //-----------------------------------------------------------
 void mmoLandmarkImporterTest::TestUnTag() 
 //-----------------------------------------------------------
 {
-  mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();
 	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
 	importer->TestModeOn();
-  importer->SetInput(storage->GetRoot());
 	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_NOT_TAGGED";
 	importer->SetFileName(filename.GetCStr());
@@ -126,4 +121,7 @@ void mmoLandmarkImporterTest::TestUnTag()
   CPPUNIT_ASSERT( fabs(xyz[0] - x) < 0.01 &&
                   fabs(xyz[1] - y) < 0.01 &&
                   fabs(xyz[2] - z) < 0.01 );
+
+  cppDEL(importer);
+
 }
