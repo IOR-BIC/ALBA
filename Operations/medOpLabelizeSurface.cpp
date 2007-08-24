@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-15 20:58:03 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-08-24 10:38:19 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -154,7 +154,7 @@ void medOpLabelizeSurface::OpRun()
 	m_VmeEditor->SetData(inputOriginalPolydata,0.0);
 	m_VmeEditor->Modified();
 	m_VmeEditor->Update();
-	m_VmeEditor->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
+	m_VmeEditor->ReparentTo(mafVME::SafeDownCast(m_Input));
 
 	PlaneCreated = false;
 
@@ -543,6 +543,9 @@ void medOpLabelizeSurface::OpStop(int result)
 
 	mafDEL(m_IsaCompositor);
 
+	mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
+	m_VmeEditor->ReparentTo(NULL);
+
 	mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
 
 	HideGui();
@@ -556,9 +559,9 @@ void medOpLabelizeSurface::OpDo()
 	{
 		mafVMESurface::SafeDownCast(m_Input)->SetData(vtkPolyData::SafeDownCast(m_VmeEditor->GetOutput()->GetVTKData()),((mafVMESurface*)m_Input)->GetTimeStamp());
 
-		mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
+		/*mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-		m_VmeEditor->ReparentTo(NULL);
+		m_VmeEditor->ReparentTo(NULL);*/
 	}
 }
 //----------------------------------------------------------------------------
