@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 15:23:55 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-08-24 09:11:51 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,9 +146,10 @@ void mmoTransformInterface::OpDo()
       // group has no dataset
       !m_Input->IsA("mafVMEGroup") &&
       //  landmarks do not scale
-      !m_Input->IsA("mafVMELandmark")
+      !m_Input->IsA("mafVMELandmark") && 
+      //  parametric surfaces do not scale
+      !m_Input->IsA("mafVMESurfaceParametric")
      )
-
   {
     // apply scale to data
     
