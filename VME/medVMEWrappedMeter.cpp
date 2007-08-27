@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:47:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-08-27 13:05:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1033,7 +1033,7 @@ mmgGui* medVMEWrappedMeter::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Divider(2);
-  m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),_("") ,_(""));
+  //m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),_("") ,_(""));
 	m_Gui->Divider();
 
   InternalUpdate();
@@ -1311,11 +1311,11 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
-		case ID_SAVE_FILE_BUTTON:
+		/*case ID_SAVE_FILE_BUTTON:
 			{
         SaveInFile();
 			}
-			break;
+			break;*/
       default:
         mafNode::OnEvent(maf_event);
     }
@@ -1406,7 +1406,7 @@ void medVMEWrappedMeter::EnableManualModeWidget(bool flag)
 bool medVMEWrappedMeter::MiddlePointsControl()
 //-------------------------------------------------------------------------
 {
-  mafLogMessage("LINKS");
+  //mafLogMessage("LINKS");
   int numberOfMiddlePoints = 0;
   for (mafLinksMap::iterator i = GetLinks()->begin(); i != GetLinks()->end(); i++)
   {
@@ -1419,7 +1419,7 @@ bool medVMEWrappedMeter::MiddlePointsControl()
       mafString message;
       message = mafString(i->first);
       message += _("doesn't exist");
-      mafLogMessage(message);
+      //mafLogMessage(message);
       return false;
     }
     else
@@ -1427,7 +1427,7 @@ bool medVMEWrappedMeter::MiddlePointsControl()
       numberOfMiddlePoints++;
       mafString message;
       message = mafString(i->first);
-      mafLogMessage(message);
+      //mafLogMessage(message);
     }
   }
 
