@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-20 10:54:13 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-08-27 13:35:17 $
+  Version:   $Revision: 1.22 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -317,9 +317,9 @@ void mmoDICOMImporter::CreateGui()
 	m_Gui->FileOpen (ID_DICTIONARY,	"dictionary",	&m_DictionaryFilename, wildcard);
 	m_Gui->DirOpen(ID_OPEN_DIR, "Folder",	&m_DICOMDir);
 	m_Gui->Divider();
-	m_Gui->Label("patient info:",true);		
-	m_Gui->String(ID_PATIENT_NAME,"name ",&m_PatientName);
-	m_Gui->String(ID_PATIENT_ID,"id ",&m_Identifier);
+	m_Gui->Label("patient info:",true);
+  m_Gui->Label("name ", &m_PatientName);
+  m_Gui->Label("id ",&m_Identifier);
 	m_StudyListbox = m_Gui->ListBox(ID_STUDY,"study id",50);
 	m_Gui->Label("surgeon info:",true);
 	m_Gui->String(ID_SURGEON_NAME,"name ",&m_SurgeonName);
