@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-23 10:13:23 $
-Version:   $Revision: 1.23 $
+Date:      $Date: 2007-08-27 13:25:23 $
+Version:   $Revision: 1.24 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -258,6 +258,10 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 		case ID_LAYOUT_HEIGHT:
 		case ID_LAYOUT_WIDTH:
 			ProbeVolume();
+      //send here
+      e->SetDouble(m_WidthSection);
+      e->SetSender(this);
+      mafEventMacro(*e);
     break;
 		case ID_LAYOUT_THICKNESS:
 			{
