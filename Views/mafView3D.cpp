@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 10:06:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-08-27 13:23:44 $
+  Version:   $Revision: 1.11 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
+#include "mafVMESurfaceParametric.h"
 #include "mafPipeIsosurface.h"
 #include "medPipeVolumeDRR.h"
 #include "medPipeVolumeVR.h"
@@ -112,7 +113,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 				{
 					pipeMIP->SetResampleFactor(m_ResampleFactor);
 				}
-				CameraReset();
+				//CameraReset();
 				CameraUpdate();
 			}
 			break;
@@ -412,8 +413,13 @@ int mafView3D::GetNodeStatus(mafNode *vme)
 		else if (vme->IsMAFType(mafVMESurface))
 		{
 			n = m_Sg->Vme2Node(vme);
-			n->m_Mutex = true;
+			n->m_Mutex = false;
 		}
+    else if (vme->IsMAFType(mafVMESurfaceParametric))
+    {
+      n = m_Sg->Vme2Node(vme);
+      n->m_Mutex = false;
+    }
 		else
 		{
 			n = m_Sg->Vme2Node(vme);
