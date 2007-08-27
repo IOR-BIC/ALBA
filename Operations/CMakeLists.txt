@@ -57,9 +57,14 @@ SET(PROJECT_SRCS
 
   medOpCreateWrappedMeter.cpp
   medOpCreateWrappedMeter.h
+  
+  medOpExporterWrappedMeter.cpp
+  medOpExporterWrappedMeter.h
 
   medOpLabelizeSurface.cpp
   medOpLabelizeSurface.h
+  medOp2DMeasure.cpp
+  medOp2DMeasure.h
 
 )
 
@@ -84,7 +89,7 @@ ENDIF (MAF_USE_ITK)
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
-SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED medCommon)
+SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED medCommon medInteraction)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
