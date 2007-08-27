@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 12:53:11 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2007-08-27 13:42:05 $
+  Version:   $Revision: 1.40 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,7 @@
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkCamera.h"
+#include "vtkTransform.h"
 
 
 //----------------------------------------------------------------------------
@@ -308,8 +309,15 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 					normal[2] = 1;
 				}
 		    m_CurrentSurface.push_back(n);
-		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(m_Slice);
+
+        double positionSlice[3];
+        positionSlice[0] = m_Slice[0];
+        positionSlice[1] = m_Slice[1];
+        positionSlice[2] = m_Slice[2];
+        VolumePositionCorrection(positionSlice, normal);
+		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+
       }
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
@@ -345,6 +353,11 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 					normal[2] = 1;
 				}
 				m_CurrentPolyline.push_back(n);
+        double positionSlice[3];
+        positionSlice[0] = m_Slice[0];
+        positionSlice[1] = m_Slice[1];
+        positionSlice[2] = m_Slice[2];
+        VolumePositionCorrection(positionSlice, normal);
 				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
 				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
 			}
@@ -380,6 +393,11 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 					normal[2] = 1;
 				}
 				m_CurrentPolylineGraphEditor.push_back(n);
+        double positionSlice[3];
+        positionSlice[0] = m_Slice[0];
+        positionSlice[1] = m_Slice[1];
+        positionSlice[2] = m_Slice[2];
+        VolumePositionCorrection(positionSlice, normal);
 				if(m_CameraPosition==CAMERA_OS_P)
 					((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
 				else
@@ -421,6 +439,11 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           normal[2] = 1;
         }
         m_CurrentMesh.push_back(n);
+        double positionSlice[3];
+        positionSlice[0] = m_Slice[0];
+        positionSlice[1] = m_Slice[1];
+        positionSlice[2] = m_Slice[2];
+        VolumePositionCorrection(positionSlice, normal);
         ((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice);
         ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
       }
@@ -548,6 +571,10 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 		}
 	}
   
+  double normal[3];
+  this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+  VolumePositionCorrection(origin,normal);
+  
   if(!m_CurrentSurface.empty())
 	{
 		for(int i=0;i<m_CurrentSurface.size();i++)
@@ -558,7 +585,9 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 				if (pipe_name.Equals("mafPipeSurfaceSlice"))
 				{
 					mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
-					pipe->SetSlice(origin); 
+          pipe->SetSlice(origin); 
+          pipe->SetNormal(normal); 
+
 				}
 			}
 		}
@@ -764,6 +793,10 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
 void mafViewSlice::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||vme->IsA("medVMEPolylineEditor"))
+  {
+    this->UpdateSurfacesList(vme);
+  }
   Superclass::VmeRemove(vme);
 }
 
@@ -858,4 +891,44 @@ void mafViewSlice::SetNormal(double normal[3])
       }
     }
   }
+}
+//-------------------------------------------------------------------------
+void mafViewSlice::VolumePositionCorrection(double *point, double *normal)
+//-------------------------------------------------------------------------
+{
+  if(m_CurrentVolume && m_CurrentVolume->m_Vme)
+  {
+    mafMatrix *mat = ((mafVME *)m_CurrentVolume->m_Vme)->GetOutput()->GetMatrix();
+    double coord[4];
+    coord[0] = point[0];
+    coord[1] = point[1];
+    coord[2] = point[2];
+    double result[4];
+
+    vtkTransform *newT = vtkTransform::New();
+    newT->SetMatrix(mat->GetVTKMatrix());
+    newT->TransformPoint(coord, result);
+    vtkDEL(newT);
+
+    point[0] = result[0];
+    point[1] = result[1];
+    point[2] = result[2];
+
+    /*mafMatrix rot;
+    rot.Identity();
+    rot.CopyRotation(*mat);
+
+    double normalOriginal[4];
+    normalOriginal[0] = normal[0];
+    normalOriginal[1] = normal[1];
+    normalOriginal[2] = normal[2];
+
+    vtkTransform *newR = vtkTransform::New();
+    newR->SetMatrix(rot.GetVTKMatrix());
+    newR->TransformPoint(normalOriginal, normal);
+    vtkDEL(newR);*/
+
+    mat->GetVersor(2, normal);
+  }
+  
 }
