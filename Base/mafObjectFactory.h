@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-08-28 14:59:02 $
+  Version:   $Revision: 1.16 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -121,7 +121,7 @@ public:
   const char* GetLibraryPath();
 
   /**
-    This function can be used by Application code to register new Objects's to the mflCoreFactory */
+    This function can be used by Application code to register new Objects's to the mafCoreFactory */
   void RegisterNewObject(const char* ObjectName, const char* description, mafCreateObjectFunction createFunction,mafReferenceCounted *args=NULL);
 
   /** Register object creation information with the factory. */
@@ -132,7 +132,7 @@ public:
       mafCreateObjectFunction createFunction,
       mafReferenceCounted *args=NULL);
 
-  /** return argument data assigned to object inthe factory */
+  /** return argument data assigned to object in the factory */
   mafReferenceCounted *GetArgs(const char *type_name);
 
   /** mmuOverrideInformation utility class.

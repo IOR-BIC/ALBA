@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObjectFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-08-28 14:59:02 $
+  Version:   $Revision: 1.15 $
   Authors:   Based on itkObjectFactory (www.itk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -373,7 +373,7 @@ void mafObjectFactory::Print(std::ostream& os, const int indent) const
       i != m_OverrideMap->end(); ++i)
     {
     os << next_indent << "Class : " <<  (*i).first.c_str() << "\n";
-    os << next_indent << "Overriden with: " <<  (*i).second.m_OverrideWithName.c_str()
+    os << next_indent << "Overridden with: " <<  (*i).second.m_OverrideWithName.c_str()
        << std::endl;
     os << next_indent << "Enable flag: " << (*i).second.m_EnabledFlag
        << std::endl;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 18:21:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-08-28 15:03:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,34 +56,27 @@ public:
     LOWER_RIGHT
   };
 
-  /** 
-  Insert a text into the render window.*/
+  /** Insert a text into the render window.*/
   void SetText(const char *text);
 
-  /** 
-  Position the text into the render window at normalized view's position x,y. (0,0) is the lower left corner.*/
+  /** Position the text into the render window at normalized view's position x,y. (0,0) is the lower left corner.*/
   void SetTextPosition(double nv_x, double nv_y);
 
-  /** 
-  Allow to change the text color. Values passed are from 0 (black) to 255 (white).*/
+  /** Allow to change the text color. Values passed are from 0 (black) to 255 (white).*/
   void SetTextColor(int textColor[3]);
   void SetTextColor(int textColorRed,int textColorGreen,int textColorBlue );
 
-  /** 
-  Allow to change the font size */
+  /** Allow to change the font size */
   void SetTextSize(int size);
 
-  /** 
-  Align text into the render window.*/
+  /** Align text into the render window.*/
   void SetTextAlignment(int align = UPPER_LEFT);
 
-	/** 
-  Returns the mafTextKit's GUI */
+	/** Returns the mafTextKit's GUI */
 	mmgGui *GetGui() {return m_Gui;};
 
 protected:
-  /** 
-  Create GUI for AttachCamera module.*/
+  /** Create GUI for AttachCamera module.*/
   void CreateGui();
 
   int m_ShowText;
