@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 10:58:00 $
-  Version:   $Revision: 1.109 $
+  Date:      $Date: 2007-08-28 15:03:10 $
+  Version:   $Revision: 1.110 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -230,11 +230,11 @@ void mafLogicWithManagers::Configure()
     m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), _("Measure Unit"));
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::Plug(mafView* view) 
+void mafLogicWithManagers::Plug(mafView* view, bool visibleInMenu)
 //----------------------------------------------------------------------------
 {
   if(m_ViewManager) 
-    m_ViewManager->ViewAdd(view);
+    m_ViewManager->ViewAdd(view, visibleInMenu);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath, bool canUndo)

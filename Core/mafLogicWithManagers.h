@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 15:30:46 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-08-28 15:03:10 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -89,7 +89,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   /**  Plug a new view */
-	virtual void Plug(mafView* view);
+	virtual void Plug(mafView* view, bool visibleInMenu = true);
 
 
   /**  Plug a new operation and its undo flag: if the operation does not support
