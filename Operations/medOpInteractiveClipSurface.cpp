@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 13:49:48 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-08-28 11:05:09 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -151,6 +151,7 @@ enum CLIP_SURFACE_ID
 	ID_USE_GIZMO,
 	ID_CLIP,
 	ID_UNDO,
+	ID_CLIP_BOX,
 };
 
 //----------------------------------------------------------------------------
@@ -210,6 +211,7 @@ void medOpInteractiveClipSurface::CreateGui()
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
 	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
+	//m_Gui->Bool(ID_CLIP_BOX,_("clipping box"),&m_ClipBoundBox,1);
 	double b[6];
 	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
@@ -290,8 +292,8 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 			{
 				if(m_IsaCompositor && !m_UseGizmo)
 					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
-				else if(m_IsaClipWithoutGizmo && m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_IsaClipWithoutGizmo);
+				else if(m_IsaCompositorWithGizmo && m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
 
 				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
 				
@@ -678,7 +680,10 @@ int medOpInteractiveClipSurface::Clip()
 	newPolyData->DeepCopy(m_Clipper->GetOutput());
 	newPolyData->Update();
 
-	m_ResultPolyData.push_back(newPolyData);
+	int result=((mafVMESurface*)m_Input)->SetData(newPolyData,((mafVME*)m_Input)->GetTimeStamp());
+
+	if(result==MAF_OK)
+		m_ResultPolyData.push_back(newPolyData);
 
 	m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
 	m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);
