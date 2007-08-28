@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 12:30:53 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2007-08-28 15:02:36 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,6 +61,7 @@ mafViewManager::mafViewManager()
   m_TemplateNum       = 0;
   m_CollaborateStatus = false;
   m_FromRemote        = false;
+  m_IdInvisibleMenuList.clear();
   for(int i=0; i<MAXVIEW; i++) 
     m_ViewTemplate[i] = NULL;
 
@@ -69,7 +70,7 @@ mafViewManager::mafViewManager()
       m_ViewMatrixID[t][v] = NULL;
 }
 //----------------------------------------------------------------------------
-mafViewManager::~mafViewManager( ) 
+mafViewManager::~mafViewManager()
 //----------------------------------------------------------------------------
 {	
 	if(m_SelectedRWI)
@@ -141,13 +142,18 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mafViewManager::ViewAdd(mafView *view)   
+void mafViewManager::ViewAdd(mafView *view, bool visibleInMenu)
 //----------------------------------------------------------------------------
 {
   m_ViewTemplate[m_TemplateNum] = view;
 	view->m_Id = m_TemplateNum + VIEW_START;
   view->m_Mult = 0;
   view->SetListener(this);
+
+  if (!visibleInMenu)
+  {
+    m_IdInvisibleMenuList.push_back(view->m_Id);
+  }
 
   m_TemplateNum++;    
 }
@@ -282,8 +288,20 @@ void mafViewManager::FillMenu(wxMenu* menu)
 	{
     mafView* v = m_ViewTemplate[i];
     s = wxString::Format("%s",v->GetLabel().c_str());
-	  menu->Append(v->m_Id, s, (wxMenu *)NULL, s );
+    if(IsVisibleInMenu(v))
+	    menu->Append(v->m_Id, s, (wxMenu *)NULL, s );
   }
+}
+//----------------------------------------------------------------------------
+bool mafViewManager::IsVisibleInMenu(mafView* v)
+//----------------------------------------------------------------------------
+{
+  for(int i=0; i<m_IdInvisibleMenuList.size(); i++)
+  {
+    if(m_IdInvisibleMenuList[i] == v->m_Id) return false;
+  }
+  
+  return true;
 }
 //----------------------------------------------------------------------------
 mafView *mafViewManager::ViewCreate(int id)

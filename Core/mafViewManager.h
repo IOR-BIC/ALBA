@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-22 15:18:29 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-08-28 15:02:36 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,9 @@ public:
   /** Fill the main menù with plugged views. */
 	void FillMenu (wxMenu* menu);
 
+  /** Check if the view 'v' should be hidden from the 'View' menu.*/
+  bool IsVisibleInMenu(mafView* v);
+
   /** Add the vme to all views. */
   void VmeAdd(mafNode *n);
 
@@ -61,7 +64,7 @@ public:
   void VmeModified(mafNode *vme); //SIL. 9-3-2005: 
 
   /** Add the View to the view-list. */
-	virtual void ViewAdd(mafView *view);
+	virtual void ViewAdd(mafView *view, bool visibleInMenu = true);
   
 	/** Pass the selected render window to the mouse device. */
   void ViewSelected(mafView *view /*, mafRWIBase *rwi*/);
@@ -117,11 +120,10 @@ public:
   /** Return the view pointer from view's id and multiplicity. */
   mafView *GetView(int id, int mult) {return m_ViewMatrixID[id][mult];};
 
-  /** 
-  Initialize the action for the mouse device. */
+  /** Initialize the action for the mouse device.*/
   void SetMouse(mmdMouse *mouse);
 
-  /** Turn On/Off the collaboration status. */
+  /** Turn On/Off the collaboration status.*/
   void Collaborate(bool status) {m_CollaborateStatus = status;};
 
   bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
@@ -141,6 +143,8 @@ protected:
   mafRWIBase    *m_SelectedRWI;
 	mafView       *m_ViewBeingCreated;
   mafView       *m_ViewMatrixID[MAXVIEW][MAXVIEW];  ///< Matrix to access views directly by (id, multiplicity)
+
+  std::vector<long> m_IdInvisibleMenuList; ///< List of views that are no visible into the 'View' menu item.
 
   bool m_CollaborateStatus;
 };
