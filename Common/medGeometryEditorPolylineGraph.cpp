@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-24 10:08:45 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-08-28 10:51:46 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -206,6 +206,8 @@ void medGeometryEditorPolylineGraph::Show(bool show)
 	mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineEditor,show));
 	if(show==false)
 		mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,show));
+
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 enum EDITOR_GRAPH_ID
@@ -255,6 +257,8 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 						
 						if(!m_TestMode)
 							mafEventMacro(mafEvent(this,VME_SHOW,m_VMEPolylineSelection,false));
+
+						mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 					}
 					else
 						mafLogMessage("It's impossible to delete a point of degree > 2");
@@ -565,6 +569,7 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 			}
 		}
 	}
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	//mafLogMessage(wxString::Format("current branch %d di %d",m_CurrentBranch,m_PolylineGraph->GetNumberOfBranches()));
 }
 //----------------------------------------------------------------------------
