@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkClipSurfaceBoundingBox.cxx,v $
 Language:  C++
-Date:      $Date: 2007-08-13 09:54:34 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-08-28 11:27:29 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,7 +20,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLinearSubdivisionFilter.h"
 #include "vtkClipPolyData.h"
 
-vtkCxxRevisionMacro(vtkClipSurfaceBoundingBox, "$Revision: 1.3 $");  
+vtkCxxRevisionMacro(vtkClipSurfaceBoundingBox, "$Revision: 1.4 $");  
 vtkStandardNewMacro(vtkClipSurfaceBoundingBox);
 
 //-------------------------------------------------------------------------
@@ -71,4 +71,8 @@ void vtkClipSurfaceBoundingBox::Execute()
 	clipFilter->Update();
 
 	output->DeepCopy(clipFilter->GetOutput());
+
+	clipFilter->Delete();
+	implicitPolyData->Delete();
+	extrusionFilter->Delete();
 }
