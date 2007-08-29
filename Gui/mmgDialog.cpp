@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-08-29 13:13:47 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ mmgDialog::mmgDialog(const wxString& title,long style)
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-  m_dialog_initialized = false;
+  m_DialogInitialized = false;
   
   long s = wxCAPTION;
   if(style & mafRESIZABLE) 
@@ -72,8 +72,6 @@ mmgDialog::mmgDialog(const wxString& title,long style)
   m_OkButton     = NULL;
   m_CancelButton = NULL;
   m_CloseButton  = NULL;
-
-  m_DialogSizer->SetMinSize(wxSize(100,50)); // looks ugly when it is empty
 
   if(style & mafOK || style & mafCANCEL || style & mafCLOSE )
   {
@@ -101,25 +99,28 @@ mmgDialog::mmgDialog(const wxString& title,long style)
     m_ButtonsSizer->Add(m_CloseButton);
   }
   this->SetSizer( m_DialogSizer );
+  SetMinSize(wxSize(200,100));
+  SetSize(wxSize(200,100));
+  m_DialogSizer->Fit(this);
 }
 //----------------------------------------------------------------------------
 mmgDialog::~mmgDialog()
 //----------------------------------------------------------------------------
 {
-  m_dialog_initialized = false;
+  m_DialogInitialized = false;
 }
 //----------------------------------------------------------------------------
 int mmgDialog::ShowModal()
 //----------------------------------------------------------------------------
 {
-  if(! m_dialog_initialized )
+  if(! m_DialogInitialized )
   {
     // these operations are delayed from the Ctor,
     // to allow the user to Add other gui in the meanwhile
     
     m_DialogSizer->Layout();           // resize & fit the contents
     m_DialogSizer->SetSizeHints(this); // resize the dialog accordingly 
-    m_dialog_initialized = true;
+    m_DialogInitialized = true;
   }
   return wxDialog::ShowModal();
 }
