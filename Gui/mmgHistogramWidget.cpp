@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-14 17:09:08 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2007-08-29 13:00:36 $
+Version:   $Revision: 1.13 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -83,6 +83,8 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   sizer->Fit(this);
 */
   CreateGui();
+
+  SetMinSize(size);
 }
 //----------------------------------------------------------------------------
 mmgHistogramWidget::~mmgHistogramWidget() 

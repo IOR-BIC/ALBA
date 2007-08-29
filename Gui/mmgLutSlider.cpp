@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 17:09:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-08-29 13:00:36 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,6 +133,8 @@ mmgLutSlider::mmgLutSlider(wxWindow *parent, wxWindowID id,const wxPoint& pos, c
   m_MiddleButton  = new mmgLutButt(this, 3, "windowing", wxPoint(25,0),	wxSize(100,BUTT_H));
   m_MaxButton     = new mmgLutButt(this, 2, "100", wxPoint(125,0), wxSize(35, BUTT_H));
   m_MaxLabel      = new wxStaticText(this, -1, "", wxPoint(0,0), wxSize(35, BUTT_H));
+
+  SetMinSize(size);
 }
 //----------------------------------------------------------------------------
 mmgLutSlider::~mmgLutSlider()
