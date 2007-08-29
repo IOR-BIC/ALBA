@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 14:41:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-08-29 13:08:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,6 +15,7 @@
 #include "mmdMouse.h"
 #include "mafRWI.h"
 #include "mafView.h"
+#include "mmgDialogPreview.h"
 #include "mafVME.h"
 #include "mafEventInteraction.h"
 
@@ -103,20 +104,12 @@ mmi2DDistance::mmi2DDistance()
   int x_init,y_init;
   x_init = mafGetFrame()->GetPosition().x;
   y_init = mafGetFrame()->GetPosition().y;
-  m_HistogramDialog = new wxDialog(mafGetFrame(),-1,_("Histogram"),wxDefaultPosition,wxDefaultSize,wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP);
-  m_HistogramRWI = new mafRWI(mafGetFrame());
+  m_HistogramDialog = new mmgDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
+  m_HistogramRWI = m_HistogramDialog->GetRWI();
   m_HistogramRWI->SetListener(this);
   m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
   m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
   m_HistogramRWI->SetSize(0,0,width,height);
-  m_HistogramRWI->m_RwiBase->Reparent(m_HistogramDialog);
-  m_HistogramRWI->m_RwiBase->Show(true);
-
-  wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-  sizer->Add(m_HistogramRWI->m_RwiBase,1, wxEXPAND);
-  m_HistogramDialog->SetSizer(sizer);
-  m_HistogramDialog->SetAutoLayout(TRUE);
-  sizer->Fit(m_HistogramDialog);
   
   m_HistogramDialog->SetSize(x_init,y_init,width,height);
 	m_HistogramDialog->Show(FALSE);
@@ -209,7 +202,6 @@ mmi2DDistance::~mmi2DDistance()
   m_Measure.clear();
   m_FlagMeasureType.clear();
 
-  cppDEL(m_HistogramRWI);
   cppDEL(m_HistogramDialog);
 }
 //----------------------------------------------------------------------------
@@ -220,7 +212,6 @@ void mmi2DDistance::OnLeftButtonDown(mafEventInteraction *e)
   e->Get2DPosition(pos_2d);
   
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-
   if(m_EndMeasure)
   { 
     RemoveMeter();
@@ -323,11 +314,10 @@ void mmi2DDistance::OnRightButtonUp(mafEventInteraction *e)
 void mmi2DDistance::OnMove(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
-	double pos_2d[2];
-	
   if (!m_DraggingMouse) return;
   if((m_DraggingLeft || m_DraggingLine) && m_ParallelView)
   {
+    double pos_2d[2];
     e->Get2DPosition(pos_2d);
     DrawMeasureTool(pos_2d[0], pos_2d[1]);
   }
@@ -371,8 +361,6 @@ void mmi2DDistance::DrawMeasureTool(double x, double y)
     m_MeterVector[m_MeterVector.size()-1] = vtkTextActorMeter::New();
     // initialization
     m_Distance = 0.0;
-    
-
 		m_CurrentRenderer->RemoveActor2D(m_LineActor2);
 		m_Line->SetPoint1(p);
 		m_Line->SetPoint2(p);
@@ -426,24 +414,22 @@ void mmi2DDistance::DrawMeasureTool(double x, double y)
 	}
 	else if(counter == 2 && m_DraggingLine)
 	{
-		
-			assert(m_MeasureType = DISTANCE_BETWEEN_LINES);
-			// add the second line 
-			double tmpPt[3];
-			m_Line->GetPoint1(tmpPt);
-			m_Line2->SetPoint1(tmpPt);
-			dx = tmpPt[0];
-			dy = tmpPt[1];
-			dz = tmpPt[2];
-			m_Line->GetPoint2(tmpPt);
-			m_Line2->SetPoint2(tmpPt);
-			dx -= tmpPt[0];
-			dy -= tmpPt[1];
-			dz -= tmpPt[2];
-			m_Line2->Update();
-			m_CurrentRenderer->AddActor2D(m_LineActor2);
-			counter++;
-		
+		assert(m_MeasureType = DISTANCE_BETWEEN_LINES);
+		// add the second line 
+		double tmpPt[3];
+		m_Line->GetPoint1(tmpPt);
+		m_Line2->SetPoint1(tmpPt);
+		dx = tmpPt[0];
+		dy = tmpPt[1];
+		dz = tmpPt[2];
+		m_Line->GetPoint2(tmpPt);
+		m_Line2->SetPoint2(tmpPt);
+		dx -= tmpPt[0];
+		dy -= tmpPt[1];
+		dz -= tmpPt[2];
+		m_Line2->Update();
+		m_CurrentRenderer->AddActor2D(m_LineActor2);
+		counter++;
 	}
 	// add the  second line for the angle between lines mode
 	else if(counter == 3 && m_MeasureType == DISTANCE_BETWEEN_POINTS && m_DraggingLeft)
@@ -522,11 +508,10 @@ void mmi2DDistance::DrawMeasureTool(double x, double y)
     }
     m_CurrentRenderer->AddActor2D(m_MeterVector[m_MeterVector.size()-1]);
   }
-  
-  
-	if(m_EndMeasure)
+
+  if(m_EndMeasure)
 	{
-	counter = 0;
+	  counter = 0;
     CalculateMeasure();
     m_RendererVector.push_back(m_CurrentRenderer);
 
@@ -654,11 +639,10 @@ void mmi2DDistance::DrawMeasureTool(double x, double y)
     
 		m_RegisterMeasure = true;
 
-    //delete temporary measure
+    // remove temporary measure
     m_CurrentRenderer->RemoveActor2D(m_LineActor);
     m_CurrentRenderer->RemoveActor2D(m_LineActor2);
 	}
-  
   
 	m_CurrentRenderer->GetRenderWindow()->Render();
 }
@@ -685,7 +669,6 @@ void mmi2DDistance::CalculateMeasure()
     mafEventMacro(mafEvent(this,ID_RESULT_MEASURE,m_Distance));
     return;
   }
-
 }
 //----------------------------------------------------------------------------
 void mmi2DDistance::CreateHistogram()
@@ -699,13 +682,11 @@ void mmi2DDistance::CreateHistogram()
     m_PlotActor->SetXRange(0,m_Distance);
     m_PlotActor->SetPlotCoordinate(0,m_Distance);
 
-
     double tmp1[3];
     if(m_LineSourceVector1.size() == 0)
       m_Line->GetPoint1(tmp1);
     else
       m_LineSourceVector1[m_LineSourceVector1.size()-1]->GetPoint1(tmp1);
-
 
     double tmp2[3];
     if(m_LineSourceVector1.size() == 0)
@@ -716,33 +697,28 @@ void mmi2DDistance::CreateHistogram()
     double b[6];
     m_ProbedVME->GetOutput()->GetBounds(b);
     
-      if(tmp1[0] < b[0]) tmp1[0] = b[0];
-      else if (tmp1[0] > b[1]) tmp1[0] = b[1];
+    if(tmp1[0] < b[0]) tmp1[0] = b[0];
+    else if (tmp1[0] > b[1]) tmp1[0] = b[1];
 
-      if(tmp1[1] < b[2]) tmp1[1] = b[2];
-      else if (tmp1[1] > b[3]) tmp1[1] = b[3];
+    if(tmp1[1] < b[2]) tmp1[1] = b[2];
+    else if (tmp1[1] > b[3]) tmp1[1] = b[3];
 
-      if(tmp1[2] < b[4]) tmp1[2] = b[4];
-      else if (tmp1[2] > b[5]) tmp1[2] = b[5];
+    if(tmp1[2] < b[4]) tmp1[2] = b[4];
+    else if (tmp1[2] > b[5]) tmp1[2] = b[5];
 
-      if(tmp2[0] < b[0]) tmp2[0] = b[0];
-      else if (tmp2[0] > b[1]) tmp2[0] = b[1];
+    if(tmp2[0] < b[0]) tmp2[0] = b[0];
+    else if (tmp2[0] > b[1]) tmp2[0] = b[1];
 
-      if(tmp2[1] < b[2]) tmp2[1] = b[2];
-      else if (tmp2[1] > b[3]) tmp2[1] = b[3];
+    if(tmp2[1] < b[2]) tmp2[1] = b[2];
+    else if (tmp2[1] > b[3]) tmp2[1] = b[3];
 
-      if(tmp2[2] < b[4]) tmp2[2] = b[4];
-      else if (tmp2[2] > b[5]) tmp2[2] = b[5];
-
-
+    if(tmp2[2] < b[4]) tmp2[2] = b[4];
+    else if (tmp2[2] > b[5]) tmp2[2] = b[5];
 
     m_ProbingLine->SetPoint1(tmp1);
     m_ProbingLine->SetPoint2(tmp2);
     m_ProbingLine->SetResolution((int)m_Distance);
     m_ProbingLine->Update();
-
-    
-   
 
     vtkMAFSmartPointer<vtkProbeFilter> prober;
     prober->SetInput(m_ProbingLine->GetOutput());
@@ -778,7 +754,6 @@ void mmi2DDistance::GenerateHistogram(bool generate)
     m_HistogramRWI->m_RwiBase->Render();
     RemoveMeter();
     SetMeasureTypeToDistanceBetweenPoints();
-   
   }
   m_HistogramDialog->Show(m_GenerateHistogram);
 }
@@ -879,12 +854,10 @@ void mmi2DDistance::SetManualDistance(double manualDistance)
     m_LineSourceVector1[m_LineSourceVector1.size()-1]->GetPoint2(tmp2);
 
     double tmp3[3] = {0,0,0};
-    //
     tmp3[0] = (manualDistance/m_Measure[m_Measure.size()-1]) * (tmp2[0] - tmp1[0]) + tmp1[0];
 		tmp3[1] = (manualDistance/m_Measure[m_Measure.size()-1]) * (tmp2[1] - tmp1[1]) + tmp1[1];
 		tmp3[2] = (manualDistance/m_Measure[m_Measure.size()-1]) * (tmp2[2] - tmp1[2]) + tmp1[2];
 
-		//
     m_LineSourceVector1[m_LineSourceVector1.size()-1]->SetPoint2(tmp3);
     m_LineSourceVector1[m_LineSourceVector1.size()-1]->Update();
 
@@ -913,7 +886,6 @@ void mmi2DDistance::SetManualDistance(double manualDistance)
 		}
 		*/
 
-
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualDistance);
     m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
@@ -922,7 +894,6 @@ void mmi2DDistance::SetManualDistance(double manualDistance)
   }
   else if (m_MeasureType == DISTANCE_BETWEEN_LINES)
   {
-     //
     if (manualDistance <= 0 || m_Measure[m_Measure.size()-1] == 0) return;
     
     double tmp1[3] = {0,0,0}; 
@@ -936,7 +907,6 @@ void mmi2DDistance::SetManualDistance(double manualDistance)
 
 		m_LineSourceVector1[m_LineSourceVector1.size()-1]->GetPoint2(tmp3);
 		m_LineSourceVector2[m_LineSourceVector2.size()-1]->GetPoint2(tmp4);
-
     
     double tmp5[3] = {0,0,0};
 		double tmp6[3] = {0,0,0};
@@ -952,8 +922,6 @@ void mmi2DDistance::SetManualDistance(double manualDistance)
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->SetPoint1(tmp5);
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->SetPoint2(tmp6);
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->Update();
-
-		
 
     mafString ds;
     ds = wxString::Format(_("%.2f") , manualDistance);

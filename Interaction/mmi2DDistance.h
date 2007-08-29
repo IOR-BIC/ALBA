@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2006-07-07 08:17:49 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-08-29 13:08:29 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class vtkXYPlotActor;
 class vtkTextActor;
 class vtkConeSource;
 
-
+class mmgDialogPreview;
 
 /**  Class implementing an interactor for creating 2D measure tool.
 This interactor build a line from picked points on VME and draw a 2D line on the renderwindow.
@@ -189,7 +189,7 @@ protected:
 	vtkRenderer         *m_CurrentRenderer;
   vtkRenderer         *m_PreviousRenderer;
 
-	wxDialog  *m_HistogramDialog;
+  mmgDialogPreview  *m_HistogramDialog;
 	mafRWI    *m_HistogramRWI;
 	vtkXYPlotActor *m_PlotActor;
 
@@ -220,4 +220,3 @@ private:
 	void operator=(const mmi2DDistance&);  // Not implemented.
 };
 #endif
-
