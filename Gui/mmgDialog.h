@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialog.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-08-29 13:12:00 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ public:
   void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_GuiSizer->Add(window,option,flag,border);};
 
   /** Add a mmgGui to the dialog. TECH: this is to force the calling of the correct reparent, is not virtual in wxWindow */
-  void Add(mmgGui* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_GuiSizer->Add(window,option,flag,border);};
+  void Add(mmgGui* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); window->FitGui(); m_GuiSizer->Add(window,option,flag,border);};
 
   /** Add a sizer to the dialog. */
   void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_GuiSizer->Add(sizer, option,flag,border);};
@@ -106,13 +106,9 @@ public:
   /** 
   Virtual functions called to terminate ShowModal - these can be redefined without providing the Event Table. 
   called when a ShowModal stage end with because the user press a 'Close' button or the CloseButton on the frame.
-  The default behaviur is to call OnCancel() - I recommend not to override this, but OnCancel */
+  The default behavior is to call OnCancel() - I recommend not to override this, but OnCancel */
   virtual void OnCloseWindow(wxCloseEvent &event);
 
-
-  // to Paolo
-  // m_GuiSizer         forse sarebbe meglio chiamarlo m_UserSizer - e' dove l'user plugga i suoi widget
-  // m_PreviewSizer (se lo aggiungi) lo chiamerei m_ClientSizer - di fatto riempira la ClientArea della finestra
 
   wxBoxSizer *m_GuiSizer;          ///< Sizer for user widgets -- Calling Add() insert a widget in this sizer
   wxBoxSizer *m_ButtonsSizer;  ///< Sizer holding the ok,cancel,close button (if any)
@@ -130,7 +126,7 @@ private:
   void nvOnCancel(wxCommandEvent &event)    {OnCancel(event);};    
   void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();}; //calls nvOnCloseWindow
 
-  bool m_dialog_initialized;
+  bool m_DialogInitialized;
   DECLARE_EVENT_TABLE()
 };
 #endif
