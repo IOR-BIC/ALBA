@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-13 11:15:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-08-30 08:44:57 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -85,7 +85,7 @@ int medVMESurfaceEditor::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
 	if (polydata)
 		polydata->Update();
 
-	return Superclass::SetData(data,t,mode);
+	return Superclass::SetData(polydata,t,mode);
 }
 //-------------------------------------------------------------------------
 mafVMEOutput *medVMESurfaceEditor::GetOutput()

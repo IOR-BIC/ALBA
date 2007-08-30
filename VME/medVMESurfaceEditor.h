@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESurfaceEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-08-13 11:15:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-08-30 08:44:57 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,16 +44,16 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafVMEGeneric.h"
+#include "mafVMESurface.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
 
-class MAF_EXPORT medVMESurfaceEditor : public mafVMEGeneric
+class MAF_EXPORT medVMESurfaceEditor : public mafVMESurface
 {
 public:
-	mafTypeMacro(medVMESurfaceEditor, mafVMEGeneric);
+	mafTypeMacro(medVMESurfaceEditor, mafVMESurface);
 
 	/** 
 	Set data for the give timestamp. This function automatically creates a
