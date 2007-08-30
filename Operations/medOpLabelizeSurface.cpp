@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-24 10:38:19 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-08-30 08:49:44 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -59,6 +59,9 @@ MafMedical is partially based on OpenMAF.
 
 #include "mafVMESurface.h"
 #include "mafVMEGizmo.h"
+#include "mafGizmoTranslate.h"
+#include "mafGizmoRotate.h"
+#include "mafGizmoScale.h"
 #include "medVMESurfaceEditor.h"
 
 #include "vtkPlane.h"
@@ -78,6 +81,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkAppendPolyData.h"
 #include "vtkCleanPolyData.h"
 #include "vtkDoubleArray.h"
+#include "vtkLookupTable.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpLabelizeSurface);
@@ -98,14 +102,17 @@ mafOp(label)
 	m_ArrowShape = NULL;
 	m_Arrow = NULL;
 	m_Gizmo = NULL;
-	m_IsaCompositor = NULL;
+	m_IsaCompositorWithGizmo = NULL;
+	m_IsaCompositorWithoutGizmo = NULL;
 	m_InputSurface = NULL;
 	m_OriginalPolydata = NULL;
 	m_ClipperBoundingBox = NULL;
 
 	m_LabelValue = 0.0;
 
-	m_ClipInside = 1;
+	m_LabelInside = 1;
+	m_UseGizmo		= 1;
+	m_GizmoType		= GIZMO_TRANSLATE;
 
 	m_PlaneWidth = 0.0;
 	m_PlaneHeight = 0.0;
@@ -169,6 +176,9 @@ void medOpLabelizeSurface::OpRun()
 
 	if(!inputPolydata->GetCellData()->GetArray("CELL_LABEL"))
 	{
+		m_VmeEditor->GetMaterial()->m_ColorLut->SetNumberOfTableValues(1);
+		m_VmeEditor->GetMaterial()->m_ColorLut->SetTableValue(0,1.0,1.0,1.0);
+		m_VmeEditor->GetMaterial()->m_ColorLut->Build();
 
 		vtkMAFSmartPointer<vtkFloatArray> pointScalar;
 		pointScalar->SetName("POINT_LABEL");
@@ -215,9 +225,14 @@ void medOpLabelizeSurface::OpRun()
 
 	if(!m_TestMode)
 	{
+		//m_VmeEditor->GetOutput()->SetMaterial()
 		CreateGui();
 		ShowGui();
 		ShowClipPlane(true);
+
+		CreateGizmos();
+		//Enable & show Gizmos
+		ChangeGizmo();
 	}
 }
 //----------------------------------------------------------------------------
@@ -229,20 +244,29 @@ enum CLIP_SURFACE_ID
 	ID_UNDO,
 	ID_PLANE_WIDTH,
 	ID_PLANE_HEIGHT,
+	ID_USE_GIZMO,
+	ID_CHOOSE_GIZMO,
+	ID_LUT,
 };
 //----------------------------------------------------------------------------
 void medOpLabelizeSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mmgGui(this);
+
+	m_Gui->Bool(ID_USE_GIZMO,_("use gizmo"),&m_UseGizmo,1);
+	wxString gizmo_name[3] = {"translate","rotate","scale"};
+	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
+
 	m_Gui->Double(ID_LABEL_VALUE,_("Label"),&m_LabelValue);
+	m_Gui->Lut(ID_LUT,"lut",m_VmeEditor->GetMaterial()->m_ColorLut);
 	double b[6];
 	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
 	m_PlaneWidth = b[1] - b[0];
 	m_PlaneHeight = b[3] - b[2];
-	m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
-	m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
+	//m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
+	//m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
 	m_Gui->Divider();
 	m_Gui->Button(ID_UNDO,_("Undo"));
 
@@ -258,14 +282,24 @@ void medOpLabelizeSurface::CreateGizmos()
 	m_ImplicitPlaneGizmo->GetOutput()->GetVTKData()->ComputeBounds();
 	m_ImplicitPlaneGizmo->Modified();
 	m_ImplicitPlaneGizmo->Update();
+
+	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoTranslate->Show(false);
+	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoRotate->Show(false);
+	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
+	m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoScale->Show(false);
 }
 //----------------------------------------------------------------------------
 void medOpLabelizeSurface::AttachInteraction()
 //----------------------------------------------------------------------------
 {
-	mafNEW(m_IsaCompositor);
+	mafNEW(m_IsaCompositorWithoutGizmo);
 
-	m_IsaRotate = m_IsaCompositor->CreateBehavior(MOUSE_LEFT);
+	m_IsaRotate = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT);
 	m_IsaRotate->SetListener(this);
 	m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
 	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
@@ -275,7 +309,7 @@ void medOpLabelizeSurface::AttachInteraction()
 	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 	m_IsaRotate->EnableRotation(true);
 
-	m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
+	m_IsaTranslate = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_MIDDLE);
 	m_IsaTranslate->SetListener(this);
 	m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
 	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
@@ -285,15 +319,28 @@ void medOpLabelizeSurface::AttachInteraction()
 	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 	m_IsaTranslate->EnableTranslation(true);
 
-	m_IsaChangeArrow = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_SHIFT);
-	m_IsaChangeArrow->SetListener(this);
-	m_IsaChangeArrow->SetVME(m_ImplicitPlaneGizmo);
+	m_IsaChangeArrowWithoutGizmo = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
+	m_IsaChangeArrowWithoutGizmo->SetListener(this);
+	m_IsaChangeArrowWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
 
-	m_IsaClip = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_CONTROL);
-	m_IsaClip->SetListener(this);
-	m_IsaClip->SetVME(m_ImplicitPlaneGizmo);
+	m_IsaLabelizeWithoutGizmo = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
+	m_IsaLabelizeWithoutGizmo->SetListener(this);
+	m_IsaLabelizeWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
 
-	m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+	mafNEW(m_IsaCompositorWithGizmo);
+
+	m_IsaChangeArrowWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
+	m_IsaChangeArrowWithGizmo->SetListener(this);
+	m_IsaChangeArrowWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+
+	m_IsaLabelizeWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
+	m_IsaLabelizeWithGizmo->SetListener(this);
+	m_IsaLabelizeWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+
+	if(!m_UseGizmo)
+		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithoutGizmo);
+	else
+		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
 }
 //----------------------------------------------------------------------------
 void medOpLabelizeSurface::ShowClipPlane(bool show)
@@ -334,7 +381,7 @@ void medOpLabelizeSurface::ShowClipPlane(bool show)
 			m_Arrow->SetSource(m_ArrowShape->GetOutput());
 			m_Arrow->SetVectorModeToUseNormal();
 
-			int clip_sign = m_ClipInside ? 1 : -1;
+			int clip_sign = m_LabelInside ? 1 : -1;
 			m_Arrow->SetScaleFactor(clip_sign * abs(zdim/10.0));
 			m_Arrow->Update();
 
@@ -393,6 +440,18 @@ void medOpLabelizeSurface::OnEvent(mafEventBase *maf_event)
 	{
 		OnEventThis(maf_event); 
 	}
+	else if(maf_event->GetSender() == this->m_GizmoTranslate)
+	{
+		OnEventGizmoTranslate(maf_event);
+	}
+	else if(maf_event->GetSender() == this->m_GizmoRotate)
+	{
+		OnEventGizmoRotate(maf_event);
+	}
+	else if(maf_event->GetSender() == this->m_GizmoScale)
+	{
+		OnEventGizmoScale(maf_event);
+	}
 	else
 	{
 		OnEventGizmoPlane(maf_event);
@@ -425,6 +484,22 @@ void medOpLabelizeSurface::OnEventThis(mafEventBase *maf_event)
 				}
 			}
 			break;
+		case ID_USE_GIZMO:
+			{
+				if(m_IsaCompositorWithoutGizmo && !m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithoutGizmo);
+				else if(m_IsaCompositorWithGizmo && m_UseGizmo)
+					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
+
+
+				ChangeGizmo();
+			}
+			break;
+		case ID_CHOOSE_GIZMO:
+			{
+				ChangeGizmo();
+			}
+			break;
 		case wxOK:
 			{
 				OpStop(OP_RUN_OK);
@@ -451,20 +526,20 @@ void medOpLabelizeSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 		{
 		case ID_TRANSFORM:
 			{
-				if(e->GetSender()==m_IsaChangeArrow)
+				if(e->GetSender()==m_IsaChangeArrowWithGizmo || e->GetSender()==m_IsaChangeArrowWithoutGizmo)
 				{
 					if(m_Arrow) 
 					{
 						if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
 						{
-							m_ClipInside= m_ClipInside ? 0 : 1;
+							m_LabelInside= m_LabelInside ? 0 : 1;
 							m_Gui->Update();
 							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
 							mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 						}
 					}
 				}
-				else if(e->GetSender()==m_IsaClip)
+				else if(e->GetSender()==m_IsaLabelizeWithGizmo || e->GetSender()==m_IsaLabelizeWithoutGizmo)
 				{
 					if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
 					{
@@ -539,9 +614,17 @@ void medOpLabelizeSurface::OpStop(int result)
 	vtkDEL(m_PlaneSource);
 	vtkDEL(m_ClipperBoundingBox);
 	vtkDEL(m_Arrow);
-	vtkDEL(m_ClipperBoundingBox);
+	vtkDEL(m_ClipperPlane);
 
-	mafDEL(m_IsaCompositor);
+	mafDEL(m_IsaCompositorWithoutGizmo);
+	mafDEL(m_IsaCompositorWithGizmo);
+
+	m_GizmoTranslate->Show(false);
+	m_GizmoRotate->Show(false);
+	m_GizmoScale->Show(false);
+	cppDEL(m_GizmoTranslate);
+	cppDEL(m_GizmoRotate);
+	cppDEL(m_GizmoScale);
 
 	mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
 	m_VmeEditor->ReparentTo(NULL);
@@ -558,10 +641,15 @@ void medOpLabelizeSurface::OpDo()
 	if(m_VmeEditor)
 	{
 		mafVMESurface::SafeDownCast(m_Input)->SetData(vtkPolyData::SafeDownCast(m_VmeEditor->GetOutput()->GetVTKData()),((mafVMESurface*)m_Input)->GetTimeStamp());
-
-		/*mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
+		mmaMaterial *mat;
+		mafNEW(mat);
+		mat->DeepCopy(m_VmeEditor->GetMaterial());
+		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->SetMaterial(mat);
+		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->Update();
+		mafVMESurface::SafeDownCast(m_Input)->GetOutput()->Update();
+		mafEventMacro(mafEvent(this,VME_SHOW,m_Input,false));
+		mafEventMacro(mafEvent(this,VME_SHOW,m_Input,true));
 		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-		m_VmeEditor->ReparentTo(NULL);*/
 	}
 }
 //----------------------------------------------------------------------------
@@ -580,7 +668,7 @@ void medOpLabelizeSurface::Labelize()
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> before_transform_plane;
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_plane;
-	if(m_ClipInside==1)//if clip reverse is necessary rotate plane
+	if(m_LabelInside==1)//if clip reverse is necessary rotate plane
 	{
 		before_transform_plane->SetTransform(rotate);
 		before_transform_plane->SetInput(m_PlaneSource->GetOutput());
@@ -605,8 +693,8 @@ void medOpLabelizeSurface::Labelize()
 	m_ClipperBoundingBox->SetClipInside(1);
 	m_ClipperBoundingBox->Update();
 
-	vtkPolyData *newPolyData1;
-	vtkNEW(newPolyData1);
+	vtkMAFSmartPointer<vtkPolyData> newPolyData1;
+	//vtkNEW(newPolyData1);
 	newPolyData1->DeepCopy(m_ClipperBoundingBox->GetOutput());
 	newPolyData1->Update();
 
@@ -637,8 +725,8 @@ void medOpLabelizeSurface::Labelize()
 	m_ClipperBoundingBox->Modified();
 	m_ClipperBoundingBox->Update();
 
-	vtkPolyData *newPolyData2;
-	vtkNEW(newPolyData2);
+	vtkMAFSmartPointer<vtkPolyData> newPolyData2;
+	//vtkNEW(newPolyData2);
 	newPolyData2->DeepCopy(m_ClipperBoundingBox->GetOutput());
 	newPolyData2->Update();
 
@@ -668,4 +756,119 @@ void medOpLabelizeSurface::Labelize()
 
 	/*m_Gui->Enable(ID_UNDO,m_ResultPolyData.size()>1);
 	m_Gui->Enable(wxOK,m_ResultPolyData.size()>1);*/
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::ChangeGizmo()
+//----------------------------------------------------------------------------
+{
+	m_GizmoTranslate->Show(m_GizmoType==GIZMO_TRANSLATE && m_UseGizmo);
+	m_GizmoRotate->Show(m_GizmoType==GIZMO_ROTATE && m_UseGizmo);
+	m_GizmoScale->Show(m_GizmoType==GIZMO_SCALE && m_UseGizmo,m_GizmoType==GIZMO_SCALE && m_UseGizmo,false,m_GizmoType==GIZMO_SCALE && m_UseGizmo);
+
+	if(m_UseGizmo)
+	{
+		switch(m_GizmoType)
+		{
+		case GIZMO_TRANSLATE:
+			m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
+			break;
+		case GIZMO_ROTATE:
+			m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
+			break;
+		case GIZMO_SCALE:
+			m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
+			break;
+		}
+	}
+	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+		long arg = e->GetArg();
+
+		// handle incoming transform events
+		vtkTransform *tr = vtkTransform::New();
+		tr->PostMultiply();
+		tr->SetMatrix(((mafVME *)m_ImplicitPlaneGizmo)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
+		tr->Update();
+
+		mafMatrix absPose;
+		absPose.DeepCopy(tr->GetMatrix());
+		absPose.SetTimeStamp(0.0);
+
+		if (arg == mmiGenericMouse::MOUSE_MOVE)
+		{
+			// move vme
+			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);
+			// update matrix for OpDo()
+			//m_NewAbsMatrix = absPose;
+		} 
+		mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+
+		// clean up
+		tr->Delete();
+	}
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::OnEventGizmoTranslate(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{    
+			// post multiplying matrixes coming from the gizmo to the vme
+			// gizmo does not set vme pose  since they cannot scale
+			PostMultiplyEventMatrix(maf_event);
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::OnEventGizmoRotate(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{    
+			// post multiplying matrixes coming from the gizmo to the vme
+			// gizmo does not set vme pose  since they cannot scale
+			PostMultiplyEventMatrix(maf_event);
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::OnEventGizmoScale(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{ 
+	switch(maf_event->GetId())
+	{
+	case ID_TRANSFORM:
+		{ 
+			mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+		}
+		break;
+
+	default:
+		{
+			mafEventMacro(*maf_event);
+		}
+	}
 }

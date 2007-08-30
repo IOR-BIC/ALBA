@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-08-15 20:14:29 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-08-30 08:49:44 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -50,6 +50,9 @@ MafMedical is partially based on OpenMAF.
 // forward references :
 //----------------------------------------------------------------------------
 class mafVMEGizmo;
+class mafGizmoTranslate;
+class mafGizmoRotate;
+class mafGizmoScale;
 class mafVMESurface;
 class medVMESurfaceEditor;
 class mmiCompositorMouse;
@@ -82,6 +85,13 @@ public:
 	void OpDo();
 	void OpUndo();
 
+	enum GIZMO_TYPE
+	{
+		GIZMO_TRANSLATE = 0,
+		GIZMO_ROTATE,
+		GIZMO_SCALE,
+	};
+
 protected: 
 	virtual void OpStop(int result);
 
@@ -95,23 +105,36 @@ protected:
 	void Labelize();
 	void Undo();
 
+	/** Change type of gizmo in the view */
+	void ChangeGizmo();
+
 	void OnEventGizmoPlane(mafEventBase *maf_event);
 	void OnEventThis(mafEventBase *maf_event);
+	void OnEventGizmoTranslate(mafEventBase *maf_event);
+	void OnEventGizmoRotate(mafEventBase *maf_event);
+	void OnEventGizmoScale(mafEventBase *maf_event);
 
-	mmiCompositorMouse *m_IsaCompositor;
+	void PostMultiplyEventMatrix(mafEventBase *maf_event);
+
+	mmiCompositorMouse *m_IsaCompositorWithoutGizmo;
+	mmiCompositorMouse *m_IsaCompositorWithGizmo;
 	mmiGenericMouse    *m_IsaTranslate;
 	mmiGenericMouse    *m_IsaRotate;
-	mmiGenericMouse		 *m_IsaChangeArrow;
-	mmiGenericMouse		 *m_IsaClip;
+	mmiGenericMouse		 *m_IsaChangeArrowWithGizmo;
+	mmiGenericMouse		 *m_IsaChangeArrowWithoutGizmo;	
+	mmiGenericMouse		 *m_IsaLabelizeWithGizmo;
+	mmiGenericMouse		 *m_IsaLabelizeWithoutGizmo;
 
-	int		m_ClipInside;
+	int		m_LabelInside;
 
 	bool	PlaneCreated;
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;
-
 	double m_LabelValue;
+
+	int		m_GizmoType;
+	int   m_UseGizmo;
 
 	mafVMESurface				*m_InputSurface;
 	medVMESurfaceEditor *m_VmeEditor;
@@ -127,5 +150,9 @@ protected:
 
 	std::vector<vtkPolyData*> m_ResultPolyData;
 	vtkPolyData	*m_OriginalPolydata;
+
+	mafGizmoTranslate		*m_GizmoTranslate;
+	mafGizmoRotate			*m_GizmoRotate;
+	mafGizmoScale				*m_GizmoScale;
 };
 #endif
