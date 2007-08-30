@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-15 20:17:50 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-08-30 08:41:35 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVME.h"
 #include "medVMEOutputSurfaceEditor.h"
 #include "mafEventSource.h"
+#include "mmaMaterial.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
@@ -106,7 +107,7 @@ void medPipeSurfaceEditor::Create(mafSceneNode *n)
 
 	vtkNEW(m_Mapper);
 	m_Mapper->SetInput(data);
-	//m_Mapper->SetLookupTable(m_LUT);
+	m_Mapper->SetLookupTable(out_polyline->GetMaterial()->m_ColorLut);
 	m_Mapper->SetScalarRange(range);
 	m_Mapper->ScalarVisibilityOn();
 	if(data->GetPointData()->GetScalars())
