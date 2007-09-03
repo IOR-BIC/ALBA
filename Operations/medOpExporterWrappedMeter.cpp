@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-27 12:59:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-03 08:13:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -146,13 +146,26 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
     return ;
   }
 
-  for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
+  if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
   {
-    outputFile << vmeWrappedMeter->GetMiddlePointCoordinate(i)[0] << '\t'
-      << vmeWrappedMeter->GetMiddlePointCoordinate(i)[1] << '\t'
-      << vmeWrappedMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
+    for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
+    {
+      outputFile << vmeWrappedMeter->GetMiddlePointCoordinate(i)[0] << '\t'
+        << vmeWrappedMeter->GetMiddlePointCoordinate(i)[1] << '\t'
+        << vmeWrappedMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
+    }
   }
+  else if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+  {
+    outputFile << vmeWrappedMeter->GetWrappedGeometryTangent1()[0] << '\t'
+      << vmeWrappedMeter->GetWrappedGeometryTangent1()[1] << '\t'
+      << vmeWrappedMeter->GetWrappedGeometryTangent1()[2] << std::endl;
 
+    outputFile << vmeWrappedMeter->GetWrappedGeometryTangent2()[0] << '\t'
+      << vmeWrappedMeter->GetWrappedGeometryTangent2()[1] << '\t'
+      << vmeWrappedMeter->GetWrappedGeometryTangent2()[2] << std::endl;
+  }
+  
   outputFile.close();
 
 }

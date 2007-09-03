@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:47:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-03 08:14:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@
 #include "mafVME.h"
 #include "medVMEOutputWrappedMeter.h"
 #include "mafEvent.h"
+#include "mafVMESurfaceParametric.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -67,8 +68,11 @@ public:
     ID_START_METER_LINK = Superclass::ID_LAST,
     ID_END1_METER_LINK,
     ID_END2_METER_LINK,
+    ID_WRAPPED_METER_LINK,
 		ID_METER_MODE,
 	  ID_WRAPPED_METER_MODE,
+    ID_WRAPPED_SIDE,
+    ID_WRAPPED_REVERSE,
     ID_LISTBOX,
     ID_ADD_POINT,
     ID_REMOVE_POINT,
@@ -79,6 +83,7 @@ public:
   };
 
   static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
+  static bool VMESurfaceParametricAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMESurfaceParametric));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -226,6 +231,7 @@ public:
   mafVME *GetStartVME();
   mafVME *GetEnd1VME();
   mafVME *GetEnd2VME();
+  mafVME *GetWrappedVME();
 
   /** Get the link to the surface.*/
   mafNode::mafLinksMap *GetMidPointsLinks();
@@ -245,6 +251,24 @@ public:
 	/**Get Coordinates of indexed middle point*/
 	double *GetMiddlePointCoordinate(int index);
 
+  /**Get Coordinates of Tangent 1 in wrapped geometry*/
+  double *GetWrappedGeometryTangent1(){ return m_WrappedTangent1;};
+
+  /**Get Coordinates of Tangent 2 in wrapped geometry*/
+  double *GetWrappedGeometryTangent2(){ return m_WrappedTangent2;};
+
+  /**Set\Get modality of wrapped vme (AUTOMATIC OR MANUAL)*/
+  int GetWrappedMode(){return m_WrappedMode;};
+  void SetWrappedMode(int value){m_WrappedMode = value;};
+
+  /**Set\Get side of geometric wrapping: the side where search tangent over parametric surface*/
+  int GetWrapSide(){return m_WrapSide;};
+  void SetWrapSide(int value){m_WrapSide = value;};
+
+  /**Set\Get reverse modality: reverse allows which direction follow for clip after finding tangent points.*/
+  int GetWrapReverse(){return m_WrapReverse;};
+  void SetWrapReverse(int value){m_WrapReverse = value;};
+
 protected:
   medVMEWrappedMeter();
   virtual ~medVMEWrappedMeter();
@@ -260,6 +284,13 @@ protected:
 
   /** update the output data structure */
   virtual void InternalUpdate();
+
+  /** update the output data structure for manual wrapped mode */
+  virtual void InternalUpdateManual();
+
+  /** update the output data structure for automate wrapped mode */
+  virtual void InternalUpdateAutomated();
+  
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
@@ -284,12 +315,17 @@ protected:
   double m_StartPoint[3];
   double m_EndPoint[3];
   double m_EndPoint2[3];
+  
+  double m_WrappedVMECenter[3];
+  double m_WrappedTangent1[3];
+  double m_WrappedTangent2[3];
 
 
   mafTransform *m_Transform;
 
   vtkLineSource     *m_LineSource;
   vtkLineSource     *m_LineSource2;
+  //vtkLineSource     *m_LineSourceMiddle;
   vtkAppendPolyData *m_Goniometer;
   mafTransform      *m_TmpTransform;
   
@@ -304,9 +340,12 @@ protected:
   mafString m_StartVmeName;
   mafString m_EndVme1Name;
   mafString m_EndVme2Name;
+  mafString m_WrappedVmeName;
 
   wxListBox *m_ListBox;
 	int        m_WrappedMode;
+  int        m_WrapSide;
+  int        m_WrapReverse;
 
 private:
   medVMEWrappedMeter(const medVMEWrappedMeter&); // Not implemented

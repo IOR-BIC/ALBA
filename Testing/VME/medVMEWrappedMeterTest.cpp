@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-20 13:50:36 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-03 08:15:19 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -294,7 +294,7 @@ void medVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 
 
 	mafDEL(wrappedMeter);
-	mafDEL(cloud);
+	mafDEL(importer);
 
 	mafDEL(storage);
 }
@@ -329,10 +329,10 @@ void medVMEWrappedMeterTest::TestLineDistanceWithGenericVME()
 
 
 	mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-	matrix1->SetElement(X,3,1); //set a translation value on x axis of 4.0
+	matrix1->SetElement(X,3,1); //set a translation value on x axis of 1.0
 
 	mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-	matrix2->SetElement(Y,3,1); //set a translation value on x axis of 3.0
+	matrix2->SetElement(Y,3,1); //set a translation value on x axis of 1.0
 
 
 	medVMEWrappedMeter *wrappedMeter;
@@ -398,10 +398,10 @@ void medVMEWrappedMeterTest::TestLineAngleWithGenericVME()
 
 
 	mafMatrix *matrix1 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
-	matrix1->SetElement(X,3,1); //set a translation value on x axis of 4.0
+	matrix1->SetElement(X,3,1); //set a translation value on x axis of 1.0
 
 	mafMatrix *matrix2 = vmeParametricSurfaceEND2->GetOutput()->GetAbsMatrix();
-	matrix2->SetElement(Y,3,1); //set a translation value on x axis of 3.0
+	matrix2->SetElement(Y,3,1); //set a translation value on x axis of 1.0
 
 
 	medVMEWrappedMeter *wrappedMeter;
@@ -485,7 +485,7 @@ void medVMEWrappedMeterTest::TestLineDistanceWithLandmark()
 
 
 	mafDEL(wrappedMeter);
-	mafDEL(cloud);
+	mafDEL(importer);
 
 	mafDEL(storage);
 }
@@ -540,7 +540,116 @@ void medVMEWrappedMeterTest::TestLineAngleWithLandmark()
 
 
 	mafDEL(wrappedMeter);
-	mafDEL(cloud);
+	mafDEL(importer);
 
 	mafDEL(storage);
+}
+//---------------------------------------------------------------
+void medVMEWrappedMeterTest::TestWrappedGeometry()
+//---------------------------------------------------------------
+{
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+
+
+  //create a parametric surface
+  mafVMESurfaceParametric *vmeParametricSurfaceSTART;
+  mafNEW(vmeParametricSurfaceSTART);	
+  vmeParametricSurfaceSTART->GetOutput()->GetVTKData()->Update();
+  vmeParametricSurfaceSTART->SetParent(storage->GetRoot());
+  vmeParametricSurfaceSTART->Update();
+
+  mafVMESurfaceParametric *vmeParametricSurfaceEND1;
+  mafNEW(vmeParametricSurfaceEND1);	
+  vmeParametricSurfaceEND1->GetOutput()->GetVTKData()->Update();
+  vmeParametricSurfaceEND1->SetParent(storage->GetRoot());
+  vmeParametricSurfaceEND1->Update();
+
+  mafVMESurfaceParametric *vmeParametricSurfaceWrapped;
+  mafNEW(vmeParametricSurfaceWrapped);	
+  vmeParametricSurfaceWrapped->GetOutput()->GetVTKData()->Update();
+  vmeParametricSurfaceWrapped->SetParent(storage->GetRoot());
+  vmeParametricSurfaceWrapped->Update();
+
+
+  mafMatrix *matrix1 = vmeParametricSurfaceSTART->GetOutput()->GetAbsMatrix();
+  matrix1->SetElement(X,3,-10); //set a translation value on x axis of -10.0
+  matrix1->SetElement(Y,3,2); //set a translation value on y axis of 2.0
+
+  mafMatrix *matrix2 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
+  matrix2->SetElement(X,3,10); //set a translation value on x axis of 10.0
+  matrix2->SetElement(Y,3,2); //set a translation value on y axis of 2.0
+
+  //this create 3 spheres, o--  10 --  -- 10 -- o , total distance is 10, and tangent points are the same
+  //                                  o  <-- this is wrapped surface
+
+  medVMEWrappedMeter *wrappedMeter;
+  mafNEW(wrappedMeter);
+
+  wrappedMeter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
+  wrappedMeter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
+  wrappedMeter->SetMeterLink("WrappedVME",vmeParametricSurfaceWrapped);
+  wrappedMeter->SetWrappedMode(medVMEWrappedMeter::AUTOMATED_WRAP);
+  wrappedMeter->SetParent(storage->GetRoot());
+  
+  wrappedMeter->GetOutput()->GetVTKData()->Update();
+  wrappedMeter->Modified();
+  wrappedMeter->Update();
+
+
+  printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
+  CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 21.5 && wrappedMeter->GetDistance() < 21.6);
+
+  CPPUNIT_ASSERT(wrappedMeter->GetWrappedGeometryTangent1()[0] - wrappedMeter->GetWrappedGeometryTangent2()[0] < 0.001 && //x is opposite
+                 fabs(wrappedMeter->GetWrappedGeometryTangent1()[1]- wrappedMeter->GetWrappedGeometryTangent2()[1]) < 0.001 &&
+                 fabs(wrappedMeter->GetWrappedGeometryTangent1()[2]- wrappedMeter->GetWrappedGeometryTangent2()[2]) < 0.001);
+
+
+  wrappedMeter->SetParent(NULL);
+
+
+  medVMEWrappedMeter *wrappedMeter2;
+  mafNEW(wrappedMeter2);
+
+  wrappedMeter2->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
+  wrappedMeter2->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
+  wrappedMeter2->SetMeterLink("WrappedVME",vmeParametricSurfaceWrapped);
+  wrappedMeter2->SetWrappedMode(medVMEWrappedMeter::AUTOMATED_WRAP);
+  wrappedMeter2->SetParent(storage->GetRoot());
+
+  wrappedMeter2->SetWrapSide(1);
+  wrappedMeter2->GetOutput()->GetVTKData()->Update();
+  wrappedMeter2->Modified();
+  wrappedMeter2->Update();
+
+
+  printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
+  
+
+  printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
+  CPPUNIT_ASSERT(wrappedMeter2->GetDistance() > 20.0);
+
+  CPPUNIT_ASSERT(wrappedMeter2->GetWrappedGeometryTangent1()[0] - wrappedMeter2->GetWrappedGeometryTangent2()[0] < 0.001 && //x is opposite
+    fabs(wrappedMeter2->GetWrappedGeometryTangent1()[1]- wrappedMeter2->GetWrappedGeometryTangent2()[1]) < 0.001 &&
+    fabs(wrappedMeter2->GetWrappedGeometryTangent1()[2]- wrappedMeter2->GetWrappedGeometryTangent2()[2]) < 0.001);
+
+
+  wrappedMeter->SetParent(NULL);
+  wrappedMeter2->SetParent(NULL);
+
+
+  vmeParametricSurfaceSTART->SetParent(NULL);
+  vmeParametricSurfaceEND1->SetParent(NULL);
+  vmeParametricSurfaceWrapped->SetParent(NULL);
+
+
+  mafDEL(wrappedMeter);
+  mafDEL(wrappedMeter2);
+  mafDEL(vmeParametricSurfaceSTART);
+  mafDEL(vmeParametricSurfaceEND1);
+  mafDEL(vmeParametricSurfaceWrapped);
+
+  mafDEL(storage);
+
 }

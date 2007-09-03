@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:47:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-03 08:14:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,20 +49,34 @@ mmgGui *medVMEOutputWrappedMeter::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
 
-  m_Distance = ((medVMEWrappedMeter *)m_VME)->GetDistance();
+  medVMEWrappedMeter *wrappedMeter = (medVMEWrappedMeter *)m_VME;
+  m_Distance = wrappedMeter->GetDistance();
   m_Gui->Label(_("distance: "), &m_Distance, true);
 
-	double *coordinateFIRST = ((medVMEWrappedMeter *)m_VME)->GetMiddlePointCoordinate(0);
-	double *coordinateLAST = ((medVMEWrappedMeter *)m_VME)->GetMiddlePointCoordinate(((medVMEWrappedMeter *)m_VME)->GetNumberMiddlePoints()-1);
-	if(coordinateFIRST != NULL)
-	  m_MiddlePoints[0] = wxString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
-	if(coordinateLAST != NULL)
-	  m_MiddlePoints[m_MiddlePoints.size()-1] = wxString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
+	double *coordinateFIRST;
+	double *coordinateLAST; 
+  
+  if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
+  {
+    coordinateFIRST = wrappedMeter->GetMiddlePointCoordinate(0);
+    coordinateLAST = wrappedMeter->GetMiddlePointCoordinate(wrappedMeter->GetNumberMiddlePoints()-1);
+  }
+  else if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+  {
+    coordinateFIRST = wrappedMeter->GetWrappedGeometryTangent1();
+    coordinateLAST =  wrappedMeter->GetWrappedGeometryTangent2();
+  }
 
+  if(coordinateFIRST != NULL)
+    m_MiddlePoints[0] = wxString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
+  if(coordinateLAST != NULL)
+    m_MiddlePoints[m_MiddlePoints.size()-1] = wxString::Format("%.2f %.2f %.2f", coordinateLAST[0], coordinateLAST[1], coordinateLAST[2]);
+
+  
 	m_Gui->Label(_("first mp:"), &m_MiddlePoints[0], true);
 	m_Gui->Label(_("last mp:"), &m_MiddlePoints[m_MiddlePoints.size()-1], true);
 
-  m_Angle = ((medVMEWrappedMeter *)m_VME)->GetAngle();
+  m_Angle = wrappedMeter->GetAngle();
   m_Gui->Label(_("angle: "), &m_Angle, true);
 	m_Gui->Divider();
 
@@ -75,12 +89,27 @@ void medVMEOutputWrappedMeter::Update()
   assert(m_VME);
   m_VME->Update();
 
-  if(((medVMEWrappedMeter *)m_VME)->GetMeterMode() == medVMEWrappedMeter::POINT_DISTANCE)
+  medVMEWrappedMeter *wrappedMeter = (medVMEWrappedMeter *)m_VME;
+
+  if(wrappedMeter->GetMeterMode() == medVMEWrappedMeter::POINT_DISTANCE)
   {
 		m_Distance = ((medVMEWrappedMeter *)m_VME)->GetDistance();
 
-		double *coordinateFIRST = ((medVMEWrappedMeter *)m_VME)->GetMiddlePointCoordinate(0);
-		double *coordinateLAST = ((medVMEWrappedMeter *)m_VME)->GetMiddlePointCoordinate(((medVMEWrappedMeter *)m_VME)->GetNumberMiddlePoints()-1);
+    double *coordinateFIRST;
+    double *coordinateLAST; 
+
+    if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
+    {
+      coordinateFIRST = wrappedMeter->GetMiddlePointCoordinate(0);
+      coordinateLAST = wrappedMeter->GetMiddlePointCoordinate(wrappedMeter->GetNumberMiddlePoints()-1);
+    }
+    else if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+    {
+      coordinateFIRST = wrappedMeter->GetWrappedGeometryTangent1();
+      coordinateLAST =  wrappedMeter->GetWrappedGeometryTangent2();
+    }
+
+		
 		if(coordinateFIRST != NULL)
 			m_MiddlePoints[0] = wxString::Format("%.2f %.2f %.2f", coordinateFIRST[0], coordinateFIRST[1], coordinateFIRST[2]);
 		if(coordinateLAST != NULL)
@@ -88,15 +117,15 @@ void medVMEOutputWrappedMeter::Update()
 
 		m_Angle ="";
   }
-	else if(((medVMEWrappedMeter *)m_VME)->GetMeterMode() == medVMEWrappedMeter::LINE_DISTANCE)
+	else if(wrappedMeter->GetMeterMode() == medVMEWrappedMeter::LINE_DISTANCE)
 	{
-		m_Distance = ((medVMEWrappedMeter *)m_VME)->GetDistance();
+		m_Distance = wrappedMeter->GetDistance();
 		m_Angle ="";
 	}
-  else if(((medVMEWrappedMeter *)m_VME)->GetMeterMode() == medVMEWrappedMeter::LINE_ANGLE)
+  else if(wrappedMeter->GetMeterMode() == medVMEWrappedMeter::LINE_ANGLE)
   {
     m_Distance ="";
-    m_Angle= ((medVMEWrappedMeter *)m_VME)->GetAngle();
+    m_Angle= wrappedMeter->GetAngle();
   }
   if (m_Gui)
   {
