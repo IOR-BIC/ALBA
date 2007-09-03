@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-03 10:08:35 $
-Version:   $Revision: 1.25 $
+Date:      $Date: 2007-09-03 14:55:36 $
+Version:   $Revision: 1.26 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -717,7 +717,7 @@ void mafViewCTNew::SetCTLookupTable(double min, double max)
       mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
 
       //calculate the variation
-      double wholeScalarRangeData[2];
+      //double wholeScalarRangeData[2];
       //m_Prober[idSubView]->GetOutput()->GetScalarRange(wholeScalarRangeData);
 
       double mapLow,mapHigh;
