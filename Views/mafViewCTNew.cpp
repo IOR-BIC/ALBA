@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-27 13:25:23 $
-Version:   $Revision: 1.24 $
+Date:      $Date: 2007-09-03 10:08:35 $
+Version:   $Revision: 1.25 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -718,11 +718,11 @@ void mafViewCTNew::SetCTLookupTable(double min, double max)
 
       //calculate the variation
       double wholeScalarRangeData[2];
-      m_Prober[idSubView]->GetOutput()->GetScalarRange(wholeScalarRangeData);
+      //m_Prober[idSubView]->GetOutput()->GetScalarRange(wholeScalarRangeData);
 
       double mapLow,mapHigh;
-      mapLow = wholeScalarRangeData[0] + ((wholeScalarRangeData[1] - wholeScalarRangeData[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (min - wholeScalarRangeVol[0]);
-      mapHigh = wholeScalarRangeData[1] + ((wholeScalarRangeData[1] - wholeScalarRangeData[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (max - wholeScalarRangeVol[1]);
+      mapLow = wholeScalarRangeVol[0] + /*((wholeScalarRangeData[1] - wholeScalarRangeData[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * */ (min - wholeScalarRangeVol[0]);
+      mapHigh = wholeScalarRangeVol[1] + /*((wholeScalarRangeData[1] - wholeScalarRangeData[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * */(max - wholeScalarRangeVol[1]);
 
       m_Mapper[idSubView]->SetScalarRange(mapLow, mapHigh);
     }
