@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-11 16:13:48 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-09-04 13:09:10 $
+  Version:   $Revision: 1.15 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,6 +24,7 @@
 #include "mafVME.h"
 #include "mafMatrix.h"
 #include "mafTransform.h"
+#include "mafVMESurface.h"
 
 #include "vtkDoubleArray.h"
 #include "vtkRenderWindowInteractor.h"
@@ -32,6 +33,10 @@
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataNormals.h"
+#include "vtkPointData.h"
+#include "vtkCellData.h"
 
 mafCxxTypeMacro(mmiGenericMouse);
 
@@ -440,14 +445,19 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       {
         if (constrainPlane == mmiConstraint::XY)
         {
-          if (m_SurfaceSnap == false)
+          if (m_SurfaceSnap == false && m_SurfaceNormal == false)
           {
             TrackballTranslate();
-          }          
+          }
           else
           {
-            SnapOnSurface();
+            if(m_SurfaceSnap)
+              SnapOnSurface();
+            else if(m_SurfaceNormal)
+              NormalOnSurface();
+
           }
+
         }
         else
         {
@@ -665,8 +675,8 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
       if (GetRotationConstraint()->GetRefSys()->GetType() == mafRefSys::VIEW)
       {
         if (constrainPlane == mmiConstraint::XY)
-        {
-          TrackballRotate();
+        {				
+					TrackballRotate();
         }      
         else
         {
@@ -1258,7 +1268,185 @@ void mmiGenericMouse::TrackballRoll()
    //send the transform matrix
    SendTransformMatrix(t.GetMatrix());
 }
+//----------------------------------------------------------------------------
+void mmiGenericMouse::NormalOnSurface()
+//----------------------------------------------------------------------------
+{
+	/*if (m_Renderer == NULL || m_Prop == NULL ) return;
 
+	int x = m_MousePose[0];
+	int y = m_MousePose[1];
+
+	vtkPropCollection *pc = vtkPropCollection::New();
+	m_Prop->GetActors(pc); 
+	pc->InitTraversal();
+	vtkProp* p = pc->GetNextProp();
+	while(p)
+	{
+		p->PickableOff();
+		p = pc->GetNextProp();
+	}
+
+	bool picked = false;
+	double newAbsPickPos[3];
+	mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+	if (mouse)
+	{
+		mafView *v = mouse->GetView();
+		if (v)
+		{
+			picked = v->Pick(x,y);
+			if(picked)
+			{
+				v->GetPickedPosition(newAbsPickPos);
+			}
+		}
+	}
+
+	pc->InitTraversal();
+	p = pc->GetNextProp();
+	while(p)
+	{
+		p->PickableOn();
+		p = pc->GetNextProp();
+	}
+
+	if (!picked)
+	{
+		TrackballTranslate();
+		return;
+	}
+	double absPivotPos[3];
+	assert(m_VME);
+	mafTransform::GetPosition(m_VME->GetAbsMatrixPipe()->GetMatrix(), absPivotPos);
+
+	double absMotionVec[3];
+	absMotionVec[0] = newAbsPickPos[0] - absPivotPos[0];
+	absMotionVec[1] = newAbsPickPos[1] - absPivotPos[1];
+	absMotionVec[2] = newAbsPickPos[2] - absPivotPos[2];*/
+
+	
+  SnapOnSurface();
+
+	if (m_Renderer == NULL || m_Prop == NULL ) return;
+
+	int x = m_MousePose[0];
+	int y = m_MousePose[1];
+
+	vtkPropCollection *pc = vtkPropCollection::New();
+	m_Prop->GetActors(pc); 
+	pc->InitTraversal();
+	vtkProp* p = pc->GetNextProp();
+	while(p)
+	{
+		p->PickableOff();
+		p = pc->GetNextProp();
+	}
+
+	bool picked = false;
+	double newAbsPickPos[3];
+	mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+	mafVME *pickedVme;
+	if (mouse)
+	{
+		mafView *v = mouse->GetView();
+		if (v)
+		{
+			picked = v->Pick(x,y);
+			if(picked)
+			{
+				v->GetPickedPosition(newAbsPickPos);
+				pickedVme = v->GetPickedVme();
+			}
+		}
+	}
+
+	pc->InitTraversal();
+	p = pc->GetNextProp();
+	while(p)
+	{
+		p->PickableOn();
+		p = pc->GetNextProp();
+	}
+
+	if (!picked)
+	{
+		TrackballTranslate();
+		return;
+	}
+
+	vtkPolyData *poly =  vtkPolyData::SafeDownCast(pickedVme->GetOutput()->GetVTKData());
+	if(poly == NULL) return;
+
+
+	//copy of poly
+	vtkMAFSmartPointer<vtkPolyData> polyCopy;
+	polyCopy->DeepCopy(poly);
+
+	// fill it with cellnormals
+	vtkMAFSmartPointer<vtkPolyDataNormals> normalsOnPoly;
+	normalsOnPoly->SetInput(polyCopy);
+	normalsOnPoly->ComputeCellNormalsOff();
+	normalsOnPoly->ComputePointNormalsOn();
+	normalsOnPoly->Update();
+	// search the cell of picking
+	// pick up the normal
+
+	int index = -1;
+	index = poly->FindPoint(newAbsPickPos);
+
+	if(index == -1) return;
+	double *normal;
+
+  if(normalsOnPoly->GetOutput()==NULL || normalsOnPoly->GetOutput()->GetPointData()==NULL || normalsOnPoly->GetOutput()->GetPointData()->GetNormals()==NULL || normalsOnPoly->GetOutput()->GetPointData()->GetNormals()->GetNumberOfComponents() <= 0)
+    return;
+  normal = normalsOnPoly->GetOutput()->GetPointData()->GetNormals()->GetTuple3(index);
+
+	double v1[3],v2[3],v3[3];
+
+	v1[0] = normal[0];
+	v1[1] = normal[1];
+	v1[2] = normal[2];
+
+	v2[0] = newAbsPickPos[0];
+	v2[1] = newAbsPickPos[1];
+	v2[2] = newAbsPickPos[2];
+
+	vtkMath::Normalize(v1);
+	vtkMath::Normalize(v2);
+
+	vtkMath::Cross(v1,v2,v3);
+	vtkMath::Normalize(v3);
+	vtkMath::Cross(v3,v1,v2);
+
+	vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
+	matrix_translation->Identity();
+	for(int i=0;i<3;i++)
+		matrix_translation->SetElement(i,3,newAbsPickPos[i]);
+
+	vtkMatrix4x4 *matrix_rotation=vtkMatrix4x4::New();
+	matrix_rotation->Identity();
+	for(int i=0;i<3;i++)
+		matrix_rotation->SetElement(i,0,v1[i]);
+	for(int i=0;i<3;i++)
+		matrix_rotation->SetElement(i,1,v2[i]);
+	for(int i=0;i<3;i++)
+		matrix_rotation->SetElement(i,2,v3[i]);
+
+	mafMatrix a;
+	a.SetVTKMatrix(matrix_rotation);
+	mafMatrix b;
+	b.SetVTKMatrix(matrix_translation);
+	mafMatrix c;
+	mafMatrix::Multiply4x4(b,a,c);
+
+	vtkDEL(matrix_rotation);
+	vtkDEL(matrix_translation);
+
+	m_VME->GetOutput()->GetAbsMatrix()->DeepCopy(&c);
+
+
+}
 //----------------------------------------------------------------------------
 void mmiGenericMouse::SnapOnSurface()
 //----------------------------------------------------------------------------

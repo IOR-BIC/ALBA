@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-04 13:09:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -165,6 +165,12 @@ public:
   void SurfaceSnapOn() {SetSurfaceSnap(true);}
   void SurfaceSnapOff() {SetSurfaceSnap(false);}
 
+	/** If Surface Snap modifier is on translation and rotation will be constrained to picked surfaces if possible*/
+	void SetSurfaceNormal(bool flag) {m_SurfaceNormal=flag;}
+	bool GetSurfaceNormal() {return m_SurfaceNormal;}
+	void SurfaceNormalOn() {SetSurfaceNormal(true);}
+	void SurfaceNormalOff() {SetSurfaceNormal(false);}
+
 protected:
   mmiGenericInterface();
   virtual ~mmiGenericInterface();
@@ -193,6 +199,7 @@ protected:
   bool            m_UniformScalingFlag;
 
   bool            m_SurfaceSnap; //< toggle surface snap
+	bool            m_SurfaceNormal; //< toggle surface snap
     
 private:
   mmiGenericInterface(const mmiGenericInterface&);  // Not implemented.

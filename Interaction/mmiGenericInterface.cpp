@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-24 16:43:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-04 13:09:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,6 +41,7 @@ mmiGenericInterface::mmiGenericInterface()
   m_ScalingFlag           = true;
   m_UniformScalingFlag    = true;
   m_SurfaceSnap           = false;
+	m_SurfaceNormal         = false;
   m_ResultTransform       = NULL;
   m_TargetRefSys          = new mafRefSys;
   m_TranslationConstraint = new mmiConstraint;

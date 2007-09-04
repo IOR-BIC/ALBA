@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 10:38:17 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-09-04 13:09:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -184,6 +184,12 @@ protected:
   // snap on surface
   //----------------------------------------------------------------------------
   void SnapOnSurface();
+
+
+	//----------------------------------------------------------------------------
+	// normal on surface
+	//----------------------------------------------------------------------------
+	void NormalOnSurface();
 
  
 

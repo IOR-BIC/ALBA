@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-22 10:55:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-04 13:09:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,8 @@ public:
     XY_PLANE, 
     XZ_PLANE, 
     YZ_PLANE,
-    SURFACE_SNAP
+    SURFACE_SNAP,
+    NORMAL_SURFACE,
   };
 
   void OnEvent(mafEventBase *maf_event);
