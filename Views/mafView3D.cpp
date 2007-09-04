@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-27 13:23:44 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-09-04 08:15:43 $
+  Version:   $Revision: 1.12 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -324,7 +324,7 @@ void mafView3D::VmeCreatePipe(mafNode *vme)
       n->m_Pipe = (mafPipe*)pipe;
       if (m_NumberOfVisibleVme == 1)
       {
-        CameraReset();
+        //CameraReset();
       }
       else
       {
@@ -568,6 +568,6 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 	{
 		((mafPipePolyline*)GetNodePipe(vme))->SetRepresentationToTube();
 	}
-	CameraReset();
+	//CameraReset();
 	CameraUpdate();
 }
