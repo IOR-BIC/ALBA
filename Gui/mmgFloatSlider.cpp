@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ mmgFloatSlider::mmgFloatSlider( wxWindow *parent,
 															 long style ):
 FLOAT_SLIDER_PARENT( parent, id, 0, 0, 1, position, size, style )
 {
-	this->DesiredTicks = 50;
+	this->m_DesiredTicks = 50;
   SetRange(minvalue,maxvalue,value);
 }
 //----------------------------------------------------------------------------
@@ -55,42 +55,42 @@ mmgFloatSlider::~mmgFloatSlider()
 void mmgFloatSlider::SetNumberOfSteps(int num)
 //----------------------------------------------------------------------------
 {
-  this->DesiredTicks = num;
-	SetRange(this->Min,this->Max);
+  this->m_DesiredTicks = num;
+	SetRange(this->m_Min,this->m_Max);
 }
 //----------------------------------------------------------------------------
 double mmgFloatSlider::GetValue()
 //----------------------------------------------------------------------------
 {
   int pos = wxSlider::GetValue();
-  assert (pos >=0 && pos <=this->Ticks );
-  this->Value = this->Min + pos*this->Step;
-  return this->Value;
+  assert (pos >=0 && pos <=this->m_Ticks );
+  this->m_Value = this->m_Min + pos*this->m_Step;
+  return this->m_Value;
 }
 //----------------------------------------------------------------------------
 void mmgFloatSlider::SetValue(double value)
 //----------------------------------------------------------------------------
 {
-  this->Value = value;
-	if(this->Value < this->Min) this->Value = this->Min;
-	if(this->Value > this->Max) this->Value = this->Max;
+  this->m_Value = value;
+	if(this->m_Value < this->m_Min) this->m_Value = this->m_Min;
+	if(this->m_Value > this->m_Max) this->m_Value = this->m_Max;
 
 	//value has to be discretized
-	this->Value = Step*(int)floor(Value/Step+0.5);
+	this->m_Value = m_Step*(int)floor(m_Value/m_Step+0.5);
 
-	wxSlider::SetValue(ceil((value-this->Min)/this->Step));
+	wxSlider::SetValue(ceil((value-this->m_Min)/this->m_Step));
 }
 //----------------------------------------------------------------------------
 void mmgFloatSlider::SetMin(double min)
 //----------------------------------------------------------------------------
 {
-  SetRange(min,this->Max);
+  SetRange(min,this->m_Max);
 }
 //----------------------------------------------------------------------------
 void mmgFloatSlider::SetMax(double max)
 //----------------------------------------------------------------------------
 {
-  SetRange(this->Min,max);
+  SetRange(this->m_Min,max);
 }
 //----------------------------------------------------------------------------
 void mmgFloatSlider::SetRange(double min, double max, double value)
@@ -104,15 +104,15 @@ void mmgFloatSlider::SetRange(double min, double max)
 //----------------------------------------------------------------------------
 {
   //if(abs(min)<1 || abs(max)<1 || (abs(max)-abs(min))<2 )
-		DiscretizeRangeRange(min, max, this->DesiredTicks, &this->Min, &this->Max, &this->Step);
+		DiscretizeRangeRange(min, max, this->m_DesiredTicks, &this->m_Min, &this->m_Max, &this->m_Step);
   //else
 	//{
-    //Max = max;
-    //Min = min;
-    //Step = (max-min)/this->DesiredTicks;
+    //m_Max = max;
+    //m_Min = min;
+    //m_Step = (max-min)/this->m_DesiredTicks;
 	//}
-	this->Ticks=ceil((this->Max-this->Min)/this->Step);
-  wxSlider::SetRange(0,this->Ticks);
+	this->m_Ticks=ceil((this->m_Max-this->m_Min)/this->m_Step);
+  wxSlider::SetRange(0,this->m_Ticks);
 }
 //----------------------------------------------------------------------------
 double	mmgFloatSlider::Pow10(double exponent)

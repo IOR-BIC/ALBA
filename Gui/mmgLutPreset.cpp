@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutPreset.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -2046,7 +2046,7 @@ void lutDefault(vtkLookupTable *lut)
   {
     int h = (i*240.0)/255.0;
     c.SetHSV(h,255,255);
-    lut->SetTableValue(i, c.m_r/255.0, c.m_g/255.0, c.m_b/255.0, 1);
+    lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
   }
 };
 //---------------------------------------------------------------------
@@ -2061,13 +2061,13 @@ void lutMinMax(vtkLookupTable *lut)
   {
     int h = (i*240.0)/255.0;
     c.SetHSV(h,255,255);
-    lut->SetTableValue(i, c.m_r/255.0, c.m_g/255.0, c.m_b/255.0, (128-i)/128.0);
+    lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, (128-i)/128.0);
   }
   for(i=128; i<256; i++)
   {
     int h = (i*240.0)/255.0;
     c.SetHSV(h,255,255);
-    lut->SetTableValue(i, c.m_r/255.0, c.m_g/255.0, c.m_b/255.0, (i-128)/128.0);
+    lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, (i-128)/128.0);
   }
 };
 //---------------------------------------------------------------------
@@ -2080,7 +2080,7 @@ void lutDefaultStep(vtkLookupTable *lut)
   
   for(int i=0; i<256; i+=16)
   {
-    lut->SetTableValue(i, c.m_r/255.0, c.m_g/255.0, c.m_b/255.0, 1);
+    lut->SetTableValue(i, c.m_Red/255.0, c.m_Green/255.0, c.m_Blue/255.0, 1);
   }
 };
 //---------------------------------------------------------------------

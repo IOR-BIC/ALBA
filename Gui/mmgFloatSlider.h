@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFloatSlider.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 15:29:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,34 +62,34 @@ public:
 	void SetNumberOfSteps(int num);
   
   /** Get the number of slider's steps. */
-	int GetNumberOfSteps() {return this->Ticks;};
+	int GetNumberOfSteps() {return this->m_Ticks;};
   
   /** Get the slider's step value. */
-  double GetStep() {return this->Step;};
+  double GetStep() {return this->m_Step;};
   
   /** Set the slider's max value. */
 	void SetMax(double max);
   
   /** Get the slider's max value. */
-  double GetMax() {return this->Max;};
+  double GetMax() {return this->m_Max;};
   
   /** Set the slider's min value. */
 	void SetMin(double min);
   
   /** Get the slider's min value. */
-  double GetMin() {return this->Min;};
+  double GetMin() {return this->m_Min;};
 
 protected:
 	double	Round(double val);
   double	Pow10(double exponent);
 	void DiscretizeRangeRange(double min,double max,double n, double *ra,double *rb,double *rs);
 
-	int DesiredTicks;
-	int Ticks;
+	int m_DesiredTicks;
+	int m_Ticks;
 	
-	double Value;
-	double Step;
-	double Max;
-	double Min;
+	double m_Value;
+	double m_Step;
+	double m_Max;
+	double m_Min;
 };
 #endif

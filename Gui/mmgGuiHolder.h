@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:51:40 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ public:
   virtual ~mmgGuiHolder();
   
 	/** Return the panel that held the gui. */
-	wxPanel* GetPanel() {return (wxPanel*)m_panel;};
+	wxPanel* GetPanel() {return (wxPanel*)m_Panel;};
 
 	/** Put the gui onto the panel removing the previous gui. */
   bool Put(mmgGui *gui);
@@ -40,7 +40,7 @@ public:
   wxWindow *GetCurrentGui();
 
 protected:
-  mmgScrolledPanel *m_panel;
+  mmgScrolledPanel *m_Panel;
   
 DECLARE_EVENT_TABLE()
 };

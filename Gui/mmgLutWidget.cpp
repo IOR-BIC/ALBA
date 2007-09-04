@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLutWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2006-03-02 21:59:45 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-09-04 16:22:15 $
+Version:   $Revision: 1.6 $
 Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -145,9 +145,9 @@ void mmgLutWidget::DrawEntry(int idx)
     for(x=0; x<w; x++)
     {
       mafColor c = mafColor::CheckeredColor(m_LutEntry[idx].m_Color, x,y);
-      *p++ = c.m_r;
-      *p++ = c.m_g;
-      *p++ = c.m_b;
+      *p++ = c.m_Red;
+      *p++ = c.m_Green;
+      *p++ = c.m_Blue;
     }
   }
 

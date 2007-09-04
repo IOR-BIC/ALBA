@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,7 +47,7 @@ mmgColorSwatch::mmgColorSwatch(wxWindow* parent, wxWindowID id, const wxPoint& p
 void mmgColorSwatch::SetColor(mafColor c)
 //----------------------------------------------------------------------------
 {
-  m_col = c;
+  m_Color = c;
   int w = GetSize().GetWidth();   
   int h = GetSize().GetHeight();   
 
@@ -55,8 +55,8 @@ void mmgColorSwatch::SetColor(mafColor c)
   unsigned char *p = data;
 
   
-  mafColor c0 = mafColor::CheckeredColor(m_col, 0,0);
-  mafColor c1 = mafColor::CheckeredColor(m_col, 8,0);
+  mafColor c0 = mafColor::CheckeredColor(m_Color, 0,0);
+  mafColor c1 = mafColor::CheckeredColor(m_Color, 8,0);
 
   int x,y;
   for(y=0; y<h; y++)
@@ -67,21 +67,21 @@ void mmgColorSwatch::SetColor(mafColor c)
       int b = y%16 >= 8;
       if( a+b == 1 )
       {
-        *p++ = c0.m_r;
-        *p++ = c0.m_g;
-        *p++ = c0.m_b;
+        *p++ = c0.m_Red;
+        *p++ = c0.m_Green;
+        *p++ = c0.m_Blue;
       }
       else
       {
-        *p++ = c1.m_r;
-        *p++ = c1.m_g;
-        *p++ = c1.m_b;
+        *p++ = c1.m_Red;
+        *p++ = c1.m_Green;
+        *p++ = c1.m_Blue;
       }
     }
   }
   wxImage img(w,h,data); // data will be freed by the image
-  //m_bmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
-  m_bmp = wxBitmap(img);
+  //m_Bmp = img.ConvertToBitmap(); // changed in passing from wx242 -> wx263
+  m_Bmp = wxBitmap(img);
 }
 //----------------------------------------------------------------------------
 void mmgColorSwatch::OnPaint(wxPaintEvent &event)
@@ -93,7 +93,7 @@ void mmgColorSwatch::OnPaint(wxPaintEvent &event)
   int h = GetSize().GetHeight();   
 
   wxMemoryDC mdc;
-  mdc.SelectObject(m_bmp);
+  mdc.SelectObject(m_Bmp);
   pdc.Blit(0, 0, w, h, &mdc, 0,0);
   mdc.SelectObject(wxNullBitmap);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 15:58:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -68,7 +68,7 @@ protected:
   
   // widgets
   mafColor         m_Color;
-  mafColor         m_clipboard;
+  mafColor         m_Clipboard;
 
   mmgColorSwatch  *m_ColorSwatch;
   mmgColorSwatch  *m_PrevColorSwatch;

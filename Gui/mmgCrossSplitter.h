@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCrossSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:50:41 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,19 +86,19 @@ protected:
   wxCursor *m_CursorNSWE;
   wxPen    *m_Pen;
   
-  CrossSplitterModes      m_mode;
-  CrossSplitterDragModes  m_dragging;
+  CrossSplitterModes      m_Mode;
+  CrossSplitterDragModes  m_Dragging;
 
-  int   m_margin;
-  int   m_x,m_y,m_w,m_h;
-  int   m_oldx,m_oldy;
-  float m_relx,m_rely;
+  int   m_Margin;
+  int   m_XPos,m_YPos,m_With,m_Height;
+  int   m_OldXPos,m_OldYPos;
+  float m_RelXPos,m_RelYPos;
   
-  wxWindow *m_focused_panel;
-  wxWindow *m_vp1;
-  wxWindow *m_vp2;
-  wxWindow *m_vp3;
-  wxWindow *m_vp4;
+  wxWindow *m_FocusedPanel;
+  wxWindow *m_ViewPanel1;
+  wxWindow *m_ViewPanel2;
+  wxWindow *m_ViewPanel3;
+  wxWindow *m_ViewPanel4;
 
 	/** Adjust the panels size. */
   void OnSize(wxSizeEvent &event);
@@ -122,6 +122,6 @@ protected:
   void DrawTracker(int x, int y);
   DECLARE_EVENT_TABLE()
 
-	bool m_maximized;
+	bool m_Maximized;
 };
 #endif

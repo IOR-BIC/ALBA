@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-24 09:01:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,10 +48,10 @@ mmgCheckListBox::mmgCheckListBox(wxWindow* parent, wxWindowID id, const wxPoint&
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-	m_selectedItem = -1;
-  m_prevent_notify = false;
-	m_check_mode = MODE_CHECK;
-  m_clb = new wxCheckListBox(this, ID_CLB, wxDefaultPosition, size, 0,NULL,wxNO_BORDER);
+	m_SelectedItem = -1;
+  m_PreventNotify = false;
+	m_CheckMode = MODE_CHECK;
+  m_CheckListBox = new wxCheckListBox(this, ID_CLB, wxDefaultPosition, size, 0,NULL,wxNO_BORDER);
 }
 //----------------------------------------------------------------------------
 mmgCheckListBox::~mmgCheckListBox( ) 
@@ -62,7 +62,7 @@ mmgCheckListBox::~mmgCheckListBox( )
 void mmgCheckListBox::Clear()
 //----------------------------------------------------------------------------
 {
-  m_clb->Clear();
+  m_CheckListBox->Clear();
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::AddItem(int id, wxString label)
@@ -72,17 +72,17 @@ void mmgCheckListBox::AddItem(int id, wxString label)
   // in passing from wx242 -> wx263
   // Number() become GetCount()
 
-  //if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
-  if( m_clb->GetCount() == mmgCheckListBox_ArraySize ) 
+  //if( m_CheckListBox->Number() == mmgCheckListBox_ArraySize ) 
+  if( m_CheckListBox->GetCount() == mmgCheckListBox_ArraySize ) 
   {
     mafLogMessage("mmgCheckListBox:overflow");
     return;
   }
   
-  m_clb->Append(label);
+  m_CheckListBox->Append(label);
 
-  //m_array[m_clb->Number()-1] = id;
-  m_array[m_clb->GetCount()-1] = id;
+  //m_Array[m_CheckListBox->Number()-1] = id;
+  m_Array[m_CheckListBox->GetCount()-1] = id;
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::AddItem(int id, wxString label, bool check)
@@ -92,34 +92,34 @@ void mmgCheckListBox::AddItem(int id, wxString label, bool check)
   // in passing from wx242 -> wx263
   // Number() become GetCount()
 
-  //if( m_clb->Number() == mmgCheckListBox_ArraySize ) 
-  if( m_clb->GetCount() == mmgCheckListBox_ArraySize ) 
+  //if( m_CheckListBox->Number() == mmgCheckListBox_ArraySize ) 
+  if( m_CheckListBox->GetCount() == mmgCheckListBox_ArraySize ) 
   {
     mafLogMessage("mmgCheckListBox:overflow");
     return;
   }
 
-  m_clb->Append(label);
-  //m_array[m_clb->Number()-1] = id;
-  m_array[m_clb->GetCount()-1] = id;
+  m_CheckListBox->Append(label);
+  //m_Array[m_CheckListBox->Number()-1] = id;
+  m_Array[m_CheckListBox->GetCount()-1] = id;
 
-  m_prevent_notify = true;
-  //m_clb->Check(m_clb->Number()-1,check);
-  m_clb->Check(m_clb->GetCount()-1,check);
-  m_prevent_notify = false;
+  m_PreventNotify = true;
+  //m_CheckListBox->Check(m_CheckListBox->Number()-1,check);
+  m_CheckListBox->Check(m_CheckListBox->GetCount()-1,check);
+  m_PreventNotify = false;
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::RemoveItem(int id)
 //----------------------------------------------------------------------------
 {
-  //int index,i,n = m_clb->Number(); // number prior to delete
-  int index,i,n = m_clb->GetCount(); // number prior to delete
+  //int index,i,n = m_CheckListBox->Number(); // number prior to delete
+  int index,i,n = m_CheckListBox->GetCount(); // number prior to delete
 
   if( index=FindItemIndex(id) == -1 ) return;
-  m_clb->Delete(index);
+  m_CheckListBox->Delete(index);
 
   // keep the array consistent
-  for(i=index+1; i<n; i++) m_array[i-1] = m_array[i];
+  for(i=index+1; i<n; i++) m_Array[i-1] = m_Array[i];
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::CheckItem(int id, bool check)
@@ -128,9 +128,9 @@ void mmgCheckListBox::CheckItem(int id, bool check)
   int index=FindItemIndex(id);
   if( index == -1 ) return;
 
-  m_prevent_notify = true;
-  m_clb->Check(index,check);
-  m_prevent_notify = false;
+  m_PreventNotify = true;
+  m_CheckListBox->Check(index,check);
+  m_PreventNotify = false;
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::SetItemLabel(int id, const wxString label)
@@ -139,9 +139,9 @@ void mmgCheckListBox::SetItemLabel(int id, const wxString label)
   int index;
   if( index=FindItemIndex(id) == -1 ) return;
 
-  m_prevent_notify = true;
-  m_clb->SetString(index,label);
-  m_prevent_notify = false;
+  m_PreventNotify = true;
+  m_CheckListBox->SetString(index,label);
+  m_PreventNotify = false;
 }
 //----------------------------------------------------------------------------
 wxString mmgCheckListBox::GetItemLabel(int id)
@@ -149,9 +149,9 @@ wxString mmgCheckListBox::GetItemLabel(int id)
 {
 	wxString label;
 
-  m_prevent_notify = true;
-  label = m_clb->GetString(id);
-  m_prevent_notify = false;
+  m_PreventNotify = true;
+  label = m_CheckListBox->GetString(id);
+  m_PreventNotify = false;
 
 	return label;
 }
@@ -159,21 +159,21 @@ wxString mmgCheckListBox::GetItemLabel(int id)
 void mmgCheckListBox::Select(int id)
 //----------------------------------------------------------------------------
 {
-  m_prevent_notify = true;
-  m_clb->Select(id);
-  m_prevent_notify = false;
+  m_PreventNotify = true;
+  m_CheckListBox->Select(id);
+  m_PreventNotify = false;
 }
 //----------------------------------------------------------------------------
 bool mmgCheckListBox::IsItemChecked(int id)
 //----------------------------------------------------------------------------
 {
-	return m_clb->IsChecked(id);
+	return m_CheckListBox->IsChecked(id);
 }
 //----------------------------------------------------------------------------
 int mmgCheckListBox::FindItem(wxString label)
 //----------------------------------------------------------------------------
 {
-	return m_clb->FindString(label);
+	return m_CheckListBox->FindString(label);
 }
 //----------------------------------------------------------------------------
 int mmgCheckListBox::FindItemIndex(int id)
@@ -181,11 +181,11 @@ int mmgCheckListBox::FindItemIndex(int id)
 {
 
   int i = 0;
-  //int n = m_clb->Number();
-  int n = m_clb->GetCount();
+  //int n = m_CheckListBox->Number();
+  int n = m_CheckListBox->GetCount();
   while(i<n)
   {
-    if (m_array[i] == id) return i;
+    if (m_Array[i] == id) return i;
     i++;
   }
 
@@ -196,26 +196,26 @@ int mmgCheckListBox::FindItemIndex(int id)
 void mmgCheckListBox::OnCheck(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-  if(m_prevent_notify) return;
+  if(m_PreventNotify) return;
   int widget_id = this->GetId();
   int index = event.GetInt();
 
-	m_prevent_notify = true;
-	m_clb->Select(index);
-	m_selectedItem = index;
+	m_PreventNotify = true;
+	m_CheckListBox->Select(index);
+	m_SelectedItem = index;
 	
-	if(m_check_mode == MODE_RADIO)
+	if(m_CheckMode == MODE_RADIO)
 	{
-    //for(int i=0; i<m_clb->Number(); i++)
-	  for(int i=0; i<m_clb->GetCount(); i++)
-	    m_clb->Check(i,FALSE);
-		m_clb->Check(index);
+    //for(int i=0; i<m_CheckListBox->Number(); i++)
+	  for(int i=0; i<m_CheckListBox->GetCount(); i++)
+	    m_CheckListBox->Check(i,FALSE);
+		m_CheckListBox->Check(index);
 	}
 
-	m_prevent_notify = false;
+	m_PreventNotify = false;
 
-  int item_id = m_array[index];
-  bool checked = m_clb->IsChecked(index);
+  int item_id = m_Array[index];
+  bool checked = m_CheckListBox->IsChecked(index);
 
   mafEventMacro(mafEvent(this, widget_id, checked, item_id ) );
 }
@@ -223,17 +223,17 @@ void mmgCheckListBox::OnCheck(wxCommandEvent &event)
 void mmgCheckListBox::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 { 
-  m_clb->SetSize(event.GetSize());
+  m_CheckListBox->SetSize(event.GetSize());
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::OnSelect(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-  if(m_prevent_notify) return;
+  if(m_PreventNotify) return;
   int widget_id = this->GetId();
   int index = event.GetInt();
-  int item_id = m_array[index];
-	m_selectedItem = item_id;
+  int item_id = m_Array[index];
+	m_SelectedItem = item_id;
 
   mafEventMacro(mafEvent(this, widget_id, (long)item_id ) );
 }

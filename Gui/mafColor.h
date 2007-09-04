@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafColor.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 15:29:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,16 +97,14 @@ class mafColor
     int a = x%16 >= 8;
     int b = y%16 >= 8;
     if( a+b == 1 )
-      return mafColor::InterpolateRGB(c,check0,c.m_a/255.0);
+      return mafColor::InterpolateRGB(c,check0,c.m_Alpha/255.0);
     else
-      return mafColor::InterpolateRGB(c,check1,c.m_a/255.0);
+      return mafColor::InterpolateRGB(c,check1,c.m_Alpha/255.0);
   }  
 
-
   // member variables 
-  int m_r,m_g,m_b; ///<  rgb color representation
-  int m_h,m_s,m_v; ///<  hsv color representation
-  int m_a;         ///<  alpha value
+  int m_Red,m_Green,m_Blue; ///<  rgb color representation
+  int m_Hue,m_Saturation,m_Value; ///<  hsv color representation
+  int m_Alpha;         ///<  alpha value
 };
 #endif
-

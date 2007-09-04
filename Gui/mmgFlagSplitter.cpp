@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFlagSplitter.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-04 11:44:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,22 +38,22 @@ mmgFlagSplitter::mmgFlagSplitter(wxWindow* parent,wxWindowID id)
 : mmgPanel(parent, id)
 //----------------------------------------------------------------------------
 {
-	m_vp1 = new wxPanel(this,1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER);         
-  m_vp2 = new wxPanel(this,2,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER);         
-  m_vp3 = new wxPanel(this,3,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER);         
+	m_ViewPanel1 = new wxPanel(this,1,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER);         
+  m_ViewPanel2 = new wxPanel(this,2,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER);         
+  m_ViewPanel3 = new wxPanel(this,3,wxDefaultPosition,wxDefaultSize,wxSUNKEN_BORDER);         
 
-  m_maximized = false;
-	m_focused_panel = m_vp1; 
+  m_Maximized = false;
+	m_FocusedPanel = m_ViewPanel1; 
 
   m_CursorWE   = new wxCursor(wxCURSOR_SIZEWE);
   m_Pen        = new wxPen(*wxBLACK, 2, wxSOLID);
 
-  m_w = m_h = 100;
-  m_x1 = 33;
-	m_x2 = 66;
-  m_oldx = 0;
+  m_With = m_Height = 100;
+  m_XPos1 = 33;
+	m_XPos2 = 66;
+  m_XPosOld = 0;
 	m_margin = 20;
-  m_dragging = drag_none;
+  m_Dragging = drag_none;
 }
 //----------------------------------------------------------------------------
 mmgFlagSplitter::~mmgFlagSplitter( ) 
@@ -74,12 +74,12 @@ void mmgFlagSplitter::OnSize(wxSizeEvent& event)
   mafYield(); 
   wxFrame *frame = (wxFrame *)GetParent(); // may be a wxChild - error prone anyway
   {
-    rx1 = m_x1/(float)m_w;
-    rx2 = m_x2/(float)m_w;
+    rx1 = m_XPos1/(float)m_With;
+    rx2 = m_XPos2/(float)m_With;
 
-    GetClientSize(&m_w,&m_h); 
-    m_x1 = rx1 * m_w;
-    m_x2 = rx2 * m_w;
+    GetClientSize(&m_With,&m_Height); 
+    m_XPos1 = rx1 * m_With;
+    m_XPos2 = rx2 * m_With;
 
     OnLayout();
   }
@@ -88,14 +88,14 @@ void mmgFlagSplitter::OnSize(wxSizeEvent& event)
 void mmgFlagSplitter::SetSplitPos(int x1,int x2)
 //----------------------------------------------------------------------------
 {
-  if (m_x1 < m_margin)          m_x1 =         m_margin;
-  if (m_x1 > m_w - 2*m_margin)  m_x1 = m_w - 2*m_margin;
-  if (m_x2 < 2*m_margin)        m_x2 =       2*m_margin;
-  if (m_x2 > m_w - m_margin)    m_x2 = m_w - m_margin;
-  if (m_x1 > m_x2 - m_margin)   m_x1 = m_x2 - m_margin;
+  if (m_XPos1 < m_margin)          m_XPos1 =         m_margin;
+  if (m_XPos1 > m_With - 2*m_margin)  m_XPos1 = m_With - 2*m_margin;
+  if (m_XPos2 < 2*m_margin)        m_XPos2 =       2*m_margin;
+  if (m_XPos2 > m_With - m_margin)    m_XPos2 = m_With - m_margin;
+  if (m_XPos1 > m_XPos2 - m_margin)   m_XPos1 = m_XPos2 - m_margin;
 
-  m_x1 = x1;
-  m_x2 = x2;
+  m_XPos1 = x1;
+  m_XPos2 = x2;
 
   OnLayout();
 }
@@ -105,34 +105,34 @@ void mmgFlagSplitter::OnLeftMouseButtonDown(wxMouseEvent &event)
 {
   CaptureMouse();
 
-  m_dragging = HitTest(event);
-  if(m_dragging == drag_none) 
+  m_Dragging = HitTest(event);
+  if(m_Dragging == drag_none) 
 		return;
 
   int x = event.GetX();
   DrawTracker(x);    
-  m_oldx = x;
+  m_XPosOld = x;
 }
 //----------------------------------------------------------------------------
 void mmgFlagSplitter::OnLeftMouseButtonUp(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  if(m_dragging != drag_none) 
+  if(m_Dragging != drag_none) 
   {
-    DrawTracker(m_oldx);    
+    DrawTracker(m_XPosOld);    
 
     int x = event.GetX();
 
-    switch(m_dragging)
+    switch(m_Dragging)
     {
       case drag_x1:
-        SetSplitPos(x,m_x2);
+        SetSplitPos(x,m_XPos2);
       break;
       case drag_x2:
-        SetSplitPos(m_x1,x);
+        SetSplitPos(m_XPos1,x);
       break;
     }
-    m_dragging = drag_none;
+    m_Dragging = drag_none;
   }
   ReleaseMouse();
 }
@@ -140,7 +140,7 @@ void mmgFlagSplitter::OnLeftMouseButtonUp(wxMouseEvent &event)
 void mmgFlagSplitter::OnMouseMotion(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
-  if (m_dragging == drag_none )
+  if (m_Dragging == drag_none )
   {
     switch(HitTest(event))
     {
@@ -156,20 +156,20 @@ void mmgFlagSplitter::OnMouseMotion(wxMouseEvent &event)
   else 
   {
     int x = event.GetX();
-    if(m_dragging == drag_x1)
+    if(m_Dragging == drag_x1)
 		{
 			if (x < m_margin)        x =        m_margin;
-			if (x > m_x2 - m_margin) x = m_x2 - m_margin;
+			if (x > m_XPos2 - m_margin) x = m_XPos2 - m_margin;
 		}
-    if(m_dragging == drag_x2)
+    if(m_Dragging == drag_x2)
 		{
-			if (x < m_x1 + m_margin + 1) x = m_x1 + m_margin + 1;
-			if (x > m_w  - m_margin) x = m_w  - m_margin;
+			if (x < m_XPos1 + m_margin + 1) x = m_XPos1 + m_margin + 1;
+			if (x > m_With  - m_margin) x = m_With  - m_margin;
 		}
 
-    DrawTracker(m_oldx);    
+    DrawTracker(m_XPosOld);    
     DrawTracker(x);
-    m_oldx = x;
+    m_XPosOld = x;
   }
 
   if( event.Leaving() )
@@ -181,30 +181,30 @@ void mmgFlagSplitter::OnMouseMotion(wxMouseEvent &event)
 void mmgFlagSplitter::OnLayout()
 //----------------------------------------------------------------------------
 {
-  if (m_x1 < m_margin)          m_x1 =         m_margin;
-  if (m_x1 > m_w - 2*m_margin)  m_x1 = m_w - 2*m_margin;
-  if (m_x2 < 2*m_margin)        m_x2 =       2*m_margin;
-  if (m_x2 > m_w - m_margin)    m_x2 = m_w - m_margin;
-  if (m_x1 > m_x2 - m_margin)   m_x1 = m_x2 - m_margin;
+  if (m_XPos1 < m_margin)          m_XPos1 =         m_margin;
+  if (m_XPos1 > m_With - 2*m_margin)  m_XPos1 = m_With - 2*m_margin;
+  if (m_XPos2 < 2*m_margin)        m_XPos2 =       2*m_margin;
+  if (m_XPos2 > m_With - m_margin)    m_XPos2 = m_With - m_margin;
+  if (m_XPos1 > m_XPos2 - m_margin)   m_XPos1 = m_XPos2 - m_margin;
 
   int m  = 3;
-  int w  = (m_w -2*m)/3;
+  int w  = (m_With -2*m)/3;
 
-  m_vp1->SetSize(0,0,m_x1,m_h);
-	m_vp2->SetSize(m+m_x1,0,m_x2 - m_x1 - m,m_h);
-	m_vp3->SetSize(m+m_x2,0,m_w-m_x2-m,m_h);
+  m_ViewPanel1->SetSize(0,0,m_XPos1,m_Height);
+	m_ViewPanel2->SetSize(m+m_XPos1,0,m_XPos2 - m_XPos1 - m,m_Height);
+	m_ViewPanel3->SetSize(m+m_XPos2,0,m_With-m_XPos2-m,m_Height);
 	
-  m_vp1->Layout();
-	m_vp2->Layout();
-  m_vp3->Layout();
+  m_ViewPanel1->Layout();
+	m_ViewPanel2->Layout();
+  m_ViewPanel3->Layout();
 }
 //----------------------------------------------------------------------------
 FlagSplitterDragModes mmgFlagSplitter::HitTest(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
   int x = event.GetX();
-  if ( abs(m_x1-x) < 5 ) return drag_x1;
-  if ( abs(m_x2-x) < 5 ) return drag_x2;
+  if ( abs(m_XPos1-x) < 5 ) return drag_x1;
+  if ( abs(m_XPos2-x) < 5 ) return drag_x2;
   return drag_none;
 }
 //----------------------------------------------------------------------------
@@ -213,7 +213,7 @@ void mmgFlagSplitter::DrawTracker(int x)
 {
   int m = 3;
   int y1 = m;
-	int y2 = m_h-m;
+	int y2 = m_Height-m;
 	int foo;
     
   wxScreenDC screenDC;
@@ -237,19 +237,19 @@ void mmgFlagSplitter::Put(wxWindow* w,int i)
   switch(i)
   {
 		case 0:
-			if (m_vp1) delete m_vp1;
-			m_vp1 = w;
-			m_vp1->Layout();
+			if (m_ViewPanel1) delete m_ViewPanel1;
+			m_ViewPanel1 = w;
+			m_ViewPanel1->Layout();
 		break;
 		case 1:
-			if (m_vp2) delete m_vp2;
-			m_vp2 = w;
-			m_vp2->Layout();
+			if (m_ViewPanel2) delete m_ViewPanel2;
+			m_ViewPanel2 = w;
+			m_ViewPanel2->Layout();
 		break;
 		case 2:
-			if (m_vp3) delete m_vp3;
-			m_vp3 = w;
-			m_vp3->Layout();
+			if (m_ViewPanel3) delete m_ViewPanel3;
+			m_ViewPanel3 = w;
+			m_ViewPanel3->Layout();
 		break;
     default:
 		  assert(false); 

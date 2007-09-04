@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDictionaryWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 11:02:28 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -180,7 +180,6 @@ mafCxxTypeMacro(mafStorableDictionary);
 mafStorableDictionary::mafStorableDictionary()
 //------------------------------------------------------------------------------
 {
-  ;
 }
 //------------------------------------------------------------------------------
 mafStorableDictionary::~mafStorableDictionary()
@@ -189,7 +188,7 @@ mafStorableDictionary::~mafStorableDictionary()
   m_StrVector.resize(0);
 }
 //------------------------------------------------------------------------------
-// example of deserialization code
+// example of de-serialization code
 int mafStorableDictionary::InternalRestore(mafStorageElement *element)
 //------------------------------------------------------------------------------
 {
@@ -199,4 +198,3 @@ int mafStorableDictionary::InternalRestore(mafStorageElement *element)
     return MAF_ERROR;
   return MAF_OK;
 }
-

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 15:58:27 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,39 +109,39 @@ mmgColorWidget::mmgColorWidget(wxWindow* parent, wxWindowID id, const wxPoint& p
   int px = m_HsvPosition.x + m_HsvSize + 5;
   lab  = new wxStaticText(this, ID_R, "red:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_R, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_R,text,&m_Color.m_r,0,255) );
+	text->SetValidator( mmgValidator(this,ID_R,text,&m_Color.m_Red,0,255) );
 
   py += (sh+3);
   lab  = new wxStaticText(this, ID_G, "green:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_G, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_G,text,&m_Color.m_g,0,255) );
+	text->SetValidator( mmgValidator(this,ID_G,text,&m_Color.m_Green,0,255) );
 
   py += (sh+3);
   lab  = new wxStaticText(this, ID_B, "blue:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_B, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_B,text,&m_Color.m_b,0,255) );
+	text->SetValidator( mmgValidator(this,ID_B,text,&m_Color.m_Blue,0,255) );
 
   py += (sh+3);
   lab  = new wxStaticText(this, ID_B, "alpha:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_B, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_A,text,&m_Color.m_a,0,255) );
+	text->SetValidator( mmgValidator(this,ID_A,text,&m_Color.m_Alpha,0,255) );
 
   w1 = 26;
   py  = 0;//2*m_r2+5;
   px += (w1+w2+10);
   lab  = new wxStaticText(this, ID_H, "hue:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_H, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_H,text,&m_Color.m_h,0,360) );
+	text->SetValidator( mmgValidator(this,ID_H,text,&m_Color.m_Hue,0,360) );
 
   py += (sh+3);
   lab  = new wxStaticText(this, ID_S, "sat:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_S, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_S,text,&m_Color.m_s,0,255) );
+	text->SetValidator( mmgValidator(this,ID_S,text,&m_Color.m_Saturation,0,255) );
 
   py += (sh+3);
   lab  = new wxStaticText(this, ID_V, "val:",wxPoint(px,py), wxSize(w1,sh), wxALIGN_RIGHT );
   text = new wxTextCtrl  (this, ID_V, "", wxPoint(px+w1+2,py), wxSize(w2,sh), wxNO_BORDER  );
-	text->SetValidator( mmgValidator(this,ID_V,text,&m_Color.m_v,0,255) );
+	text->SetValidator( mmgValidator(this,ID_V,text,&m_Color.m_Value,0,255) );
 
   w1 = 30;
   px = m_HsvPosition.x + m_HsvSize + 5;
@@ -272,7 +272,7 @@ void mmgColorWidget::UpdateHSVBitmap()
     {
       unsigned char s = (255.0 * x ) / m_SvSize;
       int r,g,b;
-      mafColor::HSVToRGB(m_Color.m_h,s,v,&r,&g,&b);
+      mafColor::HSVToRGB(m_Color.m_Hue,s,v,&r,&g,&b);
       
       *p++ = r;
       *p++ = g;
@@ -314,14 +314,14 @@ void mmgColorWidget::UpdateAlphaBitmap()
     float a = (y-y0*1.0)/(y1-y0);
     if(y<=y0) a=0;
     if(y>=y1) a=1;
-    c0.m_a = a*255;;
+    c0.m_Alpha = a*255;;
 
     for(x=0; x<w; x++)
     {
       mafColor c = mafColor::CheckeredColor(c0,x,y);
-      *p++ = c.m_r;
-      *p++ = c.m_g;
-      *p++ = c.m_b;
+      *p++ = c.m_Red;
+      *p++ = c.m_Green;
+      *p++ = c.m_Blue;
     }
   }
   wxImage img(w,h,data); // Data will be freed by the image
@@ -349,21 +349,21 @@ void mmgColorWidget::PaintHandles(wxPaintDC &dc)
   int cy = m_HsvPosition.y + m_HsvSize/2;
   
   int r       = (m_HsvInnerRadius+m_HsvOuterRadius)/2;
-  double angle= (m_Color.m_h - 90) * ppi /360.0;
+  double angle= (m_Color.m_Hue - 90) * ppi /360.0;
   m_HsvCursorPosition.x = cx + r * cos(angle);
   m_HsvCursorPosition.y = cy + r * sin(angle);    
   
   dc.DrawEllipse(m_HsvCursorPosition.x-m_CursorSize, m_HsvCursorPosition.y-m_CursorSize, 2*m_CursorSize, 2*m_CursorSize);
 
-  m_SvCursorPosition.x = m_HsvPosition.x + m_SvPosition.x + (m_Color.m_s /255.0) * m_SvSize;
-  m_SvCursorPosition.y = m_HsvPosition.y + m_SvPosition.y + m_SvSize - (m_Color.m_v /255.0) * m_SvSize;
+  m_SvCursorPosition.x = m_HsvPosition.x + m_SvPosition.x + (m_Color.m_Saturation /255.0) * m_SvSize;
+  m_SvCursorPosition.y = m_HsvPosition.y + m_SvPosition.y + m_SvSize - (m_Color.m_Value /255.0) * m_SvSize;
 
   dc.DrawEllipse(m_SvCursorPosition.x-m_CursorSize, m_SvCursorPosition.y-m_CursorSize, 2*m_CursorSize, 2*m_CursorSize);
 
   m_AlphaCursorPosition.x = m_AlphaBmpPosition.x + m_AlphaBmpSize.GetWidth()/2;
   int y0 = m_AlphaBmpPosition.y + m_CursorSize;
   int y1 = m_AlphaBmpSize.GetHeight() - 2 * m_CursorSize;
-  m_AlphaCursorPosition.y = y0 + (m_Color.m_a /255.0) * y1;
+  m_AlphaCursorPosition.y = y0 + (m_Color.m_Alpha /255.0) * y1;
 
   dc.DrawEllipse(m_AlphaCursorPosition.x-m_CursorSize, m_AlphaCursorPosition.y-m_CursorSize, 2*m_CursorSize, 2*m_CursorSize);
   
@@ -446,7 +446,7 @@ void mmgColorWidget::OnMouseMotion(wxMouseEvent &event)
   {
     double angle = atan2( 1.0*(event.m_y - cy) , 1.0*(event.m_x- cx) );
     int h = angle * 360.0 / ppi + 90;
-    m_Color.SetHSV( h, m_Color.m_s, m_Color.m_v );
+    m_Color.SetHSV( h, m_Color.m_Saturation, m_Color.m_Value );
   }
   else 
   if(m_Dragging == DRAG_SV)
@@ -464,7 +464,7 @@ void mmgColorWidget::OnMouseMotion(wxMouseEvent &event)
     if (normalized_y < 0) normalized_y = 0;
     if (normalized_y > 1) normalized_y = 1;
 
-    m_Color.SetHSV( m_Color.m_h, normalized_x *255, normalized_y *255 );
+    m_Color.SetHSV( m_Color.m_Hue, normalized_x *255, normalized_y *255 );
   }
   else 
   if(m_Dragging == DRAG_A)
@@ -476,7 +476,7 @@ void mmgColorWidget::OnMouseMotion(wxMouseEvent &event)
     if (normalized_y < 0) normalized_y = 0;
     if (normalized_y > 1) normalized_y = 1;
 
-    m_Color.SetRGB( m_Color.m_r, m_Color.m_g, m_Color.m_b, normalized_y*255);
+    m_Color.SetRGB( m_Color.m_Red, m_Color.m_Green, m_Color.m_Blue, normalized_y*255);
   }
 
   OnColorChanged(false);
@@ -505,10 +505,10 @@ void mmgColorWidget::OnEvent( mafEventBase *event )
       OnColorChanged();
       break;
     case ID_COPY:
-      m_clipboard = m_Color;
+      m_Clipboard = m_Color;
       break;
     case ID_PASTE:
-      m_Color = m_clipboard ;
+      m_Color = m_Clipboard ;
       OnColorChanged();
       break;
     default:
@@ -522,10 +522,10 @@ void mmgColorWidget::OnColorChanged(bool notify)
 //----------------------------------------------------------------------------
 {
   static mafColor old_col; 
-  if( m_Color.m_h != old_col.m_h )  
+  if( m_Color.m_Hue != old_col.m_Hue )  
     //h changed - update the SV chooser
     UpdateHSVBitmap();    
-  //if( m_Color.m_h != old_col.m_h || m_Color.m_s != old_col.m_s || m_Color.m_v != old_col.m_v )  
+  //if( m_Color.m_Hue != old_col.m_Hue || m_Color.m_Saturation != old_col.m_Saturation || m_Color.m_Value != old_col.m_Value )  
     //any changes except alpha - update the Alpha chooser
     UpdateAlphaBitmap();
   old_col = m_Color;
@@ -536,4 +536,3 @@ void mmgColorWidget::OnColorChanged(bool notify)
   if(notify)
     mafEventMacro(mafEvent(this,GetId())); // notify the user that the color has changed
 }
-

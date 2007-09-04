@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgFlagSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-10 08:52:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,17 +60,17 @@ protected:
   wxCursor     *m_CursorWE;
   wxPen        *m_Pen;
   
-  FlagSplitterDragModes m_dragging;
+  FlagSplitterDragModes m_Dragging;
 
   int m_margin;
-  int m_w,m_h;
-  int m_x1,m_x2;
-  int m_oldx;
+  int m_With,m_Height;
+  int m_XPos1,m_XPos2;
+  int m_XPosOld;
 
-  wxWindow  *m_focused_panel;
-  wxWindow  *m_vp1; 
-  wxWindow  *m_vp2; 
-  wxWindow  *m_vp3; 
+  wxWindow  *m_FocusedPanel;
+  wxWindow  *m_ViewPanel1; 
+  wxWindow  *m_ViewPanel2; 
+  wxWindow  *m_ViewPanel3; 
   
 	/** Adjust the panels size. */
   void OnSize(wxSizeEvent &event);
@@ -90,11 +90,11 @@ protected:
 	/** Hit the mouse position and return the drag modality. */
   FlagSplitterDragModes HitTest(wxMouseEvent &event);
 
-	/** Draw the cross representing the position of creoss splitter. */
+	/** Draw the cross representing the position of cross splitter. */
   void DrawTracker(int x);
 
 DECLARE_EVENT_TABLE()
 
-  bool m_maximized;
+  bool m_Maximized;
 };
 #endif

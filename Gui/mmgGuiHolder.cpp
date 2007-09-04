@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGuiHolder.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 09:29:04 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,9 +36,9 @@ mmgGuiHolder::mmgGuiHolder(wxWindow* parent,wxWindowID id,bool CloseButton,bool 
 //----------------------------------------------------------------------------
 {
   SetTitle(" module controls area:");
-  m_panel = new mmgScrolledPanel(this,-1);
+  m_Panel = new mmgScrolledPanel(this,-1);
 
-  Add(m_panel,1,wxEXPAND);
+  Add(m_Panel,1,wxEXPAND);
 }
 //----------------------------------------------------------------------------
 mmgGuiHolder::~mmgGuiHolder( ) 
@@ -56,12 +56,12 @@ bool mmgGuiHolder::Put(mmgGui* gui)
   if(gui == NULL)
     return false; //SIL. 22-4-2005: -- if passing NULL, the old content is removed 
   gui->FitGui();
-  gui->Reparent(m_panel);
-  m_panel->Add(gui,1,wxEXPAND);
+  gui->Reparent(m_Panel);
+  m_Panel->Add(gui,1,wxEXPAND);
   gui->Show(true);
   gui->Update();
   
-  m_panel->Layout();
+  m_Panel->Layout();
   gui->SetFocus();
   return true;
 }
@@ -73,23 +73,23 @@ bool mmgGuiHolder::RemoveCurrentGui()
   if(current_gui == NULL) 
     return false;  //nothing to remove
 
-  m_panel->Remove(current_gui);
+  m_Panel->Remove(current_gui);
   current_gui->Show(false);
   current_gui->Reparent(mafGetFrame());
 //  current_gui->Show(false);
-  m_panel->Layout();
+  m_Panel->Layout();
   return true;
 }
 //----------------------------------------------------------------------------
 wxWindow *mmgGuiHolder::GetCurrentGui()
 //----------------------------------------------------------------------------
 {
-  int num_children = m_panel->GetChildren().GetCount();
+  int num_children = m_Panel->GetChildren().GetCount();
   assert(num_children <= 1);
 
   if (num_children == 1)
   {
-    wxWindowList::Node *node = m_panel->GetChildren().GetFirst();
+    wxWindowList::Node *node = m_Panel->GetChildren().GetFirst();
     return (wxWindow *)node->GetData();
   }
   return NULL;

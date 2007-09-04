@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgColorSwatch.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,16 +28,15 @@ public:
            const wxSize& size = wxSize(100,50), long style = wxTAB_TRAVERSAL);
 
   void     SetColor      (mafColor c); 
-  mafColor GetColor   () {return m_col;}; 
+  mafColor GetColor   () {return m_Color;}; 
 
 protected:
 
-  wxBitmap m_bmp;      
+  wxBitmap m_Bmp;      
   void OnEraseBackground(wxEraseEvent& event) {};  // overrided to prevent flickering
   void OnPaint(wxPaintEvent &event);                
 
-  mafColor      m_col;
+  mafColor      m_Color;
   DECLARE_EVENT_TABLE()
 };
 #endif
-

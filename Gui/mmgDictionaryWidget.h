@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDictionaryWidget.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 11:02:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ public:
 	/** Load dictionary from file. */
   void LoadDictionary(wxString file);
   
-	/** Return dictionary gui. */
+	/** Return dictionary GUI. */
   wxWindow *GetWidget() {return (wxWindow *)m_List;};
 
   /** Return file name dictionary */
@@ -65,14 +65,13 @@ protected:
 	/** Set the icon of all the items present into the cloud to red or gray according to valid. */
   void ValidateAllItem(bool valid = true);
 
-  mafObserver   *m_Listener;
-	wxString			m_File;
-  int									m_NumItem;
-	wxString					**m_Items;
-  mmgListCtrl				 *m_List;
-  mafVME						 *m_Vme;
+  mafObserver *m_Listener;
+	wxString     m_File;
+  int          m_NumItem;
+	wxString   **m_Items;
+  mmgListCtrl *m_List;
+  mafVME      *m_Vme;
 };
-
 
 //------------------------------------------------------------------------------
 class mafStorableDictionary: public mafObject, public mafStorable
@@ -86,5 +85,4 @@ public:
   virtual int InternalRestore(mafStorageElement *node);
   std::vector<mafString> m_StrVector;
 };
-
 #endif

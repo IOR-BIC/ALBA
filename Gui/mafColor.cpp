@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafColor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-12-01 15:22:04 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,8 +25,8 @@
 mafColor::mafColor()
 //----------------------------------------------------------------------------
 {
-  m_r = m_g = m_b = m_h = m_s = m_v =0;
-  m_a = 0;
+  m_Red = m_Green = m_Blue = m_Hue = m_Saturation = m_Value =0;
+  m_Alpha = 0;
 }
 //----------------------------------------------------------------------------
 mafColor::mafColor( int r, int g, int b, int a )
@@ -45,7 +45,7 @@ mafColor::mafColor( double *vtkRGBA )
 mafColor::mafColor( wxColour col )
 //----------------------------------------------------------------------------
 {
-  m_a = 0;
+  m_Alpha = 0;
   Set( col );
 }
 //----------------------------------------------------------------------------
@@ -62,11 +62,11 @@ void mafColor::SetRGB( int r, int g, int b, int a )
   if( g<0 ) g=0; if( g>255 ) g=255; 
   if( b<0 ) b=0; if( b>255 ) b=255; 
   
-  m_r = r; m_g = g; m_b =b;
+  m_Red = r; m_Green = g; m_Blue =b;
   if(a != -1) 
   {
     if( a<0 ) a=0; if( a>255 ) a=255; 
-    m_a = a;
+    m_Alpha = a;
   }
   RGBToHSV();
 }
@@ -74,8 +74,8 @@ void mafColor::SetRGB( int r, int g, int b, int a )
 void mafColor::GetRGB( int *r, int *g, int *b, int *a )
 //----------------------------------------------------------------------------
 {
-  *r = m_r; *g = m_g;  *b =m_b;
-  if( a != NULL ) *a = m_a;
+  *r = m_Red; *g = m_Green;  *b =m_Blue;
+  if( a != NULL ) *a = m_Alpha;
 }
 //----------------------------------------------------------------------------
 void mafColor::SetHSV(int h, int s, int v)
@@ -86,14 +86,14 @@ void mafColor::SetHSV(int h, int s, int v)
   while(h<0)   h+= 360;
   while(h>360) h-= 360;
   
-  m_h = h; m_s = s; m_v =v;
+  m_Hue = h; m_Saturation = s; m_Value =v;
   HSVToRGB();
 }
 //----------------------------------------------------------------------------
 void mafColor::GetHSV(int *h, int *s, int *v)
 //----------------------------------------------------------------------------
 {
-  *h = m_h; *s = m_s;  *v =m_v;
+  *h = m_Hue; *s = m_Saturation;  *v =m_Value;
 }
 //----------------------------------------------------------------------------
 void mafColor::SetFloatRGB( double r, double g, double b, double o )
@@ -108,10 +108,10 @@ void mafColor::SetFloatRGB( double r, double g, double b, double o )
 void mafColor::GetFloatRGB( double *r, double *g, double *b, double *o )
 //----------------------------------------------------------------------------
 {
-   *r = m_r / 255.0;
-   *g = m_g / 255.0;
-   *b = m_b / 255.0;
-   *o = 1 - m_a / 255.0;
+   *r = m_Red / 255.0;
+   *g = m_Green / 255.0;
+   *b = m_Blue / 255.0;
+   *o = 1 - m_Alpha / 255.0;
 }
 //----------------------------------------------------------------------------
 // rgb,sv in range [0..255], h in range [0..360]
@@ -183,26 +183,26 @@ void mafColor::HSVToRGB(int h, int s, int v, int *r, int *g, int *b)
 void mafColor::HSVToRGB() 
 //----------------------------------------------------------------------------
 {
-  HSVToRGB( m_h, m_s, m_v, &m_r, &m_g, &m_b );  
+  HSVToRGB( m_Hue, m_Saturation, m_Value, &m_Red, &m_Green, &m_Blue );  
 }
 //----------------------------------------------------------------------------
 void mafColor::RGBToHSV()
 //----------------------------------------------------------------------------
 {
-  RGBToHSV( m_r, m_g, m_b, &m_h, &m_s, &m_v );  
+  RGBToHSV( m_Red, m_Green, m_Blue, &m_Hue, &m_Saturation, &m_Value );  
 }
 //----------------------------------------------------------------------------
 mafColor mafColor::InterpolateHSV(mafColor c1, mafColor c2, double t)
 //----------------------------------------------------------------------------
 {
-  if( ( c2.m_h - c1.m_h )>180 )  c1.m_h += 360;
-  if( ( c1.m_h - c2.m_h )>180 )  c2.m_h += 360;
+  if( ( c2.m_Hue - c1.m_Hue )>180 )  c1.m_Hue += 360;
+  if( ( c1.m_Hue - c2.m_Hue )>180 )  c2.m_Hue += 360;
   
   mafColor c;
-  c.m_h = c1.m_h*(1-t) + c2.m_h*t; if(c.m_h > 360 ) c.m_h -= 360; 
-  c.m_s = c1.m_s*(1-t) + c2.m_s*t; 
-  c.m_v = c1.m_v*(1-t) + c2.m_v*t; 
-  c.m_a = c1.m_a*(1-t) + c2.m_a*t; 
+  c.m_Hue = c1.m_Hue*(1-t) + c2.m_Hue*t; if(c.m_Hue > 360 ) c.m_Hue -= 360; 
+  c.m_Saturation = c1.m_Saturation*(1-t) + c2.m_Saturation*t; 
+  c.m_Value = c1.m_Value*(1-t) + c2.m_Value*t; 
+  c.m_Alpha = c1.m_Alpha*(1-t) + c2.m_Alpha*t; 
   c.HSVToRGB();
   return c;    
 }  
@@ -211,10 +211,10 @@ mafColor mafColor::InterpolateRGB(mafColor c1, mafColor c2, double t)
 //----------------------------------------------------------------------------
 {
   mafColor c;
-  c.m_r = c1.m_r*(1-t) + c2.m_r*t;
-  c.m_g = c1.m_g*(1-t) + c2.m_g*t; 
-  c.m_b = c1.m_b*(1-t) + c2.m_b*t; 
-  c.m_a = c1.m_a*(1-t) + c2.m_a*t; 
+  c.m_Red = c1.m_Red*(1-t) + c2.m_Red*t;
+  c.m_Green = c1.m_Green*(1-t) + c2.m_Green*t; 
+  c.m_Blue = c1.m_Blue*(1-t) + c2.m_Blue*t; 
+  c.m_Alpha = c1.m_Alpha*(1-t) + c2.m_Alpha*t; 
   c.RGBToHSV();
   return c;    
 }  
@@ -229,8 +229,8 @@ mafColor mafColor::CheckeredColor(mafColor c, int x, int y)
   int a = x%16 >= 8;
   int b = y%16 >= 8;
   if( a+b == 1 )
-    return mafColor::InterpolateRGB(c,check0,c.m_a/255.0);
+    return mafColor::InterpolateRGB(c,check0,c.m_Alpha/255.0);
   else
-    return mafColor::InterpolateRGB(c,check1,c.m_a/255.0);
+    return mafColor::InterpolateRGB(c,check1,c.m_Alpha/255.0);
 }  
 */

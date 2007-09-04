@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSwatch.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-26 14:13:57 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-09-04 16:22:15 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -196,9 +196,9 @@ void mmgLutSwatch::Update()
       mafColor col  = mafColor( m_Lut->GetTableValue(i) );
       mafColor col2 = mafColor::CheckeredColor(col,x,y);
 
-      *p++ = col2.m_r;
-      *p++ = col2.m_g;
-      *p++ = col2.m_b;
+      *p++ = col2.m_Red;
+      *p++ = col2.m_Green;
+      *p++ = col2.m_Blue;
     }
   }
   wxImage img(w,h,data); // data will be freed by the image
