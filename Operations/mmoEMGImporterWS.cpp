@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-16 09:57:15 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-09-04 16:26:33 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,7 +108,6 @@ void mmoEMGImporterWS::Read()
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
-  int sizeMatrix;
   freq_val = atof(freq.c_str());
   
   line = text.ReadLine();
