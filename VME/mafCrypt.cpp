@@ -34,37 +34,38 @@ const char *mafDefaultPassPhrase()
   return defaultPhrase;
 }
 //----------------------------------------------------------------------------
-void mafDefaultEncryptFile(const char *filename_in, const char *filename_out)
+bool mafDefaultEncryptFile(const char *filename_in, const char *filename_out)
 //----------------------------------------------------------------------------
 {
-	mafEncryptFile (filename_in, filename_out, defaultPhrase);
+	return mafEncryptFile(filename_in, filename_out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
-void mafDefaultDecryptFile(const char *filename_in, const char *filename_out)
+bool mafDefaultDecryptFile(const char *filename_in, const char *filename_out)
 //----------------------------------------------------------------------------
 {
-	mafDecryptFile (filename_in, filename_out, defaultPhrase);
+	return mafDecryptFile(filename_in, filename_out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
-void mafDefaultDecryptFileInMemory(const char *filename_in, std::string &out)
+bool mafDefaultDecryptFileInMemory(const char *filename_in, std::string &out)
 //----------------------------------------------------------------------------
 {
-	mafDecryptFileInMemory (filename_in, out, defaultPhrase);
+	return mafDecryptFileInMemory(filename_in, out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
-void mafDefaultEncryptFileFromMemory(const char *in, unsigned int len, const char *filename_out)
+bool mafDefaultEncryptFileFromMemory(const char *in, unsigned int len, const char *filename_out)
 //----------------------------------------------------------------------------
 {
-	mafEncryptFileFromMemory (in, len, filename_out, defaultPhrase);
+	return mafEncryptFileFromMemory(in, len, filename_out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
-void mafEncryptFile(const char *filename_in, const char *filename_out, const char *passPhrase)
+bool mafEncryptFile(const char *filename_in, const char *filename_out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
+  bool result = true;
   try
   {
     FileSink *fsink = new FileSink(filename_out);
@@ -74,14 +75,16 @@ void mafEncryptFile(const char *filename_in, const char *filename_out, const cha
   }
   catch (...)
   {
-  	wxMessageBox(_("Error occourred during the file Encryption!"),_("Error"));
+    result = false;
   }
+  return result;
 }
 
 //----------------------------------------------------------------------------
-void mafDecryptFile(const char *filename_in, const char *filename_out, const char *passPhrase)
+bool mafDecryptFile(const char *filename_in, const char *filename_out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
+  bool result = true;
   try
   {
     FileSink *fsink=new FileSink(filename_out);
@@ -91,14 +94,16 @@ void mafDecryptFile(const char *filename_in, const char *filename_out, const cha
   }
   catch (...)
   {
-    wxMessageBox(_("Error occourred during the file Decryption!"),_("Error"));
+    result = false;
   }
+  return result;
 }
 
 //----------------------------------------------------------------------------
-void mafDecryptFileInMemory(const char *filename_in, std::string &out, const char *passPhrase)
+bool mafDecryptFileInMemory(const char *filename_in, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
+  bool result;
   try
   {
     StringSink *ssink = new StringSink(out);
@@ -108,14 +113,16 @@ void mafDecryptFileInMemory(const char *filename_in, std::string &out, const cha
   }
   catch (...)
   {
-    wxMessageBox(_("Error occourred during the string Decryption!"),_("Error"));
+    result = false;
   }
+  return result;
 }
 
 //----------------------------------------------------------------------------
-void mafEncryptFileFromMemory(const char *in, unsigned int len, const char *filename_out, const char *passPhrase)
+bool mafEncryptFileFromMemory(const char *in, unsigned int len, const char *filename_out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
+  bool result;
   try
   {
     FileSink *fsink = new FileSink(filename_out);
@@ -125,28 +132,30 @@ void mafEncryptFileFromMemory(const char *in, unsigned int len, const char *file
   }
   catch (...)
   {
-    wxMessageBox(_("Error occourred during the string Encryption!"),_("Error"));
+    result = false;
   }
+  return result;
 }
 
 //----------------------------------------------------------------------------
-void mafDefaultDecryptInMemory(const char *in, std::string &out)
+bool mafDefaultDecryptInMemory(const char *in, std::string &out)
 //----------------------------------------------------------------------------
 {
-  mafDecryptInMemory(in, out, defaultPhrase);
+  return mafDecryptInMemory(in, out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
-void mafDefaultEncryptFromMemory(const char *in, unsigned int len, std::string &out)
+bool mafDefaultEncryptFromMemory(const char *in, unsigned int len, std::string &out)
 //----------------------------------------------------------------------------
 {
-  mafEncryptFromMemory(in, len, out, defaultPhrase);
+  return mafEncryptFromMemory(in, len, out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
-void mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase)
+bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
+  bool result;
   try
   {
     StringSink *ssink = new StringSink(out);
@@ -156,14 +165,16 @@ void mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase
   }
   catch (...)
   {
-    wxMessageBox(_("Error occourred during the string Decryption!"),_("Error"));
+    result = false;
   }
+  return result;
 }
 
 //----------------------------------------------------------------------------
-void mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, const char *passPhrase)
+bool mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
+  bool result;
   try
   {
     StringSink *ssink = new StringSink(out);
@@ -173,7 +184,8 @@ void mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, co
   }
   catch (...)
   {
-    wxMessageBox(_("Error occourred during the string Encryption!"),_("Error"));
+    result = false;
   }
+  return result;
 }
 #endif
