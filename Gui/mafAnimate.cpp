@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:21:17 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-09-05 11:16:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 #include "mmgGui.h"
 #include "mmgButton.h"
+#include "mmgMovieCtrl.h"
 
 #include "mafVME.h"
 #include "mafTagArray.h"
@@ -42,11 +43,12 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
   m_Tags			= NULL;
 
   m_SelectedPosition	= "";
-	m_AnimateFlag		= 1;
+	m_InterpolateFlag		= 1;
 	m_PositionList			    = NULL;
 	m_StorePositionButton		= NULL;
   m_RenamePositionButton	= NULL;
   m_DeletePositionButton	= NULL;
+  m_AnimatePlayer         = NULL;
 	
 	CreateGui();
 	SetInputVME(vme); //widgets must already exist
@@ -94,9 +96,10 @@ enum ANIMATE_KIT_WIDGET_ID
 {
 	ID_LIST = MINID,
 	ID_STORE,
-	ID_ANIMATE,
+	ID_INTERPOLATE,
 	ID_DELETE,
 	ID_RENAME,
+  ID_ANIMATE
 };
 //----------------------------------------------------------------------------
 void mafAnimate::CreateGui()
@@ -132,10 +135,14 @@ void mafAnimate::CreateGui()
   m_Gui->Add(sizer,0,wxALL,rm); 
 
 	m_PositionList = m_Gui->ListBox(ID_LIST," ");
-	m_Gui->Bool(ID_ANIMATE,"animate",&m_AnimateFlag);
+	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag);
+  
+  m_AnimatePlayer = new mmgMovieCtrl(m_Gui);
+  m_AnimatePlayer->SetListener(this);
+  m_Gui->Add(m_AnimatePlayer);
+  m_AnimatePlayer->Enable(false);
 
 	m_Gui->Divider();
-
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
@@ -147,6 +154,7 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_STORE:
+      case MOVIE_RECORD:
         StoreViewPoint();
         EnableWidgets();
       break;
@@ -158,6 +166,10 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         RenameViewPoint();
       break;
       case ID_LIST:
+        FlyTo();
+      break;
+      case TIME_SET:
+        m_PositionList->SetSelection((int)e->GetDouble());
         FlyTo();
       break;
     }
@@ -176,13 +188,15 @@ void mafAnimate::EnableWidgets()
   //m_PositionList->Enable( m_Tags != NULL && m_PositionList->Number()>0 );
 	//m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
 	//m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
-	//m_Gui->Enable( ID_ANIMATE, m_Tags != NULL && m_PositionList->Number()>0 );
+	//m_Gui->Enable( ID_INTERPOLATE, m_Tags != NULL && m_PositionList->Number()>0 );
 
   m_PositionList->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 );
   m_PositionList->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 );
   m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 && m_SelectedPosition != "" );
   m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 && m_SelectedPosition != "" );
-  m_Gui->Enable( ID_ANIMATE, m_Tags != NULL && m_PositionList->GetCount()>0 );
+  m_Gui->Enable( ID_INTERPOLATE, m_Tags != NULL && m_PositionList->GetCount()>0 );
+  m_AnimatePlayer->Enable(m_PositionList->GetCount()>1);
+  m_AnimatePlayer->SetFrameBounds(0,m_PositionList->GetCount()-1);
 }
 //----------------------------------------------------------------------------
 void mafAnimate::FlyTo(const char *fly_position)
@@ -239,7 +253,7 @@ void mafAnimate::FlyTo()
   int rate = 15;
   double pi = vtkMath::Pi();
 
-  if(m_AnimateFlag)
+  if(m_InterpolateFlag)
   {
     //m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(rate);  // SIL ??
 
@@ -313,7 +327,7 @@ void mafAnimate::FlyTo()
 	double dx_vup, dy_vup, dz_vup, distance_vup, delta_vup;
   double distance_ps, delta_par_scale;
 
-	if(m_AnimateFlag)
+	if(m_InterpolateFlag)
 	{
 		m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(rate);
 		camera->GetFocalPoint(flyFrom);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:21:17 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-09-05 11:16:22 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ class mafTagArray;
 class mmgButton;
 class vtkRenderer;
 class mmgGui;
+class mmgMovieCtrl;
 
 //----------------------------------------------------------------------------
 // mafAnimate :
@@ -81,6 +82,7 @@ protected:
 	mmgButton			*m_StorePositionButton; 
 	mmgButton			*m_DeletePositionButton;
 	mmgButton			*m_RenamePositionButton;
-	int						 m_AnimateFlag;
+  mmgMovieCtrl  *m_AnimatePlayer;
+	int						 m_InterpolateFlag;
 };
 #endif
