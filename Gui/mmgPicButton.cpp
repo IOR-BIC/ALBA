@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-01-25 16:21:47 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-09-05 11:15:23 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,8 @@ mmgPicButton::mmgPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id, m
   wxBitmap b = mafPics.GetBmp(BitmapId);
   wxSize size(b.GetWidth(),b.GetHeight());
 
-  Create(parent, m_Id, b, wxDefaultPosition, size,0);
+  //Create(parent, m_Id, b, wxDefaultPosition, size,0);
+  Create(parent, m_Id, b, wxDefaultPosition, size);
   SetBitmap(BitmapId,id);
 }
 //----------------------------------------------------------------------------
@@ -56,10 +57,11 @@ mmgPicButton::mmgPicButton(wxWindow *parent, wxBitmap *b, wxWindowID id, mafObse
   m_Id = id;
 
   wxSize size(b->GetWidth(),b->GetHeight());
-  Create(parent, m_Id, *b, wxDefaultPosition, size,0);
+  //Create(parent, m_Id, *b, wxDefaultPosition, size,0);
+  Create(parent, m_Id, *b, wxDefaultPosition, size);
 
   SetBitmapLabel(*b);
-  SetBitmapDisabled(GrayScale(*b));
+  //SetBitmapDisabled(GrayScale(*b));
   Refresh();
 }
 //----------------------------------------------------------------------------
@@ -80,7 +82,7 @@ void mmgPicButton::SetBitmap(wxString BitmapId, wxWindowID id )
 {
   wxBitmap b = mafPics.GetBmp(BitmapId);
   SetBitmapLabel(b);
-  SetBitmapDisabled(GrayScale(b));
+  //SetBitmapDisabled(GrayScale(b));
   m_Id = id;
   Refresh();
 }
