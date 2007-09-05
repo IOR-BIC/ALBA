@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrlBitmap.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:02:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:56:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,14 +43,14 @@ mmgListCtrlBitmap::mmgListCtrlBitmap( wxWindow* parent,wxWindowID id, bool Close
   m_Images = new wxImageList(25,25,FALSE,4);
   m_List = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_SMALL_ICON | wxLC_SINGLE_SEL | wxLC_AUTOARRANGE);
 
-  m_sizer->Add(m_List,1,wxEXPAND);
+  m_Sizer->Add(m_List,1,wxEXPAND);
   m_PreventNotify = false;
 
   m_List->SetColumnWidth(0,200);
   m_List->SetColumnWidth(1,200);
 }
 //----------------------------------------------------------------------------
-mmgListCtrlBitmap::~mmgListCtrlBitmap( )
+mmgListCtrlBitmap::~mmgListCtrlBitmap()
 //----------------------------------------------------------------------------
 {
 	cppDEL(m_Images);
