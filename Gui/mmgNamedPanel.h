@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgNamedPanel.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,30 +36,30 @@ public:
   virtual ~mmgNamedPanel();
   
   /** Add a widget to the panel. */
-  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_sizer->Add(window,option,flag,border);};
+  void Add(wxWindow* window,int option = 0, int flag = wxEXPAND, int border = 0)  {window->Reparent(this); m_Sizer->Add(window,option,flag,border);};
   
 	/** Add a sizer to the panel. */
-  void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_sizer->Add(sizer, option,flag,border);};
+  void Add(wxSizer*  sizer, int option = 0, int flag = wxEXPAND, int border = 0)  {m_Sizer->Add(sizer, option,flag,border);};
   
 	/** Remove a widget from the panel. */
-  bool Remove(wxWindow* window) {return m_sizer->Detach(window);};
+  bool Remove(wxWindow* window) {return m_Sizer->Detach(window);};
   
 	/** Remove a sizer from the panel. */
-  bool Remove(wxSizer*  sizer ) {return m_sizer->Detach(sizer);};
+  bool Remove(wxSizer*  sizer ) {return m_Sizer->Detach(sizer);};
 
   /** Set the text shown on the title-bar. */
-  void SetTitle(wxString label) {if(m_lab) m_lab->SetLabel(label);};
+  void SetTitle(wxString label) {if(m_Label) m_Label->SetLabel(label);};
 
   /** Change the background color of the title. */
   void SetTitleColor(wxColour *color = NULL);
 
 protected:
-  wxPanel         *m_top;
-  mmgLab          *m_lab;
-  wxBoxSizer      *m_sizer;
-  wxBoxSizer      *m_topsizer;
-  mmgNamedPanel   *m_next;
-  wxColour         m_col; 
+  wxPanel         *m_Top;
+  mmgLab          *m_Label;
+  wxBoxSizer      *m_Sizer;
+  wxBoxSizer      *m_TopSizer;
+  mmgNamedPanel   *m_NextPanel;
+  wxColour         m_Color; 
 
 DECLARE_EVENT_TABLE()
 };

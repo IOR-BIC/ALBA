@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPanelStack.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,8 +45,8 @@ protected:
 	/** Adjust the size calling wxPanel::OnSize. */
 	void DoLayout();
 
-  wxBoxSizer   *m_sizer;
-  mmgPanel     *m_curr_panel;
+  wxBoxSizer   *m_Sizer;
+  mmgPanel     *m_CurrentPanel;
 
 DECLARE_EVENT_TABLE()
 };

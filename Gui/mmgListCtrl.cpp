@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-04 11:48:41 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,92 +42,92 @@ mmgListCtrl::mmgListCtrl( wxWindow* parent,wxWindowID id, bool CloseButton, bool
    
   m_Listener = NULL;
 
-  m_images = new wxImageList(15,15,FALSE,4);
-  m_images->Add(mafPics.GetBmp("NODE_YELLOW"));
-  m_images->Add(mafPics.GetBmp("NODE_GRAY"));
-  m_images->Add(mafPics.GetBmp("NODE_RED"));
-  m_images->Add(mafPics.GetBmp("NODE_BLUE"));
+  m_Images = new wxImageList(15,15,FALSE,4);
+  m_Images->Add(mafPics.GetBmp("NODE_YELLOW"));
+  m_Images->Add(mafPics.GetBmp("NODE_GRAY"));
+  m_Images->Add(mafPics.GetBmp("NODE_RED"));
+  m_Images->Add(mafPics.GetBmp("NODE_BLUE"));
 
-  m_list = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_REPORT);
+  m_List = new wxListCtrl(this,ID_LIST,wxDefaultPosition,wxSize(100,100) ,wxLC_REPORT);
   
-  m_sizer->Add(m_list,1,wxEXPAND);
-  m_prevent_notify = false;
+  m_Sizer->Add(m_List,1,wxEXPAND);
+  m_PreventNotify = false;
 }
 //----------------------------------------------------------------------------
 mmgListCtrl::~mmgListCtrl( )
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_images);
+  cppDEL(m_Images);
 }
 //----------------------------------------------------------------------------
 void mmgListCtrl::Reset ()
 //----------------------------------------------------------------------------
 {
-  m_list->ClearAll();
+  m_List->ClearAll();
 
-  m_list->SetImageList(m_images,wxIMAGE_LIST_SMALL);
-  m_list->SetImageList(m_images,wxIMAGE_LIST_NORMAL);
+  m_List->SetImageList(m_Images,wxIMAGE_LIST_SMALL);
+  m_List->SetImageList(m_Images,wxIMAGE_LIST_NORMAL);
 
-  m_list->InsertColumn(0, "");
-  m_list->SetColumnWidth( 0,1000 );
+  m_List->InsertColumn(0, "");
+  m_List->SetColumnWidth( 0,1000 );
 }
 //----------------------------------------------------------------------------
 bool mmgListCtrl::AddItem (long item_id, wxString label, ITEM_ICONS icon)
 //----------------------------------------------------------------------------
 {
   if( ItemExist(item_id) )return false;
-  long tmp = m_list->InsertItem(item_id,label,icon); 
-  m_list->SetItemData(tmp, item_id);
+  long tmp = m_List->InsertItem(item_id,label,icon); 
+  m_List->SetItemData(tmp, item_id);
   return true;
 }
 //----------------------------------------------------------------------------
 bool mmgListCtrl::DeleteItem  (long item_id)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   if (id == -1) return false;
-  m_list->DeleteItem(id);
+  m_List->DeleteItem(id);
   return true;
 }
 //----------------------------------------------------------------------------
 bool mmgListCtrl::SetItemLabel (long item_id, wxString label)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   if (id == -1) return false;
-  m_list->SetItemText(id,label);
+  m_List->SetItemText(id,label);
   return true;
 }
 //----------------------------------------------------------------------------
 bool mmgListCtrl::SetItemIcon (long item_id, ITEM_ICONS icon)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   if(id == -1) 
     return false;
-  m_list->SetItemImage(id,icon,icon);
+  m_List->SetItemImage(id,icon,icon);
   return true;
 }
 //----------------------------------------------------------------------------
 wxString mmgListCtrl::GetItemLabel (long item_id)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   if (id == -1) return "";
-  return m_list->GetItemText(id);
+  return m_List->GetItemText(id);
 }
 //----------------------------------------------------------------------------
 ITEM_ICONS mmgListCtrl::GetItemIcon (long item_id)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   if (id == -1) 
     return ITEM_ERROR;
 
   wxListItem li;
   li.SetId(id);
   li.m_mask = wxLIST_MASK_IMAGE;
-  m_list->GetItem(li);
+  m_List->GetItem(li);
   int icon = -1;
   if( li.m_mask & wxLIST_MASK_IMAGE )
     icon = li.m_image;
@@ -139,12 +139,12 @@ ITEM_ICONS mmgListCtrl::GetItemIcon (long item_id)
 bool mmgListCtrl::SelectItem(long item_id)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   if (id == -1) return false;
  
-	m_prevent_notify = true;
-  m_list->SetItemState(id,wxLIST_MASK_IMAGE,wxLIST_MASK_IMAGE) ;
-  m_prevent_notify = false;
+	m_PreventNotify = true;
+  m_List->SetItemState(id,wxLIST_MASK_IMAGE,wxLIST_MASK_IMAGE) ;
+  m_PreventNotify = false;
   
 	return true;
 }
@@ -152,11 +152,11 @@ bool mmgListCtrl::SelectItem(long item_id)
 void mmgListCtrl::OnSelectionChanged(wxListEvent& event)
 //----------------------------------------------------------------------------
 {
-  if(m_prevent_notify) return;
+  if(m_PreventNotify) return;
    
-  mafString s = m_list->GetItemText(event.GetIndex());
+  mafString s = m_List->GetItemText(event.GetIndex());
   long item_id = event.GetData();
-  long icon = event.GetImage(); //vfc - non va
+  long icon = event.GetImage();
 
   mafEventMacro(mafEvent(this, ITEM_SELECTED, &s, item_id ));
   event.Skip();
@@ -165,7 +165,7 @@ void mmgListCtrl::OnSelectionChanged(wxListEvent& event)
 bool mmgListCtrl::ItemExist(long item_id)
 //----------------------------------------------------------------------------
 {
-  long id =  m_list->FindItem(-1, item_id);
+  long id =  m_List->FindItem(-1, item_id);
   return (id != -1);
 }
 //----------------------------------------------------------------------------
@@ -175,5 +175,5 @@ void mmgListCtrl::SetColumnLabel(int col, wxString label)
   wxListItem li;
   li.m_mask = wxLIST_MASK_TEXT;
   li.m_text = label;
-  m_list->SetColumn(col,li);
+  m_List->SetColumn(col,li);
 }

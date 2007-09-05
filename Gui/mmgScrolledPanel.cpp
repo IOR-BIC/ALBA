@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgScrolledPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-13 14:57:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-05 08:26:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,16 +33,16 @@ mmgScrolledPanel::mmgScrolledPanel(wxWindow* parent,wxWindowID id)
 :wxScrolledWindow(parent,id,wxDefaultPosition,wxDefaultSize,wxNO_BORDER) 
 //----------------------------------------------------------------------------
 {
-  m_sizer =  new wxBoxSizer( wxVERTICAL );
+  m_Sizer =  new wxBoxSizer( wxVERTICAL );
 
    //SIL. 31-3-2005: 
   this->SetScrollbars(0, 10, 0, 100); 
   this->EnableScrolling(0,1);         
 
   this->SetAutoLayout( TRUE );
-  this->SetSizer( m_sizer );
-  m_sizer->Fit(this);
-  m_sizer->SetSizeHints(this);
+  this->SetSizer( m_Sizer );
+  m_Sizer->Fit(this);
+  m_Sizer->SetSizeHints(this);
 }
 //----------------------------------------------------------------------------
 mmgScrolledPanel::~mmgScrolledPanel( ) 
@@ -54,34 +54,34 @@ bool mmgScrolledPanel::Layout()
 //----------------------------------------------------------------------------
 {
   //SIL. 08-jun-2006 - not possible to call SetScrollbars here - stack overflow
-  //this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10);
+  //this->SetScrollbars(0, 10,0, m_Sizer->GetMinSize().GetHeight()/10);
 	return wxScrolledWindow::Layout();    
 }
 //----------------------------------------------------------------------------
 void mmgScrolledPanel::Add(wxWindow* window,int option, int flag, int border)  
 //----------------------------------------------------------------------------
 {
-  m_sizer->Add(window,option,flag,border);
+  m_Sizer->Add(window,option,flag,border);
   FitInside();
 }
 //----------------------------------------------------------------------------
 void mmgScrolledPanel::Add(wxSizer*  sizer, int option, int flag, int border)  
 //----------------------------------------------------------------------------
 {
-  m_sizer->Add(sizer, option,flag,border);
+  m_Sizer->Add(sizer, option,flag,border);
   FitInside();
 }
 //----------------------------------------------------------------------------
 bool mmgScrolledPanel::Remove(wxWindow* window)
 //----------------------------------------------------------------------------
 {
-  return m_sizer->Detach(window);
+  return m_Sizer->Detach(window);
 }
 //----------------------------------------------------------------------------
 bool mmgScrolledPanel::Remove(wxSizer*  sizer ) 
 //----------------------------------------------------------------------------
 {
-  return m_sizer->Detach(sizer);
+  return m_Sizer->Detach(sizer);
 }
 //----------------------------------------------------------------------------
 void mmgScrolledPanel::FitInside()
@@ -92,8 +92,8 @@ void mmgScrolledPanel::FitInside()
   // scrollbar.
   int pos_old = GetScrollPos(wxVERTICAL);
   int range_old = GetScrollRange(wxVERTICAL);
-  int range_new = m_sizer->GetMinSize().GetHeight()/10;
+  int range_new = m_Sizer->GetMinSize().GetHeight()/10;
   int pos_new = (pos_old * range_new) / range_old;
-  this->SetScrollbars(0, 10,0, m_sizer->GetMinSize().GetHeight()/10,0,pos_new);
+  this->SetScrollbars(0, 10,0, m_Sizer->GetMinSize().GetHeight()/10,0,pos_new);
   wxScrolledWindow::Layout();    
 }

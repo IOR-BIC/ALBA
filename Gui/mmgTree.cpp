@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-30 10:55:31 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-09-05 08:26:03 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,9 +46,9 @@ mmgTree::mmgTree( wxWindow* parent,wxWindowID id, bool CloseButton, bool HideTit
   m_Autosort	    = false;
 
   m_NodeTree = new wxTreeCtrl(this,ID_TREE,wxDefaultPosition,wxSize(100,100),wxNO_BORDER | wxTR_HAS_BUTTONS );
-  m_sizer->Add(m_NodeTree,1,wxEXPAND);
+  m_Sizer->Add(m_NodeTree,1,wxEXPAND);
 
-  //default imagelist
+  //default image list
   wxBitmap bmp = mafPics.GetBmp("NODE_GRAY");
   int w = bmp.GetWidth();
   int h = bmp.GetHeight();

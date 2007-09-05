@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -463,27 +463,27 @@ private:
 
 protected:
 
-    wxFrame* m_frame;            // the frame being managed
-    wxDockArt* m_art;            // dock art object which does all drawing
-    unsigned int m_flags;        // manager flags wxAUI_MGR_*
+    wxFrame* m_Frame;            // the frame being managed
+    wxDockArt* m_Art;            // dock art object which does all drawing
+    unsigned int m_Flags;        // manager flags wxAUI_MGR_*
 
-    wxPaneInfoArray m_panes;     // array of panes structures
-    wxDockInfoArray m_docks;     // array of docks structures
-    wxDockUIPartArray m_uiparts; // array of UI parts (captions, buttons, etc)
+    wxPaneInfoArray m_PanesArray;     // array of panes structures
+    wxDockInfoArray m_Docks;     // array of docks structures
+    wxDockUIPartArray m_UIParts; // array of UI parts (captions, buttons, etc)
 
-    int m_action;                // current mouse action
-    wxPoint m_action_start;      // position where the action click started
-    wxPoint m_action_offset;     // offset from upper left of the item clicked
-    wxDockUIPart* m_action_part; // ptr to the part the action happened to
-    wxWindow* m_action_window;   // action frame or window (NULL if none)
-    wxRect m_action_hintrect;    // hint rectangle for the action
-    wxDockUIPart* m_hover_button;// button uipart being hovered over
-    wxRect m_last_hint;          // last hint rectangle
-    wxPoint m_last_mouse_move;   // last mouse move position (see OnMotion)
+    int m_Action;                // current mouse action
+    wxPoint m_ActionStart;      // position where the action click started
+    wxPoint m_ActionOffset;     // offset from upper left of the item clicked
+    wxDockUIPart* m_ActionPart; // ptr to the part the action happened to
+    wxWindow* m_ActionWindow;   // action frame or window (NULL if none)
+    wxRect m_ActionHintRect;    // hint rectangle for the action
+    wxDockUIPart* m_HoverButton;// button ui part being hovered over
+    wxRect m_LastHint;          // last hint rectangle
+    wxPoint m_LastMouseMove;   // last mouse move position (see OnMotion)
 
-    wxWindow* m_hint_wnd;        // transparent hint window (for now, only msw)
-    wxTimer m_hint_fadetimer;    // transparent fade timer (for now, only msw)
-    int m_hint_fadeamt;          // transparent fade amount (for now, only msw)
+    wxWindow* m_HintWnd;        // transparent hint window (for now, only msw)
+    wxTimer m_HintFadeTimer;    // transparent fade timer (for now, only msw)
+    int m_HintFadeAmount;          // transparent fade amount (for now, only msw)
     
     DECLARE_EVENT_TABLE()
 };
@@ -524,7 +524,7 @@ public:
 
 // dock art provider code - a dock provider provides all drawing
 // functionality to the wxAui dock manager.  This allows the dock
-// manager to have plugable look-and-feels
+// manager to have pluggable look-and-feels
 
 class wxDockArt
 {
@@ -621,30 +621,30 @@ protected:
 
 protected:
 
-    wxPen m_border_pen;
-    wxBrush m_sash_brush;
-    wxBrush m_background_brush;
-    wxBrush m_gripper_brush;
-    wxFont m_caption_font;
-    wxBitmap m_inactive_close_bitmap;
-    wxBitmap m_inactive_pin_bitmap;
-    wxBitmap m_active_close_bitmap;
-    wxBitmap m_active_pin_bitmap;
-    wxPen m_gripper_pen1;
-    wxPen m_gripper_pen2;
-    wxPen m_gripper_pen3;
-    wxColour m_active_caption_colour;
-    wxColour m_active_caption_gradient_colour;
-    wxColour m_active_caption_text_colour;
-    wxColour m_inactive_caption_colour;
-    wxColour m_inactive_caption_gradient_colour;
-    wxColour m_inactive_caption_text_colour;
-    int m_border_size;
-    int m_caption_size;
-    int m_sash_size;
-    int m_button_size;
-    int m_gripper_size;
-    int m_gradient_type;
+    wxPen m_BorderPen;
+    wxBrush m_SashBrush;
+    wxBrush m_BackgroundBrush;
+    wxBrush m_GripperBrush;
+    wxFont m_CaptionFont;
+    wxBitmap m_InactiveCloseBitmap;
+    wxBitmap m_InactivePinBitmap;
+    wxBitmap m_ActiveCloseBitmap;
+    wxBitmap m_ActivePinBitmap;
+    wxPen m_GripperPen1;
+    wxPen m_GripperPen2;
+    wxPen m_GripperPen3;
+    wxColour m_ActiveCaptionColour;
+    wxColour m_ActiveCaptionGradientColour;
+    wxColour m_ActiveCaptionTextColour;
+    wxColour m_InactiveCaptionColour;
+    wxColour m_InactiveCaptionGradientColour;
+    wxColour m_InactiveCaptionTextColour;
+    int m_BorderSize;
+    int m_CaptionSize;
+    int m_SashSize;
+    int m_ButtonSize;
+    int m_GripperSize;
+    int m_GradientType;
 };
 
 
@@ -743,7 +743,7 @@ public:
 class wxPaneButton
 {
 public:
-    int button_id;        // id of the button (e.g. buttonClose)
+    int m_ButtonId;        // id of the button (e.g. buttonClose)
 };
 
 

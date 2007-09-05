@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgScrolledPanel.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-05 08:26:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ public:
 
 
 protected:
-  wxBoxSizer *m_sizer;
+  wxBoxSizer *m_Sizer;
 
 DECLARE_EVENT_TABLE()
 };

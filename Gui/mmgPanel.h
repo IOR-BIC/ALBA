@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPanel.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ public:
   mmgPanel(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, 
            const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = "panel");
 
-  mmgPanel *m_next;
+  mmgPanel *m_NextPanel;
 
 protected:
 

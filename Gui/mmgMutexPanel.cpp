@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMutexPanel.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,11 +34,11 @@ mmgMutexPanel::mmgMutexPanel(wxWindow* parent,wxWindowID id)
 :mmgPanel(parent,id)
 //----------------------------------------------------------------------------
 {
-  m_sizer =  new wxBoxSizer( wxVERTICAL );
+  m_Sizer =  new wxBoxSizer( wxVERTICAL );
   this->SetAutoLayout( TRUE );
-  this->SetSizer( m_sizer );
-  //m_sizer->Fit(this);
-  //m_sizer->SetSizeHints(this);
+  this->SetSizer( m_Sizer );
+  //m_Sizer->Fit(this);
+  //m_Sizer->SetSizeHints(this);
 }
 //----------------------------------------------------------------------------
 mmgMutexPanel::~mmgMutexPanel( ) 
@@ -58,12 +58,12 @@ bool mmgMutexPanel::Put(wxWindow *win)
   
   //win->FitGui(); // solo in mmgGUI
   win->Reparent(this);
-  m_sizer->Add(win,1,wxEXPAND);
+  m_Sizer->Add(win,1,wxEXPAND);
   win->Show(true);
   win->Update();
   
-  //m_sizer->Fit(this);
-  //m_sizer->SetSizeHints(this);
+  //m_Sizer->Fit(this);
+  //m_Sizer->SetSizeHints(this);
   this->Layout();
 
   return true;
@@ -76,7 +76,7 @@ bool mmgMutexPanel::RemoveCurrentClient()
   if(current_gui == NULL) 
     return false;  //nothing to remove
 
-  m_sizer->Detach(current_gui);
+  m_Sizer->Detach(current_gui);
   current_gui->Show(false);
   current_gui->Reparent(mafGetFrame());
   this->Layout();

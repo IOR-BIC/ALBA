@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 
 #include "mmgListBox.h"
 //----------------------------------------------------------------------------
-// costants :
+// constants :
 //----------------------------------------------------------------------------
 #define ID_CLB 100
 //----------------------------------------------------------------------------
@@ -39,8 +39,8 @@ mmgListBox::mmgListBox(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
-  m_prevent_notify = false;
-  m_lb = new wxListBox(this, ID_CLB, wxDefaultPosition, wxDefaultSize, 0,NULL,wxLB_SINGLE | wxLB_HSCROLL | wxLB_OWNERDRAW );
+  m_PreventNotify = false;
+  m_ListBox = new wxListBox(this, ID_CLB, wxDefaultPosition, wxDefaultSize, 0,NULL,wxLB_SINGLE | wxLB_HSCROLL | wxLB_OWNERDRAW );
 }
 //----------------------------------------------------------------------------
 mmgListBox::~mmgListBox( ) 
@@ -51,15 +51,15 @@ mmgListBox::~mmgListBox( )
 void mmgListBox::Clear()
 //----------------------------------------------------------------------------
 {
-   m_lb->Clear();
+   m_ListBox->Clear();
 }
 //----------------------------------------------------------------------------
 void mmgListBox::AddItem(wxString label, bool checked)
 //----------------------------------------------------------------------------
 {
-	m_lb->Append(label);
-	int id = m_lb->GetCount()-1;
-	m_lb->SetSelection(id);
+	m_ListBox->Append(label);
+	int id = m_ListBox->GetCount()-1;
+	m_ListBox->SetSelection(id);
 
 	if(checked)
 	{
@@ -70,14 +70,14 @@ void mmgListBox::AddItem(wxString label, bool checked)
 void mmgListBox::RemoveItem(long id)
 //----------------------------------------------------------------------------
 {
-	m_lb->Delete(id);
+	m_ListBox->Delete(id);
 }
 //----------------------------------------------------------------------------
 bool mmgListBox::IsChecked()
 //----------------------------------------------------------------------------
 {
-	int id = m_lb->GetSelection();
-	//@@@ if (m_lb->GetItem(id)->GetBackgroundColour() == wxColour("YELLOW"))
+	int id = m_ListBox->GetSelection();
+	//@@@ if (m_ListBox->GetItem(id)->GetBackgroundColour() == wxColour("YELLOW"))
 	//@@@	 return true;
 	return false;
 }
@@ -85,32 +85,32 @@ bool mmgListBox::IsChecked()
 void mmgListBox::CheckItem(long id)
 //----------------------------------------------------------------------------
 {
-	//@@@ m_lb->GetItem(id)->SetBackgroundColour(wxColour("YELLOW"));
+	//@@@ m_ListBox->GetItem(id)->SetBackgroundColour(wxColour("YELLOW"));
 }
 //----------------------------------------------------------------------------
 void mmgListBox::CheckSelectedItem()
 //----------------------------------------------------------------------------
 {
-	CheckItem((long)this->m_lb->GetSelection());
+	CheckItem((long)this->m_ListBox->GetSelection());
 }
 //----------------------------------------------------------------------------
 void mmgListBox::SetItemLabel(long id, wxString label)
 //----------------------------------------------------------------------------
 {
 	//bool check = this->IsChecked();
-	//m_lb->Delete(id);
+	//m_ListBox->Delete(id);
 	//this->AddItem(label,check);
 
-  int idx = m_lb->GetSelection();
-  m_lb->SetSelection(idx,false);
-  m_lb->SetString(id,label); 
-  m_lb->SetSelection(idx,true);
+  int idx = m_ListBox->GetSelection();
+  m_ListBox->SetSelection(idx,false);
+  m_ListBox->SetString(id,label); 
+  m_ListBox->SetSelection(idx,true);
 }
 //----------------------------------------------------------------------------
 void mmgListBox::SetItemLabel(wxString label)
 //----------------------------------------------------------------------------
 {
-  int idx = m_lb->GetSelection();
+  int idx = m_ListBox->GetSelection();
 	SetItemLabel(idx,label);
 }
 //----------------------------------------------------------------------------
@@ -119,14 +119,12 @@ void mmgListBox::OnSelect(wxCommandEvent &event)
 {
    int widget_id = this->GetId();
    int index = event.GetInt();
-   m_item_selected = this->m_lb->GetStringSelection();
+   m_ItemSelected = this->m_ListBox->GetStringSelection();
    mafEventMacro(mafEvent(this, widget_id, (long)index) );
 }
 //----------------------------------------------------------------------------
 void mmgListBox::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 { 
-   m_lb->SetSize(event.GetSize());
+   m_ListBox->SetSize(event.GetSize());
 }
-
-

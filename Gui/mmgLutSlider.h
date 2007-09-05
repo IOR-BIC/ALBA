@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:59:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class mafObserver;
 // mmgLutSlider :
 /**
 mmgLutSlider is a Label that notify user-click using the normal wxEvents.
-It is used on the titlebar of mmgNamedPanel to popup a menu.
+It is used on the title bar of mmgNamedPanel to popup a menu.
 */
 //----------------------------------------------------------------------------
 class mmgLutSlider : public wxPanel

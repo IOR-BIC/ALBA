@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:45:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,9 +82,9 @@ protected:
   /** Return true if the item exists. */
   bool ItemExist(long item_id);
     
-  bool               m_prevent_notify;
-  wxListCtrl        *m_list;         
-  wxImageList       *m_images;       
+  bool          m_PreventNotify;
+  wxListCtrl   *m_List;         
+  wxImageList  *m_Images;       
   mafObserver  *m_Listener;     
 
 DECLARE_EVENT_TABLE()

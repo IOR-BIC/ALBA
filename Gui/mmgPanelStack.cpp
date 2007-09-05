@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgPanelStack.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,17 +36,17 @@ mmgPanelStack::mmgPanelStack(wxWindow* parent, wxWindowID id, const wxPoint& pos
 :mmgPanel(parent,id,pos,size,style,name)         
 //----------------------------------------------------------------------------
 {
-  m_sizer =  new wxBoxSizer( wxVERTICAL );
+  m_Sizer =  new wxBoxSizer( wxVERTICAL );
 
-  m_curr_panel= new mmgPanel(this,-1); 
-  m_next = NULL;
+  m_CurrentPanel= new mmgPanel(this,-1); 
+  m_NextPanel = NULL;
 
   Push(new mmgPanel(this,-1));
 
   this->SetAutoLayout( TRUE );
-  this->SetSizer( m_sizer );
-  m_sizer->Fit(this);
-  m_sizer->SetSizeHints(this);
+  this->SetSizer( m_Sizer );
+  m_Sizer->Fit(this);
+  m_Sizer->SetSizeHints(this);
 }
 //----------------------------------------------------------------------------
 mmgPanelStack::~mmgPanelStack( ) 
@@ -65,7 +65,7 @@ bool mmgPanelStack::Remove(mmgPanel* p)
 //----------------------------------------------------------------------------
 {
   assert(p);
-  assert(p==m_curr_panel);
+  assert(p==m_CurrentPanel);
   Pop();
   return true;
 }
@@ -73,20 +73,20 @@ bool mmgPanelStack::Remove(mmgPanel* p)
 void mmgPanelStack::Push(mmgPanel* p)
 //----------------------------------------------------------------------------
 {
-  if(m_curr_panel == p ) return;
+  if(m_CurrentPanel == p ) return;
 
   assert(p);
-  assert(m_curr_panel);
-  m_curr_panel->Reparent(mafGetFrame());
-  m_curr_panel->Show(false);
-  m_sizer->Detach(m_curr_panel);
+  assert(m_CurrentPanel);
+  m_CurrentPanel->Reparent(mafGetFrame());
+  m_CurrentPanel->Show(false);
+  m_Sizer->Detach(m_CurrentPanel);
 
-  p->m_next = m_curr_panel;
-  m_curr_panel= p;
+  p->m_NextPanel = m_CurrentPanel;
+  m_CurrentPanel= p;
 
-  m_curr_panel->Show(true);
-  m_curr_panel->Reparent(this);
-  m_sizer->Add(m_curr_panel,1,wxEXPAND);
+  m_CurrentPanel->Show(true);
+  m_CurrentPanel->Reparent(this);
+  m_Sizer->Add(m_CurrentPanel,1,wxEXPAND);
    
   DoLayout();
 }
@@ -94,18 +94,18 @@ void mmgPanelStack::Push(mmgPanel* p)
 void mmgPanelStack::Pop()
 //----------------------------------------------------------------------------
 {
-  assert(m_curr_panel);
+  assert(m_CurrentPanel);
 
-  m_curr_panel->Show(false);
-  m_curr_panel->Reparent(mafGetFrame());
-  m_sizer->Detach(m_curr_panel);
+  m_CurrentPanel->Show(false);
+  m_CurrentPanel->Reparent(mafGetFrame());
+  m_Sizer->Detach(m_CurrentPanel);
 
-  m_curr_panel= m_curr_panel->m_next;
-  assert(m_curr_panel);
+  m_CurrentPanel= m_CurrentPanel->m_NextPanel;
+  assert(m_CurrentPanel);
 
-  m_curr_panel->Show(true);
-  m_curr_panel->Reparent(this);
-  m_sizer->Add(m_curr_panel,1,wxEXPAND);
+  m_CurrentPanel->Show(true);
+  m_CurrentPanel->Reparent(this);
+  m_Sizer->Add(m_CurrentPanel,1,wxEXPAND);
 
   DoLayout();
 }

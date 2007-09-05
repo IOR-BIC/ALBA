@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListBox.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-18 13:45:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-05 08:26:02 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,59 +39,29 @@ public:
 
     virtual  ~mmgListBox();
 
-    void		Clear			();
-    void		AddItem			(wxString label, bool checked = false);
-    void		RemoveItem		(long id);
-    bool		IsChecked		();
-	void		CheckItem		(long id);
-    void		CheckSelectedItem();
-    void		SetItemLabel	(long id, wxString label);
-    void		SetItemLabel	(wxString label);
-	wxString	GetStringSelection() {return m_lb->GetStringSelection();};
-	int			GetNumberOfItems()	{return m_lb->GetCount();};
-    void		SetListener		(mafObserver *listener) {m_Listener = listener;};
-	void		Select			(int id) {m_lb->SetSelection(id);};
+  void Clear();
+  void AddItem(wxString label, bool checked = false);
+  void RemoveItem(long id);
+  bool IsChecked();
+	void CheckItem(long id);
+  void CheckSelectedItem();
+  void SetItemLabel(long id, wxString label);
+  void SetItemLabel(wxString label);
+	wxString GetStringSelection() {return m_ListBox->GetStringSelection();};
+	int GetNumberOfItems()	{return m_ListBox->GetCount();};
+  void SetListener(mafObserver *listener) {m_Listener = listener;};
+  void Select(int id) {m_ListBox->SetSelection(id);};
 
-    wxListBox *m_lb;
+  wxListBox *m_ListBox;
 
 protected:
-    void      OnSelect       (wxCommandEvent &event);
-    void      OnSize         (wxSizeEvent& event);
+  void OnSelect(wxCommandEvent &event);
+  void OnSize(wxSizeEvent& event);
 
-    wxString			m_item_selected;
-	mafObserver    *m_Listener;
-    bool                m_prevent_notify;
+  wxString     m_ItemSelected;
+	mafObserver *m_Listener;
+  bool         m_PreventNotify;
 
-    DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE()
 };
-
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
