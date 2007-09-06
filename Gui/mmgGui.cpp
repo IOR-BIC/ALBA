@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-14 11:44:59 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2007-09-06 09:18:46 $
+  Version:   $Revision: 1.50 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -914,8 +914,9 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 		sli  = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
-		text->SetValidator(mmgValidator(this,w_id_text,text,var,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
-	  sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
+		//text->SetValidator(mmgValidator(this,w_id_text,text,var,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+	  text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max));
+    sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
 		sizer->Add(text, 0);
 		sizer->Add(sli,  0);
 	}
@@ -935,8 +936,9 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
 
-		text->SetValidator(mmgValidator(this,w_id_text,text,var,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
-		sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
+		//text->SetValidator(mmgValidator(this,w_id_text,text,var,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
+		text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max));
+    sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
 		sizer->Add(lab,  0, wxRIGHT, LM);
 		sizer->Add(text, 0);
 		sizer->Add(sli,  0);
