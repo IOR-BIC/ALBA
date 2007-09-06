@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 10:48:14 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-09-06 09:17:58 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -756,21 +756,24 @@ bool mmgValidator::TransferFromWindow(void)
       sf.ToDouble(&f2d);
 			if (res) 
         res = !mafEquals(f2d,dval);
-			if (res) 
+			if (res)
+      {
         *m_FloatVar = dval;
-      m_WidgetData.fValue = *m_FloatVar;
+        m_WidgetData.fValue = *m_FloatVar;
+      }
 			return res;
     break;
  		case VAL_FLOAT_SLIDER_2:
 			s = m_TextCtrl->GetValue();
 			res = s.ToDouble(&dval);
-      //sf << *m_DoubleVar;
-      //sf.ToDouble(&f2d);
 			if (res) 
         res = !mafEquals(*m_DoubleVar,dval);
-			if (res) 
+			if (res)
+      {
 				*m_DoubleVar = dval;
-      m_WidgetData.dValue = *m_DoubleVar;
+        m_FloatSlider->SetValue(dval);
+        m_WidgetData.dValue = *m_DoubleVar;
+      }
 			return res;
     break;
     case VAL_DOUBLE:
@@ -778,9 +781,11 @@ bool mmgValidator::TransferFromWindow(void)
 			res = s.ToDouble(&dval);
 			if (res) 
         res = !mafEquals(*m_DoubleVar, dval);
-			if (res) 
+			if (res)
+      {
         *m_DoubleVar = dval;
-      m_WidgetData.dValue = *m_DoubleVar;
+        m_WidgetData.dValue = *m_DoubleVar;
+      }
 			return res;
     break;
     case VAL_INTEGER:
@@ -789,8 +794,10 @@ bool mmgValidator::TransferFromWindow(void)
 			if (res) 
         res = *m_IntVar != ival;
       if (res) 
+      {
         *m_IntVar = ival;
-      m_WidgetData.iValue = *m_IntVar;
+        m_WidgetData.iValue = *m_IntVar;
+      }
 			return res;
     break;
     case VAL_STRING:
@@ -801,8 +808,8 @@ bool mmgValidator::TransferFromWindow(void)
         if (res)
         {
           *m_StringVar = s;
+          m_WidgetData.sValue = *m_StringVar;
         }
-        m_WidgetData.sValue = *m_StringVar;
         return res;
       }
     break;
@@ -814,8 +821,8 @@ bool mmgValidator::TransferFromWindow(void)
         if (res)
         {
           *m_MafStringVar = s.c_str();
+          m_WidgetData.sValue = m_MafStringVar->GetCStr();
         }
-        m_WidgetData.sValue = m_MafStringVar->GetCStr();
         return res;
       }
     break;
@@ -829,8 +836,10 @@ bool mmgValidator::TransferFromWindow(void)
 			if (res) 
         res = *m_IntVar != ival;
 			if (res) 
+      {
 				*m_IntVar = ival;
-      m_WidgetData.iValue = *m_IntVar;
+        m_WidgetData.iValue = *m_IntVar;
+      }
 			return res;
 		break;
     case VAL_FLOAT_SLIDER:
@@ -872,7 +881,8 @@ void mmgValidator::OnChar(wxKeyEvent& event)
   if ((keyCode == WXK_RETURN || keyCode == WXK_TAB) &&
       (m_Mode == VAL_STRING  || m_Mode == VAL_MAF_STRING || 
        m_Mode == VAL_INTEGER || m_Mode == VAL_FLOAT || 
-m_Mode == VAL_DOUBLE))
+       m_Mode == VAL_DOUBLE  || m_Mode == VAL_FLOAT_SLIDER_2)
+      )
   {
     // Return is received only from widget with the wxTE_PROCESS_ENTER style flag enabled
     // i.e. console widget
