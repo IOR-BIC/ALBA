@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-03 08:14:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-06 09:32:24 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -404,8 +404,8 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     int n1 = -1; // number of intersections
     while(n1 != 0)
     {
-     n1 =locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
-     
+     locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
+     n1 = temporaryIntersection->GetNumberOfPoints();
      if(n1 != 0)
        pointsIntersection1->DeepCopy(temporaryIntersection);
 
@@ -448,7 +448,8 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
     while(n2 != 0)
     {
-      n2 =locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
+      locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
+      n2 = temporaryIntersection->GetNumberOfPoints();
 
       if(n2 != 0)
         pointsIntersection2->DeepCopy(temporaryIntersection);
