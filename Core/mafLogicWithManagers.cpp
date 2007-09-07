@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 11:33:24 $
-  Version:   $Revision: 1.111 $
+  Date:      $Date: 2007-09-07 15:49:23 $
+  Version:   $Revision: 1.112 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,7 +64,7 @@
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
 #include "mmgApplicationSettings.h"
-#include "mafGUIStorageSettings.h"
+#include "mafGUISettingsStorage.h"
 #include "mmgApplicationLayoutSettings.h"
 #include "mafRemoteLogic.h"
 #include "mmgSettingsDialog.h"
