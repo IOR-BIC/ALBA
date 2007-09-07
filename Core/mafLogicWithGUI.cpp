@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 16:25:24 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-09-07 11:33:14 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,8 @@
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
 #include "mmgApplicationSettings.h"
+#include "mafGUIStorageSettings.h"
+
 #include "mafWXLog.h"
 #include "mafPics.h"
 #ifdef MAF_USE_VTK
@@ -54,6 +56,7 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_LocaleSettings = new mmgLocaleSettings(this);
   m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
   m_ApplicationSettings = new mmgApplicationSettings(this);
+  m_StorageSettings = new mafGUIStorageSettings(this);
 
   m_ToolBar       = NULL;
   m_MenuBar       = NULL;
@@ -79,6 +82,7 @@ mafLogicWithGUI::~mafLogicWithGUI()
   cppDEL(m_LocaleSettings);
   cppDEL(m_MeasureUnitSettings);
   cppDEL(m_ApplicationSettings);
+  cppDEL(m_StorageSettings);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::SetParentFrameStyle(long style)
