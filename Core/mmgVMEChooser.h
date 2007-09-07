@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:15:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-07 08:35:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,6 +44,6 @@ public:
 
 protected:
   mmgVMEChooserTree *m_ChooserTree;
-  ValidateCallBackType Validate_Callback; // pointer to the callback
+  ValidateCallBackType m_ValidateCallback; // pointer to the callback
 };
 #endif

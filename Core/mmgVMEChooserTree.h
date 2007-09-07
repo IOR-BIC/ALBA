@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:15:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-07 08:35:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,7 +63,7 @@ protected:
   /** respond to Selection Changed */
   virtual void OnSelectionChanged(wxTreeEvent& event);
 
-  ValidateCallBackType ValidateFunction;
+  ValidateCallBackType m_ValidateFunction;
 
   mafNode   *m_ChoosedNode;
   long       m_ChooserTreeStyle;

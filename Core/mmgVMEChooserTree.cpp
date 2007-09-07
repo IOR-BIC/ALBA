@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:15:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-09-07 08:35:58 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,9 +47,9 @@ mmgVMEChooserTree::mmgVMEChooserTree( wxWindow *parent, mmgCheckTree *tree, Vali
   m_ChooserTreeStyle  = style;
 
   if(vme_accept_function == 0)
-    ValidateFunction = NULL;
+    m_ValidateFunction = NULL;
   else
-    ValidateFunction = vme_accept_function;
+    m_ValidateFunction = vme_accept_function;
   
   InitializeImageList();
 
@@ -65,7 +65,7 @@ int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
   int image_id;
-  if(ValidateFunction == NULL)
+  if(m_ValidateFunction == NULL)
   {
     if (!node->IsMAFType(mafVMERoot))
     {
@@ -75,7 +75,7 @@ int mmgVMEChooserTree::GetVmeStatus(mafNode *node)
   }
   else
   {
-    if(ValidateFunction(node))
+    if(m_ValidateFunction(node))
     {
       image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
       return image_id;
