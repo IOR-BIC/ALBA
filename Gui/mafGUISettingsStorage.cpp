@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mafGUIStorageSettings.cpp,v $
+Module:    $RCSfile: mafGUISettingsStorage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-07 15:48:54 $
+Version:   $Revision: 1.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -19,20 +19,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafGUIStorageSettings.h"
+#include "mafGUISettingsStorage.h"
 
 #include "mafDecl.h"
 #include "mmgGui.h"
 
 //----------------------------------------------------------------------------
-mafGUIStorageSettings::mafGUIStorageSettings(mafObserver *Listener)
+mafGUISettingsStorage::mafGUISettingsStorage(mafObserver *Listener):
+mafGUISettings(Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener = Listener;
-  m_Gui = NULL;
-
-  m_Config = new wxConfig(wxEmptyString);
-  
   m_SingleFileFlag = 1;
   
   m_AnonymousFalg = true;
@@ -42,17 +38,16 @@ mafGUIStorageSettings::mafGUIStorageSettings(mafObserver *Listener)
   m_Port = 21;
   m_UseRemoteStorage = 0;
   m_CacheFolder = wxGetCwd().c_str();
-  
-  InitializeApplicationSettings();
+
+  InitializeSettings();
 }
 //----------------------------------------------------------------------------
-mafGUIStorageSettings::~mafGUIStorageSettings()
+mafGUISettingsStorage::~mafGUISettingsStorage()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_Config);
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::CreateGui()
+void mafGUISettingsStorage::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_Gui = new mmgGui(this);
@@ -71,18 +66,7 @@ void mafGUIStorageSettings::CreateGui()
   m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
-mmgGui* mafGUIStorageSettings::GetGui()
-//----------------------------------------------------------------------------
-{
-  if (m_Gui == NULL)
-  {
-    CreateGui();
-  }
-  assert(m_Gui);
-  return m_Gui;
-}
-//----------------------------------------------------------------------------
-void mafGUIStorageSettings::EnableItems()
+void mafGUISettingsStorage::EnableItems()
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_CACHE_FOLDER,m_UseRemoteStorage != 0);
@@ -93,7 +77,7 @@ void mafGUIStorageSettings::EnableItems()
   m_Gui->Enable(ID_PASSWORD,m_UseRemoteStorage != 0 && m_AnonymousFalg == 0);
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::OnEvent(mafEventBase *maf_event)
+void mafGUISettingsStorage::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   switch(maf_event->GetId())
@@ -129,7 +113,7 @@ void mafGUIStorageSettings::OnEvent(mafEventBase *maf_event)
   m_Config->Flush();
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::InitializeApplicationSettings()
+void mafGUISettingsStorage::InitializeSettings()
 //----------------------------------------------------------------------------
 {
   wxString string_item;
@@ -193,7 +177,7 @@ void mafGUIStorageSettings::InitializeApplicationSettings()
   m_Config->Flush();
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetSingleFileStatus(int single_file)
+void mafGUISettingsStorage::SetSingleFileStatus(int single_file)
 //----------------------------------------------------------------------------
 {
   if (m_SingleFileFlag != single_file)
@@ -204,7 +188,7 @@ void mafGUIStorageSettings::SetSingleFileStatus(int single_file)
   }
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetUseRemoteStorage(int use_remote)
+void mafGUISettingsStorage::SetUseRemoteStorage(int use_remote)
 //----------------------------------------------------------------------------
 {
   if (m_UseRemoteStorage != use_remote)
@@ -215,7 +199,7 @@ void mafGUIStorageSettings::SetUseRemoteStorage(int use_remote)
   }
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetCacheFolder(mafString cache_folder)
+void mafGUISettingsStorage::SetCacheFolder(mafString cache_folder)
 //----------------------------------------------------------------------------
 {
   if (m_CacheFolder != cache_folder)
@@ -226,7 +210,7 @@ void mafGUIStorageSettings::SetCacheFolder(mafString cache_folder)
   }
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetRemoteHostName(mafString host)
+void mafGUISettingsStorage::SetRemoteHostName(mafString host)
 //----------------------------------------------------------------------------
 {
   if (m_RemoteHostName != host)
@@ -237,7 +221,7 @@ void mafGUIStorageSettings::SetRemoteHostName(mafString host)
   }
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetRemotePort(long port)
+void mafGUISettingsStorage::SetRemotePort(long port)
 //----------------------------------------------------------------------------
 {
   if (m_Port != port)
@@ -248,7 +232,7 @@ void mafGUIStorageSettings::SetRemotePort(long port)
   }
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetUserName(mafString user)
+void mafGUISettingsStorage::SetUserName(mafString user)
 //----------------------------------------------------------------------------
 {
   if (m_UserName != user)
@@ -259,8 +243,9 @@ void mafGUIStorageSettings::SetUserName(mafString user)
   }
 }
 //----------------------------------------------------------------------------
-void mafGUIStorageSettings::SetPassword(mafString pwd)
+void mafGUISettingsStorage::SetPassword(mafString pwd)
 //----------------------------------------------------------------------------
 {
   m_Password = pwd;
 }
+

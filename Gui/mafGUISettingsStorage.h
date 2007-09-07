@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mafGUIStorageSettings.h,v $
+Module:    $RCSfile: mafGUISettingsStorage.h,v $
 Language:  C++
-Date:      $Date: 2007-09-07 11:32:26 $
+Date:      $Date: 2007-09-07 15:48:54 $
 Version:   $Revision: 1.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
@@ -10,10 +10,10 @@ Copyright (c) 2001/2005
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mafGUIStorageSettings_H__
-#define __mafGUIStorageSettings_H__
+#ifndef __mafGUISettingsStorage_H__
+#define __mafGUISettingsStorage_H__
 
-#include "mafObserver.h"
+#include "mafGUISettings.h"
 #include <wx/config.h>
 
 //----------------------------------------------------------------------------
@@ -22,15 +22,15 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mmgGui;
 
 //----------------------------------------------------------------------------
-// mafGUIStorageSettings :
+// mafGUISettingsStorage :
 //----------------------------------------------------------------------------
 /**
 */
-class mafGUIStorageSettings : public mafObserver
+class mafGUISettingsStorage : public mafGUISettings
 {
 public:
-	mafGUIStorageSettings(mafObserver *Listener);
-	~mafGUIStorageSettings(); 
+	mafGUISettingsStorage(mafObserver *Listener);
+	~mafGUISettingsStorage(); 
 
   enum STORAGE_SETTINGS_WIDGET_ID
   {
@@ -46,11 +46,6 @@ public:
 
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
-
-  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
-  /** Return the GUI of the setting panel.*/
-  mmgGui* GetGui();
 
   /** Return the status for the single file storing animated VMEs.*/
   int GetSingleFileStatus() {return m_SingleFileFlag;};
@@ -99,15 +94,10 @@ protected:
   void CreateGui();
 
   /** Initialize the application settings.*/
-  void InitializeApplicationSettings();
+  void InitializeSettings();
 
   /** Used to enable/disable items according to the current widgets state.*/
   void EnableItems();
-
-  mmgGui *m_Gui;
-
-  wxConfig *m_Config;
-  
   // Single file variable
   int m_SingleFileFlag; ///< Flag used to turn On-Off single file mode for storing animated or not items.
 
@@ -123,3 +113,4 @@ protected:
   mafObserver *m_Listener;
 };
 #endif
+
