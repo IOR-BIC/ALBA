@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-28 15:03:10 $
-  Version:   $Revision: 1.110 $
+  Date:      $Date: 2007-09-07 11:33:24 $
+  Version:   $Revision: 1.111 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,6 +64,7 @@
 #include "mmgLocaleSettings.h"
 #include "mmgMeasureUnitSettings.h"
 #include "mmgApplicationSettings.h"
+#include "mafGUIStorageSettings.h"
 #include "mmgApplicationLayoutSettings.h"
 #include "mafRemoteLogic.h"
 #include "mmgSettingsDialog.h"
@@ -155,13 +156,13 @@ void mafLogicWithManagers::Configure()
   if(m_UseVMEManager)
   {
     m_VMEManager = new mafVMEManager();
-    m_VMEManager->SetHost(m_ApplicationSettings->GetRemoteHostName());
-    m_VMEManager->SetRemotePort(m_ApplicationSettings->GetRemotePort());
-    m_VMEManager->SetUser(m_ApplicationSettings->GetUserName());
-    m_VMEManager->SetPassword(m_ApplicationSettings->GetPassword());
-    m_VMEManager->SetLocalCacheFolder(m_ApplicationSettings->GetCacheFolder());
+    m_VMEManager->SetHost(m_StorageSettings->GetRemoteHostName());
+    m_VMEManager->SetRemotePort(m_StorageSettings->GetRemotePort());
+    m_VMEManager->SetUser(m_StorageSettings->GetUserName());
+    m_VMEManager->SetPassword(m_StorageSettings->GetPassword());
+    m_VMEManager->SetLocalCacheFolder(m_StorageSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
-    m_VMEManager->SetSingleBinaryFile(m_ApplicationSettings->GetSingleFileStatus()!= 0);
+    m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
   }
 
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -207,6 +208,7 @@ void mafLogicWithManagers::Configure()
 
   // Fill the SettingsDialog
   m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), _("Application Settings"));
+  m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), _("Storage Settings"));
 
   if (m_ViewManager)
   {
@@ -353,7 +355,7 @@ void mafLogicWithManagers::CreateMenu()
   file_menu->Append(MENU_FILE_OPEN,  _("&Open   \tCtrl+O"));
   file_menu->Append(MENU_FILE_SAVE,  _("&Save  \tCtrl+S"));
   file_menu->Append(MENU_FILE_SAVEAS,_("Save &As  \tCtrl+Shift+S"));
-  if (m_ApplicationSettings->UseRemoteStorage())
+  if (m_StorageSettings->UseRemoteStorage())
   {
     //file_menu->Append(MENU_FILE_UPLOAD, _("&Upload"));
   }
@@ -481,7 +483,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
   {
     if (e->GetId() == mafDataVector::SINGLE_FILE_DATA)
     {
-      e->SetBool(m_ApplicationSettings->GetSingleFileStatus()!= 0);
+      e->SetBool(m_StorageSettings->GetSingleFileStatus()!= 0);
       return;
     }
     switch(e->GetId())
@@ -533,13 +535,13 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         wxString remote_path = "";
         wxString remote_file = "";
         bool valid_dir = false;
-        wxString msg = _("Insert remote directory on remote host: ") + m_ApplicationSettings->GetRemoteHostName();
+        wxString msg = _("Insert remote directory on remote host: ") + m_StorageSettings->GetRemoteHostName();
         do 
         {
           remote_path = wxGetTextFromUser(msg,_("Remote directory choose"),"/mafstorage/pub/");
           if (!remote_path.IsEmpty())
           {
-            remote_file = m_ApplicationSettings->GetRemoteHostName();
+            remote_file = m_StorageSettings->GetRemoteHostName();
             remote_file << remote_path;
           }
           else
@@ -1010,7 +1012,7 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 	  {
       
       wxString file;
-      if (m_ApplicationSettings->UseRemoteStorage())
+      if (m_StorageSettings->UseRemoteStorage())
       {
         if (file_to_open != NULL)
         {
@@ -1521,9 +1523,9 @@ void mafLogicWithManagers::HandleException()
 void mafLogicWithManagers::CreateStorage(mafEvent *e)
 //----------------------------------------------------------------------------
 {
-  if (m_ApplicationSettings->UseRemoteStorage())
+  if (m_StorageSettings->UseRemoteStorage())
   {
-    mafString cache_folder = m_ApplicationSettings->GetCacheFolder();
+    mafString cache_folder = m_StorageSettings->GetCacheFolder();
     if (!wxDirExists(cache_folder.GetCStr()))
     {
       wxMkdir(cache_folder.GetCStr());
@@ -1539,10 +1541,10 @@ void mafLogicWithManagers::CreateStorage(mafEvent *e)
     storage->SetTmpFolder(cache_folder.GetCStr());
     
     //set default values for remote connection
-    storage->SetHostName(m_ApplicationSettings->GetRemoteHostName());
-    storage->SetRemotePort(m_ApplicationSettings->GetRemotePort());
-    storage->SetUsername(m_ApplicationSettings->GetUserName());
-    storage->SetPassword(m_ApplicationSettings->GetPassword());
+    storage->SetHostName(m_StorageSettings->GetRemoteHostName());
+    storage->SetRemotePort(m_StorageSettings->GetRemotePort());
+    storage->SetUsername(m_StorageSettings->GetUserName());
+    storage->SetPassword(m_StorageSettings->GetPassword());
     
     storage->GetRoot()->SetName("root");
     storage->SetListener(m_VMEManager);

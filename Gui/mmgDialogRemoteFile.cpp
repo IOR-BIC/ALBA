@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDialogRemoteFile.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-21 10:16:45 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-07 11:34:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafDecl.h"
 #include "mmgGui.h"
-#include "mmgApplicationSettings.h"
+#include "mafGUIStorageSettings.h"
 
 #include "mafCurlUtility.h"
 #include <curl/types.h>
@@ -72,12 +72,12 @@ void mmgDialogRemoteFile::CreateGui()
 	m_Gui = new mmgGui(this);
 	m_Gui->Show(true);
 
-  mmgApplicationSettings *app_settings = new mmgApplicationSettings(this);
-  m_Host = app_settings->GetRemoteHostName();
-  m_Port = app_settings->GetRemotePort();
-  m_User = app_settings->GetUserName();
-  m_Pwd  = app_settings->GetPassword();
-  cppDEL(app_settings);
+  mafGUIStorageSettings *storage_settings = new mafGUIStorageSettings(this);
+  m_Host = storage_settings->GetRemoteHostName();
+  m_Port = storage_settings->GetRemotePort();
+  m_User = storage_settings->GetUserName();
+  m_Pwd  = storage_settings->GetPassword();
+  cppDEL(storage_settings);
 
   m_RemotePath = DEFAULT_REMOTE_PATH;
   m_RemoteFilename = m_Host;
