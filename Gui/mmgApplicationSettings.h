@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-08-21 14:43:27 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-09-07 11:34:17 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,15 +37,7 @@ public:
     ID_LOG_TO_FILE = MINID,
     ID_LOG_VERBOSE,
     ID_LOG_DIR,
-    ID_SINGLE_FILE,
     ID_WARN_UNDO,
-    ID_STORAGE_TYPE,
-    ID_CACHE_FOLDER,
-    ID_HOST_NAME,
-    ID_PORT,
-    ID_USERNAME,
-    ID_PASSWORD,
-    ID_ANONYMOUS_USER,
     ID_USE_DEFAULT_PASSPHRASE,
     ID_PASSPHRASE,
 		IMAGE_TYPE_ID,
@@ -82,50 +74,8 @@ public:
   /** Set a folder name for the log file.*/
   void SetLogFolder(mafString log_folder);
 
-  /** Return the status for the single file storing animated VMEs.*/
-  int GetSingleFileStatus() {return m_SingleFileFlag;};
-
-  /** Set the flag for storing animated VMEs as single file.*/
-  void SetSingleFileStatus(int single_file);
-
   /** Return the status of the WarnUser flag.*/
   bool GetWarnUserFlag() {return m_WarnUserFlag != 0;};
-
-  /** Return true if Remote Storage flag is enabled.*/
-  bool UseRemoteStorage() {return m_UseRemoteStorage != 0;};
-
-  /** Set the flag for remote storage usage.*/
-  void SetUseRemoteStorage(int use_remote);
-
-  /** Return the path for the local cache in which download remote VMEs.*/
-  mafString &GetCacheFolder() {return m_CacheFolder;};
-
-  /** Set the cache folder.*/
-  void SetCacheFolder(mafString cache_folder);
-
-  /** Return the path for the remote host name.*/
-  mafString &GetRemoteHostName() {return m_RemoteHostName;};
-
-  /** Set the remote host-name to which connect with remote storage.*/
-  void SetRemoteHostName(mafString host);
-
-  /** Return the port for the connection.*/
-  long GetRemotePort() {return m_Port;};
-
-  /** Set the remote storage port through which connect.*/
-  void SetRemotePort(long port);
-
-  /** Return the username for the connection.*/
-  mafString &GetUserName() {return m_UserName;};
-
-  /** Set the User name with which connect to the remote storage.*/
-  void SetUserName(mafString user);
-
-  /** Return the password for the connection.*/
-  mafString &GetPassword() {return m_Password;};
-
-  /** Set the user password with which access the remote storage.*/
-  void SetPassword(mafString pwd);
 
   /** Return the status of the default pass phrase usage.*/
   bool UseDefaultPassPhrase() {return m_UseDefaultPasPhrase != 0;};
@@ -154,9 +104,6 @@ protected:
 
   wxConfig *m_Config;
   
-  // Single file variable
-  int m_SingleFileFlag; ///< Flag used to turn On-Off single file mode for storing animated or not items.
-
   // Log variables
   int     m_LogToFile; ///< Flag used to store the On-Off state of log to file mechanism.
   int     m_VerboseLog;///< Flag used to store the On-Off state of verbose logging to file.
@@ -164,15 +111,6 @@ protected:
 
   int m_WarnUserFlag; ///< Warn user flag on not supported undo operations
 
-  // Remote storage variables
-  int       m_UseRemoteStorage; ///< Flag used to store the using or not of remote storage
-  int       m_AnonymousFalg;
-  int       m_Port;
-  mafString m_CacheFolder;
-  mafString m_RemoteHostName;
-  mafString m_UserName;
-  mafString m_Password;
-  
   // Encryption variables
   int       m_UseDefaultPasPhrase;
   mafString m_PassPhrase;
