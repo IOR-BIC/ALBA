@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-12-12 10:03:45 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.8 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -66,9 +66,8 @@ public:
    /** Set a reference to the interface elements to store their visibility.*/
   void SetVisibilityVME(bool value) {m_VisibilityVme = value;};
 
-
-  /** Return the Settings GUI.*/
-  mmgGui* GetGui() {return m_Gui;};
+  /** Return the GUI of the setting panel.*/
+  mmgGui* GetGui();
 
   /** Return Layout Modification Flag*/
   bool GetModifiedLayouts(){return m_ModifiedLayouts;};
@@ -91,6 +90,9 @@ public:
   void LoadLayout(bool fileDefault = false);
 
 protected:
+  /** Create the GUI for the setting panel.*/
+  void CreateGui();
+
   /** Initialize Application layout used into the application.*/
   void InitializeLayout();
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-29 09:12:15 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -11,7 +11,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -29,10 +29,20 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener   = Listener;
+	m_Listener = Listener;
+  m_Gui = NULL;
   m_LanguageId = 0;
   InitializeLanguage();
-  
+}
+//----------------------------------------------------------------------------
+mmgLocaleSettings::~mmgLocaleSettings() 
+//----------------------------------------------------------------------------
+{
+}
+//----------------------------------------------------------------------------
+void mmgLocaleSettings::CreateGui()
+//----------------------------------------------------------------------------
+{
   //SIL. 09-jun-2006 :
   wxString lang_array[5] = {"English","French","German","Italian","Spanish"};
 
@@ -44,9 +54,15 @@ mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
   m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
-mmgLocaleSettings::~mmgLocaleSettings() 
+mmgGui* mmgLocaleSettings::GetGui()
 //----------------------------------------------------------------------------
 {
+  if (m_Gui == NULL)
+  {
+    CreateGui();
+  }
+  assert(m_Gui);
+  return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)

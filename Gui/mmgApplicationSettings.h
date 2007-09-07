@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-07 11:34:17 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -54,7 +54,8 @@ public:
 
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
-  mmgGui* GetGui() {return m_Gui;};
+  /** Return the GUI of the setting panel.*/
+  mmgGui* GetGui();
 
   /** Return true if Log To File is enabled.*/
   bool GetLogToFileStatus() {return m_LogToFile != 0;};
@@ -94,6 +95,9 @@ public:
 	int GetImageTypeId(){return m_ImageTypeId;};
 
 protected:
+  /** Create the GUI for the setting panel.*/
+  void CreateGui();
+
   /** Initialize the application settings.*/
   void InitializeApplicationSettings();
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIStorageSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 11:32:26 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -50,7 +50,6 @@ mafGUIStorageSettings::~mafGUIStorageSettings()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_Config);
-  //m_Gui = NULL; // GUI is destroyed by the dialog.
 }
 //----------------------------------------------------------------------------
 void mafGUIStorageSettings::CreateGui()

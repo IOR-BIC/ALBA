@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-07-07 12:42:22 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -52,11 +52,16 @@ public:
   /** Return measure unit name.*/
   mafString GetUnitName();
 
-  mmgGui* GetGui() {return m_Gui;};
+  /** Return the GUI of the setting panel.*/
+  mmgGui* GetGui();
 
 protected:
+  /** Create the GUI for the setting panel.*/
+  void CreateGui();
+
   /** Initialize measure unit used into the application.*/
   void InitializeMeasureUnit();
+
   mmgGui      *m_Gui;
 
   mafObserver *m_Listener;

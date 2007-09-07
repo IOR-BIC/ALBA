@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-14 17:13:23 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.11 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -52,11 +52,12 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_LayoutType        = " - ";
   m_DefaultFlag       = 0;
   
+  m_Gui           = NULL;
+  
   m_ViewManager   = NULL;
   m_Layout        = NULL;
   m_Win           = NULL;
   m_List		      = NULL;
-//  m_Storage       = NULL;
 	m_XMLStorage    = NULL;
 	m_XMLRoot       = NULL;
 
@@ -64,7 +65,20 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_VisibilityVme = false;
   m_ModifiedLayouts = false;
   m_LayoutFileSave = "";
-
+}
+//----------------------------------------------------------------------------
+mmgApplicationLayoutSettings::~mmgApplicationLayoutSettings() 
+//----------------------------------------------------------------------------
+{
+  //mafDEL(m_Layout); // already destroyed by the vme
+  vtkDEL(m_XMLStorage);
+  mafDEL(m_XMLRoot);
+  m_Gui = NULL; // gui is destroyed by the dialog.
+}
+//----------------------------------------------------------------------------
+void mmgApplicationLayoutSettings::CreateGui()
+//----------------------------------------------------------------------------
+{
   m_Gui = new mmgGui(this);
 
   // layout editor
@@ -73,12 +87,12 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_ActiveLayoutName);
   m_Gui->Label(_("Type"), &m_LayoutType);
   m_Gui->Divider(1);
-   
+
   //application layout msf
   m_Gui->Label(_("MSF"), true);
   //m_Gui->Label("For becoming definitive the layout saving,");
   //m_Gui->Label(" it needs to save the project");
-  
+
   //m_Gui->String(LAYOUT_NAME_ID,_("name"),&m_DefaultLayout);
   m_Gui->Button(APPLY_TREE_LAYOUT_ID,_("Apply Root Layout"));
   m_Gui->Bool(LAYOUT_VISIBILITY_VME, _("Visibility"), &m_VisibilityVme ,0,_("If checked the layout will be comprehensive of vme visibility"));
@@ -89,8 +103,8 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   //application layout 
   m_Gui->Divider(1);
   m_Gui->Label(_("Application"), true);
-	m_Gui->Label(_("default:"), &m_DefaultLayoutName);
-  
+  m_Gui->Label(_("default:"), &m_DefaultLayoutName);
+
   m_Gui->Button(OPEN_LAYOUT_ID,_("Load file"));
   m_Gui->Button(ADD_LAYOUT_ID,_("Add Current layout"));
   m_Gui->Button(REMOVE_LAYOUT_ID,_("Remove layout"));
@@ -99,20 +113,22 @@ mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener
   m_Gui->Button(APPLY_LAYOUT_ID,_("Apply layout"));
   m_Gui->Bool(DEFAULT_LAYOUT_ID,_("Default Layout"), &m_DefaultFlag, 1);
   //here lies the button for set as default
-  
+
   m_Gui->FileSave(SAVE_APPLICATION_LAYOUT_ID,_("File"), &m_LayoutFileSave,_("All Files (*.mly)|*.mly"));
-	m_Gui->Label(_(""));
+  m_Gui->Label(_(""));
 
   InitializeLayout();
 }
 //----------------------------------------------------------------------------
-mmgApplicationLayoutSettings::~mmgApplicationLayoutSettings() 
+mmgGui* mmgApplicationLayoutSettings::GetGui()
 //----------------------------------------------------------------------------
 {
-  //mafDEL(m_Layout); // already destroyed by the vme
-  vtkDEL(m_XMLStorage);
-  mafDEL(m_XMLRoot);
-  m_Gui = NULL; // gui is destroyed by the dialog.
+  if (m_Gui == NULL)
+  {
+    CreateGui();
+  }
+  assert(m_Gui);
+  return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mmgApplicationLayoutSettings::OnEvent(mafEventBase *maf_event)

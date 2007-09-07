@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.h,v $
 Language:  C++
-Date:      $Date: 2006-06-14 14:46:33 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -45,9 +45,13 @@ public:
   /** Show/Hide the settings interface.*/
 	//void ChooseLocale();
 	
-	mmgGui* GetGui() {return m_Gui;};
+  /** Return the GUI of the setting panel.*/
+  mmgGui* GetGui();
 
 protected:
+  /** Create the GUI for the setting panel.*/
+  void CreateGui();
+
   /** Initialize language used into the application.*/
   void InitializeLanguage();
 

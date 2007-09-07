@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-20 17:35:08 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -28,7 +28,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener    = Listener;
+	m_Listener = Listener;
+  m_Gui = NULL;
+
   m_DefaultUnits[0] = "mm";
   m_DefaultUnits[1] = "m";
   m_DefaultUnits[2] = "inch";
@@ -49,7 +51,11 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
   m_ScaleFactor = m_DefaultFactors[m_ChoosedVisualUnit] / m_DefaultFactors[m_ChoosedDataUnit];
   
   InitializeMeasureUnit();
-
+}
+//----------------------------------------------------------------------------
+void mmgMeasureUnitSettings::CreateGui()
+//----------------------------------------------------------------------------
+{
   m_Gui = new mmgGui(this);
   m_Gui->Label(_("Application measure units"));
   m_Gui->Combo(MEASURE_DEFAULT_DATA_UNIT_ID,_("data"),&m_ChoosedDataUnit,5,m_DefaultUnits);
@@ -63,6 +69,17 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
   m_Gui->Enable(MEASURE_DATA_STRING_ID,m_ChoosedDataUnit == 4);
   m_Gui->Enable(MEASURE_VISUAL_STRING_ID,m_ChoosedDataUnit == 4);
   m_Gui->Label("");
+}
+//----------------------------------------------------------------------------
+mmgGui* mmgMeasureUnitSettings::GetGui()
+//----------------------------------------------------------------------------
+{
+  if (m_Gui == NULL)
+  {
+    CreateGui();
+  }
+  assert(m_Gui);
+  return m_Gui;
 }
 //----------------------------------------------------------------------------
 mmgMeasureUnitSettings::~mmgMeasureUnitSettings() 

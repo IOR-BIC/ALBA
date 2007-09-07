@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 11:34:17 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-09-07 15:24:50 $
+Version:   $Revision: 1.11 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -29,7 +29,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener    = Listener;
+	m_Listener = Listener;
+  m_Gui = NULL;
   m_Config = new wxConfig(wxEmptyString);
   
   // Default values for the application.
@@ -45,7 +46,17 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_PassPhrase = mafDefaultPassPhrase();
 
   InitializeApplicationSettings();
-
+}
+//----------------------------------------------------------------------------
+mmgApplicationSettings::~mmgApplicationSettings()
+//----------------------------------------------------------------------------
+{
+  cppDEL(m_Config);
+}
+//----------------------------------------------------------------------------
+void mmgApplicationSettings::CreateGui()
+//----------------------------------------------------------------------------
+{
   m_Gui = new mmgGui(this);
   m_Gui->Label(_("Application general settings"));
   m_Gui->Bool(ID_USE_DEFAULT_PASSPHRASE,_("use default passphrase"),&m_UseDefaultPasPhrase,1);
@@ -59,16 +70,20 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   EnableItems();
   m_Gui->Label(_("changes will take effect when the \napplication restart"),false,true);
   m_Gui->Label("");
-	wxString id_array[2] = {_("JPG") , _("BMP")};
-	m_Gui->Combo(IMAGE_TYPE_ID,_("image type"), &m_ImageTypeId,2,id_array);
+  wxString id_array[2] = {_("JPG") , _("BMP")};
+  m_Gui->Combo(IMAGE_TYPE_ID,_("image type"), &m_ImageTypeId,2,id_array);
   m_Gui->Divider(2);
 }
 //----------------------------------------------------------------------------
-mmgApplicationSettings::~mmgApplicationSettings()
+mmgGui* mmgApplicationSettings::GetGui()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_Config);
-  //m_Gui = NULL; // GUI is destroyed by the dialog.
+  if (m_Gui == NULL)
+  {
+    CreateGui();
+  }
+  assert(m_Gui);
+  return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mmgApplicationSettings::EnableItems()
