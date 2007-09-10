@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.h,v $
 Language:  C++
-Date:      $Date: 2007-09-10 14:52:02 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-10 19:39:58 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,14 +56,22 @@ class medOpFreezeVMETest : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST_SUITE( medOpFreezeVMETest );
 	CPPUNIT_TEST( TestDynamicAllocation );
 	CPPUNIT_TEST( TestStaticAllocation );
-	CPPUNIT_TEST( TestFreezeVME );
+	CPPUNIT_TEST( TestFreezeVMESurfaceParametric );
+	CPPUNIT_TEST( TestFreezeVMEMeter );
+	CPPUNIT_TEST( TestFreezeVMEWrappedMeter );
+	CPPUNIT_TEST( TestFreezeVMESlicer );
+	CPPUNIT_TEST( TestFreezeVMEProber );
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
 
   void TestDynamicAllocation();
   void TestStaticAllocation();
-	void TestFreezeVME();
+	void TestFreezeVMESurfaceParametric();
+	void TestFreezeVMEMeter();
+	void TestFreezeVMEWrappedMeter();
+	void TestFreezeVMESlicer();
+	void TestFreezeVMEProber();
 };
 
 
