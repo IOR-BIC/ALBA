@@ -65,6 +65,9 @@ SET(PROJECT_SRCS
   medOpLabelizeSurface.h
   medOp2DMeasure.cpp
   medOp2DMeasure.h
+  
+  medOpFreezeVME.cpp
+  medOpFreezeVME.h
 
 )
 
