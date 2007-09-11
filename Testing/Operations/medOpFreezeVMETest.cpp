@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-10 19:39:58 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-11 09:39:09 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,6 +62,7 @@ MafMedical is partially based on OpenMAF.
 #include "mmoVTKImporter.h"
 #include "mafVMEProber.h"
 #include "mafVMESlicer.h"
+#include "mafVMEPolylineSpline.h"
 
 #include "mafOBB.h"
 
@@ -69,6 +70,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
 #include "vtkImageData.h"
+#include "vtkCellArray.h"
 
 //-----------------------------------------------------------
 void medOpFreezeVMETest::TestDynamicAllocation() 
@@ -422,4 +424,86 @@ void medOpFreezeVMETest::TestFreezeVMEProber()
 	mafDEL(prober);
 	cppDEL(freezeOp);
 	mafDEL(storage);
+}
+//-----------------------------------------------------------
+void medOpFreezeVMETest::TestFreezeVMEProfileSpline() 
+//-----------------------------------------------------------
+{
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+
+  mafVMERoot *root=storage->GetRoot();
+
+
+  mafVMEPolyline *vmePolyline;
+  mafNEW(vmePolyline);	
+  
+  vtkPolyData *polydata;
+  vtkPoints   *points;
+  vtkCellArray *cells;
+  vtkNEW(points);
+  vtkNEW(cells);
+  vtkNEW(polydata);
+
+  points->InsertNextPoint(0.0,0.0,0.0);
+  points->InsertNextPoint(1.0,1.0,0.0);
+  points->InsertNextPoint(2.0,0.0,0.0);
+
+  //create cells
+  int pointId[2];
+  for(int i = 0; i< points->GetNumberOfPoints();i++)
+  {
+    if (i > 0)
+    {             
+      pointId[0] = i - 1;
+      pointId[1] = i;
+      cells->InsertNextCell(2 , pointId);  
+    }
+  }
+
+  polydata->SetPoints(points);
+  polydata->SetLines(cells);
+  polydata->Update();
+  vmePolyline->SetData(polydata, 0.0);
+  vmePolyline->SetParent(root);
+  vmePolyline->Update();
+
+  medOpFreezeVME *freezeOp=new medOpFreezeVME("freeze");
+  freezeOp->TestModeOn();
+
+  mafVMEPolylineSpline *spline;
+  mafNEW(spline);
+  spline->SetPolylineLink(vmePolyline);
+  spline->SetParent(root);
+  spline->GetOutput()->GetVTKData()->Update();
+  spline->Modified();
+  spline->Update();
+
+  freezeOp->SetInput(spline);
+  freezeOp->OpRun();
+
+  mafVMEPolyline *polyline2=(mafVMEPolyline *)(freezeOp->GetOutput());
+  polyline2->SetParent(root);
+  polyline2->GetOutput()->GetVTKData()->Update();
+  polyline2->Update();
+  int value1 = spline->GetOutput()->GetVTKData()->GetNumberOfPoints();
+  int value2 = polyline2->GetOutput()->GetVTKData()->GetNumberOfPoints();
+  CPPUNIT_ASSERT(polyline2 && value1 == value2);
+
+
+  delete wxLog::SetActiveTarget(NULL);
+  spline->SetParent(NULL);
+  vmePolyline->SetParent(NULL);
+  polyline2->SetParent(NULL);
+
+  vtkDEL(polydata);
+  vtkDEL(points);
+  vtkDEL(cells);
+  
+  mafDEL(spline);
+  mafDEL(vmePolyline);
+
+  cppDEL(freezeOp);
+  mafDEL(storage);
 }
