@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-20 14:30:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-11 10:19:17 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,8 +48,8 @@ enum DOCK_SETTINGS_ID
   ID_CaptionMode
 };
 //----------------------------------------------------------------------------
-mmgDockSettings::mmgDockSettings(wxFrameManager& mgr)
-: m_mgr(mgr)
+mmgDockSettings::mmgDockSettings(wxFrameManager& mgr):
+m_mgr(mgr), mafGUISettings(NULL)
 //----------------------------------------------------------------------------
 {
   m_PaneBorderSize                = m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_PANE_BORDER_SIZE);
@@ -76,12 +76,15 @@ mmgDockSettings::mmgDockSettings(wxFrameManager& mgr)
   m_CaptionModeLabels[0] = "paint caption with flat color";
   m_CaptionModeLabels[1] = "paint caption with horizontal gradient";
   m_CaptionModeLabels[2] = "paint caption with vertical gradient";
-  
-  
+}
+//----------------------------------------------------------------------------
+void mmgDockSettings::CreateGui()
+//----------------------------------------------------------------------------
+{
   m_Gui = new mmgGui(this);
 
   m_Gui->Bool( ID_AllowFloating,   "Allow pane floating",&m_AllowFloating, 1);
-  //m_Gui->Bool( ID_AllowActivePane, "Hilight active pane",&m_AllowActivePane, 1);
+  //m_Gui->Bool( ID_AllowActivePane, "highlight active pane",&m_AllowActivePane, 1);
 
   //m_Gui->Divider(1);
   //m_Gui->Label("Pane caption mode");
@@ -190,17 +193,3 @@ void mmgDockSettings::OnEvent(mafEventBase *evt)
     m_mgr.Update();
   }
 }
-/*
-//----------------------------------------------------------------------------
-void mmgDockSettings::ShowModal()
-//----------------------------------------------------------------------------
-{
-  mmgDialog dlg("AUI Settings",mafCLOSE | mafCLOSEWINDOW);
-  dlg.Add(m_Gui,1, wxALL, 10);
-  dlg.ShowModal();
-  
-  // you dont need to destroy the GUI.
-  // The Dialog take possess of it and destroy it with itself
-}
-*/
-

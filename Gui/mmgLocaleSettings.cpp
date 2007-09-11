@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,18 +21,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mmgLocaleSettings.h"
 #include <wx/intl.h>
-#include <wx/config.h>
 #include "mmgGui.h"
 #include "mmgDialog.h"
 
 //----------------------------------------------------------------------------
-mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener)
+mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener):
+mafGUISettings(Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener = Listener;
-  m_Gui = NULL;
   m_LanguageId = 0;
-  InitializeLanguage();
+  InitializeSettings();
 }
 //----------------------------------------------------------------------------
 mmgLocaleSettings::~mmgLocaleSettings() 
@@ -43,7 +41,6 @@ mmgLocaleSettings::~mmgLocaleSettings()
 void mmgLocaleSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
-  //SIL. 09-jun-2006 :
   wxString lang_array[5] = {"English","French","German","Italian","Spanish"};
 
   m_Gui = new mmgGui(this);   
@@ -52,17 +49,6 @@ void mmgLocaleSettings::CreateGui()
 	m_Gui->Enable(LANGUAGE_ID,false); //29-03-2007 disabling for bug #218
   m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
   m_Gui->Label("");
-}
-//----------------------------------------------------------------------------
-mmgGui* mmgLocaleSettings::GetGui()
-//----------------------------------------------------------------------------
-{
-  if (m_Gui == NULL)
-  {
-    CreateGui();
-  }
-  assert(m_Gui);
-  return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)
@@ -94,10 +80,9 @@ void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)
         m_Language = wxLANGUAGE_ENGLISH;
         m_LanguageDictionary = "en";
       }
-      wxConfig *config = new wxConfig(wxEmptyString);
-      config->Write("Language",m_Language);
-      config->Write("Dictionary",m_LanguageDictionary);
-      cppDEL(config);
+      m_Config->Write("Language",m_Language);
+      m_Config->Write("Dictionary",m_LanguageDictionary);
+      m_Config->Flush();
     }
     break;
     default:
@@ -106,27 +91,27 @@ void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mmgLocaleSettings::InitializeLanguage()
+void mmgLocaleSettings::InitializeSettings()
 //----------------------------------------------------------------------------
 {
-  wxConfig *config = new wxConfig(wxEmptyString);
   long lang;
   wxString dict;
-  if(config->Read("Language", &lang))
+  if(m_Config->Read("Language", &lang))
   {
     m_Language = (wxLanguage)lang;
-    config->Read("Dictionary", &dict);
+    m_Config->Read("Dictionary", &dict);
     m_LanguageDictionary = dict;
   }
   else
   {
     // no language set; use default language: English
-    config->Write("Language",wxLANGUAGE_ENGLISH);
-    config->Write("Dictionary","en");
+    m_Config->Write("Language",wxLANGUAGE_ENGLISH);
+    m_Config->Write("Dictionary","en");
     m_Language = wxLANGUAGE_ENGLISH;
     m_LanguageDictionary = "en";
   }
-  cppDEL(config);
+
+  m_Config->Flush();
 
   wxString prefix;
   char *tmp = wxGetWorkingDirectory();

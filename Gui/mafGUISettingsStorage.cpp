@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:48:54 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -248,4 +248,3 @@ void mafGUISettingsStorage::SetPassword(mafString pwd)
 {
   m_Password = pwd;
 }
-

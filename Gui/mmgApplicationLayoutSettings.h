@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.9 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -13,12 +13,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mmgApplicationLayoutSettings_H__
 #define __mmgApplicationLayoutSettings_H__
 
-#include "mafObserver.h"
+#include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgGui;
 class mafViewManager;
 class mmaApplicationLayout;
 class mmgMDIFrame;
@@ -31,7 +30,7 @@ class mafVMERoot;
 //----------------------------------------------------------------------------
 /**
 */
-class mmgApplicationLayoutSettings : public mafObserver
+class mmgApplicationLayoutSettings : public mafGUISettings
 {
 public:
 	mmgApplicationLayoutSettings(mafObserver *listener);
@@ -55,9 +54,6 @@ public:
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
-  /** Set the listener to which send events.*/
-  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
   void SetViewManager(mafViewManager *view_manager) {m_ViewManager = view_manager;};
 
   /** Set a reference to the interface elements to store their visibility.*/
@@ -65,9 +61,6 @@ public:
 
    /** Set a reference to the interface elements to store their visibility.*/
   void SetVisibilityVME(bool value) {m_VisibilityVme = value;};
-
-  /** Return the GUI of the setting panel.*/
-  mmgGui* GetGui();
 
   /** Return Layout Modification Flag*/
   bool GetModifiedLayouts(){return m_ModifiedLayouts;};
@@ -84,7 +77,6 @@ public:
 
   /** Add current layout to the list*/
   void ApplyTreeLayout();
-
   
   /** Load layouts stored in a file*/
   void LoadLayout(bool fileDefault = false);
@@ -94,7 +86,7 @@ protected:
   void CreateGui();
 
   /** Initialize Application layout used into the application.*/
-  void InitializeLayout();
+  void InitializeSettings();
 
   /** Remove Selected Layout from the list*/
   void RemoveLayout();
@@ -112,8 +104,6 @@ protected:
   mafString              m_LayoutType;
   
   mafString              m_LayoutFileSave;
-  mmgGui                *m_Gui;
-  mafObserver           *m_Listener;
   mafViewManager        *m_ViewManager;
   mmaApplicationLayout  *m_Layout;
   //mafVMEStorage         *m_Storage;

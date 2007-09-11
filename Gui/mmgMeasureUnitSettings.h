@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -13,19 +13,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mmgMeasureUnitSettings_H__
 #define __mmgMeasureUnitSettings_H__
 
-#include "mafObserver.h"
+#include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgGui;
 
 //----------------------------------------------------------------------------
 // mmgMeasureUnitSettings :
 //----------------------------------------------------------------------------
 /**
 */
-class mmgMeasureUnitSettings : public mafObserver
+class mmgMeasureUnitSettings : public mafGUISettings
 {
 public:
 	mmgMeasureUnitSettings(mafObserver *Listener);
@@ -44,27 +43,19 @@ public:
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
-  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
   /** Return the Scale factor to map mm into new unit.*/
   double GetScaleFactor();
 
   /** Return measure unit name.*/
   mafString GetUnitName();
 
-  /** Return the GUI of the setting panel.*/
-  mmgGui* GetGui();
-
 protected:
   /** Create the GUI for the setting panel.*/
   void CreateGui();
 
   /** Initialize measure unit used into the application.*/
-  void InitializeMeasureUnit();
+  void InitializeSettings();
 
-  mmgGui      *m_Gui;
-
-  mafObserver *m_Listener;
   double       m_ScaleFactor;
   mafString    m_DataUnitName;
   mafString    m_VisualUnitName;

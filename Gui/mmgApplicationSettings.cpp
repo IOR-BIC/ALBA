@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.12 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,13 +26,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgGui.h"
 
 //----------------------------------------------------------------------------
-mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
+mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener):
+mafGUISettings(Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener = Listener;
-  m_Gui = NULL;
-  m_Config = new wxConfig(wxEmptyString);
-  
   // Default values for the application.
   m_LogToFile   = 0;
   m_VerboseLog  = 0;
@@ -45,13 +42,12 @@ mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener)
   m_UseDefaultPasPhrase = 1;
   m_PassPhrase = mafDefaultPassPhrase();
 
-  InitializeApplicationSettings();
+  InitializeSettings();
 }
 //----------------------------------------------------------------------------
 mmgApplicationSettings::~mmgApplicationSettings()
 //----------------------------------------------------------------------------
 {
-  cppDEL(m_Config);
 }
 //----------------------------------------------------------------------------
 void mmgApplicationSettings::CreateGui()
@@ -73,17 +69,6 @@ void mmgApplicationSettings::CreateGui()
   wxString id_array[2] = {_("JPG") , _("BMP")};
   m_Gui->Combo(IMAGE_TYPE_ID,_("image type"), &m_ImageTypeId,2,id_array);
   m_Gui->Divider(2);
-}
-//----------------------------------------------------------------------------
-mmgGui* mmgApplicationSettings::GetGui()
-//----------------------------------------------------------------------------
-{
-  if (m_Gui == NULL)
-  {
-    CreateGui();
-  }
-  assert(m_Gui);
-  return m_Gui;
 }
 //----------------------------------------------------------------------------
 void mmgApplicationSettings::EnableItems()
@@ -141,7 +126,7 @@ void mmgApplicationSettings::OnEvent(mafEventBase *maf_event)
   m_Config->Flush();
 }
 //----------------------------------------------------------------------------
-void mmgApplicationSettings::InitializeApplicationSettings()
+void mmgApplicationSettings::InitializeSettings()
 //----------------------------------------------------------------------------
 {
   wxString string_item;

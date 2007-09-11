@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.10 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -20,17 +20,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 
 #include "mmgMeasureUnitSettings.h"
-#include <wx/config.h>
 #include "mafDecl.h"
 #include "mmgGui.h"
 
 //----------------------------------------------------------------------------
-mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
+mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener):
+mafGUISettings(Listener)
 //----------------------------------------------------------------------------
 {
-	m_Listener = Listener;
-  m_Gui = NULL;
-
   m_DefaultUnits[0] = "mm";
   m_DefaultUnits[1] = "m";
   m_DefaultUnits[2] = "inch";
@@ -50,7 +47,7 @@ mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener)
   m_VisualUnitName= m_DefaultUnits[m_ChoosedVisualUnit];
   m_ScaleFactor = m_DefaultFactors[m_ChoosedVisualUnit] / m_DefaultFactors[m_ChoosedDataUnit];
   
-  InitializeMeasureUnit();
+  InitializeSettings();
 }
 //----------------------------------------------------------------------------
 void mmgMeasureUnitSettings::CreateGui()
@@ -71,21 +68,9 @@ void mmgMeasureUnitSettings::CreateGui()
   m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
-mmgGui* mmgMeasureUnitSettings::GetGui()
-//----------------------------------------------------------------------------
-{
-  if (m_Gui == NULL)
-  {
-    CreateGui();
-  }
-  assert(m_Gui);
-  return m_Gui;
-}
-//----------------------------------------------------------------------------
 mmgMeasureUnitSettings::~mmgMeasureUnitSettings() 
 //----------------------------------------------------------------------------
 {
-  m_Gui = NULL; // gui is destroyed by the dialog.
 }
 //----------------------------------------------------------------------------
 void mmgMeasureUnitSettings::OnEvent(mafEventBase *maf_event)
@@ -117,46 +102,42 @@ void mmgMeasureUnitSettings::OnEvent(mafEventBase *maf_event)
       m_ScaleFactor = 1.0;
     }
   }
-  wxConfig *config = new wxConfig(wxEmptyString);
-  config->Write("VisualUnitName",m_VisualUnitName.GetCStr());
-  config->Write("DataUnitName",m_DataUnitName.GetCStr());
-  config->Write("ScaleFactor",m_ScaleFactor);
-  cppDEL(config);
+  m_Config->Write("VisualUnitName",m_VisualUnitName.GetCStr());
+  m_Config->Write("DataUnitName",m_DataUnitName.GetCStr());
+  m_Config->Write("ScaleFactor",m_ScaleFactor);
+  m_Config->Flush();
   mafEventMacro(mafEvent(this,MEASURE_UNIT_UPDATED));
 }
 //----------------------------------------------------------------------------
-void mmgMeasureUnitSettings::InitializeMeasureUnit()
+void mmgMeasureUnitSettings::InitializeSettings()
 //----------------------------------------------------------------------------
 {
-  wxConfig *config = new wxConfig(wxEmptyString);
   double factor;
   wxString unit_name;
-  if(config->Read("VisualUnitName", &unit_name))
+  if(m_Config->Read("VisualUnitName", &unit_name))
   {
     m_VisualUnitName = unit_name;
   }
   else
   {
-    config->Write("VisualUnitName",m_VisualUnitName.GetCStr());
+    m_Config->Write("VisualUnitName",m_VisualUnitName.GetCStr());
   }
-  if(config->Read("DataUnitName", &unit_name))
+  if(m_Config->Read("DataUnitName", &unit_name))
   {
     m_DataUnitName = unit_name;
   }
   else
   {
-    config->Write("DataUnitName",m_DataUnitName.GetCStr());
+    m_Config->Write("DataUnitName",m_DataUnitName.GetCStr());
   }
-  if(config->Read("ScaleFactor", &factor))
+  if(m_Config->Read("ScaleFactor", &factor))
   {
     m_ScaleFactor = factor;
   }
   else
   {
-    config->Write("ScaleFactor",m_ScaleFactor);
+    m_Config->Write("ScaleFactor",m_ScaleFactor);
   }
-
-  cppDEL(config);
 
   if (m_DataUnitName == "mm")
   {

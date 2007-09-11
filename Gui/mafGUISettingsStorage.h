@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.h,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:48:54 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -14,12 +14,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __mafGUISettingsStorage_H__
 
 #include "mafGUISettings.h"
-#include <wx/config.h>
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgGui;
 
 //----------------------------------------------------------------------------
 // mafGUISettingsStorage :
@@ -98,10 +96,9 @@ protected:
 
   /** Used to enable/disable items according to the current widgets state.*/
   void EnableItems();
-  // Single file variable
+  
   int m_SingleFileFlag; ///< Flag used to turn On-Off single file mode for storing animated or not items.
 
-  // Remote storage variables
   int       m_UseRemoteStorage; ///< Flag used to store the using or not of remote storage
   int       m_AnonymousFalg;
   int       m_Port;
@@ -109,8 +106,5 @@ protected:
   mafString m_RemoteHostName;
   mafString m_UserName;
   mafString m_Password;
-  
-  mafObserver *m_Listener;
 };
 #endif
-

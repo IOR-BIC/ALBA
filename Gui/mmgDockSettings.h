@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-14 16:52:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-11 10:19:17 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,31 +11,34 @@
 =========================================================================*/
 #ifndef __mmgDockSettings_H__
 #define __mmgDockSettings_H__
+
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafObserver.h"
+#include "mafGUISettings.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
 class wxFrameManager;
+
 //----------------------------------------------------------------------------
 // mmgDockSettings :
 //----------------------------------------------------------------------------
-class mmgDockSettings: public mafObserver
+class mmgDockSettings: public mafGUISettings
 {
 public:
  mmgDockSettings(wxFrameManager& mgr);
  virtual ~mmgDockSettings();
 
  void OnEvent(mafEventBase *evt);
- mmgGui* GetGui() {return m_Gui;};
 
 protected:
+  /** Create the GUI for the setting panel.*/
+  void CreateGui();
+
   wxFrameManager& m_mgr;
 
-  mmgGui*  m_Gui;
   int      m_PaneBorderSize;
   int      m_SashSize;
   int      m_CaptionSize;
@@ -54,7 +57,5 @@ protected:
   int m_AllowActivePane;
   int m_CaptionMode;
   wxString m_CaptionModeLabels[3];
-
 };
-
 #endif

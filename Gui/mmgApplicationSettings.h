@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-07 15:24:50 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-09-11 10:19:17 $
+Version:   $Revision: 1.10 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -13,20 +13,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mmgApplicationSettings_H__
 #define __mmgApplicationSettings_H__
 
-#include "mafObserver.h"
-#include <wx/config.h>
+#include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgGui;
 
 //----------------------------------------------------------------------------
 // mmgApplicationSettings :
 //----------------------------------------------------------------------------
 /**
 */
-class mmgApplicationSettings : public mafObserver
+class mmgApplicationSettings : public mafGUISettings
 {
 public:
 	mmgApplicationSettings(mafObserver *Listener);
@@ -51,11 +49,6 @@ public:
 
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
-
-  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-
-  /** Return the GUI of the setting panel.*/
-  mmgGui* GetGui();
 
   /** Return true if Log To File is enabled.*/
   bool GetLogToFileStatus() {return m_LogToFile != 0;};
@@ -91,7 +84,7 @@ public:
   /** Set the custom passphrase to encrypt data.*/
   void SetPassPhrase(mafString pass_phrase);
 
-	/**select image type during saving of the views*/
+	/** Select image type during saving of the views*/
 	int GetImageTypeId(){return m_ImageTypeId;};
 
 protected:
@@ -99,15 +92,11 @@ protected:
   void CreateGui();
 
   /** Initialize the application settings.*/
-  void InitializeApplicationSettings();
+  void InitializeSettings();
 
   /** Used to enable/disable items according to the current widgets state.*/
   void EnableItems();
 
-  mmgGui *m_Gui;
-
-  wxConfig *m_Config;
-  
   // Log variables
   int     m_LogToFile; ///< Flag used to store the On-Off state of log to file mechanism.
   int     m_VerboseLog;///< Flag used to store the On-Off state of verbose logging to file.
@@ -119,8 +108,6 @@ protected:
   int       m_UseDefaultPasPhrase;
   mafString m_PassPhrase;
 
-  mafObserver *m_Listener;
-
-	int          m_ImageTypeId;
+	int       m_ImageTypeId;
 };
 #endif
