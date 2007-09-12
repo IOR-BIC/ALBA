@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-10 14:51:09 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-12 13:55:02 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,6 +41,7 @@
 
 #include "mmaMaterial.h"
 #include "mmgGui.h"
+#include "mafAbsMatrixPipe.h"
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
@@ -73,7 +74,7 @@ bool medOpFreezeVME::Accept(mafNode *node)
   return (node->IsMAFType(mafVME) && 
           !node->IsMAFType(mafVMEGenericAbstract) && 
           !node->IsMAFType(mafVMERoot) &&
-          !node->IsMAFType(mafVMERefSys) &&
+          //!node->IsMAFType(mafVMERefSys) &&
           !node->IsMAFType(mafVMEVolume) ); //return if is a procedural vme
 }
 //----------------------------------------------------------------------------
@@ -119,7 +120,7 @@ void medOpFreezeVME::OpRun()
 			  newPolyline->GetMaterial()->DeepCopy(material);
         newPolyline->GetMaterial()->UpdateProp();
       }
-			
+			newPolyline->SetMatrix(*vmeSpline->GetOutput()->GetMatrix());
 			m_Output=newPolyline;
       if (m_Output)
       {
@@ -142,7 +143,8 @@ void medOpFreezeVME::OpRun()
         newSurface->GetMaterial()->DeepCopy(material);
         newSurface->GetMaterial()->UpdateProp();
       }
-
+      
+      newSurface->SetMatrix(*vmeSurface->GetOutput()->GetMatrix());
 			m_Output=newSurface;
       if (m_Output)
       {
@@ -166,6 +168,7 @@ void medOpFreezeVME::OpRun()
         newPolyline->GetMaterial()->UpdateProp();
       }
 			
+      newPolyline->SetMatrix(*meter->GetOutput()->GetMatrix());
       m_Output=newPolyline;
       if (m_Output)
       {
@@ -174,6 +177,30 @@ void medOpFreezeVME::OpRun()
           OpStop(OP_RUN_OK);
       }
 		}
+    else if(mafVMERefSys *refsys = mafVMERefSys::SafeDownCast(vme))
+    {
+      mmaMaterial *material = refsys->GetMaterial();
+
+      mafSmartPointer<mafVMESurface> surface;
+      surface->SetName(refsys->GetName());
+      surface->SetData(polyData,refsys->GetTimeStamp());
+      surface->Update();
+
+      if(material)
+      {
+        surface->GetMaterial()->DeepCopy(material);
+        surface->GetMaterial()->UpdateProp();
+      }
+
+      surface->SetMatrix(*refsys->GetOutput()->GetMatrix());
+      m_Output=surface;
+      if (m_Output)
+      {
+        m_Output->ReparentTo(m_Input->GetParent());
+        if(!m_TestMode)
+          OpStop(OP_RUN_OK);
+      }
+    }
     else if(mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(vme))
     {
       mmaMaterial *material = slicer->GetMaterial();
@@ -191,11 +218,13 @@ void medOpFreezeVME::OpRun()
         newSurface->GetMaterial()->UpdateProp();
       }
 
+      newSurface->SetMatrix(*slicer->GetOutput()->GetMatrix());
       m_Output=newSurface;
       if (m_Output)
       {
         m_Output->ReparentTo(m_Input->GetParent());
-        
+        if(!m_TestMode)
+          OpStop(OP_RUN_OK);
       }
       
     }
@@ -214,6 +243,7 @@ void medOpFreezeVME::OpRun()
         newSurface->GetMaterial()->UpdateProp();
       }
 
+      newSurface->SetMatrix(*prober->GetOutput()->GetMatrix());
       m_Output=newSurface;
       if (m_Output)
       {
@@ -237,6 +267,7 @@ void medOpFreezeVME::OpRun()
         newPolyline->GetMaterial()->UpdateProp();
       }
 			
+      newPolyline->SetMatrix(*wrappedMeter->GetOutput()->GetMatrix());
       m_Output=newPolyline;
       if (m_Output)
       {
