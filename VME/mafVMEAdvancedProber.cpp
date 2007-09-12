@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 10:13:51 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-09-12 13:57:16 $
+  Version:   $Revision: 1.15 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1645,7 +1645,11 @@ bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme)
       m_ProfileDistance     != m_ControlProfileDistance     ||
       m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber //||
 	   )
+  {
+      if(m_ProfileDistance     != m_ControlProfileDistance || m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber)
+        ForwardUpEvent(&mafEvent(this,VME_SYNC_WITH_SPLINE_LINK, m_ProfileDistance*m_AdditionalProfileNumber));
       return true;
+  }
 
   if(vme && vme->GetPolylineLink())
     tempPoints = vtkPolyData::SafeDownCast(vme->GetPolylineLink()->GetOutput()->GetVTKData())->GetPoints();

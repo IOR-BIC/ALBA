@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-16 10:53:54 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-09-12 13:57:16 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -62,6 +62,7 @@ public:
     ID_PROFILE_DISTANCE,
     ID_LISTBOX,
     ID_UPDATE,
+    VME_SYNC_WITH_SPLINE_LINK,
     ID_LAST
   };
 
