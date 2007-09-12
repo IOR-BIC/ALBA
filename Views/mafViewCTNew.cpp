@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-03 14:55:36 $
-Version:   $Revision: 1.26 $
+Date:      $Date: 2007-09-12 12:10:54 $
+Version:   $Revision: 1.27 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -652,7 +652,7 @@ void mafViewCTNew::ProbeVolume()
 	  
 	  mafString t;
 		t = wxString::Format("%d",idSubView);
-	  m_Text[idSubView]->SetInput(t);
+	  //m_Text[idSubView]->SetInput(t);
 	  
 	  m_TextActor[idSubView]->SetMapper(m_Text[idSubView]);
 
@@ -667,6 +667,7 @@ void mafViewCTNew::ProbeVolume()
 	  vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor[idSubView]);
 	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[idSubView]);
 
+    //vslice->GetRWI()->GetImage()
 
 	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
 	  m_Gui->Update();
@@ -728,4 +729,12 @@ void mafViewCTNew::SetCTLookupTable(double min, double max)
     }
 		CameraUpdate();
   }
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::SetTextValue(int index, double value)
+//----------------------------------------------------------------------------
+{
+  mafString t;
+  t = mafString(wxString::Format("%.1f", value < 0.0 ? 0.0 : value));
+  m_Text[index]->SetInput(t);
 }

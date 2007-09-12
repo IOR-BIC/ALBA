@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-07-04 13:15:57 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-09-12 12:10:54 $
+Version:   $Revision: 1.10 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -112,6 +112,8 @@ public:
 
 	virtual void CameraUpdate();
 	virtual void CameraReset(mafNode *node = NULL);
+
+  void SetTextValue(int index, double value);
 
 protected:
 	/**
