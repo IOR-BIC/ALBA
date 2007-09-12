@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2007-02-21 17:21:02 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-09-12 12:50:05 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -63,6 +63,7 @@ public:
   /** Set position of the origin tick along constraint polyline; other ticks will follow*/
   void SetCurvilinearAbscissa(double s);
   double GetCurvilinearAbscissa() {return m_CurvilinearAbscissa;};
+  double GetGizmoPathCurvilinearAbscissa(int index) {return m_GizmoPathVector[index]->GetCurvilinearAbscissa();};
 
   /** Set the constraint polyline: any VME can be provided but its output must be a
   mafVMEOutputPolyline*/

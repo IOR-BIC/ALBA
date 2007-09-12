@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.h,v $
   Language:  C++
-  Date:      $Date: 2007-02-16 11:45:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-12 12:50:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,6 +50,7 @@ public:
 
   /** Set position along constraint polyline*/
   void SetCurvilinearAbscissa(double s);
+  double GetCurvilinearAbscissa();
 
   /** Set the constraint polyline: any VME can be provided but its output must be a
   mafVMEOutputPolyline*/
@@ -127,6 +128,7 @@ protected:
   void ComputeLocalPointPositionBetweenVertices(double distP0s, int idP0, int idP1, double pOut[3]);
   void ComputeLocalNormal(int idP0, int idP1, double viewUp[3], double normal[3]);
 
+  double m_CurvilinearAbscissa;
   int m_ConstraintModality;
 
   enum CONSTRAINT_MODALITY_ID

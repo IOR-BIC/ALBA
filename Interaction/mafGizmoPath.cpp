@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-22 13:02:37 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-12 12:50:05 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -161,6 +161,12 @@ void mafGizmoPath::SetInput( mafVME *vme )
 void mafGizmoPath::SetCurvilinearAbscissa( double s )
 {
   FindGizmoAbsPose(s);
+  m_CurvilinearAbscissa = s;
+}
+
+double mafGizmoPath::GetCurvilinearAbscissa()
+{
+  return m_CurvilinearAbscissa;
 }
 
 void mafGizmoPath::FindGizmoAbsPose( double s )
