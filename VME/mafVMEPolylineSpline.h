@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 09:24:27 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-12 12:53:30 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -107,6 +107,9 @@ public:
 
 	/** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
+
+  /** Get Coefficient used for calculated number of points*/ 
+  int GetSplineCoefficient(){return m_SplineCoefficient;}
 
 protected:
   mafVMEPolylineSpline();

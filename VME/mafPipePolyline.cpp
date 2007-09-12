@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-04 12:50:57 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-09-12 12:53:30 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -58,6 +58,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkFloatArray.h"
+#include "vtkMath.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipePolyline);
@@ -89,8 +90,14 @@ mafPipePolyline::mafPipePolyline()
 
 	m_Table						= NULL;
 
+  m_BorderData = NULL;
+  m_BorderMapper = NULL;
+  m_BorderProperty = NULL;
+  m_BorderActor = NULL;
+
   m_SplineMode      = 0;
   m_SplineCoefficient = 10.0;
+  m_DistanceBorder = 0.0;
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::Create(mafSceneNode *n)
@@ -242,7 +249,32 @@ void mafPipePolyline::Create(mafSceneNode *n)
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(m_OutlineProperty);
 
-	m_AssemblyFront->AddPart(m_OutlineActor);
+
+  m_BorderMapper = vtkPolyDataMapper::New();
+  m_BorderMapper->SetInput(BorderCreation());
+
+  m_BorderProperty = vtkProperty::New();
+  m_BorderProperty->SetColor(1,1,1);
+  m_BorderProperty->SetAmbient(1);
+  m_BorderProperty->SetRepresentationToWireframe();
+  m_BorderProperty->SetInterpolationToFlat();
+
+  m_BorderActor = vtkActor::New();
+  m_BorderActor->SetMapper(m_BorderMapper);
+  m_BorderActor->SetProperty(m_BorderProperty);
+  m_BorderActor->PickableOff();
+  
+  if(m_DistanceBorder == 0.0)
+  {
+    m_BorderActor->VisibilityOff();
+  }
+  else
+  {
+    m_BorderActor->VisibilityOn();
+  }
+    
+  m_AssemblyFront->AddPart(m_BorderActor);
+  m_AssemblyFront->AddPart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 mafPipePolyline::~mafPipePolyline()
@@ -253,6 +285,8 @@ mafPipePolyline::~mafPipePolyline()
 
 	m_AssemblyFront->RemovePart(m_Actor);
 	m_AssemblyFront->RemovePart(m_OutlineActor);
+  m_AssemblyFront->RemovePart(m_BorderActor);
+  
 
 	vtkDEL(m_Sphere);
 	vtkDEL(m_Glyph);
@@ -264,6 +298,12 @@ mafPipePolyline::~mafPipePolyline()
 	vtkDEL(m_OutlineMapper);
 	vtkDEL(m_OutlineProperty);
 	vtkDEL(m_OutlineActor);
+
+  vtkDEL(m_BorderData);
+  vtkDEL(m_BorderMapper);
+  vtkDEL(m_BorderProperty);
+  vtkDEL(m_BorderActor);
+
 	vtkDEL(m_Table);
 }
 //----------------------------------------------------------------------------
@@ -298,6 +338,7 @@ mmgGui *mafPipePolyline::CreateGui()
 	m_Gui = new mmgGui(this);
 	m_Gui->Combo(ID_SCALAR,"",&m_Scalar,numberOfArrays,m_ScalarsName);
   m_Gui->Bool(ID_SPLINE,_("spline"),&m_SplineMode);
+  m_Gui->Double(ID_DISTANCE_BORDER,_("XY borders"),&m_DistanceBorder,0);
 	m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,num_choices,representation_string);
 	m_Gui->Label(_("tube"));
 	m_Gui->Double(ID_TUBE_RADIUS,_("radius"),&m_TubeRadius,0);
@@ -393,6 +434,12 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         break;
       }
+    case ID_DISTANCE_BORDER:
+      {
+        UpdateProperty();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
 		default:
 			mafEventMacro(*e);
 			break;
@@ -582,6 +629,18 @@ void mafPipePolyline::UpdateProperty(bool fromTag)
 		m_Mapper->SetInput(apd->GetOutput());
 		apd->Delete();
 	}
+
+  if(m_DistanceBorder == 0.0)
+  {
+    m_BorderActor->VisibilityOff();
+  }
+  else
+  {
+    m_BorderMapper->SetInput(BorderCreation());
+    m_BorderMapper->Modified();
+    m_BorderActor->SetMapper(m_BorderMapper);
+    m_BorderActor->VisibilityOn();
+  }
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::InitializeFromTag()
@@ -832,4 +891,163 @@ void mafPipePolyline::SetLookupTableColorRange(double range[2], double colorMin[
 
 	m_Mapper->SetLookupTable(m_Table);
 	m_Mapper->Update();
+}
+
+//----------------------------------------------------------------------------
+vtkPolyData *mafPipePolyline::BorderCreation()
+//----------------------------------------------------------------------------
+{
+  mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
+  assert(out_polyline);
+  vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
+  assert(data);
+  data->Update();
+
+  vtkNEW(m_BorderData);
+  if(m_BorderData->GetNumberOfInputs() !=0)
+    m_BorderData->RemoveAllInputs();
+
+  //calculate and create the two parallel lines
+  
+  //Up Polyline
+  vtkMAFSmartPointer<vtkPolyData> polyUp;
+  polyUp->DeepCopy(data); //value original
+
+  vtkPoints *points = polyUp->GetPoints();
+  vtkMAFSmartPointer<vtkPoints> temporaryPointsUp;
+
+  vtkMAFSmartPointer<vtkPolyData> polyDown;
+  vtkMAFSmartPointer<vtkPoints> temporaryPointsDown;
+
+  if(polyUp->GetNumberOfPoints() == 0)
+  {
+    ;
+  }
+  else
+  {
+
+    temporaryPointsUp->DeepCopy(points);
+    temporaryPointsDown->DeepCopy(points);
+
+    double preiousNormal[3]; //used only for last point
+
+    for(long int j = 0; j < temporaryPointsUp->GetNumberOfPoints(); j++)
+    {
+
+      double tempPoint1[3];
+      double tempPoint2[3];
+      if(j != temporaryPointsUp->GetNumberOfPoints()-1)
+      {
+        temporaryPointsUp->GetPoint(j, tempPoint1);
+        temporaryPointsUp->GetPoint(j+1, tempPoint2);
+      }
+      else
+      {
+        temporaryPointsUp->GetPoint(j-1, tempPoint1);
+        temporaryPointsUp->GetPoint(j, tempPoint2);
+      }
+
+
+      //search the versor
+      double versor[3];
+      versor[0] = (tempPoint2[0] - tempPoint1[0]);
+      versor[1] = (tempPoint2[1] - tempPoint1[1]);
+      versor[2] = (tempPoint2[2] - tempPoint1[2]);
+
+      double zAxis[3] = {0,0,1};
+
+      //vectorial product beetween my versor and zAxis
+      double perpendicular[3];
+      double *u , *v;
+      u = versor;
+      v = zAxis;
+
+      vtkMath::Cross(versor,zAxis,perpendicular);
+
+      if(j == temporaryPointsUp->GetNumberOfPoints()-2)
+      {
+        preiousNormal[0] = perpendicular[0];
+        preiousNormal[1] = perpendicular[1];
+        preiousNormal[2] = perpendicular[2];
+      }
+
+      double coord[3];
+      coord[0] = perpendicular[0];
+      coord[1] = perpendicular[1];
+      coord[2] = perpendicular[2];
+
+
+      if(j == temporaryPointsUp->GetNumberOfPoints()-1)
+      {
+        coord[0] = preiousNormal[0];
+        coord[1] = preiousNormal[1];
+        coord[2] = preiousNormal[2];
+      }
+
+      vtkMath::Normalize(coord);
+
+      //now I can calculate the the coordinate of the point, distanced by the step
+      double newPointUp[3], newPointDown[3];
+      
+      if(j != temporaryPointsUp->GetNumberOfPoints()-1)
+      {
+        newPointDown[0] = ((m_DistanceBorder)) * (coord[0]) + tempPoint1[0];
+        newPointDown[1] = ((m_DistanceBorder)) * (coord[1]) + tempPoint1[1];
+        newPointDown[2] = ((m_DistanceBorder)) * (coord[2]) + tempPoint1[2];
+
+        newPointUp[0] = ((-m_DistanceBorder)) * (coord[0]) + tempPoint1[0];
+        newPointUp[1] = ((-m_DistanceBorder)) * (coord[1]) + tempPoint1[1];
+        newPointUp[2] = ((-m_DistanceBorder)) * (coord[2]) + tempPoint1[2];
+
+
+      }
+      else //the last point
+      {
+        newPointDown[0] = ((m_DistanceBorder)) * (coord[0]) + tempPoint2[0];
+        newPointDown[1] = ((m_DistanceBorder)) * (coord[1]) + tempPoint2[1];
+        newPointDown[2] = ((m_DistanceBorder)) * (coord[2]) + tempPoint2[2];
+
+        newPointUp[0] = ((-m_DistanceBorder)) * (coord[0]) + tempPoint2[0];
+        newPointUp[1] = ((-m_DistanceBorder)) * (coord[1]) + tempPoint2[1];
+        newPointUp[2] = ((-m_DistanceBorder)) * (coord[2]) + tempPoint2[2];
+      }
+
+      temporaryPointsUp->SetPoint(j, newPointUp);
+      temporaryPointsDown->SetPoint(j, newPointDown);
+
+    }
+
+  }
+
+  vtkMAFSmartPointer<vtkCellArray> cellArrayUp;
+  vtkMAFSmartPointer<vtkCellArray> cellArrayDown;
+
+  int pointId[2];
+  for(int i = 0; i< temporaryPointsUp->GetNumberOfPoints();i++)
+  {
+    if (i > 0)
+    {             
+      pointId[0] = i - 1;
+      pointId[1] = i;
+      cellArrayUp->InsertNextCell(2 , pointId);  
+      cellArrayDown->InsertNextCell(2 , pointId);  
+    }
+  }
+
+  polyUp->SetPoints(temporaryPointsUp);
+  polyUp->SetLines(cellArrayUp);
+  polyUp->Modified();
+  polyUp->Update();
+
+  polyDown->SetPoints(temporaryPointsDown);
+  polyDown->SetLines(cellArrayDown);
+  polyDown->Modified();
+  polyDown->Update();
+
+  m_BorderData->AddInput(polyUp);
+  m_BorderData->AddInput(polyDown);
+  m_BorderData->Update();
+
+  
+  return m_BorderData->GetOutput();
 }

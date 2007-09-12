@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 09:24:27 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-12 12:53:30 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -66,7 +66,7 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 	m_PointsSplined = NULL;
 	vtkNEW(m_PointsSplined);
 
-	m_SplineCoefficient = 10;
+	m_SplineCoefficient = 20;
 
 	DependsOnLinkedNodeOn();
 }

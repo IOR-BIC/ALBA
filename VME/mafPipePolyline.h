@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2007-06-25 09:23:47 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-09-12 12:53:30 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -85,6 +85,13 @@ public:
 	/** Calculate the cardinal spline over original polyline*/
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
+  /** Set/Get Border Distance*/
+  void SetDistanceBorder(double value){m_DistanceBorder = value;UpdateProperty();};
+  double GetDistanceBorder(){return m_DistanceBorder;};
+
+  /** Modify data in order to create a up & down border */
+  vtkPolyData *BorderCreation();
+
 	/** IDs for the GUI */
 	enum PIPE_POLYLINE_WIDGET_ID
 	{
@@ -97,6 +104,7 @@ public:
 		ID_SCALAR_DIMENSION,
 		ID_SCALAR,
     ID_SPLINE,
+    ID_DISTANCE_BORDER,
 		ID_LAST
 	};
 
@@ -118,7 +126,13 @@ protected:
 	vtkPolyDataMapper      *m_OutlineMapper;
 	vtkProperty            *m_OutlineProperty;
 	vtkActor               *m_OutlineActor;
-	vtkAppendPolyData			 *m_Apd;;
+
+  vtkAppendPolyData            *m_BorderData;
+  
+  vtkPolyDataMapper      *m_BorderMapper;
+  vtkProperty            *m_BorderProperty;
+  vtkActor               *m_BorderActor;
+  
 	vtkColorTransferFunction *m_Table;
   mmaMaterial              *m_PolylineMaterial;
 	vtkPolyData              *m_PolySpline;
@@ -134,7 +148,8 @@ protected:
 	double m_SphereRadius;
 	double m_TubeResolution;
 	double m_SphereResolution;
-  double m_SplineCoefficient;
+  double m_SplineCoefficient; 
+  double m_DistanceBorder;
 
 	/** Initialize representation, capping, radius and resolution variables.*/
 	void InitializeFromTag();
