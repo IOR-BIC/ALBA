@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-11 09:39:09 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-09-12 13:55:29 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,6 +63,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEProber.h"
 #include "mafVMESlicer.h"
 #include "mafVMEPolylineSpline.h"
+#include "mafVMERefSys.h"
 
 #include "mafOBB.h"
 
@@ -504,6 +505,47 @@ void medOpFreezeVMETest::TestFreezeVMEProfileSpline()
   mafDEL(spline);
   mafDEL(vmePolyline);
 
+  cppDEL(freezeOp);
+  mafDEL(storage);
+}
+//-----------------------------------------------------------
+void medOpFreezeVMETest::TestFreezeVMERefSys()
+//-----------------------------------------------------------
+{
+  mafVMEStorage *storage = mafVMEStorage::New();
+  storage->GetRoot()->SetName("root");
+  storage->GetRoot()->Initialize();
+
+  mafVMERoot *root=storage->GetRoot();
+
+  //create a parametric surface
+  mafVMERefSys *vmeRefSys;
+  mafNEW(vmeRefSys);
+  vmeRefSys->SetParent(root);
+  vmeRefSys->GetOutput()->GetVTKData()->Update();
+  vmeRefSys->SetParent(storage->GetRoot());
+  vmeRefSys->Update();
+
+  /* test surface parametric *//////////////////////////////////////////////////////////////////////////
+  medOpFreezeVME *freezeOp=new medOpFreezeVME("freeze");
+  freezeOp->TestModeOn();
+  freezeOp->SetInput(vmeRefSys);
+  freezeOp->OpRun();
+
+  mafVMESurface *surface=(mafVMESurface *)(freezeOp->GetOutput());
+  surface->SetParent(root);
+  surface->GetOutput()->GetVTKData()->Update();
+  surface->Update();
+
+  int num1 = surface->GetOutput()->GetVTKData()->GetNumberOfPoints();
+  int num2 = vmeRefSys->GetOutput()->GetVTKData()->GetNumberOfPoints();
+  CPPUNIT_ASSERT(surface &&  num1 == num2);
+
+  delete wxLog::SetActiveTarget(NULL);
+  vmeRefSys->SetParent(NULL);
+
+  surface->SetParent(NULL); 
+  mafDEL(vmeRefSys);
   cppDEL(freezeOp);
   mafDEL(storage);
 }
