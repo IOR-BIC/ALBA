@@ -68,6 +68,9 @@ SET(PROJECT_SRCS
   
   medOpFreezeVME.cpp
   medOpFreezeVME.h
+  
+  medOpIterativeRegistration.cpp
+  medOpIterativeRegistration.h
 
 )
 
@@ -92,7 +95,7 @@ ENDIF (MAF_USE_ITK)
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS "mafVME" "mafInteraction")
 
-SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED medCommon medInteraction)
+SET(PROJECT_LIBS ${PROJECT_LIBS} vtkMED medCommon medInteraction medGUI)
 
 # Create the library.
 ADD_LIBRARY(${PROJECT_NAME} ${PROJECT_SRCS})
