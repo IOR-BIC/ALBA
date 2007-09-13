@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-08-27 12:56:47 $
-# Version:   $Revision: 1.7 $
+# Date:      $Date: 2007-09-13 09:07:30 $
+# Version:   $Revision: 1.8 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -92,7 +92,7 @@ IF(MAF_FOUND)
 #  INCLUDE_DIRECTORIES(${MED_BINARY_DIR}/Interaction)
 #  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Interaction)
 #  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Interaction/Drivers)
-#  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Gui)
+  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Gui)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Common)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Operations)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Interaction)
@@ -104,7 +104,7 @@ IF(MAF_FOUND)
   # Configuring MED kits
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
 #  SUBDIRS (Interaction)
-#  SUBDIRS (Gui)
+  SUBDIRS (Gui)
   SUBDIRS (vtkMED)
   SUBDIRS (Common)
   SUBDIRS (Operations)
