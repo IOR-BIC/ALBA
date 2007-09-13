@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-13 09:06:56 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-13 13:06:06 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,53 +54,53 @@ medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener)
 {
   m_Listener = listener;
   
-  LMCloud = NULL;
-  LMCloudName = "lm_cloud";
+  m_LMCloud = NULL;
+  m_LMCloudName = "lm_cloud";
 
-  InputVME = mafVME::SafeDownCast(inputVME);
-  RefSysVMEName = ""; 
-  Landmark = NULL;
+  m_InputVME = mafVME::SafeDownCast(inputVME);
+  m_RefSysVMEName = ""; 
+  m_Landmark = NULL;
   
-  LandmarkName = "lm_";
-  m_gui = NULL;
+  m_LandmarkName = "lm_";
+  m_Gui = NULL;
 
 
-  IsaCompositor = NULL;    
-  IsaTranslate = NULL;
-  IsaTranslateSnap = NULL;
+  m_IsaCompositor = NULL;    
+  m_IsaTranslate = NULL;
+  m_IsaTranslateSnap = NULL;
   
-  RefSysVME = InputVME;
-  OldInteractor = NULL;
-  PickerInteractor = NULL;
+  m_RefSysVME = m_InputVME;
+  m_OldInteractor = NULL;
+  m_PickerInteractor = NULL;
 
-  OldInputVMEBehavior = NULL;
+  m_OldInputVMEBehavior = NULL;
 
-  PickerInteractor = mmiPicker::New();
-  //PickerInteractor->SetMListener(this);
-  PickerInteractor->SetListener(this);
+  m_PickerInteractor = mmiPicker::New();
+  //m_PickerInteractor->SetMListener(this);
+  m_PickerInteractor->SetListener(this);
 
-  Position[0] = Position[1] = Position[2] = 0;
+  m_Position[0] = m_Position[1] = m_Position[2] = 0;
 
   SpawnLMOff();
  
   CreateGui();
 
 
-  if (InputVME == NULL)
+  if (m_InputVME == NULL)
   {
-    CurrentTime = -1;
+    m_CurrentTime = -1;
     SetGUIStatusToDisabled();
   }
   else
   { 
-    RefSysVMEName = InputVME->GetName(); 
-    CurrentTime = InputVME->GetTimeStamp();
+    m_RefSysVMEName = m_InputVME->GetName(); 
+    m_CurrentTime = m_InputVME->GetTimeStamp();
     //PPP  Attach interactor to vme and register ald behavior
-    AttachInteractor(InputVME, PickerInteractor, OldInputVMEBehavior);        
+    AttachInteractor(m_InputVME, m_PickerInteractor, m_OldInputVMEBehavior);        
     SetGUIStatusToPick();
   }  
   
-  m_gui->Update(); 
+  m_Gui->Update(); 
 }
 //----------------------------------------------------------------------------
 medGUILandmark::~medGUILandmark() 
@@ -108,51 +108,51 @@ medGUILandmark::~medGUILandmark()
 {  
   //PPP reattach old interactor to  vme
 
-  if (InputVME) AttachInteractor(InputVME, OldInputVMEBehavior);
+  if (m_InputVME) AttachInteractor(m_InputVME, m_OldInputVMEBehavior);
 
-  mafDEL(IsaCompositor); 
+  mafDEL(m_IsaCompositor); 
 
-  mafDEL(PickerInteractor);
+  mafDEL(m_PickerInteractor);
 
-  if (LMCloud)
+  if (m_LMCloud)
   {
-    for (int i = 0; i < LMCloud->GetNumberOfLandmarks(); i++)
+    for (int i = 0; i < m_LMCloud->GetNumberOfLandmarks(); i++)
     {
-      mafNode *lm = LMCloud->GetChild(i);
+      mafNode *lm = m_LMCloud->GetChild(i);
       mafEventMacro(mafEvent(this, VME_REMOVE, lm));
       mafDEL(lm);
       //vtkDEL(lm);
     }
 
-    mafEventMacro(mafEvent(this, VME_REMOVE, LMCloud));
-    mafDEL(LMCloud);
-    //vtkDEL(LMCloud);
+    mafEventMacro(mafEvent(this, VME_REMOVE, m_LMCloud));
+    mafDEL(m_LMCloud);
+    //vtkDEL(m_LMCloud);
   }
 
 
   // delete child landmarks 
 
-  // m_gui already destroyed?
+  // m_Gui already destroyed?
 } 
 
 //----------------------------------------------------------------------------
 void medGUILandmark::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_gui = new mmgGui(this); 
+  m_Gui = new mmgGui(this); 
   /*
-  m_gui->Label("mouse interaction", true);
-  m_gui->Label("left mouse: pick landmark");
-  m_gui->Label("middle mouse: translate");
-  m_gui->Label("ctrl: toggle snap on surface during translate");
+  m_Gui->Label("mouse interaction", true);
+  m_Gui->Label("left mouse: pick landmark");
+  m_Gui->Label("middle mouse: translate");
+  m_Gui->Label("ctrl: toggle snap on surface during translate");
   */ 
 
-  m_gui->Double(ID_TRANSLATE_X, "Translate X", &Position[0]);
-  m_gui->Double(ID_TRANSLATE_Y, "Translate Y", &Position[1]);
-  m_gui->Double(ID_TRANSLATE_Z, "Translate Z", &Position[2]);
-  m_gui->Divider();
- 	m_gui->Button(ID_REF_SYS,"choose refsys");
-  m_gui->Label(mafString("refsys name: "),&RefSysVMEName);
+  m_Gui->Double(ID_TRANSLATE_X, "Translate X", &m_Position[0]);
+  m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
+  m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &m_Position[2]);
+  m_Gui->Divider();
+ 	m_Gui->Button(ID_REF_SYS,"choose refsys");
+  m_Gui->Label(mafString("refsys name: "),&m_RefSysVMEName);
 
 }
 
@@ -181,16 +181,16 @@ void medGUILandmark::OnEvent(mafEventBase *maf_event)
       { 
         vtkMAFSmartPointer<vtkTransform> tr;
         tr->PostMultiply();
-        tr->SetMatrix(Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+        tr->SetMatrix(m_Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
         tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
         tr->Update();
 
         mafMatrix mat;
         mat.DeepCopy(tr->GetMatrix());
-        mat.SetTimeStamp(CurrentTime);
+        mat.SetTimeStamp(m_CurrentTime);
 
-        //Landmark->SetAbsPose(mat);
-        Landmark->SetAbsMatrix(mat);
+        //m_Landmark->SetAbsPose(mat);
+        m_Landmark->SetAbsMatrix(mat);
         SetGuiAbsPosition(mat.GetVTKMatrix(), -1);
 
         //UpdateIsa();
@@ -227,45 +227,45 @@ void medGUILandmark::OnEvent(mafEventBase *maf_event)
 void medGUILandmark::CreateTranslateISACompositor()
 //----------------------------------------------------------------------------
 {
-  assert(Landmark);
+  assert(m_Landmark);
 
   // Create the isa compositor:
-  IsaCompositor = mmiCompositorMouse::New();
+  m_IsaCompositor = mmiCompositorMouse::New();
 
   // default aux ref sys is the vme ref sys
-  RefSysVME = InputVME;
+  m_RefSysVME = m_InputVME;
 
   //----------------------------------------------------------------------------
 	// create the translate behavior  
 	//----------------------------------------------------------------------------
    
-  IsaTranslate = IsaCompositor->CreateBehavior(MOUSE_MIDDLE); 
-  IsaTranslate->SetListener(this);
-  IsaTranslate->SetVME(Landmark);
-  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE); 
+  m_IsaTranslate->SetListener(this);
+  m_IsaTranslate->SetVME(m_Landmark);
+  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   // set the pivot point
-  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
-  IsaTranslate->GetPivotRefSys()->SetTypeToCustom(Landmark->GetOutput()->GetAbsMatrix());
+  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_Landmark->GetOutput()->GetAbsMatrix());
 
-  IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-  IsaTranslate->SurfaceSnapOff(); 
-  IsaTranslate->EnableTranslation(true);
+  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaTranslate->SurfaceSnapOff(); 
+  m_IsaTranslate->EnableTranslation(true);
   
 	//----------------------------------------------------------------------------
 	// create the translate behavior with snap
 	//----------------------------------------------------------------------------
   
-  IsaTranslateSnap = IsaCompositor->CreateBehavior(MOUSE_MIDDLE_CONTROL); 
-  IsaTranslateSnap->SetListener(this);
-  IsaTranslateSnap->SetVME(Landmark);
-  IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_IsaTranslateSnap = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE_CONTROL); 
+  m_IsaTranslateSnap->SetListener(this);
+  m_IsaTranslateSnap->SetVME(m_Landmark);
+  m_IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   // set the pivot point
-  IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
-  IsaTranslateSnap->GetPivotRefSys()->SetTypeToCustom(Landmark->GetOutput()->GetAbsMatrix());
+  m_IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_IsaTranslateSnap->GetPivotRefSys()->SetTypeToCustom(m_Landmark->GetOutput()->GetAbsMatrix());
 
-  IsaTranslateSnap->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-  IsaTranslateSnap->SurfaceSnapOn(); 
-  IsaTranslateSnap->EnableTranslation(true);  
+  m_IsaTranslateSnap->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaTranslateSnap->SurfaceSnapOn(); 
+  m_IsaTranslateSnap->EnableTranslation(true);  
 }
  
 //----------------------------------------------------------------------------
@@ -295,11 +295,11 @@ int medGUILandmark::AttachInteractor(mafNode *vme, mafInteractor *newInteractor)
 void medGUILandmark::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
-  IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-  IsaTranslate->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix()); 
+  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix()); 
 
-  IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix());
-  IsaTranslateSnap->GetPivotRefSys()->SetMatrix(RefSysVME->GetOutput()->GetAbsMatrix()); 
+  m_IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+  m_IsaTranslateSnap->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix()); 
 }
 
 void medGUILandmark::OnVmePicked(mafEvent& e)
@@ -310,56 +310,64 @@ void medGUILandmark::OnVmePicked(mafEvent& e)
   double absPosition[3] = {0, 0, 0};
 	pts->GetPoint(0, absPosition); 
 
-  if (LMCloud == NULL)
+  if (m_LMCloud == NULL)
   {
-    //LMCloud = mafVMELandmarkCloud::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
-    mafNEW(LMCloud);
-    LMCloud->Open();
-		LMCloud->SetName(LMCloudName);
-    //LMCloud->SetRadius(InputVME->GetOutput()->GetLength()/60);
-		LMCloud->ReparentTo(InputVME);
+    //m_LMCloud = mafVMELandmarkCloud::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
+    mafNEW(m_LMCloud);
+    m_LMCloud->Open();
+		m_LMCloud->SetName(m_LMCloudName);
+    double b[6];
+    mafVME::SafeDownCast(m_InputVME)->GetOutput()->GetBounds(b);
+
+    double diffX = fabs(b[1] - b[0]);
+    double diffY = fabs(b[3] - b[2]);
+    double diffZ = fabs(b[5] - b[4]);
+
+    double maxBound = diffX > diffY ? (diffX > diffZ ? diffX : diffZ ) : (diffY > diffZ ? diffY : diffZ );
+    m_LMCloud->SetRadius(maxBound/60);
+		m_LMCloud->ReparentTo(m_InputVME);
  
      /** 
     Force vme data creation since this is required by mafPipePointSet
     */
-//    mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,LMCloud));
-		mafEventMacro(mafEvent(this,VME_ADD,LMCloud));
-		mafEventMacro(mafEvent(this,VME_SHOW,LMCloud,true)); 
+//    mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_LMCloud));
+		mafEventMacro(mafEvent(this,VME_ADD,m_LMCloud));
+		mafEventMacro(mafEvent(this,VME_SHOW,m_LMCloud,true)); 
     
   }
 
-  if (Landmark == NULL)
+  if (m_Landmark == NULL)
   {  
     // create new landmark   
-    int lmNumber = LMCloud->GetNumberOfLandmarks();
-    wxString  name(LandmarkName);
+    int lmNumber = m_LMCloud->GetNumberOfLandmarks();
+    wxString  name(m_LandmarkName);
     name << lmNumber; 
 
-    //Landmark = mafVMELandmark::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
-    mafNEW(Landmark);
-    Landmark->SetName(name.c_str());
-    Landmark->ReparentTo(LMCloud);
+    //m_Landmark = mafVMELandmark::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
+    mafNEW(m_Landmark);
+    m_Landmark->SetName(name.c_str());
+    m_Landmark->ReparentTo(m_LMCloud);
 
-    Landmark->Update(); 
-    Landmark->SetAbsPose(absPosition[0],absPosition[1],absPosition[2],0,0,0);
+    m_Landmark->Update(); 
+    m_Landmark->SetAbsPose(absPosition[0],absPosition[1],absPosition[2],0,0,0);
     
-    //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,Landmark));
-	  mafEventMacro(mafEvent(this,VME_ADD,Landmark));
-    mafEventMacro(mafEvent(this,VME_SHOW,Landmark,true)); 
+    //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
+	  mafEventMacro(mafEvent(this,VME_ADD,m_Landmark));
+    mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
 	  mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 
     CreateTranslateISACompositor(); 
 
-    //AttachInteractor(InputVME, OldInputVMEBehavior); 
-    AttachInteractor(Landmark, IsaCompositor);
+    //AttachInteractor(m_InputVME, m_OldInputVMEBehavior); 
+    AttachInteractor(m_Landmark, m_IsaCompositor);
 
     SetGUIStatusToEnabled(); 
-    SetGuiAbsPosition(Landmark->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());     
+    SetGuiAbsPosition(m_Landmark->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());     
   }
   else
   {
-    Landmark->SetAbsPose(absPosition[0],absPosition[1],absPosition[2],0,0,0);
-    mafEventMacro(mafEvent(this,VME_SHOW,Landmark,true)); 
+    m_Landmark->SetAbsPose(absPosition[0],absPosition[1],absPosition[2],0,0,0);
+    mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
   }
    
   // notify listener
@@ -379,22 +387,22 @@ void medGUILandmark::OnTranslate(mafEvent &e)
 
 void medGUILandmark::SetGUIStatusToDisabled()
 {
-  GUIStatus = DISABLED;
+  m_GUIStatus = DISABLED;
   this->UpdateGuiInternal();
 } 
    
  void medGUILandmark::SetGUIStatusToPick() 
 {
-  if (Landmark)
+  if (m_Landmark)
   { 
-    AttachInteractor(Landmark, NULL);
-    Landmark->SetLandmarkVisibility(false);
-    Landmark = NULL;
+    AttachInteractor(m_Landmark, NULL);
+    m_Landmark->SetLandmarkVisibility(false);
+    m_Landmark = NULL;
   }
   
   if (GetSpawnLM() == 0)
   { 
-    GUIStatus = PICK;    
+    m_GUIStatus = PICK;    
     this->UpdateGuiInternal(); 
   }
   else
@@ -407,43 +415,43 @@ void medGUILandmark::SetGUIStatusToDisabled()
  
 void medGUILandmark::SetGUIStatusToEnabled() 
 {
-  GUIStatus = ENABLED;
+  m_GUIStatus = ENABLED;
   this->UpdateGuiInternal();
 }
 
 void medGUILandmark::UpdateGuiInternal()
 {
-  assert(m_gui);  
+  assert(m_Gui);  
 
-  switch(GUIStatus) 
+  switch(m_GUIStatus) 
   {
     case DISABLED:
     {
  
-      m_gui->Enable(ID_TRANSLATE_X, false);
-      m_gui->Enable(ID_TRANSLATE_Y, false); 
-      m_gui->Enable(ID_TRANSLATE_Z, false);
-      m_gui->Enable(ID_REF_SYS, false);
+      m_Gui->Enable(ID_TRANSLATE_X, false);
+      m_Gui->Enable(ID_TRANSLATE_Y, false); 
+      m_Gui->Enable(ID_TRANSLATE_Z, false);
+      m_Gui->Enable(ID_REF_SYS, false);
     }
     break;
        
     case PICK:
     {
   
-      m_gui->Enable(ID_TRANSLATE_X, false);
-      m_gui->Enable(ID_TRANSLATE_Y, false); 
-      m_gui->Enable(ID_TRANSLATE_Z, false);
-      m_gui->Enable(ID_REF_SYS, false);  
+      m_Gui->Enable(ID_TRANSLATE_X, false);
+      m_Gui->Enable(ID_TRANSLATE_Y, false); 
+      m_Gui->Enable(ID_TRANSLATE_Z, false);
+      m_Gui->Enable(ID_REF_SYS, false);  
     }
     break;
     
     case ENABLED:
     {
    
-      m_gui->Enable(ID_TRANSLATE_X, true);
-      m_gui->Enable(ID_TRANSLATE_Y, true); 
-      m_gui->Enable(ID_TRANSLATE_Z, true);
-      m_gui->Enable(ID_REF_SYS, true);  
+      m_Gui->Enable(ID_TRANSLATE_X, true);
+      m_Gui->Enable(ID_TRANSLATE_Y, true); 
+      m_Gui->Enable(ID_TRANSLATE_Z, true);
+      m_Gui->Enable(ID_REF_SYS, true);  
     }
     break;
 
@@ -451,39 +459,39 @@ void medGUILandmark::UpdateGuiInternal()
     {
     }
   }
-  m_gui->Update();
+  m_Gui->Update();
 }
 
 
 void medGUILandmark::SetInputVME(mafNode *vme)
 {
-   assert(InputVME == NULL); 
-   InputVME = mafVME::SafeDownCast(vme);
-   CurrentTime = InputVME->GetTimeStamp();
-   SetRefSysVME(InputVME);
-   AttachInteractor(InputVME, PickerInteractor, OldInputVMEBehavior);        
+   assert(m_InputVME == NULL); 
+   m_InputVME = mafVME::SafeDownCast(vme);
+   m_CurrentTime = m_InputVME->GetTimeStamp();
+   SetRefSysVME(m_InputVME);
+   AttachInteractor(m_InputVME, m_PickerInteractor, m_OldInputVMEBehavior);        
 }
 
 void medGUILandmark::GetSpawnPointCoordinates(double newPointCoord[3]) 
 {   
   vtkIdType pId;
-  vtkDataSet* data = InputVME->GetOutput()->GetVTKData();
+  vtkDataSet* data = m_InputVME->GetOutput()->GetVTKData();
 
-  if (InputVME->IsA("mafVMESurface"))
+  if (m_InputVME->IsA("mafVMESurface"))
   { 
-    assert(LMCloud);
+    assert(m_LMCloud);
 
     int npoints = data->GetNumberOfPoints();
     assert(data);
 
-    if (LMCloud->GetNumberOfLandmarks() == 1)
+    if (m_LMCloud->GetNumberOfLandmarks() == 1)
     {    
       vtkMAFSmartPointer<vtkIdList> idList;
       idList->SetNumberOfIds(npoints);
       
       double pos[3];
-      //mafVMELandmark::SafeDownCast(LMCloud->GetChild(0))->GetPosition(pos);
-      mafVMELandmark::SafeDownCast(LMCloud->GetChild(0))->GetPoint(pos);
+      //mafVMELandmark::SafeDownCast(m_LMCloud->GetChild(0))->GetPosition(pos);
+      mafVMELandmark::SafeDownCast(m_LMCloud->GetChild(0))->GetPoint(pos);
 
       vtkMAFSmartPointer<vtkPointLocator> locator;
       locator->SetDataSet(data);
@@ -508,7 +516,7 @@ void medGUILandmark::GetSpawnPointCoordinates(double newPointCoord[3])
 
     data->GetPoint(pId, newPointCoord);     
   }
-  else if (InputVME->IsA("mafVMEGrayVolume"))
+  else if (m_InputVME->IsA("mafVMEGrayVolume"))
   {
     double bounds[6];
     data->GetBounds(bounds);
@@ -531,41 +539,41 @@ void medGUILandmark::GetSpawnPointCoordinates(double newPointCoord[3])
 void medGUILandmark::SpawnLandmark()
 {    
   // create new landmark   
-  int lmNumber = LMCloud->GetNumberOfLandmarks();
-  wxString  name(LandmarkName);
+  int lmNumber = m_LMCloud->GetNumberOfLandmarks();
+  wxString  name(m_LandmarkName);
   name << lmNumber; 
 
   double position[3];
   GetSpawnPointCoordinates(position);
 
-  //Landmark = mafVMELandmark::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
-  mafNEW(Landmark);
-  Landmark->SetName(name.c_str());
-  Landmark->ReparentTo(LMCloud);
-  Landmark->Update(); 
+  //m_Landmark = mafVMELandmark::New();//we have a reference on the vme (we can call vtkDEL in the UNDO)
+  mafNEW(m_Landmark);
+  m_Landmark->SetName(name.c_str());
+  m_Landmark->ReparentTo(m_LMCloud);
+  m_Landmark->Update(); 
 
-  //Landmark->SetPose(position[0],position[1],position[2],-1);
+  //m_Landmark->SetPose(position[0],position[1],position[2],-1);
   double rot[3] = {0.0,0.0,0.0};
-  Landmark->SetPose(position[0],position[1],position[2],rot[0], rot[1], rot[2],-1);
+  m_Landmark->SetPose(position[0],position[1],position[2],rot[0], rot[1], rot[2],-1);
   
-  //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,Landmark));
-	mafEventMacro(mafEvent(this,VME_ADD,Landmark));
-  mafEventMacro(mafEvent(this,VME_SHOW,Landmark,true)); 
+  //mafEventMacro(mafEvent(this,VME_CREATE_CLIENT_DATA,m_Landmark));
+	mafEventMacro(mafEvent(this,VME_ADD,m_Landmark));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_Landmark,true)); 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
   
-  AttachInteractor(Landmark, IsaCompositor);
+  AttachInteractor(m_Landmark, m_IsaCompositor);
 
   SetGUIStatusToEnabled(); 
-  SetGuiAbsPosition(Landmark->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());     
+  SetGuiAbsPosition(m_Landmark->GetAbsMatrixPipe()->GetMatrixPointer()->GetVTKMatrix());     
 }
 
 void medGUILandmark::UpdateInteractor()
 { 
-  IsaTranslateSnap->SetVME(Landmark);
-  IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_IsaTranslateSnap->SetVME(m_Landmark);
+  m_IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
   // set the pivot point
-  IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
-  IsaTranslateSnap->GetPivotRefSys()->SetTypeToCustom(Landmark->GetOutput()->GetAbsMatrix()); 
+  m_IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_IsaTranslateSnap->GetPivotRefSys()->SetTypeToCustom(m_Landmark->GetOutput()->GetAbsMatrix()); 
 }
 
 
@@ -573,8 +581,8 @@ void medGUILandmark::UpdateInteractor()
 void medGUILandmark::OnRefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
-  RefSysVMEName = RefSysVME->GetName();
-  if (Landmark) this->SetGuiAbsPosition(Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+  m_RefSysVMEName = m_RefSysVME->GetName();
+  if (m_Landmark) this->SetGuiAbsPosition(m_Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 }
 
 //----------------------------------------------------------------------------
@@ -590,18 +598,18 @@ void medGUILandmark::TextEntriesChanged()
   */
 
   mafSmartPointer<mafTransform> tran;
-  tran->SetPosition(Position[0], Position[1], Position[2]);
+  tran->SetPosition(m_Position[0], m_Position[1], m_Position[2]);
 
   // premultiply to ref sys abs matrix
-  //tran->Concatenate(RefSysVME->GetOutput()->GetAbsPose(), POST_MULTIPLY);
-  tran->Concatenate(*RefSysVME->GetOutput()->GetAbsMatrix(), POST_MULTIPLY);
-//  Landmark-SetAbsPose(tran->GetMatrix(), CurrentTime);
+  //tran->Concatenate(m_RefSysVME->GetOutput()->GetAbsPose(), POST_MULTIPLY);
+  tran->Concatenate(*m_RefSysVME->GetOutput()->GetAbsMatrix(), POST_MULTIPLY);
+//  m_Landmark-SetAbsPose(tran->GetMatrix(), m_CurrentTime);
   double pos[3],rot[3];
   mafTransform::GetPosition(tran->GetMatrix(), pos);
   mafTransform::GetOrientation(tran->GetMatrix(), rot);
-  Landmark->SetAbsPose(pos,rot, CurrentTime);
+  m_Landmark->SetAbsPose(pos,rot, m_CurrentTime);
   
-  this->SetGuiAbsPosition(Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+  this->SetGuiAbsPosition(m_Landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
  
    mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -610,25 +618,25 @@ void medGUILandmark::TextEntriesChanged()
 void medGUILandmark::SetGuiAbsPosition(vtkMatrix4x4* absPose, mafTimeStamp timeStamp)
 //----------------------------------------------------------------------------
 {
-  // express absPose in RefSysVME refsys
+  // express absPose in m_RefSysVME refsys
  /* mafSmartPointer<mafTransform>  mflTr;
   mflTr->SetInput(absPose);
-  //mflTr->SetTargetFrame(RefSysVME->GetAbsPose());
+  //mflTr->SetTargetFrame(m_RefSysVME->GetAbsPose());
   mflTr->Update();*/
 
-  // Express VME abs matrix in RefSysVME refsys via mafTransform
+  // Express VME abs matrix in m_RefSysVME refsys via mafTransform
   mafSmartPointer<mafTransformFrame> mflTr;
   //mflTr->SetInput(mafMatrix(absPose));
   mafMatrix mat;
   mat.SetVTKMatrix(absPose);
   mflTr->SetInput(&mat);
-  mflTr->SetTargetFrame(RefSysVME->GetOutput()->GetAbsMatrix());
+  mflTr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
   mflTr->Update();
   
   // update gui with new position 
-  mafTransform::GetPosition(mflTr->GetMatrix(), Position);
+  mafTransform::GetPosition(mflTr->GetMatrix(), m_Position);
   
-  m_gui->Update();
+  m_Gui->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -639,6 +647,6 @@ void medGUILandmark::SetRefSysVME(mafVME* refSysVME)
   if(refSysVME == NULL)
 	return;
 
-  RefSysVME = refSysVME;
+  m_RefSysVME = refSysVME;
   OnRefSysVmeChanged();
 }

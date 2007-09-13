@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-13 09:06:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-13 13:06:06 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,24 +78,29 @@ public:
   void SetGUIStatusToDisabled();
   void SetGUIStatusToPick();
   void SetGUIStatusToEnabled();
-  int GetGuiStatus() {return GUIStatus;};
+  int GetGuiStatus() {return m_GUIStatus;};
 
-  mafVMELandmarkCloud *GetLandmarkCLoud() {return LMCloud;};
+  mafVMELandmarkCloud *GetLandmarkCLoud() {return m_LMCloud;};
  
   void SetInputVME(mafNode *vme); 
     
-  mmgGui *GetGui() {return m_gui;};
+  mmgGui *GetGui() {return m_Gui;};
 
-  void SetLMCloudName(const char *name) {LMCloudName = name;};
-  const char *GetLMCloudName() {return LMCloudName.GetCStr();};
+  void SetLMCloudName(const char *name) {m_LMCloudName = name;};
+  const char *GetLMCloudName() {return m_LMCloudName.GetCStr();};
 
-  void SpawnLMOn() {SpawnLM = 1;};
-  void SpawnLMOff() {SpawnLM = 0;};
-  int GetSpawnLM() {return SpawnLM;};
+  void SpawnLMOn() {m_SpawnLM = 1;};
+  void SpawnLMOff() {m_SpawnLM = 0;};
+  int GetSpawnLM() {return m_SpawnLM;};
 
   static bool VmeAccept(mafNode* node) {return(node != NULL);};
 
 protected: 
+  /** Create interactors */
+  void CreateTranslateISACompositor();
+
+  /** Override superclass */
+  void CreateGui();
 
   /** Attach interactor to vme; return 0 on success, -1 otherwise  */
   int AttachInteractor(mafNode *vme, mafInteractor *newInteractor,
@@ -103,56 +108,11 @@ protected:
 
   int AttachInteractor(mafNode *vme, mafInteractor *newInteractor);
 
-  double CurrentTime;
-
-  double Position[3];
-
-  mafInteractor* OldInteractor;
-   
-  /** Create interactors */
-  void CreateTranslateISACompositor();
-
-  /** Override superclass */
-  void CreateGui();
- 
-  mmiCompositorMouse *IsaCompositor;
-
-  mmiGenericMouse *IsaTranslate;
-  mmiGenericMouse *IsaTranslateSnap;
-   
-   
-  void OnRefSysVmeChanged(); 
-  void OnTextEntriesChanged();
-  void OnTranslate(mafEvent &e);
-
-  mmiPicker  *PickerInteractor;
-
-  mafVME *InputVME;
-  double LMPosition[3];
-
-  mafVMELandmarkCloud *LMCloud;
-
-  mafVMELandmark *Landmark;
-  const char *LandmarkName;
-
-  mafInteractor *OldInputVMEBehavior;
-
-  int GUIStatus;
-
   void UpdateGuiInternal();
-
-  mafObserver *m_Listener;
-  mmgGui      	 *m_gui;
-
-  mafVME *RefSysVME;
-
-  mafString LMCloudName;
-
-  int SpawnLM;
 
   void GetSpawnPointCoordinates(double newPointCoord[3]);
   void SpawnLandmark();
-   
+
   void UpdateInteractor();
 
   void SetGuiAbsPosition(vtkMatrix4x4* absPose, mafTimeStamp timeStamp = -1);
@@ -160,8 +120,38 @@ protected:
   void RefSysVmeChanged();
 
   void OnVmePicked(mafEvent& e);
-  mafString RefSysVMEName;
-
   void SetRefSysVME(mafVME* refSysVME);
+
+  void OnRefSysVmeChanged(); 
+  void OnTextEntriesChanged();
+  void OnTranslate(mafEvent &e);
+
+  double m_CurrentTime;
+  double m_Position[3];
+//  double m_LMPosition[3];
+  
+  mafInteractor* m_OldInteractor;
+  mmiPicker  *m_PickerInteractor;
+  mmiCompositorMouse *m_IsaCompositor;
+  mmiGenericMouse *m_IsaTranslate;
+  mmiGenericMouse *m_IsaTranslateSnap;
+  mafInteractor *m_OldInputVMEBehavior;
+
+  mafObserver *m_Listener;
+  mmgGui      *m_Gui;
+
+  mafString m_LMCloudName;
+  mafString m_RefSysVMEName;
+
+  mafVME *m_InputVME;
+  mafVME *m_RefSysVME;
+  mafVMELandmarkCloud *m_LMCloud;
+  mafVMELandmark *m_Landmark;
+
+  const char *m_LandmarkName;
+
+  int m_GUIStatus;
+  int m_SpawnLM;
+
 };
 #endif
