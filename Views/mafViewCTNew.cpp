@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-12 12:10:54 $
-Version:   $Revision: 1.27 $
+Date:      $Date: 2007-09-16 22:43:54 $
+Version:   $Revision: 1.28 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -668,8 +668,32 @@ void mafViewCTNew::ProbeVolume()
 	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[idSubView]);
 
     //vslice->GetRWI()->GetImage()
+    double newb[6];
+		double middleX = (b[1]+b[0])/2;
+		double middleY = (b[3]+b[2])/2;
+		double middleZ = (b[5]+b[4])/2;
 
-	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(b);
+		double distX = fabs(b[1]-b[0]);
+		double distY = fabs(b[3]-b[2]);
+		double distZ = fabs(b[5]-b[4]);
+		
+
+		double distXY = sqrt(distX*distX + distY*distY);
+
+		double max = distZ > distXY ? distZ : distXY;
+		if(distZ / distXY > 1.5)
+		  max /= 3;
+		else
+			max /= 2;
+
+		newb[0] = middleX - max;
+		newb[1] = middleX + max;
+		newb[2] = middleY - max;
+		newb[3] = middleY + max;
+		newb[4] = middleZ - max;
+		newb[5] = middleZ + max;
+
+	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(newb);
 	  m_Gui->Update();
   }
 	SetCTLookupTable(m_MinLUTHistogram,m_MaxLUTHistogram);
