@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkExporterTest.h,v $
 Language:  C++
-Date:      $Date: 2007-09-16 20:59:17 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-16 22:24:57 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mmoLandmarkExporterTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( mmoLandmarkExporterTest );
-  //CPPUNIT_TEST( TestOnVmeRawMotionData ); ///< this test is leaked for vmerawmotiondata
+  CPPUNIT_TEST( TestOnVmeRawMotionData ); ///< this test is leaked for vmerawmotiondata
 	CPPUNIT_TEST( TestOnLandmarkImporter);
   CPPUNIT_TEST_SUITE_END();
 

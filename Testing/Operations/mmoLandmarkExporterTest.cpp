@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkExporterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-16 20:59:17 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-09-16 22:24:57 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -39,8 +39,8 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
   int returnValue = -1;
 
   // reader
-  mafSmartPointer<mafVMERawMotionData> vmeRawMotionData;
-  
+  mafVMERawMotionData *vmeRawMotionData;
+	mafNEW(vmeRawMotionData);
 
   // try to set this data to the volume
   mafString filename=MED_DATA_ROOT;
@@ -91,11 +91,11 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
 
 
   char text[10] = "";
-  char name[4];
+  char name[10];
 
-  double pos1;
-  double pos2;
-  double pos3;
+  double *pos1 = new double;
+  double *pos2 = new double;
+  double *pos3 = new double;
 
 
   std::fstream control(fileExp);
@@ -111,14 +111,14 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
     {
       
       control >> name;
-      control >> pos1;
-      control >> pos2;
-      control >> pos3;
+      control >> *pos1;
+      control >> *pos2;
+      control >> *pos3;
 
      double dx = coord[i*22+j][0];
      double dy = coord[i*22+j][1];
      double dz = coord[i*22+j][2];
-     if(fabs(dx - pos1)<0.01 && fabs(dy - pos2)<0.01 && fabs(dz - pos3)<0.01);
+     if(fabs(dx - *pos1)<0.01 && fabs(dy - *pos2)<0.01 && fabs(dz - *pos3)<0.01);
      else
      {
        result = -1;
@@ -128,7 +128,9 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
     }
 
   }
-
+  delete pos1;
+	delete pos2;
+	delete pos3;
   CPPUNIT_ASSERT(result == MAF_OK);
 
 	for(int i=0; i<coord.size();i++)
@@ -139,7 +141,8 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
   control.close();
   coord.clear();
 
-	
+	mafDEL(vmeRawMotionData);
+
   delete exporter;
   exporter = NULL;
 	
@@ -165,7 +168,7 @@ void mmoLandmarkExporterTest::TestOnLandmarkImporter()
 	mmoLandmarkExporter *exporter=new mmoLandmarkExporter("test exporter");
 	exporter->SetInput(node);
 	mafString fileExp=MED_DATA_ROOT;
-	fileExp<<"/RAW_MAL/Export.txt";
+	fileExp<<"/RAW_MAL/Export2.txt";
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
 	exporter->ExportLandmark();
@@ -230,6 +233,12 @@ void mmoLandmarkExporterTest::TestOnLandmarkImporter()
 	}
 
 	CPPUNIT_ASSERT(result == MAF_OK);
+
+
+	for(int i=0; i< coord.size(); i++)
+	{
+		delete coord[i];
+	}
 
 	control.close();
 	coord.clear();
