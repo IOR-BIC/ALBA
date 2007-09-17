@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-03 08:15:19 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-17 17:11:57 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -575,11 +575,11 @@ void medVMEWrappedMeterTest::TestWrappedGeometry()
 
   mafMatrix *matrix1 = vmeParametricSurfaceSTART->GetOutput()->GetAbsMatrix();
   matrix1->SetElement(X,3,-10); //set a translation value on x axis of -10.0
-  matrix1->SetElement(Y,3,2); //set a translation value on y axis of 2.0
+  matrix1->SetElement(Y,3,1.5); //set a translation value on y axis of 1.5
 
   mafMatrix *matrix2 = vmeParametricSurfaceEND1->GetOutput()->GetAbsMatrix();
   matrix2->SetElement(X,3,10); //set a translation value on x axis of 10.0
-  matrix2->SetElement(Y,3,2); //set a translation value on y axis of 2.0
+  matrix2->SetElement(Y,3,1.5); //set a translation value on y axis of 1.5
 
   //this create 3 spheres, o--  10 --  -- 10 -- o , total distance is 10, and tangent points are the same
   //                                  o  <-- this is wrapped surface
@@ -599,7 +599,8 @@ void medVMEWrappedMeterTest::TestWrappedGeometry()
 
 
   printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
-  CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 21.5 && wrappedMeter->GetDistance() < 21.6);
+  CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 21.1 && wrappedMeter->GetDistance() < 21.2);
+	//CPPUNIT_ASSERT(wrappedMeter->GetDistance() == 20);
 
   CPPUNIT_ASSERT(wrappedMeter->GetWrappedGeometryTangent1()[0] - wrappedMeter->GetWrappedGeometryTangent2()[0] < 0.001 && //x is opposite
                  fabs(wrappedMeter->GetWrappedGeometryTangent1()[1]- wrappedMeter->GetWrappedGeometryTangent2()[1]) < 0.001 &&
