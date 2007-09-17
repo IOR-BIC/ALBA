@@ -15,6 +15,10 @@ IF (MAF_USE_VTK)
     ${PROJECT_SRCS}
     mafOpImporterMSF.cpp
     mafOpImporterMSF.h
+    mafOpImporterExternalFile.cpp
+    mafOpImporterExternalFile.h
+    #mafOpLabelizeVolume.cpp
+    #mafOpLabelizeVolume.h
     mmo2DMeasure.cpp
     mmo2DMeasure.h
     mmoAddLandmark.cpp
