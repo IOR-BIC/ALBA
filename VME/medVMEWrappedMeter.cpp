@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 13:57:46 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-17 11:19:11 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,6 +73,7 @@ medVMEWrappedMeter::medVMEWrappedMeter()
   m_EndVme2Name   = "";
   m_WrappedVmeName   = "";
 
+  m_Gui = NULL;
   m_ListBox = NULL;
   
   mafNEW(m_Transform);
@@ -377,7 +378,24 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     locator->SetDataSet(transformFirstData->GetOutput());
     locator->BuildLocator();
 
-    if(locator->InsideOrOutside(local_start) <= 0 || locator->InsideOrOutside(local_end) <= 0) return;
+    if(locator->InsideOrOutside(local_start) <= 0 || locator->InsideOrOutside(local_end) <= 0) 
+    {
+      //if one point is inside connect start and end
+      m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+      m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+      m_LineSource->Update();
+      m_Goniometer->AddInput(m_LineSource->GetOutput());
+
+      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+
+      m_Goniometer->Modified();
+      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+      m_Goniometer->Update();
+      GetWrappedMeterOutput()->Update();
+
+      ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+      return;
+    }
 
     vtkMAFSmartPointer<vtkPoints> temporaryIntersection;
     vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
@@ -402,6 +420,29 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     double v1[3],v2[3],vtemp[3];
     int count =0;
     int n1 = -1; // number of intersections
+
+    //control if there is an intersection
+    locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
+    int nControl = temporaryIntersection->GetNumberOfPoints();
+    if(nControl==0)
+    {
+      //if there is no intersection with geometry
+      m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+      m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+      m_LineSource->Update();
+      m_Goniometer->AddInput(m_LineSource->GetOutput());
+      
+      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+
+      m_Goniometer->Modified();
+      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+      m_Goniometer->Update();
+      GetWrappedMeterOutput()->Update();
+
+      ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+      return;
+    }
+
     while(n1 != 0)
     {
      locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
@@ -1103,6 +1144,12 @@ void medVMEWrappedMeter::InternalUpdateManual()
 int medVMEWrappedMeter::InternalStore(mafStorageElement *parent)
 //-----------------------------------------------------------------------
 {  
+  if(m_Gui == NULL) //this for update wrapped vme lists
+  {
+    InternalUpdateManual();
+    CreateGui();
+  }
+
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
     parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
