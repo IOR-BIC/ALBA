@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 13:57:16 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-09-17 12:35:39 $
+  Version:   $Revision: 1.16 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -169,7 +169,8 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 {
   //wxBusyCursor wait;
   //if(m_AutomaticCalculum == 0) return;
-	
+	ForwardUpEvent(&mafEvent(this,VME_SYNC_WITH_SPLINE_LINK, m_ProfileDistance*m_AdditionalProfileNumber));
+
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
   mafVMEPolylineSpline *vme;
   
@@ -890,6 +891,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    mafDEL(vol_material);
 
 	 ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
+
 }
 
 //-----------------------------------------------------------------------
@@ -1646,8 +1648,6 @@ bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme)
       m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber //||
 	   )
   {
-      if(m_ProfileDistance     != m_ControlProfileDistance || m_AdditionalProfileNumber != m_ControlAdditionalProfileNumber)
-        ForwardUpEvent(&mafEvent(this,VME_SYNC_WITH_SPLINE_LINK, m_ProfileDistance*m_AdditionalProfileNumber));
       return true;
   }
 

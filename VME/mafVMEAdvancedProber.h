@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 13:57:16 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-09-17 12:35:39 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -115,6 +115,9 @@ public:
   /** Set the sampling coefficient */
   void SetSamplingCoefficient(double value){m_SamplingCoefficient = value;};
   double GetSamplingCoefficient(){return m_SamplingCoefficient;};
+
+  double GetProfileDistance(){return m_ProfileDistance;}
+  int    GetAdditionalProfileNumber(){return m_AdditionalProfileNumber;}
 
 protected:
   mafVMEAdvancedProber();
