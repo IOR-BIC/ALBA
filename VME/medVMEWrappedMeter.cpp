@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-17 11:19:11 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-09-18 07:55:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -571,7 +571,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     normal[1] = (d1-d2<=0? 1 : (-1))*normal[1] / length;
     normal[2] = (d1-d2<=0? 1 : (-1))*normal[2] / length;
 
-		if(m_WrapReverse)
+		if(/*m_WrapReverse*/ m_WrapSide)
 		{
       normal[0] = - normal[0];
 			normal[1] = - normal[1];
