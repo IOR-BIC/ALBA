@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-18 10:39:36 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2007-09-18 10:40:42 $
+  Version:   $Revision: 1.42 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -314,7 +314,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         positionSlice[0] = m_Slice[0];
         positionSlice[1] = m_Slice[1];
         positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice, normal);
+        VolumePositionCorrection(positionSlice);
 		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
 

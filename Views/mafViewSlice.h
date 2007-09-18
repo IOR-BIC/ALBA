@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-27 13:42:05 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2007-09-18 10:39:36 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,7 +115,7 @@ public:
 	void SetNormal(double normal[3]);
 
   /* Function for the correction of slice pose in case of currentvolume pose matrix is different from identity */
-  void VolumePositionCorrection(double *point, double *normal);
+  void VolumePositionCorrection(double *point);
 
 protected:
   virtual mmgGui *CreateGui();
