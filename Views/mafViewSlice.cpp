@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-27 13:42:05 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-09-18 10:39:36 $
+  Version:   $Revision: 1.41 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -357,8 +357,8 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         positionSlice[0] = m_Slice[0];
         positionSlice[1] = m_Slice[1];
         positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice, normal);
-				((mafPipePolylineSlice *)pipe)->SetSlice(m_Slice);
+        VolumePositionCorrection(positionSlice);
+				((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
 				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
 			}
 			else if(pipe_name.Equals("medPipePolylineGraphEditor"))
@@ -397,12 +397,12 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         positionSlice[0] = m_Slice[0];
         positionSlice[1] = m_Slice[1];
         positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice, normal);
+        VolumePositionCorrection(positionSlice);
 				if(m_CameraPosition==CAMERA_OS_P)
 					((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
 				else
 					((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();
-				((medPipePolylineGraphEditor *)pipe)->SetSlice(m_Slice);
+				((medPipePolylineGraphEditor *)pipe)->SetSlice(positionSlice);
 				((medPipePolylineGraphEditor *)pipe)->SetNormal(normal);
 			}
       else if(pipe_name.Equals("mafPipeMeshSlice"))
@@ -443,8 +443,8 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         positionSlice[0] = m_Slice[0];
         positionSlice[1] = m_Slice[1];
         positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice, normal);
-        ((mafPipeMeshSlice *)pipe)->SetSlice(m_Slice);
+        VolumePositionCorrection(positionSlice);
+        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
         ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
       }
 			pipe->Create(n);
@@ -573,7 +573,12 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
   
   double normal[3];
   this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-  VolumePositionCorrection(origin,normal);
+	double coord[3];
+	coord[0]=origin[0];
+	coord[1]=origin[1];
+  coord[2]=origin[2];
+
+  VolumePositionCorrection(coord);
   
   if(!m_CurrentSurface.empty())
 	{
@@ -585,7 +590,7 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 				if (pipe_name.Equals("mafPipeSurfaceSlice"))
 				{
 					mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
-          pipe->SetSlice(origin); 
+          pipe->SetSlice(coord); 
           pipe->SetNormal(normal); 
 
 				}
@@ -603,7 +608,7 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 				if (pipe_name.Equals("mafPipePolylineSlice"))
 				{
 					mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
-					pipe->SetSlice(origin); 
+					pipe->SetSlice(coord); 
 				}
 			}
 		}
@@ -615,7 +620,7 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 		if (pipe_name.Equals("medPipePolylineGraphEditor"))
 		{
 			medPipePolylineGraphEditor *pipe = (medPipePolylineGraphEditor *)m_CurrentPolylineGraphEditor[i]->m_Pipe;
-			pipe->SetSlice(origin); 
+			pipe->SetSlice(coord); 
 		}
 	}
 
@@ -630,7 +635,7 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
         if (pipe_name.Equals("mafPipeMeshSlice"))
         {
           mafPipeMeshSlice *pipe = (mafPipeMeshSlice *)m_CurrentMesh[i]->m_Pipe;
-          pipe->SetSlice(origin); 
+          pipe->SetSlice(coord); 
         }
       }
     }
@@ -893,7 +898,7 @@ void mafViewSlice::SetNormal(double normal[3])
   }
 }
 //-------------------------------------------------------------------------
-void mafViewSlice::VolumePositionCorrection(double *point, double *normal)
+void mafViewSlice::VolumePositionCorrection(double *point)
 //-------------------------------------------------------------------------
 {
   if(m_CurrentVolume && m_CurrentVolume->m_Vme)
@@ -913,22 +918,6 @@ void mafViewSlice::VolumePositionCorrection(double *point, double *normal)
     point[0] = result[0];
     point[1] = result[1];
     point[2] = result[2];
-
-    /*mafMatrix rot;
-    rot.Identity();
-    rot.CopyRotation(*mat);
-
-    double normalOriginal[4];
-    normalOriginal[0] = normal[0];
-    normalOriginal[1] = normal[1];
-    normalOriginal[2] = normal[2];
-
-    vtkTransform *newR = vtkTransform::New();
-    newR->SetMatrix(rot.GetVTKMatrix());
-    newR->TransformPoint(normalOriginal, normal);
-    vtkDEL(newR);*/
-
-    mat->GetVersor(2, normal);
   }
   
 }
