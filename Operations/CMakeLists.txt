@@ -17,8 +17,8 @@ IF (MAF_USE_VTK)
     mafOpImporterMSF.h
     mafOpImporterExternalFile.cpp
     mafOpImporterExternalFile.h
-    #mafOpLabelizeVolume.cpp
-    #mafOpLabelizeVolume.h
+    mafOpOpenExternalFile.cpp
+    mafOpOpenExternalFile.h
     mmo2DMeasure.cpp
     mmo2DMeasure.h
     mmoAddLandmark.cpp
