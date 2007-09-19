@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-13 13:06:06 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-19 08:18:09 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -516,7 +516,7 @@ void medGUILandmark::GetSpawnPointCoordinates(double newPointCoord[3])
 
     data->GetPoint(pId, newPointCoord);     
   }
-  else if (m_InputVME->IsA("mafVMEGrayVolume"))
+  else if (m_InputVME->IsA("mafVMEVolumeGray"))
   {
     double bounds[6];
     data->GetBounds(bounds);

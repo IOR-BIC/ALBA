@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpIterativeRegistration.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-13 13:07:13 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-19 08:17:47 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -93,7 +93,7 @@ bool medOpIterativeRegistration::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
   if (!node) return false;
-  return (node->IsA("mafVMEGrayVolume") || node->IsA("mafVMESurface"));
+  return (node->IsA("mafVMEVolumeGray") || node->IsA("mafVMESurface"));
 }
 //----------------------------------------------------------------------------
 // Widgets ID's
