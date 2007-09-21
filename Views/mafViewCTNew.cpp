@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-20 09:43:14 $
-Version:   $Revision: 1.29 $
+Date:      $Date: 2007-09-21 13:26:39 $
+Version:   $Revision: 1.30 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 
 	m_ViewCTCompound    = NULL;
 
-	m_WidthSection = 20;
+	m_WidthSection = 30;
 	m_HeightSection = 50;
 
   m_Thickness = 0;
@@ -162,6 +162,15 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			m_MinLUTHistogram = wholeScalarRangeVol[0];
 			m_MaxLUTHistogram = wholeScalarRangeVol[1];
 			SetCurrentZ((b[5]-b[4])/2);
+			/*for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
+			{
+				if(m_CurrentVolume)
+				{
+					mafViewVTK* view =((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+					view->VmeAdd(node);
+					view->VmeShow(node,true);
+				}
+			}*/
 			ProbeVolume();
 		}
 		else
