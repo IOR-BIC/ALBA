@@ -52,6 +52,9 @@ SET(PROJECT_SRCS
   medPipeSurfaceEditor.h
   medVMEOutputSurfaceEditor.cpp
   medVMEOutputSurfaceEditor.h
+  
+  medVisualPipeSlicerSlice.cpp
+  medVisualPipeSlicerSlice.h
 
 )
 

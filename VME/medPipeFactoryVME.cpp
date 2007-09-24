@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:48:38 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-09-24 13:34:33 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,7 @@
 
 #include "medPipeWrappedMeter.h"
 #include "medPipeSurfaceEditor.h"
+#include "medVisualPipeSlicerSlice.h"
 
 
 
@@ -94,6 +95,9 @@ medPipeFactoryVME::medPipeFactoryVME()
 
 	mafPlugPipeMacro(medPipeWrappedMeter, "Pipe to Visualize Wrapped Meter");
 	mafPlugPipeMacro(medPipeSurfaceEditor, "Pipe to Visualize Surface in way to edit them.");
+
+  mafPlugPipeMacro(medVisualPipeSlicerSlice, "Pipe to Visualize Slicer as borders cutted from a plane.");
+
 
 
 #ifdef MAF_USE_ITK  
