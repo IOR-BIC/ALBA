@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 10:18:08 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-09-24 13:52:27 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -108,12 +108,12 @@ public:
   /** Set the current TimeStamp */
   virtual void SetTimeStamp(mafTimeStamp t);
 
+  /** called to check if the vme can be re-parented under the new parent */
+  virtual bool CanReparentTo(mafNode *parent);
+
 protected:
   mafVMELandmark();
   virtual ~mafVMELandmark();
-
-  /** called to check if the vme can be re-parented under the new parent */
-  virtual bool CanReparentTo(mafNode *parent);
 
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();
