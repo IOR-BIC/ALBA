@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-21 13:26:39 $
-Version:   $Revision: 1.30 $
+Date:      $Date: 2007-09-24 10:08:50 $
+Version:   $Revision: 1.31 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -162,7 +162,7 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			m_MinLUTHistogram = wholeScalarRangeVol[0];
 			m_MaxLUTHistogram = wholeScalarRangeVol[1];
 			SetCurrentZ((b[5]-b[4])/2);
-			/*for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
+			for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
 			{
 				if(m_CurrentVolume)
 				{
@@ -170,7 +170,7 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 					view->VmeAdd(node);
 					view->VmeShow(node,true);
 				}
-			}*/
+			}
 			ProbeVolume();
 		}
 		else
@@ -363,6 +363,8 @@ void mafViewCTNew::PackageView()
 	m_ViewCTCompound = new mafViewCompound("CT view",2,5);
 	mafViewSlice *vs = new mafViewSlice("Slice view",CAMERA_ARB,false,false,true);
 	vs->PlugVisualPipe("mafVMEPolyline","mafPipePolylineSlice");
+  vs->PlugVisualPipe("mafVMEVolumeGray","dpVisualPipeNull");
+  
 	m_ViewCTCompound->PlugChildView(vs);
 	PlugChildView(m_ViewCTCompound);
 }
