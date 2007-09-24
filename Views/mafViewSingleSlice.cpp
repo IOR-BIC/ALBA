@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-27 13:27:07 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-09-24 10:07:43 $
+  Version:   $Revision: 1.19 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,7 @@ mafViewSingleSlice::mafViewSingleSlice(wxString label, int camera_position, bool
 
 	m_Position = 0;
 	m_PlaneSelect = XY;
-	m_Slider   = NULL;
+	//m_Slider   = NULL;
 	m_OriginVolume[0] = 0.0;
 	m_OriginVolume[1] = 0.0;
   m_OriginVolume[2] = 0.0;
@@ -482,7 +482,8 @@ mmgGui *mafViewSingleSlice::CreateGui()
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   //m_Gui->AddGui(m_AttachCamera->GetGui());
 
-	m_Slider = m_Gui->FloatSlider(ID_POSITION, _("Position"), &m_Position,MINDOUBLE,MAXDOUBLE);
+	//m_Slider = m_Gui->FloatSlider(ID_POSITION, _("Position"), &m_Position,MINDOUBLE,MAXDOUBLE);
+  m_Gui->Double(ID_POSITION, _("Position"), &m_Position);
 	m_Gui->Enable(ID_POSITION,false);
 
 	//const wxString plane_string[] = {_("XY"), _("YZ"), _("ZX")};
@@ -556,21 +557,21 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 			{
 				m_CameraPosition = CAMERA_OS_Z;
 				m_Position = (b[5] + b[4])/2;
-				m_Slider->SetRange(b[4],b[5],m_Position);
+				//m_Slider->SetRange(b[4],b[5],m_Position);
 				m_Slice[2]=m_Position;
 			}
 			else if(m_PlaneSelect == YZ)
 			{
 				m_CameraPosition = CAMERA_OS_X;
 				m_Position = (b[1] + b[0])/2;
-				m_Slider->SetRange(b[0],b[1],m_Position);
+				//m_Slider->SetRange(b[0],b[1],m_Position);
 				m_Slice[0]=m_Position;
 			}
 			else if(m_PlaneSelect == ZX)
 			{
 				m_CameraPosition = CAMERA_OS_Y;
 				m_Position = (b[3] + b[2])/2;
-				m_Slider->SetRange(b[2],b[3],m_Position);
+				//m_Slider->SetRange(b[2],b[3],m_Position);
 				m_Slice[1]=m_Position;
 			}
 			m_Rwi->CameraSet(m_CameraPosition);
@@ -793,21 +794,21 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 			{
 				m_CameraPosition = CAMERA_OS_Z;
 			  m_Position = (b[5] + b[4])/2;
-				m_Slider->SetRange(b[4],b[5],m_Position);
+				//m_Slider->SetRange(b[4],b[5],m_Position);
 				m_Slice[2]=m_Position;
 			}
 			else if(m_PlaneSelect == YZ)
 			{
 				m_CameraPosition = CAMERA_OS_X;
 				m_Position = (b[1] + b[0])/2;
-				m_Slider->SetRange(b[0],b[1],m_Position);
+				//m_Slider->SetRange(b[0],b[1],m_Position);
 				m_Slice[0]=m_Position;
 			}
 			else if(m_PlaneSelect == ZX)
 			{
 				m_CameraPosition = CAMERA_OS_Y;
 				m_Position = (b[3] + b[2])/2;
-				m_Slider->SetRange(b[2],b[3],m_Position);
+				//m_Slider->SetRange(b[2],b[3],m_Position);
 				m_Slice[1]=m_Position;
 			}
 			
