@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-09-13 09:07:30 $
-# Version:   $Revision: 1.8 $
+# Date:      $Date: 2007-09-24 10:19:25 $
+# Version:   $Revision: 1.9 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -101,6 +101,9 @@ IF(MAF_FOUND)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/vtkMED)
   INCLUDE_DIRECTORIES(${MED_BINARY_DIR}/vtkMED)
 
+#other inclusions
+  INCLUDE_DIRECTORIES(${MAF_BINARY_PATH}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src)
+
   # Configuring MED kits
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
 #  SUBDIRS (Interaction)
@@ -108,6 +111,7 @@ IF(MAF_FOUND)
   SUBDIRS (vtkMED)
   SUBDIRS (Common)
   SUBDIRS (Operations)
+  SUBDIRS (Libraries)
   SUBDIRS (Interaction)
   SUBDIRS (Views)
   SUBDIRS (VME)
