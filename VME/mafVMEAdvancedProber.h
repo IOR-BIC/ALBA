@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-17 12:35:39 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-09-24 10:21:15 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -143,6 +143,8 @@ protected:
   //check if it's necessary reprocess all panoramic
   bool CheckUpdatePanoramic(mafVMEPolylineSpline *vme);
 
+  void UnsharpImage();
+
   vtkPoints *m_ControlPoints;
 
   mafString m_VolumeName;
@@ -171,11 +173,17 @@ protected:
   mafTransform *m_Transform;
   //vtkAppendPolyData *append;
 
+  vtkImageData* m_ImageFiltered;
+  vtkImageData* m_ScalarImage;
+  int m_EnableSharpening;
+
+
 	int m_Fixed;
   int m_AutomaticCalculum;
 
 private:
   mafVMEAdvancedProber(const mafVMEAdvancedProber&); // Not implemented
   void operator=(const mafVMEAdvancedProber&); // Not implemented
+  
 };
 #endif

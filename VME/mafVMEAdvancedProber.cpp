@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-17 12:35:39 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-09-24 10:21:15 $
+  Version:   $Revision: 1.17 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -60,6 +60,13 @@
 #include "vtkLookupTable.h"
 
 #include "vtkMath.h"
+#include "itkLaplacianSharpeningImageFilter.h"
+
+#include "vtkImageCast.h"
+#include "itkVTKImageToImageFilter.h"
+#include "itkImageToVTKImageFilter.h"
+#include "itkCastImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
 
 #include <algorithm>
 
@@ -93,6 +100,8 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 	//GetOutput()->Update();
 
   vtkNEW(m_Image);
+  vtkNEW(m_ScalarImage);
+  vtkNEW(m_ImageFiltered);
   vtkNEW(m_IMTC);
   vtkNEW(m_Points);
   vtkNEW(m_Plane);
@@ -118,6 +127,7 @@ mafVMEAdvancedProber::mafVMEAdvancedProber()
 
 	m_Fixed = 0;
   m_AutomaticCalculum = 0;
+  m_EnableSharpening  = 0;
 }
 
 //-------------------------------------------------------------------------
@@ -128,6 +138,8 @@ mafVMEAdvancedProber::~mafVMEAdvancedProber()
 
 	vtkDEL(m_Lut);
   vtkDEL(m_Image);
+  vtkDEL(m_ScalarImage);
+  vtkDEL(m_ImageFiltered);
   vtkDEL(m_IMTC);
   vtkDEL(m_Points);
   vtkDEL(m_Plane);
@@ -255,7 +267,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 		dimensions[2] = 1;
 
 		m_Image->SetDimensions(dimensions);
-		m_Image->SetSpacing(spacing , 0 , spacing);
+		m_Image->SetSpacing(spacing , spacing , spacing);
 
 		m_Image->UpdateData();
 
@@ -739,7 +751,7 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    dimensions[2] = numberOfIteration+1;
 
    m_Image->SetDimensions(dimensions);
-   m_Image->SetSpacing(spacing , 0 , spacing);
+   m_Image->SetSpacing(spacing , spacing , spacing);
    m_Image->AllocateScalars();
 
    m_Image->AllocateScalars();
@@ -839,19 +851,53 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
    m_Lut = vol_material->m_ColorLut;
    
    double range[2];
-   m_Image->GetScalarRange(range);
-   m_Lut->SetRange(range);
+   // unsharp filtering
+
+   m_ScalarImage->DeepCopy(m_Image); // copy the image and clean the coord arrays
+   m_ScalarImage->GetPointData()->RemoveArray("XCoords");
+   m_ScalarImage->GetPointData()->RemoveArray("YCoords");
+   m_ScalarImage->GetPointData()->RemoveArray("ZCoords");
+
+
+	if (m_EnableSharpening)
+	{
+		UnsharpImage();
+	}
+	else
+	{
+		m_ImageFiltered->DeepCopy(m_ScalarImage);
+	}
+	m_ImageFiltered->GetPointData()->AddArray(x);
+	m_ImageFiltered->GetPointData()->AddArray(y);
+	m_ImageFiltered->GetPointData()->AddArray(z);
+   //
+   m_ImageFiltered->GetScalarRange(range);
+
+	 double lowHigh[2];
+	 vol_material->m_ColorLut->GetTableRange(lowHigh);
+
+	 double wholeScalarRangeVol[2];
+	 ((mafVMEVolumeGray *)vol)->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
+
+	 double wholeScalarRangeAdv[2];
+	 m_ImageFiltered->GetScalarRange(wholeScalarRangeAdv);
+
+	 double advLow,advHigh;
+	 advLow = wholeScalarRangeAdv[0] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[0] - wholeScalarRangeVol[0]);
+	 advHigh = wholeScalarRangeAdv[1] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[1] - wholeScalarRangeVol[1]);
+ 
+   m_Lut->SetRange(advLow,advHigh);
    m_Lut->Build();
 
    //m_Surface->SetData(m_Plane->GetOutput(), 0);
    //m_Surface->Update();
    m_Plane->GetOutput()->Update();
 
-   m_Image->GetPointData()->GetArray(0)->SetLookupTable(m_Lut);
-   m_Image->UpdateData();
+   m_ImageFiltered->GetPointData()->GetArray(0)->SetLookupTable(m_Lut);
+   m_ImageFiltered->UpdateData();
 
    
-   m_IMTC->SetInput(m_Image);
+   m_IMTC->SetInput(m_ImageFiltered);
    m_IMTC->SetLookupTable(m_Lut);
    m_IMTC->Update();
 
@@ -1486,6 +1532,11 @@ mmgGui* mafVMEAdvancedProber::CreateGui()
   wxString prober_mode[2] = {_("density"), _("distance")};
   m_Gui->Combo(ID_MODALITY,_("modality"), &m_ProberMode, 2, prober_mode);*/
 
+  m_Gui->Divider();
+  // none event to process:
+ 
+  m_Gui->Bool(NULL,"Sharpening",&m_EnableSharpening,0,"This option adjust the image, but will make the application slower");
+  m_Gui->Label("");
   m_Gui->Button(ID_UPDATE,_("Update"),_(""));
 	m_Gui->Label("");
   return m_Gui;
@@ -1616,6 +1667,106 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
       case ID_PROFILE_DISTANCE:
       break;
       case ID_UPDATE:
+          if (m_EnableSharpening)
+		  {
+			  
+			  // unsharp filtering
+
+			  m_ScalarImage->DeepCopy(m_Image); // copy the image and clean the coord arrays
+			  vtkDoubleArray *x, *y, *z;
+			  vtkNEW(x);
+			  vtkNEW(y);
+			  vtkNEW(z);
+
+			  x->DeepCopy(m_ScalarImage->GetPointData()->GetArray("XCoords"));
+			  y->DeepCopy(m_ScalarImage->GetPointData()->GetArray("YCoords"));
+			  z->DeepCopy(m_ScalarImage->GetPointData()->GetArray("ZCoords"));
+			  m_ScalarImage->GetPointData()->RemoveArray("XCoords");
+			  m_ScalarImage->GetPointData()->RemoveArray("YCoords");
+			  m_ScalarImage->GetPointData()->RemoveArray("ZCoords");
+
+			  UnsharpImage();
+
+			  //
+			  m_ImageFiltered->GetPointData()->AddArray(x);
+			  m_ImageFiltered->GetPointData()->AddArray(y);
+			  m_ImageFiltered->GetPointData()->AddArray(z);
+			  //m_ImageFiltered->GetScalarRange(range);
+				mmaVolumeMaterial *vol_material;
+				mafNEW(vol_material);
+				vol_material->DeepCopy(((mafVMEVolumeGray *)this->GetParent())->GetMaterial());
+				vol_material->UpdateProp();
+				double lowHigh[2];
+				vol_material->m_ColorLut->GetTableRange(lowHigh);
+
+				double wholeScalarRangeVol[2];
+				((mafVMEVolumeGray *)this->GetParent())->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
+
+				double wholeScalarRangeAdv[2];
+				m_ImageFiltered->GetScalarRange(wholeScalarRangeAdv);
+
+				double advLow,advHigh;
+				advLow = wholeScalarRangeAdv[0] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[0] - wholeScalarRangeVol[0]);
+				advHigh = wholeScalarRangeAdv[1] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[1] - wholeScalarRangeVol[1]);
+
+			  m_Lut->SetRange(advLow,advHigh);
+			  m_Lut->Build();
+
+			  m_Plane->GetOutput()->Update();
+
+			  m_Image->GetPointData()->GetArray(0)->SetLookupTable(m_Lut);
+			  m_Image->UpdateData();
+
+				
+			  m_IMTC->SetInput(m_ImageFiltered);
+			  m_IMTC->SetLookupTable(m_Lut);
+			  m_IMTC->Update();
+
+			  ((mafVMEOutputSurface *) GetOutput())->SetTexture(m_IMTC->GetOutput());
+			  GetMaterial()->SetMaterialTexture(((mafVMEOutputSurface *) GetOutput())->GetTexture());
+			  vtkDEL(x);
+			  vtkDEL(y);
+			  vtkDEL(z);
+
+			 
+		  }
+		  else
+		  {
+			  double range[2];
+				mmaVolumeMaterial *vol_material;
+				mafNEW(vol_material);
+				vol_material->DeepCopy(((mafVMEVolumeGray *)this->GetParent())->GetMaterial());
+				vol_material->UpdateProp();
+				double lowHigh[2];
+				vol_material->m_ColorLut->GetTableRange(lowHigh);
+
+				double wholeScalarRangeVol[2];
+				((mafVMEVolumeGray *)this->GetParent())->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
+
+				double wholeScalarRangeAdv[2];
+				m_ImageFiltered->GetScalarRange(wholeScalarRangeAdv);
+
+				double advLow,advHigh;
+				advLow = wholeScalarRangeAdv[0] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[0] - wholeScalarRangeVol[0]);
+				advHigh = wholeScalarRangeAdv[1] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[1] - wholeScalarRangeVol[1]);
+
+				m_Lut->SetRange(advLow,advHigh);
+			  m_Lut->Build();
+
+			  m_Plane->GetOutput()->Update();
+
+			  m_Image->GetPointData()->GetArray(0)->SetLookupTable(m_Lut);
+			  m_Image->UpdateData();
+
+
+			  m_IMTC->SetInput(m_Image);
+			  m_IMTC->SetLookupTable(m_Lut);
+			  m_IMTC->Update();
+
+			  ((mafVMEOutputSurface *) GetOutput())->SetTexture(m_IMTC->GetOutput());
+			  GetMaterial()->SetMaterialTexture(((mafVMEOutputSurface *) GetOutput())->GetTexture());
+
+		  }
         //InternalUpdate();
         Modified();
         ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
@@ -1685,4 +1836,80 @@ bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme)
   
 
   return result;
+}
+
+//-----------------------------------------------
+void mafVMEAdvancedProber::UnsharpImage()
+//-----------------------------------------------
+{
+
+
+	typedef  double InputPixelType;
+	typedef  itk::Image< InputPixelType, 3 > InputImageType;
+	typedef  double OutputPixelType;
+	typedef  itk::Image< OutputPixelType, 3 > OutputImageType; 
+	typedef  itk::LaplacianSharpeningImageFilter< InputImageType, OutputImageType > MyLaplacianFilter;
+
+	MyLaplacianFilter::Pointer spLaplFilt = MyLaplacianFilter::New();
+	//c->SetInput
+
+	
+
+	typedef itk::VTKImageToImageFilter< OutputImageType > ConvertervtkTOitk;
+	ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New(); // i prefer the smart pointer...
+
+	vtkTOitk->SetInput( m_ScalarImage );
+	
+	try
+	{
+		vtkTOitk->Update();
+	}
+
+	catch (itk::ExceptionObject &err)
+	{
+		wxMessageBox("An error has been occurred during vtk to itk conversion");
+		m_ImageFiltered->DeepCopy(vtkImageData::SafeDownCast(m_ScalarImage));
+		return;
+	}
+	spLaplFilt->SetInput(vtkTOitk->GetOutput());
+
+	typedef itk::RescaleIntensityImageFilter<OutputImageType, OutputImageType> RescaleFilter;
+
+
+
+	//Setting the IO
+	RescaleFilter::Pointer rescale = RescaleFilter::New();
+
+	//Setting the ITK pipeline filter
+
+
+
+	// Rescale and cast to unsigned char
+	rescale->SetInput( spLaplFilt->GetOutput() );
+
+	rescale->SetOutputMinimum(   0 );
+	rescale->SetOutputMaximum( 65536 ); //16 bit..
+
+
+		// i prefer the smart pointer...->Update();
+	try
+	{
+		rescale->Update();
+	}
+	catch (itk::ExceptionObject &err)
+	{
+		m_ImageFiltered->DeepCopy(vtkImageData::SafeDownCast(m_ScalarImage));
+		wxMessageBox("An error has been occurred during unsharp computation");
+		return;
+	}
+
+	typedef itk::ImageToVTKImageFilter< OutputImageType > ConverteritkTOvtk;
+	ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New(); // i prefer the smart pointer...
+	itkTOvtk->SetInput( rescale->GetOutput() );
+	itkTOvtk->Update();
+	m_ImageFiltered->DeepCopy(vtkImageData::SafeDownCast(itkTOvtk->GetOutput()));
+
+	//set the output of the filter
+
+
 }
