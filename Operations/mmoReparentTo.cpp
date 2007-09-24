@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoReparentTo.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:57:17 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-09-24 13:58:13 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -135,7 +135,15 @@ void mmoReparentTo::OpDo()
     m_OldParent->SetTimeStamp(cTime);
 		
     transform->SetTimeStamp(cTime);
-    transform->SetInput(((mafVME *)m_Input)->GetMatrixPipe());
+    mafMatrixPipe *mp = ((mafVME *)m_Input)->GetMatrixPipe();
+    if (mp == NULL)
+    {
+      transform->SetInput(((mafVME *)m_Input)->GetOutput()->GetMatrix());
+    }
+    else
+    {
+      transform->SetInput(mp);
+    }
     transform->SetInputFrame(m_OldParent->GetAbsMatrixPipe());
     transform->SetTargetFrame(m_TargetVme->GetAbsMatrixPipe());
 		transform->Update();
