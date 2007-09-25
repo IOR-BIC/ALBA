@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 10:27:10 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-09-25 10:47:09 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
+#include "vtkDelaunay2D.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -30,7 +31,6 @@ class vtkFixedCutter;
 class vtkPlane;
 class vtkTubeFilter;
 class vtkPolyData;
-class vtkDelaunay2D;
 
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
@@ -79,7 +79,11 @@ public:
   void FillOn(){SetFill(1);UpdateProperty();};
   void FillOff(){SetFill(0);UpdateProperty();};
 
+  /** Function that retrieve a spline polyline when  input is a polyline */ 
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
+
+  /** Set the alpha of Delaunay Filter*/
+  void SetAlphaFilling(double alpha){if(m_Delaunay)m_Delaunay->SetAlpha(alpha);UpdateProperty();}
 
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
