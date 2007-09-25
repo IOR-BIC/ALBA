@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-24 10:21:15 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-09-25 16:03:21 $
+  Version:   $Revision: 1.18 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1667,8 +1667,8 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
       case ID_PROFILE_DISTANCE:
       break;
       case ID_UPDATE:
-          if (m_EnableSharpening)
-		  {
+        if (m_EnableSharpening)
+		    {
 			  
 			  // unsharp filtering
 
@@ -1744,7 +1744,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 				((mafVMEVolumeGray *)this->GetParent())->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
 
 				double wholeScalarRangeAdv[2];
-				m_ImageFiltered->GetScalarRange(wholeScalarRangeAdv);
+				m_Image->GetScalarRange(wholeScalarRangeAdv);
 
 				double advLow,advHigh;
 				advLow = wholeScalarRangeAdv[0] + ((wholeScalarRangeAdv[1] - wholeScalarRangeAdv[0])/(wholeScalarRangeVol[1] - wholeScalarRangeVol[0])) * (lowHigh[0] - wholeScalarRangeVol[0]);
