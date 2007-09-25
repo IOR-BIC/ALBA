@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2007-09-25 10:50:26 $
+Version:   $Revision: 1.13 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ mafGUISettings(Listener)
   m_VerboseLog  = 0;
   m_LogFolder = wxGetCwd().c_str();
 
-	m_ImageTypeId = 0;
+	m_ImageTypeId = 1;
 
   m_WarnUserFlag = true;
   
