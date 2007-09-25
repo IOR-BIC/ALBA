@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-09 15:10:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-25 10:50:00 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,6 +64,7 @@ protected:
   int						 m_CameraAttach; ///< Flag to turn On/Off the camera attaching on a particular VME
   mafVME				*m_AttachedVme; ///< VME on which the camera is attached when the attach-camera option is 'On'
   vtkMatrix4x4	*m_AttachedVmeMatrix; ///< Matrix given to the Camera to be moved together with m_AttachedVme
+  int            m_InitialAttach;
 
   mafObserver	*m_Listener;
 	mmgGui			*m_Gui;
