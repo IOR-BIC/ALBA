@@ -10,6 +10,10 @@ PROJECT(medGui)
 SET(PROJECT_SRCS
   medGUILandmark.cpp
   medGUILandmark.h
+  medGUIWizard.cpp
+  medGUIWizard.h
+  medGUIWizardPage.cpp
+  medGUIWizardPage.h
 )
 
 
