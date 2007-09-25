@@ -71,6 +71,9 @@ SET(PROJECT_SRCS
   
   medOpIterativeRegistration.cpp
   medOpIterativeRegistration.h
+  
+  medOpImporterDicom.cpp
+  medOpImporterDicom.h
 
 )
 
