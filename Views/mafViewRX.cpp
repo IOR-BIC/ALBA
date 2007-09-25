@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 09:30:02 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-09-25 16:06:40 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,9 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafVMESlicer.h"
+#include "mafPipeSurfaceSlice.h"
+#include "medVisualPipeSlicerSlice.h"
+#include "mafVMEVolumeGray.h"
 
 #include "vtkDataSet.h"
 #include "vtkRayCast3DPicker.h"
@@ -120,6 +123,113 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
           CameraUpdate();
         }
       }
+      else if(pipe_name.Equals("mafPipeSurfaceSlice"))
+      {
+        double normal[3];
+        switch(m_CameraPosition)
+        {
+        case CAMERA_RX_FRONT:
+          normal[0] = 0;
+          normal[1] = 1;
+          normal[2] = 0;
+          break;
+        case CAMERA_RX_LEFT:
+          normal[0] = 1;
+          normal[1] = 0;
+          normal[2] = 0;
+          break;
+        case CAMERA_OS_P:
+          break;
+          //case CAMERA_OS_REP:
+          //	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+        case CAMERA_PERSPECTIVE:
+          break;
+        default:
+          normal[0] = 0;
+          normal[1] = 0;
+          normal[2] = 1;
+        }
+        
+        double positionSlice[3];
+        double b[6];
+
+        mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+        positionSlice[0] = (b[1]+b[0])/2;
+        positionSlice[1] = (b[3]+b[2])/2;
+        positionSlice[2] = (b[5]+b[4])/2;
+        ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
+        ((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+
+      }
+      else if(pipe_name.Equals("medVisualPipeSlicerSlice"))
+      {
+        double normal[3];
+        switch(m_CameraPosition)
+        {
+        case CAMERA_RX_FRONT:
+          normal[0] = 0;
+          normal[1] = 1;
+          normal[2] = 0;
+          break;
+        case CAMERA_RX_LEFT:
+          normal[0] = 1;
+          normal[1] = 0;
+          normal[2] = 0;
+          break;
+        case CAMERA_OS_P:
+          break;
+          //case CAMERA_OS_REP:
+          //	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+        case CAMERA_PERSPECTIVE:
+          break;
+        default:
+          normal[0] = 0;
+          normal[1] = 0;
+          normal[2] = 1;
+        }
+
+        double positionSlice1[3],positionSlice2[3];
+        double b[6];
+
+        mafSmartPointer<mafVMEVolumeGray> volume;
+
+        volume->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme));
+        volume->GetOutput()->GetBounds(b);
+ 
+        double value1; 
+        double value2; 
+
+        if(m_CameraPosition == CAMERA_RX_FRONT)
+        {
+          value1= b[3] > b[2] ? b[3] : b[2];
+          value2= b[3] > b[2] ? b[2] : b[3];
+          positionSlice1[0] = (b[1]+b[0])/2;
+          positionSlice1[1] = value1 - 0.001;
+          positionSlice1[2] = (b[5]+b[4])/2;
+
+          positionSlice2[0] = (b[1]+b[0])/2;
+          positionSlice2[1] = value2 + 0.001;
+          positionSlice2[2] = (b[5]+b[4])/2;
+        }
+        else if(m_CameraPosition == CAMERA_RX_LEFT)
+        {
+          value1= b[1] > b[0] ? b[1] : b[0];
+          value2= b[1] > b[0] ? b[0] : b[1];
+          positionSlice1[0] = value1 - 0.001;
+          positionSlice1[1] = (b[3]+b[2])/2;
+          positionSlice1[2] = (b[5]+b[4])/2;
+          
+          positionSlice2[0] = value2 + 0.001;
+          positionSlice2[1] = (b[3]+b[2])/2;
+          positionSlice2[2] = (b[5]+b[4])/2;
+        }
+
+        ((medVisualPipeSlicerSlice *)pipe)->SetSlice1(positionSlice1);
+        ((medVisualPipeSlicerSlice *)pipe)->SetSlice2(positionSlice2);
+        ((medVisualPipeSlicerSlice *)pipe)->SetNormal(normal);
+        
+
+      }
       pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
     }
@@ -162,7 +272,8 @@ int mafViewRX::GetNodeStatus(mafNode *vme)
     else if (vme->IsMAFType(mafVMESlicer))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_PipeCreatable = false;
+      n->m_PipeCreatable = true;
+      n->m_Mutex = true;
     }
   }
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
@@ -178,6 +289,25 @@ mmgGui *mafViewRX::CreateGui()
 	m_Gui->Divider();
   return m_Gui;
 }
+/*//----------------------------------------------------------------------------
+void mafViewRX::VmeShow(mafNode *vme, bool show)
+//----------------------------------------------------------------------------
+{
+  mafViewVTK::VmeShow(vme,show);
+  mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(vme);
+  
+  medVisualPipeSlicerSlice *pipeSlicer = medVisualPipeSlicerSlice::SafeDownCast(SN->m_Pipe);
+  if(pipeSlicer)
+  {
+    pipeSlicer->SetThickness(3);
+  }
+  mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice ::SafeDownCast(SN->m_Pipe);
+  if(pipe)
+  {
+    pipe->SetThickness(3);
+  }
+  CameraUpdate();
+}*/
 //----------------------------------------------------------------------------
 void mafViewRX::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -210,4 +340,3 @@ void mafViewRX::GetLutRange(double minMax[2])
     pipe->GetLutRange(minMax); 
   }
 }
-

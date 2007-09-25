@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-25 16:09:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-25 16:06:40 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,6 +49,8 @@ public:
   Set the visualization status for the node (visible, not visible, mutex, ...) 
   \sa mafSceneGraph mafView*/
   virtual int GetNodeStatus(mafNode *vme);
+
+  //void VmeShow(mafNode *vme, bool show);
 
   /** IDs for the GUI */
   enum VIEW_RX_WIDGET_ID

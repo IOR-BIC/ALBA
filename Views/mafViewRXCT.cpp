@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 09:33:00 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-09-25 16:06:40 $
+  Version:   $Revision: 1.33 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,6 +35,7 @@
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
+#include "medVisualPipeSlicerSlice.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
@@ -432,6 +433,16 @@ void mafViewRXCT::OnEventSetThickness()
     mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
     mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[2])->GetSubView(0))->GetNodePipe(node);
     ((mafPipeSurfaceSlice *)p)->SetThickness(m_Border);
+
+    if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_FRONT_VIEW]->GetNodePipe(node)))
+    {
+      pipe->SetThickness(m_Border);
+    }
+
+    if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[RX_SIDE_VIEW]->GetNodePipe(node)))
+    {
+      pipe->SetThickness(m_Border);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -590,7 +601,7 @@ mmgGui* mafViewRXCT::CreateGui()
   m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
 
   mafNode* node=this->GetSceneGraph()->GetSelectedVme();
-  if (node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric"))
+  if (node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric")||node->IsA("mafVMESlicer"))
   {
     m_Gui->Enable(ID_ALL_SURFACE,true);
     m_Gui->Enable(ID_BORDER_CHANGE,true);
@@ -647,6 +658,7 @@ void mafViewRXCT::PackageView()
     // create to the child view
     m_ViewsRX[v] = new mafViewRX("RX child view", cam_pos[v]);
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "medVisualPipeSlicerSlice",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
   }
@@ -660,6 +672,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);
 }
@@ -789,7 +802,7 @@ void mafViewRXCT::VmeSelect(mafNode *node, bool select)
 	if(m_Gui)
 	{
 		mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
-		if((node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric"))&&select&&p)
+		if((node->IsA("mafVMESurface")||node->IsA("mafVMESurfaceParametric")||node->IsA("mafVMESlicer"))&&select&&p)
 		{
 			m_Gui->Enable(ID_ALL_SURFACE,true);
 			m_Gui->Enable(ID_BORDER_CHANGE,true);
