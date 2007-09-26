@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMeshImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:34:44 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-26 11:31:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,14 +23,16 @@
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
+#include "mmgGui.h"
+
+#include "mafSmartPointer.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 #include "mafVME.h"
-#include "mafSmartPointer.h"
-#include "vtkMAFSmartPointer.h"
+
 #include "mafVMEMeshAnsysTextImporter.h"
 
-#include "mmgGui.h"
+#include "vtkMAFSmartPointer.h"
 
 #include <fstream>
 
@@ -53,7 +55,7 @@ mafOp(label)
 }
 
 //----------------------------------------------------------------------------
-mmoMeshImporter::~mmoMeshImporter( ) 
+mmoMeshImporter::~mmoMeshImporter()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_ImportedVmeMesh);
@@ -102,34 +104,20 @@ int mmoMeshImporter::Read()
   } 
   else if (returnValue == MAF_OK)
   {
+    mafNEW(m_ImportedVmeMesh);
+    m_ImportedVmeMesh->SetName("Imported Mesh");
+	  m_ImportedVmeMesh->SetDataByDetaching(reader->GetOutput()->GetUnstructuredGridOutput()->GetVTKData(),0);
 
-  mafNEW(m_ImportedVmeMesh);
-  m_ImportedVmeMesh->SetName("Imported Mesh");
-	m_ImportedVmeMesh->SetDataByDetaching(reader->GetOutput()->GetUnstructuredGridOutput()->GetVTKData(),0);
+    mafTagItem tag_Nature;
+    tag_Nature.SetName("VME_NATURE");
+    tag_Nature.SetValue("NATURAL");
+    m_ImportedVmeMesh->GetTagArray()->SetTag(tag_Nature);
 
-  mafTagItem tag_Nature;
-  tag_Nature.SetName("VME_NATURE");
-  tag_Nature.SetValue("NATURAL");
-  m_ImportedVmeMesh->GetTagArray()->SetTag(tag_Nature);
-
-  m_Output = m_ImportedVmeMesh;
+    m_Output = m_ImportedVmeMesh;
   }
 
   delete reader;
   return returnValue;
-}
-//----------------------------------------------------------------------------
-void mmoMeshImporter::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-  if (result == OP_RUN_OK)
-  {
-    this->Read();
-  } 
-  
-  HideGui();
-
-	mafEventMacro(mafEvent(this,result));  	   
 }
 //----------------------------------------------------------------------------
 // Operation constants
@@ -192,14 +180,13 @@ void mmoMeshImporter::OnEvent(mafEventBase *maf_event)
       break;
       case wxOK:
       {
+        this->Read();
         this->OpStop(OP_RUN_OK);
-        return;
       }
       break;
       case wxCANCEL:
       {
         this->OpStop(OP_RUN_CANCEL);
-        return;
       }
       break;
       default:
