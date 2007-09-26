@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-24 09:11:51 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-09-26 09:51:10 $
+  Version:   $Revision: 1.12 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -241,6 +241,8 @@ void mmoTransformInterface::OpDo()
   // apply roto-translation to abs pose
   ((mafVME *)m_Input)->SetAbsMatrix(rotoTraslMatrix, m_CurrentTime);
   
+  ((mafVME *)m_Input)->GetOutput()->Update();
+
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 
