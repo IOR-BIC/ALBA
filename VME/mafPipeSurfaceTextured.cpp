@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:29 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-26 10:38:49 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -279,7 +279,7 @@ mmgGui *mafPipeSurfaceTextured::CreateGui()
   m_Gui->Bool(ID_USE_TEXTURE,"texture",&m_UseTexture);
   m_Gui->Button(ID_CHOOSE_TEXTURE,"texture");
   mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
-  m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
+  //m_Gui->Combo(ID_TEXTURE_MAPPING_MODE,"mapping",&surface_output->GetMaterial()->m_TextureMappingMode,3,mapping_mode);
   m_Gui->Enable(ID_CHOOSE_TEXTURE,m_UseTexture != 0);
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_UseTexture != 0);
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
@@ -414,7 +414,9 @@ void mafPipeSurfaceTextured::GenerateTextureMapCoordinate()
   {
     vtkMAFSmartPointer<vtkTextureMapToPlane> plane_texture_mapper;
     plane_texture_mapper->SetInput(data);
-    m_Mapper->SetInput((vtkPolyData *)plane_texture_mapper->GetOutput());
+    plane_texture_mapper->AutomaticPlaneGenerationOn();
+    vtkPolyData *tdata = (vtkPolyData *)plane_texture_mapper->GetOutput();
+    m_Mapper->SetInput(data);
   }
   else if (m_SurfaceMaterial->m_TextureMappingMode == mmaMaterial::CYLINDER_MAPPING)
   {
