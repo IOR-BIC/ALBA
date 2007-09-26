@@ -36,6 +36,8 @@ SET(PROJECT_SRCS
   mafViewCT.h
   mafViewCTNew.cpp
   mafViewCTNew.h
+  medViewSlicer.cpp
+  medViewSlicer.h
 )
 
 # List libraries that are needed by this project.
