@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 08:36:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-26 13:16:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -393,7 +393,10 @@ void medViewSlicer::VmeRemove(mafNode *node)
     m_CurrentVolume = NULL;
   }
   if(m_CurrentSlicer == node && node != NULL && m_AttachCamera)
+  {
     m_AttachCamera->SetVme(NULL);
+    m_CurrentSlicer = NULL;
+  }
 
   Superclass::VmeRemove(node);
 }
@@ -443,8 +446,10 @@ void medViewSlicer::CameraUpdate()
       }
     }
     iter->Delete();
+
+    ((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentSlicer);
   }
-  ((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentSlicer);
+  
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->CameraUpdate();
 }
