@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-25 09:49:43 $
-Version:   $Revision: 1.33 $
+Date:      $Date: 2007-09-26 10:44:24 $
+Version:   $Revision: 1.34 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -693,7 +693,7 @@ void mafViewCTNew::ProbeVolume()
 		double distXY = sqrt(distX*distX + distY*distY);
 
 		double max = distZ > distXY ? distZ : distXY;
-		if(distZ / distXY > 1.5)
+		if(distZ / distXY >= 1.5)
 		  max /= 3;
 		else
 			max /= 2;
