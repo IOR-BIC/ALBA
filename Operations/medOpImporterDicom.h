@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-09-25 14:23:49 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-26 12:01:31 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -45,6 +45,7 @@ MafMedical is partially based on OpenMAF.
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include "vtkImageData.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -137,7 +138,12 @@ protected:
 	/** Build the volume starting from the list of dicom files. */
 	void BuildVolume();
 
+	/** Build the volume starting from the list of CineMRI files. */
+	void BuildVolumeCineMRI();
+
 	void EnableSliceSlider(bool enable);
+
+	void EnableTimeSlider(bool enable);
 
 	void CameraUpdate();
 
@@ -190,11 +196,13 @@ protected:
 	wxSlider		 *m_SliceScannerCropPage;
 	wxSlider		 *m_SliceScannerBuildPage;
 
-	//int m_CurrentSlice;
 
 	wxStaticText *txt;
 
-	int m_CurrentTime;
+	int						m_CurrentTime;
+	wxSlider		 *m_TimeScannerLoadPage;
+	wxSlider		 *m_TimeScannerCropPage;
+	wxSlider		 *m_TimeScannerBuildPage;
 
 	mafTagArray	*m_TagArray;
 
@@ -208,6 +216,8 @@ protected:
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
+
+	std::vector<vtkImageData*> m_DicomRead;
 
 	~medOpImporterDicom();
 };
@@ -229,7 +239,7 @@ public:
 		m_CardiacNumberOfImages = -1;
 	};
 
-	medImporterDICOMListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
+	medImporterDICOMListElement(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceFilename = filename;
 		m_Pos[0] = coord[0];
@@ -238,9 +248,11 @@ public:
 		m_ImageNumber = imageNumber;
 		m_CardiacNumberOfImages = cardNumImages;
 		m_TriggerTime = trigTime;
+		vtkNEW(m_Data);
+		m_Data->DeepCopy(data);
 	};
 
-	~medImporterDICOMListElement() {};
+	~medImporterDICOMListElement() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
 	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0) 
@@ -269,6 +281,10 @@ public:
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
 
+	vtkImageData* GetOutput(){return m_Data;};
+
+	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};
+
 protected:
 	double m_Pos[3];
 	mafString m_SliceFilename;
@@ -276,6 +292,8 @@ protected:
 	double m_TriggerTime;
 	int m_ImageNumber;
 	int m_CardiacNumberOfImages;
+
+	vtkImageData *m_Data;
 
 };
 #endif

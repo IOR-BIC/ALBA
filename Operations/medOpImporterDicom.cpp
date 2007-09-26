@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-25 14:23:49 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-26 12:01:31 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -177,6 +177,8 @@ mafOp(label)
 
 	m_Image = NULL;
 	m_Volume = NULL;
+
+	m_DicomRead.clear();
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
@@ -196,6 +198,9 @@ medOpImporterDicom::~medOpImporterDicom()
 	cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
 	vtkDEL(m_DicomReader);
+
+	mafDEL(m_Volume);
+	mafDEL(m_Image);
 }
 //----------------------------------------------------------------------------
 mafOp *medOpImporterDicom::Copy()
@@ -216,6 +221,7 @@ void medOpImporterDicom::OpRun()
 	CreateCropPage();
 	CreateBuildPage();
 	EnableSliceSlider(false);
+	EnableTimeSlider(false);
 
 	//Create a chain between pages
 	m_LoadPage->SetNextPage(m_CropPage);
@@ -308,8 +314,6 @@ void medOpImporterDicom::BuildVolume()
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
 	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-	//mafProgressBarShowMacro();
-	//mafProgressBarSetTextMacro("Reading CT directory...");
 	long progress = 0;
 	int count,s_count;
 	for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
@@ -320,7 +324,6 @@ void medOpImporterDicom::BuildVolume()
 		s_count++;
 		progress = count * 100 / m_DirectoryReader->GetNumberOfFiles();
 		mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-		//mafProgressBarSetValueMacro(progress);
 	}
 	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	ImportDicomTags();
@@ -374,6 +377,97 @@ void medOpImporterDicom::BuildVolume()
 	}
 }
 //----------------------------------------------------------------------------
+void medOpImporterDicom::BuildVolumeCineMRI()
+//----------------------------------------------------------------------------
+{
+	int step;
+
+	if(m_BuildStepValue == 0)
+		step = 1;
+	else if (m_BuildStepValue == 1)
+		step = m_BuildStepValue << 1;
+	else
+		step = m_BuildStepValue + 1;
+
+	int n_slices = m_NumberOfSlices / step;
+
+	wxBusyInfo wait_info("Building volume: please wait");
+
+	// create the time varying vme
+	mafNEW(m_Volume);
+
+	// for every timestamp
+	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
+	{
+		// Build item at timestamp ts    
+		vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
+		accumulate->SetNumberOfSlices(n_slices);
+
+		// always build the volume on z-axis
+		accumulate->BuildVolumeOnAxes(m_SortAxes);
+
+		// get the time stamp from the dicom tag;
+		// timestamp is in ms
+		int probeHeigthId = 0;    
+		int tsImageId = GetImageId(ts, probeHeigthId);
+		if (tsImageId == -1) 
+		{
+			assert(FALSE);
+		}
+
+		medImporterDICOMListElement *element0;
+		element0 = (medImporterDICOMListElement *)m_ListSelected->Item(tsImageId)->GetData();
+		//double tsDouble = ((double) (element0->GetTriggerTime())) / 1000.0;
+		mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+
+		for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+		{
+			if (targetVolumeSliceId == n_slices) {break;}
+
+			// show the current slice
+			int currImageId = GetImageId(ts, sourceVolumeSliceId);
+			if (currImageId != -1) 
+			{
+				// update v_texture ivar
+				ShowSlice(currImageId);
+			}
+
+			accumulate->SetSlice(targetVolumeSliceId, m_SliceTexture->GetInput());
+			targetVolumeSliceId++;
+		}
+
+		/*mafVME *cTItem =new mafVME;
+		cTItem->SetData(accumulate->GetOutput());
+		cTItem->SetTimeStamp(tsDouble);*/
+		accumulate->Update();
+		m_Volume->SetDataByDetaching(accumulate->GetOutput(),tsDouble);
+
+		// clean up
+		//vtkDEL(cTItem);
+		//vtkDEL(accumulate);
+	}
+
+	// update m_tag_array ivar
+	ImportDicomTags();
+	m_Volume->GetTagArray()->DeepCopy(m_TagArray);
+	vtkDEL(m_TagArray);
+
+	mafTagItem tag_Nature;
+	tag_Nature.SetName("VME_NATURE");
+	tag_Nature.SetValue("NATURAL");
+	m_Volume->GetTagArray()->SetTag(tag_Nature);
+
+	mafTagItem tag_Surgeon;
+	tag_Surgeon.SetName("SURGEON_NAME");
+	tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
+	m_Volume->GetTagArray()->SetTag(tag_Surgeon);
+
+	//Nome VME = CTDir + IDStudio
+	wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	m_Volume->SetName(name.c_str());
+
+}
+//----------------------------------------------------------------------------
 void medOpImporterDicom::CreateLoadPage()
 //----------------------------------------------------------------------------
 {
@@ -396,6 +490,7 @@ void medOpImporterDicom::CreateLoadPage()
 	m_LoadGui->Label(_("surgeon info:"),true);
 	m_LoadGui->String(ID_SURGEON_NAME,_("name "),&m_SurgeonName);
 	m_SliceScannerLoadPage=m_LoadGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
+	m_TimeScannerLoadPage=m_LoadGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 
 	m_LoadPage->AddGui(m_LoadGui);
 
@@ -414,6 +509,7 @@ void medOpImporterDicom::CreateCropPage()
 	m_CropGui->Button(ID_CROP_BUTTON,_("crop"));
 	m_CropGui->Button(ID_UNDO_CROP_BUTTON,_("undo crop"));
 	m_SliceScannerCropPage=m_CropGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
+	m_TimeScannerCropPage=m_CropGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 
 	m_CropPage->AddGui(m_CropGui);
 
@@ -433,6 +529,7 @@ void medOpImporterDicom::CreateBuildPage()
 	m_BuildGui->Label(_("build volume"),true);
 	m_BuildGui->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
 	m_SliceScannerBuildPage=m_BuildGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
+	m_TimeScannerBuildPage=m_BuildGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 
 	m_BuildPage->AddGui(m_BuildGui);
 
@@ -469,15 +566,35 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				OnEvent(&mafEvent(this, ID_STUDY));
 			}
 			break;
+		case ID_UNDO_CROP_BUTTON:
+			{
+				m_CropFlag = false;
+				ShowSlice(m_CurrentSlice);
+				double diffx,diffy,boundsCamera[6];
+				diffx=m_DicomBounds[1]-m_DicomBounds[0];
+				diffy=m_DicomBounds[3]-m_DicomBounds[2];
+				boundsCamera[0]=0.0;
+				boundsCamera[1]=diffx;
+				boundsCamera[2]=0.0;
+				boundsCamera[3]=diffy;
+				boundsCamera[4]=0.0;
+				boundsCamera[5]=0.0;
+				m_LoadPage->GetRWI()->CameraReset(boundsCamera);
+				m_LoadPage->GetRWI()->CameraUpdate();
+				m_CropPage->GetRWI()->CameraReset(boundsCamera);
+				m_CropPage->GetRWI()->CameraUpdate();
+				m_BuildPage->GetRWI()->CameraReset(boundsCamera);
+				m_BuildPage->GetRWI()->CameraUpdate();
+				m_CropGui->Enable(ID_UNDO_CROP_BUTTON,false);
+			}
+			break;
 		case ID_STUDY:
 			{
 				
 				EnableSliceSlider(true);
 				if(m_DicomTypeRead == ID_CMRI)//If cMRI
 				{
-					//m_TimeLabel->Enable(true);
-					//m_TimeText->Enable(true);
-					//m_TimeScanner->Enable(true);
+					EnableTimeSlider(true);
 				}
 
 				m_CropGui->Enable(ID_CROP_BUTTON,true);
@@ -873,6 +990,14 @@ void medOpImporterDicom::EnableSliceSlider(bool enable)
 	m_CropGui->Enable(ID_SCAN_SLICE,enable);
 }
 //----------------------------------------------------------------------------
+void medOpImporterDicom::EnableTimeSlider(bool enable)
+//----------------------------------------------------------------------------
+{
+	m_LoadGui->Enable(ID_SCAN_TIME,enable);
+	m_BuildGui->Enable(ID_SCAN_TIME,enable);
+	m_CropGui->Enable(ID_SCAN_TIME,enable);
+}
+//----------------------------------------------------------------------------
 void medOpImporterDicom::CreatePipeline()
 //----------------------------------------------------------------------------
 {
@@ -963,6 +1088,8 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 				reader->UseDefaultDictionaryOff();
 				reader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
 				reader->UpdateInformation();
+				reader->Modified();
+				reader->Update();
 
 				ct_mode = reader->GetCTMode();
 				ct_mode.MakeUpper();
@@ -990,7 +1117,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 						reader->GetSliceLocation(slice_pos);
 						//medImporterDICOMListElement *element = new medImporterDICOMListElement(str_tmp,slice_pos);
 						//m_FilesList->Append(element);
-						m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos));
+						m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput()));
 						m_NumberOfStudy++;
 					}
 					else 
@@ -998,7 +1125,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 						reader->GetSliceLocation(slice_pos);
 						//medImporterDICOMListElement *element = new medImporterDICOMListElement(str_tmp,SlicePos);
 						//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-						((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos));
+						((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput()));
 					}
 				}
 				progress = i * 100 / m_DirectoryReader->GetNumberOfFiles();
@@ -1082,7 +1209,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 						trigTime = reader->GetTriggerTime();
 						//medImporterDICOMListElement *element = new medImporterDICOMListElement(str_tmp,slice_pos);
 						//m_FilesList->Append(element);
-						m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
+						m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput(),imageNumber, cardNumImages, trigTime));
 						m_NumberOfStudy++;
 					}
 					else 
@@ -1093,7 +1220,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 						trigTime = reader->GetTriggerTime();
 						//medImporterDICOMListElement *element = new medImporterDICOMListElement(str_tmp,SlicePos);
 						//((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-						((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
+						((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput(),imageNumber,cardNumImages,trigTime));
 					}
 				}
 				progress = i * 100 / m_DirectoryReader->GetNumberOfFiles();
@@ -1229,24 +1356,29 @@ void medOpImporterDicom::ShowSlice(int slice_num)
 	// read the slice number 'slice_num' and generate the texture
 	double spacing[3], crop_bounds[6], range[2], loc[3];
 
-	m_DicomReader->SetFileName((char *)m_ListSelected->Item(slice_num)->GetData()->GetFileName());
-	m_DicomReader->Modified();
-	m_DicomReader->Update();
+	//m_DicomReader->SetFileName((char *)m_ListSelected->Item(slice_num)->GetData()->GetFileName());
+	//m_DicomReader->Modified();
+	//m_DicomReader->Update();
 
-	m_DicomReader->GetSliceLocation(loc);
+	m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
+	//m_DicomReader->GetSliceLocation(loc);
 	//double bounds[6];
 
 	//m_DicomReader->GetOutput()->GetBounds(bounds);
-	m_DicomReader->GetOutput()->GetBounds(m_DicomBounds);
+	//m_DicomReader->GetOutput()->GetBounds(m_DicomBounds);
+
+	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
+	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
 
 
 	// switch from m_DicomReader and v_dicom_probe on m_CropFlag
 	if (m_CropFlag) 
 	{
 		double Origin[3];
-		m_DicomReader->GetOutput()->GetOrigin(Origin);
-
-		m_DicomReader->GetOutput()->GetSpacing(spacing);
+		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetOrigin(Origin);
+		//m_DicomReader->GetOutput()->GetOrigin(Origin);
+		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetSpacing(spacing);
+		//m_DicomReader->GetOutput()->GetSpacing(spacing);
 		m_CropPlane->Update();
 		m_CropPlane->GetOutput()->GetBounds(crop_bounds);
 
@@ -1288,7 +1420,7 @@ void medOpImporterDicom::ShowSlice(int slice_num)
 
 		vtkMAFSmartPointer<vtkProbeFilter> probe;
 		probe->SetInput(clip);
-		probe->SetSource(m_DicomReader->GetOutput());
+		probe->SetSource(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
 		probe->Update();
 		probe->GetOutput()->GetBounds(m_DicomBounds);
 		probe->GetOutput()->GetScalarRange(range);
@@ -1296,8 +1428,9 @@ void medOpImporterDicom::ShowSlice(int slice_num)
 	} 
 	else 
 	{
-		m_DicomReader->GetOutput()->GetScalarRange(range);
-		m_SliceTexture->SetInput(m_DicomReader->GetOutput());
+		//m_DicomReader->GetOutput()->GetScalarRange(range);
+		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetScalarRange(range);
+		m_SliceTexture->SetInput(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
 	}
 
 	m_SliceTexture->Modified();
