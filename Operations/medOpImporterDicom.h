@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-09-26 12:01:31 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-26 16:57:43 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -216,8 +216,6 @@ protected:
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
-
-	std::vector<vtkImageData*> m_DicomRead;
 
 	~medOpImporterDicom();
 };

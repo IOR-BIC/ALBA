@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-26 12:01:31 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-26 16:57:43 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -108,7 +108,7 @@ enum DICOM_IMPORTER_GUI_ID
 };
 enum DICOM_MODALITY
 {
-	ID_CT = 0,
+	ID_CTSC = 0,
 	ID_MRI,
 	ID_CMRI,
 };
@@ -178,22 +178,14 @@ mafOp(label)
 	m_Image = NULL;
 	m_Volume = NULL;
 
-	m_DicomRead.clear();
+	m_SortAxes = 2;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
 //----------------------------------------------------------------------------
 {
-	if(m_LoadPage)
-		m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-	if(m_CropPage)
-		m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-	if(m_BuildPage)
-		m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-
 	vtkDEL(m_SliceActor);
 	vtkDEL(m_SliceLookupTable);
-	vtkDEL(m_SliceTexture);
 
 	cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
@@ -230,10 +222,10 @@ void medOpImporterDicom::OpRun()
 	m_Wizard->SetFirstPage(m_LoadPage);
 	if(m_Wizard->Run())
 	{
-		if(m_DicomTypeRead == ID_CT || m_DicomTypeRead == ID_MRI)
+		if(m_DicomTypeRead == ID_CTSC || m_DicomTypeRead == ID_MRI)
 			BuildVolume();
 		else if(m_DicomTypeRead == ID_CMRI)
-			BuildVolume();
+			BuildVolumeCineMRI();
 		OpStop(OP_RUN_OK);
 	}
 	else
@@ -474,9 +466,9 @@ void medOpImporterDicom::CreateLoadPage()
 	m_LoadPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,"prima");
 	m_LoadGui = new mmgGui(this);
 
-	wxString TypeOfDICOM[2]={_("CT"),_("MRI")};
+	wxString TypeOfDICOM[3]={_("CT-SC"),_("MRI"),_("cMRI")};
 	m_LoadGui->Label(_("Type of DICOM"),true);
-	m_LoadGui->Combo(ID_TYPE_DICOM,"",&m_DicomModality,2,TypeOfDICOM);
+	m_LoadGui->Combo(ID_TYPE_DICOM,"",&m_DicomModality,3,TypeOfDICOM);
 	m_LoadGui->Label(_("data files:"),true);
 	mafString wildcard = _("DICT files (*.dic)|*.dic|All Files (*.*)|*.*");
 	m_LoadGui->FileOpen (ID_DICTIONARY,	_("dictionary"),	&m_DictionaryFilename, wildcard);
@@ -1060,14 +1052,14 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 	long progress = START_PROGRESS_BAR;
 
 	// get the dicom files from the directory
-	if(m_DicomModality==ID_CT)
-		wxBusyInfo wait_info("Reading CT directory: please wait");
+	if(m_DicomModality==ID_CTSC)
+		wxBusyInfo wait_info("Reading DICOM directory: please wait");
 	if(m_DicomModality==ID_MRI)
 		wxBusyInfo wait_info("Reading MRI directory: please wait");
 
-	if(m_DicomModality==ID_CT)//CT
+	if(m_DicomModality==ID_CTSC)//CT-SC
 	{
-		m_DicomTypeRead=ID_CT;
+		m_DicomTypeRead=m_DicomModality;
 		for (i=0; i < m_DirectoryReader->GetNumberOfFiles(); i++)
 		{
 			if ((strcmp(m_DirectoryReader->GetFile(i),".") == 0) || (strcmp(m_DirectoryReader->GetFile(i),"..") == 0)) 
@@ -1095,7 +1087,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 				ct_mode.MakeUpper();
 				ct_mode.Trim(FALSE);
 				ct_mode.Trim();
-				if (strcmp( reader->GetModality(), "CT" ) == 0 )
+				if (strcmp( reader->GetModality(), "SC" ) == 0 || strcmp( reader->GetModality(), "CT" ) == 0 )
 				{
 					//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
 					if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
@@ -1321,7 +1313,7 @@ int medOpImporterDicom::GetImageId(int timeId, int heigthId)
 	*/
 
 
-	if (m_DicomTypeRead == ID_CT || m_DicomTypeRead == ID_MRI) //If CT o MRI
+	if (m_DicomTypeRead == ID_CTSC || m_DicomTypeRead == ID_MRI) //If CT o MRI
 		return heigthId;
 
 	assert(m_StudyListbox);
