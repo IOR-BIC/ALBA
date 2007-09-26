@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 09:49:36 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-09-26 09:50:57 $
+  Version:   $Revision: 1.21 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -186,6 +186,8 @@ void mmoMAFTransform::OpUndo()
 //----------------------------------------------------------------------------
 {  
 	((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix);
+  ((mafVME *)m_Input)->GetOutput()->Update();
+
   mafEventMacro(mafEvent(this,CAMERA_UPDATE)); 
 }
 //----------------------------------------------------------------------------
