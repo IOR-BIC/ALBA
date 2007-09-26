@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-06 12:10:46 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-09-26 16:18:53 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -119,7 +119,8 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
   
   m_OpacityTransferFunction = material->m_OpacityTransferFunction;
-  m_ColorLUT = material->m_ColorLut;
+  vtkNEW(m_ColorLUT);
+  m_ColorLUT->DeepCopy(material->m_ColorLut);
   
   UpdateMIPFromLUT();
   
@@ -162,7 +163,7 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
 
   vtkDEL(m_ResampleFilter);
   vtkDEL(m_VolumeProperty);
-  
+  vtkDEL(m_ColorLUT);
   vtkDEL(m_MIPFunction);
   vtkDEL(m_VolumeMapper);
   vtkDEL(m_Volume);
