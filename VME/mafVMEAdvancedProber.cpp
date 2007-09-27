@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-25 16:03:21 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-09-27 12:23:50 $
+  Version:   $Revision: 1.19 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1678,6 +1678,10 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 			  vtkNEW(y);
 			  vtkNEW(z);
 
+        x->SetName("XCoords");
+        y->SetName("YCoords");
+        z->SetName("ZCoords");
+
 			  x->DeepCopy(m_ScalarImage->GetPointData()->GetArray("XCoords"));
 			  y->DeepCopy(m_ScalarImage->GetPointData()->GetArray("YCoords"));
 			  z->DeepCopy(m_ScalarImage->GetPointData()->GetArray("ZCoords"));
@@ -1691,6 +1695,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 			  m_ImageFiltered->GetPointData()->AddArray(x);
 			  m_ImageFiltered->GetPointData()->AddArray(y);
 			  m_ImageFiltered->GetPointData()->AddArray(z);
+
 			  //m_ImageFiltered->GetScalarRange(range);
 				mmaVolumeMaterial *vol_material;
 				mafNEW(vol_material);
@@ -1714,8 +1719,8 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 
 			  m_Plane->GetOutput()->Update();
 
-			  m_Image->GetPointData()->GetArray(0)->SetLookupTable(m_Lut);
-			  m_Image->UpdateData();
+			  m_ImageFiltered->GetPointData()->GetArray(0)->SetLookupTable(m_Lut);
+			  m_ImageFiltered->UpdateData();
 
 				
 			  m_IMTC->SetInput(m_ImageFiltered);
