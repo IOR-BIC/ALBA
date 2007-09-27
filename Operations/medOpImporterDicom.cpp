@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-26 16:57:43 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-09-27 10:49:40 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -105,6 +105,7 @@ enum DICOM_IMPORTER_GUI_ID
 	ID_TYPE_DICOM,
 	ID_SCAN_TIME,
 	ID_SCAN_SLICE,
+	ID_VOLUME_NAME,
 };
 enum DICOM_MODALITY
 {
@@ -179,6 +180,8 @@ mafOp(label)
 	m_Volume = NULL;
 
 	m_SortAxes = 2;
+
+	m_VolumeName = "";
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
@@ -340,8 +343,8 @@ void medOpImporterDicom::BuildVolume()
 		m_Image->GetTagArray()->SetTag(tag_Surgeon);
 
 		//Nome VME = CTDir + IDStudio
-		wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
-		m_Image->SetName(name.c_str());
+		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+		m_Image->SetName(m_VolumeName);
 	}
 	else if(m_NumberOfSlices > 1)
 	{
@@ -364,8 +367,8 @@ void medOpImporterDicom::BuildVolume()
 		m_Volume->GetTagArray()->SetTag(tag_Surgeon);
 
 		//Nome VME = CTDir + IDStudio
-		wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
-		m_Volume->SetName(name.c_str());
+		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+		m_Volume->SetName(m_VolumeName);
 	}
 }
 //----------------------------------------------------------------------------
@@ -520,6 +523,7 @@ void medOpImporterDicom::CreateBuildPage()
 	wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
 	m_BuildGui->Label(_("build volume"),true);
 	m_BuildGui->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
+	m_BuildGui->String(ID_VOLUME_NAME,_("volume name"),&m_VolumeName);
 	m_SliceScannerBuildPage=m_BuildGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
 	m_TimeScannerBuildPage=m_BuildGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 
@@ -528,6 +532,14 @@ void medOpImporterDicom::CreateBuildPage()
 	m_BuildPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_BuildPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicom::GuiUpdate()
+//----------------------------------------------------------------------------
+{
+	m_LoadGui->Update();
+	m_CropGui->Update();
+	m_BuildGui->Update();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::CreateGui()
@@ -582,7 +594,8 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_STUDY:
 			{
-				
+				m_VolumeName = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+				m_BuildGui->Update();
 				EnableSliceSlider(true);
 				if(m_DicomTypeRead == ID_CMRI)//If cMRI
 				{
@@ -916,11 +929,32 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 						ShowSlice(currImageId);
 						CameraUpdate();
 					}
+
 					m_SliceScannerLoadPage->Update();
 					m_SliceScannerCropPage->SetValue(m_CurrentSlice);
 					m_SliceScannerCropPage->Update();
 					m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
 					m_SliceScannerBuildPage->Update();
+
+					GuiUpdate();
+				}
+				break;
+			case ID_SCAN_TIME:
+				{
+					// show the current slice
+					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+					if (currImageId != -1) 
+					{
+						ShowSlice(currImageId);
+						CameraUpdate();
+					}
+					m_TimeScannerLoadPage->Update();
+					m_TimeScannerLoadPage->SetValue(m_CurrentTime);
+					m_TimeScannerCropPage->Update();
+					m_TimeScannerBuildPage->SetValue(m_CurrentTime);
+					m_TimeScannerBuildPage->Update();
+
+					GuiUpdate();
 				}
 				break;
 			case ID_CROP_BUTTON:
