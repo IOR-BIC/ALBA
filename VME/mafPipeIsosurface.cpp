@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-25 10:47:33 $
-Version:   $Revision: 1.18 $
+Date:      $Date: 2007-09-27 11:45:23 $
+Version:   $Revision: 1.19 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -152,7 +152,8 @@ bool mafPipeIsosurface::SetContourValue(float value)
 {
 	if (m_ContourMapper == NULL)
 		return false;
-	m_ContourMapper->SetContourValue(value);
+  m_ContourValue = value;
+	m_ContourMapper->SetContourValue(m_ContourValue);
 	m_ContourMapper->Modified();
 	return true;
 }
