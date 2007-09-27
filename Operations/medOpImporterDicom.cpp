@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-27 10:49:40 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-09-27 15:36:17 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -590,6 +590,8 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				m_BuildPage->GetRWI()->CameraReset(boundsCamera);
 				m_BuildPage->GetRWI()->CameraUpdate();
 				m_CropGui->Enable(ID_UNDO_CROP_BUTTON,false);
+				m_CropActor->VisibilityOn();
+				CameraUpdate();
 			}
 			break;
 		case ID_STUDY:
