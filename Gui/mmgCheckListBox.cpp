@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 16:22:15 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-27 16:13:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -137,7 +137,8 @@ void mmgCheckListBox::SetItemLabel(int id, const wxString label)
 //----------------------------------------------------------------------------
 {
   int index;
-  if( index=FindItemIndex(id) == -1 ) return;
+  index=FindItemIndex(id);
+  if( index == -1 ) return;
 
   m_PreventNotify = true;
   m_CheckListBox->SetString(index,label);
