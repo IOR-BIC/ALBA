@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:35:13 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-09-27 11:44:52 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -324,6 +324,9 @@ void mafRWI::CameraSet(int cam_position)
     case CAMERA_OS_P:
       m_Camera->ParallelProjectionOff();     // Paolo 09/06/2004
       x=-1; y=-1; z=1; vx=0; vy=0; vz=1;
+    case CAMERA_ARB:
+      m_Camera->ParallelProjectionOff();     // Daniele 09/05/2007
+      x=-1; y=-1; z=1; vx=0; vy=0; vz=1;
     break;
     // ste beg
     case CAMERA_RXFEM_XNEG:
@@ -474,7 +477,7 @@ void mafRWI::CameraUpdate()
   }
 }
 //----------------------------------------------------------------------------
-void mafRWI::CameraReset(mafNode *vme)
+void mafRWI::CameraReset(mafNode *vme, double zoom)
 //----------------------------------------------------------------------------
 {
   if (m_RenderWindow->GetGenericWindowId() == 0) 
@@ -484,7 +487,7 @@ void mafRWI::CameraReset(mafNode *vme)
     m_Grid->VisibilityOff();
 
   mafEventMacro(mafEvent(this,CAMERA_PRE_RESET,m_RenFront)); //- Attention - I'm sending m_RenFront, I suppose that m_RenBack is never required 
-  CameraReset(ComputeVisibleBounds(vme));
+  CameraReset(ComputeVisibleBounds(vme), zoom);
   if(m_Grid && m_ShowGrid) 
     m_Grid->VisibilityOn();
 
@@ -571,11 +574,11 @@ double *mafRWI::ComputeVisibleBounds(mafNode *node)
     return b1;
 }
 //----------------------------------------------------------------------------
-void mafRWI::CameraReset(double bounds[6])
+void mafRWI::CameraReset(double bounds[6], double zoom)
 //----------------------------------------------------------------------------
 {
   double view_up[3], view_look[3], view_right[3];
-
+  if(zoom <= 0) zoom = 1;
   m_Camera->OrthogonalizeViewUp();
   m_Camera->ComputeViewPlaneNormal();
   m_Camera->GetViewUp(view_up);
@@ -636,9 +639,9 @@ void mafRWI::CameraReset(double bounds[6])
 
   // update the camera
   m_Camera->SetFocalPoint(center[0],center[1],center[2]);
-  m_Camera->SetPosition(center[0]+distance*vl[0],
-                        center[1]+distance*vl[1],
-                        center[2]+distance*vl[2]);
+  m_Camera->SetPosition(center[0]+(1/zoom) * distance*vl[0],
+                        center[1]+(1/zoom) * distance*vl[1],
+                        center[2]+(1/zoom) * distance*vl[2]);
 
   // setup parallel scale
   m_Camera->SetParallelScale(height);

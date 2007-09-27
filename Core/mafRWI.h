@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:35:13 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-09-27 11:44:52 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,10 +59,10 @@ public:
   void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
 
   /** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
-	void CameraReset(mafNode *vme = NULL);
+	void CameraReset(mafNode *vme = NULL, double zoom = 1);
 
 	/** Reset the camera position according to the bounds. */
-	void CameraReset(double bounds[6]);
+	void CameraReset(double bounds[6], double zoom = 1);
   
 	/** Update the renderwindow. */
 	void CameraUpdate();
