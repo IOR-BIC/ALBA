@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+ xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns3="http://www.w3.org/2004/08/xop/include"
+ xmlns:ns4="http://www.w3.org/2004/11/xmlmime"
+ xmlns:ns6="http://localhost:80/SrbList.wsdl"
+ xmlns:ns1="SrbList"
+ xmlns:ns7="http://localhost:80/SrbDownload.wsdl"
+ xmlns:ns2="urn:SrbDownload"
+ xmlns:ns8="http://localhost:80/SrbUpload.wsdl"
+ xmlns:ns5="http://tempuri.org/ns.xsd">
+ <SOAP-ENV:Body>
+   <ns2:SrbDownload>
+    <srbAuth>
+     <host></host>
+     <port></port>
+     <pwd></pwd>
+     <user></user>
+     <domain></domain>
+     <auth-scheme></auth-scheme>
+     <server-dn></server-dn>
+    </srbAuth>
+    <srbFileName></srbFileName>
+    <srbPath></srbPath>
+   </ns2:SrbDownload>
+
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
