@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgSettingsDialog.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-28 15:05:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ class mmgSettingsDialog : public mafObserver
 {
 
 public:
-	mmgSettingsDialog(wxString dialog_title = "Application Settings");  
+	mmgSettingsDialog(wxString dialog_title = _("Application Settings"));
  ~mmgSettingsDialog();  
 
   void OnEvent(mafEventBase *maf_event);
