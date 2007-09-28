@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 08:38:56 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-09-28 13:59:14 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,11 @@
 #include "mmgCheckListBox.h"
 #include "mafVMEOutputScalar.h"
 #include "medVMEEmg.h"
+#include "mafTagArray.h"
+#include "mafTagItem.h"
+#include "mafVMEOutputScalar.h"
 
+#include "vtkTextProperty.h"
 #include "vtkDoubleArray.h"
 #include "vtkXYPlotActor.h"
 #include "vtkProperty2D.h"
@@ -61,6 +65,7 @@ medPipeGraph::medPipeGraph()
   m_Ymax			= 0;
   m_Xlabel		= 10;
   m_Ylabel		= 10;
+  m_NumberOfSignals = 0;
 
   m_X_title		= "Time";
   m_Y_title		= "Scalar";
@@ -81,7 +86,9 @@ void medPipeGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
-  medVMEEmg *m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
+  m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
+  m_NumberOfSignals = mafVMEOutputScalar::SafeDownCast(m_Emg_plot->GetOutput())->GetScalarData().columns();
+
   
   m_Emg_plot->Update();
   m_Emg_plot->GetTimeStamps(m_TimeVector);
@@ -114,6 +121,9 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_Actor1->SetYTitle(m_Y_title);
 
   m_LegendBox_Actor = m_Actor1->GetLegendBoxActor();
+  //m_LegendBox_Actor->BoxOff();
+  //m_LegendBox_Actor->LockBorderOff();
+
 
   m_Actor1->SetPosition(0.03,0.03);
   m_Actor1->SetPosition2(0.9,0.9);
@@ -155,6 +165,8 @@ void medPipeGraph::Create(mafSceneNode *n)
 
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);   
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -166,13 +178,13 @@ void medPipeGraph::UpdateGraph()
   m_vtkData.clear();
   scalar_Array.clear();
 
-  medVMEEmg *m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
+  m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
   int x_dim = m_TimeVector.size(); 
   
   int counter_array = 0;
   CreateLegend();
 
-  for (int c = 0; c < 32 ; c++)
+  for (int c = 0; c < m_NumberOfSignals ; c++)
   {
     if (m_CheckBox->IsItemChecked(c))
     {
@@ -241,12 +253,12 @@ void medPipeGraph::CreateLegend()
 {
   int counter_legend = 0;
   mafString name;
-  for (int c = 0; c < 32 ; c++)
+  for (int c = 0; c < m_NumberOfSignals ; c++)
   {
     if (m_CheckBox->IsItemChecked(c))
     {
         name = m_CheckBox->GetItemLabel(c);
-        m_LegendBox_Actor->SetNumberOfEntries(32);
+        m_LegendBox_Actor->SetNumberOfEntries(m_NumberOfSignals);
         m_LegendBox_Actor->SetEntryString(counter_legend,name);
         counter_legend++;
       }
@@ -258,6 +270,8 @@ void medPipeGraph::ChangeItemName()
 //----------------------------------------------------------------------------
 {
   m_CheckBox->SetItemLabel(m_ItemId, (wxString)m_ItemName);
+  mafTagItem *t = m_Vme->GetTagArray()->GetTag("SIGNALS_NAME");
+  t->SetValue(m_ItemName, m_ItemId);
   m_CheckBox->Update();
 }
 
@@ -274,10 +288,30 @@ mmgGui* medPipeGraph::CreateGui()
 
   m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),360,_("Chose item to plot"));
 
-  for (int n = 1; n <= 32; n++)
+   
+  bool tagPresent = m_Vme->GetTagArray()->IsTagPresent("SIGNALS_NAME");
+  if (!tagPresent)
   {
-    name = m_ItemName + wxString::Format("%d", n);
-    m_CheckBox->AddItem(n-1 , name, checked);
+    mafTagItem tag_Sig;
+    tag_Sig.SetName("SIGNALS_NAME");
+    tag_Sig.SetNumberOfComponents(m_NumberOfSignals);
+    m_Vme->GetTagArray()->SetTag(tag_Sig);
+  }
+
+  mafTagItem *tag_Signals = m_Vme->GetTagArray()->GetTag("SIGNALS_NAME");
+  for (int n = 1; n <= m_NumberOfSignals; n++)
+  {
+    if (tagPresent)
+    {
+      name = tag_Signals->GetValue(n-1);
+    }
+    else
+    {
+      name = m_ItemName + wxString::Format("%d", n);
+      tag_Signals->SetValue(name.c_str(), n-1);
+    }
+
+     m_CheckBox->AddItem(n-1 , name, checked);
   }
 
   m_Gui->Divider(1);
