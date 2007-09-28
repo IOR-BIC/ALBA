@@ -2,14 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-19 12:31:32 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-28 08:38:56 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -24,39 +23,16 @@
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 #include "mmgCheckListBox.h"
-#include "mmaMaterial.h"
-#include "mafMatrixVector.h"
-
-#include "mafScalarInterpolator.h"
-
-#include "mafVME.h"
-#include "mmgMaterialButton.h"
-#include "mafSceneNode.h"
-#include "mafTagArray.h"
-#include "mmaMaterial.h"
-#include "mafTagItem.h"
-#include "mafVMELandmark.h"
-#include "mafASCIIImporterUtility.h"
 #include "mafVMEOutputScalar.h"
+#include "medVMEEmg.h"
 
-#include "vnl/vnl_matrix.h"
-#include <wx/txtstrm.h>
-#include <wx/wfstream.h>
-#include <wx/string.h>
-
-#include "vtkMAFAssembly.h"
-#include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
-#include "vtkDataSet.h"
 #include "vtkXYPlotActor.h"
 #include "vtkProperty2D.h"
 #include "vtkTextProperty.h"
 #include "vtkRenderer.h"
-#include "vtkDataSetCollection.h"
 #include "vtkPointData.h"
-#include "vtkDataObject.h"
 #include "vtkRectilinearGrid.h"
-#include "medVMEEmg.h"
 #include "vtkLegendBoxActor.h"
 
 //----------------------------------------------------------------------------
@@ -88,6 +64,7 @@ medPipeGraph::medPipeGraph()
 
   m_X_title		= "Time";
   m_Y_title		= "Scalar";
+  m_ItemName  = "analog_";
  
 }
 //----------------------------------------------------------------------------
@@ -104,9 +81,8 @@ void medPipeGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   Superclass::Create(n);
- 
   medVMEEmg *m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
-
+  
   m_Emg_plot->Update();
   m_Emg_plot->GetTimeStamps(m_TimeVector);
   
@@ -119,7 +95,6 @@ void medPipeGraph::Create(mafSceneNode *n)
   }  
   
   vtkNEW(m_Actor1);
-
   m_Actor1->GetProperty()->SetColor(0.02,0.06,0.62);	
   m_Actor1->GetProperty()->SetLineWidth(2);
   m_Actor1->SetLabelFormat("%g");
@@ -188,28 +163,19 @@ void medPipeGraph::UpdateGraph()
 {
   mafTimeStamp t;
   vtkDoubleArray *scalar;
-  //scalar = vtkDoubleArray::New();
   m_vtkData.clear();
   scalar_Array.clear();
 
   medVMEEmg *m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
-  
   int x_dim = m_TimeVector.size(); 
   
   int counter_array = 0;
-  int counter_legend = 0;
-  
-  mafString name;
+  CreateLegend();
 
   for (int c = 0; c < 32 ; c++)
-  { 
+  {
     if (m_CheckBox->IsItemChecked(c))
     {
-      name = "analog_" + mafString(c+1);
-      m_LegendBox_Actor->SetNumberOfEntries(32);
-      m_LegendBox_Actor->SetEntryString(counter_legend,name);
-      counter_legend++;
-      
       int counter = 0;
       
       scalar = vtkDoubleArray::New();
@@ -270,30 +236,57 @@ void medPipeGraph::UpdateGraph()
   m_RenFront->AddActor2D(m_Actor1);
 }
 //----------------------------------------------------------------------------
+void medPipeGraph::CreateLegend()
+//----------------------------------------------------------------------------
+{
+  int counter_legend = 0;
+  mafString name;
+  for (int c = 0; c < 32 ; c++)
+  {
+    if (m_CheckBox->IsItemChecked(c))
+    {
+        name = m_CheckBox->GetItemLabel(c);
+        m_LegendBox_Actor->SetNumberOfEntries(32);
+        m_LegendBox_Actor->SetEntryString(counter_legend,name);
+        counter_legend++;
+      }
+  }
+}
+
+//----------------------------------------------------------------------------
+void medPipeGraph::ChangeItemName()
+//----------------------------------------------------------------------------
+{
+  m_CheckBox->SetItemLabel(m_ItemId, (wxString)m_ItemName);
+  m_CheckBox->Update();
+}
+
+//----------------------------------------------------------------------------
 mmgGui* medPipeGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
   Superclass::CreateGui();
 
   if(m_Gui == NULL) 
-    m_Gui = new mmgGui(this);
-
+  m_Gui = new mmgGui(this);
   wxString name;
   bool checked = FALSE;
 
-   m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),360,_("Chose item to plot"));
+  m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),360,_("Chose item to plot"));
 
   for (int n = 1; n <= 32; n++)
   {
-    name = "analog_" + wxString::Format("%d", n);
-    m_CheckBox->AddItem(n , name, checked);
+    name = m_ItemName + wxString::Format("%d", n);
+    m_CheckBox->AddItem(n-1 , name, checked);
   }
 
   m_Gui->Divider(1);
   m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
   m_Gui->Divider(1);
+  m_Gui->String(ID_ITEM_NAME,_("name :"), &m_ItemName,_(""));
+  m_Gui->Divider(1);
   m_Gui->Bool(ID_LEGEND,_("Legend"),&m_Legend,0,_("Show legend"));
-  m_Gui->Divider();
+  m_Gui->Divider(1);
 
   return m_Gui;
 }
@@ -329,12 +322,20 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
-
+    case ID_ITEM_NAME:
+       ChangeItemName();
+       CreateLegend();
+      break;
+    case ID_CHECK_BOX:
+         m_ItemId = e->GetArg();
+         m_ItemName = m_CheckBox->GetItemLabel(m_ItemId);
+         m_Gui->Update();
+        break;
     default:
-      mafEventMacro(*e);
+     mafEventMacro(*e);
     }  
   }
-   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::MinMax(double MinMax[2], std::vector<mafTimeStamp> vec)

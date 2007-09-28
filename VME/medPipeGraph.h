@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-04 13:46:15 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-09-28 08:38:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,23 +19,13 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkOutlineCornerFilter;
-class vtkPolyDataMapper;
+
 class vtkActor;
-class vtkProperty;
-class vtkPolyData;
-class vtkSphereSource;
-class mafVMELandmark;
-class vtkAppendPolyData;
-class mafMatrixVector;
 class mmgCheckListBox;
 class vtkLegendBoxActor;
-
-
 class vtkXYPlotActor;
 class vtkDoubleArray;
 class vtkRectilinearGrid;
-
 
 //----------------------------------------------------------------------------
 // medPipeGraph :
@@ -52,6 +42,9 @@ public:
 
   //Create plots of scalar data
   void medPipeGraph::UpdateGraph();
+
+  //Change the name of the selected item in the legend box
+  void medPipeGraph::ChangeItemName();
   
   void medPipeGraph::OnEvent(mafEventBase *maf_event); 
   
@@ -66,7 +59,7 @@ protected:
     ID_DRAW,
     ID_CHECK_BOX,
     ID_LEGEND,
-    
+    ID_ITEM_NAME,
     ID_LAST
   };
 
@@ -78,6 +71,8 @@ private:
 
   void MinMax(double MinMax[2], std::vector<mafTimeStamp> vec);
 
+  //create the legend
+  void medPipeGraph::CreateLegend();
 
   double m_OldColour[3];
 
@@ -87,7 +82,9 @@ private:
   double			m_Ymax;
   int				m_Xlabel;
   int				m_Ylabel;
+  long      m_ItemId;
 
+  mafString   m_ItemName;
   wxString		m_X_title;
   wxString		m_Y_title;
 
@@ -97,7 +94,6 @@ private:
  
   vtkDoubleArray      *time_Array;
   std::vector<mafTimeStamp> m_TimeVector;  
-
 
   mafVMEScalar *m_Emg_plot;
   vtkXYPlotActor *m_Actor1;
