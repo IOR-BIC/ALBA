@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 10:07:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-09-28 10:49:36 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -202,12 +202,12 @@ int mafGUISRBBrowse::RemoteSRBList()
   
   ns1__SrbAuth srb_auth;
   srb_listParams.srbAuth = &srb_auth;
-  srb_listParams.srbAuth->host = m_Host.GetNonConstCStr();//"devel.fec.cineca.it"; 
+  srb_listParams.srbAuth->host = m_Host.GetNonConstCStr();
   srb_listParams.srbAuth->domain = m_Domain.GetNonConstCStr();
   srb_listParams.srbAuth->auth_scheme = auth_scheme;
   srb_listParams.srbAuth->port = port;
-  srb_listParams.srbAuth->pwd = m_Pwd.GetNonConstCStr();//"elleh(l)";  
-  srb_listParams.srbAuth->user = m_User.GetNonConstCStr(); //"lhdl02"; 
+  srb_listParams.srbAuth->pwd = m_Pwd.GetNonConstCStr(); 
+  srb_listParams.srbAuth->user = m_User.GetNonConstCStr();
   srb_listParams.srbAuth->server_dn = server_dn;
 
    _ns1__SrbListResponse lsSRBResult;
