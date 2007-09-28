@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.10 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -25,8 +25,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgDialog.h"
 
 //----------------------------------------------------------------------------
-mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener):
-mafGUISettings(Listener)
+mmgLocaleSettings::mmgLocaleSettings(mafObserver *Listener, const mafString &label):
+mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
   m_LanguageId = 0;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-11 10:19:17 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-09-28 15:04:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class wxFrameManager;
 class mmgDockSettings: public mafGUISettings
 {
 public:
- mmgDockSettings(wxFrameManager& mgr);
+ mmgDockSettings(wxFrameManager& mgr, const mafString &label = _("User Interface Preferences"));
  virtual ~mmgDockSettings();
 
  void OnEvent(mafEventBase *evt);

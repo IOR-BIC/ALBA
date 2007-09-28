@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.13 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -41,8 +41,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
-mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener):
-mafGUISettings(listener)
+mmgApplicationLayoutSettings::mmgApplicationLayoutSettings(mafObserver *listener, const mafString &label):
+mafGUISettings(listener, label)
 //----------------------------------------------------------------------------
 {
   m_DefaultLayoutName = " - ";

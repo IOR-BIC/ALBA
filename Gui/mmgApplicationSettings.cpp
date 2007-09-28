@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-25 10:50:26 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.14 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,8 +26,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgGui.h"
 
 //----------------------------------------------------------------------------
-mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener):
-mafGUISettings(Listener)
+mmgApplicationSettings::mmgApplicationSettings(mafObserver *Listener, const mafString &label):
+mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
   // Default values for the application.

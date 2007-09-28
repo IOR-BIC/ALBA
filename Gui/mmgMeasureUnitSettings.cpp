@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.11 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,8 +24,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmgGui.h"
 
 //----------------------------------------------------------------------------
-mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener):
-mafGUISettings(Listener)
+mmgMeasureUnitSettings::mmgMeasureUnitSettings(mafObserver *Listener, const mafString &label):
+mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
   m_DefaultUnits[0] = "mm";

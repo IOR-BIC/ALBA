@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mmgMeasureUnitSettings : public mafGUISettings
 {
 public:
-	mmgMeasureUnitSettings(mafObserver *Listener);
+	mmgMeasureUnitSettings(mafObserver *Listener, const mafString &label = _("Measure Unit"));
 	~mmgMeasureUnitSettings(); 
 
   enum MEASURE_UNIT_WIDGET_ID

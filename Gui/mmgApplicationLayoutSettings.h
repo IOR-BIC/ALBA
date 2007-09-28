@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.10 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ class mafVMERoot;
 class mmgApplicationLayoutSettings : public mafGUISettings
 {
 public:
-	mmgApplicationLayoutSettings(mafObserver *listener);
+	mmgApplicationLayoutSettings(mafObserver *listener, const mafString &label = _("Application Layout"));
 	~mmgApplicationLayoutSettings(); 
 
   enum APPLICATION_LAYOUT_WIDGET_ID

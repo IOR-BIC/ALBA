@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgDockSettings.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-11 10:19:17 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-09-28 15:04:50 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,8 +48,8 @@ enum DOCK_SETTINGS_ID
   ID_CaptionMode
 };
 //----------------------------------------------------------------------------
-mmgDockSettings::mmgDockSettings(wxFrameManager& mgr):
-m_mgr(mgr), mafGUISettings(NULL)
+mmgDockSettings::mmgDockSettings(wxFrameManager& mgr, const mafString &label):
+m_mgr(mgr), mafGUISettings(NULL, label)
 //----------------------------------------------------------------------------
 {
   m_PaneBorderSize                = m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_PANE_BORDER_SIZE);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.11 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mmgApplicationSettings : public mafGUISettings
 {
 public:
-	mmgApplicationSettings(mafObserver *Listener);
+	mmgApplicationSettings(mafObserver *Listener, const mafString &label = _("Application"));
 	~mmgApplicationSettings(); 
 
   enum APP_SETTINGS_WIDGET_ID

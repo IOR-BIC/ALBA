@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.h,v $
 Language:  C++
-Date:      $Date: 2007-09-11 10:19:17 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-28 15:04:50 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafGUISettingsStorage : public mafGUISettings
 {
 public:
-	mafGUISettingsStorage(mafObserver *Listener);
+	mafGUISettingsStorage(mafObserver *Listener, const mafString &label = _("Storage"));
 	~mafGUISettingsStorage(); 
 
   enum STORAGE_SETTINGS_WIDGET_ID
