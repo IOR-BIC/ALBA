@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-10 09:24:13 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-28 11:21:01 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -41,6 +41,7 @@ All rights reserved.
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkCell.h"
+
 #include "vtkMAFMeshCutter.h"
 #include "vtkMAFMeshCutterTest.h"
 
@@ -319,7 +320,7 @@ void vtkMAFMeshCutterTest::RenderCellScalars(vtkUnstructuredGrid *UG, vtkPolyDat
 
 //------------------------------------------------------------------------------
 // Test that the scalars were copied correctly
-void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MMC, vtkUnstructuredGrid *UG, vtkPolyData *polydata) 
+void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MeshCutter, vtkUnstructuredGrid *UG, vtkPolyData *polydata) 
 //------------------------------------------------------------------------------
 {
   int i, j, k ;
@@ -345,7 +346,7 @@ void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MMC, vtkUnstructuredGrid
 
     for (j = 0 ;  j < ntuples ;  j++){
       polydata->GetPointData()->GetArray(i)->GetTuple(j, tuple) ;
-      if (MMC->GetInputEdgeCutByPoint(j, &id0, &id1, &lambda)){
+      if (MeshCutter->GetInputEdgeCutByPoint(j, &id0, &id1, &lambda)){
         // the output point cuts an edge - check the interpolation
         UG->GetPointData()->GetArray(i)->GetTuple(id0, tup0) ;
         UG->GetPointData()->GetArray(i)->GetTuple(id1, tup1) ;
@@ -373,7 +374,7 @@ void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MMC, vtkUnstructuredGrid
           }
         }
       }
-      else if (MMC->GetInputPointCutByPoint(j, &id0)){
+      else if (MeshCutter->GetInputPointCutByPoint(j, &id0)){
         // the output point cuts a point - check that scalars were copied
         UG->GetPointData()->GetArray(i)->GetTuple(id0, tup0) ;
         for (k = 0 ;  k < ncomp ;  k++){
@@ -409,7 +410,7 @@ void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MMC, vtkUnstructuredGrid
     int ntuples = polydata->GetCellData()->GetArray(i)->GetNumberOfTuples() ;
     for (j = 0 ;  j < ntuples ;  j++){
       polydata->GetCellData()->GetArray(i)->GetTuple(j, tuple) ;
-      id0 = MMC->GetInputCellCutByOutputCell(j) ;
+      id0 = MeshCutter->GetInputCellCutByOutputCell(j) ;
       UG->GetCellData()->GetArray(i)->GetTuple(id0, tup0) ;
 
       for (k = 0 ;  k < ncomp ;  k++){
@@ -450,12 +451,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -498,7 +499,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding edge in input data
-    MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
     UG->GetPoint(id0, coords0) ;
     UG->GetPoint(id1, coords1) ;
 
@@ -508,7 +509,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -545,12 +546,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut1()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -593,7 +594,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut1()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding edge in input data
-    MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
     UG->GetPoint(id0, coords0) ;
     UG->GetPoint(id1, coords1) ;
 
@@ -603,7 +604,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut1()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -640,12 +641,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut2()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -688,7 +689,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut2()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding edge in input data
-    MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
     UG->GetPoint(id0, coords0) ;
     UG->GetPoint(id1, coords1) ;
 
@@ -698,7 +699,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut2()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -735,12 +736,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_FaceInPlane()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -783,7 +784,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_FaceInPlane()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding edge in input data
-    MMC->GetInputPointCutByPoint(i, &id0) ;
+    MeshCutter->GetInputPointCutByPoint(i, &id0) ;
     UG->GetPoint(id0, coords0) ;
 
     // test if polydata coords are in the interpolated position
@@ -792,7 +793,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_FaceInPlane()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -830,12 +831,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge1()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -880,11 +881,11 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge1()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding point or edge in input data
-    if (MMC->GetInputPointCutByPoint(i, &id0)){
+    if (MeshCutter->GetInputPointCutByPoint(i, &id0)){
       UG->GetPoint(id0, coords0) ;
       CPPUNIT_ASSERT(PointsEqual(coords, coords0, FTOL)) ;
     }
-    else if (MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda)){
+    else if (MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda)){
       UG->GetPoint(id0, coords0) ;
       UG->GetPoint(id1, coords1) ;
       CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
@@ -895,7 +896,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge1()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -932,12 +933,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge2()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -982,11 +983,11 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge2()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding point or edge in input data
-    if (MMC->GetInputPointCutByPoint(i, &id0)){
+    if (MeshCutter->GetInputPointCutByPoint(i, &id0)){
       UG->GetPoint(id0, coords0) ;
       CPPUNIT_ASSERT(PointsEqual(coords, coords0, FTOL)) ;
     }
-    else if (MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda)){
+    else if (MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda)){
       UG->GetPoint(id0, coords0) ;
       UG->GetPoint(id1, coords1) ;
       CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
@@ -997,7 +998,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge2()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -1034,12 +1035,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesCorner()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -1082,11 +1083,11 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesCorner()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding point or edge in input data
-    if (MMC->GetInputPointCutByPoint(i, &id0)){
+    if (MeshCutter->GetInputPointCutByPoint(i, &id0)){
       UG->GetPoint(id0, coords0) ;
       CPPUNIT_ASSERT(PointsEqual(coords, coords0, FTOL)) ;
     }
-    else if (MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda)){
+    else if (MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda)){
       UG->GetPoint(id0, coords0) ;
       UG->GetPoint(id1, coords1) ;
       CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
@@ -1097,7 +1098,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesCorner()
 
 
   // test the scalars
-  ScalarTest(MMC, UG, polydata) ;
+  ScalarTest(MeshCutter, UG, polydata) ;
 
 
   // render the data
@@ -1134,12 +1135,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_EdgeOnly()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -1180,12 +1181,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_CornerOnly()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -1225,12 +1226,12 @@ void vtkMAFMeshCutterTest::TestGetOutputTet4()
   P->SetNormal(pnorm) ;
   P->SetOrigin(porigin);
 
-  vtkMAFMeshCutter *MMC = vtkMAFMeshCutter::New();
-  MMC->SetCutFunction(P);
-  MMC->SetInput(reader->GetOutput());
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
 
-  MMC->GetOutput()->Update() ;
-  vtkPolyData *polydata = MMC->GetOutput() ;
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
 
 
@@ -1273,7 +1274,7 @@ void vtkMAFMeshCutterTest::TestGetOutputTet4()
     polydata->GetPoint(i, coords) ;
 
     // get coords of corresponding edge in input data
-    MMC->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
     UG->GetPoint(id0, coords0) ;
     UG->GetPoint(id1, coords1) ;
 
@@ -1289,3 +1290,173 @@ void vtkMAFMeshCutterTest::TestGetOutputTet4()
   }
 }
 
+
+
+
+//------------------------------------------------------------------------------
+// Test that the cutter updates and executes properly when the cutting function changes
+// It runs the tests GetOutputHex8_VerticalCut1() and GetOutputHex8_VerticalCut2() in series
+void vtkMAFMeshCutterTest::TestUpdate() 
+//------------------------------------------------------------------------------
+{
+  //----------------------------------------------------------------------------
+  // 1. Run test Hex8_VerticalCut1()
+  //----------------------------------------------------------------------------
+  std::cout << std::endl ;
+  std::cout << "  cutting plane position 1..." << std::endl ;
+
+  // set filename
+  std::ostrstream fname ;
+  fname << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+
+  // read the data
+  vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
+  reader->SetFileName(fname.str());
+
+  // set the implicit function which defines the cut
+  vtkTransform *T = vtkTransform::New();
+
+  vtkPlane *P = vtkPlane::New();
+  P->SetTransform(T);
+  double pnorm1[3] = {1.0, 0.0, 0.0} ;
+  double porigin1[3] = {0.5, 0, 0} ;
+  P->SetNormal(pnorm1) ;
+  P->SetOrigin(porigin1);
+
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
+
+  // force update so that the output is there
+  MeshCutter->Update() ;
+
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
+  vtkUnstructuredGrid *UG = reader->GetOutput() ;
+
+
+
+  // Get the statistics of the polydata
+  int i ;
+
+  // check no. of points
+  int npts = polydata->GetPoints()->GetNumberOfPoints() ;
+  CPPUNIT_ASSERT(npts == 4) ;
+
+  // check no. of cells and type
+  int ncells = polydata->GetNumberOfCells() ;
+  CPPUNIT_ASSERT(ncells == 1) ;
+  for (i = 0 ;  i < ncells ;  i++)
+    CPPUNIT_ASSERT(polydata->GetCell(i)->GetCellType() == VTK_QUAD) ;
+
+
+  // compare the bounds of the input and output
+  double boundsin[6], boundsout[6] ;
+  UG->GetBounds(boundsin) ;
+  polydata->GetBounds(boundsout) ;
+  CPPUNIT_ASSERT((boundsout[0] >= boundsin[0]) && (boundsout[1] <= boundsin[1])) ;
+  CPPUNIT_ASSERT((boundsout[2] >= boundsin[2]) && (boundsout[3] <= boundsin[3])) ;
+  CPPUNIT_ASSERT((boundsout[4] >= boundsin[4]) && (boundsout[5] <= boundsin[5])) ;
+
+  // check that the polydata points are in the plane
+  double coords[3] ;
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+    CPPUNIT_ASSERT(PointInPlane(coords, porigin1, pnorm1, FTOL)) ;
+  }
+
+  // check that the points are interpolated correctly
+  double coords0[3], coords1[3] ;
+  vtkIdType id0, id1 ;
+  double lambda ;
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+
+    // get coords of corresponding edge in input data
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    UG->GetPoint(id0, coords0) ;
+    UG->GetPoint(id1, coords1) ;
+
+    // test if polydata coords are in the interpolated position
+    CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
+  }
+
+
+  // test the scalars
+  ScalarTest(MeshCutter, UG, polydata) ;
+
+
+  // render the data
+  if (renderingOn){
+    RenderCellScalars(UG, polydata) ;
+  }
+
+
+
+  //----------------------------------------------------------------------------
+  // 2. Change plane and run test Hex8_VerticalCut2()
+  //----------------------------------------------------------------------------
+  std::cout << "  cutting plane position 2..." << std::endl ;
+
+  // change the position of the plane
+  double pnorm2[3] = {1.0, 0.0, 0.0} ;
+  double porigin2[3] = {1.5, 0, 0} ;
+  P->SetNormal(pnorm2) ;
+  P->SetOrigin(porigin2);
+
+  // force update so that the output is there
+  MeshCutter->Update() ;
+
+
+  // Get the statistics of the polydata
+
+  // check no. of points
+  npts = polydata->GetPoints()->GetNumberOfPoints() ;
+  CPPUNIT_ASSERT(npts == 4) ;
+
+  // check no. of cells and type
+  ncells = polydata->GetNumberOfCells() ;
+  CPPUNIT_ASSERT(ncells == 1) ;
+  for (i = 0 ;  i < ncells ;  i++)
+    CPPUNIT_ASSERT(polydata->GetCell(i)->GetCellType() == VTK_QUAD) ;
+
+
+  // compare the bounds of the input and output
+  UG->GetBounds(boundsin) ;
+  polydata->GetBounds(boundsout) ;
+  CPPUNIT_ASSERT((boundsout[0] >= boundsin[0]) && (boundsout[1] <= boundsin[1])) ;
+  CPPUNIT_ASSERT((boundsout[2] >= boundsin[2]) && (boundsout[3] <= boundsin[3])) ;
+  CPPUNIT_ASSERT((boundsout[4] >= boundsin[4]) && (boundsout[5] <= boundsin[5])) ;
+
+  // check that the polydata points are in the plane
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+    CPPUNIT_ASSERT(PointInPlane(coords, porigin2, pnorm2, FTOL)) ;
+  }
+
+  // check that the points are interpolated correctly
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+
+    // get coords of corresponding edge in input data
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    UG->GetPoint(id0, coords0) ;
+    UG->GetPoint(id1, coords1) ;
+
+    // test if polydata coords are in the interpolated position
+    CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
+  }
+
+
+  // test the scalars
+  ScalarTest(MeshCutter, UG, polydata) ;
+
+
+  // render the data
+  if (renderingOn){
+    RenderCellScalars(UG, polydata) ;
+  }
+}
