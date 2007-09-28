@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.h,v $
 Language:  C++
-Date:      $Date: 2007-07-17 12:58:37 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-09-28 11:19:28 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -177,6 +177,9 @@ protected:
 
   /** transfer the scalars by interpolation from input to output */
   void TransferScalars() ;
+
+  /** initialize the cutter */
+  void Initialize() ;
 
   /** do the whole thing */
   void CreateSlice() ;

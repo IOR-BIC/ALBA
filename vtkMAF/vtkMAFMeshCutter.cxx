@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-07-06 10:40:11 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-09-28 11:19:28 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -27,7 +27,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFMeshCutter);
 //------------------------------------------------------------------------------
 
@@ -73,6 +73,10 @@ void vtkMAFMeshCutter::Execute()
   m_unstructGrid = this->GetInput() ;
   m_polydata = this->GetOutput() ;
 
+  // Make sure the cutter is cleared of previous data before you run it !
+  Initialize() ;
+
+  // Run the cutter
   CreateSlice() ;
 }
 
@@ -833,6 +837,20 @@ void vtkMAFMeshCutter::TransferScalars()
     }
   }
 }
+
+
+
+//------------------------------------------------------------------------------
+// Initialize the cutter
+void vtkMAFMeshCutter::Initialize()
+//------------------------------------------------------------------------------
+{
+  m_edgeMapping.clear() ;
+  m_intersectedCells.clear() ;
+  m_pointsInCells.clear() ;
+  m_cellMapping.clear() ;
+}
+
 
 //------------------------------------------------------------------------------
 /** Create the polydata slice */
