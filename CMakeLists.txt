@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-09-24 10:19:25 $
-# Version:   $Revision: 1.9 $
+# Date:      $Date: 2007-09-28 09:23:17 $
+# Version:   $Revision: 1.10 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -111,7 +111,6 @@ IF(MAF_FOUND)
   SUBDIRS (vtkMED)
   SUBDIRS (Common)
   SUBDIRS (Operations)
-  SUBDIRS (Libraries)
   SUBDIRS (Interaction)
   SUBDIRS (Views)
   SUBDIRS (VME)
