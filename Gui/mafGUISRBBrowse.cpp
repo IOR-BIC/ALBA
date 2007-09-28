@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 10:49:36 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-09-28 11:52:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -190,13 +190,16 @@ int mafGUISRBBrowse::RemoteSRBList()
 {
   struct soap soap; // gSOAP runtime environment
 
-  m_Domain = "lhdl";
+  // Temporarily initialized to empty values;
+  // At the end we should ask to SRB storage settings
+  // for those values.
+  m_Domain = "";
   char * auth_scheme;
-  auth_scheme = "ENCRYPT1";
+  auth_scheme = "";
   char * port;
-  port = "12544";
+  port = "";
   char * server_dn;
-  server_dn = "devel-tmp-fe06-sfs";
+  server_dn = "";
 
   _ns1__SrbList srb_listParams;
   
