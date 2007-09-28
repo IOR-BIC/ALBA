@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:26:03 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-09-28 10:06:11 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,8 @@ void mmgTree::Reset()
 {
   m_NodeTree->DeleteAllItems();
 
-  if (m_NodeTable != NULL) delete m_NodeTable; // short way to delete all associated objets
+  if (m_NodeTable != NULL)
+    delete m_NodeTable; // short way to delete all associated objects
   m_NodeTable = new wxHashTable(wxKEY_INTEGER,100);
   m_NodeTable->DeleteContents(true);
   m_NodeRoot  = 0;
@@ -162,7 +163,8 @@ bool mmgTree::DeleteNode(long node_id)
    
   DeleteNode2(node_id);
    
-  if(node_id == m_NodeRoot) m_NodeRoot = 0; // if we deleted the root we can create a new one
+  if(node_id == m_NodeRoot)
+    m_NodeRoot = 0; // if we deleted the root we can create a new one
   return true;
 }
 //----------------------------------------------------------------------------
@@ -187,22 +189,61 @@ void mmgTree::DeleteNode2(long node_id)
   m_NodeTree->Delete(item);
 
   wxObject *el = m_NodeTable->Delete(node_id);
-  if (el != NULL ) delete el;
+  if (el != NULL )
+    delete el;
 }
 //----------------------------------------------------------------------------
 bool mmgTree::SetNodeLabel(long node_id, wxString label)
 //----------------------------------------------------------------------------
 {
-  if( !NodeExist(node_id) ) return false;
-  wxTreeItemId  item = ItemFromNode(node_id);
+  if(!NodeExist(node_id))
+    return false;
+  wxTreeItemId item = ItemFromNode(node_id);
   m_NodeTree->SetItemText(item,label);
 
   wxTreeItemId parent = m_NodeTree->GetItemParent(item);
-  if(parent.IsOk() )
-    if(m_Autosort) m_NodeTree->SortChildren(parent); 
+  if(parent.IsOk())
+    if(m_Autosort)
+      m_NodeTree->SortChildren(parent); 
 
   return true;
 }
+//----------------------------------------------------------------------------
+wxString mmgTree::GetNodeLabel(long node_id)
+//----------------------------------------------------------------------------
+{
+  if(!NodeExist(node_id))
+    return "";
+  wxTreeItemId item = ItemFromNode(node_id);
+  return m_NodeTree->GetItemText(item);
+}
+//----------------------------------------------------------------------------
+bool mmgTree::NodeHasChildren(long node_id)
+//----------------------------------------------------------------------------
+{
+  if(!NodeExist(node_id))
+    return false;
+  wxTreeItemId item = ItemFromNode(node_id);
+  return m_NodeTree->ItemHasChildren(item);
+}
+//----------------------------------------------------------------------------
+long mmgTree::GetNodeParent(long node_id)
+//----------------------------------------------------------------------------
+{
+  if( !NodeExist(node_id))
+    return false;
+  wxTreeItemId  item = ItemFromNode(node_id);
+  item = m_NodeTree->GetItemParent(item);
+  if (node_id != 1)
+  {
+    return NodeFromItem(item);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
 //----------------------------------------------------------------------------
 bool mmgTree::SetNodeParent(long node_id, long parent_id )
 //----------------------------------------------------------------------------
@@ -377,14 +418,15 @@ void mmgTree::SetImageList(wxImageList *img)
   if(m_NodeRoot != 0)
   {
     mafLogMessage("warning: mmgTree::SetImageList must be called before adding any node");
-    // if you replace the imagelist with a shorter one 
+    // if you replace the image-list with a shorter one 
     // the icon-index actually in use by the existing nodes 
     // can become inconsistent 
     
     //return; //SIL. 7-4-2005: - commented 4 testing -- to be reinserted
   }
 
-  if(img == m_NodeImages) return;
+  if(img == m_NodeImages)
+    return;
   cppDEL(m_NodeImages);
   m_NodeImages = img;
   m_NodeTree->SetImageList(m_NodeImages);
@@ -393,9 +435,11 @@ void mmgTree::SetImageList(wxImageList *img)
 int mmgTree::GetNodeIcon(long node_id)
 //----------------------------------------------------------------------------
 {
-  if( !NodeExist(node_id) ) return 0;
+  if( !NodeExist(node_id) )
+    return 0;
   wxTreeItemId  item = ItemFromNode(node_id);
-  if(!item.IsOk()) return 0;
+  if(!item.IsOk())
+    return 0;
   return m_NodeTree->GetItemImage(item);
 }
 //----------------------------------------------------------------------------

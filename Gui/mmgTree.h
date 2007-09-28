@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTree.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-30 10:55:31 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-09-28 10:06:11 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,6 +106,15 @@ public:
   
 	/** Set the label for the node. */
 	bool SetNodeLabel(long node_id, wxString label);
+
+  /** Get the label for the node. Add by Mucci 19/09/2007*/
+  wxString GetNodeLabel(long node_id);
+
+  /** Check if the node has children. Add by Mucci 19/09/2007*/
+  bool NodeHasChildren(long node_id);
+
+  /** Return the parent id of the node. Add by Mucci 19/09/2007*/
+  long GetNodeParent(long node_id);
   
 	/** Move a node, and its subtree. */
 	bool SetNodeParent(long node_id, long parent_id );
