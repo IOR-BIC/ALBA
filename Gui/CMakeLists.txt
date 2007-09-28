@@ -14,6 +14,17 @@ SET(PROJECT_SRCS
   mafGUISettings.h
   mafGUISettingsStorage.cpp
   mafGUISettingsStorage.h
+	mafGUISRBBrowse.cpp
+	mafGUISRBBrowse.h
+	#---------SRBList stub---------------
+  ./SrbStorageWS/SoapC.cpp
+	./SrbStorageWS/SoapClient.cpp	
+	./SrbStorageWS/soapSrbUploadProxy.h
+	./SrbStorageWS/soapSrbDownloadProxy.h
+	./SrbStorageWS/soapSrbListProxy.h
+	./SrbStorageWS/stdsoap2.cpp
+	./SrbStorageWS/stdsoap2.h
+	#------------------------------------
   mafPics.cpp
   mafPics.h
   mafWXLog.cpp
