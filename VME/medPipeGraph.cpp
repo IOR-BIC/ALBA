@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 13:59:14 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-01 09:50:52 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,6 @@ medPipeGraph::medPipeGraph()
 //----------------------------------------------------------------------------
 {
   m_Actor1	= NULL;
-
   m_CheckBox  = NULL;
   m_Legend    = FALSE;
 
@@ -70,7 +69,6 @@ medPipeGraph::medPipeGraph()
   m_X_title		= "Time";
   m_Y_title		= "Scalar";
   m_ItemName  = "analog_";
- 
 }
 //----------------------------------------------------------------------------
 medPipeGraph::~medPipeGraph()
@@ -85,11 +83,11 @@ medPipeGraph::~medPipeGraph()
 void medPipeGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
+  int randomColorR, randomColorG, randomColorB;
   Superclass::Create(n);
   m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
   m_NumberOfSignals = mafVMEOutputScalar::SafeDownCast(m_Emg_plot->GetOutput())->GetScalarData().columns();
 
-  
   m_Emg_plot->Update();
   m_Emg_plot->GetTimeStamps(m_TimeVector);
   
@@ -100,7 +98,7 @@ void medPipeGraph::Create(mafSceneNode *n)
   {
     time_Array->InsertNextValue(m_TimeVector[t]);
   }  
-  
+
   vtkNEW(m_Actor1);
   m_Actor1->GetProperty()->SetColor(0.02,0.06,0.62);	
   m_Actor1->GetProperty()->SetLineWidth(2);
@@ -121,52 +119,22 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_Actor1->SetYTitle(m_Y_title);
 
   m_LegendBox_Actor = m_Actor1->GetLegendBoxActor();
-  //m_LegendBox_Actor->BoxOff();
-  //m_LegendBox_Actor->LockBorderOff();
-
-
-  m_Actor1->SetPosition(0.03,0.03);
+  m_Actor1->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
+  m_Actor1->SetLegendPosition2(0.35, 0.25);
+  m_Actor1->SetPosition(0.01,0.01);
   m_Actor1->SetPosition2(0.9,0.9);
   m_Actor1->SetVisibility(1);
   m_Actor1->SetXValuesToValue();
-  m_Actor1->SetPlotColor(0,1,0,0);
-  m_Actor1->SetPlotColor(1,0,1,1);
-  m_Actor1->SetPlotColor(2,0,191,255);
-  m_Actor1->SetPlotColor(3,112,219,147);
-  m_Actor1->SetPlotColor(4,105,105,105);
-  m_Actor1->SetPlotColor(5,0,0,128);
-  m_Actor1->SetPlotColor(6,0,0,205);
-  m_Actor1->SetPlotColor(7,0,100,0);
-  m_Actor1->SetPlotColor(8,0,255,0);
-  m_Actor1->SetPlotColor(9,255,255,0);
-  m_Actor1->SetPlotColor(10,255,130,710);
-  m_Actor1->SetPlotColor(11,255,165,790);
-  m_Actor1->SetPlotColor(12,124,252,0);
-  m_Actor1->SetPlotColor(13,189,183,107);
-  m_Actor1->SetPlotColor(14,255,215,0);
-  m_Actor1->SetPlotColor(15,188,143,143);
-  m_Actor1->SetPlotColor(16,139,69,19);
-  m_Actor1->SetPlotColor(17,250,128,114);
-  m_Actor1->SetPlotColor(18,255,165,0);
-  m_Actor1->SetPlotColor(19,255,105,180);
-  m_Actor1->SetPlotColor(20,255,20,147);
-  m_Actor1->SetPlotColor(21,255,0,255);
-  m_Actor1->SetPlotColor(22,160,32,240);
-  m_Actor1->SetPlotColor(23,139,137,137);
-  m_Actor1->SetPlotColor(24,255,99,71);
-  m_Actor1->SetPlotColor(25,92,92,92);
-  m_Actor1->SetPlotColor(26,135,135,135);
-  m_Actor1->SetPlotColor(27,176,176,176);
-  m_Actor1->SetPlotColor(28,214,214,214);
-  m_Actor1->SetPlotColor(29,255,218,185);
-  m_Actor1->SetPlotColor(30,240,255,240);
-  m_Actor1->SetPlotColor(31,112,128,144);
-  m_Actor1->SetPlotColor(32,124,252,0);
 
+  for (int n = 0 ; n < m_NumberOfSignals; n++)
+  {
+    randomColorR = rand() % 255;
+    randomColorG = rand() % 255;
+    randomColorB = rand() % 255;
+    m_Actor1->SetPlotColor(n ,randomColorR,randomColorG,randomColorB);
+  }
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);   
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -252,7 +220,7 @@ void medPipeGraph::CreateLegend()
 //----------------------------------------------------------------------------
 {
   int counter_legend = 0;
-  mafString name;
+  mafString name; 
   for (int c = 0; c < m_NumberOfSignals ; c++)
   {
     if (m_CheckBox->IsItemChecked(c))
@@ -264,7 +232,6 @@ void medPipeGraph::CreateLegend()
       }
   }
 }
-
 //----------------------------------------------------------------------------
 void medPipeGraph::ChangeItemName()
 //----------------------------------------------------------------------------
@@ -288,7 +255,6 @@ mmgGui* medPipeGraph::CreateGui()
 
   m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),360,_("Chose item to plot"));
 
-   
   bool tagPresent = m_Vme->GetTagArray()->IsTagPresent("SIGNALS_NAME");
   if (!tagPresent)
   {
@@ -310,7 +276,6 @@ mmgGui* medPipeGraph::CreateGui()
       name = m_ItemName + wxString::Format("%d", n);
       tag_Signals->SetValue(name.c_str(), n-1);
     }
-
      m_CheckBox->AddItem(n-1 , name, checked);
   }
 
@@ -320,8 +285,9 @@ mmgGui* medPipeGraph::CreateGui()
   m_Gui->String(ID_ITEM_NAME,_("name :"), &m_ItemName,_(""));
   m_Gui->Divider(1);
   m_Gui->Bool(ID_LEGEND,_("Legend"),&m_Legend,0,_("Show legend"));
-  m_Gui->Divider(1);
-
+  m_Gui->Divider();
+  m_Gui->Divider();
+  m_Gui->Divider(2);
   return m_Gui;
 }
 
