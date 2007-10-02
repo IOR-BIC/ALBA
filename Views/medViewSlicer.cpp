@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 09:15:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-10-02 09:28:05 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -248,7 +248,7 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
       //Show Slicer
       m_CurrentSlicer = mafVMESlicer::SafeDownCast(node);
       double sr[2];
-      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetSlicedVMELink());
+      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetParent());
       if(vol)
       {
         vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
