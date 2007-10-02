@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 11:52:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-10-02 11:37:53 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,26 +20,25 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafGUISRBBrowse.h"
 #include <wx/tokenzr.h>
+#include <wx/string.h>
 
 #include "mafDecl.h"
 #include "mmgGui.h"
 #include "mmgApplicationSettings.h"
 #include "mafPics.h"
+#include "mmgTree.h"
 
-#include "SrbStorageWS/SoapH.h"
+#include "SrbStorageWS/soapH.h"
 #include "SrbStorageWS/SrbList.nsmap"
 
 #include <list>
-
-#include <wx/string.h>
-#include "mmgTree.h"  
 
 //----------------------------------------------------------------------------
 mafGUISRBBrowse::mafGUISRBBrowse(mafObserver *listener,const wxString &title, long style, long dialogStyle)
 : mmgDialog(title, style)
 //----------------------------------------------------------------------------
 {
-	m_Listener	    = listener;
+  m_Listener = listener;
   m_DialogStyle = dialogStyle;
   mafString msfDir = mafGetApplicationDirectory().c_str();
   msfDir.ParsePathName();
@@ -57,7 +56,7 @@ mafGUISRBBrowse::~mafGUISRBBrowse()
 //----------------------------------------------------------------------------
 enum REMOTE_FILE_WIDGET_ID
 {
-	ID_HOST = MINID,
+  ID_HOST = MINID,
   ID_USER,
   ID_PWD,
   ID_BROWSE_LOCAL_FILE,
@@ -67,8 +66,8 @@ enum REMOTE_FILE_WIDGET_ID
 void mafGUISRBBrowse::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
-	m_Gui->Show(true);
+  m_Gui = new mmgGui(this);
+  m_Gui->Show(true);
   
   m_GuiList = new mmgGui(this);
   m_GuiList->Show(true);
@@ -98,7 +97,7 @@ void mafGUISRBBrowse::CreateGui()
   m_Gui->OkCancel();
   m_Gui->Enable(wxOK, FALSE);
 
-	m_Gui->Divider();
+  m_Gui->Divider();
   
   m_GuiList->Divider();
 
@@ -169,7 +168,7 @@ void mafGUISRBBrowse::OnEvent(mafEventBase *maf_event)
       break;
       case wxOK:
         GetNodeName();
-         e->SetId(wxOK);
+        e->SetId(wxOK);
         mmgDialog::OnEvent(e);
       break;
       case wxCANCEL:
@@ -213,7 +212,7 @@ int mafGUISRBBrowse::RemoteSRBList()
   srb_listParams.srbAuth->user = m_User.GetNonConstCStr();
   srb_listParams.srbAuth->server_dn = server_dn;
 
-   _ns1__SrbListResponse lsSRBResult;
+  _ns1__SrbListResponse lsSRBResult;
 
 
   soap_init(&soap); // initialize runtime environment (only once)
@@ -224,13 +223,13 @@ int mafGUISRBBrowse::RemoteSRBList()
     soap_print_fault(&soap, stderr); // display the SOAP fault message on the stderr stream
     return MAF_ERROR;
   }
-   m_FileList = lsSRBResult.filelist;
+  m_FileList = lsSRBResult.filelist;
    
-   soap_destroy(&soap); // delete deserialized class instances (for C++ only)
-   soap_end(&soap); // remove deserialized data and clean up
-   soap_done(&soap); // detach the gSOAP environment
+  soap_destroy(&soap); // delete deserialized class instances (for C++ only)
+  soap_end(&soap); // remove deserialized data and clean up
+  soap_done(&soap); // detach the gSOAP environment
    
-   return MAF_OK;
+  return MAF_OK;
 }
 
 //----------------------------------------------------------------------------
