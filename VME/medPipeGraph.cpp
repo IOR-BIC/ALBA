@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-01 09:50:52 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-02 07:54:49 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ void medPipeGraph::Create(mafSceneNode *n)
 
   vtkNEW(m_Actor1);
   m_Actor1->GetProperty()->SetColor(0.02,0.06,0.62);	
-  m_Actor1->GetProperty()->SetLineWidth(2);
+  m_Actor1->GetProperty()->SetLineWidth(1);
   m_Actor1->SetLabelFormat("%g");
   m_Actor1->SetTitle(m_Emg_plot->GetName());
 
