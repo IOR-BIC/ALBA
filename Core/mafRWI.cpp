@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-27 11:44:52 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-10-02 14:01:01 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -347,6 +347,9 @@ void mafRWI::CameraSet(int cam_position)
     case CAMERA_RXFEM_ZPOS:
       x=0; y=0; z=1; vx=1; vy=0; vz=0;
     break;
+		case CAMERA_BLEND:
+			x=0; y=0; z=1; vx=0; vy=-1; vz=0;
+		break;
     // ste end
   }
   m_Camera->SetFocalPoint(0,0,0);
