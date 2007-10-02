@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 07:54:49 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-02 12:05:32 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ void medPipeGraph::Create(mafSceneNode *n)
 
   vtkNEW(m_Actor1);
   m_Actor1->GetProperty()->SetColor(0.02,0.06,0.62);	
-  m_Actor1->GetProperty()->SetLineWidth(1);
+  m_Actor1->GetProperty()->SetLineWidth(1.4);
   m_Actor1->SetLabelFormat("%g");
   m_Actor1->SetTitle(m_Emg_plot->GetName());
 
@@ -110,7 +110,7 @@ void medPipeGraph::Create(mafSceneNode *n)
   tProp->SetFontFamilyToArial();
   tProp->ItalicOff();
   tProp->BoldOff();
-  tProp->SetFontSize(6);
+  tProp->SetFontSize(5);
 
   m_Actor1->SetAxisTitleTextProperty(tProp);
   m_Actor1->SetAxisLabelTextProperty(tProp);
@@ -246,8 +246,6 @@ void medPipeGraph::ChangeItemName()
 mmgGui* medPipeGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
-  Superclass::CreateGui();
-
   if(m_Gui == NULL) 
   m_Gui = new mmgGui(this);
   wxString name;
