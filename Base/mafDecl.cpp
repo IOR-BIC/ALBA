@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-08 16:20:01 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-10-02 14:00:45 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -345,6 +345,7 @@ std::string  mafIdString(int id)
     case CAMERA_RXFEM_ZNEG:     s="CAMERA_RXFEM_ZNEG";break;
     case CAMERA_RXFEM_ZPOS:     s="CAMERA_RXFEM_ZPOS";break;
     // modified by Stefano 21-9-2004 (end)
+		 case CAMERA_BLEND:					s="CAMERA_BLEND";break;
      case CAMERA_CT:						s="CAMERA_CT"; break; 
      case CAMERA_OS_X:	        s="CAMERA_OS_X"; break; 
      case CAMERA_OS_Y:	        s="CAMERA_OS_Y"; break; 

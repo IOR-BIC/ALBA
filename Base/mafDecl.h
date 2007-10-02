@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-14 11:08:11 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-10-02 14:00:45 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -230,6 +230,8 @@ EVT_START,
   CAMERA_RXFEM_ZNEG, //(to be moved elsewhere Marco)
   CAMERA_RXFEM_ZPOS, //(to be moved elsewhere Marco)
   //  //modified by Stefano 21-9-2004 (end)
+
+	CAMERA_BLEND,
 
 	OP_ADD,       // events used by mafOpManager, mafOp and mafLogic
   OP_REMOVE,        
