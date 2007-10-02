@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 10:07:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-10-02 11:36:39 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include <curl/curl.h>
 #include "mmgDialog.h"
 
 //----------------------------------------------------------------------------
@@ -44,12 +43,12 @@ This component allow to make remote file browsing.
 class mafGUISRBBrowse : public mmgDialog
 {
 public:
-	mafGUISRBBrowse(mafObserver *listener = NULL, const wxString &title = _("Remote file dialog"), long style = mafRESIZABLE, long dialogStyle = DOWNLOAD);
-	~mafGUISRBBrowse(); 
+  mafGUISRBBrowse(mafObserver *listener = NULL, const wxString &title = _("Remote file dialog"), long style = mafRESIZABLE, long dialogStyle = DOWNLOAD);
+  ~mafGUISRBBrowse(); 
 
 
-	void OnEvent(mafEventBase *maf_event);
-	void SetListener(mafObserver *listener) {m_Listener = listener;};
+  void OnEvent(mafEventBase *maf_event);
+  void SetListener(mafObserver *listener) {m_Listener = listener;};
 
   mafString GetFile() {return m_RemoteFileName;};
 
@@ -66,9 +65,8 @@ public:
   mafString GetPassword() {return m_Pwd;};
 
 protected:
-
-	/** Create the GUI for the FlyTo animation */
-	void CreateGui();
+  /** Create the GUI for the FlyTo animation */
+  void CreateGui();
 
   /** Call the Web Service to list files on SRB Repository.*/
    int RemoteSRBList();
@@ -96,6 +94,5 @@ protected:
   long         m_NodeId;
   long         m_NodeCounter;
   long         m_DialogStyle;
-  mafObserver	*m_Listener;
 };
 #endif
