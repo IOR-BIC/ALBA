@@ -17,8 +17,8 @@ SET(PROJECT_SRCS
 	mafGUISRBBrowse.cpp
 	mafGUISRBBrowse.h
 	#---------SRBList stub---------------
-  ./SrbStorageWS/SoapC.cpp
-	./SrbStorageWS/SoapClient.cpp	
+  ./SrbStorageWS/soapC.cpp
+	./SrbStorageWS/soapClient.cpp	
 	./SrbStorageWS/soapSrbUploadProxy.h
 	./SrbStorageWS/soapSrbDownloadProxy.h
 	./SrbStorageWS/soapSrbListProxy.h
