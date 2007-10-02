@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-28 13:59:14 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-02 16:44:36 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,11 +15,10 @@
 
 #include "mafPipe.h"
 #include "mafEvent.h"
-#include "medVMEEmg.h"
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-
+class medVMEEmg;
 class vtkActor;
 class mmgCheckListBox;
 class vtkLegendBoxActor;
@@ -38,6 +37,8 @@ public:
   medPipeGraph();
   virtual     ~medPipeGraph ();
 
+  void medPipeGraph::OnEvent(mafEventBase *maf_event); 
+
   virtual void Create(mafSceneNode *n);
 
   //Create plots of scalar data
@@ -46,16 +47,12 @@ public:
   //Change the name of the selected item in the legend box
   void medPipeGraph::ChangeItemName();
   
-  void medPipeGraph::OnEvent(mafEventBase *maf_event); 
-  
 protected:
-
   mmgGui* medPipeGraph::CreateGui();
 
   enum PIPE_GRAPH_GUI_WIDGETS
   {
     ID_X_MIN = Superclass::ID_LAST, 
-
     ID_DRAW,
     ID_CHECK_BOX,
     ID_LEGEND,
@@ -63,12 +60,11 @@ protected:
     ID_LAST
   };
 
- mmgCheckListBox* m_CheckBox;
- int m_Legend;
- vtkLegendBoxActor *m_LegendBox_Actor;
+  int m_Legend;
+  mmgCheckListBox* m_CheckBox;
+  vtkLegendBoxActor *m_LegendBox_Actor;
 
 private:
-
   void MinMax(double MinMax[2], std::vector<mafTimeStamp> vec);
 
   //create the legend
@@ -96,7 +92,7 @@ private:
   vtkDoubleArray      *time_Array;
   std::vector<mafTimeStamp> m_TimeVector;  
 
-  medVMEEmg *m_Emg_plot;
-  vtkXYPlotActor *m_Actor1;
+  medVMEEmg      *m_EmgPlot;
+  vtkXYPlotActor *m_PlotActor;
 };  
 #endif // __medPipeGraph_H__

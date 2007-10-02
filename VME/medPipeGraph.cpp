@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 12:05:32 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-02 16:44:36 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 #include "mmgCheckListBox.h"
-#include "mafVMEOutputScalar.h"
+
 #include "medVMEEmg.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
@@ -54,7 +54,7 @@ medPipeGraph::medPipeGraph()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_Actor1	= NULL;
+  m_PlotActor	= NULL;
   m_CheckBox  = NULL;
   m_Legend    = FALSE;
 
@@ -74,10 +74,10 @@ medPipeGraph::medPipeGraph()
 medPipeGraph::~medPipeGraph()
 //----------------------------------------------------------------------------
 {
-  m_RenFront->RemoveActor2D(m_Actor1);
+  m_RenFront->RemoveActor2D(m_PlotActor);
   m_RenFront->SetBackground(m_OldColour);
 
-  vtkDEL(m_Actor1);
+  vtkDEL(m_PlotActor);
   }
 //----------------------------------------------------------------------------
 void medPipeGraph::Create(mafSceneNode *n)
@@ -85,11 +85,11 @@ void medPipeGraph::Create(mafSceneNode *n)
 {
   int randomColorR, randomColorG, randomColorB;
   Superclass::Create(n);
-  m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
-  m_NumberOfSignals = mafVMEOutputScalar::SafeDownCast(m_Emg_plot->GetOutput())->GetScalarData().columns();
+  m_EmgPlot = medVMEEmg::SafeDownCast(m_Vme);
+  m_NumberOfSignals = mafVMEOutputScalar::SafeDownCast(m_EmgPlot->GetOutput())->GetScalarData().columns();
 
-  m_Emg_plot->Update();
-  m_Emg_plot->GetTimeStamps(m_TimeVector);
+  m_EmgPlot->Update();
+  m_EmgPlot->GetTimeStamps(m_TimeVector);
   
   time_Array = vtkDoubleArray::New();
   
@@ -99,39 +99,39 @@ void medPipeGraph::Create(mafSceneNode *n)
     time_Array->InsertNextValue(m_TimeVector[t]);
   }  
 
-  vtkNEW(m_Actor1);
-  m_Actor1->GetProperty()->SetColor(0.02,0.06,0.62);	
-  m_Actor1->GetProperty()->SetLineWidth(1.4);
-  m_Actor1->SetLabelFormat("%g");
-  m_Actor1->SetTitle(m_Emg_plot->GetName());
+  vtkNEW(m_PlotActor);
+  m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
+  m_PlotActor->GetProperty()->SetLineWidth(1.4);
+  m_PlotActor->SetLabelFormat("%g");
+  m_PlotActor->SetTitle(m_EmgPlot->GetName());
 
-  vtkTextProperty* tProp = m_Actor1->GetTitleTextProperty();
+  vtkTextProperty* tProp = m_PlotActor->GetTitleTextProperty();
   tProp->SetColor(0.02,0.06,0.62);
   tProp->SetFontFamilyToArial();
   tProp->ItalicOff();
   tProp->BoldOff();
   tProp->SetFontSize(5);
 
-  m_Actor1->SetAxisTitleTextProperty(tProp);
-  m_Actor1->SetAxisLabelTextProperty(tProp);
-  m_Actor1->SetTitleTextProperty(tProp);	
-  m_Actor1->SetXTitle(m_X_title);
-  m_Actor1->SetYTitle(m_Y_title);
+  m_PlotActor->SetAxisTitleTextProperty(tProp);
+  m_PlotActor->SetAxisLabelTextProperty(tProp);
+  m_PlotActor->SetTitleTextProperty(tProp);	
+  m_PlotActor->SetXTitle(m_X_title);
+  m_PlotActor->SetYTitle(m_Y_title);
 
-  m_LegendBox_Actor = m_Actor1->GetLegendBoxActor();
-  m_Actor1->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
-  m_Actor1->SetLegendPosition2(0.35, 0.25);
-  m_Actor1->SetPosition(0.01,0.01);
-  m_Actor1->SetPosition2(0.9,0.9);
-  m_Actor1->SetVisibility(1);
-  m_Actor1->SetXValuesToValue();
+  m_LegendBox_Actor = m_PlotActor->GetLegendBoxActor();
+  m_PlotActor->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
+  m_PlotActor->SetLegendPosition2(0.35, 0.25);
+  m_PlotActor->SetPosition(0.01,0.01);
+  m_PlotActor->SetPosition2(0.9,0.9);
+  m_PlotActor->SetVisibility(1);
+  m_PlotActor->SetXValuesToValue();
 
   for (int n = 0 ; n < m_NumberOfSignals; n++)
   {
     randomColorR = rand() % 255;
     randomColorG = rand() % 255;
     randomColorB = rand() % 255;
-    m_Actor1->SetPlotColor(n ,randomColorR,randomColorG,randomColorB);
+    m_PlotActor->SetPlotColor(n ,randomColorR,randomColorG,randomColorB);
   }
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);   
@@ -146,7 +146,7 @@ void medPipeGraph::UpdateGraph()
   m_vtkData.clear();
   scalar_Array.clear();
 
-  m_Emg_plot = medVMEEmg::SafeDownCast(m_Vme);
+  m_EmgPlot = medVMEEmg::SafeDownCast(m_Vme);
   int x_dim = m_TimeVector.size(); 
   
   int counter_array = 0;
@@ -162,8 +162,8 @@ void medPipeGraph::UpdateGraph()
       
       for (t = 0; t < m_TimeVector.size(); t++)
       { 
-        m_Emg_plot->SetTimeStamp(m_TimeVector[t]);
-        double scalar_data = m_Emg_plot->GetScalarOutput()->GetScalarData().get(0,c);
+        m_EmgPlot->SetTimeStamp(m_TimeVector[t]);
+        double scalar_data = m_EmgPlot->GetScalarOutput()->GetScalarData().get(0,c);
         scalar->InsertValue(counter,scalar_data);
         counter++;
       }
@@ -177,7 +177,7 @@ void medPipeGraph::UpdateGraph()
       rect_grid->GetPointData()->SetScalars(scalar_Array.at(counter_array));
       
       m_vtkData.push_back(rect_grid);
-      m_Actor1->AddInput(m_vtkData.at(counter_array));
+      m_PlotActor->AddInput(m_vtkData.at(counter_array));
       counter_array++;
     }    
   }
@@ -203,17 +203,17 @@ void medPipeGraph::UpdateGraph()
   if(m_Xmax < times_range[1])
     m_Xmax = times_range[1];
 
-  m_Actor1->SetPlotRange(m_Xmin, m_Ymin, m_Xmax, m_Ymax); 
+  m_PlotActor->SetPlotRange(m_Xmin, m_Ymin, m_Xmax, m_Ymax); 
 
   m_Xmin = 0;
   m_Ymin = 0;
   m_Xmax = 0;
   m_Ymax = 0;
 
-  m_Actor1->SetNumberOfXLabels(m_Xlabel);
-  m_Actor1->SetNumberOfYLabels(m_Ylabel);
+  m_PlotActor->SetNumberOfXLabels(m_Xlabel);
+  m_PlotActor->SetNumberOfYLabels(m_Ylabel);
 
-  m_RenFront->AddActor2D(m_Actor1);
+  m_RenFront->AddActor2D(m_PlotActor);
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::CreateLegend()
@@ -299,7 +299,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     {
     case ID_DRAW:
       {
-        m_Actor1->RemoveAllInputs();
+        m_PlotActor->RemoveAllInputs();
         UpdateGraph();
       }
       break;
@@ -309,12 +309,12 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         {
         case TRUE:
           {
-            m_Actor1->LegendOn();
+            m_PlotActor->LegendOn();
           }
           break;
         case FALSE:
           {
-            m_Actor1->LegendOff();
+            m_PlotActor->LegendOff();
           } 
           break;
         }
