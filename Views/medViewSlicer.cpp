@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 13:16:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-02 09:15:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -248,13 +248,14 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
       //Show Slicer
       m_CurrentSlicer = mafVMESlicer::SafeDownCast(node);
       double sr[2];
-      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetParent());
+      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetSlicedVMELink());
       if(vol)
       {
         vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
         
         mmaMaterial *currentSurfaceMaterial = m_CurrentSlicer->GetMaterial();
         m_ColorLUT = m_CurrentSlicer->GetMaterial()->m_ColorLut;
+        m_CurrentSlicer->GetMaterial()->UpdateProp();
         m_ColorLUT->SetTableRange(sr[0], sr[1]);
         /*m_LutWidget->SetLut(m_ColorLUT);
         m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
