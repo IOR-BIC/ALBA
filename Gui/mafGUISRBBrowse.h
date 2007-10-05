@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 11:36:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-05 08:06:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,6 +85,7 @@ protected:
   mmgGui      *m_Gui;
   mmgGui      *m_GuiList;
 
+  mafString    m_Wild;
   mafString    m_Host;
   mafString    m_User;
   mafString    m_Pwd;

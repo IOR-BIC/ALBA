@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 11:37:53 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-05 08:06:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,6 +40,7 @@ mafGUISRBBrowse::mafGUISRBBrowse(mafObserver *listener,const wxString &title, lo
 {
   m_Listener = listener;
   m_DialogStyle = dialogStyle;
+  m_Wild = "";
   mafString msfDir = mafGetApplicationDirectory().c_str();
   msfDir.ParsePathName();
 
@@ -60,6 +61,7 @@ enum REMOTE_FILE_WIDGET_ID
   ID_USER,
   ID_PWD,
   ID_BROWSE_LOCAL_FILE,
+  ID_SEARCH,
 
 };
 //----------------------------------------------------------------------------
@@ -90,6 +92,7 @@ void mafGUISRBBrowse::CreateGui()
   m_Gui->String(ID_HOST,"URL",&m_Host,_("hostname including the protocol: http://..."));
   m_Gui->String(ID_USER,_("user"),&m_User);
   m_Gui->String(ID_PWD,_("pwd"),&m_Pwd,"",false,true);
+  m_Gui->String(ID_SEARCH, _("search :"),&m_Wild);
 
   m_Gui->Divider(2);
 
@@ -124,6 +127,8 @@ void mafGUISRBBrowse::OnEvent(mafEventBase *maf_event)
       case ID_HOST:
       case ID_USER:
       case ID_PWD:
+      case ID_SEARCH:
+        m_Tree->Reset();
         if (!m_Host.IsEmpty() && !m_Pwd.IsEmpty() && !m_Host.IsEmpty())
         {    
           if (RemoteSRBList() == MAF_OK)
@@ -198,7 +203,7 @@ int mafGUISRBBrowse::RemoteSRBList()
   char * port;
   port = "";
   char * server_dn;
-  server_dn = "";
+  server_dn =  "";
 
   _ns1__SrbList srb_listParams;
   
@@ -290,74 +295,80 @@ void mafGUISRBBrowse::CreateTree()
   for (list_Iter = listName.begin(); list_Iter != listName.end(); list_Iter++)
   {
     wxString fileName = *list_Iter;
-    root_id = 1;
-    i = 0;
-    p = 0;
-   
-    posFolder = fileName.Find("/");
-    if (posFolder == -1)
+    if (m_Wild.IsEmpty() || fileName.Contains(m_Wild.GetCStr())==1)
     {
-      posFolderOK = 0;
-    }
-    else
-    {
-      posFolderOK = posFolder;
-    }
-    while(posFolder != -1) 
-    {
-      i++;
-      folder[p] = fileName.Mid(0, (posFolder + 1));
-      fileName = fileName.Mid(posFolder + 1); 
-      if (folder[p] != folderOld[p])
+      root_id = 1;
+      i = 0;
+      p = 0;
+
+      posFolder = fileName.Find("/");
+      if (posFolder == -1)
       {
-        if (p == 0)
+        posFolderOK = 0;
+      }
+      else
+      {
+        posFolderOK = posFolder;
+      }
+      while(posFolder != -1) 
+      {
+        i++;
+        folder[p] = fileName.Mid(0, (posFolder + 1));
+        fileName = fileName.Mid(posFolder + 1); 
+        if (folder[p] != folderOld[p])
         {
-          m_Tree->AddNode(m_NodeCounter, root_id, folder[p]);
-         nodeID[i] = m_NodeCounter;
-        }
-        else
-        {
-          if (newFolder == TRUE)
+          if (p == 0)
           {
-            m_Tree->AddNode(m_NodeCounter, (m_NodeCounter - 1), folder[p]);
+            m_Tree->AddNode(m_NodeCounter, root_id, folder[p]);
+            nodeID[i] = m_NodeCounter;
           }
           else
           {
-            m_Tree->AddNode(m_NodeCounter, nodeID[i-1], folder[p]);
-            nodeID[i] = m_NodeCounter;
+            if (newFolder == TRUE)
+            {
+              m_Tree->AddNode(m_NodeCounter, (m_NodeCounter - 1), folder[p]);
+              nodeID[i] = m_NodeCounter; 
+            }
+            else
+            {
+              m_Tree->AddNode(m_NodeCounter, nodeID[i-1], folder[p]);
+              nodeID[i] = m_NodeCounter;
+            }
           }
+          m_NodeCounter++;
+          newFolder = TRUE;
         }
-        m_NodeCounter++;
-        newFolder = TRUE;
+        else
+        {
+          newFolder = FALSE;
+        }
+        folderOld[p] = folder[p];
+        posFolder = fileName.Find("/");
+        if (posFolder != -1)
+        {
+          posFolderOK = posFolder;
+        }      
+        p++;
+      }
+      if (p==0)
+      {
+        m_Tree->AddNode(m_NodeCounter, root_id, fileName);
       }
       else
       {
-        newFolder = FALSE;
+        if (newFolder == TRUE)
+        {
+          m_Tree->AddNode(m_NodeCounter, (m_NodeCounter - 1), fileName);
+        }
+        else
+        {
+          m_Tree->AddNode(m_NodeCounter, nodeID[i], fileName);
+          int node = nodeID[i];
+        }
       }
-      folderOld[p] = folder[p];
-      posFolder = fileName.Find("/");
-      if (posFolder != -1)
-      {
-        posFolderOK = posFolder;
-      }      
-      p++;
+      m_NodeCounter++;
     }
-    if (p==0)
-    {
-      m_Tree->AddNode(m_NodeCounter, root_id, fileName);
-    }
-    else
-    {
-      if (newFolder == TRUE)
-      {
-        m_Tree->AddNode(m_NodeCounter, (m_NodeCounter - 1), fileName);
-      }
-      else
-      {
-         m_Tree->AddNode(m_NodeCounter, nodeID[i], fileName);
-      }
-    }
-    m_NodeCounter++;
+    
   }
 
   //Set the right icon for folders and files
@@ -368,8 +379,8 @@ void mafGUISRBBrowse::CreateTree()
       m_Tree->SetNodeIcon(i,1);
     }
   }
+  m_Gui->Update();
 }
-
 //----------------------------------------------------------------------------
 void mafGUISRBBrowse::ShowOnlyFolders()
 //----------------------------------------------------------------------------
@@ -379,6 +390,7 @@ void mafGUISRBBrowse::ShowOnlyFolders()
     if (!m_Tree->NodeHasChildren(i))
     {
       m_Tree->DeleteNode(i);
+
     }
   }
 }
