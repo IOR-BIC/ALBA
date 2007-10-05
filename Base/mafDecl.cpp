@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 14:00:45 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-10-05 10:40:14 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,19 @@ mafVmeBaseTypes mafGetBaseType(mafVME* vme)
 	else return VME_GENERIC;
 }
 */
+
+//----------------------------------------------------------------------------
+std::string  mafGetDirName(const char * initial, const char * title, wxWindow *parent)
+//----------------------------------------------------------------------------
+{
+  wxDirDialog dialog(parent, title, initial, wxDD_DEFAULT_STYLE | wxDD_NEW_DIR_BUTTON);
+
+  dialog.SetReturnCode(wxID_OK);
+  int result = dialog.ShowModal();
+  mafYield(); // wait for the dialog to disappear
+  return  (result == wxID_OK) ? dialog.GetPath().c_str() : "";
+}
+
 //----------------------------------------------------------------------------
 std::string mafGetOpenFile(const char *initial, const char * wild, const char * title, wxWindow *parent)
 //----------------------------------------------------------------------------
@@ -70,7 +83,7 @@ std::string mafGetOpenFile(const char *initial, const char * wild, const char * 
   wxString wildcard=wild;
   wildcard+="|All Files (*.*)|*.*";
  
-	wxFileDialog dialog(parent, title, path, name, wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY|wxMULTIPLE);
+	wxFileDialog dialog(parent, title, path, name, wildcard, wxOPEN|wxFILE_MUST_EXIST|wxHIDE_READONLY);
 
   dialog.SetReturnCode(wxID_OK);
 	int result = dialog.ShowModal();

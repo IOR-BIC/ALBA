@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 14:00:45 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-10-05 10:40:14 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -399,6 +399,9 @@ void mafSetFrame(wxWindow* frame);
 
 /** process pending events. be careful not to call it recursively */    
 void mafYield();
+
+/** show the Dir Selection Dialog Box */
+std::string  mafGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box */
 std::string  mafGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
