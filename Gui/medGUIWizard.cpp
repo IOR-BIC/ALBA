@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-25 14:20:27 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-08 16:21:43 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -54,10 +54,9 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Event Table:
 //----------------------------------------------------------------------------
-/*BEGIN_EVENT_TABLE(medGUIWizard, wxWizard)
-EVT_CLOSE(medGUIWizard::nvOnCloseWindow)
-EVT_WIZARD_PAGE_CHANGING(wxID_ANY, medGUIWizard::OnWizardPageChanging)
-END_EVENT_TABLE()*/
+BEGIN_EVENT_TABLE(medGUIWizard, wxWizard)
+	EVT_WIZARD_PAGE_CHANGING(wxID_ANY, medGUIWizard::OnWizardPageChanging)
+END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
 medGUIWizard::medGUIWizard(const wxString& title)
@@ -75,9 +74,11 @@ medGUIWizard::~medGUIWizard()
 //----------------------------------------------------------------------------
 {
 }
+//----------------------------------------------------------------------------
 void medGUIWizard::OnWizardPageChanging(wxWizardEvent& event)
+//----------------------------------------------------------------------------
 {
-	wxMessageBox("prova");
+	mafEventMacro(mafEvent(this,MED_WIZARD_CHANGE_PAGE));
 }
 //--------------------------------------------------------------------------------
 void medGUIWizard::OnEvent(mafEventBase *maf_event)

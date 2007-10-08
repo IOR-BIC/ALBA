@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2007-09-25 14:20:27 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-08 16:21:43 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -74,6 +74,12 @@ public:
 
 	void SetFirstPage(wxWizardPageSimple *firstPage);
 
+	enum ID_MESSAGES
+	{
+		MED_WIZARD_CHANGE_PAGE = MINID,
+		ID_LAST,
+	};
+
 	mafObserver *m_Listener;
 
 private:
@@ -84,6 +90,6 @@ private:
 	void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();}; //calls nvOnCloseWindow
 	void OnWizardPageChanging(wxWizardEvent& event);
 
-	//DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 #endif
