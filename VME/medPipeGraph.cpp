@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 16:44:36 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-08 15:16:41 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,8 @@
 // Failing in doing this will result in a run-time_Array error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+
+#include <vnl/vnl_vector.h>
 
 #include "medPipeGraph.h"
 #include "mafDecl.h"
@@ -84,20 +86,24 @@ void medPipeGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
   int randomColorR, randomColorG, randomColorB;
+  double timeData;
+  int counter = 0;
   Superclass::Create(n);
+
   m_EmgPlot = medVMEEmg::SafeDownCast(m_Vme);
-  m_NumberOfSignals = mafVMEOutputScalar::SafeDownCast(m_EmgPlot->GetOutput())->GetScalarData().columns();
+  m_NumberOfSignals = mafVMEOutputScalar::SafeDownCast(m_EmgPlot->GetOutput())->GetScalarData().rows();
+  m_TimeStamp = mafVMEOutputScalar::SafeDownCast(m_EmgPlot->GetOutput())->GetScalarData().columns();
 
   m_EmgPlot->Update();
-  m_EmgPlot->GetTimeStamps(m_TimeVector);
-  
-  time_Array = vtkDoubleArray::New();
-  
-  mafTimeStamp t;
-  for (t = 0; t < m_TimeVector.size(); t++)
+  m_TimeArray = vtkDoubleArray::New();
+  vnl_vector<double> rowTime = mafVMEOutputScalar::SafeDownCast(m_EmgPlot->GetOutput())->GetScalarData().get_row(0);
+
+  for (int t = 0; t < m_TimeStamp; t++)
   {
-    time_Array->InsertNextValue(m_TimeVector[t]);
-  }  
+   timeData = rowTime.get(t);
+   m_TimeArray->InsertValue(counter,timeData);
+   counter++;
+  } 
 
   vtkNEW(m_PlotActor);
   m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
@@ -141,30 +147,29 @@ void medPipeGraph::Create(mafSceneNode *n)
 void medPipeGraph::UpdateGraph()
 //----------------------------------------------------------------------------
 {
-  mafTimeStamp t;
+  double scalarData;
+  int counter_array = 0;
   vtkDoubleArray *scalar;
+  vnl_vector<double> row;
   m_vtkData.clear();
   scalar_Array.clear();
 
   m_EmgPlot = medVMEEmg::SafeDownCast(m_Vme);
-  int x_dim = m_TimeVector.size(); 
-  
-  int counter_array = 0;
+
   CreateLegend();
 
-  for (int c = 0; c < m_NumberOfSignals ; c++)
+  for (int c = 0; c < (m_NumberOfSignals-1) ; c++)
   {
     if (m_CheckBox->IsItemChecked(c))
     {
       int counter = 0;
-      
       scalar = vtkDoubleArray::New();
-      
-      for (t = 0; t < m_TimeVector.size(); t++)
+      row = mafVMEOutputScalar::SafeDownCast(m_EmgPlot->GetOutput())->GetScalarData().get_row(c+1);
+   
+      for (int t = 0; t < m_TimeStamp; t++)
       { 
-        m_EmgPlot->SetTimeStamp(m_TimeVector[t]);
-        double scalar_data = m_EmgPlot->GetScalarOutput()->GetScalarData().get(0,c);
-        scalar->InsertValue(counter,scalar_data);
+        scalarData = row.get(t);
+        scalar->InsertValue(counter,scalarData);
         counter++;
       }
       scalar_Array.push_back(scalar);
@@ -172,8 +177,8 @@ void medPipeGraph::UpdateGraph()
       vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
 
-      rect_grid->SetDimensions(x_dim, 1, 1);
-      rect_grid->SetXCoordinates(time_Array); 
+      rect_grid->SetDimensions(m_TimeStamp, 1, 1);
+      rect_grid->SetXCoordinates(m_TimeArray); 
       rect_grid->GetPointData()->SetScalars(scalar_Array.at(counter_array));
       
       m_vtkData.push_back(rect_grid);
@@ -182,8 +187,9 @@ void medPipeGraph::UpdateGraph()
     }    
   }
 
+  row.clear();
   double times_range[2];
-  time_Array->GetRange(times_range);
+  m_TimeArray->GetRange(times_range);
 
   double data_range[2];
   for (unsigned long i = 0; i < m_vtkData.size(); i++)
@@ -221,7 +227,7 @@ void medPipeGraph::CreateLegend()
 {
   int counter_legend = 0;
   mafString name; 
-  for (int c = 0; c < m_NumberOfSignals ; c++)
+  for (int c = 0; c < (m_NumberOfSignals - 1) ; c++)
   {
     if (m_CheckBox->IsItemChecked(c))
     {
@@ -263,7 +269,7 @@ mmgGui* medPipeGraph::CreateGui()
   }
 
   mafTagItem *tag_Signals = m_Vme->GetTagArray()->GetTag("SIGNALS_NAME");
-  for (int n = 1; n <= m_NumberOfSignals; n++)
+  for (int n = 1; n < m_NumberOfSignals; n++)
   {
     if (tagPresent)
     {

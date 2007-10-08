@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 16:44:36 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-08 15:16:41 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,6 +79,7 @@ private:
   int				m_Xlabel;
   int				m_Ylabel;
   int       m_NumberOfSignals;
+  int       m_TimeStamp;
   long      m_ItemId;
 
   mafString   m_ItemName;
@@ -89,7 +90,7 @@ private:
 
   std::vector<vtkDoubleArray*> scalar_Array;
  
-  vtkDoubleArray      *time_Array;
+  vtkDoubleArray      *m_TimeArray;
   std::vector<mafTimeStamp> m_TimeVector;  
 
   medVMEEmg      *m_EmgPlot;
