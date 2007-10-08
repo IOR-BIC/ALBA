@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-08 13:48:54 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-08 15:15:37 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -139,7 +139,7 @@ void mmoEMGImporterWS::Read()
   } while (!inputFile.Eof());
 
   vnl_matrix<double> emgMatrix;
-  emgMatrix.set_size(rowNumber - 1, num_tk);
+  emgMatrix.set_size(rowNumber-1 , num_tk);
 
   wxFileInputStream inputFile1( m_File );
   wxTextInputStream text1( inputFile1 );
@@ -151,13 +151,13 @@ void mmoEMGImporterWS::Read()
   line = text1.ReadLine();
   line.Replace(","," ");
   
-  for (int n = 1; n < rowNumber; n++)
+  for (int n = 0; n < rowNumber-1; n++)
   {
     i = 0;
     space = line.Find(' ');
     frame = line.SubString(0,space - 1);
     emg_time = atof(frame)/freq_val; 
-    emgMatrix.put(n-1,i, emg_time); //Add scalar value to the vnl_matrix
+    emgMatrix.put(n,i, emg_time); //Add scalar value to the vnl_matrix
 
     wxStringTokenizer tkz(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
     tkz.GetNextToken(); //To skip the time value
@@ -168,7 +168,7 @@ void mmoEMGImporterWS::Read()
       scalar = tkz.GetNextToken();
       val_scalar = atof(scalar);
     
-      emgMatrix.put(n-1,i,val_scalar); //Add scalar value to the vnl_matrix 
+      emgMatrix.put(n,i,val_scalar); //Add scalar value to the vnl_matrix 
     }
     line = text1.ReadLine();
     line.Replace(","," ");
