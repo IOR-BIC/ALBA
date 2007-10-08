@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-16 09:57:15 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-08 13:48:54 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,7 +59,6 @@ public:
 
 protected:
   medVMEEmg *m_EmgScalar;
-  vnl_matrix<double> m_EmgMatrix;
   wxString m_FileDir;
 	wxString m_File;
 };

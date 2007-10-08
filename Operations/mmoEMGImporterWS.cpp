@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 16:26:33 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-08 13:48:54 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,9 +23,10 @@
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
-
-#include "medVMEEmg.h"
 #include "mmgGui.h"
+
+#include "mafTagArray.h"
+#include "medVMEEmg.h"
 
 #include <iostream>
 
@@ -46,18 +47,14 @@ mmoEMGImporterWS::~mmoEMGImporterWS()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_EmgScalar);
-  m_EmgMatrix.clear();
 }
 //----------------------------------------------------------------------------
 mafOp* mmoEMGImporterWS::Copy()   
 //----------------------------------------------------------------------------
 {
 	mmoEMGImporterWS *cp = new mmoEMGImporterWS(m_Label);
-	cp->m_Canundo = m_Canundo;
-	cp->m_OpType = m_OpType;
-	cp->m_Listener = m_Listener;
-
 	cp->m_File = m_File;
+  cp->m_FileDir = m_FileDir;
 	return cp;
 }
 //----------------------------------------------------------------------------
@@ -94,8 +91,9 @@ void mmoEMGImporterWS::Read()
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
 
+  m_EmgScalar->GetTagArray()->SetTag(tag_Nature);
+
   mafString time, scalar;
-   
   wxFileInputStream inputFile( m_File );
   wxTextInputStream text( inputFile );
 
@@ -103,7 +101,14 @@ void mmoEMGImporterWS::Read()
   double val_scalar;
   wxString line;
 
+  //check if file starts with the string "ANALOG"
   line = text.ReadLine(); 
+  if (line.CompareTo("ANALOG")!= 0)
+  {
+    mafErrorMessage("Invalid file format!");
+    return;
+  }
+ 
   line = text.ReadLine();
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
@@ -113,45 +118,65 @@ void mmoEMGImporterWS::Read()
   line = text.ReadLine();
   line = text.ReadLine();
   line = text.ReadLine();
-  line.Replace(","," ");
 
   int space, num_tk;
   unsigned i;
+  unsigned c = 0;
+  int rowNumber = 0;
   wxString frame;
 
-  do 
+  do  
   {
+    line = text.ReadLine();
+    rowNumber++;
+
+    if (rowNumber == 10)
+    {
+      line.Replace(","," ");
+      wxStringTokenizer tkzCols(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
+      num_tk = tkzCols.CountTokens();  
+    }
+  } while (!inputFile.Eof());
+
+  vnl_matrix<double> emgMatrix;
+  emgMatrix.set_size(rowNumber - 1, num_tk);
+
+  wxFileInputStream inputFile1( m_File );
+  wxTextInputStream text1( inputFile1 );
+  
+  line = text1.ReadLine();
+  line = text1.ReadLine();
+  line = text1.ReadLine();
+  line = text1.ReadLine();
+  line = text1.ReadLine();
+  line.Replace(","," ");
+  
+  for (int n = 1; n < rowNumber; n++)
+  {
+    i = 0;
     space = line.Find(' ');
     frame = line.SubString(0,space - 1);
     emg_time = atof(frame)/freq_val; 
+    emgMatrix.put(n-1,i, emg_time); //Add scalar value to the vnl_matrix
+
     wxStringTokenizer tkz(line,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-
     tkz.GetNextToken(); //To skip the time value
-    num_tk = tkz.CountTokens();  
-   
-    if (num_tk > 0)
+
+    while (tkz.HasMoreTokens())
     {
-      m_EmgMatrix.set_size(1, num_tk);
-      
-      i = 0;
+      i++;
+      scalar = tkz.GetNextToken();
+      val_scalar = atof(scalar);
     
-      while (tkz.HasMoreTokens())
-      {
-        scalar = tkz.GetNextToken();
-        val_scalar = atof(scalar);
-       
-        m_EmgMatrix.put(0,i,val_scalar); //Add scalar value to the vnl_matrix
-
-        i++;     
-      }
-    
-      m_EmgScalar->SetData(m_EmgMatrix, emg_time);
+      emgMatrix.put(n-1,i,val_scalar); //Add scalar value to the vnl_matrix 
     }
-      
-    line = text.ReadLine();
+    line = text1.ReadLine();
     line.Replace(","," ");
+  }
 
-  } while (!inputFile.Eof());
+  vnl_matrix<double> emgMatrixTranspose = emgMatrix.transpose();
+
+  m_EmgScalar->SetData(emgMatrixTranspose, 0);
 
   m_Output = m_EmgScalar;
 }
