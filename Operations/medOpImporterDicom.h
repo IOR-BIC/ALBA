@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-09-27 10:49:40 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-10-08 16:21:02 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -58,6 +58,7 @@ class mafString;
 class mafTagArray;
 class mafVMEImage;
 class mafVMEVolumeGray;
+class mmgCheckListBox;
 class vtkDicomUnPacker;
 class vtkDirectory;
 class vtkWindowLevelLookupTable;
@@ -148,9 +149,14 @@ protected:
 
 	void EnableTimeSlider(bool enable);
 
+	/** Return if a particolar type of Dicom is Enabled to be read */
+	bool EnableToRead(char* type);
+
 	void CameraUpdate();
 
 	void CameraReset();
+
+	void OnWizardPageChanging(){};
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkDicomUnPacker	*m_DicomReader;
@@ -161,7 +167,7 @@ protected:
 	vtkActor					*m_SliceActor;
 	vtkPlaneSource		*m_CropPlane;
 	vtkActor					*m_CropActor;
-	vtkActor					*m_SliceCroppedActor;
+	vtkActor					*m_SliceActorInCropPage;
 
 	mmiDICOMImporterInteractor *m_DicomInteractor;
 
@@ -190,6 +196,7 @@ protected:
 
 	mafString	m_CurrentSliceName;
 	mafString	m_VolumeName;
+	int				m_VolumeSide;
 
 	int				 m_NumberOfStudy; ///<Number of study present in the DICOM directory
 	int				 m_NumberOfSlices;
@@ -199,7 +206,6 @@ protected:
 	wxSlider		 *m_SliceScannerLoadPage;
 	wxSlider		 *m_SliceScannerCropPage;
 	wxSlider		 *m_SliceScannerBuildPage;
-
 
 	wxStaticText *txt;
 
@@ -221,6 +227,8 @@ protected:
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
 
+	mmgCheckListBox *m_DicomModalityListBox;
+
 	~medOpImporterDicom();
 };
 
@@ -238,17 +246,17 @@ public:
 		m_Pos[2] = -9999;
 		m_ImageNumber = -1;
 		m_TriggerTime = -1.0;
-		m_CardiacNumberOfImages = -1;
+		m_NumberOfImages = -1;
 	};
 
-	medImporterDICOMListElement(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
+	medImporterDICOMListElement(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceFilename = filename;
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
 		m_ImageNumber = imageNumber;
-		m_CardiacNumberOfImages = cardNumImages;
+		m_NumberOfImages = numberOfImages;
 		m_TriggerTime = trigTime;
 		vtkNEW(m_Data);
 		m_Data->DeepCopy(data);
@@ -257,14 +265,14 @@ public:
 	~medImporterDICOMListElement() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
-	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0) 
+	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
 	{
 		m_SliceFilename = filename; 
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
 		m_ImageNumber = imageNumber;
-		m_CardiacNumberOfImages = cardNumImages;
+		m_NumberOfImages = numberOfImages;
 		m_TriggerTime = trigTime;
 	};
 
@@ -278,7 +286,7 @@ public:
 	int GetImageNumber() const {return m_ImageNumber;};
 
 	/** Return the image number of the dicom slice*/
-	int GetCardiacNumberOfImages() const {return m_CardiacNumberOfImages;};
+	int GetNumberOfImages() const {return m_NumberOfImages;};
 
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
@@ -293,7 +301,7 @@ protected:
 
 	double m_TriggerTime;
 	int m_ImageNumber;
-	int m_CardiacNumberOfImages;
+	int m_NumberOfImages;
 
 	vtkImageData *m_Data;
 
