@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:48:43 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-08 15:28:45 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -443,16 +443,19 @@ int mafVMEItemScalar::InternalStoreData(const char *url)
       item.SetComponent(c,1);
       m_TagArray->SetTag(item);
 
-      unsigned data_size = data.size();
-      double *s = new double[data_size];
-      data.copy_out(s);
-      m_DataString << s[0];
+      //unsigned data_size = data.size();
+      //double *s = new double[data_size];
+      //data.copy_out(s);
+      vcl_stringstream data_stream;
+      data.print(data_stream);
+      m_DataString = data_stream.str().c_str();
+      /*m_DataString << s[0];
       for (int i = 1; i < data_size; i++)
       {
         m_DataString << " ";
         m_DataString << s[i];
-      }
-      delete s;
+      }*/
+      //delete s;
 
       if ( m_IOMode == MEMORY)
       {
