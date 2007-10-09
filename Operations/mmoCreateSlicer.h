@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-09 11:28:36 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -14,7 +14,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __mmoCreateSlicer_H__
 
 #include "mafOp.h"
-
+#include "mafVMEVolume.h"
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -37,6 +37,8 @@ public:
   bool Accept(mafNode *node);
   void OpRun();
   void OpDo();
+
+  static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
 
 protected: 
   mafVMESlicer *m_Slicer;

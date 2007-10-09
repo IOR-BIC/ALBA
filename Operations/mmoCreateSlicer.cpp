@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-09 11:28:36 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,16 +59,34 @@ mafOp* mmoCreateSlicer::Copy()
 bool mmoCreateSlicer::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  return (node != NULL && node->IsMAFType(mafVMEVolume));
+  return (node != NULL);
 }
 //----------------------------------------------------------------------------
 void mmoCreateSlicer::OpRun()
 //----------------------------------------------------------------------------
 {
-  mafNEW(m_Slicer);
-  m_Slicer->SetName("slicer");
-  m_Output = m_Slicer;
-  mafEventMacro(mafEvent(this,OP_RUN_OK));
+  
+  
+  mafString title = _("Choose VME to slice");
+  mafEvent *e; e = new mafEvent();
+  e->SetId(VME_CHOOSE);
+  e->SetArg((long)&mmoCreateSlicer::VolumeAccept);
+  e->SetString(&title);
+  mafEventMacro(*e);
+
+
+  mafNode *n = e->GetVme();
+  if (n != NULL)
+  {
+		mafNEW(m_Slicer);
+		m_Slicer->SetName("slicer");
+		m_Output = m_Slicer;
+
+    m_Slicer->SetSlicedVMELink(n);
+    mafEventMacro(mafEvent(this,OP_RUN_OK));
+  }
+  else
+    mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
 }
 //----------------------------------------------------------------------------
 void mmoCreateSlicer::OpDo()
@@ -78,6 +96,8 @@ void mmoCreateSlicer::OpDo()
   double center[3], rot[3];
   mafOBB b;
   rot[0] = rot[1] = rot[2] = 0;
+  /*((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+  b.GetCenter(center);*/
   ((mafVME *)m_Input)->GetOutput()->GetVMELocalBounds(b);
   b.GetCenter(center);
   m_Slicer->SetPose(center,rot,0);
