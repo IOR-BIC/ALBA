@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:25:46 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-09 15:29:18 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,6 +46,7 @@ mafAttachCamera::mafAttachCamera(wxWindow* parent, mafRWI *rwi, mafObserver *Lis
   
   m_AttachedVme       = NULL;
   m_AttachedVmeMatrix = NULL;
+  vtkNEW(m_StartingMatrix);
 
 	CreateGui();
 }
@@ -54,6 +55,7 @@ mafAttachCamera::~mafAttachCamera()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_AttachedVmeMatrix);
+  vtkDEL(m_StartingMatrix);
   if (m_AttachedVme)
   {
     m_AttachedVme->GetEventSource()->RemoveObserver(this);
@@ -147,20 +149,24 @@ void mafAttachCamera::SetVme(mafNode *node)
     vtkNEW(m_AttachedVmeMatrix);
   }
   m_AttachedVme = mafVME::SafeDownCast(node);
-  vtkMatrix4x4 *matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
-  m_AttachedVmeMatrix->DeepCopy(matrix);
-
+  //vtkMatrix4x4 *matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
+  m_AttachedVmeMatrix->DeepCopy(m_StartingMatrix);
 
   vtkMAFSmartPointer<vtkTransform> delta;
   delta->PreMultiply();
-  delta->Concatenate(matrix);
+  delta->Concatenate(m_StartingMatrix);
 
   m_Rwi->m_Camera->ApplyTransform(delta);
 
-  
-  
   m_Rwi->CameraUpdate();
   m_AttachedVme->GetEventSource()->AddObserver(this);
+}
+//----------------------------------------------------------------------------
+void mafAttachCamera::SetStartingMatrix(mafMatrix *matrix)
+//----------------------------------------------------------------------------
+{
+  if(matrix)
+    m_StartingMatrix->DeepCopy(matrix->GetVTKMatrix());
 }
 //----------------------------------------------------------------------------
 void mafAttachCamera::UpdateCameraMatrix()
