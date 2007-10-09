@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 09:31:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-09 14:23:34 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@
 #include "mafGuiTransformMouse.h"
 #include "mafGuiSaveRestorePose.h"
 #include "mafGuiTransformTextEntries.h"
+#include "mafVMELandmark.h"
 
 #include "mmiGenericMouse.h"
 
@@ -166,7 +167,13 @@ void medOpMove::OnEvent(mafEventBase *maf_event)
   {
     // if no one can handle this event send it to the operation listener
     mafEventMacro(*maf_event); 
-  }	
+  }
+
+  if(mafVMELandmark *landmark = mafVMELandmark::SafeDownCast(m_Input)) 
+  {
+    landmark->Modified();
+    landmark->Update();
+  }
 }
 	  
 //----------------------------------------------------------------------------
