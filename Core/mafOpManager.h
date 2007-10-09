@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 15:59:44 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-10-09 10:11:46 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,8 @@ class mafOpPaste;
 class mafOpTransform;
 class vtkMatrix4x4;
 class mmdMouse;
+class mafGUISettings;
+class mmgSettingsDialog;
 
 //----------------------------------------------------------------------------
 // mafOpManager :
@@ -53,10 +55,13 @@ public:
   MAF_ID_DEC(RUN_OPERATION_EVENT)
 
 	/** Add the operation 'op' to the list of available operations. */
-	virtual void OpAdd(mafOp *op, wxString menuPath = "", bool can_undo = true);
+	virtual void OpAdd(mafOp *op, wxString menuPath = "", bool can_undo = true, mafGUISettings *setting = NULL);
 
 	/** Fill the application men with the operations name.	*/
 	virtual void FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations);
+
+  /** Fill the setting dialog with the settings associated to the plugged operations.*/
+  void FillSettingDialog(mmgSettingsDialog *settingDialog);
 
 	/** Record the selected vme and enable the menu_entries relative to the compatible operations. */
 	virtual void VmeSelected(mafNode* v);
@@ -158,9 +163,9 @@ protected:
 	wxMenu            *m_Menu[3]; ///< Array of pointers to the menù 'Operations', 'Importer' and 'Exporter'
   mafNode						*m_Selected; ///< Pointer to the current selected node.
 
-	mafOp             *m_OpList[MAXOP]; ///< List of pointer of plugged operations.
+  std::vector<mafOp *> m_OpList; ///< List of pointer of plugged operations.
   int                m_NumOp; ///< Number of plugged operations.
-  wxAcceleratorEntry m_OpAccelEntries[MAXOP];
+  wxAcceleratorEntry m_OpAccelEntries[MAXOP]; ///< List of Accelerators for menu items.
   int                m_NumOfAccelerators;
 
   void *m_OpParameters; ///< Pointer to the operation's parameter list.

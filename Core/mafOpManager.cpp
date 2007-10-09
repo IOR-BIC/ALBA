@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 08:46:07 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-10-09 10:11:46 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,9 +26,11 @@
 #include "mafDecl.h"
 #include "mafOp.h"
 #include "mmgGui.h"
+#include "mafGUISettings.h"
 #include "mafOpStack.h"
 #include "mafOpContextStack.h"
 #include "mafOpSelect.h"
+#include "mmgSettingsDialog.h"
 
 #include "mmdMouse.h"
 
@@ -78,7 +80,6 @@ mafOpManager::mafOpManager()
   m_RemoteListener = NULL;
   m_RunningOp = NULL;
 	m_Selected	= NULL;
-	//m_Warn			= false;
   m_Warn			= true;
   m_FromRemote= false;
 
@@ -101,8 +102,7 @@ mafOpManager::mafOpManager()
 
   m_NumOfAccelerators = 0;
   m_NumOp = 0;
-	for(int i=0; i<MAXOP; i++ ) 
-    m_OpList[i] = NULL;
+  m_OpList.clear();
 }
 //----------------------------------------------------------------------------
 mafOpManager::~mafOpManager()
@@ -112,7 +112,16 @@ mafOpManager::~mafOpManager()
   m_Context.Clear();
   m_OpCut->ClipboardClear();
 
-  for(int i=0; i<m_NumOp; i++) delete m_OpList[i];
+  for(int i = 0; i < m_NumOp; i++)
+  {
+    mafGUISettings *s = m_OpList[i]->GetSetting();
+    if (s != NULL)
+    {
+      delete s;
+    }
+    delete m_OpList[i];
+  }
+  m_OpList.clear();
 
   cppDEL(m_OpSelect);
   cppDEL(m_OpCut);
@@ -173,15 +182,18 @@ void mafOpManager::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo)
+void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo, mafGUISettings *setting)
 //----------------------------------------------------------------------------
 {
-  assert(m_NumOp < MAXOP);
-  m_OpList[m_NumOp] = op;
+  m_OpList.push_back(op);
   op->m_OpMenuPath = menuPath;
 	op->m_Id = m_NumOp + OP_USER;
   op->SetListener(this);
   op->SetCanundo(can_undo);
+  if (setting != NULL)
+  {
+    op->SetSetting(setting);
+  }
   m_NumOp++;
 }
 //----------------------------------------------------------------------------
@@ -230,7 +242,21 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo)
     mafGetFrame()->SetAcceleratorTable(accel);
 }*/
 //----------------------------------------------------------------------------
-void mafOpManager::FillMenu (wxMenu* import, wxMenu* mexport, wxMenu* operations)
+void mafOpManager::FillSettingDialog(mmgSettingsDialog *settingDialog)
+//----------------------------------------------------------------------------
+{
+  for(int i=0; i<m_NumOp; i++)
+  {
+    mafOp *o = m_OpList[i];
+    mafGUISettings *setting = o->GetSetting();
+    if (setting != NULL)
+    {
+      settingDialog->AddPage(setting->GetGui(), setting->GetLabel());
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mafOpManager::FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations)
 //----------------------------------------------------------------------------
 {
   int submenu_id = 1;
@@ -413,7 +439,7 @@ void mafOpManager::EnableOp(bool CanEnable)
 
 		  for(int i=0; i<m_NumOp; i++)
 		  {
-        mafOp *o = m_OpList[i]; 
+        mafOp *o = m_OpList[i];
         if(m_MenuBar->FindItem(o->m_Id))
           m_MenuBar->Enable(o->m_Id,false); 
       }
@@ -559,13 +585,19 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
 
 	m_RunningOp = op->Copy();
   m_RunningOp->m_Id = op->m_Id;    //Paolo 15/09/2004 The operation ID is not copied from the Copy() method.
-	m_RunningOp->SetListener(this);
+	m_RunningOp->SetSetting(op->GetSetting());
+  m_RunningOp->SetListener(this);
 	m_RunningOp->SetInput(m_Selected);
   m_RunningOp->SetMouse(m_Mouse);
   m_RunningOp->Collaborate(m_CollaborateStatus);
   if (op_param != NULL)
   {
     m_RunningOp->SetParameters(op_param);
+  }
+  mafGUISettings *settings = m_RunningOp->GetSetting();
+  if (settings != NULL)
+  {
+    settings->SetListener(m_RunningOp);
   }
 
   Notify(OP_RUN_STARTING);  //SIL. 17-9-2004: - moved here in order to notify which op is started
