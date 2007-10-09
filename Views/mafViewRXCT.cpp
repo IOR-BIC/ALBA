@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-25 16:06:40 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-10-09 14:25:20 $
+  Version:   $Revision: 1.34 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -673,6 +673,8 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);
 }

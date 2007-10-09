@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 12:40:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-09 14:25:20 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -149,10 +149,11 @@ void mafViewSingleSliceCompound::PackageView()
 {
 	m_ViewSingleSlice = new mafViewSingleSlice("",CAMERA_CT);
 	m_ViewSingleSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
-	//m_ViewSingleSlice->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
+	m_ViewSingleSlice->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
   m_ViewSingleSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEMesh","mafPipeMeshSlice");
+  m_ViewSingleSlice->PlugVisualPipe("mafVMEMeter","mafPipePolylineSlice");
 	
 	PlugChildView(m_ViewSingleSlice);
 }
