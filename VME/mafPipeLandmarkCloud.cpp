@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-25 11:38:16 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-09 11:29:24 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,7 +143,7 @@ mmgGui *mafPipeLandmarkCloud::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = new mmgGui(this);
-	if(m_Landmark)
+	if(m_Vme && m_Vme->IsMAFType(mafVMELandmarkCloud))
 	{
 		
 		m_Gui->Bool(ID_SCALAR_VISIBILITY,_("scalar vis."), &m_ScalarVisibility,0,_("turn on/off the scalar visibility"));
@@ -190,7 +190,7 @@ void mafPipeLandmarkCloud::OnEvent(mafEventBase *maf_event)
     {
       case ID_SCALAR_VISIBILITY:
       {
-        m_CloudMapper->SetScalarVisibility(m_ScalarVisibility);
+        if(m_CloudMapper) m_CloudMapper->SetScalarVisibility(m_ScalarVisibility);
         if (m_ScalarVisibility)
         {
           vtkPolyData *data = (vtkPolyData *)m_Vme->GetOutput()->GetVTKData();
