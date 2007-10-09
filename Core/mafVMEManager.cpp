@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 10:57:28 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2007-10-09 11:24:47 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -66,6 +66,8 @@ mafVMEManager::mafVMEManager()
   m_SingleBinaryFile = false;
 
   m_Config = wxConfigBase::Get();
+  m_ZipHandler = NULL;
+  m_FileSystem = NULL;
 }
 //----------------------------------------------------------------------------
 mafVMEManager::~mafVMEManager()
@@ -75,6 +77,9 @@ mafVMEManager::~mafVMEManager()
     NotifyRemove( m_Storage->GetRoot() ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
 
   m_Listener = NULL;
+  m_FileSystem->CleanUpHandlers();
+  cppDEL(m_FileSystem);
+  
   mafDEL(m_Storage);
   cppDEL(m_Config);
 }
@@ -379,20 +384,24 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   wxString header_name = complete_name + pkg;
   int length_header_name = header_name.Length();
   bool enable_mid = false;
-  wxFileSystem *zip_fs = new wxFileSystem();
-  zip_fs->AddHandler(new wxZipFSHandler);
-  zip_fs->ChangePathTo(m_ZipFile.GetCStr());
+  if(m_FileSystem == NULL)m_FileSystem = new wxFileSystem();
+  if(m_ZipHandler == NULL)
+  {
+    m_ZipHandler = new wxZipFSHandler();
+    m_FileSystem->AddHandler(m_ZipHandler);
+  }
+  
+  m_FileSystem->ChangePathTo(m_ZipFile.GetCStr());
   // extract filename from the zip archive
-  zfile = zip_fs->FindFirst(complete_name+pkg+name+"\\*.*");
+  zfile = m_FileSystem->FindFirst(complete_name+pkg+name+"\\*.*");
   if (zfile == "")
   {
     enable_mid = true;
-    zfile = zip_fs->FindFirst(complete_name+pkg+"\\*.*");
+    zfile = m_FileSystem->FindFirst(complete_name+pkg+"\\*.*");
   }
   if (zfile == "")
   {
-    zip_fs->CleanUpHandlers();
-    cppDEL(zip_fs);
+    
     RemoveTempDirectory();
     return "";
   }
@@ -400,11 +409,9 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   complete_name = name + "." + ext;
   if (enable_mid)
     complete_name = complete_name.Mid(length_header_name);
-  zfileStream = zip_fs->OpenFile(zfile);
+  zfileStream = m_FileSystem->OpenFile(zfile);
   if (zfileStream == NULL)
   {
-    zip_fs->CleanUpHandlers();
-    cppDEL(zip_fs);
     RemoveTempDirectory();
     return "";
   }
@@ -433,13 +440,11 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
   zfileStream->UnRef();
   delete zfileStream;
 
-  while ((zfile = zip_fs->FindNext()) != "")
+  while ((zfile = m_FileSystem->FindNext()) != "")
   {
-    zfileStream = zip_fs->OpenFile(zfile);
+    zfileStream = m_FileSystem->OpenFile(zfile);
     if (zfileStream == NULL)
     {
-      zip_fs->CleanUpHandlers();
-      cppDEL(zip_fs);
       RemoveTempDirectory();
       return "";
     }
@@ -466,9 +471,8 @@ const char *mafVMEManager::ZIPOpen(mafString filename)
     delete zfileStream;
   }
   
-  zip_fs->ChangePathTo(m_TmpDir.GetCStr(), TRUE);
-  zip_fs->CleanUpHandlers();
-  cppDEL(zip_fs);
+  m_FileSystem->ChangePathTo(m_TmpDir.GetCStr(), TRUE);
+
   
   if (m_MSFFile == "")
   {

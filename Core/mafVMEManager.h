@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 10:57:11 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-10-09 11:24:47 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,6 +24,8 @@
 // Forward References :
 //----------------------------------------------------------------------------
 class mafVMEStorage;
+class wxZipFSHandler;
+class wxFileSystem;
 
 //----------------------------------------------------------------------------
 // mafVMEManager :
@@ -146,6 +148,8 @@ protected:
 
   mafObserver*      m_Listener;
   wxConfigBase*     m_Config;
+  wxZipFSHandler    *m_ZipHandler;
+  wxFileSystem      *m_FileSystem;
   mmgFileHistory	  m_FileHistory;
   int               m_FileHistoryIdx;
 
