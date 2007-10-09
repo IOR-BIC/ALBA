@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-10-09 11:31:18 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include "mafVME.h"
 #include "mafVMEOutputPolyline.h"
+#include "mafVMEVolumeGray.h"
 #include "mafEvent.h"
 
 //----------------------------------------------------------------------------
@@ -26,6 +27,11 @@ class mmaMaterial;
 class vtkLineSource;
 class vtkLineSource;
 class vtkAppendPolyData;
+
+class vtkXYPlotActor;
+class mafRWI;
+class mmgDialogPreview;
+
 
 /** mafVMEMeter - 
 */
@@ -62,11 +68,14 @@ public:
     ID_START_METER_LINK = Superclass::ID_LAST,
     ID_END1_METER_LINK,
     ID_END2_METER_LINK,
+    ID_PLOTTED_VME_LINK,
 	  ID_METER_MODE,
+    ID_PLOT_PROFILE,
     ID_LAST
   };
 
   static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
+  static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolumeGray));};
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -212,13 +221,30 @@ public:
   mafVME *GetStartVME();
   mafVME *GetEnd1VME();
   mafVME *GetEnd2VME();
+  mafVME *GetPlottedVME();
 
   /** 
   Set links for the meter*/
   void SetMeterLink(const char *link_name, mafNode *n);
 
+  /** 
+  Set link for plot a vme*/
+  void SetPlottedLink(mafNode *n);
+
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
+
+  /** 
+  Turn On/Off the creation of the histogram.*/
+  void GenerateHistogram(int generate);
+
+  /** 
+  Turn On the generation of the histogram from the measured line. It force the measure to be on DISTANCE_BETWEEN_POINTS.*/
+  void GenerateHistogramOn() {GenerateHistogram(1);};
+
+  /** 
+  Turn Off the generation of the histogram.*/
+  void GenerateHistogramOff() {GenerateHistogram(0);};
 
 protected:
   mafVMEMeter();
@@ -239,6 +265,10 @@ protected:
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
 
+  /** 
+  Create the histogram*/
+  void CreateHistogram();
+
   double m_Distance;
   double m_Angle;
   double m_StartPoint[3];
@@ -250,11 +280,22 @@ protected:
   vtkLineSource     *m_LineSource;
   vtkLineSource     *m_LineSource2;
   vtkAppendPolyData *m_Goniometer;
+  vtkPolyData       *m_PolyData;
   mafTransform      *m_TmpTransform;
 
   mafString m_StartVmeName;
   mafString m_EndVme1Name;
   mafString m_EndVme2Name;
+  mafString m_ProbeVmeName;
+
+  vtkLineSource       *m_ProbingLine;
+
+  mmgDialogPreview  *m_HistogramDialog;
+  mafRWI    *m_HistogramRWI;
+  vtkXYPlotActor *m_PlotActor;
+
+  int m_GenerateHistogram;
+  mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
 
 private:
   mafVMEMeter(const mafVMEMeter&); // Not implemented

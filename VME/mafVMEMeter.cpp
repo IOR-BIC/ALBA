@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 10:52:05 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-10-09 11:31:18 $
+  Version:   $Revision: 1.30 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,9 @@
 #include "mmuIdFactory.h"
 #include "mmgGui.h"
 #include "mafAbsMatrixPipe.h"
+#include "vtkMAFSmartPointer.h"
+#include "mafRWI.h"
+#include "mmgDialogPreview.h"
 
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
@@ -41,6 +44,13 @@
 #include "vtkLine.h"
 #include "vtkLineSource.h"
 #include "vtkAppendPolyData.h"
+#include "vtkProbeFilter.h"
+#include "vtkXYPlotActor.h"
+#include "vtkTextProperty.h"
+#include "vtkProperty2D.h"
+#include "vtkRenderer.h"
+#include "vtkTransform.h"
+#include "vtkCellArray.h"
 
 #include <assert.h>
 
@@ -60,6 +70,7 @@ mafVMEMeter::mafVMEMeter()
   m_StartVmeName  = "";
   m_EndVme1Name   = "";
   m_EndVme2Name   = "";
+  m_ProbeVmeName   = "";
   
   mafNEW(m_Transform);
   mafVMEOutputMeter *output = mafVMEOutputMeter::New(); // an output with no data
@@ -69,6 +80,8 @@ mafVMEMeter::mafVMEMeter()
   vtkNEW(m_LineSource);
   vtkNEW(m_LineSource2);
   vtkNEW(m_Goniometer);
+  vtkNEW(m_PolyData);
+  
 
   m_Goniometer->AddInput(m_LineSource->GetOutput());
   m_Goniometer->AddInput(m_LineSource2->GetOutput());
@@ -81,7 +94,56 @@ mafVMEMeter::mafVMEMeter()
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
   SetDataPipe(dpipe);
-  dpipe->SetInput(m_Goniometer->GetOutput());
+  dpipe->SetInput(m_PolyData);
+
+  // histogram
+  // Probing tool
+  vtkNEW(m_ProbingLine);
+  m_ProbingLine->SetResolution(512);
+
+  m_ProbedVME = NULL;
+
+  mafString plot_title = _("Density vs. Length (mm)");
+  mafString plot_titleX = "mm";
+  mafString plot_titleY = _("Dens.");
+  vtkNEW(m_PlotActor);
+  m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
+  m_PlotActor->GetProperty()->SetLineWidth(2);
+  m_PlotActor->SetPosition(0.03,0.03);
+  m_PlotActor->SetPosition2(0.9,0.9);
+  m_PlotActor->SetLabelFormat("%g");
+  m_PlotActor->SetXRange(0,300);
+  m_PlotActor->SetPlotCoordinate(0,300);
+  m_PlotActor->SetNumberOfXLabels(10);
+  m_PlotActor->SetXValuesToIndex();
+  m_PlotActor->SetTitle(plot_title);
+  m_PlotActor->SetXTitle(plot_titleX);
+  m_PlotActor->SetYTitle(plot_titleY);
+  vtkTextProperty* tprop = m_PlotActor->GetTitleTextProperty();
+  tprop->SetColor(0.02,0.06,0.62);
+  tprop->SetFontFamilyToArial();
+  tprop->ItalicOff();
+  tprop->BoldOff();
+  tprop->SetFontSize(12);
+  m_PlotActor->SetPlotColor(0,.8,.3,.3);
+
+  // Histogram dialog
+  int width = 400;
+  int height = 300;
+  int x_init,y_init;
+  x_init = mafGetFrame()->GetPosition().x;
+  y_init = mafGetFrame()->GetPosition().y;
+  m_HistogramDialog = new mmgDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
+  m_HistogramRWI = m_HistogramDialog->GetRWI();
+  m_HistogramRWI->SetListener(this);
+  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
+  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
+  m_HistogramRWI->SetSize(0,0,width,height);
+
+  m_HistogramDialog->SetSize(x_init,y_init,width,height);
+  m_HistogramDialog->Show(FALSE);
+
+  m_GenerateHistogram = 0;
 }
 //-------------------------------------------------------------------------
 mafVMEMeter::~mafVMEMeter()
@@ -92,7 +154,13 @@ mafVMEMeter::~mafVMEMeter()
   vtkDEL(m_LineSource2);
   vtkDEL(m_Goniometer);
   mafDEL(m_TmpTransform);
+  vtkDEL(m_PolyData);
   SetOutput(NULL);
+
+  m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  vtkDEL(m_PlotActor);
+  vtkDEL(m_ProbingLine);
+  cppDEL(m_HistogramDialog);
 }
 //-------------------------------------------------------------------------
 int mafVMEMeter::DeepCopy(mafNode *a)
@@ -116,6 +184,10 @@ int mafVMEMeter::DeepCopy(mafNode *a)
     {
       this->SetLink("EndVME2", linked_node);
     }
+    if (linked_node)
+    {
+      this->SetLink("PlottedVME", linked_node);
+    }
     m_Transform->SetMatrix(meter->m_Transform->GetMatrix());
 
     mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
@@ -138,7 +210,8 @@ bool mafVMEMeter::Equals(mafVME *vme)
     ret = m_Transform->GetMatrix() == ((mafVMEMeter *)vme)->m_Transform->GetMatrix() && \
           GetLink("StartVME") == ((mafVMEMeter *)vme)->GetLink("StartVME") && \
           GetLink("EndVME1") == ((mafVMEMeter *)vme)->GetLink("EndVME1") && \
-          GetLink("EndVME2") == ((mafVMEMeter *)vme)->GetLink("EndVME2");
+          GetLink("EndVME2") == ((mafVMEMeter *)vme)->GetLink("EndVME2") && \
+          GetLink("PlottedVME") == ((mafVMEMeter *)vme)->GetLink("EndVME2");
   }
   return ret;
 }
@@ -284,6 +357,8 @@ void mafVMEMeter::InternalUpdate()
       m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
       m_LineSource->Update();
       m_Goniometer->Modified();
+
+      GenerateHistogram(m_GenerateHistogram);
     }
     else
       m_Distance = -1;
@@ -540,6 +615,26 @@ void mafVMEMeter::InternalUpdate()
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
       m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
   }
+
+  m_Goniometer->Update();
+  vtkPolyData *polydata = m_Goniometer->GetOutput();
+  int num = m_Goniometer->GetOutput()->GetNumberOfPoints();
+  int pointId[2];
+  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  for(int i = 0; i< num;i++)
+  {
+    if (i > 0)
+    {             
+      pointId[0] = i - 1;
+      pointId[1] = i;
+      cellArray->InsertNextCell(2 , pointId);  
+    }
+  }
+
+  m_PolyData->SetPoints(m_Goniometer->GetOutput()->GetPoints());
+  m_PolyData->SetLines(cellArray);
+  m_PolyData->Update();
+
 }
 //-----------------------------------------------------------------------
 int mafVMEMeter::InternalStore(mafStorageElement *parent)
@@ -778,6 +873,16 @@ mmgGui* mafVMEMeter::CreateGui()
   if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
     m_Gui->Enable(ID_END2_METER_LINK,false);
 
+  m_Gui->Bool(ID_PLOT_PROFILE,_("plot profile"),&m_GenerateHistogram);
+  m_Gui->Enable(ID_PLOT_PROFILE,GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
+
+  mafVME *probedVme = GetPlottedVME();
+  m_ProbedVME = probedVme;
+  m_ProbeVmeName = probedVme ? probedVme->GetName() : _("none");
+  m_Gui->Button(ID_PLOTTED_VME_LINK,&m_ProbeVmeName,_("Probed"), _("Select the vme that will be plotted"));
+  m_Gui->Enable(ID_PLOTTED_VME_LINK, GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
+  
+
 	m_Gui->Divider();
 	m_Gui->Divider();
 
@@ -828,6 +933,26 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
+      case ID_PLOTTED_VME_LINK:
+        {
+          mafID button_id = e->GetId();
+          mafString title = _("Choose meter vme link");
+          e->SetId(VME_CHOOSE);
+          e->SetArg((long)&mafVMEMeter::VolumeAccept);
+          e->SetString(&title);
+          ForwardUpEvent(e);
+          mafNode *n = e->GetVme();
+          if (n != NULL)
+          {
+            SetPlottedLink(n);
+            m_ProbedVME = mafVME::SafeDownCast(n);
+            m_ProbeVmeName = n->GetName();
+            CreateHistogram();
+          }
+          m_Gui->Update();
+          
+        }
+        break;
 	  case ID_METER_MODE:
 	  {
 		  if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
@@ -842,6 +967,8 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
 		  {       
 			  m_Gui->Enable(ID_END2_METER_LINK,true);
 		  }
+      m_Gui->Enable(ID_PLOT_PROFILE,GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
+      m_Gui->Enable(ID_PLOTTED_VME_LINK, GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
       this->Modified();
       mafID button_id = e->GetId();
       e->SetId(CAMERA_UPDATE);
@@ -849,6 +976,11 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
      
 	  }
 	  break;
+    case ID_PLOT_PROFILE:
+      {
+        GenerateHistogram(m_GenerateHistogram);
+      }
+      break;
       default:
         mafNode::OnEvent(maf_event);
     }
@@ -870,6 +1002,12 @@ void mafVMEMeter::SetMeterLink(const char *link_name, mafNode *n)
     SetLink(link_name, n);
 }
 //-------------------------------------------------------------------------
+void mafVMEMeter::SetPlottedLink(mafNode *n)
+//-------------------------------------------------------------------------
+{
+  SetLink("PlottedVME", n);
+}
+//-------------------------------------------------------------------------
 mafVME *mafVMEMeter::GetStartVME()
 //-------------------------------------------------------------------------
 {
@@ -886,4 +1024,110 @@ mafVME *mafVMEMeter::GetEnd2VME()
 //-------------------------------------------------------------------------
 {
   return mafVME::SafeDownCast(GetLink("EndVME2"));
+}
+//-------------------------------------------------------------------------
+mafVME *mafVMEMeter::GetPlottedVME()
+//-------------------------------------------------------------------------
+{
+  return mafVME::SafeDownCast(GetLink("PlottedVME"));
+}
+//----------------------------------------------------------------------------
+void mafVMEMeter::GenerateHistogram(int generate)
+//----------------------------------------------------------------------------
+{
+  m_GenerateHistogram = generate;
+  if (m_GenerateHistogram)
+  {
+    CreateHistogram();
+    m_HistogramRWI->m_RwiBase->Render();
+  }
+  m_HistogramDialog->Show(m_GenerateHistogram);
+}
+//----------------------------------------------------------------------------
+void mafVMEMeter::CreateHistogram()
+//----------------------------------------------------------------------------
+{
+  if (m_ProbedVME != NULL)
+  {
+    vtkDataSet *probed_data = m_ProbedVME->GetOutput()->GetVTKData();
+    probed_data->Update();
+
+    vtkMAFSmartPointer<vtkTransform> transformStart;
+    mafVME *start_vme = GetStartVME();
+    mafMatrix *matrixStart = start_vme->GetOutput()->GetMatrix();
+    double point1[3], rotStart[3];
+
+    if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
+    {
+      int sub_id = GetLinkSubId("StartVME");
+      ((mafVMELandmark *)((mafVMELandmarkCloud *)start_vme)->GetChild(sub_id))->GetOutput()->GetAbsPose(point1, rotStart);
+      
+    }
+    else
+    {
+      point1[0] = m_StartPoint[0];
+      point1[1] = m_StartPoint[1];
+      point1[2] = m_StartPoint[2];
+    }
+
+    vtkMAFSmartPointer<vtkTransform> transformEnd;
+   
+    mafVME *end_vme1 = GetEnd1VME();
+    mafMatrix *matrixEnd1 = end_vme1->GetOutput()->GetMatrix();
+
+    double point2[3], rotEnd[3];
+    if (end_vme1 && end_vme1->IsMAFType(mafVMELandmarkCloud))
+    {
+      int sub_id = GetLinkSubId("EndVME1");
+      ((mafVMELandmark *)((mafVMELandmarkCloud *)end_vme1)->GetChild(sub_id))->GetOutput()->GetAbsPose(point2, rotEnd);
+
+    }
+    else
+    {   
+      
+      point2[0] = m_EndPoint[0];
+      point2[1] = m_EndPoint[1];
+      point2[2] = m_EndPoint[2];
+    }
+
+    m_PlotActor->SetXRange(0,m_Distance);
+    m_PlotActor->SetPlotCoordinate(0,m_Distance);
+
+    double b[6];
+    m_ProbedVME->GetOutput()->GetBounds(b);
+
+    /*if(tmp1[0] < b[0]) tmp1[0] = b[0];
+    else if (tmp1[0] > b[1]) tmp1[0] = b[1];
+
+    if(tmp1[1] < b[2]) tmp1[1] = b[2];
+    else if (tmp1[1] > b[3]) tmp1[1] = b[3];
+
+    if(tmp1[2] < b[4]) tmp1[2] = b[4];
+    else if (tmp1[2] > b[5]) tmp1[2] = b[5];
+
+    if(tmp2[0] < b[0]) tmp2[0] = b[0];
+    else if (tmp2[0] > b[1]) tmp2[0] = b[1];
+
+    if(tmp2[1] < b[2]) tmp2[1] = b[2];
+    else if (tmp2[1] > b[3]) tmp2[1] = b[3];
+
+    if(tmp2[2] < b[4]) tmp2[2] = b[4];
+    else if (tmp2[2] > b[5]) tmp2[2] = b[5];*/
+
+    m_ProbingLine->SetPoint1(point1);
+    m_ProbingLine->SetPoint2(point2);
+    m_ProbingLine->SetResolution((int)m_Distance);
+    m_ProbingLine->Update();
+
+    vtkMAFSmartPointer<vtkProbeFilter> prober;
+    prober->SetInput(m_ProbingLine->GetOutput());
+    prober->SetSource(probed_data);
+    prober->Update();
+
+    m_PlotActor->RemoveAllInputs();
+
+    vtkPolyData *probimg_result = prober->GetPolyDataOutput();
+    m_PlotActor->AddInput(probimg_result);
+    m_HistogramRWI->m_RwiBase->Render();
+  }
 }
