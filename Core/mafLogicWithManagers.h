@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-28 15:03:10 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-10-09 10:13:00 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,6 +37,7 @@ class mafRemoteLogic;
 class mmdMouse;
 class mmgSettingsDialog;
 class mmgApplicationLayoutSettings;
+class mafGUISettings;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -94,7 +95,7 @@ public:
 
   /**  Plug a new operation and its undo flag: if the operation does not support
   undo the undo flag has no effect */
-	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true);
+	virtual void Plug(mafOp *op, wxString menuPath = "", bool canUndo = true, mafGUISettings *setting = NULL);
 	
   /** Configure the application.
   At this point are plugged all the managers, the side-bar docking panel. 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 15:49:23 $
-  Version:   $Revision: 1.112 $
+  Date:      $Date: 2007-10-09 10:13:00 $
+  Version:   $Revision: 1.113 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -207,15 +207,15 @@ void mafLogicWithManagers::Configure()
 #endif
 
   // Fill the SettingsDialog
-  m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), _("Application Settings"));
-  m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), _("Storage Settings"));
+  m_SettingsDialog->AddPage( m_ApplicationSettings->GetGui(), m_ApplicationSettings->GetLabel());
+  m_SettingsDialog->AddPage( m_StorageSettings->GetGui(), m_StorageSettings->GetLabel());
 
   if (m_ViewManager)
   {
     m_ApplicationLayoutSettings = new mmgApplicationLayoutSettings(this);
     m_ApplicationLayoutSettings->SetViewManager(m_ViewManager);
     m_ApplicationLayoutSettings->SetApplicationFrame(m_Win);
-    m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), _("Application Layout"));
+    m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), m_ApplicationLayoutSettings->GetLabel());
   }
 
   m_SettingsDialog->AddPage( m_Win->GetDockSettingGui(), _("User Interface Preferences"));
@@ -226,10 +226,10 @@ void mafLogicWithManagers::Configure()
     m_SettingsDialog->AddPage(m_InteractionManager->GetGui(), _("Interaction Manager"));
 #endif    
   if(m_LocaleSettings)
-    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), _("Interface language"));
+    m_SettingsDialog->AddPage(m_LocaleSettings->GetGui(), m_LocaleSettings->GetLabel());
 
   if (m_MeasureUnitSettings)
-    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), _("Measure Unit"));
+    m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), m_MeasureUnitSettings->GetLabel());
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view, bool visibleInMenu)
@@ -239,12 +239,12 @@ void mafLogicWithManagers::Plug(mafView* view, bool visibleInMenu)
     m_ViewManager->ViewAdd(view, visibleInMenu);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath, bool canUndo)
+void mafLogicWithManagers::Plug(mafOp *op, wxString menuPath, bool canUndo, mafGUISettings *setting)
 //----------------------------------------------------------------------------
 {
   if(m_OpManager) 
   {
-    m_OpManager->OpAdd(op, menuPath, canUndo);
+    m_OpManager->OpAdd(op, menuPath, canUndo, setting);
     
 // currently mafInteraction is strictly dependent on VTK
 #ifdef MAF_USE_VTK    
@@ -330,6 +330,8 @@ void mafLogicWithManagers::Init(int argc, char **argv)
   }
   if (m_OpManager)
   {
+    m_OpManager->FillSettingDialog(m_SettingsDialog);
+
     if(argc > 1 )
     {
       mafString op_type = argv[1];
@@ -1603,19 +1605,21 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
   if (ext == "vtk")
   {
     mmoVTKImporter *vtkImporter = new mmoVTKImporter("importer");
+    vtkImporter->SetInput(m_VMEManager->GetRoot());
     vtkImporter->SetListener(m_OpManager);
     vtkImporter->SetFileName(filename.GetCStr());
     vtkImporter->ImportVTK();
-    vtkImporter->GetOutput()->ReparentTo(m_VMEManager->GetRoot());
+    vtkImporter->OpDo();
     cppDEL(vtkImporter);
   }
   else if (ext == "stl")
   {
     mmoSTLImporter *stlImporter = new mmoSTLImporter("importer");
+    stlImporter->SetInput(m_VMEManager->GetRoot());
     stlImporter->SetListener(m_OpManager);
     stlImporter->SetFileName(filename.GetCStr());
     stlImporter->ImportSTL();
-    stlImporter->GetOutput()->ReparentTo(m_VMEManager->GetRoot());
+    stlImporter->OpDo();
     cppDEL(stlImporter);
   }
   else
