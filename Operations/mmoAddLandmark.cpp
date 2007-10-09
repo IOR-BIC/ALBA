@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-27 11:05:21 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-09 11:26:10 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -283,6 +283,7 @@ void mmoAddLandmark::OnEvent(mafEventBase *maf_event)
           {
             pts->GetPoint(0,m_LandmarkPosition);
             AddLandmark(m_LandmarkPosition);
+            m_Dict->SetCloud(m_Cloud);
             m_Gui->Update();
           }
         }
