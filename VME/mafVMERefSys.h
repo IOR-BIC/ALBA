@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-09 11:31:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -153,7 +153,7 @@ protected:
 
   double m_ScaleFactor;
 
-	int                       m_Fixed;
+	//int                       m_Fixed;
 
   mafTransform *m_Transform; ///< pose matrix for the slicer plane
 
