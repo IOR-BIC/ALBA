@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-09 10:13:25 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,16 +45,17 @@ mafOp(label)
 {
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
-  m_File    = "";
-  m_ImportedSTL = NULL;
-  m_Swap    = 0;
+  //m_File    = "";
+  //m_ImportedSTL = NULL;
+  //m_Swap    = 0;
   m_FileDir = mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mmoSTLImporter::~mmoSTLImporter( ) 
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_ImportedSTL);
+  for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
+    mafDEL(m_ImportedSTLs[i]);
 }
 //----------------------------------------------------------------------------
 bool mmoSTLImporter::Accept(mafNode *node)
@@ -67,7 +68,7 @@ mafOp* mmoSTLImporter::Copy()
 //----------------------------------------------------------------------------
 {
   mmoSTLImporter *cp = new mmoSTLImporter(m_Label);
-  cp->m_File = m_File;
+  cp->m_Files = m_Files;
   return cp;
 }
 //----------------------------------------------------------------------------
@@ -75,27 +76,35 @@ void mmoSTLImporter::OpRun()
 //----------------------------------------------------------------------------
 {
 	mafString wildc = "Stereo Litography (*.stl)|*.stl";
+  std::vector<std::string> files;
 	mafString f;
   
-  if (m_File.IsEmpty())
+  m_Files.clear();
+  mafGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.GetCStr(), files);
+  for(unsigned i = 0; i < files.size(); i++)
   {
-    f = mafGetOpenFile(m_FileDir.GetCStr(),wildc.GetCStr()).c_str(); 	
-    m_File = f;
+    f = files[i].c_str();
+    m_Files.push_back(f);
   }
 	
 	int result = OP_RUN_CANCEL;
 
-	if(!m_File.IsEmpty()) 
+	if(m_Files.size() != 0) 
 	{
 		result = OP_RUN_OK;
-    CheckSwap(m_File.GetCStr());
+    m_Swaps.resize(m_Files.size());
+    for(unsigned i = 0; i < m_Swaps.size(); i++)
+    {
+      m_Swaps[i] = 0;
+      CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
+    }
     ImportSTL();
 	}
 
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoSTLImporter::CheckSwap(const char *file_name)
+void mmoSTLImporter::CheckSwap(const char *file_name, int &swapFlag)
 //----------------------------------------------------------------------------
 {
   //check if the file is binary
@@ -139,10 +148,39 @@ void mmoSTLImporter::CheckSwap(const char *file_name)
     f_in.close();
     if ((j-1) != number)
     {
-      m_Swap = 1;
+      swapFlag = 1;
     }
   }
 }
+//----------------------------------------------------------------------------
+void mmoSTLImporter::OpDo()   
+//----------------------------------------------------------------------------
+{
+  for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
+  {
+    if (m_ImportedSTLs[i])
+    {
+      m_ImportedSTLs[i]->ReparentTo(m_Input);
+      //mafEventMacro(mafEvent(this, VME_ADD, m_ImportedSTLs[i]));
+    }
+  }
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+void mmoSTLImporter::OpUndo()   
+//----------------------------------------------------------------------------
+{
+  for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
+  {
+    if (m_ImportedSTLs[i])
+    {
+      mafEventMacro(mafEvent(this, VME_REMOVE, m_ImportedSTLs[i]));
+    }
+  }
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+
 //----------------------------------------------------------------------------
 void mmoSTLImporter::ImportSTL()
 //----------------------------------------------------------------------------
@@ -151,95 +189,98 @@ void mmoSTLImporter::ImportSTL()
   {
     wxBusyInfo wait("Loading file: ...");  
   }
-	
-  if (m_Swap != 0)
-	{ //swapping the file
-		mafString swapped;				
-		std::ifstream f_in;
-		f_in.open (m_File.GetCStr(), ifstream::in| ifstream::binary);
-		int dot_pos = m_File.FindLastChr('.');
-    swapped.NCopy(m_File.GetCStr(),dot_pos);
-		swapped = swapped + "_swapped";
-		swapped = swapped + ".stl";
-		std::ofstream f_out;
-		f_out.open(swapped.GetCStr(), ofstream::out | ofstream::binary);
-		
-		char ch;
-		unsigned int number = 0, v = 0;
-		//reading the header and copying it without swapping
-    int i;
-		for (i = 0; i< 80; i++)
-		{
-			f_in.read (&ch,1);
-			f_out.write(&ch,1);
-		} 
-			
-		//copying and swapping the integer representing the number of polygons	
-		f_in.read ((char*) &number,4);
-		Swap_Four(&number);
-		f_out.write((char*) &number,4);
 
-		int j = 0;
-		while (!f_in.eof()) 
-		{
-			for (i = 0; i < 12; i++)
-			{
-				if (!f_in.eof())
-				{
-					f_in.read ((char*) &v,4);
-					Swap_Four(&v);
-					f_out.write((char*) &v,4);
-				}
-			}
-			if (!f_in.eof())
-			{
-				f_in.read (&ch,1);
-				f_out.write(&ch,1);
+  unsigned int i;
+  for(i = 0; i < m_ImportedSTLs.size(); i++)
+    mafDEL(m_ImportedSTLs[i]);
+  m_ImportedSTLs.clear();
 
-				f_in.read (&ch,1);
-				f_out.write(&ch,1);
-			}
-			j++;
-		} 							
-		f_out.close();
-		f_in.close();		
-		m_File = swapped;
-	}
+  for(unsigned kk = 0; kk < m_Files.size(); kk++)
+  {
+    mafString fn;
+    fn = m_Files[kk];
+    if (m_Swaps[kk] != 0)
+	  { //swapping the file
+		  std::ifstream f_in;
+      mafString swapped;				
+		  f_in.open (m_Files[kk].GetCStr(), ifstream::in| ifstream::binary);
+		  int dot_pos = m_Files[kk].FindLastChr('.');
+      swapped.NCopy(m_Files[kk].GetCStr(),dot_pos);
+		  swapped = swapped + "_swapped";
+		  swapped = swapped + ".stl";
+		  std::ofstream f_out;
+		  f_out.open(swapped.GetCStr(), ofstream::out | ofstream::binary);
+  		
+		  char ch;
+		  unsigned int number = 0, v = 0;
+		  //reading the header and copying it without swapping
+		  for (i = 0; i < 80; i++)
+		  {
+			  f_in.read (&ch,1);
+			  f_out.write(&ch,1);
+		  } 
+  			
+		  //copying and swapping the integer representing the number of polygons	
+		  f_in.read ((char*) &number,4);
+		  Swap_Four(&number);
+		  f_out.write((char*) &number,4);
 
-	vtkMAFSmartPointer<vtkSTLReader> reader;
-	mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
-	reader->SetFileName(m_File);
-	reader->Update();
+		  int j = 0;
+		  while (!f_in.eof()) 
+		  {
+			  for (i = 0; i < 12; i++)
+			  {
+				  if (!f_in.eof())
+				  {
+					  f_in.read ((char*) &v,4);
+					  Swap_Four(&v);
+					  f_out.write((char*) &v,4);
+				  }
+			  }
+			  if (!f_in.eof())
+			  {
+				  f_in.read (&ch,1);
+				  f_out.write(&ch,1);
 
-  wxString path, name, ext;
-  wxSplitPath(m_File.GetCStr(),&path,&name,&ext);
+				  f_in.read (&ch,1);
+				  f_out.write(&ch,1);
+			  }
+			  j++;
+		  } 							
+		  f_out.close();
+		  f_in.close();		
+		  fn = swapped;
+	  }
 
-  mafNEW(m_ImportedSTL);
-  m_ImportedSTL->SetName(name);
-	m_ImportedSTL->SetDataByDetaching(reader->GetOutput(),0);
+	  vtkMAFSmartPointer<vtkSTLReader> reader;
+	  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
+    reader->SetFileName(fn);
+	  reader->Update();
 
-  mafTagItem tag_Nature;
-  tag_Nature.SetName("VME_NATURE");
-  tag_Nature.SetValue("NATURAL");
-  m_ImportedSTL->GetTagArray()->SetTag(tag_Nature);
+    wxString path, name, ext;
+    wxSplitPath(fn.GetCStr(),&path,&name,&ext);
 
-	//delete the swapped file
-	if (m_Swap != 0)
-	{
-		const char* file_name = (m_File);
-		remove(file_name);
-	}
-  m_Output = m_ImportedSTL;
-}
-//----------------------------------------------------------------------------
-void mmoSTLImporter::OpStop(int result)
-//----------------------------------------------------------------------------
-{
-	mafEventMacro(mafEvent(this,result));  	   
+    mafVMESurface *importedSTL;
+    mafNEW(importedSTL);
+    importedSTL->SetName(name);
+	  importedSTL->SetDataByDetaching(reader->GetOutput(),0);
+
+    mafTagItem tag_Nature;
+    tag_Nature.SetName("VME_NATURE");
+    tag_Nature.SetValue("NATURAL");
+    importedSTL->GetTagArray()->SetTag(tag_Nature);
+
+	  //delete the swapped file
+	  if (m_Swaps[kk] != 0)
+	  {
+		  const char* file_name = (fn);
+		  remove(file_name);
+	  }
+    m_ImportedSTLs.push_back(importedSTL);
+  }
 }
 //----------------------------------------------------------------------------
 void mmoSTLImporter::Swap_Four(unsigned int *value)
-/**  */
 //----------------------------------------------------------------------------
 { 
 	unsigned int r; 
@@ -279,5 +320,12 @@ bool mmoSTLImporter::IsFileBinary(const char *name_file)
 void mmoSTLImporter::SetFileName(const char *file_name)
 //----------------------------------------------------------------------------
 {
-  m_File = file_name;
+  m_Files.resize(1);
+  m_Files[0] = file_name;
+  m_Swaps.resize(m_Files.size());
+  for(unsigned i = 0; i < m_Swaps.size(); i++)
+  {
+    m_Swaps[i] = 0;
+    CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
+  }
 }

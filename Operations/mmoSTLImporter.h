@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-09 10:13:25 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafOp.h"
 #include "mafString.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -49,7 +50,13 @@ public:
   /** Builds operation's interface. */
 	void OpRun();
 
-	/** Import the file. */
+  /** Makes the undo for the operation. */
+  void OpUndo();
+
+  /** Execute the operation. */
+  void OpDo();
+
+  /** Import the file. */
 	void ImportSTL();
 
 protected:
@@ -59,15 +66,12 @@ protected:
   /** Byte swapping of a 4-byte value */
   void Swap_Four(unsigned int *value);
 
-  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-  void OpStop(int result);
-
   /** Check if the binary stl needs to be swapped. */
-  void CheckSwap(const char *file_name);
+  void CheckSwap(const char *file_name, int &swapFlag);
 
-	mafVMESurface *m_ImportedSTL;
-  mafString	m_File;
-	mafString	m_FileDir;
-	int			  m_Swap;	
+  std::vector<mafVMESurface*> m_ImportedSTLs;
+  std::vector<mafString>	    m_Files;
+	mafString	                  m_FileDir;
+  std::vector<int>            m_Swaps;	
 };
 #endif
