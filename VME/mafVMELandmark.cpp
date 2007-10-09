@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-10-09 11:30:08 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -381,6 +381,20 @@ void mafVMELandmark::SetTimeStamp(mafTimeStamp t)
   m_Position[0] = wxString::Format("x: %f",xyz[0]);
   m_Position[1] = wxString::Format("y: %f",xyz[1]);
   m_Position[2] = wxString::Format("z: %f",xyz[2]);
+  if(m_Gui)
+    m_Gui->Update();
+}
+//-------------------------------------------------------------------------
+void mafVMELandmark::InternalUpdate()
+//-------------------------------------------------------------------------
+{
+  double xyz[3],rxyz[3];
+  this->GetOutput()->GetAbsPose(xyz,rxyz);
+
+  m_Position[0] = wxString::Format("x: %f",xyz[0]);
+  m_Position[1] = wxString::Format("y: %f",xyz[1]);
+  m_Position[2] = wxString::Format("z: %f",xyz[2]);
+
   if(m_Gui)
     m_Gui->Update();
 }

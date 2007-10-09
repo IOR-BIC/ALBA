@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-24 13:52:27 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-10-09 11:30:08 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -120,6 +120,9 @@ protected:
 
   /** called to prepare the update of the output */
   virtual void InternalPreUpdate();
+
+  /** called to update of the output */
+  virtual void InternalUpdate();
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
