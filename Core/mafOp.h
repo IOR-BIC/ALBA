@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 14:51:19 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-10-09 10:10:18 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,7 @@ class mafNode;
 class mmgGui;
 class mmgGuiHolder;
 class mmdMouse;
+class mafGUISettings;
 //----------------------------------------------------------------------------
 // constants :
 //----------------------------------------------------------------------------
@@ -145,6 +146,12 @@ public:
   /** Return the Canundo flag for the operation.*/
   bool GetCanundo() {return m_Canundo;};
 
+  /** Set the reference to the operation's setting panel.*/
+  void SetSetting(mafGUISettings *setting) {m_SettingPanel = setting;};
+
+  /** Get the reference to the operation's setting panel.*/
+  mafGUISettings *GetSetting() {return m_SettingPanel;};
+
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   virtual void OpStop(int result);
@@ -159,6 +166,7 @@ protected:
 	mafObserver    *m_Listener;
   mmdMouse       *m_Mouse;
   bool            m_CollaborateStatus;
+  mafGUISettings *m_SettingPanel;
   bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.
 };
 #endif
