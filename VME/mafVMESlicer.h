@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:37:43 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-09 11:31:50 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVME.h"
+#include "mafVMEVolume.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -38,6 +39,12 @@ public:
 
   mafTypeMacro(mafVMESlicer,mafVME);
 
+  enum SLICER_WIDGET_ID
+  {
+    ID_VOLUME_LINK = Superclass::ID_LAST,
+    ID_LAST
+  };
+
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
 
@@ -46,6 +53,9 @@ public:
 
   /** Compare with another VME-Slicer. */
   virtual bool Equals(mafVME *vme);
+
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** return the right type of output */  
   mafVMEOutputSurface *GetSurfaceOutput();
@@ -78,9 +88,20 @@ public:
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();
 
+  /** Set the link to the slicer.*/
+  void SetSlicedVMELink(mafNode *node);
+
+  /** Get the link to the slicing vme.*/
+  mafNode *GetSlicedVMELink();
+
+  static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
+
 protected:
   mafVMESlicer();
   virtual ~mafVMESlicer();
+
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mmgGui *CreateGui();
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
@@ -91,12 +112,15 @@ protected:
   /** update the output data structure */
   virtual void InternalUpdate();
 
+	mafTransform*     m_CopyTransform; ///< pose matrix for the slicer plane
   mafTransform*     m_Transform; ///< pose matrix for the slicer plane
   vtkVolumeSlicer*  m_PSlicer;  ///< slicer object used to extract the cut contour
   vtkVolumeSlicer*  m_ISlicer;  ///< slicer object used to compute the slice image
 
   vtkTransformPolyDataFilter *m_BackTransform;
+  //vtkTransformPolyDataFilter *m_BackTransformParent;
 
+  mafString         m_SlicedName;
   int               m_TextureRes;
   double            m_Xspc;
   double            m_Yspc;
