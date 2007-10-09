@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 11:40:34 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-10-09 11:30:29 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEOutputLandmarkCloud.h"
 #include "mmgGui.h"
 #include "mmaMaterial.h"
+#include "mafNodeIterator.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
@@ -1205,10 +1206,38 @@ void mafVMELandmarkCloud::OnEvent(mafEventBase *maf_event)
         }
         else
         {
-          this->Close();
+          bool existLandmarkChild = false;
+          mafNodeIterator *iter = this->NewIterator();
+          for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+          {
+            if(node->GetParent() != this && node != this)
+            {
+              existLandmarkChild= true;
+            }
+          }
+          iter->Delete();
+
+          if(existLandmarkChild)
+          {
+            int answer = wxMessageBox
+              (
+              _("Warning: Collapsing LandmarkCloud will erase all landmark's childs"),
+              _("Confirm"), 
+              wxYES_NO|wxICON_EXCLAMATION , NULL
+              );
+            if(answer == wxYES) 
+              this->Close();
+            else
+              m_CloudStateCheckbox = OPEN_CLOUD;
+          }
+          else
+            this->Close();
+          
         }
         m_Gui->Enable(ID_LM_RADIUS, m_CloudStateCheckbox == 0);
         m_Gui->Enable(ID_LM_SPHERE_RESOLUTION, m_CloudStateCheckbox == 0);
+
+        m_Gui->Update();
 
         mafEvent ev(this,VME_SELECTED,this);
         this->ForwardUpEvent(&ev);
