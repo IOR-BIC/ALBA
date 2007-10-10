@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 09:28:05 $
-  Version:   $Revision: 1.4 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2007-10-10 11:02:20 $
+  Version:   $Revision: 1.5 $
+  Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -97,7 +97,6 @@ medViewSlicer::medViewSlicer(wxString label, bool show_ruler)
 	m_ViewArbitrary = NULL;
 	m_ViewSlice = NULL;
 
-	m_MatrixReset = NULL;
 	m_CurrentVolume = NULL;
 	m_CurrentSlicer = NULL;
 	
@@ -121,7 +120,6 @@ medViewSlicer::medViewSlicer(wxString label, bool show_ruler)
 medViewSlicer::~medViewSlicer()
 //----------------------------------------------------------------------------
 {
-	m_MatrixReset = NULL;
 	m_CurrentVolume = NULL;
 	m_ColorLUT = NULL;
 
@@ -156,91 +154,19 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
 	{
 		if(Vme->IsA("mafVMEVolumeGray"))
 		{
-			double sr[2],SliceCenterVolumeReset[3];
 			mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(Vme);
 			m_CurrentVolume = Volume;
 
 			// get the VTK volume
       vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
-      data->Update();
-			//Get center of Volume to can the reset
-			data->GetCenter(SliceCenterVolumeReset);
-			//Get scalar range of the volume
-			data->GetScalarRange(sr);
-			data=NULL;
-
-			mafTransform::GetOrientation(Vme->GetAbsMatrixPipe()->GetMatrix(),m_SliceAngleReset);
-
-			//Compute the center of Volume in absolute coordinate, to center the surface and gizmo
-			vtkPoints *pts;
-			vtkNEW(pts);
-			pts->InsertNextPoint(SliceCenterVolumeReset);
-			vtkPolyData *pd=vtkPolyData::New();
-			pd->SetPoints(pts);
-			vtkTransform *transform;
-			vtkNEW(transform);
-			transform->Identity();
-			transform->SetMatrix(Vme->GetOutput()->GetMatrix()->GetVTKMatrix());
-			transform->Update();
-			vtkTransformPolyDataFilter *filter;
-			vtkNEW(filter);
-			filter->SetInput(pd);
-			filter->SetTransform(transform);
-			filter->Update();
-      filter->GetOutput()->GetCenter(m_SliceCenterSurface);
-			filter->GetOutput()->GetCenter(m_SliceCenterSurfaceReset);
-
-			//((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->ApplyTransform(transform);
-		
-			//Create a matrix to permit the reset of the gizmos
-			vtkTransform *TransformReset;
-			vtkNEW(TransformReset);
-			TransformReset->Identity();
-			TransformReset->Translate(m_SliceCenterSurfaceReset);
-			TransformReset->RotateX(m_SliceAngleReset[0]);
-			TransformReset->RotateY(m_SliceAngleReset[1]);
-			TransformReset->RotateZ(m_SliceAngleReset[2]);
-			TransformReset->Update();
-			mafNEW(m_MatrixReset);
-			m_MatrixReset->Identity();
-			m_MatrixReset->SetVTKMatrix(TransformReset->GetMatrix());
-
-      /*mafPipeSurfaceTextured *pArb=(mafPipeSurfaceTextured *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
-      pArb->SetActorPicking(false);
-      pArb->SetEnableActorLOD(0);
-      mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
-      pSli->SetActorPicking(false);
-      pSli->SetEnableActorLOD(0);*/
-	
-			vtkDEL(pts);
-			vtkDEL(pd);
-			vtkDEL(transform);
-			vtkDEL(filter);
-			vtkDEL(TransformReset);
+      data->Update();	
 		}
 		else if(Vme->IsA("mafVMESurface") || Vme->IsA("mafVMESurfaceParametric"))
 		{
 			//a surface is visible only if there is a volume in the view
 			if(m_CurrentVolume)
 			{
-
-				double normal[3];
-				((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-
-				mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(node));
-				//PipeArbitraryViewSurface->SetSlice(m_SliceCenterSurface);
-				//PipeArbitraryViewSurface->SetNormal(normal);
-				mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
-
-        double surfaceOriginTranslated[3];
-
-        surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
-		    surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
-		    surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
-
-				PipeSliceViewSurface->SetSlice(surfaceOriginTranslated);
-				PipeSliceViewSurface->SetNormal(normal);
-				//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        CameraUpdate();
 			}
 		}
     else if(Vme->IsA("mafVMESlicer"))
@@ -248,7 +174,7 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
       //Show Slicer
       m_CurrentSlicer = mafVMESlicer::SafeDownCast(node);
       double sr[2];
-      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetParent());
+      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetSlicedVMELink());
       if(vol)
       {
         vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
@@ -265,43 +191,16 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
       //Set camera of slice view in way that it will follow the volume
       if(!m_AttachCamera)
         m_AttachCamera=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
+      m_AttachCamera->SetStartingMatrix(m_CurrentSlicer->GetOutput()->GetAbsMatrix());
       m_AttachCamera->SetVme(m_CurrentSlicer);
       ((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentSlicer);
-     
-
-      /*m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_CurrentSlicer, show);
-      m_ChildViewList[SLICE_VIEW]->VmeShow(m_CurrentSlicer, show);*/
     }
 	}
 	else//if show=false
 	{
-		//m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
-		//m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
-
+		
 		if(Vme->IsA("mafVMEVolumeGray"))
-		{
-			//this->GetSceneGraph()->VmeRemove(m_Slicer);
-
-			
-			mafDEL(m_MatrixReset);
-
-			//find if some surfaces are show , if yes show off
-			/*mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
-			{
-			 if(Inode->IsA("mafVMESurface") || Inode->IsA("mafVMESurfaceParametric"))
-				{
-					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(Inode));
-					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(Inode));
-					if(PipeSliceViewSurface && PipeArbitraryViewSurface)
-					{
-						//mafEventMacro(mafEvent(this, VME_SHOW, Inode, false));
-					}
-				}
-			}
-			iter->Delete();*/
-
+		{		
 			m_CurrentVolume = NULL;
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
@@ -310,6 +209,9 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
     {
       m_AttachCamera->SetVme(NULL);
       m_CurrentSlicer = NULL;
+
+      double normal[3] = {0,0,1};
+      ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
     }
 	}
 	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -372,9 +274,7 @@ mmgGui* medViewSlicer::CreateGui()
 	assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
 
-	//combo box to choose the type of gizmo
-	
-	m_Gui->Button(ID_RESET,"Reset","");
+	//m_Gui->Button(ID_RESET,"Reset","");
 	m_Gui->Divider(2);
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
@@ -397,6 +297,9 @@ void medViewSlicer::VmeRemove(mafNode *node)
   {
     m_AttachCamera->SetVme(NULL);
     m_CurrentSlicer = NULL;
+
+    double normal[3] = {0,0,1};
+    ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
   }
 
   Superclass::VmeRemove(node);

@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 08:36:39 $
-  Version:   $Revision: 1.1 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2007-10-10 11:02:20 $
+  Version:   $Revision: 1.2 $
+  Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -99,7 +99,7 @@ protected:
 	
 	mafVMEVolumeGray	*m_CurrentVolume;
 	mafVMESlicer			*m_CurrentSlicer;
-	mafMatrix					*m_MatrixReset;
+
 	mafAttachCamera		*m_AttachCamera;
 
 	vtkLookupTable    *m_ColorLUT;
