@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-12 13:55:29 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-10-10 17:52:42 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -165,10 +165,11 @@ void medOpFreezeVMETest::TestFreezeVMEMeter()
 	meter->SetMeterLink("StartVME",vmeParametricSurfaceSTART);
 	meter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
 	meter->SetParent(storage->GetRoot());
-	meter->GetOutput()->GetVTKData()->Update();
+	//meter->GetOutput()->GetVTKData()->Update();
 	meter->Modified();
 	meter->Update();
 
+  meter->GetOutput()->GetVTKData()->Update();
 
 	freezeOp->SetInput(meter);
 	freezeOp->OpRun();
@@ -298,6 +299,7 @@ void medOpFreezeVMETest::TestFreezeVMESlicer()
 	mafVMESlicer *slicer;
 	mafNEW(slicer);
 	slicer->ReparentTo(volume);
+  slicer->SetSlicedVMELink(volume);
 
 	slicer->SetPose(centerV,rotV,0);
 	slicer->Update();
