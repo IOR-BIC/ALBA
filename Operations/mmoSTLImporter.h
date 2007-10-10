@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:13:25 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-10 07:23:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,9 @@ public:
 
   /** Import the file. */
 	void ImportSTL();
+
+  /** Used to retrieve imported data. It is useful when the operation is executed from code.*/
+  void GetImportedSTL(std::vector<mafVMESurface*> &importedSTL);
 
 protected:
   /** Check if the STL file is binary */

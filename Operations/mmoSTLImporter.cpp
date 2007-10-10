@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:13:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-10 07:23:03 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,9 +45,7 @@ mafOp(label)
 {
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
-  //m_File    = "";
-  //m_ImportedSTL = NULL;
-  //m_Swap    = 0;
+  m_Files.clear();
   m_FileDir = mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
@@ -75,16 +73,19 @@ mafOp* mmoSTLImporter::Copy()
 void mmoSTLImporter::OpRun()   
 //----------------------------------------------------------------------------
 {
-	mafString wildc = "Stereo Litography (*.stl)|*.stl";
-  std::vector<std::string> files;
-	mafString f;
-  
-  m_Files.clear();
-  mafGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.GetCStr(), files);
-  for(unsigned i = 0; i < files.size(); i++)
+  if (!m_TestMode && m_Files.size() == 0)
   {
-    f = files[i].c_str();
-    m_Files.push_back(f);
+    mafString wildc = "Stereo Litography (*.stl)|*.stl";
+    std::vector<std::string> files;
+    mafString f;
+
+    m_Files.clear();
+    mafGetOpenMultiFiles(m_FileDir.GetCStr(),wildc.GetCStr(), files);
+    for(unsigned i = 0; i < files.size(); i++)
+    {
+      f = files[i].c_str();
+      m_Files.push_back(f);
+    }
   }
 	
 	int result = OP_RUN_CANCEL;
@@ -153,7 +154,7 @@ void mmoSTLImporter::CheckSwap(const char *file_name, int &swapFlag)
   }
 }
 //----------------------------------------------------------------------------
-void mmoSTLImporter::OpDo()   
+void mmoSTLImporter::OpDo()
 //----------------------------------------------------------------------------
 {
   for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
@@ -161,14 +162,13 @@ void mmoSTLImporter::OpDo()
     if (m_ImportedSTLs[i])
     {
       m_ImportedSTLs[i]->ReparentTo(m_Input);
-      //mafEventMacro(mafEvent(this, VME_ADD, m_ImportedSTLs[i]));
     }
   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 
 //----------------------------------------------------------------------------
-void mmoSTLImporter::OpUndo()   
+void mmoSTLImporter::OpUndo()
 //----------------------------------------------------------------------------
 {
   for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
@@ -327,5 +327,16 @@ void mmoSTLImporter::SetFileName(const char *file_name)
   {
     m_Swaps[i] = 0;
     CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
+  }
+}
+//----------------------------------------------------------------------------
+void mmoSTLImporter::GetImportedSTL(std::vector<mafVMESurface*> &importedSTL)
+//----------------------------------------------------------------------------
+{
+  importedSTL.clear();
+  importedSTL.resize(m_ImportedSTLs.size());
+  for (unsigned int i=0; i< m_ImportedSTLs.size(); i++)
+  {
+    importedSTL[i] = m_ImportedSTLs[i];
   }
 }
