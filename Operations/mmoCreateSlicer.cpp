@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:28:36 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-11 08:42:09 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,6 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-#include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
 
 //----------------------------------------------------------------------------
@@ -65,8 +64,6 @@ bool mmoCreateSlicer::Accept(mafNode *node)
 void mmoCreateSlicer::OpRun()
 //----------------------------------------------------------------------------
 {
-  
-  
   mafString title = _("Choose VME to slice");
   mafEvent *e; e = new mafEvent();
   e->SetId(VME_CHOOSE);
@@ -74,6 +71,7 @@ void mmoCreateSlicer::OpRun()
   e->SetString(&title);
   mafEventMacro(*e);
 
+  int result = OP_RUN_CANCEL;
 
   mafNode *n = e->GetVme();
   if (n != NULL)
@@ -83,22 +81,20 @@ void mmoCreateSlicer::OpRun()
 		m_Output = m_Slicer;
 
     m_Slicer->SetSlicedVMELink(n);
-    mafEventMacro(mafEvent(this,OP_RUN_OK));
+    result = OP_RUN_OK;
   }
-  else
-    mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
+  mafEventMacro(mafEvent(this, result));
 }
 //----------------------------------------------------------------------------
 void mmoCreateSlicer::OpDo()
 //----------------------------------------------------------------------------
 {
-  m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
   double center[3], rot[3];
   mafOBB b;
+  m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
   rot[0] = rot[1] = rot[2] = 0;
-  /*((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
-  b.GetCenter(center);*/
   ((mafVME *)m_Input)->GetOutput()->GetVMELocalBounds(b);
   b.GetCenter(center);
   m_Slicer->SetPose(center,rot,0);
+  m_Output = m_Slicer; // This allow the UnDo to work.
 }
