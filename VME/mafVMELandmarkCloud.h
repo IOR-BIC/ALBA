@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-04 11:40:34 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-10-11 11:45:22 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -81,8 +81,7 @@ public:
   /** Insert the landmark into the cloud */
   int SetLandmark(mafVMELandmark *lm);
   
-  /**
-  Set/Get a landmark. In case the specified idx is invalid return MAF_ERROR*/
+  /** Set/Get a landmark. In case the specified idx is invalid return MAF_ERROR*/
   int SetLandmark(int idx,double x,double y,double z,mafTimeStamp t=0);
   int SetLandmark(const char *name,double x,double y,double z,mafTimeStamp t=0) {return this->SetLandmark(this->FindLandmarkIndex(name),x,y,z,t);}
   //int SetLandmarkForTimeFrame(int idx,double x,double y,double z,unsigned long tid,mafTimeStamp t);
@@ -91,31 +90,28 @@ public:
   int GetLandmark(int idx, double xyz[3],mafTimeStamp t=0);
   int GetLandmark(const char *name, double xyz[3],mafTimeStamp t=0) {return this->GetLandmark(this->FindLandmarkIndex(name), xyz,t);}
 
-  /**
-  Find the index of a landmark given its name. This only works when cloud is OPEN*/
+  /** Find the index of a landmark given its name. This only works when cloud is OPEN*/
   mafVMELandmark *GetLandmark(const char *name);
 
-  /**
-  Get the landmark by index. This only works when cloud is OPEN*/
+  /** Get the landmark by index. This only works when cloud is OPEN*/
   mafVMELandmark *GetLandmark(int idx);
 
-  /**
-  Find the index of a landmark given its name*/
+  /** Return the position of the landmark number 'idx' at the timestamp t.*/
+  void GetLandmarkPosition(int idx, double pos[3], mafTimeStamp t=-1);
+
+  /** Find the index of a landmark given its name*/
   int FindLandmarkIndex(const char *name);
 
-  /**
-  Remove a landmark. In case the id is invalid return MAF_ERROR
+  /** Remove a landmark. In case the id is invalid return MAF_ERROR
   BEWARE: landmark is removed from all the VME-items*/
   int RemoveLandmark(int idx);
 
-  /**
-  Set/Get the number of landmarks stored in this VME. BEWARE the number of
+  /** Set/Get the number of landmarks stored in this VME. BEWARE the number of
   landmarks is the same for all the time frames (items)*/
   int GetNumberOfLandmarks();
   virtual int SetNumberOfLandmarks(int num);
 
-  /**
-  Set/get the name for idx-th landmark. Return null in case no landmark name 
+  /** Set/get the name for idx-th landmark. Return null in case no landmark name 
   was defined for that index.*/
   virtual const char *GetLandmarkName(int idx);
   virtual void SetLandmarkName(int idx,const char *name);
@@ -132,8 +128,7 @@ public:
   virtual void SetSphereResolution(int res, bool force_update = false);
   virtual int GetSphereResolution();
 
-  /**
-  Cloud states: Open/Close*/
+  /** Cloud states: Open/Close*/
   enum LANDMARK_CLOUDE_STATE
   {
     UNSET_CLOUD=0,
@@ -150,8 +145,7 @@ public:
     ID_LAST
   };
 
-  /**
-  Return true if the cloud is Open/Exploded, false otherwise.*/
+  /** Return true if the cloud is Open/Exploded, false otherwise.*/
   bool IsOpen() {return this->GetState() == OPEN_CLOUD;}
 
   /**
@@ -174,14 +168,14 @@ public:
   associated polydata's point. Notice that visibility is implicitly defined
   as 'm_DefaultVisibility' when a position is specified for a timestamp nd nothing is specified
   for the visibility at that time. On the other hand, if visibility is defined
-  for some time a position is implicitelly defined for that time stamp.*/
+  for some time a position is implicitly defined for that time stamp.*/
   virtual int SetLandmarkVisibility(int idx,bool a,mafTimeStamp t=0);
   int SetLandmarkVisibility(const char *name,bool a,mafTimeStamp t=0) {return this->SetLandmarkVisibility(this->FindLandmarkIndex(name),a,t);}
   virtual bool GetLandmarkVisibility(int idx,mafTimeStamp t=0);
   bool GetLandmarkVisibility(const char *name,mafTimeStamp t=0) {return this->GetLandmarkVisibility(this->FindLandmarkIndex(name),t);}
 
   /**
-  Return true if the landamrk is visible for the given time (CurrentTime is the default)*/
+  Return true if the landmark is visible for the given time (CurrentTime is the default)*/
   bool IsVisible(int idx,mafTimeStamp t=-1) {return this->GetLandmarkVisibility(idx,t);}
   bool IsVisible(const char *name,mafTimeStamp t=-1) {return this->GetLandmarkVisibility(this->FindLandmarkIndex(name),t);}
 
@@ -189,21 +183,19 @@ public:
   Set/Get the default visibility attribute. When default visibility is set to true, the creation 
   of a new time frame (by setting a landmark position for a given timestamp), makes all the other
   landmarks to be also visible at the same timestamp. If false, the visibility of the others landmark is
-  automatically set to false for the other landmarks. Notice currently this is not a persistant attribute.*/
+  automatically set to false for the other landmarks. Notice currently this is not a persistent attribute.*/
   void SetDefaultVisibility(int v) {this->m_DefaultVisibility = v; this->Modified();}
   int GetDefaultVisibility() {return m_DefaultVisibility;}
   void DefaultVisibilityOn() {SetDefaultVisibility(1);};
   void DefaultVisibilityOff() {SetDefaultVisibility(0);};
 
-  /**
-  Return number of visible landmarks*/
+  /** Return number of visible landmarks*/
   int GetNumberOfVisibleLandmarks(mafTimeStamp t=0);
   
-  /**
-  Return true if it's a rigid landmark cloud (i.e. it has a single time frame)*/
+  /** Return true if it's a rigid landmark cloud (i.e. it has a single time frame)*/
   bool IsRigid();
 
-  /** return icon */
+  /** Return icon */
   static char** GetIcon();
 
   /** Return pointer to material attribute. */
@@ -224,25 +216,20 @@ protected:
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();
 
-  /**
-  Remove a landmark name from the TagArray*/
+  /** Remove a landmark name from the TagArray*/
   void RemoveLandmarkName(int idx);
 
-  /**
-  Internal function to instatiate a VMEItem with for timestamp t containing a new polydata*/
+  /** Internal function to instantiate a VMEItem with for timestamp t containing a new polydata*/
   virtual vtkPolyData *NewPolyData(mafTimeStamp t);
 
-  /**
-  Internal functions redefined to support cells*/
+  /** Internal functions redefined to support cells*/
   virtual int AppendPoint(vtkPolyData *polydata,double x,double y,double z,int num=1);
 
-  /**
-  Internal functions used to set/get visibility for point idx of the given polydata*/
+  /** Internal functions used to set/get visibility for point idx of the given polydata*/
   virtual int SetLandmarkVisibility(vtkPolyData *polydata,int idx,bool a);
   virtual bool GetLandmarkVisibility(vtkPolyData *polydata,int idx);
 
-  /**
-  Get set cloud set retrieving it from TAG if necessary*/
+  /** Get set cloud set retrieving it from TAG if necessary*/
   int GetState();
   void SetState(int state);
 

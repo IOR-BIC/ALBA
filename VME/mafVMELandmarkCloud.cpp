@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:30:29 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2007-10-11 11:45:22 $
+  Version:   $Revision: 1.29 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -704,7 +704,22 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(int idx)
   }
 	return NULL;
 }
-
+//-------------------------------------------------------------------------
+void mafVMELandmarkCloud::GetLandmarkPosition(int idx, double pos[3], mafTimeStamp t)
+//-------------------------------------------------------------------------
+{
+  if (GetState() == CLOSED_CLOUD)
+  {
+    GetPoint(idx,pos,t);
+  }
+  else
+  {
+    if (mafVMELandmark *lm = GetLandmark(idx))
+    {
+      lm->GetPoint(pos, t);
+    }
+  }
+}
 //-------------------------------------------------------------------------
 void mafVMELandmarkCloud::Close()
 //-------------------------------------------------------------------------
