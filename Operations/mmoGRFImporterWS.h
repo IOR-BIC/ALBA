@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-16 09:44:58 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-11 11:22:08 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ class mafVMESurface;
 class mmoGRFImporterWS : public mafOp
 {
 public:
-	mmoGRFImporterWS(wxString label);
+	mmoGRFImporterWS(const wxString &label = "GRF Importer");
 	~mmoGRFImporterWS(); 
 
   void mmoGRFImporterWS::OpDo();

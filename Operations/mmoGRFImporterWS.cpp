@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-16 09:44:58 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-11 11:22:08 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,7 +43,7 @@
 #define DELTA 5.0
 
 //----------------------------------------------------------------------------
-mmoGRFImporterWS::mmoGRFImporterWS(wxString label) :
+mmoGRFImporterWS::mmoGRFImporterWS(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {

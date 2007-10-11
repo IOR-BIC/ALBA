@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-08 13:48:54 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-11 11:21:52 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ class medVMEEmg;
 class mmoEMGImporterWS : public mafOp
 {
 public:
-	mmoEMGImporterWS(wxString label);
+	mmoEMGImporterWS(const wxString &label = "EMGImporterWS");
 	~mmoEMGImporterWS(); 
 	mafOp* Copy();
 

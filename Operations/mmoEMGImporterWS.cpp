@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoEMGImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-08 15:15:37 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-10-11 11:21:52 $
+  Version:   $Revision: 1.13 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@
 #include <iostream>
 
 //----------------------------------------------------------------------------
-mmoEMGImporterWS::mmoEMGImporterWS(wxString label) :
+mmoEMGImporterWS::mmoEMGImporterWS(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
