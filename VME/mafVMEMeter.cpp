@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:31:18 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-10-11 08:33:40 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,6 +86,8 @@ mafVMEMeter::mafVMEMeter()
   m_Goniometer->AddInput(m_LineSource->GetOutput());
   m_Goniometer->AddInput(m_LineSource2->GetOutput());
 
+  m_PolyData->DeepCopy(m_Goniometer->GetOutput());
+
   mafNEW(m_TmpTransform);
 
   DependsOnLinkedNodeOn();
@@ -127,22 +129,9 @@ mafVMEMeter::mafVMEMeter()
   tprop->SetFontSize(12);
   m_PlotActor->SetPlotColor(0,.8,.3,.3);
 
-  // Histogram dialog
-  int width = 400;
-  int height = 300;
-  int x_init,y_init;
-  x_init = mafGetFrame()->GetPosition().x;
-  y_init = mafGetFrame()->GetPosition().y;
-  m_HistogramDialog = new mmgDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
-  m_HistogramRWI = m_HistogramDialog->GetRWI();
-  m_HistogramRWI->SetListener(this);
-  m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
-  m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
-  m_HistogramRWI->SetSize(0,0,width,height);
-
-  m_HistogramDialog->SetSize(x_init,y_init,width,height);
-  m_HistogramDialog->Show(FALSE);
-
+  m_HistogramDialog = NULL;
+  m_HistogramRWI    = NULL;
+  
   m_GenerateHistogram = 0;
 }
 //-------------------------------------------------------------------------
@@ -157,7 +146,8 @@ mafVMEMeter::~mafVMEMeter()
   vtkDEL(m_PolyData);
   SetOutput(NULL);
 
-  m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
+  if(m_HistogramRWI)
+    m_HistogramRWI->m_RenFront->RemoveActor(m_PlotActor);
   vtkDEL(m_PlotActor);
   vtkDEL(m_ProbingLine);
   cppDEL(m_HistogramDialog);
@@ -978,6 +968,25 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
 	  break;
     case ID_PLOT_PROFILE:
       {
+        // Histogram dialog
+        if(m_HistogramDialog == NULL)
+        {
+          int width = 400;
+          int height = 300;
+          int x_init,y_init;
+          x_init = mafGetFrame()->GetPosition().x;
+          y_init = mafGetFrame()->GetPosition().y;
+          m_HistogramDialog = new mmgDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
+          m_HistogramRWI = m_HistogramDialog->GetRWI();
+          m_HistogramRWI->SetListener(this);
+          m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
+          m_HistogramRWI->m_RenFront->SetBackground(1,1,1);
+          m_HistogramRWI->SetSize(0,0,width,height);
+
+          m_HistogramDialog->SetSize(x_init,y_init,width,height);
+          m_HistogramDialog->Show(FALSE);
+        }
+        
         GenerateHistogram(m_GenerateHistogram);
       }
       break;
@@ -1035,13 +1044,16 @@ mafVME *mafVMEMeter::GetPlottedVME()
 void mafVMEMeter::GenerateHistogram(int generate)
 //----------------------------------------------------------------------------
 {
-  m_GenerateHistogram = generate;
-  if (m_GenerateHistogram)
+  if(m_HistogramDialog)
   {
-    CreateHistogram();
-    m_HistogramRWI->m_RwiBase->Render();
+    m_GenerateHistogram = generate;
+    if (m_GenerateHistogram)
+    {
+      CreateHistogram();
+      m_HistogramRWI->m_RwiBase->Render();
+    }
+    m_HistogramDialog->Show(m_GenerateHistogram);
   }
-  m_HistogramDialog->Show(m_GenerateHistogram);
 }
 //----------------------------------------------------------------------------
 void mafVMEMeter::CreateHistogram()
