@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkExporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 11:46:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-11 15:29:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani, Daniele Giunchi (porting MAf 2.0)
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,6 +40,7 @@ public:
 	/** Build the interface of the operation, i.e the dialog that let choose the name of the output file. */
 	void OpRun();
 
+  /** Export landmarks contained into a mafVMELandmarkCloud.*/
   void ExportLandmark();
 
   /** Set the filename for the .stl to export */
