@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-10 07:27:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-11 11:44:48 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -247,6 +247,7 @@ int mafVMEPointSet::GetPoint(int idx, double xyz[3],mafTimeStamp t)
   {
     // force the pipe to the specified timestamp
     this->GetDataPipe()->SetTimeStamp(t);
+    this->GetDataPipe()->Update();
   }
 
   polydata=(vtkPolyData *)this->GetPointSetOutput()->GetPointSetData();
