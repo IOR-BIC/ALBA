@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-30 08:49:44 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-10-11 11:23:39 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -47,21 +47,22 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 
 #include "medOpLabelizeSurface.h"
-#include "mafNode.h"
 #include "mmgGui.h"
-#include "mafTransform.h"
-#include "mafMatrix.h"
 #include "mmaMaterial.h"
 #include "mafAbsMatrixPipe.h"
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
-#include "mafEventSource.h"
-
-#include "mafVMESurface.h"
-#include "mafVMEGizmo.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
 #include "mafGizmoScale.h"
+
+#include "mafTransform.h"
+#include "mafEventSource.h"
+
+#include "mafMatrix.h"
+#include "mafNode.h"
+#include "mafVMESurface.h"
+#include "mafVMEGizmo.h"
 #include "medVMESurfaceEditor.h"
 
 #include "vtkPlane.h"
