@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 11:46:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-11 14:11:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefania Paperini , Daniele Giunchi (porting MAf 2.0)
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -90,11 +90,17 @@ void mmoLandmarkExporter::ExportLandmark()
   if (!f_Out.bad())
   {
     mafVMELandmarkCloud *cloud = (mafVMELandmarkCloud *)m_Input;
+    bool statusOpen = cloud->IsOpen();
+    if (!statusOpen)
+    {
+      cloud->Open();
+    }
     int numberLandmark = cloud->GetNumberOfLandmarks();
     std::vector<mafTimeStamp> timeStamps;
     cloud->GetTimeStamps(timeStamps);
     mafString lmName = "";
     double pos[3] = {0.0,0.0,0.0};
+    double ori[3] = {0.0,0.0,0.0};
     double t;
     for (unsigned int i = 0; i < timeStamps.size(); i++)
     {
@@ -104,9 +110,14 @@ void mmoLandmarkExporter::ExportLandmark()
       for(unsigned int j = 0; j < numberLandmark; j++)
       {
         lmName = cloud->GetLandmarkName(j);
-        cloud->GetLandmarkPosition(j, pos, t);
+        //cloud->GetLandmarkPosition(j, pos, t);
+        cloud->GetLandmark(j)->GetOutput()->GetAbsPose(pos,ori,t);
         f_Out << lmName << "\t" << pos[0] << "\t" << pos[1] << "\t" << pos[2] <<"\n";
       }
+    }
+    if (!statusOpen)
+    {
+      cloud->Close();
     }
     f_Out.close();
   }
