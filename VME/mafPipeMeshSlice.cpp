@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 13:10:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-10-15 14:28:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 #include "vtkDelaunay2D.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkLookUpTable.h"
+#include "vtkLookupTable.h"
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -62,8 +62,8 @@ mafPipeMeshSlice::mafPipeMeshSlice()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
-  m_Cutter					= NULL;
-  m_Plane						= NULL;
+  m_Cutter          = NULL;
+  m_Plane           = NULL;
 
   m_Origin[0] = 0;
   m_Origin[1] = 0;
@@ -75,9 +75,9 @@ mafPipeMeshSlice::mafPipeMeshSlice()
 
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
-  m_Border=1;
+  m_Border = 1;
 
-	m_ShowSelection = false;
+  m_ShowSelection = false;
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -113,55 +113,55 @@ void mafPipeMeshSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
 
-	m_Plane	= vtkPlane::New();
-	m_Cutter = vtkMAFMeshCutter::New();
+  m_Plane = vtkPlane::New();
+  m_Cutter = vtkMAFMeshCutter::New();
 
-	m_Plane->SetOrigin(m_Origin);
-	m_Plane->SetNormal(m_Normal);
+  m_Plane->SetOrigin(m_Origin);
+  m_Plane->SetNormal(m_Normal);
 
-	vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
+  vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_Plane->SetTransform(m_VTKTransform);
+  m_Plane->SetTransform(m_VTKTransform);
 
-	m_Cutter->SetInput(data);
-	m_Cutter->SetCutFunction(m_Plane);
-	m_Cutter->GetOutput()->Update();
-	m_Cutter->Update();
-	//vtkNEW(m_Filter);
-	//m_Filter->SetInput(m_Cutter->GetOutput());
-	//m_Filter->Update();
+  m_Cutter->SetInput(data);
+  m_Cutter->SetCutFunction(m_Plane);
+  m_Cutter->GetOutput()->Update();
+  m_Cutter->Update();
+  //vtkNEW(m_Filter);
+  //m_Filter->SetInput(m_Cutter->GetOutput());
+  //m_Filter->Update();
   if(scalars != NULL)
   {
     m_ScalarVisibility = 1;
     scalars->GetRange(sr);
   }
 
-	vtkLookupTable *lut = vtkLookupTable::New() ;
-	lut->SetTableRange(sr[0], sr[1]) ;
-	lut->SetNumberOfColors(256) ;
-	lut->Build() ;
+  vtkLookupTable *lut = vtkLookupTable::New();
+  lut->SetTableRange(sr[0], sr[1]);
+  lut->SetNumberOfColors(256);
+  lut->Build();
 
   m_Mapper = vtkPolyDataMapper::New();
   m_Mapper->SetInput(m_Cutter->GetOutput());
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
 
-	m_Mapper->ScalarVisibilityOn() ;
-	m_Mapper->SetColorModeToMapScalars() ;
+  m_Mapper->ScalarVisibilityOn() ;
+  m_Mapper->SetColorModeToMapScalars() ;
 
-	m_Mapper->SetScalarModeToUsePointFieldData() ;
-	m_Mapper->ColorByArrayComponent(0, 0) ;
-	m_Mapper->SetLookupTable(lut) ;
-	m_Mapper->SetUseLookupTableScalarRange(1) ;
+  m_Mapper->SetScalarModeToUsePointFieldData() ;
+  m_Mapper->ColorByArrayComponent(0, 0) ;
+  m_Mapper->SetLookupTable(lut) ;
+  m_Mapper->SetUseLookupTableScalarRange(1) ;
   
   vtkDEL(lut);
-
-	if(m_Vme->IsAnimated())
+  
+  if(m_Vme->IsAnimated())
   {
     m_RenderingDisplayListFlag = 1;
     m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
   }
-	else
+    else
   {
     m_RenderingDisplayListFlag = 0;
     m_Mapper->ImmediateModeRenderingOff();
@@ -175,14 +175,14 @@ void mafPipeMeshSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);  
+  m_OutlineBox->SetInput(data);  
 
-	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+  m_OutlineMapper = vtkPolyDataMapper::New();
+  m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
 
-	m_OutlineProperty = vtkProperty::New();
-	m_OutlineProperty->SetColor(1,1,1);
-	m_OutlineProperty->SetAmbient(1);
+  m_OutlineProperty = vtkProperty::New();
+  m_OutlineProperty->SetColor(1,1,1);
+  m_OutlineProperty->SetAmbient(1);
 	m_OutlineProperty->SetRepresentationToWireframe();
 	m_OutlineProperty->SetInterpolationToFlat();
 
