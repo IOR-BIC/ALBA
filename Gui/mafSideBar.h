@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-12 10:24:09 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-15 10:12:54 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 #include <wx/notebook.h>
 #include <wx/splitter.h>
+#include <wx/utils.h>
 
 #include "mafEvent.h"
 #include "mafObserver.h"
@@ -36,7 +37,7 @@ class mmgSplittedPanel;
 //----------------------------------------------------------------------------
 /**
 */
-class mafSideBar
+class mafSideBar : mafObserver
 {
 public:
 	mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long style = DOUBLE_NOTEBOOK);
@@ -48,7 +49,9 @@ public:
     DOUBLE_NOTEBOOK
   };
 
-	// Description:
+	void OnEvent(mafEventBase *ev);
+
+  // Description:
 	// Add a new vme into the tree.
 	void VmeAdd(mafNode *vme);
 
@@ -89,7 +92,7 @@ public:
 	void ViewDeleted(mafView *view);
 
 	// Description:
-	// Enable/Disable the vme selectione when an operation ends/start.
+	// Enable/Disable the vme selection when an operation ends/start.
 	void EnableSelect(bool enable);
 
 	// Description:
@@ -112,12 +115,14 @@ protected:
   mmgPanelStack	*m_OpPanel;
 	mmgGuiHolder	*m_ViewPropertyPanel;
   mmgCheckTree  *m_Tree;
+  mafString      m_SearchVmeEntry;
 
   mmgGuiHolder  *m_VmePanel;
   mmgGuiHolder  *m_VmeOutputPanel;
   mmgGuiHolder  *m_VmePipePanel;
 
-  mafNode *m_SelectedVme;
-  mafView *m_SelectedView;
+  mafNode     *m_SelectedVme;
+  mafView     *m_SelectedView;
+  mafObserver *m_Listener;
 };
 #endif
