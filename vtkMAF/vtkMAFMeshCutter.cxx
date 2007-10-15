@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-09-28 11:19:28 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-10-15 13:16:09 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -27,7 +27,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkMAFMeshCutter);
 //------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ vtkMAFMeshCutter::vtkMAFMeshCutter()
 vtkMAFMeshCutter::~vtkMAFMeshCutter()
 //------------------------------------------------------------------------------
 {
-  m_cutFunction->Delete() ;
+//  m_cutFunction->Delete() ;
 }
 
 //------------------------------------------------------------------------------
