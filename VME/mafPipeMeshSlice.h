@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeshSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 14:21:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-15 13:10:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -93,7 +93,7 @@ protected:
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
 
-	vtkDelaunay2D *m_Filter;
+	//vtkDelaunay2D *m_Filter;
 
 };  
 #endif // __mafPipeMeshSlice_H__

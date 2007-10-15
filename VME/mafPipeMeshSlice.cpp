@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 14:21:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-15 13:10:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@
 #include "vtkPlane.h"
 #include "vtkDelaunay2D.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkLookUpTable.h"
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -117,27 +118,44 @@ void mafPipeMeshSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
+
 	vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
 
 	m_Cutter->SetInput(data);
 	m_Cutter->SetCutFunction(m_Plane);
+	m_Cutter->GetOutput()->Update();
 	m_Cutter->Update();
-	vtkNEW(m_Filter);
-	m_Filter->SetInput(m_Cutter->GetOutput());
-	m_Filter->Update();
+	//vtkNEW(m_Filter);
+	//m_Filter->SetInput(m_Cutter->GetOutput());
+	//m_Filter->Update();
   if(scalars != NULL)
   {
     m_ScalarVisibility = 1;
     scalars->GetRange(sr);
   }
 
+	vtkLookupTable *lut = vtkLookupTable::New() ;
+	lut->SetTableRange(sr[0], sr[1]) ;
+	lut->SetNumberOfColors(256) ;
+	lut->Build() ;
+
   m_Mapper = vtkPolyDataMapper::New();
   m_Mapper->SetInput(m_Cutter->GetOutput());
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
+
+	m_Mapper->ScalarVisibilityOn() ;
+	m_Mapper->SetColorModeToMapScalars() ;
+
+	m_Mapper->SetScalarModeToUsePointFieldData() ;
+	m_Mapper->ColorByArrayComponent(0, 0) ;
+	m_Mapper->SetLookupTable(lut) ;
+	m_Mapper->SetUseLookupTableScalarRange(1) ;
   
+  vtkDEL(lut);
+
 	if(m_Vme->IsAnimated())
   {
     m_RenderingDisplayListFlag = 1;
