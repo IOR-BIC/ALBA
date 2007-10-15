@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-13 16:51:21 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-10-15 10:09:17 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -304,7 +304,7 @@ mafString &mafString::Set(const char *a, bool release)
   {
     SetSize(0); // force memory release
     m_ConstCStr = a;
-    m_Size = release?Length(a)+1:0;
+    //m_Size = release?Length(a)+1:0;
   }
   return *this;
 }
@@ -789,7 +789,7 @@ void mafString::Printf(const char *format, ...)
   SetSize(0); // release old memory
   SetSize(2048); // Preallocate space. Sorry, maximum output string size is 2048...
   MAF_PRINT_MACRO(format,m_CStr,2048);
-  Set(Duplicate(),true); // release extra memory
+  SetCStr(Duplicate(),true); // release extra memory
 }
 
 //----------------------------------------------------------------------------
