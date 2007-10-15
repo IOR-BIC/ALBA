@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:31:50 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-10-15 13:10:09 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -215,6 +215,18 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
+int mafVMESlicer::InternalInitialize()
+//-------------------------------------------------------------------------
+{
+	if (Superclass::InternalInitialize()==MAF_OK)
+	{
+		// force material allocation
+		GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
+		return MAF_OK;
+	}
+	return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
 mafVMEOutputSurface *mafVMESlicer::GetSurfaceOutput()
 //-------------------------------------------------------------------------
 {
@@ -402,7 +414,7 @@ int mafVMESlicer::InternalRestore(mafStorageElement *node)
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
       m_Transform->SetMatrix(matrix);
-      GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
+      
       return MAF_OK;
     }
   }
