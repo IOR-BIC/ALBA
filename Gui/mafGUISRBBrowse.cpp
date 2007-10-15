@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-05 08:06:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-15 14:16:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -404,7 +404,7 @@ mafString mafGUISRBBrowse::GetNodeName()
   std::vector <long> vectorId;
   vectorId.push_back(m_NodeId);
   int i = 0;
-  long id;
+  long id = -1;
 
   //Fill the vector with the ID of the nodes parents
   while (id != 1 && id != 0)
