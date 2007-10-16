@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-08 16:21:02 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-10-16 12:46:18 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -61,6 +61,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEImage.h"
 #include "mafVMEVolumeGray.h"
 #include "mmgCheckListBox.h"
+#include "medGUIDicomSettings.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkDicomUnPacker.h"
@@ -92,7 +93,7 @@ mafCxxTypeMacro(medOpImporterDicom);
 enum DICOM_IMPORTER_GUI_ID
 {
 	ID_FIRST = medGUIWizard::ID_LAST,
-	ID_DICTIONARY,
+	//ID_DICTIONARY,
 	ID_OPEN_DIR,
 	ID_STUDY,
 	ID_CROP_BUTTON,
@@ -103,19 +104,11 @@ enum DICOM_IMPORTER_GUI_ID
 	ID_PATIENT_NAME,
 	ID_PATIENT_ID,
 	ID_SURGEON_NAME,
-	ID_TYPE_DICOM,
+	//ID_TYPE_DICOM,
 	ID_SCAN_TIME,
 	ID_SCAN_SLICE,
 	ID_VOLUME_NAME,
 	ID_VOLUME_SIDE,
-};
-enum DICOM_MODALITY
-{
-	ID_CT_MODALITY = 0,
-	ID_SC_MODALITY,
-	ID_MRI_MODALITY,
-	ID_XA_MODALITY,
-	ID_CMRI_MODALITY,
 };
 enum VOLUME_SIDE
 {
@@ -220,6 +213,7 @@ mafOp *medOpImporterDicom::Copy()
 void medOpImporterDicom::OpRun()
 //----------------------------------------------------------------------------
 {
+	m_DictionaryFilename = ((medGUIDicomSettings*)GetSetting())->GetDictionary();
 	CreateGui();
 	CreatePipeline();
 
@@ -239,7 +233,7 @@ void medOpImporterDicom::OpRun()
 	m_Wizard->SetFirstPage(m_LoadPage);
 	if(m_Wizard->Run())
 	{
-		if(m_DicomTypeRead != ID_CMRI_MODALITY)
+		if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
 			BuildVolume();
 		else
 			BuildVolumeCineMRI();
@@ -497,14 +491,14 @@ void medOpImporterDicom::CreateLoadPage()
 	m_LoadPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,"prima");
 	m_LoadGui = new mmgGui(this);
 
-	m_DicomModalityListBox=m_LoadGui->CheckList(ID_TYPE_DICOM,_("Modality"));
+	/*m_DicomModalityListBox=m_LoadGui->CheckList(ID_TYPE_DICOM,_("Modality"));
 	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),true);
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),true);
 	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),true);
-	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),true);
+	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),true);*/
 	m_LoadGui->Label(_("data files:"),true);
 	mafString wildcard = _("DICT files (*.dic)|*.dic|All Files (*.*)|*.*");
-	m_LoadGui->FileOpen (ID_DICTIONARY,	_("dictionary"),	&m_DictionaryFilename, wildcard);
+	//m_LoadGui->FileOpen (ID_DICTIONARY,	_("dictionary"),	&m_DictionaryFilename, wildcard);
 	m_LoadGui->DirOpen(ID_OPEN_DIR, _("Folder"),	&m_DicomDirectory);
 	m_LoadGui->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));//If there isn't a dictionary is impossible open DICOM Directory
 	m_LoadGui->Divider();
@@ -600,10 +594,10 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				CameraUpdate();
 			}
 			break;
-		case ID_DICTIONARY:
+		/*case ID_DICTIONARY:
 			m_DicomReader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
 			m_LoadGui->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));
-			break;
+			break;*/
 		case ID_OPEN_DIR:
 			ResetStructure();
 			// scan dicom directory
@@ -643,7 +637,7 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				m_VolumeName = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
 				m_BuildGui->Update();
 				EnableSliceSlider(true);
-				if(m_DicomTypeRead == ID_CMRI_MODALITY)//If cMRI
+				if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
 				{
 					EnableTimeSlider(true);
 				}
@@ -689,7 +683,7 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 					break;
 				}
 				m_NumberOfTimeFrames = ((medImporterDICOMListElement *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
-				if(m_DicomTypeRead == ID_CMRI_MODALITY) //If cMRI
+				if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
 					m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
 				else
 					m_NumberOfSlices = m_ListSelected->GetCount();
@@ -1158,13 +1152,13 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 			reader->Modified();
 			reader->Update();
 			
-			EnableToRead(reader->GetModality());
+			((medGUIDicomSettings*)GetSetting())->EnableToRead(reader->GetModality());
 
 			ct_mode = reader->GetCTMode();
 			ct_mode.MakeUpper();
 			ct_mode.Trim(FALSE);
 			ct_mode.Trim();
-			if (EnableToRead(reader->GetModality())&& strcmp( reader->GetModality(), "MR" ) != 0)
+			if (((medGUIDicomSettings*)GetSetting())->EnableToRead(reader->GetModality())&& strcmp( reader->GetModality(), "MR" ) != 0)
 			{
 				if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
 				{
@@ -1189,7 +1183,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 					((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput()));
 				}
 			}
-			else if ( EnableToRead(reader->GetModality())&& strcmp( reader->GetModality(), "MR" ) == 0)
+			else if ( ((medGUIDicomSettings*)GetSetting())->EnableToRead(reader->GetModality())&& strcmp( reader->GetModality(), "MR" ) == 0)
 			{
 				if( reader->GetStatus() == -1)
 				{
@@ -1210,8 +1204,8 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 					if(numberOfImages>1)
 					{
 						if (m_DicomTypeRead==-1)
-							m_DicomTypeRead=ID_CMRI_MODALITY;
-						else if(m_DicomTypeRead!=ID_CMRI_MODALITY)
+							m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
+						else if(m_DicomTypeRead!=medGUIDicomSettings::ID_CMRI_MODALITY)
 						{
 							wxString msg = _("cMRI damaged !");
 							wxMessageBox(msg,"Confirm", wxOK , NULL);
@@ -1221,8 +1215,8 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 					else
 					{
 						if (m_DicomTypeRead==-1)
-							m_DicomTypeRead=ID_MRI_MODALITY;
-						else if(m_DicomTypeRead!=ID_MRI_MODALITY)
+							m_DicomTypeRead=medGUIDicomSettings::ID_MRI_MODALITY;
+						else if(m_DicomTypeRead!=medGUIDicomSettings::ID_MRI_MODALITY)
 						{
 							wxString msg = _("cMRI damaged !");
 							wxMessageBox(msg,"Confirm", wxOK , NULL);
@@ -1253,29 +1247,6 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 		wxString msg = "No study found!";
 		wxMessageBox(msg,"Confirm", wxOK , NULL);
 	}
-}
-//----------------------------------------------------------------------------
-bool medOpImporterDicom::EnableToRead(char* type)
-//----------------------------------------------------------------------------
-{
-	if (strcmp( type, "SC" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY))
-	{
-		m_DicomTypeRead = ID_SC_MODALITY;
-		return true;
-	}
-	if (strcmp( type, "CT" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY))
-	{
-		m_DicomTypeRead = ID_CT_MODALITY;
-		return true;
-	}
-	if (strcmp( type, "XA" ) == 0 && m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY))
-	{
-		m_DicomTypeRead = ID_XA_MODALITY;
-		return true;
-	}
-	if (strcmp( type, "MR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY)||m_DicomModalityListBox->IsItemChecked(ID_CMRI_MODALITY)))
-		return true;
-	return false;
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::ResetStructure()
@@ -1352,7 +1323,7 @@ int medOpImporterDicom::GetImageId(int timeId, int heigthId)
 	*/
 
 
-	if (m_DicomTypeRead != ID_CMRI_MODALITY)
+	if (m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
 
 	assert(m_StudyListbox);

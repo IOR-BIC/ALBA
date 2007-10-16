@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-10-08 16:21:02 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-10-16 12:46:18 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -148,9 +148,6 @@ protected:
 	void EnableSliceSlider(bool enable);
 
 	void EnableTimeSlider(bool enable);
-
-	/** Return if a particolar type of Dicom is Enabled to be read */
-	bool EnableToRead(char* type);
 
 	void CameraUpdate();
 
