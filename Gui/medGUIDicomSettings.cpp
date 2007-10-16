@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-16 12:45:46 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-16 13:08:43 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -78,6 +78,9 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 	case ID_TYPE_DICOM:
 		{
 			m_Config->Write("EnableReadCT",m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY));
+			m_Config->Write("EnableReadSC",m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY));
+			m_Config->Write("EnableReadMI",m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY));
+			m_Config->Write("EnableReadXA",m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY));
 		}
 		break;
 	default:
@@ -101,6 +104,7 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
 	}
+
 	if(m_Config->Read("EnableReadCT", &long_item))
 	{
 		m_CheckOnOff[0]=long_item;
@@ -108,6 +112,33 @@ void medGUIDicomSettings::InitializeSettings()
 	else
 	{
 		m_Config->Write("EnableReadCT",m_CheckOnOff[0]);
+	}
+
+	if(m_Config->Read("EnableReadSC", &long_item))
+	{
+		m_CheckOnOff[1]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableReadSC",m_CheckOnOff[1]);
+	}
+
+	if(m_Config->Read("EnableReadMI", &long_item))
+	{
+		m_CheckOnOff[2]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableReadMI",m_CheckOnOff[2]);
+	}
+
+	if(m_Config->Read("EnableReadXA", &long_item))
+	{
+		m_CheckOnOff[3]=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableReadXA",m_CheckOnOff[3]);
 	}
 	m_Config->Flush();
 }
