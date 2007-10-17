@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-08-30 08:49:44 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-10-17 10:41:20 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -64,6 +64,7 @@ class vtkAppendPolyData;
 class vtkGlyph3D;
 class vtkClipSurfaceBoundingBox;
 class vtkPolyData;
+class vtkLookupTable;
 
 //----------------------------------------------------------------------------
 // medOpLabelizeSurface :
@@ -92,6 +93,11 @@ public:
 		GIZMO_SCALE,
 	};
 
+	void SetLutEditor(vtkLookupTable *lut);
+	void SetLabelValue(double val){m_LabelValue=val;};
+	void SetPlaneDimension(double w,double h);
+	void Labelize();
+
 protected: 
 	virtual void OpStop(int result);
 
@@ -102,7 +108,6 @@ protected:
 	void CreateGizmos();
 	void AttachInteraction();
 	void UpdateISARefSys();
-	void Labelize();
 	void Undo();
 
 	/** Change type of gizmo in the view */
@@ -115,6 +120,8 @@ protected:
 	void OnEventGizmoScale(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
+
+	void SetPlaneDimension();
 
 	mmiCompositorMouse *m_IsaCompositorWithoutGizmo;
 	mmiCompositorMouse *m_IsaCompositorWithGizmo;

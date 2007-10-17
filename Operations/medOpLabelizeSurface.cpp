@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-11 11:23:39 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-10-17 10:41:20 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -120,6 +120,10 @@ mafOp(label)
 
 	m_VmeEditor = NULL;
 
+	m_GizmoTranslate=NULL;
+	m_GizmoRotate=NULL;
+	m_GizmoScale=NULL;
+
 	m_ResultPolyData.clear();
 }
 
@@ -127,6 +131,33 @@ mafOp(label)
 medOpLabelizeSurface::~medOpLabelizeSurface()
 //----------------------------------------------------------------------------
 {
+	if(m_ImplicitPlaneGizmo)
+	{
+		m_ImplicitPlaneGizmo->SetBehavior(NULL);
+		mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneGizmo));
+	}
+	mafDEL(m_ImplicitPlaneGizmo);
+
+	vtkDEL(m_Gizmo);
+	vtkDEL(m_ArrowShape);
+	vtkDEL(m_PlaneSource);
+	vtkDEL(m_ClipperBoundingBox);
+	vtkDEL(m_Arrow);
+	vtkDEL(m_ClipperPlane);
+
+	mafDEL(m_IsaCompositorWithoutGizmo);
+	mafDEL(m_IsaCompositorWithGizmo);
+
+	if(m_GizmoTranslate)
+		m_GizmoTranslate->Show(false);
+	if(m_GizmoRotate)
+		m_GizmoRotate->Show(false);
+	if(m_GizmoScale)
+		m_GizmoScale->Show(false);
+	cppDEL(m_GizmoTranslate);
+	cppDEL(m_GizmoRotate);
+	cppDEL(m_GizmoScale);
+
 	for(int i=0;i<m_ResultPolyData.size();i++)
 	{
 		vtkDEL(m_ResultPolyData[i]);
@@ -181,15 +212,6 @@ void medOpLabelizeSurface::OpRun()
 		m_VmeEditor->GetMaterial()->m_ColorLut->SetTableValue(0,1.0,1.0,1.0);
 		m_VmeEditor->GetMaterial()->m_ColorLut->Build();
 
-		vtkMAFSmartPointer<vtkFloatArray> pointScalar;
-		pointScalar->SetName("POINT_LABEL");
-		pointScalar->SetNumberOfComponents(1);
-		pointScalar->SetNumberOfTuples(inputPolydata->GetNumberOfPoints());
-		for(int i=0;i<inputPolydata->GetNumberOfPoints();i++)
-		{
-			pointScalar->InsertTuple1(i,0.0);
-		}
-
 		vtkMAFSmartPointer<vtkDoubleArray> cellScalar;
 		cellScalar->SetName("CELL_LABEL");
 		cellScalar->SetNumberOfComponents(1);
@@ -224,12 +246,13 @@ void medOpLabelizeSurface::OpRun()
 
 	vtkNEW(m_ClipperBoundingBox);
 
+	ShowClipPlane(true);
+
 	if(!m_TestMode)
 	{
 		//m_VmeEditor->GetOutput()->SetMaterial()
 		CreateGui();
 		ShowGui();
-		ShowClipPlane(true);
 
 		CreateGizmos();
 		//Enable & show Gizmos
@@ -362,6 +385,11 @@ void medOpLabelizeSurface::ShowClipPlane(bool show)
 			//m_PlaneWidth = xdim;
 			//m_PlaneHeight = ydim;
 
+			((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
+			// bounding box dim
+			m_PlaneWidth = b[1] - b[0];
+			m_PlaneHeight = b[3] - b[2];
+
 			// create the gizmo plane on the z = 0 plane
 			vtkNEW(m_PlaneSource);
 			m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
@@ -475,14 +503,7 @@ void medOpLabelizeSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_PLANE_WIDTH:
 		case ID_PLANE_HEIGHT:
 			{
-				if(PlaneCreated)
-				{
-					m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
-					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
-					m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
-					m_PlaneSource->Update();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-				}
+				SetPlaneDimension();
 			}
 			break;
 		case ID_USE_GIZMO:
@@ -515,6 +536,27 @@ void medOpLabelizeSurface::OnEventThis(mafEventBase *maf_event)
 			mafEventMacro(*e);
 			break; 
 		}
+	}
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::SetPlaneDimension(double w,double h)
+//----------------------------------------------------------------------------
+{
+	m_PlaneWidth=w;
+	m_PlaneHeight=h;
+	SetPlaneDimension();
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::SetPlaneDimension()
+//----------------------------------------------------------------------------
+{
+	if(PlaneCreated)
+	{
+		m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+		m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
+		m_PlaneSource->SetOrigin(-m_PlaneWidth/2,-m_PlaneHeight/2, 0);
+		m_PlaneSource->Update();
+		mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 	}
 }
 //----------------------------------------------------------------------------
@@ -603,30 +645,6 @@ void medOpLabelizeSurface::UpdateISARefSys()
 void medOpLabelizeSurface::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-	if(m_ImplicitPlaneGizmo)
-	{
-		m_ImplicitPlaneGizmo->SetBehavior(NULL);
-		mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneGizmo));
-	}
-	mafDEL(m_ImplicitPlaneGizmo);
-
-	vtkDEL(m_Gizmo);
-	vtkDEL(m_ArrowShape);
-	vtkDEL(m_PlaneSource);
-	vtkDEL(m_ClipperBoundingBox);
-	vtkDEL(m_Arrow);
-	vtkDEL(m_ClipperPlane);
-
-	mafDEL(m_IsaCompositorWithoutGizmo);
-	mafDEL(m_IsaCompositorWithGizmo);
-
-	m_GizmoTranslate->Show(false);
-	m_GizmoRotate->Show(false);
-	m_GizmoScale->Show(false);
-	cppDEL(m_GizmoTranslate);
-	cppDEL(m_GizmoRotate);
-	cppDEL(m_GizmoScale);
-
 	mafEventMacro(mafEvent(this,VME_SHOW,m_VmeEditor,false));
 	m_VmeEditor->ReparentTo(NULL);
 
@@ -642,8 +660,7 @@ void medOpLabelizeSurface::OpDo()
 	if(m_VmeEditor)
 	{
 		mafVMESurface::SafeDownCast(m_Input)->SetData(vtkPolyData::SafeDownCast(m_VmeEditor->GetOutput()->GetVTKData()),((mafVMESurface*)m_Input)->GetTimeStamp());
-		mmaMaterial *mat;
-		mafNEW(mat);
+		mafSmartPointer<mmaMaterial> mat;
 		mat->DeepCopy(m_VmeEditor->GetMaterial());
 		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->SetMaterial(mat);
 		mafVMESurface::SafeDownCast(m_Input)->GetSurfaceOutput()->Update();
@@ -695,7 +712,6 @@ void medOpLabelizeSurface::Labelize()
 	m_ClipperBoundingBox->Update();
 
 	vtkMAFSmartPointer<vtkPolyData> newPolyData1;
-	//vtkNEW(newPolyData1);
 	newPolyData1->DeepCopy(m_ClipperBoundingBox->GetOutput());
 	newPolyData1->Update();
 
@@ -706,28 +722,17 @@ void medOpLabelizeSurface::Labelize()
 		{
 			cellScalar->SetTuple1(i,m_LabelValue);
 		}
-		newPolyData1->GetPointData()->Update();
+		newPolyData1->GetCellData()->Update();
 	}
 
 	double range[2];
 	newPolyData1->GetScalarRange(range);
-
-	vtkFloatArray *pointScalar = vtkFloatArray::SafeDownCast(newPolyData1->GetPointData()->GetArray("POINT_LABEL"));
-	if(pointScalar)
-	{
-		for(int i=0;i<newPolyData1->GetNumberOfPoints();i++)
-		{
-			pointScalar->SetTuple1(i,m_LabelValue);
-		}
-		newPolyData1->GetPointData()->Update();
-	}
 
 	m_ClipperBoundingBox->SetClipInside(0);
 	m_ClipperBoundingBox->Modified();
 	m_ClipperBoundingBox->Update();
 
 	vtkMAFSmartPointer<vtkPolyData> newPolyData2;
-	//vtkNEW(newPolyData2);
 	newPolyData2->DeepCopy(m_ClipperBoundingBox->GetOutput());
 	newPolyData2->Update();
 
@@ -871,5 +876,16 @@ void medOpLabelizeSurface::OnEventGizmoScale(mafEventBase *maf_event)
 		{
 			mafEventMacro(*maf_event);
 		}
+	}
+}
+//----------------------------------------------------------------------------
+void medOpLabelizeSurface::SetLutEditor(vtkLookupTable *lut)
+//----------------------------------------------------------------------------
+{
+	if(m_VmeEditor)
+	{
+		m_VmeEditor->GetMaterial()->m_ColorLut = lut;
+		m_VmeEditor->GetMaterial()->UpdateProp();
+		m_VmeEditor->Update();
 	}
 }
