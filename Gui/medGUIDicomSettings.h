@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-10-16 12:45:46 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-17 16:27:47 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,6 +35,7 @@ public:
 	{
 		ID_DICTONARY = MINID,
 		ID_TYPE_DICOM,
+		ID_AUTO_POS_CROP,
 	};
 
 	enum DICOM_MODALITY
@@ -52,6 +53,8 @@ public:
 
 	mafString GetDictionary(){return m_Dictionary;};
 
+	int AutoCropPosition(){return m_AutoCropPos;};
+
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
 
@@ -68,6 +71,8 @@ protected:
 	mafString m_Dictionary;
 	mmgCheckListBox *m_DicomModalityListBox;
 
-	bool m_CheckOnOff[4];
+	int m_CheckOnOff[4];
+
+	int m_AutoCropPos;
 };
 #endif

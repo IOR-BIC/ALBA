@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-16 13:08:43 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-10-17 16:27:47 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -34,6 +34,8 @@ mafGUISettings(Listener, label)
 
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = true;
 
+	m_AutoCropPos = 0;
+
 	InitializeSettings();
 }
 //----------------------------------------------------------------------------
@@ -47,8 +49,7 @@ void medGUIDicomSettings::CreateGui()
 {
 	m_Gui = new mmgGui(this);
 	m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary);
-	m_Gui->Divider(1);
-
+	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
 	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),m_CheckOnOff[0]);
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),m_CheckOnOff[1]);
@@ -81,6 +82,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 			m_Config->Write("EnableReadSC",m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY));
 			m_Config->Write("EnableReadMI",m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY));
 			m_Config->Write("EnableReadXA",m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY));
+		}
+		break;
+	case ID_AUTO_POS_CROP:
+		{
+			m_Config->Write("AutoCropPos",m_AutoCropPos);
 		}
 		break;
 	default:
@@ -140,6 +146,16 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("EnableReadXA",m_CheckOnOff[3]);
 	}
+
+	if(m_Config->Read("AutoCropPos", &long_item))
+	{
+		m_AutoCropPos=long_item;
+	}
+	else
+	{
+		m_Config->Write("AutoCropPos",m_AutoCropPos);
+	}
+
 	m_Config->Flush();
 }
 //----------------------------------------------------------------------------
