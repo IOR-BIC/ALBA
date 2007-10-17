@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-10-16 12:46:18 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-10-17 16:27:05 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -154,6 +154,12 @@ protected:
 	void CameraReset();
 
 	void OnWizardPageChanging(){};
+
+	/** Auto position of the crop plane in way of Volume side */
+	void AutoPositionCropPlane();
+
+	/** Performe crop of dicom data */
+	void Crop();
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkDicomUnPacker	*m_DicomReader;

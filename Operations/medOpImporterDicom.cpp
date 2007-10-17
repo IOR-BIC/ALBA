@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-16 12:46:18 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-10-17 16:27:05 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -185,7 +185,7 @@ mafOp(label)
 
 	m_VolumeName = "";
 
-	m_VolumeSide=LEFT_SIDE;
+	m_VolumeSide=RIGHT_SIDE;
 
 	m_DicomModalityListBox = NULL;
 }
@@ -528,6 +528,8 @@ void medOpImporterDicom::CreateCropPage()
 	m_CropGui->Label(_("crop"),true);
 	m_CropGui->Button(ID_CROP_BUTTON,_("crop"));
 	m_CropGui->Button(ID_UNDO_CROP_BUTTON,_("undo crop"));
+	wxString sideChoices[2] = {_("Left"),_("Right")};
+	m_CropGui->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
 	m_SliceScannerCropPage=m_CropGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
 	m_TimeScannerCropPage=m_CropGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
 
@@ -548,8 +550,6 @@ void medOpImporterDicom::CreateBuildPage()
 	wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
 	m_BuildGui->Label(_("build volume"),true);
 	m_BuildGui->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
-	wxString sideChoices[2] = {_("Left"),_("Right")};
-	m_BuildGui->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
 	m_BuildGui->String(ID_VOLUME_NAME,_("volume name"),&m_VolumeName);
 	m_SliceScannerBuildPage=m_BuildGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
 	m_TimeScannerBuildPage=m_BuildGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
@@ -584,8 +584,23 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+		case ID_VOLUME_SIDE:
+			{
+				AutoPositionCropPlane();
+			}
+			break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
+				if(m_Wizard->GetCurrentPage()==m_LoadPage && m_NumberOfStudy<1)
+				{
+					m_Wizard->EnableChangePageOff();
+					return;
+				}
+				else
+				{
+					m_Wizard->EnableChangePageOn();
+				}
+
 				if (m_Wizard->GetCurrentPage()==m_CropPage)
 					m_CropActor->VisibilityOff();
 				else
@@ -599,13 +614,30 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 			m_LoadGui->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));
 			break;*/
 		case ID_OPEN_DIR:
-			ResetStructure();
-			// scan dicom directory
-			BuildDicomFileList(m_DicomDirectory.GetCStr());
-			if(m_NumberOfStudy == 1)
 			{
-				m_StudyListbox->SetSelection(FIRST_SELECTION);
-				OnEvent(&mafEvent(this, ID_STUDY));
+				ResetStructure();
+				// scan dicom directory
+				BuildDicomFileList(m_DicomDirectory.GetCStr());
+				if(m_NumberOfStudy>0)
+				{
+					if(m_NumberOfStudy == 1)
+					{
+						m_StudyListbox->SetSelection(FIRST_SELECTION);
+						OnEvent(&mafEvent(this, ID_STUDY));
+					}
+					if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+					{
+						AutoPositionCropPlane();
+					}
+					else
+					{
+						m_CropPlane->SetOrigin(0.0,0.0,0.0);
+						m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
+						m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
+						m_CropPage->GetRWI()->CameraReset();
+					}
+					m_BoxCorrect=true;
+				}
 			}
 			break;
 		case ID_UNDO_CROP_BUTTON:
@@ -1001,37 +1033,78 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				break;
 			case ID_CROP_BUTTON:
 				{     
-					if( !m_BoxCorrect )
-					{
-						wxMessageBox("Error on selecting the box");
-						return;
-					}
-
-					m_CropFlag = true;
-					ShowSlice(m_CurrentSlice);
-					m_CropActor->VisibilityOff();
-					double diffx,diffy,boundsCamera[6];
-					diffx=m_DicomBounds[1]-m_DicomBounds[0];
-					diffy=m_DicomBounds[3]-m_DicomBounds[2];
-					boundsCamera[0]=0.0;
-					boundsCamera[1]=diffx;
-					boundsCamera[2]=0.0;
-					boundsCamera[3]=diffy;
-					boundsCamera[4]=0.0;
-					boundsCamera[5]=0.0;
-
-					m_CropPage->GetRWI()->CameraReset(boundsCamera);
-					m_CropPage->GetRWI()->CameraUpdate();
-					m_CropGui->Enable(ID_UNDO_CROP_BUTTON,true);
-
-					m_LoadPage->GetRWI()->CameraReset(boundsCamera);
-					m_LoadPage->GetRWI()->CameraUpdate();
-					m_BuildPage->GetRWI()->CameraReset(boundsCamera);
-					m_BuildPage->GetRWI()->CameraUpdate();
+					Crop();
 				}
 				break;
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicom::Crop()
+//----------------------------------------------------------------------------
+{
+	if( !m_BoxCorrect )
+	{
+		wxMessageBox("Error on selecting the box");
+		return;
+	}
+
+	m_CropFlag = true;
+	ShowSlice(m_CurrentSlice);
+	m_CropActor->VisibilityOff();
+	double diffx,diffy,boundsCamera[6];
+	diffx=m_DicomBounds[1]-m_DicomBounds[0];
+	diffy=m_DicomBounds[3]-m_DicomBounds[2];
+	boundsCamera[0]=0.0;
+	boundsCamera[1]=diffx;
+	boundsCamera[2]=0.0;
+	boundsCamera[3]=diffy;
+	boundsCamera[4]=0.0;
+	boundsCamera[5]=0.0;
+
+	m_CropPlane->SetOrigin(0.0,0.0,0.0);
+	m_CropPlane->SetPoint1(diffx,0.0,0.0);
+	m_CropPlane->SetPoint2(0.0,diffy,0.0);
+	m_CropPlane->Update();
+
+	m_CropPage->GetRWI()->CameraReset(boundsCamera);
+	m_CropPage->GetRWI()->CameraUpdate();
+	m_CropGui->Enable(ID_UNDO_CROP_BUTTON,true);
+
+	m_LoadPage->GetRWI()->CameraReset(boundsCamera);
+	m_LoadPage->GetRWI()->CameraUpdate();
+	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
+	m_BuildPage->GetRWI()->CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicom::AutoPositionCropPlane()
+//----------------------------------------------------------------------------
+{
+	int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+
+	m_ListSelected->Item(currImageId)->GetData()->GetOutput()->Update();
+	m_ListSelected->Item(currImageId)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
+
+	double diffY,diffX;
+	diffY=m_DicomBounds[3]-m_DicomBounds[2];
+	diffX=m_DicomBounds[1]-m_DicomBounds[0];
+
+	if(m_VolumeSide==RIGHT_SIDE)
+	{
+		m_CropPlane->SetOrigin(0.0,diffY/4,0.0);
+		m_CropPlane->SetPoint1(diffX/2,diffY/4,0.0);
+		m_CropPlane->SetPoint2(0.0,(diffY/4)*3,0.0);
+		m_CropPlane->Update();
+	}
+	else if(m_VolumeSide==LEFT_SIDE)
+	{
+		m_CropPlane->SetOrigin(m_DicomBounds[1]-diffX/2,diffY/4,0.0);
+		m_CropPlane->SetPoint1(m_DicomBounds[1],diffY/4,0.0);
+		m_CropPlane->SetPoint2(m_DicomBounds[1]-diffX/2,(diffY/4)*3,0.0);
+		m_CropPlane->Update();
+	}
+	
+	m_CropPage->GetRWI()->CameraReset();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::CameraUpdate()
