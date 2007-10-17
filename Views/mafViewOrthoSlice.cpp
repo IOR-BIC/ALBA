@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 17:06:50 $
-  Version:   $Revision: 1.54 $
+  Date:      $Date: 2007-10-17 09:50:50 $
+  Version:   $Revision: 1.55 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mmgLutSlider.h"
 #include "mafEventInteraction.h"
 #include "mafEventSource.h"
+#include "mafNodeIterator.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mafVMESurface.h"
@@ -36,6 +37,8 @@
 #include "mafIndent.h"
 #include "mafGizmoSlice.h"
 #include "mafVMEGizmo.h"
+#include "mafPipeSurfaceSlice.h"
+#include "medVisualPipeSlicerSlice.h"
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
@@ -97,6 +100,9 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 
   m_Side = 0;
 	m_Snap = 0;
+
+	m_AllSurface=0;
+	m_Border=1;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -206,6 +212,22 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         }
       }
       break;*/
+			case ID_BORDER_CHANGE:
+			{
+				OnEventSetThickness();
+			}
+			break;
+			case ID_ALL_SURFACE:
+			{
+				if(m_AllSurface)
+				{
+					mafNode* node=GetSceneGraph()->GetSelectedVme();
+					mafVME* vme=(mafVME*)node;
+					mafNode* root=vme->GetRoot();
+					SetThicknessForAllSurfaceSlices(root);
+				}
+			}
+			break;
       case ID_LUT_CHOOSER:
       {
         mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
@@ -302,6 +324,9 @@ mmgGui* mafViewOrthoSlice::CreateGui()
 
   m_Gui->Button(ID_RESET_SLICES,"reset slices","");
   m_Gui->Divider();
+
+	m_Gui->Bool(ID_ALL_SURFACE,"All Surface",&m_AllSurface);
+	m_Gui->FloatSlider(ID_BORDER_CHANGE,"Border",&m_Border,1.0,5.0);
 
   EnableWidgets(m_CurrentVolume != NULL);
   for(int i=1; i<m_NumOfChildView; i++)
@@ -492,8 +517,49 @@ void mafViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
 
   this->CameraUpdate();
 }
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::OnEventSetThickness()
+//----------------------------------------------------------------------------
+{
+	if(m_AllSurface)
+	{
+		mafNode* node=this->GetSceneGraph()->GetSelectedVme();
+		mafVME* vme=(mafVME*)node;
+		mafNode* root=vme->GetRoot();
+		SetThicknessForAllSurfaceSlices(root);
+	}
+	else
+	{
+		mafNode *node=this->GetSceneGraph()->GetSelectedVme();
+		mafSceneNode *SN = this->GetSceneGraph()->Vme2Node(node);
 
+		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
+		{
+			pipe->SetThickness(m_Border);
+		}
+		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
+		{
+			pipe->SetThickness(m_Border);
+		}
+		if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
+		{
+			pipe->SetThickness(m_Border);
+		}
 
+		if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
+		{
+			pipe->SetThickness(m_Border);
+		}
+		if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
+		{
+			pipe->SetThickness(m_Border);
+		}
+		if(medVisualPipeSlicerSlice *pipe = medVisualPipeSlicerSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
+		{
+			pipe->SetThickness(m_Border);
+		}
+	}
+}
 //-------------------------------------------------------------------------
 void mafViewOrthoSlice::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
@@ -509,8 +575,9 @@ void mafViewOrthoSlice::Print(std::ostream& os, const int tabs)// const
     m_ChildViewList[v]->Print(os, 1);
   }
 }
-
+//-------------------------------------------------------------------------
 void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
+//-------------------------------------------------------------------------
 {
   if (node == NULL)
   {
@@ -546,8 +613,9 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
 	GizmoCreate();
 }
-
+//-------------------------------------------------------------------------
 void mafViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
+//-------------------------------------------------------------------------
 {
 	// Destroy Ortho Stuff
   if (m_CurrentVolume == NULL)
@@ -559,12 +627,38 @@ void mafViewOrthoSlice::DestroyOrthoSlicesAndGizmos()
 	m_CurrentVolume = NULL;
 	GizmoDelete();
 }
-
+//-------------------------------------------------------------------------
 void mafViewOrthoSlice::ResetSlicesPosition( mafNode *node )
+//-------------------------------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
   this->VmeShow(node, false);
   this->VmeShow(node, true);
   CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void mafViewOrthoSlice::SetThicknessForAllSurfaceSlices(mafNode *root)
+//----------------------------------------------------------------------------
+{
+	mafNodeIterator *iter = root->NewIterator();
+	for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+		if(node->IsA("mafVMESurface"))
+		{
+			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_XN_VIEW]->GetNodePipe(node)))
+			{
+				pipe->SetThickness(m_Border);
+			}
+			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_YN_VIEW]->GetNodePipe(node)))
+			{
+				pipe->SetThickness(m_Border);
+			}
+			if(mafPipeSurfaceSlice *pipe = mafPipeSurfaceSlice::SafeDownCast(m_ChildViewList[CHILD_ZN_VIEW]->GetNodePipe(node)))
+			{
+				pipe->SetThickness(m_Border);
+			}
+		}
+	}
+	iter->Delete();
 }

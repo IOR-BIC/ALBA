@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 17:06:50 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-10-17 09:50:50 $
+  Version:   $Revision: 1.20 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,6 +70,8 @@ void CreateOrthoslicesAndGizmos( mafNode * node );
     ID_SIDE_ORTHO,
 		ID_SNAP,
     ID_RESET_SLICES,
+		ID_ALL_SURFACE,
+		ID_BORDER_CHANGE,
     ID_LAST
   };
 
@@ -100,6 +102,12 @@ protected:
 
   /** Reset slice positions  */
   void ResetSlicesPosition(mafNode *node);
+
+	void OnEventSetThickness();
+	void SetThicknessForAllSurfaceSlices(mafNode *root);
+
+	int m_AllSurface;
+	double m_Border;
 
   mafGizmoSlice   *m_Gizmo[3];
 
