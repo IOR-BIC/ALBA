@@ -74,6 +74,9 @@ SET(PROJECT_SRCS
   
   medOpImporterDicom.cpp
   medOpImporterDicom.h
+  
+  medOpSmoothSurface.cpp
+  medOpSmoothSurface.h
 
 )
 
