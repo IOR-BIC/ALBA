@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-25 14:06:32 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-18 07:15:50 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -347,14 +347,14 @@ void mafVMESurfaceParametric::SourceGui()
 				m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere);
 				m_RollOutCone = m_Gui->RollOut(ID_ROLLOUT_CONE,_("Cone Parameters"), guiCone, false);
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder, false);
-				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
+				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Parallelepiped Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
 			break;
 			case PARAMETRIC_CONE:
 				m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,"Sphere Parameters", guiSphere, false);
 				m_RollOutCone = m_Gui->RollOut(ID_ROLLOUT_CONE,_("Cone Parameters"), guiCone);
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,"Cylinder Parameters", guiCylinder, false);
-				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
+				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Parallelepiped Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
 
 			break;
@@ -362,7 +362,7 @@ void mafVMESurfaceParametric::SourceGui()
 				m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere, false);
 				m_RollOutCone = m_Gui->RollOut(ID_ROLLOUT_CONE,_("Cone Parameters"), guiCone, false);
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder);
-				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
+				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Parallelepiped Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
 
 			break;
@@ -370,7 +370,7 @@ void mafVMESurfaceParametric::SourceGui()
 				m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere, false);
 				m_RollOutCone = m_Gui->RollOut(ID_ROLLOUT_CONE,_("Cone Parameters"), guiCone, false);
 				m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder, false);
-				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube);
+				m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Parallelepiped Parameters"), guiCube);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane, false);
 
 			break;
@@ -378,7 +378,7 @@ void mafVMESurfaceParametric::SourceGui()
         m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"), guiSphere, false);
         m_RollOutCone = m_Gui->RollOut(ID_ROLLOUT_CONE,_("Cone Parameters"), guiCone, false);
         m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), guiCylinder, false);
-        m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Cube Parameters"), guiCube, false);
+        m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Parallelepiped Parameters"), guiCube, false);
         m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), guiPlane);
 
         break;
