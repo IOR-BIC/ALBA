@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-17 10:41:20 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-10-18 10:09:07 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -884,7 +884,7 @@ void medOpLabelizeSurface::SetLutEditor(vtkLookupTable *lut)
 {
 	if(m_VmeEditor)
 	{
-		m_VmeEditor->GetMaterial()->m_ColorLut = lut;
+		m_VmeEditor->GetMaterial()->m_ColorLut->DeepCopy(lut);
 		m_VmeEditor->GetMaterial()->UpdateProp();
 		m_VmeEditor->Update();
 	}
