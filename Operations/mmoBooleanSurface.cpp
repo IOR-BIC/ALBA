@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-19 08:40:01 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-10-18 07:14:21 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -103,7 +103,7 @@ mmoBooleanSurface::~mmoBooleanSurface()
 bool mmoBooleanSurface::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-	return (node && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric)));
+	return (node && (node->IsMAFType(mafVMESurface))); //|| node->IsMAFType(mafVMESurfaceParametric)));
 }
 //----------------------------------------------------------------------------
 mafOp *mmoBooleanSurface::Copy()   
