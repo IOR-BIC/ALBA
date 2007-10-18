@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-17 16:27:05 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-10-18 14:26:38 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -188,6 +188,8 @@ mafOp(label)
 	m_VolumeSide=RIGHT_SIDE;
 
 	m_DicomModalityListBox = NULL;
+
+	m_CroppedExetuted=false;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
@@ -577,7 +579,7 @@ void medOpImporterDicom::CreateGui()
 	m_Gui->SetListener(this);
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicom::	OnEvent(mafEventBase *maf_event) 
+void medOpImporterDicom::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -594,6 +596,7 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				if(m_Wizard->GetCurrentPage()==m_LoadPage && m_NumberOfStudy<1)
 				{
 					m_Wizard->EnableChangePageOff();
+					wxMessageBox(_("There isn't any studies!"));
 					return;
 				}
 				else
@@ -602,9 +605,16 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				}
 
 				if (m_Wizard->GetCurrentPage()==m_CropPage)
-					m_CropActor->VisibilityOff();
+				{
+						m_CropActor->VisibilityOff();
+				}
 				else
-					m_CropActor->VisibilityOn();
+				{
+					if(!m_CroppedExetuted)
+						m_CropActor->VisibilityOn();
+					else
+						m_CropActor->VisibilityOff();
+				}
 				
 				CameraUpdate();
 			}
@@ -661,6 +671,7 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 				m_BuildPage->GetRWI()->CameraUpdate();
 				m_CropGui->Enable(ID_UNDO_CROP_BUTTON,false);
 				m_CropActor->VisibilityOn();
+				m_CroppedExetuted=false;
 				CameraUpdate();
 			}
 			break;
@@ -768,7 +779,9 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 			break;
 			case MOUSE_DOWN:
 				{
-					if (m_Wizard->GetCurrentPage()==m_CropPage)
+					if(m_CroppedExetuted==false)
+					{
+						if (m_Wizard->GetCurrentPage()==m_CropPage)
 					{
 						//long handle_id = e->GetArg();
 						double pos[3];
@@ -901,11 +914,14 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 						}
 						CameraUpdate();
 					}
+					}
 				}
 				break;
 			case MOUSE_MOVE:  //ridimensiona il gizmo
 				{
-					if (m_Wizard->GetCurrentPage()==m_CropPage)
+					if(m_CroppedExetuted==false)
+					{
+						if (m_Wizard->GetCurrentPage()==m_CropPage)
 					{
 						//long handle_id = e->GetArg();
 						double pos[3], oldO[3], oldP1[3], oldP2[3];
@@ -964,11 +980,14 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 						}
 						CameraUpdate();
 					}
+					}
 				}
 				break;
 			case MOUSE_UP:  //blocca il gizmo
 				{
-					if (m_Wizard->GetCurrentPage()==m_CropPage)
+					if(m_CroppedExetuted==false)
+					{
+						if (m_Wizard->GetCurrentPage()==m_CropPage)
 					{
 						if (m_GizmoStatus == GIZMO_RESIZING)
 							m_GizmoStatus = 	GIZMO_DONE;
@@ -989,6 +1008,7 @@ void medOpImporterDicom::	OnEvent(mafEventBase *maf_event)
 						}
 						else
 							m_BoxCorrect = true;   
+					}
 					}
 				}
 				break; 
@@ -1052,6 +1072,7 @@ void medOpImporterDicom::Crop()
 	m_CropFlag = true;
 	ShowSlice(m_CurrentSlice);
 	m_CropActor->VisibilityOff();
+	m_CroppedExetuted=true;
 	double diffx,diffy,boundsCamera[6];
 	diffx=m_DicomBounds[1]-m_DicomBounds[0];
 	diffy=m_DicomBounds[3]-m_DicomBounds[2];
@@ -1062,10 +1083,10 @@ void medOpImporterDicom::Crop()
 	boundsCamera[4]=0.0;
 	boundsCamera[5]=0.0;
 
-	m_CropPlane->SetOrigin(0.0,0.0,0.0);
+	/*m_CropPlane->SetOrigin(0.0,0.0,0.0);
 	m_CropPlane->SetPoint1(diffx,0.0,0.0);
 	m_CropPlane->SetPoint2(0.0,diffy,0.0);
-	m_CropPlane->Update();
+	m_CropPlane->Update();*/
 
 	m_CropPage->GetRWI()->CameraReset(boundsCamera);
 	m_CropPage->GetRWI()->CameraUpdate();

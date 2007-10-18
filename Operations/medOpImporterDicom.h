@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-10-17 16:27:05 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2007-10-18 14:26:38 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -226,6 +226,7 @@ protected:
 
 	bool	m_BoxCorrect;
 	bool	m_CropFlag;
+	bool	m_CroppedExetuted; //<<<To check if a crop as been executed
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
