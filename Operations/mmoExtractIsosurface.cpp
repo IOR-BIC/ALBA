@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-15 14:22:25 $
-Version:   $Revision: 1.20 $
+Date:      $Date: 2007-10-18 07:13:01 $
+Version:   $Revision: 1.21 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,6 +65,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkSmartPointer.h"
 #include "vtkLookupTable.h"
 #include "vtkVolume.h"
+#include "vtkTriangleFilter.h"
+#include "vtkCleanPolyData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoExtractIsosurface);
@@ -93,7 +95,9 @@ mafOp(label), m_IsosurfaceVme(NULL)
   m_SliceMax  = 0;
   m_ShowSlice = 1;
   m_Autolod = 1;
-  m_Clean     = 1;
+  m_Optimize     = 1;
+	m_Triangulate = 1;
+	m_Clean				= 1;
 
   for(int i=0; i<6; i++) m_BoundingBox[i]=0;
 
@@ -136,7 +140,7 @@ void mmoExtractIsosurface::OpRun()
   if( ret_dlg == wxID_OK )
   {
     result = OP_RUN_OK;
-    ExtractSurface(m_Clean != 0);
+    ExtractSurface(m_Optimize != 0);
   }
   DeleteOpDialog();
 
@@ -176,6 +180,8 @@ enum EXTRACT_ISOSURFACE_ID
   ID_AUTO_LOD,
   ID_OK,
   ID_CANCEL,
+	ID_TRIANGULATE,
+	ID_CLEAN,
 };
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::CreateOpDialog()
@@ -252,6 +258,8 @@ void mmoExtractIsosurface::CreateOpDialog()
   wxCheckBox *chk_slice = new wxCheckBox(m_Dialog, ID_VIEW_SLICE,       "slice", p, wxSize(80,20));
   wxCheckBox *chk_opt =   new wxCheckBox(m_Dialog, ID_OPTIMIZE_CONTOUR, "optimize", p, wxSize(80,20));
   wxCheckBox *chk_lod =   new wxCheckBox(m_Dialog, ID_AUTO_LOD,         "auto-lod", p, wxSize(80,20));
+	wxCheckBox *chk_clean =   new wxCheckBox(m_Dialog, ID_CLEAN,_("clean"), p, wxSize(80,20));
+	wxCheckBox *chk_triangulate =   new wxCheckBox(m_Dialog, ID_TRIANGULATE, _("triangulate"), p, wxSize(80,20));
   //  wxCheckBox *b_grid  = new wxCheckBox(m_Dialog, ID_GRID,         "show/hide grid", p, wxSize(80,20));
 
   mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
@@ -274,8 +282,10 @@ void mmoExtractIsosurface::CreateOpDialog()
   b_ok->SetValidator(mmgValidator(this,ID_OK,b_ok));
   b_cancel->SetValidator(mmgValidator(this,ID_CANCEL,b_cancel));
   //  b_grid->SetValidator(mmgValidator(this,ID_GRID,b_grid));
-  chk_slice->SetValidator( mmgValidator(this, ID_VIEW_SLICE, chk_slice, &m_ShowSlice));
-  chk_opt->SetValidator(mmgValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Clean));
+	chk_slice->SetValidator( mmgValidator(this, ID_VIEW_SLICE, chk_slice, &m_ShowSlice));
+	chk_clean->SetValidator( mmgValidator(this, ID_CLEAN, chk_clean, &m_Clean));
+  chk_triangulate->SetValidator( mmgValidator(this, ID_TRIANGULATE, chk_triangulate, &m_Triangulate));
+  chk_opt->SetValidator(mmgValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Optimize));
   chk_lod->SetValidator(mmgValidator(this, ID_AUTO_LOD, chk_lod, &m_Autolod));
 
   wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -297,6 +307,8 @@ void mmoExtractIsosurface::CreateOpDialog()
   h_sizer3->Add(chk_lod,   0,wxRIGHT);
   h_sizer3->Add(chk_opt,   0,wxRIGHT);
   h_sizer3->Add(chk_slice, 0,wxRIGHT);
+	h_sizer3->Add(chk_clean, 0,wxRIGHT);
+	h_sizer3->Add(chk_triangulate, 0,wxRIGHT);
   //  h_sizer3->Add(b_grid,  0,wxRIGHT);
   h_sizer3->Add(b_fit,     0,wxRIGHT);
   h_sizer3->Add(b_ok,      0,wxRIGHT);
@@ -741,8 +753,27 @@ void mmoExtractIsosurface::ExtractSurface(bool clean)
 
   // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
   // and then call surface->Delete() when the VME is created
-  vtkPolyData *surface = vtkPolyData::New();
+  vtkPolyData *surface;
   surface=m_ContourVolumeMapper->GetOutput();
+	vtkMAFSmartPointer<vtkCleanPolyData>clearFilter;
+	vtkMAFSmartPointer<vtkTriangleFilter >triangleFilter;
+	if(m_Clean)
+	{
+		clearFilter->SetInput(surface);
+		clearFilter->ConvertLinesToPointsOff();
+		clearFilter->ConvertPolysToLinesOff();
+		clearFilter->ConvertStripsToPolysOff();
+		//clearFilter->PointMergingOff();
+		clearFilter->Update();
+		surface=clearFilter->GetOutput();
+	}
+	if(m_Triangulate)
+	{
+		triangleFilter->SetInput(surface);
+		triangleFilter->Update();
+		surface=triangleFilter->GetOutput();
+	}
+
   if(surface==NULL)
   {
     wxMessageBox("Operation out of memory");
@@ -755,6 +786,4 @@ void mmoExtractIsosurface::ExtractSurface(bool clean)
   mafNEW(m_IsosurfaceVme);
   m_IsosurfaceVme->SetName(name.c_str());
   m_IsosurfaceVme->SetDataByDetaching(surface,0);
-
-  surface->Delete(); 
 }

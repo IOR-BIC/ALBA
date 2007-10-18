@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-18 07:13:01 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,7 +84,9 @@ protected:
   double       m_SliceMax;
 	double       m_SliceStep;
   int          m_ShowSlice;
-  int          m_Clean;
+  int          m_Optimize;
+	int					 m_Clean;
+	int					 m_Triangulate;
   int          m_Autolod;
   double       m_BoundingBox[6];
   double       m_SliceOrigin[3];
