@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoConnectivitySurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-27 14:00:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-18 07:07:28 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,6 +54,8 @@ mafOp(label)
 	m_Thresold = 0.0;
 	m_NumberOfExtractedSurfaces = "0";
   m_Alert="";
+
+	m_ExtractBiggestSurface = 0;
 }
 //----------------------------------------------------------------------------
 mmoConnectivitySurface::~mmoConnectivitySurface()
@@ -86,6 +88,7 @@ enum FILTER_SURFACE_ID
 	ID_CLEAN = MINID,
 	ID_THRESOLD,
 	ID_VTK_CONNECT,
+	ID_EXTRACT_BIGGEST_SURFACE,
 };
 //----------------------------------------------------------------------------
 void mmoConnectivitySurface::OpRun()   
@@ -123,6 +126,9 @@ void mmoConnectivitySurface::OpRun()
 
 	  m_Gui->Label("");
 	  m_Gui->Label(_("Extracted:"), &m_NumberOfExtractedSurfaces);
+		
+		m_Gui->Label("");
+		m_Gui->Bool(ID_EXTRACT_BIGGEST_SURFACE,_("Ext. Big"),&m_ExtractBiggestSurface);
 
     vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
     connectivityFilter->SetInput(m_OriginalPolydata);
@@ -146,7 +152,7 @@ void mmoConnectivitySurface::OpRun()
 	  m_Gui->Enable(wxOK,false);
 
 	  m_Gui->Divider();
-    m_Gui->Update();
+    //m_Gui->Update();
 	  ShowGui();
   }
 }
@@ -156,7 +162,6 @@ void mmoConnectivitySurface::OpDo()
 {
 	for(int vmeShowed = 0; vmeShowed < m_ExtractedVmes.size(); vmeShowed++)
 		m_ExtractedVmes[vmeShowed]->ReparentTo(m_Input);
-    //mafEventMacro(mafEvent(this,VME_ADD,m_ExtractedVmes[vmeShowed]));
 }
 //----------------------------------------------------------------------------
 void mmoConnectivitySurface::OpUndo()
@@ -173,6 +178,25 @@ void mmoConnectivitySurface::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {	
+		case ID_EXTRACT_BIGGEST_SURFACE:
+			{
+				int regionNumbers;
+				if(m_ExtractBiggestSurface == 1)
+				{
+					regionNumbers=1;
+				}
+				else
+				{
+					vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+					connectivityFilter->SetInput(m_OriginalPolydata);
+					connectivityFilter->SetExtractionModeToAllRegions();
+					connectivityFilter->Update();
+					regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
+				}
+				m_NumberOfExtractedSurfaces = wxString::Format("%d", regionNumbers);
+				m_Gui->Update();
+			}
+			break;
       case ID_VTK_CONNECT:
         OnVtkConnect();
       break;
@@ -191,7 +215,7 @@ void mmoConnectivitySurface::OpStop(int result)
 {
 	if(result == OP_RUN_CANCEL)
 	{
-		for(int numVmes=0;numVmes<m_ExtractedVmes.size();numVmes++)
+		for(int numVmes = 0; numVmes < m_ExtractedVmes.size(); numVmes++)
 		{
 			mafDEL(m_ExtractedVmes[numVmes]);
 		}
@@ -211,7 +235,7 @@ void mmoConnectivitySurface::OnVtkConnect()
 	  m_Gui->Update();
   }
 
-	for(int numVmes=0;numVmes<m_ExtractedVmes.size();numVmes++)
+	for(int numVmes = 0; numVmes < m_ExtractedVmes.size(); numVmes++)
 	{
     mafDEL(m_ExtractedVmes[numVmes]);
 	}
@@ -226,7 +250,6 @@ void mmoConnectivitySurface::OnVtkConnect()
   dimZ = (bounds[5] - bounds[4]);
 
   double maxBound = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
-
   if(m_Thresold > maxBound)
   {
     m_NumberOfExtractedSurfaces = _("0");
@@ -236,33 +259,30 @@ void mmoConnectivitySurface::OnVtkConnect()
     m_Gui->Update();
     return;
   }
-
-
 	vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-	//vtkPolyDataConnectivityFilter *connectivityFilter = vtkPolyDataConnectivityFilter::New();
 	connectivityFilter->SetInput(m_OriginalPolydata);
-	connectivityFilter->SetExtractionModeToSpecifiedRegions();
-	connectivityFilter->Update();
-
-	int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
-	//
-	for(int region=0, deleteRegion = 0; region< regionNumbers; region++)
+	int regionNumbers;
+	if(m_ExtractBiggestSurface == 1)
 	{
-		/*for(deleteRegion; deleteRegion < region; deleteRegion++ )
-		{
-      connectivityFilter->DeleteSpecifiedRegion(deleteRegion);
-			connectivityFilter->Update();
-		}*/
+		connectivityFilter->SetExtractionModeToLargestRegion();
+		connectivityFilter->Update();
+		regionNumbers = 1;
+	}
+	else
+	{
+		connectivityFilter->SetExtractionModeToSpecifiedRegions();
+		connectivityFilter->Update();
+		regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
+	}
+
+	for(int region = 0, deleteRegion = 0; region < regionNumbers; region++)
+	{
     connectivityFilter->InitializeSpecifiedRegionList();
-		
 		connectivityFilter->AddSpecifiedRegion(region);
 		connectivityFilter->Update();
 
-
-		double bounds[6];
 		connectivityFilter->GetOutput()->GetBounds(bounds);
 		
-		double dimX, dimY, dimZ;
 		dimX = (bounds[1] - bounds[0]);
 		dimY = (bounds[3] - bounds[2]);
 		dimZ = (bounds[5] - bounds[4]);
@@ -294,5 +314,4 @@ void mmoConnectivitySurface::OnVtkConnect()
 	  m_Gui->Enable(wxOK,true);
 	  m_Gui->Update();
   }
-
 }
