@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 11:50:49 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-10-18 12:41:22 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,6 +129,7 @@ void mafPipeSurface::Create(mafSceneNode *n)
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
   m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+	m_Mapper->SetLookupTable(surface_output->GetMaterial()->m_ColorLut);
   m_Mapper->SetScalarRange(sr);
 
   vtkNEW(m_Actor);
@@ -343,7 +344,7 @@ mmgGui *mafPipeSurface::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
-  m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+	//m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
 	m_Gui->Bool(ID_NORMAL_VISIBILITY,"norm. vis.",&m_NormalVisibility);
 	m_Gui->Bool(ID_EDGE_VISIBILITY,"edge vis.",&m_EdgeVisibility);
   m_Gui->Divider();
@@ -356,8 +357,9 @@ mmgGui *mafPipeSurface::CreateGui()
   double sr[2];
   m_Mapper->GetScalarRange(sr);
   m_SurfaceMaterial->m_ColorLut->SetTableRange(sr);
-  m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
-  m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
+	//m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
+  m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
+	m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
   m_Gui->Label("");
@@ -390,6 +392,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
           data->GetScalarRange(range);
           m_Mapper->SetScalarRange(range);
         }
+				m_Gui->Enable(ID_LUT,m_ScalarVisibility != 0);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
@@ -413,9 +416,9 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         m_MaterialButton->Enable(m_UseVTKProperty != 0);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
-      case ID_USE_LOOKUP_TABLE:
+      /*case ID_USE_LOOKUP_TABLE:
         m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
-      break;
+      break;*/
       case ID_RENDERING_DISPLAY_LIST:
         m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -429,7 +432,10 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 				break;
 			case ID_EDGE_VISIBILITY:
 				if(m_EdgesActor)
+				{
+					m_EdgesActor->GetProperty()->SetColor(1-m_Actor->GetProperty()->GetColor()[0],1-m_Actor->GetProperty()->GetColor()[1],1-m_Actor->GetProperty()->GetColor()[2]);
 					m_EdgesActor->SetVisibility(m_EdgeVisibility);
+				}
 				else
 					CreateEdgesPipe();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
