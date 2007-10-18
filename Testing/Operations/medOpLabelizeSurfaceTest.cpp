@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-16 13:15:17 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-18 10:08:48 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -80,15 +80,13 @@ void medOpLabelizeSurfaceTest::Test()
 	double centerInput[3];
 	reader->GetOutput()->GetCenter(centerInput);
 
-	mafVMESurface *surface;
-	mafNEW(surface);
+	mafSmartPointer<mafVMESurface>surface;
 	surface->SetData(reader->GetOutput(),0.0);
 	surface->GetOutput()->GetVTKData()->Update();
 	surface->Update();
 	CPPUNIT_ASSERT(surface);
 
-	vtkLookupTable *lut;
-	vtkNEW(lut);
+	vtkLookupTable *lut=vtkLookupTable::New();
 	lut->SetNumberOfTableValues(2);
 	lut->SetTableValue(0,1.0,0.0,0.0);
 	lut->SetTableValue(0,0.0,1.0,0.0);
@@ -132,6 +130,6 @@ void medOpLabelizeSurfaceTest::Test()
 		}
 	}
 
-	cppDEL(labelize);
-	mafDEL(surface);
+	lut->Delete();
+	mafDEL(labelize);
 }
