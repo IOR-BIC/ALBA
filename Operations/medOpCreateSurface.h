@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-07-23 10:04:24 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-10-19 14:17:49 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -75,6 +75,9 @@ public:
 	virtual void OpDo();
 
 protected:
+
+	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
+	virtual void OpStop(int result);
 
 };
 #endif
