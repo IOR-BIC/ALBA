@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-26 10:44:24 $
-Version:   $Revision: 1.34 $
+Date:      $Date: 2007-10-19 10:56:53 $
+Version:   $Revision: 1.35 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -564,7 +564,7 @@ void mafViewCTNew::ProbeVolume()
 
 			m_Prober[idSubView]->GetPolyDataOutput()->GetBounds(b);
 
-			double *centerSlice = new double[3];
+			double centerSlice[3];
 			m_Prober[idSubView]->GetPolyDataOutput()->GetCenter(centerSlice);
 			//m_SliceOriginVector.push_back(centerSlice);
 			//m_SliceBoundsVector.push_back(b);
@@ -658,6 +658,12 @@ void mafViewCTNew::ProbeVolume()
 			m_Mapper[idSubView]->SetLookupTable(lut);  	
 
 			probeVector[m_AdditionalProfileNumber]->GetPolyDataOutput()->GetBounds(b);
+
+      for(int h=0; h<probeVector.size();h++)
+      {
+        vtkDEL(probeVector[h]);
+      }
+      probeVector.size();
 		}
 	  
 	  m_Actor[idSubView]->SetMapper(m_Mapper[idSubView]);
@@ -704,6 +710,8 @@ void mafViewCTNew::ProbeVolume()
 		newb[3] = middleY + max;
 		newb[4] = middleZ - max;
 		newb[5] = middleZ + max;
+
+    mafDEL(copy);
 
 	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(newb);
 	  m_Gui->Update();
