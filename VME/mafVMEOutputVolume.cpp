@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:56 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-10-19 08:37:11 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,8 @@
 #include "vtkUnstructuredGrid.h"
 
 #include <assert.h>
+
+#define NULL_STRING_DATA "--"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEOutputVolume)
@@ -100,7 +102,15 @@ mmgGui* mafVMEOutputVolume::CreateGui()
     this->Update();
   }
   mafString vtk_data_type;
-  vtk_data_type << this->GetVTKData()->GetClassName();
+  vtk_data_type << NULL_STRING_DATA;
+
+  vtkDataSet *data = this->GetVTKData();
+  if (data != NULL)
+  {
+    vtk_data_type.Erase(0);
+    vtk_data_type << this->GetVTKData()->GetClassName();
+  }
+
   m_Gui->Label(_("vtk type: "), vtk_data_type, true);
   m_Gui->Label(_(" bounds: "),true);
   m_Gui->Label(&m_VolumeBounds[0]);
