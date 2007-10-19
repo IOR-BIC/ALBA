@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-25 10:15:27 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2007-10-19 07:12:20 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -104,6 +104,8 @@ mafOp(label)
 	m_ResultPolydata		= NULL;
 
 	m_ExtrusionFactor		= 0.0;
+
+	m_MaxBounds = VTK_DOUBLE_MAX;
 }
 //----------------------------------------------------------------------------
 mmoExtrusionHoles::~mmoExtrusionHoles()
@@ -265,9 +267,25 @@ void mmoExtrusionHoles::SaveExtrusion()
 void mmoExtrusionHoles::Extrude()
 //----------------------------------------------------------------------------
 {
+	vtkMAFSmartPointer<vtkPoints> points;
+	if(m_MaxBounds<100)
+	{
+		for(int i=0;i<m_ExtractHole->GetOutput()->GetNumberOfPoints();i++)
+		{
+			double point[3];
+			m_ExtractHole->GetOutput()->GetPoint(i,point);
+			point[0]*=100/m_MaxBounds;
+			point[1]*=100/m_MaxBounds;
+			point[2]*=100/m_MaxBounds;
+			points->InsertNextPoint(point);
+		}
+	}
+	vtkPolyData *appo=vtkPolyData::New();
+	appo->SetPoints(points);
+	appo->Update();
 	vtkTextureMapToPlane *computeMedianPlane;
 	vtkNEW(computeMedianPlane);
-	computeMedianPlane->SetInput(m_ExtractHole->GetOutput());
+	computeMedianPlane->SetInput(appo);
 	computeMedianPlane->AutomaticPlaneGenerationOn();
 	computeMedianPlane->Update();
 	double normal[3];
@@ -467,8 +485,8 @@ void mmoExtrusionHoles::CreatePolydataPipeline()
 	dimX = (BoundingBox[1] - BoundingBox[0]);
 	dimY = (BoundingBox[3] - BoundingBox[2]);
 	dimZ = (BoundingBox[5] - BoundingBox[4]);
-	double maxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
-	m_SphereRadius = maxBounds / 100;
+	m_MaxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
+	m_SphereRadius = m_MaxBounds / 100;
 
 	ExtractFreeEdge();
 
