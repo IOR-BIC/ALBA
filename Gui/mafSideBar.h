@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 10:12:54 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-10-19 08:38:24 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class mmgSplittedPanel;
 //----------------------------------------------------------------------------
 /**
 */
-class mafSideBar : mafObserver
+class mafSideBar
 {
 public:
 	mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long style = DOUBLE_NOTEBOOK);
@@ -48,8 +48,6 @@ public:
     SINGLE_NOTEBOOK,
     DOUBLE_NOTEBOOK
   };
-
-	void OnEvent(mafEventBase *ev);
 
   // Description:
 	// Add a new vme into the tree.
@@ -115,7 +113,6 @@ protected:
   mmgPanelStack	*m_OpPanel;
 	mmgGuiHolder	*m_ViewPropertyPanel;
   mmgCheckTree  *m_Tree;
-  mafString      m_SearchVmeEntry;
 
   mmgGuiHolder  *m_VmePanel;
   mmgGuiHolder  *m_VmeOutputPanel;

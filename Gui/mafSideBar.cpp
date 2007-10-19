@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 10:12:54 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-10-19 08:38:24 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,17 +47,11 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
   m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
 
   //tree ----------------------------
-  m_SearchVmeEntry = "";
   m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,false,true);
   m_Tree->SetListener(Listener);
   m_Tree->SetSize(-1,300);
   m_Tree->SetTitle(" vme hierarchy: ");
   m_Notebook->AddPage(m_SideSplittedPanel,_("data tree"),true);
-  mmgGui *g = new mmgGui(this);
-  g->String(MINID,_("find vme: "),&m_SearchVmeEntry);
-  g->Add(m_Tree,1);
-  mmgGuiHolder *gh = new mmgGuiHolder(m_SideSplittedPanel,-1,false,true);
-  gh->Put(g);
 
   //view property panel
   m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,false,true);
@@ -84,8 +78,7 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
     vme_notebook->AddPage(m_VmePanel,_("vme"));
 
     m_SideSplittedPanel->SetMinimumPaneSize(50);
-    //m_SideSplittedPanel->SplitHorizontally(m_Tree,vme_notebook);
-    m_SideSplittedPanel->SplitHorizontally(gh, vme_notebook);
+    m_SideSplittedPanel->SplitHorizontally(m_Tree,vme_notebook);
   }
   else
   {
@@ -106,29 +99,6 @@ mafSideBar::~mafSideBar()
 //----------------------------------------------------------------------------
 {
 	cppDEL(m_Notebook);
-}
-//----------------------------------------------------------------------------
-void mafSideBar::OnEvent(mafEventBase *ev)
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(ev))
-  {
-    if (e->GetId() == MINID)
-    {
-      mafVMERoot *root = mafVMERoot::SafeDownCast(m_SelectedVme->GetRoot());
-      long node_id = (long)root->FindInTreeByName(m_SearchVmeEntry);
-      if (node_id != 0)
-      {
-        m_Tree->SelectNode(node_id);
-      }
-      else
-        mafMessage(_("No VME found named %s"), m_SearchVmeEntry);
-    }
-    else
-    {
-      mafEventMacro(*ev);
-    }
-  }
 }
 //----------------------------------------------------------------------------
 void mafSideBar::OpShowGui(bool push_gui, mmgPanel *panel)
