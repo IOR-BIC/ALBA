@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-25 12:55:59 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-10-20 07:34:47 $
+  Version:   $Revision: 1.21 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -210,6 +210,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_Slicer->SetPose(m_SliceCenterSurfaceReset,m_SliceAngleReset,0);
 			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
+			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
 			m_Slicer->Update();
 
       
@@ -439,7 +440,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 				}
 			}
 			iter->Delete();
-
+			CameraUpdate();
 			vtkDEL(tr);
 			vtkDEL(TransformReset);
 			vtkDEL(matrix);
@@ -494,6 +495,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
 				}
 			}
 			iter->Delete();
+			CameraUpdate();
 		}
     break;
   
@@ -629,6 +631,7 @@ void mafViewArbitrarySlice::VmeRemove(mafNode *node)
 {
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
+		m_AttachCamera->SetVme(NULL);
     m_CurrentVolume = NULL;
     m_GizmoTranslate->Show(false);
 		m_GizmoTranslate = NULL;
@@ -677,7 +680,12 @@ void mafViewArbitrarySlice::CameraUpdate()
     m_AttachCamera->UpdateCameraMatrix();
   }
   for(int i=0; i<m_NumOfChildView; i++)
+	{
+		if(i == SLICE_VIEW && m_CurrentVolume)
+			(m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentVolume);
+
     m_ChildViewList[i]->CameraUpdate();
+	}
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::CreateGuiView()
