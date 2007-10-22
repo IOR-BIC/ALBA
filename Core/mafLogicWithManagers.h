@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:13:00 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2007-10-22 06:42:59 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -136,6 +136,9 @@ public:
 
 	/** Set the revision string */
 	void SetRevision(mafString revision);
+
+  /** Open a Find VME dialog.*/
+  void FindVME();
 
 protected:
   //---------------------------------------------------------

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:13:00 $
-  Version:   $Revision: 1.113 $
+  Date:      $Date: 2007-10-22 06:42:59 $
+  Version:   $Revision: 1.114 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,6 +55,7 @@
 #include "mafSideBar.h"
 
 #include "mmgDialogRemoteFile.h"
+#include "mafGUIDialogFindVme.h"
 #include "mmgMDIFrame.h"
 #include "mmgMDIChild.h"
 #include "mmgCheckTree.h"
@@ -392,6 +393,7 @@ void mafLogicWithManagers::CreateMenu()
   edit_menu->Append(OP_CUT,   _("Cut   \tCtrl+Shift+X"));
   edit_menu->Append(OP_COPY,  _("Copy  \tCtrl+Shift+C"));
   edit_menu->Append(OP_PASTE, _("Paste \tCtrl+Shift+V"));
+  edit_menu->Append(MENU_EDIT_FIND_VME, _("Find VME \tCtrl+F"));
   m_MenuBar->Append(edit_menu, _("&Edit"));
 
   m_ViewMenu = new wxMenu;
@@ -583,6 +585,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break; 
         // ###############################################################
         // commands related to VME
+      case MENU_EDIT_FIND_VME:
+        FindVME();
+      break;
       case VME_SELECT:	
         VmeSelect(*e);		
       break; 
@@ -1479,6 +1484,15 @@ void mafLogicWithManagers::VmeUpdateProperties(mafVME *vme, bool updatePropertyF
   this->m_ViewManager->PropertyUpdate(updatePropertyFromTag);
   this->m_ViewManager->CameraUpdate();
   this->m_VMEManager->MSFModified(true);
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::FindVME()
+//----------------------------------------------------------------------------
+{
+  mmgCheckTree *tree = m_SideBar->GetTree();
+  mafGUIDialogFindVme fd(_("Find VME"));
+  fd.SetTree(tree);
+  fd.ShowModal();
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
