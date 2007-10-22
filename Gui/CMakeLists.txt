@@ -10,6 +10,8 @@ CONFIGURE_FILE("${MAF_SOURCE_DIR}/Gui/manifest.in" "${MAF_BINARY_DIR}/Gui/manife
 SET(PROJECT_SRCS
   mafEvent.cpp
   mafEvent.h
+  mafGUIDialogFindVme.cpp
+  mafGUIDialogFindVme.h
   mafGUISettings.cpp
   mafGUISettings.h
   mafGUISettingsStorage.cpp
