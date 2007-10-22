@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 11:53:12 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-22 06:41:49 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -325,7 +325,6 @@ Them a VME_ADD is sent, selection is not changed
 {
   m_PastedVme = m_Clipboard.GetPointer(); 
   m_PastedVme->ReparentTo(m_Selection);
-	//mafEventMacro(mafEvent(this,VME_ADD,m_PastedVme));
 	m_Clipboard = m_PastedVme->CopyTree(); 
 }
 //----------------------------------------------------------------------------
