@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:02:20 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2007-10-22 06:41:28 $
+  Version:   $Revision: 1.47 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -284,15 +284,42 @@ mafNode *mafNode::FindInTreeByTag(const char *name,const char *value,int type)
   return NULL;
 }
 //-------------------------------------------------------------------------
-mafNode *mafNode::FindInTreeByName(const char *name)
+mafNode *mafNode::FindInTreeByName(const char *name, bool match_case, bool whole_word)
 //-------------------------------------------------------------------------
 {
+  wxString word_to_search;
+  word_to_search = name;
+  wxString myName = GetName();
+
+  if (!match_case)
+  {
+    word_to_search.MakeLower();
+    myName.MakeLower();
+  }
+
+  if (whole_word)
+  {
+    if (myName == word_to_search)
+    {
+      return this;
+    }
+  }
+  else
+  {
+    if (myName.Find(word_to_search) != -1)
+    {
+      return this;
+    }
+  }
+
+  /*
   if (mafCString(GetName())==name)
     return this;
+  */
 
-  for (mafID i=0;i<m_Children.size();i++)
+  for (mafID i = 0; i < m_Children.size(); i++)
   {
-    if (mafNode *node=m_Children[i]->FindInTreeByName(name))
+    if (mafNode *node = m_Children[i]->FindInTreeByName(name, match_case, whole_word))
       return node;
   }
   return NULL;
@@ -511,17 +538,30 @@ int mafNode::SetParent(mafNode *parent)
         m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
       }
 
-      m_Parent=parent;
+      m_Parent = parent;
 
       // if it's being attached to a new tree and this has 'mafRoot' root node, ask for a new Id
-      mafRoot *root=mafRoot::SafeDownCast(new_root);
+      mafRoot *root = mafRoot::SafeDownCast(new_root);
       
       // if attached under a new root (i.e. a new tree
       // with a root node of type mafRoot) ask for
       // a new Id and set it.
-      if (old_root!=new_root)
+      if (old_root != new_root)
       {
-        SetId(root?root->GetNextNodeId():-1);
+        if (root)
+        {
+          //SetId(root->GetNextNodeId());
+          // Update the Ids also to the imported subtree
+          mafNodeIterator *iter = NewIterator();
+          for (mafNode *n = iter->GetFirstNode(); n; n = iter->GetNextNode())
+          {
+            n->UpdateId();
+          }
+        }
+        else
+        {
+          SetId(-1);
+        }
         if (parent->IsInitialized())
         {
           if (Initialize())
@@ -542,13 +582,13 @@ int mafNode::SetParent(mafNode *parent)
   else
   {
     // reparenting to NULL is admitted in any case
-    if (m_Parent!=NULL)
+    if (m_Parent != NULL)
     {
       // send event about detachment from the tree
       ForwardUpEvent(&mafEventBase(this,NODE_DETACHED_FROM_TREE));
       m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
 
-      m_Parent=parent;
+      m_Parent = parent;
       Modified();
       
     }
