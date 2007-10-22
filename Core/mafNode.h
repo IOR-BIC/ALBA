@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 14:59:27 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-10-22 06:40:53 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -126,8 +126,7 @@ public:
     do not support such a function! */  
   //virtual int ShallowCopy(mafNode *a);
   
-  /**
-    Test if the given node instance can be copied into this. This function should
+  /** Test if the given node instance can be copied into this. This function should
     be reimplemented into subclasses classes*/
   virtual bool CanCopy(mafNode *vme);
   
@@ -135,8 +134,7 @@ public:
   static mafNode *MakeCopy(mafNode *a);
   mafNode *MakeCopy() {return MakeCopy(this);}
   
-  /**
-    Copy the given VME tree into a new tree. In case a parent is provided, link the new
+  /** Copy the given VME tree into a new tree. In case a parent is provided, link the new
     root node to it. Return the root of the new tree.*/
   static mafNode *CopyTree(mafNode *vme, mafNode *parent=NULL);
   
@@ -158,26 +156,20 @@ public:
   /** Remove a child node*/
   virtual void RemoveChild(mafNode *node);
 
-  /**
-    Find a child given its pointer and return its index. Return -1 in
-    case of not found or failure.*/
+  /** Find a child given its pointer and return its index. Return -1 in case of not found or failure.*/
   int FindNodeIdx(mafNode *a);
 
-  /**
-    Find a child index given its name. Search is performed only on first level childe not
-    in the substree. Return -1 in case of not found or failure.*/
+  /** Find a child index given its name. Search is performed only on first level children not
+    in the sub-tree. Return -1 in case of not found or failure.*/
   int FindNodeIdx(const char *name);
 
-  /**
-  Find a node in all the subtrees matching the given TagName/TagValue pair.*/
+  /** Find a node in all the subtrees matching the given TagName/TagValue pair.*/
   mafNode *FindInTreeByTag(const char *name,const char *value="",int type=MAF_STRING_TAG); 
   
-  /**
-    Find a node in all the subtrees matching the given VME Name.*/
-  mafNode *FindInTreeByName(const char *name);
+  /** Find a node in all the subtrees matching the given VME Name.*/
+  mafNode *FindInTreeByName(const char *name, bool match_case = true, bool whole_word = true);
 
-  /**
-    Find a node in all the subtrees matching the given VME Name.*/
+  /** Find a node in all the subtrees matching the given VME Name.*/
   mafNode *FindInTreeById(const mafID id);
 
   /**
@@ -196,7 +188,7 @@ public:
   bool IsAChild(mafNode *a);
 
   /**
-    Find a node in all the subtrees, searching recursivelly into subnodes.
+    Find a node in all the subtrees, searching recursively into sub nodes.
     Return true if found. */
   bool IsInTree(mafNode *a);
 
