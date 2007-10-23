@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 15:49:23 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-10-23 10:36:41 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@ class mmgLocaleSettings;
 class mmgMeasureUnitSettings;
 class mmgApplicationSettings;
 class mafGUISettingsStorage;
+class mafGUISettingsTimeBar;
 
 //----------------------------------------------------------------------------
 // mafLogicWithGUI :
@@ -157,6 +158,7 @@ protected:
   mmgMeasureUnitSettings *m_MeasureUnitSettings;
   mmgApplicationSettings *m_ApplicationSettings;
   mafGUISettingsStorage  *m_StorageSettings;
+  mafGUISettingsTimeBar  *m_TimeBarSettings;
 
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.

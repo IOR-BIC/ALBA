@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 15:49:23 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2007-10-23 10:36:41 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,7 @@
 #include "mmgMeasureUnitSettings.h"
 #include "mmgApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
+#include "mafGUISettingsTimeBar.h"
 
 #include "mafWXLog.h"
 #include "mafPics.h"
@@ -57,6 +58,7 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
   m_ApplicationSettings = new mmgApplicationSettings(this);
   m_StorageSettings = new mafGUISettingsStorage(this);
+  m_TimeBarSettings = new mafGUISettingsTimeBar(this);
 
   m_ToolBar       = NULL;
   m_MenuBar       = NULL;
@@ -299,6 +301,10 @@ void mafLogicWithGUI::CreateTimebar()
 {
   m_TimePanel = new mmgTimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
   m_TimePanel->SetListener(this);
+
+  // Events coming from settings are forwarded to the time bar.
+  m_TimePanel->SetTimeSettings(m_TimeBarSettings);
+  m_TimeBarSettings->SetListener(m_TimePanel);
 
   m_Win->AddDockPane(m_TimePanel, wxPaneInfo()
     .Name("timebar")
