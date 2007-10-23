@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:05 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-23 08:31:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,6 +114,8 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
          || m_Vme->GetOutput()->IsMAFType(mafVMEOutputLandmarkCloud));
   vtkPolyData *data = NULL;
   mmaMaterial *material = NULL;
+
+	m_Vme->GetEventSource()->AddObserver(this);
   
   if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface))
   {
@@ -408,6 +410,12 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
       m_SphereSource->SetPhiResolution(((mafVMELandmarkCloud *)m_Vme)->GetSphereResolution());
     }
   }
+	else if (maf_event->GetId() == VME_ABSMATRIX_UPDATE)
+	{
+		vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
+		m_VTKTransform->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix());
+		m_Plane->SetTransform(m_VTKTransform);
+	}
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSlice::GenerateTextureMapCoordinate()
