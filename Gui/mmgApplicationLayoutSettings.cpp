@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-28 15:04:50 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2007-10-23 08:34:53 $
+Version:   $Revision: 1.14 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -352,17 +352,18 @@ void mmgApplicationLayoutSettings::SaveApplicationLayout()
 void mmgApplicationLayoutSettings::LoadLayout(bool fileDefault)
 //----------------------------------------------------------------------------
 {  
-  if(m_XMLStorage && wxFileExists(m_DefaultLayoutFile.GetCStr()))
-  {
-    mafString file = "";
+  mafString file = "";
 
-    if(fileDefault)
-      file = m_DefaultLayoutFile;
-    else
-      file = mafGetOpenFile("", _("All Files (*.*)|*.*"), _("Open Layout File"), GetGui()).c_str();
-    
-    if(file.IsEmpty()) return;
-    
+  if(fileDefault)
+    file = m_DefaultLayoutFile;
+  else
+    file = mafGetOpenFile("", _("All Files (*.*)|*.*"), _("Open Layout File"), GetGui()).c_str();
+
+  if(file.IsEmpty())
+    return;
+
+  if(m_XMLStorage && wxFileExists(file.GetCStr()))
+  {
     //clear tree
     ((mafNode *)m_XMLStorage->GetDocument())->CleanTree();
     m_List->Clear();
