@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-19 10:56:53 $
-Version:   $Revision: 1.35 $
+Date:      $Date: 2007-10-23 07:50:07 $
+Version:   $Revision: 1.36 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -212,7 +212,7 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
           {
             pipeSlice->SplineModeOn();
             pipeSlice->FillOn();
-            pipeSlice->SetAlphaFilling(2.0);
+            pipeSlice->SetAlphaFilling(4.0);
           }
         }
 
