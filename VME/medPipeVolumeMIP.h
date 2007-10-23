@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-06 12:10:46 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-23 13:37:21 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
+class mafLODActor;
+class vtkOutlineCornerFilter;
+class vtkPolyDataMapper;
+class vtkOutlineSource;
 class vtkImageCast;
 class vtkPiecewiseFunction;
 class vtkVolumeProperty;
@@ -77,6 +81,12 @@ protected:
   vtkVolumeRayCastMapper      *m_VolumeMapper;
   vtkVolume					  *m_Volume;
   vtkLookupTable      *m_ColorLUT;
+
+	/** For vtkRectilinearGrid */
+	vtkOutlineSource       *m_Box;
+	vtkPolyDataMapper	     *m_Mapper;
+	mafLODActor            *m_Actor;
+	vtkOutlineCornerFilter *m_OutlineBox;
 
 };
 #endif // __medPipeVolumeMIP_H__

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 16:18:53 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-10-23 13:37:21 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -48,6 +48,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkVolume.h"
 #include "vtkImageResample.h"
 #include "vtkImageCast.h"
+#include "mafLODActor.h"
+#include "vtkOutlineCornerFilter.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkOutlineSource.h"
 #include "mafEventSource.h"
 
 //----------------------------------------------------------------------------
@@ -70,6 +74,9 @@ medPipeVolumeMIP::medPipeVolumeMIP()
   m_ColorLUT          = NULL;
   m_Caster            = NULL;
 
+	m_Box = NULL;
+	m_Mapper = NULL;
+	m_Actor =  NULL;
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeMIP::Create(mafSceneNode *n)
@@ -88,6 +95,27 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   if(m_Vme->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
   {
     wxMessageBox(_("Resample the RectilinearGrid before Visualizing in MIP View"));
+
+		double b[6];
+		m_Vme->GetOutput()->Update();
+		m_Vme->GetOutput()->GetVMELocalBounds(b);
+
+		vtkNEW(m_Box);
+		m_Box->SetBounds(b);
+
+		vtkNEW(m_Mapper);
+		m_Mapper->SetInput(m_Box->GetOutput());
+
+		if(m_Vme->IsAnimated())
+			m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+		else
+			m_Mapper->ImmediateModeRenderingOff();
+
+		vtkNEW(m_Actor);
+		m_Actor->SetMapper(m_Mapper);
+
+		m_AssemblyFront->AddPart(m_Actor);
+
 	  return;
   }
 
@@ -159,7 +187,15 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 medPipeVolumeMIP::~medPipeVolumeMIP()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_Volume);
+	if(m_Volume)
+		m_AssemblyFront->RemovePart(m_Volume);
+	
+	if(m_Actor)
+		m_AssemblyFront->RemovePart(m_Actor);
+
+	vtkDEL(m_Box);
+	vtkDEL(m_Mapper);
+	vtkDEL(m_Actor);
 
   vtkDEL(m_ResampleFilter);
   vtkDEL(m_VolumeProperty);
@@ -183,6 +219,8 @@ mmgGui *medPipeVolumeMIP::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   
+	if(mafVMEVolume::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"));
+		return m_Gui;
   lutPreset(15,m_ColorLUT);
   m_Gui->Lut(ID_LUT_CHOOSER,_("lut"),m_ColorLUT);
   UpdateMIPFromLUT();
