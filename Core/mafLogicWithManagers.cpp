@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:42:59 $
-  Version:   $Revision: 1.114 $
+  Date:      $Date: 2007-10-23 10:37:19 $
+  Version:   $Revision: 1.115 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,6 +67,7 @@
 #include "mmgApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
 #include "mmgApplicationLayoutSettings.h"
+#include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
 #include "mmgSettingsDialog.h"
 
@@ -231,6 +232,9 @@ void mafLogicWithManagers::Configure()
 
   if (m_MeasureUnitSettings)
     m_SettingsDialog->AddPage(m_MeasureUnitSettings->GetGui(), m_MeasureUnitSettings->GetLabel());
+
+  if (m_TimeBarSettings)
+    m_SettingsDialog->AddPage(m_TimeBarSettings->GetGui(), m_TimeBarSettings->GetLabel());
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Plug(mafView* view, bool visibleInMenu)
