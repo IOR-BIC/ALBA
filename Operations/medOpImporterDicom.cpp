@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-18 14:26:38 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-10-23 14:32:29 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -588,7 +588,8 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 		{
 		case ID_VOLUME_SIDE:
 			{
-				AutoPositionCropPlane();
+				if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+					AutoPositionCropPlane();
 			}
 			break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
@@ -610,7 +611,7 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 				}
 				else
 				{
-					if(!m_CroppedExetuted)
+					if(!m_CroppedExetuted && ((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
 						m_CropActor->VisibilityOn();
 					else
 						m_CropActor->VisibilityOff();
