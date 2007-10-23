@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mafGUISettings.h
   mafGUISettingsStorage.cpp
   mafGUISettingsStorage.h
+  mafGUISettingsTimeBar.cpp
+  mafGUISettingsTimeBar.h
 	mafGUISRBBrowse.cpp
 	mafGUISRBBrowse.h
 	#---------SRBList stub---------------
