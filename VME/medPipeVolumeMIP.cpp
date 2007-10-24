@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 13:37:21 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-10-24 09:38:46 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -219,7 +219,7 @@ mmgGui *medPipeVolumeMIP::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   
-	if(mafVMEVolume::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"));
+	if(mafVMEVolume::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 		return m_Gui;
   lutPreset(15,m_ColorLUT);
   m_Gui->Lut(ID_LUT_CHOOSER,_("lut"),m_ColorLUT);
