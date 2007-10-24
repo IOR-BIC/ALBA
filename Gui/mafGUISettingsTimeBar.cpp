@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-23 10:35:03 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-24 12:35:14 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -275,7 +275,10 @@ void mafGUISettingsTimeBar::PlayInActiveViewport(int active_viewport)
 void mafGUISettingsTimeBar::Update()
 //----------------------------------------------------------------------------
 {
-  m_Gui->Update();
-  EnableWidgets();
-  m_Config->Flush();
+	if(m_Gui)
+	{
+		m_Gui->Update();
+		EnableWidgets();
+		m_Config->Flush();
+	}
 }
