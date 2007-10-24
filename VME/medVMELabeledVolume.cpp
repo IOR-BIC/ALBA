@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 08:46:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-10-24 14:20:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -270,21 +270,23 @@ void medVMELabeledVolume::InternalPreUpdate()
       {
         double scalarValue = volumeScalars->GetComponent( i, 0 );
         if ( scalarValue >= min && scalarValue <= max )
-        {
-          labelScalars->InsertTuple1( i, labelIntValue ); 
+        { 
+          labelScalars->SetTuple1( i, labelIntValue ); 
         }
         else
         {
           if (lastComponent)  //Put to OUTRANGE_SCALAR value only in the last label
           {
-            labelScalars->InsertTuple1( i, OUTRANGE_SCALAR);
+            labelScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
           }        
         }
       }
       volumeScalars = labelScalars;
+      volumeScalars->Modified();
       }
   }
   
+  labelScalars->Modified();
   m_Dataset->GetPointData()->SetScalars(labelScalars);
   m_Dataset->Modified();
 
@@ -391,7 +393,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
           if ( component == labelName )
           {
             m_LabelCheckBox->AddItem(m_CheckListId, component, TRUE);
-            m_CheckedVec.push_back(TRUE);
+            //m_CheckedVec.push_back(TRUE);
             m_CheckListId++;
           }
         }
@@ -720,14 +722,14 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
     {
       m_ItemSelected = e->GetArg();
       m_ItemLabel = m_LabelCheckBox->GetItemLabel(m_ItemSelected);
-      bool checkedBefore = m_CheckedVec.at(m_ItemSelected);
-      bool checkedAfter = e->GetBool();
-      if (checkedBefore != checkedAfter)
-      {
+   //   bool checkedBefore = m_CheckedVec.at(m_ItemSelected);
+    //  bool checkedAfter = e->GetBool();
+      //if (checkedBefore != checkedAfter)
+     // {
         //m_CheckedVec.assign(m_CheckedVec.begin() + m_ItemSelected , checkedAfter);
-        m_CheckedVec[m_ItemSelected] = checkedAfter;
+       // m_CheckedVec[m_ItemSelected] = checkedAfter;
         InternalPreUpdate();
-      }  
+     // }  
     }
     break;
     
@@ -841,7 +843,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       if (m_EditMode == FALSE)
       {
         m_LabelCheckBox->AddItem(m_CheckListId, labelLine, TRUE); 
-        m_CheckedVec.push_back(TRUE);
+        //m_CheckedVec.push_back(TRUE);
         m_CheckListId++;
         m_LabelCheckBox->Update();
         int nComp = m_TagLabel->GetNumberOfComponents();
