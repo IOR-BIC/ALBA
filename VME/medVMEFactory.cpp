@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:48:26 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-24 08:47:15 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,7 @@
 #include "medVMEPolylineEditor.h"
 #include "medVMEEmg.h"
 #include "medVMESurfaceEditor.h"
+#include "medVMELabeledVolume.h"
 
 #ifdef MAF_USE_ITK
   #include "mafVMERawMotionData.h"
@@ -86,6 +87,7 @@ medVMEFactory::medVMEFactory()
 	mafPlugNodeMacro(medVMEPolylineEditor,"VME for Editing Graph and Polyline");
   mafPlugNodeMacro(medVMEEmg,"VME rapresenting EMG scalar data");
 	mafPlugNodeMacro(medVMESurfaceEditor,"VME for Editing Surface");
+  mafPlugNodeMacro(medVMELabeledVolume,"VME representing a label put on a volume");
 
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
