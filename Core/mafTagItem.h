@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-24 09:41:46 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,6 +81,9 @@ public:
   void SetValues(const std::vector<mafString> values);
   /** same as SetComponents() */
   void SetValues(const char **values, int numcomp);
+
+  /** Remove a value  */
+  void RemoveValue(int component); //Added by Mucci 22/10/2007
   
   /** Set array of components at a once, specifying an array of numeric values. */
   void SetValues(const double *values, int numcomp);

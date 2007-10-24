@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTagItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-24 09:41:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -297,6 +297,21 @@ const char *mafTagItem::GetValue(int component) const
   else
   {
     return NULL;
+  }
+}
+
+//-------------------------------------------------------------------------
+void mafTagItem::RemoveValue(int component)
+//-------------------------------------------------------------------------
+{
+  if (GetNumberOfComponents()>component)
+  {
+    
+    m_Components.erase(m_Components.begin() + component);
+  }
+  else
+  {
+    return;
   }
 }
 
