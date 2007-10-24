@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-10 11:02:20 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-24 13:09:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -183,9 +183,14 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
         m_ColorLUT = m_CurrentSlicer->GetMaterial()->m_ColorLut;
         m_CurrentSlicer->GetMaterial()->UpdateProp();
         m_ColorLUT->SetTableRange(sr[0], sr[1]);
-        /*m_LutWidget->SetLut(m_ColorLUT);
-        m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-        m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);*/
+        
+        if(m_LutWidget)
+        {
+          m_LutWidget->SetLut(m_ColorLUT);
+          //m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+          //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+        }
+        
       }
         
       //Set camera of slice view in way that it will follow the volume
@@ -246,6 +251,7 @@ void medViewSlicer::OnEventThis(mafEventBase *maf_event)
         sr = m_ColorLUT->GetRange();
         //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
       }
+      CameraUpdate();
 			break;
 		default:
 			mafViewCompound::OnEvent(maf_event);
