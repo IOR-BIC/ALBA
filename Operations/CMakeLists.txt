@@ -6,6 +6,8 @@ PROJECT(medOperations)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+  medOpCreateLabeledVolume.cpp
+  medOpCreateLabeledVolume.h
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
   mmoCTAImporter.cpp
