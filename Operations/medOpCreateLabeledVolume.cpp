@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpCreateLabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 08:48:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-10-24 09:43:17 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 #include "mafEvent.h"
 #include "mafVMEVolumeGray.h"
 
-#include "mafVMELabeledVolume.h"
+#include "medVMELabeledVolume.h"
 
 //----------------------------------------------------------------------------
 // Constants :
