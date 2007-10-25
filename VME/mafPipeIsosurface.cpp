@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-27 11:45:23 $
-Version:   $Revision: 1.19 $
+Date:      $Date: 2007-10-25 09:11:56 $
+Version:   $Revision: 1.20 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -71,7 +71,7 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
 {
 	Superclass::Create(n);
 
-	assert(m_Vme->IsMAFType(mafVMEVolumeGray));
+	assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
 
 	vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
 	dataset->Update();

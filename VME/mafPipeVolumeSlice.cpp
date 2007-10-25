@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 10:13:25 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2007-10-25 09:11:56 $
+  Version:   $Revision: 1.46 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -180,7 +180,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
   m_AssemblyUsed = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
 
-  assert(m_Vme->IsMAFType(mafVMEVolume));
+  assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
   double b[6];
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
