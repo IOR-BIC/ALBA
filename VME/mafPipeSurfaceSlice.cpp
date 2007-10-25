@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 09:09:37 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-25 11:08:41 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -415,8 +415,8 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
   }
 	else if (maf_event->GetId() == VME_ABSMATRIX_UPDATE)
 	{
-		m_VTKTransform->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix());
-		m_Plane->SetTransform(m_VTKTransform);
+		if(m_VTKTransform)  m_VTKTransform->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix());
+		if(m_Plane)  m_Plane->SetTransform(m_VTKTransform);
 	}
 }
 //----------------------------------------------------------------------------
