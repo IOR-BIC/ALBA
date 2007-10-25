@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 14:20:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-25 07:10:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -392,7 +392,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
            wxString labelName = *myListIter;
           if ( component == labelName )
           {
-            m_LabelCheckBox->AddItem(m_CheckListId, component, TRUE);
+            m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
             //m_CheckedVec.push_back(TRUE);
             m_CheckListId++;
           }
