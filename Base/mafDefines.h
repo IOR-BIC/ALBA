@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 13:36:15 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-10-25 15:15:00 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,7 +45,7 @@ typedef std::type_info mafTypeID; ///< type for mafObject's class type IDs
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
-enum MAF_RETURN_VALUES_ID
+enum MAF_EXPORT MAF_RETURN_VALUES_ID
 {
   MAF_OK = 0,
   MAF_ERROR,
@@ -72,22 +72,22 @@ enum MAF_RETURN_VALUES_ID
 // Global Functions
 //------------------------------------------------------------------------------
 /** write a message in the log area */
-void mafLogMessage(const char *format, ...);
+MAF_EXPORT void mafLogMessage(const char *format, ...);
 /** open a warning dialog and write a message */
-void mafWarningMessage(const char *format, ...);
+MAF_EXPORT void mafWarningMessage(const char *format, ...);
 /** open an error dialog and write a message */
-void mafErrorMessage(const char *format, ...);
+MAF_EXPORT void mafErrorMessage(const char *format, ...);
 /** open a message dialog and write a message */
-void mafMessage(const char *format, ...);
+MAF_EXPORT void mafMessage(const char *format, ...);
 /** 
   reliable comparison test for floating point numbers. Extracted from article:
   "Work Around Floating-Point Accuracy/Comparison Problems" Article ID: Q69333
   of MSDN library*/
-bool mafEquals(double x, double y);
-bool mafFloatEquals(float x, float y);
+MAF_EXPORT bool mafEquals(double x, double y);
+MAF_EXPORT bool mafFloatEquals(float x, float y);
 
 /** wait for given milliseconds */
-void mafSleep(int msec);
+MAF_EXPORT void mafSleep(int msec);
 
 //------------------------------------------------------------------------------
 // Macros
@@ -158,12 +158,12 @@ void mafSleep(int msec);
   const mafTypeID &thisClass::GetTypeId() const {return typeid(thisClass);} \
   const char *thisClass::GetStaticTypeName() {return #thisClass;} \
   const char *thisClass::GetTypeName() const {return #thisClass;} \
-  bool thisClass::IsStaticType(const char *type) \
+  MAF_EXPORT bool thisClass::IsStaticType(const char *type) \
   { return ( strcmp(#thisClass,type)==0 ) ? true : Superclass::IsStaticType(type); } \
-  bool thisClass::IsStaticType(const mafTypeID &type) \
+  MAF_EXPORT bool thisClass::IsStaticType(const mafTypeID &type) \
   { return ( type==typeid(thisClass) ? true : Superclass::IsStaticType(type) ); } \
-  bool thisClass::IsA(const char *type) const {return IsStaticType(type);} \
-  bool thisClass::IsA(const mafTypeID &type) const {return IsStaticType(type);} \
+  MAF_EXPORT bool thisClass::IsA(const char *type) const {return IsStaticType(type);} \
+  MAF_EXPORT bool thisClass::IsA(const mafTypeID &type) const {return IsStaticType(type);} \
   thisClass* thisClass::SafeDownCast(mafObject *o) \
   { try { return dynamic_cast<thisClass *>(o); } catch (std::bad_cast) { return NULL;} }
 
@@ -172,17 +172,17 @@ void mafSleep(int msec);
   in the .cpp file. */
 #define mafCxxTypeMacro(thisClass) \
   mafCxxAbstractTypeMacro(thisClass); \
-  mafObject *thisClass::NewObject() \
+  MAF_EXPORT mafObject *thisClass::NewObject() \
   { \
     thisClass *obj = new thisClass; \
     if (obj) obj->m_HeapFlag=true; \
     return obj; \
   } \
-  mafObject *thisClass::NewObjectInstance() const \
+  MAF_EXPORT mafObject *thisClass::NewObjectInstance() const \
   { return NewObject(); } \
-  thisClass *thisClass::New() \
+  MAF_EXPORT thisClass *thisClass::New() \
   { return (thisClass *)NewObject(); } \
-  thisClass *thisClass::NewInstance() const \
+  MAF_EXPORT thisClass *thisClass::NewInstance() const \
   { return (thisClass *)NewObjectInstance(); }
 
 /** Shortcut for type checking */
@@ -294,4 +294,3 @@ void mafSleep(int msec);
 #endif
 
 #endif
-

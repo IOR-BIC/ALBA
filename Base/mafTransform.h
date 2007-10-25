@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:58:06 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-10-25 15:15:00 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@ class vtkMatrix4x4;
 //----------------------------------------------------------------------------	
 //  Constants:
 //----------------------------------------------------------------------------	
-enum MATRIX_MULTIPLICATION_ID
+enum MAF_EXPORT MATRIX_MULTIPLICATION_ID
 { 
   POST_MULTIPLY = 0, 
   PRE_MULTIPLY 

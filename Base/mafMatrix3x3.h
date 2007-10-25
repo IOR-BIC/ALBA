@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrix3x3.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-06 15:25:48 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-25 15:15:00 $
+  Version:   $Revision: 1.9 $
   Authors:   Based on vtkMath code (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -173,7 +173,7 @@ public:
     real symmetric matrix. Output eigenvalues in w; and output eigenvectors in v.
     Resulting eigenvalues/vectors are sorted in decreasing order; eigenvectors
     are normalized.*/
-  int Jacobi(double w[3], double v[3][3]) {Jacobi(GetElements(),w,v);}
+  //int Jacobi(double w[3], double v[3][3]) {Jacobi(GetElements(),w,v);}
 
   /**
     JacobiN iteration for the solution of eigenvectors/eigenvalues of a nxn

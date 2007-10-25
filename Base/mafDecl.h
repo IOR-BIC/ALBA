@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:42:33 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2007-10-25 15:15:00 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ const int MAXOP = 200;
 const int MAXVIEW = 200; 
 
 /** Data Type enum that identify data stored in WidgetDataType struct */
-enum WIDGET_DATA_TYPE_ID
+enum MAF_EXPORT WIDGET_DATA_TYPE_ID
 {
   NULL_DATA,
   INT_DATA,
@@ -47,7 +47,7 @@ enum WIDGET_DATA_TYPE_ID
   STRING_DATA,
 };
 
-struct WidgetDataType
+struct MAF_EXPORT WidgetDataType
 {
   int    iValue;
   float  fValue;
@@ -58,7 +58,7 @@ struct WidgetDataType
 
 
 /** conventional device button values */
-enum DEVICE_BUTTONS
+enum MAF_EXPORT DEVICE_BUTTONS
 {
   MAF_ANY_BUTTON = -1,
   MAF_LEFT_BUTTON = 0,
@@ -67,7 +67,7 @@ enum DEVICE_BUTTONS
 };
 
 /** conventional key modifiers values */
-enum DEVICE_MODIFIERS
+enum MAF_EXPORT DEVICE_MODIFIERS
 {
   MAF_SHIFT_KEY = 0,
   MAF_CTRL_KEY,
@@ -81,7 +81,7 @@ enum DEVICE_MODIFIERS
   These constants must be non-overlapping.
   Constants are grouped by bracket xx_START, xx_END as needed by mmgFrame
 */
-enum MAIN_EVENT_ID
+enum MAF_EXPORT MAIN_EVENT_ID
 {
 MENU_START = 10000,
 MENU_FILE_START,
@@ -390,49 +390,49 @@ MAF_ID_GLOBAL(REMOTE_COMMAND_CHANNEL)
 /** 
   return the application frame window.
   to be used as parent of panels to be shown later. */    
-extern wxWindow* mafGetFrame();
+MAF_EXPORT extern wxWindow* mafGetFrame();
 
 /** global function to retrieve the vme base type. */
 //mafVmeBaseTypes mafGetBaseType(mafVME* vme); //(to be removed Marco)
 
 /** to be used by mmgFrame and derived class only */    
-void mafSetFrame(wxWindow* frame);
+MAF_EXPORT void mafSetFrame(wxWindow* frame);
 
 /** process pending events. be careful not to call it recursively */    
-void mafYield();
+MAF_EXPORT void mafYield();
 
 /** show the Dir Selection Dialog Box */
 std::string  mafGetDirName(const char * initial, const char * title = "Select Directory", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box */
-std::string  mafGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
+MAF_EXPORT std::string  mafGetOpenFile(const char * initial, const char * wildcard, const char * title = "Open File", wxWindow *parent = NULL);
 
 /** show the File Open Dialog Box for multiple file selection */
-void mafGetOpenMultiFiles(const char * initial, const char * wildcard, std::vector<std::string> &files, const char * title = "Open Files", wxWindow *parent = NULL);
+MAF_EXPORT void mafGetOpenMultiFiles(const char * initial, const char * wildcard, std::vector<std::string> &files, const char * title = "Open Files", wxWindow *parent = NULL);
 
 /** show the File Save Dialog Box */
-std::string  mafGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL);
+MAF_EXPORT std::string  mafGetSaveFile(const char * initial, const char * wildcard, const char * title = "Save File", wxWindow *parent = NULL);
 
 /** return true if the filename use a protocol like ftp, http or https.
   Write into 'protocol_used' parameter the protocol used by the file.*/
-bool IsRemote(mafString filename, mafString &protocol_used);
+MAF_EXPORT bool IsRemote(mafString filename, mafString &protocol_used);
 
 /** return a random wxColour from a palette of 16 */
-wxColour  mafRandomColor();
+MAF_EXPORT wxColour  mafRandomColor();
 
 /** Used to generate gray scale bitmap given a colored one.*/
-wxBitmap GrayScale(wxBitmap bmp);
+MAF_EXPORT wxBitmap GrayScale(wxBitmap bmp);
 
 /** Used to generate red scale bitmap to represent a VME with data not present.*/
-wxBitmap RedScale(wxBitmap bmp);
+MAF_EXPORT wxBitmap RedScale(wxBitmap bmp);
 
 /** return the application start-up directory */
-std::string  mafGetApplicationDirectory();
+MAF_EXPORT std::string  mafGetApplicationDirectory();
 
 /** translate an event-id into a readable string */
-std::string  mafIdString(int id);
+MAF_EXPORT std::string  mafIdString(int id);
 
-float RoundValue(float f_in, int decimal_digits = 2);
-double RoundValue(double d_in, int decimal_digits = 2);
+MAF_EXPORT float RoundValue(float f_in, int decimal_digits = 2);
+MAF_EXPORT double RoundValue(double d_in, int decimal_digits = 2);
 
 #endif
