@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 13:09:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-25 09:30:31 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -247,9 +247,17 @@ void medViewSlicer::OnEventThis(mafEventBase *maf_event)
     {
 		case ID_LUT_CHOOSER:
       {
-        double *sr;
-        sr = m_ColorLUT->GetRange();
-        //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+        if(m_ColorLUT && m_CurrentSlicer)
+        {
+          double *sr;
+          sr = m_ColorLUT->GetRange();
+          //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+        }
+        else
+        {
+          wxMessageBox("There is no visualized Slicer");
+        }
+        
       }
       CameraUpdate();
 			break;
