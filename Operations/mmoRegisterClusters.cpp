@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 16:58:31 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-25 08:49:04 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@
 #include "mafVMELandmark.h"
 
 #include "vtkMAFSmartPointer.h"
+#include "mafMatrixVector.h"
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -466,8 +467,79 @@ void mmoRegisterClusters::OpDo()
       m_Registered->Close();
 			time.clear();
 		}
-    mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
-    m_Registered->ReparentTo(m_Result);
+
+    //conversion from time variant landmark cloud with non time variant landmark to 
+    // non variant landmark cloud with time variant landmark
+    if(m_MultiTime)
+    {
+      if(!m_Registered->IsOpen())
+        m_Registered->Open();
+
+
+      std::vector<mafTimeStamp> timeStamps;
+      m_Target->GetLocalTimeStamps(timeStamps);
+      int numTimeStamps = m_Target->GetNumberOfTimeStamps();
+
+      mafVMELandmarkCloud *landmarkCloudWithTimeVariantLandmarks;
+      mafNEW(landmarkCloudWithTimeVariantLandmarks);
+      mafEventMacro(mafEvent(this, VME_ADD, landmarkCloudWithTimeVariantLandmarks));
+      landmarkCloudWithTimeVariantLandmarks->ReparentTo(m_Result);
+
+      landmarkCloudWithTimeVariantLandmarks->SetName(m_Registered->GetName());
+      landmarkCloudWithTimeVariantLandmarks->Open();
+
+      for (int t = 0; t < numTimeStamps; t++)
+      {
+        double cTime = timeStamps[t];
+        m_Registered->SetTimeStamp(cTime); //Set current time
+        m_Registered->Update(); //>UpdateCurrentData();
+        
+
+        for(int i=0; i< m_Registered->GetNumberOfLandmarks(); i++)
+        {
+          mafVMELandmark *landmark;
+          landmark = mafVMELandmark::SafeDownCast(landmarkCloudWithTimeVariantLandmarks->GetLandmark(i));
+          if(landmark == NULL)
+          {
+            mafNEW(landmark);
+            mafEventMacro(mafEvent(this, VME_ADD,landmark));
+            landmark->SetName(m_Registered->GetLandmark(i)->GetName());
+            landmark->ReparentTo(landmarkCloudWithTimeVariantLandmarks);
+          }
+
+          double pos[3], rot[3];
+          m_Registered->GetLandmark(i)->GetOutput()->GetAbsPose(pos,rot,cTime);
+          
+          landmarkCloudWithTimeVariantLandmarks->SetLandmarkVisibility(i,m_Registered->GetLandmarkVisibility(i,cTime),cTime);
+          landmark->SetTimeStamp(cTime);
+          landmark->SetAbsPose(pos,rot,cTime);
+
+          //avoid matrix error log for the first creation of landmarks
+          mafMatrix *matrix = landmark->GetMatrixVector()->GetMatrix(cTime);
+          matrix->SetElement(0,0,1);
+          matrix->SetElement(1,1,1);
+          matrix->SetElement(2,2,1);
+
+          landmark->Modified();
+          landmark->Update();
+          
+        }
+      }
+
+      landmarkCloudWithTimeVariantLandmarks->Update();
+      landmarkCloudWithTimeVariantLandmarks->Close();
+
+      mafDEL(landmarkCloudWithTimeVariantLandmarks);
+
+      m_Registered->Close();
+      timeStamps.clear();
+    }
+    else
+    {
+      mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
+      m_Registered->ReparentTo(m_Result);
+    }
+    
 	}
 	
 	if(m_Follower)
