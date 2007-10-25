@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 08:31:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-25 09:09:37 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,6 +92,8 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
   m_Border=1;
 
 	m_ShowSelection = false;
+
+	m_VTKTransform = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -193,7 +195,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
-	vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
+	vtkNEW(m_VTKTransform);
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
 
@@ -321,6 +323,7 @@ mafPipeSurfaceSlice::~mafPipeSurfaceSlice()
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
+	vtkDEL(m_VTKTransform);
   vtkDEL(m_Plane);
   vtkDEL(m_Cutter);
   cppDEL(m_Axes);
@@ -412,7 +415,6 @@ void mafPipeSurfaceSlice::OnEvent(mafEventBase *maf_event)
   }
 	else if (maf_event->GetId() == VME_ABSMATRIX_UPDATE)
 	{
-		vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
 		m_VTKTransform->SetInputMatrix(m_Vme->GetOutput()->GetAbsMatrix());
 		m_Plane->SetTransform(m_VTKTransform);
 	}

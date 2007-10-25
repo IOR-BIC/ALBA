@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:05 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-25 09:09:37 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,7 @@ class mmgMaterialButton;
 class vtkFixedCutter;
 class vtkPlane;
 class vtkSphereSource;
+class vtkMAFToLinearTransform;
 
 //----------------------------------------------------------------------------
 // mafPipeSurfaceSlice :
@@ -110,6 +111,8 @@ protected:
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
   mmgMaterialButton *m_MaterialButton;
+
+	vtkMAFToLinearTransform* m_VTKTransform;
 
 //@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
 
