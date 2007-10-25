@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-07 12:13:03 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-10-25 08:42:23 $
+  Version:   $Revision: 1.19 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -232,7 +232,7 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
 			CameraUpdate();
     }
 
-    if (node->IsA("mafVMEVolumeGray"))
+    if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       m_SelectedVolume = m_Sg->Vme2Node(node);
       if (m_SelectedVolume->m_Pipe)
@@ -581,7 +581,7 @@ void mafViewGlobalSlice::UpdateSlice()
 				DoubleNormal[2]=(double)m_SliceNormal[2];
 				((mafPipeSurfaceSlice *)node->m_Pipe)->SetNormal(DoubleNormal);
       }
-      else if(node->m_Vme->IsA("mafVMEVolumeGray"))
+      else if(((mafVME *)node->m_Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
       {
         ((mafPipeVolumeSlice *)node->m_Pipe)->SetSlice(applied_origin, applied_xVector, applied_yVector);
       }
