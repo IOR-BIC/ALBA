@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 10:37:19 $
-  Version:   $Revision: 1.115 $
+  Date:      $Date: 2007-10-26 10:45:49 $
+  Version:   $Revision: 1.116 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1445,7 +1445,7 @@ void mafLogicWithManagers::TimeSet(double t)
 //----------------------------------------------------------------------------
 {
   if(m_VMEManager) m_VMEManager->TimeSet(t);
-  if(m_ViewManager) m_ViewManager->CameraUpdate();
+  if(m_ViewManager) m_ViewManager->CameraUpdate(m_TimeBarSettings->GetPlayingInActiveViewport() != 0);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::UpdateTimeBounds()
