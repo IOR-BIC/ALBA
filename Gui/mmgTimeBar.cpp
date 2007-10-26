@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 08:55:11 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-10-26 10:23:37 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -121,11 +121,17 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
   {
     switch(maf_event->GetId())
     {
+      case mafGUISettingsTimeBar::ID_FPS:
       case mafGUISettingsTimeBar::ID_REAL_TIME:
+      case mafGUISettingsTimeBar::ID_SPEED:
         if (m_Timer.IsRunning())
         {
           m_Timer.Stop();
         }
+        m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
+        m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
+        m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
+        Update();
       break;
     }
   }
@@ -250,9 +256,10 @@ void mmgTimeBar::SetBounds(double min, double max)
     max = min + 1;
 
   m_Timer.Stop();
+  m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
   m_TimeMax = max;
   m_TimeMin = min;
-  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
+  m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
 
   if(m_Time < min) 
   {
@@ -269,6 +276,7 @@ void mmgTimeBar::SetBounds(double min, double max)
   m_TimeBarSlider->Refresh();
 
   m_TimeBarEntry->SetValidator(mmgValidator(this,ID_ENTRY,m_TimeBarEntry,&m_Time,m_TimeMin,m_TimeMax));
+  m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
 
   m_TimeMinString = "";
   m_TimeMinString << m_TimeMin;
