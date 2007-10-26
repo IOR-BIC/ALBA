@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-25 10:17:15 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-10-26 08:54:25 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -198,6 +198,7 @@ void mafGUISettingsTimeBar::EnableWidgets()
   m_Gui->Enable(ID_TIME_MULTIPLIER, m_RealTimeMode == 1);
   m_Gui->Enable(ID_FPS, m_RealTimeMode != 1);
   m_Gui->Enable(ID_SPEED, m_RealTimeMode != 1);
+  m_Gui->Enable(ID_SUBRANGE, m_AnimateInSubrange == 1);
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::SetSubrange(double min, double max)
