@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 14:24:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-26 10:35:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -60,7 +60,7 @@ int mafVMEInfoText::DeepCopy(mafNode *a)
     mafVMEInfoText *it = mafVMEInfoText::SafeDownCast(a);
     if(it == NULL)
       return MAF_ERROR;
-    m_strings = it->m_strings;
+    m_Strings = it->m_Strings;
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -74,7 +74,7 @@ bool mafVMEInfoText::Equals(mafVME *vme)
     mafVMEInfoText *it = mafVMEInfoText::SafeDownCast(vme);
     if(it == NULL)
       return false;
-    return m_strings == it->m_strings;
+    return m_Strings == it->m_Strings;
   }
   return false;
 }
@@ -99,11 +99,13 @@ int mafVMEInfoText::InternalStore(mafStorageElement *parent)
       if(parent->StoreInteger(txtname, m_PosShow[i] ? 1 : 0) != MAF_OK)
         return MAF_ERROR;
     }
-    for(int i = 0; i < m_strings.size(); i++)
+    int strSz = m_Strings.size();
+    parent->StoreInteger("NumberOfStrings", strSz);
+    for(int i = 0; i < m_Strings.size(); i++)
     {
       char txtname[256];
       sprintf(txtname, "String%ld", i);
-      if(parent->StoreText(txtname, m_strings[i]) != MAF_OK)
+      if(parent->StoreText(txtname, m_Strings[i]) != MAF_OK)
         return MAF_ERROR;
     }
     return MAF_OK;
@@ -136,12 +138,27 @@ int mafVMEInfoText::InternalRestore(mafStorageElement *node)
     mafString ReadStr;
     int       i = 0;
     sprintf(txtname, "String%ld", i);
-    m_strings.clear();
-    while (node->RestoreText("Transform",ReadStr) == MAF_OK)
+    m_Strings.clear();
+
+    int strSz = m_Strings.size();
+    if(node->RestoreInteger("NumberOfStrings", strSz) == MAF_OK)
     {
-      m_strings.push_back(ReadStr);
-      i++;
-      sprintf(txtname, "String%ld", i);
+      for(int k = 0; k < strSz; k++) 
+      {
+        if(node->RestoreText(txtname,ReadStr) == MAF_OK)
+          m_Strings.push_back(ReadStr);
+        i++;
+        sprintf(txtname, "String%ld", i);
+      }
+    }
+    else
+    {
+      while (node->RestoreText(txtname,ReadStr) == MAF_OK)
+      {
+        m_Strings.push_back(ReadStr);
+        i++;
+        sprintf(txtname, "String%ld", i);
+      }
     }
     return MAF_OK;
   }
@@ -158,9 +175,9 @@ mmgGui* mafVMEInfoText::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  for(int i = 0; i < m_strings.size(); i++)
+  for(int i = 0; i < m_Strings.size(); i++)
   {
-    m_Gui->Label(&m_strings[i]);
+    m_Gui->Label(&m_Strings[i]);
     m_Gui->Divider();
   }
 
@@ -186,8 +203,8 @@ void mafVMEInfoText::Print(std::ostream& os, const int tabs)
   Superclass::Print(os,tabs);
   mafIndent indent(tabs);
 
-  for(int i = 0; i < m_strings.size(); i++)
-    os << m_strings[i] << endl;
+  for(int i = 0; i < m_Strings.size(); i++)
+    os << m_Strings[i] << endl;
 }
 
 //-------------------------------------------------------------------------

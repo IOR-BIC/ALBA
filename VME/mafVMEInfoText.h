@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 14:24:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-26 10:35:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -47,7 +47,7 @@ public:
   void SetPosLabel(const mafString& label, int index);
   const char *GetPosLabel(int index);
 
-  void AddString(const mafString& str){m_strings.push_back(str);Modified();}
+  void AddString(const mafString& str){m_Strings.push_back(str);Modified();}
 
   //void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes){kframes.clear();}
 
@@ -76,7 +76,7 @@ private:
 
   bool                   m_PosShow[3];
   mafString              m_PosLabels[3];
-  std::vector<mafString> m_strings;
+  std::vector<mafString> m_Strings;
 };
 
 #endif
