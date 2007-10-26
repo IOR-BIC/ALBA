@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 10:36:17 $
-  Version:   $Revision: 1.14 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2007-10-26 08:55:11 $
+  Version:   $Revision: 1.15 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -67,18 +67,11 @@ m_Timer(NULL, ID_TIMER)
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);
   
-  m_WorldTimeMultiplier = 1000.0;
-  m_RealTimeMode = 0;
   m_NumberOfIntervals = 500;
   m_Time     = 0;
   m_TimeMin  = 0; 
-  m_TimeMax  = 100; 
+  m_TimeMax  = 100;
   m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
-
-  /*wxStaticText *labcheck = new wxStaticText(this,-1," real time ");
-  wxStaticText *checkdivider = new wxStaticText(this,-1," ");
-  wxCheckBox *check = new wxCheckBox(this, ID_REAL_TIME, "", wxDefaultPosition, wxSize(-1,17), 0 );
-  check->SetValidator( mmgValidator(this,ID_REAL_TIME, check, &m_RealTimeMode) );*/
 
   m_TimeMinString = "";
   m_TimeMinString << m_TimeMin;
@@ -95,10 +88,6 @@ m_Timer(NULL, ID_TIMER)
   m_TimeBarEntry = new wxTextCtrl  (this, ID_ENTRY, "" , wxDefaultPosition, wxSize(40,17), 0 );
   m_TimeBarEntry->SetValidator(mmgValidator(this,ID_ENTRY,m_TimeBarEntry,&m_Time,m_TimeMin,m_TimeMax));
 
-  /*wxStaticText *lab2 = new wxStaticText(this,-1," speed "); 
-  m_TimeBarEntryVelocity = new wxTextCtrl  (this, TIME_BAR_VELOCITY, "" , wxDefaultPosition, wxSize(40,17), 0 );
-  m_TimeBarEntryVelocity->SetValidator(mmgValidator(this,TIME_BAR_VELOCITY,m_TimeBarEntryVelocity,&m_TimeStep,0.0000001,100));*/
-
   m_TimeBarSlider = new mmgFloatSlider(this,ID_SLIDER,m_Time,m_TimeMin,m_TimeMax);
   m_TimeBarSlider->SetValidator( mmgValidator(this,ID_SLIDER,m_TimeBarSlider,&m_Time,m_TimeBarEntry) );
   m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
@@ -109,11 +98,6 @@ m_Timer(NULL, ID_TIMER)
   m_Sizer->Add(labTimeMax,0,wxALIGN_CENTER);
   m_Sizer->Add(lab1,0,wxALIGN_CENTER);
   m_Sizer->Add(m_TimeBarEntry,0,wxALIGN_CENTER);
-  /*m_Sizer->Add(lab2,0,wxALIGN_CENTER);
-  m_Sizer->Add(m_TimeBarEntryVelocity,0,wxALIGN_CENTER);*/
-  /*m_Sizer->Add(labcheck,0,wxALIGN_CENTER);
-  m_Sizer->Add(check,0,wxALIGN_CENTER);
-  m_Sizer->Add(checkdivider,0,wxALIGN_CENTER);*/
 
   m_TimeBarButtons[0] = new mmgPicButton(this, "TIME_BEGIN", TIME_BEGIN, this);
   m_TimeBarButtons[1] = new mmgPicButton(this, "TIME_PREV",  TIME_PREV , this);
@@ -138,56 +122,53 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
     switch(maf_event->GetId())
     {
       case mafGUISettingsTimeBar::ID_REAL_TIME:
-        m_RealTimeMode = m_TimeBarSettings->GetRealTimeMode();
         if (m_Timer.IsRunning())
         {
           m_Timer.Stop();
         }
-      break;
-      case mafGUISettingsTimeBar::ID_TIME_MULTIPLIER:
-        m_WorldTimeMultiplier = m_TimeBarSettings->GetTimeMultiplier();
       break;
     }
   }
   else
   {
     bool play = false;
+    // Check for sub-range animation
+    double time_max, time_min;
+    time_min = (m_TimeBarSettings->GetAnimateSubrange() == 1) ? m_TimeBarSettings->GetSubrange()[0] : m_TimeMin;
+    time_max = (m_TimeBarSettings->GetAnimateSubrange() == 1) ? m_TimeBarSettings->GetSubrange()[1] : m_TimeMax;
+
     if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
     {
       switch(e->GetId())
       {
         case TIME_PLAY:
           play = true;
+          if (m_Time >= time_max || m_Time <= time_min)
+          {
+            m_Time = time_min;
+          }
         break; 
         case TIME_STOP:
         case ID_ENTRY:
         case ID_SLIDER:
           // time set is called later on
         break;
-        /*case TIME_BAR_VELOCITY:
-        break;*/
         case ID_CLOSE_BUTTON:
         break;
         case TIME_PREV:
           m_Time -= m_TimeStep;
-          m_Time = (m_Time <= m_TimeMin) ? m_TimeMin : m_Time;
+          m_Time = (m_Time <= time_min) ? time_min : m_Time;
         break;
         case TIME_NEXT:
           m_Time += m_TimeStep;
-          m_Time = (m_Time >= m_TimeMax) ? m_TimeMax : m_Time;
+          m_Time = (m_Time >= time_max) ? time_max : m_Time;
         break;
         case TIME_BEGIN:
-          m_Time = m_TimeMin;
+          m_Time = time_min;
         break;
         case TIME_END:
-          m_Time = m_TimeMax;
+          m_Time = time_max;
         break;
-        /*case ID_REAL_TIME:
-        if (m_Timer.IsRunning())
-        {
-          m_Timer.Stop();
-        }
-        break;*/
         default:
           e->Log();
         break;
@@ -219,7 +200,12 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
 void mmgTimeBar::OnTimer(wxTimerEvent &event)
 //----------------------------------------------------------------------------
 {
-  if (m_RealTimeMode == 0)
+  // Check for sub-range animation
+  double time_max, time_min;
+  time_min = (m_TimeBarSettings->GetAnimateSubrange() == 1) ? m_TimeBarSettings->GetSubrange()[0] : m_TimeMin;
+  time_max = (m_TimeBarSettings->GetAnimateSubrange() == 1) ? m_TimeBarSettings->GetSubrange()[1] : m_TimeMax;
+
+  if (m_TimeBarSettings->GetRealTimeMode() == 0)
   {
     m_Time += m_TimeStep;
   }
@@ -228,17 +214,25 @@ void mmgTimeBar::OnTimer(wxTimerEvent &event)
     wxDateTime dt = wxDateTime::UNow();
     wxTimeSpan ts = dt.Subtract(m_WorldTimeStart);
     wxLongLong delta = ts.GetMilliseconds();
-    m_Time = m_TimeStart + delta.ToDouble() / m_WorldTimeMultiplier;
+    m_Time = m_TimeStart + delta.ToDouble() / m_TimeBarSettings->GetTimeMultiplier();
   }
-  if (m_Time >= m_TimeMax)
+  
+  if (m_Time >= time_max)
   {
-    m_Time = m_TimeMin;
-    m_TimeStart = m_Time;
-    m_WorldTimeStart = wxDateTime::UNow();
+    if (m_TimeBarSettings->GetLoop() == 1)
+    {
+      m_Time = time_min;
+      m_TimeStart = m_Time;
+      m_WorldTimeStart = wxDateTime::UNow();
+    }
+    else
+    {
+      m_Time = time_max;
+      OnEvent(&mafEvent(this, TIME_STOP));
+    }
   }
 
-  //m_Time = (m_Time >= m_TimeMax) ? m_TimeMin : m_Time;
-  mafEventMacro(mafEvent(this,TIME_SET,m_Time,0));
+  mafEventMacro(mafEvent(this, TIME_SET, m_Time, 0));
   Update();
 }
 //----------------------------------------------------------------------------
@@ -253,7 +247,7 @@ void mmgTimeBar::SetBounds(double min, double max)
 //----------------------------------------------------------------------------
 {
   if(max <= min) 
-    max = min+1;
+    max = min + 1;
 
   m_Timer.Stop();
   m_TimeMax = max;
@@ -285,13 +279,14 @@ void mmgTimeBar::SetBounds(double min, double max)
   Update();
 }
 //----------------------------------------------------------------------------
+void mmgTimeBar::SetMultiplier(double mult)
+//----------------------------------------------------------------------------
+{
+  m_TimeBarSettings->SetTimeMultiplier(mult);
+}
+//----------------------------------------------------------------------------
 void mmgTimeBar::SetTimeSettings(mafGUISettingsTimeBar *settings)
 //----------------------------------------------------------------------------
 {
-  m_TimeBarSettings = settings;
-
-  m_WorldTimeMultiplier = m_TimeBarSettings->GetTimeMultiplier();
-  m_RealTimeMode = m_TimeBarSettings->GetRealTimeMode();
-  
-  Update();
+  m_TimeBarSettings = settings;  
 }

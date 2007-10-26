@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 10:36:17 $
-  Version:   $Revision: 1.9 $
-  Authors:   Silvano Imboden
+  Date:      $Date: 2007-10-26 08:55:11 $
+  Version:   $Revision: 1.10 $
+  Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -54,7 +54,7 @@ public:
 	void SetBounds(double min, double max);
 
   /** Set the multiplier for timer. Default value is to show time data represented in seconds.*/
-  void SetMultiplier(double mult = 1000.0) {m_WorldTimeMultiplier = mult;};
+  void SetMultiplier(double mult = 1000.0);
 
   /** Set the reference to the time setting panel.*/
   void SetTimeSettings(mafGUISettingsTimeBar *settings);
@@ -64,26 +64,23 @@ protected:
   double m_TimeMin; 
   double m_TimeMax; 
   double m_TimeStep;
-  double m_TimeStart; // maf time when the play button was pressed
+  double m_TimeStart; ///< MAF time when the play button was pressed.
 
-  int m_NumberOfIntervals;
+  int m_NumberOfIntervals; ///< Number of subdivision intervals for the time bar.
 
   mafString m_TimeMinString;
   mafString m_TimeMaxString;
 
-  int              m_RealTimeMode;
-  wxDateTime       m_WorldTimeStart; // world time when the play button was pressed
-  double           m_WorldTimeMultiplier;
+  wxDateTime       m_WorldTimeStart; ///< World time when the play button was pressed.
 
   wxBoxSizer		  *m_Sizer;
   mmgPicButton		*m_TimeBarButtons[5];
   wxTextCtrl		  *m_TimeBarEntry;
-  //wxTextCtrl		  *m_TimeBarEntryVelocity;
   mmgFloatSlider	*m_TimeBarSlider; 
   wxTimer          m_Timer;
 
   mafObserver     *m_Listener;
-  mafGUISettingsTimeBar *m_TimeBarSettings;
+  mafGUISettingsTimeBar *m_TimeBarSettings; ///< Settings panel for the time bar.
 
   /** Update the time and send the TIME_SET event to synchronize all the application. */
 	void OnTimer(wxTimerEvent &event);
