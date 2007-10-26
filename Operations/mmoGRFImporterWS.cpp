@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 11:22:08 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-10-26 11:29:44 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -268,7 +268,7 @@ void mmoGRFImporterWS::Read()
       cellArray1->InsertNextCell(2, pointId1);  
       vector1->SetPoints(points1);
       vector1->SetLines(cellArray1);
-      vector1->Update;
+      vector1->Update();
 
       vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfVecL;
       vtkMAFSmartPointer<vtkTransform> transf;
@@ -325,7 +325,7 @@ void mmoGRFImporterWS::Read()
       cellArray2->InsertNextCell(2, pointId2);  
       vector2->SetPoints(points2);
       vector2->SetLines(cellArray2);
-      vector2->Update;
+      vector2->Update();
 
       vtkMAFSmartPointer<vtkTransformPolyDataFilter> transfVecR;
       vtkMAFSmartPointer<vtkTransform> transf;
