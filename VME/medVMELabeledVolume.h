@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 08:46:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-10-26 15:08:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,11 +49,14 @@ public:
 
 //  void SetListener(mafObserver *listener) {m_Listener = listener;};
 
-  int getLabelValue( wxString &item );  
+  int GetLabelValue( wxString &item );  
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
+  int DeepCopy(mafNode *a);
+
+  bool Equals(mafVME *vme);
 
   /**
   Set the Pose matrix of the VME. This function modifies the MatrixVector. You can
@@ -67,30 +70,73 @@ public:
   obtained merging timestamps for matrixes and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
-
-  /** called to prepare the update of the output */
-  virtual void InternalPreUpdate();
-
+  /** Update the VME with the scalar values of the labels. */
+  virtual void GenerateLabeledVolume();
 
   /** This method updates the look-up table. */
-  void updateLookUpTable();
+  void UpdateLookUpTable();
 
-  void UpdateTag();
+  /** If lables tags are present retrieve them. */
+  void RetrieveTag();
 
+   /** Updates the tags and the items of the checkBox and call the InternalPreUpadate. */
+  void UpdateLabel();
+
+  /** Set the Link */
   void SetVolumeLink(mafNode *n);
 
+  /** Set the min label value. */
+  void SetMin(int min);
+
+  /** Set the max label value. */
+  void SetMax(int max);
+
+  /** Set the label value. */
+  void SetLabelValue(int value);
+
+  /** Set the label name. */
+  void SetLabelName(wxString name);
+  
+  /** Check an item of the CheckListBox. */
+  void CheckItem(int itemId);
+
+  /** Return the Link */
   mafNode *GetVolumeLink();
 
   /** This method returns the min value from the label used as input. */
-  int getMin( wxString &item );
+  int GetMin( wxString &item );
   /** This method returns the max value from the label used as input. */
-  int getMax( wxString &item );
+  int GetMax( wxString &item );
 
   /** return icon */
   static char** GetIcon();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
+
+  //----------------------------------------------------------------------------
+  // widget ID's
+  //----------------------------------------------------------------------------
+  enum VME_LABELED_VOLUME_DIALOG_ID
+  {
+    ID_INSERT_LABEL = Superclass::ID_LAST,
+    ID_REMOVE_LABEL,
+    ID_EDIT_LABEL,
+    ID_LABELS,
+    ID_FIT,	
+    ID_SLICE,
+    ID_SLICE_SLIDER,
+    ID_INCREASE_SLICE,
+    ID_DECREASE_SLICE,
+    ID_OK,
+    ID_D_LABEL_NAME,
+    ID_D_LABEL_VALUE,
+    ID_D_MIN,
+    ID_D_MAX,
+    ID_SLIDER_MIN,
+    ID_SLIDER_MAX,
+    ID_LAST,
+  };
 
 protected:
   medVMELabeledVolume();
@@ -112,10 +158,11 @@ protected:
   int m_Min   , m_Max;
   int m_MinMin, m_MaxMin;
   int m_MinMax, m_MaxMax;	
-  int   m_MinValue, m_MaxValue;
+  int m_MinValue ,m_MaxValue;
 
   int m_CheckListId;
   int m_ItemSelected;
+  int m_LabelIntValue;
 
   bool  m_CheckMax, m_CheckMin;
   bool  m_EditMode;
@@ -128,13 +175,11 @@ protected:
   mmgFloatSlider    *m_SliceSlider;
   mafRWI            *m_Rwi;
   mafTagItem        *m_TagLabel;
-  mafDataPipeCustom *m_Dpipe;
   mafVME            *m_Link;
   mafTransform      *m_Transform;
 
   wxString     m_LabelNameValue; 	
   wxString     m_LabelValueValue;
-  int          m_LabelIntValue;
 
   double m_Slice;
   double m_SliceMin;
@@ -160,7 +205,6 @@ protected:
   vtkActor          * m_ActorSlice;  
   vtkDataSet        *m_Dataset;
   vtkPolyData       *m_Polydata;
-
 
   void CopyDataset();
   /** 

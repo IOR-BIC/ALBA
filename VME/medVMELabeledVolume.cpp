@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 07:10:32 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-10-26 15:08:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -24,6 +24,9 @@
 
 #include "mmgGui.h"
 #include "mmgDialogPreview.h"
+#include "mmaMaterial.h"
+#include "mmaVolumeMaterial.h"
+#include "mafNode.h"
 #include "mafTransform.h"
 #include "mmgButton.h"
 #include "mmgValidator.h"
@@ -57,35 +60,13 @@
 #include "vtkRenderWindow.h"
 
 #include <list>
+#include <vector>
 
 #define OUTRANGE_SCALAR 0
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(medVMELabeledVolume);
 //-------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
-// widget ID's
-//----------------------------------------------------------------------------
-enum 
-{
-  ID_INSERT_LABEL = MINID,
-  ID_REMOVE_LABEL,
-  ID_EDIT_LABEL,
-  ID_LABELS,
-  ID_FIT,	
-  ID_SLICE,
-  ID_SLICE_SLIDER,
-  ID_INCREASE_SLICE,
-  ID_DECREASE_SLICE,
-  ID_OK,
-  ID_D_LABEL_NAME,
-  ID_D_LABEL_VALUE,
-  ID_D_MIN,
-  ID_D_MAX,
-  ID_SLIDER_MIN,
-  ID_SLIDER_MAX,  
-};
 
 //------------------------------------------------------------------------------
 medVMELabeledVolume::medVMELabeledVolume()
@@ -126,23 +107,53 @@ medVMELabeledVolume::medVMELabeledVolume()
   SetOutput(output);
  
   // attach a data pipe which creates a bridge between VTK and MAF
-  m_Dpipe = mafDataPipeCustom::New();
-  m_Dpipe->SetDependOnAbsPose(true);
-  SetDataPipe(m_Dpipe);
-  m_Dpipe->SetInput(NULL);
+  mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
+  dpipe->SetDependOnAbsPose(true);
+  SetDataPipe(dpipe);
+  dpipe->SetInput(NULL);
    
-  for(int i=0; i<6; i++) m_BBox[i]=0;  
+  for(int i=0; i<6; i++) 
+    m_BBox[i] = 0;
 }
 //------------------------------------------------------------------------------
 medVMELabeledVolume::~medVMELabeledVolume()
 //------------------------------------------------------------------------------
 {
-   mafDEL(m_Transform);
+  mafDEL(m_Transform);
 
   if ( m_Dlg )
     DeleteOpDialog();
-  }
+}
+//-------------------------------------------------------------------------
+int medVMELabeledVolume::DeepCopy(mafNode *a)
+//-------------------------------------------------------------------------
+{ 
+  if (Superclass::DeepCopy(a) == MAF_OK)
+  {
+    medVMELabeledVolume *lab_volume = medVMELabeledVolume::SafeDownCast(a);
+    mafNode *linked_node = lab_volume->GetLink("VolumeLink");
+    if (linked_node)
+    {
+      SetVolumeLink(linked_node);
+    }
+    m_Transform->SetMatrix(lab_volume->m_Transform->GetMatrix());
 
+    return MAF_OK;
+  }  
+  return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
+bool medVMELabeledVolume::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  bool ret = false;
+  if (Superclass::Equals(vme))
+  {
+    ret = m_Transform->GetMatrix() == ((medVMELabeledVolume *)vme)->m_Transform->GetMatrix() && \
+      GetLink("VolumeLink") == ((medVMELabeledVolume *)vme)->GetLink("VolumeLink");
+  }
+  return ret;
+}
 //----------------------------------------------------------------------------
 void medVMELabeledVolume::DeleteOpDialog()
 //----------------------------------------------------------------------------
@@ -178,8 +189,24 @@ void medVMELabeledVolume::CopyDataset()
   m_Dataset = data->NewInstance();
   m_Dataset->DeepCopy(data);
   ((mafDataPipeCustom *)GetDataPipe())->SetInput(m_Dataset); 
-  UpdateTag();
+  RetrieveTag();
   m_DataCopied = TRUE;
+
+  mmaVolumeMaterial *volMaterial;
+  mafNEW(volMaterial);
+  volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
+  volMaterial->UpdateProp();
+  volMaterial->UpdateFromTables();
+  mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
+  if  (labelMaterial)
+  {
+    ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial()->DeepCopy(volMaterial);
+  }
+  else
+  {
+    ((mafVMEOutputVolume *)this->GetOutput())->SetMaterial(volMaterial);
+    ((mafVMEOutputVolume *)this->GetOutput())->Update();
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -209,11 +236,12 @@ void medVMELabeledVolume::UpdateScalars()
 {
   m_Link = mafVME::SafeDownCast(GetVolumeLink());
   vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
+  data->Update();
   m_Dataset->GetPointData()->GetScalars()->DeepCopy(data->GetPointData()->GetScalars());
 }
 
 //-------------------------------------------------------------------------
-void medVMELabeledVolume::InternalPreUpdate()
+void medVMELabeledVolume::GenerateLabeledVolume()
 //-------------------------------------------------------------------------
 {
   UpdateScalars();
@@ -236,65 +264,81 @@ void medVMELabeledVolume::InternalPreUpdate()
   int numberC = m_TagLabel->GetNumberOfComponents();
   bool lastComponent = FALSE;
   int numberChecked = 0;
-  int posCheck = 0;
 
-  //Count how many labels are checked
+  std::vector<int> minVector;
+  std::vector<int> maxVector;
+  std::vector<int> labelVector;
+
+  int counter= 0;
+  //Fill the vectors of range and label value
   for (int c = 0; c < numberC; c++)
   {
     if   (m_LabelCheckBox->IsItemChecked(c))
     {
-      numberChecked++;
-    }
-  }
-  for (int c = 0; c < numberC; c++)
-  {
-    if   (m_LabelCheckBox->IsItemChecked(c))
-    {
-      posCheck++;
-      if (posCheck == numberChecked)
-      {
-        lastComponent = TRUE;
-      }
-      wxString label = m_TagLabel->GetValue(c);
+      wxString label = m_LabelCheckBox->GetItemLabel(c);
       wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
       mafString labelName = tkz.GetNextToken().c_str();
       mafString labelIntStr = tkz.GetNextToken().c_str();
-      int labelIntValue = atoi(labelIntStr);
+      m_LabelIntValue = atoi(labelIntStr);
+      labelVector.push_back(m_LabelIntValue);
       mafString minStr = tkz.GetNextToken().c_str();
-      double min = atof(minStr);
+      m_MinValue = atof(minStr);
+      minVector.push_back(m_MinValue);
       mafString maxStr = tkz.GetNextToken().c_str();
-      double max = atof(maxStr);
-
-      int not = volumeScalars->GetNumberOfTuples();
-      for ( int i = 0; i < not; i++ )
-      {
-        double scalarValue = volumeScalars->GetComponent( i, 0 );
-        if ( scalarValue >= min && scalarValue <= max )
-        { 
-          labelScalars->SetTuple1( i, labelIntValue ); 
-        }
-        else
-        {
-          if (lastComponent)  //Put to OUTRANGE_SCALAR value only in the last label
-          {
-            labelScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
-          }        
-        }
-      }
-      volumeScalars = labelScalars;
-      volumeScalars->Modified();
-      }
+      m_MaxValue = atof(maxStr);
+      maxVector.push_back(m_MaxValue);
+      counter++;
+    }
   }
   
-  labelScalars->Modified();
-  m_Dataset->GetPointData()->SetScalars(labelScalars);
-  m_Dataset->Modified();
+  int labelVlaue;
+  if (counter != 0)
+  {
+    int not = volumeScalars->GetNumberOfTuples();
+    for ( int i = 0; i < not; i++ )
+    {
+      bool modified = FALSE;
+      double scalarValue = volumeScalars->GetComponent( i, 0 );
+      for (int c = 0; c < labelVector.size(); c++)
+      {
+        if ( scalarValue >= minVector.at(c) && scalarValue <= maxVector.at(c))
+        { 
+          labelVlaue = labelVector.at(c);
+          labelScalars->SetTuple1( i, labelVlaue ); 
+          modified = TRUE;
+        }
+      }
+      if (!modified)
+      {
+        labelScalars->SetTuple1( i, OUTRANGE_SCALAR); 
+      }
+    }
+    
+    labelScalars->Modified();
+    m_Dataset->GetPointData()->SetScalars(labelScalars);
+    m_Dataset->Modified();
+  }
+  else
+  {
+    labelScalars->Modified();
+    m_Dataset->GetPointData()->SetScalars(labelScalars);
+    m_Dataset->Modified();
+  }
+
+  double scalarRange[2];
+  labelScalars->GetRange(scalarRange);
+
+  mmaVolumeMaterial *volMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
+  volMaterial->m_ColorLut->SetTableRange(scalarRange);
+
+  volMaterial->UpdateFromTables();
 
   mafEvent e(this,CAMERA_UPDATE);
   ForwardUpEvent(&e);  
 }
+
 //-----------------------------------------------------------------------
-void medVMELabeledVolume::UpdateTag()
+void medVMELabeledVolume::RetrieveTag()
 //----------------------------------------------------------------------
 { 
   bool tagPresent = this->GetTagArray()->IsTagPresent("LABELS");
@@ -329,7 +373,6 @@ int medVMELabeledVolume::InternalRestore(mafStorageElement *node)
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
       m_Transform->SetMatrix(matrix);
-      //CopyDataset();
       return MAF_OK;
     }
   }
@@ -350,7 +393,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
   m_Gui->SetListener(this); 
 
   // Volume label name  
-  m_Gui->Label(GetName(), true);  
+ // m_Gui->Label(GetName(), true);  
 
   // Settings for the buttons that will control the list box
   m_Gui->Button(ID_INSERT_LABEL, _("Add label"), "", _("Add a label"));
@@ -376,11 +419,9 @@ mmgGui* medVMELabeledVolume::CreateGui()
       wxString label = m_TagLabel->GetValue( i );
       if ( label != "" )
       {
-        //int min = getMin( component );
-        myList.push_front( label );
+        myList.push_back( label );
       }
     }     
-    myList.sort();
 
     for( myListIter = myList.begin(); myListIter != myList.end(); myListIter++ )
     {
@@ -393,7 +434,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
           if ( component == labelName )
           {
             m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
-            //m_CheckedVec.push_back(TRUE);
+            m_CheckedVec.push_back(TRUE);
             m_CheckListId++;
           }
         }
@@ -647,272 +688,277 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {	
+      case ID_INSERT_LABEL:
+      {      
+        m_EditMode = FALSE;
+        double sr[2];
+        m_Dataset->GetScalarRange(sr);
+        m_MinAbsolute = sr[0]; 
+        m_MaxAbsolute = sr[1]; 
 
-  case ID_INSERT_LABEL:
-    {      
-      m_EditMode = FALSE;
-      double sr[2];
-      m_Dataset->GetScalarRange(sr);
-      m_MinAbsolute = sr[0]; 
-      m_MaxAbsolute = sr[1]; 
-
-      // To initialize slider values
-      m_MinMin = m_MinAbsolute;
-      m_MinMax = m_MaxAbsolute;
-      m_Min = ( m_MinMin + m_MinMax ) * 0.5;
-      m_MaxMin = m_MinAbsolute;  
-      m_MaxMax = m_MaxAbsolute;
-      m_Max = ( m_MaxMin + m_MaxMax ) * 0.5;
-      m_LabelNameValue = wxEmptyString;
-      m_LabelIntValue = 1;
-      CreateOpDialog();
-     
-      m_Dlg->ShowModal();      
-    }
-    break;
-
-  case ID_REMOVE_LABEL:
-    {
-      m_LabelCheckBox->RemoveItem(m_ItemSelected);
-      m_CheckListId--;
-      int noc = m_TagLabel->GetNumberOfComponents();
-      for ( unsigned int w = 0; w < noc; w++ )
-      {
-        wxString component = m_TagLabel->GetValue( w );
-        if ( m_ItemLabel == component )
-        {
-          m_TagLabel->RemoveValue(w);
-        }
-        InternalPreUpdate();
+        // To initialize slider values
+        m_MinMin = m_MinAbsolute;
+        m_MinMax = m_MaxAbsolute;
+        m_Min = ( m_MinMin + m_MinMax ) * 0.5;
+        m_MaxMin = m_MinAbsolute;  
+        m_MaxMax = m_MaxAbsolute;
+        m_Max = ( m_MaxMin + m_MaxMax ) * 0.5;
+        m_LabelNameValue = wxEmptyString;
+        m_LabelIntValue = 1;
+        CreateOpDialog();
+        
+        m_Dlg->ShowModal();      
       }
-    }
-    break;
-
-  case ID_EDIT_LABEL:
-    {
-      m_EditMode = TRUE;
-      wxString componentName;
-      int noc = m_TagLabel->GetNumberOfComponents();
-      for ( unsigned int w = 0; w < noc; w++ )
+      break;
+      case ID_REMOVE_LABEL:
       {
-        componentName = m_TagLabel->GetValue( w );
-        if ( m_ItemLabel == componentName )
-        {
-          wxStringTokenizer tkz(componentName,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-          mafString labelName = tkz.GetNextToken().c_str();
-          mafString labelIntStr = tkz.GetNextToken().c_str();
-          mafString minStr = tkz.GetNextToken().c_str();
-          double min = atof(minStr);
-          mafString maxStr = tkz.GetNextToken().c_str();
-          double max = atof(maxStr);
-
-          m_LabelNameValue = labelName;
-          m_LabelValueValue = labelIntStr;
-          m_Min = min;
-          m_Max = max;
-          CreateOpDialog();
-          m_Dlg->ShowModal();  
-          break;
-        }
-      }   
-    }
-    break;
-
-  case ID_LABELS:
-    {
-      m_ItemSelected = e->GetArg();
-      m_ItemLabel = m_LabelCheckBox->GetItemLabel(m_ItemSelected);
-   //   bool checkedBefore = m_CheckedVec.at(m_ItemSelected);
-    //  bool checkedAfter = e->GetBool();
-      //if (checkedBefore != checkedAfter)
-     // {
-        //m_CheckedVec.assign(m_CheckedVec.begin() + m_ItemSelected , checkedAfter);
-       // m_CheckedVec[m_ItemSelected] = checkedAfter;
-        InternalPreUpdate();
-     // }  
-    }
-    break;
-    
-  case ID_D_MAX:
-    {  
-      m_Dlg->TransferDataToWindow();  
-      m_Max = m_MaxSlider->GetValue();
-      m_Dlg->TransferDataToWindow();  
-      //wxLogMessage("max | m_CheckMax %d | m_Max %f | m_MaxValue %f", m_CheckMax, m_Max, m_MaxValue );
-
-      if ( m_CheckMax  && m_Max >= m_MaxValue )      
-      {
-        wxMessageBox( "You have inserted a Max value bigger than the value permitted", "Error", wxOK | wxICON_ERROR  );       
-        m_Max = m_MaxValue; m_MaxSlider->SetValue( m_Max ); m_Dlg->TransferDataToWindow();       
-      }  
-
-      updateLookUpTable();
-    }
-    break;
-
-  case ID_D_MIN:
-    {
-      m_Dlg->TransferDataToWindow();  
-      m_Min = m_MinSlider->GetValue();   
-      m_Dlg->TransferDataToWindow();
-    
-      if ( m_CheckMin  && m_Min <= m_MinValue )      
-      {
-        wxMessageBox( "You have inserted a Min value smaller than the value permitted", "Error", wxOK | wxICON_ERROR  );                
-        m_Min = m_MinValue; m_MinSlider->SetValue( m_Min ); m_Dlg->TransferDataToWindow(); 
-      }      
-      updateLookUpTable();
-    }
-    break; 
-
-  case ID_SLIDER_MIN:      
-    {       
-      if ( m_CheckMin  && m_Min <= m_MinValue ) 
-      {
-        m_Min = m_MinValue; m_MinSlider->SetValue( m_Min ); 
-      }      
-      updateLookUpTable();
-    }
-    break;
-
-  case ID_SLIDER_MAX:      
-    {      
-      if ( m_CheckMax  && m_Max >= m_MaxValue )      
-      {
-        m_Max = m_MaxValue; m_MaxSlider->SetValue( m_Max ); 
-      }
-      updateLookUpTable();
-    }      
-    break;    
-
-  case ID_OK:
-    {      
-      if ( m_Max < m_Min )      
-      {
-        wxMessageBox( "Wrong values for Min and Max parameters", "Error", wxOK | wxICON_ERROR );
-        break;
-      }
-
-      wxString labelName = m_LabelNameCtrl->GetValue();
-      if ( labelName == wxEmptyString )
-        labelName = "no_name";
-      else
-        labelName.Replace( " ", "_" );
-
-      // Check if another name for the label already exists
-      if( m_TagLabel && m_EditMode == FALSE)
-      {
-        int noc = m_TagLabel->GetNumberOfComponents();
-        for ( unsigned int i = 0; i < noc; i++ )
-        {
-          wxString component = m_TagLabel->GetValue( i );
-
-          // Check if another name for the label already exists
-          wxString currentLabelName = component.BeforeFirst( ' ' );       
-          if ( currentLabelName == labelName )
-          {          
-            int answer = wxMessageBox( "The name of this label already exists - Continue?", "Warning", wxYES_NO | wxICON_ERROR, NULL);
-            if (answer == wxNO)
-            {            
-              m_LabelNameCtrl->SetValue( wxEmptyString );            
-              return;
-            }
-            else
-              break; //exit from loop for only
-          }
-          // Check if another value for the label already exists
-          int currentLabelValue = getLabelValue( currentLabelName );
-          if ( currentLabelValue == m_LabelIntValue )
-          {
-            int answer = wxMessageBox( "The value for this label already exists - Continue?", "Warning", wxYES_NO | wxICON_ERROR, NULL);
-            if (answer == wxNO)
-            {            
-              m_LabelIntValue = 1;
-              m_Dlg->TransferDataToWindow();
-              return;
-            }
-            else
-              break; //exit from loop for only
-          }
-        }
-      }
-      wxString labelLine; 
-      labelLine.Printf( "%s %d %d %d", labelName, m_LabelIntValue, m_Min, m_Max );            
-      m_Dlg->EndModal(wxID_CANCEL); 
-
-      if (m_EditMode == FALSE)
-      {
-        m_LabelCheckBox->AddItem(m_CheckListId, labelLine, TRUE); 
-        //m_CheckedVec.push_back(TRUE);
-        m_CheckListId++;
-        m_LabelCheckBox->Update();
-        int nComp = m_TagLabel->GetNumberOfComponents();
-        m_TagLabel->SetValue(labelLine.c_str(), nComp);
-      }
-      else
-      {
-        m_LabelCheckBox->SetItemLabel(m_ItemSelected, labelLine);
-        m_LabelCheckBox->Update();
-
+        m_LabelCheckBox->RemoveItem(m_ItemSelected);
+        m_CheckListId--;
         int noc = m_TagLabel->GetNumberOfComponents();
         for ( unsigned int w = 0; w < noc; w++ )
         {
-          wxString componentName = m_TagLabel->GetValue( w );
-          if ( m_ItemLabel == componentName )
+          wxString component = m_TagLabel->GetValue( w );
+          if ( m_ItemLabel == component )
           {
-            m_TagLabel->SetValue(labelLine.c_str(), w );
+            m_TagLabel->RemoveValue(w);
           }
+          GenerateLabeledVolume();
         }
       }
-      InternalPreUpdate();
+      break;
+      case ID_EDIT_LABEL:
+      {
+        m_EditMode = TRUE;
+        wxString componentName;
+        int noc = m_TagLabel->GetNumberOfComponents();
+        for ( unsigned int w = 0; w < noc; w++ )
+        {
+          componentName = m_TagLabel->GetValue( w );
+          if ( m_ItemLabel == componentName )
+          {
+            wxStringTokenizer tkz(componentName,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
+            mafString labelName = tkz.GetNextToken().c_str();
+            mafString labelIntStr = tkz.GetNextToken().c_str();
+            mafString minStr = tkz.GetNextToken().c_str();
+            double min = atof(minStr);
+            mafString maxStr = tkz.GetNextToken().c_str();
+            double max = atof(maxStr);
+
+            m_LabelNameValue = labelName;
+            m_LabelValueValue = labelIntStr;
+            m_Min = min;
+            m_Max = max;
+            CreateOpDialog();
+            m_Dlg->ShowModal();  
+            break;
+          }
+        }   
+      }
+      break;
+      case ID_LABELS:
+      {
+        m_ItemSelected = e->GetArg();
+        m_ItemLabel = m_LabelCheckBox->GetItemLabel(m_ItemSelected);
+      //   bool checkedBefore = m_CheckedVec.at(m_ItemSelected);
+      //  bool checkedAfter = e->GetBool();
+        //if (checkedBefore != checkedAfter)
+        // {
+          //m_CheckedVec.assign(m_CheckedVec.begin() + m_ItemSelected , checkedAfter);
+          // m_CheckedVec[m_ItemSelected] = checkedAfter;
+          GenerateLabeledVolume();
+        // }  
+      }
+      break;
+      case ID_D_MAX:
+      {  
+        m_Dlg->TransferDataToWindow();  
+        m_Max = m_MaxSlider->GetValue();
+        m_Dlg->TransferDataToWindow();  
+        //wxLogMessage("max | m_CheckMax %d | m_Max %f | m_MaxValue %f", m_CheckMax, m_Max, m_MaxValue );
+
+        if ( m_CheckMax  && m_Max >= m_MaxValue )      
+        {
+          wxMessageBox( "You have inserted a Max value bigger than the value permitted", "Error", wxOK | wxICON_ERROR  );       
+          m_Max = m_MaxValue; m_MaxSlider->SetValue( m_Max ); m_Dlg->TransferDataToWindow();       
+        }  
+
+        UpdateLookUpTable();
+      }
+      break;
+      case ID_D_MIN:
+      {
+        m_Dlg->TransferDataToWindow();  
+        m_Min = m_MinSlider->GetValue();   
+        m_Dlg->TransferDataToWindow();
+      
+        if ( m_CheckMin  && m_Min <= m_MinValue )      
+        {
+          wxMessageBox( "You have inserted a Min value smaller than the value permitted", "Error", wxOK | wxICON_ERROR  );                
+          m_Min = m_MinValue; m_MinSlider->SetValue( m_Min ); m_Dlg->TransferDataToWindow(); 
+        }      
+        UpdateLookUpTable();
+      }
+      break; 
+      case ID_SLIDER_MIN:      
+      {       
+        if ( m_CheckMin  && m_Min <= m_MinValue ) 
+        {
+          m_Min = m_MinValue; m_MinSlider->SetValue( m_Min ); 
+        }      
+        UpdateLookUpTable();
+      }
+      break;
+      case ID_SLIDER_MAX:      
+      {      
+        if ( m_CheckMax  && m_Max >= m_MaxValue )      
+        {
+          m_Max = m_MaxValue; m_MaxSlider->SetValue( m_Max ); 
+        }
+        UpdateLookUpTable();
+      }      
+      break;
+      case ID_OK:
+        UpdateLabel();
+      break;
+      case ID_FIT:
+        m_Rwi->m_RenFront->ResetCamera(m_BBox);
+        m_Rwi->m_Camera->Dolly(1.2);
+        m_Rwi->m_RenFront->ResetCameraClippingRange();
+        m_Rwi->m_RenFront->ResetCamera();
+        m_Rwi->m_RenderWindow->Render();
+      break;    
+      case ID_SLICE:
+        m_Dlg->TransferDataToWindow();  
+        m_Slice = m_SliceSlider->GetValue();
+        m_Dlg->TransferDataToWindow();  
+        UpdateSlice();
+      break;
+      case ID_SLICE_SLIDER:
+        UpdateSlice();
+      break;
+      case ID_INCREASE_SLICE:
+        if(m_Slice<m_SliceMax) m_Slice += m_SliceStep;
+        m_Dlg->TransferDataToWindow();  
+        UpdateSlice();
+      break;
+      case ID_DECREASE_SLICE:
+        if(m_Slice>m_SliceMin) m_Slice -= m_SliceStep;
+        m_Dlg->TransferDataToWindow();  
+        UpdateSlice();
+      break;
+      case VME_PICKED:
+      {
+        vtkDataSet *vol = m_Link->GetOutput()->GetVTKData();
+        double pos[3];
+        vtkPoints *pts = NULL; 
+        pts = (vtkPoints *)e->GetVtkObj();
+        pts->GetPoint(0,pos);
+        int pid = vol->FindPoint(pos);
+        vtkDataArray *scalars = vol->GetPointData()->GetScalars();
+      }
+      break;
+      default:
+       // this->ForwardUpEvent(*e);
+         mafNode::OnEvent(maf_event);
+      break; 
     }
-    break;
- 
-  case ID_FIT:
-    m_Rwi->m_RenFront->ResetCamera(m_BBox);
-    m_Rwi->m_Camera->Dolly(1.2);
-    m_Rwi->m_RenFront->ResetCameraClippingRange();
-    m_Rwi->m_RenFront->ResetCamera();
-    m_Rwi->m_RenderWindow->Render();
-    break;    
-
-  case ID_SLICE:
-    m_Dlg->TransferDataToWindow();  
-    m_Slice = m_SliceSlider->GetValue();
-    m_Dlg->TransferDataToWindow();  
-    UpdateSlice();
-    break;
-  case ID_SLICE_SLIDER:
-    UpdateSlice();
-    break;
-  case ID_INCREASE_SLICE:
-    if(m_Slice<m_SliceMax) m_Slice += m_SliceStep;
-    m_Dlg->TransferDataToWindow();  
-    UpdateSlice();
-    break;
-  case ID_DECREASE_SLICE:
-    if(m_Slice>m_SliceMin) m_Slice -= m_SliceStep;
-    m_Dlg->TransferDataToWindow();  
-    UpdateSlice();
-    break;
-
-  case VME_PICKED:
-    {
-      vtkDataSet *vol = m_Link->GetOutput()->GetVTKData();
-      double pos[3];
-      vtkPoints *pts = NULL; 
-      pts = (vtkPoints *)e->GetVtkObj();
-      pts->GetPoint(0,pos);
-      int pid = vol->FindPoint(pos);
-      vtkDataArray *scalars = vol->GetPointData()->GetScalars();
-    }
-    break;
-
-  default:
-       this->ForwardUpEvent(*e);
-       break; 
   }
- }
+  else
+  {
+    Superclass::OnEvent(maf_event);
+  }
+}
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::UpdateLabel()
+//----------------------------------------------------------------------------
+{      
+  if ( m_Max < m_Min )      
+  {
+    wxMessageBox( "Wrong values for Min and Max parameters", "Error", wxOK | wxICON_ERROR );
+    return;
+  }
+  wxString labelName = "";
+
+  if (m_LabelNameCtrl) //In test mode this is not present
+  {
+    labelName = m_LabelNameCtrl->GetValue();
+  }
+ 
+  if ( labelName == wxEmptyString )
+    labelName = "no_name";
+  else
+    labelName.Replace( " ", "_" );
+
+  // Check if another name for the label already exists
+  if( m_TagLabel && m_EditMode == FALSE)
+  {
+    int noc = m_TagLabel->GetNumberOfComponents();
+    for ( unsigned int i = 0; i < noc; i++ )
+    {
+      wxString component = m_TagLabel->GetValue( i );
+
+      // Check if another name for the label already exists
+      wxString currentLabelName = component.BeforeFirst( ' ' );       
+      if ( currentLabelName == labelName )
+      {          
+        int answer = wxMessageBox( "The name of this label already exists - Continue?", "Warning", wxYES_NO | wxICON_ERROR, NULL);
+        if (answer == wxNO)
+        {            
+          m_LabelNameCtrl->SetValue( wxEmptyString );            
+          return;
+        }
+        else
+          break; //exit from loop for only
+      }
+      // Check if another value for the label already exists
+      int currentLabelValue = GetLabelValue( currentLabelName );
+      if ( currentLabelValue == m_LabelIntValue )
+      {
+        int answer = wxMessageBox( "The value for this label already exists - Continue?", "Warning", wxYES_NO | wxICON_ERROR, NULL);
+        if (answer == wxNO)
+        {            
+          m_LabelIntValue = 1;
+          m_Dlg->TransferDataToWindow();
+          return;
+        }
+        else
+          break; //exit from loop for only
+      }
+    }
+  }
+  wxString labelLine; 
+  labelLine.Printf( "%s %d %d %d", labelName, m_LabelIntValue, m_Min, m_Max ); 
+
+  if (m_Dlg)
+  {
+    m_Dlg->EndModal(wxID_CANCEL);
+  }
+   
+  if (m_EditMode == FALSE)
+  {
+    m_LabelCheckBox->AddItem(m_CheckListId, labelLine, TRUE); 
+    m_CheckedVec.push_back(TRUE);
+    m_CheckListId++;
+    m_LabelCheckBox->Update();
+    int nComp = m_TagLabel->GetNumberOfComponents();
+    m_TagLabel->SetValue(labelLine.c_str(), nComp);
+  }
+  else
+  {
+    m_LabelCheckBox->SetItemLabel(m_ItemSelected, labelLine);
+    m_LabelCheckBox->Update();
+
+    int noc = m_TagLabel->GetNumberOfComponents();
+    for ( unsigned int w = 0; w < noc; w++ )
+    {
+      wxString componentName = m_TagLabel->GetValue( w );
+      if ( m_ItemLabel == componentName )
+      {
+        m_TagLabel->SetValue(labelLine.c_str(), w );
+      }
+    }
+  }
+  GenerateLabeledVolume();
 }
 //----------------------------------------------------------------------------
  void medVMELabeledVolume::UpdateSlice()
@@ -928,7 +974,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-int medVMELabeledVolume::getLabelValue( wxString &item )
+int medVMELabeledVolume::GetLabelValue( wxString &item )
 //----------------------------------------------------------------------------
 {
   wxString tmp = item.AfterFirst( ' ' );  
@@ -939,7 +985,7 @@ int medVMELabeledVolume::getLabelValue( wxString &item )
   return (int)v;  
 }
 //----------------------------------------------------------------------------
-int medVMELabeledVolume::getMin( wxString &item )
+int medVMELabeledVolume::GetMin( wxString &item )
 //----------------------------------------------------------------------------
 {
   wxString tmp = item.AfterFirst( ' ' );   
@@ -952,7 +998,7 @@ int medVMELabeledVolume::getMin( wxString &item )
 }
 
 //----------------------------------------------------------------------------
-int medVMELabeledVolume::getMax( wxString &item )
+int medVMELabeledVolume::GetMax( wxString &item )
 //----------------------------------------------------------------------------
 {
   wxString tmp = item.AfterFirst( ' ' );    
@@ -966,7 +1012,7 @@ int medVMELabeledVolume::getMax( wxString &item )
 }
 
 //----------------------------------------------------------------------------
-void medVMELabeledVolume::updateLookUpTable()
+void medVMELabeledVolume::UpdateLookUpTable()
 //----------------------------------------------------------------------------
 { 
   m_LookUpTableColor->DeepCopy( m_LookUpTable );
@@ -978,6 +1024,39 @@ void medVMELabeledVolume::updateLookUpTable()
   m_Texture->SetLookupTable( m_LookUpTableColor );    
   m_Rwi->m_RwiBase->Render(); 
 }  
+
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::SetMin(int min)
+//----------------------------------------------------------------------------
+{
+  m_MinValue = min;
+}
+
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::SetMax(int max)
+//----------------------------------------------------------------------------
+{
+  m_MaxValue = max;
+}
+
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::SetLabelValue(int value)
+//----------------------------------------------------------------------------
+{
+  m_LabelIntValue = value;
+}
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::SetLabelName(wxString name)
+//----------------------------------------------------------------------------
+{
+  m_LabelNameValue = name;
+}
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::CheckItem(int itemId)
+//----------------------------------------------------------------------------
+{
+  m_LabelCheckBox->CheckItem(itemId, TRUE);
+}
 
 //-------------------------------------------------------------------------
 char** medVMELabeledVolume::GetIcon() 
