@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-20 07:34:47 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-10-26 14:56:19 $
+  Version:   $Revision: 1.22 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -528,6 +528,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 					m_GizmoRotate->Show(true);
 				}
 			}
+      CameraUpdate();
 			break;
 		case ID_RANGE_MODIFIED:
       {
