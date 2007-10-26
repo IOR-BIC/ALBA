@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.h,v $
 Language:  C++
-Date:      $Date: 2007-10-23 10:35:03 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-26 10:22:52 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -86,6 +86,9 @@ public:
 
   /** Get the speed ID.*/
   int GetSpeedId() {return m_SpeedId;};
+
+  /** Return the speed multiplication factor according to the radio chosen.*/
+  double GetSpeedFactor();
 
   /** Set the time multiplier to transform milliseconds to the VME unit time.
   Default value will transform milliseconds in seconds.*/

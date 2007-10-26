@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 08:54:25 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-10-26 10:22:52 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -271,6 +271,23 @@ void mafGUISettingsTimeBar::PlayInActiveViewport(int active_viewport)
   m_PlayInActiveViewport = active_viewport;
   m_Config->Write("PlayInActiveViewport", m_PlayInActiveViewport);
   Update();
+}
+//----------------------------------------------------------------------------
+double mafGUISettingsTimeBar::GetSpeedFactor()
+//----------------------------------------------------------------------------
+{
+  switch(m_SpeedId)
+  {
+    case 0:
+      return 0.25;
+    case 1:
+      return 0.5;
+    case 3:
+      return 2.0;
+    case 4:
+      return 4.0;
+  }
+  return 1.0;
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::Update()
