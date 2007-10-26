@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 08:34:26 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2007-10-26 14:14:00 $
+  Version:   $Revision: 1.43 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -459,7 +459,7 @@ void mafVME::Print(std::ostream& os, const int tabs)// const
   os << indent << "Current Time: "<<m_CurrentTime<<"\n";
 
   os << indent << "Output:\n";
-  m_Output->Print(os,indent.GetNextIndent());
+  GetOutput()->Print(os,indent.GetNextIndent());
 
   os << indent << "Matrix Pipe: ";
   if (m_MatrixPipe)
