@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-30 08:41:35 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-10-26 11:32:10 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -158,13 +158,13 @@ void medPipeSurfaceEditor::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		switch(e->GetId()) 
+		/*switch(e->GetId()) 
 		{
 		default:
-			{
+			{*/
 				mafEventMacro(*e);
-			}
-		}
+			//}
+		//}
 	}
 	else if (maf_event->GetSender() == m_Vme)
 	{

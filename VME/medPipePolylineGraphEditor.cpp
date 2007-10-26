@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-20 14:15:16 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-10-26 11:32:10 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -247,12 +247,12 @@ void medPipePolylineGraphEditor::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		switch(e->GetId()) 
+		/*switch(e->GetId()) 
 		{
 		default:
-			{
+			{*/
 				mafEventMacro(*e);
-			}
-		}
+			//}
+		//}
 	}
 }

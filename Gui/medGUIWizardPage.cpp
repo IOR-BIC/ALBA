@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-25 14:20:27 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-26 11:28:49 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -128,11 +128,11 @@ void medGUIWizardPage::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		switch(e->GetId())
+		/*switch(e->GetId())
 		{
-		default:
+		default:*/
 			mafEventMacro(*e);
-		}
+		//}
 	}
 }
 //--------------------------------------------------------------------------------
