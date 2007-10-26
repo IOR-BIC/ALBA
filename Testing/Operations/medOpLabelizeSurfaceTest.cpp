@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurfaceTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-18 10:08:48 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-10-26 13:17:41 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -100,6 +100,7 @@ void medOpLabelizeSurfaceTest::Test()
 	labelize->SetLutEditor(lut);
 	labelize->SetLabelValue(1.0);
 	labelize->Labelize();
+	labelize->OpStop(OP_RUN_OK);
 	labelize->OpDo();
 
 	surface->GetOutput()->GetVTKData()->Update();

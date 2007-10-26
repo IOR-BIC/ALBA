@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-10-17 10:41:20 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-10-26 13:16:03 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -98,8 +98,8 @@ public:
 	void SetPlaneDimension(double w,double h);
 	void Labelize();
 
-protected: 
 	virtual void OpStop(int result);
+protected: 
 
 	/** Create the GUI */
 	void CreateGui();
