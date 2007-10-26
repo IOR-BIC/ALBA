@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 10:36:41 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2007-10-26 08:10:57 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,6 +85,7 @@ mafLogicWithGUI::~mafLogicWithGUI()
   cppDEL(m_MeasureUnitSettings);
   cppDEL(m_ApplicationSettings);
   cppDEL(m_StorageSettings);
+  cppDEL(m_TimeBarSettings);
 }
 //----------------------------------------------------------------------------
 void mafLogicWithGUI::SetParentFrameStyle(long style)
