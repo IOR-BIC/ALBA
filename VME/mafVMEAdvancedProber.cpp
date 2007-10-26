@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-27 12:23:50 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-10-26 11:31:00 $
+  Version:   $Revision: 1.20 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1737,7 +1737,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
 		  }
 		  else
 		  {
-			  double range[2];
+			  //double range[2];
 				mmaVolumeMaterial *vol_material;
 				mafNEW(vol_material);
 				vol_material->DeepCopy(((mafVMEVolumeGray *)this->GetParent())->GetMaterial());
@@ -1872,7 +1872,8 @@ void mafVMEAdvancedProber::UnsharpImage()
 
 	catch (itk::ExceptionObject &err)
 	{
-		wxMessageBox("An error has been occurred during vtk to itk conversion");
+		//wxMessageBox("An error has been occurred during vtk to itk conversion");
+    wxMessageBox(err.GetDescription());
 		m_ImageFiltered->DeepCopy(vtkImageData::SafeDownCast(m_ScalarImage));
 		return;
 	}
@@ -1904,7 +1905,8 @@ void mafVMEAdvancedProber::UnsharpImage()
 	catch (itk::ExceptionObject &err)
 	{
 		m_ImageFiltered->DeepCopy(vtkImageData::SafeDownCast(m_ScalarImage));
-		wxMessageBox("An error has been occurred during unsharp computation");
+    wxMessageBox(err.GetDescription());
+		//wxMessageBox("An error has been occurred during unsharp computation");
 		return;
 	}
 
