@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-17 16:27:47 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-10-26 11:09:12 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -51,10 +51,10 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary);
 	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
-	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),m_CheckOnOff[0]);
-	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),m_CheckOnOff[1]);
-	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),m_CheckOnOff[2]);
-	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3]);
+	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),m_CheckOnOff[0] != 0);
+	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),m_CheckOnOff[1] != 0);
+	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),m_CheckOnOff[2] != 0);
+	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3] != 0);
 	m_Gui->Divider(1);
 
 	m_Gui->Update();
