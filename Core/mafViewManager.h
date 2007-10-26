@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-28 15:02:36 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-10-26 10:44:52 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -93,8 +93,8 @@ public:
 	/** Reset the camera to fit the specified vme. apply to the selected view only. */
   void CameraReset(mafNode *vme);   
 
-	/** Update the camera for the selected view. */
-  void CameraUpdate();
+	/** Update the camera for all opened views; optionally the Update can be limited for the selected view. */
+  void CameraUpdate(bool only_selected = false);
 
 	/** Set the FlyTo mode for the selected view. */
 	void CameraFlyToMode();
