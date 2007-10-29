@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 10:45:49 $
-  Version:   $Revision: 1.116 $
+  Date:      $Date: 2007-10-29 14:17:23 $
+  Version:   $Revision: 1.117 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -685,6 +685,12 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if (m_OpManager)
         {
           m_OpManager->WarningIfCantUndo(m_ApplicationSettings->GetWarnUserFlag());
+        }
+      break;
+      case CLEAR_UNDO_STACK:
+        if (!m_OpManager->Running())
+        {
+          m_OpManager->ClearUndoStack();
         }
       break;
       case OP_RUN_STARTING:
