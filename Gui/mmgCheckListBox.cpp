@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 09:38:08 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-29 13:17:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -120,7 +120,8 @@ void mmgCheckListBox::RemoveItem(int id)
   m_CheckListBox->Delete(index);
 
   // keep the array consistent
-  for(i=index+1; i<n; i++) m_Array[i-1] = m_Array[i];
+  for(i=index+1; i<n; i++) 
+    m_Array[i-1] = (m_Array[i]-1);
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::CheckItem(int id, bool check)
