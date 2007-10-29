@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 15:15:00 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-10-29 14:16:34 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -252,6 +252,8 @@ EVT_START,
   ITEM_SELECTED, //used by mmgListCtrl and Dictionary
 
   IMPORT_FILE, // used when drag a non msf or zmsf file into the application as a VTK file.
+
+  CLEAR_UNDO_STACK, // used by mmgMDIFrame to clear UnDo stack when the application is running in low memory
 
   LOG_ALL_EVENT,
 	LOG_TO_FILE,
