@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 15:08:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-29 11:33:47 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -214,6 +214,9 @@ protected:
   /** 
   Builds operation's interface and visualization pipeline. */
   void CreateOpDialog();
+
+  /** Add the item to the checked listbox. */
+  void CreateCheckListBoxItem(int n, wxString name, bool checked = TRUE);
 
   /** 
   Remove operation's interface. */

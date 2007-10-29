@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 09:08:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-10-29 11:33:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -393,9 +393,6 @@ mmgGui* medVMELabeledVolume::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this); 
 
-  // Volume label name  
- // m_Gui->Label(GetName(), true);  
-
   // Settings for the buttons that will control the list box
   m_Gui->Button(ID_INSERT_LABEL, _("Add label"), "", _("Add a label"));
   m_Gui->Button(ID_REMOVE_LABEL, _("Remove label"), "", _("Remove a label"));
@@ -435,7 +432,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
           if ( component == labelName )
           {
             m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
-            m_CheckedVec.push_back(TRUE);
+            m_CheckedVec.push_back(FALSE);
             m_CheckListId++;
           }
         }
@@ -452,10 +449,16 @@ mmgGui* medVMELabeledVolume::CreateGui()
 }
 
 //----------------------------------------------------------------------------
+void medVMELabeledVolume::CreateCheckListBoxItem(int n, wxString name, bool checked)
+//----------------------------------------------------------------------------
+{
+  m_LabelCheckBox->AddItem(n, name, checked);
+}
+
+//----------------------------------------------------------------------------
 void medVMELabeledVolume::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
-  UpdateScalars();
   double b[6];
   m_Dataset->GetBounds(b);
   m_SliceMin = b[4];
@@ -690,7 +693,8 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {	
       case ID_INSERT_LABEL:
-      {      
+      {     
+        UpdateScalars();
         m_EditMode = FALSE;
         double sr[2];
         m_Dataset->GetScalarRange(sr);
@@ -715,6 +719,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       {
         m_LabelCheckBox->RemoveItem(m_ItemSelected);
         m_CheckListId--;
+        m_CheckedVec.erase(m_CheckedVec.begin() + m_ItemSelected);
         int noc = m_TagLabel->GetNumberOfComponents();
         for ( unsigned int w = 0; w < noc; w++ )
         {
@@ -760,14 +765,15 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       {
         m_ItemSelected = e->GetArg();
         m_ItemLabel = m_LabelCheckBox->GetItemLabel(m_ItemSelected);
-      //   bool checkedBefore = m_CheckedVec.at(m_ItemSelected);
-      //  bool checkedAfter = e->GetBool();
-        //if (checkedBefore != checkedAfter)
-        // {
-          //m_CheckedVec.assign(m_CheckedVec.begin() + m_ItemSelected , checkedAfter);
-          // m_CheckedVec[m_ItemSelected] = checkedAfter;
-          GenerateLabeledVolume();
-        // }  
+        for (int i = 0; i < m_CheckedVec.size(); i++)
+        {
+          if (m_CheckedVec.at(i) != m_LabelCheckBox->IsItemChecked(i))
+          {
+            m_CheckedVec[i] = m_LabelCheckBox->IsItemChecked(i);
+            GenerateLabeledVolume();
+            break;
+          }
+        } 
       }
       break;
       case ID_D_MAX:
