@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 11:33:47 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-10-29 17:00:57 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,9 @@ public:
 
   int GetLabelValue( wxString &item );  
 
+  /** Add the item to the checked listbox. */
+  void FillLabelVector(int n, wxString name, bool checked = TRUE);
+
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
@@ -85,21 +88,6 @@ public:
   /** Set the Link */
   void SetVolumeLink(mafNode *n);
 
-  /** Set the min label value. */
-  void SetMin(int min);
-
-  /** Set the max label value. */
-  void SetMax(int max);
-
-  /** Set the label value. */
-  void SetLabelValue(int value);
-
-  /** Set the label name. */
-  void SetLabelName(wxString name);
-  
-  /** Check an item of the CheckListBox. */
-  void CheckItem(int itemId);
-
   /** Return the Link */
   mafNode *GetVolumeLink();
 
@@ -129,6 +117,7 @@ public:
     ID_INCREASE_SLICE,
     ID_DECREASE_SLICE,
     ID_OK,
+    ID_CANCEL,
     ID_D_LABEL_NAME,
     ID_D_LABEL_VALUE,
     ID_D_MIN,
@@ -168,7 +157,10 @@ protected:
   bool  m_EditMode;
   bool m_DataCopied;
   
-  std::vector<bool> m_CheckedVec;
+
+  std::vector<wxString> m_LabelNameVector;
+  std::vector<bool> m_CheckedVector;
+
 
   mmgCheckListBox   *m_LabelCheckBox;  
   mmgDialogPreview  *m_Dlg;  
@@ -214,9 +206,6 @@ protected:
   /** 
   Builds operation's interface and visualization pipeline. */
   void CreateOpDialog();
-
-  /** Add the item to the checked listbox. */
-  void CreateCheckListBoxItem(int n, wxString name, bool checked = TRUE);
 
   /** 
   Remove operation's interface. */

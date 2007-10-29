@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 11:33:47 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-29 17:00:57 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -195,7 +195,6 @@ void medVMELabeledVolume::CopyDataset()
   mmaVolumeMaterial *volMaterial;
   mafNEW(volMaterial);
   volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
-  volMaterial->UpdateProp();
   volMaterial->UpdateFromTables();
   mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
   if  (labelMaterial)
@@ -268,20 +267,21 @@ void medVMELabeledVolume::GenerateLabeledVolume()
 
   std::vector<int> minVector;
   std::vector<int> maxVector;
-  std::vector<int> labelVector;
+  std::vector<int> labelIntVector;
+
 
   int counter= 0;
   //Fill the vectors of range and label value
-  for (int c = 0; c < numberC; c++)
+  for (int c = 0; c < m_CheckedVector.size(); c++)
   {
-    if   (m_LabelCheckBox->IsItemChecked(c))
+    if (m_CheckedVector.at(c))
     {
-      wxString label = m_LabelCheckBox->GetItemLabel(c);
+      wxString label = m_LabelNameVector.at(c);
       wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
       mafString labelName = tkz.GetNextToken().c_str();
       mafString labelIntStr = tkz.GetNextToken().c_str();
       m_LabelIntValue = atoi(labelIntStr);
-      labelVector.push_back(m_LabelIntValue);
+      labelIntVector.push_back(m_LabelIntValue);
       mafString minStr = tkz.GetNextToken().c_str();
       m_MinValue = atof(minStr);
       minVector.push_back(m_MinValue);
@@ -300,11 +300,11 @@ void medVMELabeledVolume::GenerateLabeledVolume()
     {
       bool modified = FALSE;
       double scalarValue = volumeScalars->GetComponent( i, 0 );
-      for (int c = 0; c < labelVector.size(); c++)
+      for (int c = 0; c < labelIntVector.size(); c++)
       {
         if ( scalarValue >= minVector.at(c) && scalarValue <= maxVector.at(c))
         { 
-          labelVlaue = labelVector.at(c);
+          labelVlaue = labelIntVector.at(c);
           labelScalars->SetTuple1( i, labelVlaue ); 
           modified = TRUE;
         }
@@ -432,7 +432,8 @@ mmgGui* medVMELabeledVolume::CreateGui()
           if ( component == labelName )
           {
             m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
-            m_CheckedVec.push_back(FALSE);
+            m_LabelNameVector.push_back(component);
+            m_CheckedVector.push_back(FALSE);
             m_CheckListId++;
           }
         }
@@ -449,10 +450,11 @@ mmgGui* medVMELabeledVolume::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void medVMELabeledVolume::CreateCheckListBoxItem(int n, wxString name, bool checked)
+void medVMELabeledVolume::FillLabelVector(int n, wxString name, bool checked)
 //----------------------------------------------------------------------------
 {
-  m_LabelCheckBox->AddItem(n, name, checked);
+  m_LabelNameVector.push_back(name);
+  m_CheckedVector.push_back(checked);
 }
 
 //----------------------------------------------------------------------------
@@ -560,8 +562,9 @@ void medVMELabeledVolume::CreateOpDialog()
   h_sizer6->Add( m_MaxSlider, 1, wxEXPAND);  
 
   mmgButton  * b_ok    = new mmgButton( m_Dlg, ID_OK, "ok", p, wxSize( 200, 20 ) );
-  mmgButton  * b_cancel= new mmgButton( m_Dlg, wxID_CANCEL, "cancel", p, wxSize( 200, 20 ) );
+  mmgButton  * b_cancel= new mmgButton( m_Dlg, ID_CANCEL, "cancel", p, wxSize( 200, 20 ) );
   b_ok->SetValidator( mmgValidator( this, ID_OK, b_ok) );
+  b_cancel->SetValidator( mmgValidator( this, ID_CANCEL, b_cancel) );
   wxBoxSizer *h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer4->Add( b_ok,     0, wxRIGHT);
   h_sizer4->Add( b_cancel, 0, wxRIGHT);  
@@ -718,8 +721,8 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       case ID_REMOVE_LABEL:
       {
         m_LabelCheckBox->RemoveItem(m_ItemSelected);
-        m_CheckListId--;
-        m_CheckedVec.erase(m_CheckedVec.begin() + m_ItemSelected);
+        m_LabelNameVector.erase(m_LabelNameVector.begin() + m_ItemSelected);
+        m_CheckedVector.erase(m_CheckedVector.begin() + m_ItemSelected);
         int noc = m_TagLabel->GetNumberOfComponents();
         for ( unsigned int w = 0; w < noc; w++ )
         {
@@ -763,13 +766,14 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       break;
       case ID_LABELS:
       {
-        m_ItemSelected = e->GetArg();
-        m_ItemLabel = m_LabelCheckBox->GetItemLabel(m_ItemSelected);
-        for (int i = 0; i < m_CheckedVec.size(); i++)
+        int itemId = e->GetArg();
+        m_ItemLabel = m_LabelCheckBox->GetItemLabel(itemId);
+        m_ItemSelected = m_LabelCheckBox->FindItemIndex(itemId);
+        for (int i = 0; i < m_CheckedVector.size(); i++)
         {
-          if (m_CheckedVec.at(i) != m_LabelCheckBox->IsItemChecked(i))
+          if (m_CheckedVector.at(i) != m_LabelCheckBox->IsItemChecked(i))
           {
-            m_CheckedVec[i] = m_LabelCheckBox->IsItemChecked(i);
+            m_CheckedVector[i] = m_LabelCheckBox->IsItemChecked(i);
             GenerateLabeledVolume();
             break;
           }
@@ -827,6 +831,12 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       case ID_OK:
         UpdateLabel();
       break;
+      case ID_CANCEL:
+        {
+          UpdateLabel();
+          m_Dlg->EndModal(wxID_CANCEL);
+        }
+        break;
       case ID_FIT:
         m_Rwi->m_RenFront->ResetCamera(m_BBox);
         m_Rwi->m_Camera->Dolly(1.2);
@@ -944,7 +954,8 @@ void medVMELabeledVolume::UpdateLabel()
   if (m_EditMode == FALSE)
   {
     m_LabelCheckBox->AddItem(m_CheckListId, labelLine, TRUE); 
-    m_CheckedVec.push_back(TRUE);
+    m_LabelNameVector.push_back(labelLine);
+    m_CheckedVector.push_back(TRUE);
     m_CheckListId++;
     m_LabelCheckBox->Update();
     int nComp = m_TagLabel->GetNumberOfComponents();
@@ -1031,39 +1042,6 @@ void medVMELabeledVolume::UpdateLookUpTable()
   m_Texture->SetLookupTable( m_LookUpTableColor );    
   m_Rwi->m_RwiBase->Render(); 
 }  
-
-//----------------------------------------------------------------------------
-void medVMELabeledVolume::SetMin(int min)
-//----------------------------------------------------------------------------
-{
-  m_MinValue = min;
-}
-
-//----------------------------------------------------------------------------
-void medVMELabeledVolume::SetMax(int max)
-//----------------------------------------------------------------------------
-{
-  m_MaxValue = max;
-}
-
-//----------------------------------------------------------------------------
-void medVMELabeledVolume::SetLabelValue(int value)
-//----------------------------------------------------------------------------
-{
-  m_LabelIntValue = value;
-}
-//----------------------------------------------------------------------------
-void medVMELabeledVolume::SetLabelName(wxString name)
-//----------------------------------------------------------------------------
-{
-  m_LabelNameValue = name;
-}
-//----------------------------------------------------------------------------
-void medVMELabeledVolume::CheckItem(int itemId)
-//----------------------------------------------------------------------------
-{
-  m_LabelCheckBox->CheckItem(itemId, TRUE);
-}
 
 //-------------------------------------------------------------------------
 char** medVMELabeledVolume::GetIcon() 
