@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-18 07:13:01 $
-Version:   $Revision: 1.21 $
+Date:      $Date: 2007-10-29 19:41:46 $
+Version:   $Revision: 1.22 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -624,8 +624,8 @@ void mmoExtractIsosurface::OnEvent(mafEventBase *maf_event)
     case ID_VIEW_SLICE:
       if(this->m_ShowSlice)
       {
-        vtkPolyData *contour=m_ContourVolumeMapper->GetOutput();
-        if(contour==NULL)
+        vtkPolyData *contour = m_ContourVolumeMapper->GetOutput();
+        if(contour == NULL)
         {
           wxMessageBox("Operation out of memory");
         }
@@ -694,14 +694,14 @@ void mmoExtractIsosurface::UpdateSurface(bool use_lod)
   {
     m_ContourVolumeMapper->SetContourValue(m_IsoValue);
     m_ContourVolumeMapper->Update();
-    vtkPolyData *contour = vtkPolyData::New();
+    vtkPolyData *contour;/* = vtkPolyData::New();
     m_IsosurfaceCutter->SetInput(contour);
-    m_IsosurfaceCutter->Update();
+    m_IsosurfaceCutter->Update();*/
     //m_ContourMapper->SetInput(contour);
     if (m_ShowSlice)
     {
-      contour=m_ContourVolumeMapper->GetOutput();
-      if(contour==NULL)
+      contour = m_ContourVolumeMapper->GetOutput();
+      if(contour == NULL)
       {
         m_Rwi->m_RenderWindow->Render();
         wxMessageBox("Operation out of memory");
@@ -754,7 +754,7 @@ void mmoExtractIsosurface::ExtractSurface(bool clean)
   // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
   // and then call surface->Delete() when the VME is created
   vtkPolyData *surface;
-  surface=m_ContourVolumeMapper->GetOutput();
+  surface = m_ContourVolumeMapper->GetOutput();
 	vtkMAFSmartPointer<vtkCleanPolyData>clearFilter;
 	vtkMAFSmartPointer<vtkTriangleFilter >triangleFilter;
 	if(m_Clean)
@@ -765,16 +765,16 @@ void mmoExtractIsosurface::ExtractSurface(bool clean)
 		clearFilter->ConvertStripsToPolysOff();
 		//clearFilter->PointMergingOff();
 		clearFilter->Update();
-		surface=clearFilter->GetOutput();
+		surface = clearFilter->GetOutput();
 	}
 	if(m_Triangulate)
 	{
 		triangleFilter->SetInput(surface);
 		triangleFilter->Update();
-		surface=triangleFilter->GetOutput();
+		surface = triangleFilter->GetOutput();
 	}
 
-  if(surface==NULL)
+  if(surface == NULL)
   {
     wxMessageBox("Operation out of memory");
     return;
