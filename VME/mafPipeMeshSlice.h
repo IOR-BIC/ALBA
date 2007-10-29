@@ -1,14 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: mafPipeMeshSlice.h,v $
-  Language:  C++
-  Date:      $Date: 2007-10-15 13:10:23 $
-  Version:   $Revision: 1.3 $
-  Authors:   Matteo Giacomoni - Daniele Giunchi
+Program:   Multimod Application Framework
+Module:    $RCSfile: mafPipeMeshSlice.h,v $
+Language:  C++
+Date:      $Date: 2007-10-29 14:13:17 $
+Version:   $Revision: 1.4 $
+Authors:   Daniele Giunchi
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
-	SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 #ifndef __mafPipeMeshSlice_H__
@@ -22,15 +21,18 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
+class mmaMaterial;
 class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkPolyData;
 class vtkActor;
 class vtkProperty;
 class mafAxes;
+class vtkLookupTable;
+class mmgMaterialButton;
 class vtkMAFMeshCutter;
 class vtkPlane;
-class vtkDelaunay2D;
+class vtkPolyDataNormals;
 
 //----------------------------------------------------------------------------
 // mafPipeMeshSlice :
@@ -38,62 +40,126 @@ class vtkDelaunay2D;
 class mafPipeMeshSlice : public mafPipe
 {
 public:
-  mafTypeMacro(mafPipeMeshSlice,mafPipe);
+	mafTypeMacro(mafPipeMeshSlice,mafPipe);
 
-               mafPipeMeshSlice();
-  virtual     ~mafPipeMeshSlice ();
+	mafPipeMeshSlice();
+	virtual     ~mafPipeMeshSlice();
 
+	/** process events coming from gui */
+	virtual void OnEvent(mafEventBase *maf_event);
+
+	virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+	virtual void Select(bool select); 
+
+	/** IDs for the GUI */
+	enum PIPE_MESH_WIDGET_ID
+	{
+		ID_LAST = Superclass::ID_LAST,
+    ID_WIREFRAME,
+    ID_BORDER_CHANGE,
+    ID_SCALARS,
+    ID_LUT,
+    ID_SCALAR_MAP_ACTIVE,
+    ID_USE_VTK_PROPERTY,
+	};
+
+  enum PIPE_MESH_TYPE_SCALARS
+  {
+    POINT_TYPE = 0,
+    CELL_TYPE,
+  };
+
+  
+  
+  /** Get assembly front/back */
+  virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
+
+	
+  /** Core of the pipe */
+  virtual void ExecutePipe();
+  
+  /** Add/RemoveTo Assembly Front/back */
+  virtual void AddActorsToAssembly(vtkMAFAssembly *assembly);
+  virtual void RemoveActorsFromAssembly(vtkMAFAssembly *assembly);
+  
+  /** Set the actor picking*/
+	void SetActorPicking(int enable = true);
+
+  /** Set the actor wireframe*/
+  void SetWireframeOn();
+  void SetWireframeOff();
+
+  /** Set the flip of normal filter*/
+  void SetFlipNormalOn();
+  void SetFlipNormalOff();
+
+  /** Set/Get Active Scalar */
+  void SetActiveScalar(int index){m_ScalarIndex = index;};
+  int GetScalarIndex(){return m_ScalarIndex;};
+
+  /** Get Number of Scalars */
+  int GetNumberOfArrays(){return m_NumberOfArrays;};
+
+  /** Set scalar map active, so you can see scalar associated to points or cells*/
+  void SetScalarMapActive(int value){m_ScalarMapActive = value;};
+  /** Set VTK Property to visualize the material of vme*/
+  void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
+  
   /**Return the thickness of the border*/	
   double GetThickness();
 
   /**Set the thickness value*/
-  void SetThickness(double thickness); 
-
-  /** process events coming from gui */
-  virtual void OnEvent(mafEventBase *maf_event);
-
-  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
-  virtual void Select(bool select); 
-
-  /** Set the origin of the slice*/
+  void SetThickness(double thickness);
+  
+   /** Set the origin of the slice*/
   void SetSlice(double *Origin);
 
   /** Set the normal of the slice*/
 	void SetNormal(double *Normal);
 
-	void ShowBoxSelectionOn(){m_ShowSelection=true;};
-	void ShowBoxSelectionOff(){m_ShowSelection=false;};
-
-  /** IDs for the GUI */
-  enum PIPE_SURFACE_WIDGET_ID
-  {						
-		ID_BORDER_CHANGE = Superclass::ID_LAST,
-    ID_LAST,
-  };
-
-  virtual mmgGui  *CreateGui();
 protected:
-  vtkPolyDataMapper	      *m_Mapper;
-  vtkActor                *m_Actor;
-  vtkOutlineCornerFilter  *m_OutlineBox;
-  vtkPolyDataMapper       *m_OutlineMapper;
-  vtkProperty             *m_OutlineProperty;
-  vtkActor                *m_OutlineActor;
-  mafAxes                 *m_Axes;
+	mmaMaterial             *m_MeshMaterial;
+	vtkPolyDataMapper        *m_Mapper;
+	vtkActor                *m_Actor;
+	vtkOutlineCornerFilter  *m_OutlineBox;
+	vtkPolyDataMapper       *m_OutlineMapper;
+	vtkProperty             *m_OutlineProperty;
+	vtkActor                *m_OutlineActor;
+	mafAxes                 *m_Axes;
+  vtkLookupTable          *m_Table;
+  
   vtkPlane				        *m_Plane;
   vtkMAFMeshCutter		    *m_Cutter;
+  vtkPolyDataNormals *m_NormalFilter;
+  
 
+  void CreateFieldDataControlArrays();
+	void UpdateProperty(bool fromTag = false);
+	/**Update data value to selected scalar */
+  void UpdateScalars();
+  /** Update the visualization with changed scalar*/
+  void UpdatePipeFromScalars();
+
+  wxString                *m_ScalarsName;
+  wxString                *m_ScalarsVTKName;
+
+  mmgMaterialButton       *m_MaterialButton;
+
+  int                      m_PointCellArraySeparation;
+  int                      m_ScalarIndex;
+  int                      m_NumberOfArrays;
+  int                      m_ActiveScalarType;
+  int                      m_Wireframe;
+  int                      m_ScalarMapActive;
+  int                      m_UseVTKProperty;
   double				           m_Border;
 
-	bool	m_ShowSelection;
-
+  int m_RenderingDisplayListFlag;
+  
   double	m_Origin[3];
   double	m_Normal[3];
 
-  int m_ScalarVisibility;
-  int m_RenderingDisplayListFlag;
-
-	//vtkDelaunay2D *m_Filter;
-
+	virtual mmgGui  *CreateGui();
 };  
 #endif // __mafPipeMeshSlice_H__
