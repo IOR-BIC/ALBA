@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-27 16:13:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-10-29 09:38:08 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -112,10 +112,11 @@ void mmgCheckListBox::AddItem(int id, wxString label, bool check)
 void mmgCheckListBox::RemoveItem(int id)
 //----------------------------------------------------------------------------
 {
-  //int index,i,n = m_CheckListBox->Number(); // number prior to delete
   int index,i,n = m_CheckListBox->GetCount(); // number prior to delete
 
-  if( index=FindItemIndex(id) == -1 ) return;
+  index=FindItemIndex(id);
+  if( index == -1 ) return;
+
   m_CheckListBox->Delete(index);
 
   // keep the array consistent
