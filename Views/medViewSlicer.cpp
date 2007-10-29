@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 09:30:31 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-29 11:33:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -113,8 +113,6 @@ medViewSlicer::medViewSlicer(wxString label, bool show_ruler)
 	m_SliceCenterSurfaceReset[1] = 0.0;
 	m_SliceCenterSurfaceReset[2] = 0.0;
 
-
-
 }
 //----------------------------------------------------------------------------
 medViewSlicer::~medViewSlicer()
@@ -187,10 +185,13 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
         if(m_LutWidget)
         {
           m_LutWidget->SetLut(m_ColorLUT);
-          //m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-          //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+          if(m_LutSlider)
+          {
+            m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+            m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+          }
         }
-        
+
       }
         
       //Set camera of slice view in way that it will follow the volume
@@ -215,6 +216,7 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
       m_AttachCamera->SetVme(NULL);
       m_CurrentSlicer = NULL;
 
+      m_LutSlider->Enable(false);
       double normal[3] = {0,0,1};
       ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
     }
@@ -245,13 +247,24 @@ void medViewSlicer::OnEventThis(mafEventBase *maf_event)
   {
     switch(e->GetId()) 
     {
+    case ID_RANGE_MODIFIED:
+      {
+        if(m_CurrentVolume)
+        {
+          int low, hi;
+          m_LutSlider->GetSubRange(&low,&hi);
+          m_ColorLUT->SetTableRange(low,hi);
+          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
+      }
+      break;
 		case ID_LUT_CHOOSER:
       {
         if(m_ColorLUT && m_CurrentSlicer)
         {
           double *sr;
           sr = m_ColorLUT->GetRange();
-          //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+          if(m_LutSlider) m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
         }
         else
         {
@@ -375,7 +388,7 @@ void medViewSlicer::CameraUpdate()
 void medViewSlicer::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-  /*m_GuiView = new mmgGui(this);
+  m_GuiView = new mmgGui(this);
   
   m_GuiView->Label("");
   m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
@@ -384,7 +397,7 @@ void medViewSlicer::CreateGuiView()
   m_LutSlider->SetMinSize(wxSize(500,24));
   EnableWidgets(m_CurrentVolume != NULL);
   m_GuiView->Add(m_LutSlider);
-  m_GuiView->Reparent(m_Win);*/
+  m_GuiView->Reparent(m_Win);
 }
 //----------------------------------------------------------------------------
 void medViewSlicer::EnableWidgets(bool enable)
@@ -392,13 +405,12 @@ void medViewSlicer::EnableWidgets(bool enable)
 {
   if (m_Gui)
   {
-		m_Gui->Enable(ID_RESET,enable);
-		m_Gui->Enable(ID_COMBO_GIZMOS,enable);
-    m_Gui->Enable(ID_LUT_CHOOSER,enable);
+		m_Gui->Enable(ID_LUT_CHOOSER,enable);
 		m_Gui->FitGui();
 		m_Gui->Update();
   }
-  //m_LutSlider->Enable(enable);
+  
+  m_LutSlider->Enable(m_CurrentSlicer != NULL);
 
 }
 //-------------------------------------------------------------------------
