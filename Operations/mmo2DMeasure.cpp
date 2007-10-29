@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-10-29 14:12:40 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -127,7 +127,7 @@ void mmo2DMeasure::OpRun()
 
   m_Gui->Label(_("measure type"),true);
   m_Gui->Combo(ID_MEASURE_TYPE,_(""),&m_MeasureType,5,measure);
-  m_Gui->Bool(ID_PLOT_PROFILE,_("plot profile"),&m_GenerateHistogramFlag);
+  //m_Gui->Bool(ID_PLOT_PROFILE,_("plot profile"),&m_GenerateHistogramFlag);
   m_Gui->Divider(2);
   
   
