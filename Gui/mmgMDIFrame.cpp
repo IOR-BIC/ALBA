@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-16 13:01:44 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-10-29 14:18:23 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -105,7 +105,7 @@ mmgMDIFrame::mmgMDIFrame(const wxString& title, const wxPoint& pos, const wxSize
 {
   mafSetFrame( this );
 
-  this->SetMinSize( wxSize(600,500)); // m_DockManager cant handle correctly the frame MinSize (yet)
+  this->SetMinSize(wxSize(600,500)); // m_DockManager cant handle correctly the frame MinSize (yet)
   m_DockManager.SetFrame(this);
   m_DockManager.GetArtProvider()->SetMetric(wxAUI_ART_PANE_BORDER_SIZE,0 );
   m_DockManager.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR, m_DockManager.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR));
@@ -262,7 +262,12 @@ void mmgMDIFrame::OnIdle(wxIdleEvent& event)
   if (current_free_memory < m_MemoryLimitAlert && !m_UserAlerted)
   {
     m_UserAlerted = true;
-    wxMessageBox(_("Program is running with few free memory!! \nYou should save your work and free memory before continue."), _("Warning"));
+    int answere = wxMessageBox(_("Program is running with few free memory!! \nFree memory used by UnDo stack?."), _("Warning"), wxYES_NO);
+    if (answere == wxYES)
+    {
+      // Clear UnDo stack to gain memory.
+      mafEventMacro(mafEvent(this, CLEAR_UNDO_STACK));
+    }
   }
 	#endif
 }
