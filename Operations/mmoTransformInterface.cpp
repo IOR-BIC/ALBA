@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 13:29:39 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-10-29 14:13:00 $
+  Version:   $Revision: 1.14 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,9 +41,11 @@
 #include "vtkMAFSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkPolyData.h"
+#include "vtkUnstructuredGrid.h"
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "vtkTransformFilter.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoTransformInterface);
@@ -139,6 +141,7 @@ void mmoTransformInterface::OpDo()
   mafTransform::SetPosition(rotoTraslMatrix, position);
 
   vtkMAFSmartPointer<vtkPolyData> pd;
+  vtkMAFSmartPointer<vtkUnstructuredGrid> ug;
   vtkMAFSmartPointer<vtkRectilinearGrid> rg;
   vtkMAFSmartPointer<vtkStructuredPoints> sp;
 
@@ -179,6 +182,27 @@ void mmoTransformInterface::OpDo()
       tPDF->Update();
 
       ((mafVMEGeneric *)m_Input)->SetData(tPDF->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
+    }
+    else if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkUnstructuredGrid"))
+    {
+      // apply fast vtkPolyDataTransformFilter
+      vtkUnstructuredGrid *currentUG = vtkUnstructuredGrid::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
+      assert(currentUG);
+
+      ug->DeepCopy(currentUG);
+
+      vtkMAFSmartPointer<vtkTransformFilter> tf;
+      tf->SetInput(ug);
+      tf->SetTransform(scaleTransform);
+
+      // progress bar stuff
+      wxString progress_string("Applying scaling to data...");
+      wxBusyInfo wait(progress_string.c_str());
+
+      mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,tf.GetPointer()));
+      tf->Update();
+
+      ((mafVMEGeneric *)m_Input)->SetData(tf->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
     }
     else if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
     {
