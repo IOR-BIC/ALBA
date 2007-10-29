@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medLogicWithManagers.h,v $
 Language:  C++
-Date:      $Date: 2007-05-31 08:14:50 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-10-29 14:32:49 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,6 +65,8 @@ public:
 	virtual void OnEvent(mafEventBase *maf_event);
 
 protected:
+  /** Show contextual menu for views when right mouse click arrives.*/
+  void ViewContextualMenu(bool vme_menu);
 
 };
 #endif
