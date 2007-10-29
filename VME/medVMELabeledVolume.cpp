@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 15:08:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-29 09:08:18 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -238,6 +238,7 @@ void medVMELabeledVolume::UpdateScalars()
   vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
   data->Update();
   m_Dataset->GetPointData()->GetScalars()->DeepCopy(data->GetPointData()->GetScalars());
+  m_Dataset->GetPointData()->GetScalars()->Modified();
 }
 
 //-------------------------------------------------------------------------
@@ -722,8 +723,8 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
           {
             m_TagLabel->RemoveValue(w);
           }
-          GenerateLabeledVolume();
         }
+        GenerateLabeledVolume();
       }
       break;
       case ID_EDIT_LABEL:
