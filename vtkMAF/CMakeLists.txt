@@ -59,6 +59,8 @@ SET(vtkMAF_SRCS
   vtkVolumeResample.cxx
   vtkVolumeSlicer.cxx
   vtkVolumeSlicer.h
+  vtkPolyDataToSinglePolyLine.cxx
+  vtkPolyDataToSinglePolyLine.h
 )
 
 # List the kits from VTK that are needed by this project.
