@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 13:17:51 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-10-29 14:50:03 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -121,7 +121,7 @@ void mmgCheckListBox::RemoveItem(int id)
 
   // keep the array consistent
   for(i=index+1; i<n; i++) 
-    m_Array[i-1] = (m_Array[i]-1);
+    m_Array[i-1] = m_Array[i];
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::CheckItem(int id, bool check)
@@ -153,7 +153,8 @@ wxString mmgCheckListBox::GetItemLabel(int id)
 	wxString label;
 
   m_PreventNotify = true;
-  label = m_CheckListBox->GetString(id);
+  int index=FindItemIndex(id);
+  label = m_CheckListBox->GetString(index);
   m_PreventNotify = false;
 
 	return label;
