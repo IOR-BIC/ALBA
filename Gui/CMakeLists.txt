@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   medGUIWizardPage.h
   medGUIDicomSettings.cpp
   medGUIDicomSettings.h
+  medGUIContextualMenu.cpp
+  medGUIContextualMenu.h
 )
 
 
