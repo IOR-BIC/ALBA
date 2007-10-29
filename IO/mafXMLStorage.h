@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:13:43 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-10-29 14:14:02 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@ class mmuXMLDOM;
     - remove "IncludeWX.h" inclusion from .cpp
     - add support for NULL destination URL
 */  
-class mafXMLStorage: public mafStorage
+class MAF_EXPORT mafXMLStorage: public mafStorage
 {
 public:
   mafTypeMacro(mafXMLStorage,mafStorage);

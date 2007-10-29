@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:39:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-29 14:14:01 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ class mafObject;
   restore implementation will probably implement a search mechanism. This happens for the specialized
   RestoreXX() functions of the mafStorageElement class, which search for the subnode of with the right name.
  */  
-class mafStorable
+class MAF_EXPORT mafStorable
 {
 public:
   mafStorable():m_Storable(true) {}

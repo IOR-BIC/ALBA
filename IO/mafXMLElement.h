@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLElement.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-10-29 14:14:02 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@ class mmuXMLDOMElement;
   during restoring are automatically destroyed by mafStorage object at the end of the restoring.
   @sa mafXMLStorage
  */  
-class mafXMLElement : public mafStorageElement
+class MAF_EXPORT mafXMLElement : public mafStorageElement
 {
 public:
   mafXMLElement(mmuXMLDOMElement *element,mafXMLElement *parent,mafXMLStorage *storage);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuXMLDOM.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-29 14:14:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,7 @@
   This class is internally used by mafXMLStorage and mafXMLElement for accessing
   XML DOM objects.
 */
-class mmuXMLDOM: public mmuUtility
+class MAF_EXPORT mmuXMLDOM: public mmuUtility
 {
 public:
   mmuXMLDOM(): m_XMLDoctype(NULL),m_XMLDoc(NULL),m_XMLNode(NULL), \

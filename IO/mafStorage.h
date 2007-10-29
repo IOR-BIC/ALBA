@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:13:43 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-10-29 14:14:01 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,7 +40,7 @@ class mafObserver;
   - remote files (URL access)
   - improve tmp files management
  */  
-class mafStorage: public mafObject
+class MAF_EXPORT mafStorage: public mafObject
 {
 public:
   mafAbstractTypeMacro(mafStorage,mafObject);
@@ -135,6 +135,7 @@ protected:
   mafString           m_ParserURL;    ///< name of the last parsed file (used for SaveAs)
   mafID               m_TmpFileId;    ///< counter for unique tmp file naming
   mafString           m_TmpFolder;    ///< folder where to store tmp files
+  
   std::set<mafString> m_TmpFileNames; ///< name of tmp files in the MSF dir
   std::set<mafString> m_FilesDictionary; ///< list of files in the storage folder: to be populated by OpenDirectory()
   int                 m_ErrorCode;    ///< the error code 0==OK

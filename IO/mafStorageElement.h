@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:39:08 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-10-29 14:14:02 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,7 +38,7 @@ class mafObject;
   @todo
   - reimplement children list as a map
  */  
-class mafStorageElement
+class MAF_EXPORT mafStorageElement
 {
 public:
   virtual ~mafStorageElement();
