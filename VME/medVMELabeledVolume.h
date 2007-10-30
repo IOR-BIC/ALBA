@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 17:00:57 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-10-30 14:17:56 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,8 +51,17 @@ public:
 
   int GetLabelValue( wxString &item );  
 
-  /** Add the item to the checked listbox. */
+  //* Set a tag with the label values. */
+  void SetLabelTag(mafString label, int component);
+
+  //* Remove a tag. */
+  void RemoveLabelTag(int component);
+
+  /** Fill the vector of label. */
   void FillLabelVector(int n, wxString name, bool checked = TRUE);
+
+   /** Modify the vector of label. */
+  void ModifyLabelVector(int n, wxString name, bool checked);
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);

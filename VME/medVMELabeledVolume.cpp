@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 17:00:57 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-10-30 14:17:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -75,7 +75,7 @@ medVMELabeledVolume::medVMELabeledVolume()
   m_LabelCheckBox = NULL;
   m_EditMode = FALSE;
   m_DataCopied = FALSE;
-  m_CheckMin = 0;
+  m_CheckMin = 0; 
   m_CheckMax = 0;
   m_MaxValue = 0;
   m_MinValue = 0;
@@ -120,7 +120,12 @@ medVMELabeledVolume::~medVMELabeledVolume()
 //------------------------------------------------------------------------------
 {
   mafDEL(m_Transform);
-
+  if (m_DataCopied)
+    mafDEL(m_Dataset);
+  m_Link = NULL;
+  m_CheckedVector.clear();
+  m_LabelNameVector.clear();
+  
   if ( m_Dlg )
     DeleteOpDialog();
 }
@@ -458,6 +463,19 @@ void medVMELabeledVolume::FillLabelVector(int n, wxString name, bool checked)
 }
 
 //----------------------------------------------------------------------------
+void medVMELabeledVolume::ModifyLabelVector(int n, wxString name, bool checked)
+//----------------------------------------------------------------------------
+{
+  if (n < m_LabelNameVector.size() )
+  {
+    m_LabelNameVector[n] = name;
+    m_CheckedVector[n] = checked;
+  }
+  else
+    return;
+}
+
+//----------------------------------------------------------------------------
 void medVMELabeledVolume::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
@@ -729,7 +747,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
           wxString component = m_TagLabel->GetValue( w );
           if ( m_ItemLabel == component )
           {
-            m_TagLabel->RemoveValue(w);
+            RemoveLabelTag(w);
           }
         }
         GenerateLabeledVolume();
@@ -748,13 +766,16 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
             wxStringTokenizer tkz(componentName,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
             mafString labelName = tkz.GetNextToken().c_str();
             mafString labelIntStr = tkz.GetNextToken().c_str();
+            int labelValue = atof(labelIntStr);
             mafString minStr = tkz.GetNextToken().c_str();
             double min = atof(minStr);
             mafString maxStr = tkz.GetNextToken().c_str();
             double max = atof(maxStr);
 
+       
             m_LabelNameValue = labelName;
             m_LabelValueValue = labelIntStr;
+            m_LabelIntValue = labelValue;
             m_Min = min;
             m_Max = max;
             CreateOpDialog();
@@ -959,7 +980,7 @@ void medVMELabeledVolume::UpdateLabel()
     m_CheckListId++;
     m_LabelCheckBox->Update();
     int nComp = m_TagLabel->GetNumberOfComponents();
-    m_TagLabel->SetValue(labelLine.c_str(), nComp);
+    SetLabelTag(labelLine.c_str(), nComp);
   }
   else
   {
@@ -972,12 +993,27 @@ void medVMELabeledVolume::UpdateLabel()
       wxString componentName = m_TagLabel->GetValue( w );
       if ( m_ItemLabel == componentName )
       {
-        m_TagLabel->SetValue(labelLine.c_str(), w );
+        SetLabelTag(labelLine.c_str(), w );
       }
     }
   }
   GenerateLabeledVolume();
 }
+
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::SetLabelTag(mafString label, int component )
+//----------------------------------------------------------------------------
+{
+  m_TagLabel->SetValue(label, component);
+}
+
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::RemoveLabelTag(int component)
+//----------------------------------------------------------------------------
+{
+  m_TagLabel->RemoveValue(component);
+}
+
 //----------------------------------------------------------------------------
  void medVMELabeledVolume::UpdateSlice()
 //----------------------------------------------------------------------------
