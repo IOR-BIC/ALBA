@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 16:57:52 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-10-31 11:42:08 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -215,6 +215,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
         m_ArchiveName << m_VectorID;
         m_ArchiveName << ".z";
         item = it->second;
+        item->UpdateData();
         m_ArchiveName << item->GetDataFileExtension();
         mafString tmp_archive;
         storage->GetTmpFile(tmp_archive);
@@ -288,6 +289,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
       for (it = Begin(), i = 0; it != End(); it++, i++)
       {
         item = it->second;
+        item->UpdateData();
 
         // set item ID if not yet set
         if (item->GetId() < 0)
