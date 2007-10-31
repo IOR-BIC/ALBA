@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkGridActor.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:39:53 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-10-31 11:23:44 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -30,7 +30,7 @@
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
-vtkCxxRevisionMacro(vtkGridActor, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkGridActor, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkGridActor);
 //------------------------------------------------------------------------------
 vtkGridActor::vtkGridActor()
@@ -205,7 +205,7 @@ double	vtkGridActor::Round(double val)
 	val = fabs(val);
 
 	int    exponent = (int)(log10(val));
-	double mantissa = val/pow(10,exponent); 
+	double mantissa = val/pow((double)10,(double)exponent); 
 	if(mantissa <1) // fix for val< 1
 	{
      mantissa *= 10;
@@ -217,7 +217,7 @@ double	vtkGridActor::Round(double val)
 	  mantissa=2;
   else 
 	  mantissa=5;
-	return sign*mantissa*pow(10,exponent);
+	return sign*mantissa*pow((double)10,(double)exponent);
 }
 //----------------------------------------------------------------------------
 void	vtkGridActor::GridUpdate(vtkCamera *camera)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:16:34 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-10-31 11:22:27 $
+  Version:   $Revision: 1.34 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -163,17 +163,17 @@ bool IsRemote(mafString filename, mafString &protocol_used)
 float RoundValue(float f_in, int decimal_digits)
 //----------------------------------------------------------------------------
 {
-  float f_tmp = f_in * pow(10,decimal_digits);
+  float f_tmp = f_in * pow((double)10,(double)decimal_digits);
   int b = ( f_tmp >= 0 ) ? static_cast<int>( f_tmp + .5):static_cast<int>( f_tmp - .5);
-  return b / pow(10,decimal_digits);
+  return b / pow((double)10,(double)decimal_digits);
 }
 //----------------------------------------------------------------------------
 double RoundValue(double d_in, int decimal_digits)
 //----------------------------------------------------------------------------
 {
-  double d_tmp = d_in * pow(10,decimal_digits);
+  double d_tmp = d_in * pow((double)10,(double)decimal_digits);
   int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
-  return b / pow(10,decimal_digits);
+  return b / pow((double)10,(double)decimal_digits);
 }
 //----------------------------------------------------------------------------
 wxBitmap GrayScale(wxBitmap bmp)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMapWIN.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-06 14:31:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-10-31 11:23:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,7 +69,7 @@ public:
   virtual void PrependItem(T *m);
 
   /** Find an item index given its pointer*/
-  mafTimeMap<T>::TimeMap::iterator FindItem(T *m);
+  typename mafTimeMap<T>::TimeMap::iterator FindItem(T *m);
 
   /**
     Set the item for a specified time. If no item with the same time exist
@@ -79,7 +79,7 @@ public:
   virtual void InsertItem(T *m);
   
   /** Remove an item given its iterator */
-  virtual void RemoveItem(mafTimeMap<T>::TimeMap::iterator it);
+  virtual void RemoveItem(typename mafTimeMap<T>::TimeMap::iterator it);
 
   /** Remove an item given its index*/
   int RemoveItem(int idx);
@@ -112,19 +112,19 @@ public:
   bool Equals(mafTimeMap *vmat);
 
   /** Find the item with the timestamp nearest to t*/
-  mafTimeMap<T>::TimeMap::iterator FindNearestItem(mafTimeStamp t);
+  typename mafTimeMap<T>::TimeMap::iterator FindNearestItem(mafTimeStamp t);
 
   /** Find the item with timestamp <=t*/
-  mafTimeMap<T>::TimeMap::iterator FindItemBefore(mafTimeStamp t);
+  typename mafTimeMap<T>::TimeMap::iterator FindItemBefore(mafTimeStamp t);
 
   /**
     Find the item with the timestamp==t. Returns the item index, and 
     set "item" to its pointer. Return -1 and NULL if not found.
     not*/
-  mafTimeMap<T>::TimeMap::iterator FindItem(mafTimeStamp t);
+  typename mafTimeMap<T>::TimeMap::iterator FindItem(mafTimeStamp t);
 
   /** return iterator of item with given index */
-  mafTimeMap<T>::TimeMap::iterator FindItemByIndex(int idx);
+  typename mafTimeMap<T>::TimeMap::iterator FindItemByIndex(int idx);
 
   /** return index of the given item. return -1 if not found. */
   mafID FindItemIndex(mafTimeStamp t);
@@ -147,9 +147,9 @@ public:
 
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
-  mafTimeMap<T>::TimeMap::iterator Begin() {return m_TimeMap.begin();}
-  mafTimeMap<T>::TimeMap::iterator End() {return m_TimeMap.end();}
-  mafTimeMap<T>::TimeMap::iterator Last() {return --(m_TimeMap.end());}
+  typename mafTimeMap<T>::TimeMap::iterator Begin() {return m_TimeMap.begin();}
+  typename mafTimeMap<T>::TimeMap::iterator End() {return m_TimeMap.end();}
+  typename mafTimeMap<T>::TimeMap::iterator Last() {return --(m_TimeMap.end());}
 
 protected:
   TimeMap         m_TimeMap;        ///< the set storing the datasets
