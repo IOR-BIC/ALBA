@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:22:09 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2007-10-31 11:51:44 $
+  Version:   $Revision: 1.31 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -444,7 +444,10 @@ mafView *mafViewCompound::GetSubView()
     {
       if (m_ChildViewList[i]->IsMAFType(mafViewCompound))
       {
-        return ((mafViewCompound *)m_ChildViewList[i])->GetSubView();
+        if(((mafViewCompound *)m_ChildViewList[i])->GetSubView()->GetRWI()==rwi)
+        {
+          return ((mafViewCompound *)m_ChildViewList[i])->GetSubView();
+        }
       }
       else if (((mafViewVTK *)m_ChildViewList[i])->GetRWI() == rwi)
       {
