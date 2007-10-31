@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 13:23:44 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-10-31 08:34:11 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -172,10 +172,7 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
     {
       vtkPoints *p = vtkPoints::New();
       double pos_picked[3];
-      if(mouse_flag)
-        cellPicker->GetPickedPositions()->GetPoint(0,pos_picked);
-      else
-        v->GetPickedPosition(pos_picked);
+      v->GetPickedPosition(pos_picked);
       p->SetNumberOfPoints(1);
       p->SetPoint(0,pos_picked);
       double scalar_value = 0;
