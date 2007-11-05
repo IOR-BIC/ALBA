@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:41:28 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2007-11-05 08:31:45 $
+  Version:   $Revision: 1.48 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -557,6 +557,7 @@ int mafNode::SetParent(mafNode *parent)
           {
             n->UpdateId();
           }
+          mafDEL(iter);
         }
         else
         {
