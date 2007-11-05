@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 15:15:00 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-11-05 12:42:35 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -196,7 +196,8 @@ MAF_EXPORT void mafSleep(int msec);
 #define MAF_ID_GLOBAL(idname) extern const mafID idname;
 
 /** This macro is used to define a group of IDs and should be placed in a .h file. Ids declaration with MAF_ID_DEC. */
-#define MAF_ID_GROUP(groupname,num) const mafID groupname = mmuIdFactory::AllocIdGroup(#groupname,num);
+// Not Used !!
+//#define MAF_ID_GROUP(groupname,num) const mafID groupname = mmuIdFactory::AllocIdGroup(#groupname,num);
 
 /** This macro is used to declare the base ID of a  group of ids. */
 #define MAF_ID_CLASS_DEC(baseClass) static const mafID BaseID;
