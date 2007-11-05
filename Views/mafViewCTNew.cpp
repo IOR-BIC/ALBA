@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-23 07:50:07 $
-Version:   $Revision: 1.36 $
+Date:      $Date: 2007-11-05 10:30:17 $
+Version:   $Revision: 1.37 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -166,7 +166,7 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			{
 				if(m_CurrentVolume)
 				{
-					mafViewVTK* view =((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+					mafViewSlice* view =((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
 					view->VmeAdd(node);
 					view->VmeShow(node,true);
 				}
@@ -179,8 +179,8 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			{
 				if(m_CurrentVolume)
 				{
-					mafViewVTK* view =((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
-					view->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[idSubView]);
+					mafViewSlice* view =((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+					view->GetSceneGraph()->m_RenBack->RemoveActor(m_Actor[idSubView]);
 					view->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[idSubView]);
 				}
 			}
@@ -241,7 +241,7 @@ void mafViewCTNew::VmeRemove(mafNode *node)
 			mafViewVTK* view =((mafViewVTK *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(i));
 
 			if(m_Actor[i])
-				view->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[i]);
+				view->GetSceneGraph()->m_RenBack->RemoveActor(m_Actor[i]);
 			if(m_TextActor[i])
 				view->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[i]);
 		}
@@ -488,7 +488,7 @@ void mafViewCTNew::ProbeVolume()
     mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
 	  if (m_Actor.size()>0)
 	  {
-		  vslice->GetSceneGraph()->m_RenFront->RemoveActor(m_Actor[idSubView]);
+		  vslice->GetSceneGraph()->m_RenBack->RemoveActor(m_Actor[idSubView]);
 	  }
 
 
@@ -546,7 +546,7 @@ void mafViewCTNew::ProbeVolume()
 	  ////////////////////////////////////////////////
 	  // No Thickness Code
 	  ////////////////////////////////////////////////
-	  if(m_AdditionalProfileNumber == 0)
+	  if(0 == 0)
 	  {
 	  
 			//prober->SetInput(m_PlaneSection[s]);
@@ -678,11 +678,11 @@ void mafViewCTNew::ProbeVolume()
 	  vslice->GetRWI()->GetCamera()->SetFocalPoint(m_Position[idSubView]);
 	  vslice->GetRWI()->GetCamera()->SetPosition(p2);
 	  vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
-	  vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
+	  //vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
 	  vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
 
 
-	  vslice->GetSceneGraph()->m_RenFront->AddActor(m_Actor[idSubView]);
+	  vslice->GetSceneGraph()->m_RenBack->AddActor(m_Actor[idSubView]);
 	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[idSubView]);
 
     //vslice->GetRWI()->GetImage()
@@ -699,7 +699,7 @@ void mafViewCTNew::ProbeVolume()
 		double distXY = sqrt(distX*distX + distY*distY);
 
 		double max = distZ > distXY ? distZ : distXY;
-		if(distZ / distXY >= 1.5)
+		if(RoundValue(distZ / distXY + 0.00001, 1) >= 1.5)
 		  max /= 3;
 		else
 			max /= 2;
@@ -714,6 +714,7 @@ void mafViewCTNew::ProbeVolume()
     mafDEL(copy);
 
 	  vslice->GetSceneGraph()->m_RenFront->ResetCamera(newb);
+		//vslice->GetSceneGraph()->m_RenBack->ResetCamera(newb);
 	  m_Gui->Update();
   }
 	SetCTLookupTable(m_MinLUTHistogram,m_MaxLUTHistogram);
