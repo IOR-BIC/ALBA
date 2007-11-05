@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: mmuIdFactory.cpp,v $
 Language:  C++
-Date:      $Date: 2005-04-25 18:20:30 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-11-05 12:43:02 $
+Version:   $Revision: 1.4 $
 
 =========================================================================*/
 
@@ -35,6 +35,7 @@ static mmuIdFactoryDestroyer mmuIdFactoryDestroyerSingleton;
 // This is for allocating unique  Ids.
 mafID mmuIdFactory::m_IdCounter = MAF_BASE_ID;
 
+/* not used
 //------------------------------------------------------------------------------
 mafID mmuIdFactory::AllocIdGroup(const char *idname,int num)
 //------------------------------------------------------------------------------
@@ -50,8 +51,16 @@ mafID mmuIdFactory::AllocIdGroup(const char *idname,int num)
 
   (*mmuIdFactoryMap)[idname]=id;
 
+ /////////////////////
+  (*mmuIdFactoryNames).resize(id+num);  
+  for (int n = 0; n < num; n++)
+  {
+    (*mmuIdFactoryNames)[id + n]=idname;
+  }
+///////////////////////
+
   return id;
-}
+}*/
 
 //------------------------------------------------------------------------------
 mafID mmuIdFactory::GetNextId(const char *idname)

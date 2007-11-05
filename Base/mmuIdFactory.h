@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuIdFactory.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-12 16:11:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-11-05 12:43:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,8 @@ public:
   static mafID GetNextId(const char *evtname);
 
   /** Alloc a number of IDs assigning a name to the group */
-  static mafID AllocIdGroup(const char *evtname,int num);
+  //not used
+  //static mafID AllocIdGroup(const char *evtname,int num);
 
   /** this function can be used to obtain an event ID, given its full name */
   static mafID GetId(const char *evtname);
