@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUIContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:31:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-05 14:01:07 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,7 +102,7 @@ void medGUIContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, boo
 	{
 		this->Append(CONTEXTUAL_MENU_HIDE_VME, "Hide");
 		this->Append(CONTEXTUAL_MENU_DELETE_VME, "Delete");
-		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Move \tCtrl+T");
+		this->Append(CONTEXTUAL_MENU_TRANSFORM, "Move\tCtrl+T");
     this->AppendSeparator();
     this->Append(CONTEXTUAL_MENU_VME_PIPE,"visual props");
     this->AppendSeparator();
@@ -224,7 +224,7 @@ void medGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
 		break;
 		case CONTEXTUAL_MENU_TRANSFORM:
 		{
-			mafString s = "Move";
+			mafString s = "Move\tCtrl+T";
 			mafEventMacro(mafEvent(this, PARSE_STRING, &s));
 		}
 		break;
