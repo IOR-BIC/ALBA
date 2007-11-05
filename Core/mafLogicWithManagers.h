@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:42:59 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-11-05 08:35:07 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -229,7 +229,7 @@ protected:
   virtual void TreeContextualMenu(mafEvent &e);
 
   /** Show contextual menu for views when right mouse click arrives.*/
-  void ViewContextualMenu(bool vme_menu);
+  virtual void ViewContextualMenu(bool vme_menu);
 
   /** Create a new view. */
 	virtual void ViewCreate(int viewId);
