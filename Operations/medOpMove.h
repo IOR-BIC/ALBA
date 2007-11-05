@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 13:45:23 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-05 10:31:24 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ Transform a vme using constrains
 class medOpMove : public mmoTransformInterface
 {
 public:
-  medOpMove(const wxString &label = "Transform  \tCtrl+T");
+  medOpMove(const wxString &label = "Move\tCtrl+T");
  ~medOpMove(); 
   virtual void OnEvent(mafEventBase *maf_event);
   
