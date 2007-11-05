@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-30 15:30:10 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-05 10:39:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,10 +46,11 @@ mafOp(label)
   m_OpType  = OPTYPE_IMPORTER;
   m_Canundo = true;
   m_Files.clear();
+  m_Swaps.clear();
   m_FileDir = mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
-mmoSTLImporter::~mmoSTLImporter( ) 
+mmoSTLImporter::~mmoSTLImporter()
 //----------------------------------------------------------------------------
 {
   for(unsigned i = 0; i < m_ImportedSTLs.size(); i++)
@@ -93,19 +94,19 @@ void mmoSTLImporter::OpRun()
 	if(m_Files.size() != 0) 
 	{
 		result = OP_RUN_OK;
-    /*m_Swaps.resize(m_Files.size());
+    m_Swaps.resize(m_Files.size());
     for(unsigned i = 0; i < m_Swaps.size(); i++)
     {
       m_Swaps[i] = 0;
       CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
-    }*/
+    }
     ImportSTL();
 	}
 
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-/*void mmoSTLImporter::CheckSwap(const char *file_name, int &swapFlag)
+void mmoSTLImporter::CheckSwap(const char *file_name, int &swapFlag)
 //----------------------------------------------------------------------------
 {
   //check if the file is binary
@@ -152,7 +153,7 @@ void mmoSTLImporter::OpRun()
       swapFlag = 1;
     }
   }
-}*/
+}
 //----------------------------------------------------------------------------
 void mmoSTLImporter::OpDo()
 //----------------------------------------------------------------------------
@@ -196,7 +197,7 @@ void mmoSTLImporter::ImportSTL()
   m_ImportedSTLs.clear();
 
   for(unsigned kk = 0; kk < m_Files.size(); kk++)
-  {/*
+  {
     mafString fn;
     fn = m_Files[kk];
     if (m_Swaps[kk] != 0)
@@ -250,15 +251,15 @@ void mmoSTLImporter::ImportSTL()
 		  f_out.close();
 		  f_in.close();		
 		  fn = swapped;
-	  }*/
+	  }
 
     vtkMAFSmartPointer<vtkSTLReader> reader;
 	  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
-    reader->SetFileName(m_Files[kk]);
+    reader->SetFileName(fn);
 	  reader->Update();
 
     wxString path, name, ext;
-    wxSplitPath(m_Files[kk].GetCStr(),&path,&name,&ext);
+    wxSplitPath(fn.GetCStr(),&path,&name,&ext);
 
     mafVMESurface *importedSTL;
     mafNEW(importedSTL);
@@ -271,16 +272,16 @@ void mmoSTLImporter::ImportSTL()
     importedSTL->GetTagArray()->SetTag(tag_Nature);
 
 	  //delete the swapped file
-	  /*if (m_Swaps[kk] != 0)
+	  if (m_Swaps[kk] != 0)
 	  {
 		  const char* file_name = (fn);
 		  remove(file_name);
-	  }*/
+	  }
     m_ImportedSTLs.push_back(importedSTL);
   }
 }
 //----------------------------------------------------------------------------
-/*void mmoSTLImporter::Swap_Four(unsigned int *value)
+void mmoSTLImporter::Swap_Four(unsigned int *value)
 //----------------------------------------------------------------------------
 { 
 	unsigned int r; 
@@ -293,41 +294,48 @@ bool mmoSTLImporter::IsFileBinary(const char *name_file)
 //  it is similar to the protected member vtkSTLReader::GetSTLFileType(FILE *fp)
 //----------------------------------------------------------------------------
 {
-  unsigned char header[256];
+  unsigned char header[80];
   int i;
   int numChars;
 
-  bool binary = false;
+  bool binary = true;
   FILE * pFile;
   pFile = fopen(name_file,"r"); 
 
-  //  Read a little from the file to figure what type it is.
-  // skip 255 characters so we are past any first line comment 
-  numChars = static_cast<int>(fread ((unsigned char *)header, 1, 255, pFile));
-  for (i = 0; i< numChars; i++) 
+  // From Wikipedia: A binary STL file has an 80 character header 
+  // (which is generally ignored - but which should never begin with 'solid' 
+  // because that will lead most software to assume that this is an ASCII STL file)
+  numChars = static_cast<int>(fread ((unsigned char *)header, 1, 80, pFile));
+  for (i = 0; i < numChars - 5; i++) // don't test \0
   {
-		if (header[i] > 127)
-		{
-			binary = true;
-		}
+    if (header[i] == 's' &&
+      header[i+1] == 'o' &&
+      header[i+2] == 'l' &&
+      header[i+3] == 'i' &&
+      header[i+4] == 'd')
+    {
+      binary = false;
+      break;
+    }
   }
+  
   // Reset file for reading
   //
   fclose(pFile);
   return binary;
-}*/
+}
 //----------------------------------------------------------------------------
 void mmoSTLImporter::SetFileName(const char *file_name)
 //----------------------------------------------------------------------------
 {
   m_Files.resize(1);
   m_Files[0] = file_name;
-  /*m_Swaps.resize(m_Files.size());
+  m_Swaps.resize(m_Files.size());
   for(unsigned i = 0; i < m_Swaps.size(); i++)
   {
     m_Swaps[i] = 0;
     CheckSwap(m_Files[i].GetCStr(), m_Swaps[i]);
-  }*/
+  }
 }
 //----------------------------------------------------------------------------
 void mmoSTLImporter::GetImportedSTL(std::vector<mafVMESurface*> &importedSTL)
