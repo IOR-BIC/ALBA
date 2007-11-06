@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:17:23 $
-  Version:   $Revision: 1.117 $
+  Date:      $Date: 2007-11-06 14:34:37 $
+  Version:   $Revision: 1.118 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,6 +54,8 @@
 
 #include "mafSideBar.h"
 
+
+#include "mafGUISRBBrowse.h"
 #include "mmgDialogRemoteFile.h"
 #include "mafGUIDialogFindVme.h"
 #include "mmgMDIFrame.h"
@@ -1029,7 +1031,7 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 	  {
       
       wxString file;
-      if (m_StorageSettings->UseRemoteStorage())
+      if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::HTTP)
       {
         if (file_to_open != NULL)
         {
@@ -1044,13 +1046,18 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
           if (IsRemote(file.c_str(),protocol))
           {
             m_VMEManager->SetHost(remoteFile.GetHost());
-            m_VMEManager->SetRemotePort(remoteFile.GetPort());
+            m_VMEManager->SetRemotePort(remoteFile.GetPort());//
             m_VMEManager->SetUser(remoteFile.GetUser());
             m_VMEManager->SetPassword(remoteFile.GetPassword());
           }
         }
       }
-      else
+      else if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::SRB)
+      {
+        mafGUISRBBrowse remoteFile;
+        remoteFile.ShowModal();
+      }
+      else      
       {
 		    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
 		    //wxString msf_dir  = wxGetCwd().c_str();
