@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:29:52 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-11-06 15:18:27 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,6 +49,7 @@
 #include "vtkCellArray.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkTransform.h"
+#include "vtkPolyDataToSinglePolyLine.h"
 
 #include <vector>
 
@@ -116,12 +117,14 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
 
-  
+  vtkMAFSmartPointer<vtkPolyDataToSinglePolyLine> polydataToPolylineFilter;
+  polydataToPolylineFilter->SetInput(data);
+  polydataToPolylineFilter->Update();
 
 	//////////////////////////////////
   vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOn();
-	m_Tube->SetInput(data);
+	m_Tube->SetInput(polydataToPolylineFilter->GetOutput());
 	m_Tube->SetRadius(m_Radius);
 	m_Tube->SetCapping(1);
 	m_Tube->SetNumberOfSides(16);
@@ -383,22 +386,43 @@ void mafPipePolylineSlice::UpdateProperty()
   data->Modified();
   data->Update();
 
-  m_Tube->SetInput(data);
+  vtkMAFSmartPointer<vtkPolyDataToSinglePolyLine> polydataToPolylineFilter;
+  polydataToPolylineFilter->SetInput(data);
+  polydataToPolylineFilter->Update();
+
+
+  m_Tube->SetInput(polydataToPolylineFilter->GetOutput());
   m_Tube->Update();
   m_Cutter->SetInput(m_Tube->GetOutput());
   m_Cutter->Update();
   
   vtkMAFSmartPointer<vtkTransform> transform;
-	double alphaZ = acos(m_Normal[2]);
-	double alphaY = acos(m_Normal[1]);
-	double alphaX = acos(m_Normal[0]);
+	double alphaZ; 
+	double alphaY;
+	double alphaX;
 	
+  if(m_Normal[2] >= 0)
+    alphaZ= acos(m_Normal[2]);
+  else
+    alphaZ= -acos(m_Normal[2]);
+
+  if(m_Normal[1] >= 0)
+    alphaY= acos(m_Normal[1]);
+  else
+    alphaY= -acos(m_Normal[1]);
+
+  if(m_Normal[0] >= 0)
+    alphaX= acos(m_Normal[0]);
+  else
+    alphaX= -acos(m_Normal[0]);
+
+
   const double pi = 3.14159;
 
 	transform->RotateX(alphaX*180/pi);
 	transform->RotateY(alphaY*180/pi);
 	transform->RotateZ(alphaZ*180/pi);
-	  
+
 	transform->Update();
 
   m_Delaunay->SetInput(m_Cutter->GetOutput());
