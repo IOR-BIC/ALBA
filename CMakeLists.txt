@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-06-29 08:54:35 $
-# Version:   $Revision: 1.40 $
+# Date:      $Date: 2007-11-06 12:31:41 $
+# Version:   $Revision: 1.41 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -148,6 +148,16 @@ IF (MAF_CAN_BUILD)
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
   
+  IF(WIN32)
+		# Disable automatic manifest generation.
+		STRING(REPLACE "/MANIFEST" "/MANIFEST:NO" CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
+		# Explicitly disable it since it is the default for newer versions of VS
+    STRING(REGEX MATCH "MANIFEST:NO" tmp_manifest ${CMAKE_EXE_LINKER_FLAGS})
+    IF(NOT tmp_manifest)
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+    ENDIF(NOT tmp_manifest)
+	ENDIF(WIN32)
+
   # Export Build settings and library dependences
   INCLUDE(CMakeExportBuildSettings)
   
