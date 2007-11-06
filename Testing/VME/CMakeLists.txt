@@ -20,6 +20,11 @@ ADD_TEST(mafPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphTest)
 ADD_EXECUTABLE(medVMEWrappedMeterTest medVMEWrappedMeterTest.h medVMEWrappedMeterTest.cpp)
 ADD_TEST(medVMEWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEWrappedMeterTest)
 
+ADD_EXECUTABLE(medVMELabeledVolumeTest medVMELabeledVolumeTest.h medVMELabeledVolumeTest.cpp)
+ADD_TEST(medVMELabeledVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medVMELabeledVolumeTest)
+
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
