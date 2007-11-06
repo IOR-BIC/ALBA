@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmo2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:12:40 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-11-06 12:44:28 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -200,14 +200,14 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
 						m_2DDistanceInteractor->SetListener(this);
 
 						if(m_2DDistanceInteractor->SizeMeasureVector() != 0)
-							m_DistanceMeasure = mafString(wxString::Format(_("%.2f") ,RoundValue(m_2DDistanceInteractor->GetLastDistance())));
+							m_DistanceMeasure = mafString(wxString::Format("%.2f" ,RoundValue(m_2DDistanceInteractor->GetLastDistance())));
 						else
-							m_DistanceMeasure = mafString(L"0");
+							m_DistanceMeasure = mafString("0");
 
 
 						if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
 						{           
-							wxMessageBox(L"Fix the label in the window");
+							wxMessageBox("Fix the label in the window");
 							m_MeasureType = 0;
 							m_Gui->Update();
 						}
@@ -227,13 +227,13 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
 						m_2DAngleInteractor->SetListener(this);
 
 						if(m_2DAngleInteractor->SizeMeasureVector() != 0)
-							m_AcuteAngle = mafString(wxString::Format(_("%.2f") ,RoundValue(m_2DAngleInteractor->GetLastAngle())));
+							m_AcuteAngle = mafString(wxString::Format("%.2f" ,RoundValue(m_2DAngleInteractor->GetLastAngle())));
 						else
-							m_AcuteAngle = mafString(L"0");
+							m_AcuteAngle = mafString("0");
 
 						if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
 						{           
-							wxMessageBox(L"Fix the label in the window");
+							wxMessageBox("Fix the label in the window");
 							m_MeasureType = 0;
 							m_Gui->Update();
 						}
@@ -257,7 +257,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           }
           else
           {
-            wxMessageBox(L"Measure Not Yet Implemented");
+            wxMessageBox("Measure Not Yet Implemented");
           }
         break;
         case ID_PLOT_PROFILE:
@@ -265,7 +265,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_UNDO_MEASURE:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox("Fix the label in the window");
           else
           {
 						if(m_InteractorType[m_InteractorType.size()-1] == ID_DISTANCE_TYPE)
@@ -425,7 +425,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_MANUAL_DISTANCE:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox("Fix the label in the window");
           else if(wxString(m_ManualDistance).ToDouble(m_Unused) != false)
           {
 						if(atof(m_ManualDistance) > 0)
@@ -443,7 +443,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_MANUAL_ANGLE:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox("Fix the label in the window");
           else if(wxString(m_ManualAngle).ToDouble(m_Unused) != false)
 					{
 						if(atof(m_ManualAngle) >= 0 && atof(m_ManualAngle) <= 180)
@@ -461,7 +461,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_MANUAL_INDICATOR:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox("Fix the label in the window");
           else
           {
             m_2DIndicatorInteractor->SetLabel(m_ManualIndicator);
@@ -505,7 +505,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         case wxOK:
         case wxCANCEL:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox("Fix the label in the window");
           else
             OpStop(OP_RUN_CANCEL);
         break;
@@ -518,7 +518,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
         case mmi2DDistance::ID_RESULT_MEASURE:
         {
           double measure = RoundValue(e->GetDouble());
-          m_DistanceMeasure = wxString::Format(_("%g"), measure);
+          m_DistanceMeasure = wxString::Format("%g", measure);
           m_AcuteAngle = "0";
           m_ObtuseAngle = "0";
           m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
@@ -541,8 +541,8 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           m_Gui->Enable(ID_MANUAL_ANGLE, m_2DAngleInteractor->SizeMeasureVector() != 0);
           m_Gui->Enable(ID_MANUAL_DISTANCE, false);
           m_Gui->Enable(ID_MANUAL_INDICATOR,false);
-          m_AcuteAngle = wxString::Format(_("%g"),measure);
-          m_ObtuseAngle = wxString::Format(_("%g"), 180.0 - measure);
+          m_AcuteAngle = wxString::Format("%g",measure);
+          m_ObtuseAngle = wxString::Format("%g", 180.0 - measure);
 					if(m_2DAngleInteractor->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_ANGLE_TYPE);
@@ -560,7 +560,7 @@ void mmo2DMeasure::OnEvent(mafEventBase *maf_event)
           if(m_2DIndicatorInteractor->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_INDICATOR_TYPE);
-            m_ManualIndicator = L"Label";
+            m_ManualIndicator = "Label";
 					}
           
           m_Gui->Update();
