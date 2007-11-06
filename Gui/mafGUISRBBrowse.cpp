@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 14:16:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-11-06 14:33:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,6 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafDecl.h"
 #include "mmgGui.h"
+#include "mafGUISettingsStorage.h"
 #include "mmgApplicationSettings.h"
 #include "mafPics.h"
 #include "mmgTree.h"
@@ -32,6 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "SrbStorageWS/SrbList.nsmap"
 
 #include <list>
+#include <stdio.h>
 
 //----------------------------------------------------------------------------
 mafGUISRBBrowse::mafGUISRBBrowse(mafObserver *listener,const wxString &title, long style, long dialogStyle)
@@ -60,7 +62,7 @@ enum REMOTE_FILE_WIDGET_ID
   ID_HOST = MINID,
   ID_USER,
   ID_PWD,
-  ID_BROWSE_LOCAL_FILE,
+  ID_LIST_FILE,
   ID_SEARCH,
 
 };
@@ -70,6 +72,17 @@ void mafGUISRBBrowse::CreateGui()
 {
   m_Gui = new mmgGui(this);
   m_Gui->Show(true);
+
+  mafGUISettingsStorage *storage_settings = new mafGUISettingsStorage(this);
+  m_Host = storage_settings->GetSRBRemoteHostName();
+  m_Domain = storage_settings->GetSRBDomain();
+  m_AuthSheme = storage_settings->GetetSRBAuth_scheme();
+  m_ServerDn = storage_settings->GetSRBServer_dn();
+  m_CacheFolder = storage_settings->GetSRBCacheFolder();
+  m_Port = storage_settings->GetSRBRemotePort();
+  m_User = storage_settings->GetSRBUserName();
+  m_Pwd  = storage_settings->GetSRBPwd();
+  cppDEL(storage_settings);
   
   m_GuiList = new mmgGui(this);
   m_GuiList->Show(true);
@@ -89,14 +102,14 @@ void mafGUISRBBrowse::CreateGui()
   tree_images->Add(mafPics.GetBmp("FILE"));
   m_Tree->SetImageList(tree_images);
 
-  m_Gui->String(ID_HOST,"URL",&m_Host,_("hostname including the protocol: http://..."));
+  m_Gui->String(ID_HOST,"URL",&m_Host,_("host name"));
   m_Gui->String(ID_USER,_("user"),&m_User);
   m_Gui->String(ID_PWD,_("pwd"),&m_Pwd,"",false,true);
   m_Gui->String(ID_SEARCH, _("search :"),&m_Wild);
 
   m_Gui->Divider(2);
 
- // m_Gui->Button(ID_BROWSE_LOCAL_FILE, _("browse"),_("local files"));
+  m_Gui->Button(ID_LIST_FILE, _("List"),_("SRB files"));
   m_Gui->OkCancel();
   m_Gui->Enable(wxOK, FALSE);
 
@@ -124,12 +137,9 @@ void mafGUISRBBrowse::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-      case ID_HOST:
-      case ID_USER:
-      case ID_PWD:
-      case ID_SEARCH:
+    case ID_LIST_FILE:
         m_Tree->Reset();
-        if (!m_Host.IsEmpty() && !m_Pwd.IsEmpty() && !m_Host.IsEmpty())
+        if (!m_Host.IsEmpty() && !m_Pwd.IsEmpty() && !m_User.IsEmpty())
         {    
           if (RemoteSRBList() == MAF_OK)
           {
@@ -194,16 +204,9 @@ int mafGUISRBBrowse::RemoteSRBList()
 {
   struct soap soap; // gSOAP runtime environment
 
-  // Temporarily initialized to empty values;
-  // At the end we should ask to SRB storage settings
-  // for those values.
-  m_Domain = "";
-  char * auth_scheme;
-  auth_scheme = "";
-  char * port;
-  port = "";
-  char * server_dn;
-  server_dn =  "";
+  int portInt = m_Port;
+  char portStr[15];//change!
+  itoa(portInt, portStr, 10);
 
   _ns1__SrbList srb_listParams;
   
@@ -211,11 +214,11 @@ int mafGUISRBBrowse::RemoteSRBList()
   srb_listParams.srbAuth = &srb_auth;
   srb_listParams.srbAuth->host = m_Host.GetNonConstCStr();
   srb_listParams.srbAuth->domain = m_Domain.GetNonConstCStr();
-  srb_listParams.srbAuth->auth_scheme = auth_scheme;
-  srb_listParams.srbAuth->port = port;
+  srb_listParams.srbAuth->auth_scheme = m_AuthSheme.GetNonConstCStr();
+  srb_listParams.srbAuth->port = portStr;
   srb_listParams.srbAuth->pwd = m_Pwd.GetNonConstCStr(); 
   srb_listParams.srbAuth->user = m_User.GetNonConstCStr();
-  srb_listParams.srbAuth->server_dn = server_dn;
+  srb_listParams.srbAuth->server_dn = m_ServerDn.GetNonConstCStr();
 
   _ns1__SrbListResponse lsSRBResult;
 
@@ -235,6 +238,7 @@ int mafGUISRBBrowse::RemoteSRBList()
   soap_done(&soap); // detach the gSOAP environment
    
   return MAF_OK;
+  
 }
 
 //----------------------------------------------------------------------------
@@ -243,7 +247,8 @@ void mafGUISRBBrowse::CreateTree()
 {
   wxStringTokenizer tkz(m_FileList, "  ");
 
-  m_Domain.Append("/");
+  mafString domain = m_Domain;
+  domain.Append("/");
 
   //Create the tree
   std::list <wxString> listName;
@@ -251,8 +256,8 @@ void mafGUISRBBrowse::CreateTree()
 
   nameComplete = tkz.GetNextToken();
 
-  int pos = nameComplete.Find(m_Domain);
-  pos = pos + m_Domain.Length();
+  int pos = nameComplete.Find(domain);
+  pos = pos + domain.Length();
 
   root = nameComplete.Mid(0, pos);
   m_Tree->AddNode(1, 0, root);
@@ -269,8 +274,8 @@ void mafGUISRBBrowse::CreateTree()
     wxString name;
     name = tkz.GetNextToken();
     
-    int pos = name.Find(m_Domain);
-    pos = pos + m_Domain.Length();
+    int pos = name.Find(domain);
+    pos = pos + domain.Length();
     name = name.Mid(pos);
 
     listName.push_back(name);
