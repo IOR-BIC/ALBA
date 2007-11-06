@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-17 09:50:50 $
-  Version:   $Revision: 1.55 $
+  Date:      $Date: 2007-11-06 14:34:26 $
+  Version:   $Revision: 1.56 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@
 #include "mmaVolumeMaterial.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolume.h"
+#include "mafVMEOutputVolume.h"
 #include "mafIndent.h"
 #include "mafGizmoSlice.h"
 #include "mafVMEGizmo.h"
@@ -135,7 +136,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 	for(int i=0; i<m_NumOfChildView; i++)
 		m_ChildViewList[i]->VmeShow(node, show);
 
-	if (node->IsMAFType(mafVMEVolume))
+	if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
 		if (show)
 		{
@@ -230,7 +231,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
 			break;
       case ID_LUT_CHOOSER:
       {
-        mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+        mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
         currentVolumeMaterial->UpdateFromTables();
         for(int i=0; i<m_NumOfChildView; i++)
         {
@@ -250,7 +251,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
           int low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
-          mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+          mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
           currentVolumeMaterial->UpdateFromTables();
           CameraUpdate();
         }
@@ -351,6 +352,7 @@ void mafViewOrthoSlice::PackageView()
   {
     m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false,false,0,TICKs[v]);
     m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
+    m_Views[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice", MUTEX);
 		m_Views[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
@@ -585,14 +587,14 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
     return;
   }
 
-  m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+  m_CurrentVolume = mafVME::SafeDownCast(node);
   if (m_CurrentVolume == NULL)
   {
     mafLogMessage("current volume = NULL");
     return;
   }
 
-	mmaVolumeMaterial *currentVolumeMaterial = m_CurrentVolume->GetMaterial();
+	mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
 	double sr[2],vtkDataCenter[3];
 	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
 	vtkData->Update();

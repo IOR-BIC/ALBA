@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 14:25:20 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2007-11-06 14:34:35 $
+  Version:   $Revision: 1.35 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -134,7 +134,8 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
   for(int i=0; i<CT_COMPOUND_VIEW; i++)
     m_ChildViewList[i]->VmeShow(node, show);
 
-  if (node->IsMAFType(mafVMEVolume))
+  //if (node->IsMAFType(mafVMEVolume))
+  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
@@ -200,10 +201,10 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
         m_Pos[i] = b[5]-step*(i+1);
       }
-      m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+      m_CurrentVolume = mafVME::SafeDownCast(node);
       GizmoCreate();
 
-      //BEGIN cycle for remove old surface and redraw the rigth slice
+      //BEGIN cycle for remove old surface and redraw the right slice
       
       mafNodeIterator *iter = node->GetRoot()->NewIterator();
       for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
@@ -658,6 +659,7 @@ void mafViewRXCT::PackageView()
     // create to the child view
     m_ViewsRX[v] = new mafViewRX("RX child view", cam_pos[v]);
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "medVisualPipeSlicerSlice",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
@@ -666,6 +668,7 @@ void mafViewRXCT::PackageView()
   m_ViewCTCompound = new mafViewCompound("CT view",3,2);
   mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_CT);
   vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
+  vs->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
@@ -675,6 +678,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
+ 
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);
 }

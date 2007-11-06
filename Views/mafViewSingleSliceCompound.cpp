@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 14:25:20 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-11-06 14:35:05 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -188,7 +188,7 @@ void mafViewSingleSliceCompound::VmeSelect(mafNode *node, bool select)
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeSelect(node, select);
 
-	UpdateWindowing(node->IsA("mafVMEVolumeGray") && select && m_ChildViewList[ID_VIEW_SINGLE_SLICE]->GetNodePipe(node),node);
+	UpdateWindowing(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") && select && m_ChildViewList[ID_VIEW_SINGLE_SLICE]->GetNodePipe(node),node);
 }
 //----------------------------------------------------------------------------
 void mafViewSingleSliceCompound::UpdateWindowing(bool enable,mafNode *node)
