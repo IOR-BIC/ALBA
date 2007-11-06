@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 10:52:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-11-06 14:33:11 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -80,7 +80,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
   Superclass::Create(n); // Always call this to initialize m_Vme, m_AssemblyFront, ... vars
   m_UsedAssembly = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
 
-	assert(m_Vme->IsMAFType(mafVMEVolumeGray));
+	assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
 
 	m_Vme->GetOutput()->Update();
 
