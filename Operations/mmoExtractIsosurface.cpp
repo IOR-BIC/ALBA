@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-29 19:41:46 $
-Version:   $Revision: 1.22 $
+Date:      $Date: 2007-11-07 08:41:21 $
+Version:   $Revision: 1.23 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -127,7 +127,7 @@ mafOp* mmoExtractIsosurface::Copy()
 bool mmoExtractIsosurface::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
-  return vme != NULL && vme->IsMAFType(mafVMEVolumeGray);
+  return vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume");
 }
 //----------------------------------------------------------------------------
 void mmoExtractIsosurface::OpRun()
@@ -335,8 +335,7 @@ void mmoExtractIsosurface::CreateOpDialog()
 void mmoExtractIsosurface::CreateVolumePipeline()
 //----------------------------------------------------------------------------
 {
-  mafVMEVolumeGray *vol_vme = mafVMEVolumeGray::SafeDownCast(m_Input);
-  vtkDataSet *dataset = vol_vme->GetVolumeOutput()->GetVTKData();
+  vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
   m_ContourVolumeMapper = vtkContourVolumeMapper::New();
   m_ContourVolumeMapper->SetInput(dataset);
   m_ContourVolumeMapper->AutoLODRenderOn();
