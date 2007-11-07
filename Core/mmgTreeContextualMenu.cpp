@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 14:41:16 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-07 13:22:33 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,7 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 	{
     bool enable;
 
-    this->Append(RMENU_ADD_TREE_LAYOUT,  "Save Tree Layout");
+    this->Append(RMENU_ADD_TREE_LAYOUT,  "Save MSF Layout");
     this->AppendSeparator();
 
     if(m_ViewActive != NULL && mafViewVTK::SafeDownCast(m_ViewActive))
