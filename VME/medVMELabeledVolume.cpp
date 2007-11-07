@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-30 14:17:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-11-07 08:03:05 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -683,11 +683,12 @@ void medVMELabeledVolume::CreateSlicePipeline()
   m_Texture->SetLookupTable( m_LookUpTable );
 
   vtkPlaneSource * planeSource = vtkPlaneSource::New();
-  planeSource->SetOrigin( m_Bounds[0], m_Bounds[2], m_Slice );
-  planeSource->SetPoint1( m_Bounds[1], m_Bounds[2], m_Slice );
-  planeSource->SetPoint2( m_Bounds[0], m_Bounds[3], m_Slice );
-  float xCenter = ( m_Bounds[0] + m_Bounds[1] ) / 2.0;
-  float yCenter = ( m_Bounds[2] + m_Bounds[3] ) / 2.0;
+  planeSource->SetOrigin( m_Bounds[1], m_Bounds[3], m_Slice );
+  planeSource->SetPoint1( m_Bounds[0], m_Bounds[3], m_Slice );
+  planeSource->SetPoint2( m_Bounds[1], m_Bounds[2], m_Slice );
+  
+  float xCenter = ( m_Bounds[1] + m_Bounds[0] ) / 2.0;
+  float yCenter = ( m_Bounds[3] + m_Bounds[2] ) / 2.0;
   planeSource->SetCenter( xCenter, yCenter, m_Slice );
 
   m_SMapper	= vtkPolyDataMapper::New();
