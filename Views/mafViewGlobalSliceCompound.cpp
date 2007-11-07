@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 08:44:11 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -185,7 +185,7 @@ void mafViewGlobalSliceCompound::VmeSelect(mafNode *node, bool select)
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeSelect(node, select);
 
-	UpdateWindowing(node->IsA("mafVMEVolumeGray") && select && m_ChildViewList[ID_VIEW_GLOBAL_SLICE]->GetNodePipe(node),node);
+	UpdateWindowing(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") && select && m_ChildViewList[ID_VIEW_GLOBAL_SLICE]->GetNodePipe(node),node);
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSliceCompound::UpdateWindowing(bool enable,mafNode *node)

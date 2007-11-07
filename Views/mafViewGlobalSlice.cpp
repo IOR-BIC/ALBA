@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 08:42:23 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.20 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -329,7 +329,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 				((mafPipeVolumeSlice *)pipe)->HideSlider();
 			}
 
-			if (m_SelectedVolume == n && m_SelectedVolume->m_Vme->IsA("mafVMEVolumeGray"))
+			if (m_SelectedVolume == n && ((mafVME *)m_SelectedVolume->m_Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 			{
 				m_Gui->Enable(ID_OPACITY_SLIDER,true);
 				m_Opacity=((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
@@ -362,7 +362,7 @@ void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
     m_NumberOfVisibleVme = 0;
   else
     m_NumberOfVisibleVme--;
-  if (vme->IsMAFType(mafVMEVolume))
+  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (m_AttachCamera)
     {
@@ -505,7 +505,7 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 
 	bool Enable = false;
   mafNode *selVME = m_Sg->GetSelectedVme();
-  if (selVME&&selVME->IsA("mafVMEVolumeGray"))
+  if (selVME&&(((mafVME *)selVME)->GetOutput()->IsA("mafVMEOutputVolume")))
   {
 		m_SelectedVolume = m_Sg->Vme2Node(selVME);
 		//m_gui->Enable(ID_LUT,en);

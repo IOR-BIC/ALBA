@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 08:15:43 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.13 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -400,7 +400,7 @@ int mafView3D::GetNodeStatus(mafNode *vme)
 	mafSceneNode *n = NULL;
 	if (m_Sg != NULL)
 	{
-		if (vme->IsMAFType(mafVMEVolumeGray))
+		if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			n = m_Sg->Vme2Node(vme);
 			n->m_Mutex = true;
@@ -535,7 +535,7 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 {
 	Superclass::VmeShow(vme,show);
 
-	if(vme->IsA("mafVMEVolumeGray"))
+	if(((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
 		if(show)
 		{

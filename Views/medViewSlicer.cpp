@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 11:33:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,6 +130,7 @@ void medViewSlicer::PackageView()
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
 	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
+  m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 	m_ViewSlice = new mafViewVTK("",CAMERA_CT);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
@@ -150,7 +151,7 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
 	Vme->Update();
 	if (show)
 	{
-		if(Vme->IsA("mafVMEVolumeGray"))
+		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(Vme);
 			m_CurrentVolume = Volume;
@@ -205,7 +206,7 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
 	else//if show=false
 	{
 		
-		if(Vme->IsA("mafVMEVolumeGray"))
+        if (((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{		
 			m_CurrentVolume = NULL;
 			m_ColorLUT = NULL;
@@ -423,7 +424,7 @@ int medViewSlicer::GetNodeStatus(mafNode *vme)
 
   if (sgArb != NULL)
   {
-    if (vme->IsMAFType(mafVMEVolume))
+    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       n = sgArb->Vme2Node(vme);
       n->m_PipeCreatable = true;

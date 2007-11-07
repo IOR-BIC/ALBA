@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:44:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,7 @@ void mafViewRXCompound::VmeShow(mafNode *node, bool show)
   for(int i=0; i<VIEWS_NUMBER; i++)
     ((mafViewRX *)m_ChildViewList[i])->VmeShow(node, show);
 
-  if (node->IsMAFType(mafVMEVolume))
+  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {
@@ -269,6 +269,7 @@ void mafViewRXCompound::PackageView()
     // create to the child view
     m_ViewsRX[v] = new mafViewRX("RX child view", cam_pos[v]);
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("mafVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
   }

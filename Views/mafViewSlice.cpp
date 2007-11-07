@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 12:53:02 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.44 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -464,7 +464,7 @@ void mafViewSlice::VmeDeletePipe(mafNode *vme)
   else
     m_NumberOfVisibleVme--;
   
-  if (vme->IsMAFType(mafVMEVolume))
+  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)
@@ -485,7 +485,7 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
-    if (vme->IsMAFType(mafVMEVolume))
+     if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       n = m_Sg->Vme2Node(vme);
       n->m_Mutex = true;
@@ -752,7 +752,7 @@ void mafViewSlice::UpdateSurfacesList(mafNode *node)
 void mafViewSlice::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
-  if (node->IsMAFType(mafVMEVolume))
+  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (show)
     {

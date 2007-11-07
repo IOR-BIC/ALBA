@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-05 10:30:17 $
-Version:   $Revision: 1.37 $
+Date:      $Date: 2007-11-07 16:58:10 $
+Version:   $Revision: 1.38 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -149,7 +149,7 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 	/*for(int i=0; i<this->GetNumberOfSubView(); i++)
 		m_ChildViewList[i]->VmeShow(node, show);*/
 
-	if(node->IsA("mafVMEVolumeGray"))
+	if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
 	{
 		if(show)
 		{

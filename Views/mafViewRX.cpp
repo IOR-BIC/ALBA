@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-25 16:06:40 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -246,7 +246,7 @@ void mafViewRX::VmeDeletePipe(mafNode *vme)
     m_NumberOfVisibleVme = 0;
   else
     m_NumberOfVisibleVme--;
-  if (vme->IsMAFType(mafVMEVolume))
+  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)
@@ -264,7 +264,7 @@ int mafViewRX::GetNodeStatus(mafNode *vme)
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
-    if (vme->IsMAFType(mafVMEVolume))
+    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       n = m_Sg->Vme2Node(vme);
       n->m_Mutex = true;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:34:35 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.36 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -358,7 +358,7 @@ void mafViewRXCT::OnEventSortSlices()
 {
   mafNode* node=GetSceneGraph()->GetSelectedVme();
   mafPipe *p=((mafViewRX *)m_ChildViewList[0])->GetNodePipe(node);
-  if (node->IsMAFType(mafVMEVolume))
+  if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
     mafLogMessage("SURFACE NOT SELECTED");
   else  if (node->IsMAFType(mafVMESurface))
   {

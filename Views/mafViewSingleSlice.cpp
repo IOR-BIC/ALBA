@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 15:38:17 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.21 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -409,7 +409,7 @@ void mafViewSingleSlice::VmeDeletePipe(mafNode *vme)
     m_NumberOfVisibleVme = 0;
   else
     m_NumberOfVisibleVme--;
-  if (vme->IsMAFType(mafVMEVolume))
+  if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutpuVolume"))
   {
     m_CurrentVolume = NULL;
     if (m_AttachCamera)
@@ -427,7 +427,7 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
-    if (vme->IsMAFType(mafVMEVolume))
+    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutpuVolume"))
     {
       n = m_Sg->Vme2Node(vme);
       if(n)
@@ -582,7 +582,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 			mafNodeIterator *iter = m_CurrentVolume->m_Vme->GetRoot()->NewIterator();
 			for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
 			{
-				if(node->IsA("mafVMESurface") || node->IsA("mafVMEVolume") || node->IsA("mafVMEPolyline"))
+			  if(node->IsA("mafVMESurface") || (((mafVME *)node)->GetOutput()->IsA("mafVMEOutpuVolume")) || node->IsA("mafVMEPolyline"))
 				{
 					mafSceneNode *n = m_Sg->Vme2Node(node);
 					if(n && n->IsVisible())
@@ -775,7 +775,7 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 {
   Superclass::VmeShow(node, show);
 
-  if (node->IsMAFType(mafVMEVolumeGray))
+  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutpuVolume"))
   {
     if (show)
     {

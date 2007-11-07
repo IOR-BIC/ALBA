@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 14:56:19 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-11-07 16:58:10 $
+  Version:   $Revision: 1.23 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -132,6 +132,7 @@ void mafViewArbitrarySlice::PackageView()
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
 	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
+  m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 	m_ViewSlice = new mafViewVTK("",CAMERA_CT);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
@@ -152,7 +153,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 	Vme->Update();
 	if (show)
 	{
-		if(Vme->IsA("mafVMEVolumeGray"))
+		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			double sr[2],SliceCenterVolumeReset[3];
 			mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(Vme);
@@ -306,7 +307,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		//m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
 		//m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
 
-		if(Vme->IsA("mafVMEVolumeGray"))
+		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			//this->GetSceneGraph()->VmeRemove(m_Slicer);
 			m_AttachCamera->SetVme(NULL);
