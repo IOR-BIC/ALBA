@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-30 14:17:56 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-11-08 08:35:32 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,21 +40,22 @@ class vtkPolyData;
 //----------------------------------------------------------------------------
 // mafVmeDataLabeledVolume :
 //----------------------------------------------------------------------------
-/** */
+/** mafVmeDataLabeledVolume - Volume with interface to assign labels to certain portions of a volume, identified by
+scalar thresholds  */
+
 class MAF_EXPORT medVMELabeledVolume : public mafVME
 {
 public:	
 
 	mafTypeMacro(medVMELabeledVolume,mafVME);
 
-//  void SetListener(mafObserver *listener) {m_Listener = listener;};
-
+  /** Return the value of the label. */
   int GetLabelValue( wxString &item );  
 
-  //* Set a tag with the label values. */
+  /**  Set a tag with the label values. */
   void SetLabelTag(mafString label, int component);
 
-  //* Remove a tag. */
+  /** Remove a tag. */
   void RemoveLabelTag(int component);
 
   /** Fill the vector of label. */
@@ -66,8 +67,10 @@ public:
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Copy the contents of another VMELabeled into this one. */
   int DeepCopy(mafNode *a);
 
+  /** Compare with another VMELabeled. */
   bool Equals(mafVME *vme);
 
   /**
@@ -206,6 +209,8 @@ protected:
   vtkActor          * m_ActorSlice;  
   vtkDataSet        *m_Dataset;
   vtkPolyData       *m_Polydata;
+
+  //mafObserver  *m_Listener; 
 
   void CopyDataset();
   /** 
