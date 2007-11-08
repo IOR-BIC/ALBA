@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:20:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-11-08 16:47:13 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -159,6 +159,10 @@ void mmiCameraMove::OnMouseMove()
     case MOUSE_CAMERA_ROTATE:
       this->Rotate();
     break;
+    case MOUSE_CAMERA_LINKED_ROTATE:
+      LinkedRotate();
+      return;
+    break;
     case MOUSE_CAMERA_PAN:
       this->Pan();
     break;
@@ -203,21 +207,7 @@ void mmiCameraMove::OnLeftButtonDown(mafEventInteraction *e)
 void mmiCameraMove::OnMiddleButtonDown(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
-  if (m_LinkedCamera.size() != 0 && CameraIsPresent()) 
-  {
-    if (e->GetModifier(MAF_CTRL_KEY)) 
-    {
-      StartPan();
-    }
-    else
-    {
-      StartLinkedPan();
-    }
-  }
-  else
-  {
-    StartPan();
-  }
+  StartPan();
 }
 //----------------------------------------------------------------------------
 bool mmiCameraMove::CameraIsPresent()
@@ -238,44 +228,30 @@ bool mmiCameraMove::CameraIsPresent()
 void mmiCameraMove::OnRightButtonDown(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
-  if (m_LinkedCamera.size() != 0 && CameraIsPresent()) 
-  {
-    if (e->GetModifier(MAF_CTRL_KEY)) 
-    {
-      StartDolly();
-    }
-    else
-    {
-      StartLinkedDolly();
-    }
-  }
-  else
-  {
-    StartDolly();
-  }
+  StartDolly();
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 {
   switch (this->m_State) 
-    {
+  {
     case MOUSE_CAMERA_DOLLY:
+    case MOUSE_CAMERA_LINKED_DOLLY:
       this->EndDolly();
-      break;
-
+    break;
     case MOUSE_CAMERA_PAN:
+    case MOUSE_CAMERA_LINKED_PAN:
       this->EndPan();
-      break;
-
+    break;
     case MOUSE_CAMERA_SPIN:
       this->EndSpin();
-      break;
-
+    break;
     case MOUSE_CAMERA_ROTATE:
+    case MOUSE_CAMERA_LINKED_ROTATE:
       this->EndRotate();
-      break;
-    }
+    break;
+  }
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::OnMiddleButtonUp()
@@ -489,6 +465,36 @@ void mmiCameraMove::LinkedPan()
   InvokeEvent(&e, MCH_UP);
 }
 //----------------------------------------------------------------------------
+void mmiCameraMove::LinkedRotate()
+//----------------------------------------------------------------------------
+{
+  if (m_Renderer == NULL)
+    return;
+
+  if (m_CurrentCamera->GetParallelProjection()) return; 
+
+  int dx = m_MousePose[0] - m_LastMousePose[0];
+  int dy = m_MousePose[1] - m_LastMousePose[1];
+
+  int *size = m_Renderer->GetRenderWindow()->GetSize();
+
+  double delta_elevation = -20.0 / size[1];
+  double delta_azimuth = -20.0 / size[0];
+
+  double rxf = (double)dx * delta_azimuth * this->m_MotionFactor;
+  double ryf = (double)dy * delta_elevation * this->m_MotionFactor;
+
+  for (int c=0; c<m_LinkedCamera.size(); c++)
+  {
+    m_LinkedCamera[c]->Azimuth(rxf);
+    m_LinkedCamera[c]->Elevation(ryf);
+    m_LinkedCamera[c]->OrthogonalizeViewUp();
+  }
+
+  mafEvent e(this,CAMERA_UPDATE);
+  InvokeEvent(&e, MCH_UP);
+}
+//----------------------------------------------------------------------------
 void mmiCameraMove::ResetClippingRange()
 //----------------------------------------------------------------------------
 {
@@ -541,18 +547,22 @@ void mmiCameraMove::ResetClippingRange()
 void mmiCameraMove::StartRotate() 
 //----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_NONE) 
+  if (m_State != MOUSE_CAMERA_NONE) 
   {
     return;
   }
-  this->StartState(MOUSE_CAMERA_ROTATE);
+
+  int state = (m_LinkedCamera.size() != 0 && CameraIsPresent()) ? MOUSE_CAMERA_LINKED_ROTATE : MOUSE_CAMERA_ROTATE;
+  this->StartState(state);
 }
 
 //----------------------------------------------------------------------------
 void mmiCameraMove::EndRotate() 
 //----------------------------------------------------------------------------
 {
-  if (this->m_State != MOUSE_CAMERA_ROTATE) 
+  if (m_State != MOUSE_CAMERA_ROTATE  &&
+      m_State != MOUSE_CAMERA_LINKED_ROTATE &&
+      m_State != MOUSE_CAMERA_LINKED_PAN) 
   {
     return;
   }
@@ -589,17 +599,8 @@ void mmiCameraMove::StartPan()
   {
     return;
   }
-  this->StartState(MOUSE_CAMERA_PAN);
-}
-//----------------------------------------------------------------------------
-void mmiCameraMove::StartLinkedPan()
-//----------------------------------------------------------------------------
-{
-  if (this->m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-  this->StartState(MOUSE_CAMERA_LINKED_PAN);
+  int state = (m_LinkedCamera.size() != 0 && CameraIsPresent()) ? MOUSE_CAMERA_LINKED_PAN : MOUSE_CAMERA_PAN;
+  this->StartState(state);
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::EndPan() 
@@ -643,17 +644,8 @@ void mmiCameraMove::StartDolly()
   {
     return;
   }
-  this->StartState(MOUSE_CAMERA_DOLLY);
-}
-//----------------------------------------------------------------------------
-void mmiCameraMove::StartLinkedDolly()
-//----------------------------------------------------------------------------
-{
-  if (this->m_State != MOUSE_CAMERA_NONE) 
-  {
-    return;
-  }
-  this->StartState(MOUSE_CAMERA_LINKED_DOLLY);
+  int state = (m_LinkedCamera.size() != 0 && CameraIsPresent()) ? MOUSE_CAMERA_LINKED_DOLLY : MOUSE_CAMERA_DOLLY;
+  this->StartState(state);
 }
 //----------------------------------------------------------------------------
 void mmiCameraMove::EndDolly() 

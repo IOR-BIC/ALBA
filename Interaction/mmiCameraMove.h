@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:20:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-08 16:47:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,6 +23,7 @@
 #define MOUSE_CAMERA_ZOOM   5
 #define MOUSE_CAMERA_LINKED_PAN 6
 #define MOUSE_CAMERA_LINKED_DOLLY  7
+#define MOUSE_CAMERA_LINKED_ROTATE  8
 
 #include "mafInteractor.h"
 #include "mafMTime.h"
@@ -63,6 +64,7 @@ public:
 
   virtual void LinkedDolly();
   virtual void LinkedPan();
+  virtual void LinkedRotate();
 
   virtual void StartRotate();
   virtual void EndRotate();
@@ -74,9 +76,6 @@ public:
   virtual void EndSpin();
   virtual void StartDolly();
   virtual void EndDolly();
-
-  virtual void StartLinkedPan();
-  virtual void StartLinkedDolly();
 
   virtual void StartState(int newstate);
   virtual void StopState();
