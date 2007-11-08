@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-29 14:13:16 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-11-08 11:06:18 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -118,6 +118,8 @@ void mafPipeMeshSlice::Create(mafSceneNode *n)
 	m_OutlineProperty = NULL;
 	m_OutlineActor    = NULL;
 	m_Axes            = NULL;
+  m_ActorWired      = NULL;
+  m_MapperWired     = NULL;
 
   m_Vme->GetEventSource()->AddObserver(this);
 
@@ -253,8 +255,17 @@ void mafPipeMeshSlice::ExecutePipe()
   if(m_MeshMaterial)
     m_Actor->SetProperty(m_MeshMaterial->m_Prop);
 
+  vtkNEW(m_MapperWired);
+  m_MapperWired->SetInput(m_NormalFilter->GetOutput());
+  m_MapperWired->SetScalarRange(0,0);
+  m_MapperWired->ScalarVisibilityOff();
+
+  vtkNEW(m_ActorWired);
+  m_ActorWired->SetMapper(m_MapperWired);
+  m_ActorWired->GetProperty()->SetRepresentationToWireframe();
+
   //m_Actor->GetProperty()->SetLineWidth (1);
-  m_AssemblyFront->AddPart(m_Actor);
+  
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
@@ -282,6 +293,7 @@ void mafPipeMeshSlice::AddActorsToAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
   assembly->AddPart(m_Actor);
+  assembly->AddPart(m_ActorWired);
 	assembly->AddPart(m_OutlineActor);	
 }
 //----------------------------------------------------------------------------
@@ -289,6 +301,7 @@ void mafPipeMeshSlice::RemoveActorsFromAssembly(vtkMAFAssembly *assembly)
 //----------------------------------------------------------------------------
 {
 	assembly->RemovePart(m_Actor);
+  assembly->RemovePart(m_ActorWired);
 	assembly->RemovePart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
@@ -309,6 +322,8 @@ mafPipeMeshSlice::~mafPipeMeshSlice()
 	vtkDEL(m_OutlineProperty);
 	vtkDEL(m_OutlineActor);
 	cppDEL(m_Axes);
+  vtkDEL(m_MapperWired);
+  vtkDEL(m_ActorWired);
   /*cppDEL(m_ScalarsName);
   cppDEL(m_ScalarsVTKName);*/
   //vtkDEL(m_Table);
@@ -347,11 +362,10 @@ mmgGui *mafPipeMeshSlice::CreateGui()
   m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("enable scalar field mapping"), &m_ScalarMapActive, 1);
   m_Gui->Lut(ID_LUT,"lut",m_Table);
 
-  m_Gui->Enable(ID_SCALARS, m_ScalarMapActive);
-  m_Gui->Enable(ID_LUT, m_ScalarMapActive);
+  m_Gui->Enable(ID_SCALARS, m_ScalarMapActive != 0);
+  m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
   m_Gui->Divider();
-  m_Gui->Label("");
   m_Gui->Update();
 	return m_Gui;
 }
@@ -503,6 +517,8 @@ void mafPipeMeshSlice::SetWireframeOn()
 {
   m_Actor->GetProperty()->SetRepresentationToWireframe();
   m_Actor->Modified();
+  m_ActorWired->SetVisibility(0);
+  m_ActorWired->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -511,6 +527,8 @@ void mafPipeMeshSlice::SetWireframeOff()
 {
   m_Actor->GetProperty()->SetRepresentationToSurface();
   m_Actor->Modified();
+  m_ActorWired->SetVisibility(1);
+  m_ActorWired->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
