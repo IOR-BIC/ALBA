@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:29:35 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-11-08 11:06:07 $
+  Version:   $Revision: 1.22 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -286,10 +286,29 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
         m_Tube->SetCapping(meter_attrib->m_Capping);
       break;
       case ID_DISTANCE_RANGE:
+        m_MeterVME->Modified();
+        m_MeterVME->Update();
       break;
       case ID_METER_MEASURE_TYPE:
+        m_MeterVME->GetDataPipe()->Update();
       case ID_INIT_MEASURE:
+        {
+          meter_attrib->m_DistanceRange[0] = meter_attrib->m_InitMeasure;
+          m_Gui->Update();
+          m_MeterVME->Modified();
+          m_MeterVME->GetDataPipe()->Update();
+        }
+      break;
       case ID_DELTA_PERCENT:
+        {
+          double value;
+          value = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0);
+          meter_attrib->m_DistanceRange[1] = value;
+          m_Gui->Update();
+          m_MeterVME->Modified();
+          m_MeterVME->GetDataPipe()->Update();
+        }
+        break;
       case ID_GENERATE_EVENT:
         m_MeterVME->GetDataPipe()->Update();
       break;
