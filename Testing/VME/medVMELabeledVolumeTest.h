@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMELabeledVolumeTest.h,v $
 Language:  C++
-Date:      $Date: 2007-10-30 15:42:11 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-11-08 16:52:05 $
+Version:   $Revision: 1.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -35,6 +35,8 @@ public:
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestVolumeCopy );
 	CPPUNIT_TEST( TestGenerateLabeledVolume );
+  CPPUNIT_TEST( TestRemoveLabelTag );
+  CPPUNIT_TEST( TestSetLabelTag );
 	CPPUNIT_TEST( TestDeepCopy );
 	CPPUNIT_TEST_SUITE_END();
 
@@ -43,6 +45,8 @@ protected:
   void TestDynamicAllocation();
 	void TestVolumeCopy();
 	void TestGenerateLabeledVolume();
+  void TestRemoveLabelTag();
+  void TestSetLabelTag();
   void TestDeepCopy();
 };
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMELabeledVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-08 13:25:02 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-11-08 16:52:05 $
+Version:   $Revision: 1.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -23,7 +23,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medVMELabeledVolumeTest.h"
 #include "medVMELabeledVolume.h"
 
-#include "mmoVTKImporter.h"
 #include "mafVMEVolumeGray.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
@@ -34,6 +33,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMAFSmartPointer.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGridReader.h"
+
+#define OUTRANGE_SCALAR 0
 
 //----------------------------------------------------------------------------
 void medVMELabeledVolumeTest::TestFixture()
@@ -64,84 +65,68 @@ void medVMELabeledVolumeTest::TestDynamicAllocation()
 void medVMELabeledVolumeTest::TestVolumeCopy()
 //---------------------------------------------------------------
 {
-  mafVMERoot *root;
-  mafNEW(root);
+  mafSmartPointer<mafVMERoot> root;
 
   mafString filename_volume=MED_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
-  vtkRectilinearGridReader *volumeReader = vtkRectilinearGridReader::New();
+  vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
   volumeReader->SetFileName(filename_volume);
   volumeReader->Update();
 
-  mafVMEVolumeGray *volume;
-  mafNEW(volume);
+  mafSmartPointer<mafVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
   volume->GetOutput()->GetVTKData()->Update();
-  volume->SetParent(root);
+  volume->ReparentTo(root);
   volume->Update();
 
-  medVMELabeledVolume *labeled; 
-  mafNEW(labeled);
+  mafSmartPointer<medVMELabeledVolume> labeled; 
   labeled->SetName("Labeled Volume");
   labeled->SetVolumeLink(volume);
 
-  //Get the scalar data of the copied original volume 
-  vtkMAFSmartPointer<vtkDataArray> volumeScalars;
-  volumeScalars = volumeReader->GetOutput()->GetPointData()->GetScalars();
-  volumeScalars->Modified();
-
   //Get the scalar data of the labeled volume 
-  vtkMAFSmartPointer<vtkDataArray> labelScalars;
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
   datasetLabel->Update();
-  vtkMAFSmartPointer<vtkRectilinearGrid> recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
   labelScalars->Modified();
 
   //Check if the medVMELabeledVolume without labels has all the scalars setted to 0.
-  int not = volumeScalars->GetNumberOfTuples();
+  int not = labelScalars->GetNumberOfTuples();
   for ( int i = 0; i < not; i++ )
   {
     double labelValue = labelScalars->GetComponent( i, 0 );
-    CPPUNIT_ASSERT(labelValue == 0);
+    CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
   }
-  
-  mafDEL(labeled);
-  mafDEL(volume);
-  mafDEL(volumeReader);
-  mafDEL(root);
-
 }
 
 //---------------------------------------------------------------
 void medVMELabeledVolumeTest::TestGenerateLabeledVolume()
 //---------------------------------------------------------------
 {
-  mafVMERoot *root;
-  mafNEW(root);
+  mafSmartPointer<mafVMERoot> root;
 
   mafString filename_volume=MED_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
-  vtkRectilinearGridReader *volumeReader = vtkRectilinearGridReader::New();
+  vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
   volumeReader->SetFileName(filename_volume);
   volumeReader->Update();
 
-  mafVMEVolumeGray *volume;
+  mafSmartPointer<mafVMEVolumeGray> volume;
   mafNEW(volume);
   volume->SetData(volumeReader->GetOutput(), 0);
   volume->GetOutput()->GetVTKData()->Update();
-  volume->SetParent(root);
+  volume->ReparentTo(root);
   volume->Update();
 
-  medVMELabeledVolume *labeled; 
-  mafNEW(labeled);
+  mafSmartPointer<medVMELabeledVolume> labeled; 
   labeled->SetName("Labeled Volume");
   labeled->SetVolumeLink(volume);
 
   //Get the scalar data of the copied original volume 
-  vtkMAFSmartPointer<vtkDataArray> volumeScalars;
+  vtkDataArray *volumeScalars;
   volumeScalars = volumeReader->GetOutput()->GetPointData()->GetScalars();
   volumeScalars->Modified();
 
@@ -149,14 +134,14 @@ void medVMELabeledVolumeTest::TestGenerateLabeledVolume()
   int max = 1500;
   int newValue = 1000;
 
-  labeled->FillLabelVector(0, "testLabel 1000 0 1500");
+  labeled->FillLabelVector("testLabel 1000 0 1500");
   labeled->GenerateLabeledVolume();
 
   //Get the scalar data of the labeled volume 
-  vtkMAFSmartPointer<vtkDataArray> labelScalars;
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
   datasetLabel->Update();
-  vtkMAFSmartPointer<vtkRectilinearGrid> recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
   labelScalars->Modified();
 
@@ -173,43 +158,149 @@ void medVMELabeledVolumeTest::TestGenerateLabeledVolume()
     }
     else
     {
-      CPPUNIT_ASSERT(labelValue == 0);
+      CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
     }
   }
-
-  mafDEL(volume);
-  mafDEL(labeled);
-  mafDEL(root);
 }
 
 //---------------------------------------------------------------
-void medVMELabeledVolumeTest::TestDeepCopy()
+void medVMELabeledVolumeTest::TestRemoveLabelTag()
 //---------------------------------------------------------------
 {
-  mafVMERoot *root;
-  mafNEW(root);
+  mafSmartPointer<mafVMERoot> root;
 
   mafString filename_volume=MED_DATA_ROOT;
   filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
 
-  vtkRectilinearGridReader *volumeReader = vtkRectilinearGridReader::New();
+  vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
   volumeReader->SetFileName(filename_volume);
   volumeReader->Update();
 
-  mafVMEVolumeGray *volume;
-  mafNEW(volume);
+  mafSmartPointer<mafVMEVolumeGray> volume;
   volume->SetData(volumeReader->GetOutput(), 0);
   volume->GetOutput()->GetVTKData()->Update();
-  volume->SetParent(root);
+  volume->ReparentTo(root);
   volume->Update();
 
-  medVMELabeledVolume *labeled; 
-  mafNEW(labeled);
+  mafSmartPointer<medVMELabeledVolume> labeled; 
+  labeled->SetName("Labeled Volume");
+  labeled->SetVolumeLink(volume);
+
+  wxString label = "testLabel 1000 0 1500";
+  labeled->FillLabelVector(label);
+
+  //Remove tha label
+  labeled->RemoveItemLabelVector(0);
+  labeled->GenerateLabeledVolume();
+
+  //Get the scalar data of the labeled volume 
+  vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
+  datasetLabel->Update();
+  vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkDataArray *labelScalars;
+  labelScalars = recGrid->GetPointData()->GetScalars();
+  labelScalars->Modified();
+
+  //Check if the medVMELabeledVolume without labels has all the scalars set to 0.
+  int not = labelScalars->GetNumberOfTuples();
+  for ( int i = 0; i < not; i++ )
+  {
+    double labelValue = labelScalars->GetComponent( i, 0 );
+    CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
+  }
+}
+
+//---------------------------------------------------------------
+void medVMELabeledVolumeTest::TestSetLabelTag()
+//---------------------------------------------------------------
+{
+  mafSmartPointer<mafVMERoot> root;
+
+  mafString filename_volume=MED_DATA_ROOT;
+  filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
+
+  vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
+  volumeReader->SetFileName(filename_volume);
+  volumeReader->Update();
+
+  mafSmartPointer<mafVMEVolumeGray> volume;
+  volume->SetData(volumeReader->GetOutput(), 0);
+  volume->GetOutput()->GetVTKData()->Update();
+  volume->ReparentTo(root);
+  volume->Update();
+
+  //Get the scalar data of the copied original volume 
+  vtkMAFSmartPointer<vtkDataArray> volumeScalars;
+  volumeScalars = volumeReader->GetOutput()->GetPointData()->GetScalars();
+  volumeScalars->Modified();
+
+  mafSmartPointer<medVMELabeledVolume> labeled; 
+  labeled->SetName("Labeled Volume");
+  labeled->SetVolumeLink(volume);
+
+  wxString label = "testLabel 1000 0 1500";
+  labeled->FillLabelVector(label);
+
+  //Modify the label 
+  int min = 0;
+  int max = 1000;
+  int newValue = 500;
+
+  wxString labelNew = "testLabelNew 500 0 1000";
+  labeled->ModifyLabelVector(0, labelNew, TRUE);
+  labeled->GenerateLabeledVolume();
+
+
+  //Get the scalar data of the labeled volume 
+  vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
+  datasetLabel->Update();
+  vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkDataArray *labelScalars;
+  labelScalars = recGrid->GetPointData()->GetScalars();
+  labelScalars->Modified();
+
+  //Check if the medVMELabeledVolume with one label has the correct scalars
+  int not = volumeScalars->GetNumberOfTuples();
+  double labelValue, volumeValue;
+  for ( int i = 0; i < not; i++ )
+  {
+    volumeValue = volumeScalars->GetComponent( i, 0 );
+    labelValue = labelScalars->GetComponent( i, 0 );
+    if ( volumeValue >= min && volumeValue <= max )
+    { 
+      CPPUNIT_ASSERT(labelValue == newValue);
+    }
+    else
+    {
+      CPPUNIT_ASSERT(labelValue == OUTRANGE_SCALAR);
+    }
+  }
+}
+//---------------------------------------------------------------
+void medVMELabeledVolumeTest::TestDeepCopy()
+//---------------------------------------------------------------
+{
+  mafSmartPointer<mafVMERoot> root;
+
+  mafString filename_volume=MED_DATA_ROOT;
+  filename_volume<<"/VTK_Volumes/LabeledVolumeTest.vtk";
+
+  vtkMAFSmartPointer<vtkRectilinearGridReader>volumeReader;
+  volumeReader->SetFileName(filename_volume);
+  volumeReader->Update();
+
+  mafSmartPointer<mafVMEVolumeGray> volume;
+  volume->SetData(volumeReader->GetOutput(), 0);
+  volume->GetOutput()->GetVTKData()->Update();
+  volume->ReparentTo(root);
+  volume->Update();
+
+  mafSmartPointer<medVMELabeledVolume> labeled; 
   labeled->SetName("Labeled Volume");
   labeled->SetVolumeLink(volume);
 
   //Get the scalar data of the copied original volume 
-  vtkMAFSmartPointer<vtkDataArray> volumeScalars;
+  vtkDataArray *volumeScalars;
   volumeScalars = volumeReader->GetOutput()->GetPointData()->GetScalars();
   volumeScalars->Modified();
 
@@ -218,21 +309,19 @@ void medVMELabeledVolumeTest::TestDeepCopy()
   int newValue = 1000;
   wxString label = "testLabel 1000 0 1500";
   
-  labeled->FillLabelVector(0, label);
+  labeled->FillLabelVector(label);
   labeled->SetLabelTag(label, 0);
   labeled->GenerateLabeledVolume();
 
   //Get the scalar data of the labeled volume 
-  vtkMAFSmartPointer<vtkDataArray> labelScalars;
   vtkDataSet *datasetLabel = labeled->GetOutput()->GetVTKData();
   datasetLabel->Update();
-  vtkMAFSmartPointer<vtkRectilinearGrid> recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkRectilinearGrid *recGrid = (vtkRectilinearGrid*) datasetLabel;
+  vtkDataArray *labelScalars;
   labelScalars = recGrid->GetPointData()->GetScalars();
   labelScalars->Modified();
 
-  medVMELabeledVolume *labeledCopied; 
-  mafNEW(labeledCopied);
-
+  mafSmartPointer<medVMELabeledVolume> labeledCopied; 
   labeledCopied->DeepCopy(labeled);
   labeledCopied->Update();
 
@@ -240,14 +329,14 @@ void medVMELabeledVolumeTest::TestDeepCopy()
   mafTagItem *tagLabel = new mafTagItem;
   tagLabel = labeledCopied->GetTagArray()->GetTag( "LABELS" );
   wxString tagString = tagLabel->GetValue(0);
-  labeledCopied->FillLabelVector(0, tagString);
+  labeledCopied->FillLabelVector(tagString);
   labeledCopied->GenerateLabeledVolume();
 
   //Get the scalar data of the copied labeled volume 
-  vtkMAFSmartPointer<vtkDataArray> labelCopiedScalars;
+  vtkDataArray *labelCopiedScalars;
   vtkDataSet *datasetLabelCopied = labeledCopied->GetOutput()->GetVTKData();
   datasetLabelCopied->Update();
-  vtkMAFSmartPointer<vtkRectilinearGrid> recGridCopied = (vtkRectilinearGrid*) datasetLabelCopied;
+  vtkRectilinearGrid *recGridCopied = (vtkRectilinearGrid*) datasetLabelCopied;
   labelCopiedScalars = recGridCopied->GetPointData()->GetScalars();
   labelScalars->Modified();
 
@@ -261,9 +350,6 @@ void medVMELabeledVolumeTest::TestDeepCopy()
     
     CPPUNIT_ASSERT(labelValue == labelCopiedValue);
   }
-
-  mafDEL(volume);
-  mafDEL(labeled);
-  mafDEL(labeledCopied);
-  mafDEL(root);
 }
+
+
