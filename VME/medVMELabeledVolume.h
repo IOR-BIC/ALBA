@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 08:35:32 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-11-08 16:57:56 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,10 +59,13 @@ public:
   void RemoveLabelTag(int component);
 
   /** Fill the vector of label. */
-  void FillLabelVector(int n, wxString name, bool checked = TRUE);
+  void FillLabelVector(wxString name, bool checked = TRUE);
 
    /** Modify the vector of label. */
   void ModifyLabelVector(int n, wxString name, bool checked);
+
+   /** Remove an item of the vector of label. */
+  void RemoveItemLabelVector(int n);
 
   /** Precess events coming from other objects */ 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -88,25 +91,11 @@ public:
   /** Update the VME with the scalar values of the labels. */
   virtual void GenerateLabeledVolume();
 
-  /** This method updates the look-up table. */
-  void UpdateLookUpTable();
-
-  /** If lables tags are present retrieve them. */
-  void RetrieveTag();
-
-   /** Updates the tags and the items of the checkBox and call the InternalPreUpadate. */
-  void UpdateLabel();
-
   /** Set the Link */
   void SetVolumeLink(mafNode *n);
 
   /** Return the Link */
   mafNode *GetVolumeLink();
-
-  /** This method returns the min value from the label used as input. */
-  int GetMin( wxString &item );
-  /** This method returns the max value from the label used as input. */
-  int GetMax( wxString &item );
 
   /** return icon */
   static char** GetIcon();
@@ -210,9 +199,18 @@ protected:
   vtkDataSet        *m_Dataset;
   vtkPolyData       *m_Polydata;
 
-  //mafObserver  *m_Listener; 
+
+  /** This method updates the look-up table. */
+  void UpdateLookUpTable();
+
+  /** If lables tags are present retrieve them. */
+  void RetrieveTag();
 
   void CopyDataset();
+
+  /** Updates the tags and the items of the checkBox and call the InternalPreUpadate. */
+  void UpdateLabel();
+
   /** 
   Copy the scalars of the VME linked. */
   void UpdateScalars();
@@ -232,6 +230,13 @@ protected:
   /** 
   Re-slice the volume according to the new coordinate value. */
   void UpdateSlice();  
+
+  /** This method returns the min value from the label used as input. */
+  int GetMin( wxString &item );
+
+  /** This method returns the max value from the label used as input. */
+  int GetMax( wxString &item );
+
 
 };
 #endif

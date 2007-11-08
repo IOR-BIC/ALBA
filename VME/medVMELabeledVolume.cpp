@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 11:13:48 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-11-08 16:57:56 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -201,12 +201,12 @@ void medVMELabeledVolume::CopyDataset()
   vtkDataArray *originalScalars;
   if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
   {
-    vtkMAFSmartPointer<vtkStructuredPoints> sp = (vtkStructuredPoints*) m_Dataset;
+    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
     originalScalars = sp->GetPointData()->GetScalars();  
   }
   else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
   {    
-    vtkMAFSmartPointer<vtkRectilinearGrid> rg = (vtkRectilinearGrid*) m_Dataset;
+    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
     originalScalars = rg->GetPointData()->GetScalars();  
   }
 
@@ -278,13 +278,13 @@ void medVMELabeledVolume::GenerateLabeledVolume()
 
   if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
   {
-    vtkMAFSmartPointer<vtkStructuredPoints> sp = (vtkStructuredPoints*) m_Dataset;
+    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
     labelScalars = sp->GetPointData()->GetScalars();
     volumeScalars = sp->GetPointData()->GetScalars();  
   }
   else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
   {    
-    vtkMAFSmartPointer<vtkRectilinearGrid> rg = (vtkRectilinearGrid*) m_Dataset;
+    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
     labelScalars = rg->GetPointData()->GetScalars();
     volumeScalars = rg->GetPointData()->GetScalars();  
   }
@@ -463,8 +463,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
           if ( component == labelName )
           {
             m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
-            m_LabelNameVector.push_back(component);
-            m_CheckedVector.push_back(FALSE);
+            FillLabelVector(component, FALSE);
             m_CheckListId++;
           }
         }
@@ -481,7 +480,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void medVMELabeledVolume::FillLabelVector(int n, wxString name, bool checked)
+void medVMELabeledVolume::FillLabelVector(wxString name, bool checked)
 //----------------------------------------------------------------------------
 {
   m_LabelNameVector.push_back(name);
@@ -496,6 +495,19 @@ void medVMELabeledVolume::ModifyLabelVector(int n, wxString name, bool checked)
   {
     m_LabelNameVector[n] = name;
     m_CheckedVector[n] = checked;
+  }
+  else
+    return;
+}
+
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::RemoveItemLabelVector(int n)
+//----------------------------------------------------------------------------
+{
+  if (n < m_LabelNameVector.size() )
+  {
+    m_LabelNameVector.erase(m_LabelNameVector.begin() + n);
+    m_CheckedVector.erase(m_CheckedVector.begin() + n);
   }
   else
     return;
@@ -662,7 +674,7 @@ void medVMELabeledVolume::CreateSlicePipeline()
   int dimensions[3];
   if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
   {
-    vtkMAFSmartPointer<vtkStructuredPoints> sp = (vtkStructuredPoints*) m_Dataset;
+    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
     sp->GetDimensions( dimensions );
 
     // Compute the spacing values
@@ -682,7 +694,7 @@ void medVMELabeledVolume::CreateSlicePipeline()
   }
   else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
   {    
-    vtkMAFSmartPointer<vtkRectilinearGrid> rg = (vtkRectilinearGrid*) m_Dataset;
+    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
     rg->GetDimensions( dimensions ); 
 
     // Compute the spacing values
@@ -766,8 +778,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       case ID_REMOVE_LABEL:
       {
         m_LabelCheckBox->RemoveItem(m_ItemSelected);
-        m_LabelNameVector.erase(m_LabelNameVector.begin() + m_ItemSelected);
-        m_CheckedVector.erase(m_CheckedVector.begin() + m_ItemSelected);
+        RemoveItemLabelVector(m_ItemSelected);
         int noc = m_TagLabel->GetNumberOfComponents();
         for ( unsigned int w = 0; w < noc; w++ )
         {
@@ -1002,8 +1013,7 @@ void medVMELabeledVolume::UpdateLabel()
   if (m_EditMode == FALSE)
   {
     m_LabelCheckBox->AddItem(m_CheckListId, labelLine, TRUE); 
-    m_LabelNameVector.push_back(labelLine);
-    m_CheckedVector.push_back(TRUE);
+    FillLabelVector(labelLine, TRUE);
     m_CheckListId++;
     m_LabelCheckBox->Update();
     int nComp = m_TagLabel->GetNumberOfComponents();
