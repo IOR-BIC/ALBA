@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 08:03:05 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-11-08 08:35:20 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -274,7 +274,6 @@ void medVMELabeledVolume::GenerateLabeledVolume()
   std::vector<int> maxVector;
   std::vector<int> labelIntVector;
 
-
   int counter= 0;
   //Fill the vectors of range and label value
   for (int c = 0; c < m_CheckedVector.size(); c++)
@@ -450,7 +449,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
 
   m_Gui->Divider(2);	
   m_Gui->Update(); 
- 
+  
   return m_Gui;
 }
 
@@ -579,8 +578,8 @@ void medVMELabeledVolume::CreateOpDialog()
   h_sizer6->Add( text_max,    0, wxLEFT);	  
   h_sizer6->Add( m_MaxSlider, 1, wxEXPAND);  
 
-  mmgButton  * b_ok    = new mmgButton( m_Dlg, ID_OK, "ok", p, wxSize( 200, 20 ) );
-  mmgButton  * b_cancel= new mmgButton( m_Dlg, ID_CANCEL, "cancel", p, wxSize( 200, 20 ) );
+  mmgButton  * b_ok    = new mmgButton( m_Dlg, ID_OK, _("ok"), p, wxSize( 200, 20 ) );
+  mmgButton  * b_cancel= new mmgButton( m_Dlg, ID_CANCEL, _("cancel"), p, wxSize( 200, 20 ) );
   b_ok->SetValidator( mmgValidator( this, ID_OK, b_ok) );
   b_cancel->SetValidator( mmgValidator( this, ID_CANCEL, b_cancel) );
   wxBoxSizer *h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
@@ -855,7 +854,8 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       break;
       case ID_CANCEL:
         {
-          UpdateLabel();
+         // UpdateLabel();
+          GenerateLabeledVolume();
           m_Dlg->EndModal(wxID_CANCEL);
         }
         break;
@@ -897,7 +897,6 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       }
       break;
       default:
-       // this->ForwardUpEvent(*e);
          mafNode::OnEvent(maf_event);
       break; 
     }
