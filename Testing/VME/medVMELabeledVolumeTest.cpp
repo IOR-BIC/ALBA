@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMELabeledVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-30 15:42:11 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-11-08 13:25:02 $
+Version:   $Revision: 1.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -99,13 +99,12 @@ void medVMELabeledVolumeTest::TestVolumeCopy()
   labelScalars = recGrid->GetPointData()->GetScalars();
   labelScalars->Modified();
 
-  //Check if the medVMELabeledVolume without labels has the same scalars of the VME parent
+  //Check if the medVMELabeledVolume without labels has all the scalars setted to 0.
   int not = volumeScalars->GetNumberOfTuples();
   for ( int i = 0; i < not; i++ )
   {
-    double scalarValue = volumeScalars->GetComponent( i, 0 );
     double labelValue = labelScalars->GetComponent( i, 0 );
-    CPPUNIT_ASSERT(scalarValue == labelValue);
+    CPPUNIT_ASSERT(labelValue == 0);
   }
   
   mafDEL(labeled);
