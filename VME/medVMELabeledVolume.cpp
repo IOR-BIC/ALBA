@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 08:35:20 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-11-08 11:13:48 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -197,6 +197,28 @@ void medVMELabeledVolume::CopyDataset()
   RetrieveTag();
   m_DataCopied = TRUE;
 
+  //Set the scalar values  of the labeled volume to OUTRANGE_SCALAR
+  vtkDataArray *originalScalars;
+  if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+  {
+    vtkMAFSmartPointer<vtkStructuredPoints> sp = (vtkStructuredPoints*) m_Dataset;
+    originalScalars = sp->GetPointData()->GetScalars();  
+  }
+  else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
+  {    
+    vtkMAFSmartPointer<vtkRectilinearGrid> rg = (vtkRectilinearGrid*) m_Dataset;
+    originalScalars = rg->GetPointData()->GetScalars();  
+  }
+
+
+  int not = originalScalars->GetNumberOfTuples();
+  for ( int i = 0; i < not; i++ )
+  {
+    originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
+  }
+
+  originalScalars->Modified();
+
   mmaVolumeMaterial *volMaterial;
   mafNEW(volMaterial);
   volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
@@ -325,6 +347,11 @@ void medVMELabeledVolume::GenerateLabeledVolume()
   }
   else
   {
+    int not = volumeScalars->GetNumberOfTuples();
+    for ( int i = 0; i < not; i++ )
+    {
+      labelScalars->SetTuple1( i, OUTRANGE_SCALAR); 
+    }
     labelScalars->Modified();
     m_Dataset->GetPointData()->SetScalars(labelScalars);
     m_Dataset->Modified();
@@ -682,9 +709,9 @@ void medVMELabeledVolume::CreateSlicePipeline()
   m_Texture->SetLookupTable( m_LookUpTable );
 
   vtkPlaneSource * planeSource = vtkPlaneSource::New();
-  planeSource->SetOrigin( m_Bounds[1], m_Bounds[3], m_Slice );
-  planeSource->SetPoint1( m_Bounds[0], m_Bounds[3], m_Slice );
-  planeSource->SetPoint2( m_Bounds[1], m_Bounds[2], m_Slice );
+  planeSource->SetOrigin( m_Bounds[0], m_Bounds[3], m_Slice );
+  planeSource->SetPoint1( m_Bounds[1], m_Bounds[3], m_Slice );
+  planeSource->SetPoint2( m_Bounds[0], m_Bounds[2], m_Slice );
   
   float xCenter = ( m_Bounds[1] + m_Bounds[0] ) / 2.0;
   float yCenter = ( m_Bounds[3] + m_Bounds[2] ) / 2.0;
