@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 16:57:56 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-09 15:59:24 $
+  Version:   $Revision: 1.13 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -28,6 +28,7 @@
 #include "mmaVolumeMaterial.h"
 #include "mafNode.h"
 #include "mafTransform.h"
+#include "mafEventSource.h"
 #include "mmgButton.h"
 #include "mmgValidator.h"
 #include "mmgCheckListBox.h"
@@ -130,6 +131,22 @@ medVMELabeledVolume::~medVMELabeledVolume()
     DeleteOpDialog();
 }
 //-------------------------------------------------------------------------
+void medVMELabeledVolume::InternalUpdate()
+//-------------------------------------------------------------------------
+{ 
+  m_Link = mafVME::SafeDownCast(GetVolumeLink());
+  if (m_Link)
+  {
+    EnableWidgets(TRUE);
+  }
+  else
+  {
+    UpdateScalars();
+    EnableWidgets(FALSE);
+  }
+}
+
+//-------------------------------------------------------------------------
 int medVMELabeledVolume::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
 { 
@@ -189,49 +206,62 @@ void medVMELabeledVolume::CopyDataset()
 //-------------------------------------------------------------------------
 {
   m_Link = mafVME::SafeDownCast(GetVolumeLink());
-  vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
-  data->Update();
-  m_Dataset = data->NewInstance();
-  m_Dataset->DeepCopy(data);
-  ((mafDataPipeCustom *)GetDataPipe())->SetInput(m_Dataset); 
-  RetrieveTag();
-  m_DataCopied = TRUE;
-
-  //Set the scalar values  of the labeled volume to OUTRANGE_SCALAR
-  vtkDataArray *originalScalars;
-  if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+  if (m_Link)
   {
-    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
-    originalScalars = sp->GetPointData()->GetScalars();  
-  }
-  else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
-  {    
-    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
-    originalScalars = rg->GetPointData()->GetScalars();  
-  }
+    vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
+    data->Update();
+    m_Dataset = data->NewInstance();
+    m_Dataset->DeepCopy(data);
+    ((mafDataPipeCustom *)GetDataPipe())->SetInput(m_Dataset); 
+    RetrieveTag();
+    m_DataCopied = TRUE;
+
+    //Set the scalar values  of the labeled volume to OUTRANGE_SCALAR
+    vtkDataArray *originalScalars;
+    if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+    {
+      vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
+      originalScalars = sp->GetPointData()->GetScalars();  
+    }
+    else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
+    {    
+      vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
+      originalScalars = rg->GetPointData()->GetScalars();  
+    }
 
 
-  int not = originalScalars->GetNumberOfTuples();
-  for ( int i = 0; i < not; i++ )
-  {
-    originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
-  }
+    int not = originalScalars->GetNumberOfTuples();
+    for ( int i = 0; i < not; i++ )
+    {
+      originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
+    }
 
-  originalScalars->Modified();
+    originalScalars->Modified();
 
-  mmaVolumeMaterial *volMaterial;
-  mafNEW(volMaterial);
-  volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
-  volMaterial->UpdateFromTables();
-  mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
-  if  (labelMaterial)
-  {
-    ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial()->DeepCopy(volMaterial);
-  }
-  else
-  {
-    ((mafVMEOutputVolume *)this->GetOutput())->SetMaterial(volMaterial);
-    ((mafVMEOutputVolume *)this->GetOutput())->Update();
+    double scalarRange[2];
+    originalScalars->GetRange(scalarRange);
+
+    mmaVolumeMaterial *volMaterial;
+    mafNEW(volMaterial);
+    volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
+    volMaterial->UpdateFromTables();
+
+
+    mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
+    if  (labelMaterial)
+    {
+      ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial()->DeepCopy(volMaterial);
+      labelMaterial->m_ColorLut->SetTableRange(scalarRange);
+      labelMaterial->UpdateFromTables();
+    }
+    else
+    {
+      ((mafVMEOutputVolume *)this->GetOutput())->SetMaterial(volMaterial);
+      ((mafVMEOutputVolume *)this->GetOutput())->Update();
+      mmaVolumeMaterial *NewlabelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
+      NewlabelMaterial->m_ColorLut->SetTableRange(scalarRange);
+      NewlabelMaterial->UpdateFromTables();
+    }
   }
 }
 
@@ -261,10 +291,38 @@ void medVMELabeledVolume::UpdateScalars()
 //-------------------------------------------------------------------------
 {
   m_Link = mafVME::SafeDownCast(GetVolumeLink());
-  vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
-  data->Update();
-  m_Dataset->GetPointData()->GetScalars()->DeepCopy(data->GetPointData()->GetScalars());
-  m_Dataset->GetPointData()->GetScalars()->Modified();
+  if (m_Link)
+  {
+    EnableWidgets();
+    vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
+    data->Update();
+    m_Dataset->GetPointData()->GetScalars()->DeepCopy(data->GetPointData()->GetScalars());
+    m_Dataset->GetPointData()->GetScalars()->Modified();
+  }
+  else
+  {
+    //Set the scalar values of the labeled volume to OUTRANGE_SCALAR
+    vtkDataArray *originalScalars;
+
+    if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+    {
+      vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
+      originalScalars = sp->GetPointData()->GetScalars();  
+    }
+    else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
+    {    
+      vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
+      originalScalars = rg->GetPointData()->GetScalars();  
+    }
+
+
+    int not = originalScalars->GetNumberOfTuples();
+    for ( int i = 0; i < not; i++ )
+    {
+      originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
+    }
+
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -273,100 +331,103 @@ void medVMELabeledVolume::GenerateLabeledVolume()
 {
   UpdateScalars();
 
-  vtkDataArray *labelScalars;
-  vtkDataArray *volumeScalars;
-
-  if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
+  if (m_Link)
   {
-    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
-    labelScalars = sp->GetPointData()->GetScalars();
-    volumeScalars = sp->GetPointData()->GetScalars();  
-  }
-  else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
-  {    
-    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
-    labelScalars = rg->GetPointData()->GetScalars();
-    volumeScalars = rg->GetPointData()->GetScalars();  
-  }
-  int numberC = m_TagLabel->GetNumberOfComponents();
-  bool lastComponent = FALSE;
-  int numberChecked = 0;
+    vtkDataArray *labelScalars;
+    vtkDataArray *volumeScalars;
 
-  std::vector<int> minVector;
-  std::vector<int> maxVector;
-  std::vector<int> labelIntVector;
-
-  int counter= 0;
-  //Fill the vectors of range and label value
-  for (int c = 0; c < m_CheckedVector.size(); c++)
-  {
-    if (m_CheckedVector.at(c))
+    if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
     {
-      wxString label = m_LabelNameVector.at(c);
-      wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-      mafString labelName = tkz.GetNextToken().c_str();
-      mafString labelIntStr = tkz.GetNextToken().c_str();
-      m_LabelIntValue = atoi(labelIntStr);
-      labelIntVector.push_back(m_LabelIntValue);
-      mafString minStr = tkz.GetNextToken().c_str();
-      m_MinValue = atof(minStr);
-      minVector.push_back(m_MinValue);
-      mafString maxStr = tkz.GetNextToken().c_str();
-      m_MaxValue = atof(maxStr);
-      maxVector.push_back(m_MaxValue);
-      counter++;
+      vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
+      labelScalars = sp->GetPointData()->GetScalars();
+      volumeScalars = sp->GetPointData()->GetScalars();  
     }
-  }
-  
-  int labelVlaue;
-  if (counter != 0)
-  {
-    int not = volumeScalars->GetNumberOfTuples();
-    for ( int i = 0; i < not; i++ )
+    else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
+    {    
+      vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
+      labelScalars = rg->GetPointData()->GetScalars();
+      volumeScalars = rg->GetPointData()->GetScalars();  
+    }
+    int numberC = m_TagLabel->GetNumberOfComponents();
+    bool lastComponent = FALSE;
+    int numberChecked = 0;
+
+    std::vector<int> minVector;
+    std::vector<int> maxVector;
+    std::vector<int> labelIntVector;
+
+    int counter= 0;
+    //Fill the vectors of range and label value
+    for (int c = 0; c < m_CheckedVector.size(); c++)
     {
-      bool modified = FALSE;
-      double scalarValue = volumeScalars->GetComponent( i, 0 );
-      for (int c = 0; c < labelIntVector.size(); c++)
+      if (m_CheckedVector.at(c))
       {
-        if ( scalarValue >= minVector.at(c) && scalarValue <= maxVector.at(c))
-        { 
-          labelVlaue = labelIntVector.at(c);
-          labelScalars->SetTuple1( i, labelVlaue ); 
-          modified = TRUE;
-        }
-      }
-      if (!modified)
-      {
-        labelScalars->SetTuple1( i, OUTRANGE_SCALAR); 
+        wxString label = m_LabelNameVector.at(c);
+        wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
+        mafString labelName = tkz.GetNextToken().c_str();
+        mafString labelIntStr = tkz.GetNextToken().c_str();
+        m_LabelIntValue = atoi(labelIntStr);
+        labelIntVector.push_back(m_LabelIntValue);
+        mafString minStr = tkz.GetNextToken().c_str();
+        m_MinValue = atof(minStr);
+        minVector.push_back(m_MinValue);
+        mafString maxStr = tkz.GetNextToken().c_str();
+        m_MaxValue = atof(maxStr);
+        maxVector.push_back(m_MaxValue);
+        counter++;
       }
     }
     
-    labelScalars->Modified();
-    m_Dataset->GetPointData()->SetScalars(labelScalars);
-    m_Dataset->Modified();
-  }
-  else
-  {
-    int not = volumeScalars->GetNumberOfTuples();
-    for ( int i = 0; i < not; i++ )
+    int labelVlaue;
+    if (counter != 0)
     {
-      labelScalars->SetTuple1( i, OUTRANGE_SCALAR); 
+      int not = volumeScalars->GetNumberOfTuples();
+      for ( int i = 0; i < not; i++ )
+      {
+        bool modified = FALSE;
+        double scalarValue = volumeScalars->GetComponent( i, 0 );
+        for (int c = 0; c < labelIntVector.size(); c++)
+        {
+          if ( scalarValue >= minVector.at(c) && scalarValue <= maxVector.at(c))
+          { 
+            labelVlaue = labelIntVector.at(c);
+            labelScalars->SetTuple1( i, labelVlaue ); 
+            modified = TRUE;
+          }
+        }
+        if (!modified)
+        {
+          labelScalars->SetTuple1( i, OUTRANGE_SCALAR); 
+        }
+      }
+      
+      labelScalars->Modified();
+      m_Dataset->GetPointData()->SetScalars(labelScalars);
+      m_Dataset->Modified();
     }
-    labelScalars->Modified();
-    m_Dataset->GetPointData()->SetScalars(labelScalars);
-    m_Dataset->Modified();
+    else
+    {
+      int not = volumeScalars->GetNumberOfTuples();
+      for ( int i = 0; i < not; i++ )
+      {
+        labelScalars->SetTuple1( i, OUTRANGE_SCALAR); 
+      }
+      labelScalars->Modified();
+      m_Dataset->GetPointData()->SetScalars(labelScalars);
+      m_Dataset->Modified();
+    }
+
+    double scalarRange[2];
+    labelScalars->GetRange(scalarRange);
+
+    mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
+    labelMaterial->m_ColorLut->SetTableRange(scalarRange);
+
+    labelMaterial->UpdateFromTables();
+
+    mafEvent e(this,CAMERA_UPDATE);
+    ForwardUpEvent(&e);
   }
-
-  double scalarRange[2];
-  labelScalars->GetRange(scalarRange);
-
-  mmaVolumeMaterial *volMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
-  volMaterial->m_ColorLut->SetTableRange(scalarRange);
-
-  volMaterial->UpdateFromTables();
-
-  mafEvent e(this,CAMERA_UPDATE);
-  ForwardUpEvent(&e);  
 }
 
 //-----------------------------------------------------------------------
@@ -428,9 +489,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
   m_Gui->Button(ID_INSERT_LABEL, _("Add label"), "", _("Add a label"));
   m_Gui->Button(ID_REMOVE_LABEL, _("Remove label"), "", _("Remove a label"));
   m_Gui->Button(ID_EDIT_LABEL, _("Edit label"), "", _("Edit a label"));
-
-  m_Gui->Enable(ID_REMOVE_LABEL, FALSE );
-  m_Gui->Enable( ID_EDIT_LABEL, FALSE );
+  EnableWidgets(TRUE);
 
   m_Gui->Divider(2);  
   m_LabelCheckBox = m_Gui->CheckList(ID_LABELS,_("Labels"),360,_("Chose label to visualize"));
@@ -440,9 +499,9 @@ mmgGui* medVMELabeledVolume::CreateGui()
   LIST::iterator myListIter;   
 
   // If there already is a tag named "LABELS" then I have to load the old labels in the correct position in the listbox
-  if( m_TagLabel )
+  int noc = m_TagLabel->GetNumberOfComponents();
+  if(noc != 0 && m_Link)
   {
-    int noc = m_TagLabel->GetNumberOfComponents();
     for ( unsigned int i = 0; i < noc; i++ )
     {
       wxString label = m_TagLabel->GetValue( i );
@@ -469,10 +528,12 @@ mmgGui* medVMELabeledVolume::CreateGui()
         }
       }  
     }
-    m_Gui->Enable(ID_REMOVE_LABEL, TRUE );
-    m_Gui->Enable( ID_EDIT_LABEL, TRUE );
-  }   
-
+  }
+  if (!m_Link)
+  {
+    EnableWidgets(FALSE);
+  }
+    
   m_Gui->Divider(2);	
   m_Gui->Update(); 
   
@@ -569,8 +630,6 @@ void medVMELabeledVolume::CreateOpDialog()
   mmgButton  * bFit   = new mmgButton(m_Dlg,ID_FIT, "reset camera", p, wxSize(80,20));  
 
   // other controls validator  
-  double min = 0;
-  double max = 1000;
   m_LabelValueCtrl->SetValidator( mmgValidator( this, ID_D_LABEL_VALUE, m_LabelValueCtrl, &m_LabelIntValue, m_MinMin, m_MaxMax ) );
   bFit->SetValidator(mmgValidator(this,ID_FIT,bFit));  
 
@@ -755,24 +814,26 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       case ID_INSERT_LABEL:
       {     
         UpdateScalars();
-        m_EditMode = FALSE;
-        double sr[2];
-        m_Dataset->GetScalarRange(sr);
-        m_MinAbsolute = sr[0]; 
-        m_MaxAbsolute = sr[1]; 
+        if (m_Link)
+        {
+          m_EditMode = FALSE;
+          double sr[2];
+          m_Dataset->GetScalarRange(sr);
+          m_MinAbsolute = sr[0]; 
+          m_MaxAbsolute = sr[1]; 
 
-        // To initialize slider values
-        m_MinMin = m_MinAbsolute;
-        m_MinMax = m_MaxAbsolute;
-        m_Min = ( m_MinMin + m_MinMax ) * 0.5;
-        m_MaxMin = m_MinAbsolute;  
-        m_MaxMax = m_MaxAbsolute;
-        m_Max = ( m_MaxMin + m_MaxMax ) * 0.5;
-        m_LabelNameValue = wxEmptyString;
-        m_LabelIntValue = 1;
-        CreateOpDialog();
-        
-        m_Dlg->ShowModal();      
+          // To initialize slider values
+          m_MinMin = m_MinAbsolute;
+          m_MinMax = m_MaxAbsolute;
+          m_Min = ( m_MinMin + m_MinMax ) * 0.5;
+          m_MaxMin = m_MinAbsolute;  
+          m_MaxMax = m_MaxAbsolute;
+          m_Max = ( m_MaxMin + m_MaxMax ) * 0.5;
+          m_LabelNameValue = wxEmptyString;
+          m_LabelIntValue = 1;
+          CreateOpDialog();
+          m_Dlg->ShowModal();      
+        }
       }
       break;
       case ID_REMOVE_LABEL:
@@ -788,39 +849,56 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
             RemoveLabelTag(w);
           }
         }
+        EnableWidgets();
         GenerateLabeledVolume();
       }
       break;
       case ID_EDIT_LABEL:
       {
-        m_EditMode = TRUE;
-        wxString componentName;
-        int noc = m_TagLabel->GetNumberOfComponents();
-        for ( unsigned int w = 0; w < noc; w++ )
+        if (m_Link)
         {
-          componentName = m_TagLabel->GetValue( w );
-          if ( m_ItemLabel == componentName )
+          m_EditMode = TRUE;
+          wxString componentName;
+          int noc = m_TagLabel->GetNumberOfComponents();
+          for ( unsigned int w = 0; w < noc; w++ )
           {
-            wxStringTokenizer tkz(componentName,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
-            mafString labelName = tkz.GetNextToken().c_str();
-            mafString labelIntStr = tkz.GetNextToken().c_str();
-            int labelValue = atof(labelIntStr);
-            mafString minStr = tkz.GetNextToken().c_str();
-            double min = atof(minStr);
-            mafString maxStr = tkz.GetNextToken().c_str();
-            double max = atof(maxStr);
+            componentName = m_TagLabel->GetValue( w );
+            if ( m_ItemLabel == componentName )
+            {
+              wxStringTokenizer tkz(componentName,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
+              mafString labelName = tkz.GetNextToken().c_str();
+              mafString labelIntStr = tkz.GetNextToken().c_str();
+              int labelValue = atof(labelIntStr);
+              mafString minStr = tkz.GetNextToken().c_str();
+              double min = atof(minStr);
+              mafString maxStr = tkz.GetNextToken().c_str();
+              double max = atof(maxStr);
 
-       
-            m_LabelNameValue = labelName;
-            m_LabelValueValue = labelIntStr;
-            m_LabelIntValue = labelValue;
-            m_Min = min;
-            m_Max = max;
-            CreateOpDialog();
-            m_Dlg->ShowModal();  
-            break;
+              UpdateScalars();
+              double sr[2];
+              m_Dataset->GetScalarRange(sr);
+              m_MinAbsolute = sr[0]; 
+              m_MaxAbsolute = sr[1]; 
+
+              // To initialize slider values
+              m_MinMin = m_MinAbsolute;
+              m_MinMax = m_MaxAbsolute;
+              m_MaxMin = m_MinAbsolute;  
+              m_MaxMax = m_MaxAbsolute;
+         
+              m_LabelNameValue = labelName;
+              m_LabelValueValue = labelIntStr;
+              m_LabelIntValue = labelValue;
+              m_Min = min;
+              m_Max = max;
+              CreateOpDialog();
+              m_Dlg->ShowModal();  
+
+            }        
           }
-        }   
+        }  
+        else
+          break;
       }
       break;
       case ID_LABELS:
@@ -888,6 +966,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       }      
       break;
       case ID_OK:
+        EnableWidgets();
         UpdateLabel();
       break;
       case ID_CANCEL:
@@ -934,9 +1013,6 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
         vtkDataArray *scalars = vol->GetPointData()->GetScalars();
       }
       break;
-      default:
-         mafNode::OnEvent(maf_event);
-      break; 
     }
   }
   else
@@ -1022,6 +1098,8 @@ void medVMELabeledVolume::UpdateLabel()
   else
   {
     m_LabelCheckBox->SetItemLabel(m_ItemSelected, labelLine);
+    m_LabelCheckBox->CheckItem(m_ItemSelected, TRUE);
+    ModifyLabelVector(m_ItemSelected, labelLine, TRUE);
     m_LabelCheckBox->Update();
 
     int noc = m_TagLabel->GetNumberOfComponents();
@@ -1116,6 +1194,31 @@ void medVMELabeledVolume::UpdateLookUpTable()
   m_Rwi->m_RwiBase->Render(); 
 }  
 
+//----------------------------------------------------------------------------
+void medVMELabeledVolume::EnableWidgets(bool enable)
+//----------------------------------------------------------------------------
+{
+  if (m_Gui)
+  {
+    if (enable == FALSE)
+    {
+      m_Gui->Enable(ID_INSERT_LABEL,enable);
+      m_Gui->Enable(ID_REMOVE_LABEL,enable);
+      m_Gui->Enable(ID_EDIT_LABEL,enable);
+    }
+    else
+    {
+      bool labelPresent = FALSE;
+      int noc = m_TagLabel->GetNumberOfComponents();
+      if (noc != 0)
+        labelPresent = TRUE;
+       m_Gui->Enable(ID_INSERT_LABEL,enable);
+       m_Gui->Enable(ID_REMOVE_LABEL,labelPresent);
+       m_Gui->Enable(ID_EDIT_LABEL,labelPresent);
+    }
+    m_Gui->Update();
+  }
+}
 //-------------------------------------------------------------------------
 char** medVMELabeledVolume::GetIcon() 
 //-------------------------------------------------------------------------

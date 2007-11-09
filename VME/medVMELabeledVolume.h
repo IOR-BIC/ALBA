@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 16:57:56 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-11-09 15:59:24 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -206,6 +206,9 @@ protected:
   /** If lables tags are present retrieve them. */
   void RetrieveTag();
 
+  /** update the output data structure */
+  virtual void InternalUpdate();
+
   void CopyDataset();
 
   /** Updates the tags and the items of the checkBox and call the InternalPreUpadate. */
@@ -222,6 +225,9 @@ protected:
   /** 
   Remove operation's interface. */
   void DeleteOpDialog();
+
+  /** Enable/disable VME widgets.*/
+  void EnableWidgets(bool enable = true);
 
   /** 
   Create the pipeline to generate the slice of the volume. */
