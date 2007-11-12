@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-09 15:59:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-11-12 11:12:33 $
+  Version:   $Revision: 1.14 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -321,7 +321,8 @@ void medVMELabeledVolume::UpdateScalars()
     {
       originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
     }
-
+    m_Dataset->GetPointData()->SetScalars(originalScalars);
+    m_Dataset->Modified();
   }
 }
 
@@ -893,7 +894,6 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
               m_Max = max;
               CreateOpDialog();
               m_Dlg->ShowModal();  
-
             }        
           }
         }  
