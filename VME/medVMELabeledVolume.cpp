@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-12 11:12:33 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-11-13 08:31:35 $
+  Version:   $Revision: 1.15 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -126,24 +126,14 @@ medVMELabeledVolume::~medVMELabeledVolume()
   m_Link = NULL;
   m_CheckedVector.clear();
   m_LabelNameVector.clear();
+
+  if (mafNode *node = GetVolumeLink())
+  {
+    node->GetEventSource()->RemoveObserver(this);
+  }
   
   if ( m_Dlg )
     DeleteOpDialog();
-}
-//-------------------------------------------------------------------------
-void medVMELabeledVolume::InternalUpdate()
-//-------------------------------------------------------------------------
-{ 
-  m_Link = mafVME::SafeDownCast(GetVolumeLink());
-  if (m_Link)
-  {
-    EnableWidgets(TRUE);
-  }
-  else
-  {
-    UpdateScalars();
-    EnableWidgets(FALSE);
-  }
 }
 
 //-------------------------------------------------------------------------
@@ -198,9 +188,28 @@ void medVMELabeledVolume::SetVolumeLink(mafNode *n)
 {
   SetLink("VolumeLink", n);
   CopyDataset();
+  n->GetEventSource()->AddObserver(this);
   Modified();
 }
 
+//-------------------------------------------------------------------------
+void medVMELabeledVolume::InternalPreUpdate()
+//-------------------------------------------------------------------------
+{
+  m_Link = mafVME::SafeDownCast(GetVolumeLink());
+  if (!m_Link)
+  {
+    EnableWidgets(FALSE);
+    return;
+  }
+
+  EnableWidgets(TRUE);
+  if ( m_DataCopied == FALSE)
+  {
+    CopyDataset();
+  }
+ 
+}
 //-------------------------------------------------------------------------
 void medVMELabeledVolume::CopyDataset()
 //-------------------------------------------------------------------------
@@ -229,7 +238,6 @@ void medVMELabeledVolume::CopyDataset()
       originalScalars = rg->GetPointData()->GetScalars();  
     }
 
-
     int not = originalScalars->GetNumberOfTuples();
     for ( int i = 0; i < not; i++ )
     {
@@ -237,7 +245,6 @@ void medVMELabeledVolume::CopyDataset()
     }
 
     originalScalars->Modified();
-
     double scalarRange[2];
     originalScalars->GetRange(scalarRange);
 
@@ -245,7 +252,6 @@ void medVMELabeledVolume::CopyDataset()
     mafNEW(volMaterial);
     volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
     volMaterial->UpdateFromTables();
-
 
     mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
     if  (labelMaterial)
@@ -321,6 +327,7 @@ void medVMELabeledVolume::UpdateScalars()
     {
       originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
     }
+    originalScalars->Modified();
     m_Dataset->GetPointData()->SetScalars(originalScalars);
     m_Dataset->Modified();
   }
@@ -423,7 +430,6 @@ void medVMELabeledVolume::GenerateLabeledVolume()
 
     mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
     labelMaterial->m_ColorLut->SetTableRange(scalarRange);
-
     labelMaterial->UpdateFromTables();
 
     mafEvent e(this,CAMERA_UPDATE);
@@ -478,10 +484,7 @@ int medVMELabeledVolume::InternalRestore(mafStorageElement *node)
 mmgGui* medVMELabeledVolume::CreateGui()
 //----------------------------------------------------------------------------
 {
-  if ( m_DataCopied == FALSE)
-  {
-    CopyDataset();
-  }
+ 
   // GUI
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this); 
@@ -490,7 +493,10 @@ mmgGui* medVMELabeledVolume::CreateGui()
   m_Gui->Button(ID_INSERT_LABEL, _("Add label"), "", _("Add a label"));
   m_Gui->Button(ID_REMOVE_LABEL, _("Remove label"), "", _("Remove a label"));
   m_Gui->Button(ID_EDIT_LABEL, _("Edit label"), "", _("Edit a label"));
-  EnableWidgets(TRUE);
+  if (m_Link)
+  {
+    EnableWidgets(TRUE);
+  }
 
   m_Gui->Divider(2);  
   m_LabelCheckBox = m_Gui->CheckList(ID_LABELS,_("Labels"),360,_("Chose label to visualize"));
@@ -500,39 +506,39 @@ mmgGui* medVMELabeledVolume::CreateGui()
   LIST::iterator myListIter;   
 
   // If there already is a tag named "LABELS" then I have to load the old labels in the correct position in the listbox
-  int noc = m_TagLabel->GetNumberOfComponents();
-  if(noc != 0 && m_Link)
-  {
-    for ( unsigned int i = 0; i < noc; i++ )
-    {
-      wxString label = m_TagLabel->GetValue( i );
-      if ( label != "" )
-      {
-        myList.push_back( label );
-      }
-    }     
 
-    for( myListIter = myList.begin(); myListIter != myList.end(); myListIter++ )
-    {
-      for ( unsigned int j = 0; j < noc; j++ )
-      {
-        wxString component = m_TagLabel->GetValue( j );
-        if ( component != "" )
-        {
-           wxString labelName = *myListIter;
-          if ( component == labelName )
-          {
-            m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
-            FillLabelVector(component, FALSE);
-            m_CheckListId++;
-          }
-        }
-      }  
-    }
-  }
-  if (!m_Link)
+  if (m_Link)
   {
-    EnableWidgets(FALSE);
+    int noc = m_TagLabel->GetNumberOfComponents();
+    if(noc != 0)
+    {
+      for ( unsigned int i = 0; i < noc; i++ )
+      {
+        wxString label = m_TagLabel->GetValue( i );
+        if ( label != "" )
+        {
+          myList.push_back( label );
+        }
+      }     
+
+      for( myListIter = myList.begin(); myListIter != myList.end(); myListIter++ )
+      {
+        for ( unsigned int j = 0; j < noc; j++ )
+        {
+          wxString component = m_TagLabel->GetValue( j );
+          if ( component != "" )
+          {
+            wxString labelName = *myListIter;
+            if ( component == labelName )
+            {
+              m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
+              FillLabelVector(component, FALSE);
+              m_CheckListId++;
+            }
+          }
+        }  
+      }
+    }
   }
     
   m_Gui->Divider(2);	
@@ -1013,12 +1019,20 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
         vtkDataArray *scalars = vol->GetPointData()->GetScalars();
       }
       break;
+      default:
+        mafNode::OnEvent(maf_event);
     }
   }
-  else
+   else
   {
     Superclass::OnEvent(maf_event);
   }
+  
+  if (maf_event->GetId() == NODE_DESTROYED)
+    {
+      EnableWidgets(FALSE);
+      UpdateScalars();
+    }
 }
 //----------------------------------------------------------------------------
 void medVMELabeledVolume::UpdateLabel()
@@ -1200,7 +1214,7 @@ void medVMELabeledVolume::EnableWidgets(bool enable)
 {
   if (m_Gui)
   {
-    if (enable == FALSE)
+    if (enable == FALSE || !m_Link)
     {
       m_Gui->Enable(ID_INSERT_LABEL,enable);
       m_Gui->Enable(ID_REMOVE_LABEL,enable);

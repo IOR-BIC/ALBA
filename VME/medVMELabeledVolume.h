@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-09 15:59:24 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-11-13 08:31:35 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -206,13 +206,15 @@ protected:
   /** If lables tags are present retrieve them. */
   void RetrieveTag();
 
-  /** update the output data structure */
-  virtual void InternalUpdate();
-
   void CopyDataset();
 
   /** Updates the tags and the items of the checkBox and call the InternalPreUpadate. */
   void UpdateLabel();
+
+
+  /** update the output data structure */
+  void InternalPreUpdate();
+
 
   /** 
   Copy the scalars of the VME linked. */
