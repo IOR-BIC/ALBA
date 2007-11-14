@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:24:47 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-11-14 14:03:19 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -176,6 +176,12 @@ void mafVMEManager::RemoveTempDirectory()
 void mafVMEManager::MSFNew(bool notify_root_creation)
 //----------------------------------------------------------------------------
 {
+  if (m_Storage)
+  {
+    m_Storage->GetRoot()->CleanTree();
+    mafEventMacro(mafEvent(this,CLEAR_UNDO_STACK));
+  }
+
   RemoveTempDirectory();
 
   m_Modified = false;
