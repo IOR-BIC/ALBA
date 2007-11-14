@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 11:48:51 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-11-14 10:12:31 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,6 @@ mafPipe::mafPipe()
   m_Gui           = NULL;
   m_Listener      = NULL;
 	m_Selected = false;
-  m_EditingVME = false;
 }
 //----------------------------------------------------------------------------
 void mafPipe::Create(mafSceneNode *n)
