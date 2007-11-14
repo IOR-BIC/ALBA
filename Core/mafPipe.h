@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 11:48:22 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-11-14 10:13:09 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,15 +74,6 @@ public:
   /** destroy the Gui */
   void DeleteGui();
 
-  /** Return true if the editing visual pipe is active otherwise false is returned.*/
-  bool IsEditingActive() {return m_EditingVME;};
-
-  /** Turn On the editing visual pipe code.*/
-  void EditingVisualPipeOn() {m_EditingVME = true;};
-
-  /** Turn Off the editing visual pipe code.*/
-  void EditingVisualPipeOff() {m_EditingVME = false;};
-
   mmgGui         *m_Gui;      ///< User Interface
   mafVME         *m_Vme;      ///< VME used as input for the visual pipe
 	vtkMAFAssembly *m_AssemblyFront; ///< Assembly used to contain the actor in the front layer
@@ -103,7 +94,5 @@ protected:
   virtual mmgGui  *CreateGui();
 
   mafObserver *m_Listener;
-
-  bool         m_EditingVME; ///< Flag to indicate if is active the editing visual pipe for the VME
 };
 #endif
