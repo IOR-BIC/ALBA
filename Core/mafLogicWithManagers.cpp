@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:34:37 $
-  Version:   $Revision: 1.118 $
+  Date:      $Date: 2007-11-14 10:04:52 $
+  Version:   $Revision: 1.119 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -635,15 +635,8 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VME_VISUAL_MODE_CHANGED:
       {
         mafVME *vme = (mafVME *)e->GetVme();
-        if (vme->GetEditingVisualPipe().IsEmpty())
-        {
-          VmeUpdateProperties(vme,false);
-        }
-        else
-        {
-          VmeShow(vme, false);
-          VmeShow(vme, true);
-        }
+        VmeShow(vme, false);
+        VmeShow(vme, true);
       }
       break;
       case UPDATE_PROPERTY:
