@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 09:10:23 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-11-14 09:58:21 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,7 @@
 #include "vtkGlyph3D.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkActor.h"
+
 #include "vtkLineSource.h"
 #include "vtkCellCenters.h"
 #include "vtkCellData.h"
@@ -78,6 +79,10 @@ mafPipeSurface::mafPipeSurface()
 	m_NormalActor					= NULL;
 	m_CenterPointsFilter	= NULL;
 	m_NormalArrow					= NULL;
+
+  m_EdgesActor          = NULL;
+  m_EdgesMapper         = NULL;
+  m_ExtractEdges        = NULL;
 
   m_ScalarVisibility = 0;
 	m_NormalVisibility = 0;
@@ -133,6 +138,7 @@ void mafPipeSurface::Create(mafSceneNode *n)
   m_Mapper->SetScalarRange(sr);
 
   vtkNEW(m_Actor);
+
 	m_Actor->SetMapper(m_Mapper);
   m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
@@ -179,12 +185,7 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
 	
-	/*vtkNEW(m_Normal);
-	m_Normal->SetInput(data);
-	m_Normal->ComputeCellNormalsOn();
-	m_Normal->ComputePointNormalsOff();
-	m_Normal->Update();*/
-
+	
 	if(data->GetCellData()->GetNormals())
 	{
 		CreateNormalsPipe();
@@ -318,24 +319,6 @@ void mafPipeSurface::Select(bool sel)
 void mafPipeSurface::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-  if (IsEditingActive())
-  {
-    // check if you have to turn off the editing visual pipe for the VME.
-    if (m_Vme->GetVisualMode() == mafVME::DEFAULT_VISUAL_MODE)
-    {
-      EditingVisualPipeOff();
-      // Here goes default visual pipe stuff update
-    }
-  }
-  else
-  {
-    // check if you have to activate the editing visual pipe for the VME.
-    if (m_Vme->GetVisualMode() == mafVME::EDIT_VISUAL_MODE)
-    {
-      EditingVisualPipeOn();
-      // Here goes visual pipe stuff create/update
-    }
-  }
 }
 //----------------------------------------------------------------------------
 mmgGui *mafPipeSurface::CreateGui()
