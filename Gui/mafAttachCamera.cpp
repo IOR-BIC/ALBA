@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 15:29:18 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-14 14:05:05 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,8 +115,9 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
     switch(maf_event->GetId())
     {
       case NODE_DETACHED_FROM_TREE:
-        SetVme(NULL);
-        //m_AttachedVme = NULL;
+      case NODE_DESTROYED:
+        vtkDEL(m_AttachedVmeMatrix);
+        m_AttachedVme = NULL;
         m_CameraAttach = 0;
         m_Gui->Update();
       break;
