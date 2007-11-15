@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-15 15:01:23 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-11-15 15:10:37 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -119,7 +119,7 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
         SetVme(NULL);
         // the code row above remove this class from the observer list
         // so after removing it we should skip the cycle on the list because 
-        // it is ahortened and may couse application crash.
+        // it is shortened and may cause application crash.
         maf_event->SetSkipFlag(true);
         m_CameraAttach = 0;
         m_Gui->Update();
