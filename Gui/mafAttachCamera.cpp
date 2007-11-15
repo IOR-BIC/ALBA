@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 14:05:05 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-11-15 15:01:23 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,8 +116,11 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
     {
       case NODE_DETACHED_FROM_TREE:
       case NODE_DESTROYED:
-        vtkDEL(m_AttachedVmeMatrix);
-        m_AttachedVme = NULL;
+        SetVme(NULL);
+        // the code row above remove this class from the observer list
+        // so after removing it we should skip the cycle on the list because 
+        // it is ahortened and may couse application crash.
+        maf_event->SetSkipFlag(true);
         m_CameraAttach = 0;
         m_Gui->Update();
       break;
@@ -173,7 +176,7 @@ void mafAttachCamera::SetStartingMatrix(mafMatrix *matrix)
 void mafAttachCamera::UpdateCameraMatrix()
 //----------------------------------------------------------------------------
 {
-  if (m_AttachedVme == NULL)
+  if (m_CameraAttach == 0)
   {
     return;
   }
