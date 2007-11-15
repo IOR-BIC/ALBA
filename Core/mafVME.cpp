@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 10:15:37 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2007-11-15 10:41:54 $
+  Version:   $Revision: 1.45 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -672,8 +672,7 @@ void mafVME::Update()
   if (GetDataPipe())
     GetDataPipe()->Update();
 
-  int vm = IsDataAvailable() ? DEFAULT_VISUAL_MODE : NO_DATA_VISUAL_MODE;
-  SetVisualMode(vm);
+  m_VisualMode = IsDataAvailable() ? DEFAULT_VISUAL_MODE : NO_DATA_VISUAL_MODE;
 }
 
 //-------------------------------------------------------------------------
