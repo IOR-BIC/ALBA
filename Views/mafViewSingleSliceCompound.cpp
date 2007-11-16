@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-11-16 10:57:59 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,7 @@
 
 #include "vtkLookupTable.h"
 #include "vtkDataSet.h"
+#include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
 // constants:
@@ -154,7 +155,7 @@ void mafViewSingleSliceCompound::PackageView()
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
 	m_ViewSingleSlice->PlugVisualPipe("mafVMEMesh","mafPipeMeshSlice");
   m_ViewSingleSlice->PlugVisualPipe("mafVMEMeter","mafPipePolylineSlice");
-	
+
 	PlugChildView(m_ViewSingleSlice);
 }
 //----------------------------------------------------------------------------
@@ -167,7 +168,7 @@ void mafViewSingleSliceCompound::VmeShow(mafNode *node, bool show)
 	if(GetSceneGraph()->GetSelectedVme()==node)
 	{
 		//UpdateWindowing(show,node);
-		UpdateWindowing(((mafVME *)node)->GetOutput()->IsA("mafVMEOutpuVolume") && show && (GetSceneGraph()->GetSelectedVme() == node),node);
+		UpdateWindowing(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") && show && (GetSceneGraph()->GetSelectedVme() == node),node);
 	}
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
