@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 12:53:30 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-11-16 10:26:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,6 +67,7 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 	vtkNEW(m_PointsSplined);
 
 	m_SplineCoefficient = 20;
+  m_OrderByAxisMode   = AXIS_NONE;
 
 	DependsOnLinkedNodeOn();
 }
@@ -83,33 +84,45 @@ mafVMEPolylineSpline::~mafVMEPolylineSpline()
 int mafVMEPolylineSpline::DeepCopy(mafNode *a)
 //-------------------------------------------------------------------------
 { 
-  /*if (Superclass::DeepCopy(a)==MAF_OK)
+  if (Superclass::DeepCopy(a)==MAF_OK)
   {
-    mafVMEPolylineSpline *vme_slicer=mafVMEPolylineSpline::SafeDownCast(a);
-    m_Transform->SetMatrix(vme_slicer->m_Transform->GetMatrix());
+    mafVMEPolylineSpline *splinePolyline = mafVMEPolylineSpline::SafeDownCast(a);
+    mafNode *linked_node = splinePolyline->GetPolylineLink();
+    if (linked_node)
+    {
+      this->SetPolylineLink(linked_node);
+    }
+    
+    m_Transform->SetMatrix(splinePolyline->m_Transform->GetMatrix());
+
     mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
     if (dpipe)
     {
-      dpipe->SetDependOnAbsPose(true);
-      dpipe->SetInput(m_BackTransform->GetOutput());
-      dpipe->SetNthInput(1,m_PSlicer->GetTexture());
+      dpipe->SetInput(m_Polyline);
+      m_Polyline->Update();
     }
-    GetMaterial()->SetMaterialTexture(m_PSlicer->GetTexture());
+    m_SplineCoefficient = splinePolyline->m_SplineCoefficient;
+    m_OrderByAxisMode = splinePolyline->m_OrderByAxisMode;
+
     return MAF_OK;
-  }
-  return MAF_ERROR;*/
-	return MAF_OK;
+  }  
+  return MAF_ERROR;
 }
 
 //-------------------------------------------------------------------------
 bool mafVMEPolylineSpline::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  /*if (Superclass::Equals(vme))
+  bool ret = false;
+  if (Superclass::Equals(vme))
   {
-    return m_Transform->GetMatrix()==((mafVMEPolylineSpline *)vme)->m_Transform->GetMatrix();
-  }*/
-  return false;
+    ret = m_Transform->GetMatrix() == ((mafVMEPolylineSpline *)vme)->m_Transform->GetMatrix() && \
+          GetPolylineLink() == ((mafVMEPolylineSpline *)vme)->GetPolylineLink() && \
+          m_OrderByAxisMode == ((mafVMEPolylineSpline *)vme)->m_OrderByAxisMode &&
+          m_SplineCoefficient == ((mafVMEPolylineSpline *)vme)->m_SplineCoefficient;
+
+  }
+  return ret;
 }
 
 
@@ -138,7 +151,7 @@ bool mafVMEPolylineSpline::IsAnimated()
 bool mafVMEPolylineSpline::IsDataAvailable()
 //-------------------------------------------------------------------------
 {
-  return GetParent()->IsDataAvailable();
+  return GetPolylineLink()->IsDataAvailable();
 }
 
 //-------------------------------------------------------------------------
@@ -155,11 +168,17 @@ void mafVMEPolylineSpline::InternalUpdate() //Multi
   //wxBusyCursor wait;
 	
   mafVMEPolyline *vme = mafVMEPolyline::SafeDownCast(GetPolylineLink());
+  
+
 	if (vme == NULL) 
 	{ 
 		return;
 	}
   vme->Update();
+
+  vtkPolyData *polyline = ((vtkPolyData *)vme->GetOutput()->GetVTKData());
+
+  if(m_OrderByAxisMode) OrderPolylineByAxis(polyline, m_OrderByAxisMode);
 
   ////transform
   ////this part set the transform for every polydata inside a node, using the pose of the node
@@ -168,14 +187,14 @@ void mafVMEPolylineSpline::InternalUpdate() //Multi
   transform->Update();
 
   vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
-  tpdf->SetInput(((vtkPolyData *)vme->GetOutput()->GetVTKData()));
+  tpdf->SetInput(polyline);
   tpdf->SetTransform(transform);
   tpdf->Update();
 
   ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
 
   vtkMAFSmartPointer<vtkPolyData> poly;
-  poly->DeepCopy(((vtkPolyData*)vme->GetOutput()->GetVTKData()));
+  poly->DeepCopy(polyline);
   poly->Update();
 
   this->SplinePolyline(poly); // generate a "splined" polyline 
@@ -210,8 +229,10 @@ int mafVMEPolylineSpline::InternalStore(mafStorageElement *parent)
 {  
   if (Superclass::InternalStore(parent)==MAF_OK)
   {
-    parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
-    return MAF_OK;
+    if(parent->StoreMatrix("Transform",&m_Transform->GetMatrix())==MAF_OK && 
+       parent->StoreInteger("AxisReorder", m_OrderByAxisMode) == MAF_OK
+      )    
+      return MAF_OK;
   }
   return MAF_ERROR;
 }
@@ -225,6 +246,7 @@ int mafVMEPolylineSpline::InternalRestore(mafStorageElement *node)
     mafMatrix matrix;
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
+      node->RestoreInteger("AxisReorder",m_OrderByAxisMode);
       m_Transform->SetMatrix(matrix);
       return MAF_OK;
     }
@@ -407,4 +429,115 @@ mmaMaterial *mafVMEPolylineSpline::GetMaterial()
   }
   return material;
 }
+//-------------------------------------------------------------------------
+void mafVMEPolylineSpline::OrderPolylineByAxis(vtkPolyData* polyline, int axis)
+//-------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkPolyData> poly;
+  poly->DeepCopy(polyline);
+  poly->Update();
 
+  vtkMAFSmartPointer<vtkPoints> points;
+  points->DeepCopy(poly->GetPoints());
+
+  vtkMAFSmartPointer<vtkCellArray> cells;
+  cells->DeepCopy(poly->GetLines());
+
+  double firstPoint[3], lastPoint[3];
+
+  points->GetPoint(0, firstPoint);
+  points->GetPoint(points->GetNumberOfPoints()-1, lastPoint);
+
+  vtkMAFSmartPointer<vtkPoints> newPoints;
+  vtkMAFSmartPointer<vtkCellArray> newLines;
+
+  if(axis == AXIS_X)
+  {
+    //control first and last point x coordinate
+    if(firstPoint[0] > lastPoint[0])
+    {
+      int i;
+      for(i = points->GetNumberOfPoints()-1; i >= 0; i--)
+      {
+        newPoints->InsertNextPoint(points->GetPoint(i));
+      }
+
+      int j;
+      int pointId[2];
+      for(j = 0; j< newPoints->GetNumberOfPoints();j++)
+      {
+        if (j > 0)
+        {             
+          pointId[0] = j - 1;
+          pointId[1] = j;
+          newLines->InsertNextCell(2 , pointId);  
+        }
+      }
+    }
+    else
+      return;
+    
+  }
+  else if(axis == AXIS_Y)
+  {
+    //control first and last point y coordinate
+    if(firstPoint[1] > lastPoint[1])
+    {
+      int i;
+      for(i = points->GetNumberOfPoints()-1; i >= 0; i--)
+      {
+        newPoints->InsertNextPoint(points->GetPoint(i));
+      }
+
+      int j;
+      int pointId[2];
+      for(j = 0; j< newPoints->GetNumberOfPoints();j++)
+      {
+        if (j > 0)
+        {             
+          pointId[0] = j - 1;
+          pointId[1] = j;
+          newLines->InsertNextCell(2 , pointId);  
+        }
+      }
+    }
+    else
+      return;
+  }
+  else if(axis == AXIS_Z)
+  {
+    //control first and last point z coordinate
+    if(firstPoint[2] > lastPoint[2])
+    {
+      int i;
+      for(i = points->GetNumberOfPoints()-1; i >= 0; i--)
+      {
+        newPoints->InsertNextPoint(points->GetPoint(i));
+      }
+
+      int j;
+      int pointId[2];
+      for(j = 0; j< newPoints->GetNumberOfPoints();j++)
+      {
+        if (j > 0)
+        {             
+          pointId[0] = j - 1;
+          pointId[1] = j;
+          newLines->InsertNextCell(2 , pointId);  
+        }
+      }
+    }
+    else
+      return;
+  }
+  else
+    return;
+
+  poly->SetPoints(newPoints);
+  poly->SetLines(newLines);
+  poly->Update();
+
+  polyline->DeepCopy(poly);
+  polyline->Update();
+
+}

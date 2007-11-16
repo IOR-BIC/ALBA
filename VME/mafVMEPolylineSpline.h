@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 12:53:30 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-11-16 10:26:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,14 @@ class mmaMaterial;
 class MAF_EXPORT mafVMEPolylineSpline : public mafVME
 {
 public:
+
+  enum ID_VME_POLYLINE_SPLINE
+  {
+    AXIS_NONE = 0,
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
+  };
 
   mafTypeMacro(mafVMEPolylineSpline,mafVME);
 
@@ -95,6 +103,8 @@ public:
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
 
+  /** reorganize the points in order to follow an axis */
+  void OrderPolylineByAxis(vtkPolyData* polyline, int axis);
 
 	enum SPLINE_WIDGET_ID
   {
@@ -110,6 +120,9 @@ public:
 
   /** Get Coefficient used for calculated number of points*/ 
   int GetSplineCoefficient(){return m_SplineCoefficient;}
+
+  void SetOrderByAxisFlag(int axis){m_OrderByAxisMode = axis;};
+  
 
 protected:
   mafVMEPolylineSpline();
@@ -135,6 +148,7 @@ protected:
 	int								m_SplineCoefficient;
 
 	mafString					m_PolylineLinkName;
+  int               m_OrderByAxisMode;
 
 
 private:
