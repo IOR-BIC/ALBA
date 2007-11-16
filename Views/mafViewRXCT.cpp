@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-11-16 10:56:52 $
+  Version:   $Revision: 1.37 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -142,24 +142,49 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       double center[3],b[CT_CHILD_VIEWS_NUMBER],step;
     
       // set the range for every slider widget
+      mafVMEVolume *volumeVme = mafVMEVolume::SafeDownCast(node);
       for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
       {
-        double minMax[2];
-        ((mafViewRX *)(m_ChildViewList[childID]))->GetLutRange(minMax);
+        double advLow,advHigh;
+        double range[2];
+        if(volumeVme->GetMaterial())
+        {
+          
+          ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range);
+          double volTableRange[2];
+          volTableRange[0] = volumeVme->GetMaterial()->m_TableRange[0];
+          volTableRange[1] = volumeVme->GetMaterial()->m_TableRange[1];
 
-        m_LutSliders[childID]->SetRange(minMax[0],minMax[1]);
-        m_LutSliders[childID]->SetSubRange(minMax[0],minMax[1]);
+          double volRange[2];
+          volumeVme->GetOutput()->GetVTKData()->GetScalarRange(volRange);
+
+          
+          advLow = range[0] + ((range[1] - range[0])/(volRange[1] - volRange[0])) * (volTableRange[0] - volRange[0]);
+          advHigh = range[1] + ((range[1] - range[0])/(volRange[1] - volRange[0])) * (volTableRange[1] - volRange[1]);
+
+
+          ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
+        }
+        else
+        {
+          ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range);
+          advLow = range[0];
+          advHigh = range[1];
+        }
+
+        m_LutSliders[childID]->SetRange(range[0],range[1]);
+        m_LutSliders[childID]->SetSubRange(advLow,advHigh);
       
         // create a lookup table for each RX view
         vtkNEW(m_vtkLUT[childID]);
-        m_vtkLUT[childID]->SetRange(minMax);
+        m_vtkLUT[childID]->SetRange(advLow,advHigh);
         m_vtkLUT[childID]->Build();
         lutPreset(4,m_vtkLUT[childID]);
-        m_vtkLUT[childID]->SetRange(minMax);
+        m_vtkLUT[childID]->SetRange(advLow,advHigh);
         m_vtkLUT[childID]->Build();
         lutPreset(4,m_vtkLUT[childID]);
 
-        ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(minMax[0],minMax[1]);
+        ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
 
       }
 
@@ -170,10 +195,23 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       data->Update();
       data->GetCenter(center);
       data->GetScalarRange(sr);
+      double totalSR[2];
+      totalSR[0] = sr[0];
+      totalSR[1] = sr[1];
+
+      if(volumeVme)
+      { 
+        if(volumeVme->GetMaterial())
+        {
+          sr[0] = volumeVme->GetMaterial()->m_TableRange[0];
+          sr[1] = volumeVme->GetMaterial()->m_TableRange[1];
+        }      
+      }
+      
 
 
       // set the slider for the CT compound view
-      m_LutSliders[CT_COMPOUND_VIEW]->SetRange(sr[0],sr[1]);
+      m_LutSliders[CT_COMPOUND_VIEW]->SetRange(totalSR[0],totalSR[1]);
       m_LutSliders[CT_COMPOUND_VIEW]->SetSubRange(sr[0],sr[1]);
       
       // create a lookup table for CT views

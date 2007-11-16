@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-07 16:58:10 $
-Version:   $Revision: 1.38 $
+Date:      $Date: 2007-11-16 10:56:25 $
+Version:   $Revision: 1.39 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -159,8 +159,18 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 			m_CurrentVolume->GetOutput()->GetBounds(b);
 			double wholeScalarRangeVol[2];
 			m_CurrentVolume->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
-			m_MinLUTHistogram = wholeScalarRangeVol[0];
-			m_MaxLUTHistogram = wholeScalarRangeVol[1];
+
+      mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
+      if(material)
+      {
+        m_MinLUTHistogram = material->m_TableRange[0];
+        m_MaxLUTHistogram = material->m_TableRange[1];
+      }
+      else
+      {
+        m_MinLUTHistogram = wholeScalarRangeVol[0];
+        m_MaxLUTHistogram = wholeScalarRangeVol[1];
+      }
 			SetCurrentZ((b[5]-b[4])/2);
 			for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
 			{
