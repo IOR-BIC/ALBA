@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 14:04:07 $
-  Version:   $Revision: 1.120 $
+  Date:      $Date: 2007-11-19 11:51:19 $
+  Version:   $Revision: 1.121 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,6 +81,7 @@
 
 #include "mmaApplicationLayout.h"
 
+#include "mafEventSource.h"
 #include "mafDataVector.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
@@ -1297,6 +1298,8 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  vme->GetEventSource()->RemoveAllObservers();
+
   bool vme_in_tree = true;
   vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
     (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);
