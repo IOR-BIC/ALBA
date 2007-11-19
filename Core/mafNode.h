@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:40:53 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-11-19 11:50:45 $
+  Version:   $Revision: 1.33 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -310,13 +310,13 @@ public:
   void SetLink(const char *name, mafNode *node, mafID sub_id = -1);
 
   /** remove a link */
-  void RemoveLink(const char *name);
+  void RemoveLink(const char *name, bool remove_also_observer = true);
 
   /** return the number of links stored in this Node */
   mafID GetNumberOfLinks() {return m_Links.size();}
 
   /** remove all links */
-  void RemoveAllLinks();
+  void RemoveAllLinks(bool remove_also_observer = true);
   
   /** return links array: links from this node to other arrays */
   mafLinksMap *GetLinks() {return &m_Links;}
