@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 09:58:21 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2007-11-19 11:57:17 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -140,7 +140,7 @@ void mafPipeSurface::Create(mafSceneNode *n)
   vtkNEW(m_Actor);
 
 	m_Actor->SetMapper(m_Mapper);
-  m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
+  //m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_LOOKUPTABLE)
   {
     m_UseVTKProperty = 0;
@@ -343,8 +343,8 @@ mmgGui *mafPipeSurface::CreateGui()
 	//m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
 	m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
-  m_Gui->Divider(2);
-  m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
+  //m_Gui->Divider(2);
+  //m_Gui->Bool(ID_ENABLE_LOD,"LOD",&m_EnableActorLOD);
   m_Gui->Label("");
 
   if (m_SurfaceMaterial == NULL)
@@ -383,7 +383,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_ENABLE_LOD:
-        m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
+        //m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
         m_OutlineActor->SetEnableHighThreshold(m_EnableActorLOD);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;

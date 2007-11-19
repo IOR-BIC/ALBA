@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:05 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-11-19 11:57:17 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,7 +84,7 @@ protected:
 	vtkActor								*m_NormalActor;
 	vtkCellCenters					*m_CenterPointsFilter;
 	vtkArrowSource					*m_NormalArrow;
-  mafLODActor             *m_Actor;
+  vtkActor             *m_Actor;
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;
