@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-12 12:53:30 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2007-11-19 11:48:25 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -562,6 +562,8 @@ void mafPipePolyline::UpdateProperty(bool fromTag)
 	out_polyline->Update();
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
   data->Update();
+
+  if(data->GetNumberOfPoints() <= 0) return;
 
   if(m_SplineMode && m_Representation != GLYPH && m_Representation != GLYPH_UNCONNECTED)
     data = SplineProcess(data);
