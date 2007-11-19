@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:31:18 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-11-19 11:54:41 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -223,27 +223,19 @@ public:
   mafVME *GetEnd2VME();
   mafVME *GetPlottedVME();
 
-  /** 
-  Set links for the meter*/
+  /** Set links for the meter*/
   void SetMeterLink(const char *link_name, mafNode *n);
-
-  /** 
-  Set link for plot a vme*/
-  void SetPlottedLink(mafNode *n);
 
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
 
-  /** 
-  Turn On/Off the creation of the histogram.*/
+  /** Turn On/Off the creation of the histogram.*/
   void GenerateHistogram(int generate);
 
-  /** 
-  Turn On the generation of the histogram from the measured line. It force the measure to be on DISTANCE_BETWEEN_POINTS.*/
+  /** Turn On the generation of the histogram from the measured line. It force the measure to be on DISTANCE_BETWEEN_POINTS.*/
   void GenerateHistogramOn() {GenerateHistogram(1);};
 
-  /** 
-  Turn Off the generation of the histogram.*/
+  /** Turn Off the generation of the histogram.*/
   void GenerateHistogramOff() {GenerateHistogram(0);};
 
 protected:
@@ -261,6 +253,9 @@ protected:
 
   /** update the output data structure */
   virtual void InternalUpdate();
+
+  /** Update the names for the meter's links. */
+  void UpdateLinks();
 
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();

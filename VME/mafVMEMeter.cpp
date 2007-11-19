@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 08:33:40 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2007-11-19 11:54:41 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -272,6 +272,8 @@ void mafVMEMeter::InternalUpdate()
 
   double threshold = GetMeterAttributes()->m_InitMeasure * (1 + GetMeterAttributes()->m_DeltaPercent / 100.0);
 
+  UpdateLinks();
+
   if (GetMeterMode() == mafVMEMeter::POINT_DISTANCE)
   {
     mafVME *start_vme = GetStartVME();
@@ -353,6 +355,7 @@ void mafVMEMeter::InternalUpdate()
     else
       m_Distance = -1;
 
+    GetOutput()->Update();
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
@@ -477,6 +480,7 @@ void mafVMEMeter::InternalUpdate()
     else
       m_Distance = -1;
 
+    GetOutput()->Update();
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Distance >= 0 && m_Distance >= threshold)
@@ -600,6 +604,7 @@ void mafVMEMeter::InternalUpdate()
     else
       m_Angle = 0;
 
+    GetOutput()->Update();
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 
     if(GetMeterMeasureType() == mafVMEMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
@@ -819,9 +824,6 @@ double mafVMEMeter::GetAngle()
 mmgGui* mafVMEMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
-  mafID sub_id = -1;
-  
-
   int num_mode = 3;
   const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};
 
@@ -830,34 +832,11 @@ mmgGui* mafVMEMeter::CreateGui()
   m_Gui->Divider();
   m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
   m_Gui->Divider();
-  mafVME *start_vme = GetStartVME();
-  if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
-  {
-    sub_id = GetLinkSubId("StartVME");
-    m_StartVmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)start_vme)->GetLandmarkName(sub_id) : _("none");
-  }
-  else
-    m_StartVmeName = start_vme ? start_vme->GetName() : _("none");
+
+  UpdateLinks();
+  
   m_Gui->Button(ID_START_METER_LINK,&m_StartVmeName,_("Start"), _("Select the start vme for the meter"));
-
-  mafVME *end_vme1 = GetEnd1VME();
-  if (end_vme1 && end_vme1->IsMAFType(mafVMELandmarkCloud))
-  {
-    sub_id = GetLinkSubId("EndVME1");
-    m_EndVme1Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme1)->GetLandmarkName(sub_id) : _("none");
-  }
-  else
-    m_EndVme1Name = end_vme1 ? end_vme1->GetName() : _("none");
   m_Gui->Button(ID_END1_METER_LINK,&m_EndVme1Name,_("End 1"), _("Select the end vme for point distance"));
-
-  mafVME *end_vme2 = GetEnd2VME();
-  if (end_vme2 && end_vme2->IsMAFType(mafVMELandmarkCloud))
-  {
-    sub_id = GetLinkSubId("EndVME2");
-    m_EndVme2Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme2)->GetLandmarkName(sub_id) : _("none");
-  }
-  else
-    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : _("none");
   m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,_("End 2"), _("Select the vme representing \nthe point for line distance"));
 
   if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
@@ -866,20 +845,52 @@ mmgGui* mafVMEMeter::CreateGui()
   m_Gui->Bool(ID_PLOT_PROFILE,_("plot profile"),&m_GenerateHistogram);
   m_Gui->Enable(ID_PLOT_PROFILE,GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
 
-  mafVME *probedVme = GetPlottedVME();
-  m_ProbedVME = probedVme;
-  m_ProbeVmeName = probedVme ? probedVme->GetName() : _("none");
   m_Gui->Button(ID_PLOTTED_VME_LINK,&m_ProbeVmeName,_("Probed"), _("Select the vme that will be plotted"));
   m_Gui->Enable(ID_PLOTTED_VME_LINK, GetMeterAttributes()->m_MeterMode == POINT_DISTANCE);
-  
 
-	m_Gui->Divider();
 	m_Gui->Divider();
 
   InternalUpdate();
   GetPolylineOutput()->Update();
 
   return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVMEMeter::UpdateLinks()
+//-------------------------------------------------------------------------
+{
+  mafID sub_id = -1;
+  mafVME *start_vme = GetStartVME();
+  mafVME *end_vme1 = GetEnd1VME();
+  mafVME *end_vme2 = GetEnd2VME();
+  mafVME *probedVme = GetPlottedVME();
+
+  if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("StartVME");
+    m_StartVmeName = (sub_id != -1) ? ((mafVMELandmarkCloud *)start_vme)->GetLandmarkName(sub_id) : _("none");
+  }
+  else
+    m_StartVmeName = start_vme ? start_vme->GetName() : _("none");
+
+  if (end_vme1 && end_vme1->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("EndVME1");
+    m_EndVme1Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme1)->GetLandmarkName(sub_id) : _("none");
+  }
+  else
+    m_EndVme1Name = end_vme1 ? end_vme1->GetName() : _("none");
+
+  if (end_vme2 && end_vme2->IsMAFType(mafVMELandmarkCloud))
+  {
+    sub_id = GetLinkSubId("EndVME2");
+    m_EndVme2Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme2)->GetLandmarkName(sub_id) : _("none");
+  }
+  else
+    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : _("none");
+
+  m_ProbedVME = probedVme;
+  m_ProbeVmeName = probedVme ? probedVme->GetName() : _("none");
 }
 //-------------------------------------------------------------------------
 void mafVMEMeter::OnEvent(mafEventBase *maf_event)
@@ -934,7 +945,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
           mafNode *n = e->GetVme();
           if (n != NULL)
           {
-            SetPlottedLink(n);
+            SetMeterLink("PlottedVME",n);
             m_ProbedVME = mafVME::SafeDownCast(n);
             m_ProbeVmeName = n->GetName();
             CreateHistogram();
@@ -996,7 +1007,31 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    Superclass::OnEvent(maf_event);
+    switch(maf_event->GetId())
+    {
+      case NODE_DESTROYED:
+      case NODE_DETACHED_FROM_TREE:
+        if (maf_event->GetSender() == GetStartVME())
+        {
+          RemoveLink("StartVME",false);
+        }
+        if (maf_event->GetSender() == GetEnd1VME())
+        {
+          RemoveLink("EndVME1",false);
+        }
+        if (maf_event->GetSender() == GetEnd2VME())
+        {
+          RemoveLink("EndVME2",false);
+        }
+        if (maf_event->GetSender() == GetPlottedVME())
+        {
+          RemoveLink("PlottedVME",false);
+        }
+        InternalUpdate();
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
+    }
   }
 }
 //-------------------------------------------------------------------------
@@ -1009,12 +1044,6 @@ void mafVMEMeter::SetMeterLink(const char *link_name, mafNode *n)
   }
   else
     SetLink(link_name, n);
-}
-//-------------------------------------------------------------------------
-void mafVMEMeter::SetPlottedLink(mafNode *n)
-//-------------------------------------------------------------------------
-{
-  SetLink("PlottedVME", n);
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMEMeter::GetStartVME()
@@ -1052,7 +1081,7 @@ void mafVMEMeter::GenerateHistogram(int generate)
       CreateHistogram();
       m_HistogramRWI->m_RwiBase->Render();
     }
-    m_HistogramDialog->Show(m_GenerateHistogram);
+    m_HistogramDialog->Show(m_GenerateHistogram != 0);
   }
 }
 //----------------------------------------------------------------------------
