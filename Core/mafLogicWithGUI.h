@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-23 10:36:41 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-11-19 12:43:49 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -160,6 +160,7 @@ protected:
   mafGUISettingsStorage  *m_StorageSettings;
   mafGUISettingsTimeBar  *m_TimeBarSettings;
 
+  bool m_Quitting;    ///< Variable that allows to determine if the application is Quitting or not.
 	bool m_PlugMenu;    ///< Flag to plug or not the Menu into the application. Default is true.
 	bool m_PlugToolbar; ///< Flag to plug or not the Toolbar into the application. Default is true.
 	bool m_PlugSidebar; ///< Flag to plug or not the Side-bar into the application. Default is true.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 08:10:57 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-11-19 12:43:49 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,6 +69,8 @@ mafLogicWithGUI::mafLogicWithGUI()
   m_VtkLog        = NULL;
 
 	m_AppTitle      = "";
+
+  m_Quitting = false;
 
 	m_PlugMenu		  = true;
 	m_PlugToolbar	  = true;
