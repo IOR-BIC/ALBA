@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-15 15:10:37 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-11-19 11:53:14 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,11 +116,11 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
     {
       case NODE_DETACHED_FROM_TREE:
       case NODE_DESTROYED:
-        SetVme(NULL);
-        // the code row above remove this class from the observer list
-        // so after removing it we should skip the cycle on the list because 
-        // it is shortened and may cause application crash.
-        maf_event->SetSkipFlag(true);
+        // detach the camera by destroying the attached matrix and 
+        // the actor observed is set to NULL. The Logic the is removing
+        // the VME will remove all the observers (so also this class).
+        vtkDEL(m_AttachedVmeMatrix);
+        m_AttachedVme = NULL;
         m_CameraAttach = 0;
         m_Gui->Update();
       break;
