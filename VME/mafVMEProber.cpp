@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-11-19 11:55:41 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -512,7 +512,23 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    Superclass::OnEvent(maf_event);
+    switch(maf_event->GetId())
+    {
+      case NODE_DETACHED_FROM_TREE:
+      case NODE_DESTROYED:
+        if (maf_event->GetSender() == GetSurfaceLink())
+        {
+          RemoveLink("Surface", false);
+        }
+        else if (maf_event->GetSender() == GetVolumeLink())
+        {
+          RemoveLink("Volume", false);
+        }
+        InternalPreUpdate();
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
+    }
   }
 }
 //-------------------------------------------------------------------------

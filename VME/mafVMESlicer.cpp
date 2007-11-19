@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 13:10:09 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-11-19 11:55:41 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -211,7 +211,19 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    Superclass::OnEvent(maf_event);
+    switch(maf_event->GetId())
+    {
+      case NODE_DESTROYED:
+      case NODE_DETACHED_FROM_TREE:
+        if (maf_event->GetSender() == GetSlicedVMELink())
+        {
+          RemoveLink("SlicedVME", false);
+        }
+        InternalPreUpdate();
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
+    }
   }
 }
 //-------------------------------------------------------------------------

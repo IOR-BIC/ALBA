@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:31:37 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-11-19 11:55:41 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -496,7 +496,27 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    Superclass::OnEvent(maf_event);
+    switch(maf_event->GetId())
+    {
+      case NODE_DESTROYED:
+      case NODE_DETACHED_FROM_TREE:
+        if (maf_event->GetSender() == GetOriginVME())
+        {
+          RemoveLink("OriginVME", false);
+        }
+        else if (maf_event->GetSender() == GetPoint1VME())
+        {
+          RemoveLink("Point1VME", false);
+        }
+        else if (maf_event->GetSender() == GetPoint2VME())
+        {
+          RemoveLink("Point2VME", false);
+        }
+        InternalUpdate();
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
+    }
   }
 }
 //-----------------------------------------------------------------------
