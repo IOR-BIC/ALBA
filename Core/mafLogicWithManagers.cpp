@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:51:19 $
-  Version:   $Revision: 1.121 $
+  Date:      $Date: 2007-11-19 12:44:22 $
+  Version:   $Revision: 1.122 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1128,7 +1128,7 @@ void mafLogicWithManagers::OnQuit()
 
   if(m_VMEManager)
   {
-    bool quit = false;
+    m_Quitting = false;
     if (m_VMEManager->MSFIsModified())
     {
       int answer = wxMessageBox
@@ -1139,15 +1139,15 @@ void mafLogicWithManagers::OnQuit()
           );
       if(answer == wxYES) 
         m_VMEManager->MSFSave();
-      quit = answer != wxCANCEL;
+      m_Quitting = answer != wxCANCEL;
 
     }
     else 
     {
       int answer = wxMessageBox(_("quit program ?"), _("Confirm"), wxYES_NO | wxICON_QUESTION , m_Win);
-      quit = answer == wxYES;
+      m_Quitting = answer == wxYES;
     }
-    if(!quit) 
+    if(!m_Quitting) 
       return;
   }
 
@@ -1298,7 +1298,10 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  vme->GetEventSource()->RemoveAllObservers();
+  if (!m_Quitting)
+  {
+    vme->GetEventSource()->RemoveAllObservers();
+  }
 
   bool vme_in_tree = true;
   vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
