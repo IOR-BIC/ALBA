@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.h,v $
 Language:  C++
-Date:      $Date: 2007-10-26 10:22:52 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-11-20 10:48:38 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -40,6 +40,7 @@ public:
     ID_PLAY_ACTIVE_VIEWPORT,
     ID_SPEED,
     ID_FPS,
+    ID_SHOW_ALL_FRAMES,
   };
 
   /** Answer to the messages coming from interface. */
@@ -81,6 +82,12 @@ public:
   /** Return the playback subrange.*/
   double *GetSubrange() {return m_SubRange;};
 
+  /** Allow the time bar to show all frames without considering time or frame per seconds information.*/
+  void SetShowAllFrames(int show_all = 1);
+
+  /** Return the flag related the showing all frames or not.*/
+  int GetShowAllFrames() {return m_ShowAllFrames;};
+
   /** Set the speed ID.*/
   void SetSpeedId(int idx = 0);
 
@@ -118,6 +125,7 @@ protected:
   void Update();
 
   int m_RealTimeMode;
+  int m_ShowAllFrames;
   int m_Fps;
   int m_Loop;
   int m_SpeedId;

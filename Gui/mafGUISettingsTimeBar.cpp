@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 10:22:52 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-11-20 10:48:38 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,6 +35,7 @@ mafGUISettings(Listener, label)
 
   m_Fps = 25;
   m_SpeedId = 2;
+  m_ShowAllFrames = 1;
 
   m_AnimateInSubrange = 0;
   m_SubRange[0] = 0.0; 
@@ -62,6 +63,7 @@ void mafGUISettingsTimeBar::CreateGui()
   m_Gui->Divider(2);
   m_Gui->Integer(ID_FPS, _("fps: "), &m_Fps, 1);
   m_Gui->Radio(ID_SPEED, _("speed: "), &m_SpeedId, 5, speed_choices);
+  m_Gui->Bool(ID_SHOW_ALL_FRAMES, _("show all frames"), &m_ShowAllFrames, 1);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_ANIMATE_IN_SUBRANGE, _("animate in subrange"), &m_AnimateInSubrange, 1);
   m_Gui->VectorN(ID_SUBRANGE, _("subrange: "), m_SubRange, 2, 0.0);
@@ -101,6 +103,9 @@ void mafGUISettingsTimeBar::OnEvent(mafEventBase *maf_event)
     break;
     case ID_FPS:
       m_Config->Write("Fps", m_Fps);
+    break;
+    case ID_SHOW_ALL_FRAMES:
+      m_Config->Write("ShowAllFrames", m_ShowAllFrames);
     break;
     default:
       mafEventMacro(*maf_event);
@@ -190,14 +195,23 @@ void mafGUISettingsTimeBar::InitializeSettings()
   {
     SetFPS(m_Fps);
   }
+  if(m_Config->Read("ShowAllFrames", &long_item))
+  {
+    m_ShowAllFrames = long_item;
+  }
+  else
+  {
+    SetShowAllFrames(m_ShowAllFrames);
+  }
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::EnableWidgets()
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_TIME_MULTIPLIER, m_RealTimeMode == 1);
-  m_Gui->Enable(ID_FPS, m_RealTimeMode != 1);
+  m_Gui->Enable(ID_FPS, m_RealTimeMode != 1 && m_ShowAllFrames == 0);
   m_Gui->Enable(ID_SPEED, m_RealTimeMode != 1);
+  m_Gui->Enable(ID_SHOW_ALL_FRAMES, m_RealTimeMode != 1);
   m_Gui->Enable(ID_SUBRANGE, m_AnimateInSubrange == 1);
 }
 //----------------------------------------------------------------------------
@@ -270,6 +284,14 @@ void mafGUISettingsTimeBar::PlayInActiveViewport(int active_viewport)
 {
   m_PlayInActiveViewport = active_viewport;
   m_Config->Write("PlayInActiveViewport", m_PlayInActiveViewport);
+  Update();
+}
+//----------------------------------------------------------------------------
+void mafGUISettingsTimeBar::SetShowAllFrames(int show_all)
+//----------------------------------------------------------------------------
+{
+  m_ShowAllFrames = show_all > 0 ? 1 : 0;
+  m_Config->Write("ShowAllFrames", m_ShowAllFrames);
   Update();
 }
 //----------------------------------------------------------------------------
