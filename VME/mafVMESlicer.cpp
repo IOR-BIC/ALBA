@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:55:41 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2007-11-20 14:58:19 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -202,6 +202,9 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
           SetSlicedVMELink(n);
           m_SlicedName = n->GetName();
           m_Gui->Update();
+          e->SetId(CAMERA_UPDATE);
+          e->SetArg(0);
+          ForwardUpEvent(e);
         }
       }
       break;
