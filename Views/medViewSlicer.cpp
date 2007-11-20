@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-11-20 13:50:04 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -391,7 +391,6 @@ void medViewSlicer::CreateGuiView()
 {
   m_GuiView = new mmgGui(this);
   
-  m_GuiView->Label("");
   m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
