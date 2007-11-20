@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkPolyDataToSinglePolyLine.cxx,v $
   Language:  C++
-  Date:      $Date: 2007-11-12 09:47:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-20 12:15:39 $
+  Version:   $Revision: 1.3 $
   Authors:   Alessandro Chiarini
   Project:   
 
@@ -26,7 +26,7 @@
 #include "vtkPolyLine.h"
 #include "vtkSplineFilter.h"
 #include "vtkCardinalSpline.h"
-//vtkCxxRevisionMacro(vtkFixedCutter, "$Revision: 1.2 $");
+//vtkCxxRevisionMacro(vtkFixedCutter, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkPolyDataToSinglePolyLine);
 
 //----------------------------------------------------------------------------
@@ -40,8 +40,8 @@ vtkPolyDataToSinglePolyLine::~vtkPolyDataToSinglePolyLine()
 {
 }
 //----------------------------------------------------------------------------
-
 void vtkPolyDataToSinglePolyLine::Execute()
+//----------------------------------------------------------------------------
 {
 	vtkPoints* InPts = this->GetInput()->GetPoints();
 	vtkPolyData* InPD = this->GetInput();
