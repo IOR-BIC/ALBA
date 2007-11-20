@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-13 08:31:35 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-11-20 17:40:08 $
+  Version:   $Revision: 1.16 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -63,7 +63,7 @@
 #include <list>
 #include <vector>
 
-#define OUTRANGE_SCALAR 0
+#define OUTRANGE_SCALAR -1000
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(medVMELabeledVolume);
@@ -74,15 +74,15 @@ medVMELabeledVolume::medVMELabeledVolume()
 //------------------------------------------------------------------------------
 {
   m_LabelCheckBox = NULL;
-  m_EditMode = FALSE;
-  m_DataCopied = FALSE;
+  m_EditMode = false;
+  m_DataCopied = false;
   m_CheckMin = 0; 
   m_CheckMax = 0;
   m_MaxValue = 0;
   m_MinValue = 0;
   m_CheckListId = 0;
 
-  m_Link = NULL;
+  m_VolumeLink = NULL;
   m_Dlg = NULL;
   m_Rwi = NULL;	
   m_SliceSlider = NULL;
@@ -123,15 +123,10 @@ medVMELabeledVolume::~medVMELabeledVolume()
   mafDEL(m_Transform);
   if (m_DataCopied)
     mafDEL(m_Dataset);
-  m_Link = NULL;
+  m_VolumeLink = NULL;
   m_CheckedVector.clear();
   m_LabelNameVector.clear();
 
-  if (mafNode *node = GetVolumeLink())
-  {
-    node->GetEventSource()->RemoveObserver(this);
-  }
-  
   if ( m_Dlg )
     DeleteOpDialog();
 }
@@ -188,7 +183,6 @@ void medVMELabeledVolume::SetVolumeLink(mafNode *n)
 {
   SetLink("VolumeLink", n);
   CopyDataset();
-  n->GetEventSource()->AddObserver(this);
   Modified();
 }
 
@@ -196,15 +190,15 @@ void medVMELabeledVolume::SetVolumeLink(mafNode *n)
 void medVMELabeledVolume::InternalPreUpdate()
 //-------------------------------------------------------------------------
 {
-  m_Link = mafVME::SafeDownCast(GetVolumeLink());
-  if (!m_Link)
+  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  if (!m_VolumeLink)
   {
-    EnableWidgets(FALSE);
+    EnableWidgets(false);
     return;
   }
 
-  EnableWidgets(TRUE);
-  if ( m_DataCopied == FALSE)
+  EnableWidgets(true);
+  if ( m_DataCopied == false)
   {
     CopyDataset();
   }
@@ -214,16 +208,16 @@ void medVMELabeledVolume::InternalPreUpdate()
 void medVMELabeledVolume::CopyDataset()
 //-------------------------------------------------------------------------
 {
-  m_Link = mafVME::SafeDownCast(GetVolumeLink());
-  if (m_Link)
+  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  if (m_VolumeLink)
   {
-    vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
+    vtkDataSet *data = m_VolumeLink->GetOutput()->GetVTKData();
     data->Update();
     m_Dataset = data->NewInstance();
     m_Dataset->DeepCopy(data);
     ((mafDataPipeCustom *)GetDataPipe())->SetInput(m_Dataset); 
     RetrieveTag();
-    m_DataCopied = TRUE;
+    m_DataCopied = true;
 
     //Set the scalar values  of the labeled volume to OUTRANGE_SCALAR
     vtkDataArray *originalScalars;
@@ -250,7 +244,7 @@ void medVMELabeledVolume::CopyDataset()
 
     mmaVolumeMaterial *volMaterial;
     mafNEW(volMaterial);
-    volMaterial->DeepCopy(((mafVMEVolumeGray *)m_Link)->GetMaterial());
+    volMaterial->DeepCopy(((mafVMEVolumeGray *)m_VolumeLink)->GetMaterial());
     volMaterial->UpdateFromTables();
 
     mmaVolumeMaterial *labelMaterial = ((mafVMEOutputVolume *)this->GetOutput())->GetMaterial();
@@ -296,11 +290,11 @@ mafNode *medVMELabeledVolume::GetVolumeLink()
 void medVMELabeledVolume::UpdateScalars()
 //-------------------------------------------------------------------------
 {
-  m_Link = mafVME::SafeDownCast(GetVolumeLink());
-  if (m_Link)
+  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  EnableWidgets(m_VolumeLink != NULL);
+  if (m_VolumeLink)
   {
-    EnableWidgets();
-    vtkDataSet *data = m_Link->GetOutput()->GetVTKData();
+    vtkDataSet *data = m_VolumeLink->GetOutput()->GetVTKData();
     data->Update();
     m_Dataset->GetPointData()->GetScalars()->DeepCopy(data->GetPointData()->GetScalars());
     m_Dataset->GetPointData()->GetScalars()->Modified();
@@ -321,7 +315,6 @@ void medVMELabeledVolume::UpdateScalars()
       originalScalars = rg->GetPointData()->GetScalars();  
     }
 
-
     int not = originalScalars->GetNumberOfTuples();
     for ( int i = 0; i < not; i++ )
     {
@@ -339,7 +332,7 @@ void medVMELabeledVolume::GenerateLabeledVolume()
 {
   UpdateScalars();
 
-  if (m_Link)
+  if (m_VolumeLink)
   {
     vtkDataArray *labelScalars;
     vtkDataArray *volumeScalars;
@@ -357,7 +350,7 @@ void medVMELabeledVolume::GenerateLabeledVolume()
       volumeScalars = rg->GetPointData()->GetScalars();  
     }
     int numberC = m_TagLabel->GetNumberOfComponents();
-    bool lastComponent = FALSE;
+    bool lastComponent = false;
     int numberChecked = 0;
 
     std::vector<int> minVector;
@@ -392,7 +385,7 @@ void medVMELabeledVolume::GenerateLabeledVolume()
       int not = volumeScalars->GetNumberOfTuples();
       for ( int i = 0; i < not; i++ )
       {
-        bool modified = FALSE;
+        bool modified = false;
         double scalarValue = volumeScalars->GetComponent( i, 0 );
         for (int c = 0; c < labelIntVector.size(); c++)
         {
@@ -400,7 +393,7 @@ void medVMELabeledVolume::GenerateLabeledVolume()
           { 
             labelVlaue = labelIntVector.at(c);
             labelScalars->SetTuple1( i, labelVlaue ); 
-            modified = TRUE;
+            modified = true;
           }
         }
         if (!modified)
@@ -493,9 +486,9 @@ mmgGui* medVMELabeledVolume::CreateGui()
   m_Gui->Button(ID_INSERT_LABEL, _("Add label"), "", _("Add a label"));
   m_Gui->Button(ID_REMOVE_LABEL, _("Remove label"), "", _("Remove a label"));
   m_Gui->Button(ID_EDIT_LABEL, _("Edit label"), "", _("Edit a label"));
-  if (m_Link)
+  if (m_VolumeLink)
   {
-    EnableWidgets(TRUE);
+    EnableWidgets(true);
   }
 
   m_Gui->Divider(2);  
@@ -507,7 +500,7 @@ mmgGui* medVMELabeledVolume::CreateGui()
 
   // If there already is a tag named "LABELS" then I have to load the old labels in the correct position in the listbox
 
-  if (m_Link)
+  if (m_VolumeLink)
   {
     int noc = m_TagLabel->GetNumberOfComponents();
     if(noc != 0)
@@ -531,8 +524,8 @@ mmgGui* medVMELabeledVolume::CreateGui()
             wxString labelName = *myListIter;
             if ( component == labelName )
             {
-              m_LabelCheckBox->AddItem(m_CheckListId, component, FALSE);
-              FillLabelVector(component, FALSE);
+              m_LabelCheckBox->AddItem(m_CheckListId, component, false);
+              FillLabelVector(component, false);
               m_CheckListId++;
             }
           }
@@ -821,9 +814,9 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       case ID_INSERT_LABEL:
       {     
         UpdateScalars();
-        if (m_Link)
+        if (m_VolumeLink)
         {
-          m_EditMode = FALSE;
+          m_EditMode = false;
           double sr[2];
           m_Dataset->GetScalarRange(sr);
           m_MinAbsolute = sr[0]; 
@@ -862,9 +855,9 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       break;
       case ID_EDIT_LABEL:
       {
-        if (m_Link)
+        if (m_VolumeLink)
         {
-          m_EditMode = TRUE;
+          m_EditMode = true;
           wxString componentName;
           int noc = m_TagLabel->GetNumberOfComponents();
           for ( unsigned int w = 0; w < noc; w++ )
@@ -1010,7 +1003,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
       break;
       case VME_PICKED:
       {
-        vtkDataSet *vol = m_Link->GetOutput()->GetVTKData();
+        vtkDataSet *vol = m_VolumeLink->GetOutput()->GetVTKData();
         double pos[3];
         vtkPoints *pts = NULL; 
         pts = (vtkPoints *)e->GetVtkObj();
@@ -1023,16 +1016,20 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
         mafNode::OnEvent(maf_event);
     }
   }
-   else
+  else
   {
+    if (maf_event->GetId() == NODE_DESTROYED ||
+        maf_event->GetId() == NODE_DETACHED_FROM_TREE)
+    {
+      if (maf_event->GetSender() == GetVolumeLink())
+      {
+        RemoveLink("VolumeLink",false);
+        UpdateScalars();
+        return;
+      }
+    }
     Superclass::OnEvent(maf_event);
   }
-  
-  if (maf_event->GetId() == NODE_DESTROYED)
-    {
-      EnableWidgets(FALSE);
-      UpdateScalars();
-    }
 }
 //----------------------------------------------------------------------------
 void medVMELabeledVolume::UpdateLabel()
@@ -1056,7 +1053,7 @@ void medVMELabeledVolume::UpdateLabel()
     labelName.Replace( " ", "_" );
 
   // Check if another name for the label already exists
-  if( m_TagLabel && m_EditMode == FALSE)
+  if( m_TagLabel && m_EditMode == false)
   {
     int noc = m_TagLabel->GetNumberOfComponents();
     for ( unsigned int i = 0; i < noc; i++ )
@@ -1100,10 +1097,10 @@ void medVMELabeledVolume::UpdateLabel()
     m_Dlg->EndModal(wxID_CANCEL);
   }
    
-  if (m_EditMode == FALSE)
+  if (m_EditMode == false)
   {
-    m_LabelCheckBox->AddItem(m_CheckListId, labelLine, TRUE); 
-    FillLabelVector(labelLine, TRUE);
+    m_LabelCheckBox->AddItem(m_CheckListId, labelLine, true); 
+    FillLabelVector(labelLine, true);
     m_CheckListId++;
     m_LabelCheckBox->Update();
     int nComp = m_TagLabel->GetNumberOfComponents();
@@ -1112,8 +1109,8 @@ void medVMELabeledVolume::UpdateLabel()
   else
   {
     m_LabelCheckBox->SetItemLabel(m_ItemSelected, labelLine);
-    m_LabelCheckBox->CheckItem(m_ItemSelected, TRUE);
-    ModifyLabelVector(m_ItemSelected, labelLine, TRUE);
+    m_LabelCheckBox->CheckItem(m_ItemSelected, true);
+    ModifyLabelVector(m_ItemSelected, labelLine, true);
     m_LabelCheckBox->Update();
 
     int noc = m_TagLabel->GetNumberOfComponents();
@@ -1214,7 +1211,7 @@ void medVMELabeledVolume::EnableWidgets(bool enable)
 {
   if (m_Gui)
   {
-    if (enable == FALSE || !m_Link)
+    if (!enable || !m_VolumeLink)
     {
       m_Gui->Enable(ID_INSERT_LABEL,enable);
       m_Gui->Enable(ID_REMOVE_LABEL,enable);
@@ -1222,13 +1219,11 @@ void medVMELabeledVolume::EnableWidgets(bool enable)
     }
     else
     {
-      bool labelPresent = FALSE;
       int noc = m_TagLabel->GetNumberOfComponents();
-      if (noc != 0)
-        labelPresent = TRUE;
-       m_Gui->Enable(ID_INSERT_LABEL,enable);
-       m_Gui->Enable(ID_REMOVE_LABEL,labelPresent);
-       m_Gui->Enable(ID_EDIT_LABEL,labelPresent);
+      bool labelPresent = noc != 0;
+      m_Gui->Enable(ID_INSERT_LABEL,enable);
+      m_Gui->Enable(ID_REMOVE_LABEL,labelPresent);
+      m_Gui->Enable(ID_EDIT_LABEL,labelPresent);
     }
     m_Gui->Update();
   }
