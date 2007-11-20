@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 14:38:08 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-11-20 14:57:28 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,5 +102,4 @@ void mmoCreateSlicer::OpDo()
     b.GetCenter(center);
   }
   m_Slicer->SetPose(center,rot,0);
-  m_Output = m_Slicer; // This allow the UnDo to work.
 }
