@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-11 17:35:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-11-20 12:26:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,6 +21,7 @@
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
 #include "wx/busyinfo.h"
+#include "wx/dir.h"
 
 #include "mmoRAWImporterImages.h"
 #include "mafEvent.h"
@@ -675,6 +676,11 @@ void mmoRAWImporterImages::	OnEvent(mafEventBase *maf_event)
       }
 		break;
 		case wxOK:
+      if(!ControlFilenameList())
+			{
+				wxMessageBox("Control numerical order of raw files");
+				return;
+			}
 			m_Dialog->EndModal(wxID_OK);
 		break;
 		case wxCANCEL:
@@ -893,7 +899,7 @@ bool mmoRAWImporterImages::Import()
 	wxString path, name, ext;
 	wxSplitPath(slice_name.c_str(),&path,&name,&ext);
 
-	if(m_Rect)
+    if(m_Rect)
 	{
 		// conversion from vtkStructuredPoints to vtkRectilinearGrid
 		vtkStructuredPoints	*structured_data = convert->GetOutput();
@@ -1054,4 +1060,68 @@ void mmoRAWImporterImages::OnOpenDir()
 
 	m_NumberFile = m_VtkRawDirectory->GetNumberOfFiles();
 	m_NumberSlices = 0;
+}
+//----------------------------------------------------------------------------
+bool mmoRAWImporterImages::ControlFilenameList()
+//----------------------------------------------------------------------------
+{
+  //control how many files are present in directory
+  wxString prefix = m_RawDirectory + "\\" + m_Prefix;
+  wxString pattern = m_Pattern + m_Extension;
+  
+  wxDir dir(m_RawDirectory.GetCStr());
+  bool result = true;
+  if ( !dir.IsOpened() )
+  {
+    // deal with the error here - wxDir would already log an error message
+    // explaining the exact reason of the failure
+    result = false;
+  }
+
+  wxArrayString SkinFiles;
+  const wxString FileSpec = "*" + m_Extension;
+  const int flags = wxDIR_FILES;
+
+  if (m_RawDirectory.GetCStr() != wxEmptyString && wxDirExists(m_RawDirectory.GetCStr()))
+  {
+    // Get all .zip files
+    wxDir::GetAllFiles(m_RawDirectory.GetCStr(), &SkinFiles, FileSpec, flags);
+  }
+
+	wxMessageBox(wxString::Format("%d",SkinFiles.GetCount()));
+
+	wxString numbers = m_Pattern.AfterLast('%');
+	numbers = numbers.Mid(0,numbers.Length()-1);
+
+	int n = atoi(numbers.c_str());
+
+	for(long number = m_Offset,  j =0; number<m_Offset+SkinFiles.GetCount()*m_FileSpacing;number = number + m_FileSpacing, j++)
+	{
+		wxString fileName = SkinFiles[j];
+		fileName = fileName.AfterLast('\\');
+		fileName = fileName.BeforeLast('.');
+
+		wxString search;
+		search = wxString::Format("%ld",number);
+
+		wxString final;
+    for(int i=0; i< n; i++)
+		{
+		  final.Append("0");
+		}
+		final.Append(search);
+		final = final.Mid(final.Length()-numbers.Length()-2,final.Length());
+
+		wxString control;
+		control = m_Prefix;
+		control.Append(final);
+
+    if(fileName.CompareTo(control) != 0)
+		{
+			result = false;
+			break;
+		}
+	}
+
+	return result;
 }

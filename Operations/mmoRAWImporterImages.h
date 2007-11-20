@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-11 17:35:31 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-20 12:26:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -105,6 +105,9 @@ protected:
 
 	/** Calculate the length of the file in order to give a guessed value for the header size. */
 	int  GetFileLength(const char * filename);
+
+  /** Control file list before read to alert for possible incoerences*/
+  bool ControlFilenameList();
 
 	mafNode			 *m_Vme; 
 
