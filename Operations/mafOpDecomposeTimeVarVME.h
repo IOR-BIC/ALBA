@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 09:36:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-20 09:41:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -68,7 +68,7 @@ public:
   MODE_PERIODICITY = 2.*/
   void SelectMode(int mode);
 
-  /** Set the timestamos interval. */
+  /** Set the timestamps interval. */
   void SetInterval(double from, double to);
 
   /** Set the period used for periodicity mode */
@@ -84,6 +84,7 @@ public:
     ID_INSERT_FRAME,
     ID_REMOVE_FRAME,
     ID_FRAME,
+
     CHANGE_VALUE_FRAMES,
     CHANGE_VALUE_INTERVAL,
     CHANGE_VALUE_PERIODICITY,
@@ -98,27 +99,6 @@ public:
     MODE_FRAMES = 0,
     MODE_INTERVAL,
     MODE_PERIODICITY,
-  };
-
-  enum MATERIAL_TAG_ID
-  {
-    MAT_NAME = 0,
-    MAT_AMBIENT_R,
-    MAT_AMBIENT_G,
-    MAT_AMBIENT_B,
-    MAT_AMBIENT_INTENSITY,
-    MAT_DIFFUSE_R,
-    MAT_DIFFUSE_G,
-    MAT_DIFFUSE_B,
-    MAT_DIFFUSE_INTENSITY,
-    MAT_SPECULAR_R,
-    MAT_SPECULAR_G,
-    MAT_SPECULAR_B,
-    MAT_SPECULAR_INTENSITY,
-    MAT_SPECULAR_POWER,
-    MAT_OPACITY,
-    MAT_REPRESENTATION,
-    MAT_NUM_COMP
   };
 
 protected: 
