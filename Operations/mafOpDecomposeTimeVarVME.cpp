@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 09:36:17 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-20 09:41:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -288,14 +288,12 @@ int mafOpDecomposeTimeVarVME::UpdateFrames()
   {
     case MODE_FRAMES:
     {
-      //int framesNummber = m_FramesListBox->GetCount();
       int framesNummber = m_FrameLabel.size();
       if (framesNummber > 0)
       {
         mafString timeStr;
         for (int f = 0; f < framesNummber; f++)
         {
-          //mafString frame = m_FramesListBox->GetString(f);
           mafString frame = m_FrameLabel.at(f);
           timeSt = atof(frame.GetCStr());
           //check if the inserted frame is inside the timestamps bounds
