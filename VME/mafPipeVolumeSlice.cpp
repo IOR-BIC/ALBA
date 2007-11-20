@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:48:42 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2007-11-20 17:38:23 $
+  Version:   $Revision: 1.48 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
 #include "mmaVolumeMaterial.h"
 
 #include "mafTransformBase.h"
-#include "mafVMEVolume.h"
+#include "mafVME.h"
 #include "mafVMEOutputVolume.h"
 
 #include "mmgFloatSlider.h"
@@ -82,6 +82,8 @@ mafPipeVolumeSlice::mafPipeVolumeSlice()
   m_AssemblyUsed = NULL;
   m_ColorLUT  = NULL;
   m_CustomColorLUT = NULL;
+
+  m_VolumeOutput = NULL;
 
 	m_Box = NULL;
 	m_Mapper = NULL;
@@ -180,13 +182,14 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
   m_AssemblyUsed = m_AssemblyBack ? m_AssemblyBack : m_AssemblyFront;
 
-  assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
+  m_VolumeOutput = mafVMEOutputVolume::SafeDownCast(m_Vme->GetOutput());
+  assert(m_VolumeOutput != NULL);
   double b[6];
   m_Vme->GetOutput()->Update();
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
-  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
   if (material->m_TableRange[1] < material->m_TableRange[0]) 
   {
     m_Vme->GetOutput()->GetVTKData()->GetScalarRange(material->m_TableRange);
@@ -540,7 +543,7 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 void mafPipeVolumeSlice::SetLutRange(double low, double high)
 //----------------------------------------------------------------------------
 {
-	mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
   material->m_Window_LUT = high-low;
   material->m_Level_LUT  = (low+high)*.5;
   material->m_TableRange[0] = low;
@@ -563,7 +566,7 @@ void mafPipeVolumeSlice::SetLutRange(double low, double high)
 void mafPipeVolumeSlice::GetLutRange(double range[2])
 //----------------------------------------------------------------------------
 {
-  mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+  mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
   material->m_ColorLut->GetTableRange(range);
   /*
 	if(m_SliceDirection != SLICE_ORTHO)
@@ -688,7 +691,7 @@ void mafPipeVolumeSlice::OnEvent(mafEventBase *maf_event)
     {
       case ID_LUT_CHOOSER:
       {
-        mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+        mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
         material->UpdateFromTables();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
