@@ -13,6 +13,8 @@ SET(PROJECT_SRCS
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
     ${PROJECT_SRCS}
+    mafOpDecomposeTimeVarVME.cpp
+    mafOpDecomposeTimeVarVME.h
     mafOpImporterMSF.cpp
     mafOpImporterMSF.h
     mafOpImporterExternalFile.cpp
