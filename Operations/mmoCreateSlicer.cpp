@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 08:42:09 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-20 14:37:41 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,7 +40,9 @@ mafOp(label)
 {
   m_OpType	= OPTYPE_OP;
   m_Canundo = true;
-  m_Slicer   = NULL;
+  
+  m_Slicer    = NULL;
+  m_SlicedVME = NULL;
 }
 //----------------------------------------------------------------------------
 mmoCreateSlicer::~mmoCreateSlicer()
@@ -80,7 +82,8 @@ void mmoCreateSlicer::OpRun()
 		m_Slicer->SetName("slicer");
 		m_Output = m_Slicer;
 
-    m_Slicer->SetSlicedVMELink(n);
+    m_SlicedVME = n;
+    m_Slicer->SetSlicedVMELink(m_SlicedVME);
     result = OP_RUN_OK;
   }
   mafEventMacro(mafEvent(this, result));
@@ -93,7 +96,7 @@ void mmoCreateSlicer::OpDo()
   mafOBB b;
   m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
   rot[0] = rot[1] = rot[2] = 0;
-  ((mafVME *)m_Input)->GetOutput()->GetVMELocalBounds(b);
+  ((mafVME *)m_SlicedVME)->GetOutput()->GetVMELocalBounds(b);
   b.GetCenter(center);
   m_Slicer->SetPose(center,rot,0);
   m_Output = m_Slicer; // This allow the UnDo to work.
