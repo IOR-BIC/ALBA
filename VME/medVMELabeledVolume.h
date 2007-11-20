@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-13 08:31:35 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2007-11-20 17:39:32 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -168,7 +168,7 @@ protected:
   mmgFloatSlider    *m_SliceSlider;
   mafRWI            *m_Rwi;
   mafTagItem        *m_TagLabel;
-  mafVME            *m_Link;
+  mafVME            *m_VolumeLink;
   mafTransform      *m_Transform;
 
   wxString     m_LabelNameValue; 	
@@ -199,11 +199,10 @@ protected:
   vtkDataSet        *m_Dataset;
   vtkPolyData       *m_Polydata;
 
-
   /** This method updates the look-up table. */
   void UpdateLookUpTable();
 
-  /** If lables tags are present retrieve them. */
+  /** If labels tags are present retrieve them. */
   void RetrieveTag();
 
   void CopyDataset();
@@ -211,32 +210,26 @@ protected:
   /** Updates the tags and the items of the checkBox and call the InternalPreUpadate. */
   void UpdateLabel();
 
-
   /** update the output data structure */
   void InternalPreUpdate();
 
 
-  /** 
-  Copy the scalars of the VME linked. */
+  /** Copy the scalars of the VME linked. */
   void UpdateScalars();
   
-  /** 
-  Builds operation's interface and visualization pipeline. */
+  /** Builds operation's interface and visualization pipeline. */
   void CreateOpDialog();
 
-  /** 
-  Remove operation's interface. */
+  /** Remove operation's interface. */
   void DeleteOpDialog();
 
   /** Enable/disable VME widgets.*/
   void EnableWidgets(bool enable = true);
 
-  /** 
-  Create the pipeline to generate the slice of the volume. */
+  /** Create the pipeline to generate the slice of the volume. */
   void CreateSlicePipeline();
 
-  /** 
-  Re-slice the volume according to the new coordinate value. */
+  /** Re-slice the volume according to the new coordinate value. */
   void UpdateSlice();  
 
   /** This method returns the min value from the label used as input. */
@@ -244,7 +237,5 @@ protected:
 
   /** This method returns the max value from the label used as input. */
   int GetMax( wxString &item );
-
-
 };
 #endif
