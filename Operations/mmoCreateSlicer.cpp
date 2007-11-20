@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 14:37:41 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-11-20 14:38:08 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,12 +92,15 @@ void mmoCreateSlicer::OpRun()
 void mmoCreateSlicer::OpDo()
 //----------------------------------------------------------------------------
 {
-  double center[3], rot[3];
+  double center[3] = {0.0,0.0,0.0}, rot[3] = {0.0,0.0,0.0};
   mafOBB b;
   m_Slicer->ReparentTo(mafVME::SafeDownCast(m_Input));
   rot[0] = rot[1] = rot[2] = 0;
   ((mafVME *)m_SlicedVME)->GetOutput()->GetVMELocalBounds(b);
-  b.GetCenter(center);
+  if (b.IsValid())
+  {
+    b.GetCenter(center);
+  }
   m_Slicer->SetPose(center,rot,0);
   m_Output = m_Slicer; // This allow the UnDo to work.
 }
