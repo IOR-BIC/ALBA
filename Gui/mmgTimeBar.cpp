@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 10:23:37 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-11-20 10:48:55 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,10 +67,10 @@ m_Timer(NULL, ID_TIMER)
   m_Sizer->Fit(this);
   m_Sizer->SetSizeHints(this);
   
-  m_NumberOfIntervals = 500;
   m_Time     = 0;
   m_TimeMin  = 0; 
   m_TimeMax  = 100;
+  m_NumberOfIntervals = 500;
   m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
 
   m_TimeMinString = "";
@@ -128,8 +128,16 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
         {
           m_Timer.Stop();
         }
-        m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
-        m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
+        if (m_TimeBarSettings->GetShowAllFrames() != 0)
+        {
+          m_NumberOfIntervals = 500;
+          m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
+        }
+        else
+        {
+          m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
+          m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
+        }
         m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
         Update();
       break;
@@ -256,10 +264,19 @@ void mmgTimeBar::SetBounds(double min, double max)
     max = min + 1;
 
   m_Timer.Stop();
-  m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
+
   m_TimeMax = max;
   m_TimeMin = min;
-  m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
+  if (m_TimeBarSettings->GetShowAllFrames() != 0)
+  {
+    m_NumberOfIntervals = 500;
+    m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
+  }
+  else
+  {
+    m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
+    m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
+  }
 
   if(m_Time < min) 
   {
