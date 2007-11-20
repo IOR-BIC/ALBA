@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkPolyDataToSinglePolyLine.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-20 12:15:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Alessandro Chiarini
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -46,8 +46,8 @@ POSSIBILITY OF SUCH DAMAGES.
 
 =========================================================================*/
 
-#ifndef __vtkExtrudedTubeFilter_h
-#define __vtkExtrudedTubeFilter_h
+#ifndef __vtkPolyDataToSinglePolyLine_h
+#define __vtkPolyDataToSinglePolyLine_h
 
 #include "vtkMAFConfigure.h"
 #include "vtkPolyDataToPolyDataFilter.h"
