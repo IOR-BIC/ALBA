@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 17:40:08 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-11-21 11:07:48 $
+  Version:   $Revision: 1.17 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -477,6 +477,11 @@ int medVMELabeledVolume::InternalRestore(mafStorageElement *node)
 mmgGui* medVMELabeledVolume::CreateGui()
 //----------------------------------------------------------------------------
 {
+  m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
+  if (m_VolumeLink)
+  {
+    CopyDataset();
+  }
  
   // GUI
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
