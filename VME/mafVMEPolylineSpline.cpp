@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-16 10:26:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-11-21 14:47:33 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,6 +54,8 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
 
+  DependsOnLinkedNodeOn();
+
   // attach a datapipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
@@ -68,8 +70,6 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 
 	m_SplineCoefficient = 20;
   m_OrderByAxisMode   = AXIS_NONE;
-
-	DependsOnLinkedNodeOn();
 }
 //-------------------------------------------------------------------------
 mafVMEPolylineSpline::~mafVMEPolylineSpline()

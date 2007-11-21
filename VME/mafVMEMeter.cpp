@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:54:41 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-11-21 14:47:33 $
+  Version:   $Revision: 1.33 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1007,31 +1007,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    switch(maf_event->GetId())
-    {
-      case NODE_DESTROYED:
-      case NODE_DETACHED_FROM_TREE:
-        if (maf_event->GetSender() == GetStartVME())
-        {
-          RemoveLink("StartVME",false);
-        }
-        if (maf_event->GetSender() == GetEnd1VME())
-        {
-          RemoveLink("EndVME1",false);
-        }
-        if (maf_event->GetSender() == GetEnd2VME())
-        {
-          RemoveLink("EndVME2",false);
-        }
-        if (maf_event->GetSender() == GetPlottedVME())
-        {
-          RemoveLink("PlottedVME",false);
-        }
-        InternalUpdate();
-      break;
-      default:
-        Superclass::OnEvent(maf_event);
-    }
+    Superclass::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------

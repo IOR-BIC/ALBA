@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 14:58:19 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-11-21 14:47:33 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,13 +72,8 @@ mafVMESlicer::mafVMESlicer()
   m_PSlicer->SetTexture(image);
   m_ISlicer->SetOutput(image);
   
-  /*vtkNEW(m_BackTransformParent);
-  m_BackTransformParent->SetInput(slice);*/
-
   vtkNEW(m_BackTransform);
-  //vtkMAFSmartPointer<vtkTransformPolyDataFilter> back_trans;
   m_BackTransform->SetInput(slice);
-  
 
   DependsOnLinkedNodeOn();
 
@@ -189,7 +184,7 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-    case ID_VOLUME_LINK:
+      case ID_VOLUME_LINK:
       {
         mafString title = _("Choose volume vme");
         e->SetId(VME_CHOOSE);
@@ -208,25 +203,13 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
         }
       }
       break;
-    default:
-      mafNode::OnEvent(maf_event);
+      default:
+        mafNode::OnEvent(maf_event);
     }
   }
   else
   {
-    switch(maf_event->GetId())
-    {
-      case NODE_DESTROYED:
-      case NODE_DETACHED_FROM_TREE:
-        if (maf_event->GetSender() == GetSlicedVMELink())
-        {
-          RemoveLink("SlicedVME", false);
-        }
-        InternalPreUpdate();
-      break;
-      default:
-        Superclass::OnEvent(maf_event);
-    }
+    Superclass::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------

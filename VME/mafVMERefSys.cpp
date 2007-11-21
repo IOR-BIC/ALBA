@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:55:41 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-11-21 14:47:33 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -452,71 +452,51 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
       }
       break;
 			case ID_RADIO:
+			{
+				if(m_Radio==0)
 				{
-					if(m_Radio==0)
-					{
-						this->RemoveAllLinks();
-						m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
-						m_Gui->Enable(ID_POINT1,false);
-						m_Gui->Enable(ID_POINT2,false);
-					}
-					else if(m_Radio==1)
-					{
-						this->RemoveLink("Point1VME");
-						this->RemoveLink("Point2VME");
-						m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
-						m_Gui->Enable(ID_POINT1,false);
-						m_Gui->Enable(ID_POINT2,false);
-					}
-					else if(m_Radio==2)
-					{
-						m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
-						m_Gui->Enable(ID_POINT1,true);
-						m_Gui->Enable(ID_POINT2,true);
-					}
-					InternalUpdate();
-					m_Gui->Update();
+					this->RemoveAllLinks();
+					m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
+					m_Gui->Enable(ID_POINT1,false);
+					m_Gui->Enable(ID_POINT2,false);
 				}
+				else if(m_Radio==1)
+				{
+					this->RemoveLink("Point1VME");
+					this->RemoveLink("Point2VME");
+					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
+					m_Gui->Enable(ID_POINT1,false);
+					m_Gui->Enable(ID_POINT2,false);
+				}
+				else if(m_Radio==2)
+				{
+					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
+					m_Gui->Enable(ID_POINT1,true);
+					m_Gui->Enable(ID_POINT2,true);
+				}
+				InternalUpdate();
+				m_Gui->Update();
+			}
 			break;
 			case ID_FIXED:
-				{
-          /*m_Gui->Enable(ID_SCALE_FACTOR, m_Fixed == 0);
-					m_Gui->Enable(ID_REF_SYS_ORIGIN, m_Fixed == 0);
+			{
+        /*m_Gui->Enable(ID_SCALE_FACTOR, m_Fixed == 0);
+				m_Gui->Enable(ID_REF_SYS_ORIGIN, m_Fixed == 0);
 
-					m_Gui->Enable(ID_POINT1, m_Fixed == 0);
-					m_Gui->Enable(ID_POINT2, m_Fixed == 0);
-					m_Gui->Enable(ID_RADIO, m_Fixed == 0);
+				m_Gui->Enable(ID_POINT1, m_Fixed == 0);
+				m_Gui->Enable(ID_POINT2, m_Fixed == 0);
+				m_Gui->Enable(ID_RADIO, m_Fixed == 0);
 
-          m_Gui->Enable(ID_FIXED, m_Fixed == 0);*/
-				}
+        m_Gui->Enable(ID_FIXED, m_Fixed == 0);*/
+			}
 			break;
       default:
-      mafNode::OnEvent(maf_event);
+        mafNode::OnEvent(maf_event);
     }
   }
   else
   {
-    switch(maf_event->GetId())
-    {
-      case NODE_DESTROYED:
-      case NODE_DETACHED_FROM_TREE:
-        if (maf_event->GetSender() == GetOriginVME())
-        {
-          RemoveLink("OriginVME", false);
-        }
-        else if (maf_event->GetSender() == GetPoint1VME())
-        {
-          RemoveLink("Point1VME", false);
-        }
-        else if (maf_event->GetSender() == GetPoint2VME())
-        {
-          RemoveLink("Point2VME", false);
-        }
-        InternalUpdate();
-      break;
-      default:
-        Superclass::OnEvent(maf_event);
-    }
+    Superclass::OnEvent(maf_event);
   }
 }
 //-----------------------------------------------------------------------
