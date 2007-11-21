@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 10:09:41 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-21 17:59:07 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -260,7 +260,7 @@ void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
 	    else if(axis == GIZMO_SLICE_Z)
 		    this->m_SnapArray->DeepCopy((vtkDoubleArray *)((vtkRectilinearGrid *)vol_data)->GetZCoordinates());
     }
-    if(vol_data->IsA("vtkStructuredPoints"))
+    if(vol_data->IsA("vtkStructuredPoints") || vol_data->IsA("vtkImageData"))
     {
 	    int dim[3];
 	    double spc[3];
