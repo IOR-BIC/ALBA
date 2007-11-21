@@ -19,6 +19,8 @@ IF (MAF_USE_VTK)
     mafOpImporterMSF.h
     mafOpImporterExternalFile.cpp
     mafOpImporterExternalFile.h
+    mafOpLabelExtractor.cpp
+    mafOpLabelExtractor.h
     mafOpOpenExternalFile.cpp
     mafOpOpenExternalFile.h
     mmo2DMeasure.cpp
