@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 15:53:06 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-11-21 15:55:10 $
+  Version:   $Revision: 1.19 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -107,6 +107,8 @@ medVMELabeledVolume::medVMELabeledVolume()
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
  
+  DependsOnLinkedNodeOn();
+
   // attach a data pipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
   dpipe->SetDependOnAbsPose(true);
