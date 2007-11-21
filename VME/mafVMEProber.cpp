@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:55:41 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-11-21 14:50:21 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,6 +64,8 @@ mafVMEProber::mafVMEProber()
   mafVMEOutputSurface *output = mafVMEOutputSurface::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
+
+  DependsOnLinkedNodeOn();
 
   // attach a data pipe which creates a bridge between VTK and MAF
   mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
@@ -512,23 +514,7 @@ void mafVMEProber::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    switch(maf_event->GetId())
-    {
-      case NODE_DETACHED_FROM_TREE:
-      case NODE_DESTROYED:
-        if (maf_event->GetSender() == GetSurfaceLink())
-        {
-          RemoveLink("Surface", false);
-        }
-        else if (maf_event->GetSender() == GetVolumeLink())
-        {
-          RemoveLink("Volume", false);
-        }
-        InternalPreUpdate();
-      break;
-      default:
-        Superclass::OnEvent(maf_event);
-    }
+    Superclass::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------
