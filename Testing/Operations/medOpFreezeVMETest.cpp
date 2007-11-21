@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-10 17:52:42 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-11-21 09:42:48 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -188,9 +188,10 @@ void medOpFreezeVMETest::TestFreezeVMEMeter()
 	vmeParametricSurfaceEND1->SetParent(NULL);
 	polyline2->SetParent(NULL);
 
+  mafDEL(vmeParametricSurfaceSTART);
+  mafDEL(vmeParametricSurfaceEND1);
 	mafDEL(meter);
-	mafDEL(vmeParametricSurfaceSTART);
-	mafDEL(vmeParametricSurfaceEND1);
+
 	cppDEL(freezeOp);
 	mafDEL(storage);
 }
@@ -504,9 +505,9 @@ void medOpFreezeVMETest::TestFreezeVMEProfileSpline()
   vtkDEL(points);
   vtkDEL(cells);
   
-  mafDEL(spline);
   mafDEL(vmePolyline);
-
+  mafDEL(spline);
+  
   cppDEL(freezeOp);
   mafDEL(storage);
 }
