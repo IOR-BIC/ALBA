@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:53:14 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-11-21 14:53:06 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,7 @@ mafAttachCamera::~mafAttachCamera()
 {
   vtkDEL(m_AttachedVmeMatrix);
   vtkDEL(m_StartingMatrix);
-  if (m_AttachedVme)
+  if (m_AttachedVme && m_AttachedVme->IsValid())
   {
     m_AttachedVme->GetEventSource()->RemoveObserver(this);
   }
@@ -116,11 +116,7 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
     {
       case NODE_DETACHED_FROM_TREE:
       case NODE_DESTROYED:
-        // detach the camera by destroying the attached matrix and 
-        // the actor observed is set to NULL. The Logic the is removing
-        // the VME will remove all the observers (so also this class).
-        vtkDEL(m_AttachedVmeMatrix);
-        m_AttachedVme = NULL;
+        // the VME observed will be removed on the destructor.
         m_CameraAttach = 0;
         m_Gui->Update();
       break;
@@ -153,7 +149,6 @@ void mafAttachCamera::SetVme(mafNode *node)
     vtkNEW(m_AttachedVmeMatrix);
   }
   m_AttachedVme = mafVME::SafeDownCast(node);
-  //vtkMatrix4x4 *matrix = m_AttachedVme->GetOutput()->GetAbsMatrix()->GetVTKMatrix();
   m_AttachedVmeMatrix->DeepCopy(m_StartingMatrix);
 
   vtkMAFSmartPointer<vtkTransform> delta;
