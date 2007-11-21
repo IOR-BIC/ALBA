@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMELabeledVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-08 16:52:05 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-11-21 08:20:05 $
+Version:   $Revision: 1.4 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPointData.h"
 #include "vtkRectilinearGridReader.h"
 
-#define OUTRANGE_SCALAR 0
+#define OUTRANGE_SCALAR -1000
 
 //----------------------------------------------------------------------------
 void medVMELabeledVolumeTest::TestFixture()
