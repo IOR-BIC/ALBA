@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:50:45 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2007-11-21 14:52:26 $
+  Version:   $Revision: 1.50 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -586,8 +586,8 @@ int mafNode::SetParent(mafNode *parent)
     if (m_Parent != NULL)
     {
       // send event about detachment from the tree
-      m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
       ForwardUpEvent(&mafEventBase(this,NODE_DETACHED_FROM_TREE));
+      m_EventSource->InvokeEvent(this,NODE_DETACHED_FROM_TREE);
 
       m_Parent = parent;
       Modified();
@@ -845,7 +845,7 @@ void mafNode::SetLink(const char *name, mafNode *node, mafID sub_id)
   Modified();
 }
 //-------------------------------------------------------------------------
-void mafNode::RemoveLink(const char *name, bool remove_also_observer)
+void mafNode::RemoveLink(const char *name)
 //-------------------------------------------------------------------------
 {
   assert(name);
@@ -853,28 +853,22 @@ void mafNode::RemoveLink(const char *name, bool remove_also_observer)
   if (it!=m_Links.end())
   {
     assert(it->second.m_Node);
-    if (remove_also_observer)
-    {
-      // detach as observer from the linked node
-      it->second.m_Node->GetEventSource()->RemoveObserver(this);
-    }
+    // detach as observer from the linked node
+    it->second.m_Node->GetEventSource()->RemoveObserver(this);
     m_Links.erase(it); // remove linked node from links container
     Modified();
   }
 }
 
 //-------------------------------------------------------------------------
-void mafNode::RemoveAllLinks(bool remove_also_observer)
+void mafNode::RemoveAllLinks()
 //-------------------------------------------------------------------------
 {
-  if (remove_also_observer)
+  for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
   {
-    for (mafLinksMap::iterator it=m_Links.begin();it!=m_Links.end();it++)
-    {
-      // detach as observer from the linked node
-      if(it->second.m_Node)
-        it->second.m_Node->GetEventSource()->RemoveObserver(this);
-    }
+    // detach as observer from the linked node
+    if(it->second.m_Node)
+      it->second.m_Node->GetEventSource()->RemoveObserver(this);
   }
   m_Links.clear();
   Modified();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:50:45 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-11-21 14:52:26 $
+  Version:   $Revision: 1.34 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -197,6 +197,9 @@ public:
 
   bool IsEmpty() const {return GetNumberOfChildren()==0;}
 
+  /** Valid VMEs have m_ID >= 0. The root has m_Id = 0, other VMEs have m_Id > 0.*/
+  bool IsValid() {return m_Id >= 0;};
+
   /** Return the number of children of this node */
   unsigned long GetNumberOfChildren() const ;
   
@@ -310,13 +313,13 @@ public:
   void SetLink(const char *name, mafNode *node, mafID sub_id = -1);
 
   /** remove a link */
-  void RemoveLink(const char *name, bool remove_also_observer = true);
+  void RemoveLink(const char *name);
 
   /** return the number of links stored in this Node */
   mafID GetNumberOfLinks() {return m_Links.size();}
 
   /** remove all links */
-  void RemoveAllLinks(bool remove_also_observer = true);
+  void RemoveAllLinks();
   
   /** return links array: links from this node to other arrays */
   mafLinksMap *GetLinks() {return &m_Links;}
