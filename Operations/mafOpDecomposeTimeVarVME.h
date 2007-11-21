@@ -2,12 +2,12 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 09:41:23 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-21 15:14:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2007 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+  ULB - Universite Libre de Bruxelles (www.ulb.ac.be)
 =========================================================================*/
 
 #ifndef __mafOpDecomposeTimeVarVME_H__
@@ -25,24 +25,19 @@ class wxListBox;
 class mafVME;
 class mmgRollOut;
 class mafVMEGroup;
-
-//////
-class mafVMEAFRefSys;
+class mafVMELandmarkCloud;
 class mafGui;
 class mafEvent;
-class mafIntGraphHyer;
-class mafVMELandmarkCloud;
-class vtkPoints;
-
 
 //----------------------------------------------------------------------------
 // mmoRefSys :
 //----------------------------------------------------------------------------
-/** */
+/** Operation to create static VMEs from a time varing VME. User can choose single timestamps,
+    timestamp interval, or set a periodicity by means extract static VMEs */
 class mafOpDecomposeTimeVarVME: public mafOp
 {
 public:
-  mafOpDecomposeTimeVarVME(const wxString& label = "TimeReduce");
+  mafOpDecomposeTimeVarVME(const wxString& label = "Decompose time varying VME");
  ~mafOpDecomposeTimeVarVME(); 
 
   virtual void OnEvent(mafEventBase *maf_event);
@@ -84,7 +79,6 @@ public:
     ID_INSERT_FRAME,
     ID_REMOVE_FRAME,
     ID_FRAME,
-
     CHANGE_VALUE_FRAMES,
     CHANGE_VALUE_INTERVAL,
     CHANGE_VALUE_PERIODICITY,
@@ -121,6 +115,8 @@ private:
   double m_IntervalTo;
   double m_Frame;
 
+  std::vector<mafVME*> m_VectorVME;
+  std::vector<mafVMELandmarkCloud*> m_VectorCloud;
   std::vector<mafString> m_FrameLabel;
 
   wxListBox *m_FramesListBox; 

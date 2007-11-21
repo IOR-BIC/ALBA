@@ -2,12 +2,12 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 09:41:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-21 15:14:09 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2007 
-  CINECA - Interuniversity Consortium (www.cineca.it)
+  ULB - Universite Libre de Bruxelles (www.ulb.ac.be)
 =========================================================================*/
 
 #include "mafDefines.h" 
@@ -22,6 +22,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
+#include "mafNodeIterator.h"
 #include "mmgGui.h"
 #include "mmgRollOut.h"
 #include "mmaMaterial.h"
@@ -29,15 +30,15 @@
 #include "mmgListBox.h"
 #include "mafTagArray.h"
 #include "mafStorageElement.h"
-
-#include "mafNodeIterator.h"
-#include "mafSmartPointer.h"
-#include "mafMatrixVector.h"
-#include "mafDataVector.h"
 #include "mafMatrix.h"
 #include "mafVMEFactory.h"
 #include "mafVMEItem.h"
 #include "mafVME.h"
+
+#include "mafSmartPointer.h"
+#include "mafMatrixVector.h"
+#include "mafDataVector.h"
+
 #include "mafVMEGroup.h"
 #include "mafVMELandmarkCloud.h"
 
@@ -63,14 +64,19 @@ mafOpDecomposeTimeVarVME::~mafOpDecomposeTimeVarVME()
 {
   if (m_Group != NULL) 
   {
-   mafNodeIterator *iter = m_Group->NewIterator();
-   for (mafNode *node=iter->GetFirstNode();node;node=iter->GetNextNode())
-   {
-     mafDEL(node);
-    // m_Group->ReparentTo(NULL);
-   }
+    for (int i = 0; i < m_VectorCloud.size(); i++)
+    {
+      m_VectorCloud[i]->RemoveLandmark(0);
+      mafDEL(m_VectorCloud[i]);
+    }
+  
+    for (int i = 0; i < m_VectorVME.size(); i++)
+    {
+      mafDEL(m_VectorVME[i]);
+    }
+    m_Group->ReparentTo(NULL);
+    mafDEL(m_Group);
   }
-  mafDEL(m_Group);
 }
 
 //----------------------------------------------------------------------------
@@ -177,14 +183,22 @@ void mafOpDecomposeTimeVarVME::OnEvent(mafEventBase *maf_event)
         }
       break;
       case wxOK:          
-      {
-        int res = (UpdateFrames() == MAF_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
-        OpStop(res);
-      }
-      break;
-      case wxCANCEL:
+      { 
+        if (UpdateFrames() == MAF_OK)
+        {
+          OpStop(OP_RUN_OK);
+        }
+        else
+        {
           OpStop(OP_RUN_CANCEL);
-      break;
+        }
+        break;
+      }
+      case wxCANCEL:
+      {    
+        OpStop(OP_RUN_CANCEL);
+        break;
+      }
       case ID_INSERT_FRAME:
       {
         char frameStr[50];
@@ -205,13 +219,20 @@ void mafOpDecomposeTimeVarVME::OnEvent(mafEventBase *maf_event)
       }
       break;
       case ID_REMOVE_FRAME:
+      {
         DeleteFrame(m_ItemId);
-      break;
+        break;
+      }
       case ID_LIST_FRAMES:
+      {
         m_ItemId = e->GetArg();
-      break;
+        break;
+      }
       default:
+      {
         mafEventMacro(*maf_event); 
+      }
+      break;
     }
   }
 }
@@ -226,7 +247,6 @@ void mafOpDecomposeTimeVarVME::AppendFrame(char *string)
   }
 
   m_FrameLabel.push_back(string);
-
 }
 
 //----------------------------------------------------------------------------
@@ -287,7 +307,7 @@ int mafOpDecomposeTimeVarVME::UpdateFrames()
   switch(m_InsertMode)
   {
     case MODE_FRAMES:
-    {
+    { 
       int framesNummber = m_FrameLabel.size();
       if (framesNummber > 0)
       {
@@ -301,7 +321,7 @@ int mafOpDecomposeTimeVarVME::UpdateFrames()
           {
             char errorMessage[50];
             sprintf(errorMessage, "Frame %s is outside timestamps bounds!", frame);
-            wxMessageBox( errorMessage, "Warning!", wxOK | wxICON_ERROR  ); 
+            wxMessageBox( errorMessage, _("Warning"), wxOK | wxICON_ERROR  ); 
           }
           CreateStaticVME(timeSt);
         }
@@ -372,7 +392,7 @@ int mafOpDecomposeTimeVarVME::UpdateFrames()
         if (pCounter == m_Periodicity)
         {
           timeSt = kframes[n];
-          ////Create new static VME with var "time"
+          //Create new static VME with var "time"
           CreateStaticVME(timeSt);
           pCounter = 0;
         }
@@ -397,21 +417,27 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
   oldVme->GetLocalTimeStamps(kframes);
 
   mafVME *newVme = NULL;
+
   // restore due attributes
   mafString typeVme;
   typeVme = m_Input->GetTypeName();
 
-  //If VME is a landmark, a landmark cloud must be created
-  if (typeVme.Equals("mafVMELandmark"))
-  {
-    mafNEW(m_Cloud);
-    m_Cloud->Open();
-  }
- 
   mafSmartPointer<mafVMEFactory> factory;
   newVme = factory->CreateVMEInstance(typeVme);
   if (!newVme)
     return;
+
+  //If VME is a landmark, a landmark cloud must be created
+  if (typeVme == "mafVMELandmark")
+  {
+    mafNEW(m_Cloud);
+    m_Cloud->Open();
+    m_VectorCloud.push_back(m_Cloud);
+  }
+  else
+  {
+    m_VectorVME.push_back(newVme);
+  }
   
   newVme->GetTagArray()->DeepCopy(oldVme->GetTagArray());
   
