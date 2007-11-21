@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 11:07:48 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-11-21 15:53:06 $
+  Version:   $Revision: 1.18 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -1023,16 +1023,6 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    if (maf_event->GetId() == NODE_DESTROYED ||
-        maf_event->GetId() == NODE_DETACHED_FROM_TREE)
-    {
-      if (maf_event->GetSender() == GetVolumeLink())
-      {
-        RemoveLink("VolumeLink",false);
-        UpdateScalars();
-        return;
-      }
-    }
     Superclass::OnEvent(maf_event);
   }
 }
