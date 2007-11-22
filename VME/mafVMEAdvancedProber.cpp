@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEAdvancedProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 11:31:00 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-11-22 10:05:54 $
+  Version:   $Revision: 1.21 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -181,10 +181,9 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 {
   //wxBusyCursor wait;
   //if(m_AutomaticCalculum == 0) return;
-	ForwardUpEvent(&mafEvent(this,VME_SYNC_WITH_SPLINE_LINK, m_ProfileDistance*m_AdditionalProfileNumber));
-
+	
   mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
-  mafVMEPolylineSpline *vme;
+  mafVMEPolylineSpline *vme = NULL;
   
   int counter = 0;
   std::vector<vtkPolyData *> profilesOrdered;
@@ -279,6 +278,9 @@ void mafVMEAdvancedProber::InternalUpdate() //Multi
 		return;
 	}
 
+  
+  ForwardUpEvent(&mafEvent(this,VME_SYNC_WITH_SPLINE_LINK, m_ProfileDistance*m_AdditionalProfileNumber));
+  
   ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
   vol->GetOutput()->Update();
 
@@ -1782,7 +1784,7 @@ void mafVMEAdvancedProber::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    Superclass::OnEvent(maf_event);
+     Superclass::OnEvent(maf_event);
   }
 }
 //-------------------------------------------------------------------------
@@ -1810,7 +1812,7 @@ bool mafVMEAdvancedProber::CheckUpdatePanoramic(mafVMEPolylineSpline *vme)
   if(vme && vme->GetPolylineLink())
     tempPoints = vtkPolyData::SafeDownCast(vme->GetPolylineLink()->GetOutput()->GetVTKData())->GetPoints();
   else
-    return true;
+    return false;
 
   if(m_ControlPoints->GetNumberOfPoints() == 0 || m_ControlPoints->GetNumberOfPoints() != tempPoints->GetNumberOfPoints()) return true;
 
