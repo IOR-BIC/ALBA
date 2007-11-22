@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 15:14:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-22 13:34:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,9 +35,11 @@
 #include "vtkImageThreshold.h"
 #include "vtkMatrix4x4.h"
 #include "vtkContourVolumeMapper.h"
+#include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkPointData.h"
+#include "vtkImageToStructuredPoints.h"
 
 
 //----------------------------------------------------------------------------
@@ -128,8 +130,8 @@ void mafOpLabelExtractor::OpRun()
 void mafOpLabelExtractor::OpDo()
 //----------------------------------------------------------------------------
 {
+  m_Output = m_Vme;
 	mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
-  //m_Output = m_Vme;
 }
 //----------------------------------------------------------------------------
 void mafOpLabelExtractor::OpUndo()
@@ -176,13 +178,12 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
 void mafOpLabelExtractor::ExtractLabel()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor wait;
+  vtkMAFSmartPointer<vtkImageToStructuredPoints> imageToSp;
 	mafVME *vme = (mafVME *)m_Input;
   vtkDataSet *ds = vme->GetOutput()->GetVTKData();
-  vtkImageData *vol = vtkImageData::SafeDownCast(ds);
-  vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(ds);
-
-  vtkImageData *imageDataRg = vtkImageData::New();
+  vtkMAFSmartPointer<vtkImageData> vol;
+  vtkMAFSmartPointer<vtkImageData> imageDataRg; 
+  
 
   double bounds[6];
   int dim[3], xdim, ydim, zdim, slice_size;
@@ -197,35 +198,78 @@ void mafOpLabelExtractor::ExtractLabel()
   double zmax = bounds[5];	   
 
   //setting the ImageData for RectilinearGrid
-  double spacing_x, spacing_y;
-  if (rg)
-  {  
-    rg->Update();
-    rg->GetDimensions(dim);
+  if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(ds))
+  {
+    double volumeSpacing[3];
+    volumeSpacing[0] = VTK_DOUBLE_MAX;
+    volumeSpacing[1] = VTK_DOUBLE_MAX;
+    volumeSpacing[2] = VTK_DOUBLE_MAX;
+
+    for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
+    {
+      double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
+      if (volumeSpacing[0] > spcx)
+        volumeSpacing[0] = spcx;
+    }
+
+    for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
+    {
+      double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
+      if (volumeSpacing[1] > spcy)
+        volumeSpacing[1] = spcy;
+    }
+
+    for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
+    {
+      double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
+      if (volumeSpacing[2] > spcz)
+        volumeSpacing[2] = spcz;
+    }
+
+    double origin[3];
+    origin[0] = bounds[0];
+    origin[1] = bounds[2];
+    origin[2] = bounds[4];
+
+    int output_extent[6];
+    output_extent[0] = 0;
+    output_extent[1] = (bounds[1] - bounds[0]) / volumeSpacing[0];
+    output_extent[2] = 0;
+    output_extent[3] = (bounds[3] - bounds[2]) / volumeSpacing[1];
+    output_extent[4] = 0;
+    output_extent[5] = (bounds[5] - bounds[4]) / volumeSpacing[2];
+
+    vtkMAFSmartPointer<vtkStructuredPoints> output_data;
+    output_data->SetSpacing(volumeSpacing);
+    // TODO: here I probably should allow a data type casting... i.e. a GUI widget
+    output_data->SetScalarType(ds->GetPointData()->GetScalars()->GetDataType());
+    output_data->SetExtent(output_extent);
+    output_data->SetUpdateExtent(output_extent);
+
+    rgrid->GetDimensions(dim);
     xdim = dim[0];
     ydim = dim[1];
     zdim = dim[2];
     slice_size = xdim*ydim;
-
-    imageDataRg->SetOrigin(xmin, ymin, zmin);
-    imageDataRg->SetDimensions(xdim, ydim, zdim);
-
-    spacing_x = (xmax-xmin)/xdim;
-    spacing_y = (ymax-ymin)/ydim;
-
-    imageDataRg->SetSpacing(spacing_x, spacing_y, 1);
-    imageDataRg->SetScalarType(rg->GetPointData()->GetScalars()->GetDataType());
-    imageDataRg->GetPointData()->SetScalars(rg->GetPointData()->GetScalars());
+    
+    output_data->SetOrigin(xdim ,ydim, zdim);
+    output_data->SetDimensions(xdim, ydim, zdim);
+    output_data->GetPointData()->SetScalars(rgrid->GetPointData()->GetScalars());
     imageDataRg->Update();
 
-    vol = imageDataRg;
+    vol->DeepCopy((vtkImageData *)output_data);
+    imageToSp->SetInput(vol);
+    imageToSp->Update();
   }
   else
   {
-    vol->DeepCopy((vtkImageData *)vme->GetOutput()->GetVTKData());
+    vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(ds);
+    vol->DeepCopy((vtkImageData *)sp);
+    imageToSp->SetInput(vol);
+    imageToSp->Update();
   }
 
-	vtkImageThreshold *it = vtkImageThreshold::New();
+	vtkMAFSmartPointer<vtkImageThreshold> it;
   it->SetInput(vol);
 
 	double maxValue;
@@ -256,10 +300,10 @@ void mafOpLabelExtractor::ExtractLabel()
   it->ThresholdBetween(m_ValLabel, m_ValLabel);
   it->Update();
 
-  vtkImageGaussianSmooth *smooth = vtkImageGaussianSmooth::New();
-  vtkImageGaussianSmooth *smoothAfter = vtkImageGaussianSmooth::New();
+  vtkMAFSmartPointer<vtkImageGaussianSmooth> smooth;
+  vtkMAFSmartPointer<vtkImageGaussianSmooth> smoothAfter;
 
-  vtkExtractVOI *extract = vtkExtractVOI::New();
+  vtkMAFSmartPointer<vtkExtractVOI> extract;
 
   if(m_SmoothVolume)
   {
@@ -285,14 +329,14 @@ void mafOpLabelExtractor::ExtractLabel()
   {
     vol->DeepCopy(it->GetOutput());
   }
+ 
+  vtkMAFSmartPointer<vtkContourVolumeMapper> contourMapper;
+  contourMapper->SetInput((vtkDataSet *)imageToSp->GetOutput());
+  contourMapper->SetContourValue(m_ValLabel);
 	
-  vtkContourVolumeMapper *contour_mapper = vtkContourVolumeMapper::New();
-	contour_mapper->SetInput((vtkDataSet *)vol);
-	contour_mapper->SetContourValue(m_ValLabel);
-	
-	vtkPolyData *surface = vtkPolyData::New();
-	contour_mapper->GetOutput(0, surface);
-	contour_mapper->Update();
+	vtkMAFSmartPointer<vtkPolyData> surface;
+  contourMapper->GetOutput(0, surface);	
+	contourMapper->Update();
 
   mafNEW(m_Vme);
 	m_Vme->SetData(surface, 0.0);

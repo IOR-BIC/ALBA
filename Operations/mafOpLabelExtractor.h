@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 15:14:47 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-22 13:34:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,9 +55,11 @@ public:
   //Set if smooth mode is true
   void SmoothMode(bool smoothMode);
 
-protected: 
-  // Ccreate a VMESurface draw from a Volume
+  // Create a VMESurface draw from a Volume
 	void ExtractLabel();
+
+protected: 
+
 
 	double   m_ValLabel;
   int      m_SmoothVolume;
