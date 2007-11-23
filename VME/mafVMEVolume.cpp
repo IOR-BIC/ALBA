@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-05-08 14:40:25 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-23 10:22:24 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkLookupTable.h"
 //-------------------------------------------------------------------------
 mafCxxAbstractTypeMacro(mafVMEVolume)
 //-------------------------------------------------------------------------
@@ -80,6 +81,16 @@ mmaVolumeMaterial *mafVMEVolume::GetMaterial()
   if (material == NULL)
   {
     material = mmaVolumeMaterial::New();
+    if(GetOutput() && GetOutput()->GetVTKData())
+    {
+      GetOutput()->GetVTKData()->Update();
+      double sr[2];
+      GetOutput()->GetVTKData()->GetScalarRange(sr);
+      material->m_ColorLut->SetTableRange(sr);
+      material->m_ColorLut->SetRange(sr);
+      material->UpdateFromTables();
+    }
+    
     SetAttribute("VolumeMaterialAttributes", material);
     if (m_Output)
     {
