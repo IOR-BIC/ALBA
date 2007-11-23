@@ -37,6 +37,8 @@ SET(vtkMAF_SRCS
   vtkLocalAxisCoordinate.h
   vtkMAFMeshCutter.cxx
   vtkMAFMeshCutter.h
+  vtkMAFTextOrientator.cxx
+  vtkMAFTextOrientator.h
   vtkProjectRG.cxx
   vtkProjectRG.h
   vtkProjectSP.cxx
