@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 10:09:17 $
-  Version:   $Revision: 1.71 $
+  Date:      $Date: 2007-11-23 10:19:58 $
+  Version:   $Revision: 1.72 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ mafCxxTypeMacro(mafViewVTK);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo)
+mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo, bool show_orientator)
 :mafView(label)
 //----------------------------------------------------------------------------
 {
@@ -63,6 +63,7 @@ mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axe
   m_ShowGrid        = show_grid;
   m_StereoType      = stereo;
   m_ShowRuler       = show_ruler;
+	m_ShowOrientator  = show_orientator;
   
   m_Sg        = NULL;
   m_Rwi       = NULL;
@@ -99,7 +100,7 @@ void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long vi
 mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_ShowRuler, m_StereoType, m_ShowOrientator);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -110,7 +111,7 @@ mafView *mafViewVTK::Copy(mafObserver *Listener)
 void mafViewVTK::Create()
 //----------------------------------------------------------------------------
 {
-  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
+  m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator);
   m_Rwi->SetListener(this);
   m_Rwi->CameraSet(m_CameraPosition);
   m_Win = m_Rwi->m_RwiBase;
