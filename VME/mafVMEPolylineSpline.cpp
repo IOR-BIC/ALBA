@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:47:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-11-23 10:22:09 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -151,7 +151,10 @@ bool mafVMEPolylineSpline::IsAnimated()
 bool mafVMEPolylineSpline::IsDataAvailable()
 //-------------------------------------------------------------------------
 {
-  return GetPolylineLink()->IsDataAvailable();
+  if(GetPolylineLink())
+    return GetPolylineLink()->IsDataAvailable();
+  else
+    return false;
 }
 
 //-------------------------------------------------------------------------
