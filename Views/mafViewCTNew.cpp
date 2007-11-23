@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-16 10:56:25 $
-Version:   $Revision: 1.39 $
+Date:      $Date: 2007-11-23 10:49:34 $
+Version:   $Revision: 1.40 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -91,6 +91,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 		m_Actor.push_back(vtkActor::New());
 		m_Text.push_back(vtkTextMapper::New());
 		m_Text[i]->GetTextProperty()->SetColor(1.0,1.0,1.0);
+    //m_Text[i]->GetTextProperty()->ShadowOn();
 		m_Mapper.push_back(vtkPolyDataMapper::New());
 		m_Prober.push_back(vtkProbeFilter::New());
 		m_PlaneSec.push_back(vtkPlaneSource::New());
@@ -194,7 +195,7 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 					view->GetSceneGraph()->m_RenFront->RemoveActor(m_TextActor[idSubView]);
 				}
 			}
-			CameraUpdate();
+			//CameraUpdate();
 			m_CurrentVolume = NULL;
 		}
 
@@ -342,6 +343,19 @@ mmgGui* mafViewCTNew::CreateGui()
 	m_Gui->Label("");
 
 	m_Gui->Update();
+
+  // actor for anatomic orientation
+  for(int idView=0;idView<CT_CHILD_VIEWS_NUMBER;idView++)
+  {    
+    mafViewSlice* view =((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0])->GetSubView(idView));
+    view->m_Rwi->SetOrientatorVisibility(true);
+    view->m_Rwi->SetOrientatorSingleActorVisibility(true,false,true,false);
+    view->m_Rwi->SetOrientatorSingleActorText("L","","B","");
+    double white[3] = {1.0,1.0,1.0};
+    double black[3] = {0.0,0.0,0.0};
+    view->m_Rwi->SetOrientatorProperties(white, black);
+  }
+  
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
