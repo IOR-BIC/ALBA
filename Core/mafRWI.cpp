@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-02 14:01:01 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2007-11-23 10:19:44 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,7 @@
 #include "vtkDataSet.h"
 #include "vtkSimpleRulerActor2D.h"
 
+
 #define DEFAULT_BG_COLOR 0.28
 
 //----------------------------------------------------------------------------
@@ -64,6 +65,7 @@ mafRWI::mafRWI()
   m_RwiBase = NULL;
   m_RenderWindow = NULL;
   m_Ruler   = NULL;
+	m_Orientator = NULL;
   m_Grid    = NULL;
   m_Axes    = NULL;
   for (int b=0; b<6; b++)
@@ -81,7 +83,7 @@ mafRWI::mafRWI()
   m_StereoMovieEnable = 0;
 }
 //----------------------------------------------------------------------------
-mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo)
+mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
 //----------------------------------------------------------------------------
 {
   m_Listener= NULL;
@@ -110,10 +112,10 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
 
-  CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo);
+  CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo, show_orientator);
 }
 //----------------------------------------------------------------------------
-void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo)
+void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
 //----------------------------------------------------------------------------
 {
   if (m_Light != NULL)
@@ -168,6 +170,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   }
 
   m_ShowRuler = show_ruler;
+	m_ShowOrientator = show_orientator;
 
   mmgMeasureUnitSettings *unit_settings = new mmgMeasureUnitSettings(this);
   m_RulerScaleFactor = unit_settings->GetScaleFactor();
@@ -185,6 +188,18 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   m_Ruler->SetColor(1,1,1);
   m_RenFront->AddActor2D(m_Ruler);
   m_Ruler->SetVisibility(m_ShowRuler);
+
+	vtkNEW(m_Orientator);
+	m_Orientator->SetTextUp("U");
+	m_Orientator->SetTextDown("D");
+	m_Orientator->SetTextLeft("L");
+	m_Orientator->SetTextRight("R");
+	
+	m_RenFront->AddActor2D(m_Orientator);
+	m_Orientator->SetVisibility(m_ShowOrientator);
+  //m_Orientator->SetBackgroundVisibility(false);
+  m_Orientator->SetTextColor(1.0,1.0,1.0);
+  m_Orientator->SetBackgroundColor(0.0,0.0,0.0);
 
   m_ShowGrid    = use_grid;
   m_GridNormal  = GRID_Z;
@@ -213,6 +228,9 @@ mafRWI::~mafRWI()
 	
   if(m_Ruler) m_RenFront->RemoveActor2D(m_Ruler);
   vtkDEL(m_Ruler);
+
+	if(m_Orientator) m_RenFront->RemoveActor2D(m_Orientator);
+	vtkDEL(m_Orientator);
 
   cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
@@ -409,6 +427,13 @@ void mafRWI::SetRuleVisibility(bool show)
 {
   if(m_Ruler) 
     m_Ruler->SetVisibility(show);
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetOrientatorVisibility(bool show)
+//----------------------------------------------------------------------------
+{
+	if(m_Orientator) 
+		m_Orientator->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetRulerScaleFactor(const double &scale_factor)
@@ -672,6 +697,7 @@ enum RWI_WIDGET_ID
   ID_CAMERA_BOTTOM,
   ID_LINK_CAMERA,
   ID_SHOW_RULER,
+	ID_SHOW_ORIENTATOR,
   ID_RULER_SCALE_FACTOR,
   ID_RULER_LEGEND
 };
@@ -714,6 +740,8 @@ mmgGui *mafRWI::CreateGui()
     m_Gui->Bool(ID_SHOW_RULER,"show ruler",&m_ShowRuler);
     m_Gui->Double(ID_RULER_SCALE_FACTOR,"scale factor",&m_RulerScaleFactor,1.0e-299,MAXDOUBLE,-1);
     m_Gui->String(ID_RULER_LEGEND,"legend",&m_RulerLegend);
+
+		
   }
 
   if (m_StereoType)
@@ -728,6 +756,7 @@ mmgGui *mafRWI::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
+	m_Gui->Bool(ID_SHOW_ORIENTATOR,"orientation",&m_ShowOrientator);
   m_Gui->Divider();
   return m_Gui;
 }
@@ -764,6 +793,10 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       case ID_SHOW_RULER:
         SetRuleVisibility(m_ShowRuler!= 0);
       break;
+			case ID_SHOW_ORIENTATOR:
+				SetOrientatorVisibility(m_ShowOrientator!= 0);
+				CameraUpdate();
+				break;
       case ID_RULER_SCALE_FACTOR:
         SetRulerScaleFactor(m_RulerScaleFactor);
       break;
@@ -851,4 +884,39 @@ void mafRWI::UpdateRulerUnit()
     m_Gui->Update();
   }
   CameraUpdate();
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale)
+//----------------------------------------------------------------------------
+{
+  if(m_Orientator)
+  {
+    m_Orientator->SetScale(scale);
+    m_Orientator->SetTextColor(rgbText[0], rgbText[1],rgbText[2]);
+    m_Orientator->SetBackgroundColor(rgbBackground[0], rgbBackground[1],rgbBackground[2]);
+  }
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetOrientatorSingleActorVisibility(bool showLeft, bool showDown, bool showRight, bool showUp)
+//----------------------------------------------------------------------------
+{
+  if(m_Orientator)
+  {
+    m_Orientator->SetSingleActorVisibility(vtkMAFTextOrientator::ID_ACTOR_LEFT, showLeft);
+    m_Orientator->SetSingleActorVisibility(vtkMAFTextOrientator::ID_ACTOR_DOWN, showDown);
+    m_Orientator->SetSingleActorVisibility(vtkMAFTextOrientator::ID_ACTOR_RIGHT, showRight);
+    m_Orientator->SetSingleActorVisibility(vtkMAFTextOrientator::ID_ACTOR_UP, showUp);
+  }
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetOrientatorSingleActorText(const char* textLeft, const char* textDown, const char* textRight, const char* textUp)
+//----------------------------------------------------------------------------
+{
+  if(m_Orientator)
+  {
+    m_Orientator->SetTextLeft(textLeft);
+    m_Orientator->SetTextDown(textDown);
+    m_Orientator->SetTextRight(textRight);
+    m_Orientator->SetTextUp(textUp);
+  }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-27 11:44:52 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-11-23 10:19:44 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,6 +16,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "mafRWIBase.h"
 #include "mafObserver.h"
+#include "vtkMAFTextOrientator.h"
 
 //----------------------------------------------------------------------------
 // Forward References :
@@ -48,7 +49,7 @@ class mafRWI : public mafObserver
 {
 public:
   				 mafRWI();
-           mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
+           mafRWI(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false);
 	virtual	~mafRWI();
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
@@ -56,7 +57,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Create all the elements necessary to build the rendering scene.*/
-  void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0);
+  void CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers = ONE_LAYER, bool use_grid = false, bool show_axes = false, bool show_ruler = false, int stereo = 0, bool show_orientator = false);
 
   /** Reset the camera position. If vme is passed as parameter, the camera is resetted to fill the vme into the view. */
 	void CameraReset(mafNode *vme = NULL, double zoom = 1);
@@ -100,12 +101,24 @@ public:
   /** Set the visibility for the rule actor. */
   void SetRuleVisibility(bool show = true);
 
+	/** Set the visibility for the rule actor. */
+	void SetOrientatorVisibility(bool show = true);
+
+  /** Set the visibility for the rule actor. */
+  void SetOrientatorSingleActorVisibility(bool showLeft = true, bool showDown = true, bool showRight = true, bool showUp = true);
+  
+  /** Set the text for the rule actor. */
+  void SetOrientatorSingleActorText(const char* textLeft, const char* textDown, const char* textRight, const char* textUp);
+
   /** Set the scale factor to convert the data scale to the visualized scale of the rule. 
       By default the ruler shows the same scale of the data. */
   void SetRulerScaleFactor(const double &scale_factor);
 
   /** Set the label of the ruler. Example the unit measure of the data. */
   void SetRulerLegend(const mafString &ruler_legend);
+
+	/** Set Orientator Text Properties */
+	void SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale = 1);
 
   /** Update scale factor and legend.
   This method is called from logic to update measure unit according to the application settings.*/
@@ -148,6 +161,8 @@ protected:
   vtkSimpleRulerActor2D *m_Ruler;
   int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
   int           m_StereoType;
+	vtkMAFTextOrientator     *m_Orientator;
+	int          m_ShowOrientator;
   mafObserver  *m_Listener;
 
   mafString m_StereoMovieDir;
