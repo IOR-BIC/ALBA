@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-29 13:00:36 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-11-23 10:22:48 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -328,7 +328,8 @@ void mmgLutSlider::ShowEntry(int id)
 				val = (val>=m_MinValue) ? val : m_MinValue;
 				val = (val< m_HighValue)  ? val : m_HighValue;
 				SetSubRange(val,m_HighValue);
-		    mafEventMacro(mafEvent(this,ID_RANGE_MODIFIED));
+        mafEvent event = mafEvent(this,ID_RANGE_MODIFIED,this);
+		    mafEventMacro(event);
 			}
 		}
 		break;
@@ -342,7 +343,8 @@ void mmgLutSlider::ShowEntry(int id)
 				val = (val> m_LowValue) ? val : m_LowValue;
 				val = (val<=m_MaxValue) ? val : m_MaxValue;
 				SetSubRange(m_LowValue,val);
-		    mafEventMacro(mafEvent(this,ID_RANGE_MODIFIED));
+        mafEvent event = mafEvent(this,ID_RANGE_MODIFIED,this);
+        mafEventMacro(event);
 			}
 		}
 		break;
