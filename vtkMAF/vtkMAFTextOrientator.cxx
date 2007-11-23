@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextOrientator.cxx,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:18:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-23 15:01:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 #include "vtkPolyData.h"
 
 
-vtkCxxRevisionMacro(vtkMAFTextOrientator, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFTextOrientator, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFTextOrientator);
 //------------------------------------------------------------------------------
 vtkMAFTextOrientator::vtkMAFTextOrientator()
@@ -289,6 +289,9 @@ void vtkMAFTextOrientator::SetScale(double multiple)
 
   TextSourceUp->GetOutput()->DeepCopy(tpdf->GetOutput());
   TextSourceUp->GetOutput()->Update();
+
+  tpdf->Delete();
+  transform->Delete();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTextOrientator::SetSingleActorVisibility(int actor, bool show)
