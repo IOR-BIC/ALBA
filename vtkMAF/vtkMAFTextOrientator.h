@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextOrientator.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:18:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-26 12:55:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -50,10 +50,7 @@ class VTK_vtkMAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
   void PrintSelf(ostream& os, vtkIndent indent);
   static	vtkMAFTextOrientator *New();
   
-  int	 RenderOverlay(vtkViewport *viewport);
-  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
-  int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;}
- 
+  
   enum ID_TEXT_ORIENTATOR
   {
     ID_ACTOR_LEFT = 0,
@@ -62,10 +59,10 @@ class VTK_vtkMAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
     ID_ACTOR_UP
   };
   
-  char*   GetTextLeft(){return TextSourceLeft->GetText();}
-  char*   GetTextDown(){return TextSourceDown->GetText();} 
-  char*   GetTextRight(){return TextSourceRight->GetText();}
-  char*   GetTextUp(){return TextSourceUp->GetText();}
+  const char*   GetTextLeft(){return TextSourceLeft->GetText();}
+  const char*   GetTextDown(){return TextSourceDown->GetText();} 
+  const char*   GetTextRight(){return TextSourceRight->GetText();}
+  const char*   GetTextUp(){return TextSourceUp->GetText();}
 
   void 	  SetTextLeft(const char * inputString){TextSourceLeft->SetText(inputString);}
   void 	  SetTextDown(const char * inputString){TextSourceDown->SetText(inputString);} 
@@ -93,8 +90,12 @@ protected:
 	
 	void			OrientatorCreate();	
 	void			OrientatorUpdate(vtkRenderer *ren);
-   //variables
+   
+  int	 RenderOverlay(vtkViewport *viewport);
+  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
+  int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;}
 
+  //variables
   int                     m_Dimension;
 
   vtkActor2D						 *TextSourceLeftActor;
