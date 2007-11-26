@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-22 13:34:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-26 15:57:37 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,22 +15,19 @@
 
 
 #include "mafOp.h"
-/*
-#ifdef __GNUG__
-    #pragma interface "mafOpLabelExtractor.cpp"
-#endif
 
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif*/
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mmgCheckListBox;
+class mafTagItem;
+class mafVME;
 class mafVMESurface;
 class mafOp;
 class mafGui;
 class mafEvent;
+class vtkDataSet;
 
 //----------------------------------------------------------------------------
 // mafOpLabelExtractor :
@@ -46,8 +43,12 @@ public:
 
   bool Accept(mafNode *vme);
   void OpRun();
-  void OpDo();
-  void OpUndo();
+
+  /** If labels tags are present retrieve them. */
+  bool RetrieveTag();
+
+  /** Fill the vector of label. */
+  void FillLabelVector(wxString name, bool checked = TRUE);
 
   // Set the label value
   void SetLabel(double labelValue);
@@ -55,11 +56,16 @@ public:
   //Set if smooth mode is true
   void SmoothMode(bool smoothMode);
 
+   /** Generate the volume depending on the labels selected. */
+  void GenerateLabeledVolume();
+
   // Create a VMESurface draw from a Volume
 	void ExtractLabel();
 
 protected: 
 
+  std::vector<wxString> m_LabelNameVector;
+  std::vector<bool>     m_CheckedVector;
 
 	double   m_ValLabel;
   int      m_SmoothVolume;
@@ -69,6 +75,12 @@ protected:
   float    m_StdDevAfter[3];
   int      m_SamplingRate[3];
 	wxString m_SurfaceName;
-	mafVMESurface *m_Vme;
+
+  vtkDataSet       *m_Ds;
+  mafVME           *m_VmeLabeled;
+	mafVMESurface    *m_Vme;
+  mmgCheckListBox  *m_LabelCheckBox;
+  mafTagItem       *m_TagLabel;
+
 };
 #endif

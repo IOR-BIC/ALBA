@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-22 13:34:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-26 15:57:37 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,15 +21,21 @@
 
 #include "mafOpLabelExtractor.h"
 
+#include <wx/tokenzr.h>
+
 #include "mafDecl.h"
+#include "mmgCheckListBox.h"
 #include "mafOp.h"
 #include "mafEvent.h"
 #include "mmgGui.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
+#include "mafTagItem.h"
+#include "mafTagArray.h"
 
 #include "vtkImageData.h"
+#include "vtkDataSet.h"
 #include "vtkImageGaussianSmooth.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageThreshold.h"
@@ -41,6 +47,9 @@
 #include "vtkPointData.h"
 #include "vtkImageToStructuredPoints.h"
 
+#include <list>
+#define OUTRANGE_SCALAR -1000
+
 
 //----------------------------------------------------------------------------
 mafOpLabelExtractor::mafOpLabelExtractor(const wxString& label) :
@@ -51,7 +60,8 @@ mafOp(label)
   m_Canundo = true;
 
 	m_Vme = NULL;
-
+  m_VmeLabeled = NULL;
+  m_Ds = NULL;
 	m_ValLabel     = 0;
 	m_SurfaceName  = "label 0";
   m_SmoothVolume = 0;
@@ -80,7 +90,7 @@ mafOp* mafOpLabelExtractor::Copy()
 bool mafOpLabelExtractor::Accept(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	return (vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") && !vme->IsA("mafVMEImage"));
+	return (vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") && !vme->IsA("mafVMEImage")); //serve??
 }
 //----------------------------------------------------------------------------
 // Constants :
@@ -93,8 +103,25 @@ enum {
   ID_SAMPLING_RATE,
   ID_RADIUS_FACTOR_AFTER,
   ID_STD_DEVIATION_AFTER,
+  ID_LABELS,
 	ID_NAME,
 };
+
+//-----------------------------------------------------------------------
+bool mafOpLabelExtractor::RetrieveTag()
+//----------------------------------------------------------------------
+{ 
+  bool tagPresent = m_Input->GetTagArray()->IsTagPresent("LABELS");
+  if (tagPresent)
+  {
+    m_TagLabel = new mafTagItem;
+    m_TagLabel = m_Input->GetTagArray()->GetTag( "LABELS" );
+    return tagPresent;
+  }
+  else
+    return !tagPresent;
+}
+
 //----------------------------------------------------------------------------
 void mafOpLabelExtractor::OpRun()   
 //----------------------------------------------------------------------------
@@ -113,9 +140,58 @@ void mafOpLabelExtractor::OpRun()
   m_Gui->Vector(ID_STD_DEVIATION_AFTER,_("std dev."),m_StdDevAfter, 0.1, MAXFLOAT,2,_("standard deviation for the smooth."));
   m_Gui->Divider(2);
   m_Gui->Divider();
-  m_Gui->Double(ID_LABEL,_("label"), &m_ValLabel);
-	m_Gui->String(ID_NAME,_("name"),&m_SurfaceName);
-	m_Gui->Divider();
+
+  if (m_Input->IsA("medVMELabeledVolume"))
+  {
+    m_LabelCheckBox = m_Gui->CheckList(ID_LABELS,_("Labels"),360,_("Chose label to extract"));
+
+    typedef std::list< wxString > LIST;
+    LIST myList;     
+    LIST::iterator myListIter;   
+
+    // If there is a tag named "LABELS" then I have to load the labels in the correct position in the listbox
+    if  (RetrieveTag())
+    {
+      int noc = m_TagLabel->GetNumberOfComponents();
+      if(noc != 0)
+      {
+        for ( unsigned int i = 0; i < noc; i++ )
+        {
+          wxString label = m_TagLabel->GetValue( i );
+          if ( label != "" )
+          {
+            myList.push_back( label );
+          }
+        }     
+
+        int checkListId = 0;
+        for( myListIter = myList.begin(); myListIter != myList.end(); myListIter++ )
+        {
+          for ( unsigned int j = 0; j < noc; j++ )
+          {
+            wxString component = m_TagLabel->GetValue( j );
+            if ( component != "" )
+            {
+              wxString labelName = *myListIter;
+              if ( component == labelName )
+              {
+                m_LabelCheckBox->AddItem(checkListId, component, false);
+                FillLabelVector(component, false);
+                checkListId++;
+              }
+            }
+          }  
+        }
+      }
+    }  
+  }
+  else
+  {
+    m_Gui->Double(ID_LABEL,_("label"), &m_ValLabel);
+    m_Gui->String(ID_NAME,_("name"),&m_SurfaceName);
+  }
+
+  m_Gui->Divider();
 	m_Gui->OkCancel();
 
   m_Gui->Enable(ID_RADIUS_FACTOR,m_SmoothVolume != 0);
@@ -127,18 +203,13 @@ void mafOpLabelExtractor::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void mafOpLabelExtractor::OpDo()
+void mafOpLabelExtractor::FillLabelVector(wxString name, bool checked)
 //----------------------------------------------------------------------------
 {
-  m_Output = m_Vme;
-	mafEventMacro(mafEvent(this,VME_ADD,m_Vme));
+  m_LabelNameVector.push_back(name);
+  m_CheckedVector.push_back(checked);
 }
-//----------------------------------------------------------------------------
-void mafOpLabelExtractor::OpUndo()
-//----------------------------------------------------------------------------
-{
-	mafEventMacro(mafEvent(this,VME_REMOVE,m_Vme)); //serve??
-}
+
 //----------------------------------------------------------------------------
 void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
@@ -168,61 +239,175 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_RADIUS_FACTOR_AFTER,m_SmoothVolume != 0);
         m_Gui->Enable(ID_STD_DEVIATION_AFTER,m_SmoothVolume != 0);
       break;
+      case ID_LABELS:
+        {
+          for (int i = 0; i < m_CheckedVector.size(); i++)
+          {
+            if (m_CheckedVector.at(i) != m_LabelCheckBox->IsItemChecked(i))
+            {
+              m_CheckedVector[i] = m_LabelCheckBox->IsItemChecked(i);
+              break;
+            }
+          } 
+        }
+        break;
       default:
-          mafEventMacro(*maf_event); 
+          mafEventMacro(*e); 
         break;
     }
-	}
+  }
 }
+
+//----------------------------------------------------------------------------
+void mafOpLabelExtractor::GenerateLabeledVolume()
+//----------------------------------------------------------------------------
+{
+  mafNode *linkedNode = m_Input->GetLink("VolumeLink");
+  mafVME *linkedVolume = mafVME::SafeDownCast(linkedNode);
+
+  //Get dataset from volume linked to
+  vtkDataSet *data = linkedVolume->GetOutput()->GetVTKData();
+  data->Update();
+  
+  //Create a copy of the dataset not to modify the original one
+  m_Ds = data->NewInstance();
+  m_Ds->DeepCopy(data);
+
+  vtkDataArray *originalScalars;
+  vtkDataArray *labelScalars;
+
+  if ( data->IsA( "vtkStructuredPoints" ) )
+  {
+    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Ds;
+    originalScalars = sp->GetPointData()->GetScalars(); 
+    labelScalars = sp->GetPointData()->GetScalars();
+  }
+  else if ( data->IsA( "vtkRectilinearGrid" ) )
+  {    
+    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Ds;
+    originalScalars = rg->GetPointData()->GetScalars();  
+    labelScalars = rg->GetPointData()->GetScalars();
+  }
+
+  std::vector<int> minVector;
+  std::vector<int> maxVector;
+  std::vector<int> labelIntVector;
+
+  int counter= 0;
+  //Fill the vectors of range and label value
+  for (int c = 0; c < m_CheckedVector.size(); c++)
+  {
+    if (m_CheckedVector.at(c))
+    {
+      wxString label = m_LabelNameVector.at(c);
+      wxStringTokenizer tkz(label,wxT(' '),wxTOKEN_RET_EMPTY_ALL);
+      mafString labelName = tkz.GetNextToken().c_str();
+      mafString labelIntStr = tkz.GetNextToken().c_str();
+      int labelIntValue = atoi(labelIntStr);
+      labelIntVector.push_back(labelIntValue);
+      //Set the label value for vtkImageThreshold
+      m_ValLabel = labelIntValue;
+      mafString minStr = tkz.GetNextToken().c_str();
+      int minValue = atof(minStr);
+      minVector.push_back(minValue);
+      mafString maxStr = tkz.GetNextToken().c_str();
+      int mxValue = atof(maxStr);
+      maxVector.push_back(mxValue);
+      counter++;
+    }
+  }
+
+  //Modify the scalars value, with the value of the label checked
+  int labelVlaue;
+  if (counter != 0)
+  {
+    int not = originalScalars->GetNumberOfTuples();
+    for ( int i = 0; i < not; i++ )
+    {
+      bool modified = false;
+      double scalarValue = labelScalars->GetComponent( i, 0 );
+      for (int c = 0; c < labelIntVector.size(); c++)
+      {
+        if ( scalarValue >= minVector.at(c) && scalarValue <= maxVector.at(c))
+        { 
+          labelVlaue = labelIntVector.at(c);
+          labelScalars->SetTuple1( i, labelVlaue ); 
+          modified = true;
+        }
+      }
+      if (!modified)
+      {
+        labelScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
+      }
+    }
+
+    labelScalars->Modified();
+    m_Ds->GetPointData()->SetScalars(labelScalars);
+    m_Ds->Modified();
+  }
+}
+
 //----------------------------------------------------------------------------
 void mafOpLabelExtractor::ExtractLabel()
 //----------------------------------------------------------------------------
 {
-  vtkMAFSmartPointer<vtkImageToStructuredPoints> imageToSp;
-	mafVME *vme = (mafVME *)m_Input;
-  vtkDataSet *ds = vme->GetOutput()->GetVTKData();
+  mafVME *vme = NULL;
+  if (m_Input->IsA("medVMELabeledVolume"))
+  {
+    GenerateLabeledVolume();
+  }
+  else
+  {
+    m_VmeLabeled = (mafVME *)m_Input;
+    m_Ds = m_VmeLabeled->GetOutput()->GetVTKData();
+    m_Ds->Update();
+  }
+
+
   vtkMAFSmartPointer<vtkImageData> vol;
-  vtkMAFSmartPointer<vtkImageData> imageDataRg; 
-  
-
-  double bounds[6];
-  int dim[3], xdim, ydim, zdim, slice_size;
-
-  vme->GetOutput()->GetBounds(bounds);
-
-  double xmin = bounds[0];
-  double xmax = bounds[1];
-  double ymin = bounds[2];
-  double ymax = bounds[3];
-  double zmin = bounds[4];
-  double zmax = bounds[5];	   
+  vtkMAFSmartPointer<vtkImageToStructuredPoints> imageToSp;
 
   //setting the ImageData for RectilinearGrid
-  if (vtkRectilinearGrid *rgrid = vtkRectilinearGrid::SafeDownCast(ds))
+  if (m_Ds->IsA("vtkRectilinearGrid"))
   {
+    vtkRectilinearGrid *rgrid = (vtkRectilinearGrid*) m_Ds;
+    double bounds[6];
+    int dim[3], xdim, ydim, zdim, slice_size;
+    rgrid->GetBounds(bounds);
+    
+    vtkMAFSmartPointer<vtkStructuredPoints> sp;
+
+    double xmin = bounds[0];
+    double xmax = bounds[1];
+    double ymin = bounds[2];
+    double ymax = bounds[3];
+    double zmin = bounds[4];
+    double zmax = bounds[5];	 
+
     double volumeSpacing[3];
     volumeSpacing[0] = VTK_DOUBLE_MAX;
     volumeSpacing[1] = VTK_DOUBLE_MAX;
     volumeSpacing[2] = VTK_DOUBLE_MAX;
 
+
     for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
     {
       double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-      if (volumeSpacing[0] > spcx)
+      if (volumeSpacing[0] > spcx && spcx != 0)
         volumeSpacing[0] = spcx;
     }
 
     for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
     {
       double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-      if (volumeSpacing[1] > spcy)
+      if (volumeSpacing[1] > spcy && spcy != 0)
         volumeSpacing[1] = spcy;
     }
 
     for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
     {
       double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
-      if (volumeSpacing[2] > spcz)
+      if (volumeSpacing[2] > spcz && spcz != 0)
         volumeSpacing[2] = spcz;
     }
 
@@ -239,12 +424,10 @@ void mafOpLabelExtractor::ExtractLabel()
     output_extent[4] = 0;
     output_extent[5] = (bounds[5] - bounds[4]) / volumeSpacing[2];
 
-    vtkMAFSmartPointer<vtkStructuredPoints> output_data;
-    output_data->SetSpacing(volumeSpacing);
-    // TODO: here I probably should allow a data type casting... i.e. a GUI widget
-    output_data->SetScalarType(ds->GetPointData()->GetScalars()->GetDataType());
-    output_data->SetExtent(output_extent);
-    output_data->SetUpdateExtent(output_extent);
+    sp->SetSpacing(volumeSpacing);
+    sp->SetScalarType(rgrid->GetPointData()->GetScalars()->GetDataType());
+    sp->SetExtent(output_extent);
+    sp->SetUpdateExtent(output_extent);
 
     rgrid->GetDimensions(dim);
     xdim = dim[0];
@@ -252,21 +435,17 @@ void mafOpLabelExtractor::ExtractLabel()
     zdim = dim[2];
     slice_size = xdim*ydim;
     
-    output_data->SetOrigin(xdim ,ydim, zdim);
-    output_data->SetDimensions(xdim, ydim, zdim);
-    output_data->GetPointData()->SetScalars(rgrid->GetPointData()->GetScalars());
-    imageDataRg->Update();
+    sp->SetOrigin( origin[0] ,origin[1], origin[2]);
+    sp->SetDimensions(xdim, ydim, zdim);
+    sp->GetPointData()->SetScalars(rgrid->GetPointData()->GetScalars());
+    sp->GetPointData()->GetScalars()->Modified();
 
-    vol->DeepCopy((vtkImageData *)output_data);
-    imageToSp->SetInput(vol);
-    imageToSp->Update();
+    vol->DeepCopy((vtkImageData *)sp);
   }
   else
   {
-    vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(ds);
-    vol->DeepCopy((vtkImageData *)sp);
-    imageToSp->SetInput(vol);
-    imageToSp->Update();
+    vtkStructuredPoints *sp = (vtkStructuredPoints *)m_Ds;
+    vol->DeepCopy((vtkImageData *)sp);  
   }
 
 	vtkMAFSmartPointer<vtkImageThreshold> it;
@@ -329,11 +508,14 @@ void mafOpLabelExtractor::ExtractLabel()
   {
     vol->DeepCopy(it->GetOutput());
   }
+  imageToSp->SetInput(vol);
+  imageToSp->Update();
  
   vtkMAFSmartPointer<vtkContourVolumeMapper> contourMapper;
   contourMapper->SetInput((vtkDataSet *)imageToSp->GetOutput());
   contourMapper->SetContourValue(m_ValLabel);
-	
+  //contourMapper->Update();
+
 	vtkMAFSmartPointer<vtkPolyData> surface;
   contourMapper->GetOutput(0, surface);	
 	contourMapper->Update();
@@ -342,6 +524,7 @@ void mafOpLabelExtractor::ExtractLabel()
 	m_Vme->SetData(surface, 0.0);
   m_Vme->SetName(m_SurfaceName.c_str());
   m_Vme->Update();
+  m_Output = m_Vme;
 }
 
 //----------------------------------------------------------------------------
