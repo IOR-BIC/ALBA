@@ -26,3 +26,7 @@ ADD_TEST(vtkMAFMeshCutterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFMeshCutterTest)
 
 ADD_EXECUTABLE(vtkPolyDataToSinglePolyLineTest vtkPolyDataToSinglePolyLineTest.h vtkPolyDataToSinglePolyLineTest.cpp)
 ADD_TEST(vtkPolyDataToSinglePolyLineTest ${EXECUTABLE_OUTPUT_PATH}/vtkPolyDataToSinglePolyLineTest)
+
+ADD_EXECUTABLE(vtkMAFTextOrientatorTest vtkMAFTextOrientatorTest.h vtkMAFTextOrientatorTest.cpp)
+ADD_TEST(vtkMAFTextOrientatorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTextOrientatorTest)
+
