@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:19:44 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2007-11-27 15:15:44 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,7 +47,7 @@
 #include "vtkActor2D.h"
 #include "vtkDataSet.h"
 #include "vtkSimpleRulerActor2D.h"
-
+#include "vtkMAFTextOrientator.h"
 
 #define DEFAULT_BG_COLOR 0.28
 
