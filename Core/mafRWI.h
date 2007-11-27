@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:19:44 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-11-27 15:15:58 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -16,7 +16,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "mafRWIBase.h"
 #include "mafObserver.h"
-#include "vtkMAFTextOrientator.h"
 
 //----------------------------------------------------------------------------
 // Forward References :
@@ -33,6 +32,7 @@ class mafAxes;
 class mmgGui;
 class mmgPicButton;
 class vtkSimpleRulerActor2D;
+class vtkMAFTextOrientator;
 
 //----------------------------------------------------------------------------
 // constants:
