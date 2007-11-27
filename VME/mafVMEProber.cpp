@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:50:21 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2007-11-27 15:19:20 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,23 +21,22 @@
 
 #include "mafVMEProber.h"
 #include "mmgGui.h"
+#include "mmaMaterial.h"
+
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
 #include "mafStorageElement.h"
-#include "mafDataPipeCustom.h"
+#include "mafDataPipeCustomProber.h"
 #include "mafVMEOutputSurface.h"
-#include "mmaMaterial.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
 
+
 #include "vtkMAFSmartPointer.h"
-#include "vtkMAFDataPipe.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataNormals.h"
 #include "vtkTransformPolyDataFilter.h"
-#include "vtkDistanceFilter.h"
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEProber)
@@ -55,11 +54,6 @@ mafVMEProber::mafVMEProber()
   m_HighDensity = -1.0;
   m_LowDensity  = -1.0;
   
-  vtkNEW(m_Normals);
-  vtkNEW(m_Prober);
-  m_Prober->SetInput((vtkDataSet *)m_Normals->GetOutput());
-//  m_Prober->SetSource(NULL);
-
   mafNEW(m_Transform);
   mafVMEOutputSurface *output = mafVMEOutputSurface::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
@@ -68,10 +62,15 @@ mafVMEProber::mafVMEProber()
   DependsOnLinkedNodeOn();
 
   // attach a data pipe which creates a bridge between VTK and MAF
-  mafDataPipeCustom *dpipe = mafDataPipeCustom::New();
-  dpipe->SetDependOnAbsPose(true);
-  dpipe->SetInput(m_Prober->GetOutput());
-  SetDataPipe(dpipe);
+  m_ProbingDataPipe = mafDataPipeCustomProber::New();
+  m_ProbingDataPipe->SetDependOnAbsPose(true);
+  m_ProbingDataPipe->SetMode(GetMode());
+  m_ProbingDataPipe->SetDistanceThreshold(GetDistanceThreshold());
+  m_ProbingDataPipe->SetMaxDistance(GetMaxDistance());
+  m_ProbingDataPipe->SetDistanceMode(GetDistanceMode());
+  m_ProbingDataPipe->SetHighDensity(GetHighDensity());
+  m_ProbingDataPipe->SetLowDensity(GetLowDensity());
+  SetDataPipe(m_ProbingDataPipe);
 }
 
 //-------------------------------------------------------------------------
@@ -81,8 +80,6 @@ mafVMEProber::~mafVMEProber()
   // these links are children, thus it's not our responsibility to
   // destroy them, it's part of the vtkTree one's
   mafDEL(m_Transform);
-  vtkDEL(m_Normals);
-  vtkDEL(m_Prober);
   SetOutput(NULL);
 }
 
@@ -115,63 +112,19 @@ int mafVMEProber::InternalInitialize()
 void mafVMEProber::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
   mafVME *surf = mafVME::SafeDownCast(GetSurfaceLink());
+  mafVME *vol = mafVME::SafeDownCast(GetVolumeLink());
   
-  if(vol && surf)
-  {
-    vol->GetOutput()->Update();
-    surf->GetOutput()->Update();
-    if (vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData())
-    {
-      if(vol->GetOutput()->GetVTKData() && surf->GetOutput()->GetVTKData())
-      {
-        m_Normals->SetInput((vtkPolyData *)surf->GetOutput()->GetVTKData());
-        m_Normals->ComputePointNormalsOn();
-        m_Normals->SplittingOff();
-        m_Normals->Update();
-
-        m_Prober->SetSource(vol->GetOutput()->GetVTKData());
-        if(GetMode() == mafVMEProber::DENSITY_MODE)
-          m_Prober->SetFilterModeToDensity();
-        else
-        {
-          m_Prober->SetFilterModeToDistance();
-          m_Prober->SetThreshold(GetDistanceThreshold());
-          m_Prober->SetMaxDistance(GetMaxDistance());
-          if(GetDistanceMode() == mafVMEProber::DISTANCE_MODE_SCALAR)
-            m_Prober->SetDistanceModeToScalar();
-          else
-            m_Prober->SetDistanceModeToVector();
-        }
-
-        mafSmartPointer<mafTransformFrame> maps_to_volume;
-        maps_to_volume->SetInput(GetAbsMatrixPipe()->GetMatrixPointer());
-        maps_to_volume->SetTargetFrame(vol->GetAbsMatrixPipe()->GetMatrixPointer());
-
-        mafMatrix tmp_matrix = maps_to_volume->GetMatrix();
-
-        m_Prober->SetInputMatrix(tmp_matrix.GetVTKMatrix());
-      }
-    }
-  }
-  else
-  {
-    m_Prober->SetSource(NULL);
-  }
+  m_ProbingDataPipe->SetSurface(surf);
+  m_ProbingDataPipe->SetVolume(vol);
 
   m_SurfaceName = surf ? surf->GetName() : _("none");
   m_VolumeName = vol ? vol->GetName() : _("none");
+
   if (m_Gui)
   {
     m_Gui->Update();
   }
-}
-
-//-----------------------------------------------------------------------
-void mafVMEProber::InternalUpdate()
-//-----------------------------------------------------------------------
-{
 }
 
 //-------------------------------------------------------------------------
@@ -181,15 +134,15 @@ int mafVMEProber::DeepCopy(mafNode *a)
   if (Superclass::DeepCopy(a)==MAF_OK)
   {
     mafVMEProber *prober = mafVMEProber::SafeDownCast(a);
-    mafNode *linked_node = prober->GetLink("Volume");
-    if (linked_node)
+    mafNode *volume_linked_node = prober->GetLink("Volume");
+    if (volume_linked_node)
     {
-      this->SetLink("Volume", linked_node);
+      SetVolumeLink(volume_linked_node);
     }
-    linked_node = prober->GetLink("Surface");
-    if (linked_node)
+    mafNode *surface_linked_node = prober->GetLink("Surface");
+    if (surface_linked_node)
     {
-      this->SetLink("Surface", linked_node);
+      SetSurfaceLink(surface_linked_node);
     }
     m_Transform->SetMatrix(prober->m_Transform->GetMatrix());
     m_ProberMode      = prober->m_ProberMode;
@@ -200,12 +153,6 @@ int mafVMEProber::DeepCopy(mafNode *a)
     m_LowDensity      = prober->m_LowDensity;
     m_VolumeName      = prober->m_VolumeName;
     m_SurfaceName     = prober->m_SurfaceName;
-    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
-    if (dpipe)
-    {
-      dpipe->SetInput(m_Prober->GetOutput());
-      m_Prober->Update();
-    }
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -280,6 +227,7 @@ void mafVMEProber::SetVolumeLink(mafNode *volume)
 //-----------------------------------------------------------------------
 {
   SetLink("Volume", volume);
+  m_ProbingDataPipe->SetVolume(volume);
   Modified();
 }
 //-----------------------------------------------------------------------
@@ -287,20 +235,23 @@ void mafVMEProber::SetSurfaceLink(mafNode *surface)
 //-----------------------------------------------------------------------
 {
   SetLink("Surface", surface);
+  m_ProbingDataPipe->SetSurface(surface);
   Modified();
 }
 //-----------------------------------------------------------------------
 void mafVMEProber::SetModeToDensity()
 //-----------------------------------------------------------------------
 {
-  this->SetMode(mafVMEProber::DENSITY_MODE);
+  this->SetMode(mafDataPipeCustomProber::DENSITY_MODE);
+  m_ProbingDataPipe->SetModeToDensity();
   Modified();
 }
 //-----------------------------------------------------------------------
 void mafVMEProber::SetModeToDistance()
 //-----------------------------------------------------------------------
 {
-  this->SetMode(mafVMEProber::DISTANCE_MODE);
+  this->SetMode(mafDataPipeCustomProber::DISTANCE_MODE);
+  m_ProbingDataPipe->SetModeToDistance();
   Modified();
 }
 //-----------------------------------------------------------------------
@@ -335,7 +286,7 @@ int mafVMEProber::InternalRestore(mafStorageElement *node)
 void mafVMEProber::SetMode(int mode)
 //-------------------------------------------------------------------------
 {
-  if (mode != mafVMEProber::DENSITY_MODE && mode != mafVMEProber::DISTANCE_MODE)
+  if (mode != mafDataPipeCustomProber::DENSITY_MODE && mode != mafDataPipeCustomProber::DISTANCE_MODE)
   {
     mafErrorMacro("trying to set the map mode to invalid type: allowed types are DENSITY_MODE & DISTANCE_MODE");
     return;
@@ -343,6 +294,7 @@ void mafVMEProber::SetMode(int mode)
 
   m_ProberMode = mode;
   GetTagArray()->SetTag(mafTagItem("MFL_MAP_MODE",m_ProberMode));
+  m_ProbingDataPipe->SetMode(m_ProberMode);
   this->Modified();
 }
 //-------------------------------------------------------------------------
@@ -355,15 +307,10 @@ int mafVMEProber::GetMode()
 void mafVMEProber::SetDistanceThreshold(float thr)
 //-------------------------------------------------------------------------
 {
-/*  if (thr < 0)
-  {
-    mafErrorMacro("Bad initial distance threshold value.");
-    return;
-  }
-*/
   m_DistThreshold = thr;
 
   GetTagArray()->SetTag(mafTagItem("MFL_MAP_DISTANCE_THRESHOLD", m_DistThreshold));
+  m_ProbingDataPipe->SetDistanceThreshold(m_DistThreshold);
   this->Modified();
 }
 //-------------------------------------------------------------------------
@@ -385,6 +332,7 @@ void mafVMEProber::SetMaxDistance(float max_dist)
   m_MaxDistance = max_dist;
 
   GetTagArray()->SetTag(mafTagItem("MFL_MAP_MAX_DISTANCE", m_MaxDistance));
+  m_ProbingDataPipe->SetMaxDistance(m_MaxDistance);
   this->Modified();
 }
 //-------------------------------------------------------------------------
@@ -397,7 +345,7 @@ float mafVMEProber::GetMaxDistance()
 void mafVMEProber::SetDistanceMode(int mode)
 //-------------------------------------------------------------------------
 {
-  if (mode != mafVMEProber::DISTANCE_MODE_SCALAR && mode != mafVMEProber::DISTANCE_MODE_VECTOR)
+  if (mode != mafDataPipeCustomProber::DISTANCE_MODE_SCALAR && mode != mafDataPipeCustomProber::DISTANCE_MODE_VECTOR)
   {
     mafErrorMacro("trying to set the map distance mode to invalid type: allowed types are DISTANCE_MODE_SCALAR & DISTANCE_MODE_VECTOR");
     return;
@@ -405,7 +353,20 @@ void mafVMEProber::SetDistanceMode(int mode)
 
   m_DistanceModeType = mode;
   GetTagArray()->SetTag(mafTagItem("MFL_MAP_DISTANCE_MODE", m_DistanceModeType));
+  m_ProbingDataPipe->SetDistanceMode(m_DistanceModeType);
   this->Modified();
+}
+//-------------------------------------------------------------------------
+void mafVMEProber::SetDistanceModeToScalar()
+//-------------------------------------------------------------------------
+{
+  this->SetDistanceMode(mafDataPipeCustomProber::DISTANCE_MODE_SCALAR);
+}
+//-------------------------------------------------------------------------
+void mafVMEProber::SetDistanceModeToVector()
+//-------------------------------------------------------------------------
+{
+  this->SetDistanceMode(mafDataPipeCustomProber::DISTANCE_MODE_VECTOR);
 }
 //-------------------------------------------------------------------------
 int mafVMEProber::GetDistanceMode()
@@ -420,6 +381,7 @@ void mafVMEProber::SetHighDensity(float high_dens)
   m_HighDensity = high_dens;
 
   GetTagArray()->SetTag(mafTagItem("MFL_MAP_HIGH_DENSITY", m_HighDensity));
+  m_ProbingDataPipe->SetHighDensity(m_HighDensity);
   this->Modified();
 }
 //-------------------------------------------------------------------------
@@ -435,6 +397,7 @@ void mafVMEProber::SetLowDensity(float low_dens)
   m_LowDensity = low_dens;
 
   GetTagArray()->SetTag(mafTagItem("MFL_MAP_LOW_DENSITY", m_LowDensity));
+  m_ProbingDataPipe->SetLowDensity(m_LowDensity);
   this->Modified();
 }
 //-------------------------------------------------------------------------

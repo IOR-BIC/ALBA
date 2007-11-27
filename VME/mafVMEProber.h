@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:16:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-11-27 15:19:20 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,20 +25,11 @@
 //----------------------------------------------------------------------------
 class mafTransform;
 class mmaMaterial;
-class vtkPolyDataNormals;
-class vtkDistanceFilter;
+class mafDataPipeCustomProber;
 
 class MAF_EXPORT mafVMEProber : public mafVME
 {
 public:
-  enum VMEPROBER_MODALITY
-  {
-    DENSITY_MODE = 0,
-    DISTANCE_MODE,
-    DISTANCE_MODE_SCALAR = 0,
-    DISTANCE_MODE_VECTOR
-  };
-
   mafTypeMacro(mafVMEProber, mafVME);
 
   enum PROBER_WIDGET_ID
@@ -91,54 +82,42 @@ public:
   void SetModeToDistance();
 
   /** Get the mode.*/
-//	int GetMode() {return m_ProberMode;};
   int GetMode();
 
   /** Set the threshold for Distance mode Map.*/
-//	void SetDistanceThreshold(float thr) {m_DistThreshold = thr; Modified();};
 	void SetDistanceThreshold(float thr);
 
   /** Get the threshold of Distance mode Map.*/
-//	float GetDistanceThreshold() {return m_DistThreshold;};
 	float GetDistanceThreshold();
 
   /** Set/Get the max distance for Distance mode Map.*/
-//	float GetMaxDistance() {return m_MaxDistance;};
 	float GetMaxDistance();
 
   /** Set/Get the max distance for Distance mode Map.*/
-//	void SetMaxDistance(float max_dist) {m_MaxDistance = max_dist; Modified();};
 	void SetMaxDistance(float max_dist);
 
   /** Set the Distance mode to produce scalar data or vector data.*/
   void SetDistanceMode(int mode);
 
   /** Set the Distance mode to produce scalar data.*/
-//	void SetDistanceModeToScalar() {m_DistanceModeType = DISTANCE_MODE_SCALAR; Modified();};
-  void SetDistanceModeToScalar() {this->SetDistanceMode(mafVMEProber::DISTANCE_MODE_SCALAR);};
+  void SetDistanceModeToScalar();
 
   /** Set the Distance mode to produce vector data.*/
-//	void SetDistanceModeToVector() {m_DistanceModeType = DISTANCE_MODE_VECTOR; Modified();};
-	void SetDistanceModeToVector() {this->SetDistanceMode(mafVMEProber::DISTANCE_MODE_VECTOR);};
+	void SetDistanceModeToVector();
 
   /** Get the distance mode type.*/
-//	int GetDistanceType() {return m_DistanceModeType;};
 	int GetDistanceMode();
 
   /** Set/Get the High Density Threshold for Density mode Map.*/
-//	float GetHighDensity (){return m_HighDensity;};
 	float GetHighDensity();
 
   /** Set/Get the High Density Threshold for Density mode Map.*/
-//	void SetHighDensity(float high_dens) {m_HighDensity = high_dens; Modified();};
 	void SetHighDensity(float high_dens);
 
 	/** Set/Get the Low Density Threshold for Density mode Map.*/
-//	float GetLowDensity() {return m_LowDensity;};
 	float GetLowDensity();
 
   /** Set/Get the Low Density Threshold for Density mode Map.*/
-//	void SetLowDensity(float low_dens) {m_LowDensity = low_dens; Modified();};
 	void SetLowDensity(float low_dens);
 
   /** Set the pose matrix for the Prober. */
@@ -173,9 +152,6 @@ protected:
   /** called to prepare the update of the output */
   virtual void InternalPreUpdate();
 
-  /** update the output data structure */
-  virtual void InternalUpdate();
-
 	float  m_DistThreshold;
 	float  m_MaxDistance;
 	int		 m_DistanceModeType;
@@ -185,11 +161,9 @@ protected:
   mafString m_VolumeName;
   mafString m_SurfaceName;
   
-  vtkPolyDataNormals *m_Normals;
-  //vtkDistanceFilter  *m_ProberFilter;
-  vtkDistanceFilter  *m_Prober;
-
   mafTransform *m_Transform;
+
+  mafDataPipeCustomProber *m_ProbingDataPipe;
 
 private:
   mafVMEProber(const mafVMEProber&); // Not implemented
