@@ -8,8 +8,6 @@ DBG_MESSAGE("Configuring project ${PROJECT_NAME}")
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mafDataInterpolator.cpp
-  mafDataInterpolator.h
   mafDataVector.cpp
   mafDataVector.h
   mafMatrixInterpolator.cpp
@@ -51,8 +49,6 @@ IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mafPipeScalar.cpp
   mafPipeScalar.h
-  mafScalarInterpolator.cpp
-  mafScalarInterpolator.h
   mafVMEOutputScalar.cpp
   mafVMEOutputScalar.h
   mafVMEScalar.cpp
@@ -65,8 +61,6 @@ ENDIF (MAF_USE_ITK)
 IF (MAF_USE_VTK)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mafDataPipeCustom.cpp
-  mafDataPipeCustom.h
   mafPipeGizmo.cpp
   mafPipeGizmo.h
   mafPipeImage3D.cpp
@@ -151,18 +145,16 @@ IF (MAF_USE_VTK)
   mafVMEVolumeGray.h
   mafVMEVolumeRGB.cpp
   mafVMEVolumeRGB.h
-  mafVTKInterpolator.cpp
-  mafVTKInterpolator.h
   mmaMeter.cpp
   mmaMeter.h
-  vtkMAFDataPipe.cpp
-  vtkMAFDataPipe.h
   )
 ENDIF (MAF_USE_VTK)
 
+SUBDIRS(DataPipes)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafCore vtkMAF)
+#SET(PROJECT_LIBS mafCore vtkMAF)
+SET(PROJECT_LIBS mafDataPipes)
 
 IF (MAF_USE_CRYPTO)
   SET(PROJECT_LIBS ${PROJECT_LIBS} Crypto)
