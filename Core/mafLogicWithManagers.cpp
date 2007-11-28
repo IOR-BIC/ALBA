@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:47:05 $
-  Version:   $Revision: 1.123 $
+  Date:      $Date: 2007-11-28 12:17:34 $
+  Version:   $Revision: 1.124 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1151,6 +1151,7 @@ void mafLogicWithManagers::OnQuit()
       return;
   }
 
+  mmgViewFrame::OnQuit();
   mmgMDIChild::OnQuit(); 
   m_Win->OnQuit(); 
 
