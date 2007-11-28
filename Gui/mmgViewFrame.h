@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgViewFrame.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-03 13:55:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-11-28 12:16:44 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,9 @@ class mmgViewFrame: public wxFrame , public mafObserver
 	
 	void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 	
+  /** Set the quitting flag. */
+  static void OnQuit () {m_Quitting=true;}; 
+
 	/** Set which is the external view. */
 	void SetView(mafView *view);
 
