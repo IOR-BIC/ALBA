@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-26 15:57:37 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-28 14:30:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 
+#include "vtkVolumeResample.h"
 #include "vtkImageData.h"
 #include "vtkDataSet.h"
 #include "vtkImageGaussianSmooth.h"
@@ -60,8 +61,9 @@ mafOp(label)
   m_Canundo = true;
 
 	m_Vme = NULL;
-  m_VmeLabeled = NULL;
   m_Ds = NULL;
+  m_OutputData = NULL;
+  m_TagLabel = NULL;
 	m_ValLabel     = 0;
 	m_SurfaceName  = "label 0";
   m_SmoothVolume = 0;
@@ -79,6 +81,11 @@ mafOpLabelExtractor::~mafOpLabelExtractor()
 //----------------------------------------------------------------------------
 {
 	mafDEL(m_Vme);
+
+  if (m_OutputData != NULL)
+  {
+    vtkDEL(m_OutputData);
+  }
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpLabelExtractor::Copy()
@@ -90,7 +97,7 @@ mafOp* mafOpLabelExtractor::Copy()
 bool mafOpLabelExtractor::Accept(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-	return (vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") && !vme->IsA("mafVMEImage")); //serve??
+	return (vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") && !vme->IsA("mafVMEImage")); 
 }
 //----------------------------------------------------------------------------
 // Constants :
@@ -257,37 +264,29 @@ void mafOpLabelExtractor::OnEvent(mafEventBase *maf_event)
     }
   }
 }
+//----------------------------------------------------------------------------
+void mafOpLabelExtractor::UpdateDataLabel()
+//----------------------------------------------------------------------------
+{
+  mafNode *linkedNode = m_Input->GetLink("VolumeLink");
+  mafSmartPointer<mafVME> linkedVolume = mafVME::SafeDownCast(linkedNode);
+
+  //Get dataset from volume linked to
+  vtkDataSet *data = linkedVolume->GetOutput()->GetVTKData();
+  data->Update();
+
+  //Create a copy of the dataset not to modify the original one
+  m_Ds = data->NewInstance();
+  m_Ds->DeepCopy(data);
+
+}
 
 //----------------------------------------------------------------------------
 void mafOpLabelExtractor::GenerateLabeledVolume()
 //----------------------------------------------------------------------------
 {
-  mafNode *linkedNode = m_Input->GetLink("VolumeLink");
-  mafVME *linkedVolume = mafVME::SafeDownCast(linkedNode);
-
-  //Get dataset from volume linked to
-  vtkDataSet *data = linkedVolume->GetOutput()->GetVTKData();
-  data->Update();
-  
-  //Create a copy of the dataset not to modify the original one
-  m_Ds = data->NewInstance();
-  m_Ds->DeepCopy(data);
-
-  vtkDataArray *originalScalars;
-  vtkDataArray *labelScalars;
-
-  if ( data->IsA( "vtkStructuredPoints" ) )
-  {
-    vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Ds;
-    originalScalars = sp->GetPointData()->GetScalars(); 
-    labelScalars = sp->GetPointData()->GetScalars();
-  }
-  else if ( data->IsA( "vtkRectilinearGrid" ) )
-  {    
-    vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Ds;
-    originalScalars = rg->GetPointData()->GetScalars();  
-    labelScalars = rg->GetPointData()->GetScalars();
-  }
+  vtkMAFSmartPointer<vtkDataArray> originalScalars = m_OutputData->GetPointData()->GetScalars(); 
+  vtkMAFSmartPointer<vtkDataArray> labelScalars = m_OutputData->GetPointData()->GetScalars();
 
   std::vector<int> minVector;
   std::vector<int> maxVector;
@@ -342,8 +341,8 @@ void mafOpLabelExtractor::GenerateLabeledVolume()
     }
 
     labelScalars->Modified();
-    m_Ds->GetPointData()->SetScalars(labelScalars);
-    m_Ds->Modified();
+    m_OutputData->GetPointData()->SetScalars(labelScalars);
+    m_OutputData->Modified();
   }
 }
 
@@ -352,17 +351,17 @@ void mafOpLabelExtractor::ExtractLabel()
 //----------------------------------------------------------------------------
 {
   mafVME *vme = NULL;
+  
   if (m_Input->IsA("medVMELabeledVolume"))
   {
-    GenerateLabeledVolume();
+    UpdateDataLabel();
   }
   else
   {
-    m_VmeLabeled = (mafVME *)m_Input;
-    m_Ds = m_VmeLabeled->GetOutput()->GetVTKData();
+    mafSmartPointer<mafVME> vmeLabeled = (mafVME *)m_Input;
+    m_Ds = vmeLabeled->GetOutput()->GetVTKData();
     m_Ds->Update();
   }
-
 
   vtkMAFSmartPointer<vtkImageData> vol;
   vtkMAFSmartPointer<vtkImageToStructuredPoints> imageToSp;
@@ -370,11 +369,11 @@ void mafOpLabelExtractor::ExtractLabel()
   //setting the ImageData for RectilinearGrid
   if (m_Ds->IsA("vtkRectilinearGrid"))
   {
-    vtkRectilinearGrid *rgrid = (vtkRectilinearGrid*) m_Ds;
+    vtkMAFSmartPointer<vtkRectilinearGrid> rgrid = (vtkRectilinearGrid*) m_Ds;
+
     double bounds[6];
-    int dim[3], xdim, ydim, zdim, slice_size;
     rgrid->GetBounds(bounds);
-    
+
     vtkMAFSmartPointer<vtkStructuredPoints> sp;
 
     double xmin = bounds[0];
@@ -385,23 +384,31 @@ void mafOpLabelExtractor::ExtractLabel()
     double zmax = bounds[5];	 
 
     double volumeSpacing[3];
+
     volumeSpacing[0] = VTK_DOUBLE_MAX;
     volumeSpacing[1] = VTK_DOUBLE_MAX;
     volumeSpacing[2] = VTK_DOUBLE_MAX;
-
-
+ 
     for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
     {
       double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-      if (volumeSpacing[0] > spcx && spcx != 0)
+      if (volumeSpacing[0] > spcx && spcx >= 0.1)
         volumeSpacing[0] = spcx;
+    }
+    if (volumeSpacing[0] <= 0.1)
+    {
+      volumeSpacing[0] = 1;
     }
 
     for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
     {
       double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-      if (volumeSpacing[1] > spcy && spcy != 0)
+      if (volumeSpacing[1] > spcy && spcy >= 0.1)
         volumeSpacing[1] = spcy;
+    }
+    if (volumeSpacing[1] <= 0.1)
+    {
+      volumeSpacing[1] = 1;
     }
 
     for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
@@ -410,11 +417,10 @@ void mafOpLabelExtractor::ExtractLabel()
       if (volumeSpacing[2] > spcz && spcz != 0)
         volumeSpacing[2] = spcz;
     }
-
-    double origin[3];
-    origin[0] = bounds[0];
-    origin[1] = bounds[2];
-    origin[2] = bounds[4];
+    if (volumeSpacing[2] <= 0.1)
+    {
+      volumeSpacing[2] = 1;
+    }
 
     int output_extent[6];
     output_extent[0] = 0;
@@ -424,29 +430,54 @@ void mafOpLabelExtractor::ExtractLabel()
     output_extent[4] = 0;
     output_extent[5] = (bounds[5] - bounds[4]) / volumeSpacing[2];
 
+    // the resample filter
+    vtkMAFSmartPointer<vtkVolumeResample> resampler;
+    resampler->SetZeroValue(0);
+
+    double origin[3];
+    origin[0] = bounds[0];
+    origin[1] = bounds[2];
+    origin[2] = bounds[4];
+
+    resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
+
     sp->SetSpacing(volumeSpacing);
     sp->SetScalarType(rgrid->GetPointData()->GetScalars()->GetDataType());
     sp->SetExtent(output_extent);
     sp->SetUpdateExtent(output_extent);
 
-    rgrid->GetDimensions(dim);
-    xdim = dim[0];
-    ydim = dim[1];
-    zdim = dim[2];
-    slice_size = xdim*ydim;
-    
-    sp->SetOrigin( origin[0] ,origin[1], origin[2]);
-    sp->SetDimensions(xdim, ydim, zdim);
-    sp->GetPointData()->SetScalars(rgrid->GetPointData()->GetScalars());
-    sp->GetPointData()->GetScalars()->Modified();
+    double sr[2];
+    rgrid->GetScalarRange(sr);
 
-    vol->DeepCopy((vtkImageData *)sp);
+    double w = sr[1] - sr[0];
+    double l = (sr[1] + sr[0]) * 0.5;
+
+    resampler->SetWindow(w);
+    resampler->SetLevel(l);
+    resampler->SetInput(rgrid);
+    resampler->SetOutput(sp);
+    resampler->AutoSpacingOff();
+    resampler->Update();
+
+    sp->SetSource(NULL);
+    sp->SetOrigin(bounds[0],bounds[2],bounds[4]);
+    m_OutputData = sp->NewInstance();
+    m_OutputData->DeepCopy(sp);
+
+    if (m_Input->IsA("medVMELabeledVolume"))
+    {
+      GenerateLabeledVolume();
+    }
+
+    vol->DeepCopy((vtkImageData *)m_OutputData);
+    //mafDEL(m_OutputData);
   }
   else
   {
-    vtkStructuredPoints *sp = (vtkStructuredPoints *)m_Ds;
+    vtkMAFSmartPointer<vtkStructuredPoints> sp = (vtkStructuredPoints *)m_Ds;
     vol->DeepCopy((vtkImageData *)sp);  
   }
+  
 
 	vtkMAFSmartPointer<vtkImageThreshold> it;
   it->SetInput(vol);
@@ -481,7 +512,6 @@ void mafOpLabelExtractor::ExtractLabel()
 
   vtkMAFSmartPointer<vtkImageGaussianSmooth> smooth;
   vtkMAFSmartPointer<vtkImageGaussianSmooth> smoothAfter;
-
   vtkMAFSmartPointer<vtkExtractVOI> extract;
 
   if(m_SmoothVolume)
@@ -508,13 +538,13 @@ void mafOpLabelExtractor::ExtractLabel()
   {
     vol->DeepCopy(it->GetOutput());
   }
+
   imageToSp->SetInput(vol);
   imageToSp->Update();
  
   vtkMAFSmartPointer<vtkContourVolumeMapper> contourMapper;
   contourMapper->SetInput((vtkDataSet *)imageToSp->GetOutput());
   contourMapper->SetContourValue(m_ValLabel);
-  //contourMapper->Update();
 
 	vtkMAFSmartPointer<vtkPolyData> surface;
   contourMapper->GetOutput(0, surface);	
@@ -540,4 +570,3 @@ void mafOpLabelExtractor::SmoothMode(bool smoothMode)
 {
   m_SmoothVolume = smoothMode;
 }
-

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-26 15:57:37 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-28 14:30:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ class mafOp;
 class mafGui;
 class mafEvent;
 class vtkDataSet;
+class vtkStructuredPoints;
 
 //----------------------------------------------------------------------------
 // mafOpLabelExtractor :
@@ -56,13 +57,16 @@ public:
   //Set if smooth mode is true
   void SmoothMode(bool smoothMode);
 
-   /** Generate the volume depending on the labels selected. */
-  void GenerateLabeledVolume();
-
   // Create a VMESurface draw from a Volume
 	void ExtractLabel();
 
 protected: 
+
+  /** Get the dataset from linked node. */
+  void UpdateDataLabel();
+
+  /** Generate the volume depending on the labels selected. */
+  void GenerateLabeledVolume();
 
   std::vector<wxString> m_LabelNameVector;
   std::vector<bool>     m_CheckedVector;
@@ -76,11 +80,11 @@ protected:
   int      m_SamplingRate[3];
 	wxString m_SurfaceName;
 
-  vtkDataSet       *m_Ds;
-  mafVME           *m_VmeLabeled;
-	mafVMESurface    *m_Vme;
-  mmgCheckListBox  *m_LabelCheckBox;
-  mafTagItem       *m_TagLabel;
+  vtkStructuredPoints *m_OutputData;
+  vtkDataSet          *m_Ds;
+	mafVMESurface       *m_Vme;
+  mmgCheckListBox     *m_LabelCheckBox;
+  mafTagItem          *m_TagLabel;
 
 };
 #endif
