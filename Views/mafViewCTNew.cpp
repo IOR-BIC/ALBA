@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-23 10:49:34 $
-Version:   $Revision: 1.40 $
+Date:      $Date: 2007-11-28 16:26:35 $
+Version:   $Revision: 1.41 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -350,7 +350,7 @@ mmgGui* mafViewCTNew::CreateGui()
     mafViewSlice* view =((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0])->GetSubView(idView));
     view->m_Rwi->SetOrientatorVisibility(true);
     view->m_Rwi->SetOrientatorSingleActorVisibility(true,false,true,false);
-    view->m_Rwi->SetOrientatorSingleActorText("L","","B","");
+    view->m_Rwi->SetOrientatorSingleActorText("B","","L","");
     double white[3] = {1.0,1.0,1.0};
     double black[3] = {0.0,0.0,0.0};
     view->m_Rwi->SetOrientatorProperties(white, black);
