@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-02 15:25:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-11-29 11:17:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ medPipeTrajectories::medPipeTrajectories()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
-  m_Interval = 20;
+  m_Interval = 50;
 }
 //----------------------------------------------------------------------------
 void medPipeTrajectories::Create(mafSceneNode *n)
@@ -134,8 +134,6 @@ medPipeTrajectories::~medPipeTrajectories()
   m_Landmark->GetEventSource()->RemoveObserver(this);
   m_RenFront->RemoveActor(m_Actor);
   m_RenFront->RemoveActor(m_OutlineActor);
-//  m_AssemblyFront->RemovePart(m_Actor);
-//  m_AssemblyFront->RemovePart(m_OutlineActor);
 
   vtkDEL(m_Traj);
   vtkDEL(m_Sphere);
@@ -183,8 +181,7 @@ void medPipeTrajectories::OnEvent(mafEventBase *maf_event)
         mafEventMacro(*e);
     }
   }
-   
-  // VME_OUTPUT_DATA_PREUPDATE
+
   if (maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
   {
     UpdateProperty();
@@ -205,7 +202,6 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
   vtkMAFSmartPointer<vtkPolyData> line;
   vtkMAFSmartPointer<vtkPoints> points;
   vtkMAFSmartPointer<vtkCellArray> cellArray;
-
 
   int pointId[2], counter = 0;
   bool current, previous, sphere_visibility;
