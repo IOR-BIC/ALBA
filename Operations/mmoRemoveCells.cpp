@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-22 14:51:22 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-11-29 16:57:23 $
+Version:   $Revision: 1.9 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMath.h"
 #include "vtkIdList.h"
 #include "vtkTriangle.h"
+#include "vtkCamera.h"
+#include "vtkInteractorStyle.h"
 
 const int ID_REGION = 0;
 
@@ -91,6 +93,7 @@ mafOp(label)
   m_OriginalPolydata  = NULL;
 
   m_TriangeCentreComputationList = NULL;
+  m_AutoClip = 1;
 }
 //----------------------------------------------------------------------------
 mmoRemoveCells::~mmoRemoveCells()
@@ -168,7 +171,7 @@ void mmoRemoveCells::OpUndo()
 //----------------------------------------------------------------------------
 // widget ID's
 //----------------------------------------------------------------------------
-enum EXTRACT_ISOSURFACE_ID
+enum REMOVE_CELL_ID
 {
   ID_FIT = MINID,
   ID_DIAMETER,
@@ -176,6 +179,8 @@ enum EXTRACT_ISOSURFACE_ID
   ID_OK,
   ID_UNSELECT,
   ID_CANCEL,
+  ID_CLIP,
+  ID_AUTOCLIP,
 };
 //----------------------------------------------------------------------------
 void mmoRemoveCells::CreateOpDialog()
@@ -197,6 +202,9 @@ void mmoRemoveCells::CreateOpDialog()
 
   m_Rwi->m_RenFront->AddActor(m_PolydataActor);
 
+  m_Rwi->SetAxesVisibility(1);
+
+  
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
  
   double bounds[6] = {0,0,0,0,0,0};
@@ -209,13 +217,15 @@ void mmoRemoveCells::CreateOpDialog()
 
   m_SelectCellInteractor->SetListener(this);
   m_Mouse->AddObserver(m_SelectCellInteractor, MCH_INPUT);
-  
+
+ 
   wxPoint p = wxDefaultPosition;
 
   wxStaticText *brushSize  = new wxStaticText(m_Dialog,-1, "brush size: ");
   wxStaticText *foo  = new wxStaticText(m_Dialog,-1, " ");
   wxTextCtrl   *diameter = new wxTextCtrl  (m_Dialog,ID_DIAMETER, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
   wxCheckBox *unselect =   new wxCheckBox(m_Dialog, ID_DELETE,         "unselect", p, wxSize(80,20));
+  wxCheckBox *b_clip =   new wxCheckBox(m_Dialog, ID_AUTOCLIP,         "autoclipping", p, wxSize(80,20));
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
@@ -223,6 +233,9 @@ void mmoRemoveCells::CreateOpDialog()
   mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
   mmgButton  *ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
   mmgButton  *cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
+
+	
+  b_clip->SetValidator(mmgValidator(this,ID_AUTOCLIP,b_clip,(int*)&m_AutoClip));
 
   diameter->SetValidator(mmgValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
   unselect->SetValidator(mmgValidator(this, ID_DELETE, unselect, &m_UnselectCells));
@@ -240,6 +253,9 @@ void mmoRemoveCells::CreateOpDialog()
   h_sizer1->Add(diameter,     0,wxRIGHT);	
   h_sizer1->Add(foo,     0,wxRIGHT);	
   h_sizer1->Add(unselect,     0,wxRIGHT);	
+
+  h_sizer1->Add(b_clip,0,wxRIGHT);
+
 
   wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer2->Add(unselectAllButton,     0,wxRIGHT);	
@@ -362,8 +378,25 @@ void mmoRemoveCells::OnEvent(mafEventBase *maf_event)
 
       }     
       break ;
+	  case ID_AUTOCLIP:
+		  if(m_AutoClip)
+		  {
+			  //achiarini (27.11.2007)
+			  //this is to guarantee that the clippingplanes are not reset during interaction
+			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOn(); 
+			  m_SelectCellInteractor->AutoResetClippingRangeOn();
 
-      default:
+		  }
+		  else{
+			  //this is to guarantee that the clippingplanes are not reset during interaction
+			  vtkInteractorStyle::SafeDownCast(m_Rwi->m_RwiBase->GetInteractorStyle())->AutoAdjustCameraClippingRangeOff(); 
+			  m_SelectCellInteractor->AutoResetClippingRangeOff();
+			  m_Rwi->CameraUpdate();
+		  }
+
+		  break;
+
+	 default:
         mafEventMacro(*e);
       break; 
     }
