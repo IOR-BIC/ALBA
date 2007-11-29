@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-11-29 08:23:54 $
+  Version:   $Revision: 1.14 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -222,7 +222,7 @@ void mafView3D::OnEvent(mafEventBase *maf_event)
 			{
 				if(((mafVME*)m_CurrentVolume)->GetVisualPipe())
 				{
-					mafVMEVolumeGray *TempVolume=m_CurrentVolume;
+					mafVME *TempVolume=m_CurrentVolume;
 					if(m_CurrentSurface)
 					{
 						if(!(m_Choose == ID_PIPE_ISO))
@@ -510,7 +510,7 @@ void mafView3D::InizializeSubGui()
 			if(pipe)
 			{
 				double sr[2];
-				m_CurrentVolume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+				((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetVTKData()->GetScalarRange(sr);
 				m_ContourValueIso=pipe->GetContourValue();
 				m_SliderContourIso->SetRange(sr[0],sr[1],m_ContourValueIso);
 				m_SliderContourIso->Update();
@@ -539,7 +539,7 @@ void mafView3D::VmeShow(mafNode *vme,bool show)
 	{
 		if(show)
 		{
-			m_CurrentVolume = mafVMEVolumeGray::SafeDownCast(vme);
+			m_CurrentVolume = mafVME::SafeDownCast(vme);
 			InizializeSubGui();
 			EnableSubGui(m_Choose);
 			m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);

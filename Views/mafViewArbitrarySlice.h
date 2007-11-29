@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 10:17:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-11-29 08:24:36 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,7 @@ protected:
 
 	mafGizmoTranslate *m_GizmoTranslate;
 	mafGizmoRotate		*m_GizmoRotate;
-	mafVMEVolumeGray	*m_CurrentVolume;
+	mafVME          	*m_CurrentVolume;
 	mafVMESlicer			*m_Slicer;
 	mafMatrix					*m_MatrixReset;
 	mafAttachCamera		*m_AttachCamera;

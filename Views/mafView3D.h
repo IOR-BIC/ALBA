@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 13:50:20 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-11-29 08:23:54 $
+  Version:   $Revision: 1.9 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ protected:
 
 	int m_Choose;
 
-	mafVMEVolumeGray	*m_CurrentVolume;
+	mafVME          	*m_CurrentVolume;
 	mafVMESurface			*m_CurrentSurface;
 	mafVMESurface			*m_CurrentInvisibleSurface;
 

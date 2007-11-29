@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-11-29 08:24:36 $
+  Version:   $Revision: 1.24 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -156,7 +156,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
 			double sr[2],SliceCenterVolumeReset[3];
-			mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(Vme);
+			mafVME *Volume=mafVME::SafeDownCast(Vme);
 			m_CurrentVolume = Volume;
 
 			// get the VTK volume
