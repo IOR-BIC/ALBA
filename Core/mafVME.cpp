@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-15 10:41:54 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2007-11-29 17:07:00 $
+  Version:   $Revision: 1.46 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -115,6 +115,9 @@ int mafVME::DeepCopy(mafNode *a)
     //AutoUpdateAbsMatrix=vme->GetAutoUpdateAbsMatrix();
     SetTimeStamp(vme->GetTimeStamp());
 
+    SetMatrix(*vme->GetOutput()->GetMatrix());
+    //SetAbsMatrix(*vme->GetOutput()->GetAbsMatrix());
+
     return MAF_OK;
   }
   else
@@ -138,7 +141,27 @@ int mafVME::ShallowCopy(mafVME *a)
 bool mafVME::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
-  return Superclass::Equals(vme);
+  if (Superclass::Equals(vme))
+  {
+    if (GetTimeStamp() == vme->GetTimeStamp())
+    {
+      if (GetParent())
+      {
+        if (GetOutput()->GetAbsMatrix()->Equals(vme->GetOutput()->GetAbsMatrix()))
+        {
+          return true;
+        }
+      }
+      else
+      {
+        if (GetOutput()->GetMatrix()->Equals(vme->GetOutput()->GetMatrix()))
+        {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 //-------------------------------------------------------------------------
@@ -158,7 +181,7 @@ int mafVME::SetParent(mafNode *parent)
 {
   if (Superclass::SetParent(parent)==MAF_OK)
   {
-    // this forces the the pipe to Update its input and input frame    
+    // this forces the pipe to Update its input and input frame
     m_AbsMatrixPipe->SetVME(this);
     return MAF_OK;
   }
