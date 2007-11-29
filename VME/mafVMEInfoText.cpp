@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 10:35:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-11-29 12:47:25 $
+  Version:   $Revision: 1.4 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -238,7 +238,9 @@ mafVMEOutput *mafVMEInfoText::GetOutput()
   return m_Output;
 }
 
+//-------------------------------------------------------------------------
 void mafVMEInfoText::SetPosShow(bool show, int index)
+//-------------------------------------------------------------------------
 {
   wxASSERT(index >= 0 && index <= 2); 
   if(index < 0 || index > 2)
@@ -256,7 +258,9 @@ void mafVMEInfoText::SetPosShow(bool show, int index)
   if(m_Gui) 
     m_Gui->Update();
 }
+//-------------------------------------------------------------------------
 bool mafVMEInfoText::GetPosShow(int index)
+//-------------------------------------------------------------------------
 {
   wxASSERT(index >= 0 && index <= 2); 
   if(index < 0 || index > 2)
@@ -264,7 +268,9 @@ bool mafVMEInfoText::GetPosShow(int index)
   return m_PosShow[index];
 }
 
+//-------------------------------------------------------------------------
 void mafVMEInfoText::SetPosLabel(const mafString& label, int index)
+//-------------------------------------------------------------------------
 {
   wxASSERT(index >= 0 && index <= 2); 
   if(index < 0 || index > 2)
@@ -282,7 +288,9 @@ void mafVMEInfoText::SetPosLabel(const mafString& label, int index)
   if(m_Gui) 
     m_Gui->Update();
 }
+//-------------------------------------------------------------------------
 const char *mafVMEInfoText::GetPosLabel(int index)
+//-------------------------------------------------------------------------
 {
   wxASSERT(index >= 0 && index <= 2); 
   if(index < 0 || index > 2)
