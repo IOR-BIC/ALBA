@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 16:47:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-11-29 16:56:51 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -91,6 +91,9 @@ public:
   /** Remove all linked camera from the link camera vector.*/
   void RemoveAllLinkedCamera();
 
+  virtual void AutoResetClippingRangeOn();
+  virtual void AutoResetClippingRangeOff();
+
 protected:
   mmiCameraMove();
   virtual ~mmiCameraMove();
@@ -112,6 +115,7 @@ protected:
   vtkCamera*    m_CurrentCamera;  ///< Stores camera to which the interaction is currently assigned
   mafMTime      m_UpdateTime;     ///< Time stamp of the last update of the tracker to world transformation 
   std::vector<vtkCamera *> m_LinkedCamera; ///< List of vtkCamera which will be forwarded the motion according to the main camera that is the camera in which the user is interacting with.
+  bool			m_AutoResetClippingRange; // Turn on (default)-off the auto reset of clipping range
 
 private:
   mmiCameraMove(const mmiCameraMove&);  // Not implemented.

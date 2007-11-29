@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 16:47:13 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-11-29 16:56:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -42,6 +42,7 @@ mmiCameraMove::mmiCameraMove()
   m_InteractionFlag = 0;
   m_CurrentCamera = NULL;
   m_MousePose[0] = m_MousePose[1] = 0;
+  m_AutoResetClippingRange = true;
 }
 
 //------------------------------------------------------------------------------
@@ -301,7 +302,7 @@ void mmiCameraMove::Rotate()
   m_CurrentCamera->Elevation(ryf);
   m_CurrentCamera->OrthogonalizeViewUp();
 
-  ResetClippingRange();
+  if (m_AutoResetClippingRange) ResetClippingRange();
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -329,7 +330,7 @@ void mmiCameraMove::Spin()
   m_CurrentCamera->Roll(newAngle - oldAngle);
   m_CurrentCamera->OrthogonalizeViewUp();
       
-  ResetClippingRange();
+  if (m_AutoResetClippingRange)  ResetClippingRange();
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -374,7 +375,7 @@ void mmiCameraMove::Pan()
                       motionVector[1] + viewPoint[1],
                       motionVector[2] + viewPoint[2]);
       
-  ResetClippingRange();
+  if (m_AutoResetClippingRange)  ResetClippingRange();
   m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -395,7 +396,7 @@ void mmiCameraMove::Dolly()
   else
     m_CurrentCamera->Dolly(zoomFactor);
   
-  ResetClippingRange();
+  if (m_AutoResetClippingRange)  ResetClippingRange();
 	m_Renderer->GetRenderWindow()->Render();
 }
 //----------------------------------------------------------------------------
@@ -698,4 +699,17 @@ void mmiCameraMove::RemoveAllLinkedCamera()
 //----------------------------------------------------------------------------
 {
   m_LinkedCamera.clear();
+}
+//----------------------------------------------------------------------------
+void mmiCameraMove::AutoResetClippingRangeOff()
+//----------------------------------------------------------------------------
+{
+	m_AutoResetClippingRange = false;
+}
+
+//----------------------------------------------------------------------------
+void mmiCameraMove::AutoResetClippingRangeOn()
+//----------------------------------------------------------------------------
+{
+	m_AutoResetClippingRange = true;
 }
