@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutterTest.h,v $
 Language:  C++
-Date:      $Date: 2007-09-28 11:21:01 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-11-29 10:38:35 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -50,7 +50,8 @@ class vtkMAFMeshCutterTest : public CPPUNIT_NS::TestFixture
     CPPUNIT_TEST( TestGetOutputHex8_EdgeOnly );
     CPPUNIT_TEST( TestGetOutputHex8_CornerOnly );
     CPPUNIT_TEST( TestGetOutputTet4 );
-    CPPUNIT_TEST( TestUpdate );
+    CPPUNIT_TEST( TestUpdateChangeCutFunction );
+    CPPUNIT_TEST( TestUpdateChangeInput );
     CPPUNIT_TEST( TestWait ) ;
     CPPUNIT_TEST_SUITE_END();
 
@@ -68,7 +69,8 @@ class vtkMAFMeshCutterTest : public CPPUNIT_NS::TestFixture
     void TestGetOutputHex8_EdgeOnly();
     void TestGetOutputHex8_CornerOnly();
     void TestGetOutputTet4();
-    void TestUpdate();
+    void TestUpdateChangeCutFunction();
+    void TestUpdateChangeInput() ;
     void TestWait() {Sleep(5000);} ; // empty test to generate pause
 
     // return true if v = (1-lambda)*v0 + lambda*v1

@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-28 11:21:01 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-11-29 10:38:35 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -47,12 +47,11 @@ All rights reserved.
 
 #include "mafConfigure.h"
 
+
 //#define TESTDATA MAF_DATA_ROOT"/FEM/ANSYS"
 #define FTOL 0.0000001
 
 static const bool renderingOn = false ;  // switch interactive rendering on
-
-
 
 void vtkMAFMeshCutterTest::setUp()
 {
@@ -172,6 +171,7 @@ void vtkMAFMeshCutterTest::RenderPointScalars(vtkUnstructuredGrid *UG, vtkPolyDa
   prop1->SetRepresentationToWireframe() ;
   prop1->SetLineWidth(1.0) ;
   A1->SetProperty(prop1) ;
+
 
 
 
@@ -426,6 +426,7 @@ void vtkMAFMeshCutterTest::ScalarTest(vtkMAFMeshCutter *MeshCutter, vtkUnstructu
 
 
 
+
 //------------------------------------------------------------------------------
 // Test filter with hex8 data (two cube cells)
 // Basic slice through centre of both cubes
@@ -440,7 +441,7 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8()
   // read the data
   vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
   reader->SetFileName(fname.str());
-
+  
   // set the implicit function which defines the cut
   vtkTransform *T = vtkTransform::New();
 
@@ -517,6 +518,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -612,6 +619,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut1()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -707,6 +720,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_VerticalCut2()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -801,6 +820,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_FaceInPlane()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -904,6 +929,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge1()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -1006,6 +1037,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesEdge2()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -1106,6 +1143,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_IncludesCorner()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -1154,6 +1197,11 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_EdgeOnly()
   int ncells = polydata->GetNumberOfCells() ;
   CPPUNIT_ASSERT(ncells == 0) ;
 
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -1199,6 +1247,12 @@ void vtkMAFMeshCutterTest::TestGetOutputHex8_CornerOnly()
   // check no. of cells and type
   int ncells = polydata->GetNumberOfCells() ;
   CPPUNIT_ASSERT(ncells == 0) ;
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -1288,6 +1342,12 @@ void vtkMAFMeshCutterTest::TestGetOutputTet4()
     RenderPointScalars(UG, polydata) ;
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
 
 
@@ -1296,7 +1356,7 @@ void vtkMAFMeshCutterTest::TestGetOutputTet4()
 //------------------------------------------------------------------------------
 // Test that the cutter updates and executes properly when the cutting function changes
 // It runs the tests GetOutputHex8_VerticalCut1() and GetOutputHex8_VerticalCut2() in series
-void vtkMAFMeshCutterTest::TestUpdate() 
+void vtkMAFMeshCutterTest::TestUpdateChangeCutFunction() 
 //------------------------------------------------------------------------------
 {
   //----------------------------------------------------------------------------
@@ -1332,7 +1392,6 @@ void vtkMAFMeshCutterTest::TestUpdate()
 
   vtkPolyData *polydata = MeshCutter->GetOutput() ;
   vtkUnstructuredGrid *UG = reader->GetOutput() ;
-
 
 
   // Get the statistics of the polydata
@@ -1392,7 +1451,7 @@ void vtkMAFMeshCutterTest::TestUpdate()
     RenderCellScalars(UG, polydata) ;
   }
 
-
+ 
 
   //----------------------------------------------------------------------------
   // 2. Change plane and run test Hex8_VerticalCut2()
@@ -1407,6 +1466,7 @@ void vtkMAFMeshCutterTest::TestUpdate()
 
   // force update so that the output is there
   MeshCutter->Update() ;
+
 
 
   // Get the statistics of the polydata
@@ -1459,4 +1519,180 @@ void vtkMAFMeshCutterTest::TestUpdate()
   if (renderingOn){
     RenderCellScalars(UG, polydata) ;
   }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
+}
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Test that the cutter updates and executes properly when the input changes
+// It runs the tests GetOutputHex8 and GetOutputTet4 in series
+void vtkMAFMeshCutterTest::TestUpdateChangeInput() 
+//------------------------------------------------------------------------------
+{
+  //----------------------------------------------------------------------------
+  // Run Hex8
+  //----------------------------------------------------------------------------
+  std::cout << std::endl ;
+  std::cout << " running hex8 data..." << std::endl ;
+
+  // set filename
+  std::ostrstream fname1 ;
+  fname1 << MAF_DATA_ROOT << "/FEM/vtk/hex8" << ".vtk" << std::ends ;
+
+  // read the data
+  vtkUnstructuredGridReader *reader = vtkUnstructuredGridReader::New();
+  reader->SetFileName(fname1.str());
+
+  // set the implicit function which defines the cut
+  vtkTransform *T = vtkTransform::New();
+
+  vtkPlane *P = vtkPlane::New();
+  P->SetTransform(T);
+  double pnorm[3] = {0.0, 1.0, 0.0} ;
+  double porigin[3] = {1.0, 0.7, 0.7} ;
+  P->SetNormal(pnorm) ;
+  P->SetOrigin(porigin);
+
+  vtkMAFMeshCutter *MeshCutter = vtkMAFMeshCutter::New();
+  MeshCutter->SetCutFunction(P);
+  MeshCutter->SetInput(reader->GetOutput());
+
+  MeshCutter->GetOutput()->Update() ;
+  vtkPolyData *polydata = MeshCutter->GetOutput() ;
+  vtkUnstructuredGrid *UG = reader->GetOutput() ;
+
+
+  // Get the statistics of the polydata
+  int i ;
+
+  // check no. of points
+  int npts = polydata->GetPoints()->GetNumberOfPoints() ;
+  CPPUNIT_ASSERT(npts == 6) ;
+
+  // check no. of cells and type
+  int ncells = polydata->GetNumberOfCells() ;
+  CPPUNIT_ASSERT(ncells == 2) ;
+  for (i = 0 ;  i < ncells ;  i++)
+    CPPUNIT_ASSERT(polydata->GetCell(i)->GetCellType() == VTK_QUAD) ;
+
+
+  // compare the bounds of the input and output
+  double boundsin[6], boundsout[6] ;
+  UG->GetBounds(boundsin) ;
+  polydata->GetBounds(boundsout) ;
+  CPPUNIT_ASSERT((boundsout[0] >= boundsin[0]) && (boundsout[1] <= boundsin[1])) ;
+  CPPUNIT_ASSERT((boundsout[2] >= boundsin[2]) && (boundsout[3] <= boundsin[3])) ;
+  CPPUNIT_ASSERT((boundsout[4] >= boundsin[4]) && (boundsout[5] <= boundsin[5])) ;
+
+  // check that the polydata points are in the plane
+  double coords[3] ;
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+    CPPUNIT_ASSERT(PointInPlane(coords, porigin, pnorm, FTOL)) ;
+  }
+
+  // check that the points are interpolated correctly
+  double coords0[3], coords1[3] ;
+  vtkIdType id0, id1 ;
+  double lambda ;
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+
+    // get coords of corresponding edge in input data
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    UG->GetPoint(id0, coords0) ;
+    UG->GetPoint(id1, coords1) ;
+
+    // test if polydata coords are in the interpolated position
+    CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
+  }
+
+
+  // test the scalars
+  ScalarTest(MeshCutter, UG, polydata) ;
+
+
+  // render the data
+  if (renderingOn){
+    RenderCellScalars(UG, polydata) ;
+  }
+
+
+
+  //----------------------------------------------------------------------------
+  // Run Tet4
+  //----------------------------------------------------------------------------
+  std::cout << " running tet4 data..." << std::endl ;
+
+  // set filename
+  std::ostrstream fname2 ;
+  fname2 << MAF_DATA_ROOT << "/FEM/vtk/tet4" << ".vtk" << std::ends ;
+
+  // read the data
+  reader->SetFileName(fname2.str());
+
+  // force update so that the output is there
+  MeshCutter->Update() ;
+
+  // Get the statistics of the polydata
+
+  // check no. of points
+  npts = polydata->GetPoints()->GetNumberOfPoints() ;
+  CPPUNIT_ASSERT(npts == 5) ;
+
+  // check no. of cells and type (should be one triangle and one quad)
+  ncells = polydata->GetNumberOfCells() ;
+  CPPUNIT_ASSERT(ncells == 2) ;
+  CPPUNIT_ASSERT(polydata->GetCell(0)->GetCellType() == VTK_TRIANGLE) ;
+  CPPUNIT_ASSERT(polydata->GetCell(1)->GetCellType() == VTK_QUAD) ;
+
+  // compare the bounds of the input and output
+  UG->GetBounds(boundsin) ;
+  polydata->GetBounds(boundsout) ;
+  CPPUNIT_ASSERT((boundsout[0] >= boundsin[0]) && (boundsout[1] <= boundsin[1])) ;
+  CPPUNIT_ASSERT((boundsout[2] >= boundsin[2]) && (boundsout[3] <= boundsin[3])) ;
+  CPPUNIT_ASSERT((boundsout[4] >= boundsin[4]) && (boundsout[5] <= boundsin[5])) ;
+
+  // check that the polydata points are in the plane
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+    CPPUNIT_ASSERT(PointInPlane(coords, porigin, pnorm, FTOL)) ;
+  }
+
+  // check that the points are interpolated correctly
+  for (i = 0 ;  i < npts ;  i++){
+    // get coords of polydata point
+    polydata->GetPoint(i, coords) ;
+
+    // get coords of corresponding edge in input data
+    MeshCutter->GetInputEdgeCutByPoint(i, &id0, &id1, &lambda) ;
+    UG->GetPoint(id0, coords0) ;
+    UG->GetPoint(id1, coords1) ;
+
+    // test if polydata coords are in the interpolated position
+    //CPPUNIT_ASSERT(ColinearVectors(coords, coords0, coords1, lambda, FTOL)) ;
+  }
+
+
+  // render the data
+  if (renderingOn){
+    RenderCellScalars(UG, polydata) ;
+  }
+
+  // delete vtk objects
+  reader->Delete() ;
+  T->Delete() ;
+  P->Delete() ;
+  MeshCutter->Delete() ;
 }
