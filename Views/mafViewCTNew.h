@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-09-12 12:10:54 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-11-29 08:51:32 $
+Version:   $Revision: 1.11 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -140,7 +140,7 @@ protected:
 
 	//double m_BorderColor[10][3];
 
-	mafVMEVolume    *m_CurrentVolume; ///< Current visualized volume
+	mafVME    *m_CurrentVolume; ///< Current visualized volume
 
 	mafViewCompound *m_ViewCTCompound;
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-11-29 08:53:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -137,7 +137,7 @@ void mafViewRXCompound::VmeShow(mafNode *node, bool show)
 
       }
       
-      m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+      m_CurrentVolume = mafVME::SafeDownCast(node);
 
     }
     else

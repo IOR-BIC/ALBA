@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-16 10:57:59 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-11-29 08:54:31 $
+  Version:   $Revision: 1.13 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,7 @@ void mafViewSingleSliceCompound::OnEvent(mafEventBase *maf_event)
 		case ID_RANGE_MODIFIED:
 			{
 				//Windowing
-				if(mafVMEVolumeGray::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
+				if(mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
 				{
 					int low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
@@ -198,12 +198,13 @@ void mafViewSingleSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 	if(enable)
 	{
 		EnableWidgets(enable);
-		mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(node);
+		mafVME *Volume=mafVME::SafeDownCast(node);
+    mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(Volume->GetOutput());
 		double sr[2];
-		Volume->GetVolumeOutput()->GetVTKData()->GetScalarRange(sr);
-		mmaVolumeMaterial *currentSurfaceMaterial = Volume->GetMaterial();
-		m_ColorLUT = Volume->GetMaterial()->m_ColorLut;
-		Volume->GetMaterial()->UpdateProp();
+		volumeOutput->GetVTKData()->GetScalarRange(sr);
+		mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
+		m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
+		volumeOutput->GetMaterial()->UpdateProp();
 		m_LutWidget->SetLut(m_ColorLUT);
 		m_LutWidget->Enable(true);
 		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);

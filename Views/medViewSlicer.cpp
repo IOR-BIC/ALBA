@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 13:50:04 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-11-29 08:55:09 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,7 +153,7 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
 	{
 		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
-			mafVMEVolumeGray *Volume=mafVMEVolumeGray::SafeDownCast(Vme);
+			mafVME *Volume=mafVME::SafeDownCast(Vme);
 			m_CurrentVolume = Volume;
 
 			// get the VTK volume

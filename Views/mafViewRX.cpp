@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2007-11-29 08:53:03 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,7 +153,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         double positionSlice[3];
         double b[6];
 
-        mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
+        mafVME::SafeDownCast(m_CurrentVolume->m_Vme)->GetOutput()->GetBounds(b);
         positionSlice[0] = (b[1]+b[0])/2;
         positionSlice[1] = (b[3]+b[2])/2;
         positionSlice[2] = (b[5]+b[4])/2;

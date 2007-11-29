@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-28 16:26:35 $
-Version:   $Revision: 1.41 $
+Date:      $Date: 2007-11-29 08:51:32 $
+Version:   $Revision: 1.42 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -154,14 +154,15 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 	{
 		if(show)
 		{
-			m_CurrentVolume = mafVMEVolume::SafeDownCast(node);
+			m_CurrentVolume = mafVME::SafeDownCast(node);
+      mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_CurrentVolume->GetOutput());
 			double b[6];
 			m_CurrentVolume->GetOutput()->Update();
 			m_CurrentVolume->GetOutput()->GetBounds(b);
 			double wholeScalarRangeVol[2];
 			m_CurrentVolume->GetOutput()->GetVTKData()->GetScalarRange(wholeScalarRangeVol);
 
-      mmaVolumeMaterial *material = m_CurrentVolume->GetMaterial();
+      mmaVolumeMaterial *material = volumeOutput->GetMaterial();
       if(material)
       {
         m_MinLUTHistogram = material->m_TableRange[0];
@@ -481,6 +482,7 @@ void mafViewCTNew::ProbeVolume()
 //----------------------------------------------------------------------------
 {
 	if (m_CurrentVolume == NULL) return;
+  mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(m_CurrentVolume->GetOutput());
 
 
   if(m_Thickness == 0)
@@ -504,7 +506,7 @@ void mafViewCTNew::ProbeVolume()
   double b[6];
   m_CurrentVolume->GetOutput()->Update();
   m_CurrentVolume->GetOutput()->GetBounds(b);
-  vtkImageData *vtk_data = ((vtkImageData *)m_CurrentVolume->GetOutput()->GetVTKData());
+  vtkImageData *vtk_data = ((vtkImageData *)volumeOutput->GetVTKData());
   vtk_data->GetSpacing(m_Spacing);
 
   for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
@@ -516,7 +518,7 @@ void mafViewCTNew::ProbeVolume()
 	  }
 
 
-    mmaVolumeMaterial *vol_material = (m_CurrentVolume)->GetMaterial();
+    mmaVolumeMaterial *vol_material = (volumeOutput)->GetMaterial();
     mmaVolumeMaterial *copy;
     mafNEW(copy);
     copy->DeepCopy(vol_material);
@@ -595,7 +597,7 @@ void mafViewCTNew::ProbeVolume()
 			//}
 
 			vtkMAFSmartPointer<vtkTransform> transform;
-			transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+			transform->SetMatrix(volumeOutput->GetAbsMatrix()->GetVTKMatrix());
 			transform->Update();
 
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
@@ -669,7 +671,7 @@ void mafViewCTNew::ProbeVolume()
 			lut->SetRange(range);
 
 			vtkMAFSmartPointer<vtkTransform> transform;
-			transform->SetMatrix(m_CurrentVolume->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+			transform->SetMatrix(volumeOutput->GetAbsMatrix()->GetVTKMatrix());
 			transform->Update();
 
 			vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;

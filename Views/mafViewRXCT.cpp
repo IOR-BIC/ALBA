@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-16 10:56:52 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-11-29 08:53:59 $
+  Version:   $Revision: 1.38 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -142,21 +142,22 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       double center[3],b[CT_CHILD_VIEWS_NUMBER],step;
     
       // set the range for every slider widget
-      mafVMEVolume *volumeVme = mafVMEVolume::SafeDownCast(node);
+      mafVME *volumeVme = mafVME::SafeDownCast(node);
+      mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(volumeVme->GetOutput());
       for (int childID = RX_FRONT_VIEW; childID < CT_COMPOUND_VIEW; childID++)
       {
         double advLow,advHigh;
         double range[2];
-        if(volumeVme->GetMaterial())
+        if(volumeOutput->GetMaterial())
         {
           
           ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range);
           double volTableRange[2];
-          volTableRange[0] = volumeVme->GetMaterial()->m_TableRange[0];
-          volTableRange[1] = volumeVme->GetMaterial()->m_TableRange[1];
+          volTableRange[0] = volumeOutput->GetMaterial()->m_TableRange[0];
+          volTableRange[1] = volumeOutput->GetMaterial()->m_TableRange[1];
 
           double volRange[2];
-          volumeVme->GetOutput()->GetVTKData()->GetScalarRange(volRange);
+          volumeOutput->GetVTKData()->GetScalarRange(volRange);
 
           
           advLow = range[0] + ((range[1] - range[0])/(volRange[1] - volRange[0])) * (volTableRange[0] - volRange[0]);
@@ -201,10 +202,10 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
 
       if(volumeVme)
       { 
-        if(volumeVme->GetMaterial())
+        if(volumeOutput->GetMaterial())
         {
-          sr[0] = volumeVme->GetMaterial()->m_TableRange[0];
-          sr[1] = volumeVme->GetMaterial()->m_TableRange[1];
+          sr[0] = volumeOutput->GetMaterial()->m_TableRange[0];
+          sr[1] = volumeOutput->GetMaterial()->m_TableRange[1];
         }      
       }
       

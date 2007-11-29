@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-11-29 08:53:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,7 +86,7 @@ protected:
   Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
-  mafVMEVolume    *m_CurrentVolume; ///< Current visualized volume
+  mafVME    *m_CurrentVolume; ///< Current visualized volume
   
   mafViewRX       *m_ViewsRX[2];
   
