@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-10-15 13:16:09 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-11-29 09:18:41 $
+Version:   $Revision: 1.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -25,18 +25,20 @@ All rights reserved.
 #include <ostream>
 #include <vector>
 
+
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkMAFMeshCutter);
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-// Constuctor
+// Constructor
 vtkMAFMeshCutter::vtkMAFMeshCutter()
 //------------------------------------------------------------------------------
 {
   m_cutFunction = NULL ;
+  m_unstructGrid = vtkUnstructuredGrid::New() ;
 }
 
 //------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ vtkMAFMeshCutter::vtkMAFMeshCutter()
 vtkMAFMeshCutter::~vtkMAFMeshCutter()
 //------------------------------------------------------------------------------
 {
-//  m_cutFunction->Delete() ;
+  m_unstructGrid->Delete() ;
 }
 
 //------------------------------------------------------------------------------
@@ -70,15 +72,25 @@ unsigned long vtkMAFMeshCutter::GetMTime()
 void vtkMAFMeshCutter::Execute()
 //------------------------------------------------------------------------------
 {
-  m_unstructGrid = this->GetInput() ;
+  // Make a copy of the input data and buil links
+  // Can't just set a pointer because BuildLinks() would change the input.
+  m_unstructGrid->Initialize() ;
+  m_unstructGrid->DeepCopy(this->GetInput()) ;
+  m_unstructGrid->BuildLinks() ;
+
+  // Set pointer to output
   m_polydata = this->GetOutput() ;
 
   // Make sure the cutter is cleared of previous data before you run it !
   Initialize() ;
 
+  // make sure the output is empty
+  m_polydata->Initialize() ;
+
   // Run the cutter
   CreateSlice() ;
 }
+
 
 //------------------------------------------------------------------------------
 // Set cutting plane
@@ -849,19 +861,19 @@ void vtkMAFMeshCutter::Initialize()
   m_intersectedCells.clear() ;
   m_pointsInCells.clear() ;
   m_cellMapping.clear() ;
+
 }
 
 
 //------------------------------------------------------------------------------
-/** Create the polydata slice */
+// Create the polydata slice
+// There must have been a call to m_unstructGrid->BuildLinks() for this to work
 void vtkMAFMeshCutter::CreateSlice()
 //------------------------------------------------------------------------------
 {
   int i ;
   vtkIdList *polygon = vtkIdList::New() ;
   vtkCellArray *cells = vtkCellArray::New() ;
-
-  m_unstructGrid->BuildLinks() ;  // build the cell links
 
   FindPointsInPlane() ;           // this finds the points where the mesh intersects the plane
 

@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.h,v $
 Language:  C++
-Date:      $Date: 2007-09-28 11:19:28 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-11-29 09:18:41 $
+Version:   $Revision: 1.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -58,7 +58,7 @@ public:
   then this object is modified as well. */
   unsigned long GetMTime();
 
-  void SetCutFunction(vtkPlane *P) ;                                            ///< Set the cutting plane
+  void SetCutFunction(vtkPlane *P) ;                                            ///< Set the cutting plane (but does not register the object)
   vtkPlane* GetCutFunction() ;                                                  ///< Get the cutting plane
 
   /** Get the output point idout corresponding to the input edge (id0,id1). 
@@ -84,6 +84,10 @@ public:
   /** Get the output cell corresponding to the input cell.
   Returns true if the input id was found. */
   bool GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkIdType *idout) ;
+
+
+  /** initialize the cutter */
+  void Initialize() ;
 
 protected:
   vtkMAFMeshCutter() ;                                                              ///< constructor
@@ -179,7 +183,7 @@ protected:
   void TransferScalars() ;
 
   /** initialize the cutter */
-  void Initialize() ;
+  //void Initialize() ;
 
   /** do the whole thing */
   void CreateSlice() ;
@@ -217,7 +221,6 @@ protected:
   // input and output
   vtkUnstructuredGrid *m_unstructGrid ;
   vtkPolyData *m_polydata ;
-
 } ;
 
 #endif
