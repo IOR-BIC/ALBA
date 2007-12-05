@@ -8,12 +8,12 @@ PROJECT(medInteraction)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
-  mmi2DAngle.cpp
-  mmi2DAngle.h
-  mmi2DDistance.cpp
-  mmi2DDistance.h
-  mmi2DIndicator.cpp
-  mmi2DIndicator.h
+  medInteractor2DAngle.cpp
+  medInteractor2DAngle.h
+  medInteractor2DDistance.cpp
+  medInteractor2DDistance.h
+  medInteractor2DIndicator.cpp
+  medInteractor2DIndicator.h
 )
 
 
