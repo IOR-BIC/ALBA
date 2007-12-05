@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUIContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-05 14:01:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-12-05 11:22:07 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -142,7 +142,7 @@ void medGUIContextualMenu::ShowContextualMenu(wxFrame *child, mafView *view, boo
   }  
   
   
-  this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, _("Export as VRML"));
+  this->Append(CONTEXTUAL_MENU_EXPORT_AS_VRML, _("Export Scene (VRML)"));
 
 	int x,y;
 	::wxGetMousePosition(&x, &y);
