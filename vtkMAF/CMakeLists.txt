@@ -37,8 +37,6 @@ SET(vtkMAF_SRCS
   vtkLocalAxisCoordinate.h
   vtkMAFMeshCutter.cxx
   vtkMAFMeshCutter.h
-  vtkMAFTextOrientator.cxx
-  vtkMAFTextOrientator.h
   vtkProjectRG.cxx
   vtkProjectRG.h
   vtkProjectSP.cxx
@@ -61,8 +59,10 @@ SET(vtkMAF_SRCS
   vtkVolumeResample.cxx
   vtkVolumeSlicer.cxx
   vtkVolumeSlicer.h
-  vtkPolyDataToSinglePolyLine.cxx
-  vtkPolyDataToSinglePolyLine.h
+  vtkMAFPolyDataToSinglePolyLine.cxx
+  vtkMAFPolyDataToSinglePolyLine.h
+  vtkMAFTextOrientator.cxx
+  vtkMAFTextOrientator.h
 )
 
 # List the kits from VTK that are needed by this project.
