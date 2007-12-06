@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:47:33 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2007-12-06 09:30:32 $
+  Version:   $Revision: 1.34 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -889,7 +889,7 @@ void mafVMEMeter::UpdateLinks()
   else
     m_EndVme2Name = end_vme2 ? end_vme2->GetName() : _("none");
 
-  m_ProbedVME = probedVme;
+  m_ProbedVME = mafVMEVolumeGray::SafeDownCast(probedVme);
   m_ProbeVmeName = probedVme ? probedVme->GetName() : _("none");
 }
 //-------------------------------------------------------------------------
@@ -946,7 +946,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
           if (n != NULL)
           {
             SetMeterLink("PlottedVME",n);
-            m_ProbedVME = mafVME::SafeDownCast(n);
+            m_ProbedVME = mafVMEVolumeGray::SafeDownCast(n);
             m_ProbeVmeName = n->GetName();
             CreateHistogram();
           }
@@ -987,7 +987,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
           int x_init,y_init;
           x_init = mafGetFrame()->GetPosition().x;
           y_init = mafGetFrame()->GetPosition().y;
-          m_HistogramDialog = new mmgDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
+          m_HistogramDialog = new mmgDialogPreview(_("Histogram Dialog"), mafCLOSEWINDOW | mafUSERWI);
           m_HistogramRWI = m_HistogramDialog->GetRWI();
           m_HistogramRWI->SetListener(this);
           m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);
@@ -1108,6 +1108,9 @@ void mafVMEMeter::CreateHistogram()
     }
 
     m_PlotActor->SetXRange(0,m_Distance);
+    double srY[2];
+    m_ProbedVME->GetOutput()->GetVTKData()->GetScalarRange(srY);
+    m_PlotActor->SetYRange(srY);
     m_PlotActor->SetPlotCoordinate(0,m_Distance);
 
     double b[6];
@@ -1145,6 +1148,6 @@ void mafVMEMeter::CreateHistogram()
 
     vtkPolyData *probimg_result = prober->GetPolyDataOutput();
     m_PlotActor->AddInput(probimg_result);
-    m_HistogramRWI->m_RwiBase->Render();
+    if(m_HistogramRWI) m_HistogramRWI->m_RwiBase->Render();
   }
 }

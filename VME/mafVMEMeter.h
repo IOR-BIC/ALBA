@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:54:41 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-12-06 09:30:32 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -290,7 +290,7 @@ protected:
   vtkXYPlotActor *m_PlotActor;
 
   int m_GenerateHistogram;
-  mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine
+  mafVMEVolumeGray *m_ProbedVME; ///< VME probed by the m_ProbingLine
 
 private:
   mafVMEMeter(const mafVMEMeter&); // Not implemented
