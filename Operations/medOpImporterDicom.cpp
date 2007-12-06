@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-23 14:32:29 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-12-06 09:35:36 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -62,6 +62,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEVolumeGray.h"
 #include "mmgCheckListBox.h"
 #include "medGUIDicomSettings.h"
+#include "mmgButton.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkDicomUnPacker.h"
@@ -144,9 +145,9 @@ mafOp(label)
 	m_CropPage = NULL;
 	m_BuildPage = NULL;
 
-	m_BuildGui = NULL;
-	m_CropGui = NULL;
-	m_LoadGui = NULL;
+	m_BuildGuiLeft = NULL;
+	m_CropGuiLeft = NULL;
+	m_LoadGuiLeft = NULL;
 
 	m_DicomReader = NULL;
 	m_DirectoryReader = NULL;
@@ -190,6 +191,8 @@ mafOp(label)
 	m_DicomModalityListBox = NULL;
 
 	m_CroppedExetuted=false;
+
+  SetSetting(new medGUIDicomSettings(this));
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
@@ -216,6 +219,8 @@ void medOpImporterDicom::OpRun()
 //----------------------------------------------------------------------------
 {
 	m_DictionaryFilename = ((medGUIDicomSettings*)GetSetting())->GetDictionary();
+  m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
+
 	CreateGui();
 	CreatePipeline();
 
@@ -233,6 +238,20 @@ void medOpImporterDicom::OpRun()
 	m_CropPage->SetNextPage(m_BuildPage);
 
 	m_Wizard->SetFirstPage(m_LoadPage);
+
+  //wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
+  wxString path;
+  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
+  dialog.SetReturnCode(wxID_OK);
+  int ret_code = dialog.ShowModal();
+  if (ret_code == wxID_OK)
+  {
+    path = dialog.GetPath();
+    m_DicomDirectory = path.c_str();
+    GuiUpdate();
+    OpenDir();
+  }
+
 	if(m_Wizard->Run())
 	{
 		if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
@@ -490,30 +509,34 @@ void medOpImporterDicom::BuildVolumeCineMRI()
 void medOpImporterDicom::CreateLoadPage()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,"prima");
-	m_LoadGui = new mmgGui(this);
+	m_LoadPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("First Step"));
+	m_LoadGuiLeft = new mmgGui(this);
+  m_LoadGuiRight = new mmgGui(this);
+  m_LoadGuiCenter = new mmgGui(this);
 
-	/*m_DicomModalityListBox=m_LoadGui->CheckList(ID_TYPE_DICOM,_("Modality"));
+	/*m_DicomModalityListBox=m_LoadGuiLeft->CheckList(ID_TYPE_DICOM,_("Modality"));
 	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),true);
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),true);
 	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),true);
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),true);*/
-	m_LoadGui->Label(_("data files:"),true);
-	mafString wildcard = _("DICT files (*.dic)|*.dic|All Files (*.*)|*.*");
-	//m_LoadGui->FileOpen (ID_DICTIONARY,	_("dictionary"),	&m_DictionaryFilename, wildcard);
-	m_LoadGui->DirOpen(ID_OPEN_DIR, _("Folder"),	&m_DicomDirectory);
-	m_LoadGui->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));//If there isn't a dictionary is impossible open DICOM Directory
-	m_LoadGui->Divider();
-	m_LoadGui->Label(_("patient info:"),true);
-	m_LoadGui->Label(_("name "), &m_PatientName);
-	m_LoadGui->Label(_("id "),&m_Identifier);
-	m_StudyListbox = m_LoadGui->ListBox(ID_STUDY,_("study id"),50);
-	m_LoadGui->Label(_("surgeon info:"),true);
-	m_LoadGui->String(ID_SURGEON_NAME,_("name "),&m_SurgeonName);
-	m_SliceScannerLoadPage=m_LoadGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
-	m_TimeScannerLoadPage=m_LoadGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+  {
+    m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+  }
 
-	m_LoadPage->AddGui(m_LoadGui);
+  m_LoadGuiCenter->DirOpen(ID_OPEN_DIR, _("Folder"),	&m_DicomDirectory,_("Sel. DICOM Folder"));
+  m_LoadGuiCenter->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));//If there isn't a dictionary is impossible open DICOM Directory
+  m_LoadGuiCenter->Divider();
+
+  m_StudyListbox = m_LoadGuiRight->ListBox(ID_STUDY,_("study id"),70,"",wxLB_HSCROLL);
+  
+  m_LoadGuiRight->FitGui();
+  m_LoadGuiLeft->FitGui();
+  m_LoadGuiRight->FitGui();
+  m_LoadPage->AddGuiLowerRight(m_LoadGuiRight);
+  m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
+  m_LoadPage->AddGuiLowerCenter(m_LoadGuiCenter);
 
 	m_LoadPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
@@ -524,18 +547,26 @@ void medOpImporterDicom::CreateLoadPage()
 void medOpImporterDicom::CreateCropPage()
 //----------------------------------------------------------------------------
 {
-	m_CropPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,"seconda");
-	m_CropGui = new mmgGui(this);
+	m_CropPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("Second Step"));
+	m_CropGuiLeft = new mmgGui(this);
+  m_CropGuiCenter = new mmgGui(this);
 
-	m_CropGui->Label(_("crop"),true);
-	m_CropGui->Button(ID_CROP_BUTTON,_("crop"));
-	m_CropGui->Button(ID_UNDO_CROP_BUTTON,_("undo crop"));
-	wxString sideChoices[2] = {_("Left"),_("Right")};
-	m_CropGui->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
-	m_SliceScannerCropPage=m_CropGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
-	m_TimeScannerCropPage=m_CropGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+	//m_CropGuiLeft->Label(_("crop"),true);
+	//m_CropGuiLeft->Button(ID_CROP_BUTTON,_("crop"));
+	//m_CropGuiLeft->Button(ID_UNDO_CROP_BUTTON,_("undo crop"));
+	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+  {
+    m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+  }
 
-	m_CropPage->AddGui(m_CropGui);
+  wxString sideChoices[2] = {_("Left"),_("Right")};
+  m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
+
+  m_CropGuiLeft->FitGui();
+  m_CropGuiCenter->FitGui();
+  m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
+	m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
 
 	m_CropPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
@@ -546,17 +577,26 @@ void medOpImporterDicom::CreateCropPage()
 void medOpImporterDicom::CreateBuildPage()
 //----------------------------------------------------------------------------
 {
-	m_BuildPage = new medGUIWizardPage(m_Wizard);
-	m_BuildGui = new mmgGui(this);
+	m_BuildPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("Third Step"));
+	m_BuildGuiLeft = new mmgGui(this);
+  m_BuildGuiCenter = new mmgGui(this);
 
-	wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
-	m_BuildGui->Label(_("build volume"),true);
-	m_BuildGui->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
-	m_BuildGui->String(ID_VOLUME_NAME,_("volume name"),&m_VolumeName);
-	m_SliceScannerBuildPage=m_BuildGui->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX);
-	m_TimeScannerBuildPage=m_BuildGui->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+	//wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
+	//m_BuildGuiLeft->Label(_("build volume"),true);
+	//m_BuildGuiLeft->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
+	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  
+  if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+  {
+	  m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+  }
 
-	m_BuildPage->AddGui(m_BuildGui);
+  m_BuildGuiCenter->String(ID_VOLUME_NAME,_("volume name"),&m_VolumeName);
+
+  m_BuildGuiLeft->FitGui();
+  m_BuildGuiCenter->FitGui();
+	m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
+  m_BuildPage->AddGuiLowerCenter(m_BuildGuiCenter);
 
 	m_BuildPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
@@ -567,16 +607,49 @@ void medOpImporterDicom::CreateBuildPage()
 void medOpImporterDicom::GuiUpdate()
 //----------------------------------------------------------------------------
 {
-	m_LoadGui->Update();
-	m_CropGui->Update();
-	m_BuildGui->Update();
+	m_LoadGuiLeft->Update();
+  m_LoadGuiRight->Update();
+  m_LoadGuiCenter->Update();
+
+	m_CropGuiLeft->Update();
+  m_CropGuiCenter->Update();
+
+	m_BuildGuiLeft->Update();
+  m_BuildGuiCenter->Update();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this);
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicom::OpenDir()
+//----------------------------------------------------------------------------
+{
+  ResetStructure();
+  // scan dicom directory
+  BuildDicomFileList(m_DicomDirectory.GetCStr());
+  if(m_NumberOfStudy>0)
+  {
+    if(m_NumberOfStudy == 1)
+    {
+      m_StudyListbox->SetSelection(FIRST_SELECTION);
+      OnEvent(&mafEvent(this, ID_STUDY));
+    }
+    if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+    {
+      AutoPositionCropPlane();
+    }
+    else
+    {
+      m_CropPlane->SetOrigin(0.0,0.0,0.0);
+      m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
+      m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
+      m_CropPage->GetRWI()->CameraReset();
+    }
+    m_BoxCorrect=true;
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::OnEvent(mafEventBase *maf_event) 
@@ -594,7 +667,7 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 			break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
-				if(m_Wizard->GetCurrentPage()==m_LoadPage && m_NumberOfStudy<1)
+				if(m_Wizard->GetCurrentPage()==m_LoadPage && m_NumberOfStudy<1)//From Load page to Crop Page
 				{
 					m_Wizard->EnableChangePageOff();
 					wxMessageBox(_("There isn't any studies!"));
@@ -605,7 +678,17 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 					m_Wizard->EnableChangePageOn();
 				}
 
-				if (m_Wizard->GetCurrentPage()==m_CropPage)
+        if (m_Wizard->GetCurrentPage()==m_CropPage && e->GetBool())//From Crop page to build page
+        {
+          Crop();
+        }
+
+        if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))//From buikd page to crop page
+        {
+          UndoCrop();
+        }
+
+				if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to any other
 				{
 						m_CropActor->VisibilityOff();
 				}
@@ -617,77 +700,36 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 						m_CropActor->VisibilityOff();
 				}
 				
+        GuiUpdate();
 				CameraUpdate();
 			}
 			break;
 		/*case ID_DICTIONARY:
 			m_DicomReader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-			m_LoadGui->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));
+			m_LoadGuiLeft->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));
 			break;*/
 		case ID_OPEN_DIR:
 			{
-				ResetStructure();
-				// scan dicom directory
-				BuildDicomFileList(m_DicomDirectory.GetCStr());
-				if(m_NumberOfStudy>0)
-				{
-					if(m_NumberOfStudy == 1)
-					{
-						m_StudyListbox->SetSelection(FIRST_SELECTION);
-						OnEvent(&mafEvent(this, ID_STUDY));
-					}
-					if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
-					{
-						AutoPositionCropPlane();
-					}
-					else
-					{
-						m_CropPlane->SetOrigin(0.0,0.0,0.0);
-						m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
-						m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
-						m_CropPage->GetRWI()->CameraReset();
-					}
-					m_BoxCorrect=true;
-				}
+				OpenDir();
 			}
 			break;
 		case ID_UNDO_CROP_BUTTON:
 			{
-				m_CropFlag = false;
-				ShowSlice(m_CurrentSlice);
-				double diffx,diffy,boundsCamera[6];
-				diffx=m_DicomBounds[1]-m_DicomBounds[0];
-				diffy=m_DicomBounds[3]-m_DicomBounds[2];
-				boundsCamera[0]=0.0;
-				boundsCamera[1]=diffx;
-				boundsCamera[2]=0.0;
-				boundsCamera[3]=diffy;
-				boundsCamera[4]=0.0;
-				boundsCamera[5]=0.0;
-				m_LoadPage->GetRWI()->CameraReset(boundsCamera);
-				m_LoadPage->GetRWI()->CameraUpdate();
-				m_CropPage->GetRWI()->CameraReset(boundsCamera);
-				m_CropPage->GetRWI()->CameraUpdate();
-				m_BuildPage->GetRWI()->CameraReset(boundsCamera);
-				m_BuildPage->GetRWI()->CameraUpdate();
-				m_CropGui->Enable(ID_UNDO_CROP_BUTTON,false);
-				m_CropActor->VisibilityOn();
-				m_CroppedExetuted=false;
-				CameraUpdate();
+				UndoCrop();
 			}
 			break;
 		case ID_STUDY:
 			{
 				m_VolumeName = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
-				m_BuildGui->Update();
+				m_BuildGuiLeft->Update();
 				EnableSliceSlider(true);
 				if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
 				{
 					EnableTimeSlider(true);
 				}
 
-				m_CropGui->Enable(ID_CROP_BUTTON,true);
-				m_CropGui->Enable(ID_UNDO_CROP_BUTTON,false);
+				//m_CropGuiLeft->Enable(ID_CROP_BUTTON,true);
+				//m_CropGuiLeft->Enable(ID_UNDO_CROP_BUTTON,false);
 				int sel = m_StudyListbox->GetSelection();
 				m_ListSelected = (medListDicomFiles *)m_StudyListbox->GetClientData(sel);
 				// sort dicom slices
@@ -776,6 +818,13 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 				int tmp = m_PatientName.FindChr('^');
 				if(tmp != -1 && tmp >= 0 && tmp < m_PatientName.GetSize())
 					m_PatientName[tmp] = ' ';
+
+        wxString tmp_name;
+
+        tmp_name.Append(m_PatientName.GetCStr());
+        tmp_name.Append(m_Identifier.GetCStr());
+        tmp_name=tmp_name+m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+        m_StudyListbox->SetString(m_StudyListbox->GetSelection(),tmp_name);
 			}
 			break;
 			case MOUSE_DOWN:
@@ -1061,6 +1110,32 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
+void medOpImporterDicom::UndoCrop()
+//----------------------------------------------------------------------------
+{
+  m_CropFlag = false;
+  ShowSlice(m_CurrentSlice);
+  double diffx,diffy,boundsCamera[6];
+  diffx=m_DicomBounds[1]-m_DicomBounds[0];
+  diffy=m_DicomBounds[3]-m_DicomBounds[2];
+  boundsCamera[0]=0.0;
+  boundsCamera[1]=diffx;
+  boundsCamera[2]=0.0;
+  boundsCamera[3]=diffy;
+  boundsCamera[4]=0.0;
+  boundsCamera[5]=0.0;
+  m_LoadPage->GetRWI()->CameraReset(boundsCamera);
+  m_LoadPage->GetRWI()->CameraUpdate();
+  m_CropPage->GetRWI()->CameraReset(boundsCamera);
+  m_CropPage->GetRWI()->CameraUpdate();
+  m_BuildPage->GetRWI()->CameraReset(boundsCamera);
+  m_BuildPage->GetRWI()->CameraUpdate();
+  //m_CropGuiLeft->Enable(ID_UNDO_CROP_BUTTON,false);
+  m_CropActor->VisibilityOn();
+  m_CroppedExetuted=false;
+  CameraUpdate();
+}
+//----------------------------------------------------------------------------
 void medOpImporterDicom::Crop()
 //----------------------------------------------------------------------------
 {
@@ -1091,7 +1166,7 @@ void medOpImporterDicom::Crop()
 
 	m_CropPage->GetRWI()->CameraReset(boundsCamera);
 	m_CropPage->GetRWI()->CameraUpdate();
-	m_CropGui->Enable(ID_UNDO_CROP_BUTTON,true);
+	//m_CropGuiLeft->Enable(ID_UNDO_CROP_BUTTON,true);
 
 	m_LoadPage->GetRWI()->CameraReset(boundsCamera);
 	m_LoadPage->GetRWI()->CameraUpdate();
@@ -1148,17 +1223,20 @@ void medOpImporterDicom::CameraReset()
 void medOpImporterDicom::EnableSliceSlider(bool enable)
 //----------------------------------------------------------------------------
 {
-	m_LoadGui->Enable(ID_SCAN_SLICE,enable);
-	m_BuildGui->Enable(ID_SCAN_SLICE,enable);
-	m_CropGui->Enable(ID_SCAN_SLICE,enable);
+	m_LoadGuiLeft->Enable(ID_SCAN_SLICE,enable);
+	m_BuildGuiLeft->Enable(ID_SCAN_SLICE,enable);
+	m_CropGuiLeft->Enable(ID_SCAN_SLICE,enable);
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::EnableTimeSlider(bool enable)
 //----------------------------------------------------------------------------
 {
-	m_LoadGui->Enable(ID_SCAN_TIME,enable);
-	m_BuildGui->Enable(ID_SCAN_TIME,enable);
-	m_CropGui->Enable(ID_SCAN_TIME,enable);
+  if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+  {
+	  m_LoadGuiLeft->Enable(ID_SCAN_TIME,enable);
+	  m_BuildGuiLeft->Enable(ID_SCAN_TIME,enable);
+	  m_CropGuiLeft->Enable(ID_SCAN_TIME,enable);
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::CreatePipeline()
@@ -1350,13 +1428,6 @@ void medOpImporterDicom::ResetStructure()
 
 	EnableSliceSlider(false);
 	EnableTimeSlider(false);
-
-	// disable the button modality
-	m_CropGui->Enable(ID_CROP_BUTTON,false);
-	m_CropGui->Enable(ID_UNDO_CROP_BUTTON,false);
-	// disable the build volume modality widgets
-	m_Gui->Enable(ID_BUILD_STEP,false);	
-	m_Gui->Enable(ID_BUILD_BUTTON,false);
 
 	// delete the previous studies detected and reset the related variables
 	for (int i=0; i < m_NumberOfStudy;i++)

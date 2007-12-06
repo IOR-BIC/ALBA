@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 11:09:12 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-12-06 09:35:52 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -34,7 +34,10 @@ mafGUISettings(Listener, label)
 
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = true;
 
-	m_AutoCropPos = 0;
+	m_AutoCropPos = FALSE;
+	m_EnableNumberOfSlice = FALSE;
+	m_EnableNumberOfTime = FALSE; 
+	m_Step = ID_4X;
 
 	InitializeSettings();
 }
@@ -49,7 +52,11 @@ void medGUIDicomSettings::CreateGui()
 {
 	m_Gui = new mmgGui(this);
 	m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary);
-	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos);
+	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
+	m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
+	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
+	wxString choices[4]={_("1x"),_("2x"),_("3x"),_("4x")};
+	m_Gui->Combo(ID_STEP,_("Build Step"),&m_Step,4,choices);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
 	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),m_CheckOnOff[0] != 0);
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),m_CheckOnOff[1] != 0);
@@ -89,6 +96,21 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 			m_Config->Write("AutoCropPos",m_AutoCropPos);
 		}
 		break;
+	case ID_ENALBLE_NUMBER_OF_SLICE:
+		{
+			m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
+		}
+		break;
+	case ID_ENALBLE_TIME_BAR:
+		{
+			m_Config->Write("EnableTimeBar",m_EnableNumberOfTime);
+		}
+		break;
+  case ID_STEP:
+    {
+      m_Config->Write("StepOfBuild",m_Step);
+    }
+    break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -102,6 +124,16 @@ void medGUIDicomSettings::InitializeSettings()
 {
 	wxString string_item;
 	long long_item;
+
+  if(m_Config->Read("StepOfBuild", &long_item))
+  {
+    m_Step=long_item;
+  }
+  else
+  {
+    m_Config->Write("StepOfBuild",m_Step);
+  }
+
 	if(m_Config->Read("DicomDictionary", &string_item))
 	{
 		m_Dictionary=string_item.c_str();
@@ -154,6 +186,24 @@ void medGUIDicomSettings::InitializeSettings()
 	else
 	{
 		m_Config->Write("AutoCropPos",m_AutoCropPos);
+	}
+
+	if(m_Config->Read("EnableTimeBar", &long_item))
+	{
+		m_EnableNumberOfTime=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableTimeBar",m_EnableNumberOfTime);
+	}
+
+	if(m_Config->Read("EnableNumberOfSlice", &long_item))
+	{
+		m_EnableNumberOfSlice=long_item;
+	}
+	else
+	{
+		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
 	}
 
 	m_Config->Flush();

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-10-18 14:26:38 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2007-12-06 09:35:36 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -153,6 +153,8 @@ protected:
 
 	void CameraReset();
 
+  void OpenDir();
+
 	void OnWizardPageChanging(){};
 
 	/** Auto position of the crop plane in way of Volume side */
@@ -160,6 +162,9 @@ protected:
 
 	/** Performe crop of dicom data */
 	void Crop();
+  
+  /** Performe Undo crop of dicom data */
+  void UndoCrop();
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkDicomUnPacker	*m_DicomReader;
@@ -179,9 +184,13 @@ protected:
 	medGUIWizardPage	*m_CropPage;
 	medGUIWizardPage	*m_BuildPage;
 
-	mmgGui	*m_LoadGui;
-	mmgGui	*m_CropGui;
-	mmgGui	*m_BuildGui;
+	mmgGui	*m_LoadGuiLeft;
+  mmgGui	*m_LoadGuiRight;
+  mmgGui	*m_LoadGuiCenter;
+	mmgGui	*m_CropGuiLeft;
+  mmgGui	*m_CropGuiCenter;
+	mmgGui	*m_BuildGuiLeft;
+  mmgGui	*m_BuildGuiCenter;
 
 	int				m_DicomModality; ///<Modality to set witch type of DICOM to read
 	mafString	m_DictionaryFilename;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2007-09-25 14:20:27 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-06 09:37:03 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -77,24 +77,28 @@ public:
 
 	mafObserver *m_Listener;
 
-	void AddGui(mmgGui *gui);
-
-	void AddSizerToRWI(wxSizer *sizer){m_RwiSizer->Add(sizer, 0, wxEXPAND);SetSizer(m_PreviewSizer,true);m_PreviewSizer->Fit(this);};
+	void AddGuiLowerLeft(mmgGui *gui);
+  void AddGuiLowerRight(mmgGui *gui);
+  void AddGuiLowerCenter(mmgGui *gui);
 
 	/** Create a chain between this page ad nextPage */
 	void SetNextPage(medGUIWizardPage *nextPage);
 
 	mafRWI* GetRWI(){return m_Rwi;};
 
-	mmgGui     *m_Gui; ///< Gui variable used to plug custom widgets
-	wxBoxSizer *m_RwiSizer; ///< Sizer used for the vtk render window and if you want to plug any gui on bottom of the RWI
-
 private:
 
 	wxWizardPageSimple *m_FirstPage;
 
-	wxBoxSizer *m_PreviewSizer; ///< Sizer used for the preview render window
+	wxBoxSizer *m_GUISizer; ///< Sizer used for the Lower GUI
+  wxBoxSizer *m_RwiSizer; ///< Sizer used for the vtk render window and if you want to plug any gui on bottom of the RWI
+  wxBoxSizer *m_SizerAll; ///< Vertical sizer used to include all other sizer
+
 	mafRWI     *m_Rwi; ///< Render window
+
+  mmgGui     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
+  mmgGui     *m_GuiLowerRight; ///< Gui variable used to plug custom widgets localized in LOWER RIGHT
+  mmgGui     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
 
 	//DECLARE_EVENT_TABLE()
 };

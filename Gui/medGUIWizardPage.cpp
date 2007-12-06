@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 11:28:49 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-12-06 09:37:03 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -74,47 +74,45 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 
 	m_FirstPage = NULL;
 
-	m_PreviewSizer = new wxBoxSizer( wxHORIZONTAL );
-	m_RwiSizer = new wxBoxSizer( wxVERTICAL );
+	m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
+	m_RwiSizer = new wxBoxSizer( wxHORIZONTAL );
+  m_SizerAll = new wxBoxSizer( wxVERTICAL );
+
 	m_Rwi = NULL;
-	m_Gui = NULL;
+	m_GuiLowerRight = NULL;
+  m_GuiLowerLeft = NULL;
 
 	if(style & medUSERWI)
 	{
 		m_Rwi = new mafRWI(this);
-		m_Rwi->SetSize(0,0,500,500);
+		m_Rwi->SetSize(0,0,600,600);
 		m_Rwi->Show(true);
 		m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
-
-		/*wxPoint dp = wxDefaultPosition;
-		wxStaticText *m_SliceLabelLoadPage = new wxStaticText(this, -1, " slice num. ",dp, wxSize(-1,16));
-		wxTextCtrl *m_SliceTextLoadPage = new wxTextCtrl(this, -1, "", dp, wxSize(30,16), wxNO_BORDER);
-		wxSlider *m_SliceScannerLoadPage = new wxSlider(this, -1, 0, 0, VTK_INT_MAX, dp, wxSize(200,22));
-
-		wxBoxSizer *m_SliceSizerLoadPage = new wxBoxSizer(wxHORIZONTAL);
-		m_SliceSizerLoadPage->Add(m_SliceLabelLoadPage, 0, wxALIGN_CENTER|wxRIGHT, 5);
-		m_SliceSizerLoadPage->Add(m_SliceTextLoadPage, 0, wxALIGN_CENTER|wxRIGHT, 5);
-		m_SliceSizerLoadPage->Add(m_SliceScannerLoadPage, 1, wxALIGN_CENTER|wxEXPAND);
-
-		int m_CurrentSliceLoadPage=0;
-		m_SliceScannerLoadPage->SetValidator(mmgValidator(this,ID_SCAN_SLICE_LOAD_PAGE,m_SliceScannerLoadPage,&m_CurrentSliceLoadPage,m_SliceTextLoadPage));
-		m_SliceTextLoadPage->SetValidator(mmgValidator(this,ID_SCAN_SLICE_LOAD_PAGE,m_SliceTextLoadPage,&m_CurrentSliceLoadPage,m_SliceScannerLoadPage,0,VTK_INT_MAX));
-
-		m_RwiSizer->Add(m_SliceSizerLoadPage,1,wxEXPAND);*/
-
-		m_PreviewSizer->Add(m_RwiSizer,1,wxEXPAND);
+    m_SizerAll->Add(m_RwiSizer,1,wxEXPAND);
 	}
 	if(style & medUSEGUI)
 	{
-		m_Gui = new mmgGui(NULL);
-		m_Gui->SetListener(this);
-		m_Gui->Reparent(this);
-		m_PreviewSizer->Add(m_Gui,0,wxEXPAND);
+		m_GuiLowerLeft = new mmgGui(this);
+    m_GuiLowerLeft->FitGui();
+		m_GuiLowerLeft->Reparent(this);
+
+    m_GuiLowerRight = new mmgGui(this);
+    m_GuiLowerRight->FitGui();
+    m_GuiLowerRight->Reparent(this);
+
+    m_GuiLowerCenter = new mmgGui(this);
+    m_GuiLowerCenter->FitGui();
+    m_GuiLowerCenter->Reparent(this);
+
+		m_GUISizer->Add(m_GuiLowerLeft,0,wxEXPAND);
+    m_GUISizer->Add(m_GuiLowerCenter,0,wxEXPAND);
+    m_GUISizer->Add(m_GuiLowerRight,0,wxEXPAND);
+
+    m_SizerAll->Add(m_GUISizer,0,wxEXPAND|wxALL);
 	}
-
-
-	SetSizer(m_PreviewSizer,true);
-	m_PreviewSizer->Fit(this);
+	
+	SetSizer(m_SizerAll,true);
+	m_SizerAll->Fit(this);
 }
 //----------------------------------------------------------------------------
 medGUIWizardPage::~medGUIWizardPage()
@@ -128,20 +126,32 @@ void medGUIWizardPage::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		/*switch(e->GetId())
-		{
-		default:*/
 			mafEventMacro(*e);
-		//}
 	}
 }
 //--------------------------------------------------------------------------------
-void medGUIWizardPage::AddGui(mmgGui *gui)
+void medGUIWizardPage::AddGuiLowerRight(mmgGui *gui)
 //--------------------------------------------------------------------------------
 {
-	m_Gui->AddGui(gui);
-	m_Gui->Fit();
-	m_Gui->Update();
+  m_GuiLowerRight->AddGui(gui);
+  m_GuiLowerRight->FitGui();
+  m_GuiLowerRight->Update();
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPage::AddGuiLowerLeft(mmgGui *gui)
+//--------------------------------------------------------------------------------
+{
+	m_GuiLowerLeft->AddGui(gui);
+	m_GuiLowerLeft->FitGui();
+	m_GuiLowerLeft->Update();
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPage::AddGuiLowerCenter(mmgGui *gui)
+//--------------------------------------------------------------------------------
+{
+  m_GuiLowerCenter->AddGui(gui);
+  m_GuiLowerCenter->FitGui();
+  m_GuiLowerCenter->Update();
 }
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::SetNextPage(medGUIWizardPage *nextPage)

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 11:10:13 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-12-06 09:37:03 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -80,7 +80,7 @@ medGUIWizard::~medGUIWizard()
 void medGUIWizard::OnWizardPageChanging(wxWizardEvent& event)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,MED_WIZARD_CHANGE_PAGE));
+	mafEventMacro(mafEvent(this,MED_WIZARD_CHANGE_PAGE,event.GetDirection()));
 
 	if(!m_EnableChangePage)
 	{
@@ -93,11 +93,7 @@ void medGUIWizard::OnEvent(mafEventBase *maf_event)
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
 	{
-		/*switch(e->GetId())
-		{
-		default:*/
 			mafEventMacro(*e);
-		//}
 	}
 }
 //--------------------------------------------------------------------------------
