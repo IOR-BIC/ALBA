@@ -24,8 +24,8 @@ ADD_TEST(vtkRemoveCellsFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkRemoveCellsFilter
 ADD_EXECUTABLE(vtkMAFMeshCutterTest vtkMAFMeshCutterTest.h vtkMAFMeshCutterTest.cpp)
 ADD_TEST(vtkMAFMeshCutterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFMeshCutterTest)
 
-ADD_EXECUTABLE(vtkPolyDataToSinglePolyLineTest vtkPolyDataToSinglePolyLineTest.h vtkPolyDataToSinglePolyLineTest.cpp)
-ADD_TEST(vtkPolyDataToSinglePolyLineTest ${EXECUTABLE_OUTPUT_PATH}/vtkPolyDataToSinglePolyLineTest)
+ADD_EXECUTABLE(vtkMAFPolyDataToSinglePolyLineTest vtkMAFPolyDataToSinglePolyLineTest.h vtkMAFPolyDataToSinglePolyLineTest.cpp)
+ADD_TEST(vtkMAFPolyDataToSinglePolyLineTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFPolyDataToSinglePolyLineTest)
 
 ADD_EXECUTABLE(vtkMAFTextOrientatorTest vtkMAFTextOrientatorTest.h vtkMAFTextOrientatorTest.cpp)
 ADD_TEST(vtkMAFTextOrientatorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTextOrientatorTest)
