@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 15:18:27 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2007-12-06 09:31:00 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@
 #include "vtkCellArray.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkTransform.h"
-#include "vtkPolyDataToSinglePolyLine.h"
+#include "vtkMAFPolyDataToSinglePolyLine.h"
 
 #include <vector>
 
@@ -117,7 +117,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
 
-  vtkMAFSmartPointer<vtkPolyDataToSinglePolyLine> polydataToPolylineFilter;
+  vtkMAFSmartPointer<vtkMAFPolyDataToSinglePolyLine> polydataToPolylineFilter;
   polydataToPolylineFilter->SetInput(data);
   polydataToPolylineFilter->Update();
 
@@ -386,7 +386,7 @@ void mafPipePolylineSlice::UpdateProperty()
   data->Modified();
   data->Update();
 
-  vtkMAFSmartPointer<vtkPolyDataToSinglePolyLine> polydataToPolylineFilter;
+  vtkMAFSmartPointer<vtkMAFPolyDataToSinglePolyLine> polydataToPolylineFilter;
   polydataToPolylineFilter->SetInput(data);
   polydataToPolylineFilter->Update();
 
