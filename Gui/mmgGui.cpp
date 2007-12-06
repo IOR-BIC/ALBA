@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-06 09:18:46 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2007-12-06 09:31:46 $
+  Version:   $Revision: 1.51 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -840,7 +840,7 @@ void mmgGui::Bool(int id,mafString label,int* var, int flag, mafString tooltip) 
   }
 }
 //----------------------------------------------------------------------------
-wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxString tooltip)
+wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxString tooltip,bool showText)
 //----------------------------------------------------------------------------
 {
   wxTextCtrl   *text = NULL;
@@ -849,7 +849,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
   int w_id_text;
   int w_id_sli;
 
-	if(label == "")
+	if(label == "" && showText)
 	{
     int text_w   = EW*0.8;
     int slider_w = FW-text_w;
@@ -866,7 +866,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 		sizer->Add(sli,  0);
 		Add(sizer,0,wxALL, M); 
 	}
-	else
+	else if(showText)
 	{
     int text_w   = EW*0.8;
 		int slider_w = DW-text_w;
@@ -888,10 +888,29 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
 		sizer->Add(sli,  0);
 		Add(sizer,0,wxALL, M); 
 	}
+  else if(!showText)
+  {
+    int text_w   = EW*0.8;
+    int slider_w = FW;
+    w_id_text = GetWidgetId(id);
+    text = new wxTextCtrl (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle);
+    text->SetFont(m_Font);
+    w_id_sli = GetWidgetId(id);
+    sli = new wxSlider(this, w_id_sli,min,min,max, dp, wxSize(slider_w,LH));
+    if(m_UseBackgroundColor) 
+      sli->SetBackgroundColour(m_BackgroundColor);
+
+    wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+    sizer->Add(text, 0);
+    sizer->Add(sli,  0);
+    Add(sizer,0,wxALL, M); 
+    text->Show(showText);
+  }
   sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
   text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max)); //- if uncommented, remove also wxTE_READONLY from the text (in both places)
 	if(tooltip != "")	text->SetToolTip(tooltip);
-	return sli;
+	
+  return sli;
 }
 //----------------------------------------------------------------------------
 mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min, double max, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 

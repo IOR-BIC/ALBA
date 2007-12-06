@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-14 11:44:59 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-12-06 09:31:46 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -201,7 +201,7 @@ public:
   void OkCancel(int alignment=wxALL);
 
   /** Integer slider widget. */
-	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "");
+	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "",bool showText=true);
 
   /** Float slider widget. */
   mmgFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "");
