@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-06 09:35:36 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2007-12-07 14:19:59 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -192,6 +192,8 @@ mafOp(label)
 
 	m_CroppedExetuted=false;
 
+  m_DicomInteractor = NULL;
+
   SetSetting(new medGUIDicomSettings(this));
 }
 //----------------------------------------------------------------------------
@@ -219,6 +221,12 @@ void medOpImporterDicom::OpRun()
 //----------------------------------------------------------------------------
 {
 	m_DictionaryFilename = ((medGUIDicomSettings*)GetSetting())->GetDictionary();
+  if(!wxFileExists(m_DictionaryFilename.GetCStr()))
+  {
+    wxMessageBox(_("Missing Dictionary"));
+    OpStop(OP_RUN_CANCEL);
+    return;
+  }
   m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
 
 	CreateGui();
@@ -286,12 +294,15 @@ void medOpImporterDicom::OpStop(int result)
 		((medListDicomFiles *)m_StudyListbox->GetClientData(i))->Clear();
 	}
 
-	m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);  
+  if(m_LoadPage)
+	  m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);  
 
-	//m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-	m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);   
+  if(m_CropPage)
+	  //m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
+	  m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);   
 
-	m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
+  if(m_BuildPage)
+	  m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
 
 	vtkDEL(m_SliceTexture);
 	vtkDEL(m_DirectoryReader);
@@ -560,8 +571,11 @@ void medOpImporterDicom::CreateCropPage()
     m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
   }
 
-  wxString sideChoices[2] = {_("Left"),_("Right")};
-  m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
+  if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+  {
+    wxString sideChoices[2] = {_("Left"),_("Right")};
+    m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
+  }
 
   m_CropGuiLeft->FitGui();
   m_CropGuiCenter->FitGui();
@@ -825,6 +839,8 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
         tmp_name.Append(m_Identifier.GetCStr());
         tmp_name=tmp_name+m_StudyListbox->GetString(m_StudyListbox->GetSelection());
         m_StudyListbox->SetString(m_StudyListbox->GetSelection(),tmp_name);
+        m_StudyListbox->Update();
+        GuiUpdate();
 			}
 			break;
 			case MOUSE_DOWN:
