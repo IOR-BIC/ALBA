@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-06 09:35:52 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2007-12-07 14:19:13 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,6 +37,7 @@ mafGUISettings(Listener, label)
 	m_AutoCropPos = FALSE;
 	m_EnableNumberOfSlice = FALSE;
 	m_EnableNumberOfTime = FALSE; 
+  m_EnableChangeSide = FALSE;
 	m_Step = ID_4X;
 
 	InitializeSettings();
@@ -55,6 +56,7 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
 	m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
 	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
+  m_Gui->Bool(ID_SIDE,_("Enable Change Side"),&m_EnableChangeSide,1);
 	wxString choices[4]={_("1x"),_("2x"),_("3x"),_("4x")};
 	m_Gui->Combo(ID_STEP,_("Build Step"),&m_Step,4,choices);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
@@ -111,6 +113,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("StepOfBuild",m_Step);
     }
     break;
+  case ID_SIDE:
+    {
+      m_Config->Write("EnableSide",m_EnableChangeSide);
+    }
+    break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -124,6 +131,15 @@ void medGUIDicomSettings::InitializeSettings()
 {
 	wxString string_item;
 	long long_item;
+
+  if(m_Config->Read("EnableSide", &long_item))
+  {
+    m_EnableChangeSide=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableSide",m_EnableChangeSide);
+  }
 
   if(m_Config->Read("StepOfBuild", &long_item))
   {
