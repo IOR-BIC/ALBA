@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-10 11:49:08 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2007-12-10 12:06:28 $
+Version:   $Revision: 1.15 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -708,6 +708,7 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 
         if (m_Wizard->GetCurrentPage()==m_CropPage && e->GetBool())//From Crop page to build page
         {
+          if(m_CropPage)
           Crop();
         }
 
@@ -722,7 +723,7 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 				}
 				else
 				{
-					if(!m_CroppedExetuted && ((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+					if(!m_CroppedExetuted)
 						m_CropActor->VisibilityOn();
 					else
 						m_CropActor->VisibilityOff();
