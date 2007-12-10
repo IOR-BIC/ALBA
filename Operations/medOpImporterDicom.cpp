@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-10 09:26:11 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2007-12-10 11:49:08 $
+Version:   $Revision: 1.14 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -698,7 +698,7 @@ void medOpImporterDicom::OnEvent(mafEventBase *maf_event)
 				if(m_Wizard->GetCurrentPage()==m_LoadPage && m_NumberOfStudy<1)//From Load page to Crop Page
 				{
 					m_Wizard->EnableChangePageOff();
-					wxMessageBox(_("There isn't any studies!"));
+					wxMessageBox(_("No study found!"));
 					return;
 				}
 				else
