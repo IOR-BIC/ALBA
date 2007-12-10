@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-07 14:19:59 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2007-12-10 09:26:11 $
+Version:   $Revision: 1.13 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -389,7 +389,14 @@ void medOpImporterDicom::BuildVolume()
 		m_Image->GetTagArray()->SetTag(tagSide);
 
 		//Nome VME = CTDir + IDStudio
-		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+    if(!m_PatientName.IsEmpty())
+      m_VolumeName=m_PatientName;
+    else
+    {
+      //Patient ID + Study ID
+      m_VolumeName=m_Identifier+"_"+m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+    }
 		m_Image->SetName(m_VolumeName);
 	}
 	else if(m_NumberOfSlices > 1)
@@ -421,7 +428,14 @@ void medOpImporterDicom::BuildVolume()
 		m_Volume->GetTagArray()->SetTag(tagSide);
 
 		//Nome VME = CTDir + IDStudio
-		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());		
+    if(!m_PatientName.IsEmpty())
+      m_VolumeName=m_PatientName;
+    else
+    {
+      //Patient ID + Study ID
+      m_VolumeName=m_Identifier+"_"+m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+    }
 		m_Volume->SetName(m_VolumeName);
 	}
 }
@@ -512,7 +526,7 @@ void medOpImporterDicom::BuildVolumeCineMRI()
 	m_Volume->GetTagArray()->SetTag(tagSide);
 
 	//Nome VME = CTDir + IDStudio
-	wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+	wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
 	m_Volume->SetName(name.c_str());
 
 }
