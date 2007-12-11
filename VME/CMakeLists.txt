@@ -36,6 +36,14 @@ SET(PROJECT_SRCS
   mafPipeMesh.h
   mafPipeMeshSlice.cpp
   mafPipeMeshSlice.h
+  mafPipeScalar.cpp
+  mafPipeScalar.h
+  mafVMEOutputScalar.cpp
+  mafVMEOutputScalar.h
+  mafVMEScalar.cpp
+  mafVMEScalar.h
+  mafVMEItemScalar.cpp
+  mafVMEItemScalar.h
 )
 
 IF (MAF_USE_CRYPTO)
@@ -47,14 +55,14 @@ ENDIF (MAF_USE_CRYPTO)
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  mafPipeScalar.cpp
-  mafPipeScalar.h
-  mafVMEOutputScalar.cpp
-  mafVMEOutputScalar.h
-  mafVMEScalar.cpp
-  mafVMEScalar.h
-  mafVMEItemScalar.cpp
-  mafVMEItemScalar.h
+  mafPipeScalarMatrix.cpp
+  mafPipeScalarMatrix.h
+  mafVMEOutputScalarMatrix.cpp
+  mafVMEOutputScalarMatrix.h
+  mafVMEScalarMatrix.cpp
+  mafVMEScalarMatrix.h
+  mafVMEItemScalarMatrix.cpp
+  mafVMEItemScalarMatrix.h
   )
 ENDIF (MAF_USE_ITK)
 
