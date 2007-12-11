@@ -14,15 +14,16 @@ SET(PROJECT_SRCS
   mafVTKInterpolator.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
+  mafScalarInterpolator.cpp
+  mafScalarInterpolator.h
 )
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
-  mafScalarInterpolator.cpp
-  mafScalarInterpolator.h
-)
+  mafScalarMatrixInterpolator.cpp
+  mafScalarMatrixInterpolator.h
+  )
 ENDIF (MAF_USE_ITK)
-
 
 # List libraries that are needed by this project.
 SET(PROJECT_LIBS mafCore vtkMAF)
