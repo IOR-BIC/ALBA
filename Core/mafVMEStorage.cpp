@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-28 23:05:34 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-12-11 11:25:50 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,7 @@ mafCxxTypeMacro(mafVMEStorage)
 mafVMEStorage::mafVMEStorage()
 //------------------------------------------------------------------------------
 {
-  SetVersion("2.0");
+  SetVersion("2.2");
   SetFileType("MSF");
   mafNEW(m_Root); // create a root node
   m_Root->SetName("Root");
