@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:36:59 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-12-11 11:24:31 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
 
 #include "mafASCIIImporterUtility.h"
 #include "mafVME.h"
-#include "mafVMEScalar.h"
+#include "mafVMEScalarMatrix.h"
 
 #include "mafTagArray.h"
 
@@ -215,7 +215,7 @@ int mmoASCIIImporter::ImportASCII()
     {
       import_result = MAF_ERROR;
     }
-    //Add the scalar array to the mafVMEScalar at the current time 't'.
+    //Add the scalar array to the mafVMEScalarMatrix at the current time 't'.
   }
 
   m_ScalarData->SetScalarArrayOrientation(m_ScalarOrder);
