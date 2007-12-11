@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 16:50:24 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-12-11 11:23:37 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,10 +40,12 @@
 #include "mafVMERoot.h"
 
 #ifdef MAF_USE_ITK
-  #include "mafVMEScalar.h"
-  #include "mafVMEItemScalar.h"
+  #include "mafVMEScalarMatrix.h"
+  #include "mafVMEItemScalarMatrix.h"
 #endif
 
+#include "mafVMEScalar.h"
+#include "mafVMEItemScalar.h"
 #include "mafVMESlicer.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
@@ -98,8 +100,9 @@ mafVMEFactory::mafVMEFactory()
 
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
+  mafPlugObjectMacro(mafVMEItemScalar,"a VME item storing scalar data");
 #ifdef MAF_USE_ITK
-  mafPlugObjectMacro(mafVMEItemScalar,"a VME item storing scalar data through vnl matrix");
+  mafPlugObjectMacro(mafVMEItemScalarMatrix,"a VME item storing matrix scalar data through vnl matrix");
 #endif
   mafPlugObjectMacro(mmaMeter,"Meter attributes");
   mafPlugObjectMacro(mmaMaterial,"Material attributes");
@@ -126,8 +129,9 @@ mafVMEFactory::mafVMEFactory()
   //mafPlugNodeMacro(mafVMEGizmo,"VME representing a tool");
   mafPlugNodeMacro(mafVMEPointSet,"VME representing a set of points");
   mafPlugNodeMacro(mafVMERefSys,"VME representing a reference system");
-#ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMEScalar,"VME representing time varying scalar values");
+#ifdef MAF_USE_ITK
+  mafPlugNodeMacro(mafVMEScalarMatrix,"VME representing time varying scalar values");
 #endif
   mafPlugNodeMacro(mafVMESlicer,"VME representing a slice of a volume");
   mafPlugNodeMacro(mafVMEVector,"VME representing aa applyed vector");

@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 13:44:08 $
-  Version:   $Revision: 1.4 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-12-11 11:23:37 $
+  Version:   $Revision: 1.5 $
+  Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -15,7 +15,6 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafVMEOutput.h"
-#include "vnl/vnl_matrix.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -27,7 +26,7 @@ class vtkPolyData;
 
 /** NULL output for VME node with a scalar output data.
   mafVMEOutputScalar is the output produced by a node generating an output
-  with a VNL matrix representing scalar/vector/tensor data.
+  with a double value representing scalar data.
 */
 class MAF_EXPORT mafVMEOutputScalar : public mafVMEOutput
 {
@@ -40,7 +39,7 @@ public:
     Usually the output is a  "smart copy" of one of the vnl matrix in 
     the DataArray. An event is rised when the output data changes to allow attached classes to 
     update their input.*/
-  virtual vnl_matrix<double> &GetScalarData();
+  virtual double GetScalarData();
 
 #ifdef MAF_USE_VTK
   /**
@@ -53,7 +52,7 @@ public:
   update their input.*/
   virtual vtkDataSet *GetVTKData();
 
-  /** Function to update VTK representation of vnl matrix representing the scalar data.*/
+  /** Function to update VTK representation of double value representing the scalar data.*/
   void UpdateVTKRepresentation();
 #endif
 
@@ -64,13 +63,11 @@ protected:
   mafVMEOutputScalar(); // to be allocated with New()
   virtual ~mafVMEOutputScalar(); // to be deleted with Delete()
 
-  mafString m_NumberOfRows;
-  mafString m_NumberOfColumns;
-
 #ifdef MAF_USE_VTK
   vtkPolyData *m_Polydata;
 #endif
 
+  mafString m_ScalarDataString;
   mmgGui *CreateGui();
 
 private:

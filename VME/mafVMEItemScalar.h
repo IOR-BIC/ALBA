@@ -2,15 +2,17 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalar.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:48:43 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-12-11 11:23:37 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
 #ifndef __mafVMEItemScalar_h
 #define __mafVMEItemScalar_h
+
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -19,7 +21,8 @@
 #include "mafString.h"
 #include "mafMTime.h"
 
-#include <vnl/vnl_matrix.h>
+#define MAF_SCALAR_MIN -1.0e+299
+#define MAF_SCALAR_MAX 1.0e+299
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -29,7 +32,7 @@ class mafOBB;
 class mafStorageElement;
 class mafTagArray;
 
-/** mafVMEItemScalar - store time-varying scalar information into a vnl_vector
+/** mafVMEItemScalar - store time-varying scalar information into a double data stored into the XML part of the msf.
   mafVMEItemScalar is an object that stores the single time stamped scalar array of a
   mafVME. This class associates a Time stamp and a Tagged list to an internally 
   stored scalar array. 
@@ -40,19 +43,11 @@ class mafTagArray;
   <B>m_URL<\B> internally used to store the name of the file where data is stored
 
   @sa mafVMEScalar mafTagArray
-
-  @todo
-  - Add a link to the VME object
-  - Implement DeepCopy and SmartCopy functions
-  - build a test
-  - implement read from TmpFile
-  - read from memory
-  - Complete the implementation of reading crypted files.
 */
 class MAF_EXPORT mafVMEItemScalar : public mafVMEItem
 {
 public:  
-  mafTypeMacro(mafVMEItemScalar,mafVMEItem);
+  mafTypeMacro(mafVMEItemScalar, mafVMEItem);
 
   virtual void Print(std::ostream& os, const int indent=0) const;
 
@@ -62,12 +57,11 @@ public:
   /** Reference another scalar item's internal data*/ 
   virtual void ShallowCopy(mafVMEItem *a);
 
-  /** Return data scalar. (Supported only if MAF is compiled
-    with ITK support which include VNL library) */
-  virtual vnl_matrix<double> &GetData();
+  /** Return scalar data.*/
+  virtual double GetData();
 
   /** Set the scalar data */
-  virtual void SetData(vnl_matrix<double> &data);
+  virtual void SetData(double data);
 
   /** Compare two scalar items. Two scalar items are considered equivalent if they store
     the same type of data, have the same TimeStamp and equivalent TagArray.
@@ -78,10 +72,10 @@ public:
   /** Read the data file and update the item's data.*/
   virtual int ReadData(mafString &filename, int resolvedURL = MAF_OK);
 
-  /** Return true if scalar data is not empty. Currently this doesn't ensure data is the same on 
-  the file. IsDataModified() can be used to know if data has been changed with respect
-  to file.*/
-  virtual bool IsDataPresent() {return !m_Data.empty();}
+  /** Return true if scalar data is different from MAF_SCALAR_MIN. 
+  Currently this doesn't ensure data is the same on the file. 
+  IsDataModified() can be used to know if data has been changed with respect to file.*/
+  virtual bool IsDataPresent() {return !mafEquals(m_Data, MAF_SCALAR_MIN);}
   
   /** UpdateBounds for this data. GetBounds automatically call this function...*/
   virtual void UpdateBounds();
@@ -90,7 +84,7 @@ public:
   virtual void UpdateData();
 
   /** Return "sca" file extension */
-  virtual const char * GetDataFileExtension();
+  virtual const char *GetDataFileExtension();
 
   /** Clear scalar data.*/
   virtual void ReleaseData();
@@ -109,24 +103,20 @@ protected:
   mafVMEItemScalar(); // to be allocated with New()
   ~mafVMEItemScalar(); // to be deleted with Delete()
 
-  /** Update the vnl reader to read from memory or file from disk (encrypted or not).*/
-  int UpdateReader(mafString &filename);
+  virtual int InternalStore(mafStorageElement *parent);
+  virtual int InternalRestore(mafStorageElement *node);
 
-  /** Restore data stored in this object. This function asks the storage
-    for the filename corresponding to the URL.
-    This method is automatically called by GetData().*/
+  /** Scalar data is stored into the XML part of the MSF, so it is restored during the MSF file load.*/
   virtual int InternalRestoreData();
   
-  /** Store scalar item's data. This function asks the storage object
-    for a tmp filename for saving and then call ... to store the tmp file
-    into the URL. This method is called by Store().*/
+  /** Scalar data is stored into the XML part of the MSF, so it is stored during the MSF file store.*/
   virtual int InternalStoreData(const char *url);
 
-  vnl_matrix<double>  m_Data;       ///< pointer to scalar data
-  mafString           m_DataString; 
-  int                 m_IOStatus;   ///< internally used to store the IO status
-  double              m_ScalarBouns[2];
-  
+  double     m_Data;       ///< scalar data
+  mafString  m_DataString; 
+  int        m_IOStatus;   ///< internally used to store the IO status
+  double     m_ScalarBouns[2];
+
 private:
   mafVMEItemScalar(const mafVMEItemScalar&);
   void operator=(const mafVMEItemScalar&);

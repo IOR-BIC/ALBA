@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-12-11 11:23:24 $
+  Version:   $Revision: 1.2 $
+  Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -53,7 +53,7 @@ bool mafScalarInterpolator::Accept(mafVME *vme)
 }
 
 //------------------------------------------------------------------------------
-vnl_matrix<double> &mafScalarInterpolator::GetScalarData()
+double mafScalarInterpolator::GetScalarData()
 //------------------------------------------------------------------------------
 {
   OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_PREUPDATE));

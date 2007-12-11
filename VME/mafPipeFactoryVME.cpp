@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-20 11:33:49 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-12-11 11:23:37 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -42,9 +42,10 @@
 #include "mafPipeVector.h"
 #include "mafPipeMesh.h"
 #include "mafPipeMeshSlice.h"
+#include "mafPipeScalar.h"
 
 #ifdef MAF_USE_ITK
-  #include "mafPipeScalar.h"
+  #include "mafPipeScalarMatrix.h"
 #endif
 
 #include <string>
@@ -102,9 +103,10 @@ mafPipeFactoryVME::mafPipeFactoryVME()
   mafPlugPipeMacro(mafPipeImage3D,"Pipe for render images");
 	mafPlugPipeMacro(mafPipeMesh,"Pipe for render Mesh");
 	mafPlugPipeMacro(mafPipeMeshSlice,"Pipe for render a slice of a Mesh");
+  mafPlugPipeMacro(mafPipeScalar,"Pipe for render scalar data");
 	
 #ifdef MAF_USE_ITK
-  mafPlugPipeMacro(mafPipeScalar,"Pipe for render scalar data");
+  mafPlugPipeMacro(mafPipeScalarMatrix,"Pipe for render matrix scalar data");
 #endif
 }
 

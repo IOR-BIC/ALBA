@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:56 $
-  Version:   $Revision: 1.8 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-12-11 11:23:37 $
+  Version:   $Revision: 1.9 $
+  Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -38,8 +38,6 @@
 #include "vtkPolyData.h"
 #endif
 
-#include <vnl/vnl_vector.h>
-
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -53,8 +51,8 @@ mafVMEOutputScalar::mafVMEOutputScalar()
 #ifdef MAF_USE_VTK
   vtkNEW(m_Polydata);
 #endif
-  m_NumberOfRows = "0";
-  m_NumberOfColumns = "0";
+
+  m_ScalarDataString = "";
 }
 
 //-------------------------------------------------------------------------
@@ -67,7 +65,7 @@ mafVMEOutputScalar::~mafVMEOutputScalar()
 }
 
 //-------------------------------------------------------------------------
-vnl_matrix<double> &mafVMEOutputScalar::GetScalarData()
+double mafVMEOutputScalar::GetScalarData()
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
@@ -92,135 +90,22 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
   mafVMEScalar *scalar_vme = mafVMEScalar::SafeDownCast(m_VME);
   assert(scalar_vme);
 
-  int active_scalar = scalar_vme->GetActiveScalarOnGeometry();
-
   mafScalarInterpolator *scalarInterpolator = (mafScalarInterpolator *)scalar_vme->GetDataPipe();
   scalarInterpolator->Update();
-  vnl_matrix<double> mat = scalarInterpolator->GetScalarData();
+  double data = scalarInterpolator->GetScalarData();
 
-  int num_of_points = 0;
-  int o = scalar_vme->GetScalarArrayOrientation();
-  int x_coord_type = scalar_vme->GetTypeForXCoordinates();
-  vnl_vector<double> vx;
-  vnl_vector<double> vy;
-  vnl_vector<double> vz;
-  if (x_coord_type == mafVMEScalar::USE_SCALAR)
-  {
-    int sx = scalar_vme->GetScalarIdForXCoordinate();
-    if (o == mafVMEScalar::ROWS)
-    {
-      vx = mat.get_row(sx);
-    }
-    else
-    {
-      vx = mat.get_column(sx);
-    }
-    num_of_points = vx.size();
-  }
-  int y_coord_type = scalar_vme->GetTypeForYCoordinates();
-  if (y_coord_type == mafVMEScalar::USE_SCALAR)
-  {
-    int sy = scalar_vme->GetScalarIdForYCoordinate();
-    if (o == mafVMEScalar::ROWS)
-    {
-      vy = mat.get_row(sy);
-    }
-    else
-    {
-      vy = mat.get_column(sy);
-    }
-    num_of_points = vy.size();
-  }
-  int z_coord_type = scalar_vme->GetTypeForZCoordinates();
-  if (z_coord_type == mafVMEScalar::USE_SCALAR)
-  {
-    int sz = scalar_vme->GetScalarIdForZCoordinate();
-    if (o == mafVMEScalar::ROWS)
-    {
-      vz = mat.get_row(sz);
-    }
-    else
-    {
-      vz = mat.get_column(sz);
-    }
-    num_of_points = vz.size();
-  }
   int pointId[2];
-  int progress_point = 0;
   double time_point = GetTimeStamp();
-  double x_coord, y_coord, z_coord;
   vtkMAFSmartPointer<vtkPoints> points;
   vtkMAFSmartPointer<vtkCellArray> verts;
-  vnl_vector<double> vs;
   vtkMAFSmartPointer<vtkDoubleArray> scalars;
-  scalars->SetNumberOfValues(num_of_points);
+  scalars->SetNumberOfValues(1);
   scalars->SetNumberOfComponents(1);
-  scalars->FillComponent(0,0.0);
-  if (active_scalar > -1)
-  {
-    if (o == mafVMEScalar::ROWS)
-    {
-      active_scalar = active_scalar >= mat.rows() ? mat.rows() - 1 : active_scalar;
-      vs = mat.get_row(active_scalar);
-    }
-    else
-    {
-      active_scalar = active_scalar >= mat.columns() ? mat.columns() - 1 : active_scalar;
-      vs = mat.get_column(active_scalar);
-    }
-    scalar_vme->SetActiveScalarOnGeometry(active_scalar);
-    vs.copy_out((double *)scalars->GetVoidPointer(0));
-  }
-  for (int p = 0; p< num_of_points; p++)
-  {
-    // X coordinate
-    if (x_coord_type == mafVMEScalar::USE_SCALAR)
-    {
-      x_coord = vx.get(p);
-    }
-    else if (x_coord_type == mafVMEScalar::USE_PROGRESS_NUMBER)
-    {
-      x_coord = progress_point;
-    }
-    else
-    {
-      x_coord = time_point;
-    }
-    // Y coordinate
-    if (y_coord_type == mafVMEScalar::USE_SCALAR)
-    {
-      y_coord = vy.get(p);
-    }
-    else if (y_coord_type == mafVMEScalar::USE_PROGRESS_NUMBER)
-    {
-      y_coord = progress_point;
-    }
-    else
-    {
-      y_coord = time_point;
-    }
-    // Z coordinate
-    if (z_coord_type == mafVMEScalar::USE_SCALAR)
-    {
-      z_coord = vz.get(p);
-    }
-    else if (z_coord_type == mafVMEScalar::USE_PROGRESS_NUMBER)
-    {
-      z_coord = progress_point;
-    }
-    else
-    {
-      z_coord = time_point;
-    }
-    points->InsertPoint(p,x_coord,y_coord,z_coord);
-    if (p>0)
-    {
-      pointId[0] = p-1;
-      pointId[1] = p;
-      verts->InsertNextCell(2,pointId);
-    }
-    progress_point++;
-  }
+  scalars->FillComponent(0,data);
+  points->InsertPoint(0, 0.0, 0.0, 0.0);
+  pointId[0] = 0;
+  pointId[1] = 0;
+  verts->InsertNextCell(2,pointId);
 
   m_Polydata->SetPoints(points);
   m_Polydata->SetLines(verts);
@@ -240,13 +125,10 @@ mmgGui* mafVMEOutputScalar::CreateGui()
   {
     this->Update();
   }
-  vnl_matrix<double> data = GetScalarData();
-  m_NumberOfRows = "";
-  m_NumberOfRows << (int)data.rows();
-  m_NumberOfColumns = "";
-  m_NumberOfColumns << (int)data.columns();
-  m_Gui->Label(_("rows: "),&m_NumberOfRows);
-  m_Gui->Label(_("columns: "),&m_NumberOfColumns);
+  double data = GetScalarData();
+  m_ScalarDataString = "";
+  m_ScalarDataString << data;
+  m_Gui->Label(_("data: "),&m_ScalarDataString);
 	m_Gui->Divider(); 
 	return m_Gui;
 }
@@ -255,11 +137,9 @@ mmgGui* mafVMEOutputScalar::CreateGui()
 void mafVMEOutputScalar::Update()
 //-------------------------------------------------------------------------
 {
-  vnl_matrix<double> data = GetScalarData();
-  m_NumberOfRows = "";
-  m_NumberOfRows << (int)data.rows();
-  m_NumberOfColumns = "";
-  m_NumberOfColumns << (int)data.columns();
+  double data = GetScalarData();
+  m_ScalarDataString = "";
+  m_ScalarDataString << data;
   if (m_Gui)
   {
     m_Gui->Update();

@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2007-12-11 11:23:24 $
+  Version:   $Revision: 1.2 $
+  Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -15,16 +15,15 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafDataInterpolator.h"
-#include <vnl/vnl_matrix.h>
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
 class mafVMEItemScalar;
 
-/** data interpolator specialized for mafVMEScalar (for VNL matrix data).
+/** data interpolator specialized for mafVMEScalar (for double data).
   This interpolator is specialized for scalar data. By default selects the 
-  right VMEItem, extracts the inner VNL matrix and set it as input of the 
+  right VMEItem, extracts the inner double data and set it as input of the 
   DataPipe.
 
   @sa mafVMEScalar
@@ -50,8 +49,8 @@ public:
    /**  Get the output of the interpolator item*/
   mafVMEItemScalar *GetCurrentItem() {return (mafVMEItemScalar *)m_CurrentItem;}
 
-  /** return the vnl_matrix data generated as output to this data pipe */
-  virtual vnl_matrix<double> &GetScalarData();
+  /** return the double scalar data generated as output to this data pipe */
+  virtual double GetScalarData();
 
 protected:
   mafScalarInterpolator();
@@ -60,11 +59,10 @@ protected:
   virtual void PreExecute();
   virtual void Execute() {}
 
-  vnl_matrix<double> m_ScalarData;
+  double m_ScalarData;
 
 private:
   mafScalarInterpolator(const mafScalarInterpolator&); // Not implemented
   void operator=(const mafScalarInterpolator&); // Not implemented  
 };
-
 #endif /* __mafScalarInterpolator_h */
