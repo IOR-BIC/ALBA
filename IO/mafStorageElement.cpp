@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-30 13:39:30 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-12-11 11:25:08 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -243,7 +243,44 @@ mafStorageElement *mafStorageElement::StoreObject(const char *name,mafObject *ob
   }
   return NULL;
 }
-
+//------------------------------------------------------------------------------
+mafString mafStorageElement::UpgradeAttribute(const char *attribute)
+//------------------------------------------------------------------------------
+{
+  mafString att_name;
+  mafString new_att_name = "";
+  GetAttribute(attribute,att_name);
+  if (att_name.Equals("mafVMEItemScalar"))
+  {
+    new_att_name = "mafVMEItemScalarMatrix";
+    SetAttribute(attribute, new_att_name);
+    return new_att_name;
+  }
+  if (att_name.FindFirst("mafVME") != -1)
+  {
+    if (att_name.Equals("mafVMEScalar"))
+    {
+      new_att_name = "mafVMEScalarMatrix";
+      SetAttribute(attribute, new_att_name);
+    }
+    else
+    {
+      new_att_name = att_name;
+    }
+    mafStorageElement *data_vector = FindNestedElement("DataVector");
+    mafString item_type;
+    if (data_vector && data_vector->GetAttribute("ItemTypeName", item_type))
+    {
+      if (item_type.Equals("mafVMEItemScalar"))
+      {
+        data_vector->SetAttribute("ItemTypeName", "mafVMEItemScalarMatrix");
+      }
+    }
+    return new_att_name;
+  }
+  
+  return att_name;
+}
 //------------------------------------------------------------------------------
 mafObject *mafStorageElement::RestoreObject()
 //------------------------------------------------------------------------------
@@ -252,6 +289,11 @@ mafObject *mafStorageElement::RestoreObject()
 
   if (GetAttribute("Type",type_name)&&!type_name.IsEmpty())
   {
+    if (m_Storage->NeedsUpgrade())
+    {
+      type_name = UpgradeAttribute("Type");
+    }
+    
     mafObject *object=mafObjectFactory::CreateInstance(type_name);
     if (object)
     {

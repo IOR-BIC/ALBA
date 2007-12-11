@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorable.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:01 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-12-11 11:25:08 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,7 +44,7 @@ public:
   int Store(mafStorageElement *element);
   /** 
     Restore this object from an XML document. The XML element from where starting the restoring
-    must must be passed as argument. Notice when restoring an element corresponding to this kind
+    must be passed as argument. Notice when restoring an element corresponding to this kind
     of object must be passed: restore is not going to search for a subnode of the right type. This
     means the calling restore loop should have identified the node passed as argument as of type
     to be restored by this object.*/

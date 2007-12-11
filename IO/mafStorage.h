@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:01 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-12-11 11:25:08 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -117,7 +117,9 @@ public:
 
   void SetErrorCode(int err) {m_ErrorCode=err;}
   int GetErrorCode() {return m_ErrorCode;}
-    
+
+  bool NeedsUpgrade() {return m_NeedsUpgrade;};
+
 protected:
   /** This is called by Store() and must be reimplemented by subclasses */
   virtual int InternalStore()=0;
@@ -128,6 +130,7 @@ protected:
   /** populate the list of files in the storage folder */
   virtual int OpenDirectory(const char *dir_name)=0;
 
+  bool                 m_NeedsUpgrade; ///< Flag used to enable or not the upgrade mechanism.
   mafStorable         *m_Document;        ///< document object to be stored, or being restored
   mafStorageElement   *m_DocumentElement; ///< document stored element
 

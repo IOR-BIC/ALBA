@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorageElement.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:02 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-12-11 11:25:08 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,6 +65,9 @@ public:
     Return an attribute value given its name, converting it to integer.
     Return false if attribute is not found. */
   bool GetAttributeAsInteger(const char *name,mafID &value);
+
+  /** Used to upgrade attribute value from previous MSF file version.*/
+  mafString UpgradeAttribute(const char *attribute);
 
   virtual int StoreText(const char *name, const char *text)=0;
   virtual int StoreMatrix(const char *name,const mafMatrix *matrix)=0;

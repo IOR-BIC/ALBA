@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 14:13:43 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2007-12-11 11:25:08 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -507,7 +507,7 @@ int mafXMLStorage::InternalRestore()
         m_DOM->m_XMLParser->parse(filename);
         int errorCount = m_DOM->m_XMLParser->getErrorCount(); 
 
-        if (errorCount!=0)
+        if (errorCount != 0)
         {
           // errors while parsing...
           mafErrorMessage("Errors while parsing XML file");
@@ -526,31 +526,42 @@ int mafXMLStorage::InternalRestore()
             mafString doc_version;
             if (m_DocumentElement->GetAttribute("Version",doc_version))
             {
-              double doc_version_f=atof(doc_version);
-              double my_version_f=atof(m_Version);
+              double doc_version_f = atof(doc_version);
+              double my_version_f = atof(m_Version);
             
-              if (my_version_f<=doc_version_f)
+              if (my_version_f <= doc_version_f)
               {
                 // Start tree restoring from root node
-                if (m_Document->Restore(m_DocumentElement)!=MAF_OK)
-                  errorCode=IO_RESTORE_ERROR;
+                if (m_Document->Restore(m_DocumentElement) != MAF_OK)
+                  errorCode = IO_RESTORE_ERROR;
               }
               else
               {
-                mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
-                errorCode=IO_WRONG_FILE_VERSION;
+                // Paolo 30-11-2007: due to changes on name for mafVMEScalar (to mafVMEScalarMatrix)
+                if (doc_version_f < 2.0)
+                {
+                  mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
+                  errorCode = IO_WRONG_FILE_VERSION;
+                }
+                else
+                {
+                  // Upgrade document to the actual version
+                  m_DocumentElement->SetAttribute("Version", my_version_f);
+                  m_NeedsUpgrade = true;
+                  if (m_Document->Restore(m_DocumentElement) != MAF_OK)
+                    errorCode = IO_RESTORE_ERROR;
+                }
               }
             }
           }
           else
           {
             mafErrorMacro("XML parsing error: wrong file type, expected \""<<m_FileType<<"\", found "<<m_DocumentElement->GetName());
-            errorCode=IO_WRONG_FILE_TYPE;
+            errorCode = IO_WRONG_FILE_TYPE;
           }
           
-
           // destroy the root XML element
-          cppDEL (m_DocumentElement);
+          cppDEL(m_DocumentElement);
         }
       }
 

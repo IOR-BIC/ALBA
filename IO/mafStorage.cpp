@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:41:26 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-12-11 11:25:08 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@ mafStorage::mafStorage()
   m_TmpFileId       = 0;
   m_ErrorCode       = 0;
   m_TmpFolder       = wxGetCwd().c_str();
+  m_NeedsUpgrade    = false;
 }
 
 //------------------------------------------------------------------------------
