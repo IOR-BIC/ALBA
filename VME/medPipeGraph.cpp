@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-12 09:15:02 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-12-12 09:24:48 $
+  Version:   $Revision: 1.14 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time_Array error saying:
+// Failing in doing this will result in a run-m_TimeArray error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
@@ -91,12 +91,12 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_EmgPlot->Update();
   m_EmgPlot->GetTimeStamps(m_TimeVector);
   
-  time_Array = vtkDoubleArray::New();
+  m_TimeArray = vtkDoubleArray::New();
   
   mafTimeStamp t;
   for (t = 0; t < m_TimeVector.size(); t++)
   {
-    time_Array->InsertNextValue(m_TimeVector[t]);
+    m_TimeArray->InsertNextValue(m_TimeVector[t]);
   }  
 
   vtkNEW(m_PlotActor);
@@ -173,7 +173,7 @@ void medPipeGraph::UpdateGraph()
       rect_grid = vtkRectilinearGrid::New();
 
       rect_grid->SetDimensions(x_dim, 1, 1);
-      rect_grid->SetXCoordinates(time_Array); 
+      rect_grid->SetXCoordinates(m_TimeArray); 
       rect_grid->GetPointData()->SetScalars(scalar_Array.at(counter_array));
       
       m_vtkData.push_back(rect_grid);
@@ -183,7 +183,7 @@ void medPipeGraph::UpdateGraph()
   }
 
   double times_range[2];
-  time_Array->GetRange(times_range);
+  m_TimeArray->GetRange(times_range);
 
   double data_range[2];
   for (unsigned long i = 0; i < m_vtkData.size(); i++)

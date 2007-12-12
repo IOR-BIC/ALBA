@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-08 15:16:41 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-12-12 09:24:48 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,6 @@ private:
   int				m_Xlabel;
   int				m_Ylabel;
   int       m_NumberOfSignals;
-  int       m_TimeStamp;
   long      m_ItemId;
 
   mafString   m_ItemName;
