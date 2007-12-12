@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:10:18 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2007-12-12 08:21:11 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,11 +75,13 @@ public:
 	/** Return the operation's interface. */
 	virtual mmgGui*	GetGui()	{return m_Gui;};
 
-	/** Set the input vme for the operation. */
+	/** Set/Get the input vme for the operation. */
 	virtual void		SetInput(mafNode* vme)	{m_Input = vme;};
+  virtual mafNode	*GetInput()	{return m_Input;};
 
   /** Return the mafNode result of the operation.*/
   virtual mafNode *GetOutput() {return m_Output;};
+  virtual void SetOutput(mafNode *output) {m_Output = output;};
 
 	/** Return true for the acceptable vme type. */
 	virtual bool		Accept(mafNode* vme);
@@ -129,6 +131,7 @@ public:
 
   /** Initialize the mouse device. */
   void SetMouse(mmdMouse *mouse);
+  mmdMouse *GetMouse(){return m_Mouse;};
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status);
@@ -139,6 +142,10 @@ public:
 
   /** Used to turn off m_TestMode flag.*/
   void TestModeOff() {m_TestMode = false;};
+
+  /** Get TestMode*/
+  bool GetTestMode(){return m_TestMode;};
+
 
   /** Set the Canundo flag for the operation when is plugged.*/
   void SetCanundo(bool can_undo = true) {m_Canundo = can_undo;};
