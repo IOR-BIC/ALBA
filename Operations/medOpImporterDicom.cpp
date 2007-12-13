@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-10 12:06:28 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2007-12-13 16:21:30 $
+Version:   $Revision: 1.16 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -194,7 +194,7 @@ mafOp(label)
 
   m_DicomInteractor = NULL;
 
-  SetSetting(new medGUIDicomSettings(this));
+  //m_SettingPanel = new medGUIDicomSettings(this);
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
