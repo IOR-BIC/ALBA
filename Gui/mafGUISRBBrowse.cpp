@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:33:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2007-12-13 13:59:30 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -204,9 +204,11 @@ int mafGUISRBBrowse::RemoteSRBList()
 {
   struct soap soap; // gSOAP runtime environment
 
-  int portInt = m_Port;
-  char portStr[15];//change!
-  itoa(portInt, portStr, 10);
+  //int portInt = m_Port;
+  //char portStr[15];//change!
+  //itoa(portInt, portStr, 10);
+  mafString portStr = "";
+  portStr << m_Port;
 
   _ns1__SrbList srb_listParams;
   
@@ -215,7 +217,7 @@ int mafGUISRBBrowse::RemoteSRBList()
   srb_listParams.srbAuth->host = m_Host.GetNonConstCStr();
   srb_listParams.srbAuth->domain = m_Domain.GetNonConstCStr();
   srb_listParams.srbAuth->auth_scheme = m_AuthSheme.GetNonConstCStr();
-  srb_listParams.srbAuth->port = portStr;
+  srb_listParams.srbAuth->port = portStr.GetNonConstCStr();
   srb_listParams.srbAuth->pwd = m_Pwd.GetNonConstCStr(); 
   srb_listParams.srbAuth->user = m_User.GetNonConstCStr();
   srb_listParams.srbAuth->server_dn = m_ServerDn.GetNonConstCStr();
