@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:30:08 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2007-12-13 15:47:02 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,9 +89,17 @@ int mafVMELandmark::DeepCopy(mafNode *a)
     SetRadius(lm->GetRadius());
     SetSphereResolution(lm->GetSphereResolution());
     SetLandmarkVisibility(lm->GetLandmarkVisibility());
-    double p[3];
-    lm->GetPoint(p);
-    SetPoint(p);
+    //double p[3];
+    //lm->GetPoint(p);
+    //SetPoint(p);
+
+    mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
+    if (dpipe)
+    {
+      dpipe->SetInput(m_Polydata);
+      m_Polydata->Update();
+    }
+
     return MAF_OK;
   }  
   return MAF_ERROR;

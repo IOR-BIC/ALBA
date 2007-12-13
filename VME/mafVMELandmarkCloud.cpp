@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 11:45:22 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2007-12-13 15:47:02 $
+  Version:   $Revision: 1.30 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -812,7 +812,7 @@ void mafVMELandmarkCloud::Close()
             assert(previous_item);
             item_id++;
           }
-          vtkPolyData *previous_polydata = previous_item ? (vtkPolyData*)previous_item->GetData() : NULL;
+          vtkPolyData *previous_polydata = previous_item ? vtkPolyData::SafeDownCast(previous_item->GetData()) : NULL;
           polydata = NewPolyData(mat->GetTimeStamp());
 
           if (previous_polydata && polydata)
