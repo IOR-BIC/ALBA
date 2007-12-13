@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-19 11:48:25 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2007-12-13 15:47:38 $
+Version:   $Revision: 1.13 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1052,4 +1052,14 @@ vtkPolyData *mafPipePolyline::BorderCreation()
 
   
   return m_BorderData->GetOutput();
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::SetOpacity(double opacity)
+//----------------------------------------------------------------------------
+{
+  m_Opacity = opacity;
+
+  if(m_Actor) m_Actor->GetProperty()->SetOpacity(m_Opacity);
+  if(m_OutlineActor) m_OutlineActor->GetProperty()->SetOpacity(m_Opacity);
+  if(m_BorderActor) m_BorderActor->GetProperty()->SetOpacity(m_Opacity);
 }

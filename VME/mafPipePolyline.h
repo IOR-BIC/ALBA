@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2007-09-12 12:53:30 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2007-12-13 15:47:38 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -92,6 +92,9 @@ public:
   /** Modify data in order to create a up & down border */
   vtkPolyData *BorderCreation();
 
+  /**Set Opacity of the actors */
+  void SetOpacity(double value);
+
 	/** IDs for the GUI */
 	enum PIPE_POLYLINE_WIDGET_ID
 	{
@@ -150,6 +153,7 @@ protected:
 	double m_SphereResolution;
   double m_SplineCoefficient; 
   double m_DistanceBorder;
+  double m_Opacity;
 
 	/** Initialize representation, capping, radius and resolution variables.*/
 	void InitializeFromTag();
