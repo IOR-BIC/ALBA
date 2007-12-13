@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:16:42 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-12-13 15:46:17 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,13 @@ class mafGuiSaveRestorePose : public mafGuiTransformInterface
 {
 public:
 
-  mafGuiSaveRestorePose(mafVME *input, mafObserver *listener = NULL);
+  enum ID_TYPE_GUI
+  {
+    ID_POSE_GUI = 0,
+    ID_SCALE_GUI, 
+  };
+
+  mafGuiSaveRestorePose(mafVME *input, mafObserver *listener = NULL , int typeGui = ID_POSE_GUI);
 	~mafGuiSaveRestorePose(); 
 
   void OnEvent(mafEventBase *maf_event);
@@ -79,5 +85,6 @@ protected:
   void RestorePose(int sel_pose);
 
   wxListBox				 *m_PositionsList;
+  int               m_TypeGui;
 };
 #endif

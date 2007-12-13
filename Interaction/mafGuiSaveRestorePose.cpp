@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 09:17:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-12-13 15:46:17 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listener)
+mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listener, int typeGui)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -43,6 +43,7 @@ mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listene
   m_Listener = listener;
   m_InputVME = input;
   m_Gui = NULL;
+  m_TypeGui = typeGui;
   
   CreateGui();
 }
@@ -59,11 +60,23 @@ void mafGuiSaveRestorePose::CreateGui()
   m_Gui = new mmgGui(this);
   m_Gui->SetListener(this);
   m_Gui->Divider(2);
-  m_Gui->Label("save/restore pose", true);
-  m_Gui->Button(ID_SAVE,"save pose");
-  m_Gui->Button(ID_REMOVE,"remove pose");
-	m_Gui->Label("");
-  m_PositionsList = m_Gui->ListBox(ID_APPLY,"apply pose");
+  if(m_TypeGui == ID_POSE_GUI)
+  {
+    m_Gui->Label("save/restore pose", true);
+    m_Gui->Button(ID_SAVE,"save pose");
+    m_Gui->Button(ID_REMOVE,"remove pose");
+    m_Gui->Label("");
+    m_PositionsList = m_Gui->ListBox(ID_APPLY,"apply pose");
+  }
+  else if(m_TypeGui == ID_SCALE_GUI)
+  {
+    m_Gui->Label("save/restore scaling", true);
+    m_Gui->Button(ID_SAVE,"save scaling");
+    m_Gui->Button(ID_REMOVE,"remove scaling");
+    m_Gui->Label("");
+    m_PositionsList = m_Gui->ListBox(ID_APPLY,"apply scaling");
+  }
+  
   m_PositionsList->Clear();
   ReadSavedPoses();
 
