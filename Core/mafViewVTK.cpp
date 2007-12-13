@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:19:58 $
-  Version:   $Revision: 1.72 $
+  Date:      $Date: 2007-12-13 15:46:00 $
+  Version:   $Revision: 1.73 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -247,7 +247,8 @@ void mafViewVTK::GetVisualPipeName(mafNode *node, mafString &pipe_name)
   v->Modified();
   vtkDataSet *data = v->GetOutput()->GetVTKData();
   mafVMELandmarkCloud *lmc = mafVMELandmarkCloud::SafeDownCast(v);
-  if (lmc == NULL && data == NULL)
+  mafVMELandmark *lm = mafVMELandmark::SafeDownCast(v);
+  if (lmc == NULL && data == NULL && lm == NULL)
   {
     pipe_name = "mafPipeBox";
   }
