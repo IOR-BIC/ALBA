@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 13:59:30 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-12-13 15:28:49 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -204,9 +204,6 @@ int mafGUISRBBrowse::RemoteSRBList()
 {
   struct soap soap; // gSOAP runtime environment
 
-  //int portInt = m_Port;
-  //char portStr[15];//change!
-  //itoa(portInt, portStr, 10);
   mafString portStr = "";
   portStr << m_Port;
 
