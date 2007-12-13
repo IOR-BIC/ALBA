@@ -79,6 +79,12 @@ SET(PROJECT_SRCS
   
   medOpSmoothSurface.cpp
   medOpSmoothSurface.h
+  
+  medOpCleanSurface.cpp
+  medOpCleanSurface.h
+  
+  medOpTriangulateSurface.cpp
+  medOpTriangulateSurface.h
 
 )
 
