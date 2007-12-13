@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:49:54 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2007-12-13 13:38:23 $
+  Version:   $Revision: 1.24 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,11 +71,11 @@ mafViewSingleSlice::mafViewSingleSlice(wxString label, int camera_position, bool
   m_Slice[0] = m_Slice[1] = m_Slice[2] = 0.0;
   m_SliceInitialized = false;
 
-//  m_TextActor=NULL;
-//  m_TextMapper=NULL;
-//  m_TextColor[0]=1;
-//  m_TextColor[1]=0;
-//  m_TextColor[2]=0;
+  m_TextActor=NULL;
+  m_TextMapper=NULL;
+  m_TextColor[0]=1;
+  m_TextColor[1]=0;
+  m_TextColor[2]=0;
 
 	m_Position = 0;
 	m_PlaneSelect = XY;
@@ -91,8 +91,8 @@ mafViewSingleSlice::~mafViewSingleSlice()
 //----------------------------------------------------------------------------
 {
   BorderDelete();
-//  vtkDEL(m_TextMapper);
-//  vtkDEL(m_TextActor);
+  vtkDEL(m_TextMapper);
+  vtkDEL(m_TextActor);
   m_CurrentSurface.clear();
 	m_CurrentPolyline.clear();
 }
@@ -128,17 +128,17 @@ void mafViewSingleSlice::Create()
   m_Picker2D->InitializePickList();
 
   // text stuff
-//  m_Text = "";
-//  m_TextMapper = vtkTextMapper::New();
-//  m_TextMapper->SetInput(m_Text.c_str());
-//  m_TextMapper->GetTextProperty()->AntiAliasingOff();
+  m_Text = "";
+  m_TextMapper = vtkTextMapper::New();
+  m_TextMapper->SetInput(m_Text.c_str());
+  m_TextMapper->GetTextProperty()->AntiAliasingOff();
 
-//  m_TextActor = vtkActor2D::New();
-//  m_TextActor->SetMapper(m_TextMapper);
-//  m_TextActor->SetPosition(3,3);
-//  m_TextActor->GetProperty()->SetColor(m_TextColor);
+  m_TextActor = vtkActor2D::New();
+  m_TextActor->SetMapper(m_TextMapper);
+  m_TextActor->SetPosition(3,3);
+  m_TextActor->GetProperty()->SetColor(m_TextColor);
 
-//  m_Rwi->m_RenFront->AddActor(m_TextActor);
+  m_Rwi->m_RenFront->AddActor(m_TextActor);
 }
 
 
@@ -147,17 +147,17 @@ void mafViewSingleSlice::Create()
 void mafViewSingleSlice::SetTextColor(double color[3])
 //----------------------------------------------------------------------------
 {
-  /*m_TextColor[0]=color[0];
+  m_TextColor[0]=color[0];
   m_TextColor[1]=color[1];
   m_TextColor[2]=color[2];
   m_TextActor->GetProperty()->SetColor(m_TextColor);
-  m_TextMapper->Modified();*/
+  m_TextMapper->Modified();
 }
 //----------------------------------------------------------------------------
 void mafViewSingleSlice::UpdateText(int ID)
 //----------------------------------------------------------------------------
 {
-  /*if (ID==1)
+  if (ID==1)
   {
     int slice_mode;
     switch(m_CameraPosition)
@@ -196,7 +196,7 @@ void mafViewSingleSlice::UpdateText(int ID)
     m_Text="";
     m_TextMapper->SetInput(m_Text.c_str());
     m_TextMapper->Modified();
-  }*/
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -507,18 +507,23 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 					if(m_PlaneSelect == XY)
 					{
 						m_OriginVolume[2] = m_Position;
+            m_Slice[2] = m_Position;
 					}
 					else if(m_PlaneSelect == YZ)
 					{
 						m_OriginVolume[0] = m_Position;
+            m_Slice[0] = m_Position;
 					}
 					else if(m_PlaneSelect == ZX)
 					{
 						m_OriginVolume[1] = m_Position;
+            m_Slice[1] = m_Position;
 					}
 					
 					((mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe)->SetSlice(m_OriginVolume);
-					CameraUpdate();
+          
+          this->UpdateText();
+          CameraUpdate();
 				}
 				else
 					return;
@@ -821,6 +826,7 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
       m_ColorLUT->SetRange(sr);
       m_ColorLUT->Build();
       lutPreset(4,m_ColorLUT);*/
+      this->UpdateText();
 			CameraUpdate();
     }
     else
