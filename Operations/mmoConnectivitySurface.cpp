@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoConnectivitySurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-18 07:07:28 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-12-13 11:28:54 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -105,7 +105,17 @@ void mmoConnectivitySurface::OpRun()
     
 	  double bounds[6];
 	  m_OriginalPolydata->GetBounds(bounds);
-  	
+
+	  m_Gui->Label("");
+	  m_Gui->Label(_("Extract the largest surface"),true);
+
+	  m_Gui->Bool(ID_EXTRACT_BIGGEST_SURFACE,_("Enable"),&m_ExtractBiggestSurface);
+	  m_Gui->Divider(2);
+	 //-------------------------------------
+
+	  m_Gui->Label(_("Filter Output by Size"),true);
+	  m_Gui->Label(_("Size Thresh."));
+	  m_Gui->Double(ID_THRESOLD,_(""), &m_Thresold,0,MAXDOUBLE,-1,_("The operation will get rid of surfaces which are under this size"));
 		m_Gui->Label("Input bounds dimensions:",true);
 	  mafString labelX;
 	  labelX.Append(wxString::Format(_("DimX:  %.2f"),(bounds[1]-bounds[0])));
@@ -120,15 +130,16 @@ void mmoConnectivitySurface::OpRun()
 	  m_Gui->Label(labelZ);
 
   	
-    m_Gui->Double(ID_THRESOLD,_("Threshold"), &m_Thresold);
+
 	  m_Gui->Divider(2);
-	  m_Gui->Button(ID_VTK_CONNECT,_("connectivity"));
+	//-------------------------------------
+
+
+	  m_Gui->Button(ID_VTK_CONNECT,_("run connectivity"));
 
 	  m_Gui->Label("");
 	  m_Gui->Label(_("Extracted:"), &m_NumberOfExtractedSurfaces);
 		
-		m_Gui->Label("");
-		m_Gui->Bool(ID_EXTRACT_BIGGEST_SURFACE,_("Ext. Big"),&m_ExtractBiggestSurface);
 
     vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
     connectivityFilter->SetInput(m_OriginalPolydata);
