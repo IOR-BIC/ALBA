@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 08:35:58 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-12-17 11:45:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -140,7 +140,7 @@ void mmgVMEChooserTree::InitializeImageList()
     for( int s=0; s<num_of_status; s++)
     {
       wxBitmap vmeico = mafPics.GetVmePic(name);
-      if(s==0) vmeico = GrayScale(vmeico);
+      if(s==0) vmeico = mafGrayScale(vmeico);
       imgs->Add(vmeico);
     }
   }

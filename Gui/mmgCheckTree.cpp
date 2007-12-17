@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-30 10:55:31 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2007-12-17 11:45:27 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -373,13 +373,13 @@ void mmgCheckTree::InitializeImageList()
     for( s=0; s<num_of_status; s++)
     {
       wxBitmap vmeico = mafPics.GetVmePic(name);
-      if(s==0) vmeico = GrayScale(vmeico);
+      if(s==0) vmeico = mafGrayScale(vmeico);
       wxBitmap merged = MergeIcons(state_ico[s],vmeico);
       imgs->Add(merged);
 
       // Icons for missing data
-      if(s!=0) vmeico = GrayScale(vmeico);
-      vmeico = RedScale(vmeico);
+      if(s!=0) vmeico = mafGrayScale(vmeico);
+      vmeico = mafRedScale(vmeico);
       wxBitmap missingData = MergeIcons(state_ico[s],vmeico); // Same icon as above, but represent a 
       imgs->Add(missingData);                                 // node with no data available.
     }
