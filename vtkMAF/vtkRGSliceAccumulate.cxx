@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2005-06-25 11:56:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-12-17 09:57:00 $
+  Version:   $Revision: 1.3 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -45,7 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -60,7 +60,8 @@ vtkRGSliceAccumulate::vtkRGSliceAccumulate()
   SetSpacing(1,1,1);
   SetDataType(VTK_UNSIGNED_CHAR);
   SetOrigin(0,0,0);
-  SetSlices(vtkRectilinearGrid::New());
+  Slices=vtkRectilinearGrid::New();
+  //SetSlices(vtkRectilinearGrid::New());
 }
 //--------------------------------------------------------------------------------------
 vtkRGSliceAccumulate::~vtkRGSliceAccumulate()
@@ -257,7 +258,7 @@ void vtkRGSliceAccumulate::Execute()
 {
 	this->GetOutput()->DeepCopy(this->Slices);
 	this->GetOutput()->SetWholeExtent(this->GetOutput()->GetExtent());
-	this->Slices->Delete();
+	//this->Slices->Delete();
 }
 //--------------------------------------------------------------------------------------
 void vtkRGSliceAccumulate::ExecuteInformation()
