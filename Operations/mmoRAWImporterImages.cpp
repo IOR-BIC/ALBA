@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 12:26:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2007-12-17 16:32:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -1088,7 +1088,7 @@ bool mmoRAWImporterImages::ControlFilenameList()
     wxDir::GetAllFiles(m_RawDirectory.GetCStr(), &SkinFiles, FileSpec, flags);
   }
 
-	wxMessageBox(wxString::Format("%d",SkinFiles.GetCount()));
+	//wxMessageBox(wxString::Format("%d",SkinFiles.GetCount()));
 
 	wxString numbers = m_Pattern.AfterLast('%');
 	numbers = numbers.Mid(0,numbers.Length()-1);
