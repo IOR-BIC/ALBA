@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:18:23 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2007-12-17 13:40:09 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,8 @@ class mmgMDIFrameCallback : public vtkCommand
         {
           m_Frame->ProgressBarShow();
           m_Frame->ProgressBarSetVal(0);
-          m_Frame->ProgressBarSetText(&wxString(po->GetClassName()));
+          //m_Frame->ProgressBarSetText(&wxString(po->GetClassName()));
+          m_Frame->ProgressBarSetText(&wxString(po->GetProgressText()));
         }
         else if(m_mode==2) // EndEvent-Callback
         {
