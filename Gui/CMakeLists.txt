@@ -12,6 +12,8 @@ SET(PROJECT_SRCS
   mafEvent.h
   mafGUIDialogFindVme.cpp
   mafGUIDialogFindVme.h
+  mafGUIDialogLogin.cpp
+  mafGUIDialogLogin.h
   mafGUISettings.cpp
   mafGUISettings.h
   mafGUISettingsStorage.cpp
