@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-17 14:37:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-17 19:07:40 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -126,27 +126,37 @@ void medOpSmoothSurface::OpRun()
 	vtkNEW(m_OriginalPolydata);
 	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
-	// interface:
-	m_Gui = new mmgGui(this);
+  if(!m_TestMode)
+  {
+    CreateGui();
+  }
 
-	m_Gui->Label("");
-	m_Gui->Label("smooth",true);
-	m_Gui->Slider(ID_ITERACTION,"n.iteraction: ",&m_Iterations,0,500);
-	m_Gui->Button(ID_SMOOTH,"apply smooth");
+}
+//----------------------------------------------------------------------------
+void medOpSmoothSurface::CreateGui()
+//----------------------------------------------------------------------------
+{
+  // interface:
+  m_Gui = new mmgGui(this);
 
-	m_Gui->Divider(2);
-	m_Gui->Label("");
-	m_Gui->Button(ID_PREVIEW,"preview");
-	m_Gui->Button(ID_CLEAR,"clear");
-	m_Gui->OkCancel();
-	m_Gui->Enable(wxOK,false);
+  m_Gui->Label("");
+  m_Gui->Label("smooth",true);
+  m_Gui->Slider(ID_ITERACTION,"n.iteraction: ",&m_Iterations,0,500);
+  m_Gui->Button(ID_SMOOTH,"apply smooth");
 
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+  m_Gui->Divider(2);
+  m_Gui->Label("");
+  m_Gui->Button(ID_PREVIEW,"preview");
+  m_Gui->Button(ID_CLEAR,"clear");
+  m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,false);
 
-	m_Gui->Divider();
+  m_Gui->Enable(ID_PREVIEW,false);
+  m_Gui->Enable(ID_CLEAR,false);
 
-	ShowGui();
+  m_Gui->Divider();
+
+  ShowGui();
 }
 //----------------------------------------------------------------------------
 void medOpSmoothSurface::OpDo()
@@ -203,10 +213,13 @@ void medOpSmoothSurface::OpStop(int result)
 void medOpSmoothSurface::OnSmooth()
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
-	m_Gui->Enable(ID_SMOOTH,false);
-	m_Gui->Enable(ID_ITERACTION,false);
-	m_Gui->Update();
+  if(!m_TestMode)
+  {
+	  wxBusyCursor wait;
+	  m_Gui->Enable(ID_SMOOTH,false);
+	  m_Gui->Enable(ID_ITERACTION,false);
+	  m_Gui->Update();
+  }
 
 	vtkMAFSmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
 	smoothFilter->SetInput(m_ResultPolydata);
@@ -216,12 +229,15 @@ void medOpSmoothSurface::OnSmooth()
 
 	m_ResultPolydata->DeepCopy(smoothFilter->GetOutput());
 
-	m_Gui->Enable(ID_SMOOTH,true);
-	m_Gui->Enable(ID_ITERACTION,true);
+  if(!m_TestMode)
+  {
+	  m_Gui->Enable(ID_SMOOTH,true);
+	  m_Gui->Enable(ID_ITERACTION,true);
 
-	m_Gui->Enable(ID_PREVIEW,true);
-	m_Gui->Enable(ID_CLEAR,true);
-	m_Gui->Enable(wxOK,true);
+	  m_Gui->Enable(ID_PREVIEW,true);
+	  m_Gui->Enable(ID_CLEAR,true);
+	  m_Gui->Enable(wxOK,true);
+  }
 
 	m_PreviewResultFlag = true;
 }

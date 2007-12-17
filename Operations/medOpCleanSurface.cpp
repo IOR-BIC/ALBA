@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-13 12:42:07 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-17 19:07:40 $
+Version:   $Revision: 1.2 $
 Authors:   Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -119,26 +119,35 @@ void medOpCleanSurface::OpRun()
 	vtkNEW(m_OriginalPolydata);
 	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
-	// interface:
-	m_Gui = new mmgGui(this);
+  if(!m_TestMode)
+  {
+    CreateGui();
+  }
+}
+//----------------------------------------------------------------------------
+void medOpCleanSurface::CreateGui()
+//----------------------------------------------------------------------------
+{
+  // interface:
+  m_Gui = new mmgGui(this);
 
-	m_Gui->Label("");
-	m_Gui->Label(_("Clean Surface"),true);
-	m_Gui->Button(ID_SMOOTH,_("Apply Clean"));
+  m_Gui->Label("");
+  m_Gui->Label(_("Clean Surface"),true);
+  m_Gui->Button(ID_SMOOTH,_("Apply Clean"));
 
-	m_Gui->Divider(2);
-	m_Gui->Label("");
-	m_Gui->Button(ID_PREVIEW,_("preview"));
-	m_Gui->Button(ID_CLEAR,_("clear"));
-	m_Gui->OkCancel();
-	m_Gui->Enable(wxOK,false);
+  m_Gui->Divider(2);
+  m_Gui->Label("");
+  m_Gui->Button(ID_PREVIEW,_("preview"));
+  m_Gui->Button(ID_CLEAR,_("clear"));
+  m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,false);
 
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+  m_Gui->Enable(ID_PREVIEW,false);
+  m_Gui->Enable(ID_CLEAR,false);
 
-	m_Gui->Divider();
+  m_Gui->Divider();
 
-	ShowGui();
+  ShowGui();
 }
 //----------------------------------------------------------------------------
 void medOpCleanSurface::OpDo()
@@ -195,10 +204,13 @@ void medOpCleanSurface::OpStop(int result)
 void medOpCleanSurface::OnClean()
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
-	m_Gui->Enable(ID_SMOOTH,false);
-	m_Gui->Enable(ID_ITERACTION,false);
-	m_Gui->Update();
+  if(!m_TestMode)
+  {
+	  wxBusyCursor wait;
+	  m_Gui->Enable(ID_SMOOTH,false);
+	  m_Gui->Enable(ID_ITERACTION,false);
+	  m_Gui->Update();
+  }
 
 	vtkMAFSmartPointer<vtkCleanPolyData> cleanFilter;
 	cleanFilter->SetTolerance(0.0); // aacc expose from GUI?
@@ -207,12 +219,16 @@ void medOpCleanSurface::OnClean()
 
 	m_ResultPolydata->DeepCopy(cleanFilter->GetOutput());
 
-	m_Gui->Enable(ID_SMOOTH,true);
-	m_Gui->Enable(ID_ITERACTION,true);
 
-	m_Gui->Enable(ID_PREVIEW,true);
-	m_Gui->Enable(ID_CLEAR,true);
-	m_Gui->Enable(wxOK,true);
+  if(!m_TestMode)
+  {
+	  m_Gui->Enable(ID_SMOOTH,true);
+	  m_Gui->Enable(ID_ITERACTION,true);
+
+	  m_Gui->Enable(ID_PREVIEW,true);
+	  m_Gui->Enable(ID_CLEAR,true);
+	  m_Gui->Enable(wxOK,true);
+  }
 
 	m_PreviewResultFlag = true;
 }

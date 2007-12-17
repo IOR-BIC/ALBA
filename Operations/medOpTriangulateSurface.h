@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpTriangulateSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-12-13 12:42:32 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-17 19:07:40 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,9 +77,14 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
+  /** Triangulate the surface. */
+  void OnTriangle();
+
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
+
+  void CreateGui();
 
 	bool m_ClearInterfaceFlag;
 	bool m_PreviewResultFlag;
@@ -87,9 +92,6 @@ protected:
 	vtkPolyData											*m_ResultPolydata;
 	vtkPolyData											*m_OriginalPolydata;
 
-
-	/** Smooth the surface. */
-	void OnTriangle();
 
 	/** Make the preview of the surface filtering. */
 	void OnPreview();  

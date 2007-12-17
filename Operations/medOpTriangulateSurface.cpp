@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpTriangulateSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-13 12:42:32 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-17 19:07:40 $
+Version:   $Revision: 1.2 $
 Authors:   Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -119,26 +119,35 @@ void medOpTriangulateSurface::OpRun()
 	vtkNEW(m_OriginalPolydata);
 	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
-	// interface:
-	m_Gui = new mmgGui(this);
+	if(!m_TestMode)
+  {
+    CreateGui();
+  }
+}
+//----------------------------------------------------------------------------
+void medOpTriangulateSurface::CreateGui()
+//----------------------------------------------------------------------------
+{
+  // interface:
+  m_Gui = new mmgGui(this);
 
-	m_Gui->Label("");
-	m_Gui->Label(_("Triangulate Surface"),true);
-	m_Gui->Button(ID_SMOOTH,_("Triangulate"));
+  m_Gui->Label("");
+  m_Gui->Label(_("Triangulate Surface"),true);
+  m_Gui->Button(ID_SMOOTH,_("Triangulate"));
 
-	m_Gui->Divider(2);
-	m_Gui->Label("");
-	m_Gui->Button(ID_PREVIEW,_("preview"));
-	m_Gui->Button(ID_CLEAR,_("clear"));
-	m_Gui->OkCancel();
-	m_Gui->Enable(wxOK,false);
+  m_Gui->Divider(2);
+  m_Gui->Label("");
+  m_Gui->Button(ID_PREVIEW,_("preview"));
+  m_Gui->Button(ID_CLEAR,_("clear"));
+  m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,false);
 
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+  m_Gui->Enable(ID_PREVIEW,false);
+  m_Gui->Enable(ID_CLEAR,false);
 
-	m_Gui->Divider();
+  m_Gui->Divider();
 
-	ShowGui();
+  ShowGui();
 }
 //----------------------------------------------------------------------------
 void medOpTriangulateSurface::OpDo()
@@ -195,10 +204,13 @@ void medOpTriangulateSurface::OpStop(int result)
 void medOpTriangulateSurface::OnTriangle()
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
-	m_Gui->Enable(ID_SMOOTH,false);
-	m_Gui->Enable(ID_ITERACTION,false);
-	m_Gui->Update();
+  if(!m_TestMode)
+  {
+	  wxBusyCursor wait;
+	  m_Gui->Enable(ID_SMOOTH,false);
+	  m_Gui->Enable(ID_ITERACTION,false);
+	  m_Gui->Update();
+  }
 
 	vtkMAFSmartPointer<vtkTriangleFilter> smoothFilter;
 	smoothFilter->SetInput(m_ResultPolydata);
@@ -206,12 +218,15 @@ void medOpTriangulateSurface::OnTriangle()
 
 	m_ResultPolydata->DeepCopy(smoothFilter->GetOutput());
 
-	m_Gui->Enable(ID_SMOOTH,true);
-	m_Gui->Enable(ID_ITERACTION,true);
+  if(!m_TestMode)
+  {
+	  m_Gui->Enable(ID_SMOOTH,true);
+	  m_Gui->Enable(ID_ITERACTION,true);
 
-	m_Gui->Enable(ID_PREVIEW,true);
-	m_Gui->Enable(ID_CLEAR,true);
-	m_Gui->Enable(wxOK,true);
+	  m_Gui->Enable(ID_PREVIEW,true);
+	  m_Gui->Enable(ID_CLEAR,true);
+	  m_Gui->Enable(wxOK,true);
+  }
 
 	m_PreviewResultFlag = true;
 }
