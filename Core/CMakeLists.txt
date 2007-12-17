@@ -61,6 +61,8 @@ SET(PROJECT_SRCS
   mafTagItem.cpp
   mafTagItem.h
   mafTimeMap.h
+  mafUser.cpp
+  mafUser.h
   mafVME.cpp
   mafVME.h
   mafVMEManager.cpp
