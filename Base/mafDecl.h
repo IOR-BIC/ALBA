@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:16:34 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2007-12-17 11:44:37 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,10 +17,10 @@
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #include "mafDefines.h"
 #include <wx/bitmap.h>
-#include <string>
-#include <vector>
 
 #include "mafString.h"
+
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -423,10 +423,10 @@ MAF_EXPORT bool IsRemote(mafString filename, mafString &protocol_used);
 MAF_EXPORT wxColour  mafRandomColor();
 
 /** Used to generate gray scale bitmap given a colored one.*/
-MAF_EXPORT wxBitmap GrayScale(wxBitmap bmp);
+MAF_EXPORT wxBitmap mafGrayScale(wxBitmap bmp);
 
 /** Used to generate red scale bitmap to represent a VME with data not present.*/
-MAF_EXPORT wxBitmap RedScale(wxBitmap bmp);
+MAF_EXPORT wxBitmap mafRedScale(wxBitmap bmp);
 
 /** return the application start-up directory */
 MAF_EXPORT std::string  mafGetApplicationDirectory();

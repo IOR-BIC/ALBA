@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-31 11:22:27 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2007-12-17 11:44:37 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -176,7 +176,7 @@ double RoundValue(double d_in, int decimal_digits)
   return b / pow((double)10,(double)decimal_digits);
 }
 //----------------------------------------------------------------------------
-wxBitmap GrayScale(wxBitmap bmp)
+wxBitmap mafGrayScale(wxBitmap bmp)
 //----------------------------------------------------------------------------
 {
   wxImage img = bmp.ConvertToImage();
@@ -195,7 +195,7 @@ wxBitmap GrayScale(wxBitmap bmp)
   return wxBitmap(img);
 }
 //----------------------------------------------------------------------------
-wxBitmap RedScale(wxBitmap bmp)
+wxBitmap mafRedScale(wxBitmap bmp)
 //----------------------------------------------------------------------------
 {
   wxImage img = bmp.ConvertToImage();
