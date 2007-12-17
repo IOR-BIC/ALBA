@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:48:43 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-12-17 13:40:37 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -401,6 +401,8 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
 int mafVMEItemVTK::UpdateReader(vtkDataReader *reader, mafString &filename)
 //-------------------------------------------------------------------------
 {
+  reader->SetProgressText("Loading data...");
+  mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,reader));
   if (m_IOMode != MEMORY)
   {
     if (GetCrypting())
