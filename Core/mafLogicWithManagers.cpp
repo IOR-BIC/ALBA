@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-28 12:17:34 $
-  Version:   $Revision: 1.124 $
+  Date:      $Date: 2007-12-18 10:55:17 $
+  Version:   $Revision: 1.125 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,7 @@
 
 #include "mafSideBar.h"
 
-
+#include "mafUser.h"
 #include "mafGUISRBBrowse.h"
 #include "mmgDialogRemoteFile.h"
 #include "mafGUIDialogFindVme.h"
@@ -85,8 +85,6 @@
 #include "mafDataVector.h"
 #include "mafVMEStorage.h"
 #include "mafRemoteStorage.h"
-//#include "vtkCamera.h"
-
 
 //----------------------------------------------------------------------------
 mafLogicWithManagers::mafLogicWithManagers()
@@ -128,12 +126,15 @@ mafLogicWithManagers::mafLogicWithManagers()
   m_ApplicationLayoutSettings = NULL;
 
 	m_Revision = _("0.1");
+
+  m_User = new mafUser();
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
 //----------------------------------------------------------------------------
 {
-  // Managers are destruct in the OnClose 
+  // Managers are destruct in the OnClose
+  cppDEL(m_User);
   cppDEL(m_ApplicationLayoutSettings);
   cppDEL(m_PrintSupport);
   cppDEL(m_SettingsDialog); 
@@ -167,7 +168,7 @@ void mafLogicWithManagers::Configure()
     m_VMEManager->SetPassword(m_StorageSettings->GetPassword());
     m_VMEManager->SetLocalCacheFolder(m_StorageSettings->GetCacheFolder());
     m_VMEManager->SetListener(this); 
-    m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
+    //m_VMEManager->SetSingleBinaryFile(m_StorageSettings->GetSingleFileStatus()!= 0);
   }
 
 // currently mafInteraction is strictly dependent on VTK (marco)
@@ -311,6 +312,12 @@ void mafLogicWithManagers::SetApplicationStamp(mafString &app_stamp)
   {
     m_VMEManager->SetApplicationStamp(app_stamp);
   }
+}
+//----------------------------------------------------------------------------
+mafUser *mafLogicWithManagers::GetUser()
+//----------------------------------------------------------------------------
+{
+  return m_User;
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::Init(int argc, char **argv)
@@ -492,11 +499,11 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
-    if (e->GetId() == mafDataVector::SINGLE_FILE_DATA)
+    /*if (e->GetId() == mafDataVector::SINGLE_FILE_DATA)
     {
       e->SetBool(m_StorageSettings->GetSingleFileStatus()!= 0);
       return;
-    }
+    }*/
     switch(e->GetId())
     {
       // ###############################################################

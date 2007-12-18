@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-05 08:35:07 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2007-12-18 10:55:18 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,6 +38,7 @@ class mmdMouse;
 class mmgSettingsDialog;
 class mmgApplicationLayoutSettings;
 class mafGUISettings;
+class mafUser;
 
 //----------------------------------------------------------------------------
 // mafLogicWithManagers :
@@ -120,6 +121,9 @@ public:
   /** Fill the View and operation menu's and set the application stamp to the VMEManager.*/
   virtual void Show();
 
+  /** Return the applications' user.*/
+  mafUser *GetUser();
+
   /** Set the application stamp for the application, 
   if set to OPEN_ALL_DATA let's the application to open all msf file. 
   As default the application stamp is the name of the application and it is set into the Show() method. */
@@ -152,17 +156,14 @@ protected:
   virtual void TimeSet(double t);
 //---------------------------------------------------------
   
-  /**
-  Redefined to add View,Op,Import,Export menu */
+  /** Redefined to add View,Op,Import,Export menu */
   virtual void CreateMenu();
 
   /** create a new storage object */
   virtual void CreateStorage(mafEvent *e);
 
-  /**
-  Redefined to add Print buttons */
+  /** Redefined to add Print buttons */
   virtual void CreateToolbar();
-
 
   // EVENT HANDLERS
 
@@ -278,5 +279,7 @@ protected:
   mmgApplicationLayoutSettings *m_ApplicationLayoutSettings;
 
 	mafString m_Revision;
+
+  mafUser *m_User; ///< Applications' user
 };
 #endif
