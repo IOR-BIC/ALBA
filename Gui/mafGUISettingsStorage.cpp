@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-06 14:34:18 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-12-18 10:57:54 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@ mafGUISettingsStorage::mafGUISettingsStorage(mafObserver *Listener, const mafStr
 mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
-  m_SingleFileFlag = 1;
+  //m_SingleFileFlag = 1;
   
   m_AnonymousFalg = true;
   m_RemoteHostName = "";
@@ -63,8 +63,8 @@ void mafGUISettingsStorage::CreateGui()
   wxString remoteStorageArray[3] = {"Local", "HTTP", "SRB"};
   m_Gui = new mmgGui(this);
   m_Gui->Label(_("Storage general settings"));
-  m_Gui->Bool(ID_SINGLE_FILE, _("single file mode"), &m_SingleFileFlag,1);
-  m_Gui->Divider(2);
+  //m_Gui->Bool(ID_SINGLE_FILE, _("single file mode"), &m_SingleFileFlag,1);
+  //m_Gui->Divider(2);
   m_Gui->Radio(ID_STORAGE_TYPE,_("Storage type"),&m_RemoteStorageType, 3, remoteStorageArray,1,_("Choose the remote storage you want to use."));
   m_Gui->Label(_("Default settings for HTTP storage"));
   m_Gui->Bool(ID_ANONYMOUS_USER,_("anonymous connection"),&m_AnonymousFalg,1);
@@ -118,9 +118,9 @@ void mafGUISettingsStorage::OnEvent(mafEventBase *maf_event)
 {
   switch(maf_event->GetId())
   {
-    case ID_SINGLE_FILE:
+    /*case ID_SINGLE_FILE:
       m_Config->Write("SingleFileMode",m_SingleFileFlag);
-    break;
+    break;*/
     case ID_CACHE_FOLDER:
       m_Config->Write("CacheFolder",m_CacheFolder.GetCStr());
     break;
@@ -180,14 +180,14 @@ void mafGUISettingsStorage::InitializeSettings()
 {
   wxString string_item;
   long long_item;
-  if(m_Config->Read("SingleFileMode", &long_item))
+  /*if(m_Config->Read("SingleFileMode", &long_item))
   {
     m_SingleFileFlag = long_item;
   }
   else
   {
     m_Config->Write("SingleFileMode", m_SingleFileFlag);
-  }
+  }*/
   if(m_Config->Read("RemoteStorageType", &long_item))
   {
     m_RemoteStorageType = long_item;
@@ -305,7 +305,7 @@ void mafGUISettingsStorage::InitializeSettings()
   }
   m_Config->Flush();
 }
-//----------------------------------------------------------------------------
+/*//----------------------------------------------------------------------------
 void mafGUISettingsStorage::SetSingleFileStatus(int single_file)
 //----------------------------------------------------------------------------
 {
@@ -315,7 +315,7 @@ void mafGUISettingsStorage::SetSingleFileStatus(int single_file)
     m_Config->Write("SingleFileMode", m_SingleFileFlag);
     m_Config->Flush();
   }
-}
+}*/
 //----------------------------------------------------------------------------
 void mafGUISettingsStorage::SetUseRemoteStorage(int use_remote)
 //----------------------------------------------------------------------------

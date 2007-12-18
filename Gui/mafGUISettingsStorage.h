@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.h,v $
 Language:  C++
-Date:      $Date: 2007-11-06 14:34:18 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-12-18 10:57:54 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,8 +32,8 @@ public:
 
   enum STORAGE_SETTINGS_WIDGET_ID
   {
-    ID_SINGLE_FILE = MINID,
-    ID_STORAGE_TYPE,
+    //ID_SINGLE_FILE,
+    ID_STORAGE_TYPE = MINID,
     ID_CACHE_FOLDER,
     ID_HOST_NAME,
     ID_PORT,
@@ -61,7 +61,7 @@ public:
   void OnEvent(mafEventBase *maf_event);
 
   /** Return the status for the single file storing animated VMEs.*/
-  int GetSingleFileStatus() {return m_SingleFileFlag;};
+  //int GetSingleFileStatus() {return m_SingleFileFlag;};
 
 
   /** Set the  storage type. */
@@ -71,7 +71,7 @@ public:
   int GetStorageType() {return m_RemoteStorageType;};
 
   /** Set the flag for storing animated VMEs as single file.*/
-  void SetSingleFileStatus(int single_file);
+  //void SetSingleFileStatus(int single_file);
 
   /** Return true if Remote Storage flag is enabled.*/
   bool UseRemoteStorage() {return m_RemoteStorageType != 0;};
@@ -173,7 +173,7 @@ protected:
   /** Used to enable/disable items according to the current widgets state.*/
   void EnableItems();
   
-  int m_SingleFileFlag; ///< Flag used to turn On-Off single file mode for storing animated or not items.
+  //int m_SingleFileFlag; ///< Flag used to turn On-Off single file mode for storing animated or not items.
 
   int       m_RemoteStorageType; ///< Flag used to store the using or not of remote storage
   int       m_AnonymousFalg;
