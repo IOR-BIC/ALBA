@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 11:44:37 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2007-12-18 14:06:32 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -158,6 +158,7 @@ EVT_START,
   VME_REMOVE,    // from a generic mafOp to mafLogic (to be removed Marco)
   VME_REMOVING,  // from mafVmeManager to mafLogic 
   VME_SELECT,    // from mmgTree or mafISV - run mafOpSelect
+  VME_DCLICKED,  // from mmiPER issued to infor logic that a double click has been done on a VME.
   VME_SELECTED,  // from mafOpSelect
   VME_SHOW,      // from a vme property panel
   VME_TRANSFORM, // from mafISV to mafLogic
