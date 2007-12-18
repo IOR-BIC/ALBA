@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:47:27 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-12-18 14:12:35 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -331,7 +331,13 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
   {
     SetPickedVME(device, picked_vme);
     // if a VME is picked its pointer is written in PickedVME
-    if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
+    int but_down_id = e->GetId();
+    if (but_down_id == mmdMouse::MOUSE_DCLICK && !picked_vme->IsA("mafVMEGizmo"))
+    {
+      // Send event to inform Logic that a double click event is rised on a VME
+      InvokeEvent(VME_DCLICKED,MCH_UP,picked_vme);
+    }
+    else if(m_CanSelect && !picked_vme->IsA("mafVMEGizmo"))
     {
       // Send a VME select event to Logic
       InvokeEvent(VME_SELECT,MCH_UP,picked_vme);

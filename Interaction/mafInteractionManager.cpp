@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2007-12-18 14:12:35 $
+  Version:   $Revision: 1.33 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -763,53 +763,52 @@ void mafInteractionManager::OnEvent(mafEventBase *event)
     return;
   }
   
-  if (id==VME_SELECT)
+  if (id == VME_SELECT || id == VME_DCLICKED)
   {
-    // event rised by PER to advise of VME selection
-    mafEventMacro(mafEvent(event->GetSender(),VME_SELECT,(mafVME *)event->GetData()));
-    //mafEventMacro(*event);
+    // event raised by PER to advise of VME selection or double click on a VME
+    mafEventMacro(mafEvent(event->GetSender(), id, (mafVME *)event->GetData()));
   }
-  else if (id==VIEW_SELECT)
+  else if (id == VIEW_SELECT)
   {
-    mafEvent *e=mafEvent::SafeDownCast(event);
+    mafEvent *e = mafEvent::SafeDownCast(event);
     assert(event);
     OnViewSelected(e);
   }  
-  else if (id==mafDeviceManager::DISPATCH_START)
+  else if (id == mafDeviceManager::DISPATCH_START)
   {
     OnStartDispatching();    
   }
-  else if (id==mafDeviceManager::DISPATCH_END)
+  else if (id == mafDeviceManager::DISPATCH_END)
   {
     OnEndDispatching();
   }
-  else if (id==CAMERA_UPDATE)
+  else if (id == CAMERA_UPDATE)
   {
     OnCameraUpdate(e);
   }
-  else if (id==SHOW_CONTEXTUAL_MENU)
+  else if (id == SHOW_CONTEXTUAL_MENU)
   {
     mafVME *vme = (mafVME *)event->GetData();
     bool vme_context_menu = (vme != NULL) && !vme->IsA("mafVMEGizmo");
     mafEventMacro(mafEvent(event->GetSender(),SHOW_CONTEXTUAL_MENU, vme_context_menu));
   }
-  else if (id==mafDevice::DEVICE_NAME_CHANGED) 
+  else if (id == mafDevice::DEVICE_NAME_CHANGED) 
   {
     OnDeviceNameChanged(event);
   }
-  else if (id==mafDeviceSet::DEVICE_ADDED) 
+  else if (id == mafDeviceSet::DEVICE_ADDED) 
   {
     OnDeviceAdded(event);
   }
-  else if (id==mafDeviceSet::DEVICE_REMOVING) 
+  else if (id == mafDeviceSet::DEVICE_REMOVING) 
   {
     OnDeviceRemoving(event);
   }
-  else if (id==AVATAR_ADDED) 
+  else if (id == AVATAR_ADDED) 
   {
     OnAddAvatar(event);
   }
-  else if (id==AVATAR_REMOVED) 
+  else if (id == AVATAR_REMOVED) 
   {
     OnRemoveAvatar(event); 
   }
