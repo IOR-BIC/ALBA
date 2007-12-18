@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 15:24:30 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2007-12-18 14:09:52 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -128,6 +128,8 @@ public:
   void OnPaint(wxPaintEvent &event);
 	/**  */
   void OnEraseBackground (wxEraseEvent& event);
+  /** Capture left mouse double click and notify it.*/
+  virtual void OnLeftMouseDoubleClick(wxMouseEvent &event);
 	/** Capture mouse and notify the mouse click. */
   virtual void OnLeftMouseButtonDown(wxMouseEvent &event);
   /** Release the mouse and send an event with mouse position. */

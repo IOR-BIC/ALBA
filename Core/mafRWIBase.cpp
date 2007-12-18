@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 15:24:30 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2007-12-18 14:09:52 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,6 +77,7 @@ IMPLEMENT_DYNAMIC_CLASS(mafRWIBase, wxWindow)
 BEGIN_EVENT_TABLE(mafRWIBase, wxWindow)
   EVT_PAINT(mafRWIBase::OnPaint)
   EVT_ERASE_BACKGROUND(mafRWIBase::OnEraseBackground)
+  EVT_LEFT_DCLICK(mafRWIBase::OnLeftMouseDoubleClick)
   EVT_LEFT_DOWN(mafRWIBase::OnLeftMouseButtonDown)
   EVT_LEFT_UP(mafRWIBase::OnLeftMouseButtonUp)
   EVT_MIDDLE_DOWN(mafRWIBase::OnMiddleMouseButtonDown)
@@ -285,6 +286,37 @@ void mafRWIBase::OnEraseBackground(wxEraseEvent &event)
   event.Skip(false);
 }
 //----------------------------------------------------------------------------
+void mafRWIBase::OnLeftMouseDoubleClick(wxMouseEvent &event)
+//----------------------------------------------------------------------------
+{
+  if (!Enabled) return;
+
+  CaptureMouse();
+  NotifyClick(); // this will advise the mmgMDIChild of the click and it fires the VIEW_SELECT
+                 // event. If it is necessary will be defined a NotifyDoubleClick with a new ID VIEW_DOUBLE_CLICKED
+
+  if (m_CustomInteractorStyle)
+  {
+    // VTK does not support double click event, so manage it through the mmdMouse
+  }
+  else
+  {
+    mafEventInteraction e(this,mmdMouse::MOUSE_DCLICK);
+    e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
+    e.SetButton(MAF_LEFT_BUTTON);
+    e.SetModifier(MAF_SHIFT_KEY,event.ShiftDown());
+    e.SetModifier(MAF_CTRL_KEY,event.ControlDown());
+    e.SetModifier(MAF_ALT_KEY,event.AltDown());
+    e.SetChannel(MCH_OUTPUT);
+    if(m_Mouse) 
+      m_Mouse->OnEvent(&e);
+    else if (m_Listener)
+    {
+      m_Listener->OnEvent(&e);
+    }
+  }
+}
+//----------------------------------------------------------------------------
 void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
 //----------------------------------------------------------------------------
 {
@@ -300,7 +332,6 @@ void mafRWIBase::OnLeftMouseButtonDown(wxMouseEvent &event)
   }
   else
   {
-    
     mafEventInteraction e(this,mmdButtonsPad::BUTTON_DOWN);
     e.Set2DPosition(event.GetX(),m_Height - event.GetY() - 1);
     e.SetButton(MAF_LEFT_BUTTON);
