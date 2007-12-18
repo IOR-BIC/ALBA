@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdRemoteMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:44:47 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2007-12-18 14:08:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,7 +66,7 @@ void mmdRemoteMouse::OnEvent(mafEventBase *event)
     NormalizedDisplayToDisplay(pos);
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
-  else if (id == BUTTON_DOWN)
+  else if (id == BUTTON_DOWN || id == MOUSE_DCLICK)
   {
     // store the Selected RWI is needed for compounded view
     m_ButtonPressed = true;
