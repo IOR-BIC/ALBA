@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 13:40:37 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2007-12-18 10:54:47 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -516,6 +516,8 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       ReleaseOutputMemory();
 
       vtkMAFSmartPointer<vtkDataSetWriter> writer;
+      writer->SetProgressText("Storing data...");
+      mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,writer));
 
       // this is to catch possible I/O errors
       //unsigned long tag=mflAgent::PlugEventSource(writer,mflMSFWriter::ErrorHandler,this,vtkCommand::ErrorEvent);
