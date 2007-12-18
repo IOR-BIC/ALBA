@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-31 11:42:08 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2007-12-18 10:57:29 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -187,11 +187,14 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   {
     if (m_LastBaseURL != base_url)
     {
-      // ask how to save the binary file (as setting of the application):
+      /*// ask how to save the binary file (as setting of the application):
       // single file or multi file.
       mafEvent single_file_event(this, SINGLE_FILE_DATA);
       InvokeEvent(&single_file_event);
-      SetSingleFileMode(single_file_event.GetBool());
+      SetSingleFileMode(single_file_event.GetBool());*/
+      bool single_file_mode;
+      single_file_mode = GetNumberOfItems() > 1;
+      SetSingleFileMode(single_file_mode);
     }
 
     // store data
