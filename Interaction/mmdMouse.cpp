@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:46:15 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-12-18 14:07:46 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,6 +38,7 @@
 //------------------------------------------------------------------------------
 MAF_ID_IMP(mmdMouse::MOUSE_2D_MOVE)
 MAF_ID_IMP(mmdMouse::MOUSE_CHAR_EVENT)
+MAF_ID_IMP(mmdMouse::MOUSE_DCLICK)
 
 //------------------------------------------------------------------------------
 mafCxxTypeMacro(mmdMouse)
@@ -84,7 +85,7 @@ void mmdMouse::OnEvent(mafEventBase *event)
     }
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
   }
-  else if (id == BUTTON_DOWN)
+  else if (id == BUTTON_DOWN || id == MOUSE_DCLICK)
   {
     // store the Selected RWI is needed for compounded view
     m_ButtonPressed = true;
@@ -99,7 +100,7 @@ void mmdMouse::OnEvent(mafEventBase *event)
       DisplayToNormalizedDisplay(disp);
       mafEventInteraction remoteEv;
       remoteEv.SetSender(this);
-      remoteEv.SetId(BUTTON_DOWN);
+      remoteEv.SetId(id);
       remoteEv.SetButton(e->GetButton());
       remoteEv.Set2DPosition(disp);
       remoteEv.SetModifiers(e->GetModifiers());

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdMouse.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:45:16 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2007-12-18 14:07:46 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,6 +43,9 @@ public:
   /** @ingroup Events
       Issued when a keyboard char is pressed */
   MAF_ID_DEC(MOUSE_CHAR_EVENT)
+  /** @ingroup Events
+      Issued on double click mouse button */
+  MAF_ID_DEC(MOUSE_DCLICK)
     
   /** Reimplemented to manage fusion of move events. */
   virtual void OnEvent(mafEventBase *event);
