@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2007-12-18 14:11:54 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -276,18 +276,18 @@ void mafInteractor::OnEvent(mafEventBase *event)
   if (ch==MCH_INPUT)
   {
     // Start the interaction if not disabled
-    if (id==m_StartInteractionEvent && !m_IgnoreTriggerEvents)
+    if ((id == m_StartInteractionEvent || id == mmdMouse::MOUSE_DCLICK) && !m_IgnoreTriggerEvents)
     {
-      mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
+      mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       assert(e);
 
       // check if the right button has been pressed
-      if ((e->GetButton()==m_StartButton || (m_StartButton<0)) && ((e->GetModifiers()&m_Modifiers) == m_Modifiers ))
+      if ((e->GetButton() == m_StartButton || (m_StartButton<0)) && ((e->GetModifiers()&m_Modifiers) == m_Modifiers ))
       {
         // the start button has been already pressed once
         if (IsInteracting((mafDevice *)e->GetSender()))
         {
-          if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
+          if (m_ButtonMode == MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
           {
             OnStartInteraction(e);
           }
@@ -302,7 +302,7 @@ void mafInteractor::OnEvent(mafEventBase *event)
             InvokeEvent(INTERACTION_STARTED);
         }
       }
-      else if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
+      else if (m_ButtonMode == MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
       {
         // in case of MULTI BUTTON and the start button has already started 
         // the interaction we call anyway the OnStartInteraction function
@@ -313,18 +313,18 @@ void mafInteractor::OnEvent(mafEventBase *event)
     // Stop the interaction if not disabled
     else if (id==m_StopInteractionEvent && !m_IgnoreTriggerEvents)
     {
-      mafEventInteraction *e=mafEventInteraction::SafeDownCast(event);
+      mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       assert(e);
 
       // check if the right button has been released
-      if (e->GetButton()==m_StartButton || (m_StartButton<0))
+      if (e->GetButton() == m_StartButton || (m_StartButton<0))
       {
         if (OnStopInteraction(e))
           if (!IsInteracting()) 
             InvokeEvent(INTERACTION_STOPPED);
 
       }
-      else if (m_ButtonMode==MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
+      else if (m_ButtonMode == MULTI_BUTTON_MODE && m_ButtonsCounter > 0)
       {
         // in case of MULTI BUTTON and the start button has already started 
         // the interaction we call anyway the OnStopInteraction function
