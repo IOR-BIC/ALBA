@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 10:55:17 $
-  Version:   $Revision: 1.125 $
+  Date:      $Date: 2007-12-18 14:14:01 $
+  Version:   $Revision: 1.126 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -608,6 +608,9 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case VME_SELECTED: 
         VmeSelected(e->GetVme());
       break;
+      case VME_DCLICKED:
+        VmeDoubleClicked(*e);
+      break;
       case VME_SHOW:
         VmeShow(e->GetVme(), e->GetBool());
       break;
@@ -1176,6 +1179,16 @@ void mafLogicWithManagers::OnQuit()
   cppDEL(m_SideBar);
 
   mafLogicWithGUI::OnQuit();
+}
+//----------------------------------------------------------------------------
+void mafLogicWithManagers::VmeDoubleClicked(mafEvent &e)
+//----------------------------------------------------------------------------
+{
+  mafNode *node = e.GetVme();
+  if (node)
+  {
+    mafLogMessage("Double click on %s", node->GetName());
+  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeSelect(mafEvent& e)	//modified by Paolo 10-9-2003

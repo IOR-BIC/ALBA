@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 10:55:18 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2007-12-18 14:14:01 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -193,9 +193,11 @@ protected:
   virtual void ImportExternalFile(mafString &filename);
 
   /** Respond to a VME_SELECT evt. Instantiate the 'Select' operation. */
-	virtual void VmeSelect(mafEvent& e);
+	virtual void VmeSelect(mafEvent &e);
 	/** Respond to a VME_SELECTED evt. Update the selection on the tree and view representation. */
 	virtual void VmeSelected(mafNode *vme);
+  /** Respond to a VME_DCLICKED evt. Manage the 'Double click' on Selected VME. */
+  virtual void VmeDoubleClicked(mafEvent &e);
 	/** Respond to a VME_SHOW evt. Show/Hide the vme. */
 	virtual void VmeShow(mafNode *vme, bool visibility);
   /** Respond to a VME_Modified evt.*/
