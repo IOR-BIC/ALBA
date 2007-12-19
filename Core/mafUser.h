@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.h,v $
 Language:  C++
-Date:      $Date: 2007-12-17 11:45:58 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-19 12:07:19 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ public:
   virtual ~mafUser();
 
   /** Allows to show login dialog and get credentials from the application's user.*/
-  void ShowLoginDialog();
+  int ShowLoginDialog();
 
   /** Function to be customized at application level.
   By default open Login Dialog if the user did not inserted any information.*/

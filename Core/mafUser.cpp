@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-17 11:45:58 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2007-12-19 12:07:19 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ mafUser::~mafUser()
 {
 }
 //----------------------------------------------------------------------------
-void mafUser::ShowLoginDialog()
+int mafUser::ShowLoginDialog()
 //----------------------------------------------------------------------------
 {
   if (!m_Initialized)
@@ -55,11 +55,12 @@ void mafUser::ShowLoginDialog()
   mafGUIDialogLogin login_dialog(_("User authentication"));
   login_dialog.SetUserCredentials(m_Username, m_Password, m_RememberCredentials);
   int result = login_dialog.ShowModal();
-  if(result != wxID_OK) return;
+  if(result != wxID_OK) return wxID_OK;
   m_Username = login_dialog.GetUser();
   m_Password = login_dialog.GetPwd();
   m_RememberCredentials = login_dialog.GetRememberUserCredentials();
   UpdateUserCredentialsFile();
+  return wxID_CANCEL;
 }
 //----------------------------------------------------------------------------
 bool mafUser::CheckUserCredentials()
@@ -69,13 +70,14 @@ bool mafUser::CheckUserCredentials()
   {
     InitializeUserInformations();
   }
+  bool res;
   if (m_Username.IsEmpty() && m_Password.IsEmpty())
   {
-    ShowLoginDialog();
+    res = ShowLoginDialog() != wxID_CANCEL;
   }
   // Check only username and not password.
   // This can be valid for anonymous (or guest) user without password
-  bool res = !m_Username.IsEmpty();
+  res = !m_Username.IsEmpty() && res;
   return res;
 }
 //----------------------------------------------------------------------------
