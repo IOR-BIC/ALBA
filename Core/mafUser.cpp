@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-19 12:07:19 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2007-12-19 13:44:54 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -55,12 +55,12 @@ int mafUser::ShowLoginDialog()
   mafGUIDialogLogin login_dialog(_("User authentication"));
   login_dialog.SetUserCredentials(m_Username, m_Password, m_RememberCredentials);
   int result = login_dialog.ShowModal();
-  if(result != wxID_OK) return wxID_OK;
+  if(result != wxID_OK) return wxID_CANCEL;
   m_Username = login_dialog.GetUser();
   m_Password = login_dialog.GetPwd();
   m_RememberCredentials = login_dialog.GetRememberUserCredentials();
   UpdateUserCredentialsFile();
-  return wxID_CANCEL;
+  return wxID_OK;
 }
 //----------------------------------------------------------------------------
 bool mafUser::CheckUserCredentials()
