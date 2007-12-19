@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-13 15:47:38 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2007-12-19 13:42:07 $
+Version:   $Revision: 1.14 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,6 +25,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafDecl.h"
 #include "mafSceneNode.h"
 #include "mmgGui.h"
+#include "mmgMaterialButton.h"
 #include "mmaMaterial.h"
 
 #include "mafVME.h"
@@ -356,6 +357,9 @@ mmgGui *mafPipePolyline::CreateGui()
 	m_Gui->Enable(ID_SPHERE_RADIUS, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
 	m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
 	m_Gui->Divider();
+  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_Gui->AddGui(m_MaterialButton->GetGui());
+  m_Gui->Divider();
 
 	return m_Gui;
 }

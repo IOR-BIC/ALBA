@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2007-12-13 15:47:38 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2007-12-19 13:42:07 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,6 +29,7 @@ class vtkAppendPolyData;
 class vtkColorTransferFunction;
 class vtkPolyData;
 class mmaMaterial;
+class mmgMaterialButton;
 
 //----------------------------------------------------------------------------
 // mafPipePolyline :
@@ -130,7 +131,7 @@ protected:
 	vtkProperty            *m_OutlineProperty;
 	vtkActor               *m_OutlineActor;
 
-  vtkAppendPolyData            *m_BorderData;
+  vtkAppendPolyData      *m_BorderData;
   
   vtkPolyDataMapper      *m_BorderMapper;
   vtkProperty            *m_BorderProperty;
@@ -139,6 +140,7 @@ protected:
 	vtkColorTransferFunction *m_Table;
   mmaMaterial              *m_PolylineMaterial;
 	vtkPolyData              *m_PolySpline;
+  mmgMaterialButton        *m_MaterialButton;
 
 	wxString *m_ScalarsName;
 
