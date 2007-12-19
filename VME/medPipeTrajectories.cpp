@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 11:17:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-12-19 10:54:14 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,7 +73,7 @@ void medPipeTrajectories::Create(mafSceneNode *n)
 
   m_Selected = false;
   m_Landmark  = mafVMELandmark::SafeDownCast(m_Vme);
-  m_Landmark->GetTimeStamps(m_TimeVector);
+  m_Landmark->GetLocalTimeStamps(m_TimeVector);
   m_MatrixVector = m_Landmark->GetMatrixVector();
 
   m_Vme->GetEventSource()->AddObserver(this);
@@ -187,7 +187,7 @@ void medPipeTrajectories::OnEvent(mafEventBase *maf_event)
     UpdateProperty();
   }
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+ // mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medPipeTrajectories::UpdateProperty(bool fromTag)
@@ -209,8 +209,7 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
   if (m_MatrixVector)
   {
     for (int i = 0; i< m_TimeVector.size(); i++)
-    {
-      
+    { 
       if (m_TimeVector[i] > t0)
       {
         break;
@@ -226,6 +225,7 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
     int maxValue = (i + m_Interval) >= m_TimeVector.size() ? m_TimeVector.size() - 1 : (i + m_Interval);
     //Landmark center position
     mafMatrix *m = m_MatrixVector->GetKeyMatrix(i);
+ 
     mafTransform::GetPosition(*m,xyz);
     m_Sphere->SetCenter(xyz[0], xyz[1], xyz[2]);
     sphere_visibility = m_Landmark->GetLandmarkVisibility(m_TimeVector[i]);
