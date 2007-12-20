@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:22:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2007-12-20 14:00:15 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,7 +81,9 @@ mmaVolumeMaterial *mafVMEVolume::GetMaterial()
   if (material == NULL)
   {
     material = mmaVolumeMaterial::New();
-    if(GetOutput() && GetOutput()->GetVTKData())
+
+    // Paolo Q.: commented lines below to avoid loading data during the msf loading on startup
+    /*if(GetOutput() && GetOutput()->GetVTKData())
     {
       GetOutput()->GetVTKData()->Update();
       double sr[2];
@@ -89,7 +91,7 @@ mmaVolumeMaterial *mafVMEVolume::GetMaterial()
       material->m_ColorLut->SetTableRange(sr);
       material->m_ColorLut->SetRange(sr);
       material->UpdateFromTables();
-    }
+    }*/
     
     SetAttribute("VolumeMaterialAttributes", material);
     if (m_Output)
@@ -110,7 +112,7 @@ int mafVMEVolume::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
     return Superclass::SetData(data,t,mode);
   }
   
-  mafErrorMacro("Trying to set the wrong type of fata inside a "<<GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
+  mafErrorMacro("Trying to set the wrong type of data inside a "<<GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
 }
 
