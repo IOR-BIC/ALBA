@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-31 08:34:11 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2007-12-21 15:37:53 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -177,15 +177,18 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
       p->SetPoint(0,pos_picked);
       double scalar_value = 0;
       mafVME *pickedVME = v->GetPickedVme();
-      vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
-      int pid = vtk_data->FindPoint(pos_picked);
-      vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
-      if (scalars)
-        scalars->GetTuple(pid,&scalar_value);
-      mafEvent pick_event(this,msg_id,p);
-      pick_event.SetDouble(scalar_value);
-      mafEventMacro(pick_event);
-      p->Delete();
+      if(pickedVME)
+      {
+        vtkDataSet *vtk_data = pickedVME->GetOutput()->GetVTKData();
+        int pid = vtk_data->FindPoint(pos_picked);
+        vtkDataArray *scalars = vtk_data->GetPointData()->GetScalars();
+        if (scalars)
+          scalars->GetTuple(pid,&scalar_value);
+        mafEvent pick_event(this,msg_id,p);
+        pick_event.SetDouble(scalar_value);
+        mafEventMacro(pick_event);
+        p->Delete();
+      }
     }
   }
   vtkDEL(cellPicker);
