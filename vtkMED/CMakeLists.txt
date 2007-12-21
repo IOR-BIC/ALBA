@@ -24,6 +24,8 @@ SET(vtkMED_SRCS
   vtkMaskPolyDataFilter.h
   vtkHoleConnectivity.cxx
   vtkHoleConnectivity.h
+  vtkMEDPolyDataMirror.cxx
+  vtkMEDPolyDataMirror.h
 )
 
 IF (MAF_USE_ITK)
