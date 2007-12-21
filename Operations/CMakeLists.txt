@@ -86,6 +86,9 @@ SET(PROJECT_SRCS
   medOpTriangulateSurface.cpp
   medOpTriangulateSurface.h
 
+  medOpSurfaceMirror.cpp
+  medOpSurfaceMirror.h
+
 )
 
 IF (MAF_USE_ITK)
