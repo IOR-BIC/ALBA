@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewEmgGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-27 13:04:30 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-12-27 17:22:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,9 +81,8 @@ medViewEmgGraph::~medViewEmgGraph()
   if(m_Rwi && m_OldColour)
     m_Rwi->m_RenFront->SetBackground(m_OldColour);
 
+
   vtkDEL(m_PlotActor);
-  cppDEL(m_Sg);
-  cppDEL(m_Rwi); 
 }
 //----------------------------------------------------------------------------
 mafView *medViewEmgGraph::Copy(mafObserver *Listener)
@@ -117,6 +116,7 @@ void medViewEmgGraph::Create()
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.005);
   m_Picker2D->InitializePickList();
+  vtkNEW(m_PlotActor);
 }
 
 //----------------------------------------------------------------------------
@@ -143,7 +143,6 @@ void medViewEmgGraph::VmeCreatePipe(mafNode *vme)
     n->m_Pipe = (mafPipe*)pipe;
   }
 
-  vtkNEW(m_PlotActor);
   m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
   m_PlotActor->GetProperty()->SetLineWidth(1.4);
   m_PlotActor->SetLabelFormat("%g");
@@ -247,53 +246,54 @@ void medViewEmgGraph::VmeShow(mafNode *node, bool show)
   {
     Superclass::VmeShow(node, show);
     CameraUpdate();
-
-    mafString pipeName;
-    int counter = 0;
-    mafNodeIterator *iter = node->GetParent()->NewIterator();
-    m_Rwi->m_RenFront->AddActor2D(m_PlotActor);
-
-    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    if (show)
     {
-      mafSceneNode *n = m_Sg->Vme2Node(node);
-      if (node->IsA("mafVMEScalar") && n && n->m_Pipe)
+      mafString pipeName;
+      int counter = 0;
+      mafNodeIterator *iter = node->GetParent()->NewIterator();
+      m_Rwi->m_RenFront->AddActor2D(m_PlotActor);
+
+      for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
       {
-        legendVec.push_back(node->GetName());
+        mafSceneNode *n = m_Sg->Vme2Node(node);
+        if (node->IsA("mafVMEScalar") && n && n->m_Pipe)
+        {
+          legendVec.push_back(node->GetName());
 
-        int randomColorR, randomColorG, randomColorB;
-        randomColorR = rand() % 255;
-        randomColorG = rand() % 255;
-        randomColorB = rand() % 255;
-        m_PlotActor->SetPlotColor(counter ,randomColorR,randomColorG,randomColorB); 
-        counter++;
+          int randomColorR, randomColorG, randomColorB;
+          randomColorR = rand() % 255;
+          randomColorG = rand() % 255;
+          randomColorB = rand() % 255;
+          m_PlotActor->SetPlotColor(counter ,randomColorR,randomColorG,randomColorB); 
+          counter++;
 
-        medPipeGraph *pipe_graph = (medPipeGraph *)n->m_Pipe;
-        vtkRectilinearGrid *rectGrid = pipe_graph->GetData(node);
+          vtkMAFSmartPointer<vtkRectilinearGrid> rectGrid = ((medPipeGraph *)n->m_Pipe)->GetData(node);
 
-        double timesRange[2];
-        rectGrid->GetXCoordinates()->GetRange(timesRange);
+          double timesRange[2];
+          rectGrid->GetXCoordinates()->GetRange(timesRange);
 
-        double dataRange[2];
-        m_PlotActor->AddInput(rectGrid);
-        rectGrid->GetPointData()->GetScalars()->GetRange(dataRange);
+          double dataRange[2];
+          m_PlotActor->AddInput(rectGrid);
+          rectGrid->GetPointData()->GetScalars()->GetRange(dataRange);
 
-        if(m_Ymin > dataRange[0])
-          m_Ymin = dataRange[0];
+          if(m_Ymin > dataRange[0])
+            m_Ymin = dataRange[0];
 
-        if(m_Ymax < dataRange[1])
-          m_Ymax = dataRange[1];
+          if(m_Ymax < dataRange[1])
+            m_Ymax = dataRange[1];
 
-        if(m_Xmin > timesRange[0])
-          m_Xmin = timesRange[0];
+          if(m_Xmin > timesRange[0])
+            m_Xmin = timesRange[0];
 
-        if(m_Xmax < timesRange[1])
-          m_Xmax = timesRange[1];
+          if(m_Xmax < timesRange[1])
+            m_Xmax = timesRange[1];
 
-        m_PlotActor->SetPlotRange(m_Xmin, m_Ymin, m_Xmax, m_Ymax);
+          m_PlotActor->SetPlotRange(m_Xmin, m_Ymin, m_Xmax, m_Ymax);
+        }
       }
+      iter->Delete();
     }
-    iter->Delete();
-
+    
     m_Xmin = 0;
     m_Ymin = 0;
     m_Xmax = 0;
