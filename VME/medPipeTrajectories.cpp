@@ -2,14 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-19 10:54:14 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2007-12-27 08:58:09 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -63,7 +62,7 @@ medPipeTrajectories::medPipeTrajectories()
   m_OutlineMapper   = NULL;
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
-  m_Interval = 50;
+  m_Interval = 0;
 }
 //----------------------------------------------------------------------------
 void medPipeTrajectories::Create(mafSceneNode *n)
@@ -160,7 +159,7 @@ mmgGui *medPipeTrajectories::CreateGui()
 {
   
   m_Gui = new mmgGui(this);
-  m_Gui->Integer(ID_INTERVAL,"Interval:",&m_Interval,0,(m_TimeVector.size()/2),"Interval of frames to visualize");
+  m_Gui->Integer(ID_INTERVAL,"Interval:",&m_Interval,0,(m_TimeVector.size()),"Interval of frames to visualize");
  
   m_Gui->Divider();
 
@@ -186,8 +185,6 @@ void medPipeTrajectories::OnEvent(mafEventBase *maf_event)
   {
     UpdateProperty();
   }
-
- // mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medPipeTrajectories::UpdateProperty(bool fromTag)
