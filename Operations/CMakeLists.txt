@@ -8,6 +8,8 @@ PROJECT(medOperations)
 SET(PROJECT_SRCS
   medOpCreateLabeledVolume.cpp
   medOpCreateLabeledVolume.h
+  medOpImporterEmgWS.cpp
+  medOpImporterEmgWS.h
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
   mmoCTAImporter.cpp
@@ -102,8 +104,6 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoClassicICPRegistration.h
   mmoC3DImporter.cpp
   mmoC3DImporter.h
-  mmoEMGImporterWS.cpp
-  mmoEMGImporterWS.h
   mmoGRFImporterWS.cpp
   mmoGRFImporterWS.h
 )
