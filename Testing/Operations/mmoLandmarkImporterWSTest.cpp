@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkImporterWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-14 08:44:13 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2007-12-28 08:37:39 $
+Version:   $Revision: 1.4 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -43,7 +43,6 @@ void mmoLandmarkImporterWSTest::TestWSImporter()
 	mafString filename=MED_DATA_ROOT;
   filename<<"/AL_FileTXT/pbCV1b05al.csv";
 	importer->SetFileName(filename.GetCStr());
-  importer->SetSkipColumn(0);
 	importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
   
@@ -59,7 +58,6 @@ void mmoLandmarkImporterWSTest::TestVisibility()
   mafString filename=MED_DATA_ROOT;
   filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
-  importer->SetSkipColumn(0);
   importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
@@ -78,7 +76,6 @@ void mmoLandmarkImporterWSTest::TestCoordinates()
   mafString filename=MED_DATA_ROOT;
   filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
-  importer->SetSkipColumn(0);
   importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
