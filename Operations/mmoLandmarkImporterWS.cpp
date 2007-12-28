@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-05 16:42:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2007-12-28 08:09:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,8 +24,6 @@
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
 
-
-
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgGui.h"
@@ -36,17 +34,6 @@
 #include "mafSmartPointer.h"
 
 #include <iostream>
-#include <fstream>
-using namespace std;
-
-//----------------------------------------------------------------------------
-// Constants :
-//----------------------------------------------------------------------------
-enum ID_LANDMARK_IMPORTER
-{
-  ID_TYPE_FILE = MINID,
-};
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mmoLandmarkImporterWS::mmoLandmarkImporterWS(wxString label) :
@@ -57,9 +44,7 @@ mafOp(label)
 	m_Canundo	= true;
 	m_File		= "";
 	m_FileDir = (mafGetApplicationDirectory() + "/Data/External/").c_str();
-	
 	m_VmeCloud		= NULL;
-  m_Start = 0;
 }
 //----------------------------------------------------------------------------
 mmoLandmarkImporterWS::~mmoLandmarkImporterWS()
@@ -96,49 +81,12 @@ void mmoLandmarkImporterWS::OpRun()
 	if(!f.IsEmpty() && wxFileExists(f))
 	 {
 	   m_File = f;
+     Read();
+     result = OP_RUN_OK;
+	 }
+  mafEventMacro(mafEvent(this,result));
+}
 
-    if (!m_TestMode)
-    {
-      m_Gui = new mmgGui(this);
-      m_Gui->Integer(ID_TYPE_FILE,"Skip Col",&m_Start,0,MAXINT,"Number of column to skip");
-      m_Gui->OkCancel();
-      m_Gui->Update();
-      ShowGui();
-     }
-	}
-  else
-  {
-    mafEventMacro(mafEvent(this,result));
-  }
-}
-//----------------------------------------------------------------------------
-void mmoLandmarkImporterWS::	OnEvent(mafEventBase *maf_event) 
-//----------------------------------------------------------------------------
-{
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId())
-    {
-      case wxOK:
-        Read();
-        OpStop(OP_RUN_OK);
-      break;
-      case wxCANCEL:
-        OpStop(OP_RUN_CANCEL);
-      break;
-      case ID_TYPE_FILE:
-      break;
-      default:
-        mafEventMacro(*e);
-    }
-  }
-}
-//----------------------------------------------------------------------------
-void mmoLandmarkImporterWS::SetSkipColumn(int column)
-//----------------------------------------------------------------------------
-{
-  m_Start = column;
-}
 //----------------------------------------------------------------------------
 void mmoLandmarkImporterWS::Read()   
 //----------------------------------------------------------------------------
@@ -160,48 +108,79 @@ void mmoLandmarkImporterWS::Read()
   m_VmeCloud->Open();
   m_VmeCloud->SetRadius(10);
 
-  wxString skipc;
+  wxString skipc, line;
   mafString time, first_time, x, y, z;
   double xval, yval, zval, tval;
+  std::vector<mafString> stringVec;
   
   std::vector<int> lm_idx;
 
   wxFileInputStream inputFile( m_File );
   wxTextInputStream text( inputFile );
 
-  wxString line;
+  //check if file starts with the string "ANALOG"
   line = text.ReadLine(); //Ignore 4 lines of textual information
+  if (line.CompareTo("TRAJECTORIES")!= 0)
+  {
+    mafErrorMessage("Invalid file format!");
+    return;
+  }
+
   line = text.ReadLine();
+
+  //Read frequency 
   int comma = line.Find(',');
   wxString freq = line.SubString(0,comma - 1);
   double freq_val;
   freq_val = atof(freq.c_str());
+
+  //Put the signals names in a vector of string
+  line = text.ReadLine();
+  wxStringTokenizer tkzName(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+  
+  tkzName.GetNextToken(); //To skip ","
+  while (tkzName.HasMoreTokens())
+  {
+    stringVec.push_back(tkzName.GetNextToken()); 
+    tkzName.GetNextToken(); //To skip ","
+    tkzName.GetNextToken(); //To skip ","
+  }
   
   line = text.ReadLine();
   line = text.ReadLine();
-  line = text.ReadLine();
-  //line.Replace(" ","\t");
 
   wxStringTokenizer tkz_numAL(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
-  int numland = (tkz_numAL.CountTokens()-1- m_Start)/3;
+  int numland = (tkz_numAL.CountTokens()-1)/3;
+
   mafString lm_name;
+  int index;
+  std::vector<int> indexSPlitOriginal;
+  std::vector<int> indexSplitCopy;
+
   for (int i=0;i<numland;i++)
   {
-    lm_name = "lm_" + mafString(i);
-    lm_idx.push_back(m_VmeCloud->AppendLandmark(lm_name));
+    lm_name = stringVec.at(i);
+    index = m_VmeCloud->FindLandmarkIndex(lm_name);
+    if (index == -1)
+    {
+      lm_idx.push_back(m_VmeCloud->AppendLandmark(lm_name));
+    }
+    else
+    {
+      //To store index of LA split
+     indexSPlitOriginal.push_back(index);
+     indexSplitCopy.push_back(i);
+    }
   }
-
-  for (int c=0;c<m_Start;c++)
-  {
-    skipc=tkz_numAL.GetNextToken();
-  }
-
+  
   do 
   {
     wxStringTokenizer tkz(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
     time = tkz.GetNextToken().c_str();
-
     long counter = 0;
+    int counterAL = 0;
+    int indexCounter = 0;
+    tval = atof(time)/freq_val;
 
     while (tkz.HasMoreTokens())
     {
@@ -211,30 +190,55 @@ void mmoLandmarkImporterWS::Read()
       xval = atof(x);
       yval = atof(y);
       zval = atof(z);
-      tval = atof(time)/freq_val;
 
-      if(x.IsEmpty() && y.IsEmpty() && z.IsEmpty() )
+
+      if (!indexSplitCopy.empty()) //true if AL is split in columns
       {
-        m_VmeCloud->SetLandmark(lm_idx[counter],0,0,0,tval);
-        m_VmeCloud->SetLandmarkVisibility(lm_idx[counter], 0,tval);
+        if ( counter == indexSplitCopy[indexCounter]) //If TRUE this AL already exists
+        {
+          if(!x.IsEmpty() && !y.IsEmpty() && !z.IsEmpty() )
+          {
+            //Insert the values in the AL with the same name (idx)
+            m_VmeCloud->SetLandmark(lm_idx[indexSPlitOriginal[indexCounter]],xval,yval,zval,tval);
+          }
+          indexCounter++;
+          counter++;
+        }
+        else
+        {
+          if(x.IsEmpty() && y.IsEmpty() && z.IsEmpty() )
+          {
+            m_VmeCloud->SetLandmark(lm_idx[counterAL],0,0,0,tval);
+            m_VmeCloud->SetLandmarkVisibility(lm_idx[counterAL], 0,tval);
+          }
+          else
+          {
+            m_VmeCloud->SetLandmark(lm_idx[counterAL],xval,yval,zval,tval);
+          }
+          counter++;
+          counterAL++;
+        }
       }
-      else
+      else //AL is not spit in columns
       {
-        m_VmeCloud->SetLandmark(lm_idx[counter],xval,yval,zval,tval);
+        if(x.IsEmpty() && y.IsEmpty() && z.IsEmpty() )
+        {
+          m_VmeCloud->SetLandmark(lm_idx[counterAL],0,0,0,tval);
+          m_VmeCloud->SetLandmarkVisibility(lm_idx[counterAL], 0,tval);
+        }
+        else
+        {
+          m_VmeCloud->SetLandmark(lm_idx[counterAL],xval,yval,zval,tval);
+        }
+        counter++;
+        counterAL++;
       }
-      counter++;
+ 
     }
     line = text.ReadLine();
-    
-
-    for (int c=0;c<m_Start;c++)
-    {
-      skipc=tkz.GetNextToken();
-    }
 
   } while (!inputFile.Eof());
 
   m_VmeCloud->Modified();
-
   m_Output = m_VmeCloud;
 }
