@@ -20,6 +20,9 @@ ADD_EXECUTABLE(vtkTriangleQualityRatioTest vtkTriangleQualityRatioTest.h vtkTria
 ADD_TEST(vtkTriangleQualityRatioTest ${EXECUTABLE_OUTPUT_PATH}/vtkTriangleQualityRatioTest)
 ADD_EXECUTABLE(vtkMaskPolyDataFilterTest vtkMaskPolyDataFilterTest.h vtkMaskPolyDataFilterTest.cpp)
 ADD_TEST(vtkMaskPolyDataFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMaskPolyDataFilterTest)
+ADD_EXECUTABLE(vtkMEDPolyDataMirrorTest vtkMEDPolyDataMirrorTest.h vtkMEDPolyDataMirrorTest.cpp)
+ADD_TEST(vtkMEDPolyDataMirrorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDPolyDataMirrorTest)
+
 
 
 # wxWidgets specific classes
