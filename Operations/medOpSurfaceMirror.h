@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSurfaceMirror.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-21 12:01:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-12-28 12:55:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani - porting  Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,10 +33,12 @@ class vtkMEDPolyDataMirror;
 class medOpSurfaceMirror: public mafOp
 {
 public:
-	medOpSurfaceMirror(wxString label);
+	medOpSurfaceMirror(wxString label = "Surface Mirror");
 	~medOpSurfaceMirror(); 
 	virtual void OnEvent(mafEventBase *maf_event);
 	mafOp* Copy();
+
+	mafTypeMacro(medOpSurfaceMirror, mafOp);
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* node);   
@@ -58,7 +60,7 @@ protected:
 	/** Makes the Preview for the mirror. */
 	void Preview();  
 
-    vtkMEDPolyDataMirror *m_MirrorFilter;
+  vtkMEDPolyDataMirror *m_MirrorFilter;
 
 	vtkPolyData	*m_OutputPolydata;
 	vtkPolyData	*m_InputPolydata;

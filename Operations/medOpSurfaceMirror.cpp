@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSurfaceMirror.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-21 12:01:37 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2007-12-28 12:55:08 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani - porting  Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,10 @@
 #include "vtkMEDPolyDataMirror.h"
 
 //----------------------------------------------------------------------------
+mafCxxTypeMacro(medOpSurfaceMirror);
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
 medOpSurfaceMirror::medOpSurfaceMirror(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
@@ -57,6 +61,7 @@ medOpSurfaceMirror::~medOpSurfaceMirror( )
 {
 	vtkDEL(m_InputPolydata);
 	vtkDEL(m_OutputPolydata);
+	vtkDEL(m_MirrorFilter);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpSurfaceMirror::Copy()   
@@ -72,7 +77,6 @@ mafOp* medOpSurfaceMirror::Copy()
 //----------------------------------------------------------------------------
 bool medOpSurfaceMirror::Accept(mafNode* node)   
 //----------------------------------------------------------------------------
-
 { return  ( 
 		      node
 					
@@ -95,6 +99,7 @@ bool medOpSurfaceMirror::Accept(mafNode* node)
 };   
 //----------------------------------------------------------------------------
 enum SURFACE_MIRROR_ID
+//----------------------------------------------------------------------------
 {
 	ID_MIRRORX = MINID,
 	ID_MIRRORY,
@@ -113,21 +118,23 @@ void medOpSurfaceMirror::OpRun()
 	m_OutputPolydata->DeepCopy((vtkPolyData*)((mafVMESurface *)m_Input)->GetOutput()->GetVTKData());
 	
 
-	// interface:
-	m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this);
-	m_Gui->Label("this doesn't work on animated vme");
-	m_Gui->Label("");
-	
-	m_Gui->Bool(ID_MIRRORX,"mirror x coords", &m_MirrorX, 1);
-	m_Gui->Bool(ID_MIRRORY,"mirror y coords", &m_MirrorY, 1);
-	m_Gui->Bool(ID_MIRRORZ,"mirror z coords", &m_MirrorZ, 1);
-	//m_Gui->Bool(ID_FLIPNORMALS,"flip normals",&m_flip_normals,1);
-	m_Gui->Label("");
-	m_Gui->OkCancel();
+	if(!m_TestMode)
+	{
+		// interface:
+		m_Gui = new mmgGui(this);
+		m_Gui->SetListener(this);
+		m_Gui->Label("this doesn't work on animated vme");
+		m_Gui->Label("");
+		
+		m_Gui->Bool(ID_MIRRORX,"mirror x coords", &m_MirrorX, 1);
+		m_Gui->Bool(ID_MIRRORY,"mirror y coords", &m_MirrorY, 1);
+		m_Gui->Bool(ID_MIRRORZ,"mirror z coords", &m_MirrorZ, 1);
+		//m_Gui->Bool(ID_FLIPNORMALS,"flip normals",&m_flip_normals,1);
+		m_Gui->Label("");
+		m_Gui->OkCancel();
 
-	ShowGui();
-
+		ShowGui();
+	}
 
   m_MirrorFilter = vtkMEDPolyDataMirror::New();
   //mafProgressMacro(mirrorFilter,"mirroring surface");
@@ -143,6 +150,7 @@ void medOpSurfaceMirror::OpRun()
 
   ((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,((mafVME *)m_Input)->GetTimeStamp());
 
+
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
@@ -150,7 +158,6 @@ void medOpSurfaceMirror::OpDo()
 //----------------------------------------------------------------------------
 {
   assert(m_OutputPolydata);
-
 
 	((mafVMESurface *)m_Input)->SetData(m_OutputPolydata,((mafVME *)m_Input)->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -160,7 +167,6 @@ void medOpSurfaceMirror::OpUndo()
 //----------------------------------------------------------------------------
 {
   assert(m_InputPolydata);
-
 
 	((mafVMESurface *)m_Input)->SetData(m_InputPolydata,((mafVME *)m_Input)->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -197,9 +203,11 @@ void medOpSurfaceMirror::OpStop(int result)
 {
   if(result == OP_RUN_CANCEL) OpUndo();
 
-  vtkDEL(m_MirrorFilter);
-	HideGui();
-	delete m_Gui;
+	if(!m_TestMode)
+	{
+	  HideGui();
+	  delete m_Gui;
+	}
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
