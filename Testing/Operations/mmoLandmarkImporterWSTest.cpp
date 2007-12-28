@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoLandmarkImporterWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-28 08:37:39 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2007-12-28 08:47:19 $
+Version:   $Revision: 1.5 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -46,7 +46,7 @@ void mmoLandmarkImporterWSTest::TestWSImporter()
 	importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
   
-  CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 32);
+  CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 24);
   cppDEL(importer);
 }
 //-----------------------------------------------------------
