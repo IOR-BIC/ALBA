@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSurfaceMirror.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-28 12:55:08 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-01-04 09:46:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani - porting  Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -129,7 +129,7 @@ void medOpSurfaceMirror::OpRun()
 		m_Gui->Bool(ID_MIRRORX,"mirror x coords", &m_MirrorX, 1);
 		m_Gui->Bool(ID_MIRRORY,"mirror y coords", &m_MirrorY, 1);
 		m_Gui->Bool(ID_MIRRORZ,"mirror z coords", &m_MirrorZ, 1);
-		//m_Gui->Bool(ID_FLIPNORMALS,"flip normals",&m_flip_normals,1);
+		//m_Gui->Bool(ID_FLIPNORMALS,"flip normals",&m_FlipNormals,1);
 		m_Gui->Label("");
 		m_Gui->OkCancel();
 
@@ -142,7 +142,7 @@ void medOpSurfaceMirror::OpRun()
   m_MirrorFilter->SetMirrorXCoordinate(m_MirrorX);
   m_MirrorFilter->SetMirrorYCoordinate(m_MirrorY);
   m_MirrorFilter->SetMirrorZCoordinate(m_MirrorZ);
-  //mirrorFilter->SetFlipNormals(m_FlipNormals);
+  //m_MirrorFilter->SetFlipNormals(m_FlipNormals);
   m_MirrorFilter->Update();
 	
   m_OutputPolydata->DeepCopy(m_MirrorFilter->GetOutput());
@@ -219,7 +219,7 @@ void medOpSurfaceMirror::Preview()
   m_MirrorFilter->SetMirrorXCoordinate(m_MirrorX);
   m_MirrorFilter->SetMirrorYCoordinate(m_MirrorY);
   m_MirrorFilter->SetMirrorZCoordinate(m_MirrorZ);
-  //mirrorFilter->SetFlipNormals(m_FlipNormals);
+  //m_MirrorFilter->SetFlipNormals(m_FlipNormals);
   m_MirrorFilter->Update();
   
 
