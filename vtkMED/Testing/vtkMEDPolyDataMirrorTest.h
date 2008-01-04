@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPolyDataMirrorTest.h,v $
 Language:  C++
-Date:      $Date: 2007-12-28 12:53:27 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-01-04 10:47:36 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -69,7 +69,7 @@ class vtkMEDPolyDataMirrorTest : public CPPUNIT_NS::TestFixture
   CPPUNIT_TEST( TestMirrorX );
   CPPUNIT_TEST( TestMirrorY );
   CPPUNIT_TEST( TestMirrorZ );
-  CPPUNIT_TEST( TestFlipNormals );
+  //CPPUNIT_TEST( TestFlipNormals );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
