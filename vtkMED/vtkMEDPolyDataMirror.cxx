@@ -18,7 +18,7 @@
 #include "vtkTriangleStrip.h"
 #include "vtkPolyDataNormals.h"
 
-vtkCxxRevisionMacro(vtkMEDPolyDataMirror, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataMirror, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkMEDPolyDataMirror);
 
 //----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ void vtkMEDPolyDataMirror::Execute()
   vtkCellData *cd=input->GetCellData(), *outCD=intermediate->GetCellData();
   outCD->PassData(cd);
 
-  vtkPolyDataNormals *pdn = vtkPolyDataNormals::New();
+  /*vtkPolyDataNormals *pdn = vtkPolyDataNormals::New();
   pdn->SetInput(intermediate);
   pdn->SplittingOff();
   pdn->ComputePointNormalsOn();   
@@ -98,17 +98,17 @@ void vtkMEDPolyDataMirror::Execute()
   pdn->Update();
 
 	if(pdn->GetOutput()->GetNumberOfPoints() == 0)
-	{
+	{*/
     output->DeepCopy(intermediate);
-	}
+	/*}
 	else
 	{
     output->DeepCopy(pdn->GetOutput());
-	}
+	}*/
   
   
   intermediate->Delete();
-  pdn->Delete();   
+  //pdn->Delete();   
 
   this->UpdateProgress (1);
 }
