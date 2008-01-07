@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-05 12:42:35 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-01-07 16:12:39 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,6 +85,12 @@ MAF_EXPORT void mafMessage(const char *format, ...);
   of MSDN library*/
 MAF_EXPORT bool mafEquals(double x, double y);
 MAF_EXPORT bool mafFloatEquals(float x, float y);
+
+/** retrieve the double value with the desired precision*/
+double mafRoundToPrecision(double val, unsigned prec);
+
+/** return true if it's little endian*/
+MAF_EXPORT bool mafIsLittleEndian(void);
 
 /** wait for given milliseconds */
 MAF_EXPORT void mafSleep(int msec);

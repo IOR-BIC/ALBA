@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 15:17:52 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-01-07 16:12:39 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -115,7 +115,13 @@ bool mafFloatEquals(float x, float y)
    float max_err=fabs(x / pow((double)10,(double)7));
    return  ( diff <= max_err);
 }
-
+//------------------------------------------------------------------------------
+double mafRoundToPrecision(double val, unsigned prec)
+//------------------------------------------------------------------------------
+{
+  double k = pow(10,prec);
+  return floor(val*k+0.5)/k; 
+} 
 //------------------------------------------------------------------------------
 void mafSleep(int msec)
 //------------------------------------------------------------------------------
@@ -127,3 +133,17 @@ void mafSleep(int msec)
   usleep(msec*1000);
 #endif
 }
+//------------------------------------------------------------------------------
+bool mafIsLittleEndian(void)
+//------------------------------------------------------------------------------
+{ 
+  /* 
+   * Variables definition 
+   */ 
+  short magic, test; 
+  char * ptr;    
+  magic = 0xABCD;                     /* endianess test number */ 
+  ptr = (char *) &magic;               
+  test = (ptr[1]<<8) + (ptr[0]&0xFF); /* build value byte by byte */ 
+  return (magic == test);             /* if the same is little endian */  
+} 
