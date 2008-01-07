@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-31 11:22:27 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-01-07 16:12:23 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -11,6 +11,7 @@
 =========================================================================*/
 
 #include "mafString.h"
+#include "mafMatrix.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -155,6 +156,21 @@ mafString &mafString::operator<<( double d )
   tmp.NPrintf(100,"%.16g",d);
   Append(tmp);
   return *this;
+}
+//----------------------------------------------------------------------------
+mafString &mafString::operator<<( mafMatrix mat )
+//----------------------------------------------------------------------------
+{
+	for(int i=0; i<4;i++)
+	{
+		for(int j=0; j<4;j++)
+		{
+			mafString tmp;
+			tmp.NPrintf(100,"%.16g ",mat.GetElement(i,j));
+			Append(tmp);
+		}
+	}
+	return *this;
 }
 /*
 //----------------------------------------------------------------------------

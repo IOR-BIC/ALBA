@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2006-04-10 16:07:22 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-01-07 16:12:24 $
+  Version:   $Revision: 1.17 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,6 +16,11 @@
 #include "mafDefines.h"
 #include "mafBase.h" 
 #include <string.h>
+
+//----------------------------------------------------------
+// forward references:
+//----------------------------------------------------------
+class mafMatrix;
 
 /** mafString - performs common string operations on c-strings.
   mafString is an implementation of string which operates on a traditional
@@ -227,6 +232,15 @@ public:
   mafString& operator<<( long       d);
   mafString& operator<<( float      d);
   mafString& operator<<( double     d);
+	/** Put inside string a mafMatrix in row order 
+	example:
+  1 0 0 0
+	0 1 0 0
+	0 0 1 0
+	0 0 0 1
+	-> "1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+	*/
+	mafString& operator<<( mafMatrix     d);
   mafString& operator<<( mafString  *s);
  //void operator<<( std::string     s);
 
