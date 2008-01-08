@@ -2,12 +2,12 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 15:14:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-01-08 15:19:14 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
-  Copyright (c) 2001/2007 
-  ULB - Universite Libre de Bruxelles (www.ulb.ac.be)
+Copyright (c) 2001/2005 
+CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 #include "mafDefines.h" 
@@ -22,23 +22,21 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mafNodeIterator.h"
 #include "mmgGui.h"
 #include "mmgRollOut.h"
-#include "mmaMaterial.h"
-
 #include "mmgListBox.h"
+
+#include "mafNodeIterator.h"
 #include "mafTagArray.h"
+
+#include "mafSmartPointer.h"
+#include "mafMatrixVector.h"
+#include "mafDataVector.h"
 #include "mafStorageElement.h"
 #include "mafMatrix.h"
 #include "mafVMEFactory.h"
 #include "mafVMEItem.h"
 #include "mafVME.h"
-
-#include "mafSmartPointer.h"
-#include "mafMatrixVector.h"
-#include "mafDataVector.h"
-
 #include "mafVMEGroup.h"
 #include "mafVMELandmarkCloud.h"
 
@@ -49,34 +47,25 @@ mafOp(label)
 {
   m_OpType    = OPTYPE_OP;
   m_Canundo   = true;
-  m_InsertMode = 0;
+  m_InsertMode = MODE_NONE;
   m_IntervalFrom = 0;
   m_IntervalTo = 0;
   m_FramesListBox = NULL;
   m_Frame = 0;
   m_Group = NULL;
   m_Cloud = NULL;
+  m_VectorVME.clear();
+  m_VectorCloud.clear();
 }
 
 //----------------------------------------------------------------------------
 mafOpDecomposeTimeVarVME::~mafOpDecomposeTimeVarVME()
 //----------------------------------------------------------------------------
 {
-  if (m_Group != NULL) 
-  {
-    for (int i = 0; i < m_VectorCloud.size(); i++)
-    {
-      m_VectorCloud[i]->RemoveLandmark(0);
-      mafDEL(m_VectorCloud[i]);
-    }
-  
-    for (int i = 0; i < m_VectorVME.size(); i++)
-    {
-      mafDEL(m_VectorVME[i]);
-    }
-    m_Group->ReparentTo(NULL);
-    mafDEL(m_Group);
-  }
+  m_VectorCloud.clear();
+  m_VectorVME.clear();
+  mafDEL(m_Cloud);
+  mafDEL(m_Group);
 }
 
 //----------------------------------------------------------------------------
@@ -111,8 +100,6 @@ void mafOpDecomposeTimeVarVME::OpRun()
   sprintf(string, "Node has %d timestamps", m_NumberFrames);
   m_Gui->Label(string);
 
-  wxString mode_array[3] = {_("Timestamps"),_("Interval"),_("Periodicity")};
-  m_Gui->Combo(CHANGE_MODE,_("Mode"), &m_InsertMode, 3, mode_array);
   ModeGui();
   m_Gui->Divider();
   ShowGui();
@@ -124,44 +111,30 @@ void mafOpDecomposeTimeVarVME::ModeGui()
 {
   if(m_Gui)
   {
-    mmgGui *guiFrames = new mmgGui(this);
-    mmgGui *guiInterval = new mmgGui(this);
-    mmgGui *guiPeriodicity = new mmgGui(this);
-
-    guiFrames->Button(ID_INSERT_FRAME, _("Add timestamp"), "", _("Add a timestamp"));
-    guiFrames->Button(ID_REMOVE_FRAME, _("Remove timestamp"), "", _("Remove a timestamp"));
+    m_GuiFrames = new mmgGui(this);
+    m_GuiInterval = new mmgGui(this);
+    m_GuiPeriodicity = new mmgGui(this);
+    
+    m_GuiFrames->Button(ID_INSERT_FRAME, _("Add timestamp"), "", _("Add a timestamp"));
+    m_GuiFrames->Button(ID_REMOVE_FRAME, _("Remove timestamp"), "", _("Remove a timestamp"));
 
     double min = 0;
-    guiFrames->Double(ID_FRAME, _("Timestamp"), &m_Frame, min);
+    m_GuiFrames->Double(ID_FRAME, _("Timestamp"), &m_Frame, min);
 
-     m_FramesListBox =  guiFrames->ListBox(ID_LIST_FRAMES,_("List"),60,_("Chose label to visualize"));
+    m_FramesListBox =  m_GuiFrames->ListBox(ID_LIST_FRAMES,_("List"),60,_("Chose label to visualize"));
   
-    guiInterval->Double(CHANGE_VALUE_INTERVAL, _("From"), &m_IntervalFrom, min );
-    guiInterval->Double(CHANGE_VALUE_INTERVAL, _("To"), &m_IntervalTo, min, m_NumberFrames);
+    m_GuiInterval->Double(CHANGE_VALUE_INTERVAL, _("From"), &m_IntervalFrom, min );
+    m_GuiInterval->Double(CHANGE_VALUE_INTERVAL, _("To"), &m_IntervalTo, min, m_NumberFrames);
 
-    guiPeriodicity->Integer(CHANGE_VALUE_PERIODICITY, _("Period"), &m_Periodicity, min, m_NumberFrames);
+    m_GuiPeriodicity->Integer(CHANGE_VALUE_PERIODICITY, _("Period"), &m_Periodicity, min, m_NumberFrames);
 
-    switch(m_InsertMode)
-    {
-    case MODE_FRAMES:
-      m_RollOutFrames = m_Gui->RollOut(ID_ROLLOUT_FRAMES,_("Timestamps mode"), guiFrames);
-      m_RollOutInterval = m_Gui->RollOut(ID_ROLLOUT_INTERVAL,_("Interval mode"), guiInterval, false);
-      m_RollOutPeriodicity = m_Gui->RollOut(ID_ROLLOUT_PERIODICITY,_("Periodicity mode"), guiPeriodicity, false);
-      break;
-    case MODE_INTERVAL:
-      m_RollOutFrames = m_Gui->RollOut(ID_ROLLOUT_FRAMES,_("Timestamps mode"), guiFrames, false);
-      m_RollOutInterval = m_Gui->RollOut(ID_ROLLOUT_INTERVAL,_("Interval mode"), guiInterval);
-      m_RollOutPeriodicity = m_Gui->RollOut(ID_ROLLOUT_PERIODICITY,_("Periodicity mode"), guiPeriodicity, false);
-      break;
-    case MODE_PERIODICITY:
-      m_RollOutFrames = m_Gui->RollOut(ID_ROLLOUT_FRAMES,_("Timestamps mode"), guiFrames, false);
-      m_RollOutInterval = m_Gui->RollOut(ID_ROLLOUT_INTERVAL,_("Interval mode"), guiInterval, false);
-      m_RollOutPeriodicity = m_Gui->RollOut(ID_ROLLOUT_PERIODICITY,_("Periodicity mode"), guiPeriodicity);
-    }
+    m_RollOutFrames = m_Gui->RollOut(ID_ROLLOUT_FRAMES,_("Timestamps mode"), m_GuiFrames, false);
+    m_RollOutInterval = m_Gui->RollOut(ID_ROLLOUT_INTERVAL,_("Interval mode"), m_GuiInterval, false);
+    m_RollOutPeriodicity = m_Gui->RollOut(ID_ROLLOUT_PERIODICITY,_("Periodicity mode"), m_GuiPeriodicity, false);
 
     m_Gui->OkCancel();
     m_Gui->Divider();
-    m_Gui->FitGui();
+    EnableWidget(false);
     m_Gui->Update();
   }
 }
@@ -174,14 +147,6 @@ void mafOpDecomposeTimeVarVME::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
-      case CHANGE_MODE:
-        if(m_Gui)
-        {
-          m_RollOutFrames->RollOut(m_InsertMode == MODE_FRAMES);
-          m_RollOutInterval->RollOut(m_InsertMode == MODE_INTERVAL);
-          m_RollOutPeriodicity->RollOut(m_InsertMode == MODE_PERIODICITY);
-        }
-      break;
       case wxOK:          
       { 
         if (UpdateFrames() == MAF_OK)
@@ -195,7 +160,7 @@ void mafOpDecomposeTimeVarVME::OnEvent(mafEventBase *maf_event)
         break;
       }
       case wxCANCEL:
-      {    
+      {
         OpStop(OP_RUN_CANCEL);
         break;
       }
@@ -235,6 +200,55 @@ void mafOpDecomposeTimeVarVME::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
+
+  if (maf_event->GetSender() == m_RollOutFrames) // from this operation gui
+  {
+    mafEvent *e = mafEvent::SafeDownCast(maf_event);
+    if  (e->GetBool())
+    {
+      m_InsertMode = MODE_FRAMES;           
+      m_RollOutInterval->RollOut(false);
+      m_RollOutPeriodicity->RollOut(false);
+      EnableWidget(true);
+    }
+    else
+    {
+      m_InsertMode = MODE_NONE;   
+      EnableWidget(false);
+    }
+  }
+  else if (maf_event->GetSender() == m_RollOutInterval) // from this operation gui
+  {
+    mafEvent *e = mafEvent::SafeDownCast(maf_event);
+    if  (e->GetBool())
+    {
+      m_InsertMode = MODE_INTERVAL;           
+      m_RollOutFrames->RollOut(false);
+      m_RollOutPeriodicity->RollOut(false);
+      EnableWidget(true);
+    }
+    else
+    {
+      m_InsertMode = MODE_NONE;
+      EnableWidget(false);
+    }
+  }
+  else if (maf_event->GetSender() == m_RollOutPeriodicity) // from this operation gui
+  {
+    mafEvent *e = mafEvent::SafeDownCast(maf_event);
+    if  (e->GetBool())
+    {
+      m_InsertMode = MODE_PERIODICITY;           
+      m_RollOutFrames->RollOut(false);
+      m_RollOutInterval->RollOut(false);
+      EnableWidget(true);
+    }
+    else
+    {
+      m_InsertMode = MODE_NONE;  
+      EnableWidget(false);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -264,7 +278,7 @@ void mafOpDecomposeTimeVarVME::DeleteFrame(int frameId)
 void mafOpDecomposeTimeVarVME::SelectMode(int mode)
 //----------------------------------------------------------------------------
 {
-  if (mode < 0 || mode > 2)
+  if (mode < MODE_NONE || mode > MODE_PERIODICITY)
     return;
   m_InsertMode = mode;
 }
@@ -409,26 +423,25 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
 //----------------------------------------------------------------------------
 {
   mafMatrix *matrix;
+  mafMatrix *matrixCopy;
   mafVMEItem *vmeItem;
+  mafVMEItem *vmeItemCopy;
   mafTimeStamp oldTime;
 
   std::vector<mafTimeStamp> kframes;
   mafVMEGenericAbstract *oldVme = mafVMEGenericAbstract::SafeDownCast(m_Input);
-  oldVme->GetLocalTimeStamps(kframes);
-
-  mafVME *newVme = NULL;
 
   // restore due attributes
   mafString typeVme;
   typeVme = m_Input->GetTypeName();
 
   mafSmartPointer<mafVMEFactory> factory;
-  newVme = factory->CreateVMEInstance(typeVme);
+  mafVME *newVme = factory->CreateVMEInstance(typeVme);
   if (!newVme)
     return;
 
   //If VME is a landmark, a landmark cloud must be created
-  if (typeVme == "mafVMELandmark")
+  if (typeVme.Equals("mafVMELandmark"))
   {
     mafNEW(m_Cloud);
     m_Cloud->Open();
@@ -449,7 +462,9 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
     matrix = mv->GetNearestMatrix(timeSt);
     if (matrix)
     {
-      vmeGeneric->GetMatrixVector()->SetMatrix(matrix);
+      mafNEW(matrixCopy);
+      matrixCopy->DeepCopy(matrix);
+      vmeGeneric->GetMatrixVector()->SetMatrix(matrixCopy);
       oldTime = matrix->GetTimeStamp();
     }
   }
@@ -460,7 +475,9 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
     vmeItem = dv->GetNearestItem(timeSt);
     if (vmeItem)
     {
-      vmeGeneric->GetDataVector()->AppendItem(vmeItem);
+      vmeItemCopy = (mafVMEItem*)factory->CreateInstance(vmeItem->GetTypeName());
+      vmeItemCopy->DeepCopy(vmeItem);
+      vmeGeneric->GetDataVector()->AppendItem(vmeItemCopy);
       oldTime = vmeItem->GetTimeStamp();
     }
   }
@@ -491,4 +508,10 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
     m_Group->AddChild(newVme);
     m_Group->Update();
   }
+}
+//----------------------------------------------------------------------------
+void mafOpDecomposeTimeVarVME::EnableWidget(bool enable)
+//----------------------------------------------------------------------------
+{
+  m_Gui->Enable(wxOK, enable);
 }
