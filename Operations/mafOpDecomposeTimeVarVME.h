@@ -2,12 +2,12 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 15:14:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-01-08 15:17:14 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
-  Copyright (c) 2001/2007 
-  ULB - Universite Libre de Bruxelles (www.ulb.ac.be)
+Copyright (c) 2001/2005 
+CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
 #ifndef __mafOpDecomposeTimeVarVME_H__
@@ -58,9 +58,10 @@ public:
   void DeleteFrame(int frameId);
 
   /** Select the operation mode:
-  MODE_FRAMES = 0,
-  MODE_INTERVAL = 1,
-  MODE_PERIODICITY = 2.*/
+  MODE_NONE = 0,
+  MODE_FRAMES = 1,
+  MODE_INTERVAL = 2,
+  MODE_PERIODICITY = 3.*/
   void SelectMode(int mode);
 
   /** Set the timestamps interval. */
@@ -72,10 +73,12 @@ public:
   /** Create a static VME from a particular timestamp of the input VME. */
   void CreateStaticVME(mafTimeStamp time);
 
+  /** Enable Ok widget */
+  void EnableWidget(bool enable);
+
   enum DECOMPOSE_MODE_WIDGET_ID
   {
-    CHANGE_MODE = MINID,
-    ID_LIST_FRAMES,
+    ID_LIST_FRAMES = MINID,
     ID_INSERT_FRAME,
     ID_REMOVE_FRAME,
     ID_FRAME,
@@ -90,7 +93,8 @@ public:
 
   enum DECOMPOSE_MODE_TYPE_ID
   {
-    MODE_FRAMES = 0,
+    MODE_NONE = 0,
+    MODE_FRAMES,
     MODE_INTERVAL,
     MODE_PERIODICITY,
   };
@@ -104,6 +108,9 @@ protected:
   mmgRollOut *m_RollOutPeriodicity;
 
 private:
+  mmgGui *m_GuiFrames;
+  mmgGui *m_GuiInterval; 
+  mmgGui *m_GuiPeriodicity; 
   mafVMEGroup         *m_Group;
   mafVMELandmarkCloud *m_Cloud;
 
