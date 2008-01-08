@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 16:49:02 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-01-08 15:14:52 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -213,7 +213,7 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
     // future release should read one item at once, write it
     // to disk and then release the data, or better simply copy the file
     // into the new place, this to be able to manage HUGE datasets.
-    if (parent==NULL||this->GetRoot()!=parent->GetRoot())
+    if (parent /*== NULL||*/ && this->GetRoot() != parent->GetRoot())
     {
       mafNodeIterator *iter=this->NewIterator();
       for (mafNode *node=iter->GetFirstNode();node;node=iter->GetNextNode())
