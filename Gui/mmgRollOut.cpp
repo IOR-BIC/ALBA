@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRollOut.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-13 14:56:29 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-08 15:13:16 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@ mmgRollOut::mmgRollOut(mmgGui *parent, mafString title, mmgGui *roll_gui, int id
 :wxPanel(parent,id)
 //----------------------------------------------------------------------------
 {
+  m_Listener = NULL;
   wxBoxSizer *topsizer =  new wxBoxSizer( wxHORIZONTAL );
   
   wxString b = rollOutOpen ? "ROLLOUT_OPEN" : "ROLLOUT_CLOSE";
@@ -73,7 +74,10 @@ mmgRollOut::~mmgRollOut()
 void mmgRollOut::OnRollOut(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
+  int widget_id = this->GetId();
   RollOut(!m_RollGui->IsShown());
+  bool isOpen = m_RollGui->IsShown();
+  mafEventMacro(mafEvent(this, widget_id, isOpen));
 }
 //----------------------------------------------------------------------------
 void mmgRollOut::RollOut(bool open)
@@ -93,3 +97,4 @@ void mmgRollOut::RollOut(bool open)
     parent->FitInside();
   }
 }
+
