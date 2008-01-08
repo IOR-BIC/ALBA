@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:31:46 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2008-01-08 15:13:37 $
+  Version:   $Revision: 1.52 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1383,6 +1383,7 @@ mmgRollOut *mmgGui::RollOut(int id, mafString title, mmgGui *roll_gui, bool roll
 {
   int w_id = GetWidgetId(id);
   mmgRollOut *roll = new mmgRollOut(this, title, roll_gui, w_id, rollOutOpen);
+  roll->SetListener(m_Listener);
   return roll;
 }
 //----------------------------------------------------------------------------
