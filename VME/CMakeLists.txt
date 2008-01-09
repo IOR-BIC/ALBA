@@ -23,8 +23,8 @@ SET(PROJECT_SRCS
   medPipeVolumeDRR.h
   medPipeVolumeVR.cpp
   medPipeVolumeVR.h
-  medVMEEmg.cpp
-  medVMEEmg.h
+  medVMEAnalog.cpp
+  medVMEAnalog.h
   mafVMEAdvancedProber.cpp
   mafVMEAdvancedProber.h
   mafVMEAdvancedSlicer.cpp
