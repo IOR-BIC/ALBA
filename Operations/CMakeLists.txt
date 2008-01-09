@@ -8,8 +8,6 @@ PROJECT(medOperations)
 SET(PROJECT_SRCS
   medOpCreateLabeledVolume.cpp
   medOpCreateLabeledVolume.h
-  medOpImporterEmgWS.cpp
-  medOpImporterEmgWS.h
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
   mmoCTAImporter.cpp
@@ -106,6 +104,8 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mmoC3DImporter.h
   mmoGRFImporterWS.cpp
   mmoGRFImporterWS.h
+  medOpImporterAnalogWS.cpp
+  medOpImporterAnalogWS.h
 )
 ENDIF (MAF_USE_ITK)
 
