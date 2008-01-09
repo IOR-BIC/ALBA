@@ -36,8 +36,8 @@ SET(PROJECT_SRCS
   mafViewCT.h
   mafViewCTNew.cpp
   mafViewCTNew.h
-  medViewEmgGraph.cpp
-  medViewEmgGraph.h
+  #medViewEmgGraph.cpp
+  #medViewEmgGraph.h
   medViewSlicer.cpp
   medViewSlicer.h
 )
