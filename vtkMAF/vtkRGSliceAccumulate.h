@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-25 11:56:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-01-09 11:53:44 $
+  Version:   $Revision: 1.3 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -124,9 +124,6 @@ protected:
   ~vtkRGSliceAccumulate();
 	vtkRGSliceAccumulate(const vtkRGSliceAccumulate&);
   void operator=(const vtkRGSliceAccumulate&);
-
-  void Execute();
-	void ExecuteInformation();
 
   vtkSetObjectMacro(Slices, vtkRectilinearGrid);
   vtkGetObjectMacro(Slices, vtkRectilinearGrid);

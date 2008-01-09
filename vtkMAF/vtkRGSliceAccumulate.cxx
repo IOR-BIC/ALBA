@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 09:57:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-01-09 11:53:43 $
+  Version:   $Revision: 1.4 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -45,7 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -60,14 +60,12 @@ vtkRGSliceAccumulate::vtkRGSliceAccumulate()
   SetSpacing(1,1,1);
   SetDataType(VTK_UNSIGNED_CHAR);
   SetOrigin(0,0,0);
-  Slices=vtkRectilinearGrid::New();
   //SetSlices(vtkRectilinearGrid::New());
 }
 //--------------------------------------------------------------------------------------
 vtkRGSliceAccumulate::~vtkRGSliceAccumulate()
 //--------------------------------------------------------------------------------------
 {
-  this->Slices->Delete();
 	//SetSlices(NULL);
 }
 //--------------------------------------------------------------------------------------
@@ -239,6 +237,9 @@ void vtkRGSliceAccumulate::Allocate()
 	for (int iz = 0; iz < Dimensions[2]; iz++)
 		vz->SetValue(iz, 0);
 
+  Slices=this->GetOutput();
+  Slices->Update();
+
 	vtkShortArray *data = vtkShortArray::New();
 	data->SetNumberOfTuples(Dimensions[0] * Dimensions[1] * Dimensions[2]);
 	this->Slices->SetDimensions(Dimensions);
@@ -251,21 +252,6 @@ void vtkRGSliceAccumulate::Allocate()
   vy->Delete();
   vz->Delete();
   data->Delete();
-}
-//--------------------------------------------------------------------------------------
-void vtkRGSliceAccumulate::Execute()
-//--------------------------------------------------------------------------------------
-{
-	this->GetOutput()->DeepCopy(this->Slices);
-	this->GetOutput()->SetWholeExtent(this->GetOutput()->GetExtent());
-	//this->Slices->Delete();
-}
-//--------------------------------------------------------------------------------------
-void vtkRGSliceAccumulate::ExecuteInformation()
-//--------------------------------------------------------------------------------------
-{
-	this->GetOutput()->CopyStructure(this->Slices);
-	this->GetOutput()->SetWholeExtent(this->GetOutput()->GetExtent());
 }
 //--------------------------------------------------------------------------------------
 static int recursing = 0;
