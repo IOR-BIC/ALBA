@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-07 16:12:23 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-01-10 13:55:37 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -712,10 +712,9 @@ const char *mafString::BaseName(const char *filename)
 void mafString::ExtractPathName()
 //----------------------------------------------------------------------------
 {
-  wxString path, s;
-  s = GetCStr();
-  path = wxPathOnly(s);
-  Set(path.c_str());
+  //wxString path, s;
+  *this = wxPathOnly(GetCStr()).c_str();
+  //Set(path.c_str());
 
 /*  int idx=FindLastChr('/');
 
