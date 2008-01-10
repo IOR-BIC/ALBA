@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 10:24:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-01-10 08:29:12 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,6 +100,7 @@ void medOpImporterAnalogWS::Read()
   double emg_time; 
   double val_scalar;
   wxString line;
+  std::vector<mafString> stringVec;
 
   //check if file starts with the string "ANALOG"
   line = text.ReadLine(); 
@@ -114,8 +115,17 @@ void medOpImporterAnalogWS::Read()
   wxString freq = line.SubString(0,comma - 1); //Read frequency 
   double freq_val;
   freq_val = atof(freq.c_str());
-  
+
+  //Put the signals names in a vector of string
   line = text.ReadLine();
+  wxStringTokenizer tkzName(line,wxT(','),wxTOKEN_RET_EMPTY_ALL);
+
+  tkzName.GetNextToken(); //To skip ","
+  while (tkzName.HasMoreTokens())
+  {
+    stringVec.push_back(tkzName.GetNextToken()); 
+  }
+
   line = text.ReadLine();
   line = text.ReadLine();
 
@@ -177,6 +187,17 @@ void medOpImporterAnalogWS::Read()
   vnl_matrix<double> emgMatrixTranspose = emgMatrix.transpose();
 
   m_EmgScalar->SetData(emgMatrixTranspose, 0);
+
+  mafTagItem tag_Sig;
+  tag_Sig.SetName("SIGNALS_NAME");
+  tag_Sig.SetNumberOfComponents(num_tk);
+  m_EmgScalar->GetTagArray()->SetTag(tag_Sig);
+
+  mafTagItem *tag_Signals = m_EmgScalar->GetTagArray()->GetTag("SIGNALS_NAME");
+  for (int n = 0; n < stringVec.size(); n++)
+  {
+    tag_Signals->SetValue(stringVec[n], n);
+  }
 
   m_Output = m_EmgScalar;
 }
