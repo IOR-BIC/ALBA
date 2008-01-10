@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 11:53:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-01-10 11:03:43 $
+  Version:   $Revision: 1.4 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -110,6 +110,8 @@ public:
   /** */
   vtkSetMacro(DataType, int);
   vtkGetMacro(DataType, int);
+
+  vtkRectilinearGrid* GetOutput(){return Slices;};
 
 protected:
   bool allocated;

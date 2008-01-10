@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 11:53:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-10 11:03:43 $
+  Version:   $Revision: 1.5 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -45,7 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkRGSliceAccumulate, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -60,6 +60,7 @@ vtkRGSliceAccumulate::vtkRGSliceAccumulate()
   SetSpacing(1,1,1);
   SetDataType(VTK_UNSIGNED_CHAR);
   SetOrigin(0,0,0);
+  Slices=vtkRectilinearGrid::New();
   //SetSlices(vtkRectilinearGrid::New());
 }
 //--------------------------------------------------------------------------------------
@@ -236,9 +237,6 @@ void vtkRGSliceAccumulate::Allocate()
 		vy->SetValue(iy, Origin[1]+((double)iy)*Spacing[1]);
 	for (int iz = 0; iz < Dimensions[2]; iz++)
 		vz->SetValue(iz, 0);
-
-  Slices=this->GetOutput();
-  Slices->Update();
 
 	vtkShortArray *data = vtkShortArray::New();
 	data->SetNumberOfTuples(Dimensions[0] * Dimensions[1] * Dimensions[2]);
