@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:10:18 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-01-11 13:21:52 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -169,9 +169,8 @@ void mafOp::ShowGui()
   m_Guih = new mmgGuiHolder(mafGetFrame(),-1);
   m_Guih->Put(m_Gui);
 	
-  wxString title;
   wxString menu_codes=wxStripMenuCodes(m_Label);
-  title.Format(" %s parameters:",menu_codes.c_str());
+  wxString title = wxString::Format(" %s parameters:",menu_codes.c_str());
   m_Guih->SetTitle(title);
   mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_Guih));
 }
