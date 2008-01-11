@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-28 14:30:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-11 11:01:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -320,8 +320,8 @@ void mafOpLabelExtractor::GenerateLabeledVolume()
   int labelVlaue;
   if (counter != 0)
   {
-    int not = originalScalars->GetNumberOfTuples();
-    for ( int i = 0; i < not; i++ )
+    int num_tuple = originalScalars->GetNumberOfTuples();
+    for ( int i = 0; i < num_tuple; i++ )
     {
       bool modified = false;
       double scalarValue = labelScalars->GetComponent( i, 0 );
