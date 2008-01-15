@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-12 10:02:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-01-15 12:11:25 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -102,7 +102,7 @@ public:
 
   enum PARAMETRIC_SURFACE_TYPE_ID
   {
-		PARAMETRIC_SPHERE = 0,
+    PARAMETRIC_SPHERE = 0,
 		PARAMETRIC_CONE,
 		PARAMETRIC_CYLINDER,
 		PARAMETRIC_CUBE,
@@ -122,8 +122,6 @@ protected:
 	/** update the output data structure */
 	virtual void InternalUpdate();
 
-  void SourceGui();
-
   /** Internally used to create a new instance of the GUI.*/
   virtual mmgGui *CreateGui();
   
@@ -132,6 +130,12 @@ protected:
 	mmgRollOut *m_RollOutCylinder;
 	mmgRollOut *m_RollOutCube;
   mmgRollOut *m_RollOutPlane;
+
+  mmgGui *m_GuiSphere;
+  mmgGui *m_GuiCone;
+  mmgGui *m_GuiCylinder;
+  mmgGui *m_GuiCube;
+  mmgGui *m_GuiPlane;
 
 	mafTransform *m_Transform; 
 	vtkPolyData  *m_PolyData;
