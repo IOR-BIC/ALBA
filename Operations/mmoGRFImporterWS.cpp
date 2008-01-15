@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 11:29:44 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-01-15 07:49:34 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -182,8 +182,14 @@ void mmoGRFImporterWS::Read()
   //Get values for platforms
    mafNEW(m_PlatformLeft);
    mafNEW(m_PlatformRight);
-   m_PlatformLeft->SetName("Left_Platform");
-   m_PlatformRight->SetName("Right_Platform");
+
+   mafString PlatNameLeft = name;
+   mafString platNameRight = name;
+   PlatNameLeft << "_PLATFORM_1";
+   platNameRight << "_PLATFORM_2";
+
+   m_PlatformLeft->SetName(PlatNameLeft);
+   m_PlatformRight->SetName(platNameRight);
   
   double thickness1 = platform1[2]-DELTA;
   double thickness2 = platform2[2]-DELTA;
@@ -213,14 +219,16 @@ void mmoGRFImporterWS::Read()
   int pointId1[2];
   int pointId2[2];
 
-  mafString alLeft = "Left";
-  mafString alRight = "Right";
-
   mafNEW(m_VectorLeft);
   mafNEW(m_VectorRight);
+
+  mafString alLeft = name;
+  mafString alRight = name;
+  alLeft << "_GRF_1";
+  alRight << "_GRF_2";
   
-  m_VectorLeft->SetName("Left_vector");
-  m_VectorRight->SetName("Right_vector");
+  m_VectorLeft->SetName(alLeft);
+  m_VectorRight->SetName(alRight);
 
   do 
   {
