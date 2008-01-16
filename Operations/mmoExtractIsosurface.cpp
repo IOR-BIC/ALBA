@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-07 08:41:21 $
-Version:   $Revision: 1.23 $
+Date:      $Date: 2008-01-16 11:00:29 $
+Version:   $Revision: 1.24 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -432,7 +432,9 @@ void mmoExtractIsosurface::CreateSlicePipeline()
 
   m_SliceImage->SetScalarType(dataset->GetPointData()->GetScalars()->GetDataType());
   m_SliceImage->SetNumberOfScalarComponents(dataset->GetPointData()->GetScalars()->GetNumberOfComponents());  
-  m_SliceImage->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
+  //m_SliceImage->SetExtent(ext[0], ext[1], ext[2], ext[3], 0, 0);
+  double textureRes=512;
+  m_SliceImage->SetExtent(0, textureRes - 1, 0, textureRes - 1, 0, 0);
   m_SliceImage->SetSpacing(xspc, yspc, 1.f);
 
   m_VolumeSlicer->SetOutput(m_SliceImage);
@@ -708,8 +710,9 @@ void mmoExtractIsosurface::UpdateSurface(bool use_lod)
       }
       m_IsosurfaceCutter->SetInput(contour);
       m_IsosurfaceCutter->Update();
+
+      contour->Delete();
     }
-    contour->Delete();
   }
 
   m_Rwi->m_RenderWindow->Render();
