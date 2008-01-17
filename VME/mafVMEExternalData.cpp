@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-16 11:04:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-01-17 08:58:16 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -186,9 +186,11 @@ void mafVMEExternalData::InitializeCurrentPath()
   mafEventIO e(this,NODE_GET_STORAGE);
   ForwardUpEvent(e);
   mafStorage *storage=e.GetStorage();
-  m_MSFPath = storage->GetURL();
-
-  m_MSFPath.ExtractPathName();
+  if (storage != NULL)
+  {
+    m_MSFPath = storage->GetURL();
+    m_MSFPath.ExtractPathName();
+  }
 }
 
 //-------------------------------------------------------------------------
