@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 12:58:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-21 11:08:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -232,7 +232,7 @@ void mafPipeVector::AllVector(bool fromTag)
 //----------------------------------------------------------------------------
 {
 //  if(!m_TestMode)
-    wxBusyInfo wait(_("Creating bunch of vectors, please wait..."));
+    wxBusyInfo wait(_("Creating Vectogram, please wait..."));
 
  
   m_MatrixVector = m_Vector->GetMatrixVector();
