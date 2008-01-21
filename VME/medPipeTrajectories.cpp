@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-27 08:58:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-21 15:36:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafTransform.h"
 #include "mafVME.h"
 #include "mafVMEOutputPolyline.h"
+#include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "mafEventSource.h"
 #include "mmuTimeSet.h"
@@ -77,9 +78,20 @@ void medPipeTrajectories::Create(mafSceneNode *n)
 
   m_Vme->GetEventSource()->AddObserver(this);
 
+  double radius;
+  if(mafVMELandmarkCloud *cloud = mafVMELandmarkCloud::SafeDownCast(m_Vme->GetParent()))
+  {
+    radius = cloud->GetRadius();
+  }
+  else
+  {
+    radius = 10;
+  }
+  
+
   //Create a sphere in the center of the trajectory
   vtkNEW(m_Sphere);
-  m_Sphere->SetRadius(10);
+  m_Sphere->SetRadius(radius);
   m_Sphere->SetPhiResolution(20);
   m_Sphere->SetThetaResolution(20);
 
