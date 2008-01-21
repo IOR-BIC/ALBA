@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-21 13:54:21 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,13 +24,14 @@
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
 #include "mmgGui.h"
-#include "mmgMaterialButton.h"
+#include "mmgMaterialButton.h" 
 #include "mafAxes.h"
 #include "mafDataVector.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafNode.h"
 #include "mafVME.h"
 #include "mmgValidator.h"
+#include "mafEventSource.h"
 #include "vtkMAFSmartPointer.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -49,10 +50,7 @@
 #include "vtkTextureMapToSphere.h"
 #include "vtkImageMapper.h"
 
-#include "vtkPolyDataNormals.h"
-#include "vtkDistanceFilter.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
 #include "vtkPolyData.h"
 #include "vtkScalarBarActor.h"
@@ -96,6 +94,8 @@ medPipeDensityDistance::medPipeDensityDistance()
   m_MidColour.Set(0,255,0);
 	m_HiColour.Set(0,0,255);
 	m_WhiteColour.Set(255,255,255);
+
+  m_EnableMAPSFilter = true;
 }
 //----------------------------------------------------------------------------
 void medPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -117,6 +117,8 @@ void medPipeDensityDistance::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
   data->Update();
   assert(data);
+
+  m_Vme->GetEventSource()->AddObserver(this);
 
 	m_Normals->SetInput(data);
 	m_Normals->ComputePointNormalsOn();
@@ -301,6 +303,7 @@ medPipeDensityDistance::~medPipeDensityDistance()
 {
   m_RenFront->RemoveActor2D(m_ScalarBar);
   m_AssemblyFront->RemovePart(m_Actor);
+  m_Vme->GetEventSource()->RemoveObserver(this);
 
   vtkDEL(m_Normals);
 	vtkDEL(m_Mapper);
@@ -571,7 +574,6 @@ void medPipeDensityDistance::OnEvent(mafEventBase *maf_event)
 					m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
 					m_ScalarBar->Modified();
 					UpdatePipeline();
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 				}
 			}
 			break;
@@ -585,6 +587,10 @@ void medPipeDensityDistance::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
+  else if (maf_event->GetId() == VME_ABSMATRIX_UPDATE)
+  {
+    UpdatePipeline();
+  }
 }
 //----------------------------------------------------------------------------
 void medPipeDensityDistance::SetVolume(mafNode *volume)
@@ -596,223 +602,272 @@ void medPipeDensityDistance::SetVolume(mafNode *volume)
 void medPipeDensityDistance::UpdatePipeline()
 //----------------------------------------------------------------------------
 {
-  m_Table->RemoveAllPoints();
-	m_DistanceFilter->SetThreshold(m_FirstThreshold);
-
-  if(m_DensityDistance==0)
+  if(m_DistanceFilter)
   {
-    m_ScalarBar->SetTitle(_("Distance"));
-		m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
-    m_ScalarBar->Modified();
+    m_Table->RemoveAllPoints();
+	  m_DistanceFilter->SetThreshold(m_FirstThreshold);
 
-    m_DistanceFilter->SetFilterModeToDistance();
-    m_DistanceFilter->SetMaxDistance(m_MaxDistance);
-		m_DistanceFilter->Update();
+    if(m_DensityDistance==0)
+    {
+      m_ScalarBar->SetTitle(_("Distance"));
+		  m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
+      m_ScalarBar->Modified();
 
-		/*double i;
-		m_Table->AddRGBPoint(-m_DistanceFilter->GetMaxDistance(), 1.f, 0.f, 0.0f);
-		double step=(double)(m_MaxDistance*2)/(m_NumSections-1);
-		double init=(double)(-m_MaxDistance+step);
-		for(i=init;i<m_MaxDistance;i+=step)
-		{
-			if(i<=0)
-				m_Table->AddRGBPoint(i, 1.f, (float)(1+(i/m_MaxDistance)), (float)(1+(i/m_MaxDistance)));
-			else
-				m_Table->AddRGBPoint(i, (float)(1-(i/m_MaxDistance)), (float)(1-(i/m_MaxDistance)),1.f );
-		}
-		m_Table->AddRGBPoint(m_DistanceFilter->GetMaxDistance(), 0.1f, 0.1f, 1.f);
+      mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
 
-		/*m_Table->AddRGBPoint(-m_DistanceFilter->GetMaxDistance(), 1.f, 0.f, 0.0f);
-		m_Table->AddRGBPoint(-0.5f *	m_DistanceFilter->GetMaxDistance(), 1.f, 0.1f, 1.f);
-		m_Table->AddRGBPoint(0.5f *	m_DistanceFilter->GetMaxDistance(), 0.9f, 0.9f, 1.f);
-		m_Table->AddRGBPoint(					m_DistanceFilter->GetMaxDistance(), 0.1f, 0.1f, 1.f);
-		m_Table->Build();
+      m_DistanceFilter->SetInputMatrix(surface_output->GetAbsMatrix()->GetVTKMatrix());
 
-		m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
-		m_ScalarBar->Modified();
-		m_Mapper->Modified();
+      m_DistanceFilter->SetFilterModeToDistance();
+      m_DistanceFilter->SetMaxDistance(m_MaxDistance);
+		  m_DistanceFilter->Update();
 
-		//Calculate the areas
-		vtkMAFSmartPointer<vtkMassProperties> mass_all;
-		mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		mass_all->Update();
+		  /*double i;
+		  m_Table->AddRGBPoint(-m_DistanceFilter->GetMaxDistance(), 1.f, 0.f, 0.0f);
+		  double step=(double)(m_MaxDistance*2)/(m_NumSections-1);
+		  double init=(double)(-m_MaxDistance+step);
+		  for(i=init;i<m_MaxDistance;i+=step)
+		  {
+			  if(i<=0)
+				  m_Table->AddRGBPoint(i, 1.f, (float)(1+(i/m_MaxDistance)), (float)(1+(i/m_MaxDistance)));
+			  else
+				  m_Table->AddRGBPoint(i, (float)(1-(i/m_MaxDistance)), (float)(1-(i/m_MaxDistance)),1.f );
+		  }
+		  m_Table->AddRGBPoint(m_DistanceFilter->GetMaxDistance(), 0.1f, 0.1f, 1.f);
 
-		double total_area = mass_all->GetSurfaceArea();
+		  /*m_Table->AddRGBPoint(-m_DistanceFilter->GetMaxDistance(), 1.f, 0.f, 0.0f);
+		  m_Table->AddRGBPoint(-0.5f *	m_DistanceFilter->GetMaxDistance(), 1.f, 0.1f, 1.f);
+		  m_Table->AddRGBPoint(0.5f *	m_DistanceFilter->GetMaxDistance(), 0.9f, 0.9f, 1.f);
+		  m_Table->AddRGBPoint(					m_DistanceFilter->GetMaxDistance(), 0.1f, 0.1f, 1.f);
+		  m_Table->Build();
 
-		double area=0;
-		step=(double)(m_MaxDistance*2)/(m_NumSections);
-		mafString message;
+		  m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
+		  m_ScalarBar->Modified();
+		  m_Mapper->Modified();
 
-		vtkMAFSmartPointer<vtkClipPolyData> clip;
-		clip->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		clip->SetValue(m_MaxDistance);
-		clip->GenerateClippedOutputOn();
-		clip->Update();
+		  //Calculate the areas
+		  vtkMAFSmartPointer<vtkMassProperties> mass_all;
+		  mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
+		  mass_all->Update();
 
-		vtkMAFSmartPointer<vtkMassProperties> mass;
-		mass->SetInput(clip->GetOutput());
-		mass->Update();
-		area = (mass->GetSurfaceArea() / total_area) * 100.0;
+		  double total_area = mass_all->GetSurfaceArea();
 
-		message= wxString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
-		mafLogMessage(message);
-	
-		vtkMAFSmartPointer<vtkClipPolyData> clip_old;
-		clip_old=clip;
-		for (i=m_MaxDistance-step;i>=-m_MaxDistance;i-=step)
-		{
-			vtkMAFSmartPointer<vtkClipPolyData> clip;
-			clip->SetInput(clip_old->GetClippedOutput());
-			clip->SetValue(i);
-			clip->GenerateClippedOutputOn();
-			clip->Update();
+		  double area=0;
+		  step=(double)(m_MaxDistance*2)/(m_NumSections);
+		  mafString message;
 
-			clip_old=clip;
+		  vtkMAFSmartPointer<vtkClipPolyData> clip;
+		  clip->SetInput(m_DistanceFilter->GetPolyDataOutput());
+		  clip->SetValue(m_MaxDistance);
+		  clip->GenerateClippedOutputOn();
+		  clip->Update();
 
-			vtkMAFSmartPointer<vtkMassProperties> mass;
-			mass->SetInput(clip->GetOutput());
-			mass->Update();
-			area = (mass->GetSurfaceArea() / total_area) * 100.0;
+		  vtkMAFSmartPointer<vtkMassProperties> mass;
+		  mass->SetInput(clip->GetOutput());
+		  mass->Update();
+		  area = (mass->GetSurfaceArea() / total_area) * 100.0;
 
-			message= wxString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
-			mafLogMessage(message);
-		}
+		  message= wxString::Format("From infinity To %d\t%.3lf %" , m_MaxDistance,area);
+		  mafLogMessage(message);
+  	
+		  vtkMAFSmartPointer<vtkClipPolyData> clip_old;
+		  clip_old=clip;
+		  for (i=m_MaxDistance-step;i>=-m_MaxDistance;i-=step)
+		  {
+			  vtkMAFSmartPointer<vtkClipPolyData> clip;
+			  clip->SetInput(clip_old->GetClippedOutput());
+			  clip->SetValue(i);
+			  clip->GenerateClippedOutputOn();
+			  clip->Update();
 
-		vtkMAFSmartPointer<vtkMassProperties> mass_final;
-		mass_final->SetInput(clip_old->GetClippedOutput());
-		mass_final->Update();
-		area = (mass_final->GetSurfaceArea() / total_area) * 100.0;
+			  clip_old=clip;
 
-		message= wxString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
-		mafLogMessage(message);*/
-		
-		int i;
-		for (i=-4*m_MaxDistance;i<-m_MaxDistance;i++)
-			m_Table->AddRGBPoint(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
-		for (i=-m_MaxDistance;i<m_MaxDistance;i++)
-			m_Table->AddRGBPoint(i,1.0,1.0,1.0);
-		for (i=m_MaxDistance;i<=4*m_MaxDistance;i++)
-			m_Table->AddRGBPoint(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
-	  
-		m_ScalarBar->SetMaximumNumberOfColors(3);
-		m_ScalarBar->Modified();
-		m_Mapper->Modified();
+			  vtkMAFSmartPointer<vtkMassProperties> mass;
+			  mass->SetInput(clip->GetOutput());
+			  mass->Update();
+			  area = (mass->GetSurfaceArea() / total_area) * 100.0;
 
-		//Calculate the areas
-		vtkMAFSmartPointer<vtkMassProperties> mass_all;
-		mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		mass_all->Update();
+			  message= wxString::Format("From %.3lf To %.3lf\t%.3lf %" , i+step,i,area);
+			  mafLogMessage(message);
+		  }
 
-		double total_area = mass_all->GetSurfaceArea();
+		  vtkMAFSmartPointer<vtkMassProperties> mass_final;
+		  mass_final->SetInput(clip_old->GetClippedOutput());
+		  mass_final->Update();
+		  area = (mass_final->GetSurfaceArea() / total_area) * 100.0;
 
-		vtkMAFSmartPointer<vtkClipPolyData> clipHigh;
-		clipHigh->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		clipHigh->SetValue(m_MaxDistance);
-		clipHigh->GenerateClippedOutputOn();
-		clipHigh->Update();
+		  message= wxString::Format("From %d To -infinity\t%.3lf %" , -m_MaxDistance,area);
+		  mafLogMessage(message);*/
+  		
+		  int i;
+		  for (i=-4*m_MaxDistance;i<-m_MaxDistance;i++)
+			  m_Table->AddRGBPoint(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+		  for (i=-m_MaxDistance;i<m_MaxDistance;i++)
+			  m_Table->AddRGBPoint(i,1.0,1.0,1.0);
+		  for (i=m_MaxDistance;i<=4*m_MaxDistance;i++)
+			  m_Table->AddRGBPoint(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+  	  
+		  m_ScalarBar->SetMaximumNumberOfColors(3);
+		  m_ScalarBar->Modified();
+		  m_Mapper->Modified();
 
-		vtkMAFSmartPointer<vtkClipPolyData> clipMidLow;
-		clipMidLow->SetInput(clipHigh->GetClippedOutput());
-		clipMidLow->SetValue(-m_MaxDistance);
-		clipMidLow->GenerateClippedOutputOn();
-		clipMidLow->Update();
+		  //Calculate the areas
+		  vtkMAFSmartPointer<vtkMassProperties> mass_all;
+		  mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
+		  mass_all->Update();
 
-		vtkMAFSmartPointer<vtkMassProperties> mass_high;
-		mass_high->SetInput(clipHigh->GetOutput());
-		mass_high->Update();
+		  double total_area = mass_all->GetSurfaceArea();
 
-		vtkMAFSmartPointer<vtkMassProperties> mass_mid;
-		mass_mid->SetInput(clipMidLow->GetOutput());
-		mass_mid->Update();
+		  vtkMAFSmartPointer<vtkClipPolyData> clipHigh;
+		  clipHigh->SetInput(m_DistanceFilter->GetPolyDataOutput());
+		  clipHigh->SetValue(m_MaxDistance);
+		  clipHigh->GenerateClippedOutputOn();
+		  clipHigh->Update();
 
-		vtkMAFSmartPointer<vtkMassProperties> mass_low;
-		mass_low->SetInput(clipMidLow->GetClippedOutput());
-		mass_low->Update();
+		  vtkMAFSmartPointer<vtkClipPolyData> clipMidLow;
+		  clipMidLow->SetInput(clipHigh->GetClippedOutput());
+		  clipMidLow->SetValue(-m_MaxDistance);
+		  clipMidLow->GenerateClippedOutputOn();
+		  clipMidLow->Update();
 
-		m_AreaDistance[0] = (mass_low->GetSurfaceArea() / total_area) * 100.0;
-		m_AreaDistance[1] = (mass_mid->GetSurfaceArea() / total_area) * 100.0;
-		m_AreaDistance[2] = (mass_high->GetSurfaceArea() / total_area) * 100.0;
+		  vtkMAFSmartPointer<vtkMassProperties> mass_high;
+		  mass_high->SetInput(clipHigh->GetOutput());
+		  mass_high->Update();
 
-		m_Gui->Update();
+		  vtkMAFSmartPointer<vtkMassProperties> mass_mid;
+		  mass_mid->SetInput(clipMidLow->GetOutput());
+		  mass_mid->Update();
 
+		  vtkMAFSmartPointer<vtkMassProperties> mass_low;
+		  mass_low->SetInput(clipMidLow->GetClippedOutput());
+		  mass_low->Update();
+
+		  m_AreaDistance[0] = (mass_low->GetSurfaceArea() / total_area) * 100.0;
+		  m_AreaDistance[1] = (mass_mid->GetSurfaceArea() / total_area) * 100.0;
+		  m_AreaDistance[2] = (mass_high->GetSurfaceArea() / total_area) * 100.0;
+
+      if(m_Gui)
+        m_Gui->Update();
+
+    }
+    else if(m_DensityDistance==1)
+    {
+      m_ScalarBar->SetTitle(_("Density"));
+      m_ScalarBar->Modified();
+
+      mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
+      m_DistanceFilter->SetInputMatrix(surface_output->GetAbsMatrix()->GetVTKMatrix());
+
+      m_DistanceFilter->SetFilterModeToDensity();
+		  m_DistanceFilter->Update();
+
+		  double range[2];
+		  ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
+
+		  if(m_BarTipology==0)
+		  {
+			  int i;
+			  for (i=range[0];i<m_SecondThreshold;i++)
+				  m_Table->AddRGBPoint(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+			  for (i=m_SecondThreshold;i<m_FirstThreshold;i++)
+				  m_Table->AddRGBPoint(i,m_MidColour.Red()/255.0, m_MidColour.Green()/255.0,	m_MidColour.Blue()/255.0);
+			  for (i=m_FirstThreshold;i<=range[1];i++)
+				  m_Table->AddRGBPoint(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+		  }
+		  else if(m_BarTipology==1)
+		  {
+			  m_Table->AddRGBPoint(range[0],m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+			  m_Table->AddRGBPoint(m_SecondThreshold,m_MidColour1.Red()/255.0, m_MidColour1.Green()/255.0,	m_MidColour1.Blue()/255.0);
+			  m_Table->AddRGBPoint(m_FirstThreshold,m_MidColour2.Red()/255.0, m_MidColour2.Green()/255.0,	m_MidColour2.Blue()/255.0);
+			  m_Table->AddRGBPoint(range[1],m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+		  }
+
+		  m_Table->Build();
+
+      m_ScalarBar->SetMaximumNumberOfColors(range[1]-range[0]);
+		  m_ScalarBar->Modified();
+
+		  m_Mapper->Modified();
+
+
+		  //Calculate the areas
+		  vtkMAFSmartPointer<vtkMassProperties> mass_all;
+		  mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
+		  mass_all->Update();
+
+		  double total_area = mass_all->GetSurfaceArea();
+
+		  vtkMAFSmartPointer<vtkClipPolyData> clipHigh;
+		  clipHigh->SetInput(m_DistanceFilter->GetPolyDataOutput());
+		  clipHigh->SetValue(m_FirstThreshold);
+		  clipHigh->GenerateClippedOutputOn();
+		  clipHigh->Update();
+
+		  vtkMAFSmartPointer<vtkClipPolyData> clipMidLow;
+		  clipMidLow->SetInput(clipHigh->GetClippedOutput());
+		  clipMidLow->SetValue(m_SecondThreshold);
+		  clipMidLow->GenerateClippedOutputOn();
+		  clipMidLow->Update();
+
+		  vtkMAFSmartPointer<vtkMassProperties> mass_high;
+		  mass_high->SetInput(clipHigh->GetOutput());
+		  mass_high->Update();
+
+		  vtkMAFSmartPointer<vtkMassProperties> mass_mid;
+		  mass_mid->SetInput(clipMidLow->GetOutput());
+		  mass_mid->Update();
+
+		  vtkMAFSmartPointer<vtkMassProperties> mass_low;
+		  mass_low->SetInput(clipMidLow->GetClippedOutput());
+		  mass_low->Update();
+
+		  m_Area[0] = (mass_low->GetSurfaceArea() / total_area) * 100.0;
+		  m_Area[1] = (mass_mid->GetSurfaceArea() / total_area) * 100.0;
+		  m_Area[2] = (mass_high->GetSurfaceArea() / total_area) * 100.0;
+
+      if(m_Gui)
+		    m_Gui->Update();
+    }
+
+    m_Actor->Modified();
+
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  else if(m_DensityDistance==1)
-  {
-    m_ScalarBar->SetTitle(_("Density"));
-    m_ScalarBar->Modified();
+}
+//----------------------------------------------------------------------------
+double medPipeDensityDistance::GetTotalArea()
+//----------------------------------------------------------------------------
+{
+  //Calculate the areas
+  vtkMAFSmartPointer<vtkMassProperties> mass_all;
+  mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
+  mass_all->Update();
 
-    m_DistanceFilter->SetFilterModeToDensity();
-		m_DistanceFilter->Update();
-
-		double range[2];
-		((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
-
-		if(m_BarTipology==0)
-		{
-			int i;
-			for (i=range[0];i<m_SecondThreshold;i++)
-				m_Table->AddRGBPoint(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
-			for (i=m_SecondThreshold;i<m_FirstThreshold;i++)
-				m_Table->AddRGBPoint(i,m_MidColour.Red()/255.0, m_MidColour.Green()/255.0,	m_MidColour.Blue()/255.0);
-			for (i=m_FirstThreshold;i<=range[1];i++)
-				m_Table->AddRGBPoint(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
-		}
-		else if(m_BarTipology==1)
-		{
-			m_Table->AddRGBPoint(range[0],m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
-			m_Table->AddRGBPoint(m_SecondThreshold,m_MidColour1.Red()/255.0, m_MidColour1.Green()/255.0,	m_MidColour1.Blue()/255.0);
-			m_Table->AddRGBPoint(m_FirstThreshold,m_MidColour2.Red()/255.0, m_MidColour2.Green()/255.0,	m_MidColour2.Blue()/255.0);
-			m_Table->AddRGBPoint(range[1],m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
-		}
-
-		m_Table->Build();
-
-    m_ScalarBar->SetMaximumNumberOfColors(range[1]-range[0]);
-		m_ScalarBar->Modified();
-
-		m_Mapper->Modified();
-
-
-		//Calculate the areas
-		vtkMAFSmartPointer<vtkMassProperties> mass_all;
-		mass_all->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		mass_all->Update();
-
-		double total_area = mass_all->GetSurfaceArea();
-
-		vtkMAFSmartPointer<vtkClipPolyData> clipHigh;
-		clipHigh->SetInput(m_DistanceFilter->GetPolyDataOutput());
-		clipHigh->SetValue(m_FirstThreshold);
-		clipHigh->GenerateClippedOutputOn();
-		clipHigh->Update();
-
-		vtkMAFSmartPointer<vtkClipPolyData> clipMidLow;
-		clipMidLow->SetInput(clipHigh->GetClippedOutput());
-		clipMidLow->SetValue(m_SecondThreshold);
-		clipMidLow->GenerateClippedOutputOn();
-		clipMidLow->Update();
-
-		vtkMAFSmartPointer<vtkMassProperties> mass_high;
-		mass_high->SetInput(clipHigh->GetOutput());
-		mass_high->Update();
-
-		vtkMAFSmartPointer<vtkMassProperties> mass_mid;
-		mass_mid->SetInput(clipMidLow->GetOutput());
-		mass_mid->Update();
-
-		vtkMAFSmartPointer<vtkMassProperties> mass_low;
-		mass_low->SetInput(clipMidLow->GetClippedOutput());
-		mass_low->Update();
-
-		m_Area[0] = (mass_low->GetSurfaceArea() / total_area) * 100.0;
-		m_Area[1] = (mass_mid->GetSurfaceArea() / total_area) * 100.0;
-		m_Area[2] = (mass_high->GetSurfaceArea() / total_area) * 100.0;
-
-		m_Gui->Update();
-  }
-
-  m_Actor->Modified();
-
+  return mass_all->GetSurfaceArea();
+}
+//----------------------------------------------------------------------------
+void medPipeDensityDistance::EnableMAPSFilterOff()
+//----------------------------------------------------------------------------
+{
+  m_Mapper->SetInput(m_Normals->GetOutput());
+  m_Mapper->Update();
+  m_EnableMAPSFilter=false;
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-  
+}
+//----------------------------------------------------------------------------
+void medPipeDensityDistance::EnableMAPSFilterOn()
+//----------------------------------------------------------------------------
+{
+  m_Mapper->SetInput((vtkPolyData*)m_DistanceFilter->GetOutput());
+  m_Mapper->Update();
+  m_EnableMAPSFilter=true;
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void medPipeDensityDistance::EnableMAPSFilter(bool enable)
+//----------------------------------------------------------------------------
+{
+  if(enable)
+    EnableMAPSFilterOn();
+  else
+    EnableMAPSFilterOff();
 }

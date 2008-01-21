@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-01-21 13:54:21 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,18 +19,18 @@
 #include "mafPipe.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolume.h"
+#include "vtkPolyDataNormals.h"
+#include "vtkDistanceFilter.h"
+#include "vtkPolyDataMapper.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkOutlineCornerFilter;
 class vtkTexture;
-class vtkPolyDataMapper;
 class vtkPolyData;
 class vtkActor;
 class vtkProperty;
-class vtkPolyDataNormals;
-class vtkDistanceFilter;
 class vtkColorTransferFunction;
 class vtkScalarBarActor;
 
@@ -58,6 +58,23 @@ public:
 
   void SetVolume(mafNode* volume);
 
+  void SetDistanceMode(){m_DensityDistance=0;UpdatePipeline();};
+  void SetDiscreteDensityMode(){m_BarTipology=0;m_DensityDistance=1;UpdatePipeline();};
+  void SetContinuosDensityMode(){m_BarTipology=1;m_DensityDistance=1;UpdatePipeline();};
+  void SetFirstThreshold(int firstThreshold){m_FirstThreshold=firstThreshold;UpdatePipeline();};
+  void SetSecondThreshold(int secondThreshold){m_SecondThreshold=secondThreshold;UpdatePipeline();};
+  void SetMaxDistance(int maxDistance){m_MaxDistance=maxDistance;UpdatePipeline();};
+
+  void EnableMAPSFilterOff();
+  void EnableMAPSFilterOn();
+  void EnableMAPSFilter(bool enable);
+  bool GetEnableMAPSFilter(){return m_EnableMAPSFilter;};
+
+  double* GetDensityArea(){return m_Area;};
+  double* GetDistanceArea(){return m_AreaDistance;};
+
+  double GetTotalArea();
+
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
   {
@@ -74,6 +91,10 @@ public:
   };
 
   static bool VolumeAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEVolume));};
+
+  /**
+  Update the visual pipeline of the surface*/
+  void UpdatePipeline();
 
 protected:
   vtkPolyDataMapper	      *m_Mapper;
@@ -106,14 +127,12 @@ protected:
 
   mmgMaterialButton *m_MaterialButton;
 
+  bool m_EnableMAPSFilter;
+
   /** 
   Generate texture coordinate for polydata according to the mapping mode*/
   void GenerateTextureMapCoordinate();
 
   virtual mmgGui  *CreateGui();
-
-  /**
-  Update the visual pipeline of the surface*/
-  void UpdatePipeline();
 };  
 #endif // __mafPipeSurface_H__
