@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-08 15:13:37 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2008-01-21 11:51:51 $
+  Version:   $Revision: 1.53 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -407,7 +407,7 @@ void mmgGui::Button  (int id,mafString *label,mafString button_text, mafString t
 }
 // integer vector form 1
 //----------------------------------------------------------------------------
-void mmgGui::Vector(int id,wxString label,int var[3],int min, int max, wxString tooltip)
+void mmgGui::Vector(int id,wxString label,int var[3],int min, int max, wxString tooltip, wxColour *bg_colour)
 //----------------------------------------------------------------------------
 {
   int w_id;
@@ -433,6 +433,12 @@ void mmgGui::Vector(int id,wxString label,int var[3],int min, int max, wxString 
 		text2->SetToolTip(tooltip);
 		text3->SetToolTip(tooltip);
 	}
+  if(bg_colour != NULL)
+  {
+    text1->SetBackgroundColour(bg_colour[0]);
+    text2->SetBackgroundColour(bg_colour[1]);
+    text3->SetBackgroundColour(bg_colour[2]);
+  }
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add( lab,  0, wxRIGHT, LM);
 	sizer->Add( text1,0, wxRIGHT, HM);
@@ -442,7 +448,7 @@ void mmgGui::Vector(int id,wxString label,int var[3],int min, int max, wxString 
 }
 // integer vector form 2
 //----------------------------------------------------------------------------
-void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,int maxy,int minz,int maxz, wxString tooltip)
+void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,int maxy,int minz,int maxz, wxString tooltip, wxColour *bg_colour)
 //----------------------------------------------------------------------------
 {
 	int w_id;
@@ -467,6 +473,12 @@ void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,
 		text2->SetToolTip(tooltip);
 		text3->SetToolTip(tooltip);
 	}
+  if(bg_colour != NULL)
+  {
+    text1->SetBackgroundColour(bg_colour[0]);
+    text2->SetBackgroundColour(bg_colour[1]);
+    text3->SetBackgroundColour(bg_colour[2]);
+  }
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add( lab,  0, wxRIGHT, LM);
 	sizer->Add( text1,0, wxRIGHT, HM);
@@ -476,7 +488,7 @@ void mmgGui::Vector(int id,wxString label,int var[3],int minx,int maxx,int miny,
 }
 // float vector form 1
 //----------------------------------------------------------------------------
-void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int decimal_digit, wxString tooltip) // <*> togliere la seconda forma
+void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int decimal_digit, wxString tooltip, wxColour *bg_colour) // <*> togliere la seconda forma
 //----------------------------------------------------------------------------
 {   
   int w_id;
@@ -500,6 +512,12 @@ void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int
 		text2->SetToolTip(tooltip);
 		text3->SetToolTip(tooltip);
 	}
+  if(bg_colour != NULL)
+  {
+    text1->SetBackgroundColour(bg_colour[0]);
+    text2->SetBackgroundColour(bg_colour[1]);
+    text3->SetBackgroundColour(bg_colour[2]);
+  }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add( lab,  0, wxRIGHT, LM);
 	sizer->Add( text1,0, wxRIGHT, HM);
@@ -509,7 +527,7 @@ void mmgGui::Vector(int id,wxString label,float var[3],float min, float max, int
 }
 // float vector form 2
 //----------------------------------------------------------------------------
-void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,float miny,float maxy,float minz,float maxz, int decimal_digit, wxString tooltip)
+void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,float miny,float maxy,float minz,float maxz, int decimal_digit, wxString tooltip, wxColour *bg_colour)
 //----------------------------------------------------------------------------
 {
   int w_id;
@@ -535,6 +553,12 @@ void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,flo
 		text2->SetToolTip(tooltip);
 		text3->SetToolTip(tooltip);
 	}
+  if(bg_colour != NULL)
+  {
+    text1->SetBackgroundColour(bg_colour[0]);
+    text2->SetBackgroundColour(bg_colour[1]);
+    text3->SetBackgroundColour(bg_colour[2]);
+  }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add( lab,  0, wxRIGHT, LM);
 	sizer->Add( text1,0, wxRIGHT, HM);
@@ -544,7 +568,7 @@ void mmgGui::Vector(int id,wxString label,float var[3],float minx,float maxx,flo
 }
 // double vector form 1
 //----------------------------------------------------------------------------
-void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, int decimal_digit, wxString tooltip)
+void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, int decimal_digit, wxString tooltip, wxColour *bg_colour)
 //----------------------------------------------------------------------------
 {   
   int w_id;
@@ -570,6 +594,12 @@ void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, 
 		text2->SetToolTip(tooltip);
 		text3->SetToolTip(tooltip);
 	}
+  if(bg_colour != NULL)
+  {
+    text1->SetBackgroundColour(bg_colour[0]);
+    text2->SetBackgroundColour(bg_colour[1]);
+    text3->SetBackgroundColour(bg_colour[2]);
+  }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   sizer->Add( lab,  0, wxRIGHT, LM);
   sizer->Add( text1,0, wxRIGHT, HM);
@@ -579,7 +609,7 @@ void mmgGui::Vector(int id,wxString label,double var[3],double min, double max, 
 }
 // double vector form 2
 //----------------------------------------------------------------------------
-void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,double miny,double maxy,double minz,double maxz, int decimal_digit, wxString tooltip)
+void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,double miny,double maxy,double minz,double maxz, int decimal_digit, wxString tooltip, wxColour *bg_colour)
 //----------------------------------------------------------------------------
 {
   int w_id;
@@ -605,6 +635,12 @@ void mmgGui::Vector(int id,wxString label,double var[3],double minx,double maxx,
 		text2->SetToolTip(tooltip);
 		text3->SetToolTip(tooltip);
 	}
+  if(bg_colour != NULL)
+  {
+    text1->SetBackgroundColour(bg_colour[0]);
+    text2->SetBackgroundColour(bg_colour[1]);
+    text3->SetBackgroundColour(bg_colour[2]);
+  }
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add( lab,  0, wxRIGHT, LM);
 	sizer->Add( text1,0, wxRIGHT, HM);

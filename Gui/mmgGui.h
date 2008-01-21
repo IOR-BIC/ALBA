@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:31:46 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2008-01-21 11:51:51 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -142,22 +142,22 @@ public:
   void Double(int id,mafString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, mafString tooltip = "");
 
   /** Integer vector3 entry widget. */
-  void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "");
+  void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "", wxColour *bg_colour = NULL);
 
   /** Integer vector3 entry widget. */
-  void Vector(int id,wxString label, int var[3], int minx, int maxx, int miny, int maxy, int minz, int maxz, wxString tooltip = "");
+  void Vector(int id,wxString label, int var[3], int minx, int maxx, int miny, int maxy, int minz, int maxz, wxString tooltip = "", wxColour *bg_colour = NULL);
 
   /** Float vector3 entry widget. */
-  void Vector(int id,wxString label, float var[3], float min = MINFLOAT, float max = MAXFLOAT, int decimal_digit = -1, wxString tooltip = "");
+  void Vector(int id,wxString label, float var[3], float min = MINFLOAT, float max = MAXFLOAT, int decimal_digit = -1, wxString tooltip = "", wxColour *bg_colour = NULL);
 
   /** Float vector3 entry widget. */
-  void Vector(int id,wxString label, float var[3], float minx, float maxx, float miny, float maxy, float minz, float maxz, int decimal_digit = -1, wxString tooltip = "");
+  void Vector(int id,wxString label, float var[3], float minx, float maxx, float miny, float maxy, float minz, float maxz, int decimal_digit = -1, wxString tooltip = "", wxColour *bg_colour = NULL);
 
   /** Double vector3 entry widget. */
-  void Vector(int id,wxString label, double var[3], double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = -1, wxString tooltip = "");
+  void Vector(int id,wxString label, double var[3], double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = -1, wxString tooltip = "", wxColour *bg_colour = NULL);
 
   /** Double vector3 entry widget. */
-  void Vector(int id,wxString label, double var[3], double minx, double maxx, double miny, double maxy, double minz, double maxz, int decimal_digit = -1, wxString tooltip = "");
+  void Vector(int id,wxString label, double var[3], double minx, double maxx, double miny, double maxy, double minz, double maxz, int decimal_digit = -1, wxString tooltip = "", wxColour *bg_colour = NULL);
 
   /** Double vectorN entry widget. */
   void VectorN(int id,wxString label, double *var, int num_elem = 3, double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = -1, wxString tooltip = "");
