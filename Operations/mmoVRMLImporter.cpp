@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:29:14 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-01-21 11:51:15 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -208,6 +208,9 @@ void  mmoVRMLImporter::ImportVRML()
   int num_actors = ac->GetNumberOfItems();
   ac->InitTraversal();
 
+  wxMessageBox("MAF VRML does  not support all entities these standard allows to encode, because some were\
+    considered not relevant and did not may to MAF data model.");
+
   for (int i = 0; i < num_actors; i++)
   {
     vtkActor *actor = ac->GetNextActor();
@@ -223,22 +226,26 @@ void  mmoVRMLImporter::ImportVRML()
       mafSmartPointer<mafVMESurface> surface;
       surface->SetName(name.c_str());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();
-      surface->SetData(data,t);
+      if(data->GetNumberOfPolys() != 0)
+      {
+        surface->SetData(data,t);
 
-      double rgb[3];
-      actor->GetProperty()->GetColor(rgb);
-      mmaMaterial *m = surface->GetMaterial();
-      m->m_Diffuse[0] = rgb[0];
-      m->m_Diffuse[1] = rgb[1];
-      m->m_Diffuse[2] = rgb[2];
-      m->UpdateProp();
+        double rgb[3];
+        actor->GetProperty()->GetColor(rgb);
+        mmaMaterial *m = surface->GetMaterial();
+        m->m_Diffuse[0] = rgb[0];
+        m->m_Diffuse[1] = rgb[1];
+        m->m_Diffuse[2] = rgb[2];
+        m->UpdateProp();
 
-      surface->GetMatrixVector()->AppendKeyMatrix(matrix);
-      surface->ReparentTo(m_Group);
-      mafTagItem tag_Nature;
-      tag_Nature.SetName("VME_NATURE");
-      tag_Nature.SetValue("NATURAL");
-      surface->GetTagArray()->SetTag(tag_Nature);
+        surface->GetMatrixVector()->AppendKeyMatrix(matrix);
+        surface->ReparentTo(m_Group);
+        mafTagItem tag_Nature;
+        tag_Nature.SetName("VME_NATURE");
+        tag_Nature.SetValue("NATURAL");
+        surface->GetTagArray()->SetTag(tag_Nature);
+      }
+      
     }
   }
   m_Output = m_Group;
