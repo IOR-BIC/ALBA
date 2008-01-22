@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2007-12-06 09:37:03 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-01-22 15:13:26 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -80,6 +80,8 @@ public:
 	void AddGuiLowerLeft(mmgGui *gui);
   void AddGuiLowerRight(mmgGui *gui);
   void AddGuiLowerCenter(mmgGui *gui);
+
+  void RemoveGuiLowerLeft(mmgGui *gui);
 
 	/** Create a chain between this page ad nextPage */
 	void SetNextPage(medGUIWizardPage *nextPage);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-06 09:37:03 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-01-22 15:13:26 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -144,6 +144,14 @@ void medGUIWizardPage::AddGuiLowerLeft(mmgGui *gui)
 	m_GuiLowerLeft->AddGui(gui);
 	m_GuiLowerLeft->FitGui();
 	m_GuiLowerLeft->Update();
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPage::RemoveGuiLowerLeft(mmgGui *gui)
+//--------------------------------------------------------------------------------
+{
+  m_GuiLowerLeft->Remove(gui);
+  m_GuiLowerLeft->FitGui();
+  m_GuiLowerLeft->Update();
 }
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::AddGuiLowerCenter(mmgGui *gui)

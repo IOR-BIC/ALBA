@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-13 16:21:30 $
-Version:   $Revision: 1.16 $
+Date:      $Date: 2008-01-22 15:14:16 $
+Version:   $Revision: 1.17 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -193,6 +193,8 @@ mafOp(label)
 	m_CroppedExetuted=false;
 
   m_DicomInteractor = NULL;
+
+  m_CurrentSlice = VTK_INT_MAX;
 
   //m_SettingPanel = new medGUIDicomSettings(this);
 }
@@ -544,10 +546,10 @@ void medOpImporterDicom::CreateLoadPage()
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),true);
 	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),true);
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),true);*/
-	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
-    m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+    m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
   }
 
   m_LoadGuiCenter->DirOpen(ID_OPEN_DIR, _("Folder"),	&m_DicomDirectory,_("Sel. DICOM Folder"));
@@ -579,10 +581,10 @@ void medOpImporterDicom::CreateCropPage()
 	//m_CropGuiLeft->Label(_("crop"),true);
 	//m_CropGuiLeft->Button(ID_CROP_BUTTON,_("crop"));
 	//m_CropGuiLeft->Button(ID_UNDO_CROP_BUTTON,_("undo crop"));
-	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
-    m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+    m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
   }
 
   if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
@@ -612,7 +614,7 @@ void medOpImporterDicom::CreateBuildPage()
 	//wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
 	//m_BuildGuiLeft->Label(_("build volume"),true);
 	//m_BuildGuiLeft->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
-	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("num slice"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
   
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
@@ -1483,9 +1485,45 @@ void medOpImporterDicom::ResetStructure()
 void medOpImporterDicom::ResetSliders()
 //----------------------------------------------------------------------------
 {
-	m_SliceScannerLoadPage->SetMax(m_NumberOfSlices-1);
-	m_SliceScannerCropPage->SetMax(m_NumberOfSlices-1);
-	m_SliceScannerBuildPage->SetMax(m_NumberOfSlices-1);
+  if(m_LoadGuiLeft)
+  {
+    m_LoadPage->RemoveGuiLowerLeft(m_LoadGuiLeft);
+    delete m_LoadGuiLeft;
+    m_LoadGuiLeft = new mmgGui(this);
+    m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+    {
+      m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+    }
+    m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
+  }
+
+  if(m_CropGuiLeft)
+  {
+    m_CropPage->RemoveGuiLowerLeft(m_CropGuiLeft);
+    delete m_CropGuiLeft;
+    m_CropGuiLeft = new mmgGui(this);
+    m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+    {
+      m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+    }
+    m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
+  }
+
+
+  if(m_BuildGuiLeft)
+  {
+    m_BuildPage->RemoveGuiLowerLeft(m_BuildGuiLeft);
+    delete m_BuildGuiLeft;
+    m_BuildGuiLeft = new mmgGui(this);
+    m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
+    {
+      m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+    }
+    m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
+  }
 }
 //----------------------------------------------------------------------------
 int medOpImporterDicom::GetImageId(int timeId, int heigthId)
