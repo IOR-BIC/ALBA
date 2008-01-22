@@ -2,15 +2,13 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-17 08:58:16 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-01-22 14:24:20 $
+  Version:   $Revision: 1.4 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mafVMEExternalData_cxx
-#define __mafVMEExternalData_cxx
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -22,12 +20,14 @@
 
 #include "mafVMEExternalData.h"
 
-#include <vtkIndent.h>
 #include <wx/filefn.h>
 
 #include "mafTagArray.h"
 #include "mafStorage.h"
 #include "mafEventIO.h"
+#include "mafStorageElement.h"
+
+#include <vtkIndent.h>
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEExternalData)
@@ -155,8 +155,8 @@ int mafVMEExternalData::InternalStore(mafStorageElement *parent)
   wxString extNew = item->GetValue();
 
   wxSplitPath(nameNew, &pathTarget, &name, &ext);
- 
-  mafString fileNameOrigin =  GetTmpPath() + "/" + GetFileName() + "." + GetExtension();
+
+  mafString fileNameOrigin =  GetTmpPath() + "/" + GetFileName() + "." + GetExtension(); 
   mafString fileNameTarget = m_MSFPath + "/" + name + "." + extNew;
 
   bool copySuccess = wxCopyFile(fileNameOrigin.GetCStr(), fileNameTarget.GetCStr());
@@ -174,8 +174,11 @@ int mafVMEExternalData::InternalRestore(mafStorageElement *parent)
 //-----------------------------------------------------------------------
 {
   Superclass::InternalRestore(parent);
-  m_MSFPath = "";
+  m_TmpPath = parent->GetStorage()->GetURL();
+  m_TmpPath.ExtractPathName();
   
+  m_MSFPath = "";
+
   return MAF_OK;
 }
 
@@ -208,5 +211,3 @@ void mafVMEExternalData::PrintSelf(std::ostream& os,const int indent)
   os << indent << "File Extension: " << this->GetExtension() << "\n" ;
 	os << indent << "MIME Type: " << this->GetMimeType() << "\n";
 }
-  
-#endif
