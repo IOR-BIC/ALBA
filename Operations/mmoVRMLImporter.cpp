@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVRMLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-21 11:51:15 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-01-22 11:02:08 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -208,9 +208,11 @@ void  mmoVRMLImporter::ImportVRML()
   int num_actors = ac->GetNumberOfItems();
   ac->InitTraversal();
 
-  wxMessageBox("MAF VRML does  not support all entities these standard allows to encode, because some were\
-    considered not relevant and did not may to MAF data model.");
-
+  if(!m_TestMode)
+  {
+    wxMessageBox("MAF VRML does  not support all entities these standard allows to encode, because some were\nconsidered not relevant and did not may to MAF data model.");
+  }
+  
   for (int i = 0; i < num_actors; i++)
   {
     vtkActor *actor = ac->GetNextActor();
@@ -226,6 +228,7 @@ void  mmoVRMLImporter::ImportVRML()
       mafSmartPointer<mafVMESurface> surface;
       surface->SetName(name.c_str());
       vtkPolyData *data = (vtkPolyData *)actor->GetMapper()->GetInput();
+      data->Update();
       if(data->GetNumberOfPolys() != 0)
       {
         surface->SetData(data,t);
