@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.h,v $
 Language:  C++
-Date:      $Date: 2007-11-08 11:06:18 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-01-22 08:05:27 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,7 @@ public:
 	{
 		ID_LAST = Superclass::ID_LAST,
     ID_WIREFRAME,
+    ID_WIRED_ACTOR_VISIBILITY,
     ID_BORDER_CHANGE,
     ID_SCALARS,
     ID_LUT,
@@ -89,6 +90,10 @@ public:
   /** Set the actor wireframe*/
   void SetWireframeOn();
   void SetWireframeOff();
+
+  /** Set the actor border visible or not*/
+  void SetWiredActorVisibilityOn();
+  void SetWiredActorVisibilityOff();
 
   /** Set the flip of normal filter*/
   void SetFlipNormalOn();
@@ -154,6 +159,7 @@ protected:
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
   int                      m_Wireframe;
+  int                      m_BorderElementsWiredActor;
   int                      m_ScalarMapActive;
   int                      m_UseVTKProperty;
   double				           m_Border;

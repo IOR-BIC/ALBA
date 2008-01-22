@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.h,v $
 Language:  C++
-Date:      $Date: 2007-06-25 09:21:29 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-01-22 08:05:27 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,7 @@ public:
 	{
 		ID_LAST = Superclass::ID_LAST,
     ID_WIREFRAME,
+    ID_WIRED_ACTOR_VISIBILITY,
     ID_SCALARS,
     ID_LUT,
     ID_SCALAR_MAP_ACTIVE,
@@ -88,6 +89,11 @@ public:
   /** Set the actor wireframe*/
   void SetWireframeOn();
   void SetWireframeOff();
+  
+  /** Set the actor border visible or not*/
+  void SetWiredActorVisibilityOn();
+  void SetWiredActorVisibilityOff();
+
 
   /** Set/Get Active Scalar */
   void SetActiveScalar(int index){m_ScalarIndex = index;};
@@ -133,6 +139,7 @@ protected:
   int                      m_NumberOfArrays;
   int                      m_ActiveScalarType;
   int                      m_Wireframe;
+  int                      m_BorderElementsWiredActor;
   int                      m_ScalarMapActive;
   int                      m_UseVTKProperty;
 

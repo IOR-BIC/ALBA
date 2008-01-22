@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-08 11:06:18 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-01-22 08:05:27 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -349,9 +349,10 @@ mmgGui *mafPipeMeshSlice::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = new mmgGui(this);
-  m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe);
+  m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
+  m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Border Elem."), &m_BorderElementsWiredActor, 1);
   
-  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
+  m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty , 1);
   m_MaterialButton = new mmgMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
@@ -383,6 +384,14 @@ void mafPipeMeshSlice::OnEvent(mafEventBase *maf_event)
             SetWireframeOff();
           else
             SetWireframeOn();
+        }
+        break;
+      case ID_WIRED_ACTOR_VISIBILITY:
+        {
+          if(m_BorderElementsWiredActor == 0) 
+            SetWiredActorVisibilityOff();
+          else
+            SetWiredActorVisibilityOn();
         }
         break;
       case ID_SCALARS:
@@ -528,6 +537,22 @@ void mafPipeMeshSlice::SetWireframeOff()
   m_Actor->GetProperty()->SetRepresentationToSurface();
   m_Actor->Modified();
   m_ActorWired->SetVisibility(1);
+  m_ActorWired->Modified();
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSlice::SetWiredActorVisibilityOn()
+//----------------------------------------------------------------------------
+{
+  m_ActorWired->SetVisibility(1);
+  m_ActorWired->Modified();
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void mafPipeMeshSlice::SetWiredActorVisibilityOff()
+//----------------------------------------------------------------------------
+{
+  m_ActorWired->SetVisibility(0);
   m_ActorWired->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
