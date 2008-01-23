@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 08:49:04 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-01-23 16:40:02 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "mafMatrixVector.h"
+#include "mafAbsMatrixPipe.h"
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -536,6 +537,7 @@ void mmoRegisterClusters::OpDo()
     }
     else
     {
+      m_Registered->SetAbsMatrix(((mafVMELandmarkCloud *)m_Target)->GetAbsMatrixPipe()->GetMatrix());
       mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
       m_Registered->ReparentTo(m_Result);
     }
