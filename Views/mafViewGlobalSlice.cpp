@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-01-23 11:58:12 $
+  Version:   $Revision: 1.21 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@
 #include "mafPipe.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
+#include "mafPipeMeshSlice.h"
 #include "mafAttachCamera.h"
 #include "mmgFloatSlider.h"
 
@@ -232,15 +233,18 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
 			CameraUpdate();
     }
 
-    if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+    if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") || ((mafVME *)node)->GetOutput()->IsA("mafVMEMesh"))
     {
       m_SelectedVolume = m_Sg->Vme2Node(node);
       if (m_SelectedVolume->m_Pipe)
       {
         //m_Gui->Enable(ID_LUT,true);
-        m_Gui->Enable(ID_OPACITY_SLIDER,true);
 				m_Gui->Enable(ID_POS_SLIDER,true);
-        m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+        if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+        {
+          m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+          m_Gui->Enable(ID_OPACITY_SLIDER,true);
+        }
         m_Gui->Update();
       }
     }
@@ -321,7 +325,20 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 				DoubleNormal[2]=(double)m_SliceNormal[2];
 				((mafPipeSurfaceSlice *)pipe)->SetNormal(DoubleNormal);
 			}
-			pipe->Create(n);
+      else if(pipe_name.Equals("mafPipeMeshSlice"))
+      {
+        double DoubleNormal[3];
+        DoubleNormal[0]=(double)m_SliceNormal[0];
+        DoubleNormal[1]=(double)m_SliceNormal[1];
+        DoubleNormal[2]=(double)m_SliceNormal[2];
+        double positionSlice[3];
+        positionSlice[0] = m_SliceOrigin[0];
+        positionSlice[1] = m_SliceOrigin[1];
+        positionSlice[2] = m_SliceOrigin[2];
+        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
+        ((mafPipeMeshSlice *)pipe)->SetNormal(DoubleNormal);
+      }
+      pipe->Create(n);
 			n->m_Pipe = (mafPipe*)pipe;
 
 			if (pipe_name.Equals("mafPipeVolumeSlice"))
@@ -580,6 +597,15 @@ void mafViewGlobalSlice::UpdateSlice()
 				DoubleNormal[1]=(double)m_SliceNormal[1];
 				DoubleNormal[2]=(double)m_SliceNormal[2];
 				((mafPipeSurfaceSlice *)node->m_Pipe)->SetNormal(DoubleNormal);
+      }
+      if(node->m_Vme->IsA("mafVMEMesh"))
+      {
+        ((mafPipeMeshSlice *)node->m_Pipe)->SetSlice(m_SliceOrigin);
+        double DoubleNormal[3];
+        DoubleNormal[0]=(double)m_SliceNormal[0];
+        DoubleNormal[1]=(double)m_SliceNormal[1];
+        DoubleNormal[2]=(double)m_SliceNormal[2];
+        ((mafPipeMeshSlice *)node->m_Pipe)->SetNormal(DoubleNormal);
       }
       else if(((mafVME *)node->m_Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
       {
