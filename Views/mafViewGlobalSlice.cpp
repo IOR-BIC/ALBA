@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-23 11:58:12 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-01-23 15:05:26 $
+  Version:   $Revision: 1.22 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -233,20 +233,17 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
 			CameraUpdate();
     }
 
-    if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") || ((mafVME *)node)->GetOutput()->IsA("mafVMEMesh"))
+    m_SelectedVolume = m_Sg->Vme2Node(node);
+    if (m_SelectedVolume->m_Pipe)
     {
-      m_SelectedVolume = m_Sg->Vme2Node(node);
-      if (m_SelectedVolume->m_Pipe)
+      //m_Gui->Enable(ID_LUT,true);
+			m_Gui->Enable(ID_POS_SLIDER,true);
+      if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
       {
-        //m_Gui->Enable(ID_LUT,true);
-				m_Gui->Enable(ID_POS_SLIDER,true);
-        if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
-        {
-          m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
-          m_Gui->Enable(ID_OPACITY_SLIDER,true);
-        }
-        m_Gui->Update();
+        m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+        m_Gui->Enable(ID_OPACITY_SLIDER,true);
       }
+      m_Gui->Update();
     }
 		else
 		{
@@ -721,4 +718,22 @@ void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
 	Superclass::VmeShow(node,show);
+
+  m_SelectedVolume = m_Sg->Vme2Node(node);
+  if (m_SelectedVolume->m_Pipe)
+  {
+    //m_Gui->Enable(ID_LUT,true);
+    m_Gui->Enable(ID_POS_SLIDER,true);
+    if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+    {
+      m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+      m_Gui->Enable(ID_OPACITY_SLIDER,true);
+    }
+    m_Gui->Update();
+  }
+  else
+  {
+    m_Gui->Enable(ID_POS_SLIDER,false);
+    m_Gui->Update();
+  }
 }

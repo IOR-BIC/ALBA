@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-23 11:58:12 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-01-23 15:05:26 $
+  Version:   $Revision: 1.12 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -193,7 +193,7 @@ void mafViewGlobalSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 //----------------------------------------------------------------------------
 {
 	mafVME *Volume=mafVME::SafeDownCast(node);
-	if(enable && Volume)
+  if(enable && Volume && (mafVMEOutputVolume::SafeDownCast(Volume->GetOutput())))
 	{
 		EnableWidgets(enable);
 		double sr[2];
@@ -207,7 +207,7 @@ void mafViewGlobalSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 	}
 	else
 	{
-		EnableWidgets(enable);
+		EnableWidgets(false);
 		m_LutSlider->SetRange(-100,100);
 		m_LutSlider->SetSubRange(-100,100);
 	}
