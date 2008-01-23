@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:53:59 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2008-01-23 11:56:50 $
+  Version:   $Revision: 1.39 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -258,6 +258,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
           }
         } 
       }
+      iter->Delete();
       //END cycle for remove old surface and redraw the rigth slice
     }
     else
