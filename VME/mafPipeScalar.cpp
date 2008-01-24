@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-24 12:26:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,16 +20,16 @@
 //----------------------------------------------------------------------------
 
 #include "mafPipeScalar.h"
-#include "mafPipeScalar.h"
 #include "mafDecl.h"
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 
-#include "mafVME.h"
-#include "mafVMEOutputScalar.h"
-#include "mafVMEScalar.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
+
+#include "mafVME.h"
+#include "mafVMEScalar.h"
+#include "mafVMEOutputScalar.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
