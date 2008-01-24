@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   mafMatrixVector.h
   mafPipeFactoryVME.cpp
   mafPipeFactoryVME.h
+  mafScalarVector.cpp
+  mafScalarVector.h
   mafVMEExternalData.cpp
   mafVMEExternalData.h
   mafVMEFactory.cpp
@@ -42,8 +44,6 @@ SET(PROJECT_SRCS
   mafVMEOutputScalar.h
   mafVMEScalar.cpp
   mafVMEScalar.h
-  mafVMEItemScalar.cpp
-  mafVMEItemScalar.h
 )
 
 IF (MAF_USE_CRYPTO)
