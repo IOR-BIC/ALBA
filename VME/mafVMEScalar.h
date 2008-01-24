@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:23:37 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-01-24 12:23:06 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafVMEOutputScalar;
+class mafScalarVector;
 class vtkDataSet;
 
 /** mafVMEScalar */
@@ -35,8 +36,25 @@ public:
   virtual int SetData(double data, mafTimeStamp t);
 
   /** Set the time for this VME.
-  It updates also the vtk representation for the scalar data.*/
+  It updates also the VTK representation for the scalar data.*/
   void SetTimeStamp(mafTimeStamp t);
+
+  /** Return true is this VME has more than one time stamp, either  for data or matrices */
+  virtual bool IsAnimated();
+
+  /** Get the pointer to the array of Scalar's*/
+  mafScalarVector *GetScalarVector() {return m_ScalarVector;}
+
+  /** Return the list of time stamps of the data scalar array stored in this VME. */
+  virtual void GetDataTimeStamps(std::vector<mafTimeStamp> &kframes);
+
+  /**
+  Return the list of timestamps for this VME. Timestamps list is 
+  obtained merging timestamps for matrices and VME scalar data*/
+  virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
+
+  /** Set the time bounds for the time varying VME based on scalar data and matrix vector.*/
+  void GetLocalTimeBounds(mafTimeStamp tbounds[2]);
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
@@ -67,6 +85,8 @@ protected:
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
+
+  mafScalarVector *m_ScalarVector;
 
 private:
   mafVMEScalar(const mafVMEScalar&); // Not implemented
