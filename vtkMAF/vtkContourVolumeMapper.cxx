@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2007-02-09 15:51:45 $
-Version:   $Revision: 1.17 $
+Date:      $Date: 2008-01-24 13:05:41 $
+Version:   $Revision: 1.18 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -72,9 +72,6 @@ All rights reserved.
 // ListOfPolyline2D::IsInside()
 // ListOfPolyline2D::FindContour()
 
-
-
-#include "mafDefines.h"
 #include <assert.h>
 #include <vector>
 
@@ -101,7 +98,6 @@ All rights reserved.
 #include "vtkContourVolumeMapper.h"
 #include <algorithm>
 #include <cmath>
-#include "mafMatrix.h"
 #include <fstream>
 
 
@@ -109,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.17 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 

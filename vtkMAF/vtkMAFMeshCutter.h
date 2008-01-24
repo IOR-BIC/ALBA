@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.h,v $
 Language:  C++
-Date:      $Date: 2007-11-29 09:18:41 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-01-24 13:05:41 $
+Version:   $Revision: 1.5 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -16,17 +16,19 @@ All rights reserved.
 #ifndef __vtkMAFMeshCutter_h
 #define __vtkMAFMeshCutter_h
 
+//---------------------------------------------
+// includes:
+//---------------------------------------------
 #include "vtkUnstructuredGridToPolyDataFilter.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkPlane.h"
-#include "vtkPolyData.h"
-#include "vtkIdType.h"
-#include "vtkIdList.h"
 #include "vtkMAFConfigure.h"
-#include "mafObject.h"
-#include <ostream>
 #include <vector>
 
+//---------------------------------------------
+// class forward:
+//---------------------------------------------
+class vtkPlane;
+class vtkIdList;
+class vtkCell;
 
 /** vtkMAFMeshCutter - vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
 This is very similar to vtkCutter().

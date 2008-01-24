@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-11-29 09:18:41 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-01-24 13:05:41 $
+Version:   $Revision: 1.5 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -12,7 +12,6 @@ Copyright (c) 2007 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
 
-#include "mafDefines.h"
 #include "vtkMAFMeshCutter.h"
 #include "vtkObjectFactory.h"
 #include "vtkPoints.h"
@@ -22,13 +21,19 @@ All rights reserved.
 #include "vtkCellData.h"
 #include "assert.h"
 #include "vtkIndent.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkPlane.h"
+#include "vtkPolyData.h"
+#include "vtkIdType.h"
+#include "vtkIdList.h"
+
 #include <ostream>
-#include <vector>
+
 
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkMAFMeshCutter);
 //------------------------------------------------------------------------------
 
