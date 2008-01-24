@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-19 11:37:43 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-01-24 12:25:13 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -95,15 +95,18 @@ public:
   mafDataVector *GetDataVector() {return m_DataVector;}
 
   /** Return the list of time stamps of the VMEItemArray stored in this VME. */
-  void GetDataTimeStamps(std::vector<mafTimeStamp> &kframes);
+  virtual void GetDataTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /** Return the list of time stamps of the MatrixVector stored in this VME. */
   void GetMatrixTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /**
     Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
+    obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
+
+  /** Set the time bounds for the time varying VME based on data and matrix vector.*/
+  void GetLocalTimeBounds(mafTimeStamp tbounds[2]);
 
   /** 
     return true is this VME has more than one time stamp, either  for

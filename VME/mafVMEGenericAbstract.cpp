@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-08 15:14:52 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-01-24 12:25:13 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -200,6 +200,28 @@ void mafVMEGenericAbstract::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframe
   m_MatrixVector->GetTimeStamps(matrixtimestamps);
 
   mmuTimeSet::Merge(datatimestamps,matrixtimestamps,kframes);
+}
+
+//-------------------------------------------------------------------------
+void mafVMEGenericAbstract::GetLocalTimeBounds(mafTimeStamp tbounds[2])
+//-------------------------------------------------------------------------
+{
+  if (m_DataVector)
+  {
+    m_DataVector->GetTimeBounds(tbounds);
+  }
+
+  mafTimeStamp tmp[2];
+  m_MatrixVector->GetTimeBounds(tmp);
+
+  tmp[0] = tmp[0] < 0 ? 0 : tmp[0];
+  tmp[1] = tmp[1] < 0 ? 0 : tmp[1];
+
+  if (tmp[0]<tbounds[0]||tbounds[0]<0)
+    tbounds[0]=tmp[0];
+
+  if (tmp[1]>tbounds[1]||tbounds[1]<0)
+    tbounds[1]=tmp[1];
 }
 
 //-----------------------------------------------------------------------
