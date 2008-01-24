@@ -26,7 +26,12 @@ IF (MAF_USE_VTK)
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase)
+
+IF(BUILD_SHARED_LIBS)
+ELSE (BUILD_SHARED_LIBS)
+  SET(PROJECT_LIBS mafBase)
+ENDIF (BUILD_SHARED_LIBS)
+
 
 # IO classes for XML related objects
 IF (MAF_USE_XercesC)
@@ -63,4 +68,8 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (MAF_USE_XercesC)
   ADD_DEPENDENCIES(${PROJECT_NAME} BUILD_XercesC_LIBRARY)
 ENDIF (MAF_USE_XercesC)
+
+IF(BUILD_SHARED_LIBS)
+  ADD_DEPENDENCIES(${PROJECT_NAME} mafBase) #substitute with  ${PROJECT_LIBS}   when external libraries are dynamic
+ENDIF (BUILD_SHARED_LIBS)
 

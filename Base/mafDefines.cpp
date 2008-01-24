@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-07 16:12:39 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-01-24 16:05:00 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,8 +25,10 @@
 #include <iostream>
 using namespace std;
 
+#define BUFFER_DIMENSION 4096
+
 static mafMutexLock mafLogMutex; 
-static char mafLogBuffer[2048];
+static char mafLogBuffer[BUFFER_DIMENSION];
 
 //------------------------------------------------------------------------------
 void mafLogMessage(const char *format, ...)
@@ -37,7 +39,21 @@ void mafLogMessage(const char *format, ...)
   MAF_PRINT_MACRO(format,mafLogBuffer,sizeof(mafLogBuffer));
 
 #ifdef MAF_USE_WX
-  wxLogMessage(mafLogBuffer);
+  wxString logStr;
+  logStr.Append(wxString::Format("%s", format));
+  if(logStr.size()<sizeof(mafLogBuffer))
+    wxLogMessage(mafLogBuffer);
+  else
+  {
+    long times;
+    times = logStr.size()/BUFFER_DIMENSION;
+    for(int count = 0; count <times+1; count++)
+    {
+      wxString temporary;
+      temporary.Append(logStr.SubString(count * BUFFER_DIMENSION, (count+1)*BUFFER_DIMENSION));
+      wxLogMessage(temporary);
+    }
+  }
 #else
   cerr << mafLogBuffer;    
 #endif
@@ -142,8 +158,8 @@ bool mafIsLittleEndian(void)
    */ 
   short magic, test; 
   char * ptr;    
-  magic = 0xABCD;                     /* endianess test number */ 
+  magic = 0xABCD;                     /* endianity test number */ 
   ptr = (char *) &magic;               
   test = (ptr[1]<<8) + (ptr[0]&0xFF); /* build value byte by byte */ 
   return (magic == test);             /* if the same is little endian */  
-} 
+}

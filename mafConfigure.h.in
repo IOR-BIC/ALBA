@@ -3,6 +3,7 @@
 
 #if @BUILD_SHARED_LIBS@
 # define MAF_SHARED
+# define MAF_EXPORTS
 #endif
 
 //--------------------------------------------------------------------------

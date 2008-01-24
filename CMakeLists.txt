@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-11-27 15:18:55 $
-# Version:   $Revision: 1.42 $
+# Date:      $Date: 2008-01-24 16:04:46 $
+# Version:   $Revision: 1.43 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -64,7 +64,7 @@ ENDIF(WIN32)
 #-----------------------------------------------------------------------------
 #Remove temporarily the BUILD_SHARED_LIBS because it is not possible to switch the compilation to dynamic.
 #SET(BUILD_SHARED_LIBS 0)
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0 )
+OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 
@@ -146,6 +146,10 @@ IF (MAF_CAN_BUILD)
     SUBDIRS (VME)
     SUBDIRS (Operations)
   ENDIF (MAF_USE_VTK)
+
+  IF(BUILD_SHARED_LIBS)
+    SET(BUILD_SHARED_LIBS 1)
+  ENDIF (BUILD_SHARED_LIBS)
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
   
