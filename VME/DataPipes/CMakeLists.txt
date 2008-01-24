@@ -14,8 +14,6 @@ SET(PROJECT_SRCS
   mafVTKInterpolator.h
   vtkMAFDataPipe.cpp
   vtkMAFDataPipe.h
-  mafScalarInterpolator.cpp
-  mafScalarInterpolator.h
 )
 
 IF (MAF_USE_ITK)
