@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:47:33 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-01-24 17:23:00 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,14 +21,15 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 #include "mafVMERefSys.h"
+#include "mmgGui.h"
+
+#include "mmaMaterial.h"
+#include "mafTagArray.h"
 #include "mafTransform.h"
 #include "mafVMEOutputSurface.h"
 #include "mafDataPipeCustom.h"
-#include "mafTagArray.h"
 #include "mafStorageElement.h"
 #include "mafIndent.h"
-#include "mmaMaterial.h"
-#include "mmgGui.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafMatrix.h"
 
@@ -537,8 +538,9 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the origin
 		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
     {
-			mafVMELandmark *o=((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"));
-			o->GetPoint(origin);
+      ((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"),origin,-1);
+			/*mafVMELandmark *o=((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"));
+			o->GetPoint(origin);*/
     }
     else if(origin_vme->IsMAFType(mafVMELandmark))
     {
@@ -549,8 +551,10 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the point 1
 		if(point1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point1VME") != -1)
     {
-			mafVMELandmark *l1=((mafVMELandmarkCloud *)point1_vme)->GetLandmark(GetLinkSubId("Point1VME"));
-			l1->GetPoint(point1);
+      ((mafVMELandmarkCloud *)point1_vme)->GetLandmark(GetLinkSubId("Point1VME"),point1,-1);
+      mafTransform t;
+      t.SetMatrix(*point1_vme->GetOutput()->GetAbsMatrix());
+      t.TransformPoint(point1, point1);
     }
     else if(point1_vme->IsMAFType(mafVMELandmark))
     {
@@ -561,8 +565,10 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the point 2
 		if(point2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point2VME") != -1)
     {
-			mafVMELandmark *l2=((mafVMELandmarkCloud *)point2_vme)->GetLandmark(GetLinkSubId("Point2VME"));
-			l2->GetPoint(point2);
+      ((mafVMELandmarkCloud *)point2_vme)->GetLandmark(GetLinkSubId("Point2VME"),point2,-1);
+      mafTransform t;
+      t.SetMatrix(*point2_vme->GetOutput()->GetAbsMatrix());
+      t.TransformPoint(point2, point2);
     }
     else if(point2_vme->IsMAFType(mafVMELandmark))
     {
@@ -621,8 +627,10 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the origin
 		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
     {
-			mafVMELandmark *o=((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"));
-			o->GetPoint(origin);
+      ((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"),origin,-1);
+      mafTransform t;
+      t.SetMatrix(*origin_vme->GetOutput()->GetAbsMatrix());
+      t.TransformPoint(origin,origin);
     }
     else if(origin_vme->IsMAFType(mafVMELandmark))
     {

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:31:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-24 17:23:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -86,7 +86,7 @@ public:
 
   /**
     Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
+    obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /** return always false since (currently) the slicer is not an animated VME (position 
@@ -103,7 +103,7 @@ public:
   virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
 
 	/** 
-  Set links for the refsys*/
+  Set links for the ref-sys*/
   void SetRefSysLink(const char *link_name, mafNode *n);
 
 	mafVME *GetOriginVME();
