@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:45:36 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,7 +50,7 @@ mafOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 0;
 
-	m_FileDir = mafGetApplicationDirectory().c_str();
+	m_FileDir = "";//mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mmoVTKExporter::~mmoVTKExporter()

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-11 11:01:39 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -102,7 +102,8 @@ bool mafOpLabelExtractor::Accept(mafNode *vme)
 //----------------------------------------------------------------------------
 // Constants :
 //----------------------------------------------------------------------------
-enum {
+enum LABEL_EXTRACTOR_WIDGET_ID
+{
 	ID_LABEL = MINID,	
   ID_SMOOTH,
   ID_RADIUS_FACTOR,

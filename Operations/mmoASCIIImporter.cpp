@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoASCIIImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:24:31 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ mafOp(label)
 
   m_ScalarOrder = 1;
 
-  m_FileDir = mafGetApplicationDirectory().c_str();
+  m_FileDir = "";//mafGetApplicationDirectory().c_str();
   m_ScalarData = NULL;
   m_ReadyToExecute = false;
 }

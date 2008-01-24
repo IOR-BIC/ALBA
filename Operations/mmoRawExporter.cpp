@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRawExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 10:09:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni - Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,7 +58,7 @@ mafOp(label)
 	m_SingleFile = 1;
 	m_Offset = 0;
 
-	m_ProposedDirectory = mafGetApplicationDirectory().c_str();
+	m_ProposedDirectory = "";//mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mmoRAWExporter::~mmoRAWExporter()

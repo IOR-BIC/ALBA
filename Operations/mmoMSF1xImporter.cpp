@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMSF1xImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:18:22 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -40,7 +40,7 @@ mafOp(label)
 	m_Canundo = true;
 	m_File    = "";
 
-  m_FileDir = mafGetApplicationDirectory().c_str();
+  m_FileDir = "";//mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mmoMSF1xImporter::~mmoMSF1xImporter( ) 

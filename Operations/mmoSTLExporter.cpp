@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLExporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:00:30 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,10 +49,10 @@ mafOp(label)
 	m_Binary        = 1;
 	m_ABSMatrixFlag = 1;
 
-	m_FileDir = mafGetApplicationDirectory().c_str();
+	m_FileDir = "";//mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
-mmoSTLExporter::~mmoSTLExporter( ) 
+mmoSTLExporter::~mmoSTLExporter()
 //----------------------------------------------------------------------------
 {
 }
@@ -100,12 +100,12 @@ void mmoSTLExporter::OnEvent(mafEventBase *maf_event)
     {
       case wxOK:
 				{
-					mafString FileDir = mafGetApplicationDirectory().c_str();
-					FileDir<<"\\";
-					FileDir<<this->m_Input->GetName();
-					FileDir<<".stl";
+					//mafString FileDir = mafGetApplicationDirectory().c_str();
+					//FileDir<<"\\";
+					m_FileDir<<this->m_Input->GetName();
+					m_FileDir<<".stl";
 					mafString wildc = "STL (*.stl)|*.stl";
-					m_File = mafGetSaveFile(FileDir.GetCStr(), wildc.GetCStr()).c_str();
+					m_File = mafGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).c_str();
 					if(m_File!="")
 					{
 						ExportSurface();

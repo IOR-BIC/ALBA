@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 08:43:05 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -62,10 +62,10 @@ mafOp(label)
   m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
-  m_FileDir = mafGetApplicationDirectory().c_str();
+  m_FileDir = "";//mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
-mmoVTKImporter::~mmoVTKImporter( ) 
+mmoVTKImporter::~mmoVTKImporter()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VmePointSet);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-07 14:32:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,7 +65,7 @@ void mafOpImporterMSF::OpRun()
 {
   if (!m_TestMode)
   {
-    mafString fileDir = mafGetApplicationDirectory().c_str();
+    mafString fileDir = "";//mafGetApplicationDirectory().c_str();
     mafString wildc  = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
     m_File = mafGetOpenFile(fileDir, wildc, _("Choose MSF file")).c_str();
   }

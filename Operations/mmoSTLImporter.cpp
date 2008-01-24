@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoSTLImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-05 10:39:10 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-01-24 16:25:29 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,7 +47,7 @@ mafOp(label)
   m_Canundo = true;
   m_Files.clear();
   m_Swaps.clear();
-  m_FileDir = mafGetApplicationDirectory().c_str();
+  m_FileDir = "";//mafGetApplicationDirectory().c_str();
 }
 //----------------------------------------------------------------------------
 mmoSTLImporter::~mmoSTLImporter()
