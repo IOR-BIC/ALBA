@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:23:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-24 12:23:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ public:
     Return a VNL matrix corresponding to the current time. This is
     the output of the DataPipe currently attached to the VME Scalar.
     Usually the output is a  "smart copy" of one of the vnl matrix in 
-    the DataArray. An event is rised when the output data changes to allow attached classes to 
+    the DataArray. An event is rise when the output data changes to allow attached classes to 
     update their input.*/
   virtual double GetScalarData();
 
