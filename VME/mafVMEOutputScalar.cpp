@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:23:37 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-01-24 12:24:21 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,8 +25,7 @@
 #include "mmgGui.h"
 
 #include "mafVMEScalar.h"
-#include "mafVMEItemScalar.h"
-#include "mafScalarInterpolator.h"
+#include "mafScalarVector.h"
 #include "mafIndent.h"
 
 #ifdef MAF_USE_VTK
@@ -69,9 +68,10 @@ double mafVMEOutputScalar::GetScalarData()
 //-------------------------------------------------------------------------
 {
   assert(m_VME);
-  mafScalarInterpolator *scalarInterpolator = (mafScalarInterpolator *)m_VME->GetDataPipe();
-  scalarInterpolator->Update();
-  return scalarInterpolator->GetScalarData();
+  mafScalarVector *scalarVector = ((mafVMEScalar *)m_VME)->GetScalarVector();
+  return scalarVector->GetItemBefore(GetTimeStamp());
+  //return scalarVector->GetNearestScalar(GetTimeStamp());  // Also this method could be used; depend on interpolation
+                                                            // we want to use.
 }
 
 #ifdef MAF_USE_VTK
@@ -86,13 +86,7 @@ vtkDataSet *mafVMEOutputScalar::GetVTKData()
 void mafVMEOutputScalar::UpdateVTKRepresentation()
 //-------------------------------------------------------------------------
 {
-  assert(m_VME);
-  mafVMEScalar *scalar_vme = mafVMEScalar::SafeDownCast(m_VME);
-  assert(scalar_vme);
-
-  mafScalarInterpolator *scalarInterpolator = (mafScalarInterpolator *)scalar_vme->GetDataPipe();
-  scalarInterpolator->Update();
-  double data = scalarInterpolator->GetScalarData();
+  double data = GetScalarData();
 
   int pointId[2];
   double time_point = GetTimeStamp();
@@ -121,13 +115,13 @@ mmgGui* mafVMEOutputScalar::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = mafVMEOutput::CreateGui();
 
-  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe())
+  if (m_VME)
   {
     this->Update();
   }
-  double data = GetScalarData();
+  /*double data = GetScalarData();
   m_ScalarDataString = "";
-  m_ScalarDataString << data;
+  m_ScalarDataString << data;*/
   m_Gui->Label(_("data: "),&m_ScalarDataString);
 	m_Gui->Divider(); 
 	return m_Gui;
