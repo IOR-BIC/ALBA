@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:01:30 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-01-24 12:19:38 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,7 +88,8 @@ void mafVMEOutput::SetBounds(const mafOBB &bounds)
 void mafVMEOutput::GetLocalTimeBounds(mafTimeStamp tbounds[2]) const
 //-------------------------------------------------------------------------
 {
-  std::vector<mafTimeStamp> tstamps;
+  // Paolo 09-01-2008: Commented and substituted by code below.
+  /*std::vector<mafTimeStamp> tstamps;
   m_VME->GetLocalTimeStamps(tstamps);
   if (tstamps.size()>0)
   {
@@ -100,7 +101,9 @@ void mafVMEOutput::GetLocalTimeBounds(mafTimeStamp tbounds[2]) const
     // set to invalid time bounds (i.e. infinite)
     tbounds[0]=0;
     tbounds[1]=-1;
-  }
+  }*/
+
+  m_VME->GetLocalTimeBounds(tbounds);
   
 }
 //-------------------------------------------------------------------------
@@ -109,7 +112,8 @@ void mafVMEOutput::GetTimeBounds(mafTimeStamp tbounds[2]) const
 {
   assert(m_VME);
   
-  GetLocalTimeBounds(tbounds);
+  //GetLocalTimeBounds(tbounds);
+  m_VME->GetLocalTimeBounds(tbounds);
   
   for (int i=0;i<m_VME->GetNumberOfChildren();i++)
   {
