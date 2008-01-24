@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:30:32 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-01-24 17:23:16 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,9 +102,8 @@ public:
     interpolates on the fly according to the matrix interpolator.*/
   virtual void SetMatrix(const mafMatrix &mat);
 
-  /**
-    Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
+  /** Return the list of timestamps for this VME. Timestamps list is 
+    obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /** return always false since (currently) the slicer is not an animated VME (position 
@@ -114,8 +113,7 @@ public:
   /** return an xpm-icon that can be used to represent this node */
   //static char ** GetIcon();
 
-  /**
-  Get/Set the kind of measure  performed: distance between points (POINT) or
+  /**Get/Set the kind of measure  performed: distance between points (POINT) or
   distance between a point and a line. */
   int GetMeterMode();
   void SetMeterMode(int mode);
@@ -123,96 +121,76 @@ public:
   void SetMeterModeToLineDistance() {this->SetMeterMode(mafVMEMeter::LINE_DISTANCE);}
   void SetMeterModeToLineAngle() {this->SetMeterMode(mafVMEMeter::LINE_ANGLE);}
 
-  /** 
-  Store the min and max distance to associate with colors.*/
+  /** Store the min and max distance to associate with colors.*/
   void SetDistanceRange(double min, double max);
   void SetDistanceRange(double range[2]) {SetDistanceRange(range[0],range[1]);};
 
-  /** 
-  Retrieve the distance range associated with colors.*/
+  /** Retrieve the distance range associated with colors.*/
   double *GetDistanceRange();
   void GetDistanceRange(double range[2]);
 
-  /** 
-  Color the meter with a range colors extracted by a LookupTable or in flat mode selected by material library. */
+  /** Color the meter with a range colors extracted by a LookupTable or in flat mode selected by material library. */
   void SetMeterColorMode(int mode);
   void SetMeterColorModeToOneColor() {this->SetMeterColorMode(mafVMEMeter::ONE_COLOR);}
   void SetMeterColorModeToRangeColor() {this->SetMeterColorMode(mafVMEMeter::RANGE_COLOR);}
 
-  /** 
-  Get the color mode of the meter. */
+  /** Get the color mode of the meter. */
   int GetMeterColorMode();
 
-  /** 
-  Set the measure type to absolute or relative to the initial measure. */
+  /** Set the measure type to absolute or relative to the initial measure. */
   void SetMeterMeasureType(int type);
   void SetMeterMeasureTypeToAbsolute() {this->SetMeterMeasureType(mafVMEMeter::ABSOLUTE_MEASURE);}
   void SetMeterMeasureTypeToRelative() {this->SetMeterMeasureType(mafVMEMeter::RELATIVE_MEASURE);}
 
-  /** 
-  Get the measure type. */
+  /** Get the measure type. */
   int GetMeterMeasureType();
 
-  /** 
-  Represent the meter with a tube or as a line. */
+  /** Represent the meter with a tube or as a line. */
   void SetMeterRepresentation(int representation);
   void SetMeterRepresentationToLine() {this->SetMeterRepresentation(mafVMEMeter::LINE_REPRESENTATION);}
   void SetMeterRepresentationToTube() {this->SetMeterRepresentation(mafVMEMeter::TUBE_REPRESENTATION);}
 
-  /** 
-  Get the representation mode of the meter. */
+  /** Get the representation mode of the meter. */
   int GetMeterRepresentation();
 
-  /** 
-  Represent the meter with a tube or as a line. */
+  /** Represent the meter with a tube or as a line. */
   void SetMeterCapping(int capping);
   void SetMeterCappingOn() {this->SetMeterCapping(1);}
   void SetMeterCappingOff() {this->SetMeterCapping(0);}
 
-  /** 
-  Get the capping of tube representation of the meter. */
+  /** Get the capping of tube representation of the meter. */
   int GetMeterCapping();
 
-  /** 
-  Enable-Disable event generation fo length threshold. */
+  /** Enable-Disable event generation of length threshold. */
   void SetGenerateEvent(int generate);
   void SetGenerateEventOn() {SetGenerateEvent(1);}
   void SetGenerateEventOff() {SetGenerateEvent(0);}
 
-  /** 
-  Get the length threshold event generation status. */
+  /** Get the length threshold event generation status. */
   int GetGenerateEvent();
 
-  /** 
-  Set the initial measure. */
+  /** Set the initial measure. */
   void SetInitMeasure(double init_measure);
 
-  /** 
-  Get the initial measure. */
+  /** Get the initial measure. */
   double GetInitMeasure();
 
-  /** 
-  Set the meter radius when represented as tube. */
+  /** Set the meter radius when represented as tube. */
   void SetMeterRadius(double radius);
 
-  /** 
-  Get the meter radius when represented as tube. */
+  /** Get the meter radius when represented as tube. */
   double GetMeterRadius();
 
-  /** 
-  Set the percentage elongation. */
+  /** Set the percentage elongation. */
   void SetDeltaPercent(int delta_percent);
 
-  /** 
-  Get the percentage elongation. */
+  /** Get the percentage elongation. */
   int GetDeltaPercent();
 
-  /**
-  return distance extracting it from the connected pipe. */
+  /** return distance extracting it from the connected pipe. */
   double GetDistance();
 
-  /**
-  return angle extracting it from the connected pipe. */
+  /** return angle extracting it from the connected pipe. */
   double GetAngle();
 
   /** return the meter's attributes */
