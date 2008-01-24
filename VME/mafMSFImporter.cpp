@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-23 10:19:54 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-01-24 12:26:27 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -207,7 +207,8 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
       for (int i=0;i<children.size();i++)
       {
         // Restore a TagArray element
-        if (mafCString("TArray") == children[i]->GetName())
+        //if (mafCString("TArray") == children[i]->GetName())
+        if (mafString("TArray").Equals(children[i]->GetName()))
         {
           if (RestoreTagArray(children[i],vme->GetTagArray()) != MAF_OK)
           {
@@ -257,7 +258,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
             return NULL;
           }
         }
-
+        
         // restore children VMEs
         else if (mafCString("VME") == children[i]->GetName())
         {
@@ -318,8 +319,8 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           {
             vme->AddChild(child_vme);
           }
-        } 
-      }
+        } // VMR restore
+      }// Children
     } // Name
   } // Type
   return vme;
