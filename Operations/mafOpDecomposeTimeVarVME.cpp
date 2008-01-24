@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-08 15:19:14 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-24 12:26:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -62,10 +62,21 @@ mafOp(label)
 mafOpDecomposeTimeVarVME::~mafOpDecomposeTimeVarVME()
 //----------------------------------------------------------------------------
 {
-  m_VectorCloud.clear();
-  m_VectorVME.clear();
-  mafDEL(m_Cloud);
-  mafDEL(m_Group);
+  if (m_Group != NULL) 
+  {
+    for (int i = 0; i < m_VectorCloud.size(); i++)
+    {
+      m_VectorCloud[i]->RemoveLandmark(0);
+      mafDEL(m_VectorCloud[i]);
+    }
+
+    for (int i = 0; i < m_VectorVME.size(); i++)
+    {
+      mafDEL(m_VectorVME[i]);
+    }
+    m_Group->ReparentTo(NULL);
+    mafDEL(m_Group);
+  }
 }
 
 //----------------------------------------------------------------------------
