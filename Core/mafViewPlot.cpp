@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-24 16:05:31 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -201,7 +201,7 @@ mmgGui *mafViewPlot::CreateGui()
 void mafViewPlot::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  /*if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId()) 
     {
@@ -213,7 +213,8 @@ void mafViewPlot::OnEvent(mafEventBase *maf_event)
   else
   {
     mafEventMacro(*maf_event);
-  }
+  }*/
+  mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
 void mafViewPlot::Print(wxDC *dc, wxRect margins)
