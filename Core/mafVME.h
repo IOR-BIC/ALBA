@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 10:14:29 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-01-24 12:18:02 $
+  Version:   $Revision: 1.35 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -164,17 +164,20 @@ public:
   
   /**
     Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
+    obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)=0;
+
+  /** Set the time bounds for the time varying VME (base VME is not time varying).*/
+  virtual void GetLocalTimeBounds(mafTimeStamp tbounds[2]) {tbounds[0] = 0; tbounds[1] = 0;};
   
 	/**
     Return the list of timestamps considering all parents timestamps. Timestamps list is
-    obtained merging timestamps for matrixes and VME items*/
+    obtained merging timestamps for matrices and VME items*/
 	virtual void GetAbsTimeStamps(std::vector<mafTimeStamp> &kframes);
   
 	/**
     Return the list of timestamps for the full sub tree. Timestamps list is
-    obtained merging timestamps for matrixes and VME items*/
+    obtained merging timestamps for matrices and VME items*/
   virtual void GetTimeStamps(std::vector<mafTimeStamp> &kframes);  
   
   /** Return the number of time stamps in the whole tree*/
