@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:23:37 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-01-24 12:21:18 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,7 +45,6 @@
 #endif
 
 #include "mafVMEScalar.h"
-#include "mafVMEItemScalar.h"
 #include "mafVMESlicer.h"
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
@@ -100,7 +99,6 @@ mafVMEFactory::mafVMEFactory()
 
   mafPlugObjectMacro(mafTagArray,"a basic kind of attribute used to store key-value pairs");
   mafPlugObjectMacro(mafVMEItemVTK,"a VME item storing VTK datasets");
-  mafPlugObjectMacro(mafVMEItemScalar,"a VME item storing scalar data");
 #ifdef MAF_USE_ITK
   mafPlugObjectMacro(mafVMEItemScalarMatrix,"a VME item storing matrix scalar data through vnl matrix");
 #endif
