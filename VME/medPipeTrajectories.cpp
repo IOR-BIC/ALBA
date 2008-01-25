@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-21 15:36:47 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-01-25 15:04:17 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,7 +88,6 @@ void medPipeTrajectories::Create(mafSceneNode *n)
     radius = 10;
   }
   
-
   //Create a sphere in the center of the trajectory
   vtkNEW(m_Sphere);
   m_Sphere->SetRadius(radius);
@@ -113,8 +112,7 @@ void medPipeTrajectories::Create(mafSceneNode *n)
   if (material)
     m_Actor->SetProperty(material->m_Prop);
  
-  m_RenFront->AddActor(m_Actor);
-//  m_AssemblyFront->AddPart(m_Actor);
+ m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
   m_OutlineBox = vtkOutlineCornerFilter::New();
@@ -135,16 +133,15 @@ void medPipeTrajectories::Create(mafSceneNode *n)
   m_OutlineActor->PickableOff();
   m_OutlineActor->SetProperty(m_OutlineProperty);
   
-  m_RenFront->AddActor(m_OutlineActor);
-//  m_AssemblyFront->AddPart(m_OutlineActor);
+  m_AssemblyFront->AddPart(m_OutlineActor);
 }
 //----------------------------------------------------------------------------
 medPipeTrajectories::~medPipeTrajectories()
 //----------------------------------------------------------------------------
 {
   m_Landmark->GetEventSource()->RemoveObserver(this);
-  m_RenFront->RemoveActor(m_Actor);
-  m_RenFront->RemoveActor(m_OutlineActor);
+  m_AssemblyFront->RemovePart(m_Actor);
+  m_AssemblyFront->AddPart(m_OutlineActor);
 
   vtkDEL(m_Traj);
   vtkDEL(m_Sphere);
@@ -187,6 +184,7 @@ void medPipeTrajectories::OnEvent(mafEventBase *maf_event)
     {
       case ID_INTERVAL:
         UpdateProperty();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         break;
       default:
         mafEventMacro(*e);
