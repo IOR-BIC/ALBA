@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 12:26:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-25 13:36:52 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -165,6 +165,9 @@ protected:
 
 	mafVMEVolumeGray  *m_VolumeGray;
   mafVMEVolumeRGB   *m_VolumeRGB;
+
+  mafString m_DimXCrop;
+  mafString m_DimYCrop;
 
 };
 #endif

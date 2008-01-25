@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 16:32:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-01-25 13:36:52 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -260,6 +260,14 @@ void mmoRAWImporterImages::CreateGui()
 		m_Gui->Integer(ID_OFFSET,_("file offset:"),&m_Offset,0, MAXINT,_("set the first slice number in the files name"));
 		m_Gui->Integer(ID_SPACING,_("file spc.:"),&m_FileSpacing,1, MAXINT, _("set the spacing between the slices in the files name"));
 		m_Gui->Divider(0);
+    m_Gui->Label(_("Crop Dim."),true);
+    m_Gui->Label(_("DimX:"), &m_DimXCrop);
+    m_Gui->Label(_("DimY:"), &m_DimYCrop);
+
+    m_DimXCrop = wxString::Format("%d", 0);
+    m_DimYCrop = wxString::Format("%d", 0);
+
+    m_Gui->Divider(0);
 		m_Gui->OkCancel();
 		m_Gui->Divider(0);
 		m_Gui->Show(true);
@@ -415,7 +423,7 @@ void mmoRAWImporterImages::EnableWidgets(bool enable)
 	m_SliceSlider->Enable(enable);
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::	OnEvent(mafEventBase *maf_event) 
+void mmoRAWImporterImages::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -598,6 +606,11 @@ void mmoRAWImporterImages::	OnEvent(mafEventBase *maf_event)
 					}
 				}
 			  m_Dialog->GetRWI()->CameraUpdate();
+
+
+        m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+        m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+        m_Gui->Update();
 			}
 		}
 		break;
@@ -657,6 +670,9 @@ void mmoRAWImporterImages::	OnEvent(mafEventBase *maf_event)
 				}
 			}
 			m_Dialog->GetRWI()->CameraUpdate();
+      m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+      m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+      m_Gui->Update();
 		}
 		break;
 		case MOUSE_UP:  //blocca il gizmo
@@ -674,6 +690,9 @@ void mmoRAWImporterImages::	OnEvent(mafEventBase *maf_event)
         m_ROI_2D[2] = b[2];
         m_ROI_2D[3] = b[3];
       }
+      m_DimXCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[0]-m_GizmoPlane->GetPoint1()[0]));
+      m_DimYCrop = wxString::Format("%.2f", abs(m_GizmoPlane->GetPoint2()[1]-m_GizmoPlane->GetPoint1()[1]));
+      m_Gui->Update();
 		break;
 		case wxOK:
       if(!ControlFilenameList())
