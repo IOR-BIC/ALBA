@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:57:17 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2008-01-28 16:26:56 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -399,9 +399,6 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         m_MaterialButton->Enable(m_UseVTKProperty != 0);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
-      /*case ID_USE_LOOKUP_TABLE:
-        m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
-      break;*/
       case ID_RENDERING_DISPLAY_LIST:
         m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -412,7 +409,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 				else if(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetNormals())
 					CreateNormalsPipe();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-				break;
+			break;
 			case ID_EDGE_VISIBILITY:
 				if(m_EdgesActor)
 				{
@@ -422,6 +419,7 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 				else
 					CreateEdgesPipe();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      break;
       default:
         mafEventMacro(*e);
       break;
