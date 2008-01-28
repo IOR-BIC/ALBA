@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-25 15:04:17 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-01-28 10:19:43 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,9 @@ void medPipeTrajectories::Create(mafSceneNode *n)
   m_Selected = false;
   m_Landmark  = mafVMELandmark::SafeDownCast(m_Vme);
   m_Landmark->GetLocalTimeStamps(m_TimeVector);
-  m_MatrixVector = m_Landmark->GetMatrixVector();
+  //mafVMEGenericAbstract *vmeGeneric = mafVMEGenericAbstract::SafeDownCast(m_Landmark->GetParent());
+ // m_MatrixVector = vmeGeneric->GetMatrixVector();
+   m_MatrixVector = m_Landmark->GetMatrixVector();
 
   m_Vme->GetEventSource()->AddObserver(this);
 
@@ -151,6 +153,7 @@ medPipeTrajectories::~medPipeTrajectories()
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
+
 }
 //----------------------------------------------------------------------------
 void medPipeTrajectories::Select(bool sel)
@@ -201,6 +204,7 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
   double xyz[3];
+  double xyzTransform[3];
   mafTimeStamp t0;
   t0 = m_Landmark->GetTimeStamp();
 
@@ -230,23 +234,30 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
     }
     int minValue = (i-m_Interval) < 0 ? 0 : (i-m_Interval);
     int maxValue = (i + m_Interval) >= m_TimeVector.size() ? m_TimeVector.size() - 1 : (i + m_Interval);
-    //Landmark center position
+    
+    //Get landmark position form the current transformation matrix
     mafMatrix *m = m_MatrixVector->GetKeyMatrix(i);
- 
-    mafTransform::GetPosition(*m,xyz);
-    m_Sphere->SetCenter(xyz[0], xyz[1], xyz[2]);
+    mafTransform::GetPosition(*m,xyzTransform);
+
+    //Landmark center position. Set to zero, because position is applied by the current transformation matrix
+    m_Sphere->SetCenter(0, 0, 0);
     sphere_visibility = m_Landmark->GetLandmarkVisibility(m_TimeVector[i]);
 
     //start construct the landmark trajectory
     m = m_MatrixVector->GetKeyMatrix(minValue);
     mafTransform::GetPosition(*m,xyz);
-    points->InsertNextPoint(xyz[0], xyz[1], xyz[2]);
+
+    //Subtract the position of the current transformation matrix, from the position of the "minValue" transformation.
+    //It is necessary because current transformation matrix is applied in visualization.
+    points->InsertNextPoint(xyz[0] - xyzTransform[0], xyz[1] - xyzTransform[1], xyz[2] - xyzTransform[2]);
    
     for (mafTimeStamp n = (minValue + 1); n <= maxValue; n++)
     {
       m = m_MatrixVector->GetKeyMatrix(n);
       mafTransform::GetPosition(*m,xyz);
-      points->InsertNextPoint(xyz[0], xyz[1], xyz[2]);
+
+      //Subtract the position of the current transformation matrix, from the position of the "n" transformation: 
+      points->InsertNextPoint(xyz[0] - xyzTransform[0], xyz[1] - xyzTransform[1], xyz[2] - xyzTransform[2]); //transform
 
       previous = m_Landmark->GetLandmarkVisibility(m_TimeVector[n-1]);
       current = m_Landmark->GetLandmarkVisibility(m_TimeVector[n]);
