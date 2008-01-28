@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-24 10:08:45 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-01-28 15:39:25 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -172,6 +172,7 @@ protected:
 	int m_PointTool;
 	int m_BranchTool;
 	int m_Action;
+  double m_SphereRadius;
 
 	//Pipe Variables
 	vtkSphereSource		*m_Sphere;

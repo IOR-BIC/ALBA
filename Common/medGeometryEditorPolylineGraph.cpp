@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-28 10:51:46 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-01-28 15:39:25 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -117,6 +117,7 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 	m_Action			= ID_POINT_ACTION;
 	m_PointTool		= ID_ADD_POINT;
 	m_BranchTool	= ID_ADD_BRANCH;
+  m_SphereRadius = 1.0;
 
 	m_SelectedPoint = UNDEFINED_POINT_ID;
 	m_SelectedPointVTK = UNDEFINED_POINT_ID;
@@ -150,14 +151,15 @@ void medGeometryEditorPolylineGraph::CreatePipe()
 	vtkMAFSmartPointer<vtkPolyData> data;
 	m_PolylineGraph->CopyToPolydata(data);
 
-	vtkMAFSmartPointer<vtkSphereSource> Sphere;
-	Sphere->SetRadius(1.0);
-	Sphere->SetPhiResolution(5);
-	Sphere->SetThetaResolution(5);
+	//vtkMAFSmartPointer<vtkSphereSource> Sphere;
+  vtkNEW(m_Sphere);
+	m_Sphere->SetRadius(m_SphereRadius);
+	m_Sphere->SetPhiResolution(5);
+	m_Sphere->SetThetaResolution(5);
 
 	vtkNEW(m_Glyph);
 	m_Glyph->SetInput(data);
-	m_Glyph->SetSource(Sphere->GetOutput());
+	m_Glyph->SetSource(m_Sphere->GetOutput());
 	m_Glyph->SetScaleModeToDataScalingOff();
 	m_Glyph->SetRange(0.0,1.0);
 	m_Glyph->Update();
@@ -196,6 +198,7 @@ medGeometryEditorPolylineGraph::~medGeometryEditorPolylineGraph()
 	vtkDEL(m_AppendPolydata);
 	vtkDEL(m_Tube);
 	vtkDEL(m_Glyph);
+  vtkDEL(m_Sphere);
 
 	delete m_PolylineGraph;
 }
@@ -218,6 +221,7 @@ enum EDITOR_GRAPH_ID
 	ID_ACTION,
 	ID_BUTTON_POINT_DELETE,
 	ID_BUTTON_BRANCH_DELETE,
+  ID_SPHERE_RADIUS,
 };
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
@@ -227,9 +231,20 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+      case ID_SPHERE_RADIUS:
+        {
+          m_Sphere->SetRadius(m_SphereRadius);
+          m_Sphere->Update();
+          vtkMAFSmartPointer<vtkPolyData> poly_new;
+          m_PolylineGraph->CopyToPolydata(poly_new);
+          UpdateVMEEditorData(poly_new);
+          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
+      break;
 			case ID_ACTION:
 				{
 					m_Gui->Enable(ID_POINT_TOOL,m_Action==ID_POINT_ACTION);
+          m_Gui->Enable(ID_SPHERE_RADIUS,m_Action==ID_POINT_ACTION);
 					m_Gui->Enable(ID_BRANCH_TOOL,m_Action==ID_BRANCH_ACTION);
 					m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
 					m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
@@ -335,6 +350,10 @@ void medGeometryEditorPolylineGraph::CreateGui()
 	wxString choices_point_tool[4]={_("Add Point"),_("Insert Point"),_("Move Point"),_("Select Point")};
 	m_Gui->Radio(ID_POINT_TOOL,_("Point Tool"),&m_PointTool,4,choices_point_tool);
 	m_Gui->Enable(ID_POINT_TOOL,m_Action==ID_POINT_ACTION);
+
+  m_Gui->Label(_("Point Radius"));
+  m_Gui->Double(ID_SPHERE_RADIUS,_(""),&m_SphereRadius);
+  m_Gui->Enable(ID_SPHERE_RADIUS,m_Action==ID_POINT_ACTION);
 
 	m_Gui->Button(ID_BUTTON_POINT_DELETE,_("Delete"));
 	m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
@@ -554,6 +573,7 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 						m_PointTool = ID_ADD_POINT;
 
 						m_Gui->Enable(ID_POINT_TOOL,m_Action==ID_POINT_ACTION);
+            m_Gui->Enable(ID_SPHERE_RADIUS,m_Action==ID_POINT_ACTION);
 						m_Gui->Enable(ID_BRANCH_TOOL,m_Action==ID_BRANCH_ACTION);
 
 						m_Gui->Update();
