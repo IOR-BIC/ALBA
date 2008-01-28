@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-11 16:06:43 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-01-28 16:03:11 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,9 @@ public:
    ~mafOpSelect(); 
     bool Accept(mafNode* vme);
     void SetInput(mafNode* vme);
+    mafNode* GetInput(){return m_OldNodeSelected;};
     void SetNewSel(mafNode* vme);
+    mafNode* GetNewSel(){return m_NewNodeSelected;};
     void OpDo();
     void OpUndo();
     mafOp* Copy();
