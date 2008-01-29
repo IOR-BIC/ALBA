@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-23 16:40:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-01-29 17:07:39 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -537,8 +537,23 @@ void mmoRegisterClusters::OpDo()
     }
     else
     {
-      m_Registered->SetAbsMatrix(((mafVMELandmarkCloud *)m_Target)->GetAbsMatrixPipe()->GetMatrix());
+      //m_Registered->SetAbsMatrix(((mafVMELandmarkCloud *)m_Target)->GetAbsMatrixPipe()->GetMatrix());
       mafEventMacro(mafEvent(this, VME_ADD, m_Registered));
+      /*std::vector<mafTimeStamp> timeStamps;
+      m_Registered->GetTimeStamps(timeStamps);
+      for(int i=0; i<timeStamps.size();i++)
+      {
+        double value;
+        value = timeStamps[i];
+        value = value;
+      }
+      m_Target->GetTimeStamps(timeStamps);
+      for(int i=0; i<timeStamps.size();i++)
+      {
+        double value;
+        value = timeStamps[i];
+        value = value;
+      }*/
       m_Registered->ReparentTo(m_Result);
     }
     
@@ -735,7 +750,23 @@ double mmoRegisterClusters::RegisterPoints(double currTime)
 	else
 	{
     m_Registered->SetTimeStamp(currTime); //SetCurrentTime(currTime);
-		m_Registered->SetPose(t_matrix,currTime);
+ 
+    //m_Registered->SetPose(t_matrix,currTime);
+    //m_Registered->Update();
+    mafMatrix *temp;
+    mafNEW(temp);
+    temp->SetVTKMatrix(t_matrix);
+    temp->SetTimeStamp(currTime);
+    temp->Modified();
+    mafMatrix *regMatrix = m_Registered->GetOutput()->GetMatrix();
+    regMatrix->DeepCopy(temp->GetVTKMatrix());
+    m_Registered->SetMatrix(*regMatrix);
+    m_Registered->Modified();
+    m_Registered->Update();
+    mafDEL(temp);
+    //mafMatrix *z;
+    //z = m_Registered->GetOutput()->GetMatrix();
+    
 
 		if(m_Follower)
 		{
