@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 11:08:41 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-01-29 11:32:31 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -130,8 +130,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   }
   else if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPointSet))
   {
-    if(m_Vme->IsMAFType(mafVMELandmarkCloud))
-      m_Vme->GetEventSource()->AddObserver(this);
+    
     if (m_Vme->IsMAFType(mafVMELandmarkCloud) && !((mafVMELandmarkCloud *)m_Vme)->IsOpen())
     {
       mafVMEOutputLandmarkCloud *landmark_cloud_output = mafVMEOutputLandmarkCloud::SafeDownCast(m_Vme->GetOutput());
