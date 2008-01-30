@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 17:38:23 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2008-01-30 11:03:43 $
+  Version:   $Revision: 1.49 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,23 +184,25 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
   m_VolumeOutput = mafVMEOutputVolume::SafeDownCast(m_Vme->GetOutput());
   assert(m_VolumeOutput != NULL);
+
+  vtkDataSet *data = m_Vme->GetOutput()->GetVTKData();
   double b[6];
   m_Vme->GetOutput()->Update();
-  m_Vme->GetOutput()->GetVTKData()->Update();
+  data->Update();
   m_Vme->GetOutput()->GetVMELocalBounds(b);
 
   mmaVolumeMaterial *material = m_VolumeOutput->GetMaterial();
   if (material->m_TableRange[1] < material->m_TableRange[0]) 
   {
-    m_Vme->GetOutput()->GetVTKData()->GetScalarRange(material->m_TableRange);
+    data->GetScalarRange(material->m_TableRange);
+    material->UpdateProp();
   }
   
   m_ColorLUT = material->m_ColorLut;
-  material->UpdateProp();
+/*  material->UpdateProp();
 
   double sr[2];
   m_Vme->GetOutput()->GetVTKData()->GetScalarRange(sr);
-  
 
   if (material->m_TableRange[1] < material->m_TableRange[0]) 
   {
@@ -209,11 +211,8 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   else
     m_ColorLUT->SetTableRange(material->m_TableRange);
 
-  
-  
   material->UpdateFromTables();
-  //mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-
+*/
 	if(m_SliceDirection == SLICE_ARB)
 		m_SliceDirection = SLICE_Z;
 
@@ -248,8 +247,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
     m_YVector[2][1] = 1;
     m_YVector[2][2] = 0;
 
-    int i;
-    for(i = 0; i<3; i++)
+    for(int i = 0; i < 3; i++)
 		{
 			vtkMath::Normalize(m_XVector[i]);
 			vtkMath::Normalize(m_YVector[i]);
@@ -276,7 +274,7 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 	//if(m_ShowVolumeBox)
 	//{
 		vtkNEW(m_VolumeBox);
-		m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
+		m_VolumeBox->SetInput(data);
 
 		vtkNEW(m_VolumeBoxMapper);
 		m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
