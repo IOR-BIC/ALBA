@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-01-30 11:03:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -209,6 +209,8 @@ int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
       node->RestoreVectorN(lutvalues,rgba,4);
       m_ColorLut->SetTableValue(v,rgba);
     }
+    m_ColorLut->SetTableRange(m_TableRange);
+    m_ColorLut->SetRange(m_TableRange);
     m_ColorLut->Build();
     node->RestoreInteger("InterpolationType", m_InterpolationType);
     node->RestoreInteger("Shade", m_Shade);
@@ -248,7 +250,11 @@ void mmaVolumeMaterial::UpdateProp()
   m_ColorLut->SetSaturationRange(m_SaturationRange);
   m_ColorLut->SetNumberOfTableValues(m_NumValues);
   m_ColorLut->SetTableRange(m_TableRange);
+  m_ColorLut->SetRange(m_TableRange);
   m_ColorLut->Build();
+
+  m_Window_LUT = m_TableRange[1] - m_TableRange[0];
+  m_Level_LUT  = (m_TableRange[1] + m_TableRange[0])* .5;
 }
 //-----------------------------------------------------------------------
 void mmaVolumeMaterial::UpdateFromTables()
