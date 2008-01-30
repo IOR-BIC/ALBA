@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:47:33 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-01-30 14:42:20 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,14 +20,17 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMESlicer.h"
+#include "mmgGui.h"
+#include "mmgLutPreset.h"
+
+#include "mmaMaterial.h"
+
 #include "mafTransform.h"
 #include "mafStorageElement.h"
 #include "mafIndent.h"
 #include "mafDataPipeCustom.h"
 #include "mafVMEVolume.h"
 #include "mafVMEOutputSurface.h"
-#include "mmaMaterial.h"
-#include "mmgGui.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFDataPipe.h"
@@ -115,6 +118,7 @@ mmaMaterial *mafVMESlicer::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
+    lutPreset(4,GetMaterial()->m_ColorLut);
   }
   return material;
 }
@@ -213,18 +217,6 @@ void mafVMESlicer::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-int mafVMESlicer::InternalInitialize()
-//-------------------------------------------------------------------------
-{
-	if (Superclass::InternalInitialize()==MAF_OK)
-	{
-		// force material allocation
-		GetMaterial()->SetMaterialTexture(GetSurfaceOutput()->GetTexture());
-		return MAF_OK;
-	}
-	return MAF_ERROR;
-}
-//-------------------------------------------------------------------------
 mafVMEOutputSurface *mafVMESlicer::GetSurfaceOutput()
 //-------------------------------------------------------------------------
 {
@@ -282,22 +274,10 @@ void mafVMESlicer::InternalPreUpdate()
   if(vol)
   {
     vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData();
-    if (vtkdata != NULL)
+    if (vtkdata)
     {
       double pos[3];
       float vectX[3],vectY[3], n[3];
-
-      //mafMatrix *slicerMatrix = this->GetOutput()->GetAbsMatrix();
-      //mafTransform::GetPosition(*slicerMatrix, pos);
-//prova a modificare i valori
-      /*mafMatrix *mSlicer = GetOutput()->GetMatrix();
-			mafMatrix *mASlicer = GetOutput()->GetAbsMatrix();
-
-			mafMatrix *mVolume = vol->GetOutput()->GetMatrix();
-			mafMatrix *mAVolume = vol->GetOutput()->GetAbsMatrix();
-
-			mafMatrix *mParent = ((mafVME *)GetParent())->GetOutput()->GetMatrix();
-			mafMatrix *mAParent = ((mafVME *)GetParent())->GetOutput()->GetAbsMatrix();*/
 
 			//transform
 			m_CopyTransform->SetMatrix(m_Transform->GetMatrix());
@@ -309,7 +289,6 @@ void mafVMESlicer::InternalPreUpdate()
 			slicedVMETransform->Invert();
 			slicedVMETransform->Update();
 
-
 			mafSmartPointer<mafTransform> parentTransform;
 			parentTransform->SetMatrix(((mafVME *)GetParent())->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 			parentTransform->Update();
@@ -317,15 +296,11 @@ void mafVMESlicer::InternalPreUpdate()
 			parentTransform->Concatenate(slicedVMETransform,0);
 			parentTransform->Update();
 
-
 			m_CopyTransform->Concatenate(parentTransform,0);
 			m_CopyTransform->Update();
-
-
       m_CopyTransform->GetPosition(pos);
       m_CopyTransform->GetVersor(0, vectX);
       m_CopyTransform->GetVersor(1, vectY);
-
 
       vtkMath::Normalize(vectX);
       vtkMath::Normalize(vectY);
@@ -346,7 +321,9 @@ void mafVMESlicer::InternalPreUpdate()
       texture->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
       texture->Modified();
 
-			
+      GetMaterial()->SetMaterialTexture(texture);
+      texture->GetScalarRange(GetMaterial()->m_TableRange);
+      GetMaterial()->UpdateProp();
 
       m_PSlicer->SetInput(vtkdata);
       m_PSlicer->SetPlaneOrigin(pos);
@@ -358,17 +335,11 @@ void mafVMESlicer::InternalPreUpdate()
       m_ISlicer->SetPlaneAxisX(vectX);
       m_ISlicer->SetPlaneAxisY(vectY);
 
-			
-
       m_BackTransform->SetTransform(m_CopyTransform->GetVTKTransform()->GetInverse());
 			m_BackTransform->Update();
-      
-
       /*m_BackTransformParent->SetTransform(transform->GetInverse());
       m_BackTransform->SetInput(m_BackTransformParent->GetOutput());
       m_BackTransform->Update();*/
-      
-      
     }
   }
 

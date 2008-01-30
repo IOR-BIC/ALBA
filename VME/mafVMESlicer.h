@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-15 13:10:09 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-01-30 14:42:20 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -106,9 +106,6 @@ protected:
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
 
-	/** used to initialize and generate texture if not present */
-	virtual int InternalInitialize();
-
   /** called to prepare the update of the output */
   virtual void InternalPreUpdate();
 
@@ -132,5 +129,4 @@ private:
   mafVMESlicer(const mafVMESlicer&); // Not implemented
   void operator=(const mafVMESlicer&); // Not implemented
 };
-
 #endif
