@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-26 10:38:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-01-30 14:42:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,6 @@
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 #include "mmgMaterialButton.h"
-#include "mmgLutPreset.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 
@@ -33,7 +32,6 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
-
 #include "vtkPointData.h"
 #include "vtkImageData.h"
 #include "vtkTextureMapToCylinder.h"
@@ -161,7 +159,7 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
     }
     else
     {
-      mafErrorMacro("texture info not correctly stored inside material!!");
+      mafLogMessage(_("texture info not correctly stored inside material!!"));
     }
   }
 
@@ -186,7 +184,6 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
     m_UseLookupTable = 1;
-    lutPreset(4,m_SurfaceMaterial->m_ColorLut);
     m_Texture->SetLookupTable(m_SurfaceMaterial->m_ColorLut);
     m_Actor->SetTexture(m_Texture);
   }
@@ -285,9 +282,6 @@ mmgGui *mafPipeSurfaceTextured::CreateGui()
   m_Gui->Enable(ID_TEXTURE_MAPPING_MODE,m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE && m_UseTexture != 0);
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_LOOKUP_TABLE,"lut",&m_UseLookupTable);
-  double sr[2];
-  m_Mapper->GetScalarRange(sr);
-  m_SurfaceMaterial->m_ColorLut->SetTableRange(sr);
   m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
   m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
   m_Gui->Divider(2);
@@ -453,4 +447,3 @@ void mafPipeSurfaceTextured::SetActorPicking(int enable)
   m_Actor->Modified();
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
-

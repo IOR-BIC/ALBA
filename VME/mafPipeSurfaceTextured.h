@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-01-30 14:42:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@ public:
   mafTypeMacro(mafPipeSurfaceTextured,mafPipe);
 
                mafPipeSurfaceTextured();
-  virtual     ~mafPipeSurfaceTextured ();
+  virtual     ~mafPipeSurfaceTextured();
 
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
@@ -107,4 +107,3 @@ protected:
   virtual mmgGui  *CreateGui();
 };  
 #endif // __mafPipeSurfaceTextured_H__
-
