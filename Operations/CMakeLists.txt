@@ -88,6 +88,9 @@ SET(PROJECT_SRCS
 
   medOpSurfaceMirror.cpp
   medOpSurfaceMirror.h
+  
+  medOpImporterVTK.cpp
+  medOpImporterVTK.h
 
 )
 
