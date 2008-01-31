@@ -3,14 +3,15 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 15:15:59 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-01-31 16:05:52 $
+  Version:   $Revision: 1.15 $
 
 =========================================================================*/
+
+#include "vtkVolumeSlicer.h"
+
 #include "vtkObjectFactory.h"
-#include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
@@ -18,11 +19,9 @@
 
 #include "vtkMath.h"
 
-#include "vtkVolumeSlicer.h"
-
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.14 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.15 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkVolumeSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 15:15:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-01-31 16:05:52 $
+  Version:   $Revision: 1.12 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -65,12 +65,12 @@ POSSIBILITY OF SUCH DAMAGES.
 
 #include "vtkMAFConfigure.h"
 #include "vtkDataSetToDataSetFilter.h"
+#include "vtkImageData.h"
+#include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkPolyData;
-class vtkImageData;
 class vtkRectilinearGrid;
 class vtkLinearTransform;
 
