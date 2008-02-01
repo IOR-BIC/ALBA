@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 11:57:17 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-02-01 11:02:30 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,8 @@ class vtkFeatureEdges;
 //----------------------------------------------------------------------------
 // mafPipeSurface :
 //----------------------------------------------------------------------------
+/** Visual pipe used to render VTK polydata and allowing to manage scalar visibility,
+lookup table and some polygonal features like edges and normals.*/
 class mafPipeSurface : public mafPipe
 {
 public:
@@ -50,12 +52,16 @@ public:
                mafPipeSurface();
   virtual     ~mafPipeSurface();
 
-  /** process events coming from gui */
+  /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
-  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** Create the VTK rendering pipeline*/
+  virtual void Create(mafSceneNode *n);
+  
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
+  /** Let to enable/disable the Level Of Detail behavior.*/
   void SetEnableActorLOD(bool value);
 
   /** IDs for the GUI */
@@ -84,7 +90,7 @@ protected:
 	vtkActor								*m_NormalActor;
 	vtkCellCenters					*m_CenterPointsFilter;
 	vtkArrowSource					*m_NormalArrow;
-  vtkActor             *m_Actor;
+  vtkActor             *m_Actor; ///< Actor representing the polygonal surface
   vtkOutlineCornerFilter  *m_OutlineBox;
   vtkPolyDataMapper       *m_OutlineMapper;
   vtkProperty             *m_OutlineProperty;
@@ -94,14 +100,14 @@ protected:
 	vtkPolyDataMapper				*m_EdgesMapper;
 	vtkActor								*m_EdgesActor;
 
-  int m_UseVTKProperty;
-  int m_UseLookupTable;
-  int m_EnableActorLOD;
+  int m_UseVTKProperty; ///< Flag to switch On/Off the VTK property usage to color the surface
+  int m_UseLookupTable; ///< Flag to switch On/Off the lookup table usage to color the surface
+  int m_EnableActorLOD; ///< Flag to switch On/Off the usage of the Level Of Ditail
 
-  int m_ScalarVisibility;
-	int m_NormalVisibility;
-	int m_EdgeVisibility;
-  int m_RenderingDisplayListFlag;
+  int m_ScalarVisibility; ///< Flag to switch On/Off the scalar visibility
+	int m_NormalVisibility; ///< Flag to switch On/Off the visibility of normals on the surface
+	int m_EdgeVisibility; ///< Flag to switch On/Off the visibility of edge feature on the surface
+  int m_RenderingDisplayListFlag; ///< Flag to switch On/Off the 
   mmaMaterial *m_SurfaceMaterial;
   mmgMaterialButton *m_MaterialButton;
 
