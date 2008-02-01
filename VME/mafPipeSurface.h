@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 11:02:30 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-02-01 12:09:41 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,17 +17,14 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkOutlineCornerFilter;
 class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
 class mafLODActor;
-class vtkProperty;
 class mafAxes;
 class mmgMaterialButton;
 class mmaMaterial;
@@ -91,9 +88,7 @@ protected:
 	vtkCellCenters					*m_CenterPointsFilter;
 	vtkArrowSource					*m_NormalArrow;
   vtkActor             *m_Actor; ///< Actor representing the polygonal surface
-  vtkOutlineCornerFilter  *m_OutlineBox;
-  vtkPolyDataMapper       *m_OutlineMapper;
-  vtkProperty             *m_OutlineProperty;
+
   mafLODActor             *m_OutlineActor;
   mafAxes                 *m_Axes;
 	vtkFeatureEdges					*m_ExtractEdges;

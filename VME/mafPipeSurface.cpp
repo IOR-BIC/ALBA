@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-28 16:26:56 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-02-01 12:09:41 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,19 +23,15 @@
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 #include "mmgMaterialButton.h"
-#include "mmgLutPreset.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 
-#include "mafDataVector.h"
 #include "mafVMESurface.h"
-#include "mafVMEGenericAbstract.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 
 #include "vtkPointData.h"
-#include "vtkImageData.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
@@ -45,7 +41,7 @@
 #include "vtkGlyph3D.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkActor.h"
-
+#include "vtkLookupTable.h"
 #include "vtkLineSource.h"
 #include "vtkCellCenters.h"
 #include "vtkCellData.h"
@@ -65,9 +61,6 @@ mafPipeSurface::mafPipeSurface()
 {
   m_Mapper          = NULL;
   m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_MaterialButton  = NULL;
   m_SurfaceMaterial = NULL;
@@ -103,9 +96,6 @@ void mafPipeSurface::Create(mafSceneNode *n)
   m_Selected = false;
   m_Mapper          = NULL;
   m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_Axes            = NULL;
 
@@ -161,23 +151,23 @@ void mafPipeSurface::Create(mafSceneNode *n)
   m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
-	vtkNEW(m_OutlineBox);
-	m_OutlineBox->SetInput(data);  
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);
 
-	vtkNEW(m_OutlineMapper);
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
-	vtkNEW(m_OutlineProperty);
-	m_OutlineProperty->SetColor(1,1,1);
-	m_OutlineProperty->SetAmbient(1);
-	m_OutlineProperty->SetRepresentationToWireframe();
-	m_OutlineProperty->SetInterpolationToFlat();
+  vtkMAFSmartPointer<vtkProperty> corner_props;
+	corner_props->SetColor(1,1,1);
+	corner_props->SetAmbient(1);
+	corner_props->SetRepresentationToWireframe();
+	corner_props->SetInterpolationToFlat();
 
 	vtkNEW(m_OutlineActor);
-	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->SetMapper(corner_mapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
-	m_OutlineActor->SetProperty(m_OutlineProperty);
+	m_OutlineActor->SetProperty(corner_props);
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
@@ -289,9 +279,6 @@ mafPipeSurface::~mafPipeSurface()
 
 	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
-  vtkDEL(m_OutlineBox);
-  vtkDEL(m_OutlineMapper);
-  vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
   cppDEL(m_Axes);
 	vtkDEL(m_NormalActor);
