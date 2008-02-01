@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-08 13:29:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-01 12:50:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,16 +21,12 @@
 
 #include "mafPipeGizmo.h"
 #include "mafSceneNode.h"
-#include "mafVMEGizmo.h"
 #include "mmaMaterial.h"
 
-#include "vtkMAFAssembly.h"
+#include "mafVMEGizmo.h"
 
-//@@@ #include "mafDecl.h"
-//@@@ #include "mafAxes.h"  //SIL. 20-5-2003 added line - 
-//@@@ #include "mafMaterial.h"  //SIL. 30-5-2003 added line -
-//@@@ #include "mmgMaterialButton.h"
-//@@@ #include "mafVmeData.h"
+#include "vtkMAFAssembly.h"
+#include "vtkMAFSmartPointer.h"
 
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
@@ -48,11 +44,7 @@ mafPipeGizmo::mafPipeGizmo()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_Mapper          = NULL;
   m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
 }
 //----------------------------------------------------------------------------
@@ -62,11 +54,7 @@ void mafPipeGizmo::Create(mafSceneNode *n)
   Superclass::Create(n);
   
   m_Selected = false;
-  m_Mapper          = NULL;
   m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
 
   assert(m_Vme->IsMAFType(mafVMEGizmo));
@@ -76,7 +64,7 @@ void mafPipeGizmo::Create(mafSceneNode *n)
   vtkPolyData *data = gizmo->GetData();
   assert(data);
 
-  m_Mapper = vtkPolyDataMapper::New();
+  vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
 	m_Mapper->SetInput(data);
 	m_Mapper->ImmediateModeRenderingOff();
 
@@ -89,23 +77,23 @@ void mafPipeGizmo::Create(mafSceneNode *n)
   m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
-	m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);  
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);  
 
-	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
-	m_OutlineProperty = vtkProperty::New();
-	m_OutlineProperty->SetColor(1,1,1);
-	m_OutlineProperty->SetAmbient(1);
-	m_OutlineProperty->SetRepresentationToWireframe();
-	m_OutlineProperty->SetInterpolationToFlat();
+  vtkMAFSmartPointer<vtkProperty> corner_props;
+	corner_props->SetColor(1,1,1);
+	corner_props->SetAmbient(1);
+	corner_props->SetRepresentationToWireframe();
+	corner_props->SetInterpolationToFlat();
 
 	m_OutlineActor = vtkActor::New();
-	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->SetMapper(corner_mapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
-	m_OutlineActor->SetProperty(m_OutlineProperty);
+	m_OutlineActor->SetProperty(corner_props);
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 }
@@ -116,25 +104,9 @@ mafPipeGizmo::~mafPipeGizmo()
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
-	vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
-  vtkDEL(m_OutlineBox);
-  vtkDEL(m_OutlineMapper);
-  vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
 }
-/*
-//----------------------------------------------------------------------------
-void mafPipeGizmo::Show(bool show)
-//----------------------------------------------------------------------------
-{
-	m_Actor->SetVisibility(show);
-	if(m_Selected)
-	{
-	  m_OutlineActor->SetVisibility(show);
-	}
-}
-*/
 //----------------------------------------------------------------------------
 void mafPipeGizmo::Select(bool sel)
 //----------------------------------------------------------------------------

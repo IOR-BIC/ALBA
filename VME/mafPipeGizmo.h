@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-02-01 12:50:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,14 +17,12 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkOutlineCornerFilter;
-class vtkPolyDataMapper;
 class vtkActor;
-class vtkProperty;
 
 //----------------------------------------------------------------------------
 // mafPipeGizmo :
 //----------------------------------------------------------------------------
+/** Visual pipe used to render a mafVMEGizmo. This show simply the polydata present into the VME.*/
 class mafPipeGizmo : public mafPipe
 {
 public:
@@ -33,15 +31,14 @@ public:
                mafPipeGizmo();
   virtual     ~mafPipeGizmo ();
 
+  /** Create the VTK rendering pipeline*/
   virtual void Create(mafSceneNode *n);
+
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
-  vtkPolyDataMapper	     *m_Mapper;
-  vtkActor               *m_Actor;
-  vtkOutlineCornerFilter *m_OutlineBox;
-	vtkPolyDataMapper      *m_OutlineMapper;
-  vtkProperty            *m_OutlineProperty;
-  vtkActor               *m_OutlineActor;
+  vtkActor *m_Actor;
+  vtkActor *m_OutlineActor;
 
 protected:
 };  

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-09 17:58:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-01 12:50:52 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ class vtkActor;
 //----------------------------------------------------------------------------
 // mafPipeScalar :
 //----------------------------------------------------------------------------
+/** Visual pipe that visually represents the VTK representation of mafVMEScalar.*/
 class mafPipeScalar : public mafPipe
 {
 public:
@@ -31,10 +32,13 @@ public:
                mafPipeScalar();
   virtual     ~mafPipeScalar ();
 
-  /** process events coming from gui */
+  /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Create the VTK rendering pipeline*/
   virtual void Create(mafSceneNode *n);
+
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
   /** IDs for the GUI */
