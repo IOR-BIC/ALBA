@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:33:11 $
-  Version:   $Revision: 1.14 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2008-02-01 13:59:03 $
+  Version:   $Revision: 1.15 $
+  Authors:   Paolo Quadrani - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -23,15 +23,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 #include "mafSceneNode.h"
 
-#include "mafMatrix.h"
-#include "mafMatrixPipe.h"
-#include "mafAbsMatrixPipe.h"
-#include "mafTransformFrame.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
-#include "mafSmartPointer.h"
 
 #include "vtkMAFAssembly.h"
+#include "vtkMAFSmartPointer.h"
+
 #include "vtkActor.h"
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkCellArray.h"
@@ -60,8 +57,6 @@ mafPipeVolumeProjected::mafPipeVolumeProjected()
 {
   m_CamPosition = CAMERA_RX_FRONT;
 
-	m_VolumeBox = NULL;
-	m_VolumeBoxMapper = NULL;
 	m_VolumeBoxActor = NULL;
 }
 //----------------------------------------------------------------------------
@@ -108,26 +103,25 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	zmin = bounds[4];
 	zmax = bounds[5];
 
-	//---- creazione del Piano --------------------------
-
+	//---- pipeline for the Plane --------------------------
 	RXPlane = vtkPlaneSource::New();
 	switch (m_CamPosition)
 	{	
-	case CAMERA_RX_FRONT:
-		RXPlane->SetOrigin(xmin, ymin, zmin);
-		RXPlane->SetPoint1(xmax, ymin, zmin);
-		RXPlane->SetPoint2(xmin, ymin, zmax);
-	break;
-	case CAMERA_RX_LEFT:
-		RXPlane->SetOrigin(xmax, ymin, zmin);
-		RXPlane->SetPoint2(xmax, ymin, zmax);
-		RXPlane->SetPoint1(xmax, ymax, zmin);
-	break;
-	case CAMERA_RX_RIGHT:
-		RXPlane->SetOrigin(xmin, ymin, zmin);
-		RXPlane->SetPoint2(xmin, ymin, zmax);
-		RXPlane->SetPoint1(xmin, ymax, zmin);
-	break;
+	  case CAMERA_RX_FRONT:
+		  RXPlane->SetOrigin(xmin, ymin, zmin);
+		  RXPlane->SetPoint1(xmax, ymin, zmin);
+		  RXPlane->SetPoint2(xmin, ymin, zmax);
+	  break;
+	  case CAMERA_RX_LEFT:
+		  RXPlane->SetOrigin(xmax, ymin, zmin);
+		  RXPlane->SetPoint2(xmax, ymin, zmax);
+		  RXPlane->SetPoint1(xmax, ymax, zmin);
+	  break;
+	  case CAMERA_RX_RIGHT:
+		  RXPlane->SetOrigin(xmin, ymin, zmin);
+		  RXPlane->SetPoint2(xmin, ymin, zmax);
+		  RXPlane->SetPoint1(xmin, ymax, zmin);
+	  break;
 	}
 
 	RXPlaneMapper = vtkPolyDataMapper::New();
@@ -278,21 +272,20 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	m_UsedAssembly->AddPart(m_TickActor);
 	m_UsedAssembly->AddPart(m_RXActor);	
 
+  // selection pipeline ////////////////////////////////
+	vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(m_Vme->GetOutput()->GetVTKData());
 
-	vtkNEW(m_VolumeBox);
-	m_VolumeBox->SetInput(m_Vme->GetOutput()->GetVTKData());
-
-	vtkNEW(m_VolumeBoxMapper);
-	m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
+	vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
 	vtkNEW(m_VolumeBoxActor);
-	m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
+	m_VolumeBoxActor->SetMapper(corner_mapper);
   m_VolumeBoxActor->PickableOff();
 	m_VolumeBoxActor->SetVisibility(m_Selected);
 
 	m_UsedAssembly->AddPart(m_VolumeBoxActor);
 
-  //ghost -  //SIL. 26-5-2003 
 	//create something invisible in the front renderer so that ResetCamera will work
   m_ghost = NULL;
   if(m_UsedAssembly == m_AssemblyBack)
@@ -333,8 +326,6 @@ mafPipeVolumeProjected::~mafPipeVolumeProjected()
 	vtkDEL(m_RXActor);
   vtkDEL(m_ghost);
 
-	vtkDEL(m_VolumeBox);
-	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
 }
 //----------------------------------------------------------------------------
@@ -383,4 +374,3 @@ void mafPipeVolumeProjected::SetActorPicking(int enable)
   m_RXActor->Modified();
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
-

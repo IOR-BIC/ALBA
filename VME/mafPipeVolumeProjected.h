@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-17 10:52:24 $
-  Version:   $Revision: 1.6 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2008-02-01 13:59:03 $
+  Version:   $Revision: 1.7 $
+  Authors:   Paolo Quadrani - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -30,6 +30,8 @@ class vtkPolyDataMapper;
 //----------------------------------------------------------------------------
 // mafPipeVolumeProjected :
 //----------------------------------------------------------------------------
+/** This visual pipe allows to represent a volume data as an image projecting its
+scalar values along a specified axes.*/
 class mafPipeVolumeProjected : public mafPipe
 {
 public:

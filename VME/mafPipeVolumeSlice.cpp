@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-30 11:03:43 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2008-02-01 13:59:03 $
+  Version:   $Revision: 1.50 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,6 @@
 #include "mafSceneNode.h"
 #include "mmaVolumeMaterial.h"
 
-#include "mafTransformBase.h"
 #include "mafVME.h"
 #include "mafVMEOutputVolume.h"
 
@@ -48,7 +47,6 @@
 #include "vtkVolumeSlicer.h"
 #include "vtkProperty.h"
 #include "vtkDataSet.h"
-#include "vtkTransform.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineSource.h"
 #include "vtkCellArray.h"
@@ -199,21 +197,8 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
   }
   
   m_ColorLUT = material->m_ColorLut;
-/*  material->UpdateProp();
 
-  double sr[2];
-  m_Vme->GetOutput()->GetVTKData()->GetScalarRange(sr);
-
-  if (material->m_TableRange[1] < material->m_TableRange[0]) 
-  {
-    m_ColorLUT->SetTableRange(sr);
-  }
-  else
-    m_ColorLUT->SetTableRange(material->m_TableRange);
-
-  material->UpdateFromTables();
-*/
-	if(m_SliceDirection == SLICE_ARB)
+  if(m_SliceDirection == SLICE_ARB)
 		m_SliceDirection = SLICE_Z;
 
 	if (!m_SliceParametersInitialized)
@@ -271,45 +256,35 @@ void mafPipeVolumeSlice::Create(mafSceneNode *n)
 
 	CreateTICKs();
 
-	//if(m_ShowVolumeBox)
-	//{
-		vtkNEW(m_VolumeBox);
-		m_VolumeBox->SetInput(data);
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);
 
-		vtkNEW(m_VolumeBoxMapper);
-		m_VolumeBoxMapper->SetInput(m_VolumeBox->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
-		vtkNEW(m_VolumeBoxActor);
-		m_VolumeBoxActor->SetMapper(m_VolumeBoxMapper);
-    m_VolumeBoxActor->PickableOff();
-		m_VolumeBoxActor->SetVisibility(m_ShowVolumeBox);
-		if(m_AssemblyUsed==m_AssemblyFront)
-			m_VolumeBoxActor->SetScale(1.01);
-		else
-			m_VolumeBoxActor->SetScale(1);
-		m_AssemblyFront->AddPart(m_VolumeBoxActor);
-
-		if(m_ShowBounds)
-		{
-			double bounds[6];
-			m_Vme->GetOutput()->Update();
-			m_Vme->GetOutput()->GetVMELocalBounds(bounds);
-			vtkNEW(m_Box);
-			m_Box->SetBounds(bounds);
-			vtkNEW(m_Mapper);
-			m_Mapper->SetInput(m_Box->GetOutput());
-			vtkNEW(m_Actor);
-			m_Actor->SetMapper(m_Mapper);
-			m_AssemblyUsed->AddPart(m_Actor);
-		}
-
-	/*}
+	vtkNEW(m_VolumeBoxActor);
+	m_VolumeBoxActor->SetMapper(corner_mapper);
+  m_VolumeBoxActor->PickableOff();
+	m_VolumeBoxActor->SetVisibility(m_ShowVolumeBox);
+	if(m_AssemblyUsed==m_AssemblyFront)
+		m_VolumeBoxActor->SetScale(1.01);
 	else
+		m_VolumeBoxActor->SetScale(1);
+	m_AssemblyFront->AddPart(m_VolumeBoxActor);
+
+	if(m_ShowBounds)
 	{
-		m_VolumeBox				= NULL;
-		m_VolumeBoxMapper = NULL;
-		m_VolumeBoxActor	= NULL;
-	}*/
+		double bounds[6];
+		m_Vme->GetOutput()->Update();
+		m_Vme->GetOutput()->GetVMELocalBounds(bounds);
+		vtkNEW(m_Box);
+		m_Box->SetBounds(bounds);
+		vtkNEW(m_Mapper);
+		m_Mapper->SetInput(m_Box->GetOutput());
+		vtkNEW(m_Actor);
+		m_Actor->SetMapper(m_Mapper);
+		m_AssemblyUsed->AddPart(m_Actor);
+	}
 
 	// if the actor is in the background renderer
 	// create something invisible in the front renderer so that ResetCamera will work
@@ -526,9 +501,6 @@ mafPipeVolumeSlice::~mafPipeVolumeSlice()
 		vtkDEL(m_SlicePolydata[i]);
 		vtkDEL(m_SliceActor[i]);
 	}
-  //vtkDEL(m_ColorLUT);
-	vtkDEL(m_VolumeBox);
-	vtkDEL(m_VolumeBoxMapper);
 	vtkDEL(m_VolumeBoxActor);
 	vtkDEL(m_Actor);
 	vtkDEL(m_TickActor);
