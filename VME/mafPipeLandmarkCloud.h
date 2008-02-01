@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 22:00:51 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-01 14:08:40 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,10 +20,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkSphereSource;
 class vtkPolyDataNormals;
 class vtkExtendedGlyph3D;
-class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkActor;
-class vtkProperty;
 class mafVMELandmarkCloud;
 class mafVMELandmark;
 class vtkDataSet;
@@ -32,6 +30,11 @@ class mmgMaterialButton;
 //----------------------------------------------------------------------------
 // mafPipeLandmarkCloud :
 //----------------------------------------------------------------------------
+/** This visual pipe represent mafVMELandmarkClound and mafVMELandmark as a set of
+spheres each one centered to the landmark position. The visual pipe is observer of
+the landmark cloud and according to the Open/Close cloud status the visual pipe
+switch the mode to manage the data contained into the cloud (cloud close) or into the
+landmarks (cloud open).*/
 class mafPipeLandmarkCloud : public mafPipe
 {
 public:
@@ -40,13 +43,14 @@ public:
                mafPipeLandmarkCloud();
   virtual     ~mafPipeLandmarkCloud ();
 
+  /** Create the VTK rendering pipeline*/
   virtual void Create(mafSceneNode *n);
 
-  /** Answer events coming from the gui and from cloud */
+  /** Answer events coming from the Gui and from cloud */
   void OnEvent(mafEventBase *maf_event);
 
 	/** Change the visibility of the bounding box actor representing the selection for the vme. */
-  virtual void Select     (bool select); 
+  virtual void Select(bool select); 
 
   /** IDs for the GUI */
   enum PIPE_LM_CLOUD_WIDGET_ID
@@ -63,9 +67,6 @@ protected:
   vtkPolyDataMapper			 *m_CloudMapper;
   vtkActor               *m_CloudActor;
 
-  vtkOutlineCornerFilter *m_OutlineFilter;
-  vtkPolyDataMapper      *m_CloudSelectionMapper;
-  vtkProperty            *m_CloudSelectionProperty;
   vtkActor               *m_CloudSelectionActor;
 
   double m_Radius;
