@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:56:42 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-02-01 10:06:36 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -81,5 +81,8 @@ protected:
 private:
 	medVMEPolylineGraph(const medVMEPolylineGraph&); // Not implemented
 	void operator=(const medVMEPolylineGraph&); // Not implemented
+
+  /** private to avoid calling by external classes */
+  virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 };
 #endif

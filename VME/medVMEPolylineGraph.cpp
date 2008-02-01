@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:56:42 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-02-01 10:06:36 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,6 +50,7 @@ MafMedical is partially based on OpenMAF.
 #include "medVMEPolylineGraph.h"
 #include "mafObject.h"
 #include "mafVMEOutputPolyline.h"
+#include "mafPolylineGraph.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
@@ -82,14 +83,22 @@ int medVMEPolylineGraph::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 	if (polydata)
 		polydata->Update();
 
-	// check this is a polydata containing only lines
-	if (polydata && polydata->GetPolys()->GetNumberOfCells()==0 && \
-		polydata->GetStrips()->GetNumberOfCells()==0 && \
-		polydata->GetVerts()->GetNumberOfCells()==0)
+  int result=MAF_ERROR;
+	
+  mafPolylineGraph *utility = new mafPolylineGraph;
+	utility->CopyFromPolydata(polydata); 
+  // check this is a polydata containing only lines
+  if (polydata && polydata->GetPolys()->GetNumberOfCells()==0 && \
+    polydata->GetStrips()->GetNumberOfCells()==0 && \
+    polydata->GetVerts()->GetNumberOfCells()==0 && \
+    utility->SelfCheck())
 	{
-			return Superclass::SetData(data,t,mode);
+		result = Superclass::SetData(data,t,mode);
+    delete utility;
+    return result;
 	}
 
+  delete utility;
 	mafErrorMacro("Trying to set the wrong type of fata inside a VME Polyline :"<< (data?data->GetClassName():"NULL"));
 	return MAF_ERROR;
 }
@@ -103,4 +112,17 @@ mafVMEOutput *medVMEPolylineGraph::GetOutput()
 		SetOutput(mafVMEOutputPolyline::New()); // create the output
 	}
 	return m_Output;
+}
+//-------------------------------------------------------------------------
+int medVMEPolylineGraph::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
+//-------------------------------------------------------------------------
+{
+  assert(data);
+  if (data->IsA("vtkPolyData"))
+  {
+    return SetData((vtkPolyData*)data,t,mode);
+  }
+
+  mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
+  return MAF_ERROR;
 }
