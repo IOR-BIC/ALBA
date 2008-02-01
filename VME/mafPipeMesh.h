@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.h,v $
 Language:  C++
-Date:      $Date: 2008-01-22 08:05:27 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-02-01 13:32:03 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,12 +22,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs :
 //----------------------------------------------------------------------------
 class mmaMaterial;
-class vtkOutlineCornerFilter;
-class vtkPolyDataMapper;
 class vtkDataSetMapper;
-class vtkPolyData;
 class vtkActor;
-class vtkProperty;
 class vtkGeometryFilter;
 class mafAxes;
 class mafParabolicMeshToLinearMeshFilter;
@@ -45,10 +41,13 @@ public:
 	mafPipeMesh();
 	virtual     ~mafPipeMesh();
 
-	/** process events coming from gui */
+	/** process events coming from Gui */
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** Create the VTK rendering pipeline*/
+	virtual void Create(mafSceneNode *n);
+
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
 	virtual void Select(bool select); 
 
 	/** IDs for the GUI */
@@ -69,12 +68,9 @@ public:
     CELL_TYPE,
   };
 
-  
-  
   /** Get assembly front/back */
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
   virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
-
 	
   /** Core of the pipe */
   virtual void ExecutePipe();
@@ -86,14 +82,13 @@ public:
   /** Set the actor picking*/
 	void SetActorPicking(int enable = true);
 
-  /** Set the actor wireframe*/
+  /** Set the actor wire frame*/
   void SetWireframeOn();
   void SetWireframeOff();
   
   /** Set the actor border visible or not*/
   void SetWiredActorVisibilityOn();
   void SetWiredActorVisibilityOff();
-
 
   /** Set/Get Active Scalar */
   void SetActiveScalar(int index){m_ScalarIndex = index;};
@@ -115,9 +110,6 @@ protected:
   vtkDataSetMapper        *m_MapperWired;
 	vtkActor                *m_Actor;
   vtkActor                *m_ActorWired;
-	vtkOutlineCornerFilter  *m_OutlineBox;
-	vtkPolyDataMapper       *m_OutlineMapper;
-	vtkProperty             *m_OutlineProperty;
 	vtkActor                *m_OutlineActor;
 	mafAxes                 *m_Axes;
   vtkLookupTable          *m_Table;
@@ -143,6 +135,7 @@ protected:
   int                      m_ScalarMapActive;
   int                      m_UseVTKProperty;
 
+  /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	virtual mmgGui  *CreateGui();
 };  
 #endif // __mafPipeMesh_H__

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 09:09:37 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-02-01 13:32:03 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,6 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkOutlineCornerFilter;
 class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
@@ -38,6 +37,8 @@ class vtkMAFToLinearTransform;
 //----------------------------------------------------------------------------
 // mafPipeSurfaceSlice :
 //----------------------------------------------------------------------------
+/** Visual pipe that allow to visualize a surface polydata sliced according to 
+a slicing plain. The result effect is the contour of the surface cut by the plain.*/
 class mafPipeSurfaceSlice : public mafPipe
 {
 public:
@@ -52,10 +53,13 @@ public:
   /**Set the thickness value*/
   void SetThickness(double thickness); 
 
-  /** process events coming from gui */
+  /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
-  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** Create the VTK rendering pipeline*/
+  virtual void Create(mafSceneNode *n);
+
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
   /** Set the origin of the slice*/
@@ -91,9 +95,7 @@ protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
-  vtkOutlineCornerFilter  *m_OutlineBox;
-  vtkPolyDataMapper       *m_OutlineMapper;
-  vtkProperty             *m_OutlineProperty;
+
   vtkActor                *m_OutlineActor;
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;

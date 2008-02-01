@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-30 14:42:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-01 13:32:03 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,19 +23,18 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class vtkOutlineCornerFilter;
 class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
 class mafLODActor;
-class vtkProperty;
 class mmgMaterialButton;
 class mmaMaterial;
-//class vtkActor;
 
 //----------------------------------------------------------------------------
 // mafPipeSurfaceTextured :
 //----------------------------------------------------------------------------
+/** Visual pipe used to render VTK polydata and allowing to manage scalar visibility,
+lookup table and textures applied to the polydata.*/
 class mafPipeSurfaceTextured : public mafPipe
 {
 public:
@@ -44,12 +43,16 @@ public:
                mafPipeSurfaceTextured();
   virtual     ~mafPipeSurfaceTextured();
 
-  /** process events coming from gui */
+  /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
-  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** Create the VTK rendering pipeline*/
+  virtual void Create(mafSceneNode *n);
+
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
+  /** Let to enable/disable the Level Of Detail behavior.*/
   void SetEnableActorLOD(bool value);
 
   /** IDs for the GUI */
@@ -67,21 +70,22 @@ public:
     ID_LAST
   };
 
+  /** Callback used to choose a node type mafVMEImage to be used as a texture to apply on the polydata.*/
   static bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
   /** Set the actor picking*/
   void SetActorPicking(int enable = true);
 
+  /** Turn On the axes visibility.*/
 	void ShowAxisOn(){m_ShowAxis = 1;m_Axes->SetVisibility(m_Selected&&m_ShowAxis);};
+  
+  /** Turn Off the axes visibility.*/
 	void ShowAxisOff(){m_ShowAxis = 0;m_Axes->SetVisibility(m_Selected&&m_ShowAxis);};
 
 protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
   mafLODActor             *m_Actor;
-  vtkOutlineCornerFilter  *m_OutlineBox;
-  vtkPolyDataMapper       *m_OutlineMapper;
-  vtkProperty             *m_OutlineProperty;
   mafLODActor             *m_OutlineActor;
   mafAxes                 *m_Axes;
 
@@ -97,13 +101,12 @@ protected:
   mmaMaterial *m_SurfaceMaterial;
   mmgMaterialButton *m_MaterialButton;
 
-//@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
   void UpdateProperty(bool fromTag = false);
 
-  /** 
-  Generate texture coordinate for polydata according to the mapping mode*/
+  /** Generate texture coordinate for polydata according to the mapping mode*/
   void GenerateTextureMapCoordinate();
 
+  /** Create the Gui of the visual pipe used to change visual parameters.*/
   virtual mmgGui  *CreateGui();
 };  
 #endif // __mafPipeSurfaceTextured_H__

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 12:09:41 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-02-01 13:32:03 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,7 +97,7 @@ protected:
 
   int m_UseVTKProperty; ///< Flag to switch On/Off the VTK property usage to color the surface
   int m_UseLookupTable; ///< Flag to switch On/Off the lookup table usage to color the surface
-  int m_EnableActorLOD; ///< Flag to switch On/Off the usage of the Level Of Ditail
+  int m_EnableActorLOD; ///< Flag to switch On/Off the usage of the Level Of Detail
 
   int m_ScalarVisibility; ///< Flag to switch On/Off the scalar visibility
 	int m_NormalVisibility; ///< Flag to switch On/Off the visibility of normals on the surface
@@ -111,6 +111,7 @@ protected:
 	void CreateEdgesPipe();
 	void CreateNormalsPipe();
 
+  /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
   virtual mmgGui  *CreateGui();
 };  
 #endif // __mafPipeSurface_H__

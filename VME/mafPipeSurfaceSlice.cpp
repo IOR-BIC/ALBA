@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-29 11:32:31 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-02-01 13:32:03 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,9 +69,6 @@ mafPipeSurfaceSlice::mafPipeSurfaceSlice()
   m_Texture         = NULL;
   m_Mapper          = NULL;
   m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_MaterialButton  = NULL;
   m_Cutter			= NULL;
@@ -105,9 +102,6 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   m_Texture         = NULL;
   m_Mapper          = NULL;
   m_Actor           = NULL;
-  m_OutlineBox      = NULL;
-  m_OutlineMapper   = NULL;
-  m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_Axes            = NULL;
 
@@ -277,23 +271,23 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
-  m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);  
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);  
 
-	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+	vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
-	m_OutlineProperty = vtkProperty::New();
-	m_OutlineProperty->SetColor(1,1,1);
-	m_OutlineProperty->SetAmbient(1);
-	m_OutlineProperty->SetRepresentationToWireframe();
-	m_OutlineProperty->SetInterpolationToFlat();
+	vtkMAFSmartPointer<vtkProperty> corner_props;
+	corner_props->SetColor(1,1,1);
+	corner_props->SetAmbient(1);
+	corner_props->SetRepresentationToWireframe();
+	corner_props->SetInterpolationToFlat();
 
 	m_OutlineActor = vtkActor::New();
-	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->SetMapper(corner_mapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
-	m_OutlineActor->SetProperty(m_OutlineProperty);
+	m_OutlineActor->SetProperty(corner_props);
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
@@ -318,9 +312,6 @@ mafPipeSurfaceSlice::~mafPipeSurfaceSlice()
   vtkDEL(m_Texture);
   vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
-  vtkDEL(m_OutlineBox);
-  vtkDEL(m_OutlineMapper);
-  vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
 	vtkDEL(m_VTKTransform);
   vtkDEL(m_Plane);
@@ -617,23 +608,23 @@ void mafPipeSurfaceSlice::CreateClosedCloudPipe()
   m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
-  m_OutlineBox = vtkOutlineCornerFilter::New();
-	m_OutlineBox->SetInput(data);  
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);  
 
-	m_OutlineMapper = vtkPolyDataMapper::New();
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
-	m_OutlineProperty = vtkProperty::New();
-	m_OutlineProperty->SetColor(1,1,1);
-	m_OutlineProperty->SetAmbient(1);
-	m_OutlineProperty->SetRepresentationToWireframe();
-	m_OutlineProperty->SetInterpolationToFlat();
+  vtkMAFSmartPointer<vtkProperty> corner_props;
+	corner_props->SetColor(1,1,1);
+	corner_props->SetAmbient(1);
+	corner_props->SetRepresentationToWireframe();
+	corner_props->SetInterpolationToFlat();
 
 	m_OutlineActor = vtkActor::New();
-	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->SetMapper(corner_mapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
-	m_OutlineActor->SetProperty(m_OutlineProperty);
+	m_OutlineActor->SetProperty(corner_props);
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
@@ -655,9 +646,6 @@ void mafPipeSurfaceSlice::RemoveClosedCloudPipe()
   vtkDEL(m_Texture);
   vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
-  vtkDEL(m_OutlineBox);
-  vtkDEL(m_OutlineMapper);
-  vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
   vtkDEL(m_Plane);
   vtkDEL(m_Cutter);

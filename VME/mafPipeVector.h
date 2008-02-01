@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-15 14:17:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-02-01 13:32:03 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,13 +17,11 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "mafVMEImage.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkAppendPolyData;
-class vtkOutlineCornerFilter;
 class vtkPolyDataMapper;
 class vtkPolyData;
 class vtkProperty;
@@ -35,7 +33,6 @@ class vtkActor;
 class mafVMEVector;
 class mafMatrixVector;
   
-
 //----------------------------------------------------------------------------
 // mafPipeVector :
 //----------------------------------------------------------------------------
@@ -47,15 +44,14 @@ public:
                mafPipeVector();
   virtual     ~mafPipeVector();
 
-  /** process events coming from gui */
+  /** process events coming from Gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
-  virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** Create the VTK rendering pipeline*/
+  virtual void Create(mafSceneNode *n);
 
-
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
-
-
 
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID
@@ -71,16 +67,11 @@ public:
     ID_LAST
   };
 
-
-
 protected:
   vtkPolyDataMapper	      *m_Mapper;
   vtkPolyDataMapper	      *m_MapperBunch;
   vtkActor                *m_Actor;
   vtkActor                *m_ActorBunch;
-  vtkOutlineCornerFilter  *m_OutlineBox;
-  vtkPolyDataMapper       *m_OutlineMapper;
-  vtkProperty             *m_OutlineProperty;
   vtkActor                *m_OutlineActor;
   mmaMaterial             *m_Material;
 
@@ -111,6 +102,7 @@ protected:
   /** Draw a bunch of vectors in a frame interval */
   void AllVector(bool fromTag = false);
   
+  /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
   virtual mmgGui  *CreateGui();
 };  
 #endif // __mafPipeSurface_H__

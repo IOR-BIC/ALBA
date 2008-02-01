@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-22 08:05:27 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-02-01 13:32:03 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,14 +23,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafSceneNode.h"
 #include "mmgGui.h"
 #include "mmgMaterialButton.h"
-#include "mmgLutPreset.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 #include "mmgLutPreset.h"
 #include "mafVMEOutputMesh.h"
 
 #include "mafDataVector.h"
-#include "mafVMEGenericAbstract.h"
 #include "mafVMEMesh.h"
 #include "mafParabolicMeshToLinearMeshFilter.h"
 #include "mmgMaterialButton.h"
@@ -66,9 +64,6 @@ mafPipeMesh::mafPipeMesh()
 {
 	m_Mapper          = NULL;
 	m_Actor           = NULL;
-	m_OutlineBox      = NULL;
-	m_OutlineMapper   = NULL;
-	m_OutlineProperty = NULL;
 	m_OutlineActor    = NULL;
 	m_Gui             = NULL;
   m_LinearizationFilter = NULL;
@@ -98,9 +93,6 @@ void mafPipeMesh::Create(mafSceneNode *n)
 	m_Mapper          = NULL;
 	m_Actor           = NULL;
   m_ActorWired      = NULL;
-	m_OutlineBox      = NULL;
-	m_OutlineMapper   = NULL;
-	m_OutlineProperty = NULL;
 	m_OutlineActor    = NULL;
 	m_Axes            = NULL;
 
@@ -232,23 +224,23 @@ void mafPipeMesh::ExecutePipe()
   //m_ActorWired->SetScale(1.1);
   
   // selection highlight
-	vtkNEW(m_OutlineBox);
-	m_OutlineBox->SetInput(data);  
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+	corner->SetInput(data);  
 
-	vtkNEW(m_OutlineMapper);
-	m_OutlineMapper->SetInput(m_OutlineBox->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+	corner_mapper->SetInput(corner->GetOutput());
 
-	vtkNEW(m_OutlineProperty);
-	m_OutlineProperty->SetColor(1,1,1);
-	m_OutlineProperty->SetAmbient(1);
-	m_OutlineProperty->SetRepresentationToWireframe();
-	m_OutlineProperty->SetInterpolationToFlat();
+  vtkMAFSmartPointer<vtkProperty> corner_props;
+	corner_props->SetColor(1,1,1);
+	corner_props->SetAmbient(1);
+	corner_props->SetRepresentationToWireframe();
+	corner_props->SetInterpolationToFlat();
 
 	vtkNEW(m_OutlineActor);
-	m_OutlineActor->SetMapper(m_OutlineMapper);
+	m_OutlineActor->SetMapper(corner_mapper);
 	m_OutlineActor->VisibilityOff();
 	m_OutlineActor->PickableOff();
-	m_OutlineActor->SetProperty(m_OutlineProperty);
+	m_OutlineActor->SetProperty(corner_props);
 
 }
 //----------------------------------------------------------------------------
@@ -279,14 +271,8 @@ mafPipeMesh::~mafPipeMesh()
 	vtkDEL(m_Actor);
   vtkDEL(m_ActorWired);
   vtkDEL(m_MapperWired);
-	vtkDEL(m_OutlineBox);
-	vtkDEL(m_OutlineMapper);
-	vtkDEL(m_OutlineProperty);
 	vtkDEL(m_OutlineActor);
 	cppDEL(m_Axes);
-  /*cppDEL(m_ScalarsName);
-  cppDEL(m_ScalarsVTKName);*/
-  //vtkDEL(m_Table);
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::Select(bool sel)
