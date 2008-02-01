@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTK.h,v $
 Language:  C++
-Date:      $Date: 2008-01-31 16:43:15 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-02-01 13:40:08 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,57 +45,36 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafOp.h"
+#include "mmoVTKImporter.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
-class mafVMEPointSet;
 class medVMEPolylineGraph;
-class mafVMESurface;
-class mafVMEVolumeGray;
-class mafVMEMesh;
-class mafVMEGeneric;
 
 //----------------------------------------------------------------------------
 // medOpImporterVTK :
 //----------------------------------------------------------------------------
 /**The same importer of the MAF , but polylines are stored inside 
 the medVMEPolylineGraph instead mafVMEPolyline*/
-class medOpImporterVTK: public mafOp 
+class medOpImporterVTK: public mmoVTKImporter 
 {
 public:
   medOpImporterVTK(const wxString &label = "medVTKImporter");
   ~medOpImporterVTK(); 
 
-  mafTypeMacro(medOpImporterVTK, mafOp);
+  mafTypeMacro(medOpImporterVTK, mmoVTKImporter);
 
   mafOp* Copy();
 
-  /** Return true for the acceptable vme type. */
-  bool Accept(mafNode* node) {return true;};
-
-  /** Builds operation's interface. */
-  void OpRun();
 
   /** Import vtk data. */
-  void ImportVTK();
+  virtual int ImportVTK();
 
-  /** Set the vtk filename to be imported. 
-  This is used when the operation is executed not using user interface. */
-  void SetFileName(const char *name) {m_File = name;};
   wxString GetFileName(){return m_File;};
 
 protected:
-  wxString m_File;
-  wxString m_FileDir;
 
-  mafVMEPointSet        *m_VmePointSet;
   medVMEPolylineGraph   *m_VmePolyLine;
-  mafVMESurface         *m_VmeSurface;
-  mafVMEVolumeGray      *m_VmeGrayVol;
-  mafVMEMesh            *m_VmeMesh;  
-  mafVMEGeneric         *m_VmeGeneric;
 };
 #endif
