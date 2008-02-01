@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:18:02 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2008-02-01 11:03:02 $
+  Version:   $Revision: 1.36 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -168,7 +168,7 @@ public:
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)=0;
 
   /** Set the time bounds for the time varying VME (base VME is not time varying).*/
-  virtual void GetLocalTimeBounds(mafTimeStamp tbounds[2]) {tbounds[0] = 0; tbounds[1] = 0;};
+  virtual void GetLocalTimeBounds(mafTimeStamp tbounds[2]) {tbounds[0] = m_CurrentTime; tbounds[1] = m_CurrentTime;};
   
 	/**
     Return the list of timestamps considering all parents timestamps. Timestamps list is
