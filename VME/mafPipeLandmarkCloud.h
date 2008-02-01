@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 14:08:40 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-02-01 14:09:12 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -83,9 +83,10 @@ protected:
   /** Remove visual-pipe for closed cloud */
   void RemoveClosedCloudPipe();
 
-  virtual mmgGui  *CreateGui();
+  /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
+  virtual mmgGui *CreateGui();
 
   /** Update the properties according to the vme's tags. */
-	void										UpdateProperty(bool fromTag = false);
+	void UpdateProperty(bool fromTag = false);
 };
 #endif // __mafPipeLandmarkCloud_H__

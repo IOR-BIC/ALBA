@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:29:24 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-02-01 14:08:40 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@
 #include "mafVMEOutput.h"
 #include "mafVMEOutputPointSet.h"
 
+#include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
 #include "vtkSphereSource.h"
 #include "vtkPolyDataNormals.h"
@@ -71,9 +72,6 @@ void mafPipeLandmarkCloud::Create(mafSceneNode *n)
   m_Glyph         = NULL;
   m_CloudMapper   = NULL;
   m_CloudActor    = NULL;
-  m_OutlineFilter = NULL;
-  m_CloudSelectionMapper    = NULL;
-  m_CloudSelectionProperty  = NULL;
   m_CloudSelectionActor     = NULL;
 
   double r = 0;
@@ -301,24 +299,24 @@ void mafPipeLandmarkCloud::CreateClosedCloudPipe(vtkDataSet *data, double radius
 
   m_AssemblyFront->AddPart(m_CloudActor);
 
-  // selection hilight
-  vtkNEW(m_OutlineFilter);
-  m_OutlineFilter->SetInput(m_Glyph->GetOutput());  
+  // selection highlight
+  vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
+  corner->SetInput(m_Glyph->GetOutput());  
 
-  vtkNEW(m_CloudSelectionMapper);
-  m_CloudSelectionMapper->SetInput(m_OutlineFilter->GetOutput());
+  vtkMAFSmartPointer<vtkPolyDataMapper> corner_mapper;
+  corner_mapper->SetInput(corner->GetOutput());
 
-  vtkNEW(m_CloudSelectionProperty);
-  m_CloudSelectionProperty->SetColor(1,1,1);
-  m_CloudSelectionProperty->SetAmbient(1);
-  m_CloudSelectionProperty->SetRepresentationToWireframe();
-  m_CloudSelectionProperty->SetInterpolationToFlat();
+  vtkMAFSmartPointer<vtkProperty> corner_props;
+  corner_props->SetColor(1,1,1);
+  corner_props->SetAmbient(1);
+  corner_props->SetRepresentationToWireframe();
+  corner_props->SetInterpolationToFlat();
 
   vtkNEW(m_CloudSelectionActor);
-  m_CloudSelectionActor->SetMapper(m_CloudSelectionMapper);
+  m_CloudSelectionActor->SetMapper(corner_mapper);
   m_CloudSelectionActor->VisibilityOff();
   m_CloudSelectionActor->PickableOff();
-  m_CloudSelectionActor->SetProperty(m_CloudSelectionProperty);
+  m_CloudSelectionActor->SetProperty(corner_props);
   m_CloudSelectionActor->SetScale(1.01,1.01,1.01);
 
   m_AssemblyFront->AddPart(m_CloudSelectionActor);
@@ -342,8 +340,5 @@ void mafPipeLandmarkCloud::RemoveClosedCloudPipe()
   vtkDEL(m_CloudMapper);
   vtkDEL(m_CloudActor);
 
-  vtkDEL(m_OutlineFilter);
-  vtkDEL(m_CloudSelectionMapper);
-  vtkDEL(m_CloudSelectionProperty);
   vtkDEL(m_CloudSelectionActor);
 }
