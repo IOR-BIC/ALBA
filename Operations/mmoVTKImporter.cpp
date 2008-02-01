@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 16:25:29 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-01 12:26:43 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,15 +96,22 @@ void mmoVTKImporter::OpRun()
   }
 
   int result = OP_RUN_CANCEL;
-  if(!m_File.IsEmpty()) 
+  if(!m_File.IsEmpty())
 	{
-    ImportVTK();
-	  result = OP_RUN_OK;
+    if (ImportVTK() == MAF_OK)
+    {
+      result = OP_RUN_OK;
+    }
+    else
+    {
+      if(!this->m_TestMode)
+        mafMessage(_("Unsupported file format"), _("I/O Error"), wxICON_ERROR );
+    }
 	}
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoVTKImporter::ImportVTK()
+int mmoVTKImporter::ImportVTK()
 //----------------------------------------------------------------------------
 {
   bool success = false;
@@ -134,9 +141,7 @@ void mmoVTKImporter::ImportVTK()
       preader = vtkUnstructuredGridReader::New();
     break;
     default:
-			if(!this->m_TestMode)
-				mafMessage(_("Unsupported file format"), _("I/O Error"), wxICON_ERROR );
-    return;
+      return MAF_ERROR;
   }
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
   preader->SetFileName(m_File);
@@ -193,5 +198,9 @@ void mmoVTKImporter::ImportVTK()
   }
   vtkDEL(preader);
   if(!success && !this->m_TestMode)
+  {
     mafMessage(_("Error reading VTK file."), _("I/O Error"), wxICON_ERROR );
+    return MAF_ERROR;
+  }
+  return MAF_OK;
 }

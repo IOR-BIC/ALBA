@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-14 12:04:13 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-02-01 12:26:43 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,7 +32,9 @@ class mafVMEGeneric;
 //----------------------------------------------------------------------------
 // mmoVTKImporter :
 //----------------------------------------------------------------------------
-/** */
+/** Import operation that try to read VTK data file and set it into the corresponding VME 
+that accept the VTK data format. If no VME can accept the format a message box will be shown 
+to the user and no data will be imported.*/
 class mmoVTKImporter: public mafOp 
 {
 public:
@@ -49,8 +51,8 @@ public:
 	/** Builds operation's interface. */
   void OpRun();
 
-	/** Import vtk data. */
-  void ImportVTK();
+	/** Import vtk data, return MAF_OK on success. */
+  virtual int ImportVTK();
 
   /** Set the vtk filename to be imported. 
       This is used when the operation is executed not using user interface. */
