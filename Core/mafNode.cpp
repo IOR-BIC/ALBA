@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:52:26 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2008-02-04 16:46:51 $
+  Version:   $Revision: 1.51 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -975,7 +975,9 @@ void mafNode::OnEvent(mafEventBase *e)
             std::strstream ss1,ss2;
             Print(ss1);
             ss1 << std::ends;   // Paolo 13/06/2005: needed to close correctly the strstream
-            mafLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
+            //mafLogMessage("[VME PRINTOUT:]\n%s\n", ss1.str()); 
+            mafLogMessage("[VME PRINTOUT:]\n");
+            mafLogMessage(ss1.str()); 
           #endif
           }
           break;
