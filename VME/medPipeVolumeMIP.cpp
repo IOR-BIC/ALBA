@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 09:38:46 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-02-04 12:29:12 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -197,6 +197,10 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
 	vtkDEL(m_Mapper);
 	vtkDEL(m_Actor);
 
+	//BES: 2.2.2008 - vtkImageResample does not release object set by
+	//SetInputSetInformationInput - fixed here
+	if (m_ResampleFilter != NULL)
+		m_ResampleFilter->SetInformationInput(NULL);
   vtkDEL(m_ResampleFilter);
   vtkDEL(m_VolumeProperty);
   vtkDEL(m_ColorLUT);
