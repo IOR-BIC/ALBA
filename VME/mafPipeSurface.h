@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:32:03 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-02-04 13:53:47 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,9 +106,12 @@ protected:
   mmaMaterial *m_SurfaceMaterial;
   mmgMaterialButton *m_MaterialButton;
 
-  void UpdateProperty(bool fromTag = false);
+  //void UpdateProperty(bool fromTag = false);
 
+  /** Create the pipeline to show the edges information on surface.*/
 	void CreateEdgesPipe();
+
+  /** Create the pipeline to show the normals of the polydata as arrows centered into the center of the cells.*/
 	void CreateNormalsPipe();
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/

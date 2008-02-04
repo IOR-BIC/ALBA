@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2008-02-01 12:50:52 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-02-04 13:53:47 $
+Version:   $Revision: 1.12 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -43,10 +43,13 @@ public:
 	mafPipeIsosurface();
 	virtual  ~mafPipeIsosurface();
 
-	/** process events coming from gui */
+	/** process events coming from Gui */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Create the VTK rendering pipeline*/
 	virtual void Create(mafSceneNode *n);
+
+  /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
 	virtual void Select(bool select);
 
 	/** Set the contour value for contour mapper, return false if contour mapper is NULL, otherwise return true. */
@@ -79,6 +82,7 @@ public:
 	};
 
 protected:
+  /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
 	virtual mmgGui  *CreateGui();
 
 	mafVMESurface            *m_IsosurfaceVme;

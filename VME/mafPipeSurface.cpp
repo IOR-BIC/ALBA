@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 12:09:41 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2008-02-04 13:53:47 $
+  Version:   $Revision: 1.45 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -303,10 +303,10 @@ void mafPipeSurface::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-void mafPipeSurface::UpdateProperty(bool fromTag)
+/*void mafPipeSurface::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-}
+}*/
 //----------------------------------------------------------------------------
 mmgGui *mafPipeSurface::CreateGui()
 //----------------------------------------------------------------------------
