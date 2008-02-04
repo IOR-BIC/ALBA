@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 10:59:28 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-02-04 14:52:40 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -68,19 +68,19 @@ public:
 
 	mafOp* Copy();
 
-	void OnEvent(mafEventBase *maf_event);
+	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* vme);
+	virtual bool Accept(mafNode* vme);
 
 	/** Builds operation's interface by calling CreateOpDialog() method. */
-	void OpRun();
+	virtual void OpRun();
 
 	/** Execute the operation. */
-	void OpDo();
+	virtual void OpDo();
 
 	/** Makes the undo for the operation. */
-	void OpUndo();
+	virtual void OpUndo();
 
 protected:
 	
@@ -92,8 +92,5 @@ protected:
 	vtkPolyData					*m_ResultPolydata;
 
 	medGeometryEditorPolylineGraph *m_Editor;
-
-	int m_Modality;
-
 };
 #endif

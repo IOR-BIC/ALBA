@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-20 14:12:46 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-02-04 14:52:40 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -104,7 +104,7 @@ void medOpCreateEditSkeleton::OpRun()
 
 	if(m_Input->IsMAFType(mafVMEVolumeGray))
 		m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input), this);
-	else if(m_Input->IsMAFType(medVMEPolylineGraph))
+	else if(m_Input->IsMAFType(medVMEPolylineGraph) && m_Input->GetParent()->IsMAFType(mafVMEVolumeGray))
 		m_Editor = new medGeometryEditorPolylineGraph(mafVME::SafeDownCast(m_Input->GetParent()), this,medVMEPolylineGraph::SafeDownCast(m_Input));
 	m_Editor->Show(true);
 
