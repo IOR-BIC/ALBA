@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-29 07:12:20 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-02-04 12:27:03 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -11,7 +11,8 @@
 =========================================================================*/
 
 
-#include "mafDefines.h" 
+#include "mafDefines.h"
+//#include "vtkMemDbg.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -141,10 +142,13 @@ mafGizmoHandle::~mafGizmoHandle()
   vtkDEL(m_TranslateBoxPolyDataFilter);
   vtkDEL(m_RotateBoxTr);
   vtkDEL(m_RotateBoxPolyDataFilter);
+  vtkDEL(m_TranslateBoxTrEnd);				//BES: 2.2.2008 - memory leaks bug fix
+  vtkDEL(m_TranslateBoxPolyDataFilterEnd);	//BES: 2.2.2008 - memory leaks bug fix
 	
-  mafDEL(m_IsaComp); 
+  mafDEL(m_IsaComp);	//m_IsaGen is released automatically
 
-  mafEventMacro(mafEvent(this, VME_REMOVE, m_BoxGizmo));  
+  mafEventMacro(mafEvent(this, VME_REMOVE, m_BoxGizmo)); //m_BoxGizmo is released
+
   vtkDEL(m_Cube);
 }
 
@@ -429,6 +433,7 @@ void mafGizmoHandle::Update()
 	mafNEW(matIdentity);
 	matIdentity->Identity();
 	SetPose(matIdentity);
+	mafDEL(matIdentity);	//BES: 3.2.3008 - memory leaks bug fix
 
   switch(m_GizmoType) 
   {
