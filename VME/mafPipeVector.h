@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:32:03 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-04 12:16:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,8 @@ class mafMatrixVector;
 //----------------------------------------------------------------------------
 // mafPipeVector :
 //----------------------------------------------------------------------------
+/** Visual pipe for mafVMEVector: creates two platforms and visualize data stored 
+in mafVMEVector as two arrows.*/
 class mafPipeVector : public mafPipe
 {
 public:
