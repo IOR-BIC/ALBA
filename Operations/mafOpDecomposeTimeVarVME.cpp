@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:26:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-02-04 13:56:26 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -94,6 +94,12 @@ bool mafOpDecomposeTimeVarVME::Accept(mafNode* node)
   {
     if(mafVMELandmarkCloud::SafeDownCast(node)->IsOpen())
       return false;
+  }
+
+  //Until VMEAnalog is non time varying
+  if (node->IsA("mafVMEScalarMatrix"))
+  {
+    return false;
   }
 
   return (node && ((mafVME *)node)->IsAnimated());
