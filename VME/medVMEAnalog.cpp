@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEAnalog.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 10:18:52 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-05 11:31:00 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,8 +46,8 @@ medVMEAnalog::~medVMEAnalog()
 mmgGui* medVMEAnalog::CreateGui()
 //-------------------------------------------------------------------------
 {
-  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
- 
+  m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->Divider();
   return m_Gui;
 }
 
@@ -86,4 +86,10 @@ void medVMEAnalog::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
   {
     kframes.push_back(timeVector.get(n));
   }
+}
+//-------------------------------------------------------------------------
+void medVMEAnalog::GetLocalTimeBounds(mafTimeStamp tbounds[2])
+//-------------------------------------------------------------------------
+{
+  GetTimeBounds(tbounds);
 }
