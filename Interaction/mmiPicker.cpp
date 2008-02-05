@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-21 15:37:53 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-02-05 17:01:42 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -186,6 +186,7 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
           scalars->GetTuple(pid,&scalar_value);
         mafEvent pick_event(this,msg_id,p);
         pick_event.SetDouble(scalar_value);
+        pick_event.SetArg(pid);
         mafEventMacro(pick_event);
         p->Delete();
       }
