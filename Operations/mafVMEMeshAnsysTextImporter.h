@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.h,v $
 Language:  C++
-Date:      $Date: 2007-04-13 12:03:02 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-02-05 10:12:22 $
+Version:   $Revision: 1.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -137,15 +137,10 @@ protected:
   /**
   // Read elements*/
   int ParseElementsFile(vtkUnstructuredGrid *grid);
-
+  
   /**
   // Elements file name*/
   const char *m_ElementsFileName;
-
-  /**
-  // Parse materials file*/
-  // int ParseMaterialsFile(vtkUnstructuredGrid *grid)
-  // {return mafVMEMeshAnsysTextImporter::ParseMaterialsFile(grid, this->m_MaterialsFileName);};
 
   /**
   // Materials file name*/
@@ -156,9 +151,13 @@ protected:
 
   std::map<int, int> m_NodeIdNodeNumberMap;
   
+  /** 
+  utility functions */
   int ReadMatrix(vnl_matrix<double> &M, const char *fname);
   void FEMDataToCellData(vtkUnstructuredGrid *input, vtkUnstructuredGrid *output );
-  
+  void AddIntArrayToUnstructuredGridCellData(vtkUnstructuredGrid *grid, vnl_matrix<double> &elementsFileMatrix, int column, mafString outputArrayName, bool activeScalar = false);
+
+
 };
 
 #endif

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-17 08:31:02 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-02-05 10:12:22 $
+Version:   $Revision: 1.8 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -219,10 +219,33 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
 
   vtkDEL(node_id_array);
 
-  
   return 0;
 }
 
+void mafVMEMeshAnsysTextImporter::AddIntArrayToUnstructuredGridCellData( vtkUnstructuredGrid *grid, vnl_matrix<double> &elementsFileMatrix, int column, mafString outputArrayName , bool activeScalar)
+{
+  // store info about cell_id <-> material_id association
+  vtkIntArray *array = vtkIntArray::New();
+  array->SetName(outputArrayName.GetCStr());
+  array->SetNumberOfTuples(elementsFileMatrix.rows());
+
+  for (int i = 0; i < elementsFileMatrix.rows(); i++)
+  {
+    // fill the array
+    array->SetValue(i, elementsFileMatrix(i, column));
+  }
+
+  if (activeScalar == true)
+  {
+    grid->GetCellData()->SetScalars(array);
+  } 
+  else
+  {
+    grid->GetCellData()->AddArray(array);
+  }
+  
+  vtkDEL(array);
+}
 int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 {
   if (strcmp(m_ElementsFileName, "") == 0)
@@ -230,18 +253,31 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
     mafLogMessage("Elements filename not specified!");
     return -1;
   }
+  
+  vnl_matrix<double> ElementsFileMatrix;
+
 
   int cell_id_col = 0;
-  int materials_col = 1;
+
+  //  column:          1          2         2
+  //  from ANSYS file: TYPE, 2  $ MAT, 2  $ REAL, 3
+
+  int ansysTYPEColumn = 1;
+  int ansysMATERIALColumn = 2; // changing material column to 2, was 1 before but I discovered
+                         // an inconsistency with ANSYS file: needs to be validated by the user 
+  int ansysREALColumn = 3;
+
   int FIRST_CONNECTIVITY_COLUMN = 6;
 
-  // name of the materials array
-  mafString mat_string("material");
-  
-  vnl_matrix<double> M;
-  
+  mafString ansysTYPEIntArrayName("ANSYS_ELEMENT_TYPE");
+  // this should be renamed ANSYS_ MATERIAL _TYPE:for the moment and possible backward compatibility issues 
+  // I leave the array name as material
+  mafString ansysMATERIALIntArrayName("material"); 
+  mafString ansysREALIntArrayName("ANSYS_ELEMENT_REAL");
+
   int ret = GetElementType();
   if (ret == -1 || ret == UNSUPPORTED_ELEMENT )
+  
   {
     return -1;
   }
@@ -249,7 +285,7 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   // id list for connectivity
   vtkIdList *id_list = vtkIdList::New();
 
-  if (ReadMatrix(M,this->m_ElementsFileName))
+  if (ReadMatrix(ElementsFileMatrix,this->m_ElementsFileName))
   {
     mafErrorMacro("Elements file not found! File:" << m_ElementsFileName << "does not exist!" << endl);
 	  return -1;
@@ -257,14 +293,14 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
 
   id_list->SetNumberOfIds(m_NodesPerElement);
     
-  grid->Allocate(M.rows(),1);
+  grid->Allocate(ElementsFileMatrix.rows(),1);
 
 
   // create the connectivity list for each cell from each row
-  for (int i = 0; i < M.rows(); i++)
+  for (int i = 0; i < ElementsFileMatrix.rows(); i++)
   {
       int id_index = 0;
-      for (int j = FIRST_CONNECTIVITY_COLUMN; j < M.columns(); j++ )
+      for (int j = FIRST_CONNECTIVITY_COLUMN; j < ElementsFileMatrix.columns(); j++ )
       {
         /*
         // store info about node_id <-> node_index association 
@@ -292,29 +328,18 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
         NodeIdNodeNumberMap[M(i, j)] = node_number
         */
 
-        id_list->SetId(id_index, m_NodeIdNodeNumberMap[M(i, j)]);
-        int mval = M(i,j);
-        int val = m_NodeIdNodeNumberMap[M(i, j)];
+        id_list->SetId(id_index, m_NodeIdNodeNumberMap[ElementsFileMatrix(i, j)]);
+        int mval = ElementsFileMatrix(i,j);
+        int val = m_NodeIdNodeNumberMap[ElementsFileMatrix(i, j)];
         id_index++;
       }
       grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
-  // store info about cell_id <-> material_id association 
-  vtkIntArray *mat_array = vtkIntArray::New();
-  mat_array->SetName(mat_string.GetCStr());
-  mat_array->SetNumberOfTuples(M.rows());
-
-  for (int i = 0; i < M.rows(); i++)
-  {
-    // fill the MaterialsArray
-    mat_array->SetValue(i, M(i, materials_col));
-  }
-
-  // create the materials section 
-  grid->GetCellData()->SetScalars(mat_array);
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, ansysTYPEIntArrayName);
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, ansysMATERIALIntArrayName,true);
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, ansysREALIntArrayName);  
   
-  vtkDEL(mat_array);  
   vtkDEL(id_list);
 
   return 0;
