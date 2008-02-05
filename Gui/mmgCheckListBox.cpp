@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:50:03 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-02-05 14:04:31 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,6 +50,7 @@ mmgCheckListBox::mmgCheckListBox(wxWindow* parent, wxWindowID id, const wxPoint&
   m_Listener = NULL;
 	m_SelectedItem = -1;
   m_PreventNotify = false;
+  m_CheckEvent = false;
 	m_CheckMode = MODE_CHECK;
   m_CheckListBox = new wxCheckListBox(this, ID_CLB, wxDefaultPosition, size, 0,NULL,wxNO_BORDER);
 }
@@ -221,6 +222,7 @@ void mmgCheckListBox::OnCheck(wxCommandEvent &event)
   int item_id = m_Array[index];
   bool checked = m_CheckListBox->IsChecked(index);
 
+  m_CheckEvent = true;
   mafEventMacro(mafEvent(this, widget_id, checked, item_id ) );
 }
 //----------------------------------------------------------------------------
@@ -239,5 +241,6 @@ void mmgCheckListBox::OnSelect(wxCommandEvent &event)
   int item_id = m_Array[index];
 	m_SelectedItem = item_id;
 
+  m_CheckEvent = false;
   mafEventMacro(mafEvent(this, widget_id, (long)item_id ) );
 }

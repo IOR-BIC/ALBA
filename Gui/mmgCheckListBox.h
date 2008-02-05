@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:50:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-02-05 14:04:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -97,6 +97,9 @@ public:
   /** Return the index of the item into the array, otherwise -1 if the item is not present. */
   int FindItemIndex(int id);
 
+  /** Return true if the event raised is coming from a check/uncheck item.*/
+  bool IsCheckEvent() {return m_CheckEvent;};
+
 protected:
   /** Send an event to the listener to notify that an item has been selected. */
   void OnSelect(wxCommandEvent &event);
@@ -107,7 +110,7 @@ protected:
   /** Resize the checked listbox according to the new parent panel size. */
   void OnSize(wxSizeEvent& event);
 
-
+  bool              m_CheckEvent; ///< Flag used to distinguish between Check item and Select item event
   mafObserver*      m_Listener;
   wxCheckListBox   *m_CheckListBox;
   bool              m_PreventNotify;
