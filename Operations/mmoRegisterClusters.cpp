@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-29 17:07:39 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-02-05 14:51:05 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -763,7 +763,7 @@ double mmoRegisterClusters::RegisterPoints(double currTime)
     m_Registered->SetMatrix(*regMatrix);
     m_Registered->Modified();
     m_Registered->Update();
-    mafDEL(temp);
+    
     //mafMatrix *z;
     //z = m_Registered->GetOutput()->GetMatrix();
     
@@ -771,8 +771,13 @@ double mmoRegisterClusters::RegisterPoints(double currTime)
 		if(m_Follower)
 		{
       m_Follower->SetTimeStamp(currTime); //SetCurrentTime(currTime);
-			m_Follower->SetPose(t_matrix,currTime);
+      mafMatrix *folMatrix = m_Follower->GetOutput()->GetMatrix();
+      folMatrix->DeepCopy(temp->GetVTKMatrix());
+			m_Follower->SetMatrix(*regMatrix);
+      m_Follower->Modified();
+      m_Follower->Update();
 		}
+    mafDEL(temp);
 	}
 
   vtkDEL(RegisterTransform);
