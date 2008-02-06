@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-22 15:14:16 $
-Version:   $Revision: 1.17 $
+Date:      $Date: 2008-02-06 11:22:39 $
+Version:   $Revision: 1.18 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -264,11 +264,12 @@ void medOpImporterDicom::OpRun()
 
 	if(m_Wizard->Run())
 	{
+    int result;
 		if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-			BuildVolume();
+			result = BuildVolume();
 		else
-			BuildVolumeCineMRI();
-		OpStop(OP_RUN_OK);
+			result = BuildVolumeCineMRI();
+		OpStop(result);
 	}
 	else
 		OpStop(OP_RUN_CANCEL);
@@ -328,7 +329,7 @@ void medOpImporterDicom::OpStop(int result)
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicom::BuildVolume()
+int medOpImporterDicom::BuildVolume()
 //----------------------------------------------------------------------------
 {
 	int step;
@@ -342,6 +343,11 @@ void medOpImporterDicom::BuildVolume()
 
 
 	int n_slices = m_NumberOfSlices / step;
+
+  if(m_NumberOfSlices % step != 0)
+  {
+    n_slices+=1;
+  }
 
 	wxBusyInfo wait_info("Building volume: please wait");
 
@@ -362,7 +368,7 @@ void medOpImporterDicom::BuildVolume()
 	}
 	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	ImportDicomTags();
-	if(m_NumberOfSlices == 1)
+	if(m_NumberOfSlices == 1 || n_slices == 1)
 	{
 		//imageCase
 		mafNEW(m_Image);
@@ -382,13 +388,16 @@ void medOpImporterDicom::BuildVolume()
 		tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 		m_Image->GetTagArray()->SetTag(tag_Surgeon);
 
-		mafTagItem tagSide;
-		tagSide.SetName("VOLUME_SIDE");
-		if(m_VolumeSide==LEFT_SIDE)
-			tagSide.SetValue("LEFT");
-		else if(m_VolumeSide==RIGHT_SIDE)
-			tagSide.SetValue("RIGHT");
-		m_Image->GetTagArray()->SetTag(tagSide);
+    if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+    {
+		  mafTagItem tagSide;
+		  tagSide.SetName("VOLUME_SIDE");
+		  if(m_VolumeSide==LEFT_SIDE)
+			  tagSide.SetValue("LEFT");
+		  else if(m_VolumeSide==RIGHT_SIDE)
+			  tagSide.SetValue("RIGHT");
+		  m_Image->GetTagArray()->SetTag(tagSide);
+    }
 
 		//Nome VME = CTDir + IDStudio
 		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
@@ -421,13 +430,16 @@ void medOpImporterDicom::BuildVolume()
 		tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 		m_Volume->GetTagArray()->SetTag(tag_Surgeon);
 
-		mafTagItem tagSide;
-		tagSide.SetName("VOLUME_SIDE");
-		if(m_VolumeSide==LEFT_SIDE)
-			tagSide.SetValue("LEFT");
-		else if(m_VolumeSide==RIGHT_SIDE)
-			tagSide.SetValue("RIGHT");
-		m_Volume->GetTagArray()->SetTag(tagSide);
+    if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+    {
+		  mafTagItem tagSide;
+		  tagSide.SetName("VOLUME_SIDE");
+		  if(m_VolumeSide==LEFT_SIDE)
+			  tagSide.SetValue("LEFT");
+		  else if(m_VolumeSide==RIGHT_SIDE)
+			  tagSide.SetValue("RIGHT");
+		  m_Volume->GetTagArray()->SetTag(tagSide);
+    }
 
 		//Nome VME = CTDir + IDStudio
 		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());		
@@ -440,9 +452,11 @@ void medOpImporterDicom::BuildVolume()
     }
 		m_Volume->SetName(m_VolumeName);
 	}
+
+  return OP_RUN_OK;
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicom::BuildVolumeCineMRI()
+int medOpImporterDicom::BuildVolumeCineMRI()
 //----------------------------------------------------------------------------
 {
 	int step;
@@ -455,6 +469,11 @@ void medOpImporterDicom::BuildVolumeCineMRI()
 		step = m_BuildStepValue + 1;
 
 	int n_slices = m_NumberOfSlices / step;
+
+  if(m_NumberOfSlices % step != 0)
+  {
+    n_slices+=1;
+  }
 
 	wxBusyInfo wait_info("Building volume: please wait");
 
@@ -519,17 +538,22 @@ void medOpImporterDicom::BuildVolumeCineMRI()
 	tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
 	m_Volume->GetTagArray()->SetTag(tag_Surgeon);
 
-	mafTagItem tagSide;
-	tagSide.SetName("VOLUME_SIDE");
-	if(m_VolumeSide==LEFT_SIDE)
-		tagSide.SetValue("LEFT");
-	else if(m_VolumeSide==RIGHT_SIDE)
-		tagSide.SetValue("RIGHT");
-	m_Volume->GetTagArray()->SetTag(tagSide);
+  if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
+  {
+	  mafTagItem tagSide;
+	  tagSide.SetName("VOLUME_SIDE");
+	  if(m_VolumeSide==LEFT_SIDE)
+		  tagSide.SetValue("LEFT");
+	  else if(m_VolumeSide==RIGHT_SIDE)
+		  tagSide.SetValue("RIGHT");
+	  m_Volume->GetTagArray()->SetTag(tagSide);
+  }
 
 	//Nome VME = CTDir + IDStudio
 	wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
 	m_Volume->SetName(name.c_str());
+
+  return OP_RUN_OK;
 
 }
 //----------------------------------------------------------------------------

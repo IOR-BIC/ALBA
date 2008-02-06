@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2007-12-06 09:35:36 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-02-06 11:22:39 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -137,10 +137,10 @@ protected:
 	void ImportDicomTags();
 
 	/** Build the volume starting from the list of dicom files. */
-	void BuildVolume();
+	int BuildVolume();
 
 	/** Build the volume starting from the list of CineMRI files. */
-	void BuildVolumeCineMRI();
+	int BuildVolumeCineMRI();
 
 	/** Perform update of guis of 3 pages of the wizard */
 	void GuiUpdate();
