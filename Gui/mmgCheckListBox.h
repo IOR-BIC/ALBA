@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-05 14:04:31 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-02-07 10:08:40 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,10 +17,13 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mmgPanel.h"
+#include "mafString.h"
+
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
 class mafObserver;
+
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
@@ -66,10 +69,10 @@ public:
   void CheckItem(int id, bool check);
 
   /** Set the item label. */
-  void SetItemLabel(int id, wxString label);
+  void SetItemLabel(int id, mafString label);
 
   /** Get the item label. */
-	wxString GetItemLabel(int id);
+	mafString GetItemLabel(int id);
 
   /** Select the item. */
 	void Select(int id);
@@ -99,6 +102,9 @@ public:
 
   /** Return true if the event raised is coming from a check/uncheck item.*/
   bool IsCheckEvent() {return m_CheckEvent;};
+
+  /** Return the number of inserted items.*/
+  int GetNumberOfItems() {return m_CheckListBox->GetCount();};
 
 protected:
   /** Send an event to the listener to notify that an item has been selected. */
