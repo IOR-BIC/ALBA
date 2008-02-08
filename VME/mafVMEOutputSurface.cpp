@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-07 10:09:32 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-02-08 12:28:29 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -121,6 +121,8 @@ void mafVMEOutputSurface::Update()
   m_VME->Update();
   if (GetSurfaceData())
   {
+    GetSurfaceData()->Modified();
+    GetSurfaceData()->Update();
     int num = GetSurfaceData()->GetNumberOfPolys();
     m_NumTriangles = num;
   }
