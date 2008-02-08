@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:08:12 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-02-08 12:27:53 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@ class vtkPolyData;
 class vtkImageData;
 class mmaMaterial;
 
-/** NULL output for VME node with a VTK image output data.
+/** Output for VME Surface with a VTK PolyData output data.
   mafVMEOutputSurface is the output produced by a node generating an output
   with a VTK dataset.
   @todo
