@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-08 15:00:04 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-02-08 13:48:27 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,9 +20,11 @@
 //----------------------------------------------------------------------------
 
 
-
 #include "mafVMEGroup.h"
 #include "mmgGui.h"
+
+#include "mafTransform.h"
+#include "mafMatrixVector.h"
 #include "mafNode.h"
 #include "mafVMEOutputNULL.h"
 
@@ -36,12 +38,15 @@ mafVMEGroup::mafVMEGroup()
 {
   // The output is created on demand in GetOutput() to avoid
   // subclasses to have to destroy base class output
+  mafNEW(m_Transform);
+  m_MatrixVector->SetMatrix(m_Transform->GetMatrix());
 }
 
 //-------------------------------------------------------------------------
 mafVMEGroup::~mafVMEGroup()
 //-------------------------------------------------------------------------
 {
+  mafDEL(m_Transform);
   // data pipe destroyed in mafVME
   // data vector destroyed in mafVMEGenericAbstract
 }
