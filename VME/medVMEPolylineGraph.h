@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-02-01 10:06:36 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-02-08 09:59:07 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -69,7 +69,7 @@ public:
 	virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
 	/** Return the suggested pipe-typename for the visualization of this vme */
-	virtual mafString GetVisualPipe() {return mafString("mafPipePolyline");};
+	virtual mafString GetVisualPipe() {return mafString("medVisualPipePolylineGraph");};
 
 	/** return the right type of output */  
 	virtual mafVMEOutput *GetOutput();

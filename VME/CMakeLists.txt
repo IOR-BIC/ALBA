@@ -57,6 +57,9 @@ SET(PROJECT_SRCS
   
   medVisualPipeSlicerSlice.cpp
   medVisualPipeSlicerSlice.h
+  
+  medVisualPipePolylineGraph.cpp
+  medVisualPipePolylineGraph.h
 
 )
 
