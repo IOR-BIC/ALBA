@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-15 12:11:25 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-02-08 13:47:33 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -246,6 +246,8 @@ void mafVMESurfaceParametric::GetLocalTimeStamps(std::vector<mafTimeStamp> &kfra
 //-------------------------------------------------------------------------
 {
 	kframes.clear(); // no timestamps
+  mafTimeStamp t = m_Transform->GetMatrix().GetTimeStamp();
+  kframes.push_back(t);
 }
 //-------------------------------------------------------------------------
 mmgGui* mafVMESurfaceParametric::CreateGui()

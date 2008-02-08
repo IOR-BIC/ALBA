@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-13 10:46:46 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-02-08 13:47:10 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,7 +101,9 @@ void mafVMERoot::SetMatrix(const mafMatrix &mat)
 void mafVMERoot::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
-  kframes.clear(); // no timestamp
+  kframes.clear();
+  mafTimeStamp t = m_Transform->GetMatrix().GetTimeStamp();
+  kframes.push_back(t);
 }
 
 //-------------------------------------------------------------------------
