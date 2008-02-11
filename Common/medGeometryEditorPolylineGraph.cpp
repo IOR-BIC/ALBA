@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-28 15:39:25 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-02-11 14:26:28 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -70,6 +70,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkOBBTree.h"
 #include "vtkCellArray.h"
 #include "vtkCell.h"
+#include "vtkCellLocator.h"
 
 enum POINT_TOOL_ID
 {
@@ -167,7 +168,7 @@ void medGeometryEditorPolylineGraph::CreatePipe()
 	vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOff();
 	m_Tube->SetInput(data);
-	m_Tube->SetRadius(.5);
+	m_Tube->SetRadius(m_SphereRadius/2);
 	m_Tube->SetCapping(true);
 	m_Tube->SetNumberOfSides(5);
 
@@ -235,6 +236,8 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
         {
           m_Sphere->SetRadius(m_SphereRadius);
           m_Sphere->Update();
+          m_Tube->SetRadius(m_SphereRadius/2);
+          m_Tube->Update();
           vtkMAFSmartPointer<vtkPolyData> poly_new;
           m_PolylineGraph->CopyToPolydata(poly_new);
           UpdateVMEEditorData(poly_new);
@@ -317,7 +320,7 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 		else if(m_PointTool==ID_INSERT_POINT||m_PointTool==ID_SELECT_POINT)
 		{
 			m_VMEPolylineEditor->SetBehavior(m_Picker);
-			m_InputVME->SetBehavior(NULL);
+			m_InputVME->SetBehavior(m_OldBehavior);
 		}
 		else if(m_PointTool==ID_MOVE_POINT)
 		{
@@ -335,7 +338,7 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 		else if(m_BranchTool==ID_SELECT_BRANCH)
 		{
 			m_VMEPolylineEditor->SetBehavior(m_Picker);
-			m_InputVME->SetBehavior(NULL);
+			m_InputVME->SetBehavior(m_OldBehavior);
 		}
 	}
 }
@@ -506,6 +509,9 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 					pts->GetPoint(0,vertexCoord);
 
 					MovePoint(vertexCoord);
+
+          if (_DEBUG)
+            mafLogMessage(wxString::Format("%.3f %.3f %.3f",vertexCoord[0],vertexCoord[1],vertexCoord[2]));
 				}
 			}
 			else if(m_PointTool==ID_SELECT_POINT)
@@ -683,9 +689,21 @@ void medGeometryEditorPolylineGraph::MovePoint(double newPosition[3],int pointID
 //----------------------------------------------------------------------------
 {
 	if(pointID==UNDEFINED_POINT_ID)
-		m_PolylineGraph->SetVertexCoords(m_SelectedPoint,newPosition);
+  {
+    double *p = new double[3];
+    m_PolylineGraph->GetConstVertexPtr(m_SelectedPoint)->GetCoords(p);
+    p[0]=newPosition[0];
+    p[1]=newPosition[1];
+		m_PolylineGraph->SetVertexCoords(m_SelectedPoint,p);
+  }
 	else
-		m_PolylineGraph->SetVertexCoords(pointID,newPosition);
+  {
+    double *p = new double[3];
+    m_PolylineGraph->GetConstVertexPtr(m_SelectedPoint)->GetCoords(p);
+    p[0]=newPosition[0];
+    p[1]=newPosition[1];
+		m_PolylineGraph->SetVertexCoords(pointID,p);
+  }
 
 	SelectPoint(pointID);
 }
@@ -857,21 +875,24 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 
 	//Create a line by two points on the normal to intersect the polyline 
 	double position2[3];
-	position[0]+=(normal[0]*0.001);
-	position[1]+=(normal[1]*0.001);
-	position[2]+=(normal[2]*0.001);
-	position2[0]=(position[0])-(normal[0]*10.0);
-	position2[1]=(position[1])-(normal[1]*10.0);
-	position2[2]=(position[2])-(normal[2]*10.0);
+  double position1[3]={position[0],position[1],position[2]};
+	position1[0]+=(normal[0]*m_SphereRadius);
+	position1[1]+=(normal[1]*m_SphereRadius);
+	position1[2]+=(normal[2]*m_SphereRadius);
+	position2[0]=(position[0])-(normal[0]*m_SphereRadius);
+	position2[1]=(position[1])-(normal[1]*m_SphereRadius);
+	position2[2]=(position[2])-(normal[2]*m_SphereRadius);
 
-	vtkMAFSmartPointer<vtkOBBTree> locator;
+	vtkMAFSmartPointer<vtkCellLocator> locator;
 	locator->SetDataSet(poly);
 	locator->BuildLocator();
 	double t, ptline[3], pcoords[3];
 	int subId;
 	vtkIdType	CellID;
-	int n=locator->IntersectWithLine(position, position2,1, t, ptline, pcoords, subId,CellID);
+	//int n=locator->IntersectWithLine(position, position2,1, t, ptline, pcoords, subId,CellID);
+  locator->FindClosestPoint(position,position2,CellID,subId,t);
 
+  int n=3;
 	if(n==0)
 		return;
 
@@ -883,6 +904,8 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	vtkMAFSmartPointer<vtkIdList> idlist;
 
 	vtkIdList *IDS=poly->GetCell(CellID)->GetPointIds();
+  mafLogMessage(wxString::Format("Points %.3f %.3f %.3f",position[0],position[1],position[2])),
+  mafLogMessage(wxString::Format("CellID %d N* Points %d",CellID,IDS->GetNumberOfIds()));
 	for(int i=0;i<IDS->GetNumberOfIds();i++)
 	{
 		int ID=IDS->GetId(i);
@@ -906,7 +929,7 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	vtkMAFSmartPointer<vtkTubeFilter> tube;
 	tube->UseDefaultNormalOff();
 	tube->SetInput(poly_selected);
-	tube->SetRadius(1.5);
+	tube->SetRadius(m_SphereRadius/1.8);
 	tube->SetCapping(true);
 	tube->SetNumberOfSides(5);
 
