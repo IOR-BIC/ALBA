@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-11 14:26:28 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-02-11 14:45:04 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -510,8 +510,9 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 
 					MovePoint(vertexCoord);
 
-          if (_DEBUG)
+          #ifndef _DEBUG
             mafLogMessage(wxString::Format("%.3f %.3f %.3f",vertexCoord[0],vertexCoord[1],vertexCoord[2]));
+          #endif
 				}
 			}
 			else if(m_PointTool==ID_SELECT_POINT)
