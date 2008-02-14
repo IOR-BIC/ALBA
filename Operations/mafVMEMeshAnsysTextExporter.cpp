@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-05 10:12:22 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-02-14 14:20:20 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -80,9 +80,19 @@ void mafVMEMeshAnsysTextExporter::Write()
 
 void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
 {
-  // write code to export ugrid as three text file, first I do not consider materials
+  // check this is a valid nodes id field data: 
+  vcl_string nodesIDArrayName = "id";
 
-  // create nodes list file
+  vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(inputUGrid->GetPointData()->GetArray(nodesIDArrayName.c_str()));
+
+  if (nodesIDArray == NULL)
+  {
+    mafLogMessage("nodesID informations not found in vtk unstructured grid!\
+    nodes file will not be written");
+    return;
+  }
+
+  assert(nodesIDArray != NULL);
 
   // get the points
   int columnsNumber;
@@ -106,8 +116,8 @@ void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
 
     enum {x = 1, y, z};
 
-    int pointID = rowID + 1; // this is +1 fortran offset;to be eventually replaced with pointID from fieldData...
-    PointsMatrix(rowID, pointIDColumn) = pointID;
+    int pointID = rowID + 1; // this is +1 fortran offset
+    PointsMatrix(rowID, pointIDColumn) = nodesIDArray->GetValue(rowID);
     PointsMatrix(rowID, x) = pointCoordinates[0];
     PointsMatrix(rowID, y) = pointCoordinates[1];
     PointsMatrix(rowID, z) = pointCoordinates[2];
@@ -150,11 +160,34 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
 
   // read all the elements with their attribute data in memory (vnl_matrix)
 
+  mafString ansysNODESIDArrayName("id");
+  mafString ansysELEMENTIDArrayName("ANSYS_ELEMENT_ID");
   mafString ansysTYPEIntArrayName("ANSYS_ELEMENT_TYPE");
   mafString ansysMATERIALIntArrayName("material"); 
   mafString ansysREALIntArrayName("ANSYS_ELEMENT_REAL");
 
   vtkCellData *cellData = inputUGrid->GetCellData();
+  vtkPointData *pointData = inputUGrid->GetPointData();
+
+  // get the ELEMENT_ID array
+  vtkIntArray *elementIdArray = vtkIntArray::SafeDownCast(cellData->GetArray(ansysELEMENTIDArrayName.GetCStr()));
+  assert(elementIdArray);
+
+  // get the ELEMENT_ID array
+   vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(pointData->GetArray(ansysNODESIDArrayName.GetCStr()));
+   assert(nodesIDArray);
+
+  // create vtkPointIdAnsysPointId map
+  vcl_map<int, int> vtkPointIdAnsysPointsIdMap;
+  int nodesIdNumber = nodesIDArray->GetNumberOfTuples();
+  
+  assert(nodesIdNumber == inputUGrid->GetNumberOfPoints());
+
+  for (int i = 0; i < nodesIdNumber; i++)
+  {
+      int ansysNodeID = nodesIDArray->GetValue(i);
+      vtkPointIdAnsysPointsIdMap[i] = ansysNodeID;
+  }
 
   // get the TYPE array
   vtkIntArray *typeArray = vtkIntArray::SafeDownCast(cellData->GetArray(ansysTYPEIntArrayName.GetCStr()));
@@ -170,8 +203,8 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
 
   // fill the matrix
   int cellIDColumn = 0;
-  int TYPEColumn = 1;
-  int MATERIALColumn = 2;
+  int MATERIALColumn = 1;
+  int TYPEColumn = 2;
   int REALColumn = 3;
   int ESYSColumn = 4;
   int COMPColumn = 5;
@@ -180,8 +213,8 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
 
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
-    // write ID into matrix
-    int id = rowID + fortranOffset; // <TODO!!!!!> consider real cell ID
+    // write element ID into matrix
+    int id = elementIdArray->GetValue(rowID);
     ElementsMatrix(rowID, cellIDColumn) = id;
 
     // type
@@ -213,7 +246,7 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
 
     for (int column = firstPointIDCol; column < firstPointIDCol + numberOfPointsPerCell;column++)
     {
-      ElementsMatrix(rowID,column) = idList->GetId(currentID) + fortranOffset; // this is +1 fortran offset;to be eventually replaced with pointID from fieldData...
+      ElementsMatrix(rowID,column) = vtkPointIdAnsysPointsIdMap[idList->GetId(currentID)];//  + fortranOffset; // this is +1 fortran offset;to be eventually replaced with pointID from fieldData...
       currentID++;
     }  
   }

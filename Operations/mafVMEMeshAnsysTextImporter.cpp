@@ -2,13 +2,16 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-05 10:12:22 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-02-14 14:20:20 $
+Version:   $Revision: 1.9 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+// debug facility
+#define DEBUG_MODE
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -39,6 +42,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <vcl_sstream.h>
 #include <vcl_map.h>
 #include <vcl_vector.h>
+#include <vcl_algorithm.h>
 
 //----------------------------------------------------------------------------
 /*
@@ -262,18 +266,22 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
   //  column:          1          2         2
   //  from ANSYS file: TYPE, 2  $ MAT, 2  $ REAL, 3
 
-  int ansysTYPEColumn = 1;
-  int ansysMATERIALColumn = 2; // changing material column to 2, was 1 before but I discovered
-                         // an inconsistency with ANSYS file: needs to be validated by the user 
+  // elId  mat  type real ?   ?   pointId...
+  // 37411 440  50   2    0   1   119324    6996    6994    4809   70910   70925   70920   84679 84682   84683
+
+  int ansysELEMENTIDColumn = 0; 
+  int ansysMATERIALColumn = 1; 
+  int ansysTYPEColumn = 2;
   int ansysREALColumn = 3;
 
   int FIRST_CONNECTIVITY_COLUMN = 6;
 
-  mafString ansysTYPEIntArrayName("ANSYS_ELEMENT_TYPE");
+  mafString ansysELEMENTIDArrayName("ANSYS_ELEMENT_ID");
+  mafString ansysTYPEIntArrayName("ANSYS_ELEMENT_TYPE"); // ET,50,187: Element Type = 50; this is used for grouping elements of the same element type
   // this should be renamed ANSYS_ MATERIAL _TYPE:for the moment and possible backward compatibility issues 
   // I leave the array name as material
   mafString ansysMATERIALIntArrayName("material"); 
-  mafString ansysREALIntArrayName("ANSYS_ELEMENT_REAL");
+  mafString ansysREALIntArrayName("ANSYS_ELEMENT_REAL");// this is another grouping ID but for the moment it is not used
 
   int ret = GetElementType();
   if (ret == -1 || ret == UNSUPPORTED_ELEMENT )
@@ -336,6 +344,7 @@ int mafVMEMeshAnsysTextImporter::ParseElementsFile(vtkUnstructuredGrid *grid)
       grid->InsertNextCell(m_VtkCellType, id_list);
   }
 
+  AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysELEMENTIDColumn, ansysELEMENTIDArrayName);
   AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysTYPEColumn, ansysTYPEIntArrayName);
   AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysMATERIALColumn, ansysMATERIALIntArrayName,true);
   AddIntArrayToUnstructuredGridCellData(grid, ElementsFileMatrix, ansysREALColumn, ansysREALIntArrayName);  
@@ -659,13 +668,29 @@ void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input,
 
   // get the materials id array
   materialIDArrayFD = vtkDoubleArray::SafeDownCast(inFD->GetArray(matIdStr.GetCStr()));
-  int firstMaterialId = (int) materialIDArrayFD->GetValue(0);
 
   // check for materials id section existence
   if (materialIDArrayFD == NULL)
   {
     mafErrorMacro(<<"materials_id field data data not found!");
     return;
+  }
+
+  int materialsNumber = materialIDArrayFD->GetNumberOfTuples();
+
+  // create a vector for searching material ID:
+  vcl_map<int, int> materialIdMaterialColumnMap;
+  for (int i = 0; i < materialsNumber; i++)
+  {
+    int materialID = (int)(materialIDArrayFD->GetValue(i));
+    materialIdMaterialColumnMap[materialID] = i;
+
+    #ifdef DEBUG_MODE
+    {
+      cout << "material id: " << materialID << std::endl;
+      cout << "material col: " << materialIdMaterialColumnMap[materialID] << std::endl;
+    }
+    #endif
   }
 
   // copying the input in the output
@@ -678,21 +703,37 @@ void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input,
     if (strcmp(inFD->GetArrayName(fieldNumber), matIdStr.GetCStr())) 
     {
       // source array
-      vtkDoubleArray *sourceArray = vtkDoubleArray::SafeDownCast(inFD->GetArray(fieldNumber));
+      vtkDoubleArray *materialPropertyRow = vtkDoubleArray::SafeDownCast(inFD->GetArray(fieldNumber));
 
       // create a double array with current field name
       // target_array is the current field array
       vtkDoubleArray *targetArray = vtkDoubleArray::New();
-      targetArray->SetName(inFD->GetArrayName(fieldNumber)); 
+      const char* propName = inFD->GetArrayName(fieldNumber);
+      targetArray->SetName(propName); 
       targetArray->SetNumberOfTuples(input->GetNumberOfCells());
 
       // for each cell
       for (int cellId = 0; cellId < input->GetNumberOfCells(); cellId++)
       {
         // get the current cell material
-        int currentCellMaterialId = materialArrayCD->GetValue(cellId);
+        int materialId = materialArrayCD->GetValue(cellId);
+
+        int currentMaterialColumn = materialIdMaterialColumnMap[materialId];
+
         // set the material prop value in target array
-        targetArray->SetValue(cellId, sourceArray->GetValue(currentCellMaterialId - firstMaterialId));
+        // <TODO!!!!!>  problems here!!!
+        // double propValue = sourceArray->GetValue(currentCellMaterialId - firstMaterialId);
+
+        double propertyValue = materialPropertyRow->GetValue(currentMaterialColumn);
+        targetArray->SetValue(cellId, propertyValue);
+
+        #ifdef DEBUG_MODE 
+        {
+          cout << "Prop name: " << propName << std::endl;
+          cout << "cellId: " << cellId << std::endl << "propVal: " << propertyValue << std::endl;
+          cout << "matId: " << materialId << std::endl;
+        }
+        #endif
       }
 
       // add the array to the output cell data 
@@ -706,7 +747,7 @@ void mafVMEMeshAnsysTextImporter::FEMDataToCellData( vtkUnstructuredGrid *input,
 
 int mafVMEMeshAnsysTextImporter::GetMeshType()
 {
-	GetElementType();
+  GetElementType();
   return m_MeshType;
 
 }
