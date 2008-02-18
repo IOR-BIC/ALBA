@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 15:46:00 $
-  Version:   $Revision: 1.73 $
+  Date:      $Date: 2008-02-18 12:29:20 $
+  Version:   $Revision: 1.74 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,7 +123,7 @@ void mafViewVTK::Create()
   vtkNEW(m_Picker3D);
   vtkNEW(m_Picker2D);
   m_Picker2D->SetTolerance(0.001);
-  m_Picker2D->InitializePickList();
+  //m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
 void mafViewVTK::SetMouse(mmdMouse *mouse)
