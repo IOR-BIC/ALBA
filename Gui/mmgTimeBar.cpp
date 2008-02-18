@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 10:48:55 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-02-18 12:30:09 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -300,7 +300,7 @@ void mmgTimeBar::SetBounds(double min, double max)
   m_TimeMaxString = "";
   m_TimeMaxString << m_TimeMax;
 
-  m_TimeBarSettings->SetSubrange(m_TimeMin,m_TimeMax);
+  //m_TimeBarSettings->SetSubrange(m_TimeMin,m_TimeMax);
   Update();
 }
 //----------------------------------------------------------------------------
