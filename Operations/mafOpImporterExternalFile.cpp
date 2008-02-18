@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterExternalFile.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 16:25:29 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-02-18 12:53:58 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     Stefano Perticoni   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -92,6 +92,7 @@ void mafOpImporterExternalFile::ImportExternalFile()
 	m_Vme->SetFileName(name.c_str());
   m_Vme->SetCurrentPath(path.c_str());
 	m_Vme->SetName(vmeName.c_str());
+  m_Vme->ReparentTo(m_Input);
   m_Vme->Update();
 
   m_Output = m_Vme;
