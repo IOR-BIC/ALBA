@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-15 07:49:34 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-02-18 14:23:05 $
+  Version:   $Revision: 1.13 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,12 +72,14 @@ void mmoGRFImporterWS::OpDo()
 {
   if(m_PlatformLeft != NULL)
   {
+    m_PlatformLeft->ReparentTo(m_Input);
     mafEventMacro(mafEvent(this,VME_ADD,m_PlatformLeft));
     m_VectorLeft->ReparentTo(m_PlatformLeft);
   }
 
   if(m_PlatformRight != NULL)
   {
+    m_PlatformRight->ReparentTo(m_Input);
     mafEventMacro(mafEvent(this,VME_ADD,m_PlatformRight));
     m_VectorRight->ReparentTo(m_PlatformRight);
   }
