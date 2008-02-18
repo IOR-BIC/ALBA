@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2006-09-20 14:59:52 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-02-18 12:24:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -78,6 +78,9 @@ public:
 
   /** Apply shading parameters to the vtkProperty */
   virtual void UpdateProp();
+
+  /** This method updates member variables from Lookup Table*/
+  void UpdateFromLut();
 
   vtkProperty        *m_Prop;
   vtkVolumeProperty2 *m_VolumeProp;

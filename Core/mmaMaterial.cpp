@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 13:11:51 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-02-18 12:24:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -414,6 +414,15 @@ void mmaMaterial::UpdateProp()
   m_ColorLut->SetNumberOfTableValues(m_NumValues);
   m_ColorLut->SetTableRange(m_TableRange);
   m_ColorLut->Build();
+}
+//-----------------------------------------------------------------------
+void mmaMaterial::UpdateFromLut()
+//-----------------------------------------------------------------------
+{
+  m_ColorLut->GetHueRange(m_HueRange);
+  m_ColorLut->GetSaturationRange(m_SaturationRange);
+  m_NumValues = m_ColorLut->GetNumberOfTableValues();
+  m_ColorLut->GetTableRange(m_TableRange);
 }
 //-----------------------------------------------------------------------
 void mmaMaterial::SetMaterialTexture(vtkImageData *tex)
