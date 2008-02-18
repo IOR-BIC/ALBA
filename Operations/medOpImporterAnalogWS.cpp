@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-05 17:00:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-02-18 15:14:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,6 +86,7 @@ void medOpImporterAnalogWS::Read()
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
   m_EmgScalar->SetName(name);
+  m_EmgScalar->ReparentTo(m_Input);
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
@@ -201,5 +202,6 @@ void medOpImporterAnalogWS::Read()
     tag_Signals->SetValue(stringVec[n], n);
   }
 
+  
   m_Output = m_EmgScalar;
 }
