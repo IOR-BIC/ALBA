@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 13:22:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-18 12:26:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,7 +96,7 @@ mmgTreeContextualMenu::~mmgTreeContextualMenu()
 {
 }
 //----------------------------------------------------------------------------
-void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu)
+void mmgTreeContextualMenu::CreateContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu)
 //----------------------------------------------------------------------------
 {
   m_ViewActive  = view;
@@ -170,11 +170,22 @@ void mmgTreeContextualMenu::ShowContextualMenu(mmgCheckTree *tree, mafView *view
 
 	this->Append(RMENU_AUTO_SORT,	"Keep tree nodes sorted","",true);
 	this->FindItem(RMENU_AUTO_SORT)->Check(m_Autosort);
-
-	int x,y;
-	::wxGetMousePosition(&x, &y);
-  m_NodeTree->ScreenToClient(&x, &y);
-	m_NodeTree->PopupMenu(this, wxPoint(x, y));
+}
+//----------------------------------------------------------------------------
+void mmgTreeContextualMenu::ShowContextualMenu()
+//----------------------------------------------------------------------------
+{
+	if (m_NodeTree != NULL)
+	{
+    int x,y;
+    ::wxGetMousePosition(&x, &y);
+    m_NodeTree->ScreenToClient(&x, &y);
+    m_NodeTree->PopupMenu(this, wxPoint(x, y));
+	}
+  else
+  {
+    mafLogMessage(_("Warning!! No tree setted to the contextual menu."));
+  }
 }
 //----------------------------------------------------------------------------
 void mmgTreeContextualMenu::OnContextualMenu(wxCommandEvent &event)

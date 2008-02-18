@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-18 14:51:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-18 12:26:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,8 +36,11 @@ public:
   virtual ~mmgTreeContextualMenu();
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
+  /** Create a contextual menu*/
+  virtual void CreateContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu);
+
   /** Visualize contextual men for the MDI child and selected view. */
-  void ShowContextualMenu(mmgCheckTree *tree, mafView *view, mafNode *vme, bool vme_menu);
+  void ShowContextualMenu();
 
 protected:
   mafView       *m_ViewActive;
@@ -53,7 +56,7 @@ protected:
   void CryptSubTree(bool crypt);
   
 	/** Answer contextual men's selection. */
-	void OnContextualMenu(wxCommandEvent& event);
+	virtual void OnContextualMenu(wxCommandEvent& event);
   DECLARE_EVENT_TABLE()
 };
 #endif
