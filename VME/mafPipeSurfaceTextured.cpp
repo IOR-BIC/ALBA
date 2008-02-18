@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:32:03 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-02-18 12:32:30 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -307,6 +307,7 @@ void mafPipeSurfaceTextured::OnEvent(mafEventBase *maf_event)
       }
     	break;
       case ID_LUT:
+        m_SurfaceMaterial->UpdateFromLut();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_ENABLE_LOD:
