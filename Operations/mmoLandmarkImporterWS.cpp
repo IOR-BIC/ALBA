@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoLandmarkImporterWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-28 08:09:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-02-18 15:43:52 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -240,5 +240,6 @@ void mmoLandmarkImporterWS::Read()
   } while (!inputFile.Eof());
 
   m_VmeCloud->Modified();
+  m_VmeCloud->ReparentTo(m_Input);  
   m_Output = m_VmeCloud;
 }
