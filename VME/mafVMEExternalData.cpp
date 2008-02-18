@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-22 14:24:20 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-18 12:51:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -99,7 +99,7 @@ mafString mafVMEExternalData::GetAbsoluteFileName()
     filename = m_TmpPath;
   }
 
-  filename.Append("/");
+  filename.Append("\\");
   filename.Append(this->GetFileName());
   filename.Append(".");
   filename.Append(this->GetExtension());
