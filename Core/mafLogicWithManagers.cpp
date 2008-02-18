@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:27:43 $
-  Version:   $Revision: 1.127 $
+  Date:      $Date: 2008-02-18 12:27:30 $
+  Version:   $Revision: 1.128 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1546,13 +1546,13 @@ void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 //----------------------------------------------------------------------------
 {
   mmgTreeContextualMenu *contextMenu = new mmgTreeContextualMenu();
-  //contextMenu->SetListener(this);
   contextMenu->SetListener(m_ApplicationLayoutSettings);
   mafView *v = m_ViewManager->GetSelectedView();
   mafVME  *vme = (mafVME *)e.GetVme();
   bool vme_menu = e.GetBool();
   bool autosort = e.GetArg() != 0;
-  contextMenu->ShowContextualMenu((mmgCheckTree *)e.GetSender(),v,vme,vme_menu);
+  contextMenu->CreateContextualMenu((mmgCheckTree *)e.GetSender(),v,vme,vme_menu);
+  contextMenu->ShowContextualMenu();
   cppDEL(contextMenu);
 }
 //----------------------------------------------------------------------------
