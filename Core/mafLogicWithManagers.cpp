@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:27:30 $
-  Version:   $Revision: 1.128 $
+  Date:      $Date: 2008-02-19 08:49:23 $
+  Version:   $Revision: 1.129 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -635,9 +635,43 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       {
         mafString *s = e->GetString();
         if(s != NULL)
-          e->SetVme(VmeChoose(e->GetArg(), e->GetBool(), *s));
+        {
+          std::vector<mafNode*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, *s, e->GetBool());
+          if (!e->GetBool())
+          {
+            if (nodeVector.size() != 0)
+            {
+              e->SetVme(nodeVector[0]);
+            }
+            else
+            {
+              e->SetVme(NULL);
+            }
+          }
+          else
+          {
+            e->SetVmeVector(nodeVector);
+          }
+        }
         else
-          e->SetVme(VmeChoose(e->GetArg(), e->GetBool()));
+        {
+          std::vector<mafNode*> nodeVector = VmeChoose(e->GetArg(), REPRESENTATION_AS_TREE, "Choose Node", e->GetBool());
+          if (!e->GetBool())
+          {
+            if (nodeVector.size() != 0)
+            {
+              e->SetVme(nodeVector[0]);
+            }
+            else
+            {
+              e->SetVme(NULL);
+            }
+          }
+          else
+          {
+            e->SetVmeVector(nodeVector);
+          }
+        }
       }
       break;
       case VME_CHOOSE_MATERIAL:
@@ -1488,10 +1522,10 @@ void mafLogicWithManagers::UpdateTimeBounds()
   }
 }
 //----------------------------------------------------------------------------
-mafNode* mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title)
+std::vector<mafNode*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect)
 //----------------------------------------------------------------------------
 {
-  mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style);
+  mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style, multiSelect);
   return vc.ShowChooserDialog();
 }
 //----------------------------------------------------------------------------
