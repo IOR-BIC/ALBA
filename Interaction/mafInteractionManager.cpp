@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:12:35 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2008-02-19 09:16:49 $
+  Version:   $Revision: 1.34 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -147,11 +147,20 @@ mafInteractionManager::mafInteractionManager()
 mafInteractionManager::~mafInteractionManager()
 //------------------------------------------------------------------------------
 {
+  while(!m_PERList.empty())
+  {
+    mafAutoPointer<mmiPER> old_per=*(m_PERList.rbegin());
+    m_PERList.pop_back();
+    assert(old_per);
+    SetPER(old_per);
+  }
+
   m_DeviceManager->Shutdown();
   cppDEL(m_Frame);
   mafDEL(m_DeviceManager);
   mafDEL(m_StaticEventRouter);
   mafDEL(m_PositionalEventRouter);
+
   //vtkDEL(m_CurrentRenderer);
 }
 
