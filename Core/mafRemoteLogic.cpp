@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-06 14:14:03 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-02-19 12:52:23 $
+Version:   $Revision: 1.13 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -390,12 +390,15 @@ void mafRemoteLogic::RemoteMessage(mafString &cmd, bool to_server)
     }
     else if(command == "VME_SHOW")
     {
-      long vme_id;
+      long vme_id, show_flag;
       data_cmd.ToLong(&vme_id);
+      data_cmd = tkz.GetNextToken();
+      data_cmd.ToLong(&show_flag);
       mafNode *root = m_ViewManager->GetCurrentRoot();
       mafNode *vme_to_show = root->FindInTreeById(vme_id);
       mafView *v = m_ViewManager->GetSelectedView();
-      mafEventMacro(mafEvent(this,VME_SHOW,vme_to_show,v->GetNodePipe(vme_to_show) == NULL));
+      mafEventMacro(mafEvent(this,VME_SHOW, vme_to_show, show_flag != 0));
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     }
     else if(command == "CameraReset")
     {
@@ -557,6 +560,17 @@ void mafRemoteLogic::VmeSelected(mafNode *vme)
   mafString cmd = "VME_SELECT";
   cmd << m_CommandSeparator;
   cmd << vme->GetId();
+  RemoteMessage(cmd);
+}
+//----------------------------------------------------------------------------
+void mafRemoteLogic::VmeShow(mafNode *vme, bool show_vme)
+//----------------------------------------------------------------------------
+{
+  mafString cmd = "VME_SHOW";
+  cmd << m_CommandSeparator;
+  cmd << vme->GetId();
+  cmd << m_CommandSeparator;
+  cmd << show_vme;
   RemoteMessage(cmd);
 }
 //----------------------------------------------------------------------------

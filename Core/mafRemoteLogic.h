@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.h,v $
 Language:  C++
-Date:      $Date: 2006-06-03 10:57:37 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-02-19 12:52:23 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,8 @@ class mmdClientMAF;
 //----------------------------------------------------------------------------
 // mafRemoteLogic :
 //----------------------------------------------------------------------------
-/**
+/** This class is used to manage remote messages to be sent to the server or received from it and allow
+to reproduce locally remote messages coming from server.
 */
 class mafRemoteLogic : public mafObserver
 {
@@ -53,7 +54,11 @@ public:
 
   void SetRemoteMouse(mmdRemoteMouse *rMouse);
 
+  /** Prepare VME_SELECTED message to be sent to remote clients.*/
   void VmeSelected(mafNode *vme);
+
+  /** Prepare VME_SHOW message to be sent to remote clients.*/
+  void VmeShow(mafNode *vme, bool show_vme);
 
   void SetClientUnit(mmdClientMAF *clientUnit);
 
