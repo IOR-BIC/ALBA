@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2007-11-29 08:51:32 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-02-19 10:59:04 $
+Version:   $Revision: 1.12 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -58,7 +58,9 @@ public:
 	virtual void VmeSelect(mafNode *node, bool select);
 
 	/** Create visual pipe and initialize them to build a RXCT view */
-	void PackageView();
+	virtual void PackageView();
+
+  virtual void OnLayout();
 
 	/** IDs for the GUI */
 	enum VIEW_RXCT_WIDGET_ID

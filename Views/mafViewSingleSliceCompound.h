@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-30 09:15:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-19 10:59:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,8 @@ public:
   virtual void VmeShow(mafNode *node, bool show);
 
 	virtual void VmeSelect(mafNode *node, bool select);
+
+  virtual void OnLayout();
 
 protected:
   /**

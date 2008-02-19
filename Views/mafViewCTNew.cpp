@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-29 08:51:32 $
-Version:   $Revision: 1.42 $
+Date:      $Date: 2008-02-19 10:59:04 $
+Version:   $Revision: 1.43 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -697,16 +697,14 @@ void mafViewCTNew::ProbeVolume()
 	  mafString t;
 		t = wxString::Format("%d",idSubView);
 	  //m_Text[idSubView]->SetInput(t);
-	  
-	  m_TextActor[idSubView]->SetMapper(m_Text[idSubView]);
 
+	  m_TextActor[idSubView]->SetMapper(m_Text[idSubView]);    
 
 	  vslice->GetRWI()->GetCamera()->SetFocalPoint(m_Position[idSubView]);
 	  vslice->GetRWI()->GetCamera()->SetPosition(p2);
 	  vslice->GetRWI()->GetCamera()->SetViewUp(0,0,1);
 	  //vslice->GetRWI()->GetCamera()->SetClippingRange(0.1,1000);
 	  vslice->GetRWI()->GetCamera()->ParallelProjectionOn();
-
 
 	  vslice->GetSceneGraph()->m_RenBack->AddActor(m_Actor[idSubView]);
 	  vslice->GetSceneGraph()->m_RenFront->AddActor2D(m_TextActor[idSubView]);
@@ -808,4 +806,16 @@ void mafViewCTNew::SetTextValue(int index, double value)
   mafString t;
   t = mafString(wxString::Format("%.1f", value < 0.0 ? 0.0 : value));
   m_Text[index]->SetInput(t);
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::OnLayout()
+//----------------------------------------------------------------------------
+{
+  mafViewCompound::OnLayout();
+  for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
+  {
+    mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+    wxSize size = ((wxWindowBase*)vslice->GetRWI())->GetSize();
+    m_TextActor[idSubView]->SetPosition(size.GetWidth() - 30, size.GetHeight() - 15);
+  }
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 13:38:23 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-02-19 10:59:04 $
+  Version:   $Revision: 1.25 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -179,11 +179,11 @@ void mafViewSingleSlice::UpdateText(int ID)
     }
     //set the init coordinates value
     if(slice_mode == SLICE_X)
-      m_Text = "X = ";
+      m_Text = "X: ";
     else if(slice_mode == SLICE_Y)
-      m_Text = "Y = ";
+      m_Text = "Y: ";
     else if(slice_mode == SLICE_Z)
-      m_Text = "Z = ";
+      m_Text = "Z: ";
 
     if((slice_mode != SLICE_ORTHO) && (slice_mode != SLICE_ARB))
       m_Text += wxString::Format("%.1f",m_Slice[slice_mode]);
@@ -196,6 +196,11 @@ void mafViewSingleSlice::UpdateText(int ID)
     m_Text="";
     m_TextMapper->SetInput(m_Text.c_str());
     m_TextMapper->Modified();
+  }
+  if(m_TextActor)
+  {
+    wxSize size = ((wxWindowBase*)this->GetRWI())->GetSize();
+    m_TextActor->SetPosition(size.GetWidth() - 50, size.GetHeight() - 15);
   }
 }
 

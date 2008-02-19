@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:54:31 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-19 10:59:04 $
+  Version:   $Revision: 1.14 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -216,4 +216,11 @@ void mafViewSingleSliceCompound::UpdateWindowing(bool enable,mafNode *node)
 		m_LutSlider->SetRange(-100,100);
 		m_LutSlider->SetSubRange(-100,100);
 	}
+}
+//----------------------------------------------------------------------------
+void mafViewSingleSliceCompound::OnLayout()
+//----------------------------------------------------------------------------
+{
+  mafViewCompound::OnLayout();
+  ((mafViewSingleSlice*)m_ChildViewList[ID_VIEW_SINGLE_SLICE])->UpdateText();
 }
