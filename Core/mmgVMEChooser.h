@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 08:35:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-02-19 08:47:52 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,9 +37,9 @@ class mmgVMEChooser : public mmgDialog
 {
 
 public:
-           mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title="Vme Chooser", long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE);
+           mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title="Vme Chooser", long vme_accept_function = 0, long style = REPRESENTATION_AS_TREE, bool multiSelect = false);
           ~mmgVMEChooser();
-	mafNode *ShowChooserDialog();
+	std::vector<mafNode*> ShowChooserDialog();
   void  OnEvent(mafEventBase *maf_event);
 
 protected:
