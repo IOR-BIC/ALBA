@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 11:45:27 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-02-19 08:45:25 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -135,7 +135,7 @@ void mmgCheckTree::EnableSelect(bool enable)
 void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
-  //pourpose: intercept and notify if the icon was clicked,
+  //purpose: intercept and notify if the icon was clicked,
   //prevent node selection if the icon was clicked,
   //prevent node selection anyway, if the selection is disabled,
   int flag;
@@ -153,7 +153,7 @@ void mmgCheckTree::OnMouseDown( wxMouseEvent& event )
 void mmgCheckTree::OnMouseUp( wxMouseEvent& event )
 //----------------------------------------------------------------------------
 {
-  //pourpose: prevent selection if I clicked on the icon.
+  //purpose: prevent selection if I clicked on the icon.
   //to select you must click the node name
   int flag;
 	wxTreeItemId i = m_NodeTree->HitTest(wxPoint(event.GetX(),event.GetY()),flag);
@@ -195,6 +195,14 @@ void mmgCheckTree::OnIconClick(wxTreeItemId item)
     mafEventMacro(mafEvent(this, VME_SHOW, vme, show));
     mafEventMacro(mafEvent(this, CAMERA_UPDATE));
   }
+}
+//----------------------------------------------------------------------------
+bool mmgCheckTree::IsIconChecked(wxTreeItemId item)
+//----------------------------------------------------------------------------
+{
+  mafNode* vme = (mafNode*) (NodeFromItem(item));
+  bool checked = GetNodeIcon((long)vme) == (ClassNameToIcon(vme->GetTypeName()) + NODE_VISIBLE_ON * 2);
+  return checked;
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeAdd(mafNode *vme)   

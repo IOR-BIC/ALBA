@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:38:58 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-02-19 08:45:06 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -47,6 +47,9 @@ public:
 
   /** Return the current selected node.*/
   mafNode *GetSelectedNode() {return m_SelectedNode;};
+
+  /** Return true if the icon associated to the tree item is checked.*/
+  bool IsIconChecked(wxTreeItemId item);
 
   /** Update the vme node icon into the checked tree. */
   void VmeShow(mafNode *n, bool show);
