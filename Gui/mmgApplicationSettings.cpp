@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-28 15:04:50 $
-Version:   $Revision: 1.14 $
-Authors:   Paolo Quadrani
+Date:      $Date: 2008-02-19 09:48:59 $
+Version:   $Revision: 1.15 $
+Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -31,7 +31,7 @@ mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
   // Default values for the application.
-  m_LogToFile   = 0;
+  m_LogToFile   = 1; //logging enabled for correcting bug #820
   m_VerboseLog  = 0;
   m_LogFolder = wxGetCwd().c_str();
 
