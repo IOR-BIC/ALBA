@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:09:52 $
-  Version:   $Revision: 1.28 $
-  Authors:   Silvano Imboden - Paolo Quadrani
+  Date:      $Date: 2008-02-19 09:52:34 $
+  Version:   $Revision: 1.29 $
+  Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -70,7 +70,9 @@
 #include "vtkImageData.h"
 #include "vtkImageExport.h"
 #include "vtkImageAppend.h"
+#include "vtkMath.h"
 
+#include <fstream>
 //----------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS(mafRWIBase, wxWindow)
 //----------------------------------------------------------------------------
@@ -752,6 +754,47 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   
   ::wxBeginBusyCursor();
 
+  long pixelXMeterX = 0;
+  long pixelXMeterY = 0;
+  vtkRenderWindow *rw = this->GetRenderWindow();
+  if(rw)
+  {
+    vtkRendererCollection *rc = rw->GetRenderers();
+    if(rc)
+    {
+      rc->InitTraversal();
+      vtkRenderer *ren = rc->GetNextItem();
+      if(ren)
+      {
+        double wp0x[4], wp1x[4];
+        ren->SetDisplayPoint(0,0,0); //x
+        ren->DisplayToWorld();
+        ren->GetWorldPoint(wp0x);
+
+        ren->SetDisplayPoint(10,0,0); //x
+        ren->DisplayToWorld();
+        ren->GetWorldPoint(wp1x);
+
+        double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
+        double meter = 1000; //millimeters
+        pixelXMeterX = meter/pixelSpacingX;
+        //wxMessageBox(wxString::Format("pixelXMeter = %f", meter/pixelSpacingX));
+
+        double wp0y[4], wp1y[4];
+        ren->SetDisplayPoint(0,0,0); //y
+        ren->DisplayToWorld();
+        ren->GetWorldPoint(wp0y);
+
+        ren->SetDisplayPoint(0,10,0); //y
+        ren->DisplayToWorld();
+        ren->GetWorldPoint(wp1y);
+
+        double pixelSpacingY = sqrt(vtkMath::Distance2BetweenPoints(wp1y,wp0y))/10;
+        pixelXMeterY = meter/pixelSpacingY;
+      }
+    }
+
+  }
   vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
   w2i->SetInput(GetRenderWindow());
   w2i->SetMagnification(magnification);
@@ -765,6 +808,49 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
     w->SetInput(w2i->GetOutput());
     w->SetFileName(filename.GetCStr());
     w->Write();
+
+    // bitmap header
+    /*
+    offset    size    description
+      0       2       signature, must be 4D42 hex
+      2       4       size of BMP file in bytes (unreliable)
+      6       2       reserved, must be zero
+      8       2       reserved, must be zero
+      10      4       offset to start of image data in bytes
+      14      4       size of BITMAPINFOHEADER structure, must be 40
+      18      4       image width in pixels
+      22      4       image height in pixels
+      26      2       number of planes in the image, must be 1
+      28      2       number of bits per pixel (1, 4, 8, or 24)
+      30      4       compression type (0=none, 1=RLE-8, 2=RLE-4)
+      34      4       size of image data in bytes (including padding)
+    * 38      4       horizontal resolution in pixels per meter (unreliable)
+    * 42      4       vertical resolution in pixels per meter (unreliable)
+      46      4       number of colors in image, or zero
+      50      4       number of important colors, or zero
+
+    * needed values
+    */
+#ifdef WIN32
+    //open file
+    fstream myFile (filename.GetCStr(), ios::in | ios::out | ios::binary);
+    myFile.seekp (38);
+    myFile.write ((char*)&pixelXMeterX, 4);
+    myFile.write ((char*)&pixelXMeterY, 4);
+    myFile.close();
+
+    FILE *fp = fopen(filename.GetCStr(), "rb");
+    if(!fp) return ;
+
+    BITMAPFILEHEADER bmfh={0};
+    BITMAPINFOHEADER bmih={0};
+    DWORD index;
+    BYTE ch;
+
+    fread(&bmfh,sizeof(bmfh),1,fp);  //read bitmap file header
+    fread(&bmih,sizeof(bmih),1,fp);  //read bitmap info header 
+    fclose(fp);
+#endif
   }
   else if (ext == "jpg")
   {
