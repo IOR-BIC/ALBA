@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-25 13:36:52 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-02-19 08:17:23 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -1012,6 +1012,7 @@ bool mmoRAWImporterImages::Import()
 	tag_Nature.SetValue(_("NATURAL"));
 
   m_Output->SetName(name.c_str());
+  m_Output->ReparentTo(m_Input);
 
 	m_Output->GetTagArray()->SetTag(tag_Nature);
 	//m_Output->Register(m_Output); //increment reference count so that the vme can't die
