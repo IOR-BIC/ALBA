@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:25:13 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-02-19 09:47:46 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -238,16 +238,16 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
     if (parent /*== NULL||*/ && this->GetRoot() != parent->GetRoot())
     {
       mafNodeIterator *iter=this->NewIterator();
-      for (mafNode *node=iter->GetFirstNode();node;node=iter->GetNextNode())
+      for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
       {
-        if (mafVMEGenericAbstract *vme=mafVMEGenericAbstract::SafeDownCast(node))
+        if (mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node))
         {
-          mafDataVector *dvector=vme->GetDataVector();
+          mafDataVector *dvector = vme->GetDataVector();
           if(dvector)
           {
-            for (int i=0;i<dvector->GetNumberOfItems();i++)
+            for (int i = 0; i < dvector->GetNumberOfItems(); i++)
             {
-              mafVMEItem *item=dvector->GetItemByIndex(i);
+              mafVMEItem *item = dvector->GetItemByIndex(i);
               assert(item);
               if (item)
               {
@@ -259,6 +259,7 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
                 {
                   item->SetId(-1);
                   item->SetURL("");
+                  dvector->Modified(); // Alert the data vector that the item is changed.
                 }
               }
               else
