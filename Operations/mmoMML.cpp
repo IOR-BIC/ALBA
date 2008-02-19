@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: mmoMML.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-11 11:53:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-02-19 10:37:35 $
+Version:   $Revision: 1.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -87,7 +87,7 @@ enum
 };
 
 //----------------------------------------------------------------------------
-mmoMML::mmoMML(wxString label) : mafOp(label)
+mmoMML::mmoMML(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
   //
@@ -194,7 +194,10 @@ mmoMML::mmoMML(wxString label) : mafOp(label)
 }
 
 //----------------------------------------------------------------------------
-mmoMML::~mmoMML( ) {}
+mmoMML::~mmoMML( ) 
+{
+  vtkDEL(m_RegisteredTransform);
+}
 
 //----------------------------------------------------------------------------
 bool mmoMML::Accept(mafNode* vme)

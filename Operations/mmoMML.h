@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoMML.h,v $
 Language:  C++
-Date:      $Date: 2007-04-11 11:53:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-02-19 10:37:35 $
+Version:   $Revision: 1.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ public:
   void OnPOperationButton();
   void Update();
   bool SetUpWidget();
-  mmoMML(wxString label);
+  mmoMML(const wxString &label);
   virtual ~mmoMML(); 
   void   OnEvent(mafEventBase *e);
   mafOp* Copy();
