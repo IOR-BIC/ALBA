@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMapScalarUX.txx,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:16:59 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-19 14:15:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -226,7 +226,7 @@ template <class T>
 typename mafTimeMapScalar<T>::TimeMapScalars::iterator mafTimeMapScalar<T>::FindItemByValue(T m)
 //----------------------------------------------------------------------------
 {
-  for (it = m_TimeMap.begin(); it != m_TimeMap.end(); it++)
+  for (typename mafTimeMapScalar<T>::TimeMapScalars::iterator it = m_TimeMap.begin(); it != m_TimeMap.end(); it++)
   {
     T m2 = it->second;
     if (m == m2)
@@ -261,7 +261,7 @@ template <class T>
 mafTimeStamp mafTimeMapScalar<T>::GetItemTime(int idx)
 //----------------------------------------------------------------------------
 {
-  mafTimeMapScalar<T>::TimeMapScalars::iterator it = FindItemByIndex(idx);
+  typename mafTimeMapScalar<T>::TimeMapScalars::iterator it = FindItemByIndex(idx);
   return (it != m_TimeMap.end()) ? it->first : -1;
 }
 
