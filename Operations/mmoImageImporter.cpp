@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoImageImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 16:25:29 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-19 08:30:20 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -295,6 +295,7 @@ void mmoImageImporter::BuildImageSequence()
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 
   m_ImportedImage->SetTimeStamp(start_time);
+  m_ImportedImage->ReparentTo(m_Input);
   m_Output = m_ImportedImage;
 }
 //----------------------------------------------------------------------------

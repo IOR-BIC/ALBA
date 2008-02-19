@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVTKImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 12:26:43 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-02-19 08:30:20 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -191,6 +191,7 @@ int mmoVTKImporter::ImportVTK()
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
       m_Output->GetTagArray()->SetTag(tag_Nature);
+      m_Output->ReparentTo(m_Input);
       m_Output->SetName(name.c_str());
 
       success = true;

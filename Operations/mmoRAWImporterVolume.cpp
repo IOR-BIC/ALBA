@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoRAWImporterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-03 10:00:52 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-02-19 08:30:20 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -577,6 +577,7 @@ bool mmoRAWImporterVolume::Import()
   wxSplitPath(m_RawFile.GetCStr(),&path,&name,&ext);
   m_Output->SetName(name.c_str());
   m_Output->GetTagArray()->SetTag(tag_Nature);
+  m_Output->ReparentTo(m_Input);
 	if(!m_TestMode)
 		mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
 	return true;
