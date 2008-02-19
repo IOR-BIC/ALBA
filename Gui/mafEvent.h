@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-02 11:31:18 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-19 08:41:01 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden, Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -69,6 +69,14 @@ public:
   mafMatrix*        GetMatrix()    {return m_Matrix;};
   mafMatrix*        GetOldMatrix() {return m_OldMatrix;};
   mafObject*        GetMafObject() {return m_MafObject;}
+
+  /** set call data, data sent by sender (event's invoker) to all observers. 
+  Be aware that the vmeVector argument will be empty after the Set */
+  void SetVmeVector(std::vector<mafNode*> vmeVector);
+
+  /** return call data, data sent by sender (event's invoker) to all observers */
+  std::vector<mafNode*> GetVmeVector();
+
   void GetWidgetData(WidgetDataType &widget_data);
 
   void SetArg(long arg)         { m_Arg = arg;};
@@ -95,6 +103,7 @@ protected:
   mafMatrix       *m_Matrix;
   mafMatrix       *m_OldMatrix;
   mafObject       *m_MafObject;
+  std::vector<mafNode*> m_VmeVector;
   WidgetDataType   m_WidgetData;
 
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

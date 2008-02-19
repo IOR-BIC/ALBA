@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEvent.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:21:30 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-02-19 08:41:01 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone, Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -221,6 +221,20 @@ void mafEvent::SetWidgetData(WidgetDataType &widget_data)
   m_WidgetData.iValue= widget_data.iValue;
   m_WidgetData.sValue= widget_data.sValue;
 }
+//------------------------------------------------------------------------------
+void mafEvent::SetVmeVector(std::vector<mafNode*> vmeVector)
+//------------------------------------------------------------------------------
+{
+  m_VmeVector.swap(vmeVector);
+}
+
+//------------------------------------------------------------------------------
+std::vector<mafNode*> mafEvent::GetVmeVector()
+//------------------------------------------------------------------------------
+{
+  return m_VmeVector;
+}
+
 //----------------------------------------------------------------------------
 int mafEvent::m_LogMode = 0;
 //----------------------------------------------------------------------------
