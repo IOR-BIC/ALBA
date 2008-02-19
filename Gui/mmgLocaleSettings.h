@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-28 15:04:50 $
-Version:   $Revision: 1.6 $
-Authors:   Paolo Quadrani
+Date:      $Date: 2008-02-19 09:49:14 $
+Version:   $Revision: 1.7 $
+Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -38,6 +38,12 @@ public:
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
+  /** Functions that handle if in Gui, the language is Enable or Disable */
+  void SetEnableLanguage(bool flag){m_EnableLanguage = flag;};
+  bool GetEnableLanguage(){return m_EnableLanguage;};
+  void EnableLanguageOn(){m_EnableLanguage = true;};
+  void EnableLanguageOff(){m_EnableLanguage = false;};
+
 protected:
   /** Create the GUI for the setting panel.*/
   void CreateGui();
@@ -45,6 +51,7 @@ protected:
   /** Initialize language used into the application.*/
   void InitializeSettings();
 
+  bool         m_EnableLanguage;
   int          m_LanguageId;
   wxLocale     m_Locale;
   wxLanguage   m_Language;
