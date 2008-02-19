@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 08:49:23 $
-  Version:   $Revision: 1.129 $
+  Date:      $Date: 2008-02-19 12:53:01 $
+  Version:   $Revision: 1.130 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -613,6 +613,10 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case VME_SHOW:
         VmeShow(e->GetVme(), e->GetBool());
+        if(m_RemoteLogic && (e->GetSender() != m_RemoteLogic) && m_RemoteLogic->IsSocketConnected())
+        {
+          m_RemoteLogic->VmeShow(e->GetVme(), e->GetBool());
+        }
       break;
       case VME_MODIFIED:
         VmeModified(e->GetVme());
