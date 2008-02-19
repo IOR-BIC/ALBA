@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:26:27 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-02-19 09:48:32 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -198,6 +198,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
       return NULL;
 
     mafString vme_name;
+
     if (node->GetAttribute("Name",vme_name))
     {
       vme->SetName(vme_name);
@@ -268,12 +269,23 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
             mafErrorMacro("MSFImporter: error restoring child VME (parent=\""<<vme->GetName()<<"\")");
             continue;
           }
+
           // add the new VME as a child of the given parent node
           if (vme_type == "mflVMELandmarkCloud" || vme_type == "mflVMERigidLandmarkCloud" || vme_type == "mflVMEDynamicLandmarkCloud" && child_vme->IsMAFType(mafVMELandmark))
           {
-            ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
-            child_vme->Delete();
-            child_vme = NULL;
+            if(mafVMELandmark::SafeDownCast(child_vme))
+            {
+              ((mafVMELandmarkCloud *)vme)->SetLandmark((mafVMELandmark *)child_vme);
+              child_vme->Delete();
+              child_vme = NULL;
+            }
+            else
+            {
+              //mafErrorMacro("MSFImporter: error restoring child VME in landmark cloud:(parent=\""<<vme->GetName()<<"\")");
+              //mafErrorMacro("MSFImporter: Child must be a landmark");
+              vme->AddChild(child_vme);
+            }
+            
           }
           else if ((vme->IsMAFType(mafVMEMeter) || vme->IsMAFType(mafVMEProber)) && child_vme->GetTagArray()->IsTagPresent("mflVMELink"))
           {
