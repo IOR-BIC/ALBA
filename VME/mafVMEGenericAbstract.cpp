@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 10:01:13 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-02-19 10:12:33 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -271,7 +271,10 @@ int mafVMEGenericAbstract::ReparentTo(mafNode *parent)
         }
       }
       iter->Delete();
-      m_DataVector->Modified();
+      if (m_DataVector)
+      {
+        m_DataVector->Modified();
+      }
     }
     return Superclass::ReparentTo(parent);
   }
