@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-07 08:35:58 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-02-19 08:48:20 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------
-mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme_accept_function, long style)
+mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme_accept_function, long style, bool multiSelect)
 : mmgDialog(dialog_title,mafCLOSEWINDOW | mafRESIZABLE | mafCLOSE | mafOK )
 //----------------------------------------------------------------------------
 {
@@ -40,7 +40,7 @@ mmgVMEChooser::mmgVMEChooser(mmgCheckTree *tree, wxString dialog_title, long vme
   else
     m_ValidateCallback = (ValidateCallBackType)vme_accept_function;
 
-  m_ChooserTree = new mmgVMEChooserTree(this,tree,m_ValidateCallback,-1,false,true,style);
+  m_ChooserTree = new mmgVMEChooserTree(this,tree,m_ValidateCallback,-1,false,true,style, multiSelect);
   m_ChooserTree->SetListener(this);
   m_ChooserTree->SetTitle("");
   m_ChooserTree->SetSize(wxSize(200,400));
@@ -56,13 +56,19 @@ mmgVMEChooser::~mmgVMEChooser()
   delete m_ChooserTree;
 }
 //----------------------------------------------------------------------------
-mafNode *mmgVMEChooser::ShowChooserDialog()
+std::vector<mafNode*> mmgVMEChooser::ShowChooserDialog()
 //----------------------------------------------------------------------------
 {
   if(ShowModal() == wxID_OK)
+  {
 		return m_ChooserTree->GetChoosedNode();
+  }
 	else
-		return NULL;
+  {
+     std::vector<mafNode*> nodeVector;
+     nodeVector.clear();
+     return nodeVector;
+  }
 }
 //----------------------------------------------------------------------------
 void mmgVMEChooser::OnEvent(mafEventBase *maf_event)
@@ -73,17 +79,7 @@ void mmgVMEChooser::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case VME_SELECTED:
-				if(m_ValidateCallback)
-				{
-					if(m_ValidateCallback(m_ChooserTree->GetChoosedNode()))
-						m_OkButton->Enable(true);
-					else
-						m_OkButton->Enable(false);
-				}
-				else
-				{
-					m_OkButton->Enable(true);
-				}
+				m_OkButton->Enable(e->GetBool());
       break;
       default:
         e->Log();
