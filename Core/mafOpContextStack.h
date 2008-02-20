@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpContextStack.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-26 11:08:34 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-02-20 13:00:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,9 @@ struct mafOpContext;
 //----------------------------------------------------------------------------
 // mafOpContextStack :
 //----------------------------------------------------------------------------
+/**
+  mafOpContextStack represents the stack used for implementing Undo and Redo mechanism 
+*/
 class mafOpContextStack
 {
 public:
