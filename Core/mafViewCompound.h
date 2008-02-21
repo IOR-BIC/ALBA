@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 09:52:57 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-02-21 15:17:26 $
+  Version:   $Revision: 1.26 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -173,7 +173,7 @@ public:
 
   /** 
   Let the sub-view to be maximized inside the compounded view. */
-  void MaximizeSubView(int subview_id = 0, bool maximize = true);
+  virtual void MaximizeSubView(int subview_id = 0, bool maximize = true);
 
   /** 
   Return true is one of the plugged view is maximized.*/
