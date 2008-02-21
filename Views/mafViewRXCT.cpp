@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-23 11:56:50 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2008-02-21 17:10:44 $
+  Version:   $Revision: 1.40 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,6 +153,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
           
           ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range);
           double volTableRange[2];
+          vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
           volTableRange[0] = volumeOutput->GetMaterial()->m_TableRange[0];
           volTableRange[1] = volumeOutput->GetMaterial()->m_TableRange[1];
 
@@ -749,6 +750,25 @@ void mafViewRXCT::LayoutSubViewCustom(int width, int height)
     i++;
   }
   ((mafViewCompound *)m_ChildViewList[i-1])->OnLayout();
+}
+//----------------------------------------------------------------------------
+void mafViewRXCT::MaximizeSubView(int subview_id, bool maximize)
+//----------------------------------------------------------------------------
+{
+  mafViewCompound::MaximizeSubView(subview_id, maximize);
+  for(int v=RX_FRONT_VIEW; v<VIEWS_NUMBER; v++)
+  {
+    if(v == subview_id || !maximize)
+    {
+       m_LutSliders[v]->Enable(true);
+    }
+    else
+    {
+       m_LutSliders[v]->Enable(false);
+    }
+  }
+  m_GuiView->Update();
+  
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::GizmoCreate()

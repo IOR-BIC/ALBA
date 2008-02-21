@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:34:35 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-21 17:10:44 $
+  Version:   $Revision: 1.14 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,6 +82,9 @@ protected:
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
   virtual mmgGui  *CreateGui();
+
+  /*Let the sub-view to be maximized inside the compounded view. */
+  virtual void MaximizeSubView(int subview_id = 0, bool maximize = true);
 
   /** 
   Redefine to arrange views to generate RXCT visualization.*/
