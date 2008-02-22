@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-22 08:38:51 $
-Version:   $Revision: 1.45 $
+Date:      $Date: 2008-02-22 13:51:26 $
+Version:   $Revision: 1.46 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -816,6 +816,10 @@ void mafViewCTNew::OnLayout()
   {
     mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
     wxSize size = ((wxWindowBase*)vslice->GetRWI())->GetSize();
-    m_TextActor[idSubView]->SetPosition(size.GetWidth() - 30, size.GetHeight() - 15);
+    int fontSize = 12;
+    int ratio;
+    ratio = 1 + size.GetWidth()/100;
+    m_Text[idSubView]->GetTextProperty()->SetFontSize(fontSize+ratio);
+    m_TextActor[idSubView]->SetPosition(size.GetWidth() - 35, size.GetHeight() - 15);
   }
 }

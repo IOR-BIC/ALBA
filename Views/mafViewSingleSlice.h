@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 13:38:23 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-02-22 13:51:26 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -116,6 +116,9 @@ public:
 
   /** Refresh text in CT View**/
   void UpdateText(int ID = 1);
+
+  /** Set Size of the text*/
+  void SetTextSize(int size);
   
   /** Update list of surfaces vme */
   void UpdateSurfacesList(mafNode *node);

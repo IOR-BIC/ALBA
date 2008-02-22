@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 10:59:04 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-02-22 13:51:26 $
+  Version:   $Revision: 1.26 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -200,7 +200,7 @@ void mafViewSingleSlice::UpdateText(int ID)
   if(m_TextActor)
   {
     wxSize size = ((wxWindowBase*)this->GetRWI())->GetSize();
-    m_TextActor->SetPosition(size.GetWidth() - 50, size.GetHeight() - 15);
+    m_TextActor->SetPosition(size.GetWidth() - 80, size.GetHeight() - 25);
   }
 }
 
@@ -875,4 +875,10 @@ void mafViewSingleSlice::SetPickerTolerance(double tolerance)
 {
   m_Picker2D->SetTolerance(tolerance);
   m_Picker2D->Modified();
+}
+//----------------------------------------------------------------------------
+void mafViewSingleSlice::SetTextSize(int size)
+//----------------------------------------------------------------------------
+{
+  m_TextMapper->GetTextProperty()->SetFontSize(size);
 }
