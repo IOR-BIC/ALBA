@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-21 15:28:26 $
-Version:   $Revision: 1.44 $
+Date:      $Date: 2008-02-22 08:38:51 $
+Version:   $Revision: 1.45 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -498,8 +498,8 @@ void mafViewCTNew::ProbeVolume()
     m_AdditionalProfileNumber = m_Thickness / m_ProfileDistance + 1;
     m_AdditionalProfileNumber  /= 2;
     //mafLogMessage(m_AdditionalProfileNumber);
-    if (m_AdditionalProfileNumber * 2 > 4)
-      wxMessageBox(L"Warning: with this Thickness value, it will be required more time to process");
+    //if (m_AdditionalProfileNumber * 2 > 4)
+    //  wxMessageBox(L"Warning: with this Thickness value, it will be required more time to process");
   }
 
 
