@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-02-25 19:41:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@ class vtkLookupTable;
 class vtkPiecewiseFunction;
 class vtkColorTransferFunction;
 class vtkVolumeProperty;
+class vtkVolumeProperty2;
 
 //----------------------------------------------------------------------------
 // mmaVolumeMaterial:
@@ -58,6 +59,7 @@ public:
   vtkPiecewiseFunction      *m_GradientTransferFunction;
   vtkColorTransferFunction  *m_ColorTransferFunction;
   vtkVolumeProperty         *m_VolumeProperty;
+  vtkVolumeProperty2        *m_VolumeProperty2;
 
   mafString m_MaterialName; ///< Associate a name to the volume material, this will be visible into the .msf file
 

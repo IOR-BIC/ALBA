@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-30 11:03:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-02-25 19:41:36 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,7 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkVolumeProperty.h"
+#include "vtkTransferFunction2D.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmaVolumeMaterial)
@@ -51,6 +52,7 @@ mmaVolumeMaterial::mmaVolumeMaterial()
   vtkNEW(m_GradientTransferFunction);
   vtkNEW(m_ColorTransferFunction);
   vtkNEW(m_VolumeProperty);
+  vtkNEW(m_VolumeProperty2);
 
   m_Level_LUT           = 0.5;
   m_Window_LUT          = 1.0;
@@ -76,6 +78,7 @@ mmaVolumeMaterial::~mmaVolumeMaterial()
 //----------------------------------------------------------------------------
 {
   vtkDEL(m_ColorLut);
+  vtkDEL(m_VolumeProperty2); 
 
   vtkDEL(m_OpacityTransferFunction);
   vtkDEL(m_GradientTransferFunction);
