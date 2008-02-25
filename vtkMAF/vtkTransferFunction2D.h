@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-23 12:12:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-25 19:39:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko, Mel Krokos
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -71,28 +71,28 @@ struct tfWidget {
   int    GradientInterpolationOrder; // 0 - no interpolation, 1 linear
 
   // position
-  float  Ratio;
-  float  Range[2][3];  // 0 - left, 1 - right, 2 - center
+  double  Ratio;
+  double  Range[2][3];  // 0 - left, 1 - right, 2 - center
   
   // value
-  float  Color[3];
-  float  Opacity;
-  float  Diffuse;
+  double  Color[3];
+  double  Opacity;
+  double  Diffuse;
 
   bool   Visible;
 
   // data calculated from the above parameters
-  float  LengthI[2][2]; // 1 / (Range[x][i] - Range[x][1])
-  float  RatioI;
+  double  LengthI[2][2]; // 1 / (Range[x][i] - Range[x][1])
+  double  RatioI;
 
   // methods
   tfWidget() { this->Name[0] = '\0'; this->GradientInterpolationOrder = 0; this->Ratio = 1.f; this->Opacity = 1.f; this->Diffuse = 0.f; this->Color[0] = this->Color[1] = this->Color[2] = 1.f; this->Visible = true; }
 
-  void   SetValueRange(float from, float to, float center) { Range[0][0] = from; Range[0][1] = to; Range[0][2] = center; }
-  void   SetGradientRange(float from, float to, float center) { Range[1][0] = from; Range[1][1] = to; Range[1][2] = center; }
+  void   SetValueRange(double from, double to, double center) { Range[0][0] = from; Range[0][1] = to; Range[0][2] = center; }
+  void   SetGradientRange(double from, double to, double center) { Range[1][0] = from; Range[1][1] = to; Range[1][2] = center; }
 
-  bool   Inside(float val, float grad) const { return (val >= this->Range[0][0] && val <= this->Range[0][1] && grad >= this->Range[1][0] && grad <= this->Range[1][1]); }
-  float  Attenuation(float val, float grad) const;
+  bool   Inside(double val, double grad) const { return (val >= this->Range[0][0] && val <= this->Range[0][1] && grad >= this->Range[1][0] && grad <= this->Range[1][1]); }
+  double  Attenuation(double val, double grad) const;
 
   void   Update();
   };
@@ -136,23 +136,23 @@ class VTK_vtkMAF_EXPORT vtkTransferFunction2D : public vtkDataObject {
     bool SetWidgetVisibility(int index, bool visible);
     bool GetWidgetVisibility(int index) const { return this->Widgets[index].Visible; }
 
-    bool  SetWidgetOpacity(int index, float opacity);
-    float GetWidgetOpacity(int index) const  { return this->Widgets[index].Opacity; }
+    bool  SetWidgetOpacity(int index, double opacity);
+    double GetWidgetOpacity(int index) const  { return this->Widgets[index].Opacity; }
 
-    bool         SetWidgetColor(int index, float color[3]);
-    const float* GetWidgetColor(int index) const {return this->Widgets[index].Color;}
+    bool         SetWidgetColor(int index, double color[3]);
+    const double* GetWidgetColor(int index) const {return this->Widgets[index].Color;}
 
-    bool  SetWidgetDiffuse(int index, float diffuse);
-    float GetWidgetDiffuse(int index) const { return this->Widgets[index].Diffuse;}
+    bool  SetWidgetDiffuse(int index, double diffuse);
+    double GetWidgetDiffuse(int index) const { return this->Widgets[index].Diffuse;}
     
-    bool  SetWidgetValueRatio(int index, float ratio);
-    float GetWidgetValueRatio(int index) const { return this->Widgets[index].Ratio;}
+    bool  SetWidgetValueRatio(int index, double ratio);
+    double GetWidgetValueRatio(int index) const { return this->Widgets[index].Ratio;}
 
-    bool SetWidgetValueRange(int index, float range[3]);
-    const float * GetWidgetValueRange(int index) const { return this->Widgets[index].Range[0];}
+    bool SetWidgetValueRange(int index, double range[3]);
+    const double * GetWidgetValueRange(int index) const { return this->Widgets[index].Range[0];}
 
-    bool SetWidgetGradientRange(int index, float range[3]);
-    const float *GetWidgetGradientRange(int index) const { return this->Widgets[index].Range[1];}
+    bool SetWidgetGradientRange(int index, double range[3]);
+    const double *GetWidgetGradientRange(int index) const { return this->Widgets[index].Range[1];}
 
     bool SetWidgetGradientInterpolation(int index, int order);
     int  GetWidgetGradientInterpolation(int index) const { return this->Widgets[index].GradientInterpolationOrder; }
@@ -163,19 +163,19 @@ class VTK_vtkMAF_EXPORT vtkTransferFunction2D : public vtkDataObject {
 
     // Description:
     // Returns the segments on which widgets are defined. Diffuse segement is defined where diffuse coefficient is not zero
-    const float *GetRange() { this->UpdateRanges(); return this->ValueRange; }
-    const float *GetGradientRange() { this->UpdateRanges(); return this->GradientRange; }
+    const double *GetRange() { this->UpdateRanges(); return this->ValueRange; }
+    const double *GetGradientRange() { this->UpdateRanges(); return this->GradientRange; }
     
     // Description:
     // Returns opacity and color for given pair of value and gradient. This is slow method and it should not
     // be use if speed is important. Renderer should only use GetTable methods.
-    float GetValue(const float val, const float gradient, float &opacity, float color[3], float &diffuse);
+    double GetValue(const double val, const double gradient, double &opacity, double color[3], double &diffuse);
  
     // Description:
     // These methods should be used by a volume mapper to sample transfer function
-    bool GetTable(int vsize, const float *vTable, int gsize, const float *gTable, float *opacityTable, unsigned char *rgbdTable, bool useOpacity = true);
+    bool GetTable(int vsize, const double *vTable, int gsize, const double *gTable, double *opacityTable, unsigned char *rgbdTable, bool useOpacity = true);
 
-    void Modified(float from = VTK_FLOAT_MIN, float to = VTK_FLOAT_MAX);
+    void Modified(double from = VTK_DOUBLE_MIN, double to = VTK_DOUBLE_MAX);
 
     // Description:
     // Save/Load transfer function to/from a string. The caller is responsible to delete the string.
@@ -189,11 +189,11 @@ class VTK_vtkMAF_EXPORT vtkTransferFunction2D : public vtkDataObject {
     tfWidget  Widgets[MAX_NUMBER_OF_WIDGETS];
     int       NumberOfWidgets;
 
-    float     UpdateRange[2];
+    double     UpdateRange[2];
 
     bool      RangeValid;
-    float     ValueRange[2];
-    float     GradientRange[2];
+    double     ValueRange[2];
+    double     GradientRange[2];
 
     void      UpdateRanges();
 
