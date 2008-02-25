@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-09-19 14:27:28 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-02-25 19:43:32 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -96,7 +96,7 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   wxComboBox   *combo;
   mmgButton    *butt;
   
-  lab = new wxStaticText(this, -1, "presets", dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  lab = new wxStaticText(this, -1, _("presets"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
 	combo = new wxComboBox  (this, ID_PRESET, "", dp, wxSize(DW,-1), lutPresetNum, LutNames, wxCB_READONLY);
 	sz = new wxBoxSizer(wxHORIZONTAL);
   sz->Add( lab,  1, wxRIGHT, LM);
@@ -104,7 +104,7 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   combo->SetValidator( mmgValidator(this,ID_PRESET,combo,&m_Preset) );
 	sizer->Add(sz,0,wxALL, M); 
 
-	lab = new wxStaticText (this, -1, "number of entries [1..256]", dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	lab = new wxStaticText (this, -1, _("number of entries [1..256]"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
 	text = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW,LH), wxNO_BORDER  );
 	text->SetValidator( mmgValidator(this,ID_NUMENTRY,text,&m_NumEntry,1,256) );
 	sz = new wxBoxSizer(wxHORIZONTAL);
@@ -112,7 +112,7 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( text, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
 
-	lab = new wxStaticText (this, -1, "mapped value range",  dp, wxSize(LW,LH), wxALIGN_RIGHT );
+	lab = new wxStaticText (this, -1, _("mapped value range"),  dp, wxSize(LW,LH), wxALIGN_RIGHT );
 	text = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW/2-HM,LH), wxNO_BORDER  );
 	text->SetValidator( mmgValidator(this,ID_VALUE_RANGE,text,&m_ValueRange[0], -1e200, 1e200, -1 ) ); //SIL: 17-01-06 - removed number of digits -- introduce errors on big numbers
 	text2 = new wxTextCtrl  (this, -1, ""   ,       dp, wxSize(DW/2,LH), wxNO_BORDER);
@@ -123,13 +123,13 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( text2, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
 
-	lab = new wxStaticText (this, -1, "Preview",dp,wxSize(150,-1));
+	lab = new wxStaticText (this, -1, _("Preview"),dp,wxSize(150,-1));
   lab->SetFont(bold_font);
 	sizer->Add( lab, 0, wxALL, M);
   m_LutSwatch = new mmgLutSwatch(this, -1, dp,wxSize(286,16));
 	sizer->Add( m_LutSwatch, 0, wxALL, 4);
 
-  lab = new wxStaticText (this, -1, "Lookup Table Entries",dp,wxSize(150,-1));
+  lab = new wxStaticText (this, -1, _("Lookup Table Entries"),dp,wxSize(150,-1));
   lab->SetFont(bold_font);
 	sizer->Add( lab, 0, wxALL, M);
   
@@ -138,60 +138,48 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 
   sizer->Add(m_LutWidget, 0, wxALL, M);
   
-	lab = new wxStaticText(this, -1, "selected indexes:", dp, wxSize(FW,LH));
+	lab = new wxStaticText(this, -1, _("selected indexes:"), dp, wxSize(FW,LH));
 	lab->SetValidator( mmgValidator(this,-1,lab,&m_Info) );
   sizer->Add(lab, 0, wxALL, M);
   
-	lab = new wxStaticText (this, -1, "Interpolations",dp,wxSize(150,-1));
+	lab = new wxStaticText (this, -1, _("Interpolations"),dp,wxSize(150,-1));
   lab->SetFont(bold_font);
 	sizer->Add( lab, 0, wxALL, M);
 	sz = new wxBoxSizer(wxHORIZONTAL);
 
-  butt = new mmgButton(this, ID_SHADE_RGB, "shade in rgba space",dp, wxSize(143,BH) );
+  butt = new mmgButton(this, ID_SHADE_RGB, _("shade in rgba space"),dp, wxSize(143,BH) );
 	butt->SetValidator( mmgValidator(this,ID_SHADE_RGB,butt) );
 	sz->Add( butt, 0, wxRIGHT, 2);
 
-  butt = new mmgButton(this, ID_SHADE_HSV, "shade in hsva space",dp, wxSize(143,BH) );
+  butt = new mmgButton(this, ID_SHADE_HSV, _("shade in hsva space"),dp, wxSize(143,BH) );
 	butt->SetValidator( mmgValidator(this,ID_SHADE_HSV,butt) );
 	sz->Add( butt, 0);
   sizer->Add(sz,0,wxALL, M);
 
-  lab = new wxStaticText (this, -1, "Color Editor",dp,wxSize(150,-1));
+  lab = new wxStaticText (this, -1, _("Color Editor"),dp,wxSize(150,-1));
   lab->SetFont(bold_font);
 	sizer->Add( lab, 0, wxALL, M);
 
   m_ColorWidget = new mmgColorWidget(this,ID_CW);//,dp,wxSize(300,300));
   m_ColorWidget->SetListener(this);
   sizer->Add(m_ColorWidget, 0, wxALL, M);
-
   
   if(m_parent->IsKindOf(CLASSINFO(wxDialog)))
   {
 	  sz = new wxBoxSizer(wxHORIZONTAL);
-    butt = new mmgButton(this, ID_OK, "ok",dp, wxSize(96,BH) );
+    butt = new mmgButton(this, ID_OK, _("ok"),dp, wxSize(96,BH) );
 	  butt->SetValidator( mmgValidator(this,ID_OK,butt) );
 	  sz->Add( butt, 0, wxRIGHT, 2);
 
-    butt = new mmgButton(this, ID_CANCEL, "cancel",dp, wxSize(96,BH) );
+    butt = new mmgButton(this, ID_CANCEL, _("cancel"),dp, wxSize(96,BH) );
 	  butt->SetValidator( mmgValidator(this,ID_CANCEL,butt) );
 	  sz->Add( butt, 0, wxRIGHT, 2);
 
-    butt = new mmgButton(this, ID_APPLY, "apply",dp, wxSize(96,BH) );
+    butt = new mmgButton(this, ID_APPLY, _("apply"),dp, wxSize(96,BH) );
 	  butt->SetValidator( mmgValidator(this,ID_APPLY,butt) );
 	  sz->Add( butt, 0);
     sizer->Add(sz,0,wxALL, M);
   }
-  
-  /*
-  lab = new wxStaticText(this, -1, "", dp, wxSize(192,LH));
-	sz = new wxBoxSizer(wxHORIZONTAL);
-	sz->Add( lab,  0, wxRIGHT, LM);
-  mmgButton *butt = new mmgButton(this, ID_SHADE, "shade range",dp, wxSize(94,BH) );
-	butt->SetValidator( mmgValidator(this,ID_SHADE,butt) );
-	butt->SetToolTip("shade the colors of the selected lut entries");
-	sz->Add( butt,  0, wxRIGHT, LM);
-  sizer->Add(sz, 0, wxALL, M);
-  */
 
   this->SetAutoLayout( TRUE );
   this->SetSizer( sizer );
@@ -330,9 +318,6 @@ void mmgLutEditor::SetLut(vtkLookupTable *lut)
     m_ValueRange[1] = m_Lut->GetRange()[1];
     m_NumEntry      = m_Lut->GetNumberOfTableValues();
   }
-  else
-  {
-  }
 
   m_LutWidget->SetLut(m_Lut);
   m_LutSwatch->SetLut(m_Lut);
@@ -359,12 +344,17 @@ void mmgLutEditor::CopyLut(vtkLookupTable *from, vtkLookupTable *to)
 void mmgLutEditor::ShowLutDialog(vtkLookupTable *lut, mafObserver *listener, int id)
 //----------------------------------------------------------------------------
 {
-  long style = /*wxDIALOG_MODAL |*/ wxDEFAULT_DIALOG_STYLE | /*wxSTAY_ON_TOP |*/ wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN;
-  mmgDialog dlg("LutEditor", mafCLOSEWINDOW);
+  long style = wxDEFAULT_DIALOG_STYLE | wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN;
+  mmgDialog dlg(_("LutEditor"), mafCLOSEWINDOW);
   
+  int x_init,y_init;
+  x_init = mafGetFrame()->GetPosition().x;
+  y_init = mafGetFrame()->GetPosition().y;
+
   mmgLutEditor *led = new mmgLutEditor(&dlg, id);
   led->SetListener(listener);
   led->SetLut(lut);
   dlg.Add(led,1,wxEXPAND);
+  dlg.SetSize(x_init,y_init,-1,-1);
   dlg.ShowModal();
 }
