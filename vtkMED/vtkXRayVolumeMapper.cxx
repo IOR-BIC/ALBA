@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkXRayVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-09-21 07:54:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-02-25 14:26:20 $
+  Version:   $Revision: 1.3 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -40,7 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#ifndef _DEBUG		
+//BES: 25.2.2008 - I really don't think it is a good idea to disable
+//runtime checks because it may hide some bugs from their occurrence in 
+//DEBUG mode and it is quite difficult to track these nasty bugs in RELEASE mode
+//Thus I changed this code to disable runtime checks only for RELEASE.
 #pragma runtime_checks( "s", off )
+#endif
+
 
 #include "vtkObjectFactory.h"
 
@@ -87,9 +94,8 @@ float vtkXRayVolumeMapper::Color[4] = { 0.5f, 0.5f, 0.5f, 1.f };
 
 void ProjectBoxToViewport(const vtkMatrix4x4 *matrixObject, const double (&boundingBox)[6], double (&minMaxViewportCoordinates)[4]);
   
-vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkXRayVolumeMapper);
-
 
 //------------------------------------------------------------------------------
 vtkXRayVolumeMapper::vtkXRayVolumeMapper() {
@@ -150,12 +156,12 @@ void vtkXRayVolumeMapper::StartRendering(vtkRenderer *renderer, vtkVolume *volum
   if (prevCheckSum == AccumBufferCacheCheckSum && AccumBuffer != NULL && AccumBufferCacheCheckSum != 0) {
     IgnoreRendering = true;
     EnableOptimization = false;
-    assert(RenderingViewport[2] == viewport[2] && RenderingViewport[3] == viewport[3]);
+    assert(RenderingViewport[2] == viewport[2] && RenderingViewport[3] == viewport[3]);	
     }
-  else {
+  else {	  
     IgnoreRendering = false;
     EnableOptimization = EnableAutoLOD && renderer->GetAllocatedRenderTime() < 0.3f;
-    if (EnableOptimization) {
+    if (EnableOptimization) {		
       AccumBufferCacheCheckSum = 0; // reset the cache
       RenderingViewport[2] = viewport[2] > 800 ? 512 : 256;
       RenderingViewport[3] = viewport[3] > 800 ? 512 : 256;
@@ -169,7 +175,7 @@ void vtkXRayVolumeMapper::StartRendering(vtkRenderer *renderer, vtkVolume *volum
       }
     
     // init accumulation buffer
-    if (AccumBuffer == NULL || (RenderingViewport[2] * RenderingViewport[3]) > AccumBufferSize) {
+    if (AccumBuffer == NULL || (RenderingViewport[2] * RenderingViewport[3]) > AccumBufferSize) {		
       delete [] AccumBuffer;
       AccumBufferSize = RenderingViewport[2] * RenderingViewport[3];
       AccumBuffer = new double[AccumBufferSize + 16];
@@ -209,14 +215,14 @@ void vtkXRayVolumeMapper::FinishRendering(vtkRenderer *renderer) {
     histogramSum += Histogram[i];
   
   // find min intensity value
-  int minSum = int(histogramSum * 0.02f);
-  for (int minI = 1; minI < HistogramSize && minSum > 0; minI++)
+  int minSum = int(histogramSum * 0.02f); int minI;
+  for (minI = 1; minI < HistogramSize && minSum > 0; minI++)
     minSum -= Histogram[minI];
   const double minVal = minI / AccumValueToHistogramIndex;
   
   // find max intensity value
-  int maxSum = int(histogramSum * 0.05f);
-  for (int maxI = HistogramSize - 1; maxI > 1 && maxSum > 0; maxI--)
+  int maxSum = int(histogramSum * 0.05f);int maxI;
+  for (maxI = HistogramSize - 1; maxI > 1 && maxSum > 0; maxI--)
     maxSum -= Histogram[maxI];
   const double maxVal = maxI / AccumValueToHistogramIndex;
   
@@ -291,7 +297,7 @@ void vtkXRayVolumeMapper::FinishRendering(vtkRenderer *renderer) {
   if (viewport[2] == width && viewport[3] == height) {
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
-    
+
     //glPixelTransferf(GL_RED_SCALE, Color[0]);
     //glPixelTransferf(GL_GREEN_SCALE, Color[1]);
     //glPixelTransferf(GL_BLUE_SCALE, Color[2]);
@@ -464,7 +470,8 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
   this->SliceIncrement *= -1; // optimization for texture caching
 
   // estimate number of renderings
-  for (int TotalNumberOfRenderings = 0, z = 0; z < this->NumberOfTextures[this->CurrentAxis]; z++) {
+  int TotalNumberOfRenderings = 0, z = 0;
+  for (; z < this->NumberOfTextures[this->CurrentAxis]; z++) {
     if (this->GlTextures[this->CurrentAxis][z][0] != 0)
       TotalNumberOfRenderings++;
     }
@@ -482,8 +489,8 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
     // ignore empty slices
     if (this->GlTextures[this->CurrentAxis][z][0] != 0) {
       numberOfRenderings++;
-      
-      // prepare the texture
+
+	  // prepare the texture
       GLuint textureId = this->GlTextures[this->CurrentAxis][z][mipMapLevel] != 0 ? this->GlTextures[this->CurrentAxis][z][mipMapLevel] :
                                                                                     this->GlTextures[this->CurrentAxis][z][0];
       GLboolean textureResident;
@@ -532,8 +539,9 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
     // copy the image from the framebuffer to accumulation buffer
     unsigned char *src = imageBuffer, *srcEnd = imageBuffer + 3 * width * height;
     unsigned int  *dst = iAccumBuffer;
+
     glReadPixels(RenderingViewport[0] + updateBox[0], RenderingViewport[1] + updateBox[2], width, height, GL_RGB, GL_UNSIGNED_BYTE, src);
-    
+
     // accumulate the colors
     const unsigned int shiftG = this->ColorBitsPerTextureByte[0], shiftB = this->ColorBitsPerTextureByte[0] + this->ColorBitsPerTextureByte[1];
 
@@ -590,6 +598,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
   glDisable(GL_LIGHTING);
   glDisable(GL_BLEND);
   glRasterPos3i(-1, -1, 0);
+
   glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, prevImage);
 
   // test
@@ -811,10 +820,12 @@ bool vtkXRayVolumeMapper::PrepareTextures() {
     
     // modify the dimensions (texture size should be equal to 2^N)
     int newDims[3];
-    for (int d = 0; d < 3; d++) {
+	int d = 0;
+    for (; d < 3; d++) {
       // find log2
       newDims[d] = dims[d];
-      for (int p = 0; newDims[d] > 0; p++)
+	  int p = 0;
+      for (; newDims[d] > 0; p++)
         newDims[d] >>= 1;
       if (d == CurrentAxis) {
         newDims[d] = dims[d];
@@ -1104,12 +1115,13 @@ int vtkXRayVolumeMapper::FindColorResolution() {
       histogram[*data] = 1;
 
     // find the first 1
-    for (int firstOne = VTK_SHORT_MIN; histogram[firstOne] == 0; firstOne++)
+	int firstOne, start, end;
+    for (firstOne = VTK_SHORT_MIN; histogram[firstOne] == 0; firstOne++)
       { ; }
     // find next one
-    for (int start = firstOne + 1; start < VTK_UNSIGNED_SHORT_MAX && histogram[start] == 0; start++)
+    for (start = firstOne + 1; start < VTK_UNSIGNED_SHORT_MAX && histogram[start] == 0; start++)
       { ; }
-    for (int end = VTK_SHORT_MAX - 1; histogram[end] == 0; end--)
+    for (end = VTK_SHORT_MAX - 1; histogram[end] == 0; end--)
       { ; }
     this->ScalarRange[0] = start;
     this->ScalarRange[1] = end;
@@ -1119,7 +1131,8 @@ int vtkXRayVolumeMapper::FindColorResolution() {
 #endif
 
   unsigned int MaxNum = (unsigned int)(this->ScalarRange[1] - this->ScalarRange[0]);
-  for (int i = 1; i < 16; i++) {
+  int i;
+  for (i = 1; i < 16; i++) {
     MaxNum >>= 1;
     if (MaxNum == 0)
       break;
@@ -1278,7 +1291,7 @@ bool vtkXRayVolumeMapper::IsDataValid(bool warnings) {
 
   // check image data
   if (imageData) {
-    int extent[3];
+    int extent[6];		//BES: 25.2.2008 - bug fix
     imageData->GetExtent(extent);
     if (extent[4] >= extent[5]) {
       if (warnings)
