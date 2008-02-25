@@ -14,6 +14,11 @@ SET(PROJECT_SRCS
   mafGUIDialogFindVme.h
   mafGUIDialogLogin.cpp
   mafGUIDialogLogin.h
+  
+  mafGUIDialogTransferFunction2D.cpp
+  mafGUIDialogTransferFunction2D.h
+  mafTransferFunction2DInteractors.cpp
+  
   mafGUISettings.cpp
   mafGUISettings.h
   mafGUISettingsStorage.cpp
