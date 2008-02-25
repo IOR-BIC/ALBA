@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 10:13:09 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-02-25 14:04:43 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,12 @@ class mmgGui;
 //----------------------------------------------------------------------------
 // mafPipe :
 //----------------------------------------------------------------------------
+/*
+  mafPipe is the base class for all visual pipes; each pipe represents how a vme can be
+  visualized inside the view, so logically a pipe has as input a vme and in output
+  creates actors that will be rendered in a render view.
+  It can handle a GUI, which events can be catched by OnEvent.
+*/
 class mafPipe : public mafObject, public mafObserver
 {
 public:
@@ -73,6 +79,9 @@ public:
 
   /** destroy the Gui */
   void DeleteGui();
+
+  /* Return Listener */
+  mafObserver *GetListener(){return m_Listener;};
 
   mmgGui         *m_Gui;      ///< User Interface
   mafVME         *m_Vme;      ///< VME used as input for the visual pipe
