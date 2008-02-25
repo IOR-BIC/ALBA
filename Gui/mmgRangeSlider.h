@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRangeSlider.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:26:03 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-02-25 19:43:51 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,8 @@
 //----------------------------------------------------------------------------
 // mmgRangeSlider :
 //----------------------------------------------------------------------------
-class mmgRangeSlider : public wxControl {
+class mmgRangeSlider : public wxControl 
+{
 public:
   mmgRangeSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxString& name = wxPanelNameStr);
 
@@ -43,7 +44,7 @@ public:
 	/** Enable/Disable the center cursor for the slider. */
   void EnableCenterWidget(bool enable) { this->m_NumberOfWidgets = (enable) ? 3 : 2; this->Refresh(); }
   
-	/** Return true if one of the cursors are moveing. */
+	/** Return true if one of the cursors are moving. */
   bool IsDragging() const { return this->m_SelectedTriangleWidget != -1 || this->m_SelectedRangeWidget != -1; }
 
 protected:
