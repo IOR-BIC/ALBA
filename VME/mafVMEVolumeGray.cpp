@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-17 11:31:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-02-25 19:44:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,10 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEVolumeGray.h"
+
+#include "mmgGui.h"
+#include "mafGUIDialogTransferFunction2D.h"
+
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
@@ -92,4 +96,40 @@ int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   
   mafErrorMacro("Trying to set the wrong type of data inside a "<<(const char *)GetTypeName()<<" :"<< (data?data->GetClassName():"NULL"));
   return MAF_ERROR;
+}
+//-------------------------------------------------------------------------
+mmgGui* mafVMEVolumeGray::CreateGui()
+//-------------------------------------------------------------------------
+{
+  m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
+  m_Gui->SetListener(this);
+  m_Gui->Divider();
+  m_Gui->Button(ID_VOLUME_TRANSFER_FUNCTION, "tf", "", "Visualize Transfer function dialog.");
+
+  return m_Gui;
+}
+//-------------------------------------------------------------------------
+void mafVMEVolumeGray::OnEvent(mafEventBase *maf_event)
+//-------------------------------------------------------------------------
+{
+  // events to be sent up or down in the tree are simply forwarded
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId())
+    {
+      case ID_VOLUME_TRANSFER_FUNCTION:
+      {
+        mafGUIDialogTransferFunction2D *dlg = new mafGUIDialogTransferFunction2D();
+        dlg->ShowModal(this);
+        cppDEL(dlg);
+      }
+      break;
+      default:
+        Superclass::OnEvent(maf_event);
+    }
+  }
+  else
+  {
+    Superclass::OnEvent(maf_event);
+  }
 }

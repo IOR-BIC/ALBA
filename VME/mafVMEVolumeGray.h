@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 14:05:15 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-25 19:44:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,15 @@ class MAF_EXPORT mafVMEVolumeGray : public mafVMEVolume
 public:
   mafTypeMacro(mafVMEVolumeGray,mafVMEVolume);
 
+  enum VOLUME_GRAY_WIDGET_ID
+  {
+    ID_VOLUME_TRANSFER_FUNCTION = Superclass::ID_LAST,
+    ID_LAST
+  };
+
+  /** Precess events coming from other objects */ 
+  virtual void OnEvent(mafEventBase *maf_event);
+
   /** Set Volume data. */
   virtual int SetData(vtkImageData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
   /** Set Volume data. */
@@ -46,6 +55,9 @@ public:
 protected:
   mafVMEVolumeGray();
   virtual ~mafVMEVolumeGray();
+
+  /** Internally used to create a new instance of the GUI.*/
+  virtual mmgGui *CreateGui();
 
 private:
   mafVMEVolumeGray(const mafVMEVolumeGray&); // Not implemented
