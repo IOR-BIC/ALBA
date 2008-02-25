@@ -35,6 +35,10 @@ SET(vtkMAF_SRCS
   vtkImplicitPolyData.h
   vtkLocalAxisCoordinate.cxx
   vtkLocalAxisCoordinate.h
+  vtkMAFAdaptiveVolumeMapper.cxx
+  vtkMAFAdaptiveVolumeMapper.h
+  vtkMAFImageMapToWidgetColors.cxx
+  vtkMAFImageMapToWidgetColors.h
   vtkMAFMeshCutter.cxx
   vtkMAFMeshCutter.h
   vtkProjectRG.cxx
