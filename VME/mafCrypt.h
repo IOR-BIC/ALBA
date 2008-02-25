@@ -7,6 +7,10 @@
 #ifdef MAF_USE_CRYPTO
   extern const char *mafDefaultPassPhrase();
 
+  // MD5 Checksum calculation for files and strings
+  extern void mafCalculateteChecksum(const char *filename, std::string &checksum_result);
+  extern void mafCalculateteChecksum(const char *input_string, int input_len, std::string &checksum_result);
+
   // files encryption/decryption
   extern bool mafEncryptFile(const char *filename_in, const char *filename_out, const char *passPhrase);
   extern bool mafDecryptFile(const char *filename_in, const char *filename_out, const char *passPhrase);

@@ -188,4 +188,53 @@ bool mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, co
   }
   return result;
 }
+//----------------------------------------------------------------------------
+void mafCalculateteChecksum(const char *filename, std::string &checksum_result)
+//----------------------------------------------------------------------------
+{
+  try
+  {
+    MD5 hashMD5;
+    HashFilter filterMD5(hashMD5);
+
+    std::auto_ptr<ChannelSwitch>
+      channelSwitch(new ChannelSwitch);
+
+    channelSwitch->AddDefaultRoute(filterMD5);
+
+    FileSource f(filename,true, channelSwitch.release());
+
+    HexEncoder encoder(new StringSink( checksum_result ), true);
+    filterMD5.TransferTo( encoder );
+  }
+  catch (...)
+  {
+    wxString msg = wxString::Format(_("Problem on calculating Checksum on file %s !!"), filename);
+    wxMessageBox(msg, _("Error"));
+  }
+}
+//----------------------------------------------------------------------------
+void mafCalculateteChecksum(const char *input_string, int input_len, std::string &checksum_result)
+//----------------------------------------------------------------------------
+{
+  try
+  {
+    MD5 hashMD5;
+    HashFilter filterMD5(hashMD5);
+
+    std::auto_ptr<ChannelSwitch>
+      channelSwitch(new ChannelSwitch);
+
+    channelSwitch->AddDefaultRoute(filterMD5);
+
+    StringSource s((const byte *)input_string, input_len, true, channelSwitch.release());
+
+    HexEncoder encoder(new StringSink( checksum_result ), true);
+    filterMD5.TransferTo( encoder );
+  }
+  catch (...)
+  {
+    wxMessageBox(_("Problem on calculating Checksum on string!!"), _("Error"));
+  }
+}
 #endif
