@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:24:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-02-25 19:41:14 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,6 @@
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkProperty;
-class vtkVolumeProperty2;
 class vtkLookupTable;
 class vtkImageData;
 
@@ -83,7 +82,6 @@ public:
   void UpdateFromLut();
 
   vtkProperty        *m_Prop;
-  vtkVolumeProperty2 *m_VolumeProp;
   vtkLookupTable     *m_ColorLut;
 
   mafString m_MaterialName;

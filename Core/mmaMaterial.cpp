@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:24:59 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-25 19:41:14 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,7 +64,6 @@ mmaMaterial::mmaMaterial()
   vtkNEW(m_ColorLut);
   vtkNEW(m_Prop);
   lutPreset(4,m_ColorLut);
-  m_VolumeProp  = NULL;
   m_Icon        = NULL;
   m_TextureImage= NULL;
 
@@ -106,7 +105,6 @@ mmaMaterial::~mmaMaterial()
 {
   vtkDEL(m_ColorLut);
 	vtkDEL(m_Prop); 
-  vtkDEL(m_VolumeProp); 
 	cppDEL(m_Icon);
 }
 //----------------------------------------------------------------------------
