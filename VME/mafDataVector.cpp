@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 10:57:29 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-02-25 19:45:31 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -263,6 +263,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
           item->SetArchiveFileName(m_ArchiveName);
           if (!item->StoreToArchive(zip))
           {
+            mafMessage(_("Unable to write %s into archive file %s"), data_file_url, m_ArchiveName.GetCStr());
             ret = MAF_ERROR;
           }
 
@@ -316,7 +317,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
 
         item->SetIOModeToDefault();
         ret = item->StoreData(data_file_url);
-
+        
         item->ReleaseOldFileOn(); // restore to default
         switch (ret)
         {
