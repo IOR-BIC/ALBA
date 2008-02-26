@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-04 16:46:51 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2008-02-26 16:48:03 $
+  Version:   $Revision: 1.52 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -616,7 +616,7 @@ int mafNode::DeepCopy(mafNode *a)
   {
     // Copy attributes
     m_Attributes.clear();
-    for (mafAttributesMap::iterator it=a->m_Attributes.begin();it!=a->m_Attributes.end();it++)
+    for (mafAttributesMap::iterator it = a->m_Attributes.begin(); it != a->m_Attributes.end();it++)
     {
       mafAttribute *attr=it->second;
       assert(attr);
@@ -625,6 +625,13 @@ int mafNode::DeepCopy(mafNode *a)
     
     // member variables
     SetName(a->GetName());
+
+    // Copy links
+    mafLinksMap::iterator lnk_it;
+    for (lnk_it = a->GetLinks()->begin(); lnk_it != a->GetLinks()->end(); lnk_it++)
+    {
+      SetLink(lnk_it->first, lnk_it->second.m_Node, lnk_it->second.m_NodeSubId);
+    }
 
     return MAF_OK;
   }
