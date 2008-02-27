@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-19 08:37:11 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-02-27 16:26:57 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -101,17 +101,16 @@ mmgGui* mafVMEOutputVolume::CreateGui()
   {
     this->Update();
   }
-  mafString vtk_data_type;
-  vtk_data_type << NULL_STRING_DATA;
+  m_VtkDataType << NULL_STRING_DATA;
 
   vtkDataSet *data = this->GetVTKData();
   if (data != NULL)
   {
-    vtk_data_type.Erase(0);
-    vtk_data_type << this->GetVTKData()->GetClassName();
+    m_VtkDataType.Erase(0);
+    m_VtkDataType << this->GetVTKData()->GetClassName();
   }
 
-  m_Gui->Label(_("vtk type: "), vtk_data_type, true);
+  m_Gui->Label(_("vtk type: "), &m_VtkDataType);
   m_Gui->Label(_(" bounds: "),true);
   m_Gui->Label(&m_VolumeBounds[0]);
   m_Gui->Label(&m_VolumeBounds[1]);
@@ -129,6 +128,8 @@ void mafVMEOutputVolume::Update()
   m_VME->Update();
   if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
   {
+    m_VtkDataType = "";
+    m_VtkDataType << this->GetVTKData()->GetClassName();
     double b[6];
     m_VME->GetOutput()->GetVMELocalBounds(b);
     m_VolumeBounds[0] = "";
