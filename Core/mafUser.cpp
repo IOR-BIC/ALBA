@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-19 13:44:54 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-02-27 16:27:58 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -99,9 +99,20 @@ void mafUser::InitializeUserInformations()
       f_in.getline(usr,256);
       credentials << usr;
     }
+    bool decrypt_success = false;
     std::string decrypted_input;
-    mafDefaultDecryptInMemory(credentials.GetCStr(), decrypted_input);
-    credentials = decrypted_input.c_str();
+    decrypt_success = mafDefaultDecryptInMemory(credentials.GetCStr(), decrypted_input);
+    if (decrypt_success)
+    {
+      credentials = decrypted_input.c_str();
+    }
+    else
+    {
+      mafLogMessage(_("Error on Decryption!!"));
+      printf("Error on Decryption!!");
+      f_in.close();
+      return;
+    }
 #else
     f_in.getline(usr,256);
     credentials << usr;
@@ -200,9 +211,19 @@ void mafUser::UpdateUserCredentialsFile()
     credentials << "\n";
     credentials << m_Password;
 #ifdef MAF_USE_CRYPTO
+    bool encrypt_success = false;
     std::string encrypted_output;
-    mafDefaultEncryptFromMemory(credentials.GetCStr(), credentials.Length(), encrypted_output);
-    credentials = encrypted_output.c_str();
+    encrypt_success = mafDefaultEncryptFromMemory(credentials.GetCStr(), credentials.Length(), encrypted_output);
+    if (encrypt_success)
+    {
+      credentials = encrypted_output.c_str();
+    }
+    else
+    {
+      mafLogMessage(_("Error on Encryption!!"));
+      printf("Error on Encryption!!");
+      return;
+    }
 #endif
     std::ofstream f_out;
     f_out.open(m_UserInfoFile.GetCStr(), std::ofstream::out | std::ofstream::binary);
