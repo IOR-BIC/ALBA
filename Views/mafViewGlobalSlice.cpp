@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-23 15:05:26 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-02-27 13:17:43 $
+  Version:   $Revision: 1.23 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,7 +143,7 @@ mafViewGlobalSlice::~mafViewGlobalSlice()
 mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewGlobalSlice *v = new mafViewGlobalSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewGlobalSlice *v = new mafViewGlobalSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -154,11 +154,11 @@ mafView *mafViewGlobalSlice::Copy(mafObserver *Listener)
 void mafViewGlobalSlice::Create()
 //----------------------------------------------------------------------------
 {
-  RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
+  RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
-  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);

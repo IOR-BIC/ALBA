@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:53:03 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-02-27 13:17:43 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@ mafViewRX::~mafViewRX()
 mafView *mafViewRX::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewRX *v = new mafViewRX(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewRX *v = new mafViewRX(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -73,7 +73,7 @@ void mafViewRX::Create()
 {
   m_Rwi = new mafRWI(mafGetFrame(), TWO_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
-  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
@@ -115,7 +115,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
       pipe->SetListener(this);
       if (pipe_name.Equals("mafPipeVolumeProjected"))
       {
-        ((mafPipeVolumeProjected *)pipe)->InitializeProjectParameters(m_CameraPosition);
+        ((mafPipeVolumeProjected *)pipe)->InitializeProjectParameters(m_CameraPositionId);
         m_CurrentVolume = n;
         if (m_AttachCamera)
         {
@@ -126,7 +126,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
         double normal[3];
-        switch(m_CameraPosition)
+        switch(m_CameraPositionId)
         {
         case CAMERA_RX_FRONT:
           normal[0] = 0;
@@ -164,7 +164,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
       else if(pipe_name.Equals("medVisualPipeSlicerSlice"))
       {
         double normal[3];
-        switch(m_CameraPosition)
+        switch(m_CameraPositionId)
         {
         case CAMERA_RX_FRONT:
           normal[0] = 0;
@@ -199,7 +199,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         double value1; 
         double value2; 
 
-        if(m_CameraPosition == CAMERA_RX_FRONT)
+        if(m_CameraPositionId == CAMERA_RX_FRONT)
         {
           value1= b[3] > b[2] ? b[3] : b[2];
           value2= b[3] > b[2] ? b[2] : b[3];
@@ -211,7 +211,7 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
           positionSlice2[1] = value2 + 0.001;
           positionSlice2[2] = (b[5]+b[4])/2;
         }
-        else if(m_CameraPosition == CAMERA_RX_LEFT)
+        else if(m_CameraPositionId == CAMERA_RX_LEFT)
         {
           value1= b[1] > b[0] ? b[1] : b[0];
           value2= b[1] > b[0] ? b[0] : b[1];

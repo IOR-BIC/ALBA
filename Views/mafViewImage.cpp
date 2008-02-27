@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-19 15:28:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-02-27 13:17:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,7 +70,7 @@ mafViewImage::~mafViewImage()
 mafView *mafViewImage::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewImage *v = new mafViewImage(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
+  mafViewImage *v = new mafViewImage(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -85,7 +85,7 @@ void mafViewImage::Create()
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
-  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);

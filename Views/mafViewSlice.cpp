@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-07 16:58:10 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2008-02-27 13:17:43 $
+  Version:   $Revision: 1.45 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -98,7 +98,7 @@ mafViewSlice::~mafViewSlice()
 mafView *mafViewSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs);
+  mafViewSlice *v = new mafViewSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowVolumeTICKs);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -109,11 +109,11 @@ mafView *mafViewSlice::Copy(mafObserver *Listener)
 void mafViewSlice::Create()
 //----------------------------------------------------------------------------
 {
-  RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
+  RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType);
   m_Rwi->SetListener(this);
-  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
@@ -158,7 +158,7 @@ void mafViewSlice::UpdateText(int ID)
   if (ID==1)
   {
     int slice_mode;
-    switch(m_CameraPosition)
+    switch(m_CameraPositionId)
     {
     case CAMERA_OS_X:
       slice_mode = SLICE_X;
@@ -244,7 +244,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         vtkDataSet *data = ((mafVME *)vme)->GetOutput()->GetVTKData();
         assert(data);
         data->Update();
-        switch(m_CameraPosition)
+        switch(m_CameraPositionId)
         {
           case CAMERA_OS_X:
             slice_mode = SLICE_X;
@@ -280,7 +280,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
         double normal[3];
-				switch(m_CameraPosition)
+				switch(m_CameraPositionId)
 				{
 				case CAMERA_OS_X:
 					normal[0] = 1;
@@ -322,7 +322,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
 				double normal[3];
-				switch(m_CameraPosition)
+				switch(m_CameraPositionId)
 				{
 				case CAMERA_OS_X:
 					normal[0] = 1;
@@ -364,7 +364,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 			else if(pipe_name.Equals("medPipePolylineGraphEditor"))
 			{
 				double normal[3];
-				switch(m_CameraPosition)
+				switch(m_CameraPositionId)
 				{
 				case CAMERA_OS_X:
 					normal[0] = 1;
@@ -398,7 +398,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         positionSlice[1] = m_Slice[1];
         positionSlice[2] = m_Slice[2];
         VolumePositionCorrection(positionSlice);
-				if(m_CameraPosition==CAMERA_OS_P)
+				if(m_CameraPositionId==CAMERA_OS_P)
 					((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
 				else
 					((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();
@@ -408,7 +408,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
       else if(pipe_name.Equals("mafPipeMeshSlice"))
       {
         double normal[3];
-        switch(m_CameraPosition)
+        switch(m_CameraPositionId)
         {
         case CAMERA_OS_X:
           normal[0] = 1;

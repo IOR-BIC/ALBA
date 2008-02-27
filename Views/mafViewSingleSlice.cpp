@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-22 13:51:26 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-02-27 13:17:43 $
+  Version:   $Revision: 1.27 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,7 @@ mafViewSingleSlice::~mafViewSingleSlice()
 mafView *mafViewSingleSlice::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewSingleSlice *v = new mafViewSingleSlice(m_Label, m_CameraPosition, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowOrientator);
+  mafViewSingleSlice *v = new mafViewSingleSlice(m_Label, m_CameraPositionId, m_ShowAxes,m_ShowGrid, m_ShowRuler, m_StereoType,m_ShowOrientator);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -111,11 +111,11 @@ mafView *mafViewSingleSlice::Copy(mafObserver *Listener)
 void mafViewSingleSlice::Create()
 //----------------------------------------------------------------------------
 {
-  RWI_LAYERS num_layers = m_CameraPosition != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
+  RWI_LAYERS num_layers = m_CameraPositionId != CAMERA_OS_P ? TWO_LAYER : ONE_LAYER;
   
   m_Rwi = new mafRWI(mafGetFrame(), num_layers, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator);
   m_Rwi->SetListener(this);
-  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
@@ -160,7 +160,7 @@ void mafViewSingleSlice::UpdateText(int ID)
   if (ID==1)
   {
     int slice_mode;
-    switch(m_CameraPosition)
+    switch(m_CameraPositionId)
     {
     case CAMERA_OS_X:
       slice_mode = SLICE_X;
@@ -250,7 +250,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
         data->Update();
 				float v1[3] = {1,0,0};
 				float v2[3] = {0,1,0};
-        switch(m_CameraPosition)
+        switch(m_CameraPositionId)
         {
           case CAMERA_OS_X:
             slice_mode = SLICE_X;
@@ -285,7 +285,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
       else if(pipe_name.Equals("mafPipeSurfaceSlice"))
       {
         double normal[3];
-				switch(m_CameraPosition)
+				switch(m_CameraPositionId)
 				{
 				case CAMERA_OS_X:
 					normal[0] = 1;
@@ -321,7 +321,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 			else if(pipe_name.Equals("mafPipeMeshSlice"))
 			{
 				double normal[3];
-				switch(m_CameraPosition)
+				switch(m_CameraPositionId)
 				{
 				case CAMERA_OS_X:
 					normal[0] = 1;
@@ -356,7 +356,7 @@ void mafViewSingleSlice::VmeCreatePipe(mafNode *vme)
 			else if(pipe_name.Equals("mafPipePolylineSlice"))
 			{
 				double normal[3];
-				switch(m_CameraPosition)
+				switch(m_CameraPositionId)
 				{
 				case CAMERA_OS_X:
 					normal[0] = 1;
@@ -565,26 +565,26 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 
 			if(m_PlaneSelect == XY)
 			{
-				m_CameraPosition = CAMERA_OS_Z;
+				m_CameraPositionId = CAMERA_OS_Z;
 				m_Position = (b[5] + b[4])/2;
 				//m_Slider->SetRange(b[4],b[5],m_Position);
 				m_Slice[2]=m_Position;
 			}
 			else if(m_PlaneSelect == YZ)
 			{
-				m_CameraPosition = CAMERA_OS_X;
+				m_CameraPositionId = CAMERA_OS_X;
 				m_Position = (b[1] + b[0])/2;
 				//m_Slider->SetRange(b[0],b[1],m_Position);
 				m_Slice[0]=m_Position;
 			}
 			else if(m_PlaneSelect == ZX)
 			{
-				m_CameraPosition = CAMERA_OS_Y;
+				m_CameraPositionId = CAMERA_OS_Y;
 				m_Position = (b[3] + b[2])/2;
 				//m_Slider->SetRange(b[2],b[3],m_Position);
 				m_Slice[1]=m_Position;
 			}
-			m_Rwi->CameraSet(m_CameraPosition);
+			m_Rwi->CameraSet(m_CameraPositionId);
 			m_Gui->Enable(ID_POSITION,true);
 			m_Gui->Update();
 
@@ -802,21 +802,21 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 
 			if(m_PlaneSelect == XY)
 			{
-				m_CameraPosition = CAMERA_OS_Z;
+				m_CameraPositionId = CAMERA_OS_Z;
 			  m_Position = (b[5] + b[4])/2;
 				//m_Slider->SetRange(b[4],b[5],m_Position);
 				m_Slice[2]=m_Position;
 			}
 			else if(m_PlaneSelect == YZ)
 			{
-				m_CameraPosition = CAMERA_OS_X;
+				m_CameraPositionId = CAMERA_OS_X;
 				m_Position = (b[1] + b[0])/2;
 				//m_Slider->SetRange(b[0],b[1],m_Position);
 				m_Slice[0]=m_Position;
 			}
 			else if(m_PlaneSelect == ZX)
 			{
-				m_CameraPosition = CAMERA_OS_Y;
+				m_CameraPositionId = CAMERA_OS_Y;
 				m_Position = (b[3] + b[2])/2;
 				//m_Slider->SetRange(b[2],b[3],m_Position);
 				m_Slice[1]=m_Position;
