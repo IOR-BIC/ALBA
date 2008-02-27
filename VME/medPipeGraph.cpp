@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 10:22:28 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-02-27 10:19:18 $
+  Version:   $Revision: 1.17 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -254,7 +254,17 @@ mmgGui* medPipeGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
   if(m_Gui == NULL) 
-  m_Gui = new mmgGui(this);
+    m_Gui = new mmgGui(this);
+
+  m_Gui->String(ID_ITEM_NAME,_("name :"), &m_ItemName,_(""));
+  m_Gui->Divider(1);
+
+  m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
+  m_Gui->Divider();
+
+  m_Gui->Bool(ID_LEGEND,_("Legend"),&m_Legend,0,_("Show legend"));
+  m_Gui->Divider(1);
+
   wxString name;
   bool checked = FALSE;
 
@@ -283,16 +293,6 @@ mmgGui* medPipeGraph::CreateGui()
     }
      m_CheckBox->AddItem(n-1 , name, checked);
   }
-
-  m_Gui->Divider(1);
-  m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
-  m_Gui->Divider(1);
-  m_Gui->String(ID_ITEM_NAME,_("name :"), &m_ItemName,_(""));
-  m_Gui->Divider(1);
-  m_Gui->Bool(ID_LEGEND,_("Legend"),&m_Legend,0,_("Show legend"));
-  m_Gui->Divider();
-  m_Gui->Divider();
-  m_Gui->Divider(2);
   return m_Gui;
 }
 
