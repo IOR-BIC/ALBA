@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:19:58 $
-  Version:   $Revision: 1.53 $
+  Date:      $Date: 2008-02-27 13:17:28 $
+  Version:   $Revision: 1.54 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -163,7 +163,7 @@ protected:
   mafAttachCamera *m_AttachCamera;
   mafAnimate      *m_AnimateKit;
 
-  int   m_CameraPosition; 
+  int   m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up.
   bool  m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
   int   m_StereoType; ///< Indicate the stereo type to use with the view
   bool  m_ShowRuler;

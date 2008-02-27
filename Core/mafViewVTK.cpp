@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:29:20 $
-  Version:   $Revision: 1.74 $
+  Date:      $Date: 2008-02-27 13:17:28 $
+  Version:   $Revision: 1.75 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,7 +58,7 @@ mafViewVTK::mafViewVTK(const wxString &label, int camera_position, bool show_axe
 :mafView(label)
 //----------------------------------------------------------------------------
 {
-  m_CameraPosition  = camera_position;
+  m_CameraPositionId= camera_position;
   m_ShowAxes        = show_axes;
   m_ShowGrid        = show_grid;
   m_StereoType      = stereo;
@@ -100,7 +100,7 @@ void mafViewVTK::PlugVisualPipe(mafString vme_type, mafString pipe_type, long vi
 mafView *mafViewVTK::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_ShowRuler, m_StereoType, m_ShowOrientator);
+  mafViewVTK *v = new mafViewVTK(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_ShowRuler, m_StereoType, m_ShowOrientator);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
@@ -113,7 +113,7 @@ void mafViewVTK::Create()
 {
   m_Rwi = new mafRWI(mafGetFrame(), ONE_LAYER, m_ShowGrid, m_ShowAxes, m_ShowRuler, m_StereoType, m_ShowOrientator);
   m_Rwi->SetListener(this);
-  m_Rwi->CameraSet(m_CameraPosition);
+  m_Rwi->CameraSet(m_CameraPositionId);
   m_Win = m_Rwi->m_RwiBase;
 
   m_Sg  = new mafSceneGraph(this,m_Rwi->m_RenFront,m_Rwi->m_RenBack);
@@ -211,7 +211,7 @@ void mafViewVTK::CameraSet(int camera_position)
 //----------------------------------------------------------------------------
 {
   assert(m_Rwi);
-  m_CameraPosition = camera_position; 
+  m_CameraPositionId = camera_position; 
   m_Rwi->CameraSet(camera_position);
 }
 //----------------------------------------------------------------------------
