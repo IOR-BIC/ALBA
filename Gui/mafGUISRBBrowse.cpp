@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 15:28:49 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-02-27 13:25:44 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -202,7 +202,23 @@ void mafGUISRBBrowse::OnEvent(mafEventBase *maf_event)
 int mafGUISRBBrowse::RemoteSRBList()
 //----------------------------------------------------------------------------
 {
-  struct soap soap; // gSOAP runtime environment
+  //soap_ssl_init(); /* init OpenSSL (just once) */
+  struct soap *soap = soap_new1(SOAP_ENC_MTOM);
+
+  if (soap_ssl_client_context(soap,
+    SOAP_SSL_NO_AUTHENTICATION,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    )) 
+  {
+    mafString errorCode = soap->fault->SOAP_ENV__Detail->__any;
+    mafMessage(errorCode.GetCStr());
+    soap_print_fault(soap, stderr);
+    return MAF_ERROR;
+  } 
 
   mafString portStr = "";
   portStr << m_Port;
@@ -221,20 +237,18 @@ int mafGUISRBBrowse::RemoteSRBList()
 
   _ns1__SrbListResponse lsSRBResult;
 
-
-  soap_init(&soap); // initialize runtime environment (only once)
-  if (soap_call___ns6__SrbList(&soap, "http://ws-lhdl.cineca.it:12000/mafSRBList.cgi", NULL, &srb_listParams, &lsSRBResult) != SOAP_OK)
+  if (soap_call___ns6__SrbList(soap, "https://ws-lhdl.cineca.it/mafSRBList.cgi", NULL, &srb_listParams, &lsSRBResult) != SOAP_OK)
   {
     mafString errorCode = lsSRBResult.soap->fault->faultstring; //->fault->SOAP_ENV__Reason->SOAP_ENV__Text;
     mafMessage(errorCode.GetCStr());
-    soap_print_fault(&soap, stderr); // display the SOAP fault message on the stderr stream
+    soap_print_fault(soap, stderr); // display the SOAP fault message on the stderr stream
     return MAF_ERROR;
   }
   m_FileList = lsSRBResult.filelist;
    
-  soap_destroy(&soap); // delete deserialized class instances (for C++ only)
-  soap_end(&soap); // remove deserialized data and clean up
-  soap_done(&soap); // detach the gSOAP environment
+  soap_destroy(soap); // delete deserialized class instances (for C++ only)
+  soap_end(soap); // remove deserialized data and clean up
+  soap_done(soap); // detach the gSOAP environment
    
   return MAF_OK;
   
