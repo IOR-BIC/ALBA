@@ -163,6 +163,16 @@ IF (MAF_USE_P5_GLOVE)
   )
 ENDIF (MAF_USE_P5_GLOVE)
 
+IF (MAF_USE_WIIMOTE)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mafDeviceTrackerWIIMote.cpp
+  mafDeviceTrackerWIIMote.h
+  )
+ENDIF (MAF_USE_WIIMOTE)
+
+
+
 #IF (MAF_USE_VTK)
 #  SET(PROJECT_SRCS
 #  ${PROJECT_SRCS}
@@ -171,6 +181,7 @@ ENDIF (MAF_USE_P5_GLOVE)
 
 IF (WIN32)
   OPTION(MAF_USE_P5_GLOVE "Link driver for P5 glove device" OFF)
+  OPTION(MAF_USE_WIIMOTE "Link driver for WIIMote device" OFF)
 ENDIF (WIN32)
 
 # currently special drivers only supported under WIN32
@@ -199,3 +210,4 @@ IF (MAF_USE_WX)
 ENDIF (MAF_USE_WX)
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/mafInteractionConfigure.h.in ${PROJECT_BINARY_DIR}/mafInteractionConfigure.h IMMEDIATE)
+
