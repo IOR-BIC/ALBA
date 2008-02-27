@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2006-05-16 15:30:34 $
-# Version:   $Revision: 1.2 $
+# Date:      $Date: 2008-02-27 17:19:45 $
+# Version:   $Revision: 1.3 $
 #
 # Description: MAF_DRIVERS Cmake project file.
 #
@@ -67,6 +67,27 @@ IF (MAF_USE_P5_GLOVE)
   )
 ENDIF (MAF_USE_P5_GLOVE)
 
+IF (MAF_USE_WIIMOTE)
+  SET (DRIVERS_SRCS 
+  ${DRIVERS_SRCS}
+  defines.h
+  Console.h
+  Console.cpp
+  HIDDevice.h
+  HIDDevice.cpp
+  hidpi.h
+  hidsdi.h
+  hidusage.h
+  #LEDPlayer.h
+  #LEDPlayer.cpp
+  #Resource.h
+  setupapi.h
+  Utils.h
+  Wiimote.h
+  Wiimote.cpp
+  )
+ENDIF (MAF_USE_WIIMOTE)
+
 #
 # Create the mafDrivers library
 #
@@ -82,3 +103,12 @@ IF (MAF_USE_P5_GLOVE)
   
   TARGET_LINK_LIBRARIES (mafDrivers P5DLL.lib)
 ENDIF (MAF_USE_P5_GLOVE)
+
+IF (MAF_USE_WIIMOTE)
+  FOREACH(config ${CMAKE_CONFIGURATION_TYPES})
+    CONFIGURE_FILE(${MAF_DRIVERS_SOURCE_DIR}/hid.lib ${EXECUTABLE_OUTPUT_PATH}/${config}/hid.lib COPYONLY IMMEDIATE)
+    CONFIGURE_FILE(${MAF_DRIVERS_SOURCE_DIR}/setupapi.lib ${EXECUTABLE_OUTPUT_PATH}/${config}/setupapi.lib COPYONLY IMMEDIATE)
+  ENDFOREACH(config)
+  
+  TARGET_LINK_LIBRARIES (mafDrivers hid.lib setupapi.lib)
+ENDIF (MAF_USE_WIIMOTE)
