@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:31:43 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-02-27 16:26:35 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -378,7 +378,9 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
     m_DataReader = reader;
     m_DataReader->Register(NULL);
 
-    if (data==NULL)
+    unsigned long err = reader->GetErrorCode();
+
+    if (data == NULL || err == VTK_ERROR)
     {
       mafErrorMacro("Cannot read data file " << filename);
       return MAF_ERROR;
