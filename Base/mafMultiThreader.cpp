@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafMultiThreader.cpp,v $
 Language:  C++
-Date:      $Date: 2005-05-12 16:11:20 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-02-27 17:21:24 $
+Version:   $Revision: 1.5 $
 Authors:   Based on mafMultiThreader (www.vtk.org), adapted by Marco Petrone
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -204,7 +204,7 @@ void mafMultiThreader::TerminateThread( int ThreadID )
   m_SpawnedThreadActiveFlagLock[ThreadID]->Unlock();
 
 #ifdef CMAKE_USE_WIN32_THREADS_INIT
-  WaitForSingleObject(m_SpawnedThreadProcessID[ThreadID], INFINITE);
+  //WaitForSingleObject(m_SpawnedThreadProcessID[ThreadID], INFINITE); // Giunchi: commented to stop Wii-Mote devices
   CloseHandle(m_SpawnedThreadProcessID[ThreadID]);
 #endif
 
