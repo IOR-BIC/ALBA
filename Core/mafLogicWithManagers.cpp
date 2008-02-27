@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 12:53:01 $
-  Version:   $Revision: 1.130 $
+  Date:      $Date: 2008-02-27 13:20:09 $
+  Version:   $Revision: 1.131 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -703,7 +703,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         if(m_OpManager) 
         {
           m_OpManager->OpRun(e->GetArg());
-          if(m_OpManager->GetRunningOperation() && m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
+          if(/*m_OpManager->GetRunningOperation() && */m_RemoteLogic && m_RemoteLogic->IsSocketConnected() && !m_OpManager->m_FromRemote)
           {
             mafEvent re(this, mafOpManager::RUN_OPERATION_EVENT, e->GetArg());
             re.SetChannel(REMOTE_COMMAND_CHANNEL);
