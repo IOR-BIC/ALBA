@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.8 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -354,12 +354,16 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 		groupWord      = read16(fp,little_endian);
 		if(feof(fp))
 		{
+      free((uint8 *)t);
+      fclose(fp);
 			Status=-1;
 			return -1;
 		}
 		elementWord    = read16(fp,little_endian);
 		if(feof(fp))
 		{
+      free((uint8 *)t);
+      fclose(fp);
 			Status=-1;
 			return -1;
 		}
@@ -540,6 +544,8 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 			fseek_result = fseek(fp,elementLength,SEEK_CUR);
 			if( (RESULT_line == SIZE_TAG && fseek_result != 0) || feof(fp))
 			{
+        free((uint8 *)t);
+        fclose(fp);
 				Status = -1;
 				return -1;
 			}
