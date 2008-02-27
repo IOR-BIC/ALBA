@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-27 16:24:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -177,4 +177,26 @@ void mafDataInterpolator::UpdateCurrentItem(mafVMEItem *item)
 	  SetCurrentItem(NULL);
     //m_UpdateTime.Modified();
   }
+}
+//------------------------------------------------------------------------------
+void mafDataInterpolator::OnEvent(mafEventBase *maf_event)
+//------------------------------------------------------------------------------
+{
+  switch (maf_event->GetId())
+  {
+  case VME_OUTPUT_DATA_PREUPDATE:
+    if (GetMTime() > m_PreExecuteTime.GetMTime() || !m_CurrentItem->IsDataPresent())
+    {
+      m_PreExecuteTime.Modified();
+      PreExecute();
+      // forward event to VME
+      if (m_VME) m_VME->OnEvent(maf_event);
+    }
+    break;
+  case VME_OUTPUT_DATA_UPDATE:
+    Execute();
+    // forward event to VME
+    if (m_VME) m_VME->OnEvent(maf_event);
+    break;
+  }; 
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-27 16:24:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,6 +35,8 @@ public:
   /** This DataPipe accepts only VME's with internal DataArray. */
   virtual bool Accept(mafVME *vme);
 
+  void OnEvent(mafEventBase *maf_event);
+
   /**
     This function makes the current bounds to be updated. It's optimized
     to not require data updating, so that data bounds can be evaluated 
@@ -63,12 +65,11 @@ protected:
   virtual void PreExecute()=0;
   virtual void Execute()=0;
 
-  /**
-  This function is called internally to updated the output data according
+  /** This function is called internally to updated the output data according
   interpolator rules. It should be reimplemented in sub-classes.*/
   virtual void InternalItemUpdate();
 
-  /** Internally used to set the current item memeber variable*/
+  /** Internally used to set the current item member variable*/
   void SetCurrentItem(mafVMEItem *data);
 
   /** Internally used update the current item variable to a new value (only if necessary)*/
