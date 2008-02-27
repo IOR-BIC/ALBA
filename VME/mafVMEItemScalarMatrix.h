@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalarMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-02-27 13:31:43 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,6 +108,12 @@ public:
 protected:
   mafVMEItemScalarMatrix(); // to be allocated with New()
   ~mafVMEItemScalarMatrix(); // to be deleted with Delete()
+
+  /** Check that stored file is valid and has the same dimension of that one present in memory.*/
+  virtual int CheckFile(const char *filename) {return MAF_OK;};
+
+  /** Check that stored string is valid.*/
+  virtual int CheckFile(const char *input_string, int input_len) {return MAF_OK;};
 
   /** Update the vnl reader to read from memory or file from disk (encrypted or not).*/
   int UpdateReader(mafString &filename);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:48:43 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-02-27 13:31:43 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -114,6 +114,12 @@ protected:
   mafVMEItemVTK(); // to be allocated with New()
   ~mafVMEItemVTK(); // to be deleted with Delete()
 
+  /** Check that stored file is valid and has the same dimension of that one present in memory.*/
+  int CheckFile(const char *filename);
+
+  /** Check that stored string is valid.*/
+  int CheckFile(const char *input_string, int input_len);
+  
   /** Update the vtk reader to read from memory or file from disk (encrypted or not).*/
   int UpdateReader(vtkDataReader *reader, mafString &filename);
 

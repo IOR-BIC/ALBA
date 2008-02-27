@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 10:54:47 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-02-27 13:31:43 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -504,10 +504,10 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       //if (!item->IsDataModified()&&found)
       //  return;
 
-      vtkDataSet *data=GetData();
+      vtkDataSet *data = GetData();
 
       // problems retrieving data... (e.g. when a file has been erroneously deleted or corrupted...)
-      if (data==NULL)
+      if (data == NULL)
       {
         return 0;
       }
@@ -552,7 +552,8 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
         }
         m_DataWriter = writer;
         m_DataWriter->Register(NULL);
-        return MAF_OK;
+        //return MAF_OK;
+        return CheckFile(m_OutputMemory, m_OutputMemorySize);
       }
       else
       {
@@ -569,6 +570,11 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
         {
           writer->SetFileName(filename);
           writer->Write();
+          int chk_res = CheckFile(filename);
+          if (chk_res != MAF_OK)
+          {
+            return MAF_ERROR;
+          }
         }
       }
       //writer->RemoveObserver(tag);
@@ -601,7 +607,42 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
   }
   return MAF_NO_IO;
 }
-
+//-------------------------------------------------------------------------
+int mafVMEItemVTK::CheckFile(const char *filename)
+//-------------------------------------------------------------------------
+{
+  // Check stored file correctness
+  vtkMAFSmartPointer<vtkDataReader> file_chk;
+  file_chk->SetFileName(filename);
+  int res = file_chk->IsFileValid(m_DataType.GetCStr());
+  if (res != 0)
+  {
+    mafMessage(_("File %s corrupted!!"), filename);
+    return MAF_ERROR;
+  }
+  std::string chk_result;
+  mafCalculateteChecksum(filename, chk_result);
+  //mafLogMessage("Checksum for %s: %s", filename, chk_result.c_str());
+  return MAF_OK;
+}
+//-------------------------------------------------------------------------
+int mafVMEItemVTK::CheckFile(const char *input_string, int input_len)
+//-------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkDataReader> file_chk;
+  file_chk->SetInputString(input_string, input_len);
+  file_chk->ReadFromInputStringOn();
+  int res = file_chk->IsFileValid(m_DataType.GetCStr());
+  if (res != 0)
+  {
+    mafMessage(_("String corrupted!!"));
+    return MAF_ERROR;
+  }
+  std::string chk_result;
+  mafCalculateteChecksum(input_string, input_len, chk_result);
+  //mafLogMessage("String Checksum: %s", chk_result.c_str());
+  return MAF_OK;
+}
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::ReleaseData()
 //-------------------------------------------------------------------------
@@ -641,7 +682,8 @@ bool mafVMEItemVTK::StoreToArchive(wxZipOutputStream &zip)
 {
   if (!zip.PutNextEntry(m_URL.GetCStr(), wxDateTime::Now(), m_OutputMemorySize) || !zip.Write(m_OutputMemory, m_OutputMemorySize))
     return false;
-  return true;
+  bool write_res = zip.LastWrite() == m_OutputMemorySize;
+  return write_res;
 }
 //-------------------------------------------------------------------------
 void mafVMEItemVTK::ReleaseOutputMemory()
