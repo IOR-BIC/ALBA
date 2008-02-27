@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:28 $
-  Version:   $Revision: 1.75 $
+  Date:      $Date: 2008-02-27 20:17:21 $
+  Version:   $Revision: 1.76 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,10 +19,11 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafIndent.h"
 #include "mafViewVTK.h"
 #include <wx/dc.h>
-#include "mafVME.h"
+
+#include "mafIndent.h"
+
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
 #include "mafLightKit.h"
@@ -30,15 +31,16 @@
 #include "mafTextKit.h"
 #include "mafAnimate.h"
 
-#include "mafVMELandmarkCloud.h"
-#include "mafVMELandmark.h"
-#include "mafVMERoot.h"
-
 #include "mafInteractor.h"
 #include "mafAvatar.h"
 #include "mafAvatar3D.h"
 #include "mmdTracker.h"
 #include "mmdMouse.h"
+
+#include "mafVME.h"
+#include "mafVMELandmarkCloud.h"
+#include "mafVMELandmark.h"
+#include "mafVMERoot.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkCamera.h"
