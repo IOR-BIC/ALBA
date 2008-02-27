@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:47:20 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-02-27 13:31:12 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -249,6 +249,12 @@ protected:
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
+
+  /** Check that stored file is valid.*/
+  virtual int CheckFile(const char *filename) = 0;
+
+  /** Check that stored string is valid.*/
+  virtual int CheckFile(const char *input_string, int input_len) = 0;
 
   /**
     Restore data stored in this object. To be redefined by specialized classes.
