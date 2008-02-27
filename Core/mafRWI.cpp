@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:15:44 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2008-02-27 13:19:31 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -131,6 +131,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   m_Camera = vtkCamera::New();
 	m_Camera->SetViewAngle(20); 
   m_Camera->ParallelProjectionOn(); 
+  UpdateCameraParameters();
 
 	m_RenFront = vtkRenderer::New();
   m_RenFront->SetBackground(DEFAULT_BG_COLOR,DEFAULT_BG_COLOR,DEFAULT_BG_COLOR);
@@ -259,7 +260,7 @@ void mafRWI::CameraSet(int cam_position)
 //-----------------------------------------------------------------------------------------
 {
   int x,y,z,vx,vy,vz;
-  m_CameraPosition = cam_position;
+  m_CameraPositionId = cam_position;
 
   if(cam_position == CAMERA_PERSPECTIVE
 	|| cam_position == CAMERA_PERSPECTIVE_FRONT
@@ -374,7 +375,7 @@ void mafRWI::CameraSet(int cam_position)
   m_Camera->SetPosition(x*100,y*100,z*100);
   m_Camera->SetViewUp(vx,vy,vz);
   m_Camera->SetClippingRange(0.1,1000);
-  
+
   CameraReset();
 }
 //----------------------------------------------------------------------------
@@ -503,6 +504,23 @@ void mafRWI::CameraUpdate()
   {
     m_RwiBase->GenerateStereoFrames();
   }
+  UpdateCameraParameters();
+}
+//----------------------------------------------------------------------------
+void mafRWI::UpdateCameraParameters()
+//----------------------------------------------------------------------------
+{
+  m_Camera->GetPosition(m_CameraPosition);
+  m_Camera->GetFocalPoint(m_FocalPoint);
+  m_Camera->GetViewUp(m_CameraViewUp);
+  double *ori = m_Camera->GetOrientation();
+  m_CameraOrientation[0] = ori[0];
+  m_CameraOrientation[1] = ori[1];
+  m_CameraOrientation[2] = ori[2];
+  if (m_Gui)
+  {
+    m_Gui->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::CameraReset(mafNode *vme, double zoom)
@@ -522,6 +540,7 @@ void mafRWI::CameraReset(mafNode *vme, double zoom)
   mafEventMacro(mafEvent(this,CAMERA_POST_RESET,m_RenFront));
   m_RenFront->ResetCameraClippingRange();
   m_RenderWindow->Render();
+  UpdateCameraParameters();
 }
 //----------------------------------------------------------------------------
 double *mafRWI::ComputeVisibleBounds(mafNode *node)
@@ -695,6 +714,10 @@ enum RWI_WIDGET_ID
   ID_CAMERA_RIGHT,
   ID_CAMERA_TOP,
   ID_CAMERA_BOTTOM,
+  ID_FOCAL_POINT,
+  ID_CAMERA_POSITION,
+  ID_CAMERA_VIEW_UP,
+  ID_CAMERA_ORIENTATION,
   ID_LINK_CAMERA,
   ID_SHOW_RULER,
 	ID_SHOW_ORIENTATOR,
@@ -722,6 +745,11 @@ mmgGui *mafRWI::CreateGui()
     for(int i = 0; i < 6; i++)
       m_Sizer->Add(m_CameraButtons[i],0,0);
     m_Gui->Add(m_Sizer);
+    m_Gui->Label("Camera parameters");
+    m_Gui->Vector(ID_FOCAL_POINT, "focal pnt.", m_FocalPoint);
+    m_Gui->Vector(ID_CAMERA_POSITION, "position", m_CameraPosition);
+    m_Gui->Vector(ID_CAMERA_VIEW_UP, "view up", m_CameraViewUp);
+    m_Gui->Vector(ID_CAMERA_ORIENTATION, "orientation", m_CameraOrientation);
     m_Gui->Divider(2);
   }
 
@@ -740,8 +768,6 @@ mmgGui *mafRWI::CreateGui()
     m_Gui->Bool(ID_SHOW_RULER,"show ruler",&m_ShowRuler);
     m_Gui->Double(ID_RULER_SCALE_FACTOR,"scale factor",&m_RulerScaleFactor,1.0e-299,MAXDOUBLE,-1);
     m_Gui->String(ID_RULER_LEGEND,"legend",&m_RulerLegend);
-
-		
   }
 
   if (m_StereoType)
@@ -843,6 +869,13 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       break;
       case ID_CAMERA_BOTTOM:
         CameraSet(CAMERA_PERSPECTIVE_BOTTOM);
+      break;
+      case ID_FOCAL_POINT:
+      case ID_CAMERA_POSITION:
+        m_Camera->SetPosition(m_CameraPosition);
+        m_Camera->SetFocalPoint(m_FocalPoint);
+        m_Camera->SetViewUp(m_CameraViewUp);
+        CameraUpdate();
       break;
       default:
         mafEventMacro(*maf_event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:15:58 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-02-27 13:19:31 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -126,16 +126,24 @@ public:
 
   virtual mmgGui *GetGui();
 
+  /** Update member variables and GUI elements according to vtkCamera position, focal point, view up, ...*/
+  void UpdateCameraParameters();
+
+  /** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
   void LinkCamera(bool linc_camera = true);
 
   mafSceneGraph    *m_Sg; 
   mafRWIBase			 *m_RwiBase;
-  vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer.
-  vtkRenderer      *m_RenBack; ///< Renderer used to show actors on the second layer.
+  vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer
+  vtkRenderer      *m_RenBack; ///< Renderer used to show actors on the second layer
   vtkRenderWindow  *m_RenderWindow;
   vtkLight         *m_Light;
   vtkCamera				 *m_Camera;
-  int               m_CameraPosition; ///< Used to store camera position ID.
+  int               m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up
+  double            m_CameraPosition[3]; ///< Vector representing the camera position
+  double            m_FocalPoint[3]; ///< Vector representing the camera focal point
+  double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
+  double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
   
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
