@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipe.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:58 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-02-27 16:25:46 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -116,7 +116,7 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0) const;
 
-  void OnEvent(mafEventBase *maf_event);
+  virtual void OnEvent(mafEventBase *maf_event);
   
 protected:
   /** function called before of data pipe execution */
