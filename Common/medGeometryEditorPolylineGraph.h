@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-01-28 15:39:25 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-02-27 18:12:03 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -137,7 +137,7 @@ protected:
 
 	int UpdateVMEEditorData(vtkPolyData *polydata);
 
-	/** Menage if a VME is picked in the view */
+	/** Manage if a VME is picked in the view */
 	void VmePicked(mafEvent *e);
 
 	/** Update VME Editor behavior and VME Input behavior */
