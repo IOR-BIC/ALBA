@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:43 $
-  Version:   $Revision: 1.15 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2008-02-27 18:13:22 $
+  Version:   $Revision: 1.16 $
+  Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
