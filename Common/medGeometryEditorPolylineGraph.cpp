@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-11 14:45:04 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-02-27 13:18:19 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -887,7 +887,7 @@ void medGeometryEditorPolylineGraph::SelectBranch(double position[3])
 	vtkMAFSmartPointer<vtkCellLocator> locator;
 	locator->SetDataSet(poly);
 	locator->BuildLocator();
-	double t, ptline[3], pcoords[3];
+	double t;
 	int subId;
 	vtkIdType	CellID;
 	//int n=locator->IntersectWithLine(position, position2,1, t, ptline, pcoords, subId,CellID);
