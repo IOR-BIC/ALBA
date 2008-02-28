@@ -25,17 +25,20 @@ SET(PROJECT_SRCS
   mafGUISettingsStorage.h
   mafGUISettingsTimeBar.cpp
   mafGUISettingsTimeBar.h
-	mafGUISRBBrowse.cpp
-	mafGUISRBBrowse.h
+  
+  ##### Example of SRB List Dialog requires OPENSSL #####
+	#mafGUISRBBrowse.cpp
+	#mafGUISRBBrowse.h
 	#---------SRBList stub---------------
-  ./SrbStorageWS/soapC.cpp
-	./SrbStorageWS/soapClient.cpp	
-	./SrbStorageWS/soapSrbUploadProxy.h
-	./SrbStorageWS/soapSrbDownloadProxy.h
-	./SrbStorageWS/soapSrbListProxy.h
-	./SrbStorageWS/stdsoap2.cpp
-	./SrbStorageWS/stdsoap2.h
+  #./SrbStorageWS/soapC.cpp
+	#./SrbStorageWS/soapClient.cpp	
+	#./SrbStorageWS/soapSrbUploadProxy.h
+	#./SrbStorageWS/soapSrbDownloadProxy.h
+	#./SrbStorageWS/soapSrbListProxy.h
+	#./SrbStorageWS/stdsoap2.cpp
+	#./SrbStorageWS/stdsoap2.h
 	#------------------------------------
+	
   mafPics.cpp
   mafPics.h
   mafWXLog.cpp
@@ -178,6 +181,11 @@ IF (MAF_USE_VTK)
   mmgHistogramWidget.h
   )
 ENDIF (MAF_USE_VTK)
+
+IF (WITH_OPENSSL)
+
+
+ENDIF(WITH_OPENSSL)
 
 
 
