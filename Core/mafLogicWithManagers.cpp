@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:20:09 $
-  Version:   $Revision: 1.131 $
+  Date:      $Date: 2008-02-28 11:12:40 $
+  Version:   $Revision: 1.132 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@
 #include "mafSideBar.h"
 
 #include "mafUser.h"
-#include "mafGUISRBBrowse.h"
+//#include "mafGUISRBBrowse.h"
 #include "mmgDialogRemoteFile.h"
 #include "mafGUIDialogFindVme.h"
 #include "mmgMDIFrame.h"
@@ -1093,11 +1093,12 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
           }
         }
       }
-      else if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::SRB)
+      //* Srb List Dialog Example */
+   /*   else if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::SRB)
       {
         mafGUISRBBrowse remoteFile;
         remoteFile.ShowModal();
-      }
+      }*/
       else      
       {
 		    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
