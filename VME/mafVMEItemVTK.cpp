@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 16:26:35 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-02-28 12:14:32 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -500,7 +500,8 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
     **********************************/
 
     m_IOStatus=0;
-    int ret=MAF_OK; // value returned by StoreToURL() function at the end of saving to file
+    int ret = MAF_OK; // value returned by StoreToURL() function at the end of saving to file
+    int vtk_err = VTK_OK;
     if ((IsDataPresent()&&(!found||(m_URL!=url)))||((IsDataPresent()==found)&&(found==IsDataModified())))
     {       
       //if (!item->IsDataModified()&&found)
@@ -531,6 +532,11 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       {
         writer->WriteToOutputStringOn();
         writer->Write();
+        vtk_err = writer->GetErrorCode();
+        if (vtk_err == VTK_ERROR)
+        {
+          return MAF_ERROR;
+        }
       }
 
       if (m_IOMode == MEMORY)
@@ -572,6 +578,11 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
         {
           writer->SetFileName(filename);
           writer->Write();
+          vtk_err = writer->GetErrorCode();
+          if (vtk_err == VTK_ERROR)
+          {
+            return MAF_ERROR;
+          }
           int chk_res = CheckFile(filename);
           if (chk_res != MAF_OK)
           {
@@ -617,7 +628,7 @@ int mafVMEItemVTK::CheckFile(const char *filename)
   vtkMAFSmartPointer<vtkDataReader> file_chk;
   file_chk->SetFileName(filename);
   int res = file_chk->IsFileValid(m_DataType.GetCStr());
-  if (res != 0)
+  if (res == VTK_ERROR)
   {
     mafMessage(_("File %s corrupted!!"), filename);
     return MAF_ERROR;
