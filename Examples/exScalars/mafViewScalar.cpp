@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 13:34:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-02-28 08:39:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ mafViewScalar::~mafViewScalar()
 mafView *mafViewScalar::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-  mafViewScalar *v = new mafViewScalar(m_Label, m_CameraPosition, m_ShowAxes, m_ShowGrid, m_ShowRuler,m_StereoType);
+  mafViewScalar *v = new mafViewScalar(m_Label, m_CameraPositionId, m_ShowAxes, m_ShowGrid, m_ShowRuler,m_StereoType);
   v->m_Listener = Listener;
   v->m_Id = m_Id;
   v->m_PipeMap = m_PipeMap;
