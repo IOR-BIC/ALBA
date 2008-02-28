@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-18 10:57:54 $
-Version:   $Revision: 1.5 $
-Authors:   Paolo Quadrani
+Date:      $Date: 2008-02-28 11:12:21 $
+Version:   $Revision: 1.6 $
+Authors:   Paolo Quadrani, Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -40,14 +40,14 @@ mafGUISettings(Listener, label)
   m_CacheFolder = wxGetCwd().c_str();
 
 
-  m_SRBRemoteHostName = "";
+ /* m_SRBRemoteHostName = "";
   m_SRBDomain = "";
   m_SRBServer_dn = "";
   m_SRBAuth_scheme = "";
   m_SRBUserName = "";
   m_SRBPwd = "";
   m_SRBPort = 12544;
-  m_SRBCacheFolder = wxGetCwd().c_str();
+  m_SRBCacheFolder = wxGetCwd().c_str();*/
 
   InitializeSettings();
 }
@@ -60,12 +60,12 @@ mafGUISettingsStorage::~mafGUISettingsStorage()
 void mafGUISettingsStorage::CreateGui()
 //----------------------------------------------------------------------------
 {
-  wxString remoteStorageArray[3] = {"Local", "HTTP", "SRB"};
+  wxString remoteStorageArray[2] = {"Local", "HTTP"}; // "SRB"};
   m_Gui = new mmgGui(this);
   m_Gui->Label(_("Storage general settings"));
   //m_Gui->Bool(ID_SINGLE_FILE, _("single file mode"), &m_SingleFileFlag,1);
   //m_Gui->Divider(2);
-  m_Gui->Radio(ID_STORAGE_TYPE,_("Storage type"),&m_RemoteStorageType, 3, remoteStorageArray,1,_("Choose the remote storage you want to use."));
+  m_Gui->Radio(ID_STORAGE_TYPE,_("Storage type"),&m_RemoteStorageType, 2, remoteStorageArray,1,_("Choose the remote storage you want to use."));
   m_Gui->Label(_("Default settings for HTTP storage"));
   m_Gui->Bool(ID_ANONYMOUS_USER,_("anonymous connection"),&m_AnonymousFalg,1);
   m_Gui->String(ID_HOST_NAME,"host",&m_RemoteHostName);
@@ -75,7 +75,7 @@ void mafGUISettingsStorage::CreateGui()
 
 
     //--------------------SRB--------------------//
-  m_Gui->Divider(2);
+ /* m_Gui->Divider(2);
   m_Gui->Label(_("Default settings for SRB storage"));
   m_Gui->String(ID_SRB_HOST_NAME,"host",&m_SRBRemoteHostName);
   m_Gui->String(ID_SRB_SERVER_DN,"server_dn",&m_SRBServer_dn);
@@ -84,7 +84,7 @@ void mafGUISettingsStorage::CreateGui()
   m_Gui->Integer(ID_SRB_PORT,_("port"),&m_SRBPort,0);
   m_Gui->String(ID_SRB_USERNAME,_("user"),&m_SRBUserName);
   m_Gui->String(ID_SRB_PWD,_("pwd"),&m_SRBPwd,"",false,true);
-  m_Gui->DirOpen(ID_SRB_CACHE_FOLDER,_("cache"),&m_SRBCacheFolder,_("set the local cache folder \nin which put downloaded files"));
+  m_Gui->DirOpen(ID_SRB_CACHE_FOLDER,_("cache"),&m_SRBCacheFolder,_("set the local cache folder \nin which put downloaded files"));*/
 
   EnableItems();
   m_Gui->Label(_("changes will take effect when the \napplication restart"),false,true);
@@ -103,14 +103,14 @@ void mafGUISettingsStorage::EnableItems()
 
 
   //--------------------SRB--------------------//
-  m_Gui->Enable(ID_SRB_HOST_NAME,m_RemoteStorageType == SRB);
+  /*m_Gui->Enable(ID_SRB_HOST_NAME,m_RemoteStorageType == SRB);
   m_Gui->Enable(ID_SRB_SERVER_DN,m_RemoteStorageType == SRB);
   m_Gui->Enable(ID_SRB_DOMAIN,m_RemoteStorageType == SRB);
   m_Gui->Enable(ID_SRB_AUTH_SCHEME,m_RemoteStorageType == SRB);
   m_Gui->Enable(ID_SRB_PORT,m_RemoteStorageType == SRB);
   m_Gui->Enable(ID_SRB_USERNAME,m_RemoteStorageType == SRB);
   m_Gui->Enable(ID_SRB_PWD,m_RemoteStorageType == SRB);
-  m_Gui->Enable(ID_SRB_CACHE_FOLDER,m_RemoteStorageType == SRB);
+  m_Gui->Enable(ID_SRB_CACHE_FOLDER,m_RemoteStorageType == SRB);*/
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsStorage::OnEvent(mafEventBase *maf_event)
@@ -143,7 +143,7 @@ void mafGUISettingsStorage::OnEvent(mafEventBase *maf_event)
     break;
 
       //--------------------SRB--------------------//
-    case ID_SRB_HOST_NAME:
+   /* case ID_SRB_HOST_NAME:
       m_Config->Write("SRBRemoteHostName",m_SRBRemoteHostName.GetCStr());
       break;
     case ID_SRB_SERVER_DN:
@@ -166,7 +166,7 @@ void mafGUISettingsStorage::OnEvent(mafEventBase *maf_event)
       break;
     case ID_SRB_CACHE_FOLDER:
       m_Config->Write("SRBCacheFolder",m_SRBCacheFolder.GetCStr());
-      break;
+      break;*/
     default:
       mafEventMacro(*maf_event);
     break; 
@@ -239,7 +239,7 @@ void mafGUISettingsStorage::InitializeSettings()
 
 
     //--------------------SRB--------------------//
-  if(m_Config->Read("SRBRemoteHostName", &string_item))
+ /* if(m_Config->Read("SRBRemoteHostName", &string_item))
   {
     m_SRBRemoteHostName = string_item;
   }
@@ -302,7 +302,7 @@ void mafGUISettingsStorage::InitializeSettings()
   else
   {
     m_Config->Write("SRBCacheFolder",m_SRBCacheFolder.GetCStr());
-  }
+  }*/
   m_Config->Flush();
 }
 /*//----------------------------------------------------------------------------
@@ -388,6 +388,7 @@ void mafGUISettingsStorage::SetPassword(mafString pwd)
 {
   m_Password = pwd;
 }
+/*
 //----------------------------------------------------------------------------
 void mafGUISettingsStorage::SetSRBServer_dn(mafString SRBServer_dn)
 //----------------------------------------------------------------------------
@@ -472,4 +473,4 @@ void mafGUISettingsStorage::SetSRBPwd(mafString SRBpwd)
 //----------------------------------------------------------------------------
 {
   m_SRBPwd = SRBpwd;
-}
+}*/

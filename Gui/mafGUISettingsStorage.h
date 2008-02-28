@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.h,v $
 Language:  C++
-Date:      $Date: 2007-12-18 10:57:54 $
-Version:   $Revision: 1.5 $
-Authors:   Paolo Quadrani
+Date:      $Date: 2008-02-28 11:12:21 $
+Version:   $Revision: 1.6 $
+Authors:   Paolo Quadrani, Robero Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -22,8 +22,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // mafGUISettingsStorage :
 //----------------------------------------------------------------------------
-/**
-*/
+/** Gui to set storage parameters. 
+    Commented example of SRB List Dialog; requires OPENSSL*/
 class mafGUISettingsStorage : public mafGUISettings
 {
 public:
@@ -40,21 +40,21 @@ public:
     ID_USERNAME,
     ID_PASSWORD,
     ID_ANONYMOUS_USER,
-    ID_SRB_HOST_NAME,
+    /*ID_SRB_HOST_NAME,
     ID_SRB_SERVER_DN,
     ID_SRB_DOMAIN,
     ID_SRB_AUTH_SCHEME,
     ID_SRB_PORT,
     ID_SRB_USERNAME,
     ID_SRB_PWD,
-    ID_SRB_CACHE_FOLDER,
+    ID_SRB_CACHE_FOLDER,*/
   };
 
   enum STORAGE_TYPE
   {
     LOCAL,
     HTTP,
-    SRB,
+    //SRB,
   };
 
   /** Answer to the messages coming from interface. */
@@ -114,52 +114,52 @@ public:
 
  
   /** Set the remote host-name to which connect with SRB storage.*/
-  void SetSRBRemoteHostName(mafString SRBhost);
+ // void SetSRBRemoteHostName(mafString SRBhost);
 
   /** Return the path for the SRB host name.*/
-  mafString &GetSRBRemoteHostName() {return m_SRBRemoteHostName;};
+ // mafString &GetSRBRemoteHostName() {return m_SRBRemoteHostName;};
 
   /** Set the Server_dn for SRB storage.*/
-  void SetSRBServer_dn(mafString SRBServer_dn);
+  //void SetSRBServer_dn(mafString SRBServer_dn);
 
   /** Return the Server_dn for SRB storage.*/
-  mafString &GetSRBServer_dn() {return m_SRBServer_dn;};
+ // mafString &GetSRBServer_dn() {return m_SRBServer_dn;};
 
   /** Set the SRB domain.*/
-  void SetSRBDomain(mafString SRBDomain);
+//  void SetSRBDomain(mafString SRBDomain);
 
   /** Return the SRB domain.*/
-  mafString &GetSRBDomain() {return m_SRBDomain;};
+ // mafString &GetSRBDomain() {return m_SRBDomain;};
 
   /** Set the SRB authentication scheme.*/
-  void SetSRBAuth_scheme(mafString SRBAuth_scheme);
+ // void SetSRBAuth_scheme(mafString SRBAuth_scheme);
   
   /** Return the SRB authentication scheme.*/
-  mafString &GetetSRBAuth_scheme() {return m_SRBAuth_scheme;};
+ // mafString &GetetSRBAuth_scheme() {return m_SRBAuth_scheme;};
 
   /** Set the SRB storage port through which connect.*/
-  void SetSRBRemotePort(long SRBport);
+ // void SetSRBRemotePort(long SRBport);
 
   /** Return the port for the SRB connection.*/
-  long GetSRBRemotePort() {return m_SRBPort;};
+ // long GetSRBRemotePort() {return m_SRBPort;};
 
   /** Set the User name with which connect to the SRB storage.*/
-  void SetSRBUserName(mafString SRBUserName);
+ // void SetSRBUserName(mafString SRBUserName);
 
   /** Return the username for the SRB connection.*/
-  mafString &GetSRBUserName() {return m_SRBUserName;}
+ // mafString &GetSRBUserName() {return m_SRBUserName;}
 
   /** Set the user password with which access the SRB storage.*/
-  void SetSRBPwd(mafString SRBpwd);
+ // void SetSRBPwd(mafString SRBpwd);
 
   /** Return the password for the SRB connection.*/
-  mafString &GetSRBPwd() {return m_SRBPwd;};
+ // mafString &GetSRBPwd() {return m_SRBPwd;};
 
   /** Set the cache folder.*/
-  void SetSRBCacheFolder(mafString SRBcache_folder);
+//  void SetSRBCacheFolder(mafString SRBcache_folder);
 
   /** Return the path for the local cache in which download remote VMEs.*/
-  mafString &GetSRBCacheFolder() {return m_SRBCacheFolder;};
+ // mafString &GetSRBCacheFolder() {return m_SRBCacheFolder;};
 
 
 
@@ -185,13 +185,13 @@ protected:
 
 
     //--------------------SRB--------------------//
-  int       m_SRBPort;
+ /* int       m_SRBPort;
   mafString m_SRBRemoteHostName;
   mafString m_SRBDomain;
   mafString m_SRBServer_dn;
   mafString m_SRBAuth_scheme;
   mafString m_SRBUserName;
   mafString m_SRBPwd;
-  mafString m_SRBCacheFolder;
+  mafString m_SRBCacheFolder;*/
 };
 #endif
