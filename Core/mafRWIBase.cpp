@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 09:52:34 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2008-03-03 18:43:37 $
+  Version:   $Revision: 1.30 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -844,8 +844,8 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
 
     BITMAPFILEHEADER bmfh={0};
     BITMAPINFOHEADER bmih={0};
-    DWORD index;
-    BYTE ch;
+//    DWORD index;
+//    BYTE ch;
 
     fread(&bmfh,sizeof(bmfh),1,fp);  //read bitmap file header
     fread(&bmih,sizeof(bmih),1,fp);  //read bitmap info header 
