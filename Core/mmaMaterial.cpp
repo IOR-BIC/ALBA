@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:41:14 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-03-03 19:36:10 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -244,6 +244,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   m_NumValues           = ((mmaMaterial *)a)->m_NumValues;
   
   m_MaterialType        = ((mmaMaterial *)a)->m_MaterialType;
+  UpdateProp();
 }
 //----------------------------------------------------------------------------
 bool mmaMaterial::Equals(const mafAttribute *a)
