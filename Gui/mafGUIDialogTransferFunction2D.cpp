@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:42:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-03 18:43:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -663,38 +663,9 @@ VTK_THREAD_RETURN_TYPE mafGUIDialogTransferFunction2D::CreatePipe(void *argDialo
   dialog->m_3DVolume->SetProperty(dialog->m_VolumeProperty);
   dialog->m_3DMapper = vtkMAFAdaptiveVolumeMapper::New();
 
-
   vtkImageCast *chardata = vtkImageCast::New();
   chardata->SetOutputScalarTypeToShort();
   vtkDataSet *data = dialog->m_Vme->GetOutput()->GetVTKData();
-  vtkDataArray *scalars = data->GetPointData()->GetScalars();
-
-  if(scalars->GetDataType() != VTK_UNSIGNED_SHORT || 
-     scalars->GetDataType() != VTK_SHORT ||
-     scalars->GetDataType() != VTK_CHAR ||
-     scalars->GetDataType() != VTK_UNSIGNED_CHAR)
-  {
-    chardata->SetInput((vtkImageData *)data);
-    chardata->Update();
-    dialog->m_3DMapper->SetInput(chardata->GetOutput());
-  }
-  else
-  {
-    dialog->m_3DMapper->SetInput((vtkDataSet *)data);
-  }
-  dialog->m_3DMapper->Update();
-  dialog->m_3DVolume->SetMapper(dialog->m_3DMapper);
-  dialog->m_3DRenderer->GetActiveCamera()->ParallelProjectionOff();
-  dialog->m_3DRenderer->GetActiveCamera()->SetPosition(0., 0., 0.);
-  dialog->m_3DRenderer->GetActiveCamera()->SetFocalPoint(0., 0., 1.);
-  dialog->m_3DRenderer->ResetCamera(dialog->m_3DMapper->GetBounds());
-  const int *range = dialog->m_3DMapper->GetDataRange();
-  dialog->m_DataRange[0] = double(range[0]);
-  dialog->m_DataRange[1] = double(range[1]);
-  dialog->m_GradientRange[0] = 0.f;
-  dialog->m_GradientRange[1] = dialog->m_3DMapper->GetGradientRange()[1];
-  dialog->m_DataReady = true;
-  dialog->m_3DPipeStatus = PipeReady;
 
   // convert rect. data to image data
   vtkImageData *imageData = vtkImageData::SafeDownCast(data);
@@ -739,6 +710,34 @@ VTK_THREAD_RETURN_TYPE mafGUIDialogTransferFunction2D::CreatePipe(void *argDialo
       imageData = NULL;
     }
   }
+
+  vtkDataArray *scalars = data->GetPointData()->GetScalars();
+  if(scalars->GetDataType() != VTK_UNSIGNED_SHORT || 
+    scalars->GetDataType() != VTK_SHORT ||
+    scalars->GetDataType() != VTK_CHAR ||
+    scalars->GetDataType() != VTK_UNSIGNED_CHAR)
+  {
+    chardata->SetInput(imageData);
+    chardata->Update();
+    dialog->m_3DMapper->SetInput(chardata->GetOutput());
+  }
+  else
+  {
+    dialog->m_3DMapper->SetInput((vtkDataSet *)data);
+  }
+  dialog->m_3DMapper->Update();
+  dialog->m_3DVolume->SetMapper(dialog->m_3DMapper);
+  dialog->m_3DRenderer->GetActiveCamera()->ParallelProjectionOff();
+  dialog->m_3DRenderer->GetActiveCamera()->SetPosition(0., 0., 0.);
+  dialog->m_3DRenderer->GetActiveCamera()->SetFocalPoint(0., 0., 1.);
+  dialog->m_3DRenderer->ResetCamera(dialog->m_3DMapper->GetBounds());
+  const int *range = dialog->m_3DMapper->GetDataRange();
+  dialog->m_DataRange[0] = double(range[0]);
+  dialog->m_DataRange[1] = double(range[1]);
+  dialog->m_GradientRange[0] = 0.f;
+  dialog->m_GradientRange[1] = dialog->m_3DMapper->GetGradientRange()[1];
+  dialog->m_DataReady = true;
+  dialog->m_3DPipeStatus = PipeReady;
 
   // create slice preview
   dialog->m_SliceActor = vtkActor2D::New();
