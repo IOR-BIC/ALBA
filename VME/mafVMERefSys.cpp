@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 17:23:00 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-03-03 19:20:05 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -538,9 +538,7 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the origin
 		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
     {
-      ((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"),origin,-1);
-			/*mafVMELandmark *o=((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"));
-			o->GetPoint(origin);*/
+      ((mafVMELandmarkCloud *)origin_vme)->GetLandmarkPosition(GetLinkSubId("OriginVME"), origin, -1);
     }
     else if(origin_vme->IsMAFType(mafVMELandmark))
     {
@@ -551,7 +549,7 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the point 1
 		if(point1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point1VME") != -1)
     {
-      ((mafVMELandmarkCloud *)point1_vme)->GetLandmark(GetLinkSubId("Point1VME"),point1,-1);
+      ((mafVMELandmarkCloud *)point1_vme)->GetLandmarkPosition(GetLinkSubId("Point1VME"),point1,-1);
       mafTransform t;
       t.SetMatrix(*point1_vme->GetOutput()->GetAbsMatrix());
       t.TransformPoint(point1, point1);
@@ -565,7 +563,7 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the point 2
 		if(point2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point2VME") != -1)
     {
-      ((mafVMELandmarkCloud *)point2_vme)->GetLandmark(GetLinkSubId("Point2VME"),point2,-1);
+      ((mafVMELandmarkCloud *)point2_vme)->GetLandmarkPosition(GetLinkSubId("Point2VME"),point2,-1);
       mafTransform t;
       t.SetMatrix(*point2_vme->GetOutput()->GetAbsMatrix());
       t.TransformPoint(point2, point2);
@@ -617,8 +615,8 @@ void mafVMERefSys::InternalUpdate()
     vtkDEL(matrix_rotation);
     vtkDEL(matrix_translation);
 
-		this->SetMatrix(c);
-		
+		//this->SetMatrix(c);
+    this->SetAbsMatrix(c);
 	}
 	else if(origin_vme)
 	{
@@ -627,7 +625,7 @@ void mafVMERefSys::InternalUpdate()
 		//Get the position of the origin
 		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
     {
-      ((mafVMELandmarkCloud *)origin_vme)->GetLandmark(GetLinkSubId("OriginVME"),origin,-1);
+      ((mafVMELandmarkCloud *)origin_vme)->GetLandmarkPosition(GetLinkSubId("OriginVME"),origin,-1);
       mafTransform t;
       t.SetMatrix(*origin_vme->GetOutput()->GetAbsMatrix());
       t.TransformPoint(origin,origin);
@@ -648,7 +646,7 @@ void mafVMERefSys::InternalUpdate()
 
     vtkDEL(matrix_translation);
 		
-		this->SetMatrix(b);
+    this->SetAbsMatrix(b);
 	}
 	else
 	{
@@ -659,7 +657,8 @@ void mafVMERefSys::InternalUpdate()
 		b.SetVTKMatrix(matrix_translation);
     vtkDEL(matrix_translation);
 		
-		this->SetMatrix(b);
+		//this->SetMatrix(b);
+    this->SetAbsMatrix(b);
 	}
 
   SetScaleFactor(m_ScaleFactor);
