@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVisualPipeVolumeRayCasting.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:40:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-03 18:55:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko - Paolo Quadrani (porting MAF2.2)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,8 @@
 #include "vtkPointData.h"
 #include "vtkProperty.h"
 #include "vtkDataArray.h"
+#include "vtkImageData.h"
+#include "vtkRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafVisualPipeVolumeRayCasting);
@@ -83,6 +85,51 @@ void mafVisualPipeVolumeRayCasting::Create(mafSceneNode *n)
 
   vtkMAFSmartPointer<vtkImageCast> chardata;
   chardata->SetOutputScalarTypeToShort();
+
+  // convert rect. data to image data
+  vtkImageData *imageData = vtkImageData::SafeDownCast(data);
+  vtkRectilinearGrid *gridData = vtkRectilinearGrid::SafeDownCast(data);
+
+  // convert grid data to image data
+  if (gridData && gridData->GetPointData() && gridData->GetPointData()->GetArray(0) &&
+    gridData->GetXCoordinates()->GetNumberOfTuples() > 1 &&
+    gridData->GetYCoordinates()->GetNumberOfTuples() > 1 &&
+    gridData->GetZCoordinates()->GetNumberOfTuples() > 1) 
+  {
+    imageData = vtkImageData::New();
+    imageData->ShallowCopy(gridData);
+    imageData->SetDimensions(gridData->GetDimensions());
+    imageData->SetNumberOfScalarComponents(gridData->GetPointData()->GetNumberOfComponents());
+    double offset[3], spacing[3];
+    offset[0] = gridData->GetXCoordinates()->GetTuple(0)[0];
+    offset[1] = gridData->GetYCoordinates()->GetTuple(0)[0];
+    offset[2] = gridData->GetZCoordinates()->GetTuple(0)[0];
+    spacing[0] = gridData->GetXCoordinates()->GetTuple(1)[0] - offset[0];
+    spacing[1] = gridData->GetYCoordinates()->GetTuple(1)[0] - offset[1];;
+    spacing[2] = gridData->GetZCoordinates()->GetTuple(1)[0] - offset[2];;
+    imageData->SetOrigin(offset);
+    imageData->SetSpacing(spacing);
+    // set type
+    vtkDataArray *data = gridData->GetPointData()->GetArray(0);
+    if (data->IsA("vtkUnsignedShortArray"))
+      imageData->SetScalarType(VTK_UNSIGNED_SHORT);
+    else if (data->IsA("vtkShortArray"))
+      imageData->SetScalarType(VTK_SHORT);
+    else if (data->IsA("vtkCharArray"))
+      imageData->SetScalarType(VTK_CHAR);
+    else if (data->IsA("vtkUnsignedCharArray"))
+      imageData->SetScalarType(VTK_UNSIGNED_CHAR);
+    else if (data->IsA("vtkFloatArray"))
+      imageData->SetScalarType(VTK_FLOAT);
+    else if (data->IsA("vtkDoubleArray"))
+      imageData->SetScalarType(VTK_DOUBLE);
+    else 
+    {
+      imageData->Delete();
+      imageData = NULL;
+    }
+  }
+
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
 
   if(scalars->GetDataType() != VTK_UNSIGNED_SHORT || 
@@ -90,7 +137,7 @@ void mafVisualPipeVolumeRayCasting::Create(mafSceneNode *n)
      scalars->GetDataType() != VTK_CHAR ||
      scalars->GetDataType() != VTK_UNSIGNED_CHAR)
   {
-    chardata->SetInput((vtkImageData *)data);
+    chardata->SetInput(imageData);
     chardata->Update();
     this->m_Mapper->SetInput((vtkDataSet*)(chardata->GetOutput()));
   }
