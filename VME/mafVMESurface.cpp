@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-08-25 23:25:42 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-03-03 19:35:43 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -75,7 +75,7 @@ int mafVMESurface::InternalInitialize()
   if (Superclass::InternalInitialize()==MAF_OK)
   {
     // force material allocation
-    GetMaterial();
+    ((mafVMEOutputSurface *)GetOutput())->SetMaterial(GetMaterial());
     return MAF_OK;
   }
   return MAF_ERROR;
