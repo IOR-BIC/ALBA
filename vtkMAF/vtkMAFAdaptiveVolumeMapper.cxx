@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFAdaptiveVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:39:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-04 17:04:19 $
+  Version:   $Revision: 1.2 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -412,7 +412,8 @@ void vtkMAFAdaptiveVolumeMapper::RenderRegion(const int viewportBBox[4])
   static const int subsamplingNeighbours[numberOfSamples] = {1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1}; // see neightbourOffsets below
 
   int subsamplingSchemeOffsets[numberOfSamples], subsamplingSchemeOffsets4[numberOfSamples];
-  for (int si = 0; si < numberOfSamples; si++) {
+  int si;
+  for (si = 0; si < numberOfSamples; si++) {
     subsamplingSchemeOffsets[si]  = subsamplingScheme[si][0] + subsamplingScheme[si][1] * width;
     subsamplingSchemeOffsets4[si] = 4 * subsamplingSchemeOffsets[si];
   }
@@ -455,10 +456,11 @@ void vtkMAFAdaptiveVolumeMapper::RenderRegion(const int viewportBBox[4])
         // compare with neighbors and interpolate if possible
         unsigned char *spixel = pixel + subsamplingSchemeOffsets4[si];
         const int shift = subsamplingDistances[si];
-        if (sx > 0 && sy > 0 && (sx + 1 + shift) < width && (sy + 1 + shift) < height) {
+        int ni, ci;
+		if (sx > 0 && sy > 0 && (sx + 1 + shift) < width && (sy + 1 + shift) < height) {
           // calculate average
           unsigned int r = 0, g = 0, b = 0, a = 0;
-          for (int ni = 0; ni < 4; ni++) {
+          for (ni = 0; ni < 4; ni++) {
             unsigned char *npixel = spixel + (neighbourOffsets[subsamplingNeighbours[si]][ni] << shift);
             r += unsigned(npixel[0]); g += unsigned(npixel[1]); b += unsigned(npixel[2]); a += unsigned(npixel[3]);
           }
@@ -467,7 +469,7 @@ void vtkMAFAdaptiveVolumeMapper::RenderRegion(const int viewportBBox[4])
           // compare with threshold
           for (ni = 0; ni < 4; ni++) {
             unsigned char *npixel = spixel + (neighbourOffsets[subsamplingNeighbours[si]][ni] << shift);
-            for (int ci = 0; ci < 4; ci++) {
+            for (ci = 0; ci < 4; ci++) {
               int difference = int(npixel[ci]) - spixel[ci];
               if (difference > supersamplingThreshold || -difference > supersamplingThreshold)
                 break;
@@ -1009,12 +1011,13 @@ bool vtkMAFAdaptiveVolumeMapper::PrepareVolumeForRendering()
     imageData->GetDimensions(this->DataDimensions);
     imageData->GetOrigin(this->DataOrigin);
     imageData->GetSpacing(dataSpacing);
-    for (int axis = 0; axis < 3; axis++) 
+    int i;
+	for (int axis = 0; axis < 3; axis++) 
     {
       delete [] this->VoxelCoordinates[axis];
       this->VoxelCoordinates[axis] = new double [this->DataDimensions[axis] + VoxelBlockSize + 1];
       double f = this->DataOrigin[axis];
-      for (int i = 0; i < this->DataDimensions[axis]; i++, f += dataSpacing[axis])
+      for (i = 0; i < this->DataDimensions[axis]; i++, f += dataSpacing[axis])
         this->VoxelCoordinates[axis][i] = f;
       for (i = 0; i < VoxelBlockSize; i++)
         this->VoxelCoordinates[axis][this->DataDimensions[axis] + i] = f;
@@ -1035,7 +1038,8 @@ bool vtkMAFAdaptiveVolumeMapper::PrepareVolumeForRendering()
       vtkDataArray *coordinates = (axis == 2) ? gridData->GetZCoordinates() : (axis == 1 ? gridData->GetYCoordinates() : gridData->GetXCoordinates());
       const double spacing = *(coordinates->GetTuple(1)) - *(coordinates->GetTuple(0));
       const double blockSpacingThreshold = 0.01f * spacing + 0.001f;
-      for (int i = 0; i < this->DataDimensions[axis]; i++) 
+      int i;
+	  for (i = 0; i < this->DataDimensions[axis]; i++) 
       {
         this->VoxelCoordinates[axis][i] = *(coordinates->GetTuple(i));
         if (i > 0 && fabs(this->VoxelCoordinates[axis][i] - this->VoxelCoordinates[axis][i - 1] - spacing) > blockSpacingThreshold) 
@@ -1122,7 +1126,8 @@ bool vtkMAFAdaptiveVolumeMapper::PrepareVolumeForRendering()
     // SliceSize array stores inter-slice distances at several levels of detail
     // UniformToRectGrid arrays help to find cell index by double z-coordinate
     const double *zcoordinates = this->VoxelCoordinates[2];
-    for (int zi = 0, ri = 1; zi < this->DataDimensions[2]; zi++) 
+    int zi, ri;
+	for (zi = 0, ri = 1; zi < this->DataDimensions[2]; zi++) 
     {
       // SliceSize
       for (int bzi = 0; bzi <= VoxelBlockSizeLog; bzi++)
@@ -1229,7 +1234,8 @@ template <typename DataType> void vtkMAFAdaptiveVolumeMapper::PrepareMinMaxDataT
   this->GradientEquationIndecesL[0] = this->GradientEquationIndecesR[0] + this->DataDimensions[0] + this->DataDimensions[1] + this->DataDimensions[2];
   delete [] this->GradientEquationDivisor[0];
   this->GradientEquationDivisor[0] = new double [this->DataDimensions[0] + this->DataDimensions[1] + this->DataDimensions[2]];
-  for (int i = 0; i < 3; i++) 
+  int i;
+  for (i = 0; i < 3; i++) 
   {
     if (i > 0) 
     {
@@ -1238,7 +1244,8 @@ template <typename DataType> void vtkMAFAdaptiveVolumeMapper::PrepareMinMaxDataT
       this->GradientEquationDivisor[i]  = this->GradientEquationDivisor[i - 1]  + this->DataDimensions[i - 1];
     }
 
-    for (int j = 1; j < (this->DataDimensions[i] - 1); j++) 
+    int j;
+	for (j = 1; j < (this->DataDimensions[i] - 1); j++) 
     {
       this->GradientEquationIndecesR[i][j] = this->VoxelToVoxelIncrement[i];
       this->GradientEquationIndecesL[i][j] = -this->VoxelToVoxelIncrement[i];
@@ -1810,7 +1817,8 @@ int vtkMAFAdaptiveVolumeMapper::CalculateViewportAndTransformationChecksum(vtkRe
 
   renderer->ComputeAspect();
   unsigned char *mPtr = (unsigned char *)volume->GetMatrix()->Element[0];
-  for (int ii = 0; ii < (16 * sizeof(double)); ii++)
+  int ii;
+  for (ii = 0; ii < (16 * sizeof(double)); ii++)
     checksum += int(mPtr[ii] * 3 + 1) * (151 + ii) + int(mPtr[ii] + 7) * (31 * ii + 3);
   if (renderer->GetRenderWindow()->GetStereoRender()) 
   {
@@ -2081,7 +2089,8 @@ bool vtkMAFAdaptiveVolumeMapper::PrepareTransferFunctionForRendering(vtkVolumePr
     double * const gTable = vTable + vsize;
     
     // value table
-    for (int vi = this->DataRange[0]; vi <= valueRange[0]; vi++)
+    int vi;
+	for (vi = this->DataRange[0]; vi <= valueRange[0]; vi++)
       this->DataToTFLookUpTable[vi] = 0;
     for ( ; vi <= valueRange[1]; vi++)
       this->DataToTFLookUpTable[vi] = vi - valueRange[0];
@@ -2094,7 +2103,8 @@ bool vtkMAFAdaptiveVolumeMapper::PrepareTransferFunctionForRendering(vtkVolumePr
     // gradient table
     const double gradientCompression  = double(gsize - 1) / (gradientRange[1] - gradientRange[0]);
     const double gradientCompressionI = 1.f / gradientCompression;
-    for (int gi = 0; gi <= gradientRange[0]; gi++)
+    int gi;
+	for (gi = 0; gi <= gradientRange[0]; gi++)
       this->GradientToTFLookUpTable[gi] = 0;
     for ( ; gi <= gradientRange[1]; gi++)
       this->GradientToTFLookUpTable[gi] = clip(int(double(gi - gradientRange[0]) * gradientCompression), 0, gsize - 1) * vsize;

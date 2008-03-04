@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 18:43:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-03-04 17:04:31 $
+  Version:   $Revision: 1.3 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -416,7 +416,8 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   this->m_ValueSlider = new mmgRangeSlider(this, ID_TF_VALUE, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   this->m_Widget.Range[0][0] = this->m_Widget.Range[0][1] = this->m_Widget.Range[0][2] = 0;
-  for (int j = 0; j < 3; j++) 
+  int j;
+  for (j = 0; j < 3; j++) 
 	{
     text = new wxTextCtrl(this, ID_TF_VALUE_0 + j, "", wxDefaultPosition, wxSize(-1, 20), 0);
     text->SetValidator(mmgValidator(this, ID_TF_VALUE_0 + j, text, this->m_Widget.Range[0] + (j == 0 ? 0 : (j == 1 ? 2 : 1)), -99999, 99999, 0));
