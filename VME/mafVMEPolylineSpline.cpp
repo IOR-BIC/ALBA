@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-23 10:22:09 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-03-04 16:58:29 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,7 +68,7 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 	m_PointsSplined = NULL;
 	vtkNEW(m_PointsSplined);
 
-	m_SplineCoefficient = 20;
+	m_SplineCoefficient = 5;
   m_OrderByAxisMode   = AXIS_NONE;
 }
 //-------------------------------------------------------------------------
@@ -183,19 +183,6 @@ void mafVMEPolylineSpline::InternalUpdate() //Multi
 
   if(m_OrderByAxisMode) OrderPolylineByAxis(polyline, m_OrderByAxisMode);
 
-  ////transform
-  ////this part set the transform for every polydata inside a node, using the pose of the node
-  vtkMAFSmartPointer<vtkTransform> transform;
-  transform->SetMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-  transform->Update();
-
-  vtkMAFSmartPointer<vtkTransformPolyDataFilter> tpdf;
-  tpdf->SetInput(polyline);
-  tpdf->SetTransform(transform);
-  tpdf->Update();
-
-  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
-
   vtkMAFSmartPointer<vtkPolyData> poly;
   poly->DeepCopy(polyline);
   poly->Update();
@@ -204,10 +191,8 @@ void mafVMEPolylineSpline::InternalUpdate() //Multi
 
   this->OrderPolyline(poly); // create orderer sequence of points and cells
 
-	m_Polyline->DeepCopy(poly);
+  m_Polyline->DeepCopy(poly);
 	m_Polyline->Update();
-
-	ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
 
 	Modified();
 }
