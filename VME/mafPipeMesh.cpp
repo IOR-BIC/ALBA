@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-04 14:51:34 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-03-04 15:11:56 $
+Version:   $Revision: 1.8 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -83,6 +83,8 @@ mafPipeMesh::mafPipeMesh()
 
   m_ScalarMapActive = 0;
   m_UseVTKProperty  = 1;
+
+  m_BorderElementsWiredActor = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeMesh::Create(mafSceneNode *n)
@@ -579,5 +581,5 @@ void mafPipeMesh::CreateFieldDataControlArrays()
   }
 
   m_PointCellArraySeparation = pointArrayNumber;
-	delete[] tempScalarsPointsName; //BES: 4.3.2008 - memory leak bug fix - NB. do not use cppDEL!
+
 }
