@@ -27,8 +27,6 @@ SET(PROJECT_SRCS
   medVMEAnalog.h
   mafVMEAdvancedProber.cpp
   mafVMEAdvancedProber.h
-  mafVMEAdvancedSlicer.cpp
-  mafVMEAdvancedSlicer.h
 
   mafPolylineGraph.cpp
   mafPolylineGraph.h

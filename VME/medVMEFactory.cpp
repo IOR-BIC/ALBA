@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 10:19:32 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-03-04 15:24:45 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,6 @@
 #include "mafVersion.h"
 
 #include "mafVMEAdvancedProber.h"
-#include "mafVMEAdvancedSlicer.h"
 #include "medVMEWrappedMeter.h"
 #include "medVMEPolylineGraph.h"
 #include "medVMEPolylineEditor.h"
@@ -81,7 +80,6 @@ medVMEFactory::medVMEFactory()
   //mafPlugObjectMacro(mmaObject,"Object attributes");
 
   mafPlugNodeMacro(mafVMEAdvancedProber,"VME for Advanced Probing");
-	mafPlugNodeMacro(mafVMEAdvancedSlicer,"VME for Advanced Slicing");
   mafPlugNodeMacro(medVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
   mafPlugNodeMacro(medVMEPolylineGraph,"VME for Graph and Polyline");
 	mafPlugNodeMacro(medVMEPolylineEditor,"VME for Editing Graph and Polyline");
