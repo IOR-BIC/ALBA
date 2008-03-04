@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-22 13:51:26 $
-Version:   $Revision: 1.46 $
+Date:      $Date: 2008-03-04 14:51:12 $
+Version:   $Revision: 1.47 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -820,6 +820,6 @@ void mafViewCTNew::OnLayout()
     int ratio;
     ratio = 1 + size.GetWidth()/100;
     m_Text[idSubView]->GetTextProperty()->SetFontSize(fontSize+ratio);
-    m_TextActor[idSubView]->SetPosition(size.GetWidth() - 35, size.GetHeight() - 15);
+    m_TextActor[idSubView]->SetPosition(size.GetWidth() - 40, size.GetHeight() - 15);
   }
 }
