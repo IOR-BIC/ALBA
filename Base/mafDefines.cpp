@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDefines.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 16:05:00 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-03-04 15:49:54 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -135,7 +135,7 @@ bool mafFloatEquals(float x, float y)
 double mafRoundToPrecision(double val, unsigned prec)
 //------------------------------------------------------------------------------
 {
-  double k = pow(10,prec);
+  double k = pow((double)10,(double)prec);
   return floor(val*k+0.5)/k; 
 } 
 //------------------------------------------------------------------------------
