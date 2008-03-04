@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-06 10:35:43 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-03-04 16:02:15 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -30,6 +30,8 @@ public:
 
   /** Enable/disable continuous picking in OnEvent. */
   void EnableContinuousPicking(bool enable) {m_ContinuousPickingFlag = enable;};
+
+  bool IsContinuousPicking(){return m_ContinuousPickingFlag;};
 
 protected:
   mmiPicker();
