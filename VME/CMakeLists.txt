@@ -25,8 +25,6 @@ SET(PROJECT_SRCS
   medPipeVolumeVR.h
   medVMEAnalog.cpp
   medVMEAnalog.h
-  mafVMEAdvancedProber.cpp
-  mafVMEAdvancedProber.h
 
   mafPolylineGraph.cpp
   mafPolylineGraph.h
