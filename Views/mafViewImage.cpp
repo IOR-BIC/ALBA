@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:43 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-03-05 21:50:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,6 @@
 #include "mafVMESlicer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
-#include "mafVMEAdvancedProber.h"
 #include "mafVMESurface.h"
 #include "mafPipeFactory.h"
 #include "mafPipe.h"
