@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-16 10:26:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-03-05 08:20:43 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@ class mmaMaterial;
 
 /** mafVMEPolylineSpline - a procedural VME computing the slice of its parent VME.
   mafVMEPolylineSpline is a node implementing a slicer of a VME (currently only VME-Volume).
-  The sliced volume is the partent VME.
+  The sliced volume is the parent VME.
   @sa mafVMEVolume
   @todo
   - 
@@ -68,7 +68,7 @@ public:
 
   /**
     Return the list of timestamps for this VME. Timestamps list is 
-    obtained merging timestamps for matrixes and VME items*/
+    obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
   /** return always false since (currently) the slicer is not an animated VME (position 
@@ -84,20 +84,16 @@ public:
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();
 
-	/** 
-  Set links for the Polyline*/
+	/** Set links for the Polyline*/
   void SetPolylineLink(mafNode *n);
 
-  /** 
-  Get links for the Polyline*/
+  /** Get links for the Polyline*/
 	mafVME *GetPolylineLink();
 
-  /** 
-  Order the points and cell in polydata*/
+  /** Order the points and cell in polydata*/
   void SplinePolyline(vtkPolyData *polyline);
 
-  /** 
-  Order the points and cell in polydata*/
+  /** Order the points and cell in polydata*/
   void OrderPolyline(vtkPolyData *polyline);
 
   /** Return pointer to material attribute. */
