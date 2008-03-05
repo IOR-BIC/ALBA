@@ -11,9 +11,6 @@ IF (MAF_USE_ITK)
   ADD_TEST(mafVMERawMotionDataTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMERawMotionDataTest)
 ENDIF (MAF_USE_ITK)
 
-ADD_EXECUTABLE(mafVMEAdvancedProberTest mafVMEAdvancedProberTest.h mafVMEAdvancedProberTest.cpp)
-ADD_TEST(mafVMEAdvancedProberTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMEAdvancedProberTest)
-
 ADD_EXECUTABLE(mafPolylineGraphTest mafPolylineGraphTest.h mafPolylineGraphTest.cpp)
 ADD_TEST(mafPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphTest)
 
