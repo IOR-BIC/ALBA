@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-21 17:10:44 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2008-03-05 11:30:45 $
+  Version:   $Revision: 1.41 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -154,15 +154,25 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
           ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range);
           double volTableRange[2];
           vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
-          volTableRange[0] = volumeOutput->GetMaterial()->m_TableRange[0];
-          volTableRange[1] = volumeOutput->GetMaterial()->m_TableRange[1];
+          
+          if (volumeOutput->GetMaterial()->m_TableRange[1] < volumeOutput->GetMaterial()->m_TableRange[0]) 
+          {
+            volTableRange[0] = range[0];
+            volTableRange[1] = range[1];
+          }
+          else
+          {
+            volTableRange[0] = volumeOutput->GetMaterial()->m_TableRange[0];
+            volTableRange[1] = volumeOutput->GetMaterial()->m_TableRange[1];
+          }
+          
 
           double volRange[2];
           volumeOutput->GetVTKData()->GetScalarRange(volRange);
 
           
-          advLow = range[0] + ((range[1] - range[0])/(volRange[1] - volRange[0])) * (volTableRange[0] - volRange[0]);
-          advHigh = range[1] + ((range[1] - range[0])/(volRange[1] - volRange[0])) * (volTableRange[1] - volRange[1]);
+          advLow = range[0] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[0] - volTableRange[0]);
+          advHigh = range[1] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[1] - volTableRange[1]);
 
 
           ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
@@ -205,9 +215,12 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
       { 
         if(volumeOutput->GetMaterial())
         {
-          sr[0] = volumeOutput->GetMaterial()->m_TableRange[0];
-          sr[1] = volumeOutput->GetMaterial()->m_TableRange[1];
-        }      
+          if (volumeOutput->GetMaterial()->m_TableRange[1] > volumeOutput->GetMaterial()->m_TableRange[0]) 
+          {
+            sr[0] = volumeOutput->GetMaterial()->m_TableRange[0];
+            sr[1] = volumeOutput->GetMaterial()->m_TableRange[1];
+          }
+        }
       }
       
 
