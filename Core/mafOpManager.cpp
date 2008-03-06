@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:11:46 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-03-06 11:48:54 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -375,6 +375,7 @@ void mafOpManager::OpSelect(mafNode* vme)
     return;
 	m_OpSelect->SetNewSel(vme);
 	OpExec(m_OpSelect);
+  mafLogMessage("node selected: %s", vme->GetName());
 }
 /*
 //----------------------------------------------------------------------------
@@ -559,8 +560,8 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
   
 	if(!tag_nature.IsEmpty() && tag_nature.Equals("NATURAL") && !op->IsInputPreserving())
 	{
-		wxString warning_msg = "The operation do not preserve input VME integrity, a copy is required! \nThis should require a lot of memory and time depending on data dimension. \nDo you want to continue?";
-		wxMessageDialog dialog(mafGetFrame(),warning_msg, "VME Preserving Warning", wxYES_NO | wxYES_DEFAULT);
+		wxString warning_msg = _("The operation do not preserve input VME integrity, a copy is required! \nThis should require a lot of memory and time depending on data dimension. \nDo you want to continue?");
+		wxMessageDialog dialog(mafGetFrame(),warning_msg, _("Warning"), wxYES_NO | wxYES_DEFAULT);
 		if(dialog.ShowModal() == wxID_YES)
     {
       wxString synthetic_name = "Copied ";
@@ -655,7 +656,11 @@ void mafOpManager::OpDo(mafOp *op)
   m_Context.Redo_Clear();
   op->OpDo();
   
-  mafLogMessage("do=%s",op->m_Label.c_str());
+  mafLogMessage("executed operation '%s' on input data: %s",op->m_Label.c_str(), op->GetInput()->GetName());
+  if (op->GetOutput() != NULL)
+  {
+    mafLogMessage("operation '%s' generate %s as output",op->m_Label.c_str(), op->GetOutput()->GetName());
+  }
 
   if(op->CanUndo()) 
   {
@@ -673,13 +678,13 @@ void mafOpManager::OpUndo()
 {
   if( m_Context.Undo_IsEmpty()) 
   {
-    mafLogMessage("empty undo stack");
+    mafLogMessage(_("empty undo stack"));
     return;
   }
 	EnableOp(false);
 
 	mafOp* op = m_Context.Undo_Pop();
-	mafLogMessage("undo=%s",op->m_Label.c_str());
+  mafLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), op->GetInput()->GetName());
 	op->OpUndo();
 	m_Context.Redo_Push(op);
 
@@ -697,7 +702,7 @@ void mafOpManager::OpRedo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Redo_Pop();
-	mafLogMessage("redo=%s",op->m_Label.c_str());
+  mafLogMessage("redo = %s on input data: %s",op->m_Label.c_str(), op->GetInput()->GetName());
 	op->OpDo();
 	m_Context.Undo_Push(op);
 
