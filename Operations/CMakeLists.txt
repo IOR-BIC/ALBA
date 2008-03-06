@@ -23,80 +23,80 @@ IF (MAF_USE_VTK)
     mafOpLabelExtractor.h
     mafOpOpenExternalFile.cpp
     mafOpOpenExternalFile.h
-    mmo2DMeasure.cpp
-    mmo2DMeasure.h
-    mmoAddLandmark.cpp
-    mmoAddLandmark.h
-    mmoBmpExporter.cpp
-    mmoBmpExporter.h
-    mmoClipSurface.cpp
-    mmoClipSurface.h
-    mmoCreateGroup.cpp
-    mmoCreateGroup.h
-    mmoCreateMeter.cpp
-    mmoCreateMeter.h
-    mmoCreateSurfaceParametric.cpp
-    mmoCreateSurfaceParametric.h
-    mmoCreateProber.cpp
-    mmoCreateProber.h
-    mmoCreateRefSys.cpp
-    mmoCreateRefSys.h
-    mmoCreateSlicer.cpp
-    mmoCreateSlicer.h
-    mmoCreateSpline.cpp
-    mmoCreateSpline.h
-    mmoRemoveCells.cpp
-    mmoRemoveCells.h
-    mmoEditMetadata.cpp
-    mmoEditMetadata.h
-    mmoExplodeCollapse.cpp
-    mmoExplodeCollapse.h
-    mmoExtractIsosurface.cpp
-    mmoExtractIsosurface.h
-    mmoFilterSurface.cpp
-    mmoFilterSurface.h
-    mmoDecimateSurface.cpp
-    mmoDecimateSurface.h
-    mmoConnectivitySurface.cpp
-    mmoConnectivitySurface.h
-    mmoFilterVolume.cpp
-    mmoFilterVolume.h
-    mmoImageImporter.cpp
-    mmoImageImporter.h
-    mmoMAFTransform.cpp
-    mmoMAFTransform.h
-    mmoMSFExporter.cpp
-    mmoMSFExporter.h
-    mmoMSF1xImporter.cpp
-    mmoMSF1xImporter.h
-    mmoRawExporter.cpp
-    mmoRawExporter.h
-    mmoRAWImporterVolume.cpp
-    mmoRAWImporterVolume.h
-    mmoReparentTo.cpp
-    mmoReparentTo.h
-    mmoSTLExporter.cpp
-    mmoSTLExporter.h
-    mmoSTLImporter.cpp
-    mmoSTLImporter.h
-    mmoTransformInterface.cpp
-    mmoTransformInterface.h
-    mmoVolumeResample.cpp
-    mmoVolumeResample.h
-    mmoVOIDensity.cpp
-    mmoVOIDensity.h
-    mmoVRMLImporter.cpp
-    mmoVRMLImporter.h
-    mmoVTKExporter.cpp
-    mmoVTKExporter.h
-    mmoVTKImporter.cpp
-    mmoVTKImporter.h
-    mmoCrop.cpp
-    mmoCrop.h
-    mmoBooleanSurface.cpp
-    mmoBooleanSurface.h
-    mmoEditNormals.cpp
-    mmoEditNormals.h
+    mafOp2DMeasure.cpp
+    mafOp2DMeasure.h
+    mafOpAddLandmark.cpp
+    mafOpAddLandmark.h
+    mafOpExporterBmp.cpp
+    mafOpExporterBmp.h
+    mafOpClipSurface.cpp
+    mafOpClipSurface.h
+    mafOpCreateGroup.cpp
+    mafOpCreateGroup.h
+    mafOpCreateMeter.cpp
+    mafOpCreateMeter.h
+    mafOpCreateSurfaceParametric.cpp
+    mafOpCreateSurfaceParametric.h
+    mafOpCreateProber.cpp
+    mafOpCreateProber.h
+    mafOpCreateRefSys.cpp
+    mafOpCreateRefSys.h
+    mafOpCreateSlicer.cpp
+    mafOpCreateSlicer.h
+    mafOpCreateSpline.cpp
+    mafOpCreateSpline.h
+    mafOpRemoveCells.cpp
+    mafOpRemoveCells.h
+    mafOpEditMetadata.cpp
+    mafOpEditMetadata.h
+    mafOpExplodeCollapse.cpp
+    mafOpExplodeCollapse.h
+    mafOpExtractIsosurface.cpp
+    mafOpExtractIsosurface.h
+    mafOpFilterSurface.cpp
+    mafOpFilterSurface.h
+    mafOpDecimateSurface.cpp
+    mafOpDecimateSurface.h
+    mafOpConnectivitySurface.cpp
+    mafOpConnectivitySurface.h
+    mafOpFilterVolume.cpp
+    mafOpFilterVolume.h
+    mafOpImporterImage.cpp
+    mafOpImporterImage.h
+    mafOpMAFTransform.cpp
+    mafOpMAFTransform.h
+    mafOpExporterMSF.cpp
+    mafOpExporterMSF.h
+    mafOpImporterMSF1x.cpp
+    mafOpImporterMSF1x.h
+    mafOpExporterRaw.cpp
+    mafOpExporterRaw.h
+    mafOpImporterRAWVolume.cpp
+    mafOpImporterRAWVolume.h
+    mafOpReparentTo.cpp
+    mafOpReparentTo.h
+    mafOpExporterSTL.cpp
+    mafOpExporterSTL.h
+    mafOpImporterSTL.cpp
+    mafOpImporterSTL.h
+    mafOpTransformInterface.cpp
+    mafOpTransformInterface.h
+    mafOpVolumeResample.cpp
+    mafOpVolumeResample.h
+    mafOpVOIDensity.cpp
+    mafOpVOIDensity.h
+    mafOpImporterVRML.cpp
+    mafOpImporterVRML.h
+    mafOpExporterVTK.cpp
+    mafOpExporterVTK.h
+    mafOpImporterVTK.cpp
+    mafOpImporterVTK.h
+    mafOpCrop.cpp
+    mafOpCrop.h
+    mafOpBooleanSurface.cpp
+    mafOpBooleanSurface.h
+    mafOpEditNormals.cpp
+    mafOpEditNormals.h
   )
 ENDIF (MAF_USE_VTK)
 
@@ -105,8 +105,8 @@ IF (MAF_USE_ITK)
     ${PROJECT_SRCS}
     mafASCIIImporterUtility.cpp
     mafASCIIImporterUtility.h
-    mmoASCIIImporter.cpp
-    mmoASCIIImporter.h
+    mafOpImporterASCII.cpp
+    mafOpImporterASCII.h
     mafVMEMeshAnsysTextImporter.cpp
     mafVMEMeshAnsysTextImporter.h
     mafVMEMeshAnsysTextExporter.cpp
@@ -115,12 +115,12 @@ IF (MAF_USE_ITK)
     mafVMEDataSetAttributesImporter.h
     mafParabolicMeshToLinearMeshFilter.cxx
     mafParabolicMeshToLinearMeshFilter.h
-    mmoMeshImporter.cpp
-    mmoMeshImporter.h
-    mmoScalarToSurface.cpp
-    mmoScalarToSurface.h
-    mmoVMEDataSetAttributesImporter.cpp
-    mmoVMEDataSetAttributesImporter.h
+    mafOpImporterMesh.cpp
+    mafOpImporterMesh.h
+    mafOpScalarToSurface.cpp
+    mafOpScalarToSurface.h
+    mafOpImporterVMEDataSetAttributes.cpp
+    mafOpImporterVMEDataSetAttributes.h
   )
 ENDIF (MAF_USE_ITK)
 

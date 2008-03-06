@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-28 11:12:40 $
-  Version:   $Revision: 1.132 $
+  Date:      $Date: 2008-03-06 11:57:39 $
+  Version:   $Revision: 1.133 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,8 +36,8 @@
 #ifdef MAF_USE_VTK
   #include "mafViewVTK.h"
   
-  #include "mmoVTKImporter.h"
-  #include "mmoSTLImporter.h"
+  #include "mafOpImporterVTK.h"
+  #include "mafOpImporterSTL.h"
   #include "mafInteractionManager.h"
   #include "mafInteractionFactory.h"
   #include "mafInteractor.h"
@@ -1689,7 +1689,7 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
   ext.MakeLower();
   if (ext == "vtk")
   {
-    mmoVTKImporter *vtkImporter = new mmoVTKImporter("importer");
+    mafOpImporterVTK *vtkImporter = new mafOpImporterVTK("importer");
     vtkImporter->SetInput(m_VMEManager->GetRoot());
     vtkImporter->SetListener(m_OpManager);
     vtkImporter->SetFileName(filename.GetCStr());
@@ -1699,7 +1699,7 @@ void mafLogicWithManagers::ImportExternalFile(mafString &filename)
   }
   else if (ext == "stl")
   {
-    mmoSTLImporter *stlImporter = new mmoSTLImporter("importer");
+    mafOpImporterSTL *stlImporter = new mafOpImporterSTL("importer");
     stlImporter->SetInput(m_VMEManager->GetRoot());
     stlImporter->SetListener(m_OpManager);
     stlImporter->SetFileName(filename.GetCStr());

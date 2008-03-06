@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-08 15:17:14 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-03-06 11:56:20 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ class mafGui;
 class mafEvent;
 
 //----------------------------------------------------------------------------
-// mmoRefSys :
+// mafOpRefSys :
 //----------------------------------------------------------------------------
 /** Operation to create static VMEs from a time varing VME. User can choose single timestamps,
     timestamp interval, or set a periodicity by means extract static VMEs */
