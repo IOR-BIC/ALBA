@@ -107,6 +107,8 @@ IF (MAF_USE_ITK)
     mafASCIIImporterUtility.h
     mafOpImporterASCII.cpp
     mafOpImporterASCII.h
+    mafVMEDataSetAttributesImporter.cpp
+    mafVMEDataSetAttributesImporter.h
     mafVMEMeshAnsysTextImporter.cpp
     mafVMEMeshAnsysTextImporter.h
     mafVMEMeshAnsysTextExporter.cpp
