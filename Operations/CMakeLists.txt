@@ -111,8 +111,6 @@ IF (MAF_USE_ITK)
     mafVMEMeshAnsysTextImporter.h
     mafVMEMeshAnsysTextExporter.cpp
     mafVMEMeshAnsysTextExporter.h
-    mafVMEDataSetAttributesImporter.cpp
-    mafVMEDataSetAttributesImporter.h
     mafParabolicMeshToLinearMeshFilter.cxx
     mafParabolicMeshToLinearMeshFilter.h
     mafOpImporterMesh.cpp
