@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:48:54 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2008-03-06 14:17:41 $
+  Version:   $Revision: 1.36 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -655,11 +655,19 @@ void mafOpManager::OpDo(mafOp *op)
 {
   m_Context.Redo_Clear();
   op->OpDo();
-  
-  mafLogMessage("executed operation '%s' on input data: %s",op->m_Label.c_str(), op->GetInput()->GetName());
-  if (op->GetOutput() != NULL)
+  mafNode *in_node = op->GetInput();
+  mafNode *out_node = op->GetOutput();
+  if (in_node != NULL)
   {
-    mafLogMessage("operation '%s' generate %s as output",op->m_Label.c_str(), op->GetOutput()->GetName());
+    mafLogMessage("executed operation '%s' on input data: %s",op->m_Label.c_str(), in_node->GetName());
+  }
+  else
+  {
+    mafLogMessage("executed operation '%s'",op->m_Label.c_str());
+  }
+  if (out_node != NULL)
+  {
+    mafLogMessage("operation '%s' generate %s as output",op->m_Label.c_str(), out_node->GetName());
   }
 
   if(op->CanUndo()) 
@@ -684,7 +692,15 @@ void mafOpManager::OpUndo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Undo_Pop();
-  mafLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), op->GetInput()->GetName());
+  mafNode *in_node = op->GetInput();
+  if (in_node != NULL)
+  {
+    mafLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
+  }
+  else
+  {
+    mafLogMessage("undo = %s",op->m_Label.c_str());
+  }
 	op->OpUndo();
 	m_Context.Redo_Push(op);
 
@@ -702,7 +718,15 @@ void mafOpManager::OpRedo()
 	EnableOp(false);
 
 	mafOp* op = m_Context.Redo_Pop();
-  mafLogMessage("redo = %s on input data: %s",op->m_Label.c_str(), op->GetInput()->GetName());
+  mafNode *in_node = op->GetInput();
+  if (in_node != NULL)
+  {
+    mafLogMessage("redo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
+  }
+  else
+  {
+    mafLogMessage("redo = %s",op->m_Label.c_str());
+  }
 	op->OpDo();
 	m_Context.Undo_Push(op);
 
