@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 09:17:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-03-06 11:57:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ class mafMatrix;
   scaling set to on.
 
   @sa
-  mmoMAFTransform for an example on how to use this component into a transform
+  mafOpMAFTransform for an example on how to use this component into a transform
   operation
 
   @todo

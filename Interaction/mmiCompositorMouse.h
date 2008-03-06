@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-22 16:17:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-03-06 11:57:56 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -76,7 +76,7 @@ enum MOUSE_BUTTON
 
   @sa
   - mmiGenericMouse since mmiCompositorMouse is working in pair with this class
-  - mafGuiTransformMouse component used by mmoMAFTransform
+  - mafGuiTransformMouse component used by mafOpMAFTransform
   @todo
   - write test suite
   

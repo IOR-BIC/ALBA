@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 12:23:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-03-06 11:57:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -76,7 +76,7 @@ class vtkMatrix4x4;
   Create a gizmo handle from the bounding box of the vme passed in the constructor.
   Handle initial position and moving constrains are set depending on the handle 
   type which can be mafGizmoHandle::XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX.
-  @sa mafGizmoROI mmoCrop 
+  @sa mafGizmoROI mafOpCrop 
 */
 
 class mafGizmoHandle: public mafObserver 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 13:09:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-03-06 11:57:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,7 +33,7 @@ class vtkDoubleArray;
   to mouse buttons with keys modifiers.
 
   @sa
-  - mmoTransformGeneric for examples on how to use this class with mmiCompositorMouse
+  - mafOpTransformGeneric for examples on how to use this class with mmiCompositorMouse
 */
 class mmiGenericMouse : public mmiGenericInterface
 {

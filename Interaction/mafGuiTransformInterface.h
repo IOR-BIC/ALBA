@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 09:17:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-03-06 11:57:56 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,10 +28,10 @@ class mafVME;
 //----------------------------------------------------------------------------
 /** transform gui interface
 
-  This abstract class defines interface for object to be plugged in mmoTransformInterface concrete descendants
+  This abstract class defines interface for object to be plugged in mafOpTransformInterface concrete descendants
 
   @sa
-  mmoTransformInterface, mmoMAFTransform
+  mafOpTransformInterface, mafOpMAFTransform
  
   @todo
 
