@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 10:22:28 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-03-06 15:40:31 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,10 +57,12 @@ protected:
     ID_CHECK_BOX,
     ID_LEGEND,
     ID_ITEM_NAME,
+    ID_RANGE_X,
+    ID_RANGE_Y,
+    ID_FIT_PLOT,
     ID_LAST
   };
 
-  int m_Legend;
   mmgCheckListBox* m_CheckBox;
   vtkLegendBoxActor *m_LegendBox_Actor;
 
@@ -72,15 +74,21 @@ private:
 
   double m_OldColour[3];
 
-  double			m_Xmin;
-  double			m_Xmax;
-  double			m_Ymin;
-  double			m_Ymax;
+  double      m_DataMax;
+  double      m_DataMin;
+  double      m_TimeStampMax;
+  double      m_DataRange[2];
+  double      m_TimesRange[2];
+  double      m_DataManualRange[2];
+  double      m_TimesManualRange[2];
   int				m_Xlabel;
   int				m_Ylabel;
   int       m_NumberOfSignals;
   int       m_TimeStamp;
   long      m_ItemId;
+
+  int m_Legend;
+  int m_FitPlot;
 
   mafString   m_ItemName;
   wxString		m_X_title;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 10:19:18 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-03-06 15:40:31 $
+  Version:   $Revision: 1.18 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,6 +41,7 @@
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkLegendBoxActor.h"
+#include "vtkMAFSmartPointer.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeGraph);
@@ -59,19 +60,24 @@ medPipeGraph::medPipeGraph()
 {
   m_PlotActor	= NULL;
   m_CheckBox  = NULL;
-  m_Legend    = FALSE;
 
-  m_Xmin			= 0;
-  m_Xmax			= 0;
-  m_Ymin			= 0;
-  m_Ymax			= 0;
-  m_Xlabel		= 10;
-  m_Ylabel		= 10;
+
+  m_Xlabel		= 50;
+  m_Ylabel		= 50;
   m_NumberOfSignals = 0;
 
   m_X_title		= "Time";
   m_Y_title		= "Scalar";
   m_ItemName  = "analog_";
+  m_FitPlot = 1;
+  m_Legend    = 0;
+
+  m_DataMax = 0;
+  m_DataMin = 0;
+  m_TimeStampMax = 0;
+
+  m_TimeStamp = 0;
+  m_ItemId = 0;
 }
 //----------------------------------------------------------------------------
 medPipeGraph::~medPipeGraph()
@@ -93,8 +99,12 @@ void medPipeGraph::Create(mafSceneNode *n)
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
   m_NumberOfSignals = m_EmgPlot->GetScalarOutput()->GetScalarData().rows();
+  m_DataMin = m_EmgPlot->GetScalarOutput()->GetScalarData().min_value();
+  m_DataMax = m_EmgPlot->GetScalarOutput()->GetScalarData().max_value();
   m_TimeStamp = m_EmgPlot->GetScalarOutput()->GetScalarData().columns();
-
+  m_DataManualRange[0] = m_DataMin; //Initialize max data range 
+  m_DataManualRange[1] = m_DataMax;
+  
   m_EmgPlot->Update();
   m_TimeArray = vtkDoubleArray::New();
   vnl_vector<double> rowTime = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(0);
@@ -105,12 +115,14 @@ void medPipeGraph::Create(mafSceneNode *n)
    m_TimeArray->InsertValue(counter,timeData);
    counter++;
   } 
+  m_TimeStampMax = m_TimeArray->GetValue(counter-1);
+  m_TimeArray->GetRange(m_TimesManualRange); //Initialize time range at max
 
   vtkNEW(m_PlotActor);
   m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
   m_PlotActor->GetProperty()->SetLineWidth(1.4);
-  m_PlotActor->SetLabelFormat("%g");
-  m_PlotActor->SetTitle(m_EmgPlot->GetName());
+  //m_PlotActor->SetLabelFormat("%g");
+  //m_PlotActor->SetTitle(m_EmgPlot->GetName());
 
   vtkTextProperty* tProp = m_PlotActor->GetTitleTextProperty();
   tProp->SetColor(0.02,0.06,0.62);
@@ -159,6 +171,8 @@ void medPipeGraph::UpdateGraph()
 
   CreateLegend();
 
+   vtkMAFSmartPointer<vtkDoubleArray> newTimeArray;
+
   for (int c = 0; c < (m_NumberOfSignals-1) ; c++)
   {
     if (m_CheckBox->IsItemChecked(c))
@@ -166,20 +180,37 @@ void medPipeGraph::UpdateGraph()
       int counter = 0;
       scalar = vtkDoubleArray::New();
       row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1);
-   
-      for (int t = 0; t < m_TimeStamp; t++)
-      { 
-        scalarData = row.get(t);
-        scalar->InsertValue(counter,scalarData);
-        counter++;
+      
+      if (m_FitPlot)
+      {
+        for (int t = 0; t < m_TimeStamp; t++) 
+        { 
+          newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
+          scalarData = row.get(t);
+          scalar->InsertValue(counter, scalarData);
+          counter++;
+        }
+      }
+      else //if not Autofit plot, get values inside m_TimeManualrange
+      {
+        for (int t = 0; t < m_TimeStamp; t++) 
+        { 
+          if (m_TimesManualRange[0] <= m_TimeArray->GetValue(t) && m_TimeArray->GetValue(t) <= m_TimesManualRange[1])
+          {
+            newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
+            scalarData = row.get(t);
+            scalar->InsertValue(counter, scalarData);
+            counter++;
+          }
+        }
       }
       scalar_Array.push_back(scalar);
           
       vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
 
-      rect_grid->SetDimensions(m_TimeStamp, 1, 1);
-      rect_grid->SetXCoordinates(m_TimeArray); 
+      rect_grid->SetDimensions(newTimeArray->GetSize(), 1, 1);
+      rect_grid->SetXCoordinates(newTimeArray); 
       rect_grid->GetPointData()->SetScalars(scalar_Array.at(counter_array));
       
       m_vtkData.push_back(rect_grid);
@@ -189,37 +220,33 @@ void medPipeGraph::UpdateGraph()
   }
 
   row.clear();
-  double times_range[2];
-  m_TimeArray->GetRange(times_range);
+  newTimeArray->GetRange(m_TimesRange);
 
-  double data_range[2];
+  double minY = 0;
+  double maxY = 0;
+
   for (unsigned long i = 0; i < m_vtkData.size(); i++)
   {
-    scalar_Array.at(i)->GetRange(data_range);
+    scalar_Array.at(i)->GetRange(m_DataRange);
 
-    if(m_Ymin > data_range[0])
-      m_Ymin = data_range[0];
+    if(m_DataRange[0] < minY)
+      minY = m_DataRange[0];
 
-    if(m_Ymax < data_range[1])
-      m_Ymax = data_range[1];
+    if(m_DataRange[1] > maxY)
+      maxY = m_DataRange[1];
   }
 
-  if(m_Xmin > times_range[0])
-    m_Xmin = times_range[0];
+  if (m_FitPlot)
+  {
+    m_PlotActor->SetPlotRange(m_TimesRange[0], minY, m_TimesRange[1], maxY);     
+  }
+  else
+  {
+    m_PlotActor->SetPlotRange(m_TimesRange[0], m_DataManualRange[0], m_TimesRange[1], m_DataManualRange[1]);
+  }
 
-  if(m_Xmax < times_range[1])
-    m_Xmax = times_range[1];
-
-  m_PlotActor->SetPlotRange(m_Xmin, m_Ymin, m_Xmax, m_Ymax); 
-
-  m_Xmin = 0;
-  m_Ymin = 0;
-  m_Xmax = 0;
-  m_Ymax = 0;
-
-  m_PlotActor->SetNumberOfXLabels(m_Xlabel);
-  m_PlotActor->SetNumberOfYLabels(m_Ylabel);
-
+ // m_PlotActor->SetNumberOfXLabels(m_Xlabel); ..don't seem to work..
+ // m_PlotActor->SetNumberOfYLabels(m_Ylabel);
   m_RenFront->AddActor2D(m_PlotActor);
 }
 //----------------------------------------------------------------------------
@@ -258,6 +285,17 @@ mmgGui* medPipeGraph::CreateGui()
 
   m_Gui->String(ID_ITEM_NAME,_("name :"), &m_ItemName,_(""));
   m_Gui->Divider(1);
+
+  m_Gui->VectorN(ID_RANGE_X, _("range x"), m_TimesManualRange, 2, 0, m_TimeStampMax);
+  m_Gui->VectorN(ID_RANGE_Y, _("range y"), m_DataManualRange, 2, m_DataMin, m_DataMax);
+
+  m_Gui->Enable(ID_RANGE_X, !m_FitPlot);
+  m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
+
+  m_Gui->Bool(ID_FIT_PLOT,_("Autofit plot"),&m_FitPlot,1,_("Fit bounds to display all graph"));
+  m_Gui->Divider();
+
+  m_Gui->Divider();
 
   m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
   m_Gui->Divider();
@@ -304,6 +342,34 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
+    case ID_RANGE_X:
+    case ID_RANGE_Y:
+      {
+        if (m_TimesManualRange[0] => m_TimesManualRange[1] || m_DataManualRange[0] => m_DataManualRange[1])
+        {
+          mafErrorMessage("Invalid plot range!");
+          return;
+        }
+        m_PlotActor->RemoveAllInputs();
+        UpdateGraph();
+      }
+      break;
+    case ID_FIT_PLOT:
+      {
+        m_Gui->Enable(ID_RANGE_X, !m_FitPlot);
+        m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
+      /*  if (m_FitPlot)
+        {
+          m_TimesManualRange[0] = 0;
+          m_TimesManualRange[1] = m_TimeStampMax;
+          m_DataManualRange[0] = m_DataMin;
+          m_DataManualRange[1] = m_DataMax;
+        }*/
+
+        m_PlotActor->RemoveAllInputs();
+        UpdateGraph();
+      }
+      break;
     case ID_DRAW:
       {
         m_PlotActor->RemoveAllInputs();
