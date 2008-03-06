@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpSelect.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:41:49 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-03-06 11:48:14 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,9 +40,9 @@ mafAutoPointer<mafNode>  mafOpEdit::m_Clipboard(NULL);
 mafOpSelect::mafOpSelect(wxString label) 
 //----------------------------------------------------------------------------
 {
-	m_Canundo = true; 
-	m_OpType  = OPTYPE_EDIT; 
-	m_Label   = label;
+  m_Canundo = true; 
+  m_OpType  = OPTYPE_EDIT; 
+  m_Label   = label;
   m_NewNodeSelected = NULL;
   m_OldNodeSelected = NULL;
 }
@@ -55,28 +55,28 @@ mafOpSelect::~mafOpSelect()
 mafOp* mafOpSelect::Copy() 
 //----------------------------------------------------------------------------
 {
-	mafOpSelect *cp  = new mafOpSelect();
-	cp->m_OldNodeSelected  = m_OldNodeSelected;
-	cp->m_NewNodeSelected  = m_NewNodeSelected;
-	return cp;
+  mafOpSelect *cp  = new mafOpSelect();
+  cp->m_OldNodeSelected  = m_OldNodeSelected;
+  cp->m_NewNodeSelected  = m_NewNodeSelected;
+  return cp;
 }
 //----------------------------------------------------------------------------
 bool mafOpSelect::Accept(mafNode* vme)     
 //----------------------------------------------------------------------------
 {
-	return true;
+  return true;
 }
 //----------------------------------------------------------------------------
 void mafOpSelect::SetInput(mafNode* vme)   
 //----------------------------------------------------------------------------
 {
-	m_OldNodeSelected = vme;
+  m_OldNodeSelected = vme;
 }
 //----------------------------------------------------------------------------
 void mafOpSelect::SetNewSel(mafNode* vme)  
 //----------------------------------------------------------------------------
 {
-	m_NewNodeSelected = vme;
+  m_NewNodeSelected = vme;
 }
 //----------------------------------------------------------------------------
 void mafOpSelect::OpDo()
@@ -100,9 +100,9 @@ mafOpEdit::mafOpEdit(wxString label)
 : m_Backup(NULL)
 //----------------------------------------------------------------------------
 {
-	m_Canundo = true; 
-	m_OpType = OPTYPE_EDIT; 
-	m_Selection = NULL; 
+  m_Canundo = true; 
+  m_OpType = OPTYPE_EDIT; 
+  m_Selection = NULL; 
 }
 //----------------------------------------------------------------------------
 mafOpEdit::~mafOpEdit()
@@ -126,7 +126,7 @@ void mafOpEdit::ClipboardBackup()
 //----------------------------------------------------------------------------
 {
   assert(m_Backup.GetPointer() == NULL);
-	m_Backup = m_Clipboard;
+  m_Backup = m_Clipboard;
   m_Clipboard = NULL;
 }
 //----------------------------------------------------------------------------
@@ -134,7 +134,7 @@ void mafOpEdit::ClipboardRestore()
 //----------------------------------------------------------------------------
 {
   //assert(m_Backup.GetPointer() ); - //SIL. 6-11-2003: assert removed, I may make a backup of an empy clipboard
-	m_Clipboard = m_Backup;
+  m_Clipboard = m_Backup;
   m_Backup = NULL;
 }
 
@@ -157,7 +157,7 @@ mafOpCut::~mafOpCut()
 mafOp* mafOpCut::Copy() 
 //----------------------------------------------------------------------------
 {
-	return new mafOpCut(m_Label);
+  return new mafOpCut(m_Label);
 }
 //----------------------------------------------------------------------------
 bool mafOpCut::Accept(mafNode* vme)
@@ -175,11 +175,11 @@ Move (doesn't make a copy) the selected vme (and it's subtree) in the Clipboard
 Select the vme parent
 */
 {
-	ClipboardBackup();
-	m_SelectionParent = m_Selection->GetParent(); 
-	m_Clipboard = m_Selection;
+  ClipboardBackup();
+  m_SelectionParent = m_Selection->GetParent(); 
+  m_Clipboard = m_Selection;
   mafEventMacro(mafEvent(this,VME_REMOVE,m_Selection));
-	mafEventMacro(mafEvent(this,VME_SELECTED,m_SelectionParent));
+  mafEventMacro(mafEvent(this,VME_SELECTED,m_SelectionParent));
   if (mafVME::SafeDownCast(m_SelectionParent.GetPointer()))
   {
     ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
@@ -216,8 +216,8 @@ Restore the Selection
   {
     ((mafVME *)m_SelectionParent.GetPointer())->GetOutput()->Update();
   }
-	mafEventMacro(mafEvent(this,VME_SELECTED,m_Selection));
-	ClipboardRestore();
+  mafEventMacro(mafEvent(this,VME_SELECTED,m_Selection));
+  ClipboardRestore();
 }
 
 
@@ -240,7 +240,7 @@ mafOpCopy::~mafOpCopy()
 mafOp* mafOpCopy::Copy()
 //----------------------------------------------------------------------------
 {
-	return new mafOpCopy(m_Label);
+  return new mafOpCopy(m_Label);
 }
 //----------------------------------------------------------------------------
 bool mafOpCopy::Accept(mafNode* vme)
@@ -259,7 +259,7 @@ make the clipboard backup
 copy the selected VME and its subtree into the clipboard
 */
 {
-	ClipboardBackup();
+  ClipboardBackup();
   m_Clipboard = m_Selection->CopyTree();
   mafString copy_name;
   copy_name = "copy of ";
@@ -293,21 +293,21 @@ mafOpPaste::mafOpPaste(wxString label)
 mafOp* mafOpPaste::Copy() 
 //----------------------------------------------------------------------------
 {                    
-	return new mafOpPaste(m_Label);
+  return new mafOpPaste(m_Label);
 }
 //----------------------------------------------------------------------------
 bool mafOpPaste::Accept(mafNode* vme)       
 //----------------------------------------------------------------------------
 {
-	//paste may be executed if
-	// - vme is not NULL
-	// - the clipboard is not empty
-	// - THE vme on the clipboard can be re-parented under vme
-	// - (this cover also restrictions imposed on Landmarks)
+  //paste may be executed if
+  // - vme is not NULL
+  // - the clipboard is not empty
+  // - THE vme on the clipboard can be re-parented under vme
+  // - (this cover also restrictions imposed on Landmarks)
 
   if(ClipboardIsEmpty()) return false;
-	if(vme == NULL) return false;
-	mafNode *cv = m_Clipboard.GetPointer();
+  if(vme == NULL) return false;
+  mafNode *cv = m_Clipboard.GetPointer();
   return cv->CanReparentTo(vme);
 };
 //----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ Them a VME_ADD is sent, selection is not changed
 {
   m_PastedVme = m_Clipboard.GetPointer(); 
   m_PastedVme->ReparentTo(m_Selection);
-	m_Clipboard = m_PastedVme->CopyTree(); 
+  m_Clipboard = m_PastedVme->CopyTree(); 
 }
 //----------------------------------------------------------------------------
 void mafOpPaste::OpUndo()                  
@@ -348,7 +348,7 @@ mafOpTransform::mafOpTransform(wxString label)
 {
   assert(false); //SIL. 9-4-2005: 
   m_canundo = true; 
-  m_optype = OPTYPE_EDIT;     	
+  m_optype = OPTYPE_EDIT;       
   m_label=label;
   m_vme = NULL;
   m_old_matrix = vtkMatrix4x4::New();
@@ -363,11 +363,11 @@ mafOpTransform::~mafOpTransform()
 //----------------------------------------------------------------------------
 mafOp* mafOpTransform::Copy() 
 {                    
-	mafOpTransform *cp  = new mafOpTransform();
-	cp->m_Listener = m_Listener;
-	cp->m_new_matrix->DeepCopy(m_new_matrix);
-	cp->m_old_matrix->DeepCopy(m_old_matrix);
-	return cp;
+  mafOpTransform *cp  = new mafOpTransform();
+  cp->m_Listener = m_Listener;
+  cp->m_new_matrix->DeepCopy(m_new_matrix);
+  cp->m_old_matrix->DeepCopy(m_old_matrix);
+  return cp;
 }
 //----------------------------------------------------------------------------
 bool mafOpTransform::Accept(mafNode* vme)       
