@@ -158,10 +158,18 @@ bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase
   bool result;
   try
   {
+    StringSource(
+      in,
+      true,
+      new DefaultDecryptorWithMAC(passPhrase, new StringSink( out )) // DefaultDecryptorWithMAC
+      ); // StringSource
+
+    /*
     StringSink *ssink = new StringSink(out);
     DefaultDecryptorWithMAC  *mac =	new DefaultDecryptorWithMAC(passPhrase, ssink);
 
     StringSource s(in, true, mac);
+    */
   }
   catch (...)
   {
@@ -177,10 +185,18 @@ bool mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, co
   bool result;
   try
   {
+    StringSource(
+      in,
+      true,
+      new DefaultEncryptorWithMAC(passPhrase,new StringSink( out )) // DefaultEncryptorWithMAC
+      ); // StringSource
+
+    /*
     StringSink *ssink = new StringSink(out);
     DefaultEncryptorWithMAC  * mac =	new DefaultEncryptorWithMAC(passPhrase, ssink);
 
     StringSource s((const byte *)in, len, true, mac);
+    */
   }
   catch (...)
   {

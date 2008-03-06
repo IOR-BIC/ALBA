@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 16:13:10 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2008-03-06 12:02:38 $
+  Version:   $Revision: 1.45 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,35 +35,35 @@
 #include "mafPipeFactoryVME.h"
 #include "mafInteractionFactory.h"
 
-#include "mmo2DMeasure.h"
-#include "mmoAddLandmark.h"
-#include "mmoClipSurface.h"
-#include "mmoCreateGroup.h"
-#include "mmoCreateMeter.h"
-#include "mmoCreateProber.h"
-#include "mmoCreateRefSys.h"
-#include "mmoCreateSlicer.h"
-#include "mmoCrop.h"
-#include "mmoEditMetadata.h"
-#include "mmoExplodeCollapse.h"
-#include "mmoExtractIsosurface.h"
-#include "mmoFilterSurface.h"
-#include "mmoFilterVolume.h"
-#include "mmoImageImporter.h"
-#include "mmoMAFTransform.h"
-#include "mmoMSFExporter.h"
-#include "mmoMSF1xImporter.h"
-#include "mmoRAWImporterVolume.h"
-#include "mmoReparentTo.h"
-#include "mmoSTLExporter.h"
-#include "mmoSTLImporter.h"
-#include "mmoVolumeResample.h"
-#include "mmoVRMLImporter.h"
-#include "mmoVTKExporter.h"
-#include "mmoVTKImporter.h"
+#include "mafOp2DMeasure.h"
+#include "mafOpAddLandmark.h"
+#include "mafOpClipSurface.h"
+#include "mafOpCreateGroup.h"
+#include "mafOpCreateMeter.h"
+#include "mafOpCreateProber.h"
+#include "mafOpCreateRefSys.h"
+#include "mafOpCreateSlicer.h"
+#include "mafOpCrop.h"
+#include "mafOpEditMetadata.h"
+#include "mafOpExplodeCollapse.h"
+#include "mafOpExtractIsosurface.h"
+#include "mafOpFilterSurface.h"
+#include "mafOpFilterVolume.h"
+#include "mafOpImporterImage.h"
+#include "mafOpMAFTransform.h"
+#include "mafOpExporterMSF.h"
+#include "mafOpImporterMSF1x.h"
+#include "mafOpImporterRAWVolume.h"
+#include "mafOpReparentTo.h"
+#include "mafOpExporterSTL.h"
+#include "mafOpImporterSTL.h"
+#include "mafOpVolumeResample.h"
+#include "mafOpImporterVRML.h"
+#include "mafOpExporterVTK.h"
+#include "mafOpImporterVTK.h"
 
 #ifdef MAF_USE_ITK
-  #include "mmoASCIIImporter.h"
+  #include "mafOpImporterASCII.h"
 #endif
 
 #include "mafViewVTK.h"
@@ -109,45 +109,45 @@ bool exOperationApp::OnInit()
   //------------------------------------------------------------
   // Importer Menu':
   //------------------------------------------------------------
-  m_Logic->Plug(new mmoImageImporter("Images"));
-  m_Logic->Plug(new mmoRAWImporterVolume("RAW Volume"));
-  m_Logic->Plug(new mmoSTLImporter("STL"));
-  m_Logic->Plug(new mmoVRMLImporter("VRML"));
-  m_Logic->Plug(new mmoVTKImporter("VTK"));
-  m_Logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
+  m_Logic->Plug(new mafOpImporterImage("Images"));
+  m_Logic->Plug(new mafOpImporterRAWVolume("RAW Volume"));
+  m_Logic->Plug(new mafOpImporterSTL("STL"));
+  m_Logic->Plug(new mafOpImporterVRML("VRML"));
+  m_Logic->Plug(new mafOpImporterVTK("VTK"));
+  m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 #ifdef MAF_USE_ITK
-  m_Logic->Plug(new mmoASCIIImporter("ASCII"));
+  m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Exporter Menu':
   //------------------------------------------------------------
-  m_Logic->Plug(new mmoMSFExporter("MSF"));
-  m_Logic->Plug(new mmoSTLExporter("STL"));
-  m_Logic->Plug(new mmoVTKExporter("VTK"));
+  m_Logic->Plug(new mafOpExporterMSF("MSF"));
+  m_Logic->Plug(new mafOpExporterSTL("STL"));
+  m_Logic->Plug(new mafOpExporterVTK("VTK"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Operation Menu':
   //------------------------------------------------------------
-  m_Logic->Plug(new mmo2DMeasure("2D Measure"));
-  m_Logic->Plug(new mmoAddLandmark("Add Landmark"));
-  m_Logic->Plug(new mmoClipSurface("Clip Surface"));
-  m_Logic->Plug(new mmoCreateGroup("Group"),"Create");
-  m_Logic->Plug(new mmoCreateMeter("Meter"),"Create");
-  m_Logic->Plug(new mmoCreateRefSys("RefSys"),"Create");
-  m_Logic->Plug(new mmoCreateProber("Prober"),"Create");
-  m_Logic->Plug(new mmoCreateSlicer("Slicer"),"Create");
-  m_Logic->Plug(new mmoEditMetadata("Metadata Editor"));
-  m_Logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"));
-  m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"));
-  m_Logic->Plug(new mmoFilterSurface("Surface"),"Filter");
-  m_Logic->Plug(new mmoFilterVolume("Volume"),"Filter/Volume");
-  m_Logic->Plug(new mmoMAFTransform("Transform  \tCtrl+T"));
-  m_Logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
-  m_Logic->Plug(new mmoVolumeResample("Resample Volume"));
-  m_Logic->Plug(new mmoCrop("Crop Volume"));
+  m_Logic->Plug(new mafOp2DMeasure("2D Measure"));
+  m_Logic->Plug(new mafOpAddLandmark("Add Landmark"));
+  m_Logic->Plug(new mafOpClipSurface("Clip Surface"));
+  m_Logic->Plug(new mafOpCreateGroup("Group"),"Create");
+  m_Logic->Plug(new mafOpCreateMeter("Meter"),"Create");
+  m_Logic->Plug(new mafOpCreateRefSys("RefSys"),"Create");
+  m_Logic->Plug(new mafOpCreateProber("Prober"),"Create");
+  m_Logic->Plug(new mafOpCreateSlicer("Slicer"),"Create");
+  m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"));
+  m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"));
+  m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"));
+  m_Logic->Plug(new mafOpFilterSurface("Surface"),"Filter");
+  m_Logic->Plug(new mafOpFilterVolume("Volume"),"Filter/Volume");
+  m_Logic->Plug(new mafOpMAFTransform("Transform  \tCtrl+T"));
+  m_Logic->Plug(new mafOpReparentTo("Reparent to...  \tCtrl+R"));
+  m_Logic->Plug(new mafOpVolumeResample("Resample Volume"));
+  m_Logic->Plug(new mafOpCrop("Crop Volume"));
   //------------------------------------------------------------
   
   //------------------------------------------------------------

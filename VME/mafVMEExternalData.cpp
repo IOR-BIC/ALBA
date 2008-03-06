@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:51:00 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-03-06 11:58:29 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -164,9 +164,7 @@ int mafVMEExternalData::InternalStore(mafStorageElement *parent)
   {
     t->SetValue(name);
   }
-  Superclass::InternalStore(parent);
-
-  return MAF_OK;
+  return Superclass::InternalStore(parent);
 }
 
 //-----------------------------------------------------------------------

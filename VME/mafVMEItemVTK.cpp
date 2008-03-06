@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-28 12:14:32 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-03-06 11:58:29 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -512,7 +512,8 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
       // problems retrieving data... (e.g. when a file has been erroneously deleted or corrupted...)
       if (data == NULL)
       {
-        return 0;
+        mafLogMessage(_("problems retrieving data... (e.g. when a file has been erroneously deleted or corrupted...)"));
+        return MAF_ERROR;
       }
 
       // force release old writer if present

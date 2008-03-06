@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:06:32 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2008-03-06 12:02:00 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -259,7 +259,7 @@ EVT_START,
   LOG_ALL_EVENT,
 	LOG_TO_FILE,
 
-  //used by mafISATransform to talk with mmoTransform 
+  //used by mafISATransform to talk with mafOpTransform 
 	MOUSE_DOWN, //(to be removed Marco)
 	MOUSE_MOVE, //(to be removed Marco)
 	MOUSE_UP,   //(to be removed Marco)

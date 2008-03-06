@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exScalarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 13:34:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-06 12:02:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,10 +34,10 @@
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
 
-#include "mmoVTKExporter.h"
+#include "mafOpExporterVTK.h"
 
 #ifdef MAF_USE_ITK
-  #include "mmoASCIIImporter.h"
+  #include "mafOpImporterASCII.h"
   #include "mafViewScalar.h"
 #endif
 
@@ -71,14 +71,14 @@ bool exScalarApp::OnInit()
   // Importer Menu':
   //------------------------------------------------------------
 #ifdef MAF_USE_ITK
-  m_Logic->Plug(new mmoASCIIImporter("ASCII"));
+  m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Exporter Menu':
   //------------------------------------------------------------
-  m_Logic->Plug(new mmoVTKExporter("VTK"));
+  m_Logic->Plug(new mafOpExporterVTK("VTK"));
 
   //------------------------------------------------------------
 

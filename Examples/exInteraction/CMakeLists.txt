@@ -3,8 +3,8 @@ PROJECT (exInteraction)
 SET(PROJECT_SRCS 
 exInteractionApp.cpp
 exInteractionApp.h
-mmoInteractionOp.cpp
-mmoInteractionOp.h
+mafOpInteractionOp.cpp
+mafOpInteractionOp.h
 )
 
 IF (WIN32)

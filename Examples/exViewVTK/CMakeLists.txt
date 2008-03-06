@@ -3,8 +3,8 @@ PROJECT (exView)
 SET(PROJECT_SRCS 
 testViewApp.cpp
 testViewApp.h
-mmoCreateVmeSurface.h
-mmoCreateVmeSurface.cpp
+mafOpCreateVmeSurface.h
+mafOpCreateVmeSurface.cpp
 testView.h
 testView.cpp
 )

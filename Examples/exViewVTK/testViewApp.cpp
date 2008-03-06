@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-26 16:09:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-03-06 12:02:57 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@
 #include "mafPipeFactoryVME.h"
 #include "mafPipeSurface.h"
 
-#include "mmoCreateVmeSurface.h"
+#include "mafOpCreateVmeSurface.h"
 
 #include "mafViewVTK.h"
 #include "testView.h"
@@ -70,7 +70,7 @@ bool testViewApp::OnInit()
   m_Logic->GetTopWin()->SetTitle("ViewVTK example");
   SetTopWindow(mafGetFrame());  
 
-  m_Logic->Plug(new mmoCreateVmeSurface("Add Vme Surface \tCtrl+A"));
+  m_Logic->Plug(new mafOpCreateVmeSurface("Add Vme Surface \tCtrl+A"));
   testView *tv = new testView("testView");
   tv->PlugVisualPipe("mafVMESurface", "mafPipeSurface");
   m_Logic->Plug(tv);

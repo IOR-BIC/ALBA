@@ -2,10 +2,10 @@ PROJECT (exVMEMan)
 SET(PROJECT_SRCS 
 exVMEManApp.cpp
 exVMEManApp.h
-mmoCreateGenericVme.h
-mmoCreateGenericVme.cpp
-mmoTest.h
-mmoTest.cpp
+mafOpCreateGenericVme.h
+mafOpCreateGenericVme.cpp
+mafOpTest.h
+mafOpTest.cpp
 )
 
 # copia icona e file delle risorse nella Build

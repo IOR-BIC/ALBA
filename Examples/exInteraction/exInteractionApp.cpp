@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-03-06 12:02:19 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,17 +33,17 @@
 #include "mafVMESurface.h"
 #include "mafPipeFactoryVME.h"
 
-#include "mmoCreateGroup.h"
-#include "mmoCreateMeter.h"
-#include "mmoCreateSlicer.h"
-#include "mmoMAFTransform.h"
-#include "mmoReparentTo.h"
-#include "mmoSTLExporter.h"
-#include "mmoSTLImporter.h"
-#include "mmoVTKExporter.h"
-#include "mmoVTKImporter.h"
-#include "mmoMSF1xImporter.h"
-#include "mmoInteractionOp.h"
+#include "mafOpCreateGroup.h"
+#include "mafOpCreateMeter.h"
+#include "mafOpCreateSlicer.h"
+#include "mafOpMAFTransform.h"
+#include "mafOpReparentTo.h"
+#include "mafOpExporterSTL.h"
+#include "mafOpImporterSTL.h"
+#include "mafOpExporterVTK.h"
+#include "mafOpImporterVTK.h"
+#include "mafOpImporterMSF1x.h"
+#include "mafOpInteractionOp.h"
 
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
@@ -114,25 +114,25 @@ bool exInteractionApp::OnInit()
 
   //------------------------------------------------------------
   // Importer Menu':
-  m_logic->Plug(new mmoSTLImporter("STL Importer"));
-  m_logic->Plug(new mmoVTKImporter("VTK Importer"));
-  //m_logic->Plug(new mmoMSF1xImporter("MSF 1.x Importer"));
+  m_logic->Plug(new mafOpImporterSTL("STL Importer"));
+  m_logic->Plug(new mafOpImporterVTK("VTK Importer"));
+  //m_logic->Plug(new mafOpImporterMSF1x("MSF 1.x Importer"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Exporter Menu':
-  m_logic->Plug(new mmoSTLExporter("STL Exporter"));
-  m_logic->Plug(new mmoVTKExporter("VTK Exporter"));
+  m_logic->Plug(new mafOpExporterSTL("STL Exporter"));
+  m_logic->Plug(new mafOpExporterVTK("VTK Exporter"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
   // Operation Menu':
-  m_logic->Plug(new mmoCreateGroup("Create Group"));
-  m_logic->Plug(new mmoCreateMeter("Create Meter"));
-  m_logic->Plug(new mmoCreateSlicer("Create Slicer"));
-  m_logic->Plug(new mmoMAFTransform("MAF Transform"));
-  m_logic->Plug(new mmoReparentTo("Reparent to...  \tCtrl+R"));
-  m_logic->Plug(new mmoInteractionOp("InteractionOp  \tCtrl+R"));  
+  m_logic->Plug(new mafOpCreateGroup("Create Group"));
+  m_logic->Plug(new mafOpCreateMeter("Create Meter"));
+  m_logic->Plug(new mafOpCreateSlicer("Create Slicer"));
+  m_logic->Plug(new mafOpMAFTransform("MAF Transform"));
+  m_logic->Plug(new mafOpReparentTo("Reparent to...  \tCtrl+R"));
+  m_logic->Plug(new mafOpInteractionOp("InteractionOp  \tCtrl+R"));  
   //------------------------------------------------------------
   
   //------------------------------------------------------------
