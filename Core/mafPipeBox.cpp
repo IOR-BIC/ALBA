@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-11 13:50:01 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-03-06 14:18:45 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -227,6 +227,28 @@ void mafPipeBox::OnEvent(mafEventBase *maf_event)
           default:
             m_Vme->GetOutput()->Get4DBounds(b);
           break;
+        }
+        if (m_BoundsMode != BOUNDS_3D)
+        {
+          double min_vector[4], max_vector[4];
+          min_vector[0] = b[0];
+          min_vector[1] = b[2];
+          min_vector[2] = b[4];
+          max_vector[0] = b[1];
+          max_vector[1] = b[3];
+          max_vector[2] = b[5];
+          min_vector[3] = max_vector[3] = 1;
+          mafMatrix *absMat = m_Vme->GetOutput()->GetAbsMatrix();
+          mafMatrix invAbsMat;
+          mafMatrix::Invert(*absMat, invAbsMat);
+          invAbsMat.MultiplyPoint(min_vector, min_vector);
+          invAbsMat.MultiplyPoint(max_vector, max_vector);
+          b[0] = min_vector[0];
+          b[2] = min_vector[1];
+          b[4] = min_vector[2];
+          b[1] = max_vector[0];
+          b[3] = max_vector[1];
+          b[5] = max_vector[2];
         }
         m_Box->SetBounds(b);
       }
