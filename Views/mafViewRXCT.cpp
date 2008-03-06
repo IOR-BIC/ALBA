@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-05 11:30:45 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2008-03-06 16:23:50 $
+  Version:   $Revision: 1.42 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,7 +88,8 @@ mafViewRXCT::mafViewRXCT(wxString label)
   m_ViewCTCompound    = NULL;
   
   m_LutSliders[RX_FRONT_VIEW] = m_LutSliders[RX_SIDE_VIEW] = m_LutSliders[CT_COMPOUND_VIEW] = NULL;
-  m_vtkLUT[RX_FRONT_VIEW] = m_vtkLUT[RX_SIDE_VIEW] = m_vtkLUT[CT_COMPOUND_VIEW] = NULL;
+  //m_vtkLUT[RX_FRONT_VIEW] = m_vtkLUT[RX_SIDE_VIEW] = m_vtkLUT[CT_COMPOUND_VIEW] = NULL;
+  m_Lut = NULL;
 
   m_RightOrLeft=1;
   m_MoveAllSlices = 0; 
@@ -109,7 +110,7 @@ mafViewRXCT::~mafViewRXCT()
   for (int i = RX_FRONT_VIEW;i < VIEWS_NUMBER;i++)
   {
     cppDEL(m_LutSliders[i]);
-    vtkDEL(m_vtkLUT[i]);
+    //vtkDEL(m_vtkLUT[i]);
   }
 }
 //----------------------------------------------------------------------------
@@ -151,14 +152,17 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         if(volumeOutput->GetMaterial())
         {
           
-          ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range);
+          ((mafViewRX *)m_ChildViewList[childID])->GetLutRange(range); //range of projected
           double volTableRange[2];
           vtkLookupTable *cl = volumeOutput->GetMaterial()->m_ColorLut;
           
+          double volRange[2];
+          volumeOutput->GetVTKData()->GetScalarRange(volRange);
+
           if (volumeOutput->GetMaterial()->m_TableRange[1] < volumeOutput->GetMaterial()->m_TableRange[0]) 
           {
-            volTableRange[0] = range[0];
-            volTableRange[1] = range[1];
+            volTableRange[0] = volRange[0];
+            volTableRange[1] = volRange[1];
           }
           else
           {
@@ -167,13 +171,15 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
           }
           
 
-          double volRange[2];
-          volumeOutput->GetVTKData()->GetScalarRange(volRange);
-
           
-          advLow = range[0] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[0] - volTableRange[0]);
-          advHigh = range[1] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[1] - volTableRange[1]);
 
+          double proportionalConstant = ((range[1] - range[0])/(volRange[1] - volRange[0]));
+          double inverseProportionalConstant = 1.0 / proportionalConstant;
+          
+          //advLow = range[0] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[0] - volTableRange[0]);
+          //advHigh = range[1] + ((range[1] - range[0])/(volTableRange[1] - volTableRange[0])) * (range[1] - volTableRange[1]);
+          advLow = proportionalConstant * (volTableRange[0] - volRange[0] + inverseProportionalConstant * range[0]);
+          advHigh = proportionalConstant * (volTableRange[1] - volRange[1] + inverseProportionalConstant * range[1]);
 
           ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
         }
@@ -188,13 +194,23 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         m_LutSliders[childID]->SetSubRange(advLow,advHigh);
       
         // create a lookup table for each RX view
-        vtkNEW(m_vtkLUT[childID]);
-        m_vtkLUT[childID]->SetRange(advLow,advHigh);
-        m_vtkLUT[childID]->Build();
-        lutPreset(4,m_vtkLUT[childID]);
-        m_vtkLUT[childID]->SetRange(advLow,advHigh);
-        m_vtkLUT[childID]->Build();
-        lutPreset(4,m_vtkLUT[childID]);
+        /*vtkNEW(m_vtkLUT[childID]);
+        if(volumeOutput->GetMaterial()->m_ColorLut)
+        {
+          m_vtkLUT[childID]->DeepCopy(volumeOutput->GetMaterial()->m_ColorLut);
+          m_vtkLUT[childID]->SetRange(advLow,advHigh);
+          m_vtkLUT[childID]->Build();
+        }
+        else
+        {
+          m_vtkLUT[childID]->SetRange(advLow,advHigh);
+          m_vtkLUT[childID]->Build();
+          lutPreset(4,m_vtkLUT[childID]);
+        }*/
+        
+        
+        
+
 
         ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
 
@@ -223,20 +239,23 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         }
       }
       
-
-
       // set the slider for the CT compound view
       m_LutSliders[CT_COMPOUND_VIEW]->SetRange(totalSR[0],totalSR[1]);
       m_LutSliders[CT_COMPOUND_VIEW]->SetSubRange(sr[0],sr[1]);
       
       // create a lookup table for CT views
-      vtkNEW(m_vtkLUT[CT_COMPOUND_VIEW]);
-      m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(sr);
-      m_vtkLUT[CT_COMPOUND_VIEW]->Build();
-      lutPreset(4,m_vtkLUT[CT_COMPOUND_VIEW]);
-      m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(sr);
-      m_vtkLUT[CT_COMPOUND_VIEW]->Build();
-      lutPreset(4,m_vtkLUT[CT_COMPOUND_VIEW]);
+      
+      if(volumeOutput->GetMaterial()->m_ColorLut)
+      {
+        /*m_vtkLUT[CT_COMPOUND_VIEW] = volumeOutput->GetMaterial()->m_ColorLut;
+        m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(sr);
+        m_vtkLUT[CT_COMPOUND_VIEW]->Build();*/
+        
+        m_Lut = volumeOutput->GetMaterial()->m_ColorLut;
+        m_Lut->SetRange(sr);
+        m_Lut->Build();
+      }
+      
 
       // gather data to initialize CT slices
       data->GetBounds(b);
@@ -251,7 +270,8 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         mafPipeVolumeSlice *p = NULL;
         // set pipe lookup table
         p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
-        p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
+        //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
+        p->SetColorLookupTable(m_Lut);
         m_Pos[i] = b[5]-step*(i+1);
       }
       m_CurrentVolume = mafVME::SafeDownCast(node);
@@ -347,6 +367,7 @@ void mafViewRXCT::VmeRemove(mafNode *node)
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
     m_CurrentVolume = NULL;
+    GizmoDelete();
   }
   Superclass::VmeRemove(node);
 }
@@ -373,12 +394,14 @@ void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
     else if (maf_event->GetSender() == m_LutSliders[CT_COMPOUND_VIEW])
     {
       m_LutSliders[CT_COMPOUND_VIEW]->GetSubRange(&low,&hi);
-      m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
+      //m_vtkLUT[CT_COMPOUND_VIEW]->SetRange(low,hi);
+      m_Lut->SetRange(low,hi);
       for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
       {
         mafPipeVolumeSlice *p = NULL;
         p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
-        p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
+        //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
+        p->SetColorLookupTable(m_Lut);
       }
     }
 
