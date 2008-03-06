@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterBmp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-06 16:32:31 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -83,7 +83,6 @@ void mafOpExporterBmp::OpRun()
   {
     //Crete GUI
     m_Gui = new mmgGui(this);
-    m_Gui->SetListener(this);
     
     m_Gui->DirOpen(ID_DIROPEN, "export dir", &m_DirName, _("choose dir") );
    
