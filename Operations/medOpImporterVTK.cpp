@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterVTK.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-01 13:40:08 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-03-06 12:03:55 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -66,7 +66,7 @@ mafCxxTypeMacro(medOpImporterVTK);
 
 //----------------------------------------------------------------------------
 medOpImporterVTK::medOpImporterVTK(const wxString &label) :
-mmoVTKImporter(label)
+mafOpImporterVTK(label)
 //----------------------------------------------------------------------------
 {
   m_VmePolyLine = NULL;
@@ -105,7 +105,7 @@ int medOpImporterVTK::ImportVTK()
     preader = vtkPolyDataReader::New();
     break;
   default:
-    return mmoVTKImporter::ImportVTK();
+    return mafOpImporterVTK::ImportVTK();
   }
     
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,preader));
@@ -128,7 +128,7 @@ int medOpImporterVTK::ImportVTK()
       else
       {
         vtkDEL(preader);
-        return mmoVTKImporter::ImportVTK();
+        return mafOpImporterVTK::ImportVTK();
       }
 
       mafTagItem tag_Nature;

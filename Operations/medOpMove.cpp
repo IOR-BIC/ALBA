@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 14:23:34 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-03-06 12:03:55 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ mafCxxTypeMacro(medOpMove);
 
 //----------------------------------------------------------------------------
 medOpMove::medOpMove(const wxString &label) :
-mmoTransformInterface(label)
+mafOpTransformInterface(label)
 //----------------------------------------------------------------------------
 {
   m_OpType = OPTYPE_OP;
@@ -180,7 +180,7 @@ void medOpMove::OnEvent(mafEventBase *maf_event)
 void medOpMove::OpDo()
 //----------------------------------------------------------------------------
 {
-  mmoTransformInterface::OpDo();
+  mafOpTransformInterface::OpDo();
 }
 //----------------------------------------------------------------------------
 void medOpMove::OpUndo()

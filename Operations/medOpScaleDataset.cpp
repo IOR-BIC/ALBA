@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 08:50:23 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-06 12:03:55 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ mafCxxTypeMacro(medOpScaleDataset);
 
 //----------------------------------------------------------------------------
 medOpScaleDataset::medOpScaleDataset(const wxString &label) :
-mmoTransformInterface(label)
+mafOpTransformInterface(label)
 //----------------------------------------------------------------------------
 {
   m_OpType = OPTYPE_OP;
@@ -140,7 +140,7 @@ void medOpScaleDataset::OnEvent(mafEventBase *maf_event)
 void medOpScaleDataset::OpDo()
 //----------------------------------------------------------------------------
 {
-  mmoTransformInterface::OpDo();
+  mafOpTransformInterface::OpDo();
 }
 //----------------------------------------------------------------------------
 void medOpScaleDataset::OpUndo()

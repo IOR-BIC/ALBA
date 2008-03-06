@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterEmgWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-27 13:04:57 $
-  Version:   $Revision: 1.1 $
-  Authors:   Roberto Mucci
+  Date:      $Date: 2008-03-06 12:03:55 $
+  Version:   $Revision: 1.2 $
+  Authors:   Roberto Mucci - Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -17,13 +17,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
-#include <vnl\vnl_matrix.h>
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-
-class mafVMEScalar;
 class mafVMEGroup;
 
 //----------------------------------------------------------------------------
@@ -55,14 +52,10 @@ public:
   void Read();
 
   /** Set the filename for the file to import */
-  void SetFileName(const char *file_name){m_File = file_name;};
-
+  void SetFileName(const char *file_name) {m_File = file_name;};
 
 protected:
-  std::vector<mafVMEScalar*> m_VectorVME;
   mafVMEGroup *m_Group;
-  vnl_matrix<double> m_EmgMatrix;
-  wxString m_FileDir;
-	wxString m_File;
+	mafString m_File;
 };
 #endif
