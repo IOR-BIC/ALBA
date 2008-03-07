@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:58:29 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-03-07 12:49:57 $
+  Version:   $Revision: 1.24 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -636,7 +636,7 @@ int mafVMEItemVTK::CheckFile(const char *filename)
   }
   std::string chk_result;
   mafCalculateteChecksum(filename, chk_result);
-  //mafLogMessage("Checksum for %s: %s", filename, chk_result.c_str());
+  m_ChecksumMD5 = chk_result.c_str();
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
@@ -654,7 +654,7 @@ int mafVMEItemVTK::CheckFile(const char *input_string, int input_len)
   }
   std::string chk_result;
   mafCalculateteChecksum(input_string, input_len, chk_result);
-  //mafLogMessage("String Checksum: %s", chk_result.c_str());
+  m_ChecksumMD5 = chk_result.c_str();
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
