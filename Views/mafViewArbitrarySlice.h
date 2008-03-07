@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:24:36 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-03-07 13:08:16 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -71,6 +71,8 @@ public:
 	virtual mafView* Copy(mafObserver *Listener);
 
 	virtual void CameraUpdate();
+
+  void UpdateSlicerBehavior();
 
 protected:
 

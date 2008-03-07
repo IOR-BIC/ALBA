@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-04 15:08:50 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-03-07 13:08:16 $
+  Version:   $Revision: 1.26 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
+#include "medDecl.h"
 #include "mafViewArbitrarySlice.h"
 #include "mafViewSlice.h"
 #include "mafVme.h"
@@ -141,6 +142,7 @@ void mafViewArbitrarySlice::PackageView()
   m_ViewSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
+  //m_ViewSlice->PlugVisualPipe("medVMEPolylineEditor","mafPipeSurfaceSlice");
 	
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
@@ -235,7 +237,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
       mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
       pSli->SetActorPicking(false);
       pSli->SetEnableActorLOD(0);
-	
+
+      UpdateSlicerBehavior();
 
 			//Set camera of slice viw in way that it will follow the volume
 			if(!m_AttachCamera)
@@ -339,6 +342,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		{
 			//this->GetSceneGraph()->VmeRemove(m_Slicer);
 			m_AttachCamera->SetVme(NULL);
+      m_Slicer->SetBehavior(NULL);
 			m_Slicer->ReparentTo(NULL);
 
 			//remove gizmos
@@ -805,3 +809,24 @@ void mafViewArbitrarySlice::EnableWidgets(bool enable)
   m_LutSlider->Enable(enable);
 
 }
+//----------------------------------------------------------------------------
+void mafViewArbitrarySlice::UpdateSlicerBehavior()
+//----------------------------------------------------------------------------
+{
+  if(m_CurrentVolume->GetBehavior())
+  {
+    m_Slicer->SetBehavior(m_CurrentVolume->GetBehavior());
+    mafPipeSurfaceTextured *pArb=(mafPipeSurfaceTextured *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
+    pArb->SetActorPicking(true);
+    mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
+    pSli->SetActorPicking(true);
+  }
+  else
+  {
+    m_Slicer->SetBehavior(NULL);
+    mafPipeSurfaceTextured *pArb=(mafPipeSurfaceTextured *)(m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(m_Slicer);
+    pArb->SetActorPicking(false);
+    mafPipeSurfaceTextured *pSli=(mafPipeSurfaceTextured *)(m_ChildViewList[SLICE_VIEW])->GetNodePipe(m_Slicer);
+    pSli->SetActorPicking(false);
+  }
+};
