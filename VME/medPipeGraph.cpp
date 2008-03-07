@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 15:40:31 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-03-07 09:38:22 $
+  Version:   $Revision: 1.19 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,7 @@ medPipeGraph::medPipeGraph()
 
   m_TimeStamp = 0;
   m_ItemId = 0;
+  
 }
 //----------------------------------------------------------------------------
 medPipeGraph::~medPipeGraph()
@@ -245,8 +246,8 @@ void medPipeGraph::UpdateGraph()
     m_PlotActor->SetPlotRange(m_TimesRange[0], m_DataManualRange[0], m_TimesRange[1], m_DataManualRange[1]);
   }
 
- // m_PlotActor->SetNumberOfXLabels(m_Xlabel); ..don't seem to work..
- // m_PlotActor->SetNumberOfYLabels(m_Ylabel);
+  m_PlotActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
+  m_PlotActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
   m_RenFront->AddActor2D(m_PlotActor);
 }
 //----------------------------------------------------------------------------
@@ -345,7 +346,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     case ID_RANGE_X:
     case ID_RANGE_Y:
       {
-        if (m_TimesManualRange[0] => m_TimesManualRange[1] || m_DataManualRange[0] => m_DataManualRange[1])
+        if (m_TimesManualRange[0] >= m_TimesManualRange[1] || m_DataManualRange[0] >= m_DataManualRange[1])
         {
           mafErrorMessage("Invalid plot range!");
           return;
@@ -358,14 +359,6 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
       {
         m_Gui->Enable(ID_RANGE_X, !m_FitPlot);
         m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
-      /*  if (m_FitPlot)
-        {
-          m_TimesManualRange[0] = 0;
-          m_TimesManualRange[1] = m_TimeStampMax;
-          m_DataManualRange[0] = m_DataMin;
-          m_DataManualRange[1] = m_DataMax;
-        }*/
-
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
       }
@@ -408,17 +401,4 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
-//----------------------------------------------------------------------------
-void medPipeGraph::MinMax(double MinMax[2], std::vector<mafTimeStamp> vec)
-//----------------------------------------------------------------------------
-{
-  MinMax[0] = MinMax[1] = vec[0];
 
-  for(int i = 0; i < vec.size(); i++)
-  {
-    if(vec[i] > MinMax[1])
-      MinMax[1] = vec[i];
-    if(vec[i] < MinMax[0])
-      MinMax[0] = vec[i];
-  }
-}

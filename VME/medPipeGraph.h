@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 15:40:31 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-03-07 09:38:22 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,8 +67,6 @@ protected:
   vtkLegendBoxActor *m_LegendBox_Actor;
 
 private:
-  void MinMax(double MinMax[2], std::vector<mafTimeStamp> vec);
-
   //create the legend
   void medPipeGraph::CreateLegend();
 
