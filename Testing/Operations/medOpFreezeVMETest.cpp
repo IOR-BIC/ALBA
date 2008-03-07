@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-21 09:42:48 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-03-07 09:42:57 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEMeter.h"
 #include "mafVMESurfaceParametric.h"
 #include "mafVMEVolumeGray.h"
-#include "mmoVTKImporter.h"
+#include "mafOpImporterVTK.h"
 #include "mafVMEProber.h"
 #include "mafVMESlicer.h"
 #include "mafVMEPolylineSpline.h"
@@ -278,7 +278,7 @@ void medOpFreezeVMETest::TestFreezeVMESlicer()
 	medOpFreezeVME *freezeOp=new medOpFreezeVME("freeze");
 	freezeOp->TestModeOn();
 
-	mmoVTKImporter *importer=new mmoVTKImporter("importer");
+	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
 	mafString filename=MED_DATA_ROOT;
@@ -357,7 +357,7 @@ void medOpFreezeVMETest::TestFreezeVMEProber()
 	medOpFreezeVME *freezeOp=new medOpFreezeVME("freeze");
 	freezeOp->TestModeOn();
 	
-	mmoVTKImporter *importer=new mmoVTKImporter("importer");
+	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
 	mafString filename=MED_DATA_ROOT;

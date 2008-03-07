@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-06-21 10:33:38 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-03-07 09:42:57 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMESurface.h"
-#include "mmoVTKImporter.h"
+#include "mafOpImporterVTK.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
@@ -93,7 +93,7 @@ void mmoExtrusionHolesTest::TestExtractFreeEdge()
 	mafVMERoot *root=storage->GetRoot();
 
 	//Imput data is a cube with 2 holes
-	mmoVTKImporter *importer=new mmoVTKImporter("importer");
+	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
 	mafString filename=MED_DATA_ROOT;
@@ -131,7 +131,7 @@ void mmoExtrusionHolesTest::TestExtrude()
 	mafVMERoot *root=storage->GetRoot();
 
 	//Imput data is a cube with 1 hole
-	mmoVTKImporter *importer=new mmoVTKImporter("importer");
+	mafOpImporterVTK *importer=new mafOpImporterVTK("importer");
 	importer->TestModeOn();
 	importer->SetInput(root);
 	mafString filename=MED_DATA_ROOT;
