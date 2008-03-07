@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:31:12 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-03-07 12:48:36 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -234,6 +234,10 @@ public:
   The Archive filename is needed to restore archived items when data is stored into a single file mode.*/
   void SetArchiveFileName(mafString &archive) {m_ArchiveFileName = archive;};
 
+  /** Get the archive file name.
+  The Archive filename is needed to restore archived items when data is stored into a single file mode.*/
+  const char *GetArchiveFileName() {return m_ArchiveFileName.GetCStr();};
+
   /** Serialize the data into the compressed archive.*/
   virtual bool StoreToArchive(wxZipOutputStream &zip) = 0;
 
@@ -308,6 +312,7 @@ protected:
   const char *  m_OutputMemory;     ///< pointer to memory storing the data to be written
   unsigned long m_OutputMemorySize; ///< size of the block of memory where data has been stored
   mafVMEItemAsynchObserver *m_DataObserver; ///< observer used to update the item's data when downloaded
+  mafString     m_ChecksumMD5; ///< Store the MD5 checksum for the data associated to the item.
 };
 
 /** mafVMEItemAsynchObserver - used by the mafVMEItem to synchronize the asynchronous
