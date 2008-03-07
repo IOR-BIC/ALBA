@@ -1,6 +1,8 @@
 #ifndef __medDefines_h
 #define __medDefines_h
 
+#include "mafDefines.h"
+
 //--------------------------------------------------------------------------
 // Data root used to reach data for testing
 //--------------------------------------------------------------------------
