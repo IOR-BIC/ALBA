@@ -81,6 +81,8 @@ IF (MAF_USE_VTK)
     mafOpImporterSTL.h
     mafOpTransformInterface.cpp
     mafOpTransformInterface.h
+    mafOpValidateTree.cpp
+    mafOpValidateTree.h
     mafOpVolumeResample.cpp
     mafOpVolumeResample.h
     mafOpVOIDensity.cpp
