@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medLogicWithManagers.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-29 14:32:49 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-03-07 13:06:04 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#include "mafDefines.h" 
+#include "medDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -47,9 +47,8 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
+#include "medDecl.h"
 #include "medLogicWithManagers.h"
-#include "mafDecl.h"
 #include "medGUIContextualMenu.h"
 #include "mmgMDIChild.h"
 #include "mafViewManager.h"
