@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-17 17:11:57 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-03-07 10:31:42 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -30,7 +30,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMath.h"
 #include "mafVMERoot.h"
 #include "mafVMEStorage.h"
-#include "mmoVTKImporter.h"
 #include "mafString.h"
 
 
