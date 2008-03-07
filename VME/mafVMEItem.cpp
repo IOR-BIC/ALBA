@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:47:20 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-03-07 12:49:03 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -68,6 +68,7 @@ mafVMEItem::mafVMEItem()
 
   m_ArchiveFileName = "";
   m_TmpFileName     = "";
+  m_ChecksumMD5     = "";
 }
 
 //-------------------------------------------------------------------------
