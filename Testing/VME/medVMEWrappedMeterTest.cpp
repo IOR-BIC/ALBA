@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-07 10:31:42 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-03-07 10:32:10 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -44,6 +44,7 @@ enum ENUM_TEST_AXIS
 	Y,
 	Z,
 };
+
 
 //---------------------------------------------------------------
 void medVMEWrappedMeterTest::TestWithGenericVME()
