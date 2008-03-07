@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 13:08:16 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-03-07 15:03:51 $
+  Version:   $Revision: 1.27 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,7 @@
 #include "mmgLutSwatch.h"
 #include "mafPipeMesh.h"
 #include "mafPipeMeshSlice.h"
+#include "medPipePolylineGraphEditor.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -108,6 +109,7 @@ mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
 	m_LutSlider = NULL;
 	m_LutWidget = NULL;
 	m_ColorLUT= NULL;
+  m_CurrentPolylineGraphEditor = NULL;
 
 	m_SliceCenterSurface[0] = 0.0;
 	m_SliceCenterSurface[1] = 0.0;
@@ -142,7 +144,6 @@ void mafViewArbitrarySlice::PackageView()
   m_ViewSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-  //m_ViewSlice->PlugVisualPipe("medVMEPolylineEditor","mafPipeSurfaceSlice");
 	
 	PlugChildView(m_ViewArbitrary);
 	PlugChildView(m_ViewSlice);
@@ -243,7 +244,8 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//Set camera of slice viw in way that it will follow the volume
 			if(!m_AttachCamera)
 				m_AttachCamera=new mafAttachCamera(m_Gui,((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->m_Rwi,this);
-			m_AttachCamera->SetVme(m_Slicer);
+			m_AttachCamera->SetStartingMatrix(m_Slicer->GetOutput()->GetAbsMatrix());
+      m_AttachCamera->SetVme(m_Slicer);
 			((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_Slicer);
 
 			// create the gizmos
@@ -307,6 +309,31 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 				//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 		}
+    else if(Vme->IsA("medVMEPolylineEditor"))
+    {
+      //a surface is visible only if there is a volume in the view
+      if(m_CurrentVolume)
+      {
+
+        m_CurrentPolylineGraphEditor = (medVMEPolylineEditor*)node;
+
+        double normal[3];
+        ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+        medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(node));
+        PipeSliceViewPolylineEditor->SetModalitySlice();
+
+        double surfaceOriginTranslated[3];
+
+        surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
+        surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
+        surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
+
+        PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
+        PipeSliceViewPolylineEditor->SetNormal(normal);
+        //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+    }
     else if(Vme->IsA("mafVMEMesh"))
     {
       //a surface is visible only if there is a volume in the view
@@ -337,6 +364,11 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 	{
 		//m_ChildViewList[ARBITRARY_VIEW]->VmeShow(node, show);
 		//m_ChildViewList[SLICE_VIEW]->VmeShow(node, show);
+
+    if(Vme->IsA("medVMEPolylineGraphEditor"))
+    {
+      m_CurrentPolylineGraphEditor = NULL;
+    }
 
 		if(((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
@@ -490,6 +522,29 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
         }
 			}
 			iter->Delete();
+      if(m_CurrentPolylineGraphEditor)
+      {
+        //a surface is visible only if there is a volume in the view
+        if(m_CurrentVolume)
+        {
+
+          double normal[3];
+          ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+          medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+          PipeSliceViewPolylineEditor->SetModalitySlice();
+
+          double surfaceOriginTranslated[3];
+
+          surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
+          surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
+          surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
+
+          PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
+          PipeSliceViewPolylineEditor->SetNormal(normal);
+          //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
+      }
 			CameraUpdate();
 			vtkDEL(tr);
 			vtkDEL(TransformReset);
@@ -566,6 +621,29 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
         }
 			}
 			iter->Delete();
+      if(m_CurrentPolylineGraphEditor)
+      {
+        //a surface is visible only if there is a volume in the view
+        if(m_CurrentVolume)
+        {
+
+          double normal[3];
+          ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+          medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+          PipeSliceViewPolylineEditor->SetModalitySlice();
+
+          double surfaceOriginTranslated[3];
+
+          surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
+          surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
+          surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
+
+          PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
+          PipeSliceViewPolylineEditor->SetNormal(normal);
+          //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
+      }
 			CameraUpdate();
 		}
     break;
@@ -673,7 +751,30 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
           }
 				}
 				iter->Delete();
-				break;
+        if(m_CurrentPolylineGraphEditor)
+        {
+          //a surface is visible only if there is a volume in the view
+          if(m_CurrentVolume)
+          {
+
+            double normal[3];
+            ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+
+            medPipePolylineGraphEditor *PipeSliceViewPolylineEditor = medPipePolylineGraphEditor::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe((mafNode*)m_CurrentPolylineGraphEditor));
+            PipeSliceViewPolylineEditor->SetModalitySlice();
+
+            double surfaceOriginTranslated[3];
+
+            surfaceOriginTranslated[0] = m_SliceCenterSurface[0] + normal[0] * 0.1;
+            surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
+            surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
+
+            PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
+            PipeSliceViewPolylineEditor->SetNormal(normal);
+            //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+          }
+        }
+        break;
 			}
 		default:
 			mafViewCompound::OnEvent(maf_event);
@@ -726,9 +827,9 @@ void mafViewArbitrarySlice::VmeRemove(mafNode *node)
 		m_AttachCamera->SetVme(NULL);
     m_CurrentVolume = NULL;
     m_GizmoTranslate->Show(false);
-		m_GizmoTranslate = NULL;
+		cppDEL(m_GizmoTranslate);
 		m_GizmoRotate->Show(false);
-		m_GizmoRotate = NULL;
+		cppDEL(m_GizmoRotate);
   }
 
   Superclass::VmeRemove(node);

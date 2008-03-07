@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 13:08:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-03-07 15:03:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,6 +32,7 @@ class mafAttachCamera;
 class mmgGui;
 class mmgLutSlider;
 class mmgLutSwatch;
+class medVMEPolylineEditor;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
@@ -117,5 +118,7 @@ protected:
 	mmgLutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
 	mmgLutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
 	mmgGui				*m_GuiGizmos;
+
+  medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
 };
 #endif
