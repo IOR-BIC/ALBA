@@ -1,9 +1,10 @@
+
 /*=========================================================================
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransferFunction2DInteractors.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:42:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-10 13:42:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -379,9 +380,9 @@ int vtkWidgetActor::RenderOverlay (vtkViewport *viewport)
   {
     double a = opacityTable[pos];
     unsigned char *rgb = rgbdTable + (pos << 2);
-    *(background++) = unsigned char(rgb[0] * a);
-    *(background++) = unsigned char(rgb[1] * a);
-    *(background++) = unsigned char(rgb[2] * a);
+    *(background++) = (unsigned char)(rgb[0] * a);
+    *(background++) = (unsigned char)(rgb[1] * a);
+    *(background++) = (unsigned char)(rgb[2] * a);
   }
 
   glRasterPos3i(-1, -1, 0);

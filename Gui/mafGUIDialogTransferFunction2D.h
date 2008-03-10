@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:42:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-10 13:42:27 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,8 +57,8 @@ class vtkInteractorStylePreviewImage;
 @sa vtkMAFAdaptiveVolumeRendering mafVisualPipeVolumeRayCasting*/
 class mafGUIDialogTransferFunction2D : public mmgDialog
 {
-  friend vtkInteractorStylePreviewImage;
-  friend vtkInteractorStyleWidget;
+  friend class vtkInteractorStylePreviewImage;
+  friend class vtkInteractorStyleWidget;
 
 public:
 								mafGUIDialogTransferFunction2D();  // reads materials from file

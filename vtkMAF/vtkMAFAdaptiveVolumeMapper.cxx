@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFAdaptiveVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-03-04 17:04:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-03-10 13:42:21 $
+  Version:   $Revision: 1.3 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -729,13 +729,13 @@ template<typename DataType> void vtkMAFAdaptiveVolumeMapper::TraceRay(const doub
   //this->NumOfSkippedVoxels   += numberOfVoxels - ti;
   //--------------------------------------- convert to byte format
   int val = int(r);
-  pixel[0] = val < 0 ? 0 : (val > 255 ? 255 : unsigned char(val));
+  pixel[0] = val < 0 ? 0 : (val > 255 ? 255 : ((unsigned char)(val)));
   val = int(g);
-  pixel[1] = val < 0 ? 0 : (val > 255 ? 255 : unsigned char(val));
+  pixel[1] = val < 0 ? 0 : (val > 255 ? 255 : ((unsigned char)(val)));
   val = int(b);
-  pixel[2] = val < 0 ? 0 : (val > 255 ? 255 : unsigned char(val));
+  pixel[2] = val < 0 ? 0 : (val > 255 ? 255 : ((unsigned char)(val)));
   val = int((1.f - a) * 255.f);
-  pixel[3] = val < 0 ? 0 : (val > 255 ? 255 : unsigned char(val));
+  //pixel[3] = val < 0 ? 0 : (val > 255 ? 255 : (unsigned char(val)));
   //pixel[0] = pixel[1] = pixel[2] = pixel[3]; //show alpha-buffer only
   this->NumOfTracedRays++;
 }
@@ -1351,7 +1351,7 @@ template <typename DataType> void vtkMAFAdaptiveVolumeMapper::PrepareMinMaxDataT
   const double indexToGradient = this->GradientRange[1] / double(VTK_UNSIGNED_SHORT_MAX);
   this->TableIndexToGradient = indexToGradient;
   for (i = this->DataDimensions[0] * this->DataDimensions[1] * this->DataDimensions[2] - 1; i >= 0; i--)
-    gradientIndexPointer[i] = unsigned short(gradientToIndex * gradientPointer[i]); // overflow is already handled
+    gradientIndexPointer[i] = (unsigned short)(gradientToIndex * gradientPointer[i]); // overflow is already handled
     
 
   // create gradient look-up table
