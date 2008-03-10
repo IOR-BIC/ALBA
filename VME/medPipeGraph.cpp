@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 09:38:22 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-03-10 12:33:56 $
+  Version:   $Revision: 1.20 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,19 +48,12 @@ mafCxxTypeMacro(medPipeGraph);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-// constants
-//----------------------------------------------------------------------------
-const int X_VALUES_TO_VALUE = 0;
-const int X_VALUES_TO_INDEX = 1;
-
-//----------------------------------------------------------------------------
 medPipeGraph::medPipeGraph()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
   m_PlotActor	= NULL;
   m_CheckBox  = NULL;
-
 
   m_Xlabel		= 50;
   m_Ylabel		= 50;
@@ -70,7 +63,7 @@ medPipeGraph::medPipeGraph()
   m_Y_title		= "Scalar";
   m_ItemName  = "analog_";
   m_FitPlot = 1;
-  m_Legend    = 0;
+  m_Legend = 0;
 
   m_DataMax = 0;
   m_DataMin = 0;
@@ -78,7 +71,6 @@ medPipeGraph::medPipeGraph()
 
   m_TimeStamp = 0;
   m_ItemId = 0;
-  
 }
 //----------------------------------------------------------------------------
 medPipeGraph::~medPipeGraph()
@@ -93,18 +85,18 @@ medPipeGraph::~medPipeGraph()
 void medPipeGraph::Create(mafSceneNode *n)
 //----------------------------------------------------------------------------
 {
-  int randomColorR, randomColorG, randomColorB;
   double timeData;
   int counter = 0;
   Superclass::Create(n);
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
-  m_NumberOfSignals = m_EmgPlot->GetScalarOutput()->GetScalarData().rows();
+  m_NumberOfSignals = m_EmgPlot->GetScalarOutput()->GetScalarData().rows()-1; //1 row is for time information
   m_DataMin = m_EmgPlot->GetScalarOutput()->GetScalarData().min_value();
   m_DataMax = m_EmgPlot->GetScalarOutput()->GetScalarData().max_value();
   m_TimeStamp = m_EmgPlot->GetScalarOutput()->GetScalarData().columns();
   m_DataManualRange[0] = m_DataMin; //Initialize max data range 
   m_DataManualRange[1] = m_DataMax;
+
   
   m_EmgPlot->Update();
   m_TimeArray = vtkDoubleArray::New();
@@ -146,13 +138,38 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_PlotActor->SetVisibility(1);
   m_PlotActor->SetXValuesToValue();
 
-  for (int n = 0 ; n < m_NumberOfSignals; n++)
+  bool tagPresent = m_Vme->GetTagArray()->IsTagPresent("SIGNALS_COLOR");
+  if (!tagPresent)
   {
-    randomColorR = rand() % 255;
-    randomColorG = rand() % 255;
-    randomColorB = rand() % 255;
-    m_PlotActor->SetPlotColor(n ,randomColorR,randomColorG,randomColorB);
+    mafTagItem tag_Sig;
+    tag_Sig.SetName("SIGNALS_COLOR");
+    tag_Sig.SetNumberOfComponents(m_NumberOfSignals*3); //3 color values each signal
+    m_Vme->GetTagArray()->SetTag(tag_Sig);
   }
+
+  mafTagItem *tag_Signals = m_Vme->GetTagArray()->GetTag("SIGNALS_COLOR");
+  for (long n = 0; n < m_NumberOfSignals; n++)
+  {
+    long id = n*3;
+    if (tagPresent) //Retrieve signals colors from tag
+    {
+      m_ColorRGB[0] = tag_Signals->GetValueAsDouble(id);
+      m_ColorRGB[1] = tag_Signals->GetValueAsDouble(id+1);
+      m_ColorRGB[2] = tag_Signals->GetValueAsDouble(id+2);
+      m_PlotActor->SetPlotColor(n, m_ColorRGB);
+    }
+    else //Create random colors
+    {
+      m_ColorRGB[0] = rand() % 255;
+      m_ColorRGB[1] = rand() % 255;
+      m_ColorRGB[2] = rand() % 255;
+      m_PlotActor->SetPlotColor(n, m_ColorRGB);
+      tag_Signals->SetValue(m_ColorRGB[0], id);
+      tag_Signals->SetValue(m_ColorRGB[1], id+1);
+      tag_Signals->SetValue(m_ColorRGB[2], id+2);
+    }
+  }
+
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);   
 }
@@ -161,26 +178,49 @@ void medPipeGraph::Create(mafSceneNode *n)
 void medPipeGraph::UpdateGraph()
 //----------------------------------------------------------------------------
 {
-  double scalarData;
+  double scalarData = 0;
   int counter_array = 0;
   vtkDoubleArray *scalar;
   vnl_vector<double> row;
   m_vtkData.clear();
-  scalar_Array.clear();
+  m_ScalarArray.clear();
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
 
-  CreateLegend();
+
 
    vtkMAFSmartPointer<vtkDoubleArray> newTimeArray;
+   vtkMAFSmartPointer<vtkDoubleArray> fakeTimeArray;
 
-  for (int c = 0; c < (m_NumberOfSignals-1) ; c++)
+   //cycle to get a fake scalar value
+   for (int c = 0; c < m_NumberOfSignals ; c++)
+   {
+     if (m_CheckBox->IsItemChecked(c)) //fill the vector with vtkDoubleArray of signals checked
+     {
+       int counter = 0;
+       scalar = vtkDoubleArray::New();
+       row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
+
+       if (m_FitPlot)
+       {
+         for (int t = 0; t < m_TimeStamp; t++) 
+         { 
+           newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
+           scalarData = row.get(t);
+           break;
+         }
+       }
+     }
+   }
+
+
+  for (int c = 0; c < m_NumberOfSignals ; c++)
   {
-    if (m_CheckBox->IsItemChecked(c))
+    if (m_CheckBox->IsItemChecked(c)) //fill the vector with vtkDoubleArray of signals checked
     {
       int counter = 0;
       scalar = vtkDoubleArray::New();
-      row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1);
+      row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
       
       if (m_FitPlot)
       {
@@ -192,7 +232,7 @@ void medPipeGraph::UpdateGraph()
           counter++;
         }
       }
-      else //if not Autofit plot, get values inside m_TimeManualrange
+      else //if not Autofit plot, get values inside m_TimeManualRange
       {
         for (int t = 0; t < m_TimeStamp; t++) 
         { 
@@ -205,19 +245,31 @@ void medPipeGraph::UpdateGraph()
           }
         }
       }
-      scalar_Array.push_back(scalar);
-          
+      
+      m_ScalarArray.push_back(scalar);
       vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
-
       rect_grid->SetDimensions(newTimeArray->GetSize(), 1, 1);
       rect_grid->SetXCoordinates(newTimeArray); 
-      rect_grid->GetPointData()->SetScalars(scalar_Array.at(counter_array));
-      
+      rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
       m_vtkData.push_back(rect_grid);
-      m_PlotActor->AddInput(m_vtkData.at(counter_array));
-      counter_array++;
-    }    
+      m_PlotActor->AddInput(m_vtkData.at(c));
+    }
+    else
+    {
+      scalar = vtkDoubleArray::New();
+      fakeTimeArray->Resize(0);
+      scalar->InsertValue(0, scalarData);  //now scalarData is a fake value, already present in the plot
+      m_ScalarArray.push_back(scalar);
+
+      vtkRectilinearGrid *rect_grid;
+      rect_grid = vtkRectilinearGrid::New();
+      rect_grid->SetDimensions(fakeTimeArray->GetSize(), 1, 1);
+      rect_grid->SetXCoordinates(fakeTimeArray); 
+      rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
+      m_vtkData.push_back(rect_grid);
+      m_PlotActor->AddInput(m_vtkData.at(c));
+    }
   }
 
   row.clear();
@@ -226,15 +278,16 @@ void medPipeGraph::UpdateGraph()
   double minY = 0;
   double maxY = 0;
 
-  for (unsigned long i = 0; i < m_vtkData.size(); i++)
+  for (int i = 0; i < m_ScalarArray.size(); i++)
   {
-    scalar_Array.at(i)->GetRange(m_DataRange);
+    double dataRange[2];
+    m_ScalarArray.at(i)->GetRange(dataRange);
 
-    if(m_DataRange[0] < minY)
-      minY = m_DataRange[0];
+    if(dataRange[0] < minY)
+      minY = dataRange[0];
 
-    if(m_DataRange[1] > maxY)
-      maxY = m_DataRange[1];
+    if(dataRange[1] > maxY)
+      maxY = dataRange[1];
   }
 
   if (m_FitPlot)
@@ -249,6 +302,7 @@ void medPipeGraph::UpdateGraph()
   m_PlotActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
   m_PlotActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
   m_RenFront->AddActor2D(m_PlotActor);
+  CreateLegend();
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::CreateLegend()
@@ -256,15 +310,24 @@ void medPipeGraph::CreateLegend()
 {
   int counter_legend = 0;
   mafString name; 
-  for (int c = 0; c < (m_NumberOfSignals - 1) ; c++)
+  mafTagItem *tag_Signals = m_Vme->GetTagArray()->GetTag("SIGNALS_COLOR");
+  m_PlotActor->RemoveAllInputs();
+  for (int c = 0; c < m_NumberOfSignals ; c++)
   {
+    int idx = c*3;
     if (m_CheckBox->IsItemChecked(c))
-    {
-        name = m_CheckBox->GetItemLabel(c);
-        m_LegendBox_Actor->SetNumberOfEntries(m_NumberOfSignals);
-        m_LegendBox_Actor->SetEntryString(counter_legend,name);
-        counter_legend++;
-      }
+    { 
+      m_PlotActor->AddInput(m_vtkData.at(c));
+      m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
+      name = m_CheckBox->GetItemLabel(c);
+      m_LegendBox_Actor->SetEntryString(counter_legend, name.GetCStr());
+
+      m_ColorRGB[0] = tag_Signals->GetValueAsDouble(idx);
+      m_ColorRGB[1] = tag_Signals->GetValueAsDouble(idx+1);
+      m_ColorRGB[2] = tag_Signals->GetValueAsDouble(idx+2);
+      m_LegendBox_Actor->SetEntryColor(counter_legend, m_ColorRGB);
+      counter_legend++;
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -278,17 +341,32 @@ void medPipeGraph::ChangeItemName()
 }
 
 //----------------------------------------------------------------------------
+void medPipeGraph::ChangeSignalColor()
+//----------------------------------------------------------------------------
+{
+  m_PlotActor->SetPlotColor(m_ItemId, m_ColorRGB);
+  mafTagItem *t = m_Vme->GetTagArray()->GetTag("SIGNALS_COLOR");
+
+  long colorId = m_ItemId*3;
+  t->SetValue(m_ColorRGB[0], colorId);
+  t->SetValue(m_ColorRGB[1], colorId+1);
+  t->SetValue(m_ColorRGB[2], colorId+2);
+  m_CheckBox->Update();
+}
+
+//----------------------------------------------------------------------------
 mmgGui* medPipeGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
   if(m_Gui == NULL) 
     m_Gui = new mmgGui(this);
 
-  m_Gui->String(ID_ITEM_NAME,_("name :"), &m_ItemName,_(""));
+  m_Gui->String(ID_ITEM_NAME,_("Name :"), &m_ItemName,_(""));
+  m_Gui->Color(ID_SIGNALS_COLOR, _("Color"), &m_SignalColor, _("Set signal color"));
   m_Gui->Divider(1);
 
-  m_Gui->VectorN(ID_RANGE_X, _("range x"), m_TimesManualRange, 2, 0, m_TimeStampMax);
-  m_Gui->VectorN(ID_RANGE_Y, _("range y"), m_DataManualRange, 2, m_DataMin, m_DataMax);
+  m_Gui->VectorN(ID_RANGE_X, _("Range X"), m_TimesManualRange, 2, 0, m_TimeStampMax);
+  m_Gui->VectorN(ID_RANGE_Y, _("Range Y"), m_DataManualRange, 2, m_DataMin, m_DataMax);
 
   m_Gui->Enable(ID_RANGE_X, !m_FitPlot);
   m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
@@ -319,18 +397,18 @@ mmgGui* medPipeGraph::CreateGui()
   }
 
   mafTagItem *tag_Signals = m_Vme->GetTagArray()->GetTag("SIGNALS_NAME");
-  for (int n = 1; n < m_NumberOfSignals; n++)
+  for (int n = 0; n < m_NumberOfSignals; n++)
   {
     if (tagPresent)
     {
-      name = tag_Signals->GetValue(n-1);
+      name = tag_Signals->GetValue(n);
     }
     else
     {
       name = m_ItemName + wxString::Format("%d", n);
-      tag_Signals->SetValue(name.c_str(), n-1);
+      tag_Signals->SetValue(name.c_str(), n);
     }
-     m_CheckBox->AddItem(n-1 , name, checked);
+     m_CheckBox->AddItem(n , name, checked);
   }
   return m_Gui;
 }
@@ -362,6 +440,15 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
       }
+      break;
+    case ID_SIGNALS_COLOR:
+      m_ColorRGB[0] = m_SignalColor.Red()/255.0;
+      m_ColorRGB[1] = m_SignalColor.Green()/255.0;
+      m_ColorRGB[2] = m_SignalColor.Blue()/255.0;
+      //m_PlotActor->SetPlotColor(m_ItemId, m_ColorRGB);
+      ChangeSignalColor();
+      m_PlotActor->RemoveAllInputs();
+      UpdateGraph();
       break;
     case ID_DRAW:
       {

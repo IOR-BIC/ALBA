@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 09:38:22 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-03-10 12:33:56 $
+  Version:   $Revision: 1.13 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,13 +42,16 @@ public:
   virtual void Create(mafSceneNode *n);
 
   //Create plots of scalar data
-  void medPipeGraph::UpdateGraph();
+  void UpdateGraph();
 
   //Change the name of the selected item in the legend box
-  void medPipeGraph::ChangeItemName();
+  void ChangeItemName();
+
+  //Change signal color
+  void ChangeSignalColor();
   
 protected:
-  mmgGui* medPipeGraph::CreateGui();
+  mmgGui* CreateGui();
 
   enum PIPE_GRAPH_GUI_WIDGETS
   {
@@ -60,6 +63,7 @@ protected:
     ID_RANGE_X,
     ID_RANGE_Y,
     ID_FIT_PLOT,
+    ID_SIGNALS_COLOR,
     ID_LAST
   };
 
@@ -68,14 +72,15 @@ protected:
 
 private:
   //create the legend
-  void medPipeGraph::CreateLegend();
+  void CreateLegend();
 
   double m_OldColour[3];
+  double m_ColorRGB[3];
+  wxColor m_SignalColor;
 
   double      m_DataMax;
   double      m_DataMin;
   double      m_TimeStampMax;
-  double      m_DataRange[2];
   double      m_TimesRange[2];
   double      m_DataManualRange[2];
   double      m_TimesManualRange[2];
@@ -94,12 +99,12 @@ private:
 
   std::vector<vtkRectilinearGrid*> m_vtkData;
 
-  std::vector<vtkDoubleArray*> scalar_Array;
+  std::vector<vtkDoubleArray*> m_ScalarArray;
  
   vtkDoubleArray      *m_TimeArray;
   std::vector<mafTimeStamp> m_TimeVector;  
 
-  medVMEAnalog      *m_EmgPlot;
+  medVMEAnalog   *m_EmgPlot;
   vtkXYPlotActor *m_PlotActor;
 };  
 #endif // __medPipeGraph_H__
