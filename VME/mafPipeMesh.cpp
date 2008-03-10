@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-04 15:11:56 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-03-10 15:45:31 $
+Version:   $Revision: 1.9 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -581,5 +581,7 @@ void mafPipeMesh::CreateFieldDataControlArrays()
   }
 
   m_PointCellArraySeparation = pointArrayNumber;
+
+  delete []tempScalarsPointsName;
 
 }
