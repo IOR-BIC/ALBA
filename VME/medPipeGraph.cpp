@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-10 12:33:56 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-03-10 14:30:37 $
+  Version:   $Revision: 1.21 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -187,8 +187,6 @@ void medPipeGraph::UpdateGraph()
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
 
-
-
    vtkMAFSmartPointer<vtkDoubleArray> newTimeArray;
    vtkMAFSmartPointer<vtkDoubleArray> fakeTimeArray;
 
@@ -197,7 +195,7 @@ void medPipeGraph::UpdateGraph()
    {
      if (m_CheckBox->IsItemChecked(c)) //fill the vector with vtkDoubleArray of signals checked
      {
-       int counter = 0;
+
        scalar = vtkDoubleArray::New();
        row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
 
@@ -205,7 +203,6 @@ void medPipeGraph::UpdateGraph()
        {
          for (int t = 0; t < m_TimeStamp; t++) 
          { 
-           newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
            scalarData = row.get(t);
            break;
          }
@@ -223,7 +220,7 @@ void medPipeGraph::UpdateGraph()
       row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
       
       if (m_FitPlot)
-      {
+       {
         for (int t = 0; t < m_TimeStamp; t++) 
         { 
           newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
@@ -231,25 +228,25 @@ void medPipeGraph::UpdateGraph()
           scalar->InsertValue(counter, scalarData);
           counter++;
         }
-      }
-      else //if not Autofit plot, get values inside m_TimeManualRange
-      {
-        for (int t = 0; t < m_TimeStamp; t++) 
-        { 
-          if (m_TimesManualRange[0] <= m_TimeArray->GetValue(t) && m_TimeArray->GetValue(t) <= m_TimesManualRange[1])
-          {
-            newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
-            scalarData = row.get(t);
-            scalar->InsertValue(counter, scalarData);
-            counter++;
-          }
+     }
+     else //if not Autofit plot, get values inside m_TimeManualRange
+     {
+      for (int t = 0; t < m_TimeStamp; t++) 
+      { 
+        if (m_TimesManualRange[0] <= m_TimeArray->GetValue(t) && m_TimeArray->GetValue(t) <= m_TimesManualRange[1])
+        {
+          newTimeArray->InsertValue(counter, m_TimeArray->GetValue(t));
+          scalarData = row.get(t);
+          scalar->InsertValue(counter, scalarData);
+          counter++;
         }
+      }
       }
       
       m_ScalarArray.push_back(scalar);
       vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
-      rect_grid->SetDimensions(newTimeArray->GetSize(), 1, 1);
+      rect_grid->SetDimensions(newTimeArray->GetNumberOfTuples(), 1, 1);
       rect_grid->SetXCoordinates(newTimeArray); 
       rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
       m_vtkData.push_back(rect_grid);
@@ -264,7 +261,7 @@ void medPipeGraph::UpdateGraph()
 
       vtkRectilinearGrid *rect_grid;
       rect_grid = vtkRectilinearGrid::New();
-      rect_grid->SetDimensions(fakeTimeArray->GetSize(), 1, 1);
+      rect_grid->SetDimensions(fakeTimeArray->GetNumberOfTuples(), 1, 1);
       rect_grid->SetXCoordinates(fakeTimeArray); 
       rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
       m_vtkData.push_back(rect_grid);
@@ -445,7 +442,6 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
       m_ColorRGB[0] = m_SignalColor.Red()/255.0;
       m_ColorRGB[1] = m_SignalColor.Green()/255.0;
       m_ColorRGB[2] = m_SignalColor.Blue()/255.0;
-      //m_PlotActor->SetPlotColor(m_ItemId, m_ColorRGB);
       ChangeSignalColor();
       m_PlotActor->RemoveAllInputs();
       UpdateGraph();
