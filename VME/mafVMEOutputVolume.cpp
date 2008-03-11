@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 16:26:57 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-03-11 19:12:44 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -141,8 +141,8 @@ void mafVMEOutputVolume::Update()
     double srange[2];
     this->GetVTKData()->Update();
     this->GetVTKData()->GetScalarRange(srange);
-    m_ScaralRangeString = "";
-    m_ScaralRangeString << " min: " << srange[0] << "    max: " << srange[1];
+    m_ScaralRangeString = wxString::Format("min: %6.2f max: %6.2f", srange[0], srange[1]);;
+    //m_ScaralRangeString << " min: " << srange[0] << "    max: " << srange[1];
   }
   
   if (m_Gui)
