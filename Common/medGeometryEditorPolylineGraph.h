@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-02-27 18:12:03 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-03-11 10:35:54 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -142,6 +142,8 @@ protected:
 
 	/** Update VME Editor behavior and VME Input behavior */
 	void BehaviorUpdate();
+
+  double ComputeDistancePointLine(double lineP0[3],double lineP1[3],double point[3]);
 
 	/**
 	Register the event receiver object*/
