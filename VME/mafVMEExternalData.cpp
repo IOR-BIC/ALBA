@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:58:29 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-03-11 17:29:32 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -145,24 +145,13 @@ int mafVMEExternalData::InternalStore(mafStorageElement *parent)
 //-----------------------------------------------------------------------
 {
   InitializeCurrentPath();
-
-  wxString path, pathTarget, name, ext;
   
-  mafTagItem *t = GetTagArray()->GetTag("EXTDATA_FILENAME");
-  wxString nameNew = t->GetValue();
-
-  mafTagItem *item=this->GetTagArray()->GetTag("EXTDATA_EXTENSION");
-  wxString extNew = item->GetValue();
-
-  wxSplitPath(nameNew, &pathTarget, &name, &ext);
-
   mafString fileNameOrigin =  GetTmpPath() + "/" + GetFileName() + "." + GetExtension(); 
-  mafString fileNameTarget = m_MSFPath + "/" + name + "." + extNew;
+  mafString fileNameTarget = m_MSFPath + "/" + GetFileName() + "." + GetExtension();
 
-  bool copySuccess = wxCopyFile(fileNameOrigin.GetCStr(), fileNameTarget.GetCStr());
-  if (copySuccess)
+  if (!fileNameOrigin.Equals(fileNameTarget))
   {
-    t->SetValue(name);
+    bool copySuccess = wxCopyFile(fileNameOrigin.GetCStr(), fileNameTarget.GetCStr());
   }
   return Superclass::InternalStore(parent);
 }
