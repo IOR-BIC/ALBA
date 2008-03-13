@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-11 17:29:32 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-03-13 17:51:26 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -90,21 +90,28 @@ mafString mafVMEExternalData::GetAbsoluteFileName()
   {
     InitializeCurrentPath();
     filename = m_MSFPath;
-   }
-
-  // if m_MSFPath is still empty, than the file is not stored yet and I must use TmpPath
-  if (m_MSFPath.IsEmpty())
-  {
-    GetTmpPath();
-    filename = m_TmpPath;
   }
-
+  
   filename.Append("\\");
   filename.Append(this->GetFileName());
   filename.Append(".");
   filename.Append(this->GetExtension());
 
-  return filename;
+  if (wxFileExists(filename.GetCStr()))
+  {
+    return filename;
+  }
+  else
+  {
+    // if file not exists, than the file is not stored yet and I must use TmpPath
+    GetTmpPath();
+    filename = m_TmpPath;
+    filename.Append("\\");
+    filename.Append(this->GetFileName());
+    filename.Append(".");
+    filename.Append(this->GetExtension());
+    return filename; 
+  }
 }
 
 //-------------------------------------------------------------------------
