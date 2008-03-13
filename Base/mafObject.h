@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-03-13 17:02:32 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,14 +74,15 @@ public:
 
   mafObject(const mafObject& c) {}
 
-#ifdef _WIN32
-    // avoid dll boundary problems
-  void* operator new( size_t tSize );
-  void operator delete( void* p );
+#ifndef _DEBUG
+	#ifdef _WIN32
+		// avoid dll boundary problems
+	  void* operator new( size_t tSize );
+	  void operator delete( void* p );
+	#endif
 #endif
 
 protected:
   bool m_HeapFlag; ///< Internally used to mark objects created on the Heap with New()
 };
-
 #endif /* __mafObject_h */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafObject.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-24 08:52:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-03-13 17:02:32 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,24 +28,25 @@ class mafObjectDictionaryType
   mafObjectDictionaryType() {if (m_TypeIDs==NULL) m_TypeIDs=new std::map<std::string,mafID>;}
   ~mafObjectDictionaryType() {if (m_TypeIDs) delete m_TypeIDs;} // this is to allow memory deallocation
 }; 
+#ifndef _DEBUG
+  #ifdef _WIN32
+  //------------------------------------------------------------------------------
+  // avoid dll boundary problems
+  void* mafObject::operator new(size_t nSize)
+  //------------------------------------------------------------------------------
+  {
+    void* p=malloc(nSize);
+    return p;
+  }
 
-#ifdef _WIN32
-//------------------------------------------------------------------------------
-// avoid dll boundary problems
-void* mafObject::operator new(size_t nSize)
-//------------------------------------------------------------------------------
-{
-  void* p=malloc(nSize);
-  return p;
-}
-
-//------------------------------------------------------------------------------
-void mafObject::operator delete( void *p )
-//------------------------------------------------------------------------------
-{
-  free(p);
-}
-#endif 
+  //------------------------------------------------------------------------------
+  void mafObject::operator delete( void *p )
+  //------------------------------------------------------------------------------
+  {
+    free(p);
+  }
+  #endif 
+#endif
 
 //------------------------------------------------------------------------------
 mafObject::mafObject():m_HeapFlag(0)
