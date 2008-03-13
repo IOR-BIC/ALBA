@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-13 17:07:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,11 +45,14 @@ class vtkVolume;
 //----------------------------------------------------------------------------
 // mafOpExtractIsosurface :
 //----------------------------------------------------------------------------
-/** */
+/** This operation generate a surface representing a collection of a selected scalar value of the input volume.
+The operation offers a preview of the Iso-Density-Surface and offers also a section of the volume with the 
+contour of the surface itself. The user can pick also into the slice with the left mouse button to generate the 
+corresponding iso-density-surface.*/
 class mafOpExtractIsosurface: public mafOp
 {
 public:
-	mafOpExtractIsosurface(const wxString &label = "ExtractIsosurface");
+	mafOpExtractIsosurface(const wxString &label = "Extract Isosurface");
  ~mafOpExtractIsosurface(); 
 	
   mafTypeMacro(mafOpExtractIsosurface, mafOp);
