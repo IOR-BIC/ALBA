@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 15:29:18 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-03-13 15:29:50 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,9 @@ public:
 
   /**Set an initial transform matrix before attaching camera, this method must be called before SetVme*/
   void SetStartingMatrix(mafMatrix *matrix);
+
+  void EnableAttachCamera(){m_CameraAttach = TRUE;};
+  void DisableAttachCamera(){m_CameraAttach = FALSE;};
 
 protected:
   /** 
