@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-11 13:49:26 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-03-13 16:51:43 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,15 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
-  virtual void Select(bool select); 
+  virtual void Select(bool select);
+
+  /** Get assembly front/back */
+  virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
+
+  void SetBoundsMode(int mode){if(mode>=BOUNDS_3D && mode<=BOUNDS_4D_SUBTREE)m_BoundsMode=mode;};
+  int  GetBoundsMode(){return m_BoundsMode;};
+
 
   /** IDs for the GUI */
   enum PIPE_BOX_WIDGET_ID
@@ -48,7 +56,6 @@ public:
     ID_LAST
   };
 
-protected:
   enum BOUNDS_MODE
   {
     BOUNDS_3D = 0,
@@ -56,6 +63,8 @@ protected:
     BOUNDS_3D_SUBTREE,
     BOUNDS_4D_SUBTREE
   };
+
+protected:
 
   vtkOutlineSource       *m_Box;
   vtkPolyDataMapper	     *m_Mapper;
