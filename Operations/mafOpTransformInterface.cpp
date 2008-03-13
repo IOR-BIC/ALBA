@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-13 17:50:13 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -152,6 +152,8 @@ void mafOpTransformInterface::OpDo()
       !m_Input->IsA("mafVMELandmark") && 
       //  parametric surfaces do not scale
       !m_Input->IsA("mafVMESurfaceParametric") &&
+      //  refSys do not scale
+      !m_Input->IsA("mafVMERefSys") &&
       //  slicer  do not scale
       !m_Input->IsA("mafVMESlicer")
      )
