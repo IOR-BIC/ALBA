@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-21 11:51:51 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2008-03-13 17:06:52 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -44,6 +44,8 @@ extern int MAFWidgetId;
 //----------------------------------------------------------------------------
 // Constants :
 //----------------------------------------------------------------------------
+#pragma warning(push)
+#pragma warning (disable:4005)
 
 #define MININT    -32000
 #define MAXINT     32000
@@ -51,6 +53,7 @@ extern int MAFWidgetId;
 #define MAXFLOAT   2000000000
 #define MINDOUBLE -1.0e+299
 #define MAXDOUBLE 1.0e+299
+#pragma warning(pop)
 
 //----------------------------------------------------------------------------
 // Constants to be used with mmgGUI::GetMetrics()
