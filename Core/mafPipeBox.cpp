@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 14:18:45 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-03-13 16:52:05 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,8 +118,11 @@ void mafPipeBox::Create(mafSceneNode *n/*, bool use_axes*/)
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
-  m_Axes = new mafAxes(m_RenFront,m_Vme);
-  m_Axes->SetVisibility(0);
+  if(m_RenFront)
+  {
+    m_Axes = new mafAxes(m_RenFront, m_Vme);
+    m_Axes->SetVisibility(0);
+  }
 }
 //----------------------------------------------------------------------------
 mafPipeBox::~mafPipeBox()
