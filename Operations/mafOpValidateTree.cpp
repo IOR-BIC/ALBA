@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 12:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-14 13:21:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -99,16 +99,22 @@ bool mafOpValidateTree::ValidateTree()
         mafNode::mafLinksMap::iterator lnk_it;
         for (lnk_it = node->GetLinks()->begin(); lnk_it != node->GetLinks()->end(); lnk_it++)
         {
-          valid = lnk_it->second.m_Node->IsValid();
-          if (!valid && !lnk_it->second.m_Node->IsMAFType(mafVMERoot))
+          if (lnk_it->second.m_Node == NULL)
           {
-            ErrorLog(mafOpValidateTree::INVALID_NODE, lnk_it->second.m_Node->GetName());
+            ErrorLog(mafOpValidateTree::LINK_NULL, node->GetName(), lnk_it->first);
             result = false;
+            continue;
           }
           valid = root->IsInTree(lnk_it->second.m_Node);
           if (!valid)
           {
             ErrorLog(mafOpValidateTree::LINK_NOT_PRESENT, lnk_it->second.m_Node->GetName());
+            result = false;
+          }
+          valid = lnk_it->second.m_Node->IsValid();
+          if (!valid && !lnk_it->second.m_Node->IsMAFType(mafVMERoot))
+          {
+            ErrorLog(mafOpValidateTree::INVALID_NODE, lnk_it->second.m_Node->GetName());
             result = false;
           }
         }
@@ -190,7 +196,7 @@ bool mafOpValidateTree::ValidateTree()
   return result;
 }
 //----------------------------------------------------------------------------
-void mafOpValidateTree::ErrorLog(int error_num, const char *node_name)
+void mafOpValidateTree::ErrorLog(int error_num, const char *node_name, const char *description)
 //----------------------------------------------------------------------------
 {
   switch(error_num)
@@ -200,6 +206,9 @@ void mafOpValidateTree::ErrorLog(int error_num, const char *node_name)
     break;
     case mafOpValidateTree::LINK_NOT_PRESENT:
       mafLogMessage(_("link node %s is not present into the tree"), node_name);
+    break;
+    case mafOpValidateTree::LINK_NULL:
+      mafLogMessage(_("link %s of node %s is null"), description, node_name);
     break;
     case mafOpValidateTree::EXCEPTION_ON_ITERATOR:
       mafLogMessage(_("exception occurred during iteration on node %s"), node_name);

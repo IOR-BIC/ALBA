@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 12:50:24 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-14 13:21:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,12 +49,13 @@ protected:
   bool ValidateTree();
 
   /** Log errors into the log area according to the error number reported.*/
-  void ErrorLog(int error_num, const char *node_name);
+  void ErrorLog(int error_num, const char *node_name, const char *description = NULL);
 
   enum ERROR_IDS
   {
     INVALID_NODE = 0,
     LINK_NOT_PRESENT,
+    LINK_NULL,
     EXCEPTION_ON_ITERATOR,
     ITEM_NOT_PRESENT,
     URL_EMPTY,
