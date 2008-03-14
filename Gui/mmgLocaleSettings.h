@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.h,v $
 Language:  C++
-Date:      $Date: 2008-02-19 09:49:14 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-03-14 13:22:18 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -43,6 +43,12 @@ public:
   bool GetEnableLanguage(){return m_EnableLanguage;};
   void EnableLanguageOn(){m_EnableLanguage = true;};
   void EnableLanguageOff(){m_EnableLanguage = false;};
+
+  /*Function for set language directory*/
+  void SetLanguageDirectory(const char* prefix, const char* languageDirectory);
+
+  /* Function for set a different language*/
+  void ChangeLanguage(wxLanguage languageEnum = wxLANGUAGE_ENGLISH , const char *languageAcronym = "en");
 
 protected:
   /** Create the GUI for the setting panel.*/
