@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 19:20:05 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-03-14 13:20:40 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -456,21 +456,29 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 			{
 				if(m_Radio==0)
 				{
+          // Normal RefSys
 					this->RemoveAllLinks();
+          m_OriginVmeName = _("none");
+          m_Point1VmeName = _("none");
+          m_Point2VmeName = _("none");
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,false);
 					m_Gui->Enable(ID_POINT1,false);
 					m_Gui->Enable(ID_POINT2,false);
 				}
 				else if(m_Radio==1)
 				{
+          // RefSys with Origin link
 					this->RemoveLink("Point1VME");
 					this->RemoveLink("Point2VME");
+          m_Point1VmeName = _("none");
+          m_Point2VmeName = _("none");
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,false);
 					m_Gui->Enable(ID_POINT2,false);
 				}
 				else if(m_Radio==2)
 				{
+          // RefSys with all the link enabled: origin, point1 and point2
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,true);
 					m_Gui->Enable(ID_POINT2,true);
@@ -677,7 +685,9 @@ void mafVMERefSys::SetRefSysLink(const char *link_name, mafNode *n)
     SetLink(link_name,n->GetParent(),((mafVMELandmarkCloud *)n->GetParent())->FindLandmarkIndex(n->GetName()));
   }
   else
+  {
     SetLink(link_name, n);
+  }
 }
 //-------------------------------------------------------------------------
 mafVME *mafVMERefSys::GetPoint1VME()
