@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-28 10:19:43 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-03-14 09:57:32 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -219,7 +219,8 @@ void medPipeTrajectories::UpdateProperty(bool fromTag)
 
   if (m_MatrixVector)
   {
-    for (int i = 0; i< m_TimeVector.size(); i++)
+    int i;
+    for (i = 0; i< m_TimeVector.size(); i++)
     { 
       if (m_TimeVector[i] > t0)
       {
