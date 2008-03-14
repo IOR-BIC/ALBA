@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-23 09:00:20 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-03-14 16:26:09 $
+Version:   $Revision: 1.13 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -66,15 +66,15 @@ MafMedical is partially based on OpenMAF.
 
 #ifndef _DEBUG
 	//IMPORTERS
-	#include "mmoImageImporter.h"
-	#include "mmoVRMLImporter.h"
-	#include "mmoVTKImporter.h"
-	#include "mmoSTLImporter.h"
-	#include "mmoMSF1xImporter.h"
-	#include "mmoRAWImporterVolume.h"
-	#include "mmoMeshImporter.h"
+	#include "mafOpImporterImage.h"
+	#include "mafOpImporterVRML.h"
+	#include "mafOpImporterVTK.h"
+	#include "mafOpImporterSTL.h"
+	#include "mafOpImporterMSF1x.h"
+	#include "mafOpImporterRAWVolume.h"
+	#include "mafOpImporterMesh.h"
 	#ifdef MAF_USE_ITK
-		#include "mmoASCIIImporter.h"
+		#include "mafOpImporterASCII.h"
 		#include "mmoEMGImporterWS.h"
 		#include "mmoGRFImporterWS.h"
 	#endif
@@ -89,37 +89,37 @@ MafMedical is partially based on OpenMAF.
 #endif
 #ifndef _DEBUG
 	//EXPORTERS
-	#include "mmoMSFExporter.h"
-	#include "mmoRAWExporter.h"
-	#include "mmoSTLExporter.h"
-	#include "mmoVTKExporter.h"
+	#include "mafOpExporterMSF.h"
+	#include "mafOpExporterRAW.h"
+	#include "mafOpExporterSTL.h"
+	#include "mafOpExporterVTK.h"
 	#include "mmoLandmarkExporter.h"
 #endif
 #ifndef _DEBUG
 	//OPERATIONS
-	#include "mmo2DMeasure.h"
-	#include "mmoAddLandmark.h"
-	#include "mmoClipSurface.h"
-	#include "mmoCreateGroup.h"
-	#include "mmoCreateMeter.h"
-	#include "mmoCreateProber.h"
-	#include "mmoCreateRefSys.h"
-	#include "mmoCreateSlicer.h"
-	#include "mmoCrop.h"
-	#include "mmoEditMetadata.h"
-	#include "mmoExplodeCollapse.h"
-	#include "mmoExtractIsosurface.h"
-	#include "mmoFilterSurface.h"
-	#include "mmoFilterVolume.h"
-	#include "mmoMAFTransform.h"
-	#include "mmoReparentTo.h"
-	#include "mmoVolumeResample.h"
-	#include "mmoDecimateSurface.h"
-	#include "mmoConnectivitySurface.h"
-	#include "mmoBooleanSurface.h"
-	#include "mmoEditNormals.h"
-	#include "mmoCreateSurfaceParametric.h"
-	#include "mmoVOIDensity.h"
+	#include "mafOp2DMeasure.h"
+	#include "mafOpAddLandmark.h"
+	#include "mafOpClipSurface.h"
+	#include "mafOpCreateGroup.h"
+	#include "mafOpCreateMeter.h"
+	#include "mafOpCreateProber.h"
+	#include "mafOpCreateRefSys.h"
+	#include "mafOpCreateSlicer.h"
+	#include "mafOpCrop.h"
+	#include "mafOpEditMetadata.h"
+	#include "mafOpExplodeCollapse.h"
+	#include "mafOpExtractIsosurface.h"
+	#include "mafOpFilterSurface.h"
+	#include "mafOpFilterVolume.h"
+	#include "mafOpMAFTransform.h"
+	#include "mafOpReparentTo.h"
+	#include "mafOpVolumeResample.h"
+	#include "mafOpDecimateSurface.h"
+	#include "mafOpConnectivitySurface.h"
+	#include "mafOpBooleanSurface.h"
+	#include "mafOpEditNormals.h"
+	#include "mafOpCreateSurfaceParametric.h"
+	#include "mafOpVOIDensity.h"
   #include "medOpScaleDataset.h"
   #include "medOpMove.h"
 #ifdef MAF_USE_ITK
@@ -131,8 +131,8 @@ MafMedical is partially based on OpenMAF.
 	#include "mmoVolumeMeasure.h"
 	#include "mmoRegisterClusters.h"
 	#include "mmoFlipNormals.h"
-	#include "mmoCreateSpline.h"
-	#include "mmoRemoveCells.h"
+	#include "mafOpCreateSpline.h"
+	#include "mafOpRemoveCells.h"
 	#include "mmoExtrusionHoles.h"
 #endif
 
@@ -187,15 +187,15 @@ bool exMedicalApp::OnInit()
 	// Importer Menu':
 	//------------------------------------------------------------
 #ifndef _DEBUG
-	m_Logic->Plug(new mmoImageImporter("Images"));
-	m_Logic->Plug(new mmoRAWImporterVolume("RAW Volume"));
-	m_Logic->Plug(new mmoSTLImporter("STL"));
-	m_Logic->Plug(new mmoVRMLImporter("VRML"));
-	m_Logic->Plug(new mmoVTKImporter("VTK"));
-	m_Logic->Plug(new mmoMSF1xImporter("MSF 1.x"));
-	m_Logic->Plug(new mmoMeshImporter("Mesh"));
+	m_Logic->Plug(new mafOpImporterImage("Images"));
+	m_Logic->Plug(new mafOpImporterRAWVolume("RAW Volume"));
+	m_Logic->Plug(new mafOpImporterSTL("STL"));
+	m_Logic->Plug(new mafOpImporterVRML("VRML"));
+	m_Logic->Plug(new mafOpImporterVTK("VTK"));
+	m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
+	m_Logic->Plug(new mafOpImporterMesh("Mesh"));
 #ifdef MAF_USE_ITK
-		m_Logic->Plug(new mmoASCIIImporter("ASCII"));
+		m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
 	m_Logic->Plug(new mmoDICOMImporter("DICOM"),"DICOM Suite");
 	m_Logic->Plug(new mmoCTAImporter("CTA-DSA"),"DICOM Suite");
@@ -217,10 +217,10 @@ bool exMedicalApp::OnInit()
 	// Exporter Menu':
 	//------------------------------------------------------------
 #ifndef _DEBUG
-	m_Logic->Plug(new mmoMSFExporter("MSF"));
-	m_Logic->Plug(new mmoSTLExporter("STL"));
-	m_Logic->Plug(new mmoVTKExporter("VTK"));
-	m_Logic->Plug(new mmoRAWExporter("Raw"));
+	m_Logic->Plug(new mafOpExporterMSF("MSF"));
+	m_Logic->Plug(new mafOpExporterSTL("STL"));
+	m_Logic->Plug(new mafOpExporterVTK("VTK"));
+	m_Logic->Plug(new mafOpExporterRAW("Raw"));
 	m_Logic->Plug(new mmoLandmarkExporter("Landmark"));
 #endif
 	//------------------------------------------------------------
@@ -229,38 +229,38 @@ bool exMedicalApp::OnInit()
 	// Operation Menu':
 	//------------------------------------------------------------
 #ifndef _DEBUG
-	m_Logic->Plug(new mmo2DMeasure("2D Measure"),"Measure");
-	m_Logic->Plug(new mmoVOIDensity("VOI Density"),"Measure");
+	m_Logic->Plug(new mafOp2DMeasure("2D Measure"),"Measure");
+	m_Logic->Plug(new mafOpVOIDensity("VOI Density"),"Measure");
 	m_Logic->Plug(new mmoVolumeMeasure("Volume"),"Measure");
 	m_Logic->Plug(new mmoMeshQuality("Mesh Quality"),"Measure");
 
-	m_Logic->Plug(new mmoAddLandmark("Add Landmark"),"Create");
-	m_Logic->Plug(new mmoCreateGroup("Group"),"Create");
-	m_Logic->Plug(new mmoCreateMeter("Meter"),"Create");
-	m_Logic->Plug(new mmoCreateRefSys("RefSys"),"Create");
-	m_Logic->Plug(new mmoCreateProber("Prober"),"Create");
-	m_Logic->Plug(new mmoCreateSlicer("Slicer"),"Create");
-	m_Logic->Plug(new mmoExtractIsosurface("Extract Isosurface"),"Create");
-	m_Logic->Plug(new mmoCreateSurfaceParametric("Parametric Surface"),"Create");
-	m_Logic->Plug(new mmoCreateSpline("Spline"),"Create");
+	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),"Create");
+	m_Logic->Plug(new mafOpCreateGroup("Group"),"Create");
+	m_Logic->Plug(new mafOpCreateMeter("Meter"),"Create");
+	m_Logic->Plug(new mafOpCreateRefSys("RefSys"),"Create");
+	m_Logic->Plug(new mafOpCreateProber("Prober"),"Create");
+	m_Logic->Plug(new mafOpCreateSlicer("Slicer"),"Create");
+	m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"),"Create");
+	m_Logic->Plug(new mafOpCreateSurfaceParametric("Parametric Surface"),"Create");
+	m_Logic->Plug(new mafOpCreateSpline("Spline"),"Create");
 
-	m_Logic->Plug(new mmoClipSurface("Clip Surface"),"Modify");
-	m_Logic->Plug(new mmoFilterSurface("Filter Surface"),"Modify");
-	m_Logic->Plug(new mmoFilterVolume("Filter Volume"),"Modify");
-	m_Logic->Plug(new mmoDecimateSurface("Decimate Surface"),"Modify");
-	m_Logic->Plug(new mmoConnectivitySurface("Connectivity Surface"),"Modify");
-	m_Logic->Plug(new mmoEditNormals("Edit Normals"),"Modify");
-	m_Logic->Plug(new mmoEditMetadata("Metadata Editor"),"Modify");
-	m_Logic->Plug(new mmoExplodeCollapse("Explode/Collapse cloud"),"Modify");
-	m_Logic->Plug(new mmoMAFTransform("Transform"),"Modify");
-	m_Logic->Plug(new mmoReparentTo("Reparent to..."),"Modify");
-	m_Logic->Plug(new mmoVolumeResample("Resample Volume"),"Modify");
-	m_Logic->Plug(new mmoCrop("Crop Volume"),"Modify");
-	m_Logic->Plug(new mmoBooleanSurface("Boolean Surface"),"Modify");
+	m_Logic->Plug(new mafOpClipSurface("Clip Surface"),"Modify");
+	m_Logic->Plug(new mafOpFilterSurface("Filter Surface"),"Modify");
+	m_Logic->Plug(new mafOpFilterVolume("Filter Volume"),"Modify");
+	m_Logic->Plug(new mafOpDecimateSurface("Decimate Surface"),"Modify");
+	m_Logic->Plug(new mafOpConnectivitySurface("Connectivity Surface"),"Modify");
+	m_Logic->Plug(new mafOpEditNormals("Edit Normals"),"Modify");
+	m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"),"Modify");
+	m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"),"Modify");
+	m_Logic->Plug(new mafOpMAFTransform("Transform"),"Modify");
+	m_Logic->Plug(new mafOpReparentTo("Reparent to..."),"Modify");
+	m_Logic->Plug(new mafOpVolumeResample("Resample Volume"),"Modify");
+	m_Logic->Plug(new mafOpCrop("Crop Volume"),"Modify");
+	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),"Modify");
 	m_Logic->Plug(new mmoMML("MML"),"Modify");
 	m_Logic->Plug(new mmoCropDeformableROI("Crop ROI"),"Modify");
 	m_Logic->Plug(new mmoFlipNormals("Flip Normals"),"Modify");
-	m_Logic->Plug(new mmoRemoveCells("Remove Cells"),"Modify");
+	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),"Modify");
 	m_Logic->Plug(new mmoExtrusionHoles(),"Modify");
   m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),"Modify");
   m_Logic->Plug(new medOpMove("Move"),"Modify");    
