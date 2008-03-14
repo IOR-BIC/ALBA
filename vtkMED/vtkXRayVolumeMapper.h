@@ -81,7 +81,7 @@ class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
     virtual void Render(vtkRenderer *ren, vtkVolume *vol);
 
     // reduce resolution to 9 bit
-    static GetReduceColorResolution() { return ReduceColorResolution; } 
+    static bool GetReduceColorResolution() { return ReduceColorResolution; } 
     static void SetReduceColorResolution(bool val) { ReduceColorResolution = val;}
     static void ReduceColorResolutionOn() { ReduceColorResolution = true;}
     static void ReduceColorResolutionOff() { ReduceColorResolution = false;}
@@ -93,7 +93,7 @@ class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
     static double GetGamma() { return Gamma; }
     static bool SetGamma(double val) { if (val > 3.f && val < 0.1f) return false; Gamma = val; return true; }
 
-    static GetPerspectiveCorrection() { return PerspectiveCorrection; } 
+    static bool GetPerspectiveCorrection() { return PerspectiveCorrection; } 
     static void SetPerspectiveCorrection(bool val) { PerspectiveCorrection = val;}
     static void PerspectiveCorrectionOn() { PerspectiveCorrection = true;}
     static void PerspectiveCorrectionOff() { PerspectiveCorrection = false;}
@@ -103,7 +103,7 @@ class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
     static void SetColor(double *val) { Color[0] = val[0]; Color[1] = val[1]; Color[2] = val[2];/* no Modified() */ }
     static void SetColor(double r, double g, double b) { Color[0] = r; Color[1] = g; Color[2] = b;/* no Modified() */ }
 
-    static GetEnableAutoLOD() { return EnableAutoLOD; } 
+    static bool GetEnableAutoLOD() { return EnableAutoLOD; } 
     static void SetEnableAutoLOD(bool val) { EnableAutoLOD = val;}
     static void EnableAutoLODOn() { SetEnableAutoLOD(true);}
     static void EnableAutoLODOff() { SetEnableAutoLOD(false);}
