@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-03-14 08:44:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,10 @@
   #include "mmdP5Glove.h"
 #endif
 
+#ifdef MAF_USE_WIIMOTE
+  #include "mafDeviceTrackerWIIMote.h"
+#endif
+
 //--------------------------------------------------------------------------------
 // Create the Application
 //--------------------------------------------------------------------------------
@@ -92,6 +96,10 @@ bool exInteractionApp::OnInit()
   //mafPlugDevice<mmdIntersense>("Intersense");
 #ifdef MAF_USE_P5_GLOVE
   mafPlugDevice<mmdP5Glove>("P5 Glove");
+#endif
+
+#ifdef MAF_USE_WIIMOTE
+  mafPlugDevice<mafDeviceTrackerWIIMote>("WII Mote");
 #endif
   
   //---------- avatars --------
