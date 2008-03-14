@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoMMLModelView.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-11 11:53:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-03-14 09:57:55 $
+  Version:   $Revision: 1.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -2214,7 +2214,8 @@ void mmoMMLModelView::UpdateContourCuttingPlane()
 
 		// unit vector along muscle axis
 		double u[3];
-		for(int i = 0; i < 3; i++)
+		int i;
+    for(i = 0; i < 3; i++)
 			u[i] = p1[i] - p2[i];
 		double n = sqrt(pow(u[0], 2.0) + pow(u[1], 2.0) + pow(u[2], 2.0));
 		for(i = 0; i < 3; i++)
