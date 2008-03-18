@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-10 12:34:30 $
-Version:   $Revision: 1.48 $
+Date:      $Date: 2008-03-18 13:59:06 $
+Version:   $Revision: 1.49 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -98,6 +98,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 	}
 
 	m_CurrentZ = 0.0;
+  m_ZoomFactor = 1.0;
 
 }
 //----------------------------------------------------------------------------
@@ -313,6 +314,11 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
           ProbeVolume();
         }
         break;
+      case ID_ZOOM_BUTTON:
+        {
+          ZoomAllCTs();
+        }
+        break;
 		default:
 			mafEventMacro(*maf_event);
 		}
@@ -334,6 +340,8 @@ mmgGui* mafViewCTNew::CreateGui()
 	m_Gui->Integer(ID_LAYOUT_HEIGHT,_("Height"),&m_HeightSection);
 
 	m_Gui->Double(ID_LAYOUT_THICKNESS,_("Thickness"), &m_Thickness,0,50,2,_("define the thickness of the slice"));
+  m_Gui->Double(ID_ZOOM_FACTOR,_("Zoom Factor"), &m_ZoomFactor,0,MAXDOUBLE,-1,_("define zoom factor"));
+  m_Gui->Button(ID_ZOOM_BUTTON,"Zoom","");
 
 	//m_Gui->Button(ID_LAYOUT_UPDATE,"Update");
 
@@ -822,4 +830,16 @@ void mafViewCTNew::OnLayout()
     m_Text[idSubView]->GetTextProperty()->SetFontSize(fontSize+ratio);
     m_TextActor[idSubView]->SetPosition(size.GetWidth() - 50, size.GetHeight() - 15);
   }
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::ZoomAllCTs()
+//----------------------------------------------------------------------------
+{
+  for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
+  {
+    mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+    vslice->GetSceneGraph()->m_RenFront->GetActiveCamera()->Zoom(m_ZoomFactor);
+  }
+  CameraUpdate();
+
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2008-02-19 10:59:04 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-03-18 13:59:06 $
+Version:   $Revision: 1.13 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ This view features two Rx views and one compound view made of six CT slices.*/
 class mafViewCTNew : public mafViewCompound
 {
 public:
-	mafViewCTNew(wxString label = "View CT");
+	mafViewCTNew(wxString label = "CROSS");
 	virtual ~mafViewCTNew();
 
 	mafTypeMacro(mafViewCTNew, mafViewCompound);
@@ -71,6 +71,8 @@ public:
 		ID_LAYOUT_NORMAL,
 		ID_LAYOUT_THICKNESS,
 		ID_LAYOUT_UPDATE,
+    ID_ZOOM_FACTOR,
+    ID_ZOOM_BUTTON,
 		ID_LAST
 	};
 
@@ -114,6 +116,7 @@ public:
 
 	virtual void CameraUpdate();
 	virtual void CameraReset(mafNode *node = NULL);
+  void ZoomAllCTs();
 
   void SetTextValue(int index, double value);
 
@@ -166,6 +169,8 @@ protected:
 
 	double	m_MinLUTHistogram;
 	double	m_MaxLUTHistogram;
+
+  double m_ZoomFactor;
 
   std::vector<vtkActor2D *>	        m_TextActor;
 	std::vector<vtkActor *>					  m_Actor;
