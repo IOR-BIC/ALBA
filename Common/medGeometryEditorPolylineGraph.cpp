@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-20 10:35:02 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2008-03-20 11:26:52 $
+Version:   $Revision: 1.16 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -252,7 +252,7 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 					m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
 					m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
 
-					BehaviorUpdate();
+					//BehaviorUpdate();
 				}
 			break;
 			case VME_PICKING:
@@ -264,7 +264,7 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 			case ID_POINT_TOOL:
 			case ID_BRANCH_TOOL:
 				{
-					BehaviorUpdate();
+					//BehaviorUpdate();
 				}
 				break;
 			case ID_BUTTON_POINT_DELETE:
@@ -319,12 +319,12 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 		}
 		else if(m_PointTool==ID_INSERT_POINT||m_PointTool==ID_SELECT_POINT)
 		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
+			m_VMEPolylineEditor->SetBehavior(NULL);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 		else if(m_PointTool==ID_MOVE_POINT)
 		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
+			m_VMEPolylineEditor->SetBehavior(NULL);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 	}
@@ -332,13 +332,13 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 	{
 		if(m_BranchTool==ID_ADD_BRANCH)//If the user want add a branch
 		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
+			m_VMEPolylineEditor->SetBehavior(NULL);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 		else if(m_BranchTool==ID_SELECT_BRANCH)
 		{
-			m_VMEPolylineEditor->SetBehavior(m_Picker);
-			m_InputVME->SetBehavior(m_OldBehavior);
+			m_VMEPolylineEditor->SetBehavior(NULL);
+			m_InputVME->SetBehavior(m_Picker);
 		}
 	}
 
