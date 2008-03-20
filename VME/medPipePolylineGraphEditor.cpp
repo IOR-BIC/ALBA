@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 11:32:10 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-03-20 11:30:47 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -144,6 +144,7 @@ void medPipePolylineGraphEditor::Create(mafSceneNode *n)
 	m_Mapper->Modified();
 
 	vtkNEW(m_Actor);
+  m_Actor->PickableOff();
 	m_Actor->SetMapper(m_Mapper);
 	m_AssemblyFront->AddPart(m_Actor);
 }
