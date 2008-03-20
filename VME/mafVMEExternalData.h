@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-16 11:04:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-03-20 09:51:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -16,8 +16,7 @@
 #include "mafVMEGroup.h"
 
 
-/** mafVMEExternalData 
-*/
+/** mafVMEExternalData: VME that links an external file */
 
 
 class mafVMEExternalData : public mafVMEGroup
@@ -57,6 +56,12 @@ void PrintSelf(std::ostream& os,const int indent);
   void SetCurrentPath(mafString &path) {this->m_TmpPath=path;};
   void SetCurrentPath(const char *path) {this->m_TmpPath=path;};
 
+  /** Copy the contents of another VMEExternalData into this one. */
+  virtual int DeepCopy(mafNode *a);
+
+  /** Compare with another VMEExternalData. */
+  virtual bool Equals(mafVME *vme);
+
 protected:
 
   /** This is used to allow nested serialization of subclasses.
@@ -77,6 +82,8 @@ protected:
 
   /** Get path of the external file imported not stored yet */
   mafString GetTmpPath();
+
+  mafString GetCurrentPath();
 
   mafVMEExternalData();
   virtual ~mafVMEExternalData();

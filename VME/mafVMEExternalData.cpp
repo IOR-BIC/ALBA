@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 17:51:26 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-03-20 09:51:35 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,6 +40,32 @@ mafVMEExternalData::mafVMEExternalData()
 
 mafVMEExternalData::~mafVMEExternalData()
 {
+}
+
+//-------------------------------------------------------------------------
+int mafVMEExternalData::DeepCopy(mafNode *a)
+//-------------------------------------------------------------------------
+{
+  if (Superclass::DeepCopy(a)==MAF_OK)
+  {
+    mafVMEExternalData *external = mafVMEExternalData::SafeDownCast(a);
+    this->SetCurrentPath(external->GetCurrentPath());
+    return MAF_OK;
+  }  
+  return MAF_ERROR;
+}
+
+//-------------------------------------------------------------------------
+bool mafVMEExternalData::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  bool ret = false;
+  if (Superclass::Equals(vme))
+  {
+    mafVMEExternalData *external = mafVMEExternalData::SafeDownCast(vme);
+    ret = (m_MSFPath == external->GetCurrentPath());
+  }
+  return ret;
 }
 
 //-------------------------------------------------------------------------
@@ -123,6 +149,15 @@ mafString mafVMEExternalData::GetTmpPath()
 }
 
 //-------------------------------------------------------------------------
+mafString mafVMEExternalData::GetCurrentPath()
+//-------------------------------------------------------------------------
+{
+  InitializeCurrentPath();
+  mafString currentPath= this->m_MSFPath;
+  return currentPath;
+}
+
+//-------------------------------------------------------------------------
 void mafVMEExternalData::GetAbsoluteFileName(char *fname)
 //-------------------------------------------------------------------------
 {
@@ -153,13 +188,19 @@ int mafVMEExternalData::InternalStore(mafStorageElement *parent)
 {
   InitializeCurrentPath();
   
-  mafString fileNameOrigin =  GetTmpPath() + "/" + GetFileName() + "." + GetExtension(); 
-  mafString fileNameTarget = m_MSFPath + "/" + GetFileName() + "." + GetExtension();
+  mafString fileNameOrigin =  GetAbsoluteFileName(); 
+  mafString fileNameTarget = m_MSFPath + "\\" + GetFileName() + "." + GetExtension();
 
   if (!fileNameOrigin.Equals(fileNameTarget))
   {
     bool copySuccess = wxCopyFile(fileNameOrigin.GetCStr(), fileNameTarget.GetCStr());
+    if (!copySuccess)
+    {
+      mafErrorMessage( "Error copying external file!" );
+      return MAF_ERROR;
+    }
   }
+  this->SetCurrentPath(m_MSFPath);
   return Superclass::InternalStore(parent);
 }
 
