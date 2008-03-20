@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-11 10:37:27 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2008-03-20 10:35:02 $
+Version:   $Revision: 1.15 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -760,14 +760,16 @@ void medGeometryEditorPolylineGraph::MovePoint(double newPosition[3],int pointID
     m_PolylineGraph->GetConstVertexPtr(m_SelectedPoint)->GetCoords(p);
     p[0]=newPosition[0];
     p[1]=newPosition[1];
+    p[2]=newPosition[2];
 		m_PolylineGraph->SetVertexCoords(m_SelectedPoint,p);
   }
 	else
   {
     double *p = new double[3];
-    m_PolylineGraph->GetConstVertexPtr(m_SelectedPoint)->GetCoords(p);
+    m_PolylineGraph->GetConstVertexPtr(pointID)->GetCoords(p);
     p[0]=newPosition[0];
     p[1]=newPosition[1];
+    p[2]=newPosition[2];
 		m_PolylineGraph->SetVertexCoords(pointID,p);
   }
 
