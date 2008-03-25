@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-17 19:07:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-03-25 13:16:33 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,6 +86,7 @@ mafOp(label)
 
 	m_ResultPolydata	  = NULL;
 	m_OriginalPolydata  = NULL;
+	m_BoundarySmoothing = 0;
 }
 //----------------------------------------------------------------------------
 medOpSmoothSurface::~medOpSmoothSurface()
@@ -115,6 +116,7 @@ enum SMOOTH_SURFACE_ID
 	ID_PREVIEW,
 	ID_CLEAR,
 	ID_ITERACTION,
+	ID_BOUNDARY,
 };
 //----------------------------------------------------------------------------
 void medOpSmoothSurface::OpRun()   
@@ -141,8 +143,9 @@ void medOpSmoothSurface::CreateGui()
 
   m_Gui->Label("");
   m_Gui->Label("smooth",true);
-  m_Gui->Slider(ID_ITERACTION,"n.iteraction: ",&m_Iterations,0,500);
-  m_Gui->Button(ID_SMOOTH,"apply smooth");
+  m_Gui->Slider(ID_ITERACTION,_("n.iteraction: "),&m_Iterations,0,500);
+  m_Gui->Button(ID_SMOOTH,_("apply smooth"));
+  m_Gui->Bool(ID_BOUNDARY,_("Boundary"),&m_BoundarySmoothing,0,_("Boundary Smoothing On/Off"));
 
   m_Gui->Divider(2);
   m_Gui->Label("");
@@ -218,6 +221,7 @@ void medOpSmoothSurface::OnSmooth()
 	  wxBusyCursor wait;
 	  m_Gui->Enable(ID_SMOOTH,false);
 	  m_Gui->Enable(ID_ITERACTION,false);
+	  m_Gui->Enable(ID_BOUNDARY, false);
 	  m_Gui->Update();
   }
 
@@ -225,6 +229,7 @@ void medOpSmoothSurface::OnSmooth()
 	smoothFilter->SetInput(m_ResultPolydata);
 	smoothFilter->SetNumberOfIterations(m_Iterations);
 	smoothFilter->FeatureEdgeSmoothingOn();
+	m_BoundarySmoothing?smoothFilter->BoundarySmoothingOn():smoothFilter->BoundarySmoothingOff();
 	smoothFilter->Update();
 
 	m_ResultPolydata->DeepCopy(smoothFilter->GetOutput());
@@ -233,6 +238,7 @@ void medOpSmoothSurface::OnSmooth()
   {
 	  m_Gui->Enable(ID_SMOOTH,true);
 	  m_Gui->Enable(ID_ITERACTION,true);
+	  m_Gui->Enable(ID_BOUNDARY,true);
 
 	  m_Gui->Enable(ID_PREVIEW,true);
 	  m_Gui->Enable(ID_CLEAR,true);
@@ -269,9 +275,11 @@ void medOpSmoothSurface::OnClear()
 	m_ResultPolydata->DeepCopy(m_OriginalPolydata);
 
 	m_Iterations	= 50;
+	m_BoundarySmoothing = false;
 
 	m_Gui->Enable(ID_SMOOTH,true);
 	m_Gui->Enable(ID_ITERACTION,true);
+	m_Gui->Enable(ID_BOUNDARY,true);
 
 	m_Gui->Enable(ID_PREVIEW,false);
 	m_Gui->Enable(ID_CLEAR,false);

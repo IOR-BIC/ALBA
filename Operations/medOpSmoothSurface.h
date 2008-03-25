@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-12-17 19:07:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-03-25 13:16:33 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -90,6 +90,7 @@ protected:
 
 	bool m_ClearInterfaceFlag;
 	bool m_PreviewResultFlag;
+	int  m_BoundarySmoothing;
 
 	vtkPolyData											*m_ResultPolydata;
 	vtkPolyData											*m_OriginalPolydata;
