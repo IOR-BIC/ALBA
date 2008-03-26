@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-19 13:42:07 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2008-03-26 15:13:50 $
+Version:   $Revision: 1.15 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -99,6 +99,7 @@ mafPipePolyline::mafPipePolyline()
   m_SplineMode      = 0;
   m_SplineCoefficient = 10.0;
   m_DistanceBorder = 0.0;
+  m_ScalarsName = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::Create(mafSceneNode *n)
@@ -351,6 +352,7 @@ mmgGui *mafPipePolyline::CreateGui()
 	m_Gui->Double(ID_SPHERE_RADIUS,_("radius"),&m_SphereRadius,0);
 	m_Gui->Double(ID_SPHERE_RESOLUTION,_("resolution"),&m_SphereResolution,0);
 
+  m_Gui->Enable(ID_SCALAR, m_ScalarsName != NULL);
 	m_Gui->Enable(ID_TUBE_RADIUS, m_Representation == TUBE);
 	m_Gui->Enable(ID_TUBE_CAPPING, m_Representation == TUBE);
 	m_Gui->Enable(ID_TUBE_RESOLUTION, m_Representation == TUBE);
@@ -453,6 +455,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 	{
 		UpdateScalars();
     UpdatePipeFromScalars();
+    UpdateProperty();
 	}
   else if (maf_event->GetSender() == m_Vme)
   {
@@ -467,6 +470,9 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 void mafPipePolyline::UpdateScalars()
 //----------------------------------------------------------------------------
 {
+  if(m_ScalarsName == NULL) 
+    return;
+
 	mafVMEPolyline *polyline=mafVMEPolyline::SafeDownCast(m_Vme);
 	polyline->GetOutput()->GetVTKData()->Update();
 	polyline->Update();
@@ -505,6 +511,8 @@ void mafPipePolyline::UpdatePipeFromScalars()
 
   vtkPolyData *data = vtkPolyData::SafeDownCast(polyline->GetOutput()->GetVTKData());
   double sr[2];
+  if(data->GetPointData()->GetScalars() == NULL) 
+    return; 
   data->GetPointData()->GetScalars()->Modified();
   data->GetPointData()->GetScalars()->GetRange(sr);
 
