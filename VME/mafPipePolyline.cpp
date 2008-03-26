@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-26 15:13:50 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2008-03-26 17:38:04 $
+Version:   $Revision: 1.16 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mmaMaterial.h"
 
 #include "mafVME.h"
-#include "mafVMEPolyline.h"
+#include "mafVMEGenericAbstract.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
@@ -473,15 +473,24 @@ void mafPipePolyline::UpdateScalars()
   if(m_ScalarsName == NULL) 
     return;
 
-	mafVMEPolyline *polyline=mafVMEPolyline::SafeDownCast(m_Vme);
-	polyline->GetOutput()->GetVTKData()->Update();
-	polyline->Update();
+	mafVMEOutputPolyline *polyline_output = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
+	vtkDataSet *data = polyline_output->GetVTKData();
+  data->Update();
 
-	polyline->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsName[m_Scalar].c_str());
-	polyline->Update();
-	polyline->Modified();
+	data->GetPointData()->SetActiveScalars(m_ScalarsName[m_Scalar].c_str());
+	polyline_output->Update();
+	m_Vme->Modified();
 
-	for (mafDataVector::Iterator it = polyline->GetDataVector()->Begin(); it != polyline->GetDataVector()->End(); it++)
+  mafVMEGenericAbstract *genAbst = mafVMEGenericAbstract::SafeDownCast(m_Vme);
+  if(genAbst == NULL)
+  {
+    m_Vme->Modified();
+    m_Vme->Update();
+    UpdatePipeFromScalars();
+    return;
+  }
+
+	for (mafDataVector::Iterator it = genAbst->GetDataVector()->Begin(); it != genAbst->GetDataVector()->End(); it++)
 	{
 		mafVMEItemVTK *item = mafVMEItemVTK::SafeDownCast(it->second);
 		assert(item);
@@ -494,8 +503,6 @@ void mafPipePolyline::UpdateScalars()
 			outputVTK->Modified();
 		}
 	}
-	polyline->Modified();
-	polyline->Update();
 	m_Vme->Modified();
 	m_Vme->Update();
 
@@ -505,11 +512,11 @@ void mafPipePolyline::UpdateScalars()
 void mafPipePolyline::UpdatePipeFromScalars()
 //----------------------------------------------------------------------------
 {
-  mafVMEPolyline *polyline=mafVMEPolyline::SafeDownCast(m_Vme);
-  polyline->GetOutput()->GetVTKData()->Update();
-  polyline->Update();
+  mafVMEOutputPolyline *polyline_output = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
+  polyline_output->GetVTKData()->Update();
+  polyline_output->Update();
 
-  vtkPolyData *data = vtkPolyData::SafeDownCast(polyline->GetOutput()->GetVTKData());
+  vtkPolyData *data = vtkPolyData::SafeDownCast(polyline_output->GetVTKData());
   double sr[2];
   if(data->GetPointData()->GetScalars() == NULL) 
     return; 
@@ -522,12 +529,12 @@ void mafPipePolyline::UpdatePipeFromScalars()
   m_Table->AddRGBPoint(sr[1],1.0,0.0,0.0);
   m_Table->Build();
 
-  m_Glyph->SelectInputScalars(polyline->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetName());
+  m_Glyph->SelectInputScalars(data->GetPointData()->GetScalars()->GetName());
   m_Glyph->SetRange(sr);
   m_Glyph->Update();
 
   m_Mapper->SetLookupTable(m_Table);
-  m_Mapper->SetScalarRange(polyline->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetRange());
+  m_Mapper->SetScalarRange(data->GetPointData()->GetScalars()->GetRange());
   m_Mapper->Update();
 
   m_Actor->Modified();
