@@ -1,10 +1,12 @@
 # Tell the user project where to find headers and libraries
+
 SET(MED_INCLUDE_DIRS
   "@MED_SOURCE_DIR@/Common"
+  "@MED_SOURCE_DIR@/Gui"
+  "@MED_SOURCE_DIR@/Interaction"
   "@MED_SOURCE_DIR@/Operations"
   "@MED_SOURCE_DIR@/Views"
   "@MED_SOURCE_DIR@/VME"
-  "@MED_SOURCE_DIR@/GUI"
   "@MED_SOURCE_DIR@/vtkMED"
   "@MED_BINARY_DIR@"
   "@MED_BINARY_DIR@/vtkMED"
