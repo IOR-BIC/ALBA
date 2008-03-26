@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2007-09-28 09:23:17 $
-# Version:   $Revision: 1.10 $
+# Date:      $Date: 2008-03-26 13:33:18 $
+# Version:   $Revision: 1.11 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -49,7 +49,7 @@ ENDIF(WIN32)
 #-----------------------------------------------------------------------------
 # Options for MAF building
 #-----------------------------------------------------------------------------
-OPTION(BUILD_SHARED_LIBS "Build with shared libraries." 0)
+OPTION(BUILD_SHARED_LIBS "Build with shared libraries." OFF )
 OPTION(BUILD_EXAMPLES "Build examples." ON )
 OPTION(BUILD_TESTING "Build the testing tree." OFF)
 
@@ -89,9 +89,6 @@ IF(MAF_FOUND)
   INCLUDE_DIRECTORIES(${MED_BINARY_DIR})
 
   #todo: add a FOREACH on all subdirs but "modules"
-#  INCLUDE_DIRECTORIES(${MED_BINARY_DIR}/Interaction)
-#  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Interaction)
-#  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Interaction/Drivers)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Gui)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Common)
   INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Operations)
@@ -106,7 +103,6 @@ IF(MAF_FOUND)
 
   # Configuring MED kits
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
-#  SUBDIRS (Interaction)
   SUBDIRS (Gui)
   SUBDIRS (vtkMED)
   SUBDIRS (Common)
@@ -118,6 +114,16 @@ IF(MAF_FOUND)
   # Configuring Doxygen documentation  
   SUBDIRS (Docs)
   
+  IF(WIN32)
+		# Disable automatic manifest generation.
+		STRING(REPLACE "/MANIFEST" "/MANIFEST:NO" CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
+		# Explicitly disable it since it is the default for newer versions of VS
+    STRING(REGEX MATCH "MANIFEST:NO" tmp_manifest ${CMAKE_EXE_LINKER_FLAGS})
+    IF(NOT tmp_manifest)
+        SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFEST:NO")
+    ENDIF(NOT tmp_manifest)
+	ENDIF(WIN32)
+
   # Export Build settings and library dependences
   INCLUDE(CMakeExportBuildSettings)
   
