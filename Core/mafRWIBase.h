@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:09:52 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-03-26 14:22:23 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,6 +110,11 @@ public:
 	/** 
   Save an image of the render window. */
   void SaveImage(mafString filename = "", int magnification = 1, int forceExtension = -1);
+  
+  /** 
+  Save all images of a view compound creating a view for every subview */
+  void SaveImageRecursive(mafString filename = "", mafViewCompound *v = NULL, int magnification = 1,int forceExtension=-1);
+  void RecursiveSaving(mafString filename="", mafViewCompound *v=NULL,int magnification=1);
   /** 
   Save all images of the compound view. */
   void SaveAllImages(mafString filename = "", mafViewCompound *v = NULL, int forceExtension=-1);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 18:43:37 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2008-03-26 14:22:23 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -766,6 +766,7 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
       vtkRenderer *ren = rc->GetNextItem();
       if(ren)
       {
+        //wxMessageBox(wxString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
         double wp0x[4], wp1x[4];
         ren->SetDisplayPoint(0,0,0); //x
         ren->DisplayToWorld();
@@ -887,11 +888,253 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   ::wxEndBusyCursor();
 }
 //----------------------------------------------------------------------------
+void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int magnification,int forceExtension)
+//----------------------------------------------------------------------------
+{
+  if(v == NULL) return;
+
+  wxString path, name, ext;
+  wxSplitPath(filename.GetCStr(),&path,&name,&ext);
+  if (filename.IsEmpty() || ext.IsEmpty())
+  {
+    //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
+    wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
+    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+    switch(forceExtension)
+    {
+    case mmgApplicationSettings::JPG :
+      wildc = "Image (*.jpg)|*.jpg";
+      break;
+    case mmgApplicationSettings::BMP:
+      wildc = "Image (*.bmp)|*.bmp";
+      break;
+    }
+    //mafString file ;
+    if(!wxDirExists(path))
+    {
+      file = m_SaveDir;
+      file +=  "\\";
+      filename = name.c_str();
+    }
+
+    file.Append(filename);
+    file = mafGetSaveFile(file,wildc).c_str(); 
+    if(file.IsEmpty()) 
+      return;
+    filename = file.c_str();
+  }
+  
+  wxString temporary = filename.GetCStr();
+  temporary = temporary.AfterLast('\\').AfterFirst('.');
+
+  switch(forceExtension)
+  {
+  case mmgApplicationSettings::JPG :
+    if(temporary != _("jpg"))
+      filename += _(".jpg");
+    break;
+  case mmgApplicationSettings::BMP:
+    if(temporary != _("bmp"))
+      filename += _(".bmp");
+    break;
+  }
+
+  mafString basename = filename.BaseName();
+  if (basename.IsEmpty())
+  {
+    filename = m_SaveDir << "\\" << filename;
+  }
+
+
+  RecursiveSaving(filename, v, magnification);
+}
+//----------------------------------------------------------------------------
+void mafRWIBase::RecursiveSaving(mafString filename, mafViewCompound *v,int magnification)
+//----------------------------------------------------------------------------
+{
+  for(int i=0; i< v->GetNumberOfSubView(); i++)
+  {
+    mafView *currentView;
+    currentView = v->GetSubView(i);
+    if(mafViewCompound::SafeDownCast(currentView) != NULL)
+    {
+      wxString subViewString;
+      subViewString.Append(filename);
+      wxString pathName, fileName, extension;
+      wxSplitPath(subViewString,&pathName,&fileName,&extension);
+
+      subViewString.Clear();
+      subViewString.Append(pathName);
+      subViewString.Append("\\");
+      subViewString.Append(fileName);
+      subViewString.Append("_");
+      subViewString.Append(currentView->GetLabel());
+      subViewString.Append(".");
+      subViewString.Append(extension);
+
+      RecursiveSaving(subViewString, mafViewCompound::SafeDownCast(currentView), magnification);
+    }
+    else
+    {
+      ///////////////////////////////////
+      wxString temp, pathName, fileName, extension;
+      temp.Append(filename);
+      wxSplitPath(temp,&pathName,&fileName,&extension);
+      fileName.Append(wxString::Format("_%d", i));
+      temp.Clear();
+      temp.Append(pathName);
+      temp.Append("\\");
+      temp.Append(fileName);
+      temp.Append(".");
+      temp.Append(extension);
+
+      ::wxBeginBusyCursor();
+
+      long pixelXMeterX = 0;
+      long pixelXMeterY = 0;
+      vtkRenderWindow *rw = currentView->GetRWI()->GetRenderWindow();
+      if(rw)
+      {
+        vtkRendererCollection *rc = rw->GetRenderers();
+        if(rc)
+        {
+          rc->InitTraversal();
+          vtkRenderer *ren = rc->GetNextItem();
+          if(ren)
+          {
+            //wxMessageBox(wxString::Format("%d", ren->GetActiveCamera()->GetParallelProjection()));
+            double wp0x[4], wp1x[4];
+            ren->SetDisplayPoint(0,0,0); //x
+            ren->DisplayToWorld();
+            ren->GetWorldPoint(wp0x);
+
+            ren->SetDisplayPoint(10,0,0); //x
+            ren->DisplayToWorld();
+            ren->GetWorldPoint(wp1x);
+
+            double pixelSpacingX = sqrt(vtkMath::Distance2BetweenPoints(wp1x,wp0x))/10;
+            double meter = 1000; //millimeters
+            pixelXMeterX = meter/pixelSpacingX;
+            //wxMessageBox(wxString::Format("pixelXMeter = %f", meter/pixelSpacingX));
+
+            double wp0y[4], wp1y[4];
+            ren->SetDisplayPoint(0,0,0); //y
+            ren->DisplayToWorld();
+            ren->GetWorldPoint(wp0y);
+
+            ren->SetDisplayPoint(0,10,0); //y
+            ren->DisplayToWorld();
+            ren->GetWorldPoint(wp1y);
+
+            double pixelSpacingY = sqrt(vtkMath::Distance2BetweenPoints(wp1y,wp0y))/10;
+            pixelXMeterY = meter/pixelSpacingY;
+          }
+        }
+
+      }
+      currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOn();
+      vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
+      w2i->SetInput(currentView->GetRWI()->GetRenderWindow());
+      w2i->SetMagnification(magnification);
+      w2i->Update();
+      currentView->GetRWI()->GetRenderWindow()->OffScreenRenderingOff();
+      
+      extension.MakeLower();
+      if (extension == "bmp")
+      {
+        vtkMAFSmartPointer<vtkBMPWriter> w;
+        w->SetInput(w2i->GetOutput());
+        w->SetFileName(temp.c_str());
+        w->Write();
+
+        // bitmap header
+        /*
+        offset    size    description
+        0       2       signature, must be 4D42 hex
+        2       4       size of BMP file in bytes (unreliable)
+        6       2       reserved, must be zero
+        8       2       reserved, must be zero
+        10      4       offset to start of image data in bytes
+        14      4       size of BITMAPINFOHEADER structure, must be 40
+        18      4       image width in pixels
+        22      4       image height in pixels
+        26      2       number of planes in the image, must be 1
+        28      2       number of bits per pixel (1, 4, 8, or 24)
+        30      4       compression type (0=none, 1=RLE-8, 2=RLE-4)
+        34      4       size of image data in bytes (including padding)
+        * 38      4       horizontal resolution in pixels per meter (unreliable)
+        * 42      4       vertical resolution in pixels per meter (unreliable)
+        46      4       number of colors in image, or zero
+        50      4       number of important colors, or zero
+
+        * needed values
+        */
+#ifdef WIN32
+        //open file
+        fstream myFile (temp.c_str(), ios::in | ios::out | ios::binary);
+        myFile.seekp (38);
+        myFile.write ((char*)&pixelXMeterX, 4);
+        myFile.write ((char*)&pixelXMeterY, 4);
+        myFile.close();
+
+        FILE *fp = fopen(temp.c_str(), "rb");
+        if(!fp) return ;
+
+        BITMAPFILEHEADER bmfh={0};
+        BITMAPINFOHEADER bmih={0};
+        //    DWORD index;
+        //    BYTE ch;
+
+        fread(&bmfh,sizeof(bmfh),1,fp);  //read bitmap file header
+        fread(&bmih,sizeof(bmih),1,fp);  //read bitmap info header 
+        fclose(fp);
+#endif
+      }
+      else if (extension == "jpg")
+      {
+        vtkMAFSmartPointer<vtkJPEGWriter> w;
+        w->SetInput(w2i->GetOutput());
+        w->SetFileName(temp.c_str());
+        w->Write();
+      }
+      else if (extension == "tiff")
+      {
+        vtkMAFSmartPointer<vtkTIFFWriter> w;
+        w->SetInput(w2i->GetOutput());
+        w->SetFileName(temp.c_str());
+        w->Write();
+      }
+      else if (extension == "ps")
+      {
+        vtkMAFSmartPointer<vtkPostScriptWriter> w;
+        w->SetInput(w2i->GetOutput());
+        w->SetFileName(temp.c_str());
+        w->Write();
+      }
+      else if (extension == "png")
+      {
+        vtkMAFSmartPointer<vtkPNGWriter> w;
+        w->SetInput(w2i->GetOutput());
+        w->SetFileName(temp.c_str());
+        w->Write();
+      }
+      else
+      {
+        wxMessageBox(_("Image can not be saved. Not valid file!"), _("Warning"));
+      }
+      ::wxEndBusyCursor();
+      ///////////////////////////////////
+    }
+    
+
+    
+  }
+}
+//----------------------------------------------------------------------------
 void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int forceExtension)
 //---------------------------------------------------------------------------
 {
   if(v == NULL) return;
-  
   wxString path, name, ext;
   wxSplitPath(filename,&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
@@ -899,11 +1142,11 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
     mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp";
     switch(forceExtension)
     {
-      case mmgApplicationSettings::JPG :
-        wildc = "Image (*.jpg)|*.jpg";
+    case mmgApplicationSettings::JPG :
+      wildc = "Image (*.jpg)|*.jpg";
       break;
-      case mmgApplicationSettings::BMP:
-        wildc = "Image (*.bmp)|*.bmp";
+    case mmgApplicationSettings::BMP:
+      wildc = "Image (*.bmp)|*.bmp";
       break;
     }
     mafString file;
@@ -925,11 +1168,11 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
 
   switch(forceExtension)
   {
-    case mmgApplicationSettings::JPG :
+  case mmgApplicationSettings::JPG :
     if(mafString(temporary) != _("jpg"))
       filename += _(".jpg");
     break;
-    case mmgApplicationSettings::BMP:
+  case mmgApplicationSettings::BMP:
     if(mafString(temporary) != _("bmp"))
       filename += _(".bmp");
     break;
@@ -940,7 +1183,7 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
   {
     filename = m_SaveDir << "\\" << filename;
   }
-  
+
   ::wxBeginBusyCursor();
 
   wxBitmap imageBitmap;
