@@ -1,15 +1,21 @@
 PROJECT (exInteraction)
 
 SET(PROJECT_SRCS 
-exInteractionApp.cpp
-exInteractionApp.h
-mafOpInteractionOp.cpp
-mafOpInteractionOp.h
+	exInteractionApp.cpp
+	exInteractionApp.h
+	mafOpInteractionOp.cpp
+	mafOpInteractionOp.h
 )
 
 IF (WIN32)
-  ADD_EXECUTABLE(${PROJECT_NAME} WIN32 ${PROJECT_SRCS} "${PROJECT_SOURCE_DIR}/app.rc")
-  #CONFIGURE_FILE( "${MAF_SOURCE_DIR}/Gui/manifest.in" "${EXECUTABLE_OUTPUT_PATH}/Debug/${PROJECT_NAME}.exe.manifest" COPYONLY)
+	IF(${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 8 2005")
+	  SET(NO_MANIFEST 1)
+	ELSE(${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 8 2005")
+	  SET(NO_MANIFEST 0)
+	ENDIF(${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008" OR ${CMAKE_GENERATOR} STREQUAL "Visual Studio 8 2005")
+	
+	CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/app.rc.in ${PROJECT_BINARY_DIR}/app.rc @ONLY)
+  ADD_EXECUTABLE(${PROJECT_NAME} WIN32 ${PROJECT_SRCS} "${PROJECT_BINARY_DIR}/app.rc")
 ELSE (WIN32)
   ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )
 ENDIF (WIN32)
