@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-11 13:21:52 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-03-31 13:00:37 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,6 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-
 
 #include "mafOp.h"
 #include "mafDecl.h"
@@ -73,7 +72,7 @@ mafOp::mafOp()
   m_CollaborateStatus = false;
 }
 //----------------------------------------------------------------------------
-mafOp::~mafOp() 
+mafOp::~mafOp()
 //----------------------------------------------------------------------------
 {
   m_Output = NULL;
@@ -85,28 +84,29 @@ void mafOp::OnEvent(mafEventBase *maf_event)
 	mafEventMacro(*maf_event);
 }
 //----------------------------------------------------------------------------
-bool mafOp::Accept(mafNode* vme)   
+bool mafOp::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
   return false;
 }
 //----------------------------------------------------------------------------
-void mafOp::OpRun()   
+void mafOp::OpRun()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mafOp::OpDo()   
+void mafOp::OpDo()
 //----------------------------------------------------------------------------
 {
   if (m_Output)
   {
-    mafEventMacro(mafEvent(this, VME_ADD, m_Output));
+    m_Output->ReparentTo(m_Input);
+    //mafEventMacro(mafEvent(this, VME_ADD, m_Output));
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
 }
 //----------------------------------------------------------------------------
-void mafOp::OpUndo()   
+void mafOp::OpUndo()
 //----------------------------------------------------------------------------
 {
   if (m_Output)
@@ -116,13 +116,13 @@ void mafOp::OpUndo()
   }
 }
 //----------------------------------------------------------------------------
-mafOp* mafOp::Copy()   
+mafOp* mafOp::Copy()
 //----------------------------------------------------------------------------
 {
    return NULL;
 }
 //----------------------------------------------------------------------------
-bool mafOp::CanUndo()   
+bool mafOp::CanUndo()
 //----------------------------------------------------------------------------
 {
   return m_Canundo;
@@ -155,7 +155,7 @@ bool mafOp::IsOp()
 }
 */
 //----------------------------------------------------------------------------
-int mafOp::GetType()   
+int mafOp::GetType()
 //----------------------------------------------------------------------------
 {
   return m_OpType;
