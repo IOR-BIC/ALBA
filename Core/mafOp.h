@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-12 08:21:11 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-03-31 12:59:40 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,13 +52,13 @@ public:
 					mafOp();
 					mafOp(const wxString &label);
 	virtual	~mafOp(); 
-					void		SetListener(mafObserver *Listener)	{m_Listener = Listener;};
+					void SetListener(mafObserver *Listener)	{m_Listener = Listener;};
           
 					/** Return the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER, OPTYPE_EDIT or OPTYPE_STATECHANGER*/
-					int			GetType();
+					int GetType();
 
-	virtual void		OnEvent(mafEventBase *maf_event);
-	virtual mafOp*	Copy();
+	virtual void OnEvent(mafEventBase *maf_event);
+	virtual mafOp* Copy();
 
 	/** Builds operation's interface. */
 	virtual void OpRun();
@@ -73,10 +73,10 @@ public:
 	virtual void OpUndo();
 
 	/** Return the operation's interface. */
-	virtual mmgGui*	GetGui()	{return m_Gui;};
+	virtual mmgGui *GetGui()	{return m_Gui;};
 
 	/** Set/Get the input vme for the operation. */
-	virtual void		SetInput(mafNode* vme)	{m_Input = vme;};
+	virtual void SetInput(mafNode* vme)	{m_Input = vme;};
   virtual mafNode	*GetInput()	{return m_Input;};
 
   /** Return the mafNode result of the operation.*/
@@ -84,10 +84,10 @@ public:
   virtual void SetOutput(mafNode *output) {m_Output = output;};
 
 	/** Return true for the acceptable vme type. */
-	virtual bool		Accept(mafNode* vme);
+	virtual bool Accept(mafNode* vme);
 
 	/** Return true if the operation is undoable. */
-	virtual bool		CanUndo();
+	virtual bool CanUndo();
 
 	/** Return true if the operation is an importer. */
 	//bool IsImporter();
@@ -108,13 +108,13 @@ public:
 	void HideGui();
 
 	/** Return true if the OK button in operation's interface is enabled. */
-	virtual bool		OkEnabled();
+	virtual bool OkEnabled();
 
 	/** Stop operation with OK condition. */
-	virtual void		ForceStopWithOk();
+	virtual void ForceStopWithOk();
 
 	/** Stop operation with CANCEL condition. */
-	virtual void		ForceStopWithCancel();
+	virtual void ForceStopWithCancel();
 
 	wxString				m_Label; ///< Label of the operation that will appear on the SideBar tab.
 	int							m_Id; ///< Index of the operation referring to the operation list.
@@ -127,7 +127,7 @@ public:
   wxString        m_OpMenuPath;
 
   //MARCO 7/05/04
-  virtual const char ** GetActions() {return NULL;}; 
+  virtual const char **GetActions() {return NULL;}; 
 
   /** Initialize the mouse device. */
   void SetMouse(mmdMouse *mouse);
@@ -145,7 +145,6 @@ public:
 
   /** Get TestMode*/
   bool GetTestMode(){return m_TestMode;};
-
 
   /** Set the Canundo flag for the operation when is plugged.*/
   void SetCanundo(bool can_undo = true) {m_Canundo = can_undo;};
