@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-07 10:08:39 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-03-31 12:57:47 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -228,8 +228,9 @@ void mmgCheckListBox::OnCheck(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 void mmgCheckListBox::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
-{ 
-  m_CheckListBox->SetSize(event.GetSize());
+{
+  //wxSize s = event.GetSize();
+  //m_CheckListBox->SetSize(s);
 }
 //----------------------------------------------------------------------------
 void mmgCheckListBox::OnSelect(wxCommandEvent &event)
@@ -242,5 +243,5 @@ void mmgCheckListBox::OnSelect(wxCommandEvent &event)
 	m_SelectedItem = item_id;
 
   m_CheckEvent = false;
-  mafEventMacro(mafEvent(this, widget_id, (long)item_id ) );
+  mafEventMacro(mafEvent(this, widget_id, (long)item_id ));
 }
