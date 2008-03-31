@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-08 11:06:07 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-03-31 17:03:39 $
+  Version:   $Revision: 1.23 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -292,23 +292,23 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
       case ID_METER_MEASURE_TYPE:
         m_MeterVME->GetDataPipe()->Update();
       case ID_INIT_MEASURE:
-        {
-          meter_attrib->m_DistanceRange[0] = meter_attrib->m_InitMeasure;
-          m_Gui->Update();
-          m_MeterVME->Modified();
-          m_MeterVME->GetDataPipe()->Update();
-        }
+      {
+        meter_attrib->m_DistanceRange[0] = meter_attrib->m_InitMeasure;
+        m_Gui->Update();
+        m_MeterVME->Modified();
+        m_MeterVME->GetDataPipe()->Update();
+      }
       break;
       case ID_DELTA_PERCENT:
-        {
-          double value;
-          value = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0);
-          meter_attrib->m_DistanceRange[1] = value;
-          m_Gui->Update();
-          m_MeterVME->Modified();
-          m_MeterVME->GetDataPipe()->Update();
-        }
-        break;
+      {
+        double value;
+        value = meter_attrib->m_InitMeasure * (1.0 + meter_attrib->m_DeltaPercent / 100.0);
+        meter_attrib->m_DistanceRange[1] = value;
+        m_Gui->Update();
+        m_MeterVME->Modified();
+        m_MeterVME->GetDataPipe()->Update();
+      }
+      break;
       case ID_GENERATE_EVENT:
         m_MeterVME->GetDataPipe()->Update();
       break;
@@ -318,16 +318,16 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  else if (maf_event->GetSender() == m_MeterVME)
+  //else if (maf_event->GetSender() == m_MeterVME)
+  //{
+  else if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
   {
-    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-    {
-      UpdateProperty();
-    }
-    else if(maf_event->GetId() == mafVMEMeter::LENGTH_THRESHOLD_EVENT) 
-    {
-    }
+    UpdateProperty();
   }
+  else if(maf_event->GetId() == mafVMEMeter::LENGTH_THRESHOLD_EVENT) 
+  {
+  }
+  //}
 }
 //----------------------------------------------------------------------------
 void mafPipeMeter::Select(bool sel)
@@ -344,20 +344,14 @@ void mafPipeMeter::Select(bool sel)
 void mafPipeMeter::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
-  if (!m_DataMapper)
+  if (NULL == m_DataMapper || NULL == m_DataActor || NULL == m_Caption)
     return;
-  
-
-  if (!m_DataActor)
-    return;
-
-  if (!m_Caption)
-    return;
-
   
   vtkPolyData *data = m_MeterVME->GetPolylineOutput()->GetPolylineData();
   if (m_MeterVME->GetMeterRepresentation() == mafVMEMeter::LINE_REPRESENTATION)
+  {
     m_DataMapper->SetInput(data);
+  }
   else
   {
     m_Tube->Update();

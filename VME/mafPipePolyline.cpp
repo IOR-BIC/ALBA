@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-26 17:38:04 $
-Version:   $Revision: 1.16 $
+Date:      $Date: 2008-03-31 17:03:39 $
+Version:   $Revision: 1.17 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -373,7 +373,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
-		case ID_POLYLINE_REPRESENTATION:
+		  case ID_POLYLINE_REPRESENTATION:
 			{
 				SetRepresentation(m_Representation);
 				mafTagItem *item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
@@ -381,7 +381,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-		case ID_TUBE_RADIUS:
+		  case ID_TUBE_RADIUS:
 			{
 				m_Tube->SetRadius(m_TubeRadius);
 				mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
@@ -389,7 +389,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-		case ID_TUBE_CAPPING:
+		  case ID_TUBE_CAPPING:
 			{
 				m_Tube->SetCapping(m_Capping);
 				mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_CAPPING");
@@ -397,7 +397,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-		case ID_TUBE_RESOLUTION:
+		  case ID_TUBE_RESOLUTION:
 			{
 				m_Tube->SetNumberOfSides(m_TubeResolution);
 				mafTagItem *item = m_Vme->GetTagArray()->GetTag("TUBE_RESOLUTION");
@@ -405,7 +405,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-		case ID_SPHERE_RADIUS:
+		  case ID_SPHERE_RADIUS:
 			{
 				m_Sphere->SetRadius(m_SphereRadius);
 				mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
@@ -413,7 +413,7 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-		case ID_SPHERE_RESOLUTION:
+		  case ID_SPHERE_RESOLUTION:
 			{
 				m_Sphere->SetPhiResolution(m_SphereResolution);
 				m_Sphere->SetThetaResolution(m_SphereResolution);
@@ -422,17 +422,17 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-		case ID_SCALAR_DIMENSION:
-			UpdateProperty();
-			mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+		  case ID_SCALAR_DIMENSION:
+			  UpdateProperty();
+			  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			break;
-		case ID_SCALAR:
+		  case ID_SCALAR:
 			{
 				UpdateScalars();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
-    case ID_SPLINE:
+      case ID_SPLINE:
       {
         mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPLINE_MODE");
         item->SetValue(m_SplineMode);
@@ -440,14 +440,14 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         break;
       }
-    case ID_DISTANCE_BORDER:
+      case ID_DISTANCE_BORDER:
       {
         UpdateProperty();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
-		default:
-			mafEventMacro(*e);
+		  default:
+			  mafEventMacro(*e);
 			break;
 		}
 	}
@@ -457,14 +457,14 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
     UpdatePipeFromScalars();
     UpdateProperty();
 	}
-  else if (maf_event->GetSender() == m_Vme)
+  //else if (maf_event->GetSender() == m_Vme)
+  //{
+  if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
   {
-    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
-    {
-      UpdateData();
-      UpdatePipeFromScalars();
-    }
+    UpdateData();
+    UpdatePipeFromScalars();
   }
+  //}
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::UpdateScalars()
@@ -482,7 +482,7 @@ void mafPipePolyline::UpdateScalars()
 	m_Vme->Modified();
 
   mafVMEGenericAbstract *genAbst = mafVMEGenericAbstract::SafeDownCast(m_Vme);
-  if(genAbst == NULL)
+  if(NULL == genAbst)
   {
     m_Vme->Modified();
     m_Vme->Update();
