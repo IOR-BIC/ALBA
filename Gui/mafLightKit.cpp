@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:07 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-01 09:27:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,7 +54,8 @@ mafLightKit::mafLightKit(wxWindow* parent, vtkRenderer *r, mafObserver *Listener
 mafLightKit::~mafLightKit() 
 //----------------------------------------------------------------------------
 {
-	if(m_Gui)	m_Gui->SetListener(NULL);
+	if(m_Gui)	
+    m_Gui->SetListener(NULL);
 	cppDEL(m_Gui);
 }
 //----------------------------------------------------------------------------
