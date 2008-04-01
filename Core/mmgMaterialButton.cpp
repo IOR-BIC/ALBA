@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:50 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-01 09:26:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,8 @@
 #include "mmgPicButton.h"
 
 #include "mafVME.h"
+
+#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 //constants:
@@ -53,12 +55,11 @@ mmgMaterialButton::mmgMaterialButton(mafVME *vme, mafObserver *listener)
 	CreateGui();
 }
 //----------------------------------------------------------------------------
-mmgMaterialButton::~mmgMaterialButton() 
+mmgMaterialButton::~mmgMaterialButton()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_Material);
-	/*if(m_Gui)	
-    m_Gui->SetListener(NULL);*/
+	if(m_Gui)
+    m_Gui->SetListener(NULL);
 	cppDEL(m_Gui);
 }
 
