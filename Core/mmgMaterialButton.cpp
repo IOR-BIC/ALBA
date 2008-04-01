@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 09:26:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-01 11:57:56 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
 
 #include "mafVME.h"
 
-#include "mafMemDbg.h"
+//#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 //constants:

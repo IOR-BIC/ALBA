@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 11:43:36 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-04-01 11:55:57 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,7 @@
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeMeter);
 //----------------------------------------------------------------------------
-#include "mafMemDbg.h"
+//#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 mafPipeMeter::mafPipeMeter() 

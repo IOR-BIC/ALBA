@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 09:28:35 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2008-04-01 11:56:10 $
+  Version:   $Revision: 1.48 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,7 @@
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
 //----------------------------------------------------------------------------
-#include "mafMemDbg.h"
+//#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 mafPipeSurface::mafPipeSurface()
