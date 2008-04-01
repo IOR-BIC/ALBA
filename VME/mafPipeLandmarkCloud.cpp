@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 14:08:40 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-04-01 12:11:23 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,6 +46,7 @@
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeLandmarkCloud);
 //----------------------------------------------------------------------------
+//#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 mafPipeLandmarkCloud::mafPipeLandmarkCloud()
@@ -126,6 +127,7 @@ mafPipeLandmarkCloud::~mafPipeLandmarkCloud()
   {
     RemoveClosedCloudPipe();
   }
+  cppDEL(m_MaterialButton);
 }
 //----------------------------------------------------------------------------
 void mafPipeLandmarkCloud::Select(bool sel)

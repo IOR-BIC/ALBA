@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:32:30 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-01 12:11:23 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -225,6 +225,7 @@ mafPipeSurfaceTextured::~mafPipeSurfaceTextured()
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineActor);
   cppDEL(m_Axes);
+  cppDEL(m_MaterialButton);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTextured::Select(bool sel)
