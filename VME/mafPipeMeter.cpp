@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-31 17:03:39 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-04-01 11:43:36 $
+  Version:   $Revision: 1.24 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,10 @@
 #include "vtkProperty2D.h"
 #include "vtkCaptionActor2D.h"
 
+//----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeMeter);
+//----------------------------------------------------------------------------
+#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 mafPipeMeter::mafPipeMeter() 
@@ -221,6 +224,8 @@ mafPipeMeter::~mafPipeMeter()
   vtkDEL(m_SelectionMapper);
   vtkDEL(m_SelectionProperty);
   vtkDEL(m_SelectionActor);
+
+  cppDEL(m_MaterialButton);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
 //----------------------------------------------------------------------------
