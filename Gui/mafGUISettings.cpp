@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-28 15:04:12 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-01 13:01:12 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,11 +24,13 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 #include "mmgGui.h"
 
+//#include "mafMemDbg.h"
+
 //----------------------------------------------------------------------------
 mafGUISettings::mafGUISettings(mafObserver *Listener, const mafString &label)
 //----------------------------------------------------------------------------
 {
-	m_Listener = Listener;
+  m_Listener = Listener;
   m_Label    = label;
 
   m_Gui = NULL;
