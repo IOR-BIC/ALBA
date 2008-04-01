@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 10:28:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-01 13:29:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -229,8 +229,8 @@ void medPipeVolumeVR::Create(mafSceneNode *n)
 	m_VolumePropertyHigh = vtkVolumeProperty::New(); 
 	m_VolumePropertyHigh->SetColor(m_ColorTransferFunction);
 	m_VolumePropertyHigh->SetScalarOpacity(m_PiecewiseFunction);
-	//m_VolumePropertyHigh->SetGradientOpacity(m_GradientFunction);
-	m_VolumePropertyHigh->DisableGradientOpacityOn();
+	m_VolumePropertyHigh->SetGradientOpacity(m_GradientFunction);
+	m_VolumePropertyHigh->DisableGradientOpacityOff();
 	m_VolumePropertyHigh->SetInterpolationTypeToLinear();
 	m_VolumePropertyHigh->ShadeOn();
 	//m_VolumePropertyHigh->SetAmbient(0.1);
@@ -242,8 +242,8 @@ void medPipeVolumeVR::Create(mafSceneNode *n)
 	m_VolumePropertyLow = vtkVolumeProperty::New(); 
 	m_VolumePropertyLow->SetColor(m_ColorTransferFunction);
 	m_VolumePropertyLow->SetScalarOpacity(m_PiecewiseFunction);
-	//m_VolumePropertyLow->SetGradientOpacity(m_GradientFunction);
-	m_VolumePropertyLow->DisableGradientOpacityOn();
+	m_VolumePropertyLow->SetGradientOpacity(m_GradientFunction);
+	m_VolumePropertyLow->DisableGradientOpacityOff();
 	m_VolumePropertyLow->ShadeOff();
 	
 	m_PropertyLOD = vtkProperty::New();
@@ -373,8 +373,8 @@ void medPipeVolumeVR::Create(mafSceneNode *n)
 			m_ColorTransferFunction->AddRGBPoint(41843, 1.00, 1.00, 1.00);
 			m_ColorTransferFunction->AddRGBPoint(65535, 1.00, 1.00, 1.00);
 
-			//m_GradientFunction->AddPoint(0,0);
-			//m_GradientFunction->AddPoint(65535,1);
+			/*m_GradientFunction->AddPoint(0,0);
+			m_GradientFunction->AddPoint(33818,1);*/
 
 
 		/*m_PiecewiseFunction->AddPoint(m_Range[0],0);
