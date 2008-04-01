@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 19:36:50 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2008-04-01 09:28:35 $
+  Version:   $Revision: 1.47 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,6 +53,7 @@
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeSurface);
 //----------------------------------------------------------------------------
+#include "mafMemDbg.h"
 
 //----------------------------------------------------------------------------
 mafPipeSurface::mafPipeSurface()
@@ -277,18 +278,20 @@ mafPipeSurface::~mafPipeSurface()
 	if(m_EdgesActor)
 		m_AssemblyFront->RemovePart(m_EdgesActor);
 
-	vtkDEL(m_Mapper);
+  cppDEL(m_Axes);
+  cppDEL(m_MaterialButton);
+
+  vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineActor);
-  cppDEL(m_Axes);
-	vtkDEL(m_NormalActor);
-	vtkDEL(m_NormalMapper);
-	vtkDEL(m_CenterPointsFilter);
-	vtkDEL(m_NormalGlyph);
-	vtkDEL(m_Normal);
-	vtkDEL(m_EdgesActor);
-	vtkDEL(m_EdgesMapper);
-	vtkDEL(m_ExtractEdges);
+  vtkDEL(m_NormalActor);
+  vtkDEL(m_NormalMapper);
+  vtkDEL(m_CenterPointsFilter);
+  vtkDEL(m_NormalGlyph);
+  vtkDEL(m_Normal);
+  vtkDEL(m_EdgesActor);
+  vtkDEL(m_EdgesMapper);
+  vtkDEL(m_ExtractEdges);
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::Select(bool sel)
