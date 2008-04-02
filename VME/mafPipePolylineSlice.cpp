@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:31:00 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-02 10:23:36 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafVMEPolyline.h"
 #include "mafVMEOutputPolyline.h"
 #include "mafAbsMatrixPipe.h"
+#include "mafEventSource.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
@@ -70,7 +71,7 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_OutlineActor    = NULL;
   m_Cutter          = NULL;
   m_Plane	    = NULL;
-//m_Tube = NULL;
+  m_Tube = NULL;
 //m_TubeRadial = NULL;
 
   m_Origin[0] = 0;
@@ -90,6 +91,8 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_SplineCoefficient = 10.0;
 
   m_Fill = 0;
+
+  m_PolydataToPolylineFilter = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::Create(mafSceneNode *n)
@@ -107,6 +110,8 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   m_Axes            = NULL;
   m_PolySpline      = NULL;
 
+  m_Vme->GetEventSource()->AddObserver(this);
+
   assert(m_Vme->GetOutput()->IsMAFType(mafVMEOutputPolyline));
   mafVMEOutputPolyline *polyline_output = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
   assert(polyline_output);
@@ -117,14 +122,14 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
 
-  vtkMAFSmartPointer<vtkMAFPolyDataToSinglePolyLine> polydataToPolylineFilter;
-  polydataToPolylineFilter->SetInput(data);
-  polydataToPolylineFilter->Update();
+  vtkNEW(m_PolydataToPolylineFilter);
+  m_PolydataToPolylineFilter->SetInput(data);
+  m_PolydataToPolylineFilter->Update();
 
 	//////////////////////////////////
   vtkNEW(m_Tube);
 	m_Tube->UseDefaultNormalOn();
-	m_Tube->SetInput(polydataToPolylineFilter->GetOutput());
+	m_Tube->SetInput(m_PolydataToPolylineFilter->GetOutput());
 	m_Tube->SetRadius(m_Radius);
 	m_Tube->SetCapping(1);
 	m_Tube->SetNumberOfSides(16);
@@ -138,7 +143,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
-	vtkMAFToLinearTransform* m_VTKTransform = vtkMAFToLinearTransform::New();
+  vtkNEW(m_VTKTransform);
   m_VTKTransform->SetInputMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_Plane->SetTransform(m_VTKTransform);
 
@@ -221,20 +226,25 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 mafPipePolylineSlice::~mafPipePolylineSlice()
 //----------------------------------------------------------------------------
 {
+  m_Vme->GetEventSource()->RemoveObserver(this);
+
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
 
 
   vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
-  vtkDEL(m_Tube);
   //vtkDEL(m_TubeRadial);
   vtkDEL(m_OutlineBox);
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
-  vtkDEL(m_Plane);
+  vtkDEL(m_Delaunay);
   vtkDEL(m_Cutter);
+  vtkDEL(m_Plane);
+  vtkDEL(m_VTKTransform);
+  vtkDEL(m_Tube);
+  vtkDEL(m_PolydataToPolylineFilter);
   vtkDEL(m_PolySpline);
   cppDEL(m_Axes);
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
@@ -295,6 +305,11 @@ void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
         mafEventMacro(*e);
       break;
     }
+  }
+  else if (maf_event->GetId() == VME_OUTPUT_DATA_UPDATE && maf_event->GetSender()==m_Vme)
+  {
+    if(m_Vme->GetOutput() && m_Vme->GetOutput()->GetVTKData() && m_Actor)
+      UpdateProperty();
   }
 }
 //----------------------------------------------------------------------------
@@ -386,12 +401,11 @@ void mafPipePolylineSlice::UpdateProperty()
   data->Modified();
   data->Update();
 
-  vtkMAFSmartPointer<vtkMAFPolyDataToSinglePolyLine> polydataToPolylineFilter;
-  polydataToPolylineFilter->SetInput(data);
-  polydataToPolylineFilter->Update();
+  m_PolydataToPolylineFilter->SetInput(data);
+  m_PolydataToPolylineFilter->Update();
 
 
-  m_Tube->SetInput(polydataToPolylineFilter->GetOutput());
+  m_Tube->SetInput(m_PolydataToPolylineFilter->GetOutput());
   m_Tube->Update();
   m_Cutter->SetInput(m_Tube->GetOutput());
   m_Cutter->Update();
@@ -436,6 +450,8 @@ void mafPipePolylineSlice::UpdateProperty()
   else
     m_Mapper->SetInput(m_Cutter->GetOutput());
 
+  m_Mapper->Update();
+
 }
 //----------------------------------------------------------------------------
 vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
@@ -477,7 +493,8 @@ vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
 
   //order
   //cell 
-  vtkMAFSmartPointer<vtkCellArray> cellArray;
+  vtkCellArray *cellArray;
+  vtkNEW(cellArray);
   int pointId[2];
 
   for(int i = 0; i< m_PolySpline->GetNumberOfPoints();i++)
@@ -493,6 +510,8 @@ vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
   m_PolySpline->SetLines(cellArray);
   m_PolySpline->Modified();
   m_PolySpline->Update();
+
+  vtkDEL(cellArray);
 
   return m_PolySpline;
 }

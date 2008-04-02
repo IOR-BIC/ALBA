@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-25 10:47:09 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-02 10:23:36 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,8 @@ class vtkFixedCutter;
 class vtkPlane;
 class vtkTubeFilter;
 class vtkPolyData;
+class vtkMAFPolyDataToSinglePolyLine;
+class vtkMAFToLinearTransform;
 
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
@@ -115,6 +117,8 @@ protected:
   vtkFixedCutter		      *m_Cutter;
   vtkPolyData             *m_PolySpline;
   vtkDelaunay2D           *m_Delaunay;
+  vtkMAFPolyDataToSinglePolyLine *m_PolydataToPolylineFilter;
+  vtkMAFToLinearTransform *m_VTKTransform;
   double				           m_Border;
   double                   m_Radius;
   int                      m_SplineMode;
