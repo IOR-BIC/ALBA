@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-14 14:20:20 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-02 15:10:13 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -270,7 +270,24 @@ void mafVMEMeshAnsysTextExporter::WriteMaterialsFile( vtkUnstructuredGrid *input
   // contains only material attributes otherwise this code will not work
   vcl_string materialIDArrayName = "material_id";
 
-  vtkDataArray *materialsIDArray = inputUGrid->GetFieldData()->GetArray(materialIDArrayName.c_str());
+  vtkDataArray *materialsIDArray = NULL;
+  
+  // try field data
+  materialsIDArray = inputUGrid->GetFieldData()->GetArray(materialIDArrayName.c_str());
+
+  if (materialsIDArray != NULL)
+  {
+    mafLogMessage("Found material array in field data");
+  }
+  else
+  {
+    // try scalars 
+    materialsIDArray = inputUGrid->GetCellData()->GetScalars(materialIDArrayName.c_str());  
+    if (materialsIDArray != NULL)
+    {
+      mafLogMessage("Found material array as active scalar");
+    }
+  }
 
   if (materialsIDArray  == NULL)
   {
