@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-26 16:48:03 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2008-04-03 10:52:42 $
+  Version:   $Revision: 1.53 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -80,7 +80,7 @@ mafNode::~mafNode()
 void mafNode::SetId(mafID id)
 //------------------------------------------------------------------------------
 {
-  m_Id=id;
+  m_Id = id;
   Modified();
 }
 
@@ -796,8 +796,15 @@ mafNode *mafNode::GetLink(const char *name)
   if (it!=m_Links.end())
   {
     // if the link is still valid return its pointer
-    if (it->second.m_NodeId>=0)
+    // Check node validity instead of checking 'm_NodeId'
+    // then if m_NodeId is different from m_Id, the link will
+    // be updated.
+    if (it->second.m_Node->IsValid())
     {
+      if (it->second.m_NodeId != it->second.m_Node->GetId())
+      {
+        it->second.m_NodeId = it->second.m_Node->GetId();
+      }
       assert(it->second.m_Node);
       return it->second.m_Node;
     }
@@ -1191,9 +1198,11 @@ void mafNode::Print(std::ostream& os, const int tabs)// const
   }
 
   os << indent << "Links:" << std::endl;
+  os << indent << "Number of links:" << m_Links.size() << std::endl;
   for (mafLinksMap::const_iterator lnk_it=m_Links.begin();lnk_it!=m_Links.end();lnk_it++)
   {
-    os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId << std::endl;
+    os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId;
+    os << "\tNodeSubId: " << lnk_it->second.m_NodeSubId << std::endl;
   }
 }
 //-------------------------------------------------------------------------
