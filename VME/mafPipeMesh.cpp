@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-10 15:45:31 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-04-03 10:50:57 $
+Version:   $Revision: 1.10 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -276,6 +276,7 @@ mafPipeMesh::~mafPipeMesh()
   vtkDEL(m_MapperWired);
 	vtkDEL(m_OutlineActor);
 	cppDEL(m_Axes);
+  cppDEL(m_MaterialButton);
 	
 	delete[] m_ScalarsName;			//BES: 4.3.2008 - memory leak bug fix - NB. do not use cppDEL!
 	delete[] m_ScalarsVTKName;		//BES: 4.3.2008 - memory leak bug fix
