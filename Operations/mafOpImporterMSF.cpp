@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 11:34:59 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-04 11:41:55 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,6 +50,7 @@ mafOpImporterMSF::~mafOpImporterMSF()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_Group);
+  RemoveTempDirectory();
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpImporterMSF::Copy()   
