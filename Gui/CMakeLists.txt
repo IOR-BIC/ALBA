@@ -38,7 +38,6 @@ SET(PROJECT_SRCS
 	#./SrbStorageWS/stdsoap2.cpp
 	#./SrbStorageWS/stdsoap2.h
 	#------------------------------------
-	
   mafPics.cpp
   mafPics.h
   mafWXLog.cpp
@@ -125,6 +124,8 @@ SET(PROJECT_SRCS
   mmgViewFrame.h
   mmgViewWin.cpp
   mmgViewWin.h
+  mafGUICrossIncremental.cpp
+  mafGUICrossIncremental.h
 )
 
 IF (MAF_USE_CURL)
