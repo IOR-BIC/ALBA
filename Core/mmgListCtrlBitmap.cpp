@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrlBitmap.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:56:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-04 10:07:16 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,7 +56,7 @@ mmgListCtrlBitmap::~mmgListCtrlBitmap()
 	cppDEL(m_Images);
 }
 //----------------------------------------------------------------------------
-void mmgListCtrlBitmap::Reset ()
+void mmgListCtrlBitmap::Reset()
 //----------------------------------------------------------------------------
 {
   m_Images->RemoveAll();
@@ -64,13 +64,14 @@ void mmgListCtrlBitmap::Reset ()
   m_List->SetImageList(m_Images,wxIMAGE_LIST_SMALL);
   m_List->SetImageList(m_Images,wxIMAGE_LIST_NORMAL);
   m_List->InsertColumn(0, "");
-  m_List->SetColumnWidth( 0,1000 );
+  m_List->SetColumnWidth(0, 1000);
 }
 //----------------------------------------------------------------------------
-bool mmgListCtrlBitmap::AddItem (long item_id, wxString label, wxBitmap *bmp)
+bool mmgListCtrlBitmap::AddItem(long item_id, wxString label, wxBitmap *bmp)
 //----------------------------------------------------------------------------
 {
-  if( ItemExist(item_id) )return false;
+  if(ItemExist(item_id))
+    return false;
 
 	if(bmp) 
 		m_Images->Add(*bmp);
@@ -96,7 +97,7 @@ bool mmgListCtrlBitmap::DeleteItem(long item_id)
 	 
   int n = m_List->GetItemCount();
   int i;
-  for(i=id; i<n; i++)
+  for(i = id; i < n; i++)
 	{
     m_List->SetItemImage(i,i,i); 
 	}
@@ -107,7 +108,8 @@ bool mmgListCtrlBitmap::SetItemLabel(long item_id, wxString label)
 //----------------------------------------------------------------------------
 {
   long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return false;
+  if (id == -1) 
+    return false;
   m_List->SetItemText(id,label);
   return true;
 }
@@ -118,7 +120,7 @@ bool mmgListCtrlBitmap::SetItemIcon(long item_id, wxBitmap *bmp)
   long id = m_List->FindItem(-1, item_id);
   if(id == -1) 
     return false;
-  if(!bmp)
+  if(bmp == NULL)
     return false;
   m_Images->Replace(id,*bmp);
   m_List->SetItemImage(id,id,id);
@@ -129,7 +131,8 @@ wxString mmgListCtrlBitmap::GetItemLabel(long item_id)
 //----------------------------------------------------------------------------
 {
   long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return "";
+  if (id == -1) 
+    return "";
   return m_List->GetItemText(id);
 }
 //----------------------------------------------------------------------------
@@ -156,10 +159,11 @@ bool mmgListCtrlBitmap::SelectItem(long item_id)
 //----------------------------------------------------------------------------
 {
   long id =  m_List->FindItem(-1, item_id);
-  if (id == -1) return false;
+  if (id == -1) 
+    return false;
  
 	m_PreventNotify = true;
-  m_List->SetItemState(id,wxLIST_MASK_IMAGE,wxLIST_MASK_IMAGE) ;
+  m_List->SetItemState(id, wxLIST_STATE_SELECTED, wxLIST_MASK_IMAGE);
   m_PreventNotify = false;
   
 	return true;
@@ -168,7 +172,8 @@ bool mmgListCtrlBitmap::SelectItem(long item_id)
 void mmgListCtrlBitmap::OnSelectionChanged(wxListEvent& event)
 //----------------------------------------------------------------------------
 {
-  if(m_PreventNotify) return;
+  if(m_PreventNotify) 
+    return;
    
   mafString s = m_List->GetItemText(event.GetIndex()).c_str();
   long item_id = event.GetData();
