@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircleTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-04 15:17:50 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-04-04 15:23:45 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -41,7 +41,7 @@ All rights reserved.
 #include "mafConfigure.h"
 
 
-static const bool renderingOn = true ;  // switch interactive rendering on
+static const bool renderingOn = false ;  // switch interactive rendering on
 
 void vtkMEDExtrudeToCircleTest::setUp()
 {
