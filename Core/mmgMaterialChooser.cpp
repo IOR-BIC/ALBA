@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-04 10:07:50 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -408,7 +408,8 @@ void mmgMaterialChooser::LoadMaterials_old()
 
   // check if is a valid file 
 	char inputline[21];
-  for(i=0;i<20;i++) f_in >> inputline[i];
+  for(i = 0; i < 20; i++) 
+    f_in >> inputline[i];
 	inputline[21] = '\0';
 	std::string str(inputline);
 	if (str.find("MATERIALSPROPERTIES:") != 0)
@@ -697,47 +698,49 @@ void mmgMaterialChooser::ClearList()
 void mmgMaterialChooser::SelectMaterial(mmaMaterial *m)
 //----------------------------------------------------------------------------
 {
-	m_ChoosedMaterial = m;
-	
-	//copy choosed material on m_Property
-	m_Property->DeepCopy(m_ChoosedMaterial->m_Prop);
-	
-  //update GUI related vars
-	double rgb[3];
-	m_Property->GetAmbientColor(rgb);
-	m_AmbientColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
-	m_Property->GetDiffuseColor(rgb);
-	m_DiffuseColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
-	m_Property->GetSpecularColor(rgb);
-	m_SpecularColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
+  if(m_ListCtrlMaterial->SelectItem((long)m))
+  {
+    m_ChoosedMaterial = m;
 
-	m_AmbientIntensity  = m_Property->GetAmbient();
-	m_DiffuseIntensity  = m_Property->GetDiffuse();  
-	m_SpecularIntensity = m_Property->GetSpecular(); 
-	m_SpecularPower     = m_Property->GetSpecularPower();  
-	m_Opacity					  = m_Property->GetOpacity(); 
-	m_MaterialName      = m_ChoosedMaterial->m_MaterialName;
-	
-  m_Wire = (m_Property->GetRepresentation() == 1);
-	if (m_Wire)
-	{
-		m_Sphere->SetThetaResolution(10);
-		m_Sphere->SetPhiResolution(3);
-		m_Property->SetRepresentationToWireframe();
-	}
-	else
-	{
-		m_Sphere->SetThetaResolution(20);
-		m_Sphere->SetPhiResolution(20);
-		m_Property->SetRepresentationToSurface();
-  } 
+    //copy chose material on m_Property
+    m_Property->DeepCopy(m_ChoosedMaterial->m_Prop);
 
-	//enable REMOVE if m_ChoosedMaterial != NULL 
-  bool enable = (m_ChoosedMaterial != NULL);
-  m_Gui->Enable(ID_REMOVE, enable);
-	m_Gui->Update();
+    //update GUI related vars
+    double rgb[3];
+    m_Property->GetAmbientColor(rgb);
+    m_AmbientColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
+    m_Property->GetDiffuseColor(rgb);
+    m_DiffuseColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
+    m_Property->GetSpecularColor(rgb);
+    m_SpecularColor.Set(255*rgb[0],255*rgb[1],255*rgb[2]);		
 
-  m_ListCtrlMaterial->SelectItem((long)m_ChoosedMaterial);
+    m_AmbientIntensity  = m_Property->GetAmbient();
+    m_DiffuseIntensity  = m_Property->GetDiffuse();  
+    m_SpecularIntensity = m_Property->GetSpecular(); 
+    m_SpecularPower     = m_Property->GetSpecularPower();  
+    m_Opacity					  = m_Property->GetOpacity(); 
+    m_MaterialName      = m_ChoosedMaterial->m_MaterialName;
+
+    m_Wire = m_Property->GetRepresentation() == 1;
+    if (m_Wire)
+    {
+      m_Sphere->SetThetaResolution(10);
+      m_Sphere->SetPhiResolution(3);
+      m_Property->SetRepresentationToWireframe();
+    }
+    else
+    {
+      m_Sphere->SetThetaResolution(20);
+      m_Sphere->SetPhiResolution(20);
+      m_Property->SetRepresentationToSurface();
+    } 
+
+    //enable REMOVE if m_ChoosedMaterial != NULL 
+    m_Gui->Enable(ID_REMOVE, m_ChoosedMaterial != NULL);
+    m_Gui->Update();
+  }
+
+//  m_ListCtrlMaterial->SelectItem((long)m_ChoosedMaterial);
 }
 //----------------------------------------------------------------------------
 void mmgMaterialChooser::AddMaterial()
@@ -751,7 +754,7 @@ void mmgMaterialChooser::AddMaterial()
   m_List.push_back(mat);
 
 	// insert mat in the tree
-	m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());	
+	m_ListCtrlMaterial->AddItem((long)mat, mat->m_MaterialName.GetCStr(), mat->MakeIcon());	
   m_ListCtrlMaterial->SelectItem((long)mat);
 	SelectMaterial(mat);
 }
@@ -795,11 +798,13 @@ void mmgMaterialChooser::LoadLibraryFromVme(mafVME *vme)
 	} */
 }
 //----------------------------------------------------------------------------
-void mmgMaterialChooser::StoreLibraryToVme (mafVME *vme)
+void mmgMaterialChooser::StoreLibraryToVme(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-	if(!vme) return;
-	if(!m_List.empty()) return;
+	if(vme == NULL) 
+    return;
+	if(!m_List.empty()) 
+    return;
 /*
 	int counter =1;
   char tagname[100];
@@ -895,6 +900,6 @@ void mmgMaterialChooser::CreateDefaultLibrary()
     m_List.push_back(mat);
 
 		// insert mat in the tree
-		this->m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
+		m_ListCtrlMaterial->AddItem((long)mat,mat->m_MaterialName.GetCStr(),mat->MakeIcon());
   }
 }
