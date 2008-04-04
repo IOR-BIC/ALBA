@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrlBitmap.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:07:16 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-04 10:58:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -70,7 +70,8 @@ void mmgListCtrlBitmap::Reset()
 bool mmgListCtrlBitmap::AddItem(long item_id, wxString label, wxBitmap *bmp)
 //----------------------------------------------------------------------------
 {
-  if(ItemExist(item_id))
+  long id =  m_List->FindItem(-1, item_id);
+  if (id != -1)
     return false;
 
 	if(bmp) 
@@ -163,8 +164,9 @@ bool mmgListCtrlBitmap::SelectItem(long item_id)
     return false;
  
 	m_PreventNotify = true;
-  m_List->SetItemState(id, wxLIST_STATE_SELECTED, wxLIST_MASK_IMAGE);
+  m_List->SetItemState(id, wxLIST_STATE_SELECTED, wxLIST_MASK_TEXT);
   m_PreventNotify = false;
+  Refresh();
   
 	return true;
 }
@@ -181,13 +183,6 @@ void mmgListCtrlBitmap::OnSelectionChanged(wxListEvent& event)
 
 	mafEventMacro(mafEvent(this, ITEM_SELECTED, &s, item_id ));
   event.Skip();
-}
-//----------------------------------------------------------------------------
-bool mmgListCtrlBitmap::ItemExist(long item_id)
-//----------------------------------------------------------------------------
-{
-  long id =  m_List->FindItem(-1, item_id);
-  return (id != -1);
 }
 //----------------------------------------------------------------------------
 void mmgListCtrlBitmap::SetColumnLabel(int col, wxString label)

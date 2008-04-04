@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:26:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-04 10:58:47 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,9 @@ void mmgListCtrl::Reset ()
 bool mmgListCtrl::AddItem (long item_id, wxString label, ITEM_ICONS icon)
 //----------------------------------------------------------------------------
 {
-  if( ItemExist(item_id) )return false;
+  long id =  m_List->FindItem(-1, item_id);
+  if(id != -1)
+    return false;
   long tmp = m_List->InsertItem(item_id,label,icon); 
   m_List->SetItemData(tmp, item_id);
   return true;
@@ -160,13 +162,6 @@ void mmgListCtrl::OnSelectionChanged(wxListEvent& event)
 
   mafEventMacro(mafEvent(this, ITEM_SELECTED, &s, item_id ));
   event.Skip();
-}
-//----------------------------------------------------------------------------
-bool mmgListCtrl::ItemExist(long item_id)
-//----------------------------------------------------------------------------
-{
-  long id =  m_List->FindItem(-1, item_id);
-  return (id != -1);
 }
 //----------------------------------------------------------------------------
 void mmgListCtrl::SetColumnLabel(int col, wxString label)

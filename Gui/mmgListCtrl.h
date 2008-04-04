@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgListCtrl.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:26:02 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-04 10:58:47 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,9 +79,6 @@ protected:
   /** Notify the Listener of item selection and deselection. */
   void OnSelectionChanged(wxListEvent& event);
 
-  /** Return true if the item exists. */
-  bool ItemExist(long item_id);
-    
   bool          m_PreventNotify;
   wxListCtrl   *m_List;         
   wxImageList  *m_Images;       
