@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:43 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-04-04 09:08:46 $
+  Version:   $Revision: 1.28 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -474,6 +474,12 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
       if(n)
 			  n->m_PipeCreatable = true;
 		}
+    else if (((mafVME *)vme)->GetOutput()->IsA("mafVMEAdvancedProber"))
+    {
+      n = m_Sg->Vme2Node(vme);
+      if(n)
+        n->m_PipeCreatable = false;
+    }
   }
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
@@ -554,6 +560,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 							((mafPipeMeshSlice *)p)->SetSlice(m_OriginVolume);
 					}
 				}
+        iter->Delete();
 			}
       mafEventMacro(mafEvent(this,ID_POSITION,m_Position));
 		break;
@@ -602,6 +609,7 @@ void mafViewSingleSlice::OnEvent(mafEventBase *maf_event)
 					}
 				}
 			}
+      iter->Delete();
 			
 			CameraUpdate();
 		}
@@ -856,6 +864,7 @@ void mafViewSingleSlice::VmeShow(mafNode *node, bool show)
 					}
 				}
 			}
+      iter->Delete();
       this->UpdateText(0);
 			m_Gui->Enable(ID_POSITION,false);
 			m_Gui->Update();
