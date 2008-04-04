@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:26:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-04 10:06:06 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,26 +40,36 @@ public:
         wxWindowID id,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
-        long style = 0
+        long style = 0,
+        const char* middleButtonTitle = "windowing"
         );
  ~mmgLutSlider();
-  
+ 
+ enum ID_ARG_MOUSE_MOVE
+ {
+   ID_MOUSE_RELEASE = 0,
+   ID_MOUSE_MOVE,
+ };
+
   void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
 
   /** Set the range of the double slider. */
-	void SetRange(int  rmin, int  rmax);
+	void SetRange(double  rmin, double  rmax);
 
   /** Get the range of the double slider. */
-  void GetRange(int *rmin, int *rmax) {*rmin = m_MinValue; *rmax = m_MaxValue;};
+  void GetRange(double *rmin, double *rmax) {*rmin = m_MinValue; *rmax = m_MaxValue;};
 
   /** Set the values of the slider's cursors. */
-  void SetSubRange(int  low, int  hi ); 
+  void SetSubRange(double  low, double  hi ); 
 
   /** Get the values of the slider's cursors. */
-  void GetSubRange(int *low, int *hi ) {*low = m_LowValue; *hi = m_HighValue;};
+  void GetSubRange(double *low, double *hi ) {*low = m_LowValue; *hi = m_HighValue;};
 
   /** Set the position of the slider's cursors and send the event foe range modified. */
   void MoveButton(int id, int pos);
+
+  /** Set the position of the slider's cursors and send the event foe range modified. */
+  void ReleaseButton();
 
   /** Show an entry to insert a numerical values from keyboard. */
 	void ShowEntry(int id);
@@ -69,6 +79,10 @@ public:
 
   /** Set the label background colour. */
 	void SetColour(long i, wxColour colour);
+
+  /** Set the label background colour. */
+  void SetFloatingPointTextOn(){m_FloatingPointText = true;};
+  void SetFloatingPointTextOff(){m_FloatingPointText = false;};
 
 protected:  
   /** Update slider's cursors. */
@@ -86,10 +100,12 @@ protected:
 	wxStaticText *m_MinLabel;
 	wxStaticText *m_MaxLabel;
   
-	int m_MinValue;
-  int m_MaxValue;
-  int m_LowValue;
-  int m_HighValue;
+	double m_MinValue;
+  double m_MaxValue;
+  double m_LowValue;
+  double m_HighValue;
+
+  bool m_FloatingPointText; ///< flag used for visualization of decimal in the title of button, default : false
 
   mafObserver  *m_Listener;     
 DECLARE_EVENT_TABLE()
