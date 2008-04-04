@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 16:25:29 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-04 11:34:59 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -183,7 +183,6 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
   }
   if (zfile == "")
   {
-    zip_fs->CleanUpHandlers();
     cppDEL(zip_fs);
     RemoveTempDirectory();
     return "";
@@ -195,7 +194,6 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
   zfileStream = zip_fs->OpenFile(zfile);
   if (zfileStream == NULL)
   {
-    zip_fs->CleanUpHandlers();
     cppDEL(zip_fs);
     RemoveTempDirectory();
     return "";
@@ -230,7 +228,6 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
     zfileStream = zip_fs->OpenFile(zfile);
     if (zfileStream == NULL)
     {
-      zip_fs->CleanUpHandlers();
       cppDEL(zip_fs);
       RemoveTempDirectory();
       return "";
@@ -259,7 +256,6 @@ const char *mafOpImporterMSF::ZIPOpen(mafString m_File)
   }
 
   zip_fs->ChangePathTo(m_TmpDir.GetCStr(), TRUE);
-  zip_fs->CleanUpHandlers();
   cppDEL(zip_fs);
 
   if (m_MSFFile == "")
