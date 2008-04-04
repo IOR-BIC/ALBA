@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.h,v $
 Language:  C++
-Date:      $Date: 2008-03-18 13:59:06 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2008-04-04 08:23:16 $
+Version:   $Revision: 1.14 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,6 +31,8 @@ class vtkPolyDataMapper;
 class vtkProbeFilter;
 class vtkPlaneSource;
 class mafMatrix;
+
+#define VTK_DOUBLE_MAX         1.0e+299
 
 //----------------------------------------------------------------------------
 // mafViewCTNew :
@@ -70,6 +72,7 @@ public:
 		ID_LAYOUT_POSITION,
 		ID_LAYOUT_NORMAL,
 		ID_LAYOUT_THICKNESS,
+    ID_COMBO_DIMENSION,
 		ID_LAYOUT_UPDATE,
     ID_ZOOM_FACTOR,
     ID_ZOOM_BUTTON,
@@ -118,7 +121,10 @@ public:
 	virtual void CameraReset(mafNode *node = NULL);
   void ZoomAllCTs();
 
-  void SetTextValue(int index, double value);
+  void SetTextValue(int index, double value , double maximum = VTK_DOUBLE_MAX);
+
+  //show on off Rulers in all SubViews
+  void RulerShow(bool show);
 
 protected:
 	/**
@@ -152,6 +158,8 @@ protected:
 	// this member variables are used by side panel gui view
 	int m_WidthSection;
 	int m_HeightSection;
+
+  int m_ComboDimension;
 
 	std::vector<double *> m_Position;
 	std::vector<double *> m_Normal;

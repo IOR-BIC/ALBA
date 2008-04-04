@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCTNew.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-18 13:59:06 $
-Version:   $Revision: 1.49 $
+Date:      $Date: 2008-04-04 08:23:16 $
+Version:   $Revision: 1.50 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -67,6 +67,13 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 mafCxxTypeMacro(mafViewCTNew);
 //----------------------------------------------------------------------------
 
+enum CTS_DIMENSION
+{
+  CTS_LARGE_DIMENSION = 0,
+  CTS_MEDIUM_DIMENSION,
+  CTS_SMALL_DIMENSION,
+};
+
 //----------------------------------------------------------------------------
 mafViewCTNew::mafViewCTNew(wxString label)
 : mafViewCompound(label, 1, 1)
@@ -78,6 +85,7 @@ mafViewCTNew::mafViewCTNew(wxString label)
 
 	m_WidthSection = 30;
 	m_HeightSection = 50;
+  m_ComboDimension = CTS_MEDIUM_DIMENSION;
 
   m_Thickness = 0;
 	m_AdditionalProfileNumber = 0;
@@ -203,6 +211,8 @@ void mafViewCTNew::VmeShow(mafNode *node, bool show)
 
 		m_Gui->Enable(ID_LAYOUT_WIDTH,m_CurrentVolume!=NULL);
 		m_Gui->Enable(ID_LAYOUT_HEIGHT,m_CurrentVolume!=NULL);
+    m_Gui->Enable(ID_COMBO_DIMENSION,m_CurrentVolume!=NULL);
+    
 		m_Gui->Enable(ID_LAYOUT_THICKNESS,m_CurrentVolume!=NULL);
 		m_Gui->Update();
 	}
@@ -261,6 +271,8 @@ void mafViewCTNew::VmeRemove(mafNode *node)
 
 		m_Gui->Enable(ID_LAYOUT_WIDTH,m_CurrentVolume!=NULL);
 		m_Gui->Enable(ID_LAYOUT_HEIGHT,m_CurrentVolume!=NULL);
+    m_Gui->Enable(ID_COMBO_DIMENSION,m_CurrentVolume!=NULL);
+    
 		m_Gui->Enable(ID_LAYOUT_THICKNESS,m_CurrentVolume!=NULL);
 		m_Gui->Update();
 	}
@@ -278,8 +290,26 @@ void mafViewCTNew::OnEvent(mafEventBase *maf_event)
 	{
 		switch(maf_event->GetId())
 		{
-		case ID_LAYOUT_HEIGHT:
-		case ID_LAYOUT_WIDTH:
+		//case ID_LAYOUT_HEIGHT:
+		//case ID_LAYOUT_WIDTH:
+    case ID_COMBO_DIMENSION:
+      {
+        switch(m_ComboDimension)
+        {
+        case CTS_LARGE_DIMENSION:
+          m_WidthSection = 40;
+          m_HeightSection = 80;
+          break;
+        case CTS_MEDIUM_DIMENSION:
+          m_WidthSection = 30;
+          m_HeightSection = 50;
+          break;
+        case CTS_SMALL_DIMENSION:
+          m_WidthSection = 15;
+          m_HeightSection = 25;
+          break;
+        }
+      }
 			ProbeVolume();
       //send here
       e->SetDouble(m_WidthSection);
@@ -336,17 +366,22 @@ mmgGui* mafViewCTNew::CreateGui()
   
   m_Gui = new mmgGui(this);
 
-	m_Gui->Integer(ID_LAYOUT_WIDTH,_("Width"),&m_WidthSection);
-	m_Gui->Integer(ID_LAYOUT_HEIGHT,_("Height"),&m_HeightSection);
+	//m_Gui->Integer(ID_LAYOUT_WIDTH,_("Width"),&m_WidthSection);
+	//m_Gui->Integer(ID_LAYOUT_HEIGHT,_("Height"),&m_HeightSection);
+
+  wxString choices[3] = {_("Large"), _("Medium"), _("Small")};
+  m_Gui->Combo(ID_COMBO_DIMENSION, "Dimension", &m_ComboDimension, 3, choices);
 
 	m_Gui->Double(ID_LAYOUT_THICKNESS,_("Thickness"), &m_Thickness,0,50,2,_("define the thickness of the slice"));
-  m_Gui->Double(ID_ZOOM_FACTOR,_("Zoom Factor"), &m_ZoomFactor,0,MAXDOUBLE,-1,_("define zoom factor"));
+  m_Gui->Double(ID_ZOOM_FACTOR,_("Zoom"), &m_ZoomFactor,0,MAXDOUBLE,-1,_("define zoom factor"));
   m_Gui->Button(ID_ZOOM_BUTTON,"Zoom","");
 
 	//m_Gui->Button(ID_LAYOUT_UPDATE,"Update");
 
 	m_Gui->Enable(ID_LAYOUT_WIDTH,m_CurrentVolume!=NULL);
 	m_Gui->Enable(ID_LAYOUT_HEIGHT,m_CurrentVolume!=NULL);
+  m_Gui->Enable(ID_COMBO_DIMENSION,m_CurrentVolume!=NULL);
+  
 	m_Gui->Enable(ID_LAYOUT_THICKNESS,m_CurrentVolume!=NULL);
 
 	m_Gui->Label("");
@@ -808,11 +843,15 @@ void mafViewCTNew::SetCTLookupTable(double min, double max)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewCTNew::SetTextValue(int index, double value)
+void mafViewCTNew::SetTextValue(int index, double value , double maximum)
 //----------------------------------------------------------------------------
 {
   mafString t;
-  t = mafString(wxString::Format("%.1f", value < 0.0 ? 0.0 : value));
+  double displayedValue;
+  displayedValue = value < 0.0 ? 0.0 : value;
+  displayedValue = displayedValue < maximum ? displayedValue : maximum;
+
+  t = mafString(wxString::Format("%.1f", displayedValue));
   m_Text[index]->SetInput(t);
 }
 //----------------------------------------------------------------------------
@@ -842,4 +881,14 @@ void mafViewCTNew::ZoomAllCTs()
   }
   CameraUpdate();
 
+}
+//----------------------------------------------------------------------------
+void mafViewCTNew::RulerShow(bool show)
+//----------------------------------------------------------------------------
+{
+  for(int idSubView=0; idSubView<CT_CHILD_VIEWS_NUMBER; idSubView++)
+  {
+    mafViewSlice *vslice = ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND])->GetSubView(idSubView));
+    vslice->m_Rwi->SetRuleVisibility(show);
+  }
 }
