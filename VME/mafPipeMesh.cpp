@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-03 10:50:57 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-04-04 13:37:48 $
+Version:   $Revision: 1.11 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -153,22 +153,20 @@ void mafPipeMesh::ExecutePipe()
     }
   }
 
-	if(m_MeshMaterial->m_ColorLut)
-	{
-	  m_Table = m_MeshMaterial->m_ColorLut;
-	}
-	else
-	{
-    vtkNEW(m_Table);
-    lutPreset(4,m_Table);
-
-		m_MeshMaterial->m_ColorLut = m_Table;
-	}
-
+  vtkNEW(m_Table);
+  lutPreset(4,m_Table);
+  m_Table->Build();
+  m_Table->DeepCopy(m_MeshMaterial->m_ColorLut);
+	
   m_Table->SetValueRange(sr);
   m_Table->SetHueRange(0.667, 0.0);
   m_Table->SetTableRange(sr);
   m_Table->Build();
+  
+  m_MeshMaterial->m_ColorLut->DeepCopy(m_Table);
+  m_MeshMaterial->m_ColorLut->Build();
+
+  
 
   // create the linearization filter
   vtkNEW(m_LinearizationFilter);
@@ -270,6 +268,7 @@ mafPipeMesh::~mafPipeMesh()
 
   vtkDEL(m_LinearizationFilter);
 	vtkDEL(m_GeometryFilter);
+  vtkDEL(m_Table);
 	vtkDEL(m_Mapper);
 	vtkDEL(m_Actor);
   vtkDEL(m_ActorWired);
@@ -465,11 +464,15 @@ void mafPipeMesh::UpdateScalars()
   {
     m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
     m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->Modified();
+    m_LinearizationFilter->GetOutput()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+    m_LinearizationFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
   }
   else if(m_ActiveScalarType == CELL_TYPE)
   {
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
+    m_LinearizationFilter->GetOutput()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+    m_LinearizationFilter->GetOutput()->GetCellData()->GetScalars()->Modified();
   }
   m_Vme->Modified();
   m_Vme->GetOutput()->GetVTKData()->Update();
@@ -501,6 +504,8 @@ void mafPipeMesh::UpdateScalars()
   }
   m_Vme->Modified();
   m_Vme->Update();
+  m_LinearizationFilter->Modified();
+  m_LinearizationFilter->Update();
   
   UpdatePipeFromScalars();
   
@@ -521,7 +526,10 @@ void mafPipeMesh::UpdatePipeFromScalars()
   m_Table->SetTableRange(sr);
   m_Table->SetValueRange(sr);
   m_Table->SetHueRange(0.667, 0.0);
-//  m_Table->Build();
+  
+  m_MeshMaterial->m_ColorLut->DeepCopy(m_Table);
+  m_MeshMaterial->UpdateProp();
+  m_MeshMaterial->UpdateFromLut();
 
 
   if(m_ActiveScalarType == POINT_TYPE)
