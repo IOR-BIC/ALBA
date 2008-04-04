@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:07:50 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-04 10:31:20 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -698,7 +698,7 @@ void mmgMaterialChooser::ClearList()
 void mmgMaterialChooser::SelectMaterial(mmaMaterial *m)
 //----------------------------------------------------------------------------
 {
-  if(m_ListCtrlMaterial->SelectItem((long)m))
+  if(m_ListCtrlMaterial->SelectItem((long)m) || m_ChoosedMaterial == NULL)
   {
     m_ChoosedMaterial = m;
 
