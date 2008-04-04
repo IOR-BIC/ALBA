@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 16:23:50 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2008-04-04 08:28:45 $
+  Version:   $Revision: 1.43 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,7 +106,7 @@ mafViewRXCT::~mafViewRXCT()
   m_ViewsRX[RX_FRONT_VIEW] = m_ViewsRX[RX_SIDE_VIEW] = NULL;
   m_ViewCTCompound = NULL;
   m_CurrentSurface.clear();
-  
+
   for (int i = RX_FRONT_VIEW;i < VIEWS_NUMBER;i++)
   {
     cppDEL(m_LutSliders[i]);
@@ -378,7 +378,7 @@ void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
   // is the volume visible?
   if(((mafViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
   {
-    int low, hi;
+    double low, hi;
 
     // from which lut slider the event is coming?
     if (maf_event->GetSender() == m_LutSliders[RX_FRONT_VIEW])

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:53:31 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-04 08:28:45 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -175,7 +175,7 @@ void mafViewRXCompound::OnEvent(mafEventBase *maf_event)
         // is the volume visible?
         if(((mafViewSlice *)m_ChildViewList[RX_FRONT_VIEW])->VolumeIsVisible())
         {
-          int low, hi;
+          double low, hi;
 
           // from which lut slider the event is coming?
           if (maf_event->GetSender() == m_LutSliders[RX_FRONT_VIEW])

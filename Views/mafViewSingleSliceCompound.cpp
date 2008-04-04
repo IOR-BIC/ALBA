@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 10:59:04 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-04-04 08:28:45 $
+  Version:   $Revision: 1.15 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,7 +112,7 @@ void mafViewSingleSliceCompound::OnEvent(mafEventBase *maf_event)
 				//Windowing
 				if(mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
 				{
-					int low, hi;
+					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
 					mafEventMacro(mafEvent(this,CAMERA_UPDATE));

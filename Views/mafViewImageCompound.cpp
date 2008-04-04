@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImageCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:35:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-04 08:28:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,7 +112,7 @@ void mafViewImageCompound::OnEvent(mafEventBase *maf_event)
 				//Windowing
 				if(mafVMEImage::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
 				{
-					int low, hi;
+					double low, hi;
 					m_LutSlider->GetSubRange(&low,&hi);
 					m_ColorLUT->SetTableRange(low,hi);
 					mafEventMacro(mafEvent(this,CAMERA_UPDATE));

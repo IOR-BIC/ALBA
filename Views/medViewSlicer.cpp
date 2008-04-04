@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:55:09 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-04 08:28:45 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -252,7 +252,7 @@ void medViewSlicer::OnEventThis(mafEventBase *maf_event)
       {
         if(m_CurrentVolume)
         {
-          int low, hi;
+          double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));

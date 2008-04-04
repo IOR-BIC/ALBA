@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-11 14:29:11 $
-  Version:   $Revision: 1.58 $
+  Date:      $Date: 2008-04-04 08:28:45 $
+  Version:   $Revision: 1.59 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -248,7 +248,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
       {
         if(((mafViewSlice *)m_ChildViewList[0])->VolumeIsVisible())
         {
-          int low, hi;
+          double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
           m_ColorLUT->SetTableRange(low,hi);
           mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
@@ -360,6 +360,8 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
+      m_Views[v]->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
     }
     else
     {

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: mmoMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-19 10:37:35 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-04 08:29:39 $
+Version:   $Revision: 1.3 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -606,7 +606,7 @@ void mmoMML::OnSlider()
 void mmoMML::OnLut() 
 //----------------------------------------------------------------------------
 {
-  int Low,High;
+  double Low,High;
 
   m_lut->GetSubRange(&Low, &High);
 
