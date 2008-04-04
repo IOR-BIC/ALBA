@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 17:06:52 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2008-04-04 10:05:33 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -26,8 +26,10 @@
 //----------------------------------------------------------------------------
 class mmgFloatSlider;
 class mmgCheckListBox;
+class mafGUICrossIncremental;
 class mmgLutSwatch;
 class mmgRollOut;
+
 
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
 class vtkLookupTable;
@@ -98,10 +100,10 @@ public:
   virtual ~mmgGui();
     
   /** Set the Listener that will receive event-notification, the Listener can be changed any time  */
-  void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
+  void SetListener(mafObserver *listener)   {m_Listener = listener;}; 
 
   /** Separator widget. */
-	void Divider(long style=0);
+	void Divider(long style = 0);
 
   /** Label widget. */
   void Label(mafString label,bool bold = false, bool multiline = false);
@@ -169,7 +171,7 @@ public:
   void VectorN(int id,wxString label, int *var,int num_elem = 3,int min = MININT, int max = MAXINT, wxString tooltip = "");
 
   /** Checkbutton widget. */
-  void Bool (int id, mafString label, int *var, int flag = 0, mafString tooltip = ""	);
+  void Bool(int id, mafString label, int *var, int flag = 0, mafString tooltip = ""	);
 
   /** Radiobutton widget. */
   void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "", int style = wxRA_SPECIFY_COLS);
@@ -184,10 +186,10 @@ public:
   void FileSave(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "");
 
   /** Dir Open dialog widget. */
-  void DirOpen (int id,mafString label,mafString *var, mafString tooltip = "");
+  void DirOpen(int id,mafString label,mafString *var, mafString tooltip = "");
 
-  /** Colour dialog widget. */
-  void Color   (int id,wxString label,wxColour *var, wxString tooltip = "");
+  /** Color dialog widget. */
+  void Color(int id,wxString label,wxColour *var, wxString tooltip = "");
 
   #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::
   /** LookupTable dialog widget. */
@@ -195,13 +197,16 @@ public:
   #endif //:::::::::::::::::::::::::::::::::
 
   /** Button widget. */
-  void Button  (int id,mafString button_text,mafString label="", mafString tooltip=""); 
+  void Button(int id,mafString button_text,mafString label="", mafString tooltip=""); 
   
   /** Button widget with variable label. */
-  void Button  (int id,mafString *label,mafString button_text, mafString tooltip=""); 
+  void Button(int id,mafString *label,mafString button_text, mafString tooltip=""); 
+
+	/** Widget with 4 buttons and a text array disposed like a cross.*/
+  mafGUICrossIncremental *CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip ="");
 
   /** Ok-Cancel Button widget. */
-  void OkCancel(int alignment=wxALL);
+  void OkCancel(int alignment = wxALL);
 
   /** Integer slider widget. */
 	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "",bool showText=true);
@@ -210,8 +215,6 @@ public:
   mmgFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "");
 
   /** Checked listbox widget. */
-  //SIL. 24-3-2005: - temporary removed
-  //MARCO: 22-6-2005 - readded 
   mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
 
   /** Listbox widget. */
@@ -238,7 +241,7 @@ public:
   /** Remove sizer from gui sizer. */
   bool Remove(wxSizer*  sizer ) {return m_Sizer->Detach(sizer);};
 
-  /** Recalc 'this' Gui Size and MinSize considering the space required by the children widgets.
+  /** Recalculate 'this' Gui Size and MinSize considering the space required by the children widgets.
       FitGui is called implicitly when a gui is inserted in a mmgGuiHolder or mmgPanel.
       FitGui must call explicitly when children widget are changed dynamically. */
   void FitGui();
@@ -264,7 +267,7 @@ public:
   As a side effect a new pair widget_ID->module_ID is stored in m_WidgetTableID
   \sa GetWidgetId GetModuleId MAFWidgetId m_WidgetTableID
   */
-  int GetWidgetId(int mod_id) {MAFWidgetId++; /*assert(MAFWidgetId < MAXID);*/ m_WidgetTableID[MAFWidgetId - MINID] = mod_id; return MAFWidgetId;}; 
+  int GetWidgetId(int mod_id) {MAFWidgetId++; m_WidgetTableID[MAFWidgetId - MINID] = mod_id; return MAFWidgetId;}; 
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};
@@ -312,5 +315,4 @@ protected:
 
 DECLARE_EVENT_TABLE()
 };
-
 #endif
