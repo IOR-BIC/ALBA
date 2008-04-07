@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterSTL.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-07 13:41:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,17 +102,31 @@ void mafOpExporterSTL::OnEvent(mafEventBase *maf_event)
 				{
 					//mafString FileDir = mafGetApplicationDirectory().c_str();
 					//FileDir<<"\\";
-					m_FileDir<<this->m_Input->GetName();
-					m_FileDir<<".stl";
-					mafString wildc = "STL (*.stl)|*.stl";
-					m_File = mafGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).c_str();
-					if(m_File!="")
+          mafString name = m_Input->GetName();
+          if (name.FindChr('\\') != -1 || name.FindChr('/') != -1 || name.FindChr(':') != -1 || 
+            name.FindChr('?')  != -1 || name.FindChr('"') != -1 || name.FindChr('<') != -1 || 
+            name.FindChr('>')  != -1 || name.FindChr('|') != -1 )
+          {
+            mafMessage("Node name contains invalid chars.\nA node name can not contain chars like \\ / : * ? \" < > |");
+            m_File = "";
+          }
+          else
+          {
+            m_FileDir << this->m_Input->GetName();
+            m_FileDir << ".stl";
+            mafString wildc = "STL (*.stl)|*.stl";
+            m_File = mafGetSaveFile(m_FileDir.GetCStr(), wildc.GetCStr()).c_str();
+          }
+
+					if(m_File.IsEmpty())
 					{
-						ExportSurface();
-						OpStop(OP_RUN_OK);
+            OpStop(OP_RUN_CANCEL);
 					}
 					else
-						OpStop(OP_RUN_CANCEL);
+          {
+            ExportSurface();
+            OpStop(OP_RUN_OK);
+          }
 				}
       break;
       case ID_CHOOSE_FILENAME:
