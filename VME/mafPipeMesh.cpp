@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-04 13:37:48 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-04-07 11:11:12 $
+Version:   $Revision: 1.12 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -80,6 +80,7 @@ mafPipeMesh::mafPipeMesh()
 
 	m_ScalarsName = NULL;
 	m_ScalarsVTKName = NULL;
+  m_MaterialButton = NULL;
 
   m_ScalarMapActive = 0;
   m_UseVTKProperty  = 1;
