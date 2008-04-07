@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-07 10:41:32 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-04-07 10:49:22 $
+  Version:   $Revision: 1.23 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -201,7 +201,7 @@ void medPipeGraph::Create(mafSceneNode *n)
 
   //m_RenFront->AddActor2D(m_PlotActor);
 
-  vtkNEW(m_TimeLine);
+  //vtkNEW(m_TimeLine);
 }
 
 //----------------------------------------------------------------------------
@@ -352,7 +352,7 @@ void medPipeGraph::UpdateGraph()
   scalarArrayLine->InsertNextTuple1(-800);
   scalarArrayLine->InsertNextTuple1(800);
 
-  vtkDEL(m_TimeLine);
+  //vtkDEL(m_TimeLine);
   vtkNEW(m_TimeLine);
   m_TimeLine->SetDimensions(2, 1, 1);
   m_TimeLine->SetXCoordinates(lineArray);
@@ -561,6 +561,9 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
   }
   else if(maf_event->GetId() == VME_TIME_SET)
   {
+    if(!m_TimeLine)
+      vtkNEW(m_TimeLine);
+
     m_RenFront->RemoveActor2D(m_PlotActor);
     //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
     //m_PlotActor->RemoveInput(m_TimeLine);
