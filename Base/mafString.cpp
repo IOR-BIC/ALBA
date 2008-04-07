@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-10 13:55:37 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-04-07 13:53:42 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -789,13 +789,29 @@ const char mafString::operator [] (const int i) const
 int mafString::FindChr(const int c) const
 //----------------------------------------------------------------------------
 {
-  return (IsEmpty()?-1:(strchr(GetCStr(),c)-GetCStr())); // difference between pointers
+  if (IsEmpty())
+  {
+    return -1;
+  }
+  char *pdest;
+  pdest = strchr((char *)GetCStr(), c);
+  int result = (int)(pdest - GetCStr());
+  return result < 0 ? -1 : result;
+//  return (IsEmpty()?-1:(strchr(GetCStr(),c)-GetCStr()));
 }
 //----------------------------------------------------------------------------
 int mafString::FindLastChr(const int c) const
 //----------------------------------------------------------------------------
 {
-  return (IsEmpty()?-1:(strrchr(GetCStr(),c)-GetCStr()));
+  if (IsEmpty())
+  {
+    return -1;
+  }
+  char *pdest;
+  pdest = strrchr((char *)GetCStr(), c);
+  int result = (int)(pdest - GetCStr());
+  return result < 0 ? -1 : result;
+//  return (IsEmpty()?-1:(strrchr(GetCStr(),c)-GetCStr()));
 }
 
 //----------------------------------------------------------------------------
@@ -816,4 +832,3 @@ void mafString::NPrintf(unsigned long size, const char *format, ...)
   SetSize(size); // Pre-allocate space.
   MAF_PRINT_MACRO(format,m_CStr,size);
 }
-
