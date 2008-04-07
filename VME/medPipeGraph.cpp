@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-10 14:30:37 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-04-07 10:41:32 $
+  Version:   $Revision: 1.22 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,6 +31,7 @@
 #include "mafTagItem.h"
 #include "mafVMEOutputScalar.h"
 #include "mafVMEOutputScalarMatrix.h"
+#include "mafEventSource.h"
 
 #include "vtkTextProperty.h"
 #include "vtkDoubleArray.h"
@@ -71,15 +72,38 @@ medPipeGraph::medPipeGraph()
 
   m_TimeStamp = 0;
   m_ItemId = 0;
+
+  m_TimeLine = NULL;
+
+  m_vtkData.clear();
+  m_ScalarArray.clear();
 }
 //----------------------------------------------------------------------------
 medPipeGraph::~medPipeGraph()
 //----------------------------------------------------------------------------
 {
+  m_Vme->GetEventSource()->RemoveObserver(this);
+
   m_RenFront->RemoveActor2D(m_PlotActor);
   m_RenFront->SetBackground(m_OldColour);
 
+  for(int i=0;i<m_vtkData.size();i++)
+  {
+    vtkDEL(m_vtkData[i]);
+  }
+  m_vtkData.clear();
+
+  for(int i=0;i<m_ScalarArray.size();i++)
+  {
+    vtkDEL(m_ScalarArray[i]);
+  }
+  m_ScalarArray.clear();
+
+  //vtkDEL(m_TimeLine);
+  vtkDEL(m_TimeArray);
+  m_PlotActor->RemoveAllInputs();
   vtkDEL(m_PlotActor);
+  //vtkDEL(m_TimeLine);
   }
 //----------------------------------------------------------------------------
 void medPipeGraph::Create(mafSceneNode *n)
@@ -88,6 +112,8 @@ void medPipeGraph::Create(mafSceneNode *n)
   double timeData;
   int counter = 0;
   Superclass::Create(n);
+
+  m_Vme->GetEventSource()->AddObserver(this);
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
   m_NumberOfSignals = m_EmgPlot->GetScalarOutput()->GetScalarData().rows()-1; //1 row is for time information
@@ -171,7 +197,11 @@ void medPipeGraph::Create(mafSceneNode *n)
   }
 
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
-  m_RenFront->SetBackground(1,1,1);   
+  m_RenFront->SetBackground(1,1,1);  
+
+  //m_RenFront->AddActor2D(m_PlotActor);
+
+  vtkNEW(m_TimeLine);
 }
 
 //----------------------------------------------------------------------------
@@ -182,8 +212,20 @@ void medPipeGraph::UpdateGraph()
   int counter_array = 0;
   vtkDoubleArray *scalar;
   vnl_vector<double> row;
+
+  for(int i=0;i<m_vtkData.size();i++)
+  {
+    vtkDEL(m_vtkData[i]);
+  }
   m_vtkData.clear();
+
+  for(int i=0;i<m_ScalarArray.size();i++)
+  {
+    vtkDEL(m_ScalarArray[i]);
+  }
   m_ScalarArray.clear();
+
+  m_RenFront->RemoveActor2D(m_PlotActor);
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
 
@@ -207,6 +249,7 @@ void medPipeGraph::UpdateGraph()
            break;
          }
        }
+       scalar->Delete();
      }
    }
 
@@ -241,7 +284,7 @@ void medPipeGraph::UpdateGraph()
           counter++;
         }
       }
-      }
+     }
       
       m_ScalarArray.push_back(scalar);
       vtkRectilinearGrid *rect_grid;
@@ -298,6 +341,31 @@ void medPipeGraph::UpdateGraph()
 
   m_PlotActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
   m_PlotActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
+
+  vtkDoubleArray *lineArray;
+  vtkNEW(lineArray);
+  lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
+  lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
+
+  vtkDoubleArray *scalarArrayLine;
+  vtkNEW(scalarArrayLine);
+  scalarArrayLine->InsertNextTuple1(-800);
+  scalarArrayLine->InsertNextTuple1(800);
+
+  vtkDEL(m_TimeLine);
+  vtkNEW(m_TimeLine);
+  m_TimeLine->SetDimensions(2, 1, 1);
+  m_TimeLine->SetXCoordinates(lineArray);
+  m_TimeLine->GetPointData()->SetScalars(scalarArrayLine); 
+  m_TimeLine->Update();
+
+  vtkDEL(lineArray);
+  vtkDEL(scalarArrayLine);
+
+  m_vtkData.push_back(m_TimeLine);
+
+  m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
+
   m_RenFront->AddActor2D(m_PlotActor);
   CreateLegend();
 }
@@ -326,6 +394,15 @@ void medPipeGraph::CreateLegend()
       counter_legend++;
     }
   }
+
+  m_PlotActor->AddInput(m_vtkData.at(c));
+  m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
+
+  m_ColorRGB[0] = 255;
+  m_ColorRGB[1] = 0;
+  m_ColorRGB[2] = 0;
+  m_LegendBox_Actor->SetEntryColor(counter_legend, m_ColorRGB);
+
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::ChangeItemName()
@@ -481,6 +558,38 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     default:
      mafEventMacro(*e);
     }  
+  }
+  else if(maf_event->GetId() == VME_TIME_SET)
+  {
+    m_RenFront->RemoveActor2D(m_PlotActor);
+    //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    //m_PlotActor->RemoveInput(m_TimeLine);
+    vtkDoubleArray *lineArray;
+    vtkNEW(lineArray);
+    lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
+    lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
+
+    vtkDoubleArray *scalarArrayLine;
+    vtkNEW(scalarArrayLine);
+    scalarArrayLine->InsertNextTuple1(-800);
+    scalarArrayLine->InsertNextTuple1(800);
+
+    vtkDEL(m_TimeLine);
+    vtkNEW(m_TimeLine);
+    m_TimeLine->SetDimensions(2, 1, 1);
+    m_TimeLine->SetXCoordinates(lineArray);
+    m_TimeLine->GetPointData()->SetScalars(scalarArrayLine); 
+    m_TimeLine->Update();
+
+    vtkDEL(lineArray);
+    vtkDEL(scalarArrayLine);
+
+    m_vtkData.pop_back();
+    m_vtkData.push_back(m_TimeLine);
+
+    m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
+    m_RenFront->AddActor2D(m_PlotActor);
+    CreateLegend();
   }
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-10 12:33:56 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-04-07 10:41:32 $
+  Version:   $Revision: 1.14 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,5 +106,7 @@ private:
 
   medVMEAnalog   *m_EmgPlot;
   vtkXYPlotActor *m_PlotActor;
+
+  vtkRectilinearGrid *m_TimeLine;
 };  
 #endif // __medPipeGraph_H__
