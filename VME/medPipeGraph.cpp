@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-07 10:49:22 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-04-08 09:29:22 $
+  Version:   $Revision: 1.24 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -394,15 +394,6 @@ void medPipeGraph::CreateLegend()
       counter_legend++;
     }
   }
-
-  m_PlotActor->AddInput(m_vtkData.at(c));
-  m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
-
-  m_ColorRGB[0] = 255;
-  m_ColorRGB[1] = 0;
-  m_ColorRGB[2] = 0;
-  m_LegendBox_Actor->SetEntryColor(counter_legend, m_ColorRGB);
-
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::ChangeItemName()
