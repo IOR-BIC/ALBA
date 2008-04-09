@@ -3,12 +3,12 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPastValuesListTest.h,v $
 Language:  C++
-Date:      $Date: 2008-04-04 15:17:50 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-04-09 11:05:49 $
+Version:   $Revision: 1.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
-Copyright (c) 2007 University of Bedfordshire, UK (www.beds.ac.uk)
+Copyright (c) 2008 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
 

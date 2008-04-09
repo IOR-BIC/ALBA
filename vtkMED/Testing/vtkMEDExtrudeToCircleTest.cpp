@@ -3,12 +3,12 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircleTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-04 15:23:45 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-09 11:05:49 $
+Version:   $Revision: 1.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
-Copyright (c) 2007 University of Bedfordshire, UK (www.beds.ac.uk)
+Copyright (c) 2008 University of Bedfordshire, UK (www.beds.ac.uk)
 All rights reserved.
 ===============================================================================*/
 
