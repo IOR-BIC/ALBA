@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 15:37:48 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-04-09 14:20:30 $
+Version:   $Revision: 1.5 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkCell.h"
 #include "vtkIdType.h"
 #include "vtkIdList.h"
+#include "vtkMath.h"
 #include "mafIndent.h"
 #include "wx/wx.h"
 #include <ostream>
@@ -1049,7 +1050,7 @@ void mafPolylineGraph::Branch::PrintSelf(std::ostream& os, const int tabs) const
   for (i = 0 ;  i < GetNumberOfVertices() ;  i++){
     os << GetVertexId(i) << " " ;
   }
-
+  
   os << std::endl ;
 }
 
@@ -2567,3 +2568,99 @@ bool mafPolylineGraph::SwapBranchIndices(vtkIdType b0, vtkIdType b1)
   return true ;
 }
 
+
+double mafPolylineGraph::GetBranchLength(vtkIdType b) const
+{
+  double sum = 0;
+
+  const mafPolylineGraph::Branch *br = GetConstBranchPtr(b);
+  assert(br != NULL);
+
+  vtkIdList *verticesIdList = vtkIdList::New();
+  br->GetVerticesIdList(verticesIdList);
+
+  for (int i = 0 ;  i < br->GetNumberOfVertices() ;  i++)
+  { 
+    if (i > 0)
+    {
+      double pos1[3], pos2[3];
+
+      const mafPolylineGraph::Vertex *vertex1 = GetConstVertexPtr(verticesIdList->GetId(i));
+      vertex1->GetCoords(pos1);
+
+      const mafPolylineGraph::Vertex *vertex2 = GetConstVertexPtr(verticesIdList->GetId(i-1));
+      vertex2->GetCoords(pos2);
+
+      sum += sqrt(vtkMath::Distance2BetweenPoints(pos1, pos2));
+
+    }
+  }
+
+  // clean up
+  vtkDEL(verticesIdList);
+
+  return sum;
+}
+
+double mafPolylineGraph::GetBranchIntervalLength(vtkIdType b, vtkIdType startVertexId, vtkIdType endVertexId) const
+{
+  double sum = 0;
+
+  assert(startVertexId  <=  endVertexId );
+
+  const mafPolylineGraph::Branch *br = GetConstBranchPtr(b);
+  assert(br != NULL);
+
+  vtkIdList *verticesIdList = vtkIdList::New();
+  br->GetVerticesIdList(verticesIdList);
+
+  int numberOfIds = verticesIdList->GetNumberOfIds();
+  
+  int startId = -1;
+
+  // find start vertex id
+  for (int i = 0; i < numberOfIds; i++) 
+  { 
+    vtkIdType currentId = verticesIdList->GetId(i);
+    if (currentId == startVertexId)
+    {
+      startId = i;
+    }
+  }
+  
+  int endId = -1;
+
+  // find start vertex id
+  for (int j = 0; j < numberOfIds; j++) 
+  { 
+    vtkIdType currentId = verticesIdList->GetId(j);
+    if (currentId == endVertexId)
+    {
+      endId = j;
+    }
+  }
+
+  assert(endId >= startId );
+
+  for (int k = startId ;  k <= endId ;  k++)
+  { 
+    if (k > 0)
+    {
+      double pos1[3], pos2[3];
+
+      const mafPolylineGraph::Vertex *vertex1 = GetConstVertexPtr(verticesIdList->GetId(k));
+      vertex1->GetCoords(pos1);
+
+      const mafPolylineGraph::Vertex *vertex2 = GetConstVertexPtr(verticesIdList->GetId(k-1));
+      vertex2->GetCoords(pos2);
+
+      sum += sqrt(vtkMath::Distance2BetweenPoints(pos1, pos2));
+
+    }
+  }
+
+  // clean up
+  vtkDEL(verticesIdList);
+
+  return sum;
+}

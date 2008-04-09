@@ -8,6 +8,8 @@ PROJECT(medOperations)
 SET(PROJECT_SRCS
   medOpCreateLabeledVolume.cpp
   medOpCreateLabeledVolume.h
+  medOpInteractionDebugger.cpp
+  medOpInteractionDebugger.h
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
   mmoCTAImporter.cpp

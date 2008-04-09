@@ -19,6 +19,10 @@ SET(PROJECT_SRCS
   medGeometryEditorPolylineGraph.cpp
   medGeometryEditorPolylineGraph.h
   medDecl.h
+  medCurvilinearAbscissaOnSkeletonHelper.cpp
+  medCurvilinearAbscissaOnSkeletonHelper.h
+  medGizmoInteractionDebugger.cpp
+  medGizmoInteractionDebugger.h
 )
 
 # List libraries that are needed by this project.

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2007-07-03 15:37:48 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-09 14:20:30 $
+Version:   $Revision: 1.6 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -93,6 +93,9 @@ public:
   void SetBranchName(vtkIdType b, const wxString *name) ; ///< set name of branch
   void UnsetBranchName(vtkIdType b) ;                     ///< unset name of branch to undefined
   vtkIdType FindBranchName(const wxString *name) const ;  ///< find branch with name
+
+  double GetBranchLength(vtkIdType b) const;              ///< return the length of the branch
+  double GetBranchIntervalLength(vtkIdType b, vtkIdType startVertexId, vtkIdType endVertexId) const;
 
   bool IsEdgeDirected(vtkIdType e) const ;                ///< get directed property of edge
   void SetEdgeDirected(vtkIdType e, bool directed) ;      ///< set directed property of edge
@@ -362,8 +365,7 @@ private:
   Vertex* GetVertexPtr(vtkIdType i) ;         ///< private: return pointer to vertex, return NULL if index out of range
   Edge* GetEdgePtr(vtkIdType i)  ;            ///< private: return pointer to edge, return NULL if index out of range
   Branch* GetBranchPtr(vtkIdType i)  ;        ///< private: return pointer to branch, return NULL if index out of range
-
-
+ 
   //-----------------------------------------------------------------------------
   // member variables
   //-----------------------------------------------------------------------------
