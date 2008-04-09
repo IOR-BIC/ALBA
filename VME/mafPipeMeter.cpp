@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 11:55:57 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-04-09 13:19:43 $
+  Version:   $Revision: 1.26 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -323,16 +323,16 @@ void mafPipeMeter::OnEvent(mafEventBase *maf_event)
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  //else if (maf_event->GetSender() == m_MeterVME)
-  //{
-  else if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+  else if (maf_event->GetSender() == m_MeterVME)
   {
-    UpdateProperty();
+    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+    {
+      UpdateProperty();
+    }
+    else if(maf_event->GetId() == mafVMEMeter::LENGTH_THRESHOLD_EVENT) 
+    {
+    }
   }
-  else if(maf_event->GetId() == mafVMEMeter::LENGTH_THRESHOLD_EVENT) 
-  {
-  }
-  //}
 }
 //----------------------------------------------------------------------------
 void mafPipeMeter::Select(bool sel)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-02 10:23:36 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-04-09 13:19:43 $
+  Version:   $Revision: 1.13 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -306,7 +306,7 @@ void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
-  else if (maf_event->GetId() == VME_OUTPUT_DATA_UPDATE && maf_event->GetSender()==m_Vme)
+  else if (maf_event->GetId() == VME_OUTPUT_DATA_UPDATE && maf_event->GetSender() == m_Vme)
   {
     if(m_Vme->GetOutput() && m_Vme->GetOutput()->GetVTKData() && m_Actor)
       UpdateProperty();

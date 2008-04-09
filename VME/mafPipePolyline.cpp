@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-31 17:03:39 $
-Version:   $Revision: 1.17 $
+Date:      $Date: 2008-04-09 13:19:43 $
+Version:   $Revision: 1.18 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -70,7 +70,7 @@ mafPipePolyline::mafPipePolyline()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-	m_Representation  = 0; // line by default
+	m_Representation  = -1; // line by default
 	m_TubeRadius      = 1.0;
 	m_SphereRadius      = 1.0;
 	m_Capping         = 0;
@@ -96,7 +96,7 @@ mafPipePolyline::mafPipePolyline()
   m_BorderProperty = NULL;
   m_BorderActor = NULL;
 
-  m_SplineMode      = 0;
+  m_SplineMode      = -1;
   m_SplineCoefficient = 10.0;
   m_DistanceBorder = 0.0;
   m_ScalarsName = NULL;
@@ -313,7 +313,7 @@ void mafPipePolyline::Select(bool sel)
 //----------------------------------------------------------------------------
 {
 	m_Selected = sel;
-	if(m_Actor->GetVisibility()) 
+	if(m_Actor && m_Actor->GetVisibility()) 
 	{
 		m_OutlineActor->SetVisibility(sel);
 	}
@@ -457,14 +457,16 @@ void mafPipePolyline::OnEvent(mafEventBase *maf_event)
     UpdatePipeFromScalars();
     UpdateProperty();
 	}
-  //else if (maf_event->GetSender() == m_Vme)
-  //{
-  if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+  else if (maf_event->GetSender() == m_Vme)
   {
-    UpdateData();
-    UpdatePipeFromScalars();
+    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+    {
+      UpdateData();
+      UpdateProperty();
+      UpdatePipeFromScalars();
+    }
   }
-  //}
+  
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::UpdateScalars()
@@ -577,6 +579,9 @@ void mafPipePolyline::UpdateData()
 void mafPipePolyline::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
+  if(!m_Vme)
+    return;
+
 	mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
 	out_polyline->Update();
 	vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
@@ -590,77 +595,83 @@ void mafPipePolyline::UpdateProperty(bool fromTag)
 	data->Modified();
 	data->Update();
 
-	if (m_Representation == TUBE)
-	{
-    m_Tube->SetInput(data);
-		m_Tube->Update();
-		m_Mapper->SetInput(m_Tube->GetOutput());
-	}
-	else if (m_Representation == GLYPH)
-	{
-		/*if(!m_ScalarDim)
-			m_Glyph->SetScaleModeToDataScalingOff();
-		else
-			m_Glyph->SetScaleModeToScaleByScalar();*/
+  if(m_Mapper)
+  {
+	  if (m_Representation == TUBE)
+	  {
+      m_Tube->SetInput(data);
+      m_Tube->Update();
+      m_Mapper->SetInput(m_Tube->GetOutput());
+	  }
+	  else if (m_Representation == GLYPH)
+	  {
+		  /*if(!m_ScalarDim)
+			  m_Glyph->SetScaleModeToDataScalingOff();
+		  else
+			  m_Glyph->SetScaleModeToScaleByScalar();*/
 
-		//m_Glyph->SetScaleFactor(m_SphereRadius);
+		  //m_Glyph->SetScaleFactor(m_SphereRadius);
+  		
+      m_Glyph->Update();
+		  m_Glyph->Modified();
+		  vtkAppendPolyData *apd = vtkAppendPolyData::New();
+    	
+      if(m_SplineMode)
+      {
+        vtkPolyData *splinedPolyData;
+        splinedPolyData = SplineProcess(data);
+        apd->AddInput(splinedPolyData);
+      }
+      else
+        apd->AddInput(data);
 
-		m_Glyph->Update();
-		m_Glyph->Modified();
-		vtkAppendPolyData *apd = vtkAppendPolyData::New();
-		
-    if(m_SplineMode)
+      apd->AddInput(m_Glyph->GetOutput());
+		  apd->Update();
+		  m_Mapper->SetInput(apd->GetOutput());
+		  apd->Delete();
+	  }
+	  else if (m_Representation == GLYPH_UNCONNECTED)
+	  {
+		  /*if(!m_ScalarDim)
+			  m_Glyph->SetScaleModeToDataScalingOff();
+		  else
+			  m_Glyph->SetScaleModeToScaleByScalar();*/
+  		
+		  //m_Glyph->SetScaleFactor(m_SphereRadius);
+      
+      m_Glyph->SetInput(data);
+		  m_Glyph->Update();
+		  m_Glyph->Modified();
+		  vtkAppendPolyData *apd = vtkAppendPolyData::New();
+		  //apd->AddInput(data);
+		  apd->AddInput(m_Glyph->GetOutput());
+		  apd->Update();
+		  m_Mapper->SetInput(apd->GetOutput());
+		  apd->Delete();
+	  }
+	  else
+	  {
+		  vtkAppendPolyData *apd = vtkAppendPolyData::New();
+		  apd->AddInput(data);
+		  apd->Update();
+		  m_Mapper->SetInput(apd->GetOutput());
+		  apd->Delete();
+	  }
+  }
+
+  if(m_BorderMapper)
+  {
+    if(m_DistanceBorder == 0.0)
     {
-      vtkPolyData *splinedPolyData;
-      splinedPolyData = SplineProcess(data);
-      apd->AddInput(splinedPolyData);
+      m_BorderActor->VisibilityOff();
     }
     else
-      apd->AddInput(data);
-
-    apd->AddInput(m_Glyph->GetOutput());
-		apd->Update();
-		m_Mapper->SetInput(apd->GetOutput());
-		apd->Delete();
-	}
-	else if (m_Representation == GLYPH_UNCONNECTED)
-	{
-		/*if(!m_ScalarDim)
-			m_Glyph->SetScaleModeToDataScalingOff();
-		else
-			m_Glyph->SetScaleModeToScaleByScalar();*/
-		
-		//m_Glyph->SetScaleFactor(m_SphereRadius);
-
-    m_Glyph->SetInput(data);
-		m_Glyph->Update();
-		m_Glyph->Modified();
-		vtkAppendPolyData *apd = vtkAppendPolyData::New();
-		//apd->AddInput(data);
-		apd->AddInput(m_Glyph->GetOutput());
-		apd->Update();
-		m_Mapper->SetInput(apd->GetOutput());
-		apd->Delete();
-	}
-	else
-	{
-		vtkAppendPolyData *apd = vtkAppendPolyData::New();
-		apd->AddInput(data);
-		apd->Update();
-		m_Mapper->SetInput(apd->GetOutput());
-		apd->Delete();
-	}
-
-  if(m_DistanceBorder == 0.0)
-  {
-    m_BorderActor->VisibilityOff();
-  }
-  else
-  {
-    m_BorderMapper->SetInput(BorderCreation());
-    m_BorderMapper->Modified();
-    m_BorderActor->SetMapper(m_BorderMapper);
-    m_BorderActor->VisibilityOn();
+    {
+      m_BorderMapper->SetInput(BorderCreation());
+      m_BorderMapper->Modified();
+      m_BorderActor->SetMapper(m_BorderMapper);
+      m_BorderActor->VisibilityOn();
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -676,8 +687,11 @@ void mafPipePolyline::InitializeFromTag()
 		m_Vme->GetTagArray()->SetTag(*item);
 		cppDEL(item);
 	}
-	item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
-	m_Representation = (int)item->GetValueAsDouble();
+  if(m_Representation==-1)
+  {
+	  item = m_Vme->GetTagArray()->GetTag("REPRESENTATION");
+	  m_Representation = (int)item->GetValueAsDouble();
+  }
 
 	if (!m_Vme->GetTagArray()->IsTagPresent("SPHERE_RADIUS"))
 	{
@@ -742,8 +756,11 @@ void mafPipePolyline::InitializeFromTag()
     m_Vme->GetTagArray()->SetTag(*item);
     cppDEL(item);
   }
-  item = m_Vme->GetTagArray()->GetTag("SPLINE_MODE");
-  m_SplineMode = (int)item->GetValueAsDouble();
+  if(m_SplineMode==-1)
+  {
+    item = m_Vme->GetTagArray()->GetTag("SPLINE_MODE");
+    m_SplineMode = (int)item->GetValueAsDouble();
+  }
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::SetRepresentation(int representation)
