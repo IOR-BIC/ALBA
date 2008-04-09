@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-08 10:28:22 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-04-09 09:37:43 $
+  Version:   $Revision: 1.26 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -349,8 +349,11 @@ void medPipeGraph::UpdateGraph()
 
   vtkDoubleArray *scalarArrayLine;
   vtkNEW(scalarArrayLine);
-  scalarArrayLine->InsertNextTuple1(-800);
-  scalarArrayLine->InsertNextTuple1(800);
+  double scalarRange[2];
+  scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
+  scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
+  scalarArrayLine->InsertNextTuple1(scalarRange[0]);
+  scalarArrayLine->InsertNextTuple1(scalarRange[1]);
 
   //vtkDEL(m_TimeLine);
   vtkNEW(m_TimeLine);
@@ -575,8 +578,11 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
 
     vtkDoubleArray *scalarArrayLine;
     vtkNEW(scalarArrayLine);
-    scalarArrayLine->InsertNextTuple1(-800);
-    scalarArrayLine->InsertNextTuple1(800);
+    double scalarRange[2];
+    scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
+    scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
+    scalarArrayLine->InsertNextTuple1(scalarRange[0]);
+    scalarArrayLine->InsertNextTuple1(scalarRange[1]);
 
     vtkDEL(m_TimeLine);
     vtkNEW(m_TimeLine);
