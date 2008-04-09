@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2007-10-19 07:12:20 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-04-09 12:51:21 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -63,6 +63,7 @@ class vtkGlyph3D;
 class vtkLinearExtrusionFilter;
 class vtkAppendPolyData;
 class vtkPlaneSource;
+class vtkMEDExtrudeToCircle;
 
 //----------------------------------------------------------------------------
 // mmoExtrusionHoles :
@@ -144,7 +145,7 @@ protected:
 
 	vtkFeatureEdges						*m_ExtractFreeEdges;
 	vtkHoleConnectivity				*m_ExtractHole;
-	vtkLinearExtrusionFilter	*m_ExtrusionFilter;
+	vtkMEDExtrudeToCircle	    *m_ExtrusionFilter;
 
 	vtkSphereSource				*m_Sphere;
 	vtkGlyph3D						*m_Glyph;

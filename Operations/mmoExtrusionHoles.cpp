@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-19 07:12:20 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-04-09 12:51:21 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -72,6 +72,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkLinearExtrusionFilter.h"
 #include "vtkCleanPolyData.h"
 #include "vtkTriangleFilter.h"
+#include "vtkMEDExtrudeToCircle.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoExtrusionHoles);
@@ -152,6 +153,8 @@ void mmoExtrusionHoles::OpRun()
 	vtkNEW(m_ExtractFreeEdges);
 	vtkNEW(m_ExtractHole);
 	vtkNEW(m_ExtrusionFilter);
+
+  ((mafVMESurface*)m_Input)->Update();
 
 	m_OriginalPolydata->DeepCopy(((vtkPolyData*)((mafVMESurface*)m_Input)->GetOutput()->GetVTKData()));
 	m_OriginalPolydata->Update();
@@ -291,10 +294,13 @@ void mmoExtrusionHoles::Extrude()
 	double normal[3];
 	computeMedianPlane->GetNormal(normal);
 
-	m_ExtrusionFilter->SetExtrusionTypeToVectorExtrusion();
+	/*m_ExtrusionFilter->SetExtrusionTypeToVectorExtrusion();
 	m_ExtrusionFilter->SetVector(normal);
-	m_ExtrusionFilter->SetScaleFactor(m_ExtrusionFactor);
+	m_ExtrusionFilter->SetScaleFactor(m_ExtrusionFactor);*/
+  m_ExtrusionFilter->SetLength(m_ExtrusionFactor);
+  m_ExtrusionFilter->SetDirection(normal) ;
 	m_ExtrusionFilter->SetInput(m_ExtractHole->GetOutput());
+  m_ExtrusionFilter->GetOutput()->Update() ;
 	m_ExtrusionFilter->Update();
 
 	m_ResultAfterExtrusion->RemoveAllInputs();
@@ -469,11 +475,14 @@ void mmoExtrusionHoles::CreatePolydataPipeline()
 //----------------------------------------------------------------------------
 {
 
+  m_ResultPolydata->Update();
+
 	double BoundingBox[6];
 	m_ResultPolydata->GetBounds(BoundingBox);
 	vtkNEW(m_SurfaceMapper);
 	m_SurfaceMapper->SetInput(m_ResultPolydata);
 	m_SurfaceMapper->ScalarVisibilityOff();
+  m_SurfaceMapper->Update();
 
 	vtkNEW(m_SurfaceActor);
 	m_SurfaceActor->SetMapper(m_SurfaceMapper);
