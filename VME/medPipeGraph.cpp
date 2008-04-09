@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 09:37:43 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-04-09 10:10:05 $
+  Version:   $Revision: 1.27 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -350,8 +350,16 @@ void medPipeGraph::UpdateGraph()
   vtkDoubleArray *scalarArrayLine;
   vtkNEW(scalarArrayLine);
   double scalarRange[2];
-  scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
-  scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
+  if(m_FitPlot)
+  {
+    scalarRange[0]=minY+abs(minY*0.1);
+    scalarRange[1]=maxY-abs(maxY*0.1);
+  }
+  else
+  {
+    scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
+    scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
+  }
   scalarArrayLine->InsertNextTuple1(scalarRange[0]);
   scalarArrayLine->InsertNextTuple1(scalarRange[1]);
 
@@ -579,8 +587,32 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     vtkDoubleArray *scalarArrayLine;
     vtkNEW(scalarArrayLine);
     double scalarRange[2];
-    scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
-    scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
+    
+    double minY = 0;
+    double maxY = 0;
+
+    for (int i = 0; i < m_ScalarArray.size(); i++)
+    {
+      double dataRange[2];
+      m_ScalarArray.at(i)->GetRange(dataRange);
+
+      if(dataRange[0] < minY)
+        minY = dataRange[0];
+
+      if(dataRange[1] > maxY)
+        maxY = dataRange[1];
+    }
+
+    if(m_FitPlot)
+    {
+      scalarRange[0]=minY+abs(minY*0.1);
+      scalarRange[1]=maxY-abs(maxY*0.1);
+    }
+    else
+    {
+      scalarRange[0]=m_DataManualRange[0]+abs(m_DataManualRange[0]*0.1);
+      scalarRange[1]=m_DataManualRange[1]-abs(m_DataManualRange[1]*0.1);
+    }
     scalarArrayLine->InsertNextTuple1(scalarRange[0]);
     scalarArrayLine->InsertNextTuple1(scalarRange[1]);
 
