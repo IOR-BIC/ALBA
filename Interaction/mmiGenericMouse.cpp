@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 13:09:10 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-04-09 14:18:49 $
+  Version:   $Revision: 1.16 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,7 +77,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 {
   mafMatrix matr;     // create matrix to send
   double motionVec[3];// motion vector
-  BuildVector(p1, p2, motionVec);
+  mafTransform::BuildVector(p1, p2, motionVec);
   int refSysType = GetTranslationConstraint()->GetRefSys()->GetType();// get the ref sys type  
 
   // set the constraint ref-sys to translation constraint, the matrix is referenced
@@ -93,12 +93,12 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
     mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp);    //get the result point pos
     int axis = GetTranslationConstraint()->GetConstraintAxis();         //get the constrain axis
     mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);   //project the motion vector on constrain axis
-    projVal = ProjectVectorOnAxis(motionVec, constrainVers, motVecProj);
+    projVal = mafTransform::ProjectVectorOnAxis(motionVec, constrainVers, motVecProj);
 
     // project rp on constrain axis; if target ref-sys is local the projection 
     // is the value along the constrain axis
     if (refSysType == mafRefSys::GLOBAL)
-      pos_rp = ProjectVectorOnAxis(rp, constrainVers);
+      pos_rp = mafTransform::ProjectVectorOnAxis(rp, constrainVers);
     else
       pos_rp = rp[axis];
 
@@ -173,7 +173,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       {
         if (pos_rp + m_ProjAcc > minb)
         {
-          BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);                             
           m_ProjAcc = 0;
         }
@@ -182,7 +182,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       { 
         if (pos_rp + m_ProjAcc < maxb)
         {
-          BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);            
           m_ProjAcc = 0;
         }
@@ -191,13 +191,13 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
       {
         if (pos_rp + projVal < minb)
         {              
-          BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);                           
           m_ProjAcc = pos_rp + projVal - minb;
         }
         else if (pos_rp + projVal > maxb)
         {            
-          BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);
           m_ProjAcc = pos_rp + projVal - maxb;
         }
@@ -209,7 +209,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
           }
           else
           {
-            BuildVector(projVal, NULL, tmpVec, refSysType, axis);
+            mafTransform::BuildVector(projVal, NULL, tmpVec, refSysType, axis);
             mafTransform::SetPosition(matr, tmpVec);
           }
         }
@@ -234,13 +234,13 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
           {
             if (pos_rp + m_ProjAcc <= maxb)
             {
-              BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);                         
               m_ProjAcc = 0;
             }
             else if (pos_rp + m_ProjAcc > maxb)
             {
-              BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);                         
               m_ProjAcc -= maxb - pos_rp;
             }
@@ -252,13 +252,13 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
           {
             if (pos_rp + m_ProjAcc >= minb)
             {
-              BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);     
               m_ProjAcc = 0;
             }
             else if (pos_rp + m_ProjAcc < minb)
             {
-              BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);     
               m_ProjAcc -= minb - pos_rp;
             }
@@ -433,7 +433,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         }
     
         // project the motion vector on constrain plane    
-        ProjectVectorOnPlane(motionVec, planeNormal, motVecProj);
+        mafTransform::ProjectVectorOnPlane(motionVec, planeNormal, motVecProj);
 
        //set the matrix to be send
         mafTransform::SetPosition(matr, motVecProj);
@@ -485,7 +485,7 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
 
   //motion vector
   double motionVec[3];
-  BuildVector(p1, p2, motionVec);
+  mafTransform::BuildVector(p1, p2, motionVec);
 
   double pa[3], pb[3];
   for (int i = 0;i<3; i++)
@@ -535,8 +535,8 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
           double op1Vec[3] = {0, 0, 0};
           double op2Vec[3] = {0, 0, 0};
           
-          BuildVector(o, p1, op1Vec);
-          BuildVector(o, p2, op2Vec);
+          mafTransform::BuildVector(o, p1, op1Vec);
+          mafTransform::BuildVector(o, p2, op2Vec);
 
           // op1 X op2
           double op1Vec_X_op2Vec[3] = {0, 0, 0};
@@ -614,8 +614,8 @@ void mmiGenericMouse::Rotate(double *p1, double *p2, double *viewup)
           double op1Vec[3] = {0, 0, 0};
           double op2Vec[3] = {0, 0, 0};
 
-          BuildVector(o, p1, op1Vec);
-          BuildVector(o, p2, op2Vec);
+          mafTransform::BuildVector(o, p1, op1Vec);
+          mafTransform::BuildVector(o, p2, op2Vec);
 
           // op1 X op2
           double op1Vec_X_op2Vec[3] = {0, 0, 0};
@@ -706,7 +706,7 @@ void mmiGenericMouse::Scale(double *p1, double *p2, double *viewup)
   /*
   //motion vector
   double motionVec[3];
-  BuildVector(p1, p2, motionVec);
+  mafTransform::BuildVector(p1, p2, motionVec);
 
   //current axis versor
   double constrainVers[3];
@@ -760,87 +760,6 @@ int mmiGenericMouse::BinarySearch(double pos, vtkDoubleArray *array, int& result
     result_point_status = NOT_ON_GRID_POINT;
     return inf;
   }
-}
-
-//----------------------------------------------------------------------------
-double mmiGenericMouse::ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *out_projection)
-//----------------------------------------------------------------------------
-{
-
-  double in_axis_norm[3];
-  
-  in_axis_norm[0] = in_axis[0];
-  in_axis_norm[1] = in_axis[1];
-  in_axis_norm[2] = in_axis[2];
-
-  vtkMath::Normalize(in_axis_norm);
-
-  double dot = vtkMath::Dot(in_vector, in_axis_norm);
-
-  //if an output vector is provided
-  if (out_projection)
-  {
-  out_projection[0] = dot * in_axis_norm[0];
-  out_projection[1] = dot * in_axis_norm[1];
-  out_projection[2] = dot * in_axis_norm[2];
-  }
-
-  return dot;
-}
-
-//----------------------------------------------------------------------------
-double mmiGenericMouse::ProjectVectorOnPlane(const double *in_vector, const double *in_plane_normal, double *out_projection)
-//----------------------------------------------------------------------------
-{
-  // normalise the plane normal
-  double inPlaneNormalNormalised[3];
-
-  inPlaneNormalNormalised[0] = in_plane_normal[0];  
-  inPlaneNormalNormalised[1] = in_plane_normal[1];  
-  inPlaneNormalNormalised[2] = in_plane_normal[2];
-  
-  vtkMath::Normalize(inPlaneNormalNormalised);
-
-  // normalise the input vector
-  double inVectorNormalised[3];
-  inVectorNormalised[0] = in_vector[0];  
-  inVectorNormalised[1] = in_vector[1];  
-  inVectorNormalised[2] = in_vector[2];
-  
-  // get the input vector norm
-  double norm = vtkMath::Normalize(inVectorNormalised);
-  
-  /*
-
-   n: normalised plane normal;    
-   A: vector to be projected
-   a: normalised vector to be projected
-
-   projection_vec = ||A||(n x (a x n))
-  */
-
-  double a_x_n[3];
-  vtkMath::Cross(inVectorNormalised, inPlaneNormalNormalised, a_x_n);
- 
-  double n_x_a_x_n[3];
-  vtkMath::Cross(inPlaneNormalNormalised, a_x_n, n_x_a_x_n);
-
-  // the projection vector
-  double projVec[3];
-  projVec[0] = norm * n_x_a_x_n[0];
-  projVec[1] = norm * n_x_a_x_n[1];
-  projVec[2] = norm * n_x_a_x_n[2];
-
-  //if an output vector is provided
-  if (out_projection)
-  {
-  out_projection[0] = projVec[0];
-  out_projection[1] = projVec[1];
-  out_projection[2] = projVec[2];
-  }
-
-  // return the norm of the projection
-  return vtkMath::Norm(projVec);
 }
 
 //----------------------------------------------------------------------------
@@ -1096,7 +1015,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
         mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp);
 
         //project rp on constrain axis
-        pos_rp = ProjectVectorOnAxis(rp, constrainVers, proj);
+        pos_rp = mafTransform::ProjectVectorOnAxis(rp, constrainVers, proj);
 
         //set m_HelpPIndex and m_HelperPointStatus
         m_HelpPIndex = BinarySearch(pos_rp, 
@@ -1505,48 +1424,6 @@ void mmiGenericMouse::SnapOnSurface()
   absMotionVec[2] = newAbsPickPos[2] - absPivotPos[2];
 
   SendTransformMatrix(absMotionVec);
-}
-//----------------------------------------------------------------------------
-void mmiGenericMouse::BuildVector(double coeff, const double *inVector, double *outVector, int refSysType, int localAxis)
-//----------------------------------------------------------------------------
-{
-  if (outVector)
-  {
-    // default
-    if (refSysType == mafRefSys::GLOBAL)
-    {
-      outVector[0] = coeff * inVector[0];
-      outVector[1] = coeff * inVector[1];
-      outVector[2] = coeff * inVector[2];
-    }
-    else if (refSysType == mafRefSys::LOCAL)
-    {
-
-      outVector[0] = outVector[1] = outVector[2];
-      switch (localAxis)
-      {
-        case (mmiConstraint::X):
-        {
-          outVector[0] = coeff;
-        }
-        break;
-        case (mmiConstraint::Y):
-        {
-          outVector[1] = coeff;
-        }
-        break;
-        case (mmiConstraint::Z):
-        {
-          outVector[2] = coeff;
-        }
-        break;
-      }
-    }
-    else
-    {
-      mafWarningMacro(<< "Ref sys type: " << refSysType << "is not supported!");
-    }
-  }
 }
 
 //------------------------------------------------------------------------------

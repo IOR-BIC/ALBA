@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-25 15:15:00 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-04-09 14:17:20 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -13,9 +13,12 @@
 #ifndef __mafTransform_h
 #define __mafTransform_h
 
+#include "mafRefSys.h"
 #include "mafTransformBase.h"
+
+#include "mmiConstraint.h"
+
 #include "mmuUtility.h"
-//#include "mafEvent.h"
 
 //------------------------------------------------------------------------------
 // Forward declarations
@@ -220,6 +223,32 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /** Copy the translation vector */
   static void CopyTranslation(const mafMatrix &source, mafMatrix &target);
   void CopyTranslation(const mafMatrix &source) {this->CopyTranslation(source,*m_Matrix);}
+
+
+  // Build vector with origin in p1 pointing to p2
+  static void BuildVector(double *p1, double *p2, double *vec)
+  {
+    if (vec)
+    {
+      vec[0] = p2[0] - p1[0];
+      vec[1] = p2[1] - p1[1];
+      vec[2] = p2[2] - p1[2];
+    }
+  }
+
+  // Build vector [coeff * inVector];
+  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mmiConstraint::X);
+
+
+  // Project in_vector on in_axis direction; in_axis does not need to be 
+  // normalised. The projection signed value is returned
+  static double ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *projection = NULL);
+
+  // Project in_vector on the plane identified by the normal vector in_plane_normal;
+  // in_plane_normal does not need to be normalised. The norm of the projection 
+  // is returned and the projection vector is written in out_projection vector if provided.
+  static double ProjectVectorOnPlane(const double *in_vector, const double *in_plane_normal, double *out_projection = NULL);
+
 
   /** rotation representation conversion */
 	int MatrixToAttitudeVector(const mafMatrix &matrix,

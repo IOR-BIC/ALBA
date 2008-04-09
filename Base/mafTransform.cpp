@@ -2,17 +2,29 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-02 21:58:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-09 14:17:19 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
+
+
+#include "mafDefines.h" 
+//----------------------------------------------------------------------------
+// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
+// This force to include Window,wxWidgets and VTK exactly in this order.
+// Failing in doing this will result in a run-time error saying:
+// "Failure#0: The value of ESP was not properly saved across a function call"
+//----------------------------------------------------------------------------
+
 #include "mafTransform.h"
 #include "mafMatrix.h"
 #include "mafMatrix3x3.h"
 #include "mafIndent.h"
+
+#include "vtkMath.h"
 
 #include <math.h>
 #include <assert.h>
@@ -1710,3 +1722,128 @@ void mafTransform::Invert()
 {
   m_Matrix->Invert();
 }
+
+//----------------------------------------------------------------------------
+double mafTransform::ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *out_projection)
+//----------------------------------------------------------------------------
+{
+
+  double in_axis_norm[3];
+
+  in_axis_norm[0] = in_axis[0];
+  in_axis_norm[1] = in_axis[1];
+  in_axis_norm[2] = in_axis[2];
+
+  vtkMath::Normalize(in_axis_norm);
+
+  double dot = vtkMath::Dot(in_vector, in_axis_norm);
+
+  //if an output vector is provided
+  if (out_projection)
+  {
+    out_projection[0] = dot * in_axis_norm[0];
+    out_projection[1] = dot * in_axis_norm[1];
+    out_projection[2] = dot * in_axis_norm[2];
+  }
+
+  return dot;
+}
+
+//----------------------------------------------------------------------------
+double mafTransform::ProjectVectorOnPlane(const double *in_vector, const double *in_plane_normal, double *out_projection)
+//----------------------------------------------------------------------------
+{
+  // normalise the plane normal
+  double inPlaneNormalNormalised[3];
+
+  inPlaneNormalNormalised[0] = in_plane_normal[0];  
+  inPlaneNormalNormalised[1] = in_plane_normal[1];  
+  inPlaneNormalNormalised[2] = in_plane_normal[2];
+
+  vtkMath::Normalize(inPlaneNormalNormalised);
+
+  // normalise the input vector
+  double inVectorNormalised[3];
+  inVectorNormalised[0] = in_vector[0];  
+  inVectorNormalised[1] = in_vector[1];  
+  inVectorNormalised[2] = in_vector[2];
+
+  // get the input vector norm
+  double norm = vtkMath::Normalize(inVectorNormalised);
+
+  /*
+
+  n: normalised plane normal;    
+  A: vector to be projected
+  a: normalised vector to be projected
+
+  projection_vec = ||A||(n x (a x n))
+  */
+
+  double a_x_n[3];
+  vtkMath::Cross(inVectorNormalised, inPlaneNormalNormalised, a_x_n);
+
+  double n_x_a_x_n[3];
+  vtkMath::Cross(inPlaneNormalNormalised, a_x_n, n_x_a_x_n);
+
+  // the projection vector
+  double projVec[3];
+  projVec[0] = norm * n_x_a_x_n[0];
+  projVec[1] = norm * n_x_a_x_n[1];
+  projVec[2] = norm * n_x_a_x_n[2];
+
+  //if an output vector is provided
+  if (out_projection)
+  {
+    out_projection[0] = projVec[0];
+    out_projection[1] = projVec[1];
+    out_projection[2] = projVec[2];
+  }
+
+  // return the norm of the projection
+  return vtkMath::Norm(projVec);
+}
+
+//----------------------------------------------------------------------------
+void mafTransform::BuildVector(double coeff, const double *inVector, double *outVector, int refSysType, int localAxis)
+//----------------------------------------------------------------------------
+{
+  if (outVector)
+  {
+    // default
+    if (refSysType == mafRefSys::GLOBAL)
+    {
+      outVector[0] = coeff * inVector[0];
+      outVector[1] = coeff * inVector[1];
+      outVector[2] = coeff * inVector[2];
+    }
+    else if (refSysType == mafRefSys::LOCAL)
+    {
+
+      outVector[0] = outVector[1] = outVector[2];
+      switch (localAxis)
+      {
+      case (mmiConstraint::X):
+        {
+          outVector[0] = coeff;
+        }
+        break;
+      case (mmiConstraint::Y):
+        {
+          outVector[1] = coeff;
+        }
+        break;
+      case (mmiConstraint::Z):
+        {
+          outVector[2] = coeff;
+        }
+        break;
+      }
+    }
+    else
+    {
+      mafWarningMacro(<< "Ref sys type: " << refSysType << "is not supported!");
+    }
+  }
+}
+

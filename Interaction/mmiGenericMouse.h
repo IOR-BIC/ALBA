@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:57:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-09 14:18:48 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,7 +33,7 @@ class vtkDoubleArray;
   to mouse buttons with keys modifiers.
 
   @sa
-  - mafOpTransformGeneric for examples on how to use this class with mmiCompositorMouse
+  - mmoTransformGeneric for examples on how to use this class with mmiCompositorMouse
 */
 class mmiGenericMouse : public mmiGenericInterface
 {
@@ -152,12 +152,6 @@ protected:
   //the constrain ref sys matrix
   mafMatrix *m_ConstrainRefSys;
 
-  // the input refsys matrix
-  mafMatrix *m_InputRefSys;
-  
-  //the target refsys type
-  int m_TargetRefSysType;
-
   //----------------------------------------------------------------------------
   // result matrix: the matrix to keep updated 
   //----------------------------------------------------------------------------
@@ -191,8 +185,6 @@ protected:
 	//----------------------------------------------------------------------------
 	void NormalOnSurface();
 
- 
-
 private:
 
   mmiGenericMouse(const mmiGenericMouse&);  // Not implemented.
@@ -200,30 +192,6 @@ private:
 
   double  m_LastPickPosition[3]; 
         
-  // Build vector with origin in p1 pointing to p2
-  void BuildVector(double *p1, double *p2, double *vec)
-  {
-    if (vec)
-    {
-        vec[0] = p2[0] - p1[0];
-        vec[1] = p2[1] - p1[1];
-        vec[2] = p2[2] - p1[2];
-    }
-  }
-
-  // Build vector [coeff * inVector];
-  void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mmiConstraint::X);
- 
-
-  // Project in_vector on in_axis direction; in_axis does not need to be 
-  // normalised. The projection signed value is returned
-  double ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *projection = NULL);
-
-  // Project in_vector on the plane identified by the normal vector in_plane_normal;
-  // in_plane_normal does not need to be normalised. The norm of the projection 
-  // is returned and the projection vector is written in out_projection vector if provided.
-  double ProjectVectorOnPlane(const double *in_vector, const double *in_plane_normal, double *out_projection = NULL);
-
   // Projection Accumulator; accumulates projections of the motion
   // vector along mouse move events 
   //   
