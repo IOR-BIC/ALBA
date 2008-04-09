@@ -24,6 +24,10 @@ SET(vtkMED_SRCS
   vtkMaskPolyDataFilter.h
   vtkHoleConnectivity.cxx
   vtkHoleConnectivity.h
+  vtkMEDExtrudeToCircle.cxx
+  vtkMEDExtrudeToCircle.h
+  vtkMEDPastValuesList.cpp
+  vtkMEDPastValuesList.h
   vtkMEDPolyDataMirror.cxx
   vtkMEDPolyDataMirror.h
 )
