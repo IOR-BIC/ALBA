@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 09:52:06 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-04-10 11:44:40 $
+  Version:   $Revision: 1.25 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -560,7 +560,7 @@ void mafViewGlobalSlice::UpdateSlice()
 			m_SliceOrigin[2] = m_GlobalBounds[4];
 	}
 
-	for(mafSceneNode *node = m_Sg->m_List; node; node=node->m_Next)
+	for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->m_Next)
 	{
     if(node->m_Pipe)
     {
@@ -701,10 +701,30 @@ void mafViewGlobalSlice::CameraUpdate()
 //----------------------------------------------------------------------------
 {
 	Superclass::CameraUpdate();
-	mafNode *node = m_Sg->GetSelectedVme();
+  mafOBB globalBounds;
+  for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->m_Next)
+  {
+    if(n->m_Pipe)
+    {
+      mafOBB b;
+      ((mafVME *)n->m_Vme)->GetOutput()->Get4DBounds(b);
+      globalBounds.MergeBounds(b);
+    }
+  }
+  if (globalBounds.IsValid())
+  {
+    mafOBB previousGlobalBound;
+    previousGlobalBound.DeepCopy(m_GlobalBounds);
+    if(!previousGlobalBound.Equals(&globalBounds))
+    {
+      UpdateSliceParameters();
+      UpdateSlice();
+    }
+  }
+	/*mafNode *node = m_Sg->GetSelectedVme();
 	mafOBB globalBounds;
 	((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(globalBounds);
-	if(m_GlobalBoundsInitialized)
+	if(globalBounds.IsValid() && m_GlobalBoundsInitialized)
   {
     mafOBB b;
     b.DeepCopy(m_GlobalBounds);
@@ -720,7 +740,7 @@ void mafViewGlobalSlice::CameraUpdate()
         UpdateSlice();
       }
 		}
-  }
+  }*/
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
