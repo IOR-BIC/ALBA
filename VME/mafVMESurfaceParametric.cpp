@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-08 13:47:33 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-10 10:37:49 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -314,8 +314,8 @@ void mafVMESurfaceParametric::OnEvent(mafEventBase *maf_event)
       case CHANGE_VALUE_PLANE:
       {
         InternalUpdate();
-        mafEvent ev(this,CAMERA_UPDATE);
-        this->ForwardUpEvent(&ev);
+        e->SetId(CAMERA_UPDATE);
+        ForwardUpEvent(e);
       }
       break;
       default:
@@ -475,8 +475,8 @@ void mafVMESurfaceParametric::InternalUpdate()
     }
     break;
 	}
-  mafEvent ev(this,CAMERA_UPDATE);
-  this->ForwardUpEvent(&ev);
+  /*mafEvent ev(this,CAMERA_UPDATE);
+  this->ForwardUpEvent(&ev);*/
 }
 //-----------------------------------------------------------------------
 int mafVMESurfaceParametric::InternalStore(mafStorageElement *parent)
