@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 08:28:45 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2008-04-10 08:13:29 $
+  Version:   $Revision: 1.30 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -887,7 +887,7 @@ void mafViewArbitrarySlice::CreateGuiView()
 {
   m_GuiView = new mmgGui(this);
   
-  m_GuiView->Label("");
+  //m_GuiView->Label("");
   m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
