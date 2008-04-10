@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 15:22:09 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-04-10 11:43:24 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,45 +38,39 @@ public:
   virtual void	SetListener(mafObserver *Listener) {m_Listener = Listener;};
 	//virtual void	OnEvent(mafEvent& e);
 
-	/** 
-  Add a vme to the scene graph. */
+	/** Add a vme to the scene graph. */
 	virtual void VmeAdd(mafNode *vme);
 
-	/** 
-  Remove a vme from the scene graph. */
+	/** Remove a vme from the scene graph. */
 	virtual void VmeRemove(mafNode *vme);
 
-	/** 
-  Select a vme and store a reference to it into m_SelectedVme variable. */
+	/** Select a vme and store a reference to it into m_SelectedVme variable. */
 	virtual void VmeSelect(mafNode *vme, bool select);
 
-	/** 
-  Change the visibility of the vme and if necessary create the vme related pipe. */
+	/** Change the visibility of the vme and if necessary create the vme related pipe. */
 	virtual void VmeShow(mafNode *vme, bool show);
 
-	/** 
-  Show/Hide the Vme with the same type of the passed vme */
+	/** Show/Hide the Vme with the same type of the passed vme */
 	virtual void VmeShowByType(mafNode *vme, bool show);
 
 	/** 
   Show all the same vme type. */
 	//@@@ virtual void					VmeShowByType			(mafNodeBaseTypes type,bool show);
 
-	/** 
-  Show all the vme subtree. */
+	/** Show all the vme subtree. */
 	virtual void VmeShowSubTree(mafNode *vme, bool show);
 
-	/** 
-  Update the vme's properties. */
+	/** Update the vme's properties. */
 	virtual void VmeUpdateProperty(mafNode *vme, bool fromTag = false);
 
-	/** 
-  Find the corresponding vme's node. */
+	/** Find the corresponding vme's node. */
 	virtual mafSceneNode *Vme2Node(mafNode *vme);
 
-  mafSceneNode	*m_List;      ///< list of visualized node
-  vtkRenderer		*m_RenFront;  ///< pointer to the front renderer
-  vtkRenderer		*m_RenBack;   ///< pointer to the back renderer
+  /** Return the list of node that are added to the view.*/
+  mafSceneNode *GetNodeList() {return m_List;};
+
+  vtkRenderer   *m_RenFront;  ///< pointer to the front renderer
+  vtkRenderer   *m_RenBack;   ///< pointer to the back renderer
   mafView		    *m_View;      ///< pointer to the view
 
   // Set the flags for creatable vmes type.
@@ -118,8 +112,9 @@ protected:
 
 	mafSceneNode *NodeAdd(mafNode *vme);
 
-  mafObserver	*m_Listener;
-	mmgGui			*m_Gui;
-	mafNode     *m_SelectedVme;
+  mafSceneNode *m_List;      ///< list of visualized node
+  mafObserver	 *m_Listener;
+	mmgGui			 *m_Gui;
+	mafNode      *m_SelectedVme;
 };
 #endif
