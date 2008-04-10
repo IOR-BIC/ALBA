@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 08:13:29 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2008-04-10 09:26:07 $
+  Version:   $Revision: 1.31 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -805,10 +805,11 @@ mmgGui* mafViewArbitrarySlice::CreateGui()
   m_Gui = new mmgGui(this);
 
 	//combo box to choose the type of gizmo
-	wxString Text[2]={"Gizmo Translation","Gizmo Rotation"};
+	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
 	m_Gui->Combo(ID_COMBO_GIZMOS,"Gizmo",&m_TypeGizmo,2,Text);
-	//button to reset at the star position
-	m_Gui->Button(ID_RESET,"Reset","");
+
+  //button to reset at the start position
+	m_Gui->Button(ID_RESET,_("Reset"),"");
 	m_Gui->Divider(2);
 
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
