@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:43 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-04-10 09:52:06 $
+  Version:   $Revision: 1.24 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -165,11 +165,6 @@ void mafViewGlobalSlice::Create()
   m_Sg->SetListener(this);
   m_Rwi->m_Sg = m_Sg;
 
-  vtkNEW(m_Picker3D);
-  vtkNEW(m_Picker2D);
-  m_Picker2D->SetTolerance(0.005);
-  m_Picker2D->InitializePickList();
-
 	m_Text = "";
 	m_TextMapper = vtkTextMapper::New();
 	m_TextMapper->SetInput(m_Text.GetCStr());
@@ -181,6 +176,11 @@ void mafViewGlobalSlice::Create()
 	m_TextActor->GetProperty()->SetColor(m_TextColor);
 
 	m_Rwi->m_RenFront->AddActor(m_TextActor);
+
+  vtkNEW(m_Picker3D);
+  vtkNEW(m_Picker2D);
+  m_Picker2D->SetTolerance(0.001);
+  //m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::InizializePlane()
@@ -701,17 +701,26 @@ void mafViewGlobalSlice::CameraUpdate()
 //----------------------------------------------------------------------------
 {
 	Superclass::CameraUpdate();
-	mafNode *node=m_Sg->GetSelectedVme();
-	double GlobalBounds[6];
-	((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(GlobalBounds);
+	mafNode *node = m_Sg->GetSelectedVme();
+	mafOBB globalBounds;
+	((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(globalBounds);
 	if(m_GlobalBoundsInitialized)
-		if(GlobalBounds[0]!=m_GlobalBounds[0]||GlobalBounds[1]!=m_GlobalBounds[1]||GlobalBounds[2]!=m_GlobalBounds[2]||GlobalBounds[3]!=m_GlobalBounds[3]||GlobalBounds[4]!=m_GlobalBounds[4]||GlobalBounds[5]!=m_GlobalBounds[5])
+  {
+    mafOBB b;
+    b.DeepCopy(m_GlobalBounds);
+		if(!b.Equals(&globalBounds))
 		{
-			((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
+			((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(b);
 			//m_GlobalBoundsInitialized = false;
-			UpdateSliceParameters();
-			UpdateSlice();
+      if (m_NumberOfVisibleVme > 0 && b.IsValid())
+      {
+        b.CopyTo(m_GlobalBounds);
+        // there is at least one VME visualized
+        UpdateSliceParameters();
+        UpdateSlice();
+      }
 		}
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
