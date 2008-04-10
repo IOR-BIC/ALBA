@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgLocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-14 13:22:18 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-04-10 14:31:08 $
+Version:   $Revision: 1.13 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,11 +42,11 @@ mmgLocaleSettings::~mmgLocaleSettings()
 void mmgLocaleSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
-  wxString lang_array[5] = {"English","French","German","Italian","Spanish"};
+  wxString lang_array[7] = {"English","French","German","Italian","Spanish","Russian","Polish"};
 
   m_Gui = new mmgGui(this);   
   m_Gui->Label(_("User Interface Language"));
-  m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId,5,lang_array);
+  m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId, 7,lang_array);
 	m_Gui->Enable(LANGUAGE_ID,m_EnableLanguage); 
   m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
   m_Gui->Label("");
@@ -76,6 +76,14 @@ void mmgLocaleSettings::OnEvent(mafEventBase *maf_event)
       case 4:
         m_Language = wxLANGUAGE_SPANISH;
         m_LanguageDictionary = "es";
+        break;
+	  case 5:
+		m_Language = wxLANGUAGE_RUSSIAN;
+        m_LanguageDictionary = "ru";
+        break;
+	  case 6:
+		m_Language = wxLANGUAGE_POLISH;
+        m_LanguageDictionary = "pl";
         break;
       default:
         m_Language = wxLANGUAGE_ENGLISH;
@@ -140,6 +148,12 @@ void mmgLocaleSettings::InitializeSettings()
   case wxLANGUAGE_SPANISH:
     m_LanguageId =4;
     break;
+  case wxLANGUAGE_RUSSIAN:
+    m_LanguageId =5;
+    break;
+  case wxLANGUAGE_POLISH:
+    m_LanguageId =6;
+    break;
   default: //wxLANGUAGE_ENGLISH;
     m_LanguageId =0; 
   }
@@ -148,8 +162,46 @@ void mmgLocaleSettings::InitializeSettings()
 void mmgLocaleSettings::SetLanguageDirectory(const char* prefix, const char* languageDirectory)
 //----------------------------------------------------------------------------
 {
+  m_LanguageDictionary = wxT(languageDirectory);
   m_Locale.AddCatalogLookupPathPrefix(prefix);
+
   m_Locale.AddCatalog(wxT(m_LanguageDictionary.GetCStr()));
+  if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "fr") == 0)
+  {
+  	m_Language		= wxLANGUAGE_FRENCH;
+	m_LanguageId	= 1;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "de") == 0)
+  {
+    m_Language		= wxLANGUAGE_GERMAN;
+	m_LanguageId	= 2;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "it") == 0)
+  {
+	  m_Language	= wxLANGUAGE_ITALIAN;
+	m_LanguageId	= 3; 
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "es") == 0)
+  {
+    m_Language		= wxLANGUAGE_SPANISH;
+	m_LanguageId	= 4;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "ru") == 0)
+  {
+    m_Language		= wxLANGUAGE_RUSSIAN;
+	m_LanguageId	= 5;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "pl") == 0)
+  {
+    m_Language		= wxLANGUAGE_POLISH;
+	m_LanguageId	= 6;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "en") == 0)
+  {
+    m_Language		= wxLANGUAGE_ENGLISH;
+	m_LanguageId	= 0;
+  }
+
 }
 //----------------------------------------------------------------------------
 void mmgLocaleSettings::ChangeLanguage(wxLanguage languageEnum, const char *languageAcronym)
