@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-07 09:42:57 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-04-10 07:47:04 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -164,7 +164,8 @@ void mmoExtrusionHolesTest::TestExtrude()
 
 	resultPolydata->GetBounds(bounds);
 
-	CPPUNIT_ASSERT(bounds[1]-bounds[0] == 4 && bounds[3]-bounds[2] == 4 && bounds[5]-bounds[4] == 8);
+  double epsilon = 0.01;
+	CPPUNIT_ASSERT(bounds[1]-bounds[0] < 4+epsilon && bounds[1]-bounds[0] > 4-epsilon && bounds[3]-bounds[2] < 4+epsilon && bounds[3]-bounds[2] > 4-epsilon && bounds[5]-bounds[4] < 8+epsilon && bounds[5]-bounds[4] > 8-epsilon);
 	
 	cube = NULL;
 
