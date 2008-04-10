@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-09 12:51:21 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-04-10 08:56:33 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -161,6 +161,17 @@ void mmoExtrusionHoles::OpRun()
 	m_ResultPolydata->DeepCopy(((vtkPolyData*)((mafVMESurface*)m_Input)->GetOutput()->GetVTKData()));
 	m_ResultPolydata->Update();
 
+  double BoundingBox[6];
+  m_ResultPolydata->GetBounds(BoundingBox);
+
+  //Compute Max bound
+  double dimX, dimY, dimZ;
+  dimX = (BoundingBox[1] - BoundingBox[0]);
+  dimY = (BoundingBox[3] - BoundingBox[2]);
+  dimZ = (BoundingBox[5] - BoundingBox[4]);
+  m_MaxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
+  m_SphereRadius = m_MaxBounds / 100;
+
 	if(!m_TestMode)
 	{
 		CreateOpDialog();
@@ -283,7 +294,12 @@ void mmoExtrusionHoles::Extrude()
 			points->InsertNextPoint(point);
 		}
 	}
-	vtkPolyData *appo=vtkPolyData::New();
+  else
+  {
+    points->DeepCopy(m_ExtractHole->GetOutput()->GetPoints());
+  }
+	vtkPolyData *appo;
+  vtkNEW(appo);
 	appo->SetPoints(points);
 	appo->Update();
 	vtkTextureMapToPlane *computeMedianPlane;
@@ -317,6 +333,7 @@ void mmoExtrusionHoles::Extrude()
 	}
 
 	vtkDEL(computeMedianPlane);
+  vtkDEL(appo);
 }
 //----------------------------------------------------------------------------
 void mmoExtrusionHoles::SelectHole(int pointID)
