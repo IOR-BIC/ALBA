@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.h,v $
   Language:  C++
-  Date:      $Date: 2006-01-30 13:52:21 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-10 08:57:54 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -45,34 +45,40 @@ public:
   virtual ~mmgLutEditor(); 
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  void OnEvent( mafEventBase *event );
+  void OnEvent(mafEventBase *maf_event);
 
+  /** Assign the external lookup table to the widget.*/
   void SetLut(vtkLookupTable *lut);
 
+  /** Show the dialog.*/
   static void ShowLutDialog(vtkLookupTable *lut, mafObserver *listener = NULL, int id = MINID);
 
 protected:
 
   void UpdateInfo();
+  
+  /** Update the internal Lookup Table according to the preset selected from the combo box.*/
+  void UpdateLut();
+  
+  /** Copy the external Lookup Table given by the user to the internal one.*/
   void CopyLut(vtkLookupTable *from, vtkLookupTable *to);
-	void OnComboSelection(wxCommandEvent &event);
+	
+  //void OnComboSelection(wxCommandEvent &event);
   
   mafObserver *m_Listener;
 
-  int          m_Preset;
-  //wxString m_presets[2];
-  //int m_num_preset;
+  int          m_Preset; ///< Index of lookup table preset.
 
-  int          m_NumEntry;
-  double       m_ValueRange[2]; 
+  int          m_NumEntry; ///< Number of colors of the current lookup table.
+  double       m_ValueRange[2]; ///< Value range of the current lookup table.
   wxString     m_Info; // selected indexes
   
   mmgLutSwatch   *m_LutSwatch;
   mmgLutWidget   *m_LutWidget;
   mmgColorWidget *m_ColorWidget;
 
-  vtkLookupTable *m_ExternalLut;  // given lut that will be modified by "ok" or "apply"
-  vtkLookupTable *m_Lut;           // internal lut -- initialized in SetLut
+  vtkLookupTable *m_ExternalLut;  ///< Given lut that will be modified by "ok" or "apply"
+  vtkLookupTable *m_Lut;          ///< Internal lut -- initialized in SetLut
   DECLARE_EVENT_TABLE()
 };
 #endif

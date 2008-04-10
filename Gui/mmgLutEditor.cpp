@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:43:32 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-04-10 08:57:54 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -203,30 +203,34 @@ mmgLutEditor::~mmgLutEditor()
 	}
 }
 //----------------------------------------------------------------------------
-void mmgLutEditor::OnComboSelection(wxCommandEvent &event)
+/*void mmgLutEditor::OnComboSelection(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-	lutPreset( m_Preset, m_Lut);
-	m_NumEntry      = m_Lut->GetNumberOfTableValues();
-	m_LutWidget->SetLut(m_Lut);
-	m_LutSwatch->SetLut(m_Lut);
+	UpdateLut();
+  //TransferDataToWindow();
+}*/
+//----------------------------------------------------------------------------
+void mmgLutEditor::UpdateLut()
+//----------------------------------------------------------------------------
+{
+  lutPreset(m_Preset, m_Lut);
+  m_Lut->Build();
+  m_NumEntry = m_Lut->GetNumberOfTableValues();
+  m_LutWidget->SetLut(m_Lut);
+  m_LutSwatch->SetLut(m_Lut);
   TransferDataToWindow();
 }
-
 //----------------------------------------------------------------------------
-void mmgLutEditor::OnEvent( mafEventBase *event )
+void mmgLutEditor::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  if (mafEvent *e = mafEvent::SafeDownCast(event))
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
 	  {
       case ID_PRESET:
       {
-        lutPreset( m_Preset, m_Lut);
-        m_NumEntry      = m_Lut->GetNumberOfTableValues();
-        m_LutWidget->SetLut(m_Lut);
-        m_LutSwatch->SetLut(m_Lut);
+        UpdateLut();
       }
       break; 
       case ID_NUMENTRY:
