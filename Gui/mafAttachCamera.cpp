@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 09:08:28 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-04-10 09:12:43 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,6 +138,11 @@ void mafAttachCamera::SetVme(mafNode *node)
     }
     vtkDEL(m_AttachedVmeMatrix);
     m_AttachedVme = NULL;
+    m_CameraAttach = 0;
+    if (m_Gui != NULL)
+    {
+      m_Gui->Update();
+    }
     return;
   }
   if (m_AttachedVme && m_AttachedVme->Equals(mafVME::SafeDownCast(node)))
