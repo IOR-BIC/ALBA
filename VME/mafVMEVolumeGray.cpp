@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:16:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-10 10:36:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -113,7 +113,8 @@ void mafVMEVolumeGray::OnEvent(mafEventBase *maf_event)
 //-------------------------------------------------------------------------
 {
   // events to be sent up or down in the tree are simply forwarded
-  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  mafEvent *e = mafEvent::SafeDownCast(maf_event);
+  if (e != NULL && e->GetSender() == m_Gui)
   {
     switch(e->GetId())
     {
