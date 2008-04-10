@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaApplicationLayout.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 14:12:53 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-10 11:44:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -298,7 +298,7 @@ void mmaApplicationLayout::AddView(mafView *v, bool vme_visibility)
   if (m_VisibilityVme)
   {
     int idx;
-    for(mafSceneNode *n=v->GetSceneGraph()->m_List; n; n = n->m_Next)
+    for(mafSceneNode *n=v->GetSceneGraph()->GetNodeList(); n; n = n->m_Next)
     {
       if(n->m_Pipe)
       {

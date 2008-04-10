@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-10 11:44:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,7 +126,7 @@ void mafViewHTML::VmeShow  (mafNode *vme, bool show)
 { 
   if(show)
   {
-    for(mafSceneNode *node = m_Sg->m_List; node; node=node->m_Next)
+    for(mafSceneNode *node = m_Sg->GetNodeList(); node; node=node->m_Next)
       mafEventMacro(mafEvent(this,VME_SHOW,node->m_Vme,false));    
   }
   else
