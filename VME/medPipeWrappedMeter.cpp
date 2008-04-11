@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 09:14:47 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-11 13:35:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -298,10 +298,6 @@ void medPipeWrappedMeter::OnEvent(mafEventBase *maf_event)
       break;
     }
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-  }
-  else if(maf_event->GetId() == VME_TIME_SET)
-  {
-    UpdateProperty();
   }
   else if (maf_event->GetSender() == m_WrappedMeterVME)
   {
