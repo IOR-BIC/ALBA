@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-04-09 14:20:30 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-04-11 16:03:07 $
+Version:   $Revision: 1.7 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -175,7 +175,7 @@ public:
   bool AddExistingEdgeToBranch(vtkIdType b, vtkIdType e) ;
 
   /** Reverse direction of branch 
-  This s useful if you want to add items at the front end of the branch. */
+  This is useful if you want to add items at the front end of the branch. */
   void ReverseBranch(vtkIdType b) ;
 
   /** Delete edge from graph
@@ -192,6 +192,22 @@ public:
   /** Delete branch from the graph.    
   Be careful: this also moves the branch at the end of the list to index i. */
   bool DeleteBranch(vtkIdType i) ;
+
+#pragma region BES April 2008
+  /** Merges two branches.
+  Both branches (identified by b1 and b2) must share common endpoint.
+  Be careful: this also moves the branch at the end of the list to index b2.*/
+  bool MergeBranches(vtkIdType b1, vtkIdType b2);
+
+  /** Merges two branches connected at the given vertex.
+  The vertex may not be at a bifurcation, i.e., it must be of order 2
+  Be careful: this also moves the branch at the end of the list to index b1.*/
+  bool MergeSimpleJoinedBranchesAtVertex(vtkIdType v);
+
+  /** Merges all branches in the graph connected in vertices of order 2  
+  Be careful: this leads to reindexing of branches */
+  void MergeSimpleJoinedBranches();
+#pragma endregion
 
   bool IsConnected() const ;                                ///< is graph connected
   bool IsConnectedTree() const ;                            ///< is graph a connected tree

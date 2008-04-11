@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-09 14:20:30 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-11 16:03:07 $
+Version:   $Revision: 1.6 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -2664,3 +2664,87 @@ double mafPolylineGraph::GetBranchIntervalLength(vtkIdType b, vtkIdType startVer
 
   return sum;
 }
+
+#pragma region BES April 2008
+//------------------------------------------------------------------------
+/** Merges two branches.
+Both branches (identified by b1 and b2) must share common endpoint.
+Be careful: this also moves the branch at the end of the list to index b2.*/
+bool mafPolylineGraph::MergeBranches(vtkIdType b1, vtkIdType b2)
+{  
+  if (b1 == b2)
+    return true;
+
+ Branch* br1 = GetBranchPtr(b1);
+ Branch* br2 = GetBranchPtr(b2);
+
+  if (br1 == NULL || br2 == NULL){
+    mafLogMessage("invalid input branches %d %d in MergeBranches()", b1, b2) ;
+    return false ;
+  }
+
+  //get the last vertex id
+  vtkIdType v = br1->GetLastVertexId();
+  int iPos = br2->FindVertexId(v);
+  if (iPos == br2->GetNumberOfVertices() - 1)
+    this->ReverseBranch(b2);  //we need to connect to the end of the second branch
+  else if (iPos != 0)
+  {
+    //OK, we cannot connect b2 after b1, let us check, if we can do it vice versa
+    v = br2->GetLastVertexId();
+    iPos = br1->FindVertexId(v);
+    if (iPos == br1->GetNumberOfVertices() - 1)
+      this->ReverseBranch(b1);  //we need to connect to the end of the second branch
+    else if (iPos != 0)
+    {
+      mafLogMessage("branches %d %d does not share common vertex in MergeBranches()", b1, b2) ;
+      return false ;
+    }
+
+    //swap b1 and b2
+    vtkIdType tmp = b1;
+    b1 = b2; b2 = tmp;
+
+    Branch* btmp = br1;
+    br1 = br2; br2 = btmp;
+  }
+
+  //now merge b2 after b1
+  for (int i = 0; i < br2->GetNumberOfEdges(); i++)
+  {
+    vtkIdType e = br2->GetEdgeId(i);    
+
+    br1->AddEdgeId(e);
+    br1->AddVertexId(br2->GetVertexId(i + 1));
+    GetEdgePtr(e)->SetBranchId(b1); 
+  }  
+
+  br2->Clear();
+  return this->DeleteBranch(b2);
+}
+
+/** Merges two branches connected at the given vertex.
+The vertex may not be at a bifurcation, i.e., it must be of order 2
+Be careful: this also moves the branch at the end of the list to index b1.*/
+bool mafPolylineGraph::MergeSimpleJoinedBranchesAtVertex(vtkIdType v)
+{
+  const Vertex* vert = this->GetConstVertexPtr(v);
+  if (vert->GetDegree() != 2)
+    return false; //either terminal node of the graph or some bifurcation
+
+  const Edge* e1 = this->GetConstEdgePtr(vert->GetEdgeId(0));
+  const Edge* e2 = this->GetConstEdgePtr(vert->GetEdgeId(1));
+
+
+  return MergeBranches(e1->GetBranchId(), e2->GetBranchId());
+}
+
+/** Merges all branches in the graph connected in vertices of order 2  
+Be careful: this leads to reindexing of branches */
+void mafPolylineGraph::MergeSimpleJoinedBranches()
+{
+  for (vtkIdType v = 0; v < this->GetMaxVertexId(); v++) {
+    MergeSimpleJoinedBranchesAtVertex(v);
+  }
+}
+#pragma endregion
