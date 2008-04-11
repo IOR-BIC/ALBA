@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:21:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-11 17:34:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -89,7 +89,10 @@ private:
   void SetVersor(int axis, double versor[3], mafMatrix &matrix);
   static void BuildVector(double p0[3],double p1[3],double vOut[3]);
   static void BuildVector(double coeff, const double *inVector, double *outVector);
-  void Compute_P0P1_ViewUp_PlaneNormal( int idP0, int idP1, double viewUp[3], double normal[3] );
+  void FindPerpendicularVersorsToSegment( int idP0, int idP1, double viewUp[3], double normal[3] );
+  
+  // Find perpendicular versors to input versor N
+  void FindPerpendicularVersors(double inVersorN[3], double outVersorP[3], double outVersorQ[3]);
 
 };
  

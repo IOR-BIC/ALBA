@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:21:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-11 17:34:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,6 +19,8 @@ const bool DEBUG_MODE = true;
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+
+#include <math.h>
 
 #include "medGizmoInteractionDebugger.h"
 #include "mafDecl.h"
@@ -406,6 +408,7 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType b
 
 void medCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose )
 {
+
   std::ostringstream stringStream;
 
   const mafPolylineGraph::Branch *currentBranch = m_ConstraintPolylineGraph->GetConstBranchPtr(inBranchId);
@@ -431,25 +434,22 @@ void medCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *in
   ComputeLocalPointPositionBetweenVerticesForSkeletonBranch(distP0s,p0ID,p1ID,pOut);
 
   // compute the normal
-  double n[3] = {0,0,0};
+  double normal1[3] = {0,0,0};
+  double normal2[3] = {0,0,1};
 
-  // view up is local z axi // TODO: this is not general... to be changed
-  double vup[3] = {0,0,1};
-
-  Compute_P0P1_ViewUp_PlaneNormal(p0ID, p1ID, vup, n);
-
+  FindPerpendicularVersorsToSegment(p0ID, p1ID, normal2, normal1);
 
   // create the local pose matrix from position and normal
-  double n_x_vup[3] = {0,0,0};
+  double normal1_x_normal2[3] = {0,0,0};
 
-  vtkMath::Normalize(vup);
-  vtkMath::Normalize(n);
-  vtkMath::Cross(n, vup, n_x_vup);
+  vtkMath::Normalize(normal2);
+  vtkMath::Normalize(normal1);
+  vtkMath::Cross(normal1, normal2, normal1_x_normal2);
 
   mafMatrix localGizmoPose;
-  SetVersor(0, n_x_vup, localGizmoPose);
-  SetVersor(1, n, localGizmoPose);
-  SetVersor(2, vup, localGizmoPose);
+  SetVersor(0, normal1_x_normal2, localGizmoPose);
+  SetVersor(1, normal1, localGizmoPose);
+  SetVersor(2, normal2, localGizmoPose);
   localGizmoPose.SetTimeStamp(-1);
   mafTransform::SetPosition(localGizmoPose, pOut);
 
@@ -525,7 +525,7 @@ void medCurvilinearAbscissaOnSkeletonHelper::BuildVector(double coeff, const dou
   }
 }
 
-void medCurvilinearAbscissaOnSkeletonHelper::Compute_P0P1_ViewUp_PlaneNormal( int idP0, int idP1, double viewUp[3], double normal[3] )
+void medCurvilinearAbscissaOnSkeletonHelper::FindPerpendicularVersorsToSegment( int idP0, int idP1, double viewUp[3], double normal[3] )
 {
   double p0[3] = {0,0,0};
   double p1[3] = {0,0,0};
@@ -537,12 +537,9 @@ void medCurvilinearAbscissaOnSkeletonHelper::Compute_P0P1_ViewUp_PlaneNormal( in
 
   BuildVector(p0, p1, p0p1);
   vtkMath::Normalize(p0p1);
-
-  // cross product with the normal
-  double viewup_x_p0p1[3] = {0,0,0};
-  vtkMath::Cross(viewUp, p0p1, normal);
-
-  vtkMath::Normalize(normal);
+ 
+  FindPerpendicularVersors(p0p1, viewUp, normal) ;
+  
 }
 
 double medCurvilinearAbscissaOnSkeletonHelper::CheckS( vtkIdType inputBranchId, double inS )
@@ -835,4 +832,35 @@ void medCurvilinearAbscissaOnSkeletonHelper::FindBoundaryVertices( vtkIdType inp
 }
 
 
+
+void medCurvilinearAbscissaOnSkeletonHelper::FindPerpendicularVersors( double inVersorN[3], double outVersorP[3], double outVersorQ[3] )
+{
+  const double M_SQRT1_2 = 0.707106781186547524401;
+
+  assert(inVersorN && outVersorP && outVersorQ);
+  if (abs(inVersorN[2]) > M_SQRT1_2) {
+    // choose p in y-z plane
+    double a = inVersorN[1]*inVersorN[1] + inVersorN[2]*inVersorN[2];
+    double k = sqrt(a);
+    outVersorP[0] = 0;
+    outVersorP[1] = -inVersorN[2]*k;
+    outVersorP[2] = inVersorN[1]*k;
+    // set q = n x p
+    outVersorQ[0] = a*k;
+    outVersorQ[1] = -inVersorN[0]*outVersorP[2];
+    outVersorQ[2] = inVersorN[0]*outVersorP[1];
+  }
+  else {
+    // choose p in x-y plane
+    double a = inVersorN[0]*inVersorN[0] + inVersorN[1]*inVersorN[1];
+    double k = sqrt(a);
+    outVersorP[0] = -inVersorN[1]*k;
+    outVersorP[1] = inVersorN[0]*k;
+    outVersorP[2] = 0;
+    // set q = n x p
+    outVersorQ[0] = -inVersorN[2]*outVersorP[1];
+    outVersorQ[1] = inVersorN[2]*outVersorP[0];
+    outVersorQ[2] = a*k;
+  }
+}
 
