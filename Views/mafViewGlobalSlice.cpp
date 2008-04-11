@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 11:44:40 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-04-11 14:27:18 $
+  Version:   $Revision: 1.26 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,6 +100,8 @@ mafViewGlobalSlice::mafViewGlobalSlice(wxString label, int camera_position, bool
 	m_GlobalBounds[1] = m_GlobalBounds[3] = m_GlobalBounds[5] = 1000.0;
 
 	m_GlobalBoundsInitialized = false;
+  m_GlobalBoundsValid = true;
+
 	m_ViewIndex = ID_XY;
 
 	m_GlobalSlider = NULL;
@@ -221,9 +223,9 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
   m_Sg->VmeSelect(node,select);
   if(select && m_Gui)
   {
-    if (!m_GlobalBoundsInitialized)
+    /*if (!m_GlobalBoundsInitialized)
     {
-      ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
+      ((mafVME*)node->GetRoot())->GetOutput()->GetVME4DBounds(m_GlobalBounds);
 
 			double bounds[6];
 			((mafVME*)node->GetRoot())->GetOutput()->GetBounds(bounds);
@@ -231,7 +233,7 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
 			InizializePlane();
 
 			CameraUpdate();
-    }
+    }*/
 
     m_SelectedVolume = m_Sg->Vme2Node(node);
     if (m_SelectedVolume->m_Pipe)
@@ -240,7 +242,7 @@ void mafViewGlobalSlice::VmeSelect(mafNode *node,bool select)
 			m_Gui->Enable(ID_POS_SLIDER,true);
       if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
       {
-        m_Opacity   = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
+        m_Opacity = ((mafPipeVolumeSlice *)m_SelectedVolume->m_Pipe)->GetSliceOpacity();
         m_Gui->Enable(ID_OPACITY_SLIDER,true);
       }
       m_Gui->Update();
@@ -262,12 +264,13 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
   mafSceneNode *n = m_Sg->Vme2Node(node);
   assert(n && !n->m_Pipe);
 
-	if (!m_GlobalBoundsInitialized)
+  m_GlobalBoundsValid = false; // new VME is shown into the view => Update the Global Bounds
+	if (!m_GlobalBoundsInitialized || !m_GlobalBoundsValid)
   {
-    ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(m_GlobalBounds);
+    ((mafVME*)node)->GetOutput()->GetVME4DBounds(m_GlobalBounds);
     UpdateSliceParameters();
 		InizializePlane();
-		CameraUpdate();
+		//CameraUpdate();
   }
 
   double *new_point;
@@ -276,7 +279,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
   float applied_yVector[3];
   float applied_normal[3];
 	
-	mafVME *vme=mafVME::SafeDownCast(node);
+	mafVME *vme = mafVME::SafeDownCast(node);
 	vtkTransform *transform;
 	vtkNEW(transform);
 	transform->SetMatrix(vme->GetOutput()->GetMatrix()->GetVTKMatrix());
@@ -356,7 +359,7 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
       }
       else
       {
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        CameraUpdate();
       }
     }
     else
@@ -371,11 +374,13 @@ void mafViewGlobalSlice::VmeCreatePipe(mafNode *node)
 void mafViewGlobalSlice::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  m_GlobalBoundsValid = false;
   mafSceneNode *n = m_Sg->Vme2Node(vme);
   if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
     m_NumberOfVisibleVme = 0;
   else
     m_NumberOfVisibleVme--;
+
   if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
   {
     if (m_AttachCamera)
@@ -440,9 +445,9 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 {
 	if(!m_GlobalBoundsInitialized)
 	{
-		m_SliceOrigin[0] = (m_GlobalBounds[0]+m_GlobalBounds[1])*.5;
-		m_SliceOrigin[1] = (m_GlobalBounds[2]+m_GlobalBounds[3])*.5;
-		m_SliceOrigin[2] = (m_GlobalBounds[4]+m_GlobalBounds[5])*.5;
+		m_SliceOrigin[0] = (m_GlobalBounds[0] + m_GlobalBounds[1]) * .5;
+		m_SliceOrigin[1] = (m_GlobalBounds[2] + m_GlobalBounds[3]) * .5;
+		m_SliceOrigin[2] = (m_GlobalBounds[4] + m_GlobalBounds[5]) * .5;
 	}
 
   double new_bounds[3] = {0.0,0.0,0.0};
@@ -450,7 +455,7 @@ void mafViewGlobalSlice::UpdateSliceParameters()
   switch(m_ViewIndex)
   {
     case ID_XY:
-			index=2;
+			index = 2;
 			m_SliceXVector[0] = 1;
 			m_SliceXVector[1] = 0;
 			m_SliceXVector[2] = 0;
@@ -459,12 +464,12 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 			m_SliceYVector[2] = 0;
       new_bounds[0] = m_GlobalBounds[4];
       new_bounds[1] = m_GlobalBounds[5];
-      new_bounds[2] = (m_GlobalBounds[4]+m_GlobalBounds[5])*.5;
+      new_bounds[2] = (m_GlobalBounds[4] + m_GlobalBounds[5]) * .5;
       if(!m_GlobalBoundsInitialized)
 				m_SliceOrigin[2] = new_bounds[2];
     break;
     case ID_XZ:
-			index=1;
+			index = 1;
 			m_SliceXVector[0] = 1;
 			m_SliceXVector[1] = 0;
 			m_SliceXVector[2] = 0;
@@ -473,12 +478,12 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 			m_SliceYVector[2] = 1;
       new_bounds[0] = m_GlobalBounds[2];
       new_bounds[1] = m_GlobalBounds[3];
-      new_bounds[2] = (m_GlobalBounds[2]+m_GlobalBounds[3])*.5;
+      new_bounds[2] = (m_GlobalBounds[2] + m_GlobalBounds[3]) * .5;
       if(!m_GlobalBoundsInitialized)
 				m_SliceOrigin[1] = new_bounds[2];
     break;
     case ID_YZ:
-			index=0;
+			index = 0;
 			m_SliceXVector[0] = 0.0001;
 			m_SliceXVector[1] = 1;
 			m_SliceXVector[2] = 0;
@@ -487,13 +492,13 @@ void mafViewGlobalSlice::UpdateSliceParameters()
 			m_SliceYVector[2] = 1;
       new_bounds[0] = m_GlobalBounds[0];
       new_bounds[1] = m_GlobalBounds[1];
-      new_bounds[2] = (m_GlobalBounds[0]+m_GlobalBounds[1])*.5;
+      new_bounds[2] = (m_GlobalBounds[0] + m_GlobalBounds[1]) * .5;
       if(!m_GlobalBoundsInitialized)
 				m_SliceOrigin[0] = new_bounds[2];
     break;
   }
-	m_GlobalSlider->SetNumberOfSteps((new_bounds[1]-new_bounds[0])*10);
-  m_GlobalSlider->SetRange(new_bounds[0],new_bounds[1],m_SliceOrigin[index]);
+	m_GlobalSlider->SetNumberOfSteps((new_bounds[1] - new_bounds[0]) * 10);
+  m_GlobalSlider->SetRange(new_bounds[0], new_bounds[1], m_SliceOrigin[index]);
 	m_GlobalSlider->SetValue(m_SliceOrigin[index]);
 	m_GlobalSlider->Update();
 
@@ -513,9 +518,9 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 	assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
 	
-	m_GlobalSlider=m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
+	m_GlobalSlider = m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
 	m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);
-	m_OpacitySlider=m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
+	m_OpacitySlider = m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_Opacity,0.1,1.0);
 
 	bool Enable = false;
   mafNode *selVME = m_Sg->GetSelectedVme();
@@ -540,11 +545,11 @@ mmgGui* mafViewGlobalSlice::CreateGui()
 void mafViewGlobalSlice::UpdateSlice()
 //----------------------------------------------------------------------------
 {
-	if(m_Dn != 0.0)
+	if(!mafEquals(m_Dn, 0.0))
 	{
-		m_SliceOrigin[0] = m_SliceOrigin[0] + abs(m_SliceNormal[0]) * (m_Dn);
-		m_SliceOrigin[1] = m_SliceOrigin[1] + abs(m_SliceNormal[1]) * (m_Dn);
-		m_SliceOrigin[2] = m_SliceOrigin[2] + abs(m_SliceNormal[2]) * (m_Dn);
+		m_SliceOrigin[0] = m_SliceOrigin[0] + abs(m_SliceNormal[0]) * m_Dn;
+		m_SliceOrigin[1] = m_SliceOrigin[1] + abs(m_SliceNormal[1]) * m_Dn;
+		m_SliceOrigin[2] = m_SliceOrigin[2] + abs(m_SliceNormal[2]) * m_Dn;
 
 		if(m_SliceOrigin[0] > m_GlobalBounds[1])
 			m_SliceOrigin[0] = m_GlobalBounds[1];
@@ -564,14 +569,13 @@ void mafViewGlobalSlice::UpdateSlice()
 	{
     if(node->m_Pipe)
     {
-
 			double *new_point;
 			double applied_origin[3];
 			float applied_xVector[3];
 			float applied_yVector[3];
 			float applied_normal[3];
 
-			mafVME *vme=mafVME::SafeDownCast(node->m_Vme);
+			mafVME *vme = mafVME::SafeDownCast(node->m_Vme);
 			vtkTransform *transform;
 			vtkNEW(transform);
 			transform->Identity();
@@ -628,24 +632,23 @@ void mafViewGlobalSlice::UpdatePlane()
 	{
 		switch(m_ViewIndex)
 		{
-		case ID_XY:
-			
-			m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
-			m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
-			m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
-			m_BoundsPlane->Update();
+		  case ID_XY:
+			  m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_GlobalBounds[2],m_SliceOrigin[2]);
+			  m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_GlobalBounds[2],m_SliceOrigin[2]);
+			  m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_GlobalBounds[3],m_SliceOrigin[2]);
+			  m_BoundsPlane->Update();
 			break;
-		case ID_XZ:
-			m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[4]);
-			m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_SliceOrigin[1],m_GlobalBounds[4]);
-			m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[5]);
-			m_BoundsPlane->Update();
+		  case ID_XZ:
+			  m_BoundsPlane->SetOrigin(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[4]);
+			  m_BoundsPlane->SetPoint1(m_GlobalBounds[1],m_SliceOrigin[1],m_GlobalBounds[4]);
+			  m_BoundsPlane->SetPoint2(m_GlobalBounds[0],m_SliceOrigin[1],m_GlobalBounds[5]);
+			  m_BoundsPlane->Update();
 			break;
-		case ID_YZ:
-			m_BoundsPlane->SetOrigin(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[4]);
-			m_BoundsPlane->SetPoint1(m_SliceOrigin[0],m_GlobalBounds[3],m_GlobalBounds[4]);
-			m_BoundsPlane->SetPoint2(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[5]);
-			m_BoundsPlane->Update();
+		  case ID_YZ:
+			  m_BoundsPlane->SetOrigin(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[4]);
+			  m_BoundsPlane->SetPoint1(m_SliceOrigin[0],m_GlobalBounds[3],m_GlobalBounds[4]);
+			  m_BoundsPlane->SetPoint2(m_SliceOrigin[0],m_GlobalBounds[2],m_GlobalBounds[5]);
+			  m_BoundsPlane->Update();
 			break;
 		}
 	}
@@ -676,7 +679,9 @@ void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 //----------------------------------------------------------------------------
 {
 	if(m_SliceMode != SLICE_ARB)
+  {
     m_SliceOrigin[m_SliceMode] = origin[m_SliceMode];
+  }
   else
   {
     m_SliceOrigin[0] = origin[0];
@@ -692,7 +697,7 @@ void mafViewGlobalSlice::SetSlice(double origin[3], double dn)
 void mafViewGlobalSlice::UpdateText()
 //----------------------------------------------------------------------------
 {
-	m_Text=wxString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_SliceOrigin[0],m_SliceOrigin[1],m_SliceOrigin[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
+	m_Text = wxString::Format("o = [%.1f %.1f %.1f]  n = [%.1f %.1f %.1f]",m_SliceOrigin[0],m_SliceOrigin[1],m_SliceOrigin[2],m_SliceNormal[0],m_SliceNormal[1],m_SliceNormal[2]);
 	m_TextMapper->SetInput(m_Text.GetCStr());
 	m_TextMapper->Modified();
 }
@@ -701,46 +706,55 @@ void mafViewGlobalSlice::CameraUpdate()
 //----------------------------------------------------------------------------
 {
 	Superclass::CameraUpdate();
-  mafOBB globalBounds;
-  for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->m_Next)
+  if (!m_GlobalBoundsValid)
   {
-    if(n->m_Pipe)
+    mafOBB globalBounds;
+    for(mafSceneNode *n = m_Sg->GetNodeList(); n; n = n->m_Next)
     {
-      mafOBB b;
-      ((mafVME *)n->m_Vme)->GetOutput()->Get4DBounds(b);
-      globalBounds.MergeBounds(b);
-    }
-  }
-  if (globalBounds.IsValid())
-  {
-    mafOBB previousGlobalBound;
-    previousGlobalBound.DeepCopy(m_GlobalBounds);
-    if(!previousGlobalBound.Equals(&globalBounds))
-    {
-      UpdateSliceParameters();
-      UpdateSlice();
-    }
-  }
-	/*mafNode *node = m_Sg->GetSelectedVme();
-	mafOBB globalBounds;
-	((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(globalBounds);
-	if(globalBounds.IsValid() && m_GlobalBoundsInitialized)
-  {
-    mafOBB b;
-    b.DeepCopy(m_GlobalBounds);
-		if(!b.Equals(&globalBounds))
-		{
-			((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(b);
-			//m_GlobalBoundsInitialized = false;
-      if (m_NumberOfVisibleVme > 0 && b.IsValid())
+      if(n->m_Pipe)
       {
-        b.CopyTo(m_GlobalBounds);
-        // there is at least one VME visualized
+        mafOBB b;
+        ((mafVME *)n->m_Vme)->GetOutput()->GetVME4DBounds(b);
+        globalBounds.MergeBounds(b);
+      }
+    }
+    if (globalBounds.IsValid())
+    {
+      mafOBB previousGlobalBound;
+      previousGlobalBound.DeepCopy(m_GlobalBounds);
+      if(!previousGlobalBound.Equals(&globalBounds))
+      {
+        globalBounds.CopyTo(m_GlobalBounds);
         UpdateSliceParameters();
         UpdateSlice();
       }
-		}
-  }*/
+    }
+    m_GlobalBoundsValid = true;
+  }
+
+  /*if (m_NumberOfVisibleVme > 0)
+	{
+    mafNode *node = m_Sg->GetSelectedVme();
+    mafOBB globalBounds;
+    ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(globalBounds);
+    if(globalBounds.IsValid() && m_GlobalBoundsInitialized)
+    {
+      mafOBB b;
+      b.DeepCopy(m_GlobalBounds);
+      if(!b.Equals(&globalBounds))
+      {
+        ((mafVME*)node->GetRoot())->GetOutput()->Get4DBounds(b);
+        //m_GlobalBoundsInitialized = false;
+        if (b.IsValid())
+        {
+          b.CopyTo(m_GlobalBounds);
+          // there is at least one VME visualized
+          UpdateSliceParameters();
+          UpdateSlice();
+        }
+      }
+    }
+	}*/
 }
 //----------------------------------------------------------------------------
 void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
