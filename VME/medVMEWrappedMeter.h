@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-03 08:14:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-11 14:44:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,11 @@
 #include "medVMEOutputWrappedMeter.h"
 #include "mafEvent.h"
 #include "mafVMESurfaceParametric.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkPlane.h"
+#include "vtkPlaneSource.h"
+#include "vtkCutter.h"
+#include "vtkClipPolyData.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -341,6 +346,12 @@ protected:
   mafString m_EndVme1Name;
   mafString m_EndVme2Name;
   mafString m_WrappedVmeName;
+
+  vtkMAFSmartPointer<vtkPlaneSource> m_PlaneSource;
+  vtkMAFSmartPointer<vtkPlane> m_PlaneCutter;
+  vtkMAFSmartPointer<vtkCutter> m_Cutter;
+  vtkMAFSmartPointer<vtkPlane> m_PlaneClip;
+  vtkMAFSmartPointer<vtkClipPolyData> m_Clip;
 
   wxListBox *m_ListBox;
 	int        m_WrappedMode;

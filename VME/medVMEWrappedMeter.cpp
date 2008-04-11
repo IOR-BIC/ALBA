@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-18 07:55:39 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-11 14:44:35 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,7 +36,6 @@
 
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
-#include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkLine.h"
 #include "vtkLineSource.h"
@@ -44,11 +43,6 @@
 #include "vtkOBBTree.h"
 #include "vtkPoints.h"
 #include "vtkTransformPolyDataFilter.h"
-#include "vtkPlane.h"
-#include "vtkPlaneSource.h"
-#include "vtkCutter.h"
-#include "vtkClipPolyData.h"
-
 
 #include <assert.h>
 
@@ -80,6 +74,12 @@ medVMEWrappedMeter::medVMEWrappedMeter()
   medVMEOutputWrappedMeter *output = medVMEOutputWrappedMeter::New(); // an output with no data
   output->SetTransform(m_Transform); // force my transform in the output
   SetOutput(output);
+  
+  /*vtkNEW(m_PlaneSource);
+  vtkNEW(m_PlaneCutter);
+  vtkNEW(m_Cutter);
+  vtkNEW(m_PlaneClip);
+  vtkNEW(m_Clip);*/
 
   vtkNEW(m_LineSource);
   vtkNEW(m_LineSource2);
@@ -105,6 +105,13 @@ medVMEWrappedMeter::~medVMEWrappedMeter()
 //-------------------------------------------------------------------------
 {
   mafDEL(m_Transform);
+
+  /*vtkDEL(m_PlaneSource);
+  vtkDEL(m_PlaneCutter);
+  vtkDEL(m_Cutter);
+  vtkDEL(m_PlaneClip);
+  vtkDEL(m_Clip);*/
+
   vtkDEL(m_LineSource);
   vtkDEL(m_LineSource2);
 //  vtkDEL(m_LineSourceMiddle);
@@ -320,7 +327,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
   if (start_ok && end_ok)
   {
     // compute distance between points
-    m_Distance = 0;
+    m_Distance = 0.0;
 
     // compute start point in local coordinate system
     double local_start[3];
@@ -442,7 +449,8 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
       ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
       return;
     }
-
+    
+    short wrapside = m_WrapSide == 0 ? (-1) : (1);
     while(n1 != 0)
     {
      locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
@@ -464,9 +472,9 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
      }
      
      
-     
+     double normalizedV2 = vtkMath::Normalize(v2);
      for(int i = 0; i<3; i++)
-       p2[i] = p2[i] + (m_WrapSide == 0 ? (-1) : (1)) * v2[i]/(vtkMath::Normalize(v2));
+       p2[i] = p2[i] + (wrapside) * v2[i]/(normalizedV2);
       
      count++;
     }
@@ -484,9 +492,9 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     p3[1] = local_start[1];
     p3[2] = local_start[2];
 
-    count =0;
+    count = 0;
     int n2 = -1; // number of intersections
-
+    
     while(n2 != 0)
     {
       locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
@@ -510,15 +518,16 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
       }
 
 
-
+      double normalizedV2 = vtkMath::Normalize(v2);
       for(int i = 0; i<3; i++)
-        p2[i] = p2[i] + (m_WrapSide == 0 ? (-1) : (1)) * v2[i]/(vtkMath::Normalize(v2));
+        p2[i] = p2[i] + (wrapside) * v2[i]/(normalizedV2);
 
       count++;
     }
     ////////////////////////////////////////////////////
     
     if(pointsIntersection1->GetNumberOfPoints() == 0 || pointsIntersection2->GetNumberOfPoints() == 0) return;
+
     pointTangent1[0] = pointsIntersection1->GetPoint(0)[0];
     pointTangent1[1] = pointsIntersection1->GetPoint(0)[1];
     pointTangent1[2] = pointsIntersection1->GetPoint(0)[2];
@@ -532,22 +541,22 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
                  sqrt(vtkMath::Distance2BetweenPoints(pointTangent2, local_end));
 
     //search normal to plane
-    vtkMAFSmartPointer<vtkPlaneSource> planeSource;
-    planeSource->SetOrigin(local_wrapped_center);
-    planeSource->SetPoint1(pointTangent1);
-    planeSource->SetPoint2(pointTangent2);
-    planeSource->Update();
+    
+    m_PlaneSource->SetOrigin(local_wrapped_center);
+    m_PlaneSource->SetPoint1(pointTangent1);
+    m_PlaneSource->SetPoint2(pointTangent2);
+    m_PlaneSource->Update();
 
 
-    vtkMAFSmartPointer<vtkPlane> planeCutter;
-    planeCutter->SetOrigin(local_wrapped_center);
-    planeCutter->SetNormal(planeSource->GetNormal());
+    
+    m_PlaneCutter->SetOrigin(local_wrapped_center);
+    m_PlaneCutter->SetNormal(m_PlaneSource->GetNormal());
     
 
-    vtkMAFSmartPointer<vtkCutter> cutter;
-    cutter->SetInput(transformFirstData->GetOutput());
-    cutter->SetCutFunction(planeCutter);
-    cutter->Update();
+    
+    m_Cutter->SetInput(transformFirstData->GetOutput());
+    m_Cutter->SetCutFunction(m_PlaneCutter);
+    m_Cutter->Update();
 
     double midPoint[3];
     midPoint[0] = (pointTangent2[0] + pointTangent1[0])/2;
@@ -578,20 +587,20 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 			normal[2] = - normal[2];
 		}
 
-    vtkMAFSmartPointer<vtkPlane> planeClip;
-    planeClip->SetOrigin(midPoint);
-    planeClip->SetNormal(normal);
+    
+    m_PlaneClip->SetOrigin(midPoint);
+    m_PlaneClip->SetNormal(normal);
 
-    vtkMAFSmartPointer<vtkClipPolyData> clip;
-    clip->SetInput(cutter->GetOutput());
-    clip->SetClipFunction(planeClip);
-    clip->Update();
+    
+    m_Clip->SetInput(m_Cutter->GetOutput());
+    m_Clip->SetClipFunction(m_PlaneClip);
+    m_Clip->Update();
 
     double clipLength = 0;
-		double numberOfCells = clip->GetOutput()->GetNumberOfCells();
+		double numberOfCells = m_Clip->GetOutput()->GetNumberOfCells();
     for(int i=0; i<numberOfCells; i++)
     {
-      clipLength += sqrt(clip->GetOutput()->GetCell(i)->GetLength2());
+      clipLength += sqrt(m_Clip->GetOutput()->GetCell(i)->GetLength2());
     }
 
     m_Distance += clipLength;
@@ -625,7 +634,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     m_Goniometer->AddInput(m_LineSource->GetOutput());
     m_Goniometer->AddInput(m_LineSource2->GetOutput());
     //m_Goniometer->AddInput(m_LineSourceMiddle->GetOutput());
-    m_Goniometer->AddInput(clip->GetOutput());
+    m_Goniometer->AddInput(m_Clip->GetOutput());
     
 
     m_Goniometer->Modified();
