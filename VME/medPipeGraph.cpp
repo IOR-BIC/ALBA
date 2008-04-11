@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 10:10:05 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-04-11 14:25:39 $
+  Version:   $Revision: 1.28 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -462,16 +462,15 @@ mmgGui* medPipeGraph::CreateGui()
 
   m_Gui->Divider();
 
-  m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
-  m_Gui->Divider();
-
   m_Gui->Bool(ID_LEGEND,_("Legend"),&m_Legend,0,_("Show legend"));
   m_Gui->Divider(1);
 
   wxString name;
   bool checked = FALSE;
 
-  m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),360,_("Chose item to plot"));
+  m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),150,_("Chose item to plot"));
+  m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
+  m_Gui->Divider();
 
   bool tagPresent = m_Vme->GetTagArray()->IsTagPresent("SIGNALS_NAME");
   if (!tagPresent)
