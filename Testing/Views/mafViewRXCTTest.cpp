@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewRXCTTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-07-12 07:51:07 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-11 08:44:43 $
+Version:   $Revision: 1.3 $
 Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -48,7 +48,7 @@ void mafViewRXCTTest::VmeShowTest()
   mafVMESurface *surface;
 
 
-  rxctView->GetSceneGraph()->m_List;
+  rxctView->GetSceneGraph()->GetNodeList();
   
   rxctView->Delete();
    
