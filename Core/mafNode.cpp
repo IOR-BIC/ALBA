@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-03 10:52:42 $
-  Version:   $Revision: 1.53 $
+  Date:      $Date: 2008-04-11 13:22:07 $
+  Version:   $Revision: 1.54 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -777,10 +777,10 @@ void mafNode::RemoveAllAttributes()
 mafTagArray  *mafNode::GetTagArray()
 //-------------------------------------------------------------------------
 {
-  mafTagArray *tarray=mafTagArray::SafeDownCast(GetAttribute("TagArray"));
+  mafTagArray *tarray = mafTagArray::SafeDownCast(GetAttribute("TagArray"));
   if (!tarray)
   {
-    tarray=mafTagArray::New();
+    tarray = mafTagArray::New();
     tarray->SetName("TagArray");
     SetAttribute("TagArray",tarray);
   }
@@ -792,14 +792,14 @@ mafNode *mafNode::GetLink(const char *name)
 //-------------------------------------------------------------------------
 {
   assert(name);
-  mafLinksMap::iterator it=m_Links.find(mafCString(name));
-  if (it!=m_Links.end())
+  mafLinksMap::iterator it = m_Links.find(mafCString(name));
+  if (it != m_Links.end())
   {
     // if the link is still valid return its pointer
     // Check node validity instead of checking 'm_NodeId'
     // then if m_NodeId is different from m_Id, the link will
     // be updated.
-    if (it->second.m_Node->IsValid())
+    if (it->second.m_Node != NULL && it->second.m_Node->IsValid())
     {
       if (it->second.m_NodeId != it->second.m_Node->GetId())
       {
