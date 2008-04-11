@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:21:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-11 14:20:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,6 +32,7 @@ class mafVME;
 
 class vtkLineSource;
 class vtkSphereSource;
+class vtkPlaneSource;
 class vtkAppendPolyData;
 
 class medVMEPolylineGraph;
@@ -98,6 +99,7 @@ protected:
   
   vtkLineSource *m_LineSource;
   vtkSphereSource  *m_SphereSource;
+  vtkPlaneSource *m_PlaneSource;
   vtkAppendPolyData *m_AppendPolyData;
   
   medCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;

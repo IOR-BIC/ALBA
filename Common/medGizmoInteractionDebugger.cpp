@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:21:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-11 14:20:52 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -38,6 +38,7 @@ const bool DEBUG_MODE = true;
 
 #include "vtkMath.h"
 #include "vtkLineSource.h"
+#include "vtkPlaneSource.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkSphereSource.h"
@@ -99,6 +100,7 @@ void medGizmoInteractionDebugger::Destructor()
 {
   m_LineSource->Delete();
   m_SphereSource->Delete();
+  m_PlaneSource->Delete();
   m_AppendPolyData->Delete();
 
   m_VmeGizmo->SetBehavior(NULL);
@@ -132,10 +134,12 @@ void medGizmoInteractionDebugger::CreateGizmoVTKData()
 {
   m_LineSource = vtkLineSource::New();
   m_SphereSource = vtkSphereSource::New();
-
+  m_PlaneSource = vtkPlaneSource::New();
+ 
   m_AppendPolyData = vtkAppendPolyData::New();
   m_AppendPolyData->SetInput(m_LineSource->GetOutput());
   m_AppendPolyData->AddInput(m_SphereSource->GetOutput());
+  m_AppendPolyData->AddInput(m_PlaneSource->GetOutput());
   m_AppendPolyData->Update();
 }
 
@@ -199,8 +203,12 @@ double medGizmoInteractionDebugger::GetCurvilinearAbscissa()
 
 void medGizmoInteractionDebugger::SetGizmoLength( double lineLength )
 {
-  m_LineSource->SetPoint1(0,  lineLength/2,0);
-  m_LineSource->SetPoint2(0, -lineLength/2,0);
+  m_LineSource->SetPoint1(0,  lineLength,0);
+  m_LineSource->SetPoint2(0, -lineLength,0);
+
+  m_PlaneSource->SetOrigin(0,0,0);
+  m_PlaneSource->SetPoint1(0,lineLength,0);
+  m_PlaneSource->SetPoint2(0,0,lineLength);
 
   m_SphereSource->SetCenter(0, 0, 0);
   m_SphereSource->SetRadius(lineLength / 8);
