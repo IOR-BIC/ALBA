@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-07 12:13:03 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-11 14:26:42 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,7 @@ public:
     ID_LAST
   };
 
-	virtual mafView*  Copy(mafObserver *Listener);
+	virtual mafView *Copy(mafObserver *Listener);
 
 	virtual void Create();
 
@@ -66,30 +66,25 @@ public:
   otherwise ask to vme which is its visual pipe. */
   virtual void VmeCreatePipe(mafNode *vme);
 
-	/** 
-  Delete vme's visual pipe. It is called when vme is removed from visualization.*/
+	/** Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
 
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	virtual void VmeSelect(mafNode *node, bool select);
 
-	/** 
-	Set slicer parameter to generate the slice. */
+	/** Set slicer parameter to generate the slice. */
   void SetSlice(double origin[3], float xVect[3], float yVect[3]);
 	
-	/** 
-	Set slicer parameter to generate the slice. */
+	/** Set slicer parameter to generate the slice. */
 	void SetSlice(double origin[3], double dn = 0.0);
 
-	/** 
-  Show/Hide VMEs into plugged sub-views*/
+	/** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 
 	virtual void CameraUpdate();
 
 protected:
-
 	void UpdateSliceParameters();
 	void UpdateSlice();
 	void UpdateText();
@@ -111,6 +106,7 @@ protected:
 	int				m_ViewIndex;
 	double		m_Dn;
 	bool			m_GlobalBoundsInitialized;
+  bool      m_GlobalBoundsValid;
 
 	mafSceneNode		*m_SelectedVolume;
 	mmgFloatSlider	*m_GlobalSlider;
