@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 08:28:45 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-04-11 14:26:11 $
+  Version:   $Revision: 1.14 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,6 +153,7 @@ void mafViewGlobalSliceCompound::PackageView()
 	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
   m_ViewGlobalSlice->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("medVMEAnalog", "mafPipeBox", NON_VISIBLE);
 	
 	PlugChildView(m_ViewGlobalSlice);
 }
