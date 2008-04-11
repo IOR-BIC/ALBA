@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-02 10:23:36 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-11 09:30:21 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,6 +95,7 @@ public:
     ID_CHOOSE_TEXTURE,
     ID_TEXTURE_MAPPING_MODE,
     ID_BORDER_CHANGE,
+    ID_RADIUS_CHANGE,
     ID_SPLINE,
     ID_FILL,
     ID_LAST,

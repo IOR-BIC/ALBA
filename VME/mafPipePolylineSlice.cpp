@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 13:19:43 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-04-11 09:30:21 $
+  Version:   $Revision: 1.14 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,7 +85,7 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_ScalarVisibility = 0;
   m_RenderingDisplayListFlag = 0;
   m_Border=1;
-  m_Radius=1;
+  m_Radius=1.0;
 
   m_SplineMode = 0;
   m_SplineCoefficient = 10.0;
@@ -267,6 +267,7 @@ mmgGui *mafPipePolylineSlice::CreateGui()
   assert(m_Gui == NULL);
   m_Gui = new mmgGui(this);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
+  m_Gui->FloatSlider(ID_RADIUS_CHANGE,_("Radius"),&m_Radius,0.1,2.5);
   m_Gui->Bool(ID_SPLINE,_("spline"),&m_SplineMode);
   m_Gui->Bool(ID_FILL,_("Fill"),&m_Fill);
   return m_Gui;
@@ -286,6 +287,11 @@ void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
 			  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 		  }
 	  break;
+    case ID_RADIUS_CHANGE:
+      {
+        SetRadius(m_Radius);
+      }
+      break;
     case ID_SPLINE:
       {
         UpdateProperty();
@@ -370,19 +376,21 @@ void mafPipePolylineSlice::SetThickness(double thickness)
 double mafPipePolylineSlice::GetRadius()
 //----------------------------------------------------------------------------
 {
-//	return m_Radius;
-	return -1;
+	return m_Radius;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::SetRadius(double radius)
 //----------------------------------------------------------------------------
 {
-	/*m_Radius=radius;
-  m_Tube->SetRadius(m_Radius);
-  m_Tube->Update();
-  m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
-	
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));*/
+	m_Radius=radius;
+  if(m_Tube)
+  {
+    m_Tube->SetRadius(m_Radius);
+    m_Tube->Update();
+    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+    m_Actor->Modified();
+  }
+	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::UpdateProperty()
