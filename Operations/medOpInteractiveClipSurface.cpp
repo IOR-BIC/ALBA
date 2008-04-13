@@ -2,13 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-28 11:05:09 $
-  Version:   $Revision: 1.4 $
-  Authors:   Paolo Quadrani    
+  Date:      $Date: 2008-04-13 11:25:21 $
+  Version:   $Revision: 1.5 $
+  Authors:   Paolo Quadrani, Stefano Perticoni    
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
+
+bool DEBUG_MODE = true;
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -37,6 +39,9 @@
 #include "mafGizmoScale.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafTransform.h"
+
+#include "medCurvilinearAbscissaOnSkeletonHelper.h"
+#include "medVMEPolylineGraph.h"
 
 #include "vtkProperty.h"
 #include "vtkTransform.h"
@@ -74,12 +79,10 @@ mafOp(label)
   m_Clipper       = NULL;
 	m_ClipperBoundingBox = NULL;
   
-  m_ImplicitPlaneGizmo  = NULL;
+  m_ImplicitPlaneVMEGizmo  = NULL;
   m_IsaCompositor       = NULL;
 
   m_OldSurface = NULL;
-	//m_ResultPolyData = NULL;
-	//m_ClippedPolyData = NULL;
   
   ClipInside      = 1;
 	m_UseGizmo			=	1;
@@ -93,21 +96,25 @@ mafOp(label)
 	m_PlaneWidth	= 0.0;
 
 	m_PlaneSource	= NULL;
-	m_Gizmo				= NULL;
-	m_ArrowShape	= NULL;
+	m_AppendPolydata				= NULL;
+	m_ArrowSource	= NULL;
 
 	m_GizmoTranslate	= NULL;
 	m_GizmoRotate			= NULL;
 	m_GizmoScale			= NULL;
+
+  m_Canundo = NULL;
+  
+  m_CASH = NULL;
+  m_Constrain = NULL;
+  m_ActiveBranchId = NULL;
+
 }
 
 //----------------------------------------------------------------------------
 medOpInteractiveClipSurface::~medOpInteractiveClipSurface()
 //----------------------------------------------------------------------------
 {
-	//cppDEL(m_GizmoTranslate);
-	//cppDEL(m_GizmoRotate);
-	//cppDEL(m_GizmoScale);
 	for(int i=0;i<m_ResultPolyData.size();i++)
 	{
 		vtkDEL(m_ResultPolyData[i]);
@@ -121,6 +128,8 @@ medOpInteractiveClipSurface::~medOpInteractiveClipSurface()
 	vtkDEL(m_ClipperBoundingBox);
   vtkDEL(m_OldSurface);
   vtkDEL(m_Arrow);
+
+  cppDEL(m_CASH);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpInteractiveClipSurface::Copy()   
@@ -152,12 +161,14 @@ enum CLIP_SURFACE_ID
 	ID_CLIP,
 	ID_UNDO,
 	ID_CLIP_BOX,
+  ID_CHOOSE_CONSTRAINT_VME,
 };
 
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::OpRun()   
 //----------------------------------------------------------------------------
 {
+  
   vtkNEW(m_Clipper);
 	vtkNEW(m_ClipperBoundingBox);
   vtkNEW(m_OldSurface);
@@ -178,24 +189,27 @@ void medOpInteractiveClipSurface::OpRun()
 		CreateGizmos();
 		//Enable & show Gizmos
 		ChangeGizmo();
+
+    assert(m_CASH == NULL);
+    m_CASH = new medCurvilinearAbscissaOnSkeletonHelper(m_ImplicitPlaneVMEGizmo) ;
 	}
 }
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::CreateGizmos()
 //----------------------------------------------------------------------------
 {
-	m_ImplicitPlaneGizmo->GetOutput()->GetVTKData()->ComputeBounds();
-	m_ImplicitPlaneGizmo->Modified();
-	m_ImplicitPlaneGizmo->Update();
+	m_ImplicitPlaneVMEGizmo->GetOutput()->GetVTKData()->ComputeBounds();
+	m_ImplicitPlaneVMEGizmo->Modified();
+	m_ImplicitPlaneVMEGizmo->Update();
 
-	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
-	m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoTranslate = new mafGizmoTranslate(mafVME::SafeDownCast(m_ImplicitPlaneVMEGizmo), this);
+	m_GizmoTranslate->SetRefSys(m_ImplicitPlaneVMEGizmo);
 	m_GizmoTranslate->Show(false);
-	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
-	m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoRotate = new mafGizmoRotate(mafVME::SafeDownCast(m_ImplicitPlaneVMEGizmo), this);
+	m_GizmoRotate->SetRefSys(m_ImplicitPlaneVMEGizmo);
 	m_GizmoRotate->Show(false);
-	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_ImplicitPlaneGizmo), this);
-	m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
+	m_GizmoScale = new mafGizmoScale(mafVME::SafeDownCast(m_ImplicitPlaneVMEGizmo), this);
+	m_GizmoScale->SetRefSys(m_ImplicitPlaneVMEGizmo);
 	m_GizmoScale->Show(false);
 }
 //----------------------------------------------------------------------------
@@ -209,27 +223,33 @@ void medOpInteractiveClipSurface::CreateGui()
 	m_Gui->Bool(ID_USE_GIZMO,_("use gizmo"),&m_UseGizmo,1);
 	wxString gizmo_name[3] = {"translate","rotate","scale"};
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
+  m_Gui->Divider();
+  m_Gui->Button(ID_CHOOSE_CONSTRAINT_VME, "medVMEPolylineGraph constrain", "");
+  m_Gui->Divider();
+
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
 	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
-	//m_Gui->Bool(ID_CLIP_BOX,_("clipping box"),&m_ClipBoundBox,1);
+	
 	double b[6];
 	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
-	// bounding box dim
+	
 	m_PlaneWidth = b[1] - b[0];
 	m_PlaneHeight = b[3] - b[2];
-	//m_Gui->Double(ID_PLANE_WIDTH,_("plane w."),&m_PlaneWidth,0.0);
-	//m_Gui->Double(ID_PLANE_HEIGHT,_("plane h."),&m_PlaneHeight,0.0);
-	//m_Gui->Divider();
-	m_Gui->Button(ID_CLIP,_("clip"));
+	
+  m_Gui->Button(ID_CLIP,_("clip"));
 	m_Gui->Button(ID_UNDO,_("undo"));
-	m_Gui->OkCancel();
+  m_Gui->OkCancel();
 
 	m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
 	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == medOpInteractiveClipSurface::MODE_SURFACE);
-	m_Gui->Enable(wxOK,m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
+  m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
 
+  m_Gui->Enable(wxOK,m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
+  
 	m_Gui->Divider();
+
+
 }
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
@@ -239,6 +259,20 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+    case ID_CHOOSE_CONSTRAINT_VME:
+      {
+        mafString s(_("Choose Constrain"));
+        mafEvent e(this,VME_CHOOSE, &s, (long)&medOpInteractiveClipSurface::ConstrainAccept);
+        mafEventMacro(e);
+        mafNode *vme = e.GetVme();
+        if(vme != NULL)
+        {
+          OnChooseConstrainVme(vme);
+
+          assert(TRUE);
+        }
+      }
+      break;
 		case ID_CHOOSE_SURFACE:
 			{
 				mafString title = "Choose m_Clipper Surface";
@@ -291,13 +325,14 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_USE_GIZMO:
 			{
 				if(m_IsaCompositor && !m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
-				else if(m_IsaCompositorWithGizmo && m_UseGizmo)
-					m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
+					m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositor);
+				else if(m_IsaCompositorWithArrowGizmo && m_UseGizmo)
+					m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositorWithArrowGizmo);
 
-				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);
-				
+				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);    				
 				ChangeGizmo();
+        m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
+
 			}
 			break;
 		case ID_CLIP:
@@ -324,6 +359,7 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		case wxCANCEL:
 			OpStop(OP_RUN_CANCEL);
 			break;
+    
 		default:
 			mafEventMacro(*e);
 			break; 
@@ -352,7 +388,7 @@ void medOpInteractiveClipSurface::ClipBoundingBox()
 		transform_plane->SetInput(m_PlaneSource->GetOutput());
 	
 	
-	transform_plane->SetTransform(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform());
+	transform_plane->SetTransform(m_ImplicitPlaneVMEGizmo->GetAbsMatrixPipe()->GetVTKTransform());
 	transform_plane->Update();
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_data_input;
@@ -446,6 +482,7 @@ void medOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 		{
 		case ID_TRANSFORM:
 			{
+        
 				if(e->GetSender()==m_IsaChangeArrowWithoutGizmo || e->GetSender()==m_IsaChangeArrowWithGizmo)
 				{
 					if(m_Arrow) 
@@ -469,22 +506,17 @@ void medOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				}
 				else
 				{
-					vtkTransform *currTr = vtkTransform::New();
-					currTr->PostMultiply();
-					currTr->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
-					currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
-					currTr->Update();
+          m_CASH->MoveOnSkeleton(e);
 
-					mafMatrix newAbsMatr;
-					newAbsMatr.DeepCopy(currTr->GetMatrix());
-					newAbsMatr.SetTimeStamp(m_ImplicitPlaneGizmo->GetTimeStamp());
-
-					// set the new pose to the gizmo
-					m_ImplicitPlaneGizmo->SetAbsMatrix(newAbsMatr);
-					UpdateISARefSys();
+          if (DEBUG_MODE)
+            {
+              std::ostringstream stringStream;
+              stringStream  << "ABS Transform Matrix" << std::endl;
+              e->GetMatrix()->Print(stringStream);
+              mafLogMessage(stringStream.str().c_str());
+            }
 
 					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-					currTr->Delete();
 				}
 			}
 			break;
@@ -535,13 +567,13 @@ void medOpInteractiveClipSurface::ChangeGizmo()
 			switch(m_GizmoType)
 			{
 			case GIZMO_TRANSLATE:
-				m_GizmoTranslate->SetRefSys(m_ImplicitPlaneGizmo);
+				m_GizmoTranslate->SetRefSys(m_ImplicitPlaneVMEGizmo);
 				break;
 			case GIZMO_ROTATE:
-				m_GizmoRotate->SetRefSys(m_ImplicitPlaneGizmo);
+				m_GizmoRotate->SetRefSys(m_ImplicitPlaneVMEGizmo);
 				break;
 			case GIZMO_SCALE:
-				m_GizmoScale->SetRefSys(m_ImplicitPlaneGizmo);
+				m_GizmoScale->SetRefSys(m_ImplicitPlaneVMEGizmo);
 				break;
 			}
 		}
@@ -558,14 +590,14 @@ void medOpInteractiveClipSurface::ChangeGizmo()
 void medOpInteractiveClipSurface::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-  if(m_ImplicitPlaneGizmo)
+  if(m_ImplicitPlaneVMEGizmo)
   {
-    m_ImplicitPlaneGizmo->SetBehavior(NULL);
-    mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneGizmo));
+    m_ImplicitPlaneVMEGizmo->SetBehavior(NULL);
+    mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneVMEGizmo));
   }
-  mafDEL(m_ImplicitPlaneGizmo);
-	vtkDEL(m_Gizmo);
-	vtkDEL(m_ArrowShape);
+  mafDEL(m_ImplicitPlaneVMEGizmo);
+	vtkDEL(m_AppendPolydata);
+	vtkDEL(m_ArrowSource);
 	vtkDEL(m_PlaneSource);
 
 	m_GizmoTranslate->Show(false);
@@ -658,7 +690,7 @@ int medOpInteractiveClipSurface::Clip()
 			// clip input surface by an implicit plane
 			vtkTransform *tr = vtkTransform::New();
 			tr->Concatenate(mat);
-			tr->Concatenate(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
+			tr->Concatenate(m_ImplicitPlaneVMEGizmo->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix());
 			tr->Inverse();
 			tr->Update();
 
@@ -713,7 +745,7 @@ void medOpInteractiveClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_even
 		// handle incoming transform events
 		vtkTransform *tr = vtkTransform::New();
 		tr->PostMultiply();
-		tr->SetMatrix(((mafVME *)m_ImplicitPlaneGizmo)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+		tr->SetMatrix(((mafVME *)m_ImplicitPlaneVMEGizmo)->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
 		tr->Concatenate(e->GetMatrix()->GetVTKMatrix());
 		tr->Update();
 
@@ -724,7 +756,7 @@ void medOpInteractiveClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_even
 		if (arg == mmiGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
-			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);
+			((mafVME *)m_ImplicitPlaneVMEGizmo)->SetAbsMatrix(absPose);
 			// update matrix for OpDo()
 			//m_NewAbsMatrix = absPose;
 		} 
@@ -761,28 +793,28 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       m_ClipperPlane->SetOrigin(m_PlaneSource->GetOrigin());
       m_ClipperPlane->SetNormal(m_PlaneSource->GetNormal());
 
-      vtkNEW(m_ArrowShape);
-      m_ArrowShape->SetShaftResolution(40);
-      m_ArrowShape->SetTipResolution(40);
+      vtkNEW(m_ArrowSource);
+      m_ArrowSource->SetShaftResolution(40);
+      m_ArrowSource->SetTipResolution(40);
 
       vtkNEW(m_Arrow);
       m_Arrow->SetInput(m_PlaneSource->GetOutput());
-      m_Arrow->SetSource(m_ArrowShape->GetOutput());
+      m_Arrow->SetSource(m_ArrowSource->GetOutput());
       m_Arrow->SetVectorModeToUseNormal();
       
       int clip_sign = ClipInside ? 1 : -1;
       m_Arrow->SetScaleFactor(clip_sign * abs(zdim/10.0));
       m_Arrow->Update();
 
-      vtkNEW(m_Gizmo);
-      m_Gizmo->AddInput(m_PlaneSource->GetOutput());
-      m_Gizmo->AddInput(m_Arrow->GetOutput());
-      m_Gizmo->Update();
+      vtkNEW(m_AppendPolydata);
+      m_AppendPolydata->AddInput(m_PlaneSource->GetOutput());
+      m_AppendPolydata->AddInput(m_Arrow->GetOutput());
+      m_AppendPolydata->Update();
 
-      mafNEW(m_ImplicitPlaneGizmo);
-      m_ImplicitPlaneGizmo->SetData(m_Gizmo->GetOutput());
-      m_ImplicitPlaneGizmo->SetName("implicit plane gizmo");
-      m_ImplicitPlaneGizmo->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
+      mafNEW(m_ImplicitPlaneVMEGizmo);
+      m_ImplicitPlaneVMEGizmo->SetData(m_AppendPolydata->GetOutput());
+      m_ImplicitPlaneVMEGizmo->SetName("implicit plane gizmo");
+      m_ImplicitPlaneVMEGizmo->ReparentTo(mafVME::SafeDownCast(m_Input->GetRoot()));
 
       // position the plane
       mafSmartPointer<mafTransform> currTr;
@@ -793,11 +825,11 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       mat.DeepCopy(&currTr->GetMatrix());
       mat.SetTimeStamp(((mafVME *)m_Input)->GetTimeStamp());
 
-      m_ImplicitPlaneGizmo->SetAbsMatrix(mat);
+      m_ImplicitPlaneVMEGizmo->SetAbsMatrix(mat);
 
-      mafEventMacro(mafEvent(this,VME_SHOW,m_ImplicitPlaneGizmo,true));
+      mafEventMacro(mafEvent(this,VME_SHOW,m_ImplicitPlaneVMEGizmo,true));
     }
-    mmaMaterial *material = m_ImplicitPlaneGizmo->GetMaterial();
+    mmaMaterial *material = m_ImplicitPlaneVMEGizmo->GetMaterial();
     material->m_Prop->SetOpacity(0.5);
     material->m_Opacity = material->m_Prop->GetOpacity();
     
@@ -811,9 +843,9 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
   }
   else
   {
-    if(m_ImplicitPlaneGizmo != NULL)
+    if(m_ImplicitPlaneVMEGizmo != NULL)
     {
-      mmaMaterial *material = m_ImplicitPlaneGizmo->GetMaterial();
+      mmaMaterial *material = m_ImplicitPlaneVMEGizmo->GetMaterial();
       material->m_Prop->SetOpacity(0);
       material->m_Opacity = material->m_Prop->GetOpacity();
     }
@@ -827,59 +859,43 @@ void medOpInteractiveClipSurface::AttachInteraction()
 {
   mafNEW(m_IsaCompositor);
 
-  m_IsaRotate = m_IsaCompositor->CreateBehavior(MOUSE_LEFT);
-  m_IsaRotate->SetListener(this);
-  m_IsaRotate->SetVME(m_ImplicitPlaneGizmo);
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetPivotRefSys()->SetTypeToView();
-  m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-  m_IsaRotate->EnableRotation(true);
-
   m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
   m_IsaTranslate->SetListener(this);
-  m_IsaTranslate->SetVME(m_ImplicitPlaneGizmo);
+  m_IsaTranslate->SetVME(m_ImplicitPlaneVMEGizmo);
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
   m_IsaTranslate->EnableTranslation(true);
-
+  
 	m_IsaChangeArrowWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_SHIFT);
 	m_IsaChangeArrowWithoutGizmo->SetListener(this);
-	m_IsaChangeArrowWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
+	m_IsaChangeArrowWithoutGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
 
 	m_IsaClipWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_CONTROL);
 	m_IsaClipWithoutGizmo->SetListener(this);
-	m_IsaClipWithoutGizmo->SetVME(m_ImplicitPlaneGizmo);
+	m_IsaClipWithoutGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
 
-	mafNEW(m_IsaCompositorWithGizmo);
+	mafNEW(m_IsaCompositorWithArrowGizmo);
 
-	m_IsaChangeArrowWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
+	m_IsaChangeArrowWithGizmo = m_IsaCompositorWithArrowGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
 	m_IsaChangeArrowWithGizmo->SetListener(this);
-	m_IsaChangeArrowWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+	m_IsaChangeArrowWithGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
 
-	m_IsaClipWithGizmo = m_IsaCompositorWithGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
+	m_IsaClipWithGizmo = m_IsaCompositorWithArrowGizmo->CreateBehavior(MOUSE_LEFT_CONTROL);
 	m_IsaClipWithGizmo->SetListener(this);
-	m_IsaClipWithGizmo->SetVME(m_ImplicitPlaneGizmo);
+	m_IsaClipWithGizmo->SetVME(m_ImplicitPlaneVMEGizmo);
 
 	if(!m_UseGizmo)
-		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);
+		m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositor);
 	else
-		m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositorWithGizmo);
+		m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositorWithArrowGizmo);
 }
 
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::UpdateISARefSys()
 //----------------------------------------------------------------------------
-{
-  m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  
-  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+{  
+  m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneVMEGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
+  m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneVMEGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 }
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::SetClippingModality(int mode)
@@ -902,5 +918,16 @@ void medOpInteractiveClipSurface::SetClippingSurface(mafVMESurface *surface)
 void medOpInteractiveClipSurface::SetImplicitPlanePosition(mafMatrix &matrix)
 //----------------------------------------------------------------------------
 {
-  m_ImplicitPlaneGizmo->SetAbsMatrix(matrix);
+  m_ImplicitPlaneVMEGizmo->SetAbsMatrix(matrix);
+}
+
+void medOpInteractiveClipSurface::OnChooseConstrainVme( mafNode *vme )
+{
+  m_Constrain = mafVME::SafeDownCast(vme);
+  assert(m_Constrain);
+
+  m_CASH->SetConstraintPolylineGraph(medVMEPolylineGraph::SafeDownCast(m_Constrain));
+  m_CASH->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
+  
+  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }

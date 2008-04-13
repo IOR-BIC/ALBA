@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-26 14:29:19 $
-  Version:   $Revision: 1.2 $
-  Authors:   Paolo Quadrani    
+  Date:      $Date: 2008-04-13 11:25:21 $
+  Version:   $Revision: 1.3 $
+  Authors:   Paolo Quadrani , Stefano Perticoni 
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -20,18 +20,22 @@
 #include "mafNode.h"
 #include "mafVMESurface.h"
 
+#include "medVMEPolylineGraph.h"
+
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mafEvent;
-
 class mmiCompositorMouse;
 class mmiGenericMouse;
 class mafVMESurface;
 class mafVMEGizmo;
+class mafVME;
 class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafGizmoScale;
+
+class medCurvilinearAbscissaOnSkeletonHelper;
 
 class vtkPlane;
 class vtkPolyData;
@@ -93,6 +97,9 @@ public:
 	/** Function that returns polydata results of clipping operation*/
 	vtkPolyData *GetResultPolyData(){return m_ResultPolyData[m_ResultPolyData.size()-1];};
 
+  static bool ConstrainAccept(mafNode* node) {return (node != NULL && \
+    (node->IsMAFType(medVMEPolylineGraph))) ;};
+
 protected: 
 	virtual void OpStop(int result);
 	
@@ -126,15 +133,17 @@ protected:
 	void OnEventGizmoScale(mafEventBase *maf_event);
 	void OnEventGizmoPlane(mafEventBase *maf_event);
 
+  void OnChooseConstrainVme( mafNode *vme );
+
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 
 	/** Clip Using vtkClipSurfaceBoundingBox */
 	void ClipBoundingBox();
-
+  
   mafVMESurface   *m_ClipperVME;
 	mafVMESurface   *m_ClippedVME;
 
-  mafVMEGizmo     *m_ImplicitPlaneGizmo;
+  mafVMEGizmo     *m_ImplicitPlaneVMEGizmo;
   vtkPlane        *m_ClipperPlane;
   vtkClipPolyData *m_Clipper;
 	vtkClipSurfaceBoundingBox	*m_ClipperBoundingBox;
@@ -142,10 +151,9 @@ protected:
 
   mmiCompositorMouse *m_IsaCompositor;
   mmiGenericMouse    *m_IsaTranslate;
-  mmiGenericMouse    *m_IsaRotate;
 	mmiGenericMouse		 *m_IsaChangeArrowWithoutGizmo;
 	mmiGenericMouse		 *m_IsaClipWithoutGizmo;
-	mmiCompositorMouse *m_IsaCompositorWithGizmo;
+	mmiCompositorMouse *m_IsaCompositorWithArrowGizmo;
 	mmiGenericMouse		 *m_IsaChangeArrowWithGizmo;
 	mmiGenericMouse		 *m_IsaClipWithGizmo;
 
@@ -163,11 +171,18 @@ protected:
 	double m_PlaneHeight;
 
 	vtkPlaneSource	*m_PlaneSource;
-	vtkArrowSource	*m_ArrowShape;
-	vtkAppendPolyData	*m_Gizmo;
+	vtkArrowSource	*m_ArrowSource;
+	vtkAppendPolyData	*m_AppendPolydata;
 
 	mafGizmoTranslate		*m_GizmoTranslate;
 	mafGizmoRotate			*m_GizmoRotate;
 	mafGizmoScale				*m_GizmoScale;
+
+  medCurvilinearAbscissaOnSkeletonHelper *m_CASH;
+  
+  mafVME *m_Constrain;
+
+  int m_ActiveBranchId;
+
 };
 #endif

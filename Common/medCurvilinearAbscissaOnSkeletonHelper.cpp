@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 17:34:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-13 11:24:24 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -460,6 +460,7 @@ void medCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *in
   mafSmartPointer<mafTransform> trans; // output
   trans->SetMatrix(constrainAbsPose);
   trans->Concatenate(localGizmoPose, PRE_MULTIPLY);
+  trans->RotateY(90, PRE_MULTIPLY);
   trans->Update();
 
   moverOutputAbsPose = trans->GetMatrix();

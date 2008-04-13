@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:20:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-13 11:24:24 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -208,7 +208,7 @@ void medGizmoInteractionDebugger::SetGizmoLength( double lineLength )
 
   m_PlaneSource->SetOrigin(0,0,0);
   m_PlaneSource->SetPoint1(0,lineLength,0);
-  m_PlaneSource->SetPoint2(0,0,lineLength);
+  m_PlaneSource->SetPoint2(lineLength,0,0);
 
   m_SphereSource->SetCenter(0, 0, 0);
   m_SphereSource->SetRadius(lineLength / 8);
