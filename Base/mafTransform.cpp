@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:17:19 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-14 11:42:23 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1847,3 +1847,52 @@ void mafTransform::BuildVector(double coeff, const double *inVector, double *out
   }
 }
 
+void mafTransform::FindPerpendicularVersors( double inVersorN[3], double outVersorP[3], double outVersorQ[3] )
+{
+  const double M_SQRT1_2 = 0.707106781186547524401;
+
+  assert(inVersorN && outVersorP && outVersorQ);
+  if (abs(inVersorN[2]) > M_SQRT1_2) {
+    // choose p in y-z plane
+    double a = inVersorN[1]*inVersorN[1] + inVersorN[2]*inVersorN[2];
+    double k = sqrt(a);
+    outVersorP[0] = 0;
+    outVersorP[1] = -inVersorN[2]*k;
+    outVersorP[2] = inVersorN[1]*k;
+    // set q = n x p
+    outVersorQ[0] = a*k;
+    outVersorQ[1] = -inVersorN[0]*outVersorP[2];
+    outVersorQ[2] = inVersorN[0]*outVersorP[1];
+  }
+  else {
+    // choose p in x-y plane
+    double a = inVersorN[0]*inVersorN[0] + inVersorN[1]*inVersorN[1];
+    double k = sqrt(a);
+    outVersorP[0] = -inVersorN[1]*k;
+    outVersorP[1] = inVersorN[0]*k;
+    outVersorP[2] = 0;
+    // set q = n x p
+    outVersorQ[0] = -inVersorN[2]*outVersorP[1];
+    outVersorQ[1] = inVersorN[2]*outVersorP[0];
+    outVersorQ[2] = a*k;
+  }
+}
+
+void mafTransform::SetVersor( int axis, double versor[3], mafMatrix &matrix )
+{
+  if (0 <= axis && axis <= 2)
+  {
+    for (int i = 0; i < 3; i++)
+    {
+      matrix.SetElement(i, axis, versor[i]);
+    }	
+  }	
+}
+
+void mafTransform::AddVectors( double p0[3],double p1[3],double sum[3] )
+{
+  for (int i = 0;i < 3; i++)
+  {
+    sum[i] = p0[i] + p1[i];
+  }
+}

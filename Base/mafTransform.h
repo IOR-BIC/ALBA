@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:17:20 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-14 11:42:23 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -202,7 +202,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   void Scale(double scalex,double scaley,double scalez,int premultiply) \
     { Scale(*m_Matrix,scalex,scaley,scalez,premultiply);}
 
-  /** Extract the given matrix versor*/
+  /** Set/Get given matrix versor*/
+  static void SetVersor(int axis, double versor[3], mafMatrix &matrix);
+  
   static void GetVersor(int axis, const mafMatrix &matrix, double versor[3]) {mafMatrix::GetVersor(axis,matrix,versor);}
   static void GetVersor(int axis, const mafMatrix &matrix, float versor[3]) \
     { \
@@ -223,7 +225,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   /** Copy the translation vector */
   static void CopyTranslation(const mafMatrix &source, mafMatrix &target);
   void CopyTranslation(const mafMatrix &source) {this->CopyTranslation(source,*m_Matrix);}
-
+  
+  /** Add two vector 3 */
+  static void AddVectors( double inV0[3],double inV1[3],double outSum[3] );
 
   // Build vector with origin in p1 pointing to p2
   static void BuildVector(double *p1, double *p2, double *vec)
@@ -239,7 +243,6 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   // Build vector [coeff * inVector];
   static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mmiConstraint::X);
 
-
   // Project in_vector on in_axis direction; in_axis does not need to be 
   // normalised. The projection signed value is returned
   static double ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *projection = NULL);
@@ -248,6 +251,9 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   // in_plane_normal does not need to be normalised. The norm of the projection 
   // is returned and the projection vector is written in out_projection vector if provided.
   static double ProjectVectorOnPlane(const double *in_vector, const double *in_plane_normal, double *out_projection = NULL);
+
+  // Find perpendicular versors to input versor N
+  static void FindPerpendicularVersors(double inVersorN[3], double outVersorP[3], double outVersorQ[3]);
 
 
   /** rotation representation conversion */
