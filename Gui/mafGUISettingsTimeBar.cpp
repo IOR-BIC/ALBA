@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-20 10:48:38 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-04-14 12:58:39 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,12 +30,9 @@ mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
   m_RealTimeMode = 0;
-  m_TimeMultiplier = 1000.0;
+  m_TimeSpeed = 1.0;
+  m_TimeScale = 1000.0;
   m_Loop = 1;
-
-  m_Fps = 25;
-  m_SpeedId = 2;
-  m_ShowAllFrames = 1;
 
   m_AnimateInSubrange = 0;
   m_SubRange[0] = 0.0; 
@@ -54,16 +51,11 @@ mafGUISettingsTimeBar::~mafGUISettingsTimeBar()
 void mafGUISettingsTimeBar::CreateGui()
 //----------------------------------------------------------------------------
 {
-  wxString speed_choices[5] = {"1/4x", "1/2x", "1x", "2x", "4x"};
-
   m_Gui = new mmgGui(this);
   m_Gui->Bool(ID_REAL_TIME, _("real time"), &m_RealTimeMode, 1);
-  m_Gui->Double(ID_TIME_MULTIPLIER, _("multiplier: "), &m_TimeMultiplier, 0.000001);
+  m_Gui->Double(ID_TIME_SCALE, _("scale:"), &m_TimeScale, 0.000001, MAXDOUBLE, -1, _("time scale referring to the time unit: seconds"));
+  m_Gui->Double(ID_TIME_SPEED, _("speed Nx:"), &m_TimeSpeed, 0.000001, MAXDOUBLE, -1, _("time multiplier to speed up the animation"));
   m_Gui->Bool(ID_LOOP, _("loop playback"), &m_Loop, 1);
-  m_Gui->Divider(2);
-  m_Gui->Integer(ID_FPS, _("fps: "), &m_Fps, 1);
-  m_Gui->Radio(ID_SPEED, _("speed: "), &m_SpeedId, 5, speed_choices);
-  m_Gui->Bool(ID_SHOW_ALL_FRAMES, _("show all frames"), &m_ShowAllFrames, 1);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_ANIMATE_IN_SUBRANGE, _("animate in subrange"), &m_AnimateInSubrange, 1);
   m_Gui->VectorN(ID_SUBRANGE, _("subrange: "), m_SubRange, 2, 0.0);
@@ -82,8 +74,11 @@ void mafGUISettingsTimeBar::OnEvent(mafEventBase *maf_event)
     case ID_REAL_TIME:
       m_Config->Write("RealTimeMode", m_RealTimeMode);
     break;
-    case ID_TIME_MULTIPLIER:
-      m_Config->Write("TimeMultiplier", m_TimeMultiplier);
+    case ID_TIME_SPEED:
+      m_Config->Write("TimeMultiplier", m_TimeSpeed);
+    break;
+    case ID_TIME_SCALE:
+      m_Config->Write("TimeScale", m_TimeScale);
     break;
     case ID_ANIMATE_IN_SUBRANGE:
       m_Config->Write("AnimateInSubrange", m_AnimateInSubrange);
@@ -97,15 +92,6 @@ void mafGUISettingsTimeBar::OnEvent(mafEventBase *maf_event)
     break;
     case ID_PLAY_ACTIVE_VIEWPORT:
       m_Config->Write("PlayInActiveViewport", m_PlayInActiveViewport);
-    break;
-    case ID_SPEED:
-      m_Config->Write("SpeedId", m_SpeedId);
-    break;
-    case ID_FPS:
-      m_Config->Write("Fps", m_Fps);
-    break;
-    case ID_SHOW_ALL_FRAMES:
-      m_Config->Write("ShowAllFrames", m_ShowAllFrames);
     break;
     default:
       mafEventMacro(*maf_event);
@@ -133,11 +119,19 @@ void mafGUISettingsTimeBar::InitializeSettings()
   }
   if(m_Config->Read("TimeMultiplier", &double_item))
   {
-    m_TimeMultiplier = double_item;
+    m_TimeSpeed = double_item;
   }
   else
   {
-    SetTimeMultiplier(m_TimeMultiplier);
+    SetTimeMultiplier(m_TimeSpeed);
+  }
+  if(m_Config->Read("TimeScale", &double_item))
+  {
+    m_TimeScale = double_item;
+  }
+  else
+  {
+    SetTimeScale(m_TimeScale);
   }
   if(m_Config->Read("AnimateInSubrange", &long_item))
   {
@@ -179,39 +173,13 @@ void mafGUISettingsTimeBar::InitializeSettings()
   {
     PlayInActiveViewport(m_PlayInActiveViewport);
   }
-  if(m_Config->Read("SpeedId", &long_item))
-  {
-    m_SpeedId = long_item;
-  }
-  else
-  {
-    SetSpeedId(m_SpeedId);
-  }
-  if(m_Config->Read("Fps", &long_item))
-  {
-    m_Fps = long_item;
-  }
-  else
-  {
-    SetFPS(m_Fps);
-  }
-  if(m_Config->Read("ShowAllFrames", &long_item))
-  {
-    m_ShowAllFrames = long_item;
-  }
-  else
-  {
-    SetShowAllFrames(m_ShowAllFrames);
-  }
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::EnableWidgets()
 //----------------------------------------------------------------------------
 {
-  m_Gui->Enable(ID_TIME_MULTIPLIER, m_RealTimeMode == 1);
-  m_Gui->Enable(ID_FPS, m_RealTimeMode != 1 && m_ShowAllFrames == 0);
-  m_Gui->Enable(ID_SPEED, m_RealTimeMode != 1);
-  m_Gui->Enable(ID_SHOW_ALL_FRAMES, m_RealTimeMode != 1);
+  m_Gui->Enable(ID_TIME_SPEED, m_RealTimeMode == 0);
+  m_Gui->Enable(ID_TIME_SCALE, m_RealTimeMode == 1);
   m_Gui->Enable(ID_SUBRANGE, m_AnimateInSubrange == 1);
 }
 //----------------------------------------------------------------------------
@@ -239,14 +207,6 @@ void mafGUISettingsTimeBar::SetRealTimeMode(int realTime)
   Update();
 }
 //----------------------------------------------------------------------------
-void mafGUISettingsTimeBar::SetFPS(int fps)
-//----------------------------------------------------------------------------
-{
-  m_Fps = fps;
-  m_Config->Write("Fps", m_Fps);
-  Update();
-}
-//----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::LoopAnimation(int loop)
 //----------------------------------------------------------------------------
 {
@@ -263,19 +223,19 @@ void mafGUISettingsTimeBar::AminateInSubrange(int animate_subrange)
   Update();
 }
 //----------------------------------------------------------------------------
-void mafGUISettingsTimeBar::SetSpeedId(int idx)
-//----------------------------------------------------------------------------
-{
-  m_SpeedId = idx;
-  m_Config->Write("SpeedId", m_SpeedId);
-  Update();
-}
-//----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::SetTimeMultiplier(double tmult)
 //----------------------------------------------------------------------------
 {
-  m_TimeMultiplier = tmult;
-  m_Config->Write("TimeMultiplier", m_TimeMultiplier);
+  m_TimeSpeed = tmult;
+  m_Config->Write("TimeMultiplier", m_TimeSpeed);
+  Update();
+}
+//----------------------------------------------------------------------------
+void mafGUISettingsTimeBar::SetTimeScale(double tscale)
+//----------------------------------------------------------------------------
+{
+  m_TimeScale = tscale;
+  m_Config->Write("TimeScale", m_TimeScale);
   Update();
 }
 //----------------------------------------------------------------------------
@@ -285,31 +245,6 @@ void mafGUISettingsTimeBar::PlayInActiveViewport(int active_viewport)
   m_PlayInActiveViewport = active_viewport;
   m_Config->Write("PlayInActiveViewport", m_PlayInActiveViewport);
   Update();
-}
-//----------------------------------------------------------------------------
-void mafGUISettingsTimeBar::SetShowAllFrames(int show_all)
-//----------------------------------------------------------------------------
-{
-  m_ShowAllFrames = show_all > 0 ? 1 : 0;
-  m_Config->Write("ShowAllFrames", m_ShowAllFrames);
-  Update();
-}
-//----------------------------------------------------------------------------
-double mafGUISettingsTimeBar::GetSpeedFactor()
-//----------------------------------------------------------------------------
-{
-  switch(m_SpeedId)
-  {
-    case 0:
-      return 0.25;
-    case 1:
-      return 0.5;
-    case 3:
-      return 2.0;
-    case 4:
-      return 4.0;
-  }
-  return 1.0;
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::Update()

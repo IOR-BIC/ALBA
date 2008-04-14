@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.h,v $
 Language:  C++
-Date:      $Date: 2007-11-20 10:48:38 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-04-14 12:58:39 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,14 +33,12 @@ public:
   enum STORAGE_SETTINGS_WIDGET_ID
   {
     ID_REAL_TIME = MINID,
-    ID_TIME_MULTIPLIER,
+    ID_TIME_SPEED,
+    ID_TIME_SCALE,
     ID_ANIMATE_IN_SUBRANGE,
     ID_SUBRANGE,
     ID_LOOP,
     ID_PLAY_ACTIVE_VIEWPORT,
-    ID_SPEED,
-    ID_FPS,
-    ID_SHOW_ALL_FRAMES,
   };
 
   /** Answer to the messages coming from interface. */
@@ -51,12 +49,6 @@ public:
 
   /** Set the play modality: real time or all frames.*/
   void SetRealTimeMode(int realTime = 0);
-
-  /** Return the Frame Per Second generated from the time bar.*/
-  int GetFPS() {return m_Fps;};
-
-  /** Set the number f Frame Per Second to be rendered.*/
-  void SetFPS(int fps = 25);
 
   /** Return true if loop animation is active.*/
   int GetLoop() {return m_Loop;};
@@ -82,27 +74,19 @@ public:
   /** Return the playback subrange.*/
   double *GetSubrange() {return m_SubRange;};
 
-  /** Allow the time bar to show all frames without considering time or frame per seconds information.*/
-  void SetShowAllFrames(int show_all = 1);
-
-  /** Return the flag related the showing all frames or not.*/
-  int GetShowAllFrames() {return m_ShowAllFrames;};
-
-  /** Set the speed ID.*/
-  void SetSpeedId(int idx = 0);
-
-  /** Get the speed ID.*/
-  int GetSpeedId() {return m_SpeedId;};
-
-  /** Return the speed multiplication factor according to the radio chosen.*/
-  double GetSpeedFactor();
-
-  /** Set the time multiplier to transform milliseconds to the VME unit time.
-  Default value will transform milliseconds in seconds.*/
-  void SetTimeMultiplier(double tmult = 1000.0);
+  /** Set the time multiplier to speed up or down the animation when the
+  playback is not in real time.*/
+  void SetTimeMultiplier(double tmult = 1.0);
 
   /** Return the time multiplier.*/
-  double GetTimeMultiplier() {return m_TimeMultiplier;};
+  double GetTimeMultiplier() {return m_TimeSpeed;};
+
+  /** Set the time scale to transform milliseconds to the VME unit time.
+  Default value will transform milliseconds in seconds.*/
+  void SetTimeScale(double tscale = 1000.0);
+
+  /** Return the time scale factor.*/
+  double GetTimeScale() {return m_TimeScale;};
 
   /** Enable/Disable the update of the animation only in the active viewport.*/
   void PlayInActiveViewport(int active_viewport = 0);
@@ -124,14 +108,12 @@ protected:
   and flush these new values to the registry.*/
   void Update();
 
-  int m_RealTimeMode;
-  int m_ShowAllFrames;
-  int m_Fps;
+  int m_RealTimeMode; ///< Flag to play the animation in real time mode (checked) or to show all key-frames of the animation (unchecked)
   int m_Loop;
-  int m_SpeedId;
   int m_PlayInActiveViewport;
   int m_AnimateInSubrange;
-  double m_SubRange[2];
-  double m_TimeMultiplier;
+  double m_SubRange[2]; ///< Time subrange animation.
+  double m_TimeSpeed; ///< Multiplier to speed up the animation when is not in real time mode.
+  double m_TimeScale; ///< Time scale referring to the time base = seconds.
 };
 #endif
