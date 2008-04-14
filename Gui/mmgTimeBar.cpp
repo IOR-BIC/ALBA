@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-14 10:05:49 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-04-14 12:59:00 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -121,25 +121,17 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
   {
     switch(maf_event->GetId())
     {
-      case mafGUISettingsTimeBar::ID_FPS:
       case mafGUISettingsTimeBar::ID_REAL_TIME:
-      case mafGUISettingsTimeBar::ID_SPEED:
+      case mafGUISettingsTimeBar::ID_TIME_SPEED:
         if (m_Timer.IsRunning())
         {
           m_Timer.Stop();
         }
-        if (m_TimeBarSettings->GetShowAllFrames() != 0)
+        if (m_TimeBarSettings->GetRealTimeMode() == 0)
         {
-          m_NumberOfIntervals = 500;
           m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
-          m_TimeStep *= m_TimeBarSettings->GetSpeedFactor();
+          m_TimeStep *= m_TimeBarSettings->GetTimeMultiplier();
         }
-        else
-        {
-          m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
-          m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
-        }
-        m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
         Update();
       break;
     }
@@ -229,7 +221,7 @@ void mmgTimeBar::OnTimer(wxTimerEvent &event)
     wxDateTime dt = wxDateTime::UNow();
     wxTimeSpan ts = dt.Subtract(m_WorldTimeStart);
     wxLongLong delta = ts.GetMilliseconds();
-    m_Time = m_TimeStart + delta.ToDouble() / m_TimeBarSettings->GetTimeMultiplier();
+    m_Time = m_TimeStart + delta.ToDouble() / m_TimeBarSettings->GetTimeScale();
   }
   
   if (m_Time >= time_max)
@@ -268,15 +260,10 @@ void mmgTimeBar::SetBounds(double min, double max)
 
   m_TimeMax = max;
   m_TimeMin = min;
-  if (m_TimeBarSettings->GetShowAllFrames() != 0)
+  if (m_TimeBarSettings->GetRealTimeMode() == 0)
   {
-    m_NumberOfIntervals = 500;
     m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
-  }
-  else
-  {
-    m_NumberOfIntervals = (m_TimeMax - m_TimeMin) * m_TimeBarSettings->GetFPS();
-    m_TimeStep = m_TimeBarSettings->GetSpeedFactor() / m_NumberOfIntervals;
+    m_TimeStep *= m_TimeBarSettings->GetTimeMultiplier();
   }
 
   if(m_Time < min) 
@@ -294,7 +281,6 @@ void mmgTimeBar::SetBounds(double min, double max)
   m_TimeBarSlider->Refresh();
 
   m_TimeBarEntry->SetValidator(mmgValidator(this,ID_ENTRY,m_TimeBarEntry,&m_Time,m_TimeMin,m_TimeMax));
-  m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
 
   m_TimeMinString = "";
   m_TimeMinString << m_TimeMin;
