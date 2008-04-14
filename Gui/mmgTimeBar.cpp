@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:30:09 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-04-14 10:05:49 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -132,6 +132,7 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
         {
           m_NumberOfIntervals = 500;
           m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
+          m_TimeStep *= m_TimeBarSettings->GetSpeedFactor();
         }
         else
         {
