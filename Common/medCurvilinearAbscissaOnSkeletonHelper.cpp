@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-13 11:24:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-14 11:43:41 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -249,7 +249,7 @@ vtkIdType &outputVertexId, vtkIdType &outputEdgeID, vtkIdType &outputBranchId)
       LogPoint(localPoint, "has coordinates:");
     }
 
-    BuildVector(bifurcationPoint, localPoint, localVector);
+    mafTransform::BuildVector(bifurcationPoint, localPoint, localVector);
     vtkMath::Normalize(localVector);
     localRadiatingVersors->InsertPoint(neighborID, localVector);
 
@@ -447,9 +447,9 @@ void medCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *in
   vtkMath::Cross(normal1, normal2, normal1_x_normal2);
 
   mafMatrix localGizmoPose;
-  SetVersor(0, normal1_x_normal2, localGizmoPose);
-  SetVersor(1, normal1, localGizmoPose);
-  SetVersor(2, normal2, localGizmoPose);
+  mafTransform::SetVersor(0, normal1_x_normal2, localGizmoPose);
+  mafTransform::SetVersor(1, normal1, localGizmoPose);
+  mafTransform::SetVersor(2, normal2, localGizmoPose);
   localGizmoPose.SetTimeStamp(-1);
   mafTransform::SetPosition(localGizmoPose, pOut);
 
@@ -478,52 +478,14 @@ void medCurvilinearAbscissaOnSkeletonHelper::ComputeLocalPointPositionBetweenVer
 
   // creates versor from two points
   double p0p1[3] = {0,0,0};
-  BuildVector(p0,p1,p0p1);
+  mafTransform::BuildVector(p0,p1,p0p1);
   vtkMath::Normalize(p0p1);
 
   double p0s[3] = {0,0,0};
-  BuildVector(distP0s, p0p1, p0s);
+  mafTransform::BuildVector(distP0s, p0p1, p0s, mafRefSys::GLOBAL);
 
-  AddVectors(p0,p0s,pOut);
+  mafTransform::AddVectors(p0,p0s,pOut);
 
-}
-
-void medCurvilinearAbscissaOnSkeletonHelper::AddVectors( double p0[3],double p1[3],double sum[3] )
-{
-  for (int i = 0;i < 3; i++)
-  {
-    sum[i] = p0[i] + p1[i];
-  }
-}
-
-
-void medCurvilinearAbscissaOnSkeletonHelper::SetVersor( int axis, double versor[3], mafMatrix &matrix )
-{
-  if (0 <= axis && axis <= 2)
-  {
-    for (int i = 0; i < 3; i++)
-    {
-      matrix.SetElement(i, axis, versor[i]);
-    }	
-  }	
-}
-
-void medCurvilinearAbscissaOnSkeletonHelper::BuildVector( double p0[3],double p1[3],double vOut[3] )
-{
-  for (int i = 0;i < 3; i++)
-  {
-    vOut[i] = p1[i] - p0[i];
-  }
-}
-
-void medCurvilinearAbscissaOnSkeletonHelper::BuildVector(double coeff, const double *inVector, double *outVector)
-{
-  if (outVector)
-  {
-    outVector[0] = coeff * inVector[0];
-    outVector[1] = coeff * inVector[1];
-    outVector[2] = coeff * inVector[2];
-  }
 }
 
 void medCurvilinearAbscissaOnSkeletonHelper::FindPerpendicularVersorsToSegment( int idP0, int idP1, double viewUp[3], double normal[3] )
@@ -536,10 +498,10 @@ void medCurvilinearAbscissaOnSkeletonHelper::FindPerpendicularVersorsToSegment( 
 
   double p0p1[3] = {0,0,0};
 
-  BuildVector(p0, p1, p0p1);
+  mafTransform::BuildVector(p0, p1, p0p1);
   vtkMath::Normalize(p0p1);
  
-  FindPerpendicularVersors(p0p1, viewUp, normal) ;
+  mafTransform::FindPerpendicularVersors(p0p1, viewUp, normal) ;
   
 }
 
@@ -622,12 +584,12 @@ void medCurvilinearAbscissaOnSkeletonHelper::MoveOnSkeletonInternal( vtkIdType i
   m_ConstraintPolylineGraph->GetVertexCoords(upperSVertexID, p1);
 
   double p0p1[3] = {0,0,0};
-  BuildVector(p0, p1, p0p1);
+  mafTransform::BuildVector(p0, p1, p0p1);
 
   // project move vector on s poly
 
   double inMoveAbsVector_p0p1_ProjectionValue = 
-    mafTransform::ProjectVectorOnAxis(inMoveAbsVector, p0p1);
+  mafTransform::ProjectVectorOnAxis(inMoveAbsVector, p0p1);
 
   // compute distance between s and near/far vertex
   double p0p1Distance = vtkMath::Norm(p0p1);
@@ -687,11 +649,12 @@ void medCurvilinearAbscissaOnSkeletonHelper::MoveOnSkeletonInternal( vtkIdType i
     m_ConstraintPolylineGraph->GetVertexCoords(bifurcationPoindID, bifurcationPoint);
 
     double bifurcationPoint_LastSId_Versor[3] = {0,0,0};
-    BuildVector(bifurcationPoint,p0, bifurcationPoint_LastSId_Versor);
+    mafTransform::BuildVector(bifurcationPoint,p0, bifurcationPoint_LastSId_Versor);
 
     vtkMath::Normalize(bifurcationPoint_LastSId_Versor);
 
-    double bifurcationPoint_LastSId_Vector[3] = {0,0,0};
+    double bifurcationPoint_LastSId_Vector[3]
+    = {0,0,0};
     mafTransform::BuildVector(abs(dist_S_P1), bifurcationPoint_LastSId_Versor, bifurcationPoint_LastSId_Vector, mafRefSys::GLOBAL);
 
     double outputMoveVector[3] = {0,0,0};
@@ -714,7 +677,7 @@ void medCurvilinearAbscissaOnSkeletonHelper::MoveOnSkeletonInternal( vtkIdType i
 
 
     double bifurcationPoint_newEndVertex_Versor[3] = {0,0,0};
-    BuildVector(bifurcationPoint,newEndVertex, bifurcationPoint_newEndVertex_Versor);
+    mafTransform::BuildVector(bifurcationPoint,newEndVertex, bifurcationPoint_newEndVertex_Versor);
     vtkMath::Normalize(bifurcationPoint_newEndVertex_Versor);
 
 
@@ -833,35 +796,12 @@ void medCurvilinearAbscissaOnSkeletonHelper::FindBoundaryVertices( vtkIdType inp
 }
 
 
-
-void medCurvilinearAbscissaOnSkeletonHelper::FindPerpendicularVersors( double inVersorN[3], double outVersorP[3], double outVersorQ[3] )
+void BuildVector( double p0[3],double p1[3],double vOut[3] )
 {
-  const double M_SQRT1_2 = 0.707106781186547524401;
-
-  assert(inVersorN && outVersorP && outVersorQ);
-  if (abs(inVersorN[2]) > M_SQRT1_2) {
-    // choose p in y-z plane
-    double a = inVersorN[1]*inVersorN[1] + inVersorN[2]*inVersorN[2];
-    double k = sqrt(a);
-    outVersorP[0] = 0;
-    outVersorP[1] = -inVersorN[2]*k;
-    outVersorP[2] = inVersorN[1]*k;
-    // set q = n x p
-    outVersorQ[0] = a*k;
-    outVersorQ[1] = -inVersorN[0]*outVersorP[2];
-    outVersorQ[2] = inVersorN[0]*outVersorP[1];
-  }
-  else {
-    // choose p in x-y plane
-    double a = inVersorN[0]*inVersorN[0] + inVersorN[1]*inVersorN[1];
-    double k = sqrt(a);
-    outVersorP[0] = -inVersorN[1]*k;
-    outVersorP[1] = inVersorN[0]*k;
-    outVersorP[2] = 0;
-    // set q = n x p
-    outVersorQ[0] = -inVersorN[2]*outVersorP[1];
-    outVersorQ[1] = inVersorN[2]*outVersorP[0];
-    outVersorQ[2] = a*k;
+  for (int i = 0;i < 3; i++)
+  {
+    vOut[i] = p1[i] - p0[i];
   }
 }
+
 
