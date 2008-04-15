@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-20 11:26:52 $
-Version:   $Revision: 1.16 $
+Date:      $Date: 2008-04-15 15:45:11 $
+Version:   $Revision: 1.17 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -99,7 +99,10 @@ medGeometryEditorPolylineGraph::medGeometryEditorPolylineGraph(mafVME *input, ma
 	m_TestMode = testMode;
 	
 	if(polyline)
+  {
 		m_PolylineGraph->CopyFromPolydata(vtkPolyData::SafeDownCast(polyline->GetOutput()->GetVTKData()));
+    m_PolylineGraph->MergeSimpleJoinedBranches();
+  }
 
 	vtkMAFSmartPointer<vtkPolyData> data;
 	m_PolylineGraph->CopyToPolydata(data);
@@ -252,7 +255,7 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 					m_Gui->Enable(ID_BUTTON_POINT_DELETE,m_Action==ID_POINT_ACTION && m_SelectedPoint!=UNDEFINED_POINT_ID);
 					m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
 
-					//BehaviorUpdate();
+					BehaviorUpdate();
 				}
 			break;
 			case VME_PICKING:
@@ -264,7 +267,7 @@ void medGeometryEditorPolylineGraph::OnEvent(mafEventBase *maf_event)
 			case ID_POINT_TOOL:
 			case ID_BRANCH_TOOL:
 				{
-					//BehaviorUpdate();
+					BehaviorUpdate();
 				}
 				break;
 			case ID_BUTTON_POINT_DELETE:
@@ -319,12 +322,12 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 		}
 		else if(m_PointTool==ID_INSERT_POINT||m_PointTool==ID_SELECT_POINT)
 		{
-			m_VMEPolylineEditor->SetBehavior(NULL);
-			m_InputVME->SetBehavior(m_Picker);
+			m_VMEPolylineEditor->SetBehavior(m_Picker);
+			m_InputVME->SetBehavior(NULL);
 		}
 		else if(m_PointTool==ID_MOVE_POINT)
 		{
-			m_VMEPolylineEditor->SetBehavior(NULL);
+			m_VMEPolylineEditor->SetBehavior(m_Picker);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 	}
@@ -337,7 +340,7 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 		}
 		else if(m_BranchTool==ID_SELECT_BRANCH)
 		{
-			m_VMEPolylineEditor->SetBehavior(NULL);
+			m_VMEPolylineEditor->SetBehavior(m_Picker);
 			m_InputVME->SetBehavior(m_Picker);
 		}
 	}
@@ -468,7 +471,7 @@ void medGeometryEditorPolylineGraph::CreateISA()
 	m_Picker->SetListener(this);
 
 	m_InputVME->SetBehavior(m_Picker);
-	m_VMEPolylineEditor->SetBehavior(NULL);
+	m_VMEPolylineEditor->SetBehavior(m_Picker);
 
   mafEventMacro(mafEvent(this,ID_VME_BEHAVIOR_UPDATE,m_InputVME));
 }
@@ -580,6 +583,8 @@ void medGeometryEditorPolylineGraph::VmePicked(mafEvent *e)
 				pts->GetPoint(0,pos);
 
 				SelectBranch(pos);
+
+        mafLogMessage(wxString::Format("Branch Select = %d",m_CurrentBranch));
 
 				m_Gui->Enable(ID_BUTTON_BRANCH_DELETE,m_Action==ID_BRANCH_ACTION && m_SelectedBranch!=UNDEFINED_BRANCH_ID);
 			}
@@ -724,31 +729,45 @@ void medGeometryEditorPolylineGraph::DeleteBranch(vtkIdType branchID)
 		vList[i]=m_PolylineGraph->GetConstBranchPtr(branchID)->GetVertexId(i);
 
 	int nEdge=m_PolylineGraph->GetConstBranchPtr(branchID)->GetNumberOfEdges();
+
+  const mafPolylineGraph::Branch *branchToDelete=m_PolylineGraph->GetConstBranchPtr(branchID);
+
 	for(int i=0;i<nEdge;i++)
 	{
 		int pID=m_PolylineGraph->GetConstEdgePtr(m_PolylineGraph->GetConstBranchPtr(branchID)->GetLastEdgeId())->GetVertexId(1);
 		m_PolylineGraph->DeleteEdge(m_PolylineGraph->GetConstBranchPtr(branchID)->GetLastEdgeId());
-		if(m_PolylineGraph->GetConstVertexPtr(pID)->GetDegree()==0)//only vertex with degree == 0 can be delete
+    m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());//when an edge is deleted a new branch is created
+    if(m_PolylineGraph->GetConstVertexPtr(pID)->GetDegree()==0)//only vertex with degree == 0 can be delete
 		{
 			m_PolylineGraph->DeleteVertex(pID);
 		}
-		else
+		/*else
 		{
 			for(int k=0;k<m_PolylineGraph->GetNumberOfBranches()-1;k++)
 			{
 				for(int j=0;j<m_PolylineGraph->GetConstBranchPtr(k)->GetNumberOfVertices();j++)
 				{
 					if(pID==m_PolylineGraph->GetConstBranchPtr(k)->GetVertexId(j) && k!=branchID)
-						DeleteBranch(k);
+          {
+						//DeleteBranch(k);
+            break;
+          }
 				}
 			}
-		}
-		m_PolylineGraph->DeleteBranch(m_PolylineGraph->GetMaxBranchId());//when an edge is deleted a new branch is created
+		}*/
 	}
 	if(m_PolylineGraph->GetConstVertexPtr(m_PolylineGraph->GetConstBranchPtr(branchID)->GetLastVertexId())->GetDegree()==0)
 		m_PolylineGraph->DeleteVertex(m_PolylineGraph->GetConstBranchPtr(branchID)->GetLastVertexId());
 
-	m_PolylineGraph->DeleteBranch(branchID);
+  
+  for (int i=0;i<m_PolylineGraph->GetNumberOfBranches();i++)
+  {
+    if(m_PolylineGraph->GetConstBranchPtr(i)==m_PolylineGraph->GetConstBranchPtr(branchID))
+      m_PolylineGraph->DeleteBranch(i);
+
+  }
+
+  m_PolylineGraph->MergeSimpleJoinedBranches();
 }
 //----------------------------------------------------------------------------
 void medGeometryEditorPolylineGraph::MovePoint(double newPosition[3],int pointID)
