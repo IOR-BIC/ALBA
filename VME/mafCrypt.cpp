@@ -103,7 +103,7 @@ bool mafDecryptFile(const char *filename_in, const char *filename_out, const cha
 bool mafDecryptFileInMemory(const char *filename_in, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
-  bool result;
+  bool result = true;
   try
   {
     StringSink *ssink = new StringSink(out);
@@ -122,7 +122,7 @@ bool mafDecryptFileInMemory(const char *filename_in, std::string &out, const cha
 bool mafEncryptFileFromMemory(const char *in, unsigned int len, const char *filename_out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
-  bool result;
+  bool result = true;
   try
   {
     FileSink *fsink = new FileSink(filename_out);
