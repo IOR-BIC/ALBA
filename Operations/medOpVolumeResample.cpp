@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 15:26:14 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-16 08:45:35 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -71,6 +71,8 @@ medOpVolumeResample::medOpVolumeResample(const wxString &label) : mafOp(label)
   m_Canundo	= true;
 
   m_ResampledVme = NULL;
+
+  m_InputPreserving = true;
 	
   // initialize Crop OBB parameters
   m_ROIPosition[0]    = m_ROIPosition[1]    = m_ROIPosition[2]    = 0;
@@ -390,6 +392,9 @@ void medOpVolumeResample::Resample()
   m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
   m_ResampledVme->Register(m_ResampledVme);
   m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray()); // copy tags
+  mafTagItem *ti = NULL;
+  ti = m_ResampledVme->GetTagArray()->GetTag("VME_NATURE");
+  ti->SetValue("SYNTHETIC");
   m_ResampledVme->SetName(new_vme_name);
 
   m_ResampledVme->ReparentTo(m_Input->GetParent());
