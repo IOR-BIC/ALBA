@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:33 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-18 16:05:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,7 +70,7 @@ public:
   void SetPlane(int axis); 
   
   /** Get gizmo Plane*/
-  int  GetPlane(); 
+  int  GetPlane() {return ActivePlane;}; 
   
   //----------------------------------------------------------------------------
   // highlight and show 
@@ -89,7 +89,7 @@ public:
   
   /** Set/Get the side length of the gizmo*/
   void   SetSizeLength(double length);
-  double GetSizeLength();
+  double GetSizeLength() {return m_Length;};
 
   
   //----------------------------------------------------------------------------
@@ -150,7 +150,10 @@ protected:
   
   /** Register the gizmo plane */
   int ActivePlane;
-  
+ 
+  /** Register the gizmo square plane side length*/
+  double m_Length;
+
   /** Line source*/
   vtkLineSource *Line[2];
 
@@ -196,5 +199,7 @@ protected:
 
   /** Register Gizmo status*/
   bool IsActive;
+
+  friend class mafGizmoTranslatePlaneTest;
 };
 #endif

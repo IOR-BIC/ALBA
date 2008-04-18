@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:58:10 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-18 16:05:10 $
+  Version:   $Revision: 1.12 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,6 +52,7 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   IsaComp[0]  = IsaComp[1] =  NULL;
   m_Listener  = listener;
   InputVme    = input;
+  m_Length = 1;
   
   // default plane is YZ
   ActivePlane = YZ;
@@ -359,6 +360,9 @@ void  mafGizmoTranslatePlane::SetSizeLength(double length)
 
                 (0,L,0)
   */
+
+  // register the gizmo length
+  m_Length = length;
   double L = length;
   // update S1
   Line[S1]->SetPoint1(0, L, 0);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:58:10 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-04-18 16:05:10 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,6 +47,9 @@
 mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
+  ConeLength = 0.5;
+  CylinderLength = 0.5;
+
   IsaComp[0] = IsaComp[1] = NULL;
 
   m_Listener = listener;
@@ -347,11 +350,13 @@ void  mafGizmoTranslateAxis::SetConeLength(double length)
      cylLen    conLen
   */  
   // set the cone length
+  ConeLength = length;
   Cone->SetHeight(length);
 
   // translate the cone in (cylLen + conLen/2)
   TranslateTr[CONE]->Identity();
   TranslateTr[CONE]->Translate(Cylinder->GetHeight() + length / 2, 0, 0);
+  
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetCylinderLength(double length)
@@ -371,6 +376,7 @@ void mafGizmoTranslateAxis::SetCylinderLength(double length)
   */  
 
   // set cylLen to length
+  CylinderLength = length;
   Cylinder->SetHeight(length);
 
   // translate the cyl in (cylLen / 2)

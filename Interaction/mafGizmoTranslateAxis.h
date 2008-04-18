@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-07 11:21:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-18 16:05:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,7 +66,7 @@ public:
   
   /** Set/Get gizmo axis, default axis is X*/        
   void SetAxis(int axis); 
-  int  GetAxis(); 
+  int  GetAxis() {return Axis;}; 
   
   //----------------------------------------------------------------------------
   // highlight and show 
@@ -84,7 +84,7 @@ public:
     
   /** Set/Get the length of the cone*/
   void   SetConeLength(double length);
-  double GetConeLength();
+  double GetConeLength() {return ConeLength;};
  
   //----------------------------------------------------------------------------
   // cylinder stuff
@@ -92,7 +92,7 @@ public:
  
   /** Set/Get the length of the cylinder*/
   void   SetCylinderLength(double length);
-  double GetCylinderLength();
+  double GetCylinderLength() {return CylinderLength;};
   
   /** 
   Set the abs pose */
@@ -128,10 +128,16 @@ protected:
   
   /** Cone source*/
   vtkConeSource *Cone;
-  
+
+  /** Cone length*/
+  double ConeLength;
+
   /** Cylinder source*/
   vtkCylinderSource *Cylinder;
   
+  /** Cylinder length*/
+  double CylinderLength;
+
   /** Cylinder and cone gizmo vme data*/
   //mafVmeData *GizmoData[2];
 
@@ -168,5 +174,8 @@ protected:
   /**
   Register the event receiver object*/
   mafObserver *m_Listener;
+
+  /** test friend */
+  friend class mafGizmoTranslateAxisTest;
 };
 #endif
