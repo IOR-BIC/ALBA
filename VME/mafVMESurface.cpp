@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 19:35:43 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-04-21 13:02:28 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,9 @@ int mafVMESurface::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
       (polydata->GetPolys()->GetNumberOfCells() > 0 || polydata->GetStrips()->GetNumberOfCells() > 0) && \
       polydata->GetLines()->GetNumberOfCells() == 0)
     {
-      return Superclass::SetData(polydata,t,mode);
+      int res = Superclass::SetData(polydata,t,mode);
+      GetOutput()->Update();
+      return res;
     }
   }
   return MAF_ERROR;
