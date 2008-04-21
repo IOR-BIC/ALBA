@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-14 11:43:41 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-21 16:49:43 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,6 +22,7 @@ const bool DEBUG_MODE = true;
 
 #include <math.h>
 
+#include "mmgGui.h"
 #include "medGizmoInteractionDebugger.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
@@ -53,8 +54,14 @@ const bool DEBUG_MODE = true;
 
 const double defaultLineLength = 50;
 
-//----------------------------------------------------------------------------
- 
+
+enum GUI_GIZMO_TRANSLATE_ID
+{
+  ID_BRANCH = MINID,
+  ID_S,
+  ID_TRANSLATE_Z,
+};
+
 
 void medCurvilinearAbscissaOnSkeletonHelper::MoveOnSkeleton( mafEvent *mouseEvent )
 {
@@ -344,7 +351,7 @@ vtkIdType &outputVertexId, vtkIdType &outputEdgeID, vtkIdType &outputBranchId)
 }
   
 
-medCurvilinearAbscissaOnSkeletonHelper::medCurvilinearAbscissaOnSkeletonHelper( mafVME *inputVME )
+medCurvilinearAbscissaOnSkeletonHelper::medCurvilinearAbscissaOnSkeletonHelper( mafVME *inputVME, mafObserver *listener )
 {
   m_InputVME = inputVME;
   m_ConstraintVMEPolylineGraph = NULL;
@@ -352,8 +359,17 @@ medCurvilinearAbscissaOnSkeletonHelper::medCurvilinearAbscissaOnSkeletonHelper( 
   m_ConstraintPolylineGraph = NULL; 
   m_ConstraintPolylineGraph = new mafPolylineGraph();
   
-  m_ActiveBranchId = 0; 
+  m_ActiveBranchId = 0;
+  m_GUIActiveBranchId = m_ActiveBranchId;
+
   m_CurvilinearAbscissa = 0;
+  m_GUICurvilinearAbscissa = m_CurvilinearAbscissa;
+
+  m_Listener = listener;
+  m_Gui = NULL;
+
+  CreateGui();
+
 }
 
 medCurvilinearAbscissaOnSkeletonHelper::~medCurvilinearAbscissaOnSkeletonHelper()
@@ -395,6 +411,8 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( medVMEP
   {
     wxMessageBox("Skeleton not consistent! See log area for more details.","", wxICON_WARNING);
   }
+
+  
 }
 
 void medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType branchId, double s )
@@ -403,7 +421,11 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType b
   mafMatrix outputGizmoAbsMatrix;
   GetAbsPose(m_ConstraintVMEPolylineGraph, branchId, s, outputGizmoAbsMatrix);
   m_InputVME->SetAbsMatrix(outputGizmoAbsMatrix, -1);
-
+  
+  // gui update
+  m_GUIActiveBranchId = branchId;
+  m_GUICurvilinearAbscissa = s;
+  m_Gui->Update();
 }
 
 void medCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose )
@@ -805,3 +827,49 @@ void BuildVector( double p0[3],double p1[3],double vOut[3] )
 }
 
 
+void medCurvilinearAbscissaOnSkeletonHelper::CreateGui()
+{
+  m_Gui = new mmgGui(this);
+
+  m_Gui->Divider(2);
+  // m_Gui->Label("skeleton gui", true);
+  
+  m_Gui->Integer(ID_BRANCH, "branch id", &m_GUIActiveBranchId, 0);
+  m_Gui->Double(ID_S, "s",  &m_GUICurvilinearAbscissa, 0);
+  m_Gui->Divider();
+  m_Gui->Update();
+}
+
+void medCurvilinearAbscissaOnSkeletonHelper::OnEvent(mafEventBase *maf_event)
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId())
+    {
+      case ID_BRANCH:
+      {
+        SetCurvilinearAbscissa(m_GUIActiveBranchId, 0);
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
+
+      case ID_S:
+      {
+        SetCurvilinearAbscissa(m_ActiveBranchId, m_GUICurvilinearAbscissa);
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+      }
+      break;
+
+      default:
+        mafEventMacro(*e);
+      break;
+    }
+  }
+}
+
+void medCurvilinearAbscissaOnSkeletonHelper::EnableWidgets( bool enable )
+{
+  m_Gui->Enable(ID_BRANCH, enable);
+  m_Gui->Enable(ID_S, enable);
+  m_Gui->Update();
+}

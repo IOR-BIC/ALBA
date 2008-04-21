@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-14 11:43:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-21 16:49:43 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,8 +12,6 @@
 
 #ifndef __medCurvilinearAbscissaOnSkeletonHelper_h
 #define __medCurvilinearAbscissaOnSkeletonHelper_h
-
-#include "mafGizmoInterface.h"
   
 class mafEvent;
 class mafVME;
@@ -23,12 +21,12 @@ class medVMEPolylineGraph;
 
 /** Decorate input vme with curvilinear abscissa interface for medVMEPolylineGraph 
  constrained interaction */
-class medCurvilinearAbscissaOnSkeletonHelper
+class medCurvilinearAbscissaOnSkeletonHelper : mafObserver
 {
 public:
 
   /** Pass the vme you want to decorate with curvilinear abscissa interface */
-  medCurvilinearAbscissaOnSkeletonHelper(mafVME *inputVME);
+  medCurvilinearAbscissaOnSkeletonHelper(mafVME *inputVME, mafObserver *listener = NULL);
  
   /** Set the polyline graph constraint */
   void SetConstraintPolylineGraph(medVMEPolylineGraph* constraintPolylineGraph);
@@ -63,6 +61,16 @@ public:
 
   medCurvilinearAbscissaOnSkeletonHelper::~medCurvilinearAbscissaOnSkeletonHelper();
 
+  /** GUI Stuff */
+
+  virtual void OnEvent(mafEventBase *maf_event);
+
+  /** Return the gui to be plugged*/
+  mmgGui *GetGui() {return m_Gui;};
+
+  /** Enable-Disable the GUI's widgets */
+  virtual void EnableWidgets(bool enable);
+
 private:
   
   void GetAbsPose( medVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose );
@@ -83,6 +91,15 @@ private:
   // log helpers
   static void LogPoint( double *point, const char *logMessage = NULL );
   static void LogVector3( double *vector , const char *logMessage = NULL);
+  
+  // gui stuff
+  virtual void CreateGui();
+
+  int m_GUIActiveBranchId;
+  double m_GUICurvilinearAbscissa;
+
+  mafObserver *m_Listener;
+  mmgGui      *m_Gui;    
 
 };
  
