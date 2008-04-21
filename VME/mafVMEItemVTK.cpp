@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 12:49:57 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-04-21 14:27:17 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -27,6 +27,7 @@
 #include "mafStorage.h"
 #include "mafStorageElement.h"
 #include "mafCrypt.h"
+#include "mafTagArray.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkDataSet.h"
@@ -502,6 +503,7 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
     m_IOStatus=0;
     int ret = MAF_OK; // value returned by StoreToURL() function at the end of saving to file
     int vtk_err = VTK_OK;
+    int chk_res = MAF_OK;
     if ((IsDataPresent()&&(!found||(m_URL!=url)))||((IsDataPresent()==found)&&(found==IsDataModified())))
     {       
       //if (!item->IsDataModified()&&found)
@@ -561,8 +563,9 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
         }
         m_DataWriter = writer;
         m_DataWriter->Register(NULL);
-        //return MAF_OK;
-        return CheckFile(m_OutputMemory, m_OutputMemorySize);
+        
+        chk_res = CheckFile(m_OutputMemory, m_OutputMemorySize);
+        return chk_res != MAF_OK ? MAF_ERROR : MAF_OK;
       }
       else
       {
@@ -637,6 +640,14 @@ int mafVMEItemVTK::CheckFile(const char *filename)
   std::string chk_result;
   mafCalculateteChecksum(filename, chk_result);
   m_ChecksumMD5 = chk_result.c_str();
+  if(!GetTagArray()->IsTagPresent("MD5Checksum"))
+  {
+    mafTagItem ti;
+    ti.SetName("MD5Checksum");
+    GetTagArray()->SetTag(ti);
+  }
+  mafTagItem *md5tag = GetTagArray()->GetTag("MD5Checksum");
+  md5tag->SetValue(m_ChecksumMD5);
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
@@ -655,6 +666,14 @@ int mafVMEItemVTK::CheckFile(const char *input_string, int input_len)
   std::string chk_result;
   mafCalculateteChecksum(input_string, input_len, chk_result);
   m_ChecksumMD5 = chk_result.c_str();
+  if(!GetTagArray()->IsTagPresent("MD5Checksum"))
+  {
+    mafTagItem ti;
+    ti.SetName("MD5Checksum");
+    GetTagArray()->SetTag(ti);
+  }
+  mafTagItem *md5tag = GetTagArray()->GetTag("MD5Checksum");
+  md5tag->SetValue(m_ChecksumMD5);
   return MAF_OK;
 }
 //-------------------------------------------------------------------------
