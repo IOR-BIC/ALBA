@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 14:03:19 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2008-04-21 14:21:55 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -308,21 +308,22 @@ void mafVMEManager::MSFOpen(mafString filename)
   m_LoadingFlag = false;
 
   mafTimeStamp b[2];
-  m_Storage->GetRoot()->GetOutput()->GetTimeBounds(b);
-  m_Storage->GetRoot()->SetTreeTime(b[0]);
+  mafVMERoot *root_node = m_Storage->GetRoot();
+  root_node->GetOutput()->GetTimeBounds(b);
+  root_node->SetTreeTime(b[0]);
   
 	////////////////////////////////  Application Stamp managing ////////////////////
-	if(!m_Storage->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
+	if(!root_node->GetTagArray()->IsTagPresent("APP_STAMP"))
 	{
 		//update the old data files to support Application Stamp
 		mafTagItem tag_appstamp;
 		tag_appstamp.SetName("APP_STAMP");
 		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
-		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp);
+		root_node->GetTagArray()->SetTag(tag_appstamp);
 	}
 	
 	mafString app_stamp;
-  app_stamp << m_Storage->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+  app_stamp << root_node->GetTagArray()->GetTag("APP_STAMP")->GetValue();
 	if(app_stamp.Equals("INVALID") || ((!app_stamp.Equals(m_AppStamp.GetCStr())) && (!m_AppStamp.Equals("DataManager")) && (!m_AppStamp.Equals("OPEN_ALL_DATA"))))
 	{
 		//Application stamp not valid
@@ -334,9 +335,9 @@ void mafVMEManager::MSFOpen(mafString filename)
 		return;
 	}
 	///////////////////////////////////////////////////////////////////////////////// 
-  NotifyAdd(m_Storage->GetRoot());
+  NotifyAdd(root_node);
 
-	mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot())); 
+	mafEventMacro(mafEvent(this,VME_SELECTED, root_node)); 
   mafEventMacro(mafEvent(this,CAMERA_RESET)); 
   
 	if (m_TmpDir != "")
