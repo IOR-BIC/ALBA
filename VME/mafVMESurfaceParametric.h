@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-15 12:11:25 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-21 12:26:29 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -81,7 +81,14 @@ public:
 	/** return an xpm-icon that can be used to represent this node */
 	static char ** GetIcon();
 
-  void SetGeometryType(int geometry){m_GeometryType = geometry;}
+  /** Set the geometry type to be generated.*/
+  void SetGeometryType(int geometry);
+
+  /** Set the radius for the parametric sphere.*/
+  void SetSphereRadius(double radius);
+
+  /** Return the radius of the parametric sphere.*/
+  double GetSphereRadius() {return m_SphereRadius;};
 
 	enum PARAMETRIC_SURFACE_WIDGET_ID
 	{

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 10:37:49 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-04-21 12:26:28 $
+  Version:   $Revision: 1.13 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -545,12 +545,24 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
 	}
   return MAF_ERROR;
 }
-
+//-------------------------------------------------------------------------
+void mafVMESurfaceParametric::SetGeometryType(int geometry)
+//-------------------------------------------------------------------------
+{
+  m_GeometryType = geometry;
+  Modified();
+}
+//-------------------------------------------------------------------------
+void mafVMESurfaceParametric::SetSphereRadius(double radius)
+//-------------------------------------------------------------------------
+{
+  m_SphereRadius = radius;
+  Modified();
+}
 //-------------------------------------------------------------------------
 char** mafVMESurfaceParametric::GetIcon() 
 //-------------------------------------------------------------------------
 {
-
   #include "mafVMEProcedural.xpm"
   return mafVMEProcedural_xpm;
 }
