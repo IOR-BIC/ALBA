@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgApplicationLayoutSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-01 13:01:12 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2008-04-21 12:27:40 $
+Version:   $Revision: 1.16 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -104,14 +104,14 @@ void mmgApplicationLayoutSettings::CreateGui()
   m_Gui->Button(OPEN_LAYOUT_ID,_("Load file"));
   m_Gui->Button(ADD_LAYOUT_ID,_("Add Current layout"));
   m_Gui->Button(REMOVE_LAYOUT_ID,_("Remove layout"));
-  m_List= m_Gui->ListBox(ID_LIST_LAYOUT,_(""),60);
+  m_List= m_Gui->ListBox(ID_LIST_LAYOUT,"",60);
   //m_Gui->Button(SAVE_APPLICATION_LAYOUT_ID,_("Save"));
   m_Gui->Button(APPLY_LAYOUT_ID,_("Apply layout"));
   m_Gui->Bool(DEFAULT_LAYOUT_ID,_("Default Layout"), &m_DefaultFlag, 1);
   //here lies the button for set as default
 
   m_Gui->FileSave(SAVE_APPLICATION_LAYOUT_ID,_("File"), &m_LayoutFileSave,_("All Files (*.mly)|*.mly"));
-  m_Gui->Label(_(""));
+  m_Gui->Label("");
 
   InitializeSettings();
 }

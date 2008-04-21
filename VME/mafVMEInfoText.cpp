@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 10:03:14 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-21 12:29:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -189,7 +189,7 @@ mmgGui* mafVMEInfoText::CreateGui()
       m_PositionText[i] = wxString::Format("%s%f",m_PosLabels[i].GetCStr(), xyz[i]);
     else
       m_PositionText[i] = "";
-    m_Gui->Label(_(""), &m_PositionText[i]);
+    m_Gui->Label("", &m_PositionText[i]);
   }
 
   m_Gui->Update();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-03 10:50:37 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-04-21 12:29:04 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -340,9 +340,9 @@ mmgGui* mafVMELandmark::CreateGui()
   m_Position[0] = wxString::Format("x: %f",xyz[0]);
   m_Position[1] = wxString::Format("y: %f",xyz[1]);
   m_Position[2] = wxString::Format("z: %f",xyz[2]);
-  m_Gui->Label(_(""), &m_Position[0]);
-  m_Gui->Label(_(""), &m_Position[1]);
-  m_Gui->Label(_(""), &m_Position[2]);
+  m_Gui->Label("", &m_Position[0]);
+  m_Gui->Label("", &m_Position[1]);
+  m_Gui->Label("", &m_Position[2]);
   m_Gui->Divider();
 	return m_Gui;
 }
