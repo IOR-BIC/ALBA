@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 14:17:41 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2008-04-21 17:04:47 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -80,6 +80,7 @@ mafOpManager::mafOpManager()
   m_RemoteListener = NULL;
   m_RunningOp = NULL;
 	m_Selected	= NULL;
+  m_NaturalNode = NULL;
   m_Warn			= true;
   m_FromRemote= false;
 
@@ -572,6 +573,7 @@ void mafOpManager::OpRun(mafOp *op, void *op_param)
       ti = synthetic_vme->GetTagArray()->GetTag("VME_NATURE");
       ti->SetValue("SYNTHETIC");
       mafEventMacro(mafEvent(this,VME_SHOW,m_Selected,false));
+      m_NaturalNode = m_Selected;
       OpSelect(synthetic_vme);
       mafEventMacro(mafEvent(this,VME_SHOW,synthetic_vme,true));
     }
@@ -626,6 +628,14 @@ void mafOpManager::OpRunCancel(mafOp *op)
 
 	m_RunningOp = NULL;
 	delete op;
+
+  if (m_NaturalNode != NULL)
+  {
+    m_Selected->ReparentTo(NULL);
+    OpSelect(m_NaturalNode);
+    mafEventMacro(mafEvent(this,VME_SHOW,m_NaturalNode,true));
+    m_NaturalNode = NULL;
+  }
 
   Notify(OP_RUN_TERMINATED);
 

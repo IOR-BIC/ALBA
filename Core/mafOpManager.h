@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 10:11:46 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-04-21 17:04:47 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -157,11 +157,12 @@ protected:
   void SetAccelerator(mafOp *op);
 
   mmdMouse          *m_Mouse; ///< Pointer to the mouse devices.
-  bool							 m_Warn; ///< Flag to warn the user when an undoable application is starting.
+  bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
 	mafOpContextStack  m_Context;
   mafOp             *m_RunningOp; ///< Pointer to the current running operation.
-	wxMenu            *m_Menu[3]; ///< Array of pointers to the menù 'Operations', 'Importer' and 'Exporter'
+	wxMenu            *m_Menu[3]; ///< Array of pointers to the menu 'Operations', 'Importer' and 'Exporter'
   mafNode						*m_Selected; ///< Pointer to the current selected node.
+  mafNode           *m_NaturalNode; ///< Pointer to the NATURAL node on which is running a non-input preserving operation.
 
   std::vector<mafOp *> m_OpList; ///< List of pointer of plugged operations.
   int                m_NumOp; ///< Number of plugged operations.
