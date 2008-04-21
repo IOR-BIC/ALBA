@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:44:35 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-21 08:32:19 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -474,7 +474,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
      
      double normalizedV2 = vtkMath::Normalize(v2);
      for(int i = 0; i<3; i++)
-       p2[i] = p2[i] + (wrapside) * v2[i]/(normalizedV2);
+       p2[i] += ((wrapside) * v2[i]/(normalizedV2));
       
      count++;
     }
@@ -520,7 +520,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
       double normalizedV2 = vtkMath::Normalize(v2);
       for(int i = 0; i<3; i++)
-        p2[i] = p2[i] + (wrapside) * v2[i]/(normalizedV2);
+        p2[i] += ((wrapside) * v2[i]/(normalizedV2));
 
       count++;
     }
@@ -1479,17 +1479,17 @@ mmgGui* medVMEWrappedMeter::CreateGui()
 	
 
   
-  m_Gui->Button(ID_ADD_POINT, _("Add"), _("") ,_(""));
-  m_Gui->Button(ID_REMOVE_POINT, _("Remove"), _("") ,_(""));
-  m_Gui->Button(ID_UP, _("Up"), _("") ,_(""));
-  m_Gui->Button(ID_DOWN, _("Down"), _("") ,_(""));
+  m_Gui->Button(ID_ADD_POINT, _("Add"), "" ,"");
+  m_Gui->Button(ID_REMOVE_POINT, _("Remove"), "" ,"");
+  m_Gui->Button(ID_UP, _("Up"), "" ,"");
+  m_Gui->Button(ID_DOWN, _("Down"), "" ,"");
 
   EnableManualModeWidget(m_WrappedMode == MANUAL_WRAP);
 
 	m_Gui->Divider();
 	m_Gui->Divider();
 	m_Gui->Divider(2);
-  //m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),_("") ,_(""));
+  //m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),"" ,"");
 	m_Gui->Divider();
 
   InternalUpdate();
