@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DAngle.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 13:48:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-21 12:28:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1323,7 +1323,9 @@ s = wxString::Format(L"tmp4OLD:%f , %f , %f" , tmp4[0],tmp4[1],tmp4[2]);
     m_LineSourceVector2[m_LineSourceVector2.size()-1]->Update();
 
     mafString ds;
-    ds = wxString::Format(_("%.2f°") , manualAngle);
+    mafString degree = "°";
+    ds = wxString::Format(_("%.2f")  , manualAngle);
+    ds.Append(degree);
     m_MeterVector[m_MeterVector.size()-1]->SetText(ds);
     
     double tmp_pos[3];
