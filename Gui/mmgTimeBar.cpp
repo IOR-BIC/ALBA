@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-14 12:59:00 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-04-21 14:23:00 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,6 +112,22 @@ m_Timer(NULL, ID_TIMER)
 mmgTimeBar::~mmgTimeBar()
 //----------------------------------------------------------------------------
 {
+}
+//----------------------------------------------------------------------------
+void mmgTimeBar::SetNumberOfIntervals(int intervals)
+//----------------------------------------------------------------------------
+{
+  m_NumberOfIntervals = intervals;
+  m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
+  if (m_Timer.IsRunning())
+  {
+    m_Timer.Stop();
+  }
+  if (m_TimeBarSettings->GetRealTimeMode() == 0)
+  {
+    m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
+    m_TimeStep *= m_TimeBarSettings->GetTimeMultiplier();
+  }
 }
 //----------------------------------------------------------------------------
 void mmgTimeBar::OnEvent(mafEventBase *maf_event)

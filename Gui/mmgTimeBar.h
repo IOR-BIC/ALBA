@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 08:55:11 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-04-21 14:23:00 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,9 @@ public:
 
   /** Set the reference to the time setting panel.*/
   void SetTimeSettings(mafGUISettingsTimeBar *settings);
+
+  /** Set the number of subdivisions for the slider.*/
+  void SetNumberOfIntervals(int intervals);
 
 protected:
   double m_Time; 
