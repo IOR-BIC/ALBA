@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-15 15:45:11 $
-Version:   $Revision: 1.17 $
+Date:      $Date: 2008-04-21 08:20:34 $
+Version:   $Revision: 1.18 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -360,7 +360,7 @@ void medGeometryEditorPolylineGraph::CreateGui()
 	m_Gui->Enable(ID_POINT_TOOL,m_Action==ID_POINT_ACTION);
 
   m_Gui->Label(_("Point Radius"));
-  m_Gui->Double(ID_SPHERE_RADIUS,_(""),&m_SphereRadius);
+  m_Gui->Double(ID_SPHERE_RADIUS,"",&m_SphereRadius);
   m_Gui->Enable(ID_SPHERE_RADIUS,m_Action==ID_POINT_ACTION);
 
 	m_Gui->Button(ID_BUTTON_POINT_DELETE,_("Delete"));
