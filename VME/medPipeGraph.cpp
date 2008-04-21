@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:25:39 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2008-04-21 08:28:33 $
+  Version:   $Revision: 1.29 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -447,7 +447,7 @@ mmgGui* medPipeGraph::CreateGui()
   if(m_Gui == NULL) 
     m_Gui = new mmgGui(this);
 
-  m_Gui->String(ID_ITEM_NAME,_("Name :"), &m_ItemName,_(""));
+  m_Gui->String(ID_ITEM_NAME,_("Name :"), &m_ItemName,"");
   m_Gui->Color(ID_SIGNALS_COLOR, _("Color"), &m_SignalColor, _("Set signal color"));
   m_Gui->Divider(1);
 
@@ -469,7 +469,7 @@ mmgGui* medPipeGraph::CreateGui()
   bool checked = FALSE;
 
   m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),150,_("Chose item to plot"));
-  m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
+  m_Gui->Button(ID_DRAW,_("Plot"), "",_("Draw selected items"));
   m_Gui->Divider();
 
   bool tagPresent = m_Vme->GetTagArray()->IsTagPresent("SIGNALS_NAME");

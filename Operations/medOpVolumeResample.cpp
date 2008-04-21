@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-16 08:45:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-21 08:27:01 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -657,7 +657,7 @@ void medOpVolumeResample::CreateGui()
 	wxString chooses_gizmo[3];
 	chooses_gizmo[0]="Translate Origin";
 	chooses_gizmo[1]="Rotate Volume";
-	m_Gui->Combo(ID_CHOOSE_GIZMO,_(""),&m_GizmoChoose,2,chooses_gizmo);
+	m_Gui->Combo(ID_CHOOSE_GIZMO,"",&m_GizmoChoose,2,chooses_gizmo);
   
 	m_Gui->Label("Bouding Box Origin");
 

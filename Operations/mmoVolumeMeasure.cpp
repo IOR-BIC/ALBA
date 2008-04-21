@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 11:28:47 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-21 08:27:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -182,12 +182,12 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
     break;
     case ID_STORE_MEASURE:
     {
-      m_MeasureText = wxGetTextFromUser(_(""),_("Insert measure description"), _(m_MeasureText));
+      m_MeasureText = wxGetTextFromUser("",_("Insert measure description"), _(m_MeasureText));
       if(m_MeasureText == "") break;
       mafString t;
         t = m_VolumeMeasure + _(" ") + m_SurfaceArea + " " + m_NormalizedShapeIndex + " " + m_MeasureText;
       m_MeasureList->Append(_(t));
-      m_MeasureText = _("");
+      m_MeasureText = "";
       m_Gui->Enable(ID_REMOVE_MEASURE,true);
       //m_gui->Enable(ID_ADD_TO_VME_TREE,true);
     }
