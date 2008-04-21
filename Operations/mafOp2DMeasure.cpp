@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-21 12:28:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,7 +126,7 @@ void mafOp2DMeasure::OpRun()
 	m_Gui->SetListener(this);
 
   m_Gui->Label(_("measure type"),true);
-  m_Gui->Combo(ID_MEASURE_TYPE,_(""),&m_MeasureType,5,measure);
+  m_Gui->Combo(ID_MEASURE_TYPE,"",&m_MeasureType,5,measure);
   //m_Gui->Bool(ID_PLOT_PROFILE,_("plot profile"),&m_GenerateHistogramFlag);
   m_Gui->Divider(2);
   
@@ -470,7 +470,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_STORE_MEASURE:
         {         
-          m_MeasureText = wxGetTextFromUser(_(""),_("Insert measure description"), _(m_MeasureText));
+          m_MeasureText = wxGetTextFromUser("",_("Insert measure description"), _(m_MeasureText));
           if(m_MeasureText == "") break;
           mafString t;
           if(m_MeasureType == 0 || m_MeasureType == 1)
@@ -483,7 +483,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           {
             //t = m_AcuteAngle + "° (" + m_ObtuseAngle + "°) " + m_MeasureText;
             t = m_AcuteAngle;
-            t += _("° (");
+            t += "° (";
             t += m_MeasureText;
           }
           m_MeasureList->Append(_(t));

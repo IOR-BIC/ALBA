@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpConnectivitySurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-21 12:28:45 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -115,7 +115,7 @@ void mafOpConnectivitySurface::OpRun()
 
 	  m_Gui->Label(_("Filter Output by Size"),true);
 	  m_Gui->Label(_("Size Thresh."));
-	  m_Gui->Double(ID_THRESOLD,_(""), &m_Thresold,0,MAXDOUBLE,-1,_("The operation will get rid of surfaces which are under this size"));
+	  m_Gui->Double(ID_THRESOLD,"", &m_Thresold,0,MAXDOUBLE,-1,_("The operation will get rid of surfaces which are under this size"));
 		m_Gui->Label("Input bounds dimensions:",true);
 	  mafString labelX;
 	  labelX.Append(wxString::Format(_("DimX:  %.2f"),(bounds[1]-bounds[0])));
@@ -154,7 +154,7 @@ void mafOpConnectivitySurface::OpRun()
       m_Alert= _("Warning: process time will be heavy");
     }
     else
-      m_Alert = _("");
+      m_Alert = "";
 
     m_Gui->Label(&m_Alert, true, true);
 	  m_Gui->Label("");
@@ -317,7 +317,7 @@ void mafOpConnectivitySurface::OnVtkConnect()
     m_Alert= _("Warning: process time will be heavy");
   }
   else
-    m_Alert = _("");
+    m_Alert = "";
 
   if(!m_TestMode)
   {
