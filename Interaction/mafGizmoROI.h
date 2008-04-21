@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 12:23:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-21 12:11:19 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -73,7 +73,7 @@ class mafVME;
 class mafGizmoROI: public mafGizmoInterface
 {
 public:
-	mafGizmoROI(mafVME *input, mafObserver* listener = NULL , int constraintModality=mafGizmoHandle::BOUNDS,mafVME* parent=NULL);
+	mafGizmoROI(mafVME *input, mafObserver* listener = NULL , int constraintModality=mafGizmoHandle::BOUNDS,mafVME* parent=NULL,bool showShadingPlane=false);
   virtual ~mafGizmoROI(); 
 
   /** Set input vme for the gizmo*/
@@ -111,6 +111,8 @@ public:
 
   /** Reset the gizmo*/
   void Reset();
+
+  void ShowShadingPlane(bool show);
 
 protected:
 

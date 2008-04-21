@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 12:23:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-21 12:11:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@
 using namespace std;
 
 //----------------------------------------------------------------------------
-mafGizmoROI::mafGizmoROI(mafVME* input, mafObserver *listener , int constraintModality, mafVME* parent)
+mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int constraintModality/* =mafGizmoHandle::BOUNDS */,mafVME* parent/* =NULL */,bool showShadingPlane/* =false */)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -59,7 +59,7 @@ mafGizmoROI::mafGizmoROI(mafVME* input, mafObserver *listener , int constraintMo
   {
     // Create mafGizmoHandle and send events to this
     m_GHandle[i] = NULL;
-    m_GHandle[i] = new mafGizmoHandle(input, this, constraintModality,parent);
+    m_GHandle[i] = new mafGizmoHandle(input, this, constraintModality,parent,showShadingPlane);
     m_GHandle[i]->SetType(i);
   }
   
@@ -360,7 +360,15 @@ void mafGizmoROI::UpdateHandlePositions()
   // since handles position has changed outline bounds must be recomputed
   UpdateOutlineBounds();
 }
-
+//----------------------------------------------------------------------------
+void mafGizmoROI::ShowShadingPlane(bool show)
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<6;i++)
+  {
+    m_GHandle[i]->ShowShadingPlane(show);
+  }
+}
 //----------------------------------------------------------------------------
 void mafGizmoROI::UpdateOutlineBounds()
 //----------------------------------------------------------------------------
@@ -387,7 +395,12 @@ void mafGizmoROI::UpdateOutlineBounds()
 	pos1_new[i]+=center[i];
 	b[m_ActiveGizmoComponent]=pos1_new[i];
 
-  m_OutlineGizmo->SetBounds(b);  
+  m_OutlineGizmo->SetBounds(b);
+
+  for (int i = 0;i<6;i++)
+  {
+    m_GHandle[i]->UpdateShadingPlaneDimension(b);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -433,6 +446,7 @@ void mafGizmoROI::SetBounds(double bounds[6])
   for (int i = 0; i < 6; i++)
   {
     m_GHandle[i]->SetBBCenters(newBounds);
+    m_GHandle[i]->UpdateShadingPlaneDimension(newBounds);
   }
 }
 
@@ -450,13 +464,21 @@ void mafGizmoROI::UpdateGizmosLength()
   dim.push_back(bounds[3] - bounds[2]);
   dim.push_back(bounds[5] - bounds[4]);
 
-  vector<double>::iterator result;
-  result = min_element(dim.begin(), dim.end());
+  vector<double>::iterator min;
+  min = min_element(dim.begin(), dim.end());
+  vector<double>::iterator max;
+  max = max_element(dim.begin(), dim.end());
 
-  double min_dim = *result;
+  std::sort(dim.begin(),dim.end());
+  double med_dim=dim[1];
+
+  double min_dim = dim[0];
   for (int i = 0; i <6; i++)
   {
-    m_GHandle[i]->SetLength(min_dim/12);
+    if(med_dim/12.<(3./4.*min_dim))
+      m_GHandle[i]->SetLength(med_dim/12.);
+    else
+      m_GHandle[i]->SetLength(3./4.*min_dim);
   }
 }
 

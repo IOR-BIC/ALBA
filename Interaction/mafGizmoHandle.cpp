@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-04 12:27:03 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-04-21 12:11:19 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,8 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkDOFMatrix.h"
+#include "vtkPlane.h"
+#include "vtkPlaneSource.h"
 
 #include <vector>
 #include <algorithm>
@@ -51,12 +53,14 @@
 using namespace std;
 
 //----------------------------------------------------------------------------
-mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener, int constraintModality,mafVME *parent)
+mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener /* = NULL */, int constraintModality/* =BOUNDS */,mafVME *parent/* =NULL */, bool showShadingPlane /* = true */)
 //----------------------------------------------------------------------------
 {
 	m_ConstraintModality = constraintModality;
   m_IsaComp = NULL;
   m_Cube = NULL;
+
+  m_ShowShadingPlane = showShadingPlane;
 
 	for(int i=0;i<6;i++)
 		for(int j=0;j<3;j++)
@@ -73,6 +77,9 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener, int constra
   //-----------------
   // create vme gizmos stuff
   //-----------------
+  // plane
+  m_ShadingPlaneGizmo = mafVMEGizmo::New();
+  m_ShadingPlaneGizmo->SetName("ShadingPlaneGizmo");
   // cone gizmo
   m_BoxGizmo = mafVMEGizmo::New();  
   m_BoxGizmo->SetName("BoxGizmo");
@@ -84,6 +91,18 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener, int constra
 	else
 		m_BoxGizmo->ReparentTo(m_InputVme);
 
+  m_ShadingPlaneGizmo->SetData(m_TranslateShadingPlanePolyDataFilterEnd->GetOutput());
+  if(parent)
+    m_ShadingPlaneGizmo->ReparentTo(parent);
+  else
+    m_ShadingPlaneGizmo->ReparentTo(m_InputVme);
+
+  mmaMaterial *material = m_ShadingPlaneGizmo->GetMaterial();
+  material->m_Prop->SetOpacity(0.5);
+  material->m_Opacity = material->m_Prop->GetOpacity();
+  material->m_Prop->SetColor(0.2,0.2,0.8);
+  material->m_Prop->GetDiffuseColor(material->m_Diffuse);
+
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0);
 
@@ -92,6 +111,8 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener, int constra
 
   // ask the manager to create the pipeline
   mafEventMacro(mafEvent(this,VME_SHOW,m_BoxGizmo,true));
+
+  mafEventMacro(mafEvent(this,VME_SHOW,m_ShadingPlaneGizmo,m_ShowShadingPlane));
   
   //-----------------
   // create isa stuff
@@ -144,10 +165,20 @@ mafGizmoHandle::~mafGizmoHandle()
   vtkDEL(m_RotateBoxPolyDataFilter);
   vtkDEL(m_TranslateBoxTrEnd);				//BES: 2.2.2008 - memory leaks bug fix
   vtkDEL(m_TranslateBoxPolyDataFilterEnd);	//BES: 2.2.2008 - memory leaks bug fix
+
+  vtkDEL(m_TranslateShadingPlaneTr);
+  vtkDEL(m_TranslateShadingPlanePolyDataFilter);
+  vtkDEL(m_RotateShadingPlaneTr);
+  vtkDEL(m_RotateShadingPlanePolyDataFilter);
+  vtkDEL(m_TranslateShadingPlaneTrEnd);
+  vtkDEL(m_TranslateShadingPlanePolyDataFilterEnd);
+
+  vtkDEL(m_PlaneSource);
 	
   mafDEL(m_IsaComp);	//m_IsaGen is released automatically
 
   mafEventMacro(mafEvent(this, VME_REMOVE, m_BoxGizmo)); //m_BoxGizmo is released
+  mafEventMacro(mafEvent(this, VME_REMOVE, m_ShadingPlaneGizmo)); //m_ShadingPlaneGizmo is released
 
   vtkDEL(m_Cube);
 }
@@ -201,6 +232,31 @@ void mafGizmoHandle::CreatePipeline()
 	m_TranslateBoxPolyDataFilterEnd->SetTransform(m_TranslateBoxTrEnd);
 
   SetLength(m_CubeSize);
+
+  // create the gizmo plane on the z = 0 plane
+  m_ShadingPlaneDimension[0]=dim[0];
+  m_ShadingPlaneDimension[1]=dim[1];
+  m_ShadingPlaneDimension[2]=dim[2];
+  vtkNEW(m_PlaneSource);
+  m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+  m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[1]/2, 0);
+  m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+  m_PlaneSource->Update();
+
+  m_TranslateShadingPlaneTr = vtkTransform::New();
+  m_TranslateShadingPlanePolyDataFilter = vtkTransformPolyDataFilter::New();
+  m_TranslateShadingPlanePolyDataFilter->SetInput(m_PlaneSource->GetOutput());
+  m_TranslateShadingPlanePolyDataFilter->SetTransform(m_TranslateShadingPlaneTr);
+
+  m_RotateShadingPlaneTr = vtkTransform::New();
+  m_RotateShadingPlanePolyDataFilter = vtkTransformPolyDataFilter::New();
+  m_RotateShadingPlanePolyDataFilter->SetInput(m_TranslateShadingPlanePolyDataFilter->GetOutput());
+  m_RotateShadingPlanePolyDataFilter->SetTransform(m_RotateShadingPlaneTr);
+
+  m_TranslateShadingPlaneTrEnd = vtkTransform::New();
+  m_TranslateShadingPlanePolyDataFilterEnd = vtkTransformPolyDataFilter::New();
+  m_TranslateShadingPlanePolyDataFilterEnd->SetInput(m_RotateShadingPlanePolyDataFilter->GetOutput());
+  m_TranslateShadingPlanePolyDataFilterEnd->SetTransform(m_TranslateShadingPlaneTrEnd);
 }
 
 //----------------------------------------------------------------------------
@@ -271,8 +327,22 @@ void mafGizmoHandle::Show(bool show)
   // use VTK opacity instead of VME_SHOW to speed up the render
   double opacity = show ? 1 : 0;
   m_BoxGizmo->GetMaterial()->m_Prop->SetOpacity(opacity);
+  if(m_ShowShadingPlane)
+  {
+    m_ShadingPlaneGizmo->GetMaterial()->m_Prop->SetOpacity(opacity*0.5);
+  }
 }
-
+//----------------------------------------------------------------------------
+void mafGizmoHandle::ShowShadingPlane(bool show)
+//----------------------------------------------------------------------------
+{
+  m_ShowShadingPlane = show;
+  if(m_ShowShadingPlane)
+  {
+    double opacity = show ? 1 : 0;
+    m_ShadingPlaneGizmo->GetMaterial()->m_Prop->SetOpacity(opacity*0.5);
+  }
+}
 //----------------------------------------------------------------------------
 void mafGizmoHandle::SetConstrainRefSys(mafMatrix *constrain)
 //----------------------------------------------------------------------------
@@ -299,6 +369,7 @@ void mafGizmoHandle::SetPose(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   m_BoxGizmo->SetMatrix(*pose);
+  m_ShadingPlaneGizmo->SetMatrix(*pose);
 }
 
 //----------------------------------------------------------------------------
@@ -315,7 +386,47 @@ void mafGizmoHandle::SetInput(mafVME *vme)
   this->m_InputVme = vme; 
   SetType(m_GizmoType); 
 }
+//----------------------------------------------------------------------------
+void mafGizmoHandle::UpdateShadingPlaneDimension(double b[6])
+//----------------------------------------------------------------------------
+{
+  m_ShadingPlaneDimension[0]=b[1]-b[0];
+  m_ShadingPlaneDimension[1]=b[3]-b[2];
+  m_ShadingPlaneDimension[2]=b[5]-b[4];
+  
+  switch(m_GizmoType) 
+  {
+  case XMIN:
+  case XMAX:
+    {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[2]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[2]/2, m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[2]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->Update();
+    }
+    break;
 
+  case YMIN:
+  case YMAX:
+    {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->Update();
+    }
+    break;
+
+  case ZMIN:
+  case ZMAX:
+    {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->Update();
+    }
+    break;
+  }
+}
 //----------------------------------------------------------------------------
 void mafGizmoHandle::SetBBCenters(double bounds[6])
 //----------------------------------------------------------------------------
@@ -427,6 +538,7 @@ void mafGizmoHandle::Update()
 {
   // reset the rotation transform
   m_RotateBoxTr->Identity();
+  m_RotateShadingPlaneTr->Identity();
   double rot[3] = {0,0,0};
   
 	mafMatrix *matIdentity;
@@ -439,6 +551,13 @@ void mafGizmoHandle::Update()
   {
     case XMIN:
     {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[2]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[2]/2, m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[2]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->Update();
+
+      m_RotateShadingPlaneTr->RotateY(90);
+
 			// place the gizmo
 			if(m_ConstraintModality==BOUNDS)
 			{
@@ -447,15 +566,26 @@ void mafGizmoHandle::Update()
 			}
 			else if(m_ConstraintModality==FREE)
 				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
-			
+
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[0]);
+
+      m_TranslateShadingPlaneTrEnd->Identity();
+      m_TranslateShadingPlaneTrEnd->Translate(m_BBCenters[0]);
+
       mafTransform::SetPosition(m_PivotMatrix, m_BBCenters[0]);
     }
     break;
     
     case XMAX:
     {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[2]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[2]/2, m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[2]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->Update();
+
+      m_RotateShadingPlaneTr->RotateY(90);
+
       m_RotateBoxTr->RotateZ(180);
 
 			if(m_ConstraintModality==BOUNDS)
@@ -468,12 +598,23 @@ void mafGizmoHandle::Update()
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[1]);
+
+      m_TranslateShadingPlaneTrEnd->Identity();
+      m_TranslateShadingPlaneTrEnd->Translate(m_BBCenters[1]);
+
       mafTransform::SetPosition(m_PivotMatrix, m_BBCenters[1]);
     }
     break;
     
     case YMIN:
     {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->Update();
+
+      m_RotateShadingPlaneTr->RotateX(90);
+
       m_RotateBoxTr->RotateZ(90);
 
 			if(m_ConstraintModality==BOUNDS)
@@ -486,12 +627,23 @@ void mafGizmoHandle::Update()
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[2]);
+
+      m_TranslateShadingPlaneTrEnd->Identity();
+      m_TranslateShadingPlaneTrEnd->Translate(m_BBCenters[2]);
+
       mafTransform::SetPosition(m_PivotMatrix, m_BBCenters[2]);
     }
     break;
     
     case YMAX:
     {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[2]/2, 0);
+      m_PlaneSource->Update();
+
+      m_RotateShadingPlaneTr->RotateX(90);
+
       m_RotateBoxTr->RotateZ(-90);
 
 			if(m_ConstraintModality==BOUNDS)
@@ -504,12 +656,23 @@ void mafGizmoHandle::Update()
 			
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[3]);
+
+      m_TranslateShadingPlaneTrEnd->Identity();
+      m_TranslateShadingPlaneTrEnd->Translate(m_BBCenters[3]);
+
       mafTransform::SetPosition(m_PivotMatrix, m_BBCenters[3]);
     }
     break;
     
     case ZMIN:
     {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->Update();
+
+      //m_RotateShadingPlaneTr->RotateZ(90);
+
       m_RotateBoxTr->RotateY(-90);
 
 			if(m_ConstraintModality==BOUNDS)
@@ -522,12 +685,21 @@ void mafGizmoHandle::Update()
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[4]);
+
+      m_TranslateShadingPlaneTrEnd->Identity();
+      m_TranslateShadingPlaneTrEnd->Translate(m_BBCenters[4]);
+
       mafTransform::SetPosition(m_PivotMatrix, m_BBCenters[4]);
     }
     break;
     
     case ZMAX:
     {
+      m_PlaneSource->SetPoint1(m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetPoint2(-m_ShadingPlaneDimension[0]/2, m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->SetOrigin(-m_ShadingPlaneDimension[0]/2,-m_ShadingPlaneDimension[1]/2, 0);
+      m_PlaneSource->Update();
+
       m_RotateBoxTr->RotateY(90);
 
 			if(m_ConstraintModality==BOUNDS)
@@ -540,6 +712,10 @@ void mafGizmoHandle::Update()
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[5]);
+
+      m_TranslateShadingPlaneTrEnd->Identity();
+      m_TranslateShadingPlaneTrEnd->Translate(m_BBCenters[5]);
+
       mafTransform::SetPosition(m_PivotMatrix, m_BBCenters[5]);
     }
     break;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:57:56 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-21 12:11:19 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,6 +33,8 @@ class vtkTransformPolyDataFilter;
 class vtkTransform;
 class mafVMEGizmo;
 class vtkMatrix4x4;
+class vtkPlane;
+class vtkPlaneSource;
 
 //----------------------------------------------------------------------------
 // constants :
@@ -82,7 +84,7 @@ class vtkMatrix4x4;
 class mafGizmoHandle: public mafObserver 
 {
 public:
-           mafGizmoHandle(mafVME *input, mafObserver *listener = NULL, int constraintModality=BOUNDS,mafVME *parent=NULL);
+           mafGizmoHandle(mafVME *input, mafObserver *listener = NULL, int constraintModality=BOUNDS,mafVME *parent=NULL, bool showShadingPlane = false);
   virtual ~mafGizmoHandle(); 
   
   /** Set the gizmo generating vme; the gizmo will be centered on this vme*/
@@ -151,6 +153,12 @@ public:
   /** Return the center of the handle*/
 	void GetHandleCenter(int type, double HandleCenter[3]);
 
+  /** Since handles position has changed shading plane bounds must be recomputed */
+  void UpdateShadingPlaneDimension(double b[6]);
+
+  void ShowShadingPlane(bool show);
+  bool GetShowShadingPlaneOn(){return m_ShowShadingPlane;};
+
 protected:
 
   mafVME *m_InputVme;///<Register input vme
@@ -158,18 +166,25 @@ protected:
   vtkCubeSource *m_Cube;///<Cube source
 
   mafVMEGizmo *m_BoxGizmo; 
+  mafVMEGizmo *m_ShadingPlaneGizmo;
 
   vtkTransformPolyDataFilter *m_TranslateBoxPolyDataFilter;///<translate PDF for box
+  vtkTransformPolyDataFilter *m_TranslateShadingPlanePolyDataFilter;///<translate PDF for box
 
   vtkTransform *m_TranslateBoxTr;///<translation transform for box
+  vtkTransform *m_TranslateShadingPlaneTr;///<translation transform for box
 
 	vtkTransformPolyDataFilter *m_TranslateBoxPolyDataFilterEnd;///<translate PDF for box
+  vtkTransformPolyDataFilter *m_TranslateShadingPlanePolyDataFilterEnd;///<translate PDF for box
 
 	vtkTransform *m_TranslateBoxTrEnd;///<translation transform for box
+  vtkTransform *m_TranslateShadingPlaneTrEnd;///<translation transform for box
 
   vtkTransformPolyDataFilter *m_RotateBoxPolyDataFilter;///<rotate PDF for box
+  vtkTransformPolyDataFilter *m_RotateShadingPlanePolyDataFilter;///<rotate PDF for box
 
   vtkTransform *m_RotateBoxTr;///<rotation transform for box
+  vtkTransform *m_RotateShadingPlaneTr;///<rotation transform for box
   
   /** Create vtk objects needed*/
   void CreatePipeline();
@@ -198,5 +213,12 @@ protected:
 	double m_CubeSize;
 
 	int m_ConstraintModality;
+
+  bool m_ShowShadingPlane;
+
+  vtkPlaneSource *m_PlaneSource;
+  vtkPlane *m_ShadingPlane;
+
+  double m_ShadingPlaneDimension[3];
 };
 #endif
