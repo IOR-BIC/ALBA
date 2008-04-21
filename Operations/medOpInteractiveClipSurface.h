@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-13 11:25:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-21 16:52:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani , Stefano Perticoni 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,6 +41,7 @@ class vtkPlane;
 class vtkPolyData;
 class vtkClipPolyData;
 class vtkGlyph3D;
+class vtkSphereSource;
 class vtkPlaneSource;
 class vtkArrowSource;
 class vtkAppendPolyData;
@@ -118,8 +119,9 @@ protected:
 	/** Create the GUI */
 	void CreateGui();
 
+  void GuiEnable();
 	/** Change Gizmo visualization */
-	void CreateGizmos();
+	void BuildTransformGizmos();
 
 	/** Change type of gizmo in the view */
 	void ChangeGizmo();
@@ -173,14 +175,15 @@ protected:
 	vtkPlaneSource	*m_PlaneSource;
 	vtkArrowSource	*m_ArrowSource;
 	vtkAppendPolyData	*m_AppendPolydata;
+  vtkSphereSource *m_SphereSource;
 
-	mafGizmoTranslate		*m_GizmoTranslate;
+  mafGizmoTranslate		*m_GizmoTranslate;
 	mafGizmoRotate			*m_GizmoRotate;
 	mafGizmoScale				*m_GizmoScale;
 
   medCurvilinearAbscissaOnSkeletonHelper *m_CASH;
   
-  mafVME *m_Constrain;
+  mafVME *m_ConstrainMedVMEPolylineGraph;
 
   int m_ActiveBranchId;
 

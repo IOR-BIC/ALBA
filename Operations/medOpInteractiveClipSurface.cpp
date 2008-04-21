@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-13 11:25:21 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-21 16:52:36 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani, Stefano Perticoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -57,6 +57,7 @@ bool DEBUG_MODE = true;
 #include "vtkGlyph3D.h"
 #include "vtkAppendPolyData.h"
 #include "vtkClipSurfaceBoundingBox.h"
+#include "vtkSphereSource.h"
 
 
 //----------------------------------------------------------------------------
@@ -98,6 +99,7 @@ mafOp(label)
 	m_PlaneSource	= NULL;
 	m_AppendPolydata				= NULL;
 	m_ArrowSource	= NULL;
+  m_SphereSource = NULL;
 
 	m_GizmoTranslate	= NULL;
 	m_GizmoRotate			= NULL;
@@ -106,7 +108,7 @@ mafOp(label)
   m_Canundo = NULL;
   
   m_CASH = NULL;
-  m_Constrain = NULL;
+  m_ConstrainMedVMEPolylineGraph = NULL;
   m_ActiveBranchId = NULL;
 
 }
@@ -128,6 +130,7 @@ medOpInteractiveClipSurface::~medOpInteractiveClipSurface()
 	vtkDEL(m_ClipperBoundingBox);
   vtkDEL(m_OldSurface);
   vtkDEL(m_Arrow);
+  vtkDEL(m_SphereSource);
 
   cppDEL(m_CASH);
 }
@@ -182,20 +185,23 @@ void medOpInteractiveClipSurface::OpRun()
 
 	if(!m_TestMode)
 	{
-		CreateGui();
-		ShowGui();
-	  
-		ShowClipPlane(m_ClipModality != medOpInteractiveClipSurface::MODE_SURFACE);
-		CreateGizmos();
+    ShowClipPlane(m_ClipModality != medOpInteractiveClipSurface::MODE_SURFACE);
+		BuildTransformGizmos();
+    
+    assert(m_CASH == NULL);
+    m_CASH = new medCurvilinearAbscissaOnSkeletonHelper(m_ImplicitPlaneVMEGizmo, this) ;
+
 		//Enable & show Gizmos
 		ChangeGizmo();
 
-    assert(m_CASH == NULL);
-    m_CASH = new medCurvilinearAbscissaOnSkeletonHelper(m_ImplicitPlaneVMEGizmo) ;
-	}
+    
+    CreateGui();
+    ShowGui();
+  
+  }
 }
 //----------------------------------------------------------------------------
-void medOpInteractiveClipSurface::CreateGizmos()
+void medOpInteractiveClipSurface::BuildTransformGizmos()
 //----------------------------------------------------------------------------
 {
 	m_ImplicitPlaneVMEGizmo->GetOutput()->GetVTKData()->ComputeBounds();
@@ -219,34 +225,37 @@ void medOpInteractiveClipSurface::CreateGui()
 	m_Gui = new mmgGui(this);
 	m_Gui->Divider();
 	wxString clip_by_choices[2] = {"surface","implicit function"};
+
 	m_Gui->Combo(ID_CLIP_BY,_("clip by"),&m_ClipModality,2,clip_by_choices);
-	m_Gui->Bool(ID_USE_GIZMO,_("use gizmo"),&m_UseGizmo,1);
+  m_Gui->Divider(2);
+
+  m_Gui->Bool(ID_USE_GIZMO,_("use gizmo"),&m_UseGizmo,1);
 	wxString gizmo_name[3] = {"translate","rotate","scale"};
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
-  m_Gui->Divider();
-  m_Gui->Button(ID_CHOOSE_CONSTRAINT_VME, "medVMEPolylineGraph constrain", "");
-  m_Gui->Divider();
+  
+  m_Gui->AddGui(m_GizmoTranslate->GetGui());
+  m_Gui->AddGui(m_GizmoRotate->GetGui());
+  // something strange has happened to the gizmo scale...
+  // commented for the moment
+  // m_Gui->AddGui(m_GizmoScale->GetGui());
 
+  m_Gui->Divider();
+  m_Gui->Divider(2);
+
+  m_Gui->Button(ID_CHOOSE_CONSTRAINT_VME, "choose curve", "", "medVMEPolylineGraph constrain");
+  m_Gui->Divider();
+  m_Gui->AddGui(m_CASH->GetGui());
+  m_CASH->EnableWidgets(false);
+  m_Gui->Divider();
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
 	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
-	
-	double b[6];
-	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
-	
-	m_PlaneWidth = b[1] - b[0];
-	m_PlaneHeight = b[3] - b[2];
 	
   m_Gui->Button(ID_CLIP,_("clip"));
 	m_Gui->Button(ID_UNDO,_("undo"));
   m_Gui->OkCancel();
 
-	m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
-	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
-	m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == medOpInteractiveClipSurface::MODE_SURFACE);
-  m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
+  GuiEnable();
 
-  m_Gui->Enable(wxOK,m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
-  
 	m_Gui->Divider();
 
 
@@ -261,6 +270,15 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		{
     case ID_CHOOSE_CONSTRAINT_VME:
       {
+        int result = wxMessageBox("the current position will be reset: continue?","Warning", wxOK|wxCANCEL);
+        if (result == wxOK)
+        {
+          // continue and change constraint...
+        } 
+        else
+        {
+          return;
+        }
         mafString s(_("Choose Constrain"));
         mafEvent e(this,VME_CHOOSE, &s, (long)&medOpInteractiveClipSurface::ConstrainAccept);
         mafEventMacro(e);
@@ -332,6 +350,7 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);    				
 				ChangeGizmo();
         m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
+        m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainMedVMEPolylineGraph ? true : false);
 
 			}
 			break;
@@ -782,6 +801,18 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       double ydim = b[3] - b[2];
       double zdim = b[5] - b[4];
 
+      if (DEBUG_MODE)
+        {
+          std::ostringstream stringStream;
+          stringStream << "xdim: " << xdim  << std::endl;
+          stringStream << "ydim: " << ydim  << std::endl;
+          stringStream << "zdim: " << zdim  << std::endl;
+          mafLogMessage(stringStream.str().c_str());
+        }
+
+      m_PlaneWidth = (b[1] - b[0]) / 4;
+      m_PlaneHeight = (b[3] - b[2]) /4;
+
       // create the gizmo plane on the z = 0 plane
       vtkNEW(m_PlaneSource);
       m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
@@ -797,11 +828,15 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       m_ArrowSource->SetShaftResolution(40);
       m_ArrowSource->SetTipResolution(40);
 
+      vtkNEW(m_SphereSource);
+      m_SphereSource->SetRadius(m_PlaneWidth / 10);
+
       vtkNEW(m_Arrow);
       m_Arrow->SetInput(m_PlaneSource->GetOutput());
       m_Arrow->SetSource(m_ArrowSource->GetOutput());
       m_Arrow->SetVectorModeToUseNormal();
-      
+   
+
       int clip_sign = ClipInside ? 1 : -1;
       m_Arrow->SetScaleFactor(clip_sign * abs(zdim/10.0));
       m_Arrow->Update();
@@ -809,6 +844,7 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       vtkNEW(m_AppendPolydata);
       m_AppendPolydata->AddInput(m_PlaneSource->GetOutput());
       m_AppendPolydata->AddInput(m_Arrow->GetOutput());
+      m_AppendPolydata->AddInput(m_SphereSource->GetOutput());
       m_AppendPolydata->Update();
 
       mafNEW(m_ImplicitPlaneVMEGizmo);
@@ -923,11 +959,21 @@ void medOpInteractiveClipSurface::SetImplicitPlanePosition(mafMatrix &matrix)
 
 void medOpInteractiveClipSurface::OnChooseConstrainVme( mafNode *vme )
 {
-  m_Constrain = mafVME::SafeDownCast(vme);
-  assert(m_Constrain);
+  m_ConstrainMedVMEPolylineGraph = mafVME::SafeDownCast(vme);
+  assert(m_ConstrainMedVMEPolylineGraph);
 
-  m_CASH->SetConstraintPolylineGraph(medVMEPolylineGraph::SafeDownCast(m_Constrain));
-  m_CASH->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
   
+  m_CASH->SetConstraintPolylineGraph(medVMEPolylineGraph::SafeDownCast(m_ConstrainMedVMEPolylineGraph));
+  m_CASH->SetCurvilinearAbscissa(m_ActiveBranchId, 0.0);
+  m_CASH->EnableWidgets(true)  ;
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+}
+
+void medOpInteractiveClipSurface::GuiEnable()
+{
+  m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
+  m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
+  m_Gui->Enable(ID_CHOOSE_SURFACE, m_ClipModality == medOpInteractiveClipSurface::MODE_SURFACE);
+  m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
+  m_Gui->Enable(wxOK,m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
 }
