@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:04:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-21 12:27:26 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -98,6 +98,8 @@ public:
   int IsIncrement(){return m_Increment;};
   double GetTopBottomVariation(){return m_TopBottomVariation;};
   double GetLeftRightVariation(){return m_LeftRightVariation;};
+
+  void SetStepVariable(double step){if(m_StepText) *m_StepVariable = step;m_StepText->SetValue(wxString::Format("%.2f", *m_StepVariable));}
 
 private:
 
