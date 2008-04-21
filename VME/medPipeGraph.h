@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-07 10:41:32 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-04-21 09:43:40 $
+  Version:   $Revision: 1.15 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,8 @@ class vtkRectilinearGrid;
 //----------------------------------------------------------------------------
 // medPipeGraph :
 //----------------------------------------------------------------------------
+/** 
+Visual pipe to visualize graphs of analog signals. */
 class medPipeGraph : public mafPipe
 {
 public:
@@ -47,6 +49,9 @@ public:
   //Change the name of the selected item in the legend box
   void ChangeItemName();
 
+  //Change the title of the axis
+  void ChangeAxisTitle();
+
   //Change signal color
   void ChangeSignalColor();
   
@@ -60,6 +65,8 @@ protected:
     ID_CHECK_BOX,
     ID_LEGEND,
     ID_ITEM_NAME,
+    ID_AXIS_NAME_X,
+    ID_AXIS_NAME_Y,
     ID_RANGE_X,
     ID_RANGE_Y,
     ID_FIT_PLOT,
@@ -94,8 +101,8 @@ private:
   int m_FitPlot;
 
   mafString   m_ItemName;
-  wxString		m_X_title;
-  wxString		m_Y_title;
+  wxString		m_TitileX;
+  wxString		m_TitileY;
 
   std::vector<vtkRectilinearGrid*> m_vtkData;
 

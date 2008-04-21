@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 08:28:33 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2008-04-21 09:43:40 $
+  Version:   $Revision: 1.30 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,8 +60,8 @@ medPipeGraph::medPipeGraph()
   m_Ylabel		= 50;
   m_NumberOfSignals = 0;
 
-  m_X_title		= "Time";
-  m_Y_title		= "Scalar";
+  m_TitileX		= "X";
+  m_TitileY		= "Y";
   m_ItemName  = "analog_";
   m_FitPlot = 1;
   m_Legend = 0;
@@ -153,8 +153,6 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_PlotActor->SetAxisTitleTextProperty(tProp);
   m_PlotActor->SetAxisLabelTextProperty(tProp);
   m_PlotActor->SetTitleTextProperty(tProp);	
-  m_PlotActor->SetXTitle(m_X_title);
-  m_PlotActor->SetYTitle(m_Y_title);
 
   m_LegendBox_Actor = m_PlotActor->GetLegendBoxActor();
   m_PlotActor->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
@@ -195,6 +193,30 @@ void medPipeGraph::Create(mafSceneNode *n)
       tag_Signals->SetValue(m_ColorRGB[2], id+2);
     }
   }
+
+  tagPresent = false;
+  tagPresent = m_Vme->GetTagArray()->IsTagPresent("AXIS_TITLE");
+  if (!tagPresent)
+  {
+    mafTagItem tag_Sig;
+    tag_Sig.SetName("AXIS_TITLE");
+    tag_Sig.SetNumberOfComponents(2);
+    m_Vme->GetTagArray()->SetTag(tag_Sig);
+  }
+
+  mafTagItem *tagAxisTile = m_Vme->GetTagArray()->GetTag("AXIS_TITLE");
+  if (tagPresent) //Retrieve axis title from tag
+  {
+    m_TitileX = tagAxisTile->GetValue(0);
+    m_TitileY = tagAxisTile->GetValue(1);
+  }
+  else //set default axis title
+  {
+    tagAxisTile->SetValue(m_TitileX,0);
+    tagAxisTile->SetValue(m_TitileY,1);
+  }
+  m_PlotActor->SetXTitle(m_TitileX);
+  m_PlotActor->SetYTitle(m_TitileY);
 
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);  
@@ -427,6 +449,15 @@ void medPipeGraph::ChangeItemName()
 }
 
 //----------------------------------------------------------------------------
+void medPipeGraph::ChangeAxisTitle()
+//----------------------------------------------------------------------------
+{
+  mafTagItem *t = m_Vme->GetTagArray()->GetTag("AXIS_TITLE");
+  t->SetValue(m_TitileX, 0);
+  t->SetValue(m_TitileY, 1);
+}
+
+//----------------------------------------------------------------------------
 void medPipeGraph::ChangeSignalColor()
 //----------------------------------------------------------------------------
 {
@@ -447,8 +478,12 @@ mmgGui* medPipeGraph::CreateGui()
   if(m_Gui == NULL) 
     m_Gui = new mmgGui(this);
 
-  m_Gui->String(ID_ITEM_NAME,_("Name :"), &m_ItemName,"");
+  m_Gui->String(ID_ITEM_NAME,_("Name :"), &m_ItemName,_(""));
   m_Gui->Color(ID_SIGNALS_COLOR, _("Color"), &m_SignalColor, _("Set signal color"));
+  m_Gui->Divider(1);
+
+  m_Gui->String(ID_AXIS_NAME_X,_("X Title"), &m_TitileX,_("Set X axis name"));
+  m_Gui->String(ID_AXIS_NAME_Y,_("Y Title"), &m_TitileY,_("Set Y axis name"));
   m_Gui->Divider(1);
 
   m_Gui->VectorN(ID_RANGE_X, _("Range X"), m_TimesManualRange, 2, 0, m_TimeStampMax);
@@ -469,7 +504,7 @@ mmgGui* medPipeGraph::CreateGui()
   bool checked = FALSE;
 
   m_CheckBox = m_Gui->CheckList(ID_CHECK_BOX,_("Item"),150,_("Chose item to plot"));
-  m_Gui->Button(ID_DRAW,_("Plot"), "",_("Draw selected items"));
+  m_Gui->Button(ID_DRAW,_("Plot"), _(""),_("Draw selected items"));
   m_Gui->Divider();
 
   bool tagPresent = m_Vme->GetTagArray()->IsTagPresent("SIGNALS_NAME");
@@ -527,12 +562,14 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
       }
       break;
     case ID_SIGNALS_COLOR:
-      m_ColorRGB[0] = m_SignalColor.Red()/255.0;
-      m_ColorRGB[1] = m_SignalColor.Green()/255.0;
-      m_ColorRGB[2] = m_SignalColor.Blue()/255.0;
-      ChangeSignalColor();
-      m_PlotActor->RemoveAllInputs();
-      UpdateGraph();
+      {
+        m_ColorRGB[0] = m_SignalColor.Red()/255.0;
+        m_ColorRGB[1] = m_SignalColor.Green()/255.0;
+        m_ColorRGB[2] = m_SignalColor.Blue()/255.0;
+        ChangeSignalColor();
+        m_PlotActor->RemoveAllInputs();
+        UpdateGraph();
+      }
       break;
     case ID_DRAW:
       {
@@ -558,14 +595,26 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
       }
       break;
     case ID_ITEM_NAME:
-       ChangeItemName();
-       CreateLegend();
+      {
+        ChangeItemName();
+        CreateLegend();
+      }
+      break;
+    case ID_AXIS_NAME_X:
+        m_PlotActor->SetXTitle(m_TitileX);
+        ChangeAxisTitle();
+      break;
+    case ID_AXIS_NAME_Y:
+        m_PlotActor->SetYTitle(m_TitileY);
+        ChangeAxisTitle();
       break;
     case ID_CHECK_BOX:
-         m_ItemId = e->GetArg();
-         m_ItemName = m_CheckBox->GetItemLabel(m_ItemId);
-         m_Gui->Update();
-        break;
+      {
+        m_ItemId = e->GetArg();
+        m_ItemName = m_CheckBox->GetItemLabel(m_ItemId);
+        m_Gui->Update();
+      }
+      break;
     default:
      mafEventMacro(*e);
     }  
