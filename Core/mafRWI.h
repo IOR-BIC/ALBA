@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:19:31 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-04-21 12:27:10 $
+  Version:   $Revision: 1.19 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -69,7 +69,7 @@ public:
 	void CameraUpdate();
 
 	/** Set the camera position. */
-	void CameraSet(int cam_position);
+	void CameraSet(int cam_position, double zoom = 1);
 
 	/** Set the render window's size. */
 	void SetSize(int x, int y, int w,int h);

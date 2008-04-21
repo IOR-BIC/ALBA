@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:19:31 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2008-04-21 12:27:10 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -256,7 +256,7 @@ mafRWI::~mafRWI()
   vtkDEL(m_RwiBase);  //The renderer has to be Deleted as last
 }
 //-----------------------------------------------------------------------------------------
-void mafRWI::CameraSet(int cam_position)
+void mafRWI::CameraSet(int cam_position, double zoom)
 //-----------------------------------------------------------------------------------------
 {
   int x,y,z,vx,vy,vz;
@@ -376,7 +376,7 @@ void mafRWI::CameraSet(int cam_position)
   m_Camera->SetViewUp(vx,vy,vz);
   m_Camera->SetClippingRange(0.1,1000);
 
-  CameraReset();
+  CameraReset((mafNode*)NULL, zoom);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetSize(int x, int y, int w,int h)
