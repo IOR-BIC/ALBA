@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-10 08:56:33 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-04-21 09:06:43 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,7 +50,6 @@ MafMedical is partially based on OpenMAF.
 #include "mafNode.h"
 
 #include "mmgDialog.h"
-#include "mmgGui.h"
 #include "mmgButton.h"
 #include "mmdMouse.h"
 #include "mmgValidator.h"
@@ -69,10 +68,11 @@ MafMedical is partially based on OpenMAF.
 #include "vtkGlyph3D.h"
 #include "vtkProperty.h"
 #include "vtkTextureMapToPlane.h"
-#include "vtkLinearExtrusionFilter.h"
 #include "vtkCleanPolyData.h"
 #include "vtkTriangleFilter.h"
 #include "vtkMEDExtrudeToCircle.h"
+#include "vtkMath.h"
+#include "vtkCell.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmoExtrusionHoles);
@@ -104,7 +104,7 @@ mafOp(label)
 	m_OriginalPolydata	= NULL;
 	m_ResultPolydata		= NULL;
 
-	m_ExtrusionFactor		= 0.0;
+	m_ExtrusionFactor		= 2.5;
 
 	m_MaxBounds = VTK_DOUBLE_MAX;
 }
@@ -313,7 +313,22 @@ void mmoExtrusionHoles::Extrude()
 	/*m_ExtrusionFilter->SetExtrusionTypeToVectorExtrusion();
 	m_ExtrusionFilter->SetVector(normal);
 	m_ExtrusionFilter->SetScaleFactor(m_ExtrusionFactor);*/
-  m_ExtrusionFilter->SetLength(m_ExtrusionFactor);
+
+  double lenght=0.0;
+  for(int i = 0;i<m_ExtractHole->GetOutput()->GetNumberOfCells();i++)
+  {
+    vtkPoints *pts=m_ExtractHole->GetOutput()->GetCell(i)->GetPoints();
+    for (int iPts=0;iPts<pts->GetNumberOfPoints()-1;iPts++)
+    {
+      double pt1[3],pt2[3];
+      pts->GetPoint(iPts,pt1);
+      pts->GetPoint(iPts+1,pt2);
+      lenght+=vtkMath::Distance2BetweenPoints(pt1,pt2);
+    }
+  }
+
+  double diameter = lenght/vtkMath::Pi();
+  m_ExtrusionFilter->SetLength(m_ExtrusionFactor*diameter);
   m_ExtrusionFilter->SetDirection(normal) ;
 	m_ExtrusionFilter->SetInput(m_ExtractHole->GetOutput());
   m_ExtrusionFilter->GetOutput()->Update() ;
@@ -441,7 +456,7 @@ void mmoExtrusionHoles::CreateOpDialog()
 	wxStaticText *label1 = new wxStaticText(m_Dialog, -1, _("sphere radius"),p, wxSize(80, 16 ));
 	wxTextCtrl *radius		= new wxTextCtrl(m_Dialog,ID_RADIUS, _("sphere radius"),p,wxSize(50, 16 ), wxNO_BORDER );
 	
-	wxStaticText *label2 = new wxStaticText(m_Dialog, -1, _("extrusion factor"),p, wxSize(80, 16 ));
+	wxStaticText *label2 = new wxStaticText(m_Dialog, -1, _("extrusion factor (diameters)"),p, wxSize(80, 16 ));
 	wxTextCtrl *extrusion = new wxTextCtrl(m_Dialog,ID_EXTRUSION_FACTOR, _("extrusion factor"),p,wxSize(50, 16 ), wxNO_BORDER );
 	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(90,20));
 

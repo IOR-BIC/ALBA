@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2008-04-09 12:51:21 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-21 09:06:43 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,7 +60,6 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkSphereSource;
 class vtkGlyph3D;
-class vtkLinearExtrusionFilter;
 class vtkAppendPolyData;
 class vtkPlaneSource;
 class vtkMEDExtrudeToCircle;
@@ -86,16 +85,16 @@ public:
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	/*virtual*/ bool Accept(mafNode *node);
 
 	/** Builds operation's interface. */
-	void OpRun();
+	/*virtual*/ void OpRun();
 
 	/** Execute the operation. */
-	void OpDo();
+	/*virtual*/ void OpDo();
 
 	/** Makes the undo for the operation. */
-	void OpUndo();
+	/*virtual*/ void OpUndo();
 
 	/** Highlight the hole selected with red color */
 	void SelectHole(int pointID);
@@ -117,7 +116,7 @@ public:
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
+	/*virtual*/ void OpStop(int result);
 
 	void CreateOpDialog();
 	void DeleteOpDialog();
