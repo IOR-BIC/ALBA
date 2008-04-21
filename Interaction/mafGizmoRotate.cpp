@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-03-17 11:17:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-21 12:27:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -382,5 +382,16 @@ void mafGizmoRotate::SetRefSys(mafVME *refSys)
     {
       GuiGizmoRotate->EnableWidgets(false);
     }
+  }
+}
+//----------------------------------------------------------------------------
+void mafGizmoRotate::SetCircleFanRadius(double radius)
+//----------------------------------------------------------------------------
+{
+  short circleNumber;
+  for(circleNumber = 0; circleNumber < 3; circleNumber++)
+  {
+    if(GRCircle[circleNumber]) GRCircle[circleNumber]->SetRadius(radius);
+    if(GRFan[circleNumber]) GRFan[circleNumber]->SetRadius(radius);
   }
 }
