@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOp2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 08:26:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-21 12:37:53 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -202,12 +202,12 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
 						if(m_2DDistanceInteractor->SizeMeasureVector() != 0)
 							m_DistanceMeasure = mafString(wxString::Format(_("%.2f") ,RoundValue(m_2DDistanceInteractor->GetLastDistance())));
 						else
-							m_DistanceMeasure = mafString(L"0");
+							m_DistanceMeasure = mafString(_("0"));
 
 
 						if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
 						{           
-							wxMessageBox(L"Fix the label in the window");
+							wxMessageBox(_("Fix the label in the window"));
 							m_MeasureType = 0;
 							m_Gui->Update();
 						}
@@ -229,11 +229,11 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
 						if(m_2DAngleInteractor->SizeMeasureVector() != 0)
 							m_AcuteAngle = mafString(wxString::Format(_("%.2f") ,RoundValue(m_2DAngleInteractor->GetLastAngle())));
 						else
-							m_AcuteAngle = mafString(L"0");
+							m_AcuteAngle = mafString(_("0"));
 
 						if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
 						{           
-							wxMessageBox(L"Fix the label in the window");
+							wxMessageBox(_("Fix the label in the window"));
 							m_MeasureType = 0;
 							m_Gui->Update();
 						}
@@ -257,7 +257,7 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
           }
           else
           {
-            wxMessageBox(L"Measure Not Yet Implemented");
+            wxMessageBox(_("Measure Not Yet Implemented"));
           }
         break;
         case ID_PLOT_PROFILE:
@@ -265,7 +265,7 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_UNDO_MEASURE:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox(_("Fix the label in the window"));
           else
           {
 						if(m_InteractorType[m_InteractorType.size()-1] == ID_DISTANCE_TYPE)
@@ -425,7 +425,7 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case ID_MANUAL_DISTANCE:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox(_("Fix the label in the window"));
           else if(wxString(m_ManualDistance).ToDouble(m_Unused) != false)
           {
 						if(atof(m_ManualDistance) > 0)
@@ -437,13 +437,13 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
           }
 					else
 					{
-						//wxMessageBox(L"label");
+						//wxMessageBox(_("label"));
 						m_2DDistanceInteractor->SetLabel(m_ManualDistance);
 					}
         break;
         case ID_MANUAL_ANGLE:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox(_("Fix the label in the window"));
           else if(wxString(m_ManualAngle).ToDouble(m_Unused) != false)
 					{
 						if(atof(m_ManualAngle) >= 0 && atof(m_ManualAngle) <= 180)
@@ -455,13 +455,13 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
 					}
 					else
 					{
-						//wxMessageBox(L"label");
+						//wxMessageBox(_("label"));
 						m_2DAngleInteractor->SetLabel(m_ManualAngle);
 					}
         break;
         case ID_MANUAL_INDICATOR:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox(_("Fix the label in the window"));
           else
           {
             m_2DIndicatorInteractor->SetLabel(m_ManualIndicator);
@@ -505,7 +505,7 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
         case wxOK:
         case wxCANCEL:
           if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
-            wxMessageBox(L"Fix the label in the window");
+            wxMessageBox(_("Fix the label in the window"));
           else
             OpStop(OP_RUN_CANCEL);
         break;
@@ -560,7 +560,7 @@ void medOp2DMeasure::OnEvent(mafEventBase *maf_event)
           if(m_2DIndicatorInteractor->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_INDICATOR_TYPE);
-            m_ManualIndicator = L"Label";
+            m_ManualIndicator = _("Label");
 					}
           
           m_Gui->Update();
