@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-22 10:15:34 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-04-22 10:27:47 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -456,7 +456,7 @@ void mmoExtrusionHoles::CreateOpDialog()
 	wxStaticText *label1 = new wxStaticText(m_Dialog, -1, _("sphere radius"),p, wxSize(80, 16 ));
 	wxTextCtrl *radius		= new wxTextCtrl(m_Dialog,ID_RADIUS, _("sphere radius"),p,wxSize(50, 16 ), wxNO_BORDER );
 	
-	wxStaticText *label2 = new wxStaticText(m_Dialog, -1, _("extrusion factor (diameters)"),p, wxSize(80, 16 ));
+	wxStaticText *label2 = new wxStaticText(m_Dialog, -1, _("extrusion factor (diameters)"),p, wxSize(150, 16 ));
 	wxTextCtrl *extrusion = new wxTextCtrl(m_Dialog,ID_EXTRUSION_FACTOR, _("extrusion factor"),p,wxSize(50, 16 ), wxNO_BORDER );
 	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(90,20));
 
