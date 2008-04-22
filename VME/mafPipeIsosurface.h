@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2008-02-04 13:53:47 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-04-22 11:30:49 $
+Version:   $Revision: 1.13 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,6 +65,8 @@ public:
   void  EnableBoundingBoxVisibility(bool enable = true);
 
 	void ExctractIsosurface();
+
+  void UpdateFromData();
 
 	/** IDs for the GUI */
 	enum PIPE_ISOSURFACE_WIDGET_ID

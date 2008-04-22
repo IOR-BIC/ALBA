@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-25 09:11:56 $
-Version:   $Revision: 1.20 $
+Date:      $Date: 2008-04-22 11:30:49 $
+Version:   $Revision: 1.21 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
+#include "mafEventSource.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
@@ -72,6 +73,8 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
 	Superclass::Create(n);
 
 	assert(m_Vme->GetOutput()->IsA("mafVMEOutputVolume"));
+
+  m_Vme->GetEventSource()->AddObserver(this);
 
 	vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
 	dataset->Update();
@@ -123,6 +126,8 @@ void mafPipeIsosurface::Create(mafSceneNode *n)
 mafPipeIsosurface::~mafPipeIsosurface()
 //----------------------------------------------------------------------------
 {
+  m_Vme->GetEventSource()->RemoveObserver(this);
+
 	m_AssemblyFront->RemovePart(m_Volume);
 	
   if(m_BoundingBoxVisibility)
@@ -211,6 +216,23 @@ void mafPipeIsosurface::OnEvent(mafEventBase *maf_event)
 			break;
 		}
 	}
+  if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+  {
+    UpdateFromData();
+  }
+}
+//----------------------------------------------------------------------------
+void mafPipeIsosurface::UpdateFromData()
+//----------------------------------------------------------------------------
+{
+  vtkDataSet *dataset = m_Vme->GetOutput()->GetVTKData();
+  if(dataset)
+  {
+    dataset->Update();
+
+    m_ContourMapper->SetInput(dataset);
+    m_ContourMapper->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void mafPipeIsosurface::ExctractIsosurface()
