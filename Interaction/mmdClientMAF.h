@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmdClientMAF.h,v $
 Language:  C++
-Date:      $Date: 2006-06-03 11:02:29 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-22 16:58:11 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class ClientUnit;
+
 
 /** Device implementing interface for PLASTIC hub.
   mmdClientMAF is a class providing interface for MAFServer (socket communication).
