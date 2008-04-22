@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-21 09:06:43 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-04-22 10:15:34 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -323,7 +323,7 @@ void mmoExtrusionHoles::Extrude()
       double pt1[3],pt2[3];
       pts->GetPoint(iPts,pt1);
       pts->GetPoint(iPts+1,pt2);
-      lenght+=vtkMath::Distance2BetweenPoints(pt1,pt2);
+      lenght+=sqrt(vtkMath::Distance2BetweenPoints(pt1,pt2));
     }
   }
 
