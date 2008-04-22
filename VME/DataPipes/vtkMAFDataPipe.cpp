@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-22 16:58:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,11 +21,11 @@
 
 
 #include "mafDecl.h"
+#include "vtkMAFDataPipe.h"
 #include "mafEventBase.h"
 
 #include "mafVTKInterpolator.h"
 
-#include "vtkMAFDataPipe.h"
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkErrorCode.h"
