@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 13:22:07 $
-  Version:   $Revision: 1.54 $
+  Date:      $Date: 2008-04-22 12:03:32 $
+  Version:   $Revision: 1.55 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -830,6 +830,12 @@ void mafNode::SetLink(const char *name, mafNode *node, mafID sub_id)
 {
   assert(name);
   assert(node);
+
+  if (node == NULL)
+  {
+    mafLogMessage(_("Warning!! NULL node can not be set as link."));
+    return;
+  }
 
   mmuNodeLink newlink;
   if (node->GetRoot() == GetRoot())
