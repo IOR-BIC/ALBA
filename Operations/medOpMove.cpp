@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-22 10:33:36 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -104,7 +104,8 @@ bool medOpMove::Accept(mafNode* vme)
 {
 	/*mafEvent e(this,VIEW_SELECTED);
 	mafEventMacro(e);*/
-	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") && !vme->IsA("mafVMEExternalData") /*&& e.GetBool()*/);
+	return (vme!=NULL && vme->IsMAFType(mafVME) && !vme->IsA("mafVMERoot") 
+    && !vme->IsA("mafVMEExternalData") && !vme->IsA("mafVMERefSys") /*&& e.GetBool()*/);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpMove::Copy()   
