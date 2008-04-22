@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-22 15:26:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-22 14:16:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class medOpVolumeResample: public mafOp
 {
 public:
              
-            	 medOpVolumeResample(const wxString &label = "VolumeResample");
+            	 medOpVolumeResample(const wxString &label = "VolumeResample",bool showShadingPlane = false);
 	virtual     ~medOpVolumeResample();
 	virtual void OnEvent(mafEventBase *maf_event);
 	
@@ -123,5 +123,7 @@ protected:
 	double	m_MaxBoundZ;
 
   bool    m_ViewSelectedMessage;
+  bool  m_ShowShadingPlane;
+  
 };
 #endif

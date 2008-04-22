@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 08:27:01 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-22 14:16:13 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -64,11 +64,13 @@ mafCxxTypeMacro(medOpVolumeResample);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medOpVolumeResample::medOpVolumeResample(const wxString &label) : mafOp(label)
+medOpVolumeResample::medOpVolumeResample(const wxString &label /* =  */,bool showShadingPlane /* = false */) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_OP;
   m_Canundo	= true;
+
+  m_ShowShadingPlane = showShadingPlane;
 
   m_ResampledVme = NULL;
 
@@ -103,11 +105,14 @@ medOpVolumeResample::medOpVolumeResample(const wxString &label) : mafOp(label)
 	m_MaxBoundX = 0.0;
 	m_MaxBoundY = 0.0;
 	m_MaxBoundZ = 0.0;
+
+  m_CenterVolumeRefSysMatrix = NULL;
 }
 //----------------------------------------------------------------------------
 medOpVolumeResample::~medOpVolumeResample()
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_CenterVolumeRefSysMatrix);
 	mafDEL(m_ResampledVme);
 }
 //----------------------------------------------------------------------------
@@ -163,7 +168,8 @@ void medOpVolumeResample::CreateGizmos()
   mafEventMacro(e);
   m_ViewSelectedMessage = e.GetBool();
 
-	m_GizmoROI = new mafGizmoROI(mafVME::SafeDownCast(m_Input), this, mafGizmoHandle::FREE,m_VMEDummy);
+	m_GizmoROI = new mafGizmoROI(mafVME::SafeDownCast(m_Input), this, mafGizmoHandle::FREE,m_VMEDummy,m_ShowShadingPlane);
+  m_GizmoROI->ShowShadingPlane(true);
 	m_GizmoROI->Show(true && m_ViewSelectedMessage);
 	
   if(m_ViewSelectedMessage)
@@ -336,7 +342,7 @@ void medOpVolumeResample::GizmoDelete()
 mafOp *medOpVolumeResample::Copy()
 //----------------------------------------------------------------------------
 {
-	return new medOpVolumeResample(m_Label);
+	return new medOpVolumeResample(m_Label,m_ShowShadingPlane);
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::InizializeVMEDummy()   
