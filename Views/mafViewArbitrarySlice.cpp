@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 09:26:07 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2008-04-22 13:15:05 $
+  Version:   $Revision: 1.32 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -218,11 +218,15 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
-			m_Slicer->Update();
+      //m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
+      //vtkDEL(m_ColorLUT);
+      m_Slicer->GetMaterial()->SetColorLut(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
+		  m_Slicer->GetMaterial()->UpdateFromLut();
+      m_Slicer->GetMaterial()->UpdateProp();
+      m_Slicer->Update();
 
-      
-			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
-			m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
+			
+      m_ColorLUT = m_Slicer->GetMaterial()->GetColorLut();
       m_ColorLUT->SetTableRange(sr[0], sr[1]);
       m_LutWidget->SetLut(m_ColorLUT);
       m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
@@ -375,6 +379,12 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 		{
 			//this->GetSceneGraph()->VmeRemove(m_Slicer);
 			m_AttachCamera->SetVme(NULL);
+      m_AttachCamera->DisableAttachCamera();
+
+      //Show Slicer
+      m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, false);
+      m_ChildViewList[SLICE_VIEW]->VmeShow(m_Slicer, false);
+
       m_Slicer->SetBehavior(NULL);
 			m_Slicer->ReparentTo(NULL);
 
@@ -384,9 +394,11 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_GizmoTranslate->Show(false);
 			m_GizmoRotate->Show(false);
 			
+      //m_Slicer->GetMaterial()->m_ColorLut = NULL;
+      cppDEL(m_AttachCamera);
+      cppDEL(m_GizmoTranslate);
+      cppDEL(m_GizmoRotate);
 			mafDEL(m_Slicer);
-			cppDEL(m_GizmoTranslate);
-			cppDEL(m_GizmoRotate);
 			cppDEL(m_GuiGizmos);
 			mafDEL(m_MatrixReset);
 
@@ -696,6 +708,8 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
         double *sr;
         sr = m_ColorLUT->GetRange();
         m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+        if(m_Slicer)
+          m_Slicer->GetMaterial()->UpdateFromLut();
       }
 			break;
 		case ID_RESET:
@@ -826,12 +840,34 @@ void mafViewArbitrarySlice::VmeRemove(mafNode *node)
 {
   if (m_CurrentVolume && node == m_CurrentVolume) 
   {
-		m_AttachCamera->SetVme(NULL);
-    m_CurrentVolume = NULL;
+    //this->GetSceneGraph()->VmeRemove(m_Slicer);
+    m_AttachCamera->SetVme(NULL);
+    m_AttachCamera->DisableAttachCamera();
+
+    //Show Slicer
+    m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, false);
+    m_ChildViewList[SLICE_VIEW]->VmeShow(m_Slicer, false);
+
+    m_Slicer->SetBehavior(NULL);
+    m_Slicer->ReparentTo(NULL);
+
+    //remove gizmos
+    m_Gui->Remove(m_GuiGizmos);
+    m_Gui->Update();
     m_GizmoTranslate->Show(false);
-		cppDEL(m_GizmoTranslate);
-		m_GizmoRotate->Show(false);
-		cppDEL(m_GizmoRotate);
+    m_GizmoRotate->Show(false);
+
+    //m_Slicer->GetMaterial()->m_ColorLut = NULL;
+    cppDEL(m_AttachCamera);
+    cppDEL(m_GizmoTranslate);
+    cppDEL(m_GizmoRotate);
+    mafDEL(m_Slicer);
+    cppDEL(m_GuiGizmos);
+    mafDEL(m_MatrixReset);
+
+    m_CurrentVolume = NULL;
+    m_ColorLUT = NULL;
+    m_LutWidget->SetLut(m_ColorLUT);
   }
 
   Superclass::VmeRemove(node);
@@ -876,8 +912,8 @@ void mafViewArbitrarySlice::CameraUpdate()
   }
   for(int i=0; i<m_NumOfChildView; i++)
 	{
-		if(i == SLICE_VIEW && m_CurrentVolume)
-			(m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentVolume);
+		/*if(i == SLICE_VIEW && m_CurrentVolume)
+			(m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentVolume);*/
 
     m_ChildViewList[i]->CameraUpdate();
 	}
