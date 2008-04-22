@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-22 10:27:47 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-04-22 10:49:30 $
+Version:   $Revision: 1.13 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -256,26 +256,34 @@ void mmoExtrusionHoles::OnEvent(mafEventBase *maf_event)
 void mmoExtrusionHoles::SaveExtrusion()
 //----------------------------------------------------------------------------
 {
-	vtkCleanPolyData  *clean;
-	vtkNEW(clean);
-	clean->SetInput(m_ResultAfterExtrusion->GetOutput());
-	clean->Update();
-	vtkMAFSmartPointer<vtkTriangleFilter> triangle;
-	triangle->SetInput(clean->GetOutput());
-	triangle->Update();
-	m_ResultPolydata->DeepCopy(triangle->GetOutput());
-	m_ResultPolydata->Update();
-	if(!m_TestMode)
-	{
-		m_SurfaceMapper->SetInput(m_ResultPolydata);
-		m_SurfaceMapper->Update();
-	}
-	if(!m_TestMode)
-	{
-		m_Rwi->m_RenFront->RemoveActor(m_SelectedHoleActor);
-		m_Rwi->CameraUpdate();
-	}
-	vtkDEL(clean);
+  if(m_ResultAfterExtrusion->GetOutput()->GetNumberOfPoints()>0)
+  {
+	  vtkCleanPolyData  *clean;
+	  vtkNEW(clean);
+	  clean->SetInput(m_ResultAfterExtrusion->GetOutput());
+	  clean->Update();
+	  vtkMAFSmartPointer<vtkTriangleFilter> triangle;
+	  triangle->SetInput(clean->GetOutput());
+	  triangle->Update();
+	  m_ResultPolydata->DeepCopy(triangle->GetOutput());
+	  m_ResultPolydata->Update();
+	  if(!m_TestMode)
+	  {
+		  m_SurfaceMapper->SetInput(m_ResultPolydata);
+		  m_SurfaceMapper->Update();
+	  }
+	  if(!m_TestMode)
+	  {
+		  m_Rwi->m_RenFront->RemoveActor(m_SelectedHoleActor);
+		  m_Rwi->CameraUpdate();
+	  }
+	  vtkDEL(clean);
+  }
+  else
+  {
+    wxMessageBox(_("An hole must be selected!"));
+    m_Rwi->CameraUpdate();
+  }
 }
 //----------------------------------------------------------------------------
 void mmoExtrusionHoles::Extrude()
