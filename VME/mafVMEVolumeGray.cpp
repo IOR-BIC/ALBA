@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 10:36:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-23 08:27:03 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -104,7 +104,7 @@ mmgGui* mafVMEVolumeGray::CreateGui()
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
-  m_Gui->Button(ID_VOLUME_TRANSFER_FUNCTION, "transfer function", "", "Visualize Transfer function dialog.");
+  //m_Gui->Button(ID_VOLUME_TRANSFER_FUNCTION, "transfer function", "", "Visualize Transfer function dialog.");
 
   return m_Gui;
 }
