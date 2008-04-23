@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeLayout.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 14:38:37 $
-  Version:   $Revision: 1.1 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2008-04-23 09:07:25 $
+  Version:   $Revision: 1.2 $
+  Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
