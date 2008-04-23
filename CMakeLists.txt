@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-03-26 13:33:18 $
-# Version:   $Revision: 1.11 $
+# Date:      $Date: 2008-04-23 12:11:36 $
+# Version:   $Revision: 1.12 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -63,7 +63,6 @@ SET (CONFIGURE_ERROR 0)
 # If MAF found or configure continue with MED Configuration
 #-----------------------------------------------------------------------------
 INCLUDE("${PROJECT_SOURCE_DIR}/FindMAF.cmake")
-INCLUDE("${MAF_BINARY_PATH}/MAFConfig.cmake")
 
 IF(MAF_FOUND)
   INCLUDE("${MAF_USE_FILE}")
@@ -86,17 +85,9 @@ IF(MAF_FOUND)
 
   # Add single dirs to inclusion path
   INCLUDE_DIRECTORIES(BEFORE ".")
-  INCLUDE_DIRECTORIES(${MED_BINARY_DIR})
-
-  #todo: add a FOREACH on all subdirs but "modules"
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Gui)
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Common)
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Operations)
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Interaction)
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/VME)
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/Views)
-  INCLUDE_DIRECTORIES(${MED_SOURCE_DIR}/vtkMED)
-  INCLUDE_DIRECTORIES(${MED_BINARY_DIR}/vtkMED)
+  INCLUDE_DIRECTORIES("${MED_BINARY_DIR}" "${MED_SOURCE_DIR}/Gui" "${MED_SOURCE_DIR}/Common" "${MED_SOURCE_DIR}/Operations"
+                      "${MED_SOURCE_DIR}/Interaction" "${MED_SOURCE_DIR}/VME" "${MED_SOURCE_DIR}/Views" "${MED_SOURCE_DIR}/vtkMED"
+                      "${MED_BINARY_DIR}/vtkMED")
 
 #other inclusions
   INCLUDE_DIRECTORIES(${MAF_BINARY_PATH}/Libraries/ITK/Sources/InsightToolkit-3.0.1/Wrapping/WrapITK/ExternalProjects/ItkVtkGlue/src)
