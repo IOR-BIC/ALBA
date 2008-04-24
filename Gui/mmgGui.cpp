@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:05:33 $
-  Version:   $Revision: 1.55 $
+  Date:      $Date: 2008-04-24 08:40:44 $
+  Version:   $Revision: 1.56 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -402,15 +402,15 @@ void mmgGui::Button  (int id,mafString *label,mafString button_text, mafString t
 	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-mafGUICrossIncremental *mmgGui::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */)
+mafGUICrossIncremental *mmgGui::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */, bool boldLabel /* = true */)
 //----------------------------------------------------------------------------
 {
   int width = (label == "") ? FW : DW;
   
-  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, modality, dp);
+  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp);
   cI->SetListener(this);
   
-	Add(cI,0,wxALIGN_TOP, M); 
+	Add(cI,0,wxALL, M); 
   
   return cI;
 }

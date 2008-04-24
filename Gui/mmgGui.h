@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:05:33 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2008-04-24 08:40:44 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -203,7 +203,7 @@ public:
   void Button(int id,mafString *label,mafString button_text, mafString tooltip=""); 
 
 	/** Widget with 4 buttons and a text array disposed like a cross.*/
-  mafGUICrossIncremental *CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip ="");
+  mafGUICrossIncremental *CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip ="", bool boldLabel = true);
 
   /** Ok-Cancel Button widget. */
   void OkCancel(int alignment = wxALL);
