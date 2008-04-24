@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:11:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-24 08:41:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,6 +114,9 @@ public:
 
   void ShowShadingPlane(bool show);
 
+  void EnableMinimumHandleSize(bool value){m_EnableMinimumHandleSize = value;}
+  void SetMinimumHandleSize(double value){m_MinimumHandleSize = value;}
+
 protected:
 
   /** Highlight one component of the gizmo and turn off the highlight others;
@@ -142,6 +145,9 @@ protected:
 	mafGizmoHandle *m_GHandle[6];///<Array holding the six gizmo handles
 
 	mafGizmoBoundingBox *m_OutlineGizmo;///<The gizmo bounding box
+
+  double m_MinimumHandleSize;
+  bool m_EnableMinimumHandleSize;
 
 };
 #endif

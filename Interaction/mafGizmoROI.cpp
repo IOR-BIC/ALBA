@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:11:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-24 08:41:02 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,8 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
   m_Listener = listener;
 	m_ConstraintModality = constraintModality;
   //no gizmo component is active at construction
+  m_MinimumHandleSize = 0.0;
+  m_EnableMinimumHandleSize = false;
   
   this->m_ActiveGizmoComponent = -1;
   this->SetModalityToLocal();
@@ -473,12 +475,24 @@ void mafGizmoROI::UpdateGizmosLength()
   double med_dim=dim[1];
 
   double min_dim = dim[0];
+  
   for (int i = 0; i <6; i++)
   {
     if(med_dim/12.<(3./4.*min_dim))
       m_GHandle[i]->SetLength(med_dim/12.);
     else
-      m_GHandle[i]->SetLength(3./4.*min_dim);
+    {
+      double value = 3./4.*min_dim;
+      if(m_EnableMinimumHandleSize)
+      {
+        if(m_MinimumHandleSize > 3./4.*min_dim)
+        {
+          value = m_MinimumHandleSize;
+        }
+      }
+
+      m_GHandle[i]->SetLength(value);
+    }
   }
 }
 
