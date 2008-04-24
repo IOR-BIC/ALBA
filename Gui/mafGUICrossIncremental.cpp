@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:04:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-24 08:39:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -48,21 +48,22 @@ const int BH	= 20;											// button height
 //const int EW	= 60;											// entry width  - (was 48)  
 
 #ifdef WIN32
-const int LW	= 55;	// label width Windows
+const int LW	= 60;	// label width Windows
 #else
 const int LW	= 100;	// label width Linux
 #endif
 const int EW	= 45;
+const int MEDIUM	= 70;
 
 BEGIN_EVENT_TABLE(mafGUICrossIncremental,mmgPanel)
 
 END_EVENT_TABLE()
 
 
-
+#define FONTSIZE 9
 
 //----------------------------------------------------------------------------
-mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, const char * label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality /* = ID_COMPLETE_LAYOUT */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, double min /* = MINFLOAT */, double max /* = MAXFLOAT */, int decimal_digit /* = -1 */, long style /* = wxTAB_TRAVERSAL | wxCLIP_CHILDREN */)
+mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, const char * label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, bool boldLabel /* = true */, int modality /* = ID_COMPLETE_LAYOUT */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, double min /* = MINFLOAT */, double max /* = MAXFLOAT */, int decimal_digit /* = -1 */, long style /* = wxTAB_TRAVERSAL | wxCLIP_CHILDREN */)
 :mmgPanel(parent,id,pos,size,style) 
 //----------------------------------------------------------------------------
 {
@@ -81,54 +82,15 @@ mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, 
 
 	m_Sizer = NULL;
   m_Increment = 0;
+	m_Bold = boldLabel;
 	
-	if(label == "") label = "cross incremental";
-  wxStaticText *lab  = new wxStaticText(this, -1, label, dp, wxSize(2*LW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
-  wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
-#if WIN32   
-  font.SetPointSize(9);
-#endif
-  font.SetWeight(wxBOLD);
-  lab->SetFont(font);
-  lab->Update();
 	
   CreateWidgetTopBottom();
 	CreateWidgetLeftRight();
 	CreateWidgetTextEntry(min, max, decimal_digit );
 
-
-  //wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-	m_Sizer =  new wxBoxSizer( wxVERTICAL );
-  wxBoxSizer *sizerLabel = new wxBoxSizer(wxHORIZONTAL);
-  wxBoxSizer *sizerTop = new wxBoxSizer(wxHORIZONTAL);
-  wxBoxSizer *sizerMiddle = new wxBoxSizer(wxHORIZONTAL);
-  wxBoxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
-
-  sizerLabel->Add(lab, 0, wxALIGN_LEFT, 0);
-
-  sizerTop->AddSpacer(LM);
-  if(m_ButtonTop != NULL) sizerTop->Add( m_ButtonTop, 0, wxALIGN_LEFT, 0);
-
-  sizerMiddle->AddSpacer(LM);
-  if(m_ButtonLeft != NULL) sizerMiddle->Add( m_ButtonLeft, 0, wxALIGN_CENTRE, 0);
-  //sizerMiddle->AddSpacer(EW);
-  if(m_StepText != NULL) sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
-  if(m_ButtonRight != NULL) sizerMiddle->Add( m_ButtonRight, 0, wxALIGN_CENTRE, 0);
-
-
-  sizerBottom->AddSpacer(LM);
-  if(m_ButtonBottom != NULL) sizerBottom->Add( m_ButtonBottom, 0, wxALIGN_LEFT, 0);
-
-	
-  m_Sizer->Add( sizerLabel, 0, wxALIGN_LEFT, 0);
-  m_Sizer->AddSpacer(LM);
-  m_Sizer->Add( sizerTop, 0, wxALIGN_CENTRE, 0);
-  m_Sizer->Add( sizerMiddle, 0, wxALIGN_CENTRE, 0);
-  m_Sizer->Add( sizerBottom, 0, wxALIGN_CENTRE, 0);
-  m_Sizer->AddSpacer(LM);
+  LayoutStyle(label);
   
-  //((mmgGui *)parent)->Add(sizer,0,wxALL, 0);
-
 	this->SetAutoLayout( TRUE );
 	this->SetSizer( m_Sizer );
 	m_Sizer->Fit(this);
@@ -270,4 +232,146 @@ void mafGUICrossIncremental::EnableStep(bool value)
 		m_StepText->Enable(value);
 		m_StepText->Update();
 	}
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::LayoutStyle(const char* label)
+//----------------------------------------------------------------------------
+{
+  switch(m_IdLayout)
+  {
+  case ID_TOP_BOTTOM_LAYOUT:
+    {
+      wxStaticText *lab  = new wxStaticText(this, -1, label, dp, wxSize(2*LW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
+      wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+#if WIN32   
+      font.SetPointSize(9);
+#endif
+      if(m_Bold)
+      {
+        font.SetWeight(wxBOLD);
+      }
+
+      lab->SetFont(font);
+      lab->Update();
+
+      //wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+      m_Sizer =  new wxBoxSizer( wxVERTICAL );
+      wxBoxSizer *verticalSizer = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *horizontalSizer = new wxBoxSizer(wxVERTICAL);
+      wxBoxSizer *sizerLabel = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *sizerTop = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *sizerMiddle = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
+
+      sizerLabel->Add(lab, 0, wxALIGN_LEFT, 0);
+
+      sizerTop->AddSpacer(LM);
+      sizerTop->Add( m_ButtonTop, 0, wxALIGN_LEFT, 0);
+
+      sizerMiddle->AddSpacer(LM);    
+      //sizerMiddle->AddSpacer(EW);
+      sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
+      
+      sizerBottom->AddSpacer(LM);
+      sizerBottom->Add( m_ButtonBottom, 0, wxALIGN_LEFT, 0);
+
+
+      //horizontalSizer->Add( sizerLabel, 0, wxALIGN_TOP, 0);
+
+      
+      horizontalSizer->Add( sizerTop, 0, wxALL, 0);
+      horizontalSizer->Add( sizerMiddle, 0, wxALL, 0);
+      horizontalSizer->Add( sizerBottom, 0, wxALL, 0);
+
+      verticalSizer->AddSpacer(MEDIUM);
+      verticalSizer->Add( horizontalSizer, 0, wxALL, 0);
+
+      m_Sizer->Add( sizerLabel, 0, wxALIGN_LEFT, 0);
+      m_Sizer->Add( verticalSizer, 0, wxALL, 0);
+
+    }
+    break;
+  case ID_LEFT_RIGHT_LAYOUT:
+    {
+      wxStaticText *lab  = new wxStaticText(this, -1, label, dp, wxSize(LW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
+      wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+#if WIN32   
+      font.SetPointSize(FONTSIZE);
+#endif
+      if(m_Bold)
+      {
+        font.SetWeight(wxBOLD);
+      }
+
+      lab->SetFont(font);
+      lab->Update();
+
+      m_Sizer =  new wxBoxSizer( wxHORIZONTAL );     
+     
+      m_Sizer->AddSpacer(LM);
+      m_Sizer->Add(lab, 0, wxALIGN_LEFT, 0);
+
+      m_Sizer->Add( m_ButtonLeft, 0, wxALIGN_LEFT, 0);
+      m_Sizer->Add( m_StepText, 0, wxALIGN_LEFT, 0);
+      m_Sizer->Add( m_ButtonRight, 0, wxALIGN_LEFT, 0);
+
+      //((mmgGui *)parent)->Add(sizer,0,wxALL, 0);
+
+    }
+    break;
+  case ID_COMPLETE_LAYOUT:
+    {
+      wxStaticText *lab  = new wxStaticText(this, -1, label, dp, wxSize(2*LW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
+      wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+#if WIN32   
+      font.SetPointSize(FONTSIZE);
+#endif
+      if(m_Bold)
+      {
+        font.SetWeight(wxBOLD);
+      }
+
+      lab->SetFont(font);
+      lab->Update();
+
+      //wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
+      m_Sizer =  new wxBoxSizer( wxVERTICAL );
+      wxBoxSizer *verticalSizer = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *horizontalSizer = new wxBoxSizer(wxVERTICAL);
+      wxBoxSizer *sizerLabel = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *sizerTop = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *sizerMiddle = new wxBoxSizer(wxHORIZONTAL);
+      wxBoxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
+
+      sizerLabel->Add(lab, 0, wxALIGN_LEFT, 0);
+
+      sizerTop->AddSpacer(LM);
+      if(m_ButtonTop != NULL) sizerTop->Add( m_ButtonTop, 0, wxALIGN_LEFT, 0);
+
+      sizerMiddle->AddSpacer(LM);
+      if(m_ButtonLeft != NULL) sizerMiddle->Add( m_ButtonLeft, 0, wxALIGN_CENTRE, 0);
+      //sizerMiddle->AddSpacer(EW);
+      if(m_StepText != NULL) sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
+      if(m_ButtonRight != NULL) sizerMiddle->Add( m_ButtonRight, 0, wxALIGN_CENTRE, 0);
+
+
+      sizerBottom->AddSpacer(LM);
+      if(m_ButtonBottom != NULL) sizerBottom->Add( m_ButtonBottom, 0, wxALIGN_LEFT, 0);
+      
+      horizontalSizer->Add( sizerTop, 0, wxALIGN_CENTRE, 0);
+      horizontalSizer->Add( sizerMiddle, 0, wxALIGN_CENTRE, 0);
+      horizontalSizer->Add( sizerBottom, 0, wxALIGN_CENTRE, 0);
+      
+      verticalSizer->AddSpacer(LW);
+      verticalSizer->Add( horizontalSizer, 0, wxALL, 0);
+
+      m_Sizer->Add( sizerLabel, 0, wxALIGN_LEFT, 0);
+      m_Sizer->Add( verticalSizer, 0, wxALL, 0);
+
+      //((mmgGui *)parent)->Add(sizer,0,wxALL, 0);
+
+    }
+    break;
+  }
+  
 }

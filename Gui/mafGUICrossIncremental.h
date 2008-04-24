@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:27:26 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-24 08:39:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -54,6 +54,7 @@ public:
                   double *stepVariable,
 									double *topBottomVariable,
 									double *leftRightVariable,
+                  bool boldLabel = true,
 									int modality = ID_COMPLETE_LAYOUT,
                   const wxPoint& pos = wxDefaultPosition, 
                   const wxSize& size = wxDefaultSize,
@@ -99,7 +100,10 @@ public:
   double GetTopBottomVariation(){return m_TopBottomVariation;};
   double GetLeftRightVariation(){return m_LeftRightVariation;};
 
+
   void SetStepVariable(double step){if(m_StepText) *m_StepVariable = step;m_StepText->SetValue(wxString::Format("%.2f", *m_StepVariable));}
+
+  void LayoutStyle(const char *label);
 
 private:
 
@@ -117,6 +121,7 @@ private:
   double            m_TopBottomVariation;
   double            m_LeftRightVariation;
 
+  bool m_Bold;
   int m_Increment;
 
   double            *m_StepVariable;
