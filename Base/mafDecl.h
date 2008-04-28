@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:00 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2008-04-28 11:18:21 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,8 @@ class wxWindow;
 const int MAXWIDGET = 4096;
 const int MAXOP = 200; 
 const int MAXVIEW = 200; 
+
+extern MAF_EXPORT int MAFExpertMode; ///< Flag to turn On/Off detailed debug information or GUI widgets
 
 /** Data Type enum that identify data stored in WidgetDataType struct */
 enum MAF_EXPORT WIDGET_DATA_TYPE_ID
