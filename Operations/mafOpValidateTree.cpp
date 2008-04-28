@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:17:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-28 12:04:32 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -228,31 +228,31 @@ void mafOpValidateTree::ErrorLog(int error_num, const char *node_name, const cha
   switch(error_num)
   {
     case mafOpValidateTree::INVALID_NODE:
-      mafLogMessage(_("Patched Node %s with an invalid ID!!"), node_name);
+      mafLogMessage(_("Patched Node '%s' with an invalid ID!!"), node_name);
     break;
     case mafOpValidateTree::LINK_NOT_PRESENT:
-      mafLogMessage(_("Link node %s is not present into the tree"), node_name);
+      mafLogMessage(_("Link node '%s' is not present into the tree"), node_name);
     break;
     case mafOpValidateTree::LINK_NULL:
-      mafLogMessage(_("Link %s of node %s is null"), description, node_name);
+      mafLogMessage(_("Link '%s' of node '%s' is null"), description, node_name);
     break;
     case mafOpValidateTree::EXCEPTION_ON_ITERATOR:
-      mafLogMessage(_("Exception occurred during iteration on node %s"), node_name);
+      mafLogMessage(_("Exception occurred during iteration on node '%s'"), node_name);
     break;
     case mafOpValidateTree::ITEM_NOT_PRESENT:
-      mafLogMessage(_("Item not present in node %s"), node_name);
+      mafLogMessage(_("Item not present in node '%s'"), node_name);
     break;
     case mafOpValidateTree::MAX_ITEM_ID_PATCHED:
-      mafLogMessage(_("Item of Node %s has caused Max item Id to be patched!!"), node_name);
+      mafLogMessage(_("Item of Node '%s' has caused Max item Id to be patched!!"), node_name);
     break;
     case mafOpValidateTree::URL_EMPTY:
-      mafLogMessage(_("URL referring to binary data not present in node %s"), node_name);
+      mafLogMessage(_("URL referring to binary data not present in node '%s'"), node_name);
     break;
     case mafOpValidateTree::BINARY_FILE_NOT_PRESENT:
       mafLogMessage(_("Binary data file '%s' not present"), node_name);
     break;
     case mafOpValidateTree::ARCHIVE_FILE_NOT_PRESENT:
-      mafLogMessage(_("Archive data file not present for node %s"), node_name);
+      mafLogMessage(_("Archive data file not present for node '%s'"), node_name);
     break;
   }
 }
