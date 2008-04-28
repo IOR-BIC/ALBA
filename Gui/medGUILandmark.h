@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-13 13:06:06 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 08:07:41 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ class mafVMELandmark;
 class mafVMELandmarkCloud;
  
 //----------------------------------------------------------------------------
-/** Pluggable component for mmoIterativeRegistration operation
+/** Pluggable component for medOpIterativeRegistration operation
 
   @sa
   - medOpIterativeRegistration 
