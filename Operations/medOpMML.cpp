@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-#include "  Module:    $RCSfile: mmoMML.cpp,v $
+#include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-04 08:29:39 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-04-28 08:48:42 $
+Version:   $Revision: 1.1 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTransformFilter.h"
 
 #include "mafOp.h"
-#include "mmoMML.h"
+#include "medOpMML.h"
 #include "mmgDialog.h"
 #include "mmgButton.h"
 #include "mafRWI.h"
@@ -42,9 +42,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMESurface.h"
 #include "mafVMEGroup.h"
 #include "mmgCheckListBox.h"
-#include "mmoMMLParameterView.h"
-#include "mmoMMLModelView.h"
-#include "mmoMMLContourWidget.h"
+#include "medOpMMLParameterView.h"
+#include "medOpMMLModelView.h"
+#include "medOpMMLContourWidget.h"
 #include "mafVMELandmark.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
@@ -87,7 +87,7 @@ enum
 };
 
 //----------------------------------------------------------------------------
-mmoMML::mmoMML(const wxString &label) : mafOp(label)
+medOpMML::medOpMML(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
   //
@@ -194,31 +194,31 @@ mmoMML::mmoMML(const wxString &label) : mafOp(label)
 }
 
 //----------------------------------------------------------------------------
-mmoMML::~mmoMML( ) 
+medOpMML::~medOpMML( ) 
 {
   vtkDEL(m_RegisteredTransform);
 }
 
 //----------------------------------------------------------------------------
-bool mmoMML::Accept(mafNode* vme)
+bool medOpMML::Accept(mafNode* vme)
 { 
   return vme != NULL && vme->IsMAFType(mafVMEVolumeGray);
 }
 
 //----------------------------------------------------------------------------
-mafOp* mmoMML::Copy() {return new mmoMML(m_Label);}
+mafOp* medOpMML::Copy() {return new medOpMML(m_Label);}
 
 //----------------------------------------------------------------------------
-void mmoMML::OpDo()  {}
+void medOpMML::OpDo()  {}
 
 //----------------------------------------------------------------------------
-void mmoMML::OpUndo() {}
+void medOpMML::OpUndo() {}
 
 //----------------------------------------------------------------------------
-void mmoMML::OpStop(int result) {	mafEventMacro(mafEvent(this,result));}
+void medOpMML::OpStop(int result) {	mafEventMacro(mafEvent(this,result));}
 
 //----------------------------------------------------------------------------
-void mmoMML::OpRun()   
+void medOpMML::OpRun()   
 //----------------------------------------------------------------------------
 {
   //inputs dialog
@@ -245,7 +245,7 @@ void mmoMML::OpRun()
 
 
 //----------------------------------------------------------------------------
-void mmoMML::OnEvent(mafEventBase *maf_event) 
+void medOpMML::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event)){
@@ -367,7 +367,7 @@ void mmoMML::OnEvent(mafEventBase *maf_event)
 
 
 //----------------------------------------------------------------------------
-void mmoMML::OnRegistrationOK() 
+void medOpMML::OnRegistrationOK() 
 //----------------------------------------------------------------------------
 {
   // deform
@@ -524,14 +524,14 @@ void mmoMML::OnRegistrationOK()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnRegistrationCANCEL()
+void medOpMML::OnRegistrationCANCEL()
 //----------------------------------------------------------------------------
 {
 
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnSlider() 
+void medOpMML::OnSlider() 
 //----------------------------------------------------------------------------
 {
   //
@@ -603,7 +603,7 @@ void mmoMML::OnSlider()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnLut() 
+void medOpMML::OnLut() 
 //----------------------------------------------------------------------------
 {
   double Low,High;
@@ -619,7 +619,7 @@ void mmoMML::OnLut()
 
 
 //----------------------------------------------------------------------------
-void mmoMML::OnMuscleSelection() 
+void medOpMML::OnMuscleSelection() 
 //----------------------------------------------------------------------------
 {
   // raise event to request a VME selection dialog
@@ -798,7 +798,7 @@ void mmoMML::OnMuscleSelection()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnResetView() 
+void medOpMML::OnResetView() 
 //----------------------------------------------------------------------------
 {
   Model->GetRenderer()->ResetCamera();
@@ -806,7 +806,7 @@ void mmoMML::OnResetView()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnUndo() 
+void medOpMML::OnUndo() 
 //----------------------------------------------------------------------------
 {
   int i;
@@ -1263,7 +1263,7 @@ void mmoMML::OnUndo()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnOperation() 
+void medOpMML::OnOperation() 
 //----------------------------------------------------------------------------
 {
   // operations
@@ -1340,7 +1340,7 @@ void mmoMML::OnOperation()
           Widget->ScalingModeOn();
 
           // on successful scaling, ScalingOccured flag in Model
-          // is set to true, mmoMMLContourWidget::OnLeftButtonUp
+          // is set to true, medOpMMLContourWidget::OnLeftButtonUp
         }
         else
           wxMessageBox("Unknown operation","alert",wxICON_WARNING);
@@ -1350,7 +1350,7 @@ void mmoMML::OnOperation()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::ResetOperation() 
+void medOpMML::ResetOperation() 
 //----------------------------------------------------------------------------
 {
   // reset - handles off
@@ -1365,7 +1365,7 @@ void mmoMML::ResetOperation()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnContourLineAxesVisibility() 
+void medOpMML::OnContourLineAxesVisibility() 
 //----------------------------------------------------------------------------
 {
   m_show_axes = (m_show_axes + 1) % 2;
@@ -1408,7 +1408,7 @@ void mmoMML::OnContourLineAxesVisibility()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnContourVisibility() 
+void medOpMML::OnContourVisibility() 
 //----------------------------------------------------------------------------
 {
   m_ContourVisibility = (m_ContourVisibility + 1) % 2;
@@ -1460,7 +1460,7 @@ void mmoMML::OnContourVisibility()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnLandmark1AtlasPatientSelection() 
+void medOpMML::OnLandmark1AtlasPatientSelection() 
 //----------------------------------------------------------------------------
 {
   //
@@ -1570,7 +1570,7 @@ void mmoMML::OnLandmark1AtlasPatientSelection()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnLandmark2AtlasPatientSelection() 
+void medOpMML::OnLandmark2AtlasPatientSelection() 
 //----------------------------------------------------------------------------
 {
   //
@@ -1680,7 +1680,7 @@ void mmoMML::OnLandmark2AtlasPatientSelection()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnLandmark3AtlasPatientSelection() 
+void medOpMML::OnLandmark3AtlasPatientSelection() 
 //----------------------------------------------------------------------------
 {
   //
@@ -1790,7 +1790,7 @@ void mmoMML::OnLandmark3AtlasPatientSelection()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnLandmark4AtlasPatientSelection() 
+void medOpMML::OnLandmark4AtlasPatientSelection() 
 //----------------------------------------------------------------------------
 {
   //
@@ -1902,7 +1902,7 @@ void mmoMML::OnLandmark4AtlasPatientSelection()
 
 
 //----------------------------------------------------------------------------
-bool mmoMML::CreateInputsDlg() 
+bool medOpMML::CreateInputsDlg() 
 //----------------------------------------------------------------------------
 {
   // create the dialog
@@ -2115,7 +2115,7 @@ bool mmoMML::CreateInputsDlg()
 
 
 //----------------------------------------------------------------------------
-void mmoMML::CreateRegistrationDlg()
+void medOpMML::CreateRegistrationDlg()
 //----------------------------------------------------------------------------
 { 
 
@@ -2265,7 +2265,7 @@ void mmoMML::CreateRegistrationDlg()
   //
   // mml model view
   // create
-  Model = new mmoMMLModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, Muscle, Volume);
+  Model = new medOpMMLModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, Muscle, Volume);
   // initialise
   CreateFakeLandmarks();
   SetUpInputs();
@@ -2312,20 +2312,20 @@ void mmoMML::CreateRegistrationDlg()
   //
   // mml parameter views
   // create
-  PH = new mmoMMLParameterView(m_PHmafRWI->m_RenderWindow, m_PHmafRWI->m_RenFront); 
-  PV = new mmoMMLParameterView(m_PVmafRWI->m_RenderWindow, m_PVmafRWI->m_RenFront);
-  TH = new mmoMMLParameterView(m_THmafRWI->m_RenderWindow, m_THmafRWI->m_RenFront);
-  TV = new mmoMMLParameterView(m_TVmafRWI->m_RenderWindow, m_TVmafRWI->m_RenFront);
-  RA = new mmoMMLParameterView(m_RAmafRWI->m_RenderWindow, m_RAmafRWI->m_RenFront);
-  SN = new mmoMMLParameterView(m_SNmafRWI->m_RenderWindow, m_SNmafRWI->m_RenFront);
-  SS = new mmoMMLParameterView(m_SSmafRWI->m_RenderWindow, m_SSmafRWI->m_RenFront);
-  SE = new mmoMMLParameterView(m_SEmafRWI->m_RenderWindow, m_SEmafRWI->m_RenFront);
-  SW = new mmoMMLParameterView(m_SWmafRWI->m_RenderWindow, m_SWmafRWI->m_RenFront);
+  PH = new medOpMMLParameterView(m_PHmafRWI->m_RenderWindow, m_PHmafRWI->m_RenFront); 
+  PV = new medOpMMLParameterView(m_PVmafRWI->m_RenderWindow, m_PVmafRWI->m_RenFront);
+  TH = new medOpMMLParameterView(m_THmafRWI->m_RenderWindow, m_THmafRWI->m_RenFront);
+  TV = new medOpMMLParameterView(m_TVmafRWI->m_RenderWindow, m_TVmafRWI->m_RenFront);
+  RA = new medOpMMLParameterView(m_RAmafRWI->m_RenderWindow, m_RAmafRWI->m_RenFront);
+  SN = new medOpMMLParameterView(m_SNmafRWI->m_RenderWindow, m_SNmafRWI->m_RenFront);
+  SS = new medOpMMLParameterView(m_SSmafRWI->m_RenderWindow, m_SSmafRWI->m_RenFront);
+  SE = new medOpMMLParameterView(m_SEmafRWI->m_RenderWindow, m_SEmafRWI->m_RenFront);
+  SW = new medOpMMLParameterView(m_SWmafRWI->m_RenderWindow, m_SWmafRWI->m_RenFront);
 
 
   // mml contour widget
   // create
-  Widget = mmoMMLContourWidget::New();
+  Widget = medOpMMLContourWidget::New();
 
   //
   SetUpWidget();
@@ -2339,7 +2339,7 @@ void mmoMML::CreateRegistrationDlg()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMML::SetUpInputs()
+bool medOpMML::SetUpInputs()
 //----------------------------------------------------------------------------
 {
   // set muscle type (1 - one slicing axis, 2 - two slicing axes)
@@ -2415,7 +2415,7 @@ bool mmoMML::SetUpInputs()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMML::SetUpParameterViews() 
+bool medOpMML::SetUpParameterViews() 
 //----------------------------------------------------------------------------
 {
   // size of synthetic scans
@@ -2632,7 +2632,7 @@ bool mmoMML::SetUpParameterViews()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMML::SetUpWidget()
+bool medOpMML::SetUpWidget()
 //----------------------------------------------------------------------------
 {
   Widget->SetModel(Model);
@@ -2660,7 +2660,7 @@ bool mmoMML::SetUpWidget()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMML::SetUpModelView() 
+bool medOpMML::SetUpModelView() 
 //----------------------------------------------------------------------------
 {
   // pre-process muscle
@@ -2672,7 +2672,7 @@ bool mmoMML::SetUpModelView()
   Model->FindSizeAndResolutionOfSyntheticScans();
   Model->SetUpSyntheticScans();
 
-  // initalise lut slider (called after void mmoMMLModelView::SetUpSyntheticScans()
+  // initalise lut slider (called after void medOpMMLModelView::SetUpSyntheticScans()
   m_lut->SetRange(Model->GetLowScalar(), Model->GetHighScalar());
   m_lut->SetSubRange(Model->GetSyntheticScansLevel() - 0.5 * Model->GetSyntheticScansWindow(),
     Model->GetSyntheticScansLevel() + 0.5 * Model->GetSyntheticScansWindow());
@@ -2722,7 +2722,7 @@ bool mmoMML::SetUpModelView()
 }
 
 //----------------------------------------------------------------------------
-mafRWI* mmoMML::CreateParameterViewmafRWI(wxString lab, float r, float g, float b)
+mafRWI* medOpMML::CreateParameterViewmafRWI(wxString lab, float r, float g, float b)
 //----------------------------------------------------------------------------
 { 
   mafRWI *rwi = new mafRWI(m_op_dlg);
@@ -2754,7 +2754,7 @@ mafRWI* mmoMML::CreateParameterViewmafRWI(wxString lab, float r, float g, float 
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectionVMEName)
+void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectionVMEName)
 //----------------------------------------------------------------------------
 {
   int i;
@@ -3286,7 +3286,7 @@ void mmoMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectio
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::Update()
+void medOpMML::Update()
 //----------------------------------------------------------------------------
 {
   // update sectional cut
@@ -3324,7 +3324,7 @@ void mmoMML::Update()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnPOperationButton()
+void medOpMML::OnPOperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
@@ -3381,7 +3381,7 @@ void mmoMML::OnPOperationButton()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnTOperationButton()
+void medOpMML::OnTOperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
@@ -3438,7 +3438,7 @@ void mmoMML::OnTOperationButton()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnROperationButton()
+void medOpMML::OnROperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
@@ -3497,7 +3497,7 @@ void mmoMML::OnROperationButton()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::OnSOperationButton()
+void medOpMML::OnSOperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
@@ -3543,7 +3543,7 @@ void mmoMML::OnSOperationButton()
   Widget->ScalingModeOn();
 
   // on successful scaling, ScalingOccured flag in Model
-  // is set to true, mmoMMLContourWidget::OnLeftButtonUp
+  // is set to true, medOpMMLContourWidget::OnLeftButtonUp
 
   //
   Model->Render();
@@ -3556,7 +3556,7 @@ void mmoMML::OnSOperationButton()
 //----------------------------------------------------------------------------
 // Apply the registration operations: translation, rotation, deformation
 // Called when we select "ok" from the registration dialog.
-void mmoMML::ApplyRegistrationOps()
+void medOpMML::ApplyRegistrationOps()
 //----------------------------------------------------------------------------
 {
   int i;
@@ -3688,13 +3688,13 @@ void mmoMML::ApplyRegistrationOps()
 }
 
 //----------------------------------------------------------------------------
-void mmoMML::ApplyInverseRegistrationOps()
+void medOpMML::ApplyInverseRegistrationOps()
 //----------------------------------------------------------------------------
 {
 
 }
 
-void mmoMML::CreateFakeLandmarks() 
+void medOpMML::CreateFakeLandmarks() 
 {
   double inputBounds[6]; 
 

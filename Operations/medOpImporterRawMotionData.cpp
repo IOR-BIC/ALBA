@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoRawMotionDataImporter.cpp,v $
+  Module:    $RCSfile: medOpImporterRawMotionData.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 08:44:58 $
+  Date:      $Date: 2008-04-28 08:47:16 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoRawMotionDataImporter.h"
+#include "medOpImporterRawMotionData.h"
 #include <wx/busyinfo.h>
 
 
@@ -34,7 +34,7 @@
 // #include <mflVMEIterator.h> non ce ne e' bisogno
 
 //----------------------------------------------------------------------------
-mmoRawMotionDataImporter::mmoRawMotionDataImporter(wxString label) :
+medOpImporterRawMotionData::medOpImporterRawMotionData(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -50,17 +50,17 @@ mafOp(label)
 	m_DictionaryAvailable = 0;
 }
 //----------------------------------------------------------------------------
-mmoRawMotionDataImporter::~mmoRawMotionDataImporter( ) 
+medOpImporterRawMotionData::~medOpImporterRawMotionData( ) 
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-mafOp* mmoRawMotionDataImporter::Copy()   
+mafOp* medOpImporterRawMotionData::Copy()   
 /** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
 //----------------------------------------------------------------------------
 {
 	//non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
-	mmoRawMotionDataImporter *cp = new mmoRawMotionDataImporter(m_Label);
+	medOpImporterRawMotionData *cp = new medOpImporterRawMotionData(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -72,7 +72,7 @@ mafOp* mmoRawMotionDataImporter::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-void mmoRawMotionDataImporter::OpRun()   
+void medOpImporterRawMotionData::OpRun()   
 //----------------------------------------------------------------------------
 {
   
@@ -102,7 +102,7 @@ void mmoRawMotionDataImporter::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoRawMotionDataImporter::OpDo()   
+void medOpImporterRawMotionData::OpDo()   
 //----------------------------------------------------------------------------
 {
 	assert(!m_Vme);
@@ -137,7 +137,7 @@ void mmoRawMotionDataImporter::OpDo()
 }
 /*
 //----------------------------------------------------------------------------
-void mmoRawMotionDataImporter::OpUndo()   
+void medOpImporterRawMotionData::OpUndo()   
 
 //----------------------------------------------------------------------------
 {

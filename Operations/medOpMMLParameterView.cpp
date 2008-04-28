@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMMLParameterView.cpp,v $
+  Module:    $RCSfile: medOpMMLParameterView.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-11 11:53:06 $
+  Date:      $Date: 2008-04-28 08:48:42 $
   Version:   $Revision: 1.1 $
   Authors:   Mel Krokos
 ==========================================================================
@@ -13,12 +13,12 @@
 #include "mafDefines.h"
 
 //#include "MuscleRegistrationProject.h"
-#include "mmoMMLParameterView.h"
+#include "medOpMMLParameterView.h"
 #include "assert.h"
 #include "vtkProperty2D.h"
 
 //----------------------------------------------------------------------------
-mmoMMLParameterView::mmoMMLParameterView(vtkRenderWindow *rw, vtkRenderer *ren)
+medOpMMLParameterView::medOpMMLParameterView(vtkRenderWindow *rw, vtkRenderer *ren)
 //----------------------------------------------------------------------------
 {
 	m_pRenderer = ren;
@@ -101,12 +101,12 @@ mmoMMLParameterView::mmoMMLParameterView(vtkRenderWindow *rw, vtkRenderer *ren)
 	
 }
 //----------------------------------------------------------------------------
-mmoMMLParameterView::~mmoMMLParameterView()
+medOpMMLParameterView::~medOpMMLParameterView()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::ComputeConvertTommoMMLParameterViewX()
+void medOpMMLParameterView::ComputeConvertTommoMMLParameterViewX()
 //----------------------------------------------------------------------------
 {
 	double dRange;
@@ -116,7 +116,7 @@ void mmoMMLParameterView::ComputeConvertTommoMMLParameterViewX()
  	m_dXPosConvertRatio = m_Width / dRange;
 }
 //----------------------------------------------------------------------------
-double mmoMMLParameterView::ConvertTommoMMLParameterViewX(double X)
+double medOpMMLParameterView::ConvertTommoMMLParameterViewX(double X)
 //----------------------------------------------------------------------------
 {
 	//assert(X >= m_dXMin);
@@ -124,7 +124,7 @@ double mmoMMLParameterView::ConvertTommoMMLParameterViewX(double X)
 	return m_dXPosConvertRatio * X;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::ComputeConvertTommoMMLParameterViewY()
+void medOpMMLParameterView::ComputeConvertTommoMMLParameterViewY()
 //----------------------------------------------------------------------------
 {
 	double dRange1, dRange2;
@@ -141,7 +141,7 @@ void mmoMMLParameterView::ComputeConvertTommoMMLParameterViewY()
  	m_dYPosConvertRatio2 = (0.5 * ((double) (m_Height))) / dRange2;
 }
 //----------------------------------------------------------------------------
-double mmoMMLParameterView::ConvertTommoMMLParameterViewY(double Y)
+double medOpMMLParameterView::ConvertTommoMMLParameterViewY(double Y)
 //----------------------------------------------------------------------------
 {
 	double dMiddle;
@@ -164,13 +164,13 @@ double mmoMMLParameterView::ConvertTommoMMLParameterViewY(double Y)
 		return dMiddle;
 }
 //----------------------------------------------------------------------------
-double mmoMMLParameterView::ConvertFrommmoMMLParameterViewX(double X)
+double medOpMMLParameterView::ConvertFrommmoMMLParameterViewX(double X)
 //----------------------------------------------------------------------------
 {
 	return X / m_dXPosConvertRatio;
 }
 //----------------------------------------------------------------------------
-double mmoMMLParameterView::ConverFrommmoMMLParameterViewY(double Y)
+double medOpMMLParameterView::ConverFrommmoMMLParameterViewY(double Y)
 //----------------------------------------------------------------------------
 {
 	double dMiddle;
@@ -190,7 +190,7 @@ double mmoMMLParameterView::ConverFrommmoMMLParameterViewY(double Y)
 		return m_dYMid;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::ComputeSpline()
+void medOpMMLParameterView::ComputeSpline()
 //----------------------------------------------------------------------------
 {
 	int i;
@@ -243,14 +243,14 @@ void mmoMMLParameterView::ComputeSpline()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::Render()
+void medOpMMLParameterView::Render()
 //----------------------------------------------------------------------------
 {
 	ComputeSpline();
 	m_pRenderWindow->Render();
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::ResetSpline()
+void medOpMMLParameterView::ResetSpline()
 //----------------------------------------------------------------------------
 {
 	int i;
@@ -272,67 +272,67 @@ void mmoMMLParameterView::ResetSpline()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetMinX(double x)
+void medOpMMLParameterView::SetMinX(double x)
 //----------------------------------------------------------------------------
 {
 	m_dXMin = x;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetMaxX(double x)
+void medOpMMLParameterView::SetMaxX(double x)
 //----------------------------------------------------------------------------
 {
 	m_dXMax = x;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetMinY(double y)
+void medOpMMLParameterView::SetMinY(double y)
 //----------------------------------------------------------------------------
 {
 	m_dYMin = y;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetMaxY(double y)
+void medOpMMLParameterView::SetMaxY(double y)
 //----------------------------------------------------------------------------
 {
 	m_dYMax = y;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetMidY(double y)
+void medOpMMLParameterView::SetMidY(double y)
 //----------------------------------------------------------------------------
 {
 	m_dYMid = y;
 }
 //----------------------------------------------------------------------------
-double mmoMMLParameterView::GetMinY()
+double medOpMMLParameterView::GetMinY()
 //----------------------------------------------------------------------------
 {
 	return m_dYMin;
 }
 //----------------------------------------------------------------------------
-double mmoMMLParameterView::GetMaxY()
+double medOpMMLParameterView::GetMaxY()
 //----------------------------------------------------------------------------
 {
 	return m_dYMax;
 }
 //----------------------------------------------------------------------------
-vtkActor2D* mmoMMLParameterView::GetLineActor()
+vtkActor2D* medOpMMLParameterView::GetLineActor()
 //----------------------------------------------------------------------------
 {
 	return m_pLineActor2D;
 }
 //----------------------------------------------------------------------------
-vtkActor2D* mmoMMLParameterView::GetSplineActor()
+vtkActor2D* medOpMMLParameterView::GetSplineActor()
 //----------------------------------------------------------------------------
 {
 	return m_pSplineActor2D;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetSplineSamples(int s)
+void medOpMMLParameterView::SetSplineSamples(int s)
 //----------------------------------------------------------------------------
 {
 	m_nNumberOfKochanekSplinePoints = s;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetRangeX(int r)
+void medOpMMLParameterView::SetRangeX(int r)
 //----------------------------------------------------------------------------
 {
 	SetMinX(0);
@@ -340,14 +340,14 @@ void mmoMMLParameterView::SetRangeX(int r)
 	ComputeConvertTommoMMLParameterViewX();
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::InitialiseLineActor()
+void medOpMMLParameterView::InitialiseLineActor()
 //----------------------------------------------------------------------------
 {
 	m_pLineSource->SetPoint1(0, 0, 0);
 	m_pLineSource->SetPoint2(0, ConvertTommoMMLParameterViewY(m_dYMax), 0);
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::AddPoint(double x, double y)
+void medOpMMLParameterView::AddPoint(double x, double y)
 //----------------------------------------------------------------------------
 {
 	ResetSpline();
@@ -359,21 +359,21 @@ void mmoMMLParameterView::AddPoint(double x, double y)
 }
 
 //----------------------------------------------------------------------------
-float mmoMMLParameterView::GetValue(double x)
+float medOpMMLParameterView::GetValue(double x)
 //----------------------------------------------------------------------------
 {
 	return m_pPiecewiseFunction->GetValue(x);
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::RemovePoint(double x)
+void medOpMMLParameterView::RemovePoint(double x)
 //----------------------------------------------------------------------------
 {
 	ResetSpline();
 	m_pPiecewiseFunction->RemovePoint(ConvertTommoMMLParameterViewX(x));
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetRangeY(double left, double middle, double right)
+void medOpMMLParameterView::SetRangeY(double left, double middle, double right)
 //----------------------------------------------------------------------------
 {
 	SetMinY(left);
@@ -384,13 +384,13 @@ void mmoMMLParameterView::SetRangeY(double left, double middle, double right)
 	InitialiseHorizontalLineActor();
 }
 //----------------------------------------------------------------------------
-vtkActor2D* mmoMMLParameterView::GetPointsActor()
+vtkActor2D* medOpMMLParameterView::GetPointsActor()
 //----------------------------------------------------------------------------
 {
 	return m_pDataPointsActor2D;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::SetLineActorX(int x)
+void medOpMMLParameterView::SetLineActorX(int x)
 //----------------------------------------------------------------------------
 {
 	double x1, y1;
@@ -410,27 +410,27 @@ void mmoMMLParameterView::SetLineActorX(int x)
 	//Render();
 }
 //----------------------------------------------------------------------------
-vtkActor2D* mmoMMLParameterView::GetHorizontalLineActor()
+vtkActor2D* medOpMMLParameterView::GetHorizontalLineActor()
 //----------------------------------------------------------------------------
 {
 	return m_pHorizontalLineActor2D;
 }
 //----------------------------------------------------------------------------
-void mmoMMLParameterView::InitialiseHorizontalLineActor()
+void medOpMMLParameterView::InitialiseHorizontalLineActor()
 //----------------------------------------------------------------------------
 {
 	m_pHorizontalLineSource->SetPoint1(0, ConvertTommoMMLParameterViewY(m_dYMid), 0);
 	m_pHorizontalLineSource->SetPoint2(ConvertTommoMMLParameterViewX(m_dXMax), ConvertTommoMMLParameterViewY(m_dYMid), 0);
 }
 //----------------------------------------------------------------------------
-vtkRenderer* mmoMMLParameterView::GetRenderer()
+vtkRenderer* medOpMMLParameterView::GetRenderer()
 //----------------------------------------------------------------------------
 {
 	return m_pRenderer;
 }
 
 //----------------------------------------------------------------------------
-int mmoMMLParameterView::GetNumberOfDataPoints()
+int medOpMMLParameterView::GetNumberOfDataPoints()
 //----------------------------------------------------------------------------
 {
 	return m_pDataPointsPolyDataPoints->GetNumberOfPoints();

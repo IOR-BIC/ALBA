@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMMLModelView.cpp,v $
+  Module:    $RCSfile: medOpMMLModelView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-14 09:57:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 08:48:42 $
+  Version:   $Revision: 1.1 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,7 +12,7 @@
 
 #include "mafDefines.h"
 
-#include "mmoMMLModelView.h"
+#include "medOpMMLModelView.h"
 #include "mafSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 // Constructor for model view
-mmoMMLModelView::mmoMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume)
+medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume)
 //----------------------------------------------------------------------------
 { 
 	//mafSmartPointer <vtkTransform> transf;
@@ -577,7 +577,7 @@ mmoMMLModelView::mmoMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtkPoly
 
 
 //----------------------------------------------------------------------------
-mmoMMLModelView::~mmoMMLModelView()
+medOpMMLModelView::~medOpMMLModelView()
 //----------------------------------------------------------------------------
 {
 }
@@ -587,7 +587,7 @@ mmoMMLModelView::~mmoMMLModelView()
 
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
+void medOpMMLModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
 //----------------------------------------------------------------------------
 {
 	int i;
@@ -625,7 +625,7 @@ void mmoMMLModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMMLModelView::MapAtlasToPatient()
+bool medOpMMLModelView::MapAtlasToPatient()
 //----------------------------------------------------------------------------
 {
 	// insertions
@@ -763,7 +763,7 @@ bool mmoMMLModelView::MapAtlasToPatient()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMMLModelView::MakeActionLineZAxis()
+bool medOpMMLModelView::MakeActionLineZAxis()
 //----------------------------------------------------------------------------
 {
 	// transform 2
@@ -897,7 +897,7 @@ bool mmoMMLModelView::MakeActionLineZAxis()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::FindSizeAndResolutionOfSyntheticScans()
+void medOpMMLModelView::FindSizeAndResolutionOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
 	// must be called prior to SetUpSyntheticScans
@@ -965,7 +965,7 @@ void mmoMMLModelView::FindSizeAndResolutionOfSyntheticScans()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetUpSyntheticScans()
+void medOpMMLModelView::SetUpSyntheticScans()
 //----------------------------------------------------------------------------
 {
 	/*
@@ -1142,7 +1142,7 @@ void mmoMMLModelView::SetUpSyntheticScans()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetPlaneSourceOriginOfSyntheticScans(int s, double p[])
+void medOpMMLModelView::GetPlaneSourceOriginOfSyntheticScans(int s, double p[])
 //----------------------------------------------------------------------------
 {
 	int i;
@@ -1196,7 +1196,7 @@ void mmoMMLModelView::GetPlaneSourceOriginOfSyntheticScans(int s, double p[])
 }
 
 //----------------------------------------------------------------------------
-vtkMatrix4x4* mmoMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
+vtkMatrix4x4* medOpMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 //----------------------------------------------------------------------------
 {
 	//
@@ -1337,7 +1337,7 @@ vtkMatrix4x4* mmoMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 }
 
 //----------------------------------------------------------------------------
-vtkMatrix4x4* mmoMMLModelView::GetActorTransformOfSyntheticScans(int s)
+vtkMatrix4x4* medOpMMLModelView::GetActorTransformOfSyntheticScans(int s)
 //----------------------------------------------------------------------------
 {
 	//
@@ -1385,67 +1385,67 @@ vtkMatrix4x4* mmoMMLModelView::GetActorTransformOfSyntheticScans(int s)
 }
 
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetContourActor()
+vtkActor* medOpMMLModelView::GetContourActor()
 //----------------------------------------------------------------------------
 {
 	return m_pContourActor;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetPHSpline()
+vtkKochanekSpline* medOpMMLModelView::GetPHSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pCenterHorizontalOffsetSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetPVSpline()
+vtkKochanekSpline* medOpMMLModelView::GetPVSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pCenterVerticalOffsetSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetTHSpline()
+vtkKochanekSpline* medOpMMLModelView::GetTHSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pHorizontalTranslationSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetTVSpline()
+vtkKochanekSpline* medOpMMLModelView::GetTVSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pVerticalTranslationSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetRASpline()
+vtkKochanekSpline* medOpMMLModelView::GetRASpline()
 //----------------------------------------------------------------------------
 {
 	return m_pTwistSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetSNSpline()
+vtkKochanekSpline* medOpMMLModelView::GetSNSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pNorthScalingSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetSSSpline()
+vtkKochanekSpline* medOpMMLModelView::GetSSSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pSouthScalingSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetSESpline()
+vtkKochanekSpline* medOpMMLModelView::GetSESpline()
 //----------------------------------------------------------------------------
 {
 	return m_pEastScalingSpline;
 }
 //----------------------------------------------------------------------------
-vtkKochanekSpline* mmoMMLModelView::GetSWSpline()
+vtkKochanekSpline* medOpMMLModelView::GetSWSpline()
 //----------------------------------------------------------------------------
 {
 	return m_pWestScalingSpline;
 }
 //----------------------------------------------------------------------------
-double mmoMMLModelView::GetZOfSyntheticScans(int s)
+double medOpMMLModelView::GetZOfSyntheticScans(int s)
 //----------------------------------------------------------------------------
 {
 	int n; // number of scans
@@ -1467,92 +1467,92 @@ double mmoMMLModelView::GetZOfSyntheticScans(int s)
 	return start + length / (n - 1) * s;
 }
 //----------------------------------------------------------------------------
-double mmoMMLModelView::GetCurrentZOfSyntheticScans()
+double medOpMMLModelView::GetCurrentZOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
 	return GetZOfSyntheticScans(GetCurrentIdOfSyntheticScans());
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::Render()
+void medOpMMLModelView::Render()
 //----------------------------------------------------------------------------
 {
 	m_pRenderWindow->Render();
 }
 //----------------------------------------------------------------------------
-vtkTextMapper* mmoMMLModelView::GetTextMapper2()
+vtkTextMapper* medOpMMLModelView::GetTextMapper2()
 //----------------------------------------------------------------------------
 {
 	return m_pTextMapperX;
 }
 //----------------------------------------------------------------------------
-vtkScaledTextActor* mmoMMLModelView::GetScaledTextActor2()
+vtkScaledTextActor* medOpMMLModelView::GetScaledTextActor2()
 //----------------------------------------------------------------------------
 {
 	return m_pScaledTextActorX;
 }
 //----------------------------------------------------------------------------
-vtkScaledTextActor* mmoMMLModelView::GetScaledTextActor1()
+vtkScaledTextActor* medOpMMLModelView::GetScaledTextActor1()
 //----------------------------------------------------------------------------
 {
 	return m_pScaledTextActorY;
 }
 //----------------------------------------------------------------------------
-vtkTextMapper* mmoMMLModelView::GetTextMapper1()
+vtkTextMapper* medOpMMLModelView::GetTextMapper1()
 //----------------------------------------------------------------------------
 {
 	return m_pTextMapperY;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetNEContourActor()
+vtkActor* medOpMMLModelView::GetNEContourActor()
 //----------------------------------------------------------------------------
 {
 	return m_pNEContourActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetNWContourActor()
+vtkActor* medOpMMLModelView::GetNWContourActor()
 //----------------------------------------------------------------------------
 {
 	return m_pNWContourActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetSEContourActor()
+vtkActor* medOpMMLModelView::GetSEContourActor()
 //----------------------------------------------------------------------------
 {
 	return m_pSEContourActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetSWContourActor()
+vtkActor* medOpMMLModelView::GetSWContourActor()
 //----------------------------------------------------------------------------
 {
 	return m_pSWContourActor;
 }
 //----------------------------------------------------------------------------
-vtkTransformPolyDataFilter* mmoMMLModelView::GetNEContourTransformPolyDataFilter()
+vtkTransformPolyDataFilter* medOpMMLModelView::GetNEContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pNEContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
-vtkTransformPolyDataFilter* mmoMMLModelView::GetNWContourTransformPolyDataFilter()
+vtkTransformPolyDataFilter* medOpMMLModelView::GetNWContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pNWContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
-vtkTransformPolyDataFilter* mmoMMLModelView::GetSEContourTransformPolyDataFilter()
+vtkTransformPolyDataFilter* medOpMMLModelView::GetSEContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pSEContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
-vtkTransformPolyDataFilter* mmoMMLModelView::GetSWContourTransformPolyDataFilter()
+vtkTransformPolyDataFilter* medOpMMLModelView::GetSWContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pSWContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
 /** m = 1, 2 for text actor 1,2 */
-void mmoMMLModelView::SetText(int m, double n, int d, int s)
+void medOpMMLModelView::SetText(int m, double n, int d, int s)
 //----------------------------------------------------------------------------
 {
 	char text[10];
@@ -1679,14 +1679,14 @@ void mmoMMLModelView::SetText(int m, double n, int d, int s)
 		GetTextMapper2()->SetInput(text);
 }
 //----------------------------------------------------------------------------
-vtkCamera* mmoMMLModelView::GetActiveCamera()
+vtkCamera* medOpMMLModelView::GetActiveCamera()
 //----------------------------------------------------------------------------
 {
 	return m_pRenderer->GetActiveCamera();
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SaveCameraFocalPoint(double *fp)
+void medOpMMLModelView::SaveCameraFocalPoint(double *fp)
 //----------------------------------------------------------------------------
 {
 	m_pCameraFocalPoint[0] = *fp;
@@ -1694,7 +1694,7 @@ void mmoMMLModelView::SaveCameraFocalPoint(double *fp)
 	m_pCameraFocalPoint[2] = *(fp+2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SaveCameraPosition(double *cp)
+void medOpMMLModelView::SaveCameraPosition(double *cp)
 //----------------------------------------------------------------------------
 {
 	m_pCameraPosition[0] = *cp;
@@ -1702,14 +1702,14 @@ void mmoMMLModelView::SaveCameraPosition(double *cp)
 	m_pCameraPosition[2] = *(cp+2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SaveCameraClippingRange(double *cr)
+void medOpMMLModelView::SaveCameraClippingRange(double *cr)
 //----------------------------------------------------------------------------
 {
 	m_pCameraClippingRange[0] = *cr;
 	m_pCameraClippingRange[1] = *(cr+1);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SaveCameraViewUp(double *vu)
+void medOpMMLModelView::SaveCameraViewUp(double *vu)
 //----------------------------------------------------------------------------
 {
 	m_pCameraViewUp[0] = *vu;
@@ -1717,7 +1717,7 @@ void mmoMMLModelView::SaveCameraViewUp(double *vu)
 	m_pCameraViewUp[2] = *(vu+2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::RetrieveCameraFocalPoint(double *fp)
+void medOpMMLModelView::RetrieveCameraFocalPoint(double *fp)
 //----------------------------------------------------------------------------
 {
 	*fp = m_pCameraFocalPoint[0];
@@ -1725,7 +1725,7 @@ void mmoMMLModelView::RetrieveCameraFocalPoint(double *fp)
 	*(fp+2) = m_pCameraFocalPoint[2];
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::RetrieveCameraPosition(double *cp)
+void medOpMMLModelView::RetrieveCameraPosition(double *cp)
 //----------------------------------------------------------------------------
 {
 	*cp = m_pCameraPosition[0];
@@ -1733,14 +1733,14 @@ void mmoMMLModelView::RetrieveCameraPosition(double *cp)
 	*(cp+2) = m_pCameraPosition[2];
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::RetrieveCameraClippingRange(double *cr)
+void medOpMMLModelView::RetrieveCameraClippingRange(double *cr)
 //----------------------------------------------------------------------------
 {
 	*cr = m_pCameraClippingRange[0];
 	*(cr+1) = m_pCameraClippingRange[1];
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::RetrieveCameraViewUp(double *vu)
+void medOpMMLModelView::RetrieveCameraViewUp(double *vu)
 //----------------------------------------------------------------------------
 {
 	*vu = m_pCameraViewUp[0];
@@ -1749,76 +1749,76 @@ void mmoMMLModelView::RetrieveCameraViewUp(double *vu)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::AddActor(vtkActor *a)
+void medOpMMLModelView::AddActor(vtkActor *a)
 //----------------------------------------------------------------------------
 {
 	m_pRenderer->AddActor(a);
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetPositiveXAxisActor()
+vtkActor* medOpMMLModelView::GetPositiveXAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pPosXAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetPositiveYAxisActor()
+vtkActor* medOpMMLModelView::GetPositiveYAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pPosYAxisActor;
 }
-vtkActor* mmoMMLModelView::GetPositiveZAxisActor()
+vtkActor* medOpMMLModelView::GetPositiveZAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pPosZAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetNegativeXAxisActor()
+vtkActor* medOpMMLModelView::GetNegativeXAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pNegXAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetNegativeYAxisActor()
+vtkActor* medOpMMLModelView::GetNegativeYAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pNegYAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetNegativeZAxisActor()
+vtkActor* medOpMMLModelView::GetNegativeZAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pNegZAxisActor;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetPositiveLineActorX(double p1[], double p2[])
+void medOpMMLModelView::SetPositiveLineActorX(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
 	m_pPosXAxisLineSource->SetPoint1(p1);
 	m_pPosXAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetNegativeLineActorY(double p1[], double p2[])
+void medOpMMLModelView::SetNegativeLineActorY(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
 	m_pNegYAxisLineSource->SetPoint1(p1);
 	m_pNegYAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetPositiveLineActorY(double p1[], double p2[])
+void medOpMMLModelView::SetPositiveLineActorY(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
 	m_pPosYAxisLineSource->SetPoint1(p1);
 	m_pPosYAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetNegativeLineActorX(double p1[], double p2[])
+void medOpMMLModelView::SetNegativeLineActorX(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
 	m_pNegXAxisLineSource->SetPoint1(p1);
 	m_pNegXAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
+void medOpMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
 //----------------------------------------------------------------------------
 {
 	int i, j;
@@ -1846,26 +1846,26 @@ void mmoMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
 	fclose( stream );
 }
 //----------------------------------------------------------------------------
-vtkLODActor* mmoMMLModelView::GetMuscleLODActor()
+vtkLODActor* medOpMMLModelView::GetMuscleLODActor()
 //----------------------------------------------------------------------------
 {
 	return m_pMuscleLODActor;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetTotalNumberOfSyntheticScans(int n)
+void medOpMMLModelView::SetTotalNumberOfSyntheticScans(int n)
 //----------------------------------------------------------------------------
 {
 	m_nSyntheticScansTotalNumber = n;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetResolutionOfSyntheticScans(int x, int y)
+void medOpMMLModelView::SetResolutionOfSyntheticScans(int x, int y)
 //----------------------------------------------------------------------------
 {
 	m_nSyntheticScansXResolution = x;
 	m_nSyntheticScansYResolution = y;
 }
 //----------------------------------------------------------------------------
-int mmoMMLModelView::GetTotalNumberOfSyntheticScans()
+int medOpMMLModelView::GetTotalNumberOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
 	assert(m_nSyntheticScansTotalNumber > 3); // at least 3 synthetic scans
@@ -1873,7 +1873,7 @@ int mmoMMLModelView::GetTotalNumberOfSyntheticScans()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetResolutionOfSyntheticScans(int *x, int *y)
+void medOpMMLModelView::GetResolutionOfSyntheticScans(int *x, int *y)
 //----------------------------------------------------------------------------
 {
 	*x = m_nSyntheticScansXResolution;
@@ -1881,45 +1881,45 @@ void mmoMMLModelView::GetResolutionOfSyntheticScans(int *x, int *y)
 }
 
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetActorOfSyntheticScans(int s)
+vtkActor* medOpMMLModelView::GetActorOfSyntheticScans(int s)
 //----------------------------------------------------------------------------
 {
 	return m_pSyntheticScansActor[s];
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetCurrentIdOfSyntheticScans(int n)
+void medOpMMLModelView::SetCurrentIdOfSyntheticScans(int n)
 //----------------------------------------------------------------------------
 {
 	m_nSyntheticScansCurrentId = n;
 }
 //----------------------------------------------------------------------------
-int mmoMMLModelView::GetCurrentIdOfSyntheticScans()
+int medOpMMLModelView::GetCurrentIdOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
 	return m_nSyntheticScansCurrentId;
 }
 //----------------------------------------------------------------------------
-vtkWindowLevelLookupTable* mmoMMLModelView::GetWindowLevelLookupTableOfSyntheticScans()
+vtkWindowLevelLookupTable* medOpMMLModelView::GetWindowLevelLookupTableOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
 	return m_pSyntheticScansWindowLevelLookupTable;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetSizeOfSyntheticScans(float x, float y)
+void medOpMMLModelView::SetSizeOfSyntheticScans(float x, float y)
 //----------------------------------------------------------------------------
 {
 	m_nSyntheticScansXSize = x;
 	m_nSyntheticScansYSize = y;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetSizeOfSyntheticScans(float *x, float *y)
+void medOpMMLModelView::GetSizeOfSyntheticScans(float *x, float *y)
 //----------------------------------------------------------------------------
 {
 	*x = m_nSyntheticScansXSize;
 	*y = m_nSyntheticScansYSize;
 }
 //----------------------------------------------------------------------------
-vtkMatrix4x4* mmoMMLModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b)
+vtkMatrix4x4* medOpMMLModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b)
 //----------------------------------------------------------------------------
 {
 	//
@@ -1952,238 +1952,238 @@ vtkMatrix4x4* mmoMMLModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *
 	return c;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetXYScalingFactorsOfMuscle(double x, double y)
+void medOpMMLModelView::SetXYScalingFactorsOfMuscle(double x, double y)
 //----------------------------------------------------------------------------
 {
 	m_flMuscleXScalingFactor = x;
 	m_flMuscleYScalingFactor = y;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetXYScalingFactorsOfMuscle(double *x, double *y)
+void medOpMMLModelView::GetXYScalingFactorsOfMuscle(double *x, double *y)
 //----------------------------------------------------------------------------
 {
 	*x = m_flMuscleXScalingFactor;
 	*y = m_flMuscleYScalingFactor;
 }
 //----------------------------------------------------------------------------
-vtkTransformPolyDataFilter* mmoMMLModelView::GetContourCutterTransformPolyDataFilter()
+vtkTransformPolyDataFilter* medOpMMLModelView::GetContourCutterTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pContourCutterTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
-vtkPlane* mmoMMLModelView::GetContourPlane()
+vtkPlane* medOpMMLModelView::GetContourPlane()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPlane;
 }
 //----------------------------------------------------------------------------
-vtkTransform* mmoMMLModelView::GetContourCutterTransform()
+vtkTransform* medOpMMLModelView::GetContourCutterTransform()
 //----------------------------------------------------------------------------
 {
 	return m_pContourCutterTransform;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetPositiveXAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetPositiveXAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pPosXAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetNegativeXAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetNegativeXAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pNegXAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetPositiveYAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetPositiveYAxisLineSource()
 //----------------------------------------------------------------------------
 {
 		return m_pPosYAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetNegativeYAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetNegativeYAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pNegYAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetPositiveXAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetPositiveXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pPosXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetNegativeXAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetNegativeXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pNegXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetPositiveYAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetPositiveYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pPosYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetNegativeYAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetNegativeYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pNegYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkRenderWindowInteractor* mmoMMLModelView::GetRenderWindowInteractor()
+vtkRenderWindowInteractor* medOpMMLModelView::GetRenderWindowInteractor()
 //----------------------------------------------------------------------------
 {
 	return m_pRenderWindowInteractor;
 }
 //----------------------------------------------------------------------------
-vtkInteractorStyleImage* mmoMMLModelView::GetInteractorStyleImage()
+vtkInteractorStyleImage* medOpMMLModelView::GetInteractorStyleImage()
 //----------------------------------------------------------------------------
 {
 	return m_pInteractorStyleImage;
 }
 //----------------------------------------------------------------------------
-vtkInteractorStyleTrackballCamera* mmoMMLModelView::GetInteractorStyleTrackballCamera()
+vtkInteractorStyleTrackballCamera* medOpMMLModelView::GetInteractorStyleTrackballCamera()
 //----------------------------------------------------------------------------
 {
 	return m_pInteractorStyleTrackballCamera;
 }
 
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetContourPositiveXAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetContourPositiveXAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPosXAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetContourPositiveYAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetContourPositiveYAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPosYAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetContourNegativeXAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetContourNegativeXAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pContourNegXAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkLineSource* mmoMMLModelView::GetContourNegativeYAxisLineSource()
+vtkLineSource* medOpMMLModelView::GetContourNegativeYAxisLineSource()
 //----------------------------------------------------------------------------
 {
 	return m_pContourNegYAxisLineSource;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetContourPositiveXAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetContourPositiveXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPosXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetContourPositiveYAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetContourPositiveYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPosYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetContourNegativeXAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetContourNegativeXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pContourNegXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetContourNegativeYAxisTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetContourNegativeYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pContourNegYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetContourPositiveXAxisActor()
+vtkActor* medOpMMLModelView::GetContourPositiveXAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPosXAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetContourPositiveYAxisActor()
+vtkActor* medOpMMLModelView::GetContourPositiveYAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pContourPosYAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetContourNegativeXAxisActor()
+vtkActor* medOpMMLModelView::GetContourNegativeXAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pContourNegXAxisActor;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLModelView::GetContourNegativeYAxisActor()
+vtkActor* medOpMMLModelView::GetContourNegativeYAxisActor()
 //----------------------------------------------------------------------------
 {
 	return m_pContourNegYAxisActor;
 }
 //----------------------------------------------------------------------------
-float mmoMMLModelView::GetLowScalar()
+float medOpMMLModelView::GetLowScalar()
 //----------------------------------------------------------------------------
 {
 	return m_SyntheticScansMinScalarValue;
 }
 //----------------------------------------------------------------------------
-float mmoMMLModelView::GetHighScalar()
+float medOpMMLModelView::GetHighScalar()
 //----------------------------------------------------------------------------
 {
  	return m_SyntheticScansMaxScalarValue;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetTypeOfMuscles(int t)
+void medOpMMLModelView::SetTypeOfMuscles(int t)
 //----------------------------------------------------------------------------
 {
 	m_nTypeOfMuscles = t;
 }
 //----------------------------------------------------------------------------
-int mmoMMLModelView::GetTypeOfMuscles()
+int medOpMMLModelView::GetTypeOfMuscles()
 //----------------------------------------------------------------------------
 {
 	return m_nTypeOfMuscles;
 }
 //----------------------------------------------------------------------------
-vtkPlane* mmoMMLModelView::GetCuttingPlaneNorth()
+vtkPlane* medOpMMLModelView::GetCuttingPlaneNorth()
 //----------------------------------------------------------------------------
 {
 	return m_pX0ZNPlane;
 }
 //----------------------------------------------------------------------------
-vtkPlane* mmoMMLModelView::GetCuttingPlaneSouth()
+vtkPlane* medOpMMLModelView::GetCuttingPlaneSouth()
 //----------------------------------------------------------------------------
 {
 	return m_pX0ZSPlane;
 }
 //----------------------------------------------------------------------------
-vtkPlane* mmoMMLModelView::GetCuttingPlaneEast()
+vtkPlane* medOpMMLModelView::GetCuttingPlaneEast()
 //----------------------------------------------------------------------------
 {
 	return m_pY0ZEPlane;
 }
 //----------------------------------------------------------------------------
-vtkPlane* mmoMMLModelView::GetCuttingPlaneWest()
+vtkPlane* medOpMMLModelView::GetCuttingPlaneWest()
 //----------------------------------------------------------------------------
 {
 	return m_pY0ZWPlane;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetContourAxesLengthScale(float l)
+void medOpMMLModelView::SetContourAxesLengthScale(float l)
 {
 	ContourAxesLengthScale = l;
 }
 //----------------------------------------------------------------------------
-float mmoMMLModelView::GetContourAxesLengthScale()
+float medOpMMLModelView::GetContourAxesLengthScale()
 //----------------------------------------------------------------------------
 {
 	return ContourAxesLengthScale;
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateContourCuttingPlane()
+void medOpMMLModelView::UpdateContourCuttingPlane()
 //----------------------------------------------------------------------------
 {
 	if (m_3dDisplay == 0) // standard display
@@ -2226,7 +2226,7 @@ void mmoMMLModelView::UpdateContourCuttingPlane()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateSegmentCuttingPlanes()
+void medOpMMLModelView::UpdateSegmentCuttingPlanes()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2254,7 +2254,7 @@ void mmoMMLModelView::UpdateSegmentCuttingPlanes()
 	GetCuttingPlaneWest()->SetOrigin(center[0] - trans[0], 0.0, 0.0); // x translation only
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateContourAxesTransform()
+void medOpMMLModelView::UpdateContourAxesTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2317,7 +2317,7 @@ void mmoMMLModelView::UpdateContourAxesTransform()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetContourAxesVisibility()
+void medOpMMLModelView::SetContourAxesVisibility()
 //----------------------------------------------------------------------------
 {
 	if (m_3dDisplay == 1)
@@ -2361,7 +2361,7 @@ void mmoMMLModelView::SetContourAxesVisibility()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateGlobalAxesTransform()
+void medOpMMLModelView::UpdateGlobalAxesTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2410,7 +2410,7 @@ void mmoMMLModelView::UpdateGlobalAxesTransform()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetGlobalAxesVisibility()
+void medOpMMLModelView::SetGlobalAxesVisibility()
 //----------------------------------------------------------------------------
 {
 	if (m_3dDisplay == 1)
@@ -2424,7 +2424,7 @@ void mmoMMLModelView::SetGlobalAxesVisibility()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateSegmentNorthEastTransform()
+void medOpMMLModelView::UpdateSegmentNorthEastTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2497,7 +2497,7 @@ void mmoMMLModelView::UpdateSegmentNorthEastTransform()
 	Transform->Delete();
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateSegmentNorthWestTransform()
+void medOpMMLModelView::UpdateSegmentNorthWestTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2570,7 +2570,7 @@ void mmoMMLModelView::UpdateSegmentNorthWestTransform()
 	Transform->Delete();
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateSegmentSouthEastTransform()
+void medOpMMLModelView::UpdateSegmentSouthEastTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2643,7 +2643,7 @@ void mmoMMLModelView::UpdateSegmentSouthEastTransform()
 	Transform->Delete();
 }
 //----------------------------------------------------------------------------
-void mmoMMLModelView::UpdateSegmentSouthWestTransform()
+void medOpMMLModelView::UpdateSegmentSouthWestTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2717,7 +2717,7 @@ void mmoMMLModelView::UpdateSegmentSouthWestTransform()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark1OfAtlas(double *xyz)
+void medOpMMLModelView::SetLandmark1OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleAtlasInsertionPoint1[0] = xyz[0];
@@ -2726,7 +2726,7 @@ void mmoMMLModelView::SetLandmark1OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark2OfAtlas(double *xyz)
+void medOpMMLModelView::SetLandmark2OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleAtlasInsertionPoint2[0] = xyz[0];
@@ -2735,7 +2735,7 @@ void mmoMMLModelView::SetLandmark2OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark3OfAtlas(double *xyz)
+void medOpMMLModelView::SetLandmark3OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleAtlasReferencePoint1[0] = xyz[0];
@@ -2744,7 +2744,7 @@ void mmoMMLModelView::SetLandmark3OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark4OfAtlas(double *xyz)
+void medOpMMLModelView::SetLandmark4OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleAtlasReferencePoint2[0] = xyz[0];
@@ -2753,7 +2753,7 @@ void mmoMMLModelView::SetLandmark4OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark1OfAtlas(double *xyz)
+void medOpMMLModelView::GetLandmark1OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleAtlasInsertionPoint1[0];
@@ -2762,7 +2762,7 @@ void mmoMMLModelView::GetLandmark1OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark2OfAtlas(double *xyz)
+void medOpMMLModelView::GetLandmark2OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleAtlasInsertionPoint2[0];
@@ -2771,7 +2771,7 @@ void mmoMMLModelView::GetLandmark2OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark3OfAtlas(double *xyz)
+void medOpMMLModelView::GetLandmark3OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleAtlasReferencePoint1[0];
@@ -2780,7 +2780,7 @@ void mmoMMLModelView::GetLandmark3OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark4OfAtlas(double *xyz)
+void medOpMMLModelView::GetLandmark4OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleAtlasReferencePoint2[0];
@@ -2789,7 +2789,7 @@ void mmoMMLModelView::GetLandmark4OfAtlas(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark1OfPatient(double *xyz)
+void medOpMMLModelView::SetLandmark1OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleScansInsertionPoint1[0] = xyz[0];
@@ -2798,7 +2798,7 @@ void mmoMMLModelView::SetLandmark1OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark2OfPatient(double *xyz)
+void medOpMMLModelView::SetLandmark2OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleScansInsertionPoint2[0] = xyz[0];
@@ -2807,7 +2807,7 @@ void mmoMMLModelView::SetLandmark2OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark3OfPatient(double *xyz)
+void medOpMMLModelView::SetLandmark3OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleScansReferencePoint1[0] = xyz[0];
@@ -2816,7 +2816,7 @@ void mmoMMLModelView::SetLandmark3OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetLandmark4OfPatient(double *xyz)
+void medOpMMLModelView::SetLandmark4OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	m_dMuscleScansReferencePoint2[0] = xyz[0];
@@ -2825,7 +2825,7 @@ void mmoMMLModelView::SetLandmark4OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark1OfPatient(double *xyz)
+void medOpMMLModelView::GetLandmark1OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleScansInsertionPoint1[0];
@@ -2834,7 +2834,7 @@ void mmoMMLModelView::GetLandmark1OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark2OfPatient(double *xyz)
+void medOpMMLModelView::GetLandmark2OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleScansInsertionPoint2[0];
@@ -2843,7 +2843,7 @@ void mmoMMLModelView::GetLandmark2OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark3OfPatient(double *xyz)
+void medOpMMLModelView::GetLandmark3OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleScansReferencePoint1[0];
@@ -2852,7 +2852,7 @@ void mmoMMLModelView::GetLandmark3OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::GetLandmark4OfPatient(double *xyz)
+void medOpMMLModelView::GetLandmark4OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
 	xyz[0] = m_dMuscleScansReferencePoint2[0];
@@ -2861,7 +2861,7 @@ void mmoMMLModelView::GetLandmark4OfPatient(double *xyz)
 }
 
 //----------------------------------------------------------------------------
-bool mmoMMLModelView::SetUpContourCoordinateAxes()
+bool medOpMMLModelView::SetUpContourCoordinateAxes()
 //----------------------------------------------------------------------------
 {
 	// east
@@ -2896,7 +2896,7 @@ bool mmoMMLModelView::SetUpContourCoordinateAxes()
 }
 
 //----------------------------------------------------------------------------
-bool mmoMMLModelView::SetUpGlobalCoordinateAxes()
+bool medOpMMLModelView::SetUpGlobalCoordinateAxes()
 //----------------------------------------------------------------------------
 {
 	// east
@@ -2935,7 +2935,7 @@ bool mmoMMLModelView::SetUpGlobalCoordinateAxes()
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::Switch3dDisplayOn()
+void medOpMMLModelView::Switch3dDisplayOn()
 //----------------------------------------------------------------------------
 {
  	// 3d display flag
@@ -3066,7 +3066,7 @@ void mmoMMLModelView::Switch3dDisplayOn()
 
 //SIL. 24-12-2004: begin
 //----------------------------------------------------------------------------
-void mmoMMLModelView::Print(vtkObject *obj, wxString msg)
+void medOpMMLModelView::Print(vtkObject *obj, wxString msg)
 //----------------------------------------------------------------------------
 {
 		wxLogMessage("%s",msg);
@@ -3094,35 +3094,35 @@ void mmoMMLModelView::Print(vtkObject *obj, wxString msg)
 //SIL. 24-12-2004: end
 
 //----------------------------------------------------------------------------
-int mmoMMLModelView::GetScalingOccured()
+int medOpMMLModelView::GetScalingOccured()
 //----------------------------------------------------------------------------
 {
 	return ScalingOccured;
 }
 
 //----------------------------------------------------------------------------
-vtkTransformPolyDataFilter* mmoMMLModelView::GetMuscleTransform2PolyDataFilter()
+vtkTransformPolyDataFilter* medOpMMLModelView::GetMuscleTransform2PolyDataFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pMuscleTransform2PolyDataFilter;
 }
 
 //----------------------------------------------------------------------------
-vtkMatrix4x4* mmoMMLModelView::GetFinalM()
+vtkMatrix4x4* medOpMMLModelView::GetFinalM()
 //----------------------------------------------------------------------------
 {
 	return m_pfinalm;
 }
 
 //----------------------------------------------------------------------------
-vtkTubeFilter* mmoMMLModelView::GetContourTubeFilter()
+vtkTubeFilter* medOpMMLModelView::GetContourTubeFilter()
 //----------------------------------------------------------------------------
 {
 	return m_pContourTubeFilter;
 }
 
 //----------------------------------------------------------------------------
-float mmoMMLModelView::GetSyntheticScansWindow()
+float medOpMMLModelView::GetSyntheticScansWindow()
 //----------------------------------------------------------------------------
 {
 	//assert(m_pWindow > 0);
@@ -3130,21 +3130,21 @@ float mmoMMLModelView::GetSyntheticScansWindow()
 }
 
 //----------------------------------------------------------------------------
-float mmoMMLModelView::GetSyntheticScansLevel()
+float medOpMMLModelView::GetSyntheticScansLevel()
 //----------------------------------------------------------------------------
 {
 	return m_pLevel;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::Set4LandmarksFlag(int n)
+void medOpMMLModelView::Set4LandmarksFlag(int n)
 //----------------------------------------------------------------------------
 {
 	m_4Landmarks = n;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLModelView::SetGrainOfScans(int n)
+void medOpMMLModelView::SetGrainOfScans(int n)
 //----------------------------------------------------------------------------
 {
 	m_SyntheticScansGrain = n;

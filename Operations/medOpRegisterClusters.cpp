@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoRegisterClusters.cpp,v $
+  Module:    $RCSfile: medOpRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-05 14:51:05 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-28 08:49:26 $
+  Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoRegisterClusters.h"
+#include "medOpRegisterClusters.h"
 
 #include "mafDecl.h"
 #include <wx/busyinfo.h>
@@ -43,7 +43,7 @@
 #include "vtkTransformPolyDataFilter.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoRegisterClusters);
+mafCxxTypeMacro(medOpRegisterClusters);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ enum ID_REGISTER_CLUSTERS
 	AFFINE
 };
 //----------------------------------------------------------------------------
-mmoRegisterClusters::mmoRegisterClusters(wxString label) :
+medOpRegisterClusters::medOpRegisterClusters(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -89,7 +89,7 @@ mafOp(label)
   m_Dialog = NULL;
 }
 //----------------------------------------------------------------------------
-mmoRegisterClusters::~mmoRegisterClusters( ) 
+medOpRegisterClusters::~medOpRegisterClusters( ) 
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_Follower);
@@ -108,13 +108,13 @@ mmoRegisterClusters::~mmoRegisterClusters( )
 	}
 }
 //----------------------------------------------------------------------------
-mafOp* mmoRegisterClusters::Copy()   
+mafOp* medOpRegisterClusters::Copy()   
 //----------------------------------------------------------------------------
 {
-	return new mmoRegisterClusters(m_Label);
+	return new medOpRegisterClusters(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mmoRegisterClusters::Accept(mafNode* node)
+bool medOpRegisterClusters::Accept(mafNode* node)
 //----------------------------------------------------------------------------
 {
 	if(!node) return false;
@@ -140,7 +140,7 @@ enum
 	
 };
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::OpRun()   
+void medOpRegisterClusters::OpRun()   
 //----------------------------------------------------------------------------
 {
   m_Source = (mafVMELandmarkCloud*)m_Input;
@@ -189,7 +189,7 @@ void mmoRegisterClusters::OpRun()
 
 }
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
+void medOpRegisterClusters::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if(mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -199,7 +199,7 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
 		  case ID_CHOOSE:
 		  {
 			  mafString s(_("Choose cloud"));
-        mafEvent e(this,VME_CHOOSE, &s, (long)&mmoRegisterClusters::ClosedCloudAccept);
+        mafEvent e(this,VME_CHOOSE, &s, (long)&medOpRegisterClusters::ClosedCloudAccept);
 			  mafEventMacro(e);
 			  mafNode *vme = e.GetVme();
 		    OnChooseVme(vme);
@@ -210,7 +210,7 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
 		  case ID_CHOOSE_SURFACE:
 		  {
 			  mafString s(_("Choose surface"));
-        mafEvent e(this,VME_CHOOSE, &s, (long)&mmoRegisterClusters::SurfaceAccept);
+        mafEvent e(this,VME_CHOOSE, &s, (long)&medOpRegisterClusters::SurfaceAccept);
 			  mafEventMacro(e);
 			  mafNode *vme = e.GetVme();
 		    OnChooseVme(vme);
@@ -304,7 +304,7 @@ void mmoRegisterClusters::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::OpDo()
+void medOpRegisterClusters::OpDo()
 //----------------------------------------------------------------------------
 {
 	wxBusyInfo wait(_("Please wait, working..."));
@@ -570,7 +570,7 @@ void mmoRegisterClusters::OpDo()
   mafEventMacro(mafEvent(this,TIME_SET,-1.0));
 }
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::OpUndo()
+void medOpRegisterClusters::OpUndo()
 //----------------------------------------------------------------------------
 {
   assert(m_Result);
@@ -582,7 +582,7 @@ void mmoRegisterClusters::OpUndo()
   mafDEL(m_Info);
 }
 //----------------------------------------------------------------------------
-int mmoRegisterClusters::ExtractMatchingPoints(double time)
+int medOpRegisterClusters::ExtractMatchingPoints(double time)
 //----------------------------------------------------------------------------
 {
 	m_PointsSource->Reset();
@@ -658,7 +658,7 @@ int mmoRegisterClusters::ExtractMatchingPoints(double time)
 	return ncp;
 }
 //----------------------------------------------------------------------------
-double mmoRegisterClusters::RegisterPoints(double currTime)
+double medOpRegisterClusters::RegisterPoints(double currTime)
 //----------------------------------------------------------------------------
 {
   double deviation = 0.0;
@@ -785,7 +785,7 @@ double mmoRegisterClusters::RegisterPoints(double currTime)
   return deviation;
 }
 //----------------------------------------------------------------------------
-void mmoRegisterClusters::OnChooseVme(mafNode *vme)
+void medOpRegisterClusters::OnChooseVme(mafNode *vme)
 //----------------------------------------------------------------------------
 {
 	if(!vme) // user choose cancel - keep everything as before

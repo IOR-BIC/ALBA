@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMMLContourWidget.h,v $
+  Module:    $RCSfile: medOpMMLContourWidget.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-11 11:53:06 $
+  Date:      $Date: 2008-04-28 08:48:42 $
   Version:   $Revision: 1.1 $
   Authors:   Mel Krokos
 ==========================================================================
@@ -10,16 +10,16 @@
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoMMLContourWidget_h
-#define __mmoMMLContourWidget_h
+#ifndef __medOpMMLContourWidget_h
+#define __medOpMMLContourWidget_h
 
 #include "mafDefines.h"
 
 #include "vtkPolyDataSourceWidget.h"
 #include "vtkTubeFilter.h"
 
-#include "mmoMMLModelView.h"
-#include "mmoMMLParameterView.h"
+#include "medOpMMLModelView.h"
+#include "medOpMMLParameterView.h"
 
 //----------------------------------------------------------------------------
 // forward reference :
@@ -44,21 +44,21 @@ class vtkPlane;
 #define VTK_PLANE_SURFACE 3
 
 //----------------------------------------------------------------------------
-// mmoMMLContourWidget  :
+// medOpMMLContourWidget  :
 //----------------------------------------------------------------------------
-class mmoMMLContourWidget : public vtkPolyDataSourceWidget
+class medOpMMLContourWidget : public vtkPolyDataSourceWidget
 {
 public:
-	void SetPH(mmoMMLParameterView* PH);
-	void SetPV(mmoMMLParameterView* PV);
-	void SetTH(mmoMMLParameterView* TH);
-	void SetTV(mmoMMLParameterView* TV);
-	void SetRA(mmoMMLParameterView* RA);
-	void SetSN(mmoMMLParameterView* SN);
-	void SetSS(mmoMMLParameterView* SS);
-	void SetSE(mmoMMLParameterView* SE);
-	void SetSW(mmoMMLParameterView* SW);
-	void SetModel(mmoMMLModelView* Model);
+	void SetPH(medOpMMLParameterView* PH);
+	void SetPV(medOpMMLParameterView* PV);
+	void SetTH(medOpMMLParameterView* TH);
+	void SetTV(medOpMMLParameterView* TV);
+	void SetRA(medOpMMLParameterView* RA);
+	void SetSN(medOpMMLParameterView* SN);
+	void SetSS(medOpMMLParameterView* SS);
+	void SetSE(medOpMMLParameterView* SE);
+	void SetSW(medOpMMLParameterView* SW);
+	void SetModel(medOpMMLModelView* Model);
 	void SetNextOperationId(int n);
 	int GetNextOperationId();
 	int OperationID;
@@ -120,9 +120,9 @@ public:
 
   // Description:
   // Instantiate the object.
-  static mmoMMLContourWidget *New();
+  static medOpMMLContourWidget *New();
 
-  vtkTypeRevisionMacro(mmoMMLContourWidget,vtkPolyDataSourceWidget);
+  vtkTypeRevisionMacro(medOpMMLContourWidget,vtkPolyDataSourceWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -259,22 +259,22 @@ public:
   vtkGetObjectMacro(SelectedPlaneProperty,vtkProperty);
 
   // MK BEGIN
-  mmoMMLModelView *M; // model
+  medOpMMLModelView *M; // model
   
-  mmoMMLParameterView *CH; // center horizontal translation
-  mmoMMLParameterView *CV; // center vertical translation
-  mmoMMLParameterView *T; // twist
-  mmoMMLParameterView *H; // horizontal translation
-  mmoMMLParameterView *V; // vertical translation
-  mmoMMLParameterView *N; // north scaling
-  mmoMMLParameterView *S; // south scaling
-  mmoMMLParameterView *E; // east scaling
-  mmoMMLParameterView *W; // west scaling
+  medOpMMLParameterView *CH; // center horizontal translation
+  medOpMMLParameterView *CV; // center vertical translation
+  medOpMMLParameterView *T; // twist
+  medOpMMLParameterView *H; // horizontal translation
+  medOpMMLParameterView *V; // vertical translation
+  medOpMMLParameterView *N; // north scaling
+  medOpMMLParameterView *S; // south scaling
+  medOpMMLParameterView *E; // east scaling
+  medOpMMLParameterView *W; // west scaling
   // MK END
 
 protected:
-  mmoMMLContourWidget();
-  ~mmoMMLContourWidget();
+  medOpMMLContourWidget();
+  ~medOpMMLContourWidget();
 
 // MK Operation
   int Operation;
@@ -406,8 +406,8 @@ protected:
   void GeneratePlane();
 
 private:
-  mmoMMLContourWidget(const mmoMMLContourWidget&);  //Not implemented
-  void operator=(const mmoMMLContourWidget&);  //Not implemented
+  medOpMMLContourWidget(const medOpMMLContourWidget&);  //Not implemented
+  void operator=(const medOpMMLContourWidget&);  //Not implemented
 };
 
 #endif

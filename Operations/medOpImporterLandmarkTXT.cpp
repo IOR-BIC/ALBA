@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoLandmarkImporterTXT.cpp,v $
+  Module:    $RCSfile: medOpImporterLandmarkTXT.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-05 16:42:09 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-28 08:44:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoLandmarkImporterTXT.h"
+#include "medOpImporterLandmarkTXT.h"
 #include <wx/busyinfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
@@ -49,7 +49,7 @@ enum ID_LANDMARK_IMPORTER
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoLandmarkImporterTXT::mmoLandmarkImporterTXT(wxString label) :
+medOpImporterLandmarkTXT::medOpImporterLandmarkTXT(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -62,16 +62,16 @@ mafOp(label)
   m_Start = 1;
 }
 //----------------------------------------------------------------------------
-mmoLandmarkImporterTXT::~mmoLandmarkImporterTXT()
+medOpImporterLandmarkTXT::~medOpImporterLandmarkTXT()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoLandmarkImporterTXT::Copy()   
+mafOp* medOpImporterLandmarkTXT::Copy()   
 //----------------------------------------------------------------------------
 {
-	mmoLandmarkImporterTXT *cp = new mmoLandmarkImporterTXT(m_Label);
+	medOpImporterLandmarkTXT *cp = new medOpImporterLandmarkTXT(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -83,7 +83,7 @@ mafOp* mmoLandmarkImporterTXT::Copy()
 }
 
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::OpRun()   
+void medOpImporterLandmarkTXT::OpRun()   
 //----------------------------------------------------------------------------
 {
 
@@ -115,7 +115,7 @@ void mmoLandmarkImporterTXT::OpRun()
   }
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::	OnEvent(mafEventBase *maf_event) 
+void medOpImporterLandmarkTXT::	OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -137,13 +137,13 @@ void mmoLandmarkImporterTXT::	OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::SetSkipColumn(int column)
+void medOpImporterLandmarkTXT::SetSkipColumn(int column)
 //----------------------------------------------------------------------------
 {
   m_Start = column;
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterTXT::Read()   
+void medOpImporterLandmarkTXT::Read()   
 //----------------------------------------------------------------------------
 {
   if (!m_TestMode)

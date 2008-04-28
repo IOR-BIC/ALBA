@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoLandmarkImporter.h,v $
+  Module:    $RCSfile: medOpImporterLandmarkWS.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 08:44:58 $
-  Version:   $Revision: 1.1 $
-  Authors:   Daniele Giunchi
+  Date:      $Date: 2008-04-28 08:44:19 $
+  Version:   $Revision: 1.3 $
+  Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoLandmarkImporter_H__
-#define __mmoLandmarkImporter_H__
+#ifndef __medOpImporterLandmarkWS_H__
+#define __medOpImporterLandmarkWS_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -24,16 +24,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafVMELandmarkCloud;  
 class mafEvent;
 //----------------------------------------------------------------------------
-// mmoLandmarkImporter :
+// medOpImporterLandmarkWS :
 //----------------------------------------------------------------------------
-/** */
-class mmoLandmarkImporter : public mafOp
+/** This importer loads an ASCII file containing all landmarks trajectories,i.e. the position of any marker 
+for any single frame that composes the marker trajectory. Particularly, this file is produced by means of 
+Vicon Workstation© employed in Human Movement Analysis.*/
+
+class medOpImporterLandmarkWS : public mafOp
 {
 public:
-	mmoLandmarkImporter(wxString label);
-	~mmoLandmarkImporter(); 
+	medOpImporterLandmarkWS(wxString label);
+	~medOpImporterLandmarkWS(); 
 	mafOp* Copy();
-  virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
 	bool Accept(mafNode* node) {return true;};
@@ -41,42 +43,22 @@ public:
 	/** Builds operation's interface. */
 	void OpRun();
 
-	/** Execute the operation. */
-	void OpDo();
-
-  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop	(int result);
-
   /** Read the file.
-  the format of the file admits some speficics.
-  1) a line with initial # is a comment
-  2) Before a sequence of landmark it can be a line with "Time XXX" where XXX is a number current of timestep
-     After the list of landmark is finished for that time, a new line with Time XXY or similar will follow.
-     If there's not time, the cloud is considered time-INVARIANT
-  3) the line with landmark data are:
-     nameOfLandmark x y z
+  the format of the file requires some spec
+  1) Check "TRAJECTORIES" as string of the first line
+  2) Read the frequency 
+  3) Read the names of the AL
+  2) Ignore the fourth line
+  3) the first element of each line is Time, then x y z x1 y1 z1 etc
   */
   void Read();
 
-  /** Read the file.
-  the format of the file admits some speficics.
-  1) the line with landmark data are:
-     nameOfLandmark x y z
-  */
-  void ReadWithoutTag();
-
   /** Set the filename for the file to import */
   void SetFileName(const char *file_name){m_File = file_name;};
-
-
-	/** Makes the undo for the operation. */
-	//void OpUndo();                       // gia' implementata in mafOp
 
 protected:
   wxString m_FileDir;
 	wxString m_File;
 	mafVMELandmarkCloud  *m_VmeCloud;
-  int m_TagFileFlag;
-
 };
 #endif

@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 08:52:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi , Stefano Perticoni  
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoMAFTransformScale_H__
-#define __mmoMAFTransformScale_H__
+#ifndef __medOpScaleDataset_H__
+#define __medOpScaleDataset_H__
 
 //----------------------------------------------------------------------------
 // includes :

@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMMLModelView.h,v $
+  Module:    $RCSfile: medOpMMLModelView.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-11 11:53:06 $
+  Date:      $Date: 2008-04-28 08:48:42 $
   Version:   $Revision: 1.1 $
   Authors:   Mel Krokos
 ==========================================================================
@@ -11,8 +11,8 @@
 =========================================================================*/
 
 
-#ifndef __mmoMMLModelView_H__
-#define __mmoMMLModelView_H__
+#ifndef __medOpMMLModelView_H__
+#define __medOpMMLModelView_H__
 
 #include "mafDefines.h"
 
@@ -74,13 +74,13 @@
 #include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
-// mmoMMLModelView     :
+// medOpMMLModelView     :
 //----------------------------------------------------------------------------
-class mmoMMLModelView  
+class medOpMMLModelView  
 {
 public:
-  mmoMMLModelView(vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume);
-  virtual ~mmoMMLModelView();
+  medOpMMLModelView(vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume);
+  virtual ~medOpMMLModelView();
 
   void FindUnitVectorsAndLengthsOfLandmarkLines();
 	vtkMatrix4x4* GetActorTransformOfSyntheticScans(int s);

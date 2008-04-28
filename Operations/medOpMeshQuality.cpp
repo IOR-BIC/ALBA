@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoMeshQuality.cpp,v $
+Module:    $RCSfile: medOpMeshQuality.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-28 08:28:48 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-28 08:48:05 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,7 +47,7 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoMeshQuality.h"
+#include "medOpMeshQuality.h"
 #include "wx/busyinfo.h"
 
 #include "mmgDialog.h"
@@ -77,11 +77,11 @@ MafMedical is partially based on OpenMAF.
 #include "vtkScalarBarActor.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoMeshQuality);
+mafCxxTypeMacro(medOpMeshQuality);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoMeshQuality::mmoMeshQuality(const wxString &label) :
+medOpMeshQuality::medOpMeshQuality(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -97,22 +97,22 @@ mafOp(label)
 	m_BarActor = NULL;
 }
 //----------------------------------------------------------------------------
-mmoMeshQuality::~mmoMeshQuality()
+medOpMeshQuality::~medOpMeshQuality()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_CheckMeshQuality);
 }
 //----------------------------------------------------------------------------
-bool mmoMeshQuality::Accept(mafNode *node)
+bool medOpMeshQuality::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMESurface"));
 }
 //----------------------------------------------------------------------------
-mafOp *mmoMeshQuality::Copy()   
+mafOp *medOpMeshQuality::Copy()   
 //----------------------------------------------------------------------------
 {
-	return (new mmoMeshQuality(m_Label));
+	return (new medOpMeshQuality(m_Label));
 }
 //----------------------------------------------------------------------------
 // Constants:
@@ -122,7 +122,7 @@ enum MESH_QUALITY_ID
 	ID_OK = MINID,
 };
 //----------------------------------------------------------------------------
-void mmoMeshQuality::OpRun()   
+void medOpMeshQuality::OpRun()   
 //----------------------------------------------------------------------------
 {  
 	vtkNEW(m_CheckMeshQuality);
@@ -140,17 +140,17 @@ void mmoMeshQuality::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::OpDo()
+void medOpMeshQuality::OpDo()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::OpUndo()
+void medOpMeshQuality::OpUndo()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::OnEvent(mafEventBase *maf_event)
+void medOpMeshQuality::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -167,13 +167,13 @@ void mmoMeshQuality::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::OpStop(int result)
+void medOpMeshQuality::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::DeleteOpDialog()
+void medOpMeshQuality::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
 	m_Mouse->RemoveObserver(m_Picker);
@@ -190,7 +190,7 @@ void mmoMeshQuality::DeleteOpDialog()
 	cppDEL(m_Dialog);
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::CreateOpDialog()
+void medOpMeshQuality::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
 	wxBusyCursor wait;
@@ -245,7 +245,7 @@ void mmoMeshQuality::CreateOpDialog()
 	this->m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mmoMeshQuality::CreatePolydataPipeline()
+void medOpMeshQuality::CreatePolydataPipeline()
 //----------------------------------------------------------------------------
 {
 	mafVMESurface *surface = mafVMESurface::SafeDownCast(m_Input);

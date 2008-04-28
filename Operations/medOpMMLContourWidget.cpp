@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMMLContourWidget.cpp,v $
+  Module:    $RCSfile: medOpMMLContourWidget.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-04-11 11:53:06 $
+  Date:      $Date: 2008-04-28 08:48:42 $
   Version:   $Revision: 1.1 $
   Authors:   Mel Krokos
 ==========================================================================
@@ -13,7 +13,7 @@
 #include "mafDefines.h"
 
 //#include "MuscleRegistrationProject.h"   ///????????????
-#include "mmoMMLContourWidget.h"
+#include "medOpMMLContourWidget.h"
 
 #include "vtkActor.h"
 #include "vtkAssemblyNode.h"
@@ -41,12 +41,12 @@
 #include "vtkProperty2D.h"
 
 
-vtkCxxRevisionMacro(mmoMMLContourWidget, "$Revision: 1.1 $");
-vtkStandardNewMacro(mmoMMLContourWidget);
-vtkCxxSetObjectMacro(mmoMMLContourWidget, PlaneProperty, vtkProperty);
+vtkCxxRevisionMacro(medOpMMLContourWidget, "$Revision: 1.1 $");
+vtkStandardNewMacro(medOpMMLContourWidget);
+vtkCxxSetObjectMacro(medOpMMLContourWidget, PlaneProperty, vtkProperty);
 
 //----------------------------------------------------------------------------
-mmoMMLContourWidget::mmoMMLContourWidget() 
+medOpMMLContourWidget::medOpMMLContourWidget() 
 : vtkPolyDataSourceWidget()
 //----------------------------------------------------------------------------
 {
@@ -55,8 +55,8 @@ mmoMMLContourWidget::mmoMMLContourWidget()
   this->m_bScalingMode = FALSE; // scaling mode off
   this->m_bRotatingMode = FALSE; // rotating mode off
   this->m_bTranslatingMode = FALSE; // translating mode off
-  this->State = mmoMMLContourWidget::Start;
-  this->EventCallbackCommand->SetCallback(mmoMMLContourWidget::ProcessEvents);
+  this->State = medOpMMLContourWidget::Start;
+  this->EventCallbackCommand->SetCallback(medOpMMLContourWidget::ProcessEvents);
   
   this->NormalToXAxis = 0;
   this->NormalToYAxis = 0;
@@ -216,7 +216,7 @@ mmoMMLContourWidget::mmoMMLContourWidget()
   this->SelectRepresentation();
 }
 //----------------------------------------------------------------------------
-mmoMMLContourWidget::~mmoMMLContourWidget()
+medOpMMLContourWidget::~medOpMMLContourWidget()
 //----------------------------------------------------------------------------
 {
   this->PlaneActor->Delete();
@@ -261,7 +261,7 @@ mmoMMLContourWidget::~mmoMMLContourWidget()
   this->Transform->Delete();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetEnabled(int enabling)
+void medOpMMLContourWidget::SetEnabled(int enabling)
 //----------------------------------------------------------------------------
 {
   if ( ! this->Interactor )
@@ -385,13 +385,13 @@ void mmoMMLContourWidget::SetEnabled(int enabling)
   this->Interactor->Render();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ProcessEvents(vtkObject* vtkNotUsed(object), 
+void medOpMMLContourWidget::ProcessEvents(vtkObject* vtkNotUsed(object), 
                                    unsigned long event,
                                    void* clientdata, 
                                    void* vtkNotUsed(calldata))
 //----------------------------------------------------------------------------
 {
-  mmoMMLContourWidget* self = reinterpret_cast<mmoMMLContourWidget *>( clientdata );
+  medOpMMLContourWidget* self = reinterpret_cast<medOpMMLContourWidget *>( clientdata );
 
   //okay, let's do the right thing
   switch(event)
@@ -424,7 +424,7 @@ void mmoMMLContourWidget::ProcessEvents(vtkObject* vtkNotUsed(object),
     }
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::PrintSelf(ostream& os, vtkIndent indent)
+void medOpMMLContourWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
@@ -502,7 +502,7 @@ void mmoMMLContourWidget::PrintSelf(ostream& os, vtkIndent indent)
      << pt2[2] << ")\n";
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::PositionHandles(float X, float Y)
+void medOpMMLContourWidget::PositionHandles(float X, float Y)
 //----------------------------------------------------------------------------
 {
  /* //int res = this->PlaneSource->GetXResolution();
@@ -584,7 +584,7 @@ void mmoMMLContourWidget::PositionHandles(float X, float Y)
   this->ConeSource2->SetDirection(this->Normal);*/
 }
 //----------------------------------------------------------------------------
-int mmoMMLContourWidget::HighlightHandle(vtkProp *prop)
+int medOpMMLContourWidget::HighlightHandle(vtkProp *prop)
 //----------------------------------------------------------------------------
 {
   // first unhighlight anything picked
@@ -612,7 +612,7 @@ int mmoMMLContourWidget::HighlightHandle(vtkProp *prop)
   return -1;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::HighlightNormal(int highlight)
+void medOpMMLContourWidget::HighlightNormal(int highlight)
 //----------------------------------------------------------------------------
 {
   if ( highlight )
@@ -633,7 +633,7 @@ void mmoMMLContourWidget::HighlightNormal(int highlight)
     }
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::HighlightPlane(int highlight)
+void medOpMMLContourWidget::HighlightPlane(int highlight)
 //----------------------------------------------------------------------------
 {
   if ( highlight )
@@ -648,7 +648,7 @@ void mmoMMLContourWidget::HighlightPlane(int highlight)
     }
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnLeftButtonDown()
+void medOpMMLContourWidget::OnLeftButtonDown()
 //----------------------------------------------------------------------------
 {
   int X = this->Interactor->GetEventPosition()[0];
@@ -658,7 +658,7 @@ void mmoMMLContourWidget::OnLeftButtonDown()
   vtkRenderer *ren = this->Interactor->FindPokedRenderer(X,Y);
   if ( ren != this->CurrentRenderer )
     {
-    this->State = mmoMMLContourWidget::Outside;
+    this->State = medOpMMLContourWidget::Outside;
     return;
     }
   
@@ -669,7 +669,7 @@ void mmoMMLContourWidget::OnLeftButtonDown()
   path = this->HandlePicker->GetPath();
   if ( path != NULL )
     {
-    this->State = mmoMMLContourWidget::Moving;
+    this->State = medOpMMLContourWidget::Moving;
     this->HighlightHandle(path->GetFirstNode()->GetProp());
 
 	if (GetScalingMode())
@@ -679,25 +679,25 @@ void mmoMMLContourWidget::OnLeftButtonDown()
 				if (this->CurrentHandle == this->Handle[0])
 				{
 					// begin s-s op
-					this->Operation = mmoMMLContourWidget::SouthScale;
+					this->Operation = medOpMMLContourWidget::SouthScale;
 				}
 				else
 				if (this->CurrentHandle == this->Handle[1])
 				{
 					// begin s-e op
-					this->Operation = mmoMMLContourWidget::EastScale;
+					this->Operation = medOpMMLContourWidget::EastScale;
 				}
 				else
 				if (this->CurrentHandle == this->Handle[2])
 				{
 					// begin s-w op
-					this->Operation = mmoMMLContourWidget::WestScale;
+					this->Operation = medOpMMLContourWidget::WestScale;
 				}
 				else
 				if (this->CurrentHandle == this->Handle[3])
 				{
 					// begin s-n op
-					this->Operation = mmoMMLContourWidget::NorthScale;
+					this->Operation = medOpMMLContourWidget::NorthScale;
 				}
 			}
 	}
@@ -714,39 +714,39 @@ void mmoMMLContourWidget::OnLeftButtonDown()
            prop == this->ConeActor2 || prop == this->LineActor2*/
 		   prop == this->RotationalHandle)
         {
-        this->State = mmoMMLContourWidget::Rotating;
+        this->State = medOpMMLContourWidget::Rotating;
         this->HighlightNormal(1);
 
 		// begin r-op
-		this->Operation = mmoMMLContourWidget::Rotation;
+		this->Operation = medOpMMLContourWidget::Rotation;
         }
      /* else
 	  if (prop == this->CenterHandle)
         {
-        this->State = mmoMMLContourWidget::Centralising;
+        this->State = medOpMMLContourWidget::Centralising;
         this->HighlightNormal(1);
         }*/
 	  else
         {
-        this->State = mmoMMLContourWidget::Moving;
+        this->State = medOpMMLContourWidget::Moving;
         this->HighlightPlane(1);
 
 		if (GetTranslationMode())
 		{
 			// begin t-op
-			this->Operation = mmoMMLContourWidget::Translation;
+			this->Operation = medOpMMLContourWidget::Translation;
 		}
 		else
 		if (GetCenterMode())
 		{
 			// begin p-op
-			this->Operation = mmoMMLContourWidget::Placement;
+			this->Operation = medOpMMLContourWidget::Placement;
 		}
        }
       }
     else
       {
-      this->State = mmoMMLContourWidget::Outside;
+      this->State = medOpMMLContourWidget::Outside;
       this->HighlightHandle(NULL);
       return;
       }
@@ -758,11 +758,11 @@ void mmoMMLContourWidget::OnLeftButtonDown()
   this->Interactor->Render();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnLeftButtonUp()
+void medOpMMLContourWidget::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 {
-  if ( this->State == mmoMMLContourWidget::Outside ||
-       this->State == mmoMMLContourWidget::Start )
+  if ( this->State == medOpMMLContourWidget::Outside ||
+       this->State == medOpMMLContourWidget::Start )
     {
     return;
     }
@@ -786,22 +786,22 @@ void mmoMMLContourWidget::OnLeftButtonUp()
 
   switch (Operation)
   {
-    case mmoMMLContourWidget::Placement : //
+    case medOpMMLContourWidget::Placement : //
 		                params[3] = M->GetPHSpline()->Evaluate(params[1]);
 						params[4] = M->GetPVSpline()->Evaluate(params[1]);
 	break;
 
-	case mmoMMLContourWidget::Translation : //
+	case medOpMMLContourWidget::Translation : //
 						params[3] = M->GetTHSpline()->Evaluate(params[1]);
 						params[4] = M->GetTVSpline()->Evaluate(params[1]);
 	break;
 
-	case mmoMMLContourWidget::Rotation : //
+	case medOpMMLContourWidget::Rotation : //
 						params[3] = M->GetRASpline()->Evaluate(params[1]);
 						params[4] = 0.0;
 	break;
 
-	case mmoMMLContourWidget::NorthScale : //
+	case medOpMMLContourWidget::NorthScale : //
 						params[3] = M->GetSNSpline()->Evaluate(params[1]);
 						params[4] = 0.0;
 						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
@@ -839,7 +839,7 @@ void mmoMMLContourWidget::OnLeftButtonUp()
 
 	break;
 
-	case mmoMMLContourWidget::SouthScale : //
+	case medOpMMLContourWidget::SouthScale : //
 						params[3] = M->GetSSSpline()->Evaluate(params[1]);
 						params[4] = 0.0;
 						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
@@ -876,7 +876,7 @@ void mmoMMLContourWidget::OnLeftButtonUp()
 						}
 	break;
 
-	case mmoMMLContourWidget::EastScale : //
+	case medOpMMLContourWidget::EastScale : //
 						params[3] = M->GetSESpline()->Evaluate(params[1]);
 						params[4] = 0.0;
 						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
@@ -913,7 +913,7 @@ void mmoMMLContourWidget::OnLeftButtonUp()
 						}
 	break;
 
-	case mmoMMLContourWidget::WestScale : //
+	case medOpMMLContourWidget::WestScale : //
 						params[3] = M->GetSWSpline()->Evaluate(params[1]);
 						params[4] = 0.0;
 						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
@@ -961,7 +961,7 @@ void mmoMMLContourWidget::OnLeftButtonUp()
   // new next op
   SetNextOperationId(GetNextOperationId() + 1);
 
-  this->State = mmoMMLContourWidget::Start;
+  this->State = medOpMMLContourWidget::Start;
   this->HighlightHandle(NULL);
   this->HighlightPlane(0);
   this->HighlightNormal(0);
@@ -973,7 +973,7 @@ void mmoMMLContourWidget::OnLeftButtonUp()
   this->Interactor->Render();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnMiddleButtonDown()
+void medOpMMLContourWidget::OnMiddleButtonDown()
 //----------------------------------------------------------------------------
 {
   /*
@@ -984,7 +984,7 @@ void mmoMMLContourWidget::OnMiddleButtonDown()
   vtkRenderer *ren = this->Interactor->FindPokedRenderer(X,Y);
   if ( ren != this->CurrentRenderer )
     {
-    this->State = mmoMMLContourWidget::Outside;
+    this->State = medOpMMLContourWidget::Outside;
     return;
     }
   
@@ -995,7 +995,7 @@ void mmoMMLContourWidget::OnMiddleButtonDown()
   path = this->HandlePicker->GetPath();
   if ( path != NULL )
     {
-    this->State = mmoMMLContourWidget::Pushing;
+    this->State = medOpMMLContourWidget::Pushing;
     this->HighlightPlane(1);
     this->HighlightNormal(1);
     this->HighlightHandle(path->GetFirstNode()->GetProp());
@@ -1006,12 +1006,12 @@ void mmoMMLContourWidget::OnMiddleButtonDown()
     path = this->PlanePicker->GetPath();
     if ( path == NULL ) //nothing picked
       {
-      this->State = mmoMMLContourWidget::Outside;
+      this->State = medOpMMLContourWidget::Outside;
       return;
       }
     else
       {
-      this->State = mmoMMLContourWidget::Pushing;
+      this->State = medOpMMLContourWidget::Pushing;
       this->HighlightNormal(1);
       this->HighlightPlane(1);
       }
@@ -1024,17 +1024,17 @@ void mmoMMLContourWidget::OnMiddleButtonDown()
   */
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnMiddleButtonUp()
+void medOpMMLContourWidget::OnMiddleButtonUp()
 //----------------------------------------------------------------------------
 {
   /*
-  if ( this->State == mmoMMLContourWidget::Outside ||
-       this->State == mmoMMLContourWidget::Start )
+  if ( this->State == medOpMMLContourWidget::Outside ||
+       this->State == medOpMMLContourWidget::Start )
     {
     return;
     }
 
-  this->State = mmoMMLContourWidget::Start;
+  this->State = medOpMMLContourWidget::Start;
   this->HighlightPlane(0);
   this->HighlightNormal(0);
   this->HighlightHandle(NULL);
@@ -1047,7 +1047,7 @@ void mmoMMLContourWidget::OnMiddleButtonUp()
   */
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnRightButtonDown()
+void medOpMMLContourWidget::OnRightButtonDown()
 //----------------------------------------------------------------------------
 {
   /*
@@ -1058,7 +1058,7 @@ void mmoMMLContourWidget::OnRightButtonDown()
   vtkRenderer *ren = this->Interactor->FindPokedRenderer(X,Y);
   if ( ren != this->CurrentRenderer )
     {
-    this->State = mmoMMLContourWidget::Outside;
+    this->State = medOpMMLContourWidget::Outside;
     return;
     }
   
@@ -1069,7 +1069,7 @@ void mmoMMLContourWidget::OnRightButtonDown()
   path = this->HandlePicker->GetPath();
   if ( path != NULL )
     {
-    this->State = mmoMMLContourWidget::Scaling;
+    this->State = medOpMMLContourWidget::Scaling;
     this->HighlightPlane(1);
     this->HighlightHandle(path->GetFirstNode()->GetProp());
     }
@@ -1079,12 +1079,12 @@ void mmoMMLContourWidget::OnRightButtonDown()
     path = this->PlanePicker->GetPath();
     if ( path == NULL )
       {
-      this->State = mmoMMLContourWidget::Outside;
+      this->State = medOpMMLContourWidget::Outside;
       return;
       }
     else
       {
-      this->State = mmoMMLContourWidget::Scaling;
+      this->State = medOpMMLContourWidget::Scaling;
       this->HighlightPlane(1);
       }
     }
@@ -1096,17 +1096,17 @@ void mmoMMLContourWidget::OnRightButtonDown()
   */
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnRightButtonUp()
+void medOpMMLContourWidget::OnRightButtonUp()
 //----------------------------------------------------------------------------
 {
   /*
-  if ( this->State == mmoMMLContourWidget::Outside ||
-       this->State == mmoMMLContourWidget::Start )
+  if ( this->State == medOpMMLContourWidget::Outside ||
+       this->State == medOpMMLContourWidget::Start )
     {
     return;
     }
 
-  this->State = mmoMMLContourWidget::Start;
+  this->State = medOpMMLContourWidget::Start;
   this->HighlightPlane(0);
   this->SizeHandles();
   
@@ -1117,12 +1117,12 @@ void mmoMMLContourWidget::OnRightButtonUp()
   */
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::OnMouseMove()
+void medOpMMLContourWidget::OnMouseMove()
 //----------------------------------------------------------------------------
 {
   // See whether we're active
-  if ( this->State == mmoMMLContourWidget::Outside || 
-       this->State == mmoMMLContourWidget::Start )
+  if ( this->State == medOpMMLContourWidget::Outside || 
+       this->State == medOpMMLContourWidget::Start )
     {
     return;
     }
@@ -1152,7 +1152,7 @@ void mmoMMLContourWidget::OnMouseMove()
   this->ComputeDisplayToWorld(double(X), double(Y), z, pickPoint);
 
   // Process the motion
-  if ( this->State == mmoMMLContourWidget::Moving )
+  if ( this->State == medOpMMLContourWidget::Moving )
   {
    // interaction operations
    // using a contour widget
@@ -1206,15 +1206,15 @@ void mmoMMLContourWidget::OnMouseMove()
 	this->Place(prevPickPoint, pickPoint);
    }
   }
-  else if ( this->State == mmoMMLContourWidget::Scaling )
+  else if ( this->State == medOpMMLContourWidget::Scaling )
   {
    this->Scale(prevPickPoint, pickPoint, X, Y);
   }
-  else if ( this->State == mmoMMLContourWidget::Pushing )
+  else if ( this->State == medOpMMLContourWidget::Pushing )
   {
    this->Push(prevPickPoint, pickPoint);
   }
-  else if ( this->State == mmoMMLContourWidget::Rotating ) // rotation
+  else if ( this->State == medOpMMLContourWidget::Rotating ) // rotation
   {
    // display information on.
    // off in OnLeftButtonUp()
@@ -1229,7 +1229,7 @@ void mmoMMLContourWidget::OnMouseMove()
   this->Interactor->Render();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::Scale(double *p1, double *p2, int vtkNotUsed(X), int Y)
+void medOpMMLContourWidget::Scale(double *p1, double *p2, int vtkNotUsed(X), int Y)
 //----------------------------------------------------------------------------
 {
   //Get the motion vector
@@ -1276,7 +1276,7 @@ void mmoMMLContourWidget::Scale(double *p1, double *p2, int vtkNotUsed(X), int Y
   this->PositionHandles(0.5, 0.5);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::Push(double *p1, double *p2)
+void medOpMMLContourWidget::Push(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   //Get the motion vector
@@ -1290,7 +1290,7 @@ void mmoMMLContourWidget::Push(double *p1, double *p2)
   this->PositionHandles(0.5, 0.5);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::CreateDefaultProperties()
+void medOpMMLContourWidget::CreateDefaultProperties()
 //----------------------------------------------------------------------------
 {
   // Handle properties
@@ -1311,7 +1311,7 @@ void mmoMMLContourWidget::CreateDefaultProperties()
   this->SelectedPlaneProperty->SetAmbientColor(0.5,0.5,0.5);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::PlaceWidget(double bds[6])
+void medOpMMLContourWidget::PlaceWidget(double bds[6])
 //----------------------------------------------------------------------------
 {
   int i;
@@ -1381,7 +1381,7 @@ void mmoMMLContourWidget::PlaceWidget(double bds[6])
   this->SizeHandles();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SizeHandles()
+void medOpMMLContourWidget::SizeHandles()
 //----------------------------------------------------------------------------
 {
  // float radius = this->vtk3DWidget::SizeHandles(1.25);
@@ -1403,7 +1403,7 @@ void mmoMMLContourWidget::SizeHandles()
   this->ConeSource2->SetRadius(radius);*/
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SelectRepresentation()
+void medOpMMLContourWidget::SelectRepresentation()
 //----------------------------------------------------------------------------
 {
   if ( ! this->CurrentRenderer )
@@ -1445,14 +1445,14 @@ void mmoMMLContourWidget::SelectRepresentation()
 //----------------------------------------------------------------------------
 /** Description:
  Set/Get the resolution (number of subdivisions) of the plane. */
-void mmoMMLContourWidget::SetResolution(int r)
+void medOpMMLContourWidget::SetResolution(int r)
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->SetXResolution(r); 
   this->PlaneSource->SetYResolution(r); 
 }
 //----------------------------------------------------------------------------
-int mmoMMLContourWidget::GetResolution()
+int medOpMMLContourWidget::GetResolution()
 //----------------------------------------------------------------------------
 { 
   return this->PlaneSource->GetXResolution(); 
@@ -1460,26 +1460,26 @@ int mmoMMLContourWidget::GetResolution()
 //----------------------------------------------------------------------------
 // Description:
 // Set/Get the origin of the plane.
-void mmoMMLContourWidget::SetOrigin(double x, double y, double z) 
+void medOpMMLContourWidget::SetOrigin(double x, double y, double z) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->SetOrigin(x,y,z);
   this->PositionHandles(0.5, 0.5);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetOrigin(double x[3]) 
+void medOpMMLContourWidget::SetOrigin(double x[3]) 
 //----------------------------------------------------------------------------
 {
   this->SetOrigin(x[0], x[1], x[2]);
 }
 //----------------------------------------------------------------------------
-double* mmoMMLContourWidget::GetOrigin() 
+double* medOpMMLContourWidget::GetOrigin() 
 //----------------------------------------------------------------------------
 {
   return this->PlaneSource->GetOrigin();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetOrigin(double xyz[3]) 
+void medOpMMLContourWidget::GetOrigin(double xyz[3]) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->GetOrigin(xyz);
@@ -1487,26 +1487,26 @@ void mmoMMLContourWidget::GetOrigin(double xyz[3])
 //----------------------------------------------------------------------------
 // Description:
 // Set/Get the position of the point defining the first axis of the plane.
-void mmoMMLContourWidget::SetPoint1(double x, double y, double z) 
+void medOpMMLContourWidget::SetPoint1(double x, double y, double z) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->SetPoint1(x,y,z);
   //this->PositionHandles(0.5, 0.5);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetPoint1(double x[3]) 
+void medOpMMLContourWidget::SetPoint1(double x[3]) 
 //----------------------------------------------------------------------------
 {
   this->SetPoint1(x[0], x[1], x[2]);
 }
 //----------------------------------------------------------------------------
-double* mmoMMLContourWidget::GetPoint1() 
+double* medOpMMLContourWidget::GetPoint1() 
 //----------------------------------------------------------------------------
 {
   return this->PlaneSource->GetPoint1();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetPoint1(double xyz[3]) 
+void medOpMMLContourWidget::GetPoint1(double xyz[3]) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->GetPoint1(xyz);
@@ -1514,26 +1514,26 @@ void mmoMMLContourWidget::GetPoint1(double xyz[3])
 //----------------------------------------------------------------------------
 // Description:
 // Set/Get the position of the point defining the second axis of the plane.
-void mmoMMLContourWidget::SetPoint2(double x, double y, double z) 
+void medOpMMLContourWidget::SetPoint2(double x, double y, double z) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->SetPoint2(x,y,z);
   //this->PositionHandles(0.5, 0.5);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetPoint2(double x[3]) 
+void medOpMMLContourWidget::SetPoint2(double x[3]) 
 //----------------------------------------------------------------------------
 {
   this->SetPoint2(x[0], x[1], x[2]);
 }
 //----------------------------------------------------------------------------
-double* mmoMMLContourWidget::GetPoint2() 
+double* medOpMMLContourWidget::GetPoint2() 
 //----------------------------------------------------------------------------
 {
   return this->PlaneSource->GetPoint2();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetPoint2(double xyz[3]) 
+void medOpMMLContourWidget::GetPoint2(double xyz[3]) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->GetPoint2(xyz);
@@ -1541,7 +1541,7 @@ void mmoMMLContourWidget::GetPoint2(double xyz[3])
 //----------------------------------------------------------------------------
 // Description:
 // Set the center of the plane.
-void mmoMMLContourWidget::SetCenter(double x, double y, double z) 
+void medOpMMLContourWidget::SetCenter(double x, double y, double z) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->SetCenter(x, y, z);
@@ -1550,7 +1550,7 @@ void mmoMMLContourWidget::SetCenter(double x, double y, double z)
 //----------------------------------------------------------------------------
 // Description:
 // Set the center of the plane.
-void mmoMMLContourWidget::SetCenter(double c[3]) 
+void medOpMMLContourWidget::SetCenter(double c[3]) 
 //----------------------------------------------------------------------------
 {
   this->SetCenter(c[0], c[1], c[2]);
@@ -1558,13 +1558,13 @@ void mmoMMLContourWidget::SetCenter(double c[3])
 //----------------------------------------------------------------------------
 // Description:
 // Get the center of the plane.
-double* mmoMMLContourWidget::GetCenter() 
+double* medOpMMLContourWidget::GetCenter() 
 //----------------------------------------------------------------------------
 {
   return this->PlaneSource->GetCenter();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetCenter(double xyz[3]) 
+void medOpMMLContourWidget::GetCenter(double xyz[3]) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->GetCenter(xyz);
@@ -1572,7 +1572,7 @@ void mmoMMLContourWidget::GetCenter(double xyz[3])
 //----------------------------------------------------------------------------
 // Description:
 // Set the normal to the plane.
-void mmoMMLContourWidget::SetNormal(double x, double y, double z) 
+void medOpMMLContourWidget::SetNormal(double x, double y, double z) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->SetNormal(x, y, z);
@@ -1581,7 +1581,7 @@ void mmoMMLContourWidget::SetNormal(double x, double y, double z)
 //----------------------------------------------------------------------------
 // Description:
 // Set the normal to the plane.
-void mmoMMLContourWidget::SetNormal(double n[3]) 
+void medOpMMLContourWidget::SetNormal(double n[3]) 
 //----------------------------------------------------------------------------
 {
   this->SetNormal(n[0], n[1], n[2]);
@@ -1589,31 +1589,31 @@ void mmoMMLContourWidget::SetNormal(double n[3])
 //----------------------------------------------------------------------------
 // Description:
 // Get the normal to the plane.
-double* mmoMMLContourWidget::GetNormal() 
+double* medOpMMLContourWidget::GetNormal() 
 //----------------------------------------------------------------------------
 {
   return this->PlaneSource->GetNormal();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetNormal(double xyz[3]) 
+void medOpMMLContourWidget::GetNormal(double xyz[3]) 
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->GetNormal(xyz);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetPolyData(vtkPolyData *pd)
+void medOpMMLContourWidget::GetPolyData(vtkPolyData *pd)
 //----------------------------------------------------------------------------
 { 
   pd->ShallowCopy(this->PlaneSource->GetOutput()); 
 }
 //----------------------------------------------------------------------------
-vtkPolyDataSource *mmoMMLContourWidget::GetPolyDataSource()
+vtkPolyDataSource *medOpMMLContourWidget::GetPolyDataSource()
 //----------------------------------------------------------------------------
 {
   return this->PlaneSource;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::GetPlane(vtkPlane *plane)
+void medOpMMLContourWidget::GetPlane(vtkPlane *plane)
 //----------------------------------------------------------------------------
 {
   if ( plane == NULL )
@@ -1625,7 +1625,7 @@ void mmoMMLContourWidget::GetPlane(vtkPlane *plane)
   plane->SetOrigin(this->GetCenter());
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::UpdatePlacement(void)
+void medOpMMLContourWidget::UpdatePlacement(void)
 //----------------------------------------------------------------------------
 {
   this->PlaneSource->Update();
@@ -1635,7 +1635,7 @@ void mmoMMLContourWidget::UpdatePlacement(void)
 // MK BEGIN 26/05/04
 // Description:
 // Set the motion vector
-void mmoMMLContourWidget::SetMotionVector(float x, float y, float z) 
+void medOpMMLContourWidget::SetMotionVector(float x, float y, float z) 
 //----------------------------------------------------------------------------
 {
   this->Motion[0] = x;
@@ -1645,7 +1645,7 @@ void mmoMMLContourWidget::SetMotionVector(float x, float y, float z)
 //----------------------------------------------------------------------------
 // Description:
 // Set the motion vector.
-void mmoMMLContourWidget::SetMotionVector(float m[3]) 
+void medOpMMLContourWidget::SetMotionVector(float m[3]) 
 //----------------------------------------------------------------------------
 {
   this->Motion[0] = m[0];
@@ -1655,7 +1655,7 @@ void mmoMMLContourWidget::SetMotionVector(float m[3])
 //----------------------------------------------------------------------------
 // Description:
 // Get the motion vector
-float* mmoMMLContourWidget::GetMotionVector() 
+float* medOpMMLContourWidget::GetMotionVector() 
 //----------------------------------------------------------------------------
 {
   return this->Motion;
@@ -1663,7 +1663,7 @@ float* mmoMMLContourWidget::GetMotionVector()
 //----------------------------------------------------------------------------
 // Description:
 // Get the motion vector
-void mmoMMLContourWidget::GetMotionVector(float xyz[3]) 
+void medOpMMLContourWidget::GetMotionVector(float xyz[3]) 
 //----------------------------------------------------------------------------
 {
   xyz[0] = this->Motion[0];
@@ -1672,33 +1672,33 @@ void mmoMMLContourWidget::GetMotionVector(float xyz[3])
 }
 // MK END
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::TranslationModeOn()
+void medOpMMLContourWidget::TranslationModeOn()
 //----------------------------------------------------------------------------
 {
   this->m_bTranslatingMode = TRUE;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::TranslationModeOff()
+void medOpMMLContourWidget::TranslationModeOff()
 //----------------------------------------------------------------------------
 {
   this->m_bTranslatingMode = FALSE;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::CenterModeOn()
+void medOpMMLContourWidget::CenterModeOn()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOn();
   this->m_bCenterMode = TRUE;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::CenterModeOff()
+void medOpMMLContourWidget::CenterModeOff()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOff();
   this->m_bCenterMode = FALSE;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::RotationModeOn()
+void medOpMMLContourWidget::RotationModeOn()
 //----------------------------------------------------------------------------
 {
   //this->RotationalHandle->VisibilityOn();
@@ -1706,14 +1706,14 @@ void mmoMMLContourWidget::RotationModeOn()
   this->m_bRotatingMode = TRUE;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::RotationModeOff()
+void medOpMMLContourWidget::RotationModeOff()
 //----------------------------------------------------------------------------
 {
   //this->RotationalHandle->VisibilityOff();
   this->m_bRotatingMode = FALSE;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScalingModeOn()
+void medOpMMLContourWidget::ScalingModeOn()
 //----------------------------------------------------------------------------
 {
   this->m_bScalingMode = TRUE;
@@ -1728,7 +1728,7 @@ void mmoMMLContourWidget::ScalingModeOn()
   //this->PlanePicker->DeletePickList(this->PlaneActor);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScalingModeOff()
+void medOpMMLContourWidget::ScalingModeOff()
 //----------------------------------------------------------------------------
 {
   this->m_bScalingMode = FALSE;
@@ -1745,101 +1745,101 @@ void mmoMMLContourWidget::ScalingModeOff()
   //this->PlanePicker->AddPickList(this->PlaneActor);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle0(double *xyz)
+void medOpMMLContourWidget::SetHandle0(double *xyz)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[0]->SetCenter(xyz);
   this->HandleGeometry[0]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle0(double x, double y, double z)
+void medOpMMLContourWidget::SetHandle0(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[0]->SetCenter(x, y, z);
   this->HandleGeometry[0]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle1(double *xyz)
+void medOpMMLContourWidget::SetHandle1(double *xyz)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[1]->SetCenter(xyz);
   this->HandleGeometry[1]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle1(double x, double y, double z)
+void medOpMMLContourWidget::SetHandle1(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[1]->SetCenter(x, y, z);
   this->HandleGeometry[1]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle2(double *xyz)
+void medOpMMLContourWidget::SetHandle2(double *xyz)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[2]->SetCenter(xyz);
   this->HandleGeometry[2]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle2(double x, double y, double z)
+void medOpMMLContourWidget::SetHandle2(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[2]->SetCenter(x, y, z);
   this->HandleGeometry[2]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle3(double *xyz)
+void medOpMMLContourWidget::SetHandle3(double *xyz)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[3]->SetCenter(xyz);
   this->HandleGeometry[3]->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandle3(double x, double y, double z)
+void medOpMMLContourWidget::SetHandle3(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
   this->HandleGeometry[3]->SetCenter(x, y, z);
   this->HandleGeometry[3]->Modified();
 }
 //----------------------------------------------------------------------------
-BOOL mmoMMLContourWidget::GetCenterMode()
+BOOL medOpMMLContourWidget::GetCenterMode()
 //----------------------------------------------------------------------------
 {
 	return m_bCenterMode;
 }
 //----------------------------------------------------------------------------
-BOOL mmoMMLContourWidget::GetTranslationMode()
+BOOL medOpMMLContourWidget::GetTranslationMode()
 //----------------------------------------------------------------------------
 {
 	return m_bTranslatingMode;
 }
 //----------------------------------------------------------------------------
-BOOL mmoMMLContourWidget::GetRotationMode()
+BOOL medOpMMLContourWidget::GetRotationMode()
 //----------------------------------------------------------------------------
 {
 	return m_bRotatingMode;
 }
 //----------------------------------------------------------------------------
-BOOL mmoMMLContourWidget::GetScalingMode()
+BOOL medOpMMLContourWidget::GetScalingMode()
 //----------------------------------------------------------------------------
 {
 	return m_bScalingMode;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetRotationalHandle(double x, double y, double z)
+void medOpMMLContourWidget::SetRotationalHandle(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
 	this->RotationalHandleGeometry->SetCenter(x, y, z);
 	this->RotationalHandleGeometry->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetRotationalHandle(double *xyz)
+void medOpMMLContourWidget::SetRotationalHandle(double *xyz)
 //----------------------------------------------------------------------------
 {
 	this->RotationalHandleGeometry->SetCenter(xyz);
 	this->RotationalHandleGeometry->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScalingHandlesOn()
+void medOpMMLContourWidget::ScalingHandlesOn()
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<4; i++)
@@ -1848,7 +1848,7 @@ void mmoMMLContourWidget::ScalingHandlesOn()
   }
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScalingHandlesOff()
+void medOpMMLContourWidget::ScalingHandlesOff()
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<4; i++)
@@ -1857,69 +1857,69 @@ void mmoMMLContourWidget::ScalingHandlesOff()
   }
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetCenterHandle(double x, double y, double z)
+void medOpMMLContourWidget::SetCenterHandle(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
 	this->CenterHandleGeometry->SetCenter(x, y, z);
 	this->CenterHandleGeometry->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetCenterHandle(double *xyz)
+void medOpMMLContourWidget::SetCenterHandle(double *xyz)
 //----------------------------------------------------------------------------
 {
 	this->CenterHandleGeometry->SetCenter(xyz);
 	this->CenterHandleGeometry->Modified();
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLContourWidget::GetCenterHandleActor()
+vtkActor* medOpMMLContourWidget::GetCenterHandleActor()
 //----------------------------------------------------------------------------
 {
 	return CenterHandle;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLContourWidget::GetRotationalHandleActor()
+vtkActor* medOpMMLContourWidget::GetRotationalHandleActor()
 //----------------------------------------------------------------------------
 {
 	return RotationalHandle;
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLContourWidget::GetNorthScalingHandleActor()
+vtkActor* medOpMMLContourWidget::GetNorthScalingHandleActor()
 //----------------------------------------------------------------------------
 {
 	return Handle[3];
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLContourWidget::GetSouthScalingHandleActor()
+vtkActor* medOpMMLContourWidget::GetSouthScalingHandleActor()
 //----------------------------------------------------------------------------
 {
 	return Handle[0];
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLContourWidget::GetEastScalingHandleActor()
+vtkActor* medOpMMLContourWidget::GetEastScalingHandleActor()
 //----------------------------------------------------------------------------
 {
 	return Handle[1];
 }
 //----------------------------------------------------------------------------
-vtkActor* mmoMMLContourWidget::GetWestScalingHandleActor()
+vtkActor* medOpMMLContourWidget::GetWestScalingHandleActor()
 //----------------------------------------------------------------------------
 {
 	return Handle[2];
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetHandleRadius(float r)
+void medOpMMLContourWidget::SetHandleRadius(float r)
 //----------------------------------------------------------------------------
 {
 	HandleRadius = r;
 }
 //----------------------------------------------------------------------------
-float mmoMMLContourWidget::GetHandleRadius()
+float medOpMMLContourWidget::GetHandleRadius()
 //----------------------------------------------------------------------------
 {
 	return HandleRadius;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetRotationHandleVisibility()
+void medOpMMLContourWidget::SetRotationHandleVisibility()
 //----------------------------------------------------------------------------
 {/*
 	// get z level
@@ -1946,25 +1946,25 @@ void mmoMMLContourWidget::SetRotationHandleVisibility()
 	GetRotationalHandleActor()->VisibilityOn();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::RotationHandleOn()
+void medOpMMLContourWidget::RotationHandleOn()
 //----------------------------------------------------------------------------
 {
 	GetRotationalHandleActor()->VisibilityOn();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::RotationHandleOff()
+void medOpMMLContourWidget::RotationHandleOff()
 //----------------------------------------------------------------------------
 {
 	GetRotationalHandleActor()->VisibilityOff();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ComputeBounds(double *b)
+void medOpMMLContourWidget::ComputeBounds(double *b)
 //----------------------------------------------------------------------------
 {
   M->GetContourActor()->GetBounds(b);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ComputeCenter(double *c)
+void medOpMMLContourWidget::ComputeCenter(double *c)
 //----------------------------------------------------------------------------
 {
   double b[6];
@@ -1976,7 +1976,7 @@ void mmoMMLContourWidget::ComputeCenter(double *c)
   c[2] = (b[4] + b[5]) / 2.0; // z
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::UpdateScalingHandles()
+void medOpMMLContourWidget::UpdateScalingHandles()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2182,7 +2182,7 @@ void mmoMMLContourWidget::UpdateScalingHandles()
 	SetHandle2(h2[0], h2[1], h2[2]);			
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::UpdateRotationHandle()
+void medOpMMLContourWidget::UpdateRotationHandle()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2206,7 +2206,7 @@ void mmoMMLContourWidget::UpdateRotationHandle()
 	SetRotationalHandle(center[0] + ctrans[0], center[1] + ctrans[1], 0.0);
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::UpdateWidgetTransform()
+void medOpMMLContourWidget::UpdateWidgetTransform()
 //----------------------------------------------------------------------------
 {
 	// get z level
@@ -2345,7 +2345,7 @@ void mmoMMLContourWidget::UpdateWidgetTransform()
 	PlaneSource->Update();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScaleNorth(double *p1, double *p2)
+void medOpMMLContourWidget::ScaleNorth(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
@@ -2446,7 +2446,7 @@ void mmoMMLContourWidget::ScaleNorth(double *p1, double *p2)
   M->UpdateSegmentSouthWestTransform();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScaleSouth(double *p1, double *p2)
+void medOpMMLContourWidget::ScaleSouth(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
@@ -2549,7 +2549,7 @@ void mmoMMLContourWidget::ScaleSouth(double *p1, double *p2)
   M->UpdateSegmentSouthWestTransform();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScaleEast(double *p1, double *p2)
+void medOpMMLContourWidget::ScaleEast(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
@@ -2652,7 +2652,7 @@ void mmoMMLContourWidget::ScaleEast(double *p1, double *p2)
   M->UpdateSegmentSouthWestTransform();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::ScaleWest(double *p1, double *p2)
+void medOpMMLContourWidget::ScaleWest(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
@@ -2755,7 +2755,7 @@ void mmoMMLContourWidget::ScaleWest(double *p1, double *p2)
   M->UpdateSegmentSouthWestTransform();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::Place(double *p1, double *p2)
+void medOpMMLContourWidget::Place(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
    // get vector of motion
@@ -2839,7 +2839,7 @@ void mmoMMLContourWidget::Place(double *p1, double *p2)
   M->UpdateGlobalAxesTransform();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::Translate(double *p1, double *p2)
+void medOpMMLContourWidget::Translate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   float x[3]; // x axis unit vector
@@ -2948,7 +2948,7 @@ void mmoMMLContourWidget::Translate(double *p1, double *p2)
   M->UpdateGlobalAxesTransform();
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::Rotate(double *p1, double *p2)
+void medOpMMLContourWidget::Rotate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // motion vector (world space)
@@ -3013,83 +3013,83 @@ void mmoMMLContourWidget::Rotate(double *p1, double *p2)
   M->UpdateGlobalAxesTransform();
 }
 //----------------------------------------------------------------------------
-int mmoMMLContourWidget::GetNextOperationId()
+int medOpMMLContourWidget::GetNextOperationId()
 //----------------------------------------------------------------------------
 {
   return OperationID;
 }
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetNextOperationId(int n)
+void medOpMMLContourWidget::SetNextOperationId(int n)
 //----------------------------------------------------------------------------
 {
   OperationID = n;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetModel(mmoMMLModelView *Model)
+void medOpMMLContourWidget::SetModel(medOpMMLModelView *Model)
 //----------------------------------------------------------------------------
 {
 	M = Model;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetPH(mmoMMLParameterView *PH)
+void medOpMMLContourWidget::SetPH(medOpMMLParameterView *PH)
 //----------------------------------------------------------------------------
 {
 	CH = PH;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetPV(mmoMMLParameterView *PV)
+void medOpMMLContourWidget::SetPV(medOpMMLParameterView *PV)
 //----------------------------------------------------------------------------
 {
 	CV = PV;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetTH(mmoMMLParameterView *TH)
+void medOpMMLContourWidget::SetTH(medOpMMLParameterView *TH)
 //----------------------------------------------------------------------------
 {
 	H = TH;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetTV(mmoMMLParameterView *TV)
+void medOpMMLContourWidget::SetTV(medOpMMLParameterView *TV)
 //----------------------------------------------------------------------------
 {
 	V = TV;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetRA(mmoMMLParameterView *RA)
+void medOpMMLContourWidget::SetRA(medOpMMLParameterView *RA)
 //----------------------------------------------------------------------------
 {
 	T = RA;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetSN(mmoMMLParameterView *SN)
+void medOpMMLContourWidget::SetSN(medOpMMLParameterView *SN)
 //----------------------------------------------------------------------------
 {
 	N = SN;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetSS(mmoMMLParameterView *SS)
+void medOpMMLContourWidget::SetSS(medOpMMLParameterView *SS)
 //----------------------------------------------------------------------------
 {
 	S = SS;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetSE(mmoMMLParameterView *SE)
+void medOpMMLContourWidget::SetSE(medOpMMLParameterView *SE)
 //----------------------------------------------------------------------------
 {
 	E = SE;
 }
 
 //----------------------------------------------------------------------------
-void mmoMMLContourWidget::SetSW(mmoMMLParameterView *SW)
+void medOpMMLContourWidget::SetSW(medOpMMLParameterView *SW)
 //----------------------------------------------------------------------------
 {
 	W = SW;

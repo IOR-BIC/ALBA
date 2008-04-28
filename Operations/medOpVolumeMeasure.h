@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoVolumeMeasure.h,v $
+  Module:    $RCSfile: medOpVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-19 10:17:26 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-28 08:52:52 $
+  Version:   $Revision: 1.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoVolumeMeasure_H__
-#define __mmoVolumeMeasure_H__
+#ifndef __medOpVolumeMeasure_H__
+#define __medOpVolumeMeasure_H__
 
 #include "mafOp.h"
 #include "mafNode.h"
@@ -29,7 +29,7 @@ class vtkMassProperties;
 class vtkPolyData;
 
 //----------------------------------------------------------------------------
-// mmoVolumeMeasure :
+// medOpVolumeMeasure :
 //----------------------------------------------------------------------------
 /** 
 Measure a Volume of a PolyData
@@ -40,15 +40,15 @@ of the divergence theorem. The general assumption here is
 that the model is of closed surface.
 */
 
-class mmoVolumeMeasure: public mafOp
+class medOpVolumeMeasure: public mafOp
 {
 public:
              
-            	 mmoVolumeMeasure(wxString label = "Volume Measure");
-	virtual     ~mmoVolumeMeasure();
+            	 medOpVolumeMeasure(wxString label = "Volume Measure");
+	virtual     ~medOpVolumeMeasure();
 	virtual void OnEvent(mafEventBase *maf_event);
 
-  mafTypeMacro(mmoVolumeMeasure, mafOp);
+  mafTypeMacro(medOpVolumeMeasure, mafOp);
 
   mafOp* Copy();
 

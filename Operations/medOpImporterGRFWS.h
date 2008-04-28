@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoGRFImporterWS.h,v $
+  Module:    $RCSfile: medOpImporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 11:22:08 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-04-28 08:44:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoGRFImporterWS_H__
-#define __mmoGRFImporterWS_H__
+#ifndef __medOpImporterGRFWS_H__
+#define __medOpImporterGRFWS_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -25,18 +25,18 @@ class mafVMEVector;
 class mafVMESurface;
 
 //----------------------------------------------------------------------------
-// mmoGRFImporterWS :
+// medOpImporterGRFWS :
 //----------------------------------------------------------------------------
 /** */
-class mmoGRFImporterWS : public mafOp
+class medOpImporterGRFWS : public mafOp
 {
 public:
-	mmoGRFImporterWS(const wxString &label = "GRF Importer");
-	~mmoGRFImporterWS(); 
+	medOpImporterGRFWS(const wxString &label = "GRF Importer");
+	~medOpImporterGRFWS(); 
 
-  void mmoGRFImporterWS::OpDo();
+  void medOpImporterGRFWS::OpDo();
 
-  void mmoGRFImporterWS::OpUndo();
+  void medOpImporterGRFWS::OpUndo();
 
 	mafOp* Copy();
 

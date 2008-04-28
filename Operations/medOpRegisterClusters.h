@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoRegisterClusters.h,v $
+  Module:    $RCSfile: medOpRegisterClusters.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-09 16:58:31 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-28 08:49:26 $
+  Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani      - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoRegisterClusters_H__
-#define __mmoRegisterClusters_H__
+#ifndef __medOpRegisterClusters_H__
+#define __medOpRegisterClusters_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -31,17 +31,17 @@ class vtkPoints;
 class mmgDialog;
 
 //----------------------------------------------------------------------------
-// mmoRegisterClusters :
+// medOpRegisterClusters :
 //----------------------------------------------------------------------------
 /** */
-class mmoRegisterClusters: public mafOp
+class medOpRegisterClusters: public mafOp
 {
 public:
-  mmoRegisterClusters(wxString label = _("Register Landmark Cloud"));
- ~mmoRegisterClusters(); 
+  medOpRegisterClusters(wxString label = _("Register Landmark Cloud"));
+ ~medOpRegisterClusters(); 
   virtual void OnEvent(mafEventBase *maf_event);
   
-  mafTypeMacro(mmoRegisterClusters, mafOp);
+  mafTypeMacro(medOpRegisterClusters, mafOp);
   
   mafOp* Copy();
 

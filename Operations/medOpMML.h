@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoMML.h,v $
+Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-02-19 10:37:35 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-28 08:48:42 $
+Version:   $Revision: 1.1 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoMML_H__
-#define __mmoMML_H__
+#ifndef __medOpMML_H__
+#define __medOpMML_H__
 
 #include "mafDefines.h"
 
@@ -36,23 +36,23 @@ class mmgLutSlider;
 class vtkLookupTable;
 class mafVMEVolumeGray;
 class mafVMESurface;
-class mmoMMLParameterView;
-class mmoMMLModelView;
-class mmoMMLContourWidget;
+class medOpMMLParameterView;
+class medOpMMLModelView;
+class medOpMMLContourWidget;
 class vtkDataSet;
 class vtkPolyData;
 class mmgButton;
 
 
 //----------------------------------------------------------------------------
-// mmoMML :
+// medOpMML :
 // Muscle Modelling Lab.
 // This operation allows the user to deform a polydata model of a muscle or bone
 // to fit a volume image of the feature.
 // The inputs are a volume (the patient data) and a surface (the model).
 //----------------------------------------------------------------------------
 
-class mmoMML: public mafOp
+class medOpMML: public mafOp
 {
 public:
   void ApplyInverseRegistrationOps();
@@ -63,8 +63,8 @@ public:
   void OnPOperationButton();
   void Update();
   bool SetUpWidget();
-  mmoMML(const wxString &label);
-  virtual ~mmoMML(); 
+  medOpMML(const wxString &label);
+  virtual ~medOpMML(); 
   void   OnEvent(mafEventBase *e);
   mafOp* Copy();
 
@@ -89,15 +89,15 @@ protected:
   mmgDialog	*m_op_dlg;			  // operation dialog
 
   // parameter views
-  mmoMMLParameterView *PH; // PH parameter view
-  mmoMMLParameterView *PV; // PV parameter view
-  mmoMMLParameterView *TH; // TH parameter view
-  mmoMMLParameterView *TV; // TV parameter view
-  mmoMMLParameterView *RA; // RA parameter view
-  mmoMMLParameterView *SN; // SN parameter view
-  mmoMMLParameterView *SS; // SS parameter view
-  mmoMMLParameterView *SE; // SE parameter view
-  mmoMMLParameterView *SW; // SW parameter view
+  medOpMMLParameterView *PH; // PH parameter view
+  medOpMMLParameterView *PV; // PV parameter view
+  medOpMMLParameterView *TH; // TH parameter view
+  medOpMMLParameterView *TV; // TV parameter view
+  medOpMMLParameterView *RA; // RA parameter view
+  medOpMMLParameterView *SN; // SN parameter view
+  medOpMMLParameterView *SS; // SS parameter view
+  medOpMMLParameterView *SE; // SE parameter view
+  medOpMMLParameterView *SW; // SW parameter view
 
   // parameter views maf RWIs
   mafRWI      *m_PHmafRWI;		// PH parameter view maf RWI
@@ -111,13 +111,13 @@ protected:
   mafRWI      *m_SWmafRWI;		// SW parameter view maf RWI
 
   // model view
-  mmoMMLModelView     *Model;
+  medOpMMLModelView     *Model;
 
   // model view maf RWI
   mafRWI		*m_ModelmafRWI;
 
   //
-  mmoMMLContourWidget *Widget;  // interactive contour widget
+  medOpMMLContourWidget *Widget;  // interactive contour widget
 
   void    OpStop(int result);
 

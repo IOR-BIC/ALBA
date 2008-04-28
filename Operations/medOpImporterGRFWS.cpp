@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoGRFImporterWS.cpp,v $
+  Module:    $RCSfile: medOpImporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 14:23:05 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-04-28 08:44:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoGRFImporterWS.h"
+#include "medOpImporterGRFWS.h"
 
 #include <wx/busyinfo.h>
 #include <wx/txtstrm.h>
@@ -43,7 +43,7 @@
 #define DELTA 5.0
 
 //----------------------------------------------------------------------------
-mmoGRFImporterWS::mmoGRFImporterWS(const wxString &label) :
+medOpImporterGRFWS::medOpImporterGRFWS(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -58,7 +58,7 @@ mafOp(label)
   m_VectorRight   = NULL;
 }
 //----------------------------------------------------------------------------
-mmoGRFImporterWS::~mmoGRFImporterWS()
+medOpImporterGRFWS::~medOpImporterGRFWS()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_PlatformLeft);
@@ -67,7 +67,7 @@ mmoGRFImporterWS::~mmoGRFImporterWS()
   mafDEL(m_VectorRight);
 }
 //----------------------------------------------------------------------------
-void mmoGRFImporterWS::OpDo()
+void medOpImporterGRFWS::OpDo()
 //----------------------------------------------------------------------------
 {
   if(m_PlatformLeft != NULL)
@@ -85,7 +85,7 @@ void mmoGRFImporterWS::OpDo()
   }
 }
 //----------------------------------------------------------------------------
-void mmoGRFImporterWS::OpUndo()
+void medOpImporterGRFWS::OpUndo()
 //----------------------------------------------------------------------------
 {   
   if(m_PlatformLeft != NULL)
@@ -94,10 +94,10 @@ void mmoGRFImporterWS::OpUndo()
     mafEventMacro(mafEvent(this,VME_REMOVE,m_PlatformRight));
 }
 //----------------------------------------------------------------------------
-mafOp* mmoGRFImporterWS::Copy()   
+mafOp* medOpImporterGRFWS::Copy()   
 //----------------------------------------------------------------------------
 {
-	mmoGRFImporterWS *cp = new mmoGRFImporterWS(m_Label);
+	medOpImporterGRFWS *cp = new medOpImporterGRFWS(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -106,7 +106,7 @@ mafOp* mmoGRFImporterWS::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-void mmoGRFImporterWS::OpRun()   
+void medOpImporterGRFWS::OpRun()   
 //----------------------------------------------------------------------------
 {
   int result = OP_RUN_CANCEL;
@@ -124,7 +124,7 @@ void mmoGRFImporterWS::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void mmoGRFImporterWS::Read()   
+void medOpImporterGRFWS::Read()   
 //----------------------------------------------------------------------------
 {
   //if (!m_TestMode)

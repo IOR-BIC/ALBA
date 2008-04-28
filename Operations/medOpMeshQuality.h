@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoMeshQuality.h,v $
+Module:    $RCSfile: medOpMeshQuality.h,v $
 Language:  C++
-Date:      $Date: 2007-04-05 10:26:57 $
+Date:      $Date: 2008-04-28 08:48:05 $
 Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#ifndef __mmoMeshQuality_H__
-#define __mmoMeshQuality_H__
+#ifndef __medOpMeshQuality_H__
+#define __medOpMeshQuality_H__
 
 #include "mafOp.h"
 
@@ -58,18 +58,18 @@ class vtkScalarBarActor;
 class vtkTriangleQualityRatio;
 
 //----------------------------------------------------------------------------
-// mmoMeshQuality :
+// medOpMeshQuality :
 //----------------------------------------------------------------------------
 /** */
-class mmoMeshQuality: public mafOp
+class medOpMeshQuality: public mafOp
 {
 public:
-	mmoMeshQuality(const wxString &label = "Check Mesh Quality");
-	~mmoMeshQuality(); 
+	medOpMeshQuality(const wxString &label = "Check Mesh Quality");
+	~medOpMeshQuality(); 
 
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	mafTypeMacro(mmoMeshQuality, mafOp);
+	mafTypeMacro(medOpMeshQuality, mafOp);
 
 	mafOp* Copy();
 

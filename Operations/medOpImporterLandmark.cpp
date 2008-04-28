@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoLandmarkImporter.cpp,v $
+  Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-25 13:39:09 $
+  Date:      $Date: 2008-04-28 08:44:19 $
   Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoLandmarkImporter.h"
+#include "medOpImporterLandmark.h"
 #include <wx/busyinfo.h>
 
 
@@ -43,7 +43,7 @@ enum ID_LANDMARK_IMPORTER
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoLandmarkImporter::mmoLandmarkImporter(wxString label) :
+medOpImporterLandmark::medOpImporterLandmark(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -56,18 +56,18 @@ mafOp(label)
 	m_TagFileFlag = false;
 }
 //----------------------------------------------------------------------------
-mmoLandmarkImporter::~mmoLandmarkImporter( ) 
+medOpImporterLandmark::~medOpImporterLandmark( ) 
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoLandmarkImporter::Copy()   
+mafOp* medOpImporterLandmark::Copy()   
 /** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
 //----------------------------------------------------------------------------
 {
 	//non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
-	mmoLandmarkImporter *cp = new mmoLandmarkImporter(m_Label);
+	medOpImporterLandmark *cp = new medOpImporterLandmark(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -78,7 +78,7 @@ mafOp* mmoLandmarkImporter::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::OpRun()   
+void medOpImporterLandmark::OpRun()   
 //----------------------------------------------------------------------------
 {
   
@@ -108,7 +108,7 @@ void mmoLandmarkImporter::OpRun()
 
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::	OnEvent(mafEventBase *maf_event) 
+void medOpImporterLandmark::	OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -127,7 +127,7 @@ void mmoLandmarkImporter::	OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::OpDo()   
+void medOpImporterLandmark::OpDo()   
 //----------------------------------------------------------------------------
 {
 	
@@ -152,7 +152,7 @@ void mmoLandmarkImporter::OpDo()
 	mafEventMacro(mafEvent(this,VME_ADD,m_VmeCloud));
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::OpStop(int result)
+void medOpImporterLandmark::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	HideGui();
@@ -160,7 +160,7 @@ void mmoLandmarkImporter::OpStop(int result)
 }
 /*
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::OpUndo()   
+void medOpImporterLandmark::OpUndo()   
 
 //----------------------------------------------------------------------------
 {
@@ -171,7 +171,7 @@ void mmoLandmarkImporter::OpUndo()
 }
 */
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::Read()   
+void medOpImporterLandmark::Read()   
 //----------------------------------------------------------------------------
 {
 	mafNEW(m_VmeCloud);
@@ -232,7 +232,7 @@ void mmoLandmarkImporter::Read()
   m_Output = m_VmeCloud;
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporter::ReadWithoutTag()   
+void medOpImporterLandmark::ReadWithoutTag()   
 //----------------------------------------------------------------------------
 {
 	mafNEW(m_VmeCloud);

@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoVolumeMeasure.cpp,v $
+  Module:    $RCSfile: medOpVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 08:27:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-28 08:52:52 $
+  Version:   $Revision: 1.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoVolumeMeasure.h"
+#include "medOpVolumeMeasure.h"
 #include <wx/busyinfo.h>
 #include "mafEvent.h"
 #include "mmgGui.h"
@@ -35,11 +35,11 @@
 #include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoVolumeMeasure);
+mafCxxTypeMacro(medOpVolumeMeasure);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoVolumeMeasure::mmoVolumeMeasure(wxString label) 
+medOpVolumeMeasure::medOpVolumeMeasure(wxString label) 
 : mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -55,20 +55,20 @@ mmoVolumeMeasure::mmoVolumeMeasure(wxString label)
 	m_SurfaceArea = "";
 }
 //----------------------------------------------------------------------------
-mmoVolumeMeasure::~mmoVolumeMeasure()
+medOpVolumeMeasure::~medOpVolumeMeasure()
 //----------------------------------------------------------------------------
 {
 	
 }
 
 //----------------------------------------------------------------------------
-mafOp *mmoVolumeMeasure::Copy()
+mafOp *medOpVolumeMeasure::Copy()
 //----------------------------------------------------------------------------
 {
-	return new mmoVolumeMeasure(m_Label);
+	return new medOpVolumeMeasure(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mmoVolumeMeasure::Accept(mafNode *node)
+bool medOpVolumeMeasure::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
 	if(node)
@@ -103,7 +103,7 @@ enum ID_VOLUME_MEASURE
   //ID_ADD_TO_VME_TREE,
 };
 //----------------------------------------------------------------------------
-void mmoVolumeMeasure::OpRun()   
+void medOpVolumeMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
 	wxString measure[3] = {_("points"), _("lines"), _("angle")};
@@ -150,14 +150,14 @@ void mmoVolumeMeasure::OpRun()
   ShowGui();
 }
 //----------------------------------------------------------------------------
-void mmoVolumeMeasure::OpDo()
+void medOpVolumeMeasure::OpDo()
 //----------------------------------------------------------------------------
 {
   
 }
 
 //----------------------------------------------------------------------------
-void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event) 
+void medOpVolumeMeasure::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -167,7 +167,7 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
 			case ID_CHOOSE_ORIGIN:
     {
 		  mafString title = _("Choose Origin Surface");
-	    mafEvent e(this,VME_CHOOSE,&title,(long)&mmoVolumeMeasure::SurfaceAccept);
+	    mafEvent e(this,VME_CHOOSE,&title,(long)&medOpVolumeMeasure::SurfaceAccept);
       mafEventMacro(e); 
       m_VmeSurface = (mafVMESurface *)e.GetVme();
 			
@@ -230,7 +230,7 @@ void mmoVolumeMeasure::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mmoVolumeMeasure::OpStop(int result)
+void medOpVolumeMeasure::OpStop(int result)
 //----------------------------------------------------------------------------
 {
   if (result == OP_RUN_CANCEL)
@@ -255,7 +255,7 @@ void mmoVolumeMeasure::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-void mmoVolumeMeasure::VolumeCompute(mafVME *vme)
+void medOpVolumeMeasure::VolumeCompute(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	if (vme == NULL)

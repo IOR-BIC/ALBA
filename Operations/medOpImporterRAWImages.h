@@ -1,16 +1,16 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoRAWImporterImages.h,v $
+  Module:    $RCSfile: medOpImporterRAWImages.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-25 13:36:52 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-28 08:47:16 $
+  Version:   $Revision: 1.1 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-#ifndef __mmoRAWImporterImages_H__
-#define __mmoRAWImporterImages_H__
+#ifndef __medOpImporterRAWImages_H__
+#define __medOpImporterRAWImages_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -41,19 +41,19 @@ class mafVMEVolumeGray;
 class mafVMEVolumeRGB;
 
 //----------------------------------------------------------------------------
-// mmoRAWImporterImages :
+// medOpImporterRAWImages :
 //----------------------------------------------------------------------------
 /** Importer for Raw volume data. The raw data must be stored in multiple files.
 Every file is a single slice of the volume data.
 In the directory must be present only raw slices.
 If the first slice is not 0, the slice offset (m_offset) must be setted. */
-class mmoRAWImporterImages: public mafOp
+class medOpImporterRAWImages: public mafOp
 {
 public:
-            	 mmoRAWImporterImages(wxString label="RAWImporterImage");
-	virtual     ~mmoRAWImporterImages();
+            	 medOpImporterRAWImages(wxString label="RAWImporterImage");
+	virtual     ~medOpImporterRAWImages();
 
-	mafTypeMacro(mmoRAWImporterImages, mafOp);
+	mafTypeMacro(medOpImporterRAWImages, mafOp);
 	virtual void OnEvent(mafEventBase *maf_event);
 	mafOp* Copy();
 

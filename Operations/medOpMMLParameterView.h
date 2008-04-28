@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMMLParameterView.h,v $
+  Module:    $RCSfile: medOpMMLParameterView.h,v $
   Language:  C++
-  Date:      $Date: 2007-04-11 11:53:06 $
+  Date:      $Date: 2008-04-28 08:48:42 $
   Version:   $Revision: 1.1 $
   Authors:   Mel Krokos
 ==========================================================================
@@ -10,8 +10,8 @@
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoMMLParameterView_H__
-#define __mmoMMLParameterView_H__
+#ifndef __medOpMMLParameterView_H__
+#define __medOpMMLParameterView_H__
 
 #include "mafDefines.h"
 
@@ -29,15 +29,15 @@
 #include "vtkPiecewiseFunction.h"
 
 //----------------------------------------------------------------------------
-// mmoMMLParameterView   :
+// medOpMMLParameterView   :
 //----------------------------------------------------------------------------
-class mmoMMLParameterView  
+class medOpMMLParameterView  
 {
 public:
 	float GetValue(double x);
 	int GetNumberOfDataPoints();
-	mmoMMLParameterView( vtkRenderWindow *rw, vtkRenderer *ren );
-	virtual ~mmoMMLParameterView();
+	medOpMMLParameterView( vtkRenderWindow *rw, vtkRenderer *ren );
+	virtual ~medOpMMLParameterView();
 
 	vtkRenderer* GetRenderer();
 	void InitialiseHorizontalLineActor();

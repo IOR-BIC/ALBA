@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoRAWImporterImages.cpp,v $
+  Module:    $RCSfile: medOpImporterRAWImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 08:17:23 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-04-28 08:47:16 $
+  Version:   $Revision: 1.1 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,7 +23,7 @@
 #include "wx/busyinfo.h"
 #include "wx/dir.h"
 
-#include "mmoRAWImporterImages.h"
+#include "medOpImporterRAWImages.h"
 #include "mafEvent.h"
 #include "mmgGui.h"
 #include "mafOp.h"
@@ -58,11 +58,11 @@
 #include "vtkDoubleArray.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoRAWImporterImages);
+mafCxxTypeMacro(medOpImporterRAWImages);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoRAWImporterImages::mmoRAWImporterImages(wxString label) : mafOp(label)
+medOpImporterRAWImages::medOpImporterRAWImages(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType					= OPTYPE_IMPORTER;
@@ -120,16 +120,16 @@ mmoRAWImporterImages::mmoRAWImporterImages(wxString label) : mafOp(label)
 	m_SideToBeDragged = 0;
 }
 //----------------------------------------------------------------------------
-mmoRAWImporterImages::~mmoRAWImporterImages()
+medOpImporterRAWImages::~medOpImporterRAWImages()
 //----------------------------------------------------------------------------
 {
 	mafDEL(m_Output);
 }
 //----------------------------------------------------------------------------
-mafOp *mmoRAWImporterImages::Copy()
+mafOp *medOpImporterRAWImages::Copy()
 //----------------------------------------------------------------------------
 {
-	return new mmoRAWImporterImages(m_Label);
+	return new medOpImporterRAWImages(m_Label);
 }
 //----------------------------------------------------------------------------
 // Constants :
@@ -156,7 +156,7 @@ enum
   ID_RGB_TYPE,
 };
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::CreatePipeline()
+void medOpImporterRAWImages::CreatePipeline()
 //----------------------------------------------------------------------------
 {
 	//Preview Pipeline ++++++++++++++++++++++++++++++
@@ -217,7 +217,7 @@ void mmoRAWImporterImages::CreatePipeline()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::CreateGui()
+void medOpImporterRAWImages::CreateGui()
 //----------------------------------------------------------------------------
 {
 	int res=OP_RUN_OK;
@@ -337,14 +337,14 @@ void mmoRAWImporterImages::CreateGui()
 	return;
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OpRun()   
+void medOpImporterRAWImages::OpRun()   
 //----------------------------------------------------------------------------
 {
 	CreatePipeline();
 	CreateGui();
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OpStop(int result)
+void medOpImporterRAWImages::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	if(m_DicomInteractor)
@@ -380,21 +380,21 @@ void mmoRAWImporterImages::OpStop(int result)
 		mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OpDo()
+void medOpImporterRAWImages::OpDo()
 //----------------------------------------------------------------------------
 {
  	assert(m_Output);
 	mafEventMacro(mafEvent(this,VME_ADD,m_Output)); 		  
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OpUndo()
+void medOpImporterRAWImages::OpUndo()
 //----------------------------------------------------------------------------
 {
  	assert(m_Output);
 	mafEventMacro(mafEvent(this,VME_REMOVE,m_Output));
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::EnableWidgets(bool enable)
+void medOpImporterRAWImages::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui && m_SliceLab && m_SliceText && m_SliceSlider);
@@ -423,7 +423,7 @@ void mmoRAWImporterImages::EnableWidgets(bool enable)
 	m_SliceSlider->Enable(enable);
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OnEvent(mafEventBase *maf_event) 
+void medOpImporterRAWImages::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -712,7 +712,7 @@ void mmoRAWImporterImages::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::	UpdateReader() 
+void medOpImporterRAWImages::	UpdateReader() 
 //----------------------------------------------------------------------------
 {
 	wxString prefix = m_RawDirectory + "\\" + m_Prefix;
@@ -819,7 +819,7 @@ void mmoRAWImporterImages::	UpdateReader()
 	m_LookupTable->Build();
 }
 //----------------------------------------------------------------------------
-bool mmoRAWImporterImages::Import()
+bool medOpImporterRAWImages::Import()
 //----------------------------------------------------------------------------
 {
 	if(!this->m_TestMode)
@@ -1023,7 +1023,7 @@ bool mmoRAWImporterImages::Import()
 	return true;
 }
 //----------------------------------------------------------------------------
-int mmoRAWImporterImages::GetFileLength(const char * filename) 
+int medOpImporterRAWImages::GetFileLength(const char * filename) 
 //----------------------------------------------------------------------------
 {
 	int l,m,len;
@@ -1036,7 +1036,7 @@ int mmoRAWImporterImages::GetFileLength(const char * filename)
 	return len;
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OnStringPrefix() 
+void medOpImporterRAWImages::OnStringPrefix() 
 //----------------------------------------------------------------------------
 {
 	const char* nome_file = (m_Prefix);
@@ -1062,7 +1062,7 @@ void mmoRAWImporterImages::OnStringPrefix()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoRAWImporterImages::OnOpenDir() 
+void medOpImporterRAWImages::OnOpenDir() 
 //----------------------------------------------------------------------------
 {
 	if(!this->m_TestMode)
@@ -1082,7 +1082,7 @@ void mmoRAWImporterImages::OnOpenDir()
 	m_NumberSlices = 0;
 }
 //----------------------------------------------------------------------------
-bool mmoRAWImporterImages::ControlFilenameList()
+bool medOpImporterRAWImages::ControlFilenameList()
 //----------------------------------------------------------------------------
 {
   //control how many files are present in directory

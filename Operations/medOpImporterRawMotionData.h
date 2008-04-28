@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoRawMotionDataImporter.h,v $
+  Module:    $RCSfile: medOpImporterRawMotionData.h,v $
   Language:  C++
-  Date:      $Date: 2006-10-05 08:44:58 $
+  Date:      $Date: 2008-04-28 08:47:16 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
@@ -10,8 +10,8 @@ Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoRawMotionDataImporter_H__
-#define __mmoRawMotionDataImporter_H__
+#ifndef __medOpImporterRawMotionData_H__
+#define __medOpImporterRawMotionData_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -24,14 +24,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafVME;                      //era mflVME
 class mafEvent;
 //----------------------------------------------------------------------------
-// mmoRawMotionDataImporter :
+// medOpImporterRawMotionData :
 //----------------------------------------------------------------------------
 /** */
-class mmoRawMotionDataImporter : public mafOp
+class medOpImporterRawMotionData : public mafOp
 {
 public:
-	mmoRawMotionDataImporter(wxString label);
-	~mmoRawMotionDataImporter(); 
+	medOpImporterRawMotionData(wxString label);
+	~medOpImporterRawMotionData(); 
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

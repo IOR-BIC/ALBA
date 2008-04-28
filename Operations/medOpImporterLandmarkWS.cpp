@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoLandmarkImporterWS.cpp,v $
+  Module:    $RCSfile: medOpImporterLandmarkWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 15:43:52 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-04-28 08:44:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoLandmarkImporterWS.h"
+#include "medOpImporterLandmarkWS.h"
 #include <wx/busyinfo.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
@@ -36,7 +36,7 @@
 #include <iostream>
 
 //----------------------------------------------------------------------------
-mmoLandmarkImporterWS::mmoLandmarkImporterWS(wxString label) :
+medOpImporterLandmarkWS::medOpImporterLandmarkWS(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -47,16 +47,16 @@ mafOp(label)
 	m_VmeCloud		= NULL;
 }
 //----------------------------------------------------------------------------
-mmoLandmarkImporterWS::~mmoLandmarkImporterWS()
+medOpImporterLandmarkWS::~medOpImporterLandmarkWS()
 //----------------------------------------------------------------------------
 {
   mafDEL(m_VmeCloud);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoLandmarkImporterWS::Copy()   
+mafOp* medOpImporterLandmarkWS::Copy()   
 //----------------------------------------------------------------------------
 {
-	mmoLandmarkImporterWS *cp = new mmoLandmarkImporterWS(m_Label);
+	medOpImporterLandmarkWS *cp = new medOpImporterLandmarkWS(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -67,7 +67,7 @@ mafOp* mmoLandmarkImporterWS::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterWS::OpRun()   
+void medOpImporterLandmarkWS::OpRun()   
 //----------------------------------------------------------------------------
 {
 	int result = OP_RUN_CANCEL;
@@ -88,7 +88,7 @@ void mmoLandmarkImporterWS::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void mmoLandmarkImporterWS::Read()   
+void medOpImporterLandmarkWS::Read()   
 //----------------------------------------------------------------------------
 {
   if (!m_TestMode)

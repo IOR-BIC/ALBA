@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoMotionDataImporter.h,v $
+  Module:    $RCSfile: medOpImporterMotionData.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-16 10:32:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 08:46:06 $
+  Version:   $Revision: 1.1 $
   Authors:   Fedor Moiseev
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoMotionDataImporter_H__
-#define __mmoMotionDataImporter_H__
+#ifndef __medOpImporterMotionData_H__
+#define __medOpImporterMotionData_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -33,14 +33,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafVME;                      //era mflVME
 class mafEvent;
 //----------------------------------------------------------------------------
-// mmoMotionDataImporter :
+// medOpImporterMotionData :
 //----------------------------------------------------------------------------
 /** */
 template <class MotionReader>
-class mmoMotionDataImporter : public mafOp
+class medOpImporterMotionData : public mafOp
 {
 public:
-  mmoMotionDataImporter(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  mafOp(label), m_pgdWildc(pgdWildc), m_dicWildc(dicWildc)
+  medOpImporterMotionData(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  mafOp(label), m_pgdWildc(pgdWildc), m_dicWildc(dicWildc)
         //----------------------------------------------------------------------------
   {
     m_OpType	= OPTYPE_IMPORTER;
@@ -55,7 +55,7 @@ public:
     m_DictionaryAvailable = 0;
   }
       //----------------------------------------------------------------------------
-  ~mmoMotionDataImporter( ) 
+  ~medOpImporterMotionData( ) 
     //----------------------------------------------------------------------------
   {
   }
@@ -65,7 +65,7 @@ public:
     //----------------------------------------------------------------------------
   {
     //non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
-    mmoMotionDataImporter *cp = new mmoMotionDataImporter(m_Label, m_pgdWildc, m_dicWildc);
+    medOpImporterMotionData *cp = new medOpImporterMotionData(m_Label, m_pgdWildc, m_dicWildc);
     cp->m_Canundo = m_Canundo;
     cp->m_OpType = m_OpType;
     cp->m_Listener = m_Listener;
