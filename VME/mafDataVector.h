@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:50:27 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-28 11:17:20 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,8 @@ public:
     as a single file. */
   void SetSingleFileMode(bool mode);
   bool GetSingleFileMode() {return m_SingleFileMode;}
+
+  mafString GetArchiveName() {return m_ArchiveName;}
 
    /**
     Insert an item to the vector trying to append it, anyway the array
