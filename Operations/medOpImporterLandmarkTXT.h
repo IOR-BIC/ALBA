@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkTXT.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:44:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-28 08:40:14 $
+  Version:   $Revision: 1.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
