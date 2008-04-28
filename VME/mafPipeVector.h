@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-04 12:16:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-28 11:16:25 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,5 +106,9 @@ protected:
   
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
   virtual mmgGui  *CreateGui();
+
+  /** Enable widgets */
+  void mafPipeVector::EnableWidget();
+
 };  
 #endif // __mafPipeSurface_H__

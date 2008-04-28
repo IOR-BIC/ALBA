@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:32:03 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-04-28 11:16:25 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,13 +85,14 @@ void mafPipeVector::Create(mafSceneNode *n)
 {  
   Superclass::Create(n);
   m_Selected = false;
+
   mafVMEOutputPolyline *out_polyline = mafVMEOutputPolyline::SafeDownCast(m_Vme->GetOutput());
   assert(out_polyline);
   m_Data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
   assert(m_Data);
   m_Data->Update(); 
 
-  m_Vector  = mafVMEVector::SafeDownCast(m_Vme);
+  m_Vector = mafVMEVector::SafeDownCast(m_Vme);
   m_Vector->GetTimeStamps(m_TimeVector);
  
   m_Vme->GetEventSource()->AddObserver(this);
@@ -197,7 +198,6 @@ void mafPipeVector::UpdateProperty(bool fromTag)
   if (m_UseSphere == TRUE)
   {
     m_Sphere->SetCenter(pointCop);
-    m_Sphere->Update();
   }
   
   if (m_UseArrow == TRUE)
@@ -214,7 +214,6 @@ void mafPipeVector::UpdateProperty(bool fromTag)
     direction[1] = pointForce[1] - pointCop[1];
     direction[2] = pointForce[2] - pointCop[2];
     m_ArrowTip->SetDirection(direction);
-    m_ArrowTip->Update(); 
   }
 }
 //----------------------------------------------------------------------------
@@ -256,17 +255,13 @@ void mafPipeVector::AllVector(bool fromTag)
       double point2[3];
 
       m_Vector->SetTimeStamp(m_TimeVector[n]);
-      m_Vector->Update();
-            
       m_Vector->GetOutput()->GetVTKData()->GetPoint(0, point1);
       m_Vector->GetOutput()->GetVTKData()->GetPoint(1, point2);
 
       line->SetPoint1(point1);
       line->SetPoint2(point2);
-      line->Modified();
  
       m_Bunch->AddInput(line->GetOutput());
-      m_Bunch->Update();
     } 
 
     if (m_Bunch->GetNumberOfInputs() == 0)
@@ -363,6 +358,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Gui->Update();
           m_Bunch->RemoveAllInputs();
         }
+        EnableWidget();
       break;
       case ID_INTERVAL:
         m_Bunch->RemoveAllInputs();
@@ -385,6 +381,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Interval = 0;
           m_Bunch->RemoveAllInputs();
         }
+        EnableWidget();
       break;
       default:
         mafEventMacro(*e);
@@ -396,13 +393,13 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
   {
     UpdateProperty();
   }
-
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-
-  if (m_Gui)
-  {
-    m_Gui->Enable(ID_INTERVAL, m_UseBunch == 1 && m_AllBunch == 0);
-    m_Gui->Enable(ID_STEP, m_UseBunch == 1);
-    m_Gui->Enable(ID_ALL_BUNCH, m_UseBunch == 1);
-  }
 }
+//----------------------------------------------------------------------------
+void mafPipeVector::EnableWidget()
+//----------------------------------------------------------------------------
+{
+  m_Gui->Enable(ID_INTERVAL, m_UseBunch == 1 && m_AllBunch == 0);
+  m_Gui->Enable(ID_STEP, m_UseBunch == 1);
+  m_Gui->Enable(ID_ALL_BUNCH, m_UseBunch == 1);
+}
+
