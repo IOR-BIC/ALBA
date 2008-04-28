@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 17:04:47 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2008-04-28 12:51:48 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,9 +34,13 @@
 
 #include "mmdMouse.h"
 
+#include "mafStorage.h"
+#include "mafEventIO.h"
+#include "mafDataVector.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 #include "mafNode.h"
+#include "mafVMEGenericAbstract.h"
 
 //------------------------------------------------------------------------------
 // Events
@@ -517,6 +521,44 @@ void mafOpManager::OpRun(int op_id)
       {
         mafNode *node_to_del = m_Selected;
         OpSelect(m_Selected->GetParent());
+
+        // do not remove binary files but fill a list with files to be deleted on save by the storage.
+        mafEventIO e(this,NODE_GET_STORAGE);
+        node_to_del->ForwardUpEvent(e);
+        mafStorage *storage = e.GetStorage();
+        mafNodeIterator *iter = node_to_del->NewIterator();
+        mafString data_filename;
+        for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+        {
+          if(mafVMEGenericAbstract::SafeDownCast(node))
+          {
+            mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
+            mafDataVector *dv = vme->GetDataVector();
+            if (dv != NULL)
+            {
+              if (dv->GetSingleFileMode())
+              {
+                mafString archive_filename = dv->GetArchiveName();
+                if (archive_filename != "")
+                {
+                  storage->ReleaseURL(archive_filename);
+                }
+              }
+              else
+              {
+                mafVMEItem *item;
+                int i;
+                for (i = 0; i < dv->GetNumberOfItems(); i++)
+                {
+                  item = dv->GetItemByIndex(i);
+                  data_filename = item->GetURL();
+                  storage->ReleaseURL(data_filename);
+                }
+              }
+            }
+          }
+        }
+        iter->Delete();
         node_to_del->ReparentTo(NULL);
         ClearUndoStack();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
