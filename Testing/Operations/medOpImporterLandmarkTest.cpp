@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoLandmarkImporterTest.cpp,v $
+Module:    $RCSfile: medOpImporterLandmarkTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-24 13:58:07 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-04-28 09:01:03 $
+Version:   $Revision: 1.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -19,8 +19,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoLandmarkImporterTest.h"
-#include "mmoLandmarkImporter.h"
+#include "medOpImporterLandmarkTest.h"
+#include "medOpImporterLandmark.h"
 
 
 #include "mafString.h"
@@ -33,10 +33,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <assert.h>
 
 //-----------------------------------------------------------
-void mmoLandmarkImporterTest::Test() 
+void medOpImporterLandmarkTest::Test() 
 //-----------------------------------------------------------
 {
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 
 	mafString filename=MED_DATA_ROOT;
@@ -63,10 +63,10 @@ void mmoLandmarkImporterTest::Test()
   cppDEL(importer);
 }
 //-----------------------------------------------------------
-void mmoLandmarkImporterTest::TestTimeVariant() 
+void medOpImporterLandmarkTest::TestTimeVariant() 
 //-----------------------------------------------------------
 {
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/Export.txt";
@@ -96,10 +96,10 @@ void mmoLandmarkImporterTest::TestTimeVariant()
 
 }
 //-----------------------------------------------------------
-void mmoLandmarkImporterTest::TestUnTag() 
+void medOpImporterLandmarkTest::TestUnTag() 
 //-----------------------------------------------------------
 {
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_NOT_TAGGED";

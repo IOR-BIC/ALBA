@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoVolumeMeasureTest.h,v $
+Module:    $RCSfile: medOpImporterRAWImagesTest.h,v $
 Language:  C++
-Date:      $Date: 2006-11-28 11:15:47 $
+Date:      $Date: 2008-04-28 09:01:03 $
 Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi
+Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_mmoVolumeMeasureTEST_H
-#define CPP_UNIT_mmoVolumeMeasureTEST_H
+#ifndef CPP_UNIT_medOpImporterRAWImagesTEST_H
+#define CPP_UNIT_medOpImporterRAWImagesTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -22,9 +22,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestRunner.h>
 
 
-class mmoVolumeMeasureTest : public CPPUNIT_NS::TestFixture
+class medOpImporterRAWImagesTest : public CPPUNIT_NS::TestFixture
 {
-  CPPUNIT_TEST_SUITE( mmoVolumeMeasureTest );
+  CPPUNIT_TEST_SUITE( medOpImporterRAWImagesTest );
   CPPUNIT_TEST( Test );
   CPPUNIT_TEST_SUITE_END();
 
@@ -49,7 +49,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( mmoVolumeMeasureTest::suite());
+  runner.addTest( medOpImporterRAWImagesTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

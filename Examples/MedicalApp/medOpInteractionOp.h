@@ -1,16 +1,16 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoInteractionOp.h,v $
+  Module:    $RCSfile: medOpInteractionOp.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 09:19:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 09:02:40 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __mmoInteraction_H__
-#define __mmoInteraction_H__
+#ifndef __medOpInteraction_H__
+#define __medOpInteraction_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -23,12 +23,12 @@ class mafVMEGizmo;
 class mmiCompositorMouse;
 
 // ============================================================================
-class mmoInteractionOp : public mafOp
+class medOpInteractionOp : public mafOp
 // ============================================================================
 {
 public:
-                mmoInteractionOp(wxString label);
-               ~mmoInteractionOp();
+                medOpInteractionOp(wxString label);
+               ~medOpInteractionOp();
 	virtual void OnEvent(mafEventBase *e);
   mafOp* Copy();
 
@@ -51,7 +51,7 @@ protected:
   mmiCompositorMouse  *m_MouseInteractor;
 
 };
-#endif // __mmoInteraction_H__
+#endif // __medOpInteraction_H__
 
 
 

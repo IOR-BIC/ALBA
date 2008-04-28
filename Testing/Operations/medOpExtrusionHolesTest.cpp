@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoExtrusionHolesTest.cpp,v $
+Module:    $RCSfile: medOpExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-10 07:47:04 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-28 09:00:28 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,8 +47,8 @@ MafMedical is partially based on OpenMAF.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "mmoExtrusionHolesTest.h"
-#include "mmoExtrusionHoles.h"
+#include "medOpExtrusionHolesTest.h"
+#include "medOpExtrusionHoles.h"
 
 #include "mafString.h"
 #include "mafVMEStorage.h"
@@ -60,29 +60,29 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPolyData.h"
 
 //-----------------------------------------------------------
-void mmoExtrusionHolesTest::TestDynamicAllocation() 
+void medOpExtrusionHolesTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	medOpExtrusionHoles *extrusion = new medOpExtrusionHoles();
 	mafDEL(extrusion);
 }
 //-----------------------------------------------------------
-void mmoExtrusionHolesTest::TestStaticAllocation() 
+void medOpExtrusionHolesTest::TestStaticAllocation() 
 //-----------------------------------------------------------
 {
-	mmoExtrusionHoles extrusion; 
+	medOpExtrusionHoles extrusion; 
 }
 //-----------------------------------------------------------
-void mmoExtrusionHolesTest::TestSetGetExtrusionFactor() 
+void medOpExtrusionHolesTest::TestSetGetExtrusionFactor() 
 //-----------------------------------------------------------
 {
-	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	medOpExtrusionHoles *extrusion = new medOpExtrusionHoles();
 	extrusion->SetExtrusionFactor(4.0);
 	CPPUNIT_ASSERT(extrusion->GetExtrusionFactor()==4.0);
 	mafDEL(extrusion);
 }
 //-----------------------------------------------------------
-void mmoExtrusionHolesTest::TestExtractFreeEdge() 
+void medOpExtrusionHolesTest::TestExtractFreeEdge() 
 //-----------------------------------------------------------
 {
 	//Create storage
@@ -104,7 +104,7 @@ void mmoExtrusionHolesTest::TestExtractFreeEdge()
 	cube->GetOutput()->GetVTKData()->Update();
 	cube->Update();
 
-	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	medOpExtrusionHoles *extrusion = new medOpExtrusionHoles();
 	extrusion->TestModeOn();
 	extrusion->SetInput(cube);
 	extrusion->OpRun();
@@ -120,7 +120,7 @@ void mmoExtrusionHolesTest::TestExtractFreeEdge()
 	mafDEL(storage);
 }
 //-----------------------------------------------------------
-void mmoExtrusionHolesTest::TestExtrude() 
+void medOpExtrusionHolesTest::TestExtrude() 
 //-----------------------------------------------------------
 {
 	//Create storage
@@ -149,7 +149,7 @@ void mmoExtrusionHolesTest::TestExtrude()
 	
 	polydata->GetBounds(bounds);
 
-	mmoExtrusionHoles *extrusion = new mmoExtrusionHoles();
+	medOpExtrusionHoles *extrusion = new medOpExtrusionHoles();
 	extrusion->TestModeOn();
 	extrusion->SetInput(cube);
 	extrusion->SetExtrusionFactor(4.0);

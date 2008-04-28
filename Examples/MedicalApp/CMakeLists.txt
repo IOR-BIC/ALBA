@@ -3,8 +3,8 @@ PROJECT (exMedical)
 SET(PROJECT_SRCS 
 	exMedicalApp.cpp
 	exMedicalApp.h
-	mmoInteractionOp.cpp
-	mmoInteractionOp.h
+	medOpInteractionOp.cpp
+	medOpInteractionOp.h
 )
 
 IF (NOT EXECUTABLE_OUTPUT_PATH)

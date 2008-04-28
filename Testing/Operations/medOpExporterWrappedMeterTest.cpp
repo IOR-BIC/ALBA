@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-27 13:02:23 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-04-28 08:58:51 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medVMEWrappedMeter.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
-#include "mmoLandmarkImporter.h"
+#include "medOpImporterLandmark.h"
 #include "vtkMath.h"
 #include "mafVMERoot.h"
 #include "mafVMEStorage.h"
@@ -47,7 +47,7 @@ void medOpExporterWrappedMeterTest::Test()
 
 
   //create landmarks and relative landmark cloud
-  mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+  medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
   importer->TestModeOn();
   //importer->SetInput(storage->GetRoot());
   mafString filename=MED_DATA_ROOT;

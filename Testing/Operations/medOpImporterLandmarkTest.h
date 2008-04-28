@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoLandmarkExporterTest.h,v $
+Module:    $RCSfile: medOpImporterLandmarkTest.h,v $
 Language:  C++
-Date:      $Date: 2007-10-11 15:30:39 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-04-28 09:01:03 $
+Version:   $Revision: 1.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_mmoLandmarkExporterTEST_H
-#define CPP_UNIT_mmoLandmarkExporterTEST_H
+#ifndef CPP_UNIT_medOpImporterLandmarkTEST_H
+#define CPP_UNIT_medOpImporterLandmarkTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -22,16 +22,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestRunner.h>
 
 
-class mmoLandmarkExporterTest : public CPPUNIT_NS::TestFixture
+class medOpImporterLandmarkTest : public CPPUNIT_NS::TestFixture
 {
-  CPPUNIT_TEST_SUITE( mmoLandmarkExporterTest );
-  //CPPUNIT_TEST( TestOnVmeRawMotionData ); ///< this test is leaked for vmerawmotiondata
-	CPPUNIT_TEST( TestOnLandmarkImporter);
+  CPPUNIT_TEST_SUITE( medOpImporterLandmarkTest );
+  CPPUNIT_TEST( Test );
+  CPPUNIT_TEST( TestTimeVariant );
+  CPPUNIT_TEST( TestUnTag );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-    void TestOnVmeRawMotionData();
-		void TestOnLandmarkImporter();
+    void Test();
+    void TestTimeVariant();
+    void TestUnTag();
 };
 
 
@@ -41,7 +43,7 @@ main( int argc, char* argv[] )
   // Create the event manager and test controller
   CPPUNIT_NS::TestResult controller;
 
-  // Add a listener that collects test result
+  // Add a listener that colllects test result
   CPPUNIT_NS::TestResultCollector result;
   controller.addListener( &result );        
 
@@ -51,7 +53,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( mmoLandmarkExporterTest::suite());
+  runner.addTest( medOpImporterLandmarkTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-14 16:26:09 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2008-04-28 09:04:28 $
+Version:   $Revision: 1.14 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -75,17 +75,17 @@ MafMedical is partially based on OpenMAF.
 	#include "mafOpImporterMesh.h"
 	#ifdef MAF_USE_ITK
 		#include "mafOpImporterASCII.h"
-		#include "mmoEMGImporterWS.h"
-		#include "mmoGRFImporterWS.h"
+		#include "medOpImporterEMGWS.h"
+		#include "medOpImporterGRFWS.h"
 	#endif
 	#include "mmoDICOMImporter.h"
-	#include "mmoCTAImporter.h"
-	#include "mmoCTMRIImporter.h"
-	#include "mmoLandmarkImporter.h"
-	#include "mmoLandmarkImporterTXT.h"
-	#include "mmoLandmarkImporterWS.h"
-	#include "mmoRAWImporterImages.h"
-	#include "mmoC3DImporter.h"
+	#include "medOpImporterCTA.h"
+	#include "medOpImporterCTMRI.h"
+	#include "medOpImporterLandmark.h"
+	#include "medOpImporterLandmarkTXT.h"
+	#include "medOpImporterLandmarkWS.h"
+	#include "medOpImporterRAWImages.h"
+	#include "medOpImporterC3D.h"
 #endif
 #ifndef _DEBUG
 	//EXPORTERS
@@ -93,7 +93,7 @@ MafMedical is partially based on OpenMAF.
 	#include "mafOpExporterRAW.h"
 	#include "mafOpExporterSTL.h"
 	#include "mafOpExporterVTK.h"
-	#include "mmoLandmarkExporter.h"
+	#include "medOpExporterLandmark.h"
 #endif
 #ifndef _DEBUG
 	//OPERATIONS
@@ -123,17 +123,17 @@ MafMedical is partially based on OpenMAF.
   #include "medOpScaleDataset.h"
   #include "medOpMove.h"
 #ifdef MAF_USE_ITK
-		#include "mmoClassicICPRegistration.h"
+		#include "medOpClassicICPRegistration.h"
 #endif
-	#include "mmoCropDeformableROI.h"
-	#include "mmoMML.h"
-	#include "mmoMeshQuality.h"
-	#include "mmoVolumeMeasure.h"
-	#include "mmoRegisterClusters.h"
-	#include "mmoFlipNormals.h"
+	#include "medOpCropDeformableROI.h"
+	#include "medOpMML.h"
+	#include "medOpMeshQuality.h"
+	#include "medOpVolumeMeasure.h"
+	#include "medOpRegisterClusters.h"
+	#include "medOpFlipNormals.h"
 	#include "mafOpCreateSpline.h"
 	#include "mafOpRemoveCells.h"
-	#include "mmoExtrusionHoles.h"
+	#include "medOpExtrusionHoles.h"
 #endif
 
 #ifndef _DEBUG
@@ -198,18 +198,18 @@ bool exMedicalApp::OnInit()
 		m_Logic->Plug(new mafOpImporterASCII("ASCII"));
 #endif
 	m_Logic->Plug(new mmoDICOMImporter("DICOM"),"DICOM Suite");
-	m_Logic->Plug(new mmoCTAImporter("CTA-DSA"),"DICOM Suite");
-	m_Logic->Plug(new mmoCTMRIImporter("CT"),"DICOM Suite");
-	m_Logic->Plug(new mmoCTMRIImporter("MRI"),"DICOM Suite");
-	m_Logic->Plug(new mmoLandmarkImporter("Landmark"),"Landmark Suite");
-	m_Logic->Plug(new mmoLandmarkImporterTXT("Landmark TXT"),"Landmark Suite");
-	m_Logic->Plug(new mmoLandmarkImporterWS("Landmark WS"),"Landmark Suite");
-	m_Logic->Plug(new mmoC3DImporter("C3D"),"Landmark Suite");
+	m_Logic->Plug(new medOpImporterCTA("CTA-DSA"),"DICOM Suite");
+	m_Logic->Plug(new medOpImporterCTMRI("CT"),"DICOM Suite");
+	m_Logic->Plug(new medOpImporterCTMRI("MRI"),"DICOM Suite");
+	m_Logic->Plug(new medOpImporterLandmark("Landmark"),"Landmark Suite");
+	m_Logic->Plug(new medOpImporterLandmarkTXT("Landmark TXT"),"Landmark Suite");
+	m_Logic->Plug(new medOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
+	m_Logic->Plug(new medOpImporterC3D("C3D"),"Landmark Suite");
 #ifdef MAF_USE_ITK
-		m_Logic->Plug(new mmoEMGImporterWS("EMG"));
-		m_Logic->Plug(new mmoGRFImporterWS("GRF"));
+		m_Logic->Plug(new medOpImporterEMGWS("EMG"));
+		m_Logic->Plug(new medOpImporterGRFWS("GRF"));
 #endif
-	m_Logic->Plug(new mmoRAWImporterImages("RAW Images"));
+	m_Logic->Plug(new medOpImporterRAWImages("RAW Images"));
 #endif
 	//------------------------------------------------------------
 
@@ -221,7 +221,7 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpExporterSTL("STL"));
 	m_Logic->Plug(new mafOpExporterVTK("VTK"));
 	m_Logic->Plug(new mafOpExporterRAW("Raw"));
-	m_Logic->Plug(new mmoLandmarkExporter("Landmark"));
+	m_Logic->Plug(new medOpExporterLandmark("Landmark"));
 #endif
 	//------------------------------------------------------------
 
@@ -231,8 +231,8 @@ bool exMedicalApp::OnInit()
 #ifndef _DEBUG
 	m_Logic->Plug(new mafOp2DMeasure("2D Measure"),"Measure");
 	m_Logic->Plug(new mafOpVOIDensity("VOI Density"),"Measure");
-	m_Logic->Plug(new mmoVolumeMeasure("Volume"),"Measure");
-	m_Logic->Plug(new mmoMeshQuality("Mesh Quality"),"Measure");
+	m_Logic->Plug(new medOpVolumeMeasure("Volume"),"Measure");
+	m_Logic->Plug(new medOpMeshQuality("Mesh Quality"),"Measure");
 
 	m_Logic->Plug(new mafOpAddLandmark("Add Landmark"),"Create");
 	m_Logic->Plug(new mafOpCreateGroup("Group"),"Create");
@@ -257,16 +257,16 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new mafOpVolumeResample("Resample Volume"),"Modify");
 	m_Logic->Plug(new mafOpCrop("Crop Volume"),"Modify");
 	m_Logic->Plug(new mafOpBooleanSurface("Boolean Surface"),"Modify");
-	m_Logic->Plug(new mmoMML("MML"),"Modify");
-	m_Logic->Plug(new mmoCropDeformableROI("Crop ROI"),"Modify");
-	m_Logic->Plug(new mmoFlipNormals("Flip Normals"),"Modify");
+	m_Logic->Plug(new medOpMML("MML"),"Modify");
+	m_Logic->Plug(new medOpCropDeformableROI("Crop ROI"),"Modify");
+	m_Logic->Plug(new medOpFlipNormals("Flip Normals"),"Modify");
 	m_Logic->Plug(new mafOpRemoveCells("Remove Cells"),"Modify");
-	m_Logic->Plug(new mmoExtrusionHoles(),"Modify");
+	m_Logic->Plug(new medOpExtrusionHoles(),"Modify");
   m_Logic->Plug(new medOpScaleDataset("Scale Dataset"),"Modify");
   m_Logic->Plug(new medOpMove("Move"),"Modify");    
-	m_Logic->Plug(new mmoRegisterClusters("Clusters"),"Register");
+	m_Logic->Plug(new medOpRegisterClusters("Clusters"),"Register");
 #ifdef MAF_USE_ITK
-		m_Logic->Plug(new mmoClassicICPRegistration("Surface"),"Register");
+		m_Logic->Plug(new medOpClassicICPRegistration("Surface"),"Register");
 #endif
 #endif
 	//------------------------------------------------------------

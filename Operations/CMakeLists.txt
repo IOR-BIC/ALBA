@@ -10,7 +10,7 @@ SET(PROJECT_SRCS
   medOpCreateLabeledVolume.h
   medOpInteractionDebugger.cpp
   medOpInteractionDebugger.h
-  mmoDICOMImporter.cpp //Old Class
+  mmoDICOMImporter.cpp
   mmoDICOMImporter.h
   medOpImporterCTA.cpp
   medOpImporterCTA.h

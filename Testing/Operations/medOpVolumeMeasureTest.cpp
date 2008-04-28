@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoVolumeMeasureTest.cpp,v $
+Module:    $RCSfile: medOpVolumeMeasureTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-02 13:15:33 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-28 09:01:31 $
+Version:   $Revision: 1.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,8 +18,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoVolumeMeasureTest.h"
-#include "mmoVolumeMeasure.h"
+#include "medOpVolumeMeasureTest.h"
+#include "medOpVolumeMeasure.h"
 
 #include "mafString.h"
 #include "mafVMESurface.h"
@@ -29,7 +29,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <assert.h>
 
 //-----------------------------------------------------------
-void mmoVolumeMeasureTest::Test() 
+void medOpVolumeMeasureTest::Test() 
 //-----------------------------------------------------------
 {
   vtkCubeSource *cube = vtkCubeSource::New();
@@ -43,7 +43,7 @@ void mmoVolumeMeasureTest::Test()
   vmeSurface->SetData(cube->GetOutput(), 0);
   vmeSurface->Update();
   	
-	mmoVolumeMeasure *volumeMeasureOp=new mmoVolumeMeasure("Volume Measure");
+	medOpVolumeMeasure *volumeMeasureOp=new medOpVolumeMeasure("Volume Measure");
 	volumeMeasureOp->TestModeOn();
   mafString result;
  volumeMeasureOp->VolumeCompute(vmeSurface);

@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoRAWImporterImagesTest.cpp,v $
+Module:    $RCSfile: medOpImporterRAWImagesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-12 16:04:17 $
+Date:      $Date: 2008-04-28 09:01:03 $
 Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
@@ -19,8 +19,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoRAWImporterImagesTest.h"
-#include "mmoRAWImporterImages.h"
+#include "medOpImporterRAWImagesTest.h"
+#include "medOpImporterRAWImages.h"
 
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
@@ -29,14 +29,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRectilinearGrid.h"
 
 //-----------------------------------------------------------
-void mmoRAWImporterImagesTest::Test() 
+void medOpImporterRAWImagesTest::Test() 
 //-----------------------------------------------------------
 {
 	mafVMEStorage *Storage = mafVMEStorage::New();
   Storage->GetRoot()->SetName("root");
   Storage->GetRoot()->Initialize();
 
-	mmoRAWImporterImages *Importer=new mmoRAWImporterImages("importer");
+	medOpImporterRAWImages *Importer=new medOpImporterRAWImages("importer");
 	Importer->TestModeOn();
   Importer->SetInput(Storage->GetRoot());
 	mafString Directory=MED_DATA_ROOT;

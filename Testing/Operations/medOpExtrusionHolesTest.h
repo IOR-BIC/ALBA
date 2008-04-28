@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoExtrusionHolesTest.h,v $
+Module:    $RCSfile: medOpExtrusionHolesTest.h,v $
 Language:  C++
-Date:      $Date: 2007-06-20 16:43:47 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-28 09:00:28 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#ifndef CPP_UNIT_mmoExtrusionHolesTEST_H
-#define CPP_UNIT_mmoExtrusionHolesTEST_H
+#ifndef CPP_UNIT_medOpExtrusionHolesTEST_H
+#define CPP_UNIT_medOpExtrusionHolesTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -51,9 +51,9 @@ MafMedical is partially based on OpenMAF.
 #include <cppunit/TestRunner.h>
 
 
-class mmoExtrusionHolesTest : public CPPUNIT_NS::TestFixture
+class medOpExtrusionHolesTest : public CPPUNIT_NS::TestFixture
 {
-	CPPUNIT_TEST_SUITE( mmoExtrusionHolesTest );
+	CPPUNIT_TEST_SUITE( medOpExtrusionHolesTest );
 	CPPUNIT_TEST( TestDynamicAllocation );
 	CPPUNIT_TEST( TestStaticAllocation );
 	CPPUNIT_TEST( TestSetGetExtrusionFactor );
@@ -86,7 +86,7 @@ main( int argc, char* argv[] )
 
 	// Add the top suite to the test runner
 	CPPUNIT_NS::TestRunner runner;
-	runner.addTest( mmoExtrusionHolesTest::suite());
+	runner.addTest( medOpExtrusionHolesTest::suite());
 	runner.run( controller );
 
 	// Print test in a compiler compatible format.

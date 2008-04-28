@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoInteractionOp.cpp,v $
+  Module:    $RCSfile: medOpInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 09:19:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 09:02:40 $
+  Version:   $Revision: 1.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "mmoInteractionOp.h"
+#include "medOpInteractionOp.h"
 #include "mmgGui.h"
 
 #include "mmiCompositorMouse.h"
@@ -35,11 +35,11 @@
 /** UNCOMMENT HERE TO DECLARE THE ACTIONS               (PASS 1)              */
 /* *
 //----------------------------------------------------------------------------
-const char *mmoInteractionOp::m_Actions[] = {"MyCustomAction",NULL};
+const char *medOpInteractionOp::m_Actions[] = {"MyCustomAction",NULL};
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-const char ** mmoInteractionOp::GetActions()
+const char ** medOpInteractionOp::GetActions()
 //----------------------------------------------------------------------------
 {
   return m_Actions;
@@ -48,26 +48,26 @@ const char ** mmoInteractionOp::GetActions()
 
 
 //----------------------------------------------------------------------------
-mmoInteractionOp::mmoInteractionOp(wxString label)
+medOpInteractionOp::medOpInteractionOp(wxString label)
 : mafOp(label)
 //----------------------------------------------------------------------------
 {
   
 }
 //----------------------------------------------------------------------------
-mmoInteractionOp::~mmoInteractionOp()
+medOpInteractionOp::~medOpInteractionOp()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-mafOp* mmoInteractionOp::Copy()
+mafOp* medOpInteractionOp::Copy()
 //----------------------------------------------------------------------------
 {
-  return new mmoInteractionOp(m_Label);
+  return new medOpInteractionOp(m_Label);
 }
 
 //----------------------------------------------------------------------------
-void mmoInteractionOp::OpRun()
+void medOpInteractionOp::OpRun()
 //----------------------------------------------------------------------------
 {
   // CREATE A SPHERE GIZMO
@@ -124,18 +124,18 @@ void mmoInteractionOp::OpRun()
 	ShowGui(); // display the GUI
 }
 //----------------------------------------------------------------------------
-void mmoInteractionOp::OpDo()
+void medOpInteractionOp::OpDo()
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-void mmoInteractionOp::OpUndo()
+void medOpInteractionOp::OpUndo()
 //----------------------------------------------------------------------------
 {
 }
 
 //----------------------------------------------------------------------------
-void mmoInteractionOp::OpStop(int result)
+void medOpInteractionOp::OpStop(int result)
 {	
   HideGui();
   
@@ -168,7 +168,7 @@ void mmoInteractionOp::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-void mmoInteractionOp::OnEvent(mafEventBase *e) 
+void medOpInteractionOp::OnEvent(mafEventBase *e) 
 //----------------------------------------------------------------------------
 { 
 

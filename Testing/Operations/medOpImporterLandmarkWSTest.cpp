@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoLandmarkImporterTXTTest.cpp,v $
+Module:    $RCSfile: medOpImporterLandmarkWSTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-14 08:44:13 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-04-28 09:01:03 $
+Version:   $Revision: 1.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -19,8 +19,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoLandmarkImporterTXTTest.h"
-#include "mmoLandmarkImporterTXT.h"
+#include "medOpImporterLandmarkWSTest.h"
+#include "medOpImporterLandmarkWS.h"
 
 
 #include "mafString.h"
@@ -35,60 +35,57 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <iostream>
 
 //-----------------------------------------------------------
-void mmoLandmarkImporterTXTTest::TestTXTImporter() 
+void medOpImporterLandmarkWSTest::TestWSImporter() 
 //-----------------------------------------------------------
 {
-	mmoLandmarkImporterTXT *importer=new mmoLandmarkImporterTXT("importer");
+	medOpImporterLandmarkWS *importer=new medOpImporterLandmarkWS("importer");
 	importer->TestModeOn();
 	mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_FileTXT/cammino02.txt";
+  filename<<"/AL_FileTXT/pbCV1b05al.csv";
 	importer->SetFileName(filename.GetCStr());
-  importer->SetSkipColumn(1);
 	importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
   
-  CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 18);
+  CPPUNIT_ASSERT(node->GetNumberOfLandmarks() == 24);
   cppDEL(importer);
 }
 //-----------------------------------------------------------
-void mmoLandmarkImporterTXTTest::TestVisibility() 
+void medOpImporterLandmarkWSTest::TestVisibility() 
 //-----------------------------------------------------------
 {
-  mmoLandmarkImporterTXT *importer=new mmoLandmarkImporterTXT("importer");
+  medOpImporterLandmarkWS *importer=new medOpImporterLandmarkWS("importer");
   importer->TestModeOn();
   mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_FileTXT/cammino02.txt";
+  filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
-  importer->SetSkipColumn(1);
   importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
-  bool visible = node->GetLandmarkVisibility(0,1.98);
+  bool visible = node->GetLandmarkVisibility(0,7.21);
 
   CPPUNIT_ASSERT(visible == false);
   cppDEL(importer);
 }
 
 //-----------------------------------------------------------
-void mmoLandmarkImporterTXTTest::TestCoordinates() 
+void medOpImporterLandmarkWSTest::TestCoordinates() 
 //-----------------------------------------------------------
 {
-  mmoLandmarkImporterTXT *importer=new mmoLandmarkImporterTXT("importer");
+  medOpImporterLandmarkWS *importer=new medOpImporterLandmarkWS("importer");
   importer->TestModeOn();
   mafString filename=MED_DATA_ROOT;
-  filename<<"/AL_FileTXT/cammino02.txt";
+  filename<<"/AL_FileTXT/pbCV1b05al.csv";
   importer->SetFileName(filename.GetCStr());
-  importer->SetSkipColumn(1);
   importer->Read();
   mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
   double xyz[3], rot[3];
   mafVMELandmark *lm = node->GetLandmark(0);
-  lm->GetOutput()->GetPose(xyz,rot,1.99);
+  lm->GetOutput()->GetPose(xyz,rot,2.94);
 
-  CPPUNIT_ASSERT( fabs(xyz[0] - 144.13) < 0.01 &&
-    fabs(xyz[1] - -1103.8) < 0.01 &&
-    fabs(xyz[2] - 1547.2) < 0.01 );
+  CPPUNIT_ASSERT( fabs(xyz[0] - 36.110333) < 0.01 &&
+    fabs(xyz[1] - -1012.215299) < 0.01 &&
+    fabs(xyz[2] - 19.816351) < 0.01 );
 
   //CPPUNIT_ASSERT( mafEquals(xyz[0],144.13) && mafEquals(xyz[1],-1103.8) && mafEquals(xyz[2],1547.2));
   cppDEL(importer);

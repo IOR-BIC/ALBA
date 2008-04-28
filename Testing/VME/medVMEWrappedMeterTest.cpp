@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-07 10:32:10 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-28 08:59:19 $
+Version:   $Revision: 1.6 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMESurfaceParametric.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
-#include "mmoLandmarkImporter.h"
+#include "medOpImporterLandmark.h"
 #include "vtkMath.h"
 #include "mafVMERoot.h"
 #include "mafVMEStorage.h"
@@ -182,7 +182,7 @@ void medVMEWrappedMeterTest::TestWithGenericLandmark()
 
 
 	//create landmarks and relative landmark cloud
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
 	mafString filename=MED_DATA_ROOT;
@@ -238,7 +238,7 @@ void medVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 
 
 	//create landmarks and relative landmark cloud
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
 	mafString filename=MED_DATA_ROOT;
@@ -447,7 +447,7 @@ void medVMEWrappedMeterTest::TestLineDistanceWithLandmark()
 
 
 	//create landmarks and relative landmark cloud
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
 	mafString filename=MED_DATA_ROOT;
@@ -499,7 +499,7 @@ void medVMEWrappedMeterTest::TestLineAngleWithLandmark()
 
 
 	//create landmarks and relative landmark cloud
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 	importer->SetInput(storage->GetRoot());
 	mafString filename=MED_DATA_ROOT;

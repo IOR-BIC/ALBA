@@ -8,28 +8,28 @@ LINK_LIBRARIES(medCommon)
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
 IF (MAF_USE_ITK)
-  ADD_EXECUTABLE(mmoLandmarkExporterTest mmoLandmarkExporterTest.h mmoLandmarkExporterTest.cpp)
-  ADD_TEST(mmoLandmarkExporterTest ${EXECUTABLE_OUTPUT_PATH}/mmoLandmarkExporterTest)
+  ADD_EXECUTABLE(medOpExporterLandmarkTest medOpExporterLandmarkTest.h medOpExporterLandmarkTest.cpp)
+  ADD_TEST(medOpExporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterLandmarkTest)
 
-  ADD_EXECUTABLE(mmoLandmarkImporterTest mmoLandmarkImporterTest.h mmoLandmarkImporterTest.cpp)
-  ADD_TEST(mmoLandmarkImporterTest ${EXECUTABLE_OUTPUT_PATH}/mmoLandmarkImporterTest)
+  ADD_EXECUTABLE(medOpImporterLandmarkTest medOpImporterLandmarkTest.h medOpImporterLandmarkTest.cpp)
+  ADD_TEST(medOpImporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkTest)
   
 ENDIF (MAF_USE_ITK)
 
-ADD_EXECUTABLE(mmoVolumeMeasureTest mmoVolumeMeasureTest.h mmoVolumeMeasureTest.cpp)
-ADD_TEST(mmoVolumeMeasureTest ${EXECUTABLE_OUTPUT_PATH}/mmoVolumeMeasureTest)
+ADD_EXECUTABLE(medOpVolumeMeasureTest medOpVolumeMeasureTest.h medOpVolumeMeasureTest.cpp)
+ADD_TEST(medOpVolumeMeasureTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeMeasureTest)
 
-ADD_EXECUTABLE(mmoRAWImporterImagesTest mmoRAWImporterImagesTest.h mmoRAWImporterImagesTest.cpp)
-ADD_TEST(mmoRAWImporterImagesTest ${EXECUTABLE_OUTPUT_PATH}/mmoRAWImporterImagesTest)
+ADD_EXECUTABLE(medOpImporterRAWImagesTest medOpImporterRAWImagesTest.h medOpImporterRAWImagesTest.cpp)
+ADD_TEST(medOpImporterRAWImagesTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterRAWImagesTest)
 
-ADD_EXECUTABLE(mmoLandmarkImporterTXTTest mmoLandmarkImporterTXTTest.h mmoLandmarkImporterTXTTest.cpp)
-ADD_TEST(mmoLandmarkImporterTXTTest ${EXECUTABLE_OUTPUT_PATH}/mmoLandmarkImporterTXTTest)
+ADD_EXECUTABLE(medOpImporterLandmarkTXTTest medOpImporterLandmarkTXTTest.h medOpImporterLandmarkTXTTest.cpp)
+ADD_TEST(medOpImporterLandmarkTXTTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkTXTTest)
 
-ADD_EXECUTABLE(mmoLandmarkImporterWSTest mmoLandmarkImporterWSTest.h mmoLandmarkImporterWSTest.cpp)
-ADD_TEST(mmoLandmarkImporterWSTest ${EXECUTABLE_OUTPUT_PATH}/mmoLandmarkImporterWSTest)
+ADD_EXECUTABLE(medOpImporterLandmarkWSTest medOpImporterLandmarkWSTest.h medOpImporterLandmarkWSTest.cpp)
+ADD_TEST(medOpImporterLandmarkWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkWSTest)
   
-ADD_EXECUTABLE(mmoExtrusionHolesTest mmoExtrusionHolesTest.h mmoExtrusionHolesTest.cpp)
-ADD_TEST(mmoExtrusionHolesTest ${EXECUTABLE_OUTPUT_PATH}/mmoExtrusionHolesTest)
+ADD_EXECUTABLE(medOpExtrusionHolesTest medOpExtrusionHolesTest.h medOpExtrusionHolesTest.cpp)
+ADD_TEST(medOpExtrusionHolesTest ${EXECUTABLE_OUTPUT_PATH}/medOpExtrusionHolesTest)
 
 ADD_EXECUTABLE(medOpExporterWrappedMeterTest medOpExporterWrappedMeterTest.h medOpExporterWrappedMeterTest.cpp)
 ADD_TEST(medOpExporterWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterWrappedMeterTest)

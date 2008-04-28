@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoLandmarkImporterTest.h,v $
+Module:    $RCSfile: medOpImporterLandmarkWSTest.h,v $
 Language:  C++
-Date:      $Date: 2006-10-05 08:49:36 $
+Date:      $Date: 2008-04-28 09:01:03 $
 Version:   $Revision: 1.1 $
-Authors:   Daniele Giunchi
+Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef CPP_UNIT_mmoLandmarkImporterTEST_H
-#define CPP_UNIT_mmoLandmarkImporterTEST_H
+#ifndef CPP_UNIT_medOpImporterLandmarkWSTEST_H
+#define CPP_UNIT_medOpImporterLandmarkWSTEST_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -22,18 +22,19 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestRunner.h>
 
 
-class mmoLandmarkImporterTest : public CPPUNIT_NS::TestFixture
+class medOpImporterLandmarkWSTest : public CPPUNIT_NS::TestFixture
 {
-  CPPUNIT_TEST_SUITE( mmoLandmarkImporterTest );
-  CPPUNIT_TEST( Test );
-  CPPUNIT_TEST( TestTimeVariant );
-  CPPUNIT_TEST( TestUnTag );
+  CPPUNIT_TEST_SUITE( medOpImporterLandmarkWSTest );
+  CPPUNIT_TEST( TestWSImporter );
+  CPPUNIT_TEST( TestVisibility );
+  CPPUNIT_TEST( TestCoordinates );
+ 
   CPPUNIT_TEST_SUITE_END();
 
   protected:
-    void Test();
-    void TestTimeVariant();
-    void TestUnTag();
+    void TestWSImporter();
+    void TestVisibility();
+    void TestCoordinates();
 };
 
 
@@ -53,7 +54,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( mmoLandmarkImporterTest::suite());
+  runner.addTest( medOpImporterLandmarkWSTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.
@@ -62,5 +63,7 @@ main( int argc, char* argv[] )
 
   return result.wasSuccessful() ? 0 : 1;
 }
+
+
 
 #endif

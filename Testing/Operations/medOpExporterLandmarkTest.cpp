@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoLandmarkExporterTest.cpp,v $
+Module:    $RCSfile: medOpExporterLandmarkTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-11 15:30:56 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-28 08:59:56 $
+Version:   $Revision: 1.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -19,9 +19,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #pragma runtime_checks( "s", off )
-#include "mmoLandmarkExporterTest.h"
-#include "mmoLandmarkExporter.h"
-#include "mmoLandmarkImporter.h"
+#include "medOpExporterLandmarkTest.h"
+#include "medOpExporterLandmark.h"
+#include "medOpImporterLandmark.h"
 
 #include "mafVMERawMotionData.h"
 #include "mafSmartPointer.h"
@@ -33,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <assert.h>
 
 //-----------------------------------------------------------
-void mmoLandmarkExporterTest::TestOnVmeRawMotionData() 
+void medOpExporterLandmarkTest::TestOnVmeRawMotionData() 
 //-----------------------------------------------------------
 {
   int returnValue = -1;
@@ -57,7 +57,7 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
   vmeRawMotionData->Read();
 
 	//Initialize exporter
-	mmoLandmarkExporter *exporter=new mmoLandmarkExporter("test exporter");
+	medOpExporterLandmark *exporter=new medOpExporterLandmark("test exporter");
 	exporter->SetInput(vmeRawMotionData);
 	mafString fileExp=MED_DATA_ROOT;
   fileExp<<"/RAW_MAL/Export.txt";
@@ -138,12 +138,12 @@ void mmoLandmarkExporterTest::TestOnVmeRawMotionData()
   exporter = NULL;
 }
 //------------------------------------------------------------------------
-void mmoLandmarkExporterTest::TestOnLandmarkImporter()
+void medOpExporterLandmarkTest::TestOnLandmarkImporter()
 //------------------------------------------------------------------------
 {
 	int returnValue = -1;
 
-	mmoLandmarkImporter *importer=new mmoLandmarkImporter("importer");
+	medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
 	importer->TestModeOn();
 
 	mafString filename=MED_DATA_ROOT;
@@ -153,7 +153,7 @@ void mmoLandmarkExporterTest::TestOnLandmarkImporter()
 	mafVMELandmarkCloud *node=(mafVMELandmarkCloud *)importer->GetOutput();
 
 	//Initialize exporter
-	mmoLandmarkExporter *exporter=new mmoLandmarkExporter("test exporter");
+	medOpExporterLandmark *exporter=new medOpExporterLandmark("test exporter");
 	exporter->SetInput(node);
 	mafString fileExp=MED_DATA_ROOT;
 	fileExp<<"/RAW_MAL/Export2.txt";
