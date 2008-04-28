@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-14 13:21:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-28 11:17:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -64,9 +64,14 @@ mafOp* mafOpValidateTree::Copy()
 void mafOpValidateTree::OpRun()
 //----------------------------------------------------------------------------
 {
-  if (ValidateTree())
+  int result = ValidateTree();
+  if (result == mafOpValidateTree::VALIDATE_SUCCESS)
   {
     wxMessageBox(_("Tree validation terminated succesfully!!."), _("Info"));
+  }
+  else if (result == mafOpValidateTree::VALIDATE_WARNING)
+  {
+    wxMessageBox(_("Tree Patched!! In log area you can find details."), _("Warning"));
   }
   else
   {
@@ -75,11 +80,17 @@ void mafOpValidateTree::OpRun()
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
 //----------------------------------------------------------------------------
-bool mafOpValidateTree::ValidateTree()
+int mafOpValidateTree::ValidateTree()
 //----------------------------------------------------------------------------
 {
-  bool result = true;
-  mafNode *node, *root = m_Input->GetRoot();
+  int result = mafOpValidateTree::VALIDATE_SUCCESS;
+
+  mafNode *node;
+  mafVMERoot *root = mafVMERoot::SafeDownCast(m_Input->GetRoot());
+  assert(root != NULL);
+  int max_item_id = root->GetMaxItemId();
+  int max_node_id = root->GetMaxNodeId();
+
   mafNodeIterator *iter = root->NewIterator();
   try
   {
@@ -90,7 +101,11 @@ bool mafOpValidateTree::ValidateTree()
       if (!valid && !node->IsMAFType(mafVMERoot))
       {
         ErrorLog(mafOpValidateTree::INVALID_NODE, node->GetName());
-        result = false;
+        node->UpdateId();
+        if (result != mafOpValidateTree::VALIDATE_ERROR)
+        {
+          result = mafOpValidateTree::VALIDATE_WARNING;
+        }
       }
       int numLinks = node->GetNumberOfLinks();
       if (numLinks > 0)
@@ -102,20 +117,20 @@ bool mafOpValidateTree::ValidateTree()
           if (lnk_it->second.m_Node == NULL)
           {
             ErrorLog(mafOpValidateTree::LINK_NULL, node->GetName(), lnk_it->first);
-            result = false;
+            result = mafOpValidateTree::VALIDATE_ERROR;
             continue;
           }
           valid = root->IsInTree(lnk_it->second.m_Node);
           if (!valid)
           {
             ErrorLog(mafOpValidateTree::LINK_NOT_PRESENT, lnk_it->second.m_Node->GetName());
-            result = false;
+            result = mafOpValidateTree::VALIDATE_ERROR;
           }
           valid = lnk_it->second.m_Node->IsValid();
           if (!valid && !lnk_it->second.m_Node->IsMAFType(mafVMERoot))
           {
             ErrorLog(mafOpValidateTree::INVALID_NODE, lnk_it->second.m_Node->GetName());
-            result = false;
+            result = mafOpValidateTree::VALIDATE_ERROR;
           }
         }
       }
@@ -150,22 +165,33 @@ bool mafOpValidateTree::ValidateTree()
             if (item == NULL)
             {
               ErrorLog(mafOpValidateTree::ITEM_NOT_PRESENT, vme->GetName());
-              result = false;
+              result = mafOpValidateTree::VALIDATE_ERROR;
             }
             else
             {
+              int item_id = item->GetId();
+              if (max_item_id < item_id)
+              {
+                ErrorLog(mafOpValidateTree::MAX_ITEM_ID_PATCHED, vme->GetName());
+                root->SetMaxItemId(item_id);
+                if (result != mafOpValidateTree::VALIDATE_ERROR)
+                {
+                  result = mafOpValidateTree::VALIDATE_WARNING;
+                }
+              }
+
               urlString = item->GetURL();
               if (urlString.IsEmpty())
               {
                 ErrorLog(mafOpValidateTree::URL_EMPTY, vme->GetName());
-                result = false;
+                result = mafOpValidateTree::VALIDATE_ERROR;
               }
               archiveFilename = item->GetArchiveFileName();
               singleFileMode = dv->GetSingleFileMode();
               if (singleFileMode && archiveFilename.IsEmpty())
               {
                 ErrorLog(mafOpValidateTree::ARCHIVE_FILE_NOT_PRESENT, vme->GetName());
-                result = false;
+                result = mafOpValidateTree::VALIDATE_ERROR;
               }
               absFilename = m_MSFPath;
               absFilename << "/";
@@ -180,7 +206,7 @@ bool mafOpValidateTree::ValidateTree()
               if (!wxFileExists(absFilename.GetCStr()))
               {
                 ErrorLog(mafOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.GetCStr());
-                result = false;
+                result = mafOpValidateTree::VALIDATE_ERROR;
               }
             } // item != NULL
           } // for() on items
@@ -202,19 +228,22 @@ void mafOpValidateTree::ErrorLog(int error_num, const char *node_name, const cha
   switch(error_num)
   {
     case mafOpValidateTree::INVALID_NODE:
-      mafLogMessage(_("node %s has an invalid ID"), node_name);
+      mafLogMessage(_("Patched Node %s with an invalid ID!!"), node_name);
     break;
     case mafOpValidateTree::LINK_NOT_PRESENT:
-      mafLogMessage(_("link node %s is not present into the tree"), node_name);
+      mafLogMessage(_("Link node %s is not present into the tree"), node_name);
     break;
     case mafOpValidateTree::LINK_NULL:
-      mafLogMessage(_("link %s of node %s is null"), description, node_name);
+      mafLogMessage(_("Link %s of node %s is null"), description, node_name);
     break;
     case mafOpValidateTree::EXCEPTION_ON_ITERATOR:
-      mafLogMessage(_("exception occurred during iteration on node %s"), node_name);
+      mafLogMessage(_("Exception occurred during iteration on node %s"), node_name);
     break;
     case mafOpValidateTree::ITEM_NOT_PRESENT:
       mafLogMessage(_("Item not present in node %s"), node_name);
+    break;
+    case mafOpValidateTree::MAX_ITEM_ID_PATCHED:
+      mafLogMessage(_("Item of Node %s has caused Max item Id to be patched!!"), node_name);
     break;
     case mafOpValidateTree::URL_EMPTY:
       mafLogMessage(_("URL referring to binary data not present in node %s"), node_name);
