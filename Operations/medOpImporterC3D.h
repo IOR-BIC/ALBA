@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoC3DImporter.h,v $
+  Module:    $RCSfile: medOpImporterC3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 11:32:14 $
+  Date:      $Date: 2008-04-28 08:38:31 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
@@ -10,8 +10,8 @@ Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoC3DImporter_H__
-#define __mmoC3DImporter_H__
+#ifndef __medOpImporterC3D_H__
+#define __medOpImporterC3D_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -26,15 +26,15 @@ class mafNode;
 class mafEvent;
 class mafEventListener;
 //----------------------------------------------------------------------------
-// mmoC3DImporter :
+// medOpImporterC3D :
 //----------------------------------------------------------------------------
 /**
 */
-class mmoC3DImporter: public mafOp
+class medOpImporterC3D: public mafOp
 {
 public:
-  mmoC3DImporter(wxString label);
- ~mmoC3DImporter(); 
+  medOpImporterC3D(wxString label);
+ ~medOpImporterC3D(); 
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

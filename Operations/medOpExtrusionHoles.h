@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoCropDeformableROI.h,v $
+Module:    $RCSfile: medOpExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2007-06-15 14:17:50 $
-Version:   $Revision: 1.4 $
-Authors:   Matteo Giacomoni - Daniele Giunchi
+Date:      $Date: 2008-04-28 08:37:52 $
+Version:   $Revision: 1.1 $
+Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -38,67 +38,119 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
-
-#ifndef __mmoCropDeformableROI_H__
-#define __mmoCropDeformableROI_H__
+#ifndef __medOpExtrusionHoles_H__
+#define __medOpExtrusionHoles_H__
 
 #include "mafOp.h"
-#include "mafVME.h"
+#include "vtkAppendPolyData.h"
+#include "vtkFeatureEdges.h"
+#include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 
-class vtkMaskPolyDataFilter;
-class mafVMEVolumeGray;
+class mmgDialog;
+class mmgButton;
+class mafRWI;
+class mmiSelectPoint;
 class mafVMESurface;
+class vtkHoleConnectivity;
+class vtkPolyDataMapper;
+class vtkActor;
+class vtkSphereSource;
+class vtkGlyph3D;
+class vtkAppendPolyData;
+class vtkPlaneSource;
+class vtkMEDExtrudeToCircle;
 
 //----------------------------------------------------------------------------
-// mmoCropDeformableROI :
+// medOpExtrusionHoles :
 //----------------------------------------------------------------------------
-/** */
-class mmoCropDeformableROI: public mafOp
+/** 
+Perform extrusion of holes in a surface.
+CTRL modifier must be used in order to select a hole in render window while
+performing mouse dragging.
+*/
+class medOpExtrusionHoles: public mafOp
 {
 public:
-	mmoCropDeformableROI(const wxString &label = "CropDeformableROI");
-	~mmoCropDeformableROI(); 
+	medOpExtrusionHoles(const wxString &label = "Extrude Holes");
+	~medOpExtrusionHoles(); 
 
 	virtual void OnEvent(mafEventBase *maf_event);
 
-	mafTypeMacro(mmoCropDeformableROI, mafOp);
-
-	static bool OutputSurfaceAccept(mafNode *node) {return(node != NULL && ((mafVME*)node)->GetOutput()->IsA("mafVMEOutputSurface"));};
+	mafTypeMacro(medOpExtrusionHoles, mafOp);
 
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode *node);
+	/*virtual*/ bool Accept(mafNode *node);
 
 	/** Builds operation's interface. */
-	void OpRun();
+	/*virtual*/ void OpRun();
 
 	/** Execute the operation. */
-	void OpDo();
+	/*virtual*/ void OpDo();
 
 	/** Makes the undo for the operation. */
-	void OpUndo();
+	/*virtual*/ void OpUndo();
+
+	/** Highlight the hole selected with red color */
+	void SelectHole(int pointID);
+
+	/** Perform extrusion and visualize the result */
+	void Extrude();
+
+	/** Save the result polydata of extrusion in VME data */
+	void SaveExtrusion();
+
+	void ExtractFreeEdge();
+
+	void SetExtrusionFactor(double value){m_ExtrusionFactor = value;};
+	double GetExtrusionFactor(){return m_ExtrusionFactor;};
+
+	int GetExtractFreeEdgesNumeberOfPoints(){if(m_ExtractFreeEdges)return m_ExtractFreeEdges->GetOutput()->GetNumberOfPoints(); else return 0;};
+
+	vtkPolyData* GetExtrutedSurface(){return m_ResultPolydata;};
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-	void OpStop(int result);
+	/*virtual*/ void OpStop(int result);
 
-	void Algorithm(mafVME *vme);
+	void CreateOpDialog();
+	void DeleteOpDialog();
+	void CreatePolydataPipeline();
 
-	vtkMaskPolyDataFilter *m_MaskPolydataFilter;
+	mmgDialog							*m_Dialog;
+	mmgButton							*m_ButtonOk;
+	mafRWI								*m_Rwi;
+	mmiSelectPoint				*m_Picker;
 
-	double m_Distance;
-	double m_FillValue;
-	int		m_InsideOut;
-	double	m_MaxDistance;
-	mafNode *m_pNode;
+	vtkPolyData						*m_ResultPolydata;
+	vtkPolyData						*m_OriginalPolydata;
+	mafVMESurface					*m_ResultSurface;
+	vtkAppendPolyData			*m_ResultAfterExtrusion;
 
-	mafVMEVolumeGray *m_ResultVme;
-  mafVMESurface    *m_Surface;
+	double								m_SphereRadius;
+	double								m_ExtrusionFactor;
 
+	vtkPolyDataMapper			*m_SurfaceMapper;
+	vtkActor							*m_SurfaceActor;
+	vtkPolyDataMapper			*m_HolesMapper;
+	vtkActor							*m_HolesActor;
+	vtkPolyDataMapper			*m_SelectedHoleMapper;
+	vtkActor							*m_SelectedHoleActor;
+
+	vtkFeatureEdges						*m_ExtractFreeEdges;
+	vtkHoleConnectivity				*m_ExtractHole;
+	vtkMEDExtrudeToCircle	    *m_ExtrusionFilter;
+
+	vtkSphereSource				*m_Sphere;
+	vtkGlyph3D						*m_Glyph;
+
+	vtkPlaneSource *m_Plane;
+
+	double m_MaxBounds;
 };
 #endif

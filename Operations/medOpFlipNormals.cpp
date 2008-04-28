@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoFlipNormals.cpp,v $
+Module:    $RCSfile: medOpFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-25 13:08:03 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-04-28 08:37:52 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -46,7 +46,7 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoFlipNormals.h"
+#include "medOpFlipNormals.h"
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
@@ -82,11 +82,11 @@ MafMedical is partially based on OpenMAF.
 const int ID_REGION = 0;
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoFlipNormals);
+mafCxxTypeMacro(medOpFlipNormals);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoFlipNormals::mmoFlipNormals(wxString label) :
+medOpFlipNormals::medOpFlipNormals(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -119,7 +119,7 @@ mafOp(label)
 	m_NormalArrow = NULL;
 }
 //----------------------------------------------------------------------------
-mmoFlipNormals::~mmoFlipNormals()
+medOpFlipNormals::~medOpFlipNormals()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_Mesh);
@@ -132,20 +132,20 @@ mmoFlipNormals::~mmoFlipNormals()
 	vtkDEL(m_NormalGlyph);
 }
 //----------------------------------------------------------------------------
-mafOp* mmoFlipNormals::Copy()
+mafOp* medOpFlipNormals::Copy()
 //----------------------------------------------------------------------------
 {
 	/** return a copy of itself, needs to put it into the undo stack */
-	return new mmoFlipNormals(m_Label);
+	return new medOpFlipNormals(m_Label);
 }
 //----------------------------------------------------------------------------
-bool mmoFlipNormals::Accept(mafNode* vme)
+bool medOpFlipNormals::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {
 	return vme != NULL && vme->IsMAFType(mafVMESurface);
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::OpRun()
+void medOpFlipNormals::OpRun()
 //----------------------------------------------------------------------------
 {
 
@@ -195,14 +195,14 @@ void mmoFlipNormals::OpRun()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::OpDo()
+void medOpFlipNormals::OpDo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_ResultPolydata,((mafVME *)m_Input)->GetTimeStamp());
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::OpUndo()
+void medOpFlipNormals::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface *)m_Input)->SetData(m_OriginalPolydata,((mafVME *)m_Input)->GetTimeStamp());
@@ -224,7 +224,7 @@ enum EXTRACT_ISOSURFACE_ID
 	ID_ALL_NORMAL,
 };
 //----------------------------------------------------------------------------
-void mmoFlipNormals::CreateOpDialog()
+void medOpFlipNormals::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
 	wxBusyCursor wait;
@@ -319,7 +319,7 @@ void mmoFlipNormals::CreateOpDialog()
 	m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::CreateSurfacePipeline()
+void medOpFlipNormals::CreateSurfacePipeline()
 //----------------------------------------------------------------------------
 {
 	m_CellFilter = vtkCellsFilter::New();
@@ -335,7 +335,7 @@ void mmoFlipNormals::CreateSurfacePipeline()
 
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::CreateNormalsPipe()
+void medOpFlipNormals::CreateNormalsPipe()
 //----------------------------------------------------------------------------
 {
 	vtkNEW(m_CenterPointsFilter);
@@ -377,7 +377,7 @@ void mmoFlipNormals::CreateNormalsPipe()
 	m_NormalActor->Modified();
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::DeleteOpDialog()
+void medOpFlipNormals::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
 	m_Mouse->RemoveObserver(m_SelectCellInteractor);
@@ -394,7 +394,7 @@ void mmoFlipNormals::DeleteOpDialog()
 
 
 //----------------------------------------------------------------------------
-void mmoFlipNormals::OnEvent(mafEventBase *maf_event)
+void medOpFlipNormals::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -486,7 +486,7 @@ void mmoFlipNormals::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::ModifyAllNormal()
+void medOpFlipNormals::ModifyAllNormal()
 //----------------------------------------------------------------------------
 {
 	vtkOBBTree *OBBFilter;
@@ -568,7 +568,7 @@ void mmoFlipNormals::ModifyAllNormal()
 	m_ResultPolydata->Update();
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::TraverseMeshAndMark( double radius )
+void medOpFlipNormals::TraverseMeshAndMark( double radius )
 //----------------------------------------------------------------------------
 {
 
@@ -642,7 +642,7 @@ void mmoFlipNormals::TraverseMeshAndMark( double radius )
 	} //while wave is not empty
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::MarkCellsInRadius(double radius)
+void medOpFlipNormals::MarkCellsInRadius(double radius)
 //----------------------------------------------------------------------------
 {
 
@@ -723,13 +723,13 @@ void mmoFlipNormals::MarkCellsInRadius(double radius)
 	vtkDEL(m_Wave2);
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::SetSeed( vtkIdType cellSeed )
+void medOpFlipNormals::SetSeed( vtkIdType cellSeed )
 //----------------------------------------------------------------------------
 {
 	m_CellSeed = cellSeed;
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::FindTriangleCellCenter(vtkIdType id, double center[3])
+void medOpFlipNormals::FindTriangleCellCenter(vtkIdType id, double center[3])
 //----------------------------------------------------------------------------
 {
 	double p0[3] = {0,0,0};
@@ -752,7 +752,7 @@ void mmoFlipNormals::FindTriangleCellCenter(vtkIdType id, double center[3])
 	list->Delete();
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::InitializeMesh()
+void medOpFlipNormals::InitializeMesh()
 //----------------------------------------------------------------------------
 {
 	// Build cell structure
@@ -765,7 +765,7 @@ void mmoFlipNormals::InitializeMesh()
 	this->m_Mesh->BuildLinks();
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::FlipNormals()
+void medOpFlipNormals::FlipNormals()
 //----------------------------------------------------------------------------
 {
 	// perform cells removing...
@@ -800,7 +800,7 @@ void mmoFlipNormals::FlipNormals()
 	m_ResultPolydata->Update();
 }
 //----------------------------------------------------------------------------
-void mmoFlipNormals::MarkCells()
+void medOpFlipNormals::MarkCells()
 //----------------------------------------------------------------------------
 {
 	MarkCellsInRadius(m_Diameter/2);  

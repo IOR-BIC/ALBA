@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoCTMRIImporter.cpp,v $
+  Module:    $RCSfile: medOpImporterCTA.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-22 11:42:35 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-04-28 08:38:31 $
+  Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoCTMRIImporter.h"
+#include "medOpImporterCTA.h"
 
 #include <wx/listimpl.cpp>
 #include "wx/busyinfo.h"
@@ -57,18 +57,17 @@
 #include "vtkOutlineFilter.h"
 #include "vtkRGSliceAccumulate.h"
 
-int compareX(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2);
-int compareY(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2);
-int compareZ(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2);
-int compareTriggerTime(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2);
-int compareImageNumber(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2);
+int compareX(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2);
+int compareY(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2);
+int compareZ(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2);
+int compareTriggerTime(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2);
+int compareImageNumber(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2);
 
-WX_DEFINE_LIST(ListCTMRIFiles);
+WX_DEFINE_LIST(ListCTAFiles);
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoCTMRIImporter);
+mafCxxTypeMacro(medOpImporterCTA);
 //----------------------------------------------------------------------------
-
 //----------------------------------------------------------------------------
 // Constants :
 //----------------------------------------------------------------------------
@@ -95,22 +94,12 @@ enum DICOM_IMPORTER_ID
 	ID_MRI,
 	ID_CMRI,
 };
-enum DICOM_IMPORTER_MODALITY
-{
-	CROP_SELECTED,
-	ADD_CROP_ITEM,
-	GIZMO_NOT_EXIST,
-	GIZMO_RESIZING,
-	GIZMO_DONE
-};
-
 //----------------------------------------------------------------------------
-mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
+medOpImporterCTA::medOpImporterCTA(wxString label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
 	m_OpType	= OPTYPE_IMPORTER;
 	m_Canundo	= true;
-
 
 	for (int i = 0; i < 6; i++) 
 		m_DicomBounds[i] = 0;
@@ -123,8 +112,8 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	m_DICOM = 0;
 	m_DICOMType = -1;
 	
-	if(this->m_Label.Contains("CT") ) m_DICOM = 0;
-	else if(this->m_Label.Contains("MR")) m_DICOM = 1;
+	if(this->m_Label == "CTA/DSA") m_DICOM = 0;
+	else if(this->m_Label == "MRI") m_DICOM = 1;
 
   m_DictionaryFilename	= "";
   wxString dictionary = mafGetApplicationDirectory().c_str();
@@ -135,7 +124,7 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 
 	m_DICOMDir	= mafGetApplicationDirectory().c_str();
   m_DICOMDir += _("\\Data\\External\\");
-	//m_DICOMDir = "";
+  //m_DICOMDir = "";
 	m_CurrentSlice			  = 0;
 	m_CurrentTime				  = 0;
   m_BuildStepValue			= 0;
@@ -173,35 +162,35 @@ mmoCTMRIImporter::mmoCTMRIImporter(wxString label) : mafOp(label)
 	m_SliceActor				= NULL;
 	m_SliceLookupTable	= NULL;
 	
-	m_GizmoStatus = GIZMO_NOT_EXIST;
+	m_GizmoStatus = CTA_GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
 
   m_BoxCorrect = false;
 }
 //----------------------------------------------------------------------------
-mmoCTMRIImporter::~mmoCTMRIImporter()
+medOpImporterCTA::~medOpImporterCTA()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_Volume);
   vtkDEL(m_Image);
 }
 //----------------------------------------------------------------------------
-mafOp *mmoCTMRIImporter::Copy()
+mafOp *medOpImporterCTA::Copy()
 //----------------------------------------------------------------------------
 {
-	return new mmoCTMRIImporter(m_Label);
+	return new medOpImporterCTA(m_Label);
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::OpRun()   
+void medOpImporterCTA::OpRun()   
 //----------------------------------------------------------------------------
 {
-	CreatePipeline();
+ 	CreatePipeline();
 	CreateGui();
 	if(m_DictionaryFilename!="")
 	{
 		m_Gui->Enable(ID_OPEN_DIR,1);
 		m_Gui->Update();
-		if(m_DICOMDir!="" && m_AutoLoad)
+		if(m_DICOMDir!="" && this->m_AutoLoad)
 		{
 			OnEvent(&mafEvent(this, ID_OPEN_DIR));
 			m_Gui->Update();
@@ -210,7 +199,17 @@ void mmoCTMRIImporter::OpRun()
 	WaitUser();
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::OpStop(int result)
+void medOpImporterCTA::WaitUser()
+//----------------------------------------------------------------------------
+{
+	m_DicomDialog->ShowModal();
+	int res = (m_DicomDialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
+
+	OpStop(res);
+	return;
+}
+//----------------------------------------------------------------------------
+void medOpImporterCTA::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	if(m_DicomInteractor)
@@ -219,8 +218,8 @@ void mmoCTMRIImporter::OpStop(int result)
   //close dialog
 	for (int i=0; i < m_NumberOfStudy;i++)
 	{
-		((ListCTMRIFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(TRUE);
-		((ListCTMRIFiles *)m_StudyListbox->GetClientData(i))->Clear();
+		((ListCTAFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(TRUE);
+		((ListCTAFiles *)m_StudyListbox->GetClientData(i))->Clear();
 	}
 
   m_DicomDialog->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);   //SIL. 28-11-2003: - you must always remove actors from the Renderer before cleaning
@@ -245,7 +244,7 @@ void mmoCTMRIImporter::OpStop(int result)
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::OpDo()
+void medOpImporterCTA::OpDo()
 //----------------------------------------------------------------------------
 {
 	//assert(m_Volume != NULL);
@@ -257,7 +256,7 @@ void mmoCTMRIImporter::OpDo()
 
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::OpUndo()
+void medOpImporterCTA::OpUndo()
 //----------------------------------------------------------------------------
 {   
 	//assert(m_Volume != NULL);
@@ -268,7 +267,7 @@ void mmoCTMRIImporter::OpUndo()
     mafEventMacro(mafEvent(this,VME_REMOVE,m_Volume));
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::CreatePipeline()
+void medOpImporterCTA::CreatePipeline()
 //----------------------------------------------------------------------------
 {
 	vtkNEW(m_CTDirectoryReader);
@@ -310,7 +309,7 @@ void mmoCTMRIImporter::CreatePipeline()
   m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::CreateGui()
+void medOpImporterCTA::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_DicomDialog = new mmgDialogPreview("dicom importer", mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
@@ -321,12 +320,10 @@ void mmoCTMRIImporter::CreateGui()
 	mafString wildcard = "DICT files (*.dic)|*.dic|All Files (*.*)|*.*";
 
 	m_Gui = new mmgGui(this);
-	m_Gui->SetListener(this); 
+	m_Gui->SetListener(this);
 
-	//if(m_DICOM == 0) m_Gui->Label("CT Importer",true);
-	//else if(m_DICOM == 0) m_Gui->Label("MRI Importer",true);
-	// this two lines have no sense: 
-	m_Gui->Label(m_Label+" Importer",true);
+	if(this->m_Label == "CTA/DSA") m_Gui->Label("CTA/DSA Importer",true);
+	else if(this->m_Label == "MRI") m_Gui->Label("MRI Importer",true);
 
 	//m_Gui->Label("Type of DICOM",true);
 	//m_Gui->Combo(ID_TYPE_DICOM,"",&m_DICOM,1,TypeOfDICOM);
@@ -410,9 +407,11 @@ void mmoCTMRIImporter::CreateGui()
   int w,h;
   m_DicomDialog->GetSize(&w,&h);
   m_DicomDialog->SetSize(x_init+10,y_init+10,w,h);
+
+	return;
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
+void medOpImporterCTA::BuildDicomFileList(const char *dir)
 //----------------------------------------------------------------------------
 {
 	int row, i;
@@ -433,7 +432,7 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 	long progress = 0;
 	// get the dicom files from the directory
 	if(m_DICOM==0)
-		wxBusyInfo wait_info("Reading CT directory: please wait");
+		wxBusyInfo wait_info("Reading CTA/DSA directory: please wait");
 	if(m_DICOM==1)
 		wxBusyInfo wait_info("Reading MRI directory: please wait");
 	if(m_DICOM==0)//CT
@@ -464,38 +463,38 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 				ct_mode.MakeUpper();
 				ct_mode.Trim(FALSE);
 				ct_mode.Trim();
-				if (strcmp( reader->GetModality(), "CT" ) == 0 || strcmp(reader->GetModality(), "XA" ) == 0)
+				if (strcmp( reader->GetModality(), "CT" ) == 0 )
 				{
-					//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
-					if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
-					{
-						reader->Delete();
-						continue;
-					}
-					reader->Update();
-					//row = m_StudyListbox->FindString(reader->GetStudy());
-					row = m_StudyListbox->FindString(reader->GetStudyUID());
-					if (row == -1)
-					{
-						// the study is not present into the listbox, so need to create new
-						// list of files related to the new studyID
-						m_FilesList = new ListCTMRIFiles;
-						//m_StudyListbox->Append(reader->GetStudy());
-						m_StudyListbox->Append(reader->GetStudyUID());
-						m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-						reader->GetSliceLocation(slice_pos);
-						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
-						//m_FilesList->Append(element);
-						m_FilesList->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
-						m_NumberOfStudy++;
-					}
-					else 
-					{
-						reader->GetSliceLocation(slice_pos);
-						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
-						//((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-						((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos));
-					}
+				//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
+				if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+				{
+					reader->Delete();
+					continue;
+				}
+				
+				//row = m_StudyListbox->FindString(reader->GetStudy());
+				row = m_StudyListbox->FindString(reader->GetStudyUID());
+				if (row == -1)
+				{
+					// the study is not present into the listbox, so need to create new
+					// list of files related to the new studyID
+					m_FilesList = new ListCTAFiles;
+					//m_StudyListbox->Append(reader->GetStudy());
+					m_StudyListbox->Append(reader->GetStudyUID());
+					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+					reader->GetSliceLocation(slice_pos);
+					//medOpImporterDICOMListElement *element = new medOpImporterDICOMListElement(str_tmp,slice_pos);
+					//m_FilesList->Append(element);
+					m_FilesList->Append(new medOpImporterCTAListElement(str_tmp,slice_pos));
+					m_NumberOfStudy++;
+				}
+				else 
+				{
+					reader->GetSliceLocation(slice_pos);
+					//medOpImporterDICOMListElement *element = new medOpImporterDICOMListElement(str_tmp,SlicePos);
+					//((ListCTAFiles *)m_StudyListbox->GetClientData(row))->Append(element);
+					((ListCTAFiles *)m_StudyListbox->GetClientData(row))->Append(new medOpImporterCTAListElement(str_tmp,slice_pos));
+				}
 				}
 				progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
 				mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
@@ -546,7 +545,7 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 					{
 						// the study is not present into the listbox, so need to create new
 						// list of files related to the new studyID
-						m_FilesList = new ListCTMRIFiles;
+						m_FilesList = new ListCTAFiles;
 						//m_StudyListbox->Append(reader->GetStudy());
 						m_StudyListbox->Append(reader->GetStudyUID());
 						m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
@@ -576,9 +575,9 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 							}
 						}
 						trigTime = reader->GetTriggerTime();
-						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,slice_pos);
+						//medOpImporterDICOMListElement *element = new medOpImporterDICOMListElement(str_tmp,slice_pos);
 						//m_FilesList->Append(element);
-						m_FilesList->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
+						m_FilesList->Append(new medOpImporterCTAListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
 						m_NumberOfStudy++;
 					}
 					else 
@@ -587,9 +586,9 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 						imageNumber=reader->GetInstanceNumber();
 						cardNumImages = reader->GetCardiacNumberOfImages();
 						trigTime = reader->GetTriggerTime();
-						//mmoDICOMImporterListElement *element = new mmoDICOMImporterListElement(str_tmp,SlicePos);
-						//((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(element);
-						((ListCTMRIFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoCTMRIImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
+						//medOpImporterDICOMListElement *element = new medOpImporterDICOMListElement(str_tmp,SlicePos);
+						//((ListCTAFiles *)m_StudyListbox->GetClientData(row))->Append(element);
+						((ListCTAFiles *)m_StudyListbox->GetClientData(row))->Append(new medOpImporterCTAListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
 					}
 				}
 				progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
@@ -608,7 +607,7 @@ void mmoCTMRIImporter::BuildDicomFileList(const char *dir)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::BuildVolumeCineMRI()
+void medOpImporterCTA::BuildVolumeCineMRI()
 //----------------------------------------------------------------------------
 {
 	int step;
@@ -644,8 +643,8 @@ void mmoCTMRIImporter::BuildVolumeCineMRI()
       assert(FALSE);
     }
     
-    mmoCTMRIImporterListElement *element0;
-    element0 = (mmoCTMRIImporterListElement *)m_ListSelected->Item(tsImageId)->GetData();
+    medOpImporterCTAListElement *element0;
+    element0 = (medOpImporterCTAListElement *)m_ListSelected->Item(tsImageId)->GetData();
     //double tsDouble = ((double) (element0->GetTriggerTime())) / 1000.0;
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
@@ -697,7 +696,7 @@ void mmoCTMRIImporter::BuildVolumeCineMRI()
 	
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::BuildVolume()
+void medOpImporterCTA::BuildVolume()
 //----------------------------------------------------------------------------
 {
 	int step;
@@ -781,7 +780,7 @@ void mmoCTMRIImporter::BuildVolume()
   }
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::ImportDicomTags()
+void medOpImporterCTA::ImportDicomTags()
 //----------------------------------------------------------------------------
 {
   if (m_TagArray == NULL) 
@@ -860,7 +859,7 @@ void mmoCTMRIImporter::ImportDicomTags()
   }
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::ShowSlice(int slice_num)
+void medOpImporterCTA::ShowSlice(int slice_num)
 //----------------------------------------------------------------------------
 {
 	// Description:
@@ -898,7 +897,6 @@ void mmoCTMRIImporter::ShowSlice(int slice_num)
 			crop_bounds[1] = m_DicomBounds[1];
 		if(crop_bounds[3] > m_DicomBounds[3]) 
 			crop_bounds[3] = m_DicomBounds[3];
-			
 
 		int k = 0;
 		while(k * spacing[0] +Origin[0]<crop_bounds[0])
@@ -960,7 +958,7 @@ void mmoCTMRIImporter::ShowSlice(int slice_num)
 	m_SliceActor->VisibilityOn();
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::ResetSliders()
+void medOpImporterCTA::ResetSliders()
 //----------------------------------------------------------------------------
 {
 	m_SliceScanner->SetRange(0,m_NumberOfSlices - 1);
@@ -970,7 +968,7 @@ void mmoCTMRIImporter::ResetSliders()
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::ResetStructure()
+void medOpImporterCTA::ResetStructure()
 //----------------------------------------------------------------------------
 {
 	// disable the scan slider
@@ -995,8 +993,8 @@ void mmoCTMRIImporter::ResetStructure()
 	// delete the previous studyes detected and reset the related variables
 	for (int i=0; i < m_NumberOfStudy;i++)
 	{
-		((ListCTMRIFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(true);
-		((ListCTMRIFiles *)m_StudyListbox->GetClientData(i))->Clear();
+		((ListCTAFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(true);
+		((ListCTAFiles *)m_StudyListbox->GetClientData(i))->Clear();
 	}
 	m_StudyListbox->Clear();
 	m_NumberOfStudy		= 0;
@@ -1012,13 +1010,13 @@ void mmoCTMRIImporter::ResetStructure()
 	mafYield();
 }
 //----------------------------------------------------------------------------
-int compareX(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2)
+int compareX(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the x coordinate of both arguments
 	// return:
-	double x1 = (*(mmoCTMRIImporterListElement **)arg1)->GetCoordinate(0);
-	double x2 = (*(mmoCTMRIImporterListElement **)arg2)->GetCoordinate(0);
+	double x1 = (*(medOpImporterCTAListElement **)arg1)->GetCoordinate(0);
+	double x2 = (*(medOpImporterCTAListElement **)arg2)->GetCoordinate(0);
 	if (x1 > x2)
 		return 1;
 	if (x1 < x2)
@@ -1027,13 +1025,13 @@ int compareX(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
-int compareY(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2)
+int compareY(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the y coordinate of both arguments
 	// return:
-	double y1 = (*(mmoCTMRIImporterListElement **)arg1)->GetCoordinate(1);
-	double y2 = (*(mmoCTMRIImporterListElement **)arg2)->GetCoordinate(1);
+	double y1 = (*(medOpImporterCTAListElement **)arg1)->GetCoordinate(1);
+	double y2 = (*(medOpImporterCTAListElement **)arg2)->GetCoordinate(1);
 	if (y1 > y2)
 		return 1;
 	if (y1 < y2)
@@ -1042,13 +1040,13 @@ int compareY(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
-int compareZ(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2)
+int compareZ(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the z coordinate of both arguments
 	// return:
-	double z1 = (*(mmoCTMRIImporterListElement **)arg1)->GetCoordinate(2);
-	double z2 = (*(mmoCTMRIImporterListElement **)arg2)->GetCoordinate(2);
+	double z1 = (*(medOpImporterCTAListElement **)arg1)->GetCoordinate(2);
+	double z2 = (*(medOpImporterCTAListElement **)arg2)->GetCoordinate(2);
 	if (z1 > z2)
 		return 1;
 	if (z1 < z2)
@@ -1057,13 +1055,13 @@ int compareZ(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
-int compareTriggerTime(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2)
+int compareTriggerTime(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
-	float t1 = (*(mmoCTMRIImporterListElement **)arg1)->GetTriggerTime();
-	float t2 = (*(mmoCTMRIImporterListElement **)arg2)->GetTriggerTime();;
+	float t1 = (*(medOpImporterCTAListElement **)arg1)->GetTriggerTime();
+	float t2 = (*(medOpImporterCTAListElement **)arg2)->GetTriggerTime();;
 	if (t1 > t2)
 		return 1;
 	if (t1 < t2)
@@ -1073,13 +1071,13 @@ int compareTriggerTime(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIIm
 }
 
 //----------------------------------------------------------------------------
-int compareImageNumber(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIImporterListElement **arg2)
+int compareImageNumber(const medOpImporterCTAListElement **arg1,const medOpImporterCTAListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
-	float i1 = (*(mmoCTMRIImporterListElement **)arg1)->GetImageNumber();
-	float i2 = (*(mmoCTMRIImporterListElement **)arg2)->GetImageNumber();;
+	float i1 = (*(medOpImporterCTAListElement **)arg1)->GetImageNumber();
+	float i2 = (*(medOpImporterCTAListElement **)arg2)->GetImageNumber();;
 	if (i1 > i2)
 		return 1;
 	if (i1 < i2)
@@ -1088,7 +1086,7 @@ int compareImageNumber(const mmoCTMRIImporterListElement **arg1,const mmoCTMRIIm
 		return 0;
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event) 
+void medOpImporterCTA::	OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -1131,15 +1129,15 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
         m_Gui->Enable(ID_BUILDVOLUME_MODE_BUTTON,1);
         int sel = m_StudyListbox->GetSelection();
-        m_ListSelected = (ListCTMRIFiles *)m_StudyListbox->GetClientData(sel);
+        m_ListSelected = (ListCTAFiles *)m_StudyListbox->GetClientData(sel);
         // sort dicom slices
         if(m_ListSelected->GetCount() > 1)
         {
           double item1_pos[3],item2_pos[3],d[3];
-          mmoCTMRIImporterListElement *element1;
-          mmoCTMRIImporterListElement *element2;
-          element1 = (mmoCTMRIImporterListElement *)m_ListSelected->Item(0)->GetData();
-          element2 = (mmoCTMRIImporterListElement *)m_ListSelected->Item(1)->GetData();
+          medOpImporterCTAListElement *element1;
+          medOpImporterCTAListElement *element2;
+          element1 = (medOpImporterCTAListElement *)m_ListSelected->Item(0)->GetData();
+          element2 = (medOpImporterCTAListElement *)m_ListSelected->Item(1)->GetData();
           item1_pos[0] = element1->GetCoordinate(0);
           item1_pos[1] = element1->GetCoordinate(1);
           item1_pos[2] = element1->GetCoordinate(2);
@@ -1168,7 +1166,7 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
           m_ListSelected->Sort(compareZ);
           break;
         }
-				m_NumberOfTimeFrames = ((mmoCTMRIImporterListElement *)m_ListSelected->Item(0)->GetData())->GetCardiacNumberOfImages();
+				m_NumberOfTimeFrames = ((medOpImporterCTAListElement *)m_ListSelected->Item(0)->GetData())->GetCardiacNumberOfImages();
         if(m_DICOMType == ID_CMRI) //If cMRI
 					m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
 				else
@@ -1259,7 +1257,7 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_BUILD_BUTTON,0);
         m_DicomDialog->GetRWI()->CameraUpdate();
       break;
-      case ID_CROP_BUTTON:
+	  case ID_CROP_BUTTON:
 				{
         if( !m_BoxCorrect )
         {
@@ -1381,9 +1379,9 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
 					}
 					//End Matteo
 
-          if (m_GizmoStatus == GIZMO_NOT_EXIST)
+          if (m_GizmoStatus == CTA_GIZMO_NOT_EXIST)
           {
-            m_GizmoStatus = GIZMO_RESIZING;
+            m_GizmoStatus = CTA_GIZMO_RESIZING;
             m_CropActor->VisibilityOn();
 
             pos[2] = 0;
@@ -1391,7 +1389,7 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
             m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
             m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
           }
-          else if (m_GizmoStatus == GIZMO_DONE)
+          else if (m_GizmoStatus == CTA_GIZMO_DONE)
           {
             //	  6------------5----------4--->x
             //		|												|
@@ -1445,7 +1443,7 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
               //hai pickato in un punto che non corrisponde a nessun lato
               // => crea un nuovo gizmo
             {
-              m_GizmoStatus = GIZMO_RESIZING;
+              m_GizmoStatus = CTA_GIZMO_RESIZING;
               m_CropActor->VisibilityOn();
 
               pos[2] = 0;
@@ -1469,12 +1467,12 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         m_CropPlane->GetPoint1(oldP1);
         m_CropPlane->GetPoint2(oldP2);
 
-        if (m_GizmoStatus == GIZMO_RESIZING)
+        if (m_GizmoStatus == CTA_GIZMO_RESIZING)
         {
           m_CropPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
           m_CropPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
         }
-        else if (m_GizmoStatus == GIZMO_DONE)
+        else if (m_GizmoStatus == CTA_GIZMO_DONE)
         {
           if (m_SideToBeDragged == 0)
           {
@@ -1521,9 +1519,9 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
       case MOUSE_UP:  //blocca il gizmo
       {
         if (m_CropMode == true)
-          if (m_GizmoStatus == GIZMO_RESIZING)
-            m_GizmoStatus = 	GIZMO_DONE;
-          else if (m_GizmoStatus == GIZMO_DONE)
+          if (m_GizmoStatus == CTA_GIZMO_RESIZING)
+            m_GizmoStatus = 	CTA_GIZMO_DONE;
+          else if (m_GizmoStatus == CTA_GIZMO_DONE)
             m_SideToBeDragged = 0;
 
         double p1[3], p2[3], origin[3];
@@ -1540,7 +1538,7 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
         }
         else
           m_BoxCorrect = true;
-      }   
+      }
       break;
 			case ID_TYPE_DICOM:
 				/*if(m_DICOM==0)
@@ -1569,7 +1567,7 @@ void mmoCTMRIImporter::	OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-int mmoCTMRIImporter::GetImageId(int timeId, int heigthId)
+int medOpImporterCTA::GetImageId(int timeId, int heigthId)
 //----------------------------------------------------------------------------
 {
   /* 
@@ -1606,10 +1604,10 @@ int mmoCTMRIImporter::GetImageId(int timeId, int heigthId)
 
   assert(m_StudyListbox);
 
-  m_ListSelected = (ListCTMRIFiles *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+  m_ListSelected = (ListCTAFiles *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
   
-  mmoCTMRIImporterListElement *element0;
-  element0 = (mmoCTMRIImporterListElement *)m_ListSelected->Item(0)->GetData();
+  medOpImporterCTAListElement *element0;
+  element0 = (medOpImporterCTAListElement *)m_ListSelected->Item(0)->GetData();
   
   int cardiacNumberOfImages =  element0->GetCardiacNumberOfImages();
 
@@ -1629,51 +1627,21 @@ int mmoCTMRIImporter::GetImageId(int timeId, int heigthId)
   return (heigthId * cardiacNumberOfImages + timeId); 
 }
 //----------------------------------------------------------------------------
-void mmoCTMRIImporter::WaitUser()
-//----------------------------------------------------------------------------
-{
-	m_DicomDialog->ShowModal();
-	int res = (m_DicomDialog->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
-
-	OpStop(res);
-	return;
-}
-//----------------------------------------------------------------------------
-void mmoCTMRIImporter::SetDirectory(mafString dir)
-//----------------------------------------------------------------------------
-{
-	m_DICOMDir=dir;
-}
-//----------------------------------------------------------------------------
-void mmoCTMRIImporter::SetDictonary(mafString dic)
-//----------------------------------------------------------------------------
-{
-	m_DictionaryFilename=dic;
-}
-//----------------------------------------------------------------------------
-void mmoCTMRIImporter::SetModality(mafString modality)
-//----------------------------------------------------------------------------
-{
-	if (modality.Equals("CT"))
-	{
-		m_DICOM = 0;
-	}
-	else if (modality.Equals("MRI"))
-	{
-		m_DICOM = 1;
-	}
-}
-//----------------------------------------------------------------------------
-void mmoCTMRIImporter::SetParameters(void *param)
+void medOpImporterCTA::SetParameters(void *param)
 //----------------------------------------------------------------------------
 {
 	if(param)
 	{
 		m_AutoLoad = true;
 		mafString *settings=(mafString*)param;
-		SetModality(settings[0]);
-		SetDirectory(settings[1]);
+		SetDirectory(settings[0]);
 		if(m_Gui)
 			m_Gui->Update();
 	}
+}
+//----------------------------------------------------------------------------
+void medOpImporterCTA::SetDirectory(mafString dir)
+//----------------------------------------------------------------------------
+{
+	m_DICOMDir=dir;
 }

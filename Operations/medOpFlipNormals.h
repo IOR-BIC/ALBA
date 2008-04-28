@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoFlipNormals.h,v $
+Module:    $RCSfile: medOpFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2007-04-20 08:51:08 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-04-28 08:37:52 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#ifndef __mmoFlipNormals_H__
-#define __mmoFlipNormals_H__
+#ifndef __medOpFlipNormals_H__
+#define __medOpFlipNormals_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -65,7 +65,7 @@ class vtkPolyDataMapper;
 class vtkGlyph3D;
 
 //----------------------------------------------------------------------------
-// mmoFlipNormals :
+// medOpFlipNormals :
 //----------------------------------------------------------------------------
 /** 
 Perform cells selection and flip of the normals.
@@ -73,14 +73,14 @@ CTRL modifier must be used in order to select cells in render window while
 performing mouse dragging.
 This operation assumes that input polygonal data is made of triangles only.
 */
-class mmoFlipNormals: public mafOp
+class medOpFlipNormals: public mafOp
 {
 public:
 
-	mmoFlipNormals(wxString label = "Flip Normals");
-	~mmoFlipNormals(); 
+	medOpFlipNormals(wxString label = "Flip Normals");
+	~medOpFlipNormals(); 
 
-	mafTypeMacro(mmoFlipNormals, mafOp);
+	mafTypeMacro(medOpFlipNormals, mafOp);
 
 	mafOp* Copy();
 

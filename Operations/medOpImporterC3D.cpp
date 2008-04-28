@@ -1,8 +1,8 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoC3DImporter.cpp,v $
+  Module:    $RCSfile: medOpImporterC3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 11:32:14 $
+  Date:      $Date: 2008-04-28 08:38:31 $
   Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
@@ -17,7 +17,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "mmoC3DImporter.h"
+#include "medOpImporterC3D.h"
 
 #include "wx/busyinfo.h"
 
@@ -27,7 +27,7 @@
 //#include "mafC3DReader.h"
 
 //----------------------------------------------------------------------------
-mmoC3DImporter::mmoC3DImporter(wxString label) :
+medOpImporterC3D::medOpImporterC3D(wxString label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -43,17 +43,17 @@ mafOp(label)
   m_DictDir += "/Config/Dictionary/";
 }
 //----------------------------------------------------------------------------
-mmoC3DImporter::~mmoC3DImporter( ) 
+medOpImporterC3D::~medOpImporterC3D( ) 
 //----------------------------------------------------------------------------
 {
 }
 //----------------------------------------------------------------------------
-mafOp* mmoC3DImporter::Copy()   
+mafOp* medOpImporterC3D::Copy()   
 /** restituisce una copia di se stesso, serve per metterlo nell'undo stack */
 //----------------------------------------------------------------------------
 {
 	//non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
-	mmoC3DImporter *cp = new mmoC3DImporter(m_Label);
+	medOpImporterC3D *cp = new medOpImporterC3D(m_Label);
 	cp->m_Canundo = m_Canundo;
 	cp->m_OpType = m_OpType;
 	cp->m_Listener = m_Listener;
@@ -64,7 +64,7 @@ mafOp* mmoC3DImporter::Copy()
 	return cp;
 }
 //----------------------------------------------------------------------------
-void mmoC3DImporter::OpRun()   
+void medOpImporterC3D::OpRun()   
 //----------------------------------------------------------------------------
 {
 	int result = OP_RUN_CANCEL;
@@ -93,7 +93,7 @@ void mmoC3DImporter::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoC3DImporter::OpDo()   
+void medOpImporterC3D::OpDo()   
 /**  */
 //----------------------------------------------------------------------------
 {
@@ -124,7 +124,7 @@ void mmoC3DImporter::OpDo()
 	//reader->Delete();
 }
 //----------------------------------------------------------------------------
-void mmoC3DImporter::OpUndo()   
+void medOpImporterC3D::OpUndo()   
 /**  */
 //----------------------------------------------------------------------------
 {

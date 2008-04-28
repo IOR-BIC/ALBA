@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmoCTMRIImporter.h,v $
+  Module:    $RCSfile: medOpImporterCTMRI.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 11:27:19 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-04-28 08:38:31 $
+  Version:   $Revision: 1.1 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mmoCTMRIImporter_H__
-#define __mmoCTMRIImporter_H__
+#ifndef __medOpImporterCTMRI_H__
+#define __medOpImporterCTMRI_H__
 
 //----------------------------------------------------------------------------
 // Include :
@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 class mafNode;
 class mmgDialogPreview;
-class mmoCTMRIImporterListElement;
+class medOpImporterCTMRIListElement;
 class mmiDICOMImporterInteractor;
 class vtkPlaneSource;
 class vtkDicomUnPacker;
@@ -37,20 +37,20 @@ class mafVMEVolumeGray;
 class mafVMEImage;
 class vtkImageData;
 
-//WX_DECLARE_LIST(mmoCineMRIImporterListElement, ListDicomCineMRIFiles);
-WX_DECLARE_LIST(mmoCTMRIImporterListElement, ListCTMRIFiles);
+//WX_DECLARE_LIST(medOpImporterCineMRIListElement, ListDicomCineMRIFiles);
+WX_DECLARE_LIST(medOpImporterCTMRIListElement, ListCTMRIFiles);
 //----------------------------------------------------------------------------
-// mmoCTMRIImporter :
+// medOpImporterCTMRI :
 //----------------------------------------------------------------------------
 
-class mmoCTMRIImporter: public mafOp
+class medOpImporterCTMRI: public mafOp
 {
 public:
-            	 mmoCTMRIImporter(wxString label = "CTMRIImporter");
-	virtual     ~mmoCTMRIImporter();
+            	 medOpImporterCTMRI(wxString label = "CTMRIImporter");
+	virtual     ~medOpImporterCTMRI();
 	virtual void OnEvent(mafEventBase *maf_event);
 	
-  mafTypeMacro(mmoCTMRIImporter, mafOp);
+  mafTypeMacro(medOpImporterCTMRI, mafOp);
 
   mafOp* Copy();
 
@@ -182,12 +182,12 @@ protected:
 	wxStaticText *m_TimeLabel;
 };
 
-/*class mmoDICOMImporterListElement
+/*class medOpImporterDICOMListElement
 {
 public:
-	mmoDICOMImporterListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
-	mmoDICOMImporterListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
-	~mmoDICOMImporterListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
+	medOpImporterDICOMListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
+	medOpImporterDICOMListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
+	~medOpImporterDICOMListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
 
 	/** Add the filename and the image coordinates to the list. */
 	//void SetListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
@@ -203,10 +203,10 @@ public:
 	mafString m_SliceFilename;
 };*/
 
-class mmoCTMRIImporterListElement
+class medOpImporterCTMRIListElement
 {
 public:
-	mmoCTMRIImporterListElement() 
+	medOpImporterCTMRIListElement() 
   {
     m_SliceFilename = "";
     m_Pos[0] = -9999;
@@ -217,7 +217,7 @@ public:
     m_CardiacNumberOfImages = -1;
   };
 
-	mmoCTMRIImporterListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
+	medOpImporterCTMRIListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
   {
     m_SliceFilename = filename;
     m_Pos[0] = coord[0];
@@ -228,7 +228,7 @@ public:
     m_TriggerTime = trigTime;
   };
 
-  ~mmoCTMRIImporterListElement() {};
+  ~medOpImporterCTMRIListElement() {};
 
 	/** Add the filename and the image coordinates to the list. */
 	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0) 

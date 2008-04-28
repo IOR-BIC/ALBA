@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoCropDeformableROI.cpp,v $
+Module:    $RCSfile: medOpCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-04 14:56:45 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-04-28 08:36:21 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,7 +47,7 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoCropDeformableROI.h"
+#include "medOpCropDeformableROI.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmgGui.h"
@@ -64,11 +64,11 @@ MafMedical is partially based on OpenMAF.
 #include "vtkStructuredPoints.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoCropDeformableROI);
+mafCxxTypeMacro(medOpCropDeformableROI);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoCropDeformableROI::mmoCropDeformableROI(const wxString &label) :
+medOpCropDeformableROI::medOpCropDeformableROI(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -86,7 +86,7 @@ mafOp(label)
   m_Surface = NULL;
 }
 //----------------------------------------------------------------------------
-mmoCropDeformableROI::~mmoCropDeformableROI()
+medOpCropDeformableROI::~medOpCropDeformableROI()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_MaskPolydataFilter);
@@ -96,16 +96,16 @@ mmoCropDeformableROI::~mmoCropDeformableROI()
     mafDEL(m_Surface);
 }
 //----------------------------------------------------------------------------
-bool mmoCropDeformableROI::Accept(mafNode *node)
+bool medOpCropDeformableROI::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMEVolumeGray"));
 }
 //----------------------------------------------------------------------------
-mafOp *mmoCropDeformableROI::Copy()   
+mafOp *medOpCropDeformableROI::Copy()   
 //----------------------------------------------------------------------------
 {
-	return (new mmoCropDeformableROI(m_Label));
+	return (new medOpCropDeformableROI(m_Label));
 }
 //----------------------------------------------------------------------------
 // Constants:
@@ -119,7 +119,7 @@ enum FILTER_SURFACE_ID
 	ID_INSIDE_OUT,
 };
 //----------------------------------------------------------------------------
-void mmoCropDeformableROI::OpRun()   
+void medOpCropDeformableROI::OpRun()   
 //----------------------------------------------------------------------------
 {
 	mafNEW(m_ResultVme);
@@ -144,19 +144,19 @@ void mmoCropDeformableROI::OpRun()
 	ShowGui();
 }
 //----------------------------------------------------------------------------
-void mmoCropDeformableROI::OpDo()
+void medOpCropDeformableROI::OpDo()
 //----------------------------------------------------------------------------
 {
 	m_ResultVme->ReparentTo(m_Input->GetRoot());
 }
 //----------------------------------------------------------------------------
-void mmoCropDeformableROI::OpUndo()
+void medOpCropDeformableROI::OpUndo()
 //----------------------------------------------------------------------------
 {
 	mafEventMacro(mafEvent(this,VME_REMOVE,m_ResultVme));
 }
 //----------------------------------------------------------------------------
-void mmoCropDeformableROI::OnEvent(mafEventBase *maf_event)
+void medOpCropDeformableROI::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -168,7 +168,7 @@ void mmoCropDeformableROI::OnEvent(mafEventBase *maf_event)
 			{
 				mafString title = _("Choose mask");
 				e->SetId(VME_CHOOSE);
-        e->SetArg((long)&mmoCropDeformableROI::OutputSurfaceAccept);
+        e->SetArg((long)&medOpCropDeformableROI::OutputSurfaceAccept);
 				e->SetString(&title);
 				mafEventMacro(*e);
 				m_pNode = e->GetVme();
@@ -189,14 +189,14 @@ void mmoCropDeformableROI::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoCropDeformableROI::OpStop(int result)
+void medOpCropDeformableROI::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	HideGui();
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mmoCropDeformableROI::Algorithm(mafVME *vme)
+void medOpCropDeformableROI::Algorithm(mafVME *vme)
 //----------------------------------------------------------------------------
 {
 	if(vme)

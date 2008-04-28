@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmoExtrusionHoles.cpp,v $
+Module:    $RCSfile: medOpExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-22 10:49:30 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2008-04-28 08:37:52 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -46,7 +46,7 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoExtrusionHoles.h"
+#include "medOpExtrusionHoles.h"
 #include "mafNode.h"
 
 #include "mmgDialog.h"
@@ -75,11 +75,11 @@ MafMedical is partially based on OpenMAF.
 #include "vtkCell.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoExtrusionHoles);
+mafCxxTypeMacro(medOpExtrusionHoles);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoExtrusionHoles::mmoExtrusionHoles(const wxString &label) :
+medOpExtrusionHoles::medOpExtrusionHoles(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -109,7 +109,7 @@ mafOp(label)
 	m_MaxBounds = VTK_DOUBLE_MAX;
 }
 //----------------------------------------------------------------------------
-mmoExtrusionHoles::~mmoExtrusionHoles()
+medOpExtrusionHoles::~medOpExtrusionHoles()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_ExtrusionFilter);
@@ -121,16 +121,16 @@ mmoExtrusionHoles::~mmoExtrusionHoles()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool mmoExtrusionHoles::Accept(mafNode *node)
+bool medOpExtrusionHoles::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMESurface"));
 }
 //----------------------------------------------------------------------------
-mafOp *mmoExtrusionHoles::Copy()   
+mafOp *medOpExtrusionHoles::Copy()   
 //----------------------------------------------------------------------------
 {
-	return (new mmoExtrusionHoles(m_Label));
+	return (new medOpExtrusionHoles(m_Label));
 }
 //----------------------------------------------------------------------------
 // Constants:
@@ -144,7 +144,7 @@ enum FILTER_SURFACE_ID
 	ID_RADIUS,
 };
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::OpRun()   
+void medOpExtrusionHoles::OpRun()   
 //----------------------------------------------------------------------------
 {
 	vtkNEW(m_OriginalPolydata);
@@ -189,7 +189,7 @@ void mmoExtrusionHoles::OpRun()
 	}
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::OpDo()
+void medOpExtrusionHoles::OpDo()
 //----------------------------------------------------------------------------
 {
 	if(m_ResultPolydata)
@@ -198,7 +198,7 @@ void mmoExtrusionHoles::OpDo()
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::OpUndo()
+void medOpExtrusionHoles::OpUndo()
 //----------------------------------------------------------------------------
 {
 	if(m_OriginalPolydata)
@@ -207,7 +207,7 @@ void mmoExtrusionHoles::OpUndo()
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::OnEvent(mafEventBase *maf_event)
+void medOpExtrusionHoles::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -253,7 +253,7 @@ void mmoExtrusionHoles::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::SaveExtrusion()
+void medOpExtrusionHoles::SaveExtrusion()
 //----------------------------------------------------------------------------
 {
   if(m_ResultAfterExtrusion->GetOutput()->GetNumberOfPoints()>0)
@@ -286,7 +286,7 @@ void mmoExtrusionHoles::SaveExtrusion()
   }
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::Extrude()
+void medOpExtrusionHoles::Extrude()
 //----------------------------------------------------------------------------
 {
 	vtkMAFSmartPointer<vtkPoints> points;
@@ -359,7 +359,7 @@ void mmoExtrusionHoles::Extrude()
   vtkDEL(appo);
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::SelectHole(int pointID)
+void medOpExtrusionHoles::SelectHole(int pointID)
 //----------------------------------------------------------------------------
 {
 	double	coordPointSelected[3];
@@ -394,13 +394,13 @@ void mmoExtrusionHoles::SelectHole(int pointID)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::OpStop(int result)
+void medOpExtrusionHoles::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::DeleteOpDialog()
+void medOpExtrusionHoles::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
 	m_Mouse->RemoveObserver(m_Picker);
@@ -427,7 +427,7 @@ void mmoExtrusionHoles::DeleteOpDialog()
 	cppDEL(m_Dialog);
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::CreateOpDialog()
+void medOpExtrusionHoles::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
 	wxBusyCursor wait;
@@ -499,7 +499,7 @@ void mmoExtrusionHoles::CreateOpDialog()
 	this->m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::ExtractFreeEdge()
+void medOpExtrusionHoles::ExtractFreeEdge()
 //----------------------------------------------------------------------------
 {
 	//Extract Holes from the input surface
@@ -511,7 +511,7 @@ void mmoExtrusionHoles::ExtractFreeEdge()
 	m_ExtractFreeEdges->Update();
 }
 //----------------------------------------------------------------------------
-void mmoExtrusionHoles::CreatePolydataPipeline()
+void medOpExtrusionHoles::CreatePolydataPipeline()
 //----------------------------------------------------------------------------
 {
 
