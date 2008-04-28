@@ -10,40 +10,40 @@ SET(PROJECT_SRCS
   medOpCreateLabeledVolume.h
   medOpInteractionDebugger.cpp
   medOpInteractionDebugger.h
-  mmoDICOMImporter.cpp
+  mmoDICOMImporter.cpp //Old Class
   mmoDICOMImporter.h
-  mmoCTAImporter.cpp
-  mmoCTAImporter.h
-  mmoCTMRIImporter.cpp
-  mmoCTMRIImporter.h
-  mmoLandmarkImporter.cpp
-  mmoLandmarkImporter.h
-  mmoLandmarkImporterTXT.cpp
-  mmoLandmarkImporterTXT.h
-  mmoLandmarkImporterWS.cpp
-  mmoLandmarkImporterWS.h
-  mmoMML.cpp
-  mmoMML.h
-  mmoMMLContourWidget.cpp
-  mmoMMLContourWidget.h
-  mmoMMLModelView.cpp
-  mmoMMLModelView.h
-  mmoMMLParameterView.cpp
-  mmoMMLParameterView.h
-  mmoRegisterClusters.cpp
-  mmoRegisterClusters.h
-  mmoVolumeMeasure.cpp
-  mmoVolumeMeasure.h
-  mmoRAWImporterImages.cpp
-  mmoRAWImporterImages.h
-  mmoMeshQuality.cpp
-  mmoMeshQuality.h
-  mmoCropDeformableROI.cpp
-  mmoCropDeformableROI.h
-  mmoFlipNormals.cpp
-  mmoFlipNormals.h
-  mmoExtrusionHoles.cpp
-  mmoExtrusionHoles.h
+  medOpImporterCTA.cpp
+  medOpImporterCTA.h
+  medOpImporterCTMRI.cpp
+  medOpImporterCTMRI.h
+  medOpImporterLandmark.cpp
+  medOpImporterLandmark.h
+  medOpImporterLandmarkTXT.cpp
+  medOpImporterLandmarkTXT.h
+  medOpImporterLandmarkWS.cpp
+  medOpImporterLandmarkWS.h
+  medOpMML.cpp
+  medOpMML.h
+  medOpMMLContourWidget.cpp
+  medOpMMLContourWidget.h
+  medOpMMLModelView.cpp
+  medOpMMLModelView.h
+  medOpMMLParameterView.cpp
+  medOpMMLParameterView.h
+  medOpRegisterClusters.cpp
+  medOpRegisterClusters.h
+  medOpVolumeMeasure.cpp
+  medOpVolumeMeasure.h
+  medOpImporterRAWImages.cpp
+  medOpImporterRAWImages.h
+  medOpMeshQuality.cpp
+  medOpMeshQuality.h
+  medOpCropDeformableROI.cpp
+  medOpCropDeformableROI.h
+  medOpFlipNormals.cpp
+  medOpFlipNormals.h
+  medOpExtrusionHoles.cpp
+  medOpExtrusionHoles.h
   medOpVolumeResample.cpp
   medOpVolumeResample.h
   medOpSplitSurface.cpp
@@ -100,15 +100,15 @@ IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
   itkRawMotionImporterUtility.cxx
   itkRawMotionImporterUtility.h
-  mmoMotionDataImporter.h
-  mmoLandmarkExporter.cpp
-  mmoLandmarkExporter.h
-  mmoClassicICPRegistration.cpp
-  mmoClassicICPRegistration.h
-  mmoC3DImporter.cpp
-  mmoC3DImporter.h
-  mmoGRFImporterWS.cpp
-  mmoGRFImporterWS.h
+  medOpImporterMotionData.h
+  medOpExporterLandmark.cpp
+  medOpExporterLandmark.h
+  medOpClassicICPRegistration.cpp
+  medOpClassicICPRegistration.h
+  medOpImporterC3D.cpp
+  medOpImporterC3D.h
+  medOpImporterGRFWS.cpp
+  medOpImporterGRFWS.h
   medOpImporterAnalogWS.cpp
   medOpImporterAnalogWS.h
 )
