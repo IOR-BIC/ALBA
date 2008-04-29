@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafParabolicMeshToLinearMeshFilter.cxx,v $
 Language:  C++
-Date:      $Date: 2007-07-17 12:58:20 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-04-29 10:56:01 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafString.h"
 
-vtkCxxRevisionMacro(mafParabolicMeshToLinearMeshFilter, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(mafParabolicMeshToLinearMeshFilter, "$Revision: 1.4 $");
 vtkStandardNewMacro(mafParabolicMeshToLinearMeshFilter);
 
 mafParabolicMeshToLinearMeshFilter::mafParabolicMeshToLinearMeshFilter()
@@ -50,9 +50,14 @@ mafParabolicMeshToLinearMeshFilter::~mafParabolicMeshToLinearMeshFilter()
 
 }
 
+//#define __PROFILING__
+//#include <atlbase.h>
+//#include "G:/Programs/Libraries/BSGenLib/BSGenLib/Include/BSGenLib.h"
+
 void mafParabolicMeshToLinearMeshFilter::Execute()
 {
-  
+//  PROFILE_THIS_FUNCTION();
+
   int nCells;
   int numPointsNew;
   int oldCellType, newCellType;
@@ -61,9 +66,6 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
   // 
   vtkUnstructuredGrid *input = this->GetInput();
   vtkUnstructuredGrid *output = this->GetOutput();
-
-  vcl_list<int> connectivityVectorWithRepeatedValues;
-  vcl_list<int> connectivityVectorWithUniqueValues;
 
   nCells = input->GetNumberOfCells();
   
@@ -93,60 +95,38 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
     {
       output->DeepCopy(input);
 
-      mafLogMessage("Mesh is already linear or made of unsupported type elements!\
-      Bypassing the filter");
+      mafLogMessage("Mesh is already linear or made of unsupported type elements! Bypassing the filter");
       return;
     }
-  }
-
-  vnl_matrix<double> connectivityMatrix(nCells, numPointsPerCellNew);
-  
-  // load the geometry
-      
-  // load the connectivity 
-  for (int i = 0; i < nCells; i++)
-  {
-    for (int j = 0; j < numPointsPerCellNew; j++)
-    {     
-      // create vector with id from submatrix
-      // 0 1 2 3 3 1 2 10
-      connectivityVectorWithRepeatedValues.push_back(input->GetCell(i)->GetPointId(j));
-    }
-  }
-
-  // order ids
-  // 0 1 1 2 3 3 10
-  connectivityVectorWithRepeatedValues.sort();
-
-  // eliminate repeating ids
-  // 0 1 2 3 10 => linear mesh points
-  std::unique_copy(connectivityVectorWithRepeatedValues.begin(), connectivityVectorWithRepeatedValues.end(),  std::back_inserter(connectivityVectorWithUniqueValues));
-
-  numPointsNew = connectivityVectorWithUniqueValues.size();
-
-  /*
-    map(10) = 4;
-  */
+  }  
 
   //-----------------------
   // create output geometry
   //-----------------------
-
-  // create new geometry from connectivityVectorWithUniqueValues
+    
   vtkPoints *points = vtkPoints::New();
-  
-
-  typedef vcl_list<int>::iterator listIter;
-  listIter iter;
-  int pointId = 0;
-
-  for (iter = connectivityVectorWithUniqueValues.begin(); iter != connectivityVectorWithUniqueValues.end(); iter++)    
+  vcl_map<int, int> oldIdToNewIdMap;
+  typedef vcl_map<int, int>::const_iterator  Iter;
+  numPointsNew = 0;
+    
+  // load the connectivity and store the new geometry
+  for (int i = 0; i < nCells; i++)
   {
-    double point[3];
-    input->GetPoints()->GetPoint((*iter), point);
-    points->InsertNextPoint(point[0], point[1], point[2]);
-    pointId++;
-  }
+    for (int j = 0; j < numPointsPerCellNew; j++)
+    {      
+      int ptId = input->GetCell(i)->GetPointId(j);
+      if (oldIdToNewIdMap.find(ptId) == oldIdToNewIdMap.end())
+      {
+        oldIdToNewIdMap.insert(vcl_map<int,int>::value_type(ptId, numPointsNew));        
+        numPointsNew++;
+
+        //add another point to output
+        double point[3];
+        input->GetPoints()->GetPoint(ptId, point);
+        points->InsertNextPoint(point[0], point[1], point[2]);
+      }
+    }
+  }  
 
   // fill the POINT section of the Mesh
   output->SetPoints(points);
@@ -160,17 +140,6 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
 
   // create new topology
   output->Allocate(numCells, 1);
-
-  vcl_map<int, int> oldIdToNewIdMap;
-  
-  int newPointId = 0;
-
-  // map with (key = oldPointId, value = newPointId)
-  for (iter = connectivityVectorWithUniqueValues.begin(); iter != connectivityVectorWithUniqueValues.end(); iter++)    
-  {
-    oldIdToNewIdMap.insert(vcl_map<int,int>::value_type(*iter, newPointId));
-    newPointId++;
-  }
 
   vtkIdList *newIdList = vtkIdList::New();
   
@@ -223,16 +192,17 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
       newArray->SetNumberOfComponents(currentArray->GetNumberOfComponents());
       newArray->SetNumberOfTuples(numPointsNew);      
 
-      for (iter = connectivityVectorWithUniqueValues.begin(); iter != connectivityVectorWithUniqueValues.end(); iter++)    
+      for (Iter iter = oldIdToNewIdMap.begin(); iter != oldIdToNewIdMap.end(); iter++)    
       {
-        newArray->SetTuple(numPoint, currentArray->GetTuple(*iter));
+        newArray->SetTuple(numPoint, currentArray->GetTuple(iter->first));
         numPoint++;
       }
   
       outPD->AddArray(newArray);
 
       //modified by Daniele
-      if(strcmp(activeArray->GetName(), newArray->GetName()) == 0) outPD->SetScalars(newArray);
+      if(strcmp(activeArray->GetName(), newArray->GetName()) == 0) 
+        outPD->SetScalars(newArray);
 
       newArray->Delete();
     }
@@ -242,12 +212,12 @@ void mafParabolicMeshToLinearMeshFilter::Execute()
     vtkFieldData *inFD = input->GetFieldData();
     output->GetFieldData()->DeepCopy(inFD);
   
-    output->Squeeze();  
+    output->Squeeze();     
 }
 
 void mafParabolicMeshToLinearMeshFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  //os << indent << "PrintMe! : " << this->Ivar2Print << "\n";
+  //os << indent << "PrintMe! : " << this->Ivar2Print << "/n";
 }
