@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 09:48:32 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-04-29 10:47:15 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -39,6 +39,7 @@
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMEVolumeRGB.h"
+#include "mafVMEExternalData.h"
 
 #include "mafNodeIterator.h"
 
@@ -233,7 +234,7 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
           {
             RestoreMeterAttribute(vme);
           }
-          if (vme_type == "mflVMELandmarkCloud" || vme_type == "mflVMERigidLandmarkCloud" || vme_type == "mflVMEDynamicLandmarkCloud")
+          else if (vme_type == "mflVMELandmarkCloud" || vme_type == "mflVMERigidLandmarkCloud" || vme_type == "mflVMEDynamicLandmarkCloud")
           {
             int num_lm = ((mafVMELandmarkCloud *)vme)->GetNumberOfLandmarks();
             double rad = ((mafVMELandmarkCloud *)vme)->GetRadius();
@@ -252,11 +253,24 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
         // restore MatrixVector element
         else if (mafCString("VMatrix") == children[i]->GetName())
         {
-          mafVMEGenericAbstract *vme_generic = mafVMEGenericAbstract::SafeDownCast(vme);
-          if (vme_generic && RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
+          if (vme_type == "mflVMEGroup")
           {
-            mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
-            return NULL;
+            mafMatrixVector vmatrix;
+            if (RestoreVMatrix(children[i], &vmatrix) != MAF_OK)
+            {
+              mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
+              return NULL;
+            }
+            vme->SetMatrix(*vmatrix.GetKeyMatrix(0));
+          } 
+          else
+          {
+            mafVMEGenericAbstract *vme_generic = mafVMEGenericAbstract::SafeDownCast(vme);
+            if (vme_generic && RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
+            {
+              mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
+              return NULL;
+            }
           }
         }
         
@@ -344,7 +358,6 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
 {
   if (
     name == "mafVMEGeneric"         ||
-    name == "mflVMEExternalData"    ||
     name == "mflVMEAlias"
     )
   {
@@ -355,6 +368,10 @@ mafVME *mmuMSF1xDocument::CreateVMEInstance(mafString &name)
     mafVME *link = mafVMEGeneric::New();
     link->GetTagArray()->SetTag("mflVMELink","1");
     return link;
+  }
+  else if (name == "mflVMEExternalData")
+  {
+    return mafVMEExternalData::New();
   }
   else if (name == "mflVMEGroup")
   {
