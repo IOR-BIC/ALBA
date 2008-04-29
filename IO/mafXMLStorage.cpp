@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:25:08 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-04-29 14:19:50 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,6 +109,7 @@ mafXMLStorage::mafXMLStorage()
 {
   m_DOM = new mmuXMLDOM;
   m_Version = "1.1";
+  m_DocumentVersion = "1.1";
 }
 
 //------------------------------------------------------------------------------
@@ -320,7 +321,12 @@ const char *mafXMLStorage::GetVersion()
 {
   return m_Version;
 }
-
+//------------------------------------------------------------------------------
+const char *mafXMLStorage::GetDocumentVersion()
+//------------------------------------------------------------------------------
+{
+  return m_DocumentVersion;
+}
 //------------------------------------------------------------------------------
 void mafXMLStorage::EmptyGarbageCollector()
 //------------------------------------------------------------------------------
@@ -523,10 +529,9 @@ int mafXMLStorage::InternalRestore()
 
           if (m_FileType == m_DocumentElement->GetName())
           {
-            mafString doc_version;
-            if (m_DocumentElement->GetAttribute("Version",doc_version))
+            if (m_DocumentElement->GetAttribute("Version",m_DocumentVersion))
             {
-              double doc_version_f = atof(doc_version);
+              double doc_version_f = atof(m_DocumentVersion);
               double my_version_f = atof(m_Version);
             
               if (my_version_f <= doc_version_f)
@@ -540,7 +545,7 @@ int mafXMLStorage::InternalRestore()
                 // Paolo 30-11-2007: due to changes on name for mafVMEScalar (to mafVMEScalarMatrix)
                 if (doc_version_f < 2.0)
                 {
-                  mafErrorMacro("XML parsing error: wrong file version v"<<doc_version.GetCStr()<<", should be > v"<<m_Version.GetCStr());
+                  mafErrorMacro("XML parsing error: wrong file version v"<<m_DocumentVersion.GetCStr()<<", should be > v"<<m_Version.GetCStr());
                   errorCode = IO_WRONG_FILE_VERSION;
                 }
                 else

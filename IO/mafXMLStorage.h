@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:14:02 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-04-29 14:19:50 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,6 +57,9 @@ public:
   /** The version of the file format used type of file. (default "1.1") */
   const char *GetVersion();
 
+  /** Return the version of the opened document.*/
+  const char *GetDocumentVersion();
+
   /** resolve an URL and provide local filename to be used as input */
   virtual int ResolveInputURL(const char * url, mafString &filename, mafObserver *observer = NULL);
 
@@ -87,9 +90,10 @@ protected:
   /** This is called by Restore() and must be reimplemented by subclasses */
   virtual int InternalRestore();
 
-  mafString  m_FileType;  ///< The type of file to be opened
-  mafString  m_Version;   ///< The version of the file to be opened
-  mmuXMLDOM  *m_DOM;      ///< PIMPL object storing XML objects' pointers
+  mafString m_FileType;  ///< The type of file to be opened
+  mafString m_Version;   ///< Current MSF version
+  mafString m_DocumentVersion; ///< Open Document version.
+  mmuXMLDOM *m_DOM;      ///< PIMPL object storing XML objects' pointers
   std::set<mafString> m_GarbageCollector; ///< collect URL to be released
   mafString  m_DefaultTmpFolder; ///< used to store the current default tmp folder
 };
