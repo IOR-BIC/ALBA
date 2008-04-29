@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-01-24 16:04:46 $
-# Version:   $Revision: 1.43 $
+# Date:      $Date: 2008-04-29 15:17:59 $
+# Version:   $Revision: 1.44 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -115,21 +115,12 @@ IF (MAF_CAN_BUILD)
 
   # Add single dirs to inclusion path
   INCLUDE_DIRECTORIES(BEFORE ".")
-  INCLUDE_DIRECTORIES(${MAF_BINARY_DIR})
 
-  #todo: add a FOREACH on all subdirs but "modules"
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Base)
-  INCLUDE_DIRECTORIES(${MAF_BINARY_DIR}/Interaction)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Interaction)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Interaction/Drivers)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Core)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Gui)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/IO)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/Operations)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/VME)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/VME/DataPipes)
-  INCLUDE_DIRECTORIES(${MAF_SOURCE_DIR}/vtkMAF)
-  INCLUDE_DIRECTORIES(${MAF_BINARY_DIR}/vtkMAF)
+  ###############add all subdirs but "modules"
+  SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
+              "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" 
+              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF")
+  INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits")
@@ -179,6 +170,31 @@ IF (MAF_CAN_BUILD)
   ${MAF_BINARY_DIR}/MAFConfig.cmake
   @ONLY IMMEDIATE
   )
+  
+  #### Include directory for binary distribution of MAF
+  SET(MAF_INSTALL_INCLUDE_DIRS ${MAF_BINARY_DIR}/Include)
+  FILE(MAKE_DIRECTORY ${MAF_INSTALL_INCLUDE_DIRS})
+  
+  FOREACH(dirs ${INCLUDE_DIRS})
+    FILE(GLOB include_file_list "${dirs}/*.h")
+    FILE(GLOB template_file_list "${dirs}/*.txx")
+    FILE(GLOB icons_file_list "${dirs}/*.xpm")
+    
+    FOREACH(file ${include_file_list})
+      FILE(RELATIVE_PATH file_name "${dirs}" "${file}")
+    	CONFIGURE_FILE("${file}" "${MAF_INSTALL_INCLUDE_DIRS}/${file_name}")
+    ENDFOREACH(file ${include_file_list})
+    
+    FOREACH(template_file ${template_file_list})
+      FILE(RELATIVE_PATH template_file_name "${dirs}" "${template_file}")
+    	CONFIGURE_FILE("${template_file}" "${MAF_INSTALL_INCLUDE_DIRS}/${template_file_name}")
+    ENDFOREACH(template_file ${template_file_list})
+    
+    FOREACH(icons_file ${icons_file_list})
+      FILE(RELATIVE_PATH icons_file_name "${dirs}" "${icons_file}")
+    	CONFIGURE_FILE("${icons_file}" "${MAF_INSTALL_INCLUDE_DIRS}/${icons_file_name}")
+    ENDFOREACH(icons_file ${icons_file_list})
+  ENDFOREACH(dirs ${MAF_INCLUDE_DIRS})
   
   CONFIGURE_FILE(
   ${MAF_SOURCE_DIR}/MAFUse.cmake.in
@@ -251,5 +267,3 @@ IF (DEBUG_MESSAGES)
   							"${var} \"${${var}}\"\n")
   ENDFOREACH(var ${VARS})
 ENDIF (DEBUG_MESSAGES)
-
-
