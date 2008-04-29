@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-29 10:47:15 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-04-29 15:17:12 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -253,24 +253,11 @@ mafVME *mmuMSF1xDocument::RestoreVME(mafStorageElement *node, mafVME *parent)
         // restore MatrixVector element
         else if (mafCString("VMatrix") == children[i]->GetName())
         {
-          if (vme_type == "mflVMEGroup")
+          mafVMEGenericAbstract *vme_generic = mafVMEGenericAbstract::SafeDownCast(vme);
+          if (vme_generic && RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
           {
-            mafMatrixVector vmatrix;
-            if (RestoreVMatrix(children[i], &vmatrix) != MAF_OK)
-            {
-              mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
-              return NULL;
-            }
-            vme->SetMatrix(*vmatrix.GetKeyMatrix(0));
-          } 
-          else
-          {
-            mafVMEGenericAbstract *vme_generic = mafVMEGenericAbstract::SafeDownCast(vme);
-            if (vme_generic && RestoreVMatrix(children[i],vme_generic->GetMatrixVector()) != MAF_OK)
-            {
-              mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
-              return NULL;
-            }
+            mafErrorMacro("MSFImporter: error restoring VME-Item of node: \""<<vme->GetName()<<"\"");
+            return NULL;
           }
         }
         
@@ -606,6 +593,8 @@ int mmuMSF1xDocument::RestoreVMatrix(mafStorageElement *node, mafMatrixVector *v
   // restore single matrices
   mafStorageElement::ChildrenVector children;
   children = node->GetChildren();
+
+  vmatrix->RemoveAllItems();
 
   for (int i = 0;i<children.size();i++)
   {
