@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 13:35:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-30 13:21:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -174,9 +174,9 @@ void medPipeWrappedMeter::Create(mafSceneNode *n/*, bool use_axes*/)
   dis = wxString::Format("%.2f",m_WrappedMeterVME->GetDistance());
   m_Caption->SetCaption(dis.c_str());
 
-  if(m_WrappedMeterVME->GetMeterMode() == medVMEWrappedMeter::LINE_ANGLE)
+ /* if(m_WrappedMeterVME->GetMeterMode() == medVMEWrappedMeter::LINE_ANGLE)
     m_Caption->SetVisibility((m_WrappedMeterVME->GetAngle() != 0) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
-  else
+  else*/
     m_Caption->SetVisibility((m_WrappedMeterVME->GetDistance() >= 0 || m_WrappedMeterVME->GetMeterMeasureType() == medVMEWrappedMeter::RELATIVE_MEASURE) && m_WrappedMeterVME->GetMeterAttributes()->m_LabelVisibility);
   
   if(m_WrappedMeterVME->GetStartVME())
@@ -347,7 +347,7 @@ void medPipeWrappedMeter::UpdateProperty(bool fromTag)
   }
 
   double distance_value = m_WrappedMeterVME->GetDistance();
-  if(m_WrappedMeterVME->GetMeterMode() == medVMEWrappedMeter::LINE_ANGLE) distance_value = m_WrappedMeterVME->GetAngle();
+ // if(m_WrappedMeterVME->GetMeterMode() == medVMEWrappedMeter::LINE_ANGLE) distance_value = m_WrappedMeterVME->GetAngle();
   distance_value = RoundValue(distance_value);
   wxString dis;
   dis = wxString::Format("%.2f",distance_value);
