@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 16:23:50 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-04-30 09:33:30 $
+  Version:   $Revision: 1.16 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,6 +72,9 @@ public:
 
   /** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
+
+  /* Method for determine if the pick is over a Slice view or not*/
+  bool IsPickedSliceView();
 
 protected:
   /**

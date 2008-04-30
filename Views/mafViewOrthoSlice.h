@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:34:26 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-04-30 09:33:30 $
+  Version:   $Revision: 1.22 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -77,6 +77,9 @@ void CreateOrthoslicesAndGizmos( mafNode * node );
 
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
+
+  /* Method for determine if the pick is over a Slice view or not*/
+  bool IsPickedSliceView();
 
 protected:
   /**

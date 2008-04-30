@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 08:28:45 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-04-30 09:33:30 $
+  Version:   $Revision: 1.44 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
 #include "medVisualPipeSlicerSlice.h"
+#include "mmdMouse.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"
@@ -943,4 +944,31 @@ void mafViewRXCT::ResetSlicesPosition( mafNode *node )
   this->VmeShow(node, false);
   this->VmeShow(node, true);
   CameraUpdate();
+}
+//----------------------------------------------------------------------------
+bool mafViewRXCT::IsPickedSliceView()
+//----------------------------------------------------------------------------
+{
+  mafRWIBase *rwi = m_Mouse->GetRWI();
+  if (rwi)
+  {
+    for(int i=0; i<m_NumOfChildView; i++)
+    {
+      if (m_ChildViewList[i]->IsMAFType(mafViewSlice))
+      {
+        if(((mafViewSlice *)m_ChildViewList[i])->GetRWI()==rwi)
+          return true;
+      }
+      else if (m_ChildViewList[i]->IsMAFType(mafViewCompound))
+      {
+        if(((mafViewCompound *)m_ChildViewList[i])->GetSubView()->GetRWI()==rwi)
+          return true;
+      }
+      else if (((mafViewVTK *)m_ChildViewList[i])->GetRWI() == rwi)
+      {
+        return false;
+      }
+    }
+  }
+  return false;
 }
