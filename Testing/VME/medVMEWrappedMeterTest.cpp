@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:59:19 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-04-30 15:01:17 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -298,7 +298,7 @@ void medVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 
 	mafDEL(storage);
 }
-
+/*
 //---------------------------------------------------------------
 void medVMEWrappedMeterTest::TestLineDistanceWithGenericVME()
 //---------------------------------------------------------------
@@ -543,7 +543,7 @@ void medVMEWrappedMeterTest::TestLineAngleWithLandmark()
 	mafDEL(importer);
 
 	mafDEL(storage);
-}
+}*/
 //---------------------------------------------------------------
 void medVMEWrappedMeterTest::TestWrappedGeometry()
 //---------------------------------------------------------------
@@ -591,6 +591,7 @@ void medVMEWrappedMeterTest::TestWrappedGeometry()
   wrappedMeter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   wrappedMeter->SetMeterLink("WrappedVME",vmeParametricSurfaceWrapped);
   wrappedMeter->SetWrappedMode(medVMEWrappedMeter::AUTOMATED_WRAP);
+  wrappedMeter->SetWrappingPrecision(1);
   wrappedMeter->SetParent(storage->GetRoot());
   
   wrappedMeter->GetOutput()->GetVTKData()->Update();

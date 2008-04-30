@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.h,v $
 Language:  C++
-Date:      $Date: 2007-09-03 08:15:19 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-04-30 15:01:17 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -30,11 +30,11 @@ class medVMEWrappedMeterTest : public CPPUNIT_NS::TestFixture
 	CPPUNIT_TEST( TestWithGenericLandmark );
 	CPPUNIT_TEST( TestWithGenericLandmarkWithMiddlePoints );
 	
-	CPPUNIT_TEST( TestLineDistanceWithGenericVME );
-	CPPUNIT_TEST( TestLineAngleWithGenericVME );
+	//CPPUNIT_TEST( TestLineDistanceWithGenericVME );
+	//CPPUNIT_TEST( TestLineAngleWithGenericVME );
 
-	CPPUNIT_TEST( TestLineDistanceWithLandmark );
-	CPPUNIT_TEST( TestLineAngleWithLandmark );
+	//CPPUNIT_TEST( TestLineDistanceWithLandmark );
+	//CPPUNIT_TEST( TestLineAngleWithLandmark );
 
   CPPUNIT_TEST( TestWrappedGeometry);
 	
@@ -46,11 +46,11 @@ protected:
 	void TestWithGenericLandmark();
 	void TestWithGenericLandmarkWithMiddlePoints();
 
-	void TestLineDistanceWithGenericVME();
+	/*void TestLineDistanceWithGenericVME();
 	void TestLineAngleWithGenericVME();
 
 	void TestLineDistanceWithLandmark();
-	void TestLineAngleWithLandmark();
+	void TestLineAngleWithLandmark();*/
 
   void TestWrappedGeometry();
 };
