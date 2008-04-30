@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 13:38:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-04-30 14:31:13 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -162,7 +162,6 @@ int medVMEWrappedMeter::DeepCopy(mafNode *a)
     if (dpipe)
     {
       dpipe->SetInput(m_Goniometer->GetOutput());
-      m_Goniometer->Update();
     }
     return MAF_OK;
   }  
@@ -272,7 +271,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     }
     else
     {
-      start_vme->GetOutput()->Update();  
       start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
     }
 
@@ -288,7 +286,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     }
     else
     {
-      wrapped_vme->GetOutput()->Update();  
       wrapped_vme->GetOutput()->GetAbsPose(m_WrappedVMECenter, orientation);
 
       double translation[3];
@@ -310,7 +307,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     }
     else
     {
-      end_vme->GetOutput()->Update();  
       end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
     }
   }
@@ -391,14 +387,12 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
      //if one point is inside connect start and end
      m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
      m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-     m_LineSource->Update();
      m_Goniometer->AddInput(m_LineSource->GetOutput());
 
      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
      m_Goniometer->Modified();
      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-     m_Goniometer->Update();
      GetWrappedMeterOutput()->Update();
 
      ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
@@ -549,9 +543,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     m_PlaneSource->SetOrigin(local_wrapped_center);
     m_PlaneSource->SetPoint1(pointTangent1);
     m_PlaneSource->SetPoint2(pointTangent2);
-    m_PlaneSource->Update();
-
-
     
     m_PlaneCutter->SetOrigin(local_wrapped_center);
     m_PlaneCutter->SetNormal(m_PlaneSource->GetNormal());
@@ -559,7 +550,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     
     m_Cutter->SetInput(transformFirstData->GetOutput());
     m_Cutter->SetCutFunction(m_PlaneCutter);
-    m_Cutter->Update();
 
     double midPoint[3];
     midPoint[0] = (pointTangent2[0] + pointTangent1[0])/2;
@@ -597,7 +587,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     
     m_Clip->SetInput(m_Cutter->GetOutput());
     m_Clip->SetClipFunction(m_PlaneClip);
-    m_Clip->Update();
 
     double clipLength = 0;
 		double numberOfCells = m_Clip->GetOutput()->GetNumberOfCells();
@@ -627,12 +616,9 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     
     m_LineSource2->SetPoint1(pointTangent2[0],pointTangent2[1],pointTangent2[2]);
     m_LineSource2->SetPoint2(local_end[0],local_end[1],local_end[2]);
-    m_LineSource2->Update();
-
 
     m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
     m_LineSource->SetPoint2(pointTangent1[0],pointTangent1[1],pointTangent1[2]);
-    m_LineSource->Update();
 
     m_Goniometer->AddInput(m_LineSource->GetOutput());
     m_Goniometer->AddInput(m_LineSource2->GetOutput());
@@ -646,11 +632,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
   }
   else
     m_Distance = -1;
-
-  m_Goniometer->Update();
-  GetWrappedMeterOutput()->Update();
-
-  //ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));//Mucci
 }
 //-----------------------------------------------------------------------
 void medVMEWrappedMeter::InternalUpdateManual()
@@ -699,7 +680,6 @@ void medVMEWrappedMeter::InternalUpdateManual()
         }
         else
         {
-          ((mafVME *)middleVME)->GetOutput()->Update();  
           ((mafVME *)middleVME)->GetOutput()->GetAbsPose(m_MiddlePointList[m_MiddlePointList.size()-1], orientation);
         }
         
@@ -717,7 +697,6 @@ void medVMEWrappedMeter::InternalUpdateManual()
       }
       else
       {
-        start_vme->GetOutput()->Update();  
         start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
       }
 
@@ -733,7 +712,6 @@ void medVMEWrappedMeter::InternalUpdateManual()
       }
       else
       {
-        end_vme->GetOutput()->Update();  
         end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
       }
     }
@@ -821,10 +799,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
       {
         m_LineSource2->SetPoint1(local_start[0],local_start[1],local_start[2]);
         m_LineSource2->SetPoint2(local_start[0],local_start[1],local_start[2]);
-        m_LineSource2->Update();
         m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
         m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-        m_LineSource->Update();
 				
         m_Goniometer->AddInput(m_LineSource->GetOutput());
         m_Goniometer->AddInput(m_LineSource2->GetOutput());
@@ -839,13 +815,11 @@ void medVMEWrappedMeter::InternalUpdateManual()
         {        
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint1(local_start[0],local_start[1],local_start[2]);
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint2(localMiddlePointList[0][0],localMiddlePointList[0][1],localMiddlePointList[0][2]);
-          m_LineSourceList[m_LineSourceList.size()-1]->Update();
         }
         else
         {         
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint1(localMiddlePointList[j-1][0],localMiddlePointList[j-1][1],localMiddlePointList[j-1][2]);
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint2(localMiddlePointList[j][0],localMiddlePointList[j][1],localMiddlePointList[j][2]);
-          m_LineSourceList[m_LineSourceList.size()-1]->Update();
         }
         
 
@@ -856,7 +830,6 @@ void medVMEWrappedMeter::InternalUpdateManual()
        
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint1(localMiddlePointList[j][0],localMiddlePointList[j][1],localMiddlePointList[j][2]);
           m_LineSourceList[m_LineSourceList.size()-1]->SetPoint2(local_end[0],local_end[1],local_end[2]);
-          m_LineSourceList[m_LineSourceList.size()-1]->Update();
         }
       }
 
@@ -1146,11 +1119,6 @@ void medVMEWrappedMeter::InternalUpdateManual()
     if(GetMeterMeasureType() == medVMEWrappedMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
       m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
   }*/
-
-	m_Goniometer->Update();
-	GetWrappedMeterOutput()->Update();
-	
-	//ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));//Mucci
 }
 //-----------------------------------------------------------------------
 int medVMEWrappedMeter::InternalStore(mafStorageElement *parent)
@@ -1494,7 +1462,6 @@ mmgGui* medVMEWrappedMeter::CreateGui()
 	m_Gui->Divider();
 
   InternalUpdate();
-  GetWrappedMeterOutput()->Update();
 
   return m_Gui;
 }
