@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:44:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-04-30 13:38:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,8 +43,8 @@ public:
   enum METER_MEASURE_TYPE_ID
   {
     POINT_DISTANCE=0,
-    LINE_DISTANCE,
-    LINE_ANGLE
+  //  LINE_DISTANCE,
+  //  LINE_ANGLE
   };
   enum METER_MODALITY_TYPE_ID
   {
@@ -135,8 +135,8 @@ public:
   int GetMeterMode();
   void SetMeterMode(int mode);
   void SetMeterModeToPointDistance() {this->SetMeterMode(medVMEWrappedMeter::POINT_DISTANCE);}
-  void SetMeterModeToLineDistance() {this->SetMeterMode(medVMEWrappedMeter::LINE_DISTANCE);}
-  void SetMeterModeToLineAngle() {this->SetMeterMode(medVMEWrappedMeter::LINE_ANGLE);}
+ // void SetMeterModeToLineDistance() {this->SetMeterMode(medVMEWrappedMeter::LINE_DISTANCE);}
+ // void SetMeterModeToLineAngle() {this->SetMeterMode(medVMEWrappedMeter::LINE_ANGLE);}
 
   /** 
   Store the min and max distance to associate with colors.*/

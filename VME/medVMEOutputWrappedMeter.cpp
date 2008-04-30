@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-03 08:14:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-30 13:38:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -117,7 +117,7 @@ void medVMEOutputWrappedMeter::Update()
 
 		m_Angle ="";
   }
-	else if(wrappedMeter->GetMeterMode() == medVMEWrappedMeter::LINE_DISTANCE)
+/*	else if(wrappedMeter->GetMeterMode() == medVMEWrappedMeter::LINE_DISTANCE)
 	{
 		m_Distance = wrappedMeter->GetDistance();
 		m_Angle ="";
@@ -126,7 +126,7 @@ void medVMEOutputWrappedMeter::Update()
   {
     m_Distance ="";
     m_Angle= wrappedMeter->GetAngle();
-  }
+  }*/
   if (m_Gui)
   {
     m_Gui->Update();

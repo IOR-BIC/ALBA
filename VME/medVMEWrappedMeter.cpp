@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 09:21:56 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-04-30 13:38:11 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -879,7 +879,7 @@ void medVMEWrappedMeter::InternalUpdateManual()
     }
     localMiddlePointList.clear();
   }
-  else if (GetMeterMode() == medVMEWrappedMeter::LINE_DISTANCE)
+/*  else if (GetMeterMode() == medVMEWrappedMeter::LINE_DISTANCE)
   {
     mafVME *start_vme = GetStartVME();
     mafVME *end1_vme  = GetEnd1VME();
@@ -900,8 +900,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
     if (start_vme && end1_vme && end2_vme)
     {
       // start is a landmark, consider also visibility
-      /*if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
-        start_ok = start_landmark->GetLandmarkVisibility();*/
+      //if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
+      //  start_ok = start_landmark->GetLandmarkVisibility();
 
       if(start_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("StartVME") != -1)
       {
@@ -916,8 +916,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
       }
 
       // end is a landmark, consider also visibility
-      /*if (mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
-        end1_ok = end1_landmark->GetLandmarkVisibility();*/
+      //if (mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
+      //  end1_ok = end1_landmark->GetLandmarkVisibility();
 
       if(end1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME1") != -1)
       {
@@ -932,8 +932,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
       }
 
       // end is a landmark, consider also visibility
-      /*if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
-        end2_ok = end2_landmark->GetLandmarkVisibility();*/
+      //if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
+      //  end2_ok = end2_landmark->GetLandmarkVisibility();
 
       if(end2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME2") != -1)
       {
@@ -1035,8 +1035,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
     if (start_vme && end1_vme && end2_vme)
     {
       // start is a landmark, consider also visibility
-      /*if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
-        start_ok = start_landmark->GetLandmarkVisibility();*/
+      //if (mflVMELandmark *start_landmark = mflVMELandmark::SafeDownCast(start_vme))
+      //start_ok = start_landmark->GetLandmarkVisibility();
 
       if(start_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("StartVME") != -1)
       {
@@ -1050,8 +1050,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
         start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
       }
 
-      /*if(mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
-        end1_ok = end1_landmark->GetLandmarkVisibility();*/
+      //if(mflVMELandmark *end1_landmark = mflVMELandmark::SafeDownCast(end1_vme))
+      // end1_ok = end1_landmark->GetLandmarkVisibility();
 
       if(end1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME1") != -1)
       {
@@ -1065,8 +1065,8 @@ void medVMEWrappedMeter::InternalUpdateManual()
         end1_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
       }
 
-      /*if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
-        end2_ok = end2_landmark->GetLandmarkVisibility();*/
+      //if (mflVMELandmark *end2_landmark = mflVMELandmark::SafeDownCast(end2_vme))
+      //  end2_ok = end2_landmark->GetLandmarkVisibility();
 
       if(end2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME2") != -1)
       {
@@ -1145,7 +1145,7 @@ void medVMEWrappedMeter::InternalUpdateManual()
 
     if(GetMeterMeasureType() == medVMEWrappedMeter::ABSOLUTE_MEASURE && GetMeterAttributes()->m_ThresholdEvent > 0 && m_Angle > 0 && m_Angle >= threshold)
       m_EventSource->InvokeEvent(this,LENGTH_THRESHOLD_EVENT);
-  }
+  }*/
 
 	m_Goniometer->Update();
 	GetWrappedMeterOutput()->Update();
@@ -1393,14 +1393,14 @@ mmgGui* medVMEWrappedMeter::CreateGui()
 
   int num_mode = 3;
 	int num_wrap = 2;
-	const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};;
+//	const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};;
   const wxString wrap_choices_string[] = {_("manual"), _("automated")};
 
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Combo(ID_WRAPPED_METER_MODE,_("wrap"),&m_WrappedMode,num_wrap,wrap_choices_string,_("Choose the meter mode"));
-	m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
+	//m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
   m_Gui->Divider();
   mafVME *start_vme = GetStartVME();
   if (start_vme && start_vme->IsMAFType(mafVMELandmarkCloud))
@@ -1428,9 +1428,9 @@ mmgGui* medVMEWrappedMeter::CreateGui()
     sub_id = GetLinkSubId("EndVME2");
     m_EndVme2Name = (sub_id != -1) ? ((mafVMELandmarkCloud *)end_vme2)->GetLandmarkName(sub_id) : _("none");
   }
-  else
-    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : _("none");
-    m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,_("End 2"), _("Select the vme representing \nthe point for line distance"));
+//  else
+//    m_EndVme2Name = end_vme2 ? end_vme2->GetName() : _("none");
+ //   m_Gui->Button(ID_END2_METER_LINK,&m_EndVme2Name,_("End 2"), _("Select the vme representing \nthe point for line distance"));
 
   
   mafVME *wrapped_vme = GetWrappedVME();
@@ -1439,8 +1439,8 @@ mmgGui* medVMEWrappedMeter::CreateGui()
   m_Gui->Bool(ID_WRAPPED_SIDE,"reverse direction", &m_WrapSide ,1);
   //m_Gui->Bool(ID_WRAPPED_REVERSE,"reverse wrap", &m_WrapReverse,1);
 
-  if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
-    m_Gui->Enable(ID_END2_METER_LINK,false);
+ // if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
+ //   m_Gui->Enable(ID_END2_METER_LINK,false);
 
   m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP);
   m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP);
@@ -1479,8 +1479,6 @@ mmgGui* medVMEWrappedMeter::CreateGui()
 			}
 		}
 	}
-	
-
   
   m_Gui->Button(ID_ADD_POINT, _("Add"), "" ,"");
   m_Gui->Button(ID_REMOVE_POINT, _("Remove"), "" ,"");
@@ -1511,7 +1509,7 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
     {
       case ID_START_METER_LINK:
       case ID_END1_METER_LINK:
-      case ID_END2_METER_LINK:
+    //  case ID_END2_METER_LINK:
       case ID_WRAPPED_METER_LINK:
       {
         mafID button_id = e->GetId();
@@ -1536,11 +1534,11 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
             SetMeterLink("EndVME1", n);
             m_EndVme1Name = n->GetName();
           }
-          else if (button_id == ID_END2_METER_LINK)
+    /*      else if (button_id == ID_END2_METER_LINK)
           {
             SetMeterLink("EndVME2", n);
             m_EndVme2Name = n->GetName();
-          }
+          }*/
           else if (button_id == ID_WRAPPED_METER_LINK)
           {
             SetMeterLink("WrappedVME", n);
@@ -1553,18 +1551,18 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
       break;
 	  case ID_METER_MODE:
 	  {
-		  if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
+		/*  if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
 		  {  
         m_Gui->Enable(ID_END2_METER_LINK,false);
-		  }
-		  else if(GetMeterAttributes()->m_MeterMode ==  LINE_DISTANCE)
+		  }*/
+		/*  else if(GetMeterAttributes()->m_MeterMode ==  LINE_DISTANCE)
 		  { 
 			  m_Gui->Enable(ID_END2_METER_LINK,true);
 		  }
 		  else if(GetMeterAttributes()->m_MeterMode ==  LINE_ANGLE)
 		  {       
 			  m_Gui->Enable(ID_END2_METER_LINK,true);
-		  }
+		  }*/
       
       Modified();
 			InternalUpdate();
