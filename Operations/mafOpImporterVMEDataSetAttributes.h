@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVMEDataSetAttributes.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-04-30 16:55:35 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni   
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,6 +70,12 @@ public:
   Are we using the time stamp file?*/
   void SetUseTSFile(bool useTSFile);
 
+  void SetUseIdArrayFlag(bool useIdArray) {m_UseIdArray = useIdArray;};
+  bool GetUseIdArrayFlag() {return m_UseIdArray;};
+
+  void SetIdArrayName(const char *idArrayName) {m_IdArrayName = idArrayName; };
+  const char *GetIdArrayName() { return m_IdArrayName.GetCStr(); };
+
   /** 
   Set the attribute data type*/
   void SetDataTypeToPointData();
@@ -115,5 +121,10 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 	void EnableTimeVaryingGui( bool enable );
+
+  /** use data array for cell id */
+  int m_UseIdArray;
+  mafString m_IdArrayName;
+
 };
 #endif

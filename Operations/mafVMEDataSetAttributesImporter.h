@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 13:33:30 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-04-30 16:55:35 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,6 +52,35 @@ public:
   void TimeVaryingOff() {m_TimeVarying = false;};
   void SetTimeVaryingFlag(bool flag) {m_TimeVarying = flag;};
   bool GetTimeVaryingFlag() {return m_TimeVarying;};
+
+  /** An id array can be used to map vtk cell or points ID to special ids,
+  this is useful for interfacing with finite elements simulation software
+  for example the following input attributes file:
+
+  ELEM	EPEL1
+  49445	0.0004
+  41871	0.0035
+  41995	0.0045
+  
+  has elements with ID 49445, 41871, 41995
+  
+  if this array is present in vtk data structure:
+
+  ANSYS_ELEMENT_ID 1 3 int
+  41995 49740 41871
+
+  it can be used to map vtk ids to ansys one
+
+  vtkId     0        1      2
+  ansysId 41995    49740  41871
+  */
+  void UseIdArrayOn() {m_UseIdArray = true;};
+  void UseIdArrayOff() {m_UseIdArray = false;};
+  void SetUseIdArrayFlag(bool useIdArray) {m_UseIdArray = useIdArray;};
+  bool GetUseIdArrayFlag() {return m_UseIdArray;};
+
+  void SetIdArrayName(const char *idArrayName) {m_IdArrayName = idArrayName; };
+  const char *GetIdArrayName() { return m_IdArrayName.GetCStr(); };
 
   /**
   Set the prefix of the attribute files; the prefix is the 
@@ -121,6 +150,10 @@ protected:
 
   /** use timestamp file*/
   bool m_UseTSFile;
+
+  /** use data array for attributes id */
+  bool m_UseIdArray;
+  mafString m_IdArrayName;
 
   /** result type*/
   int m_AttributeType;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVMEDataSetAttributes.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-16 09:48:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-04-30 16:55:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,9 @@ mafOp(label)
   
   m_InputPreserving = false;
   m_Input = NULL;
+
+  m_UseIdArray = false;
+  m_IdArrayName = "ANSYS_ELEMENT_ID";
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +108,8 @@ int mafOpImporterVMEDataSetAttributes::Read()
   attributesImporter->SetTSFileName(m_TSFileName.GetCStr());
   attributesImporter->SetFilePrefix(m_FilePrefix.GetCStr());
   attributesImporter->SetAttributeType(m_AttributeType);
+  attributesImporter->SetUseIdArrayFlag(m_UseIdArray);
+  attributesImporter->SetIdArrayName(m_IdArrayName.GetCStr());
 
   int returnValue = attributesImporter->Read();
 
@@ -146,6 +151,8 @@ enum Mesh_Importer_ID
   ID_UseTSFile,
   ID_TSFileName,
   ID_TimeVarying,
+  ID_UseIdArray,
+  ID_IdArrayName,
   ID_OK,
   ID_CANCEL,
 };
@@ -180,6 +187,14 @@ void mafOpImporterVMEDataSetAttributes::CreateGui()
   m_Gui->Label("Importer type",true);
   m_Gui->Combo(ID_AttributeType,"",&m_AttributeType,2,attributeType);
   m_Gui->Divider(2);
+
+  m_Gui->Label("use id map array");
+  m_Gui->Bool(ID_UseIdArray,"",&m_UseIdArray);
+  m_Gui->Divider();
+  m_Gui->Label("id map array name:",true);
+  m_Gui->String(ID_IdArrayName,	"",	&m_IdArrayName);
+  m_Gui->Enable(ID_IdArrayName, m_UseIdArray ? true : false);
+  m_Gui->Divider();
 
   m_Gui->Divider();
   m_Gui->OkCancel();
@@ -218,6 +233,10 @@ void mafOpImporterVMEDataSetAttributes::OnEvent(mafEventBase *maf_event)
 
     case ID_UseTSFile:
       m_Gui->Enable(ID_TSFileName,m_UseTSFile ? true : false);
+    break;
+    
+    case ID_UseIdArray:
+      m_Gui->Enable(ID_IdArrayName, m_UseIdArray ? true : false);
     break;
 
     case wxOK:

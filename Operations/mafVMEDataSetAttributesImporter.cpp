@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 13:33:30 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-04-30 16:55:35 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,8 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+
+const int DEBUG_MODE = true;
 
 #include "mafVMEDataSetAttributesImporter.h"
 
@@ -51,7 +53,7 @@
 #include <vcl_sstream.h>
 #include <vcl_algorithm.h>
 #include <vcl_string.h>
-
+#include <vcl_map.h>
 #include "vnl/vnl_matrix.h"
 
 mafVMEDataSetAttributesImporter::mafVMEDataSetAttributesImporter()
@@ -66,6 +68,8 @@ mafVMEDataSetAttributesImporter::mafVMEDataSetAttributesImporter()
   m_FileExtension = "";
   SetAttributeTypeToPointData();
   UseTSFileOff();
+  UseIdArrayOff();
+  m_IdArrayName = "UNDEFINED";
 }
 
 mafVMEDataSetAttributesImporter::~mafVMEDataSetAttributesImporter()
@@ -206,46 +210,49 @@ int mafVMEDataSetAttributesImporter::Read()
   }
 
   // file enumeration is starting from 1
-  int index = 1;
+  int fileId = 1;
   
+  // create the cell id hash table: 
+  vcl_map<int, int> attributeFileAnsysIdToRowIdIMap;
+
   while (1)
   {
     // build the ith file name
     
     //build the index part
     vcl_ostringstream number;     
-    number << std::setfill('0') << std::setw(4) << index;
+    number << std::setfill('0') << std::setw(4) << fileId;
       
     // build the full name
-    mafString ithFileName = m_ResultsDir;
-    ithFileName.Append(vclFilePrefix.c_str());
-    if (m_TimeVarying) ithFileName.Append(number.str().c_str()) ;
-    ithFileName.Append(m_FileExtension);
+    mafString ithAttributesFileName = m_ResultsDir;
+    ithAttributesFileName.Append(vclFilePrefix.c_str());
+    if (m_TimeVarying) ithAttributesFileName.Append(number.str().c_str()) ;
+    ithAttributesFileName.Append(m_FileExtension);
      
-    vtkGenericWarningMacro(<< "reading "<< ithFileName.GetCStr() << endl);
+    vtkGenericWarningMacro(<< "reading "<< ithAttributesFileName.GetCStr() << endl);
     
     // open the ith file
-    vcl_ifstream ithFileStream(ithFileName.GetCStr(), std::ios::in);
-    if (ithFileStream.is_open() == false)
+    vcl_ifstream ithAttributesFileStream(ithAttributesFileName.GetCStr(), std::ios::in);
+    if (ithAttributesFileStream.is_open() == false)
     {
-      if (index == 1)
+      if (fileId == 1)
       {
-        ithFileStream.close();
+        ithAttributesFileStream.close();
         mafWarningMessageMacro("File with index 1 not found!");
         return MAF_ERROR;
       }
       else
       {
-        ithFileStream.close();
+        ithAttributesFileStream.close();
         break;
       }
     }
 
-    if (index == 1)
+    if (fileId == 1)
     {
       char buf[1000];
       // fill the vector representing the result labels from the file of index 1
-      ithFileStream.getline(buf, 1000, '\n');
+      ithAttributesFileStream.getline(buf, 1000, '\n');
 
       // associate an istringstream with full line
       vcl_istringstream inputStrStream(buf);
@@ -262,42 +269,70 @@ int mafVMEDataSetAttributesImporter::Read()
     else
     {
       // discard the line containing the labels from the other files
-      ithFileStream.ignore(INT_MAX, '\n');
+      ithAttributesFileStream.ignore(INT_MAX, '\n');
     }
 
     // fill the result matrix
-    vnl_matrix<double> tmpMatrix;
-    tmpMatrix.read_ascii(ithFileStream);
+    vnl_matrix<double> tmpAttributesMatrix;
+    tmpAttributesMatrix.read_ascii(ithAttributesFileStream);
     
     if (GetAttributeType() == POINT_DATA)
     {
-      if (tmpMatrix.rows() != numNodes)
+      if (tmpAttributesMatrix.rows() != numNodes)
       {
-        ithFileStream.close();
+        ithAttributesFileStream.close();
         vtkGenericWarningMacro("Number of nodes is  different from number of results!" << endl 
-          << "nodes:" << numNodes << endl << "results:" << tmpMatrix.rows() << endl );
+          << "nodes:" << numNodes << endl << "results:" << tmpAttributesMatrix.rows() << endl );
         vtkGenericWarningMacro(<< vcl_cerr);
         return MAF_ERROR;
       }
     }
     else if (GetAttributeType() == CELL_DATA)
     {
-      if (tmpMatrix.rows() != numElements)
+      if (tmpAttributesMatrix.rows() != numElements)
       {
-        ithFileStream.close();
+        ithAttributesFileStream.close();
         mafWarningMessageMacro("Number of elements different from number of results!");
         return MAF_ERROR;    
       }
     }
 
+    if (DEBUG_MODE)
+    {
+      std::ostringstream stringStream;
+      stringStream << std::endl;
+      stringStream << "tmpAttributesMatrix" << std::endl;
+      stringStream << tmpAttributesMatrix  << std::endl;
+      mafLogMessage(stringStream.str().c_str());
+    }
+
+    typedef vcl_map<int, int>::const_iterator  Iter;
+    
+
+    
+    int ansysIdCol = 0;
+
+    
+    for (int vtkId = 0; vtkId < tmpAttributesMatrix.rows(); vtkId++)
+    {
+      int ansysCellId = tmpAttributesMatrix(vtkId, ansysIdCol);
+      attributeFileAnsysIdToRowIdIMap.insert(vcl_map<int,int>::value_type(ansysCellId, vtkId));       
+      if (DEBUG_MODE)
+        {
+          std::ostringstream stringStream;
+          stringStream << "ansysCellId: " << ansysCellId << " vtkId: " << attributeFileAnsysIdToRowIdIMap[ansysCellId] << std::endl;
+          mafLogMessage(stringStream.str().c_str());
+        }
+    }  
+  
     // push the matrix in the matrix vector
-    attributesMatrixVector.push_back(tmpMatrix); 
-    ithFileStream.close();
+    attributesMatrixVector.push_back(tmpAttributesMatrix); 
+    ithAttributesFileStream.close();
     
     // exit for single time results
     if (m_TimeVarying == false) break;
     
-    index++;
+    fileId++;
   }
 
   // if UseTSFile is On check if number of ts in the txt file is the
@@ -314,35 +349,39 @@ int mafVMEDataSetAttributesImporter::Read()
 
   // fill the input vme
   
-  int nResultTuples = (GetAttributeType() == POINT_DATA) ? numNodes : numElements;
+  int attributesNumber = (GetAttributeType() == POINT_DATA) ? numNodes : numElements;
 
+  
   // for every time stamp
   for (int tsIndex = 0; tsIndex < numTS; tsIndex++)
   {
+    
+    vtkDataSet *inputVTKDatasetDeepCopy = NULL;
 
     // input structure
-    vtkDataSet *inputDataSetStructureCopy = NULL;
-
+    
     // get the current time
     float currentTime = GetUseTSFile() == true ? tsMatrixWith1Column(tsIndex, 0) : (double)tsIndex;
 
     mafVMEItemVTK *currentItem = mafVMEItemVTK::SafeDownCast(m_Input->GetDataVector()->GetItem(currentTime));
-    
+
+    vtkDataSet *currentItemVTKData = currentItem->GetData();
+
     // check if an item at the current time exists already
     bool itemExist = currentItem ? true : false;
 
     // the dataset attribute
-    vtkDataSetAttributes *attributeData = NULL;
+    vtkDataSetAttributes *targetAttributeData = NULL;
 
     if (itemExist) // only attach attribute data
     {
       if (GetAttributeType() == POINT_DATA)
       {
-        attributeData = currentItem->GetData()->GetPointData();
+        targetAttributeData = currentItem->GetData()->GetPointData();
       }
       else
       {
-        attributeData = currentItem->GetData()->GetCellData();
+        targetAttributeData = currentItem->GetData()->GetCellData();
       }
 
     }
@@ -351,15 +390,15 @@ int mafVMEDataSetAttributesImporter::Read()
 
       if (m_Input->IsA("mafVMEMesh"))
       {
-        inputDataSetStructureCopy = vtkUnstructuredGrid::New();
+        inputVTKDatasetDeepCopy = vtkUnstructuredGrid::New();
       }
       else if (m_Input->IsA("mafVMESurface"))
       {
-        inputDataSetStructureCopy = vtkPolyData::New();
+        inputVTKDatasetDeepCopy = vtkPolyData::New();
       }
       else if (m_Input->IsA("mafVMEVolume"))
       {
-        inputDataSetStructureCopy = vtkRectilinearGrid::New();
+        inputVTKDatasetDeepCopy = vtkRectilinearGrid::New();
       }
       else
       {
@@ -367,45 +406,124 @@ int mafVMEDataSetAttributesImporter::Read()
         return MAF_ERROR;
       }
 
-      inputDataSetStructureCopy->DeepCopy(m_Input->GetOutput()->GetVTKData());
+      inputVTKDatasetDeepCopy->DeepCopy(m_Input->GetOutput()->GetVTKData());
 
-      numNodes = inputDataSetStructureCopy->GetNumberOfPoints();
-      numElements = inputDataSetStructureCopy->GetNumberOfCells();
+      numNodes = inputVTKDatasetDeepCopy->GetNumberOfPoints();
+      numElements = inputVTKDatasetDeepCopy->GetNumberOfCells();
 
       if (GetAttributeType() == POINT_DATA)
       {
-        attributeData = inputDataSetStructureCopy->GetPointData();
+        targetAttributeData = inputVTKDatasetDeepCopy->GetPointData();
       }
       else
       {
-        attributeData = inputDataSetStructureCopy->GetCellData();
+        targetAttributeData = inputVTKDatasetDeepCopy->GetCellData();
       }
-
     }  
 
-    // for every column add the array to the dataset attribute data  
-    for (int j = 0; j < labelsVector.size() - 1; j++)
-    {
-      vtkMAFSmartPointer<vtkDoubleArray> dataArray;
-      dataArray->SetNumberOfComponents(1);
-      dataArray->SetName(labelsVector[j+1].c_str());
-      dataArray->SetNumberOfTuples(nResultTuples);      
+    vtkIntArray *idArray = NULL;
 
-      // for every row
-      for (int i = 0; i < nResultTuples; i++)
+    
+    if (m_UseIdArray == true)
+    {
+      // get the cell id array
+      if (GetAttributeType() == POINT_DATA)
       {
-        dataArray->SetValue(i, attributesMatrixVector[tsIndex](i, j+1));
-      }       
 
-      attributeData->AddArray(dataArray); 
-    } // for each label
-     
-    if (inputDataSetStructureCopy)
-    {
-      m_Input->SetData(inputDataSetStructureCopy,currentTime);
+        idArray = vtkIntArray::
+          SafeDownCast(
+          currentItemVTKData->GetPointData()->GetArray(m_IdArrayName.GetCStr())
+          );
+
+        if (idArray == NULL)
+        {
+          // try active scalar
+          idArray = vtkIntArray::
+            SafeDownCast(
+            currentItemVTKData->GetPointData()->GetScalars(m_IdArrayName.GetCStr())
+            );
+
+        }
+        if (idArray == NULL)
+          {
+            std::ostringstream stringStream;
+            stringStream << "Point Data Array " << m_IdArrayName.GetCStr() << " does not exist!" << std::endl;
+            stringStream << "exiting with MAF_ERROR" << std::endl;
+            return MAF_ERROR;
+            mafLogMessage(stringStream.str().c_str());
+          }
+        
+        assert(idArray);
+      }
+      else
+      {
+        idArray = vtkIntArray::
+          SafeDownCast(
+          currentItemVTKData->GetCellData()->GetArray(m_IdArrayName.GetCStr())
+          );
+
+        if (idArray == NULL)
+        {
+          // try active scalar
+          idArray = vtkIntArray::
+            SafeDownCast(
+            currentItemVTKData->GetCellData()->GetScalars(m_IdArrayName.GetCStr())
+            );
+        }
+        if (idArray == NULL)
+        {
+          std::ostringstream stringStream;
+          stringStream << "Cell Data Array " << m_IdArrayName.GetCStr() << " does not exist!" << std::endl;
+          stringStream << "exiting with MAF_ERROR" << std::endl;
+          return MAF_ERROR;
+          mafLogMessage(stringStream.str().c_str());
+        }
+
+        assert(idArray);
+      }
+      
     }
 
-    vtkDEL(inputDataSetStructureCopy);
+    // for everery column add the array to the dataset attribute data  
+    for (int labelId = 0; labelId < labelsVector.size() - 1; labelId++)
+    {
+      vtkMAFSmartPointer<vtkDoubleArray> attributeDoubleArray;
+      attributeDoubleArray->SetNumberOfComponents(1);
+      attributeDoubleArray->SetName(labelsVector[labelId+1].c_str());
+      attributeDoubleArray->SetNumberOfTuples(attributesNumber);      
+
+      if (m_UseIdArray == true)
+      {     
+        // for every row
+        for (int vtkId = 0; vtkId < attributesNumber; vtkId++)
+        {
+          int ansysId = idArray->GetValue(vtkId);
+          int inputAttributeTextFileRow = attributeFileAnsysIdToRowIdIMap[ansysId];
+
+          attributeDoubleArray->SetValue(
+            vtkId, attributesMatrixVector[tsIndex](inputAttributeTextFileRow, labelId+1));
+        }       
+      }
+      else
+      {
+        // for every row
+        for (int vtkId = 0; vtkId < attributesNumber; vtkId++)
+        {
+          attributeDoubleArray->SetValue(
+            vtkId, attributesMatrixVector[tsIndex](vtkId, labelId+1));
+        }
+      }
+
+      targetAttributeData->AddArray(attributeDoubleArray); 
+
+    } // for each label
+     
+    if (inputVTKDatasetDeepCopy)
+    {
+      m_Input->SetData(inputVTKDatasetDeepCopy,currentTime);
+    }
+
+    vtkDEL(inputVTKDatasetDeepCopy);
 
   } // for every ts  
   
