@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 14:31:13 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-04-30 15:02:24 $
+  Version:   $Revision: 1.13 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,6 +61,7 @@ medVMEWrappedMeter::medVMEWrappedMeter()
 	m_WrappedMode   = MANUAL_WRAP;
   m_WrapSide      = 0;
   m_WrapReverse   = 0;
+  m_Precision     = 5;
   
   m_StartVmeName  = "";
   m_EndVme1Name   = "";
@@ -448,7 +449,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 //     }
 */
     
-    short wrapside = m_WrapSide == 0 ? (-5) : (5);
+    short wrapside = m_WrapSide == 0 ? (-(m_Precision)) : (m_Precision);
     while(n1 != 0)
     {
      locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
