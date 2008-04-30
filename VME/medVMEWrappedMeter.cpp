@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 08:32:19 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-04-30 09:21:56 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -363,7 +363,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 		vec3[2] = local_end[2] - local_wrapped_center[2];
 
     double vectorProduct[3];
-    vtkMath::Cross(vec1,vec2, vectorProduct);
+    vtkMath::Cross(vec1,vec2, vectorProduct); 
     if(vectorProduct[0] == 0.0 && vectorProduct[1] == 0.0 && vectorProduct[2] == 0.0)
       return;
     
@@ -385,31 +385,30 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     locator->SetDataSet(transformFirstData->GetOutput());
     locator->BuildLocator();
 
-    if(locator->InsideOrOutside(local_start) <= 0 || locator->InsideOrOutside(local_end) <= 0) 
-    {
-      //if one point is inside connect start and end
-      m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
-      m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-      m_LineSource->Update();
-      m_Goniometer->AddInput(m_LineSource->GetOutput());
+   //Control if Start or End point is inside vtk data (surface)
+   if(locator->InsideOrOutside(local_start) <= 0 || locator->InsideOrOutside(local_end) <= 0) 
+   {
+     //if one point is inside connect start and end
+     m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+     m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+     m_LineSource->Update();
+     m_Goniometer->AddInput(m_LineSource->GetOutput());
 
-      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+     m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
-      m_Goniometer->Modified();
-      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-      m_Goniometer->Update();
-      GetWrappedMeterOutput()->Update();
+     m_Goniometer->Modified();
+     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+     m_Goniometer->Update();
+     GetWrappedMeterOutput()->Update();
 
-      ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
-      return;
-    }
+     ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+     return;
+  }
 
     vtkMAFSmartPointer<vtkPoints> temporaryIntersection;
     vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
     vtkMAFSmartPointer<vtkPoints> pointsIntersection2;
-
    
-
     double p1[3], p2[3], p3[3];
     p1[0] = local_start[0];
     p1[1] = local_start[1];
@@ -428,29 +427,34 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     int count =0;
     int n1 = -1; // number of intersections
 
-    //control if there is an intersection
+    //control if there is an intersection //Mucci
     locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
-    int nControl = temporaryIntersection->GetNumberOfPoints();
-    if(nControl==0)
-    {
-      //if there is no intersection with geometry
-      m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
-      m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-      m_LineSource->Update();
-      m_Goniometer->AddInput(m_LineSource->GetOutput());
-      
-      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
-      m_Goniometer->Modified();
-      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-      m_Goniometer->Update();
-      GetWrappedMeterOutput()->Update();
-
-      ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
-      return;
-    }
+/*
+  code to control if exist an intersection between the line draw from start point to end point and 
+  the vtk data (surface)
+//     int nControl = temporaryIntersection->GetNumberOfPoints();
+//     if(nControl==0)
+//     {
+//       //if there is no intersection with geometry
+//       m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+//       m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+//       m_LineSource->Update();
+//       m_Goniometer->AddInput(m_LineSource->GetOutput());
+//       
+//       m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+// 
+//       m_Goniometer->Modified();
+//       m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+//       m_Goniometer->Update();
+//       GetWrappedMeterOutput()->Update();
+// 
+//       ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+//       return;
+//     }
+*/
     
-    short wrapside = m_WrapSide == 0 ? (-1) : (1);
+    short wrapside = m_WrapSide == 0 ? (-5) : (5);
     while(n1 != 0)
     {
      locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
@@ -551,7 +555,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     
     m_PlaneCutter->SetOrigin(local_wrapped_center);
     m_PlaneCutter->SetNormal(m_PlaneSource->GetNormal());
-    
 
     
     m_Cutter->SetInput(transformFirstData->GetOutput());
@@ -570,24 +573,24 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
 		if( normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0) return; // midpoint and center are the same point
 
-		double d1,d2;
-		d1 = vtkMath::Distance2BetweenPoints(local_start, local_wrapped_center);
-		d2 = vtkMath::Distance2BetweenPoints(local_start, midPoint);
+		//double d1,d2;
+		//d1 = vtkMath::Distance2BetweenPoints(local_start, local_wrapped_center);
+		//d2 = vtkMath::Distance2BetweenPoints(local_start, midPoint);
 
 
-    double length = vtkMath::Norm(normal);
-    normal[0] = (d1-d2<=0? 1 : (-1))*normal[0] / length;
-    normal[1] = (d1-d2<=0? 1 : (-1))*normal[1] / length;
-    normal[2] = (d1-d2<=0? 1 : (-1))*normal[2] / length;
+  //  double length = vtkMath::Norm(normal);
+  //  normal[0] = (d1-d2<=0? 1 : (-1))*normal[0] / length;
+  //  normal[1] = (d1-d2<=0? 1 : (-1))*normal[1] / length;
+  //  normal[2] = (d1-d2<=0? 1 : (-1))*normal[2] / length;
 
-		if(/*m_WrapReverse*/ m_WrapSide)
-		{
-      normal[0] = - normal[0];
-			normal[1] = - normal[1];
-			normal[2] = - normal[2];
-		}
+ 	//	if(/*m_WrapReverse*/ m_WrapSide)
+  //  {
+  //    normal[0] = - normal[0];
+ 	//		normal[1] = - normal[1];
+ 	//		normal[2] = - normal[2];
+ 	//	}
 
-    
+
     m_PlaneClip->SetOrigin(midPoint);
     m_PlaneClip->SetNormal(normal);
 
@@ -647,7 +650,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
   m_Goniometer->Update();
   GetWrappedMeterOutput()->Update();
 
-  ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+  //ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));//Mucci
 }
 //-----------------------------------------------------------------------
 void medVMEWrappedMeter::InternalUpdateManual()
@@ -1147,7 +1150,7 @@ void medVMEWrappedMeter::InternalUpdateManual()
 	m_Goniometer->Update();
 	GetWrappedMeterOutput()->Update();
 	
-	ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+	//ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));//Mucci
 }
 //-----------------------------------------------------------------------
 int medVMEWrappedMeter::InternalStore(mafStorageElement *parent)
