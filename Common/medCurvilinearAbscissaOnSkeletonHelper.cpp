@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 16:49:43 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-05-01 14:06:02 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -387,6 +387,7 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( medVMEP
 
   m_ConstraintPolylineGraph->Clear();
   m_ConstraintPolylineGraph->CopyFromPolydata(pd);
+  m_ConstraintPolylineGraph->MergeSimpleJoinedBranches();   //BES 1.5.2008 - added to support "not correct" polylines
 
   if (DEBUG_MODE)
   {
