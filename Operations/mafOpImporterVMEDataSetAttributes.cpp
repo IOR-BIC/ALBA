@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVMEDataSetAttributes.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 16:55:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-05-02 08:57:36 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -241,12 +241,17 @@ void mafOpImporterVMEDataSetAttributes::OnEvent(mafEventBase *maf_event)
 
     case wxOK:
     {
+      this->OpStop(OP_RUN_OK);
+
       //WORKAROUND CODE 
       //referred to bug 933
-      mafEventMacro(mafEvent(this,VME_SHOW, m_Input, false));
-      mafEventMacro(mafEvent(this,VME_SHOW, m_Input, true));
+      if (m_Output != NULL)
+      {
+        mafEventMacro(mafEvent(this,VME_SHOW, m_Output, false));
+        mafEventMacro(mafEvent(this,VME_SHOW, m_Output, true));
+      }
       //END WORKAROUND CODE 
-      this->OpStop(OP_RUN_OK);
+
       return;
     }
     break;
