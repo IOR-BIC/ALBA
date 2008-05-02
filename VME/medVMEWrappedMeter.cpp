@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 15:02:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-05-02 12:12:16 $
+  Version:   $Revision: 1.14 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -423,7 +423,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     int n1 = -1; // number of intersections
 
     //control if there is an intersection //Mucci
-    locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
+    //locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
 
 /*
   code to control if exist an intersection between the line draw from start point to end point and 
@@ -468,12 +468,11 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
        // the order is important to understand the direction of the control
        vtkMath::Cross(v1,v2, vtemp);
        vtkMath::Cross(vtemp,v1, v2);
+       vtkMath::Normalize(v2);
      }
      
-     
-     double normalizedV2 = vtkMath::Normalize(v2);
      for(int i = 0; i<3; i++)
-       p2[i] += ((wrapside) * v2[i]/(normalizedV2));
+      p2[i] += ((wrapside) * v2[i]);
       
      count++;
     }
@@ -514,12 +513,11 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
         // the order is important to understand the direction of the control
         vtkMath::Cross(v1,v2, vtemp);
         vtkMath::Cross(vtemp,v1, v2);
+        vtkMath::Normalize(v2);
       }
 
-
-      double normalizedV2 = vtkMath::Normalize(v2);
       for(int i = 0; i<3; i++)
-        p2[i] += ((wrapside) * v2[i]/(normalizedV2));
+        p2[i] += ((wrapside) * v2[i]);
 
       count++;
     }
@@ -627,9 +625,9 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     m_Goniometer->AddInput(m_Clip->GetOutput());
     
 
-    m_Goniometer->Modified();
+  //  m_Goniometer->Modified();/Mucci
 
-    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+   // m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);//Mucci
   }
   else
     m_Distance = -1;
