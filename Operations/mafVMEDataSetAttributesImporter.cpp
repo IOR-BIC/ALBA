@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 16:55:35 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-05-02 11:10:46 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -363,9 +363,11 @@ int mafVMEDataSetAttributesImporter::Read()
     // get the current time
     float currentTime = GetUseTSFile() == true ? tsMatrixWith1Column(tsIndex, 0) : (double)tsIndex;
 
-    mafVMEItemVTK *currentItem = mafVMEItemVTK::SafeDownCast(m_Input->GetDataVector()->GetItem(currentTime));
+    int ni = m_Input->GetDataVector()->GetNumberOfItems();
+    mafVMEItem *it = m_Input->GetDataVector()->GetItem(currentTime);
+    
+    mafVMEItemVTK *currentItem = mafVMEItemVTK::SafeDownCast(it);
 
-    vtkDataSet *currentItemVTKData = currentItem->GetData();
 
     // check if an item at the current time exists already
     bool itemExist = currentItem ? true : false;
@@ -429,10 +431,9 @@ int mafVMEDataSetAttributesImporter::Read()
       // get the cell id array
       if (GetAttributeType() == POINT_DATA)
       {
-
         idArray = vtkIntArray::
           SafeDownCast(
-          currentItemVTKData->GetPointData()->GetArray(m_IdArrayName.GetCStr())
+          targetAttributeData->GetArray(m_IdArrayName.GetCStr())
           );
 
         if (idArray == NULL)
@@ -440,7 +441,7 @@ int mafVMEDataSetAttributesImporter::Read()
           // try active scalar
           idArray = vtkIntArray::
             SafeDownCast(
-            currentItemVTKData->GetPointData()->GetScalars(m_IdArrayName.GetCStr())
+            targetAttributeData->GetScalars(m_IdArrayName.GetCStr())
             );
 
         }
@@ -459,7 +460,7 @@ int mafVMEDataSetAttributesImporter::Read()
       {
         idArray = vtkIntArray::
           SafeDownCast(
-          currentItemVTKData->GetCellData()->GetArray(m_IdArrayName.GetCStr())
+          targetAttributeData->GetArray(m_IdArrayName.GetCStr())
           );
 
         if (idArray == NULL)
@@ -467,7 +468,7 @@ int mafVMEDataSetAttributesImporter::Read()
           // try active scalar
           idArray = vtkIntArray::
             SafeDownCast(
-            currentItemVTKData->GetCellData()->GetScalars(m_IdArrayName.GetCStr())
+            targetAttributeData->GetScalars(m_IdArrayName.GetCStr())
             );
         }
         if (idArray == NULL)
