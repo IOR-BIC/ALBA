@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 11:41:55 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-05-05 15:32:44 $
+  Version:   $Revision: 1.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -135,6 +135,7 @@ int mafOpImporterMSF::ImportMSF()
  
   mafNEW(m_Group);
   m_Group->SetName(group_name);
+  m_Group->ReparentTo(m_Input);
   
   while (mafNode *node = root->GetFirstChild())
   {
