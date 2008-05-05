@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 08:48:50 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2008-05-05 13:44:32 $
+  Version:   $Revision: 1.45 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,6 +143,11 @@ public:
 
   /** Open a Find VME dialog.*/
   void FindVME();
+
+  /* Set MAF Expert Mode*/
+  void MAFExpertModeOn(){MAFExpertMode = TRUE;};
+  void MAFExpertModeOff(){MAFExpertMode = FALSE;};
+  void SetMAFExpertMode(int value){MAFExpertMode = value;};
 
 protected:
   //---------------------------------------------------------

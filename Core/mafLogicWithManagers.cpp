@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 14:22:25 $
-  Version:   $Revision: 1.134 $
+  Date:      $Date: 2008-05-05 13:44:32 $
+  Version:   $Revision: 1.135 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-
+#include "mafDecl.h"
 
 #include "mafLogicWithManagers.h"
 #include <wx/config.h>
@@ -128,6 +128,7 @@ mafLogicWithManagers::mafLogicWithManagers()
 	m_Revision = _("0.1");
 
   m_User = new mafUser();
+
 }
 //----------------------------------------------------------------------------
 mafLogicWithManagers::~mafLogicWithManagers()
