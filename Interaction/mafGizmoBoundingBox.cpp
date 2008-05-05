@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 12:23:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-05-05 13:49:33 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -132,6 +132,13 @@ void mafGizmoBoundingBox::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
   m_BoxGizmo->SetAbsMatrix(*absPose);
+}
+
+//----------------------------------------------------------------------------
+void mafGizmoBoundingBox::SetPose(mafMatrix *pose)
+//----------------------------------------------------------------------------
+{
+  m_BoxGizmo->SetAbsMatrix(*pose);
 }
 
 //----------------------------------------------------------------------------
