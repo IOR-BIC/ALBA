@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:06:32 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2008-05-05 13:44:06 $
+  Version:   $Revision: 1.37 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,6 +18,9 @@
 #include <math.h>
 
 MAF_ID_IMP(REMOTE_COMMAND_CHANNEL)
+
+
+int MAFExpertMode = TRUE;
 
 static bool yelding;
 //----------------------------------------------------------------------------
