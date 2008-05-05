@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-02 12:12:16 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-05-05 09:51:47 $
+  Version:   $Revision: 1.15 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,7 @@ medVMEWrappedMeter::medVMEWrappedMeter()
 	m_WrappedMode   = MANUAL_WRAP;
   m_WrapSide      = 0;
   m_WrapReverse   = 0;
-  m_Precision     = 5;
+  m_Precision     = 10;
   
   m_StartVmeName  = "";
   m_EndVme1Name   = "";
@@ -422,32 +422,31 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     int count =0;
     int n1 = -1; // number of intersections
 
-    //control if there is an intersection //Mucci
-    //locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
+    //control if there is an intersection
+    locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
 
-/*
-  code to control if exist an intersection between the line draw from start point to end point and 
-  the vtk data (surface)
-//     int nControl = temporaryIntersection->GetNumberOfPoints();
-//     if(nControl==0)
-//     {
-//       //if there is no intersection with geometry
-//       m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
-//       m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-//       m_LineSource->Update();
-//       m_Goniometer->AddInput(m_LineSource->GetOutput());
-//       
-//       m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
-// 
-//       m_Goniometer->Modified();
-//       m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-//       m_Goniometer->Update();
-//       GetWrappedMeterOutput()->Update();
-// 
-//       ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
-//       return;
-//     }
-*/
+//  code to control if exist an intersection between the line draw from start point to end point and 
+//  the vtk data (surface)
+     int nControl = temporaryIntersection->GetNumberOfPoints();
+     if(nControl==0)
+     {
+       //if there is no intersection with geometry
+       m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+       m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+       m_LineSource->Update();
+       m_Goniometer->AddInput(m_LineSource->GetOutput());
+       
+       m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+ 
+       m_Goniometer->Modified();
+       m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+       m_Goniometer->Update();
+       GetWrappedMeterOutput()->Update();
+ 
+       ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
+       return;
+     }
+
     
     short wrapside = m_WrapSide == 0 ? (-(m_Precision)) : (m_Precision);
     while(n1 != 0)
@@ -1557,6 +1556,7 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
     case ID_WRAPPED_SIDE:
     case ID_WRAPPED_REVERSE:
       InternalUpdate();
+      ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
       break;
     case ID_ADD_POINT:
       {
