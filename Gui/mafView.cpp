@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 10:07:25 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-05-05 13:45:00 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -109,7 +109,8 @@ mmgGui* mafView::CreateGui()
   m_Gui = new mmgGui(this);
 
   mafString type_name = GetTypeName();
-  m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
+  if(MAFExpertMode == TRUE) 
+    m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
 
   return m_Gui;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-22 12:03:32 $
-  Version:   $Revision: 1.55 $
+  Date:      $Date: 2008-05-05 13:44:51 $
+  Version:   $Revision: 1.56 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -19,7 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-
+#include "mafDecl.h"
 
 #include "mafNode.h"
 #include "mafNodeIterator.h"
@@ -1240,8 +1240,9 @@ mmgGui* mafNode::CreateGui()
   m_Gui = new mmgGui(this);
   
   mafString type_name = GetTypeName();
-  m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
-  //m_Gui->Label("type: ", type_name);
+  if(MAFExpertMode == TRUE) 
+    m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print node debug information");
+  
   m_Gui->String(ID_NAME,"name :", &m_Name);
 	m_Gui->Divider();
 
