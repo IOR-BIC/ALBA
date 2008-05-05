@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 14:53:05 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2008-05-05 15:03:05 $
+  Version:   $Revision: 1.33 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -690,7 +690,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
     m_RenFront->AddActor2D(m_PlotActor);
     CreateLegend();
-    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+    //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
   //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
