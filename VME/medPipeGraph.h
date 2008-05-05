@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 09:43:40 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-05-05 14:53:05 $
+  Version:   $Revision: 1.16 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ public:
 
   void medPipeGraph::OnEvent(mafEventBase *maf_event); 
 
-  virtual void Create(mafSceneNode *n);
+  /*virtual*/ void Create(mafSceneNode *n);
 
   //Create plots of scalar data
   void UpdateGraph();
@@ -54,6 +54,12 @@ public:
 
   //Change signal color
   void ChangeSignalColor();
+
+  /** Set if visualize or not a particular signal */
+  void SetSignalToPlot(int index,bool plot);
+
+  void SetTitleX(mafString title);
+  void SetTitleY(mafString title);
   
 protected:
   mmgGui* CreateGui();

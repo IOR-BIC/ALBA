@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:31:49 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2008-05-05 14:53:05 $
+  Version:   $Revision: 1.32 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -224,6 +224,8 @@ void medPipeGraph::Create(mafSceneNode *n)
   //m_RenFront->AddActor2D(m_PlotActor);
 
   //vtkNEW(m_TimeLine);
+
+  CreateGui();
 }
 
 //----------------------------------------------------------------------------
@@ -551,6 +553,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         }
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     case ID_FIT_PLOT:
@@ -559,6 +562,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     case ID_SIGNALS_COLOR:
@@ -569,12 +573,14 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         ChangeSignalColor();
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     case ID_DRAW:
       {
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     case ID_LEGEND:
@@ -592,21 +598,25 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
           } 
           break;
         }
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     case ID_ITEM_NAME:
       {
         ChangeItemName();
         CreateLegend();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
     case ID_AXIS_NAME_X:
         m_PlotActor->SetXTitle(m_TitileX);
         ChangeAxisTitle();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
     case ID_AXIS_NAME_Y:
         m_PlotActor->SetYTitle(m_TitileY);
         ChangeAxisTitle();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
     case ID_CHECK_BOX:
       {
@@ -680,7 +690,29 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
     m_RenFront->AddActor2D(m_PlotActor);
     CreateLegend();
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
-
+//----------------------------------------------------------------------------
+void medPipeGraph::SetSignalToPlot(int index,bool plot)
+//----------------------------------------------------------------------------
+{
+  m_CheckBox->CheckItem(index,plot);
+}
+//----------------------------------------------------------------------------
+void medPipeGraph::SetTitleX(mafString title)
+//----------------------------------------------------------------------------
+{
+  m_TitileX = title.GetCStr();
+  m_PlotActor->SetXTitle(m_TitileX);
+  ChangeAxisTitle();
+}
+//----------------------------------------------------------------------------
+void medPipeGraph::SetTitleY(mafString title)
+//----------------------------------------------------------------------------
+{
+  m_TitileY = title.GetCStr();
+  m_PlotActor->SetYTitle(m_TitileY);
+  ChangeAxisTitle();
+}
