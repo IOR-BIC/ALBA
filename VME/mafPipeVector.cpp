@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:16:25 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-05-06 10:56:07 $
+  Version:   $Revision: 1.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -331,6 +331,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Apd->AddInput(m_ArrowTip->GetOutput());
           m_Apd->Update();
         }
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_USE_SPHERE:
         if (m_UseSphere == FALSE)
@@ -344,6 +345,7 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Apd->AddInput(m_Sphere->GetOutput());
           m_Apd->Update();
         }
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_USE_BUNCH:
         if (m_UseBunch == TRUE)
@@ -359,14 +361,17 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
           m_Bunch->RemoveAllInputs();
         }
         EnableWidget();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_INTERVAL:
         m_Bunch->RemoveAllInputs();
         AllVector();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_STEP:
         m_Bunch->RemoveAllInputs();
         AllVector();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_ALL_BUNCH:
         if (m_AllBunch == TRUE)
@@ -379,9 +384,11 @@ void mafPipeVector::OnEvent(mafEventBase *maf_event)
         else
         {
           m_Interval = 0;
+          m_Gui->Update();
           m_Bunch->RemoveAllInputs();
         }
         EnableWidget();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       default:
         mafEventMacro(*e);
