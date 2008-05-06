@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 09:00:28 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-05-06 10:19:28 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -152,7 +152,7 @@ void medOpExtrusionHolesTest::TestExtrude()
 	medOpExtrusionHoles *extrusion = new medOpExtrusionHoles();
 	extrusion->TestModeOn();
 	extrusion->SetInput(cube);
-	extrusion->SetExtrusionFactor(4.0);
+	extrusion->SetExtrusionFactor(4.0);//diameter is 5,09
 	extrusion->OpRun();
 	extrusion->ExtractFreeEdge();
 	//Select 1° hole with point ID 1
@@ -165,7 +165,7 @@ void medOpExtrusionHolesTest::TestExtrude()
 	resultPolydata->GetBounds(bounds);
 
   double epsilon = 0.01;
-	CPPUNIT_ASSERT(bounds[1]-bounds[0] < 4+epsilon && bounds[1]-bounds[0] > 4-epsilon && bounds[3]-bounds[2] < 4+epsilon && bounds[3]-bounds[2] > 4-epsilon && bounds[5]-bounds[4] < 8+epsilon && bounds[5]-bounds[4] > 8-epsilon);
+	CPPUNIT_ASSERT(bounds[1]-bounds[0] < 4+epsilon && bounds[1]-bounds[0] > 4-epsilon && bounds[3]-bounds[2] < 4+epsilon && bounds[3]-bounds[2] > 4-epsilon && bounds[5]-bounds[4] < 24.37+epsilon && bounds[5]-bounds[4] > 24.37-epsilon);
 	
 	cube = NULL;
 
