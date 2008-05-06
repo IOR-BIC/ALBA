@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-14 11:42:23 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-05-06 10:54:34 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1849,10 +1849,10 @@ void mafTransform::BuildVector(double coeff, const double *inVector, double *out
 
 void mafTransform::FindPerpendicularVersors( double inVersorN[3], double outVersorP[3], double outVersorQ[3] )
 {
-  const double M_SQRT1_2 = 0.707106781186547524401;
+  const double sqrt1_2 = 0.707106781186547524401;
 
   assert(inVersorN && outVersorP && outVersorQ);
-  if (abs(inVersorN[2]) > M_SQRT1_2) {
+  if (abs(inVersorN[2]) > sqrt1_2) {
     // choose p in y-z plane
     double a = inVersorN[1]*inVersorN[1] + inVersorN[2]*inVersorN[2];
     double k = sqrt(a);
