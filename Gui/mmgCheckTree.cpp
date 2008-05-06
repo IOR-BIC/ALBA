@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 08:45:25 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-05-06 14:58:18 $
+  Version:   $Revision: 1.27 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,10 +22,12 @@
 
 #include "mmgCheckTree.h" 
 #include "mafDecl.h"
+#include "mafView.h"
 #include "mafPics.h" 
+
 #include "mafNode.h"
 #include "mafVME.h"
-#include "mafView.h"
+#include "mafNodeIterator.h"
 #include <vector>
 
 //=========================================================================================
@@ -97,10 +99,11 @@ mmgCheckTree::mmgCheckTree( wxWindow* parent,wxWindowID id, bool CloseButton, bo
   InitializeImageList();
 }
 //----------------------------------------------------------------------------
-mmgCheckTree::~mmgCheckTree( )
+mmgCheckTree::~mmgCheckTree()
 //----------------------------------------------------------------------------
 {
-	if(m_RMenu) delete m_RMenu;
+	if(m_RMenu)
+    delete m_RMenu;
 	m_NodeTree->PopEventHandler(true);
 }
 //----------------------------------------------------------------------------
@@ -246,38 +249,44 @@ void mmgCheckTree::VmeShow(mafNode *vme, bool show)
 int mmgCheckTree::GetVmeStatus(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(!m_View) return NODE_NON_VISIBLE;
+  if(!m_View)
+    return NODE_NON_VISIBLE;
   return m_View->GetNodeStatus(vme);
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
-  int dataStatus = 1;
-  int icon_index;
-
-  dataStatus = ((mafVME *)vme)->IsDataAvailable() ? 0 : 1;
-  icon_index = ClassNameToIcon(vme->GetTypeName()) + (GetVmeStatus(vme)*2) + dataStatus;
-  SetNodeIcon( (long)vme, icon_index );
-  
-  if (vme->GetNumberOfLinks() != 0)
+  mafNodeIterator *iter = vme->NewIterator();
+  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
-    mafNode::mafLinksMap *links = vme->GetLinks();
-    mafVME *linkedVME = NULL;
-    for (mafNode::mafLinksMap::iterator it=links->begin();it!=links->end();it++)
+    int dataStatus = 1;
+    int icon_index;
+
+    dataStatus = ((mafVME *)node)->IsDataAvailable() ? 0 : 1;
+    icon_index = ClassNameToIcon(node->GetTypeName()) + (GetVmeStatus(node)*2) + dataStatus;
+    SetNodeIcon( (long)node, icon_index );
+
+    if (node->GetNumberOfLinks() != 0)
     {
-      if(it->second.m_Node)
+      mafNode::mafLinksMap *links = node->GetLinks();
+      mafVME *linkedVME = NULL;
+      for (mafNode::mafLinksMap::iterator it = links->begin(); it != links->end(); it++)
       {
-        linkedVME = mafVME::SafeDownCast(it->second.m_Node);
-        if (linkedVME)
+        if(it->second.m_Node)
         {
-          dataStatus = linkedVME->IsDataAvailable() ? 0 : 1;
-          icon_index = ClassNameToIcon(linkedVME->GetTypeName()) + (GetVmeStatus(linkedVME)*2) + dataStatus;
-          SetNodeIcon( (long)linkedVME, icon_index );
+          linkedVME = mafVME::SafeDownCast(it->second.m_Node);
+          if (linkedVME)
+          {
+            dataStatus = linkedVME->IsDataAvailable() ? 0 : 1;
+            icon_index = ClassNameToIcon(linkedVME->GetTypeName()) + (GetVmeStatus(linkedVME)*2) + dataStatus;
+            SetNodeIcon( (long)linkedVME, icon_index );
+          }
         }
       }
     }
   }
+  iter->Delete();
 //  int icon_index = ClassNameToIcon(vme->GetTypeName()) + (GetVmeStatus(vme)*2) + dataStatus;
 //  SetNodeIcon( (long)vme, icon_index );
 }
@@ -292,29 +301,25 @@ void mmgCheckTree::ViewSelected(mafView *view)
 void mmgCheckTree::TreeUpdateIcon()
 //----------------------------------------------------------------------------
 {
-  m_NodeTable->BeginFind();
-	while(wxNode* node = m_NodeTable->Next())
-	{
-		mmgTreeTableElement* el = (mmgTreeTableElement*)node->GetData();
-		assert(el);
-		wxTreeItemId i = el->GetItem(); 
-		if(i.IsOk())
-			VmeUpdateIcon((mafNode*)NodeFromItem(i));
-	}
+  if (m_SelectedNode != NULL)
+  {
+  	VmeUpdateIcon(m_SelectedNode->GetRoot());
+  }
 }
 //----------------------------------------------------------------------------
 void mmgCheckTree::ViewDeleted(mafView *view)
 //----------------------------------------------------------------------------
 {
-	if(view != m_View) return;
+	if(view != m_View) 
+    return;
 	ViewSelected(NULL);
 }
 //----------------------------------------------------------------------------
 int mmgCheckTree::ClassNameToIcon(wxString classname)
 //----------------------------------------------------------------------------
 {
-  MapClassNameToIcon::iterator it=m_MapClassNameToIcon.find(classname.c_str());
-  if (it!= m_MapClassNameToIcon.end())
+  MapClassNameToIcon::iterator it = m_MapClassNameToIcon.find(classname.c_str());
+  if (it != m_MapClassNameToIcon.end())
     return int((*it).second);
   else
   {
@@ -381,12 +386,14 @@ void mmgCheckTree::InitializeImageList()
     for( s=0; s<num_of_status; s++)
     {
       wxBitmap vmeico = mafPics.GetVmePic(name);
-      if(s==0) vmeico = mafGrayScale(vmeico);
+      if(s == 0)
+        vmeico = mafGrayScale(vmeico);
       wxBitmap merged = MergeIcons(state_ico[s],vmeico);
       imgs->Add(merged);
 
       // Icons for missing data
-      if(s!=0) vmeico = mafGrayScale(vmeico);
+      if(s != 0)
+        vmeico = mafGrayScale(vmeico);
       vmeico = mafRedScale(vmeico);
       wxBitmap missingData = MergeIcons(state_ico[s],vmeico); // Same icon as above, but represent a 
       imgs->Add(missingData);                                 // node with no data available.
@@ -428,7 +435,8 @@ void mmgCheckTree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
   wxTreeItemId i;
-  if(m_PreventNotify) return;
+  if(m_PreventNotify)
+    return;
 
   i = event.GetItem();
   if(i.IsOk())
