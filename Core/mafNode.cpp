@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 13:44:51 $
-  Version:   $Revision: 1.56 $
+  Date:      $Date: 2008-05-06 14:57:25 $
+  Version:   $Revision: 1.57 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1022,13 +1022,13 @@ void mafNode::OnEvent(mafEventBase *e)
     }
 //    return;
   }
-  else if (e->GetChannel()==MCH_DOWN)
+  else if (e->GetChannel() == MCH_DOWN)
   {
     ForwardDownEvent(e);
     return;
   }
   // events arriving directly from another node
-  else if (e->GetChannel()==MCH_NODE)
+  else if (e->GetChannel() == MCH_NODE)
   {
     switch (e->GetId())
     {
@@ -1092,20 +1092,20 @@ int mafNode::InternalRestore(mafStorageElement *node)
 //-------------------------------------------------------------------------
 {
   // first restore node Name
-  if (node->GetAttribute("Name",m_Name))
+  if (node->GetAttribute("Name", m_Name))
   {
     // restore Id
     mafString id;
-    if (node->GetAttribute("Id",id))
+    if (node->GetAttribute("Id", id))
     {
       SetId((mafID)atof(id));
 
       // restore attributes
       RemoveAllAttributes();
       std::vector<mafObject *> attrs;
-      if (node->RestoreObjectVector("Attributes",attrs)!=MAF_OK)
+      if (node->RestoreObjectVector("Attributes",attrs) != MAF_OK)
       {
-        mafErrorMacro("Problems restoring attributes for node "<<GetName());
+        mafErrorMacro("Problems restoring attributes for node " << GetName());
 
         // do not return MAF_ERROR when cannot restore an attribute due to missing object type
         if (node->GetStorage()->GetErrorCode()!=mafStorage::IO_WRONG_OBJECT_TYPE)
@@ -1124,15 +1124,15 @@ int mafNode::InternalRestore(mafStorageElement *node)
       
       // restore Links
       RemoveAllLinks();
-      if (mafStorageElement *links_element=node->FindNestedElement("Links"))
+      if (mafStorageElement *links_element = node->FindNestedElement("Links"))
       {
         mafString num_links;
-        links_element->GetAttribute("NumberOfLinks",num_links);
+        links_element->GetAttribute("NumberOfLinks", num_links);
         int n=(int)atof(num_links);
-        mafStorageElement::ChildrenVector links_vector=links_element->GetChildren();
-        assert(links_vector.size()==n);
+        mafStorageElement::ChildrenVector links_vector = links_element->GetChildren();
+        assert(links_vector.size() == n);
         unsigned int i;
-        for (i=0;i<n;i++)
+        for (i = 0; i < n; i++)
         {
           mafString link_name;
           links_vector[i]->GetAttribute("Name",link_name);
@@ -1145,7 +1145,7 @@ int mafNode::InternalRestore(mafStorageElement *node)
         // restore children
         RemoveAllChildren();
         std::vector<mafObject *> children;
-        if (node->RestoreObjectVector("Children",children,"Node")!=MAF_OK)
+        if (node->RestoreObjectVector("Children",children,"Node") != MAF_OK)
         {
           if (node->GetStorage()->GetErrorCode()!=mafStorage::IO_WRONG_OBJECT_TYPE)
             return MAF_ERROR;
@@ -1153,14 +1153,14 @@ int mafNode::InternalRestore(mafStorageElement *node)
         }
         m_Children.resize(children.size());
         
-        for (i=0;i<children.size();i++)
+        for (i = 0; i < children.size(); i++)
         {
-          mafNode *node=mafNode::SafeDownCast(children[i]);
+          mafNode *node = mafNode::SafeDownCast(children[i]);
           assert(node);
           if (node)
           {
-            node->m_Parent=this;
-            m_Children[i]=node;
+            node->m_Parent = this;
+            m_Children[i] = node;
           }
         }
         return MAF_OK;
@@ -1205,7 +1205,7 @@ void mafNode::Print(std::ostream& os, const int tabs)// const
 
   os << indent << "Links:" << std::endl;
   os << indent << "Number of links:" << m_Links.size() << std::endl;
-  for (mafLinksMap::const_iterator lnk_it=m_Links.begin();lnk_it!=m_Links.end();lnk_it++)
+  for (mafLinksMap::const_iterator lnk_it = m_Links.begin(); lnk_it != m_Links.end(); lnk_it++)
   {
     os << next_indent << "Name: " << lnk_it->first.GetCStr() << "\tNodeId: " << lnk_it->second.m_NodeId;
     os << "\tNodeSubId: " << lnk_it->second.m_NodeSubId << std::endl;
@@ -1222,7 +1222,8 @@ char** mafNode::GetIcon()
 mmgGui *mafNode::GetGui()
 //-------------------------------------------------------------------------
 {
-  if (m_Gui==NULL) CreateGui();
+  if (m_Gui == NULL)
+    CreateGui();
   assert(m_Gui);
   return m_Gui;
 }
@@ -1252,12 +1253,15 @@ mmgGui* mafNode::CreateGui()
 void mafNode::UpdateId()
 //-------------------------------------------------------------------------
 {
-  if (this->m_Id == -1)
-  {
-    mafRoot *root=mafRoot::SafeDownCast(GetRoot());
+  // If the node was attached under another root its Id is different from -1
+  // when it is attached to the new root it has to be updated anyway.
+  // So 'if' test below has been commented.
+  //if (this->m_Id == -1)
+  //{
+    mafRoot *root = mafRoot::SafeDownCast(GetRoot());
     if (root)
     {
       SetId(root->GetNextNodeId());
     }
-  }
+  //}
 }
