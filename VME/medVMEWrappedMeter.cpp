@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 09:51:47 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-05-06 14:41:23 $
+  Version:   $Revision: 1.16 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -447,14 +447,33 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
        return;
      }
 
-    
-    short wrapside = m_WrapSide == 0 ? (-(m_Precision)) : (m_Precision);
+    m_Precision = 50;
+    short wrapside = m_WrapSide == 0 ? (-1) : (1);
+    int invertDirection = 1;
     while(n1 != 0)
     {
      locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
      n1 = temporaryIntersection->GetNumberOfPoints();
+
      if(n1 != 0)
+     {
        pointsIntersection1->DeepCopy(temporaryIntersection);
+     }
+
+     if (n1 == 0 && invertDirection == 1)
+     {
+       invertDirection = -1;
+       m_Precision = 5;
+       n1 = 1;
+     }
+     else if (n1 == 0 && invertDirection == -1)
+     {
+       n1 = 1;
+     }
+     else if (n1 != 0 && invertDirection == -1)
+     {
+       break;
+     }
 
      if(count == 0)
      {
@@ -471,7 +490,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
      }
      
      for(int i = 0; i<3; i++)
-      p2[i] += ((wrapside) * v2[i]);
+      p2[i] += (invertDirection*(wrapside*m_Precision) * v2[i]);
       
      count++;
     }
@@ -491,15 +510,32 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
     count = 0;
     int n2 = -1; // number of intersections
-    
+    m_Precision = 50;
+    invertDirection = 1;
     while(n2 != 0)
     {
       locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
       n2 = temporaryIntersection->GetNumberOfPoints();
 
       if(n2 != 0)
+      {
         pointsIntersection2->DeepCopy(temporaryIntersection);
+      }
 
+      if (n2 == 0 && invertDirection == 1)
+      {
+        invertDirection = -1;
+        m_Precision = 5;
+        n2 = 1;
+      }
+      else if (n2 == 0 && invertDirection == -1)
+      {
+        n2 = 1;
+      }
+      else if (n2 != 0 && invertDirection == -1)
+      {
+        break;
+      }
 
       if(count == 0)
       {
@@ -516,7 +552,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
       }
 
       for(int i = 0; i<3; i++)
-        p2[i] += ((wrapside) * v2[i]);
+        p2[i] += (invertDirection*(wrapside*m_Precision) * v2[i]);
 
       count++;
     }
