@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGeneric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-29 16:32:24 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-05-06 10:55:19 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,7 @@ int mafVMEGeneric::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   item->SetTimeStamp(t);
   GetDataVector()->InsertItem(item);
 
-  ForwardUpEvent(mafEvent(this, VME_MODIFIED, this));
+  ForwardUpEvent(&mafEvent(this, VME_MODIFIED, this));
 
   return MAF_OK;
 }
