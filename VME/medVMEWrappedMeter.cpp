@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 09:39:53 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-05-07 13:01:52 $
+  Version:   $Revision: 1.20 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -273,10 +273,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     {
       start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
     }
-
-    // end is a landmark, consider also visibility
-    /*if (mflVMELandmark *end_landmark = mflVMELandmark::SafeDownCast(end_vme))
-    end_ok = end_landmark->GetLandmarkVisibility();*/
 
     if(wrapped_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("WrappedVME") != -1)
     {
@@ -597,24 +593,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
 		if( normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0) return; // midpoint and center are the same point
 
-		//double d1,d2;
-		//d1 = vtkMath::Distance2BetweenPoints(local_start, local_wrapped_center);
-		//d2 = vtkMath::Distance2BetweenPoints(local_start, midPoint);
-
-
-  //  double length = vtkMath::Norm(normal);
-  //  normal[0] = (d1-d2<=0? 1 : (-1))*normal[0] / length;
-  //  normal[1] = (d1-d2<=0? 1 : (-1))*normal[1] / length;
-  //  normal[2] = (d1-d2<=0? 1 : (-1))*normal[2] / length;
-
- 	//	if(/*m_WrapReverse*/ m_WrapSide)
-  //  {
-  //    normal[0] = - normal[0];
- 	//		normal[1] = - normal[1];
- 	//		normal[2] = - normal[2];
- 	//	}
-
-
     m_PlaneClip->SetOrigin(midPoint);
     m_PlaneClip->SetNormal(normal);
 
@@ -631,14 +609,8 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
     m_Distance += clipLength;
 
-		//test
-		//m_Distance = d1-d2;
-    ////////////////////////////////////////////////////////
 
-    //test linesource
-/*    m_LineSourceMiddle->SetPoint1(pointTangent1[0],pointTangent1[1],pointTangent1[2]);
-    m_LineSourceMiddle->SetPoint2(pointTangent2[0],pointTangent2[1],pointTangent2[2]);
-    m_LineSourceMiddle->Update();*/
+    ////////////////////////////////////////////////////////
 
     m_WrappedTangent1[0] = pointTangent1[0];
     m_WrappedTangent1[1] = pointTangent1[1];
@@ -658,11 +630,10 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     m_Goniometer->AddInput(m_LineSource2->GetOutput());
     //m_Goniometer->AddInput(m_LineSourceMiddle->GetOutput());
     m_Goniometer->AddInput(m_Clip->GetOutput());
-    
 
-  //  m_Goniometer->Modified();/Mucci
 
     m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+    GetWrappedMeterOutput()->Update(); 
   }
   else
     m_Distance = -1;
@@ -803,8 +774,6 @@ void medVMEWrappedMeter::InternalUpdateManual()
           }
         }
 			}
-
-      
 
       if(GetMeterMeasureType() == medVMEWrappedMeter::RELATIVE_MEASURE)
         m_Distance -= GetMeterAttributes()->m_InitMeasure;
