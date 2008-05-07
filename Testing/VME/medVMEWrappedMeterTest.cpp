@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-30 15:01:17 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-05-07 08:41:48 $
+Version:   $Revision: 1.8 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -591,7 +591,6 @@ void medVMEWrappedMeterTest::TestWrappedGeometry()
   wrappedMeter->SetMeterLink("EndVME1",vmeParametricSurfaceEND1);
   wrappedMeter->SetMeterLink("WrappedVME",vmeParametricSurfaceWrapped);
   wrappedMeter->SetWrappedMode(medVMEWrappedMeter::AUTOMATED_WRAP);
-  wrappedMeter->SetWrappingPrecision(1);
   wrappedMeter->SetParent(storage->GetRoot());
   
   wrappedMeter->GetOutput()->GetVTKData()->Update();
@@ -600,7 +599,7 @@ void medVMEWrappedMeterTest::TestWrappedGeometry()
 
 
   printf("\ndist:%.2f\n", wrappedMeter->GetDistance());
-  CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 21.1 && wrappedMeter->GetDistance() < 21.2);
+  CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 21.5 && wrappedMeter->GetDistance() < 21.6);
 	//CPPUNIT_ASSERT(wrappedMeter->GetDistance() == 20);
 
   CPPUNIT_ASSERT(wrappedMeter->GetWrappedGeometryTangent1()[0] - wrappedMeter->GetWrappedGeometryTangent2()[0] < 0.001 && //x is opposite
