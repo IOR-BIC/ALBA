@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-05-07 15:12:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,33 +42,33 @@ class mafOpCrop: public mafOp
 {
 public:
              
-            	 mafOpCrop(const wxString &label = _("Crop"));
+            	 mafOpCrop(const wxString &label=_("Crop") , bool showShadingPlane = false);
 	virtual     ~mafOpCrop();
-	virtual void OnEvent(mafEventBase *maf_event);
+	/*virtual*/ void OnEvent(mafEventBase *maf_event);
 
   mafTypeMacro(mafOpCrop, mafOp);
 
   mafOp* Copy();
 
-	bool Accept(mafNode* node);
-	void OpRun();	
+	/*virtual*/ bool Accept(mafNode* node);
+	/*virtual*/ void OpRun();	
 	
   /**	Extract the volume cropped*/
 	void Crop();
 
 	/** Makes the undo for the operation. */
-	virtual void OpUndo();
+	/*virtual*/ void OpUndo();
 
-  void OpDo();
+  /*virtual*/ void OpDo();
 
-  virtual void CreateGui(); 
+  /*virtual*/ void CreateGui(); 
 
 	/**	Set cropping area*/
 	void SetCroppingBoxBounds(double bounds[]);
 
 protected:
   void UpdateGui();
-  void OpStop(int result);	
+  /*virtual*/ void OpStop(int result);	
   
   mafGizmoROI *m_GizmoROI; ///< Gizmo used to define sub-volume region to crop
   
@@ -90,5 +90,7 @@ protected:
 
 	vtkRectilinearGrid	*m_OutputRG; ///< Pointer for Rectilinear Grid cropped volume
 	vtkStructuredPoints *m_OutputSP; ///< Pointer for Structured Points cropped volume
+
+  bool  m_ShowShadingPlane;
 };
 #endif

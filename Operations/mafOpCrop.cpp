@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-05-07 15:12:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ mafCxxTypeMacro(mafOpCrop);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mafOpCrop::mafOpCrop(const wxString &label) 
+mafOpCrop::mafOpCrop(const wxString &label, bool showShadingPlane)
 : mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -58,6 +58,8 @@ mafOpCrop::mafOpCrop(const wxString &label)
   m_GizmoROI = NULL;
 	m_OutputRG = NULL;
 	m_OutputSP = NULL;
+
+  m_ShowShadingPlane = showShadingPlane;
 }
 //----------------------------------------------------------------------------
 mafOpCrop::~mafOpCrop()
@@ -73,7 +75,7 @@ mafOpCrop::~mafOpCrop()
 mafOp *mafOpCrop::Copy()
 //----------------------------------------------------------------------------
 {
-	return new mafOpCrop(m_Label);
+	return new mafOpCrop(m_Label,m_ShowShadingPlane);
 }
 //----------------------------------------------------------------------------
 bool mafOpCrop::Accept(mafNode* node)
@@ -96,7 +98,7 @@ void mafOpCrop::OpRun()
 	// create gizmo roi
 	if(!m_TestMode)
 	{
-		m_GizmoROI = new mafGizmoROI(volume, this,mafGizmoHandle::BOUNDS);
+		m_GizmoROI = new mafGizmoROI(volume, this,mafGizmoHandle::BOUNDS,NULL,m_ShowShadingPlane);
 		m_GizmoROI->Show(e.GetBool());
 	}
 
