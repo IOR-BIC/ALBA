@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgCheckTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-06 14:58:18 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-05-07 15:12:42 $
+  Version:   $Revision: 1.28 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -254,7 +254,7 @@ int mmgCheckTree::GetVmeStatus(mafNode *vme)
   return m_View->GetNodeStatus(vme);
 }
 //----------------------------------------------------------------------------
-void mmgCheckTree::VmeUpdateIcon(mafNode *vme)   
+void mmgCheckTree::VmeUpdateIcon(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafNodeIterator *iter = vme->NewIterator();
