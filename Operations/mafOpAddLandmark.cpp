@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:16:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-05-07 15:11:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -379,7 +379,8 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
   mafSmartPointer<mafVMELandmark> landmark;
   landmark->SetName(m_LandmarkName.GetCStr());
   landmark->ReparentTo(m_Cloud);
-  landmark->SetTimeStamp(m_PickedVme->GetTimeStamp());
+  if(NULL != m_PickedVme)
+     landmark->SetTimeStamp(m_PickedVme->GetTimeStamp());
   landmark->Update();
   if(m_AddToCurrentTime)
     landmark->SetAbsPose(m_LandmarkPosition[0],m_LandmarkPosition[1],m_LandmarkPosition[2],0,0,0);
