@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 20:17:21 $
-  Version:   $Revision: 1.76 $
+  Date:      $Date: 2008-05-07 13:48:38 $
+  Version:   $Revision: 1.77 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,7 +184,10 @@ int  mafViewVTK::GetNodeStatus(mafNode *vme)
     else if (m_PipeMap[vme_type].m_Visibility == MUTEX)
     {
       mafSceneNode *n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      if (n != NULL)
+      {
+      	n->m_Mutex = true;
+      }
       status = m_Sg->GetNodeStatus(vme);
     }
   }
