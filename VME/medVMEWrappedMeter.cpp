@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 08:42:21 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-05-07 09:23:14 $
+  Version:   $Revision: 1.18 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -358,10 +358,11 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 		vec3[1] = local_end[1] - local_wrapped_center[1];
 		vec3[2] = local_end[2] - local_wrapped_center[2];
 
+    bool aligned = false;
     double vectorProduct[3];
     vtkMath::Cross(vec1,vec2, vectorProduct); 
     if(vectorProduct[0] == 0.0 && vectorProduct[1] == 0.0 && vectorProduct[2] == 0.0)
-      return;
+      aligned = true;
     
     // create ordered list of tangent point (2) real algorithm
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
@@ -427,7 +428,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 //  code to control if exist an intersection between the line draw from start point to end point and 
 //  the vtk data (surface)
      int nControl = temporaryIntersection->GetNumberOfPoints();
-     if(nControl==0)
+     if(nControl==0 || aligned == true)
      {
        //if there is no intersection with geometry
        m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
