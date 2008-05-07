@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 09:23:14 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-05-07 09:39:53 $
+  Version:   $Revision: 1.19 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -662,7 +662,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
   //  m_Goniometer->Modified();/Mucci
 
-   // m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);//Mucci
+    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
   }
   else
     m_Distance = -1;
