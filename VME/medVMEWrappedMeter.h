@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 15:02:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-05-07 08:42:21 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -137,12 +137,6 @@ public:
   void SetMeterModeToPointDistance() {this->SetMeterMode(medVMEWrappedMeter::POINT_DISTANCE);}
  // void SetMeterModeToLineDistance() {this->SetMeterMode(medVMEWrappedMeter::LINE_DISTANCE);}
  // void SetMeterModeToLineAngle() {this->SetMeterMode(medVMEWrappedMeter::LINE_ANGLE);}
-
-  /** 
-  Set precision of the algorithm that calculate the tangent ponits.*/
-  void SetWrappingPrecision(int precision) {m_Precision = precision;}
-  
-
 
   /** 
   Store the min and max distance to associate with colors.*/
@@ -363,7 +357,6 @@ protected:
 	int        m_WrappedMode;
   int        m_WrapSide;
   int        m_WrapReverse;
-  int        m_Precision;
 
 private:
   medVMEWrappedMeter(const medVMEWrappedMeter&); // Not implemented

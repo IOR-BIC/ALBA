@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-06 14:41:23 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-05-07 08:42:21 $
+  Version:   $Revision: 1.17 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,6 @@ medVMEWrappedMeter::medVMEWrappedMeter()
 	m_WrappedMode   = MANUAL_WRAP;
   m_WrapSide      = 0;
   m_WrapReverse   = 0;
-  m_Precision     = 10;
   
   m_StartVmeName  = "";
   m_EndVme1Name   = "";
@@ -447,7 +446,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
        return;
      }
 
-    m_Precision = 50;
+    int precision = 50;
     short wrapside = m_WrapSide == 0 ? (-1) : (1);
     int invertDirection = 1;
     while(n1 != 0)
@@ -463,7 +462,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
      if (n1 == 0 && invertDirection == 1)
      {
        invertDirection = -1;
-       m_Precision = 5;
+       precision = 5;
        n1 = 1;
      }
      else if (n1 == 0 && invertDirection == -1)
@@ -490,7 +489,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
      }
      
      for(int i = 0; i<3; i++)
-      p2[i] += (invertDirection*(wrapside*m_Precision) * v2[i]);
+      p2[i] += (invertDirection*(wrapside*precision) * v2[i]);
       
      count++;
     }
@@ -510,7 +509,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
     count = 0;
     int n2 = -1; // number of intersections
-    m_Precision = 50;
+    precision = 50;
     invertDirection = 1;
     while(n2 != 0)
     {
@@ -525,7 +524,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
       if (n2 == 0 && invertDirection == 1)
       {
         invertDirection = -1;
-        m_Precision = 5;
+        precision = 5;
         n2 = 1;
       }
       else if (n2 == 0 && invertDirection == -1)
@@ -552,7 +551,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
       }
 
       for(int i = 0; i<3; i++)
-        p2[i] += (invertDirection*(wrapside*m_Precision) * v2[i]);
+        p2[i] += (invertDirection*(wrapside*precision) * v2[i]);
 
       count++;
     }
