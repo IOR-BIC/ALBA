@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 09:08:46 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2008-05-07 15:00:23 $
+  Version:   $Revision: 1.29 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -432,54 +432,31 @@ int mafViewSingleSlice::GetNodeStatus(mafNode *vme)
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
-    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+    n = m_Sg->Vme2Node(vme);
+    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") ||
+        vme->IsMAFType(mafVMEImage) ||
+        vme->IsMAFType(mafVMEPolylineSpline))
     {
-      n = m_Sg->Vme2Node(vme);
-      if(n)
+      if(n != NULL)
         n->m_Mutex = true;
     }
-    else if (vme->IsMAFType(mafVMESlicer))
+    else if (vme->IsMAFType(mafVMEPolyline) ||
+             vme->IsMAFType(mafVMESurface))
     {
-      n = m_Sg->Vme2Node(vme);
-      if(n)
-        n->m_PipeCreatable = false;
-    }
-    else if (vme->IsMAFType(mafVMEImage))
-    {
-      n = m_Sg->Vme2Node(vme);
-      if(n)
-        n->m_Mutex = true;
-    }
-		else if (vme->IsMAFType(mafVMEPolyline))
-		{
-			n = m_Sg->Vme2Node(vme);
-      if(n)
-			  n->m_Mutex = false;
-		}
-    else if (vme->IsMAFType(mafVMESurface))
-    {
-      n = m_Sg->Vme2Node(vme);
-      if(n)
+      if(n != NULL)
         n->m_Mutex = false;
     }
-		else if(vme->IsMAFType(mafVMEPolylineSpline))
-		{
-			n = m_Sg->Vme2Node(vme);
-      if(n)
-			  n->m_Mutex = true;
-		}
-		else if (vme->IsMAFType(mafVMEGizmo))
-		{
-			n = m_Sg->Vme2Node(vme);
-      if(n)
-			  n->m_PipeCreatable = true;
-		}
-    else if (((mafVME *)vme)->GetOutput()->IsA("mafVMEAdvancedProber"))
+    else if (vme->IsMAFType(mafVMESlicer) ||
+            ((mafVME *)vme)->GetOutput()->IsA("mafVMEAdvancedProber"))
     {
-      n = m_Sg->Vme2Node(vme);
-      if(n)
+      if(n != NULL)
         n->m_PipeCreatable = false;
     }
+		else if (vme->IsMAFType(mafVMEGizmo))
+		{
+      if(n != NULL)
+			  n->m_PipeCreatable = true;
+		}
   }
 
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;

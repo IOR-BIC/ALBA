@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-05 21:50:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-05-07 15:00:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,15 +103,20 @@ int mafViewImage::GetNodeStatus(mafNode *vme)
   mafSceneNode *n = NULL;
   if (m_Sg != NULL)
   {
+    n = m_Sg->Vme2Node(vme);
     if (vme->IsMAFType(mafVMEImage) || vme->IsA("mafVMEAdvancedProber") || vme->IsMAFType(mafVMESurface))
     {
-      n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      if (n != NULL)
+      {
+      	n->m_Mutex = true;
+      }
     }
     else
     {
-      n = m_Sg->Vme2Node(vme);
-      n->m_PipeCreatable = false;
+      if (n != NULL)
+      {
+      	n->m_PipeCreatable = false;
+      }
     }
   }
 

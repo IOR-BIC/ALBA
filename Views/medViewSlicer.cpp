@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 08:28:45 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-05-07 15:00:24 $
+  Version:   $Revision: 1.13 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -423,26 +423,23 @@ int medViewSlicer::GetNodeStatus(mafNode *vme)
 
   if (sgArb != NULL)
   {
-    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+    n = sgArb->Vme2Node(vme);
+    if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") ||
+        vme->IsMAFType(mafVMESurface) ||
+        vme->IsMAFType(mafVMESurfaceParametric))
     {
-      n = sgArb->Vme2Node(vme);
-      n->m_PipeCreatable = true;
+      if (n != NULL)
+      {
+      	n->m_PipeCreatable = true;
+      }
     }
     else if (vme->IsMAFType(mafVMESlicer))
     {
-      n = sgArb->Vme2Node(vme);
-      n->m_PipeCreatable = true;
-      n->m_Mutex = true;
-    }
-    else if (vme->IsMAFType(mafVMESurface))
-    {
-      n = sgArb->Vme2Node(vme);
-      n->m_PipeCreatable = true;
-    }
-    else if (vme->IsMAFType(mafVMESurfaceParametric))
-    {
-      n = sgArb->Vme2Node(vme);
-      n->m_PipeCreatable = true;
+      if (n != NULL)
+      {
+	      n->m_PipeCreatable = true;
+	      n->m_Mutex = true;
+      }
     }
   }
   return sgArb ? sgArb->GetNodeStatus(vme) : NODE_NON_VISIBLE;

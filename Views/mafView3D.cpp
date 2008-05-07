@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 18:13:22 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-05-07 15:00:23 $
+  Version:   $Revision: 1.17 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -400,30 +400,29 @@ int mafView3D::GetNodeStatus(mafNode *vme)
 	mafSceneNode *n = NULL;
 	if (m_Sg != NULL)
 	{
+    n = m_Sg->Vme2Node(vme);
 		if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{
-			n = m_Sg->Vme2Node(vme);
-			n->m_Mutex = true;
+			if (n != NULL)
+			{
+				n->m_Mutex = true;
+			}
 		}
-		else if (vme->IsMAFType(mafVMEPolyline))
-		{
-			n = m_Sg->Vme2Node(vme);
-			n->m_Mutex = false;
-		}
-		else if (vme->IsMAFType(mafVMESurface))
-		{
-			n = m_Sg->Vme2Node(vme);
-			n->m_Mutex = false;
-		}
-    else if (vme->IsMAFType(mafVMESurfaceParametric))
+    else if(vme->IsMAFType(mafVMEPolyline) || 
+      vme->IsMAFType(mafVMESurface) ||
+      vme->IsMAFType(mafVMESurfaceParametric))
     {
-      n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = false;
+      if (n != NULL)
+      {
+      	n->m_Mutex = false;
+      }
     }
 		else
 		{
-			n = m_Sg->Vme2Node(vme);
-			n->m_PipeCreatable = false;
+			if (n != NULL)
+			{
+				n->m_PipeCreatable = false;
+			}
 		}
 	}
 
