@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 13:01:52 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-05-08 12:37:40 $
+  Version:   $Revision: 1.21 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -429,17 +429,13 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
        //if there is no intersection with geometry
        m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
        m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
-       m_LineSource->Update();
        m_Goniometer->AddInput(m_LineSource->GetOutput());
        
        m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
  
-       m_Goniometer->Modified();
        m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-       m_Goniometer->Update();
        GetWrappedMeterOutput()->Update();
  
-       ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
        return;
      }
 
