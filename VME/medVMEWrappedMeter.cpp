@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-08 12:37:40 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-05-08 15:43:07 $
+  Version:   $Revision: 1.22 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -388,11 +388,9 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 
      m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
 
-     m_Goniometer->Modified();
      m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
      GetWrappedMeterOutput()->Update();
 
-     ForwardUpEvent(mafEvent(this, CAMERA_UPDATE));
      return;
   }
 
