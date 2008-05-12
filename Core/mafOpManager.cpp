@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 12:51:48 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2008-05-12 15:10:24 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -657,6 +657,7 @@ void mafOpManager::OpRunOk(mafOp *op)
   m_Context.Pop();
 
   m_RunningOp = NULL;
+  m_NaturalNode = NULL;
 	OpDo(op);
   Notify(OP_RUN_TERMINATED);
 	if(m_Context.Caller() == NULL) 	
