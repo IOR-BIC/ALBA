@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-03 15:14:49 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-05-13 12:00:37 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,7 @@
 #endif
 #include <string>
 #include <ostream>
+#include <algorithm>
 
 mafPipeFactory *mafPipeFactory::m_Instance=NULL;
 
@@ -100,6 +101,11 @@ mafPipe *mafPipeFactory::CreatePipeInstance(const char *type_name)
 void mafPipeFactory::RegisterNewPipe(const char* pipe_name, const char* description, mafCreateObjectFunction createFunction)
 //------------------------------------------------------------------------------
 {
+	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(m_PipeNames.begin (), m_PipeNames.end (), std::string(pipe_name));
+	if(it._Myptr != 0 && it != m_PipeNames.end() )
+	{
+    return;
+	}
   m_PipeNames.push_back(pipe_name);
   RegisterNewObject(pipe_name,description,createFunction);
 }
