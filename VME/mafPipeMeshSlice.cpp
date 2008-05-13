@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-13 13:12:36 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-05-13 13:20:01 $
+Version:   $Revision: 1.11 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -61,6 +61,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include <vector>
 
+// local debug facility
 const bool DEBUG_MODE = false;
 
 //----------------------------------------------------------------------------
