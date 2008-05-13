@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-22 11:30:49 $
-Version:   $Revision: 1.21 $
+Date:      $Date: 2008-05-13 17:19:06 $
+Version:   $Revision: 1.22 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -230,8 +230,11 @@ void mafPipeIsosurface::UpdateFromData()
   {
     dataset->Update();
 
-    m_ContourMapper->SetInput(dataset);
-    m_ContourMapper->Update();
+    if (m_ContourMapper != NULL)
+    {
+      m_ContourMapper->SetInput(dataset);
+      m_ContourMapper->Update();
+    }
   }
 }
 //----------------------------------------------------------------------------
