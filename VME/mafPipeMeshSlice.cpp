@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-04 15:11:56 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-05-13 13:12:36 $
+Version:   $Revision: 1.10 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,6 +60,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPolyDataNormals.h"
 
 #include <vector>
+
+const bool DEBUG_MODE = false;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeMeshSlice);
@@ -484,8 +486,22 @@ void mafPipeMeshSlice::SetSlice(double *Origin)
 		m_Plane->SetOrigin(m_Origin);
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
+    
+    // this is needed otherwise scalars are not updated after moving the slice 
+    UpdateScalars();
+    
     m_NormalFilter->Update();
 	}
+
+  if (true == DEBUG_MODE && NULL != m_Mapper)
+  {
+    int scalarVisibility = m_Mapper->GetScalarVisibility();
+    m_Mapper->SetScalarVisibility(m_ScalarMapActive);
+
+    std::ostringstream stringStream;
+    stringStream << "scalar visibility:" << (scalarVisibility ? "true" : "false")  << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+  }
 }
 //----------------------------------------------------------------------------
 void mafPipeMeshSlice::SetNormal(double *Normal)
@@ -613,7 +629,8 @@ void mafPipeMeshSlice::UpdatePipeFromScalars()
   else if(m_ActiveScalarType == CELL_TYPE)
     data->GetCellData()->GetScalars()->GetRange(sr);
 
-  m_Table->SetTableRange(sr);
+  // HERE 
+  // m_Table->SetTableRange(sr);
   //m_Table->SetValueRange(sr);
   //m_Table->SetHueRange(0.667, 0.0);
   //m_Table->Build();
@@ -626,7 +643,8 @@ void mafPipeMeshSlice::UpdatePipeFromScalars()
 
   m_Mapper->SetInput(m_NormalFilter->GetOutput());
   m_Mapper->SetLookupTable(m_Table);
-  m_Mapper->SetScalarRange(sr);
+  // HERE
+  // m_Mapper->SetScalarRange(sr);
   m_Mapper->Update();
 
   m_Actor->Modified();
