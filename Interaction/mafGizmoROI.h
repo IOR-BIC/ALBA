@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-24 08:41:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-05-13 11:57:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,6 +117,8 @@ public:
   void EnableMinimumHandleSize(bool value){m_EnableMinimumHandleSize = value;}
   void SetMinimumHandleSize(double value){m_MinimumHandleSize = value;}
 
+  void EnableMinimumDistanceBetweenGizmo(bool value){m_EnableMinimumDistanceBetweenGizmo = value;}
+
 protected:
 
   /** Highlight one component of the gizmo and turn off the highlight others;
@@ -142,12 +144,15 @@ protected:
 
 	int m_ConstraintModality;
 
-	mafGizmoHandle *m_GHandle[6];///<Array holding the six gizmo handles
 
+	mafGizmoHandle *m_GHandle[6];///<Array holding the six gizmo handles
+  double m_Center[6][3];
 	mafGizmoBoundingBox *m_OutlineGizmo;///<The gizmo bounding box
 
+  double m_Accumulator;
   double m_MinimumHandleSize;
   bool m_EnableMinimumHandleSize;
+  bool m_EnableMinimumDistanceBetweenGizmo;
 
 };
 #endif

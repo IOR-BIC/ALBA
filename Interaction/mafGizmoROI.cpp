@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-24 08:41:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-05-13 11:57:10 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,11 +36,13 @@
 #include "vtkTransform.h"
 #include "vtkCubeSource.h"
 #include "vtkDataSet.h"
+#include "vtkMath.h"
 
 #include <vector>
 #include <algorithm>
 
 using namespace std;
+
 
 //----------------------------------------------------------------------------
 mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int constraintModality/* =mafGizmoHandle::BOUNDS */,mafVME* parent/* =NULL */,bool showShadingPlane/* =false */)
@@ -53,6 +55,7 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
   //no gizmo component is active at construction
   m_MinimumHandleSize = 0.0;
   m_EnableMinimumHandleSize = false;
+  m_Accumulator = 0.;
   
   this->m_ActiveGizmoComponent = -1;
   this->SetModalityToLocal();
@@ -63,10 +66,11 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
     m_GHandle[i] = NULL;
     m_GHandle[i] = new mafGizmoHandle(input, this, constraintModality,parent,showShadingPlane);
     m_GHandle[i]->SetType(i);
-  }
-  
+    m_GHandle[i]->GetHandleCenter(i,m_Center[i]);
+  } 
 	// create the outline gizmo
 	m_OutlineGizmo = new mafGizmoBoundingBox(input, this,parent);
+
 }
 //----------------------------------------------------------------------------
 mafGizmoROI::~mafGizmoROI() 
@@ -119,6 +123,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
         // if a gizmo has been picked highlight the gizmo and register the active component
         if (arg == mmiGenericMouse::MOUSE_DOWN)
         {
+          m_Accumulator = 0.;
           if (sender == m_GHandle[0])
           {
             this->Highlight(0);
@@ -156,14 +161,153 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
           {
             // local mode
 
-            // translate selected gizmo
-            mafTransform *tr = mafTransform::New();                   
-            tr->SetMatrix(*m_GHandle[m_ActiveGizmoComponent]->GetPose());
-            tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
+						double distance;
+				    double actualBounds[6];
+						double currentDistance;
+            short component;
+						m_OutlineGizmo->GetBounds(actualBounds);
+            
+            if(m_EnableMinimumHandleSize == true)
+            {
+						  if(m_ActiveGizmoComponent == 0 || m_ActiveGizmoComponent == 1)
+						  {
+							  component = m_ActiveGizmoComponent == 0 ? -1 : 1;
+							  distance = (*e->GetMatrix()).GetElement(0,3) * component;
+							  currentDistance = actualBounds[1]-actualBounds[0];
+  							
 
-            mafMatrix mat;
-            mat.DeepCopy(tr->GetMatrixPointer());
-            mat.SetTimeStamp(InputVME->GetTimeStamp());
+                //stop it
+							  if(m_MinimumHandleSize >= currentDistance+distance)
+							  {	
+                  double surplusDistance = distance;
+  								
+                  //mafLogMessage(wxString::Format("IN-VERSUS%.2f", acc));
+                  distance = m_MinimumHandleSize - currentDistance;
+
+                  surplusDistance -= distance;
+                  m_Accumulator += surplusDistance;
+
+								  distance *= component;
+								  (*e->GetMatrix()).SetElement(0,3, distance);
+
+                  
+							  }
+  							
+                if(distance > 0)
+                {
+                  m_Accumulator += distance;
+                  if(m_Accumulator < 0)
+                  {
+                    return;
+                  }
+                  else
+                  {
+                    m_Accumulator =.0;
+                  }
+                }
+                /*else //only for log
+                {
+                  mafLogMessage(wxString::Format("distance%.2f", distance));
+                  mafLogMessage(wxString::Format("acc%.2f", m_Accumulator));
+                }*/
+
+  							
+						  }
+						  else if(m_ActiveGizmoComponent == 2 || m_ActiveGizmoComponent == 3)
+						  {
+							  component = m_ActiveGizmoComponent == 2 ? -1 : 1;
+							  distance = (*e->GetMatrix()).GetElement(1,3) * component;
+							  currentDistance = actualBounds[3]-actualBounds[2];
+
+                //stop it
+                if(m_MinimumHandleSize >= currentDistance+distance)
+                {	
+                  double surplusDistance = distance;
+
+                  //mafLogMessage(wxString::Format("IN-VERSUS%.2f", acc));
+                  distance = m_MinimumHandleSize - currentDistance;
+
+                  surplusDistance -= distance;
+                  m_Accumulator += surplusDistance;
+
+                  distance *= component;
+                  (*e->GetMatrix()).SetElement(1,3, distance);
+
+
+                }
+
+                if(distance > 0)
+                {
+                  m_Accumulator += distance;
+                  if(m_Accumulator < 0)
+                  {
+                    return;
+                  }
+                  else
+                  {
+                    m_Accumulator =.0;
+                  }
+                }
+                /*else //only for log
+                {
+                mafLogMessage(wxString::Format("distance%.2f", distance));
+                mafLogMessage(wxString::Format("acc%.2f", m_Accumulator));
+                }*/
+						  }
+						  else if(m_ActiveGizmoComponent == 4 || m_ActiveGizmoComponent == 5)
+						  {
+							  component = m_ActiveGizmoComponent == 4 ? -1 : 1;
+							  distance = (*e->GetMatrix()).GetElement(2,3) * component;
+							  currentDistance = actualBounds[5]-actualBounds[4];
+
+                //stop it
+                if(m_MinimumHandleSize >= currentDistance+distance)
+                {	
+                  double surplusDistance = distance;
+
+                  //mafLogMessage(wxString::Format("IN-VERSUS%.2f", acc));
+                  distance = m_MinimumHandleSize - currentDistance;
+
+                  surplusDistance -= distance;
+                  m_Accumulator += surplusDistance;
+
+                  distance *= component;
+                  (*e->GetMatrix()).SetElement(2,3, distance);
+
+
+                }
+
+                if(distance > 0)
+                {
+                  m_Accumulator += distance;
+                  if(m_Accumulator < 0)
+                  {
+                    return;
+                  }
+                  else
+                  {
+                    m_Accumulator =.0;
+                  }
+                }
+                /*else //only for log
+                {
+                mafLogMessage(wxString::Format("distance%.2f", distance));
+                mafLogMessage(wxString::Format("acc%.2f", m_Accumulator));
+                }*/
+						  }
+
+            }
+
+						// translate selected gizmo
+						mafTransform *tr = mafTransform::New();                   
+						tr->SetMatrix(*m_GHandle[m_ActiveGizmoComponent]->GetPose());
+						tr->Concatenate(*e->GetMatrix(), PRE_MULTIPLY);
+
+						mafMatrix mat;
+						mat.DeepCopy(tr->GetMatrixPointer());
+						mat.SetTimeStamp(InputVME->GetTimeStamp());
+
+						//must set the matrix?
 
             m_GHandle[m_ActiveGizmoComponent]->SetPose(&mat);
 
@@ -479,7 +623,17 @@ void mafGizmoROI::UpdateGizmosLength()
   for (int i = 0; i <6; i++)
   {
     if(med_dim/12.<(3./4.*min_dim))
-      m_GHandle[i]->SetLength(med_dim/12.);
+    {
+      double value = med_dim/12.;
+      if(m_EnableMinimumHandleSize)
+      {
+        if(m_MinimumHandleSize > med_dim/12.)
+        {
+          value = m_MinimumHandleSize;
+        }
+      }
+      m_GHandle[i]->SetLength(value);
+    }
     else
     {
       double value = 3./4.*min_dim;
