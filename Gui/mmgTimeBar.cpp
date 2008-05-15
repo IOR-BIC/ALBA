@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 14:23:00 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-05-15 15:18:48 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,7 +69,7 @@ m_Timer(NULL, ID_TIMER)
   
   m_Time     = 0;
   m_TimeMin  = 0; 
-  m_TimeMax  = 100;
+  m_TimeMax  = 1;
   m_NumberOfIntervals = 500;
   m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
 
@@ -137,6 +137,10 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
   {
     switch(maf_event->GetId())
     {
+      case mafGUISettingsTimeBar::ID_TIME_STEP:
+      case mafGUISettingsTimeBar::ID_NUMBER_OF_FRAMES:
+        SetNumberOfIntervals(m_TimeBarSettings->GetNumberOfFrames());
+      break;
       case mafGUISettingsTimeBar::ID_REAL_TIME:
       case mafGUISettingsTimeBar::ID_TIME_SPEED:
         if (m_Timer.IsRunning())
@@ -276,6 +280,8 @@ void mmgTimeBar::SetBounds(double min, double max)
 
   m_TimeMax = max;
   m_TimeMin = min;
+  m_TimeBarSettings->SetTimeBounds(min, max);
+  //SetNumberOfIntervals(m_TimeBarSettings->GetNumberOfFrames());
   if (m_TimeBarSettings->GetRealTimeMode() == 0)
   {
     m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
@@ -316,5 +322,7 @@ void mmgTimeBar::SetMultiplier(double mult)
 void mmgTimeBar::SetTimeSettings(mafGUISettingsTimeBar *settings)
 //----------------------------------------------------------------------------
 {
-  m_TimeBarSettings = settings;  
+  m_TimeBarSettings = settings;
+  m_TimeBarSettings->SetTimeBounds(m_TimeMin, m_TimeMax);
+  m_TimeBarSettings->SetNumberOfFrames(m_NumberOfIntervals);
 }
