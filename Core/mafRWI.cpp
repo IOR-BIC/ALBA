@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:27:10 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-05-15 08:28:28 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -395,13 +395,29 @@ void mafRWI::Show(bool show)
 void mafRWI::SetGridNormal(int normal_id)
 //----------------------------------------------------------------------------
 {
-  if(m_Grid) m_Grid->SetGridNormal(normal_id);
+  if(m_Grid)
+  {
+    m_GridNormal = normal_id;
+    m_Grid->SetGridNormal(normal_id);
+    if (m_Gui != NULL)
+    {
+      m_Gui->Update();
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridPosition(double position)
 //----------------------------------------------------------------------------
 {
-   if(m_Grid) m_Grid->SetGridPosition(position);
+   if(m_Grid)
+   {
+     m_GridPosition = position;
+     m_Grid->SetGridPosition(position);
+     if (m_Gui != NULL)
+     {
+       m_Gui->Update();
+     }
+   }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridVisibility(bool show)
@@ -413,6 +429,10 @@ void mafRWI::SetGridVisibility(bool show)
     m_Grid->SetVisibility(m_ShowGrid);
     m_Grid->GetLabelActor()->SetVisibility(m_ShowGrid);
     m_RenFront->ResetCameraClippingRange();
+    if (m_Gui != NULL)
+    {
+      m_Gui->Update();
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -420,21 +440,42 @@ void mafRWI::SetAxesVisibility(bool show)
 //----------------------------------------------------------------------------
 {
   if(m_Axes) 
+  {
+    m_ShowAxes = show;
     m_Axes->SetVisibility(show);
+    if (m_Gui != NULL)
+    {
+      m_Gui->Update();
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetRuleVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-  if(m_Ruler) 
+  if(m_Ruler)
+  {
+    m_ShowRuler = show;
     m_Ruler->SetVisibility(show);
+    if (m_Gui != NULL)
+    {
+      m_Gui->Update();
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetOrientatorVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-	if(m_Orientator) 
-		m_Orientator->SetVisibility(show);
+	if(m_Orientator)
+  {
+		m_ShowOrientator = show;
+    m_Orientator->SetVisibility(show);
+    if (m_Gui != NULL)
+    {
+      m_Gui->Update();
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetRulerScaleFactor(const double &scale_factor)
@@ -442,7 +483,10 @@ void mafRWI::SetRulerScaleFactor(const double &scale_factor)
 {
   m_RulerScaleFactor = scale_factor;
   m_Ruler->SetScaleFactor(m_RulerScaleFactor);
-  m_Gui->Update();
+  if (m_Gui != NULL) 
+  {
+    m_Gui->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetRulerLegend(const mafString &ruler_legend)
@@ -450,19 +494,34 @@ void mafRWI::SetRulerLegend(const mafString &ruler_legend)
 {
   m_RulerLegend = ruler_legend;
   m_Ruler->SetLegend(m_RulerLegend.GetCStr());
-  m_Gui->Update();
+  if (m_Gui != NULL) 
+  {
+    m_Gui->Update();
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetGridColor(const wxColor &col)
 //----------------------------------------------------------------------------
 {
-  if(m_Grid) 
+  if(m_Grid)
+  {
+    m_GridColour = col;
     m_Grid->SetGridColor(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
+    if (m_Gui != NULL) 
+    {
+      m_Gui->Update();
+    }
+  }
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetBackgroundColor(const wxColor &col)
 //----------------------------------------------------------------------------
 {
+  m_BGColour = col;
+  if (m_Gui != NULL) 
+  {
+    m_Gui->Update();
+  }
   m_RenFront->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
   if(m_RenBack) 
     m_RenBack->SetBackground(col.Red()/255.0,col.Green()/255.0,col.Blue()/255.0);
@@ -484,6 +543,10 @@ void mafRWI::SetStereo(int stereo_type)
     return;
  
   m_StereoType = stereo_type;
+  if (m_Gui != NULL) 
+  {
+    m_Gui->Update();
+  }
   
   m_RenderWindow->SetStereoCapableWindow(m_StereoType != 0);
   m_RenderWindow->SetStereoRender(m_StereoType != 0);
