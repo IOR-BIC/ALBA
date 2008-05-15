@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.h,v $
 Language:  C++
-Date:      $Date: 2008-04-14 12:58:39 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-05-15 15:19:03 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,6 +35,8 @@ public:
     ID_REAL_TIME = MINID,
     ID_TIME_SPEED,
     ID_TIME_SCALE,
+    ID_TIME_STEP,
+    ID_NUMBER_OF_FRAMES,
     ID_ANIMATE_IN_SUBRANGE,
     ID_SUBRANGE,
     ID_LOOP,
@@ -94,6 +96,18 @@ public:
   /** Return true if is active the flag for the update only into the active viewport.*/
   int GetPlayingInActiveViewport() {return m_PlayInActiveViewport;};
 
+  /** Called by the time bar to set the time-bounds of the loaded data tree.*/
+  void SetTimeBounds(double min, double max);
+
+  /** Return the number of subdivision for the time bar.*/
+  int GetNumberOfFrames() {return m_NumberOfFrames;};
+
+  /** Set the number of frames.*/
+  void SetNumberOfFrames(int frames);
+
+  /** Set the time step for the animation.*/
+  void SetTimeStep(double step);
+
 protected:
   /** Create the GUI for the setting panel.*/
   void CreateGui();
@@ -108,6 +122,11 @@ protected:
   and flush these new values to the registry.*/
   void Update();
 
+  double m_TimeMin;
+  double m_TimeMax;
+
+  int m_NumberOfFrames; ///< Number of frames
+  double m_TimeStep; ///< Time step linked to the number of frames and to the time range.
   int m_RealTimeMode; ///< Flag to play the animation in real time mode (checked) or to show all key-frames of the animation (unchecked)
   int m_Loop;
   int m_PlayInActiveViewport;

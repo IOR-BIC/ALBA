@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-14 12:58:39 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-05-15 15:19:03 $
+Version:   $Revision: 1.8 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -40,6 +40,12 @@ mafGUISettings(Listener, label)
 
   m_PlayInActiveViewport = 0;
 
+  m_NumberOfFrames = 500;
+  m_TimeStep = 0.2;
+
+  m_TimeMin = 0;
+  m_TimeMax = m_TimeMin + m_NumberOfFrames * m_TimeStep;
+
   InitializeSettings();
 }
 //----------------------------------------------------------------------------
@@ -55,6 +61,8 @@ void mafGUISettingsTimeBar::CreateGui()
   m_Gui->Bool(ID_REAL_TIME, _("real time"), &m_RealTimeMode, 1);
   m_Gui->Double(ID_TIME_SCALE, _("scale:"), &m_TimeScale, 0.000001, MAXDOUBLE, -1, _("time scale referring to the time unit: seconds"));
   m_Gui->Double(ID_TIME_SPEED, _("speed Nx:"), &m_TimeSpeed, 0.000001, MAXDOUBLE, -1, _("time multiplier to speed up the animation"));
+  m_Gui->Integer(ID_NUMBER_OF_FRAMES, _("frames:"), &m_NumberOfFrames, 1, MAXINT, _("Number of frame representing the animation"));
+  m_Gui->Double(ID_TIME_STEP, _("step:"), &m_TimeStep, 0.000001, MAXDOUBLE, -1, _("time step between two keyframes"));
   m_Gui->Bool(ID_LOOP, _("loop playback"), &m_Loop, 1);
   m_Gui->Divider(2);
   m_Gui->Bool(ID_ANIMATE_IN_SUBRANGE, _("animate in subrange"), &m_AnimateInSubrange, 1);
@@ -66,32 +74,48 @@ void mafGUISettingsTimeBar::CreateGui()
   EnableWidgets();
 }
 //----------------------------------------------------------------------------
+void mafGUISettingsTimeBar::SetTimeBounds(double min, double max)
+//----------------------------------------------------------------------------
+{
+  m_TimeMin = min;
+  m_TimeMax = max;
+  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfFrames;
+//  m_Config->Write("TimeStep", m_TimeStep);
+//  m_Config->Write("NumberOfFrames", m_NumberOfFrames);
+  Update();
+}
+//----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   switch(maf_event->GetId())
   {
     case ID_REAL_TIME:
-      m_Config->Write("RealTimeMode", m_RealTimeMode);
+      SetRealTimeMode(m_RealTimeMode);
     break;
     case ID_TIME_SPEED:
       m_Config->Write("TimeMultiplier", m_TimeSpeed);
     break;
+    case ID_TIME_STEP:
+      SetTimeStep(m_TimeStep);
+    break;
+    case ID_NUMBER_OF_FRAMES:
+      SetNumberOfFrames(m_NumberOfFrames);
+    break;
     case ID_TIME_SCALE:
-      m_Config->Write("TimeScale", m_TimeScale);
+      SetTimeScale(m_TimeScale);
     break;
     case ID_ANIMATE_IN_SUBRANGE:
-      m_Config->Write("AnimateInSubrange", m_AnimateInSubrange);
+      AminateInSubrange(m_AnimateInSubrange);
     break;
     case ID_SUBRANGE:
-      m_Config->Write("SubRange0", m_SubRange[0]);
-      m_Config->Write("SubRange1", m_SubRange[1]);
+      SetSubrange(m_SubRange[0], m_SubRange[1]);
     break;
     case ID_LOOP:
-      m_Config->Write("Loop", m_Loop);
+      LoopAnimation(m_Loop);
     break;
     case ID_PLAY_ACTIVE_VIEWPORT:
-      m_Config->Write("PlayInActiveViewport", m_PlayInActiveViewport);
+      PlayInActiveViewport(m_PlayInActiveViewport);
     break;
     default:
       mafEventMacro(*maf_event);
@@ -100,7 +124,6 @@ void mafGUISettingsTimeBar::OnEvent(mafEventBase *maf_event)
   // Update the time bar.
   maf_event->SetSender(this);
   mafEventMacro(*maf_event);
-  Update();
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::InitializeSettings()
@@ -179,8 +202,34 @@ void mafGUISettingsTimeBar::EnableWidgets()
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_TIME_SPEED, m_RealTimeMode == 0);
+  m_Gui->Enable(ID_NUMBER_OF_FRAMES, m_RealTimeMode == 0);
+  m_Gui->Enable(ID_TIME_STEP, m_RealTimeMode == 0);
   m_Gui->Enable(ID_TIME_SCALE, m_RealTimeMode == 1);
   m_Gui->Enable(ID_SUBRANGE, m_AnimateInSubrange == 1);
+}
+//----------------------------------------------------------------------------
+void mafGUISettingsTimeBar::SetNumberOfFrames(int frames)
+//----------------------------------------------------------------------------
+{
+  m_NumberOfFrames = frames < 1 ? 1 : frames;
+  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfFrames;
+//  m_Config->Write("NumberOfFrames", m_NumberOfFrames);
+//  m_Config->Write("TimeStep", m_TimeStep);
+  Update();
+}
+//----------------------------------------------------------------------------
+void mafGUISettingsTimeBar::SetTimeStep(double step)
+//----------------------------------------------------------------------------
+{
+  m_TimeStep = step;
+  m_NumberOfFrames = (int)((m_TimeMax - m_TimeMin) / m_TimeStep);
+  if (m_NumberOfFrames < 1)
+  {
+    m_NumberOfFrames = 1;
+    m_TimeStep = m_TimeMax - m_TimeMin;
+  }
+//  m_Config->Write("TimeStep", m_TimeStep);
+//  m_Config->Write("NumberOfFrames", m_NumberOfFrames);
 }
 //----------------------------------------------------------------------------
 void mafGUISettingsTimeBar::SetSubrange(double min, double max)
