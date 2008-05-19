@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 14:27:17 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-05-19 12:14:01 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -43,6 +43,7 @@
 #include "vtkUnstructuredGridReader.h"
 #include "vtkDataSetReader.h"
 #include "vtkDataSetWriter.h"
+#include "vtkCharArray.h"
 
 #include <assert.h>
 
@@ -434,10 +435,17 @@ int mafVMEItemVTK::UpdateReader(vtkDataReader *reader, mafString &filename)
       mafErrorMacro("Error extracting item from the archive!");
       return MAF_ERROR;
     }
+
+    //BES: 14.5.2008 - SetInputString creates a copy of m_InputMemory    
     reader->ReadFromInputStringOn();
-    reader->SetInputString(m_InputMemory, m_InputMemorySize);
+    //reader->SetInputString(m_InputMemory, m_InputMemorySize);
+    vtkMAFSmartPointer<vtkCharArray> pCharArray;
+    pCharArray->SetArray(const_cast<char*>(m_InputMemory), m_InputMemorySize, 0);
+    reader->SetInputArray(pCharArray);
     reader->Update();
-    delete m_InputMemory;
+    //delete m_InputMemory;
+    //reader->SetInputArray(NULL);  //Paolo 19.05.2008: commented because otherwise the data is lost before
+                                    //it is passed to the item.
     m_InputMemory = NULL;
     m_InputMemorySize = 0;
   }
