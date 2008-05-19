@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-30 14:42:20 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-05-19 12:09:47 $
+  Version:   $Revision: 1.26 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -270,7 +270,8 @@ void mafVMESlicer::SetSlicedVMELink(mafNode *node)
 void mafVMESlicer::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVMEVolume::SafeDownCast(GetSlicedVMELink());
+  //mafVME *vol = mafVMEVolume::SafeDownCast(GetSlicedVMELink());
+  mafVME *vol = mafVME::SafeDownCast(GetSlicedVMELink());
   if(vol)
   {
     vtkDataSet *vtkdata = vol->GetOutput()->GetVTKData();
@@ -350,7 +351,8 @@ void mafVMESlicer::InternalPreUpdate()
 void mafVMESlicer::InternalUpdate()
 //-----------------------------------------------------------------------
 {
-  mafVME *vol = mafVMEVolume::SafeDownCast(GetSlicedVMELink());
+  //mafVME *vol = mafVMEVolume::SafeDownCast(GetSlicedVMELink());
+  mafVME *vol = mafVME::SafeDownCast(GetSlicedVMELink());
   if(vol)
   {
     vol->Update();
