@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-15 15:19:03 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-05-19 12:13:05 $
+Version:   $Revision: 1.9 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,7 +44,7 @@ mafGUISettings(Listener, label)
   m_TimeStep = 0.2;
 
   m_TimeMin = 0;
-  m_TimeMax = m_TimeMin + m_NumberOfFrames * m_TimeStep;
+  m_TimeMax = m_TimeMin + (m_NumberOfFrames - 1) * m_TimeStep;
 
   InitializeSettings();
 }
@@ -79,7 +79,7 @@ void mafGUISettingsTimeBar::SetTimeBounds(double min, double max)
 {
   m_TimeMin = min;
   m_TimeMax = max;
-  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfFrames;
+  //m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfFrames;
 //  m_Config->Write("TimeStep", m_TimeStep);
 //  m_Config->Write("NumberOfFrames", m_NumberOfFrames);
   Update();
@@ -212,7 +212,14 @@ void mafGUISettingsTimeBar::SetNumberOfFrames(int frames)
 //----------------------------------------------------------------------------
 {
   m_NumberOfFrames = frames < 1 ? 1 : frames;
-  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfFrames;
+  if (m_NumberOfFrames == 1)
+  {
+    m_TimeStep = m_TimeMax - m_TimeMin;
+  }
+  else
+  {
+    m_TimeStep = (m_TimeMax - m_TimeMin) / (m_NumberOfFrames - 1);
+  }
 //  m_Config->Write("NumberOfFrames", m_NumberOfFrames);
 //  m_Config->Write("TimeStep", m_TimeStep);
   Update();
@@ -222,8 +229,8 @@ void mafGUISettingsTimeBar::SetTimeStep(double step)
 //----------------------------------------------------------------------------
 {
   m_TimeStep = step;
-  m_NumberOfFrames = (int)((m_TimeMax - m_TimeMin) / m_TimeStep);
-  if (m_NumberOfFrames < 1)
+  m_NumberOfFrames = (int)((m_TimeMax - m_TimeMin) / m_TimeStep) + 1;
+  if (m_NumberOfFrames <= 1)
   {
     m_NumberOfFrames = 1;
     m_TimeStep = m_TimeMax - m_TimeMin;
