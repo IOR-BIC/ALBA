@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-15 15:18:48 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-05-19 12:12:25 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,8 +70,6 @@ m_Timer(NULL, ID_TIMER)
   m_Time     = 0;
   m_TimeMin  = 0; 
   m_TimeMax  = 1;
-  m_NumberOfIntervals = 500;
-  m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
 
   m_TimeMinString = "";
   m_TimeMinString << m_TimeMin;
@@ -107,6 +105,8 @@ m_Timer(NULL, ID_TIMER)
 
   for(int i = 0; i < 5; i++)
     m_Sizer->Add(m_TimeBarButtons[i],0,0);
+
+  SetNumberOfIntervals(500);
 }
 //----------------------------------------------------------------------------
 mmgTimeBar::~mmgTimeBar()
@@ -117,15 +117,31 @@ mmgTimeBar::~mmgTimeBar()
 void mmgTimeBar::SetNumberOfIntervals(int intervals)
 //----------------------------------------------------------------------------
 {
-  m_NumberOfIntervals = intervals;
+  m_NumberOfIntervals = intervals < 1 ? 1 : intervals;
   m_TimeBarSlider->SetNumberOfSteps(m_NumberOfIntervals);
   if (m_Timer.IsRunning())
   {
     m_Timer.Stop();
   }
-  if (m_TimeBarSettings->GetRealTimeMode() == 0)
+  if (m_TimeBarSettings != NULL && m_TimeBarSettings->GetRealTimeMode() == 0)
   {
-    m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
+    UpdateTimeStep();
+  }
+}
+//----------------------------------------------------------------------------
+void mmgTimeBar::UpdateTimeStep()
+//----------------------------------------------------------------------------
+{
+  if (m_NumberOfIntervals == 1)
+  {
+    m_TimeStep = m_TimeMax - m_TimeMin;
+  }
+  else
+  {
+    m_TimeStep = (m_TimeMax - m_TimeMin) / (m_NumberOfIntervals - 1);
+  }
+  if (m_TimeBarSettings != NULL)
+  {
     m_TimeStep *= m_TimeBarSettings->GetTimeMultiplier();
   }
 }
@@ -149,8 +165,7 @@ void mmgTimeBar::OnEvent(mafEventBase *maf_event)
         }
         if (m_TimeBarSettings->GetRealTimeMode() == 0)
         {
-          m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
-          m_TimeStep *= m_TimeBarSettings->GetTimeMultiplier();
+          UpdateTimeStep();
         }
         Update();
       break;
@@ -284,8 +299,7 @@ void mmgTimeBar::SetBounds(double min, double max)
   //SetNumberOfIntervals(m_TimeBarSettings->GetNumberOfFrames());
   if (m_TimeBarSettings->GetRealTimeMode() == 0)
   {
-    m_TimeStep = (m_TimeMax - m_TimeMin) / m_NumberOfIntervals;
-    m_TimeStep *= m_TimeBarSettings->GetTimeMultiplier();
+    UpdateTimeStep();
   }
 
   if(m_Time < min) 

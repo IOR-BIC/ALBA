@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTimeBar.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 14:23:00 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-05-19 12:12:25 $
+  Version:   $Revision: 1.12 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -90,6 +90,9 @@ protected:
   
 	/** Update the time bar interface. */
 	void Update();
+
+  /** Calculate the Time step according to the number of intervals.*/
+  void UpdateTimeStep();
 
 DECLARE_EVENT_TABLE()
 };
