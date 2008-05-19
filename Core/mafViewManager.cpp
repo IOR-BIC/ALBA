@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 10:44:52 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2008-05-19 12:15:51 $
+  Version:   $Revision: 1.31 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -163,8 +163,8 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
 {
   m_SelectedView = view;
 
-  if(m_SelectedRWI)
-    m_SelectedRWI->SetInteractorStyle(NULL);
+//  if(m_SelectedRWI)
+//    m_SelectedRWI->SetInteractorStyle(NULL);
 
   m_SelectedRWI = view->GetRWI();
   if (m_Mouse)
