@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-13 12:00:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-05-19 09:32:29 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -102,7 +102,7 @@ void mafPipeFactory::RegisterNewPipe(const char* pipe_name, const char* descript
 //------------------------------------------------------------------------------
 {
 	std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(m_PipeNames.begin (), m_PipeNames.end (), std::string(pipe_name));
-	if(it._Myptr != 0 && it != m_PipeNames.end() )
+	if(it != m_PipeNames.end() )
 	{
     return;
 	}
