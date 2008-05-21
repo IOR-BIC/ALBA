@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-05-21 10:11:32 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -118,5 +118,8 @@ protected:
   /**
   Register the event receiver object*/
   mafObserver *m_Listener;
+
+  /** friend test */
+  friend class mafGizmoScaleIsotropicTest;
 };
 #endif
