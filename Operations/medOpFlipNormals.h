@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:37:52 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-05-21 09:54:51 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -126,8 +126,6 @@ protected:
 	vtkIdType						 m_CellSeed;
 	vtkIdList						*m_Wave;
 	vtkIdList						*m_Wave2;
-	vtkIdList						*PointIds;
-	vtkIdList						*CellIds;
 	double							 m_Diameter;
 
 	vtkGlyph3D					*m_NormalGlyph;
