@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 14:53:05 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-05-21 09:23:58 $
+  Version:   $Revision: 1.17 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -110,7 +110,7 @@ private:
   wxString		m_TitileX;
   wxString		m_TitileY;
 
-  std::vector<vtkRectilinearGrid*> m_vtkData;
+  std::vector<vtkRectilinearGrid*> m_VtkData;
 
   std::vector<vtkDoubleArray*> m_ScalarArray;
  

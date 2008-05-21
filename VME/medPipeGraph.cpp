@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 15:03:05 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2008-05-21 09:23:58 $
+  Version:   $Revision: 1.34 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ medPipeGraph::medPipeGraph()
 
   m_TimeLine = NULL;
 
-  m_vtkData.clear();
+  m_VtkData.clear();
   m_ScalarArray.clear();
 }
 //----------------------------------------------------------------------------
@@ -87,11 +87,11 @@ medPipeGraph::~medPipeGraph()
   m_RenFront->RemoveActor2D(m_PlotActor);
   m_RenFront->SetBackground(m_OldColour);
 
-  for(int i=0;i<m_vtkData.size();i++)
+  for(int i=0;i<m_VtkData.size();i++)
   {
-    vtkDEL(m_vtkData[i]);
+    vtkDEL(m_VtkData[i]);
   }
-  m_vtkData.clear();
+  m_VtkData.clear();
 
   for(int i=0;i<m_ScalarArray.size();i++)
   {
@@ -237,11 +237,11 @@ void medPipeGraph::UpdateGraph()
   vtkDoubleArray *scalar;
   vnl_vector<double> row;
 
-  for(int i=0;i<m_vtkData.size();i++)
+  for(int i=0;i<m_VtkData.size();i++)
   {
-    vtkDEL(m_vtkData[i]);
+    vtkDEL(m_VtkData[i]);
   }
-  m_vtkData.clear();
+  m_VtkData.clear();
 
   for(int i=0;i<m_ScalarArray.size();i++)
   {
@@ -316,8 +316,8 @@ void medPipeGraph::UpdateGraph()
       rect_grid->SetDimensions(newTimeArray->GetNumberOfTuples(), 1, 1);
       rect_grid->SetXCoordinates(newTimeArray); 
       rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
-      m_vtkData.push_back(rect_grid);
-      m_PlotActor->AddInput(m_vtkData.at(c));
+      m_VtkData.push_back(rect_grid);
+      m_PlotActor->AddInput(m_VtkData.at(c));
     }
     else
     {
@@ -331,8 +331,8 @@ void medPipeGraph::UpdateGraph()
       rect_grid->SetDimensions(fakeTimeArray->GetNumberOfTuples(), 1, 1);
       rect_grid->SetXCoordinates(fakeTimeArray); 
       rect_grid->GetPointData()->SetScalars(m_ScalarArray.at(c)); 
-      m_vtkData.push_back(rect_grid);
-      m_PlotActor->AddInput(m_vtkData.at(c));
+      m_VtkData.push_back(rect_grid);
+      m_PlotActor->AddInput(m_VtkData.at(c));
     }
   }
 
@@ -397,7 +397,7 @@ void medPipeGraph::UpdateGraph()
   vtkDEL(lineArray);
   vtkDEL(scalarArrayLine);
 
-  m_vtkData.push_back(m_TimeLine);
+  m_VtkData.push_back(m_TimeLine);
 
   m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
 
@@ -417,7 +417,7 @@ void medPipeGraph::CreateLegend()
     int idx = c*3;
     if (m_CheckBox->IsItemChecked(c))
     { 
-      m_PlotActor->AddInput(m_vtkData.at(c));
+      m_PlotActor->AddInput(m_VtkData.at(c));
       m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
       name = m_CheckBox->GetItemLabel(c);
       m_LegendBox_Actor->SetEntryString(counter_legend, name.GetCStr());
@@ -430,7 +430,7 @@ void medPipeGraph::CreateLegend()
     }
   }
 
-  m_PlotActor->AddInput(m_vtkData.at(m_vtkData.size()-1));
+  m_PlotActor->AddInput(m_VtkData.at(m_VtkData.size()-1));
   m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
   m_LegendBox_Actor->SetEntryString(counter_legend, "");
 
@@ -684,8 +684,8 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     vtkDEL(lineArray);
     vtkDEL(scalarArrayLine);
 
-    m_vtkData.pop_back();
-    m_vtkData.push_back(m_TimeLine);
+    m_VtkData.pop_back();
+    m_VtkData.push_back(m_TimeLine);
 
     m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
     m_RenFront->AddActor2D(m_PlotActor);
