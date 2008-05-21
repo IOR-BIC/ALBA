@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 16:52:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-05-21 10:05:44 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani , Stefano Perticoni 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -164,10 +164,10 @@ protected:
 
   int		m_ClipModality;
 	int		m_GizmoType;
-  int		ClipInside;
+  int		m_ClipInside;
 	int   m_UseGizmo;
 	int		m_ClipBoundBox;
-  bool	PlaneCreated;
+  bool	m_PlaneCreated;
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;

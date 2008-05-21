@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 16:52:36 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-05-21 10:05:44 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani, Stefano Perticoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -85,13 +85,13 @@ mafOp(label)
 
   m_OldSurface = NULL;
   
-  ClipInside      = 1;
+  m_ClipInside      = 1;
 	m_UseGizmo			=	1;
 	m_ClipBoundBox	= 1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
 	m_GizmoType			= GIZMO_TRANSLATE;
   
-  PlaneCreated = false;
+  m_PlaneCreated = false;
 
 	m_PlaneHeight = 0.0;
 	m_PlaneWidth	= 0.0;
@@ -248,7 +248,7 @@ void medOpInteractiveClipSurface::CreateGui()
   m_CASH->EnableWidgets(false);
   m_Gui->Divider();
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
-	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
+	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&m_ClipInside,1);
 	
   m_Gui->Button(ID_CLIP,_("clip"));
 	m_Gui->Button(ID_UNDO,_("undo"));
@@ -317,7 +317,7 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 			m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION);
-			ClipInside = m_ClipModality;
+			m_ClipInside = m_ClipModality;
 			m_Gui->Update();
 			ShowClipPlane(m_ClipModality != medOpInteractiveClipSurface::MODE_SURFACE);
 			ChangeGizmo();
@@ -325,7 +325,7 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_PLANE_WIDTH:
 		case ID_PLANE_HEIGHT:
 			{
-				if(PlaneCreated)
+				if(m_PlaneCreated)
 				{
 					m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
@@ -395,7 +395,7 @@ void medOpInteractiveClipSurface::ClipBoundingBox()
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> before_transform_plane;
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transform_plane;
-	if(ClipInside==1)//if clip reverse is necessary rotate plane
+	if(m_ClipInside==1)//if clip reverse is necessary rotate plane
 	{
 		before_transform_plane->SetTransform(rotate);
 		before_transform_plane->SetInput(m_PlaneSource->GetOutput());
@@ -508,7 +508,7 @@ void medOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 					{
 						if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
 						{
-							ClipInside= ClipInside ? 0 : 1;
+							m_ClipInside= m_ClipInside ? 0 : 1;
 							m_Gui->Update();
 							m_Arrow->SetScaleFactor(-1 * m_Arrow->GetScaleFactor());
 							mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -724,7 +724,7 @@ int medOpInteractiveClipSurface::Clip()
 	vtkNEW(newPolyData);
 
 	m_Clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
-	m_Clipper->SetInsideOut(ClipInside);  // use 0/1 to reverse sense of clipping
+	m_Clipper->SetInsideOut(m_ClipInside);  // use 0/1 to reverse sense of clipping
 	m_Clipper->SetValue(0);               // use this to control clip distance from clipper function to surface
   m_Clipper->Update();
 
@@ -837,7 +837,7 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       m_Arrow->SetVectorModeToUseNormal();
    
 
-      int clip_sign = ClipInside ? 1 : -1;
+      int clip_sign = m_ClipInside ? 1 : -1;
       m_Arrow->SetScaleFactor(clip_sign * abs(zdim/10.0));
       m_Arrow->Update();
 
@@ -869,12 +869,12 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
     material->m_Prop->SetOpacity(0.5);
     material->m_Opacity = material->m_Prop->GetOpacity();
     
-    if(!PlaneCreated)
+    if(!m_PlaneCreated)
     {
       material->m_Prop->SetColor(0.2,0.2,0.8);
       material->m_Prop->GetDiffuseColor(material->m_Diffuse);
       AttachInteraction();
-      PlaneCreated = true;
+      m_PlaneCreated = true;
     }
   }
   else
