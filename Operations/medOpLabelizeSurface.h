@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-10-26 13:16:03 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-05-21 10:15:07 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -134,7 +134,7 @@ protected:
 
 	int		m_LabelInside;
 
-	bool	PlaneCreated;
+	bool	m_PlaneCreated;
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;

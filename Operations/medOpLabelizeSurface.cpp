@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 13:16:03 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-05-21 10:15:07 $
+Version:   $Revision: 1.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -168,7 +168,7 @@ void medOpLabelizeSurface::OpRun()
 	m_VmeEditor->Update();
 	m_VmeEditor->ReparentTo(mafVME::SafeDownCast(m_Input));
 
-	PlaneCreated = false;
+	m_PlaneCreated = false;
 
 	vtkPolyData *inputPolydata=vtkPolyData::SafeDownCast(m_VmeEditor->GetOutput()->GetVTKData());
 	inputPolydata->Modified();
@@ -181,9 +181,9 @@ void medOpLabelizeSurface::OpRun()
 
 	if(!inputPolydata->GetCellData()->GetArray("CELL_LABEL"))
 	{
-		m_VmeEditor->GetMaterial()->m_ColorLut->SetNumberOfTableValues(1);
-		m_VmeEditor->GetMaterial()->m_ColorLut->SetTableValue(0,1.0,1.0,1.0);
-		m_VmeEditor->GetMaterial()->m_ColorLut->Build();
+		m_VmeEditor->GetMaterial()->GetColorLut()->SetNumberOfTableValues(1);
+		m_VmeEditor->GetMaterial()->GetColorLut()->SetTableValue(0,1.0,1.0,1.0);
+		m_VmeEditor->GetMaterial()->GetColorLut()->Build();
 
 		vtkMAFSmartPointer<vtkDoubleArray> cellScalar;
 		cellScalar->SetName("CELL_LABEL");
@@ -256,7 +256,7 @@ void medOpLabelizeSurface::CreateGui()
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
 
 	m_Gui->Double(ID_LABEL_VALUE,_("Label"),&m_LabelValue);
-	m_Gui->Lut(ID_LUT,"lut",m_VmeEditor->GetMaterial()->m_ColorLut);
+	m_Gui->Lut(ID_LUT,"lut",m_VmeEditor->GetMaterial()->GetColorLut());
 	double b[6];
 	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
@@ -414,12 +414,12 @@ void medOpLabelizeSurface::ShowClipPlane(bool show)
 		material->m_Prop->SetOpacity(0.5);
 		material->m_Opacity = material->m_Prop->GetOpacity();
 
-		if(!PlaneCreated)
+		if(!m_PlaneCreated)
 		{
 			material->m_Prop->SetColor(0.2,0.2,0.8);
 			material->m_Prop->GetDiffuseColor(material->m_Diffuse);
 			AttachInteraction();
-			PlaneCreated = true;
+			m_PlaneCreated = true;
 		}
 	}
 	else
@@ -523,7 +523,7 @@ void medOpLabelizeSurface::SetPlaneDimension(double w,double h)
 void medOpLabelizeSurface::SetPlaneDimension()
 //----------------------------------------------------------------------------
 {
-	if(PlaneCreated)
+	if(m_PlaneCreated)
 	{
 		m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 		m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
@@ -893,7 +893,7 @@ void medOpLabelizeSurface::SetLutEditor(vtkLookupTable *lut)
 {
 	if(m_VmeEditor)
 	{
-		m_VmeEditor->GetMaterial()->m_ColorLut->DeepCopy(lut);
+		m_VmeEditor->GetMaterial()->GetColorLut()->DeepCopy(lut);
 		m_VmeEditor->GetMaterial()->UpdateProp();
 		m_VmeEditor->Update();
 	}
