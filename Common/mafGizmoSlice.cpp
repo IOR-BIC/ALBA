@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 17:59:07 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-05-21 09:48:22 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -74,9 +74,9 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
 
   // default gizmo moving modality set to SNAP
   m_MovingModality = SNAP;
-  m_axis      = GIZMO_SLICE_Z;
+  m_Axis      = GIZMO_SLICE_Z;
   m_SnapArray = NULL;
-  m_id        = 0;
+  m_Id        = 0;
 
   mafNEW(m_VmeGizmo);
   m_VmeGizmo->SetName(m_Name);
@@ -119,10 +119,10 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 //----------------------------------------------------------------------------
 {
   //register gizmo axis
-  m_axis = axis;
+  m_Axis = axis;
 
   // register id
-  m_id = gizmoSliceId;
+  m_Id = gizmoSliceId;
 	
 	double localBounds[6];
   if (vtkDataSet *VolumeVTKData = InputVME->GetOutput()->GetVTKData())
@@ -321,7 +321,7 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
 
 				// position sent as vtk point
 				m_Point->SetPoint(0,slicePlaneOrigin);
-				mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_id));
+				mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_Id));
 
       }
       break;
@@ -349,7 +349,7 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
 
 			// position sent as vtk point
 			m_Point->SetPoint(0,slicePlaneOrigin);
-			mafEventMacro(mafEvent(this,MOUSE_UP, m_Point, m_id));
+			mafEventMacro(mafEvent(this,MOUSE_UP, m_Point, m_Id));
 		}
 	}
 }
@@ -360,7 +360,7 @@ void mafGizmoSlice::SetGizmoMovingModalityToBound()
 {
   this->m_MovingModality = BOUND;
  
-  switch(m_axis)  
+  switch(m_Axis)  
   {
     case GIZMO_SLICE_X:
     {
@@ -386,7 +386,7 @@ void mafGizmoSlice::SetGizmoMovingModalityToSnap()
 {
   this->m_MovingModality = SNAP; 
 
-  switch(m_axis)  
+  switch(m_Axis)  
   {
     case GIZMO_SLICE_X:
     {

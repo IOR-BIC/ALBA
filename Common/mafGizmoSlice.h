@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 10:09:41 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-05-21 09:48:22 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -86,7 +86,7 @@ protected:
 	void InitSnapArray(mafVME *vol, int axis);
 
   mafString           m_Name;
-  long                m_id;
+  long                m_Id;
   mafVMEGizmo        *m_VmeGizmo;
   mmiCompositorMouse *m_GizmoBehavior;
 	vtkDoubleArray     *m_SnapArray;
@@ -95,7 +95,7 @@ protected:
   vtkPoints		  *m_Point;
 
   /** Register the gizmo axis, default is z */
-  int m_axis;
+  int m_Axis;
 
   /** 
   Register the gizmo behavior: BOUND means gizmo movement is free
