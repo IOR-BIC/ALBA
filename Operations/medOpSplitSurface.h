@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 15:31:51 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-05-21 08:42:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -148,11 +148,11 @@ protected:
 
   int		m_ClipModality;
 	int		m_GizmoType;
-  int		ClipInside;
+  int		m_ClipInside;
 	int   m_UseGizmo;
 	int		m_GenerateClippedOutput;
 	int		m_ClipBoundBox;
-  bool	PlaneCreated;
+  bool	m_PlaneCreated;
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;

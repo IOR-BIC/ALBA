@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-25 15:31:51 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-05-21 08:42:40 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -81,13 +81,13 @@ mafOp(label)
 	m_ResultPolyData = NULL;
 	m_ClippedPolyData = NULL;
   
-  ClipInside      = 1;
+  m_ClipInside      = 1;
 	m_UseGizmo			=	1;
 	m_ClipBoundBox	= 1;
   m_ClipModality  = MODE_IMPLICIT_FUNCTION;
 	m_GizmoType			= GIZMO_TRANSLATE;
   
-  PlaneCreated = false;
+  m_PlaneCreated = false;
 
 	m_PlaneHeight = 0.0;
 	m_PlaneWidth	= 0.0;
@@ -203,7 +203,7 @@ void medOpSplitSurface::CreateGui()
 	wxString gizmo_name[3] = {"translate","rotate","scale"};
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
 	m_Gui->Button(ID_CHOOSE_SURFACE,_("clipper surface"));
-	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&ClipInside,1);
+	m_Gui->Bool(ID_CLIP_INSIDE,_("reverse clipping"),&m_ClipInside,1);
 	double b[6];
 	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
@@ -256,7 +256,7 @@ void medOpSplitSurface::OnEventThis(mafEventBase *maf_event)
 			m_Gui->Enable(ID_GENERATE_CLIPPED_OUTPUT, m_ClipModality == medOpSplitSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(ID_USE_GIZMO,m_ClipModality == medOpSplitSurface::MODE_IMPLICIT_FUNCTION);
 			m_Gui->Enable(wxOK,m_ClipModality == medOpSplitSurface::MODE_IMPLICIT_FUNCTION);
-			ClipInside = m_ClipModality;
+			m_ClipInside = m_ClipModality;
 			m_Gui->Update();
 			ShowClipPlane(m_ClipModality != medOpSplitSurface::MODE_SURFACE);
 			ChangeGizmo();
@@ -264,7 +264,7 @@ void medOpSplitSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_PLANE_WIDTH:
 		case ID_PLANE_HEIGHT:
 			{
-				if(PlaneCreated)
+				if(m_PlaneCreated)
 				{
 					m_PlaneSource->SetPoint1(m_PlaneWidth/2,-m_PlaneHeight/2, 0);
 					m_PlaneSource->SetPoint2(-m_PlaneWidth/2, m_PlaneHeight/2, 0);
@@ -330,7 +330,7 @@ void medOpSplitSurface::ClipBoundingBox()
 
 	m_ClipperBoundingBox->SetInput(transform_data_input->GetOutput());
 	m_ClipperBoundingBox->SetMask(transform_plane->GetOutput());
-	m_ClipperBoundingBox->SetClipInside(ClipInside);
+	m_ClipperBoundingBox->SetClipInside(m_ClipInside);
 	m_ClipperBoundingBox->Update();
 
 	m_ResultPolyData->DeepCopy(m_ClipperBoundingBox->GetOutput());
@@ -340,7 +340,7 @@ void medOpSplitSurface::ClipBoundingBox()
 
 	if(m_GenerateClippedOutput)
 	{
-		m_ClipperBoundingBox->SetClipInside(ClipInside?0:1);
+		m_ClipperBoundingBox->SetClipInside(m_ClipInside?0:1);
 		m_ClipperBoundingBox->Update();
 
 		m_ClippedPolyData->DeepCopy(m_ClipperBoundingBox->GetOutput());
@@ -637,7 +637,7 @@ int medOpSplitSurface::Clip()
 	}
 
 	m_Clipper->SetGenerateClipScalars(0); // 0 outputs input data scalars, 1 outputs implicit function values
-	m_Clipper->SetInsideOut(ClipInside);  // use 0/1 to reverse sense of clipping
+	m_Clipper->SetInsideOut(m_ClipInside);  // use 0/1 to reverse sense of clipping
 	m_Clipper->SetValue(0);               // use this to control clip distance from clipper function to surface
   m_Clipper->Update();
 
@@ -647,7 +647,7 @@ int medOpSplitSurface::Clip()
 	if(m_GenerateClippedOutput)
 	{
 
-		m_Clipper->SetInsideOut(ClipInside?0:1);
+		m_Clipper->SetInsideOut(m_ClipInside?0:1);
 		m_Clipper->Update();
 
 		m_ClippedPolyData->DeepCopy(m_Clipper->GetOutput());
@@ -728,7 +728,7 @@ void medOpSplitSurface::ShowClipPlane(bool show)
       m_Arrow->SetSource(m_ArrowShape->GetOutput());
       m_Arrow->SetVectorModeToUseNormal();
       
-      int clip_sign = ClipInside ? 1 : -1;
+      int clip_sign = m_ClipInside ? 1 : -1;
       m_Arrow->SetScaleFactor(clip_sign * abs(zdim/10.0));
       m_Arrow->Update();
 
@@ -759,12 +759,12 @@ void medOpSplitSurface::ShowClipPlane(bool show)
     material->m_Prop->SetOpacity(0.5);
     material->m_Opacity = material->m_Prop->GetOpacity();
     
-    if(!PlaneCreated)
+    if(!m_PlaneCreated)
     {
       material->m_Prop->SetColor(0.2,0.2,0.8);
       material->m_Prop->GetDiffuseColor(material->m_Diffuse);
       AttachInteraction();
-      PlaneCreated = true;
+      m_PlaneCreated = true;
     }
   }
   else
