@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-21 10:15:07 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-05-21 12:02:18 $
+Version:   $Revision: 1.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -181,9 +181,9 @@ void medOpLabelizeSurface::OpRun()
 
 	if(!inputPolydata->GetCellData()->GetArray("CELL_LABEL"))
 	{
-		m_VmeEditor->GetMaterial()->GetColorLut()->SetNumberOfTableValues(1);
-		m_VmeEditor->GetMaterial()->GetColorLut()->SetTableValue(0,1.0,1.0,1.0);
-		m_VmeEditor->GetMaterial()->GetColorLut()->Build();
+		m_VmeEditor->GetMaterial()->m_ColorLut->SetNumberOfTableValues(1);
+		m_VmeEditor->GetMaterial()->m_ColorLut->SetTableValue(0,1.0,1.0,1.0);
+		m_VmeEditor->GetMaterial()->m_ColorLut->Build();
 
 		vtkMAFSmartPointer<vtkDoubleArray> cellScalar;
 		cellScalar->SetName("CELL_LABEL");
@@ -256,7 +256,7 @@ void medOpLabelizeSurface::CreateGui()
 	m_Gui->Combo(ID_CHOOSE_GIZMO,_("gizmo"),&m_GizmoType,3,gizmo_name);
 
 	m_Gui->Double(ID_LABEL_VALUE,_("Label"),&m_LabelValue);
-	m_Gui->Lut(ID_LUT,"lut",m_VmeEditor->GetMaterial()->GetColorLut());
+	m_Gui->Lut(ID_LUT,"lut",m_VmeEditor->GetMaterial()->m_ColorLut);
 	double b[6];
 	((mafVME *)m_Input)->GetOutput()->GetVMEBounds(b);
 	// bounding box dim
@@ -893,7 +893,7 @@ void medOpLabelizeSurface::SetLutEditor(vtkLookupTable *lut)
 {
 	if(m_VmeEditor)
 	{
-		m_VmeEditor->GetMaterial()->GetColorLut()->DeepCopy(lut);
+		m_VmeEditor->GetMaterial()->m_ColorLut->DeepCopy(lut);
 		m_VmeEditor->GetMaterial()->UpdateProp();
 		m_VmeEditor->Update();
 	}
