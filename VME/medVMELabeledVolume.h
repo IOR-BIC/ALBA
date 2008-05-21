@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-20 17:39:32 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-05-21 09:20:12 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -183,8 +183,7 @@ protected:
   double        m_BBox[6];
   double        m_Origin[3];
   double        m_XVect[3];
-  double        m_YVect[3]; 
-  wxColour     currentColor;
+  double        m_YVect[3];
   
   wxString m_ItemLabel;
 
