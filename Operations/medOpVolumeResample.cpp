@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-22 14:16:13 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-05-22 14:40:55 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -400,7 +400,19 @@ void medOpVolumeResample::Resample()
   m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray()); // copy tags
   mafTagItem *ti = NULL;
   ti = m_ResampledVme->GetTagArray()->GetTag("VME_NATURE");
-  ti->SetValue("SYNTHETIC");
+  if(ti)
+  {
+    ti->SetValue("SYNTHETIC");
+  }
+  else
+  {
+    mafTagItem tag_Nature;
+    tag_Nature.SetName("VME_NATURE");
+    tag_Nature.SetValue("SYNTHETIC");
+
+    m_ResampledVme->GetTagArray()->SetTag(tag_Nature);
+  }
+
   m_ResampledVme->SetName(new_vme_name);
 
   m_ResampledVme->ReparentTo(m_Input->GetParent());
