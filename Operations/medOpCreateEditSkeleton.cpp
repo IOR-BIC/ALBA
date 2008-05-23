@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-06 11:21:50 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-05-23 08:47:07 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -122,6 +122,13 @@ void medOpCreateEditSkeleton::OpDo()
 	{
 		m_Skeleton->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
 		m_Skeleton->SetName("VME Skeleton");
+
+    mafTagItem tag_Nature;
+    tag_Nature.SetName("VME_NATURE");
+    tag_Nature.SetValue("SYNTHETIC");
+
+    m_Skeleton->GetTagArray()->SetTag(tag_Nature);
+
 		m_Skeleton->ReparentTo(m_Input);
 	}
 	else if(m_Input->IsMAFType(medVMEPolylineGraph))
