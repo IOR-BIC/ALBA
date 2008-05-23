@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 17:07:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-05-23 08:51:08 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,6 +17,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include <vector>
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -73,7 +74,7 @@ public:
   void OpUndo();
 
 protected:
-  mafVMESurface *m_IsosurfaceVme;   // polydata VME
+  std::vector<mafVMESurface *> m_IsosurfaceVme;   // surface VME vector
 
   mmgDialog		*m_Dialog;
 	mafRWI      *m_Rwi;
@@ -95,6 +96,11 @@ protected:
   double       m_SliceOrigin[3];
   float        m_SliceXVect[3];
   float        m_SliceYVect[3];
+
+  int m_MultiContoursFlag;
+  int m_NumberOfContours;
+  double m_MinRange;
+  double m_MaxRange;
 
   mmgFloatSlider *m_IsoSlider;
   mmgFloatSlider *m_SliceSlider;
@@ -120,32 +126,25 @@ protected:
 
   mmiExtractIsosurface *m_DensityPicker;
 
-	/** 
-  Builds operation's interface and visualization pipeline. */
+	/** Builds operation's interface and visualization pipeline. */
   void CreateOpDialog();
 
-	/** 
-  Remove operation's interface. */
+	/** Remove operation's interface. */
   void DeleteOpDialog();
 
-	/** 
-  Create the pipeline to generate the isosurface of the volume. */
+	/** Create the pipeline to generate the isosurface of the volume. */
   void CreateVolumePipeline();
 
-	/** 
-  Create the pipeline to generate the slice of the volume. */
+	/** Create the pipeline to generate the slice of the volume. */
   void CreateSlicePipeline();
 
-	/** 
-  Extract the isosurface and build the related vme. */
+	/** Extract the isosurface and build the related vme. */
   void ExtractSurface(bool clean=true);
 
-	/** 
-  Re-generate the surface according to the new threshold value. */
+	/** Re-generate the surface according to the new threshold value. */
   void UpdateSurface(bool use_lod = false);
 
-	/** 
-  Re-slice the volume according to the new coordinate value. */
+	/** Re-slice the volume according to the new coordinate value. */
   void UpdateSlice();
 };
 #endif

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-06 11:55:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-05-23 08:51:08 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -74,7 +74,7 @@ mafCxxTypeMacro(mafOpExtractIsosurface);
 
 //----------------------------------------------------------------------------
 mafOpExtractIsosurface::mafOpExtractIsosurface(const wxString &label) :
-mafOp(label), m_IsosurfaceVme(NULL)
+mafOp(label)
 //----------------------------------------------------------------------------
 {
   m_OpType  = OPTYPE_OP;
@@ -99,22 +99,33 @@ mafOp(label), m_IsosurfaceVme(NULL)
 	m_Triangulate = 1;
 	m_Clean				= 1;
 
-  for(int i=0; i<6; i++) m_BoundingBox[i]=0;
+  m_MultiContoursFlag = 0;
+  m_NumberOfContours = 1;
+  m_MinRange = 0;
+  m_MaxRange = 0;
 
-  m_Box    = NULL;
+  for(int i=0; i<6; i++) 
+    m_BoundingBox[i]=0;
+
+  m_Box = NULL;
 
   m_ContourVolumeMapper  = NULL; 
   m_OutlineFilter  = NULL;
   m_OutlineMapper  = NULL;
 
   m_DensityPicker  = NULL;
-  m_IsosurfaceVme  = NULL;
+  m_IsosurfaceVme.clear();
 }
 //----------------------------------------------------------------------------
 mafOpExtractIsosurface::~mafOpExtractIsosurface()
 //----------------------------------------------------------------------------
 {
-  mafDEL(m_IsosurfaceVme);
+  for (int i = 0; i < m_IsosurfaceVme.size(); i++)
+  {
+    mafDEL(m_IsosurfaceVme[i]);
+  }
+  m_IsosurfaceVme.clear();
+//  mafDEL(m_IsosurfaceVme);
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExtractIsosurface::Copy()
@@ -150,15 +161,22 @@ void mafOpExtractIsosurface::OpRun()
 void mafOpExtractIsosurface::OpDo()
 //----------------------------------------------------------------------------
 {
-  m_IsosurfaceVme->ReparentTo(m_Input);
+  for (int i = 0; i < m_IsosurfaceVme.size(); i++)
+  {
+    m_IsosurfaceVme[i]->ReparentTo(m_Input);
+  }
   //mafEventMacro(mafEvent(this,VME_ADD,m_IsosurfaceVme));
 }
 //----------------------------------------------------------------------------
 void mafOpExtractIsosurface::OpUndo()
 //----------------------------------------------------------------------------
 {
-  assert(m_IsosurfaceVme);
-  mafEventMacro(mafEvent(this,VME_REMOVE,m_IsosurfaceVme));
+  assert(m_IsosurfaceVme.size() > 0);
+  for (int i = 0; i < m_IsosurfaceVme.size(); i++)
+  {
+    mafEventMacro(mafEvent(this,VME_REMOVE,m_IsosurfaceVme[i]));
+  }
+//  mafEventMacro(mafEvent(this,VME_REMOVE,m_IsosurfaceVme));
 }
 //----------------------------------------------------------------------------
 // widget ID's
@@ -178,6 +196,12 @@ enum EXTRACT_ISOSURFACE_ID
   ID_VIEW_SLICE,
   ID_OPTIMIZE_CONTOUR,
   ID_AUTO_LOD,
+
+  ID_MULTIPLE_CONTOURS,
+  ID_NUM_OF_CONTOURS,
+  ID_MIN_RANGE,
+  ID_MAX_RANGE,
+
   ID_OK,
   ID_CANCEL,
 	ID_TRIANGULATE,
@@ -194,6 +218,9 @@ void mafOpExtractIsosurface::CreateOpDialog()
   dataset->GetScalarRange(sr);
   m_MinDensity = sr[0];
   m_MaxDensity = sr[1];
+  m_MinRange = m_MinDensity;
+  m_MaxRange = m_MaxDensity;
+
   m_IsoValue = (m_MinDensity + m_MaxDensity)*0.5;
 
   double b[6];
@@ -266,6 +293,12 @@ void mafOpExtractIsosurface::CreateOpDialog()
   mmgButton  *b_ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
   mmgButton  *b_cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
+  wxCheckBox *chk_multi = new wxCheckBox(m_Dialog, ID_MULTIPLE_CONTOURS, "multi contours", p, wxSize(100,20));
+  wxTextCtrl *text_num_of_contours = new wxTextCtrl(m_Dialog, ID_NUM_OF_CONTOURS, "num", p,wxSize(25, 16), wxNO_BORDER);
+  wxStaticText *lab_multi_contours  = new wxStaticText(m_Dialog,   -1, "range: ");
+  wxTextCtrl *text_min_range = new wxTextCtrl(m_Dialog, ID_MIN_RANGE, "", p,wxSize(50, 16));
+  wxTextCtrl *text_max_range = new wxTextCtrl(m_Dialog, ID_MAX_RANGE, "", p,wxSize(50, 16));
+
   // iso interface validator
   text->SetValidator(mmgValidator(this,ID_ISO,text,&m_IsoValue,m_MinDensity,m_MaxDensity));
   m_IsoSlider->SetValidator(mmgValidator(this,ID_ISO_SLIDER,m_IsoSlider,&m_IsoValue,text));
@@ -288,6 +321,11 @@ void mafOpExtractIsosurface::CreateOpDialog()
   chk_opt->SetValidator(mmgValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Optimize));
   chk_lod->SetValidator(mmgValidator(this, ID_AUTO_LOD, chk_lod, &m_Autolod));
 
+  chk_multi->SetValidator(mmgValidator(this, ID_MULTIPLE_CONTOURS, chk_multi, &m_MultiContoursFlag));
+  text_num_of_contours->SetValidator(mmgValidator(this, ID_NUM_OF_CONTOURS,text_num_of_contours, &m_NumberOfContours, 1, 100));
+  text_min_range->SetValidator(mmgValidator(this, ID_MIN_RANGE,text_min_range, &m_MinRange, m_MinDensity, m_MaxDensity));
+  text_max_range->SetValidator(mmgValidator(this, ID_MAX_RANGE,text_max_range, &m_MaxRange, m_MinDensity, m_MaxDensity));
+
   wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer1->Add(lab,     0,wxLEFT);	
   h_sizer1->Add(text,    0,wxLEFT);	
@@ -303,22 +341,34 @@ void mafOpExtractIsosurface::CreateOpDialog()
   h_sizer2->Add(b_incr_slice,  0, wxLEFT);	
 
   wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
-  h_sizer3->Add(foo,       1,wxEXPAND);	
-  h_sizer3->Add(chk_lod,   0,wxRIGHT);
-  h_sizer3->Add(chk_opt,   0,wxRIGHT);
-  h_sizer3->Add(chk_slice, 0,wxRIGHT);
-	h_sizer3->Add(chk_clean, 0,wxRIGHT);
-	h_sizer3->Add(chk_triangulate, 0,wxRIGHT);
+//  h_sizer3->Add(foo,       1,wxEXPAND);	
+  h_sizer3->Add(chk_lod,   0,wxLEFT);
+  h_sizer3->Add(chk_opt,   0,wxLEFT);
+  h_sizer3->Add(chk_slice, 0,wxLEFT);
+	h_sizer3->Add(chk_clean, 0,wxLEFT);
+	h_sizer3->Add(chk_triangulate, 0,wxLEFT);
   //  h_sizer3->Add(b_grid,  0,wxRIGHT);
-  h_sizer3->Add(b_fit,     0,wxRIGHT);
-  h_sizer3->Add(b_ok,      0,wxRIGHT);
-  h_sizer3->Add(b_cancel,  0,wxRIGHT);
+  
+  wxBoxSizer *h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
+  h_sizer4->Add(chk_multi, 0,wxLEFT);
+  h_sizer4->Add(text_num_of_contours, 0,wxLEFT);
+  h_sizer4->Add(lab_multi_contours, 0,wxLEFT);
+  h_sizer4->Add(text_min_range, 0,wxLEFT);
+  h_sizer4->Add(text_max_range, 0,wxLEFT);
+  
+  wxBoxSizer *h_sizer5 = new wxBoxSizer(wxHORIZONTAL);
+  h_sizer5->Add(foo,       1,wxEXPAND);	
+  h_sizer5->Add(b_fit,     0,wxRIGHT);
+  h_sizer5->Add(b_ok,      0,wxRIGHT);
+  h_sizer5->Add(b_cancel,  0,wxRIGHT);
 
   wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
   v_sizer->Add(m_Rwi->m_RwiBase, 1,wxEXPAND);
   v_sizer->Add(h_sizer1,     0,wxEXPAND | wxALL,5);
   v_sizer->Add(h_sizer2,     0,wxEXPAND | wxALL,5);
   v_sizer->Add(h_sizer3,     0,wxEXPAND | wxALL,5);
+  v_sizer->Add(h_sizer4,     0,wxEXPAND | wxALL,5);
+  v_sizer->Add(h_sizer5,     0,wxEXPAND | wxALL,5);
 
   m_Dialog->Add(v_sizer, 1, wxEXPAND);
 
@@ -613,12 +663,14 @@ void mafOpExtractIsosurface::OnEvent(mafEventBase *maf_event)
       UpdateSlice();
       break;
     case ID_INCREASE_SLICE:
-      if(m_Slice<m_SliceMax) m_Slice += m_SliceStep;
+      if(m_Slice < m_SliceMax) 
+        m_Slice += m_SliceStep;
       m_Dialog->TransferDataToWindow();  
       UpdateSlice();
       break;
     case ID_DECREASE_SLICE:
-      if(m_Slice>m_SliceMin) m_Slice -= m_SliceStep;
+      if(m_Slice > m_SliceMin) 
+        m_Slice -= m_SliceStep;
       m_Dialog->TransferDataToWindow();  
       UpdateSlice();
       break;
@@ -674,6 +726,28 @@ void mafOpExtractIsosurface::OnEvent(mafEventBase *maf_event)
         {
           wxMessageBox("Invalid picked point!!", "Warning");
         }
+      }
+      break;
+    case ID_MULTIPLE_CONTOURS:
+      if (m_MultiContoursFlag == 0)
+      {
+        m_NumberOfContours = 1;
+      }
+      break;
+    case ID_NUM_OF_CONTOURS:
+      break;
+    case ID_MIN_RANGE:
+      if (m_MinRange > m_MaxRange)
+      {
+        m_MinRange = m_MaxRange;
+        m_Dialog->TransferDataToWindow();
+      }
+      break;
+    case ID_MAX_RANGE:
+      if (m_MaxRange < m_MinRange)
+      {
+        m_MaxRange = m_MinRange;
+        m_Dialog->TransferDataToWindow();
       }
       break;
     default:
@@ -749,43 +823,57 @@ void mafOpExtractIsosurface::UpdateSlice()
 void mafOpExtractIsosurface::ExtractSurface(bool clean) 
 //------------------------------------------------------------------------------
 {
-  wxBusyInfo wait("Extracting Isosurface: please wait ...");
+  wxBusyInfo wait(_("Extracting Isosurface: please wait ..."));
 
   m_ContourVolumeMapper->SetEnableContourAnalysis(clean);
 
   // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
   // and then call surface->Delete() when the VME is created
-  vtkPolyData *surface;
-  surface = m_ContourVolumeMapper->GetOutput();
-	vtkMAFSmartPointer<vtkCleanPolyData>clearFilter;
-	vtkMAFSmartPointer<vtkTriangleFilter >triangleFilter;
-	if(m_Clean)
-	{
-		clearFilter->SetInput(surface);
-		clearFilter->ConvertLinesToPointsOff();
-		clearFilter->ConvertPolysToLinesOff();
-		clearFilter->ConvertStripsToPolysOff();
-		//clearFilter->PointMergingOff();
-		clearFilter->Update();
-		surface = clearFilter->GetOutput();
-	}
-	if(m_Triangulate)
-	{
-		triangleFilter->SetInput(surface);
-		triangleFilter->Update();
-		surface = triangleFilter->GetOutput();
-	}
-
-  if(surface == NULL)
+  int divisor = m_NumberOfContours - 1;
+  divisor = divisor == 0 ? 1 : divisor;
+  double step = (m_MaxRange - m_MinRange) / divisor;
+  for (int contour = 0; contour < m_NumberOfContours; contour++)
   {
-    wxMessageBox("Operation out of memory");
-    return;
+    if (m_MultiContoursFlag != 0)
+    {
+      m_IsoValue = m_MinRange + step * contour;
+      m_ContourVolumeMapper->SetContourValue(m_IsoValue);
+      m_ContourVolumeMapper->Update();
+    }
+    vtkPolyData *surface;
+    surface = m_ContourVolumeMapper->GetOutput();
+    vtkMAFSmartPointer<vtkCleanPolyData>clearFilter;
+    vtkMAFSmartPointer<vtkTriangleFilter >triangleFilter;
+    if(m_Clean)
+    {
+      clearFilter->SetInput(surface);
+      clearFilter->ConvertLinesToPointsOff();
+      clearFilter->ConvertPolysToLinesOff();
+      clearFilter->ConvertStripsToPolysOff();
+      //clearFilter->PointMergingOff();
+      clearFilter->Update();
+      surface = clearFilter->GetOutput();
+    }
+    if(m_Triangulate)
+    {
+      triangleFilter->SetInput(surface);
+      triangleFilter->Update();
+      surface = triangleFilter->GetOutput();
+    }
+
+    if(surface == NULL)
+    {
+      wxMessageBox(_("Operation out of memory"));
+      return;
+    }
+    m_ContourVolumeMapper->Update();
+
+    wxString name = wxString::Format( "%s Isosurface %g", m_Input->GetName(),m_IsoValue );
+
+    mafVMESurface *vme_surf;
+    mafNEW(vme_surf);
+    vme_surf->SetName(name.c_str());
+    vme_surf->SetDataByDetaching(surface,0);
+    m_IsosurfaceVme.push_back(vme_surf);
   }
-  m_ContourVolumeMapper->Update();
-
-  wxString name = wxString::Format( "%s Isosurface %g", m_Input->GetName(),m_IsoValue );
-
-  mafNEW(m_IsosurfaceVme);
-  m_IsosurfaceVme->SetName(name.c_str());
-  m_IsosurfaceVme->SetDataByDetaching(surface,0);
 }
