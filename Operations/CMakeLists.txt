@@ -111,6 +111,8 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   medOpImporterGRFWS.h
   medOpImporterAnalogWS.cpp
   medOpImporterAnalogWS.h
+  medOpSmoothSurfaceCells.cpp
+  medOpSmoothSurfaceCells.h
 )
 ENDIF (MAF_USE_ITK)
 
