@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 13:09:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-05-27 12:31:30 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -31,7 +31,7 @@
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 
-vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkHistogram, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkHistogram);
 //------------------------------------------------------------------------------
 vtkHistogram::vtkHistogram()
@@ -93,6 +93,20 @@ void vtkHistogram::SetInputData(vtkDataArray* inputData)
     if (this->InputData != NULL) { this->InputData->Register(this); }
     this->Modified();
     AutoscaleCalculated = false;
+  }
+}
+//------------------------------------------------------------------------------
+void vtkHistogram::SetAutoscaleHistogram(int autoscale)
+//------------------------------------------------------------------------------
+{
+  if (autoscale != 0 && AutoscaleHistogram == 0)
+  {
+    AutoscaleCalculated = false;
+  }
+  if (AutoscaleHistogram != autoscale)
+  {
+    AutoscaleHistogram = autoscale;
+    Modified();
   }
 }
 //------------------------------------------------------------------------------

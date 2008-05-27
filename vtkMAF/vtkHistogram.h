@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 13:09:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-05-27 12:31:30 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -83,7 +83,8 @@ class VTK_vtkMAF_EXPORT vtkHistogram : public vtkActor2D
   vtkGetMacro(LabelVisibility,int);
 
   /** Turn on/off auto-scale.*/
-  vtkSetMacro(AutoscaleHistogram,int);
+  void SetAutoscaleHistogram(int autoscale);
+  
   /** Turn on/off auto-scale.*/
   vtkBooleanMacro(AutoscaleHistogram,int);
   /** Get the state of the auto-scale.*/
