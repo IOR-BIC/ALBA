@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 10:05:44 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-05-27 17:12:15 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani, Stefano Perticoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -609,6 +609,12 @@ void medOpInteractiveClipSurface::ChangeGizmo()
 void medOpInteractiveClipSurface::OpStop(int result)
 //----------------------------------------------------------------------------
 {
+  if(result == OP_RUN_CANCEL)
+  {
+    ((mafVMESurface *)m_Input)->SetData(m_OldSurface,((mafVME *)m_Input)->GetTimeStamp());
+    ((mafVMESurface *)m_Input)->Update();
+  }
+
   if(m_ImplicitPlaneVMEGizmo)
   {
     m_ImplicitPlaneVMEGizmo->SetBehavior(NULL);
