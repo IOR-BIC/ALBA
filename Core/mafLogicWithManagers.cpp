@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 13:44:32 $
-  Version:   $Revision: 1.135 $
+  Date:      $Date: 2008-05-27 16:41:08 $
+  Version:   $Revision: 1.136 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1030,7 +1030,7 @@ void mafLogicWithManagers::OnFileNew()
 {
 	if(m_VMEManager)
   {
-    if( m_VMEManager->AskConfirmAndSave())
+    if(m_VMEManager->AskConfirmAndSave())
 	  {
       /*if(m_OpManager)
       {
@@ -1133,8 +1133,11 @@ void mafLogicWithManagers::OnFileHistory(int menuId)
 {
 	if(m_VMEManager) 
   {
-    this->m_VMEManager->MSFOpen(menuId);
-    UpdateFrameTitle();
+    if(m_VMEManager->AskConfirmAndSave())
+    {
+      m_VMEManager->MSFOpen(menuId);
+      UpdateFrameTitle();
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -1174,7 +1177,6 @@ void mafLogicWithManagers::OnQuit()
 		if(answer == wxYES) 
 			m_ApplicationLayoutSettings->SaveApplicationLayout();
 	}
-
 
   if(m_VMEManager)
   {
