@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkRemoveCellsFilter.cxx
   Language:  C++
-  Version:   $Id: vtkRemoveCellsFilter.cxx,v 1.1 2007-03-15 14:44:04 ior01 Exp $
+  Version:   $Id: vtkRemoveCellsFilter.cxx,v 1.2 2008-05-27 11:15:39 aqd0 Exp $
 
   Copyright (c) 2003-2004 Goodwin Lawlor
   All rights reserved.
@@ -20,23 +20,34 @@
 #include "vtkIdList.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkRemoveCellsFilter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkRemoveCellsFilter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkRemoveCellsFilter);
 
+vtkRemoveCellsFilter::vtkRemoveCellsFilter()
+{
+  m_ReverseRemove = FALSE;
+}
 
 void vtkRemoveCellsFilter::RemoveMarkedCells()
 {
+  
   vtkIdType numIds = this->MarkedCellIdList->GetNumberOfIds();
   
-  for (vtkIdType i = 0; i < numIds; i++)
+  if(m_ReverseRemove == TRUE)
+  {
+    this->CellIdList->DeepCopy(this->MarkedCellIdList);
+  }
+  else
+  {
+    for (vtkIdType i = 0; i < numIds; i++)
     {
-    this->CellIdList->DeleteId(this->MarkedCellIdList->GetId(i));
+      this->CellIdList->DeleteId(this->MarkedCellIdList->GetId(i));
     }
-    
+  }
+  
   this->InitializeScalars();
   this->Modified();
 }
-
 
 void vtkRemoveCellsFilter::RemoveCell(vtkIdType cellid_at_output)
 {

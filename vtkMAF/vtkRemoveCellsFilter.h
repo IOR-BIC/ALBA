@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkRemoveCellsFilter.h
   Language:  C++
-  Version:   $Id: vtkRemoveCellsFilter.h,v 1.1 2007-03-15 14:44:04 ior01 Exp $
+  Version:   $Id: vtkRemoveCellsFilter.h,v 1.2 2008-05-27 11:15:39 aqd0 Exp $
 
   Copyright (c) Goodwin Lawlor 2003-2004
   All rights reserved.
@@ -69,11 +69,17 @@ public:
  int GetNumberOfDeletedCells(){return this->GetInput()->GetNumberOfCells() - this->GetOutput()->GetNumberOfCells();}
  int GetNumberOfRemovedCells(){return this->GetInput()->GetNumberOfCells() - this->GetOutput()->GetNumberOfCells();} 
 
-
+ //Description
+ //Set the m_ReverseRemove variable to 0 or 1 , if 1 reverse the removal
+ void ReverseRemoveOn(){m_ReverseRemove = TRUE;}
+ void ReverseRemoveOff(){m_ReverseRemove = FALSE;}
 
 protected:
-  vtkRemoveCellsFilter(){};
+
+  vtkRemoveCellsFilter();
   ~vtkRemoveCellsFilter(){};
+
+  int m_ReverseRemove; //< if On remove all the cells that are  that are not marked
   
 
 private:
