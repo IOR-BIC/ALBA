@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRangeSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 08:26:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-05-27 12:49:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,6 +34,7 @@ BEGIN_EVENT_TABLE(mmgRangeSlider, wxControl)
   EVT_LEFT_UP(mmgRangeSlider::OnMouse)	
   EVT_MOTION(mmgRangeSlider::OnMouse)
   EVT_PAINT(mmgRangeSlider::OnPaint)
+  EVT_COMMAND_RANGE(MINID, MAXID, wxEVT_COMMAND_SLIDER_UPDATED, mmgRangeSlider::OnRangeModified)
 END_EVENT_TABLE()
 
 int     mmgRangeSlider::m_TriangleWidgetRadius = 5;
@@ -45,9 +46,11 @@ mmgRangeSlider::mmgRangeSlider(wxWindow *parent, wxWindowID id, const wxPoint& p
 //----------------------------------------------------------------------------
 { 
   this->Initialize();
+  m_BorderWidgetRadius = 3;
+  m_Listener = NULL;
 }
 //----------------------------------------------------------------------------
-void mmgRangeSlider::SetValue(int i, float value) 
+void mmgRangeSlider::SetValue(int i, double value) 
 //----------------------------------------------------------------------------
 {
   assert(i >= 0 && i < 3);
@@ -71,24 +74,36 @@ void mmgRangeSlider::SetValue(int i, float value)
     this->m_Value[1] = this->m_Value[2];
 
   if (this->m_Value[i] < this->m_Range[0])
-    this->m_Range[0] = this->m_Value[i];
+    this->m_Value[i] = this->m_Range[0];
 
   if (this->m_Value[i] > this->m_Range[1])
-    this->m_Range[1] = this->m_Value[i];
+    this->m_Value[i] = this->m_Range[1];
   this->Refresh();
 }
 //----------------------------------------------------------------------------
-void mmgRangeSlider::SetRange(float *range) 
+void mmgRangeSlider::SetRange(double *range) 
 //----------------------------------------------------------------------------
 {
   this->m_Range[0] = range[0];
   this->m_Range[1] = range[1];
 
+  // Adjust the minimum value according to the new slider range
   if (this->m_Value[0] < this->m_Range[0])
-    this->m_Range[0] = this->m_Value[0];
+    this->m_Value[0] = this->m_Range[0];
+  if (this->m_Value[0] > this->m_Range[1])
+    this->m_Value[0] = this->m_Range[1];
 
+  // Adjust the maximum value according to the new slider range
   if (this->m_Value[2] > this->m_Range[1])
-    this->m_Range[1] = this->m_Value[2];
+    this->m_Value[2] = this->m_Range[1];
+  if (this->m_Value[2] < this->m_Value[0])
+    this->m_Value[2] = this->m_Value[0];
+
+  // Adjust the middle value according to the new slider range
+  if (this->m_Value[1] > this->m_Value[2])
+    this->m_Value[1] = this->m_Value[2];
+  if (this->m_Value[1] < this->m_Value[0])
+    this->m_Value[1] = this->m_Value[0];
 
   this->Refresh();
 }
@@ -117,10 +132,10 @@ void mmgRangeSlider::OnPaint(wxPaintEvent &event)
   dc.Clear();
   const wxSize size = this->GetClientSize();
 
-#define BORDER_WIDGET_RADIUS  6
+//#define BORDER_WIDGET_RADIUS  3
 
-  const int lineWidth  = size.x - 10 - (4 * BORDER_WIDGET_RADIUS);
-  const int lineX = (size.x - lineWidth) >> 1, lineY = 5 + BORDER_WIDGET_RADIUS;
+  const int lineWidth  = size.x - 10 - (4 * m_BorderWidgetRadius);
+  const int lineX = (size.x - lineWidth) >> 1, lineY = 5 + m_BorderWidgetRadius;
   // draw line
   wxPen darkGreyPen(wxColour(64, 64, 64), 1, wxSOLID);
   dc.SetPen(*wxGREY_PEN);
@@ -138,8 +153,8 @@ void mmgRangeSlider::OnPaint(wxPaintEvent &event)
   // draw borders
   dc.SetPen(*wxGREY_PEN);
   dc.SetBrush(*wxWHITE_BRUSH);
-  dc.DrawCircle(lineX - BORDER_WIDGET_RADIUS, lineY, BORDER_WIDGET_RADIUS);
-  dc.DrawCircle(lineX + lineWidth + BORDER_WIDGET_RADIUS, lineY, BORDER_WIDGET_RADIUS);
+  dc.DrawCircle(lineX - m_BorderWidgetRadius, lineY, m_BorderWidgetRadius);
+  dc.DrawCircle(lineX + lineWidth + m_BorderWidgetRadius, lineY, m_BorderWidgetRadius);
 
   this->RedrawWidgets(dc);
   dc.EndDrawing();
@@ -151,7 +166,7 @@ void mmgRangeSlider::RedrawWidgets(wxDC &dc, bool eraseWidgets)
   wxPen darkGreyPen(wxColour(64, 64, 64), 1, wxSOLID);
   wxPen bkgPen(dc.GetBackground().GetColour(), 1, wxSOLID);
   // draw triangles
-  float range = this->m_Range[1] - this->m_Range[0];
+  double range = this->m_Range[1] - this->m_Range[0];
   dc.SetPen(eraseWidgets ? bkgPen : *wxGREY_PEN);
   for (int i = 0; i < 3; i++) 
 	{
@@ -193,8 +208,8 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
     if (this->m_SelectedTriangleWidget != -1) 
 		{
       // change value
-      float dx = float(x - this->m_PrevMousePosition.x) / this->m_LineWidth;
-      float newVal = this->m_Value[this->m_SelectedTriangleWidget] + dx * (this->m_Range[1] - this->m_Range[0]);
+      double dx = double(x - this->m_PrevMousePosition.x) / this->m_LineWidth;
+      double newVal = this->m_Value[this->m_SelectedTriangleWidget] + dx * (this->m_Range[1] - this->m_Range[0]);
       // clipping
       if (this->m_NumberOfWidgets > 1) 
 			{
@@ -226,8 +241,8 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
     }
     else if (this->m_SelectedRangeWidget != -1) 
 		{
-      float dx = float(x - this->m_PrevMousePosition.x) / this->m_LineWidth;
-      float newrange = this->m_Range[this->m_SelectedRangeWidget] + (this->m_Range[1] - this->m_Range[0]) * dx;
+      double dx = double(x - this->m_PrevMousePosition.x) / this->m_LineWidth;
+      double newrange = this->m_Range[this->m_SelectedRangeWidget] + (this->m_Range[1] - this->m_Range[0]) * dx;
       if (this->m_SelectedRangeWidget == 0 && newrange > this->m_Value[0])
         newrange = this->m_Value[0];
       else if (this->m_SelectedRangeWidget == 1 && newrange < this->m_Value[2])
@@ -256,10 +271,10 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
 		{
       if (this->m_NumberOfWidgets == 1 && i > 0 || this->m_NumberOfWidgets == 2 && i == 1)
         continue;
-      //SIL 16/03/04 changed dx,dy from int to float -- to disambiguate the call to sqrt
-      float dx = this->m_TrianglePosition[i].x + m_TriangleWidgetCenter.x - x;
-      float dy = this->m_TrianglePosition[i].y + m_TriangleWidgetCenter.y - y;
-      float distance = sqrt(dx * dx + dy * dy);
+      //SIL 16/03/04 changed dx,dy from int to double -- to disambiguate the call to sqrt
+      double dx = this->m_TrianglePosition[i].x + m_TriangleWidgetCenter.x - x;
+      double dy = this->m_TrianglePosition[i].y + m_TriangleWidgetCenter.y - y;
+      double distance = sqrt(dx * dx + dy * dy);
       if (distance < m_TriangleWidgetRadius) 
 			{
         if (distance < (0.5f * closestDistance) ||
@@ -277,11 +292,11 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
     // is the border widget
     for (i = 0; i < 2; i++) 
 		{
-      //SIL 16/03/04 changed dx,dy from int to float -- to disambiguate the call to sqrt
-      float dx = this->m_LineStartX - x + (i ? (this->m_LineWidth + BORDER_WIDGET_RADIUS) : -BORDER_WIDGET_RADIUS);
-      float dy = this->m_LineStartY - y;
+      //SIL 16/03/04 changed dx,dy from int to double -- to disambiguate the call to sqrt
+      double dx = this->m_LineStartX - x + (i ? (this->m_LineWidth + m_BorderWidgetRadius) : -m_BorderWidgetRadius);
+      double dy = this->m_LineStartY - y;
       int distance = int(sqrt(dx * dx + dy * dy) + 0.5f);
-      if (distance < BORDER_WIDGET_RADIUS)
+      if (distance < m_BorderWidgetRadius)
         this->m_SelectedRangeWidget = i;
     }
     if (this->m_SelectedRangeWidget != -1)
@@ -305,4 +320,10 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
       this->Refresh();
     }
   }
+}
+//----------------------------------------------------------------------------
+void mmgRangeSlider::OnRangeModified(wxCommandEvent &event)
+//----------------------------------------------------------------------------
+{
+  mafEventMacro(mafEvent(this, this->GetId()));
 }

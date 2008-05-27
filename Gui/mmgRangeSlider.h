@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRangeSlider.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:43:51 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-05-27 12:49:50 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
+#include "mafObserver.h"
 
 //----------------------------------------------------------------------------
 // mmgRangeSlider :
@@ -23,26 +24,31 @@ class mmgRangeSlider : public wxControl
 public:
   mmgRangeSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxString& name = wxPanelNameStr);
 
+  void SetListener(mafObserver *listener) {m_Listener = listener;}
+
   /** Get the 'min', 'max' or 'mid' value according to 'i'. */
-	float GetValue(int i) const { return this->m_Value[i]; }
+	double GetValue(int i) const { return this->m_Value[i]; }
 
   /** Set the 'min', 'max' or 'mid' value according to 'i'. */
-  void SetValue(int i, float value);
+  void SetValue(int i, double value);
 
   /** Get the range of the slider. */
-	const float *GetRange() const { return this->m_Range; }
+	const double *GetRange() const { return this->m_Range; }
 
   /** Set the range for the slider. */
-  void SetRange(float *range);
+  void SetRange(double *range);
 
   /** Set the range for the slider. */
-  void SetRange(float minR, float maxR) { float range[2] = {minR, maxR}; this->SetRange(range); }
+  void SetRange(double minR, double maxR) { double range[2] = {minR, maxR}; this->SetRange(range); }
 
   /** Set the number of widgets for the slider. */
   void SetNumberOfWidgets(int num) { if (num == this->m_NumberOfWidgets || num < 1 || num > 3) return; this->m_NumberOfWidgets = num; this->Refresh(); }
   
 	/** Enable/Disable the center cursor for the slider. */
   void EnableCenterWidget(bool enable) { this->m_NumberOfWidgets = (enable) ? 3 : 2; this->Refresh(); }
+
+  /** Hide / show the circles on the boundary of the slider.*/
+  void EnableBoundaryHandles(bool enable) {this->m_BorderWidgetRadius = (enable) ? 3 : 0; this->Refresh();}
   
 	/** Return true if one of the cursors are moving. */
   bool IsDragging() const { return this->m_SelectedTriangleWidget != -1 || this->m_SelectedRangeWidget != -1; }
@@ -56,20 +62,25 @@ protected:
 	
 	/** Move the cursors on mouse event. */
   void OnMouse(wxMouseEvent &event);
+
+  /** Intercept slider events and forward to the listener.*/
+  void OnRangeModified(wxCommandEvent &event);
 	
 	/** Redraw the widgets in the new position. */
   void RedrawWidgets(wxDC &dc, bool eraseWidgets = false);
 
-  float m_Range[2];
-  float m_Value[3];
+  double m_Range[2];
+  double m_Value[3];
 
-  int   m_NumberOfWidgets;
+  int m_NumberOfWidgets;
+  mafObserver *m_Listener;
 
 private:
   // ui coordinates
   int m_LineStartX;
   int m_LineStartY;
   int m_LineWidth;
+  int m_BorderWidgetRadius;
   wxPoint m_TrianglePosition[3];
 
   static wxPoint m_TriangleWidgetPoints[3];
