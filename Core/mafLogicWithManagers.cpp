@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-27 16:41:08 $
-  Version:   $Revision: 1.136 $
+  Date:      $Date: 2008-05-27 16:44:41 $
+  Version:   $Revision: 1.137 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1032,11 +1032,6 @@ void mafLogicWithManagers::OnFileNew()
   {
     if(m_VMEManager->AskConfirmAndSave())
 	  {
-      /*if(m_OpManager)
-      {
-        m_OpManager->GetSelectedVme()->GetRoot()->CleanTree();
-        m_OpManager->ClearUndoStack(); 
-      }*/
 		  m_VMEManager->MSFNew();
 	  }
   }
@@ -1053,16 +1048,6 @@ void mafLogicWithManagers::OnFileUpload(const char *remote_file, unsigned int up
   }
 
   wxMessageBox(_("Not implemented: think about it!!"), _("Warning"));
-  /*
-  if(m_VMEManager)
-  {
-    if(m_VMEManager->AskConfirmAndSave())
-    {
-      // Upload the file to remote host.
-      m_VMEManager->Upload(remote_file,upload_flag);
-    }
-  }
-  */
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
@@ -1094,16 +1079,9 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
           }
         }
       }
-      //* Srb List Dialog Example */
-   /*   else if (m_StorageSettings->GetStorageType() == mafGUISettingsStorage::SRB)
-      {
-        mafGUISRBBrowse remoteFile;
-        remoteFile.ShowModal();
-      }*/
       else      
       {
 		    wxString wildc    = _("MAF Storage Format file (*.msf)|*.msf|Compressed file (*.zmsf)|*.zmsf");
-		    //wxString msf_dir  = wxGetCwd().c_str();
         if (file_to_open != NULL)
         {
           file = file_to_open;
@@ -1116,12 +1094,6 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
 
       if(file.IsEmpty())
         return;
-
-      /*if(m_OpManager)
-      {
-        m_OpManager->GetSelectedVme()->GetRoot()->CleanTree();
-        m_OpManager->ClearUndoStack(); 
-      }*/
 
 		  m_VMEManager->MSFOpen(file);
 	  }
@@ -1160,7 +1132,6 @@ void mafLogicWithManagers::OnFileSaveAs()
 void mafLogicWithManagers::OnQuit()
 //----------------------------------------------------------------------------
 {
-  
   if (m_OpManager && m_OpManager->Running())
   {
     return;
@@ -1192,7 +1163,6 @@ void mafLogicWithManagers::OnQuit()
       if(answer == wxYES) 
         m_VMEManager->MSFSave();
       m_Quitting = answer != wxCANCEL;
-
     }
     else 
     {
@@ -1285,8 +1255,6 @@ void mafLogicWithManagers::VmeShow(mafNode *vme, bool visibility)
 {
 	if(m_ViewManager) m_ViewManager->VmeShow(vme, visibility);
   bool vme_in_tree = vme->IsVisible(); //check VisibleToTraverse flag.
-/*  vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
-    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);*/
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeShow(vme,visibility);
 }
@@ -1296,8 +1264,6 @@ void mafLogicWithManagers::VmeModified(mafNode *vme)
 {
   if(m_PlugTimebar) UpdateTimeBounds();
   bool vme_in_tree = vme->IsVisible();
-/*  vme_in_tree = !vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") || 
-    (vme->GetTagArray()->IsTagPresent("VISIBLE_IN_THE_TREE") && vme->GetTagArray()->GetTag("VISIBLE_IN_THE_TREE")->GetValueAsDouble() != 0);*/
   if(m_SideBar && vme_in_tree)
     m_SideBar->VmeModified(vme);
 	if(m_VMEManager) m_VMEManager->MSFModified(true);
@@ -1313,8 +1279,6 @@ void mafLogicWithManagers::VmeAdd(mafNode *vme)
 void mafLogicWithManagers::VmeAdded(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  //vme->Initialize();
-
   if(m_ViewManager)
     m_ViewManager->VmeAdd(vme);
   bool vme_in_tree = true;
@@ -1354,9 +1318,7 @@ void mafLogicWithManagers::VmeRemove(mafNode *vme)
   if(m_PlugTimebar)
     UpdateTimeBounds();
   if (m_ViewManager)
-  {
     m_ViewManager->CameraUpdate();
-  }
 }
 //----------------------------------------------------------------------------
 void mafLogicWithManagers::VmeRemoving(mafNode *vme)
@@ -1433,13 +1395,6 @@ void mafLogicWithManagers::ViewCreate(int viewId)
 	if(m_ViewManager)
   {
     mafView* v = m_ViewManager->ViewCreate(viewId);
-
-    /*
-    if(m_OpManager) 
-    {
-      VmeShow(m_OpManager->GetSelectedVme(),true);
-    }
-    */
   }
 }
 //----------------------------------------------------------------------------
@@ -1587,9 +1542,6 @@ void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
   mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
-/*  else
-    //m_extern_view->ShowContextualMenu(vme_menu);
-    contextMenu->ShowContextualMenu(m_extern_view,v,vme_menu);*/
   cppDEL(contextMenu);
 }
 //----------------------------------------------------------------------------
