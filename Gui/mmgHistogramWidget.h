@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-14 17:09:08 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-05-27 12:52:11 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,8 @@ class mafRWI;
 class vtkDataArray;
 class mmgGui;
 class vtkImageData;
+class mmgRangeSlider;
+class vtkLookupTable;
 
 //----------------------------------------------------------------------------
 /** mmgHistogramWidget : widget that encapsulate render window into a gui*/
@@ -40,7 +42,10 @@ public:
   virtual ~mmgHistogramWidget();
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  void OnEvent( mafEventBase *event );
+  
+  void OnEvent(mafEventBase *event);
+
+  MAF_ID_DEC(RANGE_MODIFIED);
 
   enum HISTOGRAM_WIDGET_ID
   {
@@ -48,7 +53,9 @@ public:
     ID_SCALE_FACTOR,
     ID_LOGSCALE,
     ID_LOGFACTOR,
-    ID_REPRESENTATION
+    ID_REPRESENTATION,
+    ID_RESET,
+    ID_RANGE_SLICER,
   };
 
 	/** Set a pre-calculated histogram, just visualize it instead calculate. It is used like a cache.*/
@@ -97,17 +104,28 @@ public:
   Possible values are: vtkHistogram::POINT_REPRESENTATION, vtkHistogram::LINE_REPRESENTATION or vtkHistogram::BAR_REPRESENTATION*/
   void SetRepresentation(int represent);
 
-  mmgGui *GetGui() {return m_Gui;};
+  void GetSelectedRange(double range[2]);
+
+  /** Set the reference to the lut which range will be adjusted by the slider.
+  The reference to the Lookup Table should be set before asking for the Histogram's Gui, so the slider to 
+  change the lookup table's range will appear on the UI.*/
+  void SetLut(vtkLookupTable *lut) {m_Lut = lut;};
+
+  /** Return a reference to the UI.*/
+  mmgGui *GetGui();
 
 protected:
   /** Create GUI for histogram widget.*/
   void CreateGui();
 
-  /** Update gui parameters according to the vtkHistogram.*/
+  /** Update UI parameters according to the vtkHistogram.*/
   void UpdateGui();
 
   /** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
+
+  /** Reset to default histogram parameters.*/
+  void ResetHistogram();
 
   mafObserver   *m_Listener;
   double         m_ScaleFactor;
@@ -122,6 +140,10 @@ protected:
 
   mmgGui        *m_Gui;
 
+  mmgRangeSlider *m_Slider;
+  double m_SelectedRange[2];
+  
+  vtkLookupTable*m_Lut;
   vtkDataArray  *m_Data;
   mafRWI        *m_HistogramRWI;
   vtkHistogram  *m_Histogram;
