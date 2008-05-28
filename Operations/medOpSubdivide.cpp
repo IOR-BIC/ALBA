@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSubdivide.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-28 12:14:17 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-05-28 12:15:27 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2008
@@ -189,7 +189,7 @@ void medOpSubdivide::OnEvent(mafEventBase *maf_event)
         {
           if (m_NumberOfSubdivision >5)
           {
-            wxMessageBox("Warning! the number of subdivision is hight, it could require too many memory!")
+            wxMessageBox("Warning! the number of subdivision is hight, it could require too many memory!");
           }
         }
         break;
