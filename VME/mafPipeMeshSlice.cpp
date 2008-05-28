@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-28 14:09:24 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-05-28 16:02:13 $
+Version:   $Revision: 1.13 $
 Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -708,11 +708,19 @@ void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
 {
   m_NormalFilter->Update();
 
+  vtkPolyData *pd = m_NormalFilter->GetOutput();
+
   if(m_ActiveScalarType == POINT_TYPE)
   {
     mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
-    m_NormalFilter->GetOutput()->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
-    m_NormalFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
+    int res = pd->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
+    
+    if (res == -1)
+    {
+      // the array is not in the list of active arrays
+      return;
+    }
+    pd->GetPointData()->GetScalars()->Modified();
 
     if (DEBUG_MODE)
     {
@@ -724,8 +732,15 @@ void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
   else if(m_ActiveScalarType == CELL_TYPE)
   {
     mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
-    m_NormalFilter->GetOutput()->GetCellData()->SetActiveScalars(activeScalarName.GetCStr());
-    m_NormalFilter->GetOutput()->GetCellData()->GetScalars()->Modified();
+    int res = pd->GetCellData()->SetActiveScalars(activeScalarName.GetCStr());
+
+    if (res == -1)
+    {
+      // the array is not in the list of active arrays
+      return;
+    }
+
+    pd->GetCellData()->GetScalars()->Modified();
 
     if (DEBUG_MODE)
     {
