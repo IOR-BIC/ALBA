@@ -94,6 +94,8 @@ SET(PROJECT_SRCS
   medOpImporterVTK.cpp
   medOpImporterVTK.h
 
+  medOpSubdivide.cpp
+  medOpSubdivide.h
 )
 
 IF (MAF_USE_ITK)
