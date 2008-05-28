@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRangeSlider.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-27 12:49:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-05-28 12:45:06 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,6 +69,9 @@ protected:
 	/** Redraw the widgets in the new position. */
   void RedrawWidgets(wxDC &dc, bool eraseWidgets = false);
 
+  /** Draw a label according to the mouse position.*/
+  void DrawLabel(int x, int y, double val);
+
   double m_Range[2];
   double m_Value[3];
 
@@ -90,6 +93,8 @@ private:
   wxPoint m_PrevMousePosition;
   int     m_SelectedTriangleWidget;
   int     m_SelectedRangeWidget;
+  wxString m_ValueString;
+  wxStaticText *m_RangeValueLabel;
   
 DECLARE_EVENT_TABLE()
 };

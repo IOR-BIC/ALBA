@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgRangeSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-27 12:49:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-05-28 12:45:06 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,7 @@ mmgRangeSlider::mmgRangeSlider(wxWindow *parent, wxWindowID id, const wxPoint& p
   this->Initialize();
   m_BorderWidgetRadius = 3;
   m_Listener = NULL;
+  m_RangeValueLabel = new wxStaticText(this,-1,"");
 }
 //----------------------------------------------------------------------------
 void mmgRangeSlider::SetValue(int i, double value) 
@@ -234,6 +235,8 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
       this->RedrawWidgets(dc);
       dc.EndDrawing();
       
+      DrawLabel(x,y,this->m_Value[this->m_SelectedTriangleWidget]);
+
       // send event
       wxCommandEvent event(wxEVT_COMMAND_SLIDER_UPDATED, this->GetId());
       event.SetEventObject(this);
@@ -258,7 +261,7 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
     this->m_PrevMousePosition.y = y;
   }
   else if (event.LeftDown()) 
-	{                                  // click
+	{// click
     this->m_PrevMousePosition.x = x;
     this->m_PrevMousePosition.y = y;
 
@@ -283,6 +286,8 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
 				{
           closestDistance = distance;
           this->m_SelectedTriangleWidget = i;
+          DrawLabel(x,y,this->m_Value[this->m_SelectedTriangleWidget]);
+          m_RangeValueLabel->Show();
         }
       }
     }
@@ -299,11 +304,14 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
       if (distance < m_BorderWidgetRadius)
         this->m_SelectedRangeWidget = i;
     }
+
     if (this->m_SelectedRangeWidget != -1)
+    {
       this->CaptureMouse();
+    }
   }
   else if (event.LeftUp()) 
-	{                              // click
+	{// click
     if (this->m_SelectedTriangleWidget != -1) 
 		{
       // send event
@@ -319,7 +327,29 @@ void mmgRangeSlider::OnMouse(wxMouseEvent &event)
       this->m_SelectedRangeWidget = -1;
       this->Refresh();
     }
+    m_RangeValueLabel->Show(false);
   }
+}
+//----------------------------------------------------------------------------
+void mmgRangeSlider::DrawLabel(int x, int y, double val)
+//----------------------------------------------------------------------------
+{
+  m_ValueString = wxString::Format("%g", val);
+  m_RangeValueLabel->SetLabel(m_ValueString);
+  int pos_end = m_LineStartX + m_LineWidth + m_BorderWidgetRadius;
+  wxSize lab_size = m_RangeValueLabel->GetSize();
+  int lab_offset[2];
+  int lab_pos_end = x + lab_size.GetWidth();
+  lab_offset[1] = -(lab_size.GetHeight() / 2);
+  if (lab_pos_end > pos_end)
+  {
+    lab_offset[0] = -lab_size.GetWidth() - 10;
+  }
+  else
+  {
+    lab_offset[0] = 10;
+  }
+  m_RangeValueLabel->SetSize(x + lab_offset[0], y + lab_offset[1], -1, -1);
 }
 //----------------------------------------------------------------------------
 void mmgRangeSlider::OnRangeModified(wxCommandEvent &event)
