@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.h,v $
 Language:  C++
-Date:      $Date: 2008-01-22 08:05:27 $
-Version:   $Revision: 1.6 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2008-05-28 14:09:24 $
+Version:   $Revision: 1.7 $
+Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -146,8 +146,10 @@ protected:
 	void UpdateProperty(bool fromTag = false);
 	/**Update data value to selected scalar */
   void UpdateScalars();
+
+  void UpdateVtkPolyDataNormalFilterActiveScalar();
   /** Update the visualization with changed scalar*/
-  void UpdatePipeFromScalars();
+  void UpdateLUTAndMapperFromNewActiveScalars();
 
   wxString                *m_ScalarsName;
   wxString                *m_ScalarsVTKName;

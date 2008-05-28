@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-13 13:20:01 $
-Version:   $Revision: 1.11 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2008-05-28 14:09:24 $
+Version:   $Revision: 1.12 $
+Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -62,7 +62,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <vector>
 
 // local debug facility
-const bool DEBUG_MODE = false;
+const bool DEBUG_MODE = true;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeMeshSlice);
@@ -443,12 +443,10 @@ void mafPipeMeshSlice::OnEvent(mafEventBase *maf_event)
         if (m_UseVTKProperty != 0)
         {
           m_Actor->SetProperty(m_MeshMaterial->m_Prop);
-          //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_VTK_PROPERTY;
         }
         else
         {
           m_Actor->SetProperty(NULL);
-          //m_MeshMaterial->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
         }
         m_MaterialButton->Enable(m_UseVTKProperty != 0);
         m_MaterialButton->UpdateMaterialIcon();
@@ -488,8 +486,7 @@ void mafPipeMeshSlice::SetSlice(double *Origin)
 		m_Cutter->SetCutFunction(m_Plane);
 		m_Cutter->Update();
     
-    // this is needed otherwise scalars are not updated after moving the slice 
-    UpdateScalars();
+    UpdateVtkPolyDataNormalFilterActiveScalar();
     
     m_NormalFilter->Update();
 	}
@@ -501,6 +498,11 @@ void mafPipeMeshSlice::SetSlice(double *Origin)
 
     std::ostringstream stringStream;
     stringStream << "scalar visibility:" << (scalarVisibility ? "true" : "false")  << std::endl;
+    
+    double tr[2];
+    m_Table->GetTableRange(tr);
+    stringStream << "LUT sr: " << "[" << tr[0] << " , " << tr[1] << "]"  << std::endl;
+
     mafLogMessage(stringStream.str().c_str());
   }
 }
@@ -600,42 +602,34 @@ void mafPipeMeshSlice::UpdateScalars()
 {
   m_Vme->GetOutput()->GetVTKData()->Update();
   m_Vme->Update();
-  m_NormalFilter->Update();
-  
-  if(m_ActiveScalarType == POINT_TYPE)
-  {
-    m_NormalFilter->GetOutput()->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-    m_NormalFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
-  }
-  else if(m_ActiveScalarType == CELL_TYPE)
-  {
-    m_NormalFilter->GetOutput()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
-    m_NormalFilter->GetOutput()->GetCellData()->GetScalars()->Modified();
-  }
-  m_NormalFilter->GetOutput()->Update();
-  m_NormalFilter->Update();
-  
-  UpdatePipeFromScalars();
+
+  UpdateVtkPolyDataNormalFilterActiveScalar();
+  UpdateLUTAndMapperFromNewActiveScalars();
  
 }
 //----------------------------------------------------------------------------
-void mafPipeMeshSlice::UpdatePipeFromScalars()
+void mafPipeMeshSlice::UpdateLUTAndMapperFromNewActiveScalars()
 //----------------------------------------------------------------------------
 {
   vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
   data->Update();
   double sr[2];
+
+  mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+
   if(m_ActiveScalarType == POINT_TYPE)
-    data->GetPointData()->GetScalars()->GetRange(sr);
+    data->GetPointData()->GetScalars(activeScalarName.GetCStr())->GetRange(sr);
   else if(m_ActiveScalarType == CELL_TYPE)
-    data->GetCellData()->GetScalars()->GetRange(sr);
+    data->GetCellData()->GetScalars(activeScalarName.GetCStr())->GetRange(sr);
 
-  // HERE 
-  // m_Table->SetTableRange(sr);
-  //m_Table->SetValueRange(sr);
-  //m_Table->SetHueRange(0.667, 0.0);
-  //m_Table->Build();
-
+  if (DEBUG_MODE)
+    {
+      std::ostringstream stringStream;
+      stringStream << "Scalar Range: [" << sr[0] << " , " << sr[1] << "]"  << std::endl;
+      mafLogMessage(stringStream.str().c_str());
+    }
+  
+  m_Table->SetTableRange(sr);
 
   if(m_ActiveScalarType == POINT_TYPE)
     m_Mapper->SetScalarModeToUsePointData();
@@ -643,9 +637,17 @@ void mafPipeMeshSlice::UpdatePipeFromScalars()
     m_Mapper->SetScalarModeToUseCellData();
 
   m_Mapper->SetInput(m_NormalFilter->GetOutput());
-  m_Mapper->SetLookupTable(m_Table);
-  // HERE
-  // m_Mapper->SetScalarRange(sr);
+  m_Mapper->SetLookupTable(m_Table);  
+  m_Mapper->UseLookupTableScalarRangeOn();
+  if (DEBUG_MODE)
+    {
+      double tr[2];
+      m_Table->GetTableRange(tr);
+
+      std::ostringstream stringStream;
+      stringStream << "LUT sr: " << "[" << tr[0] << " , " << tr[1] << "]"  << std::endl;
+      mafLogMessage(stringStream.str().c_str());
+    }
   m_Mapper->Update();
 
   m_Actor->Modified();
@@ -700,4 +702,38 @@ void mafPipeMeshSlice::CreateFieldDataControlArrays()
 
   delete []tempScalarsPointsName;
 
+}
+
+void mafPipeMeshSlice::UpdateVtkPolyDataNormalFilterActiveScalar()
+{
+  m_NormalFilter->Update();
+
+  if(m_ActiveScalarType == POINT_TYPE)
+  {
+    mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+    m_NormalFilter->GetOutput()->GetPointData()->SetActiveScalars(activeScalarName.GetCStr());
+    m_NormalFilter->GetOutput()->GetPointData()->GetScalars()->Modified();
+
+    if (DEBUG_MODE)
+    {
+      std::ostringstream stringStream;
+      stringStream << "Active Scalar: POINT TYPE, " << activeScalarName.GetCStr() << std::endl;
+      mafLogMessage(stringStream.str().c_str());
+    }
+  }
+  else if(m_ActiveScalarType == CELL_TYPE)
+  {
+    mafString activeScalarName = m_ScalarsVTKName[m_ScalarIndex].c_str();
+    m_NormalFilter->GetOutput()->GetCellData()->SetActiveScalars(activeScalarName.GetCStr());
+    m_NormalFilter->GetOutput()->GetCellData()->GetScalars()->Modified();
+
+    if (DEBUG_MODE)
+    {
+      std::ostringstream stringStream;
+      stringStream << "Active Scalar: CELL TYPE, " << activeScalarName.GetCStr() << std::endl;
+      mafLogMessage(stringStream.str().c_str());
+    }
+  }
+  m_NormalFilter->GetOutput()->Update();
+  m_NormalFilter->Update();
 }
