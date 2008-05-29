@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-08 09:59:07 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-05-29 13:06:07 $
+Version:   $Revision: 1.2 $
 Authors:   DMatteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -469,6 +469,10 @@ mmgGui *medVisualPipePolylineGraph::CreateGui()
   m_Gui->Combo(ID_POLYLINE_REPRESENTATION,"",&m_Representation,num_choices,representation_string);
 
   m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);	
+  if (m_NumberOfArrays==0)
+  {
+    m_Gui->Enable(ID_SCALARS,false);
+  }
   
   m_Gui->Label(_("sphere"));
   m_Gui->Bool(ID_SCALAR_DIMENSION,_("scalar dim."),&m_ScalarDim,0,_("Check to scale the sphere radius proportional to the selected scalars"));
