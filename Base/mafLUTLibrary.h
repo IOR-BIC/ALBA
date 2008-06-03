@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.h,v $
 Language:  C++
-Date:      $Date: 2008-06-03 16:43:38 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-06-03 16:50:34 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -12,8 +12,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 using namespace std;
 
-#ifndef __CPP_UNIT_mafPipeMeshSliceTest_H__
-#define __CPP_UNIT_mafPipeMeshSliceTest_H__
+#ifndef __CPP_UNIT_mafLUTLibrary_H__
+#define __CPP_UNIT_mafLUTLibrary_H__
 
 #include <map>
 #include <vector>
