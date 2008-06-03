@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 08:57:54 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-06-03 17:02:20 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,8 @@
 #include "mmgButton.h"
 #include "mmgLutPreset.h"
 #include "mmgDialog.h"
+
+
 
 //----------------------------------------------------------------------------
 // const
@@ -61,6 +63,10 @@ enum LUT_EDITOR_WIDGET_ID
   ID_OK,
   ID_CANCEL,
   ID_APPLY,
+  ID_USER_PRESET,
+  ID_ADD_TO_ULIB,
+  ID_REMOVE_FROM_ULIB,
+  ID_NEW_USER_LUT_NAME,
 };
 
 //----------------------------------------------------------------------------
@@ -81,8 +87,40 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   m_ValueRange[0] = 0;
   m_ValueRange[1] = 100;
   m_Preset = 0;
+  m_UserPreset = 0;
+  m_NewUserLutName = "New LUT Name";
   m_Info = "" ;
+  
+  m_UserLutLibraryDir = (mafGetApplicationDirectory() + "\\UserDefinedLookupTables\\").c_str();
 
+  if (wxDirExists(m_UserLutLibraryDir.c_str()))
+  {
+    mafLogMessage("User lut library found! Loading...");
+  } 
+  else
+  {
+    mafLogMessage("User lut library not found! Creating new one...");
+    wxMkdir(m_UserLutLibraryDir.c_str());
+  }
+
+  assert(wxDirExists(m_UserLutLibraryDir.c_str()));
+
+  m_UserLutLibrary = new mafLUTLibrary;
+  m_UserLutLibrary->SetDir(m_UserLutLibraryDir.c_str());
+  m_UserLutLibrary->Load();
+
+  int userLutPresetNum = m_UserLutLibrary->GetNumberOfLuts();
+  
+  vector<string> lutNames;
+  m_UserLutLibrary->GetLutNames(lutNames);
+
+  wxArrayString userLutNames;
+
+  for (int id = 0; id < userLutPresetNum; id++) 
+  { 
+    userLutNames.Add(lutNames[id].c_str());
+  }
+  
   wxFont bold_font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
   bold_font.SetPointSize(9);
   bold_font.SetWeight(wxBOLD);
@@ -96,9 +134,9 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   wxComboBox   *combo;
   mmgButton    *butt;
   
-  lab = new wxStaticText(this, -1, _("presets"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  lab = new wxStaticText(this, -1, _("Presets LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
 	combo = new wxComboBox  (this, ID_PRESET, "", dp, wxSize(DW,-1), lutPresetNum, LutNames, wxCB_READONLY);
-	sz = new wxBoxSizer(wxHORIZONTAL);
+  sz = new wxBoxSizer(wxHORIZONTAL);
   sz->Add( lab,  1, wxRIGHT, LM);
 	sz->Add( combo,0, wxRIGHT, HM);
   combo->SetValidator( mmgValidator(this,ID_PRESET,combo,&m_Preset) );
@@ -123,7 +161,45 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( text2, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
 
-	lab = new wxStaticText (this, -1, _("Preview"),dp,wxSize(150,-1));
+  // here the lut library stuff
+  
+  wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW, 2), 0);
+  sizer->Add(div,0,wxALL, M);
+
+
+  wxBoxSizer   *sz1;
+  wxStaticText *lab2;
+
+  lab2 = new wxStaticText(this, -1, _("User Defined LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
+  sz1 = new wxBoxSizer(wxHORIZONTAL);
+  sz1->Add( lab2,  1, wxRIGHT, LM);
+  sz1->Add( m_UserPresetCombo,0, wxRIGHT, HM);
+  m_UserPresetCombo->SetValidator( mmgValidator(this,ID_USER_PRESET,m_UserPresetCombo,&m_UserPreset) );
+  sizer->Add(sz1,0,wxRIGHT, HM);
+
+
+  wxTextCtrl *txt1;
+  txt1 = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(96,LH), wxNO_BORDER  );
+  txt1->SetValidator( mmgValidator(this,ID_NEW_USER_LUT_NAME,txt1,&m_NewUserLutName) );
+  
+  mmgButton  *addToULib;
+  addToULib = new mmgButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(96,BH) );
+  addToULib->SetValidator( mmgValidator(this,ID_ADD_TO_ULIB,addToULib) );
+
+  mmgButton  *removeFromULib;
+  removeFromULib = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(96,BH) );
+  removeFromULib->SetValidator( mmgValidator(this,ID_REMOVE_FROM_ULIB,removeFromULib) );  
+
+  wxBoxSizer   *sz2;
+  sz2 = new wxBoxSizer(wxHORIZONTAL);
+  sz2->Add( txt1,  1, wxRIGHT, LM);
+  sz2->Add( addToULib,0, wxRIGHT, HM);
+  sz2->Add( removeFromULib,0, wxRIGHT, HM);
+
+  sizer->Add(sz2,0,wxRIGHT, HM);
+
+  lab = new wxStaticText (this, -1, _("Preview"),dp,wxSize(150,-1));
   lab->SetFont(bold_font);
 	sizer->Add( lab, 0, wxALL, M);
   m_LutSwatch = new mmgLutSwatch(this, -1, dp,wxSize(286,16));
@@ -196,6 +272,8 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 mmgLutEditor::~mmgLutEditor()
 //----------------------------------------------------------------------------
 {
+  cppDEL(m_UserLutLibrary);
+
   if(m_Lut) 
 	{
 		m_Lut->Delete();
@@ -215,10 +293,7 @@ void mmgLutEditor::UpdateLut()
 {
   lutPreset(m_Preset, m_Lut);
   m_Lut->Build();
-  m_NumEntry = m_Lut->GetNumberOfTableValues();
-  m_LutWidget->SetLut(m_Lut);
-  m_LutSwatch->SetLut(m_Lut);
-  TransferDataToWindow();
+  UpdateWidgetsOnLutChange();
 }
 //----------------------------------------------------------------------------
 void mmgLutEditor::OnEvent(mafEventBase *maf_event)
@@ -228,6 +303,52 @@ void mmgLutEditor::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
 	  {
+
+      case ID_NEW_USER_LUT_NAME:
+      {
+        mafLogMessage("ID_NEW_USER_LUT_NAME");
+      }
+      break;
+
+      case ID_ADD_TO_ULIB:
+      {
+        mafLogMessage("ID_ADD_TO_ULIB");
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
+        int id = m_UserPresetCombo->FindString(m_NewUserLutName.c_str());
+        if (id != -1)
+        {
+          // the item  already exists and it will not be added to the combo
+          return;
+        }
+        wxString sel = m_UserPresetCombo->GetString(id) ;
+        m_UserPresetCombo->Append(m_NewUserLutName);
+      }
+      break;
+
+      case ID_REMOVE_FROM_ULIB:
+      {
+        mafLogMessage("ID_REMOVE_FROM_ULIB");
+        m_UserLutLibrary->Add(m_Lut, m_NewUserLutName.c_str());
+        int id = m_UserPresetCombo->GetSelection();
+        wxString sel = m_UserPresetCombo->GetString(id) ;
+        m_UserPresetCombo->Delete(id);
+        m_UserLutLibrary->Remove(sel.c_str());
+
+      }
+      break;
+
+      case ID_USER_PRESET:
+      {
+        mafLogMessage("ID_USER_PRESET");
+        int id = m_UserPresetCombo->GetSelection();
+        wxString sel = m_UserPresetCombo->GetString(id) ;
+        mafLogMessage(sel.c_str());
+        m_Lut->DeepCopy(m_UserLutLibrary->GetLutByName(sel.c_str()));
+        m_NewUserLutName = sel.c_str();
+        UpdateWidgetsOnLutChange();
+      }
+      break;
+
       case ID_PRESET:
       {
         UpdateLut();
@@ -361,4 +482,14 @@ void mmgLutEditor::ShowLutDialog(vtkLookupTable *lut, mafObserver *listener, int
   dlg.Add(led,1,wxEXPAND);
   dlg.SetSize(x_init,y_init,-1,-1);
   dlg.ShowModal();
+}
+
+void mmgLutEditor::UpdateWidgetsOnLutChange()
+{
+  m_NumEntry = m_Lut->GetNumberOfTableValues();
+  m_ValueRange[0] = m_Lut->GetRange()[0];
+  m_ValueRange[1] = m_Lut->GetRange()[1];
+  m_LutWidget->SetLut(m_Lut);
+  m_LutSwatch->SetLut(m_Lut);
+  TransferDataToWindow();
 }

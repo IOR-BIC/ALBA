@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 08:57:54 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-06-03 17:02:20 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -15,6 +15,8 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
+#include "mafLUTLibrary.h"
+
 #include "mmgLutWidget.h"
 #include "mmgLutSwatch.h"
 #include "mmgColorWidget.h"
@@ -59,6 +61,8 @@ protected:
   
   /** Update the internal Lookup Table according to the preset selected from the combo box.*/
   void UpdateLut();
+
+  void UpdateWidgetsOnLutChange();
   
   /** Copy the external Lookup Table given by the user to the internal one.*/
   void CopyLut(vtkLookupTable *from, vtkLookupTable *to);
@@ -68,15 +72,20 @@ protected:
   mafObserver *m_Listener;
 
   int          m_Preset; ///< Index of lookup table preset.
+  int          m_UserPreset;
 
   int          m_NumEntry; ///< Number of colors of the current lookup table.
   double       m_ValueRange[2]; ///< Value range of the current lookup table.
   wxString     m_Info; // selected indexes
-  
+  wxString     m_NewUserLutName;
+  wxString m_UserLutLibraryDir;
+
   mmgLutSwatch   *m_LutSwatch;
   mmgLutWidget   *m_LutWidget;
   mmgColorWidget *m_ColorWidget;
 
+  mafLUTLibrary *m_UserLutLibrary;
+  wxComboBox   *m_UserPresetCombo;
   vtkLookupTable *m_ExternalLut;  ///< Given lut that will be modified by "ok" or "apply"
   vtkLookupTable *m_Lut;          ///< Internal lut -- initialized in SetLut
   DECLARE_EVENT_TABLE()
