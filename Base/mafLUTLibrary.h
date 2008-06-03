@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.h,v $
 Language:  C++
-Date:      $Date: 2008-06-03 16:41:02 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-03 16:43:38 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,6 +22,7 @@ using namespace std;
 #include "vtkMAFSmartPointer.h"
 #include "vtkLookupTable.h"
 
+/** A component to handle lookup table libraries */
 class mafLUTLibrary
 {
 

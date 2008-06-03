@@ -27,6 +27,8 @@ mafIncludeWIN32.h
 mafIncludeWX.h
 mafIndent.cpp
 mafIndent.h
+mafLUTLibrary.cpp
+mafLUTLibrary.h
 mafMTime.cpp
 mafMTime.h
 mafMatrix.cpp
