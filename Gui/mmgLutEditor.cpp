@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-04 09:49:27 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-06-04 10:29:41 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -184,24 +184,26 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 
   
   mmgButton  *removeFromUserLUTSButton;
-  removeFromUserLUTSButton = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(LW,BH) );
+  removeFromUserLUTSButton = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(DW,BH) );
   removeFromUserLUTSButton->SetValidator( mmgValidator(this,ID_REMOVE_FROM_ULIB,removeFromUserLUTSButton) );  
 
-  wxStaticText *lab2;
-  lab2 = new wxStaticText(this, -1, _(""), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  wxStaticText *selUserLut = new wxStaticText (this, -1, _("select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
 
-  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,LH), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
+  wxBoxSizer   *emoveFromUserLutsHSizer;
 
-  wxBoxSizer   *removeFromUserLutsHSizer;
-
-  removeFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
-  removeFromUserLutsHSizer->Add( removeFromUserLUTSButton,  1, wxRIGHT, LM);
-  removeFromUserLutsHSizer->Add( m_UserPresetCombo,0, wxRIGHT, HM);
+  emoveFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
+  emoveFromUserLutsHSizer->Add( selUserLut,  1, wxRIGHT, LM);
+  emoveFromUserLutsHSizer->Add( m_UserPresetCombo,0, wxRIGHT, HM);
   m_UserPresetCombo->SetValidator( mmgValidator(this,ID_USER_PRESET,m_UserPresetCombo,&m_UserPreset) );
-  sizer->Add(removeFromUserLutsHSizer,0,wxRIGHT, HM);
-
-
+  sizer->Add(emoveFromUserLutsHSizer,0,wxRIGHT, HM);
   
+  wxStaticText *elUserLut = new wxStaticText (this, -1, _("remove selected LUT"), dp, wxSize(LW,BH), wxALIGN_RIGHT );
+
+  wxSizer *removeFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
+  removeFromUserLutsHSizer->Add( elUserLut,  1, wxRIGHT, LM);
+  removeFromUserLutsHSizer->Add( removeFromUserLUTSButton,0, wxRIGHT, HM);
+  sizer->Add(removeFromUserLutsHSizer,0,wxRIGHT, HM);
 
   wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW, 2), 0);
   sizer->Add(div,0,wxALL, M);
