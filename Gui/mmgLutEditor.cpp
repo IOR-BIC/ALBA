@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-03 17:02:20 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-06-04 09:49:27 $
+  Version:   $Revision: 1.15 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -161,43 +161,51 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( text2, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
 
-  // here the lut library stuff
+  // here the lut liberrary stuff
+  wxStaticText *labUserPresets;
+  labUserPresets = new wxStaticText (this, -1, _("User Presets"),dp,wxSize(150,-1));
+  labUserPresets->SetFont(bold_font);
+  sizer->Add( labUserPresets, 0, wxALL, M);
+
+  mmgButton  *setUserLUTButton;
+  setUserLUTButton = new mmgButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(LW,BH) );
+  setUserLUTButton->SetValidator( mmgValidator(this,ID_ADD_TO_ULIB,setUserLUTButton) );
+
+  wxTextCtrl *userLUTName;
+  userLUTName = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW,LH), wxNO_BORDER  );
+  userLUTName->SetValidator( mmgValidator(this,ID_NEW_USER_LUT_NAME,userLUTName,&m_NewUserLutName) );
+
+
+  wxBoxSizer   *setUserLutHSizer;
+  setUserLutHSizer = new wxBoxSizer(wxHORIZONTAL);
+  setUserLutHSizer->Add( setUserLUTButton,0, wxRIGHT, LM);
+  setUserLutHSizer->Add( userLUTName,  1, wxRIGHT, HM);
+  sizer->Add(setUserLutHSizer,0,wxALL, M);
+
   
+  mmgButton  *removeFromUserLUTSButton;
+  removeFromUserLUTSButton = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(LW,BH) );
+  removeFromUserLUTSButton->SetValidator( mmgValidator(this,ID_REMOVE_FROM_ULIB,removeFromUserLUTSButton) );  
+
+  wxStaticText *lab2;
+  lab2 = new wxStaticText(this, -1, _(""), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+
+  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,LH), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
+
+  wxBoxSizer   *removeFromUserLutsHSizer;
+
+  removeFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
+  removeFromUserLutsHSizer->Add( removeFromUserLUTSButton,  1, wxRIGHT, LM);
+  removeFromUserLutsHSizer->Add( m_UserPresetCombo,0, wxRIGHT, HM);
+  m_UserPresetCombo->SetValidator( mmgValidator(this,ID_USER_PRESET,m_UserPresetCombo,&m_UserPreset) );
+  sizer->Add(removeFromUserLutsHSizer,0,wxRIGHT, HM);
+
+
+  
+
   wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW, 2), 0);
   sizer->Add(div,0,wxALL, M);
 
-
-  wxBoxSizer   *sz1;
-  wxStaticText *lab2;
-
-  lab2 = new wxStaticText(this, -1, _("User Defined LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
-  m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
-  sz1 = new wxBoxSizer(wxHORIZONTAL);
-  sz1->Add( lab2,  1, wxRIGHT, LM);
-  sz1->Add( m_UserPresetCombo,0, wxRIGHT, HM);
-  m_UserPresetCombo->SetValidator( mmgValidator(this,ID_USER_PRESET,m_UserPresetCombo,&m_UserPreset) );
-  sizer->Add(sz1,0,wxRIGHT, HM);
-
-
-  wxTextCtrl *txt1;
-  txt1 = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(96,LH), wxNO_BORDER  );
-  txt1->SetValidator( mmgValidator(this,ID_NEW_USER_LUT_NAME,txt1,&m_NewUserLutName) );
-  
-  mmgButton  *addToULib;
-  addToULib = new mmgButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(96,BH) );
-  addToULib->SetValidator( mmgValidator(this,ID_ADD_TO_ULIB,addToULib) );
-
-  mmgButton  *removeFromULib;
-  removeFromULib = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(96,BH) );
-  removeFromULib->SetValidator( mmgValidator(this,ID_REMOVE_FROM_ULIB,removeFromULib) );  
-
-  wxBoxSizer   *sz2;
-  sz2 = new wxBoxSizer(wxHORIZONTAL);
-  sz2->Add( txt1,  1, wxRIGHT, LM);
-  sz2->Add( addToULib,0, wxRIGHT, HM);
-  sz2->Add( removeFromULib,0, wxRIGHT, HM);
-
-  sizer->Add(sz2,0,wxRIGHT, HM);
 
   lab = new wxStaticText (this, -1, _("Preview"),dp,wxSize(150,-1));
   lab->SetFont(bold_font);
