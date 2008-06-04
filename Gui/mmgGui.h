@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-24 08:40:44 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2008-06-04 14:25:00 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -213,6 +213,9 @@ public:
 
   /** Float slider widget. */
   mmgFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "");
+
+  /** Float slider widget. */
+  mmgFloatSlider *FloatSlider(int id, double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size = wxDefaultSize, wxString tooltip = "");
 
   /** Checked listbox widget. */
   mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");

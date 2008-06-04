@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-24 08:40:44 $
-  Version:   $Revision: 1.56 $
+  Date:      $Date: 2008-06-04 14:25:00 $
+  Version:   $Revision: 1.57 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1010,6 +1010,49 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	if(tooltip != "")	
     text->SetToolTip(tooltip);
 	return sli;
+}
+//----------------------------------------------------------------------------
+mmgFloatSlider *mmgGui::FloatSlider(int id,double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
+//----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
+{
+  wxTextCtrl     *text = NULL;
+  mmgFloatSlider *sli  = NULL;
+  wxStaticText   *minText  = NULL;
+  wxStaticText   *maxText  = NULL;
+  int w_id_sli;
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+
+  int text_w   = 0.1;
+  int slider_w = FW - EW*2;
+  minText = new wxStaticText  (this, GetWidgetId(id), minLab, dp, wxSize(EW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+  if(m_UseBackgroundColor) 
+    minText->SetBackgroundColour(m_BackgroundColor);
+  minText->SetFont(m_Font);
+
+  maxText = new wxStaticText  (this, GetWidgetId(id), maxLab, dp, wxSize(EW,LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
+  if(m_UseBackgroundColor) 
+    maxText->SetBackgroundColour(m_BackgroundColor);
+  maxText->SetFont(m_Font);
+
+  w_id_sli = GetWidgetId(id);
+  sli = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
+  if(m_UseBackgroundColor) 
+    sli->SetBackgroundColour(m_BackgroundColor);
+
+  int w_id_text = GetWidgetId(id);
+  text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
+  text->SetFont(m_Font);
+
+  text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max));
+  sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
+
+  sizer->Add(minText,  0, wxRIGHT, LM);
+  sizer->Add(sli,  0, 0, LM);
+  sizer->Add(maxText,  0);
+
+  Add(sizer,0,wxALL, M); 
+
+  return sli;
 }
 //----------------------------------------------------------------------------
 void mmgGui::Radio(int id,wxString label,int* var, int numchoices, const wxString choices[], int dim, wxString tooltip,int style)
