@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-06 11:22:39 $
-Version:   $Revision: 1.18 $
+Date:      $Date: 2008-06-04 15:22:54 $
+Version:   $Revision: 1.19 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -113,7 +113,8 @@ enum DICOM_IMPORTER_GUI_ID
 };
 enum VOLUME_SIDE
 {
-	LEFT_SIDE = 0,
+  NON_VALID_SIDE = 0,
+	LEFT_SIDE,
 	RIGHT_SIDE,
 };
 enum DICOM_IMPORTER_MODALITY
@@ -186,7 +187,7 @@ mafOp(label)
 
 	m_VolumeName = "";
 
-	m_VolumeSide=RIGHT_SIDE;
+	m_VolumeSide=NON_VALID_SIDE;
 
 	m_DicomModalityListBox = NULL;
 
@@ -396,6 +397,8 @@ int medOpImporterDicom::BuildVolume()
 			  tagSide.SetValue("LEFT");
 		  else if(m_VolumeSide==RIGHT_SIDE)
 			  tagSide.SetValue("RIGHT");
+      else if(m_VolumeSide==NON_VALID_SIDE)
+        tagSide.SetValue("NON_VALID_SIDE");
 		  m_Image->GetTagArray()->SetTag(tagSide);
     }
 
@@ -438,6 +441,8 @@ int medOpImporterDicom::BuildVolume()
 			  tagSide.SetValue("LEFT");
 		  else if(m_VolumeSide==RIGHT_SIDE)
 			  tagSide.SetValue("RIGHT");
+      else if(m_VolumeSide==NON_VALID_SIDE)
+        tagSide.SetValue("NON_VALID_SIDE");
 		  m_Volume->GetTagArray()->SetTag(tagSide);
     }
 
@@ -546,6 +551,8 @@ int medOpImporterDicom::BuildVolumeCineMRI()
 		  tagSide.SetValue("LEFT");
 	  else if(m_VolumeSide==RIGHT_SIDE)
 		  tagSide.SetValue("RIGHT");
+    else if(m_VolumeSide==NON_VALID_SIDE)
+      tagSide.SetValue("NON_VALID_SIDE");
 	  m_Volume->GetTagArray()->SetTag(tagSide);
   }
 
@@ -613,8 +620,8 @@ void medOpImporterDicom::CreateCropPage()
 
   if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
   {
-    wxString sideChoices[2] = {_("Left"),_("Right")};
-    m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,2,sideChoices);
+    wxString sideChoices[3] = {_("non-valid"),_("Left"),_("Right")};
+    m_CropGuiCenter->Combo(ID_VOLUME_SIDE,_("volume side"),&m_VolumeSide,3,sideChoices);
   }
 
   m_CropGuiLeft->FitGui();
@@ -1252,11 +1259,18 @@ void medOpImporterDicom::AutoPositionCropPlane()
 	}
 	else if(m_VolumeSide==LEFT_SIDE)
 	{
-		m_CropPlane->SetOrigin(m_DicomBounds[1]-diffX/2,diffY/4,0.0);
+ 		m_CropPlane->SetOrigin(m_DicomBounds[1]-diffX/2,diffY/4,0.0);
 		m_CropPlane->SetPoint1(m_DicomBounds[1],diffY/4,0.0);
 		m_CropPlane->SetPoint2(m_DicomBounds[1]-diffX/2,(diffY/4)*3,0.0);
 		m_CropPlane->Update();
 	}
+  else if (m_VolumeSide==NON_VALID_SIDE)
+  {
+    m_CropPlane->SetOrigin(0.0,0.0,0.0);
+    m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
+    m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
+    m_CropPage->GetRWI()->CameraReset();
+  }
 	
 	m_CropPage->GetRWI()->CameraReset();
 }
