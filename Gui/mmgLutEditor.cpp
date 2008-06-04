@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-04 10:29:41 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-06-04 11:32:53 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -161,48 +161,47 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( text2, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
 
-  // here the lut liberrary stuff
-  wxStaticText *labUserPresets;
-  labUserPresets = new wxStaticText (this, -1, _("User Presets"),dp,wxSize(150,-1));
-  labUserPresets->SetFont(bold_font);
-  sizer->Add( labUserPresets, 0, wxALL, M);
+  wxStaticText *labelUserPresets;
+  labelUserPresets = new wxStaticText (this, -1, _("User Presets"),dp,wxSize(150,-1));
+  labelUserPresets->SetFont(bold_font);
+  sizer->Add( labelUserPresets, 0, wxALL, M);
 
-  mmgButton  *setUserLUTButton;
-  setUserLUTButton = new mmgButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(LW,BH) );
-  setUserLUTButton->SetValidator( mmgValidator(this,ID_ADD_TO_ULIB,setUserLUTButton) );
+  mmgButton  *buttonSetUserLUT;
+  buttonSetUserLUT = new mmgButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(LW,BH) );
+  buttonSetUserLUT->SetValidator( mmgValidator(this,ID_ADD_TO_ULIB,buttonSetUserLUT) );
 
-  wxTextCtrl *userLUTName;
-  userLUTName = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW,LH), wxNO_BORDER  );
-  userLUTName->SetValidator( mmgValidator(this,ID_NEW_USER_LUT_NAME,userLUTName,&m_NewUserLutName) );
+  wxTextCtrl *textNewUserLUTName;
+  textNewUserLUTName = new wxTextCtrl  (this, -1, ""   ,        dp, wxSize(DW,LH), wxNO_BORDER  );
+  textNewUserLUTName->SetValidator( mmgValidator(this,ID_NEW_USER_LUT_NAME,textNewUserLUTName,&m_NewUserLutName) );
 
 
   wxBoxSizer   *setUserLutHSizer;
   setUserLutHSizer = new wxBoxSizer(wxHORIZONTAL);
-  setUserLutHSizer->Add( setUserLUTButton,0, wxRIGHT, LM);
-  setUserLutHSizer->Add( userLUTName,  1, wxRIGHT, HM);
+  setUserLutHSizer->Add( buttonSetUserLUT,0, wxRIGHT, LM);
+  setUserLutHSizer->Add( textNewUserLUTName,  1, wxRIGHT, HM);
   sizer->Add(setUserLutHSizer,0,wxALL, M);
 
   
-  mmgButton  *removeFromUserLUTSButton;
-  removeFromUserLUTSButton = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(DW,BH) );
-  removeFromUserLUTSButton->SetValidator( mmgValidator(this,ID_REMOVE_FROM_ULIB,removeFromUserLUTSButton) );  
+  mmgButton  *buttonRemoveFromUserLUTS;
+  buttonRemoveFromUserLUTS = new mmgButton(this, ID_REMOVE_FROM_ULIB, _("Remove"),dp, wxSize(DW,BH) );
+  buttonRemoveFromUserLUTS->SetValidator( mmgValidator(this,ID_REMOVE_FROM_ULIB,buttonRemoveFromUserLUTS) );  
 
-  wxStaticText *selUserLut = new wxStaticText (this, -1, _("select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
+  wxStaticText *staticTextSelectUserLut = new wxStaticText (this, -1, _("select user LUT"), dp, wxSize(LW,LH), wxALIGN_RIGHT );
   m_UserPresetCombo = new wxComboBox  (this, ID_USER_PRESET, "", dp, wxSize(DW,-1), userLutPresetNum, userLutNames.GetStringArray(), wxCB_READONLY);
 
-  wxBoxSizer   *emoveFromUserLutsHSizer;
+  wxBoxSizer   *selectUserLutsHSizer;
 
-  emoveFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
-  emoveFromUserLutsHSizer->Add( selUserLut,  1, wxRIGHT, LM);
-  emoveFromUserLutsHSizer->Add( m_UserPresetCombo,0, wxRIGHT, HM);
+  selectUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
+  selectUserLutsHSizer->Add( staticTextSelectUserLut,  1, wxRIGHT, LM);
+  selectUserLutsHSizer->Add( m_UserPresetCombo,0, wxRIGHT, HM);
   m_UserPresetCombo->SetValidator( mmgValidator(this,ID_USER_PRESET,m_UserPresetCombo,&m_UserPreset) );
-  sizer->Add(emoveFromUserLutsHSizer,0,wxRIGHT, HM);
+  sizer->Add(selectUserLutsHSizer,0,wxRIGHT, HM);
   
-  wxStaticText *elUserLut = new wxStaticText (this, -1, _("remove selected LUT"), dp, wxSize(LW,BH), wxALIGN_RIGHT );
+  wxStaticText *staticTextRemoveUserLut = new wxStaticText (this, -1, _("remove selected LUT"), dp, wxSize(LW,BH), wxALIGN_RIGHT );
 
   wxSizer *removeFromUserLutsHSizer = new wxBoxSizer(wxHORIZONTAL);
-  removeFromUserLutsHSizer->Add( elUserLut,  1, wxRIGHT, LM);
-  removeFromUserLutsHSizer->Add( removeFromUserLUTSButton,0, wxRIGHT, HM);
+  removeFromUserLutsHSizer->Add( staticTextRemoveUserLut,  1, wxRIGHT, LM);
+  removeFromUserLutsHSizer->Add( buttonRemoveFromUserLUTS,0, wxRIGHT, HM);
   sizer->Add(removeFromUserLutsHSizer,0,wxRIGHT, HM);
 
   wxStaticText* div = new wxStaticText(this, -1, "",dp, wxSize(FW, 2), 0);
