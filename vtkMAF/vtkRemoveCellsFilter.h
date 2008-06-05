@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkRemoveCellsFilter.h
   Language:  C++
-  Version:   $Id: vtkRemoveCellsFilter.h,v 1.2 2008-05-27 11:15:39 aqd0 Exp $
+  Version:   $Id: vtkRemoveCellsFilter.h,v 1.3 2008-06-05 16:33:26 aqd0 Exp $
 
   Copyright (c) Goodwin Lawlor 2003-2004
   All rights reserved.
@@ -71,8 +71,8 @@ public:
 
  //Description
  //Set the m_ReverseRemove variable to 0 or 1 , if 1 reverse the removal
- void ReverseRemoveOn(){m_ReverseRemove = TRUE;}
- void ReverseRemoveOff(){m_ReverseRemove = FALSE;}
+ void ReverseRemoveOn(){m_ReverseRemove = 1;}
+ void ReverseRemoveOff(){m_ReverseRemove = 0;}
 
 protected:
 

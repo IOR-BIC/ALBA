@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkRemoveCellsFilter.cxx
   Language:  C++
-  Version:   $Id: vtkRemoveCellsFilter.cxx,v 1.2 2008-05-27 11:15:39 aqd0 Exp $
+  Version:   $Id: vtkRemoveCellsFilter.cxx,v 1.3 2008-06-05 16:33:26 aqd0 Exp $
 
   Copyright (c) 2003-2004 Goodwin Lawlor
   All rights reserved.
@@ -20,12 +20,12 @@
 #include "vtkIdList.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkRemoveCellsFilter, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkRemoveCellsFilter, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkRemoveCellsFilter);
 
 vtkRemoveCellsFilter::vtkRemoveCellsFilter()
 {
-  m_ReverseRemove = FALSE;
+  m_ReverseRemove = 0;
 }
 
 void vtkRemoveCellsFilter::RemoveMarkedCells()
@@ -33,7 +33,7 @@ void vtkRemoveCellsFilter::RemoveMarkedCells()
   
   vtkIdType numIds = this->MarkedCellIdList->GetNumberOfIds();
   
-  if(m_ReverseRemove == TRUE)
+  if(m_ReverseRemove == 1)
   {
     this->CellIdList->DeepCopy(this->MarkedCellIdList);
   }
