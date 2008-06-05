@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-21 17:21:02 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-05 14:07:00 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,6 +25,7 @@
 #include "mmiGenericMouse.h"
 #include "mafSmartPointer.h"
 #include "mafVector.h"
+#include "mafVMEGizmo.h"
 
 #include "mafMatrix.h"
 #include "mafVME.h"
@@ -121,7 +122,12 @@ void mafGizmoPathRuler::BuildGizmos()
     VMEGizmoName += gizmoID;
    
     // create a gizmo for each tick
-    mafGizmoPath *gp = new mafGizmoPath(InputVME, this, VMEGizmoName.c_str() );
+    int visibility = FALSE;
+    if(gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1)
+    {
+      visibility = TRUE;
+    }
+    mafGizmoPath *gp = new mafGizmoPath(InputVME, this, VMEGizmoName.c_str(), visibility );
 
     // set the constraint
     // ...
@@ -210,4 +216,18 @@ void mafGizmoPathRuler::SetColor( double col[3] )
 void mafGizmoPathRuler::SetColor( int idGizmo,double col[3] )
 {
 	m_GizmoPathVector[idGizmo]->SetColor(col);
+}
+void mafGizmoPathRuler::SetGizmoLabelsVisibility(bool value)
+{
+  for (int gizmoID = 0; gizmoID < m_GizmoPathVector.size();gizmoID++)
+  {
+    if(m_GizmoPathVector[gizmoID]->GetOutput() == NULL) continue;
+    if(gizmoID != 0 && gizmoID != m_TicksNumber/2 && gizmoID != m_TicksNumber-1)
+    {
+      m_GizmoPathVector[gizmoID]->GetOutput()->SetTextVisibility(FALSE);
+    }
+    else
+      m_GizmoPathVector[gizmoID]->GetOutput()->SetTextVisibility(value);
+    
+  }
 }

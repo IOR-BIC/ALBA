@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2007-09-12 12:50:05 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-06-05 14:07:00 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -106,6 +106,7 @@ public:
   /** not yet available... */
   mmgGui *GetGui() {return NULL;};
 
+  void SetGizmoLabelsVisibility(bool value);
 
 protected:
 
