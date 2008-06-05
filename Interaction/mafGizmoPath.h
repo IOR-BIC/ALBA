@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 12:50:05 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-06-05 14:06:46 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -42,10 +42,16 @@ class mafGizmoPath : public mafGizmoInterface
 {
 public:
 
-	mafGizmoPath(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath");
+	mafGizmoPath(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", int textVisibility = 0);
 
   virtual	~mafGizmoPath();
   
+  enum ID_TEXT_SIDE
+  {
+    ID_LEFT_TEXT_SIDE = 0,
+    ID_RIGTH_TEXT_SIDE,
+  };
+
   enum SentPoseID {ABS_POSE = mmiGenericMouse::MOUSE_UP+1};
 
   /** Set position along constraint polyline*/
@@ -89,6 +95,9 @@ public:
   /** Events handling method */
   void OnEvent(mafEventBase *maf_event); 
 
+  void SetSideTextPosition(bool leftRight = ID_LEFT_TEXT_SIDE){m_TextSidePosition = leftRight;};
+  bool GetSideTextPosition(){return m_TextSidePosition;};
+
 protected:
 
   // create gizmo
@@ -130,6 +139,9 @@ protected:
 
   double m_CurvilinearAbscissa;
   int m_ConstraintModality;
+
+  int m_TextVisibility;
+  bool m_TextSidePosition;
 
   enum CONSTRAINT_MODALITY_ID
   {

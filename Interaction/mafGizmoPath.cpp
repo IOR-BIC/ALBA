@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 12:50:05 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-06-05 14:06:46 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -42,9 +42,10 @@
 const double defaultLineLength = 50;
 
 //----------------------------------------------------------------------------
-mafGizmoPath::mafGizmoPath(mafNode* imputVme, mafObserver *listener, const char* name) 
+mafGizmoPath::mafGizmoPath(mafNode* imputVme, mafObserver *listener, const char* name, int textVisibility) 
 //----------------------------------------------------------------------------
 {
+  m_TextVisibility = textVisibility;
   Constructor(imputVme, listener, name);
 }
 //----------------------------------------------------------------------------
@@ -85,6 +86,8 @@ void mafGizmoPath::Constructor(mafNode *imputVme, mafObserver *listener, const c
 
   CreateInteractor();
   m_VmeGizmoPath->SetBehavior(m_GizmoInteractor);
+
+  m_TextSidePosition = ID_LEFT_TEXT_SIDE;
 }
 //----------------------------------------------------------------------------
 void mafGizmoPath::Destructor()
@@ -162,6 +165,43 @@ void mafGizmoPath::SetCurvilinearAbscissa( double s )
 {
   FindGizmoAbsPose(s);
   m_CurvilinearAbscissa = s;
+
+  double pos[3], rot[3];
+  m_VmeGizmoPath->GetOutput()->GetPose(pos, rot);
+  
+  mafMatrix *matrix;
+  matrix = m_VmeGizmoPath->GetOutput()->GetMatrix();
+  
+  //calculate position of the text
+  double point1[3], point2[3];
+  m_LineSource->GetPoint1(point1);
+  m_LineSource->GetPoint2(point2);
+  double halfLength;
+  halfLength = sqrt(vtkMath::Distance2BetweenPoints(point1,point2))/2.;
+
+  double versorY[3];
+  matrix->GetVersor(1, versorY);
+
+  if(m_TextSidePosition == ID_LEFT_TEXT_SIDE)
+  {
+    pos[0] = pos[0] - halfLength * (versorY[0]); 
+    pos[1] = pos[1] - halfLength * (versorY[1]);
+    pos[2] = pos[2] - halfLength * (versorY[2]);
+  }
+  else
+  {
+    pos[0] = pos[0] + halfLength * (versorY[0]); 
+    pos[1] = pos[1] + halfLength * (versorY[1]);
+    pos[2] = pos[2] + halfLength * (versorY[2]);
+  }
+
+  
+
+  
+  m_VmeGizmoPath->SetTextPosition(pos);
+
+  m_VmeGizmoPath->SetTextValue(wxString::Format("%.0f", m_CurvilinearAbscissa>0?floor(m_CurvilinearAbscissa + 0.5):0.0));
+  
 }
 
 double mafGizmoPath::GetCurvilinearAbscissa()
@@ -373,6 +413,7 @@ void mafGizmoPath::CreateVMEGizmo()
 
   mafNEW(m_VmeGizmoPath);
   m_VmeGizmoPath->SetName(m_Name);
+  m_VmeGizmoPath->SetTextVisibility(m_TextVisibility);
 
   // find the root from InputVME
   mafVMERoot *root = mafVMERoot::SafeDownCast(InputVME->GetRoot());
