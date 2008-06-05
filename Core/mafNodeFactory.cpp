@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-07 14:38:43 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-06-05 14:00:30 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,7 @@
 #include "mafIndent.h"
 #include <string>
 #include <ostream>
+#include <algorithm>
 
 mafNodeFactory *mafNodeFactory::m_Instance=NULL;
 
@@ -99,6 +100,11 @@ mafNode *mafNodeFactory::CreateNodeInstance(const char *type_name)
 void mafNodeFactory::RegisterNewNode(const char* node_name, const char* description, mafCreateObjectFunction createFunction)
 //------------------------------------------------------------------------------
 {
+  std::vector<std::string, std::allocator<std::string> >::const_iterator it = std::find(m_NodeNames.begin (), m_NodeNames.end (), std::string(node_name));
+  if(it != m_NodeNames.end() )
+  {
+    return;
+  }
   m_NodeNames.push_back(node_name);
   RegisterNewObject(node_name,description,createFunction);
 }
