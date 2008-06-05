@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-19 12:14:01 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-06-05 16:20:56 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -377,18 +377,26 @@ int mafVMEItemVTK::ReadData(mafString &filename, int resolvedURL)
       data = ((vtkDataSetReader *)reader)->GetOutput();
     }
 
-    m_DataReader = reader;
-    m_DataReader->Register(NULL);
+    //BES: 23.5.2008 - m_DataReader is apparently not necessary, however,
+    //it may consume lot of memory (especially, if the data is loaded from memory)
+    //we do not need it => the following code is commented
+
+    //m_DataReader = reader;
+    //m_DataReader->Register(NULL);
 
     unsigned long err = reader->GetErrorCode();
 
     if (data == NULL || err == VTK_ERROR)
     {
       mafErrorMacro("Cannot read data file " << filename);
+      reader->Delete(); //BES: 23.5.2008 - added to avoid memory leaks
       return MAF_ERROR;
     }
     else
     {
+      //BES: 23.5.2008 - detach data from its reader, so we can destroy the reader
+      data->SetSource(NULL);
+
       SetData(data);
       m_IsLoadingData = false;
     }
@@ -467,26 +475,26 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
 
     switch (m_IOMode)
     {
-    case MEMORY:
-      found = false;
+      case MEMORY:
+        found = false;
       break;
-    case TMP_FILE:
-      found = false;
-      filename = url; // use directly the url as a tmp file
-      mafErrorMacro("Unsupported I/O Mode");
+      case TMP_FILE:
+        found = false;
+        filename = url; // use directly the url as a tmp file
+        mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
-    case DEFAULT:
-      if (mafString::IsEmpty(url))
-      {
-        mafWarningMacro("No filename specified: cannot write data to disk");
-        return MAF_ERROR;
-      }
+      case DEFAULT:
+        if (mafString::IsEmpty(url))
+        {
+          mafWarningMacro("No filename specified: cannot write data to disk");
+          return MAF_ERROR;
+        }
 
-      found=storage->IsFileInDirectory(url);
-      storage->GetTmpFile(filename);
+        found=storage->IsFileInDirectory(url);
+        storage->GetTmpFile(filename);
       break;
-    default:
-      mafErrorMacro("Unsupported I/O Mode");
+      default:
+        mafErrorMacro("Unsupported I/O Mode");
       return MAF_ERROR;
     };
 
