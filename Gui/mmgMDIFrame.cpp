@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 13:40:09 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-06-05 15:52:10 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -249,17 +249,104 @@ void mmgMDIFrame::CreateStatusbar()
 	m_Gauge->SetForegroundColour( *wxRED );
   m_Gauge->Show(FALSE);
 }
+
+#ifdef __WIN32__
+/** 
+Determines the total amount of free memory available for the current
+application and the size of the largest free block (in bytes) */
+size_t GetFreeMemorySize(size_t* pLargest)
+{
+  MEMORY_BASIC_INFORMATION ssMemInfo;
+  memset(&ssMemInfo, 0, sizeof(ssMemInfo));
+  ssMemInfo.BaseAddress = (LPVOID)0x10000;    //First 64 KB is reserved
+
+  size_t nTotalMem = 0;
+  size_t nLargestFree = 0;
+  while (VirtualQuery(ssMemInfo.BaseAddress, &ssMemInfo, sizeof(ssMemInfo)) != 0)
+  {    
+    if (ssMemInfo.State == MEM_FREE)
+    {
+      nTotalMem += ssMemInfo.RegionSize;
+      if (ssMemInfo.RegionSize > nLargestFree)
+        nLargestFree = ssMemInfo.RegionSize;
+    }
+
+    ssMemInfo.BaseAddress = ((BYTE*)ssMemInfo.BaseAddress) + ssMemInfo.RegionSize;
+    //VirtualQuery returns 0 if the passed address goes into the kernel region
+    //which is on top addresses
+  }
+
+  //we may have also some free memory in the CRT heap
+  _HEAPINFO hinfo;
+  int heapstatus;  
+  hinfo._pentry = NULL;
+
+  while((heapstatus = _heapwalk(&hinfo)) == _HEAPOK)
+  {
+    if (hinfo._useflag != _USEDENTRY)
+    {
+      nTotalMem += hinfo._size;    
+      if (hinfo._size > nLargestFree)
+        nLargestFree = hinfo._size;      
+    }
+  }
+
+  if (pLargest != NULL)
+    *pLargest = nLargestFree;
+  return nTotalMem;
+}
+#endif
+
 //----------------------------------------------------------------------------
 void mmgMDIFrame::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 { 
-  #ifdef __WIN32__
-	MEMORYSTATUS ms;
-	GlobalMemoryStatus( &ms );
+#ifdef __WIN32__
+
+  //BES: 30.5.2008 - do not refresh the memory status all the time
+  static DWORD dwLastTime = 0;
+  DWORD dwCurTime = GetTickCount();
+  if (dwCurTime - dwLastTime < 1000)
+    return; //1 second is the minimal time
+
+//BES: 30.5.2008 - GlobalMemoryStatus actually measures available free physical 
+//memory in the whole system, it only tells you that your next memory operations
+//may be slow as some data will have to be swapped on disk and vice versa.
+//it is NOT related to the memory consumption of the running application
+//	MEMORYSTATUS ms;
+//	GlobalMemoryStatus( &ms );         
+
+  size_t nLargest;
+  int current_free_memory = (int)(GetFreeMemorySize(&nLargest) / (1024*1024));
+    //ms.dwAvailPhys/1000000;
+
+  static bool bShowTotal = false;
+  if (bShowTotal)
+  {
+    //6 seconds for total free
+    if ((dwCurTime - dwLastTime) >= 6000)
+    {
+      dwLastTime = dwCurTime;
+      bShowTotal = false;
+    }
+  }
+  else
+  {
+    //3 seconds for total free
+    if ((dwCurTime - dwLastTime) >= 3000)
+    {
+      dwLastTime = dwCurTime;
+      bShowTotal = true;
+    }
+  }
+
   wxString s;
-  int current_free_memory = ms.dwAvailPhys/1000000;
-  s << "free mem " << current_free_memory << " mb";   
-  SetStatusText(s,5);
+  if (bShowTotal)
+    s << "free mem: " << current_free_memory << " mb";
+  else
+    s << "largest: " << (int)(nLargest / (1024*1024)) << " mb";
+  SetStatusText(s,5);  
+  //GetStatusBar()->SetToolTip(s);
   if (current_free_memory < m_MemoryLimitAlert && !m_UserAlerted)
   {
     m_UserAlerted = true;
