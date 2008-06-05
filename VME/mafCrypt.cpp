@@ -155,7 +155,7 @@ bool mafDefaultEncryptFromMemory(const char *in, unsigned int len, std::string &
 bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
-  bool result;
+  bool result = true;
   try
   {
     StringSource(
@@ -182,7 +182,7 @@ bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase
 bool mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
-  bool result;
+  bool result = true;
   try
   {
     StringSource(
