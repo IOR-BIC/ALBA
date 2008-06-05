@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 12:50:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-05 14:06:26 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,12 +28,16 @@
 #include "vtkMAFAssembly.h"
 #include "vtkMAFSmartPointer.h"
 
+#include "mafEventSource.h"
+
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
+#include "vtkTextProperty.h"
+#include "vtkCaptionActor2D.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipeGizmo);
@@ -46,6 +50,9 @@ mafPipeGizmo::mafPipeGizmo()
 {
   m_Actor           = NULL;
   m_OutlineActor    = NULL;
+  m_CaptionActor    = NULL;
+
+  m_Caption = "";
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmo::Create(mafSceneNode *n)
@@ -63,6 +70,8 @@ void mafPipeGizmo::Create(mafSceneNode *n)
   gizmo->Update();
   vtkPolyData *data = gizmo->GetData();
   assert(data);
+
+  m_Vme->GetEventSource()->AddObserver(this);
 
   vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
 	m_Mapper->SetInput(data);
@@ -96,16 +105,45 @@ void mafPipeGizmo::Create(mafSceneNode *n)
 	m_OutlineActor->SetProperty(corner_props);
 
   m_AssemblyFront->AddPart(m_OutlineActor);
+
+  //caption
+  vtkNEW(m_CaptionActor);
+  m_CaptionActor->SetPosition(0,0);
+  //m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToTimes();
+  m_CaptionActor->GetCaptionTextProperty()->SetFontFamilyToArial();
+  m_CaptionActor->GetCaptionTextProperty()->BoldOn();
+  m_CaptionActor->GetCaptionTextProperty()->AntiAliasingOn();
+  m_CaptionActor->GetCaptionTextProperty()->ItalicOff();
+  m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
+  m_CaptionActor->SetPadding(0);
+  
+  m_CaptionActor->ThreeDimensionalLeaderOff();
+  m_CaptionActor->SetCaption(m_Caption);
+
+  m_CaptionActor->SetHeight(0.03);
+  //m_CaptionActor->SetWidth(0.05);
+  m_CaptionActor->BorderOff();
+  
+  m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
+  m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
+
+  m_CaptionActor->LeaderOff();
+
+  m_RenFront->AddActor2D(m_CaptionActor);
+
 }
 //----------------------------------------------------------------------------
 mafPipeGizmo::~mafPipeGizmo()
 //----------------------------------------------------------------------------
 {
+  m_Vme->GetEventSource()->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
+  m_RenFront->RemoveActor2D(m_CaptionActor);
 
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineActor);
+  vtkDEL(m_CaptionActor);
 }
 //----------------------------------------------------------------------------
 void mafPipeGizmo::Select(bool sel)
@@ -116,4 +154,40 @@ void mafPipeGizmo::Select(bool sel)
 	{
 			m_OutlineActor->SetVisibility(sel);
 	}
+}
+//----------------------------------------------------------------------------
+void mafPipeGizmo::OnEvent(mafEventBase *maf_event)
+//----------------------------------------------------------------------------
+{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
+    default:
+      mafEventMacro(*e);
+      break;
+    }
+  }
+  else if(maf_event->GetSender() == m_Vme && maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+  {
+    UpdatePipe();
+  }
+}
+//----------------------------------------------------------------------------
+void mafPipeGizmo::UpdatePipe()
+//----------------------------------------------------------------------------
+{
+  assert(m_Vme->IsMAFType(mafVMEGizmo));
+  mafVMEGizmo *gizmo = mafVMEGizmo::SafeDownCast(m_Vme);
+  assert(gizmo);
+  gizmo->Update();
+  vtkPolyData *data = gizmo->GetData();
+  assert(data);
+
+  if(m_CaptionActor != NULL)
+  {
+    m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
+    m_CaptionActor->SetCaption(gizmo->GetTextValue());
+    m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
+  }
 }

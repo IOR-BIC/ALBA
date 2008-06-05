@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 12:50:52 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-05 14:06:26 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,7 @@
 // forward refs :
 //----------------------------------------------------------------------------
 class vtkActor;
+class vtkCaptionActor2D;
 
 //----------------------------------------------------------------------------
 // mafPipeGizmo :
@@ -35,11 +36,18 @@ public:
   virtual void Create(mafSceneNode *n);
 
   /** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
-  virtual void Select(bool select); 
+  virtual void Select(bool select);
+
+  /** process events coming from gui */
+  virtual void OnEvent(mafEventBase *maf_event);
+
+protected:
+  void UpdatePipe();
+
+  mafString m_Caption;
 
   vtkActor *m_Actor;
   vtkActor *m_OutlineActor;
-
-protected:
+  vtkCaptionActor2D *m_CaptionActor;
 };  
 #endif // __mafPipeGizmo_H__
