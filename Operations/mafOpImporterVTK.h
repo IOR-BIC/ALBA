@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVTK.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-05 15:52:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,6 +26,7 @@ class mafVMEPointSet;
 class mafVMEPolyline;
 class mafVMESurface;
 class mafVMEVolumeGray;
+class mafVMEVolumeRGB;
 class mafVMEMesh;
 class mafVMEGeneric;
 
@@ -66,6 +67,7 @@ protected:
   mafVMEPolyline   *m_VmePolyLine;
   mafVMESurface    *m_VmeSurface;
   mafVMEVolumeGray *m_VmeGrayVol;
+  mafVMEVolumeRGB *m_VmeRGBVol;
   mafVMEMesh       *m_VmeMesh;  
   mafVMEGeneric    *m_VmeGeneric;
 };

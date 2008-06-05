@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-05 15:52:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,7 @@
 #include "mafVMEPolyline.h"
 #include "mafVMESurface.h"
 #include "mafVMEVolumeGray.h"
+#include "mafVMEVolumeRGB.h"
 #include "mafVMEMesh.h"
 
 #include "mafTagArray.h"
@@ -59,6 +60,7 @@ mafOp(label)
   m_VmePolyLine = NULL;
   m_VmeSurface  = NULL;
   m_VmeGrayVol  = NULL;
+  m_VmeRGBVol  = NULL;
   m_VmeMesh     = NULL;
   m_VmeGeneric  = NULL;
 
@@ -72,6 +74,7 @@ mafOpImporterVTK::~mafOpImporterVTK()
   mafDEL(m_VmePolyLine);
   mafDEL(m_VmeSurface);
   mafDEL(m_VmeGrayVol);
+  mafDEL(m_VmeRGBVol);
   mafDEL(m_VmeMesh);
   mafDEL(m_VmeGeneric);
 }
@@ -159,6 +162,7 @@ int mafOpImporterVTK::ImportVTK()
       mafNEW(m_VmePolyLine);
       mafNEW(m_VmeSurface);
       mafNEW(m_VmeGrayVol);
+      mafNEW(m_VmeRGBVol);
       mafNEW(m_VmeMesh);
       mafNEW(m_VmeGeneric);
       if (m_VmePointSet->SetDataByDetaching(data,0) == MAF_OK)
@@ -176,6 +180,10 @@ int mafOpImporterVTK::ImportVTK()
       else if (m_VmeGrayVol->SetDataByDetaching(data,0) == MAF_OK)
       {
         m_Output = m_VmeGrayVol;
+      }
+      else if (m_VmeRGBVol->SetDataByDetaching(data,0) == MAF_OK)
+      {
+        m_Output = m_VmeRGBVol;
       }
       else if (m_VmeMesh->SetDataByDetaching(data,0) == MAF_OK)
       {
