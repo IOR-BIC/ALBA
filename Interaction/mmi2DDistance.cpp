@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-29 13:08:29 $
-  Version:   $Revision: 1.4 $
-  Authors:   Daniele Giunchi
+  Date:      $Date: 2008-06-05 14:07:29 $
+  Version:   $Revision: 1.5 $
+  Authors:   Daniele Giunchi - Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -204,6 +204,7 @@ mmi2DDistance::~mmi2DDistance()
 
   cppDEL(m_HistogramDialog);
 }
+
 //----------------------------------------------------------------------------
 void mmi2DDistance::OnLeftButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
@@ -227,7 +228,7 @@ void mmi2DDistance::OnLeftButtonDown(mafEventInteraction *e)
   m_ParallelView = m_CurrentRenderer->GetActiveCamera()->GetParallelProjection() != 0;
   if (m_ParallelView)
   {
-    OnButtonDown(e);  
+    OnButtonDown2D(e);  
     if (m_GenerateHistogram)
     {
       mafView *v = m_Mouse->GetView();
@@ -252,12 +253,7 @@ void mmi2DDistance::OnMiddleButtonDown(mafEventInteraction *e)
 {
   OnButtonDown(e); 
 }
-//----------------------------------------------------------------------------
-void mmi2DDistance::OnRightButtonDown(mafEventInteraction *e)
-//----------------------------------------------------------------------------
-{
-  OnLeftButtonDown(e); 
-}
+
 //----------------------------------------------------------------------------
 void mmi2DDistance::OnLeftButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
@@ -304,12 +300,20 @@ void mmi2DDistance::OnMiddleButtonUp(mafEventInteraction *e)
 {
   OnButtonUp(e);
 }
-//----------------------------------------------------------------------------
-void mmi2DDistance::OnRightButtonUp(mafEventInteraction *e)
-//----------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+void mmi2DDistance::OnEvent(mafEventBase *event)
+//------------------------------------------------------------------------------
 {
-  OnLeftButtonUp(e);
+  assert(event);
+  assert(event->GetSender());
+
+  mafID id=event->GetId();
+  mafID channel=event->GetChannel();
+
+  Superclass::OnEvent(event);
 }
+
 //----------------------------------------------------------------------------
 void mmi2DDistance::OnMove(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
@@ -323,7 +327,7 @@ void mmi2DDistance::OnMove(mafEventInteraction *e)
   }
 }
 //----------------------------------------------------------------------------
-void mmi2DDistance::OnButtonDown(mafEventInteraction *e)
+void mmi2DDistance::OnButtonDown2D(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
  	m_DraggingMouse = true;
