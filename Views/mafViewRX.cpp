@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:43 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-06-05 10:37:43 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -267,13 +267,19 @@ int mafViewRX::GetNodeStatus(mafNode *vme)
     if (((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume"))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_Mutex = true;
+      if (n != NULL)
+      {
+        n->m_Mutex = true;
+      }
     }
     else if (vme->IsMAFType(mafVMESlicer))
     {
       n = m_Sg->Vme2Node(vme);
-      n->m_PipeCreatable = true;
-      n->m_Mutex = true;
+      if (n != NULL)
+      {
+        n->m_PipeCreatable = true;
+        n->m_Mutex = true;
+      }
     }
   }
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
