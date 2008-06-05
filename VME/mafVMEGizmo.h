@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:08:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-06-05 14:06:08 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -82,6 +82,19 @@ public:
   /** Return the suggested pipe-typename for the visualization of this vme */
   virtual mafString GetVisualPipe() {return mafString("mafPipeGizmo");};
 
+  /**Set/Get Text Value , that is an information that can be renderized in a custom position*/
+  void SetTextValue(const char* text);
+  const char *GetTextValue();
+
+  /**Set/Get Text Position , that is the position of Text Value in 3d position*/
+  void SetTextPosition(double *position3D);
+  double *GetTextPosition();
+
+  /**Set/Get Visibility of Text Value in 3d position*/
+  void SetTextVisibility(int visibility);
+  int GetTextVisibility(){return m_TextVisibility;};
+
+
 protected:
   mafVMEGizmo();
   virtual ~mafVMEGizmo();
@@ -94,6 +107,10 @@ protected:
 
   mafTransform *m_Transform; ///< pose matrix for the slicer plane
   vtkPolyData  *m_GizmoData;
+
+  mafString m_TextValue;
+  double m_TextPosition[3];
+  int    m_TextVisibility;
 
 private:
   mafVMEGizmo(const mafVMEGizmo&); // Not implemented

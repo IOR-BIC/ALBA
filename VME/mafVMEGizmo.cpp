@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-10-23 11:28:19 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-06-05 14:06:08 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDataPipeCustom.h"
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
+#include "mafEventSource.h"
 
 #include "vtkPolyData.h"
 #include "vtkMAFDataPipe.h"
@@ -52,6 +53,9 @@ mafVMEGizmo::mafVMEGizmo()
   GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 
   SetVisibleToTraverse(false);
+
+  m_TextValue = "";
+  m_TextVisibility = FALSE;
 }
 
 //-------------------------------------------------------------------------
@@ -143,4 +147,39 @@ void mafVMEGizmo::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)
 //-------------------------------------------------------------------------
 {
   kframes.clear(); // no timestamps
+}
+//-------------------------------------------------------------------------
+void mafVMEGizmo::SetTextValue(const char* text)
+//-------------------------------------------------------------------------
+{
+  m_TextValue = mafString(text);
+  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+}
+//-------------------------------------------------------------------------
+const char * mafVMEGizmo::GetTextValue()
+//-------------------------------------------------------------------------
+{
+  return m_TextValue;
+}
+//-------------------------------------------------------------------------
+void mafVMEGizmo::SetTextPosition(double *position3D)
+//-------------------------------------------------------------------------
+{
+  m_TextPosition[0] = position3D[0];
+  m_TextPosition[1] = position3D[1];
+  m_TextPosition[2] = position3D[2];
+  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+}
+//-------------------------------------------------------------------------
+void mafVMEGizmo::SetTextVisibility(int visibility)
+//-------------------------------------------------------------------------
+{ 
+  m_TextVisibility = visibility;
+  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+}
+//-------------------------------------------------------------------------
+double *mafVMEGizmo::GetTextPosition()
+//-------------------------------------------------------------------------
+{
+  return m_TextPosition;
 }
