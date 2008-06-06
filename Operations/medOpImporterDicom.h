@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2008-02-06 11:22:39 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-06-06 10:29:56 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -218,8 +218,6 @@ protected:
 	wxSlider		 *m_SliceScannerLoadPage;
 	wxSlider		 *m_SliceScannerCropPage;
 	wxSlider		 *m_SliceScannerBuildPage;
-
-	wxStaticText *txt;
 
 	int						m_CurrentTime;
 	wxSlider		 *m_TimeScannerLoadPage;
