@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:39:48 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2008-06-06 10:45:04 $
+  Version:   $Revision: 1.50 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,7 +122,8 @@ void mafPipeSurface::Create(mafSceneNode *n)
   vtkNEW(m_Mapper);
   m_Mapper->SetInput(data);
   
-  m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 0 : 1;
+  //m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 0 : 1;
+  m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
   m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 	m_Mapper->SetLookupTable(m_SurfaceMaterial->m_ColorLut);
