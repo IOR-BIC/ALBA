@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 11:56:10 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2008-06-06 10:39:48 $
+  Version:   $Revision: 1.49 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -122,7 +122,7 @@ void mafPipeSurface::Create(mafSceneNode *n)
   vtkNEW(m_Mapper);
   m_Mapper->SetInput(data);
   
-  m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
+  m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 0 : 1;
   m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
 	m_Mapper->SetLookupTable(m_SurfaceMaterial->m_ColorLut);
@@ -176,14 +176,14 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
 	
-	
+/*	
 	if(data->GetCellData()->GetNormals())
 	{
 		CreateNormalsPipe();
 	}
 
 	CreateEdgesPipe();
-
+*/
 }
 //----------------------------------------------------------------------------
 void mafPipeSurface::CreateEdgesPipe()
