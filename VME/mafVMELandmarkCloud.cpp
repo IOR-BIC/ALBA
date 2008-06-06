@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 15:47:02 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2008-06-06 08:17:04 $
+  Version:   $Revision: 1.31 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -664,7 +664,7 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
 {
   if (GetState() == OPEN_CLOUD)
   {
-    for (int i=0;i<GetNumberOfChildren();i++)
+    for (int i = 0; i < GetNumberOfChildren(); i++)
     {
       mafVMELandmark *vme = mafVMELandmark::SafeDownCast(GetChild(i));
       if (vme && mafCString(vme->GetName()) == name)
@@ -673,7 +673,7 @@ mafVMELandmark *mafVMELandmarkCloud::GetLandmark(const char *name)
   }
   else
   {
-    mafErrorMacro("GetLandmark by name: this function works only when cloud is Closed!");
+    mafErrorMacro("GetLandmark by name: this function works only when cloud is open!");
   }
   return NULL;
 }
