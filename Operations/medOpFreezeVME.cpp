@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-12 13:55:02 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:00:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,8 +38,11 @@
 #include "mafVMESlicer.h"
 #include "mafVMEProber.h"
 #include "medVMEWrappedMeter.h"
+#include "medVMELabeledVolume.h"
 
+#include "vtkRectilinearGrid.h"
 #include "mmaMaterial.h"
+#include "mmaVolumeMaterial.h"
 #include "mmgGui.h"
 #include "mafAbsMatrixPipe.h"
 
@@ -99,11 +102,37 @@ void medOpFreezeVME::OpRun()
 	
 	/*if(vtkImageData *imageData = vtkImageData::SafeDownCast(output->GetVTKData()))
 	{
+    //
 	}
-	else if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
+  else*/
+	if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
 	{
+    if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
+    {
+      mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
+
+      mafSmartPointer<mafVMEVolumeGray> newVolume;
+      newVolume->SetName(labeledVolume->GetName());
+      newVolume->SetData(rectilinearGrid,labeledVolume->GetTimeStamp());
+      newVolume->Update();
+
+      if(material)
+      {
+        newVolume->GetMaterial()->DeepCopy(material);
+        newVolume->GetMaterial()->UpdateProp();
+      }
+
+      newVolume->SetMatrix(*labeledVolume->GetOutput()->GetMatrix());
+      m_Output=newVolume;
+      if (m_Output)
+      {
+        m_Output->ReparentTo(m_Input->GetParent());
+        if(!m_TestMode)
+          OpStop(OP_RUN_OK);
+      }
+    }
 	}
-	else*/
+	else
 	if(vtkPolyData *polyData = vtkPolyData::SafeDownCast(output->GetVTKData()))
 	{
 		if(mafVMEPolylineSpline *vmeSpline = mafVMEPolylineSpline::SafeDownCast(vme))
@@ -276,6 +305,7 @@ void medOpFreezeVME::OpRun()
           OpStop(OP_RUN_OK);
       }
 		}
+
     else
       OpStop(OP_RUN_CANCEL);
 		
