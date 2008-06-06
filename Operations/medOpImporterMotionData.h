@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterMotionData.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:46:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-06 10:32:20 $
+  Version:   $Revision: 1.2 $
   Authors:   Fedor Moiseev
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ template <class MotionReader>
 class medOpImporterMotionData : public mafOp
 {
 public:
-  medOpImporterMotionData(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  mafOp(label), m_pgdWildc(pgdWildc), m_dicWildc(dicWildc)
+  medOpImporterMotionData(const wxString &label, const wxString &pgdWildc, const wxString &dicWildc) :  mafOp(label), m_PgdWildc(pgdWildc), m_DicWildc(dicWildc)
         //----------------------------------------------------------------------------
   {
     m_OpType	= OPTYPE_IMPORTER;
@@ -65,7 +65,7 @@ public:
     //----------------------------------------------------------------------------
   {
     //non devo incrementare l'id counter --- vfc le operazioni sono gia inserite nei menu;
-    medOpImporterMotionData *cp = new medOpImporterMotionData(m_Label, m_pgdWildc, m_dicWildc);
+    medOpImporterMotionData *cp = new medOpImporterMotionData(m_Label, m_PgdWildc, m_DicWildc);
     cp->m_Canundo = m_Canundo;
     cp->m_OpType = m_OpType;
     cp->m_Listener = m_Listener;
@@ -90,11 +90,11 @@ public:
     m_File = "";
     m_Dict = "";
 
-    mafString f = mafGetOpenFile(m_FileDir,m_pgdWildc).c_str(); 
+    mafString f = mafGetOpenFile(m_FileDir,m_PgdWildc).c_str(); 
     if(f != "")
     {
       m_File = f;
-      f = mafGetOpenFile(m_DictDir,m_dicWildc,"Open Dictionary").c_str(); 
+      f = mafGetOpenFile(m_DictDir,m_DicWildc,"Open Dictionary").c_str(); 
       if(f != "")
       {
         m_Dict = f;
@@ -163,8 +163,8 @@ protected:
 	wxString m_DictDir;
 	wxString m_File;
 	wxString m_Dict;
-  wxString m_pgdWildc;
-  wxString m_dicWildc;
+  wxString m_PgdWildc;
+  wxString m_DicWildc;
 	mafVME  *m_Vme; 						// era mflVME *m_vme
 	int m_DictionaryAvailable;
 };
