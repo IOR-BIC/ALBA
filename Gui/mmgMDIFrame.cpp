@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 15:52:10 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-06-06 08:00:35 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,11 @@
 #include "mafEvent.h"
 #include "mafPics.h"
 #include "mmgDockSettings.h"
+
+#ifdef __WIN32__
+#include <malloc.h>
+#endif
+
 
 #ifdef MAF_USE_VTK //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
   #include "vtkVersion.h"
