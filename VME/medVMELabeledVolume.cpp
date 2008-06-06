@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 15:55:10 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-06-06 08:18:54 $
+  Version:   $Revision: 1.20 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -204,7 +204,7 @@ void medVMELabeledVolume::InternalPreUpdate()
   {
     CopyDataset();
   }
- 
+    GenerateLabeledVolume(); 
 }
 //-------------------------------------------------------------------------
 void medVMELabeledVolume::CopyDataset()
@@ -918,6 +918,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
           {
             m_CheckedVector[i] = m_LabelCheckBox->IsItemChecked(i);
             GenerateLabeledVolume();
+            m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
             break;
           }
         } 
@@ -1017,6 +1018,7 @@ void medVMELabeledVolume::OnEvent(mafEventBase *maf_event)
         pts->GetPoint(0,pos);
         int pid = vol->FindPoint(pos);
         vtkDataArray *scalars = vol->GetPointData()->GetScalars();
+
       }
       break;
       default:
