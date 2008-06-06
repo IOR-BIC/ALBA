@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 09:48:22 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-06-06 13:02:44 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -65,10 +65,10 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_Listener = listener;
   
   // this is the only supported modality for the moment...
-  Modality = G_LOCAL;
+  m_Modality = G_LOCAL;
 
   // register the input vme
-  InputVME = mafVME::SafeDownCast(imputVme);
+  m_InputVME = mafVME::SafeDownCast(imputVme);
 
   mafNEW(m_GizmoHandleCenterMatrix);
 
@@ -86,7 +86,7 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_MouseBH = m_GizmoBehavior->CreateBehavior(MOUSE_LEFT);
   m_MouseBH->SetListener(this);
   m_MouseBH->SetVME(m_VmeGizmo);
-  m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(InputVME);
+  m_MouseBH->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
   m_MouseBH->EnableTranslation(true);
   m_MouseBH->ResultMatrixConcatenationOn();
 
@@ -125,7 +125,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
   m_Id = gizmoSliceId;
 	
 	double localBounds[6];
-  if (vtkDataSet *VolumeVTKData = InputVME->GetOutput()->GetVTKData())
+  if (vtkDataSet *VolumeVTKData = m_InputVME->GetOutput()->GetVTKData())
   {
     VolumeVTKData->Update();
 	  VolumeVTKData->GetBounds(localBounds);
@@ -150,7 +150,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 
     double interval[3][2] ={{localBounds[0], localBounds[1]}, {localBounds[2], localBounds[3]}, {localBounds[4], localBounds[5]}};
 
-	  this->InitSnapArray(InputVME,axis);
+	  this->InitSnapArray(m_InputVME,axis);
     m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
     m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, mmiConstraint::BOUNDS);
 

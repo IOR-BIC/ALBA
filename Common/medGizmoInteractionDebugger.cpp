@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-13 11:24:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-06 13:02:44 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -61,16 +61,16 @@ medGizmoInteractionDebugger::medGizmoInteractionDebugger(mafNode* imputVme, mafO
 
 void medGizmoInteractionDebugger::CreateInteractor()
 {  
-  RefSysVME = InputVME;
+  m_RefSysVME = m_InputVME;
 
   mafMatrix *absMatrix;
-  absMatrix = RefSysVME->GetOutput()->GetAbsMatrix();
+  absMatrix = m_RefSysVME->GetOutput()->GetAbsMatrix();
 
   mafNEW(m_GizmoInteractor);
   m_LeftMouseInteractor = m_GizmoInteractor->CreateBehavior(MOUSE_LEFT);
 
   m_LeftMouseInteractor->SetListener(this);
-  m_LeftMouseInteractor->SetVME(InputVME);
+  m_LeftMouseInteractor->SetVME(m_InputVME);
 
   m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 
@@ -88,7 +88,7 @@ void medGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *li
   m_Name = name;
   m_Listener = listener;
 
-  InputVME = mafVME::SafeDownCast(imputVme);
+  m_InputVME = mafVME::SafeDownCast(imputVme);
 
   CreateVMEGizmo();
 
@@ -217,7 +217,7 @@ void medGizmoInteractionDebugger::SetGizmoLength( double lineLength )
 void medGizmoInteractionDebugger::CreateVMEGizmo()
 {
 
-  mafVMERoot *root = mafVMERoot::SafeDownCast(InputVME->GetRoot());
+  mafVMERoot *root = mafVMERoot::SafeDownCast(m_InputVME->GetRoot());
   assert(root);
 
   assert(m_VmeGizmo == NULL);
