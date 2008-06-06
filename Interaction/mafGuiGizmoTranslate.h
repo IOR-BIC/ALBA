@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:16:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,7 +70,7 @@ protected:
 
   /**
   Gizmo abs pose*/
-  double Position[3];
+  double m_Position[3];
 
 };
 #endif

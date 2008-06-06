@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:55:54 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,39 +43,39 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
   assert(input);
-  InputVME = input;
+  m_InputVME = input;
   m_Listener = listener;
   
-  GSAxis[X] = GSAxis[Y] = GSAxis[Z] = NULL;
-  GSIsotropic = NULL;
-  GuiGizmoScale = NULL;
+  m_GSAxis[X] = m_GSAxis[Y] = m_GSAxis[Z] = NULL;
+  m_GSIsotropic = NULL;
+  m_GuiGizmoScale = NULL;
 
   //no gizmo component is active at construction
-  this->ActiveGizmoComponent = NONE;
+  this->m_ActiveGizmoComponent = NONE;
   this->SetModalityToLocal();
 
-  mafNEW(InitialGizmoPose);
-  InitialGizmoPose->DeepCopy(InputVME->GetOutput()->GetAbsMatrix());
+  mafNEW(m_InitialGizmoPose);
+  m_InitialGizmoPose->DeepCopy(m_InputVME->GetOutput()->GetAbsMatrix());
 
-  mafNEW(VmeMatrixRelativeToRefSysVME);
-  mafNEW(RefSysVMEAbsMatrixAtMouseDown);
+  mafNEW(m_VmeMatrixRelativeToRefSysVME);
+  mafNEW(m_RefSysVMEAbsMatrixAtMouseDown);
 
   for (int i = 0; i < 3; i++)
   {
     // Create mafGizmoScaleAxis and send events to this
-    GSAxis[i] = new mafGizmoScaleAxis(input, this);
-	  GSAxis[i]->SetAxis(i);
+    m_GSAxis[i] = new mafGizmoScaleAxis(input, this);
+	  m_GSAxis[i]->SetAxis(i);
   }
   
-  GSIsotropic = new mafGizmoScaleIsotropic(input, this);
+  m_GSIsotropic = new mafGizmoScaleIsotropic(input, this);
 
   // create the gizmo gui
   // gui is sending events to this
-  GuiGizmoScale = new mafGuiGizmoScale(this);
+  m_GuiGizmoScale = new mafGuiGizmoScale(this);
 
   // initialize gizmo gui
-  GuiGizmoScale->SetAbsScaling(InputVME->GetOutput()->GetAbsMatrix());
-  GuiGizmoScale->EnableWidgets(true);
+  m_GuiGizmoScale->SetAbsScaling(m_InputVME->GetOutput()->GetAbsMatrix());
+  m_GuiGizmoScale->EnableWidgets(true);
 }
 //----------------------------------------------------------------------------
 mafGizmoScale::~mafGizmoScale() 
@@ -85,13 +85,13 @@ mafGizmoScale::~mafGizmoScale()
   //3 mafGizmoScaleAxis 
   for (int i = 0; i < 3; i++)
   {
-    cppDEL(GSAxis[i]);
+    cppDEL(m_GSAxis[i]);
   }
-  cppDEL(GSIsotropic);
-  mafDEL(InitialGizmoPose);
-  mafDEL(VmeMatrixRelativeToRefSysVME);
-  mafDEL(RefSysVMEAbsMatrixAtMouseDown);
-  cppDEL(GuiGizmoScale);
+  cppDEL(m_GSIsotropic);
+  mafDEL(m_InitialGizmoPose);
+  mafDEL(m_VmeMatrixRelativeToRefSysVME);
+  mafDEL(m_RefSysVMEAbsMatrixAtMouseDown);
+  cppDEL(m_GuiGizmoScale);
 }
 //----------------------------------------------------------------------------
 void mafGizmoScale::OnEvent(mafEventBase *maf_event)
@@ -99,11 +99,11 @@ void mafGizmoScale::OnEvent(mafEventBase *maf_event)
 {
   void *sender = maf_event->GetSender();
 
-  if (sender == GSAxis[X] || sender == GSAxis[Y] || sender == GSAxis[Z] || sender == GSIsotropic)
+  if (sender == m_GSAxis[X] || sender == m_GSAxis[Y] || sender == m_GSAxis[Z] || sender == m_GSIsotropic)
   {
     OnEventGizmoComponents(maf_event); // process events from gizmo components
   }
-  else if (sender == GuiGizmoScale)
+  else if (sender == m_GuiGizmoScale)
   {
     OnEventGizmoGui(maf_event); // process events from the gui
   }
@@ -130,29 +130,29 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
         // to be activated
         if (arg == mmiGenericMouse::MOUSE_DOWN)
         {
-          if (sender == GSAxis[X])
+          if (sender == m_GSAxis[X])
           {
             this->Highlight(X);
-            ActiveGizmoComponent = X_AXIS;
+            m_ActiveGizmoComponent = X_AXIS;
           }
-          else if (sender == GSAxis[Y])
+          else if (sender == m_GSAxis[Y])
           {
             this->Highlight(Y);
-            ActiveGizmoComponent = Y_AXIS;
+            m_ActiveGizmoComponent = Y_AXIS;
           }
-          else if (sender == GSAxis[Z])
+          else if (sender == m_GSAxis[Z])
           {
             this->Highlight(Z);
-            ActiveGizmoComponent = Z_AXIS;
+            m_ActiveGizmoComponent = Z_AXIS;
           }
-          else if (sender == GSIsotropic)
+          else if (sender == m_GSIsotropic)
           {
             this->Highlight(ISOTROPIC);
-            ActiveGizmoComponent = ISOTROPIC;
+            m_ActiveGizmoComponent = ISOTROPIC;
           }
 
           // Store initial gizmo pose
-          InitialGizmoPose->DeepCopy(GSIsotropic->GetAbsPose());
+          m_InitialGizmoPose->DeepCopy(m_GSIsotropic->GetAbsPose());
 
 
           /* At MOUSE_DOWN
@@ -166,18 +166,18 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
 
           // Express VME abs matrix in RefSysVME refsys via mafTransform
           mafSmartPointer<mafTransformFrame> tr;
-          tr->SetInput(InputVME->GetOutput()->GetAbsMatrix());
-          tr->SetTargetFrame(RefSysVME->GetOutput()->GetAbsMatrix());
+          tr->SetInput(m_InputVME->GetOutput()->GetAbsMatrix());
+          tr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
           // update private ivar 
-          VmeMatrixRelativeToRefSysVME->SetTimeStamp(InputVME->GetTimeStamp());
-          VmeMatrixRelativeToRefSysVME->DeepCopy(&tr->GetMatrix());
+          m_VmeMatrixRelativeToRefSysVME->SetTimeStamp(m_InputVME->GetTimeStamp());
+          m_VmeMatrixRelativeToRefSysVME->DeepCopy(&tr->GetMatrix());
 
-          RefSysVMEAbsMatrixAtMouseDown->DeepCopy(RefSysVME->GetOutput()->GetAbsMatrix());
+          m_RefSysVMEAbsMatrixAtMouseDown->DeepCopy(m_RefSysVME->GetOutput()->GetAbsMatrix());
         }
         else if (arg == mmiGenericMouse::MOUSE_MOVE)
         {               
-          if (ActiveGizmoComponent == X_AXIS || ActiveGizmoComponent == Y_AXIS || ActiveGizmoComponent == Z_AXIS)
+          if (m_ActiveGizmoComponent == X_AXIS || m_ActiveGizmoComponent == Y_AXIS || m_ActiveGizmoComponent == Z_AXIS)
           {
             // matrix holding abs pose after mouse move event
             mafSmartPointer<mafMatrix> newAbsMatr;
@@ -187,7 +187,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
             // forward to active axis gizmo              
             vtkTransform *currTr = vtkTransform::New();
             currTr->PostMultiply();
-            currTr->SetMatrix(GSAxis[ActiveGizmoComponent]->GetAbsPose()->GetVTKMatrix());
+            currTr->SetMatrix(m_GSAxis[m_ActiveGizmoComponent]->GetAbsPose()->GetVTKMatrix());
             currTr->Concatenate(e->GetMatrix()->GetVTKMatrix());
             currTr->Update();
 
@@ -195,11 +195,11 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
             newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
 
             // set the new pose to the gizmo
-            GSAxis[ActiveGizmoComponent]->SetAbsPose(newAbsMatr);
+            m_GSAxis[m_ActiveGizmoComponent]->SetAbsPose(newAbsMatr);
 
             currTr->Delete();
           }
-          else if (ActiveGizmoComponent == ISOTROPIC)
+          else if (m_ActiveGizmoComponent == ISOTROPIC)
           {
             // get the translation value
             double translationValue = e->GetMatrix()->GetElement(0,3);
@@ -214,7 +214,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
             for (int gizmoId = X_AXIS; gizmoId < ISOTROPIC; gizmoId++)
             {        
               mafSmartPointer<mafTransform> currTr;
-              currTr.GetPointer()->SetMatrix(*GSAxis[gizmoId]->GetAbsPose());
+              currTr.GetPointer()->SetMatrix(*m_GSAxis[gizmoId]->GetAbsPose());
               currTr.GetPointer()->Concatenate(gizmoTr[gizmoId].GetPointer()->GetMatrix(),PRE_MULTIPLY);
               currTr.GetPointer()->Update();
 
@@ -223,7 +223,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
               newAbsMatr->SetTimeStamp(GetAbsPose()->GetTimeStamp());
 
               // set the new pose to the gizmo
-              GSAxis[gizmoId]->SetAbsPose(newAbsMatr);
+              m_GSAxis[gizmoId]->SetAbsPose(newAbsMatr);
             }
           }
           ////////////////////////////////////////
@@ -258,22 +258,22 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
 
           vtkMAFSmartPointer<vtkTransform> scaleTrans;
           scaleTrans->PostMultiply();
-          scaleTrans->SetMatrix(VmeMatrixRelativeToRefSysVME->GetVTKMatrix());
+          scaleTrans->SetMatrix(m_VmeMatrixRelativeToRefSysVME->GetVTKMatrix());
 
           vtkMAFSmartPointer<vtkTransform> absScaleTrans;
-          if (ActiveGizmoComponent == X_AXIS)
+          if (m_ActiveGizmoComponent == X_AXIS)
           {
             absScaleTrans->Scale(scale, 1, 1); 
           }
-          else if (ActiveGizmoComponent == Y_AXIS)
+          else if (m_ActiveGizmoComponent == Y_AXIS)
           {
             absScaleTrans->Scale(1, scale, 1);
           }
-          else if (ActiveGizmoComponent == Z_AXIS)
+          else if (m_ActiveGizmoComponent == Z_AXIS)
           {
             absScaleTrans->Scale (1, 1, scale);
           }
-          else if (ActiveGizmoComponent == ISOTROPIC)
+          else if (m_ActiveGizmoComponent == ISOTROPIC)
           {
             absScaleTrans->Scale(scale, scale, scale);
           }
@@ -294,10 +294,10 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
 
           mafSmartPointer<mafTransformFrame> newVmeAbsPoseTr;
           newVmeAbsPoseTr.GetPointer()->SetInput(scaleTransMatrix);
-          newVmeAbsPoseTr.GetPointer()->SetInputFrame(RefSysVMEAbsMatrixAtMouseDown);
+          newVmeAbsPoseTr.GetPointer()->SetInputFrame(m_RefSysVMEAbsMatrixAtMouseDown);
 
           // Set VME Pose
-          InputVME->SetAbsMatrix(newVmeAbsPoseTr.GetPointer()->GetMatrix());
+          m_InputVME->SetAbsMatrix(newVmeAbsPoseTr.GetPointer()->GetMatrix());
 
           // notify the vme about changed vme abs pose due to scaling; also send new vme bs matrix
           mafEvent e2s;
@@ -310,17 +310,17 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
           mafSmartPointer<mafMatrix> scaleMat;
           scaleMat->DeepCopy(absScaleTrans->GetMatrix());
 
-          GuiGizmoScale->SetAbsScaling(scaleMat);
+          m_GuiGizmoScale->SetAbsScaling(scaleMat);
         }
         else if (arg == mmiGenericMouse::MOUSE_UP)
         {
           // put the gizmo back in the initial pose  
-          SetAbsPose(InitialGizmoPose);
+          SetAbsPose(m_InitialGizmoPose);
 
           // Update scale gizmo gui 
           mafSmartPointer<mafMatrix> identity;
           identity->Identity();
-          GuiGizmoScale->SetAbsScaling(identity);
+          m_GuiGizmoScale->SetAbsScaling(identity);
         }
 
         // forward event to the listener ie the operation
@@ -376,34 +376,34 @@ void mafGizmoScale::Highlight (int component)
 {
   if (X_AXIS <= component && component < ISOTROPIC)
   {
-   GSIsotropic->Highlight(false);
+   m_GSIsotropic->Highlight(false);
    for (int i = 0; i < 3; i++)
    {
      if (i != component)
      {
-       GSAxis[i]->Highlight(false);
+       m_GSAxis[i]->Highlight(false);
      }
    }
 
-   GSAxis[component]->Highlight(true);
+   m_GSAxis[component]->Highlight(true);
  
   }       
   else if (component == ISOTROPIC)
   {
     for (int i = X_AXIS; i < 3; i++)
     {
-      GSAxis[i]->Highlight(false);
+      m_GSAxis[i]->Highlight(false);
     }
-    GSIsotropic->Highlight(true);
+    m_GSIsotropic->Highlight(true);
   }
   else if (component == NONE)
   {
     for (int i = 0; i < 3; i++)
     {
      // DeHighlight everything;
-     GSAxis[i]->Highlight(false);
+     m_GSAxis[i]->Highlight(false);
     }
-    GSIsotropic->Highlight(false);
+    m_GSIsotropic->Highlight(false);
   }
 }
 
@@ -412,14 +412,14 @@ void mafGizmoScale::Show(bool show)
 //----------------------------------------------------------------------------
 {
   // set visibility ivar
-  Visibility = show;
+  m_Visibility = show;
 
   for (int i = 0; i < 3; i++)
   {
-    GSAxis[i]->Show(show);
+    m_GSAxis[i]->Show(show);
   }
 
-  GSIsotropic->Show(show);
+  m_GSIsotropic->Show(show);
 
   // Gizmo scale text entry is not keyable to not confuse the user;
   /*
@@ -429,11 +429,11 @@ void mafGizmoScale::Show(bool show)
 
   if (RefSysVME == InputVME)
   {
-    GuiGizmoScale->EnableWidgets(show);
+    m_GuiGizmoScale->EnableWidgets(show);
   }
   else
   {
-    GuiGizmoScale->EnableWidgets(false);
+    m_GuiGizmoScale->EnableWidgets(false);
   }
   */
   // update the camera
@@ -443,29 +443,29 @@ void mafGizmoScale::Show(bool show)
 void mafGizmoScale::Show(bool showX, bool showY, bool showZ, bool showIso)
 //----------------------------------------------------------------------------
 {
-	GSAxis[mafGizmoScale::X_AXIS]->Show(showX);
-	GSAxis[mafGizmoScale::Y_AXIS]->Show(showY);
-	GSAxis[mafGizmoScale::Z_AXIS]->Show(showZ);
+	m_GSAxis[mafGizmoScale::X_AXIS]->Show(showX);
+	m_GSAxis[mafGizmoScale::Y_AXIS]->Show(showY);
+	m_GSAxis[mafGizmoScale::Z_AXIS]->Show(showZ);
 
-	GSIsotropic->Show(showIso);
+	m_GSIsotropic->Show(showIso);
 }
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoScale::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return GSAxis[0]->GetAbsPose();
+  return m_GSAxis[0]->GetAbsPose();
 }
 
 //----------------------------------------------------------------------------  
 void mafGizmoScale::SetInput(mafVME *input)
 //----------------------------------------------------------------------------
 {
-  this->InputVME = input;
+  this->m_InputVME = input;
   for (int i = 0; i < 3; i++)
   {
-    GSAxis[i]->SetInput(input);
+    m_GSAxis[i]->SetInput(input);
   }
-  GSIsotropic->SetInput(input);
+  m_GSIsotropic->SetInput(input);
 }
 
 //----------------------------------------------------------------------------
@@ -508,21 +508,21 @@ void mafGizmoScale::SendTransformMatrixFromGui(mafEventBase *maf_event)
   invOldAbsPose->DeepCopy(this->GetAbsPose());
   invOldAbsPose->Invert();
 
-  mafMatrix::Multiply4x4(*newAbsPose, *InputVME->GetOutput()->GetAbsMatrix(), *M);
+  mafMatrix::Multiply4x4(*newAbsPose, *m_InputVME->GetOutput()->GetAbsMatrix(), *M);
   // update gizmo abs pose
   //this->SetAbsPose(newAbsPose, InputVME->GetTimeStamp());
 
   // update input vme abs pose
   
-	InputVME->SetAbsMatrix(*M, InputVME->GetTimeStamp());
-  InputVME->Modified();
+	m_InputVME->SetAbsMatrix(*M, m_InputVME->GetTimeStamp());
+  m_InputVME->Modified();
 
   // notify the listener about changed vme pose
   SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);   
 
   mafSmartPointer<mafMatrix> identity;
   identity->Identity();
-  GuiGizmoScale->SetAbsScaling(identity);
+  m_GuiGizmoScale->SetAbsScaling(identity);
 
 
   // clean up
@@ -551,24 +551,24 @@ void mafGizmoScale::SetAbsPose(mafMatrix *absPose, mafTimeStamp ts)
 
   for (int i = 0; i < 3; i++)
   {
-    GSAxis[i]->SetAbsPose(tmpMatr);
+    m_GSAxis[i]->SetAbsPose(tmpMatr);
   }
 
-  GSIsotropic->SetAbsPose(tmpMatr);
-  GuiGizmoScale->SetAbsScaling(tmpMatr);
+  m_GSIsotropic->SetAbsPose(tmpMatr);
+  m_GuiGizmoScale->SetAbsScaling(tmpMatr);
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoScale::SetRefSys(mafVME *refSys)
 //----------------------------------------------------------------------------
 {
-  assert(InputVME);  
-  assert(GuiGizmoScale);
+  assert(m_InputVME);  
+  assert(m_GuiGizmoScale);
 
-  RefSysVME = refSys;
-  SetAbsPose(RefSysVME->GetOutput()->GetAbsMatrix());
+  m_RefSysVME = refSys;
+  SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-  // GuiGizmoScale not keyable for the moment to not confuse the user  
+  // m_GuiGizmoScale not keyable for the moment to not confuse the user  
   /*
 
   if (RefSysVME == InputVME)
@@ -577,7 +577,7 @@ void mafGizmoScale::SetRefSys(mafVME *refSys)
     // if the refsys is local
     if (Visibility == true)
     {
-      GuiGizmoScale->EnableWidgets(true);
+      m_GuiGizmoScale->EnableWidgets(true);
     }
   }
   else
@@ -586,7 +586,7 @@ void mafGizmoScale::SetRefSys(mafVME *refSys)
     // if the refsys is global since this refsys cannot be changed
     if (Visibility == true)
     {
-      GuiGizmoScale->EnableWidgets(false);
+      m_GuiGizmoScale->EnableWidgets(false);
     }
   }
   */
@@ -597,28 +597,28 @@ double mafGizmoScale::GetScalingValue() const
 //----------------------------------------------------------------------------
 {
   int gizmoId = X_AXIS;
-  if (X_AXIS <= ActiveGizmoComponent && ActiveGizmoComponent <= Z_AXIS)
+  if (X_AXIS <= m_ActiveGizmoComponent && m_ActiveGizmoComponent <= Z_AXIS)
   {
-    gizmoId = ActiveGizmoComponent; 
+    gizmoId = m_ActiveGizmoComponent; 
   }
-  else if (ActiveGizmoComponent == ISOTROPIC)
+  else if (m_ActiveGizmoComponent == ISOTROPIC)
   {
     gizmoId = X_AXIS;
   }
 
   // get the current refsys versor
   double refSysVersor[3] = {0, 0, 0};
-  mafTransform::GetVersor(gizmoId, *RefSysVME->GetOutput()->GetAbsMatrix(), refSysVersor);
+  mafTransform::GetVersor(gizmoId, *m_RefSysVME->GetOutput()->GetAbsMatrix(), refSysVersor);
 
-  double gizmoLength = GSAxis[gizmoId]->GetCubeLength() + GSAxis[gizmoId]->GetCylinderLength();
+  double gizmoLength = m_GSAxis[gizmoId]->GetCubeLength() + m_GSAxis[gizmoId]->GetCylinderLength();
   double dist = 0;
   double scale = 1;
   double p0[3] = {0, 0, 0};
   double p1[3] = {0, 0, 0};
   double p0p1[3] = {0, 0, 0};
  
-  mafTransform::GetPosition(*InitialGizmoPose, p0);
-  mafTransform::GetPosition(*GSAxis[gizmoId]->GetAbsPose(), p1);
+  mafTransform::GetPosition(*m_InitialGizmoPose, p0);
+  mafTransform::GetPosition(*m_GSAxis[gizmoId]->GetAbsPose(), p1);
   dist = sqrt(vtkMath::Distance2BetweenPoints(p0, p1));
   
   this->BuildVector(p0, p1, p0p1);

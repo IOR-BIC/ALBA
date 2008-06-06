@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,7 +54,7 @@ public:
   /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme);
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -103,32 +103,32 @@ protected:
   
  
   /** Register input vme*/
-  mafVME *InputVme;
+  mafVME *m_InputVme;
 
   /**
   Register the event receiver object*/
   mafObserver *m_Listener;
  
   /** Register the gizmo axis */
-  int ActiveAxis;
+  int m_ActiveAxis;
   
   /** Create the sphere*/
-  vtkSphereSource *Sphere;
+  vtkSphereSource *m_Sphere;
 
   /** Transform to rotate the fan around Z axi after creation
   to match new StartTheta angle*/
-  vtkTransform *RotateFanTr;
+  vtkTransform *m_RotateFanTr;
 
-  vtkTransformPolyDataFilter *RotateFanTPDF;
+  vtkTransformPolyDataFilter *m_RotateFanTPDF;
 
   /** sphere transform */
-  vtkTransform *ChangeFanAxisTr;
+  vtkTransform *m_ChangeFanAxisTr;
 
   /** rotate PDF for sphere*/
-  vtkTransformPolyDataFilter *ChangeFanAxisTPDF;
+  vtkTransformPolyDataFilter *m_ChangeFanAxisTPDF;
   
    /** Fan gizmo */
-  mafVMEGizmo *Gizmo;
+  mafVMEGizmo *m_Gizmo;
 
   /** gizmo data */
   //mafVmeData *GizmoData;
@@ -141,17 +141,17 @@ protected:
   void SetColor(double colR, double colG, double colB);
 
   /** Start angle and end angle*/
-  double StartTheta;
-  double EndTheta;
+  double m_StartTheta;
+  double m_EndTheta;
 
   enum MIRROR_STATUS {OFF = 0, ON};
 
   /** Register the mirror status of the fan; default status is off*/
-  int MirrorStatus;
+  int m_MirrorStatus;
 
-  vtkTransform *MirrorTr;
-  vtkTransform *BufferTr;
-  vtkTransformPolyDataFilter *MirrorTPDF;
+  vtkTransform *m_MirrorTr;
+  vtkTransform *m_BufferTr;
+  vtkTransformPolyDataFilter *m_MirrorTPDF;
 
   /** Get the start theta from abs pick coordinates */
   double PointPickedToStartTheta(double xp, double yp, double zp);
@@ -160,6 +160,6 @@ protected:
   Set the reference system matrix. Reference system type is set to CUSTOM.*/
   void SetRefSysMatrix(mafMatrix *matrix);
 
-  mafRefSys *RefSys;
+  mafRefSys *m_RefSys;
 };
 #endif

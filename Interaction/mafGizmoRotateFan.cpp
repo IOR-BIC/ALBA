@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:57:20 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -50,16 +50,16 @@
 mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
-  StartTheta = EndTheta = 0;
-  MirrorStatus = false;
+  m_StartTheta = m_EndTheta = 0;
+  m_MirrorStatus = false;
 
   // default axis is X
-  ActiveAxis  = X;
+  m_ActiveAxis  = X;
   m_Listener  = listener;
-  InputVme    = input;
+  m_InputVme    = input;
 
-  mafMatrix *absInputMatrix = InputVme->GetOutput()->GetAbsMatrix();
-  RefSys = new mafRefSys(absInputMatrix->GetVTKMatrix());
+  mafMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
+  m_RefSys = new mafRefSys(absInputMatrix->GetVTKMatrix());
 
   // create pipeline stuff
   CreatePipeline();
@@ -68,12 +68,12 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   // create vme gizmo stuff
   //-----------------
   // the circle gizmo
-  Gizmo = mafVMEGizmo::New();
-  Gizmo->SetName("fan");
-  Gizmo->SetData(ChangeFanAxisTPDF->GetOutput());
+  m_Gizmo = mafVMEGizmo::New();
+  m_Gizmo->SetName("fan");
+  m_Gizmo->SetData(m_ChangeFanAxisTPDF->GetOutput());
 
   // set the default axis to X axis
-  this->SetAxis(ActiveAxis);
+  this->SetAxis(m_ActiveAxis);
 
   // set gizmo color to yellow
   this->SetColor(1, 1, 0);
@@ -81,43 +81,43 @@ mafGizmoRotateFan::mafGizmoRotateFan(mafVME *input, mafObserver *listener)
   SetAbsPose(absInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
-  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  m_Gizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateFan::~mafGizmoRotateFan() 
 //----------------------------------------------------------------------------
 {   
-  cppDEL(RefSys);
+  cppDEL(m_RefSys);
 
-  vtkDEL(Sphere);
-  vtkDEL(RotateFanTPDF);
-  vtkDEL(RotateFanTr);
-  vtkDEL(MirrorTPDF);
-  vtkDEL(MirrorTr);
-  vtkDEL(BufferTr);
-  vtkDEL(ChangeFanAxisTr);
-  vtkDEL(ChangeFanAxisTPDF);
+  vtkDEL(m_Sphere);
+  vtkDEL(m_RotateFanTPDF);
+  vtkDEL(m_RotateFanTr);
+  vtkDEL(m_MirrorTPDF);
+  vtkDEL(m_MirrorTr);
+  vtkDEL(m_BufferTr);
+  vtkDEL(m_ChangeFanAxisTr);
+  vtkDEL(m_ChangeFanAxisTPDF);
   
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
-	Gizmo->ReparentTo(NULL);
+	m_Gizmo->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::CreatePipeline() 
 //----------------------------------------------------------------------------
 {
   // buffer transfrom for storing mirror transform
-  vtkNEW(BufferTr);
-  BufferTr->PostMultiply();
+  vtkNEW(m_BufferTr);
+  m_BufferTr->PostMultiply();
 
-  InputVme->Update();
-  // calculate diagonal of InputVme space bounds 
+  m_InputVme->Update();
+  // calculate diagonal of m_InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-	if(InputVme->IsA("mafVMEGizmo"))
-		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	if(m_InputVme->IsA("mafVMEGizmo"))
+		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
-		InputVme->GetOutput()->GetBounds(b);
+		m_InputVme->GetOutput()->GetBounds(b);
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
@@ -126,37 +126,37 @@ void mafGizmoRotateFan::CreatePipeline()
   p2[2] = b[5];
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
   
-  // create sphere
-  vtkNEW(Sphere);
-	Sphere->SetRadius(d/2);
-	Sphere->SetThetaResolution(50);
-	Sphere->SetStartTheta(StartTheta);
-	Sphere->SetEndTheta(EndTheta);
+  // create m_Sphere
+  vtkNEW(m_Sphere);
+	m_Sphere->SetRadius(d/2);
+	m_Sphere->SetThetaResolution(50);
+	m_Sphere->SetStartTheta(m_StartTheta);
+	m_Sphere->SetEndTheta(m_EndTheta);
 
   // create the rotate fan transform
-  RotateFanTr = vtkTransform::New();
+  m_RotateFanTr = vtkTransform::New();
 
-  RotateFanTPDF = vtkTransformPolyDataFilter::New();
-  RotateFanTPDF->SetTransform(RotateFanTr);
-  RotateFanTPDF->SetInput(Sphere->GetOutput());
+  m_RotateFanTPDF = vtkTransformPolyDataFilter::New();
+  m_RotateFanTPDF->SetTransform(m_RotateFanTr);
+  m_RotateFanTPDF->SetInput(m_Sphere->GetOutput());
 
   // create the mirroring transform
-  MirrorTr = vtkTransform::New();
-  vtkNEW(MirrorTPDF);
-  MirrorTPDF->SetTransform(MirrorTr);
-  MirrorTPDF->SetInput(RotateFanTPDF->GetOutput());
+  m_MirrorTr = vtkTransform::New();
+  vtkNEW(m_MirrorTPDF);
+  m_MirrorTPDF->SetTransform(m_MirrorTr);
+  m_MirrorTPDF->SetInput(m_RotateFanTPDF->GetOutput());
 
-  // create the transform for the sphere
-  ChangeFanAxisTr = vtkTransform::New();
-  ChangeFanAxisTr->PostMultiply();
+  // create the transform for the m_Sphere
+  m_ChangeFanAxisTr = vtkTransform::New();
+  m_ChangeFanAxisTr->PostMultiply();
 
   // update transform to set the gizmo normal to X
   this->SetAxis(X);
 
-	// transform the sphere
-  ChangeFanAxisTPDF = vtkTransformPolyDataFilter::New();
-  ChangeFanAxisTPDF->SetInput(MirrorTPDF->GetOutput());
-	ChangeFanAxisTPDF->SetTransform(ChangeFanAxisTr);
+	// transform the m_Sphere
+  m_ChangeFanAxisTPDF = vtkTransformPolyDataFilter::New();
+  m_ChangeFanAxisTPDF->SetInput(m_MirrorTPDF->GetOutput());
+	m_ChangeFanAxisTPDF->SetTransform(m_ChangeFanAxisTr);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetAxis(int axis) 
@@ -166,7 +166,7 @@ void mafGizmoRotateFan::SetAxis(int axis)
   // is created; gizmos are not highlighted
   
   // register the axis
-  ActiveAxis = axis;
+  m_ActiveAxis = axis;
   
   // rotate the gizmo components to match the specified axis
     /**
@@ -180,30 +180,30 @@ void mafGizmoRotateFan::SetAxis(int axis)
   
           X               Y            Z
   */
-  ChangeFanAxisTr->Identity();
+  m_ChangeFanAxisTr->Identity();
   
-  // splat the sphere on XY plane; the
+  // splat the m_Sphere on XY plane; the
   // gizmo us normal to the Z axis
-  ChangeFanAxisTr->Scale(1, 1, 0);
+  m_ChangeFanAxisTr->Scale(1, 1, 0);
 
-  if (ActiveAxis == X)
+  if (m_ActiveAxis == X)
   {
     // set rotation to move gizmo normal to X
-    ChangeFanAxisTr->RotateY(90);
-    ChangeFanAxisTr->RotateX(90);
+    m_ChangeFanAxisTr->RotateY(90);
+    m_ChangeFanAxisTr->RotateX(90);
   }
-  else if (ActiveAxis == Y)
+  else if (m_ActiveAxis == Y)
   {
     // set rotation to move gizmo normal to Y 
-    ChangeFanAxisTr->RotateX(-90);
-    ChangeFanAxisTr->RotateY(-90);
+    m_ChangeFanAxisTr->RotateX(-90);
+    m_ChangeFanAxisTr->RotateY(-90);
   }
 }
 //----------------------------------------------------------------------------
 void  mafGizmoRotateFan::SetRadius(double radius)
 //----------------------------------------------------------------------------
 {
-  Sphere->SetRadius(radius);
+  m_Sphere->SetRadius(radius);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
@@ -219,7 +219,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
         if (e->GetArg() == mmiGenericMouse::MOUSE_DOWN)
         {
           //----------------------------------------
-          // compute start theta for the sphere
+          // compute start theta for the m_Sphere
           //----------------------------------------
 
           // get the picked position from the event
@@ -231,8 +231,8 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 
           //----------------------------------------
           // rotate the fan of theta around its axis 
-          RotateFanTr->Identity();
-          RotateFanTr->RotateZ(offsetAngle);
+          m_RotateFanTr->Identity();
+          m_RotateFanTr->RotateZ(offsetAngle);
 
           // build the rotation axis for mirroring
           double axis[3];
@@ -241,8 +241,8 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           axis[2] = 0;
 
           // create the transform for mirroring the fan
-          BufferTr->Identity();
-          BufferTr->RotateWXYZ(180, axis);
+          m_BufferTr->Identity();
+          m_BufferTr->RotateWXYZ(180, axis);
 
           // change the sender and forward the event
           e->SetSender(this);
@@ -251,39 +251,39 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
         else if (e->GetArg() == mmiGenericMouse::MOUSE_MOVE)
         {
           double dTheta = e->GetDouble();
-          if (MirrorStatus == ON)
+          if (m_MirrorStatus == ON)
           {
-            EndTheta -= dTheta;     
+            m_EndTheta -= dTheta;     
           }
           else
           {
-            EndTheta += dTheta;
+            m_EndTheta += dTheta;
           }
 
-          if (EndTheta > 360)
+          if (m_EndTheta > 360)
           {
-            EndTheta -= 360;
+            m_EndTheta -= 360;
           }
 
-          if (EndTheta < 0)
+          if (m_EndTheta < 0)
           {
             // toggle mirror status
-            if (MirrorStatus == ON)
+            if (m_MirrorStatus == ON)
             {
-              MirrorStatus = OFF;
-              MirrorTr->Identity();
+              m_MirrorStatus = OFF;
+              m_MirrorTr->Identity();
             }
             else
             {
-              MirrorStatus = ON;
-              MirrorTr->Identity();
-              MirrorTr->Concatenate(BufferTr);
+              m_MirrorStatus = ON;
+              m_MirrorTr->Identity();
+              m_MirrorTr->Concatenate(m_BufferTr);
             }
-            EndTheta = -EndTheta;
+            m_EndTheta = -m_EndTheta;
           }
 
-          // update the sphere EndTheta ivar
-          Sphere->SetEndTheta(EndTheta);
+          // update the m_Sphere m_EndTheta ivar
+          m_Sphere->SetEndTheta(m_EndTheta);
 
           // change the sender and forward the event
           e->SetSender(this);
@@ -292,12 +292,12 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
         else if (e->GetArg() == mmiGenericMouse::MOUSE_UP)
         {
 
-          // reset StartTheta and EndTheta
-          StartTheta = 0;
-          EndTheta = 0;
+          // reset m_StartTheta and m_EndTheta
+          m_StartTheta = 0;
+          m_EndTheta = 0;
 
-          // update the sphere EndTheta ivar
-          Sphere->SetEndTheta(EndTheta);
+          // update the m_Sphere m_EndTheta ivar
+          m_Sphere->SetEndTheta(m_EndTheta);
 
           // change the sender and forward the event
           e->SetSender(this);
@@ -317,10 +317,10 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 void mafGizmoRotateFan::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  Gizmo->GetMaterial()->m_Prop->SetColor(col);
-	Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_Gizmo->GetMaterial()->m_Prop->SetColor(col);
+	m_Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
+	m_Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+	m_Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
@@ -333,7 +333,7 @@ void mafGizmoRotateFan::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateFan::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo,show));
 }
 //----------------------------------------------------------------------------
 double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double zp)
@@ -341,7 +341,7 @@ double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double z
 {
   // Get the abs matrix
   mafMatrix invParentAbsMat;
-  invParentAbsMat.Invert(*RefSys->GetMatrix(), invParentAbsMat);
+  invParentAbsMat.Invert(*m_RefSys->GetMatrix(), invParentAbsMat);
 
   double pAbs[4], pLoc[4];
   pAbs[0] = xp;
@@ -357,7 +357,7 @@ double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double z
 
   // compute the start theta
   double startThetaRad = 0;
-  switch (ActiveAxis)
+  switch (m_ActiveAxis)
   {
 	  case (X):
 	  {
@@ -382,19 +382,19 @@ double mafGizmoRotateFan::PointPickedToStartTheta(double xp, double yp, double z
 void mafGizmoRotateFan::SetAbsPose(mafMatrix *absPose )
 //----------------------------------------------------------------------------
 {
-  Gizmo->SetAbsMatrix(*absPose);
+  m_Gizmo->SetAbsMatrix(*absPose);
   SetRefSysMatrix(absPose);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
- this->InputVme = vme;
+ this->m_InputVme = vme;
  SetAbsPose(vme->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetRefSysMatrix(mafMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-  RefSys->SetTypeToCustom(matrix);
+  m_RefSys->SetTypeToCustom(matrix);
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-15 18:18:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@ public:
   /** 
   Set input vme for the gizmo*/
   virtual void SetInput(mafVME *vme) = 0;
-  mafVME *GetInput() {return this->InputVME;};
+  mafVME *GetInput() {return this->m_InputVME;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -73,13 +73,13 @@ public:
   enum MODALITY {G_LOCAL = 0, G_GLOBAL};
 
   /** Modality to be used when gizmo reference frame is the input vme abs pose */
-  void SetModalityToLocal(){this->Modality = G_LOCAL;};
+  void SetModalityToLocal(){this->m_Modality = G_LOCAL;};
 
   /** Modality to be used when gizmo reference frame is different from input vme abs pose */
-  void SetModalityToGlobal() {this->Modality = G_GLOBAL;};
+  void SetModalityToGlobal() {this->m_Modality = G_GLOBAL;};
 
   /** Return the working modality */
-  int  GetModality() {return this->Modality;};
+  int  GetModality() {return this->m_Modality;};
 
   //----------------------------------------------------------------------------
   /**
@@ -100,11 +100,11 @@ protected:
   
   /** 
   The input vme*/
-  mafVME *InputVME;
+  mafVME *m_InputVME;
 
   /** 
   The gizmo interaction mode*/
-  int Modality;
+  int m_Modality;
 
   /**
   Register the event receiver object*/
@@ -112,10 +112,10 @@ protected:
 
   /** 
   Vme to be used as reference system */
-  mafVME *RefSysVME;
+  mafVME *m_RefSysVME;
 
   /** */
-  bool Visibility;
+  bool m_Visibility;
 
   void SendTransformMatrix(mafMatrix* matrix, int eventId, long arg);
 

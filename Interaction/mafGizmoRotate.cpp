@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:27:58 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,31 +41,31 @@ mafGizmoRotate::mafGizmoRotate(mafVME* input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
   assert(input);
-  InputVME    = input;
+  m_InputVME    = input;
   m_Listener  = listener;
 
-  GRFan[X]    = GRFan[Y]    = GRFan[Z]    = NULL;
-  GRCircle[X] = GRCircle[Y] = GRCircle[Z] = NULL;
-  GuiGizmoRotate = NULL;
+  m_GRFan[X]    = m_GRFan[Y]    = m_GRFan[Z]    = NULL;
+  m_GRCircle[X] = m_GRCircle[Y] = m_GRCircle[Z] = NULL;
+  m_GuiGizmoRotate = NULL;
 
   for (int i = 0; i < 3; i++)
   {
     // create the fan and send events to this
-    GRFan[i] = new mafGizmoRotateFan(input, this);
-    GRFan[i]->SetAxis(i);
+    m_GRFan[i] = new mafGizmoRotateFan(input, this);
+    m_GRFan[i]->SetAxis(i);
 
     // Create mafGizmoRotateCircle and send events to the corresponding fan
-    GRCircle[i] = new mafGizmoRotateCircle(input, GRFan[i]);
-	  GRCircle[i]->SetAxis(i);
+    m_GRCircle[i] = new mafGizmoRotateCircle(input, m_GRFan[i]);
+	  m_GRCircle[i]->SetAxis(i);
   }
   
 
   // create the gizmo gui
   // gui is sending events to this
-  GuiGizmoRotate = new mafGuiGizmoRotate(this);
+  m_GuiGizmoRotate = new mafGuiGizmoRotate(this);
   
   // initialize gizmo gui
-  GuiGizmoRotate->SetAbsOrientation(InputVME->GetOutput()->GetAbsMatrix());
+  m_GuiGizmoRotate->SetAbsOrientation(m_InputVME->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
 mafGizmoRotate::~mafGizmoRotate() 
@@ -76,10 +76,10 @@ mafGizmoRotate::~mafGizmoRotate()
   //1 mafGizmoRotateFan
   for (int i = 0; i < 3; i++)
   {
-    cppDEL(GRCircle[i]);
-    cppDEL(GRFan[i]);
+    cppDEL(m_GRCircle[i]);
+    cppDEL(m_GRFan[i]);
   }
-  cppDEL(GuiGizmoRotate);
+  cppDEL(m_GuiGizmoRotate);
 }
 
 //----------------------------------------------------------------------------
@@ -89,11 +89,11 @@ void mafGizmoRotate::OnEvent(mafEventBase *maf_event)
   // get the sender
   void *sender = maf_event->GetSender();
     
-  if (sender == GRFan[X] || sender == GRFan[Y] || sender == GRFan[Z])
+  if (sender == m_GRFan[X] || sender == m_GRFan[Y] || sender == m_GRFan[Z])
   {
     OnEventGizmoComponents(maf_event); // process events from fans
   }
-  else if (sender == GuiGizmoRotate)
+  else if (sender == m_GuiGizmoRotate)
   {
     OnEventGizmoGui(maf_event); // process events from gui
   }
@@ -121,15 +121,15 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
         // if a gizmo circle has been picked
         if (arg == mmiGenericMouse::MOUSE_DOWN)
         {
-          if (sender == GRFan[X])
+          if (sender == m_GRFan[X])
           {
             this->Highlight(X);
           }
-          else if (sender == GRFan[Y])
+          else if (sender == m_GRFan[Y])
           {
             this->Highlight(Y);
           }
-          else if (sender == GRFan[Z])
+          else if (sender == m_GRFan[Z])
           {
             this->Highlight(Z);
           }
@@ -137,7 +137,7 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
         else if (arg == mmiGenericMouse::MOUSE_MOVE)
         {
           // gizmo mode == local; gizmo is rotating during mouse move events
-          if (Modality == G_LOCAL)
+          if (m_Modality == G_LOCAL)
           {
             // get the old abs pose
             vtkTransform *currTr = vtkTransform::New();
@@ -158,7 +158,7 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
         else if (arg == mmiGenericMouse::MOUSE_UP)
         {
           // gizmo mode == local
-          if (Modality == G_LOCAL)
+          if (m_Modality == G_LOCAL)
           {
             SetAbsPose(GetAbsPose());
           }
@@ -220,19 +220,19 @@ void mafGizmoRotate::Highlight (int component)
     {
       if (i != component)
       {
-        GRCircle[i]->Highlight(false);
-        GRFan[i]->Show(false);
+        m_GRCircle[i]->Highlight(false);
+        m_GRFan[i]->Show(false);
       }
-      GRCircle[component]->Highlight(true);
-      GRFan[component]->Show(true);
+      m_GRCircle[component]->Highlight(true);
+      m_GRFan[component]->Show(true);
     }
   }
   else if (component == NONE)
   {
     for (int i = 0; i < NUM_COMPONENTS; i++)
     {
-        GRCircle[i]->Highlight(false);
-        GRFan[i]->Show(false);
+        m_GRCircle[i]->Highlight(false);
+        m_GRFan[i]->Show(false);
     }
   }
 }
@@ -242,24 +242,24 @@ void mafGizmoRotate::Show(bool show)
 //----------------------------------------------------------------------------
 {
   // set visibility ivar
-  Visibility = show;
+  m_Visibility = show;
 
   for (int i = 0; i < 3; i++)
   {
-    GRCircle[i]->Show(show);
-    GRFan[i]->Show(show);
+    m_GRCircle[i]->Show(show);
+    m_GRFan[i]->Show(show);
   }
 
   // if auxiliary ref sys is different from vme its orientation cannot be changed
   // so gui must not be keyable. Otherwise set gui keyability to show.
 
-  if (RefSysVME == InputVME)
+  if (m_RefSysVME == m_InputVME)
   {
-    GuiGizmoRotate->EnableWidgets(show);
+    m_GuiGizmoRotate->EnableWidgets(show);
   }
   else
   {
-    GuiGizmoRotate->EnableWidgets(false);
+    m_GuiGizmoRotate->EnableWidgets(false);
   }
   // update the camera
   //mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
@@ -283,31 +283,31 @@ void mafGizmoRotate::SetAbsPose(mafMatrix *absPose, bool applyPoseToFans)
 
   for (int i = 0; i < 3; i++)
   {
-    GRCircle[i]->SetAbsPose(tmpMatr);
+    m_GRCircle[i]->SetAbsPose(tmpMatr);
     if (applyPoseToFans == true)
     {
-      GRFan[i]->SetAbsPose(tmpMatr);
+      m_GRFan[i]->SetAbsPose(tmpMatr);
     }
   }
-  GuiGizmoRotate->SetAbsOrientation(tmpMatr);
+  m_GuiGizmoRotate->SetAbsOrientation(tmpMatr);
 }
 
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoRotate::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return GRCircle[0]->GetAbsPose();
+  return m_GRCircle[0]->GetAbsPose();
 }
 
 //----------------------------------------------------------------------------  
 void mafGizmoRotate::SetInput(mafVME *input)
 //----------------------------------------------------------------------------
 {
-  InputVME = input;
+  m_InputVME = input;
   for (int i = 0; i < 3; i++)
   {
-    GRCircle[i]->SetInput(input);
-    GRFan[i]->SetInput(input);
+    m_GRCircle[i]->SetInput(input);
+    m_GRFan[i]->SetInput(input);
   }
 }
 
@@ -315,7 +315,7 @@ void mafGizmoRotate::SetInput(mafVME *input)
 mmiGenericInterface *mafGizmoRotate::GetInteractor(int axis)
 //----------------------------------------------------------------------------  
 {
-  return GRCircle[axis]->GetInteractor();
+  return m_GRCircle[axis]->GetInteractor();
 }
 
 //----------------------------------------------------------------------------
@@ -355,21 +355,21 @@ void mafGizmoRotate::SendTransformMatrixFromGui(mafEventBase *maf_event)
 void mafGizmoRotate::SetRefSys(mafVME *refSys)
 //----------------------------------------------------------------------------
 {
-  assert(InputVME);  
-  assert(GuiGizmoRotate);
+  assert(m_InputVME);  
+  assert(m_GuiGizmoRotate);
 
-  RefSysVME = refSys;
-  SetAbsPose(RefSysVME->GetOutput()->GetAbsMatrix());
+  m_RefSysVME = refSys;
+  SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-  if (RefSysVME == InputVME)
+  if (m_RefSysVME == m_InputVME)
   {
     SetModalityToLocal();
 
     // if the gizmo is visible set the widgets visibility to true
     // if the refsys is local
-    if (Visibility == true)
+    if (m_Visibility == true)
     {
-      GuiGizmoRotate->EnableWidgets(true);
+      m_GuiGizmoRotate->EnableWidgets(true);
     }
   }
   else
@@ -378,9 +378,9 @@ void mafGizmoRotate::SetRefSys(mafVME *refSys)
 
     // if the gizmo is visible set the widgets visibility to false
     // if the refsys is global since this refsys cannot be changed
-    if (Visibility == true)
+    if (m_Visibility == true)
     {
-      GuiGizmoRotate->EnableWidgets(false);
+      m_GuiGizmoRotate->EnableWidgets(false);
     }
   }
 }
@@ -391,7 +391,7 @@ void mafGizmoRotate::SetCircleFanRadius(double radius)
   short circleNumber;
   for(circleNumber = 0; circleNumber < 3; circleNumber++)
   {
-    if(GRCircle[circleNumber]) GRCircle[circleNumber]->SetRadius(radius);
-    if(GRFan[circleNumber]) GRFan[circleNumber]->SetRadius(radius);
+    if(m_GRCircle[circleNumber]) m_GRCircle[circleNumber]->SetRadius(radius);
+    if(m_GRFan[circleNumber]) m_GRFan[circleNumber]->SetRadius(radius);
   }
 }

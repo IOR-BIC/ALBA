@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,7 +68,7 @@ protected:
 
   /**
   Gui rot angles*/
-  double Orientation[3];
+  double m_Orientation[3];
 
   /** 
   Send position to listener as vtkMatrix */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-16 13:19:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -114,7 +114,7 @@ public:
   void SetRefSys(mafVME *refSys);
   mafVME* GetRefSys();
 
-  mmgGui *GetGui() {return (GuiGizmoTranslate->GetGui());};
+  mmgGui *GetGui() {return (m_GuiGizmoTranslate->GetGui());};
 
   /**
   Set the constraint modality for the given axis; allowed constraint modality are:
@@ -126,7 +126,7 @@ public:
 
 protected:
 
-  mafGuiGizmoTranslate *GuiGizmoTranslate;
+  mafGuiGizmoTranslate *m_GuiGizmoTranslate;
 
   /** Gizmo components events handling */
   void OnEventGizmoGui(mafEventBase *maf_event);
@@ -145,18 +145,18 @@ protected:
   void Highlight(int component); 
   
   /** Array holding the three gizmo that performs translation on a vector*/  
-  mafGizmoTranslateAxis *GTAxis[3];
+  mafGizmoTranslateAxis *m_GTAxis[3];
 
   /** Array holding the three gizmo that performs translation on a plane*/  
-  mafGizmoTranslatePlane *GTPlane[3];
+  mafGizmoTranslatePlane *m_GTPlane[3];
 
   /** 
   Register the active gizmo component at MOUSE_DOWN*/
-  int ActiveGizmoComponent;
+  int m_ActiveGizmoComponent;
 
   /**
   Pivot point position; */
-  mafMatrix *PivotPose;
+  mafMatrix *m_PivotPose;
 
   /** Send matrix to postmultiply to listener */
   void SendTransformMatrixFromGui(mafEventBase *maf_event);

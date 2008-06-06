@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:07:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@ mafGizmoPathRuler::mafGizmoPathRuler(mafVME *input, mafObserver* listener, \
                  int ticksNumber, int originTickID, double ticksHeigth,double ticksDistance)
 {
   assert(input);
-  InputVME = input;
+  m_InputVME = input;
   m_Listener = listener;
   m_TicksNumber = ticksNumber;
   m_OriginTickID = originTickID;
@@ -127,7 +127,7 @@ void mafGizmoPathRuler::BuildGizmos()
     {
       visibility = TRUE;
     }
-    mafGizmoPath *gp = new mafGizmoPath(InputVME, this, VMEGizmoName.c_str(), visibility );
+    mafGizmoPath *gp = new mafGizmoPath(m_InputVME, this, VMEGizmoName.c_str(), visibility );
 
     // set the constraint
     // ...
@@ -203,7 +203,7 @@ void mafGizmoPathRuler::SetConstraintPolyline( mafVME* constraintPolyline )
 void mafGizmoPathRuler::SetInput( mafVME *vme )
 {
   // register the input vme
-  InputVME = mafVME::SafeDownCast(vme);
+  m_InputVME = mafVME::SafeDownCast(vme);
 }
 
 void mafGizmoPathRuler::SetColor( double col[3] )

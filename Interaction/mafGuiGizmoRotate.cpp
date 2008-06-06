@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ mafGuiGizmoRotate::mafGuiGizmoRotate(mafObserver *listener)
 {
   m_Listener = listener;
 
-  Orientation[0] = Orientation[1] = Orientation[2] = 0;
+  m_Orientation[0] = m_Orientation[1] = m_Orientation[2] = 0;
   CreateGui();
 }
 //----------------------------------------------------------------------------
@@ -55,9 +55,9 @@ void mafGuiGizmoRotate::CreateGui()
   
   m_Gui->Divider(2);
   m_Gui->Label("rotation gizmo abs orientation", true);
-  m_Gui->Double(ID_ROTATE_X, "Rotate X", &Orientation[0]);
-  m_Gui->Double(ID_ROTATE_Y, "Rotate Y", &Orientation[1]);
-  m_Gui->Double(ID_ROTATE_Z, "Rotate Z", &Orientation[2]);
+  m_Gui->Double(ID_ROTATE_X, "Rotate X", &m_Orientation[0]);
+  m_Gui->Double(ID_ROTATE_Y, "Rotate Y", &m_Orientation[1]);
+  m_Gui->Double(ID_ROTATE_Z, "Rotate Z", &m_Orientation[2]);
 	m_Gui->Divider();
   m_Gui->Update();
 }
@@ -98,7 +98,7 @@ void mafGuiGizmoRotate::SendAbsOrientation(mafEventBase *sourceEvent)
 {
   // build abs matrix position
   mafMatrix m2send;
-  mafTransform::SetOrientation(m2send, Orientation[0], Orientation[1], Orientation[2]);
+  mafTransform::SetOrientation(m2send, m_Orientation[0], m_Orientation[1], m_Orientation[2]);
 
   mafEvent event2Send;
   event2Send.SetSender(this);
@@ -112,7 +112,7 @@ void mafGuiGizmoRotate::SendAbsOrientation(mafEventBase *sourceEvent)
 void mafGuiGizmoRotate::SetAbsOrientation(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
-  mafTransform::GetOrientation(*pose, Orientation);
+  mafTransform::GetOrientation(*pose, m_Orientation);
 
   assert(m_Gui);
   m_Gui->Update();

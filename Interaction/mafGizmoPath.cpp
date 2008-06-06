@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:06:46 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,7 +55,7 @@ void mafGizmoPath::CreateInteractor()
   m_LeftMouseInteractor = m_GizmoInteractor->CreateBehavior(MOUSE_LEFT);
   m_LeftMouseInteractor->SetListener(this);
   m_LeftMouseInteractor->SetVME(m_VmeGizmoPath);
-  m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(InputVME);
+  m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal(m_InputVME);
   m_LeftMouseInteractor->EnableTranslation(true);
   m_LeftMouseInteractor->ResultMatrixConcatenationOn();
 }
@@ -73,7 +73,7 @@ void mafGizmoPath::Constructor(mafNode *imputVme, mafObserver *listener, const c
   SetLineLength(defaultLineLength);
 
   // register the input vme
-  InputVME = mafVME::SafeDownCast(imputVme);
+  m_InputVME = mafVME::SafeDownCast(imputVme);
 
   m_ConstraintModality = FREE;
 
@@ -416,7 +416,7 @@ void mafGizmoPath::CreateVMEGizmo()
   m_VmeGizmoPath->SetTextVisibility(m_TextVisibility);
 
   // find the root from InputVME
-  mafVMERoot *root = mafVMERoot::SafeDownCast(InputVME->GetRoot());
+  mafVMERoot *root = mafVMERoot::SafeDownCast(m_InputVME->GetRoot());
 
   assert(root);
 

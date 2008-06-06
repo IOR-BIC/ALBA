@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ mafGuiGizmoScale::mafGuiGizmoScale(mafObserver *listener)
 {
   m_Listener = listener;
 
-  Scaling[0] = Scaling[1] = Scaling[2] = 1;
+  m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1;
   CreateGui();
 }
 
@@ -57,9 +57,9 @@ void mafGuiGizmoScale::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Label("scaling gizmo abs scaling", true);
-  m_Gui->Double(ID_SCALE_X, "Scaling X", &Scaling[0], 0);
-  m_Gui->Double(ID_SCALE_Y, "Scaling Y", &Scaling[1], 0);
-  m_Gui->Double(ID_SCALE_Z, "Scaling Z", &Scaling[2], 0);
+  m_Gui->Double(ID_SCALE_X, "Scaling X", &m_Scaling[0], 0);
+  m_Gui->Double(ID_SCALE_Y, "Scaling Y", &m_Scaling[1], 0);
+  m_Gui->Double(ID_SCALE_Z, "Scaling Z", &m_Scaling[2], 0);
 	m_Gui->Divider();
   m_Gui->Update();
 }
@@ -101,7 +101,7 @@ void mafGuiGizmoScale::SendAbsScaling(mafEventBase *sourceEvent)
 {
   // build abs matrix scaling
   mafMatrix m2send;
-  mafTransform::Scale(m2send, Scaling[0], Scaling[1], Scaling[2], PRE_MULTIPLY);
+  mafTransform::Scale(m2send, m_Scaling[0], m_Scaling[1], m_Scaling[2], PRE_MULTIPLY);
 
   mafEvent event2Send;
   event2Send.SetSender(this);
@@ -115,7 +115,7 @@ void mafGuiGizmoScale::SendAbsScaling(mafEventBase *sourceEvent)
 void mafGuiGizmoScale::SetAbsScaling(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
-  mafTransform::GetScale(*pose, Scaling);
+  mafTransform::GetScale(*pose, m_Scaling);
 
   assert(m_Gui);
   m_Gui->Update();

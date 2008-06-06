@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:27:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -112,13 +112,13 @@ public:
   void SetRefSys(mafVME *refSys);
   mafVME* GetRefSys();
 
-  mmgGui *GetGui() {return GuiGizmoRotate->GetGui();};
+  mmgGui *GetGui() {return m_GuiGizmoRotate->GetGui();};
 
   /** Modify radius of circles*/
   void SetCircleFanRadius(double radius);
 
 protected:
-  mafGuiGizmoRotate *GuiGizmoRotate;
+  mafGuiGizmoRotate *m_GuiGizmoRotate;
 
   /** Send matrix to postmultiply to listener */
   void SendTransformMatrixFromGui(mafEventBase *maf_event);
@@ -140,9 +140,9 @@ protected:
   void Highlight(int component); 
   
   /** Array holding the three gizmo that performs rotation*/  
-  mafGizmoRotateCircle *GRCircle[3];
+  mafGizmoRotateCircle *m_GRCircle[3];
 
   /** The rotating fan gizmo*/
-  mafGizmoRotateFan *GRFan[3];
+  mafGizmoRotateFan *m_GRFan[3];
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-13 11:57:10 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,7 @@ mafGizmoROI::mafGizmoROI(mafVME *input, mafObserver* listener /* = NULL  */, int
 //----------------------------------------------------------------------------
 {
   assert(input);
-  InputVME = input;
+  m_InputVME = input;
   m_Listener = listener;
 	m_ConstraintModality = constraintModality;
   //no gizmo component is active at construction
@@ -157,7 +157,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
         }
         else if (arg == mmiGenericMouse::MOUSE_MOVE)
         {     
-          if (this->Modality == G_LOCAL)
+          if (this->m_Modality == G_LOCAL)
           {
             // local mode
 
@@ -305,7 +305,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
 
 						mafMatrix mat;
 						mat.DeepCopy(tr->GetMatrixPointer());
-						mat.SetTimeStamp(InputVME->GetTimeStamp());
+						mat.SetTimeStamp(m_InputVME->GetTimeStamp());
 
 						//must set the matrix?
 
@@ -406,7 +406,7 @@ void mafGizmoROI::SetConstrainRefSys(mafMatrix *constrain)
 void mafGizmoROI::SetInput(mafVME *input)
 //----------------------------------------------------------------------------
 {
-  this->InputVME = input;
+  this->m_InputVME = input;
   for (int i = 0; i < 6; i++)
   {
     m_GHandle[i]->SetInput(input);
@@ -442,7 +442,7 @@ void mafGizmoROI::UpdateHandlePositions()
 
 			mafMatrix mat;
 			mat.DeepCopy(tr->GetMatrixPointer());
-			mat.SetTimeStamp(InputVME->GetTimeStamp());
+			mat.SetTimeStamp(m_InputVME->GetTimeStamp());
 
 			m_GHandle[i]->SetPose(&mat);
 			//End Matteo
@@ -470,7 +470,7 @@ void mafGizmoROI::UpdateHandlePositions()
 
 				mafMatrix mat;
 				mat.DeepCopy(tr->GetMatrixPointer());
-				mat.SetTimeStamp(InputVME->GetTimeStamp());
+				mat.SetTimeStamp(m_InputVME->GetTimeStamp());
 
 				m_GHandle[i]->SetPose(&mat);
 				//End Matteo
@@ -497,7 +497,7 @@ void mafGizmoROI::UpdateHandlePositions()
 
 			mafMatrix mat;
 			mat.DeepCopy(tr->GetMatrixPointer());
-			mat.SetTimeStamp(InputVME->GetTimeStamp());
+			mat.SetTimeStamp(m_InputVME->GetTimeStamp());
 
 			m_GHandle[i]->SetPose(&mat);
 			//End Matteo
@@ -563,10 +563,10 @@ void mafGizmoROI::SetBounds(double bounds[6])
 	double newBounds[6] = {bounds[0], bounds[1], bounds[2], bounds[3], bounds[4], bounds[5]}; 
 	if(m_ConstraintModality==mafGizmoHandle::BOUNDS)
 	{
-		InputVME->GetOutput()->Update();
+		m_InputVME->GetOutput()->Update();
 		// check for bounds 
 		double vmeLocBounds[6];
-		InputVME->GetOutput()->GetVTKData()->GetBounds(vmeLocBounds);
+		m_InputVME->GetOutput()->GetVTKData()->GetBounds(vmeLocBounds);
 
 		// new bounds must be internal do vme bounds
 		int i;
@@ -655,7 +655,7 @@ void mafGizmoROI::Reset()
 //----------------------------------------------------------------------------
 {
   double b[6];
-  InputVME->GetOutput()->GetBounds(b);
+  m_InputVME->GetOutput()->GetBounds(b);
   SetBounds(b);
   UpdateGizmosLength();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:21 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ mafGuiGizmoTranslate::mafGuiGizmoTranslate(mafObserver *listener)
 {
   m_Listener = listener;
 
-  Position[0] = Position[1] = Position[2] = 0;
+  m_Position[0] = m_Position[1] = m_Position[2] = 0;
   CreateGui();
 }
 //----------------------------------------------------------------------------
@@ -56,9 +56,9 @@ void mafGuiGizmoTranslate::CreateGui()
 
   m_Gui->Divider(2);
   m_Gui->Label("translation gizmo abs position", true);
-  m_Gui->Double(ID_TRANSLATE_X, "Translate X", &Position[0]);
-  m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &Position[1]);
-  m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &Position[2]);
+  m_Gui->Double(ID_TRANSLATE_X, "Translate X", &m_Position[0]);
+  m_Gui->Double(ID_TRANSLATE_Y, "Translate Y", &m_Position[1]);
+  m_Gui->Double(ID_TRANSLATE_Z, "Translate Z", &m_Position[2]);
 	m_Gui->Divider();
   m_Gui->Update();
 }
@@ -100,7 +100,7 @@ void mafGuiGizmoTranslate::SendAbsPosition(mafEventBase *sourceEvent)
 {
   // build abs matrix position
   mafMatrix m2send;
-  mafTransform::SetPosition(m2send, Position);
+  mafTransform::SetPosition(m2send, m_Position);
 
   mafEvent event2Send;
   event2Send.SetSender(this);
@@ -114,7 +114,7 @@ void mafGuiGizmoTranslate::SendAbsPosition(mafEventBase *sourceEvent)
 void mafGuiGizmoTranslate::SetAbsPosition(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
-  mafTransform::GetPosition(*pose, Position);
+  mafTransform::GetPosition(*pose, m_Position);
 
   assert(m_Gui);
   m_Gui->Update();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:55:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-06 10:59:10 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -105,11 +105,11 @@ public:
   //----------------------------------------------------------------------------
   // Gizmo Gui
   //----------------------------------------------------------------------------
-  mmgGui *GetGui() {return (GuiGizmoScale->GetGui());};
+  mmgGui *GetGui() {return (m_GuiGizmoScale->GetGui());};
 
 protected:
 
-  mafGuiGizmoScale *GuiGizmoScale;
+  mafGuiGizmoScale *m_GuiGizmoScale;
 
   /** Gizmo components events handling */
   void OnEventGizmoGui(mafEventBase *maf_event);
@@ -127,13 +127,13 @@ protected:
   void Highlight(int component); 
   
   /** Array holding the three gizmo that performs scaling on a vector*/  
-  mafGizmoScaleAxis *GSAxis[3];
+  mafGizmoScaleAxis *m_GSAxis[3];
 
-  mafGizmoScaleIsotropic *GSIsotropic;
+  mafGizmoScaleIsotropic *m_GSIsotropic;
 
   /** 
   Register the active gizmo component at MOUSE_DOWN*/
-  int ActiveGizmoComponent;
+  int m_ActiveGizmoComponent;
 
   /** Send matrix to postmultiply to listener */
   void SendTransformMatrixFromGui(mafEventBase *maf_event);
@@ -142,15 +142,15 @@ private:
   
   /**
   Scaling gizmo initial pose; used to restore scale gizmo axis pose after a gizmo drag event*/
-  mafMatrix *InitialGizmoPose;
+  mafMatrix *m_InitialGizmoPose;
   
   /**
   Vme matrix relative to RefSysVME at MOUSE_DOWN*/
-  mafMatrix *VmeMatrixRelativeToRefSysVME;
+  mafMatrix *m_VmeMatrixRelativeToRefSysVME;
 
   /**
   RefSys abs matrix at MOUSE_DOWN*/
-  mafMatrix *RefSysVMEAbsMatrixAtMouseDown;
+  mafMatrix *m_RefSysVMEAbsMatrixAtMouseDown;
 
   /** 
   Return the scaling value to be applied to vme on current axis based on active gizmo position */
