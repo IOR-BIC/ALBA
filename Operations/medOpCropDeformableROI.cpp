@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:36:21 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-06 10:27:21 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -82,7 +82,7 @@ mafOp(label)
 	m_InsideOut = 0;
 	m_MaxDistance = sqrt(1.0e29)/3.0;
 	m_FillValue = 0.0;
-	m_pNode = NULL;
+	m_PNode = NULL;
   m_Surface = NULL;
 }
 //----------------------------------------------------------------------------
@@ -171,13 +171,13 @@ void medOpCropDeformableROI::OnEvent(mafEventBase *maf_event)
         e->SetArg((long)&medOpCropDeformableROI::OutputSurfaceAccept);
 				e->SetString(&title);
 				mafEventMacro(*e);
-				m_pNode = e->GetVme();
+				m_PNode = e->GetVme();
 			}
 			break;
 		case wxOK:
-			if(m_pNode!=NULL)
+			if(m_PNode!=NULL)
 				{
-					Algorithm(mafVME::SafeDownCast(m_pNode));
+					Algorithm(mafVME::SafeDownCast(m_PNode));
 				}
 
 			OpStop(OP_RUN_OK);        

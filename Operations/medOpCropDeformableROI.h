@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:36:21 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-06 10:27:21 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -95,7 +95,7 @@ protected:
 	double m_FillValue;
 	int		m_InsideOut;
 	double	m_MaxDistance;
-	mafNode *m_pNode;
+	mafNode *m_PNode;
 
 	mafVMEVolumeGray *m_ResultVme;
   mafVMESurface    *m_Surface;
