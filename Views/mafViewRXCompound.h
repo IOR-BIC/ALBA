@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:53:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-06 10:16:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -97,7 +97,7 @@ protected:
 
   mmgGui  *m_GuiViews[2];
   mmgLutSlider *m_LutSliders[2];
-  vtkLookupTable  *m_vtkLUT[2];  
+  vtkLookupTable  *m_VtkLUT[2];  
   mmgLutSwatch    *m_LutWidget;
 };
 #endif

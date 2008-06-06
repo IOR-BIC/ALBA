@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 08:28:45 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-06-06 10:16:13 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni , Paolo Quadrani, Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,7 +68,7 @@ mafViewRXCompound::mafViewRXCompound(wxString label)
   m_ViewsRX[RX_FRONT_VIEW] = m_ViewsRX[RX_SIDE_VIEW] = NULL;
     
   m_LutSliders[RX_FRONT_VIEW] = m_LutSliders[RX_SIDE_VIEW] = NULL;
-  m_vtkLUT[RX_FRONT_VIEW] = m_vtkLUT[RX_SIDE_VIEW] = NULL ;
+  m_VtkLUT[RX_FRONT_VIEW] = m_VtkLUT[RX_SIDE_VIEW] = NULL ;
 
   m_RightOrLeft=1;
   m_CurrentSurface.clear();
@@ -85,7 +85,7 @@ mafViewRXCompound::~mafViewRXCompound()
   for (int i = RX_FRONT_VIEW;i < VIEWS_NUMBER;i++)
   {
     cppDEL(m_LutSliders[i]);
-    vtkDEL(m_vtkLUT[i]);
+    vtkDEL(m_VtkLUT[i]);
   }
 }
 //----------------------------------------------------------------------------
@@ -125,13 +125,13 @@ void mafViewRXCompound::VmeShow(mafNode *node, bool show)
         m_LutSliders[childID]->SetSubRange(minMax[0],minMax[1]);
       
         // create a lookup table for each RX view
-        vtkNEW(m_vtkLUT[childID]);
-        m_vtkLUT[childID]->SetRange(minMax);
-        m_vtkLUT[childID]->Build();
-        lutPreset(4,m_vtkLUT[childID]);
-        m_vtkLUT[childID]->SetRange(minMax);
-        m_vtkLUT[childID]->Build();
-        lutPreset(4,m_vtkLUT[childID]);
+        vtkNEW(m_VtkLUT[childID]);
+        m_VtkLUT[childID]->SetRange(minMax);
+        m_VtkLUT[childID]->Build();
+        lutPreset(4,m_VtkLUT[childID]);
+        m_VtkLUT[childID]->SetRange(minMax);
+        m_VtkLUT[childID]->Build();
+        lutPreset(4,m_VtkLUT[childID]);
 
         ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(minMax[0],minMax[1]);
 
