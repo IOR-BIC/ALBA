@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 08:56:22 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-06-09 11:41:56 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -265,7 +265,8 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
       // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
       // they are of different type: only one MUTEX VME per time is visible into the view.
 			for(mafSceneNode *n = m_List; n; n=n->m_Next)
-        if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
+        //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
+        if(vme->GetTypeId() == n->m_Vme->GetTypeId() && n->m_Pipe != NULL && n->m_Vme != vme)
 					mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
 		}
 		if(!node->m_Pipe) 
