@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-09 12:08:24 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-06-09 15:05:59 $
+Version:   $Revision: 1.6 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -71,7 +71,7 @@ bool mafUser::CheckUserCredentials()
   {
     InitializeUserInformations();
   }
-  bool res;
+  bool res = true;
   if (m_Username.IsEmpty() && m_Password.IsEmpty())
   {
     res = ShowLoginDialog() != wxID_CANCEL;
