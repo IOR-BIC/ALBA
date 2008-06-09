@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 16:20:56 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-06-09 15:35:52 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -564,7 +564,8 @@ int mafVMEItemVTK::InternalStoreData(const char *url)
         {
 #ifdef MAF_USE_CRYPTO
           std::string encrypted_output;
-          mafDefaultEncryptFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(), encrypted_output);
+//          mafDefaultEncryptFromMemory(writer->GetOutputString(), writer->GetOutputStringLength(), encrypted_output);
+          mafDefaultEncryptFromMemory(writer->GetOutputString(), encrypted_output);
           m_OutputMemory = encrypted_output.c_str();
           m_OutputMemorySize = encrypted_output.size();
 #else

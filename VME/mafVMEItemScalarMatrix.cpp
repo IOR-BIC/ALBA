@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-09 15:35:52 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -463,7 +463,8 @@ int mafVMEItemScalarMatrix::InternalStoreData(const char *url)
         {
 #ifdef MAF_USE_CRYPTO
           std::string encrypted_output;
-          mafDefaultEncryptFromMemory(m_DataString.GetCStr(), m_DataString.Length(), encrypted_output);
+//          mafDefaultEncryptFromMemory(m_DataString.GetCStr(), m_DataString.Length(), encrypted_output);
+          mafDefaultEncryptFromMemory(m_DataString.GetCStr(), encrypted_output);
           m_OutputMemory = encrypted_output.c_str();
           m_OutputMemorySize = encrypted_output.size();
 #else
