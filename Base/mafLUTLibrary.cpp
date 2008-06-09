@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-03 16:41:02 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-09 08:35:01 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -245,10 +245,10 @@ void mafLUTLibrary::Add( vtkLookupTable *inputLUT, const char *lutName )
   newLut->DeepCopy(inputLUT);
   m_LutMap[lutName] = newLut;
 
-  string lutFileName = m_LibraryDir + "/" + lutName + ".lut";
-  SaveLUT(newLut, lutFileName.c_str());
+  mafString lutFileName = m_LibraryDir + "/" + lutName + ".lut";
+  SaveLUT(newLut, lutFileName.GetCStr());
 
-  assert(wxFileExists(lutFileName.c_str()));
+  assert(wxFileExists(lutFileName.GetCStr()));
 }
 
 void mafLUTLibrary::Save()
@@ -345,9 +345,9 @@ int mafLUTLibrary::Remove( const char *lutName )
 
 void mafLUTLibrary::RemoveLUTFromDisk(const char *lutName)
 {
-  string lutFileName = m_LibraryDir + "/" + lutName + ".lut";
-  assert(wxFileExists(lutFileName.c_str()));
-  wxRemoveFile(lutFileName.c_str());
+  mafString lutFileName = m_LibraryDir + "/" + lutName + ".lut";
+  assert(wxFileExists(lutFileName.GetCStr()));
+  wxRemoveFile(lutFileName.GetCStr());
 }
 
 int mafLUTLibrary::GetNumberOfLuts()
