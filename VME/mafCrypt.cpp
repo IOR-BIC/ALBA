@@ -165,8 +165,7 @@ bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase
       new DefaultDecryptorWithMAC(passPhrase, new StringSink( out )) // DefaultDecryptorWithMAC
       ); // StringSource
     */
-    std::string plaintext;
-    StringSource s(plaintext, true, new DefaultDecryptorWithMAC(passPhrase, new Base64Encoder(new StringSink(out))));
+    StringSource s(in, true, new DefaultDecryptorWithMAC(passPhrase, new Base64Encoder(new StringSink(out))));
   }
   catch (...)
   {
@@ -188,8 +187,7 @@ bool mafEncryptFromMemory(const char *in, std::string &out, const char *passPhra
       new DefaultEncryptorWithMAC(passPhrase,new StringSink( out )) // DefaultEncryptorWithMAC
       ); // StringSource*/
 
-    std::string plaintext;
-    StringSource s(plaintext, true, new DefaultEncryptorWithMAC(passPhrase, new Base64Encoder(new StringSink(out))));
+    StringSource s(in, true, new DefaultEncryptorWithMAC(passPhrase, new Base64Encoder(new StringSink(out))));
   }
   catch (...)
   {
