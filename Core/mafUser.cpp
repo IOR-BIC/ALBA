@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-09 15:05:59 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-06-09 15:34:29 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -193,26 +193,6 @@ void mafUser::UpdateUserCredentialsFile()
     credentials = m_Username;
     credentials << "\n";
     credentials << m_Password;
-    /*
-#ifdef MAF_USE_CRYPTO
-    bool encrypt_success = false;
-    std::string encrypted_output;
-    encrypt_success = mafDefaultEncryptFromMemory(credentials.c_str(), credentials.Length(), encrypted_output);
-    if (encrypt_success)
-    {
-      credentials = encrypted_output.c_str();
-    }
-    else
-    {
-      mafLogMessage(_("Error on Encryption!!"));
-      //printf("Error on Encryption!!");
-      return;
-    }
-#endif
-    wxFFile f_out(m_UserInfoFile.GetCStr(), "w");
-    f_out.Write(credentials);
-    f_out.Close();*/
-
 #ifdef MAF_USE_CRYPTO
     bool encrypt_success = false;
     encrypt_success = mafDefaultEncryptFileFromMemory(credentials.c_str(), credentials.Length(), m_UserInfoFile.GetCStr());
