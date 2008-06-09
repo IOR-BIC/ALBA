@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-27 16:27:58 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-06-09 12:08:24 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafUser.h"
 #include <wx/stdpaths.h>
 #include <wx/tokenzr.h>
+#include <wx/ffile.h>
 
 #include "mafDecl.h"
 #include "mafGUIDialogLogin.h"
@@ -87,43 +88,25 @@ void mafUser::InitializeUserInformations()
   // if not initialized, m_UserHome will be initialized to the LocalSettings user folder.
   InitUserInfoHome();
 
-  mafString credentials = "";
+  wxString credentials = "";
   if (wxFileExists(m_UserInfoFile.GetCStr()))
   {
-    char usr[256];
-    std::ifstream f_in;
-    f_in.open(m_UserInfoFile.GetCStr(), std::ifstream::in| std::ifstream::binary);
 #ifdef MAF_USE_CRYPTO
-    while(!f_in.eof())
-    {
-      f_in.getline(usr,256);
-      credentials << usr;
-    }
     bool decrypt_success = false;
-    std::string decrypted_input;
-    decrypt_success = mafDefaultDecryptInMemory(credentials.GetCStr(), decrypted_input);
-    if (decrypt_success)
-    {
-      credentials = decrypted_input.c_str();
-    }
-    else
+    std::string decrypt_credentials;
+    decrypt_credentials.clear();
+    decrypt_success = mafDefaultDecryptFileInMemory(m_UserInfoFile.GetCStr(), decrypt_credentials);
+    if (!decrypt_success)
     {
       mafLogMessage(_("Error on Decryption!!"));
-      printf("Error on Decryption!!");
-      f_in.close();
       return;
     }
+    credentials = decrypt_credentials.c_str();
 #else
-    f_in.getline(usr,256);
-    credentials << usr;
-    while(!f_in.eof())
-    {
-      credentials << "\n";
-      f_in.getline(usr, 256);
-      credentials << usr;
-    }
+    wxFFile f_in(m_UserInfoFile.GetCStr(), "r");
+    f_in.ReadAll(&credentials);
+    f_in.Close();
 #endif
-    f_in.close();
   }
 
   if (credentials.Length() > 0)
@@ -131,7 +114,7 @@ void mafUser::InitializeUserInformations()
     mafString usr;
     mafString pwd;
 
-    wxStringTokenizer tkz(credentials.GetCStr(), "\n");
+    wxStringTokenizer tkz(credentials, "\n");
     usr = tkz.GetNextToken().c_str();
     if (tkz.HasMoreTokens())
     {
@@ -206,14 +189,15 @@ void mafUser::UpdateUserCredentialsFile()
 {
   if (m_RememberCredentials != 0)
   {
-    mafString credentials;
+    wxString credentials;
     credentials = m_Username;
     credentials << "\n";
     credentials << m_Password;
+    /*
 #ifdef MAF_USE_CRYPTO
     bool encrypt_success = false;
     std::string encrypted_output;
-    encrypt_success = mafDefaultEncryptFromMemory(credentials.GetCStr(), credentials.Length(), encrypted_output);
+    encrypt_success = mafDefaultEncryptFromMemory(credentials.c_str(), credentials.Length(), encrypted_output);
     if (encrypt_success)
     {
       credentials = encrypted_output.c_str();
@@ -221,14 +205,26 @@ void mafUser::UpdateUserCredentialsFile()
     else
     {
       mafLogMessage(_("Error on Encryption!!"));
-      printf("Error on Encryption!!");
+      //printf("Error on Encryption!!");
       return;
     }
 #endif
-    std::ofstream f_out;
-    f_out.open(m_UserInfoFile.GetCStr(), std::ofstream::out | std::ofstream::binary);
-    f_out.write(credentials.GetCStr(), credentials.Length());
-    f_out.close();
+    wxFFile f_out(m_UserInfoFile.GetCStr(), "w");
+    f_out.Write(credentials);
+    f_out.Close();*/
+
+#ifdef MAF_USE_CRYPTO
+    bool encrypt_success = false;
+    encrypt_success = mafDefaultEncryptFileFromMemory(credentials.c_str(), credentials.Length(), m_UserInfoFile.GetCStr());
+    if (!encrypt_success)
+    {
+      mafLogMessage(_("Error on Encryption!!"));
+    }
+#else
+    wxFFile f_out(m_UserInfoFile.GetCStr(), "w");
+    f_out.Write(credentials);
+    f_out.Close();
+#endif
   }
   else
   {
