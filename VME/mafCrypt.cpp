@@ -17,6 +17,7 @@
 #include "randpool.h"
 #include "ida.h"
 #include "socketft.h"
+#include <base64.h>
 
 #include <iostream>
 #include <wx/msgdlg.h>
@@ -145,10 +146,10 @@ bool mafDefaultDecryptInMemory(const char *in, std::string &out)
 }
 
 //----------------------------------------------------------------------------
-bool mafDefaultEncryptFromMemory(const char *in, unsigned int len, std::string &out)
+bool mafDefaultEncryptFromMemory(const char *in, std::string &out)
 //----------------------------------------------------------------------------
 {
-  return mafEncryptFromMemory(in, len, out, defaultPhrase);
+  return mafEncryptFromMemory(in, out, defaultPhrase);
 }
 
 //----------------------------------------------------------------------------
@@ -158,18 +159,14 @@ bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase
   bool result = true;
   try
   {
-    StringSource(
+    /*StringSource(
       in,
       true,
       new DefaultDecryptorWithMAC(passPhrase, new StringSink( out )) // DefaultDecryptorWithMAC
       ); // StringSource
-
-    /*
-    StringSink *ssink = new StringSink(out);
-    DefaultDecryptorWithMAC  *mac =	new DefaultDecryptorWithMAC(passPhrase, ssink);
-
-    StringSource s(in, true, mac);
     */
+    std::string plaintext;
+    StringSource s(plaintext, true, new DefaultDecryptorWithMAC(passPhrase, new Base64Encoder(new StringSink(out))));
   }
   catch (...)
   {
@@ -179,24 +176,20 @@ bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase
 }
 
 //----------------------------------------------------------------------------
-bool mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, const char *passPhrase)
+bool mafEncryptFromMemory(const char *in, std::string &out, const char *passPhrase)
 //----------------------------------------------------------------------------
 {
   bool result = true;
   try
   {
-    StringSource(
+    /*StringSource(
       in,
       true,
       new DefaultEncryptorWithMAC(passPhrase,new StringSink( out )) // DefaultEncryptorWithMAC
-      ); // StringSource
+      ); // StringSource*/
 
-    /*
-    StringSink *ssink = new StringSink(out);
-    DefaultEncryptorWithMAC  * mac =	new DefaultEncryptorWithMAC(passPhrase, ssink);
-
-    StringSource s((const byte *)in, len, true, mac);
-    */
+    std::string plaintext;
+    StringSource s(plaintext, true, new DefaultEncryptorWithMAC(passPhrase, new Base64Encoder(new StringSink(out))));
   }
   catch (...)
   {

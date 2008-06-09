@@ -24,9 +24,9 @@
 
   // strings encryption/decryption
   extern bool mafDecryptInMemory(const char *in, std::string &out, const char *passPhrase);
-  extern bool mafEncryptFromMemory(const char *in, unsigned int len, std::string &out, const char *passPhrase);
+  extern bool mafEncryptFromMemory(const char *in, std::string &out, const char *passPhrase);
 
   extern bool mafDefaultDecryptInMemory(const char *in, std::string &out);
-  extern bool mafDefaultEncryptFromMemory(const char *in, unsigned int len, std::string &out);
+  extern bool mafDefaultEncryptFromMemory(const char *in, std::string &out);
 #endif
 #endif
