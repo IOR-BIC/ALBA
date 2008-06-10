@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-09 08:35:01 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-06-10 13:12:02 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -291,17 +291,24 @@ void mafLUTLibrary::Load()
   for (int fileId = 0; fileId < numFiles; fileId++) 
   { 
     string lutLocalFileName = vtkDir->GetFile(fileId);
-    size_t found;
+    size_t foundPosition;
 
-    found=lutLocalFileName.find(".lut");
+    foundPosition=lutLocalFileName.find(".lut");
 
-    if (found!=string::npos)
+    int nameLength = lutLocalFileName.size();
+
+    bool foundLUTExtensionInName = (foundPosition!=string::npos);
+    bool isExtensionAtTheEndOfName = (nameLength - foundPosition)  == 4 ? true : false ;
+
+    bool isLutFile = foundLUTExtensionInName && isExtensionAtTheEndOfName;
+
+    if (isLutFile)
     {
-      cout << "found .lut at: " << int(found) << " in " << lutLocalFileName << endl;
+      cout << "found .lut at: " << int(foundPosition) << " in " << lutLocalFileName << endl;
       string lutAbsFileName = string(m_LibraryDir.GetCStr()) + lutLocalFileName;
       assert(wxFileExists(lutAbsFileName.c_str()));
 
-      string lutName = lutLocalFileName.erase(found);
+      string lutName = lutLocalFileName.erase(foundPosition);
       vtkLookupTable *vtkLut = vtkLookupTable::New();
       LoadLUT(lutAbsFileName.c_str(), vtkLut);
       m_LutMap[lutName] = vtkLut;
