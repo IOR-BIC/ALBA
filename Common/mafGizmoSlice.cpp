@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 13:02:44 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-06-12 10:02:55 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -223,7 +223,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
     m_MouseBH->SetResultMatrix(m_GizmoHandleCenterMatrix);
 
     //Default moving modality
-    this->SetGizmoMovingModalityToSnap();
+    this->SetGizmoMovingModalityToBound();
   }
 }
 //----------------------------------------------------------------------------
@@ -404,7 +404,40 @@ void mafGizmoSlice::SetGizmoMovingModalityToSnap()
     }
 	  break;
   }
+
+  SetOnSnapArray(m_Axis);
 }
+//----------------------------------------------------------------------------
+void mafGizmoSlice::SetOnSnapArray(int axis)
+//----------------------------------------------------------------------------
+{
+  vtkDoubleArray *snapArray = m_MouseBH->GetTranslationConstraint()->GetSnapArray(GIZMO_SLICE_Z);
+  double translation = 0.;
+
+  double pos[3], rot[3];
+  this->m_VmeGizmo->GetOutput()->GetPose(pos,rot, m_VmeGizmo->GetTimeStamp());
+  double minimumDistance = VTK_DOUBLE_MAX;
+  for(int i=0; i<snapArray->GetSize(); i++)
+  {
+    double slice = snapArray->GetTuple1(i);
+    double effectiveTranslation = slice - pos[axis];
+    double currentDifference = fabs(effectiveTranslation);
+    if(currentDifference < minimumDistance)
+    {
+      minimumDistance = currentDifference;
+      translation = effectiveTranslation;
+    }
+    
+  }
+
+  mafMatrix matrix;
+  matrix.SetElement(axis, 3, translation);
+  mafEvent event;
+  event.SetId(ID_TRANSFORM);
+  event.SetMatrix(&matrix);
+  OnEvent(&event);
+}
+
 
 //----------------------------------------------------------------------------
 void mafGizmoSlice::Show(bool show)

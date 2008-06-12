@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 09:48:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-06-12 10:02:55 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -84,6 +84,9 @@ protected:
 
 	/** Initialize snap array */
 	void InitSnapArray(mafVME *vol, int axis);
+
+  /*Set Gizmo On correct slices when activate snap array modality*/
+  void SetOnSnapArray(int axis);
 
   mafString           m_Name;
   long                m_Id;
