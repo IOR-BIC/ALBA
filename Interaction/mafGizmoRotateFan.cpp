@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-06-12 11:15:42 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -91,11 +91,11 @@ mafGizmoRotateFan::~mafGizmoRotateFan()
 
   vtkDEL(m_Sphere);
   vtkDEL(m_RotateFanTPDF);
-  vtkDEL(m_RotateFanTr);
+  vtkDEL(m_RotateFanTransform);
   vtkDEL(m_MirrorTPDF);
   vtkDEL(m_MirrorTr);
   vtkDEL(m_BufferTr);
-  vtkDEL(m_ChangeFanAxisTr);
+  vtkDEL(m_ChangeFanAxisTransform);
   vtkDEL(m_ChangeFanAxisTPDF);
   
 	//----------------------
@@ -126,7 +126,7 @@ void mafGizmoRotateFan::CreatePipeline()
   p2[2] = b[5];
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
   
-  // create m_Sphere
+  // create sphere
   vtkNEW(m_Sphere);
 	m_Sphere->SetRadius(d/2);
 	m_Sphere->SetThetaResolution(50);
@@ -134,10 +134,10 @@ void mafGizmoRotateFan::CreatePipeline()
 	m_Sphere->SetEndTheta(m_EndTheta);
 
   // create the rotate fan transform
-  m_RotateFanTr = vtkTransform::New();
+  m_RotateFanTransform = vtkTransform::New();
 
   m_RotateFanTPDF = vtkTransformPolyDataFilter::New();
-  m_RotateFanTPDF->SetTransform(m_RotateFanTr);
+  m_RotateFanTPDF->SetTransform(m_RotateFanTransform);
   m_RotateFanTPDF->SetInput(m_Sphere->GetOutput());
 
   // create the mirroring transform
@@ -146,17 +146,17 @@ void mafGizmoRotateFan::CreatePipeline()
   m_MirrorTPDF->SetTransform(m_MirrorTr);
   m_MirrorTPDF->SetInput(m_RotateFanTPDF->GetOutput());
 
-  // create the transform for the m_Sphere
-  m_ChangeFanAxisTr = vtkTransform::New();
-  m_ChangeFanAxisTr->PostMultiply();
+  // create the transform for the sphere
+  m_ChangeFanAxisTransform = vtkTransform::New();
+  m_ChangeFanAxisTransform->PostMultiply();
 
   // update transform to set the gizmo normal to X
   this->SetAxis(X);
 
-	// transform the m_Sphere
+	// transform the sphere
   m_ChangeFanAxisTPDF = vtkTransformPolyDataFilter::New();
   m_ChangeFanAxisTPDF->SetInput(m_MirrorTPDF->GetOutput());
-	m_ChangeFanAxisTPDF->SetTransform(m_ChangeFanAxisTr);
+	m_ChangeFanAxisTPDF->SetTransform(m_ChangeFanAxisTransform);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetAxis(int axis) 
@@ -180,23 +180,23 @@ void mafGizmoRotateFan::SetAxis(int axis)
   
           X               Y            Z
   */
-  m_ChangeFanAxisTr->Identity();
+  m_ChangeFanAxisTransform->Identity();
   
-  // splat the m_Sphere on XY plane; the
+  // splat the sphere on XY plane; the
   // gizmo us normal to the Z axis
-  m_ChangeFanAxisTr->Scale(1, 1, 0);
+  m_ChangeFanAxisTransform->Scale(1, 1, 0);
 
   if (m_ActiveAxis == X)
   {
     // set rotation to move gizmo normal to X
-    m_ChangeFanAxisTr->RotateY(90);
-    m_ChangeFanAxisTr->RotateX(90);
+    m_ChangeFanAxisTransform->RotateY(90);
+    m_ChangeFanAxisTransform->RotateX(90);
   }
   else if (m_ActiveAxis == Y)
   {
     // set rotation to move gizmo normal to Y 
-    m_ChangeFanAxisTr->RotateX(-90);
-    m_ChangeFanAxisTr->RotateY(-90);
+    m_ChangeFanAxisTransform->RotateX(-90);
+    m_ChangeFanAxisTransform->RotateY(-90);
   }
 }
 //----------------------------------------------------------------------------
@@ -205,6 +205,12 @@ void  mafGizmoRotateFan::SetRadius(double radius)
 {
   m_Sphere->SetRadius(radius);
 }
+
+double mafGizmoRotateFan::GetRadius()
+{
+  return m_Sphere->GetRadius();
+}
+
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -219,7 +225,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
         if (e->GetArg() == mmiGenericMouse::MOUSE_DOWN)
         {
           //----------------------------------------
-          // compute start theta for the m_Sphere
+          // compute start theta for the sphere
           //----------------------------------------
 
           // get the picked position from the event
@@ -231,8 +237,8 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
 
           //----------------------------------------
           // rotate the fan of theta around its axis 
-          m_RotateFanTr->Identity();
-          m_RotateFanTr->RotateZ(offsetAngle);
+          m_RotateFanTransform->Identity();
+          m_RotateFanTransform->RotateZ(offsetAngle);
 
           // build the rotation axis for mirroring
           double axis[3];
@@ -282,7 +288,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
             m_EndTheta = -m_EndTheta;
           }
 
-          // update the m_Sphere m_EndTheta ivar
+          // update the sphere m_EndTheta ivar
           m_Sphere->SetEndTheta(m_EndTheta);
 
           // change the sender and forward the event
@@ -296,7 +302,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           m_StartTheta = 0;
           m_EndTheta = 0;
 
-          // update the m_Sphere m_EndTheta ivar
+          // update the sphere m_EndTheta ivar
           m_Sphere->SetEndTheta(m_EndTheta);
 
           // change the sender and forward the event
@@ -312,7 +318,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
     }
   }
 } 
-/** Gizmo color */
+/** m_Gizmo color */
 //----------------------------------------------------------------------------
 void mafGizmoRotateFan::SetColor(double col[3])
 //----------------------------------------------------------------------------

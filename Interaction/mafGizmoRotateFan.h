@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-06-12 11:15:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -93,8 +93,7 @@ public:
   /** Set/Get the radius of the gizmo*/
   void   SetRadius(double radius);
   double GetRadius();
-
-  
+ 
   /** 
   Set the abs pose */
   void SetAbsPose(mafMatrix *absPose);
@@ -115,14 +114,14 @@ protected:
   /** Create the sphere*/
   vtkSphereSource *m_Sphere;
 
-  /** Transform to rotate the fan around Z axi after creation
-  to match new StartTheta angle*/
-  vtkTransform *m_RotateFanTr;
+  /** Transform to rotate the fan around Z axis after creation
+  to match new m_StartTheta angle*/
+  vtkTransform *m_RotateFanTransform;
 
   vtkTransformPolyDataFilter *m_RotateFanTPDF;
 
   /** sphere transform */
-  vtkTransform *m_ChangeFanAxisTr;
+  vtkTransform *m_ChangeFanAxisTransform;
 
   /** rotate PDF for sphere*/
   vtkTransformPolyDataFilter *m_ChangeFanAxisTPDF;
@@ -136,7 +135,7 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  /** Gizmo color setting facilities for gizmo segments;*/
+  /** m_Gizmo color setting facilities for gizmo segments;*/
   void SetColor(double col[3]);
   void SetColor(double colR, double colG, double colB);
 
@@ -156,10 +155,13 @@ protected:
   /** Get the start theta from abs pick coordinates */
   double PointPickedToStartTheta(double xp, double yp, double zp);
 
-   /**
+  /**
   Set the reference system matrix. Reference system type is set to CUSTOM.*/
   void SetRefSysMatrix(mafMatrix *matrix);
 
   mafRefSys *m_RefSys;
+
+  /** Test Friend */
+  friend class mafGizmoRotateFanTest;
 };
 #endif
