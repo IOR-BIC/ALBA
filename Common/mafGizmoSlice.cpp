@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-12 10:02:55 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-06-12 10:45:59 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -411,17 +411,21 @@ void mafGizmoSlice::SetGizmoMovingModalityToSnap()
 void mafGizmoSlice::SetOnSnapArray(int axis)
 //----------------------------------------------------------------------------
 {
-  vtkDoubleArray *snapArray = m_MouseBH->GetTranslationConstraint()->GetSnapArray(GIZMO_SLICE_Z);
-  double translation = 0.;
+  vtkDoubleArray *snapArray = m_MouseBH->GetTranslationConstraint()->GetSnapArray(axis);
+  if(NULL == snapArray) return;
 
+  double translation = 0.;
   double pos[3], rot[3];
   this->m_VmeGizmo->GetOutput()->GetPose(pos,rot, m_VmeGizmo->GetTimeStamp());
   double minimumDistance = VTK_DOUBLE_MAX;
+  double slice;
+  double effectiveTranslation;
+  double currentDifference;
   for(int i=0; i<snapArray->GetSize(); i++)
   {
-    double slice = snapArray->GetTuple1(i);
-    double effectiveTranslation = slice - pos[axis];
-    double currentDifference = fabs(effectiveTranslation);
+    slice = snapArray->GetTuple1(i);
+    effectiveTranslation = slice - pos[axis];
+    currentDifference = fabs(effectiveTranslation);
     if(currentDifference < minimumDistance)
     {
       minimumDistance = currentDifference;
@@ -429,6 +433,7 @@ void mafGizmoSlice::SetOnSnapArray(int axis)
     }
     
   }
+  m_GizmoHandleCenterMatrix->SetElement(axis, 3, m_GizmoHandleCenterMatrix->GetElement(axis, 3) + translation);
 
   mafMatrix matrix;
   matrix.SetElement(axis, 3, translation);
