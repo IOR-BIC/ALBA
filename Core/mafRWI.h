@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:27:10 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-06-13 08:03:23 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -70,6 +70,10 @@ public:
 
 	/** Set the camera position. */
 	void CameraSet(int cam_position, double zoom = 1);
+
+  /** Set the camera position, given the custom position, custom viewUp , zoom and
+  if projection is parallel or no.*/
+  void CameraSet(double pos[3],double viewUp[3], double zoom = 1., bool parallelProjection = false);
 
 	/** Set the render window's size. */
 	void SetSize(int x, int y, int w,int h);
