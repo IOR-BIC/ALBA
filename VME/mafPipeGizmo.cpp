@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:06:26 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-06-13 10:54:34 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -189,5 +189,31 @@ void mafPipeGizmo::UpdatePipe()
     m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
     m_CaptionActor->SetCaption(gizmo->GetTextValue());
     m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
+    
+
+    double h,w;
+    int *size = m_RenFront->GetSize();
+    h = m_CaptionActor->GetHeight();
+    w = m_CaptionActor->GetWidth();
+
+    if(w < h)
+    {
+      w *= size[0];
+      h = w*size[1];
+    }
+    else
+    {
+      w = h*size[0];
+      h *= size[1];
+    }
+    
+    
+    double newPosition[2];
+    newPosition[0] =  - w/2.;
+    newPosition[1] =  - h/2.;
+
+    m_CaptionActor->SetPosition(newPosition);
+    
+    
   }
 }
