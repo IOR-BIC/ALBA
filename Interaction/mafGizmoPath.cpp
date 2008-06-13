@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-06-13 07:59:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -173,7 +173,7 @@ void mafGizmoPath::SetCurvilinearAbscissa( double s )
   matrix = m_VmeGizmoPath->GetOutput()->GetMatrix();
   
   //calculate position of the text
-  double point1[3], point2[3];
+  /*double point1[3], point2[3];
   m_LineSource->GetPoint1(point1);
   m_LineSource->GetPoint2(point2);
   double halfLength;
@@ -193,13 +193,9 @@ void mafGizmoPath::SetCurvilinearAbscissa( double s )
     pos[0] = pos[0] + halfLength * (versorY[0]); 
     pos[1] = pos[1] + halfLength * (versorY[1]);
     pos[2] = pos[2] + halfLength * (versorY[2]);
-  }
+  }*/
 
-  
-
-  
   m_VmeGizmoPath->SetTextPosition(pos);
-
   m_VmeGizmoPath->SetTextValue(wxString::Format("%.0f", m_CurvilinearAbscissa>0?floor(m_CurvilinearAbscissa + 0.5):0.0));
   
 }
