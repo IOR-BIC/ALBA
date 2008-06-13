@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-06-13 07:59:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -132,7 +132,15 @@ void mafGizmoPathRuler::BuildGizmos()
     // set the constraint
     // ...
 
-    gp->SetLineLength(m_TicksHeigth);
+    if(gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1)
+    {
+      gp->SetLineLength(m_TicksHeigth);
+    }
+    else
+    {
+      gp->SetLineLength(m_TicksHeigth/2.);
+    }
+    
 
     // put pointer to gizmo in the vector;
     m_GizmoPathVector.push_back(gp);
@@ -157,7 +165,14 @@ void mafGizmoPathRuler::SetTicksHeigth( double height )
 {
   for (int i = 0; i < m_GizmoPathVector.size();i++)
   {
-    m_GizmoPathVector[i]->SetLineLength(height);
+    if(i == 0 || i == m_TicksNumber/2 || i == m_TicksNumber-1)
+    {
+      m_GizmoPathVector[i]->SetLineLength(height);
+    }
+    else
+    {
+      m_GizmoPathVector[i]->SetLineLength(height/2.);
+    }
   }
 }
 
