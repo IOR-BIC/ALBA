@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-01-31 16:05:52 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-06-17 15:28:56 $
+  Version:   $Revision: 1.16 $
 
 =========================================================================*/
 
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.15 $");
+vtkCxxRevisionMacro(vtkVolumeSlicer, "$Revision: 1.16 $");
 vtkStandardNewMacro(vtkVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -630,6 +630,32 @@ void vtkVolumeSlicer::ExecuteData(vtkImageData *outputObject)
         default:
           vtkErrorMacro(<< "vtkVolumeSlicer: Scalar type is not supported");
           return;
+      }
+      break;
+    case VTK_DOUBLE: //--------------------------------------------
+      switch (outputObject->GetPointData()->GetScalars()->GetDataType()) 
+      {
+      case VTK_CHAR:
+        this->CreateImage((const double*)inputPointer, (char*)outputPointer, outputObject);
+        break;
+      case VTK_UNSIGNED_CHAR:
+        this->CreateImage((const double*)inputPointer, (unsigned char*)outputPointer, outputObject);
+        break;
+      case VTK_SHORT:
+        this->CreateImage((const double*)inputPointer, (short*)outputPointer, outputObject);
+        break;
+      case VTK_UNSIGNED_SHORT:
+        this->CreateImage((const double*)inputPointer, (unsigned short*)outputPointer, outputObject);
+        break;
+      case VTK_FLOAT:
+        this->CreateImage((const double*)inputPointer, (float*)outputPointer, outputObject);
+        break;
+      case VTK_DOUBLE:
+        this->CreateImage((const double*)inputPointer, (double*)outputPointer, outputObject);
+        break;
+      default:
+        vtkErrorMacro(<< "vtkVolumeSlicer: Scalar type is not supported");
+        return;
       }
       break;
     default:

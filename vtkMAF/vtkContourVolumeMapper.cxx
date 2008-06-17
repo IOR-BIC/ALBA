@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2008-01-24 13:05:41 $
-Version:   $Revision: 1.18 $
+Date:      $Date: 2008-06-17 15:30:16 $
+Version:   $Revision: 1.19 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.18 $");
+vtkCxxRevisionMacro(vtkContourVolumeMapper, "$Revision: 1.19 $");
 vtkStandardNewMacro(vtkContourVolumeMapper);
 
 
@@ -269,6 +269,8 @@ float vtkContourVolumeMapper::EstimateRelevantVolume(const double contourValue)
       return EstimateRelevantVolumeTemplate((unsigned short)contourValue);
     case VTK_FLOAT:
       return EstimateRelevantVolumeTemplate((float)contourValue);
+    case VTK_DOUBLE:
+      return EstimateRelevantVolumeTemplate((double)contourValue);
     default:
       return 0.f;
   }
@@ -367,6 +369,10 @@ void vtkContourVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume)
     case VTK_FLOAT:
       if (PrepareAccelerationDataTemplate((const float*)dataPointer))
         this->RenderMCubes(renderer, volume, (const float*)dataPointer);
+      break;
+    case VTK_DOUBLE:
+      if (PrepareAccelerationDataTemplate((const double*)dataPointer))
+        this->RenderMCubes(renderer, volume, (const double*)dataPointer);
       break;
     default:
       vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
@@ -486,12 +492,17 @@ template <typename DataType> bool vtkContourVolumeMapper::PrepareAccelerationDat
     for (int ii = 0, ilen = this->NumBlocks[0] * this->NumBlocks[1] * this->NumBlocks[2]; ii < ilen; ii++)
       BlockMinMax[ii][0] = (DataType)VTK_UNSIGNED_SHORT_MAX, BlockMinMax[ii][1] = 0;
   }
-  else if (this->GetDataType() != VTK_FLOAT) { // signed
+  else if (this->GetDataType() != VTK_FLOAT && this->GetDataType() != VTK_DOUBLE) { // signed
     for (int ii = 0, ilen = this->NumBlocks[0] * this->NumBlocks[1] * this->NumBlocks[2]; ii < ilen; ii++)
       BlockMinMax[ii][0] = (DataType)VTK_SHORT_MAX, BlockMinMax[ii][1] = (DataType)VTK_SHORT_MIN;
   }
-  else { 
+  else if (this->GetDataType() == VTK_FLOAT) { 
     float (*BlockMinMax)[2] = (float (*)[2])this->BlockMinMax;
+    for (int ii = 0, ilen = this->NumBlocks[0] * this->NumBlocks[1] * this->NumBlocks[2]; ii < ilen; ii++)
+      BlockMinMax[ii][0] = VTK_FLOAT_MAX, BlockMinMax[ii][1] = VTK_FLOAT_MIN;
+  }
+  else {
+    double (*BlockMinMax)[2] = (double (*)[2])this->BlockMinMax;
     for (int ii = 0, ilen = this->NumBlocks[0] * this->NumBlocks[1] * this->NumBlocks[2]; ii < ilen; ii++)
       BlockMinMax[ii][0] = VTK_FLOAT_MAX, BlockMinMax[ii][1] = VTK_FLOAT_MIN;
   }
@@ -617,7 +628,7 @@ bool vtkContourVolumeMapper::IsDataValid(bool warnings)
 
   int dataType = this->GetDataType();
   if (dataType != VTK_SHORT && dataType != VTK_UNSIGNED_SHORT &&
-    dataType != VTK_CHAR && dataType != VTK_UNSIGNED_CHAR && dataType != VTK_FLOAT) {
+    dataType != VTK_CHAR && dataType != VTK_UNSIGNED_CHAR && dataType != VTK_FLOAT && dataType != VTK_DOUBLE) {
       if (warnings)
         vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
       return false;
@@ -723,6 +734,11 @@ vtkPolyData *vtkContourVolumeMapper::GetOutput(int level, vtkPolyData *data)
       if (!PrepareAccelerationDataTemplate((const float*)dataPointer))
         return NULL;
       this->CreateMCubes(level, polydata, (const float*)dataPointer);
+      break;
+    case VTK_DOUBLE:
+      if (!PrepareAccelerationDataTemplate((const double*)dataPointer))
+        return NULL;
+      this->CreateMCubes(level, polydata, (const double*)dataPointer);
       break;
     default:
       vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
@@ -862,8 +878,6 @@ void vtkContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volume,
         glDrawArrays(GL_TRIANGLES, 0, nvert);
     }
   }
-
-
 
   InitializeRender(false);
 
@@ -1758,7 +1772,7 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes(int LODLev
   vertexNormals->Squeeze();
   triangles->Squeeze();
 
-  // assign points, triangles andnormals to polydata
+  // assign points, triangles and normals to polydata
   polydata->SetPoints(points);
   polydata->SetPolys(triangles);
   polydata->GetPointData()->SetNormals(vertexNormals);
@@ -1883,7 +1897,7 @@ template<typename DataType> void vtkContourVolumeMapper::CreateMCubes_old(int le
             // find the case
             const DataType voxelVals[8] = {voxelPtr[0], voxelPtr[VoxelOffsets[1]], voxelPtr[VoxelOffsets[2]], voxelPtr[VoxelOffsets[3]],
               voxelPtr[VoxelOffsets[4]], voxelPtr[VoxelOffsets[5]], voxelPtr[VoxelOffsets[6]], voxelPtr[VoxelOffsets[7]]};
-            //Check if the scalar value is greter or equal then the threshold
+            //Check if the scalar value is greater or equal then the threshold
             int caseIndex;
             //Modified by Matteo 27/06/06
             if(m_MAXScalar==ContourValue)
