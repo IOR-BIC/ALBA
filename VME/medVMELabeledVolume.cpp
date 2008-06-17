@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 08:18:54 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-06-17 14:31:15 $
+  Version:   $Revision: 1.21 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -193,18 +193,18 @@ void medVMELabeledVolume::InternalPreUpdate()
 //-------------------------------------------------------------------------
 {
   m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
-  if (!m_VolumeLink)
+  EnableWidgets(m_VolumeLink != NULL);
+
+  if (m_VolumeLink == NULL)
   {
-    EnableWidgets(false);
     return;
   }
 
-  EnableWidgets(true);
-  if ( m_DataCopied == false)
+  if (!m_DataCopied)
   {
     CopyDataset();
   }
-    GenerateLabeledVolume(); 
+  GenerateLabeledVolume(); 
 }
 //-------------------------------------------------------------------------
 void medVMELabeledVolume::CopyDataset()
@@ -221,31 +221,17 @@ void medVMELabeledVolume::CopyDataset()
     RetrieveTag();
     m_DataCopied = true;
 
+    double scalarRange[2];
+
     //Set the scalar values  of the labeled volume to OUTRANGE_SCALAR
     vtkDataArray *originalScalars;
-    if ( m_Dataset->IsA( "vtkStructuredPoints" ) )
-    {
-      vtkStructuredPoints *sp = (vtkStructuredPoints*) m_Dataset;
-      originalScalars = sp->GetPointData()->GetScalars();  
-    }
-    else if ( m_Dataset->IsA( "vtkRectilinearGrid" ) )
-    {    
-      vtkRectilinearGrid *rg = (vtkRectilinearGrid*) m_Dataset;
-      originalScalars = rg->GetPointData()->GetScalars();  
-    }
-
-    int not = originalScalars->GetNumberOfTuples();
-    for ( int i = 0; i < not; i++ )
-    {
-      originalScalars->SetTuple1( i, OUTRANGE_SCALAR ); 
-    }
-
+    originalScalars = m_Dataset->GetPointData()->GetScalars();
+    originalScalars->FillComponent(0, OUTRANGE_SCALAR);
     originalScalars->Modified();
-    double scalarRange[2];
     originalScalars->GetRange(scalarRange);
 
-    mmaVolumeMaterial *volMaterial;
-    mafNEW(volMaterial);
+    mmaVolumeMaterial *volMaterial = GetMaterial();
+//    mafNEW(volMaterial);  //@@@@@@@@ Do the code below needs for something??
     volMaterial->DeepCopy(((mafVMEVolumeGray *)m_VolumeLink)->GetMaterial());
     volMaterial->UpdateFromTables();
 
@@ -1152,6 +1138,22 @@ void medVMELabeledVolume::RemoveLabelTag(int component)
   m_Rwi->m_RenderWindow->SetDesiredUpdateRate(15.f);  
 }
 
+//-------------------------------------------------------------------------
+mmaVolumeMaterial * medVMELabeledVolume::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  mmaVolumeMaterial *material = (mmaVolumeMaterial *)GetAttribute("VolumeMaterialAttributes");
+  if (material == NULL)
+  {
+    material = mmaVolumeMaterial::New();
+    SetAttribute("VolumeMaterialAttributes", material);
+    if (m_Output)
+    {
+      ((mafVMEOutputVolume *)m_Output)->SetMaterial(material);
+    }
+  }
+  return material;
+}
 //----------------------------------------------------------------------------
 int medVMELabeledVolume::GetLabelValue( wxString &item )
 //----------------------------------------------------------------------------
@@ -1233,4 +1235,16 @@ char** medVMELabeledVolume::GetIcon()
 {
 #include "mafVMEVolume.xpm"
   return mafVMEVolume_xpm;
+}
+
+//-------------------------------------------------------------------------
+bool medVMELabeledVolume::IsDataAvailable()
+//-------------------------------------------------------------------------
+{
+  mafVME *volume = mafVME::SafeDownCast(GetVolumeLink());
+  if (volume != NULL)
+  {
+    return volume->IsDataAvailable();
+  }
+  return false;
 }

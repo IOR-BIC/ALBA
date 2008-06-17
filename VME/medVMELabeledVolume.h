@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 09:20:12 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-06-17 14:31:15 $
+  Version:   $Revision: 1.12 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ class vtkTexture;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkPolyData;
-
+class mmaVolumeMaterial;
 
 //----------------------------------------------------------------------------
 // mafVmeDataLabeledVolume :
@@ -57,6 +57,9 @@ public:
 
   /** Remove a tag. */
   void RemoveLabelTag(int component);
+
+  /** Return true if the data associated with the VME is present and updated at the current time.*/
+  /*virtual*/ bool IsDataAvailable();
 
   /** Fill the vector of label. */
   void FillLabelVector(wxString name, bool checked = TRUE);
@@ -96,6 +99,9 @@ public:
 
   /** Return the Link */
   mafNode *GetVolumeLink();
+
+  /** return material attribute of this surface if present */
+  mmaVolumeMaterial *GetMaterial();
 
   /** return icon */
   static char** GetIcon();
