@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCreateSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-18 09:31:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -67,15 +67,15 @@ void mafOpCreateSlicer::OpRun()
 //----------------------------------------------------------------------------
 {
   mafString title = _("Choose VME to slice");
-  mafEvent *e; e = new mafEvent();
-  e->SetId(VME_CHOOSE);
-  e->SetArg((long)&mafOpCreateSlicer::VolumeAccept);
-  e->SetString(&title);
-  mafEventMacro(*e);
+  mafEvent e;
+  e.SetId(VME_CHOOSE);
+  e.SetArg((long)&mafOpCreateSlicer::VolumeAccept);
+  e.SetString(&title);
+  mafEventMacro(e);
 
   int result = OP_RUN_CANCEL;
 
-  mafNode *n = e->GetVme();
+  mafNode *n = e.GetVme();
   if (n != NULL)
   {
 		mafNEW(m_Slicer);
