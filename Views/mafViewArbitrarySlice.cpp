@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-16 15:15:36 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-06-18 16:16:39 $
+  Version:   $Revision: 1.35 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -482,7 +482,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
 			mafNEW(matrix);
 			matrix->Identity();
 			matrix->SetVTKMatrix(TransformReset->GetMatrix());
-			m_GizmoRotate->SetAbsPose(matrix);
+			//m_GizmoRotate->SetAbsPose(matrix);
 
 			//for each surface visualized change the center of the cut plane
 			mafNode *root=m_CurrentVolume->GetRoot();
@@ -678,6 +678,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 				{
 					m_GizmoTranslate->Show(false);
 					m_GizmoRotate->Show(true);
+          m_GizmoRotate->SetAbsPose(m_Slicer->GetOutput()->GetAbsMatrix(),0);
 				}
 			}
       CameraUpdate();
