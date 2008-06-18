@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-04 11:32:53 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-06-18 14:09:15 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,7 +88,7 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   m_ValueRange[1] = 100;
   m_Preset = 0;
   m_UserPreset = 0;
-  m_NewUserLutName = "New LUT Name";
+  m_NewUserLutName = "New User Preset";
   m_Info = "" ;
   
   m_UserLutLibraryDir = (mafGetApplicationDirectory() + "\\UserDefinedLookupTables\\").c_str();
@@ -161,10 +161,10 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( text2, 0, wxRIGHT, HM);
 	sizer->Add(sz,0,wxALL, M);
 
-  wxStaticText *labelUserPresets;
-  labelUserPresets = new wxStaticText (this, -1, _("User Presets"),dp,wxSize(150,-1));
-  labelUserPresets->SetFont(bold_font);
-  sizer->Add( labelUserPresets, 0, wxALL, M);
+  //wxStaticText *labelUserPresets;
+  //labelUserPresets = new wxStaticText (this, -1, _("User Presets"),dp,wxSize(150,-1));
+  //labelUserPresets->SetFont(bold_font);
+  // sizer->Add( labelUserPresets, 0, wxALL, M);
 
   mmgButton  *buttonSetUserLUT;
   buttonSetUserLUT = new mmgButton(this, ID_ADD_TO_ULIB, _("Set"),dp, wxSize(LW,BH) );
@@ -208,15 +208,15 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
   sizer->Add(div,0,wxALL, M);
 
 
-  lab = new wxStaticText (this, -1, _("Preview"),dp,wxSize(150,-1));
-  lab->SetFont(bold_font);
-	sizer->Add( lab, 0, wxALL, M);
+  //lab = new wxStaticText (this, -1, _("Preview"),dp,wxSize(150,-1));
+  //lab->SetFont(bold_font);
+  // 	sizer->Add( lab, 0, wxALL, M);
   m_LutSwatch = new mmgLutSwatch(this, -1, dp,wxSize(286,16));
 	sizer->Add( m_LutSwatch, 0, wxALL, 4);
 
-  lab = new wxStaticText (this, -1, _("Lookup Table Entries"),dp,wxSize(150,-1));
-  lab->SetFont(bold_font);
-	sizer->Add( lab, 0, wxALL, M);
+//  lab = new wxStaticText (this, -1, _("Lookup Table Entries"),dp,wxSize(150,-1));
+//  lab->SetFont(bold_font);
+// 	sizer->Add( lab, 0, wxALL, M);
   
   m_LutWidget = new mmgLutWidget(this,ID_LW);//,dp,wxSize(300,300));
   m_LutWidget->SetListener(this);
@@ -227,9 +227,9 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	lab->SetValidator( mmgValidator(this,-1,lab,&m_Info) );
   sizer->Add(lab, 0, wxALL, M);
   
-	lab = new wxStaticText (this, -1, _("Interpolations"),dp,wxSize(150,-1));
-  lab->SetFont(bold_font);
-	sizer->Add( lab, 0, wxALL, M);
+	//lab = new wxStaticText (this, -1, _("Interpolations"),dp,wxSize(150,-1));
+ // lab->SetFont(bold_font);
+// 	sizer->Add( lab, 0, wxALL, M);
 	sz = new wxBoxSizer(wxHORIZONTAL);
 
   butt = new mmgButton(this, ID_SHADE_RGB, _("shade in rgba space"),dp, wxSize(143,BH) );
@@ -241,9 +241,9 @@ mmgLutEditor::mmgLutEditor(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	sz->Add( butt, 0);
   sizer->Add(sz,0,wxALL, M);
 
-  lab = new wxStaticText (this, -1, _("Color Editor"),dp,wxSize(150,-1));
-  lab->SetFont(bold_font);
-	sizer->Add( lab, 0, wxALL, M);
+  //lab = new wxStaticText (this, -1, _("Color Editor"),dp,wxSize(150,-1));
+  //lab->SetFont(bold_font);
+	  // sizer->Add( lab, 0, wxALL, M);
 
   m_ColorWidget = new mmgColorWidget(this,ID_CW);//,dp,wxSize(300,300));
   m_ColorWidget->SetListener(this);
