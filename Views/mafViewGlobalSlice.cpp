@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:27:18 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-06-18 13:27:48 $
+  Version:   $Revision: 1.27 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -590,7 +590,7 @@ void mafViewGlobalSlice::UpdateSlice()
 			transform->TransformNormal(m_SliceXVector, applied_xVector);
 			transform->TransformNormal(m_SliceYVector, applied_yVector);
 
-		  if(node->m_Vme->IsA("mafVMESurface")||node->m_Vme->IsA("mafVMESurfaceParametric"))
+		  if(node->m_Vme->IsA("mafVMESurface")||node->m_Vme->IsA("mafVMESurfaceParametric")||node->m_Vme->IsA("mafVMELandmarkCloud")||node->m_Vme->IsA("mafVMELandmark"))
 		  {
         ((mafPipeSurfaceSlice *)node->m_Pipe)->SetSlice(m_SliceOrigin);
 				double DoubleNormal[3];
