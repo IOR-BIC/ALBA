@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 08:46:53 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-06-18 13:29:26 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -240,6 +240,7 @@ void mmgVMEChooserTree::InitializeImageListMulti()
 void mmgVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
 //----------------------------------------------------------------------------
 {
+  int status = false;
   wxTreeItemId i;
   if(m_PreventNotify) return;
 
@@ -250,11 +251,15 @@ void mmgVMEChooserTree::OnSelectionChanged(wxTreeEvent& event)
   }
   event.Skip();
 
-  int status = GetVmeStatus(m_ChoosedNode);
+  if (m_ChoosedNode != NULL)
+  {
+     status = GetVmeStatus(m_ChoosedNode);
+  }
+  
   bool enable_ok = false;
   if (!m_MultipleSelection)
   {
-    if (m_ValidateFunction)
+    if (m_ValidateFunction && m_ChoosedNode != NULL)
     {
       enable_ok = m_ValidateFunction(m_ChoosedNode);
     }
