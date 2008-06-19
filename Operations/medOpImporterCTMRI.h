@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterCTMRI.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:38:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-19 08:12:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,7 +133,7 @@ protected:
   // gui related variables
 	mafString									m_DictionaryFilename;
 	mafString									m_DICOMDir;
-	mafString									m_current_slice_name;
+	mafString									m_CurrentSliceName;
 	int												m_DICOM;
 
 	// slices related informations
