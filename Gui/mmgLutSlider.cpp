@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:06:06 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-06-19 08:00:57 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -139,6 +139,7 @@ mmgLutSlider::mmgLutSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos /
   SetMinSize(size);
 
   m_FloatingPointText = false;
+  m_FixedText = false;
 }
 //----------------------------------------------------------------------------
 mmgLutSlider::~mmgLutSlider()
@@ -172,8 +173,11 @@ void mmgLutSlider::MoveButton(int id, int pos)
 			m_MiddleButton->SetSize(pos+w1,0,x2-pos-w1,BUTT_H);
 			x1 = pos;   
 
-			m_LowValue = ( x1 * (m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
-      m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
+      m_LowValue = ( x1 * (m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
+      if(false == m_FixedText)
+      {
+        m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
+      }
 
 			m_MinLabel->SetSize(0,0,pos,BUTT_H);
       Refresh(false);
@@ -187,8 +191,11 @@ void mmgLutSlider::MoveButton(int id, int pos)
 			m_MiddleButton->SetSize(x1+w1,0,pos-x1-w1,BUTT_H);
 			x2 = pos;
 
-			m_HighValue  =( (x2-w2-BUTT_W)*(m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
-			m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+      m_HighValue  =( (x2-w2-BUTT_W)*(m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
+      if(false == m_FixedText)
+      {
+	    m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+      }
 
 			m_MaxLabel->SetSize(pos+w2,0,w-(pos+w2),BUTT_H);
       Refresh(false);
@@ -205,10 +212,13 @@ void mmgLutSlider::MoveButton(int id, int pos)
 			x1 = pos-w1;
 			x2 = pos+w3;
 
-			m_LowValue = ( x1 * (m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
-			m_HighValue  =( (x2-w2-BUTT_W)*(m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
-			m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));
-			m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+      m_LowValue = ( x1 * (m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
+      m_HighValue  =( (x2-w2-BUTT_W)*(m_MaxValue - m_MinValue) ) / (w-w2-w2-BUTT_W) + m_MinValue;
+      if(false == m_FixedText)
+      {
+	    m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));
+		m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));
+      }
 		
 			m_MinLabel->SetSize(0,0,x1,BUTT_H);
 			m_MaxLabel->SetSize(x2+w2,0,w-(x2+w2),BUTT_H);
@@ -281,6 +291,7 @@ void mmgLutSlider::SetRange(double rmin, double rmax )
 void mmgLutSlider::SetSubRange(double  low, double  hi )
 //----------------------------------------------------------------------------
 {
+  
   m_LowValue = low;
   m_HighValue  = hi;
 
@@ -290,9 +301,12 @@ void mmgLutSlider::SetSubRange(double  low, double  hi )
   m_HighValue  = (m_HighValue  < m_MaxValue)	? m_HighValue  : m_MaxValue;
   m_HighValue  = (m_HighValue  > m_LowValue)	? m_HighValue 	: m_LowValue;
 
-  m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
-  m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));	
-
+  if(false == m_FixedText)
+  {
+    m_MinButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue));	
+    m_MaxButton->SetLabel(wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue));	
+  }
+  
   UpdateButtons();
 }
 //----------------------------------------------------------------------------
@@ -336,6 +350,7 @@ void mmgLutSlider::ShowEntry(int id)
 	{
 		case 1: //min
 		{
+      if(true == m_FixedText) return;
 			msg = wxString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_MinValue, m_HighValue);
 			s = wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_LowValue);
 			s = wxGetTextFromUser(msg, "Lookup table Minimum",s,this);
@@ -351,6 +366,7 @@ void mmgLutSlider::ShowEntry(int id)
 		break;
 		case 2: //max
 		{
+      if(true == m_FixedText) return;
       msg = wxString::Format(m_FloatingPointText?"Enter a value in [%.1f .. %.1f]":"Enter a value in [%.0f .. %.0f]",m_LowValue, m_MaxValue);
 			s = wxString::Format(m_FloatingPointText?"%.1f":"%.0f",m_HighValue);
 			s = wxGetTextFromUser(msg, "Lookup table Maximum",s,this);
@@ -365,4 +381,23 @@ void mmgLutSlider::ShowEntry(int id)
 		}
 		break;
 	}
+}
+
+//----------------------------------------------------------------------------
+void mmgLutSlider::SetFixedTextMinButton(const char* label)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_MinButton)
+  {
+    m_MinButton->SetLabel(label);
+  }
+}
+//----------------------------------------------------------------------------
+void mmgLutSlider::SetFixedTextMaxButton(const char* label)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_MaxButton)
+  {
+    m_MaxButton->SetLabel(label);
+  }
 }

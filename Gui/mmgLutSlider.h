@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgLutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:06:06 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-06-19 08:00:58 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -84,6 +84,18 @@ public:
   void SetFloatingPointTextOn(){m_FloatingPointText = true;};
   void SetFloatingPointTextOff(){m_FloatingPointText = false;};
 
+  /** Turn On the fixed text for labels */
+  void SetFixedTextOn(){m_FixedText = true;};
+
+  /** Turn Off the fixed text for labels */
+  void SetFixedTextOff(){m_FixedText = false;};
+
+  /** Set the fixed text for min button.*/
+  void SetFixedTextMinButton(const char* label);
+
+  /** Set the fixed text for max button.*/
+  void SetFixedTextMaxButton(const char* label);
+
 protected:  
   /** Update slider's cursors. */
   void OnSize(wxSizeEvent &event);
@@ -106,6 +118,7 @@ protected:
   double m_HighValue;
 
   bool m_FloatingPointText; ///< flag used for visualization of decimal in the title of button, default : false
+  bool m_FixedText; ///< flag used for visualization of fixed text, default: false
 
   mafObserver  *m_Listener;     
 DECLARE_EVENT_TABLE()
