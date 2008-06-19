@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-18 16:16:39 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2008-06-19 09:52:35 $
+  Version:   $Revision: 1.36 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -221,11 +221,13 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
+      m_Slicer->GetMaterial()->m_ColorLut = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut;
 			m_Slicer->Update();
 
-			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
-			m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
-      m_ColorLUT->SetTableRange(sr[0], sr[1]);
+// 			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
+// 			m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
+//       m_ColorLUT->SetTableRange(sr[0], sr[1]);
+      m_ColorLUT = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut;
       m_LutWidget->SetLut(m_ColorLUT);
       m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
       m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
