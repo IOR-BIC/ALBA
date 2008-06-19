@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.cxx,v $
 Language:  C++
-Date:      $Date: 2008-06-16 14:41:22 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-06-19 08:46:32 $
+Version:   $Revision: 1.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -35,7 +35,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 //------------------------------------------------------------------------------
 
@@ -459,84 +459,68 @@ void vtkMEDExtrudeToCircle::CalcUpVector(vtkIdList *holepts)
 void vtkMEDExtrudeToCircle::CalcExtrusionRings()
 //------------------------------------------------------------------------------
 {
-  int i ;
+  int i, k ;
 
-
-  // calculate no. of end points from requested min. value
+  // set the requested min. value for the no. of end points to something sensible.
   // default is the same as the no. of vertices on the hole.
   if (!m_definedMinNumEndPts || (m_minNumEndPts < m_holeNumVerts)){
     // set min no. of end vertices to default
     m_minNumEndPts = m_holeNumVerts ;
     m_definedMinNumEndPts = true ;
   }
-  m_mesh->CalcNumberOfEndPoints(m_holeNumVerts, m_minNumEndPts) ;
 
+  // calculate circumference of extrusion
+  double circumf = 2*M_PI * m_endRadius ;
 
+  // try increasing the no. of rings k until we get a number which gives the right length.
+  k = 2 ;
+  double m, sumL;
+  while (k < 1000){
+    // calculate slope m where no. of vertices ni in ring i is given by ni = n0 + m*i
+    m = (double)(m_minNumEndPts - m_holeNumVerts) / (double)(k-1) ;
 
-  // calculate distance between vertices at start end = 2pi*r / no. of pts
-  double triangle_size = 2*M_PI * m_endRadius / (double)m_holeNumVerts ;
+    // calculate the total length of the extrusion
+    for (i = 1, sumL = 0.0 ;  i < k ;  i++){
+      int ni = m_holeNumVerts + (int)(m*(double)i) ; 
+      double Li = circumf / (double)ni ;
+      sumL += Li ;
+    }
 
+    // stop when the length reaches the desired length
+    if (sumL >= m_length)
+      break ;
 
-  // calculate total length of doubling sections
-  double lsec = triangle_size ;
-  double lDoubles = 0.0 ;
-  for (i = 0 ;  i < m_mesh->numDoublings ;  i++){
-    lsec /= 2.0 ;
-    lDoubles += lsec ;
+    k++ ;
   }
 
-
-  // calculate no. of singles sections
-  if (lDoubles < m_length){
-    // not enough length from doubling sections - how many singles sections do we need to make it up
-    // this will give a length less than or equal to the required length
-    m_mesh->numSingles = (int)((m_length - lDoubles) / triangle_size) ;
-  }
-  else{
-    // no need for any singles sections
-    m_mesh->numSingles = 0 ;
-  }
-
-  // make sure that we have at least one section !
-  if ((m_mesh->numSingles == 0) && (m_mesh->numDoublings == 0))
-    m_mesh->numSingles = 1 ;
-
-
-  // calculate length of singles sections
-  double lSingles = (double)m_mesh->numSingles*triangle_size ;
-
-  // adjust triangle size so that sections add up to exact length of tube
-  triangle_size *= m_length / (lSingles + lDoubles) ;
-
+  // tweak the circumference so that the total length will be the same as the requested length
+  circumf *= m_length / sumL ;
 
 
   //----------------------------------------------------------------------------
   // set the positions and no. of vertices in each ring
   //----------------------------------------------------------------------------
-  m_mesh->AllocateRings(m_mesh->numSingles + m_mesh->numDoublings + 1) ;
+
+  // allocate the rings
+  m_mesh->AllocateRings(k) ;
 
   // first ring is same as start hole
   m_mesh->ring[0].AllocateVertices(m_holeNumVerts) ;
   m_mesh->ring[0].z = 0.0 ;
 
-  // rings which do not double no. of vertices
+  // allocate the number of vertices in each ring
   double z = 0.0 ;
-  for (i = 1 ;  i <= m_mesh->numSingles ;  i++){
-    z += triangle_size ;
-    m_mesh->ring[i].AllocateVertices(m_holeNumVerts) ;
+  for (i = 1 ;  i < k-1 ;  i++){
+    int ni = m_holeNumVerts + (int)(m*(double)i) ; 
+    z += circumf / (double)ni ;
+
+    m_mesh->ring[i].AllocateVertices(ni) ;
     m_mesh->ring[i].z = z ;
   }
 
-  // doubling rings
-  lsec = triangle_size ;
-  int verts = m_holeNumVerts ;
-  for (i = m_mesh->numSingles+1 ;  i < m_mesh->numRings ;  i++){
-    lsec /= 2.0 ;
-    verts *= 2.0 ;
-    z += lsec ;
-    m_mesh->ring[i].AllocateVertices(verts) ;
-    m_mesh->ring[i].z = z ;
-  }
+  // last ring as requested
+  m_mesh->ring[k-1].AllocateVertices(m_minNumEndPts) ;
+  m_mesh->ring[k-1].z = m_length ;
 }
 
 
@@ -593,22 +577,26 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
   }
 
   // Tricky bit: now we have to interpolate the vertices on the middle rings
-  int factor ;
   for (i = 1 ;  i < m_mesh->numRings-1 ;  i++){
     for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
       // find the point on the end ring which corresponds to point j
-      factor = m_mesh->ring[iend].numVerts / m_mesh->ring[i].numVerts ;
-      int jend = j * factor ;
+      double factor1 = (double)m_mesh->ring[iend].numVerts / (double)m_mesh->ring[i].numVerts ;
+      int jend = (int)((double)j * factor1 + 0.5) ;
 
       // find the points on the start ring which correspond to point j
       // and the relative weighting for each
-      factor = m_mesh->ring[i].numVerts / m_mesh->ring[0].numVerts ;
-      double jdouble = (double)j / (double)factor ;
+      double factor2 = (double)m_mesh->ring[0].numVerts / (double)m_mesh->ring[i].numVerts ;
+      double jdouble = (double)j * (double)factor2 ;
       int jstart0 = (int)jdouble ;
-      int jstart1 = (jstart0 + 1) % m_mesh->ring[0].numVerts ;
-      double rmdr = jdouble - jstart0 ;
+      int jstart1 = (jstart0 + 1) ;
+      double rmdr = jdouble - (double)jstart0 ;
       double w0 = 1.0 - rmdr ;
       double w1 = rmdr ;
+
+      // make sure indices are in correct range
+      jend = jend % m_mesh->ring[iend].numVerts ;
+      jstart0 = jstart0 % m_mesh->ring[0].numVerts ;
+      jstart1 = jstart1 % m_mesh->ring[0].numVerts ;
 
       // get the total weights for the three points
       double lambda = m_mesh->ring[i].z / m_mesh->ring[iend].z ;
@@ -682,102 +670,62 @@ void vtkMEDExtrudeToCircle::VerticesToVtkPoints(vtkPoints *points) const
 
 
 //------------------------------------------------------------------------------
-/*
-Sort vertices into vtk triangles
-This allocates memory for triangles
-
-The triangles are arranged like this:
-
- --------------------------------> z
-|
-|      j = 0 --- 0 --- 0 - 0
-|          |   / |   / | \ |
-|          |  /  |  /  |   1
-|          | /   | /   | / |
-|          1 --- 1 --- 1 - 2
-|          |   / |   / | \ |
-|          |  /  |  /  |   3
-|          | /   | /   | / |
-|          2 --- 2 --- 2 - 4
-|          |   / |   / | \ |
-|          |  /  |  /  |   5
-|          | /   | /   | / |
-|          3 --- 3 --- 3 - 6
-|          |   / |   / | \ |
-|          |  /  |  /  |   7
-|          | /   | /   | / |
-|          0 --- 0 --- 0 - 0
-|
-V
-phi
-
-*/
+//Sort vertices into vtk triangles
+//This allocates memory for triangles
 void vtkMEDExtrudeToCircle::VerticesToVtkTriangles(vtkCellArray *triangles) const
 //------------------------------------------------------------------------------
 {
-  int i, j, totalpts ;
-  vtkIdType thisTriangle[3] ;
+  int i, j, totalTriangles ;
+  vtkIdType id0, id1, id2, thisTriangle[3] ;
 
   // pre-allocate memory for total no. of vertices
-  for (i = 0, totalpts = 0 ;  i < m_mesh->numRings ;  i++)
-    totalpts += m_mesh->ring[i].numVerts ;
-  triangles->Allocate(7*totalpts) ;       // allocate space for indices (each vertex appears in no more than 7 triangles)
+  for (i = 0, totalTriangles = 0 ;  i < m_mesh->numRings-1 ;  i++)
+    totalTriangles += m_mesh->ring[i].numVerts + m_mesh->ring[i+1].numVerts ;
+  triangles->Allocate(3*totalTriangles) ;       // allocate space for indices 
 
-  for (i = 1 ;  i < m_mesh->numRings ;  i++){
+  for (i = 0 ;  i < m_mesh->numRings-1 ;  i++){
     int nthis = m_mesh->ring[i].numVerts ;      // no. vertices in this ring
-    int nprev = m_mesh->ring[i-1].numVerts ;    // no. vertices in previous ring
+    int nnext = m_mesh->ring[i+1].numVerts ;    // no. vertices in previous ring
+    double nratio = (double)nnext / (double)nthis ;
 
-    if (nthis == nprev){
-      // calc triangles between ring i and i-1 where no. of vertices is the same
-      vtkIdType id0, id1, id2, id3 ;
-      for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
-        id0 = m_mesh->ring[i-1].vertex[j].GetId() ;
-        id1 = m_mesh->ring[i-1].vertex[(j+1) % nprev].GetId() ;
-        id2 = m_mesh->ring[i].vertex[(j+1) % nthis].GetId() ;
-        id3 = m_mesh->ring[i].vertex[j].GetId() ;
+    // loop through the vertices
+    for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
+      // get the range of vertices which will be connected to this one on the next ring
+      // n.b. need to use floor() because (int) moves negative numbers towards zero.
+      int jjminus = floor(nratio * (double)(j-0.5) + 0.5) ;
+      int jjplus = floor(nratio * (double)(j+0.5) + 0.5) ;
 
+      // spray triangles forward from {ring i, vertex j} to {ring i+1, vertices jjminus to jjplus}
+      for (int jj = jjminus ;  jj < jjplus ;  jj++){
+        int jj0 = Modulo(jj, nnext) ;
+        int jj1 = Modulo(jj+1, nnext) ;
 
-        // triangle 0, 1, 3
-        thisTriangle[0] = id0 ; thisTriangle[1] = id1 ; thisTriangle[2] = id3 ;
-        triangles->InsertNextCell(3, thisTriangle) ;
+        // construct triangle.
+        // this goes anticlock if ring index goes left to right and j axis points down.
+        id0 = m_mesh->ring[i].vertex[j].GetId() ;
+        id1 = m_mesh->ring[i+1].vertex[jj1].GetId() ;
+        id2 = m_mesh->ring[i+1].vertex[jj0].GetId() ;
 
-        // triangle 1, 2, 3
-        thisTriangle[0] = id1 ; thisTriangle[1] = id2 ; thisTriangle[2] = id3 ;
-        triangles->InsertNextCell(3, thisTriangle) ;
-      }
-    }
-    else if (nthis == 2*nprev){
-      // calc triangles between ring i and i-1 where no. of vertices is doubled
-      vtkIdType id0, id1, id2, id3, id4 ;
-      for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j+=2){
-        id0 = m_mesh->ring[i-1].vertex[j/2].GetId() ;
-        id1 = m_mesh->ring[i-1].vertex[(j/2+1) % nprev].GetId() ;
-        id2 = m_mesh->ring[i].vertex[(j+2) % nthis].GetId() ;
-        id3 = m_mesh->ring[i].vertex[j+1].GetId() ;
-        id4 = m_mesh->ring[i].vertex[j].GetId() ;
-
-        // triangle 0, 3, 4
-        thisTriangle[0] = id0 ; thisTriangle[1] = id3 ; thisTriangle[2] = id4 ;
-        triangles->InsertNextCell(3, thisTriangle) ;
-
-        // triangle 0, 1, 3
-        thisTriangle[0] = id0 ; thisTriangle[1] = id1 ; thisTriangle[2] = id3 ;
-        triangles->InsertNextCell(3, thisTriangle) ;
-
-        // triangle 1, 2, 3
-        thisTriangle[0] = id1 ; thisTriangle[1] = id2 ; thisTriangle[2] = id3 ;
+        thisTriangle[0] = id0 ; thisTriangle[1] = id1 ; thisTriangle[2] = id2 ;
         triangles->InsertNextCell(3, thisTriangle) ;
       }
-    }
-    else{
-      // something badly wrong if you get here
-      std::cout << "error in vtkMEDExtrudeToCircle::VerticesToVtkTriangles()" ;
-      assert(false) ;
+
+      // add the triangle which has its baseline on the current ring
+      int j1 = Modulo(j+1, nthis) ;
+      int jjp = Modulo(jjplus, nnext) ;
+
+      id0 = m_mesh->ring[i].vertex[j].GetId() ;
+      id1 = m_mesh->ring[i].vertex[j1].GetId() ;
+      id2 = m_mesh->ring[i+1].vertex[jjp].GetId() ;
+
+      thisTriangle[0] = id0 ; thisTriangle[1] = id1 ; thisTriangle[2] = id2 ;
+      triangles->InsertNextCell(3, thisTriangle) ;
     }
   }
 
   triangles->Squeeze() ;
 }
+
 
 
 //------------------------------------------------------------------------------
@@ -788,7 +736,7 @@ void vtkMEDExtrudeToCircle::VerticesToVtkTriangles(vtkCellArray *triangles) cons
 // phi is in the range 0 to 2pi.
 void vtkMEDExtrudeToCircle::CalcCylinderCoords(const double *x, const double *centre, const double *cylAxis, const double *upVector, 
                                          double *r, double *phi, double *z) const 
-//------------------------------------------------------------------------------
+                                         //------------------------------------------------------------------------------
 {
   // Get normalised central axis
   double u[3], v[3], w[3] ;
@@ -1099,7 +1047,7 @@ void vtkMEDExtrudeToCircle::Remove2PiArtefactsFromFirstRing()
 }
 
 
- 
+
 //------------------------------------------------------------------------------
 // Reverse id list
 void vtkMEDExtrudeToCircle::ReverseIdList(vtkIdList *pts) const
@@ -1318,11 +1266,6 @@ void vtkMEDExtrudeToCircle::MeshData::PrintSelf(ostream& os, vtkIndent indent) c
 {
   os << indent << "no. rings = " << numRings << std::endl ;
 
-  os << indent << "no. endpts = " << numEndPts << "\t" 
-    << "no. doublings = " << numDoublings << "\t" 
-    << "no. singles = " << numSingles << std::endl ;
-  os << std::endl ;
-
   for (int i = 0 ;  i < numRings ;  i++){
     os << indent << "ring " << i << "\t" ;
     ring[i].PrintSelf(os, 0) ;
@@ -1351,24 +1294,4 @@ void vtkMEDExtrudeToCircle::VertexData::PrintSelf(ostream& os, vtkIndent indent)
 {
   os << indent << "cyl " << m_cylcoord[0] << "\t" << m_cylcoord[1] << "\t" << m_cylcoord[2] << "\t"
     << "cart " << m_cartcoord[0] << "\t" << m_cartcoord[1] << "\t" << m_cartcoord[2] << std::endl ;
-}
-
-
-
-//------------------------------------------------------------------------------
-// Calculate required no. of end vertices, given number on hole
-// This is always 2^m no. of hole vertices
-// Default is that no. end verts = no. of start verts.
-// Sets no. of end points and no. of doublings reqd to get there.
-void vtkMEDExtrudeToCircle::MeshData::CalcNumberOfEndPoints(int numHolePts, int minNumEndPts)
-//------------------------------------------------------------------------------
-{
-  numDoublings = 0 ;
-  numEndPts = numHolePts ;
-
-  // calculate no. of end points and no. of doublings
-  while (numEndPts < minNumEndPts){
-    numEndPts *= 2 ;
-    numDoublings++ ;
-  }
 }

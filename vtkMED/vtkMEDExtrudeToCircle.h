@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2008-06-16 14:41:22 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-06-19 08:46:32 $
+Version:   $Revision: 1.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -266,13 +266,6 @@ public:
   void AllocateRings(int n) {numRings = n ;  ring = new RingData[n] ;}
   void PrintSelf(ostream& os, vtkIndent indent) const ;
 
-  // Calculate required no. of end vertices, given number on hole 
-  // The number is always 2^m * no. of hole vertices
-  void CalcNumberOfEndPoints(int numHolePoints, int minNumEndPts) ;
-
-  int numEndPts ;             // actual no. of end vertices
-  int numDoublings ;          // no. of doublings of vertices required to get to end total
-  int numSingles ;            // no. of non-doubling steps required
   int numRings ;              // no. of rings in mesh
   RingData *ring ;            // array of rings
 } ;
