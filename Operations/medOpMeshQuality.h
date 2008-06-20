@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.h,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:48:05 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-20 15:25:16 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,6 +56,8 @@ class vtkPolyDataMapper;
 class vtkActor;
 class vtkScalarBarActor;
 class vtkTriangleQualityRatio;
+class vtkFeatureEdges;
+class vtkTubeFilter;
 
 //----------------------------------------------------------------------------
 // medOpMeshQuality :
@@ -79,12 +81,6 @@ public:
 	/** Builds operation's interface. */
 	void OpRun();
 
-	/** Execute the operation. */
-	void OpDo();
-
-	/** Makes the undo for the operation. */
-	void OpUndo();
-
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -105,6 +101,13 @@ protected:
 	wxStaticText						*m_LabelMinAspectRatio;
 
 	vtkTriangleQualityRatio	*m_CheckMeshQuality;
+
+  vtkFeatureEdges *m_FeatureEdgeFilter;
+  vtkPolyDataMapper *m_MapperFeatureEdge;
+  vtkTubeFilter *m_TubeFilter;
+  vtkActor *m_ActorFeatureEdge;
+
+  double m_Angle;
 
 };
 #endif

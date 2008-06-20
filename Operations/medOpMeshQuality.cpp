@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:48:05 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-20 15:25:16 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -75,6 +75,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkLookupTable.h"
 #include "vtkCell.h"
 #include "vtkScalarBarActor.h"
+#include "vtkFeatureEdges.h"
+#include "vtkTubeFilter.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpMeshQuality);
@@ -95,6 +97,8 @@ mafOp(label)
 
 	m_Actor = NULL;
 	m_BarActor = NULL;
+  m_FeatureEdgeFilter = NULL;
+  m_Angle = 40.0;
 }
 //----------------------------------------------------------------------------
 medOpMeshQuality::~medOpMeshQuality()
@@ -120,6 +124,7 @@ mafOp *medOpMeshQuality::Copy()
 enum MESH_QUALITY_ID
 {
 	ID_OK = MINID,
+  ID_RADIUS,
 };
 //----------------------------------------------------------------------------
 void medOpMeshQuality::OpRun()   
@@ -140,16 +145,6 @@ void medOpMeshQuality::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void medOpMeshQuality::OpDo()
-//----------------------------------------------------------------------------
-{
-}
-//----------------------------------------------------------------------------
-void medOpMeshQuality::OpUndo()
-//----------------------------------------------------------------------------
-{
-}
-//----------------------------------------------------------------------------
 void medOpMeshQuality::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
@@ -157,6 +152,11 @@ void medOpMeshQuality::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+    case ID_RADIUS:
+      m_FeatureEdgeFilter->SetFeatureAngle(m_Angle);
+      m_FeatureEdgeFilter->Update();
+      this->m_Rwi->CameraUpdate();
+      break;
 		case ID_OK:
 			m_Dialog->EndModal(wxID_OK);
 			break;
@@ -180,10 +180,17 @@ void medOpMeshQuality::DeleteOpDialog()
 
 	m_Rwi->m_RenFront->RemoveActor(m_Actor);
 	m_Rwi->m_RenFront->RemoveActor(m_BarActor);
+  m_Rwi->m_RenFront->RemoveActor(m_ActorFeatureEdge);
 
 	vtkDEL(m_Actor);
 	vtkDEL(m_BarActor);
 	vtkDEL(m_Mapper);
+
+  vtkDEL(m_ActorFeatureEdge);
+  vtkDEL(m_MapperFeatureEdge);
+  vtkDEL(m_TubeFilter);
+  vtkDEL(m_FeatureEdgeFilter);
+
 	mafDEL(m_Picker);
 
 	cppDEL(m_Rwi); 
@@ -217,6 +224,11 @@ void medOpMeshQuality::CreateOpDialog()
 	m_LabelMaxAspectRatio  = new wxStaticText(m_Dialog,   -1, _(" max : "));
 	m_LabelMinAspectRatio  = new wxStaticText(m_Dialog,   -1, _(" min : "));
 
+  wxStaticText *labelAngle = new wxStaticText(m_Dialog, -1, _("Angle"),p, wxSize(80, 16 ));
+  wxTextCtrl *angleText		= new wxTextCtrl(m_Dialog,ID_RADIUS, _("Angle"),p,wxSize(50, 16 ), wxNO_BORDER );
+
+  angleText->SetValidator(mmgValidator(this,ID_RADIUS,angleText,&m_Angle,0.0,999.0));
+
 	mmgButton  *b_ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
 
 	b_ok->SetValidator(mmgValidator(this,ID_OK,b_ok));
@@ -225,6 +237,8 @@ void medOpMeshQuality::CreateOpDialog()
 	h_sizer2->Add(m_LabelAverageAspectRatio,     0, wxLEFT);
 	h_sizer2->Add(m_LabelMaxAspectRatio,     0, wxLEFT);
 	h_sizer2->Add(m_LabelMinAspectRatio,     0, wxLEFT);
+  h_sizer2->Add(labelAngle,     0, wxLEFT);
+  h_sizer2->Add(angleText,     0, wxLEFT);
 
 	wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
 	h_sizer3->Add(b_ok,      0,wxRIGHT);
@@ -301,6 +315,41 @@ void medOpMeshQuality::CreatePolydataPipeline()
 
 	m_Rwi->m_RenFront->AddActor(m_Actor);
 	m_Rwi->m_RenFront->AddActor(m_BarActor);
+
+  vtkNEW(m_FeatureEdgeFilter);
+  m_FeatureEdgeFilter->SetInput(dataset);
+  m_FeatureEdgeFilter->FeatureEdgesOn();
+  m_FeatureEdgeFilter->NonManifoldEdgesOn();
+  m_FeatureEdgeFilter->BoundaryEdgesOff();
+  m_FeatureEdgeFilter->ManifoldEdgesOff();
+  m_FeatureEdgeFilter->SetFeatureAngle(m_Angle);
+  m_FeatureEdgeFilter->Update();
+
+  double boundingBox[6];
+  dataset->GetBounds(boundingBox);
+
+  //Compute Max bound
+  double dimX, dimY, dimZ;
+  dimX = (boundingBox[1] - boundingBox[0]);
+  dimY = (boundingBox[3] - boundingBox[2]);
+  dimZ = (boundingBox[5] - boundingBox[4]);
+  double maxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
+  double radius = maxBounds / 100;
+
+  vtkNEW(m_TubeFilter);
+  m_TubeFilter->SetInput(m_FeatureEdgeFilter->GetOutput());
+  m_TubeFilter->SetNumberOfSides(10);
+  m_TubeFilter->SetRadius(radius);
+  m_TubeFilter->Update();
+
+  vtkNEW(m_MapperFeatureEdge);
+  m_MapperFeatureEdge->SetInput(m_TubeFilter->GetOutput());
+  m_MapperFeatureEdge->Update();
+
+  vtkNEW(m_ActorFeatureEdge);
+  m_ActorFeatureEdge->SetMapper(m_MapperFeatureEdge);
+
+  m_Rwi->m_RenFront->AddActor(m_ActorFeatureEdge);
 
 	m_Rwi->m_RenFront->ResetCamera(BoundingBox);
 }
