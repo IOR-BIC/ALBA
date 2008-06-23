@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-06-23 13:01:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,6 +54,9 @@ public:
 
   /** update the data pipe output */
   virtual void Update();
+
+  /** retrieve vtk data pipe*/
+  vtkMAFDataPipe *GetVTKDataPipe(){return m_VTKDataPipe;};
 
 protected:
   mafVTKInterpolator();
