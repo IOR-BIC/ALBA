@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-13 08:03:23 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2008-06-24 09:11:07 $
+  Version:   $Revision: 1.46 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,6 +30,7 @@
 #include "mafSceneGraph.h"
 #include "mmgPicButton.h"
 #include "mmgMeasureUnitSettings.h"
+#include "mafGUICrossIncremental.h"
 
 #include "mafVME.h"
 #include "mafVMELandmark.h"
@@ -81,6 +82,10 @@ mafRWI::mafRWI()
 
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
+
+  m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
+  m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
+  m_StepCameraOrientation = 10.0;
 }
 //----------------------------------------------------------------------------
 mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
@@ -111,6 +116,12 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
+
+  m_StepCameraOrientation = 10.0;
+  m_TopBottomAccumulation = 0.0;
+  m_LeftRigthAccumulation = 0.0;
+  m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
+  m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
 
   CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo, show_orientator);
 }
@@ -592,11 +603,11 @@ void mafRWI::UpdateCameraParameters()
 {
   m_Camera->GetPosition(m_CameraPosition);
   m_Camera->GetFocalPoint(m_FocalPoint);
-  m_Camera->GetViewUp(m_CameraViewUp);
+  //m_Camera->GetViewUp(m_CameraViewUp);
   double *ori = m_Camera->GetOrientation();
-  m_CameraOrientation[0] = ori[0];
+  /*m_CameraOrientation[0] = ori[0];
   m_CameraOrientation[1] = ori[1];
-  m_CameraOrientation[2] = ori[2];
+  m_CameraOrientation[2] = ori[2];*/
   if (m_Gui)
   {
     m_Gui->Update();
@@ -828,8 +839,10 @@ mmgGui *mafRWI::CreateGui()
     m_Gui->Label("Camera parameters");
     m_Gui->Vector(ID_FOCAL_POINT, "focal pnt.", m_FocalPoint);
     m_Gui->Vector(ID_CAMERA_POSITION, "position", m_CameraPosition);
-    m_Gui->Vector(ID_CAMERA_VIEW_UP, "view up", m_CameraViewUp);
-    m_Gui->Vector(ID_CAMERA_ORIENTATION, "orientation", m_CameraOrientation);
+    //m_Gui->Vector(ID_CAMERA_VIEW_UP, "view up", m_CameraViewUp);
+    //m_Gui->Vector(ID_CAMERA_ORIENTATION, "orientation", m_CameraOrientation);
+    mafGUICrossIncremental *ci = m_Gui->CrossIncremental(ID_CAMERA_ORIENTATION,"orientation", &m_StepCameraOrientation, &m_TopBottomAccumulation, &m_LeftRigthAccumulation,mafGUICrossIncremental::ID_COMPLETE_LAYOUT,"Change the rotation step value from the entry.",false);
+    ci->EnableStep(true);
     m_Gui->Divider(2);
   }
 
@@ -954,8 +967,30 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
       case ID_CAMERA_POSITION:
         m_Camera->SetPosition(m_CameraPosition);
         m_Camera->SetFocalPoint(m_FocalPoint);
-        m_Camera->SetViewUp(m_CameraViewUp);
+        //m_Camera->SetViewUp(m_CameraViewUp);
         CameraUpdate();
+      break;
+      case ID_CAMERA_ORIENTATION:
+        {
+          int dx = m_LeftRigthAccumulation - m_LeftRigthAccumulationLast;
+          int dy = m_TopBottomAccumulation - m_TopBottomAccumulationLast;
+
+          int *size = m_RenderWindow->GetSize();
+
+          double delta_elevation = -20.0 / size[1];
+          double delta_azimuth = -20.0 / size[0];
+
+          double rxf = (double)dx * delta_azimuth * this->m_StepCameraOrientation;
+          double ryf = (double)dy * delta_elevation * this->m_StepCameraOrientation;
+
+          m_Camera->Azimuth(rxf);
+          m_Camera->Elevation(ryf);
+          m_Camera->OrthogonalizeViewUp();
+
+          CameraUpdate();
+          m_LeftRigthAccumulationLast = m_LeftRigthAccumulation;
+          m_TopBottomAccumulationLast = m_TopBottomAccumulation;
+        }
       break;
       default:
         mafEventMacro(*maf_event);
