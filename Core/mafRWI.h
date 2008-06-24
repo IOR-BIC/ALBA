@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-13 08:03:23 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-06-24 09:10:46 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -146,8 +146,13 @@ public:
   int               m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up
   double            m_CameraPosition[3]; ///< Vector representing the camera position
   double            m_FocalPoint[3]; ///< Vector representing the camera focal point
-  double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
-  double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
+  //double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
+  //double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
+  double            m_StepCameraOrientation; ///< Step with which rotate the camera around its focal point.
+  double            m_TopBottomAccumulation;
+  double            m_LeftRigthAccumulation; 
+  double            m_TopBottomAccumulationLast;
+  double            m_LeftRigthAccumulationLast; 
   
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
