@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 19:36:10 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-06-24 11:32:57 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -234,6 +234,7 @@ void mmaMaterial::DeepCopy(const mafAttribute *a)
   // texture
   m_TextureID           = ((mmaMaterial *)a)->m_TextureID;
   m_TextureMappingMode  = ((mmaMaterial *)a)->m_TextureMappingMode;
+  m_TextureImage        = ((mmaMaterial *)a)->m_TextureImage;
   // lut
   m_HueRange[0]         = ((mmaMaterial *)a)->m_HueRange[0];
   m_HueRange[1]         = ((mmaMaterial *)a)->m_HueRange[1];
@@ -269,6 +270,7 @@ bool mmaMaterial::Equals(const mafAttribute *a)
       m_SpecularPower       == ((mmaMaterial *)a)->m_SpecularPower      &&
       m_Opacity             == ((mmaMaterial *)a)->m_Opacity            &&
       m_TextureID           == ((mmaMaterial *)a)->m_TextureID          &&
+      m_TextureImage        == ((mmaMaterial *)a)->m_TextureImage       &&
       m_HueRange[0]         == ((mmaMaterial *)a)->m_HueRange[0]        &&
       m_HueRange[1]         == ((mmaMaterial *)a)->m_HueRange[1]        &&
       m_SaturationRange[0]  == ((mmaMaterial *)a)->m_SaturationRange[0] &&
