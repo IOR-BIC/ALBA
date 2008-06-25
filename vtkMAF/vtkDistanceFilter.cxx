@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkDistanceFilter.cxx,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 13:59:49 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-06-25 12:38:20 $
+  Version:   $Revision: 1.6 $
 
 =========================================================================*/
 
@@ -23,7 +23,7 @@
 #include "assert.h"
 
 
-vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.5 $");
+vtkCxxRevisionMacro(vtkDistanceFilter, "$Revision: 1.6 $");
 vtkStandardNewMacro(vtkDistanceFilter);
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -184,6 +184,7 @@ void vtkDistanceFilter::ExecuteData(vtkDataObject *outputObject) {
         case VTK_UNSIGNED_CHAR:  distance = this->TraceRay(point, normal, (const unsigned char*)DataPointer); break;
         case VTK_CHAR:           distance = this->TraceRay(point, normal, (const char*)DataPointer); break;
         case VTK_FLOAT:          distance = this->TraceRay(point, normal, (const float*)DataPointer); break;
+        case VTK_DOUBLE:         distance = this->TraceRay(point, normal, (const double*)DataPointer); break;
         }
       if (scalars)
         scalars->SetTuple1(pi, distance);
@@ -215,6 +216,7 @@ void vtkDistanceFilter::ExecuteData(vtkDataObject *outputObject) {
         case VTK_UNSIGNED_CHAR:  density = this->FindDensity(point, (const unsigned char*)DataPointer); break;
         case VTK_CHAR:           density = this->FindDensity(point, (const char*)DataPointer); break;
         case VTK_FLOAT:          density = this->FindDensity(point, (const float*)DataPointer); break;
+        case VTK_DOUBLE:         density = this->FindDensity(point, (const double*)DataPointer); break;
         }
       if (scalars)
         scalars->SetTuple1(pi, density);
