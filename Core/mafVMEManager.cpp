@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 14:21:55 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2008-06-26 14:57:25 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -738,6 +738,18 @@ void mafVMEManager::NotifyAdd(mafNode *n)
   iter->IgnoreVisibleToTraverse(true);
   for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
   {
+    mafVMERoot *root = GetRoot();
+    if (root != NULL)
+    {
+      mafVME *vme = mafVME::SafeDownCast(node);
+      if (vme != NULL)
+      {
+        // Update the new VME added to the tree with the current time-stamp
+        // present in the tree.
+        vme->SetTimeStamp(root->GetTimeStamp());
+      }
+    }
+
     mafEventMacro(mafEvent(this,VME_ADDED,node));
     if (checkSingleFile)
     {
@@ -756,6 +768,7 @@ void mafVMEManager::NotifyAdd(mafNode *n)
     }
   }
   iter->Delete();
+  m_Modified = true;
 }
 //----------------------------------------------------------------------------
 void mafVMEManager::SetFileHistoryMenu(wxMenu *menu)
