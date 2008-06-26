@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-23 08:51:08 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-06-26 14:58:14 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -137,8 +137,12 @@ mafOp* mafOpExtractIsosurface::Copy()
 //----------------------------------------------------------------------------
 bool mafOpExtractIsosurface::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
-{
-  return vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume");
+{  
+  bool is3DData = false;
+  double bounds[6];
+  ((mafVME *)vme)->GetOutput()->GetVMEBounds(bounds);
+  is3DData = (bounds[0] != bounds[1] && bounds[2] != bounds[3] && bounds[4] != bounds[5]);
+  return vme != NULL && ((mafVME *)vme)->GetOutput()->IsA("mafVMEOutputVolume") && is3DData;
 }
 //----------------------------------------------------------------------------
 void mafOpExtractIsosurface::OpRun()
