@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgTreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:26:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-06-27 15:29:12 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -103,9 +103,6 @@ void mmgTreeContextualMenu::CreateContextualMenu(mmgCheckTree *tree, mafView *vi
   m_NodeActive  = vme;
   m_VmeActive   = mafVME::SafeDownCast(vme);
 
-  m_NodeTree    = tree;
-  m_Autosort    = m_NodeTree->GetAutoSort();
-  
   if(vme_menu)
 	{
     bool enable;
@@ -168,8 +165,15 @@ void mmgTreeContextualMenu::CreateContextualMenu(mmgCheckTree *tree, mafView *vi
 		this->FindItem(RMENU_DISABLE_CRYPT_SUBTREE)->Enable(enable);
 	}
 
-	this->Append(RMENU_AUTO_SORT,	"Keep tree nodes sorted","",true);
-	this->FindItem(RMENU_AUTO_SORT)->Check(m_Autosort);
+  m_NodeTree = tree;
+  if (m_NodeTree != NULL)
+  {
+    // m_NodeTree == NULL should be only in test mode.
+	  m_Autosort = m_NodeTree->GetAutoSort();
+	
+		this->Append(RMENU_AUTO_SORT,	"Keep tree nodes sorted","",true);
+		this->FindItem(RMENU_AUTO_SORT)->Check(m_Autosort);
+  }
 }
 //----------------------------------------------------------------------------
 void mmgTreeContextualMenu::ShowContextualMenu()
