@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:37:52 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-30 14:57:15 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -152,5 +152,8 @@ protected:
 	vtkPlaneSource *m_Plane;
 
 	double m_MaxBounds;
+
+  int m_ReverseExtrusion;
+  int m_NumVertices;
 };
 #endif

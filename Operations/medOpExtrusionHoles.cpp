@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:37:52 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-06-30 14:57:15 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -107,6 +107,10 @@ mafOp(label)
 	m_ExtrusionFactor		= 2.5;
 
 	m_MaxBounds = VTK_DOUBLE_MAX;
+
+  m_ReverseExtrusion = FALSE;
+
+  m_NumVertices = 50;
 }
 //----------------------------------------------------------------------------
 medOpExtrusionHoles::~medOpExtrusionHoles()
@@ -142,6 +146,8 @@ enum FILTER_SURFACE_ID
 	ID_EXTRUSION_FACTOR,
 	ID_EXTRUDE,
 	ID_RADIUS,
+  ID_REVERSE,
+  ID_NUM_VERTICES,
 };
 //----------------------------------------------------------------------------
 void medOpExtrusionHoles::OpRun()   
@@ -214,6 +220,25 @@ void medOpExtrusionHoles::OnEvent(mafEventBase *maf_event)
 	{
 		switch(e->GetId())
 		{
+    case ID_NUM_VERTICES:
+      {
+        m_ExtrusionFilter->SetMinNumberofEndPoints(m_NumVertices);
+        m_ExtrusionFilter->Update();
+        m_Rwi->CameraUpdate();
+      }
+      break;
+    case ID_REVERSE:
+      {
+        double dir[3];
+        m_ExtrusionFilter->GetDirection(dir);
+        dir[0]=-dir[0];
+        dir[1]=-dir[1];
+        dir[2]=-dir[2];
+        m_ExtrusionFilter->SetDirection(dir);
+        m_ExtrusionFilter->Update();
+        m_Rwi->CameraUpdate();
+      }
+      break;
 		case VME_PICKED:
 			{
 				//Get the picked point
@@ -289,6 +314,11 @@ void medOpExtrusionHoles::SaveExtrusion()
 void medOpExtrusionHoles::Extrude()
 //----------------------------------------------------------------------------
 {
+  if (m_ExtractHole->GetOutput()->GetNumberOfPoints()==0)
+  {
+  	return;
+  }
+
 	vtkMAFSmartPointer<vtkPoints> points;
 	if(m_MaxBounds<100)
 	{
@@ -337,7 +367,7 @@ void medOpExtrusionHoles::Extrude()
 
   double diameter = lenght/vtkMath::Pi();
   m_ExtrusionFilter->SetLength(m_ExtrusionFactor*diameter);
-  m_ExtrusionFilter->SetDirection(normal) ;
+  //m_ExtrusionFilter->SetDirection(normal) ;
 	m_ExtrusionFilter->SetInput(m_ExtractHole->GetOutput());
   m_ExtrusionFilter->GetOutput()->Update() ;
 	m_ExtrusionFilter->Update();
@@ -468,9 +498,17 @@ void medOpExtrusionHoles::CreateOpDialog()
 	wxTextCtrl *extrusion = new wxTextCtrl(m_Dialog,ID_EXTRUSION_FACTOR, _("extrusion factor"),p,wxSize(50, 16 ), wxNO_BORDER );
 	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(90,20));
 
+  wxStaticText *label3 = new wxStaticText(m_Dialog, -1, _("num. vertices"),p, wxSize(150, 16 ));
+  wxTextCtrl *num_vertices = new wxTextCtrl(m_Dialog,ID_NUM_VERTICES, _("num. vertices"),p,wxSize(50, 16 ), wxNO_BORDER );
+  num_vertices->SetValidator(mmgValidator(this,ID_NUM_VERTICES,num_vertices,&m_NumVertices,0.0,999.0));
+
+  //wxStaticText *label3 = new wxStaticText(m_Dialog, -1, _("extrusion factor (diameters)"),p, wxSize(150, 16 ));
+  wxCheckBox *chk_reverse =   new wxCheckBox(m_Dialog, ID_REVERSE,_("reverse"), p, wxSize(80,20));
+  chk_reverse->SetValidator( mmgValidator(this, ID_REVERSE, chk_reverse, &m_ReverseExtrusion));
+
 	b_extrude->SetValidator(mmgValidator(this,ID_EXTRUDE,b_extrude));
 	radius->SetValidator(mmgValidator(this,ID_RADIUS,radius,&m_SphereRadius,0.0,999.0));
-	extrusion->SetValidator(mmgValidator(this,ID_EXTRUSION_FACTOR,extrusion,&m_ExtrusionFactor,-999.0,999.0));
+	extrusion->SetValidator(mmgValidator(this,ID_EXTRUSION_FACTOR,extrusion,&m_ExtrusionFactor,0.0,999.0));
 
 	wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
 	h_sizer1->Add(label1,0,wxRIGHT);
@@ -480,6 +518,9 @@ void medOpExtrusionHoles::CreateOpDialog()
 	h_sizer2->Add(label2,0,wxRIGHT);
 	h_sizer2->Add(extrusion,0,wxRIGHT);
 	h_sizer2->Add(b_extrude,0,wxRIGHT);
+  h_sizer2->Add(chk_reverse,0,wxRIGHT);
+  h_sizer2->Add(label3,0,wxRIGHT);
+  h_sizer2->Add(num_vertices,0,wxRIGHT);
 
 	wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
 	v_sizer->Add(m_Rwi->m_RwiBase, 1,wxEXPAND);
