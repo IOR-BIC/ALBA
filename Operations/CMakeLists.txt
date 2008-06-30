@@ -96,6 +96,9 @@ SET(PROJECT_SRCS
 
   medOpSubdivide.cpp
   medOpSubdivide.h
+  
+  medOpImporterDicomXA.cpp
+  medOpImporterDicomXA.h
 )
 
 IF (MAF_USE_ITK)
