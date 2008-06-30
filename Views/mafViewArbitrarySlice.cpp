@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-19 09:52:35 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2008-06-30 12:58:20 $
+  Version:   $Revision: 1.37 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,7 +138,7 @@ void mafViewArbitrarySlice::PackageView()
 	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
   m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
-	m_ViewSlice = new mafViewVTK("",CAMERA_CT);
+	m_ViewSlice = new mafViewVTK("",CAMERA_FRONT);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
