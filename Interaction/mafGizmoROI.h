@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-13 11:57:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-01 13:47:19 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -98,6 +98,9 @@ public:
   /** Show gizmo handles */
   void ShowHandles(bool show);
 
+  /** Show shading planes */
+  void ShowShadingPlane(bool show);
+
   /** Show gizmo cube */
   void ShowROI(bool show);
 
@@ -112,8 +115,7 @@ public:
   /** Reset the gizmo*/
   void Reset();
 
-  void ShowShadingPlane(bool show);
-
+  /** Minimum handles size */
   void EnableMinimumHandleSize(bool value){m_EnableMinimumHandleSize = value;}
   void SetMinimumHandleSize(double value){m_MinimumHandleSize = value;}
 
@@ -152,7 +154,11 @@ protected:
   double m_Accumulator;
   double m_MinimumHandleSize;
   bool m_EnableMinimumHandleSize;
-  bool m_EnableMinimumDistanceBetweenGizmo;
+bool m_EnableMinimumDistanceBetweenGizmo;
+	
+  
+  /** friend test */
+  friend class mafGizmoROITest ;
 
 };
 #endif
