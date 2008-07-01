@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:11:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-01 13:47:19 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -157,6 +157,7 @@ public:
   void UpdateShadingPlaneDimension(double b[6]);
 
   void ShowShadingPlane(bool show);
+
   bool GetShowShadingPlaneOn(){return m_ShowShadingPlane;};
 
 protected:
@@ -220,5 +221,9 @@ protected:
   vtkPlane *m_ShadingPlane;
 
   double m_ShadingPlaneDimension[3];
+
+  /** friend test */
+  friend class mafGizmoROITest;
+
 };
 #endif

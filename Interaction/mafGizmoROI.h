@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-01 13:47:19 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-01 13:49:20 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,7 +118,6 @@ public:
   /** Minimum handles size */
   void EnableMinimumHandleSize(bool value){m_EnableMinimumHandleSize = value;}
   void SetMinimumHandleSize(double value){m_MinimumHandleSize = value;}
-
   void EnableMinimumDistanceBetweenGizmo(bool value){m_EnableMinimumDistanceBetweenGizmo = value;}
 
 protected:
@@ -154,9 +153,8 @@ protected:
   double m_Accumulator;
   double m_MinimumHandleSize;
   bool m_EnableMinimumHandleSize;
-bool m_EnableMinimumDistanceBetweenGizmo;
-	
-  
+  bool m_EnableMinimumDistanceBetweenGizmo;
+
   /** friend test */
   friend class mafGizmoROITest ;
 
