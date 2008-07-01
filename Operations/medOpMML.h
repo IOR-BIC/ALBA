@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:48:42 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-01 14:58:51 $
+Version:   $Revision: 1.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -188,10 +188,10 @@ protected:
   int m_Landmarksflag;
 
   // input vme and vtk data for volume and selected muscle polydata
-  mafVMEVolumeGray    *m_vol;
-  mafVMESurface       *m_surface;
-  vtkDataSet          *Volume;
-  vtkPolyData         *Muscle;
+  mafVMEVolumeGray    *m_Vol;
+  mafVMESurface       *m_Surface;
+  vtkDataSet          *m_Volume;
+  vtkPolyData         *m_Muscle;
 
   // other parameters
   //double m_ScansDistance;

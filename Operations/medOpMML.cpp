@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:48:42 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-01 14:58:51 $
+Version:   $Revision: 1.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -94,8 +94,8 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_OpType = OPTYPE_OP;
   m_Canundo = false;
 
-  m_vol         = NULL;
-  m_surface     = NULL;
+  m_Vol         = NULL;
+  m_Surface     = NULL;
 
   m_op_dlg      = NULL; // registration dialog
   m_radio       = NULL; // radio buttons
@@ -631,10 +631,10 @@ void medOpMML::OnMuscleSelection()
   if(!vme) return;
 
   // get vme surface
-  m_surface = mafVMESurface::SafeDownCast(vme);
+  m_Surface = mafVMESurface::SafeDownCast(vme);
 
   //
-  if(m_surface == NULL)
+  if(m_Surface == NULL)
   {
     wxMessageBox("Wrong type of vme, a muscle vme is required","alert",wxICON_WARNING);
     return;
@@ -730,7 +730,7 @@ void medOpMML::OnMuscleSelection()
     TypeOfMuscleTag = vme->GetTagArray()->GetTag("TYPE_OF_MUSCLE_TAG");
     m_muscle_type = TypeOfMuscleTag->GetComponentAsDouble(0);
 
-    // set m_surface to parent vme (original non-registered muscle)
+    // set m_Surface to parent vme (original non-registered muscle)
     // to identify landmarks correctly
     wxString ParentVMEName;
     ParentVMEName = m_surface_name.BeforeFirst('.');
@@ -758,20 +758,20 @@ void medOpMML::OnMuscleSelection()
     assert (!(MuscleInAtlasSectionVME == NULL));
 
     //
-    m_surface = mafVMESurface::SafeDownCast(MuscleInAtlasSectionVME);
+    m_Surface = mafVMESurface::SafeDownCast(MuscleInAtlasSectionVME);
   }
 
 
   // set polydata transform filter to get selected muscle
   vtkTransform *transform = vtkTransform::New();
   vtkTransformPolyDataFilter *musclepd = vtkTransformPolyDataFilter::New();
-  transform->SetMatrix(m_surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
-  musclepd->SetInput((vtkPolyData*)m_surface->GetOutput()->GetVTKData());
+  transform->SetMatrix(m_Surface->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+  musclepd->SetInput((vtkPolyData*)m_Surface->GetOutput()->GetVTKData());
   musclepd->SetTransform(transform);
   musclepd->Update();
 
   // set muscle as output from transform
-  Muscle = musclepd->GetOutput();
+  m_Muscle = musclepd->GetOutput();
 
 
   // clean up
@@ -1464,7 +1464,7 @@ void medOpMML::OnLandmark1AtlasPatientSelection()
 //----------------------------------------------------------------------------
 {
   //
-  if(m_surface == NULL)
+  if(m_Surface == NULL)
   {
     wxMessageBox("No muscle selected","alert",wxICON_WARNING);
     return;
@@ -1574,7 +1574,7 @@ void medOpMML::OnLandmark2AtlasPatientSelection()
 //----------------------------------------------------------------------------
 {
   //
-  if(m_surface == NULL)
+  if(m_Surface == NULL)
   {
     wxMessageBox("No muscle selected","alert",wxICON_WARNING);
     return;
@@ -1684,7 +1684,7 @@ void medOpMML::OnLandmark3AtlasPatientSelection()
 //----------------------------------------------------------------------------
 {
   //
-  if(m_surface == NULL)
+  if(m_Surface == NULL)
   {
     wxMessageBox("No muscle selected","alert",wxICON_WARNING);
     return;
@@ -1794,7 +1794,7 @@ void medOpMML::OnLandmark4AtlasPatientSelection()
 //----------------------------------------------------------------------------
 {
   //
-  if(m_surface == NULL)
+  if(m_Surface == NULL)
   {
     wxMessageBox("No muscle selected","alert",wxICON_WARNING);
     return;
@@ -2096,7 +2096,7 @@ bool medOpMML::CreateInputsDlg()
   //
   if (returncode == wxID_OK) // ok button pressed
   {
-    if (m_surface)
+    if (m_Surface)
     {
       return 1;
     }
@@ -2236,36 +2236,36 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(m_lut,0,wxEXPAND ,6);
 
   // get maf gray volume 
-  m_vol = mafVMEVolumeGray::SafeDownCast(m_Input);
-  assert(!(m_vol == NULL));
+  m_Vol = mafVMEVolumeGray::SafeDownCast(m_Input);
+  assert(!(m_Vol == NULL));
 
   /*vtkTransform *t = vtkTransform::New();
-  t->SetMatrix(m_vol->GetAbsMatrix());
+  t->SetMatrix(m_Vol->GetAbsMatrix());
 
   for(int i = 0; i < 4; i++)
   for(int j = 0; j < 4; j++)
   {
-  double element = m_vol->GetMatrix()->GetElement(i, j);
+  double element = m_Vol->GetMatrix()->GetElement(i, j);
   }*/
 
   /*vtkTransformFilter *tf = vtkTransformFilter::New();
-  tf->SetInput(vtkRectilinearGrid::SafeDownCast(m_vol->GetCurrentData()));
+  tf->SetInput(vtkRectilinearGrid::SafeDownCast(m_Vol->GetCurrentData()));
   tf->SetTransform(t);
   tf->Update();
-  Volume = tf->GetOutput();*/
+  m_Volume = tf->GetOutput();*/
 
 
   // get vtk rectilinear grid 
-  Volume = m_vol->GetOutput()->GetVTKData();
-  assert(!(Volume == NULL));
+  m_Volume = m_Vol->GetOutput()->GetVTKData();
+  assert(!(m_Volume == NULL));
 
   // polydata muscle should be known already from OnMuscleSelection()
-  assert(!(Muscle == NULL));
+  assert(!(m_Muscle == NULL));
 
   //
   // mml model view
   // create
-  Model = new medOpMMLModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, Muscle, Volume);
+  Model = new medOpMMLModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, m_Muscle, m_Volume);
   // initialise
   CreateFakeLandmarks();
   SetUpInputs();
