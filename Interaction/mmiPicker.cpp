@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 09:15:43 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -37,7 +37,7 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkCellPicker.h"
-#include "vtkRayCast3DPicker.h"
+#include "vtkMAFRayCast3DPicker.h"
 #include "vtkObjectFactory.h"
 #include "vtkPoints.h"
 #include "vtkRendererCollection.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-19 12:09:47 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.27 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@
 #include "vtkMath.h"
 #include "vtkImageData.h"
 #include "vtkPolyData.h"
-#include "vtkVolumeSlicer.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkLinearTransform.h"
 #include "vtkPointData.h"

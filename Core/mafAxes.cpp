@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAxes.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 13:40:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:30:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,8 +33,8 @@
 #include "vtkActor2D.h"
 #include "vtkProperty2D.h"
 #include "vtkCoordinate.h"
-#include "vtkLocalAxisCoordinate.h"
-#include "vtkGlobalAxisCoordinate.h"
+#include "vtkMAFLocalAxisCoordinate.h"
+#include "vtkMAFGlobalAxisCoordinate.h"
 
 //----------------------------------------------------------------------------
 mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme)
@@ -50,12 +50,12 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme)
 	if(m_Vme)
   {
 		m_Vme->GetOutput()->Update();  
-    m_Coord = vtkLocalAxisCoordinate::New();
-		((vtkLocalAxisCoordinate*) m_Coord)->SetMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
-		((vtkLocalAxisCoordinate*) m_Coord)->SetDataSet(m_Vme->GetOutput()->GetVTKData());
+    m_Coord = vtkMAFLocalAxisCoordinate::New();
+		((vtkMAFLocalAxisCoordinate*) m_Coord)->SetMatrix(m_Vme->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix());
+		((vtkMAFLocalAxisCoordinate*) m_Coord)->SetDataSet(m_Vme->GetOutput()->GetVTKData());
 
 		/*
-		vtkLocalAxisCoordinate *coord = vtkLocalAxisCoordinate::New();
+		vtkMAFLocalAxisCoordinate *coord = vtkMAFLocalAxisCoordinate::New();
 		coord->SetMatrix(m_Vme->GetAbsMatrix());
 		coord->SetDataSet(m_Vme->GetOutput()->GetVTKData());
 		m_Coord = coord;
@@ -63,7 +63,7 @@ mafAxes::mafAxes(vtkRenderer *ren, mafVME* vme)
   }
   else
   {
-		m_Coord = vtkGlobalAxisCoordinate::New();
+		m_Coord = vtkMAFGlobalAxisCoordinate::New();
   }
 
   m_AxesLUT = vtkLookupTable::New();
@@ -107,10 +107,10 @@ void mafAxes::SetVisibility(bool show)
 void mafAxes::SetPose( vtkMatrix4x4 *abs_pose_matrix )
 //----------------------------------------------------------------------------
 {
-  // WARNING - I am assuming that if m_Vme != NULL --> m_Coord ISA vtkLocalAxisCoordinate
+  // WARNING - I am assuming that if m_Vme != NULL --> m_Coord ISA vtkMAFLocalAxisCoordinate
   if(!m_Vme) return;
   assert(m_Coord);
-  vtkLocalAxisCoordinate *coord = (vtkLocalAxisCoordinate*) m_Coord; 
+  vtkMAFLocalAxisCoordinate *coord = (vtkMAFLocalAxisCoordinate*) m_Coord; 
   if( abs_pose_matrix )
     coord->SetMatrix(abs_pose_matrix);
   else

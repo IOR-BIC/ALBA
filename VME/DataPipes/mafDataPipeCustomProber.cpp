@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipeCustomProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:34:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@
 #include "vtkMAFDataPipe.h"
 #include "vtkDataSet.h"
 #include "vtkPolyDataNormals.h"
-#include "vtkDistanceFilter.h"
+#include "vtkMAFDistanceFilter.h"
 
 #include <assert.h>
 

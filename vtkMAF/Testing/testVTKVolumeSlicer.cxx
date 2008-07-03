@@ -20,7 +20,7 @@
 #include "vtkTimerLog.h"
 #include "vtkCamera.h"
 #include "vtkPlane.h"
-#include "vtkVolumeSlicer.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkTexture.h"
 #include "vtkProperty.h"
 
@@ -30,11 +30,11 @@
 int VolumeSlicerTest()
   //--------------------------------------------------------------------
 {  
-  vtkVolumeSlicer         *slicer;
-  vtkVolumeSlicer         *pslicer;
+  vtkMAFVolumeSlicer         *slicer;
+  vtkMAFVolumeSlicer         *pslicer;
 
-  slicer = vtkVolumeSlicer::New();
-  pslicer = vtkVolumeSlicer::New();
+  slicer = vtkMAFVolumeSlicer::New();
+  pslicer = vtkMAFVolumeSlicer::New();
 
   // create windows
   vtkMAFSmartPointer<vtkRenderer> renderer;

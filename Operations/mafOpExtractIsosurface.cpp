@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-26 14:58:14 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-03 11:29:50 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,16 +52,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPointData.h"
 #include "vtkProperty.h"
 #include "vtkActor.h"
-#include "vtkContourVolumeMapper.h"
+#include "vtkMAFContourVolumeMapper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkInteractorStyleTrackballCamera.h" 
 #include "vtkPolyData.h"
-#include "vtkFixedCutter.h"
+#include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkImageData.h"
 #include "vtkTexture.h"
-#include "vtkVolumeSlicer.h"
+#include "vtkMAFVolumeSlicer.h"
 #include "vtkSmartPointer.h"
 #include "vtkLookupTable.h"
 #include "vtkVolume.h"
@@ -390,7 +390,7 @@ void mafOpExtractIsosurface::CreateVolumePipeline()
 //----------------------------------------------------------------------------
 {
   vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
-  m_ContourVolumeMapper = vtkContourVolumeMapper::New();
+  m_ContourVolumeMapper = vtkMAFContourVolumeMapper::New();
   m_ContourVolumeMapper->SetInput(dataset);
   m_ContourVolumeMapper->AutoLODRenderOn();
   m_ContourVolumeMapper->AutoLODCreateOn();
@@ -471,8 +471,8 @@ void mafOpExtractIsosurface::CreateSlicePipeline()
   m_SliceYVect[1] = 1.0;
   m_SliceYVect[2] = 0.0;
 
-  m_PolydataSlicer = vtkVolumeSlicer::New();
-  m_VolumeSlicer	= vtkVolumeSlicer::New();
+  m_PolydataSlicer = vtkMAFVolumeSlicer::New();
+  m_VolumeSlicer	= vtkMAFVolumeSlicer::New();
   m_VolumeSlicer->SetPlaneOrigin(m_SliceOrigin);
   m_PolydataSlicer->SetPlaneOrigin(m_VolumeSlicer->GetPlaneOrigin());
   m_VolumeSlicer->SetPlaneAxisX(m_SliceXVect);
@@ -556,7 +556,7 @@ void mafOpExtractIsosurface::CreateSlicePipeline()
   m_CutterPlane->SetOrigin(m_SliceImage->GetOrigin());
   m_CutterPlane->SetNormal(0,0,1);
 
-  m_IsosurfaceCutter = vtkFixedCutter::New();
+  m_IsosurfaceCutter = vtkMAFFixedCutter::New();
   m_IsosurfaceCutter->SetCutFunction(m_CutterPlane);  
   m_IsosurfaceCutter->SetInput(contour);
   m_IsosurfaceCutter->Update();

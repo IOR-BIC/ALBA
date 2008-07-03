@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-04 17:04:31 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-03 11:30:13 $
+  Version:   $Revision: 1.4 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -137,7 +137,7 @@ void mafGUIDialogTransferFunction2D::ShowModal(mafVME *vme)
   
   if (this->m_VolumeProperty->GetTransferFunction2D() == NULL) 
 	{
-    this->m_TransferFunction = vtkTransferFunction2D::New();
+    this->m_TransferFunction = vtkMAFTransferFunction2D::New();
     this->m_VolumeProperty->SetTransferFunction2D(this->m_TransferFunction);
     this->m_TransferFunction->Delete();
   }
@@ -820,7 +820,7 @@ void mafGUIDialogTransferFunction2D::OnEvent(mafEventBase *maf_event)
 			}
       {
 			wxString string =	m_Vme->GetTagArray()->GetTag("VOLUME_TRANSFER_FUNCTION")->GetValue();
-      vtkTransferFunction2D *newf = vtkTransferFunction2D::New();
+      vtkMAFTransferFunction2D *newf = vtkMAFTransferFunction2D::New();
 			newf->DeepCopy(this->m_TransferFunction);
 			if (newf->LoadFromString(string.c_str()))
 				this->m_TransferFunction->DeepCopy(newf);
@@ -1030,7 +1030,7 @@ void mafGUIDialogTransferFunction2D::LoadTransferFunction()
 //----------------------------------------------------------------------------
 {
 	wxString string =	m_Vme->GetTagArray()->GetTag("VOLUME_TRANSFER_FUNCTION")->GetValue();
-  vtkTransferFunction2D *newf = vtkTransferFunction2D::New();
+  vtkMAFTransferFunction2D *newf = vtkMAFTransferFunction2D::New();
 	newf->DeepCopy(this->m_TransferFunction);
 	if (newf->LoadFromString(string.c_str()))
 		this->m_TransferFunction->DeepCopy(newf);

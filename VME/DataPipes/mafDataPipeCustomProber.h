@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataPipeCustomProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:17:03 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:34:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
-class vtkDistanceFilter;
+class vtkMAFDistanceFilter;
 class vtkPolyDataNormals;
 
 /** a data pipe which calculate new data depending on parameters given by the VME.
@@ -118,7 +118,7 @@ protected:
   mafNode *m_Volume;
 
   vtkPolyDataNormals *m_Normals;
-  vtkDistanceFilter  *m_Prober;
+  vtkMAFDistanceFilter  *m_Prober;
 
   float  m_DistThreshold;
   float  m_MaxDistance;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-24 09:10:46 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-07-03 11:30:29 $
+  Version:   $Revision: 1.22 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Forward References :
 //----------------------------------------------------------------------------
 class mafNode;
-class vtkGridActor;
+class vtkMAFGridActor;
 class vtkLight;
 class vtkCamera;
 class vtkRenderer;
@@ -31,7 +31,7 @@ class mafSceneGraph;
 class mafAxes;
 class mmgGui;
 class mmgPicButton;
-class vtkSimpleRulerActor2D;
+class vtkMAFSimpleRulerActor2D;
 class vtkMAFTextOrientator;
 
 //----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ protected:
   wxBoxSizer	 *m_Sizer;
 	
   mafAxes          *m_Axes; ///< Actor representing a global reference system.
-  vtkGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
+  vtkMAFGridActor     *m_Grid; ///< Actor representing a grid showed into the render window.
   int               m_ShowGrid; ///< Flag used to show/hide the grid.
   int               m_GridNormal;
   int               m_ShowAxes;  ///< Flag used to show/hide axes in low left corner of the view
@@ -175,7 +175,7 @@ protected:
 
   double        m_RulerScaleFactor;
   mafString     m_RulerLegend;
-  vtkSimpleRulerActor2D *m_Ruler;
+  vtkMAFSimpleRulerActor2D *m_Ruler;
   int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
   int           m_StereoType;
 	vtkMAFTextOrientator     *m_Orientator;

@@ -8,61 +8,61 @@ PROJECT(vtkMAF)
 # Set your list of sources here.  Do not change the name of the
 # vtkMAF_SRCS variable.
 SET(vtkMAF_SRCS
-  vtkCellsFilter.cxx
-  vtkCellsFilter.h  
-  vtkRemoveCellsFilter.cxx
-  vtkRemoveCellsFilter.h
-  vtkClipSurfaceBoundingBox.cxx
-  vtkClipSurfaceBoundingBox.h
-  vtkContourVolumeMapper.cxx
-  vtkContourVolumeMapper.h
-#  vtkContourVolumeMapperAdv.cxx
-  vtkDistanceFilter.cxx
-  vtkDistanceFilter.h
-  vtkDOFMatrix.cxx
-  vtkDOFMatrix.h
-  vtkExtendedGlyph3D.cxx
-  vtkExtendedGlyph3D.h
-  vtkFixedCutter.cxx
-  vtkFixedCutter.h
-  vtkGlobalAxisCoordinate.cxx
-  vtkGlobalAxisCoordinate.h
-  vtkGridActor.cxx
-  vtkGridActor.h
-  vtkHistogram.cxx
-  vtkHistogram.h
-  vtkImplicitPolyData.cxx
-  vtkImplicitPolyData.h
-  vtkLocalAxisCoordinate.cxx
-  vtkLocalAxisCoordinate.h
+  vtkMAFCellsFilter.cxx
+  vtkMAFCellsFilter.h  
+  vtkMAFRemoveCellsFilter.cxx
+  vtkMAFRemoveCellsFilter.h
+  vtkMAFClipSurfaceBoundingBox.cxx
+  vtkMAFClipSurfaceBoundingBox.h
+  vtkMAFContourVolumeMapper.cxx
+  vtkMAFContourVolumeMapper.h
+#  vtkMAFContourVolumeMapperAdv.cxx
+  vtkMAFDistanceFilter.cxx
+  vtkMAFDistanceFilter.h
+  vtkMAFDOFMatrix.cxx
+  vtkMAFDOFMatrix.h
+  vtkMAFExtendedGlyph3D.cxx
+  vtkMAFExtendedGlyph3D.h
+  vtkMAFFixedCutter.cxx
+  vtkMAFFixedCutter.h
+  vtkMAFGlobalAxisCoordinate.cxx
+  vtkMAFGlobalAxisCoordinate.h
+  vtkMAFGridActor.cxx
+  vtkMAFGridActor.h
+  vtkMAFHistogram.cxx
+  vtkMAFHistogram.h
+  vtkMAFImplicitPolyData.cxx
+  vtkMAFImplicitPolyData.h
+  vtkMAFLocalAxisCoordinate.cxx
+  vtkMAFLocalAxisCoordinate.h
   vtkMAFAdaptiveVolumeMapper.cxx
   vtkMAFAdaptiveVolumeMapper.h
   vtkMAFImageMapToWidgetColors.cxx
   vtkMAFImageMapToWidgetColors.h
   vtkMAFMeshCutter.cxx
   vtkMAFMeshCutter.h
-  vtkProjectRG.cxx
-  vtkProjectRG.h
-  vtkProjectSP.cxx
-  vtkProjectSP.h
-  vtkRayCast3DPicker.cxx
-  vtkRayCast3DPicker.h
-  vtkRectilinearGridToRectilinearGridFilter.cxx
-  vtkRectilinearGridToRectilinearGridFilter.h
-  vtkRGSliceAccumulate.cxx
-  vtkRGSliceAccumulate.h
-  vtkRulerActor2D.cxx
-  vtkRulerActor2D.h
-  vtkSimpleRulerActor2D.cxx
-  vtkSimpleRulerActor2D.h
-  vtkTextActorMeter.cxx
-  vtkTextActorMeter.h
-  vtkTransferFunction2D.cxx
-  vtkTransferFunction2D.h
-  vtkVolumeResample.h
-  vtkVolumeResample.cxx
-  vtkVolumeSlicer.cxx
-  vtkVolumeSlicer.h
+  vtkMAFProjectRG.cxx
+  vtkMAFProjectRG.h
+  vtkMAFProjectSP.cxx
+  vtkMAFProjectSP.h
+  vtkMAFRayCast3DPicker.cxx
+  vtkMAFRayCast3DPicker.h
+  vtkMAFRectilinearGridToRectilinearGridFilter.cxx
+  vtkMAFRectilinearGridToRectilinearGridFilter.h
+  vtkMAFRGSliceAccumulate.cxx
+  vtkMAFRGSliceAccumulate.h
+  vtkMAFRulerActor2D.cxx
+  vtkMAFRulerActor2D.h
+  vtkMAFSimpleRulerActor2D.cxx
+  vtkMAFSimpleRulerActor2D.h
+  vtkMAFTextActorMeter.cxx
+  vtkMAFTextActorMeter.h
+  vtkMAFTransferFunction2D.cxx
+  vtkMAFTransferFunction2D.h
+  vtkMAFVolumeResample.h
+  vtkMAFVolumeResample.cxx
+  vtkMAFVolumeSlicer.cxx
+  vtkMAFVolumeSlicer.h
   vtkMAFPolyDataToSinglePolyLine.cxx
   vtkMAFPolyDataToSinglePolyLine.h
   vtkMAFTextOrientator.cxx

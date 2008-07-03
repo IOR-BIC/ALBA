@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 15:12:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-03 11:29:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 
-#include "vtkDistanceFilter.h"
+#include "vtkMAFDistanceFilter.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"

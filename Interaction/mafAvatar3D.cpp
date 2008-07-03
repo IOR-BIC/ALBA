@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 12:20:37 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.11 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,7 +47,7 @@
 #include "vtkAxes.h"
 #include "vtkAssembly.h"
 #include "vtkProperty.h"
-#include "vtkRayCast3DPicker.h"
+#include "vtkMAFRayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkMatrix4x4.h"
 
@@ -154,7 +154,7 @@ void mafAvatar3D::SetDebugTextPosition(double posx, double posy)
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::SetPicker3D(vtkRayCast3DPicker *picker)
+void mafAvatar3D::SetPicker3D(vtkMAFRayCast3DPicker *picker)
 //------------------------------------------------------------------------------
 {
   vtkDEL(m_Picker3D);
@@ -635,7 +635,7 @@ vtkAbstractPropPicker *mafAvatar3D::GetPicker()
 }
 
 //------------------------------------------------------------------------------
-vtkRayCast3DPicker *mafAvatar3D::GetPicker3D()
+vtkMAFRayCast3DPicker *mafAvatar3D::GetPicker3D()
 //------------------------------------------------------------------------------
 {
   return m_Picker3D;

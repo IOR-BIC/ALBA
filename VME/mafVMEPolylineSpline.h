@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-05 08:20:43 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkVolumeSlicer;
+class vtkMAFVolumeSlicer;
 class vtkPolyData;
 class mafNode;
 class vtkPoints;

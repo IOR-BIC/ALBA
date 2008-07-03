@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:29:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,14 +44,14 @@
 #include "vtkPlane.h"
 #include "vtkPlaneSource.h"
 #include "vtkClipPolyData.h"
-#include "vtkImplicitPolyData.h"
+#include "vtkMAFImplicitPolyData.h"
 #include "vtkLinearSubdivisionFilter.h"
 #include "vtkTriangleFilter.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkArrowSource.h"
 #include "vtkGlyph3D.h"
 #include "vtkAppendPolyData.h"
-#include "vtkClipSurfaceBoundingBox.h"
+#include "vtkMAFClipSurfaceBoundingBox.h"
 
 
 //----------------------------------------------------------------------------
@@ -602,7 +602,7 @@ int mafOpClipSurface::Clip()
     transform_data_clipper->SetInput((vtkPolyData *)m_ClipperVME->GetOutput()->GetVTKData());
     transform_data_clipper->Update();
 
-		vtkMAFSmartPointer<vtkImplicitPolyData> implicitPolyData;
+		vtkMAFSmartPointer<vtkMAFImplicitPolyData> implicitPolyData;
 		implicitPolyData->SetInput(transform_data_clipper->GetOutput());
 		m_Clipper->SetInput(subdivider->GetOutput());
 		m_Clipper->SetClipFunction(implicitPolyData);

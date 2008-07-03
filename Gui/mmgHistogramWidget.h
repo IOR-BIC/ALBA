@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-27 12:52:11 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-07-03 11:30:13 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 #include "mafDecl.h"
 #include "mafEvent.h"
 
-#include "vtkHistogram.h"
+#include "vtkMAFHistogram.h"
 
 //----------------------------------------------------------------------------
 // forward refs
@@ -101,7 +101,7 @@ public:
   double GetLogScaleConstant() {return m_LogScaleConstant;};
 
   /** Allow to set the histogram representation.
-  Possible values are: vtkHistogram::POINT_REPRESENTATION, vtkHistogram::LINE_REPRESENTATION or vtkHistogram::BAR_REPRESENTATION*/
+  Possible values are: vtkMAFHistogram::POINT_REPRESENTATION, vtkMAFHistogram::LINE_REPRESENTATION or vtkMAFHistogram::BAR_REPRESENTATION*/
   void SetRepresentation(int represent);
 
   void GetSelectedRange(double range[2]);
@@ -118,7 +118,7 @@ protected:
   /** Create GUI for histogram widget.*/
   void CreateGui();
 
-  /** Update UI parameters according to the vtkHistogram.*/
+  /** Update UI parameters according to the vtkMAFHistogram.*/
   void UpdateGui();
 
   /** Enable/disable view widgets.*/
@@ -146,7 +146,7 @@ protected:
   vtkLookupTable*m_Lut;
   vtkDataArray  *m_Data;
   mafRWI        *m_HistogramRWI;
-  vtkHistogram  *m_Histogram;
+  vtkMAFHistogram  *m_Histogram;
 	vtkImageData  *m_HistogramData;
 };
 #endif

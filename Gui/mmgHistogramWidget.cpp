@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmgHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-27 12:52:11 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2008-07-03 11:30:13 $
+Version:   $Revision: 1.16 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -68,7 +68,7 @@ mmgHistogramWidget::mmgHistogramWidget(wxWindow* parent, wxWindowID id, const wx
   
   vtkNEW(m_Histogram);
   m_Histogram->SetColor(1,1,1);
-  m_Histogram->SetHisctogramRepresentation(vtkHistogram::LINE_REPRESENTATION);
+  m_Histogram->SetHisctogramRepresentation(vtkMAFHistogram::LINE_REPRESENTATION);
 
   m_HistogramRWI = new mafRWI(mafGetFrame());
   m_HistogramRWI->SetListener(this);
@@ -302,13 +302,13 @@ void mmgHistogramWidget::SetRepresentation(int represent)
 {
   switch(represent) 
   {
-    case vtkHistogram::POINT_REPRESENTATION:
-    case vtkHistogram::LINE_REPRESENTATION:
-    case vtkHistogram::BAR_REPRESENTATION:
+    case vtkMAFHistogram::POINT_REPRESENTATION:
+    case vtkMAFHistogram::LINE_REPRESENTATION:
+    case vtkMAFHistogram::BAR_REPRESENTATION:
       m_Representation = represent;
   	break;
     default:
-      m_Representation = vtkHistogram::POINT_REPRESENTATION;
+      m_Representation = vtkMAFHistogram::POINT_REPRESENTATION;
   }
   m_Histogram->SetHisctogramRepresentation(m_Representation);
   if (m_Gui != NULL)
@@ -339,7 +339,7 @@ void mmgHistogramWidget::ResetHistogram()
   AutoscaleHistogram(0);
   LogarithmicScale(0);
   SetLogScaleConstant(10);
-  SetRepresentation(vtkHistogram::LINE_REPRESENTATION);
+  SetRepresentation(vtkMAFHistogram::LINE_REPRESENTATION);
   AutoscaleHistogram(1);
   if(m_Slider != NULL && m_Lut != NULL)
   {

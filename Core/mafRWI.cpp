@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-24 09:11:07 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2008-07-03 11:30:29 $
+  Version:   $Revision: 1.47 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@
 #include "mafVMELandmarkCloud.h"
 #include "mafAbsMatrixPipe.h"
 
-#include "vtkGridActor.h"  // users must see GRID_XYZ const declared in vtkGridActor
+#include "vtkMAFGridActor.h"  // users must see GRID_XYZ const declared in vtkMAFGridActor
 #include "vtkLight.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
@@ -47,7 +47,7 @@
 #include "vtkActor.h"
 #include "vtkActor2D.h"
 #include "vtkDataSet.h"
-#include "vtkSimpleRulerActor2D.h"
+#include "vtkMAFSimpleRulerActor2D.h"
 #include "vtkMAFTextOrientator.h"
 
 #define DEFAULT_BG_COLOR 0.28
@@ -216,7 +216,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   m_ShowGrid    = use_grid;
   m_GridNormal  = GRID_Z;
 
-  m_Grid = vtkGridActor::New();
+  m_Grid = vtkMAFGridActor::New();
   m_RenFront->AddActor(m_Grid);
   m_RenFront->AddActor2D(m_Grid->GetLabelActor());
   SetGridNormal(m_GridNormal);

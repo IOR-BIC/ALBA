@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3DCone.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-08-24 16:13:54 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,7 +23,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkAssembly.h"
 #include "vtkProperty.h"
-#include "vtkRayCast3DPicker.h"
+#include "vtkMAFRayCast3DPicker.h"
 #include "vtkLineSource.h"
 #include "vtkTubeFilter.h"
 #include "vtkRenderer.h"

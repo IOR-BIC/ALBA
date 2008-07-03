@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:57:56 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,7 +23,7 @@
 #include <map>
 
 //#include "vtkMatrix4x4.h"
-//#include "vtkDOFMatrix.h"
+//#include "vtkMAFDOFMatrix.h"
 
 //----------------------------------------------------------------------------
 //forward ref

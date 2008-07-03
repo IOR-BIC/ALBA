@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:41:36 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 11:30:29 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,7 +34,7 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkVolumeProperty.h"
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mmaVolumeMaterial)

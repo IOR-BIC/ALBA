@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-23 08:51:08 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-03 11:29:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class mafNode;
 class mafRWI;
 
 class vtkActor;
-class vtkContourVolumeMapper;
+class vtkMAFContourVolumeMapper;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkRenderer;
@@ -38,8 +38,8 @@ class mmiExtractIsosurface;
 class vtkImageData;
 class vtkTexture;
 class vtkPolyData;
-class vtkVolumeSlicer;
-class vtkFixedCutter;
+class vtkMAFVolumeSlicer;
+class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkVolume;
 
@@ -108,12 +108,12 @@ protected:
   //vtkPolyDataMapper       *m_ContourMapper;
   vtkVolume                *m_ContourActor;
   vtkActor                *m_Box;
-  vtkContourVolumeMapper  *m_ContourVolumeMapper; 
+  vtkMAFContourVolumeMapper  *m_ContourVolumeMapper; 
   vtkOutlineCornerFilter  *m_OutlineFilter;
   vtkPolyDataMapper       *m_OutlineMapper;
 
-  vtkVolumeSlicer   *m_VolumeSlicer;
-  vtkVolumeSlicer   *m_PolydataSlicer;
+  vtkMAFVolumeSlicer   *m_VolumeSlicer;
+  vtkMAFVolumeSlicer   *m_PolydataSlicer;
   vtkImageData      *m_SliceImage;
   vtkTexture        *m_SliceTexture;
   vtkPolyData       *m_Polydata;          // copy of polydata used by slicer
@@ -122,7 +122,7 @@ protected:
   vtkPolyDataMapper *m_PolydataMapper;
   vtkActor          *m_PolydataActor;
   vtkPlane          *m_CutterPlane;
-  vtkFixedCutter    *m_IsosurfaceCutter;
+  vtkMAFFixedCutter    *m_IsosurfaceCutter;
 
   mmiExtractIsosurface *m_DensityPicker;
 

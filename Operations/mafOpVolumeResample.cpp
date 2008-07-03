@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:29:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafTransformFrame.h"
 
 #include "vtkMAFSmartPointer.h"
-#include "vtkVolumeResample.h"
+#include "vtkMAFVolumeResample.h"
 #include "vtkOutlineSource.h"
 #include "vtkProperty.h"
 #include "vtkPolyData.h"
@@ -336,7 +336,7 @@ void mafOpVolumeResample::Resample()
       if (vtkDataSet *input_data = input_item->GetData())
       {
         // the resample filter
-        vtkMAFSmartPointer<vtkVolumeResample> resampler;
+        vtkMAFSmartPointer<vtkMAFVolumeResample> resampler;
         resampler->SetZeroValue(m_ZeroPadValue);
 
         // Set the target be vme's parent frame. And Input frame to the root. I've to 

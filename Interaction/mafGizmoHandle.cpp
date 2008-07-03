@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:11:19 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@
 #include "vtkPolyData.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
-#include "vtkDOFMatrix.h"
+#include "vtkMAFDOFMatrix.h"
 #include "vtkPlane.h"
 #include "vtkPlaneSource.h"
 
@@ -561,11 +561,11 @@ void mafGizmoHandle::Update()
 			// place the gizmo
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::X, m_TranslationIntervals[0]);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::BOUNDS, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkMAFDOFMatrix::X, m_TranslationIntervals[0]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::FREE, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[0]);
@@ -590,11 +590,11 @@ void mafGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::X, m_TranslationIntervals[1]);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::BOUNDS, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkMAFDOFMatrix::X, m_TranslationIntervals[1]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::FREE, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[1]);
@@ -619,11 +619,11 @@ void mafGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Y, m_TranslationIntervals[2]);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::BOUNDS, vtkMAFDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkMAFDOFMatrix::Y, m_TranslationIntervals[2]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::FREE, vtkMAFDOFMatrix::LOCK);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[2]);
@@ -648,11 +648,11 @@ void mafGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS, vtkDOFMatrix::LOCK);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Y, m_TranslationIntervals[3]);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::BOUNDS, vtkMAFDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkMAFDOFMatrix::Y, m_TranslationIntervals[3]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE, vtkDOFMatrix::LOCK);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::FREE, vtkMAFDOFMatrix::LOCK);
 			
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[3]);
@@ -677,11 +677,11 @@ void mafGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Z, m_TranslationIntervals[4]);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::BOUNDS);
+				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkMAFDOFMatrix::Z, m_TranslationIntervals[4]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::FREE);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[4]);
@@ -704,11 +704,11 @@ void mafGizmoHandle::Update()
 
 			if(m_ConstraintModality==BOUNDS)
 			{
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::BOUNDS);
-				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkDOFMatrix::Z, m_TranslationIntervals[5]);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::BOUNDS);
+				m_IsaGen->GetTranslationConstraint()->SetBounds(vtkMAFDOFMatrix::Z, m_TranslationIntervals[5]);
 			}
 			else if(m_ConstraintModality==FREE)
-				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkDOFMatrix::LOCK, vtkDOFMatrix::LOCK, vtkDOFMatrix::FREE);
+				m_IsaGen->GetTranslationConstraint()->SetConstraintModality(vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::LOCK, vtkMAFDOFMatrix::FREE);
 
 			m_TranslateBoxTrEnd->Identity();
 			m_TranslateBoxTrEnd->Translate(m_BBCenters[5]);

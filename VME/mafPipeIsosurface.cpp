@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-13 17:19:06 $
-Version:   $Revision: 1.22 $
+Date:      $Date: 2008-07-03 11:29:30 $
+Version:   $Revision: 1.23 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProperty.h"
 #include "vtkActor.h"
 #include "vtkVolume.h"
-#include "vtkContourVolumeMapper.h"
+#include "vtkMAFContourVolumeMapper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
 

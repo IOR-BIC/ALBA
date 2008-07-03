@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DAngle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:28:10 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@
 #include "vtkTextProperty.h"
 #include "vtkImageImport.h"
 #include "vtkImageAccumulate.h"
-#include "vtkTextActorMeter.h"
+#include "vtkMAFTextActorMeter.h"
 
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
@@ -282,7 +282,7 @@ void mmi2DAngle::DrawMeasureTool(double x, double y)
 		m_EndMeasure = false;
     
     m_MeterVector.push_back(NULL);
-    m_MeterVector[m_MeterVector.size()-1] = vtkTextActorMeter::New();
+    m_MeterVector[m_MeterVector.size()-1] = vtkMAFTextActorMeter::New();
     // initialization
     
     m_Angle = 0.0;

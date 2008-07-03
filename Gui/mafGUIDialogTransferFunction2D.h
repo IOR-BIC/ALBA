@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-10 13:42:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-03 11:30:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,7 +19,7 @@
 #include "mmgDialog.h"
 
 #include "vtkProp.h"
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -36,7 +36,7 @@ class vtkViewport;
 class vtkRenderWindow;
 class vtkRenderer;
 class vtkVolumeProperty2;
-class vtkTransferFunction2D;
+class vtkMAFTransferFunction2D;
 class vtkMAFAdaptiveVolumeMapper;
 class vtkImageMapper;
 class vtkMAFImageMapToWidgetColors;
@@ -93,7 +93,7 @@ protected:
   mafVME                *m_Vme;
   mmaVolumeMaterial     *m_Material;
 	vtkVolumeProperty2  	*m_VolumeProperty;
-  vtkTransferFunction2D *m_TransferFunction;
+  vtkMAFTransferFunction2D *m_TransferFunction;
   
   // slice preview
   wxNotebook            *m_preview_book;
@@ -163,7 +163,7 @@ public:
 
   int RenderOverlay (vtkViewport *);
 
-  void SetTransferFunction(vtkTransferFunction2D *tf);
+  void SetTransferFunction(vtkMAFTransferFunction2D *tf);
   void SetViewportRange(double xmin, double xmax, double ymin, double ymax) { ViewportRange[0] = xmin; ViewportRange[1] = xmax; ViewportRange[2] = ymin; ViewportRange[3] = ymax; }
   const double *GetViewportRange() const { return this->ViewportRange; }
 
@@ -181,7 +181,7 @@ protected:
   vtkWidgetActor(const vtkWidgetActor&); // no implementation
   void operator=(const vtkWidgetActor&); // no implementation
 
-  vtkTransferFunction2D *TransferFunction;
+  vtkMAFTransferFunction2D *TransferFunction;
   double                 ViewportRange[4]; // xmin, xmax, ymin, ymax
   int                    SelectedWidget;
   int                    HighlightedWidget;

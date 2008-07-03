@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 16:25:29 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 11:29:50 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,14 +34,14 @@
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 
-#include "vtkVolumeResample.h"
+#include "vtkMAFVolumeResample.h"
 #include "vtkImageData.h"
 #include "vtkDataSet.h"
 #include "vtkImageGaussianSmooth.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageThreshold.h"
 #include "vtkMatrix4x4.h"
-#include "vtkContourVolumeMapper.h"
+#include "vtkMAFContourVolumeMapper.h"
 #include "vtkStructuredPoints.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkMAFSmartPointer.h"
@@ -432,7 +432,7 @@ void mafOpLabelExtractor::ExtractLabel()
     output_extent[5] = (bounds[5] - bounds[4]) / volumeSpacing[2];
 
     // the resample filter
-    vtkMAFSmartPointer<vtkVolumeResample> resampler;
+    vtkMAFSmartPointer<vtkMAFVolumeResample> resampler;
     resampler->SetZeroValue(0);
 
     double origin[3];
@@ -543,7 +543,7 @@ void mafOpLabelExtractor::ExtractLabel()
   imageToSp->SetInput(vol);
   imageToSp->Update();
  
-  vtkMAFSmartPointer<vtkContourVolumeMapper> contourMapper;
+  vtkMAFSmartPointer<vtkMAFContourVolumeMapper> contourMapper;
   contourMapper->SetInput((vtkDataSet *)imageToSp->GetOutput());
   contourMapper->SetContourValue(m_ValLabel);
 

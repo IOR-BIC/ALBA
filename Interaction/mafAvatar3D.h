@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2006-02-21 12:20:11 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@ class mafTransform;
 class mafCameraTransform;
 class mafView;
 class mafEventBase;
-class vtkRayCast3DPicker;
+class vtkMAFRayCast3DPicker;
 class vtkTextMapper;
 class vtkActor2D;
 class vtkOutlineSource;
@@ -98,7 +98,7 @@ public:
   virtual void Show();
   
   /** Return picker 3D used by 3DAvatar for picking */
-  vtkRayCast3DPicker *GetPicker3D();
+  vtkMAFRayCast3DPicker *GetPicker3D();
 
   /** Return picker 2D used by 3DAvatar for 2D picking */
   vtkCellPicker *GetPicker2D();
@@ -218,7 +218,7 @@ protected:
   virtual void OnPostResetCamera(mafEventBase *event);
 
   /** Internally used to redefine the 3D picker class */  
-  void SetPicker3D(vtkRayCast3DPicker *picker);
+  void SetPicker3D(vtkMAFRayCast3DPicker *picker);
 
   vtkProp3D*          m_WorkingBoxActor; ///< Prop3D of the working box
   vtkOutlineSource*   m_WorkingBox; ///< Working box the tracker coords are mapped to
@@ -228,7 +228,7 @@ protected:
 
   mafMatrix           m_LastPoseMatrix;
 
-  vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
+  vtkMAFRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
   vtkCellPicker*      m_Picker2D;
 
 

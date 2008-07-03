@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-06 11:55:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-03 11:29:50 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkClipPolyData.h"
-#include "vtkImplicitPolyData.h"
+#include "vtkMAFImplicitPolyData.h"
 #include "vtkLinearSubdivisionFilter.h"
 #include "vtkTriangleFilter.h"
 #include "vtkPlaneSource.h"
@@ -465,7 +465,7 @@ void mafOpBooleanSurface::Intersection()
 			subdivider->SetNumberOfSubdivisions(m_Subdivision);   //  use  this  (0-3+)  to  see improvement in clipping
 			subdivider->Update();
 
-			vtkImplicitPolyData *implicitPolyData;
+			vtkMAFImplicitPolyData *implicitPolyData;
 			vtkNEW(implicitPolyData);
 			implicitPolyData->SetInput(transformSecondDataInput->GetOutput());
 
@@ -685,7 +685,7 @@ void mafOpBooleanSurface::Difference()
 			subdivider->SetNumberOfSubdivisions(m_Subdivision);   //  use  this  (0-3+)  to  see improvement in clipping
 			subdivider->Update();
 
-			vtkImplicitPolyData *implicitPolyData;
+			vtkMAFImplicitPolyData *implicitPolyData;
 			vtkNEW(implicitPolyData);
 			implicitPolyData->SetInput(transformSecondDataInput->GetOutput());
 

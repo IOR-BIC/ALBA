@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVOIDensity.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:29:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
 #include "vtkDataSet.h"
-#include "vtkImplicitPolyData.h"
+#include "vtkMAFImplicitPolyData.h"
 #include "vtkTransformPolyDataFilter.h"
 
 #define min(x0, x1) (((x0) < (x1)) ? (x0) : (x1))
@@ -239,7 +239,7 @@ void mafOpVOIDensity::ExtractVolumeScalars()
   TransformDataClipper->SetInput(polydata);
   TransformDataClipper->Update();
 
-	vtkMAFSmartPointer<vtkImplicitPolyData> ImplicitSurface;
+	vtkMAFSmartPointer<vtkMAFImplicitPolyData> ImplicitSurface;
 	ImplicitSurface->SetInput(TransformDataClipper->GetOutput());
 
 	vtkMAFSmartPointer<vtkPlanes> ImplicitBox;

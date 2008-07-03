@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 14:09:12 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -19,7 +19,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class vtkSphereSource;
 class vtkPolyDataNormals;
-class vtkExtendedGlyph3D;
+class vtkMAFExtendedGlyph3D;
 class vtkPolyDataMapper;
 class vtkActor;
 class mafVMELandmarkCloud;
@@ -63,7 +63,7 @@ public:
 protected:
   vtkSphereSource			   *m_SphereSource;
   vtkPolyDataNormals     *m_Normals;
-  vtkExtendedGlyph3D     *m_Glyph;
+  vtkMAFExtendedGlyph3D     *m_Glyph;
   vtkPolyDataMapper			 *m_CloudMapper;
   vtkActor               *m_CloudActor;
 

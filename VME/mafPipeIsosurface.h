@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2008-04-22 11:30:49 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2008-07-03 11:29:30 $
+Version:   $Revision: 1.14 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,7 +20,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class vtkActor;
 class vtkVolume;
-class vtkContourVolumeMapper;
+class vtkMAFContourVolumeMapper;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class mafVME;
@@ -89,7 +89,7 @@ protected:
 
 	mafVMESurface            *m_IsosurfaceVme;
 
-	vtkContourVolumeMapper   *m_ContourMapper; 
+	vtkMAFContourVolumeMapper   *m_ContourMapper; 
 	vtkVolume                *m_Volume;
 
 	vtkOutlineCornerFilter   *m_OutlineBox;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-06 11:55:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-03 11:29:50 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 #include "vtkVolume.h"
-#include "vtkRemoveCellsFilter.h"
+#include "vtkMAFRemoveCellsFilter.h"
 #include "vtkMath.h"
 #include "vtkIdList.h"
 #include "vtkTriangle.h"
@@ -284,7 +284,7 @@ void mafOpRemoveCells::CreateSurfacePipeline()
 {
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
-  m_rcf = vtkRemoveCellsFilter::New();
+  m_rcf = vtkMAFRemoveCellsFilter::New();
   m_rcf->SetInput(polydata);
   m_rcf->Update();
 

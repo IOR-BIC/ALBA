@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:59:03 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.16 $
   Authors:   Paolo Quadrani - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,8 +39,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTexture.h"
 #include "vtkProbeFilter.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkProjectSP.h"
-#include "vtkProjectRG.h"
+#include "vtkMAFProjectSP.h"
+#include "vtkMAFProjectRG.h"
 #include "vtkProperty.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -85,8 +85,8 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	vtkPlaneSource     *RXPlane       = NULL;
 	vtkPolyDataMapper  *RXPlaneMapper	= NULL;
 	vtkTexture         *RXTexture			= NULL;
-	vtkProjectSP       *SPProjection	= NULL;
-	vtkProjectRG       *RGProjection	= NULL;
+	vtkMAFProjectSP       *SPProjection	= NULL;
+	vtkMAFProjectRG       *RGProjection	= NULL;
 	
   vtkDataSet *vtk_data = m_Vme->GetOutput()->GetVTKData();
   vtk_data->Update();
@@ -133,7 +133,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
 	if (vtk_data->IsA("vtkStructuredPoints"))
 	{
-		SPProjection = vtkProjectSP::New();
+		SPProjection = vtkMAFProjectSP::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,SPProjection));
 		SPProjection->SetInput(((vtkStructuredPoints *)vtk_data));
 		if (m_CamPosition == CAMERA_RX_FRONT )
@@ -147,7 +147,7 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 
   if (vtk_data->IsA("vtkRectilinearGrid"))
 	{
-		RGProjection = vtkProjectRG::New();
+		RGProjection = vtkMAFProjectRG::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,RGProjection));
 		RGProjection->SetInput(vtkRectilinearGrid::SafeDownCast(vtk_data));
 		vtkStructuredPoints *SP = vtkStructuredPoints::New();

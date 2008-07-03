@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransferFunction2DInteractors.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-10 13:42:27 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-03 11:30:13 $
+  Version:   $Revision: 1.3 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -324,7 +324,7 @@ vtkWidgetActor::~vtkWidgetActor()
 }
 
 //------------------------------------------------------------------------
-void vtkWidgetActor::SetTransferFunction(vtkTransferFunction2D *tf) 
+void vtkWidgetActor::SetTransferFunction(vtkMAFTransferFunction2D *tf) 
 //------------------------------------------------------------------------
 {
   if (this->TransferFunction == tf)

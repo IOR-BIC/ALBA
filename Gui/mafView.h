@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2007-05-10 10:07:14 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-07-03 11:30:13 $
+  Version:   $Revision: 1.21 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ class mafInteractor;
 
 class mafRWIBase;
 class vtkCellPicker;
-class vtkRayCast3DPicker;
+class vtkMAFRayCast3DPicker;
 class vtkAssemblyPath;
 class vtkProp3D;
 
@@ -176,7 +176,7 @@ protected:
   mmgGuiHolder	*m_Guih;
 
   vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
-  vtkRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
+  vtkMAFRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
 
   mafVME        *m_PickedVME;   ///< Pointer to the picked vme. It is initialized on picking
   vtkProp3D     *m_PickedProp;  ///< Pointer to the picked vme Prop3D. It is initialized on picking

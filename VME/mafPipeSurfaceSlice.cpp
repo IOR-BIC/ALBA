@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:32:03 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.13 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,9 +50,9 @@
 #include "vtkTextureMapToCylinder.h"
 #include "vtkTextureMapToPlane.h"
 #include "vtkTextureMapToSphere.h"
-#include "vtkFixedCutter.h"
+#include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
-#include "vtkExtendedGlyph3D.h"
+#include "vtkMAFExtendedGlyph3D.h"
 #include "vtkSphereSource.h"
 
 #include <vector>
@@ -137,7 +137,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
       m_SphereSource->SetPhiResolution(((mafVMELandmarkCloud *)m_Vme)->GetSphereResolution());
       m_SphereSource->Update();
 
-      vtkExtendedGlyph3D *glyph = vtkExtendedGlyph3D::New();
+      vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
       glyph->SetSource(m_SphereSource->GetOutput());
       glyph->SetInput(landmark_cloud_output->GetVTKData());
       glyph->OrientOff();
@@ -163,7 +163,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
       m_SphereSource->SetPhiResolution(((mafVMELandmark *)m_Vme)->GetSphereResolution());
       m_SphereSource->Update();
 
-      vtkExtendedGlyph3D *glyph = vtkExtendedGlyph3D::New();
+      vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
       glyph->SetSource(m_SphereSource->GetOutput());
       glyph->SetInput(pointset_output->GetVTKData());
       glyph->OrientOff();
@@ -184,7 +184,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
   double sr[2] = {0,1};
 
 	m_Plane	= vtkPlane::New();
-	m_Cutter = vtkFixedCutter::New();
+	m_Cutter = vtkMAFFixedCutter::New();
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);
@@ -503,7 +503,7 @@ void mafPipeSurfaceSlice::CreateClosedCloudPipe()
   m_SphereSource->SetPhiResolution(((mafVMELandmarkCloud *)m_Vme)->GetSphereResolution());
   m_SphereSource->Update();
 
-  vtkExtendedGlyph3D *glyph = vtkExtendedGlyph3D::New();
+  vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
   glyph->SetSource(m_SphereSource->GetOutput());
   glyph->SetInput(landmark_cloud_output->GetVTKData());
   glyph->OrientOff();
@@ -521,7 +521,7 @@ void mafPipeSurfaceSlice::CreateClosedCloudPipe()
   double sr[2] = {0,1};
 
 	m_Plane	= vtkPlane::New();
-	m_Cutter = vtkFixedCutter::New();
+	m_Cutter = vtkMAFFixedCutter::New();
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);

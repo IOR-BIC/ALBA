@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2008-06-05 14:07:29 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-03 11:30:06 $
+Version:   $Revision: 1.5 $
 Authors:   Daniele Giunchi - Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -15,7 +15,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mmiPER.h"
 #include "mafEvent.h"
-#include "vtkTextActorMeter.h"
+#include "vtkMAFTextActorMeter.h"
 #include "mafInteractor.h"
 
 
@@ -173,7 +173,7 @@ protected:
   std::vector<vtkPolyDataMapper2D *> m_LineMapperVector2;
   std::vector<vtkLineSource *> m_LineSourceVector2;
 
-  std::vector<vtkTextActorMeter *> m_MeterVector;
+  std::vector<vtkMAFTextActorMeter *> m_MeterVector;
   
 
   std::vector<vtkRenderer *> m_RendererVector;

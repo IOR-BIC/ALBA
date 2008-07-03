@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVisualPipeVolumeRayCasting.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-03 18:55:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Alexander Savenko - Paolo Quadrani (porting MAF2.2)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@
 #include "vtkDataSet.h"
 #include "vtkActor.h"
 #include "vtkVolume.h"
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 #include "vtkMAFAdaptiveVolumeMapper.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineCornerFilter.h"
@@ -154,10 +154,10 @@ void mafVisualPipeVolumeRayCasting::Create(mafSceneNode *n)
   if (vp == NULL)
     vp = vtkVolumeProperty2::New();
   
-  vtkTransferFunction2D *tf = vp->GetTransferFunction2D();
+  vtkMAFTransferFunction2D *tf = vp->GetTransferFunction2D();
   if (tf == NULL) 
   {
-    tf = vtkTransferFunction2D::New();
+    tf = vtkMAFTransferFunction2D::New();
     vp->SetTransferFunction2D(tf);
     tf->UnRegister(NULL);
     

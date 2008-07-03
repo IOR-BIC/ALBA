@@ -15,18 +15,18 @@ ENDIF (CPPUNIT_FOUND)
 # ADD_EXECUTABLE(testVTKVolumeSlicer testVTKVolumeSlicer.cxx)
 # ADD_TEST(testVTKVolumeSlicer ${EXECUTABLE_OUTPUT_PATH}/testVTKVolumeSlicer)
 
-############ vtkContourVolumeMapperTest
-ADD_EXECUTABLE(vtkContourVolumeMapperTest vtkContourVolumeMapperTest.h vtkContourVolumeMapperTest.cpp)
-ADD_TEST(vtkContourVolumeMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkContourVolumeMapperTest)
+############ vtkMAFContourVolumeMapperTest
+ADD_EXECUTABLE(vtkMAFContourVolumeMapperTest vtkMAFContourVolumeMapperTest.h vtkMAFContourVolumeMapperTest.cpp)
+ADD_TEST(vtkMAFContourVolumeMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFContourVolumeMapperTest)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(vtkContourVolumeMapperTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFContourVolumeMapperTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
-############ vtkRemoveCellsFilterTest
-ADD_EXECUTABLE(vtkRemoveCellsFilterTest vtkRemoveCellsFilterTest.h vtkRemoveCellsFilterTest.cpp)
-ADD_TEST(vtkRemoveCellsFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkRemoveCellsFilterTest)
+############ vtkMAFRemoveCellsFilterTest
+ADD_EXECUTABLE(vtkMAFRemoveCellsFilterTest vtkMAFRemoveCellsFilterTest.h vtkMAFRemoveCellsFilterTest.cpp)
+ADD_TEST(vtkMAFRemoveCellsFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFRemoveCellsFilterTest)
 IF (WIN32)
-  SET_TARGET_PROPERTIES(vtkRemoveCellsFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFRemoveCellsFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ vtkMAFMeshCutterTest

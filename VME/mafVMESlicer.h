@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-30 14:42:20 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkVolumeSlicer;
+class vtkMAFVolumeSlicer;
 class vtkTransformPolyDataFilter;
 class mafNode;
 class mmaMaterial;
@@ -114,8 +114,8 @@ protected:
 
 	mafTransform*     m_CopyTransform; ///< pose matrix for the slicer plane
   mafTransform*     m_Transform; ///< pose matrix for the slicer plane
-  vtkVolumeSlicer*  m_PSlicer;  ///< slicer object used to extract the cut contour
-  vtkVolumeSlicer*  m_ISlicer;  ///< slicer object used to compute the slice image
+  vtkMAFVolumeSlicer*  m_PSlicer;  ///< slicer object used to extract the cut contour
+  vtkMAFVolumeSlicer*  m_ISlicer;  ///< slicer object used to compute the slice image
 
   vtkTransformPolyDataFilter *m_BackTransform;
   //vtkTransformPolyDataFilter *m_BackTransformParent;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 12:11:23 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@
 #include "vtkMAFAssembly.h"
 #include "vtkSphereSource.h"
 #include "vtkPolyDataNormals.h"
-#include "vtkExtendedGlyph3D.h"
+#include "vtkMAFExtendedGlyph3D.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"

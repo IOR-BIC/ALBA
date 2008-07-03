@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:32:03 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.9 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class vtkActor;
 class vtkProperty;
 class mafAxes;
 class mmgMaterialButton;
-class vtkFixedCutter;
+class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkSphereSource;
 class vtkMAFToLinearTransform;
@@ -99,7 +99,7 @@ protected:
   vtkActor                *m_OutlineActor;
   mafAxes                 *m_Axes;
   vtkPlane				        *m_Plane;
-  vtkFixedCutter		      *m_Cutter;
+  vtkMAFFixedCutter		      *m_Cutter;
 
   vtkSphereSource         *m_SphereSource;
 

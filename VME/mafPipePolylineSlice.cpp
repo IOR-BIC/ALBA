@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 09:30:21 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-07-03 11:29:30 $
+  Version:   $Revision: 1.15 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkPointData.h"
-#include "vtkFixedCutter.h"
+#include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkMAFToLinearTransform.h"
 #include "vtkTubeFilter.h"
@@ -139,7 +139,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 	//////////////////////////////////
 
 	m_Plane	= vtkPlane::New();
-	m_Cutter = vtkFixedCutter::New();
+	m_Cutter = vtkMAFFixedCutter::New();
 
 	m_Plane->SetOrigin(m_Origin);
 	m_Plane->SetNormal(m_Normal);

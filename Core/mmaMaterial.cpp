@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-24 11:32:57 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-07-03 11:30:29 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkProperty.h"
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 #include "vtkTexturedSphereSource.h"
 #include "vtkTexture.h"
 #include "vtkPolyDataMapper.h"

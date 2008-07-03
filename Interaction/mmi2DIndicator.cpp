@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DIndicator.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:17:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-03 11:30:06 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@
 #include "vtkTextProperty.h"
 #include "vtkImageImport.h"
 #include "vtkImageAccumulate.h"
-#include "vtkTextActorMeter.h"
+#include "vtkMAFTextActorMeter.h"
 
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
@@ -283,7 +283,7 @@ void mmi2DIndicator::DrawMeasureTool(double x, double y)
 		m_EndMeasure = false;
     
     m_MeterVector.push_back(NULL);
-    m_MeterVector[m_MeterVector.size()-1] = vtkTextActorMeter::New();
+    m_MeterVector[m_MeterVector.size()-1] = vtkMAFTextActorMeter::New();
     // initialization
 
     
