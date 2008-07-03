@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkRemoveCellsFilterTest.cpp,v $
+Module:    $RCSfile: vtkMAFRemoveCellsFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-03-19 15:48:59 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-03 11:34:43 $
+Version:   $Revision: 1.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -29,26 +29,26 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "vtkSphereSource.h"
 #include "vtkCamera.h"
-#include "vtkRemoveCellsFilter.h"
+#include "vtkMAFRemoveCellsFilter.h"
 
-#include "vtkRemoveCellsFilterTest.h"
+#include "vtkMAFRemoveCellsFilterTest.h"
 
-void vtkRemoveCellsFilterTest::setUp()
+void vtkMAFRemoveCellsFilterTest::setUp()
 {
  
 }
 
-void vtkRemoveCellsFilterTest::tearDown()
+void vtkMAFRemoveCellsFilterTest::tearDown()
 {
 
 }
 
-void vtkRemoveCellsFilterTest::TestFixture()
+void vtkMAFRemoveCellsFilterTest::TestFixture()
 {
 
 }
 
-void vtkRemoveCellsFilterTest::RenderData( vtkPolyData *data )
+void vtkMAFRemoveCellsFilterTest::RenderData( vtkPolyData *data )
 {
   vtkMAFSmartPointer<vtkRenderer> renderer;
   renderer->SetBackground(0.1, 0.1, 0.1);
@@ -77,13 +77,13 @@ void vtkRemoveCellsFilterTest::RenderData( vtkPolyData *data )
 
 }
 
-void vtkRemoveCellsFilterTest::TestRemoveMarkedCells()
+void vtkMAFRemoveCellsFilterTest::TestRemoveMarkedCells()
 {
   
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->Update();
 
-	vtkMAFSmartPointer<vtkRemoveCellsFilter> rc;
+	vtkMAFSmartPointer<vtkMAFRemoveCellsFilter> rc;
   rc->SetInput(sphere->GetOutput());
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -105,12 +105,12 @@ void vtkRemoveCellsFilterTest::TestRemoveMarkedCells()
   CPPUNIT_ASSERT(rc->GetOutput()->GetNumberOfCells() == (nc/2));
 }
 
-void vtkRemoveCellsFilterTest::TestMarkCell()
+void vtkMAFRemoveCellsFilterTest::TestMarkCell()
 {
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->Update();
 
-  vtkMAFSmartPointer<vtkRemoveCellsFilter> rc;
+  vtkMAFSmartPointer<vtkMAFRemoveCellsFilter> rc;
   rc->SetInput(sphere->GetOutput());
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
@@ -129,12 +129,12 @@ void vtkRemoveCellsFilterTest::TestMarkCell()
 }
 
 
-void vtkRemoveCellsFilterTest::TestUndoMarks()
+void vtkMAFRemoveCellsFilterTest::TestUndoMarks()
 {
   vtkMAFSmartPointer<vtkSphereSource> sphere;
   sphere->Update();
 
-  vtkMAFSmartPointer<vtkRemoveCellsFilter> rc;
+  vtkMAFSmartPointer<vtkMAFRemoveCellsFilter> rc;
   rc->SetInput(sphere->GetOutput());
 
   int nc = sphere->GetOutput()->GetNumberOfCells();

@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkRemoveCellsFilterTest.h,v $
+Module:    $RCSfile: vtkMAFRemoveCellsFilterTest.h,v $
 Language:  C++
-Date:      $Date: 2007-03-19 15:48:59 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-03 11:34:43 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __CPP_UNIT_vtkRemoveCellsFilterTEST_H__
-#define __CPP_UNIT_vtkRemoveCellsFilterTEST_H__
+#ifndef __CPP_UNIT_vtkMAFRemoveCellsFilterTEST_H__
+#define __CPP_UNIT_vtkMAFRemoveCellsFilterTEST_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
-class vtkRemoveCellsFilterTest : public CPPUNIT_NS::TestFixture
+class vtkMAFRemoveCellsFilterTest : public CPPUNIT_NS::TestFixture
 {
   public:
   
@@ -31,7 +31,7 @@ class vtkRemoveCellsFilterTest : public CPPUNIT_NS::TestFixture
     // CPPUNIT fixture: executed after each test
     void tearDown();
 
-    CPPUNIT_TEST_SUITE( vtkRemoveCellsFilterTest );
+    CPPUNIT_TEST_SUITE( vtkMAFRemoveCellsFilterTest );
     CPPUNIT_TEST( TestFixture );
     CPPUNIT_TEST( TestMarkCell );
     CPPUNIT_TEST( TestUndoMarks );
@@ -68,7 +68,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( vtkRemoveCellsFilterTest::suite());
+  runner.addTest( vtkMAFRemoveCellsFilterTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

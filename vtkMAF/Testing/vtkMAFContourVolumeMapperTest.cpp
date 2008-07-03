@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkContourVolumeMapperTest.cpp,v $
+Module:    $RCSfile: vtkMAFContourVolumeMapperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-09 15:52:19 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-07-03 11:34:43 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -51,15 +51,15 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPoints.h"
 #include "vtkProperty.h"
 
-#include "vtkContourVolumeMapper.h"
-#include "vtkVolumeSlicer.h"
+#include "vtkMAFContourVolumeMapper.h"
+#include "vtkMAFVolumeSlicer.h"
 
-#include "vtkContourVolumeMapperTest.h"
+#include "vtkMAFContourVolumeMapperTest.h"
 
 static bool ExtractModel   = true;
 static bool CleanModel     = false;
 
-void vtkContourVolumeMapperTest::setUp()
+void vtkMAFContourVolumeMapperTest::setUp()
 {
   m_RGData = NULL;
   m_ImageData = NULL;
@@ -68,7 +68,7 @@ void vtkContourVolumeMapperTest::setUp()
   CreateDataID();
 }
 
-void vtkContourVolumeMapperTest::tearDown()
+void vtkMAFContourVolumeMapperTest::tearDown()
 {
   m_RGData->Delete() ;
   m_ImageData->Delete() ;
@@ -79,19 +79,19 @@ void vtkContourVolumeMapperTest::tearDown()
 }
 
 
-void vtkContourVolumeMapperTest::TestFixture()
+void vtkMAFContourVolumeMapperTest::TestFixture()
 {
 
 }
 
 //------------------------------------------------------------------------------
 // Test the mapper with rect. grid data
-void vtkContourVolumeMapperTest::TestRectilinearGrid() 
+void vtkMAFContourVolumeMapperTest::TestRectilinearGrid() 
 //------------------------------------------------------------------------------
 {
   char filename[]   = "cubePolyFromRG";
   //------------------ create objects
-  vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
+  vtkMAFContourVolumeMapper *mapper = vtkMAFContourVolumeMapper::New();
   vtkMAFSmartPointer<vtkVolume> volume;
   volume->SetMapper(mapper);
 
@@ -140,7 +140,7 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
   oactor->SetUserMatrix(volume->GetMatrix());
   oactor->Delete();
 
-  vtkVolumeSlicer *slicer = NULL, *pslicer = NULL;
+  vtkMAFVolumeSlicer *slicer = NULL, *pslicer = NULL;
 
   mapper->SetEnableContourAnalysis(CleanModel);
 
@@ -156,7 +156,7 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
   mapper->AutoLODCreateOff() ;
 
   // This loop tests that the output has the correct no. of points
-  for (int lod = 0 ;  lod < vtkContourVolumeMapperNamespace::NumberOfLods ;  lod++){
+  for (int lod = 0 ;  lod < vtkMAFContourVolumeMapperNamespace::NumberOfLods ;  lod++){
     // get the step lodxy for this lod
     int lodxy, lodz ;
     mapper->CalculateLodIncrements(lod, &lodxy, &lodz) ;
@@ -210,12 +210,12 @@ void vtkContourVolumeMapperTest::TestRectilinearGrid()
 
 //------------------------------------------------------------------------------
 // Test the mapper with image data
-void vtkContourVolumeMapperTest::TestImageData() 
+void vtkMAFContourVolumeMapperTest::TestImageData() 
 //------------------------------------------------------------------------------
 {
   char filename[]   = "cubePolyFromID";
   //------------------ create objects
-  vtkContourVolumeMapper *mapper = vtkContourVolumeMapper::New();
+  vtkMAFContourVolumeMapper *mapper = vtkMAFContourVolumeMapper::New();
   vtkMAFSmartPointer<vtkVolume> volume;
   volume->SetMapper(mapper);
 
@@ -263,7 +263,7 @@ void vtkContourVolumeMapperTest::TestImageData()
   oactor->SetUserMatrix(volume->GetMatrix());
   oactor->Delete();
 
-  vtkVolumeSlicer *slicer = NULL, *pslicer = NULL;
+  vtkMAFVolumeSlicer *slicer = NULL, *pslicer = NULL;
 
   mapper->SetEnableContourAnalysis(CleanModel);
 
@@ -279,7 +279,7 @@ void vtkContourVolumeMapperTest::TestImageData()
   mapper->AutoLODCreateOff() ;
 
   // This loop tests that the output has the correct no. of points
-  for (int lod = 0 ;  lod < vtkContourVolumeMapperNamespace::NumberOfLods ;  lod++){
+  for (int lod = 0 ;  lod < vtkMAFContourVolumeMapperNamespace::NumberOfLods ;  lod++){
     // get the step lodxy for this lod
     int lodxy, lodz ;
     mapper->CalculateLodIncrements(lod, &lodxy, &lodz) ;
@@ -331,7 +331,7 @@ void vtkContourVolumeMapperTest::TestImageData()
 
 //------------------------------------------------------------------------------
 // Create the Rectlinear Grid volume
-void vtkContourVolumeMapperTest::CreateDataRG()
+void vtkMAFContourVolumeMapperTest::CreateDataRG()
 //------------------------------------------------------------------------------
 {
   int dims[3] = {9, 9, 9} ;
@@ -388,7 +388,7 @@ void vtkContourVolumeMapperTest::CreateDataRG()
 
 
 //-----------------------------------------------------------
-void vtkContourVolumeMapperTest::CreateDataID()
+void vtkMAFContourVolumeMapperTest::CreateDataID()
 //-----------------------------------------------------------
 {
   int dims[3] = {64, 64, 64} ;

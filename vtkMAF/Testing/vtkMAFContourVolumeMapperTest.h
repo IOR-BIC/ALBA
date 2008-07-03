@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkContourVolumeMapperTest.h,v $
+Module:    $RCSfile: vtkMAFContourVolumeMapperTest.h,v $
 Language:  C++
-Date:      $Date: 2006-12-14 17:47:25 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-03 11:34:43 $
+Version:   $Revision: 1.1 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkImageData;
 class vtkRectilinearGrid;
 
-class vtkContourVolumeMapperTest : public CPPUNIT_NS::TestFixture
+class vtkMAFContourVolumeMapperTest : public CPPUNIT_NS::TestFixture
 {
   public:
   
@@ -34,7 +34,7 @@ class vtkContourVolumeMapperTest : public CPPUNIT_NS::TestFixture
     // CPPUNIT fixture: executed after each test
     void tearDown();
 
-    CPPUNIT_TEST_SUITE( vtkContourVolumeMapperTest );
+    CPPUNIT_TEST_SUITE( vtkMAFContourVolumeMapperTest );
     CPPUNIT_TEST( TestFixture );
     CPPUNIT_TEST( TestImageData );
     CPPUNIT_TEST( TestRectilinearGrid );
@@ -72,7 +72,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( vtkContourVolumeMapperTest::suite());
+  runner.addTest( vtkMAFContourVolumeMapperTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.
