@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-04 15:22:54 $
-Version:   $Revision: 1.19 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.20 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -79,7 +79,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkStructuredPoints.h"
 #include "vtkProbeFilter.h"
 #include "vtkRenderer.h"
-#include "vtkRGSliceAccumulate.h"
+#include "vtkMAFRGSliceAccumulate.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicom);
@@ -352,7 +352,7 @@ int medOpImporterDicom::BuildVolume()
 
 	wxBusyInfo wait_info("Building volume: please wait");
 
-	vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
+	vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
 	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
@@ -489,7 +489,7 @@ int medOpImporterDicom::BuildVolumeCineMRI()
 	for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
 	{
 		// Build item at timestamp ts    
-		vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
+		vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 		accumulate->SetNumberOfSlices(n_slices);
 
 		// always build the volume on z-axis

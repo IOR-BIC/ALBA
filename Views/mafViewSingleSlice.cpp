@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 15:00:23 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2008-07-03 12:04:54 $
+  Version:   $Revision: 1.30 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@
 #include "mafPipeMeshSlice.h"
 
 #include "vtkDataSet.h"
-#include "vtkRayCast3DPicker.h"
+#include "vtkMAFRayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkPlaneSource.h"
 #include "vtkOutlineFilter.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomXA.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-30 13:48:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 12:03:55 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineFilter.h"
-#include "vtkRGSliceAccumulate.h"
+#include "vtkMAFRGSliceAccumulate.h"
 
 int compareX(const medOpImporterDicomXAListElement **arg1,const medOpImporterDicomXAListElement **arg2);
 int compareY(const medOpImporterDicomXAListElement **arg1,const medOpImporterDicomXAListElement **arg2);
@@ -633,7 +633,7 @@ void medOpImporterDicomXA::BuildVolumeCineMRI()
   for (ts = 0 , timeFrame=0.0; ts < m_NumberOfTimeFrames; ts++,timeFrame+=m_TimeFrame)
   {
     // Build item at timestamp ts    
-    vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
+    vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 		accumulate->SetNumberOfSlices(n_slices);
 
     // always build the volume on z-axis
@@ -754,7 +754,7 @@ void medOpImporterDicomXA::BuildVolume()
 
 	wxBusyInfo wait_info("Building volume: please wait");
 
-	vtkMAFSmartPointer<vtkRGSliceAccumulate> accumulate;
+	vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
 	accumulate->SetNumberOfSlices(n_slices);
 	accumulate->BuildVolumeOnAxes(m_SortAxes);
 	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-20 14:15:16 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-03 12:06:18 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -57,7 +57,7 @@ class vtkPolyDataMapper;
 class vtkAppendPolyData;
 class vtkActor;
 class vtkLookupTable;
-class vtkFixedCutter;
+class vtkMAFFixedCutter;
 class vtkPlane;
 
 //----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ protected:
 
 	vtkPolyDataMapper	*m_Mapper;
 	vtkActor					*m_Actor;
-	vtkFixedCutter		*m_Cutter;
+	vtkMAFFixedCutter		*m_Cutter;
 	vtkPlane				  *m_Plane;
 
 	double						m_Normal[3];

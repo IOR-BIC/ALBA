@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 15:00:23 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-07-03 12:04:54 $
+  Version:   $Revision: 1.18 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
 #include "mmgFloatSlider.h"
 
 #include "vtkDataSet.h"
-#include "vtkRayCast3DPicker.h"
+#include "vtkMAFRayCast3DPicker.h"
 #include "vtkCellPicker.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"

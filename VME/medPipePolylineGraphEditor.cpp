@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-15 15:45:36 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-07-03 12:06:18 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,7 +68,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "vtkCellData.h"
-#include "vtkFixedCutter.h"
+#include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkMAFToLinearTransform.h"
 

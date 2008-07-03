@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 10:05:44 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-03 12:03:55 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani , Stefano Perticoni 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ class vtkSphereSource;
 class vtkPlaneSource;
 class vtkArrowSource;
 class vtkAppendPolyData;
-class vtkClipSurfaceBoundingBox;
+class vtkMAFClipSurfaceBoundingBox;
 
 //----------------------------------------------------------------------------
 // medOpInteractiveClipSurface :
@@ -139,7 +139,7 @@ protected:
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 
-	/** Clip Using vtkClipSurfaceBoundingBox */
+	/** Clip Using vtkMAFClipSurfaceBoundingBox */
 	void ClipBoundingBox();
   
   mafVMESurface   *m_ClipperVME;
@@ -148,7 +148,7 @@ protected:
   mafVMEGizmo     *m_ImplicitPlaneVMEGizmo;
   vtkPlane        *m_ClipperPlane;
   vtkClipPolyData *m_Clipper;
-	vtkClipSurfaceBoundingBox	*m_ClipperBoundingBox;
+	vtkMAFClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
   mmiCompositorMouse *m_IsaCompositor;

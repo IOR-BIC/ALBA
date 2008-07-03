@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.h,v $
 Language:  C++
-Date:      $Date: 2008-06-06 10:24:23 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -59,12 +59,12 @@ class mmiSelectCell;
 
 class vtkActor;
 class vtkPolyData;
-class vtkCellsFilter;
+class vtkMAFCellsFilter;
 class vtkCellCenters;
 class vtkArrowSource;
 class vtkPolyDataMapper;
 class vtkGlyph3D;
-class vtkRemoveCellsFilter;
+class vtkMAFRemoveCellsFilter;
 
 //----------------------------------------------------------------------------
 // medOpSmoothSurfaceCells :
@@ -145,9 +145,9 @@ protected:
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;
 	mmiSelectCell				*m_SelectCellInteractor;
-	vtkCellsFilter			*m_CellFilter;
-  vtkRemoveCellsFilter *m_RemoveSelectedCells;
-  vtkRemoveCellsFilter *m_RemoveUnSelectedCells;
+	vtkMAFCellsFilter			*m_CellFilter;
+  vtkMAFRemoveCellsFilter *m_RemoveSelectedCells;
+  vtkMAFRemoveCellsFilter *m_RemoveUnSelectedCells;
 	vtkPolyData					*m_Mesh;
 
 	vtkPolyData					*m_ResultPolydata;

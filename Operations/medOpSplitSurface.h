@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 08:42:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-03 12:03:55 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ class vtkGlyph3D;
 class vtkPlaneSource;
 class vtkArrowSource;
 class vtkAppendPolyData;
-class vtkClipSurfaceBoundingBox;
+class vtkMAFClipSurfaceBoundingBox;
 
 //----------------------------------------------------------------------------
 // medOpSplitSurface :
@@ -126,7 +126,7 @@ protected:
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 
-	/** Clip Using vtkClipSurfaceBoundingBox */
+	/** Clip Using vtkMAFClipSurfaceBoundingBox */
 	void ClipBoundingBox();
 
   mafVMESurface   *m_ClipperVME;
@@ -135,7 +135,7 @@ protected:
   mafVMEGizmo     *m_ImplicitPlaneGizmo;
   vtkPlane        *m_ClipperPlane;
   vtkClipPolyData *m_Clipper;
-	vtkClipSurfaceBoundingBox	*m_ClipperBoundingBox;
+	vtkMAFClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
   mmiCompositorMouse *m_IsaCompositor;

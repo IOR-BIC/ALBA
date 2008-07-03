@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DAngle.h,v $
 Language:  C++
-Date:      $Date: 2007-12-05 09:16:48 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-03 12:00:56 $
+Version:   $Revision: 1.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -15,7 +15,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mmiPER.h"
 #include "mafEvent.h"
-#include "vtkTextActorMeter.h"
+#include "vtkMAFTextActorMeter.h"
 
 //----------------------------------------------------------------------------
 // forward refs
@@ -148,7 +148,7 @@ protected:
   std::vector<vtkPolyDataMapper2D *> m_LineMapperVector2;
   std::vector<vtkLineSource *> m_LineSourceVector2;
 
-  std::vector<vtkTextActorMeter *> m_MeterVector;
+  std::vector<vtkMAFTextActorMeter *> m_MeterVector;
   
 
   std::vector<vtkRenderer *> m_RendererVector;

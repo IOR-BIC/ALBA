@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-21 12:02:18 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -77,7 +77,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkFloatArray.h"
 #include "vtkCellData.h"
 #include "vtkPointData.h"
-#include "vtkClipSurfaceBoundingBox.h"
+#include "vtkMAFClipSurfaceBoundingBox.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCleanPolyData.h"

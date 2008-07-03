@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-12 10:45:59 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-07-03 11:59:27 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,7 +47,7 @@
 #include "vtkPolyData.h"
 #include "vtkRenderer.h"
 #include "vtkDoubleArray.h"
-#include "vtkDOFMatrix.h"
+#include "vtkMAFDOFMatrix.h"
 #include "vtkMatrix4x4.h"
 
 

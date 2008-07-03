@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractor2DIndicator.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-05 09:16:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 12:00:56 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -38,7 +38,7 @@
 #include "vtkTextProperty.h"
 #include "vtkImageImport.h"
 #include "vtkImageAccumulate.h"
-#include "vtkTextActorMeter.h"
+#include "vtkMAFTextActorMeter.h"
 
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
@@ -294,7 +294,7 @@ void medInteractor2DIndicator::DrawMeasureTool(double x, double y)
 		m_EndMeasure = false;
     
     m_MeterVector.push_back(NULL);
-    m_MeterVector[m_MeterVector.size()-1] = vtkTextActorMeter::New();
+    m_MeterVector[m_MeterVector.size()-1] = vtkMAFTextActorMeter::New();
     // initialization
 
     

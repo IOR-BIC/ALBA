@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2008-05-21 10:15:07 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -62,7 +62,7 @@ class vtkPlaneSource;
 class vtkArrowSource;
 class vtkAppendPolyData;
 class vtkGlyph3D;
-class vtkClipSurfaceBoundingBox;
+class vtkMAFClipSurfaceBoundingBox;
 class vtkPolyData;
 class vtkLookupTable;
 
@@ -153,7 +153,7 @@ protected:
 	vtkAppendPolyData	*m_Gizmo;
 	vtkGlyph3D				*m_Arrow;
 
-	vtkClipSurfaceBoundingBox	*m_ClipperBoundingBox;
+	vtkMAFClipSurfaceBoundingBox	*m_ClipperBoundingBox;
 
 	std::vector<vtkPolyData*> m_ResultPolyData;
 	vtkPolyData	*m_OriginalPolydata;

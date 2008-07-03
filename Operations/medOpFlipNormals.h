@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2008-05-21 09:54:51 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -58,7 +58,7 @@ class mmiSelectCell;
 
 class vtkActor;
 class vtkPolyData;
-class vtkCellsFilter;
+class vtkMAFCellsFilter;
 class vtkCellCenters;
 class vtkArrowSource;
 class vtkPolyDataMapper;
@@ -144,7 +144,7 @@ protected:
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;
 	mmiSelectCell				*m_SelectCellInteractor;
-	vtkCellsFilter			*m_CellFilter;
+	vtkMAFCellsFilter			*m_CellFilter;
 	vtkPolyData					*m_Mesh;
 
 	vtkPolyData					*m_ResultPolydata;

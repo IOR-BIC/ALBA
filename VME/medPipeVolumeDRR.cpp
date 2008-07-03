@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 10:28:17 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-03 12:06:18 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkProperty.h"
 #include "vtkOutlineCornerFilter.h"
 #include "vtkLookupTable.h"
-#include "vtkVolumeResample.h"
+#include "vtkMAFVolumeResample.h"
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
 #include "mafVMEVolumeGray.h"

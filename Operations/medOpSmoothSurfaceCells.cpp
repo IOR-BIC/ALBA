@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-23 14:29:01 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -72,9 +72,9 @@ MafMedical is partially based on OpenMAF.
 #include "vtkFloatArray.h"
 #include "vtkCell.h"
 #include "vtkCellData.h"
-#include "vtkCellsFilter.h"
+#include "vtkMAFCellsFilter.h"
 
-#include "vtkRemoveCellsFilter.h"
+#include "vtkMAFRemoveCellsFilter.h"
 
 #include "vtkAppendPolyData.h"
 #include "vtkSmoothPolyDataFilter.h"
@@ -342,15 +342,15 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 void medOpSmoothSurfaceCells::CreateCellFilters()
 //----------------------------------------------------------------------------
 {
-  m_CellFilter = vtkCellsFilter::New();
+  m_CellFilter = vtkMAFCellsFilter::New();
   m_CellFilter->SetInput(m_ResultPolydata);
   m_CellFilter->Update();
 
-  m_RemoveSelectedCells = vtkRemoveCellsFilter::New();
+  m_RemoveSelectedCells = vtkMAFRemoveCellsFilter::New();
   m_RemoveSelectedCells->SetInput(m_ResultPolydata);
   m_RemoveSelectedCells->Update();
 
-  m_RemoveUnSelectedCells = vtkRemoveCellsFilter::New();
+  m_RemoveUnSelectedCells = vtkMAFRemoveCellsFilter::New();
   m_RemoveUnSelectedCells->SetInput(m_ResultPolydata);
   m_RemoveUnSelectedCells->Update();
 }

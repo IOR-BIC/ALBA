@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:37:52 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-03 12:03:55 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -72,7 +72,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkFloatArray.h"
 #include "vtkCell.h"
 #include "vtkCellData.h"
-#include "vtkCellsFilter.h"
+#include "vtkMAFCellsFilter.h"
 #include "vtkCellCenters.h" 
 #include "vtkGlyph3D.h"
 #include "vtkArrowSource.h"
@@ -322,7 +322,7 @@ void medOpFlipNormals::CreateOpDialog()
 void medOpFlipNormals::CreateSurfacePipeline()
 //----------------------------------------------------------------------------
 {
-	m_CellFilter = vtkCellsFilter::New();
+	m_CellFilter = vtkMAFCellsFilter::New();
 	m_CellFilter->SetInput(m_ResultPolydata);
 	m_CellFilter->Update();
 

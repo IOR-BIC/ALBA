@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVisualPipeSlicerSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-24 13:34:33 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 12:06:18 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,7 +46,7 @@
 
 #include "vtkPointData.h"
 
-#include "vtkFixedCutter.h"
+#include "vtkMAFFixedCutter.h"
 #include "vtkPlane.h"
 #include "vtkSphereSource.h"
 #include "vtkImageData.h"
@@ -137,8 +137,8 @@ void medVisualPipeSlicerSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 
 	m_Plane1	= vtkPlane::New();
   m_Plane2	= vtkPlane::New();
-	m_Cutter1 = vtkFixedCutter::New();
-  m_Cutter2 = vtkFixedCutter::New();
+	m_Cutter1 = vtkMAFFixedCutter::New();
+  m_Cutter2 = vtkMAFFixedCutter::New();
   
   
   m_Plane1->SetOrigin(m_Origin1);

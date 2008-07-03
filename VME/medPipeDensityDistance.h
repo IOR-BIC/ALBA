@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-21 13:54:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-03 12:06:18 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@
 #include "mafVMEImage.h"
 #include "mafVMEVolume.h"
 #include "vtkPolyDataNormals.h"
-#include "vtkDistanceFilter.h"
+#include "vtkMAFDistanceFilter.h"
 #include "vtkPolyDataMapper.h"
 
 //----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ protected:
   mafAxes                 *m_Axes;
 
   vtkPolyDataNormals      *m_Normals;
-  vtkDistanceFilter       *m_DistanceFilter;
+  vtkMAFDistanceFilter       *m_DistanceFilter;
   vtkColorTransferFunction *m_Table;
   vtkScalarBarActor       *m_ScalarBar;
   mafNode                 *m_Volume;
