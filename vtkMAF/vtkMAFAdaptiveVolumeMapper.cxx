@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFAdaptiveVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-03-10 13:42:21 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-03 11:28:23 $
+  Version:   $Revision: 1.4 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -59,9 +59,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkVolumeProperty.h"
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 
-#include "vtkContourVolumeMapper.h"
+#include "vtkMAFContourVolumeMapper.h"
 #include "vtkMAFAdaptiveVolumeMapper.h"
 
 ////////////////////////////////////////// constant expressions
@@ -2058,7 +2058,7 @@ bool vtkMAFAdaptiveVolumeMapper::PrepareTransferFunctionForRendering(vtkVolumePr
   this->TransferFunction2D = property2 != NULL;
   if (property2) 
   {
-    vtkTransferFunction2D *function = property2->GetTransferFunction2D();
+    vtkMAFTransferFunction2D *function = property2->GetTransferFunction2D();
     if (!function)
       return false;
 

@@ -43,15 +43,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // .SECTION Description
 // vtkMAFAdaptiveVolumeMapper performs a fast volume rendering of volume data using adaptive (LOD) techniques
-// This class supports both 1D and 2D transfer functions (vtkTransferFunction2D). Also, unlike the standard VTK volume renderers, this class supports vtkRectilinearGrid objects.
-// It is currently assumed that X and Y spacing in volume data is constant. If this stops being the case, the code should be modified (see vtkDistanceFilter).
+// This class supports both 1D and 2D transfer functions (vtkMAFTransferFunction2D). Also, unlike the standard VTK volume renderers, this class supports vtkRectilinearGrid objects.
+// It is currently assumed that X and Y spacing in volume data is constant. If this stops being the case, the code should be modified (see vtkMAFDistanceFilter).
 //
 // Current limitations: the renderer supports multiresolution volumes to accelerate the rendering. This optimisation however is heavely dependent on the heuristics that are used to assign 
 // level-of-detail to different blocks of the volume. The current heuristics are trivial and some work have to be done to improve them (see PrepareBlockLODTemplate). When this is done the rendering speed can
 // increase dramatically..
 
 // .SECTION see also
-// vtkVolumeMapper vtkTransferFunction2D
+// vtkVolumeMapper vtkMAFTransferFunction2D
 
 #ifndef __vtkMAFAdaptiveVolumeMapper_h
 #define __vtkMAFAdaptiveVolumeMapper_h

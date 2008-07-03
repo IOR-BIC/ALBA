@@ -3,19 +3,19 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFImageMapToWidgetColors.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:39:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:28:23 $
+  Version:   $Revision: 1.2 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 #include "vtkMAFImageMapToWidgetColors.h"
 
 
-vtkCxxRevisionMacro(vtkMAFImageMapToWidgetColors, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFImageMapToWidgetColors, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFImageMapToWidgetColors);
 
 template<typename type> static inline type clip(type x, type xmin, type xmax) { if (x < xmin) return xmin; if (x > xmax) return xmax; return x; }

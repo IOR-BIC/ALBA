@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFPolyDataToSinglePolyLine.cxx,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:12:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:28:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Alessandro Chiarini
   Project:   
 
@@ -26,7 +26,7 @@
 #include "vtkPolyLine.h"
 #include "vtkSplineFilter.h"
 #include "vtkCardinalSpline.h"
-//vtkCxxRevisionMacro(vtkFixedCutter, "$Revision: 1.1 $");
+//vtkCxxRevisionMacro(vtkMAFFixedCutter, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFPolyDataToSinglePolyLine);
 
 //----------------------------------------------------------------------------

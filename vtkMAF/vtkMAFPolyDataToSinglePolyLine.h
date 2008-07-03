@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFPolyDataToSinglePolyLine.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:12:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:28:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Alessandro Chiarini
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -56,7 +56,7 @@ class VTK_vtkMAF_EXPORT vtkMAFPolyDataToSinglePolyLine : public vtkPolyDataToPol
 //----------------------------------------------------------------------------
 {
 public:
-  //vtkTypeRevisionMacro(vtkFixedCutter,vtkCutter);
+  //vtkTypeRevisionMacro(vtkMAFFixedCutter,vtkCutter);
 
            vtkMAFPolyDataToSinglePolyLine();
   virtual ~vtkMAFPolyDataToSinglePolyLine();

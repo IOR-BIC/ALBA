@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFImageMapToWidgetColors.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:39:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-03 11:28:24 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko, Mel Krokos
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGES.
 // .SECTION Description
 
 // .SECTION See Also
-// vtkVolumeProperty2 vtkTransferFunction2D
+// vtkVolumeProperty2 vtkMAFTransferFunction2D
 
 #ifndef __vtkMAFImageMapToWidgetColors_h
 #define __vtkMAFImageMapToWidgetColors_h
@@ -60,7 +60,7 @@ POSSIBILITY OF SUCH DAMAGES.
 #include "vtkMAFConfigure.h"
 
 #include "vtkImageMapToColors.h"
-#include "vtkTransferFunction2D.h"
+#include "vtkMAFTransferFunction2D.h"
 
 //------------------------------------------------------------------------------
 // forward declarations
@@ -77,8 +77,8 @@ public:
 
   /**
   Set / Get transfer function*/
-  vtkSetObjectMacro(TransferFunction, vtkTransferFunction2D);
-  vtkGetObjectMacro(TransferFunction, vtkTransferFunction2D);
+  vtkSetObjectMacro(TransferFunction, vtkMAFTransferFunction2D);
+  vtkGetObjectMacro(TransferFunction, vtkMAFTransferFunction2D);
 
   /**
   Set / Get widget index*/
@@ -112,7 +112,7 @@ protected:
   void ExecuteData(vtkDataObject *output);
   template<class T> void UpdateGradientCache(T *dataPointer);
 
-  vtkTransferFunction2D *TransferFunction;
+  vtkMAFTransferFunction2D *TransferFunction;
 
   int   WidgetIndex;
 
