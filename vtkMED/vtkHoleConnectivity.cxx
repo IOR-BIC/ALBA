@@ -1,9 +1,9 @@
 /*=========================================================================
 
 Program:   Visualization Toolkit
-Module:    vtkRemoveCellsFilter.cxx
+Module:    vtkHoleConnectivity.cxx
 Language:  C++
-Version:   $Id: vtkHoleConnectivity.cxx,v 1.2 2007-06-08 07:55:55 ior02 Exp $
+Version:   $Id: vtkHoleConnectivity.cxx,v 1.3 2008-07-03 12:09:26 ior02 Exp $
 
 Copyright (c) 2003-2004 Goodwin Lawlor
 All rights reserved.
