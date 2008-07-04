@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-14 13:20:40 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-04 15:01:53 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -522,8 +522,8 @@ void mafVMERefSys::Print(std::ostream& os, const int tabs)
 char **mafVMERefSys::GetIcon()
 //-------------------------------------------------------------------------
 {
-#include "mafVMESurface.xpm"
-  return mafVMESurface_xpm;
+  #include "mafVMEProcedural.xpm"
+  return mafVMEProcedural_xpm;
 }
 //-----------------------------------------------------------------------
 void mafVMERefSys::InternalPreUpdate()
