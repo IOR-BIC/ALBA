@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.h,v $
 Language:  C++
-Date:      $Date: 2008-02-05 10:12:22 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-07 14:30:06 $
+Version:   $Revision: 1.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -14,7 +14,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __mafVMEMeshAnsysTextExporter_h
 
 #include "vtkUnstructuredGrid.h"
-
+#include "vtkMatrix4x4.h"
 #include "mafVMEMesh.h"
 
 #include "vnl/vnl_matrix.h"
@@ -65,9 +65,17 @@ public:
   void SetOutputMaterialsFileName(const char *name)   {this->m_OutputMaterialsFileName = name;};
   const char *GetOutputMaterialsFileName() {return this->m_OutputMaterialsFileName;};
 
+  /** Set the abs matrix to be applied to the geometry */
+  void SetMatrix(vtkMatrix4x4 *absMatrix) {m_MatrixToBeAppliedToGeometry = absMatrix;};
+  vtkMatrix4x4 *GetMatrix() {return m_MatrixToBeAppliedToGeometry;};
+
+  /** Apply abs matrix to geometry */
+  void ApplyMatrixOn() {m_ApplyMatrixFlag = 1;};
+  void ApplyMatrixOff() {m_ApplyMatrixFlag = 0;};
+  void SetApplyMatrix(int apply_matrix) {m_ApplyMatrixFlag = apply_matrix;};
+
   /** Write output files  */
   void Write();
-
 
   mafVMEMeshAnsysTextExporter();
   ~mafVMEMeshAnsysTextExporter();
@@ -88,7 +96,8 @@ protected:
   const char *m_OutputMaterialsFileName;
 
   vtkUnstructuredGrid *m_Input;
- 
+  int				 m_ApplyMatrixFlag;
+  vtkMatrix4x4 *m_MatrixToBeAppliedToGeometry;
 };
 
 #endif

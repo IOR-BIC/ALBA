@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-02 15:10:13 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-07 14:30:06 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -28,6 +28,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
+#include "vtkTransform.h"
+#include "vtkTransformFilter.h"
 
 #include "mafVMEMesh.h"
 #include "mafTagArray.h"
@@ -61,7 +63,8 @@ mafVMEMeshAnsysTextExporter::mafVMEMeshAnsysTextExporter()
   m_OutputNodesFileName = "NLIST.txt";
   m_OutputElementsFileName = "ELIST.txt";
   m_OutputMaterialsFileName = "MPLIST.txt";
-
+  m_ApplyMatrixFlag = 0;
+  m_MatrixToBeAppliedToGeometry = NULL;
 }
 //----------------------------------------------------------------------------
 mafVMEMeshAnsysTextExporter::~mafVMEMeshAnsysTextExporter()
@@ -94,7 +97,7 @@ void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
 
   assert(nodesIDArray != NULL);
 
-  // get the points
+  // get the pointsToBeExported
   int columnsNumber;
   int rowsNumber = inputUGrid->GetNumberOfPoints();
   columnsNumber = 4; // point ID + point coordinates
@@ -102,17 +105,46 @@ void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
   // create a matrix
   vnl_matrix<double>  PointsMatrix;
   PointsMatrix.set_size(rowsNumber,columnsNumber);
+  
+  vtkPoints *pointsToBeExported = NULL;
 
-  // read all the points in memory (vnl_matrix)
-  vtkPoints *points = inputUGrid->GetPoints();
+  vtkTransform *transform = NULL;
+  vtkTransformFilter *transformFilter = NULL;
+  vtkUnstructuredGrid *inUGDeepCopy = NULL;
+  
+  if (m_ApplyMatrixFlag)
+  {
+    // apply abs matrix to geometry
+    assert(m_MatrixToBeAppliedToGeometry);
 
+    transform = vtkTransform::New();
+    transform->SetMatrix(m_MatrixToBeAppliedToGeometry);
+
+    transformFilter = vtkTransformFilter::New();
+    inUGDeepCopy = vtkUnstructuredGrid::New();
+    inUGDeepCopy->DeepCopy(inputUGrid);
+
+    transformFilter->SetInput(inUGDeepCopy);
+    transformFilter->SetTransform(transform);
+    transformFilter->Update();
+
+    pointsToBeExported = transformFilter->GetOutput()->GetPoints();
+  } 
+  else
+  {
+    // do not transform geometry
+    pointsToBeExported = inputUGrid->GetPoints();
+  }
+  
+  // read all the pointsToBeExported in memory (vnl_matrix)
+  
   int pointIDColumn = 0;
 
   double pointCoordinates[3] = {-9999, -9999, -9999};
 
   for (int rowID = 0 ; rowID < rowsNumber ; rowID++)
   {
-    points->GetPoint(rowID, pointCoordinates);
+    pointsToBeExported->GetPoint(rowID, pointCoordinates);
 
     enum {x = 1, y, z};
 
@@ -136,6 +168,12 @@ void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
   output.open(fileName.c_str());
   output << PointsMatrix;
   output.close();
+
+  // clean up
+  vtkDEL(inUGDeepCopy);
+  vtkDEL(transform);
+  vtkDEL(transformFilter);
+
 }
 
 void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
@@ -149,7 +187,7 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
   int rowsNumber = cellsNumber;
 
   // tetra 10 example
-  //  offset                  |                     points ID
+  //  offset                  |                     pointsToBeExported ID
   //  1   3   3   3   0   1      5     2     4     3    11    10    14    13    9    12
   int offset = 6;  
   int columnsNumber = offset + numberOfPointsPerCell;
