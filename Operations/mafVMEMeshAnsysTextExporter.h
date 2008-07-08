@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.h,v $
 Language:  C++
-Date:      $Date: 2008-07-07 14:34:57 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-08 10:33:03 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -74,17 +74,17 @@ public:
   void ApplyMatrixOff() {m_ApplyMatrixFlag = 0;};
   void SetApplyMatrix(int applyMatrix) {m_ApplyMatrixFlag = applyMatrix;};
 
-  /** Write output files  */
-  void Write();
+  /** Write output files; return MAF_OK if succesful, otherwise MAF_ERROR  */
+  int Write();
 
   mafVMEMeshAnsysTextExporter();
   ~mafVMEMeshAnsysTextExporter();
 	
 protected:
 
-  void WriteNodesFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
+  int WriteNodesFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
 	
-  void WriteElementsFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
+  int WriteElementsFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
 	
   void WriteMaterialsFile(vtkUnstructuredGrid *inputUGrid, const char *outputFileName);
   

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-07 14:30:06 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-08 10:33:03 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -73,15 +73,29 @@ mafVMEMeshAnsysTextExporter::~mafVMEMeshAnsysTextExporter()
 }
 
 //----------------------------------------------------------------------------
-void mafVMEMeshAnsysTextExporter::Write()
-{	 
-  WriteNodesFile(m_Input, m_OutputNodesFileName);
-  WriteElementsFile(m_Input, m_OutputElementsFileName);
-  WriteMaterialsFile(m_Input, m_OutputMaterialsFileName);
+int mafVMEMeshAnsysTextExporter::Write()
+{
+  int writeResult = MAF_ERROR;
 
+  writeResult = WriteNodesFile(m_Input, m_OutputNodesFileName);
+
+  if (writeResult == MAF_ERROR)
+  {
+    return MAF_ERROR;
+  }
+
+  writeResult = WriteElementsFile(m_Input, m_OutputElementsFileName);
+  if (writeResult == MAF_ERROR)
+  {
+    return MAF_ERROR;
+  }
+
+  WriteMaterialsFile(m_Input, m_OutputMaterialsFileName);
+  
+  return MAF_OK;
 }
 
-void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
+int mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
 {
   // check this is a valid nodes id field data: 
   vcl_string nodesIDArrayName = "id";
@@ -92,7 +106,7 @@ void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
   {
     mafLogMessage("nodesID informations not found in vtk unstructured grid!\
     nodes file will not be written");
-    return;
+    return MAF_ERROR;
   }
 
   assert(nodesIDArray != NULL);
@@ -174,9 +188,11 @@ void mafVMEMeshAnsysTextExporter::WriteNodesFile( vtkUnstructuredGrid *inputUGri
   vtkDEL(transform);
   vtkDEL(transformFilter);
 
+  return MAF_OK;
+
 }
 
-void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
+int mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputUGrid, const char *outputFileName )
 {
   // create elements matrix 
   int cellsNumber = inputUGrid->GetNumberOfCells();
@@ -209,11 +225,23 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
 
   // get the ELEMENT_ID array
   vtkIntArray *elementIdArray = vtkIntArray::SafeDownCast(cellData->GetArray(ansysELEMENTIDArrayName.GetCStr()));
-  assert(elementIdArray);
 
-  // get the ELEMENT_ID array
-   vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(pointData->GetArray(ansysNODESIDArrayName.GetCStr()));
-   assert(nodesIDArray);
+  if (elementIdArray == NULL)
+  {
+    mafLogMessage("ANSYS_ELEMENT_ID information not found in vtk unstructured grid!\
+                  elements file will not be written");
+    return MAF_ERROR;
+  }
+
+  // get the Ansys Nodes Id array
+  vtkIntArray *nodesIDArray = vtkIntArray::SafeDownCast(pointData->GetArray(ansysNODESIDArrayName.GetCStr()));
+
+  if (nodesIDArray == NULL)
+  {
+    mafLogMessage("Ansys Nodes Id array information not found in vtk unstructured grid!\
+                  elements file will not be written");
+    return MAF_ERROR;
+  }
 
   // create vtkPointIdAnsysPointId map
   vcl_map<int, int> vtkPointIdAnsysPointsIdMap;
@@ -299,6 +327,9 @@ void mafVMEMeshAnsysTextExporter::WriteElementsFile( vtkUnstructuredGrid *inputU
   output.open(fileName.c_str());
   output << ElementsMatrix;
   output.close();
+
+  return MAF_OK;
+
 
 }
 
