@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:09:21 $
-  Version:   $Revision: 1.1 $
-  Authors:   Stefania Paperini porting Matteo Giacomoni
+  Date:      $Date: 2008-07-09 15:01:59 $
+  Version:   $Revision: 1.2 $
+  Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -30,6 +30,8 @@
 
 #include "mafNode.h"
 #include "mafVMELandmarkCloud.h"
+
+#include "mafAbsMatrixPipe.h"
 #include "mafVMEItem.h"
 #include "mafVMESurface.h"
 #include "vtkMatrix4x4.h"
@@ -206,7 +208,21 @@ void medOpClassicICPRegistration::OpDo()
 
 	m_Registered->ReparentTo(m_Input);
 
-	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+  mafVME *sourceVME = mafVME::SafeDownCast(m_Input);
+
+  vtkMAFSmartPointer<vtkTransform> sourceABSPoseInverseTr;
+  sourceABSPoseInverseTr->PostMultiply();
+  sourceABSPoseInverseTr->SetMatrix((sourceVME->GetAbsMatrixPipe()->GetMatrix()).GetVTKMatrix());
+  sourceABSPoseInverseTr->Inverse();
+  sourceABSPoseInverseTr->PreMultiply();
+  sourceABSPoseInverseTr->Concatenate((m_Registered->GetAbsMatrixPipe()->GetMatrix()).GetVTKMatrix());
+  
+  mafSmartPointer<mafMatrix> mat;
+  mat->SetVTKMatrix(sourceABSPoseInverseTr->GetMatrix());
+
+  m_Registered->SetAbsMatrix(*mat);
+  
+  mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 
   // modified by Stefano 7-11-2004 (beg)
   // registration error feedback to user

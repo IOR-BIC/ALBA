@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:09:21 $
-  Version:   $Revision: 1.1 $
-  Authors:   Stefania Paperini porting Matteo Giacomoni
+  Date:      $Date: 2008-07-09 15:01:59 $
+  Version:   $Revision: 1.2 $
+  Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
