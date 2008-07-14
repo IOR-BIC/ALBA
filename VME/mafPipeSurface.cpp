@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:45:04 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2008-07-14 11:50:21 $
+  Version:   $Revision: 1.51 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -125,7 +125,18 @@ void mafPipeSurface::Create(mafSceneNode *n)
   //m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 0 : 1;
   m_RenderingDisplayListFlag = m_Vme->IsAnimated() ? 1 : 0;
   m_Mapper->SetImmediateModeRendering(m_RenderingDisplayListFlag);
+  
+  // TODO: REFACTOR THIS 
+  // workaround code to show RefSys colors by default... RefSys could have a different pipe
+  // inheriting from this one...
+  if (m_Vme->IsA("mafVMERefSys"))
+  {
+    m_ScalarVisibility = 1;
+  }
+  // END TODO: REFACTOR THIS 
+
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
+
 	m_Mapper->SetLookupTable(m_SurfaceMaterial->m_ColorLut);
   m_Mapper->SetScalarRange(sr);
 
@@ -176,7 +187,7 @@ void mafPipeSurface::Create(mafSceneNode *n)
 	m_Axes = new mafAxes(m_RenFront, m_Vme);
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
-	
+  	
 /*	
 	if(data->GetCellData()->GetNormals())
 	{
