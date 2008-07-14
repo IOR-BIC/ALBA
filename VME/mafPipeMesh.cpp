@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-07 11:11:12 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-07-14 09:23:29 $
+Version:   $Revision: 1.13 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -373,6 +373,29 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
         break;
       case ID_SCALAR_MAP_ACTIVE:
         {
+          if (m_NumberOfArrays > m_PointCellArraySeparation)
+          {
+            m_ActiveScalarType = CELL_TYPE;
+            for (int i=m_PointCellArraySeparation;i<m_NumberOfArrays;i++)
+            {
+              if (strcmp(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
+              {
+                m_ScalarIndex = i;
+              }
+            }
+          }
+          else
+          {
+            m_ActiveScalarType = POINT_TYPE;
+            for (int i=0;i<m_PointCellArraySeparation;i++)
+            {
+              if (strcmp(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
+              {
+                m_ScalarIndex = i;
+              }
+            }
+          }
+
           if(m_ScalarMapActive)
             m_Mapper->ScalarVisibilityOn();
           else
