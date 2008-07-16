@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:18:21 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2008-07-16 16:48:15 $
+  Version:   $Revision: 1.41 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -439,5 +439,8 @@ MAF_EXPORT std::string  mafIdString(int id);
 
 MAF_EXPORT float RoundValue(float f_in, int decimal_digits = 2);
 MAF_EXPORT double RoundValue(double d_in, int decimal_digits = 2);
+
+/** Formats the specified size to B, KB, MB or GB */
+MAF_EXPORT void mafFormatDataSize(long long size, mafString& szOut);
 
 #endif

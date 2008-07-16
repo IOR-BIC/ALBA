@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 13:44:06 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2008-07-16 16:48:15 $
+  Version:   $Revision: 1.38 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -177,6 +177,26 @@ double RoundValue(double d_in, int decimal_digits)
   double d_tmp = d_in * pow((double)10,(double)decimal_digits);
   int b = ( d_tmp >= 0 ) ? static_cast<int>( d_tmp + .5):static_cast<int>( d_tmp - .5);
   return b / pow((double)10,(double)decimal_digits);
+}
+//----------------------------------------------------------------------------
+void mafFormatDataSize( long long size, mafString& szOut )
+//----------------------------------------------------------------------------
+{
+  const char* SZUN[] = {"B", "KB", "MB", "GB", NULL};
+  const int LIMITS[] = { 16384, 4096, 1024, INT_MAX};
+
+  int idx = 0;
+  double nsize = (double)size;
+  while (SZUN[idx] != NULL)
+  {
+    if (nsize < LIMITS[idx])
+      break;
+
+    nsize /= 1024;
+    idx++;
+  }
+
+  szOut = wxString::Format("%g %s", RoundValue(nsize), SZUN[idx]);
 }
 //----------------------------------------------------------------------------
 wxBitmap mafGrayScale(wxBitmap bmp)
