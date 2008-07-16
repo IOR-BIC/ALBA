@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 09:23:58 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-07-16 12:51:33 $
+  Version:   $Revision: 1.35 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,14 +54,15 @@ medPipeGraph::medPipeGraph()
 //----------------------------------------------------------------------------
 {
   m_PlotActor	= NULL;
+  m_PlotTimeLineActor	= NULL;
   m_CheckBox  = NULL;
 
   m_Xlabel		= 50;
   m_Ylabel		= 50;
   m_NumberOfSignals = 0;
 
-  m_TitileX		= "X";
-  m_TitileY		= "Y";
+  m_TitileX		= "";
+  m_TitileY		= "";
   m_ItemName  = "analog_";
   m_FitPlot = 1;
   m_Legend = 0;
@@ -85,6 +86,7 @@ medPipeGraph::~medPipeGraph()
   m_Vme->GetEventSource()->RemoveObserver(this);
 
   m_RenFront->RemoveActor2D(m_PlotActor);
+  m_RenFront->RemoveActor2D(m_PlotTimeLineActor);
   m_RenFront->SetBackground(m_OldColour);
 
   for(int i=0;i<m_VtkData.size();i++)
@@ -99,11 +101,11 @@ medPipeGraph::~medPipeGraph()
   }
   m_ScalarArray.clear();
 
-  //vtkDEL(m_TimeLine);
   vtkDEL(m_TimeArray);
   m_PlotActor->RemoveAllInputs();
+  m_PlotTimeLineActor->RemoveAllInputs();
   vtkDEL(m_PlotActor);
-  //vtkDEL(m_TimeLine);
+  vtkDEL(m_PlotTimeLineActor);
   }
 //----------------------------------------------------------------------------
 void medPipeGraph::Create(mafSceneNode *n)
@@ -137,18 +139,51 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_TimeStampMax = m_TimeArray->GetValue(counter-1);
   m_TimeArray->GetRange(m_TimesManualRange); //Initialize time range at max
 
-  vtkNEW(m_PlotActor);
-  m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
-  m_PlotActor->GetProperty()->SetLineWidth(1.4);
-  //m_PlotActor->SetLabelFormat("%g");
-  //m_PlotActor->SetTitle(m_EmgPlot->GetName());
+  //NB: I must create 2 vtkXYPlotActor in order to have a time line 
+  //on the plot but not on the legend. m_PlotTimeLineActor contains
+  //only the time line
+  vtkNEW(m_PlotTimeLineActor);
+  m_PlotTimeLineActor->GetProperty()->SetColor(0.02,0.06,0.62);	
+  m_PlotTimeLineActor->GetProperty()->SetLineWidth(1.4);
 
-  vtkTextProperty* tProp = m_PlotActor->GetTitleTextProperty();
+  vtkTextProperty* tProp = m_PlotTimeLineActor->GetTitleTextProperty();
   tProp->SetColor(0.02,0.06,0.62);
   tProp->SetFontFamilyToArial();
   tProp->ItalicOff();
   tProp->BoldOff();
   tProp->SetFontSize(5);
+ 
+  m_PlotTimeLineActor->SetAxisTitleTextProperty(tProp);
+  m_PlotTimeLineActor->SetAxisLabelTextProperty(tProp);
+  m_PlotTimeLineActor->SetTitleTextProperty(tProp);	
+
+  m_LegendBoxTimeLine_Actor = m_PlotTimeLineActor->GetLegendBoxActor();
+  m_PlotTimeLineActor->SetLegendPosition(0.75, 0.85); //Set position and size of the Legend Box
+  m_PlotTimeLineActor->SetLegendPosition2(0.35, 0.25);
+  m_PlotTimeLineActor->SetPosition(0.01,0.01);
+  m_PlotTimeLineActor->SetPosition2(0.9,0.9);
+  m_PlotTimeLineActor->SetVisibility(1);
+  m_PlotTimeLineActor->SetXValuesToValue();
+
+  m_LegendBoxTimeLine_Actor->SetNumberOfEntries(1);
+  m_LegendBoxTimeLine_Actor->SetEntryString(0, "");
+
+  m_ColorRGB[0] = 255;
+  m_ColorRGB[1] = 0;
+  m_ColorRGB[2] = 0;
+
+  m_LegendBoxTimeLine_Actor->SetEntryColor(0, m_ColorRGB);
+
+  vtkNEW(m_PlotActor);
+  m_PlotActor->GetProperty()->SetColor(0.02,0.06,0.62);	
+  m_PlotActor->GetProperty()->SetLineWidth(1.4);
+
+  vtkTextProperty* tPropB = m_PlotActor->GetTitleTextProperty();
+  tPropB->SetColor(0.02,0.06,0.62);
+  tPropB->SetFontFamilyToArial();
+  tPropB->ItalicOff();
+  tPropB->BoldOff();
+  tPropB->SetFontSize(5);
 
   m_PlotActor->SetAxisTitleTextProperty(tProp);
   m_PlotActor->SetAxisLabelTextProperty(tProp);
@@ -218,12 +253,11 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_PlotActor->SetXTitle(m_TitileX);
   m_PlotActor->SetYTitle(m_TitileY);
 
+  m_PlotTimeLineActor->SetXTitle(m_TitileX);
+  m_PlotTimeLineActor->SetYTitle(m_TitileY);
+
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);  
-
-  //m_RenFront->AddActor2D(m_PlotActor);
-
-  //vtkNEW(m_TimeLine);
 
   CreateGui();
 }
@@ -250,6 +284,7 @@ void medPipeGraph::UpdateGraph()
   m_ScalarArray.clear();
 
   m_RenFront->RemoveActor2D(m_PlotActor);
+  m_RenFront->RemoveActor2D(m_PlotTimeLineActor);
 
   m_EmgPlot = medVMEAnalog::SafeDownCast(m_Vme);
 
@@ -276,7 +311,6 @@ void medPipeGraph::UpdateGraph()
        scalar->Delete();
      }
    }
-
 
   for (int c = 0; c < m_NumberOfSignals ; c++)
   {
@@ -356,15 +390,20 @@ void medPipeGraph::UpdateGraph()
 
   if (m_FitPlot)
   {
-    m_PlotActor->SetPlotRange(m_TimesRange[0], minY, m_TimesRange[1], maxY);     
+    m_PlotActor->SetPlotRange(m_TimesRange[0], minY, m_TimesRange[1], maxY);
+    m_PlotTimeLineActor->SetPlotRange(m_TimesRange[0], minY, m_TimesRange[1], maxY);
   }
   else
   {
     m_PlotActor->SetPlotRange(m_TimesRange[0], m_DataManualRange[0], m_TimesRange[1], m_DataManualRange[1]);
+    m_PlotTimeLineActor->SetPlotRange(m_TimesRange[0], m_DataManualRange[0], m_TimesRange[1], m_DataManualRange[1]);
   }
 
   m_PlotActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
   m_PlotActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
+
+  m_PlotTimeLineActor->SetNumberOfXLabels(m_TimesRange[1]-m_TimesRange[0]); 
+  m_PlotTimeLineActor->SetNumberOfYLabels(m_DataMax - m_DataMin);
 
   vtkDoubleArray *lineArray;
   vtkNEW(lineArray);
@@ -398,10 +437,11 @@ void medPipeGraph::UpdateGraph()
   vtkDEL(scalarArrayLine);
 
   m_VtkData.push_back(m_TimeLine);
-
-  m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
+  m_PlotTimeLineActor->AddInput((vtkDataSet*)m_TimeLine);
 
   m_RenFront->AddActor2D(m_PlotActor);
+  m_RenFront->AddActor2D(m_PlotTimeLineActor);
+  
   CreateLegend();
 }
 //----------------------------------------------------------------------------
@@ -430,14 +470,9 @@ void medPipeGraph::CreateLegend()
     }
   }
 
-  m_PlotActor->AddInput(m_VtkData.at(m_VtkData.size()-1));
-  m_LegendBox_Actor->SetNumberOfEntries(counter_legend + 1);
-  m_LegendBox_Actor->SetEntryString(counter_legend, "");
+  m_PlotTimeLineActor->RemoveAllInputs();
 
-  m_ColorRGB[0] = 255;
-  m_ColorRGB[1] = 0;
-  m_ColorRGB[2] = 0;
-  m_LegendBox_Actor->SetEntryColor(counter_legend, m_ColorRGB);
+  m_PlotTimeLineActor->AddInput(m_VtkData.at(m_VtkData.size()-1));
 
 }
 //----------------------------------------------------------------------------
@@ -610,11 +645,13 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
       break;
     case ID_AXIS_NAME_X:
         m_PlotActor->SetXTitle(m_TitileX);
+        m_PlotTimeLineActor->SetXTitle(m_TitileX);
         ChangeAxisTitle();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
     case ID_AXIS_NAME_Y:
         m_PlotActor->SetYTitle(m_TitileY);
+        m_PlotTimeLineActor->SetYTitle(m_TitileY);
         ChangeAxisTitle();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
@@ -634,9 +671,8 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     if(!m_TimeLine)
       vtkNEW(m_TimeLine);
 
-    m_RenFront->RemoveActor2D(m_PlotActor);
-    //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-    //m_PlotActor->RemoveInput(m_TimeLine);
+    m_RenFront->RemoveActor2D(m_PlotTimeLineActor);
+
     vtkDoubleArray *lineArray;
     vtkNEW(lineArray);
     lineArray->InsertNextTuple1(m_EmgPlot->GetTimeStamp());
@@ -687,12 +723,11 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
     m_VtkData.pop_back();
     m_VtkData.push_back(m_TimeLine);
 
-    m_PlotActor->AddInput((vtkDataSet*)m_TimeLine);
-    m_RenFront->AddActor2D(m_PlotActor);
+    m_PlotTimeLineActor->AddInput((vtkDataSet*)m_TimeLine);
+    m_RenFront->AddActor2D(m_PlotTimeLineActor);
+    
     CreateLegend();
-    //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::SetSignalToPlot(int index,bool plot)
@@ -706,6 +741,7 @@ void medPipeGraph::SetTitleX(mafString title)
 {
   m_TitileX = title.GetCStr();
   m_PlotActor->SetXTitle(m_TitileX);
+  m_PlotTimeLineActor->SetXTitle(m_TitileX);
   ChangeAxisTitle();
 }
 //----------------------------------------------------------------------------
@@ -714,5 +750,6 @@ void medPipeGraph::SetTitleY(mafString title)
 {
   m_TitileY = title.GetCStr();
   m_PlotActor->SetYTitle(m_TitileY);
+  m_PlotTimeLineActor->SetYTitle(m_TitileY);
   ChangeAxisTitle();
 }

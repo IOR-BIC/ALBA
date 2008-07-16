@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 09:23:58 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-07-16 12:51:33 $
+  Version:   $Revision: 1.18 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,6 +82,7 @@ protected:
 
   mmgCheckListBox* m_CheckBox;
   vtkLegendBoxActor *m_LegendBox_Actor;
+  vtkLegendBoxActor *m_LegendBoxTimeLine_Actor;
 
 private:
   //create the legend
@@ -119,6 +120,7 @@ private:
 
   medVMEAnalog   *m_EmgPlot;
   vtkXYPlotActor *m_PlotActor;
+  vtkXYPlotActor *m_PlotTimeLineActor;
 
   vtkRectilinearGrid *m_TimeLine;
 };  
