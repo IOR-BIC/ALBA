@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 12:11:23 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-16 15:05:18 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,7 @@
 #include "mafDataVector.h"
 #include "mafVMESurface.h"
 #include "mafVMEGenericAbstract.h"
+#include "mafEventSource.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFAssembly.h"
@@ -44,6 +45,7 @@
 #include "vtkTexture.h"
 #include "mafLODActor.h"
 #include "vtkRenderer.h"
+#include "vtkLookupTable.h"
 
 #include <vector>
 
@@ -74,6 +76,7 @@ mafPipeSurfaceTextured::mafPipeSurfaceTextured()
   m_EnableActorLOD  = 0;
 
 	m_ShowAxis = 1;
+  m_SelectionVisibility = 1;
 }
 //----------------------------------------------------------------------------
 void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
@@ -96,6 +99,9 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
   vtkPolyData *data = vtkPolyData::SafeDownCast(surface_output->GetVTKData());
   assert(data);
   data->Update();
+
+  m_Vme->GetEventSource()->AddObserver(this);
+
   vtkDataArray *scalars = data->GetPointData()->GetScalars();
   double sr[2] = {0,1};
   if(scalars != NULL)
@@ -187,7 +193,10 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
     m_Gui->Update();
   }
 
-  m_AssemblyFront->AddPart(m_Actor);
+  if(m_AssemblyBack)
+    m_AssemblyBack->AddPart(m_Actor);
+  else
+    m_AssemblyFront->AddPart(m_Actor);
 
   // selection highlight
   vtkMAFSmartPointer<vtkOutlineCornerFilter> corner;
@@ -208,7 +217,10 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
 	m_OutlineActor->PickableOff();
 	m_OutlineActor->SetProperty(corner_props);
 
-  m_AssemblyFront->AddPart(m_OutlineActor);
+  if(m_AssemblyBack)
+    m_AssemblyBack->AddPart(m_OutlineActor);
+  else
+    m_AssemblyFront->AddPart(m_OutlineActor);
 
   m_Axes = new mafAxes(m_RenFront, m_Vme);
   m_Axes->SetVisibility(0);
@@ -217,8 +229,19 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
 mafPipeSurfaceTextured::~mafPipeSurfaceTextured()
 //----------------------------------------------------------------------------
 {
-  m_AssemblyFront->RemovePart(m_Actor);
-  m_AssemblyFront->RemovePart(m_OutlineActor);
+  m_Vme->GetEventSource()->RemoveObserver(this);
+
+  if(m_AssemblyBack)
+  {
+    m_AssemblyBack->RemovePart(m_Actor);
+    m_AssemblyBack->RemovePart(m_OutlineActor);
+  }
+  else
+  {
+    m_AssemblyFront->RemovePart(m_Actor);
+    m_AssemblyFront->RemovePart(m_OutlineActor);
+  }
+  
 
   vtkDEL(m_Texture);
 	vtkDEL(m_Mapper);
@@ -234,7 +257,7 @@ void mafPipeSurfaceTextured::Select(bool sel)
 	m_Selected = sel;
 	if(m_Actor->GetVisibility()) 
 	{
-		m_OutlineActor->SetVisibility(sel);
+		m_OutlineActor->SetVisibility(sel && m_SelectionVisibility);
     m_Axes->SetVisibility(sel&&m_ShowAxis);
 	}
 }
@@ -242,6 +265,13 @@ void mafPipeSurfaceTextured::Select(bool sel)
 void mafPipeSurfaceTextured::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
 {
+  if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
+  {
+    double sr[2];
+    sr[0] = m_SurfaceMaterial->m_TableRange[0];
+    sr[1] = m_SurfaceMaterial->m_TableRange[1];
+    m_Mapper->SetScalarRange(sr);
+  }
 }
 //----------------------------------------------------------------------------
 mmgGui *mafPipeSurfaceTextured::CreateGui()
@@ -381,6 +411,13 @@ void mafPipeSurfaceTextured::OnEvent(mafEventBase *maf_event)
       default:
         mafEventMacro(*e);
       break;
+    }
+  }
+  else if (maf_event->GetSender() == m_Vme)
+  {
+    if(maf_event->GetId() == VME_OUTPUT_DATA_UPDATE)
+    {
+      UpdateProperty();
     }
   }
 }
