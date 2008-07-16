@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:13 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-16 15:04:41 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,6 +63,10 @@ mafView::mafView(const wxString &label)
   m_PickedVME         = NULL;
   m_PickedProp        = NULL;
   m_PickedPosition[0] = m_PickedPosition[1] = m_PickedPosition[2] = 0.0;
+
+  //parameters
+  m_Slice[0] = m_Slice[1] = m_Slice[2] =  0.;
+  m_Normal[0] = m_Normal[1] = m_Normal[2] =  0.;
 }
 //----------------------------------------------------------------------------
 mafView::~mafView()
@@ -109,6 +113,7 @@ mmgGui* mafView::CreateGui()
   m_Gui = new mmgGui(this);
 
   mafString type_name = GetTypeName();
+  
   if(MAFExpertMode == TRUE) 
     m_Gui->Button(ID_PRINT_INFO, type_name, "", "Print view debug information");
 
@@ -211,4 +216,36 @@ void mafView::Print(std::ostream& os, const int tabs)// const
 {
   mafIndent indent(tabs);
   os << indent << "mafView" << '\t' << this << "\n";
+}
+
+//-------------------------------------------------------------------------
+double *mafView::GetSlice()// const
+//-------------------------------------------------------------------------
+{
+  return m_Slice;
+}
+
+//-------------------------------------------------------------------------
+void mafView::SetSlice(double slice[3])// const
+//-------------------------------------------------------------------------
+{
+  m_Slice[0] = slice[0];
+  m_Slice[1] = slice[1];
+  m_Slice[2] = slice[2];
+}
+
+//-------------------------------------------------------------------------
+double *mafView::GetNormal()// const
+//-------------------------------------------------------------------------
+{
+  return m_Normal;
+}
+
+//-------------------------------------------------------------------------
+void mafView::SetNormal(double normal[3])// const
+//-------------------------------------------------------------------------
+{
+  m_Normal[0] = normal[0];
+  m_Normal[1] = normal[1];
+  m_Normal[2] = normal[2];
 }
