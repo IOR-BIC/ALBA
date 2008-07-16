@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-29 14:19:21 $
-  Version:   $Revision: 1.7 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2008-07-16 11:25:56 $
+  Version:   $Revision: 1.8 $
+  Authors:   Marco Petrone , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -45,6 +45,18 @@ public:
   /** return icon */
   static char** GetIcon();
   
+  /** override superclass */
+  void SetMatrix(const mafMatrix &mat);
+
+  /** override superclass */
+  void Print(std::ostream& os, const int tabs);
+
+  /** return icon */
+  bool Equals(mafVME *vme);
+
+  /** return icon */
+  int DeepCopy(mafNode *a);
+
 protected:
   mafVMEGroup();
   virtual ~mafVMEGroup();
@@ -54,9 +66,19 @@ protected:
 
   mafTransform *m_Transform;
 
+  int InternalStore(mafStorageElement *parent);
+
+  int InternalRestore(mafStorageElement *node);
+
+
 private:
   mafVMEGroup(const mafVMEGroup&); // Not implemented
   void operator=(const mafVMEGroup&); // Not implemented
+  
+
+  
+  
+  
 };
 
 #endif

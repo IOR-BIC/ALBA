@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-29 14:19:21 $
-  Version:   $Revision: 1.10 $
-  Authors:   Marco Petrone
+  Date:      $Date: 2008-07-16 11:25:55 $
+  Version:   $Revision: 1.11 $
+  Authors:   Marco Petrone , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -28,6 +28,8 @@
 #include "mafNode.h"
 #include "mafVMEOutputNULL.h"
 
+const int DEBUG_MODE = false;
+
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEGroup)
 //-------------------------------------------------------------------------
@@ -40,6 +42,10 @@ mafVMEGroup::mafVMEGroup()
   // subclasses to have to destroy base class output
   mafNEW(m_Transform);
   m_MatrixVector->SetMatrix(m_Transform->GetMatrix());
+
+  mafVMEOutputNULL *output=mafVMEOutputNULL::New(); // an output with no data
+  output->SetTransform(m_Transform); // force my transform in the output
+  SetOutput(output);
 }
 
 //-------------------------------------------------------------------------
@@ -47,6 +53,9 @@ mafVMEGroup::~mafVMEGroup()
 //-------------------------------------------------------------------------
 {
   mafDEL(m_Transform);
+  
+  SetOutput(NULL);
+
   // data pipe destroyed in mafVME
   // data vector destroyed in mafVMEGenericAbstract
 }
@@ -125,4 +134,98 @@ char** mafVMEGroup::GetIcon()
 {
   #include "mafVMEGroup.xpm"
   return mafVMEGroup_xpm;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEGroup::SetMatrix(const mafMatrix &mat)
+//-------------------------------------------------------------------------
+{
+  Superclass::SetMatrix(mat);
+  m_Transform->SetMatrix(mat);
+}
+
+//-----------------------------------------------------------------------
+int mafVMEGroup::InternalStore(mafStorageElement *parent)
+//-----------------------------------------------------------------------
+{ 
+  if (DEBUG_MODE)
+  {
+    std::ostringstream stringStream;
+    stringStream << "Storing matrix:"  << std::endl;
+    m_Transform->Print(stringStream);
+    mafLogMessage(stringStream.str().c_str());
+  }
+
+  if (Superclass::InternalStore(parent)==MAF_OK)
+  {
+    parent->StoreMatrix("Transform",&m_Transform->GetMatrix());
+    return MAF_OK;
+  }
+  return MAF_ERROR;
+  
+  
+}
+
+//-----------------------------------------------------------------------
+int mafVMEGroup::InternalRestore(mafStorageElement *node)
+//-----------------------------------------------------------------------
+{
+  if (DEBUG_MODE)
+  {
+    std::ostringstream stringStream;
+    stringStream << "Restoring matrix:"  << std::endl;
+    m_Transform->Print(stringStream);
+    mafLogMessage(stringStream.str().c_str());
+  }
+
+  if (Superclass::InternalRestore(node)==MAF_OK)
+  {
+    mafMatrix matrix;
+    if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
+    {
+      this->SetMatrix(matrix);
+      return MAF_OK;
+    }
+  }
+
+  return MAF_ERROR;
+}
+
+//-----------------------------------------------------------------------
+void mafVMEGroup::Print(std::ostream& os, const int tabs)
+//-----------------------------------------------------------------------
+{
+  Superclass::Print(os,tabs);
+  mafIndent indent(tabs);
+
+  mafMatrix m = m_Transform->GetMatrix();
+  m.Print(os,indent.GetNextIndent());
+}
+
+//-------------------------------------------------------------------------
+bool mafVMEGroup::Equals(mafVME *vme)
+//-------------------------------------------------------------------------
+{
+  bool ret = false;
+  if (Superclass::Equals(vme))
+  {
+    return ret = (m_Transform->GetMatrix()==((mafVMEGroup *)vme)->m_Transform->GetMatrix());
+  }
+  return ret;
+}
+
+//-------------------------------------------------------------------------
+int mafVMEGroup::DeepCopy(mafNode *a)
+//-------------------------------------------------------------------------
+{ 
+  if (Superclass::DeepCopy(a)==MAF_OK)
+  {
+    mafVMEGroup *group = mafVMEGroup::SafeDownCast(a);
+    
+    m_Transform->SetMatrix(group->m_Transform->GetMatrix());
+    
+    return MAF_OK;
+  }  
+
+  return MAF_ERROR;
 }
