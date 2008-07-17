@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-26 14:22:23 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2008-07-17 08:29:51 $
+  Version:   $Revision: 1.32 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,7 +108,8 @@ mafRWIBase::mafRWIBase(wxWindow *parent, wxWindowID id, const wxPoint &pos,
 {
   m_Hidden = true;
   this->Show(false);
-	m_SaveDir = ::wxGetHomeDir().c_str(); 
+	//m_SaveDir = ::wxGetHomeDir().c_str(); 
+  m_SaveDir = "";
   m_Width = m_Height = 10;
   
   m_Camera    = NULL;
@@ -704,9 +705,9 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
-    //wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg";
     wxString wildc = "Image (*.bmp)|*.bmp|Image (*.jpg)|*.jpg|Image (*.png)|*.png|Image (*.ps)|*.ps|Image (*.tiff)|*.tiff";
-    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+//    wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
+    wxString file = "";
     switch(forceExtension)
     {
       case mmgApplicationSettings::JPG :
@@ -716,14 +717,14 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
         wildc = "Image (*.bmp)|*.bmp";
       break;
     }
-    //mafString file ;
+/*
     if(!wxDirExists(path))
     {
       file = m_SaveDir;
       file +=  "\\";
       filename = name.c_str();
     }
-    
+*/    
     file.Append(filename);
     file = mafGetSaveFile(file,wildc).c_str(); 
     if(file.IsEmpty()) 
