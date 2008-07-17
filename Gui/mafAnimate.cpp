@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 11:16:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-17 16:00:24 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -41,6 +41,7 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
 	m_Listener	= listener;
 	m_Renderer	= renderer;
   m_Tags			= NULL;
+  m_StoredPositions = NULL;
 
   m_SelectedPosition	= "";
 	m_InterpolateFlag		= 1;
@@ -57,6 +58,7 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
 mafAnimate::~mafAnimate() 
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_StoredPositions);
 }
 //----------------------------------------------------------------------------
 void mafAnimate::SetInputVME(mafNode *vme) 
@@ -64,13 +66,15 @@ void mafAnimate::SetInputVME(mafNode *vme)
 {
   assert(m_Gui && m_PositionList && m_StorePositionButton && m_RenamePositionButton && m_DeletePositionButton);
 
-  ResetKit();
+  //ResetKit();
 
   if(!vme) return;
   mafVME *root = mafVME::SafeDownCast(vme->GetRoot());
 	if(!root) return;
   m_Tags = root->GetTagArray();
-	if(!m_Tags) return;
+	
+  RetrieveStoredPositions();
+  /*if(!m_Tags) return;
 
   std::vector<std::string> tag_list;
   m_Tags->GetTagList(tag_list);
@@ -85,7 +89,7 @@ void mafAnimate::SetInputVME(mafNode *vme)
 			  name = name.Remove(0,7);
 			m_PositionList->Append(name);
 		}
-	}
+	}*/
 
   EnableWidgets(); 
 }
@@ -135,12 +139,13 @@ void mafAnimate::CreateGui()
   m_Gui->Add(sizer,0,wxALL,rm); 
 
 	m_PositionList = m_Gui->ListBox(ID_LIST," ");
-	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag);
+	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag, 1);
   
   m_AnimatePlayer = new mmgMovieCtrl(m_Gui);
   m_AnimatePlayer->SetListener(this);
   m_Gui->Add(m_AnimatePlayer);
-  m_AnimatePlayer->Enable(false);
+
+  EnableWidgets();
 
 	m_Gui->Divider();
 	m_Gui->Update();
@@ -159,7 +164,7 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         EnableWidgets();
       break;
       case ID_DELETE:
-        DeleteViewPoint();
+        DeleteViewPoint(m_PositionList->GetSelection());
         EnableWidgets();
       break;
       case ID_RENAME:
@@ -179,17 +184,7 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
 void mafAnimate::EnableWidgets()
 //----------------------------------------------------------------------------
 {
-  // SIL: 05-may-06
-  // in passing from wx242 -> wx263
-  // Number() become GetCount()
-
   m_StorePositionButton->Enable( m_Tags != NULL ); 
-	//m_PositionList->Enable( m_Tags != NULL && m_PositionList->Number()>0 );
-  //m_PositionList->Enable( m_Tags != NULL && m_PositionList->Number()>0 );
-	//m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
-	//m_RenamePositionButton->Enable( m_Tags != NULL && m_PositionList->Number()>0 && m_SelectedPosition != "" );
-	//m_Gui->Enable( ID_INTERPOLATE, m_Tags != NULL && m_PositionList->Number()>0 );
-
   m_PositionList->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 );
   m_PositionList->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 );
   m_DeletePositionButton->Enable( m_Tags != NULL && m_PositionList->GetCount()>0 && m_SelectedPosition != "" );
@@ -255,8 +250,6 @@ void mafAnimate::FlyTo()
 
   if(m_InterpolateFlag)
   {
-    //m_Renderer->GetRenderWindow()->SetDesiredUpdateRate(rate);  // SIL ??
-
     for (int i = 0; i <= numSteps; i++)
     {
       double t  = ( i * 1.0 ) / numSteps;
@@ -480,11 +473,9 @@ void mafAnimate::StoreViewPoint()
 	item.SetComponent(view_up[1],7);
 	item.SetComponent(view_up[2],8);
   item.SetComponent(par_scale,9);
-	//item.SetType(1000);
 	m_Tags->SetTag(item);
 
 	m_PositionList->Append(m_SelectedPosition);
-	//m_PositionList->SetSelection(m_PositionList->Number() - 1);
   m_PositionList->SetSelection(m_PositionList->GetCount() - 1);
 	m_Gui->Update();
 }
@@ -530,20 +521,20 @@ void mafAnimate::RenameViewPoint()
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-void mafAnimate::DeleteViewPoint()
+void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
 //----------------------------------------------------------------------------
 {
+  m_SelectedPosition = m_PositionList->GetStringSelection();
 	assert(m_SelectedPosition != "");
 
-	int n = m_PositionList->GetSelection();
-	m_PositionList->Delete(n);
+//	int n = m_PositionList->GetSelection();
+	m_PositionList->Delete(pos);
 
 	wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
   if(m_Tags->IsTagPresent(flyto_tagName))
 	  m_Tags->DeleteTag(flyto_tagName);
 
 	m_SelectedPosition = "";
-	//if(m_PositionList->Number()) 
   if(m_PositionList->GetCount()) 
 	{
 		m_PositionList->SetSelection(0);
@@ -555,13 +546,65 @@ void mafAnimate::DeleteViewPoint()
 void mafAnimate::ResetKit()
 //----------------------------------------------------------------------------
 {
-  //int num_items = m_PositionList->Number();
   int num_items = m_PositionList->GetCount();
   for (int i=0; i<num_items;i++)
   {
-    m_PositionList->Delete(0);
+    DeleteViewPoint(i);
+    //m_PositionList->Delete(0);
   }
-  m_Tags = NULL;
+  //m_Tags = NULL;
   EnableWidgets(); // disable all
   m_Gui->Update();
+}
+
+//----------------------------------------------------------------------------
+void mafAnimate::RetrieveStoredPositions(bool update_listbox /*= true*/)
+//----------------------------------------------------------------------------
+{
+  if(!m_Tags) return;
+  mafDEL(m_StoredPositions); // Initialize the tag array.
+  mafNEW(m_StoredPositions);
+  
+  std::vector<std::string> tag_list;
+  m_Tags->GetTagList(tag_list);
+
+  for(int t=0; t<tag_list.size(); t++)
+  {
+    mafTagItem *item = m_Tags->GetTag(tag_list[t].c_str());
+    if(item && ((item->GetNumberOfComponents() == 9) || (item->GetNumberOfComponents() == 10)))
+    {
+      wxString name = item->GetName();
+      if(name.Find("FLY_TO_") != -1)
+      {
+        m_StoredPositions->SetTag(*item);
+        if (update_listbox)
+        {
+	        name = name.Remove(0,7);
+	        m_PositionList->Append(name);
+        }
+      }
+    }
+  }
+}
+//----------------------------------------------------------------------------
+void mafAnimate::SetStoredPositions(mafTagArray *positions)
+//----------------------------------------------------------------------------
+{
+  ResetKit();
+  std::vector<std::string> tag_list;
+  positions->GetTagList(tag_list);
+
+  for(int t=0; t<tag_list.size(); t++)
+  {
+    mafTagItem *item = m_Tags->GetTag(tag_list[t].c_str());
+    m_Tags->SetTag(*item);
+  }
+  
+  if (tag_list.size() > 0)
+  {
+    RetrieveStoredPositions();
+    m_PositionList->SetSelection(0);
+    m_SelectedPosition = m_PositionList->GetStringSelection();
+    FlyTo();
+  }
 }

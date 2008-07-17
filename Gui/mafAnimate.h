@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-05 11:16:22 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-17 16:00:24 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,7 @@ public:
 	/** Return mafAnimate User Interface */
 	mmgGui *GetGui() {return m_Gui;};
 
-  /** set the vme that hold the tagarray where the ViewPoint are stored */
+  /** set the vme that hold the tag-array where the ViewPoint are stored */
 	void SetInputVME(mafNode *vme);
 
   /** delete All entries in listbox.*/
@@ -50,12 +50,18 @@ public:
   /** Allow to fly on specified position present into the stored positions. */
   void FlyTo(const char *fly_position);
 
+  /** Return the tag-array containing the stored positions (tag) list.*/
+  mafTagArray *GetStoredPositions() {RetrieveStoredPositions(false); return m_StoredPositions;};
+
+  /** Set the list of stored position given by the user.*/
+  void SetStoredPositions(mafTagArray *positions);
+
 protected:
 	/** Move the camera to the target position */
 	void FlyTo();
 
   /** Read root node's tags to retrieve previous stored camera positions.  */
-  void RetrieveStoredPositions();
+  void RetrieveStoredPositions(bool update_listbox = true);
 
 	/** Store a view position into the root's tag array */
 	void StoreViewPoint();
@@ -64,7 +70,7 @@ protected:
 	void RenameViewPoint();
 
 	/** Delete the view position */
-	void DeleteViewPoint();
+	void DeleteViewPoint(int pos = 0);
 
 	/** Create the GUI for the FlyTo animation */
 	void CreateGui();
@@ -74,6 +80,7 @@ protected:
 	mafObserver	*m_Listener;
 
 	mafTagArray		*m_Tags;
+  mafTagArray		*m_StoredPositions;
 	vtkRenderer		*m_Renderer;
 	mmgGui				*m_Gui;
 
