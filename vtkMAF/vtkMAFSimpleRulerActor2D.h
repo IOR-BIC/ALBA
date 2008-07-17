@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-17 08:30:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -67,6 +67,8 @@ class VTK_vtkMAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
   void UseGlobalAxesOff() {GlobalAxes = false; Modified();};
   void UseGlobalAxesOn() {GlobalAxes = true; Modified();};
 
+  void SetInverseTicks(bool inverseTicks){InverseTicks = inverseTicks;};
+
 protected:
 										vtkMAFSimpleRulerActor2D();
 									 ~vtkMAFSimpleRulerActor2D();
@@ -103,6 +105,7 @@ protected:
   bool   AxesLabelVisibility;
   bool   AxesVisibility;
   bool   TickVisibility;
+  bool   InverseTicks;
   double ScaleFactor;
   char  *Legend;
 

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-17 08:30:46 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
@@ -53,6 +53,8 @@ vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
   TickVisibility        = true;
   CenterAxes            = true;
   GlobalAxes            = true;
+
+  InverseTicks          = true;
 
   Legend = NULL;
   Axis = Tick = ScaleLabel = NULL;
@@ -562,10 +564,26 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   double axesOffsetX = (CenterAxes) ? rwWidth/2 -margin : ren->GetOrigin()[0];
   double axesOffsetY = (CenterAxes) ? rwHeight/2 -margin : ren->GetOrigin()[1];
   
-  double t0  = margin;              // tick begin
+
+  double t0;              // tick begin
   double t1x, t1y; // tick end 
-  double ta  = margin-shortTickLen; // short tick end 
-  double tc  = margin-longTickLen;  // long  tick end 
+  double ta; // short tick end 
+  double tc;  // long  tick end 
+
+  if(false == InverseTicks)
+  {
+    t0  = margin;              // tick begin
+    ta  = margin-shortTickLen; // short tick end 
+    tc  = margin-longTickLen;  // long  tick end 
+  }
+  else
+  {
+    t0  = margin-longTickLen;              // tick begin
+    ta  = margin-longTickLen+shortTickLen; // short tick end 
+    tc  = margin-longTickLen+longTickLen;  // long  tick end 
+  }
+
+  
   int id=0;
 
   // Update Axis and Ticks Points
