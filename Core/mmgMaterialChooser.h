@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-17 15:59:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,6 +31,7 @@ class vtkPolyDataMapper;
 class vtkProperty;
 class mafRWI;
 class mmgGui;
+class mmgButton;
 class vtkWindowToImageFilter;
 class mmgBitmaps;
 class vtkImageData;
@@ -51,7 +52,7 @@ public:
  ~mmgMaterialChooser();  // store materials to file
 
   /** Show in modal configuration the material editor. */
-	bool ShowChooserDialog(mafVME *vme);
+	bool ShowChooserDialog(mafVME *vme, bool remember_last_material = false);
 
   void OnEvent(mafEventBase *maf_event);
 	
@@ -100,10 +101,14 @@ protected:
   std::vector<mmaMaterial	*> m_List;
 	mmaMaterial				*m_ChoosedMaterial;
 	mmaMaterial       *m_VmeMaterial;
+  mafVME            *m_Vme;
 	vtkSphereSource		*m_Sphere;
 	vtkProperty				*m_Property;
 	vtkPolyDataMapper	*m_Mapper;
 	vtkActor					*m_Actor;
+  mmgButton *m_OkButton;
+  mmgButton *m_CancelButton;
+  mmgButton *m_ApplyButton;
 
 	mafString	m_MaterialName;
 	wxColour	m_AmbientColor;

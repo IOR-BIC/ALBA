@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 10:31:20 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-17 15:59:11 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -33,6 +33,7 @@
 #include "mafDecl.h"
 #include "mmaMaterial.h"
 #include "mafRWIBase.h"
+#include "mmgButton.h"
 #include "mmgMaterialButton.h"
 #include "mmgListCtrlBitmap.h"
 #include "mmgGui.h"
@@ -63,6 +64,7 @@ mmgMaterialChooser::mmgMaterialChooser(wxString dialog_title)
 {  
 	m_ChoosedMaterial	= NULL;
   m_VmeMaterial     = NULL;
+  m_Vme             = NULL;
   m_Dialog			    = NULL;
 	m_Gui					    = NULL;
 	m_ListCtrlMaterial= NULL;
@@ -101,7 +103,7 @@ mmgMaterialChooser::~mmgMaterialChooser()
   cppDEL(m_Dialog);
 };
 //----------------------------------------------------------------------------
-bool mmgMaterialChooser::ShowChooserDialog(mafVME *vme)
+bool mmgMaterialChooser::ShowChooserDialog(mafVME *vme, bool remember_last_material)
 //----------------------------------------------------------------------------
 {
   if(m_List.empty())
@@ -110,9 +112,14 @@ bool mmgMaterialChooser::ShowChooserDialog(mafVME *vme)
 	  CreateDefaultLibrary();
 	}
 
-  m_VmeMaterial = (mmaMaterial *)vme->GetAttribute("MaterialAttributes");
+  m_Vme = vme;
+  m_VmeMaterial = (mmaMaterial *)m_Vme->GetAttribute("MaterialAttributes");
   assert(m_VmeMaterial);
 
+  if (!remember_last_material)
+  {
+    m_ChoosedMaterial = NULL;
+  }
   SelectMaterial(m_VmeMaterial);
 
   bool res = m_Dialog->ShowModal() != 0;
@@ -139,6 +146,9 @@ enum MATERIAL_PROPERTY_ID
 	ID_ADD,
 	ID_REMOVE,
 	ID_BITMAP,
+  ID_OK,
+  ID_CANCEL,
+  ID_APPLY
 };
 //----------------------------------------------------------------------------
 void mmgMaterialChooser::CreateGUI() 
@@ -197,7 +207,20 @@ void mmgMaterialChooser::CreateGUI()
 	m_Gui->FileOpen(ID_LOAD,"load library",&m_Filename,wildcard);
 	m_Gui->FileSave(ID_SAVE,"save library",&m_Filename,wildcard);
 	m_Gui->Label		("");
-  m_Gui->OkCancel();
+  //m_Gui->OkCancel();
+  int bh = m_Gui->GetMetrics(GUI_BUTTON_HEIGHT);
+  int fw = m_Gui->GetMetrics(GUI_FULL_WIDTH);
+  m_OkButton  = new mmgButton (m_Gui,ID_OK, "Ok", wxDefaultPosition,wxSize(fw/3, bh));
+  m_CancelButton = new mmgButton (m_Gui,ID_CANCEL,"Cancel",wxDefaultPosition,wxSize(fw/3, bh));
+  m_ApplyButton = new mmgButton (m_Gui,ID_APPLY,"Apply",wxDefaultPosition,wxSize(fw/3, bh));
+  m_OkButton->SetListener(this);
+  m_CancelButton->SetListener(this);
+  m_ApplyButton->SetListener(this);
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+  sizer->Add(m_OkButton,  0, wxRIGHT);
+  sizer->Add(m_CancelButton, 0, wxRIGHT);
+  sizer->Add(m_ApplyButton, 0, wxRIGHT);
+  m_Gui->Add(sizer,0,wxALL); 
 
 	//m_Gui->Update();
 	//m_Gui->SetSize(wxSize(220,520));
@@ -380,13 +403,21 @@ void mmgMaterialChooser::OnEvent(mafEventBase *maf_event)
       case ID_LOAD:
         LoadLibraryFromFile();
       break;
-      case wxOK:
+      //case wxOK:
+      case ID_OK:
         assert(m_VmeMaterial);
         m_VmeMaterial->DeepCopy(m_ChoosedMaterial);
         m_VmeMaterial->m_Prop->DeepCopy(m_Property);
         m_Dialog->EndModal(wxOK); 
       break;
-      case wxCANCEL:
+      case ID_APPLY:
+        assert(m_VmeMaterial);
+        m_VmeMaterial->DeepCopy(m_ChoosedMaterial);
+        m_VmeMaterial->m_Prop->DeepCopy(m_Property);
+        m_Vme->ForwardUpEvent(mafEvent(m_Vme,CAMERA_UPDATE));
+      break;
+      //case wxCANCEL:
+      case ID_CANCEL:
         m_Dialog->EndModal(wxCANCEL); 
       break;
       case ID_GUI_UPDATE:
