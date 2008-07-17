@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:04:54 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2008-07-17 07:20:56 $
+  Version:   $Revision: 1.50 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -247,9 +247,15 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         {
           case CAMERA_OS_X:
             slice_mode = SLICE_X;
+            m_Normal[0] = 1.0;
+            m_Normal[1] = 0.0;
+            m_Normal[2] = 0.0;
         	break;
           case CAMERA_OS_Y:
             slice_mode = SLICE_Y;
+            m_Normal[0] = 0.0;
+            m_Normal[1] = 1.0;
+            m_Normal[2] = 0.0;
           break;
           case CAMERA_OS_P:
             slice_mode = SLICE_ORTHO;
@@ -259,6 +265,9 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           break;
           default:
             slice_mode = SLICE_Z;
+            m_Normal[0] = 0.0;
+            m_Normal[1] = 0.0;
+            m_Normal[2] = 1.0;
         }
         if (m_SliceInitialized)
         {
@@ -574,6 +583,10 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
   coord[2]=origin[2];
 
   VolumePositionCorrection(coord);
+
+  m_Slice[0] = coord[0];
+  m_Slice[1] = coord[1];
+  m_Slice[2] = coord[2];
   
   if(!m_CurrentSurface.empty())
 	{
@@ -827,6 +840,9 @@ void mafViewSlice::SetNormal(double normal[3])
 			this->UpdateText();
 		}
 	}*/
+  m_Normal[0] = normal[0];
+  m_Normal[1] = normal[1];
+  m_Normal[2] = normal[2];
 
 	if(!m_CurrentSurface.empty())
 	{
