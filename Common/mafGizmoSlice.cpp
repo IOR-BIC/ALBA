@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:59:27 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-07-17 07:19:50 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,13 +52,13 @@
 
 
 //----------------------------------------------------------------------------
-mafGizmoSlice::mafGizmoSlice(mafNode* imputVme, mafObserver *listener, const char* name) 
+mafGizmoSlice::mafGizmoSlice(mafNode* inputVme, mafObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */)
 //----------------------------------------------------------------------------
 {
-  CreateGizmoSlice(imputVme, listener, name);
+  CreateGizmoSlice(inputVme, Listener, name, inverseHandle);
 }
 //----------------------------------------------------------------------------
-void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char* name)
+void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char* name, bool inverseHandle)
 //----------------------------------------------------------------------------
 {
   m_Name = name;
@@ -70,6 +70,8 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   // register the input vme
   m_InputVME = mafVME::SafeDownCast(imputVme);
 
+  m_InverseHandle = inverseHandle;
+
   mafNEW(m_GizmoHandleCenterMatrix);
 
   // default gizmo moving modality set to SNAP
@@ -77,6 +79,7 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_Axis      = GIZMO_SLICE_Z;
   m_SnapArray = NULL;
   m_Id        = 0;
+  
 
   mafNEW(m_VmeGizmo);
   m_VmeGizmo->SetName(m_Name);
@@ -144,9 +147,21 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 
     double borderCube = VolumeVTKData->GetLength()/50;
 
-    cubeHandleLocalPosition[0] = localBounds[0];
-    cubeHandleLocalPosition[1] = localBounds[2];
-    cubeHandleLocalPosition[2] = localBounds[4];
+    double inversion = 1.;
+    if(false == m_InverseHandle)
+    {
+      cubeHandleLocalPosition[0] = localBounds[0];
+      cubeHandleLocalPosition[1] = localBounds[2];
+      cubeHandleLocalPosition[2] = localBounds[4];
+    }
+    else
+    {
+      cubeHandleLocalPosition[0] = localBounds[1];
+      cubeHandleLocalPosition[1] = localBounds[3];
+      cubeHandleLocalPosition[2] = localBounds[5];
+      inversion = -1.;
+    }
+    
 
     double interval[3][2] ={{localBounds[0], localBounds[1]}, {localBounds[2], localBounds[3]}, {localBounds[4], localBounds[5]}};
 
@@ -157,35 +172,35 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 	  switch(axis)
 	  {
 		  case GIZMO_SLICE_X:
-      {      
+      { 
 			  cubeHandleLocalPosition[0] = localPositionOnAxis;
-        cubeHandleLocalPosition[1] -= borderCube /2;
-        cubeHandleLocalPosition[2] -= borderCube /2;
+        cubeHandleLocalPosition[1] -= inversion * borderCube /2;
+        cubeHandleLocalPosition[2] -= inversion *borderCube /2;
 				if(wy<0.00001) wy=-10;
-			  ps->SetPoint1(0,wy + borderCube /2,0);
-			  ps->SetPoint2(0,0,wz + borderCube /2);
+			  ps->SetPoint1(0,inversion * (wy + borderCube /2),0);
+			  ps->SetPoint2(0,0,inversion *(wz + borderCube /2));
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::X, interval[0]);
       }
 		  break;
 		  case GIZMO_SLICE_Y:
       {     
-        cubeHandleLocalPosition[0] -= borderCube /2;
+        cubeHandleLocalPosition[0] -= inversion *borderCube /2;
 			  cubeHandleLocalPosition[1] = localPositionOnAxis;
-        cubeHandleLocalPosition[2] -= borderCube /2;
-			  ps->SetPoint1(wx+ borderCube /2,0,0);
-			  ps->SetPoint2(0,0,wz+ borderCube /2); 
+        cubeHandleLocalPosition[2] -= inversion *borderCube /2;
+			  ps->SetPoint1(inversion *(wx+ borderCube /2),0,0);
+			  ps->SetPoint2(0,0,inversion *(wz+ borderCube /2)); 
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Y, interval[1]);
       } 
 		  break;
 		  case GIZMO_SLICE_Z:
 		  default:
       {
-        cubeHandleLocalPosition[0] -= borderCube /2;
-        cubeHandleLocalPosition[1] -= borderCube /2;
+        cubeHandleLocalPosition[0] -= inversion *borderCube /2;
+        cubeHandleLocalPosition[1] -= inversion *borderCube /2;
 			  cubeHandleLocalPosition[2] = localPositionOnAxis;
-			  ps->SetPoint1(wx+ borderCube /2,0,0);
+			  ps->SetPoint1(inversion *(wx+ borderCube /2),0,0);
 				if(wy<0.00001) wy=-10;
-			  ps->SetPoint2(0,wy+ borderCube /2,0);
+			  ps->SetPoint2(0,inversion *(wy+ borderCube /2),0);
         m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Z, interval[2]);
       }
 		  break;
@@ -320,6 +335,22 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
 				mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 
 				// position sent as vtk point
+        if(m_Axis == GIZMO_SLICE_X)
+        {
+          slicePlaneOrigin[1] = 0.;
+          slicePlaneOrigin[2] = 0.;
+        }
+        else if(m_Axis == GIZMO_SLICE_Y)
+        {
+          slicePlaneOrigin[0] = 0.;
+          slicePlaneOrigin[2] = 0.;
+        }
+        else if(m_Axis == GIZMO_SLICE_Z)
+        {
+          slicePlaneOrigin[0] = 0.;
+          slicePlaneOrigin[1] = 0.;
+        }
+
 				m_Point->SetPoint(0,slicePlaneOrigin);
 				mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_Id));
 
@@ -348,6 +379,22 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
 			mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 
 			// position sent as vtk point
+      if(m_Axis == GIZMO_SLICE_X)
+		  {
+			  slicePlaneOrigin[1] = 0.;
+        slicePlaneOrigin[2] = 0.;
+		  }
+		  else if(m_Axis == GIZMO_SLICE_Y)
+		  {
+        slicePlaneOrigin[0] = 0.;
+        slicePlaneOrigin[2] = 0.;
+		  }
+		  else if(m_Axis == GIZMO_SLICE_Z)
+		  {
+        slicePlaneOrigin[0] = 0.;
+        slicePlaneOrigin[1] = 0.;
+		  }
+
 			m_Point->SetPoint(0,slicePlaneOrigin);
 			mafEventMacro(mafEvent(this,MOUSE_UP, m_Point, m_Id));
 		}
@@ -465,7 +512,7 @@ void mafGizmoSlice::SetInput( mafVME *vme )
   if (m_VmeGizmo != NULL)
   {
     DestroyGizmoSlice();
-    CreateGizmoSlice(vme, m_Listener, m_Name);
+    CreateGizmoSlice(vme, m_Listener, m_Name, m_InverseHandle);
   }
 }
 //----------------------------------------------------------------------------

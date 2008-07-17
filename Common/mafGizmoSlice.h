@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-12 10:02:55 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-17 07:19:50 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ class mafGizmoSlice : public mafGizmoInterface
 {
 public:
 
-	mafGizmoSlice(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice");
+	mafGizmoSlice(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice", bool inverseHandle = false);
 
   virtual	~mafGizmoSlice();
 
@@ -78,7 +78,7 @@ public:
 
 protected:
 
-  void CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name);
+  void CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name, bool inverseHandle);
 
   void DestroyGizmoSlice();
 
@@ -112,5 +112,7 @@ protected:
     MOVING_MODALITY_NUMBERS,
   };
   mmiGenericMouse *m_MouseBH;
+
+  bool m_InverseHandle;
 };
 #endif
