@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-17 08:30:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFRulerActor2D::vtkMAFRulerActor2D()
@@ -44,15 +44,21 @@ vtkMAFRulerActor2D::vtkMAFRulerActor2D()
   shortTickLen = 5;
   midTickLen   = 10;
   longTickLen  = 15;
-  DesiredTickSpacing = 60;
+  DesiredTickSpacing = 20;
   ntick    = 800; // enough for a tick spacing = 15 on a 1600x1200 screen
   ScaleFactor = 1.0;
+
+  PositionWorld[0] = PositionWorld[1] = PositionWorld[2] = 0;
+  Position[0] = Position[1] = Position[2] = 0;
+  PositionDisplay[0] = PositionDisplay[1] = PositionDisplay[2] = 0;
+  AttachPositionFlag = false;
 
   ScaleLabelVisibility  = true;
   AxesLabelVisibility   = true;
   AxesVisibility        = false;
   TickVisibility        = true;
   GlobalAxes            = true;
+  InverseTicks          = false;
 
   Legend = NULL;
   Axis = Tick = ScaleLabel = NULL;
@@ -213,10 +219,10 @@ void vtkMAFRulerActor2D::RulerCreate()
   int i, id=0, cp[2];
   for(i=0; i<ntick; i++)
 	{
-			Points->SetPoint(id,     i, m0,	0);
-      Points->SetPoint(id+1,   i, m1, 0);
-      Points->SetPoint(id+2,   m0, i, 0);
-      Points->SetPoint(id+3,   m1, i, 0);
+			Points->SetPoint(id,     Position[0]+i, Position[1]+m0,	0);
+      Points->SetPoint(id+1,   Position[0]+i, Position[1]+m1, 0);
+      Points->SetPoint(id+2,   Position[0]+m0, Position[1]+i, 0);
+      Points->SetPoint(id+3,   Position[0]+m1, Position[1]+i, 0);
 
       cp[0]=id, cp[1]=id+1;
 			tick_cell->InsertNextCell(2,cp);    
@@ -282,7 +288,7 @@ void vtkMAFRulerActor2D::RulerCreate()
   ScaleLabel->GetTextProperty()->SetFontFamilyToArial();
   ScaleLabel->GetTextProperty()->SetJustificationToLeft();
 	ScaleLabel->ScaledTextOff();
-	ScaleLabel->SetDisplayPosition(margin + 4,margin + 4);
+	ScaleLabel->SetDisplayPosition(Position[0] + margin + 4,Position[1] + margin + 4);
 	ScaleLabel->SetInput("");
 
   HorizontalAxesLabel = vtkTextActor::New();
@@ -292,7 +298,7 @@ void vtkMAFRulerActor2D::RulerCreate()
   HorizontalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   HorizontalAxesLabel->GetTextProperty()->SetJustificationToRight();
   HorizontalAxesLabel->ScaledTextOff();
-  HorizontalAxesLabel->SetDisplayPosition(0,0);
+  HorizontalAxesLabel->SetDisplayPosition(Position[0],Position[1]);
   HorizontalAxesLabel->SetInput("");
 
   VerticalAxesLabel = vtkTextActor::New();
@@ -302,7 +308,7 @@ void vtkMAFRulerActor2D::RulerCreate()
   VerticalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   VerticalAxesLabel->GetTextProperty()->SetJustificationToLeft();
   VerticalAxesLabel->ScaledTextOff();
-  VerticalAxesLabel->SetDisplayPosition(0,0);
+  VerticalAxesLabel->SetDisplayPosition(Position[0],Position[1]);
   VerticalAxesLabel->SetInput("");
 
   for(i=0; i<NUM_LAB; i++)
@@ -315,7 +321,7 @@ void vtkMAFRulerActor2D::RulerCreate()
     Labx[i]->GetTextProperty()->SetJustificationToCentered();
     Labx[i]->GetTextProperty()->SetVerticalJustificationToTop();
     Labx[i]->ScaledTextOff();
-    Labx[i]->SetDisplayPosition(0,0);
+    Labx[i]->SetDisplayPosition(Position[0],Position[1]);
     Labx[i]->SetInput("");
 
 
@@ -328,7 +334,7 @@ void vtkMAFRulerActor2D::RulerCreate()
     Laby[i]->GetTextProperty()->SetJustificationToLeft();
     Laby[i]->GetTextProperty()->SetVerticalJustificationToCentered();
     Laby[i]->ScaledTextOff();
-    Laby[i]->SetDisplayPosition(0,0);
+    Laby[i]->SetDisplayPosition(Position[0],Position[1]);
     Laby[i]->SetInput("");
   }
 }
@@ -552,17 +558,28 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   //   (w - wo) =    d * 1/w2d   =   d * d2w;
   //
 
+  if(true == AttachPositionFlag)
+  {
+    ren->SetWorldPoint(PositionWorld[0],PositionWorld[1],PositionWorld[2],1.);
+    ren->WorldToDisplay();
+    ren->GetDisplayPoint(PositionDisplay);
+
+    Position[0] = PositionDisplay[0] - margin;
+    Position[1] = PositionDisplay[1] - margin;
+    Position[2] = PositionDisplay[2];
+  }
+
   double p[4],p0[4],p1[4];
 
-  ren->SetDisplayPoint(margin,margin,0);
+  ren->SetDisplayPoint(Position[0] + margin, Position[1] + margin,0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p);
 
-  ren->SetDisplayPoint(0,0,0);
+  ren->SetDisplayPoint(Position[0], Position[1] ,0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p0);
 
-  ren->SetDisplayPoint(rwWidth, rwHeight, 0);
+  ren->SetDisplayPoint(Position[0]+rwWidth, Position[1]+rwHeight, 0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p1);
 
@@ -629,11 +646,27 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dy < rwHeight - margin ) dy_max = dy;
   }
 
-  double t0 = margin;              // tick begin
+  double t0;              // tick begin
   double t1x, t1y;                 // tick end
-  double ta = margin-shortTickLen; // short tick end 
-  double tb = margin-midTickLen;   // mid   tick end 
-  double tc = margin-longTickLen;  // long  tick end 
+  double ta; // short tick end 
+  double tb;   // mid   tick end 
+  double tc;  // long  tick end 
+
+  if(false == InverseTicks)
+  {
+    t0 = margin;              // tick begin  
+    ta = margin-shortTickLen; // short tick end 
+    tb = margin-midTickLen;   // mid   tick end 
+    tc = margin-longTickLen;  // long  tick end 
+  }
+  else
+  {
+    t0 = margin-longTickLen;              // tick begin
+    ta = margin-longTickLen+shortTickLen; // short tick end 
+    tb = margin-longTickLen+midTickLen;   // mid   tick end 
+    tc = margin-longTickLen+longTickLen;  // long  tick end 
+  }
+  
   int id=0;
 
   // Update Axis and Ticks Points
@@ -658,10 +691,10 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dx > rwWidth  - margin ) { dx = dx_max ; t1x = t0; } // discard tick
     if( dy > rwHeight - margin ) { dy = dy_max ; t1y = t0; } 
 
-    Points->SetPoint(id++, dx,  t0,   0);
-    Points->SetPoint(id++, dx,	t1x,  0);
-    Points->SetPoint(id++, t0,  dy,   0);
-    Points->SetPoint(id++, t1y, dy,   0);
+    Points->SetPoint(id++, Position[0]+dx,  Position[1]+t0,   0);
+    Points->SetPoint(id++, Position[0]+dx,	Position[1]+t1x,  0);
+    Points->SetPoint(id++, Position[0]+t0,  Position[1]+dy,   0);
+    Points->SetPoint(id++, Position[0]+t1y, Position[1]+dy,   0);
  }
   
   char labxtex[50];
@@ -678,10 +711,12 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dy < rwHeight - margin ) sprintf(labytex, "%g",wy ); else sprintf(labytex, "" );
 
     Labx[i]->SetInput(labxtex);
-    Labx[i]->SetDisplayPosition(dx , margin - longTickLen -2 );
+    Labx[i]->SetDisplayPosition(Position[0]+dx , Position[1]+margin - longTickLen -2 );
+    Labx[i]->Modified();
 
     Laby[i]->SetInput(labytex);
-    Laby[i]->SetDisplayPosition(margin +4, dy );
+    Laby[i]->SetDisplayPosition(Position[0]+margin +4, Position[1]+dy );
+    Laby[i]->Modified();
   }
 
 
@@ -693,15 +728,23 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     char caption[100];
     sprintf(caption, "%s%s %s", sign,  letter[x_index], Legend);
     HorizontalAxesLabel->SetInput(caption);
-    HorizontalAxesLabel->SetDisplayPosition(rwWidth - margin, margin + 4);
+    HorizontalAxesLabel->SetDisplayPosition(Position[0]+rwWidth - margin, Position[1]+margin + 4);
 
     sign = (w1Y-w0Y > 0) ? (char *)" " : (char *)"-";
     sprintf(caption, "%s%s %s", sign, letter[y_index], Legend);
     VerticalAxesLabel->SetInput(caption);
-    VerticalAxesLabel->SetDisplayPosition( margin, rwHeight - margin/2);
+    VerticalAxesLabel->SetDisplayPosition( Position[0]+margin, Position[1]+rwHeight - margin/2);
   }
 
   char lab[50];
   sprintf(lab,"%g %s", abs( worldTickSpacingX ), Legend);
   ScaleLabel->SetInput(lab);
+}
+//----------------------------------------------------------------------------
+void vtkMAFRulerActor2D::SetAttachPosition(double position[3])
+//----------------------------------------------------------------------------
+{
+  PositionWorld[0] = position[0];
+  PositionWorld[1] = position[1];
+  PositionWorld[2] = position[2];
 }

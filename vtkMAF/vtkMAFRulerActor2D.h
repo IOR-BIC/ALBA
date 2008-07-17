@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-17 08:30:29 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -66,6 +66,11 @@ class VTK_vtkMAF_EXPORT vtkMAFRulerActor2D : public vtkActor2D
   void UseGlobalAxesOff() {GlobalAxes = false; Modified();};
   void UseGlobalAxesOn() {GlobalAxes = true; Modified();};
 
+  void SetInverseTicks(bool inverseTicks){InverseTicks = inverseTicks;};
+  
+  void SetAttachPositionFlag(bool value){AttachPositionFlag = value;};
+  void SetAttachPosition(double position[3]);
+  
 protected:
 										vtkMAFRulerActor2D();
 									 ~vtkMAFRulerActor2D();
@@ -106,8 +111,15 @@ protected:
   bool   AxesLabelVisibility;
   bool   AxesVisibility;
   bool   TickVisibility;
+  bool   InverseTicks;
   double ScaleFactor;
   char  *Legend;
+
+
+  int    Position[3];
+  double PositionDisplay[3];
+  double PositionWorld[3];
+  bool   AttachPositionFlag;
 
   inline void   DecomposeValue(double val, int *sign, double *mantissa, int *exponent);
   inline double RicomposeValue(int sign, double mantissa, int exponent);
