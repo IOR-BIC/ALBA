@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 11:25:55 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-07-18 10:03:00 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
 #include "mafNode.h"
 #include "mafVMEOutputNULL.h"
 
-const int DEBUG_MODE = false;
+const int DEBUG_MODE = true;
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMEGroup)
@@ -170,20 +170,36 @@ int mafVMEGroup::InternalStore(mafStorageElement *parent)
 int mafVMEGroup::InternalRestore(mafStorageElement *node)
 //-----------------------------------------------------------------------
 {
-  if (DEBUG_MODE)
-  {
-    std::ostringstream stringStream;
-    stringStream << "Restoring matrix:"  << std::endl;
-    m_Transform->Print(stringStream);
-    mafLogMessage(stringStream.str().c_str());
-  }
-
   if (Superclass::InternalRestore(node)==MAF_OK)
   {
     mafMatrix matrix;
     if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
     {
+
+      if (DEBUG_MODE)
+      {
+        std::ostringstream stringStream;
+        stringStream << "Restoring group matrix:"  << std::endl;
+        matrix.Print(stringStream);
+        mafLogMessage(stringStream.str().c_str());
+      }
+
       this->SetMatrix(matrix);
+      return MAF_OK;
+    }
+    else
+    {
+      // code handling for old msf without group pose matrix serialization
+      this->SetMatrix(matrix);
+      if (DEBUG_MODE)
+        {
+          std::ostringstream stringStream;
+          stringStream << "BEWARE!!! Opening an old MSF without group matrix serialized:\
+restoring group matrix as:"  << std::endl;
+          matrix.Print(stringStream);
+          stringStream << "Please report any problem with old MSF containing groups!!!"  << std::endl;
+          mafLogMessage(stringStream.str().c_str());
+        }
       return MAF_OK;
     }
   }
