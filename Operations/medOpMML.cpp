@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:39:50 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-07-23 09:48:56 $
+Version:   $Revision: 1.8 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -175,8 +175,8 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_PH = NULL; // place horizontal
   m_PV = NULL; // place vertical
   m_TH = NULL; // translate horizontal
-  TV = NULL; // translate vertical
-  RA = NULL; // rotate
+  m_TV = NULL; // translate vertical
+  m_RA = NULL; // rotate
   SN = NULL; // scale north
   SS = NULL; // scale south
   SE = NULL; // scale east
@@ -548,8 +548,8 @@ void medOpMML::OnSlider()
   m_PH->SetLineActorX(m_slice - 1);
   m_PV->SetLineActorX(m_slice - 1);
   m_TH->SetLineActorX(m_slice - 1);
-  TV->SetLineActorX(m_slice - 1);
-  RA->SetLineActorX(m_slice - 1);
+  m_TV->SetLineActorX(m_slice - 1);
+  m_RA->SetLineActorX(m_slice - 1);
   SN->SetLineActorX(m_slice - 1);
   SS->SetLineActorX(m_slice - 1);
   SE->SetLineActorX(m_slice - 1);
@@ -591,8 +591,8 @@ void medOpMML::OnSlider()
   m_PH->Render();
   m_PV->Render();
   m_TH->Render();
-  TV->Render();
-  RA->Render();
+  m_TV->Render();
+  m_RA->Render();
   SN->Render();
   SS->Render();
   SE->Render();
@@ -862,17 +862,17 @@ void medOpMML::OnUndo()
       m_PV->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
       m_PV->Render();
 
-      RA->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      RA->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      RA->Render();
+      m_RA->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      m_RA->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      m_RA->Render();
 
       m_TH->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
       m_TH->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
       m_TH->Render();
 
-      TV->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      TV->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      TV->Render();
+      m_TV->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      m_TV->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      m_TV->Render();
     }
   }
 
@@ -923,7 +923,7 @@ void medOpMML::OnUndo()
 
   case 1 : // translate
     m_TH->RemovePoint(params_undo[0]);
-    TV->RemovePoint(params_undo[0]);
+    m_TV->RemovePoint(params_undo[0]);
     Model->GetTHSpline()->RemovePoint(params_undo[1]);
     Model->GetTVSpline()->RemovePoint(params_undo[1]);
 
@@ -935,7 +935,7 @@ void medOpMML::OnUndo()
         params[2] == (int) params_undo[2]) // same operation
       {
         m_TH->AddPoint(params_undo[0], params[3]);
-        TV->AddPoint(params_undo[0], params[4]);
+        m_TV->AddPoint(params_undo[0], params[4]);
         Model->GetTHSpline()->AddPoint(params_undo[1], params[3]);
         Model->GetTVSpline()->AddPoint(params_undo[1], params[4]);
         break;
@@ -951,18 +951,18 @@ void medOpMML::OnUndo()
         Model->GetTHSpline()->AddPoint(params_undo[0], 0.0);
       }
 
-      if (!(TV->GetValue(params_undo[0]) == 0.0))
+      if (!(m_TV->GetValue(params_undo[0]) == 0.0))
       {
-        TV->AddPoint(params_undo[0], 0.0);
+        m_TV->AddPoint(params_undo[0], 0.0);
         Model->GetTVSpline()->AddPoint(params_undo[0], 0.0);
       }
     }
     m_TH->Render();
-    TV->Render();
+    m_TV->Render();
     break;
 
   case 2 : // rotate
-    RA->RemovePoint(params_undo[0]);
+    m_RA->RemovePoint(params_undo[0]);
     Model->GetRASpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
@@ -972,7 +972,7 @@ void medOpMML::OnUndo()
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
-        RA->AddPoint(params_undo[0], params[3]);
+        m_RA->AddPoint(params_undo[0], params[3]);
         Model->GetRASpline()->AddPoint(params_undo[1], params[3]);
         break;
       }
@@ -981,13 +981,13 @@ void medOpMML::OnUndo()
     // first/last slice
     if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
-      if (!(RA->GetValue(params_undo[0]) == 0.0))
+      if (!(m_RA->GetValue(params_undo[0]) == 0.0))
       {
-        RA->AddPoint(params_undo[0], 0.0);
+        m_RA->AddPoint(params_undo[0], 0.0);
         Model->GetRASpline()->AddPoint(params_undo[0], 0.0);
       }
     }
-    RA->Render();
+    m_RA->Render();
     break;
 
   case 3 : // scale north
@@ -2315,8 +2315,8 @@ void medOpMML::CreateRegistrationDlg()
   m_PH = new medOpMMLParameterView(m_PHmafRWI->m_RenderWindow, m_PHmafRWI->m_RenFront); 
   m_PV = new medOpMMLParameterView(m_PVmafRWI->m_RenderWindow, m_PVmafRWI->m_RenFront);
   m_TH = new medOpMMLParameterView(m_THmafRWI->m_RenderWindow, m_THmafRWI->m_RenFront);
-  TV = new medOpMMLParameterView(m_TVmafRWI->m_RenderWindow, m_TVmafRWI->m_RenFront);
-  RA = new medOpMMLParameterView(m_RAmafRWI->m_RenderWindow, m_RAmafRWI->m_RenFront);
+  m_TV = new medOpMMLParameterView(m_TVmafRWI->m_RenderWindow, m_TVmafRWI->m_RenFront);
+  m_RA = new medOpMMLParameterView(m_RAmafRWI->m_RenderWindow, m_RAmafRWI->m_RenFront);
   SN = new medOpMMLParameterView(m_SNmafRWI->m_RenderWindow, m_SNmafRWI->m_RenFront);
   SS = new medOpMMLParameterView(m_SSmafRWI->m_RenderWindow, m_SSmafRWI->m_RenFront);
   SE = new medOpMMLParameterView(m_SEmafRWI->m_RenderWindow, m_SEmafRWI->m_RenFront);
@@ -2432,11 +2432,11 @@ bool medOpMML::SetUpParameterViews()
   m_TH->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
   m_TH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // tv spline
-  TV->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
-  TV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
+  m_TV->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_TV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // ra spline
-  RA->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
-  RA->SetRangeY(-70.0, 0.0, 70.0);
+  m_RA->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_RA->SetRangeY(-70.0, 0.0, 70.0);
   // sn spline
   SN->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
   SN->SetRangeY(0.1, 1.0, 3.0);
@@ -2469,14 +2469,14 @@ bool medOpMML::SetUpParameterViews()
   Model->GetTHSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - H = 0
   Model->GetTHSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice - H = 0
   // display values
-  TV->AddPoint(0, 0.0); // first slice, V = 0
-  TV->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TV = 0
+  m_TV->AddPoint(0, 0.0); // first slice, V = 0
+  m_TV->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TV = 0
   // actual values
   Model->GetTVSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - V = 0
   Model->GetTVSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, TV = 0
   // display values
-  RA->AddPoint(0, 0.0); // first slice, TA = 0
-  RA->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, RA = 0
+  m_RA->AddPoint(0, 0.0); // first slice, TA = 0
+  m_RA->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, RA = 0
   // actual values
   Model->GetRASpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, TA = 0
   Model->GetRASpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, RA = 0
@@ -2559,7 +2559,7 @@ bool medOpMML::SetUpParameterViews()
       case 1: // t
         // display values
         m_TH->AddPoint(params[0], params[3]);
-        TV->AddPoint(params[0], params[4]);
+        m_TV->AddPoint(params[0], params[4]);
         // actual values
         Model->GetTHSpline()->AddPoint(params[1], params[3]);
         Model->GetTVSpline()->AddPoint(params[1], params[4]);
@@ -2567,7 +2567,7 @@ bool medOpMML::SetUpParameterViews()
 
       case 2: // r
         // display values
-        RA->AddPoint(params[0], params[3]);
+        m_RA->AddPoint(params[0], params[3]);
         // actual values
         Model->GetRASpline()->AddPoint(params[1], params[3]);
         break;
@@ -2616,10 +2616,10 @@ bool medOpMML::SetUpParameterViews()
         m_PV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
         m_TH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
         m_TH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-        TV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-        TV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-        RA->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-        RA->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+        m_TV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+        m_TV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+        m_RA->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+        m_RA->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
       }
 
       // new next op
@@ -2641,8 +2641,8 @@ bool medOpMML::SetUpWidget()
   Widget->SetPH(m_PH);
   Widget->SetPV(m_PV);
   Widget->SetTH(m_TH);
-  Widget->SetTV(TV);
-  Widget->SetRA(RA);
+  Widget->SetTV(m_TV);
+  Widget->SetRA(m_RA);
   Widget->SetSN(SN);
   Widget->SetSS(SS);
   Widget->SetSE(SE);
@@ -3331,8 +3331,8 @@ void medOpMML::OnPOperationButton()
   m_PH->Render();
   m_PV->Render();
   m_TH->Render();
-  TV->Render();
-  RA->Render();
+  m_TV->Render();
+  m_RA->Render();
   SN->Render();
   SS->Render();
   SE->Render();
@@ -3388,8 +3388,8 @@ void medOpMML::OnTOperationButton()
   m_PH->Render();
   m_PV->Render();
   m_TH->Render();
-  TV->Render();
-  RA->Render();
+  m_TV->Render();
+  m_RA->Render();
   SN->Render();
   SS->Render();
   SE->Render();
@@ -3445,8 +3445,8 @@ void medOpMML::OnROperationButton()
   m_PH->Render();
   m_PV->Render();
   m_TH->Render();
-  TV->Render();
-  RA->Render();
+  m_TV->Render();
+  m_RA->Render();
   SN->Render();
   SS->Render();
   SE->Render();
@@ -3504,8 +3504,8 @@ void medOpMML::OnSOperationButton()
   m_PH->Render();
   m_PV->Render();
   m_TH->Render();
-  TV->Render();
-  RA->Render();
+  m_TV->Render();
+  m_RA->Render();
   SN->Render();
   SS->Render();
   SE->Render();

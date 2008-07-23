@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:39:50 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-07-23 09:48:56 $
+Version:   $Revision: 1.8 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -92,8 +92,8 @@ protected:
   medOpMMLParameterView *m_PH; // PH parameter view
   medOpMMLParameterView *m_PV; // PV parameter view
   medOpMMLParameterView *m_TH; // TH parameter view
-  medOpMMLParameterView *TV; // TV parameter view
-  medOpMMLParameterView *RA; // RA parameter view
+  medOpMMLParameterView *m_TV; // TV parameter view
+  medOpMMLParameterView *m_RA; // RA parameter view
   medOpMMLParameterView *SN; // SN parameter view
   medOpMMLParameterView *SS; // SS parameter view
   medOpMMLParameterView *SE; // SE parameter view
