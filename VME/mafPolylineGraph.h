@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-04-11 16:03:07 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-07-23 12:21:05 $
+Version:   $Revision: 1.8 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -385,9 +385,9 @@ private:
   //-----------------------------------------------------------------------------
   // member variables
   //-----------------------------------------------------------------------------
-  std::vector<Vertex> vertex ;                ///< list of vertices
-  std::vector<Edge> edge ;                    ///< list of edges
-  std::vector<Branch> branch ;                ///< list of branches
+  std::vector<Vertex> m_Vertex ;                ///< list of vertices
+  std::vector<Edge> m_Edge ;                    ///< list of edges
+  std::vector<Branch> m_Branch ;                ///< list of branches
 } ;
 
 #endif

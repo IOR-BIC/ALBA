@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-11 16:03:07 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-07-23 12:21:05 $
+Version:   $Revision: 1.7 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1076,9 +1076,9 @@ mafPolylineGraph::mafPolylineGraph()
 mafPolylineGraph::~mafPolylineGraph()
 //-------------------------------------------------------------------------
 {
-  vertex.clear() ;
-  edge.clear() ;
-  branch.clear() ;
+  m_Vertex.clear() ;
+  m_Edge.clear() ;
+  m_Branch.clear() ;
 }
 
 
@@ -1087,7 +1087,7 @@ mafPolylineGraph::~mafPolylineGraph()
 int mafPolylineGraph::GetNumberOfVertices() const
 //-------------------------------------------------------------------------
 {
-  return vertex.size() ;
+  return m_Vertex.size() ;
 }
 
 //-------------------------------------------------------------------------
@@ -1095,7 +1095,7 @@ int mafPolylineGraph::GetNumberOfVertices() const
 int mafPolylineGraph::GetNumberOfEdges() const
 //-------------------------------------------------------------------------
 {
-  return edge.size() ;
+  return m_Edge.size() ;
 }
 
 //-------------------------------------------------------------------------
@@ -1103,7 +1103,7 @@ int mafPolylineGraph::GetNumberOfEdges() const
 int mafPolylineGraph::GetNumberOfBranches() const
 //-------------------------------------------------------------------------
 {
-  return branch.size() ;
+  return m_Branch.size() ;
 }
 
 
@@ -1112,7 +1112,7 @@ int mafPolylineGraph::GetNumberOfBranches() const
 vtkIdType mafPolylineGraph::GetMaxVertexId() const
 //-------------------------------------------------------------------------
 {
-  return (vtkIdType)(vertex.size() - 1) ;
+  return (vtkIdType)(m_Vertex.size() - 1) ;
 }
 
 //-------------------------------------------------------------------------
@@ -1120,7 +1120,7 @@ vtkIdType mafPolylineGraph::GetMaxVertexId() const
 vtkIdType mafPolylineGraph::GetMaxEdgeId() const
 //-------------------------------------------------------------------------
 {
-  return (vtkIdType)(edge.size() - 1) ;
+  return (vtkIdType)(m_Edge.size() - 1) ;
 }
 
 //-------------------------------------------------------------------------
@@ -1128,7 +1128,7 @@ vtkIdType mafPolylineGraph::GetMaxEdgeId() const
 vtkIdType mafPolylineGraph::GetMaxBranchId() const
 //-------------------------------------------------------------------------
 {
-  return (vtkIdType)(branch.size() - 1) ;
+  return (vtkIdType)(m_Branch.size() - 1) ;
 }
 
 
@@ -1247,7 +1247,7 @@ mafPolylineGraph::Vertex* mafPolylineGraph::GetVertexPtr(vtkIdType i)
 //-------------------------------------------------------------------------
 {
   if ((i >= 0) && (i < GetNumberOfVertices()))
-    return &(vertex.at(i)) ;
+    return &(m_Vertex.at(i)) ;
   else
     return NULL ;
 }
@@ -1258,7 +1258,7 @@ mafPolylineGraph::Edge* mafPolylineGraph::GetEdgePtr(vtkIdType i)
 //-------------------------------------------------------------------------
 {
   if ((i >= 0) && (i < GetNumberOfEdges()))
-    return &(edge.at(i)) ;
+    return &(m_Edge.at(i)) ;
   else
     return NULL ;
 }
@@ -1270,7 +1270,7 @@ mafPolylineGraph::Branch* mafPolylineGraph::GetBranchPtr(vtkIdType i)
 //-------------------------------------------------------------------------
 {
   if ((i >= 0) && (i < GetNumberOfBranches()))
-    return &(branch.at(i)) ;
+    return &(m_Branch.at(i)) ;
   else
     return NULL ;
 }
@@ -1284,7 +1284,7 @@ const mafPolylineGraph::Vertex* mafPolylineGraph::GetConstVertexPtr(vtkIdType i)
 //-------------------------------------------------------------------------
 {
   if ((i >= 0) && (i < GetNumberOfVertices()))
-    return &(vertex.at(i)) ;
+    return &(m_Vertex.at(i)) ;
   else
     return NULL ;
 }
@@ -1295,7 +1295,7 @@ const mafPolylineGraph::Edge* mafPolylineGraph::GetConstEdgePtr(vtkIdType i) con
 //-------------------------------------------------------------------------
 {
   if ((i >= 0) && (i < GetNumberOfEdges()))
-    return &(edge.at(i)) ;
+    return &(m_Edge.at(i)) ;
   else
     return NULL ;
 }
@@ -1306,7 +1306,7 @@ const mafPolylineGraph::Branch* mafPolylineGraph::GetConstBranchPtr(vtkIdType i)
 //-------------------------------------------------------------------------
 {
   if ((i >= 0) && (i < GetNumberOfBranches()))
-    return &(branch.at(i)) ;
+    return &(m_Branch.at(i)) ;
   else
     return NULL ;
 }
@@ -1318,7 +1318,7 @@ void mafPolylineGraph::AllocateVertices(int nv)
 //-------------------------------------------------------------------------
 {
   Vertex v ;
-  vertex.resize(nv, v) ;
+  m_Vertex.resize(nv, v) ;
 }
 
 //-------------------------------------------------------------------------
@@ -1327,7 +1327,7 @@ void mafPolylineGraph::AllocateEdges(int ne)
 //-------------------------------------------------------------------------
 {
   Edge e ;
-  edge.resize(ne, e) ;
+  m_Edge.resize(ne, e) ;
 }
 
 //-------------------------------------------------------------------------
@@ -1336,7 +1336,7 @@ void mafPolylineGraph::AllocateBranches(int nb)
 //-------------------------------------------------------------------------
 {
   Branch b ;
-  branch.resize(nb, b) ;
+  m_Branch.resize(nb, b) ;
 }
 
 
@@ -1588,9 +1588,9 @@ vtkIdType mafPolylineGraph::GetBranchCorrespondingToOutputCell(vtkIdType cellid)
 void mafPolylineGraph::Clear()
 //-------------------------------------------------------------------------
 {
-  vertex.clear() ;
-  edge.clear() ;
-  branch.clear() ;
+  m_Vertex.clear() ;
+  m_Edge.clear() ;
+  m_Branch.clear() ;
 }
 
 
@@ -1891,7 +1891,7 @@ bool mafPolylineGraph::AddNewEdge(vtkIdType v0, vtkIdType v1)
 
   // construct new edge with given vertices and add to graph
   Edge ed(v0,v1) ;
-  edge.push_back(ed) ;
+  m_Edge.push_back(ed) ;
 
   // get edge index and add to vertices
   vtkIdType e = GetMaxEdgeId() ;
@@ -1915,7 +1915,7 @@ void mafPolylineGraph::AddNewVertex(double *coords)
   if (coords != NULL)
     vert.SetCoords(coords) ;
 
-  vertex.push_back(vert) ;
+  m_Vertex.push_back(vert) ;
 }
 
 
@@ -1937,7 +1937,7 @@ bool mafPolylineGraph::AddNewVertex(vtkIdType v0, double *coords)
   if (coords != NULL)
     vert.SetCoords(coords) ;
 
-  vertex.push_back(vert) ;
+  m_Vertex.push_back(vert) ;
 
   // get index of new vertex and connect it to the input vertex
   vtkIdType v1 = GetMaxVertexId() ;
@@ -1953,7 +1953,7 @@ void mafPolylineGraph::AddNewBranch(const wxString *name)
 //-------------------------------------------------------------------------
 {
   Branch br(name) ;
-  branch.push_back(br) ;
+  m_Branch.push_back(br) ;
 }
 
 //-------------------------------------------------------------------------
@@ -1970,7 +1970,7 @@ bool mafPolylineGraph::AddNewBranch(vtkIdType v0, const wxString *name)
 
   // construct new branch with start vertex and add to graph
   Branch br(v0, name) ;
-  branch.push_back(br) ;
+  m_Branch.push_back(br) ;
 
   return true ;
 }
@@ -1988,7 +1988,7 @@ bool mafPolylineGraph::SplitBranchAtEdge(vtkIdType b, vtkIdType e)
 
   // create a new branch at the end of the list
   Branch Br ;
-  branch.push_back(Br) ;
+  m_Branch.push_back(Br) ;
   Branch *bold = GetBranchPtr(b) ;
   Branch *bnew = GetBranchPtr(GetMaxBranchId()) ;
   Branch *btemp = &Br ;
@@ -2048,7 +2048,7 @@ bool mafPolylineGraph::SplitBranchAtVertex(vtkIdType b, vtkIdType v)
 
   // create a new branch at the end of the list
   Branch Br ;
-  branch.push_back(Br) ;
+  m_Branch.push_back(Br) ;
   Branch *bold = GetBranchPtr(b) ;
   Branch *bnew = GetBranchPtr(GetMaxBranchId()) ;
   Branch *btemp = &Br ;
@@ -2305,7 +2305,7 @@ bool mafPolylineGraph::DeleteLastEdge()
   }
 
   // finally delete the edge from the end of the list
-  edge.pop_back() ;
+  m_Edge.pop_back() ;
 
   return true ;
 }
@@ -2369,7 +2369,7 @@ bool mafPolylineGraph::DeleteLastVertex()
   }
 
   // finally delete the vertex from the end of the list
-  vertex.pop_back() ;
+  m_Vertex.pop_back() ;
 
   return true ;
 }
@@ -2415,7 +2415,7 @@ bool mafPolylineGraph::DeleteLastBranch()
   }
 
   // finally delete the branch from the end of the list
-  branch.pop_back() ;
+  m_Branch.pop_back() ;
 
   return true ;
 }
