@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 12:21:05 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-07-23 12:51:04 $
+Version:   $Revision: 1.8 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -179,9 +179,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 mafPolylineGraph::Vertex::Vertex()
 //-------------------------------------------------------------------------
 {
-  m_coords[0] = 0.0 ;
-  m_coords[1] = 0.0 ;
-  m_coords[2] = 0.0 ;
+  m_Coords[0] = 0.0 ;
+  m_Coords[1] = 0.0 ;
+  m_Coords[2] = 0.0 ;
 }
 
 
@@ -190,9 +190,9 @@ mafPolylineGraph::Vertex::Vertex()
 mafPolylineGraph::Vertex::Vertex(double *coords)
 //-------------------------------------------------------------------------
 {
-  m_coords[0] = coords[0] ;
-  m_coords[1] = coords[1] ;
-  m_coords[2] = coords[2] ;
+  m_Coords[0] = coords[0] ;
+  m_Coords[1] = coords[1] ;
+  m_Coords[2] = coords[2] ;
 }
 
 //-------------------------------------------------------------------------
@@ -200,8 +200,8 @@ mafPolylineGraph::Vertex::Vertex(double *coords)
 mafPolylineGraph::Vertex::~Vertex()
 //-------------------------------------------------------------------------
 {
-  edgeId.clear() ;
-  vertexId.clear() ;
+  m_EdgeId.clear() ;
+  m_VertexId.clear() ;
 }
 
 
@@ -210,7 +210,7 @@ mafPolylineGraph::Vertex::~Vertex()
 int mafPolylineGraph::Vertex::GetDegree() const
 //-------------------------------------------------------------------------
 {
-  return (int)edgeId.size() ;
+  return (int)m_EdgeId.size() ;
 }
 
 
@@ -219,7 +219,7 @@ int mafPolylineGraph::Vertex::GetDegree() const
 vtkIdType mafPolylineGraph::Vertex::GetEdgeId(int i) const
 //-------------------------------------------------------------------------
 {
-  return edgeId.at(i) ;
+  return m_EdgeId.at(i) ;
 }
 
 
@@ -228,7 +228,7 @@ vtkIdType mafPolylineGraph::Vertex::GetEdgeId(int i) const
 void mafPolylineGraph::Vertex::SetEdgeId(int i, vtkIdType e)
 //-------------------------------------------------------------------------
 {
-  edgeId.at(i) = e ;
+  m_EdgeId.at(i) = e ;
 }
 
 //-------------------------------------------------------------------------
@@ -236,7 +236,7 @@ void mafPolylineGraph::Vertex::SetEdgeId(int i, vtkIdType e)
 void mafPolylineGraph::Vertex::AddEdgeId(vtkIdType e)
 //-------------------------------------------------------------------------
 {
-  edgeId.push_back(e) ;
+  m_EdgeId.push_back(e) ;
 }
 
 
@@ -267,11 +267,11 @@ bool mafPolylineGraph::Vertex::DeleteEdgeId(vtkIdType e)
   }
 
   // copy the end of the list to position j and delete the end of the list
-  edgeId.at(j) = edgeId.back() ;
-  edgeId.pop_back() ;
+  m_EdgeId.at(j) = m_EdgeId.back() ;
+  m_EdgeId.pop_back() ;
 
-  vertexId.at(j) = vertexId.back() ;
-  vertexId.pop_back() ;
+  m_VertexId.at(j) = m_VertexId.back() ;
+  m_VertexId.pop_back() ;
 
   return true ;
 }
@@ -282,7 +282,7 @@ bool mafPolylineGraph::Vertex::DeleteEdgeId(vtkIdType e)
 vtkIdType mafPolylineGraph::Vertex::GetVertexId(int i) const
 //-------------------------------------------------------------------------
 {
-  return vertexId.at(i) ;
+  return m_VertexId.at(i) ;
 }
 
 
@@ -291,7 +291,7 @@ vtkIdType mafPolylineGraph::Vertex::GetVertexId(int i) const
 void mafPolylineGraph::Vertex::SetVertexId(int i, vtkIdType v)
 //-------------------------------------------------------------------------
 {
-  vertexId.at(i) = v ;
+  m_VertexId.at(i) = v ;
 }
 
 
@@ -300,7 +300,7 @@ void mafPolylineGraph::Vertex::SetVertexId(int i, vtkIdType v)
 void mafPolylineGraph::Vertex::AddVertexId(vtkIdType v)
 //-------------------------------------------------------------------------
 {
-  vertexId.push_back(v) ;
+  m_VertexId.push_back(v) ;
 }
 
 
@@ -334,11 +334,11 @@ bool mafPolylineGraph::Vertex::DeleteVertexId(vtkIdType v)
   }
 
   // copy the end of the list to position j and delete the end of the list
-  edgeId.at(j) = edgeId.back() ;
-  edgeId.pop_back() ;
+  m_EdgeId.at(j) = m_EdgeId.back() ;
+  m_EdgeId.pop_back() ;
 
-  vertexId.at(j) = vertexId.back() ;
-  vertexId.pop_back() ;
+  m_VertexId.at(j) = m_VertexId.back() ;
+  m_VertexId.pop_back() ;
 
   return true ;
 }
@@ -362,9 +362,9 @@ void mafPolylineGraph::Vertex::GetVerticesIdList(vtkIdList *idlist) const
 void mafPolylineGraph::Vertex::GetCoords(double *coords) const
 //-------------------------------------------------------------------------
 {
-  coords[0] = m_coords[0] ;
-  coords[1] = m_coords[1] ;
-  coords[2] = m_coords[2] ;
+  coords[0] = m_Coords[0] ;
+  coords[1] = m_Coords[1] ;
+  coords[2] = m_Coords[2] ;
 }
 
 
@@ -373,9 +373,9 @@ void mafPolylineGraph::Vertex::GetCoords(double *coords) const
 void mafPolylineGraph::Vertex::SetCoords(const double* coords)
 //-------------------------------------------------------------------------
 {
-  m_coords[0] = coords[0] ;
-  m_coords[1] = coords[1] ;
-  m_coords[2] = coords[2] ;
+  m_Coords[0] = coords[0] ;
+  m_Coords[1] = coords[1] ;
+  m_Coords[2] = coords[2] ;
 }
 
 
@@ -384,8 +384,8 @@ void mafPolylineGraph::Vertex::SetCoords(const double* coords)
 void mafPolylineGraph::Vertex::Clear()
 //-------------------------------------------------------------------------
 {
-  edgeId.clear() ;
-  vertexId.clear() ;
+  m_EdgeId.clear() ;
+  m_VertexId.clear() ;
 }
 
 
@@ -396,8 +396,8 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
 //-------------------------------------------------------------------------
 {
   // arrays should be of the same length
-  if (edgeId.size() != vertexId.size()){
-    mafLogMessage("mismatched list sizes in vertex %d %d", edgeId.size(), vertexId.size()) ;
+  if (m_EdgeId.size() != m_VertexId.size()){
+    mafLogMessage("mismatched list sizes in vertex %d %d", m_EdgeId.size(), m_VertexId.size()) ;
     return false ;
   }
 
@@ -456,21 +456,21 @@ void mafPolylineGraph::Vertex::PrintSelf(std::ostream& os, const int tabs) const
 
 //-------------------------------------------------------------------------
 // constructor (sets default values)
-mafPolylineGraph::Edge::Edge() : directed(false), weight(1.0), branchId(UndefinedId), m_OutputPolydataCell(UndefinedId), m_OutputPolydataCellIndex(UndefinedId)
+mafPolylineGraph::Edge::Edge() : m_Directed(false), m_Weight(1.0), m_BranchId(UndefinedId), m_OutputPolydataCell(UndefinedId), m_OutputPolydataCellIndex(UndefinedId)
 //-------------------------------------------------------------------------
 {
-  vertexId[0] = UndefinedId ;
-  vertexId[1] = UndefinedId ;
+  m_VertexId[0] = UndefinedId ;
+  m_VertexId[1] = UndefinedId ;
 }
 
 
 //-------------------------------------------------------------------------
 // constructor with end vertices
-mafPolylineGraph::Edge::Edge(vtkIdType v0, vtkIdType v1) : directed(false), weight(1.0), branchId(UndefinedId), m_OutputPolydataCell(UndefinedId), m_OutputPolydataCellIndex(UndefinedId)
+mafPolylineGraph::Edge::Edge(vtkIdType v0, vtkIdType v1) : m_Directed(false), m_Weight(1.0), m_BranchId(UndefinedId), m_OutputPolydataCell(UndefinedId), m_OutputPolydataCellIndex(UndefinedId)
 //-------------------------------------------------------------------------
 {
-  vertexId[0] = v0 ;
-  vertexId[1] = v1 ;
+  m_VertexId[0] = v0 ;
+  m_VertexId[1] = v1 ;
 }
 
 
@@ -479,11 +479,11 @@ mafPolylineGraph::Edge::Edge(vtkIdType v0, vtkIdType v1) : directed(false), weig
 mafPolylineGraph::Edge::Edge(const mafPolylineGraph::Edge& e)                      
 //-------------------------------------------------------------------------
 {
-  vertexId[0] = e.vertexId[0] ;
-  vertexId[1] = e.vertexId[1] ;
-  directed = e.directed ;
-  weight = e.weight ;
-  branchId = e.branchId ;
+  m_VertexId[0] = e.m_VertexId[0] ;
+  m_VertexId[1] = e.m_VertexId[1] ;
+  m_Directed = e.m_Directed ;
+  m_Weight = e.m_Weight ;
+  m_BranchId = e.m_BranchId ;
 }
 
 
@@ -500,11 +500,11 @@ mafPolylineGraph::Edge::~Edge()
 mafPolylineGraph::Edge& mafPolylineGraph::Edge::operator=(const mafPolylineGraph::Edge& e)                      
 //-------------------------------------------------------------------------
 {
-  vertexId[0] = e.vertexId[0] ;
-  vertexId[1] = e.vertexId[1] ;
-  directed = e.directed ;
-  weight = e.weight ;
-  branchId = e.branchId ;
+  m_VertexId[0] = e.m_VertexId[0] ;
+  m_VertexId[1] = e.m_VertexId[1] ;
+  m_Directed = e.m_Directed ;
+  m_Weight = e.m_Weight ;
+  m_BranchId = e.m_BranchId ;
 
   return *this ;
 }
@@ -514,7 +514,7 @@ mafPolylineGraph::Edge& mafPolylineGraph::Edge::operator=(const mafPolylineGraph
 vtkIdType mafPolylineGraph::Edge::GetVertexId(int i) const
 //-------------------------------------------------------------------------
 {
-  return vertexId[i] ;
+  return m_VertexId[i] ;
 }
 
 //-------------------------------------------------------------------------
@@ -522,7 +522,7 @@ vtkIdType mafPolylineGraph::Edge::GetVertexId(int i) const
 void mafPolylineGraph::Edge::SetVertexId(int i, vtkIdType v)
 //-------------------------------------------------------------------------
 {
-  vertexId[i] = v ;
+  m_VertexId[i] = v ;
 }
 
 //-------------------------------------------------------------------------
@@ -530,8 +530,8 @@ void mafPolylineGraph::Edge::SetVertexId(int i, vtkIdType v)
 void mafPolylineGraph::Edge::SetVertexIds(vtkIdType v0, vtkIdType v1)
 //-------------------------------------------------------------------------
 {
-  vertexId[0] = v0 ;
-  vertexId[1] = v1 ;
+  m_VertexId[0] = v0 ;
+  m_VertexId[1] = v1 ;
 }
 
 
@@ -567,7 +567,7 @@ vtkIdType mafPolylineGraph::Edge::GetOtherEndVertexId(vtkIdType v) const
 vtkIdType mafPolylineGraph::Edge::GetBranchId() const
 //-------------------------------------------------------------------------
 {
-  return branchId ;
+  return m_BranchId ;
 }
 
 //-------------------------------------------------------------------------
@@ -575,7 +575,7 @@ vtkIdType mafPolylineGraph::Edge::GetBranchId() const
 void mafPolylineGraph::Edge::SetBranchId(vtkIdType b)
 //-------------------------------------------------------------------------
 {
-  branchId = b ;
+  m_BranchId = b ;
 }
 
 //-------------------------------------------------------------------------
@@ -583,7 +583,7 @@ void mafPolylineGraph::Edge::SetBranchId(vtkIdType b)
 bool mafPolylineGraph::Edge::IsVertexPair(vtkIdType v0, vtkIdType v1) const
 //-------------------------------------------------------------------------
 {
-  return (vertexId[0] == v0 && vertexId[1] == v1) || (vertexId[0] == v1 && vertexId[1] == v0) ;
+  return (m_VertexId[0] == v0 && m_VertexId[1] == v1) || (m_VertexId[0] == v1 && m_VertexId[1] == v0) ;
 }
 
 
@@ -592,7 +592,7 @@ bool mafPolylineGraph::Edge::IsVertexPair(vtkIdType v0, vtkIdType v1) const
 bool mafPolylineGraph::Edge::IsVertexPairOrdered(vtkIdType v0, vtkIdType v1) const
 //-------------------------------------------------------------------------
 {
-  return (vertexId[0] == v0 && vertexId[1] == v1) ;
+  return (m_VertexId[0] == v0 && m_VertexId[1] == v1) ;
 }
 
 
@@ -601,7 +601,7 @@ bool mafPolylineGraph::Edge::IsVertexPairOrdered(vtkIdType v0, vtkIdType v1) con
 void mafPolylineGraph::Edge::SetDirected(bool dir)
 //-------------------------------------------------------------------------
 {
-  directed = dir ;
+  m_Directed = dir ;
 }
 
 
@@ -610,7 +610,7 @@ void mafPolylineGraph::Edge::SetDirected(bool dir)
 bool mafPolylineGraph::Edge::IsDirected() const
 //-------------------------------------------------------------------------
 {
-  return directed ;
+  return m_Directed ;
 }
 
 
@@ -633,7 +633,7 @@ void mafPolylineGraph::Edge::ReverseDirection()
 double mafPolylineGraph::Edge::GetWeight() const
 //-------------------------------------------------------------------------
 {
-  return weight ;
+  return m_Weight ;
 }
 
 //-------------------------------------------------------------------------
@@ -641,7 +641,7 @@ double mafPolylineGraph::Edge::GetWeight() const
 void mafPolylineGraph::Edge::SetWeight(double w)
 //-------------------------------------------------------------------------
 {
-  weight = w ;
+  m_Weight = w ;
 }
 
 
@@ -673,8 +673,8 @@ bool mafPolylineGraph::Edge::SelfCheck() const
 //-------------------------------------------------------------------------
 {
   // edge must not be empty
-  if ((vertexId[0] == UndefinedId) || (vertexId[1] == UndefinedId)){
-    mafLogMessage("undefined vertex or vertices %d %d on edge", vertexId[0], vertexId[1]) ;
+  if ((m_VertexId[0] == UndefinedId) || (m_VertexId[1] == UndefinedId)){
+    mafLogMessage("undefined vertex or vertices %d %d on edge", m_VertexId[0], m_VertexId[1]) ;
     return false ;
   }
 
@@ -709,9 +709,9 @@ mafPolylineGraph::Branch::Branch(const wxString *name) : m_OutputPolydataCell(Un
 //-------------------------------------------------------------------------
 {
   if (name != NULL)
-    m_name = *name ;
+    m_Name = *name ;
   else
-    m_name = UndefinedName ;
+    m_Name = UndefinedName ;
 }
 
 
@@ -721,12 +721,12 @@ mafPolylineGraph::Branch::Branch(vtkIdType v, const wxString *name) : m_OutputPo
 //-------------------------------------------------------------------------
 {
   // insert first vertex id
-  vertexId.push_back(v) ;
+  m_VertexId.push_back(v) ;
 
   if (name != NULL)
-    m_name = *name ;
+    m_Name = *name ;
   else
-    m_name = UndefinedName ;
+    m_Name = UndefinedName ;
 }
 
 
@@ -736,8 +736,8 @@ mafPolylineGraph::Branch::Branch(vtkIdType v, const wxString *name) : m_OutputPo
 mafPolylineGraph::Branch::~Branch()
 //-------------------------------------------------------------------------
 {
-  edgeId.clear() ;
-  vertexId.clear() ;
+  m_EdgeId.clear() ;
+  m_VertexId.clear() ;
 }
 
 
@@ -746,7 +746,7 @@ mafPolylineGraph::Branch::~Branch()
 int mafPolylineGraph::Branch::GetNumberOfVertices() const
 //-------------------------------------------------------------------------
 {
-  return vertexId.size() ;
+  return m_VertexId.size() ;
 }
 
 //-------------------------------------------------------------------------
@@ -754,7 +754,7 @@ int mafPolylineGraph::Branch::GetNumberOfVertices() const
 int mafPolylineGraph::Branch::GetNumberOfEdges() const
 //-------------------------------------------------------------------------
 {
-  return edgeId.size() ;
+  return m_EdgeId.size() ;
 }
 
 
@@ -763,7 +763,7 @@ int mafPolylineGraph::Branch::GetNumberOfEdges() const
 void mafPolylineGraph::Branch::GetName(wxString *name) const
 //-------------------------------------------------------------------------
 {
-  *name = m_name ;
+  *name = m_Name ;
 }
 
 //-------------------------------------------------------------------------
@@ -771,7 +771,7 @@ void mafPolylineGraph::Branch::GetName(wxString *name) const
 const wxString* mafPolylineGraph::Branch::GetName() const
 //-------------------------------------------------------------------------
 {
-  return &m_name ;
+  return &m_Name ;
 }
 
 
@@ -785,7 +785,7 @@ void mafPolylineGraph::Branch::SetName(const wxString *name)
     assert(false) ;
   }
 
-  m_name = *name ;
+  m_Name = *name ;
 }
 
 //-------------------------------------------------------------------------
@@ -793,7 +793,7 @@ void mafPolylineGraph::Branch::SetName(const wxString *name)
 void mafPolylineGraph::Branch::UnsetName()
 //-------------------------------------------------------------------------
 {
-  m_name = UndefinedName ;
+  m_Name = UndefinedName ;
 }
 
 
@@ -802,7 +802,7 @@ void mafPolylineGraph::Branch::UnsetName()
 vtkIdType mafPolylineGraph::Branch::GetEdgeId(int i) const
 //-------------------------------------------------------------------------
 {
-  return edgeId.at(i) ;
+  return m_EdgeId.at(i) ;
 }
 
 
@@ -811,7 +811,7 @@ vtkIdType mafPolylineGraph::Branch::GetEdgeId(int i) const
 void mafPolylineGraph::Branch::SetEdgeId(int i, vtkIdType e)
 //-------------------------------------------------------------------------
 {
-  edgeId.at(i) = e ;
+  m_EdgeId.at(i) = e ;
 }
 
 
@@ -820,7 +820,7 @@ void mafPolylineGraph::Branch::SetEdgeId(int i, vtkIdType e)
 void mafPolylineGraph::Branch::AddEdgeId(vtkIdType e)
 //-------------------------------------------------------------------------
 {
-  edgeId.push_back(e) ;
+  m_EdgeId.push_back(e) ;
 }
 
 //-------------------------------------------------------------------------
@@ -840,7 +840,7 @@ int mafPolylineGraph::Branch::FindEdgeId(vtkIdType e) const
 void mafPolylineGraph::Branch::InsertEdgeId(int i, vtkIdType e)
 //-------------------------------------------------------------------------
 {
-  edgeId.insert(edgeId.begin()+i, e) ;
+  m_EdgeId.insert(m_EdgeId.begin()+i, e) ;
 }
 
 
@@ -859,7 +859,7 @@ vtkIdType mafPolylineGraph::Branch::GetLastEdgeId() const
 vtkIdType mafPolylineGraph::Branch::GetVertexId(int i) const
 //-------------------------------------------------------------------------
 {
-  return vertexId.at(i) ;
+  return m_VertexId.at(i) ;
 }
 
 
@@ -868,7 +868,7 @@ vtkIdType mafPolylineGraph::Branch::GetVertexId(int i) const
 void mafPolylineGraph::Branch::SetVertexId(int i, vtkIdType v)
 //-------------------------------------------------------------------------
 {
-  vertexId.at(i) = v ;
+  m_VertexId.at(i) = v ;
 }
 
 
@@ -878,7 +878,7 @@ void mafPolylineGraph::Branch::SetVertexId(int i, vtkIdType v)
 void mafPolylineGraph::Branch::AddVertexId(vtkIdType v)
 //-------------------------------------------------------------------------
 {
-  vertexId.push_back(v) ;
+  m_VertexId.push_back(v) ;
 }
 
 
@@ -900,7 +900,7 @@ int mafPolylineGraph::Branch::FindVertexId(vtkIdType v) const
 void mafPolylineGraph::Branch::InsertVertexId(int i, vtkIdType v)
 //-------------------------------------------------------------------------
 {
-  vertexId.insert(vertexId.begin()+i, v) ;
+  m_VertexId.insert(m_VertexId.begin()+i, v) ;
 }
 
 
@@ -922,10 +922,10 @@ void mafPolylineGraph::Branch::DeleteLastVertex()
 //-------------------------------------------------------------------------
 {
   if (GetNumberOfVertices() > 0)
-    vertexId.pop_back() ;
+    m_VertexId.pop_back() ;
 
   if (GetNumberOfEdges() > 0)
-    edgeId.pop_back() ;
+    m_EdgeId.pop_back() ;
 }
 
 
@@ -951,16 +951,16 @@ void mafPolylineGraph::Branch::ReverseDirection()
   vtkIdType tempId ;
   int i, j ;
 
-  for (i = 0, j = edgeId.size()-1 ;  i < j ;  i++, j--){
-    tempId = edgeId.at(i) ;
-    edgeId.at(i) = edgeId.at(j) ;
-    edgeId.at(j) = tempId ;
+  for (i = 0, j = m_EdgeId.size()-1 ;  i < j ;  i++, j--){
+    tempId = m_EdgeId.at(i) ;
+    m_EdgeId.at(i) = m_EdgeId.at(j) ;
+    m_EdgeId.at(j) = tempId ;
   }
 
-  for (i = 0, j = vertexId.size()-1 ;  i < j ;  i++, j--){
-    tempId = vertexId.at(i) ;
-    vertexId.at(i) = vertexId.at(j) ;
-    vertexId.at(j) = tempId ;
+  for (i = 0, j = m_VertexId.size()-1 ;  i < j ;  i++, j--){
+    tempId = m_VertexId.at(i) ;
+    m_VertexId.at(i) = m_VertexId.at(j) ;
+    m_VertexId.at(j) = tempId ;
   }
 }
 
@@ -989,8 +989,8 @@ void mafPolylineGraph::Branch::SetMappingToOutputPolydata(vtkIdType cellid)
 void mafPolylineGraph::Branch::Clear()
 //-------------------------------------------------------------------------
 {
-  edgeId.clear() ;
-  vertexId.clear() ;
+  m_EdgeId.clear() ;
+  m_VertexId.clear() ;
 }
 
 

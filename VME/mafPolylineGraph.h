@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 12:21:05 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-07-23 12:51:04 $
+Version:   $Revision: 1.9 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -245,9 +245,9 @@ public:
     bool SelfCheck() const ;                                  ///< check self consistency
     void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
-    double m_coords[3] ;                    ///< coordinates of point
-    std::vector<vtkIdType> edgeId ;         ///< edges 0..deg-1 attached to vertex
-    std::vector<vtkIdType> vertexId ;       ///< vertices 0..deg-1 attached to vertex, in same order
+    double m_Coords[3] ;                    ///< coordinates of point
+    std::vector<vtkIdType> m_EdgeId ;         ///< edges 0..deg-1 attached to vertex
+    std::vector<vtkIdType> m_VertexId ;       ///< vertices 0..deg-1 attached to vertex, in same order
   } ;
 
 
@@ -283,10 +283,10 @@ public:
     bool SelfCheck() const ;                                                      ///< check self consistency
     void PrintSelf(std::ostream& os, const int tabs) const ;                      ///< print self
   private:
-    vtkIdType vertexId[2] ;                                 ///< vertices at ends of edge
-    bool directed ;                                         ///< directed edge - if true, points from v0 to v1 (default = false)
-    double weight ;                                         ///< weight (default = 1.0)
-    vtkIdType branchId ;                                      ///< index of branch which edge belongs to (value = UndefinedId if no branch)
+    vtkIdType m_VertexId[2] ;                                 ///< vertices at ends of edge
+    bool m_Directed ;                                         ///< directed edge - if true, points from v0 to v1 (default = false)
+    double m_Weight ;                                         ///< weight (default = 1.0)
+    vtkIdType m_BranchId ;                                      ///< index of branch which edge belongs to (value = UndefinedId if no branch)
 
     vtkIdType m_OutputPolydataCell ;      ///< cell id of edge in output polydata
     vtkIdType m_OutputPolydataCellIndex ; ///< index of edge on cell in output polydata
@@ -332,9 +332,9 @@ public:
     bool SelfCheck() const ;                                  ///< check self consistency (empty branches are allowed)
     void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
-    wxString m_name ;                                   ///< name of branch
-    std::vector<vtkIdType> vertexId ;                   ///< list by vertices
-    std::vector<vtkIdType> edgeId ;                     ///< list by edges
+    wxString m_Name ;                                   ///< name of branch
+    std::vector<vtkIdType> m_VertexId ;                   ///< list by vertices
+    std::vector<vtkIdType> m_EdgeId ;                     ///< list by edges
 
     vtkIdType m_OutputPolydataCell ;                    ///< cell id of branch in output polydata
 
