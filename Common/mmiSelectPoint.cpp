@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.cpp,v $
 Language:  C++
-Date:      $Date: 2007-05-14 09:51:09 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-23 07:54:40 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni	
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -106,6 +106,7 @@ void mmiSelectPoint::PickCell( mafDevice *device )
 
 		if(pointPicker->Pick(x,y,0,m_Renderer))
 		{
+      pointPicker->GetPickPosition(pos_picked);
 			vtkPoints *pickedPoint = vtkPoints::New();
 			pickedPoint->SetNumberOfPoints(1);
 			pickedPoint->SetPoint(0,pos_picked);
