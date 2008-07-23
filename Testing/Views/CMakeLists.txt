@@ -23,6 +23,8 @@ ADD_EXECUTABLE(mafViewRXCTTest mafViewRXCTTest.h mafViewRXCTTest.cpp)
 ADD_TEST(mafViewRXCTTest ${EXECUTABLE_OUTPUT_PATH}/mafViewRXCTTest)
 ADD_EXECUTABLE(mafViewOrthoSliceTest mafViewOrthoSliceTest.h mafViewOrthoSliceTest.cpp)
 ADD_TEST(mafViewOrthoSliceTest ${EXECUTABLE_OUTPUT_PATH}/mafViewOrthoSliceTest)
+ADD_EXECUTABLE(mafViewCTTest mafViewCTTest.h mafViewCTTest.cpp)
+ADD_TEST(mafViewCTTest ${EXECUTABLE_OUTPUT_PATH}/mafViewCTTest)
 
 
 # wxWidgets specific classes
