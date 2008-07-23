@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 10:11:03 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-07-23 11:46:27 $
+Version:   $Revision: 1.11 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -117,7 +117,7 @@ protected:
   mafRWI		*m_ModelmafRWI;
 
   //
-  medOpMMLContourWidget *Widget;  // interactive contour widget
+  medOpMMLContourWidget *m_Widget;  // interactive contour widget
 
   void    OpStop(int result);
 
@@ -136,16 +136,16 @@ protected:
   void	OnLandmark3AtlasPatientSelection();
   void	OnLandmark4AtlasPatientSelection();
 
-  int             m_slice;
-  mmgLutSlider   *m_lut;
-  wxRadioBox     *m_radio;
+  int             m_Slice;
+  mmgLutSlider   *m_Lut;
+  wxRadioBox     *m_Radio;
 
-  int             m_state;
-  int             m_show_axes;
+  int             m_State;
+  int             m_ShowAxes;
   int             m_ContourVisibility ;
 
-  wxString             m_vol_name;
-  wxString             m_surface_name;
+  wxString             m_VolName;
+  wxString             m_SurfaceName;
 
   // msf file sections
   wxString			   m_AtlasMSFSectionName;
@@ -153,39 +153,39 @@ protected:
 
   //atlas landmarks
   //names
-  wxString             m_l1_name;
-  wxString             m_l2_name;
-  wxString             m_l3_name;
-  wxString             m_l4_name;
+  wxString             m_L1Name;
+  wxString             m_L2Name;
+  wxString             m_L3Name;
+  wxString             m_L4Name;
   // points
-  double			   m_l1_point[3];
-  double			   m_l2_point[3];
-  double			   m_l3_point[3];
-  double			   m_l4_point[3];
+  double			   m_L1Point[3];
+  double			   m_L2Point[3];
+  double			   m_L3Point[3];
+  double			   m_L4Point[3];
 
   //patient landmarks
   // names
-  wxString             m_p1_name;
-  wxString             m_p2_name;
-  wxString             m_p3_name;
-  wxString             m_p4_name;
+  wxString             m_P1Name;
+  wxString             m_P2Name;
+  wxString             m_P3Name;
+  wxString             m_P4Name;
   // points
-  double			   m_p1[3];
-  double			   m_p2[3];
-  double			   m_p3[3];
-  double			   m_p4[3];
+  double			   m_P1[3];
+  double			   m_P2[3];
+  double			   m_P3[3];
+  double			   m_P4[3];
 
   // muscle type
-  int m_muscle_type;
+  int m_MuscleType;
 
   // registration status
   int m_RegistrationStatus;
 
   // 3d flag
-  int m_3dflag;
+  int m_ThreeDFlag;
 
   // 4 landmarks flag
-  int m_Landmarksflag;
+  int m_LandmarksFlag;
 
   // input vme and vtk data for volume and selected muscle polydata
   mafVMEVolumeGray    *m_Vol;
@@ -201,37 +201,37 @@ protected:
   double m_ScansResolution[2];
   int m_ScansGrain;
 
-  mmgButton *m_choose_ok;
-  mmgButton *AxesOnOffButton;
-  mmgButton *ContourOnOffButton;
+  mmgButton *m_ChooseOk;
+  mmgButton *m_AxesOnOffButton;
+  mmgButton *m_ContourOnOffButton;
 
-  mmgButton *PlaceOpButton;
-  mmgButton *TranslateOpButton;
-  mmgButton *RotateOpButton;
-  mmgButton *ScaleOpButton;
-  mmgButton *ResetViewButton;
-  mmgButton *UndoButton;
-  mmgButton *OkButton;
-  mmgButton *CancelButton;
+  mmgButton *m_PlaceOpButton;
+  mmgButton *m_TranslateOpButton;
+  mmgButton *m_RotateOpButton;
+  mmgButton *m_ScaleOpButton;
+  mmgButton *m_ResetViewButton;
+  mmgButton *m_UndoButton;
+  mmgButton *m_OkButton;
+  mmgButton *m_CancelButton;
 
   wxColour m_ButtonBackgroundColour;
 
   vtkMatrix4x4 *m_RegisteredTransform;
 
   // operation tags
-  mafTagItem *SliceId_StackTag;
-  mafTagItem *ZValue_StackTag;
-  mafTagItem *OperationType_StackTag;
-  mafTagItem *Parameter1_StackTag;
-  mafTagItem *Parameter2_StackTag;
+  mafTagItem *m_SliceIdStackTag;
+  mafTagItem *m_ZValueStackTag;
+  mafTagItem *m_OperationTypeStackTag;
+  mafTagItem *m_Parameter1StackTag;
+  mafTagItem *m_Parameter2StackTag;
 
   // coords tags
-  mafTagItem *CoordsXTag;
-  mafTagItem *CoordsYTag;
-  mafTagItem *CoordsZTag;
+  mafTagItem *m_CoordsXTag;
+  mafTagItem *m_CoordsYTag;
+  mafTagItem *m_CoordsZTag;
 
-  wxTextCtrl   *ScansNumberTxt;
-  wxTextCtrl   *RegistrationXYSxalingFactorTxt;
+  wxTextCtrl   *m_ScansNumberTxt;
+  wxTextCtrl   *m_RegistrationXYSxalingFactorTxt;
 };
 #endif
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 10:11:09 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-07-23 11:46:27 $
+Version:   $Revision: 1.11 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -98,25 +98,25 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_Surface     = NULL;
 
   m_OpDlg      = NULL; // registration dialog
-  m_radio       = NULL; // radio buttons
+  m_Radio       = NULL; // radio buttons
 
   //
-  AxesOnOffButton = NULL;
-  ContourOnOffButton = NULL;
-  ResetViewButton = NULL;
-  UndoButton = NULL;
-  OkButton = NULL;
-  CancelButton = NULL;
+  m_AxesOnOffButton = NULL;
+  m_ContourOnOffButton = NULL;
+  m_ResetViewButton = NULL;
+  m_UndoButton = NULL;
+  m_OkButton = NULL;
+  m_CancelButton = NULL;
 
   // p/t/r/s operation buttons
-  PlaceOpButton = NULL;
-  TranslateOpButton = NULL;
-  RotateOpButton = NULL;
-  ScaleOpButton = NULL;
+  m_PlaceOpButton = NULL;
+  m_TranslateOpButton = NULL;
+  m_RotateOpButton = NULL;
+  m_ScaleOpButton = NULL;
 
-  m_slice = 1; // start up slice
-  m_state = 0; // start up operation (place)
-  m_show_axes = 1; // contour line axes switched on
+  m_Slice = 1; // start up slice
+  m_State = 0; // start up operation (place)
+  m_ShowAxes = 1; // contour line axes switched on
   m_ContourVisibility = 1; // contour switched on
 
   // .msf file section names
@@ -124,21 +124,21 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_PatientMSFSectionName = "Patient";
 
   // initial inputs
-  m_surface_name = "none";
-  m_l1_name      = "none";
-  m_l2_name      = "none";
-  m_l3_name      = "none";
-  m_l4_name      = "none";
-  m_p1_name      = "none";
-  m_p2_name      = "none";
-  m_p3_name      = "none";
-  m_p4_name      = "none";
+  m_SurfaceName = "none";
+  m_L1Name      = "none";
+  m_L2Name      = "none";
+  m_L3Name      = "none";
+  m_L4Name      = "none";
+  m_P1Name      = "none";
+  m_P2Name      = "none";
+  m_P3Name      = "none";
+  m_P4Name      = "none";
 
   // no 3d view
-  m_3dflag = 0;
+  m_ThreeDFlag = 0;
 
   // no 4th landmark
-  m_Landmarksflag = 0;
+  m_LandmarksFlag = 0;
 
   // unregistered
   m_RegistrationStatus = 0;
@@ -183,14 +183,14 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_SW = NULL; // scale west
 
   m_Model = NULL;
-  Widget = NULL;
+  m_Widget = NULL;
 
   //
-  m_vol_name     = "none";
-  m_choose_ok = NULL;
+  m_VolName     = "none";
+  m_ChooseOk = NULL;
 
   // Stefano
-  m_muscle_type = 1;
+  m_MuscleType = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -287,22 +287,22 @@ void medOpMML::OnEvent(mafEventBase *maf_event)
       break;
 
     case ID_SHOW_AXES: // registration dlg axes on/off
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnContourLineAxesVisibility();
       break;
 
     case ID_SHOW_CONTOUR: // registration dlg contour on/off
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnContourVisibility();
       break;
 
     case ID_RESET_VIEW: // registration dlg reset view
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnResetView();
       break;
 
     case ID_OK: // registration dlg ok
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnRegistrationOK();
       m_OpDlg->EndModal(wxID_OK);
       break;
@@ -313,27 +313,27 @@ void medOpMML::OnEvent(mafEventBase *maf_event)
       break;
 
     case ID_P_OPERATION: // registration dlg p-op
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnPOperationButton();
       break;
 
     case ID_T_OPERATION: // registration dlg t-op
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnTOperationButton();
       break;
 
     case ID_R_OPERATION: // registration dlg r-op
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnROperationButton();
       break;
 
     case ID_S_OPERATION: // registration dlg s-op
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnSOperationButton();
       break;
 
     case ID_UNDO: // registration dlg undo
-      if (m_3dflag == 0)
+      if (m_ThreeDFlag == 0)
         OnUndo();
       break;
 
@@ -431,15 +431,15 @@ void medOpMML::OnRegistrationOK()
   Parameter2_StackTag.SetName("PARAMETER_2_STACK_TAG");
 
   // size
-  SliceId_StackTag.SetNumberOfComponents(Widget->GetNextOperationId());
-  ZValue_StackTag.SetNumberOfComponents(Widget->GetNextOperationId());
-  OperationType_StackTag.SetNumberOfComponents(Widget->GetNextOperationId());
-  Parameter1_StackTag.SetNumberOfComponents(Widget->GetNextOperationId());
-  Parameter2_StackTag.SetNumberOfComponents(Widget->GetNextOperationId());
+  SliceId_StackTag.SetNumberOfComponents(m_Widget->GetNextOperationId());
+  ZValue_StackTag.SetNumberOfComponents(m_Widget->GetNextOperationId());
+  OperationType_StackTag.SetNumberOfComponents(m_Widget->GetNextOperationId());
+  Parameter1_StackTag.SetNumberOfComponents(m_Widget->GetNextOperationId());
+  Parameter2_StackTag.SetNumberOfComponents(m_Widget->GetNextOperationId());
 
   // values
   double operation_stack[5];
-  for(int i = 0; i < Widget->GetNextOperationId(); i++)
+  for(int i = 0; i < m_Widget->GetNextOperationId(); i++)
   {
     m_Model->OperationsStack->GetTuple(i, operation_stack);
 
@@ -516,7 +516,7 @@ void medOpMML::OnRegistrationOK()
   //	ext.Printf("%d", num + 1);
 
   //
-  vme->SetName(m_surface_name + " registered");
+  vme->SetName(m_SurfaceName + " registered");
 
   // add to tree (save now)
   //OurMuscleVME->AddChild(vme);
@@ -535,56 +535,56 @@ void medOpMML::OnSlider()
 //----------------------------------------------------------------------------
 {
   //
-  m_Model->SetCurrentIdOfSyntheticScans(m_slice - 1);
+  m_Model->SetCurrentIdOfSyntheticScans(m_Slice - 1);
 
   // switch off non-relevant scans
   for (int j = 0; j < m_Model->GetTotalNumberOfSyntheticScans(); j++)
     m_Model->GetActorOfSyntheticScans(j)->VisibilityOff();
 
   // switch on current scan
-  m_Model->GetActorOfSyntheticScans(m_slice - 1)->VisibilityOn();
+  m_Model->GetActorOfSyntheticScans(m_Slice - 1)->VisibilityOn();
 
   // update line actors
-  m_PH->SetLineActorX(m_slice - 1);
-  m_PV->SetLineActorX(m_slice - 1);
-  m_TH->SetLineActorX(m_slice - 1);
-  m_TV->SetLineActorX(m_slice - 1);
-  m_RA->SetLineActorX(m_slice - 1);
-  m_SN->SetLineActorX(m_slice - 1);
-  m_SS->SetLineActorX(m_slice - 1);
-  m_SE->SetLineActorX(m_slice - 1);
-  m_SW->SetLineActorX(m_slice - 1);
+  m_PH->SetLineActorX(m_Slice - 1);
+  m_PV->SetLineActorX(m_Slice - 1);
+  m_TH->SetLineActorX(m_Slice - 1);
+  m_TV->SetLineActorX(m_Slice - 1);
+  m_RA->SetLineActorX(m_Slice - 1);
+  m_SN->SetLineActorX(m_Slice - 1);
+  m_SS->SetLineActorX(m_Slice - 1);
+  m_SE->SetLineActorX(m_Slice - 1);
+  m_SW->SetLineActorX(m_Slice - 1);
 
   //
   Update();
 
   //
-  if (Widget->GetCenterMode())
+  if (m_Widget->GetCenterMode())
   {
 
   }
 
   //
-  if (Widget->GetTranslationMode())
+  if (m_Widget->GetTranslationMode())
   {
 
   }
 
   //
-  if (Widget->GetRotationMode())
+  if (m_Widget->GetRotationMode())
   {
     // update rotation handle
-    Widget->UpdateRotationHandle();
+    m_Widget->UpdateRotationHandle();
 
     // visibility
-    Widget->SetRotationHandleVisibility();
+    m_Widget->SetRotationHandleVisibility();
   }
 
   // update - scaling mode
-  if (Widget->GetScalingMode())
+  if (m_Widget->GetScalingMode())
   {
     // update scaling handles
-    Widget->UpdateScalingHandles();
+    m_Widget->UpdateScalingHandles();
   }
 
   // render parameter views
@@ -608,7 +608,7 @@ void medOpMML::OnLut()
 {
   double Low,High;
 
-  m_lut->GetSubRange(&Low, &High);
+  m_Lut->GetSubRange(&Low, &High);
 
   m_Model->GetWindowLevelLookupTableOfSyntheticScans()->SetLevel((float) ((High + Low) / 2.0));
   m_Model->GetWindowLevelLookupTableOfSyntheticScans()->SetWindow((float) (High - Low));
@@ -641,7 +641,7 @@ void medOpMML::OnMuscleSelection()
   }
 
   // get vme name
-  m_surface_name = vme->GetName();
+  m_SurfaceName = vme->GetName();
 
   // if muscle registered previously
   // read in relevant tags stored in
@@ -662,7 +662,7 @@ void medOpMML::OnMuscleSelection()
 
     // can not change slice number
     m_ScansNumber2 = m_ScansNumber;
-    ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,ScansNumberTxt,&m_ScansNumber2,3,100)); // min/max values
+    m_ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber2,3,100)); // min/max values
 
     // tag 3: xy scaling factors
     if(vme->GetTagArray()->IsTagPresent("XY_SCALING_FACTORS_TAG") == false)
@@ -676,7 +676,7 @@ void medOpMML::OnMuscleSelection()
 
     // can not change xy scaling factor
     m_RegistrationXYScalingFactor2 = m_RegistrationXYScalingFactor;
-    RegistrationXYSxalingFactorTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor2,0.01,2.0)); // min/max values
+    m_RegistrationXYSxalingFactorTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,m_RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor2,0.01,2.0)); // min/max values
 
     // tag 4: operation stack
     //
@@ -686,7 +686,7 @@ void medOpMML::OnMuscleSelection()
       wxMessageBox("Slice id tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
       return;
     }
-    SliceId_StackTag = vme->GetTagArray()->GetTag("SLICE_ID_STACK_TAG");
+    m_SliceIdStackTag = vme->GetTagArray()->GetTag("SLICE_ID_STACK_TAG");
 
     // z value
     if(vme->GetTagArray()->IsTagPresent("Z_VALUE_STACK_TAG") == false)
@@ -694,7 +694,7 @@ void medOpMML::OnMuscleSelection()
       wxMessageBox("Z value tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
       return;
     }
-    ZValue_StackTag = vme->GetTagArray()->GetTag("Z_VALUE_STACK_TAG");
+    m_ZValueStackTag = vme->GetTagArray()->GetTag("Z_VALUE_STACK_TAG");
 
     // operation type
     if(vme->GetTagArray()->IsTagPresent("OPERATION_TYPE_STACK_TAG") == false)
@@ -702,7 +702,7 @@ void medOpMML::OnMuscleSelection()
       wxMessageBox("Operation type tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
       return;
     }
-    OperationType_StackTag = vme->GetTagArray()->GetTag("OPERATION_TYPE_STACK_TAG");
+    m_OperationTypeStackTag = vme->GetTagArray()->GetTag("OPERATION_TYPE_STACK_TAG");
 
     // parameter 1
     if(vme->GetTagArray()->IsTagPresent("PARAMETER_1_STACK_TAG") == false)
@@ -710,7 +710,7 @@ void medOpMML::OnMuscleSelection()
       wxMessageBox("Parameter 1 tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
       return;
     }
-    Parameter1_StackTag = vme->GetTagArray()->GetTag("PARAMETER_1_STACK_TAG");
+    m_Parameter1StackTag = vme->GetTagArray()->GetTag("PARAMETER_1_STACK_TAG");
 
     // parameter 2
     if(vme->GetTagArray()->IsTagPresent("PARAMETER_2_STACK_TAG") == false)
@@ -718,7 +718,7 @@ void medOpMML::OnMuscleSelection()
       wxMessageBox("Parameter 2 tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
       return;
     }
-    Parameter2_StackTag = vme->GetTagArray()->GetTag("PARAMETER_2_STACK_TAG");
+    m_Parameter2StackTag = vme->GetTagArray()->GetTag("PARAMETER_2_STACK_TAG");
 
     // tag 5: type of muscle
     if(vme->GetTagArray()->IsTagPresent("TYPE_OF_MUSCLE_TAG") == false)
@@ -728,13 +728,13 @@ void medOpMML::OnMuscleSelection()
     }
     mafTagItem *TypeOfMuscleTag;
     TypeOfMuscleTag = vme->GetTagArray()->GetTag("TYPE_OF_MUSCLE_TAG");
-    m_muscle_type = TypeOfMuscleTag->GetComponentAsDouble(0);
+    m_MuscleType = TypeOfMuscleTag->GetComponentAsDouble(0);
 
     // set m_Surface to parent vme (original non-registered muscle)
     // to identify landmarks correctly
     wxString ParentVMEName;
-    ParentVMEName = m_surface_name.BeforeFirst('.');
-    m_surface_name = ParentVMEName;
+    ParentVMEName = m_SurfaceName.BeforeFirst('.');
+    m_SurfaceName = ParentVMEName;
   }
 
   // set up landmarks (parameters are .msf section names)
@@ -754,7 +754,7 @@ void medOpMML::OnMuscleSelection()
     AtlasSectionVME = (mafVME*)(RootVME->FindInTreeByName(m_AtlasMSFSectionName));
     assert (!(AtlasSectionVME == NULL));
 
-    MuscleInAtlasSectionVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(m_surface_name));
+    MuscleInAtlasSectionVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(m_SurfaceName));
     assert (!(MuscleInAtlasSectionVME == NULL));
 
     //
@@ -791,7 +791,7 @@ void medOpMML::OnMuscleSelection()
   //		m_choose_ok->Enable(false);  
 
 
-  m_choose_ok->Enable(true);
+  m_ChooseOk->Enable(true);
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -817,12 +817,12 @@ void medOpMML::OnUndo()
   //	return;
 
   // operations stack empty
-  if (Widget->GetNextOperationId() == 0)
+  if (m_Widget->GetNextOperationId() == 0)
     return;
 
   // the operation to undo
   double params_undo[5];
-  m_Model->OperationsStack->GetTuple(Widget->GetNextOperationId() - 1, params_undo);
+  m_Model->OperationsStack->GetTuple(m_Widget->GetNextOperationId() - 1, params_undo);
 
   int maxsliceid = m_Model->GetTotalNumberOfSyntheticScans() - 1;
 
@@ -840,16 +840,16 @@ void medOpMML::OnUndo()
     return;
 
   // new next op (go back by 1)
-  Widget->SetNextOperationId(Widget->GetNextOperationId() - 1);
+  m_Widget->SetNextOperationId(m_Widget->GetNextOperationId() - 1);
 
   // the new current operation
   double params_undo_again[5];
-  m_Model->OperationsStack->GetTuple(Widget->GetNextOperationId() - 1, params_undo_again);
+  m_Model->OperationsStack->GetTuple(m_Widget->GetNextOperationId() - 1, params_undo_again);
 
   // if go back to non-scaling situation reset non-scaling splines colours
   if (m_Model->ScalingOccured)
   {
-    if (m_Model->ScalingOccuredOperationId == Widget->GetNextOperationId())
+    if (m_Model->ScalingOccuredOperationId == m_Widget->GetNextOperationId())
     {
       m_Model->ScalingOccured = FALSE;
 
@@ -886,7 +886,7 @@ void medOpMML::OnUndo()
     m_Model->GetPHSpline()->RemovePoint(params_undo[1]);
     m_Model->GetPVSpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -927,7 +927,7 @@ void medOpMML::OnUndo()
     m_Model->GetTHSpline()->RemovePoint(params_undo[1]);
     m_Model->GetTVSpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -965,7 +965,7 @@ void medOpMML::OnUndo()
     m_RA->RemovePoint(params_undo[0]);
     m_Model->GetRASpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -994,7 +994,7 @@ void medOpMML::OnUndo()
     m_SN->RemovePoint(params_undo[0]);
     m_Model->GetSNSpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -1023,7 +1023,7 @@ void medOpMML::OnUndo()
     m_SS->RemovePoint(params_undo[0]);
     m_Model->GetSSSpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -1052,7 +1052,7 @@ void medOpMML::OnUndo()
     m_SE->RemovePoint(params_undo[0]);
     m_Model->GetSESpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -1081,7 +1081,7 @@ void medOpMML::OnUndo()
     m_SW->RemovePoint(params_undo[0]);
     m_Model->GetSWSpline()->RemovePoint(params_undo[1]);
 
-    for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
+    for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
       m_Model->OperationsStack->GetTuple(i, params);
@@ -1115,16 +1115,16 @@ void medOpMML::OnUndo()
   {
   case 0: // place
     // other buttons off
-    TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    TranslateOpButton->SetTitle("T");
-    RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    RotateOpButton->SetTitle("R");
-    ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    ScaleOpButton->SetTitle("S");
+    m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_TranslateOpButton->SetTitle("T");
+    m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_RotateOpButton->SetTitle("R");
+    m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_ScaleOpButton->SetTitle("S");
 
     // this button on
-    PlaceOpButton->SetBackgroundColour(Green);
-    PlaceOpButton->SetTitle(">>P<<");
+    m_PlaceOpButton->SetBackgroundColour(Green);
+    m_PlaceOpButton->SetTitle(">>P<<");
 
     //
     ResetOperation();
@@ -1133,21 +1133,21 @@ void medOpMML::OnUndo()
     m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
     m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-    Widget->CenterModeOn();
+    m_Widget->CenterModeOn();
     break;
 
   case 1: // translate
     // other buttons off
-    PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    PlaceOpButton->SetTitle("P");
-    RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    RotateOpButton->SetTitle("R");
-    ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    ScaleOpButton->SetTitle("S");
+    m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_PlaceOpButton->SetTitle("P");
+    m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_RotateOpButton->SetTitle("R");
+    m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_ScaleOpButton->SetTitle("S");
 
     // this button on
-    TranslateOpButton->SetBackgroundColour(Green);
-    TranslateOpButton->SetTitle(">>T<<");
+    m_TranslateOpButton->SetBackgroundColour(Green);
+    m_TranslateOpButton->SetTitle(">>T<<");
 
     //
     ResetOperation();
@@ -1156,21 +1156,21 @@ void medOpMML::OnUndo()
     m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
     m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-    Widget->TranslationModeOn();
+    m_Widget->TranslationModeOn();
     break;
 
   case 2: // rotate
     // other buttons off
-    PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    PlaceOpButton->SetTitle("P");
-    TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    TranslateOpButton->SetTitle("T");
-    ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    ScaleOpButton->SetTitle("S");
+    m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_PlaceOpButton->SetTitle("P");
+    m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_TranslateOpButton->SetTitle("T");
+    m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_ScaleOpButton->SetTitle("S");
 
     // this button on
-    RotateOpButton->SetBackgroundColour(Green);
-    RotateOpButton->SetTitle(">>R<<");
+    m_RotateOpButton->SetBackgroundColour(Green);
+    m_RotateOpButton->SetTitle(">>R<<");
 
     //
     ResetOperation();
@@ -1178,10 +1178,10 @@ void medOpMML::OnUndo()
     // prepare display information
     m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-    Widget->UpdateRotationHandle();
-    Widget->RotationHandleOn();
-    Widget->SetRotationHandleVisibility();
-    Widget->RotationModeOn();
+    m_Widget->UpdateRotationHandle();
+    m_Widget->RotationHandleOn();
+    m_Widget->SetRotationHandleVisibility();
+    m_Widget->RotationModeOn();
     break;
   }
 
@@ -1190,32 +1190,32 @@ void medOpMML::OnUndo()
     // ok, the new current operation mode is scaling
   {
     // other buttons off
-    PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    PlaceOpButton->SetTitle("P");
-    TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    TranslateOpButton->SetTitle("T");
-    RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-    RotateOpButton->SetTitle("R");
+    m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_PlaceOpButton->SetTitle("P");
+    m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_TranslateOpButton->SetTitle("T");
+    m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+    m_RotateOpButton->SetTitle("R");
 
     // this button on
-    ScaleOpButton->SetBackgroundColour(Green);
-    ScaleOpButton->SetTitle(">>S<<");
+    m_ScaleOpButton->SetBackgroundColour(Green);
+    m_ScaleOpButton->SetTitle(">>S<<");
 
     m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
     //
     ResetOperation();
 
-    Widget->UpdateScalingHandles();
-    Widget->ScalingHandlesOn();
-    Widget->ScalingModeOn();
+    m_Widget->UpdateScalingHandles();
+    m_Widget->ScalingHandlesOn();
+    m_Widget->ScalingModeOn();
   }
 
   // update vertical cuts
   m_Model->UpdateSegmentCuttingPlanes();
 
   // update widget
-  Widget->UpdateWidgetTransform();
+  m_Widget->UpdateWidgetTransform();
 
   // update north east segment
   m_Model->UpdateSegmentNorthEastTransform();
@@ -1242,20 +1242,20 @@ void medOpMML::OnUndo()
   m_Model->SetGlobalAxesVisibility();
 
   //
-  if (Widget->GetRotationMode())
+  if (m_Widget->GetRotationMode())
   {
     // update rotation handle
-    Widget->UpdateRotationHandle();
+    m_Widget->UpdateRotationHandle();
 
     // visibility
-    Widget->SetRotationHandleVisibility();
+    m_Widget->SetRotationHandleVisibility();
   }
 
   // update - scaling mode
-  if (Widget->GetScalingMode())
+  if (m_Widget->GetScalingMode())
   {
     // update scaling handles
-    Widget->UpdateScalingHandles();
+    m_Widget->UpdateScalingHandles();
   }
 
   //
@@ -1267,11 +1267,11 @@ void medOpMML::OnOperation()
 //----------------------------------------------------------------------------
 {
   // operations
-  if (m_state == 0) // place
+  if (m_State == 0) // place
   {
     if (m_Model->GetScalingOccured())
     {
-      m_state = 3;
+      m_State = 3;
       m_OpDlg->TransferDataToWindow();
       wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
       return;
@@ -1284,14 +1284,14 @@ void medOpMML::OnOperation()
     m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
     m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-    Widget->CenterModeOn();
+    m_Widget->CenterModeOn();
   }
   else
-    if (m_state == 1) // translate
+    if (m_State == 1) // translate
     {
       if (m_Model->GetScalingOccured())
       {
-        m_state = 3;
+        m_State = 3;
         m_OpDlg->TransferDataToWindow();
         wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
         return;
@@ -1305,14 +1305,14 @@ void medOpMML::OnOperation()
       m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
       // prepare widget
-      Widget->TranslationModeOn();
+      m_Widget->TranslationModeOn();
     }
     else
-      if (m_state == 2) // rotate
+      if (m_State == 2) // rotate
       {
         if (m_Model->GetScalingOccured())
         {
-          m_state = 3;
+          m_State = 3;
           m_OpDlg->TransferDataToWindow();
           wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
           return;
@@ -1323,21 +1323,21 @@ void medOpMML::OnOperation()
 
         m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-        Widget->UpdateRotationHandle();
-        Widget->RotationHandleOn();
-        Widget->RotationModeOn();
+        m_Widget->UpdateRotationHandle();
+        m_Widget->RotationHandleOn();
+        m_Widget->RotationModeOn();
       }
       else
-        if (m_state == 3) // scale
+        if (m_State == 3) // scale
         {
           m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
           //
           ResetOperation();
 
-          Widget->UpdateScalingHandles();
-          Widget->ScalingHandlesOn();
-          Widget->ScalingModeOn();
+          m_Widget->UpdateScalingHandles();
+          m_Widget->ScalingHandlesOn();
+          m_Widget->ScalingModeOn();
 
           // on successful scaling, ScalingOccured flag in Model
           // is set to true, medOpMMLContourWidget::OnLeftButtonUp
@@ -1354,25 +1354,25 @@ void medOpMML::ResetOperation()
 //----------------------------------------------------------------------------
 {
   // reset - handles off
-  Widget->RotationHandleOff();
-  Widget->ScalingHandlesOff();
+  m_Widget->RotationHandleOff();
+  m_Widget->ScalingHandlesOff();
 
   // reset - modes off
-  Widget->CenterModeOff();
-  Widget->ScalingModeOff();
-  Widget->RotationModeOff();
-  Widget->TranslationModeOff();
+  m_Widget->CenterModeOff();
+  m_Widget->ScalingModeOff();
+  m_Widget->RotationModeOff();
+  m_Widget->TranslationModeOff();
 }
 
 //----------------------------------------------------------------------------
 void medOpMML::OnContourLineAxesVisibility() 
 //----------------------------------------------------------------------------
 {
-  m_show_axes = (m_show_axes + 1) % 2;
+  m_ShowAxes = (m_ShowAxes + 1) % 2;
 
-  if (m_show_axes)
+  if (m_ShowAxes)
   {
-    AxesOnOffButton->SetTitle("Axes Off");
+    m_AxesOnOffButton->SetTitle("Axes Off");
     // action line coordinate system
     //Model->GetPositiveXAxisActor()->VisibilityOn();
     //Model->GetNegativeXAxisActor()->VisibilityOn();
@@ -1389,7 +1389,7 @@ void medOpMML::OnContourLineAxesVisibility()
   }
   else
   {
-    AxesOnOffButton->SetTitle("Axes On");
+    m_AxesOnOffButton->SetTitle("Axes On");
     // action line coordinate system
     //Model->GetPositiveXAxisActor()->VisibilityOff();
     //Model->GetNegativeXAxisActor()->VisibilityOff();
@@ -1415,44 +1415,44 @@ void medOpMML::OnContourVisibility()
 
   if (m_ContourVisibility) // visible
   {
-    ContourOnOffButton->SetTitle("Contour Off");
+    m_ContourOnOffButton->SetTitle("Contour Off");
 
     m_Model->GetNEContourActor()->VisibilityOn();
     m_Model->GetNWContourActor()->VisibilityOn();
     m_Model->GetSEContourActor()->VisibilityOn();
     m_Model->GetSWContourActor()->VisibilityOn();
 
-    if (Widget->GetRotationMode())
+    if (m_Widget->GetRotationMode())
     {
       // handle
-      Widget->RotationHandleOn();
+      m_Widget->RotationHandleOn();
     }
     else
-      if (Widget->GetScalingMode())
+      if (m_Widget->GetScalingMode())
       {
         // handles
-        Widget->ScalingHandlesOn();
+        m_Widget->ScalingHandlesOn();
       }
   }
   else // non-visible
   {
-    ContourOnOffButton->SetTitle("Contour On");
+    m_ContourOnOffButton->SetTitle("Contour On");
 
     m_Model->GetNEContourActor()->VisibilityOff();
     m_Model->GetNWContourActor()->VisibilityOff();
     m_Model->GetSEContourActor()->VisibilityOff();
     m_Model->GetSWContourActor()->VisibilityOff();
 
-    if (Widget->GetRotationMode())
+    if (m_Widget->GetRotationMode())
     {
       // handle
-      Widget->RotationHandleOff();
+      m_Widget->RotationHandleOff();
     }
     else
-      if (Widget->GetScalingMode())
+      if (m_Widget->GetScalingMode())
       {
         // handles
-        Widget->ScalingHandlesOff();
+        m_Widget->ScalingHandlesOff();
       }
   }
 
@@ -1523,7 +1523,7 @@ void medOpMML::OnLandmark1AtlasPatientSelection()
 
   // if identical to L2 or L3
   wxString   Name = vme->GetName();
-  if (Name.compare(m_l2_name) == 0 || Name.compare(m_l3_name) == 0)
+  if (Name.compare(m_L2Name) == 0 || Name.compare(m_L3Name) == 0)
   {
     wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
     return;
@@ -1545,25 +1545,25 @@ void medOpMML::OnLandmark1AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_l1_point);
-  L1PatientVMELandmark->GetPoint(m_p1);
+  lm->GetPoint(m_L1Point);
+  L1PatientVMELandmark->GetPoint(m_P1);
 
   // set name
-  m_l1_name = vme->GetName();
-  m_p1_name = L1PatientVME->GetName();
+  m_L1Name = vme->GetName();
+  m_P1Name = L1PatientVME->GetName();
 
   // if all landmarks chosen
-  if (m_l1_name.compare("none") != 0 &&
-    m_l2_name.compare("none") != 0 &&
-    m_l3_name.compare("none") != 0
+  if (m_L1Name.compare("none") != 0 &&
+    m_L2Name.compare("none") != 0 &&
+    m_L3Name.compare("none") != 0
     )
   {
     // activate ok button
-    m_choose_ok->Enable(true);
+    m_ChooseOk->Enable(true);
   }
   else
     // de-activate ok button
-    m_choose_ok->Enable(false);
+    m_ChooseOk->Enable(false);
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -1633,7 +1633,7 @@ void medOpMML::OnLandmark2AtlasPatientSelection()
 
   // if identical to L1 or L3
   wxString   Name = vme->GetName();
-  if (Name.compare(m_l1_name) == 0 || Name.compare(m_l3_name) == 0)
+  if (Name.compare(m_L1Name) == 0 || Name.compare(m_L3Name) == 0)
   {
     wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
     return;
@@ -1655,25 +1655,25 @@ void medOpMML::OnLandmark2AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_l2_point);
-  L2PatientVMELandmark->GetPoint(m_p2);
+  lm->GetPoint(m_L2Point);
+  L2PatientVMELandmark->GetPoint(m_P2);
 
   // set name
-  m_l2_name = vme->GetName();
-  m_p2_name = L2PatientVME->GetName();
+  m_L2Name = vme->GetName();
+  m_P2Name = L2PatientVME->GetName();
 
   // if all landmarks chosen
-  if (m_l1_name.compare("none") != 0 &&
-    m_l2_name.compare("none") != 0 &&
-    m_l3_name.compare("none") != 0
+  if (m_L1Name.compare("none") != 0 &&
+    m_L2Name.compare("none") != 0 &&
+    m_L3Name.compare("none") != 0
     )
   {
     // activate ok button
-    m_choose_ok->Enable(true);
+    m_ChooseOk->Enable(true);
   }
   else
     // de-activate ok button
-    m_choose_ok->Enable(false);
+    m_ChooseOk->Enable(false);
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -1743,7 +1743,7 @@ void medOpMML::OnLandmark3AtlasPatientSelection()
 
   // if identical to L1 or L2
   wxString   Name = vme->GetName();
-  if (Name.compare(m_l1_name) == 0 || Name.compare(m_l2_name) == 0)
+  if (Name.compare(m_L1Name) == 0 || Name.compare(m_L2Name) == 0)
   {
     wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
     return;
@@ -1765,25 +1765,25 @@ void medOpMML::OnLandmark3AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_l3_point);
-  L3PatientVMELandmark->GetPoint(m_p3);
+  lm->GetPoint(m_L3Point);
+  L3PatientVMELandmark->GetPoint(m_P3);
 
   // set name
-  m_l3_name = vme->GetName();
-  m_p3_name = L3PatientVME->GetName();
+  m_L3Name = vme->GetName();
+  m_P3Name = L3PatientVME->GetName();
 
   // if all landmarks chosen
-  if (m_l1_name.compare("none") != 0 &&
-    m_l2_name.compare("none") != 0 &&
-    m_l3_name.compare("none") != 0
+  if (m_L1Name.compare("none") != 0 &&
+    m_L2Name.compare("none") != 0 &&
+    m_L3Name.compare("none") != 0
     )
   {
     // activate ok button
-    m_choose_ok->Enable(true);
+    m_ChooseOk->Enable(true);
   }
   else
     // de-activate ok button
-    m_choose_ok->Enable(false);
+    m_ChooseOk->Enable(false);
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -1853,7 +1853,7 @@ void medOpMML::OnLandmark4AtlasPatientSelection()
 
   // if identical to L1 or L2
   wxString   Name = vme->GetName();
-  if (Name.compare(m_l1_name) == 0 || Name.compare(m_l2_name) == 0)
+  if (Name.compare(m_L1Name) == 0 || Name.compare(m_L2Name) == 0)
   {
     wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
     return;
@@ -1875,25 +1875,25 @@ void medOpMML::OnLandmark4AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_l3_point);
-  L3PatientVMELandmark->GetPoint(m_p3);
+  lm->GetPoint(m_L3Point);
+  L3PatientVMELandmark->GetPoint(m_P3);
 
   // set name
-  m_l3_name = vme->GetName();
-  m_p3_name = L3PatientVME->GetName();
+  m_L3Name = vme->GetName();
+  m_P3Name = L3PatientVME->GetName();
 
   // if all landmarks chosen
-  if (m_l1_name.compare("none") != 0 &&
-    m_l2_name.compare("none") != 0 &&
-    m_l3_name.compare("none") != 0
+  if (m_L1Name.compare("none") != 0 &&
+    m_L2Name.compare("none") != 0 &&
+    m_L3Name.compare("none") != 0
     )
   {
     // activate ok button
-    m_choose_ok->Enable(true);
+    m_ChooseOk->Enable(true);
   }
   else
     // de-activate ok button
-    m_choose_ok->Enable(false);
+    m_ChooseOk->Enable(false);
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -1915,7 +1915,7 @@ bool medOpMML::CreateInputsDlg()
   // muscle
   wxStaticText *lab_1  = new wxStaticText(m_ChooseDlg, -1, "Surface", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
-  text_1->SetValidator(mmgValidator(this, ID_CHOOSE_SURFACE, text_1, &m_surface_name));
+  text_1->SetValidator(mmgValidator(this, ID_CHOOSE_SURFACE, text_1, &m_SurfaceName));
   mmgButton    *b_1    = new mmgButton(m_ChooseDlg , ID_CHOOSE_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
   b_1->SetListener(this);
 
@@ -1999,11 +1999,11 @@ bool medOpMML::CreateInputsDlg()
 
   // scans number
   wxStaticText *ScansNumberLab  = new wxStaticText(m_ChooseDlg, -1, "Slice number (3 - 100)", wxPoint(0,0), wxSize(150,20));
-  ScansNumberTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,ScansNumberTxt,&m_ScansNumber,3,100)); // min/max values
+  m_ScansNumberTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
+  m_ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber,3,100)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
-  ScansNumberHorizontalSizer->Add(ScansNumberTxt,1,wxEXPAND);
+  ScansNumberHorizontalSizer->Add(m_ScansNumberTxt,1,wxEXPAND);
   vs1->Add(ScansNumberHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
 
@@ -2036,7 +2036,7 @@ bool medOpMML::CreateInputsDlg()
   // 3d flag
   wxStaticText *flagLab  = new wxStaticText(m_ChooseDlg, -1, "3D (0/1)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *flagTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  flagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_3dflag,0,1));
+  flagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_ThreeDFlag,0,1));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   flagHorizontalSizer->Add(flagLab, 0);
   flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2069,13 +2069,13 @@ bool medOpMML::CreateInputsDlg()
   */
 
   // ok/cancel button
-  m_choose_ok = new mmgButton(m_ChooseDlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
-  m_choose_ok->SetListener(this);
-  m_choose_ok->Enable(false);
+  m_ChooseOk = new mmgButton(m_ChooseDlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
+  m_ChooseOk->SetListener(this);
+  m_ChooseOk->Enable(false);
   mmgButton *b_cancel = new mmgButton(m_ChooseDlg, ID_CHOOSE_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
   wxBoxSizer *hs_b = new wxBoxSizer(wxHORIZONTAL);
   b_cancel->SetListener(this);
-  hs_b->Add(m_choose_ok,0);
+  hs_b->Add(m_ChooseOk,0);
   hs_b->Add(b_cancel,0);
   vs1->Add(hs_b,0,wxALIGN_CENTER | wxALL, 2);
 
@@ -2121,7 +2121,7 @@ void medOpMML::CreateRegistrationDlg()
 
   // create dialog
   wxString Title;
-  Title = "registration of " + m_surface_name;
+  Title = "registration of " + m_SurfaceName;
   m_OpDlg = new mmgDialog(Title); 
 
 
@@ -2140,32 +2140,32 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(TopHorizontalBoxSizer);
 
   // axes on/off button
-  AxesOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
-  AxesOnOffButton->SetListener(this);
-  TopHorizontalBoxSizer->Add(AxesOnOffButton,0,wxALL, 5);
+  m_AxesOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
+  m_AxesOnOffButton->SetListener(this);
+  TopHorizontalBoxSizer->Add(m_AxesOnOffButton,0,wxALL, 5);
 
   // contour on/off buton
-  ContourOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
-  ContourOnOffButton->SetListener(this);
-  TopHorizontalBoxSizer->Add(ContourOnOffButton,0,wxALL, 5);
+  m_ContourOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
+  m_ContourOnOffButton->SetListener(this);
+  TopHorizontalBoxSizer->Add(m_ContourOnOffButton,0,wxALL, 5);
 
   // reset view button
-  ResetViewButton = new mmgButton(m_OpDlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
-  ResetViewButton->SetListener(this);
-  TopHorizontalBoxSizer->Add(ResetViewButton,0,wxALL, 5);
+  m_ResetViewButton = new mmgButton(m_OpDlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
+  m_ResetViewButton->SetListener(this);
+  TopHorizontalBoxSizer->Add(m_ResetViewButton,0,wxALL, 5);
 
   // ok button
-  OkButton = new mmgButton(m_OpDlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
-  OkButton->SetListener(this);
-  TopHorizontalBoxSizer->Add(OkButton,0,wxALL, 5);
+  m_OkButton = new mmgButton(m_OpDlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
+  m_OkButton->SetListener(this);
+  TopHorizontalBoxSizer->Add(m_OkButton,0,wxALL, 5);
 
   // cancel button
-  CancelButton = new mmgButton(m_OpDlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
-  CancelButton->SetListener(this);
-  TopHorizontalBoxSizer->Add(CancelButton,0, wxALL, 5);
+  m_CancelButton = new mmgButton(m_OpDlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
+  m_CancelButton->SetListener(this);
+  TopHorizontalBoxSizer->Add(m_CancelButton,0, wxALL, 5);
 
   // button background colour
-  m_ButtonBackgroundColour = CancelButton->GetBackgroundColour();
+  m_ButtonBackgroundColour = m_CancelButton->GetBackgroundColour();
 
   // maf check boxes
   //wxBoxSizer *CheckBoxHorizontalBoxSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -2183,26 +2183,26 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(OperationHorizontalBoxSizer);
 
   // create p/t/r/s operation buttons
-  PlaceOpButton = new mmgButton(m_OpDlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
-  PlaceOpButton->SetListener(this);
-  OperationHorizontalBoxSizer->Add(PlaceOpButton,0,wxALL, 5);
+  m_PlaceOpButton = new mmgButton(m_OpDlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
+  m_PlaceOpButton->SetListener(this);
+  OperationHorizontalBoxSizer->Add(m_PlaceOpButton,0,wxALL, 5);
 
-  TranslateOpButton = new mmgButton(m_OpDlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
-  TranslateOpButton->SetListener(this);
-  OperationHorizontalBoxSizer->Add(TranslateOpButton,0,wxALL, 5);
+  m_TranslateOpButton = new mmgButton(m_OpDlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
+  m_TranslateOpButton->SetListener(this);
+  OperationHorizontalBoxSizer->Add(m_TranslateOpButton,0,wxALL, 5);
 
-  RotateOpButton = new mmgButton(m_OpDlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
-  RotateOpButton->SetListener(this);
-  OperationHorizontalBoxSizer->Add(RotateOpButton,0,wxALL, 5);
+  m_RotateOpButton = new mmgButton(m_OpDlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
+  m_RotateOpButton->SetListener(this);
+  OperationHorizontalBoxSizer->Add(m_RotateOpButton,0,wxALL, 5);
 
-  ScaleOpButton = new mmgButton(m_OpDlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
-  ScaleOpButton->SetListener(this);
-  OperationHorizontalBoxSizer->Add(ScaleOpButton,0,wxALL, 5);
+  m_ScaleOpButton = new mmgButton(m_OpDlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
+  m_ScaleOpButton->SetListener(this);
+  OperationHorizontalBoxSizer->Add(m_ScaleOpButton,0,wxALL, 5);
 
   // undo button
-  UndoButton = new mmgButton(m_OpDlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
-  UndoButton->SetListener(this);
-  OperationHorizontalBoxSizer->Add(UndoButton,0,wxALL, 5);
+  m_UndoButton = new mmgButton(m_OpDlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
+  m_UndoButton->SetListener(this);
+  OperationHorizontalBoxSizer->Add(m_UndoButton,0,wxALL, 5);
 
   //wxString choices[4];
   //choices[0] = "PLACE       >>>";
@@ -2231,9 +2231,9 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(m_ModelmafRWI->m_RwiBase, 1, wxEXPAND | wxALL, 5);
 
   // maf lut
-  m_lut = new mmgLutSlider(m_OpDlg,-1,wxPoint(0,0),wxSize(420,24));
-  m_lut->SetListener(this);
-  LeftVerticalBoxSizer->Add(m_lut,0,wxEXPAND ,6);
+  m_Lut = new mmgLutSlider(m_OpDlg,-1,wxPoint(0,0),wxSize(420,24));
+  m_Lut->SetListener(this);
+  LeftVerticalBoxSizer->Add(m_Lut,0,wxEXPAND ,6);
 
   // get maf gray volume 
   m_Vol = mafVMEVolumeGray::SafeDownCast(m_Input);
@@ -2279,7 +2279,7 @@ void medOpMML::CreateRegistrationDlg()
   RightVerticalBoxSizer->Add(hs4, 0, wxTOP, 25);
 
   wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 1, m_Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
-  sli->SetValidator(mmgValidator(this,ID_SLICE,(wxSlider*)sli,&m_slice,text));
+  sli->SetValidator(mmgValidator(this,ID_SLICE,(wxSlider*)sli,&m_Slice,text));
   //RightVerticalBoxSizer->Add(sli,0);
   RightVerticalBoxSizer->Add(sli, 0, wxLEFT, -9);
 
@@ -2325,7 +2325,7 @@ void medOpMML::CreateRegistrationDlg()
 
   // mml contour widget
   // create
-  Widget = medOpMMLContourWidget::New();
+  m_Widget = medOpMMLContourWidget::New();
 
   //
   SetUpWidget();
@@ -2343,7 +2343,7 @@ bool medOpMML::SetUpInputs()
 //----------------------------------------------------------------------------
 {
   // set muscle type (1 - one slicing axis, 2 - two slicing axes)
-  m_Model->SetTypeOfMuscles(m_muscle_type);
+  m_Model->SetTypeOfMuscles(m_MuscleType);
   /*
 
   // set atlas landmarks
@@ -2360,7 +2360,7 @@ bool medOpMML::SetUpInputs()
   */
 
   // landmark flag
-  m_Model->Set4LandmarksFlag(m_Landmarksflag);
+  m_Model->Set4LandmarksFlag(m_LandmarksFlag);
 
   // set x, y scaling factors
   m_Model->SetXYScalingFactorsOfMuscle(m_RegistrationXYScalingFactor, m_RegistrationXYScalingFactor);
@@ -2510,13 +2510,13 @@ bool medOpMML::SetUpParameterViews()
   {
 
     int NumberOfOperations;
-    NumberOfOperations = SliceId_StackTag->GetNumberOfComponents();
+    NumberOfOperations = m_SliceIdStackTag->GetNumberOfComponents();
 
     int MaxScanId;
     MaxScanId = m_Model->GetTotalNumberOfSyntheticScans() - 1;
 
     int NextOperationId;
-    NextOperationId = Widget->GetNextOperationId();
+    NextOperationId = m_Widget->GetNextOperationId();
 
     // get operations
     double params[5];
@@ -2526,11 +2526,11 @@ bool medOpMML::SetUpParameterViews()
       assert(NextOperationId < 2000);
 
       // values
-      params[0] = SliceId_StackTag->GetComponentAsDouble(i);
-      params[1] = ZValue_StackTag->GetComponentAsDouble(i);
-      params[2] = OperationType_StackTag->GetComponentAsDouble(i);
-      params[3] = Parameter1_StackTag->GetComponentAsDouble(i);
-      params[4] = Parameter2_StackTag->GetComponentAsDouble(i);
+      params[0] = m_SliceIdStackTag->GetComponentAsDouble(i);
+      params[1] = m_ZValueStackTag->GetComponentAsDouble(i);
+      params[2] = m_OperationTypeStackTag->GetComponentAsDouble(i);
+      params[3] = m_Parameter1StackTag->GetComponentAsDouble(i);
+      params[4] = m_Parameter2StackTag->GetComponentAsDouble(i);
 
       // built operations stack
       m_Model->OperationsStack->SetTuple(NextOperationId, params);
@@ -2623,7 +2623,7 @@ bool medOpMML::SetUpParameterViews()
       }
 
       // new next op
-      Widget->SetNextOperationId(NextOperationId + 1);
+      m_Widget->SetNextOperationId(NextOperationId + 1);
       NextOperationId++;
     }
   }
@@ -2635,26 +2635,26 @@ bool medOpMML::SetUpParameterViews()
 bool medOpMML::SetUpWidget()
 //----------------------------------------------------------------------------
 {
-  Widget->SetModel(m_Model);
-  Widget->SetInteractor(m_Model->GetRenderWindowInteractor());
+  m_Widget->SetModel(m_Model);
+  m_Widget->SetInteractor(m_Model->GetRenderWindowInteractor());
 
-  Widget->SetPH(m_PH);
-  Widget->SetPV(m_PV);
-  Widget->SetTH(m_TH);
-  Widget->SetTV(m_TV);
-  Widget->SetRA(m_RA);
-  Widget->SetSN(m_SN);
-  Widget->SetSS(m_SS);
-  Widget->SetSE(m_SE);
-  Widget->SetSW(m_SW);
+  m_Widget->SetPH(m_PH);
+  m_Widget->SetPV(m_PV);
+  m_Widget->SetTH(m_TH);
+  m_Widget->SetTV(m_TV);
+  m_Widget->SetRA(m_RA);
+  m_Widget->SetSN(m_SN);
+  m_Widget->SetSS(m_SS);
+  m_Widget->SetSE(m_SE);
+  m_Widget->SetSW(m_SW);
 
-  Widget->SetResolution(20);
-  Widget->GetPlaneProperty()->SetColor(1.0, 1.0, 1.0);
-  Widget->GetPlaneProperty()->SetOpacity(0.001);
-  Widget->GetSelectedPlaneProperty()->SetColor(1.0, 1.0, 1.0);
-  Widget->GetSelectedPlaneProperty()->SetOpacity(0.001);
+  m_Widget->SetResolution(20);
+  m_Widget->GetPlaneProperty()->SetColor(1.0, 1.0, 1.0);
+  m_Widget->GetPlaneProperty()->SetOpacity(0.001);
+  m_Widget->GetSelectedPlaneProperty()->SetColor(1.0, 1.0, 1.0);
+  m_Widget->GetSelectedPlaneProperty()->SetOpacity(0.001);
   //Widget->CenterModeOn();
-  Widget->On();
+  m_Widget->On();
 
   return 1;
 }
@@ -2673,8 +2673,8 @@ bool medOpMML::SetUpModelView()
   m_Model->SetUpSyntheticScans();
 
   // initalise lut slider (called after void medOpMMLModelView::SetUpSyntheticScans()
-  m_lut->SetRange(m_Model->GetLowScalar(), m_Model->GetHighScalar());
-  m_lut->SetSubRange(m_Model->GetSyntheticScansLevel() - 0.5 * m_Model->GetSyntheticScansWindow(),
+  m_Lut->SetRange(m_Model->GetLowScalar(), m_Model->GetHighScalar());
+  m_Lut->SetSubRange(m_Model->GetSyntheticScansLevel() - 0.5 * m_Model->GetSyntheticScansWindow(),
     m_Model->GetSyntheticScansLevel() + 0.5 * m_Model->GetSyntheticScansWindow());
   //m_lut->SetText(0, "");
   //m_lut->SetText(1, ""); 
@@ -2703,10 +2703,10 @@ bool medOpMML::SetUpModelView()
   m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   // 3d display?
-  if (m_3dflag == 1)
+  if (m_ThreeDFlag == 1)
   {
     //
-    Widget->Off();
+    m_Widget->Off();
 
     //
     m_Model->Switch3dDisplayOn();
@@ -2792,17 +2792,17 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
   double a, b;
 
   // starting from no landmarks
-  m_l1_name      = "none";
-  m_l2_name      = "none";
-  m_l3_name      = "none";
-  m_l4_name      = "none";
-  m_p1_name      = "none";
-  m_p2_name      = "none";
-  m_p3_name      = "none";
-  m_p4_name      = "none";
+  m_L1Name      = "none";
+  m_L2Name      = "none";
+  m_L3Name      = "none";
+  m_L4Name      = "none";
+  m_P1Name      = "none";
+  m_P2Name      = "none";
+  m_P3Name      = "none";
+  m_P4Name      = "none";
 
   // select strings
-  if (m_surface_name.compare("obturator externus") == 0)
+  if (m_SurfaceName.compare("obturator externus") == 0)
   {
     // landmarks
     Landmark1VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
@@ -2811,10 +2811,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
     Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
     a = 1.25; // 1.20
     b = 0.10; // 0.14
-    m_muscle_type = 1;
+    m_MuscleType = 1;
   }
   else
-    if (m_surface_name.compare("gamellus inferior") == 0)
+    if (m_SurfaceName.compare("gamellus inferior") == 0)
     {
       // landmarks
       Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
@@ -2823,10 +2823,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
       Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
       a = 1.15; // 1.07
       b = 0.20; // 0.28
-      m_muscle_type = 1;
+      m_MuscleType = 1;
     }
     else
-      if (m_surface_name.compare("gamellus superior") == 0)
+      if (m_SurfaceName.compare("gamellus superior") == 0)
       {
         // landmarks
         Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
@@ -2835,10 +2835,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
         Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
         a = 1.65; // 1.60
         b = 0.25; // 0.32
-        m_muscle_type = 1;
+        m_MuscleType = 1;
       }
       else
-        if (m_surface_name.compare("piriformis") == 0)
+        if (m_SurfaceName.compare("piriformis") == 0)
         {
           // landmarks
           Landmark1VMEName = "Anterior surface of the Right sacrum between second and third foramen midway between line of foramen and lateral border (first sacral foramen is most superior)";
@@ -2847,10 +2847,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
           Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
           a = 1.20; // 1.14
           b = 0.20; // 0.27
-          m_muscle_type = 1;
+          m_MuscleType = 1;
         }
         else
-          if (m_surface_name.compare("gluteus minimus") == 0)
+          if (m_SurfaceName.compare("gluteus minimus") == 0)
           {
             // landmarks
             Landmark1VMEName = "Top of ridge on lateral surface of the Right ilium between superior tubercle of iliac crest (pt. 39) and acetabulum (pt. 5) along a line from anterior superior iliac spine ASIS (pt. 1) to posterior superior iliac spine PSIS (pt. 3) ";
@@ -2859,10 +2859,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
             Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
             a = 1.30; // 1.25
             b = -0.05;// 0.00
-            m_muscle_type = 1;
+            m_MuscleType = 1;
           }
           else
-            if (m_surface_name.compare("tensor fasciae latae") == 0)
+            if (m_SurfaceName.compare("tensor fasciae latae") == 0)
             {
               // landmarks
               Landmark1VMEName = "Midpoint along Right lateral superior ridge of iliac crest between the anterior superior iliac spine ASIS and most lateral point on superior tubercle of the iliac crest ";
@@ -2871,10 +2871,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
               Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
               a = 1.00; // 0.95
               b = 0.60; // 0.69
-              m_muscle_type = 1;
+              m_MuscleType = 1;
             }
             else
-              if (m_surface_name.compare("adductor longus") == 0)
+              if (m_SurfaceName.compare("adductor longus") == 0)
               {
                 // landmarks
                 Landmark1VMEName = "Anterior corner of inferior surface of the Right pubic tubercle ";
@@ -2883,10 +2883,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                 Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                 a = 1.00; // 0.92
                 b = -0.20;// -0.16
-                m_muscle_type = 1;
+                m_MuscleType = 1;
               }
               else
-                if (m_surface_name.compare("adductor brevis") == 0)
+                if (m_SurfaceName.compare("adductor brevis") == 0)
                 {
                   // landmarks
                   Landmark1VMEName = "Midpoint of lateral surface of the Right inferior pubic ramus ";
@@ -2895,10 +2895,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                   Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                   a = 1.15; // 1.09
                   b = -0.20;// -0.14
-                  m_muscle_type = 1;
+                  m_MuscleType = 1;
                 }
                 else
-                  if (m_surface_name.compare("rectus femoris") == 0)
+                  if (m_SurfaceName.compare("rectus femoris") == 0)
                   {
                     // landmarks
                     Landmark1VMEName = "Right Anterior Inferior Iliac Spine ";
@@ -2907,10 +2907,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                     Landmark4VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
                     a = 1.05; // 0.97
                     b = 0.15; // 0.19
-                    m_muscle_type = 1;
+                    m_MuscleType = 1;
                   }
                   else
-                    if (m_surface_name.compare("semitendinous") == 0)
+                    if (m_SurfaceName.compare("semitendinous") == 0)
                     {
                       // landmarks
                       Landmark1VMEName = "Posterior most point on medial border of posterior surface of the Right ischial tuberosity";
@@ -2919,10 +2919,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                       Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                       a = 1.05; // 0.98
                       b = 0.25; // 0.32
-                      m_muscle_type = 1;
+                      m_MuscleType = 1;
                     }
                     else
-                      if (m_surface_name.compare("gluteus maximus") == 0)
+                      if (m_SurfaceName.compare("gluteus maximus") == 0)
                       {
                         // landmarks
                         Landmark1VMEName = "Lateral corner of Right sacral-coccygeal facet  ";
@@ -2931,10 +2931,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                         Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                         a = 1.25; // 1.18
                         b = -0.20;// -0.15
-                        m_muscle_type = 1;
+                        m_MuscleType = 1;
                       }
                       else
-                        if (m_surface_name.compare("gluteus medius") == 0)
+                        if (m_SurfaceName.compare("gluteus medius") == 0)
                         {
                           // landmarks
                           Landmark1VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
@@ -2943,10 +2943,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                           Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                           a = 1.30; // 1.25
                           b = -0.25;// -0.18
-                          m_muscle_type = 1;
+                          m_MuscleType = 1;
                         }
                         else
-                          if (m_surface_name.compare("pectineus") == 0)
+                          if (m_SurfaceName.compare("pectineus") == 0)
                           {
                             // landmarks
                             Landmark1VMEName = "Base of the Right superior pubic ramus on superior surface lateral to pectineal line ";
@@ -2955,10 +2955,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                             Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                             a = 1.10; // 1.05
                             b = -0.15;// -0.09
-                            m_muscle_type = 1;
+                            m_MuscleType = 1;
                           }
                           else
-                            if (m_surface_name.compare("adductor magnus") == 0)
+                            if (m_SurfaceName.compare("adductor magnus") == 0)
                             {
                               // landmarks
                               Landmark1VMEName = "Most lateral aspect at posterior corner of lateral surface of Right ischial tuberosity ";
@@ -2967,10 +2967,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                               Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                               a = 1.10; // 1.05
                               b = 0.10; // 0.15
-                              m_muscle_type = 1;
+                              m_MuscleType = 1;
                             }
                             else
-                              if (m_surface_name.compare("quadratus femoris") == 0)
+                              if (m_SurfaceName.compare("quadratus femoris") == 0)
                               {
                                 // landmarks
                                 Landmark1VMEName = "On lateral surface of Right ischial tuberosity at midpoint between obturator foramen and lateral posterior corner ";
@@ -2979,10 +2979,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                 Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                 a = 1.05; // 1.00
                                 b = -0.20;// -0.14
-                                m_muscle_type = 1;
+                                m_MuscleType = 1;
                               }
                               else
-                                if (m_surface_name.compare("sartorius") == 0)
+                                if (m_SurfaceName.compare("sartorius") == 0)
                                 {
                                   // landmarks
                                   Landmark1VMEName = "Right Anterior Superior Iliac Spine (repeat of pt. 1) ";
@@ -2991,10 +2991,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                   Landmark4VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
                                   a = 1.05; // 1.00
                                   b = -0.15;// -0.10
-                                  m_muscle_type = 1;
+                                  m_MuscleType = 1;
                                 }
                                 else
-                                  if (m_surface_name.compare("vastus medialis") == 0)
+                                  if (m_SurfaceName.compare("vastus medialis") == 0)
                                   {
                                     // landmarks
                                     Landmark1VMEName = "most medial corner of femoral shaft cross-section at height of midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
@@ -3003,10 +3003,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                     Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                     a = 1.85; // 1.80
                                     b = -0.30;// -0.25
-                                    m_muscle_type = 1;
+                                    m_MuscleType = 1;
                                   }
                                   else
-                                    if (m_surface_name.compare("semimembranous") == 0)
+                                    if (m_SurfaceName.compare("semimembranous") == 0)
                                     {
                                       // landmarks
                                       Landmark1VMEName = "Bottom of superior depression on posterior surface of Right ischial tuberosity ";
@@ -3015,10 +3015,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                       Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                       a = 0.80; // 0.74
                                       b = 0.00; // 0.06
-                                      m_muscle_type = 1;
+                                      m_MuscleType = 1;
                                     }
                                     else
-                                      if (m_surface_name.compare("obturator internal") == 0)
+                                      if (m_SurfaceName.compare("obturator internal") == 0)
                                       {
                                         // DAVID P. 19-01-2005: This is not the permanent solution.
                                         // landmarks
@@ -3037,10 +3037,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                         Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                         a = 1.75; // 1.70
                                         b = 0.50; // 0.58
-                                        m_muscle_type = 2;
+                                        m_MuscleType = 2;
                                       }
                                       else
-                                        if (m_surface_name.compare("long head of the biceps") == 0)
+                                        if (m_SurfaceName.compare("long head of the biceps") == 0)
                                         {
                                           // landmarks
                                           Landmark1VMEName = "Posterior most point on medial border of posterior surface of the Right ischial tuberosity";
@@ -3049,10 +3049,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                           Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                           a = 1.00; // 0.94
                                           b = 0.15; // 0.20
-                                          m_muscle_type = 1;
+                                          m_MuscleType = 1;
                                         }
                                         else
-                                          if (m_surface_name.compare("short head of the biceps") == 0)
+                                          if (m_SurfaceName.compare("short head of the biceps") == 0)
                                           {
                                             // landmarks
                                             Landmark1VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
@@ -3061,10 +3061,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                             Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                             a = 1.10; // 1.03
                                             b = 0.00; // 0.07
-                                            m_muscle_type = 1;
+                                            m_MuscleType = 1;
                                           }
                                           else
-                                            if (m_surface_name.compare("gracilis") == 0)
+                                            if (m_SurfaceName.compare("gracilis") == 0)
                                             {
                                               // landmarks
                                               Landmark1VMEName = "Inferior margin of lateral surface of right inferior pubic ramus ";
@@ -3073,10 +3073,10 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                               Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                               a = 1.05; // 0.97
                                               b = 0.25; // 0.30
-                                              m_muscle_type = 1;
+                                              m_MuscleType = 1;
                                             }
                                             else
-                                              if (m_surface_name.compare("vastus lateralis and intermedius") == 0)
+                                              if (m_SurfaceName.compare("vastus lateralis and intermedius") == 0)
                                               {
                                                 // landmarks
                                                 Landmark1VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
@@ -3085,7 +3085,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
                                                 a = 1.50; // 1.44
                                                 b = -0.05;// 0.00
-                                                m_muscle_type = 1;
+                                                m_MuscleType = 1;
                                               }
                                               else
                                               {
@@ -3128,7 +3128,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark1AtlasVMELandmark->GetPoint(a1);
 
                                                 // set name
-                                                m_l1_name = Landmark1AtlasVMELandmark->GetName();
+                                                m_L1Name = Landmark1AtlasVMELandmark->GetName();
                                               }
 
                                               // atlas - landmark 2
@@ -3147,7 +3147,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark2AtlasVMELandmark->GetPoint(a2);
 
                                                 // set name
-                                                m_l2_name = Landmark2AtlasVMELandmark->GetName();
+                                                m_L2Name = Landmark2AtlasVMELandmark->GetName();
                                               }
 
                                               // atlas - landmark 3
@@ -3166,7 +3166,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark3AtlasVMELandmark->GetPoint(a3);
 
                                                 // set name
-                                                m_l3_name = Landmark3AtlasVMELandmark->GetName();
+                                                m_L3Name = Landmark3AtlasVMELandmark->GetName();
                                               }
 
                                               // atlas - landmark 4
@@ -3185,7 +3185,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark4AtlasVMELandmark->GetPoint(a4);
 
                                                 // set name
-                                                m_l4_name = Landmark4AtlasVMELandmark->GetName();
+                                                m_L4Name = Landmark4AtlasVMELandmark->GetName();
                                               }
 
                                               // patient - landmark 1
@@ -3204,7 +3204,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark1PatientVMELandmark->GetPoint(p1);
 
                                                 // set name
-                                                m_p1_name = Landmark1PatientVMELandmark->GetName();
+                                                m_P1Name = Landmark1PatientVMELandmark->GetName();
                                               }
 
                                               // patient - landmark 2
@@ -3223,7 +3223,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark2PatientVMELandmark->GetPoint(p2);
 
                                                 // set name
-                                                m_p2_name = Landmark2PatientVMELandmark->GetName();
+                                                m_P2Name = Landmark2PatientVMELandmark->GetName();
                                               }
 
                                               // patient - landmark 3
@@ -3242,7 +3242,7 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark3PatientVMELandmark->GetPoint(p3);
 
                                                 // set name
-                                                m_p3_name = Landmark3PatientVMELandmark->GetName();
+                                                m_P3Name = Landmark3PatientVMELandmark->GetName();
                                               }
 
                                               // patient - landmark 4
@@ -3261,27 +3261,27 @@ void medOpMML::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSect
                                                 Landmark4PatientVMELandmark->GetPoint(p4);
 
                                                 // set name
-                                                m_p4_name = Landmark4PatientVMELandmark->GetName();
+                                                m_P4Name = Landmark4PatientVMELandmark->GetName();
                                               }
 
                                               // use weights to relocate landmarks 1, 2
                                               for(i = 0; i < 3; i++)
                                               {
-                                                m_l1_point[i] = a * a1[i] + (1 - a) * a2[i];
-                                                m_l2_point[i] = b * a1[i] + (1 - b) * a2[i];
+                                                m_L1Point[i] = a * a1[i] + (1 - a) * a2[i];
+                                                m_L2Point[i] = b * a1[i] + (1 - b) * a2[i];
 
-                                                m_p1[i] = a * p1[i] + (1 - a) * p2[i];
-                                                m_p2[i] = b * p1[i] + (1 - b) * p2[i];
+                                                m_P1[i] = a * p1[i] + (1 - a) * p2[i];
+                                                m_P2[i] = b * p1[i] + (1 - b) * p2[i];
                                               }
 
                                               // landmarks 3 / 4
                                               for(i = 0; i < 3; i++)
                                               {
-                                                m_l3_point[i] = a3[i];
-                                                m_l4_point[i] = a4[i];
+                                                m_L3Point[i] = a3[i];
+                                                m_L4Point[i] = a4[i];
 
-                                                m_p3[i] = p3[i];
-                                                m_p4[i] = p4[i];
+                                                m_P3[i] = p3[i];
+                                                m_P4[i] = p4[i];
                                               }
 }
 
@@ -3296,7 +3296,7 @@ void medOpMML::Update()
   m_Model->UpdateSegmentCuttingPlanes();
 
   // update widget
-  Widget->UpdateWidgetTransform();
+  m_Widget->UpdateWidgetTransform();
 
   // update north east segment
   m_Model->UpdateSegmentNorthEastTransform();
@@ -3341,7 +3341,7 @@ void medOpMML::OnPOperationButton()
   // render model view
   m_Model->Render();
 
-  wxColour Colour = PlaceOpButton->GetBackgroundColour();
+  wxColour Colour = m_PlaceOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
 
   // p operation active already
@@ -3356,16 +3356,16 @@ void medOpMML::OnPOperationButton()
   }
 
   // other buttons off
-  TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  TranslateOpButton->SetTitle("T");
-  RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  RotateOpButton->SetTitle("R");
-  ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  ScaleOpButton->SetTitle("S");
+  m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_TranslateOpButton->SetTitle("T");
+  m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_RotateOpButton->SetTitle("R");
+  m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_ScaleOpButton->SetTitle("S");
 
   // this button on
-  PlaceOpButton->SetBackgroundColour(Green);
-  PlaceOpButton->SetTitle(">>P<<");
+  m_PlaceOpButton->SetBackgroundColour(Green);
+  m_PlaceOpButton->SetTitle(">>P<<");
 
   //
   ResetOperation();
@@ -3374,7 +3374,7 @@ void medOpMML::OnPOperationButton()
   m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
   m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-  Widget->CenterModeOn();
+  m_Widget->CenterModeOn();
 
   //
   m_Model->Render();
@@ -3398,7 +3398,7 @@ void medOpMML::OnTOperationButton()
   // render model view
   m_Model->Render();
 
-  wxColour Colour = TranslateOpButton->GetBackgroundColour();
+  wxColour Colour = m_TranslateOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
 
   // t operation active already
@@ -3413,16 +3413,16 @@ void medOpMML::OnTOperationButton()
   }
 
   // other buttons off
-  PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  PlaceOpButton->SetTitle("P");
-  RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  RotateOpButton->SetTitle("R");
-  ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  ScaleOpButton->SetTitle("S");
+  m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_PlaceOpButton->SetTitle("P");
+  m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_RotateOpButton->SetTitle("R");
+  m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_ScaleOpButton->SetTitle("S");
 
   // this button on
-  TranslateOpButton->SetBackgroundColour(Green);
-  TranslateOpButton->SetTitle(">>T<<");
+  m_TranslateOpButton->SetBackgroundColour(Green);
+  m_TranslateOpButton->SetTitle(">>T<<");
 
   //
   ResetOperation();
@@ -3431,7 +3431,7 @@ void medOpMML::OnTOperationButton()
   m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
   m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-  Widget->TranslationModeOn();
+  m_Widget->TranslationModeOn();
 
   //
   m_Model->Render();
@@ -3455,7 +3455,7 @@ void medOpMML::OnROperationButton()
   // render model view
   m_Model->Render();
 
-  wxColour Colour = RotateOpButton->GetBackgroundColour();
+  wxColour Colour = m_RotateOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
 
   // r operation active already
@@ -3470,16 +3470,16 @@ void medOpMML::OnROperationButton()
   }
 
   // other buttons off
-  PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  PlaceOpButton->SetTitle("P");
-  TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  TranslateOpButton->SetTitle("T");
-  ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  ScaleOpButton->SetTitle("S");
+  m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_PlaceOpButton->SetTitle("P");
+  m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_TranslateOpButton->SetTitle("T");
+  m_ScaleOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_ScaleOpButton->SetTitle("S");
 
   // this button on
-  RotateOpButton->SetBackgroundColour(Green);
-  RotateOpButton->SetTitle(">>R<<");
+  m_RotateOpButton->SetBackgroundColour(Green);
+  m_RotateOpButton->SetTitle(">>R<<");
 
   //
   ResetOperation();
@@ -3487,10 +3487,10 @@ void medOpMML::OnROperationButton()
   // prepare display information
   m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-  Widget->UpdateRotationHandle();
-  Widget->RotationHandleOn();
-  Widget->SetRotationHandleVisibility();
-  Widget->RotationModeOn();
+  m_Widget->UpdateRotationHandle();
+  m_Widget->RotationHandleOn();
+  m_Widget->SetRotationHandleVisibility();
+  m_Widget->RotationModeOn();
 
   //
   m_Model->Render();
@@ -3514,7 +3514,7 @@ void medOpMML::OnSOperationButton()
   // render model view
   m_Model->Render();
 
-  wxColour Colour = ScaleOpButton->GetBackgroundColour();
+  wxColour Colour = m_ScaleOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
 
   // s operation active already
@@ -3522,25 +3522,25 @@ void medOpMML::OnSOperationButton()
     return;
 
   // other buttons off
-  PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  PlaceOpButton->SetTitle("P");
-  TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  TranslateOpButton->SetTitle("T");
-  RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
-  RotateOpButton->SetTitle("R");
+  m_PlaceOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_PlaceOpButton->SetTitle("P");
+  m_TranslateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_TranslateOpButton->SetTitle("T");
+  m_RotateOpButton->SetBackgroundColour(m_ButtonBackgroundColour);
+  m_RotateOpButton->SetTitle("R");
 
   // this button on
-  ScaleOpButton->SetBackgroundColour(Green);
-  ScaleOpButton->SetTitle(">>S<<");
+  m_ScaleOpButton->SetBackgroundColour(Green);
+  m_ScaleOpButton->SetTitle(">>S<<");
 
   m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   //
   ResetOperation();
 
-  Widget->UpdateScalingHandles();
-  Widget->ScalingHandlesOn();
-  Widget->ScalingModeOn();
+  m_Widget->UpdateScalingHandles();
+  m_Widget->ScalingHandlesOn();
+  m_Widget->ScalingModeOn();
 
   // on successful scaling, ScalingOccured flag in Model
   // is set to true, medOpMMLContourWidget::OnLeftButtonUp
