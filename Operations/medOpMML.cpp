@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 11:46:27 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-07-23 12:11:42 $
+Version:   $Revision: 1.12 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -135,7 +135,7 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_P4Name      = "none";
 
   // no 3d view
-  m_ThreeDFlag = 0;
+  m_3DFlag = 0;
 
   // no 4th landmark
   m_LandmarksFlag = 0;
@@ -287,22 +287,22 @@ void medOpMML::OnEvent(mafEventBase *maf_event)
       break;
 
     case ID_SHOW_AXES: // registration dlg axes on/off
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnContourLineAxesVisibility();
       break;
 
     case ID_SHOW_CONTOUR: // registration dlg contour on/off
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnContourVisibility();
       break;
 
     case ID_RESET_VIEW: // registration dlg reset view
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnResetView();
       break;
 
     case ID_OK: // registration dlg ok
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnRegistrationOK();
       m_OpDlg->EndModal(wxID_OK);
       break;
@@ -313,27 +313,27 @@ void medOpMML::OnEvent(mafEventBase *maf_event)
       break;
 
     case ID_P_OPERATION: // registration dlg p-op
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnPOperationButton();
       break;
 
     case ID_T_OPERATION: // registration dlg t-op
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnTOperationButton();
       break;
 
     case ID_R_OPERATION: // registration dlg r-op
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnROperationButton();
       break;
 
     case ID_S_OPERATION: // registration dlg s-op
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnSOperationButton();
       break;
 
     case ID_UNDO: // registration dlg undo
-      if (m_ThreeDFlag == 0)
+      if (m_3DFlag == 0)
         OnUndo();
       break;
 
@@ -2036,7 +2036,7 @@ bool medOpMML::CreateInputsDlg()
   // 3d flag
   wxStaticText *flagLab  = new wxStaticText(m_ChooseDlg, -1, "3D (0/1)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *flagTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  flagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_ThreeDFlag,0,1));
+  flagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_3DFlag,0,1));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   flagHorizontalSizer->Add(flagLab, 0);
   flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2703,7 +2703,7 @@ bool medOpMML::SetUpModelView()
   m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   // 3d display?
-  if (m_ThreeDFlag == 1)
+  if (m_3DFlag == 1)
   {
     //
     m_Widget->Off();
