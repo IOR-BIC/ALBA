@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:03:41 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-23 09:15:56 $
+Version:   $Revision: 1.4 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -97,7 +97,7 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_Vol         = NULL;
   m_Surface     = NULL;
 
-  m_op_dlg      = NULL; // registration dialog
+  m_OpDlg      = NULL; // registration dialog
   m_radio       = NULL; // radio buttons
 
   //
@@ -233,12 +233,12 @@ void medOpMML::OpRun()
   CreateRegistrationDlg(); 
 
   //
-  int res = (m_op_dlg->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
+  int res = (m_OpDlg->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
 
   //wxDELETE(m_RwiBase);
   //for(int i=0; i<9; i++) wxDELETE(m_RenderWindow[i]);
   //vtkDEL(m_rw_camera);
-  wxDELETE(m_op_dlg);
+  wxDELETE(m_OpDlg);
 
   OpStop(res);
 }
@@ -304,12 +304,12 @@ void medOpMML::OnEvent(mafEventBase *maf_event)
     case ID_OK: // registration dlg ok
       if (m_3dflag == 0)
         OnRegistrationOK();
-      m_op_dlg->EndModal(wxID_OK);
+      m_OpDlg->EndModal(wxID_OK);
       break;
 
     case ID_CANCEL: // registration dlg cancel
       OnRegistrationCANCEL();
-      m_op_dlg->EndModal(wxID_CANCEL);
+      m_OpDlg->EndModal(wxID_CANCEL);
       break;
 
     case ID_P_OPERATION: // registration dlg p-op
@@ -1272,7 +1272,7 @@ void medOpMML::OnOperation()
     if (Model->GetScalingOccured())
     {
       m_state = 3;
-      m_op_dlg->TransferDataToWindow();
+      m_OpDlg->TransferDataToWindow();
       wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
       return;
     }
@@ -1292,7 +1292,7 @@ void medOpMML::OnOperation()
       if (Model->GetScalingOccured())
       {
         m_state = 3;
-        m_op_dlg->TransferDataToWindow();
+        m_OpDlg->TransferDataToWindow();
         wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
         return;
       }
@@ -1313,7 +1313,7 @@ void medOpMML::OnOperation()
         if (Model->GetScalingOccured())
         {
           m_state = 3;
-          m_op_dlg->TransferDataToWindow();
+          m_OpDlg->TransferDataToWindow();
           wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
           return;
         }
@@ -2122,7 +2122,7 @@ void medOpMML::CreateRegistrationDlg()
   // create dialog
   wxString Title;
   Title = "registration of " + m_surface_name;
-  m_op_dlg = new mmgDialog(Title); 
+  m_OpDlg = new mmgDialog(Title); 
 
 
   // left/right vertical box sizers
@@ -2140,27 +2140,27 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(TopHorizontalBoxSizer);
 
   // axes on/off button
-  AxesOnOffButton = new mmgButton(m_op_dlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
+  AxesOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
   AxesOnOffButton->SetListener(this);
   TopHorizontalBoxSizer->Add(AxesOnOffButton,0,wxALL, 5);
 
   // contour on/off buton
-  ContourOnOffButton = new mmgButton(m_op_dlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
+  ContourOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
   ContourOnOffButton->SetListener(this);
   TopHorizontalBoxSizer->Add(ContourOnOffButton,0,wxALL, 5);
 
   // reset view button
-  ResetViewButton = new mmgButton(m_op_dlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
+  ResetViewButton = new mmgButton(m_OpDlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
   ResetViewButton->SetListener(this);
   TopHorizontalBoxSizer->Add(ResetViewButton,0,wxALL, 5);
 
   // ok button
-  OkButton = new mmgButton(m_op_dlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
+  OkButton = new mmgButton(m_OpDlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
   OkButton->SetListener(this);
   TopHorizontalBoxSizer->Add(OkButton,0,wxALL, 5);
 
   // cancel button
-  CancelButton = new mmgButton(m_op_dlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
+  CancelButton = new mmgButton(m_OpDlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
   CancelButton->SetListener(this);
   TopHorizontalBoxSizer->Add(CancelButton,0, wxALL, 5);
 
@@ -2183,24 +2183,24 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(OperationHorizontalBoxSizer);
 
   // create p/t/r/s operation buttons
-  PlaceOpButton = new mmgButton(m_op_dlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
+  PlaceOpButton = new mmgButton(m_OpDlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
   PlaceOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(PlaceOpButton,0,wxALL, 5);
 
-  TranslateOpButton = new mmgButton(m_op_dlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
+  TranslateOpButton = new mmgButton(m_OpDlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
   TranslateOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(TranslateOpButton,0,wxALL, 5);
 
-  RotateOpButton = new mmgButton(m_op_dlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
+  RotateOpButton = new mmgButton(m_OpDlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
   RotateOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(RotateOpButton,0,wxALL, 5);
 
-  ScaleOpButton = new mmgButton(m_op_dlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
+  ScaleOpButton = new mmgButton(m_OpDlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
   ScaleOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(ScaleOpButton,0,wxALL, 5);
 
   // undo button
-  UndoButton = new mmgButton(m_op_dlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
+  UndoButton = new mmgButton(m_OpDlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
   UndoButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(UndoButton,0,wxALL, 5);
 
@@ -2217,7 +2217,7 @@ void medOpMML::CreateRegistrationDlg()
 
 
   // maf model view RWI
-  m_ModelmafRWI = new mafRWI(m_op_dlg);
+  m_ModelmafRWI = new mafRWI(m_OpDlg);
   m_ModelmafRWI->SetListener(this);
   m_ModelmafRWI->m_RwiBase->SetInteractorStyle(NULL);
 
@@ -2231,7 +2231,7 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(m_ModelmafRWI->m_RwiBase, 1, wxEXPAND | wxALL, 5);
 
   // maf lut
-  m_lut = new mmgLutSlider(m_op_dlg,-1,wxPoint(0,0),wxSize(420,24));
+  m_lut = new mmgLutSlider(m_OpDlg,-1,wxPoint(0,0),wxSize(420,24));
   m_lut->SetListener(this);
   LeftVerticalBoxSizer->Add(m_lut,0,wxEXPAND ,6);
 
@@ -2271,14 +2271,14 @@ void medOpMML::CreateRegistrationDlg()
   SetUpInputs();
 
   // maf slider widget 
-  wxStaticText *lab  = new wxStaticText(m_op_dlg, -1, "Slice", wxPoint(0,0), wxSize(-1, 16));
-  wxTextCtrl   *text = new wxTextCtrl  (m_op_dlg, ID_SLICE, "hello",  wxPoint(0,0), wxSize(20, 16),wxNO_BORDER |wxTE_READONLY );
+  wxStaticText *lab  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(-1, 16));
+  wxTextCtrl   *text = new wxTextCtrl  (m_OpDlg, ID_SLICE, "hello",  wxPoint(0,0), wxSize(20, 16),wxNO_BORDER |wxTE_READONLY );
   wxBoxSizer *hs4 = new wxBoxSizer(wxHORIZONTAL);
   hs4->Add(lab,  0, wxLEFT, 85);
   hs4->Add(text, 0, wxLEFT, 10);
   RightVerticalBoxSizer->Add(hs4, 0, wxTOP, 25);
 
-  wxSlider *sli  = new wxSlider(m_op_dlg, ID_SLICE,0, 1, Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
+  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 1, Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
   sli->SetValidator(mmgValidator(this,ID_SLICE,(wxSlider*)sli,&m_slice,text));
   //RightVerticalBoxSizer->Add(sli,0);
   RightVerticalBoxSizer->Add(sli, 0, wxLEFT, -9);
@@ -2306,8 +2306,8 @@ void medOpMML::CreateRegistrationDlg()
   RightVerticalBoxSizer->Add(m_SWmafRWI->m_RwiBase, 0, wxTOP, 3);
 
   //
-  m_op_dlg->Add(WindowHorizontalBoxSizer);    
-  WindowHorizontalBoxSizer->Fit(m_op_dlg);
+  m_OpDlg->Add(WindowHorizontalBoxSizer);    
+  WindowHorizontalBoxSizer->Fit(m_OpDlg);
 
   //
   // mml parameter views
@@ -2335,7 +2335,7 @@ void medOpMML::CreateRegistrationDlg()
   mafEventMacro(mafEvent(this, ID_T_OPERATION));
   //
 
-  m_op_dlg->ShowModal();	
+  m_OpDlg->ShowModal();	
 }
 
 //----------------------------------------------------------------------------
@@ -2725,7 +2725,7 @@ bool medOpMML::SetUpModelView()
 mafRWI* medOpMML::CreateParameterViewmafRWI(wxString lab, float r, float g, float b)
 //----------------------------------------------------------------------------
 { 
-  mafRWI *rwi = new mafRWI(m_op_dlg);
+  mafRWI *rwi = new mafRWI(m_OpDlg);
   rwi->SetListener(this);
   rwi->m_RwiBase->SetInteractorStyle(NULL);
 

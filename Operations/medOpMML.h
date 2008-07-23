@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:03:41 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-23 09:15:51 $
+Version:   $Revision: 1.4 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,7 +86,7 @@ protected:
   void	  SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
 
   mmgDialog	*m_ChooseDlg;		// inputs dialog
-  mmgDialog	*m_op_dlg;			  // operation dialog
+  mmgDialog	*m_OpDlg;			  // operation dialog
 
   // parameter views
   medOpMMLParameterView *PH; // PH parameter view
