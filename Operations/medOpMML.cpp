@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-01 14:58:51 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-23 09:03:41 $
+Version:   $Revision: 1.3 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -279,11 +279,11 @@ void medOpMML::OnEvent(mafEventBase *maf_event)
       */
 
     case ID_CHOOSE_OK: // set up dlg ok
-      m_choose_dlg->EndModal(wxID_OK);
+      m_ChooseDlg->EndModal(wxID_OK);
       break;
 
     case ID_CHOOSE_CANCEL: // set up dlg cancel
-      m_choose_dlg->EndModal(wxID_CANCEL);
+      m_ChooseDlg->EndModal(wxID_CANCEL);
       break;
 
     case ID_SHOW_AXES: // registration dlg axes on/off
@@ -794,7 +794,7 @@ void medOpMML::OnMuscleSelection()
   m_choose_ok->Enable(true);
 
   // update window
-  m_choose_dlg->TransferDataToWindow();
+  m_ChooseDlg->TransferDataToWindow();
 }
 
 //----------------------------------------------------------------------------
@@ -1566,7 +1566,7 @@ void medOpMML::OnLandmark1AtlasPatientSelection()
     m_choose_ok->Enable(false);
 
   // update window
-  m_choose_dlg->TransferDataToWindow();
+  m_ChooseDlg->TransferDataToWindow();
 }
 
 //----------------------------------------------------------------------------
@@ -1676,7 +1676,7 @@ void medOpMML::OnLandmark2AtlasPatientSelection()
     m_choose_ok->Enable(false);
 
   // update window
-  m_choose_dlg->TransferDataToWindow();
+  m_ChooseDlg->TransferDataToWindow();
 }
 
 //----------------------------------------------------------------------------
@@ -1786,7 +1786,7 @@ void medOpMML::OnLandmark3AtlasPatientSelection()
     m_choose_ok->Enable(false);
 
   // update window
-  m_choose_dlg->TransferDataToWindow();
+  m_ChooseDlg->TransferDataToWindow();
 }
 
 //----------------------------------------------------------------------------
@@ -1896,7 +1896,7 @@ void medOpMML::OnLandmark4AtlasPatientSelection()
     m_choose_ok->Enable(false);
 
   // update window
-  m_choose_dlg->TransferDataToWindow();
+  m_ChooseDlg->TransferDataToWindow();
 }
 
 
@@ -1906,17 +1906,17 @@ bool medOpMML::CreateInputsDlg()
 //----------------------------------------------------------------------------
 {
   // create the dialog
-  m_choose_dlg = new mmgDialog("SetUp"); 
+  m_ChooseDlg = new mmgDialog("SetUp"); 
 
   // vertical stacker for the rows of widgets
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
 
 
   // muscle
-  wxStaticText *lab_1  = new wxStaticText(m_choose_dlg, -1, "Surface", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
+  wxStaticText *lab_1  = new wxStaticText(m_ChooseDlg, -1, "Surface", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
   text_1->SetValidator(mmgValidator(this, ID_CHOOSE_SURFACE, text_1, &m_surface_name));
-  mmgButton    *b_1    = new mmgButton(m_choose_dlg , ID_CHOOSE_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
+  mmgButton    *b_1    = new mmgButton(m_ChooseDlg , ID_CHOOSE_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
   b_1->SetListener(this);
 
   wxBoxSizer *hs_1 = new wxBoxSizer(wxHORIZONTAL);
@@ -1998,8 +1998,8 @@ bool medOpMML::CreateInputsDlg()
 
 
   // scans number
-  wxStaticText *ScansNumberLab  = new wxStaticText(m_choose_dlg, -1, "Slice number (3 - 100)", wxPoint(0,0), wxSize(150,20));
-  ScansNumberTxt = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
+  wxStaticText *ScansNumberLab  = new wxStaticText(m_ChooseDlg, -1, "Slice number (3 - 100)", wxPoint(0,0), wxSize(150,20));
+  ScansNumberTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
   ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,ScansNumberTxt,&m_ScansNumber,3,100)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
@@ -2023,8 +2023,8 @@ bool medOpMML::CreateInputsDlg()
 
 
   // scans grain
-  wxStaticText *ScansGrainLab  = new wxStaticText(m_choose_dlg, -1, "Slice grain (1 - 5)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansGrainTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, -1, "Slice grain (1 - 5)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *ScansGrainTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
   ScansGrainTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,ScansGrainTxt1,&m_ScansGrain,1,5));
   wxBoxSizer *ScansGrainHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansGrainHorizontalSizer->Add(ScansGrainLab,0);
@@ -2034,8 +2034,8 @@ bool medOpMML::CreateInputsDlg()
 
 #ifdef TestingVersion
   // 3d flag
-  wxStaticText *flagLab  = new wxStaticText(m_choose_dlg, -1, "3D (0/1)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *flagTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  wxStaticText *flagLab  = new wxStaticText(m_ChooseDlg, -1, "3D (0/1)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *flagTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
   flagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_3dflag,0,1));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   flagHorizontalSizer->Add(flagLab, 0);
@@ -2069,10 +2069,10 @@ bool medOpMML::CreateInputsDlg()
   */
 
   // ok/cancel button
-  m_choose_ok = new mmgButton(m_choose_dlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
+  m_choose_ok = new mmgButton(m_ChooseDlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
   m_choose_ok->SetListener(this);
   m_choose_ok->Enable(false);
-  mmgButton *b_cancel = new mmgButton(m_choose_dlg, ID_CHOOSE_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
+  mmgButton *b_cancel = new mmgButton(m_ChooseDlg, ID_CHOOSE_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
   wxBoxSizer *hs_b = new wxBoxSizer(wxHORIZONTAL);
   b_cancel->SetListener(this);
   hs_b->Add(m_choose_ok,0);
@@ -2082,16 +2082,16 @@ bool medOpMML::CreateInputsDlg()
 
 
   // put the vertical sizer into the dialog and display
-  vs1->Fit(m_choose_dlg);	  // fit the window to the min size of the sizer
-  m_choose_dlg->Add(vs1) ;  // plug the sizer into the dialog
-  m_choose_dlg->ShowModal();
+  vs1->Fit(m_ChooseDlg);	  // fit the window to the min size of the sizer
+  m_ChooseDlg->Add(vs1) ;  // plug the sizer into the dialog
+  m_ChooseDlg->ShowModal();
 
 
   // dialog return code
-  int returncode =  m_choose_dlg->GetReturnCode();
+  int returncode =  m_ChooseDlg->GetReturnCode();
 
   // destroy object
-  wxDELETE(m_choose_dlg);
+  wxDELETE(m_ChooseDlg);
 
   //
   if (returncode == wxID_OK) // ok button pressed
