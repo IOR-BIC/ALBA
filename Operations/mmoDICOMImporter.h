@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2007-07-06 11:27:20 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-07-23 08:59:04 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,7 +118,7 @@ protected:
   // gui related variables
 	mafString									m_DictionaryFilename;
 	mafString									m_DICOMDir;
-	mafString									m_current_slice_name;
+	mafString									m_CurrentSliceName;
 	int												m_DICOM;
 
 	// slices related informations

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:03:55 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-07-23 08:59:04 $
+  Version:   $Revision: 1.25 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -436,12 +436,12 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 			}
 			else
 			{
-				m_current_slice_name = m_CTDirectoryReader->GetFile(i);
+				m_CurrentSliceName = m_CTDirectoryReader->GetFile(i);
 				// Append of the path at the dicom file
 				wxString str_tmp, ct_mode;
 				str_tmp.Append(dir);
 				str_tmp.Append("\\");
-				str_tmp.Append(m_current_slice_name);
+				str_tmp.Append(m_CurrentSliceName);
 				
 				vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
 				reader->SetFileName((char *)str_tmp.c_str());
@@ -503,12 +503,12 @@ void mmoDICOMImporter::BuildDicomFileList(const char *dir)
 			}
 			else
 			{
-				m_current_slice_name = m_CTDirectoryReader->GetFile(i);
+				m_CurrentSliceName = m_CTDirectoryReader->GetFile(i);
 				// Append of the path at the dicom file
 				wxString str_tmp, ct_mode;
 				str_tmp.Append(dir);
 				str_tmp.Append("\\");
-				str_tmp.Append(m_current_slice_name);
+				str_tmp.Append(m_CurrentSliceName);
 				
 				vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
 				reader->SetFileName((char *)str_tmp.c_str());
