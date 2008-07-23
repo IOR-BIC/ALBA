@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:15:56 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-23 09:29:19 $
+Version:   $Revision: 1.5 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -172,7 +172,7 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_SWmafRWI = NULL;
 
   // parameter views
-  PH = NULL; // place horizontal
+  m_PH = NULL; // place horizontal
   PV = NULL; // place vertical
   TH = NULL; // translate horizontal
   TV = NULL; // translate vertical
@@ -545,7 +545,7 @@ void medOpMML::OnSlider()
   Model->GetActorOfSyntheticScans(m_slice - 1)->VisibilityOn();
 
   // update line actors
-  PH->SetLineActorX(m_slice - 1);
+  m_PH->SetLineActorX(m_slice - 1);
   PV->SetLineActorX(m_slice - 1);
   TH->SetLineActorX(m_slice - 1);
   TV->SetLineActorX(m_slice - 1);
@@ -588,7 +588,7 @@ void medOpMML::OnSlider()
   }
 
   // render parameter views
-  PH->Render();
+  m_PH->Render();
   PV->Render();
   TH->Render();
   TV->Render();
@@ -827,7 +827,7 @@ void medOpMML::OnUndo()
   int maxsliceid = Model->GetTotalNumberOfSyntheticScans() - 1;
 
   // total number of data points
-  int n = PH->GetNumberOfDataPoints();
+  int n = m_PH->GetNumberOfDataPoints();
 
   // can not undo op on first/last slice if only these are left
   if ((params_undo[0] == 0 || params_undo[0] == maxsliceid))
@@ -854,9 +854,9 @@ void medOpMML::OnUndo()
       Model->ScalingOccured = FALSE;
 
       // re-draw curves
-      PH->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      PH->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-      PH->Render();
+      m_PH->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      m_PH->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      m_PH->Render();
 
       PV->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
       PV->GetPointsActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -881,7 +881,7 @@ void medOpMML::OnUndo()
   switch ((int) params_undo[2])
   {
   case 0 : // place
-    PH->RemovePoint(params_undo[0]);
+    m_PH->RemovePoint(params_undo[0]);
     PV->RemovePoint(params_undo[0]);
     Model->GetPHSpline()->RemovePoint(params_undo[1]);
     Model->GetPVSpline()->RemovePoint(params_undo[1]);
@@ -893,7 +893,7 @@ void medOpMML::OnUndo()
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
-        PH->AddPoint(params_undo[0], params[3]);
+        m_PH->AddPoint(params_undo[0], params[3]);
         PV->AddPoint(params_undo[0], params[4]);
         Model->GetPHSpline()->AddPoint(params_undo[1], params[3]);
         Model->GetPVSpline()->AddPoint(params_undo[1], params[4]);
@@ -904,9 +904,9 @@ void medOpMML::OnUndo()
     // first/last slice
     if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
-      if (!(PH->GetValue(params_undo[0]) == 0.0))
+      if (!(m_PH->GetValue(params_undo[0]) == 0.0))
       {
-        PH->AddPoint(params_undo[0], 0.0);
+        m_PH->AddPoint(params_undo[0], 0.0);
         Model->GetPHSpline()->AddPoint(params_undo[0], 0.0);
       }
 
@@ -917,7 +917,7 @@ void medOpMML::OnUndo()
       }
     }
 
-    PH->Render();
+    m_PH->Render();
     PV->Render();
     break;
 
@@ -2312,7 +2312,7 @@ void medOpMML::CreateRegistrationDlg()
   //
   // mml parameter views
   // create
-  PH = new medOpMMLParameterView(m_PHmafRWI->m_RenderWindow, m_PHmafRWI->m_RenFront); 
+  m_PH = new medOpMMLParameterView(m_PHmafRWI->m_RenderWindow, m_PHmafRWI->m_RenFront); 
   PV = new medOpMMLParameterView(m_PVmafRWI->m_RenderWindow, m_PVmafRWI->m_RenFront);
   TH = new medOpMMLParameterView(m_THmafRWI->m_RenderWindow, m_THmafRWI->m_RenFront);
   TV = new medOpMMLParameterView(m_TVmafRWI->m_RenderWindow, m_TVmafRWI->m_RenFront);
@@ -2423,8 +2423,8 @@ bool medOpMML::SetUpParameterViews()
   Model->GetSizeOfSyntheticScans(&sx, &sy);
 
   // ph spline
-  PH->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
-  PH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
+  m_PH->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_PH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // pv spline																											   
   PV->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
   PV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
@@ -2451,8 +2451,8 @@ bool medOpMML::SetUpParameterViews()
   SW->SetRangeY(0.1, 1.0, 3.0);
 
   // display values
-  PH->AddPoint(0, 0.0); 
-  PH->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0);
+  m_PH->AddPoint(0, 0.0); 
+  m_PH->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0);
   // actual values
   Model->GetPHSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, PH = 0
   Model->GetPHSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PH = 0
@@ -2548,7 +2548,7 @@ bool medOpMML::SetUpParameterViews()
         }*/
 
         // display values
-        PH->AddPoint(params[0], params[3]);
+        m_PH->AddPoint(params[0], params[3]);
         PV->AddPoint(params[0], params[4]);
         // actual values
         Model->GetPHSpline()->AddPoint(params[1], params[3]);
@@ -2610,8 +2610,8 @@ bool medOpMML::SetUpParameterViews()
         // grey out twist, h/v translation views
 
         // redraw curves
-        PH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-        PH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+        m_PH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+        m_PH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
         PV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
         PV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
         TH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
@@ -2638,7 +2638,7 @@ bool medOpMML::SetUpWidget()
   Widget->SetModel(Model);
   Widget->SetInteractor(Model->GetRenderWindowInteractor());
 
-  Widget->SetPH(PH);
+  Widget->SetPH(m_PH);
   Widget->SetPV(PV);
   Widget->SetTH(TH);
   Widget->SetTV(TV);
@@ -3328,7 +3328,7 @@ void medOpMML::OnPOperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
-  PH->Render();
+  m_PH->Render();
   PV->Render();
   TH->Render();
   TV->Render();
@@ -3385,7 +3385,7 @@ void medOpMML::OnTOperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
-  PH->Render();
+  m_PH->Render();
   PV->Render();
   TH->Render();
   TV->Render();
@@ -3442,7 +3442,7 @@ void medOpMML::OnROperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
-  PH->Render();
+  m_PH->Render();
   PV->Render();
   TH->Render();
   TV->Render();
@@ -3501,7 +3501,7 @@ void medOpMML::OnSOperationButton()
 //----------------------------------------------------------------------------
 {
   // render parameter views
-  PH->Render();
+  m_PH->Render();
   PV->Render();
   TH->Render();
   TV->Render();

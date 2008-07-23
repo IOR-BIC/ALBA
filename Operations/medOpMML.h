@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:15:51 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-23 09:25:52 $
+Version:   $Revision: 1.5 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -89,7 +89,7 @@ protected:
   mmgDialog	*m_OpDlg;			  // operation dialog
 
   // parameter views
-  medOpMMLParameterView *PH; // PH parameter view
+  medOpMMLParameterView *m_PH; // PH parameter view
   medOpMMLParameterView *PV; // PV parameter view
   medOpMMLParameterView *TH; // TH parameter view
   medOpMMLParameterView *TV; // TV parameter view
