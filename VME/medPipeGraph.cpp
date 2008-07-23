@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 12:51:33 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2008-07-23 07:52:57 $
+  Version:   $Revision: 1.36 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -522,6 +522,11 @@ mmgGui* medPipeGraph::CreateGui()
   m_Gui->String(ID_AXIS_NAME_X,_("X Title"), &m_TitileX,_("Set X axis name"));
   m_Gui->String(ID_AXIS_NAME_Y,_("Y Title"), &m_TitileY,_("Set Y axis name"));
   m_Gui->Divider(1);
+
+  if (m_TimeStampMax == 0.0)
+  {
+    m_TimeStampMax = VTK_DOUBLE_MAX;
+  }
 
   m_Gui->VectorN(ID_RANGE_X, _("Range X"), m_TimesManualRange, 2, 0, m_TimeStampMax);
   m_Gui->VectorN(ID_RANGE_Y, _("Range Y"), m_DataManualRange, 2, m_DataMin, m_DataMax);
