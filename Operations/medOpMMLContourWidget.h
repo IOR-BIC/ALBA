@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLContourWidget.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:48:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-23 15:40:41 $
+  Version:   $Revision: 1.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,6 +14,7 @@
 #define __medOpMMLContourWidget_h
 
 #include "mafDefines.h"
+#include "medDecl.h"
 
 #include "vtkPolyDataSourceWidget.h"
 #include "vtkTubeFilter.h"
@@ -189,8 +190,13 @@ public:
   // with the outline plus the interior mesh (corresponding to the
   // resolution specified). If the mode is "surface" then the plane
   // is drawn as a surface.
-  vtkSetClampMacro(Representation,int,VTK_PLANE_OFF,VTK_PLANE_SURFACE);
-  vtkGetMacro(Representation,int);
+
+  //vtkSetClampMacro(Representation,int,VTK_PLANE_OFF,VTK_PLANE_SURFACE);
+  virtual void SetRepresentation(int representation); 
+  virtual int GetRepresentationMinValue () {return VTK_PLANE_OFF;};
+  virtual int GetRepresentationMaxValue () {return VTK_PLANE_SURFACE;};
+  virtual int GetRepresentation () {return m_Representation;};
+  //vtkGetMacro(Representation,int);
   void SetRepresentationToOff()
     {this->SetRepresentation(VTK_PLANE_OFF);}
   void SetRepresentationToOutline()
@@ -205,15 +211,16 @@ public:
   // Remember that when the state changes, a ModifiedEvent is invoked.
   // This can be used to snap the plane to the axes if it is orginally
   // not aligned.
-  vtkSetMacro(NormalToXAxis,int);
-  vtkGetMacro(NormalToXAxis,int);
-  vtkBooleanMacro(NormalToXAxis,int);
-  vtkSetMacro(NormalToYAxis,int);
-  vtkGetMacro(NormalToYAxis,int);
-  vtkBooleanMacro(NormalToYAxis,int);
-  vtkSetMacro(NormalToZAxis,int);
-  vtkGetMacro(NormalToZAxis,int);
-  vtkBooleanMacro(NormalToZAxis,int);
+
+//   vtkSetMacro(m_NormalToXAxis,int);
+//   vtkGetMacro(m_NormalToXAxis,int);
+//   vtkBooleanMacro(m_NormalToXAxis,int);
+//   vtkSetMacro(NormalToYAxis,int);
+//   vtkGetMacro(NormalToYAxis,int);
+//   vtkBooleanMacro(NormalToYAxis,int);
+//   vtkSetMacro(NormalToZAxis,int);
+//   vtkGetMacro(NormalToZAxis,int);
+//   vtkBooleanMacro(NormalToZAxis,int);
 
   // Description:
   // Grab the polydata (including points) that defines the plane.  The
@@ -277,7 +284,7 @@ protected:
   ~medOpMMLContourWidget();
 
 // MK Operation
-  int Operation;
+  int m_Operation;
   enum WidgetOperation
   {
     Placement, // placement
@@ -291,7 +298,7 @@ protected:
 //
 
 //BTX - manage the state of the widget
-  int State;
+  int m_State;
   enum WidgetState
   {
     Start=0,
@@ -321,14 +328,14 @@ protected:
 
   // MK BEGIN 26/05/04
   // motion vector
-  float Motion[3];
+  float m_Motion[3];
   // MK END
 
   // controlling ivars
-  int NormalToXAxis;
-  int NormalToYAxis;
-  int NormalToZAxis;
-  int Representation;
+  int m_NormalToXAxis;
+  int m_NormalToYAxis;
+  int m_NormalToZAxis;
+  int m_Representation;
   void SelectRepresentation();
 
   // the plane
