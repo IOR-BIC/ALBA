@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:56:18 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-07-23 10:11:03 $
+Version:   $Revision: 1.10 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -111,7 +111,7 @@ protected:
   mafRWI      *m_SWmafRWI;		// SW parameter view maf RWI
 
   // model view
-  medOpMMLModelView     *Model;
+  medOpMMLModelView     *m_Model;
 
   // model view maf RWI
   mafRWI		*m_ModelmafRWI;

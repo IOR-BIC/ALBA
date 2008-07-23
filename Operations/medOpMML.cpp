@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 09:56:18 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-07-23 10:11:09 $
+Version:   $Revision: 1.10 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -182,7 +182,7 @@ medOpMML::medOpMML(const wxString &label) : mafOp(label)
   m_SE = NULL; // scale east
   m_SW = NULL; // scale west
 
-  Model = NULL;
+  m_Model = NULL;
   Widget = NULL;
 
   //
@@ -376,7 +376,7 @@ void medOpMML::OnRegistrationOK()
   // inverse m_pfinalm matrix
   vtkMatrix4x4 *inversem_pfinalm= vtkMatrix4x4::New();
   inversem_pfinalm->Identity();
-  inversem_pfinalm->Invert(Model->GetFinalM(), inversem_pfinalm);
+  inversem_pfinalm->Invert(m_Model->GetFinalM(), inversem_pfinalm);
 
   // transform
   vtkTransform *deformedt = vtkTransform::New();
@@ -384,7 +384,7 @@ void medOpMML::OnRegistrationOK()
 
   // muscle: deformed version
   vtkTransformPolyDataFilter *deformedpd = vtkTransformPolyDataFilter::New();
-  deformedpd->SetInput(Model->GetMuscleTransform2PolyDataFilter()->GetOutput());
+  deformedpd->SetInput(m_Model->GetMuscleTransform2PolyDataFilter()->GetOutput());
   deformedpd->SetTransform(deformedt);
   deformedpd->Update();
 
@@ -403,7 +403,7 @@ void medOpMML::OnRegistrationOK()
   // tag 2: number of slices
   mafTagItem noofslices;
   noofslices.SetName("NUMBER_OF_SLICES_TAG");
-  noofslices.SetValue(Model->GetTotalNumberOfSyntheticScans());
+  noofslices.SetValue(m_Model->GetTotalNumberOfSyntheticScans());
   vme->GetTagArray()->SetTag(noofslices);
 
   // tag 3: xy scaling factors
@@ -411,7 +411,7 @@ void medOpMML::OnRegistrationOK()
   xyscalingfactors.SetName("XY_SCALING_FACTORS_TAG");
   xyscalingfactors.SetNumberOfComponents(2);
   double x, y;
-  Model->GetXYScalingFactorsOfMuscle(&x, &y);
+  m_Model->GetXYScalingFactorsOfMuscle(&x, &y);
   xyscalingfactors.SetComponent(x, 0);
   xyscalingfactors.SetComponent(y, 1);
   vme->GetTagArray()->SetTag(xyscalingfactors);
@@ -441,7 +441,7 @@ void medOpMML::OnRegistrationOK()
   double operation_stack[5];
   for(int i = 0; i < Widget->GetNextOperationId(); i++)
   {
-    Model->OperationsStack->GetTuple(i, operation_stack);
+    m_Model->OperationsStack->GetTuple(i, operation_stack);
 
     SliceId_StackTag.SetComponent(operation_stack[0], i);
     ZValue_StackTag.SetComponent(operation_stack[1], i);
@@ -460,7 +460,7 @@ void medOpMML::OnRegistrationOK()
   // tag 5: type of muscle
   mafTagItem typeofmuscle;
   typeofmuscle.SetName("TYPE_OF_MUSCLE_TAG");
-  typeofmuscle.SetValue(Model->GetTypeOfMuscles());
+  typeofmuscle.SetValue(m_Model->GetTypeOfMuscles());
   vme->GetTagArray()->SetTag(typeofmuscle);
 
   // root vme
@@ -535,14 +535,14 @@ void medOpMML::OnSlider()
 //----------------------------------------------------------------------------
 {
   //
-  Model->SetCurrentIdOfSyntheticScans(m_slice - 1);
+  m_Model->SetCurrentIdOfSyntheticScans(m_slice - 1);
 
   // switch off non-relevant scans
-  for (int j = 0; j < Model->GetTotalNumberOfSyntheticScans(); j++)
-    Model->GetActorOfSyntheticScans(j)->VisibilityOff();
+  for (int j = 0; j < m_Model->GetTotalNumberOfSyntheticScans(); j++)
+    m_Model->GetActorOfSyntheticScans(j)->VisibilityOff();
 
   // switch on current scan
-  Model->GetActorOfSyntheticScans(m_slice - 1)->VisibilityOn();
+  m_Model->GetActorOfSyntheticScans(m_slice - 1)->VisibilityOn();
 
   // update line actors
   m_PH->SetLineActorX(m_slice - 1);
@@ -599,7 +599,7 @@ void medOpMML::OnSlider()
   m_SW->Render();
 
   // render model view
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -610,10 +610,10 @@ void medOpMML::OnLut()
 
   m_lut->GetSubRange(&Low, &High);
 
-  Model->GetWindowLevelLookupTableOfSyntheticScans()->SetLevel((float) ((High + Low) / 2.0));
-  Model->GetWindowLevelLookupTableOfSyntheticScans()->SetWindow((float) (High - Low));
+  m_Model->GetWindowLevelLookupTableOfSyntheticScans()->SetLevel((float) ((High + Low) / 2.0));
+  m_Model->GetWindowLevelLookupTableOfSyntheticScans()->SetWindow((float) (High - Low));
 
-  Model->Render();
+  m_Model->Render();
 }
 
 
@@ -801,8 +801,8 @@ void medOpMML::OnMuscleSelection()
 void medOpMML::OnResetView() 
 //----------------------------------------------------------------------------
 {
-  Model->GetRenderer()->ResetCamera();
-  Model->Render();
+  m_Model->GetRenderer()->ResetCamera();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -822,9 +822,9 @@ void medOpMML::OnUndo()
 
   // the operation to undo
   double params_undo[5];
-  Model->OperationsStack->GetTuple(Widget->GetNextOperationId() - 1, params_undo);
+  m_Model->OperationsStack->GetTuple(Widget->GetNextOperationId() - 1, params_undo);
 
-  int maxsliceid = Model->GetTotalNumberOfSyntheticScans() - 1;
+  int maxsliceid = m_Model->GetTotalNumberOfSyntheticScans() - 1;
 
   // total number of data points
   int n = m_PH->GetNumberOfDataPoints();
@@ -844,14 +844,14 @@ void medOpMML::OnUndo()
 
   // the new current operation
   double params_undo_again[5];
-  Model->OperationsStack->GetTuple(Widget->GetNextOperationId() - 1, params_undo_again);
+  m_Model->OperationsStack->GetTuple(Widget->GetNextOperationId() - 1, params_undo_again);
 
   // if go back to non-scaling situation reset non-scaling splines colours
-  if (Model->ScalingOccured)
+  if (m_Model->ScalingOccured)
   {
-    if (Model->ScalingOccuredOperationId == Widget->GetNextOperationId())
+    if (m_Model->ScalingOccuredOperationId == Widget->GetNextOperationId())
     {
-      Model->ScalingOccured = FALSE;
+      m_Model->ScalingOccured = FALSE;
 
       // re-draw curves
       m_PH->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -883,37 +883,37 @@ void medOpMML::OnUndo()
   case 0 : // place
     m_PH->RemovePoint(params_undo[0]);
     m_PV->RemovePoint(params_undo[0]);
-    Model->GetPHSpline()->RemovePoint(params_undo[1]);
-    Model->GetPVSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetPHSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetPVSpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_PH->AddPoint(params_undo[0], params[3]);
         m_PV->AddPoint(params_undo[0], params[4]);
-        Model->GetPHSpline()->AddPoint(params_undo[1], params[3]);
-        Model->GetPVSpline()->AddPoint(params_undo[1], params[4]);
+        m_Model->GetPHSpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetPVSpline()->AddPoint(params_undo[1], params[4]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_PH->GetValue(params_undo[0]) == 0.0))
       {
         m_PH->AddPoint(params_undo[0], 0.0);
-        Model->GetPHSpline()->AddPoint(params_undo[0], 0.0);
+        m_Model->GetPHSpline()->AddPoint(params_undo[0], 0.0);
       }
 
       if (!(m_PV->GetValue(params_undo[0]) == 0.0))
       {
         m_PV->AddPoint(params_undo[0], 0.0);
-        Model->GetPVSpline()->AddPoint(params_undo[0], 0.0);
+        m_Model->GetPVSpline()->AddPoint(params_undo[0], 0.0);
       }
     }
 
@@ -924,37 +924,37 @@ void medOpMML::OnUndo()
   case 1 : // translate
     m_TH->RemovePoint(params_undo[0]);
     m_TV->RemovePoint(params_undo[0]);
-    Model->GetTHSpline()->RemovePoint(params_undo[1]);
-    Model->GetTVSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetTHSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetTVSpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_TH->AddPoint(params_undo[0], params[3]);
         m_TV->AddPoint(params_undo[0], params[4]);
-        Model->GetTHSpline()->AddPoint(params_undo[1], params[3]);
-        Model->GetTVSpline()->AddPoint(params_undo[1], params[4]);
+        m_Model->GetTHSpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetTVSpline()->AddPoint(params_undo[1], params[4]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_TH->GetValue(params_undo[0]) == 0.0))
       {
         m_TH->AddPoint(params_undo[0], 0.0);
-        Model->GetTHSpline()->AddPoint(params_undo[0], 0.0);
+        m_Model->GetTHSpline()->AddPoint(params_undo[0], 0.0);
       }
 
       if (!(m_TV->GetValue(params_undo[0]) == 0.0))
       {
         m_TV->AddPoint(params_undo[0], 0.0);
-        Model->GetTVSpline()->AddPoint(params_undo[0], 0.0);
+        m_Model->GetTVSpline()->AddPoint(params_undo[0], 0.0);
       }
     }
     m_TH->Render();
@@ -963,28 +963,28 @@ void medOpMML::OnUndo()
 
   case 2 : // rotate
     m_RA->RemovePoint(params_undo[0]);
-    Model->GetRASpline()->RemovePoint(params_undo[1]);
+    m_Model->GetRASpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_RA->AddPoint(params_undo[0], params[3]);
-        Model->GetRASpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetRASpline()->AddPoint(params_undo[1], params[3]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_RA->GetValue(params_undo[0]) == 0.0))
       {
         m_RA->AddPoint(params_undo[0], 0.0);
-        Model->GetRASpline()->AddPoint(params_undo[0], 0.0);
+        m_Model->GetRASpline()->AddPoint(params_undo[0], 0.0);
       }
     }
     m_RA->Render();
@@ -992,28 +992,28 @@ void medOpMML::OnUndo()
 
   case 3 : // scale north
     m_SN->RemovePoint(params_undo[0]);
-    Model->GetSNSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetSNSpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_SN->AddPoint(params_undo[0], params[3]);
-        Model->GetSNSpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetSNSpline()->AddPoint(params_undo[1], params[3]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_SN->GetValue(params_undo[0]) == 1.0))
       {
         m_SN->AddPoint(params_undo[0], 1.0);
-        Model->GetSNSpline()->AddPoint(params_undo[0], 1.0);
+        m_Model->GetSNSpline()->AddPoint(params_undo[0], 1.0);
       }
     }
     m_SN->Render();
@@ -1021,28 +1021,28 @@ void medOpMML::OnUndo()
 
   case 4 : // scale south
     m_SS->RemovePoint(params_undo[0]);
-    Model->GetSSSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetSSSpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_SS->AddPoint(params_undo[0], params[3]);
-        Model->GetSSSpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetSSSpline()->AddPoint(params_undo[1], params[3]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_SS->GetValue(params_undo[0]) == 1.0))
       {
         m_SS->AddPoint(params_undo[0], 1.0);
-        Model->GetSSSpline()->AddPoint(params_undo[0], 1.0);
+        m_Model->GetSSSpline()->AddPoint(params_undo[0], 1.0);
       }
     }
     m_SS->Render();
@@ -1050,28 +1050,28 @@ void medOpMML::OnUndo()
 
   case 5 : // scale east
     m_SE->RemovePoint(params_undo[0]);
-    Model->GetSESpline()->RemovePoint(params_undo[1]);
+    m_Model->GetSESpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_SE->AddPoint(params_undo[0], params[3]);
-        Model->GetSESpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetSESpline()->AddPoint(params_undo[1], params[3]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_SE->GetValue(params_undo[0]) == 1.0))
       {
         m_SE->AddPoint(params_undo[0], 1.0);
-        Model->GetSESpline()->AddPoint(params_undo[0], 1.0);
+        m_Model->GetSESpline()->AddPoint(params_undo[0], 1.0);
       }
     }
     m_SE->Render();
@@ -1079,28 +1079,28 @@ void medOpMML::OnUndo()
 
   case 6 : // scale west
     m_SW->RemovePoint(params_undo[0]);
-    Model->GetSWSpline()->RemovePoint(params_undo[1]);
+    m_Model->GetSWSpline()->RemovePoint(params_undo[1]);
 
     for(i = Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      Model->OperationsStack->GetTuple(i, params);
+      m_Model->OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
         m_SW->AddPoint(params_undo[0], params[3]);
-        Model->GetSWSpline()->AddPoint(params_undo[1], params[3]);
+        m_Model->GetSWSpline()->AddPoint(params_undo[1], params[3]);
         break;
       }
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
     {
       if (!(m_SW->GetValue(params_undo[0]) == 1.0))
       {
         m_SW->AddPoint(params_undo[0], 1.0);
-        Model->GetSWSpline()->AddPoint(params_undo[0], 1.0);
+        m_Model->GetSWSpline()->AddPoint(params_undo[0], 1.0);
       }
     }
     m_SW->Render();
@@ -1130,8 +1130,8 @@ void medOpMML::OnUndo()
     ResetOperation();
 
     // prepare display information
-    Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
     Widget->CenterModeOn();
     break;
@@ -1153,8 +1153,8 @@ void medOpMML::OnUndo()
     ResetOperation();
 
     // prepare display information
-    Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
     Widget->TranslationModeOn();
     break;
@@ -1176,7 +1176,7 @@ void medOpMML::OnUndo()
     ResetOperation();
 
     // prepare display information
-    Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
     Widget->UpdateRotationHandle();
     Widget->RotationHandleOn();
@@ -1201,7 +1201,7 @@ void medOpMML::OnUndo()
     ScaleOpButton->SetBackgroundColour(Green);
     ScaleOpButton->SetTitle(">>S<<");
 
-    Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
     //
     ResetOperation();
@@ -1212,34 +1212,34 @@ void medOpMML::OnUndo()
   }
 
   // update vertical cuts
-  Model->UpdateSegmentCuttingPlanes();
+  m_Model->UpdateSegmentCuttingPlanes();
 
   // update widget
   Widget->UpdateWidgetTransform();
 
   // update north east segment
-  Model->UpdateSegmentNorthEastTransform();
+  m_Model->UpdateSegmentNorthEastTransform();
 
   // update north west segment
-  Model->UpdateSegmentNorthWestTransform();
+  m_Model->UpdateSegmentNorthWestTransform();
 
   // update south east segment
-  Model->UpdateSegmentSouthEastTransform();
+  m_Model->UpdateSegmentSouthEastTransform();
 
   // update south west segment
-  Model->UpdateSegmentSouthWestTransform();
+  m_Model->UpdateSegmentSouthWestTransform();
 
   // update contour axes
-  Model->UpdateContourAxesTransform();
+  m_Model->UpdateContourAxesTransform();
 
   // set visibility
-  Model->SetContourAxesVisibility();
+  m_Model->SetContourAxesVisibility();
 
   // update global axes
-  Model->UpdateGlobalAxesTransform();
+  m_Model->UpdateGlobalAxesTransform();
 
   // set visibility
-  Model->SetGlobalAxesVisibility();
+  m_Model->SetGlobalAxesVisibility();
 
   //
   if (Widget->GetRotationMode())
@@ -1259,7 +1259,7 @@ void medOpMML::OnUndo()
   }
 
   //
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -1269,7 +1269,7 @@ void medOpMML::OnOperation()
   // operations
   if (m_state == 0) // place
   {
-    if (Model->GetScalingOccured())
+    if (m_Model->GetScalingOccured())
     {
       m_state = 3;
       m_OpDlg->TransferDataToWindow();
@@ -1281,15 +1281,15 @@ void medOpMML::OnOperation()
     ResetOperation();
 
     // prepare display information
-    Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
     Widget->CenterModeOn();
   }
   else
     if (m_state == 1) // translate
     {
-      if (Model->GetScalingOccured())
+      if (m_Model->GetScalingOccured())
       {
         m_state = 3;
         m_OpDlg->TransferDataToWindow();
@@ -1301,8 +1301,8 @@ void medOpMML::OnOperation()
       ResetOperation();
 
       // prepare display information
-      Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-      Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+      m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+      m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
       // prepare widget
       Widget->TranslationModeOn();
@@ -1310,7 +1310,7 @@ void medOpMML::OnOperation()
     else
       if (m_state == 2) // rotate
       {
-        if (Model->GetScalingOccured())
+        if (m_Model->GetScalingOccured())
         {
           m_state = 3;
           m_OpDlg->TransferDataToWindow();
@@ -1321,7 +1321,7 @@ void medOpMML::OnOperation()
         //
         ResetOperation();
 
-        Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+        m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
         Widget->UpdateRotationHandle();
         Widget->RotationHandleOn();
@@ -1330,7 +1330,7 @@ void medOpMML::OnOperation()
       else
         if (m_state == 3) // scale
         {
-          Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+          m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
           //
           ResetOperation();
@@ -1346,7 +1346,7 @@ void medOpMML::OnOperation()
           wxMessageBox("Unknown operation","alert",wxICON_WARNING);
 
   //
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -1382,10 +1382,10 @@ void medOpMML::OnContourLineAxesVisibility()
     //Model->GetNegativeZAxisActor()->VisibilityOn();
 
     // contour coordinate system
-    Model->GetContourPositiveXAxisActor()->VisibilityOn();
-    Model->GetContourNegativeXAxisActor()->VisibilityOn();
-    Model->GetContourPositiveYAxisActor()->VisibilityOn();
-    Model->GetContourNegativeYAxisActor()->VisibilityOn();
+    m_Model->GetContourPositiveXAxisActor()->VisibilityOn();
+    m_Model->GetContourNegativeXAxisActor()->VisibilityOn();
+    m_Model->GetContourPositiveYAxisActor()->VisibilityOn();
+    m_Model->GetContourNegativeYAxisActor()->VisibilityOn();
   }
   else
   {
@@ -1398,13 +1398,13 @@ void medOpMML::OnContourLineAxesVisibility()
     //Model->GetPositiveZAxisActor()->VisibilityOff();
     //Model->GetNegativeZAxisActor()->VisibilityOff();
 
-    Model->GetContourPositiveXAxisActor()->VisibilityOff();
-    Model->GetContourNegativeXAxisActor()->VisibilityOff();
-    Model->GetContourPositiveYAxisActor()->VisibilityOff();
-    Model->GetContourNegativeYAxisActor()->VisibilityOff();
+    m_Model->GetContourPositiveXAxisActor()->VisibilityOff();
+    m_Model->GetContourNegativeXAxisActor()->VisibilityOff();
+    m_Model->GetContourPositiveYAxisActor()->VisibilityOff();
+    m_Model->GetContourNegativeYAxisActor()->VisibilityOff();
   }
 
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -1417,10 +1417,10 @@ void medOpMML::OnContourVisibility()
   {
     ContourOnOffButton->SetTitle("Contour Off");
 
-    Model->GetNEContourActor()->VisibilityOn();
-    Model->GetNWContourActor()->VisibilityOn();
-    Model->GetSEContourActor()->VisibilityOn();
-    Model->GetSWContourActor()->VisibilityOn();
+    m_Model->GetNEContourActor()->VisibilityOn();
+    m_Model->GetNWContourActor()->VisibilityOn();
+    m_Model->GetSEContourActor()->VisibilityOn();
+    m_Model->GetSWContourActor()->VisibilityOn();
 
     if (Widget->GetRotationMode())
     {
@@ -1438,10 +1438,10 @@ void medOpMML::OnContourVisibility()
   {
     ContourOnOffButton->SetTitle("Contour On");
 
-    Model->GetNEContourActor()->VisibilityOff();
-    Model->GetNWContourActor()->VisibilityOff();
-    Model->GetSEContourActor()->VisibilityOff();
-    Model->GetSWContourActor()->VisibilityOff();
+    m_Model->GetNEContourActor()->VisibilityOff();
+    m_Model->GetNWContourActor()->VisibilityOff();
+    m_Model->GetSEContourActor()->VisibilityOff();
+    m_Model->GetSWContourActor()->VisibilityOff();
 
     if (Widget->GetRotationMode())
     {
@@ -1456,7 +1456,7 @@ void medOpMML::OnContourVisibility()
       }
   }
 
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -2265,7 +2265,7 @@ void medOpMML::CreateRegistrationDlg()
   //
   // mml model view
   // create
-  Model = new medOpMMLModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, m_Muscle, m_Volume);
+  m_Model = new medOpMMLModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, m_Muscle, m_Volume);
   // initialise
   CreateFakeLandmarks();
   SetUpInputs();
@@ -2278,7 +2278,7 @@ void medOpMML::CreateRegistrationDlg()
   hs4->Add(text, 0, wxLEFT, 10);
   RightVerticalBoxSizer->Add(hs4, 0, wxTOP, 25);
 
-  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 1, Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
+  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 1, m_Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
   sli->SetValidator(mmgValidator(this,ID_SLICE,(wxSlider*)sli,&m_slice,text));
   //RightVerticalBoxSizer->Add(sli,0);
   RightVerticalBoxSizer->Add(sli, 0, wxLEFT, -9);
@@ -2343,7 +2343,7 @@ bool medOpMML::SetUpInputs()
 //----------------------------------------------------------------------------
 {
   // set muscle type (1 - one slicing axis, 2 - two slicing axes)
-  Model->SetTypeOfMuscles(m_muscle_type);
+  m_Model->SetTypeOfMuscles(m_muscle_type);
   /*
 
   // set atlas landmarks
@@ -2360,10 +2360,10 @@ bool medOpMML::SetUpInputs()
   */
 
   // landmark flag
-  Model->Set4LandmarksFlag(m_Landmarksflag);
+  m_Model->Set4LandmarksFlag(m_Landmarksflag);
 
   // set x, y scaling factors
-  Model->SetXYScalingFactorsOfMuscle(m_RegistrationXYScalingFactor, m_RegistrationXYScalingFactor);
+  m_Model->SetXYScalingFactorsOfMuscle(m_RegistrationXYScalingFactor, m_RegistrationXYScalingFactor);
 
   //// set number of scans based on scans distance
   //double length; // length between scans insertions
@@ -2373,16 +2373,16 @@ bool medOpMML::SetUpInputs()
   //Model->SetTotalNumberOfSyntheticScans((int) (length / m_ScansDistance));
 
   // set number of scans
-  Model->SetTotalNumberOfSyntheticScans(m_ScansNumber);
+  m_Model->SetTotalNumberOfSyntheticScans(m_ScansNumber);
 
   // set x, y, scans size
-  Model->SetSizeOfSyntheticScans(m_ScansSize[0], m_ScansSize[1]);
+  m_Model->SetSizeOfSyntheticScans(m_ScansSize[0], m_ScansSize[1]);
 
   // set x, y scans resolution
-  Model->SetResolutionOfSyntheticScans(2.0 * m_ScansSize[0], 2.0 * m_ScansSize[1]/*m_ScansResolution[0], m_ScansResolution[1]*/);
+  m_Model->SetResolutionOfSyntheticScans(2.0 * m_ScansSize[0], 2.0 * m_ScansSize[1]/*m_ScansResolution[0], m_ScansResolution[1]*/);
 
   // set scans grain
-  Model->SetGrainOfScans(m_ScansGrain);
+  m_Model->SetGrainOfScans(m_ScansGrain);
 
   // landmarks
   //double la1[3]; // low
@@ -2420,90 +2420,90 @@ bool medOpMML::SetUpParameterViews()
 {
   // size of synthetic scans
   float sx, sy;
-  Model->GetSizeOfSyntheticScans(&sx, &sy);
+  m_Model->GetSizeOfSyntheticScans(&sx, &sy);
 
   // ph spline
-  m_PH->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_PH->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_PH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // pv spline																											   
-  m_PV->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_PV->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_PV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // th spline
-  m_TH->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_TH->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_TH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // tv spline
-  m_TV->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_TV->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_TV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // ra spline
-  m_RA->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_RA->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_RA->SetRangeY(-70.0, 0.0, 70.0);
   // sn spline
-  m_SN->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_SN->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_SN->SetRangeY(0.1, 1.0, 3.0);
   // ss spline
-  m_SS->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_SS->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_SS->SetRangeY(0.1, 1.0, 3.0);
   // se spline
-  m_SE->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_SE->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_SE->SetRangeY(0.1, 1.0, 3.0);
   // sw spline
-  m_SW->SetRangeX(Model->GetTotalNumberOfSyntheticScans());
+  m_SW->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
   m_SW->SetRangeY(0.1, 1.0, 3.0);
 
   // display values
   m_PH->AddPoint(0, 0.0); 
-  m_PH->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0);
+  m_PH->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0);
   // actual values
-  Model->GetPHSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, PH = 0
-  Model->GetPHSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PH = 0
+  m_Model->GetPHSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, PH = 0
+  m_Model->GetPHSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PH = 0
   // display values
   m_PV->AddPoint(0, 0.0); // first slice, PV = 0
-  m_PV->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, PV = 0
+  m_PV->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, PV = 0
   // actual values
-  Model->GetPVSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - PV = 0
-  Model->GetPVSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PV = 0
+  m_Model->GetPVSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - PV = 0
+  m_Model->GetPVSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PV = 0
   // display values
   m_TH->AddPoint(0, 0.0); // first slice, TH = 0
-  m_TH->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TH = 0
+  m_TH->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TH = 0
   // actual values
-  Model->GetTHSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - H = 0
-  Model->GetTHSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice - H = 0
+  m_Model->GetTHSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - H = 0
+  m_Model->GetTHSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice - H = 0
   // display values
   m_TV->AddPoint(0, 0.0); // first slice, V = 0
-  m_TV->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TV = 0
+  m_TV->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TV = 0
   // actual values
-  Model->GetTVSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - V = 0
-  Model->GetTVSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, TV = 0
+  m_Model->GetTVSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - V = 0
+  m_Model->GetTVSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, TV = 0
   // display values
   m_RA->AddPoint(0, 0.0); // first slice, TA = 0
-  m_RA->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, RA = 0
+  m_RA->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, RA = 0
   // actual values
-  Model->GetRASpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, TA = 0
-  Model->GetRASpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, RA = 0
+  m_Model->GetRASpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, TA = 0
+  m_Model->GetRASpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, RA = 0
   // display values
   m_SN->AddPoint(0, 1.0); // first slice, SN = 1.0
-  m_SN->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SN = 1.0
+  m_SN->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SN = 1.0
   // actual values
-  Model->GetSNSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SN = 1.0
-  Model->GetSNSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SN = 1.0
+  m_Model->GetSNSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SN = 1.0
+  m_Model->GetSNSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SN = 1.0
   // display values
   m_SS->AddPoint(0, 1.0); // first slice, SS = 1.0
-  m_SS->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SS = 1.0
+  m_SS->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SS = 1.0
   // actual values
-  Model->GetSSSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SS = 1.0
-  Model->GetSSSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SS = 1.0
+  m_Model->GetSSSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SS = 1.0
+  m_Model->GetSSSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SS = 1.0
   // display values
   m_SE->AddPoint(0, 1.0); // first slice, SE = 1.0
-  m_SE->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SE = 1.0
+  m_SE->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SE = 1.0
   // actual values
-  Model->GetSESpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SE = 1.0
-  Model->GetSESpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SE = 1.0
+  m_Model->GetSESpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SE = 1.0
+  m_Model->GetSESpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SE = 1.0
   // display values
   m_SW->AddPoint(0, 1.0); // first slice, SW = 1.0
-  m_SW->AddPoint(Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SW = 1.0
+  m_SW->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SW = 1.0
   // actual values
-  Model->GetSWSpline()->AddPoint(Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SW = 1.0
-  Model->GetSWSpline()->AddPoint(Model->GetZOfSyntheticScans(Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SW = 1.0
+  m_Model->GetSWSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SW = 1.0
+  m_Model->GetSWSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SW = 1.0
 
   // apply operations
   if (m_RegistrationStatus == 1)
@@ -2513,7 +2513,7 @@ bool medOpMML::SetUpParameterViews()
     NumberOfOperations = SliceId_StackTag->GetNumberOfComponents();
 
     int MaxScanId;
-    MaxScanId = Model->GetTotalNumberOfSyntheticScans() - 1;
+    MaxScanId = m_Model->GetTotalNumberOfSyntheticScans() - 1;
 
     int NextOperationId;
     NextOperationId = Widget->GetNextOperationId();
@@ -2533,7 +2533,7 @@ bool medOpMML::SetUpParameterViews()
       params[4] = Parameter2_StackTag->GetComponentAsDouble(i);
 
       // built operations stack
-      Model->OperationsStack->SetTuple(NextOperationId, params);
+      m_Model->OperationsStack->SetTuple(NextOperationId, params);
 
       // add points in splines
       switch ((int) params[2])
@@ -2551,8 +2551,8 @@ bool medOpMML::SetUpParameterViews()
         m_PH->AddPoint(params[0], params[3]);
         m_PV->AddPoint(params[0], params[4]);
         // actual values
-        Model->GetPHSpline()->AddPoint(params[1], params[3]);
-        Model->GetPVSpline()->AddPoint(params[1], params[4]);
+        m_Model->GetPHSpline()->AddPoint(params[1], params[3]);
+        m_Model->GetPVSpline()->AddPoint(params[1], params[4]);
 
         break;
 
@@ -2561,51 +2561,51 @@ bool medOpMML::SetUpParameterViews()
         m_TH->AddPoint(params[0], params[3]);
         m_TV->AddPoint(params[0], params[4]);
         // actual values
-        Model->GetTHSpline()->AddPoint(params[1], params[3]);
-        Model->GetTVSpline()->AddPoint(params[1], params[4]);
+        m_Model->GetTHSpline()->AddPoint(params[1], params[3]);
+        m_Model->GetTVSpline()->AddPoint(params[1], params[4]);
         break;
 
       case 2: // r
         // display values
         m_RA->AddPoint(params[0], params[3]);
         // actual values
-        Model->GetRASpline()->AddPoint(params[1], params[3]);
+        m_Model->GetRASpline()->AddPoint(params[1], params[3]);
         break;
 
       case 3: // ns
         // display values
         m_SN->AddPoint(params[0], params[3]);
         // actual values
-        Model->GetSNSpline()->AddPoint(params[1], params[3]);
+        m_Model->GetSNSpline()->AddPoint(params[1], params[3]);
         break;
 
       case 4: // ss
         // display values
         m_SS->AddPoint(params[0], params[3]);
         // actual values
-        Model->GetSSSpline()->AddPoint(params[1], params[3]);
+        m_Model->GetSSSpline()->AddPoint(params[1], params[3]);
         break;
 
       case 5: // es
         // display values
         m_SE->AddPoint(params[0], params[3]);
         // actual values
-        Model->GetSESpline()->AddPoint(params[1], params[3]);
+        m_Model->GetSESpline()->AddPoint(params[1], params[3]);
         break;
 
       case 6: // ws
         // display values
         m_SW->AddPoint(params[0], params[3]);
         // actual values
-        Model->GetSWSpline()->AddPoint(params[1], params[3]);
+        m_Model->GetSWSpline()->AddPoint(params[1], params[3]);
         break;
       }
 
       // is the operation a scaling?
       if (params[2] == 3 || params[2] == 4 || params[2] == 5 || params[2] == 6)
       {
-        Model->ScalingOccured = TRUE;
-        Model->ScalingOccuredOperationId = NextOperationId;
+        m_Model->ScalingOccured = TRUE;
+        m_Model->ScalingOccuredOperationId = NextOperationId;
 
         // grey out twist, h/v translation views
 
@@ -2635,8 +2635,8 @@ bool medOpMML::SetUpParameterViews()
 bool medOpMML::SetUpWidget()
 //----------------------------------------------------------------------------
 {
-  Widget->SetModel(Model);
-  Widget->SetInteractor(Model->GetRenderWindowInteractor());
+  Widget->SetModel(m_Model);
+  Widget->SetInteractor(m_Model->GetRenderWindowInteractor());
 
   Widget->SetPH(m_PH);
   Widget->SetPV(m_PV);
@@ -2664,43 +2664,43 @@ bool medOpMML::SetUpModelView()
 //----------------------------------------------------------------------------
 {
   // pre-process muscle
-  Model->FindUnitVectorsAndLengthsOfLandmarkLines();
-  Model->MapAtlasToPatient();
-  Model->MakeActionLineZAxis();
+  m_Model->FindUnitVectorsAndLengthsOfLandmarkLines();
+  m_Model->MapAtlasToPatient();
+  m_Model->MakeActionLineZAxis();
 
   // pre-process scans
-  Model->FindSizeAndResolutionOfSyntheticScans();
-  Model->SetUpSyntheticScans();
+  m_Model->FindSizeAndResolutionOfSyntheticScans();
+  m_Model->SetUpSyntheticScans();
 
   // initalise lut slider (called after void medOpMMLModelView::SetUpSyntheticScans()
-  m_lut->SetRange(Model->GetLowScalar(), Model->GetHighScalar());
-  m_lut->SetSubRange(Model->GetSyntheticScansLevel() - 0.5 * Model->GetSyntheticScansWindow(),
-    Model->GetSyntheticScansLevel() + 0.5 * Model->GetSyntheticScansWindow());
+  m_lut->SetRange(m_Model->GetLowScalar(), m_Model->GetHighScalar());
+  m_lut->SetSubRange(m_Model->GetSyntheticScansLevel() - 0.5 * m_Model->GetSyntheticScansWindow(),
+    m_Model->GetSyntheticScansLevel() + 0.5 * m_Model->GetSyntheticScansWindow());
   //m_lut->SetText(0, "");
   //m_lut->SetText(1, ""); 
   //m_lut->SetText(2, "");
 
   // sub-contours actors (switch on)
-  Model->GetNEContourActor()->VisibilityOn();
-  Model->GetNWContourActor()->VisibilityOn();
-  Model->GetSEContourActor()->VisibilityOn();
-  Model->GetSWContourActor()->VisibilityOn();
+  m_Model->GetNEContourActor()->VisibilityOn();
+  m_Model->GetNWContourActor()->VisibilityOn();
+  m_Model->GetSEContourActor()->VisibilityOn();
+  m_Model->GetSWContourActor()->VisibilityOn();
 
   // contour axes
-  Model->SetUpContourCoordinateAxes();
+  m_Model->SetUpContourCoordinateAxes();
 
   // global axes
-  Model->SetUpGlobalCoordinateAxes();
+  m_Model->SetUpGlobalCoordinateAxes();
 
   // set up display information
-  Model->GetTextMapper1()->GetTextProperty()->SetFontSize(10);
-  Model->GetTextMapper2()->GetTextProperty()->SetFontSize(10);
-  Model->GetTextMapper1()->GetTextProperty()->SetFontFamilyToCourier();
-  Model->GetTextMapper2()->GetTextProperty()->SetFontFamilyToCourier();
-  Model->GetScaledTextActor1()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  Model->GetScaledTextActor2()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-  Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetTextMapper1()->GetTextProperty()->SetFontSize(10);
+  m_Model->GetTextMapper2()->GetTextProperty()->SetFontSize(10);
+  m_Model->GetTextMapper1()->GetTextProperty()->SetFontFamilyToCourier();
+  m_Model->GetTextMapper2()->GetTextProperty()->SetFontFamilyToCourier();
+  m_Model->GetScaledTextActor1()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+  m_Model->GetScaledTextActor2()->GetProperty()->SetColor(1.0, 1.0, 1.0);
+  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+  m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   // 3d display?
   if (m_3dflag == 1)
@@ -2709,14 +2709,14 @@ bool medOpMML::SetUpModelView()
     Widget->Off();
 
     //
-    Model->Switch3dDisplayOn();
+    m_Model->Switch3dDisplayOn();
   }
 
   //
   Update();
 
   // initialise
-  Model->GetRenderer()->ResetCamera();
+  m_Model->GetRenderer()->ResetCamera();
 
   return 1;
 }
@@ -3290,37 +3290,37 @@ void medOpMML::Update()
 //----------------------------------------------------------------------------
 {
   // update sectional cut
-  Model->UpdateContourCuttingPlane();
+  m_Model->UpdateContourCuttingPlane();
 
   // update vertical cuts
-  Model->UpdateSegmentCuttingPlanes();
+  m_Model->UpdateSegmentCuttingPlanes();
 
   // update widget
   Widget->UpdateWidgetTransform();
 
   // update north east segment
-  Model->UpdateSegmentNorthEastTransform();
+  m_Model->UpdateSegmentNorthEastTransform();
 
   // update north west segment
-  Model->UpdateSegmentNorthWestTransform();
+  m_Model->UpdateSegmentNorthWestTransform();
 
   // update south east segment
-  Model->UpdateSegmentSouthEastTransform();
+  m_Model->UpdateSegmentSouthEastTransform();
 
   // update south west segment
-  Model->UpdateSegmentSouthWestTransform();
+  m_Model->UpdateSegmentSouthWestTransform();
 
   // update contour axes
-  Model->UpdateContourAxesTransform();
+  m_Model->UpdateContourAxesTransform();
 
   // update global axes
-  Model->UpdateGlobalAxesTransform();
+  m_Model->UpdateGlobalAxesTransform();
 
   // set visibility
-  Model->SetContourAxesVisibility();
+  m_Model->SetContourAxesVisibility();
 
   // set visibility
-  Model->SetGlobalAxesVisibility();
+  m_Model->SetGlobalAxesVisibility();
 }
 
 //----------------------------------------------------------------------------
@@ -3339,7 +3339,7 @@ void medOpMML::OnPOperationButton()
   m_SW->Render();
 
   // render model view
-  Model->Render();
+  m_Model->Render();
 
   wxColour Colour = PlaceOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
@@ -3349,7 +3349,7 @@ void medOpMML::OnPOperationButton()
     return;
 
   // not allowed if scaling has happened
-  if (Model->GetScalingOccured())
+  if (m_Model->GetScalingOccured())
   {
     wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
     return;
@@ -3371,13 +3371,13 @@ void medOpMML::OnPOperationButton()
   ResetOperation();
 
   // prepare display information
-  Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-  Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+  m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   Widget->CenterModeOn();
 
   //
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -3396,7 +3396,7 @@ void medOpMML::OnTOperationButton()
   m_SW->Render();
 
   // render model view
-  Model->Render();
+  m_Model->Render();
 
   wxColour Colour = TranslateOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
@@ -3406,7 +3406,7 @@ void medOpMML::OnTOperationButton()
     return;
 
   // not allowed if scaling has happened
-  if (Model->GetScalingOccured())
+  if (m_Model->GetScalingOccured())
   {
     wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
     return;
@@ -3428,13 +3428,13 @@ void medOpMML::OnTOperationButton()
   ResetOperation();
 
   // prepare display information
-  Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-  Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+  m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   Widget->TranslationModeOn();
 
   //
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -3453,7 +3453,7 @@ void medOpMML::OnROperationButton()
   m_SW->Render();
 
   // render model view
-  Model->Render();
+  m_Model->Render();
 
   wxColour Colour = RotateOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
@@ -3463,7 +3463,7 @@ void medOpMML::OnROperationButton()
     return;
 
   // not allowed if scaling has happened
-  if (Model->GetScalingOccured())
+  if (m_Model->GetScalingOccured())
   {
     wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
     return;
@@ -3485,7 +3485,7 @@ void medOpMML::OnROperationButton()
   ResetOperation();
 
   // prepare display information
-  Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   Widget->UpdateRotationHandle();
   Widget->RotationHandleOn();
@@ -3493,7 +3493,7 @@ void medOpMML::OnROperationButton()
   Widget->RotationModeOn();
 
   //
-  Model->Render();
+  m_Model->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -3512,7 +3512,7 @@ void medOpMML::OnSOperationButton()
   m_SW->Render();
 
   // render model view
-  Model->Render();
+  m_Model->Render();
 
   wxColour Colour = ScaleOpButton->GetBackgroundColour();
   wxColour Green = wxColour(0, 255, 0);
@@ -3533,7 +3533,7 @@ void medOpMML::OnSOperationButton()
   ScaleOpButton->SetBackgroundColour(Green);
   ScaleOpButton->SetTitle(">>S<<");
 
-  Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   //
   ResetOperation();
@@ -3546,7 +3546,7 @@ void medOpMML::OnSOperationButton()
   // is set to true, medOpMMLContourWidget::OnLeftButtonUp
 
   //
-  Model->Render();
+  m_Model->Render();
 }
 
 
@@ -3573,51 +3573,51 @@ void medOpMML::ApplyRegistrationOps()
   vtkTransform* Transform = vtkTransform::New();
 
   // number of points
-  n = Model->GetMuscleTransform2PolyDataFilter()->GetOutput()->GetPoints()->GetNumberOfPoints();
+  n = m_Model->GetMuscleTransform2PolyDataFilter()->GetOutput()->GetPoints()->GetNumberOfPoints();
 
   // deform each point
   for(i = 0; i < n; i++)
   {
     // get ith point
-    Model->GetMuscleTransform2PolyDataFilter()->GetOutput()->GetPoints()->GetPoint(i, pt);
+    m_Model->GetMuscleTransform2PolyDataFilter()->GetOutput()->GetPoints()->GetPoint(i, pt);
 
     // get z level and evaluate the splines at z.
     z = pt[2];
 
     // get ph
-    double ph = Model->GetPHSpline()->Evaluate(z);
+    double ph = m_Model->GetPHSpline()->Evaluate(z);
 
     // get pv
-    double pv = Model->GetPVSpline()->Evaluate(z);
+    double pv = m_Model->GetPVSpline()->Evaluate(z);
 
     // get ra
-    double ra = Model->GetRASpline()->Evaluate(z);
+    double ra = m_Model->GetRASpline()->Evaluate(z);
 
     // get th
-    double th = Model->GetTHSpline()->Evaluate(z);
+    double th = m_Model->GetTHSpline()->Evaluate(z);
 
     // get tv
-    double tv = Model->GetTVSpline()->Evaluate(z);
+    double tv = m_Model->GetTVSpline()->Evaluate(z);
 
     // get se
-    double se = Model->GetSESpline()->Evaluate(z);
+    double se = m_Model->GetSESpline()->Evaluate(z);
 
     // get sw
-    double sw = Model->GetSWSpline()->Evaluate(z);
+    double sw = m_Model->GetSWSpline()->Evaluate(z);
 
     // get sn
-    double sn = Model->GetSNSpline()->Evaluate(z);
+    double sn = m_Model->GetSNSpline()->Evaluate(z);
 
     // get ss
-    double ss = Model->GetSSSpline()->Evaluate(z);
+    double ss = m_Model->GetSSSpline()->Evaluate(z);
 
     // update the contour actor, for z level used currently
     // doesn't matter to change it as this method is called
     // only when terminating the registration operation (ok)
-    Model->GetContourPlane()->SetOrigin(0.0, 0.0, z);
+    m_Model->GetContourPlane()->SetOrigin(0.0, 0.0, z);
 
     // original bounds
-    Model->GetContourTubeFilter()->GetOutput()->GetBounds(bounds);
+    m_Model->GetContourTubeFilter()->GetOutput()->GetBounds(bounds);
 
     // original center
     cx = (bounds[0] + bounds[1]) / 2.0; // x
@@ -3678,10 +3678,10 @@ void medOpMML::ApplyRegistrationOps()
     Transform->TransformPoint(pt, pt);
 
     // set
-    Model->GetMuscleTransform2PolyDataFilter()->GetOutput()->GetPoints()->SetPoint(i, pt);
+    m_Model->GetMuscleTransform2PolyDataFilter()->GetOutput()->GetPoints()->SetPoint(i, pt);
   }
 
-  Model->GetMuscleTransform2PolyDataFilter()->Update();
+  m_Model->GetMuscleTransform2PolyDataFilter()->Update();
 
   // clean up
   Transform->Delete();
@@ -3708,11 +3708,11 @@ void medOpMML::CreateFakeLandmarks()
   double lm2[3] = {xmed ,ymed, inputBounds[4]}; //low
   double lm3[3] = {inputBounds[1], inputBounds[3], inputBounds[4]}; 
 
-  Model->SetLandmark1OfPatient(lm1);
-  Model->SetLandmark2OfPatient(lm2);
-  Model->SetLandmark3OfPatient(lm3); 
+  m_Model->SetLandmark1OfPatient(lm1);
+  m_Model->SetLandmark2OfPatient(lm2);
+  m_Model->SetLandmark3OfPatient(lm3); 
 
-  Model->SetLandmark1OfAtlas(lm1);
-  Model->SetLandmark2OfAtlas(lm2);
-  Model->SetLandmark3OfAtlas(lm3);  
+  m_Model->SetLandmark1OfAtlas(lm1);
+  m_Model->SetLandmark2OfAtlas(lm2);
+  m_Model->SetLandmark3OfAtlas(lm3);  
 }
