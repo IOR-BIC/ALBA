@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 12:11:42 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-07-24 08:00:09 $
+Version:   $Revision: 1.13 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -441,7 +441,7 @@ void medOpMML::OnRegistrationOK()
   double operation_stack[5];
   for(int i = 0; i < m_Widget->GetNextOperationId(); i++)
   {
-    m_Model->OperationsStack->GetTuple(i, operation_stack);
+    m_Model->m_OperationsStack->GetTuple(i, operation_stack);
 
     SliceId_StackTag.SetComponent(operation_stack[0], i);
     ZValue_StackTag.SetComponent(operation_stack[1], i);
@@ -822,7 +822,7 @@ void medOpMML::OnUndo()
 
   // the operation to undo
   double params_undo[5];
-  m_Model->OperationsStack->GetTuple(m_Widget->GetNextOperationId() - 1, params_undo);
+  m_Model->m_OperationsStack->GetTuple(m_Widget->GetNextOperationId() - 1, params_undo);
 
   int maxsliceid = m_Model->GetTotalNumberOfSyntheticScans() - 1;
 
@@ -844,14 +844,14 @@ void medOpMML::OnUndo()
 
   // the new current operation
   double params_undo_again[5];
-  m_Model->OperationsStack->GetTuple(m_Widget->GetNextOperationId() - 1, params_undo_again);
+  m_Model->m_OperationsStack->GetTuple(m_Widget->GetNextOperationId() - 1, params_undo_again);
 
   // if go back to non-scaling situation reset non-scaling splines colours
-  if (m_Model->ScalingOccured)
+  if (m_Model->m_ScalingOccured)
   {
-    if (m_Model->ScalingOccuredOperationId == m_Widget->GetNextOperationId())
+    if (m_Model->m_ScalingOccuredOperationId == m_Widget->GetNextOperationId())
     {
-      m_Model->ScalingOccured = FALSE;
+      m_Model->m_ScalingOccured = FALSE;
 
       // re-draw curves
       m_PH->GetSplineActor()->GetProperty()->SetColor(1.0, 1.0, 1.0);
@@ -889,7 +889,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -930,7 +930,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -968,7 +968,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -997,7 +997,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -1026,7 +1026,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -1055,7 +1055,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -1084,7 +1084,7 @@ void medOpMML::OnUndo()
     for(i = m_Widget->GetNextOperationId() - 1; i >= 0 ; i--)
     {
       double params[5];
-      m_Model->OperationsStack->GetTuple(i, params);
+      m_Model->m_OperationsStack->GetTuple(i, params);
       if (params[0] == params_undo[0] && // same slice
         params[2] == (int) params_undo[2]) // same operation
       {
@@ -2533,7 +2533,7 @@ bool medOpMML::SetUpParameterViews()
       params[4] = m_Parameter2StackTag->GetComponentAsDouble(i);
 
       // built operations stack
-      m_Model->OperationsStack->SetTuple(NextOperationId, params);
+      m_Model->m_OperationsStack->SetTuple(NextOperationId, params);
 
       // add points in splines
       switch ((int) params[2])
@@ -2604,8 +2604,8 @@ bool medOpMML::SetUpParameterViews()
       // is the operation a scaling?
       if (params[2] == 3 || params[2] == 4 || params[2] == 5 || params[2] == 6)
       {
-        m_Model->ScalingOccured = TRUE;
-        m_Model->ScalingOccuredOperationId = NextOperationId;
+        m_Model->m_ScalingOccured = TRUE;
+        m_Model->m_ScalingOccuredOperationId = NextOperationId;
 
         // grey out twist, h/v translation views
 

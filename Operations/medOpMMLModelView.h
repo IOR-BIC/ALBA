@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:48:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-24 08:00:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -104,10 +104,10 @@ public:
   void Print(vtkObject *obj, wxString msg = ""); //SIL. 24-12-2004: 
   
   
-  BOOL ScalingOccured;
-	int ScalingOccuredOperationId;
-	vtkIntArray* ScalingFlagStack;
-	vtkDoubleArray* OperationsStack;
+  BOOL m_ScalingOccured;
+	int m_ScalingOccuredOperationId;
+	vtkIntArray* m_ScalingFlagStack;
+	vtkDoubleArray* m_OperationsStack;
 	/*vtkDoubleArray* SStack;
 	vtkDoubleArray* ZStack;
 
@@ -119,7 +119,7 @@ public:
 	void SetGlobalAxesVisibility();
 	void SetContourAxesVisibility();
 	// length of contour axes
-	float ContourAxesLengthScale;
+	float m_ContourAxesLengthScale;
 	float GetContourAxesLengthScale();
 	void SetContourAxesLengthScale(float l);
 	void UpdateContourAxesTransform();
@@ -230,15 +230,15 @@ public:
 	vtkKochanekSpline* GetSNSpline();
 	
 	// splines variables
-	vtkKochanekSpline *m_pCenterHorizontalOffsetSpline;
-	vtkKochanekSpline *m_pCenterVerticalOffsetSpline;
-	vtkKochanekSpline *m_pTwistSpline;
-	vtkKochanekSpline *m_pHorizontalTranslationSpline;
-	vtkKochanekSpline *m_pVerticalTranslationSpline;
-	vtkKochanekSpline *m_pNorthScalingSpline;
-	vtkKochanekSpline *m_pSouthScalingSpline;
-	vtkKochanekSpline *m_pEastScalingSpline;
-	vtkKochanekSpline *m_pWestScalingSpline;
+	vtkKochanekSpline *m_PCenterHorizontalOffsetSpline;
+	vtkKochanekSpline *m_PCenterVerticalOffsetSpline;
+	vtkKochanekSpline *m_PTwistSpline;
+	vtkKochanekSpline *m_PHorizontalTranslationSpline;
+	vtkKochanekSpline *m_PVerticalTranslationSpline;
+	vtkKochanekSpline *m_PNorthScalingSpline;
+	vtkKochanekSpline *m_PSouthScalingSpline;
+	vtkKochanekSpline *m_PEastScalingSpline;
+	vtkKochanekSpline *m_PWestScalingSpline;
 
 	// atlas landmarks functions
 	void SetLandmark1OfAtlas(double *xyz);
@@ -251,10 +251,10 @@ public:
 	void GetLandmark4OfAtlas(double *xyz);
 
 	// atlas landmarks variables
-	double m_dMuscleAtlasInsertionPoint1[3];
-	double m_dMuscleAtlasInsertionPoint2[3];
-	double m_dMuscleAtlasReferencePoint1[3];
-	double m_dMuscleAtlasReferencePoint2[3];
+	double m_DMuscleAtlasInsertionPoint1[3];
+	double m_DMuscleAtlasInsertionPoint2[3];
+	double m_DMuscleAtlasReferencePoint1[3];
+	double m_DMuscleAtlasReferencePoint2[3];
 
 	// patient landmarks functions
 	void SetLandmark1OfPatient(double *xyz);
@@ -267,10 +267,10 @@ public:
 	void GetLandmark4OfPatient(double *xyz);
 
 	// patient landmarks variables
-	double m_dMuscleScansInsertionPoint1[3];
-	double m_dMuscleScansInsertionPoint2[3];
-	double m_dMuscleScansReferencePoint1[3];
-	double m_dMuscleScansReferencePoint2[3];
+	double m_DMuscleScansInsertionPoint1[3];
+	double m_DMuscleScansInsertionPoint2[3];
+	double m_DMuscleScansReferencePoint1[3];
+	double m_DMuscleScansReferencePoint2[3];
 	
 	// other functions
 	void SetUpSyntheticScans();
@@ -281,30 +281,30 @@ public:
 
 
 	// 2d axes - action line system
-	vtkLineSource *m_pPosXAxisLineSource; // positive x
-	vtkActor *m_pPosXAxisActor;
-	vtkTubeFilter *m_pPosXAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_pPosXAxisPolyDataMapper;
-	vtkLineSource *m_pPosYAxisLineSource; // positive y
-	vtkActor *m_pPosYAxisActor;
-	vtkTubeFilter *m_pPosYAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_pPosYAxisPolyDataMapper;
-	vtkLineSource *m_pNegXAxisLineSource; // negative x
-	vtkActor *m_pNegXAxisActor;
-	vtkTubeFilter *m_pNegXAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_pNegXAxisPolyDataMapper;
-	vtkLineSource *m_pNegYAxisLineSource; // negative y
-	vtkActor *m_pNegYAxisActor;
-	vtkTubeFilter *m_pNegYAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_pNegYAxisPolyDataMapper;
-	vtkLineSource *m_pPosZAxisLineSource; // positive z (3d display only)
-	vtkActor *m_pPosZAxisActor;
-	vtkTubeFilter *m_pPosZAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_pPosZAxisPolyDataMapper;
-	vtkLineSource *m_pNegZAxisLineSource; // negative z (3d display only)
-	vtkActor *m_pNegZAxisActor;
-	vtkTubeFilter *m_pNegZAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_pNegZAxisPolyDataMapper;
+	vtkLineSource *m_PPosXAxisLineSource; // positive x
+	vtkActor *m_PPosXAxisActor;
+	vtkTubeFilter *m_PPosXAxisAxesTubeFilter;
+	vtkPolyDataMapper *m_PPosXAxisPolyDataMapper;
+	vtkLineSource *m_PPosYAxisLineSource; // positive y
+	vtkActor *m_PPosYAxisActor;
+	vtkTubeFilter *m_PPosYAxisAxesTubeFilter;
+	vtkPolyDataMapper *m_PPosYAxisPolyDataMapper;
+	vtkLineSource *m_PNegXAxisLineSource; // negative x
+	vtkActor *m_PNegXAxisActor;
+	vtkTubeFilter *m_PNegXAxisAxesTubeFilter;
+	vtkPolyDataMapper *m_PNegXAxisPolyDataMapper;
+	vtkLineSource *m_PNegYAxisLineSource; // negative y
+	vtkActor *m_PNegYAxisActor;
+	vtkTubeFilter *m_PNegYAxisAxesTubeFilter;
+	vtkPolyDataMapper *m_PNegYAxisPolyDataMapper;
+	vtkLineSource *m_PPosZAxisLineSource; // positive z (3d display only)
+	vtkActor *m_PPosZAxisActor;
+	vtkTubeFilter *m_PPosZAxisAxesTubeFilter;
+	vtkPolyDataMapper *m_PPosZAxisPolyDataMapper;
+	vtkLineSource *m_PNegZAxisLineSource; // negative z (3d display only)
+	vtkActor *m_PNegZAxisActor;
+	vtkTubeFilter *m_PNegZAxisAxesTubeFilter;
+	vtkPolyDataMapper *m_PNegZAxisPolyDataMapper;
 
 	// 2d axes - contour system
 	vtkLineSource *m_pContourPosXAxisLineSource; // positive x

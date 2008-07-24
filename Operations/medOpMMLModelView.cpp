@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:48:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-24 08:00:04 $
+  Version:   $Revision: 1.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,7 +60,7 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_pslicesm = vtkMatrix4x4::New();
 
 	//
-	ScalingOccured = FALSE;
+	m_ScalingOccured = FALSE;
 
 	//
 	m_pRenderer = ren;
@@ -121,34 +121,34 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_pRenderWindowInteractor->SetInteractorStyle(m_pInteractorStyleImage);
 
 	//
-	m_pCenterHorizontalOffsetSpline = vtkKochanekSpline::New();
-	m_pCenterHorizontalOffsetSpline->ClosedOff();
+	m_PCenterHorizontalOffsetSpline = vtkKochanekSpline::New();
+	m_PCenterHorizontalOffsetSpline->ClosedOff();
 
 	//
-	m_pCenterVerticalOffsetSpline = vtkKochanekSpline::New();
-	m_pCenterVerticalOffsetSpline->ClosedOff();
+	m_PCenterVerticalOffsetSpline = vtkKochanekSpline::New();
+	m_PCenterVerticalOffsetSpline->ClosedOff();
 
 	//
-	m_pTwistSpline = vtkKochanekSpline::New();
-	m_pTwistSpline->ClosedOff();
+	m_PTwistSpline = vtkKochanekSpline::New();
+	m_PTwistSpline->ClosedOff();
 
-	m_pHorizontalTranslationSpline = vtkKochanekSpline::New();
-	m_pHorizontalTranslationSpline->ClosedOff();
+	m_PHorizontalTranslationSpline = vtkKochanekSpline::New();
+	m_PHorizontalTranslationSpline->ClosedOff();
 
-	m_pVerticalTranslationSpline = vtkKochanekSpline::New();
-	m_pVerticalTranslationSpline->ClosedOff();
+	m_PVerticalTranslationSpline = vtkKochanekSpline::New();
+	m_PVerticalTranslationSpline->ClosedOff();
 
-	m_pNorthScalingSpline = vtkKochanekSpline::New();
-	m_pNorthScalingSpline->ClosedOff();
+	m_PNorthScalingSpline = vtkKochanekSpline::New();
+	m_PNorthScalingSpline->ClosedOff();
 
-	m_pSouthScalingSpline = vtkKochanekSpline::New();
-	m_pSouthScalingSpline->ClosedOff();
+	m_PSouthScalingSpline = vtkKochanekSpline::New();
+	m_PSouthScalingSpline->ClosedOff();
 
-	m_pEastScalingSpline = vtkKochanekSpline::New();
-	m_pEastScalingSpline->ClosedOff();
+	m_PEastScalingSpline = vtkKochanekSpline::New();
+	m_PEastScalingSpline->ClosedOff();
 
-	m_pWestScalingSpline = vtkKochanekSpline::New();
-	m_pWestScalingSpline->ClosedOff();
+	m_PWestScalingSpline = vtkKochanekSpline::New();
+	m_PWestScalingSpline->ClosedOff();
 
 	// synthetic slices
 	m_pSyntheticScansPlaneSource = NULL ; // planes
@@ -163,12 +163,12 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_pSyntheticScansWindowLevelLookupTable = vtkWindowLevelLookupTable::New();
 
 	//
-	ScalingFlagStack = vtkIntArray::New();
-	ScalingFlagStack->SetNumberOfComponents(1);
+	m_ScalingFlagStack = vtkIntArray::New();
+	m_ScalingFlagStack->SetNumberOfComponents(1);
 
-	OperationsStack = vtkDoubleArray::New();
-	OperationsStack->SetNumberOfComponents(5);
-	OperationsStack->SetNumberOfTuples(2000);
+	m_OperationsStack = vtkDoubleArray::New();
+	m_OperationsStack->SetNumberOfComponents(5);
+	m_OperationsStack->SetNumberOfTuples(2000);
 
 	/*SStack = vtkDoubleArray::New();
 	SStack->SetNumberOfComponents(1);
@@ -234,48 +234,48 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_pContourNegYAxisActor->VisibilityOff();
 
 	// east global axis
-	m_pPosXAxisLineSource = vtkLineSource::New();
-	m_pPosXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pPosXAxisAxesTubeFilter->SetInput(m_pPosXAxisLineSource->GetOutput());
-	m_pPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pPosXAxisPolyDataMapper->SetInput(m_pPosXAxisAxesTubeFilter->GetOutput());
-	m_pPosXAxisActor = vtkActor::New();
-	m_pPosXAxisActor->SetMapper(m_pPosXAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pPosXAxisActor);
-	m_pPosXAxisActor->VisibilityOff();
+	m_PPosXAxisLineSource = vtkLineSource::New();
+	m_PPosXAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PPosXAxisAxesTubeFilter->SetInput(m_PPosXAxisLineSource->GetOutput());
+	m_PPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PPosXAxisPolyDataMapper->SetInput(m_PPosXAxisAxesTubeFilter->GetOutput());
+	m_PPosXAxisActor = vtkActor::New();
+	m_PPosXAxisActor->SetMapper(m_PPosXAxisPolyDataMapper);
+	m_pRenderer->AddActor(m_PPosXAxisActor);
+	m_PPosXAxisActor->VisibilityOff();
 	
 	// north global axis
-	m_pPosYAxisLineSource = vtkLineSource::New();
-	m_pPosYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pPosYAxisAxesTubeFilter->SetInput(m_pPosYAxisLineSource->GetOutput());
-	m_pPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pPosYAxisPolyDataMapper->SetInput(m_pPosYAxisAxesTubeFilter->GetOutput());
-	m_pPosYAxisActor = vtkActor::New();
-	m_pPosYAxisActor->SetMapper(m_pPosYAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pPosYAxisActor);
-	m_pPosYAxisActor->VisibilityOff();
+	m_PPosYAxisLineSource = vtkLineSource::New();
+	m_PPosYAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PPosYAxisAxesTubeFilter->SetInput(m_PPosYAxisLineSource->GetOutput());
+	m_PPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PPosYAxisPolyDataMapper->SetInput(m_PPosYAxisAxesTubeFilter->GetOutput());
+	m_PPosYAxisActor = vtkActor::New();
+	m_PPosYAxisActor->SetMapper(m_PPosYAxisPolyDataMapper);
+	m_pRenderer->AddActor(m_PPosYAxisActor);
+	m_PPosYAxisActor->VisibilityOff();
 
 	// west global axis
-	m_pNegXAxisLineSource = vtkLineSource::New();
-	m_pNegXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pNegXAxisAxesTubeFilter->SetInput(m_pNegXAxisLineSource->GetOutput());
-	m_pNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pNegXAxisPolyDataMapper->SetInput(m_pNegXAxisAxesTubeFilter->GetOutput());
-	m_pNegXAxisActor = vtkActor::New();
-	m_pNegXAxisActor->SetMapper(m_pNegXAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pNegXAxisActor);
-	m_pNegXAxisActor->VisibilityOff();
+	m_PNegXAxisLineSource = vtkLineSource::New();
+	m_PNegXAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PNegXAxisAxesTubeFilter->SetInput(m_PNegXAxisLineSource->GetOutput());
+	m_PNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PNegXAxisPolyDataMapper->SetInput(m_PNegXAxisAxesTubeFilter->GetOutput());
+	m_PNegXAxisActor = vtkActor::New();
+	m_PNegXAxisActor->SetMapper(m_PNegXAxisPolyDataMapper);
+	m_pRenderer->AddActor(m_PNegXAxisActor);
+	m_PNegXAxisActor->VisibilityOff();
 
 	// south global axis
-	m_pNegYAxisLineSource = vtkLineSource::New();
-	m_pNegYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pNegYAxisAxesTubeFilter->SetInput(m_pNegYAxisLineSource->GetOutput());
-	m_pNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pNegYAxisPolyDataMapper->SetInput(m_pNegYAxisAxesTubeFilter->GetOutput());
-	m_pNegYAxisActor = vtkActor::New();
-	m_pNegYAxisActor->SetMapper(m_pNegYAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pNegYAxisActor);
-	m_pNegYAxisActor->VisibilityOff();
+	m_PNegYAxisLineSource = vtkLineSource::New();
+	m_PNegYAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PNegYAxisAxesTubeFilter->SetInput(m_PNegYAxisLineSource->GetOutput());
+	m_PNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PNegYAxisPolyDataMapper->SetInput(m_PNegYAxisAxesTubeFilter->GetOutput());
+	m_PNegYAxisActor = vtkActor::New();
+	m_PNegYAxisActor->SetMapper(m_PNegYAxisPolyDataMapper);
+	m_pRenderer->AddActor(m_PNegYAxisActor);
+	m_PNegYAxisActor->VisibilityOff();
 
 	// 3d display
 	// 1st landmark
@@ -337,26 +337,26 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_pRenderer->AddActor(m_pL2L3Actor);
 
 	// positive z global axis
-	m_pPosZAxisLineSource = vtkLineSource::New();
-	m_pPosZAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pPosZAxisAxesTubeFilter->SetInput(m_pPosZAxisLineSource->GetOutput());
-	m_pPosZAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pPosZAxisPolyDataMapper->SetInput(m_pPosZAxisAxesTubeFilter->GetOutput());
-	m_pPosZAxisActor = vtkActor::New();
-	m_pPosZAxisActor->SetMapper(m_pPosZAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pPosZAxisActor);
-	m_pPosZAxisActor->VisibilityOff();
+	m_PPosZAxisLineSource = vtkLineSource::New();
+	m_PPosZAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PPosZAxisAxesTubeFilter->SetInput(m_PPosZAxisLineSource->GetOutput());
+	m_PPosZAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PPosZAxisPolyDataMapper->SetInput(m_PPosZAxisAxesTubeFilter->GetOutput());
+	m_PPosZAxisActor = vtkActor::New();
+	m_PPosZAxisActor->SetMapper(m_PPosZAxisPolyDataMapper);
+	m_pRenderer->AddActor(m_PPosZAxisActor);
+	m_PPosZAxisActor->VisibilityOff();
 
 	// negative z global axis
-	m_pNegZAxisLineSource = vtkLineSource::New();
-	m_pNegZAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pNegZAxisAxesTubeFilter->SetInput(m_pNegZAxisLineSource->GetOutput());
-	m_pNegZAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pNegZAxisPolyDataMapper->SetInput(m_pNegZAxisAxesTubeFilter->GetOutput());
-	m_pNegZAxisActor = vtkActor::New();
-	m_pNegZAxisActor->SetMapper(m_pNegZAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pNegZAxisActor);
-	m_pNegZAxisActor->VisibilityOff();
+	m_PNegZAxisLineSource = vtkLineSource::New();
+	m_PNegZAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PNegZAxisAxesTubeFilter->SetInput(m_PNegZAxisLineSource->GetOutput());
+	m_PNegZAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PNegZAxisPolyDataMapper->SetInput(m_PNegZAxisAxesTubeFilter->GetOutput());
+	m_PNegZAxisActor = vtkActor::New();
+	m_PNegZAxisActor->SetMapper(m_PNegZAxisPolyDataMapper);
+	m_pRenderer->AddActor(m_PNegZAxisActor);
+	m_PNegZAxisActor->VisibilityOff();
 
 
 	// muscle transform pipeline
@@ -989,10 +989,10 @@ void medOpMMLModelView::SetUpSyntheticScans()
 	n = this->GetTotalNumberOfSyntheticScans();
 
 	// initialise scaling flag stack
-	ScalingFlagStack->SetNumberOfTuples(n);
+	m_ScalingFlagStack->SetNumberOfTuples(n);
 	float a = 0;
 	for(int ii = 0; ii < n; ii++)
-		ScalingFlagStack->SetTuple(ii, &a);
+		m_ScalingFlagStack->SetTuple(ii, &a);
 
 	// allocate planes
 	m_pSyntheticScansPlaneSource = new vtkPlaneSource* [n] ;
@@ -1394,55 +1394,55 @@ vtkActor* medOpMMLModelView::GetContourActor()
 vtkKochanekSpline* medOpMMLModelView::GetPHSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pCenterHorizontalOffsetSpline;
+	return m_PCenterHorizontalOffsetSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetPVSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pCenterVerticalOffsetSpline;
+	return m_PCenterVerticalOffsetSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetTHSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pHorizontalTranslationSpline;
+	return m_PHorizontalTranslationSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetTVSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pVerticalTranslationSpline;
+	return m_PVerticalTranslationSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetRASpline()
 //----------------------------------------------------------------------------
 {
-	return m_pTwistSpline;
+	return m_PTwistSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetSNSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pNorthScalingSpline;
+	return m_PNorthScalingSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetSSSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pSouthScalingSpline;
+	return m_PSouthScalingSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetSESpline()
 //----------------------------------------------------------------------------
 {
-	return m_pEastScalingSpline;
+	return m_PEastScalingSpline;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetSWSpline()
 //----------------------------------------------------------------------------
 {
-	return m_pWestScalingSpline;
+	return m_PWestScalingSpline;
 }
 //----------------------------------------------------------------------------
 double medOpMMLModelView::GetZOfSyntheticScans(int s)
@@ -1758,64 +1758,64 @@ void medOpMMLModelView::AddActor(vtkActor *a)
 vtkActor* medOpMMLModelView::GetPositiveXAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pPosXAxisActor;
+	return m_PPosXAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetPositiveYAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pPosYAxisActor;
+	return m_PPosYAxisActor;
 }
 vtkActor* medOpMMLModelView::GetPositiveZAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pPosZAxisActor;
+	return m_PPosZAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetNegativeXAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pNegXAxisActor;
+	return m_PNegXAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetNegativeYAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pNegYAxisActor;
+	return m_PNegYAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetNegativeZAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pNegZAxisActor;
+	return m_PNegZAxisActor;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetPositiveLineActorX(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
-	m_pPosXAxisLineSource->SetPoint1(p1);
-	m_pPosXAxisLineSource->SetPoint2(p2);
+	m_PPosXAxisLineSource->SetPoint1(p1);
+	m_PPosXAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetNegativeLineActorY(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
-	m_pNegYAxisLineSource->SetPoint1(p1);
-	m_pNegYAxisLineSource->SetPoint2(p2);
+	m_PNegYAxisLineSource->SetPoint1(p1);
+	m_PNegYAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetPositiveLineActorY(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
-	m_pPosYAxisLineSource->SetPoint1(p1);
-	m_pPosYAxisLineSource->SetPoint2(p2);
+	m_PPosYAxisLineSource->SetPoint1(p1);
+	m_PPosYAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetNegativeLineActorX(double p1[], double p2[])
 //----------------------------------------------------------------------------
 {
-	m_pNegXAxisLineSource->SetPoint1(p1);
-	m_pNegXAxisLineSource->SetPoint2(p2);
+	m_PNegXAxisLineSource->SetPoint1(p1);
+	m_PNegXAxisLineSource->SetPoint2(p2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
@@ -1987,49 +1987,49 @@ vtkTransform* medOpMMLModelView::GetContourCutterTransform()
 vtkLineSource* medOpMMLModelView::GetPositiveXAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pPosXAxisLineSource;
+	return m_PPosXAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetNegativeXAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pNegXAxisLineSource;
+	return m_PNegXAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetPositiveYAxisLineSource()
 //----------------------------------------------------------------------------
 {
-		return m_pPosYAxisLineSource;
+		return m_PPosYAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetNegativeYAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pNegYAxisLineSource;
+	return m_PNegYAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetPositiveXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pPosXAxisAxesTubeFilter;
+	return m_PPosXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetNegativeXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pNegXAxisAxesTubeFilter;
+	return m_PNegXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetPositiveYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pPosYAxisAxesTubeFilter;
+	return m_PPosYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetNegativeYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pNegYAxisAxesTubeFilter;
+	return m_PNegYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkRenderWindowInteractor* medOpMMLModelView::GetRenderWindowInteractor()
@@ -2174,13 +2174,13 @@ vtkPlane* medOpMMLModelView::GetCuttingPlaneWest()
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetContourAxesLengthScale(float l)
 {
-	ContourAxesLengthScale = l;
+	m_ContourAxesLengthScale = l;
 }
 //----------------------------------------------------------------------------
 float medOpMMLModelView::GetContourAxesLengthScale()
 //----------------------------------------------------------------------------
 {
-	return ContourAxesLengthScale;
+	return m_ContourAxesLengthScale;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::UpdateContourCuttingPlane()
@@ -2720,144 +2720,144 @@ void medOpMMLModelView::UpdateSegmentSouthWestTransform()
 void medOpMMLModelView::SetLandmark1OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleAtlasInsertionPoint1[0] = xyz[0];
-	m_dMuscleAtlasInsertionPoint1[1] = xyz[1];
-	m_dMuscleAtlasInsertionPoint1[2] = xyz[2];
+	m_DMuscleAtlasInsertionPoint1[0] = xyz[0];
+	m_DMuscleAtlasInsertionPoint1[1] = xyz[1];
+	m_DMuscleAtlasInsertionPoint1[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark2OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleAtlasInsertionPoint2[0] = xyz[0];
-	m_dMuscleAtlasInsertionPoint2[1] = xyz[1];
-	m_dMuscleAtlasInsertionPoint2[2] = xyz[2];
+	m_DMuscleAtlasInsertionPoint2[0] = xyz[0];
+	m_DMuscleAtlasInsertionPoint2[1] = xyz[1];
+	m_DMuscleAtlasInsertionPoint2[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark3OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleAtlasReferencePoint1[0] = xyz[0];
-	m_dMuscleAtlasReferencePoint1[1] = xyz[1];
-	m_dMuscleAtlasReferencePoint1[2] = xyz[2];
+	m_DMuscleAtlasReferencePoint1[0] = xyz[0];
+	m_DMuscleAtlasReferencePoint1[1] = xyz[1];
+	m_DMuscleAtlasReferencePoint1[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark4OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleAtlasReferencePoint2[0] = xyz[0];
-	m_dMuscleAtlasReferencePoint2[1] = xyz[1];
-	m_dMuscleAtlasReferencePoint2[2] = xyz[2];
+	m_DMuscleAtlasReferencePoint2[0] = xyz[0];
+	m_DMuscleAtlasReferencePoint2[1] = xyz[1];
+	m_DMuscleAtlasReferencePoint2[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark1OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleAtlasInsertionPoint1[0];
-	xyz[1] = m_dMuscleAtlasInsertionPoint1[1];
-	xyz[2] = m_dMuscleAtlasInsertionPoint1[2];
+	xyz[0] = m_DMuscleAtlasInsertionPoint1[0];
+	xyz[1] = m_DMuscleAtlasInsertionPoint1[1];
+	xyz[2] = m_DMuscleAtlasInsertionPoint1[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark2OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleAtlasInsertionPoint2[0];
-	xyz[1] = m_dMuscleAtlasInsertionPoint2[1];
-	xyz[2] = m_dMuscleAtlasInsertionPoint2[2];
+	xyz[0] = m_DMuscleAtlasInsertionPoint2[0];
+	xyz[1] = m_DMuscleAtlasInsertionPoint2[1];
+	xyz[2] = m_DMuscleAtlasInsertionPoint2[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark3OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleAtlasReferencePoint1[0];
-	xyz[1] = m_dMuscleAtlasReferencePoint1[1];
-	xyz[2] = m_dMuscleAtlasReferencePoint1[2];
+	xyz[0] = m_DMuscleAtlasReferencePoint1[0];
+	xyz[1] = m_DMuscleAtlasReferencePoint1[1];
+	xyz[2] = m_DMuscleAtlasReferencePoint1[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark4OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleAtlasReferencePoint2[0];
-	xyz[1] = m_dMuscleAtlasReferencePoint2[1];
-	xyz[2] = m_dMuscleAtlasReferencePoint2[2];
+	xyz[0] = m_DMuscleAtlasReferencePoint2[0];
+	xyz[1] = m_DMuscleAtlasReferencePoint2[1];
+	xyz[2] = m_DMuscleAtlasReferencePoint2[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark1OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleScansInsertionPoint1[0] = xyz[0];
-	m_dMuscleScansInsertionPoint1[1] = xyz[1];
-	m_dMuscleScansInsertionPoint1[2] = xyz[2];
+	m_DMuscleScansInsertionPoint1[0] = xyz[0];
+	m_DMuscleScansInsertionPoint1[1] = xyz[1];
+	m_DMuscleScansInsertionPoint1[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark2OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleScansInsertionPoint2[0] = xyz[0];
-	m_dMuscleScansInsertionPoint2[1] = xyz[1];
-	m_dMuscleScansInsertionPoint2[2] = xyz[2];
+	m_DMuscleScansInsertionPoint2[0] = xyz[0];
+	m_DMuscleScansInsertionPoint2[1] = xyz[1];
+	m_DMuscleScansInsertionPoint2[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark3OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleScansReferencePoint1[0] = xyz[0];
-	m_dMuscleScansReferencePoint1[1] = xyz[1];
-	m_dMuscleScansReferencePoint1[2] = xyz[2];
+	m_DMuscleScansReferencePoint1[0] = xyz[0];
+	m_DMuscleScansReferencePoint1[1] = xyz[1];
+	m_DMuscleScansReferencePoint1[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetLandmark4OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	m_dMuscleScansReferencePoint2[0] = xyz[0];
-	m_dMuscleScansReferencePoint2[1] = xyz[1];
-	m_dMuscleScansReferencePoint2[2] = xyz[2];
+	m_DMuscleScansReferencePoint2[0] = xyz[0];
+	m_DMuscleScansReferencePoint2[1] = xyz[1];
+	m_DMuscleScansReferencePoint2[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark1OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleScansInsertionPoint1[0];
-	xyz[1] = m_dMuscleScansInsertionPoint1[1];
-	xyz[2] = m_dMuscleScansInsertionPoint1[2];
+	xyz[0] = m_DMuscleScansInsertionPoint1[0];
+	xyz[1] = m_DMuscleScansInsertionPoint1[1];
+	xyz[2] = m_DMuscleScansInsertionPoint1[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark2OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleScansInsertionPoint2[0];
-	xyz[1] = m_dMuscleScansInsertionPoint2[1];
-	xyz[2] = m_dMuscleScansInsertionPoint2[2];
+	xyz[0] = m_DMuscleScansInsertionPoint2[0];
+	xyz[1] = m_DMuscleScansInsertionPoint2[1];
+	xyz[2] = m_DMuscleScansInsertionPoint2[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark3OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleScansReferencePoint1[0];
-	xyz[1] = m_dMuscleScansReferencePoint1[1];
-	xyz[2] = m_dMuscleScansReferencePoint1[2];
+	xyz[0] = m_DMuscleScansReferencePoint1[0];
+	xyz[1] = m_DMuscleScansReferencePoint1[1];
+	xyz[2] = m_DMuscleScansReferencePoint1[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetLandmark4OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-	xyz[0] = m_dMuscleScansReferencePoint2[0];
-	xyz[1] = m_dMuscleScansReferencePoint2[1];
-	xyz[2] = m_dMuscleScansReferencePoint2[2];
+	xyz[0] = m_DMuscleScansReferencePoint2[0];
+	xyz[1] = m_DMuscleScansReferencePoint2[1];
+	xyz[2] = m_DMuscleScansReferencePoint2[2];
 }
 
 //----------------------------------------------------------------------------
@@ -2900,36 +2900,36 @@ bool medOpMMLModelView::SetUpGlobalCoordinateAxes()
 //----------------------------------------------------------------------------
 {
 	// east
-	m_pPosXAxisAxesTubeFilter->SetRadius(0.5);
-    m_pPosXAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pPosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pPosXAxisLineSource->SetPoint2(m_nSyntheticScansXSize / 2.0, 0.0, 0.0);
-	m_pPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-	m_pPosXAxisActor->VisibilityOn();
+	m_PPosXAxisAxesTubeFilter->SetRadius(0.5);
+    m_PPosXAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PPosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PPosXAxisLineSource->SetPoint2(m_nSyntheticScansXSize / 2.0, 0.0, 0.0);
+	m_PPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
+	m_PPosXAxisActor->VisibilityOn();
 
 	// north
-	m_pPosYAxisAxesTubeFilter->SetRadius(0.5);
-    m_pPosYAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pPosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pPosYAxisLineSource->SetPoint2(0.0, m_nSyntheticScansYSize / 2.0, 0.0);
-	m_pPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-	m_pPosYAxisActor->VisibilityOn();
+	m_PPosYAxisAxesTubeFilter->SetRadius(0.5);
+    m_PPosYAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PPosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PPosYAxisLineSource->SetPoint2(0.0, m_nSyntheticScansYSize / 2.0, 0.0);
+	m_PPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
+	m_PPosYAxisActor->VisibilityOn();
 	
 	// west
-	m_pNegXAxisAxesTubeFilter->SetRadius(0.5);
-    m_pNegXAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pNegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pNegXAxisLineSource->SetPoint2(-1.0 * m_nSyntheticScansXSize / 2.0, 0.0, 0.0);
-	m_pNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
-	m_pNegXAxisActor->VisibilityOn();
+	m_PNegXAxisAxesTubeFilter->SetRadius(0.5);
+    m_PNegXAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PNegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PNegXAxisLineSource->SetPoint2(-1.0 * m_nSyntheticScansXSize / 2.0, 0.0, 0.0);
+	m_PNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
+	m_PNegXAxisActor->VisibilityOn();
 	
 	// south
-	m_pNegYAxisAxesTubeFilter->SetRadius(0.5);
-    m_pNegYAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pNegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pNegYAxisLineSource->SetPoint2(0.0, -1.0 * m_nSyntheticScansYSize / 2.0, 0.0);
-	m_pNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-	m_pNegYAxisActor->VisibilityOn();
+	m_PNegYAxisAxesTubeFilter->SetRadius(0.5);
+    m_PNegYAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PNegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PNegYAxisLineSource->SetPoint2(0.0, -1.0 * m_nSyntheticScansYSize / 2.0, 0.0);
+	m_PNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
+	m_PNegYAxisActor->VisibilityOn();
 
 	return 1;
 }
@@ -2979,32 +2979,32 @@ void medOpMMLModelView::Switch3dDisplayOn()
 	// axes
 	// east/north/west/south re-set up and switch on
 	// set up performed in SetUpMuscleActionLineAxes
-	m_pPosXAxisAxesTubeFilter->SetRadius(1.0);
-	m_pPosYAxisAxesTubeFilter->SetRadius(1.0);
-	m_pNegXAxisAxesTubeFilter->SetRadius(1.0);
-	m_pNegYAxisAxesTubeFilter->SetRadius(1.0);
+	m_PPosXAxisAxesTubeFilter->SetRadius(1.0);
+	m_PPosYAxisAxesTubeFilter->SetRadius(1.0);
+	m_PNegXAxisAxesTubeFilter->SetRadius(1.0);
+	m_PNegYAxisAxesTubeFilter->SetRadius(1.0);
 
 	// positive z axis set up
-	m_pPosZAxisAxesTubeFilter->SetRadius(1.0);
-    m_pPosZAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pPosZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pPosZAxisLineSource->SetPoint2(0.0, 0.0, (m_nSyntheticScansXSize + m_nSyntheticScansYSize) / 2.0);
-	m_pPosZAxisActor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
+	m_PPosZAxisAxesTubeFilter->SetRadius(1.0);
+    m_PPosZAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PPosZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PPosZAxisLineSource->SetPoint2(0.0, 0.0, (m_nSyntheticScansXSize + m_nSyntheticScansYSize) / 2.0);
+	m_PPosZAxisActor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
 
 	// negative z axis set up
-	m_pNegZAxisAxesTubeFilter->SetRadius(1.0);
-    m_pNegZAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pNegZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pNegZAxisLineSource->SetPoint2(0.0, 0.0, -1.0 * (m_nSyntheticScansXSize + m_nSyntheticScansYSize) / 2.0);
-	m_pNegZAxisActor->GetProperty()->SetColor(1.0, 1.0, 1.0); // white
+	m_PNegZAxisAxesTubeFilter->SetRadius(1.0);
+    m_PNegZAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PNegZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PNegZAxisLineSource->SetPoint2(0.0, 0.0, -1.0 * (m_nSyntheticScansXSize + m_nSyntheticScansYSize) / 2.0);
+	m_PNegZAxisActor->GetProperty()->SetColor(1.0, 1.0, 1.0); // white
 
 	// axes off
-	m_pPosXAxisActor->VisibilityOff();
-	m_pNegXAxisActor->VisibilityOff();
-	m_pPosYAxisActor->VisibilityOff();
-	m_pNegYAxisActor->VisibilityOff();
-	m_pPosZAxisActor->VisibilityOff();
-	m_pNegZAxisActor->VisibilityOff();
+	m_PPosXAxisActor->VisibilityOff();
+	m_PNegXAxisActor->VisibilityOff();
+	m_PPosYAxisActor->VisibilityOff();
+	m_PNegYAxisActor->VisibilityOff();
+	m_PPosZAxisActor->VisibilityOff();
+	m_PNegZAxisActor->VisibilityOff();
 
  	// landmarks
  	double p1[3]; this->GetLandmark1OfPatient(p1);
@@ -3097,7 +3097,7 @@ void medOpMMLModelView::Print(vtkObject *obj, wxString msg)
 int medOpMMLModelView::GetScalingOccured()
 //----------------------------------------------------------------------------
 {
-	return ScalingOccured;
+	return m_ScalingOccured;
 }
 
 //----------------------------------------------------------------------------
