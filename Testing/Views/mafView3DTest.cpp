@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mafViewOrthoSliceTest.cpp,v $
+Module:    $RCSfile: mafView3DTest.cpp,v $
 Language:  C++
 Date:      $Date: 2008-07-24 09:05:18 $
-Version:   $Revision: 1.4 $
-Authors:   Stefano Perticoni
+Version:   $Revision: 1.1 $
+Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -19,22 +19,19 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 
 #include <cppunit/config/SourcePrefix.h>
-#include "mafViewOrthoSlice.h"
-#include "mafViewOrthoSliceTest.h"
-
-#include "mafVMESurface.h"
-#include "mafSceneGraph.h"
+#include "mafView3D.h"
+#include "mafView3DTest.h"
 
 #include <iostream>
 
 //-------------------------------------------------------------------------
-void mafViewOrthoSliceTest::CreateDestroyTest()
+void mafView3DTest::CreateDestroyTest()
 //-------------------------------------------------------------------------
 {
-  mafViewOrthoSlice *rxctView = new mafViewOrthoSlice();
-  rxctView->PackageView();
-  rxctView->Delete();
+  mafView3D *view3D = new mafView3D();
+  view3D->Delete();
    
   CPPUNIT_ASSERT(true);
- 
 }
+
+  

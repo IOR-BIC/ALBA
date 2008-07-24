@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewOrthoSliceTest.h,v $
 Language:  C++
-Date:      $Date: 2006-07-12 07:51:07 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-24 09:05:18 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -27,12 +27,10 @@ class mafViewOrthoSliceTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( mafViewOrthoSliceTest );
   CPPUNIT_TEST( CreateDestroyTest );
-  //CPPUNIT_TEST( VmeShowTest );
   CPPUNIT_TEST_SUITE_END();
 
   protected:
     void CreateDestroyTest();
-    void VmeShowTest();
 };
 
 

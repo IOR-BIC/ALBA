@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mafViewRXCTTest.h,v $
+Module:    $RCSfile: mafView3DTest.h,v $
 Language:  C++
 Date:      $Date: 2008-07-24 09:05:18 $
-Version:   $Revision: 1.4 $
-Authors:   Marco Petrone, Stefano Perticoni
+Version:   $Revision: 1.1 $
+Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __CPP_UNIT_MAFVIEWRXCTTEST_H__
-#define __CPP_UNIT_MAFVIEWRXCTTEST_H__
+#ifndef __CPP_UNIT_mafView3DTEST_H__
+#define __CPP_UNIT_mafView3DTEST_H__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -21,9 +21,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
-class mafViewRXCTTest : public CPPUNIT_NS::TestFixture
+class mafView3DTest : public CPPUNIT_NS::TestFixture
 {
-  CPPUNIT_TEST_SUITE( mafViewRXCTTest );
+  CPPUNIT_TEST_SUITE( mafView3DTest );
   CPPUNIT_TEST( CreateDestroyTest );
   CPPUNIT_TEST_SUITE_END();
 
@@ -47,7 +47,7 @@ main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( mafViewRXCTTest::suite());
+  runner.addTest( mafView3DTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewRXTest.cpp,v $
 Language:  C++
-Date:      $Date: 2006-10-30 09:17:37 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-24 09:05:18 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,9 +21,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include "mafViewRX.h"
 #include "mafViewRXTest.h"
-
-#include "mafVMESurface.h"
-#include "mafSceneGraph.h"
 
 #include <iostream>
 

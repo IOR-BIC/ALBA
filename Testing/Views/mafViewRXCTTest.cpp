@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewRXCTTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-11 08:44:43 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-24 09:05:18 $
+Version:   $Revision: 1.4 $
 Authors:   Marco Petrone, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,9 +22,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafViewRXCT.h"
 #include "mafViewRXCTTest.h"
 
-#include "mafVMESurface.h"
-#include "mafSceneGraph.h"
-
 #include <iostream>
 
 //-------------------------------------------------------------------------
@@ -38,23 +35,3 @@ void mafViewRXCTTest::CreateDestroyTest()
   CPPUNIT_ASSERT(true);
  
 }
-//-------------------------------------------------------------------------
-void mafViewRXCTTest::VmeShowTest()
-//-------------------------------------------------------------------------
-{
-  mafViewRXCT *rxctView = new mafViewRXCT();
-  //rxctView->PackageView();
-  
-  mafVMESurface *surface;
-
-
-  rxctView->GetSceneGraph()->GetNodeList();
-  
-  rxctView->Delete();
-   
-
-  CPPUNIT_ASSERT(true);
- 
-}
-
-  
