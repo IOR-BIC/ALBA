@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLContourWidget.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-23 15:40:41 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-24 08:19:32 $
+  Version:   $Revision: 1.3 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,7 @@
 
 #include "vtkPolyDataSourceWidget.h"
 #include "vtkTubeFilter.h"
+#include "vtkProperty.h"
 
 #include "medOpMMLModelView.h"
 #include "medOpMMLParameterView.h"
@@ -62,7 +63,7 @@ public:
 	void SetModel(medOpMMLModelView* Model);
 	void SetNextOperationId(int n);
 	int GetNextOperationId();
-	int OperationID;
+	int m_OperationID;
 	void SetRotationHandleVisibility();
 	void RotationHandleOff();
 	void RotationHandleOn();
@@ -78,7 +79,7 @@ public:
 	void ScaleSouth(double *p1, double *p2);
 	float GetHandleRadius();
 	void SetHandleRadius(float r);
-	float HandleRadius;
+	float m_HandleRadius;
 	vtkActor* GetWestScalingHandleActor();
 	vtkActor* GetEastScalingHandleActor();
 	vtkActor* GetSouthScalingHandleActor();
@@ -90,7 +91,7 @@ public:
 	void CenterModeOff();
 	void CenterModeOn();
 	BOOL GetCenterMode();
-	vtkPlaneSource    *PlaneSource;
+	vtkPlaneSource    *m_PlaneSource;
 	void PositionHandles(float X, float Y);
 	void ScalingHandlesOff();
 	void ScalingHandlesOn();
@@ -107,11 +108,11 @@ public:
 	void SetHandle2(double* xyz);
 	void SetHandle1(double* xyz);
 	void SetHandle0(double* xyz);
-	BOOL m_bRotatingMode;
-	BOOL m_bScalingMode;
-	BOOL m_bTranslatingMode;
-	BOOL m_bCenterMode;
-	float bounds[6];
+	BOOL m_BRotatingMode;
+	BOOL m_BScalingMode;
+	BOOL m_BTranslatingMode;
+	BOOL m_BCenterMode;
+	float m_Bounds[6];
 	void ScalingModeOff();
 	void ScalingModeOn();
 	void RotationModeOff();
@@ -255,28 +256,30 @@ public:
   // Get the handle properties (the little balls are the handles). The 
   // properties of the handles when selected and normal can be 
   // manipulated.
-  vtkGetObjectMacro(HandleProperty,vtkProperty);
-  vtkGetObjectMacro(SelectedHandleProperty,vtkProperty);
+//   vtkGetObjectMacro(HandleProperty,vtkProperty);
+//   vtkGetObjectMacro(SelectedHandleProperty,vtkProperty);
   
   // Description:
   // Get the plane properties. The properties of the plane when selected 
   // and unselected can be manipulated.
-  virtual void SetPlaneProperty(vtkProperty*);
-  vtkGetObjectMacro(PlaneProperty,vtkProperty);
-  vtkGetObjectMacro(SelectedPlaneProperty,vtkProperty);
+  virtual void Setm_PlaneProperty(vtkProperty*);
+  virtual vtkProperty* GetPlaneProperty(){return m_PlaneProperty;};
+  virtual vtkProperty* GetSelectedPlaneProperty(){return m_SelectedPlaneProperty;};
+  //vtkGetObjectMacro(PlaneProperty,vtkProperty);
+  //vtkGetObjectMacro(SelectedPlaneProperty,vtkProperty);
 
   // MK BEGIN
-  medOpMMLModelView *M; // model
+  medOpMMLModelView *m_M; // model
   
-  medOpMMLParameterView *CH; // center horizontal translation
-  medOpMMLParameterView *CV; // center vertical translation
-  medOpMMLParameterView *T; // twist
-  medOpMMLParameterView *H; // horizontal translation
-  medOpMMLParameterView *V; // vertical translation
-  medOpMMLParameterView *N; // north scaling
-  medOpMMLParameterView *S; // south scaling
-  medOpMMLParameterView *E; // east scaling
-  medOpMMLParameterView *W; // west scaling
+  medOpMMLParameterView *m_CH; // center horizontal translation
+  medOpMMLParameterView *m_CV; // center vertical translation
+  medOpMMLParameterView *m_T; // twist
+  medOpMMLParameterView *m_H; // horizontal translation
+  medOpMMLParameterView *m_V; // vertical translation
+  medOpMMLParameterView *m_N; // north scaling
+  medOpMMLParameterView *m_S; // south scaling
+  medOpMMLParameterView *m_E; // east scaling
+  medOpMMLParameterView *m_W; // west scaling
   // MK END
 
 protected:
@@ -339,25 +342,25 @@ protected:
   void SelectRepresentation();
 
   // the plane
-  vtkActor          *PlaneActor;
-  vtkPolyDataMapper *PlaneMapper;
+  vtkActor          *m_PlaneActor;
+  vtkPolyDataMapper *m_PlaneMapper;
   
-  vtkTubeFilter		*PlaneOutlineTubes; // MK
-  vtkPolyData       *PlaneOutline;
+  vtkTubeFilter		*m_PlaneOutlineTubes; // MK
+  vtkPolyData       *m_PlaneOutline;
   void HighlightPlane(int highlight);
 
   // glyphs representing hot spots (e.g., handles)
-  vtkActor          **Handle;
-  vtkPolyDataMapper **HandleMapper;
-  vtkSphereSource   **HandleGeometry;
+  vtkActor          **m_Handle;
+  vtkPolyDataMapper **m_HandleMapper;
+  vtkSphereSource   **m_HandleGeometry;
 
-  vtkActor          *RotationalHandle;
-  vtkPolyDataMapper *RotationalHandleMapper;
-  vtkSphereSource   *RotationalHandleGeometry;
+  vtkActor          *m_RotationalHandle;
+  vtkPolyDataMapper *m_RotationalHandleMapper;
+  vtkSphereSource   *m_RotationalHandleGeometry;
 
-  vtkActor          *CenterHandle;
-  vtkPolyDataMapper *CenterHandleMapper;
-  vtkSphereSource   *CenterHandleGeometry;
+  vtkActor          *m_CenterHandle;
+  vtkPolyDataMapper *m_CenterHandleMapper;
+  vtkSphereSource   *m_CenterHandleGeometry;
 
   void HandlesOn(double length);
   void HandlesOff();
@@ -365,30 +368,30 @@ protected:
   virtual void SizeHandles();
   
   // the normal cone
-  vtkActor          *ConeActor;
-  vtkPolyDataMapper *ConeMapper;
-  vtkConeSource     *ConeSource;
+  vtkActor          *m_ConeActor;
+  vtkPolyDataMapper *m_ConeMapper;
+  vtkConeSource     *m_ConeSource;
   void HighlightNormal(int highlight);
 
   // the normal line
-  vtkActor          *LineActor;
-  vtkPolyDataMapper *LineMapper;
-  vtkLineSource     *LineSource;
+  vtkActor          *m_LineActor;
+  vtkPolyDataMapper *m_LineMapper;
+  vtkLineSource     *m_LineSource;
 
   // the normal cone
-  vtkActor          *ConeActor2;
-  vtkPolyDataMapper *ConeMapper2;
-  vtkConeSource     *ConeSource2;
+  vtkActor          *m_ConeActor2;
+  vtkPolyDataMapper *m_ConeMapper2;
+  vtkConeSource     *m_ConeSource2;
 
   // the normal line
-  vtkActor          *LineActor2;
-  vtkPolyDataMapper *LineMapper2;
-  vtkLineSource     *LineSource2;
+  vtkActor          *m_LineActor2;
+  vtkPolyDataMapper *m_LineMapper2;
+  vtkLineSource     *m_LineSource2;
 
   // Do the picking
-  vtkCellPicker *HandlePicker;
-  vtkCellPicker *PlanePicker;
-  vtkActor *CurrentHandle;
+  vtkCellPicker *m_HandlePicker;
+  vtkCellPicker *m_PlanePicker;
+  vtkActor *m_CurrentHandle;
   
   // Methods to manipulate the hexahedron.
   void Rotate(double *p1, double *p2);
@@ -397,17 +400,17 @@ protected:
   void Push(double *p1, double *p2);
   
   // Plane normal, normalized
-  float Normal[3];
+  float m_Normal[3];
 
   // Transform the hexahedral points (used for rotations)
-  vtkTransform *Transform;
+  vtkTransform *m_Transform;
   
   // Properties used to control the appearance of selected objects and
   // the manipulator in general.
-  vtkProperty *HandleProperty;
-  vtkProperty *SelectedHandleProperty;
-  vtkProperty *PlaneProperty;
-  vtkProperty *SelectedPlaneProperty;
+  vtkProperty *m_HandleProperty;
+  vtkProperty *m_SelectedHandleProperty;
+  vtkProperty *m_PlaneProperty;
+  vtkProperty *m_SelectedPlaneProperty;
   void CreateDefaultProperties();
   
   void GeneratePlane();
