@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLParameterView.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:48:42 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-24 07:55:01 $
+  Version:   $Revision: 1.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,10 +50,10 @@ public:
 	void RemovePoint(double x);
 	void AddPoint(double x, double y);
 	void InitialiseLineActor();
-	vtkPiecewiseFunction* m_pPiecewiseFunction;
+	vtkPiecewiseFunction* m_PPiecewiseFunction;
 	void SetRangeX(int r);
 	void SetSplineSamples(int s);
-	int m_nNumberOfKochanekSplinePoints;
+	int m_NNumberOfKochanekSplinePoints;
 	vtkActor2D* GetSplineActor();
 	vtkActor2D* GetLineActor();
 	void SetMidY(double y);
@@ -74,42 +74,42 @@ public:
   int m_Width;
   int m_Height;
 
-	double m_dYMin;
-	double m_dYMax;
-	double m_dYMid;
-	double m_dYPosConvertRatio1;
-	double m_dYPosConvertTrans1;
-	double m_dYPosConvertRatio2;
-	double m_dYPosConvertTrans2;
+	double m_DYMin;
+	double m_DYMax;
+	double m_DYMid;
+	double m_DYPosConvertRatio1;
+	double m_DYPosConvertTrans1;
+	double m_DYPosConvertRatio2;
+	double m_DYPosConvertTrans2;
 
-	double m_dXMin;
-	double m_dXMax;
-	double m_dXPosConvertRatio;
+	double m_DXMin;
+	double m_DXMax;
+	double m_DXPosConvertRatio;
 	
-	vtkRenderer 				*m_pRenderer;
-	vtkRenderWindow 		*m_pRenderWindow;
+	vtkRenderer 				*m_PRenderer;
+	vtkRenderWindow 		*m_PRenderWindow;
 
-	vtkPolyData 				*m_pDataPointsPolyData;
-	vtkPoints 					*m_pDataPointsPolyDataPoints;
-	vtkGlyphSource2D 		*m_pDataPointsGlyphSource2D;
-	vtkGlyph2D 					*m_pDataPointsGlyph2D;
-	vtkPolyDataMapper2D *m_pDataPointsPolyDataMapper2D;
-	vtkActor2D 					*m_pDataPointsActor2D;
+	vtkPolyData 				*m_PDataPointsPolyData;
+	vtkPoints 					*m_PDataPointsPolyDataPoints;
+	vtkGlyphSource2D 		*m_PDataPointsGlyphSource2D;
+	vtkGlyph2D 					*m_PDataPointsGlyph2D;
+	vtkPolyDataMapper2D *m_PDataPointsPolyDataMapper2D;
+	vtkActor2D 					*m_PDataPointsActor2D;
 
-	vtkKochanekSpline 	*m_pKochanekSpline;
-	vtkPolyData 				*m_pSplinePolyData;
-	vtkPoints 					*m_pSplinePolyDataPoints;
-	vtkCellArray 				*m_pSplinePolyDataLines;
-	vtkPolyDataMapper2D *m_pSplinePolyDataMapper2D;
-	vtkActor2D 					*m_pSplineActor2D;
+	vtkKochanekSpline 	*m_PKochanekSpline;
+	vtkPolyData 				*m_PSplinePolyData;
+	vtkPoints 					*m_PSplinePolyDataPoints;
+	vtkCellArray 				*m_PSplinePolyDataLines;
+	vtkPolyDataMapper2D *m_PSplinePolyDataMapper2D;
+	vtkActor2D 					*m_PSplineActor2D;
 
-	vtkLineSource 			*m_pLineSource;
-	vtkPolyDataMapper2D *m_pLinePolyDataMapper2D;
-	vtkActor2D 					*m_pLineActor2D;
+	vtkLineSource 			*m_PLineSource;
+	vtkPolyDataMapper2D *m_PLinePolyDataMapper2D;
+	vtkActor2D 					*m_PLineActor2D;
 
-	vtkLineSource 			*m_pHorizontalLineSource;
-	vtkPolyDataMapper2D *m_pHorizontalLinePolyDataMapper2D;
-	vtkActor2D 					*m_pHorizontalLineActor2D;
+	vtkLineSource 			*m_PHorizontalLineSource;
+	vtkPolyDataMapper2D *m_PHorizontalLinePolyDataMapper2D;
+	vtkActor2D 					*m_PHorizontalLineActor2D;
 };
 
 #endif
