@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-04 14:25:00 $
-  Version:   $Revision: 1.57 $
+  Date:      $Date: 2008-07-24 11:20:58 $
+  Version:   $Revision: 1.58 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -959,7 +959,7 @@ wxSlider *mmgGui::Slider(int id,wxString label,int* var,int min, int max, wxStri
   return sli;
 }
 //----------------------------------------------------------------------------
-mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min, double max, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
+mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min, double max, wxSize size, wxString tooltip, bool enableTextCtrl) //<*> Si puo Chiamare Slider lo stesso 
 //----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
 {
   wxTextCtrl     *text = NULL;
@@ -975,6 +975,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
     w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
+    text->Enable(enableTextCtrl);
     w_id_sli  = GetWidgetId(id);
 		sli  = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
@@ -995,6 +996,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
     w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
+    text->Enable(enableTextCtrl);
     w_id_sli = GetWidgetId(id);
 		sli = new mmgFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
@@ -1012,7 +1014,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,wxString label,double *var,double min
 	return sli;
 }
 //----------------------------------------------------------------------------
-mmgFloatSlider *mmgGui::FloatSlider(int id,double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
+mmgFloatSlider *mmgGui::FloatSlider(int id,double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size, wxString tooltip, bool enableTextCtrl) //<*> Si puo Chiamare Slider lo stesso 
 //----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
 {
   wxTextCtrl     *text = NULL;
@@ -1042,6 +1044,7 @@ mmgFloatSlider *mmgGui::FloatSlider(int id,double *var, double min, double max, 
   int w_id_text = GetWidgetId(id);
   text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
   text->SetFont(m_Font);
+  text->Enable(enableTextCtrl);
 
   text->SetValidator(mmgValidator(this,w_id_text,text,var,sli,min,max));
   sli->SetValidator(mmgValidator(this,w_id_sli,sli,var,text));
@@ -1207,7 +1210,7 @@ void mmgGui::DirOpen(int id,mafString label,mafString *var, mafString tooltip)
   Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wildcard, mafString tooltip)
+void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wildcard, mafString tooltip, bool enableTextCtrl)
 //----------------------------------------------------------------------------
 {
   int text_w = EW+HM+EW;
@@ -1235,6 +1238,7 @@ void mmgGui::FileSave(int id,mafString label,mafString* var, const mafString wil
 		text->SetToolTip(tooltip.GetCStr());
 		butt->SetToolTip(tooltip.GetCStr());
 	}
+  text->Enable(enableTextCtrl);
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	if (!label.IsEmpty())
 	{

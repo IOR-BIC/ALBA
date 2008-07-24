@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmgGui.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-04 14:25:00 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-07-24 11:20:58 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -183,7 +183,7 @@ public:
   void FileOpen(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "");
 
   /** File save dialog widget. */
-  void FileSave(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "");
+  void FileSave(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "", bool enableTextCtrl = true);
 
   /** Dir Open dialog widget. */
   void DirOpen(int id,mafString label,mafString *var, mafString tooltip = "");
@@ -212,10 +212,10 @@ public:
 	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "",bool showText=true);
 
   /** Float slider widget. */
-  mmgFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "");
+  mmgFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "", bool enableTextCtrl = true);
 
   /** Float slider widget. */
-  mmgFloatSlider *FloatSlider(int id, double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size = wxDefaultSize, wxString tooltip = "");
+  mmgFloatSlider *FloatSlider(int id, double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size = wxDefaultSize, wxString tooltip = "", bool enableTextCtrl = true);
 
   /** Checked listbox widget. */
   mmgCheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
