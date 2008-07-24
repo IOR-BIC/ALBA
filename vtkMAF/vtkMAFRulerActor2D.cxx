@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 08:30:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-24 14:46:54 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkMAFRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFRulerActor2D::vtkMAFRulerActor2D()
@@ -711,8 +711,13 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dy < rwHeight - margin ) sprintf(labytex, "%g",wy ); else sprintf(labytex, "" );
 
     Labx[i]->SetInput(labxtex);
+
+    Labx[i]->SetDisplayPosition(Position[0]+dx , Position[1]+ margin + longTickLen  );
+    Labx[i]->Modified();
+/*
     Labx[i]->SetDisplayPosition(Position[0]+dx , Position[1]+margin - longTickLen -2 );
     Labx[i]->Modified();
+*/
 
     Laby[i]->SetInput(labytex);
     Laby[i]->SetDisplayPosition(Position[0]+margin +4, Position[1]+dy );
