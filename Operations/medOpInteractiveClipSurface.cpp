@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:03:55 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 11:12:22 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani, Stefano Perticoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ bool DEBUG_MODE = true;
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mmaMaterial.h"
 #include "mmiCompositorMouse.h"
@@ -222,7 +222,7 @@ void medOpInteractiveClipSurface::BuildTransformGizmos()
 void medOpInteractiveClipSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->Divider();
 	wxString clip_by_choices[2] = {"surface","implicit function"};
 

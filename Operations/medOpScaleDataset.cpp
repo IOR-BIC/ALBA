@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,11 +25,11 @@
 #include <wx/busyinfo.h>
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafGizmoScale.h"
-#include "mafGuiTransformMouse.h"
-#include "mafGuiSaveRestorePose.h"
-#include "mafGuiTransformTextEntries.h"
+#include "mafGUITransformMouse.h"
+#include "mafGUISaveRestorePose.h"
+#include "mafGUITransformTextEntries.h"
 
 #include "mmiGenericMouse.h"
 
@@ -246,7 +246,7 @@ void medOpScaleDataset::OnEventGuiSaveRestorePose(mafEventBase *maf_event)
 void medOpScaleDataset::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Divider(2);
   m_Gui->Label("gizmo interaction", true);
@@ -264,7 +264,7 @@ void medOpScaleDataset::CreateGui()
   //---------------------------------
   // Store/Restore position Gui
   //---------------------------------
-  m_GuiSaveRestorePose = new mafGuiSaveRestorePose(mafVME::SafeDownCast(m_Input), this);
+  m_GuiSaveRestorePose = new mafGUISaveRestorePose(mafVME::SafeDownCast(m_Input), this);
   
   // add Gui to operation
   m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
@@ -308,7 +308,7 @@ void medOpScaleDataset::RefSysVmeChanged()
   // plugged components set their refsys;
   /*
   this should cycle on all plugged components => improve in order to use base class
-  SetRefSys on mafGuiTransformInterface pointer
+  SetRefSys on mafGUITransformInterface pointer
   */
   
   // change gscale refsys

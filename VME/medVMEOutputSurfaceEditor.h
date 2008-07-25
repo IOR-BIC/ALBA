@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEOutputSurfaceEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-08-30 08:46:19 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -73,7 +73,7 @@ public:
 	virtual void Update();
 
 protected:
-	mmgGui *CreateGui();
+	mafGUI *CreateGui();
 
 private:
 	medVMEOutputSurfaceEditor(const medVMEOutputSurfaceEditor&); // Not implemented

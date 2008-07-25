@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpIterativeRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-13 13:07:13 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:12:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class vtkMatrix4x4;
 /** Perform point based registration in iterative way
 
   @sa
-  - mafGuiLandmark 
+  - mafGUILandmark 
  
   @todo
   - Code cleaning and improve documentation

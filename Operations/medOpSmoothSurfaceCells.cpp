@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:03:55 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 11:14:48 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -54,9 +54,9 @@ MafMedical is partially based on OpenMAF.
 #include "mafRWI.h"
 #include "mmdMouse.h"
 
-#include "mmgDialog.h"
-#include "mmgButton.h"
-#include "mmgValidator.h"
+#include "mafGUIDialog.h"
+#include "mafGUIButton.h"
+#include "mafGUIValidator.h"
 
 #include "mafVME.h"
 #include "mafVMESurface.h"
@@ -225,7 +225,7 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 	wxBusyCursor wait;
 
 	//===== setup interface ====
-	m_Dialog = new mmgDialog("Smooth Cells", mafCLOSEWINDOW | mafRESIZABLE);
+	m_Dialog = new mafGUIDialog("Smooth Cells", mafCLOSEWINDOW | mafRESIZABLE);
 
 	m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
 	m_Rwi->SetListener(this);
@@ -272,30 +272,30 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
-	mmgButton  *unselectAllButton =    new mmgButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
-	mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
-	mmgButton  *smoothButton =    new mmgButton(m_Dialog, ID_SMOOTH, "smooth", p,wxSize(80,20));
+	mafGUIButton  *unselectAllButton =    new mafGUIButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
+	mafGUIButton  *b_fit =    new mafGUIButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
+	mafGUIButton  *smoothButton =    new mafGUIButton(m_Dialog, ID_SMOOTH, "smooth", p,wxSize(80,20));
 
-	mmgButton  *resetButton =    new mmgButton(m_Dialog, ID_RESET, "reset", p,wxSize(80,20));
+	mafGUIButton  *resetButton =    new mafGUIButton(m_Dialog, ID_RESET, "reset", p,wxSize(80,20));
 	
-	mmgButton  *ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
-	mmgButton  *cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
+	mafGUIButton  *ok =     new mafGUIButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
+	mafGUIButton  *cancel = new mafGUIButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
   
-	diameter->SetValidator(mmgValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
-	unselect->SetValidator(mmgValidator(this, ID_DELETE, unselect, &m_UnselectCells));
+	diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
+	unselect->SetValidator(mafGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
-  smoothIterations->SetValidator(mmgValidator(this,ID_ITERATIONS,smoothIterations,&m_SmoothParameterNumberOfInteractions,0));
-  boundaryEnable->SetValidator(mmgValidator(this, ID_BOUNDARY, boundaryEnable, &m_SmoothParameterBoundary));
-  featureAngle->SetValidator(mmgValidator(this, ID_FEATURE_ANGLE, featureAngle, &m_SmoothParameterFeatureAngle));
+  smoothIterations->SetValidator(mafGUIValidator(this,ID_ITERATIONS,smoothIterations,&m_SmoothParameterNumberOfInteractions,0));
+  boundaryEnable->SetValidator(mafGUIValidator(this, ID_BOUNDARY, boundaryEnable, &m_SmoothParameterBoundary));
+  featureAngle->SetValidator(mafGUIValidator(this, ID_FEATURE_ANGLE, featureAngle, &m_SmoothParameterFeatureAngle));
 
-	unselectAllButton->SetValidator(mmgValidator(this,ID_UNSELECT,unselectAllButton));
-	b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
-	smoothButton->SetValidator(mmgValidator(this,ID_SMOOTH,smoothButton));
-	resetButton->SetValidator(mmgValidator(this,ID_RESET,resetButton));
+	unselectAllButton->SetValidator(mafGUIValidator(this,ID_UNSELECT,unselectAllButton));
+	b_fit->SetValidator(mafGUIValidator(this,ID_FIT,b_fit));
+	smoothButton->SetValidator(mafGUIValidator(this,ID_SMOOTH,smoothButton));
+	resetButton->SetValidator(mafGUIValidator(this,ID_RESET,resetButton));
 	
-	ok->SetValidator(mmgValidator(this,ID_OK,ok));
-	cancel->SetValidator(mmgValidator(this,ID_CANCEL,cancel));
+	ok->SetValidator(mafGUIValidator(this,ID_OK,ok));
+	cancel->SetValidator(mafGUIValidator(this,ID_CANCEL,cancel));
 
 	wxBoxSizer *h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
 	h_sizer0->Add(help,     0,wxRIGHT);	

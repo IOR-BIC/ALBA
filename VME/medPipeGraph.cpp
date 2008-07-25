@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-23 07:52:57 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.37 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,8 +23,8 @@
 #include "medPipeGraph.h"
 #include "mafDecl.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
-#include "mmgCheckListBox.h"
+#include "mafGUI.h"
+#include "mafGUICheckListBox.h"
 
 #include "medVMEAnalog.h"
 #include "mafTagArray.h"
@@ -509,11 +509,11 @@ void medPipeGraph::ChangeSignalColor()
 }
 
 //----------------------------------------------------------------------------
-mmgGui* medPipeGraph::CreateGui()
+mafGUI* medPipeGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
   if(m_Gui == NULL) 
-    m_Gui = new mmgGui(this);
+    m_Gui = new mafGUI(this);
 
   m_Gui->String(ID_ITEM_NAME,_("Name :"), &m_ItemName,"");
   m_Gui->Color(ID_SIGNALS_COLOR, _("Color"), &m_SignalColor, _("Set signal color"));

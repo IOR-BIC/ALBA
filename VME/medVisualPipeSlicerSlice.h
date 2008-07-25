@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVisualPipeSlicerSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:06:18 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class vtkPolyData;
 class vtkActor;
 class vtkProperty;
 class mafAxes;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkAppendPolyData;
@@ -81,7 +81,7 @@ public:
 
   //bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 protected:
   
   vtkPolyDataMapper	      *m_Mapper1;
@@ -112,7 +112,7 @@ protected:
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
 };  
 #endif // __medVisualPipeSlicerSlice_H__

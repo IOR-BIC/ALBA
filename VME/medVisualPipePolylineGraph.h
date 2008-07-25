@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-02-08 09:59:07 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -179,6 +179,6 @@ protected:
   double m_SphereResolution;
 
 
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 };  
 #endif // __medVisualPipePolylineGraph_H__

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-20 15:25:16 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 11:12:22 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,17 +50,17 @@ MafMedical is partially based on OpenMAF.
 #include "medOpMeshQuality.h"
 #include "wx/busyinfo.h"
 
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mmiCameraMove.h"
 #include "mmdMouse.h"
-#include "mmgButton.h"
-#include "mmgValidator.h"
+#include "mafGUIButton.h"
+#include "mafGUIValidator.h"
 #include "mafVMESurface.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafNode.h"
 #include "mafVME.h"
 
@@ -203,7 +203,7 @@ void medOpMeshQuality::CreateOpDialog()
 	wxBusyCursor wait;
 
 	//===== setup interface ====
-	m_Dialog = new mmgDialog("Check Mesh Quality", mafCLOSEWINDOW | mafRESIZABLE);
+	m_Dialog = new mafGUIDialog("Check Mesh Quality", mafCLOSEWINDOW | mafRESIZABLE);
 
 	m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
 	m_Rwi->SetListener(this);//SIL. 16-6-2004: 
@@ -227,11 +227,11 @@ void medOpMeshQuality::CreateOpDialog()
   wxStaticText *labelAngle = new wxStaticText(m_Dialog, -1, _("Angle"),p, wxSize(80, 16 ));
   wxTextCtrl *angleText		= new wxTextCtrl(m_Dialog,ID_RADIUS, _("Angle"),p,wxSize(50, 16 ), wxNO_BORDER );
 
-  angleText->SetValidator(mmgValidator(this,ID_RADIUS,angleText,&m_Angle,0.0,999.0));
+  angleText->SetValidator(mafGUIValidator(this,ID_RADIUS,angleText,&m_Angle,0.0,999.0));
 
-	mmgButton  *b_ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
+	mafGUIButton  *b_ok =     new mafGUIButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
 
-	b_ok->SetValidator(mmgValidator(this,ID_OK,b_ok));
+	b_ok->SetValidator(mafGUIValidator(this,ID_OK,b_ok));
 
 	wxBoxSizer *h_sizer2= new wxBoxSizer(wxHORIZONTAL);
 	h_sizer2->Add(m_LabelAverageAspectRatio,     0, wxLEFT);

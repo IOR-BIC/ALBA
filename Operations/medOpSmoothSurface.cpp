@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-25 13:16:33 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 11:14:48 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ MafMedical is partially based on OpenMAF.
 #include "medOpSmoothSurface.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMESurface.h"
 
@@ -139,7 +139,7 @@ void medOpSmoothSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
   // interface:
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Label("");
   m_Gui->Label("smooth",true);

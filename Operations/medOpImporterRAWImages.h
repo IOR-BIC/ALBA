@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterRAWImages.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:47:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:10:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class vtkActor;
 class vtkDirectory;
 class mafRWI;
 class vtkWindowLevelLookupTable;
-class mmgDialogPreview;
+class mafGUIDialogPreview;
 class vtkTexture;
 class mmiDICOMImporterInteractor;
 class mafString;
@@ -159,7 +159,7 @@ protected:
 
 	vtkWindowLevelLookupTable	*m_LookupTable;
 	
-	mmgDialogPreview	*m_Dialog;
+	mafGUIDialogPreview	*m_Dialog;
 
 	mmiDICOMImporterInteractor *m_DicomInteractor;
 

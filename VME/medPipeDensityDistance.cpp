@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-21 13:54:21 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.6 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,14 +23,14 @@
 #include "mafSceneNode.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h" 
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h" 
 #include "mafAxes.h"
 #include "mafDataVector.h"
 #include "mafVMEGenericAbstract.h"
 #include "mafNode.h"
 #include "mafVME.h"
-#include "mmgValidator.h"
+#include "mafGUIValidator.h"
 #include "mafEventSource.h"
 #include "vtkMAFSmartPointer.h"
 
@@ -325,11 +325,11 @@ void medPipeDensityDistance::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-mmgGui *medPipeDensityDistance::CreateGui()
+mafGUI *medPipeDensityDistance::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   
   wxString m_Choices[2];
   m_Choices[0]="Distance";
@@ -366,7 +366,7 @@ mmgGui *medPipeDensityDistance::CreateGui()
 		wxTextCtrl   *tex = new wxTextCtrl  (m_Gui,-1,"",         p,s,wxNO_BORDER);
 		tex->SetBackgroundColour(colour[i]);
 		tex->SetToolTip(tip);
-		tex->SetValidator( mmgValidator(this,ID_AREA,tex,&m_Area[i], MINFLOAT,MAXFLOAT,3) ); 
+		tex->SetValidator( mafGUIValidator(this,ID_AREA,tex,&m_Area[i], MINFLOAT,MAXFLOAT,3) ); 
 		sizer->Add(lab, 0,wxRIGHT,1);
 		sizer->Add(tex,0,wxRIGHT,1);
 	}
@@ -386,7 +386,7 @@ mmgGui *medPipeDensityDistance::CreateGui()
 		wxTextCtrl   *tex = new wxTextCtrl  (m_Gui,-1,"",         p1,s1,wxNO_BORDER);
 		tex->SetBackgroundColour(colour_distance[i]);
 		tex->SetToolTip(tip);
-		tex->SetValidator( mmgValidator(this,ID_AREA_DISTANCE,tex,&m_AreaDistance[i], MINFLOAT,MAXFLOAT,3) ); 
+		tex->SetValidator( mafGUIValidator(this,ID_AREA_DISTANCE,tex,&m_AreaDistance[i], MINFLOAT,MAXFLOAT,3) ); 
 		sizer_distance->Add(lab, 0,wxRIGHT,1);
 		sizer_distance->Add(tex,0,wxRIGHT,1);
 	}

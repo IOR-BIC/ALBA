@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-08 10:28:17 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class vtkActor;
 class vtkVolume;
 class vtkLookupTable;
 class vtkImageResample;
-class mmgFloatSlider;
+class mafGUIFloatSlider;
 
 //----------------------------------------------------------------------------
 // medPipeVolumeDRR :
@@ -80,7 +80,7 @@ public:
 	double GetResampleFactor();
 
 protected:
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   vtkLookupTable              *m_ColorLUT;
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
@@ -97,9 +97,9 @@ protected:
 
 	//----------------------------- volume settings
 	double             m_ExposureCorrection[2];
-	mmgFloatSlider    *m_ExposureCorrectionSlider[2];
+	mafGUIFloatSlider    *m_ExposureCorrectionSlider[2];
 	double             m_Gamma;
-	mmgFloatSlider    *m_GammaSlider;
+	mafGUIFloatSlider    *m_GammaSlider;
 	wxColor            m_VolumeColor;
 
 	//----------------------------- image settings

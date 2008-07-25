@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkTXT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:40:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:10:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafVME.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -102,7 +102,7 @@ void medOpImporterLandmarkTXT::OpRun()
     
     if (!m_TestMode)
     {
-      m_Gui = new mmgGui(this);
+      m_Gui = new mafGUI(this);
       m_Gui->Integer(ID_TYPE_FILE,"Skip Col",&m_Start,0,MAXINT,"Number of column to skip");
       m_Gui->OkCancel();
 	    m_Gui->Update();

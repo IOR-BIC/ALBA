@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSubdivide.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-28 12:15:27 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2008
@@ -50,7 +50,7 @@
 #include "medOpSubdivide.h"
 #include "medDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMESurface.h"
 
@@ -156,7 +156,7 @@ void medOpSubdivide::CreateGui()
 //----------------------------------------------------------------------------
 {
   // interface:
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   // ToDO: add your custom widgets...
 

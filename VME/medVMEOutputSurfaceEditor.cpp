@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEOutputSurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-08-13 11:15:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ MafMedical is partially based on OpenMAF.
 
 #include "medVMEOutputSurfaceEditor.h"
 #include "mafVME.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "vtkPolyData.h"
 
@@ -78,7 +78,7 @@ vtkPolyData *medVMEOutputSurfaceEditor::GetPolylineData()
 	return (vtkPolyData *)GetVTKData();
 }
 //-------------------------------------------------------------------------
-mmgGui* medVMEOutputSurfaceEditor::CreateGui()
+mafGUI* medVMEOutputSurfaceEditor::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);

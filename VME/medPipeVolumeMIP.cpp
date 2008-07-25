@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-04 12:29:12 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.17 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,8 +22,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medPipeVolumeMIP.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgLutPreset.h"
+#include "mafGUI.h"
+#include "mafGUILutPreset.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mafVME.h"
@@ -216,12 +216,12 @@ void medPipeVolumeMIP::Select(bool sel)
 	m_Selected = sel;
 }
 //----------------------------------------------------------------------------
-mmgGui *medPipeVolumeMIP::CreateGui()
+mafGUI *medPipeVolumeMIP::CreateGui()
 //----------------------------------------------------------------------------
 {
 	
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   
 	if(mafVMEVolume::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
 		return m_Gui;

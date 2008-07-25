@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVisualPipePolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-29 13:06:07 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.3 $
 Authors:   DMatteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ MafMedical is partially based on OpenMAF.
 
 #include "medVisualPipePolylineGraph.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 #include "mafVMEOutputPolyline.h"
@@ -458,11 +458,11 @@ void medVisualPipePolylineGraph::UpdateProperty(bool fromTag)
   }
 }
 //----------------------------------------------------------------------------
-mmgGui *medVisualPipePolylineGraph::CreateGui()
+mafGUI *medVisualPipePolylineGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   const wxString representation_string[] = {_("line"), _("tube"), _("sphere"), _("unconnected sphere")};
   int num_choices = 4;

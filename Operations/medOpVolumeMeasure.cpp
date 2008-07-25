@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:52:52 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 #include "medOpVolumeMeasure.h"
 #include <wx/busyinfo.h>
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafSmartPointer.h"
 #include "mafVME.h"
@@ -109,7 +109,7 @@ void medOpVolumeMeasure::OpRun()
 	wxString measure[3] = {_("points"), _("lines"), _("angle")};
 
   // setup Gui
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
   m_Gui->Label(_("volume to measure:"),true);

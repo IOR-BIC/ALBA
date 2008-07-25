@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeDensityDistance.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:06:18 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class vtkColorTransferFunction;
 class vtkScalarBarActor;
 
 class mafAxes;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class mafNode;
 class mafVMEVolume;
 
@@ -125,7 +125,7 @@ protected:
 	wxColour	m_MidColour2;
 	wxColour	m_HiColour;
 
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
   bool m_EnableMAPSFilter;
 
@@ -133,6 +133,6 @@ protected:
   Generate texture coordinate for polydata according to the mapping mode*/
   void GenerateTextureMapCoordinate();
 
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeSurface_H__

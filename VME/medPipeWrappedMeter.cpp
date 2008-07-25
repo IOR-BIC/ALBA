@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 13:21:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,14 +20,14 @@
 //----------------------------------------------------------------------------
 
 #include "medPipeWrappedMeter.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafSceneNode.h"
 #include "mafDataPipe.h"
 #include "medVMEWrappedMeter.h"
 #include "mafEventSource.h"
 #include "mmaMeter.h"
 #include "mmaMaterial.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafTransform.h"
 #include "mafSmartPointer.h"
@@ -37,7 +37,7 @@
 //@@@ #include "mafDecl.h"
 //@@@ #include "mafAxes.h"  //SIL. 20-5-2003 added line - 
 //@@@ #include "mafMaterial.h"  //SIL. 30-5-2003 added line -
-//@@@ #include "mmgMaterialButton.h"
+//@@@ #include "mafGUIMaterialButton.h"
 
 #include "vtkRenderer.h"
 #include "vtkOutlineCornerFilter.h"
@@ -224,7 +224,7 @@ medPipeWrappedMeter::~medPipeWrappedMeter()
 	//@@@ if(m_use_axes) wxDEL(m_axes);  
 }
 //----------------------------------------------------------------------------
-mmgGui *medPipeWrappedMeter::CreateGui()
+mafGUI *medPipeWrappedMeter::CreateGui()
 //----------------------------------------------------------------------------
 {
   const wxString type_measure_string[] = {"absolute", "relative"};
@@ -235,10 +235,10 @@ mmgGui *medPipeWrappedMeter::CreateGui()
   mmaMeter *meter_attrib = m_WrappedMeterVME->GetMeterAttributes();
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Bool(ID_SHOW_LABEL,"label", &meter_attrib->m_LabelVisibility);
   m_Gui->Combo(ID_COLOR_MODE,"color", &meter_attrib->m_ColorMode,num_choices,color_string);
-  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_Gui->VectorN(ID_DISTANCE_RANGE,"range",meter_attrib->m_DistanceRange,2,0);
   m_Gui->Combo(ID_METER_REPRESENTATION,"",&meter_attrib->m_Representation,num_choices,representation_string);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:06:18 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,8 +22,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medPipeVolumeDRR.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgLutPreset.h"
+#include "mafGUI.h"
+#include "mafGUILutPreset.h"
 
 #include "mmaVolumeMaterial.h"
 #include "mafVME.h"
@@ -205,11 +205,11 @@ void medPipeVolumeDRR::Select(bool sel)
 			m_SelectionActor->SetVisibility(sel);
 }
 //----------------------------------------------------------------------------
-mmgGui *medPipeVolumeDRR::CreateGui()
+mafGUI *medPipeVolumeDRR::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   //lutPreset(15,m_ColorLUT);
   //m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
   //UpdateMIPFromLUT();

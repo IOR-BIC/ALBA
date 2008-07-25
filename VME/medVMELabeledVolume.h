@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-17 14:31:15 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.13 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,9 +18,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgCheckListBox;
-class mmgFloatSlider;
-class mmgDialogPreview;
+class mafGUICheckListBox;
+class mafGUIFloatSlider;
+class mafGUIDialogPreview;
 class mafRWI;
 class mmiExtractIsosurface;
 class mafVMEVolumeGray;
@@ -142,7 +142,7 @@ protected:
   virtual int InternalRestore(mafStorageElement *node);
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
   
   wxSlider        *m_MinSlider;
   wxSlider        *m_MaxSlider;
@@ -169,9 +169,9 @@ protected:
   std::vector<bool> m_CheckedVector;
 
 
-  mmgCheckListBox   *m_LabelCheckBox;  
-  mmgDialogPreview  *m_Dlg;  
-  mmgFloatSlider    *m_SliceSlider;
+  mafGUICheckListBox   *m_LabelCheckBox;  
+  mafGUIDialogPreview  *m_Dlg;  
+  mafGUIFloatSlider    *m_SliceSlider;
   mafRWI            *m_Rwi;
   mafTagItem        *m_TagLabel;
   mafVME            *m_VolumeLink;

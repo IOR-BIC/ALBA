@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpRegisterClusters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:49:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,9 +24,9 @@
 #include <wx/busyinfo.h>
 
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 
 #include "mafVME.h"
 #include "mafSmartPointer.h"
@@ -150,7 +150,7 @@ void medOpRegisterClusters::OpRun()
 	const wxString choices_string[] = {_("rigid"), _("similarity"), _("affine")}; 
 	mafString wildcard = "Dictionary (*.txt)|*.txt|All Files (*.*)|*.*";
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
 	
 	m_Gui->Label(_("source :"),true);
@@ -229,10 +229,10 @@ void medOpRegisterClusters::OnEvent(mafEventBase *maf_event)
 				  x_init = mafGetFrame()->GetPosition().x;
 				  y_init = mafGetFrame()->GetPosition().y;
 
-          m_Dialog = new mmgDialog(_("setting weights"), mafCLOSEWINDOW);
+          m_Dialog = new mafGUIDialog(_("setting weights"), mafCLOSEWINDOW);
 				  m_Dialog->SetSize(x_init+40,y_init+40,220,220);
   				
-				  m_GuiSetWeights = new mmgGui(this);
+				  m_GuiSetWeights = new mafGUI(this);
 				  m_GuiSetWeights->SetListener(this);
   			
 				  /////////////////////////////////////////////////////

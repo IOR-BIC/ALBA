@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:39:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:10:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafVME.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -94,7 +94,7 @@ void medOpImporterLandmark::OpRun()
 
     if (!m_TestMode)
     {
-      m_Gui = new mmgGui(this);
+      m_Gui = new mafGUI(this);
       m_Gui->Bool(ID_TYPE_FILE,"Tagged file",&m_TagFileFlag,0,"Check if the format is NAME x y z");
       m_Gui->OkCancel();
 	    m_Gui->Update();

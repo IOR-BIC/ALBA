@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-08 15:43:07 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.23 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@
 #include "mafIndent.h"
 #include "mafDataPipeCustom.h"
 #include "mmuIdFactory.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafAbsMatrixPipe.h"
 #include "vtkMAFSmartPointer.h"
 
@@ -1351,7 +1351,7 @@ double medVMEWrappedMeter::GetAngle()
   return m_Angle;
 }
 //-------------------------------------------------------------------------
-mmgGui* medVMEWrappedMeter::CreateGui()
+mafGUI* medVMEWrappedMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
   mafID sub_id = -1;

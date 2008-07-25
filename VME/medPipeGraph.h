@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 12:51:33 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.19 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 class medVMEAnalog;
 class vtkActor;
-class mmgCheckListBox;
+class mafGUICheckListBox;
 class vtkLegendBoxActor;
 class vtkXYPlotActor;
 class vtkDoubleArray;
@@ -62,7 +62,7 @@ public:
   void SetTitleY(mafString title);
   
 protected:
-  mmgGui* CreateGui();
+  mafGUI* CreateGui();
 
   enum PIPE_GRAPH_GUI_WIDGETS
   {
@@ -80,7 +80,7 @@ protected:
     ID_LAST
   };
 
-  mmgCheckListBox* m_CheckBox;
+  mafGUICheckListBox* m_CheckBox;
   vtkLegendBoxActor *m_LegendBox_Actor;
   vtkLegendBoxActor *m_LegendBoxTimeLine_Actor;
 

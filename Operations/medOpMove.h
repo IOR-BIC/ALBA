@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:55 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,9 +24,9 @@
 class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafGizmoScale;
-class mafGuiTransformMouse;
-class mafGuiSaveRestorePose;
-class mafGuiTransformTextEntries;
+class mafGUITransformMouse;
+class mafGUISaveRestorePose;
+class mafGUITransformTextEntries;
 class mafNode;
 
 //----------------------------------------------------------------------------
@@ -78,9 +78,9 @@ protected:
   plugged objects */
   mafGizmoTranslate           *m_GizmoTranslate;  
   mafGizmoRotate              *m_GizmoRotate;
-  mafGuiTransformMouse        *m_GuiTransformMouse;
-  mafGuiSaveRestorePose       *m_GuiSaveRestorePose;
-  mafGuiTransformTextEntries  *m_GuiTransformTextEntries;
+  mafGUITransformMouse        *m_GuiTransformMouse;
+  mafGUISaveRestorePose       *m_GuiSaveRestorePose;
+  mafGUITransformTextEntries  *m_GuiTransformTextEntries;
 
   double m_RotationStep;
   double m_TranslationStep;

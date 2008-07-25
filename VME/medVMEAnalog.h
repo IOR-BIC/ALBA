@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEAnalog.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-05 11:31:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,7 +48,7 @@ protected:
   virtual ~medVMEAnalog();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   mafTimeStamp    m_CurrentTime;  ///< the time parameter for generation of the output
 

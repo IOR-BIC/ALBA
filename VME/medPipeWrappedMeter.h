@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:47:49 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class vtkTubeFilter;
 class medVMEWrappedMeter;
 class vtkLookupTable;
 class vtkCaptionActor2D;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 
 //----------------------------------------------------------------------------
 // medPipeWrappedMeter :
@@ -72,10 +72,10 @@ public:
 
 protected:
   medVMEWrappedMeter       *m_WrappedMeterVME;
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
   /** Update visual properties*/
   void UpdateProperty(bool fromTag = false);
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 };
 #endif // __medPipeWrappedMeter_H__

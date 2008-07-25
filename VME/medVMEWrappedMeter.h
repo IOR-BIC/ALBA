@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 08:42:21 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -298,7 +298,7 @@ protected:
   
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   /*Control if the vme linked to wrapped meter are correctly represented in its gui*/
   bool MiddlePointsControl();

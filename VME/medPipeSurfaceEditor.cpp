@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-26 11:32:10 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ MafMedical is partially based on OpenMAF.
 #include "medPipeSurfaceEditor.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVME.h"
 #include "medVMEOutputSurfaceEditor.h"
@@ -144,11 +144,11 @@ void medPipeSurfaceEditor::Select(bool sel)
 
 }
 //----------------------------------------------------------------------------
-mmgGui *medPipeSurfaceEditor::CreateGui()
+mafGUI *medPipeSurfaceEditor::CreateGui()
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
 	return m_Gui;
 }

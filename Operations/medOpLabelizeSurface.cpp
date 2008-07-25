@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:03:55 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-07-25 11:12:22 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -47,7 +47,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 
 #include "medOpLabelizeSurface.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 #include "mafAbsMatrixPipe.h"
 #include "mmiCompositorMouse.h"
@@ -249,7 +249,7 @@ enum CLIP_SURFACE_ID
 void medOpLabelizeSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
 	m_Gui->Bool(ID_USE_GIZMO,_("use gizmo"),&m_UseGizmo,1);
 	wxString gizmo_name[3] = {"translate","rotate","scale"};

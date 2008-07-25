@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 13:38:11 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 #include "medVMEOutputWrappedMeter.h"
 #include "medVMEWrappedMeter.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include <assert.h>
 
@@ -43,7 +43,7 @@ medVMEOutputWrappedMeter::~medVMEOutputWrappedMeter()
 {
 }
 //-------------------------------------------------------------------------
-mmgGui *medVMEOutputWrappedMeter::CreateGui()
+mafGUI *medVMEOutputWrappedMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

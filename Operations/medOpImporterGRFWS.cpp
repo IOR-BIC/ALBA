@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:39:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:10:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,7 +28,7 @@
 #include "mafVMEVector.h"
 #include "mafVMESurface.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include <vtkCubeSource.h>
 #include <vtkTransformPolyDataFilter.h>

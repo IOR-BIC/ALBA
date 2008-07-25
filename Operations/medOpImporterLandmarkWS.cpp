@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmarkWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:40:14 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:10:50 $
+  Version:   $Revision: 1.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafVME.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"

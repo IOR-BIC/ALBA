@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:47:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 
 /** NULL output for VME node with a VTK image output data.
   medVMEOutputWrappedMeter is the output produced by a node generating an output
@@ -36,7 +36,7 @@ public:
   virtual void Update();
 
 protected:
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
   mafString m_Distance;
   mafString m_Angle;

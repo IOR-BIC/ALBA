@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSurfaceMirror.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-04 09:46:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani - porting  Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 
 #include "mafVME.h"
@@ -121,7 +121,7 @@ void medOpSurfaceMirror::OpRun()
 	if(!m_TestMode)
 	{
 		// interface:
-		m_Gui = new mmgGui(this);
+		m_Gui = new mafGUI(this);
 		m_Gui->SetListener(this);
 		m_Gui->Label("this doesn't work on animated vme");
 		m_Gui->Label("");

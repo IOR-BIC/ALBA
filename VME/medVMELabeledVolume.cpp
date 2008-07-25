@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-17 14:31:15 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.22 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -22,20 +22,20 @@
 
 #include <wx/tokenzr.h>
 
-#include "mmgGui.h"
-#include "mmgDialogPreview.h"
+#include "mafGUI.h"
+#include "mafGUIDialogPreview.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mafNode.h"
 #include "mafTransform.h"
 #include "mafEventSource.h"
-#include "mmgButton.h"
-#include "mmgValidator.h"
-#include "mmgCheckListBox.h"
+#include "mafGUIButton.h"
+#include "mafGUIValidator.h"
+#include "mafGUICheckListBox.h"
 #include "mmiExtractIsosurface.h"
 #include "mafRWIBase.h"
 #include "mafRWI.h"
-#include "mmgFloatSlider.h"
+#include "mafGUIFloatSlider.h"
 #include "mafString.h"
 #include "mafDataPipeCustom.h"
 #include "mafStorageElement.h"
@@ -462,7 +462,7 @@ int medVMELabeledVolume::InternalRestore(mafStorageElement *node)
 }
 
 //----------------------------------------------------------------------------
-mmgGui* medVMELabeledVolume::CreateGui()
+mafGUI* medVMELabeledVolume::CreateGui()
 //----------------------------------------------------------------------------
 {
   m_VolumeLink = mafVME::SafeDownCast(GetVolumeLink());
@@ -579,7 +579,7 @@ void medVMELabeledVolume::CreateOpDialog()
 
   int x_pos,y_pos,w,h;
   mafGetFrame()->GetPosition(&x_pos,&y_pos);
-  m_Dlg = new mmgDialogPreview("Insert Label",mafCLOSEWINDOW | mafRESIZABLE | mafUSERWI);
+  m_Dlg = new mafGUIDialogPreview("Insert Label",mafCLOSEWINDOW | mafRESIZABLE | mafUSERWI);
   m_Dlg->GetSize(&w,&h);
   m_Dlg->SetSize(x_pos+5,y_pos+5,w,h); 
 
@@ -592,21 +592,21 @@ void medVMELabeledVolume::CreateOpDialog()
   wxStaticText *lab_slice  = new wxStaticText(m_Dlg,-1, "slice position: ");
   wxStaticText *foo_slice  = new wxStaticText(m_Dlg,-1, "");
   wxTextCtrl   *text_slice = new wxTextCtrl  (m_Dlg,ID_SLICE, "",	p, wxSize(50, 16 ), wxNO_BORDER );
-  m_SliceSlider						 = new mmgFloatSlider( m_Dlg, ID_SLICE_SLIDER, m_Slice, m_SliceMin, m_SliceMax, p, wxSize( 235, 20 ) );
+  m_SliceSlider						 = new mafGUIFloatSlider( m_Dlg, ID_SLICE_SLIDER, m_Slice, m_SliceMin, m_SliceMax, p, wxSize( 235, 20 ) );
   m_SliceSlider->SetNumberOfSteps( 200 );
   m_SliceStep = m_SliceSlider->GetStep();
   m_SliceMin  = m_SliceSlider->GetMin();
   m_SliceMax  = m_SliceSlider->GetMax();
   m_Slice     = m_SliceSlider->GetValue();
 
-  mmgButton * b_incr_slice  = new mmgButton(m_Dlg,ID_INCREASE_SLICE, ">", p, wxSize( 25, 20) );
-  mmgButton * b_decr_slice  = new mmgButton(m_Dlg,ID_DECREASE_SLICE, "<", p, wxSize( 25, 20) );
+  mafGUIButton * b_incr_slice  = new mafGUIButton(m_Dlg,ID_INCREASE_SLICE, ">", p, wxSize( 25, 20) );
+  mafGUIButton * b_decr_slice  = new mafGUIButton(m_Dlg,ID_DECREASE_SLICE, "<", p, wxSize( 25, 20) );
 
   // slice interface validator
-  text_slice->SetValidator(mmgValidator(this,ID_SLICE,text_slice,&m_Slice,m_SliceMin,m_SliceMax));
-  m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE_SLIDER,m_SliceSlider,&m_Slice,text_slice));
-  b_incr_slice->SetValidator(mmgValidator(this,ID_INCREASE_SLICE,b_incr_slice));
-  b_decr_slice->SetValidator(mmgValidator(this,ID_DECREASE_SLICE,b_decr_slice));
+  text_slice->SetValidator(mafGUIValidator(this,ID_SLICE,text_slice,&m_Slice,m_SliceMin,m_SliceMax));
+  m_SliceSlider->SetValidator(mafGUIValidator(this,ID_SLICE_SLIDER,m_SliceSlider,&m_Slice,text_slice));
+  b_incr_slice->SetValidator(mafGUIValidator(this,ID_INCREASE_SLICE,b_incr_slice));
+  b_decr_slice->SetValidator(mafGUIValidator(this,ID_DECREASE_SLICE,b_decr_slice));
 
   // slice sizer
   wxBoxSizer * h_sizer2= new wxBoxSizer( wxHORIZONTAL );
@@ -620,11 +620,11 @@ void medVMELabeledVolume::CreateOpDialog()
   m_LabelNameCtrl = new wxTextCtrl  ( m_Dlg, ID_D_LABEL_NAME, m_LabelNameValue, p, wxSize( 100, 16 ), wxNO_BORDER );    
   wxStaticText * lab_labelValue  = new wxStaticText( m_Dlg, -1, "Label value: ");
   m_LabelValueCtrl = new wxTextCtrl  ( m_Dlg, ID_D_LABEL_VALUE, m_LabelValueValue, p, wxSize( 100, 16 ), wxNO_BORDER );       
-  mmgButton  * bFit   = new mmgButton(m_Dlg,ID_FIT, "reset camera", p, wxSize(80,20));  
+  mafGUIButton  * bFit   = new mafGUIButton(m_Dlg,ID_FIT, "reset camera", p, wxSize(80,20));  
 
   // other controls validator  
-  m_LabelValueCtrl->SetValidator( mmgValidator( this, ID_D_LABEL_VALUE, m_LabelValueCtrl, &m_LabelIntValue, m_MinMin, m_MaxMax ) );
-  bFit->SetValidator(mmgValidator(this,ID_FIT,bFit));  
+  m_LabelValueCtrl->SetValidator( mafGUIValidator( this, ID_D_LABEL_VALUE, m_LabelValueCtrl, &m_LabelIntValue, m_MinMin, m_MaxMax ) );
+  bFit->SetValidator(mafGUIValidator(this,ID_FIT,bFit));  
 
   // other controls sizer
   wxBoxSizer * h_sizer3 = new wxBoxSizer( wxHORIZONTAL );
@@ -653,10 +653,10 @@ void medVMELabeledVolume::CreateOpDialog()
   m_Max     = m_MaxSlider->GetValue();
 
   // Min and Max interface validator
-  m_MinSlider->SetValidator( mmgValidator( this, ID_SLIDER_MIN, m_MinSlider, &m_Min, text_min ) );
-  text_min->SetValidator( mmgValidator( this,ID_D_MIN, text_min, &m_Min, m_MinSlider, m_MinMin, m_MinMax ) );  
-  m_MaxSlider->SetValidator(mmgValidator(this,ID_SLIDER_MAX, m_MaxSlider, &m_Max, text_max ) );
-  text_max->SetValidator(mmgValidator(this,ID_D_MAX, text_max, &m_Max, m_MaxMin, m_MaxMax ) );
+  m_MinSlider->SetValidator( mafGUIValidator( this, ID_SLIDER_MIN, m_MinSlider, &m_Min, text_min ) );
+  text_min->SetValidator( mafGUIValidator( this,ID_D_MIN, text_min, &m_Min, m_MinSlider, m_MinMin, m_MinMax ) );  
+  m_MaxSlider->SetValidator(mafGUIValidator(this,ID_SLIDER_MAX, m_MaxSlider, &m_Max, text_max ) );
+  text_max->SetValidator(mafGUIValidator(this,ID_D_MAX, text_max, &m_Max, m_MaxMin, m_MaxMax ) );
 
   // Min and Max sizer
   wxBoxSizer * h_sizer5 = new wxBoxSizer( wxHORIZONTAL );
@@ -669,10 +669,10 @@ void medVMELabeledVolume::CreateOpDialog()
   h_sizer6->Add( text_max,    0, wxLEFT);	  
   h_sizer6->Add( m_MaxSlider, 1, wxEXPAND);  
 
-  mmgButton  * b_ok    = new mmgButton( m_Dlg, ID_OK, _("ok"), p, wxSize( 200, 20 ) );
-  mmgButton  * b_cancel= new mmgButton( m_Dlg, ID_CANCEL, _("cancel"), p, wxSize( 200, 20 ) );
-  b_ok->SetValidator( mmgValidator( this, ID_OK, b_ok) );
-  b_cancel->SetValidator( mmgValidator( this, ID_CANCEL, b_cancel) );
+  mafGUIButton  * b_ok    = new mafGUIButton( m_Dlg, ID_OK, _("ok"), p, wxSize( 200, 20 ) );
+  mafGUIButton  * b_cancel= new mafGUIButton( m_Dlg, ID_CANCEL, _("cancel"), p, wxSize( 200, 20 ) );
+  b_ok->SetValidator( mafGUIValidator( this, ID_OK, b_ok) );
+  b_cancel->SetValidator( mafGUIValidator( this, ID_CANCEL, b_cancel) );
   wxBoxSizer *h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer4->Add( b_ok,     0, wxRIGHT);
   h_sizer4->Add( b_cancel, 0, wxRIGHT);  

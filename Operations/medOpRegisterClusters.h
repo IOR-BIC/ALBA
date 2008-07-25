@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpRegisterClusters.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:49:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani      - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,10 +25,10 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class mafEvent;
 class vtkPoints;
-class mmgDialog;
+class mafGUIDialog;
 
 //----------------------------------------------------------------------------
 // medOpRegisterClusters :
@@ -86,8 +86,8 @@ protected:
 	double*					m_Weight;			 
 
 	mafVME *m_Follower;
-  mmgGui *m_GuiSetWeights;
-  mmgDialog *m_Dialog;
+  mafGUI *m_GuiSetWeights;
+  mafGUIDialog *m_Dialog;
   
 	mafString   m_SourceName;
 	mafString   m_TargetName;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmoDICOMImporter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-23 08:59:04 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mmgDialogPreview;
+class mafGUIDialogPreview;
 class mmoDICOMImporterListElement;
 class mmiDICOMImporterInteractor;
 class vtkPlaneSource;
@@ -144,7 +144,7 @@ protected:
 	wxString									m_BuildStepChoices[4];
 
 	mafTagArray							 *m_TagArray;
-	mmgDialogPreview				 *m_DicomDialog;
+	mafGUIDialogPreview				 *m_DicomDialog;
 	mafVMEVolumeGray				 *m_Volume;
   mafVMEImage              *m_Image;
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-14 09:57:32 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 #include "medPipeTrajectories.h"
 #include "mafDecl.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 #include "mafMatrixVector.h"
 
@@ -166,11 +166,11 @@ void medPipeTrajectories::Select(bool sel)
   }
 }
 //----------------------------------------------------------------------------
-mmgGui *medPipeTrajectories::CreateGui()
+mafGUI *medPipeTrajectories::CreateGui()
 //----------------------------------------------------------------------------
 {
   
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Integer(ID_INTERVAL,"Interval:",&m_Interval,0,(m_TimeVector.size()),"Interval of frames to visualize");
  
   m_Gui->Divider();

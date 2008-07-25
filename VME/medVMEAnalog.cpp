@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEAnalog.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-05 11:31:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include "medVMEAnalog.h"
 
 #include <vnl/vnl_vector.h>
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafVMEOutputScalarMatrix.h"
 
 #include "mafDataVector.h"
@@ -43,7 +43,7 @@ medVMEAnalog::~medVMEAnalog()
 {
 }
 //-------------------------------------------------------------------------
-mmgGui* medVMEAnalog::CreateGui()
+mafGUI* medVMEAnalog::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-08 14:02:09 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 11:14:48 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi , Stefano Perticoni  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,9 +22,9 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafGizmoScale;
-class mafGuiTransformMouse;
-class mafGuiSaveRestorePose;
-class mafGuiTransformTextEntries;
+class mafGUITransformMouse;
+class mafGUISaveRestorePose;
+class mafGUITransformTextEntries;
 class mafNode;
 
 //----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ protected:
   /** 
   plugged objects */
   mafGizmoScale               *m_GizmoScale;
-  mafGuiSaveRestorePose       *m_GuiSaveRestorePose;
+  mafGUISaveRestorePose       *m_GuiSaveRestorePose;
 
   /** 
   Override superclass*/

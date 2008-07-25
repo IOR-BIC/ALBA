@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:22:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:12:22 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafSmartPointer.h"
 #include "mafTagItem.h"
@@ -95,7 +95,7 @@ void medOpInteractionDebugger::OpRun()
 
 void medOpInteractionDebugger::CreateGui()
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   m_Gui->Divider();
   m_Gui->Button(ID_RESET, "Reset", "");

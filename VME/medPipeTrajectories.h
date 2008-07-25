@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-01 09:07:21 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:19:42 $
+  Version:   $Revision: 1.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ protected:
 
   int m_Interval;
   
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   /**Function to update trajectory */
   void UpdateProperty(bool fromTag = false);

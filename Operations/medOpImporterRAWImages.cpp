@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterRAWImages.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:47:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:10:50 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefania Paperini porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,12 +25,12 @@
 
 #include "medOpImporterRAWImages.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafOp.h"
-#include "mmgValidator.h"
+#include "mafGUIValidator.h"
 #include "mafRWIBase.h"
 #include "mafRWI.h"
-#include "mmgDialogPreview.h"
+#include "mafGUIDialogPreview.h"
 #include "mmdMouse.h"
 #include "mmiDICOMImporterInteractor.h"
 #include "mafTagArray.h"
@@ -223,12 +223,12 @@ void medOpImporterRAWImages::CreateGui()
 	int res=OP_RUN_OK;
 	if(!this->m_TestMode)
 	{
-		m_Dialog = new mmgDialogPreview(_("raw importer"), mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
+		m_Dialog = new mafGUIDialogPreview(_("raw importer"), mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 
 		wxString bit_choices[4] = {_("8 bits"),_("16 bits Big Endian"),_("16 bits Little Endian"),_("24 bits (RGB)")};
 		wxString type_choices[2] = {_("interleaved"),_("not interleaved")};
 		
-		m_Gui = new mmgGui(this);
+		m_Gui = new mafGUI(this);
 		m_Gui->SetListener(this);
 
 		m_Gui->Divider(0);
@@ -280,8 +280,8 @@ void medOpImporterRAWImages::CreateGui()
 		m_SliceText    = new wxTextCtrl  (m_Dialog, -1, "",					   dp, wxSize(30,16), wxNO_BORDER);
 		m_SliceSlider  = new wxSlider     (m_Dialog, -1,0,0,100,		   dp, wxSize(200,22));
 
-		m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE,m_SliceSlider,&m_CurrentSlice,m_SliceText));
-		m_SliceText->SetValidator(mmgValidator(this,ID_SLICE,m_SliceText,  &m_CurrentSlice,m_SliceSlider,0,100));
+		m_SliceSlider->SetValidator(mafGUIValidator(this,ID_SLICE,m_SliceSlider,&m_CurrentSlice,m_SliceText));
+		m_SliceText->SetValidator(mafGUIValidator(this,ID_SLICE,m_SliceText,  &m_CurrentSlice,m_SliceSlider,0,100));
 
 		wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
 		slice_sizer->Add(m_SliceLab,    0, wxALIGN_CENTER|wxRIGHT, 5);

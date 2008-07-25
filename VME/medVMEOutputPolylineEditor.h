@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEOutputPolylineEditor.h,v $
 Language:  C++
-Date:      $Date: 2007-07-04 09:44:00 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -73,7 +73,7 @@ public:
 	virtual void Update();
 
 protected:
-	mmgGui *CreateGui();
+	mafGUI *CreateGui();
 
 private:
 	medVMEOutputPolylineEditor(const medVMEOutputPolylineEditor&); // Not implemented

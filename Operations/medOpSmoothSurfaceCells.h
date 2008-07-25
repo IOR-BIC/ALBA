@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:03:55 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 11:14:48 $
+Version:   $Revision: 1.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -54,7 +54,7 @@ MafMedical is partially based on OpenMAF.
 
 class mafRWI;
 class mafNode;
-class mmgDialog;
+class mafGUIDialog;
 class mmiSelectCell;
 
 class vtkActor;
@@ -140,7 +140,7 @@ protected:
   //end smooth parameters
 	int                  m_UnselectCells;
 
-	mmgDialog						*m_Dialog;
+	mafGUIDialog						*m_Dialog;
 	mafRWI							*m_Rwi;
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;

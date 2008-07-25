@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:06:18 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 11:19:42 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -80,7 +80,7 @@ public:
 
 
 protected:
-	virtual mmgGui  *CreateGui();
+	virtual mafGUI  *CreateGui();
 
 	vtkPolyDataMapper	*m_Mapper;
 	vtkActor					*m_Actor;
