@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2008-01-22 15:13:26 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 10:27:22 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -50,8 +50,8 @@ MafMedical is partially based on OpenMAF.
 #include "mafDecl.h"
 #include "medGUIWizardPage.h"
 #include "medGUIWizard.h"
-#include "mmgGui.h"
-#include "mmgValidator.h"
+#include "mafGUI.h"
+#include "mafGUIValidator.h"
 
 //----------------------------------------------------------------------------
 // Event Table:
@@ -92,15 +92,15 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 	}
 	if(style & medUSEGUI)
 	{
-		m_GuiLowerLeft = new mmgGui(this);
+		m_GuiLowerLeft = new mafGUI(this);
     m_GuiLowerLeft->FitGui();
 		m_GuiLowerLeft->Reparent(this);
 
-    m_GuiLowerRight = new mmgGui(this);
+    m_GuiLowerRight = new mafGUI(this);
     m_GuiLowerRight->FitGui();
     m_GuiLowerRight->Reparent(this);
 
-    m_GuiLowerCenter = new mmgGui(this);
+    m_GuiLowerCenter = new mafGUI(this);
     m_GuiLowerCenter->FitGui();
     m_GuiLowerCenter->Reparent(this);
 
@@ -130,7 +130,7 @@ void medGUIWizardPage::OnEvent(mafEventBase *maf_event)
 	}
 }
 //--------------------------------------------------------------------------------
-void medGUIWizardPage::AddGuiLowerRight(mmgGui *gui)
+void medGUIWizardPage::AddGuiLowerRight(mafGUI *gui)
 //--------------------------------------------------------------------------------
 {
   m_GuiLowerRight->AddGui(gui);
@@ -138,7 +138,7 @@ void medGUIWizardPage::AddGuiLowerRight(mmgGui *gui)
   m_GuiLowerRight->Update();
 }
 //--------------------------------------------------------------------------------
-void medGUIWizardPage::AddGuiLowerLeft(mmgGui *gui)
+void medGUIWizardPage::AddGuiLowerLeft(mafGUI *gui)
 //--------------------------------------------------------------------------------
 {
 	m_GuiLowerLeft->AddGui(gui);
@@ -146,7 +146,7 @@ void medGUIWizardPage::AddGuiLowerLeft(mmgGui *gui)
 	m_GuiLowerLeft->Update();
 }
 //--------------------------------------------------------------------------------
-void medGUIWizardPage::RemoveGuiLowerLeft(mmgGui *gui)
+void medGUIWizardPage::RemoveGuiLowerLeft(mafGUI *gui)
 //--------------------------------------------------------------------------------
 {
   m_GuiLowerLeft->Remove(gui);
@@ -154,7 +154,7 @@ void medGUIWizardPage::RemoveGuiLowerLeft(mmgGui *gui)
   m_GuiLowerLeft->Update();
 }
 //--------------------------------------------------------------------------------
-void medGUIWizardPage::AddGuiLowerCenter(mmgGui *gui)
+void medGUIWizardPage::AddGuiLowerCenter(mafGUI *gui)
 //--------------------------------------------------------------------------------
 {
   m_GuiLowerCenter->AddGui(gui);

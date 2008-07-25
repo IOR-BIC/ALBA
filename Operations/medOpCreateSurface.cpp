@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-10-19 14:17:49 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 10:31:18 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -48,7 +48,7 @@ MafMedical is partially based on OpenMAF.
 
 #include "medOpCreateSurface.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafNode.h"
 #include "mafVMESurfaceParametric.h"

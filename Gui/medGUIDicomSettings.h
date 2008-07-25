@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2007-12-07 14:19:13 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 10:27:22 $
+Version:   $Revision: 1.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgCheckListBox;
+class mafGUICheckListBox;
 
 //----------------------------------------------------------------------------
 // medGUIDicomSettings :
@@ -84,7 +84,7 @@ protected:
 	void EnableItems();
 
 	mafString m_Dictionary;
-	mmgCheckListBox *m_DicomModalityListBox;
+	mafGUICheckListBox *m_DicomModalityListBox;
 
 	int m_CheckOnOff[4];
 

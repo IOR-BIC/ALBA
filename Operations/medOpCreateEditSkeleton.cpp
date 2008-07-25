@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-23 09:25:42 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2008-07-25 10:31:18 $
+Version:   $Revision: 1.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -49,7 +49,7 @@ MafMedical is partially based on OpenMAF.
 #include "medOpCreateEditSkeleton.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
@@ -149,7 +149,7 @@ void medOpCreateEditSkeleton::OpUndo()
 void medOpCreateEditSkeleton::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->AddGui(m_Editor->GetGui());
 	m_Gui->OkCancel();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterCTMRI.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-19 08:12:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 10:35:29 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mmgDialogPreview;
+class mafGUIDialogPreview;
 class medOpImporterCTMRIListElement;
 class mmiDICOMImporterInteractor;
 class vtkPlaneSource;
@@ -161,7 +161,7 @@ protected:
 	wxString									m_BuildStepChoices[3];
 
 	mafTagArray							 *m_TagArray;
-	mmgDialogPreview				 *m_DicomDialog;
+	mafGUIDialogPreview				 *m_DicomDialog;
 	mafVMEVolumeGray				 *m_Volume;
   mafVMEImage              *m_Image;
 

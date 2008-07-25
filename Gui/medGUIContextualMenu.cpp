@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUIContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-05 11:22:07 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 10:27:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,9 +32,9 @@
 #include "mafView.h"
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
-#include "mmgMDIChild.h"
-#include "mmgDialog.h"
-#include "mmgGui.h"
+#include "mafGUIMDIChild.h"
+#include "mafGUIDialog.h"
+#include "mafGUI.h"
 #include "mafPipe.h"
 
 #include "mafPipe.h"
@@ -199,8 +199,8 @@ void medGUIContextualMenu::OnContextualViewMenu(wxCommandEvent& event)
           {
             wxString t = vme->GetName();
             t += " pipe gui";
-            mmgDialog dlg(t,mafCLOSEWINDOW);
-            mmgGui *gui = p->GetGui();
+            mafGUIDialog dlg(t,mafCLOSEWINDOW);
+            mafGUI *gui = p->GetGui();
             wxWindow *old_parent = gui->GetParent();
             dlg.Add(gui,1,wxEXPAND);
             dlg.ShowModal();

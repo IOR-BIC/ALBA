@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2008-01-22 15:13:26 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 10:27:22 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -51,7 +51,7 @@ MafMedical is partially based on OpenMAF.
 // forward references :
 //----------------------------------------------------------------------------
 class medGUIWizard;
-class mmgGui;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 // Const:
@@ -77,11 +77,11 @@ public:
 
 	mafObserver *m_Listener;
 
-	void AddGuiLowerLeft(mmgGui *gui);
-  void AddGuiLowerRight(mmgGui *gui);
-  void AddGuiLowerCenter(mmgGui *gui);
+	void AddGuiLowerLeft(mafGUI *gui);
+  void AddGuiLowerRight(mafGUI *gui);
+  void AddGuiLowerCenter(mafGUI *gui);
 
-  void RemoveGuiLowerLeft(mmgGui *gui);
+  void RemoveGuiLowerLeft(mafGUI *gui);
 
 	/** Create a chain between this page ad nextPage */
 	void SetNextPage(medGUIWizardPage *nextPage);
@@ -98,9 +98,9 @@ private:
 
 	mafRWI     *m_Rwi; ///< Render window
 
-  mmgGui     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
-  mmgGui     *m_GuiLowerRight; ///< Gui variable used to plug custom widgets localized in LOWER RIGHT
-  mmgGui     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
+  mafGUI     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
+  mafGUI     *m_GuiLowerRight; ///< Gui variable used to plug custom widgets localized in LOWER RIGHT
+  mafGUI     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
 
 	//DECLARE_EVENT_TABLE()
 };

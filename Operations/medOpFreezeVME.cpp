@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:00:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 10:34:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,7 +43,7 @@
 #include "vtkRectilinearGrid.h"
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafAbsMatrixPipe.h"
 
 #include "vtkPolyData.h"
@@ -92,7 +92,7 @@ void medOpFreezeVME::OpRun()
 //----------------------------------------------------------------------------
 {
   if(!m_TestMode)
-    m_Gui = new mmgGui(this);
+    m_Gui = new mafGUI(this);
 
 	//control the output and create the right vme
 	mafVME *vme = mafVME::SafeDownCast(m_Input);

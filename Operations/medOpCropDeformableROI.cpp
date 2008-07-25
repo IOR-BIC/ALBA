@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCropDeformableROI.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-06 10:27:21 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 10:31:18 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ MafMedical is partially based on OpenMAF.
 #include "medOpCropDeformableROI.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafNode.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
@@ -128,7 +128,7 @@ void medOpCropDeformableROI::OpRun()
 	vtkNEW(m_MaskPolydataFilter);
 
 	// interface:
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
 	m_Gui->Button(ID_CHOOSE_MASK,_("Choose mask"));
 

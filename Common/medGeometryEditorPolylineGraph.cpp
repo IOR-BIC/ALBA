@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-21 08:20:34 $
-Version:   $Revision: 1.18 $
+Date:      $Date: 2008-07-25 10:25:33 $
+Version:   $Revision: 1.19 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -50,7 +50,7 @@ MafMedical is partially based on OpenMAF.
 #include "medGeometryEditorPolylineGraph.h"
 #include "medDecl.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "medVMEPolylineEditor.h"
 #include "medVMEPolylineGraph.h"
 #include "mmiPicker.h"
@@ -351,7 +351,7 @@ void medGeometryEditorPolylineGraph::BehaviorUpdate()
 void medGeometryEditorPolylineGraph::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui =new mmgGui(this);
+	m_Gui =new mafGUI(this);
 	wxString choices_action[2]={_("Point"),_("Branch")};
 	m_Gui->Radio(ID_ACTION,_("Action"),&m_Action,2,choices_action);
 
@@ -375,7 +375,7 @@ void medGeometryEditorPolylineGraph::CreateGui()
 
 }
 //----------------------------------------------------------------------------
-mmgGui* medGeometryEditorPolylineGraph::GetGui()
+mafGUI* medGeometryEditorPolylineGraph::GetGui()
 //----------------------------------------------------------------------------
 {
 	return m_Gui;

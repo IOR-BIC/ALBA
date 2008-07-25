@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterCTMRI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:03:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 10:35:28 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,10 +25,10 @@
 
 #include "mafEvent.h"
 #include "mafRWIBase.h"
-#include "mmgValidator.h"
-#include "mmgGui.h"
+#include "mafGUIValidator.h"
+#include "mafGUI.h"
 #include "mafRWI.h"
-#include "mmgDialogPreview.h"
+#include "mafGUIDialogPreview.h"
 
 #include "mmdMouse.h"
 #include "mmiDICOMImporterInteractor.h"
@@ -313,14 +313,14 @@ void medOpImporterCTMRI::CreatePipeline()
 void medOpImporterCTMRI::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_DicomDialog = new mmgDialogPreview("dicom importer", mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
+	m_DicomDialog = new mafGUIDialogPreview("dicom importer", mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 	int x_init,y_init;
 	x_init = mafGetFrame()->GetPosition().x;
 	y_init = mafGetFrame()->GetPosition().y-20;
 
 	mafString wildcard = "DICT files (*.dic)|*.dic|All Files (*.*)|*.*";
 
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this); 
 
 	//if(m_DICOM == 0) m_Gui->Label("CT Importer",true);
@@ -372,8 +372,8 @@ void medOpImporterCTMRI::CreateGui()
 	m_SliceText->Enable(false);
 	m_SliceScanner->Enable(false);
 
-	m_SliceScanner->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceScanner,&m_CurrentSlice,m_SliceText));
-  m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,VTK_INT_MAX));
+	m_SliceScanner->SetValidator(mafGUIValidator(this,ID_SCAN_SLICE,m_SliceScanner,&m_CurrentSlice,m_SliceText));
+  m_SliceText->SetValidator(mafGUIValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,VTK_INT_MAX));
 
 	wxBoxSizer *slice_sizer = new wxBoxSizer(wxHORIZONTAL);
 	slice_sizer->Add(m_SliceLabel, 0, wxALIGN_CENTER|wxRIGHT, 5);
@@ -388,8 +388,8 @@ void medOpImporterCTMRI::CreateGui()
 	m_TimeText->Enable(false);
 	m_TimeScanner->Enable(false);
 
-	m_TimeScanner->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeScanner,&m_CurrentTime,m_TimeText));
-  m_TimeText->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,100));
+	m_TimeScanner->SetValidator(mafGUIValidator(this,ID_SCAN_TIME,m_TimeScanner,&m_CurrentTime,m_TimeText));
+  m_TimeText->SetValidator(mafGUIValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,100));
 
 	wxBoxSizer *time_sizer = new wxBoxSizer(wxHORIZONTAL);
 	time_sizer->Add(m_TimeLabel, 0, wxALIGN_CENTER|wxRIGHT, 5);
@@ -964,9 +964,9 @@ void medOpImporterCTMRI::ResetSliders()
 //----------------------------------------------------------------------------
 {
 	m_SliceScanner->SetRange(0,m_NumberOfSlices - 1);
-	m_SliceText->SetValidator(mmgValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,m_NumberOfSlices - 1));
+	m_SliceText->SetValidator(mafGUIValidator(this,ID_SCAN_SLICE,m_SliceText,&m_CurrentSlice,m_SliceScanner,0,m_NumberOfSlices - 1));
 	m_TimeScanner->SetRange(0, m_NumberOfTimeFrames -1);
-	m_TimeText->SetValidator(mmgValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,m_NumberOfTimeFrames-1));
+	m_TimeText->SetValidator(mafGUIValidator(this,ID_SCAN_TIME,m_TimeText,&m_CurrentTime,m_TimeScanner,0,m_NumberOfTimeFrames-1));
 	m_Gui->Update();
 }
 //----------------------------------------------------------------------------

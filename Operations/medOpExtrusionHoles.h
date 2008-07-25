@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.h,v $
 Language:  C++
-Date:      $Date: 2008-06-30 14:57:15 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 10:32:50 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,8 +50,8 @@ MafMedical is partially based on OpenMAF.
 // forward references :
 //----------------------------------------------------------------------------
 
-class mmgDialog;
-class mmgButton;
+class mafGUIDialog;
+class mafGUIButton;
 class mafRWI;
 class mmiSelectPoint;
 class mafVMESurface;
@@ -122,8 +122,8 @@ protected:
 	void DeleteOpDialog();
 	void CreatePolydataPipeline();
 
-	mmgDialog							*m_Dialog;
-	mmgButton							*m_ButtonOk;
+	mafGUIDialog							*m_Dialog;
+	mafGUIButton							*m_ButtonOk;
 	mafRWI								*m_Rwi;
 	mmiSelectPoint				*m_Picker;
 

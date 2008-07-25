@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-17 19:07:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 10:31:18 $
+Version:   $Revision: 1.3 $
 Authors:   Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ MafMedical is partially based on OpenMAF.
 #include "medOpCleanSurface.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMESurface.h"
 #include "vtkPointData.h"
@@ -129,7 +129,7 @@ void medOpCleanSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
   // interface:
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Label("");
   m_Gui->Label(_("Clean Surface"),true);

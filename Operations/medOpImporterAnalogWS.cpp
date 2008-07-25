@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 15:39:26 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 10:34:22 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/wfstream.h>
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafTagArray.h"
 #include "medVMEAnalog.h"

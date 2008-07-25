@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-09 15:01:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 10:29:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class mafEvent;
 class mafNode;
 class mafVME;

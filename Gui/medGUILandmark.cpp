@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2007-09-19 08:18:09 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 10:27:22 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,8 +24,8 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 #include "medGUILandmark.h"
 
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 #include "mmiGenericMouse.h"
 #include "mmiCompositorMouse.h"
 #include "mmiPicker.h"            
@@ -139,7 +139,7 @@ medGUILandmark::~medGUILandmark()
 void medGUILandmark::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this); 
+  m_Gui = new mafGUI(this); 
   /*
   m_Gui->Label("mouse interaction", true);
   m_Gui->Label("left mouse: pick landmark");

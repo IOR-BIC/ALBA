@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 13:02:44 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 10:25:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@ const bool DEBUG_MODE = true;
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmaMaterial.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
 #include "mafSmartPointer.h"

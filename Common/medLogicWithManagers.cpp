@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medLogicWithManagers.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-07 13:06:04 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 10:25:33 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,9 +50,9 @@ MafMedical is partially based on OpenMAF.
 #include "medDecl.h"
 #include "medLogicWithManagers.h"
 #include "medGUIContextualMenu.h"
-#include "mmgMDIChild.h"
+#include "mafGUIMDIChild.h"
 #include "mafViewManager.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 
 //----------------------------------------------------------------------------
 medLogicWithManagers::medLogicWithManagers()
@@ -72,7 +72,7 @@ void medLogicWithManagers::ViewContextualMenu(bool vme_menu)
   medGUIContextualMenu *contextMenu = new medGUIContextualMenu();
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
-  mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+  mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
   /*  else

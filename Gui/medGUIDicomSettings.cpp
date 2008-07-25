@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2007-12-07 14:19:13 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-07-25 10:27:22 $
+Version:   $Revision: 1.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,8 +22,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medGUIDicomSettings.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgCheckListBox.h"
+#include "mafGUI.h"
+#include "mafGUICheckListBox.h"
 
 //----------------------------------------------------------------------------
 medGUIDicomSettings::medGUIDicomSettings(mafObserver *Listener, const mafString &label):
@@ -51,7 +51,7 @@ medGUIDicomSettings::~medGUIDicomSettings()
 void medGUIDicomSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary);
 	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
 	m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);

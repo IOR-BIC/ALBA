@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-30 14:57:15 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 10:32:50 $
+Version:   $Revision: 1.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,10 +49,10 @@ MafMedical is partially based on OpenMAF.
 #include "medOpExtrusionHoles.h"
 #include "mafNode.h"
 
-#include "mmgDialog.h"
-#include "mmgButton.h"
+#include "mafGUIDialog.h"
+#include "mafGUIButton.h"
 #include "mmdMouse.h"
-#include "mmgValidator.h"
+#include "mafGUIValidator.h"
 #include "mafRWI.h"
 #include "mmiSelectPoint.h"
 #include "mafVMESurface.h"
@@ -463,7 +463,7 @@ void medOpExtrusionHoles::CreateOpDialog()
 	wxBusyCursor wait;
 
 	//===== setup interface ====
-	m_Dialog = new mmgDialog("Extrusion", mafCLOSEWINDOW | mafRESIZABLE);
+	m_Dialog = new mafGUIDialog("Extrusion", mafCLOSEWINDOW | mafRESIZABLE);
 
 	m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
 	m_Rwi->SetListener(this);
@@ -479,13 +479,13 @@ void medOpExtrusionHoles::CreateOpDialog()
 
 	wxPoint p = wxDefaultPosition;
 
-	m_ButtonOk = new mmgButton(m_Dialog, ID_OK,_("ok"), p, wxSize(80,20));
-	mmgButton  *b_cancel	= new mmgButton(m_Dialog, ID_CANCEL,_("cancel"), p, wxSize(80,20));
+	m_ButtonOk = new mafGUIButton(m_Dialog, ID_OK,_("ok"), p, wxSize(80,20));
+	mafGUIButton  *b_cancel	= new mafGUIButton(m_Dialog, ID_CANCEL,_("cancel"), p, wxSize(80,20));
 
 
-	m_ButtonOk->SetValidator(mmgValidator(this,ID_OK,m_ButtonOk));
+	m_ButtonOk->SetValidator(mafGUIValidator(this,ID_OK,m_ButtonOk));
 	//m_ButtonOk->Enable(false);
-	b_cancel->SetValidator(mmgValidator(this,ID_CANCEL,b_cancel));
+	b_cancel->SetValidator(mafGUIValidator(this,ID_CANCEL,b_cancel));
 
 	wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
 	h_sizer3->Add(m_ButtonOk,0,wxRIGHT);
@@ -496,19 +496,19 @@ void medOpExtrusionHoles::CreateOpDialog()
 	
 	wxStaticText *label2 = new wxStaticText(m_Dialog, -1, _("extrusion factor (diameters)"),p, wxSize(150, 16 ));
 	wxTextCtrl *extrusion = new wxTextCtrl(m_Dialog,ID_EXTRUSION_FACTOR, _("extrusion factor"),p,wxSize(50, 16 ), wxNO_BORDER );
-	mmgButton  *b_extrude	= new mmgButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(90,20));
+	mafGUIButton  *b_extrude	= new mafGUIButton(m_Dialog, ID_EXTRUDE,_("apply extrusion"), p, wxSize(90,20));
 
   wxStaticText *label3 = new wxStaticText(m_Dialog, -1, _("num. vertices"),p, wxSize(150, 16 ));
   wxTextCtrl *num_vertices = new wxTextCtrl(m_Dialog,ID_NUM_VERTICES, _("num. vertices"),p,wxSize(50, 16 ), wxNO_BORDER );
-  num_vertices->SetValidator(mmgValidator(this,ID_NUM_VERTICES,num_vertices,&m_NumVertices,0.0,999.0));
+  num_vertices->SetValidator(mafGUIValidator(this,ID_NUM_VERTICES,num_vertices,&m_NumVertices,0.0,999.0));
 
   //wxStaticText *label3 = new wxStaticText(m_Dialog, -1, _("extrusion factor (diameters)"),p, wxSize(150, 16 ));
   wxCheckBox *chk_reverse =   new wxCheckBox(m_Dialog, ID_REVERSE,_("reverse"), p, wxSize(80,20));
-  chk_reverse->SetValidator( mmgValidator(this, ID_REVERSE, chk_reverse, &m_ReverseExtrusion));
+  chk_reverse->SetValidator( mafGUIValidator(this, ID_REVERSE, chk_reverse, &m_ReverseExtrusion));
 
-	b_extrude->SetValidator(mmgValidator(this,ID_EXTRUDE,b_extrude));
-	radius->SetValidator(mmgValidator(this,ID_RADIUS,radius,&m_SphereRadius,0.0,999.0));
-	extrusion->SetValidator(mmgValidator(this,ID_EXTRUSION_FACTOR,extrusion,&m_ExtrusionFactor,0.0,999.0));
+	b_extrude->SetValidator(mafGUIValidator(this,ID_EXTRUDE,b_extrude));
+	radius->SetValidator(mafGUIValidator(this,ID_RADIUS,radius,&m_SphereRadius,0.0,999.0));
+	extrusion->SetValidator(mafGUIValidator(this,ID_EXTRUSION_FACTOR,extrusion,&m_ExtrusionFactor,0.0,999.0));
 
 	wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
 	h_sizer1->Add(label1,0,wxRIGHT);

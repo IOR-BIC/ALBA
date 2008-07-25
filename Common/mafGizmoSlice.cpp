@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 07:19:50 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-07-25 10:25:33 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,7 +23,7 @@
 #include "mafGizmoSlice.h"
 #include "mafDecl.h"
 #include "mmaMaterial.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"

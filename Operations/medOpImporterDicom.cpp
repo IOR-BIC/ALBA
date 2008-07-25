@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:03:55 $
-Version:   $Revision: 1.20 $
+Date:      $Date: 2008-07-25 10:35:29 $
+Version:   $Revision: 1.21 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -53,16 +53,16 @@ MafMedical is partially based on OpenMAF.
 
 #include "medGUIWizard.h"
 #include "medGUIWizardPage.h"
-#include "mmgValidator.h"
+#include "mafGUIValidator.h"
 #include "mmdMouse.h"
 #include "mmiDICOMImporterInteractor.h"
 #include "mafTagArray.h"
 #include "mafRWI.h"
 #include "mafVMEImage.h"
 #include "mafVMEVolumeGray.h"
-#include "mmgCheckListBox.h"
+#include "mafGUICheckListBox.h"
 #include "medGUIDicomSettings.h"
-#include "mmgButton.h"
+#include "mafGUIButton.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkDicomUnPacker.h"
@@ -568,9 +568,9 @@ void medOpImporterDicom::CreateLoadPage()
 //----------------------------------------------------------------------------
 {
 	m_LoadPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("First Step"));
-	m_LoadGuiLeft = new mmgGui(this);
-  m_LoadGuiRight = new mmgGui(this);
-  m_LoadGuiCenter = new mmgGui(this);
+	m_LoadGuiLeft = new mafGUI(this);
+  m_LoadGuiRight = new mafGUI(this);
+  m_LoadGuiCenter = new mafGUI(this);
 
 	/*m_DicomModalityListBox=m_LoadGuiLeft->CheckList(ID_TYPE_DICOM,_("Modality"));
 	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),true);
@@ -606,8 +606,8 @@ void medOpImporterDicom::CreateCropPage()
 //----------------------------------------------------------------------------
 {
 	m_CropPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("Second Step"));
-	m_CropGuiLeft = new mmgGui(this);
-  m_CropGuiCenter = new mmgGui(this);
+	m_CropGuiLeft = new mafGUI(this);
+  m_CropGuiCenter = new mafGUI(this);
 
 	//m_CropGuiLeft->Label(_("crop"),true);
 	//m_CropGuiLeft->Button(ID_CROP_BUTTON,_("crop"));
@@ -639,8 +639,8 @@ void medOpImporterDicom::CreateBuildPage()
 //----------------------------------------------------------------------------
 {
 	m_BuildPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("Third Step"));
-	m_BuildGuiLeft = new mmgGui(this);
-  m_BuildGuiCenter = new mmgGui(this);
+	m_BuildGuiLeft = new mafGUI(this);
+  m_BuildGuiCenter = new mafGUI(this);
 
 	//wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
 	//m_BuildGuiLeft->Label(_("build volume"),true);
@@ -682,7 +682,7 @@ void medOpImporterDicom::GuiUpdate()
 void medOpImporterDicom::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::OpenDir()
@@ -1527,7 +1527,7 @@ void medOpImporterDicom::ResetSliders()
   {
     m_LoadPage->RemoveGuiLowerLeft(m_LoadGuiLeft);
     delete m_LoadGuiLeft;
-    m_LoadGuiLeft = new mmgGui(this);
+    m_LoadGuiLeft = new mafGUI(this);
     m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
@@ -1540,7 +1540,7 @@ void medOpImporterDicom::ResetSliders()
   {
     m_CropPage->RemoveGuiLowerLeft(m_CropGuiLeft);
     delete m_CropGuiLeft;
-    m_CropGuiLeft = new mmgGui(this);
+    m_CropGuiLeft = new mafGUI(this);
     m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
@@ -1554,7 +1554,7 @@ void medOpImporterDicom::ResetSliders()
   {
     m_BuildPage->RemoveGuiLowerLeft(m_BuildGuiLeft);
     delete m_BuildGuiLeft;
-    m_BuildGuiLeft = new mmgGui(this);
+    m_BuildGuiLeft = new mafGUI(this);
     m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {

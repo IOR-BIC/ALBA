@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-03-11 10:35:54 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2008-07-25 10:25:33 $
+Version:   $Revision: 1.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -55,7 +55,7 @@ class mafVME;
 class medVMEPolylineEditor;
 class medVMEPolylineGraph;
 class mafPolylineGraph;
-class mmgGui;
+class mafGUI;
 class mmiPicker;
 class mafInteractor;
 class vtkSphereSource;
@@ -83,7 +83,7 @@ public:
 	void Show(bool show);
 
 	/** Return the current GUI */
-	mmgGui* GetGui();
+	mafGUI* GetGui();
 
 	/** Add a new vertex at the selected branch */
 	int AddNewVertex(double vertex[3],vtkIdType branch=UNDEFINED_BRANCH_ID);
@@ -156,7 +156,7 @@ protected:
 	medVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection
 	mafPolylineGraph					*m_PolylineGraph;
 
-	mmgGui	*m_Gui;
+	mafGUI	*m_Gui;
 
 	mafVME	*m_InputVME;
 

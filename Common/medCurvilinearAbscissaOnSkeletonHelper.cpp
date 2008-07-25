@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-01 14:06:02 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 10:25:33 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,12 +22,12 @@ const bool DEBUG_MODE = true;
 
 #include <math.h>
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "medGizmoInteractionDebugger.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mmaMaterial.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
 #include "mafSmartPointer.h"
@@ -830,7 +830,7 @@ void BuildVector( double p0[3],double p1[3],double vOut[3] )
 
 void medCurvilinearAbscissaOnSkeletonHelper::CreateGui()
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Divider(2);
   // m_Gui->Label("skeleton gui", true);

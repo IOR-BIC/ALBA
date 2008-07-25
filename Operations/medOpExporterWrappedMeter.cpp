@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-03 08:13:07 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 10:32:50 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include "medOpExporterWrappedMeter.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "medVMEWrappedMeter.h"
 #include "medVMEOutputWrappedMeter.h"
@@ -80,7 +80,7 @@ void medOpExporterWrappedMeter::OpRun()
 {
   mafString wildc = "Wrapped Meter Coordinates(*.txt)|*.txt";
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	//m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc,"Save As...");
 	m_Gui->OkCancel();
   

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2008-06-06 10:29:56 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2008-07-25 10:35:29 $
+Version:   $Revision: 1.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -58,7 +58,7 @@ class mafString;
 class mafTagArray;
 class mafVMEImage;
 class mafVMEVolumeGray;
-class mmgCheckListBox;
+class mafGUICheckListBox;
 class vtkDicomUnPacker;
 class vtkDirectory;
 class vtkWindowLevelLookupTable;
@@ -184,13 +184,13 @@ protected:
 	medGUIWizardPage	*m_CropPage;
 	medGUIWizardPage	*m_BuildPage;
 
-	mmgGui	*m_LoadGuiLeft;
-  mmgGui	*m_LoadGuiRight;
-  mmgGui	*m_LoadGuiCenter;
-	mmgGui	*m_CropGuiLeft;
-  mmgGui	*m_CropGuiCenter;
-	mmgGui	*m_BuildGuiLeft;
-  mmgGui	*m_BuildGuiCenter;
+	mafGUI	*m_LoadGuiLeft;
+  mafGUI	*m_LoadGuiRight;
+  mafGUI	*m_LoadGuiCenter;
+	mafGUI	*m_CropGuiLeft;
+  mafGUI	*m_CropGuiCenter;
+	mafGUI	*m_BuildGuiLeft;
+  mafGUI	*m_BuildGuiCenter;
 
 	int				m_DicomModality; ///<Modality to set witch type of DICOM to read
 	mafString	m_DictionaryFilename;
@@ -238,7 +238,7 @@ protected:
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
 
-	mmgCheckListBox *m_DicomModalityListBox;
+	mafGUICheckListBox *m_DicomModalityListBox;
 
 	~medOpImporterDicom();
 };

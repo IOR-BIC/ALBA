@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2007-10-17 16:29:09 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 10:27:22 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 #include "wx/wizard.h"
 #include "mafEvent.h"
 #include "mafObserver.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------

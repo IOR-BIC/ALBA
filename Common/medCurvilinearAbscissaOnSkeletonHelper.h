@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 16:49:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 10:25:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,7 +66,7 @@ public:
   virtual void OnEvent(mafEventBase *maf_event);
 
   /** Return the gui to be plugged*/
-  mmgGui *GetGui() {return m_Gui;};
+  mafGUI *GetGui() {return m_Gui;};
 
   /** Enable-Disable the GUI's widgets */
   virtual void EnableWidgets(bool enable);
@@ -99,7 +99,7 @@ private:
   double m_GUICurvilinearAbscissa;
 
   mafObserver *m_Listener;
-  mmgGui      *m_Gui;    
+  mafGUI      *m_Gui;    
 
 };
  

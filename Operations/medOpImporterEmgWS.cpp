@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterEmgWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:55 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 10:37:30 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include <wx/wfstream.h>
 #include <wx/sstream.h>
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafTagArray.h"
 #include "mafVMEScalar.h"

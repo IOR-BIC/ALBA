@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOp2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:37:53 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 10:29:01 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOp2DMeasure);
@@ -122,7 +122,7 @@ void medOp2DMeasure::OpRun()
                                           // eventually next value will be "5"
 
   // setup Gui
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
   m_Gui->Label(_("measure type"),true);

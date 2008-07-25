@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-09 15:01:59 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 10:29:46 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 #include "mafDecl.h"
 #include "mafOp.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "vtkMAFSmartPointer.h"
 
@@ -97,7 +97,7 @@ void medOpClassicICPRegistration::CreateGui()
 	
 	m_InputName = m_Input->GetName();
 	
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 	m_Gui->Label("");
 	m_Gui->Label(_("source:"),true);

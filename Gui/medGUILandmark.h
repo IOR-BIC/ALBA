@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:07:41 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 10:27:22 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
-class mmgButton;
+class mafGUI;
+class mafGUIButton;
 class mmiGenericMouse;
 class mmiCompositorMouse;
 class mmiPicker;
@@ -84,7 +84,7 @@ public:
  
   void SetInputVME(mafNode *vme); 
     
-  mmgGui *GetGui() {return m_Gui;};
+  mafGUI *GetGui() {return m_Gui;};
 
   void SetLMCloudName(const char *name) {m_LMCloudName = name;};
   const char *GetLMCloudName() {return m_LMCloudName.GetCStr();};
@@ -138,7 +138,7 @@ protected:
   mafInteractor *m_OldInputVMEBehavior;
 
   mafObserver *m_Listener;
-  mmgGui      *m_Gui;
+  mafGUI      *m_Gui;
 
   mafString m_LMCloudName;
   mafString m_RefSysVMEName;
