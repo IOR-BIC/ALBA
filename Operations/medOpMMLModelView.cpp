@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-24 08:00:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:30:49 $
+  Version:   $Revision: 1.3 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,29 +54,29 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_TubeFilterRadius = 0.5 ;
 
 	// final transform
-	m_pfinalm = vtkMatrix4x4::New();
+	m_PFinalm = vtkMatrix4x4::New();
 
 	// synthetic slices transform
-	m_pslicesm = vtkMatrix4x4::New();
+	m_PSlicesm = vtkMatrix4x4::New();
 
 	//
 	m_ScalingOccured = FALSE;
 
 	//
-	m_pRenderer = ren;
-	m_pRenderWindow = rw;
-	m_pRenderWindowInteractor = rw->GetInteractor();
+	m_PRenderer = ren;
+	m_PRenderWindow = rw;
+	m_PRenderWindowInteractor = rw->GetInteractor();
 	
 	//
-	m_pRenderer->SetBackground(0.2,0.4,0.6);
+	m_PRenderer->SetBackground(0.2,0.4,0.6);
 	
-	int *size = m_pRenderWindow->GetSize();
+	int *size = m_PRenderWindow->GetSize();
 	assert(size[0] > 0);
 	assert(size[1] > 0);
   
-	m_pRenderWindow->LineSmoothingOn();
-	m_pInteractorStyleImage = vtkInteractorStyleImage::New();
-	m_pInteractorStyleTrackballCamera = vtkInteractorStyleTrackballCamera::New();
+	m_PRenderWindow->LineSmoothingOn();
+	m_PInteractorStyleImage = vtkInteractorStyleImage::New();
+	m_PInteractorStyleTrackballCamera = vtkInteractorStyleTrackballCamera::New();
 
 
 	//// just to test things
@@ -118,7 +118,7 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	
 	
 	// 2d display
-	m_pRenderWindowInteractor->SetInteractorStyle(m_pInteractorStyleImage);
+	m_PRenderWindowInteractor->SetInteractorStyle(m_PInteractorStyleImage);
 
 	//
 	m_PCenterHorizontalOffsetSpline = vtkKochanekSpline::New();
@@ -151,16 +151,16 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PWestScalingSpline->ClosedOff();
 
 	// synthetic slices
-	m_pSyntheticScansPlaneSource = NULL ; // planes
-	m_pSyntheticScansPlaneSourceTransform = NULL; // transforms
-	m_pSyntheticScansPlaneSourceTransformPolyDataFilter = NULL;
-	m_pSyntheticScansProbeFilter = NULL; // probes
-	m_pSyntheticScansPolyDataMapper = NULL; // mappers
-	m_pSyntheticScansActor = NULL; // actors
-	m_pSyntheticScansActorTransform = NULL; // transforms
+	m_PSyntheticScansPlaneSource = NULL ; // planes
+	m_PSyntheticScansPlaneSourceTransform = NULL; // transforms
+	m_PSyntheticScansPlaneSourceTransformPolyDataFilter = NULL;
+	m_PSyntheticScansProbeFilter = NULL; // probes
+	m_PSyntheticScansPolyDataMapper = NULL; // mappers
+	m_PSyntheticScansActor = NULL; // actors
+	m_PSyntheticScansActorTransform = NULL; // transforms
 
 	// synthetic slices lut
-	m_pSyntheticScansWindowLevelLookupTable = vtkWindowLevelLookupTable::New();
+	m_PSyntheticScansWindowLevelLookupTable = vtkWindowLevelLookupTable::New();
 
 	//
 	m_ScalingFlagStack = vtkIntArray::New();
@@ -190,48 +190,48 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 
 	// standard display
 	// east contour axis
-	m_pContourPosXAxisLineSource = vtkLineSource::New();
-	m_pContourPosXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pContourPosXAxisAxesTubeFilter->SetInput(m_pContourPosXAxisLineSource->GetOutput());
-	m_pContourPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pContourPosXAxisPolyDataMapper->SetInput(m_pContourPosXAxisAxesTubeFilter->GetOutput());
-	m_pContourPosXAxisActor = vtkActor::New();
-	m_pContourPosXAxisActor->SetMapper(m_pContourPosXAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pContourPosXAxisActor);
-	m_pContourPosXAxisActor->VisibilityOff();
+	m_PContourPosXAxisLineSource = vtkLineSource::New();
+	m_PContourPosXAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PContourPosXAxisAxesTubeFilter->SetInput(m_PContourPosXAxisLineSource->GetOutput());
+	m_PContourPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PContourPosXAxisPolyDataMapper->SetInput(m_PContourPosXAxisAxesTubeFilter->GetOutput());
+	m_PContourPosXAxisActor = vtkActor::New();
+	m_PContourPosXAxisActor->SetMapper(m_PContourPosXAxisPolyDataMapper);
+	m_PRenderer->AddActor(m_PContourPosXAxisActor);
+	m_PContourPosXAxisActor->VisibilityOff();
 	
 	// north contour axis
-	m_pContourPosYAxisLineSource = vtkLineSource::New();
-	m_pContourPosYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pContourPosYAxisAxesTubeFilter->SetInput(m_pContourPosYAxisLineSource->GetOutput());
-	m_pContourPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pContourPosYAxisPolyDataMapper->SetInput(m_pContourPosYAxisAxesTubeFilter->GetOutput());
-	m_pContourPosYAxisActor = vtkActor::New();
-	m_pContourPosYAxisActor->SetMapper(m_pContourPosYAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pContourPosYAxisActor);
-	m_pContourPosYAxisActor->VisibilityOff();
+	m_PContourPosYAxisLineSource = vtkLineSource::New();
+	m_PContourPosYAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PContourPosYAxisAxesTubeFilter->SetInput(m_PContourPosYAxisLineSource->GetOutput());
+	m_PContourPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PContourPosYAxisPolyDataMapper->SetInput(m_PContourPosYAxisAxesTubeFilter->GetOutput());
+	m_PContourPosYAxisActor = vtkActor::New();
+	m_PContourPosYAxisActor->SetMapper(m_PContourPosYAxisPolyDataMapper);
+	m_PRenderer->AddActor(m_PContourPosYAxisActor);
+	m_PContourPosYAxisActor->VisibilityOff();
 
 	// west contour axis
-	m_pContourNegXAxisLineSource = vtkLineSource::New();
-	m_pContourNegXAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pContourNegXAxisAxesTubeFilter->SetInput(m_pContourNegXAxisLineSource->GetOutput());
-	m_pContourNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pContourNegXAxisPolyDataMapper->SetInput(m_pContourNegXAxisAxesTubeFilter->GetOutput());
-	m_pContourNegXAxisActor = vtkActor::New();
-	m_pContourNegXAxisActor->SetMapper(m_pContourNegXAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pContourNegXAxisActor);
-	m_pContourNegXAxisActor->VisibilityOff();
+	m_PContourNegXAxisLineSource = vtkLineSource::New();
+	m_PContourNegXAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PContourNegXAxisAxesTubeFilter->SetInput(m_PContourNegXAxisLineSource->GetOutput());
+	m_PContourNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PContourNegXAxisPolyDataMapper->SetInput(m_PContourNegXAxisAxesTubeFilter->GetOutput());
+	m_PContourNegXAxisActor = vtkActor::New();
+	m_PContourNegXAxisActor->SetMapper(m_PContourNegXAxisPolyDataMapper);
+	m_PRenderer->AddActor(m_PContourNegXAxisActor);
+	m_PContourNegXAxisActor->VisibilityOff();
 	
 	// south contour axis
-	m_pContourNegYAxisLineSource = vtkLineSource::New();
-	m_pContourNegYAxisAxesTubeFilter = vtkTubeFilter::New();
-	m_pContourNegYAxisAxesTubeFilter->SetInput(m_pContourNegYAxisLineSource->GetOutput());
-	m_pContourNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
-	m_pContourNegYAxisPolyDataMapper->SetInput(m_pContourNegYAxisAxesTubeFilter->GetOutput());
-	m_pContourNegYAxisActor = vtkActor::New();
-	m_pContourNegYAxisActor->SetMapper(m_pContourNegYAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_pContourNegYAxisActor);
-	m_pContourNegYAxisActor->VisibilityOff();
+	m_PContourNegYAxisLineSource = vtkLineSource::New();
+	m_PContourNegYAxisAxesTubeFilter = vtkTubeFilter::New();
+	m_PContourNegYAxisAxesTubeFilter->SetInput(m_PContourNegYAxisLineSource->GetOutput());
+	m_PContourNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
+	m_PContourNegYAxisPolyDataMapper->SetInput(m_PContourNegYAxisAxesTubeFilter->GetOutput());
+	m_PContourNegYAxisActor = vtkActor::New();
+	m_PContourNegYAxisActor->SetMapper(m_PContourNegYAxisPolyDataMapper);
+	m_PRenderer->AddActor(m_PContourNegYAxisActor);
+	m_PContourNegYAxisActor->VisibilityOff();
 
 	// east global axis
 	m_PPosXAxisLineSource = vtkLineSource::New();
@@ -241,7 +241,7 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PPosXAxisPolyDataMapper->SetInput(m_PPosXAxisAxesTubeFilter->GetOutput());
 	m_PPosXAxisActor = vtkActor::New();
 	m_PPosXAxisActor->SetMapper(m_PPosXAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_PPosXAxisActor);
+	m_PRenderer->AddActor(m_PPosXAxisActor);
 	m_PPosXAxisActor->VisibilityOff();
 	
 	// north global axis
@@ -252,7 +252,7 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PPosYAxisPolyDataMapper->SetInput(m_PPosYAxisAxesTubeFilter->GetOutput());
 	m_PPosYAxisActor = vtkActor::New();
 	m_PPosYAxisActor->SetMapper(m_PPosYAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_PPosYAxisActor);
+	m_PRenderer->AddActor(m_PPosYAxisActor);
 	m_PPosYAxisActor->VisibilityOff();
 
 	// west global axis
@@ -263,7 +263,7 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PNegXAxisPolyDataMapper->SetInput(m_PNegXAxisAxesTubeFilter->GetOutput());
 	m_PNegXAxisActor = vtkActor::New();
 	m_PNegXAxisActor->SetMapper(m_PNegXAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_PNegXAxisActor);
+	m_PRenderer->AddActor(m_PNegXAxisActor);
 	m_PNegXAxisActor->VisibilityOff();
 
 	// south global axis
@@ -274,67 +274,67 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PNegYAxisPolyDataMapper->SetInput(m_PNegYAxisAxesTubeFilter->GetOutput());
 	m_PNegYAxisActor = vtkActor::New();
 	m_PNegYAxisActor->SetMapper(m_PNegYAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_PNegYAxisActor);
+	m_PRenderer->AddActor(m_PNegYAxisActor);
 	m_PNegYAxisActor->VisibilityOff();
 
 	// 3d display
 	// 1st landmark
-	m_pLandmark1SphereSource = vtkSphereSource::New();
-	m_pLandmark1PolyDataMapper = vtkPolyDataMapper::New();
-	m_pLandmark1PolyDataMapper->SetInput(m_pLandmark1SphereSource->GetOutput());
-	m_pLandmark1Actor = vtkActor::New();
-	m_pLandmark1Actor->SetMapper(m_pLandmark1PolyDataMapper);
-	m_pLandmark1Actor->VisibilityOff();
-	m_pRenderer->AddActor(m_pLandmark1Actor);
+	m_PLandmark1SphereSource = vtkSphereSource::New();
+	m_PLandmark1PolyDataMapper = vtkPolyDataMapper::New();
+	m_PLandmark1PolyDataMapper->SetInput(m_PLandmark1SphereSource->GetOutput());
+	m_PLandmark1Actor = vtkActor::New();
+	m_PLandmark1Actor->SetMapper(m_PLandmark1PolyDataMapper);
+	m_PLandmark1Actor->VisibilityOff();
+	m_PRenderer->AddActor(m_PLandmark1Actor);
 
 	// 2nd landmark
-	m_pLandmark2SphereSource = vtkSphereSource::New();
-	m_pLandmark2PolyDataMapper = vtkPolyDataMapper::New();
-	m_pLandmark2PolyDataMapper->SetInput(m_pLandmark2SphereSource->GetOutput());
-	m_pLandmark2Actor = vtkActor::New();
-	m_pLandmark2Actor->SetMapper(m_pLandmark2PolyDataMapper);
-	m_pLandmark2Actor->VisibilityOff();
-	m_pRenderer->AddActor(m_pLandmark2Actor);
+	m_PLandmark2SphereSource = vtkSphereSource::New();
+	m_PLandmark2PolyDataMapper = vtkPolyDataMapper::New();
+	m_PLandmark2PolyDataMapper->SetInput(m_PLandmark2SphereSource->GetOutput());
+	m_PLandmark2Actor = vtkActor::New();
+	m_PLandmark2Actor->SetMapper(m_PLandmark2PolyDataMapper);
+	m_PLandmark2Actor->VisibilityOff();
+	m_PRenderer->AddActor(m_PLandmark2Actor);
 
 	// 3rd landmark
-	m_pLandmark3SphereSource = vtkSphereSource::New();
-	m_pLandmark3PolyDataMapper = vtkPolyDataMapper::New();
-	m_pLandmark3PolyDataMapper->SetInput(m_pLandmark3SphereSource->GetOutput());
-	m_pLandmark3Actor = vtkActor::New();
-	m_pLandmark3Actor->SetMapper(m_pLandmark3PolyDataMapper);
-	m_pLandmark3Actor->VisibilityOff();
-	m_pRenderer->AddActor(m_pLandmark3Actor);
+	m_PLandmark3SphereSource = vtkSphereSource::New();
+	m_PLandmark3PolyDataMapper = vtkPolyDataMapper::New();
+	m_PLandmark3PolyDataMapper->SetInput(m_PLandmark3SphereSource->GetOutput());
+	m_PLandmark3Actor = vtkActor::New();
+	m_PLandmark3Actor->SetMapper(m_PLandmark3PolyDataMapper);
+	m_PLandmark3Actor->VisibilityOff();
+	m_PRenderer->AddActor(m_PLandmark3Actor);
 
 	// 4th landmark
-	m_pLandmark4SphereSource = vtkSphereSource::New();
-	m_pLandmark4PolyDataMapper = vtkPolyDataMapper::New();
-	m_pLandmark4PolyDataMapper->SetInput(m_pLandmark4SphereSource->GetOutput());
-	m_pLandmark4Actor = vtkActor::New();
-	m_pLandmark4Actor->SetMapper(m_pLandmark4PolyDataMapper);
-	m_pLandmark4Actor->VisibilityOff();
-	m_pRenderer->AddActor(m_pLandmark4Actor);
+	m_PLandmark4SphereSource = vtkSphereSource::New();
+	m_PLandmark4PolyDataMapper = vtkPolyDataMapper::New();
+	m_PLandmark4PolyDataMapper->SetInput(m_PLandmark4SphereSource->GetOutput());
+	m_PLandmark4Actor = vtkActor::New();
+	m_PLandmark4Actor->SetMapper(m_PLandmark4PolyDataMapper);
+	m_PLandmark4Actor->VisibilityOff();
+	m_PRenderer->AddActor(m_PLandmark4Actor);
 
 	// L1 to L2 line (action)
-	m_pL1L2LineSource = vtkLineSource::New();
-	m_pL1L2TubeFilter = vtkTubeFilter::New();
-	m_pL1L2TubeFilter->SetInput(m_pL1L2LineSource->GetOutput());
-	m_pL1L2PolyDataMapper = vtkPolyDataMapper::New();
-	m_pL1L2PolyDataMapper->SetInput(m_pL1L2TubeFilter->GetOutput());
-	m_pL1L2Actor = vtkActor::New();
-	m_pL1L2Actor->SetMapper(m_pL1L2PolyDataMapper);
-	m_pL1L2Actor->VisibilityOff();
-	m_pRenderer->AddActor(m_pL1L2Actor);
+	m_PL1L2LineSource = vtkLineSource::New();
+	m_PL1L2TubeFilter = vtkTubeFilter::New();
+	m_PL1L2TubeFilter->SetInput(m_PL1L2LineSource->GetOutput());
+	m_PL1L2PolyDataMapper = vtkPolyDataMapper::New();
+	m_PL1L2PolyDataMapper->SetInput(m_PL1L2TubeFilter->GetOutput());
+	m_PL1L2Actor = vtkActor::New();
+	m_PL1L2Actor->SetMapper(m_PL1L2PolyDataMapper);
+	m_PL1L2Actor->VisibilityOff();
+	m_PRenderer->AddActor(m_PL1L2Actor);
 
 	// L2 to L3 line
-	m_pL2L3LineSource = vtkLineSource::New();
-	m_pL2L3TubeFilter = vtkTubeFilter::New();
-	m_pL2L3TubeFilter->SetInput(m_pL2L3LineSource->GetOutput());
-	m_pL2L3PolyDataMapper = vtkPolyDataMapper::New();
-	m_pL2L3PolyDataMapper->SetInput(m_pL2L3TubeFilter->GetOutput());
-	m_pL2L3Actor = vtkActor::New();
-	m_pL2L3Actor->SetMapper(m_pL2L3PolyDataMapper);
-	m_pL2L3Actor->VisibilityOff();
-	m_pRenderer->AddActor(m_pL2L3Actor);
+	m_PL2L3LineSource = vtkLineSource::New();
+	m_PL2L3TubeFilter = vtkTubeFilter::New();
+	m_PL2L3TubeFilter->SetInput(m_PL2L3LineSource->GetOutput());
+	m_PL2L3PolyDataMapper = vtkPolyDataMapper::New();
+	m_PL2L3PolyDataMapper->SetInput(m_PL2L3TubeFilter->GetOutput());
+	m_PL2L3Actor = vtkActor::New();
+	m_PL2L3Actor->SetMapper(m_PL2L3PolyDataMapper);
+	m_PL2L3Actor->VisibilityOff();
+	m_PRenderer->AddActor(m_PL2L3Actor);
 
 	// positive z global axis
 	m_PPosZAxisLineSource = vtkLineSource::New();
@@ -344,7 +344,7 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PPosZAxisPolyDataMapper->SetInput(m_PPosZAxisAxesTubeFilter->GetOutput());
 	m_PPosZAxisActor = vtkActor::New();
 	m_PPosZAxisActor->SetMapper(m_PPosZAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_PPosZAxisActor);
+	m_PRenderer->AddActor(m_PPosZAxisActor);
 	m_PPosZAxisActor->VisibilityOff();
 
 	// negative z global axis
@@ -355,29 +355,29 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	m_PNegZAxisPolyDataMapper->SetInput(m_PNegZAxisAxesTubeFilter->GetOutput());
 	m_PNegZAxisActor = vtkActor::New();
 	m_PNegZAxisActor->SetMapper(m_PNegZAxisPolyDataMapper);
-	m_pRenderer->AddActor(m_PNegZAxisActor);
+	m_PRenderer->AddActor(m_PNegZAxisActor);
 	m_PNegZAxisActor->VisibilityOff();
 
 
 	// muscle transform pipeline
   // Transform1 -> Transform2 -> Normals -> Mapper
-	m_pMuscleTransform1 = vtkTransform::New();
-	m_pMuscleTransform1PolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pMuscleTransform1PolyDataFilter->SetInput(muscle);
-	m_pMuscleTransform1PolyDataFilter->SetTransform(m_pMuscleTransform1);
-	m_pMuscleTransform2 = vtkTransform::New();
-	m_pMuscleTransform2PolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pMuscleTransform2PolyDataFilter->SetInput(m_pMuscleTransform1PolyDataFilter->GetOutput());
-	m_pMuscleTransform2PolyDataFilter->SetTransform(m_pMuscleTransform2);
-	m_pMusclePolyDataNormals = vtkPolyDataNormals::New();
-	m_pMusclePolyDataNormals->SetInput(m_pMuscleTransform2PolyDataFilter->GetOutput());
-	m_pMusclePolyDataNormals->FlipNormalsOn();
-	m_pMusclePolyDataMapper = vtkPolyDataMapper::New();
-	m_pMusclePolyDataMapper->SetInput(m_pMusclePolyDataNormals->GetOutput());
-	m_pMuscleLODActor = vtkLODActor::New();
-	m_pMuscleLODActor->SetMapper(m_pMusclePolyDataMapper);
-	m_pRenderer->AddActor(m_pMuscleLODActor);
-	m_pMuscleLODActor->VisibilityOff();   // visibility off, but we can switch it on if we want to (see later)
+	m_PMuscleTransform1 = vtkTransform::New();
+	m_PMuscleTransform1PolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PMuscleTransform1PolyDataFilter->SetInput(muscle);
+	m_PMuscleTransform1PolyDataFilter->SetTransform(m_PMuscleTransform1);
+	m_PMuscleTransform2 = vtkTransform::New();
+	m_PMuscleTransform2PolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PMuscleTransform2PolyDataFilter->SetInput(m_PMuscleTransform1PolyDataFilter->GetOutput());
+	m_PMuscleTransform2PolyDataFilter->SetTransform(m_PMuscleTransform2);
+	m_PMusclePolyDataNormals = vtkPolyDataNormals::New();
+	m_PMusclePolyDataNormals->SetInput(m_PMuscleTransform2PolyDataFilter->GetOutput());
+	m_PMusclePolyDataNormals->FlipNormalsOn();
+	m_PMusclePolyDataMapper = vtkPolyDataMapper::New();
+	m_PMusclePolyDataMapper->SetInput(m_PMusclePolyDataNormals->GetOutput());
+	m_PMuscleLODActor = vtkLODActor::New();
+	m_PMuscleLODActor->SetMapper(m_PMusclePolyDataMapper);
+	m_PRenderer->AddActor(m_PMuscleLODActor);
+	m_PMuscleLODActor->VisibilityOff();   // visibility off, but we can switch it on if we want to (see later)
 
 
 	// 2d axes - contour system
@@ -395,29 +395,29 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 
 
 	// standard contour pipeline
-	m_pContourPlane = vtkPlane::New();
-	m_pContourCutter = vtkCutter::New();
-	m_pContourCutter->SetCutFunction(m_pContourPlane);
-	m_pContourCutter->SetInput(m_pMuscleTransform2PolyDataFilter->GetOutput());
+	m_PContourPlane = vtkPlane::New();
+	m_PContourCutter = vtkCutter::New();
+	m_PContourCutter->SetCutFunction(m_PContourPlane);
+	m_PContourCutter->SetInput(m_PMuscleTransform2PolyDataFilter->GetOutput());
 
-	m_pContourCutterTransform = vtkTransform::New(); //to put back to z=0 plane
-	m_pContourCutterTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pContourCutterTransformPolyDataFilter->SetInput(m_pContourCutter->GetOutput());
-	m_pContourCutterTransformPolyDataFilter->SetTransform(m_pContourCutterTransform);
+	m_PContourCutterTransform = vtkTransform::New(); //to put back to z=0 plane
+	m_PContourCutterTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PContourCutterTransformPolyDataFilter->SetInput(m_PContourCutter->GetOutput());
+	m_PContourCutterTransformPolyDataFilter->SetTransform(m_PContourCutterTransform);
 
-	m_pContourTubeFilter = vtkTubeFilter::New();
-	m_pContourTubeFilter->SetRadius(m_TubeFilterRadius);
-    m_pContourTubeFilter->SetNumberOfSides(12);
-	m_pContourTubeFilter->SetInput(m_pContourCutterTransformPolyDataFilter->GetOutput());
+	m_PContourTubeFilter = vtkTubeFilter::New();
+	m_PContourTubeFilter->SetRadius(m_TubeFilterRadius);
+    m_PContourTubeFilter->SetNumberOfSides(12);
+	m_PContourTubeFilter->SetInput(m_PContourCutterTransformPolyDataFilter->GetOutput());
 	
-	m_pContourPolyDataMapper = vtkPolyDataMapper::New();
-	m_pContourPolyDataMapper->SetInput(m_pContourTubeFilter->GetOutput());
+	m_PContourPolyDataMapper = vtkPolyDataMapper::New();
+	m_PContourPolyDataMapper->SetInput(m_PContourTubeFilter->GetOutput());
 	
-	m_pContourActor = vtkActor::New();
-	m_pContourActor->SetMapper(m_pContourPolyDataMapper);
-	m_pContourActor->VisibilityOff();
-	m_pRenderer->AddActor(m_pContourActor);
-	m_pContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+	m_PContourActor = vtkActor::New();
+	m_PContourActor->SetMapper(m_PContourPolyDataMapper);
+	m_PContourActor->VisibilityOff();
+	m_PRenderer->AddActor(m_PContourActor);
+	m_PContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
 	
 	//// glyphed contour
 	//
@@ -433,144 +433,144 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	//
 
 	// scaling contours stuff
-	m_pX0ZNPlane = vtkPlane::New(); // xOz north
-	m_pX0ZNPlane->SetNormal(0.0, 1.0, 0.0);
+	m_PX0ZNPlane = vtkPlane::New(); // xOz north
+	m_PX0ZNPlane->SetNormal(0.0, 1.0, 0.0);
 
-	m_pX0ZSPlane = vtkPlane::New(); // x0z south
-	m_pX0ZSPlane->SetNormal(0.0, -1.0, 0.0);
+	m_PX0ZSPlane = vtkPlane::New(); // x0z south
+	m_PX0ZSPlane->SetNormal(0.0, -1.0, 0.0);
 	
-	m_pY0ZEPlane = vtkPlane::New(); // y0z east
-	m_pY0ZEPlane->SetNormal(1.0, 0.0, 0.0);
+	m_PY0ZEPlane = vtkPlane::New(); // y0z east
+	m_PY0ZEPlane->SetNormal(1.0, 0.0, 0.0);
 
-	m_pY0ZWPlane = vtkPlane::New(); // y0z west
-	m_pY0ZWPlane->SetNormal(-1.0, 0.0, 0.0);
+	m_PY0ZWPlane = vtkPlane::New(); // y0z west
+	m_PY0ZWPlane->SetNormal(-1.0, 0.0, 0.0);
 
 	// north-east
-	m_pNEContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pNEContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pNEContourTubeFilter =  vtkTubeFilter::New();
-	m_pNEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pNEContourPolyDataMapper = vtkPolyDataMapper::New();
-	m_pNEContourActor = vtkActor::New();
+	m_PNEContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PNEContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PNEContourTubeFilter =  vtkTubeFilter::New();
+	m_PNEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PNEContourPolyDataMapper = vtkPolyDataMapper::New();
+	m_PNEContourActor = vtkActor::New();
 	
-	m_pNEContourX0ZPlaneClipPolyData->SetInput(m_pContourCutter->GetOutput()); // first cut plane
-	m_pNEContourX0ZPlaneClipPolyData->SetClipFunction(m_pX0ZNPlane);
-	m_pNEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PNEContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput()); // first cut plane
+	m_PNEContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZNPlane);
+	m_PNEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_pNEContourY0ZPlaneClipPolyData->SetInput(m_pNEContourX0ZPlaneClipPolyData->GetOutput()); // second cut plane
-	m_pNEContourY0ZPlaneClipPolyData->SetClipFunction(m_pY0ZEPlane);
-	m_pNEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PNEContourY0ZPlaneClipPolyData->SetInput(m_PNEContourX0ZPlaneClipPolyData->GetOutput()); // second cut plane
+	m_PNEContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZEPlane);
+	m_PNEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_pNEContourTransformPolyDataFilter->SetInput(m_pNEContourY0ZPlaneClipPolyData->GetOutput());
+	m_PNEContourTransformPolyDataFilter->SetInput(m_PNEContourY0ZPlaneClipPolyData->GetOutput());
 
-	m_pNEContourTubeFilter->SetRadius(m_TubeFilterRadius);
-    m_pNEContourTubeFilter->SetNumberOfSides(12);
-	m_pNEContourTubeFilter->SetInput(m_pNEContourTransformPolyDataFilter->GetOutput());
+	m_PNEContourTubeFilter->SetRadius(m_TubeFilterRadius);
+    m_PNEContourTubeFilter->SetNumberOfSides(12);
+	m_PNEContourTubeFilter->SetInput(m_PNEContourTransformPolyDataFilter->GetOutput());
 
-	m_pNEContourPolyDataMapper->SetInput(m_pNEContourTubeFilter->GetOutput());
-	m_pNEContourActor->SetMapper(m_pNEContourPolyDataMapper);
-	m_pRenderer->AddActor(m_pNEContourActor);
-	m_pNEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-	m_pNEContourActor->VisibilityOff();
+	m_PNEContourPolyDataMapper->SetInput(m_PNEContourTubeFilter->GetOutput());
+	m_PNEContourActor->SetMapper(m_PNEContourPolyDataMapper);
+	m_PRenderer->AddActor(m_PNEContourActor);
+	m_PNEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+	m_PNEContourActor->VisibilityOff();
 
 	// north-west
-	m_pNWContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pNWContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pNWContourTubeFilter =  vtkTubeFilter::New();
-	m_pNWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pNWContourPolyDataMapper = vtkPolyDataMapper::New();
-	m_pNWContourActor = vtkActor::New();
+	m_PNWContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PNWContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PNWContourTubeFilter =  vtkTubeFilter::New();
+	m_PNWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PNWContourPolyDataMapper = vtkPolyDataMapper::New();
+	m_PNWContourActor = vtkActor::New();
 
-	m_pNWContourX0ZPlaneClipPolyData->SetInput(m_pContourCutter->GetOutput());
-	m_pNWContourX0ZPlaneClipPolyData->SetClipFunction(m_pX0ZNPlane);
-	m_pNWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PNWContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput());
+	m_PNWContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZNPlane);
+	m_PNWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 
-	m_pNWContourY0ZPlaneClipPolyData->SetInput(m_pNWContourX0ZPlaneClipPolyData->GetOutput());
-	m_pNWContourY0ZPlaneClipPolyData->SetClipFunction(m_pY0ZWPlane);
-	m_pNWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PNWContourY0ZPlaneClipPolyData->SetInput(m_PNWContourX0ZPlaneClipPolyData->GetOutput());
+	m_PNWContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZWPlane);
+	m_PNWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 
-	m_pNWContourTransformPolyDataFilter->SetInput(m_pNWContourY0ZPlaneClipPolyData->GetOutput());
+	m_PNWContourTransformPolyDataFilter->SetInput(m_PNWContourY0ZPlaneClipPolyData->GetOutput());
 
-	m_pNWContourTubeFilter->SetRadius(m_TubeFilterRadius);
-    m_pNWContourTubeFilter->SetNumberOfSides(12);
-	m_pNWContourTubeFilter->SetInput(m_pNWContourTransformPolyDataFilter->GetOutput());
+	m_PNWContourTubeFilter->SetRadius(m_TubeFilterRadius);
+    m_PNWContourTubeFilter->SetNumberOfSides(12);
+	m_PNWContourTubeFilter->SetInput(m_PNWContourTransformPolyDataFilter->GetOutput());
 
-	m_pNWContourPolyDataMapper->SetInput(m_pNWContourTubeFilter->GetOutput());
-	m_pNWContourActor->SetMapper(m_pNWContourPolyDataMapper);
-	m_pRenderer->AddActor(m_pNWContourActor);
-	m_pNWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-	m_pNWContourActor->VisibilityOff();
+	m_PNWContourPolyDataMapper->SetInput(m_PNWContourTubeFilter->GetOutput());
+	m_PNWContourActor->SetMapper(m_PNWContourPolyDataMapper);
+	m_PRenderer->AddActor(m_PNWContourActor);
+	m_PNWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+	m_PNWContourActor->VisibilityOff();
 
 	// south-east
-	m_pSEContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pSEContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pSEContourTubeFilter =  vtkTubeFilter::New();
-	m_pSEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pSEContourPolyDataMapper = vtkPolyDataMapper::New();
-	m_pSEContourActor = vtkActor::New();
+	m_PSEContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PSEContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PSEContourTubeFilter =  vtkTubeFilter::New();
+	m_PSEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PSEContourPolyDataMapper = vtkPolyDataMapper::New();
+	m_PSEContourActor = vtkActor::New();
 	
-	m_pSEContourX0ZPlaneClipPolyData->SetInput(m_pContourCutter->GetOutput());
-	m_pSEContourX0ZPlaneClipPolyData->SetClipFunction(m_pX0ZSPlane);
-	m_pSEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PSEContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput());
+	m_PSEContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZSPlane);
+	m_PSEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_pSEContourY0ZPlaneClipPolyData->SetInput(m_pSEContourX0ZPlaneClipPolyData->GetOutput());
-	m_pSEContourY0ZPlaneClipPolyData->SetClipFunction(m_pY0ZEPlane);
-	m_pSEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PSEContourY0ZPlaneClipPolyData->SetInput(m_PSEContourX0ZPlaneClipPolyData->GetOutput());
+	m_PSEContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZEPlane);
+	m_PSEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_pSEContourTransformPolyDataFilter->SetInput(m_pSEContourY0ZPlaneClipPolyData->GetOutput());
+	m_PSEContourTransformPolyDataFilter->SetInput(m_PSEContourY0ZPlaneClipPolyData->GetOutput());
 
-	m_pSEContourTubeFilter->SetRadius(m_TubeFilterRadius);
-    m_pSEContourTubeFilter->SetNumberOfSides(12);
-	m_pSEContourTubeFilter->SetInput(m_pSEContourTransformPolyDataFilter->GetOutput());
+	m_PSEContourTubeFilter->SetRadius(m_TubeFilterRadius);
+    m_PSEContourTubeFilter->SetNumberOfSides(12);
+	m_PSEContourTubeFilter->SetInput(m_PSEContourTransformPolyDataFilter->GetOutput());
 
-	m_pSEContourPolyDataMapper->SetInput(m_pSEContourTubeFilter->GetOutput());
-	m_pSEContourActor->SetMapper(m_pSEContourPolyDataMapper);
-	m_pRenderer->AddActor(m_pSEContourActor);
-	m_pSEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-	m_pSEContourActor->VisibilityOff();
+	m_PSEContourPolyDataMapper->SetInput(m_PSEContourTubeFilter->GetOutput());
+	m_PSEContourActor->SetMapper(m_PSEContourPolyDataMapper);
+	m_PRenderer->AddActor(m_PSEContourActor);
+	m_PSEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+	m_PSEContourActor->VisibilityOff();
 
 	// south-west
-	m_pSWContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pSWContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-	m_pSWContourTubeFilter =  vtkTubeFilter::New();
-	m_pSWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-	m_pSWContourPolyDataMapper = vtkPolyDataMapper::New();
-	m_pSWContourActor = vtkActor::New();
+	m_PSWContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PSWContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
+	m_PSWContourTubeFilter =  vtkTubeFilter::New();
+	m_PSWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
+	m_PSWContourPolyDataMapper = vtkPolyDataMapper::New();
+	m_PSWContourActor = vtkActor::New();
 	
-	m_pSWContourX0ZPlaneClipPolyData->SetInput(m_pContourCutter->GetOutput());
-	m_pSWContourX0ZPlaneClipPolyData->SetClipFunction(m_pX0ZSPlane);
-	m_pSWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PSWContourX0ZPlaneClipPolyData->SetInput(m_PContourCutter->GetOutput());
+	m_PSWContourX0ZPlaneClipPolyData->SetClipFunction(m_PX0ZSPlane);
+	m_PSWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_pSWContourY0ZPlaneClipPolyData->SetInput(m_pSWContourX0ZPlaneClipPolyData->GetOutput());
-	m_pSWContourY0ZPlaneClipPolyData->SetClipFunction(m_pY0ZWPlane);
-	m_pSWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
+	m_PSWContourY0ZPlaneClipPolyData->SetInput(m_PSWContourX0ZPlaneClipPolyData->GetOutput());
+	m_PSWContourY0ZPlaneClipPolyData->SetClipFunction(m_PY0ZWPlane);
+	m_PSWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
 	
-	m_pSWContourTransformPolyDataFilter->SetInput(m_pSWContourY0ZPlaneClipPolyData->GetOutput());
+	m_PSWContourTransformPolyDataFilter->SetInput(m_PSWContourY0ZPlaneClipPolyData->GetOutput());
 
-	m_pSWContourTubeFilter->SetRadius(m_TubeFilterRadius);
-    m_pSWContourTubeFilter->SetNumberOfSides(12);
-	m_pSWContourTubeFilter->SetInput(m_pSWContourTransformPolyDataFilter->GetOutput());
+	m_PSWContourTubeFilter->SetRadius(m_TubeFilterRadius);
+    m_PSWContourTubeFilter->SetNumberOfSides(12);
+	m_PSWContourTubeFilter->SetInput(m_PSWContourTransformPolyDataFilter->GetOutput());
 
-	m_pSWContourPolyDataMapper->SetInput(m_pSWContourTubeFilter->GetOutput());
-	m_pSWContourActor->SetMapper(m_pSWContourPolyDataMapper);
-	m_pRenderer->AddActor(m_pSWContourActor);
-	m_pSWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-	m_pSWContourActor->VisibilityOff();
+	m_PSWContourPolyDataMapper->SetInput(m_PSWContourTubeFilter->GetOutput());
+	m_PSWContourActor->SetMapper(m_PSWContourPolyDataMapper);
+	m_PRenderer->AddActor(m_PSWContourActor);
+	m_PSWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+	m_PSWContourActor->VisibilityOff();
 	
 	// display information
-	m_pTextMapperX = vtkTextMapper::New();
-	m_pScaledTextActorX = vtkScaledTextActor::New();
-	m_pScaledTextActorX->SetMapper(m_pTextMapperX);
-	m_pScaledTextActorX->VisibilityOff();
-	m_pScaledTextActorX->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
-	m_pRenderer->AddActor2D(m_pScaledTextActorX);
+	m_PTextMapperX = vtkTextMapper::New();
+	m_PScaledTextActorX = vtkScaledTextActor::New();
+	m_PScaledTextActorX->SetMapper(m_PTextMapperX);
+	m_PScaledTextActorX->VisibilityOff();
+	m_PScaledTextActorX->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
+	m_PRenderer->AddActor2D(m_PScaledTextActorX);
 	
-	m_pTextMapperY = vtkTextMapper::New();
-	m_pScaledTextActorY = vtkScaledTextActor::New();
-	m_pScaledTextActorY->SetMapper(m_pTextMapperY);
-	m_pScaledTextActorY->VisibilityOff();
-	m_pScaledTextActorY->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
-	m_pRenderer->AddActor2D(m_pScaledTextActorY);
+	m_PTextMapperY = vtkTextMapper::New();
+	m_PScaledTextActorY = vtkScaledTextActor::New();
+	m_PScaledTextActorY->SetMapper(m_PTextMapperY);
+	m_PScaledTextActorY->VisibilityOff();
+	m_PScaledTextActorY->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
+	m_PRenderer->AddActor2D(m_PScaledTextActorY);
 }
 
 
@@ -600,28 +600,28 @@ void medOpMMLModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
 
 	// vector l1 - l2
 	for(i = 0; i < 3; i++)
-		m_dunitvector12[i] = l1[i] - l2[i];
+		m_DUnitVector12[i] = l1[i] - l2[i];
 
 	// length of vector l1 - l2
-	m_dlength12 = sqrt(pow(m_dunitvector12[0], 2.0) + pow(m_dunitvector12[1], 2.0) + pow(m_dunitvector12[2], 2.0));
+	m_DLength12 = sqrt(pow(m_DUnitVector12[0], 2.0) + pow(m_DUnitVector12[1], 2.0) + pow(m_DUnitVector12[2], 2.0));
 
 	// unit vector along l1 - l2
 	for(i = 0; i < 3; i++)
-		m_dunitvector12[i] = m_dunitvector12[i] / m_dlength12;
+		m_DUnitVector12[i] = m_DUnitVector12[i] / m_DLength12;
 
 	// vector l2 - l3
 	for(i = 0; i < 3; i++)
-		m_dunitvector23[i] = l2[i] - l3[i];
+		m_DUnitVector23[i] = l2[i] - l3[i];
 
 	// length of vector l2 - l3
-	m_dlength23 = sqrt(pow(m_dunitvector23[0], 2.0) + pow(m_dunitvector23[1], 2.0) + pow(m_dunitvector23[2], 2.0));
+	m_DLength23 = sqrt(pow(m_DUnitVector23[0], 2.0) + pow(m_DUnitVector23[1], 2.0) + pow(m_DUnitVector23[2], 2.0));
 
 	// unit vector along l2 - l3
 	for(i = 0; i < 3; i++)
-		m_dunitvector23[i] = m_dunitvector23[i] / m_dlength23;
+		m_DUnitVector23[i] = m_DUnitVector23[i] / m_DLength23;
 
 	// overall length
-	m_doveralllength = m_dlength12 + m_dlength23;
+	m_DOverallLength = m_DLength12 + m_DLength23;
 }
 
 //----------------------------------------------------------------------------
@@ -751,10 +751,10 @@ bool medOpMMLModelView::MapAtlasToPatient()
 		assert(sqrt(pow(diff4[0], 2.0) + pow(diff4[1], 2.0) + pow(diff4[2], 2.0)) < 0.001);
 
 	// transform muscle
-	m_pMuscleTransform1->SetMatrix(finalm);
+	m_PMuscleTransform1->SetMatrix(finalm);
 
 	// execute
-	m_pMuscleTransform1PolyDataFilter->SetTransform(this->m_pMuscleTransform1);
+	m_PMuscleTransform1PolyDataFilter->SetTransform(this->m_PMuscleTransform1);
 
 	// clean up
 	finalm->Delete();
@@ -845,16 +845,16 @@ bool medOpMMLModelView::MakeActionLineZAxis()
 	scalem->SetElement(2, 2, 1.0);
 
 	// synthetic slices transform
-	m_pslicesm->Identity();
-	m_pslicesm = MultiplyMatrix4x4(rotaym, m_pslicesm); // rotation y
-	m_pslicesm = MultiplyMatrix4x4(rotaxm, m_pslicesm); // rotation x
+	m_PSlicesm->Identity();
+	m_PSlicesm = MultiplyMatrix4x4(rotaym, m_PSlicesm); // rotation y
+	m_PSlicesm = MultiplyMatrix4x4(rotaxm, m_PSlicesm); // rotation x
 
 	// tranformation matrix
-	m_pfinalm->Identity();
-	m_pfinalm = MultiplyMatrix4x4(scalem, m_pfinalm); // 4. scaling
-	m_pfinalm = MultiplyMatrix4x4(rotaym, m_pfinalm); // 3. rotation y
-	m_pfinalm = MultiplyMatrix4x4(rotaxm, m_pfinalm); // 2. rotation x
-	m_pfinalm = MultiplyMatrix4x4(transm, m_pfinalm); // 1. translation
+	m_PFinalm->Identity();
+	m_PFinalm = MultiplyMatrix4x4(scalem, m_PFinalm); // 4. scaling
+	m_PFinalm = MultiplyMatrix4x4(rotaym, m_PFinalm); // 3. rotation y
+	m_PFinalm = MultiplyMatrix4x4(rotaxm, m_PFinalm); // 2. rotation x
+	m_PFinalm = MultiplyMatrix4x4(transm, m_PFinalm); // 1. translation
 	
 	//vtkMatrix4x4 *finalm = vtkMatrix4x4::New();
 	//finalm->Identity();
@@ -865,17 +865,17 @@ bool medOpMMLModelView::MakeActionLineZAxis()
 
 
 	// transform muscle
-	m_pMuscleTransform2->SetMatrix(m_pfinalm);
+	m_PMuscleTransform2->SetMatrix(m_PFinalm);
 
 	// execute
-	m_pMuscleTransform2PolyDataFilter->SetTransform(this->m_pMuscleTransform2);
+	m_PMuscleTransform2PolyDataFilter->SetTransform(this->m_PMuscleTransform2);
 
 	double newp1[3];
 	double newp2[3];
 
 	// transform insertions (tests)
 	vtkTransform *transf = vtkTransform::New();
-	transf->SetMatrix(m_pfinalm);
+	transf->SetMatrix(m_PFinalm);
 	transf->TransformPoint(p1, newp1); // landmark 1
 	transf->TransformPoint(p2, newp2); // landmark 2
 	transf->Delete();
@@ -891,7 +891,7 @@ bool medOpMMLModelView::MakeActionLineZAxis()
 	transm->Delete();
 
 	//
-	m_pMuscleTransform2PolyDataFilter->Update();
+	m_PMuscleTransform2PolyDataFilter->Update();
 
 	return 1;
 }
@@ -909,7 +909,7 @@ void medOpMMLModelView::FindSizeAndResolutionOfSyntheticScans()
 		case 1: // slicing axis is single line
 				// bounds
 				double bounds[6];
-				m_pMuscleTransform2PolyDataFilter->GetOutput()->GetBounds(bounds);
+				m_PMuscleTransform2PolyDataFilter->GetOutput()->GetBounds(bounds);
 
 				// size
 				if (fabs(bounds[0]) > fabs(bounds[1]))
@@ -995,32 +995,32 @@ void medOpMMLModelView::SetUpSyntheticScans()
 		m_ScalingFlagStack->SetTuple(ii, &a);
 
 	// allocate planes
-	m_pSyntheticScansPlaneSource = new vtkPlaneSource* [n] ;
-	assert(!(m_pSyntheticScansPlaneSource == NULL));
+	m_PSyntheticScansPlaneSource = new vtkPlaneSource* [n] ;
+	assert(!(m_PSyntheticScansPlaneSource == NULL));
 
 	// allocate plane transforms
-	m_pSyntheticScansPlaneSourceTransform = new vtkTransform* [n];
-	assert(!(m_pSyntheticScansPlaneSourceTransform == NULL));
+	m_PSyntheticScansPlaneSourceTransform = new vtkTransform* [n];
+	assert(!(m_PSyntheticScansPlaneSourceTransform == NULL));
 
 	//
-	m_pSyntheticScansPlaneSourceTransformPolyDataFilter = new vtkTransformPolyDataFilter* [n];
-	assert(!(m_pSyntheticScansPlaneSourceTransformPolyDataFilter == NULL));
+	m_PSyntheticScansPlaneSourceTransformPolyDataFilter = new vtkTransformPolyDataFilter* [n];
+	assert(!(m_PSyntheticScansPlaneSourceTransformPolyDataFilter == NULL));
 
 	// allocate probes
-	m_pSyntheticScansProbeFilter = new vtkProbeFilter* [n];
-	assert(!(m_pSyntheticScansProbeFilter == NULL));
+	m_PSyntheticScansProbeFilter = new vtkProbeFilter* [n];
+	assert(!(m_PSyntheticScansProbeFilter == NULL));
 
 	// allocate mappers
-	m_pSyntheticScansPolyDataMapper = new vtkPolyDataMapper* [n];
-	assert(!(m_pSyntheticScansPolyDataMapper == NULL));
+	m_PSyntheticScansPolyDataMapper = new vtkPolyDataMapper* [n];
+	assert(!(m_PSyntheticScansPolyDataMapper == NULL));
 
 	// allocate actors
-	m_pSyntheticScansActor = new vtkActor* [n];
-	assert(!(m_pSyntheticScansActor == NULL));
+	m_PSyntheticScansActor = new vtkActor* [n];
+	assert(!(m_PSyntheticScansActor == NULL));
 
 	// allocate actor transforms
-	m_pSyntheticScansActorTransform = new vtkTransform* [n];
-	assert(!(m_pSyntheticScansActorTransform == NULL));
+	m_PSyntheticScansActorTransform = new vtkTransform* [n];
+	assert(!(m_PSyntheticScansActorTransform == NULL));
 
 	// initial scalar value min/max
 	m_SyntheticScansMinScalarValue = 100000;
@@ -1033,62 +1033,62 @@ void medOpMMLModelView::SetUpSyntheticScans()
 	for(int i = 0; i < n; i++)
 	{
 		// allocate objects
-		m_pSyntheticScansPlaneSource[i] = vtkPlaneSource::New();
-		assert(!(m_pSyntheticScansPlaneSource[i] == NULL));
+		m_PSyntheticScansPlaneSource[i] = vtkPlaneSource::New();
+		assert(!(m_PSyntheticScansPlaneSource[i] == NULL));
 
 		//
-		m_pSyntheticScansPlaneSourceTransform[i] = vtkTransform::New();
-		assert(!(m_pSyntheticScansPlaneSourceTransform[i] == NULL));
+		m_PSyntheticScansPlaneSourceTransform[i] = vtkTransform::New();
+		assert(!(m_PSyntheticScansPlaneSourceTransform[i] == NULL));
 
 		//
-		m_pSyntheticScansPlaneSourceTransformPolyDataFilter[i] = vtkTransformPolyDataFilter::New();
-		assert(!(m_pSyntheticScansPlaneSourceTransformPolyDataFilter[i] == NULL));
+		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i] = vtkTransformPolyDataFilter::New();
+		assert(!(m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i] == NULL));
 		
 		//
-		m_pSyntheticScansProbeFilter[i] = vtkProbeFilter::New();
-		assert(!(m_pSyntheticScansProbeFilter[i] == NULL));
+		m_PSyntheticScansProbeFilter[i] = vtkProbeFilter::New();
+		assert(!(m_PSyntheticScansProbeFilter[i] == NULL));
 
 		//
-		m_pSyntheticScansPolyDataMapper[i] = vtkPolyDataMapper::New();
-		assert(!(m_pSyntheticScansPolyDataMapper[i] == NULL));
+		m_PSyntheticScansPolyDataMapper[i] = vtkPolyDataMapper::New();
+		assert(!(m_PSyntheticScansPolyDataMapper[i] == NULL));
 
 		//
-		m_pSyntheticScansActor[i] = vtkActor::New();
-		assert(!(m_pSyntheticScansActor[i] == NULL));
+		m_PSyntheticScansActor[i] = vtkActor::New();
+		assert(!(m_PSyntheticScansActor[i] == NULL));
 
 		//
-		m_pSyntheticScansActorTransform[i] = vtkTransform::New();
-		assert(!(m_pSyntheticScansActorTransform[i] == NULL));
+		m_PSyntheticScansActorTransform[i] = vtkTransform::New();
+		assert(!(m_PSyntheticScansActorTransform[i] == NULL));
 
 		// plane source resolution
-		m_pSyntheticScansPlaneSource[i]->SetResolution(m_nSyntheticScansXResolution, m_nSyntheticScansYResolution);
+		m_PSyntheticScansPlaneSource[i]->SetResolution(m_nSyntheticScansXResolution, m_nSyntheticScansYResolution);
 		
 		// plane source transformation matrix
-		m_pSyntheticScansPlaneSourceTransform[i]->SetMatrix(this->GetPlaneSourceTransformOfSyntheticScans(i));
-		m_pSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetInput(m_pSyntheticScansPlaneSource[i]->GetOutput());
-		m_pSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetTransform(m_pSyntheticScansPlaneSourceTransform[i]);
+		m_PSyntheticScansPlaneSourceTransform[i]->SetMatrix(this->GetPlaneSourceTransformOfSyntheticScans(i));
+		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetInput(m_PSyntheticScansPlaneSource[i]->GetOutput());
+		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->SetTransform(m_PSyntheticScansPlaneSourceTransform[i]);
 		
 		// actor transformation matrix
-		m_pSyntheticScansActorTransform[i]->SetMatrix(this->GetActorTransformOfSyntheticScans(i));
-		m_pSyntheticScansActor[i]->SetUserTransform(m_pSyntheticScansActorTransform[i]);
-		m_pSyntheticScansActor[i]->SetMapper(m_pSyntheticScansPolyDataMapper[i]);
-		m_pSyntheticScansActor[i]->VisibilityOff();
-		m_pRenderer->AddActor(m_pSyntheticScansActor[i]);
+		m_PSyntheticScansActorTransform[i]->SetMatrix(this->GetActorTransformOfSyntheticScans(i));
+		m_PSyntheticScansActor[i]->SetUserTransform(m_PSyntheticScansActorTransform[i]);
+		m_PSyntheticScansActor[i]->SetMapper(m_PSyntheticScansPolyDataMapper[i]);
+		m_PSyntheticScansActor[i]->VisibilityOff();
+		m_PRenderer->AddActor(m_PSyntheticScansActor[i]);
 
 		// probe
-		m_pSyntheticScansProbeFilter[i]->SetInput(m_pSyntheticScansPlaneSourceTransformPolyDataFilter[i]->GetOutput());
-		m_pSyntheticScansProbeFilter[i]->SetSource(scans);
-		m_pSyntheticScansProbeFilter[i]->Update();
+		m_PSyntheticScansProbeFilter[i]->SetInput(m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->GetOutput());
+		m_PSyntheticScansProbeFilter[i]->SetSource(scans);
+		m_PSyntheticScansProbeFilter[i]->Update();
 
 		// asjust min/max scalar values
-		m_pSyntheticScansProbeFilter[i]->GetPolyDataOutput()->GetScalarRange(scalars);
+		m_PSyntheticScansProbeFilter[i]->GetPolyDataOutput()->GetScalarRange(scalars);
 		if (scalars[0] < m_SyntheticScansMinScalarValue)
 			m_SyntheticScansMinScalarValue = scalars[0];
 		if (scalars[1] > m_SyntheticScansMaxScalarValue)
 			m_SyntheticScansMaxScalarValue = scalars[1];
 
 		// probe mapper 
-		m_pSyntheticScansPolyDataMapper[i]->SetInput(m_pSyntheticScansProbeFilter[i]->GetPolyDataOutput());
+		m_PSyntheticScansPolyDataMapper[i]->SetInput(m_PSyntheticScansProbeFilter[i]->GetPolyDataOutput());
 		
 		// i-th scan: handles large datasets
 		// at the expense of slower rendering
@@ -1097,48 +1097,48 @@ void medOpMMLModelView::SetUpSyntheticScans()
 		*/
 
 		// clean up
-		m_pSyntheticScansActorTransform[i]->Delete();
-		m_pSyntheticScansPolyDataMapper[i]->Delete();
-		m_pSyntheticScansProbeFilter[i]->Delete();
-		m_pSyntheticScansPlaneSourceTransformPolyDataFilter[i]->Delete();
-		m_pSyntheticScansPlaneSourceTransform[i]->Delete();
-		m_pSyntheticScansPlaneSource[i]->Delete();
+		m_PSyntheticScansActorTransform[i]->Delete();
+		m_PSyntheticScansPolyDataMapper[i]->Delete();
+		m_PSyntheticScansProbeFilter[i]->Delete();
+		m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->Delete();
+		m_PSyntheticScansPlaneSourceTransform[i]->Delete();
+		m_PSyntheticScansPlaneSource[i]->Delete();
 	}
 
 	// window
-	m_pWindow = (m_SyntheticScansMaxScalarValue - m_SyntheticScansMinScalarValue);
+	m_PWindow = (m_SyntheticScansMaxScalarValue - m_SyntheticScansMinScalarValue);
 
 	// level
-	m_pLevel = 0.5 * (m_SyntheticScansMinScalarValue + m_SyntheticScansMaxScalarValue);
+	m_PLevel = 0.5 * (m_SyntheticScansMinScalarValue + m_SyntheticScansMaxScalarValue);
 
 	// lut
-	m_pSyntheticScansWindowLevelLookupTable->SetTableRange(m_SyntheticScansMinScalarValue, m_SyntheticScansMaxScalarValue);
-	m_pSyntheticScansWindowLevelLookupTable->SetHueRange(0.0, 0.0);
-	m_pSyntheticScansWindowLevelLookupTable->SetSaturationRange(0.0, 0.0);
-	m_pSyntheticScansWindowLevelLookupTable->SetValueRange(0.0, 1.0);
-	m_pSyntheticScansWindowLevelLookupTable->SetNumberOfColors(1024);
-	m_pSyntheticScansWindowLevelLookupTable->SetWindow(m_pWindow);
-	m_pSyntheticScansWindowLevelLookupTable->SetLevel(m_pLevel);
-	m_pSyntheticScansWindowLevelLookupTable->Build();
+	m_PSyntheticScansWindowLevelLookupTable->SetTableRange(m_SyntheticScansMinScalarValue, m_SyntheticScansMaxScalarValue);
+	m_PSyntheticScansWindowLevelLookupTable->SetHueRange(0.0, 0.0);
+	m_PSyntheticScansWindowLevelLookupTable->SetSaturationRange(0.0, 0.0);
+	m_PSyntheticScansWindowLevelLookupTable->SetValueRange(0.0, 1.0);
+	m_PSyntheticScansWindowLevelLookupTable->SetNumberOfColors(1024);
+	m_PSyntheticScansWindowLevelLookupTable->SetWindow(m_PWindow);
+	m_PSyntheticScansWindowLevelLookupTable->SetLevel(m_PLevel);
+	m_PSyntheticScansWindowLevelLookupTable->Build();
 	
 	for(int j = 0; j < n; j++)
 	{
-		m_pSyntheticScansPolyDataMapper[j]->SetLookupTable(m_pSyntheticScansWindowLevelLookupTable);
-		m_pSyntheticScansPolyDataMapper[j]->UseLookupTableScalarRangeOn();
-		m_pSyntheticScansPolyDataMapper[j]->SetColorModeToMapScalars();
+		m_PSyntheticScansPolyDataMapper[j]->SetLookupTable(m_PSyntheticScansWindowLevelLookupTable);
+		m_PSyntheticScansPolyDataMapper[j]->UseLookupTableScalarRangeOn();
+		m_PSyntheticScansPolyDataMapper[j]->SetColorModeToMapScalars();
 	}
 
 	// delete objects
-	delete m_pSyntheticScansActorTransform;
-	delete m_pSyntheticScansProbeFilter;
-	delete m_pSyntheticScansPlaneSourceTransformPolyDataFilter;
-	delete m_pSyntheticScansPlaneSourceTransform;
-	delete m_pSyntheticScansPlaneSource;
-	delete m_pSyntheticScansPolyDataMapper;
+	delete m_PSyntheticScansActorTransform;
+	delete m_PSyntheticScansProbeFilter;
+	delete m_PSyntheticScansPlaneSourceTransformPolyDataFilter;
+	delete m_PSyntheticScansPlaneSourceTransform;
+	delete m_PSyntheticScansPlaneSource;
+	delete m_PSyntheticScansPolyDataMapper;
 
 	// set to scan 0 display
 	m_nSyntheticScansCurrentId = 0; // current id
-	m_pSyntheticScansActor[0]->VisibilityOn(); // actor on
+	m_PSyntheticScansActor[0]->VisibilityOn(); // actor on
 }
 
 //----------------------------------------------------------------------------
@@ -1164,11 +1164,11 @@ void medOpMMLModelView::GetPlaneSourceOriginOfSyntheticScans(int s, double p[])
 				// ending at landmark 1 (high)
 
 				// current length
-				currentlength = m_dlength12 / (n - 1) * s;
+				currentlength = m_DLength12 / (n - 1) * s;
 
 				// origin
 				for(i = 0; i < 3; i++)
-					p[i] = l2[i] + currentlength * m_dunitvector12[i];
+					p[i] = l2[i] + currentlength * m_DUnitVector12[i];
 				break;
 
 		case 2: // slicing axis is double line
@@ -1176,18 +1176,18 @@ void medOpMMLModelView::GetPlaneSourceOriginOfSyntheticScans(int s, double p[])
 				// ending at landmark 1 (high)
 				
 				// current length
-				currentlength = m_doveralllength / (n - 1) * s;
+				currentlength = m_DOverallLength / (n - 1) * s;
 
 				// origin
 				for(i = 0; i < 3; i++)
 				{
-					if (currentlength < m_dlength23)
+					if (currentlength < m_DLength23)
 					{
-						p[i] = l3[i] + currentlength * m_dunitvector23[i];
+						p[i] = l3[i] + currentlength * m_DUnitVector23[i];
 					}
 					else
 					{
-						p[i] = l2[i] + (currentlength - m_dlength23) * m_dunitvector12[i];
+						p[i] = l2[i] + (currentlength - m_DLength23) * m_DUnitVector12[i];
 					}
 				}
 				
@@ -1241,7 +1241,7 @@ vtkMatrix4x4* medOpMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 
 				//
 				inversem_pslicesm->Identity();
-				inversem_pslicesm->Invert(m_pslicesm, inversem_pslicesm);
+				inversem_pslicesm->Invert(m_PSlicesm, inversem_pslicesm);
 
 				//  s-th synthetic scan: plane source transformation matrix
 				finalm->Identity();
@@ -1270,13 +1270,13 @@ vtkMatrix4x4* medOpMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 
 				// s-synthetic scan: plane source normal
 				// current length
-				currentlength = m_doveralllength / (n - 1) * s;
+				currentlength = m_DOverallLength / (n - 1) * s;
 
 				// current normal
 				for(i = 0; i < 3; i++)
 				{
-					normal[i] = (1.0 / m_doveralllength) * (currentlength * m_dunitvector12[i] + 
-														   (m_doveralllength - currentlength)  * m_dunitvector23[i]);
+					normal[i] = (1.0 / m_DOverallLength) * (currentlength * m_DUnitVector12[i] + 
+														   (m_DOverallLength - currentlength)  * m_DUnitVector23[i]);
 				}
 
 				// align transformation
@@ -1362,7 +1362,7 @@ vtkMatrix4x4* medOpMMLModelView::GetActorTransformOfSyntheticScans(int s)
 
 				//
 				inversem_pslicesm->Identity();
-				inversem_pslicesm->Invert(m_pslicesm, inversem_pslicesm);
+				inversem_pslicesm->Invert(m_PSlicesm, inversem_pslicesm);
 				
 				finalm->Identity();
 				finalm = MultiplyMatrix4x4(transm, finalm); // 2. translation
@@ -1388,7 +1388,7 @@ vtkMatrix4x4* medOpMMLModelView::GetActorTransformOfSyntheticScans(int s)
 vtkActor* medOpMMLModelView::GetContourActor()
 //----------------------------------------------------------------------------
 {
-	return m_pContourActor;
+	return m_PContourActor;
 }
 //----------------------------------------------------------------------------
 vtkKochanekSpline* medOpMMLModelView::GetPHSpline()
@@ -1476,79 +1476,79 @@ double medOpMMLModelView::GetCurrentZOfSyntheticScans()
 void medOpMMLModelView::Render()
 //----------------------------------------------------------------------------
 {
-	m_pRenderWindow->Render();
+	m_PRenderWindow->Render();
 }
 //----------------------------------------------------------------------------
 vtkTextMapper* medOpMMLModelView::GetTextMapper2()
 //----------------------------------------------------------------------------
 {
-	return m_pTextMapperX;
+	return m_PTextMapperX;
 }
 //----------------------------------------------------------------------------
 vtkScaledTextActor* medOpMMLModelView::GetScaledTextActor2()
 //----------------------------------------------------------------------------
 {
-	return m_pScaledTextActorX;
+	return m_PScaledTextActorX;
 }
 //----------------------------------------------------------------------------
 vtkScaledTextActor* medOpMMLModelView::GetScaledTextActor1()
 //----------------------------------------------------------------------------
 {
-	return m_pScaledTextActorY;
+	return m_PScaledTextActorY;
 }
 //----------------------------------------------------------------------------
 vtkTextMapper* medOpMMLModelView::GetTextMapper1()
 //----------------------------------------------------------------------------
 {
-	return m_pTextMapperY;
+	return m_PTextMapperY;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetNEContourActor()
 //----------------------------------------------------------------------------
 {
-	return m_pNEContourActor;
+	return m_PNEContourActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetNWContourActor()
 //----------------------------------------------------------------------------
 {
-	return m_pNWContourActor;
+	return m_PNWContourActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetSEContourActor()
 //----------------------------------------------------------------------------
 {
-	return m_pSEContourActor;
+	return m_PSEContourActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetSWContourActor()
 //----------------------------------------------------------------------------
 {
-	return m_pSWContourActor;
+	return m_PSWContourActor;
 }
 //----------------------------------------------------------------------------
 vtkTransformPolyDataFilter* medOpMMLModelView::GetNEContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pNEContourTransformPolyDataFilter;
+	return m_PNEContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
 vtkTransformPolyDataFilter* medOpMMLModelView::GetNWContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pNWContourTransformPolyDataFilter;
+	return m_PNWContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
 vtkTransformPolyDataFilter* medOpMMLModelView::GetSEContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pSEContourTransformPolyDataFilter;
+	return m_PSEContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
 vtkTransformPolyDataFilter* medOpMMLModelView::GetSWContourTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pSWContourTransformPolyDataFilter;
+	return m_PSWContourTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
 /** m = 1, 2 for text actor 1,2 */
@@ -1682,77 +1682,77 @@ void medOpMMLModelView::SetText(int m, double n, int d, int s)
 vtkCamera* medOpMMLModelView::GetActiveCamera()
 //----------------------------------------------------------------------------
 {
-	return m_pRenderer->GetActiveCamera();
+	return m_PRenderer->GetActiveCamera();
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SaveCameraFocalPoint(double *fp)
 //----------------------------------------------------------------------------
 {
-	m_pCameraFocalPoint[0] = *fp;
-	m_pCameraFocalPoint[1] = *(fp+1);
-	m_pCameraFocalPoint[2] = *(fp+2);
+	m_PCameraFocalPoint[0] = *fp;
+	m_PCameraFocalPoint[1] = *(fp+1);
+	m_PCameraFocalPoint[2] = *(fp+2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SaveCameraPosition(double *cp)
 //----------------------------------------------------------------------------
 {
-	m_pCameraPosition[0] = *cp;
-	m_pCameraPosition[1] = *(cp+1);
-	m_pCameraPosition[2] = *(cp+2);
+	m_PCameraPosition[0] = *cp;
+	m_PCameraPosition[1] = *(cp+1);
+	m_PCameraPosition[2] = *(cp+2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SaveCameraClippingRange(double *cr)
 //----------------------------------------------------------------------------
 {
-	m_pCameraClippingRange[0] = *cr;
-	m_pCameraClippingRange[1] = *(cr+1);
+	m_PCameraClippingRange[0] = *cr;
+	m_PCameraClippingRange[1] = *(cr+1);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SaveCameraViewUp(double *vu)
 //----------------------------------------------------------------------------
 {
-	m_pCameraViewUp[0] = *vu;
-	m_pCameraViewUp[1] = *(vu+1);
-	m_pCameraViewUp[2] = *(vu+2);
+	m_PCameraViewUp[0] = *vu;
+	m_PCameraViewUp[1] = *(vu+1);
+	m_PCameraViewUp[2] = *(vu+2);
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::RetrieveCameraFocalPoint(double *fp)
 //----------------------------------------------------------------------------
 {
-	*fp = m_pCameraFocalPoint[0];
-	*(fp+1) = m_pCameraFocalPoint[1];
-	*(fp+2) = m_pCameraFocalPoint[2];
+	*fp = m_PCameraFocalPoint[0];
+	*(fp+1) = m_PCameraFocalPoint[1];
+	*(fp+2) = m_PCameraFocalPoint[2];
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::RetrieveCameraPosition(double *cp)
 //----------------------------------------------------------------------------
 {
-	*cp = m_pCameraPosition[0];
-	*(cp+1) = m_pCameraPosition[1];
-	*(cp+2) = m_pCameraPosition[2];
+	*cp = m_PCameraPosition[0];
+	*(cp+1) = m_PCameraPosition[1];
+	*(cp+2) = m_PCameraPosition[2];
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::RetrieveCameraClippingRange(double *cr)
 //----------------------------------------------------------------------------
 {
-	*cr = m_pCameraClippingRange[0];
-	*(cr+1) = m_pCameraClippingRange[1];
+	*cr = m_PCameraClippingRange[0];
+	*(cr+1) = m_PCameraClippingRange[1];
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::RetrieveCameraViewUp(double *vu)
 //----------------------------------------------------------------------------
 {
-	*vu = m_pCameraViewUp[0];
-	*(vu+1) = m_pCameraViewUp[1];
-	*(vu+2) = m_pCameraViewUp[2];
+	*vu = m_PCameraViewUp[0];
+	*(vu+1) = m_PCameraViewUp[1];
+	*(vu+2) = m_PCameraViewUp[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::AddActor(vtkActor *a)
 //----------------------------------------------------------------------------
 {
-	m_pRenderer->AddActor(a);
+	m_PRenderer->AddActor(a);
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetPositiveXAxisActor()
@@ -1849,7 +1849,7 @@ void medOpMMLModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m)
 vtkLODActor* medOpMMLModelView::GetMuscleLODActor()
 //----------------------------------------------------------------------------
 {
-	return m_pMuscleLODActor;
+	return m_PMuscleLODActor;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetTotalNumberOfSyntheticScans(int n)
@@ -1884,7 +1884,7 @@ void medOpMMLModelView::GetResolutionOfSyntheticScans(int *x, int *y)
 vtkActor* medOpMMLModelView::GetActorOfSyntheticScans(int s)
 //----------------------------------------------------------------------------
 {
-	return m_pSyntheticScansActor[s];
+	return m_PSyntheticScansActor[s];
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetCurrentIdOfSyntheticScans(int n)
@@ -1902,7 +1902,7 @@ int medOpMMLModelView::GetCurrentIdOfSyntheticScans()
 vtkWindowLevelLookupTable* medOpMMLModelView::GetWindowLevelLookupTableOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
-	return m_pSyntheticScansWindowLevelLookupTable;
+	return m_PSyntheticScansWindowLevelLookupTable;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetSizeOfSyntheticScans(float x, float y)
@@ -1969,19 +1969,19 @@ void medOpMMLModelView::GetXYScalingFactorsOfMuscle(double *x, double *y)
 vtkTransformPolyDataFilter* medOpMMLModelView::GetContourCutterTransformPolyDataFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pContourCutterTransformPolyDataFilter;
+	return m_PContourCutterTransformPolyDataFilter;
 }
 //----------------------------------------------------------------------------
 vtkPlane* medOpMMLModelView::GetContourPlane()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPlane;
+	return m_PContourPlane;
 }
 //----------------------------------------------------------------------------
 vtkTransform* medOpMMLModelView::GetContourCutterTransform()
 //----------------------------------------------------------------------------
 {
-	return m_pContourCutterTransform;
+	return m_PContourCutterTransform;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetPositiveXAxisLineSource()
@@ -2035,92 +2035,92 @@ vtkTubeFilter* medOpMMLModelView::GetNegativeYAxisTubeFilter()
 vtkRenderWindowInteractor* medOpMMLModelView::GetRenderWindowInteractor()
 //----------------------------------------------------------------------------
 {
-	return m_pRenderWindowInteractor;
+	return m_PRenderWindowInteractor;
 }
 //----------------------------------------------------------------------------
 vtkInteractorStyleImage* medOpMMLModelView::GetInteractorStyleImage()
 //----------------------------------------------------------------------------
 {
-	return m_pInteractorStyleImage;
+	return m_PInteractorStyleImage;
 }
 //----------------------------------------------------------------------------
 vtkInteractorStyleTrackballCamera* medOpMMLModelView::GetInteractorStyleTrackballCamera()
 //----------------------------------------------------------------------------
 {
-	return m_pInteractorStyleTrackballCamera;
+	return m_PInteractorStyleTrackballCamera;
 }
 
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetContourPositiveXAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPosXAxisLineSource;
+	return m_PContourPosXAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetContourPositiveYAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPosYAxisLineSource;
+	return m_PContourPosYAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetContourNegativeXAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pContourNegXAxisLineSource;
+	return m_PContourNegXAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkLineSource* medOpMMLModelView::GetContourNegativeYAxisLineSource()
 //----------------------------------------------------------------------------
 {
-	return m_pContourNegYAxisLineSource;
+	return m_PContourNegYAxisLineSource;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetContourPositiveXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPosXAxisAxesTubeFilter;
+	return m_PContourPosXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetContourPositiveYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPosYAxisAxesTubeFilter;
+	return m_PContourPosYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetContourNegativeXAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pContourNegXAxisAxesTubeFilter;
+	return m_PContourNegXAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetContourNegativeYAxisTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pContourNegYAxisAxesTubeFilter;
+	return m_PContourNegYAxisAxesTubeFilter;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetContourPositiveXAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPosXAxisActor;
+	return m_PContourPosXAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetContourPositiveYAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pContourPosYAxisActor;
+	return m_PContourPosYAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetContourNegativeXAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pContourNegXAxisActor;
+	return m_PContourNegXAxisActor;
 }
 //----------------------------------------------------------------------------
 vtkActor* medOpMMLModelView::GetContourNegativeYAxisActor()
 //----------------------------------------------------------------------------
 {
-	return m_pContourNegYAxisActor;
+	return m_PContourNegYAxisActor;
 }
 //----------------------------------------------------------------------------
 float medOpMMLModelView::GetLowScalar()
@@ -2151,25 +2151,25 @@ int medOpMMLModelView::GetTypeOfMuscles()
 vtkPlane* medOpMMLModelView::GetCuttingPlaneNorth()
 //----------------------------------------------------------------------------
 {
-	return m_pX0ZNPlane;
+	return m_PX0ZNPlane;
 }
 //----------------------------------------------------------------------------
 vtkPlane* medOpMMLModelView::GetCuttingPlaneSouth()
 //----------------------------------------------------------------------------
 {
-	return m_pX0ZSPlane;
+	return m_PX0ZSPlane;
 }
 //----------------------------------------------------------------------------
 vtkPlane* medOpMMLModelView::GetCuttingPlaneEast()
 //----------------------------------------------------------------------------
 {
-	return m_pY0ZEPlane;
+	return m_PY0ZEPlane;
 }
 //----------------------------------------------------------------------------
 vtkPlane* medOpMMLModelView::GetCuttingPlaneWest()
 //----------------------------------------------------------------------------
 {
-	return m_pY0ZWPlane;
+	return m_PY0ZWPlane;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetContourAxesLengthScale(float l)
@@ -2865,32 +2865,32 @@ bool medOpMMLModelView::SetUpContourCoordinateAxes()
 //----------------------------------------------------------------------------
 {
 	// east
-	m_pContourPosXAxisAxesTubeFilter->SetRadius(0.5);
-    m_pContourPosXAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pContourPosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pContourPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-	m_pContourPosXAxisActor->VisibilityOn();
+	m_PContourPosXAxisAxesTubeFilter->SetRadius(0.5);
+    m_PContourPosXAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PContourPosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PContourPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
+	m_PContourPosXAxisActor->VisibilityOn();
 
 	// north
-	m_pContourPosYAxisAxesTubeFilter->SetRadius(0.5);
-    m_pContourPosYAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pContourPosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pContourPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-	m_pContourPosYAxisActor->VisibilityOn();
+	m_PContourPosYAxisAxesTubeFilter->SetRadius(0.5);
+    m_PContourPosYAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PContourPosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PContourPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
+	m_PContourPosYAxisActor->VisibilityOn();
 
 	// west
-	m_pContourNegXAxisAxesTubeFilter->SetRadius(0.5);
-    m_pContourNegXAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pContourNegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pContourNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
-	m_pContourNegXAxisActor->VisibilityOn();
+	m_PContourNegXAxisAxesTubeFilter->SetRadius(0.5);
+    m_PContourNegXAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PContourNegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PContourNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
+	m_PContourNegXAxisActor->VisibilityOn();
 
 	// south
-	m_pContourNegYAxisAxesTubeFilter->SetRadius(0.5);
-    m_pContourNegYAxisAxesTubeFilter->SetNumberOfSides(6);
-	m_pContourNegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_pContourNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-	m_pContourNegYAxisActor->VisibilityOn();
+	m_PContourNegYAxisAxesTubeFilter->SetRadius(0.5);
+    m_PContourNegYAxisAxesTubeFilter->SetNumberOfSides(6);
+	m_PContourNegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
+	m_PContourNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
+	m_PContourNegYAxisActor->VisibilityOn();
 	
 	return 1;
 }
@@ -2942,7 +2942,7 @@ void medOpMMLModelView::Switch3dDisplayOn()
  	m_3dDisplay = 1;
  
  	// interactor style for 3d display
- 	m_pRenderWindowInteractor->SetInteractorStyle(GetInteractorStyleTrackballCamera());
+ 	m_PRenderWindowInteractor->SetInteractorStyle(GetInteractorStyleTrackballCamera());
  
  	// identity transform
  	vtkTransform *t = vtkTransform::New();
@@ -2955,26 +2955,26 @@ void medOpMMLModelView::Switch3dDisplayOn()
  	int n = GetTotalNumberOfSyntheticScans();
  	for(int i = 0; i < n; i++)
  	{
- 		m_pSyntheticScansActor[i]->SetUserTransform(t);
+ 		m_PSyntheticScansActor[i]->SetUserTransform(t);
  	}
  
  	// muscle mapped to patient space only, using transform 1
 	// thus, transform 2 must simply be an identity transform
- 	m_pMuscleTransform2PolyDataFilter->SetTransform(t);
+ 	m_PMuscleTransform2PolyDataFilter->SetTransform(t);
  
  	// set up muscle and switch on
- 	m_pMuscleLODActor->VisibilityOn();
- 	m_pMuscleLODActor->GetProperty()->SetColor(1.0, 0.0, 0.0);
- 	m_pMuscleLODActor->GetProperty()->SetOpacity(0.5);
+ 	m_PMuscleLODActor->VisibilityOn();
+ 	m_PMuscleLODActor->GetProperty()->SetColor(1.0, 0.0, 0.0);
+ 	m_PMuscleLODActor->GetProperty()->SetOpacity(0.5);
  
  	// standard contour switch on
- 	m_pContourActor->VisibilityOn();
+ 	m_PContourActor->VisibilityOn();
  
  	// sub-contours switch off
- 	m_pNEContourActor->VisibilityOff();
- 	m_pNWContourActor->VisibilityOff();
- 	m_pSEContourActor->VisibilityOff();
- 	m_pSWContourActor->VisibilityOff();
+ 	m_PNEContourActor->VisibilityOff();
+ 	m_PNWContourActor->VisibilityOff();
+ 	m_PSEContourActor->VisibilityOff();
+ 	m_PSWContourActor->VisibilityOff();
  
 	// axes
 	// east/north/west/south re-set up and switch on
@@ -3013,55 +3013,55 @@ void medOpMMLModelView::Switch3dDisplayOn()
  	double p4[3]; this->GetLandmark4OfPatient(p4);
  	
  	// 1st landmark set up and switch on
-	m_pLandmark1SphereSource->SetRadius(2.0);
-	m_pLandmark1SphereSource->SetThetaResolution(10);
-	m_pLandmark1SphereSource->SetPhiResolution(10);
- 	m_pLandmark1SphereSource->SetCenter(p1[0], p1[1], p1[2]);
- 	m_pLandmark1Actor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-	m_pLandmark1Actor->VisibilityOn();
+	m_PLandmark1SphereSource->SetRadius(2.0);
+	m_PLandmark1SphereSource->SetThetaResolution(10);
+	m_PLandmark1SphereSource->SetPhiResolution(10);
+ 	m_PLandmark1SphereSource->SetCenter(p1[0], p1[1], p1[2]);
+ 	m_PLandmark1Actor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
+	m_PLandmark1Actor->VisibilityOn();
  
 	// 2nd landmark set up and switch on
-	m_pLandmark2SphereSource->SetRadius(2.0);
-	m_pLandmark2SphereSource->SetThetaResolution(10);
-	m_pLandmark2SphereSource->SetPhiResolution(10);
- 	m_pLandmark2SphereSource->SetCenter(p2[0], p2[1], p2[2]);
- 	m_pLandmark2Actor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-	m_pLandmark2Actor->VisibilityOn();
+	m_PLandmark2SphereSource->SetRadius(2.0);
+	m_PLandmark2SphereSource->SetThetaResolution(10);
+	m_PLandmark2SphereSource->SetPhiResolution(10);
+ 	m_PLandmark2SphereSource->SetCenter(p2[0], p2[1], p2[2]);
+ 	m_PLandmark2Actor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
+	m_PLandmark2Actor->VisibilityOn();
  
 	// 3rd landmark set up and switch on
-	m_pLandmark3SphereSource->SetRadius(2.0);
-	m_pLandmark3SphereSource->SetThetaResolution(10);
-	m_pLandmark3SphereSource->SetPhiResolution(10);
- 	m_pLandmark3SphereSource->SetCenter(p3[0], p3[1], p3[2]);
- 	m_pLandmark3Actor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-	m_pLandmark3Actor->VisibilityOn();
+	m_PLandmark3SphereSource->SetRadius(2.0);
+	m_PLandmark3SphereSource->SetThetaResolution(10);
+	m_PLandmark3SphereSource->SetPhiResolution(10);
+ 	m_PLandmark3SphereSource->SetCenter(p3[0], p3[1], p3[2]);
+ 	m_PLandmark3Actor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
+	m_PLandmark3Actor->VisibilityOn();
  	
 	// 4th landmark set up and switch on
  	if (m_4Landmarks == 1)
  	{
-		m_pLandmark4SphereSource->SetRadius(2.0);
-		m_pLandmark4SphereSource->SetThetaResolution(10);
-		m_pLandmark4SphereSource->SetPhiResolution(10);
- 		m_pLandmark4SphereSource->SetCenter(p4[0], p4[1], p4[2]);
- 		m_pLandmark4Actor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
-		m_pLandmark4Actor->VisibilityOn();	
+		m_PLandmark4SphereSource->SetRadius(2.0);
+		m_PLandmark4SphereSource->SetThetaResolution(10);
+		m_PLandmark4SphereSource->SetPhiResolution(10);
+ 		m_PLandmark4SphereSource->SetCenter(p4[0], p4[1], p4[2]);
+ 		m_PLandmark4Actor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
+		m_PLandmark4Actor->VisibilityOn();	
  	}
  
  	// line of action (L1 to L2) set up and switch on
- 	m_pL1L2TubeFilter->SetRadius(1.0);
-    m_pL1L2TubeFilter->SetNumberOfSides(6);
-	m_pL1L2LineSource->SetPoint1(p1[0], p1[1], p1[2]);
- 	m_pL1L2LineSource->SetPoint2(p2[0], p2[1], p2[2]);
-	m_pL1L2Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
- 	m_pL1L2Actor->VisibilityOn();
+ 	m_PL1L2TubeFilter->SetRadius(1.0);
+    m_PL1L2TubeFilter->SetNumberOfSides(6);
+	m_PL1L2LineSource->SetPoint1(p1[0], p1[1], p1[2]);
+ 	m_PL1L2LineSource->SetPoint2(p2[0], p2[1], p2[2]);
+	m_PL1L2Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+ 	m_PL1L2Actor->VisibilityOn();
 
 	// L2 to L3 line set up and switch on
- 	m_pL2L3TubeFilter->SetRadius(1.0);
-    m_pL2L3TubeFilter->SetNumberOfSides(6);
-	m_pL2L3LineSource->SetPoint1(p2[0], p2[1], p2[2]);
- 	m_pL2L3LineSource->SetPoint2(p3[0], p3[1], p3[2]);
-	m_pL2L3Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
- 	m_pL2L3Actor->VisibilityOn();
+ 	m_PL2L3TubeFilter->SetRadius(1.0);
+    m_PL2L3TubeFilter->SetNumberOfSides(6);
+	m_PL2L3LineSource->SetPoint1(p2[0], p2[1], p2[2]);
+ 	m_PL2L3LineSource->SetPoint2(p3[0], p3[1], p3[2]);
+	m_PL2L3Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+ 	m_PL2L3Actor->VisibilityOn();
 }
 
 //SIL. 24-12-2004: begin
@@ -3104,36 +3104,36 @@ int medOpMMLModelView::GetScalingOccured()
 vtkTransformPolyDataFilter* medOpMMLModelView::GetMuscleTransform2PolyDataFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pMuscleTransform2PolyDataFilter;
+	return m_PMuscleTransform2PolyDataFilter;
 }
 
 //----------------------------------------------------------------------------
 vtkMatrix4x4* medOpMMLModelView::GetFinalM()
 //----------------------------------------------------------------------------
 {
-	return m_pfinalm;
+	return m_PFinalm;
 }
 
 //----------------------------------------------------------------------------
 vtkTubeFilter* medOpMMLModelView::GetContourTubeFilter()
 //----------------------------------------------------------------------------
 {
-	return m_pContourTubeFilter;
+	return m_PContourTubeFilter;
 }
 
 //----------------------------------------------------------------------------
 float medOpMMLModelView::GetSyntheticScansWindow()
 //----------------------------------------------------------------------------
 {
-	//assert(m_pWindow > 0);
-	return m_pWindow;
+	//assert(m_PWindow > 0);
+	return m_PWindow;
 }
 
 //----------------------------------------------------------------------------
 float medOpMMLModelView::GetSyntheticScansLevel()
 //----------------------------------------------------------------------------
 {
-	return m_pLevel;
+	return m_PLevel;
 }
 
 //----------------------------------------------------------------------------

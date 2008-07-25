@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 12:11:42 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-07-25 11:30:49 $
+Version:   $Revision: 1.13 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -19,8 +19,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <vtkPolyData.h>
 
 #include "mafEvent.h"
-#include "mmgGui.h"
-#include "mmgCheckListBox.h"
+#include "mafGUI.h"
+#include "mafGUICheckListBox.h"
 #include "mafVME.h"
 #include "mafTagItem.h"
 
@@ -29,10 +29,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafVME;
 class mafOp;
-class mmgDialog;
+class mafGUIDialog;
 class mafRWI;
 class vtkCamera;
-class mmgLutSlider;
+class mafGUILutSlider;
 class vtkLookupTable;
 class mafVMEVolumeGray;
 class mafVMESurface;
@@ -41,7 +41,7 @@ class medOpMMLModelView;
 class medOpMMLContourWidget;
 class vtkDataSet;
 class vtkPolyData;
-class mmgButton;
+class mafGUIButton;
 
 
 //----------------------------------------------------------------------------
@@ -85,8 +85,8 @@ protected:
   bool	  SetUpModelView();
   void	  SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
 
-  mmgDialog	*m_ChooseDlg;		// inputs dialog
-  mmgDialog	*m_OpDlg;			  // operation dialog
+  mafGUIDialog	*m_ChooseDlg;		// inputs dialog
+  mafGUIDialog	*m_OpDlg;			  // operation dialog
 
   // parameter views
   medOpMMLParameterView *m_PH; // PH parameter view
@@ -137,7 +137,7 @@ protected:
   void	OnLandmark4AtlasPatientSelection();
 
   int             m_Slice;
-  mmgLutSlider   *m_Lut;
+  mafGUILutSlider   *m_Lut;
   wxRadioBox     *m_Radio;
 
   int             m_State;
@@ -201,18 +201,18 @@ protected:
   double m_ScansResolution[2];
   int m_ScansGrain;
 
-  mmgButton *m_ChooseOk;
-  mmgButton *m_AxesOnOffButton;
-  mmgButton *m_ContourOnOffButton;
+  mafGUIButton *m_ChooseOk;
+  mafGUIButton *m_AxesOnOffButton;
+  mafGUIButton *m_ContourOnOffButton;
 
-  mmgButton *m_PlaceOpButton;
-  mmgButton *m_TranslateOpButton;
-  mmgButton *m_RotateOpButton;
-  mmgButton *m_ScaleOpButton;
-  mmgButton *m_ResetViewButton;
-  mmgButton *m_UndoButton;
-  mmgButton *m_OkButton;
-  mmgButton *m_CancelButton;
+  mafGUIButton *m_PlaceOpButton;
+  mafGUIButton *m_TranslateOpButton;
+  mafGUIButton *m_RotateOpButton;
+  mafGUIButton *m_ScaleOpButton;
+  mafGUIButton *m_ResetViewButton;
+  mafGUIButton *m_UndoButton;
+  mafGUIButton *m_OkButton;
+  mafGUIButton *m_CancelButton;
 
   wxColour m_ButtonBackgroundColour;
 

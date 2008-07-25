@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-24 08:00:09 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2008-07-25 11:30:49 $
+Version:   $Revision: 1.14 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,16 +32,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafOp.h"
 #include "medOpMML.h"
-#include "mmgDialog.h"
-#include "mmgButton.h"
+#include "mafGUIDialog.h"
+#include "mafGUIButton.h"
 #include "mafRWI.h"
 #include "mafRWIBase.h"
-#include "mmgValidator.h"
-#include "mmgLutSlider.h"
+#include "mafGUIValidator.h"
+#include "mafGUILutSlider.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
 #include "mafVMEGroup.h"
-#include "mmgCheckListBox.h"
+#include "mafGUICheckListBox.h"
 #include "medOpMMLParameterView.h"
 #include "medOpMMLModelView.h"
 #include "medOpMMLContourWidget.h"
@@ -662,7 +662,7 @@ void medOpMML::OnMuscleSelection()
 
     // can not change slice number
     m_ScansNumber2 = m_ScansNumber;
-    m_ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber2,3,100)); // min/max values
+    m_ScansNumberTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber2,3,100)); // min/max values
 
     // tag 3: xy scaling factors
     if(vme->GetTagArray()->IsTagPresent("XY_SCALING_FACTORS_TAG") == false)
@@ -676,7 +676,7 @@ void medOpMML::OnMuscleSelection()
 
     // can not change xy scaling factor
     m_RegistrationXYScalingFactor2 = m_RegistrationXYScalingFactor;
-    m_RegistrationXYSxalingFactorTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,m_RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor2,0.01,2.0)); // min/max values
+    m_RegistrationXYSxalingFactorTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor2,0.01,2.0)); // min/max values
 
     // tag 4: operation stack
     //
@@ -1906,7 +1906,7 @@ bool medOpMML::CreateInputsDlg()
 //----------------------------------------------------------------------------
 {
   // create the dialog
-  m_ChooseDlg = new mmgDialog("SetUp"); 
+  m_ChooseDlg = new mafGUIDialog("SetUp"); 
 
   // vertical stacker for the rows of widgets
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
@@ -1915,8 +1915,8 @@ bool medOpMML::CreateInputsDlg()
   // muscle
   wxStaticText *lab_1  = new wxStaticText(m_ChooseDlg, -1, "Surface", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
-  text_1->SetValidator(mmgValidator(this, ID_CHOOSE_SURFACE, text_1, &m_SurfaceName));
-  mmgButton    *b_1    = new mmgButton(m_ChooseDlg , ID_CHOOSE_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
+  text_1->SetValidator(mafGUIValidator(this, ID_CHOOSE_SURFACE, text_1, &m_SurfaceName));
+  mafGUIButton    *b_1    = new mafGUIButton(m_ChooseDlg , ID_CHOOSE_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
   b_1->SetListener(this);
 
   wxBoxSizer *hs_1 = new wxBoxSizer(wxHORIZONTAL);
@@ -1931,8 +1931,8 @@ bool medOpMML::CreateInputsDlg()
   // landmarks
   wxStaticText *lab_5  = new wxStaticText(m_choose_dlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_5 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_5->SetValidator(mmgValidator(this,ID_CHOOSE_L1,text_5,&m_l1_name));
-  mmgButton *b_5       = new mmgButton(m_choose_dlg ,ID_CHOOSE_L1,"select",wxPoint(0,0), wxSize(50,20));
+  text_5->SetValidator(mafGUIValidator(this,ID_CHOOSE_L1,text_5,&m_l1_name));
+  mafGUIButton *b_5       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L1,"select",wxPoint(0,0), wxSize(50,20));
   b_5->SetListener(this);
   wxBoxSizer *hs_5 = new wxBoxSizer(wxHORIZONTAL);
   hs_5->Add(lab_5,0);
@@ -1942,8 +1942,8 @@ bool medOpMML::CreateInputsDlg()
 
   wxStaticText *lab_6  = new wxStaticText(m_choose_dlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_6 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_6->SetValidator(mmgValidator(this,ID_CHOOSE_L2,text_6,&m_l2_name));
-  mmgButton *b_6       = new mmgButton(m_choose_dlg ,ID_CHOOSE_L2,"select",wxPoint(0,0), wxSize(50,20));
+  text_6->SetValidator(mafGUIValidator(this,ID_CHOOSE_L2,text_6,&m_l2_name));
+  mafGUIButton *b_6       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L2,"select",wxPoint(0,0), wxSize(50,20));
   b_6->SetListener(this);
   wxBoxSizer *hs_6 = new wxBoxSizer(wxHORIZONTAL);
   hs_6->Add(lab_6,0);
@@ -1953,8 +1953,8 @@ bool medOpMML::CreateInputsDlg()
 
   wxStaticText *lab_7  = new wxStaticText(m_choose_dlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_7 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_7->SetValidator(mmgValidator(this,ID_CHOOSE_L3,text_7,&m_l3_name));
-  mmgButton *b_7       = new mmgButton(m_choose_dlg ,ID_CHOOSE_L3,"select",wxPoint(0,0), wxSize(50,20));
+  text_7->SetValidator(mafGUIValidator(this,ID_CHOOSE_L3,text_7,&m_l3_name));
+  mafGUIButton *b_7       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L3,"select",wxPoint(0,0), wxSize(50,20));
   b_7->SetListener(this);
   wxBoxSizer *hs_7 = new wxBoxSizer(wxHORIZONTAL);
   hs_7->Add(lab_7,0);
@@ -1965,8 +1965,8 @@ bool medOpMML::CreateInputsDlg()
   #ifdef TestingVersion
   wxStaticText *lab_8  = new wxStaticText(m_choose_dlg, -1, "Landmark 4", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_8 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_8->SetValidator(mmgValidator(this,ID_CHOOSE_L4,text_8,&m_l4_name));
-  mmgButton *b_8       = new mmgButton(m_choose_dlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
+  text_8->SetValidator(mafGUIValidator(this,ID_CHOOSE_L4,text_8,&m_l4_name));
+  mafGUIButton *b_8       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
   b_8->SetListener(this);
   wxBoxSizer *hs_8 = new wxBoxSizer(wxHORIZONTAL);
   hs_8->Add(lab_8,0);
@@ -1978,7 +1978,7 @@ bool medOpMML::CreateInputsDlg()
   // registration xy scaling factor
   wxStaticText *RegistrationXYSxalingFactorLab  = new wxStaticText(m_choose_dlg, -1, "XY scale (0.01 - 2.0)", wxPoint(0,0), wxSize(150,20));
   RegistrationXYSxalingFactorTxt = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  RegistrationXYSxalingFactorTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor,0.01,2.0)); // min/max values
+  RegistrationXYSxalingFactorTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor,0.01,2.0)); // min/max values
   wxBoxSizer *RegistrationXYSxalingFactorSizer = new wxBoxSizer(wxHORIZONTAL);
   RegistrationXYSxalingFactorSizer->Add(RegistrationXYSxalingFactorLab,0);
   RegistrationXYSxalingFactorSizer->Add(RegistrationXYSxalingFactorTxt,1,wxEXPAND);
@@ -1988,7 +1988,7 @@ bool medOpMML::CreateInputsDlg()
   // scans distance
   wxStaticText *ScansDistanceLab  = new wxStaticText(m_choose_dlg, -1, "Slice distance (0.1 - 100.0)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *ScansDistanceTxt = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  ScansDistanceTxt->SetValidator(mmgValidator(this,ID_FAKE,ScansDistanceTxt,&m_ScansDistance,0.1,100)); // min/max values
+  ScansDistanceTxt->SetValidator(mafGUIValidator(this,ID_FAKE,ScansDistanceTxt,&m_ScansDistance,0.1,100)); // min/max values
   wxBoxSizer *ScansDistanceHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansDistanceHorizontalSizer->Add(ScansDistanceLab,0);
   ScansDistanceHorizontalSizer->Add(ScansDistanceTxt,1,wxEXPAND);
@@ -2000,7 +2000,7 @@ bool medOpMML::CreateInputsDlg()
   // scans number
   wxStaticText *ScansNumberLab  = new wxStaticText(m_ChooseDlg, -1, "Slice number (3 - 100)", wxPoint(0,0), wxSize(150,20));
   m_ScansNumberTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  m_ScansNumberTxt->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber,3,100)); // min/max values
+  m_ScansNumberTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber,3,100)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
   ScansNumberHorizontalSizer->Add(m_ScansNumberTxt,1,wxEXPAND);
@@ -2011,9 +2011,9 @@ bool medOpMML::CreateInputsDlg()
   // scans x y size (now done automatically)
   wxStaticText *ScansSizeLab  = new wxStaticText(m_choose_dlg, -1, "Slice size (1 - 128)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *ScansSizeTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansSizeTxt1->SetValidator(mmgValidator(this,ID_FAKE,ScansSizeTxt1,&m_ScansSize[0],1,128)); //min/max values
+  ScansSizeTxt1->SetValidator(mafGUIValidator(this,ID_FAKE,ScansSizeTxt1,&m_ScansSize[0],1,128)); //min/max values
   wxTextCtrl   *ScansSizeTxt2 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansSizeTxt2->SetValidator(mmgValidator(this,ID_FAKE,ScansSizeTxt2,&m_ScansSize[1],1,128)); // min/max values
+  ScansSizeTxt2->SetValidator(mafGUIValidator(this,ID_FAKE,ScansSizeTxt2,&m_ScansSize[1],1,128)); // min/max values
   wxBoxSizer *ScansSizeHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansSizeHorizontalSizer->Add(ScansSizeLab,0);
   ScansSizeHorizontalSizer->Add(ScansSizeTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2025,7 +2025,7 @@ bool medOpMML::CreateInputsDlg()
   // scans grain
   wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, -1, "Slice grain (1 - 5)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *ScansGrainTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansGrainTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,ScansGrainTxt1,&m_ScansGrain,1,5));
+  ScansGrainTxt1->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,ScansGrainTxt1,&m_ScansGrain,1,5));
   wxBoxSizer *ScansGrainHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansGrainHorizontalSizer->Add(ScansGrainLab,0);
   ScansGrainHorizontalSizer->Add(ScansGrainTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2036,7 +2036,7 @@ bool medOpMML::CreateInputsDlg()
   // 3d flag
   wxStaticText *flagLab  = new wxStaticText(m_ChooseDlg, -1, "3D (0/1)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *flagTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  flagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_3DFlag,0,1));
+  flagTxt1->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,flagTxt1,&m_3DFlag,0,1));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   flagHorizontalSizer->Add(flagLab, 0);
   flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2046,7 +2046,7 @@ bool medOpMML::CreateInputsDlg()
   // 4 landmarks flag
   wxStaticText *LandmarksflagLab  = new wxStaticText(m_choose_dlg, -1, "4 Landmarks (0/1)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *LandmarksflagTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  LandmarksflagTxt1->SetValidator(mmgValidator(this,ID_CHOOSE_FAKE,LandmarksflagTxt1,&m_Landmarksflag,0,1));
+  LandmarksflagTxt1->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,LandmarksflagTxt1,&m_Landmarksflag,0,1));
   wxBoxSizer *LandmarksflagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   LandmarksflagHorizontalSizer->Add(LandmarksflagLab, 0);
   LandmarksflagHorizontalSizer->Add(LandmarksflagTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2058,9 +2058,9 @@ bool medOpMML::CreateInputsDlg()
   // scans x y resolution  (set automatically from scans x, y size)
   wxStaticText *ScansResolutionLab  = new wxStaticText(m_choose_dlg, -1, "Slice resolution (8 - 256)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *ScansResolutionTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansResolutionTxt1->SetValidator(mmgValidator(this,ID_FAKE,ScansResolutionTxt1,&m_ScansResolution[0],8,256));
+  ScansResolutionTxt1->SetValidator(mafGUIValidator(this,ID_FAKE,ScansResolutionTxt1,&m_ScansResolution[0],8,256));
   wxTextCtrl   *ScansResolutionTxt2 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansResolutionTxt2->SetValidator(mmgValidator(this,ID_FAKE,ScansResolutionTxt2,&m_ScansResolution[1],8,256));
+  ScansResolutionTxt2->SetValidator(mafGUIValidator(this,ID_FAKE,ScansResolutionTxt2,&m_ScansResolution[1],8,256));
   wxBoxSizer *ScansResolutionHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansResolutionHorizontalSizer->Add(ScansResolutionLab,0);
   ScansResolutionHorizontalSizer->Add(ScansResolutionTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -2069,10 +2069,10 @@ bool medOpMML::CreateInputsDlg()
   */
 
   // ok/cancel button
-  m_ChooseOk = new mmgButton(m_ChooseDlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
+  m_ChooseOk = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
   m_ChooseOk->SetListener(this);
   m_ChooseOk->Enable(false);
-  mmgButton *b_cancel = new mmgButton(m_ChooseDlg, ID_CHOOSE_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
+  mafGUIButton *b_cancel = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
   wxBoxSizer *hs_b = new wxBoxSizer(wxHORIZONTAL);
   b_cancel->SetListener(this);
   hs_b->Add(m_ChooseOk,0);
@@ -2122,7 +2122,7 @@ void medOpMML::CreateRegistrationDlg()
   // create dialog
   wxString Title;
   Title = "registration of " + m_SurfaceName;
-  m_OpDlg = new mmgDialog(Title); 
+  m_OpDlg = new mafGUIDialog(Title); 
 
 
   // left/right vertical box sizers
@@ -2140,27 +2140,27 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(TopHorizontalBoxSizer);
 
   // axes on/off button
-  m_AxesOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
+  m_AxesOnOffButton = new mafGUIButton(m_OpDlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
   m_AxesOnOffButton->SetListener(this);
   TopHorizontalBoxSizer->Add(m_AxesOnOffButton,0,wxALL, 5);
 
   // contour on/off buton
-  m_ContourOnOffButton = new mmgButton(m_OpDlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
+  m_ContourOnOffButton = new mafGUIButton(m_OpDlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
   m_ContourOnOffButton->SetListener(this);
   TopHorizontalBoxSizer->Add(m_ContourOnOffButton,0,wxALL, 5);
 
   // reset view button
-  m_ResetViewButton = new mmgButton(m_OpDlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
+  m_ResetViewButton = new mafGUIButton(m_OpDlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
   m_ResetViewButton->SetListener(this);
   TopHorizontalBoxSizer->Add(m_ResetViewButton,0,wxALL, 5);
 
   // ok button
-  m_OkButton = new mmgButton(m_OpDlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
+  m_OkButton = new mafGUIButton(m_OpDlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
   m_OkButton->SetListener(this);
   TopHorizontalBoxSizer->Add(m_OkButton,0,wxALL, 5);
 
   // cancel button
-  m_CancelButton = new mmgButton(m_OpDlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
+  m_CancelButton = new mafGUIButton(m_OpDlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
   m_CancelButton->SetListener(this);
   TopHorizontalBoxSizer->Add(m_CancelButton,0, wxALL, 5);
 
@@ -2170,10 +2170,10 @@ void medOpMML::CreateRegistrationDlg()
   // maf check boxes
   //wxBoxSizer *CheckBoxHorizontalBoxSizer = new wxBoxSizer(wxHORIZONTAL);
   //wxCheckBox *c0 = new wxCheckBox(m_op_dlg,ID_SHOW_AXES,"show axes");
-  //c0->SetValidator( mmgValidator(this,ID_SHOW_AXES,c0,&m_show_axes) );
+  //c0->SetValidator( mafGUIValidator(this,ID_SHOW_AXES,c0,&m_show_axes) );
   //CheckBoxHorizontalBoxSizer->Add(c0,0,wxALL, 5);
   //wxCheckBox *c1 = new wxCheckBox(m_op_dlg,ID_SHOW_CONTOUR,"show contour");
-  //c1->SetValidator( mmgValidator(this,ID_SHOW_CONTOUR,c1,&m_ContourVisibility));
+  //c1->SetValidator( mafGUIValidator(this,ID_SHOW_CONTOUR,c1,&m_ContourVisibility));
   //CheckBoxHorizontalBoxSizer->Add(c1,0,wxALL, 5);
   //LeftVerticalBoxSizer->Add(CheckBoxHorizontalBoxSizer);
 
@@ -2183,24 +2183,24 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(OperationHorizontalBoxSizer);
 
   // create p/t/r/s operation buttons
-  m_PlaceOpButton = new mmgButton(m_OpDlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
+  m_PlaceOpButton = new mafGUIButton(m_OpDlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
   m_PlaceOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(m_PlaceOpButton,0,wxALL, 5);
 
-  m_TranslateOpButton = new mmgButton(m_OpDlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
+  m_TranslateOpButton = new mafGUIButton(m_OpDlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
   m_TranslateOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(m_TranslateOpButton,0,wxALL, 5);
 
-  m_RotateOpButton = new mmgButton(m_OpDlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
+  m_RotateOpButton = new mafGUIButton(m_OpDlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
   m_RotateOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(m_RotateOpButton,0,wxALL, 5);
 
-  m_ScaleOpButton = new mmgButton(m_OpDlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
+  m_ScaleOpButton = new mafGUIButton(m_OpDlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
   m_ScaleOpButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(m_ScaleOpButton,0,wxALL, 5);
 
   // undo button
-  m_UndoButton = new mmgButton(m_OpDlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
+  m_UndoButton = new mafGUIButton(m_OpDlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
   m_UndoButton->SetListener(this);
   OperationHorizontalBoxSizer->Add(m_UndoButton,0,wxALL, 5);
 
@@ -2210,7 +2210,7 @@ void medOpMML::CreateRegistrationDlg()
   //choices[2] = "ROTATE     >>>";
   //choices[3] = "SCALE";
   //m_radio = new wxRadioBox(m_op_dlg, ID_STATE, "", wxPoint(0,0), wxSize(500,40), 4,choices,4,wxRA_SPECIFY_COLS|wxNO_BORDER|wxTAB_TRAVERSAL);
-  //m_radio->SetValidator( mmgValidator(this,ID_STATE,m_radio,&m_state) );
+  //m_radio->SetValidator( mafGUIValidator(this,ID_STATE,m_radio,&m_state) );
   //if (m_3dflag == 0)
   //	m_radio->Enable(TRUE);
   //LeftVerticalBoxSizer->Add(m_radio,0,wxLEFT,5);
@@ -2231,7 +2231,7 @@ void medOpMML::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(m_ModelmafRWI->m_RwiBase, 1, wxEXPAND | wxALL, 5);
 
   // maf lut
-  m_Lut = new mmgLutSlider(m_OpDlg,-1,wxPoint(0,0),wxSize(420,24));
+  m_Lut = new mafGUILutSlider(m_OpDlg,-1,wxPoint(0,0),wxSize(420,24));
   m_Lut->SetListener(this);
   LeftVerticalBoxSizer->Add(m_Lut,0,wxEXPAND ,6);
 
@@ -2279,7 +2279,7 @@ void medOpMML::CreateRegistrationDlg()
   RightVerticalBoxSizer->Add(hs4, 0, wxTOP, 25);
 
   wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 1, m_Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
-  sli->SetValidator(mmgValidator(this,ID_SLICE,(wxSlider*)sli,&m_Slice,text));
+  sli->SetValidator(mafGUIValidator(this,ID_SLICE,(wxSlider*)sli,&m_Slice,text));
   //RightVerticalBoxSizer->Add(sli,0);
   RightVerticalBoxSizer->Add(sli, 0, wxLEFT, -9);
 
