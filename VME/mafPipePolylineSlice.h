@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,7 @@ public:
     ID_LAST,
   };
 
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
   void UpdateProperty();
 
 protected:

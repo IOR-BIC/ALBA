@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-01 09:27:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,8 @@
 #include "mafLightKit.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 
 #include "vtkRenderWindow.h"
 #include "vtkLight.h"
@@ -76,7 +76,7 @@ enum LIGHTKIT_WIDGET_ID
 void mafLightKit::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->Show(true);
 
 	LightItem *item = NULL;
@@ -93,8 +93,8 @@ void mafLightKit::CreateGui()
 	
   wxStaticText *lab = new wxStaticText(m_Gui,-1,"lights list",dp,ls, wxALIGN_RIGHT);
 	
-	m_ButtonAdd = new mmgButton (m_Gui,ID_ADD_LIGHT,"add",dp,bs);
-  m_ButtonRemove = new mmgButton (m_Gui,ID_REMOVE_LIGHT,"remove",dp,bs);
+	m_ButtonAdd = new mafGUIButton (m_Gui,ID_ADD_LIGHT,"add",dp,bs);
+  m_ButtonRemove = new mafGUIButton (m_Gui,ID_REMOVE_LIGHT,"remove",dp,bs);
 	m_ButtonAdd->SetListener(this);
 	m_ButtonRemove->SetListener(this);
 

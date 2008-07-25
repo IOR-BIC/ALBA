@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-19 12:13:05 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-07-25 07:03:23 $
+Version:   $Revision: 1.10 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUISettingsTimeBar.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 //----------------------------------------------------------------------------
 mafGUISettingsTimeBar::mafGUISettingsTimeBar(mafObserver *Listener, const mafString &label):
@@ -57,7 +57,7 @@ mafGUISettingsTimeBar::~mafGUISettingsTimeBar()
 void mafGUISettingsTimeBar::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Bool(ID_REAL_TIME, _("real time"), &m_RealTimeMode, 1);
   m_Gui->Double(ID_TIME_SCALE, _("scale:"), &m_TimeScale, 0.000001, MAXDOUBLE, -1, _("time scale referring to the time unit: seconds"));
   m_Gui->Double(ID_TIME_SPEED, _("speed Nx:"), &m_TimeSpeed, 0.000001, MAXDOUBLE, -1, _("time multiplier to speed up the animation"));

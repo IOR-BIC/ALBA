@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 09:12:43 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.20 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 #include "mafAttachCamera.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 
@@ -76,7 +76,7 @@ enum ATTACH_CAMERA_WIDGET_ID
 void mafAttachCamera::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->Show(true);
   m_Gui->Bool(ID_CAMERA_ATTACH,"attach",&m_CameraAttach,0,"Attach the camera to selected vme");
 	m_Gui->Divider();

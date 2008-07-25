@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.52 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,14 +21,14 @@
 
 #include "mafPipeVolumeSlice.h"
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafSceneNode.h"
 #include "mmaVolumeMaterial.h"
 
 #include "mafVME.h"
 #include "mafVMEOutputVolume.h"
 
-#include "mmgFloatSlider.h"
+#include "mafGUIFloatSlider.h"
 
 #include "mafLODActor.h"
 #include "vtkMAFSmartPointer.h"
@@ -624,12 +624,12 @@ float mafPipeVolumeSlice::GetSliceOpacity()
   return m_SliceOpacity;
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeVolumeSlice::CreateGui()
+mafGUI *mafPipeVolumeSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
   double b[6] = {-1,1,-1,1,-1,1};
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_Gui->FloatSlider(ID_OPACITY_SLIDER,"opacity",&m_SliceOpacity,0.1,1.0);
   m_Vme->GetOutput()->GetVMELocalBounds(b);

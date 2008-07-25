@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettings.h,v $
 Language:  C++
-Date:      $Date: 2007-09-28 15:04:12 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 07:03:23 $
+Version:   $Revision: 1.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -19,7 +19,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 // mafGUISettings :
@@ -38,7 +38,7 @@ public:
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   /** Return the GUI of the setting panel.*/
-  mmgGui* GetGui();
+  mafGUI* GetGui();
 
   /** Return the settings' label*/
   const char *GetLabel() {return m_Label.GetCStr();};
@@ -50,7 +50,7 @@ protected:
   /** Initialize the settings.*/
   virtual void InitializeSettings();
 
-  mmgGui *m_Gui;
+  mafGUI *m_Gui;
   mafString m_Label;
 
   wxConfig *m_Config;

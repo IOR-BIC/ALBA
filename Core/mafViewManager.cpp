@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-26 14:56:30 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,9 +28,9 @@
 #include "mafNodeIterator.h"
 #include "mafVMERoot.h"
 
-#include "mmgMDIFrame.h"
-#include "mmgMDIChild.h"
-#include "mmgViewFrame.h"
+#include "mafGUIMDIFrame.h"
+#include "mafGUIMDIChild.h"
+#include "mafGUIViewFrame.h"
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
 
@@ -494,8 +494,8 @@ void mafViewManager::Activate(mafView *view)
   cppDEL(config);
 
   if(externalViewFlag)
-    ((mmgViewFrame *)view->GetFrame())->SetFocus();
+    ((mafGUIViewFrame *)view->GetFrame())->SetFocus();
   else
-    //((mmgMDIChild *)view->GetFrame())->Activate();
-    ((mmgMDIChild *)view->GetFrame())->SetFocus();
+    //((mafGUIMDIChild *)view->GetFrame())->Activate();
+    ((mafGUIMDIChild *)view->GetFrame())->SetFocus();
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpConnectivitySurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:28:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpConnectivitySurface.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMESurface.h"
 
@@ -100,7 +100,7 @@ void mafOpConnectivitySurface::OpRun()
 	// interface:
   if(!m_TestMode)
   {
-	  m_Gui = new mmgGui(this);
+	  m_Gui = new mafGUI(this);
 
     
 	  double bounds[6];

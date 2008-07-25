@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 17:23:00 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -127,7 +127,7 @@ protected:
   virtual int InternalInitialize();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
 	mafString m_Point1VmeName;
 	mafString m_Point2VmeName;

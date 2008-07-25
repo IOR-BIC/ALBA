@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:44:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,7 +57,7 @@ protected:
   virtual ~mafVMEVolumeGray();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
 private:
   mafVMEVolumeGray(const mafVMEVolumeGray&); // Not implemented

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:30:08 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -125,7 +125,7 @@ protected:
   virtual void InternalUpdate();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   vtkPolyData *m_Polydata; ///< Polydata storing the landmark point
   mafString m_Position[3];

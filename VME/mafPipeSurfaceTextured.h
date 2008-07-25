@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 15:05:18 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ class vtkTexture;
 class vtkPolyDataMapper;
 class vtkPolyData;
 class mafLODActor;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class mmaMaterial;
 
 //----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ protected:
   int m_SelectionVisibility;
   int m_RenderingDisplayListFlag;
   mmaMaterial *m_SurfaceMaterial;
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
   void UpdateProperty(bool fromTag = false);
 
@@ -114,6 +114,6 @@ protected:
   void GenerateTextureMapCoordinate();
 
   /** Create the Gui of the visual pipe used to change visual parameters.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeSurfaceTextured_H__

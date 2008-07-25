@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterRaw.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni - Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include "mafDecl.h"
 #include "mafString.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafOp.h"
 #include "mafNode.h"
 #include "mafVMEVolumeGray.h"
@@ -93,7 +93,7 @@ void mafOpExporterRAW::OpRun()
 		m_FileName = file;
 
 		//Crete GUI
-		m_Gui = new mmgGui(this);
+		m_Gui = new mafGUI(this);
 		m_Gui->SetListener(this);
 
 		m_Gui->Bool(ID_SINGLE_FILE,"single file",&m_SingleFile);

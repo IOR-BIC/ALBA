@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 06:56:05 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -92,7 +92,7 @@ protected:
   virtual ~mafVMERoot();  
 
   /** Create GUI for the VME */
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);

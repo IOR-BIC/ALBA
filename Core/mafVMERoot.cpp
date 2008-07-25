@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-08 13:47:10 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-07-25 06:56:05 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 
 
 #include "mafVMERoot.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
 #include "mafAbsMatrixPipe.h"
@@ -227,7 +227,7 @@ void mafVMERoot::Update()
 }
 
 //-------------------------------------------------------------------------
-mmgGui *mafVMERoot::CreateGui()
+mafGUI *mafVMERoot::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

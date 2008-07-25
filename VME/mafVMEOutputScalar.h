@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:23:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -68,7 +68,7 @@ protected:
 #endif
 
   mafString m_ScalarDataString;
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
 private:
   mafVMEOutputScalar(const mafVMEOutputScalar&); // Not implemented

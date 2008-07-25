@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-06 10:56:07 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.10 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,8 +23,8 @@
 #include "wx/busyinfo.h"
 
 #include "mafSceneNode.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h"
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h"
 #include "mmaMaterial.h"
 #include "mafVMEVector.h"
 
@@ -271,14 +271,14 @@ void mafPipeVector::AllVector(bool fromTag)
   }
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeVector::CreateGui()
+mafGUI *mafPipeVector::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_VTK_PROPERTY,_("property"),&m_UseVTKProperty);
-  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
   m_Gui->Divider();

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2008-06-05 14:07:00 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-07-25 07:03:38 $
+Version:   $Revision: 1.6 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,7 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafGizmoInterface.h"
-#include "mafGuiGizmoTranslate.h"
+#include "mafGUIGizmoTranslate.h"
 #include "mafGizmoPath.h"
 #include <vector>
 //----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ public:
   mafMatrix *GetAbsPose(int tickId);
 
   /** not yet available... */
-  mmgGui *GetGui() {return NULL;};
+  mafGUI *GetGui() {return NULL;};
 
   void SetGizmoLabelsVisibility(bool value);
 

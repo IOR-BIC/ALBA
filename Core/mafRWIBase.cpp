@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 08:29:51 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.33 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@
 
 #endif
 
-#include "mmgApplicationSettings.h"
+#include "mafGUIApplicationSettings.h"
 #include "mafDevice.h"
 #include "mmdButtonsPad.h"
 #include "mmdMouse.h"
@@ -295,7 +295,7 @@ void mafRWIBase::OnLeftMouseDoubleClick(wxMouseEvent &event)
   if (!Enabled) return;
 
   CaptureMouse();
-  NotifyClick(); // this will advise the mmgMDIChild of the click and it fires the VIEW_SELECT
+  NotifyClick(); // this will advise the mafGUIMDIChild of the click and it fires the VIEW_SELECT
                  // event. If it is necessary will be defined a NotifyDoubleClick with a new ID VIEW_DOUBLE_CLICKED
 
   if (m_CustomInteractorStyle)
@@ -710,10 +710,10 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
     wxString file = "";
     switch(forceExtension)
     {
-      case mmgApplicationSettings::JPG :
+      case mafGUIApplicationSettings::JPG :
         wildc = "Image (*.jpg)|*.jpg";
       break;
-      case mmgApplicationSettings::BMP:
+      case mafGUIApplicationSettings::BMP:
         wildc = "Image (*.bmp)|*.bmp";
       break;
     }
@@ -737,11 +737,11 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
 
   switch(forceExtension)
   {
-    case mmgApplicationSettings::JPG :
+    case mafGUIApplicationSettings::JPG :
     if(temporary != _("jpg"))
       filename += _(".jpg");
     break;
-    case mmgApplicationSettings::BMP:
+    case mafGUIApplicationSettings::BMP:
     if(temporary != _("bmp"))
       filename += _(".bmp");
     break;
@@ -903,10 +903,10 @@ void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int m
     wxString file = wxString::Format("%s\\%sSnapshot", m_SaveDir.GetCStr(),filename.GetCStr());
     switch(forceExtension)
     {
-    case mmgApplicationSettings::JPG :
+    case mafGUIApplicationSettings::JPG :
       wildc = "Image (*.jpg)|*.jpg";
       break;
-    case mmgApplicationSettings::BMP:
+    case mafGUIApplicationSettings::BMP:
       wildc = "Image (*.bmp)|*.bmp";
       break;
     }
@@ -930,11 +930,11 @@ void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int m
 
   switch(forceExtension)
   {
-  case mmgApplicationSettings::JPG :
+  case mafGUIApplicationSettings::JPG :
     if(temporary != _("jpg"))
       filename += _(".jpg");
     break;
-  case mmgApplicationSettings::BMP:
+  case mafGUIApplicationSettings::BMP:
     if(temporary != _("bmp"))
       filename += _(".bmp");
     break;
@@ -1143,10 +1143,10 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
     mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp";
     switch(forceExtension)
     {
-    case mmgApplicationSettings::JPG :
+    case mafGUIApplicationSettings::JPG :
       wildc = "Image (*.jpg)|*.jpg";
       break;
-    case mmgApplicationSettings::BMP:
+    case mafGUIApplicationSettings::BMP:
       wildc = "Image (*.bmp)|*.bmp";
       break;
     }
@@ -1169,11 +1169,11 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
 
   switch(forceExtension)
   {
-  case mmgApplicationSettings::JPG :
+  case mafGUIApplicationSettings::JPG :
     if(mafString(temporary) != _("jpg"))
       filename += _(".jpg");
     break;
-  case mmgApplicationSettings::BMP:
+  case mafGUIApplicationSettings::BMP:
     if(mafString(temporary) != _("bmp"))
       filename += _(".bmp");
     break;

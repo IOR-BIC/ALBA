@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 15:12:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 
 class mafEventBase;
 class mafString;

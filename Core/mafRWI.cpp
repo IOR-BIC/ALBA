@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:29 $
-  Version:   $Revision: 1.47 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.48 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,12 +24,12 @@
 #include "mafDecl.h"  // per CAMERA_POSITIONS
 #include "mafEvent.h"
 #include "mafAxes.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafNode.h"
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
-#include "mmgPicButton.h"
-#include "mmgMeasureUnitSettings.h"
+#include "mafGUIPicButton.h"
+#include "mafGUIMeasureUnitSettings.h"
 #include "mafGUICrossIncremental.h"
 
 #include "mafVME.h"
@@ -184,7 +184,7 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
   m_ShowRuler = show_ruler;
 	m_ShowOrientator = show_orientator;
 
-  mmgMeasureUnitSettings *unit_settings = new mmgMeasureUnitSettings(this);
+  mafGUIMeasureUnitSettings *unit_settings = new mafGUIMeasureUnitSettings(this);
   m_RulerScaleFactor = unit_settings->GetScaleFactor();
   m_RulerLegend = unit_settings->GetUnitName();
   cppDEL(unit_settings);
@@ -816,23 +816,23 @@ enum RWI_WIDGET_ID
   ID_RULER_LEGEND
 };
 //-------------------------------------------------------------------------
-mmgGui *mafRWI::CreateGui()
+mafGUI *mafRWI::CreateGui()
 //-------------------------------------------------------------------------
 {
   wxString grid_normal[3] = {"X axes","Y axes","Z axes"};
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   // constant used in mafRWIxxx to initialize Camera pos
   if (m_Camera->GetParallelProjection() == 0)
   {
     m_Sizer =  new wxBoxSizer( wxHORIZONTAL );
-    m_CameraButtons[0] = new mmgPicButton(m_Gui, "PIC_BOTTOM",ID_CAMERA_BOTTOM, this);
-    m_CameraButtons[1] = new mmgPicButton(m_Gui, "PIC_TOP",   ID_CAMERA_TOP,    this);
-    m_CameraButtons[2] = new mmgPicButton(m_Gui, "PIC_BACK",  ID_CAMERA_BACK,   this);
-    m_CameraButtons[3] = new mmgPicButton(m_Gui, "PIC_FRONT", ID_CAMERA_FRONT,  this);
-    m_CameraButtons[4] = new mmgPicButton(m_Gui, "PIC_LEFT",  ID_CAMERA_LEFT,   this);
-    m_CameraButtons[5] = new mmgPicButton(m_Gui, "PIC_RIGHT", ID_CAMERA_RIGHT,  this);
+    m_CameraButtons[0] = new mafGUIPicButton(m_Gui, "PIC_BOTTOM",ID_CAMERA_BOTTOM, this);
+    m_CameraButtons[1] = new mafGUIPicButton(m_Gui, "PIC_TOP",   ID_CAMERA_TOP,    this);
+    m_CameraButtons[2] = new mafGUIPicButton(m_Gui, "PIC_BACK",  ID_CAMERA_BACK,   this);
+    m_CameraButtons[3] = new mafGUIPicButton(m_Gui, "PIC_FRONT", ID_CAMERA_FRONT,  this);
+    m_CameraButtons[4] = new mafGUIPicButton(m_Gui, "PIC_LEFT",  ID_CAMERA_LEFT,   this);
+    m_CameraButtons[5] = new mafGUIPicButton(m_Gui, "PIC_RIGHT", ID_CAMERA_RIGHT,  this);
     for(int i = 0; i < 6; i++)
       m_Sizer->Add(m_CameraButtons[i],0,0);
     m_Gui->Add(m_Sizer);
@@ -880,7 +880,7 @@ mmgGui *mafRWI::CreateGui()
   return m_Gui;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafRWI::GetGui()
+mafGUI *mafRWI::GetGui()
 //-------------------------------------------------------------------------
 {
   if(m_Gui == NULL)
@@ -1021,7 +1021,7 @@ void mafRWI::LinkCamera(bool linc_camera)
 void mafRWI::UpdateRulerUnit()
 //----------------------------------------------------------------------------
 {
-  mmgMeasureUnitSettings *unit_settings = new mmgMeasureUnitSettings(this);
+  mafGUIMeasureUnitSettings *unit_settings = new mafGUIMeasureUnitSettings(this);
   m_RulerScaleFactor = unit_settings->GetScaleFactor();
   m_RulerLegend = unit_settings->GetUnitName();
   cppDEL(unit_settings);

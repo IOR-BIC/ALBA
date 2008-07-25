@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class vtkActor;
 class mafVMELandmarkCloud;
 class mafVMELandmark;
 class vtkDataSet;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 
 //----------------------------------------------------------------------------
 // mafPipeLandmarkCloud :
@@ -75,7 +75,7 @@ protected:
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
   /** Create visual-pipe for closed cloud or single landmark */
   void CreateClosedCloudPipe(vtkDataSet *data, double radius, double resolution);
@@ -84,7 +84,7 @@ protected:
   void RemoveClosedCloudPipe();
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   /** Update the properties according to the vme's tags. */
 	void UpdateProperty(bool fromTag = false);

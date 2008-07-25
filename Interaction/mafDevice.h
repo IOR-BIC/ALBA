@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:22:03 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 
 /** 
   This abstract class manages function calls coming from devices and 
@@ -123,7 +123,7 @@ public:
   bool IsPersistent() {return m_PersistentFalg;}
   
   /** Return pointer to the GUI. */
-  mmgGui *GetGui();
+  mafGUI *GetGui();
   
   /** used to force Gui to update its content */
   virtual void UpdateGui();
@@ -155,7 +155,7 @@ protected:
   virtual int InternalRestore(mafStorageElement *node);
   
 
-  mmgGui*             m_Gui;
+  mafGUI*             m_Gui;
   mafID               m_ID;
   int                 m_AutoStart;
   int                 m_Start;  //SIL. 07-jun-2006 : -- connected to a Bool in the Gui

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-04 16:58:29 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.11 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,7 +26,7 @@
 #include "mafDataPipeCustom.h"
 #include "mafVMEPolyline.h"
 #include "mafVMEOutputPolyline.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -273,7 +273,7 @@ mafVME *mafVMEPolylineSpline::GetPolylineLink()
   return mafVME::SafeDownCast(GetLink("PolylineSource"));
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEPolylineSpline::CreateGui()
+mafGUI* mafVMEPolylineSpline::CreateGui()
 //-------------------------------------------------------------------------
 {
 

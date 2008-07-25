@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 17:23:16 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ class vtkAppendPolyData;
 
 class vtkXYPlotActor;
 class mafRWI;
-class mmgDialogPreview;
+class mafGUIDialogPreview;
 
 
 /** mafVMEMeter - 
@@ -236,7 +236,7 @@ protected:
   void UpdateLinks();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   /** 
   Create the histogram*/
@@ -263,7 +263,7 @@ protected:
 
   vtkLineSource       *m_ProbingLine;
 
-  mmgDialogPreview  *m_HistogramDialog;
+  mafGUIDialogPreview  *m_HistogramDialog;
   mafRWI    *m_HistogramRWI;
   vtkXYPlotActor *m_PlotActor;
 

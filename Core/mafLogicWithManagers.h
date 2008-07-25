@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 13:44:32 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.46 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,11 +16,11 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mmgPanel.h"
+#include "mafGUIPanel.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
 #include "mafLogicWithGUI.h"
-#include "mmgVMEChooser.h"
+#include "mafGUIVMEChooser.h"
 #include "mafVMEManager.h"
 
 //----------------------------------------------------------------------------
@@ -29,14 +29,14 @@
 class mafViewManager;
 class mafOpManager;
 class mafSideBar;
-class mmgMaterialChooser;
+class mafGUIMaterialChooser;
 class mafVME;
 class mafInteractionManager;
 class mafPrintSupport;
 class mafRemoteLogic;
 class mmdMouse;
-class mmgSettingsDialog;
-class mmgApplicationLayoutSettings;
+class mafGUISettingsDialog;
+class mafGUIApplicationLayoutSettings;
 class mafGUISettings;
 class mafUser;
 
@@ -229,7 +229,7 @@ protected:
   /** Called when an operation stops. Re-enable all menu and unlock the Selection */ 
 	virtual void OpRunTerminated();
 	/** Show the gui of the running operation or the settings of the selected view. */
-	virtual void OpShowGui(bool push_gui, mmgPanel *panel);
+	virtual void OpShowGui(bool push_gui, mafGUIPanel *panel);
 	/** Hide the setting's gui when a view is destroyed. */
 	virtual void OpHideGui(bool view_closed);
   
@@ -264,7 +264,7 @@ protected:
   mafInteractionManager  *m_InteractionManager;
   mafRemoteLogic         *m_RemoteLogic;
 
-  mmgMaterialChooser  *m_MaterialChooser;
+  mafGUIMaterialChooser  *m_MaterialChooser;
   mafPrintSupport     *m_PrintSupport;
 
   mmdMouse            *m_Mouse;
@@ -282,8 +282,8 @@ protected:
   bool m_UseViewManager;
   bool m_UseOpManager;
   bool m_UseInteractionManager;
-  mmgSettingsDialog *m_SettingsDialog;
-  mmgApplicationLayoutSettings *m_ApplicationLayoutSettings;
+  mafGUISettingsDialog *m_SettingsDialog;
+  mafGUIApplicationLayoutSettings *m_ApplicationLayoutSettings;
 
 	mafString m_Revision;
 

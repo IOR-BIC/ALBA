@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,12 +18,12 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
-#include "mafGuiGizmoInterface.h"
+#include "mafGUIGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgButton;
+class mafGUIButton;
 class mafMatrix;
 
 //----------------------------------------------------------------------------
@@ -33,12 +33,12 @@ class mafMatrix;
  
   @todo
 */
-class mafGuiGizmoRotate : public mafGuiGizmoInterface
+class mafGUIGizmoRotate : public mafGUIGizmoInterface
 {
 public:
 
-  mafGuiGizmoRotate(mafObserver *listener);
-  ~mafGuiGizmoRotate(); 
+  mafGUIGizmoRotate(mafObserver *listener);
+  ~mafGUIGizmoRotate(); 
 
   void OnEvent(mafEventBase *maf_event);
 

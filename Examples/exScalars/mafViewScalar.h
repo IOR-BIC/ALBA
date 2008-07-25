@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewScalar.h,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 13:34:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:01:19 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ public:
   };
 
 protected:
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   /** Import ASCII data. */
   int ImportASCII();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:00 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,7 +114,7 @@ public:
 protected:
   mafSceneGraph *m_Sg;
 
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   /** Return the visual pipe's name.*/
   void GetVisualPipeName(mafNode *node, mafString &pipe_name);

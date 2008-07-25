@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 16:52:05 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 #include "mafPipeBox.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafVME.h"
 #include "mafAxes.h"
 #include "mafEventSource.h"
@@ -193,14 +193,14 @@ void mafPipeBox::UpdateProperty(bool fromTag)
 	}
 }
 //-------------------------------------------------------------------------
-mmgGui *mafPipeBox::CreateGui()
+mafGUI *mafPipeBox::CreateGui()
 //-------------------------------------------------------------------------
 {
   const wxString box_type[] = {_("3D"), _("4D"),_("3D Subtree"),_("4D Subtree")};
   int num_choices = 4;
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Combo(ID_BOUNDS_MODE, _("bounds"), &m_BoundsMode, num_choices, box_type);
   m_Gui->Divider();
 	return m_Gui;

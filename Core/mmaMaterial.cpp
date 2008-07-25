@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:29 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-07-25 06:56:05 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@
 #include "mmaMaterial.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgLutPreset.h"
+#include "mafGUILutPreset.h"
 
 #include "mafStorageElement.h"
 #include "mafIndent.h"

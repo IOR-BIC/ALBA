@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:29 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,8 +29,8 @@ class vtkRenderWindow;
 class mafRWIBase;
 class mafSceneGraph;
 class mafAxes;
-class mmgGui;
-class mmgPicButton;
+class mafGUI;
+class mafGUIPicButton;
 class vtkMAFSimpleRulerActor2D;
 class vtkMAFTextOrientator;
 
@@ -128,7 +128,7 @@ public:
   This method is called from logic to update measure unit according to the application settings.*/
   void UpdateRulerUnit();
 
-  virtual mmgGui *GetGui();
+  virtual mafGUI *GetGui();
 
   /** Update member variables and GUI elements according to vtkCamera position, focal point, view up, ...*/
   void UpdateCameraParameters();
@@ -157,13 +157,13 @@ public:
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
-  mmgGui       *m_Gui;
+  mafGUI       *m_Gui;
   wxColour	    m_BGColour;
   wxColour	    m_GridColour;
   double        m_GridPosition;
-  mmgPicButton *m_CameraButtons[6];
+  mafGUIPicButton *m_CameraButtons[6];
   wxBoxSizer	 *m_Sizer;
 	
   mafAxes          *m_Axes; ///< Actor representing a global reference system.

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:19:20 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -141,7 +141,7 @@ protected:
   virtual ~mafVMEProber(); 
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   /** used to initialize and create the material attribute if not yet present */
   virtual int InternalInitialize();

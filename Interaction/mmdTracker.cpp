@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-14 14:46:33 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,7 +14,7 @@
 #include "mmdTracker.h"
 
 // gui
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 // general
 #include "mafSmartPointer.h"

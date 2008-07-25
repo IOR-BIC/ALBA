@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:51:05 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,10 +24,10 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgButton;
+class mafGUIButton;
 class vtkLight;
 class vtkRenderer;
-class mmgGui;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 // mafLightKit :
@@ -45,7 +45,7 @@ public:
 	void CreateGui();
 
 	/** Returns the mafLightKit's GUI */
-	mmgGui *GetGui() {return m_Gui;};
+	mafGUI *GetGui() {return m_Gui;};
 
 protected:
 	class LightItem {
@@ -74,8 +74,8 @@ protected:
 
 	mafObserver	*m_Listener;
 
-	mmgButton  *m_ButtonAdd; 
-	mmgButton  *m_ButtonRemove;
+	mafGUIButton  *m_ButtonAdd; 
+	mafGUIButton  *m_ButtonRemove;
 
 	int				 m_LightCounter;
 	wxListBox	*m_LightList;
@@ -90,6 +90,6 @@ protected:
 	vtkRenderer	*m_LightRenderer;
 	
 	wxWindow	  *m_LightParentPanel;
-	mmgGui			*m_Gui;
+	mafGUI			*m_Gui;
 };
 #endif

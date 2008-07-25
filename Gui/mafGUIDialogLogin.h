@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogLogin.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 11:47:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,16 +15,16 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
 //----------------------------------------------------------------------------
 
 /** mafGUIDialogLogin - a dialog widget with a find VME GUI.
-@sa mmgDialog
+@sa mafGUIDialog
 */
-class mafGUIDialogLogin : public mmgDialog
+class mafGUIDialogLogin : public mafGUIDialog
 {
 public:
 	mafGUIDialogLogin(const wxString& title, long style = mafCLOSEWINDOW | mafOK | mafCANCEL);
@@ -48,7 +48,7 @@ public:
   int GetRememberUserCredentials() {return m_RememberMe;};
 
 protected:
-  mmgGui *m_Gui; ///< Gui variable used to plug custom widgets.
+  mafGUI *m_Gui; ///< Gui variable used to plug custom widgets.
   mafString m_Username; ///< Current username inserted into the dialog.
   mafString m_Pwd; ///< Current password inserted into the dialog.
   mafString m_UsernameOld; ///< Last username inserted.

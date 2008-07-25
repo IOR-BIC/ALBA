@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:17:28 $
-  Version:   $Revision: 1.54 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.55 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -170,7 +170,7 @@ protected:
   bool  m_ShowGrid;
 	bool m_ShowOrientator;
 
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   virtual void OnPreResetCamera();
   virtual void OnPostResetCamera();

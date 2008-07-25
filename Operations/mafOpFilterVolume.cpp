@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMEVolumeGray.h"
 
@@ -105,7 +105,7 @@ void mafOpFilterVolume::OpRun()
 	m_OriginalImageData->DeepCopy(m_InputData);
 	
 	// interface:
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
   m_Gui->Bool(ID_APPLY_ON_INPUT,_("apply on input"),&m_ApplyDirectlyOnInput,0,_("Check this flag for big volumes to save memory"));
 	m_Gui->Label("");

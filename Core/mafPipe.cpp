@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-14 10:12:31 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 #include "mafSceneNode.h"
 #include "mafSceneGraph.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafPipe.h"
 #include "mafNode.h"
@@ -73,11 +73,11 @@ void mafPipe::DeleteGui()
   cppDEL(m_Gui);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafPipe::CreateGui()
+mafGUI* mafPipe::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   mafString type = "mafPipe" ;
   m_Gui->Label("type :", type);

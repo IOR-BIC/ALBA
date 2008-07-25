@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 15:29:50 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class mafRWI;
 class mafVME;
 class vtkMatrix4x4;
@@ -46,7 +46,7 @@ public:
 
 	/** 
   Returns the mafAttachCamera's GUI */
-	mmgGui *GetGui() {return m_Gui;};
+	mafGUI *GetGui() {return m_Gui;};
 
   /** 
   Update the camera according to the absolute position of the attached VME.*/
@@ -74,7 +74,7 @@ protected:
 
 
   mafObserver	*m_Listener;
-	mmgGui			*m_Gui;
+	mafGUI			*m_Gui;
 	mafRWI      *m_Rwi;
 	wxWindow	  *m_ParentPanel;
 };

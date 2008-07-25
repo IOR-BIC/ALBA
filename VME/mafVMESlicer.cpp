@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.28 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,8 +20,8 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMESlicer.h"
-#include "mmgGui.h"
-#include "mmgLutPreset.h"
+#include "mafGUI.h"
+#include "mafGUILutPreset.h"
 
 #include "mmaMaterial.h"
 
@@ -166,7 +166,7 @@ bool mafVMESlicer::Equals(mafVME *vme)
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMESlicer::CreateGui()
+mafGUI* mafVMESlicer::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name

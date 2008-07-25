@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-31 12:59:40 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,8 +23,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafNode;
-class mmgGui;
-class mmgGuiHolder;
+class mafGUI;
+class mafGUIHolder;
 class mmdMouse;
 class mafGUISettings;
 //----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ public:
 	virtual void OpUndo();
 
 	/** Return the operation's interface. */
-	virtual mmgGui *GetGui()	{return m_Gui;};
+	virtual mafGUI *GetGui()	{return m_Gui;};
 
 	/** Set/Get the input vme for the operation. */
 	virtual void SetInput(mafNode* vme)	{m_Input = vme;};
@@ -164,8 +164,8 @@ protected:
 
 	mafNode				 *m_Input; ///< Pointer to the Input VME.
   mafNode        *m_Output; ///< Pointer to the Output VME
-	mmgGui      	 *m_Gui; ///< Pointer to the operation's GUI.
-	mmgGuiHolder	 *m_Guih;
+	mafGUI      	 *m_Gui; ///< Pointer to the operation's GUI.
+	mafGUIHolder	 *m_Guih;
 	bool 						m_Canundo; ///< Flag to establish if the operation define the UnDo method or not.
 	int 						m_OpType; ///< Store the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER
 	bool						m_InputPreserving; ///< Flag to say if the operation change the input data (m_InputPreserving = false) or not.

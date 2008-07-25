@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-13 09:08:41 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 06:56:05 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@ class mafMatrix;
 class mafTransformBase;
 class mafOBB;
 class mafNodeIterator;
-class mmgGui;
+class mafGUI;
 #ifdef MAF_USE_VTK
 class vtkDataSet;
 #endif //MAF_USE_VTK
@@ -164,7 +164,7 @@ public:
   };
 
   /** create and return the GUI for changing the node parameters */
-  mmgGui *GetGui();
+  mafGUI *GetGui();
 
   /** destroy the Gui */
   void DeleteGui();
@@ -177,7 +177,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   /** retrieve bounds of the output data not considering the VME pose matrix and the visibility. */
   virtual void GetDataBounds(mafOBB &bounds,mafTimeStamp t) const;
@@ -185,7 +185,7 @@ protected:
   mafVME *                  m_VME;      ///< pointer to source VME
   mafString                 m_DataType; ///< the type of data stored in object expressed as a string
   mafOBB                    m_Bounds;   ///< bounds of the output data (i.e. for current time)
-  mmgGui                   *m_Gui;      ///< user interface
+  mafGUI                   *m_Gui;      ///< user interface
 
   mafAutoPointer<mafTransformBase> m_Transform; ///< the transform generating the output pose matrix
 

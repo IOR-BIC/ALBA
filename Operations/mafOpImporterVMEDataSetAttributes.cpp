@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterVMEDataSetAttributes.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-02 08:57:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@
 #include "mafVMEDataSetAttributesImporter.h"
 #include "mafVMEGeneric.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include <fstream>
 
@@ -161,7 +161,7 @@ void mafOpImporterVMEDataSetAttributes::CreateGui()
 {
   mafString wildcard = "txt files (*.txt)|*.txt|All Files (*.*)|*.*";
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   
   m_Gui->Label(" ");

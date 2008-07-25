@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:56 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.9 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 #include "mafVMEOutputPointSet.h"
 #include "mafVME.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafIndent.h"
 #include "mmaMaterial.h"
 
@@ -75,7 +75,7 @@ void mafVMEOutputPointSet::SetMaterial(mmaMaterial *material)
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputPointSet::CreateGui()
+mafGUI* mafVMEOutputPointSet::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

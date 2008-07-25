@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,10 +20,10 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiGizmoTranslate.h"
+#include "mafGUIGizmoTranslate.h"
 #include "mafDecl.h"
-#include "mmgButton.h"
-#include "mmgGui.h"
+#include "mafGUIButton.h"
+#include "mafGUI.h"
 
 #include "mafGizmoInterface.h"
 #include "mafGizmoTranslate.h"
@@ -33,7 +33,7 @@
 #include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
-mafGuiGizmoTranslate::mafGuiGizmoTranslate(mafObserver *listener)
+mafGUIGizmoTranslate::mafGUIGizmoTranslate(mafObserver *listener)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
@@ -42,17 +42,17 @@ mafGuiGizmoTranslate::mafGuiGizmoTranslate(mafObserver *listener)
   CreateGui();
 }
 //----------------------------------------------------------------------------
-mafGuiGizmoTranslate::~mafGuiGizmoTranslate() 
+mafGUIGizmoTranslate::~mafGUIGizmoTranslate() 
 //----------------------------------------------------------------------------
 { 	
   
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoTranslate::CreateGui()
+void mafGUIGizmoTranslate::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Divider(2);
   m_Gui->Label("translation gizmo abs position", true);
@@ -64,7 +64,7 @@ void mafGuiGizmoTranslate::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoTranslate::OnEvent(mafEventBase *maf_event)
+void mafGUIGizmoTranslate::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -86,7 +86,7 @@ void mafGuiGizmoTranslate::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafGuiGizmoTranslate::EnableWidgets(bool enable)
+void mafGUIGizmoTranslate::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_TRANSLATE_X, enable);
@@ -95,7 +95,7 @@ void mafGuiGizmoTranslate::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoTranslate::SendAbsPosition(mafEventBase *sourceEvent)
+void mafGUIGizmoTranslate::SendAbsPosition(mafEventBase *sourceEvent)
 //----------------------------------------------------------------------------
 {
   // build abs matrix position
@@ -111,7 +111,7 @@ void mafGuiGizmoTranslate::SendAbsPosition(mafEventBase *sourceEvent)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoTranslate::SetAbsPosition(mafMatrix *pose)
+void mafGUIGizmoTranslate::SetAbsPosition(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   mafTransform::GetPosition(*pose, m_Position);

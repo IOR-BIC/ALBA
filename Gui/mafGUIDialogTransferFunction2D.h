@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.4 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 
 #include "vtkProp.h"
 #include "vtkMAFTransferFunction2D.h"
@@ -29,8 +29,8 @@ class wxNotebook;
 class mafVME;
 class mmaVolumeMaterial;
 class mafRWIBase;
-class mmgGui;
-class mmgRangeSlider;
+class mafGUI;
+class mafGUIRangeSlider;
 
 class vtkViewport;
 class vtkRenderWindow;
@@ -55,7 +55,7 @@ class vtkInteractorStylePreviewImage;
 //----------------------------------------------------------------------------
 /** This dialog is used to define a 2D transfer function to make a volume Ray Cast.
 @sa vtkMAFAdaptiveVolumeRendering mafVisualPipeVolumeRayCasting*/
-class mafGUIDialogTransferFunction2D : public mmgDialog
+class mafGUIDialogTransferFunction2D : public mafGUIDialog
 {
   friend class vtkInteractorStylePreviewImage;
   friend class vtkInteractorStyleWidget;
@@ -126,14 +126,14 @@ protected:
   int        m_CurrentWidget;
   
   int             m_SliceNumber;
-  mmgRangeSlider *m_WindowingSlider;
+  mafGUIRangeSlider *m_WindowingSlider;
   double          m_SliceLevel;
   double          m_SliceWinowing;
   wxString        m_WidgetName;
   wxColour        m_WidgetColor;
   wxString        m_Filename;
-  mmgRangeSlider *m_ValueSlider;
-  mmgRangeSlider *m_GradientSlider;
+  mafGUIRangeSlider *m_ValueSlider;
+  mafGUIRangeSlider *m_GradientSlider;
 
   wxStatusBar *m_StatusBar;
 

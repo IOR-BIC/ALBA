@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:29:04 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEInfoText.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafStorageElement.h"
 #include "mafIndent.h"
@@ -166,7 +166,7 @@ int mafVMEInfoText::InternalRestore(mafStorageElement *node)
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEInfoText::CreateGui()
+mafGUI* mafVMEInfoText::CreateGui()
 //-------------------------------------------------------------------------
 {
 

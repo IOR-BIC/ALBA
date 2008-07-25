@@ -3,6 +3,15 @@ PROJECT (exOperations)
 SET(PROJECT_SRCS 
 	exOperationApp.cpp
 	exOperationApp.h
+	
+	#SRBUpload/SrbUpload.nsmap
+	#SRBUpload/soapH.h
+	#SRBUpload/soapC.cpp
+	#SRBUpload/soapClient.cpp
+	#SRBUpload/stdsoap2.cpp
+	#SRBUpload/stdsoap2.h
+	#mmoSRBUpload.cpp
+	#mmoSRBUpload.h
 )
 
 IF (WIN32)

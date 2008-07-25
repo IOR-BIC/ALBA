@@ -2,8 +2,8 @@ PROJECT (exHistogram)
 
 SET(PROJECT_SRCS 
   main.cpp
-  vtkHistogram.h
-  vtkHistogram.cxx
+  vtkMAFHistogram.h
+  vtkMAFHistogram.cxx
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )

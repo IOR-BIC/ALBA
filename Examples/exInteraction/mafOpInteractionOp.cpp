@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:00:43 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 
 
 #include "mafOpInteractionOp.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
@@ -119,7 +119,7 @@ void mafOpInteractionOp::OpRun()
   
   
   // the interface
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   m_Gui->OkCancel();
 

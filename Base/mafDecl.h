@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 16:48:15 $
-  Version:   $Revision: 1.41 $
+  Date:      $Date: 2008-07-25 06:55:21 $
+  Version:   $Revision: 1.42 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@ class wxWindow;
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
-// MAX number of widgets that mmgGUI can hold - used also by mmgGuiValidator
+// MAX number of widgets that mafGUI can hold - used also by mafGUIGuiValidator
 //const int MAXWIDGET = 200; 
 const int MAXWIDGET = 4096;
 const int MAXOP = 200; 
@@ -81,7 +81,7 @@ enum MAF_EXPORT DEVICE_MODIFIERS
 /**
   Most of the constants used in MAF are declared here.
   These constants must be non-overlapping.
-  Constants are grouped by bracket xx_START, xx_END as needed by mmgFrame
+  Constants are grouped by bracket xx_START, xx_END as needed by mafGUIFrame
 */
 enum MAF_EXPORT MAIN_EVENT_ID
 {
@@ -106,7 +106,7 @@ MENU_EDIT_END,
 MENU_VIEW_START,
   MENU_VIEW_LAYOUT,        // call the Load/Save Layout Dialog
   MENU_VIEW_LAYOUT_MSF,    // call the Load/Save Layout_Msf Dialog 
-SASH_START,                // ids of mmgSashPanel/ ids of Dockable Panes - must be Menu events too
+SASH_START,                // ids of mafGUISashPanel/ ids of Dockable Panes - must be Menu events too
 	MENU_VIEW_TOOLBAR,
 	MENU_VIEW_LOGBAR,
   MENU_VIEW_SIDEBAR,
@@ -114,7 +114,7 @@ SASH_START,                // ids of mmgSashPanel/ ids of Dockable Panes - must 
   MENU_VIEW_USER_FIRST,
   MENU_VIEW_USER_LAST = MENU_VIEW_USER_FIRST+20,
 SASH_END,
-MENU_LAYOUT_START,     // used by mmgCrossSplitter
+MENU_LAYOUT_START,     // used by mafGUICrossSplitter
   LAYOUT_ONE,          
   LAYOUT_TWO_VERT,
   LAYOUT_TWO_HORZ,
@@ -159,7 +159,7 @@ EVT_START,
   VME_ADDED,     // from mafVmeManager to mafLogic (to be removed Marco)
   VME_REMOVE,    // from a generic mafOp to mafLogic (to be removed Marco)
   VME_REMOVING,  // from mafVmeManager to mafLogic 
-  VME_SELECT,    // from mmgTree or mafISV - run mafOpSelect
+  VME_SELECT,    // from mafGUITree or mafISV - run mafOpSelect
   VME_DCLICKED,  // from mmiPER issued to infor logic that a double click has been done on a VME.
   VME_SELECTED,  // from mafOpSelect
   VME_SHOW,      // from a vme property panel
@@ -172,19 +172,19 @@ EVT_START,
   VME_CHOOSE_MATERIAL,
   VME_CHOOSE_TRANSFER_FUNCTION,
   VME_CHOOSE_FEM_PROPERTY,
-  VME_REF_SYS_CHOOSED,  //from mmgVMERefSysChooser to a mafOp (to be moved elsewhere Marco)
-  VME_FEM_DATA_CHOOSED, //from mmgVMEFEMDataChooser to a mafOp (to be moved elsewhere Marco)
+  VME_REF_SYS_CHOOSED,  //from mafGUIVMERefSysChooser to a mafOp (to be moved elsewhere Marco)
+  VME_FEM_DATA_CHOOSED, //from mafGUIVMEFEMDataChooser to a mafOp (to be moved elsewhere Marco)
   CREATE_STORAGE,
 
   // events about views
   VIEW_QUIT,		 // from keyboard, used specially to close external views.
   VIEW_CREATE,   // from menu to mafViewManager
   VIEW_CREATED,  // from mafViewManager to Logic
-  VIEW_DELETE,   // from mmgMDIChild to mafViewManager
-  VIEW_SELECT,   // from mmgMDIChild and mmgViewPanel to mafViewManager
+  VIEW_DELETE,   // from mafGUIMDIChild to mafViewManager
+  VIEW_SELECT,   // from mafGUIMDIChild and mafGUIViewPanel to mafViewManager
   VIEW_SELECTED, // used to ask to logic if there is at least a view selected.
-  VIEW_CLICKED,  // from mafRWIBase to mmgMDIChild and mmgViewPanel to mafViewManager
-  VIEW_MAXIMIZE, // from mmgGui to mmgCrossSplitter
+  VIEW_CLICKED,  // from mafRWIBase to mafGUIMDIChild and mafGUIViewPanel to mafViewManager
+  VIEW_MAXIMIZE, // from mafGUI to mafGUICrossSplitter
   VIEW_RESIZE,   // from anyone that want to block the view's size.
   VIEW_SAVE_IMAGE,//from mafMDIChild  to mafViewManager
   PER_PUSH,       // from an Operation to mafInteractionManager
@@ -252,11 +252,11 @@ EVT_START,
 
   REMOTE_PARAMETER,
 
-  ITEM_SELECTED, //used by mmgListCtrl and Dictionary
+  ITEM_SELECTED, //used by mafGUIListCtrl and Dictionary
 
   IMPORT_FILE, // used when drag a non msf or zmsf file into the application as a VTK file.
 
-  CLEAR_UNDO_STACK, // used by mmgMDIFrame to clear UnDo stack when the application is running in low memory
+  CLEAR_UNDO_STACK, // used by mafGUIMDIFrame to clear UnDo stack when the application is running in low memory
 
   LOG_ALL_EVENT,
 	LOG_TO_FILE,
@@ -286,7 +286,7 @@ MENU_USER_END = MENU_USER_START+1000,
 
 MENU_END,
 
-// ids of operations - used by mafOpManager and mmgFrame
+// ids of operations - used by mafOpManager and mafGUIFrame
 // must be after MENU_END
 OP_START,
   OP_UNDO,
@@ -300,7 +300,7 @@ OP_START,
 	OP_USER,
 OP_END = OP_START + MAXOP,
 
-// ids of views - used by mafViewManager and mmgFrame
+// ids of views - used by mafViewManager and mafGUIFrame
 // must be after MENU_END
 VIEW_START,
 VIEW_END = VIEW_START + MAXVIEW,
@@ -308,17 +308,17 @@ VIEW_END = VIEW_START + MAXVIEW,
 // events sent by widget
 
 WIDGETS_START,
-  ID_LAYOUT,         //sent from a mmgSashPanel to mmgFrame
-  ID_CLOSE_SASH,     //sent from a mmgButton		to mmgSashPanel 
-  ID_LABEL_CLICK,    //sent from a mmgLabel			to mmgViewPanel
-  ID_DISPLAY_LIST,   //sent from a mmgButton		to mmgMDIChild  - ask for display list menu
-  ID_SETTINGS,       //sent from a mmgButton		to mmgMDIChild  - ask to display a view-settings-panel
-  ID_RANGE_MODIFIED, //sent from a mmgLutSlider	to mmgMDIChild  - ask to Views
+  ID_LAYOUT,         //sent from a mafGUISashPanel to mafGUIFrame
+  ID_CLOSE_SASH,     //sent from a mafGUIButton		to mafGUISashPanel 
+  ID_LABEL_CLICK,    //sent from a mafGUILabel			to mafGUIViewPanel
+  ID_DISPLAY_LIST,   //sent from a mafGUIButton		to mafGUIMDIChild  - ask for display list menu
+  ID_SETTINGS,       //sent from a mafGUIButton		to mafGUIMDIChild  - ask to display a view-settings-panel
+  ID_RANGE_MODIFIED, //sent from a mafGUILutSlider	to mafGUIMDIChild  - ask to Views
 WIDGETS_END,
 
-// id of pictures - used in mmgBitmaps
+// id of pictures - used in mafGUIBitmaps
 PIC_START,  
-  TIME_SET,				 //also sent by mmgTimeBar to mafLogic
+  TIME_SET,				 //also sent by mafGUITimeBar to mafLogic
   TIME_PLAY,       //pictures used by the timebar
   TIME_STOP,
   TIME_PREV,
@@ -376,7 +376,7 @@ AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been 
 
 MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
 
-// const used by mmgGui and mmgGuiValidator
+// const used by mafGUI and mafGUIGuiValidator
 MINID,      
 MAXID = MINID + MAXWIDGET,
 
@@ -400,7 +400,7 @@ MAF_EXPORT extern wxWindow* mafGetFrame();
 /** global function to retrieve the vme base type. */
 //mafVmeBaseTypes mafGetBaseType(mafVME* vme); //(to be removed Marco)
 
-/** to be used by mmgFrame and derived class only */    
+/** to be used by mafGUIFrame and derived class only */    
 MAF_EXPORT void mafSetFrame(wxWindow* frame);
 
 /** process pending events. be careful not to call it recursively */    

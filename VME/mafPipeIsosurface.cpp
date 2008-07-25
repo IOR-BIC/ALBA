@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:29:30 $
-Version:   $Revision: 1.23 $
+Date:      $Date: 2008-07-25 07:05:59 $
+Version:   $Revision: 1.24 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,8 +25,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafPipeIsosurface.h"
 #include "mafEvent.h"
 #include "mafSceneNode.h"
-#include "mmgFloatSlider.h"
-#include "mmgGui.h"
+#include "mafGUIFloatSlider.h"
+#include "mafGUI.h"
 
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
@@ -172,14 +172,14 @@ float mafPipeIsosurface::GetContourValue()
 	return m_ContourMapper->GetContourValue();
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeIsosurface::CreateGui()
+mafGUI *mafPipeIsosurface::CreateGui()
 //----------------------------------------------------------------------------
 {
 	double range[2] = {0, 0};
 	m_Vme->GetOutput()->GetVTKData()->GetScalarRange(range);
 
 	assert(m_Gui == NULL);
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_ContourSlider = m_Gui->FloatSlider(ID_CONTOUR_VALUE,_("contour"), &m_ContourValue,range[0],range[1]);
 	m_AlphaSlider = m_Gui->FloatSlider(ID_ALPHA_VALUE,_("alpha"), &m_AlphaValue,0.0,1.0);
 	//m_Gui->Button(ID_GENERATE_ISOSURFACE,"generate iso");

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-28 16:02:13 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2008-07-25 07:05:59 $
+Version:   $Revision: 1.14 $
 Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,12 +21,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafPipeMeshSlice.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h"
-#include "mmgLutPreset.h"
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h"
+#include "mafGUILutPreset.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
-#include "mmgLutPreset.h"
+#include "mafGUILutPreset.h"
 #include "mafVMEOutputMesh.h"
 #include "mafEventSource.h"
 #include "mafAbsMatrixPipe.h"
@@ -35,7 +35,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEGenericAbstract.h"
 #include "mafVMEMesh.h"
 #include "mafParabolicMeshToLinearMeshFilter.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 #include "vtkMAFMeshCutter.h"
 
 #include "mafVMEItemVTK.h"
@@ -354,16 +354,16 @@ void mafPipeMeshSlice::UpdateProperty(bool fromTag)
 {
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeMeshSlice::CreateGui()
+mafGUI *mafPipeMeshSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
   m_Gui->Bool(ID_WIREFRAME,_("Wireframe"), &m_Wireframe, 1);
   m_Gui->Bool(ID_WIRED_ACTOR_VISIBILITY,_("Border Elem."), &m_BorderElementsWiredActor, 1);
   
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty , 1);
-  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
 

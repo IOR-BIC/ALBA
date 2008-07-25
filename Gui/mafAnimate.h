@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 16:00:24 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,11 +17,12 @@
 #include "mafObserver.h"
 
 class mafNode;
+class mafVME;
 class mafTagArray;
-class mmgButton;
+class mafGUIButton;
 class vtkRenderer;
-class mmgGui;
-class mmgMovieCtrl;
+class mafGUI;
+class mafGUIMovieCtrl;
 
 //----------------------------------------------------------------------------
 // mafAnimate :
@@ -33,13 +34,16 @@ mafAnimate allow to store and retrieve a particular point of view.
 class mafAnimate : public mafObserver
 {
 public:
+
+  MAF_ID_DEC(UPDATE_STORAGE_POSITION);
+
 	mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener = NULL);
 	~mafAnimate(); 
 	void OnEvent(mafEventBase *maf_event);
 	void SetListener(mafObserver *listener) {m_Listener = listener;};
 
 	/** Return mafAnimate User Interface */
-	mmgGui *GetGui() {return m_Gui;};
+	mafGUI *GetGui() {return m_Gui;};
 
   /** set the vme that hold the tag-array where the ViewPoint are stored */
 	void SetInputVME(mafNode *vme);
@@ -79,17 +83,20 @@ protected:
 	void EnableWidgets();
 	mafObserver	*m_Listener;
 
+  mafNode *m_Vme;
+  mafVME *m_Root;
+
 	mafTagArray		*m_Tags;
   mafTagArray		*m_StoredPositions;
 	vtkRenderer		*m_Renderer;
-	mmgGui				*m_Gui;
+	mafGUI				*m_Gui;
 
 	wxString			 m_SelectedPosition;
 	wxListBox			*m_PositionList;
-	mmgButton			*m_StorePositionButton; 
-	mmgButton			*m_DeletePositionButton;
-	mmgButton			*m_RenamePositionButton;
-  mmgMovieCtrl  *m_AnimatePlayer;
+	mafGUIButton			*m_StorePositionButton; 
+	mafGUIButton			*m_DeletePositionButton;
+	mafGUIButton			*m_RenamePositionButton;
+  mafGUIMovieCtrl  *m_AnimatePlayer;
 	int						 m_InterpolateFlag;
 };
 #endif

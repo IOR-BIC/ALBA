@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-13 15:27:24 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.16 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -36,7 +36,7 @@ class mafDeviceManager;
 class mafDeviceSet;
 class mmdMouse;
 class mmdRemoteMouse;
-class mmgInteractionSettings;
+class mafGUIInteractionSettings;
 class vtkRenderer;
 class vtkRendererWindow;
 class mafView;
@@ -46,12 +46,12 @@ class vtkXMLDataParser;
 class mmiSER;
 class mmiPER;
 class mafNode;
-class mmgDialog;
-class mmgGui;
-class mmgTree;
-class mmgCheckListBox;
-class mmgGuiHolder;
-class mmgNamedPanel;
+class mafGUIDialog;
+class mafGUI;
+class mafGUITree;
+class mafGUICheckListBox;
+class mafGUIHolder;
+class mafGUINamedPanel;
 class mmdClientMAF;
 
 
@@ -211,7 +211,7 @@ public:
 
   /** Show in modal configuration the settings dialog. */
   //bool ShowModal(); //SIL. 07-jun-2006 : 
-  mmgGui* GetGui();  //SIL. 07-jun-2006 : 
+  mafGUI* GetGui();  //SIL. 07-jun-2006 : 
 
   mmiSER *GetStaticEventRouter() {return m_StaticEventRouter;}
 
@@ -236,15 +236,15 @@ protected:
   /** Create the GUI dialog. */
   void CreateGUI();
 
-  mmgGui*                 m_Gui;  //SIL. 07-jun-2006 : 
+  mafGUI*                 m_Gui;  //SIL. 07-jun-2006 : 
   wxFrame*                m_Frame;
-  //mmgDialog*              m_Dialog;
-  mmgGui*                 m_Devices;
-  mmgTree*                m_DeviceTree;
-  mmgCheckListBox*        m_ActionsList;
-  mmgGuiHolder*           m_SettingsPanel;
-  //mmgNamedPanel*          m_BindingsPanel;
-  mmgGui*                 m_Bindings;
+  //mafGUIDialog*              m_Dialog;
+  mafGUI*                 m_Devices;
+  mafGUITree*                m_DeviceTree;
+  mafGUICheckListBox*        m_ActionsList;
+  mafGUIHolder*           m_SettingsPanel;
+  //mafGUINamedPanel*          m_BindingsPanel;
+  mafGUI*                 m_Bindings;
 
   mafDevice*              m_CurrentDevice;
   mafString			          m_SettingFileName;

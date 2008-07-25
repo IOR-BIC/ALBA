@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-02-09 10:31:33 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include "mafVMEOutputPolyline.h"
 #include "mafVME.h"
 #include "mafDataPipe.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafIndent.h"
 #include "mmaMaterial.h"
 
@@ -63,7 +63,7 @@ void mafVMEOutputPolyline::SetMaterial(mmaMaterial *material)
   m_Material = material;
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputPolyline::CreateGui()
+mafGUI* mafVMEOutputPolyline::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

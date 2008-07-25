@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-28 14:30:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,12 +20,12 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgCheckListBox;
+class mafGUICheckListBox;
 class mafTagItem;
 class mafVME;
 class mafVMESurface;
 class mafOp;
-class mafGui;
+class mafGUI;
 class mafEvent;
 class vtkDataSet;
 class vtkStructuredPoints;
@@ -83,7 +83,7 @@ protected:
   vtkStructuredPoints *m_OutputData;
   vtkDataSet          *m_Ds;
 	mafVMESurface       *m_Vme;
-  mmgCheckListBox     *m_LabelCheckBox;
+  mafGUICheckListBox     *m_LabelCheckBox;
   mafTagItem          *m_TagLabel;
 
 };

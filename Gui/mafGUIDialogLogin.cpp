@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogLogin.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 11:47:28 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ enum LOGIN_ID
 };
 //----------------------------------------------------------------------------
 mafGUIDialogLogin::mafGUIDialogLogin(const wxString& title, long style)
-: mmgDialog(title, style)
+: mafGUIDialog(title, style)
 //----------------------------------------------------------------------------
 {
   m_RememberMe = 0;
@@ -42,7 +42,7 @@ mafGUIDialogLogin::mafGUIDialogLogin(const wxString& title, long style)
   m_PwdOld = m_Pwd;
   m_InformationsInserted = false;
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->String(USERNAME_ID,_("user: "), &m_Username);
   m_Gui->String(PWD_ID,_("pwd: "), &m_Pwd, "", false, true);
   m_Gui->Bool(REMEMBER_ME_ID, _("remember me"), &m_RememberMe, 1);
@@ -76,10 +76,10 @@ void mafGUIDialogLogin::OnEvent(mafEventBase *maf_event)
         m_Username = m_UsernameOld;
         m_Pwd = m_PwdOld;
       }
-      mmgDialog::OnEvent(maf_event);
+      mafGUIDialog::OnEvent(maf_event);
     break;
     default:
-      mmgDialog::OnEvent(maf_event);
+      mafGUIDialog::OnEvent(maf_event);
   }
 }
 //----------------------------------------------------------------------------

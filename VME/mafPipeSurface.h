@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-04 13:53:47 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.29 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ class vtkPolyDataMapper;
 class vtkPolyData;
 class mafLODActor;
 class mafAxes;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class mmaMaterial;
 class vtkActor;
 class vtkGlyph3D;
@@ -104,7 +104,7 @@ protected:
 	int m_EdgeVisibility; ///< Flag to switch On/Off the visibility of edge feature on the surface
   int m_RenderingDisplayListFlag; ///< Flag to switch On/Off the 
   mmaMaterial *m_SurfaceMaterial;
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
   //void UpdateProperty(bool fromTag = false);
 
@@ -115,6 +115,6 @@ protected:
 	void CreateNormalsPipe();
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeSurface_H__

@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-08 09:46:01 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:00:01 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
-#ifndef __testViewApp_H__
-#define __testViewApp_H__
+#ifndef __exOperationApp_H__
+#define __exOperationApp_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
@@ -29,4 +29,4 @@ protected:
   void OnFatalException();
 };
 DECLARE_APP(exOperationApp)
-#endif //__testViewApp_H__
+#endif //__exOperationApp_H__

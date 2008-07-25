@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:10 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:02:58 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 
 
 #include "mafOpTest.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ void mafOpTest::OpRun()
   m_ButtonString = "choose";
 
   
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Label("label");
   m_Gui->Label("label1",mafString("label2")) ;

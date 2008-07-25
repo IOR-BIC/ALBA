@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdTracker.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-15 21:40:01 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.6 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ class mafOBB;
   The mmdTracker class has a specialized settings class which implements gui for
   setting the avatar and the tracker's tracked volume.
   The mmdTracker is also a mmdButtonsPad supporting buttons.
-  @sa mmdButtonsPad mmgTrackerSettings mafAvatar
+  @sa mmdButtonsPad mafGUITrackerSettings mafAvatar
   @todo 
     - manage fusion of position matrices (not working any more)
     - manage multiple button press (rewrite mflActionEvent)

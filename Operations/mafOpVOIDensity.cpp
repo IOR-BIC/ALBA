@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVOIDensity.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafOp.h"
 #include "mafString.h"
 #include "mafOpVOIDensity.h"
@@ -114,7 +114,7 @@ void mafOpVOIDensity::OpRun()
 	if(!this->m_TestMode)
 	{
 		// setup Gui
-		m_Gui = new mmgGui(this);
+		m_Gui = new mafGUI(this);
 		m_Gui->SetListener(this);
 
 		m_Gui->Divider();

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.h,v $
 Language:  C++
-Date:      $Date: 2008-02-01 13:32:03 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-07-25 07:05:59 $
+Version:   $Revision: 1.7 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class vtkGeometryFilter;
 class mafAxes;
 class mafParabolicMeshToLinearMeshFilter;
 class vtkLookupTable;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 
 //----------------------------------------------------------------------------
 // mafPipeMesh :
@@ -124,7 +124,7 @@ protected:
   wxString                *m_ScalarsName;
   wxString                *m_ScalarsVTKName;
 
-  mmgMaterialButton       *m_MaterialButton;
+  mafGUIMaterialButton       *m_MaterialButton;
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
@@ -136,6 +136,6 @@ protected:
   int                      m_UseVTKProperty;
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-	virtual mmgGui  *CreateGui();
+	virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeMesh_H__

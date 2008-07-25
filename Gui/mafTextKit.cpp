@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:46:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:24 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,8 @@
 #include "mafTextKit.h"
 
 #include "mafDecl.h"
-#include "mmgDialog.h"
-#include "mmgGui.h"
+#include "mafGUIDialog.h"
+#include "mafGUI.h"
 #include "mafRWI.h"
 
 #include "vtkTextMapper.h"
@@ -98,7 +98,7 @@ void mafTextKit::CreateGui()
                        "center left","center","center right",
                        "lower left","lower center","lower right"};
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	m_Gui->Show(true);
   m_Gui->Label("Text kit",true);
   m_Gui->Bool(ID_SHOW_TEXT,"show",&m_ShowText,0,"Show/hide text");
@@ -121,7 +121,7 @@ void mafTextKit::OnEvent(mafEventBase *maf_event)
     {
       case ID_NLINE_TEXT_IN_VIEW:
       {
-        mmgDialog dlg("Edit text",mafCLOSEWINDOW|mafRESIZABLE|mafOK|mafCANCEL);
+        mafGUIDialog dlg("Edit text",mafCLOSEWINDOW|mafRESIZABLE|mafOK|mafCANCEL);
         wxTextCtrl *text = new wxTextCtrl(&dlg,-1,wxString(m_TextInView.GetCStr()),wxDefaultPosition,wxSize(200,200),wxTE_MULTILINE);
         dlg.Add(text,1);
         int answer = dlg.ShowModal();

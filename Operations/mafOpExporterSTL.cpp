@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterSTL.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-07 13:41:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 #include "mafOpExporterSTL.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVME.h"
 #include "mafVMEOutputSurface.h"
@@ -77,7 +77,7 @@ void mafOpExporterSTL::OpRun()
 {
   mafString wildc = "Stereo Litography (*.stl)|*.stl";
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	//m_Gui->FileSave(ID_CHOOSE_FILENAME,"stl file", &m_File, wildc,"Save As...");
   m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_STL_BINARY_FILE,"binary",&m_Binary,0);

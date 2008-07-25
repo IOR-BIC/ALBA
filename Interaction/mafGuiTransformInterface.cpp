@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 09:17:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,11 +20,11 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiTransformInterface.h"
+#include "mafGUITransformInterface.h"
 #include "mafDecl.h"
 
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 
 #include "mmiGenericMouse.h"
 #include "mmiCompositorMouse.h"
@@ -36,7 +36,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGuiTransformInterface::mafGuiTransformInterface()
+mafGUITransformInterface::mafGUITransformInterface()
 //----------------------------------------------------------------------------
 {
   m_CurrentTime = -1;
@@ -46,14 +46,14 @@ mafGuiTransformInterface::mafGuiTransformInterface()
   m_RefSysVME = m_InputVME;
 }
 //----------------------------------------------------------------------------
-mafGuiTransformInterface::~mafGuiTransformInterface() 
+mafGUITransformInterface::~mafGUITransformInterface() 
 //----------------------------------------------------------------------------
 {   
  
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformInterface::SetRefSys(mafVME* refSysVme)
+void mafGUITransformInterface::SetRefSys(mafVME* refSysVme)
 //----------------------------------------------------------------------------
 { 
   if (refSysVme == NULL)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-12 15:10:24 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.40 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,12 +25,12 @@
 #include "mmuIdFactory.h"
 #include "mafDecl.h"
 #include "mafOp.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafGUISettings.h"
 #include "mafOpStack.h"
 #include "mafOpContextStack.h"
 #include "mafOpSelect.h"
-#include "mmgSettingsDialog.h"
+#include "mafGUISettingsDialog.h"
 
 #include "mmdMouse.h"
 
@@ -247,7 +247,7 @@ void mafOpManager::OpAdd(mafOp *op, wxString menuPath, bool can_undo, mafGUISett
     mafGetFrame()->SetAcceleratorTable(accel);
 }*/
 //----------------------------------------------------------------------------
-void mafOpManager::FillSettingDialog(mmgSettingsDialog *settingDialog)
+void mafOpManager::FillSettingDialog(mafGUISettingsDialog *settingDialog)
 //----------------------------------------------------------------------------
 {
   for(int i=0; i<m_NumOp; i++)

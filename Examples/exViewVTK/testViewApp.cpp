@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: testViewApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:57 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 07:01:31 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 #include "testViewApp.h"
 #include "mafVMEFactory.h"
 #include "mafPics.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 
 #include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"

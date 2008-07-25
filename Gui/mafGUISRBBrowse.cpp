@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 13:25:44 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.11 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,11 +23,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <wx/string.h>
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUIGui.h"
 #include "mafGUISettingsStorage.h"
-#include "mmgApplicationSettings.h"
+#include "mafGUIApplicationSettings.h"
 #include "mafPics.h"
-#include "mmgTree.h"
+#include "mafGUITree.h"
 
 #include "SrbStorageWS/soapH.h"
 #include "SrbStorageWS/SrbList.nsmap"
@@ -37,7 +37,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 //----------------------------------------------------------------------------
 mafGUISRBBrowse::mafGUISRBBrowse(mafObserver *listener,const wxString &title, long style, long dialogStyle)
-: mmgDialog(title, style)
+: mafGUIDialog(title, style)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
@@ -70,7 +70,7 @@ enum REMOTE_FILE_WIDGET_ID
 void mafGUISRBBrowse::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUIGui(this);
   m_Gui->Show(true);
 
   mafGUISettingsStorage *storage_settings = new mafGUISettingsStorage(this);
@@ -84,10 +84,10 @@ void mafGUISRBBrowse::CreateGui()
   m_Pwd  = storage_settings->GetSRBPwd();
   cppDEL(storage_settings);
   
-  m_GuiList = new mmgGui(this);
+  m_GuiList = new mafGUIGui(this);
   m_GuiList->Show(true);
 
-  m_Tree = new mmgTree(m_GuiList,-1,false,true);
+  m_Tree = new mafGUITree(m_GuiList,-1,false,true);
   m_Tree->SetAutoSort(FALSE);
   m_Tree->SetSize(290,470);
   m_Tree->SetListener(this);
@@ -162,7 +162,7 @@ void mafGUISRBBrowse::OnEvent(mafEventBase *maf_event)
         {
         //  m_FileName = local_file;
           e->SetId(wxOK);
-          mmgDialog::OnEvent(e);
+          mafGUIDialog::OnEvent(e);
         }
       }
       break;
@@ -184,12 +184,12 @@ void mafGUISRBBrowse::OnEvent(mafEventBase *maf_event)
       case wxOK:
         GetNodeName();
         e->SetId(wxOK);
-        mmgDialog::OnEvent(e);
+        mafGUIDialog::OnEvent(e);
       break;
       case wxCANCEL:
         m_RemoteFileName = "";
         e->SetId(wxCANCEL);
-        mmgDialog::OnEvent(e);
+        mafGUIDialog::OnEvent(e);
       break;
       default:
         mafEventMacro(*e);

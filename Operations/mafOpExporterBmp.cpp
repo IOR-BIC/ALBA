@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterBmp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 16:32:31 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMEVolumeGray.h"
 
@@ -82,7 +82,7 @@ void mafOpExporterBmp::OpRun()
   if(!m_TestMode)
   {
     //Crete GUI
-    m_Gui = new mmgGui(this);
+    m_Gui = new mafGUI(this);
     
     m_Gui->DirOpen(ID_DIROPEN, "export dir", &m_DirName, _("choose dir") );
    

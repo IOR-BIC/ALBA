@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-19 08:38:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,18 +20,18 @@
 
 #include "mafEvent.h"
 #include "mafObserver.h"
-#include "mmgCheckTree.h"
+#include "mafGUICheckTree.h"
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmgGuiHolder;
-class mmgGui;
-class mmgPanelStack;
-class mmgPanel;
+class mafGUIHolder;
+class mafGUI;
+class mafGUIPanelStack;
+class mafGUIPanel;
 class mafNode;
 class mafView;
-class mmgNamedPanel;
-class mmgSplittedPanel;
+class mafGUINamedPanel;
+class mafGUISplittedPanel;
 //----------------------------------------------------------------------------
 // mafSideBar :
 //----------------------------------------------------------------------------
@@ -71,11 +71,11 @@ public:
 
 	// Description:
 	// Remove the vme property gui from the panel.
-	void VmePropertyRemove(mmgGui *gui);
+	void VmePropertyRemove(mafGUI *gui);
 
 	// Description:
 	// Show the operation's parameters gui on the tabbed panel.
-	void OpShowGui(bool push_gui, mmgPanel *panel);
+	void OpShowGui(bool push_gui, mafGUIPanel *panel);
 
 	// Description:
 	// Hide the view/operation's gui from the tabbed panel.
@@ -99,24 +99,24 @@ public:
 
 	// Description:
 	// Return the pointer to the tree.
-	mmgCheckTree *GetTree() {return m_Tree;};
+	mafGUICheckTree *GetTree() {return m_Tree;};
 
   bool IsShown() {return m_Notebook->IsShown();};
   void Show( bool show) {m_Notebook->Show(show);};
 
   wxNotebook        *m_Notebook;
-  //mmgNamedPanel    *m_SideSplittedPanel;
+  //mafGUINamedPanel    *m_SideSplittedPanel;
   wxSplitterWindow *m_SideSplittedPanel;
 protected:
   void UpdateVmePanel();  
 
-  mmgPanelStack	*m_OpPanel;
-	mmgGuiHolder	*m_ViewPropertyPanel;
-  mmgCheckTree  *m_Tree;
+  mafGUIPanelStack	*m_OpPanel;
+	mafGUIHolder	*m_ViewPropertyPanel;
+  mafGUICheckTree  *m_Tree;
 
-  mmgGuiHolder  *m_VmePanel;
-  mmgGuiHolder  *m_VmeOutputPanel;
-  mmgGuiHolder  *m_VmePipePanel;
+  mafGUIHolder  *m_VmePanel;
+  mafGUIHolder  *m_VmeOutputPanel;
+  mafGUIHolder  *m_VmePipePanel;
 
   mafNode     *m_SelectedVme;
   mafView     *m_SelectedView;

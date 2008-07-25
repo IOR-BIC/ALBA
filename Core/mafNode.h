@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-21 14:52:26 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.35 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@
 class mafEventSource;
 class mafNodeIterator;
 class mafTagArray;
-class mmgGui;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 // mafNode
@@ -341,7 +341,7 @@ public:
   };
 
   /** create and return the GUI for changing the node parameters */
-  mmgGui *GetGui();
+  mafGUI *GetGui();
 
   /** destroy the Gui */
   void DeleteGui();
@@ -396,13 +396,13 @@ protected:
     the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
     subclass to continue the ID enumeration from it. For appending the widgets in the
     same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   void OnNodeDetachedFromTree(mafEventBase *e);
   void OnNodeAttachedToTree(mafEventBase *e);
   void OnNodeDestroyed(mafEventBase *e);
 
-  mmgGui            *m_Gui;         ///< pointer to the node GUI
+  mafGUI            *m_Gui;         ///< pointer to the node GUI
 
   mafChildrenVector m_Children;     ///< list of children
   mafNode           *m_Parent;      ///< parent node

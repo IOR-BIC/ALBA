@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-24 08:39:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -23,10 +23,10 @@
 
 #include "mafEvent.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafGUICrossIncremental.h"
-#include "mmgButton.h"
-#include "mmgValidator.h"
+#include "mafGUIButton.h"
+#include "mafGUIValidator.h"
 
 //----------------------------------------------------------------------------
 // costants :
@@ -55,7 +55,7 @@ const int LW	= 100;	// label width Linux
 const int EW	= 45;
 const int MEDIUM	= 70;
 
-BEGIN_EVENT_TABLE(mafGUICrossIncremental,mmgPanel)
+BEGIN_EVENT_TABLE(mafGUICrossIncremental,mafGUIPanel)
 
 END_EVENT_TABLE()
 
@@ -64,7 +64,7 @@ END_EVENT_TABLE()
 
 //----------------------------------------------------------------------------
 mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, const char * label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, bool boldLabel /* = true */, int modality /* = ID_COMPLETE_LAYOUT */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, double min /* = MINFLOAT */, double max /* = MAXFLOAT */, int decimal_digit /* = -1 */, long style /* = wxTAB_TRAVERSAL | wxCLIP_CHILDREN */)
-:mmgPanel(parent,id,pos,size,style) 
+:mafGUIPanel(parent,id,pos,size,style) 
 //----------------------------------------------------------------------------
 {
   m_Listener = NULL;
@@ -103,15 +103,15 @@ void mafGUICrossIncremental::CreateWidgetTopBottom()
 {
 	if(m_IdLayout == ID_TOP_BOTTOM_LAYOUT || m_IdLayout == ID_COMPLETE_LAYOUT )
 	{
-		m_ButtonTop = new mmgButton   (this, ID_BUTTON_TOP/*w_id*/, "+",dp, wxSize(EW, BH) );
-		m_ButtonTop->SetValidator( mmgValidator(this,ID_BUTTON_TOP/*w_id*/,m_ButtonTop) );
+		m_ButtonTop = new mafGUIButton   (this, ID_BUTTON_TOP/*w_id*/, "+",dp, wxSize(EW, BH) );
+		m_ButtonTop->SetValidator( mafGUIValidator(this,ID_BUTTON_TOP/*w_id*/,m_ButtonTop) );
 		//  m_ButtonTop->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
 		//  m_ButtonTop->SetToolTip(tooltip.GetCStr());
 
-		m_ButtonBottom = new mmgButton   (this, ID_BUTTON_BOTTOM/*w_id*/, "-",dp, wxSize(EW, BH) );
+		m_ButtonBottom = new mafGUIButton   (this, ID_BUTTON_BOTTOM/*w_id*/, "-",dp, wxSize(EW, BH) );
 
-		m_ButtonBottom->SetValidator( mmgValidator(this,ID_BUTTON_BOTTOM/*w_id*/,m_ButtonBottom) );
+		m_ButtonBottom->SetValidator( mafGUIValidator(this,ID_BUTTON_BOTTOM/*w_id*/,m_ButtonBottom) );
 		//m_ButtonBottom->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
 		//   butt->SetToolTip(tooltip.GetCStr());
@@ -125,14 +125,14 @@ void mafGUICrossIncremental::CreateWidgetLeftRight()
 {
 	if(m_IdLayout == ID_LEFT_RIGHT_LAYOUT || m_IdLayout == ID_COMPLETE_LAYOUT)
 	{
-		m_ButtonLeft = new mmgButton   (this, ID_BUTTON_LEFT/*w_id*/, "-",dp, wxSize(EW, BH) );
-		m_ButtonLeft->SetValidator( mmgValidator(this,ID_BUTTON_LEFT/*w_id*/,m_ButtonLeft) );
+		m_ButtonLeft = new mafGUIButton   (this, ID_BUTTON_LEFT/*w_id*/, "-",dp, wxSize(EW, BH) );
+		m_ButtonLeft->SetValidator( mafGUIValidator(this,ID_BUTTON_LEFT/*w_id*/,m_ButtonLeft) );
 		//m_ButtonLeft->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
 		//  m_ButtonTop->SetToolTip(tooltip.GetCStr());
 
-		m_ButtonRight = new mmgButton   (this, ID_BUTTON_RIGHT/*w_id*/, "+",dp, wxSize(EW, BH) );
-		m_ButtonRight->SetValidator( mmgValidator(this,ID_BUTTON_RIGHT/*w_id*/,m_ButtonRight) );
+		m_ButtonRight = new mafGUIButton   (this, ID_BUTTON_RIGHT/*w_id*/, "+",dp, wxSize(EW, BH) );
+		m_ButtonRight->SetValidator( mafGUIValidator(this,ID_BUTTON_RIGHT/*w_id*/,m_ButtonRight) );
 		//m_ButtonRight->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
 		//  m_ButtonTop->SetToolTip(tooltip.GetCStr());
@@ -143,9 +143,9 @@ void mafGUICrossIncremental::CreateWidgetTextEntry(double min , double max , int
 //----------------------------------------------------------------------------
 {
 	
-	//w_id = ((mmgGui *) parent)->GetWidgetId(w_id);
+	//w_id = ((mafGUI *) parent)->GetWidgetId(w_id);
 	m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.2f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
-	m_StepText->SetValidator( mmgValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,decimal_digit)  );
+	m_StepText->SetValidator( mafGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,decimal_digit)  );
 	//m_StepText->SetFont(m_Font);
 	//if(!tooltip.IsEmpty())
 	//  text->SetToolTip(tooltip.GetCStr());
@@ -315,7 +315,7 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
       m_Sizer->Add( m_StepText, 0, wxALIGN_LEFT, 0);
       m_Sizer->Add( m_ButtonRight, 0, wxALIGN_LEFT, 0);
 
-      //((mmgGui *)parent)->Add(sizer,0,wxALL, 0);
+      //((mafGUI *)parent)->Add(sizer,0,wxALL, 0);
 
     }
     break;
@@ -368,7 +368,7 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
       m_Sizer->Add( sizerLabel, 0, wxALIGN_LEFT, 0);
       m_Sizer->Add( verticalSizer, 0, wxALL, 0);
 
-      //((mmgGui *)parent)->Add(sizer,0,wxALL, 0);
+      //((mafGUI *)parent)->Add(sizer,0,wxALL, 0);
 
     }
     break;

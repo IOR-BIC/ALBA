@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-28 08:39:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:01:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 #include "mafViewScalar.h"
 #include "mafDecl.h"
-#include "mmgLutPreset.h"
+#include "mafGUILutPreset.h"
 
 #include "mafVME.h"
 #include "mafPipe.h"
@@ -82,7 +82,7 @@ mafView *mafViewScalar::Copy(mafObserver *Listener)
   return v;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafViewScalar::CreateGui()
+mafGUI *mafViewScalar::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
@@ -94,7 +94,7 @@ mmgGui *mafViewScalar::CreateGui()
   vtkNEW(m_Lut);
   lutPreset(4,m_Lut);
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Button(ID_ASCII_FILE,"ASCII data","","Choose single or multiple file ASCII.");
   m_Gui->Radio(ID_DATA_ORDER,"data order",&m_DataOrder,2,order_choices);
   m_Gui->Button(ID_READ_DATA,"read");

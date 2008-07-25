@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D2DPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-03 05:58:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -176,7 +176,7 @@ int mafAvatar3D2DPicker::InternalRestore(vtkXMLDataElement *node,vtkXMLDataParse
 void mafAvatar3D2DPicker::CreateSettings()
 //------------------------------------------------------------------------------
 {
-  Settings = new mmgAvatar3D2DPickerSettings(this); 
+  Settings = new mafGUIAvatar3D2DPickerSettings(this); 
 }
 //------------------------------------------------------------------------------
 int mafAvatar3D2DPicker::Pick(mflMatrix &tracker_pose)

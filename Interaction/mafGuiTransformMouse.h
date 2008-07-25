@@ -2,28 +2,28 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 13:09:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mafGuiTransformMouse_H__
-#define __mafGuiTransformMouse_H__
+#ifndef __mafGUITransformMouse_H__
+#define __mafGUITransformMouse_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
-#include "mafGuiTransformInterface.h"
+#include "mafGUITransformInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
-class mmgButton;
+class mafGUI;
+class mafGUIButton;
 class mmiGenericMouse;
 class mmiCompositorMouse;
 class mafInteractor;
@@ -37,11 +37,11 @@ class mafVME;
   @todo
 
 */
-class mafGuiTransformMouse : public mafGuiTransformInterface
+class mafGUITransformMouse : public mafGUITransformInterface
 {
 public:
-  mafGuiTransformMouse(mafVME *input, mafObserver *listener = NULL);
-	~mafGuiTransformMouse(); 
+  mafGUITransformMouse(mafVME *input, mafObserver *listener = NULL);
+	~mafGUITransformMouse(); 
 
   // constraints enum
   enum TRANSFORM_MOUSE_WIDGET_ID

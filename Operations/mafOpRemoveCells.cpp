@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:29:50 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 07:03:51 $
+Version:   $Revision: 1.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,18 +22,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mmdMouse.h"
 
-#include "mmgButton.h"
-#include "mmgValidator.h"
-#include "mmgPicButton.h"
-#include "mmgFloatSlider.h"
+#include "mafGUIButton.h"
+#include "mafGUIValidator.h"
+#include "mafGUIPicButton.h"
+#include "mafGUIFloatSlider.h"
 
 #include "mafVME.h"
 #include "mafVMESurface.h"
@@ -189,7 +189,7 @@ void mafOpRemoveCells::CreateOpDialog()
   wxBusyCursor wait;
 
   //===== setup interface ====
-  m_Dialog = new mmgDialog("Remove Cells", mafCLOSEWINDOW | mafRESIZABLE);
+  m_Dialog = new mafGUIDialog("Remove Cells", mafCLOSEWINDOW | mafRESIZABLE);
   
   m_Rwi = new mafRWI(m_Dialog,ONE_LAYER,false);
   m_Rwi->SetListener(this);
@@ -229,21 +229,21 @@ void mafOpRemoveCells::CreateOpDialog()
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
 
-  mmgButton  *unselectAllButton =    new mmgButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
-  mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
-  mmgButton  *ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
-  mmgButton  *cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
+  mafGUIButton  *unselectAllButton =    new mafGUIButton(m_Dialog, ID_UNSELECT,    "unselect all", p,wxSize(80,20));
+  mafGUIButton  *b_fit =    new mafGUIButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
+  mafGUIButton  *ok =     new mafGUIButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
+  mafGUIButton  *cancel = new mafGUIButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
 	
-  b_clip->SetValidator(mmgValidator(this,ID_AUTOCLIP,b_clip,(int*)&m_AutoClip));
+  b_clip->SetValidator(mafGUIValidator(this,ID_AUTOCLIP,b_clip,(int*)&m_AutoClip));
 
-  diameter->SetValidator(mmgValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
-  unselect->SetValidator(mmgValidator(this, ID_DELETE, unselect, &m_UnselectCells));
+  diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
+  unselect->SetValidator(mafGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
-  unselectAllButton->SetValidator(mmgValidator(this,ID_UNSELECT,unselectAllButton));
-  b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
-  ok->SetValidator(mmgValidator(this,ID_OK,ok));
-  cancel->SetValidator(mmgValidator(this,ID_CANCEL,cancel));
+  unselectAllButton->SetValidator(mafGUIValidator(this,ID_UNSELECT,unselectAllButton));
+  b_fit->SetValidator(mafGUIValidator(this,ID_FIT,b_fit));
+  ok->SetValidator(mafGUIValidator(this,ID_OK,ok));
+  cancel->SetValidator(mafGUIValidator(this,ID_CANCEL,cancel));
 
   wxBoxSizer *h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer0->Add(help,     0,wxRIGHT);	

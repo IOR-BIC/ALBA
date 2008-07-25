@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 08:17:04 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.32 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEItemVTK.h"
 #include "mafEventSource.h"
 #include "mafVMEOutputLandmarkCloud.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 #include "mafNodeIterator.h"
 
@@ -1177,7 +1177,7 @@ void mafVMELandmarkCloud::Print(std::ostream &os, const int tabs)
   }
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMELandmarkCloud::CreateGui()
+mafGUI* mafVMELandmarkCloud::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name

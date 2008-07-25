@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMesh.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 13:08:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include "mafVME.h"
 #include "mafIndent.h"
 #include "mafDataPipe.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 
 #include "vtkUnstructuredGrid.h"
@@ -59,7 +59,7 @@ vtkUnstructuredGrid *mafVMEOutputMesh::GetUnstructuredGridData()
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputMesh::CreateGui()
+mafGUI* mafVMEOutputMesh::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

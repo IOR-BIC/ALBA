@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpEditMetadata.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafNode.h"
 #include "mafTagArray.h"
@@ -96,7 +96,7 @@ void mafOpEditMetadata::OpRun()
   std::vector<std::string> tag_list;
   m_TagArray->GetTagList(tag_list);
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_MetadataList = m_Gui->ListBox(ID_METADATA_LIST,"",120);
   for (int t=0; t<tag_list.size();t++)
     m_MetadataList->Insert(tag_list[t].c_str(),0);

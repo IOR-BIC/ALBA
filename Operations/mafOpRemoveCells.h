@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgDialog;
-class mmgFloatSlider;
+class mafGUIDialog;
+class mafGUIFloatSlider;
 class mafVMESurface;
 class mafNode;
 class mafRWI;
@@ -116,7 +116,7 @@ protected:
   double m_MaxBrushMSize;
   int m_UnselectCells;
 
-  mmgDialog		*m_Dialog;
+  mafGUIDialog		*m_Dialog;
 	mafRWI      *m_Rwi;
   vtkPolyDataMapper *m_PolydataMapper;
   vtkActor          *m_PolydataActor;

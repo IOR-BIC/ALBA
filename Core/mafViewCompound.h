@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-21 15:17:26 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.27 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 class mmdMouse;
 class mafSceneGraph;
-class mmgGui;
+class mafGUI;
 class mafRWIBase;
 
 //----------------------------------------------------------------------------
@@ -32,8 +32,8 @@ class mafRWIBase;
 /** 
 mafViewCompound is the base class for Compound Views in MAF.
 
-The member function GetNodeStatus(vme) will be called by the mmgCheckTree 
-in order to update it's icons. (Note that mmgCheckTree doesn't know about
+The member function GetNodeStatus(vme) will be called by the mafGUICheckTree 
+in order to update it's icons. (Note that mafGUICheckTree doesn't know about
 the SceneGraph anymore)
 
 mafViewCompound doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVTK.
@@ -94,7 +94,7 @@ public:
 
   /** 
   return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
-  having mafViewCompound::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph */
+  having mafViewCompound::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph */
   virtual int  GetNodeStatus(mafNode *vme);
 
   virtual void OnSize(wxSizeEvent &event);
@@ -149,11 +149,11 @@ public:
 
   /** 
   Return the GUI for the visual pipe corresponding to the default child view. */
-//  virtual mmgGui *GetNodePipeGUI(mafNode *vme);
+//  virtual mafGUI *GetNodePipeGUI(mafNode *vme);
 
   /** 
   Return the gui for the visual pipe corresponding to the n-th child view. */
-//  virtual mmgGui *GetNodePipeGUI(mafNode *vme, int view_idx);
+//  virtual mafGUI *GetNodePipeGUI(mafNode *vme, int view_idx);
 
   /** 
   Return the sub-view in which the mouse is interacting with.*/
@@ -197,7 +197,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   /** Arrange sub-view into the defined layout configuration.*/
   void LayoutSubView(int width, int height);
@@ -218,7 +218,7 @@ protected:
   int m_LinkSubView;
 
   wxSize  m_Size; ///< size of the compound view
-  mmgGui *m_GuiView;
+  mafGUI *m_GuiView;
   wxWindow *m_GuiViewWindow;
   mmdMouse *m_Mouse;
 

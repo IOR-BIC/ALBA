@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 13:02:28 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.20 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,8 +29,8 @@
 #include "mafVMEItemVTK.h"
 #include "mafAbsMatrixPipe.h"
 #include "mmaMaterial.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h"
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h"
 
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"

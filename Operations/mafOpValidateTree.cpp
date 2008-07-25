@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 12:04:32 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 #include "mafOpValidateTree.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafStorage.h"
 #include "mafEventIO.h"

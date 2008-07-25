@@ -2,27 +2,27 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 15:46:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mafGuiSaveRestorePose_H__
-#define __mafGuiSaveRestorePose_H__
+#ifndef __mafGUISaveRestorePose_H__
+#define __mafGUISaveRestorePose_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
-#include "mafGuiTransformInterface.h"
+#include "mafGUITransformInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class mafMatrix;
 //----------------------------------------------------------------------------
 /** transform gui
@@ -32,7 +32,7 @@ class mafMatrix;
   @todo
 
 */
-class mafGuiSaveRestorePose : public mafGuiTransformInterface
+class mafGUISaveRestorePose : public mafGUITransformInterface
 {
 public:
 
@@ -42,8 +42,8 @@ public:
     ID_SCALE_GUI, 
   };
 
-  mafGuiSaveRestorePose(mafVME *input, mafObserver *listener = NULL , int typeGui = ID_POSE_GUI);
-	~mafGuiSaveRestorePose(); 
+  mafGUISaveRestorePose(mafVME *input, mafObserver *listener = NULL , int typeGui = ID_POSE_GUI);
+	~mafGUISaveRestorePose(); 
 
   void OnEvent(mafEventBase *maf_event);
 

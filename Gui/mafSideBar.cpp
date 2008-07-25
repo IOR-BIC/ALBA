@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-19 08:38:24 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.35 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,12 +22,12 @@
 #include "mafSideBar.h"
 #include "mafView.h"
 #include "mafViewVTK.h"
-#include "mmgGui.h"
-#include "mmgGuiHolder.h"
-#include "mmgPanelStack.h"
-#include "mmgPanel.h"
-#include "mmgSplittedPanel.h"
-#include "mmgTree.h"
+#include "mafGUI.h"
+#include "mafGUIHolder.h"
+#include "mafGUIPanelStack.h"
+#include "mafGUIPanel.h"
+#include "mafGUISplittedPanel.h"
+#include "mafGUITree.h"
 
 #include "mafVME.h"
 #include "mafVMEOutput.h"
@@ -47,20 +47,20 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
   m_SideSplittedPanel = new wxSplitterWindow(m_Notebook, -1, wxDefaultPosition, wxSize(-1,-1),/*wxSP_3DSASH |*/ wxSP_FULLSASH);
 
   //tree ----------------------------
-  m_Tree = new mmgCheckTree(m_SideSplittedPanel,-1,false,true);
+  m_Tree = new mafGUICheckTree(m_SideSplittedPanel,-1,false,true);
   m_Tree->SetListener(Listener);
   m_Tree->SetSize(-1,300);
   m_Tree->SetTitle(" vme hierarchy: ");
   m_Notebook->AddPage(m_SideSplittedPanel,_("data tree"),true);
 
   //view property panel
-  m_ViewPropertyPanel = new mmgGuiHolder(m_Notebook,-1,false,true);
+  m_ViewPropertyPanel = new mafGUIHolder(m_Notebook,-1,false,true);
   m_ViewPropertyPanel->SetTitle(_("no view selected:"));
   m_Notebook->AddPage(m_ViewPropertyPanel,_("view settings"));
 
   //op_panel ----------------------------
-  m_OpPanel  = new mmgPanelStack(m_Notebook ,-1);
-  mmgNamedPanel *empty_op = new mmgNamedPanel(m_OpPanel ,-1,false,true);
+  m_OpPanel  = new mafGUIPanelStack(m_Notebook ,-1);
+  mafGUINamedPanel *empty_op = new mafGUINamedPanel(m_OpPanel ,-1,false,true);
   empty_op->SetTitle(_(" no operation running:"));
   m_OpPanel->Push(empty_op);
   m_Notebook->AddPage(m_OpPanel ,_("operation"));
@@ -70,11 +70,11 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
     wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
     vme_notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
 
-    m_VmeOutputPanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+    m_VmeOutputPanel = new mafGUIHolder(vme_notebook,-1,false,true);
     vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));
-    m_VmePipePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+    m_VmePipePanel = new mafGUIHolder(vme_notebook,-1,false,true);
     vme_notebook->AddPage(m_VmePipePanel,_(" visual props "));
-    m_VmePanel = new mmgGuiHolder(vme_notebook,-1,false,true);
+    m_VmePanel = new mafGUIHolder(vme_notebook,-1,false,true);
     vme_notebook->AddPage(m_VmePanel,_("vme"));
 
     m_SideSplittedPanel->SetMinimumPaneSize(50);
@@ -82,15 +82,15 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
   }
   else
   {
-    m_VmePanel = new mmgGuiHolder(m_Notebook,-1,false,true);
+    m_VmePanel = new mafGUIHolder(m_Notebook,-1,false,true);
     m_Notebook->AddPage(m_VmePanel ,_("vme"));
 
-    m_VmeOutputPanel = new mmgGuiHolder(m_SideSplittedPanel,-1,false,true);
+    m_VmeOutputPanel = new mafGUIHolder(m_SideSplittedPanel,-1,false,true);
     m_VmeOutputPanel->Show();
     m_SideSplittedPanel->SetMinimumPaneSize(50);
     m_SideSplittedPanel->SplitHorizontally(m_Tree,m_VmeOutputPanel);
 
-    m_VmePipePanel = new mmgGuiHolder(m_Notebook,-1,false,true);
+    m_VmePipePanel = new mafGUIHolder(m_Notebook,-1,false,true);
     m_VmePipePanel->Show(false);
   }
 }
@@ -101,7 +101,7 @@ mafSideBar::~mafSideBar()
 	cppDEL(m_Notebook);
 }
 //----------------------------------------------------------------------------
-void mafSideBar::OpShowGui(bool push_gui, mmgPanel *panel)
+void mafSideBar::OpShowGui(bool push_gui, mafGUIPanel *panel)
 //----------------------------------------------------------------------------
 {
 	m_Notebook->Show(true);
@@ -138,7 +138,7 @@ void mafSideBar::ViewSelect(mafView *view)
 		s += wxStripMenuCodes(view->GetLabel());
 		s += " props:";
 		m_ViewPropertyPanel->SetTitle(s);
-		mmgGui *gui = view->GetGui();
+		mafGUI *gui = view->GetGui();
 		if(gui) 
 			m_ViewPropertyPanel->Put(gui);
 		else
@@ -205,7 +205,7 @@ void mafSideBar::VmeSelected(mafNode *vme)
   m_Tree->VmeSelected(vme);
 }
 //----------------------------------------------------------------------------
-void mafSideBar::VmePropertyRemove(mmgGui *gui)
+void mafSideBar::VmePropertyRemove(mafGUI *gui)
 //----------------------------------------------------------------------------
 {
 	m_VmePanel->Remove(gui);
@@ -222,9 +222,9 @@ void mafSideBar::UpdateVmePanel()
 {
   mafVMEOutput *vme_out = NULL;
   mafPipe      *vme_pipe = NULL;
-  mmgGui       *vme_gui = NULL;
-  mmgGui       *vme_out_gui = NULL;
-  mmgGui       *vme_pipe_gui = NULL;
+  mafGUI       *vme_gui = NULL;
+  mafGUI       *vme_out_gui = NULL;
+  mafGUI       *vme_pipe_gui = NULL;
 
   if(m_SelectedVme)
   {

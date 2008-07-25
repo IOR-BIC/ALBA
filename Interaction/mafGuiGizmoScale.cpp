@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,10 +20,10 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiGizmoScale.h"
+#include "mafGUIGizmoScale.h"
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 
 #include "mafGizmoInterface.h"
 
@@ -33,7 +33,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGuiGizmoScale::mafGuiGizmoScale(mafObserver *listener)
+mafGUIGizmoScale::mafGUIGizmoScale(mafObserver *listener)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
@@ -43,17 +43,17 @@ mafGuiGizmoScale::mafGuiGizmoScale(mafObserver *listener)
 }
 
 //----------------------------------------------------------------------------
-mafGuiGizmoScale::~mafGuiGizmoScale() 
+mafGUIGizmoScale::~mafGUIGizmoScale() 
 //----------------------------------------------------------------------------
 { 	
   
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoScale::CreateGui()
+void mafGUIGizmoScale::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   m_Gui->Divider(2);
   m_Gui->Label("scaling gizmo abs scaling", true);
@@ -65,7 +65,7 @@ void mafGuiGizmoScale::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoScale::OnEvent(mafEventBase *maf_event)
+void mafGUIGizmoScale::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -87,7 +87,7 @@ void mafGuiGizmoScale::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafGuiGizmoScale::EnableWidgets(bool enable)
+void mafGUIGizmoScale::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_SCALE_X, enable);
@@ -96,7 +96,7 @@ void mafGuiGizmoScale::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoScale::SendAbsScaling(mafEventBase *sourceEvent)
+void mafGUIGizmoScale::SendAbsScaling(mafEventBase *sourceEvent)
 //----------------------------------------------------------------------------
 {
   // build abs matrix scaling
@@ -112,7 +112,7 @@ void mafGuiGizmoScale::SendAbsScaling(mafEventBase *sourceEvent)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoScale::SetAbsScaling(mafMatrix *pose)
+void mafGUIGizmoScale::SetAbsScaling(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   mafTransform::GetScale(*pose, m_Scaling);

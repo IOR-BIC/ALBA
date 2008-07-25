@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-24 10:51:58 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mafStorageElement;
-class mmgGui;
+class mafGUI;
 class mafEvent;
 class mafEventBase;
 class mafMatrix;
@@ -131,7 +131,7 @@ public:
   /** 
     Return settings object for this Avatar, and if not yet allocated 
     create it. Settings objects usually include a GUI for interactive settings.*/
-  //mmgAvatarSettings *GetSettings() {if (!Settings) CreateSettings(); return Settings;}
+  //mafGUIAvatarSettings *GetSettings() {if (!Settings) CreateSettings(); return Settings;}
 
    /** 
      return the tracker attached to this avatar: the avatar usually follows the 
@@ -160,7 +160,7 @@ public:
   virtual vtkAbstractPropPicker *GetPicker(){ return NULL; }
 
   /** Return pointer to the GUI. */
-  mmgGui *GetGui();
+  mafGUI *GetGui();
 
   /** internal function to create device GUI for settings */
   virtual void CreateGui();
@@ -199,7 +199,7 @@ protected:
   vtkMAFSmartPointer<vtkProp3D>   m_Actor3D;  ///< 3D representation of the avatar
   vtkMAFSmartPointer<vtkActor2D>  m_Actor2D;  ///< 2D representation of the avatar
 
-  mmgGui*           m_Gui;  ///< the settings Gui
+  mafGUI*           m_Gui;  ///< the settings Gui
   mafView*          m_View; ///< the selected view
   int               m_Mode; ///< Avatar modality, either 2D or 3D         
 

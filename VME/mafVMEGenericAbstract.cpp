@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 19:53:12 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.25 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 
 
 #include "mafVMEGenericAbstract.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafDataVector.h"
 #include "mafMatrixVector.h"
@@ -334,7 +334,7 @@ int mafVMEGenericAbstract::InternalRestore(mafStorageElement *node)
   return ret_val;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafVMEGenericAbstract::CreateGui()
+mafGUI *mafVMEGenericAbstract::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name

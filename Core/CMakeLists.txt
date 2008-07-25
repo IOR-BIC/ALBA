@@ -78,12 +78,12 @@ SET(PROJECT_SRCS
   mafVMEStorage.h
   mmaApplicationLayout.cpp
   mmaApplicationLayout.h
-  mmgListCtrlBitmap.cpp
-  mmgListCtrlBitmap.h
-  mmgVMEChooser.cpp
-  mmgVMEChooser.h
-  mmgVMEChooserTree.cpp
-  mmgVMEChooserTree.h
+  mafGUIListCtrlBitmap.cpp
+  mafGUIListCtrlBitmap.h
+  mafGUIVMEChooser.cpp
+  mafGUIVMEChooser.h
+  mafGUIVMEChooserTree.cpp
+  mafGUIVMEChooserTree.h
   mmuTimeSet.cpp
   mmuTimeSet.h
 
@@ -126,21 +126,21 @@ IF (MAF_USE_VTK)
   mmaMaterial.h
   mmaVolumeMaterial.cpp
   mmaVolumeMaterial.h
-  mmgContextualMenu.cpp
-  mmgContextualMenu.h
-  mmgMaterialButton.cpp
-  mmgMaterialButton.h
-  mmgMaterialChooser.cpp
-  mmgMaterialChooser.h
-  mmgTreeContextualMenu.cpp
-  mmgTreeContextualMenu.h
+  mafGUIContextualMenu.cpp
+  mafGUIContextualMenu.h
+  mafGUIMaterialButton.cpp
+  mafGUIMaterialButton.h
+  mafGUIMaterialChooser.cpp
+  mafGUIMaterialChooser.h
+  mafGUITreeContextualMenu.cpp
+  mafGUITreeContextualMenu.h
   vtkMAFAssembly.cpp
   vtkMAFAssembly.h
   )
 ENDIF (MAF_USE_VTK)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui mafInteraction mafOperations curl)
+SET(PROJECT_LIBS mafBase mafIO mafGUI mafInteraction mafOperations curl)
 
 IF (MAF_USE_VTK)
   SET(PROJECT_LIBS ${PROJECT_LIBS} vtkCommon)

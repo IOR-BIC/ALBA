@@ -78,22 +78,22 @@ SET(PROJECT_SRCS
   mafGizmoTranslateAxis.h
   mafGizmoTranslatePlane.cpp
   mafGizmoTranslatePlane.h
-  mafGuiGizmoInterface.cpp
-  mafGuiGizmoInterface.h
-  mafGuiGizmoRotate.cpp
-  mafGuiGizmoRotate.h
-  mafGuiGizmoScale.cpp
-  mafGuiGizmoScale.h
-  mafGuiGizmoTranslate.cpp
-  mafGuiGizmoTranslate.h
-  mafGuiSaveRestorePose.cpp
-  mafGuiSaveRestorePose.h
-  mafGuiTransformInterface.cpp
-  mafGuiTransformInterface.h
-  mafGuiTransformMouse.cpp
-  mafGuiTransformMouse.h
-  mafGuiTransformTextEntries.cpp
-  mafGuiTransformTextEntries.h
+  mafGUIGizmoInterface.cpp
+  mafGUIGizmoInterface.h
+  mafGUIGizmoRotate.cpp
+  mafGUIGizmoRotate.h
+  mafGUIGizmoScale.cpp
+  mafGUIGizmoScale.h
+  mafGUIGizmoTranslate.cpp
+  mafGUIGizmoTranslate.h
+  mafGUISaveRestorePose.cpp
+  mafGUISaveRestorePose.h
+  mafGUITransformInterface.cpp
+  mafGUITransformInterface.h
+  mafGUITransformMouse.cpp
+  mafGUITransformMouse.h
+  mafGUITransformTextEntries.cpp
+  mafGUITransformTextEntries.h
   mafInteractionFactory.cpp
   mafInteractionFactory.h
   mafInteractionManager.cpp
@@ -190,7 +190,7 @@ ENDIF (WIN32)
 #ENDIF (WIN32)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
+SET(PROJECT_LIBS mafBase mafIO mafGUI vtkMAF)
 
 # currently special drivers only supported under WIN32
 #IF (WIN32)

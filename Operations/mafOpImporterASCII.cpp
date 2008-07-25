@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterASCII.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 #include <wx/dir.h>
 
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafASCIIImporterUtility.h"
 #include "mafVME.h"
@@ -135,7 +135,7 @@ void mafOpImporterASCII::OpRun()
 {
   wxString scalar_order[2] = {_("row"), _("columns")};
   
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Combo(ID_ASCII_DATA_ORDER,_("order"),&m_ScalarOrder,2,scalar_order,_("Select the order of how are stored the scalars."));
   m_Gui->Button(ID_ASCII_FILE,_("ASCII data"),"",_("Choose single or multiple file ASCII."));
   m_Gui->OkCancel();

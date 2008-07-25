@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterRAWVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,9 +21,9 @@
 #include "mafOpImporterRAWVolume.h"
 #include "wx/busyinfo.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafRWI.h"
-#include "mmgDialogPreview.h"
+#include "mafGUIDialogPreview.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
 
@@ -120,10 +120,10 @@ enum RAW_IMPORTER_ID
 void mafOpImporterRAWVolume::OpRun()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
 	//dialog +++++++++++++++++++++++++++++++++++++++
-	m_Dialog = new mmgDialogPreview(_("raw importer"), mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
+	m_Dialog = new mafGUIDialogPreview(_("raw importer"), mafCLOSEWINDOW | mafRESIZABLE | mafUSEGUI | mafUSERWI);
 
 	//Preview Pipeline ++++++++++++++++++++++++++++++
 	vtkNEW(m_Reader);
@@ -177,7 +177,7 @@ void mafOpImporterRAWVolume::OpRun()
 	m_Gui->OkCancel();
 
 	//slice slider +++++++++++++++++++++++++++++++++++++++++++
-  m_GuiSlider = new mmgGui(this);
+  m_GuiSlider = new mafGUI(this);
   m_SliceSlider = m_GuiSlider->Slider(ID_SLICE,_("slice num"),&m_CurrentSlice,0);
   m_GuiSlider->Show(true);
   m_GuiSlider->Reparent(m_Dialog);

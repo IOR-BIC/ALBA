@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 17:04:47 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class mafOpTransform;
 class vtkMatrix4x4;
 class mmdMouse;
 class mafGUISettings;
-class mmgSettingsDialog;
+class mafGUISettingsDialog;
 
 //----------------------------------------------------------------------------
 // mafOpManager :
@@ -61,7 +61,7 @@ public:
 	virtual void FillMenu(wxMenu* import, wxMenu* mexport, wxMenu* operations);
 
   /** Fill the setting dialog with the settings associated to the plugged operations.*/
-  void FillSettingDialog(mmgSettingsDialog *settingDialog);
+  void FillSettingDialog(mafGUISettingsDialog *settingDialog);
 
 	/** Record the selected vme and enable the menu_entries relative to the compatible operations. */
 	virtual void VmeSelected(mafNode* v);

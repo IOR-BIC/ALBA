@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@
 #include "mafDecl.h"
 #include "mafGizmoRotateCircle.h"
 #include "mafGizmoRotateFan.h"
-#include "mafGuiGizmoRotate.h"
+#include "mafGUIGizmoRotate.h"
 #include "mafSmartPointer.h"
 
 #include "mmiGenericMouse.h"
@@ -62,7 +62,7 @@ mafGizmoRotate::mafGizmoRotate(mafVME* input, mafObserver *listener)
 
   // create the gizmo gui
   // gui is sending events to this
-  m_GuiGizmoRotate = new mafGuiGizmoRotate(this);
+  m_GuiGizmoRotate = new mafGUIGizmoRotate(this);
   
   // initialize gizmo gui
   m_GuiGizmoRotate->SetAbsOrientation(m_InputVME->GetOutput()->GetAbsMatrix());
@@ -186,18 +186,18 @@ void mafGizmoRotate::OnEventGizmoGui(mafEventBase *maf_event)
   // process events from the gui
   switch (maf_event->GetId())
   {
-    case (mafGuiGizmoRotate::ID_ROTATE_X):
+    case (mafGUIGizmoRotate::ID_ROTATE_X):
     {
       // receiving abs orientation from gui
       SendTransformMatrixFromGui(maf_event);
     }
     break;
-    case (mafGuiGizmoRotate::ID_ROTATE_Y):
+    case (mafGUIGizmoRotate::ID_ROTATE_Y):
     {
       SendTransformMatrixFromGui(maf_event);     
     }
     break;
-    case (mafGuiGizmoRotate::ID_ROTATE_Z):
+    case (mafGUIGizmoRotate::ID_ROTATE_Z):
     {
       SendTransformMatrixFromGui(maf_event);     
     }

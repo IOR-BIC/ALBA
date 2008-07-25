@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogFindVme.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-22 06:39:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,8 +20,8 @@
 
 #include "mafGUIDialogFindVme.h"
 #include "mafDecl.h"
-#include "mmgValidator.h"
-#include "mmgCheckTree.h"
+#include "mafGUIValidator.h"
+#include "mafGUICheckTree.h"
 
 #include "mafVMERoot.h"
 
@@ -34,7 +34,7 @@ enum FIND_VME_ID
 };
 //----------------------------------------------------------------------------
 mafGUIDialogFindVme::mafGUIDialogFindVme(const wxString& title, long style)
-: mmgDialog(title, style)
+: mafGUIDialog(title, style)
 //----------------------------------------------------------------------------
 {
   m_SearchString = "";
@@ -44,14 +44,14 @@ mafGUIDialogFindVme::mafGUIDialogFindVme(const wxString& title, long style)
   m_Tree = NULL;
   m_NodeFoundList.clear();
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->String(FIND_STRING,_("find vme: "), &m_SearchString);
   m_Gui->Bool(MATCH_CASE_ID, _("match case"), &m_MatchCase, 1);
   m_Gui->Bool(WHOLE_WORD_ID, _("match whole word"), &m_WholeWord, 1);
 
   wxBoxSizer *buttons_sizer = new wxBoxSizer(wxHORIZONTAL);
   wxButton *findNextButton = new wxButton(this,FIND_NEXT,_("find next"));
-  findNextButton->SetValidator(mmgValidator(this, FIND_NEXT, findNextButton));
+  findNextButton->SetValidator(mafGUIValidator(this, FIND_NEXT, findNextButton));
   wxButton *cancelButton = new wxButton(this,wxID_CANCEL,_("cancel"));
   buttons_sizer->Add(findNextButton);
   buttons_sizer->Add(cancelButton);
@@ -93,7 +93,7 @@ void mafGUIDialogFindVme::OnEvent(mafEventBase *maf_event)
     case WHOLE_WORD_ID:
     break;
     default:
-      mmgDialog::OnEvent(maf_event);
+      mafGUIDialog::OnEvent(maf_event);
   }
 }
 //----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ bool mafGUIDialogFindVme::FindNextNode(const char *text)
   return m_Tree->SelectNode((long)nodeFound);
 }
 //----------------------------------------------------------------------------
-void mafGUIDialogFindVme::SetTree(mmgCheckTree *tree)
+void mafGUIDialogFindVme::SetTree(mafGUICheckTree *tree)
 //----------------------------------------------------------------------------
 {
   m_Tree = tree;

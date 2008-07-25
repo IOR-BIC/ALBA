@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVisualPipeVolumeRayCasting.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Alexander Savenko - Paolo Quadrani (porting MAF2.2)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 
 #include "mmaVolumeMaterial.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVME.h"
 #include "mafVMEOutputVolume.h"
@@ -210,11 +210,11 @@ void mafVisualPipeVolumeRayCasting::Select(bool sel)
   }
 }
 //----------------------------------------------------------------------------
-mmgGui *mafVisualPipeVolumeRayCasting::CreateGui()
+mafGUI *mafVisualPipeVolumeRayCasting::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   return m_Gui;
 }

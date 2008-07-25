@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 11:03:02 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.37 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -256,7 +256,7 @@ protected:
   void SetAbsMatrixPipe(mafAbsMatrixPipe *pipe);
 
   /** Create GUI for the VME */
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   mafAutoPointer<mafDataPipe>       m_DataPipe;
   mafAutoPointer<mafMatrixPipe>     m_MatrixPipe;

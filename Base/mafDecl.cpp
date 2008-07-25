@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 16:48:15 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2008-07-25 06:55:21 $
+  Version:   $Revision: 1.39 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -479,7 +479,7 @@ std::string  mafIdString(int id)
 
      case MATRIX_UPDATED:       s="MATRIX_UPDATED"; break;
 
-// const used by mmgGui and mmgGuiValidator
+// const used by mafGUI and mafGUIGuiValidator
      case MINID:	              s="MINID"; break; 
      case MAXID:	              s="MAXID"; break; 
      case ID_GUI_UPDATE:	      s="ID_GUI_UPDATE"; break; 

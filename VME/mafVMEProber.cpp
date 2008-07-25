@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEProber.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-27 15:19:20 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEProber.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 
 #include "mafTransform.h"
@@ -407,7 +407,7 @@ float mafVMEProber::GetLowDensity()
   return mafRestoreNumericFromTag(GetTagArray(),"MFL_MAP_LOW_DENSITY",m_LowDensity,-1.0f,300.0f);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEProber::CreateGui()
+mafGUI* mafVMEProber::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name

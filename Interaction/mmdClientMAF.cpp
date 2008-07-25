@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmdClientMAF.cpp,v $
 Language:  C++
-Date:      $Date: 2006-12-14 10:00:21 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 07:03:38 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mmdClientMAF.h"
 #include "mmuIdFactory.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafEventSender.h"
 

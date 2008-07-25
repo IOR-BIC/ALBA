@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-01 13:01:12 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 07:03:23 $
+Version:   $Revision: 1.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUISettings.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 //#include "mafMemDbg.h"
 
@@ -47,11 +47,11 @@ mafGUISettings::~mafGUISettings()
 void mafGUISettings::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Label("");
 }
 //----------------------------------------------------------------------------
-mmgGui* mafGUISettings::GetGui()
+mafGUI* mafGUISettings::GetGui()
 //----------------------------------------------------------------------------
 {
   if (m_Gui == NULL)

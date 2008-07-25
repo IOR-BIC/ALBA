@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:29 $
-  Version:   $Revision: 1.78 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.79 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -314,11 +314,11 @@ void mafViewVTK::VmeDeletePipe(mafNode *vme)
   cppDEL(n->m_Pipe);
 }
 //-------------------------------------------------------------------------
-mmgGui *mafViewVTK::CreateGui()
+mafGUI *mafViewVTK::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = mafView::CreateGui(); //new mmgGui(this);
+  m_Gui = mafView::CreateGui(); //new mafGUI(this);
   m_Gui->AddGui(m_Rwi->GetGui());
   
   /////////////////////////////////////////Attach Camera GUI

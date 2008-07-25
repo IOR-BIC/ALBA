@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.16 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 #include "mafPipePolylineSlice.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafAxes.h"
 
 #include "mmaMaterial.h"
@@ -261,11 +261,11 @@ void mafPipePolylineSlice::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipePolylineSlice::CreateGui()
+mafGUI *mafPipePolylineSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
   m_Gui->FloatSlider(ID_RADIUS_CHANGE,_("Radius"),&m_Radius,0.1,2.5);
   m_Gui->Bool(ID_SPLINE,_("spline"),&m_SplineMode);

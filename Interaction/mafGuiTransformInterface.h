@@ -2,16 +2,16 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:57:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mafGuiTransformInterface_H__
-#define __mafGuiTransformInterface_H__
+#ifndef __mafGUITransformInterface_H__
+#define __mafGUITransformInterface_H__
 
 //----------------------------------------------------------------------------
 // Include:
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class mafVME;
 
 //----------------------------------------------------------------------------
@@ -36,12 +36,12 @@ class mafVME;
   @todo
 
 */
-class mafGuiTransformInterface : public mafObserver
+class mafGUITransformInterface : public mafObserver
 {
 public:
 
   /** Return the gui to be plugged*/
-  mmgGui *GetGui() {return m_Gui;};
+  mafGUI *GetGui() {return m_Gui;};
 
   /** Enable-Disable the GUI's widgets */
   virtual void EnableWidgets(bool enable) = 0;
@@ -58,8 +58,8 @@ public:
   
 protected:
   
-  mafGuiTransformInterface();
-  ~mafGuiTransformInterface(); 
+  mafGUITransformInterface();
+  ~mafGUITransformInterface(); 
    
   /** Create the GUI */
   virtual void CreateGui() {};
@@ -67,7 +67,7 @@ protected:
   mafVME *m_InputVME;
 
   mafObserver *m_Listener;
-  mmgGui      *m_Gui;
+  mafGUI      *m_Gui;
    
   /** Vme to be used as reference system */
   mafVME *m_RefSysVME;

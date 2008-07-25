@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-07-23 09:17:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,13 +20,13 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiTransformTextEntries.h"
+#include "mafGUITransformTextEntries.h"
 #include "mafDecl.h"
 #include "mafSmartPointer.h"
 #include "mafTransformFrame.h"
 
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 
 #include "mmiGenericMouse.h"
 #include "mmiCompositorMouse.h"
@@ -39,7 +39,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGuiTransformTextEntries::mafGuiTransformTextEntries(mafVME *input, mafObserver *listener, bool enableScaling /* = true */)
+mafGUITransformTextEntries::mafGUITransformTextEntries(mafVME *input, mafObserver *listener, bool enableScaling /* = true */)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -62,17 +62,17 @@ mafGuiTransformTextEntries::mafGuiTransformTextEntries(mafVME *input, mafObserve
   SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
-mafGuiTransformTextEntries::~mafGuiTransformTextEntries() 
+mafGUITransformTextEntries::~mafGUITransformTextEntries() 
 //----------------------------------------------------------------------------
 {   
   
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::CreateGui()
+void mafGUITransformTextEntries::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
 
   m_Gui->Divider(2);
@@ -101,7 +101,7 @@ void mafGuiTransformTextEntries::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::OnEvent(mafEventBase *maf_event)
+void mafGUITransformTextEntries::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -130,7 +130,7 @@ void mafGuiTransformTextEntries::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::EnableWidgets(bool enable)
+void mafGUITransformTextEntries::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_TRANSLATE_X, enable);
@@ -145,7 +145,7 @@ void mafGuiTransformTextEntries::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::Reset()
+void mafGUITransformTextEntries::Reset()
 //----------------------------------------------------------------------------
 {
   SetRefSys(m_InputVME);
@@ -155,14 +155,14 @@ void mafGuiTransformTextEntries::Reset()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::RefSysVmeChanged()
+void mafGUITransformTextEntries::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
   this->SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::TextEntriesChanged()
+void mafGUITransformTextEntries::TextEntriesChanged()
 //----------------------------------------------------------------------------
 {
   // build the matrix to be applied to vme:
@@ -195,7 +195,7 @@ void mafGuiTransformTextEntries::TextEntriesChanged()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp timeStamp)
+void mafGUITransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp timeStamp)
 //----------------------------------------------------------------------------
 {
   // express absPose in RefSysVME refsys

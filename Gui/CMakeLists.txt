@@ -42,88 +42,88 @@ SET(PROJECT_SRCS
   mafPics.h
   mafWXLog.cpp
   mafWXLog.h
-  mmgApplicationLayoutSettings.cpp
-  mmgApplicationLayoutSettings.h
-  mmgApplicationSettings.cpp
-  mmgApplicationSettings.h
-  mmgButton.cpp
-  mmgButton.h
-  mmgCheckListBox.cpp
-  mmgCheckListBox.h
-  mmgCheckTree.cpp
-  mmgCheckTree.h
-  mmgColorSwatch.cpp
-  mmgColorSwatch.h
-  mmgColorWidget.cpp
-  mmgColorWidget.h
-  mmgCrossSplitter.cpp
-  mmgCrossSplitter.h
-  mmgDialog.cpp
-  mmgDialog.h
-  mmgDockManager.cpp
-  mmgDockManager.h
-  mmgDockSettings.cpp
-  mmgDockSettings.h
-  mmgFileHistory.cpp
-  mmgFileHistory.h
-  mmgFlagSplitter.cpp
-  mmgFlagSplitter.h
-  mmgFloatSlider.cpp
-  mmgFloatSlider.h
-  mmgFrame.cpp
-  mmgFrame.h
-  mmgGui.cpp
-  mmgGui.h
-  mmgGuiHolder.cpp
-  mmgGuiHolder.h
-  mmgLab.cpp
-  mmgLab.h
-  mmgListBox.cpp
-  mmgListBox.h
-  mmgListCtrl.cpp
-  mmgListCtrl.h
-  mmgLocaleSettings.cpp
-  mmgLocaleSettings.h
-  mmgMeasureUnitSettings.cpp
-  mmgMeasureUnitSettings.h
-  mmgMovieCtrl.cpp
-  mmgMovieCtrl.h
-  mmgMDIChild.cpp
-  mmgMDIChild.h
-  mmgMDIFrame.cpp
-  mmgMDIFrame.h
-  mmgMutexPanel.cpp
-  mmgMutexPanel.h
-  mmgNamedPanel.cpp
-  mmgNamedPanel.h
-  mmgPanel.cpp
-  mmgPanel.h
-  mmgPanelStack.cpp
-  mmgPanelStack.h
-  mmgPicButton.cpp
-  mmgPicButton.h
-  mmgRangeSlider.cpp
-  mmgRangeSlider.h
-  mmgRollOut.cpp
-  mmgRollOut.h
-  mmgSashPanel.h
-  mmgSashPanel.cpp
-  mmgScrolledPanel.cpp
-  mmgScrolledPanel.h
-  mmgSettingsDialog.cpp
-  mmgSettingsDialog.h
-  mmgSplittedPanel.cpp
-  mmgSplittedPanel.h
-  mmgTimeBar.cpp
-  mmgTimeBar.h
-  mmgTree.cpp
-  mmgTree.h
-  mmgValidator.cpp
-  mmgValidator.h
-  mmgViewFrame.cpp
-  mmgViewFrame.h
-  mmgViewWin.cpp
-  mmgViewWin.h
+  mafGUIApplicationLayoutSettings.cpp
+  mafGUIApplicationLayoutSettings.h
+  mafGUIApplicationSettings.cpp
+  mafGUIApplicationSettings.h
+  mafGUIButton.cpp
+  mafGUIButton.h
+  mafGUICheckListBox.cpp
+  mafGUICheckListBox.h
+  mafGUICheckTree.cpp
+  mafGUICheckTree.h
+  mafGUIColorSwatch.cpp
+  mafGUIColorSwatch.h
+  mafGUIColorWidget.cpp
+  mafGUIColorWidget.h
+  mafGUICrossSplitter.cpp
+  mafGUICrossSplitter.h
+  mafGUIDialog.cpp
+  mafGUIDialog.h
+  mafGUIDockManager.cpp
+  mafGUIDockManager.h
+  mafGUIDockSettings.cpp
+  mafGUIDockSettings.h
+  mafGUIFileHistory.cpp
+  mafGUIFileHistory.h
+  mafGUIFlagSplitter.cpp
+  mafGUIFlagSplitter.h
+  mafGUIFloatSlider.cpp
+  mafGUIFloatSlider.h
+  mafGUIFrame.cpp
+  mafGUIFrame.h
+  mafGUI.cpp
+  mafGUI.h
+  mafGUIHolder.cpp
+  mafGUIHolder.h
+  mafGUILab.cpp
+  mafGUILab.h
+  mafGUIListBox.cpp
+  mafGUIListBox.h
+  mafGUIListCtrl.cpp
+  mafGUIListCtrl.h
+  mafGUILocaleSettings.cpp
+  mafGUILocaleSettings.h
+  mafGUIMeasureUnitSettings.cpp
+  mafGUIMeasureUnitSettings.h
+  mafGUIMovieCtrl.cpp
+  mafGUIMovieCtrl.h
+  mafGUIMDIChild.cpp
+  mafGUIMDIChild.h
+  mafGUIMDIFrame.cpp
+  mafGUIMDIFrame.h
+  mafGUIMutexPanel.cpp
+  mafGUIMutexPanel.h
+  mafGUINamedPanel.cpp
+  mafGUINamedPanel.h
+  mafGUIPanel.cpp
+  mafGUIPanel.h
+  mafGUIPanelStack.cpp
+  mafGUIPanelStack.h
+  mafGUIPicButton.cpp
+  mafGUIPicButton.h
+  mafGUIRangeSlider.cpp
+  mafGUIRangeSlider.h
+  mafGUIRollOut.cpp
+  mafGUIRollOut.h
+  mafGUISashPanel.h
+  mafGUISashPanel.cpp
+  mafGUIScrolledPanel.cpp
+  mafGUIScrolledPanel.h
+  mafGUISettingsDialog.cpp
+  mafGUISettingsDialog.h
+  mafGUISplittedPanel.cpp
+  mafGUISplittedPanel.h
+  mafGUITimeBar.cpp
+  mafGUITimeBar.h
+  mafGUITree.cpp
+  mafGUITree.h
+  mafGUIValidator.cpp
+  mafGUIValidator.h
+  mafGUIViewFrame.cpp
+  mafGUIViewFrame.h
+  mafGUIViewWin.cpp
+  mafGUIViewWin.h
   mafGUICrossIncremental.cpp
   mafGUICrossIncremental.h
 )
@@ -131,8 +131,8 @@ SET(PROJECT_SRCS
 IF (MAF_USE_CURL)
 	SET(PROJECT_SRCS
 	${PROJECT_SRCS}
-	mmgDialogRemoteFile.cpp
-	mmgDialogRemoteFile.h
+	mafGUIDialogRemoteFile.cpp
+	mafGUIDialogRemoteFile.h
 	)
 ENDIF (MAF_USE_CURL)
 
@@ -142,11 +142,11 @@ IF (MAF_USE_VTK)
   mafLightKit.cpp
   mafLightKit.h
 
-  mmgDialogPreview.cpp
-  mmgDialogPreview.h
+  mafGUIDialogPreview.cpp
+  mafGUIDialogPreview.h
 
-  mmgDictionaryWidget.cpp
-  mmgDictionaryWidget.h
+  mafGUIDictionaryWidget.cpp
+  mafGUIDictionaryWidget.h
 
   mafAnimate.cpp
   mafAnimate.h
@@ -167,19 +167,19 @@ IF (MAF_USE_VTK)
   # these depends on vtkLookupTable
   mafColor.cpp
   mafColor.h
-  mmgLutEditor.cpp
-  mmgLutEditor.h
-  mmgLutPreset.cpp
-  mmgLutPreset.h
-  mmgLutSlider.cpp
-  mmgLutSlider.h
-  mmgLutSwatch.cpp
-  mmgLutSwatch.h
-  mmgLutWidget.cpp
-  mmgLutWidget.h
+  mafGUILutEditor.cpp
+  mafGUILutEditor.h
+  mafGUILutPreset.cpp
+  mafGUILutPreset.h
+  mafGUILutSlider.cpp
+  mafGUILutSlider.h
+  mafGUILutSwatch.cpp
+  mafGUILutSwatch.h
+  mafGUILutWidget.cpp
+  mafGUILutWidget.h
 
-  mmgHistogramWidget.cpp
-  mmgHistogramWidget.h
+  mafGUIHistogramWidget.cpp
+  mafGUIHistogramWidget.h
   )
 ENDIF (MAF_USE_VTK)
 

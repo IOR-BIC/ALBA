@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 15:04:41 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-07-25 07:03:24 $
+  Version:   $Revision: 1.23 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,8 +19,8 @@
 #include "mafObject.h"
 #include "mafDecl.h"
 #include "mafNode.h"
-#include "mmgGuiHolder.h"
-#include "mmgGui.h"
+#include "mafGUIHolder.h"
+#include "mafGUI.h"
 #include "mafPipe.h"
 
 //----------------------------------------------------------------------------
@@ -62,8 +62,8 @@ enum VME_VISIBILITY_ID
 /** 
 mafView is the base class for Views in maf.
 
-The member function GetNodeStatus(vme) will be called by the mmgCheckTree 
-in order to update it's icons. (Note that mmgCheckTree doesn't know about
+The member function GetNodeStatus(vme) will be called by the mafGUICheckTree 
+in order to update it's icons. (Note that mafGUICheckTree doesn't know about
 the SceneGraph anymore)
 
 mafView doesn't have a Scenegraph, nor knowledge about VTK /sa mafViewVTK.
@@ -110,7 +110,7 @@ public:
   virtual bool FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior) {return false;};
 
   /** return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... */
-  //having mafView::GetNodeStatus allow mmgCheckTree to not know about mafSceneGraph
+  //having mafView::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph
   virtual int GetNodeStatus(mafNode *vme) {return NODE_NON_VISIBLE;};
   
   /** return the current pipe for the specified vme (if any exist at this moment) */
@@ -123,7 +123,7 @@ public:
 
   virtual wxWindow*	GetWindow(){return m_Win;};
   virtual wxFrame*	GetFrame() {return m_Frame;};
-  virtual mmgGui*		GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
+  virtual mafGUI*		GetGui()   {if(m_Gui == NULL) CreateGui(); assert(m_Gui); return m_Gui;};
   virtual void		  SetFrame(wxFrame* f) {m_Frame = f;};
 
   virtual void			OnSize(wxSizeEvent &size_event)	{};
@@ -172,8 +172,8 @@ protected:
   wxString       m_Name;
   wxWindow			*m_Win;
   wxFrame				*m_Frame;
-  mmgGui      	*m_Gui;
-  mmgGuiHolder	*m_Guih;
+  mafGUI      	*m_Gui;
+  mafGUIHolder	*m_Guih;
 
   vtkCellPicker *m_Picker2D;  ///< the picker used to pick the in the render window
   vtkMAFRayCast3DPicker* m_Picker3D; ///< Used to pick in a VTK Render window
@@ -211,7 +211,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   double m_Slice[3];
   double m_Normal[3];

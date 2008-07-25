@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-04 13:56:26 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,9 +22,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
-#include "mmgRollOut.h"
-#include "mmgListBox.h"
+#include "mafGUI.h"
+#include "mafGUIRollOut.h"
+#include "mafGUIListBox.h"
 
 #include "mafNodeIterator.h"
 #include "mafTagArray.h"
@@ -109,7 +109,7 @@ bool mafOpDecomposeTimeVarVME::Accept(mafNode* node)
 void mafOpDecomposeTimeVarVME::OpRun()   
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
 
   char string[100];
@@ -128,9 +128,9 @@ void mafOpDecomposeTimeVarVME::ModeGui()
 {
   if(m_Gui)
   {
-    m_GuiFrames = new mmgGui(this);
-    m_GuiInterval = new mmgGui(this);
-    m_GuiPeriodicity = new mmgGui(this);
+    m_GuiFrames = new mafGUI(this);
+    m_GuiInterval = new mafGUI(this);
+    m_GuiPeriodicity = new mafGUI(this);
     
     m_GuiFrames->Button(ID_INSERT_FRAME, _("Add timestamp"), "", _("Add a timestamp"));
     m_GuiFrames->Button(ID_REMOVE_FRAME, _("Remove timestamp"), "", _("Remove a timestamp"));

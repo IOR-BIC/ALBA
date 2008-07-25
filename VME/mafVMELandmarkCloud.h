@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-11 11:45:22 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -234,7 +234,7 @@ protected:
   void SetState(int state);
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   int m_SingleFile;
   int m_NumberOfLandmarks;

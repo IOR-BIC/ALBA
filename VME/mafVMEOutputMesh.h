@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMesh.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 13:08:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@ public:
 protected: 
 
   mafString  m_NumCells;
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
 	mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the surface
 

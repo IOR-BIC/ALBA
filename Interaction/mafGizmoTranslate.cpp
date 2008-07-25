@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@
 #include "mmiGenericMouse.h"
 #include "mafGizmoTranslateAxis.h"
 #include "mafGizmoTranslatePlane.h"
-#include "mafGuiGizmoTranslate.h"
+#include "mafGUIGizmoTranslate.h"
 #include "mafSmartPointer.h"
 
 #include "mmiGenericMouse.h"
@@ -69,7 +69,7 @@ mafGizmoTranslate::mafGizmoTranslate(mafVME* input, mafObserver *listener)
   }
   // create the gizmo gui
   // gui is sending events to this
-  m_GuiGizmoTranslate = new mafGuiGizmoTranslate(this);
+  m_GuiGizmoTranslate = new mafGUIGizmoTranslate(this);
   // initialize gizmo gui
   m_GuiGizmoTranslate->SetAbsPosition(absInputMatrix);
 }
@@ -250,18 +250,18 @@ void mafGizmoTranslate::OnEventGizmoGui(mafEventBase *maf_event)
   switch(maf_event->GetId())
   {
     // process events from the gui   
-    case (mafGuiGizmoTranslate::ID_TRANSLATE_X):
+    case (mafGUIGizmoTranslate::ID_TRANSLATE_X):
     {
       // receiving abs position from gui
       SendTransformMatrixFromGui(maf_event);     
     }
     break;
-    case (mafGuiGizmoTranslate::ID_TRANSLATE_Y):
+    case (mafGUIGizmoTranslate::ID_TRANSLATE_Y):
     {
       SendTransformMatrixFromGui(maf_event);     
     }
     break;
-    case (mafGuiGizmoTranslate::ID_TRANSLATE_Z):
+    case (mafGUIGizmoTranslate::ID_TRANSLATE_Z):
     {
       SendTransformMatrixFromGui(maf_event);     
     }

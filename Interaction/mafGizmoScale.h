@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@
 #include "mafEvent.h"
 #include "mafObserver.h"
 #include "mafGizmoInterface.h"
-#include "mafGuiGizmoScale.h"
+#include "mafGUIGizmoScale.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -28,7 +28,7 @@ class mafGizmoScaleAxis;
 class mafGizmoScaleIsotropic;
 class mafMatrix;
 class mafVME;
-class mmgGui;
+class mafGUI;
 
 /** Gizmo used to perform constrained scaling along the x, yz axis
  or the xy, xz, yz plane.
@@ -105,11 +105,11 @@ public:
   //----------------------------------------------------------------------------
   // Gizmo Gui
   //----------------------------------------------------------------------------
-  mmgGui *GetGui() {return (m_GuiGizmoScale->GetGui());};
+  mafGUI *GetGui() {return (m_GuiGizmoScale->GetGui());};
 
 protected:
 
-  mafGuiGizmoScale *m_GuiGizmoScale;
+  mafGUIGizmoScale *m_GuiGizmoScale;
 
   /** Gizmo components events handling */
   void OnEventGizmoGui(mafEventBase *maf_event);

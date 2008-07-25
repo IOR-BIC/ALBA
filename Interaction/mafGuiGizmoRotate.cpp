@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,10 +20,10 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiGizmoRotate.h"
+#include "mafGUIGizmoRotate.h"
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 
 #include "mafGizmoInterface.h"
 #include "mafGizmoTranslate.h"
@@ -32,7 +32,7 @@
 #include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
-mafGuiGizmoRotate::mafGuiGizmoRotate(mafObserver *listener)
+mafGUIGizmoRotate::mafGUIGizmoRotate(mafObserver *listener)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
@@ -41,17 +41,17 @@ mafGuiGizmoRotate::mafGuiGizmoRotate(mafObserver *listener)
   CreateGui();
 }
 //----------------------------------------------------------------------------
-mafGuiGizmoRotate::~mafGuiGizmoRotate() 
+mafGUIGizmoRotate::~mafGUIGizmoRotate() 
 //----------------------------------------------------------------------------
 {
   
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoRotate::CreateGui()
+void mafGUIGizmoRotate::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   
   m_Gui->Divider(2);
   m_Gui->Label("rotation gizmo abs orientation", true);
@@ -63,7 +63,7 @@ void mafGuiGizmoRotate::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoRotate::OnEvent(mafEventBase *maf_event)
+void mafGUIGizmoRotate::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -84,7 +84,7 @@ void mafGuiGizmoRotate::OnEvent(mafEventBase *maf_event)
   }
 }
 //----------------------------------------------------------------------------
-void mafGuiGizmoRotate::EnableWidgets(bool enable)
+void mafGUIGizmoRotate::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_ROTATE_X, enable);
@@ -93,7 +93,7 @@ void mafGuiGizmoRotate::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoRotate::SendAbsOrientation(mafEventBase *sourceEvent)
+void mafGUIGizmoRotate::SendAbsOrientation(mafEventBase *sourceEvent)
 //----------------------------------------------------------------------------
 {
   // build abs matrix position
@@ -109,7 +109,7 @@ void mafGuiGizmoRotate::SendAbsOrientation(mafEventBase *sourceEvent)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiGizmoRotate::SetAbsOrientation(mafMatrix *pose)
+void mafGUIGizmoRotate::SetAbsOrientation(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   mafTransform::GetOrientation(*pose, m_Orientation);

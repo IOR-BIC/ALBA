@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.24 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class mmgFloatSlider;
+class mafGUIFloatSlider;
 class vtkPolyData;
 class vtkImageData;
 class vtkTexture;
@@ -134,7 +134,7 @@ protected:
 	void CreateTICKs();
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
 	double	m_Origin[3];    ///< Origin position of the cutting plane
 	float		m_Normal[3][3]; ///< Normal vectors defining the cutting plane orientation
@@ -145,7 +145,7 @@ protected:
 	int		 m_TextureRes; ///< Texture resolution used to render the volume slice
 	int		 m_SliceDirection; ///< Store the slicing direction: SLICE_X, SLICE_Y or SLICE_)
 
-  mmgFloatSlider *m_SliceSlider[3]; ///< Sliders used to move the cutting plane along the normals
+  mafGUIFloatSlider *m_SliceSlider[3]; ///< Sliders used to move the cutting plane along the normals
   vtkMAFAssembly *m_AssemblyUsed;
 
   mafVMEOutputVolume *m_VolumeOutput;

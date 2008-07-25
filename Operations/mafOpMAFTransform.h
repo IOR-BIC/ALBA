@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpMAFTransform.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,9 +24,9 @@
 class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafGizmoScale;
-class mafGuiTransformMouse;
-class mafGuiSaveRestorePose;
-class mafGuiTransformTextEntries;
+class mafGUITransformMouse;
+class mafGUISaveRestorePose;
+class mafGUITransformTextEntries;
 class mafNode;
 
 //----------------------------------------------------------------------------
@@ -80,9 +80,9 @@ protected:
   mafGizmoTranslate           *m_GizmoTranslate;  
   mafGizmoRotate              *m_GizmoRotate;
   mafGizmoScale               *m_GizmoScale;
-  mafGuiTransformMouse        *m_GuiTransform;
-  mafGuiSaveRestorePose       *m_GuiSaveRestorePose;
-  mafGuiTransformTextEntries  *m_GuiTransformTextEntries;
+  mafGUITransformMouse        *m_GuiTransform;
+  mafGUISaveRestorePose       *m_GuiSaveRestorePose;
+  mafGUITransformTextEntries  *m_GuiTransformTextEntries;
 
   double m_RotationStep;
   double m_TranslationStep;

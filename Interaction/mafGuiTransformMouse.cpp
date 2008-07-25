@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-09-04 13:09:10 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,11 +20,11 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiTransformMouse.h"
+#include "mafGUITransformMouse.h"
 #include "mafDecl.h"
 
-#include "mmgGui.h"
-#include "mmgButton.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
 
 #include "mmiGenericMouse.h"
 #include "mmiCompositorMouse.h"
@@ -39,7 +39,7 @@
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
-mafGuiTransformMouse::mafGuiTransformMouse(mafVME *input, mafObserver *listener)
+mafGUITransformMouse::mafGUITransformMouse(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -64,7 +64,7 @@ mafGuiTransformMouse::mafGuiTransformMouse(mafVME *input, mafObserver *listener)
   AttachInteractorToVme();
 }
 //----------------------------------------------------------------------------
-mafGuiTransformMouse::~mafGuiTransformMouse() 
+mafGUITransformMouse::~mafGUITransformMouse() 
 //----------------------------------------------------------------------------
 { 
   DetachInteractorFromVme();    
@@ -72,10 +72,10 @@ mafGuiTransformMouse::~mafGuiTransformMouse()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::CreateGui()
+void mafGUITransformMouse::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Divider(2);
   m_Gui->Label("mouse interaction", true);
   m_Gui->Label("left mouse: rotate");
@@ -103,7 +103,7 @@ void mafGuiTransformMouse::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
+void mafGUITransformMouse::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   switch(maf_event->GetId())
@@ -267,7 +267,7 @@ void mafGuiTransformMouse::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::CreateISA()
+void mafGUITransformMouse::CreateISA()
 //----------------------------------------------------------------------------
 {
   OldInteractor = m_InputVME->GetBehavior();
@@ -336,7 +336,7 @@ void mafGuiTransformMouse::CreateISA()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::EnableWidgets(bool enable)
+void mafGUITransformMouse::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   m_Gui->Enable(ID_ROTATION_AXES, enable);
@@ -353,21 +353,21 @@ void mafGuiTransformMouse::EnableWidgets(bool enable)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::AttachInteractorToVme()
+void mafGUITransformMouse::AttachInteractorToVme()
 //----------------------------------------------------------------------------
 {
   m_InputVME->SetBehavior(IsaCompositor);
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::DetachInteractorFromVme()
+void mafGUITransformMouse::DetachInteractorFromVme()
 //----------------------------------------------------------------------------
 {
   m_InputVME->SetBehavior(OldInteractor);
 }
 
 //----------------------------------------------------------------------------
-void mafGuiTransformMouse::RefSysVmeChanged()
+void mafGUITransformMouse::RefSysVmeChanged()
 //----------------------------------------------------------------------------
 {
   IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());

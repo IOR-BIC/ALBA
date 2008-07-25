@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:26:28 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.14 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,8 +30,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEItemVTK.h"
 #include "mafEventSource.h"
 #include "mafTransform.h"
-#include "mmgGui.h"
-#include "mmgRollOut.h"
+#include "mafGUI.h"
+#include "mafGUIRollOut.h"
 #include "mmaMaterial.h"
 #include "mafVMEOutputSurface.h"
 #include "mafDataPipeCustom.h"
@@ -250,17 +250,17 @@ void mafVMESurfaceParametric::GetLocalTimeStamps(std::vector<mafTimeStamp> &kfra
   kframes.push_back(t);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMESurfaceParametric::CreateGui()
+mafGUI* mafVMESurfaceParametric::CreateGui()
 //-------------------------------------------------------------------------
 {
   mafVME::CreateGui();
   if(m_Gui)
   {
-    m_GuiSphere = new mmgGui(this);
-    m_GuiCone = new mmgGui(this);
-    m_GuiCylinder = new mmgGui(this);
-    m_GuiCube = new mmgGui(this);
-    m_GuiPlane= new mmgGui(this);
+    m_GuiSphere = new mafGUI(this);
+    m_GuiCone = new mafGUI(this);
+    m_GuiCylinder = new mafGUI(this);
+    m_GuiCube = new mafGUI(this);
+    m_GuiPlane= new mafGUI(this);
 
     m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Radius"), &m_SphereRadius);
     m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Phi res"), &m_SpherePhiRes);

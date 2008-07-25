@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DDistance.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:06 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.7 $
   Authors:   Daniele Giunchi - Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -15,7 +15,7 @@
 #include "mmdMouse.h"
 #include "mafRWI.h"
 #include "mafView.h"
-#include "mmgDialogPreview.h"
+#include "mafGUIDialogPreview.h"
 #include "mafVME.h"
 #include "mafEventInteraction.h"
 
@@ -104,7 +104,7 @@ mmi2DDistance::mmi2DDistance()
   int x_init,y_init;
   x_init = mafGetFrame()->GetPosition().x;
   y_init = mafGetFrame()->GetPosition().y;
-  m_HistogramDialog = new mmgDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
+  m_HistogramDialog = new mafGUIDialogPreview(_("Histogram"), mafCLOSEWINDOW | mafUSERWI);
   m_HistogramRWI = m_HistogramDialog->GetRWI();
   m_HistogramRWI->SetListener(this);
   m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 
 #include "mafGizmoInterface.h"
-#include "mafGuiGizmoInterface.h"
+#include "mafGUIGizmoInterface.h"
 
 #include "mafVME.h"
 

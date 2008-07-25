@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 16:00:24 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.12 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,11 +20,13 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafAnimate.h"
 
+#include "mmuIdFactory.h"
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgButton.h"
-#include "mmgMovieCtrl.h"
+#include "mafGUI.h"
+#include "mafGUIButton.h"
+#include "mafGUIMovieCtrl.h"
 
+#include "mafEventSource.h"
 #include "mafVME.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
@@ -33,6 +35,11 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkCamera.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+
+//------------------------------------------------------------------------------
+// Events
+//------------------------------------------------------------------------------
+MAF_ID_IMP(mafAnimate::UPDATE_STORAGE_POSITION);   
 
 //----------------------------------------------------------------------------
 mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener)
@@ -50,6 +57,9 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
   m_RenamePositionButton	= NULL;
   m_DeletePositionButton	= NULL;
   m_AnimatePlayer         = NULL;
+
+  m_Vme = vme;
+  vme->GetRoot()->GetEventSource()->AddObserver(this);
 	
 	CreateGui();
 	SetInputVME(vme); //widgets must already exist
@@ -58,6 +68,7 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
 mafAnimate::~mafAnimate() 
 //----------------------------------------------------------------------------
 {
+  m_Vme->GetEventSource()->RemoveObserver(this); 
   mafDEL(m_StoredPositions);
 }
 //----------------------------------------------------------------------------
@@ -69,9 +80,9 @@ void mafAnimate::SetInputVME(mafNode *vme)
   //ResetKit();
 
   if(!vme) return;
-  mafVME *root = mafVME::SafeDownCast(vme->GetRoot());
-	if(!root) return;
-  m_Tags = root->GetTagArray();
+  m_Root = mafVME::SafeDownCast(vme->GetRoot());
+	if(!m_Root) return;
+  m_Tags = m_Root->GetTagArray();
 	
   RetrieveStoredPositions();
   /*if(!m_Tags) return;
@@ -109,7 +120,7 @@ enum ANIMATE_KIT_WIDGET_ID
 void mafAnimate::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->Show(true);
 
   int rm = m_Gui->GetMetrics(GUI_ROW_MARGIN);
@@ -124,9 +135,9 @@ void mafAnimate::CreateGui()
 	wxStaticText *lab = new wxStaticText(m_Gui,-1,"fly pose",dp,wxSize(lw,bh));
   lab->SetFont(m_Gui->GetBoldFont());
 
-	m_StorePositionButton  = new mmgButton (m_Gui,ID_STORE, "store", dp,bs);
-  m_RenamePositionButton = new mmgButton (m_Gui,ID_RENAME,"rename",dp,bs);
-  m_DeletePositionButton = new mmgButton (m_Gui,ID_DELETE,"delete",dp,bs);
+	m_StorePositionButton  = new mafGUIButton (m_Gui,ID_STORE, "store", dp,bs);
+  m_RenamePositionButton = new mafGUIButton (m_Gui,ID_RENAME,"rename",dp,bs);
+  m_DeletePositionButton = new mafGUIButton (m_Gui,ID_DELETE,"delete",dp,bs);
 	m_StorePositionButton->SetListener(this);
 	m_RenamePositionButton->SetListener(this);
 	m_DeletePositionButton->SetListener(this);
@@ -141,7 +152,7 @@ void mafAnimate::CreateGui()
 	m_PositionList = m_Gui->ListBox(ID_LIST," ");
 	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag, 1);
   
-  m_AnimatePlayer = new mmgMovieCtrl(m_Gui);
+  m_AnimatePlayer = new mafGUIMovieCtrl(m_Gui);
   m_AnimatePlayer->SetListener(this);
   m_Gui->Add(m_AnimatePlayer);
 
@@ -172,11 +183,21 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
       break;
       case ID_LIST:
         FlyTo();
+        EnableWidgets();
       break;
       case TIME_SET:
         m_PositionList->SetSelection((int)e->GetDouble());
         FlyTo();
       break;
+    }
+  }
+  else if (maf_event->GetId() == mafAnimate::UPDATE_STORAGE_POSITION)
+  {
+    if (maf_event->GetSender() != this)
+    {
+      m_PositionList->Clear();
+      RetrieveStoredPositions();
+      EnableWidgets();
     }
   }
 }
@@ -478,6 +499,7 @@ void mafAnimate::StoreViewPoint()
 	m_PositionList->Append(m_SelectedPosition);
   m_PositionList->SetSelection(m_PositionList->GetCount() - 1);
 	m_Gui->Update();
+  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 //----------------------------------------------------------------------------
 void mafAnimate::RenameViewPoint()
@@ -509,9 +531,13 @@ void mafAnimate::RenameViewPoint()
 
 	wxString flyto_oldTagName = "FLY_TO_" + m_SelectedPosition;
   mafTagItem *item = m_Tags->GetTag(flyto_oldTagName.c_str());
-  assert(item  && item->GetNumberOfComponents() == 9);
-	
-	item->SetName(flyto_tagName.c_str());	
+  assert(item  && item->GetNumberOfComponents() == 10);
+
+  mafTagItem itemNew;
+  itemNew.DeepCopy(item);
+	itemNew.SetName(flyto_tagName.c_str());	
+  m_Tags->DeleteTag(flyto_oldTagName);
+  m_Tags->SetTag(itemNew);
 
 	int n = m_PositionList->GetSelection();
 	if(n >= 0) 
@@ -519,6 +545,7 @@ void mafAnimate::RenameViewPoint()
 
   m_SelectedPosition = name;
 	m_Gui->Update();
+  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 //----------------------------------------------------------------------------
 void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
@@ -541,6 +568,7 @@ void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
 	  m_SelectedPosition = m_PositionList->GetStringSelection();
 	}
 	m_Gui->Update();
+  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 //----------------------------------------------------------------------------
 void mafAnimate::ResetKit()
@@ -555,6 +583,7 @@ void mafAnimate::ResetKit()
   //m_Tags = NULL;
   EnableWidgets(); // disable all
   m_Gui->Update();
+  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 
 //----------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-09 13:19:43 $
-Version:   $Revision: 1.18 $
+Date:      $Date: 2008-07-25 07:05:59 $
+Version:   $Revision: 1.19 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,8 +24,8 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafPipePolyline.h"
 #include "mafDecl.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h"
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h"
 #include "mmaMaterial.h"
 
 #include "mafVME.h"
@@ -319,7 +319,7 @@ void mafPipePolyline::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipePolyline::CreateGui()
+mafGUI *mafPipePolyline::CreateGui()
 //----------------------------------------------------------------------------
 {
   int numberOfArrays = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfArrays();
@@ -337,7 +337,7 @@ mmgGui *mafPipePolyline::CreateGui()
 
 	const wxString representation_string[] = {_("line"), _("tube"), _("sphere"), _("unconnected sphere")};
 	int num_choices = 4;
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->Combo(ID_SCALAR,"",&m_Scalar,numberOfArrays,m_ScalarsName);
   m_Gui->Bool(ID_SPLINE,_("spline"),&m_SplineMode);
   m_Gui->Double(ID_DISTANCE_BORDER,_("XY borders"),&m_DistanceBorder,0);
@@ -359,7 +359,7 @@ mmgGui *mafPipePolyline::CreateGui()
 	m_Gui->Enable(ID_SPHERE_RADIUS, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
 	m_Gui->Enable(ID_SPHERE_RESOLUTION, m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED);
 	m_Gui->Divider();
-  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_Gui->Divider();
 

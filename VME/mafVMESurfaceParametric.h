@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:26:29 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,7 +26,7 @@ class mafNode;
 class mmaMaterial;
 class mafVMEOutputSurface;
 class vtkPolyData;
-class mmgRollOut;
+class mafGUIRollOut;
 
 /** mafVMESurfaceParametric - this class represents a surface that is a specific geometry 
 like cylinder, sphere, cube.
@@ -130,19 +130,19 @@ protected:
 	virtual void InternalUpdate();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
   
-	mmgRollOut *m_RollOutSphere;
-	mmgRollOut *m_RollOutCone;
-	mmgRollOut *m_RollOutCylinder;
-	mmgRollOut *m_RollOutCube;
-  mmgRollOut *m_RollOutPlane;
+	mafGUIRollOut *m_RollOutSphere;
+	mafGUIRollOut *m_RollOutCone;
+	mafGUIRollOut *m_RollOutCylinder;
+	mafGUIRollOut *m_RollOutCube;
+  mafGUIRollOut *m_RollOutPlane;
 
-  mmgGui *m_GuiSphere;
-  mmgGui *m_GuiCone;
-  mmgGui *m_GuiCylinder;
-  mmgGui *m_GuiCube;
-  mmgGui *m_GuiPlane;
+  mafGUI *m_GuiSphere;
+  mafGUI *m_GuiCone;
+  mafGUI *m_GuiCylinder;
+  mafGUI *m_GuiCube;
+  mafGUI *m_GuiPlane;
 
 	mafTransform *m_Transform; 
 	vtkPolyData  *m_PolyData;

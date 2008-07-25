@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpVolumeResample.h"
 
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 
 #include "mafVME.h"
@@ -461,7 +461,7 @@ enum BOUNDS
 void mafOpVolumeResample::CreateGui() 
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
   //m_Gui->Button(ID_VOLUME_VMELOCALBOUNDS,"VME Local Bounds","","set the crop bounding box to the oriented VME bounds (default option)");
   //m_Gui->Button(ID_VOLUME_VMEBOUNDS,"VME Global Bounds","","set the crop bounding box to the VME global bounds");

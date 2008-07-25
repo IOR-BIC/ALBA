@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafVMEOutputLandmarkCloud.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafDataPipe.h"
 
 #include "mafVME.h"
@@ -65,7 +65,7 @@ vtkDataSet *mafVMEOutputLandmarkCloud::GetVTKData()
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputLandmarkCloud::CreateGui()
+mafGUI* mafVMEOutputLandmarkCloud::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

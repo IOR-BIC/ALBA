@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:03:56 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,8 +22,8 @@
 #include "mafOp.h"
 #include "mafDecl.h"
 #include "mafSmartPointer.h"
-#include "mmgGui.h"
-#include "mmgGuiHolder.h"
+#include "mafGUI.h"
+#include "mafGUIHolder.h"
 #include "mafNode.h"
 
 //----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ void mafOp::ShowGui()
 {
   assert(m_Gui); 
   m_Gui->Collaborate(m_CollaborateStatus);
-  m_Guih = new mmgGuiHolder(mafGetFrame(),-1);
+  m_Guih = new mafGUIHolder(mafGetFrame(),-1);
   m_Guih->Put(m_Gui);
 	
   wxString menu_codes=wxStripMenuCodes(m_Label);

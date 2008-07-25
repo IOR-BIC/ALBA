@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-27 16:44:41 $
-  Version:   $Revision: 1.137 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.138 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -47,8 +47,8 @@
   #include "mmdClientMAF.h"
   #include "mmiPER.h"
   #include "mmiPER.h"
-  #include "mmgTreeContextualMenu.h"
-  #include "mmgContextualMenu.h"
+  #include "mafGUITreeContextualMenu.h"
+  #include "mafGUIContextualMenu.h"
   #include "vtkCamera.h"
 #endif
 
@@ -56,22 +56,22 @@
 
 #include "mafUser.h"
 //#include "mafGUISRBBrowse.h"
-#include "mmgDialogRemoteFile.h"
+#include "mafGUIDialogRemoteFile.h"
 #include "mafGUIDialogFindVme.h"
-#include "mmgMDIFrame.h"
-#include "mmgMDIChild.h"
-#include "mmgCheckTree.h"
-#include "mmgTimeBar.h"
-#include "mmgMaterialChooser.h"
-#include "mmgViewFrame.h"
-#include "mmgLocaleSettings.h"
-#include "mmgMeasureUnitSettings.h"
-#include "mmgApplicationSettings.h"
+#include "mafGUIMDIFrame.h"
+#include "mafGUIMDIChild.h"
+#include "mafGUICheckTree.h"
+#include "mafGUITimeBar.h"
+#include "mafGUIMaterialChooser.h"
+#include "mafGUIViewFrame.h"
+#include "mafGUILocaleSettings.h"
+#include "mafGUIMeasureUnitSettings.h"
+#include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
-#include "mmgApplicationLayoutSettings.h"
+#include "mafGUIApplicationLayoutSettings.h"
 #include "mafGUISettingsTimeBar.h"
 #include "mafRemoteLogic.h"
-#include "mmgSettingsDialog.h"
+#include "mafGUISettingsDialog.h"
 
 #ifdef WIN32
   #include "mmdClientMAF.h"
@@ -121,7 +121,7 @@ mafLogicWithManagers::mafLogicWithManagers()
 
   m_PrintSupport = new mafPrintSupport();
   
-  m_SettingsDialog = new mmgSettingsDialog();
+  m_SettingsDialog = new mafGUISettingsDialog();
 
   m_ApplicationLayoutSettings = NULL;
 
@@ -219,7 +219,7 @@ void mafLogicWithManagers::Configure()
 
   if (m_ViewManager)
   {
-    m_ApplicationLayoutSettings = new mmgApplicationLayoutSettings(this);
+    m_ApplicationLayoutSettings = new mafGUIApplicationLayoutSettings(this);
     m_ApplicationLayoutSettings->SetViewManager(m_ViewManager);
     m_ApplicationLayoutSettings->SetApplicationFrame(m_Win);
     m_SettingsDialog->AddPage( m_ApplicationLayoutSettings->GetGui(), m_ApplicationLayoutSettings->GetLabel());
@@ -740,7 +740,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break;
       case OP_RUN_STARTING:
       {
-        mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+        mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
           c->SetAllowCloseWindow(false);
         OpRunStarting();
@@ -748,14 +748,14 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       break; 
       case OP_RUN_TERMINATED:
       {
-        mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+        mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
         if (c != NULL)
           c->SetAllowCloseWindow(true);
         OpRunTerminated();
       }
       break; 
       case OP_SHOW_GUI:
-        OpShowGui(!e->GetBool(), (mmgPanel*)e->GetWin());
+        OpShowGui(!e->GetBool(), (mafGUIPanel*)e->GetWin());
       break; 
       case OP_HIDE_GUI:
         OpHideGui(e->GetBool());
@@ -804,7 +804,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
         ViewSelect();
         if (m_OpManager)
         {
-          mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+          mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
           if (c != NULL)
             c->SetAllowCloseWindow(!m_OpManager->Running());
         }
@@ -895,7 +895,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
       case ID_APP_SETTINGS:
         m_SettingsDialog->ShowModal();
       break;
-      case mmgMeasureUnitSettings::MEASURE_UNIT_UPDATED:
+      case mafGUIMeasureUnitSettings::MEASURE_UNIT_UPDATED:
         UpdateMeasureUnit();
       break;
       case CAMERA_PRE_RESET:
@@ -1066,7 +1066,7 @@ void mafLogicWithManagers::OnFileOpen(const char *file_to_open)
         }
         else
         {
-          mmgDialogRemoteFile remoteFile;
+          mafGUIDialogRemoteFile remoteFile;
           remoteFile.ShowModal();
           file = remoteFile.GetFile().GetCStr();
           mafString protocol;
@@ -1173,8 +1173,8 @@ void mafLogicWithManagers::OnQuit()
       return;
   }
 
-  mmgViewFrame::OnQuit();
-  mmgMDIChild::OnQuit(); 
+  mafGUIViewFrame::OnQuit();
+  mafGUIMDIChild::OnQuit(); 
   m_Win->OnQuit(); 
 
   cppDEL(m_RemoteLogic);
@@ -1377,7 +1377,7 @@ void mafLogicWithManagers::EnableMenuAndToolbar(bool enable)
   EnableItem(wxID_FILE9,enable);
 }
 //----------------------------------------------------------------------------
-void mafLogicWithManagers::OpShowGui(bool push_gui, mmgPanel *panel)
+void mafLogicWithManagers::OpShowGui(bool push_gui, mafGUIPanel *panel)
 //----------------------------------------------------------------------------
 {
 	if(m_SideBar) m_SideBar->OpShowGui(push_gui, panel);
@@ -1447,7 +1447,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
     if (GetExternalViewFlag())
     {
       // external views
-      mmgViewFrame *extern_view = new mmgViewFrame(m_Win, -1, v->GetLabel(), wxPoint(10,10),wxSize(800,600)/*, wxSIMPLE_BORDER|wxMAXIMIZE*/);
+      mafGUIViewFrame *extern_view = new mafGUIViewFrame(m_Win, -1, v->GetLabel(), wxPoint(10,10),wxSize(800,600)/*, wxSIMPLE_BORDER|wxMAXIMIZE*/);
       extern_view->SetView(v);
       extern_view->SetListener(m_ViewManager);
       v->GetFrame()->SetWindowStyleFlag(m_ChildFrameStyle);
@@ -1458,7 +1458,7 @@ void mafLogicWithManagers::ViewCreated(mafView *v)
     else
     {
       // child views
-      mmgMDIChild *c = new mmgMDIChild(m_Win,v);
+      mafGUIMDIChild *c = new mafGUIMDIChild(m_Win,v);
       c->SetWindowStyleFlag(m_ChildFrameStyle);
       c->SetListener(m_ViewManager);
       v->SetFrame(c);
@@ -1497,7 +1497,7 @@ void mafLogicWithManagers::UpdateTimeBounds()
 std::vector<mafNode*> mafLogicWithManagers::VmeChoose(long vme_accept_function, long style, mafString title, bool multiSelect)
 //----------------------------------------------------------------------------
 {
-  mmgVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style, multiSelect);
+  mafGUIVMEChooser vc(m_SideBar->GetTree(),title.GetCStr(), vme_accept_function, style, multiSelect);
   return vc.ShowChooserDialog();
 }
 //----------------------------------------------------------------------------
@@ -1506,7 +1506,7 @@ void mafLogicWithManagers::VmeChooseMaterial(mafVME *vme, bool updateProperty)
 {
   if (m_MaterialChooser == NULL)
   {
-    m_MaterialChooser = new mmgMaterialChooser();
+    m_MaterialChooser = new mafGUIMaterialChooser();
   }
   if(m_MaterialChooser->ShowChooserDialog(vme))
   {
@@ -1527,7 +1527,7 @@ void mafLogicWithManagers::VmeUpdateProperties(mafVME *vme, bool updatePropertyF
 void mafLogicWithManagers::FindVME()
 //----------------------------------------------------------------------------
 {
-  mmgCheckTree *tree = m_SideBar->GetTree();
+  mafGUICheckTree *tree = m_SideBar->GetTree();
   mafGUIDialogFindVme fd(_("Find VME"));
   fd.SetTree(tree);
   fd.ShowModal();
@@ -1536,10 +1536,10 @@ void mafLogicWithManagers::FindVME()
 void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
 //----------------------------------------------------------------------------
 {
-  mmgContextualMenu *contextMenu = new mmgContextualMenu();
+  mafGUIContextualMenu *contextMenu = new mafGUIContextualMenu();
   contextMenu->SetListener(this);
   mafView *v = m_ViewManager->GetSelectedView();
-  mmgMDIChild *c = (mmgMDIChild *)m_Win->GetActiveChild();
+  mafGUIMDIChild *c = (mafGUIMDIChild *)m_Win->GetActiveChild();
   if(c != NULL)
     contextMenu->ShowContextualMenu(c,v,vme_menu);
   cppDEL(contextMenu);
@@ -1548,13 +1548,13 @@ void mafLogicWithManagers::ViewContextualMenu(bool vme_menu)
 void mafLogicWithManagers::TreeContextualMenu(mafEvent &e)
 //----------------------------------------------------------------------------
 {
-  mmgTreeContextualMenu *contextMenu = new mmgTreeContextualMenu();
+  mafGUITreeContextualMenu *contextMenu = new mafGUITreeContextualMenu();
   contextMenu->SetListener(m_ApplicationLayoutSettings);
   mafView *v = m_ViewManager->GetSelectedView();
   mafVME  *vme = (mafVME *)e.GetVme();
   bool vme_menu = e.GetBool();
   bool autosort = e.GetArg() != 0;
-  contextMenu->CreateContextualMenu((mmgCheckTree *)e.GetSender(),v,vme,vme_menu);
+  contextMenu->CreateContextualMenu((mafGUICheckTree *)e.GetSender(),v,vme,vme_menu);
   contextMenu->ShowContextualMenu();
   cppDEL(contextMenu);
 }

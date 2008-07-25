@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:23:06 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.10 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 
 #include "mafVMEScalar.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mmuTimeSet.h"
 #include "mafStorageElement.h"

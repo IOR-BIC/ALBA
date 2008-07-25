@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-28 09:49:27 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,7 @@
 #include "mafNode.h"
 #include "mafVMERoot.h"
 #include "mafVMERoot.h"
-#include "mmgFileHistory.h"
+#include "mafGUIFileHistory.h"
 
 //----------------------------------------------------------------------------
 // Forward References :
@@ -112,7 +112,7 @@ protected:
   mafVMERoot      *m_root;
   mafObserver     *m_Listener;
   wxConfigBase		*m_Config;
-  mmgFileHistory	 m_FileHistory;
+  mafGUIFileHistory	 m_FileHistory;
 
   bool      m_make_bak_file;
   wxString  m_msf_dir;

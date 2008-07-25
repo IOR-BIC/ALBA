@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 #include "mafPipeScalarMatrix.h"
 #include "mafDecl.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVME.h"
 #include "mafVMEOutputScalarMatrix.h"
@@ -106,10 +106,10 @@ void mafPipeScalarMatrix::Select(bool sel)
 	m_Selected = sel;
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeScalarMatrix::CreateGui()
+mafGUI *mafPipeScalarMatrix::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	m_Gui->Divider();
   return m_Gui;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTextKit.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-28 15:03:43 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:24 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class vtkRenderer;
 class vtkActor2D;
 class vtkTextMapper;
@@ -73,7 +73,7 @@ public:
   void SetTextAlignment(int align = UPPER_LEFT);
 
 	/** Returns the mafTextKit's GUI */
-	mmgGui *GetGui() {return m_Gui;};
+	mafGUI *GetGui() {return m_Gui;};
 
 protected:
   /** Create GUI for AttachCamera module.*/
@@ -91,7 +91,7 @@ protected:
   vtkActor2D    *m_TextActor;
 
   mafObserver	*m_Listener;
-	mmgGui			*m_Gui;
+	mafGUI			*m_Gui;
 	vtkRenderer *m_TextRenderer;
 	wxWindow	  *m_ParentPanel;
 };

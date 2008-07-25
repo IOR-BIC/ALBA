@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-08 12:27:53 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -74,7 +74,7 @@ protected:
   mafString     m_NumTriangles;
   mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the surface
 
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
 private:
   mafVMEOutputSurface(const mafVMEOutputSurface&); // Not implemented

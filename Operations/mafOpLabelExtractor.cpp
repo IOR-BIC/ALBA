@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,10 +24,10 @@
 #include <wx/tokenzr.h>
 
 #include "mafDecl.h"
-#include "mmgCheckListBox.h"
+#include "mafGUICheckListBox.h"
 #include "mafOp.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
@@ -134,7 +134,7 @@ bool mafOpLabelExtractor::RetrieveTag()
 void mafOpLabelExtractor::OpRun()   
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
 	m_Gui->Bool(ID_SMOOTH,_("smooth"),&m_SmoothVolume,0,_("gaussian smooth for extracting big surface"));

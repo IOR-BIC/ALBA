@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-15 14:22:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 class mafRWI;
 class mafSceneGraph;
 class mafSceneGraph;
-class mmgCheckListBox;
+class mafGUICheckListBox;
 class wxHtmlWindow;
 //----------------------------------------------------------------------------
 // mafViewHTML :
@@ -69,7 +69,7 @@ protected:
   void  OnForward();
   void  OnBack();
   
-	mmgGui *CreateGui();
+	mafGUI *CreateGui();
 
   wxHtmlWindow *m_Html;
   wxString m_Url;

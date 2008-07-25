@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-07 11:26:34 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.44 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,17 +27,17 @@
 #include <wx/splash.h>
 #include "mafDecl.h"
 #include "mafView.h"
-#include "mmgMDIFrame.h"
-#include "mmgMDIChild.h"
-#include "mmgFrame.h"
-#include "mmgPicButton.h"
-#include "mmgSplittedPanel.h"
-#include "mmgNamedPanel.h"
-#include "mmgCrossSplitter.h"
-#include "mmgTimeBar.h"
-#include "mmgLocaleSettings.h"
-#include "mmgMeasureUnitSettings.h"
-#include "mmgApplicationSettings.h"
+#include "mafGUIMDIFrame.h"
+#include "mafGUIMDIChild.h"
+#include "mafGUIFrame.h"
+#include "mafGUIPicButton.h"
+#include "mafGUISplittedPanel.h"
+#include "mafGUINamedPanel.h"
+#include "mafGUICrossSplitter.h"
+#include "mafGUITimeBar.h"
+#include "mafGUILocaleSettings.h"
+#include "mafGUIMeasureUnitSettings.h"
+#include "mafGUIApplicationSettings.h"
 #include "mafGUISettingsStorage.h"
 #include "mafGUISettingsTimeBar.h"
 
@@ -51,13 +51,13 @@
 mafLogicWithGUI::mafLogicWithGUI()
 //----------------------------------------------------------------------------
 {
-  m_Win = new mmgMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
+  m_Win = new mafGUIMDIFrame("maf", wxDefaultPosition, wxSize(800, 600));
   m_Win->SetListener(this);
 
   m_ChildFrameStyle = wxCAPTION | wxMAXIMIZE_BOX | wxMINIMIZE_BOX | wxRESIZE_BORDER; //wxTHICK_FRAME; // Default style
-  m_LocaleSettings = new mmgLocaleSettings(this);
-  m_MeasureUnitSettings = new mmgMeasureUnitSettings(this);
-  m_ApplicationSettings = new mmgApplicationSettings(this);
+  m_LocaleSettings = new mafGUILocaleSettings(this);
+  m_MeasureUnitSettings = new mafGUIMeasureUnitSettings(this);
+  m_ApplicationSettings = new mafGUIApplicationSettings(this);
   m_StorageSettings = new mafGUISettingsStorage(this);
   m_TimeBarSettings = new mafGUISettingsTimeBar(this);
 
@@ -307,7 +307,7 @@ void mafLogicWithGUI::CreateToolbar()
 void mafLogicWithGUI::CreateTimebar()
 //----------------------------------------------------------------------------
 {
-  m_TimePanel = new mmgTimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
+  m_TimePanel = new mafGUITimeBar(m_Win,MENU_VIEW_TIMEBAR,true);
   m_TimePanel->SetListener(this);
 
   // Events coming from settings are forwarded to the time bar.

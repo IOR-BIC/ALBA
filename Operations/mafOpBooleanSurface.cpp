@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:29:50 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-07-25 07:03:51 $
+Version:   $Revision: 1.3 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpBooleanSurface.h"
 #include "mafDecl.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafVMEGizmo.h"
@@ -129,7 +129,7 @@ enum FILTER_SURFACE_ID
 void mafOpBooleanSurface::OpRun()   
 //----------------------------------------------------------------------------
 {  		
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
   //creation of vme result
   mafNEW(m_ResultVME);

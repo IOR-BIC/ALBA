@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 class mafVME;
 class mafMatrix;
 
@@ -92,7 +92,7 @@ public:
   //----------------------------------------------------------------------------
 
   /** Return gui owned by the gizmo*/
-  virtual mmgGui *GetGui() {return NULL;};
+  virtual mafGUI *GetGui() {return NULL;};
   
 protected:
            mafGizmoInterface();

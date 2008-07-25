@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 17:08:39 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include "mafVME.h"
 #include "mafIndent.h"
 #include "mafDataPipe.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 
 #include "vtkPolyData.h"
@@ -99,7 +99,7 @@ void mafVMEOutputSurface::SetMaterial(mmaMaterial *material)
   m_Material = material;
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputSurface::CreateGui()
+mafGUI* mafVMEOutputSurface::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

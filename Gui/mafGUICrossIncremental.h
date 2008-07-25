@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-24 08:39:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -16,14 +16,14 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mmgPanel.h"
+#include "mafGUIPanel.h"
 #include "mafObserver.h"
 #include "mafString.h"
 
 //----------------------------------------------------------------------------
 // Forward refs:
 //----------------------------------------------------------------------------
-class mmgButton;
+class mafGUIButton;
 
 //----------------------------------------------------------------------------
 // constant
@@ -45,7 +45,7 @@ It can use two accumulator variable that are updated. It needed absolutely step 
 After modification, it returns to listener an event with in Arg the sign of increment.
 */
 //----------------------------------------------------------------------------
-class mafGUICrossIncremental: public mmgPanel , public mafObserver
+class mafGUICrossIncremental: public mafGUIPanel , public mafObserver
 {
 public:
   mafGUICrossIncremental(wxWindow* parent, 
@@ -107,10 +107,10 @@ public:
 
 private:
 
-  mmgButton    *m_ButtonTop;
-  mmgButton    *m_ButtonBottom;
-  mmgButton    *m_ButtonLeft;
-  mmgButton    *m_ButtonRight;
+  mafGUIButton    *m_ButtonTop;
+  mafGUIButton    *m_ButtonBottom;
+  mafGUIButton    *m_ButtonLeft;
+  mafGUIButton    *m_ButtonRight;
   wxTextCtrl   *m_StepText;
 
 	wxBoxSizer      *m_Sizer;

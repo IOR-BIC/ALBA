@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-11 19:12:44 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.15 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafDataPipe.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaVolumeMaterial.h"
 
 #include "vtkImageData.h"
@@ -91,7 +91,7 @@ void mafVMEOutputVolume::SetMaterial(mmaVolumeMaterial *material)
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputVolume::CreateGui()
+mafGUI* mafVMEOutputVolume::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

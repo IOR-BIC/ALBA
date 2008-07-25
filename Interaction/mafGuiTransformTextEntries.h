@@ -2,28 +2,28 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiTransformTextEntries.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:57:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-#ifndef __mafGuiTransformTextEntries_H__
-#define __mafGuiTransformTextEntries_H__
+#ifndef __mafGUITransformTextEntries_H__
+#define __mafGUITransformTextEntries_H__
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
-#include "mafGuiTransformInterface.h"
+#include "mafGUITransformInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgGui;
-class mmgButton;
+class mafGUI;
+class mafGUIButton;
 class mmiGenericMouse;
 class mmiCompositorMouse;
 class mafInteractor;
@@ -44,12 +44,12 @@ class mafMatrix;
   @todo
 
 */
-class mafGuiTransformTextEntries : public mafGuiTransformInterface
+class mafGUITransformTextEntries : public mafGUITransformInterface
 {
 public:
 
-  mafGuiTransformTextEntries(mafVME *input, mafObserver *listener = NULL, bool enableScaling = true);
-	~mafGuiTransformTextEntries(); 
+  mafGUITransformTextEntries(mafVME *input, mafObserver *listener = NULL, bool enableScaling = true);
+	~mafGUITransformTextEntries(); 
 
   void OnEvent(mafEventBase *maf_event);
 

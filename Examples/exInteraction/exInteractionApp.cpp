@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-14 08:44:47 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:00:43 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,7 +24,7 @@
 #include "mafDecl.h"
 #include "mafVMEFactory.h"
 #include "mafPics.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 
 #include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafGizmoInterface.h"
-#include "mafGuiGizmoTranslate.h"
+#include "mafGUIGizmoTranslate.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -114,7 +114,7 @@ public:
   void SetRefSys(mafVME *refSys);
   mafVME* GetRefSys();
 
-  mmgGui *GetGui() {return (m_GuiGizmoTranslate->GetGui());};
+  mafGUI *GetGui() {return (m_GuiGizmoTranslate->GetGui());};
 
   /**
   Set the constraint modality for the given axis; allowed constraint modality are:
@@ -126,7 +126,7 @@ public:
 
 protected:
 
-  mafGuiGizmoTranslate *m_GuiGizmoTranslate;
+  mafGUIGizmoTranslate *m_GuiGizmoTranslate;
 
   /** Gizmo components events handling */
   void OnEventGizmoGui(mafEventBase *maf_event);

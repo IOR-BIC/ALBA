@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecimateSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOpDecimateSurface.h"
 #include "mafDecl.h"
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
@@ -108,7 +108,7 @@ void mafOpDecimateSurface::OpRun()
 	if(!m_TestMode)
 	{
 		// interface:
-		m_Gui = new mmgGui(this);
+		m_Gui = new mafGUI(this);
 
 	  
 		m_Gui->Bool(ID_WIREFRAME,"wireframe",&m_WireFrame, 0);
@@ -119,7 +119,7 @@ void mafOpDecimateSurface::OpRun()
 		m_Gui->Slider(ID_REDUCTION,"reduc.to %",&m_Reduction,1, 100);
 		m_Gui->Button(ID_DECIMATE,"apply decimate");
 
-		//mmgMaterialButton *m_MaterialButton = new mmgMaterialButton(m_Input,this);
+		//mafGUIMaterialButton *m_MaterialButton = new mafGUIMaterialButton(m_Input,this);
 		
 		m_Gui->Divider(2);
 		m_Gui->Label("");

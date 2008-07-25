@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.14 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,8 +23,8 @@
 #include "mafSceneNode.h"
 #include "mafVMESurface.h"
 #include "mmaMaterial.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h"
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h"
 #include "mafAxes.h"
 #include "mafDataVector.h"
 #include "mafVMEGenericAbstract.h"
@@ -332,11 +332,11 @@ void mafPipeSurfaceSlice::Select(bool sel)
 	}
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeSurfaceSlice::CreateGui()
+mafGUI *mafPipeSurfaceSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->FloatSlider(ID_BORDER_CHANGE,_("Border"),&m_Border,1.0,5.0);
   m_Gui->Divider();
 	return m_Gui;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutput.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:19:38 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-07-25 06:56:05 $
+  Version:   $Revision: 1.22 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,7 +29,7 @@
 #include "mafSmartPointer.h"
 #include "mafTransform.h"
 #include "mafIndent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include <assert.h>
 
 //-------------------------------------------------------------------------
@@ -532,7 +532,7 @@ void mafVMEOutput::Print(std::ostream& os, const int tabs)// const
 }
 
 //-------------------------------------------------------------------------
-mmgGui *mafVMEOutput::GetGui()
+mafGUI *mafVMEOutput::GetGui()
 //-------------------------------------------------------------------------
 {
   if (m_Gui==NULL) CreateGui();
@@ -546,11 +546,11 @@ void mafVMEOutput::DeleteGui()
   cppDEL(m_Gui);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutput::CreateGui()
+mafGUI* mafVMEOutput::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(m_VME);
+  m_Gui = new mafGUI(m_VME);
 
   mafString type = GetTypeName(); 
   m_Gui->Label("type: ", type, true);

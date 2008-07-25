@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVector.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:16:25 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class vtkAppendPolyData;
 class vtkPolyDataMapper;
 class vtkPolyData;
 class vtkProperty;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class mmaMaterial;
 class vtkSphereSource;
 class vtkConeSource;
@@ -96,7 +96,7 @@ protected:
   int                       m_UseBunch;
   int                       m_AllBunch;
   mmaMaterial              *m_SurfaceMaterial;
-  mmgMaterialButton        *m_MaterialButton;
+  mafGUIMaterialButton        *m_MaterialButton;
 
   /** Update the position of the sphere and the position/orientation of the arrow */
   void UpdateProperty(bool fromTag = false);
@@ -105,7 +105,7 @@ protected:
   void AllVector(bool fromTag = false);
   
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   /** Enable widgets */
   void mafPipeVector::EnableWidget();

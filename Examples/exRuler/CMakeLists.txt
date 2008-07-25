@@ -2,10 +2,10 @@ PROJECT (exRuler)
 
 SET(PROJECT_SRCS 
 main.cpp
-vtkRulerActor2D.h
-vtkRulerActor2D.cxx
-vtkSimpleRulerActor2D.h
-vtkSimpleRulerActor2D.cxx
+vtkMAFRulerActor2D.h
+vtkMAFRulerActor2D.cxx
+vtkMAFSimpleRulerActor2D.h
+vtkMAFSimpleRulerActor2D.cxx
 )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SRCS} )

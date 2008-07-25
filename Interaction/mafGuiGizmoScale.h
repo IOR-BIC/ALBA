@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,13 +17,13 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
-#include "mafGuiGizmoInterface.h"
+#include "mafGUIGizmoInterface.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgButton;
-class mmgGui;
+class mafGUIButton;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 /** gui class for translation gizmo
@@ -33,12 +33,12 @@ class mmgGui;
   @todo
 */
 
-class mafGuiGizmoScale : public mafGuiGizmoInterface
+class mafGUIGizmoScale : public mafGUIGizmoInterface
 {
 public:
 
-  mafGuiGizmoScale(mafObserver *listener = NULL);
-	~mafGuiGizmoScale(); 
+  mafGUIGizmoScale(mafObserver *listener = NULL);
+	~mafGUIGizmoScale(); 
 
   void OnEvent(mafEventBase *maf_event);
 

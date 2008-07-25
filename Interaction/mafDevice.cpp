@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDevice.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 10:00:20 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.12 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 #include "mmuIdFactory.h"
 
 // GUI
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 // serialization
 #include "mafStorageElement.h"
@@ -95,7 +95,7 @@ void mafDevice::Stop()
 }
 
 //----------------------------------------------------------------------------
-mmgGui *mafDevice::GetGui()
+mafGUI *mafDevice::GetGui()
 //----------------------------------------------------------------------------
 {
   if (!m_Gui)
@@ -108,7 +108,7 @@ void mafDevice::CreateGui()
 {
   /*  //SIL. 07-jun-2006 : 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->String(ID_NAME,"name",&m_Name);
   m_Gui->Divider();
   m_Gui->Button(ID_ACTIVATE,"activate device");
@@ -119,7 +119,7 @@ void mafDevice::CreateGui()
   */
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->String(ID_NAME,"name",&m_Name);
   m_Gui->Divider();
   m_Gui->Bool(ID_ACTIVATE,"start",&m_Start,0,"activate/deactivate this device");

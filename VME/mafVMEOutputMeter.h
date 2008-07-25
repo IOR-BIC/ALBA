@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMeter.h,v $
   Language:  C++
-  Date:      $Date: 2006-05-04 11:51:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmgGui;
+class mafGUI;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputMeter is the output produced by a node generating an output
@@ -36,7 +36,7 @@ public:
   virtual void Update();
 
 protected:
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
   mafString m_Distance;
   mafString m_Angle;

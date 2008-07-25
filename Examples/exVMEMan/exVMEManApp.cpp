@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exVMEManApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:03:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 07:02:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 #include "exVMEManApp.h"
 #include "mafNodeFactory.h"
 #include "mafPics.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 #include "mafPipeFactoryVME.h"
 #include "mafVMEFactory.h"
 #include "mafNodeGeneric.h"

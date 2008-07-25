@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice.h,v $
 Language:  C++
-Date:      $Date: 2008-05-28 14:24:47 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-07-25 07:05:59 $
+Version:   $Revision: 1.9 $
 Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class vtkActor;
 class vtkProperty;
 class mafAxes;
 class vtkLookupTable;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class vtkMAFMeshCutter;
 class vtkPlane;
 class vtkPolyDataNormals;
@@ -158,7 +158,7 @@ protected:
   wxString                *m_ScalarsName;
   wxString                *m_ScalarsVTKName;
 
-  mmgMaterialButton       *m_MaterialButton;
+  mafGUIMaterialButton       *m_MaterialButton;
 
   int                      m_PointCellArraySeparation;
   int                      m_ScalarIndex;
@@ -175,6 +175,6 @@ protected:
   double	m_Origin[3];
   double	m_Normal[3];
 
-	virtual mmgGui  *CreateGui();
+	virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeMeshSlice_H__

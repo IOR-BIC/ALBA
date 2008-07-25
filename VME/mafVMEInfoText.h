@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 10:35:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.4 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -61,7 +61,7 @@ protected:
   virtual ~mafVMEInfoText();
 
   /** Internally used to create a new instance of the GUI.*/
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);

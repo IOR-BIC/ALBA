@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.4 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 #include "mafOpCrop.h"
 #include <wx/busyinfo.h>
 #include "mafEvent.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafGizmoROI.h"
 
@@ -307,7 +307,7 @@ void mafOpCrop::CreateGui()
 	m_ZminZmax[0] = bounds[4];
 	m_ZminZmax[1] = bounds[5];
 
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
   m_Gui->Label("");
   m_Gui->Bool(ID_SHOW_HANDLES, _("handles"), &m_ShowHandles, 0, _("toggle gizmo handles visibility"));
   m_Gui->Bool(ID_SHOW_ROI, "ROI", &m_ShowROI, 0, _("toggle region of interest visibility"));

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 16:51:43 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.8 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,6 @@ protected:
   int m_BoundsMode;
 
   void UpdateProperty(bool fromTag = false);
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 };  
 #endif // __mafPipeBox_H__

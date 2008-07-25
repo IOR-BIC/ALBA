@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISRBBrowse.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-06 14:33:59 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,13 +16,13 @@
 //----------------------------------------------------------------------------
 // includes :
 //----------------------------------------------------------------------------
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmgGui;
-class mmgTree;
+class mafGUIGui;
+class mafGUITree;
 
 //----------------------------------------------------------------------------
 // const :
@@ -40,7 +40,7 @@ enum SRB_BROWSING_STYLE
 /**
 This component allow to make remote file browsing.
 */
-class mafGUISRBBrowse : public mmgDialog
+class mafGUISRBBrowse : public mafGUIDialog
 {
 public:
   mafGUISRBBrowse(mafObserver *listener = NULL, const wxString &title = _("Remote file dialog"), long style = mafRESIZABLE, long dialogStyle = DOWNLOAD);
@@ -80,10 +80,10 @@ protected:
   /** Enable/Disable dialog widgets according to the protocol choose for the file.*/
   //void EnableWidgets();
 
-  mmgTree  *m_Tree;
+  mafGUITree  *m_Tree;
 
-  mmgGui      *m_Gui;
-  mmgGui      *m_GuiList;
+  mafGUIGui      *m_Gui;
+  mafGUIGui      *m_GuiList;
 
   mafString    m_Wild;
   mafString    m_Host;

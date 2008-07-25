@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 15:04:41 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-07-25 07:03:24 $
+  Version:   $Revision: 1.17 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,11 +106,11 @@ void mafView::DeleteGui()
   cppDEL(m_Gui);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafView::CreateGui()
+mafGUI* mafView::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
   mafString type_name = GetTypeName();
   

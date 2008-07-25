@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmgDialog;
-class mmgFloatSlider;
+class mafGUIDialog;
+class mafGUIFloatSlider;
 class mafVMESurface;
 class mafNode;
 class mafRWI;
@@ -76,7 +76,7 @@ public:
 protected:
   std::vector<mafVMESurface *> m_IsosurfaceVme;   // surface VME vector
 
-  mmgDialog		*m_Dialog;
+  mafGUIDialog		*m_Dialog;
 	mafRWI      *m_Rwi;
   vtkRenderer *m_PIPRen;
 	double       m_IsoValue;
@@ -102,8 +102,8 @@ protected:
   double m_MinRange;
   double m_MaxRange;
 
-  mmgFloatSlider *m_IsoSlider;
-  mmgFloatSlider *m_SliceSlider;
+  mafGUIFloatSlider *m_IsoSlider;
+  mafGUIFloatSlider *m_SliceSlider;
   
   //vtkPolyDataMapper       *m_ContourMapper;
   vtkVolume                *m_ContourActor;

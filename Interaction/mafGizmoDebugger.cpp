@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:18:48 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@
 #include "mafGizmoDebugger.h"
 #include "mafDecl.h"
 #include "mmaMaterial.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
 #include "mafSmartPointer.h"
@@ -65,7 +65,7 @@ void mafGizmoDebugger::CreateInteractor1()
 
 void mafGizmoDebugger::CreateInteractor2()
 {
-  // from void mafGuiTransformMouse::CreateISA()
+  // from void mafGUITransformMouse::CreateISA()
   // used for unconstrained move interaction
 
 

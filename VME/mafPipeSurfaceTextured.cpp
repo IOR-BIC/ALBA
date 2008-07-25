@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-16 15:05:18 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,8 +21,8 @@
 
 #include "mafPipeSurfaceTextured.h"
 #include "mafSceneNode.h"
-#include "mmgGui.h"
-#include "mmgMaterialButton.h"
+#include "mafGUI.h"
+#include "mafGUIMaterialButton.h"
 #include "mafAxes.h"
 #include "mmaMaterial.h"
 
@@ -274,18 +274,18 @@ void mafPipeSurfaceTextured::UpdateProperty(bool fromTag)
   }
 }
 //----------------------------------------------------------------------------
-mmgGui *mafPipeSurfaceTextured::CreateGui()
+mafGUI *mafPipeSurfaceTextured::CreateGui()
 //----------------------------------------------------------------------------
 {
   wxString mapping_mode[3] = {"Plane", "Cylinder","Sphere"};
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Bool(ID_RENDERING_DISPLAY_LIST,"displaylist",&m_RenderingDisplayListFlag,0,"turn on/off \nrendering displaylist calculation");
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
   m_Gui->Divider();
   m_Gui->Bool(ID_USE_VTK_PROPERTY,"property",&m_UseVTKProperty);
-  m_MaterialButton = new mmgMaterialButton(m_Vme,this);
+  m_MaterialButton = new mafGUIMaterialButton(m_Vme,this);
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
   m_Gui->Divider();

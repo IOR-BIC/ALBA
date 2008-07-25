@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:29:30 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2008-07-25 07:05:59 $
+Version:   $Revision: 1.15 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ class vtkMAFContourVolumeMapper;
 class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class mafVME;
-class mmgFloatSlider;
+class mafGUIFloatSlider;
 class mafEventBase;
 class mafVMESurface;
 
@@ -85,7 +85,7 @@ public:
 
 protected:
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-	virtual mmgGui  *CreateGui();
+	virtual mafGUI  *CreateGui();
 
 	mafVMESurface            *m_IsosurfaceVme;
 
@@ -96,8 +96,8 @@ protected:
 	vtkPolyDataMapper        *m_OutlineMapper;
 	vtkActor                 *m_OutlineActor;
 
-	mmgFloatSlider  *m_ContourSlider;
-	mmgFloatSlider  *m_AlphaSlider;
+	mafGUIFloatSlider  *m_ContourSlider;
+	mafGUIFloatSlider  *m_AlphaSlider;
 	double m_ContourValue;
 	double m_AlphaValue;
 

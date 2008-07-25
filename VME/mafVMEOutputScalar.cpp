@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:24:21 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 
 
 #include "mafVMEOutputScalar.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMEScalar.h"
 #include "mafScalarVector.h"
@@ -109,7 +109,7 @@ void mafVMEOutputScalar::UpdateVTKRepresentation()
 #endif
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputScalar::CreateGui()
+mafGUI* mafVMEOutputScalar::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

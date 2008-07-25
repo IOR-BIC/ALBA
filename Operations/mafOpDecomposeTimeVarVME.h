@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:56:20 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.6 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,10 +23,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class wxListBox;
 class mafVME;
-class mmgRollOut;
+class mafGUIRollOut;
 class mafVMEGroup;
 class mafVMELandmarkCloud;
-class mafGui;
+class mafGUI;
 class mafEvent;
 
 //----------------------------------------------------------------------------
@@ -103,14 +103,14 @@ protected:
   /** Additional Gui. */
   void ModeGui();
 
-  mmgRollOut *m_RollOutFrames;
-  mmgRollOut *m_RollOutInterval;
-  mmgRollOut *m_RollOutPeriodicity;
+  mafGUIRollOut *m_RollOutFrames;
+  mafGUIRollOut *m_RollOutInterval;
+  mafGUIRollOut *m_RollOutPeriodicity;
 
 private:
-  mmgGui *m_GuiFrames;
-  mmgGui *m_GuiInterval; 
-  mmgGui *m_GuiPeriodicity; 
+  mafGUI *m_GuiFrames;
+  mafGUI *m_GuiInterval; 
+  mafGUI *m_GuiPeriodicity; 
   mafVMEGroup         *m_Group;
   mafVMELandmarkCloud *m_Cloud;
 

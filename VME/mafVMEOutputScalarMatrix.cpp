@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalarMatrix.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@
 
 
 #include "mafVMEOutputScalarMatrix.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafVMEScalarMatrix.h"
 #include "mafVMEItemScalarMatrix.h"
@@ -230,7 +230,7 @@ void mafVMEOutputScalarMatrix::UpdateVTKRepresentation()
 #endif
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEOutputScalarMatrix::CreateGui()
+mafGUI* mafVMEOutputScalarMatrix::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

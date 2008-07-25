@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-12-14 09:55:55 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 #include "mafVMEOutputMeter.h"
 #include "mafVMEMeter.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include <assert.h>
 
@@ -41,7 +41,7 @@ mafVMEOutputMeter::~mafVMEOutputMeter()
 {
 }
 //-------------------------------------------------------------------------
-mmgGui *mafVMEOutputMeter::CreateGui()
+mafGUI *mafVMEOutputMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);

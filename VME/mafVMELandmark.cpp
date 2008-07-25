@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-21 12:29:04 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.19 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,7 +27,7 @@
 #include "mafOBB.h"
 #include "mafIndent.h"
 #include "mafTransform.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mmaMaterial.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -330,7 +330,7 @@ void mafVMELandmark::Print(std::ostream &os, const int tabs)
     << this->GetLandmarkVisibility(this->m_CurrentTime)<<std::endl;
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMELandmark::CreateGui()
+mafGUI* mafVMELandmark::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafVME::CreateGui(); // Called to show info about vmes' type and name

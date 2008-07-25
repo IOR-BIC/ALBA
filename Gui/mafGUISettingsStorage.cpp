@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsStorage.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-28 11:12:21 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-07-25 07:03:23 $
+Version:   $Revision: 1.7 $
 Authors:   Paolo Quadrani, Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUISettingsStorage.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 //----------------------------------------------------------------------------
 mafGUISettingsStorage::mafGUISettingsStorage(mafObserver *Listener, const mafString &label):
@@ -61,7 +61,7 @@ void mafGUISettingsStorage::CreateGui()
 //----------------------------------------------------------------------------
 {
   wxString remoteStorageArray[2] = {"Local", "HTTP"}; // "SRB"};
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Label(_("Storage general settings"));
   //m_Gui->Bool(ID_SINGLE_FILE, _("single file mode"), &m_SingleFileFlag,1);
   //m_Gui->Divider(2);

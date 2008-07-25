@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 14:04:43 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.18 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@ class mafSceneNode;
 class mafSceneGraph;
 class vtkMAFAssembly;
 class vtkRenderer;
-class mmgGui;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 // mafPipe :
@@ -70,7 +70,7 @@ public:
   };
 
   /** create and return the GUI for changing the node parameters */
-  mmgGui *GetGui() \
+  mafGUI *GetGui() \
   { \
     if (m_Gui==NULL) CreateGui(); \
     assert(m_Gui); \
@@ -83,7 +83,7 @@ public:
   /* Return Listener */
   mafObserver *GetListener(){return m_Listener;};
 
-  mmgGui         *m_Gui;      ///< User Interface
+  mafGUI         *m_Gui;      ///< User Interface
   mafVME         *m_Vme;      ///< VME used as input for the visual pipe
 	vtkMAFAssembly *m_AssemblyFront; ///< Assembly used to contain the actor in the front layer
 	vtkMAFAssembly *m_AssemblyBack;  ///< Assembly used to contain the actor in the background layer
@@ -100,7 +100,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   mafObserver *m_Listener;
 };

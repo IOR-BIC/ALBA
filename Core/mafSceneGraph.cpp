@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-09 11:41:56 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.26 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 #include "mafView.h"
 //#include "mafPipeGizmo.h"
 //#include "mafPipePointSet.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafIndent.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
@@ -383,12 +383,12 @@ enum
 
 };
 //----------------------------------------------------------------------------
-mmgGui *mafSceneGraph::GetGui()
+mafGUI *mafSceneGraph::GetGui()
 //----------------------------------------------------------------------------
 {
 	if(m_Gui == NULL)
 	{
-		m_Gui = new mmgGui(this);
+		m_Gui = new mafGUI(this);
 		
 		bool b1 = m_creatable[VME_SURFACE]	&& !m_Mutex[VME_SURFACE];
 		bool b2 = m_creatable[VME_VOLUME]		&& !m_Mutex[VME_VOLUME];

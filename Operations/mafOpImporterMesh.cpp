@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMesh.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,7 +23,7 @@
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafSmartPointer.h"
 #include "mafTagItem.h"
@@ -138,7 +138,7 @@ void mafOpImporterMesh::CreateGui()
 {
   mafString wildcard = "lis files (*.lis)|*.lis|All Files (*.*)|*.*";
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
 
   wxString TypeOfImporter[2]={"Ansys Text","ToDo"};

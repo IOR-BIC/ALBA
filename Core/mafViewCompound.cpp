@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-10-31 11:51:44 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.32 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,8 +24,8 @@
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
-#include "mmgViewWin.h"
-#include "mmgGui.h"
+#include "mafGUIViewWin.h"
+#include "mafGUI.h"
 #include "mafInteractor.h"
 #include "mafAvatar.h"
 #include "mafAvatar3D.h"
@@ -99,7 +99,7 @@ void mafViewCompound::PlugChildView(mafView *child)
 void mafViewCompound::Create()
 //----------------------------------------------------------------------------
 {
-  mmgViewWin *w = new mmgViewWin(mafGetFrame(),-1);
+  mafGUIViewWin *w = new mafGUIViewWin(mafGetFrame(),-1);
   w->SetBackgroundColour(wxColour(102,102,102));
   w->m_Owner = this;
   w->Show(false);
@@ -125,7 +125,7 @@ void mafViewCompound::Create()
 void mafViewCompound::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-  /*m_GuiView = new mmgGui(this);
+  /*m_GuiView = new mafGUI(this);
   m_GuiView->Label("Compound View's GUI",true);
   m_GuiView->Reparent(m_Win);*/
 }
@@ -214,13 +214,13 @@ mafPipe *mafViewCompound::GetNodePipe(mafNode *vme)
   return n->m_Pipe;
 }
 //----------------------------------------------------------------------------
-mmgGui *mafViewCompound::GetNodePipeGUI(mafNode *vme)
+mafGUI *mafViewCompound::GetNodePipeGUI(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   return GetNodePipeGUI(vme, m_DefauldChildView);
 }
 //----------------------------------------------------------------------------
-mmgGui *mafViewCompound::GetNodePipeGUI(mafNode *vme, int view_idx)
+mafGUI *mafViewCompound::GetNodePipeGUI(mafNode *vme, int view_idx)
 //----------------------------------------------------------------------------
 {
   mafSceneGraph *sg = ((mafViewVTK *)m_ChildViewList[view_idx])->GetSceneGraph();
@@ -264,7 +264,7 @@ void mafViewCompound::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-mmgGui* mafViewCompound::CreateGui()
+mafGUI* mafViewCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
   mafString childview_tooltip;
@@ -273,7 +273,7 @@ mmgGui* mafViewCompound::CreateGui()
   wxString layout_choices[4] = {"default","layout 1","layout 2", "custom"};
 
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->Integer(ID_DEFAULT_CHILD_VIEW,"default child", &m_DefauldChildView, 0, m_NumOfChildView, childview_tooltip);
   m_Gui->Combo(ID_LAYOUT_CHOOSER,"layout",&m_LayoutConfiguration,4,layout_choices);
   m_Gui->Bool(ID_LINK_SUBVIEW,"link camera",&m_LinkSubView);

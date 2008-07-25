@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -71,7 +71,7 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
 
   // create the gizmo gui
   // gui is sending events to this
-  m_GuiGizmoScale = new mafGuiGizmoScale(this);
+  m_GuiGizmoScale = new mafGUIGizmoScale(this);
 
   // initialize gizmo gui
   m_GuiGizmoScale->SetAbsScaling(m_InputVME->GetOutput()->GetAbsMatrix());
@@ -346,18 +346,18 @@ void mafGizmoScale::OnEventGizmoGui(mafEventBase *maf_event)
   switch(maf_event->GetId())
   {
     // process events from the gui   
-    case (mafGuiGizmoScale::ID_SCALE_X):
+    case (mafGUIGizmoScale::ID_SCALE_X):
     {
       // receiving abs scaling from gui
       SendTransformMatrixFromGui(maf_event);
     }
     break;
-    case (mafGuiGizmoScale::ID_SCALE_Y):
+    case (mafGUIGizmoScale::ID_SCALE_Y):
     {
       SendTransformMatrixFromGui(maf_event);
     }
     break;
-    case (mafGuiGizmoScale::ID_SCALE_Z):
+    case (mafGUIGizmoScale::ID_SCALE_Z):
     {
       SendTransformMatrixFromGui(maf_event);
     }

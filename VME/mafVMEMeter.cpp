@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-06 09:30:32 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.35 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,11 +31,11 @@
 #include "mafIndent.h"
 #include "mafDataPipeCustom.h"
 #include "mmuIdFactory.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafAbsMatrixPipe.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafRWI.h"
-#include "mmgDialogPreview.h"
+#include "mafGUIDialogPreview.h"
 
 #include "vtkMAFDataPipe.h"
 #include "vtkMath.h"
@@ -821,7 +821,7 @@ double mafVMEMeter::GetAngle()
   return m_Angle;
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEMeter::CreateGui()
+mafGUI* mafVMEMeter::CreateGui()
 //-------------------------------------------------------------------------
 {
   int num_mode = 3;
@@ -987,7 +987,7 @@ void mafVMEMeter::OnEvent(mafEventBase *maf_event)
           int x_init,y_init;
           x_init = mafGetFrame()->GetPosition().x;
           y_init = mafGetFrame()->GetPosition().y;
-          m_HistogramDialog = new mmgDialogPreview(_("Histogram Dialog"), mafCLOSEWINDOW | mafUSERWI);
+          m_HistogramDialog = new mafGUIDialogPreview(_("Histogram Dialog"), mafCLOSEWINDOW | mafUSERWI);
           m_HistogramRWI = m_HistogramDialog->GetRWI();
           m_HistogramRWI->SetListener(this);
           m_HistogramRWI->m_RenFront->AddActor2D(m_PlotActor);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterRAWVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafNode;
 class vtkImageReader;
 class vtkActor;
-class mmgDialogPreview;
+class mafGUIDialogPreview;
 class mafVMEVolumeGray;
 class mafVMEVolumeRGB;
 class vtkWindowLevelLookupTable;
@@ -105,7 +105,7 @@ protected:
 	int			m_NumberOfByte;
 	bool		m_BuildRectilinearGrid;
 	mafString	m_CoordFile;
-  mmgGui *m_GuiSlider;
+  mafGUI *m_GuiSlider;
 
   mafVMEVolumeGray  *m_VolumeGray;
   mafVMEVolumeRGB   *m_VolumeRGB;
@@ -119,6 +119,6 @@ protected:
 	int					  m_CurrentSlice;
 	wxSlider		 *m_SliceSlider;
   
-	mmgDialogPreview *m_Dialog;
+	mafGUIDialogPreview *m_Dialog;
 };
 #endif

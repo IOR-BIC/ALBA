@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiSaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-13 15:46:17 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.8 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,9 +20,9 @@
 //----------------------------------------------------------------------------
 
 
-#include "mafGuiSaveRestorePose.h"
+#include "mafGUISaveRestorePose.h"
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafSmartPointer.h"
 
 #include "mafMatrix.h"
@@ -35,7 +35,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listener, int typeGui)
+mafGUISaveRestorePose::mafGUISaveRestorePose(mafVME *input, mafObserver *listener, int typeGui)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -48,16 +48,16 @@ mafGuiSaveRestorePose::mafGuiSaveRestorePose(mafVME *input, mafObserver *listene
   CreateGui();
 }
 //----------------------------------------------------------------------------
-mafGuiSaveRestorePose::~mafGuiSaveRestorePose() 
+mafGUISaveRestorePose::~mafGUISaveRestorePose() 
 //----------------------------------------------------------------------------
 { 
 }
 
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::CreateGui()
+void mafGUISaveRestorePose::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   m_Gui->Divider(2);
   if(m_TypeGui == ID_POSE_GUI)
@@ -88,7 +88,7 @@ void mafGuiSaveRestorePose::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::OnEvent(mafEventBase *maf_event)
+void mafGUISaveRestorePose::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -125,7 +125,7 @@ void mafGuiSaveRestorePose::OnEvent(mafEventBase *maf_event)
 }
 
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::EnableWidgets(bool enable)
+void mafGUISaveRestorePose::EnableWidgets(bool enable)
 //----------------------------------------------------------------------------
 {
   int num_stored_poses = m_PositionsList->GetCount();
@@ -135,7 +135,7 @@ void mafGuiSaveRestorePose::EnableWidgets(bool enable)
   m_Gui->Enable(ID_APPLY, enable && num_stored_poses > 0);
 }
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::ReadSavedPoses()
+void mafGUISaveRestorePose::ReadSavedPoses()
 //----------------------------------------------------------------------------
 {
 	mafTagArray *tag_array = m_InputVME->GetTagArray();
@@ -157,7 +157,7 @@ void mafGuiSaveRestorePose::ReadSavedPoses()
 	}
 }
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::SavePose(mafMatrix *abs_pose)
+void mafGUISaveRestorePose::SavePose(mafMatrix *abs_pose)
 //----------------------------------------------------------------------------
 {
   wxString pose_name = "";
@@ -207,7 +207,7 @@ void mafGuiSaveRestorePose::SavePose(mafMatrix *abs_pose)
   m_PositionsList->Append(pose_name);
 }
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::RemovePose(int sel_pose)
+void mafGUISaveRestorePose::RemovePose(int sel_pose)
 //----------------------------------------------------------------------------
 {
   wxString pose_name = m_PositionsList->GetString(sel_pose);
@@ -217,7 +217,7 @@ void mafGuiSaveRestorePose::RemovePose(int sel_pose)
   m_PositionsList->Delete(sel_pose);
 }
 //----------------------------------------------------------------------------
-void mafGuiSaveRestorePose::RestorePose(int sel_pose)
+void mafGUISaveRestorePose::RestorePose(int sel_pose)
 //----------------------------------------------------------------------------
 {
   wxString pose_name = m_PositionsList->GetString(sel_pose);

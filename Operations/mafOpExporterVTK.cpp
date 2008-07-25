@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 #include "mafOpExporterVTK.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
@@ -86,7 +86,7 @@ void mafOpExporterVTK::OpRun()
 {
   mafString wildc = "vtk Data (*.vtk)|*.vtk";
 
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->FileSave(ID_CHOOSE_FILENAME, _("vtk file"), &m_File, wildc);
 	m_Gui->Label("file type",true);
 	m_Gui->Bool(ID_VTK_BINARY_FILE,"binary",&m_Binary,0);

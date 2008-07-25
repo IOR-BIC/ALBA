@@ -19,8 +19,8 @@
 #include "vtkRendererCollection.h"
 #include "vtkPlaneSource.h"
 
-#include "vtkRulerActor2D.h"
-#include "vtkSimpleRulerActor2D.h"
+#include "vtkMAFRulerActor2D.h"
+#include "vtkMAFSimpleRulerActor2D.h"
 
 int main( int argc, char *argv[] ) { 
 
@@ -76,7 +76,7 @@ vtkActor *A2 = vtkActor::New();
    //A2->SetScale(10);
 
    
-vtkSimpleRulerActor2D *A2D = vtkSimpleRulerActor2D::New();
+vtkMAFSimpleRulerActor2D *A2D = vtkMAFSimpleRulerActor2D::New();
    A2D->SetLabelAxesVisibility();
    A2D->SetLabelScaleVisibility();
    //A2D->SetAxesVisibility(false);
@@ -88,7 +88,7 @@ vtkSimpleRulerActor2D *A2D = vtkSimpleRulerActor2D::New();
    //A2D->SetLegend("inch");
    //A2D->SetScaleFactor(25.4);
 
-vtkRulerActor2D *A2D2 = vtkRulerActor2D::New();
+vtkMAFRulerActor2D *A2D2 = vtkMAFRulerActor2D::New();
    A2D2->SetLabelAxesVisibility();
    A2D2->SetLabelScaleVisibility(false);
    //A2D2->SetAxesVisibility(false);

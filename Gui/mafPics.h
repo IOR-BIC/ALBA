@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPics.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-14 11:03:18 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.11 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mmgCheckTree.h" // friend class
+#include "mafGUICheckTree.h" // friend class
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -56,8 +56,8 @@ struct mafPictureFactory_Pimpl;
 
 NOTE:
 - Icons for the Toolbar must be 20x20 in size, and with transparent background (replacing blank color with "None" in the XPM)
-- Icons to be used in one ImageList (mmgTree,mmgCheckTree,...) must be all the same size, and with white background.
-- Icons to be used in mmgCheckTree (vme icons) must be 16x16 with white background
+- Icons to be used in one ImageList (mafGUITree,mafGUICheckTree,...) must be all the same size, and with white background.
+- Icons to be used in mafGUICheckTree (vme icons) must be 16x16 with white background
 */
 class mafPictureFactory 
 {

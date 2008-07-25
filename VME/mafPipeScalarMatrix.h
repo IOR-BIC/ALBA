@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeScalarMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:56 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,6 +50,6 @@ protected:
 
   /** Update visual properties*/
   void UpdateProperty(bool fromTag = false);
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeScalar_H__

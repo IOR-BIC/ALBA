@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNode.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-06 14:57:25 $
-  Version:   $Revision: 1.57 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.58 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@
 #include "mafStorageElement.h"
 #include "mafStorage.h"
 #include "mafTagArray.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include <assert.h>
 
 #ifdef VTK_USE_ANSI_STDLIB
@@ -1219,7 +1219,7 @@ char** mafNode::GetIcon()
   return mafNode_xpm;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafNode::GetGui()
+mafGUI *mafNode::GetGui()
 //-------------------------------------------------------------------------
 {
   if (m_Gui == NULL)
@@ -1234,11 +1234,11 @@ void mafNode::DeleteGui()
   cppDEL(m_Gui);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafNode::CreateGui()
+mafGUI* mafNode::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   
   mafString type_name = GetTypeName();
   if(MAFExpertMode == TRUE) 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-26 10:44:52 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.16 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 class mafNode;
 class mafVMERoot;
 class mafView;
-class mmgViewPanel;
+class mafGUIViewPanel;
 class mafRWIBase;
 class mmdMouse;
 //----------------------------------------------------------------------------

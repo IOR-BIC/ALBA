@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeGray.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-23 08:27:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.7 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 #include "mafVMEVolumeGray.h"
 
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafGUIDialogTransferFunction2D.h"
 
 #include "vtkImageData.h"
@@ -98,7 +98,7 @@ int mafVMEVolumeGray::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMEVolumeGray::CreateGui()
+mafGUI* mafVMEVolumeGray::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGenericAbstract.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:25:13 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.10 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 class mafDataVector;
 class mafMatrixVector;
 class mafNode;
-class mmgGui;
+class mafGUI;
 
 /** mafVMEGenericAbstract - a VME featuring an internal array for matrices and data.
   mafVMEGenericAbstract is a node featuring a standard way for managing 4D data, featuring
@@ -129,7 +129,7 @@ protected:
   virtual int InternalRestore(mafStorageElement *node);
 
   /** Create GUI for the VME */
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   mafMatrixVector *m_MatrixVector;
   mafDataVector   *m_DataVector;

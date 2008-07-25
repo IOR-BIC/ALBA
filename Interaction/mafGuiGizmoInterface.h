@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGuiGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:27 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mflMatrix;
-class mmgGui;
+class mafGUI;
 
 //---------------------------------------------------------------------------- 
 /** abstract base class for gizmo gui
@@ -32,16 +32,16 @@ class mmgGui;
  
   @todo
 */
-class mafGuiGizmoInterface : public mafObserver
+class mafGUIGizmoInterface : public mafObserver
 {
 public:
 
-  virtual ~mafGuiGizmoInterface(); 
+  virtual ~mafGUIGizmoInterface(); 
 
   virtual void OnEvent(mafEventBase *maf_event) {};
 
   /** Return the gui to be plugged*/
-  mmgGui *GetGui() {return m_Gui;};
+  mafGUI *GetGui() {return m_Gui;};
 
   /** Enable-Disable the GUI's widgets */
   virtual void EnableWidgets(bool enable) {};
@@ -49,9 +49,9 @@ public:
 protected:
   virtual void CreateGui() {};
   
-  mafGuiGizmoInterface(mafObserver *listener = NULL);
+  mafGUIGizmoInterface(mafObserver *listener = NULL);
 
   mafObserver *m_Listener;
-  mmgGui      *m_Gui;    
+  mafGUI      *m_Gui;    
 };
 #endif

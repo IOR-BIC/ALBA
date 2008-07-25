@@ -6,7 +6,7 @@
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkDataSetReader.h"
-#include "vtkHistogram.h"
+#include "vtkMAFHistogram.h"
 
 int main( int argc, char *argv[] ) { 
 
@@ -34,11 +34,11 @@ vtkDataSetReader *reader = vtkDataSetReader::New();
    //reader->SetFileName("F:\\MAF2\\Data\\Volume.vtk");  //Set your own vtkImageData to load befor running the example!!!
    reader->Update();
 
-vtkHistogram *A2D = vtkHistogram::New();
+vtkMAFHistogram *A2D = vtkMAFHistogram::New();
    A2D->SetColor(1,1,1);
    A2D->SetImageData(vtkImageData::SafeDownCast(reader->GetOutput()));
-//   A2D->SetHisctogramRepresentation(vtkHistogram::BAR_REPRESENTATION);
-//   A2D->SetHisctogramRepresentation(vtkHistogram::POINT_REPRESENTATION);
+//   A2D->SetHisctogramRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
+//   A2D->SetHisctogramRepresentation(vtkMAFHistogram::POINT_REPRESENTATION);
    
 // -----------------------------------
 // Insert all actors into the renderer

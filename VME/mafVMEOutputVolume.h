@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 16:26:57 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.8 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,7 +58,7 @@ protected:
   mafString m_ScaralRangeString;
   mmaVolumeMaterial *m_Material;
 
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
 
 private:
   mafVMEOutputVolume(const mafVMEOutputVolume&); // Not implemented

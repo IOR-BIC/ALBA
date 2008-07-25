@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-13 13:57:07 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@
 #include "mafGizmoPath.h"
 #include "mafDecl.h"
 #include "mmaMaterial.h"
-#include "mmgMaterialButton.h"
+#include "mafGUIMaterialButton.h"
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
 #include "mafSmartPointer.h"

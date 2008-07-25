@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 class mafGizmoTranslate;
 class mafGizmoRotate;
-class mafGuiTransformMouse;
+class mafGUITransformMouse;
 class mafInteractor;
 class mmiCompositorMouse;
 class mmiGenericMouse;
@@ -41,11 +41,11 @@ class mafTransform;
 
   This class defines the basic structure to assemble components for vme transformations.
   Typical object that can be plugged in mafOpTransformInterface concrete descendants are
-  gizmos (mafGizmoXXX)and gui transform components (mafGuiTransformXXX). See mafOpMAFTransform
+  gizmos (mafGizmoXXX)and gui transform components (mafGUITransformXXX). See mafOpMAFTransform
   for a concrete implementation.
 
   @sa
-  mafOpMAFTransform, mafGuiTransformInterface, mafGizmoInterface
+  mafOpMAFTransform, mafGUITransformInterface, mafGizmoInterface
 
   @todo
   - improve components plugging: see comments in mafOpMAFTransform.cpp

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVisualPipeVolumeRayCasting.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:40:25 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.2 $
   Authors:   Alexander Savenko - Paolo Quadrani (porting MAF2.2)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,7 @@ public:
 
 protected:
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   vtkMAFAdaptiveVolumeMapper  *m_Mapper; 
   vtkVolume *m_Volume;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,8 +30,8 @@ class mafVMELandmark;
 class mafVMELandmarkCloud;
 class mafInteractor;
 class mmiPicker;
-class mmgNamedPanel;
-class mmgDictionaryWidget;
+class mafGUINamedPanel;
+class mafGUIDictionaryWidget;
 //----------------------------------------------------------------------------
 // mafOpAddLandmark :
 //----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ protected:
 
 	double							 m_LandmarkPosition[3];
 
-  mmgNamedPanel			  *m_GuiPanel;
-  mmgDictionaryWidget *m_Dict;
+  mafGUINamedPanel			  *m_GuiPanel;
+  mafGUIDictionaryWidget *m_Dict;
 };
 #endif

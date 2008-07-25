@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-19 12:43:49 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,14 +24,14 @@
 // forward reference
 //----------------------------------------------------------------------------
 class mafView;
-class mmgMDIFrame;
-class mmgNamedPanel;
-class mmgTimeBar;
+class mafGUIMDIFrame;
+class mafGUINamedPanel;
+class mafGUITimeBar;
 class mafWXLog;
 class mafVTKLog;
-class mmgLocaleSettings;
-class mmgMeasureUnitSettings;
-class mmgApplicationSettings;
+class mafGUILocaleSettings;
+class mafGUIMeasureUnitSettings;
+class mafGUIApplicationSettings;
 class mafGUISettingsStorage;
 class mafGUISettingsTimeBar;
 
@@ -90,7 +90,7 @@ public:
   /** Main initialization.*/
   virtual void Init(int argc, char **argv) {};
 	/** Returns the pointer to the main panel of the application.*/
-	virtual mmgMDIFrame *GetTopWin()						{return m_Win;};
+	virtual mafGUIMDIFrame *GetTopWin()						{return m_Win;};
 	/** Sets the icon for the application.*/
 	//virtual void SetAppIcon(char **icon)				{m_AppIcon = icon;};
 	/** Sets icon for the child windows.*/
@@ -144,19 +144,19 @@ protected:
   void EnableItem(int item, bool enable);
 
   long               m_ChildFrameStyle;
-  mmgMDIFrame       *m_Win;
+  mafGUIMDIFrame       *m_Win;
   wxToolBar         *m_ToolBar;
   wxMenuBar         *m_MenuBar;
 	wxString					 m_LastSelectedPanel;
-  mmgTimeBar        *m_TimePanel;
+  mafGUITimeBar        *m_TimePanel;
 	mafString					 m_AppTitle;
 	bool               m_LogToFile;
 	bool               m_LogAllEvents;
   mafWXLog          *m_Logger;
   mafVTKLog         *m_VtkLog;
-  mmgLocaleSettings *m_LocaleSettings;
-  mmgMeasureUnitSettings *m_MeasureUnitSettings;
-  mmgApplicationSettings *m_ApplicationSettings;
+  mafGUILocaleSettings *m_LocaleSettings;
+  mafGUIMeasureUnitSettings *m_MeasureUnitSettings;
+  mafGUIApplicationSettings *m_ApplicationSettings;
   mafGUISettingsStorage  *m_StorageSettings;
   mafGUISettingsTimeBar  *m_TimeBarSettings;
 

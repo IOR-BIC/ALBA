@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-13 17:50:13 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,10 +24,10 @@
 #include <wx/busyinfo.h>
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
-#include "mafGuiTransformMouse.h"
+#include "mafGUITransformMouse.h"
 
 #include "mmiGenericMouse.h"
 

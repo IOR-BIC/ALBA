@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:29:50 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 07:03:51 $
+Version:   $Revision: 1.5 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -22,18 +22,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "wx/busyinfo.h"
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
-#include "mmgDialog.h"
+#include "mafGUIDialog.h"
 
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mmdMouse.h"
 
-#include "mmgButton.h"
-#include "mmgValidator.h"
-#include "mmgPicButton.h"
-#include "mmgFloatSlider.h"
+#include "mafGUIButton.h"
+#include "mafGUIValidator.h"
+#include "mafGUIPicButton.h"
+#include "mafGUIFloatSlider.h"
 
 #include "mafVME.h"
 #include "mafVMESurface.h"
@@ -235,7 +235,7 @@ void mafOpExtractIsosurface::CreateOpDialog()
 
 
   //===== setup interface ====
-  m_Dialog = new mmgDialog("Extract Isosurface", mafCLOSEWINDOW | mafRESIZABLE);
+  m_Dialog = new mafGUIDialog("Extract Isosurface", mafCLOSEWINDOW | mafRESIZABLE);
 
   m_PIPRen = vtkRenderer::New();
 
@@ -263,7 +263,7 @@ void mafOpExtractIsosurface::CreateOpDialog()
   wxStaticText *lab  = new wxStaticText(m_Dialog,-1, "contur value: ");
   wxStaticText *foo  = new wxStaticText(m_Dialog,-1, "");
   wxTextCtrl   *text = new wxTextCtrl  (m_Dialog,ID_ISO, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
-  m_IsoSlider				 = new mmgFloatSlider(m_Dialog,ID_ISO_SLIDER,m_IsoValue,m_MinDensity,m_MaxDensity,p,wxSize(150,20));
+  m_IsoSlider				 = new mafGUIFloatSlider(m_Dialog,ID_ISO_SLIDER,m_IsoValue,m_MinDensity,m_MaxDensity,p,wxSize(150,20));
   m_IsoSlider->SetNumberOfSteps(sr[1]-sr[0]);
   m_StepDensity = m_IsoSlider->GetStep();
   //m_MinDensity  = m_IsoSlider->GetMin();
@@ -274,17 +274,17 @@ void mafOpExtractIsosurface::CreateOpDialog()
   wxStaticText *lab_slice  = new wxStaticText(m_Dialog,   -1, "slice position: ");
   wxStaticText *foo_slice  = new wxStaticText(m_Dialog,   -1, "");
   wxTextCtrl   *text_slice = new wxTextCtrl  (m_Dialog,   ID_SLICE, "",							 		p,wxSize(50, 16 ), wxNO_BORDER );
-  m_SliceSlider						 = new mmgFloatSlider(m_Dialog, ID_SLICE_SLIDER,m_Slice,m_SliceMin,m_SliceMax,p,wxSize(150,20));
+  m_SliceSlider						 = new mafGUIFloatSlider(m_Dialog, ID_SLICE_SLIDER,m_Slice,m_SliceMin,m_SliceMax,p,wxSize(150,20));
   m_SliceSlider->SetNumberOfSteps(200);
   m_SliceStep = m_SliceSlider->GetStep();
   m_SliceMin  = m_SliceSlider->GetMin();
   m_SliceMax  = m_SliceSlider->GetMax();
   m_Slice     = m_SliceSlider->GetValue();
 
-  mmgButton *b_incr_slice = new mmgButton(m_Dialog, ID_INCREASE_SLICE, ">",	p,wxSize(25, 20));
-  mmgButton *b_decr_slice = new mmgButton(m_Dialog, ID_DECREASE_SLICE, "<",	p,wxSize(25, 20));
-  mmgButton *b_incr =       new mmgButton(m_Dialog, ID_INCREASE_ISO,   ">",	p,wxSize(25, 20));
-  mmgButton *b_decr =       new mmgButton(m_Dialog, ID_DECREASE_ISO,   "<",	p,wxSize(25, 20));
+  mafGUIButton *b_incr_slice = new mafGUIButton(m_Dialog, ID_INCREASE_SLICE, ">",	p,wxSize(25, 20));
+  mafGUIButton *b_decr_slice = new mafGUIButton(m_Dialog, ID_DECREASE_SLICE, "<",	p,wxSize(25, 20));
+  mafGUIButton *b_incr =       new mafGUIButton(m_Dialog, ID_INCREASE_ISO,   ">",	p,wxSize(25, 20));
+  mafGUIButton *b_decr =       new mafGUIButton(m_Dialog, ID_DECREASE_ISO,   "<",	p,wxSize(25, 20));
 
   wxCheckBox *chk_slice = new wxCheckBox(m_Dialog, ID_VIEW_SLICE,       "slice", p, wxSize(80,20));
   wxCheckBox *chk_opt =   new wxCheckBox(m_Dialog, ID_OPTIMIZE_CONTOUR, "optimize", p, wxSize(80,20));
@@ -293,9 +293,9 @@ void mafOpExtractIsosurface::CreateOpDialog()
 	wxCheckBox *chk_triangulate =   new wxCheckBox(m_Dialog, ID_TRIANGULATE, _("triangulate"), p, wxSize(80,20));
   //  wxCheckBox *b_grid  = new wxCheckBox(m_Dialog, ID_GRID,         "show/hide grid", p, wxSize(80,20));
 
-  mmgButton  *b_fit =    new mmgButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
-  mmgButton  *b_ok =     new mmgButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
-  mmgButton  *b_cancel = new mmgButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
+  mafGUIButton  *b_fit =    new mafGUIButton(m_Dialog, ID_FIT,    "reset camera", p,wxSize(80,20));
+  mafGUIButton  *b_ok =     new mafGUIButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
+  mafGUIButton  *b_cancel = new mafGUIButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
   wxCheckBox *chk_multi = new wxCheckBox(m_Dialog, ID_MULTIPLE_CONTOURS, "multi contours", p, wxSize(100,20));
   wxTextCtrl *text_num_of_contours = new wxTextCtrl(m_Dialog, ID_NUM_OF_CONTOURS, "num", p,wxSize(25, 16), wxNO_BORDER);
@@ -304,31 +304,31 @@ void mafOpExtractIsosurface::CreateOpDialog()
   wxTextCtrl *text_max_range = new wxTextCtrl(m_Dialog, ID_MAX_RANGE, "", p,wxSize(50, 16));
 
   // iso interface validator
-  text->SetValidator(mmgValidator(this,ID_ISO,text,&m_IsoValue,m_MinDensity,m_MaxDensity));
-  m_IsoSlider->SetValidator(mmgValidator(this,ID_ISO_SLIDER,m_IsoSlider,&m_IsoValue,text));
-  b_incr->SetValidator(mmgValidator(this,ID_INCREASE_ISO,b_incr));
-  b_decr->SetValidator(mmgValidator(this,ID_DECREASE_ISO,b_decr));
+  text->SetValidator(mafGUIValidator(this,ID_ISO,text,&m_IsoValue,m_MinDensity,m_MaxDensity));
+  m_IsoSlider->SetValidator(mafGUIValidator(this,ID_ISO_SLIDER,m_IsoSlider,&m_IsoValue,text));
+  b_incr->SetValidator(mafGUIValidator(this,ID_INCREASE_ISO,b_incr));
+  b_decr->SetValidator(mafGUIValidator(this,ID_DECREASE_ISO,b_decr));
 
   // slice interface validator
-  text_slice->SetValidator(mmgValidator(this,ID_SLICE,text_slice,&m_Slice,m_SliceMin,m_SliceMax));
-  m_SliceSlider->SetValidator(mmgValidator(this,ID_SLICE_SLIDER,m_SliceSlider,&m_Slice,text_slice));
-  b_incr_slice->SetValidator(mmgValidator(this,ID_INCREASE_SLICE,b_incr_slice));
-  b_decr_slice->SetValidator(mmgValidator(this,ID_DECREASE_SLICE,b_decr_slice));
+  text_slice->SetValidator(mafGUIValidator(this,ID_SLICE,text_slice,&m_Slice,m_SliceMin,m_SliceMax));
+  m_SliceSlider->SetValidator(mafGUIValidator(this,ID_SLICE_SLIDER,m_SliceSlider,&m_Slice,text_slice));
+  b_incr_slice->SetValidator(mafGUIValidator(this,ID_INCREASE_SLICE,b_incr_slice));
+  b_decr_slice->SetValidator(mafGUIValidator(this,ID_DECREASE_SLICE,b_decr_slice));
 
-  b_fit->SetValidator(mmgValidator(this,ID_FIT,b_fit));
-  b_ok->SetValidator(mmgValidator(this,ID_OK,b_ok));
-  b_cancel->SetValidator(mmgValidator(this,ID_CANCEL,b_cancel));
-  //  b_grid->SetValidator(mmgValidator(this,ID_GRID,b_grid));
-	chk_slice->SetValidator( mmgValidator(this, ID_VIEW_SLICE, chk_slice, &m_ShowSlice));
-	chk_clean->SetValidator( mmgValidator(this, ID_CLEAN, chk_clean, &m_Clean));
-  chk_triangulate->SetValidator( mmgValidator(this, ID_TRIANGULATE, chk_triangulate, &m_Triangulate));
-  chk_opt->SetValidator(mmgValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Optimize));
-  chk_lod->SetValidator(mmgValidator(this, ID_AUTO_LOD, chk_lod, &m_Autolod));
+  b_fit->SetValidator(mafGUIValidator(this,ID_FIT,b_fit));
+  b_ok->SetValidator(mafGUIValidator(this,ID_OK,b_ok));
+  b_cancel->SetValidator(mafGUIValidator(this,ID_CANCEL,b_cancel));
+  //  b_grid->SetValidator(mafGUIValidator(this,ID_GRID,b_grid));
+	chk_slice->SetValidator( mafGUIValidator(this, ID_VIEW_SLICE, chk_slice, &m_ShowSlice));
+	chk_clean->SetValidator( mafGUIValidator(this, ID_CLEAN, chk_clean, &m_Clean));
+  chk_triangulate->SetValidator( mafGUIValidator(this, ID_TRIANGULATE, chk_triangulate, &m_Triangulate));
+  chk_opt->SetValidator(mafGUIValidator(this, ID_OPTIMIZE_CONTOUR,chk_opt, &m_Optimize));
+  chk_lod->SetValidator(mafGUIValidator(this, ID_AUTO_LOD, chk_lod, &m_Autolod));
 
-  chk_multi->SetValidator(mmgValidator(this, ID_MULTIPLE_CONTOURS, chk_multi, &m_MultiContoursFlag));
-  text_num_of_contours->SetValidator(mmgValidator(this, ID_NUM_OF_CONTOURS,text_num_of_contours, &m_NumberOfContours, 1, 100));
-  text_min_range->SetValidator(mmgValidator(this, ID_MIN_RANGE,text_min_range, &m_MinRange, m_MinDensity, m_MaxDensity));
-  text_max_range->SetValidator(mmgValidator(this, ID_MAX_RANGE,text_max_range, &m_MaxRange, m_MinDensity, m_MaxDensity));
+  chk_multi->SetValidator(mafGUIValidator(this, ID_MULTIPLE_CONTOURS, chk_multi, &m_MultiContoursFlag));
+  text_num_of_contours->SetValidator(mafGUIValidator(this, ID_NUM_OF_CONTOURS,text_num_of_contours, &m_NumberOfContours, 1, 100));
+  text_min_range->SetValidator(mafGUIValidator(this, ID_MIN_RANGE,text_min_range, &m_MinRange, m_MinDensity, m_MaxDensity));
+  text_max_range->SetValidator(mafGUIValidator(this, ID_MAX_RANGE,text_max_range, &m_MaxRange, m_MinDensity, m_MaxDensity));
 
   wxBoxSizer *h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
   h_sizer1->Add(lab,     0,wxLEFT);	

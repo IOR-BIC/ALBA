@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:13 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:23 $
+  Version:   $Revision: 1.5 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,15 +26,15 @@
 #include <fstream>
 
 #include "mafDecl.h"
-#include "mmgGui.h"
-#include "mmgRangeSlider.h"
-#include "mmgButton.h"
-#include "mmgPicButton.h"
-#include "mmgFloatSlider.h"
+#include "mafGUI.h"
+#include "mafGUIRangeSlider.h"
+#include "mafGUIButton.h"
+#include "mafGUIPicButton.h"
+#include "mafGUIFloatSlider.h"
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mmaVolumeMaterial.h"
-#include "mmgValidator.h"
+#include "mafGUIValidator.h"
 
 #include "mafTagArray.h"
 #include "mafTagItem.h"
@@ -108,7 +108,7 @@ enum TRANSFER_FUNCTION_DIALOG_ID
 
 //----------------------------------------------------------------------------
 mafGUIDialogTransferFunction2D::mafGUIDialogTransferFunction2D() :
-  mmgDialog("Choose Transfer Function", wxDIALOG_MODAL | wxCAPTION | wxTHICK_FRAME )
+  mafGUIDialog("Choose Transfer Function", wxDIALOG_MODAL | wxCAPTION | wxTHICK_FRAME )
 //----------------------------------------------------------------------------
 {
 }
@@ -297,7 +297,7 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   gridSizer->Add(sliceSlider, 0, wxALIGN_CENTER | wxEXPAND, 0);
 
   // windowing slider
-  this->m_WindowingSlider = new mmgRangeSlider(previewPage, ID_WINDOWING_SLIDER, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
+  this->m_WindowingSlider = new mafGUIRangeSlider(previewPage, ID_WINDOWING_SLIDER, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
   this->m_WindowingSlider->EnableCenterWidget(false);
   gridSizer->Add(this->m_WindowingSlider, 0, wxEXPAND, 0);
 
@@ -353,11 +353,11 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   tmpSizer->Add(addRemoveSizer, 0, wxALIGN_RIGHT | wxLEFT, 2);
 
   // add / remove buttons
-  mmgButton  *b1, *b2;
-  b1 = new mmgButton(this, ID_TF_ADD,    "add",wxDefaultPosition, wxSize(40, 20));
-  b1->SetValidator(mmgValidator(this, ID_TF_ADD, b1));
-  b2 = new mmgButton(this, ID_TF_REMOVE, "remove", wxDefaultPosition, wxSize(40, 20));
-  b2->SetValidator(mmgValidator(this, ID_TF_REMOVE, b2));
+  mafGUIButton  *b1, *b2;
+  b1 = new mafGUIButton(this, ID_TF_ADD,    "add",wxDefaultPosition, wxSize(40, 20));
+  b1->SetValidator(mafGUIValidator(this, ID_TF_ADD, b1));
+  b2 = new mafGUIButton(this, ID_TF_REMOVE, "remove", wxDefaultPosition, wxSize(40, 20));
+  b2->SetValidator(mafGUIValidator(this, ID_TF_REMOVE, b2));
   addRemoveSizer->Add(b1, 0, wxALIGN_TOP | wxALL, 6);
   addRemoveSizer->Add(b2, 0, wxALIGN_BOTTOM | wxALL, 6);
 
@@ -365,7 +365,7 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   rightPaneU->Add(new wxStaticText(this, -1, ""), 0, wxALIGN_CENTER);
   this->m_WidgetName = "";
   wxTextCtrl  *text = new wxTextCtrl(this, ID_TF_NAME, this->m_WidgetName, wxDefaultPosition, wxSize(-1, 20), wxNO_BORDER);
-	text->SetValidator(mmgValidator(this, ID_TF_NAME, text, &this->m_WidgetName));
+	text->SetValidator(mafGUIValidator(this, ID_TF_NAME, text, &this->m_WidgetName));
   wxBoxSizer *nameSizer = new wxBoxSizer(wxHORIZONTAL);
   nameSizer->Add(new wxStaticText(this, -1, "Name: ", wxDefaultPosition, controlTextSize), 0, wxALIGN_LEFT | wxRIGHT, 5);
   nameSizer->Add(text, wxEXPAND | wxALIGN_RIGHT, 0);
@@ -375,9 +375,9 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   this->m_WidgetColor.Set(this->m_Widget.Color[0] * 255, this->m_Widget.Color[1] * 255, this->m_Widget.Color[2] * 255);
   wxString bmp_id = "";
   bmp_id << MENU_FILE_OPEN;
-  mmgPicButton *colorOpen = new mmgPicButton(this, bmp_id, ID_TF_COLOR);
+  mafGUIPicButton *colorOpen = new mafGUIPicButton(this, bmp_id, ID_TF_COLOR);
 	wxTextCtrl   *colorBox = new wxTextCtrl  (this, ID_TF_COLOR, "", wxDefaultPosition, wxSize(-1,16), wxTE_READONLY|wxNO_BORDER);
-  colorOpen->SetValidator( mmgValidator(this, ID_TF_COLOR, colorOpen, &this->m_WidgetColor, colorBox));
+  colorOpen->SetValidator( mafGUIValidator(this, ID_TF_COLOR, colorOpen, &this->m_WidgetColor, colorBox));
   
   wxBoxSizer *colorSizer = new wxBoxSizer(wxHORIZONTAL);
   colorSizer->Add(new wxStaticText(this, -1, "Colour: ", wxDefaultPosition, controlTextSize, wxALIGN_LEFT), 0, wxALIGN_LEFT | wxRIGHT, 5);
@@ -389,9 +389,9 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   wxBoxSizer *opacitySizer = new wxBoxSizer(wxHORIZONTAL);
 
 	text = new wxTextCtrl  (this, ID_TF_OPACITY, ""   , wxDefaultPosition, wxSize(35, 20), 0);
-  mmgFloatSlider *slider = new mmgFloatSlider(this, ID_TF_OPACITY, 0, 0, 1, wxDefaultPosition, wxSize(40, 20));
-  text->SetValidator(mmgValidator(this, ID_TF_OPACITY, text, &this->m_Widget.Opacity, slider, 0.f, 1.f));
-	slider->SetValidator(mmgValidator(this, ID_TF_OPACITY, slider, &this->m_Widget.Opacity, text));
+  mafGUIFloatSlider *slider = new mafGUIFloatSlider(this, ID_TF_OPACITY, 0, 0, 1, wxDefaultPosition, wxSize(40, 20));
+  text->SetValidator(mafGUIValidator(this, ID_TF_OPACITY, text, &this->m_Widget.Opacity, slider, 0.f, 1.f));
+	slider->SetValidator(mafGUIValidator(this, ID_TF_OPACITY, slider, &this->m_Widget.Opacity, text));
 
   opacitySizer->Add(new wxStaticText(this, -1, "Opacity: ", wxDefaultPosition, controlTextSize), 0, wxALIGN_LEFT | wxRIGHT, 5);
   opacitySizer->Add(text, 0, wxALIGN_CENTRE, 0);
@@ -402,9 +402,9 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   wxBoxSizer *diffuseSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	text = new wxTextCtrl  (this, ID_TF_DIFFUSE, ""   , wxDefaultPosition, wxSize(35, 20), 0);
-  slider = new mmgFloatSlider(this, ID_TF_DIFFUSE, 0, 0, 1, wxDefaultPosition, wxSize(40, 20));
-  text->SetValidator(mmgValidator(this, ID_TF_DIFFUSE, text, &this->m_Widget.Diffuse, slider, 0.f, 1.f));
-	slider->SetValidator(mmgValidator(this, ID_TF_DIFFUSE, slider, &this->m_Widget.Diffuse, text));
+  slider = new mafGUIFloatSlider(this, ID_TF_DIFFUSE, 0, 0, 1, wxDefaultPosition, wxSize(40, 20));
+  text->SetValidator(mafGUIValidator(this, ID_TF_DIFFUSE, text, &this->m_Widget.Diffuse, slider, 0.f, 1.f));
+	slider->SetValidator(mafGUIValidator(this, ID_TF_DIFFUSE, slider, &this->m_Widget.Diffuse, text));
 
   diffuseSizer->Add(new wxStaticText(this, -1, "Diffuse: ", wxDefaultPosition, controlTextSize), 0, wxALIGN_LEFT | wxRIGHT, 5);
   diffuseSizer->Add(text, 0, wxALIGN_CENTRE, 0);
@@ -413,14 +413,14 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
 
   // value
   wxStaticBoxSizer *valueSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, "Value range"), wxVERTICAL);
-  this->m_ValueSlider = new mmgRangeSlider(this, ID_TF_VALUE, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
+  this->m_ValueSlider = new mafGUIRangeSlider(this, ID_TF_VALUE, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
   wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
   this->m_Widget.Range[0][0] = this->m_Widget.Range[0][1] = this->m_Widget.Range[0][2] = 0;
   int j;
   for (j = 0; j < 3; j++) 
 	{
     text = new wxTextCtrl(this, ID_TF_VALUE_0 + j, "", wxDefaultPosition, wxSize(-1, 20), 0);
-    text->SetValidator(mmgValidator(this, ID_TF_VALUE_0 + j, text, this->m_Widget.Range[0] + (j == 0 ? 0 : (j == 1 ? 2 : 1)), -99999, 99999, 0));
+    text->SetValidator(mafGUIValidator(this, ID_TF_VALUE_0 + j, text, this->m_Widget.Range[0] + (j == 0 ? 0 : (j == 1 ? 2 : 1)), -99999, 99999, 0));
     sizer->Add(text, 1, wxEXPAND | wxALIGN_LEFT | wxLEFT | wxRIGHT, 5);
   }
   valueSizer->Add(this->m_ValueSlider, 0, wxEXPAND | wxALIGN_LEFT | wxTOP | wxBOTTOM, 5);
@@ -428,13 +428,13 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   rightPaneU->Add(valueSizer, 0, wxEXPAND | wxALIGN_LEFT | wxALL, 5);
 
   wxStaticBoxSizer *gradientSizer = new wxStaticBoxSizer(new wxStaticBox(this, -1, "Gradient range"), wxVERTICAL);
-  this->m_GradientSlider = new mmgRangeSlider(this, ID_TF_GRADIENT, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
+  this->m_GradientSlider = new mafGUIRangeSlider(this, ID_TF_GRADIENT, wxDefaultPosition, wxSize(-1, 30), wxNO_BORDER);
   sizer = new wxBoxSizer(wxHORIZONTAL);
   this->m_Widget.Range[1][0] = this->m_Widget.Range[1][1] = this->m_Widget.Range[1][2] = 0;
   for (j = 0; j < 3; j++) 
 	{
     text = new wxTextCtrl(this, ID_TF_GRADIENT_0 + j, "", wxDefaultPosition, wxSize(-1, 20), 0);
-    text->SetValidator(mmgValidator(this, ID_TF_GRADIENT_0 + j, text, this->m_Widget.Range[1] + (j == 0 ? 0 : (j == 1 ? 2 : 1)), -99999, 99999, 0));
+    text->SetValidator(mafGUIValidator(this, ID_TF_GRADIENT_0 + j, text, this->m_Widget.Range[1] + (j == 0 ? 0 : (j == 1 ? 2 : 1)), -99999, 99999, 0));
     sizer->Add(text, 1, wxEXPAND | wxALIGN_LEFT | wxLEFT | wxRIGHT, 5);
   }
   gradientSizer->Add(this->m_GradientSlider, 0, wxEXPAND | wxALIGN_LEFT | wxTOP | wxBOTTOM, 5);
@@ -451,10 +451,10 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   rightPaneU->Add(gradientSizer, 0, wxEXPAND | wxALIGN_LEFT | wxALL, 5);
   
   // library
-//  b1 = new mmgButton(this, ID_TF_LOAD, "load", wxDefaultPosition, wxSize(-1, 20));
-//  b1->SetValidator(mmgValidator(this, ID_TF_LOAD, b1));
-//  b2 = new mmgButton(this, ID_TF_SAVE, "save",wxDefaultPosition, wxSize(-1, 20));
-//  b2->SetValidator(mmgValidator(this, ID_TF_SAVE, b2));
+//  b1 = new mafGUIButton(this, ID_TF_LOAD, "load", wxDefaultPosition, wxSize(-1, 20));
+//  b1->SetValidator(mafGUIValidator(this, ID_TF_LOAD, b1));
+//  b2 = new mafGUIButton(this, ID_TF_SAVE, "save",wxDefaultPosition, wxSize(-1, 20));
+//  b2->SetValidator(mafGUIValidator(this, ID_TF_SAVE, b2));
 //  wxBoxSizer *ioSizer = new wxBoxSizer(wxHORIZONTAL);
 //  ioSizer->Add(b1, 0, wxALIGN_CENTER,  0);
 //  ioSizer->Add(b2, 0, wxALIGN_CENTER | wxLEFT,  4);
@@ -462,10 +462,10 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
 //  rightPaneL->Add(new wxStaticText(this, -1, "", wxDefaultPosition, wxSize(-1, 20)), wxEXPAND, 0);
 
   // ok, cancel
-  b1 = new mmgButton(this, wxOK,    "ok", wxDefaultPosition, wxSize(-1, 20));
-  b1->SetValidator(mmgValidator(this, wxOK, b1));
-  b2 = new mmgButton(this, wxCANCEL,    "cancel",wxDefaultPosition, wxSize(-1, 20));
-  b2->SetValidator(mmgValidator(this, wxCANCEL, b2));
+  b1 = new mafGUIButton(this, wxOK,    "ok", wxDefaultPosition, wxSize(-1, 20));
+  b1->SetValidator(mafGUIValidator(this, wxOK, b1));
+  b2 = new mafGUIButton(this, wxCANCEL,    "cancel",wxDefaultPosition, wxSize(-1, 20));
+  b2->SetValidator(mafGUIValidator(this, wxCANCEL, b2));
   
   wxBoxSizer *applyOkCancelSizer = new wxBoxSizer(wxHORIZONTAL);
   applyOkCancelSizer->Add(b1, 0, wxALIGN_CENTER | wxLEFT,  12);

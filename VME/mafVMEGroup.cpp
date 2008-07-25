@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGroup.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-18 10:03:00 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.13 $
   Authors:   Marco Petrone , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@
 
 
 #include "mafVMEGroup.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mafTransform.h"
 #include "mafMatrixVector.h"
@@ -73,7 +73,7 @@ mafVMEOutput *mafVMEGroup::GetOutput()
 }
 
 //-------------------------------------------------------------------------
-mmgGui* mafVMEGroup::CreateGui()
+mafGUI* mafVMEGroup::CreateGui()
 //-------------------------------------------------------------------------
 {
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name

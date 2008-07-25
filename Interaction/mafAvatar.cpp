@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:18:00 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:03:38 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -17,7 +17,7 @@
 #include "mmdTracker.h"
 
 // gui
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 // events
 #include "mafEventInteraction.h"
@@ -76,7 +76,7 @@ mafAvatar::~mafAvatar()
 }
 
 //----------------------------------------------------------------------------
-mmgGui *mafAvatar::GetGui()
+mafGUI *mafAvatar::GetGui()
 //----------------------------------------------------------------------------
 {
   if (!m_Gui)
@@ -90,7 +90,7 @@ void mafAvatar::CreateGui()
   assert(m_Gui == NULL);
   if (m_Gui==NULL)
   {
-    m_Gui=new mmgGui(this);
+    m_Gui=new mafGUI(this);
     assert(m_Gui);
 
     m_Gui->Divider(2);

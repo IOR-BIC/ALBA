@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPointSet.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-17 13:08:12 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.5 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,7 +53,7 @@ public:
   virtual void Update();
 
 protected:
-  mmgGui *CreateGui();
+  mafGUI *CreateGui();
   mafString     m_NumPoints;
   mmaMaterial  *m_Material; ///< material object used to store shading propertied to render the pointset
 

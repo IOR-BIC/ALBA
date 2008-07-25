@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 07:05:59 $
+  Version:   $Revision: 1.10 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ class vtkPolyData;
 class vtkActor;
 class vtkProperty;
 class mafAxes;
-class mmgMaterialButton;
+class mafGUIMaterialButton;
 class vtkMAFFixedCutter;
 class vtkPlane;
 class vtkSphereSource;
@@ -90,7 +90,7 @@ public:
 
   //bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
 
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
@@ -112,7 +112,7 @@ protected:
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
-  mmgMaterialButton *m_MaterialButton;
+  mafGUIMaterialButton *m_MaterialButton;
 
 	vtkMAFToLinearTransform* m_VTKTransform;
 

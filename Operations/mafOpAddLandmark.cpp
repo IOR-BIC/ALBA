@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 15:11:30 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,13 +16,13 @@
 
 #include "mmiPicker.h"
 #include "mafInteractor.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 //dictionary
-#include "mmgGuiHolder.h"
-#include "mmgSplittedPanel.h"
-#include "mmgNamedPanel.h"
-#include "mmgDictionaryWidget.h"
+#include "mafGUIHolder.h"
+#include "mafGUISplittedPanel.h"
+#include "mafGUINamedPanel.h"
+#include "mafGUIDictionaryWidget.h"
 #include "mafOpExplodeCollapse.h"
 #include "mafSmartPointer.h"
 
@@ -190,25 +190,25 @@ void mafOpAddLandmark::OpRun()
   mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
 
   // setup gui_panel
-  m_GuiPanel = new mmgNamedPanel(mafGetFrame(),-1);
+  m_GuiPanel = new mafGUINamedPanel(mafGetFrame(),-1);
   m_GuiPanel->SetTitle(_("Add Landmark:"));
 
   // setup splitter
-  mmgSplittedPanel *sp = new mmgSplittedPanel(m_GuiPanel,-1);
+  mafGUISplittedPanel *sp = new mafGUISplittedPanel(m_GuiPanel,-1);
   m_GuiPanel->Add(sp,1,wxEXPAND);
 
   // setup dictionary
-  m_Dict = new mmgDictionaryWidget(sp,-1);
+  m_Dict = new mafGUIDictionaryWidget(sp,-1);
   m_Dict->SetListener(this);
   m_Dict->SetCloud(m_Cloud);
   sp->PutOnTop(m_Dict->GetWidget());
 
   // setup GuiHolder
-  m_Guih = new mmgGuiHolder(sp,-1,false,true);
+  m_Guih = new mafGUIHolder(sp,-1,false,true);
   
 
   // setup Gui
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   m_Gui->Button(ID_LOAD,_("load dictionary"));
   m_Gui->Divider();

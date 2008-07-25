@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exScalarApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 07:01:19 $
+  Version:   $Revision: 1.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 
 #include "mafVMEFactory.h"
 #include "mafPics.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 
 #include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"

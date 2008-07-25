@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 12:02:38 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2008-07-25 07:00:01 $
+  Version:   $Revision: 1.46 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,7 +25,7 @@
 
 #include "mafVMEFactory.h"
 #include "mafPics.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 
 #include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"
@@ -52,6 +52,7 @@
 #include "mafOpImporterImage.h"
 #include "mafOpMAFTransform.h"
 #include "mafOpExporterMSF.h"
+#include "mafOpImporterMSF.h"
 #include "mafOpImporterMSF1x.h"
 #include "mafOpImporterRAWVolume.h"
 #include "mafOpReparentTo.h"
@@ -61,6 +62,9 @@
 #include "mafOpImporterVRML.h"
 #include "mafOpExporterVTK.h"
 #include "mafOpImporterVTK.h"
+#include "mafOpValidateTree.h"
+#include "mafOpRemoveCells.h"
+#include "mafOpEditNormals.h"
 
 #ifdef MAF_USE_ITK
   #include "mafOpImporterASCII.h"
@@ -68,6 +72,11 @@
 
 #include "mafViewVTK.h"
 #include "mafViewCompound.h"
+#include "mafOpCreateSurfaceParametric.h"
+
+//#include "mafUser.h"
+//#include "mafCrypt.h"
+//#include "mmoSRBUpload.h"
 //#include "mafViewPlot.h"
 
 //--------------------------------------------------------------------------------
@@ -114,6 +123,7 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mafOpImporterSTL("STL"));
   m_Logic->Plug(new mafOpImporterVRML("VRML"));
   m_Logic->Plug(new mafOpImporterVTK("VTK"));
+  m_Logic->Plug(new mafOpImporterMSF("MSF"));
   m_Logic->Plug(new mafOpImporterMSF1x("MSF 1.x"));
 #ifdef MAF_USE_ITK
   m_Logic->Plug(new mafOpImporterASCII("ASCII"));
@@ -131,9 +141,14 @@ bool exOperationApp::OnInit()
   //------------------------------------------------------------
   // Operation Menu':
   //------------------------------------------------------------
+  //m_Logic->Plug(new mmoSRBUpload());
+  m_Logic->Plug(new mafOpValidateTree());
+  m_Logic->Plug(new mafOpRemoveCells());
+  m_Logic->Plug(new mafOpEditNormals());
   m_Logic->Plug(new mafOp2DMeasure("2D Measure"));
   m_Logic->Plug(new mafOpAddLandmark("Add Landmark"));
   m_Logic->Plug(new mafOpClipSurface("Clip Surface"));
+  m_Logic->Plug(new mafOpCreateSurfaceParametric("Surface Parametric"),"Create");
   m_Logic->Plug(new mafOpCreateGroup("Group"),"Create");
   m_Logic->Plug(new mafOpCreateMeter("Meter"),"Create");
   m_Logic->Plug(new mafOpCreateRefSys("RefSys"),"Create");
@@ -168,7 +183,7 @@ bool exOperationApp::OnInit()
 
   mafViewCompound *vc = new mafViewCompound("view compound",3);
   mafViewVTK *v2 = new mafViewVTK("Slice view", CAMERA_CT);
-  v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
+  v2->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);
   vc->PlugChildView(v2);
   m_Logic->Plug(vc);
   //------------------------------------------------------------
@@ -180,6 +195,10 @@ bool exOperationApp::OnInit()
   mafString app_stamp;
   app_stamp = "OPEN_ALL_DATA";
   m_Logic->SetApplicationStamp(app_stamp);
+
+  //mafUser *user = m_Logic->GetUser();
+  //user->ShowLoginDialog();
+
   m_Logic->Init(0,NULL); // calls FileNew - which create the root
   return TRUE;
 }

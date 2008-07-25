@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 07:03:51 $
+  Version:   $Revision: 1.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,13 +25,13 @@
 #include <wx/busyinfo.h>
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
 #include "mafGizmoScale.h"
-#include "mafGuiTransformMouse.h"
-#include "mafGuiSaveRestorePose.h"
-#include "mafGuiTransformTextEntries.h"
+#include "mafGUITransformMouse.h"
+#include "mafGUISaveRestorePose.h"
+#include "mafGUITransformTextEntries.h"
 
 #include "mmiGenericMouse.h"
 
@@ -449,7 +449,7 @@ void mafOpMAFTransform::OnEventGuiTransform(mafEventBase *maf_event)
 {
   switch(maf_event->GetId())
 	{
-    case ID_TRANSFORM: // from mafGuiTransformMouse
+    case ID_TRANSFORM: // from mafGUITransformMouse
     {
       PostMultiplyEventMatrix(maf_event);
 
@@ -535,7 +535,7 @@ void mafOpMAFTransform::OnEventGuiTransformTextEntries(mafEventBase *maf_event)
 void mafOpMAFTransform::CreateGui()
 //----------------------------------------------------------------------------
 {
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   
   // enable/disable gizmo interaction
   m_Gui->Label("interaction modality", true);
@@ -563,7 +563,7 @@ void mafOpMAFTransform::CreateGui()
   // Transform Gui
   //---------------------------------
   // create the transform Gui
-  m_GuiTransform = new mafGuiTransformMouse(mafVME::SafeDownCast(m_Input), this);
+  m_GuiTransform = new mafGUITransformMouse(mafVME::SafeDownCast(m_Input), this);
 
   // add transform gui to operation
   m_Gui->AddGui(m_GuiTransform->GetGui());
@@ -572,7 +572,7 @@ void mafOpMAFTransform::CreateGui()
   // Text transform Gui
   //---------------------------------
   // create the transform Gui
-  m_GuiTransformTextEntries = new mafGuiTransformTextEntries(mafVME::SafeDownCast(m_Input), this);
+  m_GuiTransformTextEntries = new mafGUITransformTextEntries(mafVME::SafeDownCast(m_Input), this);
 
   // add transform Gui to operation
   //m_Gui->AddGui(m_GuiTransformTextEntries->GetGui());
@@ -613,7 +613,7 @@ void mafOpMAFTransform::CreateGui()
   //---------------------------------
   // Store/Restore position Gui
   //---------------------------------
-  m_GuiSaveRestorePose = new mafGuiSaveRestorePose(mafVME::SafeDownCast(m_Input), this);
+  m_GuiSaveRestorePose = new mafGUISaveRestorePose(mafVME::SafeDownCast(m_Input), this);
   
   // add Gui to operation
   //m_Gui->AddGui(m_GuiSaveRestorePose->GetGui());
@@ -665,7 +665,7 @@ void mafOpMAFTransform::RefSysVmeChanged()
   // plugged components set their refsys;
   /*
   this should cycle on all plugged components => improve in order to use base class
-  SetRefSys on mafGuiTransformInterface pointer
+  SetRefSys on mafGUITransformInterface pointer
   */
 
   // change isa refsys

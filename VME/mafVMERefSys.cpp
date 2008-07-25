@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-04 15:01:53 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-07-25 07:06:00 $
+  Version:   $Revision: 1.17 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 #include "mafVMERefSys.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 
 #include "mmaMaterial.h"
 #include "mafTagArray.h"
@@ -334,7 +334,7 @@ mmaMaterial *mafVMERefSys::GetMaterial()
   return material;
 }
 //-------------------------------------------------------------------------
-mmgGui* mafVMERefSys::CreateGui()
+mafGUI* mafVMERefSys::CreateGui()
 //-------------------------------------------------------------------------
 {
 

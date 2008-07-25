@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewHTML.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-10 11:44:10 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-07-25 06:56:04 $
+  Version:   $Revision: 1.6 $
   Authors:   Paolo Quadrani    Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,7 +28,7 @@
 #include <wx/fs_inet.h>
 
 #include "mafDecl.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafRWI.h"
 
 //from mafSceneGraph
@@ -162,11 +162,11 @@ void mafViewHTML::VmeCreatePipe(mafNode *vme)
   m_ActiveNote = vme;
 }
 //----------------------------------------------------------------------------
-mmgGui *mafViewHTML::CreateGui()
+mafGUI *mafViewHTML::CreateGui()
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
 	m_Gui->Label("");
 	m_Gui->Button(ID_LOAD,"load html file");

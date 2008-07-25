@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-09 11:24:47 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2008-07-25 06:56:05 $
+  Version:   $Revision: 1.20 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 #include "mafNode.h"
 #include "mafNodeRoot.h"
 #include "mafVMERoot.h"
-#include "mmgFileHistory.h"
+#include "mafGUIFileHistory.h"
 
 //----------------------------------------------------------------------------
 // Forward References :
@@ -150,7 +150,7 @@ protected:
   wxConfigBase*     m_Config;
   wxZipFSHandler    *m_ZipHandler;
   wxFileSystem      *m_FileSystem;
-  mmgFileHistory	  m_FileHistory;
+  mafGUIFileHistory	  m_FileHistory;
   int               m_FileHistoryIdx;
 
   bool              m_MakeBakFile; ///< Flag used to create or not the backup file of the saved msf.
