@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImageCompound.h,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 15:35:29 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,12 +22,12 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafSceneGraph;
-class mmgGui;
+class mafGUI;
 class mafRWIBase;
 class mafViewImage;
-class mmgLutSlider;
-class mmgLutSwatch;
-class mmgFloatSlider;
+class mafGUILutSlider;
+class mafGUILutSwatch;
+class mafGUIFloatSlider;
 class vtkLookupTable;
 class vtkWindowLevelLookupTable;
 
@@ -75,7 +75,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
 	void EnableWidgets(bool enable);
 
@@ -83,8 +83,8 @@ protected:
 
 	mafViewImage	*m_ViewImage;
 
-	mmgLutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
-	mmgLutSlider		*m_LutSlider;
+	mafGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
+	mafGUILutSlider		*m_LutSlider;
 
 	vtkWindowLevelLookupTable	*m_ColorLUT;
 };

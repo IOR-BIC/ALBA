@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 09:33:30 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.23 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,12 +22,12 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafGizmoSlice;
-class mmgLutSlider;
-class mmgFloatSlider;
+class mafGUILutSlider;
+class mafGUIFloatSlider;
 class mafViewSlice;
 class mafVMEVolume;
 class vtkLookupTable;
-class mmgLutSwatch;
+class mafGUILutSwatch;
 class vtkPoints;
 
 //----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   /** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
@@ -118,8 +118,8 @@ protected:
 
   mafVME *m_CurrentVolume; ///< Current visualized volume
   
-  mmgLutSlider *m_LutSlider; ///< Double slider used to change brightness and contrast of the image
-  mmgLutSwatch *m_LutWidget; ///< LUT widget in view side panel 
+  mafGUILutSlider *m_LutSlider; ///< Double slider used to change brightness and contrast of the image
+  mafGUILutSwatch *m_LutWidget; ///< LUT widget in view side panel 
   vtkLookupTable *m_ColorLUT;
   mafViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera

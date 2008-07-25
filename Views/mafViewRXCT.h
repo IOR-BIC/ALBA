@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 09:33:30 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.17 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,8 +25,8 @@ class mafViewRX;
 class mafVMEVolume;
 class vtkLookupTable;
 class mafGizmoSlice;
-class mmgLutSwatch;
-class mmgLutSlider;
+class mafGUILutSwatch;
+class mafGUILutSlider;
 
 //----------------------------------------------------------------------------
 // mafViewRXCT :
@@ -84,7 +84,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
   /*Let the sub-view to be maximized inside the compounded view. */
   virtual void MaximizeSubView(int subview_id = 0, bool maximize = true);
@@ -142,13 +142,13 @@ protected:
   double m_Border;
   std::vector<mafSceneNode*> m_CurrentSurface;
 
-  mmgGui  *m_GuiViews[3];
-  mmgLutSlider *m_LutSliders[3];
+  mafGUI  *m_GuiViews[3];
+  mafGUILutSlider *m_LutSliders[3];
 
   //obsolete variable
   //vtkLookupTable  *m_vtkLUT[3];
   vtkLookupTable  *m_Lut; 
 
-  mmgLutSwatch    *m_LutWidget;
+  mafGUILutSwatch    *m_LutWidget;
 };
 #endif

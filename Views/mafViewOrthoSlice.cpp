@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-30 09:33:30 $
-  Version:   $Revision: 1.60 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.61 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,11 +22,11 @@
 #include "mafViewOrthoSlice.h"
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
-#include "mmgLutSwatch.h"
-#include "mmgLutPreset.h"
-#include "mmgGui.h"
-#include "mmgFloatSlider.h"
-#include "mmgLutSlider.h"
+#include "mafGUILutSwatch.h"
+#include "mafGUILutPreset.h"
+#include "mafGUI.h"
+#include "mafGUIFloatSlider.h"
+#include "mafGUILutSlider.h"
 #include "mafEventInteraction.h"
 #include "mafEventSource.h"
 #include "mafNodeIterator.h"
@@ -184,8 +184,8 @@ void mafViewOrthoSlice::VmeRemove(mafNode *node)
 void mafViewOrthoSlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-  m_GuiView = new mmgGui(this);
-  m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_GuiView = new mafGUI(this);
+  m_LutSlider = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));
@@ -304,7 +304,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-mmgGui* mafViewOrthoSlice::CreateGui()
+mafGUI* mafViewOrthoSlice::CreateGui()
 //-------------------------------------------------------------------------
 {
   wxString layout_choices[3] = {"default","layout 1","layout 2"};

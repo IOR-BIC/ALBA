@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.cpp,v $
 Language:  C++
-Date:      $Date: 2007-02-08 22:13:26 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-07-25 11:25:10 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,8 +23,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafViewSlice.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
-#include "mmgGui.h"
-#include "mmgLutSlider.h"
+#include "mafGUI.h"
+#include "mafGUILutSlider.h"
 #include "mafVMEVolume.h"
 #include "mafVMESurface.h"
 #include "mafViewSlice.h"
@@ -139,11 +139,11 @@ void mafViewCT::OnEvent(mafEventBase *maf_event)
 		mafEventMacro(*maf_event);
 }
 //-------------------------------------------------------------------------
-mmgGui* mafViewCT::CreateGui()
+mafGUI* mafViewCT::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-	m_Gui = new mmgGui(this);
+	m_Gui = new mafGUI(this);
 
 	m_Gui->Integer(ID_LAYOUT_WIDTH,"Layout Width",&m_LayoutWidth);
 	m_Gui->Integer(ID_LAYOUT_HEIGHT,"Layout Height",&m_LayoutHeight);
@@ -154,14 +154,14 @@ mmgGui* mafViewCT::CreateGui()
 void mafViewCT::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-	/*m_GuiView = new mmgGui(this);
+	/*m_GuiView = new mafGUI(this);
 	wxBoxSizer *lutsSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	// create three windowing widgets
 	//for (int i = RX_FRONT_VIEW; i < VIEWS_NUMBER; i++)
 	for (int i = 0; i < 1; i++)
 	{
-		m_LutSliders[i] = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(10,24));
+		m_LutSliders[i] = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(10,24));
 		m_LutSliders[i]->SetListener(this);
 		m_LutSliders[i]->SetSize(10,24);
 		m_LutSliders[i]->SetMinSize(wxSize(10,24));

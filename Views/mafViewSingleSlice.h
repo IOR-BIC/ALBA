@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-22 13:51:26 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@ class mafVME;
 class mafSceneNode;
 class vtkActor2D;
 class vtkTextMapper;
-class mmgFloatSlider;
+class mafGUIFloatSlider;
 
 //----------------------------------------------------------------------------
 // mafViewSingleSlice :
@@ -126,9 +126,9 @@ public:
   void VmeShow(mafNode *node, bool show);
 
 protected:
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
   
-  //mmgFloatSlider  *m_Slider;
+  //mafGUIFloatSlider  *m_Slider;
   mafSceneNode    *m_CurrentVolume; ///< Current visualized volume
   vtkActor2D      *m_Border;
   double           m_Slice[3];

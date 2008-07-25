@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:04:54 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.29 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeMeshSlice.h"
 #include "mafAttachCamera.h"
-#include "mmgFloatSlider.h"
+#include "mafGUIFloatSlider.h"
 
 #include "mafTransform.h"
 #include "mafAbsMatrixPipe.h"
@@ -510,13 +510,13 @@ void mafViewGlobalSlice::UpdateSliceParameters()
   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
-mmgGui* mafViewGlobalSlice::CreateGui()
+mafGUI* mafViewGlobalSlice::CreateGui()
 //----------------------------------------------------------------------------
 {
 	wxString Views[3] = {"XY","XZ","YZ"};
 
 	assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	
 	m_GlobalSlider = m_Gui->FloatSlider(ID_POS_SLIDER,"pos.",&m_SliderOrigin,m_GlobalBounds[4],m_GlobalBounds[5]);
 	m_Gui->Combo(ID_CHANGE_VIEW,"view",&m_ViewIndex,3,Views);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-18 10:39:36 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.26 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -118,7 +118,7 @@ public:
   void VolumePositionCorrection(double *point);
 
 protected:
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   mafSceneNode    *m_CurrentVolume; ///< Current visualized volume
   vtkActor2D      *m_Border;

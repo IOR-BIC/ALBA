@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:26:42 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.9 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,7 +91,7 @@ protected:
 	void InizializePlane();
 	void UpdatePlane();
 
-	virtual mmgGui  *CreateGui();
+	virtual mafGUI  *CreateGui();
 
 	double		m_SliceOrigin[3];
 	float			m_SliceXVector[3];
@@ -109,8 +109,8 @@ protected:
   bool      m_GlobalBoundsValid;
 
 	mafSceneNode		*m_SelectedVolume;
-	mmgFloatSlider	*m_GlobalSlider;
-	mmgFloatSlider	*m_OpacitySlider;
+	mafGUIFloatSlider	*m_GlobalSlider;
+	mafGUIFloatSlider	*m_OpacitySlider;
 
 	vtkActor2D					*m_TextActor;
 	vtkTextMapper				*m_TextMapper;

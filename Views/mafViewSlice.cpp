@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 07:20:56 $
-  Version:   $Revision: 1.50 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.51 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -515,11 +515,11 @@ int mafViewSlice::GetNodeStatus(mafNode *vme)
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafViewSlice::CreateGui()
+mafGUI *mafViewSlice::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->AddGui(m_AttachCamera->GetGui());
 	m_Gui->Divider();

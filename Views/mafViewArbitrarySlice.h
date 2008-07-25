@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 15:03:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.8 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,9 +29,9 @@ class mafVMEVolumeGray;
 class mafVMESlicer;
 class mafMatrix;
 class mafAttachCamera;
-class mmgGui;
-class mmgLutSlider;
-class mmgLutSwatch;
+class mafGUI;
+class mafGUILutSlider;
+class mafGUILutSwatch;
 class medVMEPolylineEditor;
 
 //----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ protected:
   an extension of the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-	virtual mmgGui* CreateGui();
+	virtual mafGUI* CreateGui();
 
 	/** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
@@ -115,9 +115,9 @@ protected:
 	double	m_SliceAngleReset[3];
 	int			m_TypeGizmo;
 
-	mmgLutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
-	mmgLutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
-	mmgGui				*m_GuiGizmos;
+	mafGUILutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
+	mafGUILutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
+	mafGUI				*m_GuiGizmos;
 
   medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
 };

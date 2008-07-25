@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImage.h,v $
   Language:  C++
-  Date:      $Date: 2006-11-07 12:51:58 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -79,7 +79,7 @@ public:
   void VmeDeletePipe(mafNode *vme);
 
 protected:
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   mafSceneNode    *m_CurrentImage; ///< Current visualized volume
 

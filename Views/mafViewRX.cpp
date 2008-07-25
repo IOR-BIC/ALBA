@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:04:54 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.19 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafPipe.h"
 #include "mafPipeVolumeProjected.h"
 #include "mafVME.h"
@@ -285,11 +285,11 @@ int mafViewRX::GetNodeStatus(mafNode *vme)
   return m_Sg ? m_Sg->GetNodeStatus(vme) : NODE_NON_VISIBLE;
 }
 //-------------------------------------------------------------------------
-mmgGui *mafViewRX::CreateGui()
+mafGUI *mafViewRX::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->AddGui(m_AttachCamera->GetGui());
 	m_Gui->Divider();

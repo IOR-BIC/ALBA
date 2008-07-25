@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewImageCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-04 08:28:45 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,14 +26,14 @@
 #include "mafSceneGraph.h"
 #include "mafSceneNode.h"
 #include "mafPipeImage3D.h"
-#include "mmgViewWin.h"
-#include "mmgGui.h"
-#include "mmgLutSlider.h"
-#include "mmgLutSwatch.h"
+#include "mafGUIViewWin.h"
+#include "mafGUI.h"
+#include "mafGUILutSlider.h"
+#include "mafGUILutSwatch.h"
 #include "mafNode.h"
 #include "mafNodeIterator.h"
 #include "mafVMEImage.h"
-#include "mmgFloatSlider.h"
+#include "mafGUIFloatSlider.h"
 #include "mafVMEOutputImage.h"
 #include "vtkImageData.h"
 #include "vtkTexture.h"
@@ -91,9 +91,9 @@ mafView *mafViewImageCompound::Copy(mafObserver *Listener)
 void mafViewImageCompound::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-	m_GuiView = new mmgGui(this);
+	m_GuiView = new mafGUI(this);
   
-  m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_LutSlider = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));
@@ -131,11 +131,11 @@ void mafViewImageCompound::OnEvent(mafEventBase *maf_event)
   }
 }
 //-------------------------------------------------------------------------
-mmgGui* mafViewImageCompound::CreateGui()
+mafGUI* mafViewImageCompound::CreateGui()
 //-------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	m_Gui->AddGui(((mafViewImage*)m_ChildViewList[ID_VIEW_IMAGE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_LutWidget->Enable(false);

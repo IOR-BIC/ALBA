@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-30 12:58:20 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.38 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,11 +44,11 @@
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mafNodeIterator.h"
-#include "mmgLutPreset.h"
+#include "mafGUILutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
-#include "mmgLutSlider.h"
-#include "mmgLutSwatch.h"
+#include "mafGUILutSlider.h"
+#include "mafGUILutSwatch.h"
 #include "mafPipeMesh.h"
 #include "mafPipeMeshSlice.h"
 #include "medPipePolylineGraphEditor.h"
@@ -273,7 +273,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			
 			//Create the Gizmos' Gui
 			if(!m_GuiGizmos)
-				m_GuiGizmos = new mmgGui(this);
+				m_GuiGizmos = new mafGUI(this);
 			m_GuiGizmos->AddGui(m_GizmoTranslate->GetGui());
 			m_GuiGizmos->AddGui(m_GizmoRotate->GetGui());
 			m_GuiGizmos->Update();
@@ -803,11 +803,11 @@ mafView *mafViewArbitrarySlice::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-mmgGui* mafViewArbitrarySlice::CreateGui()
+mafGUI* mafViewArbitrarySlice::CreateGui()
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
 	//combo box to choose the type of gizmo
 	wxString Text[2]={_("Gizmo Translation"),_("Gizmo Rotation")};
@@ -891,10 +891,10 @@ void mafViewArbitrarySlice::CameraUpdate()
 void mafViewArbitrarySlice::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-  m_GuiView = new mmgGui(this);
+  m_GuiView = new mafGUI(this);
   
   //m_GuiView->Label("");
-  m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_LutSlider = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));

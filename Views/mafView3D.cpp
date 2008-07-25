@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:04:54 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.19 $
   Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 #include "mafRWI.h"
 #include "mafSceneGraph.h"
 #include "mafAttachCamera.h"
-#include "mmgGui.h"
+#include "mafGUI.h"
 #include "mafPipe.h"
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
@@ -36,7 +36,7 @@
 #include "medPipeVolumeMIP.h"
 #include "mafPipePolyline.h"
 #include "mafVMEPolyline.h"
-#include "mmgFloatSlider.h"
+#include "mafGUIFloatSlider.h"
 
 #include "vtkDataSet.h"
 #include "vtkMAFRayCast3DPicker.h"
@@ -348,11 +348,11 @@ void mafView3D::VmeDeletePipe(mafNode *vme)
   cppDEL(n->m_Pipe);
 }*/
 //-------------------------------------------------------------------------
-mmgGui *mafView3D::CreateGui()
+mafGUI *mafView3D::CreateGui()
 //-------------------------------------------------------------------------
 {
   assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 	wxString choices[4] = {_("ISO"),_("MIP"),_("DRR"),_("VR")};
 	m_Gui->Combo(ID_COMBO_PIPE,_("Choose pipe"),&m_Choose,4,choices);
 	m_Gui->Enable(ID_COMBO_PIPE,m_CurrentVolume!=NULL);

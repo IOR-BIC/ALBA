@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView3D.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:23:54 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.10 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafSceneNode;
-class mmgGui;
+class mafGUI;
 class mafVMEVolumeGray;
 class mafVMESurface;
 
@@ -93,7 +93,7 @@ public:
 
 protected:
 
-	virtual mmgGui *CreateGui();
+	virtual mafGUI *CreateGui();
 
 	void EnableSubGui(int idSubPipe,bool enable=true);
 
@@ -110,14 +110,14 @@ protected:
 	//----------------------------- ISO settings
 	double m_ContourValueIso;
 	double m_AlphaValueIso;
-	mmgFloatSlider *m_SliderContourIso;
-	mmgFloatSlider *m_SliderAlphaIso;
+	mafGUIFloatSlider *m_SliderContourIso;
+	mafGUIFloatSlider *m_SliderAlphaIso;
 
 	//----------------------------- DRR settings
 	double             m_ExposureCorrection[2];
-	mmgFloatSlider    *m_ExposureCorrectionSlider[2];
+	mafGUIFloatSlider    *m_ExposureCorrectionSlider[2];
 	double             m_Gamma;
-	mmgFloatSlider    *m_GammaSlider;
+	mafGUIFloatSlider    *m_GammaSlider;
 	wxColor            m_VolumeColor;
 	wxColor            m_ImageColor;
 	double             m_ImageAngle;

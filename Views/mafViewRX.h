@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2007-09-25 16:06:40 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-07-25 11:25:10 $
+  Version:   $Revision: 1.7 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafSceneNode;
-class mmgGui;
+class mafGUI;
 
 //----------------------------------------------------------------------------
 // mafViewRX :
@@ -79,7 +79,7 @@ public:
   bool VolumeIsVisible() {return m_CurrentVolume != NULL;};
 
 protected:
-  virtual mmgGui *CreateGui();
+  virtual mafGUI *CreateGui();
 
   mafSceneNode *m_CurrentVolume; ///< Current visualized volume
 };

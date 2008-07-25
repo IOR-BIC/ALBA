@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-07 15:00:24 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.14 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,11 +44,11 @@
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mafNodeIterator.h"
-#include "mmgLutPreset.h"
+#include "mafGUILutPreset.h"
 #include "mafVMEOutputSurface.h"
 #include "mafAttribute.h"
-#include "mmgLutSlider.h"
-#include "mmgLutSwatch.h"
+#include "mafGUILutSlider.h"
+#include "mafGUILutSwatch.h"
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
@@ -296,11 +296,11 @@ mafView *medViewSlicer::Copy(mafObserver *Listener)
   return v;
 }
 //----------------------------------------------------------------------------
-mmgGui* medViewSlicer::CreateGui()
+mafGUI* medViewSlicer::CreateGui()
 //----------------------------------------------------------------------------
 {
 	assert(m_Gui == NULL);
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
 
 	//m_Gui->Button(ID_RESET,"Reset","");
 	m_Gui->Divider(2);
@@ -389,9 +389,9 @@ void medViewSlicer::CameraUpdate()
 void medViewSlicer::CreateGuiView()
 //----------------------------------------------------------------------------
 {
-  m_GuiView = new mmgGui(this);
+  m_GuiView = new mafGUI(this);
   
-  m_LutSlider = new mmgLutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
+  m_LutSlider = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));

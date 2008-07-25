@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 10:59:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,12 +22,12 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafSceneGraph;
-class mmgGui;
+class mafGUI;
 class mafRWIBase;
 class mafViewSingleSlice;
-class mmgLutSlider;
-class mmgLutSwatch;
-class mmgFloatSlider;
+class mafGUILutSlider;
+class mafGUILutSwatch;
+class mafGUIFloatSlider;
 class vtkLookupTable;
 
 //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ protected:
   the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same pannel GUI, each CreateGUI() function should first call the superclass' one.*/
-  virtual mmgGui  *CreateGui();
+  virtual mafGUI  *CreateGui();
 
 	void EnableWidgets(bool enable);
 
@@ -84,8 +84,8 @@ protected:
 
 	mafViewSingleSlice	*m_ViewSingleSlice;
 
-	mmgLutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
-	mmgLutSlider		*m_LutSlider;
+	mafGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
+	mafGUILutSlider		*m_LutSlider;
 
 	vtkLookupTable	*m_ColorLUT;
 };

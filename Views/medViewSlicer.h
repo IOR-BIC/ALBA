@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 08:55:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 11:25:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,9 +29,9 @@ class mafVMEVolumeGray;
 class mafVMESlicer;
 class mafMatrix;
 class mafAttachCamera;
-class mmgGui;
-class mmgLutSlider;
-class mmgLutSwatch;
+class mafGUI;
+class mafGUILutSlider;
+class mafGUILutSwatch;
 
 //----------------------------------------------------------------------------
 // mafViewOrthoSlice :
@@ -85,7 +85,7 @@ protected:
   an extension of the superclass enum. The last id value must be defined as "LAST_ID" to allow the 
   subclass to continue the ID enumeration from it. For appending the widgets in the
   same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-	virtual mmgGui* CreateGui();
+	virtual mafGUI* CreateGui();
 
 	/** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
@@ -109,8 +109,8 @@ protected:
 	double	m_SliceAngleReset[3];
 	
 
-	mmgLutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
-	mmgLutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
+	mafGUILutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
+	mafGUILutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
 	
 };
 #endif

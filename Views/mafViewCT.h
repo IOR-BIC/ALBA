@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafViewCT.h,v $
 Language:  C++
-Date:      $Date: 2007-01-23 15:36:20 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-07-25 11:25:10 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi, Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ protected:
 	the superclass enum. The last id value must be defined as "LAST_ID" to allow the
 	subclass to continue the ID enumeration from it. For appending the widgets in the
 	same panel GUI, each CreateGUI() function should first call the superclass' one.*/
-	virtual mmgGui  *CreateGui();
+	virtual mafGUI  *CreateGui();
 
 	/**
 	Redefine to arrange views to generate RXCT visualization.*/
@@ -92,7 +92,7 @@ protected:
 	int m_LayoutWidth;
 	int m_LayoutHeight;
 
-	mmgGui  *m_GuiViews[3];
+	mafGUI  *m_GuiViews[3];
 
 	mafViewVTK *m_Vs;
 };
