@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewScalar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:01:19 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-25 10:51:11 $
+  Version:   $Revision: 1.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,6 +26,7 @@
 #include "mafVME.h"
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
+#include "mafGUI.h"
 
 #include "mafASCIIImporterUtility.h"
 
