@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.cpp,v $
 Language:  C++
-Date:      $Date: 2008-06-10 13:12:02 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-25 08:47:02 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafLUTLibrary.h"
 
-#include "mmgLutPreset.h"
+#include "mafGUILutPreset.h"
 
 #include "vtkDirectory.h"
 #include "vtkLookupTable.h"
