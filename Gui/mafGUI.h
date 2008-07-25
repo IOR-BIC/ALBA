@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-25 08:55:49 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-#ifndef __mafGUIGui_H__
-#define __mafGUIGui_H__
+#ifndef __mafGUI_H__
+#define __mafGUI_H__
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------

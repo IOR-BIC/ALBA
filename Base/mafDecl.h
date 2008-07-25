@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:55:21 $
-  Version:   $Revision: 1.42 $
+  Date:      $Date: 2008-07-25 08:53:43 $
+  Version:   $Revision: 1.43 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -31,7 +31,7 @@ class wxWindow;
 //----------------------------------------------------------------------------
 // constant
 //----------------------------------------------------------------------------
-// MAX number of widgets that mafGUI can hold - used also by mafGUIGuiValidator
+// MAX number of widgets that mafGUI can hold - used also by mafGUIValidator
 //const int MAXWIDGET = 200; 
 const int MAXWIDGET = 4096;
 const int MAXOP = 200; 
@@ -376,7 +376,7 @@ AVATAR_REMOVED,   ///< used to advise the InteractionManager an avatar has been 
 
 MATRIX_UPDATED, ///< issue by a matrix pipe to advise consumers of output matrix updating
 
-// const used by mafGUI and mafGUIGuiValidator
+// const used by mafGUI and mafGUIValidator
 MINID,      
 MAXID = MINID + MAXWIDGET,
 
