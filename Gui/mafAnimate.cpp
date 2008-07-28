@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-07-28 14:38:01 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,16 +59,20 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
   m_AnimatePlayer         = NULL;
 
   m_Vme = vme;
-  vme->GetRoot()->GetEventSource()->AddObserver(this);
+  m_Vme->GetRoot()->GetEventSource()->AddObserver(this);
 	
 	CreateGui();
-	SetInputVME(vme); //widgets must already exist
+	SetInputVME(m_Vme); //widgets must already exist
 }
 //----------------------------------------------------------------------------
 mafAnimate::~mafAnimate() 
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this); 
+  if (m_Root->IsValid())
+  {
+    m_Root->GetEventSource()->RemoveObserver(this); 
+  }
+  
   mafDEL(m_StoredPositions);
 }
 //----------------------------------------------------------------------------
