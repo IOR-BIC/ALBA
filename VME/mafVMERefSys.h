@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.7 $
-  Authors:   Marco Petrone, Paolo Quadrani
+  Date:      $Date: 2008-07-29 11:51:58 $
+  Version:   $Revision: 1.8 $
+  Authors:   Marco Petrone, Paolo Quadrani, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -32,12 +32,8 @@ class vtkTransform;
 class vtkAppendPolyData;
 class mmaMaterial;
 
-/* mafVMERefSys - 
- @sa mafVME
-
-@todo
-- extend to support non orthogonal reference systems
-- create a test program */
+/* mafVMERefSys
+ A procedural reference system */
 class MAF_EXPORT mafVMERefSys : public mafVME
 {
 public:
@@ -153,8 +149,6 @@ protected:
 
   double m_ScaleFactor;
 
-	//int                       m_Fixed;
-
   mafTransform *m_Transform; ///< pose matrix for the slicer plane
 
 	int m_Radio;
@@ -162,5 +156,12 @@ protected:
 private:
   mafVMERefSys(const mafVMERefSys&); // Not implemented
   void operator=(const mafVMERefSys&); // Not implemented
+
+  // TODO: REFACTOR THIS 
+  // Move these methods in a suitable logging helper class
+  void LogVector3( double *vector , const char *logMessage /*= NULL*/ );
+  void LogPoint3( double *point, const char *logMessage );
+  void LogVTKMatrix4x4( vtkMatrix4x4 *mat, const char *logMessage );
+  void LogMAFMatrix4x4( mafMatrix *mat, const char *logMessage );
 };
 #endif

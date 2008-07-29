@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERefSys.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.17 $
-  Authors:   Marco Petrone, Paolo Quadrani
+  Date:      $Date: 2008-07-29 11:51:57 $
+  Version:   $Revision: 1.18 $
+  Authors:   Marco Petrone, Paolo Quadrani, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -48,6 +48,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkAxes.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
+
+const bool DEBUG_MODE = false;
 
 //-------------------------------------------------------------------------
 mafCxxTypeMacro(mafVMERefSys)
@@ -358,7 +360,7 @@ mafGUI* mafVMERefSys::CreateGui()
   }
   else
     m_OriginVmeName = origin_vme ? origin_vme->GetName() : _("none");
-  m_Gui->Button(ID_REF_SYS_ORIGIN,&m_OriginVmeName,_("Origin"), _("Select the vme origin for the ref sys"));
+  m_Gui->Button(ID_REF_SYS_ORIGIN,&m_OriginVmeName,_("Origin"), _("Select the vme originABSPosition for the ref sys"));
 	m_Gui->Enable(ID_REF_SYS_ORIGIN,origin_vme!=NULL);
 
   mafVME *point1_vme = GetPoint1VME();
@@ -478,7 +480,7 @@ void mafVMERefSys::OnEvent(mafEventBase *maf_event)
 				}
 				else if(m_Radio==2)
 				{
-          // RefSys with all the link enabled: origin, point1 and point2
+          // RefSys with all the link enabled: originABSPosition, point1ABSPosition and point2ABSPosition
 					m_Gui->Enable(ID_REF_SYS_ORIGIN,true);
 					m_Gui->Enable(ID_POINT1,true);
 					m_Gui->Enable(ID_POINT2,true);
@@ -534,84 +536,108 @@ void mafVMERefSys::InternalPreUpdate()
 void mafVMERefSys::InternalUpdate()
 //-----------------------------------------------------------------------
 {
-	mafVME *point1_vme = GetPoint1VME();
-	mafVME *point2_vme = GetPoint2VME();
-	mafVME *origin_vme = GetOriginVME();
+  if (DEBUG_MODE)
+  {
+    std::ostringstream stringStream;
+    stringStream << "Entering InternalUpdate for: " << this->GetName() << " VME"  << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+  }
+	mafVME *point1VME = GetPoint1VME();
+	mafVME *point2VME = GetPoint2VME();
+	mafVME *originVME = GetOriginVME();
 
-	if(point1_vme && point2_vme && origin_vme)
+	if(point1VME && point2VME && originVME)
 	{
-		double point1[3],point2[3],origin[3],orientation[3];
+		double point1ABSPosition[3],point2ABSPosition[3],originABSPosition[3],useless[3];
 		mafSmartPointer<mafTransform> TmpTransform;
 
-		//Get the position of the origin
-		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
+		//Get the position of the originABSPosition
+		if(originVME->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
     {
-      ((mafVMELandmarkCloud *)origin_vme)->GetLandmarkPosition(GetLinkSubId("OriginVME"), origin, -1);
+      ((mafVMELandmarkCloud *)originVME)->GetLandmarkPosition(GetLinkSubId("OriginVME"), originABSPosition, -1);
+      mafTransform t;
+      t.SetMatrix(*originVME->GetOutput()->GetAbsMatrix());
+      t.TransformPoint(originABSPosition, originABSPosition);
+    
     }
-    else if(origin_vme->IsMAFType(mafVMELandmark))
+    else if(originVME->IsMAFType(mafVMELandmark))
     {
-			origin_vme->GetOutput()->Update();  
-      origin_vme->GetOutput()->GetAbsPose(origin, orientation);
+			originVME->GetOutput()->Update();  
+      originVME->GetOutput()->GetAbsPose(originABSPosition, useless);
     }
 
-		//Get the position of the point 1
-		if(point1_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point1VME") != -1)
+    if (DEBUG_MODE)
     {
-      ((mafVMELandmarkCloud *)point1_vme)->GetLandmarkPosition(GetLinkSubId("Point1VME"),point1,-1);
-      mafTransform t;
-      t.SetMatrix(*point1_vme->GetOutput()->GetAbsMatrix());
-      t.TransformPoint(point1, point1);
+      LogVector3(originABSPosition, "originABSPosition abs position");
     }
-    else if(point1_vme->IsMAFType(mafVMELandmark))
+
+
+		//Get the position of the point 1
+		if(point1VME->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point1VME") != -1)
     {
-			point1_vme->GetOutput()->Update();  
-      point1_vme->GetOutput()->GetAbsPose(point1, orientation);
+      ((mafVMELandmarkCloud *)point1VME)->GetLandmarkPosition(GetLinkSubId("Point1VME"),point1ABSPosition,-1);
+      mafTransform t;
+      t.SetMatrix(*point1VME->GetOutput()->GetAbsMatrix());
+      t.TransformPoint(point1ABSPosition, point1ABSPosition);
+    }
+    else if(point1VME->IsMAFType(mafVMELandmark))
+    {
+			point1VME->GetOutput()->Update();  
+      point1VME->GetOutput()->GetAbsPose(point1ABSPosition, useless);
+    }
+    if (DEBUG_MODE)
+    {
+      LogVector3(point1ABSPosition, "point1ABSPosition abs position");
     }
 
 		//Get the position of the point 2
-		if(point2_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point2VME") != -1)
+		if(point2VME->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("Point2VME") != -1)
     {
-      ((mafVMELandmarkCloud *)point2_vme)->GetLandmarkPosition(GetLinkSubId("Point2VME"),point2,-1);
+      ((mafVMELandmarkCloud *)point2VME)->GetLandmarkPosition(GetLinkSubId("Point2VME"),point2ABSPosition,-1);
       mafTransform t;
-      t.SetMatrix(*point2_vme->GetOutput()->GetAbsMatrix());
-      t.TransformPoint(point2, point2);
+      t.SetMatrix(*point2VME->GetOutput()->GetAbsMatrix());
+      t.TransformPoint(point2ABSPosition, point2ABSPosition);
     }
-    else if(point2_vme->IsMAFType(mafVMELandmark))
+    else if(point2VME->IsMAFType(mafVMELandmark))
     {
-			point2_vme->GetOutput()->Update();  
-      point2_vme->GetOutput()->GetAbsPose(point2, orientation);
+			point2VME->GetOutput()->Update();  
+      point2VME->GetOutput()->GetAbsPose(point2ABSPosition, useless);
+    }
+    if (DEBUG_MODE)
+    {
+      LogVector3(point1ABSPosition, "point2ABSPosition abs position");
     }
 
-		double v1[3],v2[3],v3[3];
+		double point1OriginVector[3],point2OriginVector[3],point1Point2CrossProductVector[3];
 
-		v1[0] = point1[0] - origin[0];
-		v1[1] = point1[1] - origin[1];
-		v1[2] = point1[2] - origin[2];
+		point1OriginVector[0] = point1ABSPosition[0] - originABSPosition[0];
+		point1OriginVector[1] = point1ABSPosition[1] - originABSPosition[1];
+		point1OriginVector[2] = point1ABSPosition[2] - originABSPosition[2];
 
-		v2[0] = point2[0] - origin[0];
-		v2[1] = point2[1] - origin[1];
-		v2[2] = point2[2] - origin[2];
+		point2OriginVector[0] = point2ABSPosition[0] - originABSPosition[0];
+		point2OriginVector[1] = point2ABSPosition[1] - originABSPosition[1];
+		point2OriginVector[2] = point2ABSPosition[2] - originABSPosition[2];
 
-		vtkMath::Normalize(v1);
-		vtkMath::Normalize(v2);
+		vtkMath::Normalize(point1OriginVector);
+		vtkMath::Normalize(point2OriginVector);
 
-		vtkMath::Cross(v1,v2,v3);
-		vtkMath::Normalize(v3);
-		vtkMath::Cross(v3,v1,v2);
+		vtkMath::Cross(point1OriginVector,point2OriginVector,point1Point2CrossProductVector);
+		vtkMath::Normalize(point1Point2CrossProductVector);
+		vtkMath::Cross(point1Point2CrossProductVector,point1OriginVector,point2OriginVector);
 
 		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
 		matrix_translation->Identity();
 		for(int i=0;i<3;i++)
-			matrix_translation->SetElement(i,3,origin[i]);
+			matrix_translation->SetElement(i,3,originABSPosition[i]);
 
 		vtkMatrix4x4 *matrix_rotation=vtkMatrix4x4::New();
 		matrix_rotation->Identity();
 		for(int i=0;i<3;i++)
-			matrix_rotation->SetElement(i,0,v1[i]);
+			matrix_rotation->SetElement(i,0,point1OriginVector[i]);
 		for(int i=0;i<3;i++)
-			matrix_rotation->SetElement(i,1,v2[i]);
+			matrix_rotation->SetElement(i,1,point2OriginVector[i]);
 		for(int i=0;i<3;i++)
-			matrix_rotation->SetElement(i,2,v3[i]);
+			matrix_rotation->SetElement(i,2,point1Point2CrossProductVector[i]);
 
 		mafMatrix a;
 		a.SetVTKMatrix(matrix_rotation);
@@ -623,25 +649,24 @@ void mafVMERefSys::InternalUpdate()
     vtkDEL(matrix_rotation);
     vtkDEL(matrix_translation);
 
-		//this->SetMatrix(c);
     this->SetAbsMatrix(c);
 	}
-	else if(origin_vme)
+	else if(originVME)
 	{
 		double origin[3],orientation[3];
 
 		//Get the position of the origin
-		if(origin_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
+		if(originVME->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("OriginVME") != -1)
     {
-      ((mafVMELandmarkCloud *)origin_vme)->GetLandmarkPosition(GetLinkSubId("OriginVME"),origin,-1);
+      ((mafVMELandmarkCloud *)originVME)->GetLandmarkPosition(GetLinkSubId("OriginVME"),origin,-1);
       mafTransform t;
-      t.SetMatrix(*origin_vme->GetOutput()->GetAbsMatrix());
+      t.SetMatrix(*originVME->GetOutput()->GetAbsMatrix());
       t.TransformPoint(origin,origin);
     }
-    else if(origin_vme->IsMAFType(mafVMELandmark))
+    else if(originVME->IsMAFType(mafVMELandmark))
     {
-			origin_vme->GetOutput()->Update();  
-      origin_vme->GetOutput()->GetAbsPose(origin, orientation);
+			originVME->GetOutput()->Update();  
+      originVME->GetOutput()->GetAbsPose(origin, orientation);
     }
 
 		vtkMatrix4x4 *matrix_translation=vtkMatrix4x4::New();
@@ -706,4 +731,38 @@ mafVME *mafVMERefSys::GetOriginVME()
 //-------------------------------------------------------------------------
 {
   return mafVME::SafeDownCast(GetLink("OriginVME"));
+}
+
+void mafVMERefSys::LogVector3( double *vector , const char *logMessage /*= NULL*/ )
+{
+  std::ostringstream stringStream;
+  if (logMessage)stringStream << logMessage << std::endl;
+  stringStream << "Vector components: [" << vector[0] << " , " << vector[1] << " , " << vector[2] << " ]" << std::endl;
+  stringStream << "Vector module: " << vtkMath::Norm(vector) << std::endl; 
+
+  mafLogMessage(stringStream.str().c_str());
+}
+
+void mafVMERefSys::LogPoint3( double *point, const char *logMessage )
+{
+  std::ostringstream stringStream;
+  if (logMessage) stringStream << logMessage << std::endl;
+  stringStream << "Point coordinates: [" << point[0] << " , " << point[1] << " , " << point[2] << " ]" << std::endl;
+  mafLogMessage(stringStream.str().c_str());
+}
+
+void mafVMERefSys::LogMAFMatrix4x4( mafMatrix *mat, const char *logMessage )
+{
+  std::ostringstream stringStream;
+  if (logMessage) stringStream << logMessage << std::endl;
+  mat->Print(stringStream);
+  mafLogMessage(stringStream.str().c_str());
+}
+
+void mafVMERefSys::LogVTKMatrix4x4( vtkMatrix4x4 *mat, const char *logMessage )
+{
+  std::ostringstream stringStream;
+  if (logMessage) stringStream << logMessage << std::endl;
+  mat->Print(stringStream);
+  mafLogMessage(stringStream.str().c_str());
 }
