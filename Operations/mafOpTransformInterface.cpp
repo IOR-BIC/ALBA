@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-07-29 07:57:38 $
+  Version:   $Revision: 1.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -155,7 +155,9 @@ void mafOpTransformInterface::OpDo()
       //  refSys do not scale
       !m_Input->IsA("mafVMERefSys") &&
       //  slicer  do not scale
-      !m_Input->IsA("mafVMESlicer")
+      !m_Input->IsA("mafVMESlicer") &&
+      //  slicer  do not scale
+      !m_Input->IsA("mafVMELandmarkCloud")
      )
   {
     // apply scale to data
@@ -164,7 +166,17 @@ void mafOpTransformInterface::OpDo()
     vtkMAFSmartPointer<vtkTransform> scaleTransform;
     scaleTransform->Scale(scaling);
 
-    if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkPolyData"))
+    mafVME *inVME = mafVME::SafeDownCast(m_Input);
+
+    vtkDataSet *dataSet = inVME->GetOutput()->GetVTKData();
+    
+    if (true)
+    {
+        std::ostringstream stringStream;
+        stringStream << "mafOpTransformInterface : Applying scaling to dataset..."  << std::endl;
+        mafLogMessage(stringStream.str().c_str());
+    }
+    if (dataSet->IsA("vtkPolyData"))
     {
       // apply fast vtkPolyDataTransformFilter
       vtkPolyData *currentPD = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
@@ -185,7 +197,7 @@ void mafOpTransformInterface::OpDo()
 
       ((mafVMEGeneric *)m_Input)->SetData(tPDF->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
     }
-    else if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkUnstructuredGrid"))
+    else if (dataSet->IsA("vtkUnstructuredGrid"))
     {
       // apply fast vtkPolyDataTransformFilter
       vtkUnstructuredGrid *currentUG = vtkUnstructuredGrid::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
@@ -206,7 +218,7 @@ void mafOpTransformInterface::OpDo()
 
       ((mafVMEGeneric *)m_Input)->SetData(tf->GetOutput(),((mafVME *)m_Input)->GetTimeStamp());
     }
-    else if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
+    else if (dataSet->IsA("vtkStructuredPoints"))
     {
       wxBusyInfo wait_info("Applying scaling to data...");
 
@@ -228,7 +240,7 @@ void mafOpTransformInterface::OpDo()
 
       ((mafVMEGeneric *)m_Input)->SetData(sp,((mafVME *)m_Input)->GetTimeStamp());
     }
-    else if (((mafVME *)m_Input)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
+    else if (dataSet->IsA("vtkRectilinearGrid"))
     {
 	    wxBusyInfo wait_info("Applying scaling to data...");
   
