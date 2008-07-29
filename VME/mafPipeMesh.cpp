@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:05:59 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2008-07-29 08:57:46 $
+Version:   $Revision: 1.15 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -373,28 +373,22 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
         break;
       case ID_SCALAR_MAP_ACTIVE:
         {
-          if (m_NumberOfArrays > m_PointCellArraySeparation)
-          {
-            m_ActiveScalarType = CELL_TYPE;
-            for (int i=m_PointCellArraySeparation;i<m_NumberOfArrays;i++)
+
+            for (int i=0;i<m_NumberOfArrays;i++)
             {
-              if (strcmp(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
+              if (m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars() && strcmp(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
               {
                 m_ScalarIndex = i;
+                m_ActiveScalarType = POINT_TYPE;
+                break;
               }
-            }
-          }
-          else
-          {
-            m_ActiveScalarType = POINT_TYPE;
-            for (int i=0;i<m_PointCellArraySeparation;i++)
-            {
-              if (strcmp(m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
+              else if (m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars() && strcmp(m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->GetName(),m_ScalarsVTKName[i]) == 0 )
               {
                 m_ScalarIndex = i;
+                m_ActiveScalarType = CELL_TYPE;
+                break;
               }
             }
-          }
 
           if(m_ScalarMapActive)
             m_Mapper->ScalarVisibilityOn();
