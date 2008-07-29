@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-28 14:38:01 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-07-29 09:01:22 $
+  Version:   $Revision: 1.14 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -36,10 +36,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 
-//------------------------------------------------------------------------------
-// Events
-//------------------------------------------------------------------------------
-MAF_ID_IMP(mafAnimate::UPDATE_STORAGE_POSITION);   
 
 //----------------------------------------------------------------------------
 mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener)
@@ -57,22 +53,15 @@ mafAnimate::mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listene
   m_RenamePositionButton	= NULL;
   m_DeletePositionButton	= NULL;
   m_AnimatePlayer         = NULL;
+  m_Root = NULL;
 
-  m_Vme = vme;
-  m_Vme->GetRoot()->GetEventSource()->AddObserver(this);
-	
 	CreateGui();
-	SetInputVME(m_Vme); //widgets must already exist
+	SetInputVME(vme); //widgets must already exist
 }
 //----------------------------------------------------------------------------
 mafAnimate::~mafAnimate() 
 //----------------------------------------------------------------------------
 {
-  if (m_Root->IsValid())
-  {
-    m_Root->GetEventSource()->RemoveObserver(this); 
-  }
-  
   mafDEL(m_StoredPositions);
 }
 //----------------------------------------------------------------------------
@@ -193,15 +182,6 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         m_PositionList->SetSelection((int)e->GetDouble());
         FlyTo();
       break;
-    }
-  }
-  else if (maf_event->GetId() == mafAnimate::UPDATE_STORAGE_POSITION)
-  {
-    if (maf_event->GetSender() != this)
-    {
-      m_PositionList->Clear();
-      RetrieveStoredPositions();
-      EnableWidgets();
     }
   }
 }
@@ -503,7 +483,6 @@ void mafAnimate::StoreViewPoint()
 	m_PositionList->Append(m_SelectedPosition);
   m_PositionList->SetSelection(m_PositionList->GetCount() - 1);
 	m_Gui->Update();
-  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 //----------------------------------------------------------------------------
 void mafAnimate::RenameViewPoint()
@@ -549,7 +528,6 @@ void mafAnimate::RenameViewPoint()
 
   m_SelectedPosition = name;
 	m_Gui->Update();
-  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 //----------------------------------------------------------------------------
 void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
@@ -572,7 +550,6 @@ void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
 	  m_SelectedPosition = m_PositionList->GetStringSelection();
 	}
 	m_Gui->Update();
-  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 //----------------------------------------------------------------------------
 void mafAnimate::ResetKit()
@@ -587,7 +564,6 @@ void mafAnimate::ResetKit()
   //m_Tags = NULL;
   EnableWidgets(); // disable all
   m_Gui->Update();
-  m_Root->GetEventSource()->InvokeEvent(this, mafAnimate::UPDATE_STORAGE_POSITION);  
 }
 
 //----------------------------------------------------------------------------

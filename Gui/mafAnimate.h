@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-29 09:01:22 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,8 +34,6 @@ mafAnimate allow to store and retrieve a particular point of view.
 class mafAnimate : public mafObserver
 {
 public:
-
-  MAF_ID_DEC(UPDATE_STORAGE_POSITION);
 
 	mafAnimate(vtkRenderer *renderer, mafNode *vme, mafObserver *listener = NULL);
 	~mafAnimate(); 
