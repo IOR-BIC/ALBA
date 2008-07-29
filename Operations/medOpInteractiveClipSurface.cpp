@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:12:22 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-07-29 13:20:55 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani, Stefano Perticoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -620,17 +620,35 @@ void medOpInteractiveClipSurface::OpStop(int result)
     m_ImplicitPlaneVMEGizmo->SetBehavior(NULL);
     mafEventMacro(mafEvent(this, VME_REMOVE, m_ImplicitPlaneVMEGizmo));
   }
-  mafDEL(m_ImplicitPlaneVMEGizmo);
-	vtkDEL(m_AppendPolydata);
-	vtkDEL(m_ArrowSource);
-	vtkDEL(m_PlaneSource);
 
-	m_GizmoTranslate->Show(false);
-	m_GizmoRotate->Show(false);
-	m_GizmoScale->Show(false);
+  if(m_GizmoTranslate)
+  {
+	  m_GizmoTranslate->Show(false);
+  }
+	if (m_GizmoRotate)
+	{
+		m_GizmoRotate->Show(false);
+	}
+	if (m_GizmoScale)
+	{
+		m_GizmoScale->Show(false);
+	}
+
+  mafDEL(m_IsaCompositor);
+  mafDEL(m_IsaCompositorWithArrowGizmo);
+
 	cppDEL(m_GizmoTranslate);
 	cppDEL(m_GizmoRotate);
 	cppDEL(m_GizmoScale);
+
+  cppDEL(m_CASH);
+  mafDEL(m_ImplicitPlaneVMEGizmo);
+  vtkDEL(m_AppendPolydata);
+  vtkDEL(m_Arrow);
+  vtkDEL(m_SphereSource);
+  vtkDEL(m_ArrowSource);
+  vtkDEL(m_ClipperPlane);
+  vtkDEL(m_PlaneSource);
 
   HideGui();
   mafEventMacro(mafEvent(this,result));
