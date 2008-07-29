@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 09:02:40 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-07-29 11:59:09 $
+  Version:   $Revision: 1.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,7 +20,7 @@
 
 
 #include "medOpInteractionOp.h"
-#include "mmgGui.h"
+#include "mafGui.h"
 
 #include "mmiCompositorMouse.h"
 #include "mmiGenericMouse.h"
@@ -117,7 +117,7 @@ void medOpInteractionOp::OpRun()
   
   
   // the interface
-  m_Gui = new mmgGui(this);
+  m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   m_Gui->OkCancel();
 	m_Gui->Label("");

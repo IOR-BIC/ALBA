@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 09:04:28 $
-Version:   $Revision: 1.14 $
+Date:      $Date: 2008-07-29 11:59:09 $
+Version:   $Revision: 1.15 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMEFactory.h"
 #include "medVMEFactory.h"
 #include "mafPics.h"
-#include "mmgMDIFrame.h"
+#include "mafGUIMDIFrame.h"
 
 #include "mafNodeFactory.h"
 #include "mafNodeGeneric.h"
