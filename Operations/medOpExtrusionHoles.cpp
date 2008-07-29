@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:32:50 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-07-29 09:08:27 $
+Version:   $Revision: 1.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -139,7 +139,7 @@ mafOp *medOpExtrusionHoles::Copy()
 //----------------------------------------------------------------------------
 // Constants:
 //----------------------------------------------------------------------------
-enum FILTER_SURFACE_ID
+enum EXTRUSION_HOLES_ID
 {
 	ID_OK = MINID,
 	ID_CANCEL,
