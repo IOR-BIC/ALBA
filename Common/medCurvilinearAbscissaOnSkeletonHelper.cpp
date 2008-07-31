@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:25:33 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-31 09:25:54 $
+  Version:   $Revision: 1.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -384,6 +384,8 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( medVMEP
 
   vtkPolyData *pd = vtkPolyData::SafeDownCast(m_ConstraintVMEPolylineGraph->GetOutput()->GetVTKData());
   assert(pd);
+
+  pd->Update();
 
   m_ConstraintPolylineGraph->Clear();
   m_ConstraintPolylineGraph->CopyFromPolydata(pd);
