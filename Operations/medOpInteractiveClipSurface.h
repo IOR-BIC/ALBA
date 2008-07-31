@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:03:55 $
-  Version:   $Revision: 1.6 $
-  Authors:   Paolo Quadrani , Stefano Perticoni 
+  Date:      $Date: 2008-07-31 09:25:26 $
+  Version:   $Revision: 1.7 $
+  Authors:   Paolo Quadrani , Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -64,7 +64,10 @@ public:
 
   bool Accept(mafNode *node);   
   void OpRun();
-  void OpDo();
+
+  /** Execute the operation. */
+  /*virtual*/ void OpDo();
+
   void OpUndo();
 
   enum CLIP_SURFACE_MODALITY
@@ -93,7 +96,7 @@ public:
 
   /** Function called to clip the input surface. m_ClipModality member variable, says if the surface will be clipped by 
   another surface or by an implicit function. */
-  int Clip();
+  virtual int Clip();
 
 	/** Function that returns polydata results of clipping operation*/
 	vtkPolyData *GetResultPolyData(){return m_ResultPolyData[m_ResultPolyData.size()-1];};
@@ -117,7 +120,7 @@ protected:
   void UpdateISARefSys();
 
 	/** Create the GUI */
-	void CreateGui();
+	virtual void CreateGui();
 
   void GuiEnable();
 	/** Change Gizmo visualization */
@@ -128,6 +131,8 @@ protected:
 
 	/** Menage the undo inside the operation */
 	void Undo();
+
+  void OnUseGizmo();
 
 	void OnEventThis(mafEventBase *maf_event);
 	void OnEventGizmoTranslate(mafEventBase *maf_event);

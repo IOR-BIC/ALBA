@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-29 13:20:55 $
-  Version:   $Revision: 1.11 $
-  Authors:   Paolo Quadrani, Stefano Perticoni    
+  Date:      $Date: 2008-07-31 09:25:26 $
+  Version:   $Revision: 1.12 $
+  Authors:   Paolo Quadrani, Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -197,6 +197,8 @@ void medOpInteractiveClipSurface::OpRun()
     
     CreateGui();
     ShowGui();
+
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   
   }
 }
@@ -321,6 +323,7 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 			m_Gui->Update();
 			ShowClipPlane(m_ClipModality != medOpInteractiveClipSurface::MODE_SURFACE);
 			ChangeGizmo();
+      mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			break;
 		case ID_PLANE_WIDTH:
 		case ID_PLANE_HEIGHT:
@@ -338,20 +341,12 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		case ID_CHOOSE_GIZMO:
 			{
 				ChangeGizmo();
+        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 			}
 			break;
 		case ID_USE_GIZMO:
 			{
-				if(m_IsaCompositor && !m_UseGizmo)
-					m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositor);
-				else if(m_IsaCompositorWithArrowGizmo && m_UseGizmo)
-					m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositorWithArrowGizmo);
-
-				m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);    				
-				ChangeGizmo();
-        m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
-        m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainMedVMEPolylineGraph ? true : false);
-
+        OnUseGizmo();
 			}
 			break;
 		case ID_CLIP:
@@ -385,6 +380,23 @@ void medOpInteractiveClipSurface::OnEventThis(mafEventBase *maf_event)
 		}
 	}
 }
+//----------------------------------------------------------------------------
+void medOpInteractiveClipSurface::OnUseGizmo()
+//----------------------------------------------------------------------------
+{
+	if(m_IsaCompositor && !m_UseGizmo)
+	m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositor);
+	else if(m_IsaCompositorWithArrowGizmo && m_UseGizmo)
+	m_ImplicitPlaneVMEGizmo->SetBehavior(m_IsaCompositorWithArrowGizmo);
+	
+	m_Gui->Enable(ID_CHOOSE_GIZMO, m_ClipModality == medOpInteractiveClipSurface::MODE_IMPLICIT_FUNCTION  && m_UseGizmo);    				
+	ChangeGizmo();
+	m_Gui->Enable(ID_CHOOSE_CONSTRAINT_VME, m_UseGizmo?false:true);
+	m_CASH->EnableWidgets(!m_UseGizmo && m_ConstrainMedVMEPolylineGraph ? true : false);
+
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+}
+
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::ClipBoundingBox()
 //----------------------------------------------------------------------------
@@ -603,7 +615,6 @@ void medOpInteractiveClipSurface::ChangeGizmo()
 		m_GizmoRotate->Show(false);
 		m_GizmoScale->Show(false);
 	}
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::OpStop(int result)
@@ -910,8 +921,6 @@ void medOpInteractiveClipSurface::ShowClipPlane(bool show)
       material->m_Opacity = material->m_Prop->GetOpacity();
     }
   }
-
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
 void medOpInteractiveClipSurface::AttachInteraction()
