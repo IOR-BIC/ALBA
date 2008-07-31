@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-07-31 08:34:45 $
+  Version:   $Revision: 1.24 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1788,6 +1788,14 @@ void medVMEWrappedMeter::SetMeterLink(const char *link_name, mafNode *n)
 	}
 
 }
+
+//-------------------------------------------------------------------------
+void medVMEWrappedMeter::AddMidPoint(mafNode *node)
+//-------------------------------------------------------------------------
+{
+    m_OrderMiddlePointsVMEList.push_back(node->GetId());
+}
+
 //-------------------------------------------------------------------------
 void medVMEWrappedMeter::RemoveLink(const char *link_name)
 //-------------------------------------------------------------------------

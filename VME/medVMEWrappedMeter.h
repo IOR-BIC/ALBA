@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-07-31 08:34:45 $
+  Version:   $Revision: 1.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -273,6 +273,8 @@ public:
   /**Set\Get reverse modality: reverse allows which direction follow for clip after finding tangent points.*/
   int GetWrapReverse(){return m_WrapReverse;};
   void SetWrapReverse(int value){m_WrapReverse = value;};
+
+  void AddMidPoint(mafNode *node);
 
 protected:
   medVMEWrappedMeter();
