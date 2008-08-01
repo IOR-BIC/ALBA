@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-31 08:34:45 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-08-01 10:28:20 $
+  Version:   $Revision: 1.25 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1786,14 +1786,18 @@ void medVMEWrappedMeter::SetMeterLink(const char *link_name, mafNode *n)
 	{
 		m_OrderMiddlePointsNameVMEList.push_back(n->GetName());
 	}
-
 }
 
 //-------------------------------------------------------------------------
 void medVMEWrappedMeter::AddMidPoint(mafNode *node)
 //-------------------------------------------------------------------------
 {
-    m_OrderMiddlePointsVMEList.push_back(node->GetId());
+  m_OrderMiddlePointsVMEList.push_back(node->GetId());
+  if (node->IsA("mafVMELandmarkCloud"))
+  {
+    //Set first landmark as mid point
+    m_OrderMiddlePointsVMEList.push_back(0);
+  }
 }
 
 //-------------------------------------------------------------------------
