@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 12:51:04 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-08-06 10:38:37 $
+Version:   $Revision: 1.9 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -2640,7 +2640,13 @@ double mafPolylineGraph::GetBranchIntervalLength(vtkIdType b, vtkIdType startVer
     }
   }
 
-  assert(endId >= startId );
+  //assert(endId >= startId );
+  if (endId <= startId)
+  {
+    int tmp = endId;
+    endId = startId;
+    startId = tmp;
+  }
 
   for (int k = startId ;  k <= endId ;  k++)
   { 
