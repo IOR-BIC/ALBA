@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-08-16 12:14:48 $
+  Version:   $Revision: 1.15 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -183,6 +183,7 @@ int mafVMESurfaceParametric::DeepCopy(mafNode *a)
 bool mafVMESurfaceParametric::Equals(mafVME *vme)
 //-------------------------------------------------------------------------
 {
+  bool ret = false;
   if (Superclass::Equals(vme))
   {
     if (     
@@ -217,10 +218,10 @@ bool mafVMESurfaceParametric::Equals(mafVME *vme)
       this->m_PlanePoint2[2] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint2[2] 
       )
     {
-      return MAF_OK;
+      ret = true;
     }
   }
- return MAF_ERROR;
+ return ret;
 }
 //-------------------------------------------------------------------------
 mafVMEOutputSurface *mafVMESurfaceParametric::GetSurfaceOutput()
