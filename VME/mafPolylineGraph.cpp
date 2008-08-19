@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-06 10:38:37 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2008-08-19 17:00:58 $
+Version:   $Revision: 1.10 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -2749,8 +2749,21 @@ bool mafPolylineGraph::MergeSimpleJoinedBranchesAtVertex(vtkIdType v)
 Be careful: this leads to reindexing of branches */
 void mafPolylineGraph::MergeSimpleJoinedBranches()
 {
-  for (vtkIdType v = 0; v < this->GetMaxVertexId(); v++) {
+  for (vtkIdType v = 0; v < GetNumberOfVertices(); v++) {
     MergeSimpleJoinedBranchesAtVertex(v);
+  }
+
+  //BES 19.8.2008 - remove all empty branches
+  int nCount = GetNumberOfBranches();
+  for (int i = 0; i < nCount; )
+  {
+    if (GetConstBranchPtr(i)->GetNumberOfEdges() != 0)
+      i++;
+    else
+    {
+      DeleteBranch(i);      
+      nCount--;
+    }    
   }
 }
 #pragma endregion
