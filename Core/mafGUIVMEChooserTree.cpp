@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-08-21 11:38:16 $
+  Version:   $Revision: 1.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,7 @@
 #include "mafNode.h"
 #include "mafView.h"
 #include "mafVMERoot.h"
+#include "mafVMELandmarkCloud.h"
 
 #include <vector>
 #include <algorithm>
@@ -75,10 +76,26 @@ int mafGUIVMEChooserTree::GetVmeStatus(mafNode *node)
   int image_id;
   if(m_ValidateFunction == NULL)
   {
-    if (!node->IsMAFType(mafVMERoot))
+    if (m_MultipleSelection)
     {
-      image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
-      return image_id;
+      if (!node->IsMAFType(mafVMELandmarkCloud))
+      {
+        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+        return image_id;
+      }
+      else if (!((mafVMELandmarkCloud*)node)->IsOpen())
+      {
+        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+        return image_id;
+      }
+    }
+    else
+    {
+      if (!node->IsMAFType(mafVMERoot))
+      {
+        image_id = ClassNameToIcon(node->GetTypeName()) + NODE_VISIBLE_ON;
+        return image_id;
+      }
     }
   }
   else
