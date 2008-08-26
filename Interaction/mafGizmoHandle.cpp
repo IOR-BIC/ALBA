@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:06 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-08-26 08:36:53 $
+  Version:   $Revision: 1.12 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -726,7 +726,7 @@ void mafGizmoHandle::Update()
   }
 }
 //----------------------------------------------------------------------------
-void mafGizmoHandle::GetHandleCenter(int type,double HandleCenter[6])
+void mafGizmoHandle::GetHandleCenter(int type,double HandleCenter[3])
 //----------------------------------------------------------------------------
 {
 	for(int i=0;i<3;i++)
