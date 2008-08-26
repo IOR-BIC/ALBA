@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2008-08-26 08:36:33 $
+  Version:   $Revision: 1.24 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,6 +33,8 @@ class mafGUI;
 class mafGUIPicButton;
 class vtkMAFSimpleRulerActor2D;
 class vtkMAFTextOrientator;
+//class vtkMAFFPSCallback;
+class vtkFPSActor;
 
 //----------------------------------------------------------------------------
 // constants:
@@ -71,8 +73,8 @@ public:
 	/** Set the camera position. */
 	void CameraSet(int cam_position, double zoom = 1);
 
-  /** Set the camera position, given the custom position, custom viewUp , zoom and
-  if projection is parallel or no.*/
+
+  /** Set the camera position, set custom pos , custom viewUp , zoom and if projection is parallel */
   void CameraSet(double pos[3],double viewUp[3], double zoom = 1., bool parallelProjection = false);
 
 	/** Set the render window's size. */
@@ -124,6 +126,9 @@ public:
 	/** Set Orientator Text Properties */
 	void SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale = 1);
 
+	/** Set Fps Text Visibility*/
+	void SetFpsVisibility(bool show);
+
   /** Update scale factor and legend.
   This method is called from logic to update measure unit according to the application settings.*/
   void UpdateRulerUnit();
@@ -136,6 +141,9 @@ public:
   /** Allow to add/remove current vtkCamera to the list of vtkCamera linked together*/
   void LinkCamera(bool linc_camera = true);
 
+  /*Return active ruler for using its methods*/
+	vtkMAFSimpleRulerActor2D *GetRuler(){return m_Ruler;};
+
   mafSceneGraph    *m_Sg; 
   mafRWIBase			 *m_RwiBase;
   vtkRenderer      *m_RenFront; ///< Renderer used to show actors on the first layer
@@ -146,14 +154,15 @@ public:
   int               m_CameraPositionId; ///< Integer representing a preset for camera position, focal point and view up
   double            m_CameraPosition[3]; ///< Vector representing the camera position
   double            m_FocalPoint[3]; ///< Vector representing the camera focal point
-  //double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
-  //double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
+
+  double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
+  double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
+  double m_Z1;
   double            m_StepCameraOrientation; ///< Step with which rotate the camera around its focal point.
   double            m_TopBottomAccumulation;
   double            m_LeftRigthAccumulation; 
   double            m_TopBottomAccumulationLast;
   double            m_LeftRigthAccumulationLast; 
-  
 protected:
 	/** Compute the bounds for the visible actors; if vme is passed, the bounds of vme are calculated. */
 	double *ComputeVisibleBounds(mafNode *node = NULL);
@@ -179,8 +188,12 @@ protected:
   int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
   int           m_StereoType;
 	vtkMAFTextOrientator     *m_Orientator;
+	int          m_ShowFPS;
 	int          m_ShowOrientator;
   mafObserver  *m_Listener;
+
+	//vtkMAFFPSCallback *m_FPSCallback;
+	vtkFPSActor *m_FPSActor;
 
   mafString m_StereoMovieDir;
   int       m_StereoMovieEnable;
