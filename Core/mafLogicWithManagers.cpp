@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.138 $
+  Date:      $Date: 2008-08-26 08:36:19 $
+  Version:   $Revision: 1.139 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -721,7 +721,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
           }
           int menuId, opId;
           mafString *s = e->GetString();
-          menuId = m_MenuBar->FindMenu("Operations");
+          menuId = m_MenuBar->FindMenu(_("Operations"));
           opId = m_MenuBar->GetMenu(menuId)->FindItem(s->GetCStr());
           m_OpManager->OpRun(opId);
         }
