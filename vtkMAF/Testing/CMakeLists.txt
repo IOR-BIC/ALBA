@@ -49,3 +49,17 @@ ADD_TEST(vtkMAFTextOrientatorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTextOrientator
 IF (WIN32)
   SET_TARGET_PROPERTIES(vtkMAFTextOrientatorTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFGlobalAxisCoordinate
+ADD_EXECUTABLE(vtkMAFGlobalAxisCoordinateTest vtkMAFGlobalAxisCoordinateTest.h vtkMAFGlobalAxisCoordinateTest.cpp)
+ADD_TEST(vtkMAFGlobalAxisCoordinateTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFGlobalAxisCoordinateTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(vtkMAFGlobalAxisCoordinateTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ vtkMAFGlobalAxisCoordinate
+ADD_EXECUTABLE(vtkMAFLocalAxisCoordinateTest vtkMAFLocalAxisCoordinateTest.h vtkMAFLocalAxisCoordinateTest.cpp)
+ADD_TEST(vtkMAFLocalAxisCoordinateTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFLocalAxisCoordinateTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(vtkMAFLocalAxisCoordinateTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
