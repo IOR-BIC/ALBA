@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 08:30:46 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-08-26 08:37:40 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.2 $");
+vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.3 $");
 vtkStandardNewMacro(vtkMAFSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
@@ -47,6 +47,9 @@ vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
   ntick    = 800; // enough for a tick spacing = 15 on a 1600x1200 screen
   ScaleFactor = 1.0;
 
+	xOffSet = -2;
+	yOffSet =  4;
+
   ScaleLabelVisibility  = true;
   AxesLabelVisibility   = true;
   AxesVisibility        = true;
@@ -55,6 +58,10 @@ vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
   GlobalAxes            = true;
 
   InverseTicks          = true;
+	Position[0] = Position[1] = Position[2] = 0;
+	PositionDisplay[0] = PositionDisplay[1] = PositionDisplay[2] = 0;
+	PositionWorld[0] = PositionWorld[1] = PositionWorld[2] = 0;
+	AttachPositionFlag = false;
 
   Legend = NULL;
   Axis = Tick = ScaleLabel = NULL;
@@ -278,7 +285,7 @@ void vtkMAFSimpleRulerActor2D::RulerCreate()
   ScaleLabel->GetTextProperty()->SetFontFamilyToArial();
   ScaleLabel->GetTextProperty()->SetJustificationToLeft();
 	ScaleLabel->ScaledTextOff();
-	ScaleLabel->SetDisplayPosition(margin + 4,margin + 4);
+	ScaleLabel->SetDisplayPosition(Position[0] + margin + 4, Position[1] + margin + 4);
 	ScaleLabel->SetInput("");
 
   HorizontalAxesLabel = vtkTextActor::New();
@@ -288,7 +295,7 @@ void vtkMAFSimpleRulerActor2D::RulerCreate()
   HorizontalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   HorizontalAxesLabel->GetTextProperty()->SetJustificationToRight();
   HorizontalAxesLabel->ScaledTextOff();
-  HorizontalAxesLabel->SetDisplayPosition(0,0);
+	HorizontalAxesLabel->SetDisplayPosition(Position[0], Position[1]);
   HorizontalAxesLabel->SetInput("");
 
   VerticalAxesLabel = vtkTextActor::New();
@@ -298,7 +305,7 @@ void vtkMAFSimpleRulerActor2D::RulerCreate()
   VerticalAxesLabel->GetTextProperty()->SetFontFamilyToArial();
   VerticalAxesLabel->GetTextProperty()->SetJustificationToLeft();
   VerticalAxesLabel->ScaledTextOff();
-  VerticalAxesLabel->SetDisplayPosition(0,0);
+  VerticalAxesLabel->SetDisplayPosition(Position[0],Position[1]);
   VerticalAxesLabel->SetInput("");
 
 }
@@ -486,17 +493,28 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   //   (w - wo) =    d * 1/w2d   =   d * d2w;
   //
 
+	if(true == AttachPositionFlag)
+	{
+		ren->SetWorldPoint(PositionWorld[0],PositionWorld[1],PositionWorld[2],1.);
+		ren->WorldToDisplay();
+		ren->GetDisplayPoint(PositionDisplay);
+
+		Position[0] = PositionDisplay[0] - margin;
+		Position[1] = PositionDisplay[1] - margin;
+		Position[2] = PositionDisplay[2];
+	}
+
   double p[4],p0[4],p1[4];
 
-  ren->SetDisplayPoint(margin,margin,0);
+  ren->SetDisplayPoint(Position[0] + margin,Position[1] + margin,0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p);
 
-  ren->SetDisplayPoint(0,0,0);
+  ren->SetDisplayPoint(Position[0],Position[1],0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p0);
 
-  ren->SetDisplayPoint(rwWidth, rwHeight, 0);
+  ren->SetDisplayPoint(Position[0] + rwWidth, Position[1] + rwHeight, 0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p1);
 
@@ -603,10 +621,10 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dx > rwWidth  - margin ) { dx = dx_max ; t1x = t0; } // discard tick
     if( dy > rwHeight - margin ) { dy = dy_max ; t1y = t0; } 
 
-    Points->SetPoint(id++, dx,  t0 +axesOffsetY,  0);
-    Points->SetPoint(id++, dx,	t1x+axesOffsetY,  0);
-    Points->SetPoint(id++, t0 +axesOffsetX, dy,   0);
-    Points->SetPoint(id++, t1y+axesOffsetX, dy,   0);
+    Points->SetPoint(id++, Position[0] + dx,  Position[1] + t0 +axesOffsetY,  0);
+    Points->SetPoint(id++, Position[0] + dx,	Position[1] + t1x+axesOffsetY,  0);
+    Points->SetPoint(id++, Position[0] + t0 +axesOffsetX, Position[1] + dy,   0);
+    Points->SetPoint(id++, Position[0] + t1y+axesOffsetX, Position[1] + dy,   0);
  }
   
   if (GlobalAxes) 
@@ -614,17 +632,42 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     char *alab[] = {"x","y","z","-x","-y","-z"};
     int direction = ( w1X-w0X > 0 ) ? 0 : 3;
     HorizontalAxesLabel->SetInput(alab[ x_index + direction]);
-    HorizontalAxesLabel->SetDisplayPosition(rwWidth - margin , axesOffsetY + margin + 4);
+    HorizontalAxesLabel->SetDisplayPosition(Position[0] + rwWidth - margin , Position[1] + axesOffsetY + margin + 4);
 
     direction = ( w1Y-w0Y > 0 ) ? 0 : 3;
     VerticalAxesLabel->SetInput(alab[ y_index + direction]);
-    VerticalAxesLabel->SetDisplayPosition( axesOffsetX + margin + 4, rwHeight - margin );
+    VerticalAxesLabel->SetDisplayPosition(Position[0] +  axesOffsetX + margin + 4,Position[1] +  rwHeight - margin );
   }
 
   char lab[50];
   sprintf(lab,"%g %s", abs( worldTickSpacingX ) ,Legend);
   ScaleLabel->SetInput(lab);
-  ScaleLabel->SetDisplayPosition( axesOffsetX + margin + 4, axesOffsetY + margin + 4 );
+  ScaleLabel->SetDisplayPosition(Position[0] +  axesOffsetX + margin + 4,Position[1] +  axesOffsetY + margin + 4 );
 }
+//----------------------------------------------------------------------------
+void vtkMAFSimpleRulerActor2D::SetAttachPosition(double position[3])
+//----------------------------------------------------------------------------
+{
+	PositionWorld[0] = position[0];
+	PositionWorld[1] = position[1];
+	PositionWorld[2] = position[2];
+}
+//----------------------------------------------------------------------------
+void vtkMAFSimpleRulerActor2D::SetAttachPositionFlag(bool value)
+//----------------------------------------------------------------------------
+{
+	AttachPositionFlag = value;
+}
+//----------------------------------------------------------------------------
+void vtkMAFSimpleRulerActor2D::ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg)
+//----------------------------------------------------------------------------
+{
+	margin   = marginArg; 
+	shortTickLen = shortTickLenArg;
+	//midTickLen   = midTickLenArg;
+	longTickLen  = longTickLenArg;
 
+	xOffSet = xOffSetArg;
+	yOffSet = yOffSetArg;
+}
 

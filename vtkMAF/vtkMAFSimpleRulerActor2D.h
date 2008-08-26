@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 08:30:46 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-08-26 08:37:40 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -69,6 +69,11 @@ class VTK_vtkMAF_EXPORT vtkMAFSimpleRulerActor2D : public vtkActor2D
 
   void SetInverseTicks(bool inverseTicks){InverseTicks = inverseTicks;};
 
+	void SetAttachPositionFlag(bool value);
+	void SetAttachPosition(double position[3]);
+
+	void ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg);
+
 protected:
 										vtkMAFSimpleRulerActor2D();
 									 ~vtkMAFSimpleRulerActor2D();
@@ -94,6 +99,9 @@ protected:
   int longTickLen;
   double DesiredTickSpacing;
 
+	int xOffSet;
+	int yOffSet;
+
   int margin;
   int ntick;
   int x_index;
@@ -108,6 +116,11 @@ protected:
   bool   InverseTicks;
   double ScaleFactor;
   char  *Legend;
+
+	int    Position[3];
+	double PositionDisplay[3];
+	double PositionWorld[3];
+	bool   AttachPositionFlag;
 
   inline void   DecomposeValue(double val, int *sign, double *mantissa, int *exponent);
   inline double RicomposeValue(int sign, double mantissa, int exponent);
