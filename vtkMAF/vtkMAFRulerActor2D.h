@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 08:30:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-08-26 08:37:57 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -68,9 +68,17 @@ class VTK_vtkMAF_EXPORT vtkMAFRulerActor2D : public vtkActor2D
 
   void SetInverseTicks(bool inverseTicks){InverseTicks = inverseTicks;};
   
-  void SetAttachPositionFlag(bool value){AttachPositionFlag = value;};
+  void SetAttachPositionFlag(bool value);
   void SetAttachPosition(double position[3]);
-  
+
+  void ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg);
+	void SetText(const char *labels[3])
+	{
+		for(int i=0; i<3;i++)
+		{
+			m_Text[i] = labels[i];
+		}  
+	}
 protected:
 										vtkMAFRulerActor2D();
 									 ~vtkMAFRulerActor2D();
@@ -101,6 +109,9 @@ protected:
   int longTickLen;
   double DesiredTickSpacing;
 
+  int xOffSet;
+  int yOffSet;
+
   int margin;
   int ntick;
   int x_index;
@@ -114,7 +125,7 @@ protected:
   bool   InverseTicks;
   double ScaleFactor;
   char  *Legend;
-
+	const char *m_Text[3];
 
   int    Position[3];
   double PositionDisplay[3];

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-24 14:46:54 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-08-26 08:37:56 $
+  Version:   $Revision: 1.4 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.4 $");
 vtkStandardNewMacro(vtkMAFRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFRulerActor2D::vtkMAFRulerActor2D()
@@ -47,6 +47,9 @@ vtkMAFRulerActor2D::vtkMAFRulerActor2D()
   DesiredTickSpacing = 20;
   ntick    = 800; // enough for a tick spacing = 15 on a 1600x1200 screen
   ScaleFactor = 1.0;
+
+  xOffSet = -2;
+  yOffSet =  4;
 
   PositionWorld[0] = PositionWorld[1] = PositionWorld[2] = 0;
   Position[0] = Position[1] = Position[2] = 0;
@@ -65,6 +68,10 @@ vtkMAFRulerActor2D::vtkMAFRulerActor2D()
   Points = NULL;
   x_index = 0;
   y_index = 1;
+
+	m_Text[0] = "x";
+	m_Text[1] = "y";
+	m_Text[2] = "z";
 
   SetLegend("");
   RulerCreate();
@@ -710,6 +717,7 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     if( dx < rwWidth  - margin ) sprintf(labxtex, "%g",wx ); else sprintf(labxtex, "" );
     if( dy < rwHeight - margin ) sprintf(labytex, "%g",wy ); else sprintf(labytex, "" );
 
+    
     Labx[i]->SetInput(labxtex);
 
     Labx[i]->SetDisplayPosition(Position[0]+dx , Position[1]+ margin + longTickLen  );
@@ -719,24 +727,33 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     Labx[i]->Modified();
 */
 
-    Laby[i]->SetInput(labytex);
-    Laby[i]->SetDisplayPosition(Position[0]+margin +4, Position[1]+dy );
-    Laby[i]->Modified();
+
+	  Labx[i]->SetDisplayPosition(Position[0]+dx , Position[1]+ margin - longTickLen + xOffSet );
+	  Labx[i]->Modified();
+/*
+	  Labx[i]->SetDisplayPosition(Position[0]+dx , Position[1]+margin - longTickLen -2 );
+	  Labx[i]->Modified();
+*/
+
+	  Laby[i]->SetInput(labytex);
+	  Laby[i]->SetDisplayPosition(Position[0]+ margin +yOffSet, Position[1]+dy );
+	  Laby[i]->Modified();
+    
+    
   }
 
 
   if (GlobalAxes) 
   {
-    char *letter[] = {"x","y","z"};
     char *sign = (w1X-w0X > 0) ? (char *)" " : (char *)"-";
 
     char caption[100];
-    sprintf(caption, "%s%s %s", sign,  letter[x_index], Legend);
+    sprintf(caption, "%s%s %s", sign,  m_Text[x_index], Legend);
     HorizontalAxesLabel->SetInput(caption);
     HorizontalAxesLabel->SetDisplayPosition(Position[0]+rwWidth - margin, Position[1]+margin + 4);
 
     sign = (w1Y-w0Y > 0) ? (char *)" " : (char *)"-";
-    sprintf(caption, "%s%s %s", sign, letter[y_index], Legend);
+    sprintf(caption, "%s%s %s", sign, m_Text[y_index], Legend);
     VerticalAxesLabel->SetInput(caption);
     VerticalAxesLabel->SetDisplayPosition( Position[0]+margin, Position[1]+rwHeight - margin/2);
   }
@@ -752,4 +769,22 @@ void vtkMAFRulerActor2D::SetAttachPosition(double position[3])
   PositionWorld[0] = position[0];
   PositionWorld[1] = position[1];
   PositionWorld[2] = position[2];
+}
+//----------------------------------------------------------------------------
+void vtkMAFRulerActor2D::SetAttachPositionFlag(bool value)
+//----------------------------------------------------------------------------
+{
+  AttachPositionFlag = value;
+}
+//----------------------------------------------------------------------------
+void vtkMAFRulerActor2D::ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg)
+//----------------------------------------------------------------------------
+{
+  margin   = marginArg; 
+  shortTickLen = shortTickLenArg;
+  midTickLen   = midTickLenArg;
+  longTickLen  = longTickLenArg;
+
+  xOffSet = xOffSetArg;
+  yOffSet = yOffSetArg;
 }
