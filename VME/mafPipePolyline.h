@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:05:59 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-08-26 08:37:11 $
+Version:   $Revision: 1.13 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -95,6 +95,9 @@ public:
 
   /**Set Opacity of the actors */
   void SetOpacity(double value);
+
+  /**Set if actor is pickable */
+  void SetActorPicking(int enable);
 
 	/** IDs for the GUI */
 	enum PIPE_POLYLINE_WIDGET_ID

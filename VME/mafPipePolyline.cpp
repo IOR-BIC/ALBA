@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:05:59 $
-Version:   $Revision: 1.19 $
+Date:      $Date: 2008-08-26 08:37:11 $
+Version:   $Revision: 1.20 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1098,4 +1098,11 @@ void mafPipePolyline::SetOpacity(double opacity)
   if(m_Actor) m_Actor->GetProperty()->SetOpacity(m_Opacity);
   if(m_OutlineActor) m_OutlineActor->GetProperty()->SetOpacity(m_Opacity);
   if(m_BorderActor) m_BorderActor->GetProperty()->SetOpacity(m_Opacity);
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::SetActorPicking(int enable)
+//----------------------------------------------------------------------------
+{
+  m_Actor->SetPickable(enable);
+  m_Actor->Modified();
 }
