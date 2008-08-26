@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFGlobalAxisCoordinate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-08-26 15:04:54 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -66,8 +66,6 @@ class VTK_vtkMAF_EXPORT  vtkMAFGlobalAxisCoordinate : public vtkCoordinate
 {
 public:
   //vtkTypeRevisionMacro(vtkMAFGlobalAxisCoordinate,vtkCoordinate);
-
-           vtkMAFGlobalAxisCoordinate();
   virtual ~vtkMAFGlobalAxisCoordinate();
 
   static vtkMAFGlobalAxisCoordinate* New();
@@ -75,6 +73,7 @@ public:
   virtual double *GetComputedUserDefinedValue(vtkViewport *viewport);
 
 protected:
+  vtkMAFGlobalAxisCoordinate();
 
 private:
 	vtkRenderWindow *renderwindow;
