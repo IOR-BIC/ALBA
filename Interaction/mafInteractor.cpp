@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:11:54 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2008-08-27 12:53:45 $
+  Version:   $Revision: 1.14 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,7 +31,7 @@
 #include "mafVME.h"
 #include "mmuIdFactory.h"
 #include "mafView.h"
-#include "mafViewCompound.h"
+//#include "mafViewCompound.h"
 
 #include "vtkRenderer.h"
 #include "vtkProp3D.h"
