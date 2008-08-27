@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:06 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-08-27 12:56:05 $
+  Version:   $Revision: 1.18 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@
 #include "mafEvent.h"
 
 #include "mafView.h"
-#include "mafViewCompound.h"
+//#include "mafViewCompound.h"
 #include "mmdTracker.h"
 #include "mmdMouse.h"
 #include "mafAvatar3D.h"
@@ -150,9 +150,9 @@ void mmiPicker::SendPickingInformation(mafView *v, double *mouse_pos, int msg_id
   cellPicker->SetTolerance(0.001);
   if (v)
   {
-    mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
+    /*mafViewCompound *vc = mafViewCompound::SafeDownCast(v);
     if (vc)
-      v = vc->GetSubView();
+      v = vc->GetSubView();*/ // the code is integrated into the GetRWI method of the mafViewCompound, so it is not necessary!
     if(mouse_flag)
     {
       vtkRendererCollection *rc = v->GetRWI()->GetRenderWindow()->GetRenderers();
