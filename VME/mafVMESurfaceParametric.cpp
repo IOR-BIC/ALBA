@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-16 12:14:48 $
-  Version:   $Revision: 1.15 $
-  Authors:   Roberto Mucci
+  Date:      $Date: 2008-08-27 11:25:07 $
+  Version:   $Revision: 1.16 $
+  Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -50,6 +50,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include <vector>
 
+const bool DEBUG_MODE = true;
 
 //------------------------------------------------------------------------------
 // Events
@@ -65,13 +66,6 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
 //-------------------------------------------------------------------------
 {
   m_GeometryType = PARAMETRIC_SPHERE;
-
-	m_RollOutCube = NULL;
-	m_RollOutSphere = NULL;
-	m_RollOutCylinder = NULL;
-	m_RollOutCone = NULL;
-  m_RollOutPlane = NULL;
-
 	
   m_SphereRadius = 2.0;
   m_SpherePhiRes = 10.0;
@@ -257,42 +251,24 @@ mafGUI* mafVMESurfaceParametric::CreateGui()
   mafVME::CreateGui();
   if(m_Gui)
   {
-    m_GuiSphere = new mafGUI(this);
-    m_GuiCone = new mafGUI(this);
-    m_GuiCylinder = new mafGUI(this);
-    m_GuiCube = new mafGUI(this);
-    m_GuiPlane= new mafGUI(this);
+    wxString geometryType[5] = {"Sphere", "Cone", "Cylinder", "Cube","Plane"};
+    m_Gui->Combo(ID_GEOMETRY_TYPE, "", &m_GeometryType, 5, geometryType);
+    m_Gui->Divider(2);
 
-    m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Radius"), &m_SphereRadius);
-    m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Phi res"), &m_SpherePhiRes);
-    m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Theta res"), &m_SphereTheRes);
+    CreateGuiSphere();   
+    m_Gui->Divider(2);
+    CreateGuiCone();
+    m_Gui->Divider(2);
+    CreateGuiCylinder();
+    m_Gui->Divider(2);
+    CreateGuiCube();
+    m_Gui->Divider(2);
 
-    m_GuiCone->Double(CHANGE_VALUE_CYLINDER,_("Height"), &m_ConeHeight);
-    m_GuiCone->Double(CHANGE_VALUE_CYLINDER,_("Radius"), &m_ConeRadius);
-    m_GuiCone->Double(CHANGE_VALUE_CYLINDER,_("Resolution"), &m_ConeRes);
-    m_GuiCone->Bool(CHANGE_VALUE_CYLINDER,"Cap", &m_ConeCapping); // Open or closed cone
-
-    m_GuiCylinder->Double(CHANGE_VALUE_CONE,_("Height"), &m_CylinderHeight);
-    m_GuiCylinder->Double(CHANGE_VALUE_CONE,_("Radius"), &m_CylinderRadius);
-    m_GuiCylinder->Double(CHANGE_VALUE_CONE,_("Resolution"), &m_CylinderRes);
-
-    m_GuiCube->Double(CHANGE_VALUE_CUBE,_("X Length"), &m_CubeXLength);
-    m_GuiCube->Double(CHANGE_VALUE_CUBE,_("Y Length"), &m_CubeYLength);
-    m_GuiCube->Double(CHANGE_VALUE_CUBE,_("Z Length"), &m_CubeZLength);
-
-    m_GuiPlane->Double(CHANGE_VALUE_PLANE,_("X Res"), &m_PlaneXRes);
-    m_GuiPlane->Double(CHANGE_VALUE_PLANE,_("Y Res"), &m_PlaneYRes);
-    m_GuiPlane->Vector(CHANGE_VALUE_PLANE,_("Origin"), m_PlaneOrigin);
-    m_GuiPlane->Vector(CHANGE_VALUE_PLANE,_("Point 1"), m_PlanePoint1);
-    m_GuiPlane->Vector(CHANGE_VALUE_PLANE,_("Point 2"), m_PlanePoint2);
-
-    m_RollOutSphere = m_Gui->RollOut(ID_ROLLOUT_SPHERE,_("Sphere Parameters"),m_GuiSphere);
-    m_RollOutCone = m_Gui->RollOut(ID_ROLLOUT_CONE,_("Cone Parameters"), m_GuiCone, false);
-    m_RollOutCylinder = m_Gui->RollOut(ID_ROLLOUT_CYLINDER,_("Cylinder Parameters"), m_GuiCylinder, false);
-    m_RollOutCube = m_Gui->RollOut(ID_ROLLOUT_CUBE,_("Parallelepiped Parameters"), m_GuiCube, false);
-    m_RollOutPlane = m_Gui->RollOut(ID_ROLLOUT_PLANE,_("Plane Parameters"), m_GuiPlane, false);
-
+    CreateGuiPlane();
+    
     m_Gui->FitGui();
+    
+    EnableParametricSurfaceGui(m_GeometryType);
     m_Gui->Update();
   }
 
@@ -308,6 +284,14 @@ void mafVMESurfaceParametric::OnEvent(mafEventBase *maf_event)
   {
     switch(e->GetId())
     {
+      case ID_GEOMETRY_TYPE:
+      {  
+        EnableParametricSurfaceGui(m_GeometryType);
+        m_Gui->Update();
+        InternalUpdate();
+        m_Gui->FitGui();
+      }
+
       case CHANGE_VALUE_SPHERE:
       case CHANGE_VALUE_CUBE:
       case CHANGE_VALUE_CONE:
@@ -319,81 +303,12 @@ void mafVMESurfaceParametric::OnEvent(mafEventBase *maf_event)
         ForwardUpEvent(e);
       }
       break;
+      
       default:
         mafVME::OnEvent(maf_event);
     }
-
   }
-  if (maf_event->GetSender() == m_RollOutSphere) // from this operation gui
-  {
-    mafEvent *e = mafEvent::SafeDownCast(maf_event);
-    if  (e->GetBool())
-    {
-      m_GeometryType = PARAMETRIC_SPHERE;           
-      m_RollOutCone->RollOut(false);
-      m_RollOutCylinder->RollOut(false);
-      m_RollOutCube->RollOut(false);
-      m_RollOutPlane->RollOut(false);
-      InternalUpdate();
-      m_Gui->FitGui();
-    }
-  }
-  else if (maf_event->GetSender() == m_RollOutCone) // from this operation gui
-  {
-    mafEvent *e = mafEvent::SafeDownCast(maf_event);
-    if  (e->GetBool())
-    {
-      m_GeometryType = PARAMETRIC_CONE;           
-      m_RollOutSphere->RollOut(false);
-      m_RollOutCylinder->RollOut(false);
-      m_RollOutCube->RollOut(false);
-      m_RollOutPlane->RollOut(false);
-      InternalUpdate();
-      m_Gui->FitGui();
-    }
-  }
-  else if (maf_event->GetSender() == m_RollOutCylinder) // from this operation gui
-  {
-    mafEvent *e = mafEvent::SafeDownCast(maf_event);
-    if  (e->GetBool())
-    {
-      m_GeometryType = PARAMETRIC_CYLINDER;
-      m_RollOutSphere->RollOut(false);           
-      m_RollOutCone->RollOut(false);
-      m_RollOutCube->RollOut(false);
-      m_RollOutPlane->RollOut(false);
-      InternalUpdate();
-      m_Gui->FitGui();
-    }
-  }
-  else if (maf_event->GetSender() == m_RollOutCube) // from this operation gui
-  {
-    mafEvent *e = mafEvent::SafeDownCast(maf_event);
-    if  (e->GetBool())
-    {
-      m_GeometryType = PARAMETRIC_CUBE;     
-      m_RollOutSphere->RollOut(false);
-      m_RollOutCone->RollOut(false);
-      m_RollOutCylinder->RollOut(false);
-      m_RollOutPlane->RollOut(false);
-      InternalUpdate();
-      m_Gui->FitGui();
-    }
-  }
-  else if (maf_event->GetSender() == m_RollOutPlane) // from this operation gui
-  {
-    mafEvent *e = mafEvent::SafeDownCast(maf_event);
-    if  (e->GetBool())
-    {
-      m_GeometryType = PARAMETRIC_PLANE;  
-      m_RollOutSphere->RollOut(false);
-      m_RollOutCone->RollOut(false);
-      m_RollOutCylinder->RollOut(false);
-      m_RollOutCube->RollOut(false);
-      InternalUpdate();
-      m_Gui->FitGui();
-    }
-  }
+  
   else
   {
     Superclass::OnEvent(maf_event);
@@ -547,10 +462,9 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
   return MAF_ERROR;
 }
 //-------------------------------------------------------------------------
-void mafVMESurfaceParametric::SetGeometryType(int geometry)
-//-------------------------------------------------------------------------
+void mafVMESurfaceParametric::SetGeometryType( int parametricSurfaceTypeID )
 {
-  m_GeometryType = geometry;
+  m_GeometryType = parametricSurfaceTypeID;
   Modified();
 }
 //-------------------------------------------------------------------------
@@ -566,4 +480,177 @@ char** mafVMESurfaceParametric::GetIcon()
 {
   #include "mafVMEProcedural.xpm"
   return mafVMEProcedural_xpm;
+}
+
+void mafVMESurfaceParametric::CreateGuiPlane()
+{
+  m_GuiPlane= new mafGUI(this);
+  m_GuiPlane->Label("Plane");
+  m_GuiPlane->Double(CHANGE_VALUE_PLANE,_("X Res"), &m_PlaneXRes);
+  m_GuiPlane->Double(CHANGE_VALUE_PLANE,_("Y Res"), &m_PlaneYRes);
+  m_GuiPlane->Vector(CHANGE_VALUE_PLANE,_("Origin"), m_PlaneOrigin);
+  m_GuiPlane->Vector(CHANGE_VALUE_PLANE,_("Point 1"), m_PlanePoint1);
+  m_GuiPlane->Vector(CHANGE_VALUE_PLANE,_("Point 2"), m_PlanePoint2);
+  assert(m_Gui);
+  m_Gui->AddGui(m_GuiPlane);
+}
+
+void mafVMESurfaceParametric::CreateGuiCube()
+{
+  m_GuiCube = new mafGUI(this);
+  m_GuiCube->Label("Cube");
+  m_GuiCube->Double(CHANGE_VALUE_CUBE,_("X Length"), &m_CubeXLength);
+  m_GuiCube->Double(CHANGE_VALUE_CUBE,_("Y Length"), &m_CubeYLength);
+  m_GuiCube->Double(CHANGE_VALUE_CUBE,_("Z Length"), &m_CubeZLength);
+  assert(m_Gui);
+  m_Gui->AddGui(m_GuiCube);
+}
+
+void mafVMESurfaceParametric::CreateGuiCylinder()
+{
+  m_GuiCylinder = new mafGUI(this);
+  m_GuiCylinder->Label("Cylinder");
+  m_GuiCylinder->Double(CHANGE_VALUE_CYLINDER,_("Height"), &m_CylinderHeight);
+  m_GuiCylinder->Double(CHANGE_VALUE_CYLINDER,_("Radius"), &m_CylinderRadius);
+  m_GuiCylinder->Double(CHANGE_VALUE_CYLINDER,_("Resolution"), &m_CylinderRes);
+  assert(m_Gui);
+  m_Gui->AddGui(m_GuiCylinder);
+
+}
+
+void mafVMESurfaceParametric::CreateGuiCone()
+{
+  m_GuiCone = new mafGUI(this);
+  m_GuiCone->Label("Cone");
+  m_GuiCone->Double(CHANGE_VALUE_CONE,_("Height"), &m_ConeHeight);
+  m_GuiCone->Double(CHANGE_VALUE_CONE,_("Radius"), &m_ConeRadius);
+  m_GuiCone->Double(CHANGE_VALUE_CONE,_("Resolution"), &m_ConeRes);
+  m_GuiCone->Bool(CHANGE_VALUE_CONE,"Cap", &m_ConeCapping); // Open or closed cone
+  assert(m_Gui);
+  m_Gui->AddGui(m_GuiCone);
+}
+
+void mafVMESurfaceParametric::CreateGuiSphere()
+{
+  m_GuiSphere = new mafGUI(this);
+  m_GuiSphere->Label("Sphere");
+  m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Radius"), &m_SphereRadius);
+  m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Phi res"), &m_SpherePhiRes);
+  m_GuiSphere->Double(CHANGE_VALUE_SPHERE,_("Theta res"), &m_SphereTheRes);
+  assert(m_Gui);
+  m_Gui->AddGui(m_GuiSphere);
+
+}
+
+void mafVMESurfaceParametric::EnableGuiPlane()
+{
+  m_GuiPlane->Enable(CHANGE_VALUE_PLANE, true);
+  m_GuiCube->Enable(CHANGE_VALUE_CUBE, false);
+  m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
+  m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
+  m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
+}
+
+void mafVMESurfaceParametric::EnableGuiCube()
+{
+  m_GuiPlane->Enable(CHANGE_VALUE_PLANE, false);
+  m_GuiCube->Enable(CHANGE_VALUE_CUBE, true);
+  m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
+  m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
+  m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
+  
+}
+
+void mafVMESurfaceParametric::EnableGuiCylinder()
+{
+  m_GuiPlane->Enable(CHANGE_VALUE_PLANE, false);
+  m_GuiCube->Enable(CHANGE_VALUE_CUBE, false);
+  m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, true);
+  m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
+  m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
+
+}
+
+void mafVMESurfaceParametric::EnableGuiCone()
+{
+  m_GuiPlane->Enable(CHANGE_VALUE_PLANE, false);
+  m_GuiCube->Enable(CHANGE_VALUE_CUBE, false);
+  m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
+  m_GuiCone->Enable(CHANGE_VALUE_CONE, true);
+  m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
+  
+}
+
+void mafVMESurfaceParametric::EnableGuiSphere()
+{
+  m_GuiPlane->Enable(CHANGE_VALUE_PLANE, false);
+  m_GuiCube->Enable(CHANGE_VALUE_CUBE, false);
+  m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
+  m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
+  m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, true);
+
+}
+
+void mafVMESurfaceParametric::EnableParametricSurfaceGui( int surfaceTypeID )
+{
+  switch(surfaceTypeID)
+  {
+    case PARAMETRIC_SPHERE:
+       EnableGuiSphere();
+       
+       if (DEBUG_MODE)
+         {
+           std::ostringstream stringStream;
+           stringStream << "enabling Sphere gui" << std::endl;
+           mafLogMessage(stringStream.str().c_str());
+         }
+    break;
+  
+    case PARAMETRIC_CONE:
+      EnableGuiCone();
+      if (DEBUG_MODE)
+      {
+        std::ostringstream stringStream;
+        stringStream << "enabling Cone gui" << std::endl;
+        mafLogMessage(stringStream.str().c_str());
+      }
+
+    break;
+    
+    case PARAMETRIC_CYLINDER:
+      EnableGuiCylinder();
+      if (DEBUG_MODE)
+      {
+        std::ostringstream stringStream;
+        stringStream << "enabling Cylinder gui" << std::endl;
+        mafLogMessage(stringStream.str().c_str());
+      }
+
+    break;
+  
+    case PARAMETRIC_CUBE:
+      EnableGuiCube();
+      if (DEBUG_MODE)
+      {
+        std::ostringstream stringStream;
+        stringStream << "enabling Cube gui" << std::endl;
+        mafLogMessage(stringStream.str().c_str());
+      }
+
+    break;
+
+    case PARAMETRIC_PLANE:
+      EnableGuiPlane();
+      if (DEBUG_MODE)
+      {
+        std::ostringstream stringStream;
+        stringStream << "enabling Plane gui" << std::endl;
+        mafLogMessage(stringStream.str().c_str());
+      }
+
+    break;
+    
+    default:
+      break;
+  }
 }
