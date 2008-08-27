@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-27 11:25:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-08-27 11:35:39 $
+  Version:   $Revision: 1.7 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -26,10 +26,9 @@ class mafNode;
 class mmaMaterial;
 class mafVMEOutputSurface;
 class vtkPolyData;
-class mafGUIRollOut;
 
-/** mafVMESurfaceParametric - this class represents a parametric surface that is a specific geometry 
-like cylinder, sphere, cube.
+/** mafVMESurfaceParametric - this class represents a parametric surface that is a specific geometry.
+currently generated geometries are: cylinder, sphere, cube, cone and plane.
 */
 class MAF_EXPORT mafVMESurfaceParametric : public mafVME
 {
@@ -47,7 +46,7 @@ public:
     PARAMETRIC_PLANE,
   };
 
-  /** Set the geegometry type to be generated: use PARAMETRIC_SURFACE_TYPE_ID as arg*/
+  /** Set the geometry type to be generated: use PARAMETRIC_SURFACE_TYPE_ID as arg*/
   void SetGeometryType(int parametricSurfaceTypeID);
 
   /** Set the radius for the parametric sphere.*/

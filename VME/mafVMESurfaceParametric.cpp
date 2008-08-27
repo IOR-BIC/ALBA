@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-27 11:25:07 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-08-27 11:35:39 $
+  Version:   $Revision: 1.17 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,7 +31,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafEventSource.h"
 #include "mafTransform.h"
 #include "mafGUI.h"
-#include "mafGUIRollOut.h"
 #include "mmaMaterial.h"
 #include "mafVMEOutputSurface.h"
 #include "mafDataPipeCustom.h"
