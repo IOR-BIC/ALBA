@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpOpenExternalFile.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-18 12:51:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-08-27 09:47:31 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -64,7 +64,8 @@ void mafOpOpenExternalFile::OpRun()
 {
 	wxString file, ext, mime, command2execute;
 
-	file = ((mafVMEExternalData *)(this->m_Input))->GetAbsoluteFileName().GetCStr();
+	mafString fileString = ((mafVMEExternalData *)(this->m_Input))->GetAbsoluteFileName().GetCStr();
+  file = fileString.ParsePathName();
 	ext = ((mafVMEExternalData *)(this->m_Input))->GetExtension();
 
 	wxFileType *filetype;
