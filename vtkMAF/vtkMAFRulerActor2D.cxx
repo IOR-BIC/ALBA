@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:37:56 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-08-28 10:48:16 $
+  Version:   $Revision: 1.5 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.5 $");
 vtkStandardNewMacro(vtkMAFRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFRulerActor2D::vtkMAFRulerActor2D()
@@ -750,12 +750,12 @@ void vtkMAFRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     char caption[100];
     sprintf(caption, "%s%s %s", sign,  m_Text[x_index], Legend);
     HorizontalAxesLabel->SetInput(caption);
-    HorizontalAxesLabel->SetDisplayPosition(Position[0]+rwWidth - margin, Position[1]+margin + 4);
+    HorizontalAxesLabel->SetDisplayPosition(rwWidth - (margin>0?margin:-margin) , (margin>0?margin:-margin) + 4);
 
     sign = (w1Y-w0Y > 0) ? (char *)" " : (char *)"-";
     sprintf(caption, "%s%s %s", sign, m_Text[y_index], Legend);
     VerticalAxesLabel->SetInput(caption);
-    VerticalAxesLabel->SetDisplayPosition( Position[0]+margin, Position[1]+rwHeight - margin/2);
+    VerticalAxesLabel->SetDisplayPosition( (margin>0?margin:-margin), rwHeight - (margin>0?margin:-margin)/2);
   }
 
   char lab[50];
