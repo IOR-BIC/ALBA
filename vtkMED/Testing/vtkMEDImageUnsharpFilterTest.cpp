@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDImageUnsharpFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-28 10:02:58 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-08-28 10:37:40 $
+Version:   $Revision: 1.2 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -101,7 +101,7 @@ void vtkMEDImageUnsharpFilterTest::TestUnsharp()
   m_TestNumber = ID_UNSHARP_TEST;
   
   mafString filename = MED_DATA_ROOT;
-  filename<<"/unsharpTest.bmp";
+  filename<<"/ImageFilters/unsharpTest.bmp";
 
   //load an image
   vtkBMPReader *r = vtkBMPReader::New();
