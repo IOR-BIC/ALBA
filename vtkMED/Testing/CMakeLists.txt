@@ -26,6 +26,8 @@ ADD_EXECUTABLE(vtkMEDPastValuesListTest vtkMEDPastValuesListTest.h vtkMEDPastVal
 ADD_TEST(vtkMEDPastValuesListTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDPastValuesListTest)
 ADD_EXECUTABLE(vtkMEDPolyDataMirrorTest vtkMEDPolyDataMirrorTest.h vtkMEDPolyDataMirrorTest.cpp)
 ADD_TEST(vtkMEDPolyDataMirrorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDPolyDataMirrorTest)
+ADD_EXECUTABLE(vtkMEDImageUnsharpFilterTest vtkMEDImageUnsharpFilterTest.h vtkMEDImageUnsharpFilterTest.cpp)
+ADD_TEST(vtkMEDImageUnsharpFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDImageUnsharpFilterTest)
 
 
 
