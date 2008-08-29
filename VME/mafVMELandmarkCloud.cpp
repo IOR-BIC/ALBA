@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-29 15:43:43 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2008-08-29 15:57:57 $
+  Version:   $Revision: 1.34 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-const bool DEBUG_MODE = true;
+const bool DEBUG_MODE = false;
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
