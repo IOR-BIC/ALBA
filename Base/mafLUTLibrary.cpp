@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 08:47:02 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-09-01 08:15:30 $
+Version:   $Revision: 1.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -27,10 +27,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkLookupTable.h"
 #include "vtkMAFSmartPointer.h"
 
-#include <iostream>
-#include <fstream>
+//#include <iostream>
+//#include <fstream>
 
-using namespace std;
+//using namespace std;
 
 const bool DEBUG_MODE = false;
 
@@ -38,14 +38,14 @@ const bool DEBUG_MODE = false;
 void mafLUTLibrary::Clear(bool removeLibraryFromDisk)
 {
   // destroy lib
-  map<string, vtkLookupTable *>::iterator it;
+  std::map<std::string, vtkLookupTable *>::iterator it;
 
   for(it = m_LutMap.begin(); it != m_LutMap.end(); it++)
   {
     vtkLookupTable *lut = (*it).second;
     if (DEBUG_MODE)
       {
-        string lutName = (*it).first;
+	std::string lutName = (*it).first;
         std::ostringstream stringStream;
         stringStream << "destroying lut:" << lutName << " at " << lut << std::endl;
         mafLogMessage(stringStream.str().c_str());
@@ -256,13 +256,13 @@ void mafLUTLibrary::Save()
   wxMkdir(m_LibraryDir.GetCStr());
   assert(wxDirExists(m_LibraryDir.GetCStr()));
 
-  map<string, vtkLookupTable *>::iterator it;
+  std::map<std::string, vtkLookupTable *>::iterator it;
 
   for(it = m_LutMap.begin(); it != m_LutMap.end(); it++)
   {
-    string s = (*it).first;
+    std::string s = (*it).first;
     vtkLookupTable *lut = (*it).second;
-    string absFileName = string(m_LibraryDir)  + "/" + s.append(".lut");
+    std::string absFileName = std::string(m_LibraryDir)  + "/" + s.append(".lut");
     SaveLUT(lut, absFileName.c_str());
   }  
 }
@@ -290,36 +290,36 @@ void mafLUTLibrary::Load()
   int numFiles = vtkDir->GetNumberOfFiles();
   for (int fileId = 0; fileId < numFiles; fileId++) 
   { 
-    string lutLocalFileName = vtkDir->GetFile(fileId);
+    std::string lutLocalFileName = vtkDir->GetFile(fileId);
     size_t foundPosition;
 
     foundPosition=lutLocalFileName.find(".lut");
 
     int nameLength = lutLocalFileName.size();
 
-    bool foundLUTExtensionInName = (foundPosition!=string::npos);
+    bool foundLUTExtensionInName = (foundPosition!=std::string::npos);
     bool isExtensionAtTheEndOfName = (nameLength - foundPosition)  == 4 ? true : false ;
 
     bool isLutFile = foundLUTExtensionInName && isExtensionAtTheEndOfName;
 
     if (isLutFile)
     {
-      cout << "found .lut at: " << int(foundPosition) << " in " << lutLocalFileName << endl;
-      string lutAbsFileName = string(m_LibraryDir.GetCStr()) + lutLocalFileName;
+      cout << "found .lut at: " << int(foundPosition) << " in " << lutLocalFileName << std::endl;
+      std::string lutAbsFileName = std::string(m_LibraryDir.GetCStr()) + lutLocalFileName;
       assert(wxFileExists(lutAbsFileName.c_str()));
 
-      string lutName = lutLocalFileName.erase(foundPosition);
+      std::string lutName = lutLocalFileName.erase(foundPosition);
       vtkLookupTable *vtkLut = vtkLookupTable::New();
       LoadLUT(lutAbsFileName.c_str(), vtkLut);
       m_LutMap[lutName] = vtkLut;
     }
   }  
 
-  map<string, vtkLookupTable *>::iterator it;
+  std::map<std::string, vtkLookupTable *>::iterator it;
 
   for(it = m_LutMap.begin(); it != m_LutMap.end(); it++)
   {
-    string s = (*it).first;
+    std::string s = (*it).first;
     mafLogMessage(s.c_str());
   }
 
@@ -330,18 +330,18 @@ void mafLUTLibrary::Load()
 int mafLUTLibrary::Remove( const char *lutName )
 {
 
-  map<string, vtkLookupTable *>::const_iterator it;
+  std::map<std::string, vtkLookupTable *>::const_iterator it;
   it = m_LutMap.find(lutName);
 
   if (it == m_LutMap.end())
   {
     cout << "The LUT lib doesn't have an element "
-      << "with key: " << lutName << endl;
+      << "with key: " << lutName << std::endl;
     return MAF_ERROR;
   }
   else
   {
-    cout << "removing element: " << lutName << endl;
+    cout << "removing element: " << lutName << std::endl;
     vtkLookupTable *lut = m_LutMap[lutName];
     lut->Delete();
     m_LutMap.erase(lutName);
@@ -362,13 +362,13 @@ int mafLUTLibrary::GetNumberOfLuts()
   return m_LutMap.size();
 }
 
-void mafLUTLibrary::GetLutNames( vector<string> &names )
+void mafLUTLibrary::GetLutNames( std::vector<std::string> &names )
 {
-  map<string, vtkLookupTable *>::iterator it;
+  std::map<std::string, vtkLookupTable *>::iterator it;
 
   for(it = m_LutMap.begin(); it != m_LutMap.end(); it++)
   {
-    string lutName = (*it).first;
+    std::string lutName = (*it).first;
     names.push_back(lutName);      
   }
 }
@@ -387,13 +387,13 @@ vtkLookupTable *mafLUTLibrary::GetLutByName(const char *name)
 
 bool mafLUTLibrary::HasLut(const char *name)
 {
-  map<string, vtkLookupTable *>::const_iterator it;
+  std::map<std::string, vtkLookupTable *>::const_iterator it;
   it = m_LutMap.find(name);
 
   if (it == m_LutMap.end())
   {
     cout << "The LUT lib doesn't have an element "
-      << "with key: " << name << endl;
+      << "with key: " << name << std::endl;
     return false;
   }
   else
