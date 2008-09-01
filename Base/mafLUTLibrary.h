@@ -2,34 +2,30 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafLUTLibrary.h,v $
 Language:  C++
-Date:      $Date: 2008-06-03 16:50:34 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-09-01 08:15:11 $
+Version:   $Revision: 1.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-using namespace std;
-
-#ifndef __CPP_UNIT_mafLUTLibrary_H__
-#define __CPP_UNIT_mafLUTLibrary_H__
-
-#include <map>
-#include <vector>
+#ifndef __mafLUTLibrary_H__
+#define __mafLUTLibrary_H__
 
 #include "mafString.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkLookupTable.h"
 
+#include <map>
+#include <vector>
+
 /** A component to handle lookup table libraries */
 class mafLUTLibrary
 {
-
 public:
-
-  mafLUTLibrary::mafLUTLibrary();
-  mafLUTLibrary::~mafLUTLibrary();
+  mafLUTLibrary();
+  ~mafLUTLibrary();
 
   /** set get the library directory */
   void SetDir(const char *dir);
@@ -52,7 +48,7 @@ public:
   int GetNumberOfLuts();
 
   /** return the lut names vector */
-  void GetLutNames(vector<string> &names);
+  void GetLutNames(std::vector<std::string> &names);
 
   /** get a lut by name */
   vtkLookupTable *GetLutByName(const char *name);
@@ -66,14 +62,11 @@ public:
   void PrintLut( std::ostringstream &stringStream, vtkLookupTable *lut );
 
 private:
-
-  map<string, vtkLookupTable *> m_LutMap;
+  std::map<std::string, vtkLookupTable *> m_LutMap;
   mafString m_LibraryDir;
 
   void RemoveLUTFromDisk(const char *lutName);
   void LoadLUT( const char *inLutFileName, vtkLookupTable *targetLut);
-  void SaveLUT( vtkLookupTable *inLut, const char *outFileName);
-  
- 
+  void SaveLUT( vtkLookupTable *inLut, const char *outFileName); 
 };
 #endif
