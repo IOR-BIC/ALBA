@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutEditor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-09-01 08:21:53 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -111,7 +111,7 @@ mafGUILutEditor::mafGUILutEditor(wxWindow* parent, wxWindowID id, const wxPoint&
 
   int userLutPresetNum = m_UserLutLibrary->GetNumberOfLuts();
   
-  vector<string> lutNames;
+  std::vector<std::string> lutNames;
   m_UserLutLibrary->GetLutNames(lutNames);
 
   wxArrayString userLutNames;
