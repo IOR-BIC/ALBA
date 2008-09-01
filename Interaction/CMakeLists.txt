@@ -190,7 +190,7 @@ ENDIF (WIN32)
 #ENDIF (WIN32)
 
 # List libraries that are needed by this project.
-SET(PROJECT_LIBS mafBase mafIO mafGUI vtkMAF)
+SET(PROJECT_LIBS mafBase mafIO mafGui vtkMAF)
 
 # currently special drivers only supported under WIN32
 #IF (WIN32)
