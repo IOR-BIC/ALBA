@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-29 15:57:57 $
-  Version:   $Revision: 1.34 $
+  Date:      $Date: 2008-09-03 15:14:53 $
+  Version:   $Revision: 1.35 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -46,6 +46,7 @@ const bool DEBUG_MODE = false;
 
 #include <vector>
 
+#include <wx/busyinfo.h>
 //------------------------------------------------------------------------------
 // local defines
 //------------------------------------------------------------------------------
@@ -203,7 +204,9 @@ int mafVMELandmarkCloud::GetNumberOfLandmarks()
   else
   {
     int num = 0;
-    for (int i = 0; i < GetNumberOfChildren(); i++)
+    int numberOfChildren = GetNumberOfChildren();
+
+    for (int i = 0; i < numberOfChildren; i++)
     {
       mafVMELandmark *vme = mafVMELandmark::SafeDownCast(GetChild(i));
       if (vme)
@@ -338,15 +341,18 @@ void mafVMELandmarkCloud::RemoveLandmarkName(int idx)
 }
 
 //-------------------------------------------------------------------------
-int mafVMELandmarkCloud::AppendLandmark(const char *name)
+int mafVMELandmarkCloud::AppendLandmark(const char *name, bool checkForDuplicatedNames)
 //-------------------------------------------------------------------------
 {
-  if (FindLandmarkIndex(name) >= 0)
+  if (checkForDuplicatedNames)
   {
-    mafErrorMacro("Cannot add new landmark \""<<name<<"\": a landmark with the same name already exists!!!");
-    return -1;
+    if (FindLandmarkIndex(name) >= 0)
+    {
+      mafErrorMacro("Cannot add new landmark \""<<name<<"\": a landmark with the same name already exists!!!");
+      return -1;
+    }
   }
-
+  
   int old = GetNumberOfLandmarks();
   int ret = SetNumberOfLandmarks(old+1);
 
@@ -450,7 +456,9 @@ int mafVMELandmarkCloud::FindLandmarkIndex(const char *name)
 //-------------------------------------------------------------------------
 {
   mafString lmname;
-  for (int i = 0; i < GetNumberOfLandmarks(); i++)
+  int numberOfLandmarks = GetNumberOfLandmarks();
+
+  for (int i = 0; i < numberOfLandmarks; i++)
   {
     lmname = GetLandmarkName(i);
     if (lmname == name)
@@ -744,7 +752,14 @@ void mafVMELandmarkCloud::Close()
   // could change in the future having also position to be synchronous.
   int idx = 0;
   std::vector<mafVMELandmark *> landmarks;
-	for (int c = 0; c < GetNumberOfChildren();c++)
+  int numberOfChildren = GetNumberOfChildren();
+
+  long progress = 0;
+  wxBusyInfo wait("Collapsing cloud...");
+
+  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
+
+  for (int c = 0; c < numberOfChildren;c++)
   {
     if (mafVMELandmark *lm = mafVMELandmark::SafeDownCast(GetChild(c)))
     {
@@ -841,6 +856,9 @@ void mafVMELandmarkCloud::Close()
 
       landmarks.push_back(lm); 
     }
+    progress = c * 100 / numberOfChildren;
+    ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
+
   }
   
   // remove all child landmarks
@@ -857,6 +875,7 @@ void mafVMELandmarkCloud::Close()
     
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
+  ForwardUpEvent(mafEvent(this,PROGRESSBAR_HIDE));
 }
 
 //-------------------------------------------------------------------------
@@ -868,6 +887,10 @@ void mafVMELandmarkCloud::Open()
     mafWarningMacro("Cloud " << GetName() << " already open!!");
     return;
   }
+
+  wxBusyInfo wait("Exploding cloud...");
+  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
+  long progress  = 0;
 
   int i,numlm = GetNumberOfLandmarks();
   for (i = 0; i < numlm; i++)
@@ -912,6 +935,9 @@ void mafVMELandmarkCloud::Open()
         mafErrorMacro("Open: problems retrieving polydata for timestamp: " << item->GetTimeStamp());
       }
 		}
+    progress = i * 100 / numlm;
+    ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
+
 	}
   // remove all items and tags...
   m_DataVector->RemoveAllItems();
@@ -922,6 +948,10 @@ void mafVMELandmarkCloud::Open()
   SetState(OPEN_CLOUD);
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
+
+  
+  ForwardUpEvent(mafEvent(this,PROGRESSBAR_HIDE));
+
 }
 
 //-------------------------------------------------------------------------
