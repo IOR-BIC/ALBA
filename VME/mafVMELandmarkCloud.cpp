@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-03 15:14:53 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2008-09-03 16:36:51 $
+  Version:   $Revision: 1.36 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -755,9 +755,9 @@ void mafVMELandmarkCloud::Close()
   int numberOfChildren = GetNumberOfChildren();
 
   long progress = 0;
-  wxBusyInfo wait("Collapsing cloud...");
 
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
+  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Collapsing cloud")));
 
   for (int c = 0; c < numberOfChildren;c++)
   {
@@ -888,8 +888,8 @@ void mafVMELandmarkCloud::Open()
     return;
   }
 
-  wxBusyInfo wait("Exploding cloud...");
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
+  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
   long progress  = 0;
 
   int i,numlm = GetNumberOfLandmarks();
