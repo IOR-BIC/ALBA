@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:10:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-09-03 15:15:35 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,8 @@
 #include "mafSmartPointer.h"
 
 #include <fstream>
+
+const bool DEBUG_MODE = true;
 
 //----------------------------------------------------------------------------
 // Constants :
@@ -235,16 +237,41 @@ void medOpImporterLandmark::Read()
 void medOpImporterLandmark::ReadWithoutTag()   
 //----------------------------------------------------------------------------
 {
-	mafNEW(m_VmeCloud);
+ 	mafNEW(m_VmeCloud);
   m_VmeCloud->Open();
+
+  // need the number of landmarks for the progress bar
+  std::ifstream  landmarkNumberPromptFileStream(m_File);
+  int numberOfLandmarks = 0;
+  char tmp[200];
+  while(!landmarkNumberPromptFileStream.fail())
+  {
+    landmarkNumberPromptFileStream.getline(tmp,200);
+    numberOfLandmarks += 1;
+  }
+  landmarkNumberPromptFileStream.close();
+
+  if (DEBUG_MODE)
+  {
+    std::ostringstream stringStream;
+    stringStream << "Number of landmarks: " << numberOfLandmarks  << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+  }
+
+  // end  number of lm check
 
   std::ifstream  landmarkFileStream(m_File);
 
   char x[10];
   char y[10];
   char z[10];
+  
+  long counter = 0; 
+  long progress = 0;
 
-  long counter = 0;
+  wxBusyInfo wait("Reading landmark cloud...");
+  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+
   while(!landmarkFileStream.fail())
   {
 
@@ -261,12 +288,17 @@ void medOpImporterLandmark::ReadWithoutTag()
     landmarkFileStream >> y;
     landmarkFileStream >> z;
     
-    m_VmeCloud->AppendLandmark(mafString(counter));
+    // todo: optimize this append
+    m_VmeCloud->AppendLandmark(mafString(counter), false);
     m_VmeCloud->SetLandmark(counter, atof(x) ,atof(y) ,atof(z),0);
     //m_VmeCloud->GetLandmark(counter)->SetRadius(5);
     if(atof(x) == -9999 && atof(y) == -9999 && atof(z) == -9999 )
       m_VmeCloud->SetLandmarkVisibility(counter, 0, 0);
     counter++;
+
+    progress = counter * 100 / numberOfLandmarks;
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
+
   }
   m_VmeCloud->Close();
   m_VmeCloud->Modified();
@@ -274,5 +306,6 @@ void medOpImporterLandmark::ReadWithoutTag()
 
   landmarkFileStream.close();
 
+  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   m_Output = m_VmeCloud;
 }
