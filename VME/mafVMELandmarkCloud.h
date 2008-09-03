@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-03 15:14:53 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-09-03 15:21:45 $
+  Version:   $Revision: 1.21 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -74,7 +74,10 @@ public:
   Add a new landmark an returns its index. BEWARE: landmark is added to all the
   VME-items, and its position should for each time frame by means SetPoint()
   The second syntax is used to add points in t=0, and is used in place of corresponding
-  function of ex. RigidLandmarkClouds*/
+  function of ex. RigidLandmarkClouds.
+  The check for duplicates flag is used to inhibit append if the cloud contains a landmark 
+  with the same name already. Set this flag to false for faster appending. 
+*/
   int AppendLandmark(const char *name, bool checkForDuplicatedNames = true);
   int AppendLandmark(double x,double y,double z,const char *name, bool checkForDuplicatedNames = true) {int idx=this->AppendLandmark(name, checkForDuplicatedNames); return this->SetLandmark(idx, x, y, z);}
 
