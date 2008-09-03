@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-09-03 12:26:42 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,6 +86,12 @@ public:
   
 	/** Remove one point for the gradient transfer function. */
 	void RemoveOpacityGradPoint(int scalarPoint);
+
+	/** Set ShadeOn HiRes prop. */
+	void VolumePropertyHighShadeOn(void);
+
+	/** Set ShadeOff HiRes prop. */
+	void VolumePropertyHighShadeOff(void);
 
 	void SetResampleFactor(double value);
 	double GetResampleFactor();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-09-03 12:26:42 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -230,7 +230,7 @@ void medPipeVolumeVR::Create(mafSceneNode *n)
 	m_VolumePropertyHigh->SetColor(m_ColorTransferFunction);
 	m_VolumePropertyHigh->SetScalarOpacity(m_PiecewiseFunction);
 	m_VolumePropertyHigh->SetGradientOpacity(m_GradientFunction);
-	m_VolumePropertyHigh->DisableGradientOpacityOff();
+	//m_VolumePropertyHigh->DisableGradientOpacityOff();
 	m_VolumePropertyHigh->SetInterpolationTypeToLinear();
 	m_VolumePropertyHigh->ShadeOn();
 	//m_VolumePropertyHigh->SetAmbient(0.1);
@@ -243,7 +243,7 @@ void medPipeVolumeVR::Create(mafSceneNode *n)
 	m_VolumePropertyLow->SetColor(m_ColorTransferFunction);
 	m_VolumePropertyLow->SetScalarOpacity(m_PiecewiseFunction);
 	m_VolumePropertyLow->SetGradientOpacity(m_GradientFunction);
-	m_VolumePropertyLow->DisableGradientOpacityOff();
+	//m_VolumePropertyLow->DisableGradientOpacityOff();
 	m_VolumePropertyLow->ShadeOff();
 	
 	m_PropertyLOD = vtkProperty::New();
@@ -536,7 +536,6 @@ void medPipeVolumeVR::RemoveColorPoint(int scalarPoint)
 {
 	m_ColorTransferFunction->RemovePoint((double)scalarPoint);	
 }
-
 //----------------------------------------------------------------------------
 void medPipeVolumeVR::RemoveOpacityGradPoint(int scalarPoint)
 //----------------------------------------------------------------------------
@@ -638,4 +637,19 @@ void medPipeVolumeVR::SetResampleFactor(double value)
 
 	if(m_Gui)
 		m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeVR::VolumePropertyHighShadeOn()
+//----------------------------------------------------------------------------
+{
+	m_VolumePropertyHigh->ShadeOn();
+	m_VolumePropertyHigh->Modified();
+
+}
+//----------------------------------------------------------------------------
+void medPipeVolumeVR::VolumePropertyHighShadeOff()
+//----------------------------------------------------------------------------
+{
+	m_VolumePropertyHigh->ShadeOff();
+	m_VolumePropertyHigh->Modified();
 }
