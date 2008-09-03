@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-03 15:15:35 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-09-03 16:37:23 $
+  Version:   $Revision: 1.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -269,7 +269,11 @@ void medOpImporterLandmark::ReadWithoutTag()
   long counter = 0; 
   long progress = 0;
 
-  wxBusyInfo wait("Reading landmark cloud...");
+  if (!m_TestMode)
+  {
+    wxBusyInfo wait("Reading landmark cloud");
+  }
+
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 
   while(!landmarkFileStream.fail())
