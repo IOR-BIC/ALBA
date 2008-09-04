@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:05 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-09-04 10:32:02 $
+  Version:   $Revision: 1.9 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -63,6 +63,7 @@ mmaVolumeMaterial::mmaVolumeMaterial()
   m_TableRange[0]       = 0.0;
   m_TableRange[1]       = -1.0; // this is an invalid range, needed to be checked by visual pipe, 
                                 // that if them found it invalid, initialize with data range
+  m_GammaCorrection     = 1.0;
   m_NumValues           = 128;
   m_InterpolationType   = 0;
   m_Shade               = 0;
@@ -101,6 +102,7 @@ void mmaVolumeMaterial::DeepCopy(const mafAttribute *a)
   m_SaturationRange[1]  = ((mmaVolumeMaterial *)a)->m_SaturationRange[1];
   m_TableRange[0]       = ((mmaVolumeMaterial *)a)->m_TableRange[0];
   m_TableRange[1]       = ((mmaVolumeMaterial *)a)->m_TableRange[1];
+  m_GammaCorrection     = ((mmaVolumeMaterial *)a)->m_GammaCorrection;
   m_NumValues           = ((mmaVolumeMaterial *)a)->m_NumValues;
   m_InterpolationType   = ((mmaVolumeMaterial *)a)->m_InterpolationType;
   m_Shade               = ((mmaVolumeMaterial *)a)->m_Shade;
@@ -120,6 +122,7 @@ bool mmaVolumeMaterial::Equals(const mafAttribute *a)
       m_SaturationRange[1]  == ((mmaVolumeMaterial *)a)->m_SaturationRange[1] &&
       m_TableRange[0]       == ((mmaVolumeMaterial *)a)->m_TableRange[0]      &&
       m_TableRange[1]       == ((mmaVolumeMaterial *)a)->m_TableRange[1]      &&
+      m_GammaCorrection     == ((mmaVolumeMaterial *)a)->m_GammaCorrection    &&
       m_InterpolationType   == ((mmaVolumeMaterial *)a)->m_InterpolationType  &&
       m_Shade               == ((mmaVolumeMaterial *)a)->m_Shade              &&
       m_NumValues           == ((mmaVolumeMaterial *)a)->m_NumValues);
@@ -144,6 +147,7 @@ int mmaVolumeMaterial::InternalStore(mafStorageElement *parent)
     parent->StoreDouble("SaturationRange1", m_SaturationRange[1]);
     parent->StoreDouble("TableRange0", m_TableRange[0]);
     parent->StoreDouble("TableRange1", m_TableRange[1]);
+    parent->StoreDouble("GammaCorrection", m_GammaCorrection);
     parent->StoreInteger("NumValues", m_NumValues);
     mafString lutvalues;
     double *rgba;
@@ -201,6 +205,7 @@ int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreDouble("SaturationRange1", m_SaturationRange[1]);
     node->RestoreDouble("TableRange0", m_TableRange[0]);
     node->RestoreDouble("TableRange1", m_TableRange[1]);
+    node->RestoreDouble("GammaCorrection", m_GammaCorrection);
     node->RestoreInteger("NumValues", m_NumValues);
     m_ColorLut->SetNumberOfTableValues(m_NumValues);
     mafString lutvalues;
@@ -218,6 +223,7 @@ int mmaVolumeMaterial::InternalRestore(mafStorageElement *node)
     node->RestoreInteger("InterpolationType", m_InterpolationType);
     node->RestoreInteger("Shade", m_Shade);
     node->RestoreInteger("NumOpacityValues", m_NumOpacityValues);
+
     double point[2];
     int p;
     for (p = 0; p < m_NumOpacityValues; p++)
@@ -269,6 +275,36 @@ void mmaVolumeMaterial::UpdateFromTables()
   m_ColorLut->GetTableRange(m_TableRange);
   m_Window_LUT = m_TableRange[1] - m_TableRange[0];
   m_Level_LUT  = (m_TableRange[1] + m_TableRange[0])* .5;
+}
+//-----------------------------------------------------------------------
+void mmaVolumeMaterial::ApplyGammaCorrection(const int preset)
+//-----------------------------------------------------------------------
+{
+  if (-1 != preset)
+  {
+    lutPreset(preset, m_ColorLut);
+  }
+  
+  if(1.0 == m_GammaCorrection)
+  {
+    //useless calculation
+    return;
+  }
+  for(int i=0; i<m_NumValues;i++)
+  {
+    double rgba[4];
+    m_ColorLut->GetTableValue(i,rgba);
+    rgba[0] = pow(rgba[0], 1./m_GammaCorrection);
+    rgba[0] = rgba[0] < 0. ?  0.: rgba[0];
+    rgba[0] = rgba[0] > 1. ?  1.: rgba[0];
+    rgba[1] = pow(rgba[1], 1./m_GammaCorrection);
+    rgba[1] = rgba[1] < 0. ?  0.: rgba[1];
+    rgba[1] = rgba[1] > 1. ?  1.: rgba[1];
+    rgba[2] = pow(rgba[2], 1./m_GammaCorrection);
+    rgba[2] = rgba[2] < 0. ?  0.: rgba[2];
+    rgba[2] = rgba[2] > 1. ?  1.: rgba[2];
+    m_ColorLut->SetTableValue(i,rgba);
+  }
 }
 //-----------------------------------------------------------------------
 void mmaVolumeMaterial::Print(std::ostream& os, const int tabs) const

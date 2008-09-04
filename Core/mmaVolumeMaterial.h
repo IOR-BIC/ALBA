@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:41:36 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-09-04 10:32:02 $
+  Version:   $Revision: 1.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,6 +54,9 @@ public:
   /** Used to update all member variables from LUT or Transfer Functions.*/
   void UpdateFromTables();
 
+  /** Used to apply gamma correction to lut preset, need preset in order to avoid recursive applying on the same lut*/
+  void ApplyGammaCorrection(int preset = -1);
+
   vtkLookupTable            *m_ColorLut;
   vtkPiecewiseFunction      *m_OpacityTransferFunction;
   vtkPiecewiseFunction      *m_GradientTransferFunction;
@@ -65,6 +68,7 @@ public:
 
   double m_Level_LUT;
   double m_Window_LUT;
+  double m_GammaCorrection;
   double m_HueRange[2];
   double m_SaturationRange[2];
   double m_TableRange[2];
