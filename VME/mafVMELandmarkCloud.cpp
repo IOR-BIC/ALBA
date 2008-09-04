@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-03 16:36:51 $
-  Version:   $Revision: 1.36 $
+  Date:      $Date: 2008-09-04 10:49:03 $
+  Version:   $Revision: 1.37 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -738,6 +738,8 @@ void mafVMELandmarkCloud::Close()
     return;
   }
 
+  wxBusyCursor wait;
+
   int num = GetNumberOfLandmarks();
   // change the state to closed to disable extra features
   SetState(CLOSED_CLOUD);
@@ -887,6 +889,7 @@ void mafVMELandmarkCloud::Open()
     mafWarningMacro("Cloud " << GetName() << " already open!!");
     return;
   }
+  wxBusyCursor wait;
 
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
