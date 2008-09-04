@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIValidator.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-09-04 10:23:38 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -943,7 +943,7 @@ void mafGUIValidator::OnScrollEvent(wxScrollEvent& event)
 				TransferFromWindow();
 				s.Printf("%g",*m_DoubleVar);
 				m_TextCtrl->SetValue(s);
-				mafEventMacro(mafEvent(m_FloatSlider, m_ModuleId));
+				mafEventMacro(mafEvent(m_FloatSlider, m_ModuleId, m_FloatSlider));
       break;
 		}
   }
