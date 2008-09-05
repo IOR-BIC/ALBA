@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 08:49:27 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2008-09-05 10:19:38 $
+  Version:   $Revision: 1.39 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -738,7 +738,18 @@ void mafVMELandmarkCloud::Close()
     return;
   }
 
-  wxBusyCursor wait;
+  wxBusyCursor *busyCursor = NULL;
+
+  try
+  {
+    busyCursor = new wxBusyCursor();
+  }
+  catch (...)
+  {
+    std::ostringstream stringStream;
+    stringStream << "cannot render busy cursor..."  << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+  }
 
   int num = GetNumberOfLandmarks();
   // change the state to closed to disable extra features
@@ -878,6 +889,11 @@ void mafVMELandmarkCloud::Close()
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_HIDE));
+
+  if (busyCursor)
+  {
+    delete busyCursor;
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -890,17 +906,19 @@ void mafVMELandmarkCloud::Open()
     return;
   }
 
+  wxBusyCursor *busyCursor = NULL;
+
   try
   {
-    wxBusyCursor wait;
+    busyCursor = new wxBusyCursor();
   }
   catch (...)
   {
-  	std::ostringstream stringStream;
-  	stringStream << "cannot render busy cursor..."  << std::endl;
-  	mafLogMessage(stringStream.str().c_str());
+    std::ostringstream stringStream;
+    stringStream << "cannot render busy cursor..."  << std::endl;
+    mafLogMessage(stringStream.str().c_str());
   }
-  
+
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
   long progress  = 0;
@@ -965,6 +983,10 @@ void mafVMELandmarkCloud::Open()
   
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_HIDE));
 
+  if (busyCursor)
+  {
+    delete busyCursor;
+  }
 }
 
 //-------------------------------------------------------------------------
