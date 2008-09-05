@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:25:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-09-05 11:11:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -92,7 +92,7 @@ void medGizmoInteractionDebugger::Constructor(mafNode *imputVme, mafObserver *li
 
   CreateVMEGizmo();
 
-  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo );
+  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, this );
 }
 //----------------------------------------------------------------------------
 void medGizmoInteractionDebugger::Destructor()
@@ -279,3 +279,8 @@ void medGizmoInteractionDebugger::LogTransformEvent( mafEvent *e )
   mafLogMessage(stringStream.str().c_str());
 }
 
+mafGUI * medGizmoInteractionDebugger::GetGui()
+{
+  assert(m_CurvilinearAbscissaHelper);
+  return m_CurvilinearAbscissaHelper->GetGui();
+}

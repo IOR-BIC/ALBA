@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:25:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-09-05 11:11:58 $
+  Version:   $Revision: 1.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,8 +34,8 @@ public:
   /** Get the polyline graph constraint */
   medVMEPolylineGraph *GetSetConstraintPolylineGraph() {return m_ConstraintVMEPolylineGraph;};
 
-  /** Set the curvilinear abscissa value s on branchId branch */
-  void SetCurvilinearAbscissa( vtkIdType branchId, double s );
+  /** Set the curvilinear abscissa value s on branchId branch, return MAF_OK or MAF_ERROR */
+  int SetCurvilinearAbscissa( vtkIdType branchId, double s );
   
   /** Get the curvilinear abscissa */
   double GetCurvilinearAbscissa() { return m_CurvilinearAbscissa;};

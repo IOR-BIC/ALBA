@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-31 09:25:26 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-09-05 11:12:35 $
+  Version:   $Revision: 1.13 $
   Authors:   Paolo Quadrani, Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -928,7 +928,7 @@ void medOpInteractiveClipSurface::AttachInteraction()
 {
   mafNEW(m_IsaCompositor);
 
-  m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
+  m_IsaTranslate = m_IsaCompositor->CreateBehavior( MOUSE_LEFT );
   m_IsaTranslate->SetListener(this);
   m_IsaTranslate->SetVME(m_ImplicitPlaneVMEGizmo);
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();

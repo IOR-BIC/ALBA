@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:12:22 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-09-05 11:12:35 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,7 +94,10 @@ void medOpInteractionDebugger::OpRun()
 }
 
 void medOpInteractionDebugger::CreateGui()
-{
+{  
+  this->AddMEDVMEPolylineGraphTestConstrain1ToTree();
+  this->AddMEDGizmoDebuggerToTree();
+
   m_Gui = new mafGUI(this);
   m_Gui->SetListener(this);
   m_Gui->Divider();
@@ -102,12 +105,12 @@ void medOpInteractionDebugger::CreateGui()
   m_Gui->Divider();
   m_Gui->Button(ID_CHOOSE, "Choose Constrain", "");
   m_Gui->Divider();
+  m_Gui->AddGui(m_GizmoDebugger->GetGui());
+  m_Gui->Divider();
   m_Gui->OkCancel();
 
   m_Gui->Update();
-  
-  this->AddMEDVMEPolylineGraphTestConstrain1ToTree();
-  this->AddMEDGizmoDebuggerToTree();
+
 }
 
 void medOpInteractionDebugger::OnEvent(mafEventBase *maf_event) 
@@ -556,5 +559,5 @@ void medOpInteractionDebugger::OpDo()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_GizmoDebugger);
-  RemoveTestConstraintGraph1FromTree();
+  // RemoveTestConstraintGraph1FromTree();
 }

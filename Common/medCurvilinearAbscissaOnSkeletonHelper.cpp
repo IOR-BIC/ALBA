@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-31 09:25:54 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-09-05 11:11:58 $
+  Version:   $Revision: 1.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -418,9 +418,39 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetConstraintPolylineGraph( medVMEP
   
 }
 
-void medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType branchId, double s )
+int medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType branchId, double s )
 { 
+  int numberOfBranches = m_ConstraintPolylineGraph->GetNumberOfBranches();
+
+  if (branchId < 0)
+  {
+    std::ostringstream stringStream;
+    stringStream << " please use an integer between 0 and " << numberOfBranches - 1 << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    return MAF_ERROR;          
+  }
+  if (branchId > numberOfBranches)
+  {
+    std::ostringstream stringStream;
+    stringStream << "Constrain has: " << numberOfBranches  << std::endl;
+    mafLogMessage(stringStream.str().c_str());      
+    return MAF_ERROR;
+  }
+
+  double length = m_ConstraintPolylineGraph->GetBranchLength(branchId);
+  
+  if (s  < 0 || s > length)
+  {
+    std::ostringstream stringStream;
+    stringStream << "Curvilinear abscissa must be between 0 and " << length\
+    << " for current to branch" << std::endl;
+    mafLogMessage(stringStream.str().c_str());          
+    return MAF_ERROR;
+  }
+
   m_CurvilinearAbscissa = s;
+  m_ActiveBranchId = branchId;
+
   mafMatrix outputGizmoAbsMatrix;
   GetAbsPose(m_ConstraintVMEPolylineGraph, branchId, s, outputGizmoAbsMatrix);
   m_InputVME->SetAbsMatrix(outputGizmoAbsMatrix, -1);
@@ -429,6 +459,9 @@ void medCurvilinearAbscissaOnSkeletonHelper::SetCurvilinearAbscissa( vtkIdType b
   m_GUIActiveBranchId = branchId;
   m_GUICurvilinearAbscissa = s;
   m_Gui->Update();
+
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  return MAF_OK;
 }
 
 void medCurvilinearAbscissaOnSkeletonHelper::GetAbsPose( medVMEPolylineGraph *inputConstrainVMEGraph, vtkIdType inBranchId, double s, mafMatrix &moverOutputAbsPose )
@@ -851,15 +884,26 @@ void medCurvilinearAbscissaOnSkeletonHelper::OnEvent(mafEventBase *maf_event)
     {
       case ID_BRANCH:
       {
-        SetCurvilinearAbscissa(m_GUIActiveBranchId, 0);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        int result = MAF_ERROR;
+        result = SetCurvilinearAbscissa(m_GUIActiveBranchId, 0);
+        if (result == MAF_ERROR)
+        {
+          m_GUIActiveBranchId = m_ActiveBranchId;
+          m_Gui->Update();
+        }
       }
       break;
 
       case ID_S:
       {
-        SetCurvilinearAbscissa(m_ActiveBranchId, m_GUICurvilinearAbscissa);
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        int result = MAF_ERROR;
+        result = SetCurvilinearAbscissa(m_ActiveBranchId, m_GUICurvilinearAbscissa);
+        if (result == MAF_ERROR)
+        {
+          m_GUICurvilinearAbscissa = m_CurvilinearAbscissa;
+          m_Gui->Update();
+        }
+
       }
       break;
 

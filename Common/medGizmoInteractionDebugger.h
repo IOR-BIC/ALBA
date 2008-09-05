@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-11 14:20:52 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-09-05 11:11:58 $
+  Version:   $Revision: 1.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -77,6 +77,9 @@ public:
 
   /** Set the gizmo color */
   void SetColor(double col[3]);
+
+  /** Get the gizmo gui */
+  mafGUI *GetGui();
 
 protected:
 
