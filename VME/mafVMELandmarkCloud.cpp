@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-04 10:49:03 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2008-09-05 08:49:27 $
+  Version:   $Revision: 1.38 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -889,8 +889,18 @@ void mafVMELandmarkCloud::Open()
     mafWarningMacro("Cloud " << GetName() << " already open!!");
     return;
   }
-  wxBusyCursor wait;
 
+  try
+  {
+    wxBusyCursor wait;
+  }
+  catch (...)
+  {
+  	std::ostringstream stringStream;
+  	stringStream << "cannot render busy cursor..."  << std::endl;
+  	mafLogMessage(stringStream.str().c_str());
+  }
+  
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
   ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
   long progress  = 0;
