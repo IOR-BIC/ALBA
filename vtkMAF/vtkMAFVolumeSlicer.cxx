@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-09-08 13:08:06 $
+  Version:   $Revision: 1.2 $
 
 =========================================================================*/
 
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer, "$Revision: 1.2 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer);
 
 typedef unsigned short u_short;
@@ -227,7 +227,11 @@ void vtkMAFVolumeSlicer::ExecuteInformation()
         float maxSpacing = max(maxS - minS, maxT - minT);
         spacing[0] = spacing[1] = max(maxSpacing, 1.e-8f);
         output->SetSpacing(spacing);
-        if (fabs(minT) > 1.e-3 || fabs(minS) > 1.e-3) 
+
+        // http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1180
+        // Totally heuristic bug fix: magicNumber was 1.e-3 before.
+        const float magicNumber = 1.e-5;
+        if (fabs(minT) > magicNumber || fabs(minS) > magicNumber) 
         {
           this->GlobalPlaneOrigin[0] += minT * this->GlobalPlaneAxisX[0] * dims[0] + minS * this->GlobalPlaneAxisY[0] * dims[1];
           this->GlobalPlaneOrigin[1] += minT * this->GlobalPlaneAxisX[1] * dims[0] + minS * this->GlobalPlaneAxisY[1] * dims[1];
