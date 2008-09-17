@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-29 09:01:22 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2008-09-17 14:03:38 $
+  Version:   $Revision: 1.15 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -107,7 +107,8 @@ enum ANIMATE_KIT_WIDGET_ID
 	ID_INTERPOLATE,
 	ID_DELETE,
 	ID_RENAME,
-  ID_ANIMATE
+  ID_ANIMATE,
+  ID_REFRESH
 };
 //----------------------------------------------------------------------------
 void mafAnimate::CreateGui()
@@ -131,18 +132,29 @@ void mafAnimate::CreateGui()
 	m_StorePositionButton  = new mafGUIButton (m_Gui,ID_STORE, "store", dp,bs);
   m_RenamePositionButton = new mafGUIButton (m_Gui,ID_RENAME,"rename",dp,bs);
   m_DeletePositionButton = new mafGUIButton (m_Gui,ID_DELETE,"delete",dp,bs);
-	m_StorePositionButton->SetListener(this);
+  
+  m_StorePositionButton->SetListener(this);
 	m_RenamePositionButton->SetListener(this);
 	m_DeletePositionButton->SetListener(this);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(lab,      0, wxRIGHT, lm);
-	sizer->Add(m_StorePositionButton,  0, wxRIGHT, wm);
-	sizer->Add(m_RenamePositionButton, 0, wxRIGHT, wm);
-	sizer->Add(m_DeletePositionButton, 0, wxRIGHT, wm);
+	sizer->Add(m_StorePositionButton,   0, wxRIGHT, wm);
+	sizer->Add(m_RenamePositionButton,  0, wxRIGHT, wm);
+	sizer->Add(m_DeletePositionButton,  0, wxRIGHT, wm);
   m_Gui->Add(sizer,0,wxALL,rm); 
 
 	m_PositionList = m_Gui->ListBox(ID_LIST," ");
+
+  wxStaticText *labRefresh = new wxStaticText(m_Gui,-1,"        ",dp,wxSize(lw,bh));
+  m_RefreshPositionButton = new mafGUIButton (m_Gui,ID_REFRESH,"refresh",dp,bs);
+  m_RefreshPositionButton->SetListener(this);
+
+  wxBoxSizer *sizerRefresh = new wxBoxSizer(wxHORIZONTAL);
+  sizerRefresh->Add(labRefresh,      0, wxRIGHT, lm);
+  sizerRefresh->Add(m_RefreshPositionButton,  0, wxRIGHT, wm);
+  m_Gui->Add(sizerRefresh,0,wxALL,rm); 
+
 	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag, 1);
   
   m_AnimatePlayer = new mafGUIMovieCtrl(m_Gui);
@@ -164,20 +176,33 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
     {
       case ID_STORE:
       case MOVIE_RECORD:
+        m_PositionList->Clear();
+        RetrieveStoredPositions();
         StoreViewPoint();
         EnableWidgets();
       break;
       case ID_DELETE:
+        m_PositionList->Clear();
+        RetrieveStoredPositions();
         DeleteViewPoint(m_PositionList->GetSelection());
         EnableWidgets();
       break;
       case ID_RENAME:
+        m_PositionList->Clear();
+        RetrieveStoredPositions();
         RenameViewPoint();
       break;
       case ID_LIST:
+        m_PositionList->Clear();
+        RetrieveStoredPositions();
         FlyTo();
         EnableWidgets();
       break;
+      case ID_REFRESH:
+        m_PositionList->Clear();
+        RetrieveStoredPositions();
+        EnableWidgets();
+        break;
       case TIME_SET:
         m_PositionList->SetSelection((int)e->GetDouble());
         FlyTo();
@@ -534,7 +559,11 @@ void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
 //----------------------------------------------------------------------------
 {
   m_SelectedPosition = m_PositionList->GetStringSelection();
-	assert(m_SelectedPosition != "");
+	if (m_SelectedPosition == "" && m_PositionList->GetCount()>0)
+  {
+    m_SelectedPosition = m_PositionList->GetString(0);
+    pos = 0;
+  };
 
 //	int n = m_PositionList->GetSelection();
 	m_PositionList->Delete(pos);
@@ -547,9 +576,11 @@ void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
   if(m_PositionList->GetCount()) 
 	{
 		m_PositionList->SetSelection(0);
+
 	  m_SelectedPosition = m_PositionList->GetStringSelection();
 	}
-	m_Gui->Update();
+  m_Gui->Update();
+
 }
 //----------------------------------------------------------------------------
 void mafAnimate::ResetKit()
@@ -594,6 +625,8 @@ void mafAnimate::RetrieveStoredPositions(bool update_listbox /*= true*/)
       }
     }
   }
+  m_Gui->Update();
+
 }
 //----------------------------------------------------------------------------
 void mafAnimate::SetStoredPositions(mafTagArray *positions)
