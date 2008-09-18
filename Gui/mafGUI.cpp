@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-09-18 08:59:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -959,7 +959,7 @@ wxSlider *mafGUI::Slider(int id,wxString label,int* var,int min, int max, wxStri
   return sli;
 }
 //----------------------------------------------------------------------------
-mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double min, double max, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
+mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double min, double max, wxSize size, wxString tooltip, bool textBoxEnable) //<*> Si puo Chiamare Slider lo stesso 
 //----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
 {
   wxTextCtrl     *text = NULL;
@@ -973,8 +973,9 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
     int text_w   = EW * 0.8;
     int slider_w = FW - text_w;
     w_id_text = GetWidgetId(id);
-		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle/*|wxTE_READONLY*/);
-    text->SetFont(m_Font);
+	  text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,  LH), m_EntryStyle/*|wxTE_READONLY*/);
+	  text->SetFont(m_Font);
+    text->Enable(textBoxEnable);
     w_id_sli  = GetWidgetId(id);
 		sli  = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
@@ -995,6 +996,7 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
     w_id_text = GetWidgetId(id);
 		text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
     text->SetFont(m_Font);
+    text->Enable(textBoxEnable);
     w_id_sli = GetWidgetId(id);
 		sli = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
     if(m_UseBackgroundColor) 
@@ -1012,7 +1014,7 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
 	return sli;
 }
 //----------------------------------------------------------------------------
-mafGUIFloatSlider *mafGUI::FloatSlider(int id,double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size, wxString tooltip) //<*> Si puo Chiamare Slider lo stesso 
+mafGUIFloatSlider *mafGUI::FloatSlider(int id,double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size, wxString tooltip, bool textBoxEnable) //<*> Si puo Chiamare Slider lo stesso 
 //----------------------------------------------------------------------------                                            //<*> verificare se le entry erano abilitate o no
 {
   wxTextCtrl     *text = NULL;
@@ -1042,6 +1044,7 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,double *var, double min, double ma
   int w_id_text = GetWidgetId(id);
   text = new wxTextCtrl    (this, w_id_text, "", dp, wxSize(text_w,LH), m_EntryStyle/*|wxTE_READONLY*/);
   text->SetFont(m_Font);
+  text->Enable(textBoxEnable);
 
   text->SetValidator(mafGUIValidator(this,w_id_text,text,var,sli,min,max));
   sli->SetValidator(mafGUIValidator(this,w_id_sli,sli,var,text));

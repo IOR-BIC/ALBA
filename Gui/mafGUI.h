@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:55:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-09-18 08:59:14 $
+  Version:   $Revision: 1.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -211,11 +211,11 @@ public:
   /** Integer slider widget. */
 	wxSlider *Slider(int id, wxString label, int *var,int min = MININT, int max = MAXINT, wxString tooltip = "",bool showText=true);
 
-  /** Float slider widget. */
-  mafGUIFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "");
+  /** Float slider widget.*/
+  mafGUIFloatSlider *FloatSlider(int id, wxString label, double *var,double min, double max, wxSize size = wxDefaultSize, wxString tooltip = "", bool textBoxEnable = true);
 
-  /** Float slider widget. */
-  mafGUIFloatSlider *FloatSlider(int id, double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size = wxDefaultSize, wxString tooltip = "");
+  /** Float slider widget.*/
+  mafGUIFloatSlider *FloatSlider(int id, double *var, double min, double max, wxString minLab, wxString maxLab, wxSize size = wxDefaultSize, wxString tooltip = "", bool textBoxEnable = true);
 
   /** Checked listbox widget. */
   mafGUICheckListBox *CheckList(int id, wxString label = "", int height = 60, wxString tooltip = "");
