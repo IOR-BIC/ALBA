@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-31 08:34:45 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-09-18 14:18:44 $
+  Version:   $Revision: 1.9 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -255,6 +255,9 @@ public:
 
 	/**Get Coordinates of indexed middle point*/
 	double *GetMiddlePointCoordinate(int index);
+
+  double *GetStartPointCoordinate();
+  double *GetEndPointCoordinate();
 
   /**Get Coordinates of Tangent 1 in wrapped geometry*/
   double *GetWrappedGeometryTangent1(){ return m_WrappedTangent1;};

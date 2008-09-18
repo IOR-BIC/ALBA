@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-01 10:28:20 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-09-18 14:18:44 $
+  Version:   $Revision: 1.26 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,7 @@
 #include "vtkOBBTree.h"
 #include "vtkPoints.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "vtkLinearTransform.h"
 
 #include <assert.h>
 
@@ -373,9 +374,9 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     transformFirstData->Update(); 
 
     // here REAL ALGORITHM //////////////////////////////
-
     vtkMAFSmartPointer<vtkOBBTree> locator;
     locator->SetDataSet(transformFirstData->GetOutput());
+    locator->SetGlobalWarningDisplay(0);
     locator->BuildLocator();
 
    //Control if Start or End point is inside vtk data (surface)
@@ -422,7 +423,7 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
 //  code to control if exist an intersection between the line draw from start point to end point and 
 //  the vtk data (surface)
      int nControl = temporaryIntersection->GetNumberOfPoints();
-     if(nControl==0 || aligned == true)
+     if(aligned == true)
      {
        //if there is no intersection with geometry
        m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
@@ -436,6 +437,51 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
  
        return;
      }
+
+     //WRAPPED METER REFACTOR // 2008 09 15
+
+     //local_wrapped_center -> center of wrapped surface
+     //need a vector that is the normal of the plane
+
+     vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+     mafMatrix matrix;
+     matrix.SetVTKMatrix(mat);
+     double versorX[3], versorY[3], versorZ[3];
+     matrix.GetVersor(0, versorX);
+     matrix.GetVersor(1, versorY);
+     matrix.GetVersor(2, versorZ);
+     // these versors determine the semiplanes, versor Z determines XY plane.
+     double t;
+     double pseudoIntersection[3];
+
+     // for now only contol y, because data test is oriented in such way
+     bool controlParallel = (vtkPlane::IntersectWithLine(local_start,local_end,versorZ,local_wrapped_center, t, pseudoIntersection)!=0.)?true:false;
+     bool semiplaneControl = (pseudoIntersection[1] - local_wrapped_center[1])<0? true: false ;
+     
+
+     if(nControl==0)
+     {
+       if(controlParallel == false || semiplaneControl == false /* INTERSECTION WRAPPED PLANE is positive or zero*/)
+       {
+         //if there is no intersection with geometry
+         m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+         m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+         m_Goniometer->AddInput(m_LineSource->GetOutput());
+
+         m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+
+         m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+         GetWrappedMeterOutput()->Update();
+
+         return;
+       }
+       else
+       {
+         // just continue to calculate
+       }
+       
+     }
+     //WRAPPED METER REFACTOR // 2008 09 15
 
     int precision = 50;
     short wrapside = m_WrapSide == 0 ? (-1) : (1);
@@ -1974,6 +2020,18 @@ double *medVMEWrappedMeter::GetMiddlePointCoordinate(int index)
 	  return m_MiddlePointList[index];
 
 	return NULL;
+}
+//-------------------------------------------------------------------------
+double *medVMEWrappedMeter::GetStartPointCoordinate()
+//-------------------------------------------------------------------------
+{
+  return m_StartPoint;
+}
+//-------------------------------------------------------------------------
+double *medVMEWrappedMeter::GetEndPointCoordinate()
+//-------------------------------------------------------------------------
+{
+  return m_EndPoint;
 }
 //-------------------------------------------------------------------------
 void medVMEWrappedMeter::SaveInFile()
