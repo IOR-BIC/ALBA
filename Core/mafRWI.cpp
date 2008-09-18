@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.48 $
+  Date:      $Date: 2008-09-18 10:25:53 $
+  Version:   $Revision: 1.49 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,6 +49,7 @@
 #include "vtkDataSet.h"
 #include "vtkMAFSimpleRulerActor2D.h"
 #include "vtkMAFTextOrientator.h"
+#include "vtkMAFProfilingActor.h"
 
 #define DEFAULT_BG_COLOR 0.28
 
@@ -69,6 +70,8 @@ mafRWI::mafRWI()
 	m_Orientator = NULL;
   m_Grid    = NULL;
   m_Axes    = NULL;
+
+	m_ProfilingActor = NULL;
   for (int b=0; b<6; b++)
   {
     m_CameraButtons[b] = NULL;
@@ -83,9 +86,12 @@ mafRWI::mafRWI()
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
 
+  m_ShowProfilingInformation = 0;
+
   m_TopBottomAccumulation = m_TopBottomAccumulationLast = 0.0;
   m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
   m_StepCameraOrientation = 10.0;
+
 }
 //----------------------------------------------------------------------------
 mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
@@ -103,6 +109,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_Ruler   = NULL;
   m_Grid    = NULL;
   m_Axes    = NULL;
+	m_ProfilingActor = NULL;
   for (int b=0; b<6; b++)
   {
     m_CameraButtons[b] = NULL;
@@ -116,6 +123,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
 
   m_StereoMovieDir    = "";
   m_StereoMovieEnable = 0;
+	m_ShowProfilingInformation = 0;
 
   m_StepCameraOrientation = 10.0;
   m_TopBottomAccumulation = 0.0;
@@ -124,6 +132,7 @@ mafRWI::mafRWI(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axe
   m_LeftRigthAccumulation = m_LeftRigthAccumulationLast = 0.0;
 
   CreateRenderingScene(parent, layers, use_grid, show_axes, show_ruler, stereo, show_orientator);
+	
 }
 //----------------------------------------------------------------------------
 void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_grid, bool show_axes, bool show_ruler, int stereo, bool show_orientator)
@@ -206,12 +215,17 @@ void mafRWI::CreateRenderingScene(wxWindow *parent, RWI_LAYERS layers, bool use_
 	m_Orientator->SetTextDown("D");
 	m_Orientator->SetTextLeft("L");
 	m_Orientator->SetTextRight("R");
-	
+
 	m_RenFront->AddActor2D(m_Orientator);
 	m_Orientator->SetVisibility(m_ShowOrientator);
   //m_Orientator->SetBackgroundVisibility(false);
   m_Orientator->SetTextColor(1.0,1.0,1.0);
   m_Orientator->SetBackgroundColor(0.0,0.0,0.0);
+
+	vtkNEW(m_ProfilingActor);
+	m_RenFront->AddActor2D(m_ProfilingActor);
+	m_ProfilingActor->SetVisibility(m_ShowProfilingInformation);
+	
 
   m_ShowGrid    = use_grid;
   m_GridNormal  = GRID_Z;
@@ -247,11 +261,14 @@ mafRWI::~mafRWI()
   cppDEL(m_Axes); //Must be removed before deleting renderers
   vtkDEL(m_Light);
   vtkDEL(m_Camera);
+	
+
   if(m_RenFront) 
   {
     m_RenFront->RemoveAllProps();
     m_RenderWindow->RemoveRenderer(m_RenFront);
   }
+	vtkDEL(m_ProfilingActor);
   vtkDEL(m_RenFront);
   if(m_RenBack)
   {
@@ -504,6 +521,12 @@ void mafRWI::SetOrientatorVisibility(bool show)
       m_Gui->Update();
     }
   }
+}
+//----------------------------------------------------------------------------
+void mafRWI::SetProfilingActorVisibility(bool show)
+//----------------------------------------------------------------------------
+{
+	m_ProfilingActor->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
 void mafRWI::SetRulerScaleFactor(const double &scale_factor)
@@ -812,6 +835,7 @@ enum RWI_WIDGET_ID
   ID_LINK_CAMERA,
   ID_SHOW_RULER,
 	ID_SHOW_ORIENTATOR,
+	ID_SHOW_PROFILING_INFORMATION,
   ID_RULER_SCALE_FACTOR,
   ID_RULER_LEGEND
 };
@@ -876,6 +900,7 @@ mafGUI *mafRWI::CreateGui()
   m_Gui->Divider(2);
   m_Gui->Bool(ID_LINK_CAMERA,"link camera",&m_LinkCamera,0,"Turn On/Off camera interaction synchronization");
 	m_Gui->Bool(ID_SHOW_ORIENTATOR,"orientation",&m_ShowOrientator);
+	m_Gui->Bool(ID_SHOW_PROFILING_INFORMATION,"fps",&m_ShowProfilingInformation);
   m_Gui->Divider();
   return m_Gui;
 }
@@ -915,6 +940,12 @@ void mafRWI::OnEvent(mafEventBase *maf_event)
 			case ID_SHOW_ORIENTATOR:
 				SetOrientatorVisibility(m_ShowOrientator!= 0);
 				CameraUpdate();
+				break;
+			case ID_SHOW_PROFILING_INFORMATION:
+				{  
+					SetProfilingActorVisibility(m_ShowProfilingInformation!=0);
+				  CameraUpdate();
+				}
 				break;
       case ID_RULER_SCALE_FACTOR:
         SetRulerScaleFactor(m_RulerScaleFactor);

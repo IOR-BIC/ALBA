@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:36:33 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-09-18 10:25:53 $
+  Version:   $Revision: 1.25 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -33,8 +33,7 @@ class mafGUI;
 class mafGUIPicButton;
 class vtkMAFSimpleRulerActor2D;
 class vtkMAFTextOrientator;
-//class vtkMAFFPSCallback;
-class vtkFPSActor;
+class vtkMAFProfilingActor;
 
 //----------------------------------------------------------------------------
 // constants:
@@ -126,8 +125,8 @@ public:
 	/** Set Orientator Text Properties */
 	void SetOrientatorProperties(double rgbText[3], double rgbBackground[3], double scale = 1);
 
-	/** Set Fps Text Visibility*/
-	void SetFpsVisibility(bool show);
+	/** Set Profiling Information Text Visibility*/
+	void SetProfilingActorVisibility(bool show);
 
   /** Update scale factor and legend.
   This method is called from logic to update measure unit according to the application settings.*/
@@ -157,7 +156,7 @@ public:
 
   double            m_CameraViewUp[3]; ///< Vector representing the camera view-up
   double            m_CameraOrientation[3]; ///< Vector representing the camera orientation
-  double m_Z1;
+
   double            m_StepCameraOrientation; ///< Step with which rotate the camera around its focal point.
   double            m_TopBottomAccumulation;
   double            m_LeftRigthAccumulation; 
@@ -188,12 +187,12 @@ protected:
   int           m_ShowRuler; ///< Flag used to show/hide ruler actor into a parallel view
   int           m_StereoType;
 	vtkMAFTextOrientator     *m_Orientator;
-	int          m_ShowFPS;
+	int          m_ShowProfilingInformation;
 	int          m_ShowOrientator;
   mafObserver  *m_Listener;
 
-	//vtkMAFFPSCallback *m_FPSCallback;
-	vtkFPSActor *m_FPSActor;
+	
+	vtkMAFProfilingActor *m_ProfilingActor;
 
   mafString m_StereoMovieDir;
   int       m_StereoMovieEnable;
