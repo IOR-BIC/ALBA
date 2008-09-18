@@ -67,6 +67,8 @@ SET(vtkMAF_SRCS
   vtkMAFPolyDataToSinglePolyLine.h
   vtkMAFTextOrientator.cxx
   vtkMAFTextOrientator.h
+  vtkMAFProfilingActor.cxx
+  vtkMAFProfilingActor.h
 )
 
 # List the kits from VTK that are needed by this project.
