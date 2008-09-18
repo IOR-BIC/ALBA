@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-09-18 08:59:51 $
+  Version:   $Revision: 1.23 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -215,6 +215,15 @@ public:
 
   /** Turn Off the generation of the histogram.*/
   void GenerateHistogramOff() {GenerateHistogram(0);};
+
+  /** Retrieve StartPoint coordinates*/
+  double *GetStartPointCoordinate(){return m_StartPoint;};
+
+  /** Retrieve EndPoint1 coordinates*/
+  double *GetEndPointCoordinate(){return m_EndPoint;};
+
+  /** Retrieve EndPoint coordinates*/
+  double *GetEndPoint2Coordinate(){return m_EndPoint2;};
 
 protected:
   mafVMEMeter();
