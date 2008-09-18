@@ -99,6 +99,9 @@ SET(PROJECT_SRCS
   
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
+
+  medOpExporterMeters.cpp
+  medOpExporterMeters.h
 )
 
 IF (MAF_USE_ITK)
