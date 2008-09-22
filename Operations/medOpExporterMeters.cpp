@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterMeters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 14:16:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-09-22 11:54:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -163,6 +163,15 @@ void medOpExporterMeters::OpDo()
 
   if (m_File == "") return;
 
+  Export();
+  
+  m_OutputFile.close();
+}
+//----------------------------------------------------------------------------
+void medOpExporterMeters::Export()
+//----------------------------------------------------------------------------
+{
+
   m_OutputFile.open(m_File, std::ios::out);
 
   if (m_OutputFile == NULL) {
@@ -186,7 +195,6 @@ void medOpExporterMeters::OpDo()
     }
     break;
   }
-  m_OutputFile.close();
 }
 //----------------------------------------------------------------------------
 void medOpExporterMeters::ExportTypeOfMeters()

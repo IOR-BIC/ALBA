@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterMeters.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 14:16:00 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-09-22 11:54:14 $
+  Version:   $Revision: 1.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -61,13 +61,16 @@ public:
   /** Set the filename for the .stl to export */
   void SetFileName(const char *file_name) {m_File = file_name;};
   
+  /**Public API for exporting*/
+  void Export();
+
+protected:
   /* Export All meters of an msf in a single ascii file*/
   void ExportTypeOfMeters();
 
   /* Export All meters of an msf in a single ascii file*/
   void ExportSelectedMeter();
 
-protected:
   /* Export single meter in a single ascii file*/
   void ExportMeter();
 
