@@ -55,6 +55,9 @@ ADD_TEST(medOpSurfaceMirrorTest ${EXECUTABLE_OUTPUT_PATH}/medOpSurfaceMirrorTest
 ADD_EXECUTABLE(medOpImporterVTKTest medOpImporterVTKTest.h medOpImporterVTKTest.cpp)
 ADD_TEST(medOpImporterVTKTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterVTKTest)
 
+ADD_EXECUTABLE(medOpExporterMetersTest medOpExporterMetersTest.h medOpExporterMetersTest.cpp)
+ADD_TEST(medOpExporterMetersTest ${EXECUTABLE_OUTPUT_PATH}/medOpExporterMetersTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
