@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDecl.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:53:43 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-09-23 11:19:05 $
+  Version:   $Revision: 1.43.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,7 +57,6 @@ struct MAF_EXPORT WidgetDataType
   const char *sValue;
   int    dType;
 };
-
 
 /** conventional device button values */
 enum MAF_EXPORT DEVICE_BUTTONS
