@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFContourVolumeMapperTest.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:34:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-09-23 10:18:53 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -81,5 +81,4 @@ main( int argc, char* argv[] )
 
   return result.wasSuccessful() ? 0 : 1;
 }
-
 #endif
