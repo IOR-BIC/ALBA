@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-25 15:44:39 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2008-09-25 16:36:51 $
+  Version:   $Revision: 1.28 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -542,6 +542,8 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
 
     if( normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0) return; // midpoint and center are the same point
 
+    vtkMath::Normalize(normal);
+
     double start_tangent[3];
     start_tangent[0] = pointTangent1[0] - local_start[0];
     start_tangent[1] = pointTangent1[1] - local_start[1];
@@ -559,7 +561,18 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
 
     vtkMath::Normalize(sumtangents);
     double dotNormal = vtkMath::Dot(normal, sumtangents);
-    if(dotNormal < 0.)
+
+    vtkMath::Normalize(start_tangent);
+    vtkMath::Normalize(end_tangent);
+    double cross[3];
+    vtkMath::Cross(start_tangent,end_tangent,cross);
+    const double tolerance = 0.09;
+    bool zerovector = false;
+    if(cross[0] < tolerance && cross[1] < tolerance && cross[2] < tolerance)
+    {
+      zerovector = true;
+    }
+    if(dotNormal < 0. && zerovector == false)
     {
       normal[0] = -normal[0];
       normal[1] = -normal[1];
