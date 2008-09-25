@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEOutputWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-09-25 15:44:39 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -53,15 +53,15 @@ mafGUI *medVMEOutputWrappedMeter::CreateGui()
   m_Distance = wrappedMeter->GetDistance();
   m_Gui->Label(_("distance: "), &m_Distance, true);
 
-	double *coordinateFIRST;
-	double *coordinateLAST; 
-  
+	double *coordinateFIRST = NULL;
+	double *coordinateLAST = NULL;
+
   if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
   {
     coordinateFIRST = wrappedMeter->GetMiddlePointCoordinate(0);
     coordinateLAST = wrappedMeter->GetMiddlePointCoordinate(wrappedMeter->GetNumberMiddlePoints()-1);
   }
-  else if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+  else /*if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)*/
   {
     coordinateFIRST = wrappedMeter->GetWrappedGeometryTangent1();
     coordinateLAST =  wrappedMeter->GetWrappedGeometryTangent2();
@@ -95,15 +95,16 @@ void medVMEOutputWrappedMeter::Update()
   {
 		m_Distance = ((medVMEWrappedMeter *)m_VME)->GetDistance();
 
-    double *coordinateFIRST;
-    double *coordinateLAST; 
-
+    double *coordinateFIRST = NULL;
+    double *coordinateLAST = NULL; 
+    
+    if(wrappedMeter->GetNumberMiddlePoints() == 0) return;
     if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
     {
       coordinateFIRST = wrappedMeter->GetMiddlePointCoordinate(0);
       coordinateLAST = wrappedMeter->GetMiddlePointCoordinate(wrappedMeter->GetNumberMiddlePoints()-1);
     }
-    else if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+    else /*if(wrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)*/
     {
       coordinateFIRST = wrappedMeter->GetWrappedGeometryTangent1();
       coordinateLAST =  wrappedMeter->GetWrappedGeometryTangent2();

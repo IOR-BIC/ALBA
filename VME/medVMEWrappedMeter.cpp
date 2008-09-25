@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 14:18:44 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-09-25 15:44:39 $
+  Version:   $Revision: 1.27 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -244,9 +244,487 @@ void medVMEWrappedMeter::InternalUpdate()
 //-----------------------------------------------------------------------
 {
   if(m_WrappedMode == MANUAL_WRAP)
+  {
     InternalUpdateManual();
+  }
   else if(m_WrappedMode == AUTOMATED_WRAP)
+  {
     InternalUpdateAutomated();
+  }
+  else if(m_WrappedMode == IOR_AUTOMATED_WRAP)
+  {
+    InternalUpdateAutomatedIOR();
+  }
+}
+//-----------------------------------------------------------------------
+void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
+//-----------------------------------------------------------------------
+{
+  mafVME *start_vme = GetStartVME();
+  mafVME *end_vme   = GetEnd1VME();
+  mafVME *wrapped_vme   = GetWrappedVME();
+
+  bool start_ok = true, end_ok = true;
+
+  double orientation[3];
+  m_Goniometer->RemoveAllInputs();
+
+
+  if (start_vme && end_vme && wrapped_vme)
+  { 
+    if(start_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("StartVME") != -1)
+    {
+      ((mafVMELandmarkCloud *)start_vme)->GetLandmark(GetLinkSubId("StartVME"),m_StartPoint,-1);
+      m_TmpTransform->SetMatrix(*start_vme->GetOutput()->GetAbsMatrix());
+      m_TmpTransform->TransformPoint(m_StartPoint,m_StartPoint);
+    }
+    else
+    {
+      start_vme->GetOutput()->GetAbsPose(m_StartPoint, orientation);
+    }
+
+    if(wrapped_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("WrappedVME") != -1)
+    {
+      ((mafVMELandmarkCloud *)wrapped_vme)->GetLandmark(GetLinkSubId("WrappedVME"),m_WrappedVMECenter,-1);
+      m_TmpTransform->SetMatrix(*wrapped_vme->GetOutput()->GetAbsMatrix());
+      m_TmpTransform->TransformPoint(m_WrappedVMECenter,m_WrappedVMECenter);
+    }
+    else
+    {
+      wrapped_vme->GetOutput()->GetAbsPose(m_WrappedVMECenter, orientation);
+
+      double translation[3];
+      ((vtkPolyData *)wrapped_vme->GetOutput()->GetVTKData())->GetCenter(translation);
+
+      mafMatrix mat;
+      mat.Identity();
+      for(int i=0; i<3; i++)
+        mat.SetElement(i,3,translation[i]);
+      m_TmpTransform->SetMatrix(mat);
+      m_TmpTransform->TransformPoint(m_WrappedVMECenter,m_WrappedVMECenter);
+    }
+
+    if(end_vme->IsMAFType(mafVMELandmarkCloud) && GetLinkSubId("EndVME1") != -1)
+    {
+      ((mafVMELandmarkCloud *)end_vme)->GetLandmark(GetLinkSubId("EndVME1"),m_EndPoint,-1);
+      m_TmpTransform->SetMatrix(*end_vme->GetOutput()->GetAbsMatrix());
+      m_TmpTransform->TransformPoint(m_EndPoint,m_EndPoint);
+    }
+    else
+    {
+      end_vme->GetOutput()->GetAbsPose(m_EndPoint, orientation);
+    }
+  }
+  else
+  {
+    start_ok = false;
+    end_ok   = false;
+  }
+
+  m_WrappedTangent1[0] =  m_WrappedTangent1[1] = m_WrappedTangent1[2] = 0.0;
+  m_WrappedTangent2[0] =  m_WrappedTangent2[1] = m_WrappedTangent2[2] = 0.0;
+
+
+  if (start_ok && end_ok)
+  {
+    // compute distance between points
+    m_Distance = 0.0;
+
+    // compute start point in local coordinate system
+    double local_start[3];
+    m_TmpTransform->SetMatrix(GetOutput()->GetAbsTransform()->GetMatrix());
+    m_TmpTransform->Invert();
+    m_TmpTransform->TransformPoint(m_StartPoint, local_start);  // m_TmpTransform needed to fix a memory leaks of GetInverse()
+    //GetAbsMatrixPipe()->GetInverse()->TransformPoint(StartPoint,local_start);
+
+    // compute end point in local coordinate system
+    double local_end[3];
+    m_TmpTransform->TransformPoint(m_EndPoint,local_end);
+
+    // compute end point in local coordinate system
+    double local_wrapped_center[3];
+    m_TmpTransform->TransformPoint(m_WrappedVMECenter,local_wrapped_center);
+
+    // use list of tangent point (raw)
+    double pointTangent1[3];
+    double pointTangent2[3];
+
+    //control if the point are allineated
+    double vec1[3], vec2[3], vec3[3];
+    vec1[0] = local_start[0] - local_end[0];
+    vec1[1] = local_start[1] - local_end[1];
+    vec1[2] = local_start[2] - local_end[2];
+
+    vec2[0] = local_start[0] - local_wrapped_center[0];
+    vec2[1] = local_start[1] - local_wrapped_center[1];
+    vec2[2] = local_start[2] - local_wrapped_center[2];
+
+    vec3[0] = local_end[0] - local_wrapped_center[0];
+    vec3[1] = local_end[1] - local_wrapped_center[1];
+    vec3[2] = local_end[2] - local_wrapped_center[2];
+
+    bool aligned = false;
+    double vectorProduct[3];
+    vtkMath::Cross(vec1,vec2, vectorProduct); 
+    if(vectorProduct[0] == 0.0 && vectorProduct[1] == 0.0 && vectorProduct[2] == 0.0)
+      aligned = true;
+
+    // create ordered list of tangent point (2) real algorithm
+    vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
+    transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
+    transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
+    transformFirstDataInput->Update();
+
+    vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
+    transformFirstData->SetTransform((vtkAbstractTransform *)m_TmpTransform->GetVTKTransform());
+    transformFirstData->SetInput((vtkPolyData *)transformFirstDataInput->GetOutput());
+    transformFirstData->Update(); 
+
+    // here REAL ALGORITHM //////////////////////////////
+    vtkMAFSmartPointer<vtkOBBTree> locator;
+    locator->SetDataSet(transformFirstData->GetOutput());
+    locator->SetGlobalWarningDisplay(0);
+    locator->BuildLocator();
+
+    //Control if Start or End point is inside vtk data (surface)
+    if(locator->InsideOrOutside(local_start) <= 0 || locator->InsideOrOutside(local_end) <= 0) 
+    {
+      AvoidWrapping(local_start,local_end);
+
+      return;
+    }
+
+    vtkMAFSmartPointer<vtkPoints> temporaryIntersection;
+    vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
+    vtkMAFSmartPointer<vtkPoints> pointsIntersection2;
+
+    //control if there is an intersection
+    locator->IntersectWithLine(local_start, local_end, temporaryIntersection, NULL);
+
+    //  code to control if exist an intersection between the line draw from start point to end point and 
+    //  the vtk data (surface)
+    int nControl = temporaryIntersection->GetNumberOfPoints();
+    if(aligned == true)
+    {
+      AvoidWrapping(local_start,local_end);
+
+      return;
+    }
+
+    //WRAPPED METER REFACTOR // 2008 09 15
+
+    //local_wrapped_center -> center of wrapped surface
+    //need a vector that is the normal of the plane
+
+    vtkMatrix4x4 *mat = ((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform()->GetMatrix();
+    mafMatrix matrix;
+    matrix.SetVTKMatrix(mat);
+    double versorX[3], versorY[3], versorZ[3];
+    matrix.GetVersor(0, versorX);
+    matrix.GetVersor(1, versorY);
+    matrix.GetVersor(2, versorZ);
+    // these versors determine the semiplanes, versor Z determines XY plane.
+    double t;
+    double pseudoIntersection[3];
+
+    double extendStart[3];
+    double extendEnd[3];
+    double factor = 100000;
+
+    double direction[3];
+    direction[0] = local_end[0] - local_start[0];
+    direction[1] = local_end[1] - local_start[1];
+    direction[2] = local_end[2] - local_start[2];
+
+    extendStart[0] = local_start[0] - factor * direction[0];
+    extendStart[1] = local_start[1] - factor * direction[1];
+    extendStart[2] = local_start[2] - factor * direction[2];
+
+    extendEnd[0] = local_end[0] + factor * direction[0];
+    extendEnd[1] = local_end[1] + factor * direction[1];
+    extendEnd[2] = local_end[2] + factor * direction[2];
+
+    // for now only contol y, because data test is oriented in such way
+    bool controlParallel = false;
+    bool controlParallelExtend = false;
+    bool semiplaneControlExtend = false;
+    bool semiplaneControl = false;
+
+    //WRAPPED METER REFACTOR // 2008 09 15
+
+    double start_end_vector[3];
+    start_end_vector[0] = local_end[0] - local_start[0];
+    start_end_vector[1] = local_end[1] - local_start[1];
+    start_end_vector[2] = local_end[2] - local_start[2];
+
+    double start_center[3];
+    start_center[0] = local_wrapped_center[0] - local_start[0];
+    start_center[1] = local_wrapped_center[1] - local_start[1];
+    start_center[2] = local_wrapped_center[2] - local_start[2];
+
+    double vtemp[3], finalDirection[3];
+    vtkMath::Cross(start_end_vector, start_center, vtemp);
+    vtkMath::Cross(vtemp, start_end_vector, finalDirection);
+
+    double dott = vtkMath::Dot(finalDirection, versorY);
+    if(dott > 0. || nControl!=0)
+    {
+      WrappingCore(local_start, local_wrapped_center, local_end,\
+        controlParallelExtend, controlParallel,\
+        locator, temporaryIntersection, pointsIntersection1,\
+        versorY, nControl);
+
+      WrappingCore(local_end, local_wrapped_center, local_start,\
+        controlParallelExtend, controlParallel,\
+        locator, temporaryIntersection, pointsIntersection2,\
+        versorY, nControl);
+    }
+    else
+    {
+      AvoidWrapping(local_start, local_end);
+      return;
+    }
+
+
+
+    if(pointsIntersection1->GetNumberOfPoints() == 0 || pointsIntersection2->GetNumberOfPoints() == 0) return;
+
+    pointTangent1[0] = pointsIntersection1->GetPoint(0)[0];
+    pointTangent1[1] = pointsIntersection1->GetPoint(0)[1];
+    pointTangent1[2] = pointsIntersection1->GetPoint(0)[2];
+
+    pointTangent2[0] = pointsIntersection2->GetPoint(0)[0];
+    pointTangent2[1] = pointsIntersection2->GetPoint(0)[1];
+    pointTangent2[2] = pointsIntersection2->GetPoint(0)[2];
+
+    //here put the code for cut and clip, so there is a wrap
+    m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start,  pointTangent1)) + 
+      sqrt(vtkMath::Distance2BetweenPoints(pointTangent2, local_end));
+
+    //search normal to plane
+
+    m_PlaneSource->SetOrigin(local_wrapped_center);
+    m_PlaneSource->SetPoint1(pointTangent1);
+    m_PlaneSource->SetPoint2(pointTangent2);
+
+    m_PlaneCutter->SetOrigin(local_wrapped_center);
+    m_PlaneCutter->SetNormal(m_PlaneSource->GetNormal());
+
+
+    m_Cutter->SetInput(transformFirstData->GetOutput());
+    m_Cutter->SetCutFunction(m_PlaneCutter);
+
+    double midPoint[3];
+    midPoint[0] = (pointTangent2[0] + pointTangent1[0])/2;
+    midPoint[1] = (pointTangent2[1] + pointTangent1[1])/2;
+    midPoint[2] = (pointTangent2[2] + pointTangent1[2])/2;
+
+    double normal[3];
+    normal[0] = midPoint[0] - local_wrapped_center[0];
+    normal[1] = midPoint[1] - local_wrapped_center[1];
+    normal[2] = midPoint[2] - local_wrapped_center[2];
+
+    /*if(controlParallelExtend==true && controlParallel==false)
+    {
+      double distance = vtkMath::Distance2BetweenPoints(midPoint,local_wrapped_center);
+      double shift[3];
+      shift[0] = midPoint[0] + normal[0];
+      shift[1] = midPoint[1] + normal[1];
+      shift[2] = midPoint[2] + normal[2];
+      double distance2 = vtkMath::Distance2BetweenPoints(shift,local_wrapped_center);
+      if(distance2<distance)
+      {
+        normal[0] = -normal[0];
+        normal[1] = -normal[1];
+        normal[2] = -normal[2];
+      }
+    }*/
+
+    if( normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0) return; // midpoint and center are the same point
+
+    double start_tangent[3];
+    start_tangent[0] = pointTangent1[0] - local_start[0];
+    start_tangent[1] = pointTangent1[1] - local_start[1];
+    start_tangent[2] = pointTangent1[2] - local_start[2];
+
+    double end_tangent[3];
+    end_tangent[0] = pointTangent2[0] - local_end[0];
+    end_tangent[1] = pointTangent2[1] - local_end[1];
+    end_tangent[2] = pointTangent2[2] - local_end[2];
+
+    double sumtangents[3];
+    sumtangents[0] = start_tangent[0] + end_tangent[0];
+    sumtangents[1] = start_tangent[1] + end_tangent[1];
+    sumtangents[2] = start_tangent[2] + end_tangent[2];
+
+    vtkMath::Normalize(sumtangents);
+    double dotNormal = vtkMath::Dot(normal, sumtangents);
+    if(dotNormal < 0.)
+    {
+      normal[0] = -normal[0];
+      normal[1] = -normal[1];
+      normal[2] = -normal[2];
+    }
+
+    m_PlaneClip->SetOrigin(midPoint);
+    m_PlaneClip->SetNormal(normal);
+
+
+    m_Clip->SetInput(m_Cutter->GetOutput());
+    m_Clip->SetClipFunction(m_PlaneClip);
+
+    double clipLength = 0;
+    double numberOfCells = m_Clip->GetOutput()->GetNumberOfCells();
+    for(int i=0; i<numberOfCells; i++)
+    {
+      clipLength += sqrt(m_Clip->GetOutput()->GetCell(i)->GetLength2());
+    }
+
+    m_Distance += clipLength;
+
+
+    ////////////////////////////////////////////////////////
+
+    m_WrappedTangent1[0] = pointTangent1[0];
+    m_WrappedTangent1[1] = pointTangent1[1];
+    m_WrappedTangent1[2] = pointTangent1[2];
+
+    m_WrappedTangent2[0] = pointTangent2[0];
+    m_WrappedTangent2[1] = pointTangent2[1];
+    m_WrappedTangent2[2] = pointTangent2[2];
+
+    m_LineSource2->SetPoint1(pointTangent2[0],pointTangent2[1],pointTangent2[2]);
+    m_LineSource2->SetPoint2(local_end[0],local_end[1],local_end[2]);
+
+    m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+    m_LineSource->SetPoint2(pointTangent1[0],pointTangent1[1],pointTangent1[2]);
+
+    m_Goniometer->AddInput(m_LineSource->GetOutput());
+    m_Goniometer->AddInput(m_LineSource2->GetOutput());
+    //m_Goniometer->AddInput(m_LineSourceMiddle->GetOutput());
+    m_Goniometer->AddInput(m_Clip->GetOutput());
+
+
+    m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+    GetWrappedMeterOutput()->Update(); 
+  }
+  else
+    m_Distance = -1;
+}
+//-----------------------------------------------------------------------
+void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,\
+                                      bool controlParallelExtend, bool controlParallel,\
+                                      vtkOBBTree *locator, vtkPoints *temporaryIntersection, vtkPoints *pointsIntersection,\
+                                      double *versorY, int nControl)
+//-----------------------------------------------------------------------
+{
+  double p1[3], p2[3], p3[3];
+  p1[0] = init[0];
+  p1[1] = init[1];
+  p1[2] = init[2];
+
+  const int factorLenght = 3;
+  p2[0] = center[0] ;
+  p2[1] = center[1] ;
+  p2[2] = center[2] ;
+
+  p3[0] = end[0];
+  p3[1] = end[1];
+  p3[2] = end[2];
+
+  double v1[3],v2[3],vtemp[3];
+  int count =0;
+  int n1 = -1; // number of intersections
+
+  int precision = 50;
+  short wrapside = m_WrapSide == 0 ? (-1) : (1);
+  int invertDirection = 1;
+  
+  while(n1 != 0)
+  {
+    locator->IntersectWithLine(p1, p2, temporaryIntersection, NULL);
+    n1 = temporaryIntersection->GetNumberOfPoints();
+
+    if(n1 != 0)
+    {
+      pointsIntersection->DeepCopy(temporaryIntersection);
+    }
+
+    if (n1 == 0 && invertDirection == 1)
+    {
+      invertDirection = -1;
+      precision = 5;
+      n1 = 1;
+    }
+    else if (n1 == 0 && invertDirection == -1)
+    {
+      n1 = 1;
+    }
+    else if (n1 != 0 && invertDirection == -1)
+    {
+      break;
+    }
+
+    if(count == 0)
+    {
+
+      for(int i = 0; i<3; i++)
+      {
+        v1[i] = (p2[i] - p1[i]);
+        v2[i] = (p3[i] - p2[i]);
+
+      }
+
+      
+      // the order is important to understand the direction of the control
+      vtkMath::Cross(v1,v2, vtemp);
+      vtkMath::Cross(vtemp,v1, v2);
+      vtkMath::Normalize(v2);
+
+      
+      double middle[3];
+      middle[0] = (end[0] + init[0])/2.;
+      middle[1] = (end[1] + init[1])/2.;
+      middle[2] = (end[2] + init[2])/2.;
+      double centerMiddle[3];
+      centerMiddle[0] = center[0] - middle[0];
+      centerMiddle[1] = center[1] - middle[1];
+      centerMiddle[2] = center[2] - middle[2];
+
+      double dot1 = vtkMath::Dot(centerMiddle, versorY);
+      double dot2 = vtkMath::Dot(v2, versorY);
+
+      if(dot1 <0.  &&  dot2 > 0.)
+      {
+        v2[0] = -v2[0];
+        v2[1] = -v2[1];
+        v2[2] = -v2[2];
+
+      }
+
+      mafLogMessage("dotCenter %.2f - dotV2 %.2f", dot1, dot2);
+
+    }
+
+    for(int i = 0; i<3; i++)
+      p2[i] += (invertDirection*(wrapside*precision) * v2[i]);
+
+    count++;
+  }
+}
+//-----------------------------------------------------------------------
+void medVMEWrappedMeter::AvoidWrapping(double *local_start, double *local_end)
+//-----------------------------------------------------------------------
+{
+  //if there is no intersection with geometry
+  m_LineSource->SetPoint1(local_start[0],local_start[1],local_start[2]);
+  m_LineSource->SetPoint2(local_end[0],local_end[1],local_end[2]);
+  m_Goniometer->AddInput(m_LineSource->GetOutput());
+  
+  m_Distance = sqrt(vtkMath::Distance2BetweenPoints(local_start, local_end));
+
+  m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+  GetWrappedMeterOutput()->Update();
 }
 //-----------------------------------------------------------------------
 void medVMEWrappedMeter::InternalUpdateAutomated()
@@ -363,7 +841,6 @@ void medVMEWrappedMeter::InternalUpdateAutomated()
     
     // create ordered list of tangent point (2) real algorithm
     vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstDataInput;
-    vtkNEW(transformFirstDataInput);
     transformFirstDataInput->SetTransform((vtkAbstractTransform *)((mafVME *)wrapped_vme)->GetAbsMatrixPipe()->GetVTKTransform());
     transformFirstDataInput->SetInput((vtkPolyData *)((mafVME *)wrapped_vme)->GetOutput()->GetVTKData());
     transformFirstDataInput->Update();
@@ -1403,9 +1880,9 @@ mafGUI* medVMEWrappedMeter::CreateGui()
   mafID sub_id = -1;
 
   int num_mode = 3;
-	int num_wrap = 2;
+	int num_wrap = 3;
 //	const wxString mode_choices_string[] = {_("point distance"), _("line distance"), _("line angle")};;
-  const wxString wrap_choices_string[] = {_("manual"), _("automated")};
+  const wxString wrap_choices_string[] = {_("manual"), _("automated"), _("IOR_automated")};
 
   m_Gui = mafNode::CreateGui(); // Called to show info about vmes' type and name
   m_Gui->SetListener(this);
@@ -1453,9 +1930,9 @@ mafGUI* medVMEWrappedMeter::CreateGui()
  // if(GetMeterAttributes()->m_MeterMode == POINT_DISTANCE)
  //   m_Gui->Enable(ID_END2_METER_LINK,false);
 
-  m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP);
-  m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP);
-  m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP);
+  m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+  m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+  m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
 
   m_Gui->Label(_("MidPoints"), true);
   m_ListBox=m_Gui->ListBox(ID_LISTBOX);
@@ -1586,9 +2063,9 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
 			{
 				EnableManualModeWidget(m_WrappedMode ==MANUAL_WRAP);
 
-        m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP);
-        m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP);
-        m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP);
+        m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+        m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+        m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
         
 
 				Modified();

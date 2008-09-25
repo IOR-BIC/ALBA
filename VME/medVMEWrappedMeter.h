@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 14:18:44 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2008-09-25 15:44:39 $
+  Version:   $Revision: 1.10 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -32,6 +32,8 @@ class mmaMaterial;
 class vtkLineSource;
 class vtkLineSource;
 class vtkAppendPolyData;
+class vtkOBBTree;
+class vtkPoints;
 
 /** medVMEWrappedMeter - 
 */
@@ -50,6 +52,7 @@ public:
   {
     MANUAL_WRAP=0,
     AUTOMATED_WRAP,
+    IOR_AUTOMATED_WRAP,
   };
   enum METER_COLOR_TYPE_ID
   {
@@ -298,8 +301,11 @@ protected:
   /** update the output data structure for manual wrapped mode */
   virtual void InternalUpdateManual();
 
-  /** update the output data structure for automate wrapped mode */
+  /** update the output data structure for automate wrapped mode with IOR customization*/
   virtual void InternalUpdateAutomated();
+
+  /** update the output data structure for automate wrapped mode */
+  virtual void InternalUpdateAutomatedIOR();
   
 
   /** Internally used to create a new instance of the GUI.*/
@@ -319,6 +325,14 @@ protected:
 
 	/**Push in Id Vector links id*/
 	void PushIdVector(int id){m_OrderMiddlePointsVMEList.push_back(id);}
+
+  /** Wrapping Core*/
+  void WrappingCore(double *init, double *center, double *end,\
+                    bool controlParallelExtend, bool controlParallel,\
+                    vtkOBBTree *locator, vtkPoints *temporaryIntersection, vtkPoints *pointsIntersection,\
+                    double *versorY, int nControl);
+
+  void AvoidWrapping(double *local_start, double *local_end);
 
   double m_Distance;
   double m_Angle;
