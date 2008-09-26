@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-25 16:36:51 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2008-09-26 07:21:21 $
+  Version:   $Revision: 1.29 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -472,12 +472,12 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
       WrappingCore(local_start, local_wrapped_center, local_end,\
         controlParallelExtend, controlParallel,\
         locator, temporaryIntersection, pointsIntersection1,\
-        versorY, nControl);
+        versorY, versorX,nControl);
 
       WrappingCore(local_end, local_wrapped_center, local_start,\
         controlParallelExtend, controlParallel,\
         locator, temporaryIntersection, pointsIntersection2,\
-        versorY, nControl);
+        versorY, versorX,nControl);
     }
     else
     {
@@ -566,7 +566,7 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
     vtkMath::Normalize(end_tangent);
     double cross[3];
     vtkMath::Cross(start_tangent,end_tangent,cross);
-    const double tolerance = 0.09;
+    const double tolerance = 0.05;
     bool zerovector = false;
     if(cross[0] < tolerance && cross[1] < tolerance && cross[2] < tolerance)
     {
@@ -628,7 +628,7 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
 void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,\
                                       bool controlParallelExtend, bool controlParallel,\
                                       vtkOBBTree *locator, vtkPoints *temporaryIntersection, vtkPoints *pointsIntersection,\
-                                      double *versorY, int nControl)
+                                      double *versorY, double *versorX, int nControl)
 //-----------------------------------------------------------------------
 {
   double p1[3], p2[3], p3[3];
@@ -637,9 +637,10 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
   p1[2] = init[2];
 
   const int factorLenght = 3;
-  p2[0] = center[0] ;
-  p2[1] = center[1] ;
-  p2[2] = center[2] ;
+  
+  p2[0] = center[0]  + factorLenght * (center[0] - init[0]);;
+  p2[1] = center[1]  + factorLenght * (center[1] - init[1]);;
+  p2[2] = center[2]  + factorLenght * (center[2] - init[2]);;
 
   p3[0] = end[0];
   p3[1] = end[1];
@@ -704,8 +705,14 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
       centerMiddle[1] = center[1] - middle[1];
       centerMiddle[2] = center[2] - middle[2];
 
+      double start_end[3];
+      start_end[0] = end[0] - init[0];
+      start_end[1] = end[1] - init[1];
+      start_end[2] = end[2] - init[2];
+
       double dot1 = vtkMath::Dot(centerMiddle, versorY);
       double dot2 = vtkMath::Dot(v2, versorY);
+      double dot3 = vtkMath::Dot(centerMiddle, versorX);
 
       if(dot1 <0.  &&  dot2 > 0.)
       {
@@ -715,7 +722,7 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
 
       }
 
-      mafLogMessage("dotCenter %.2f - dotV2 %.2f", dot1, dot2);
+      mafLogMessage("dot1 %.2f - dot2 %.2f dot3 %.2f", dot1, dot2,dot3);
 
     }
 
