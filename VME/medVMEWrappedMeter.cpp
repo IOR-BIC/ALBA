@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-26 15:53:16 $
-  Version:   $Revision: 1.30 $
+  Date:      $Date: 2008-09-26 16:04:11 $
+  Version:   $Revision: 1.31 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -708,14 +708,6 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
       centerMiddle[1] = center[1] - middle[1];
       centerMiddle[2] = center[2] - middle[2];*/
 
-      double x[3] = {1,0,0};
-      double dotXI = vtkMath::Dot(init_center, x);
-      double dotYI = vtkMath::Dot(init_center, versorY);
-      double dotZI = vtkMath::Dot(init_center, versorZ);
-
-      double dotXE = vtkMath::Dot(end_center, x);
-      double dotYE = vtkMath::Dot(end_center, versorY);
-      double dotZE = vtkMath::Dot(end_center, versorZ);
 
       /*double dotXM = vtkMath::Dot(centerMiddle, x);
       double dotYM = vtkMath::Dot(centerMiddle, versorY);
