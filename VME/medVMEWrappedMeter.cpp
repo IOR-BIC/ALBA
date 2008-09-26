@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-26 07:21:21 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2008-09-26 15:53:16 $
+  Version:   $Revision: 1.30 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -470,14 +470,14 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
     if(dott > 0. || nControl!=0)
     {
       WrappingCore(local_start, local_wrapped_center, local_end,\
-        controlParallelExtend, controlParallel,\
+        true, controlParallel,\
         locator, temporaryIntersection, pointsIntersection1,\
-        versorY, versorX,nControl);
+        versorY, versorZ,nControl);
 
       WrappingCore(local_end, local_wrapped_center, local_start,\
-        controlParallelExtend, controlParallel,\
+        false, controlParallel,\
         locator, temporaryIntersection, pointsIntersection2,\
-        versorY, versorX,nControl);
+        versorY, versorZ,nControl);
     }
     else
     {
@@ -626,9 +626,9 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
 }
 //-----------------------------------------------------------------------
 void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,\
-                                      bool controlParallelExtend, bool controlParallel,\
+                                      bool IsStart, bool controlParallel,\
                                       vtkOBBTree *locator, vtkPoints *temporaryIntersection, vtkPoints *pointsIntersection,\
-                                      double *versorY, double *versorX, int nControl)
+                                      double *versorY, double *versorZ, int nControl)
 //-----------------------------------------------------------------------
 {
   double p1[3], p2[3], p3[3];
@@ -638,9 +638,9 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
 
   const int factorLenght = 3;
   
-  p2[0] = center[0]  + factorLenght * (center[0] - init[0]);;
-  p2[1] = center[1]  + factorLenght * (center[1] - init[1]);;
-  p2[2] = center[2]  + factorLenght * (center[2] - init[2]);;
+  p2[0] = center[0]  + factorLenght * (center[0] - init[0]);
+  p2[1] = center[1]  + factorLenght * (center[1] - init[1]);
+  p2[2] = center[2]  + factorLenght * (center[2] - init[2]);
 
   p3[0] = end[0];
   p3[1] = end[1];
@@ -682,48 +682,111 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
     if(count == 0)
     {
 
-      for(int i = 0; i<3; i++)
+      /*for(int i = 0; i<3; i++)
       {
         v1[i] = (p2[i] - p1[i]);
         v2[i] = (p3[i] - p2[i]);
 
-      }
-
+      }*/
       
-      // the order is important to understand the direction of the control
-      vtkMath::Cross(v1,v2, vtemp);
-      vtkMath::Cross(vtemp,v1, v2);
-      vtkMath::Normalize(v2);
+      double init_center[3];
+      init_center[0] = center[0] - init[0];
+      init_center[1] = center[1] - init[1];
+      init_center[2] = center[2] - init[2];
 
-      
-      double middle[3];
+      double end_center[3];
+      end_center[0] = end[0] - center[0];
+      end_center[1] = end[1] - center[1];
+      end_center[2] = end[2] - center[2];
+
+      /*double middle[3];
       middle[0] = (end[0] + init[0])/2.;
       middle[1] = (end[1] + init[1])/2.;
       middle[2] = (end[2] + init[2])/2.;
       double centerMiddle[3];
       centerMiddle[0] = center[0] - middle[0];
       centerMiddle[1] = center[1] - middle[1];
-      centerMiddle[2] = center[2] - middle[2];
+      centerMiddle[2] = center[2] - middle[2];*/
 
-      double start_end[3];
-      start_end[0] = end[0] - init[0];
-      start_end[1] = end[1] - init[1];
-      start_end[2] = end[2] - init[2];
+      double x[3] = {1,0,0};
+      double dotXI = vtkMath::Dot(init_center, x);
+      double dotYI = vtkMath::Dot(init_center, versorY);
+      double dotZI = vtkMath::Dot(init_center, versorZ);
 
-      double dot1 = vtkMath::Dot(centerMiddle, versorY);
+      double dotXE = vtkMath::Dot(end_center, x);
+      double dotYE = vtkMath::Dot(end_center, versorY);
+      double dotZE = vtkMath::Dot(end_center, versorZ);
+
+      /*double dotXM = vtkMath::Dot(centerMiddle, x);
+      double dotYM = vtkMath::Dot(centerMiddle, versorY);
+      double dotZM = vtkMath::Dot(centerMiddle, versorZ);*/
+
+      //function
+
+      vtkMAFSmartPointer<vtkPlaneSource> planeSource;
+      planeSource->SetOrigin(init);
+      planeSource->SetPoint1(center);
+      planeSource->SetPoint2(end);
+      planeSource->Update();
+
+      double normal[3];
+      planeSource->GetNormal(normal);
+
+      
+      //mafLogMessage("DotMX %.2f DotMY %.2f DotMZ %.2f", dotXM,dotYM,dotZM);
+
+      
+      double v2new[3];
+      vtkMath::Cross(normal,init_center, v2new);
+      vtkMath::Normalize(v2new);
+      //double dot = vtkMath::Dot(v2new, v2);
+      v2[0] = v2new[0];
+      v2[1] = v2new[1];
+      v2[2] = v2new[2];
+
       double dot2 = vtkMath::Dot(v2, versorY);
-      double dot3 = vtkMath::Dot(centerMiddle, versorX);
+      double dot3 = vtkMath::Dot(v2, versorZ);
 
-      if(dot1 <0.  &&  dot2 > 0.)
+      
+      double dot4 = -1;
+
+      mafLogMessage("DotVersorY %.2f ", dot2);
+      mafLogMessage("DotVersorZ %.2f ", dot3);
+
+
+      if(IsStart == false)
       {
-        v2[0] = -v2[0];
-        v2[1] = -v2[1];
-        v2[2] = -v2[2];
-
+        double insertionVector[3];
+        insertionVector[0] = -init_center[0];
+        insertionVector[1] = -init_center[1];
+        insertionVector[2] = -init_center[2];
+        dot4 = vtkMath::Dot(insertionVector, versorZ);
       }
 
-      mafLogMessage("dot1 %.2f - dot2 %.2f dot3 %.2f", dot1, dot2,dot3);
-
+      mafLogMessage("Z: %.2f" , dot4);
+      if(dot4 < 0.)
+      {
+        if(dot2 > 0.)
+        {
+          v2[0] = - v2[0];
+          v2[1] = - v2[1];
+          v2[2] = - v2[2];
+        }
+      }
+      else
+      {
+        if(dot2 < 0.)
+        {
+          v2[0] = - v2[0];
+          v2[1] = - v2[1];
+          v2[2] = - v2[2];
+        }
+      }
+      
+      
+      
+      
+      
     }
 
     for(int i = 0; i<3; i++)

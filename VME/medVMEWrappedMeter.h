@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-26 07:21:21 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-09-26 15:53:16 $
+  Version:   $Revision: 1.12 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -328,11 +328,12 @@ protected:
 
   /** Wrapping Core*/
   void WrappingCore(double *init, double *center, double *end,\
-                    bool controlParallelExtend, bool controlParallel,\
+                    bool IsStart, bool controlParallel,\
                     vtkOBBTree *locator, vtkPoints *temporaryIntersection, vtkPoints *pointsIntersection,\
-                    double *versorY, double *versorX, int nControl);
+                    double *versorY, double *versorZ, int nControl);
 
   void AvoidWrapping(double *local_start, double *local_end);
+
 
   double m_Distance;
   double m_Angle;
