@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-26 16:04:11 $
-  Version:   $Revision: 1.31 $
+  Date:      $Date: 2008-10-01 15:48:55 $
+  Version:   $Revision: 1.32 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -651,7 +651,7 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
   int n1 = -1; // number of intersections
 
   int precision = 50;
-  short wrapside = m_WrapSide == 0 ? (-1) : (1);
+  short wrapside = -1; // m_WrapSide == 0 ? (-1) : (1);
   int invertDirection = 1;
   
   while(n1 != 0)
@@ -2006,8 +2006,8 @@ mafGUI* medVMEWrappedMeter::CreateGui()
  //   m_Gui->Enable(ID_END2_METER_LINK,false);
 
   m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
-  m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
-  m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+  m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP);
+  m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP);
 
   m_Gui->Label(_("MidPoints"), true);
   m_ListBox=m_Gui->ListBox(ID_LISTBOX);
@@ -2139,8 +2139,8 @@ void medVMEWrappedMeter::OnEvent(mafEventBase *maf_event)
 				EnableManualModeWidget(m_WrappedMode ==MANUAL_WRAP);
 
         m_Gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
-        m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
-        m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP || m_WrappedMode == IOR_AUTOMATED_WRAP);
+        m_Gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode == AUTOMATED_WRAP );
+        m_Gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode == AUTOMATED_WRAP);
         
 
 				Modified();
