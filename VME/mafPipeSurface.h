@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2008-10-06 10:24:07 $
+  Version:   $Revision: 1.29.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,22 @@ public:
   /** Set the actor picking*/
   void SetActorPicking(int enable = true);
 
+  /** Get assembly front/back */
+  virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
+
+  void SetEdgeVisibilityOn(){m_EdgeVisibility = TRUE;};
+  void SetEdgeVisibilityOff(){m_EdgeVisibility = FALSE;};
+
+  void SetNormalVisibilityOn(){m_NormalVisibility = TRUE;};
+  void SetNormalVisibilityOff(){m_NormalVisibility = FALSE;};
+
+  void SetScalarVisibilityOn(){m_ScalarVisibility = TRUE;};
+  void SetScalarVisibilityOff(){m_ScalarVisibility = FALSE;};
+
+  void SetUseVtkPropertyOn(){m_UseVTKProperty = TRUE;};
+  void SetUseVtkPropertyOff(){m_UseVTKProperty = FALSE;};
+
 protected:
   vtkPolyDataMapper	      *m_Mapper;
 	vtkLineSource						*m_Arrow;
@@ -87,7 +103,7 @@ protected:
 	vtkActor								*m_NormalActor;
 	vtkCellCenters					*m_CenterPointsFilter;
 	vtkArrowSource					*m_NormalArrow;
-  vtkActor             *m_Actor; ///< Actor representing the polygonal surface
+  vtkActor                *m_Actor; ///< Actor representing the polygonal surface
 
   mafLODActor             *m_OutlineActor;
   mafAxes                 *m_Axes;

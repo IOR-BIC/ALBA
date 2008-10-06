@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.52 $
+  Date:      $Date: 2008-10-06 10:24:07 $
+  Version:   $Revision: 1.52.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,7 +184,9 @@ void mafPipeSurface::Create(mafSceneNode *n)
 
   m_AssemblyFront->AddPart(m_OutlineActor);
 
-	m_Axes = new mafAxes(m_RenFront, m_Vme);
+  if(m_RenFront)
+	  m_Axes = new mafAxes(m_RenFront, m_Vme);
+
 	if(m_Vme->IsA("mafVMERefSys"))
 		m_Axes->SetVisibility(false);
   	
@@ -300,6 +302,7 @@ mafPipeSurface::~mafPipeSurface()
   vtkDEL(m_NormalMapper);
   vtkDEL(m_CenterPointsFilter);
   vtkDEL(m_NormalGlyph);
+  vtkDEL(m_NormalArrow);
   vtkDEL(m_Normal);
   vtkDEL(m_EdgesActor);
   vtkDEL(m_EdgesMapper);
@@ -377,7 +380,10 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
           data->GetScalarRange(range);
           m_Mapper->SetScalarRange(range);
         }
-				m_Gui->Enable(ID_LUT,m_ScalarVisibility != 0);
+				if (m_Gui != NULL)
+				{
+					m_Gui->Enable(ID_LUT,m_ScalarVisibility != 0);
+				}
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     	break;
@@ -398,7 +404,11 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
         {
           m_Actor->SetProperty(NULL);
         }
-        m_MaterialButton->Enable(m_UseVTKProperty != 0);
+
+        if (m_MaterialButton != NULL)
+        {
+        	m_MaterialButton->Enable(m_UseVTKProperty != 0);
+        }
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_RENDERING_DISPLAY_LIST:
