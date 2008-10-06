@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-27 11:35:39 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-10-06 10:00:00 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -108,6 +108,13 @@ protected:
     ID_GEOMETRY_TYPE,
     ID_LAST
   };
+
+  enum ID_ORIENTATION_AXIS
+  {
+    ID_X_AXIS = 0,
+    ID_Y_AXIS,
+    ID_Z_AXIS,
+  };
   
 
   /** this function uses PARAMETRIC_SURFACE_TYPE_ID as argument*/
@@ -157,9 +164,11 @@ protected:
   double m_ConeRadius;
   int m_ConeCapping;
   double m_ConeRes;
+  int m_ConeOrientationAxis;
   double m_CylinderHeight;
   double m_CylinderRadius;
   double m_CylinderRes;
+  int m_CylinderOrientationAxis;
   double m_CubeXLength;
   double m_CubeYLength;
   double m_CubeZLength;
