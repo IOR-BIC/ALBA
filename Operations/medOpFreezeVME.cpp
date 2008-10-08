@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:34:22 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-10-08 14:27:33 $
+  Version:   $Revision: 1.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -100,11 +100,34 @@ void medOpFreezeVME::OpRun()
   mafVMEOutput *output = vme->GetOutput();
   output->Update();
 	
-	/*if(vtkImageData *imageData = vtkImageData::SafeDownCast(output->GetVTKData()))
+	if(vtkImageData *imageData = vtkImageData::SafeDownCast(output->GetVTKData()))
 	{
-    //
+    if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
+    {
+      mmaMaterial *material = (mmaMaterial *)labeledVolume->GetAttribute("MaterialAttributes");
+
+      mafSmartPointer<mafVMEVolumeGray> newVolume;
+      newVolume->SetName(labeledVolume->GetName());
+      newVolume->SetData(imageData,labeledVolume->GetTimeStamp());
+      newVolume->Update();
+
+      if(material)
+      {
+        newVolume->GetMaterial()->DeepCopy(material);
+        newVolume->GetMaterial()->UpdateProp();
+      }
+
+      newVolume->SetMatrix(*labeledVolume->GetOutput()->GetMatrix());
+      m_Output=newVolume;
+      if (m_Output)
+      {
+        m_Output->ReparentTo(m_Input->GetParent());
+        if(!m_TestMode)
+          OpStop(OP_RUN_OK);
+      }
+    }
 	}
-  else*/
+  else
 	if(vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::SafeDownCast(output->GetVTKData()))
 	{
     if(medVMELabeledVolume *labeledVolume = medVMELabeledVolume::SafeDownCast(vme))
