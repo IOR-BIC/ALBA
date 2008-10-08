@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:06:26 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-10-08 14:28:59 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 class vtkActor;
 class vtkCaptionActor2D;
+class vtkPolyDataMapper;
 
 //----------------------------------------------------------------------------
 // mafPipeGizmo :
@@ -41,11 +42,16 @@ public:
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Get assembly front/back */
+  virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
+
 protected:
   void UpdatePipe();
 
   mafString m_Caption;
 
+  vtkPolyDataMapper *m_Mapper;
   vtkActor *m_Actor;
   vtkActor *m_OutlineActor;
   vtkCaptionActor2D *m_CaptionActor;

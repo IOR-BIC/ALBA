@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-13 10:54:34 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-10-08 14:28:59 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,7 @@ mafPipeGizmo::mafPipeGizmo()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
+  m_Mapper          = NULL;
   m_Actor           = NULL;
   m_OutlineActor    = NULL;
   m_CaptionActor    = NULL;
@@ -73,7 +74,7 @@ void mafPipeGizmo::Create(mafSceneNode *n)
 
   m_Vme->GetEventSource()->AddObserver(this);
 
-  vtkMAFSmartPointer<vtkPolyDataMapper> m_Mapper;
+  m_Mapper = vtkPolyDataMapper::New();
 	m_Mapper->SetInput(data);
 	m_Mapper->ImmediateModeRenderingOff();
 
@@ -129,7 +130,8 @@ void mafPipeGizmo::Create(mafSceneNode *n)
 
   m_CaptionActor->LeaderOff();
 
-  m_RenFront->AddActor2D(m_CaptionActor);
+  if(NULL != m_RenFront)
+    m_RenFront->AddActor2D(m_CaptionActor);
 
 }
 //----------------------------------------------------------------------------
@@ -139,8 +141,10 @@ mafPipeGizmo::~mafPipeGizmo()
   m_Vme->GetEventSource()->RemoveObserver(this);
   m_AssemblyFront->RemovePart(m_Actor);
   m_AssemblyFront->RemovePart(m_OutlineActor);
-  m_RenFront->RemoveActor2D(m_CaptionActor);
+  if(NULL != m_RenFront)
+    m_RenFront->RemoveActor2D(m_CaptionActor);
 
+  vtkDEL(m_Mapper);
   vtkDEL(m_Actor);
   vtkDEL(m_OutlineActor);
   vtkDEL(m_CaptionActor);
