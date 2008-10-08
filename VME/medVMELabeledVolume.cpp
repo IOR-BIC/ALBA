@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.22 $
+  Date:      $Date: 2008-10-08 15:48:15 $
+  Version:   $Revision: 1.23 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -685,6 +685,7 @@ void medVMELabeledVolume::CreateOpDialog()
   m_Dlg->Add( h_sizer4 );
 
   CreateSlicePipeline();  
+  UpdateLookUpTable();
   this->m_Rwi->CameraUpdate();
 }
 
