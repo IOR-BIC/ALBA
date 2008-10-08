@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIVMEChooserTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-21 11:38:16 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-10-08 13:05:17 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 #include "mafPics.h" 
 #include "mafEvent.h"
 #include "mafNode.h"
+#include "mafNodeIterator.h"
 #include "mafView.h"
 #include "mafVMERoot.h"
 #include "mafVMELandmarkCloud.h"
@@ -367,22 +368,51 @@ void mafGUIVMEChooserTree::VmeUpdateIcon(mafNode *vme)
   int icon_index;
   int nodeSatus;
 
-  bool checked = IsIconChecked(ItemFromNode((long)vme));
-  if (!checked)
+  //When root VME is checked, all the sub-tree will be checked.
+  if (vme->IsA("mafVMERoot"))
   {
-    nodeSatus = NODE_VISIBLE_ON*2;
-    icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
-    m_CheckedNode.push_back(vme);
+    bool checked = IsIconChecked(ItemFromNode((long)vme));
+    mafNodeIterator *iter = vme->NewIterator();
+    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    {
+      if (!checked)
+      {
+        nodeSatus = NODE_VISIBLE_ON*2;
+        icon_index = ClassNameToIcon(node->GetTypeName()) + nodeSatus;
+        m_CheckedNode.push_back(node);
+      }
+      else
+      {
+        nodeSatus = NODE_VISIBLE_ON;
+        icon_index = ClassNameToIcon(node->GetTypeName()) + nodeSatus;
+        std::vector<mafNode *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), node);
+        if (found != m_CheckedNode.end())
+        {
+          m_CheckedNode.erase(found);
+        }
+      }
+      SetNodeIcon( (long)node, icon_index );
+    }
   }
   else
   {
-    nodeSatus = NODE_VISIBLE_ON;
-    icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
-    std::vector<mafNode *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), vme);
-    if (found != m_CheckedNode.end())
+    bool checked = IsIconChecked(ItemFromNode((long)vme));
+    if (!checked)
     {
-      m_CheckedNode.erase(found);
+      nodeSatus = NODE_VISIBLE_ON*2;
+      icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
+      m_CheckedNode.push_back(vme);
     }
+    else
+    {
+      nodeSatus = NODE_VISIBLE_ON;
+      icon_index = ClassNameToIcon(vme->GetTypeName()) + nodeSatus;
+      std::vector<mafNode *>::iterator found = std::find(m_CheckedNode.begin(), m_CheckedNode.end(), vme);
+      if (found != m_CheckedNode.end())
+      {
+        m_CheckedNode.erase(found);
+      }
+    }
+    SetNodeIcon( (long)vme, icon_index );
   }
-  SetNodeIcon( (long)vme, icon_index );
 }
