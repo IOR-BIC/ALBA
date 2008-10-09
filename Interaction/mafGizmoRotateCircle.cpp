@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:57:38 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-10-09 09:43:50 $
+  Version:   $Revision: 1.8.4.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -332,4 +332,9 @@ mmiGenericInterface *mafGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
   return IsaGen;
+}
+
+int mafGizmoRotateCircle::GetAxis()
+{
+ return ActiveAxis;
 }

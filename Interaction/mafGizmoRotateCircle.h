@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2005-12-12 11:39:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-10-09 09:43:51 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -71,7 +71,7 @@ public:
   /** Set/Get gizmo axis, default axis is X*/        
   void SetAxis(int axis); 
   
-  /** Get gizmo axis*/
+  /** Get egizmo axis*/
   int  GetAxis(); 
   
   //----------------------------------------------------------------------------
@@ -182,6 +182,8 @@ protected:
 
   /** Register Gizmo status*/
   bool IsActive;
-
+  
+  /** friend test */
+  friend class mafGizmoRotateCircleTest;
 };
 #endif
