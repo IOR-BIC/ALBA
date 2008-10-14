@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-10-14 09:17:13 $
+  Version:   $Revision: 1.18 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,7 +86,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 
   m_Selected = false;
 
-  wxBusyCursor wait;
+  //wxBusyCursor wait;
 
   // image pipeline
   double sr[2];
