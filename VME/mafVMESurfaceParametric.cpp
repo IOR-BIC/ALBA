@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-06 10:00:00 $
-  Version:   $Revision: 1.17.2.1 $
+  Date:      $Date: 2008-10-14 08:09:50 $
+  Version:   $Revision: 1.17.2.2 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -79,7 +79,7 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
   m_CylinderHeight = 5.0;
   m_CylinderRadius = 2.0;
   m_CylinderRes = 20.0;
-  m_CylinderOrientationAxis = ID_X_AXIS;
+  m_CylinderOrientationAxis = ID_Y_AXIS;
   m_CubeXLength = 2.0;
   m_CubeYLength = 2.0;
   m_CubeZLength = 2.0;
