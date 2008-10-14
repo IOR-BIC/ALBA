@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-01 15:48:55 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2008-10-14 08:08:19 $
+  Version:   $Revision: 1.33 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -424,9 +424,7 @@ void medVMEWrappedMeter::InternalUpdateAutomatedIOR()
     matrix.GetVersor(1, versorY);
     matrix.GetVersor(2, versorZ);
     // these versors determine the semiplanes, versor Z determines XY plane.
-    double t;
-    double pseudoIntersection[3];
-
+    
     double extendStart[3];
     double extendEnd[3];
     double factor = 100000;
@@ -646,7 +644,7 @@ void medVMEWrappedMeter::WrappingCore(double *init, double *center, double *end,
   p3[1] = end[1];
   p3[2] = end[2];
 
-  double v1[3],v2[3],vtemp[3];
+  double v2[3];
   int count =0;
   int n1 = -1; // number of intersections
 
