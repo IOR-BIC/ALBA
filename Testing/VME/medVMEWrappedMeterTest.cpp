@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-07 08:41:48 $
-Version:   $Revision: 1.8 $
+Date:      $Date: 2008-10-14 08:08:59 $
+Version:   $Revision: 1.9 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -101,6 +101,8 @@ void medVMEWrappedMeterTest::TestWithGenericVME()
 	mafDEL(vmeParametricSurfaceEND1);
 
 	mafDEL(storage);
+
+  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------------
@@ -170,6 +172,8 @@ void medVMEWrappedMeterTest::TestWithGenericVMEWithMiddlePoints()
 	mafDEL(vmeParametricSurfaceMiddlePoint);
 
 	mafDEL(storage);
+
+  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------------
@@ -218,14 +222,16 @@ void medVMEWrappedMeterTest::TestWithGenericLandmark()
 		             wrappedMeter->GetDistance() <= 8.34    );
 
 
-	wrappedMeter->SetParent(NULL);
-	cloud->SetParent(NULL);
+  wrappedMeter->SetParent(NULL);
+  cloud->SetParent(NULL);
 
 
-	mafDEL(wrappedMeter);
-	mafDEL(cloud);
+  mafDEL(wrappedMeter);
+  mafDEL(importer);
 
-	mafDEL(storage);
+  mafDEL(storage);
+
+  delete wxLog::SetActiveTarget(NULL);
 }
 
 //---------------------------------------------------------------
@@ -297,6 +303,8 @@ void medVMEWrappedMeterTest::TestWithGenericLandmarkWithMiddlePoints()
 	mafDEL(importer);
 
 	mafDEL(storage);
+
+  delete wxLog::SetActiveTarget(NULL);
 }
 /*
 //---------------------------------------------------------------
@@ -652,5 +660,7 @@ void medVMEWrappedMeterTest::TestWrappedGeometry()
   mafDEL(vmeParametricSurfaceWrapped);
 
   mafDEL(storage);
+
+  delete wxLog::SetActiveTarget(NULL);
 
 }
