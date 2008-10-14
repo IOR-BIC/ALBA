@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 07:19:50 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-10-14 09:08:26 $
+  Version:   $Revision: 1.11 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -66,6 +66,8 @@ public:
   void SetGizmoMovingModalityToSnap(); 
   int  GetGizmoMovingModality() {return this->m_MovingModality;};
   
+  void SetGizmoEnableMoving(bool enable);
+
   /** Events handling method */
   void OnEvent(mafEventBase *maf_event);
  

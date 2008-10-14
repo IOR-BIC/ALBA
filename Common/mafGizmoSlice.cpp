@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:25:33 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-10-14 09:08:26 $
+  Version:   $Revision: 1.21 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -98,6 +98,21 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   vtkNEW(m_Point);
   m_Point->SetNumberOfPoints(1);
 }
+
+//----------------------------------------------------------------------------
+void mafGizmoSlice::SetGizmoEnableMoving(bool enable)
+//----------------------------------------------------------------------------
+{
+  if(true == enable)
+  {
+    m_VmeGizmo->SetBehavior(m_GizmoBehavior);
+  }
+  else
+  {
+    m_VmeGizmo->SetBehavior(NULL);
+  }
+}
+
 //----------------------------------------------------------------------------
 void mafGizmoSlice::DestroyGizmoSlice()
 //----------------------------------------------------------------------------
