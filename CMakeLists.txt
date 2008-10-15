@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-04-23 12:11:36 $
-# Version:   $Revision: 1.12 $
+# Date:      $Date: 2008-10-15 08:35:44 $
+# Version:   $Revision: 1.12.2.1 $
 #
 # Description:
 # CMake Project file for the Medical Library.
@@ -187,4 +187,3 @@ SET(MEDICAL_PARABUILD_BUILD_NUMBER $ENV{PARABUILD_BUILD_NUMBER} CACHE INTERNAL "
 
 # create the main version variable:
 SET(MEDICAL_PARABUILD_VERSION "${MEDICAL_PARABUILD_MAJOR_VERSION}_${MEDICAL_PARABUILD_MINOR_VERSION}_TS_${MEDICAL_PARABUILD_BUILD_TIMESTAMP}_BUILD_${MEDICAL_PARABUILD_BUILD_NUMBER}" CACHE INTERNAL "big version identifier concatenating other identifier")
- 
