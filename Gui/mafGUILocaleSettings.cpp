@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUILocaleSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-10-16 17:37:31 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,11 +42,11 @@ mafGUILocaleSettings::~mafGUILocaleSettings()
 void mafGUILocaleSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
-  wxString lang_array[7] = {"English","French","German","Italian","Spanish","Russian","Polish"};
+  wxString lang_array[8] = {"English","French","German","Italian","Spanish","Russian","Polish","Czech"};
 
   m_Gui = new mafGUI(this);   
   m_Gui->Label(_("User Interface Language"));
-  m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId, 7,lang_array);
+  m_Gui->Radio(LANGUAGE_ID,"", &m_LanguageId, 8,lang_array);
 	m_Gui->Enable(LANGUAGE_ID,m_EnableLanguage); 
   m_Gui->Label(_("changes will take effect when \nthe application restart"),false,true);
   m_Gui->Label("");
@@ -55,7 +55,7 @@ void mafGUILocaleSettings::CreateGui()
 void mafGUILocaleSettings::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-	switch(maf_event->GetId())
+  switch(maf_event->GetId())
   {
     case LANGUAGE_ID:
     {
@@ -85,6 +85,10 @@ void mafGUILocaleSettings::OnEvent(mafEventBase *maf_event)
 		m_Language = wxLANGUAGE_POLISH;
         m_LanguageDictionary = "pl";
         break;
+	  case 7:
+		m_Language = wxLANGUAGE_CZECH;
+		m_LanguageDictionary = "cs";
+		break;
       default:
         m_Language = wxLANGUAGE_ENGLISH;
         m_LanguageDictionary = "en";
@@ -154,6 +158,9 @@ void mafGUILocaleSettings::InitializeSettings()
   case wxLANGUAGE_POLISH:
     m_LanguageId =6;
     break;
+  case wxLANGUAGE_CZECH:
+	m_LanguageId =7;
+	break;
   default: //wxLANGUAGE_ENGLISH;
     m_LanguageId =0; 
   }
@@ -195,6 +202,11 @@ void mafGUILocaleSettings::SetLanguageDirectory(const char* prefix, const char* 
   {
     m_Language		= wxLANGUAGE_POLISH;
 	m_LanguageId	= 6;
+  }
+  else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "cs") == 0)
+  {
+	m_Language		= wxLANGUAGE_CZECH;
+	m_LanguageId	= 7;
   }
   else if (strcmp(wxT(m_LanguageDictionary.GetCStr()), "en") == 0)
   {
