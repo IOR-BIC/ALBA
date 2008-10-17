@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.44 $
+  Date:      $Date: 2008-10-17 11:52:48 $
+  Version:   $Revision: 1.44.2.1 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -253,7 +253,10 @@ void mafLogicWithGUI::CreateLogbar()
     s += m_Win->GetTitle();
     s += wxString::Format("_%02d_%02d_%d_%02d_%2d",log_time.GetYear(),log_time.GetMonth() + 1,log_time.GetDay(),log_time.GetHour(),log_time.GetMinute());
     s += ".log";
-    m_Logger->SetFileName(s);
+    if (m_Logger->SetFileName(s) == MAF_ERROR)
+    {
+      wxMessageBox(wxString::Format("Unable to create log file %s!!",s),"Warning", wxOK|wxICON_WARNING);
+    }
   }
   m_Logger->SetVerbose(m_LogAllEvents);
 
