@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafWXLog.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-11 11:22:19 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-10-17 11:50:33 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ public:
  ~mafWXLog();
   
   /** Set the filename for the log file. */ 
-  void SetFileName(wxString filename);
+  int SetFileName(wxString filename);
   
   /** Set the flag to rodirect the log on a file. */ 
   void LogToFile(bool on);
