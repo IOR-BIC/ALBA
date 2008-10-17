@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-10-17 11:51:53 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -89,6 +89,7 @@ void mafGUIApplicationSettings::OnEvent(mafEventBase *maf_event)
     break;
     case ID_LOG_VERBOSE:
       m_Config->Write("LogVerbose",m_VerboseLog);
+      mafEventBase::SetLogVerbose(m_VerboseLog != 0);
     break;
     case ID_LOG_DIR:
       m_Config->Write("LogFolder",m_LogFolder.GetCStr());
@@ -142,6 +143,7 @@ void mafGUIApplicationSettings::InitializeSettings()
   if(m_Config->Read("LogVerbose", &long_item))
   {
     m_VerboseLog = long_item;
+    mafEventBase::SetLogVerbose(m_VerboseLog != 0);
   }
   else
   {
