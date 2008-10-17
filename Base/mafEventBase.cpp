@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-09 13:55:43 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-10-17 11:48:53 $
+  Version:   $Revision: 1.5.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,11 +26,14 @@
 mafCxxTypeMacro(mafEventBase)
 //------------------------------------------------------------------------------
 
+bool mafEventBase::m_LogVerbose = false;
+
 //------------------------------------------------------------------------------
 mafEventBase::mafEventBase(void *sender, mafID id, void *data, mafID channel):
 m_Sender(sender),m_Source(NULL),m_Data(data),m_Id(id),m_Channel(channel),m_SkipFlag(false)
 //------------------------------------------------------------------------------
-{}
+{
+}
 
 //------------------------------------------------------------------------------
 mafEventBase::~mafEventBase()
@@ -106,6 +109,24 @@ void mafEventBase::SetId(mafID id)
 mafID mafEventBase::GetId()
 //------------------------------------------------------------------------------
 {
+  if (m_Id != UPDATE_UI && m_LogVerbose)
+  {
+    mafString sender_type = "Received Event. Sender: ";
+    try
+    {
+      mafObject *obj = (mafObject *)m_Sender;
+      sender_type << typeid(*obj).name();
+    }
+    catch (...)
+    {
+      sender_type = "not mafObject (";
+      sender_type << (long)m_Sender;
+      sender_type << ")";
+    }
+    mafString id_name = mafIdString(m_Id).c_str();
+    mafString msg = sender_type + "  ID: " + id_name;
+    mafLogMessage(msg);
+  }
   return m_Id;
 }
 
