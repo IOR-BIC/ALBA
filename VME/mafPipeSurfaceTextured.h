@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2008-10-20 15:23:24 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -87,6 +87,16 @@ public:
 
   /** Turn Off the selection visibility.*/
   void SelectionActorOn(){m_SelectionVisibility = TRUE;};
+
+	/** Get assembly front/back */
+	virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+	virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
+
+	void SetScalarVisibilityOn(){m_ScalarVisibility = TRUE;};
+	void SetScalarVisibilityOff(){m_ScalarVisibility = FALSE;};
+
+	void SetUseVtkPropertyOn(){m_UseVTKProperty = TRUE;};
+	void SetUseVtkPropertyOff(){m_UseVTKProperty = FALSE;};
 
 protected:
   vtkTexture              *m_Texture;

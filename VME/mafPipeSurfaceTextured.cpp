@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-10-20 15:23:24 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -222,8 +222,11 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
   else
     m_AssemblyFront->AddPart(m_OutlineActor);
 
-  m_Axes = new mafAxes(m_RenFront, m_Vme);
-  m_Axes->SetVisibility(0);
+	if(m_RenFront)
+	{
+      m_Axes = new mafAxes(m_RenFront, m_Vme);
+      m_Axes->SetVisibility(0);
+	}
 }
 //----------------------------------------------------------------------------
 mafPipeSurfaceTextured::~mafPipeSurfaceTextured()
@@ -355,7 +358,10 @@ void mafPipeSurfaceTextured::OnEvent(mafEventBase *maf_event)
         {
           m_Actor->SetProperty(NULL);
         }
-        m_MaterialButton->Enable(m_UseVTKProperty != 0);
+		if (m_MaterialButton != NULL)
+		{
+		  m_MaterialButton->Enable(m_UseVTKProperty != 0);
+		}
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
       case ID_USE_LOOKUP_TABLE:
