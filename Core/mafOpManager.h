@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-10-21 15:53:01 $
+  Version:   $Revision: 1.16.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,6 +36,7 @@ class vtkMatrix4x4;
 class mmdMouse;
 class mafGUISettings;
 class mafGUISettingsDialog;
+class mafUser;
 
 //----------------------------------------------------------------------------
 // mafOpManager :
@@ -118,6 +119,7 @@ public:
   Initialize the action for the mouse device. */
   void SetMouse(mmdMouse *mouse);
 
+
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status);
 
@@ -125,6 +127,9 @@ public:
 
   /** Called by logic to refresh the operation's menù items.*/
   void RefreshMenu();
+
+  /** Set MafUser */
+  void SetMafUser(mafUser *user);
 
 protected:
 	/** Execute the current operation. */
@@ -154,6 +159,9 @@ protected:
 	/** Enable/Disable the toolbar's buttons. */
 	virtual void EnableToolbar(bool CanEnable = true);
 
+  /** Fill the attribute for traceability events*/
+  void FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNode *out_node);
+
   void SetAccelerator(mafOp *op);
 
   mmdMouse          *m_Mouse; ///< Pointer to the mouse devices.
@@ -163,6 +171,8 @@ protected:
 	wxMenu            *m_Menu[3]; ///< Array of pointers to the menu 'Operations', 'Importer' and 'Exporter'
   mafNode						*m_Selected; ///< Pointer to the current selected node.
   mafNode           *m_NaturalNode; ///< Pointer to the NATURAL node on which is running a non-input preserving operation.
+
+  mafUser           *m_User; ///<User credentials
 
   std::vector<mafOp *> m_OpList; ///< List of pointer of plugged operations.
   int                m_NumOp; ///< Number of plugged operations.

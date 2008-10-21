@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.40 $
+  Date:      $Date: 2008-10-21 15:53:01 $
+  Version:   $Revision: 1.40.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,13 +25,14 @@
 #include "mmuIdFactory.h"
 #include "mafDecl.h"
 #include "mafOp.h"
+#include "mafUser.h"
 #include "mafGUI.h"
 #include "mafGUISettings.h"
 #include "mafOpStack.h"
 #include "mafOpContextStack.h"
 #include "mafOpSelect.h"
 #include "mafGUISettingsDialog.h"
-
+#include "mafAttributeTraceability.h"
 #include "mmdMouse.h"
 
 #include "mafStorage.h"
@@ -80,13 +81,14 @@ but could not be done the undo.
 mafOpManager::mafOpManager()
 //----------------------------------------------------------------------------
 {
-  m_Listener	= NULL;
+  m_Listener	     = NULL;
   m_RemoteListener = NULL;
-  m_RunningOp = NULL;
-	m_Selected	= NULL;
-  m_NaturalNode = NULL;
-  m_Warn			= true;
-  m_FromRemote= false;
+  m_RunningOp      = NULL;
+	m_Selected	     = NULL;
+  m_NaturalNode    = NULL;
+  m_User           = NULL;
+  m_Warn           = true;
+  m_FromRemote     = false;
 
   m_OpParameters = NULL;
   
@@ -132,6 +134,7 @@ mafOpManager::~mafOpManager()
   cppDEL(m_OpCut);
   cppDEL(m_OpCopy);
   cppDEL(m_OpPaste);
+  cppDEL(m_User);
 }
 //----------------------------------------------------------------------------
 void mafOpManager::OnEvent(mafEventBase *maf_event)
@@ -723,6 +726,9 @@ void mafOpManager::OpDo(mafOp *op)
     mafLogMessage("operation '%s' generate %s as output",op->m_Label.c_str(), out_node->GetName());
   }
 
+  if (op->GetType() != OPTYPE_EDIT)
+      FillTraceabilityAttribute(op, in_node, out_node);
+
   if(op->CanUndo()) 
   {
 	  m_Context.Undo_Push(op);
@@ -731,6 +737,96 @@ void mafOpManager::OpDo(mafOp *op)
   {
 	  m_Context.Undo_Clear();
     delete op;  
+  }
+}
+
+//----------------------------------------------------------------------------
+void mafOpManager::SetMafUser(mafUser *user)
+//----------------------------------------------------------------------------
+{
+  m_User = user;
+}
+
+//----------------------------------------------------------------------------
+void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNode *out_node)
+//----------------------------------------------------------------------------
+{
+  char dateStr[9];
+
+  mafString trialEvent = "Modify";
+  mafString operationName;
+  mafString appStamp;
+  mafString userID;
+  mafString isNatural;
+  wxString revision;
+
+  _strdate(dateStr);
+  operationName = op->GetTypeName();
+
+  if (m_User != NULL && m_User->IsAuthenticated())
+      userID = m_User->GetName();
+
+  if (in_node != NULL)
+  {
+    mafAttributeTraceability *traceability = (mafAttributeTraceability *)in_node->GetAttribute("TrialAttribute");
+    if (traceability == NULL)
+    {
+      traceability = mafAttributeTraceability::New();
+      traceability->SetName("TrialAttribute");
+      in_node->SetAttribute("TrialAttribute", traceability);
+    }
+
+    wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\lhpBuilder"));
+    if(RegKey.Exists())
+    {
+      RegKey.Create();
+      RegKey.QueryValue(wxString("DisplayVersion"), revision);
+    }
+    if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
+      appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+
+    appStamp.Append(" ");
+    appStamp.Append(revision.c_str());
+
+    if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
+      isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
+
+    traceability->AddTraceabilityEvent(trialEvent, operationName, dateStr, appStamp, userID, isNatural);
+  }
+
+  if (out_node != NULL)
+  {
+    mafAttributeTraceability *traceability = (mafAttributeTraceability *)out_node->GetAttribute("TrialAttribute");
+    if (traceability == NULL)
+    {
+      trialEvent = "Create";
+      traceability = mafAttributeTraceability::New();
+      traceability->SetName("TrialAttribute");
+      out_node->SetAttribute("TrialAttribute", traceability);
+    }
+    else
+    {
+      mafString trial = traceability->GetLastTrialEvent();
+      if (trial.IsEmpty())
+        trialEvent = "Create";
+    }
+
+    wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\lhpBuilder"));
+    if(RegKey.Exists())
+    {
+      RegKey.Create();
+      RegKey.QueryValue(wxString("DisplayVersion"), revision);
+    }
+    if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
+      appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+
+    appStamp.Append(" ");
+    appStamp.Append(revision.c_str());
+
+    if(out_node->GetTagArray()->IsTagPresent("VME_NATURE"))
+      isNatural = out_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
+
+    traceability->AddTraceabilityEvent(trialEvent, operationName, dateStr, appStamp, userID, isNatural);
   }
 }
 //----------------------------------------------------------------------------
@@ -746,14 +842,33 @@ void mafOpManager::OpUndo()
 
 	mafOp* op = m_Context.Undo_Pop();
   mafNode *in_node = op->GetInput();
+  mafNode *out_node = op->GetOutput();
   if (in_node != NULL)
   {
     mafLogMessage("undo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
+    mafAttributeTraceability *traceability = (mafAttributeTraceability *)in_node->GetAttribute("TrialAttribute");
+    if (traceability != NULL)
+    {
+      traceability->RemoveTraceabilityEvent();
+      mafString trial = traceability->GetLastTrialEvent();
+      if (trial.IsEmpty())
+        in_node->RemoveAttribute("TrialAttribute");
+    }
   }
   else
   {
     mafLogMessage("undo = %s",op->m_Label.c_str());
   }
+
+  if (out_node != NULL)
+  {
+    mafAttributeTraceability *traceability = (mafAttributeTraceability *)out_node->GetAttribute("TrialAttribute");
+    if (traceability != NULL)
+    {
+      traceability->RemoveTraceabilityEvent();
+    }
+  }
+
 	op->OpUndo();
 	m_Context.Redo_Push(op);
 
@@ -772,6 +887,7 @@ void mafOpManager::OpRedo()
 
 	mafOp* op = m_Context.Redo_Pop();
   mafNode *in_node = op->GetInput();
+  mafNode *out_node = op->GetOutput();
   if (in_node != NULL)
   {
     mafLogMessage("redo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
@@ -781,7 +897,10 @@ void mafOpManager::OpRedo()
     mafLogMessage("redo = %s",op->m_Label.c_str());
   }
 	op->OpDo();
+  
 	m_Context.Undo_Push(op);
+
+  FillTraceabilityAttribute(op, in_node, out_node);
 
 	EnableOp();
 }
