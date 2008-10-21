@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.h,v $
 Language:  C++
-Date:      $Date: 2007-12-19 12:07:19 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-10-21 15:53:46 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,6 +37,10 @@ public:
   /** Function to be customized at application level.
   By default open Login Dialog if the user did not inserted any information.*/
   virtual bool CheckUserCredentials();
+
+  /** Function to be customized at application level.
+  Must return true if user is authenticated*/
+  virtual bool IsAuthenticated();
 
   /** Set the user's credentials. 
   Return 'true' if the users' credentials are correctly initialized, otherwise 'flase' value is returned. */
