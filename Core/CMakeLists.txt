@@ -12,6 +12,8 @@ SET(PROJECT_SRCS
   mafAbsMatrixPipe.h
   mafAttribute.cpp
   mafAttribute.h
+  mafAttributeTraceability.cpp
+  mafAttributeTraceability.h
   mafCoreFactory.cpp
   mafCoreFactory.h
   mafDataPipe.cpp
