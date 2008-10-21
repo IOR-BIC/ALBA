@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-01-24 12:21:18 $
-  Version:   $Revision: 1.25 $
+  Date:      $Date: 2008-10-21 15:54:05 $
+  Version:   $Revision: 1.25.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -56,6 +56,7 @@
 #include "mmaMaterial.h"
 #include "mmaVolumeMaterial.h"
 #include "mmaApplicationLayout.h"
+#include "mafAttributeTraceability.h"
 #include "mmaMeter.h"
 #include "mafTagArray.h"
 #include "mafVMEItemVTK.h"
@@ -106,6 +107,7 @@ mafVMEFactory::mafVMEFactory()
   mafPlugObjectMacro(mmaMaterial,"Material attributes");
   mafPlugObjectMacro(mmaVolumeMaterial,"Volume material attributes");
   mafPlugObjectMacro(mmaApplicationLayout,"Applycation layout attributes");
+  mafPlugObjectMacro(mafAttributeTraceability,"Trial event attributes");
   
   mafPlugNodeMacro(mafVMERoot,"root for VME tree");
   mafPlugNodeMacro(mafVMEExternalData,"VME used for referencing MAF external data.");
