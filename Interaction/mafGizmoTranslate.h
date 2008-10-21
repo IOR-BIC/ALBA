@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-10-21 15:11:45 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -76,7 +76,7 @@ class mafMatrix;
 class mafGizmoTranslate : public mafGizmoInterface 
 {
 public:
-           mafGizmoTranslate(mafVME *input, mafObserver* listener = NULL);
+           mafGizmoTranslate(mafVME *input, mafObserver* listener = NULL, bool BuildGUI = true);
   virtual ~mafGizmoTranslate(); 
 
   /** 
@@ -101,9 +101,8 @@ public:
   void Show(bool show);
 
   /**
-  Set the gizmo pose*/
+  Set/Get the gizmo pose*/
   void SetAbsPose(mafMatrix *absPose, mafTimeStamp ts = -1);
-
   mafMatrix *GetAbsPose();
   
   //----------------------------------------------------------------------------
@@ -118,11 +117,13 @@ public:
 
   /**
   Set the constraint modality for the given axis; allowed constraint modality are:
-  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY.*/
+  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY defined in mmiConstraint*/
   void SetConstraintModality(int axis, int constrainModality);
+  int GetConstraintModality(int axis);
 
   /** Set the step value for snap step constraint type for the given axis*/
   void SetStep(int axis, double step);
+  int GetStep(int axis);
 
 protected:
 
@@ -160,5 +161,18 @@ protected:
 
   /** Send matrix to postmultiply to listener */
   void SendTransformMatrixFromGui(mafEventBase *maf_event);
+  
+  /** Build Gizmo GUI */
+  bool m_BuildGUI;
+
+  /** test friend */
+  friend class mafGizmoTranslateTest;
+
+  /** register axis constraint modality */
+  int m_ConstraintModality[3];
+
+  /** register step on axes */
+  int m_Step[3];
+
 };
 #endif
