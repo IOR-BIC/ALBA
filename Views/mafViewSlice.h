@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2008-10-21 16:07:01 $
+  Version:   $Revision: 1.26.2.1 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,6 +117,8 @@ public:
   /* Function for the correction of slice pose in case of currentvolume pose matrix is different from identity */
   void VolumePositionCorrection(double *point);
 
+  void BorderUpdate();
+
 protected:
   virtual mafGUI *CreateGui();
 
@@ -126,7 +128,7 @@ protected:
   bool             m_SliceInitialized; 
 
 	bool						 m_ShowVolumeTICKs;
-
+  double           m_BorderColor[3];
   // text stuff
   vtkActor2D    *m_TextActor;
   vtkTextMapper	*m_TextMapper;

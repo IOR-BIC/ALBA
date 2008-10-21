@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.45 $
+  Date:      $Date: 2008-10-21 16:07:01 $
+  Version:   $Revision: 1.45.2.1 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -804,6 +804,12 @@ void mafViewRXCT::MaximizeSubView(int subview_id, bool maximize)
        m_LutSliders[v]->Enable(false);
     }
   }
+
+  for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+  {  
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderUpdate();
+  }
+
   m_GuiView->Update();
   
 }

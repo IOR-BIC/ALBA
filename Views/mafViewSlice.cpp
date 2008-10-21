@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.51 $
+  Date:      $Date: 2008-10-21 16:07:01 $
+  Version:   $Revision: 1.51.2.1 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -665,22 +665,37 @@ double *mafViewSlice::GetSlice()
   return m_Slice;
 }
 //----------------------------------------------------------------------------
+void mafViewSlice::BorderUpdate()
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_Border)
+  {
+    BorderCreate(m_BorderColor);
+  }
+  
+}
+//----------------------------------------------------------------------------
 void mafViewSlice::BorderCreate(double col[3])
 //----------------------------------------------------------------------------
 {
-  if(m_Border) BorderDelete();
+  m_BorderColor[0] = col[0];
+  m_BorderColor[1] = col[1];
+  m_BorderColor[2] = col[2];
 
+  if(m_Border) BorderDelete();
+  int size[2];
+  this->GetWindow()->GetSize(&size[0],&size[1]);
   vtkPlaneSource *ps = vtkPlaneSource::New();
   ps->SetOrigin(0, 0, 0);
-  ps->SetPoint1(1, 0, 0);
-  ps->SetPoint2(0, 1, 0);
+  ps->SetPoint1(size[0]-1, 0, 0);
+  ps->SetPoint2(0, size[1]-1, 0);
 
   vtkOutlineFilter *of = vtkOutlineFilter::New();
   of->SetInput((vtkDataSet *)ps->GetOutput());
 
   vtkCoordinate *coord = vtkCoordinate::New();
-  coord->SetCoordinateSystemToNormalizedViewport();
-  coord->SetValue(1, 1, 0);
+  coord->SetCoordinateSystemToDisplay();
+  coord->SetValue(size[0]-1, size[1]-1, 0);
 
   vtkPolyDataMapper2D *pdmd = vtkPolyDataMapper2D::New();
   pdmd->SetInput(of->GetOutput());
@@ -688,13 +703,13 @@ void mafViewSlice::BorderCreate(double col[3])
 
   vtkProperty2D *pd = vtkProperty2D::New();
   pd->SetDisplayLocationToForeground();
-  pd->SetLineWidth(3);
+  pd->SetLineWidth(4);
   pd->SetColor(col[0],col[1],col[2]);
 
   m_Border = vtkActor2D::New();
   m_Border->SetMapper(pdmd);
   m_Border->SetProperty(pd);
-  m_Border->SetPosition(0,0);
+  m_Border->SetPosition(1,1);
 
   m_Rwi->m_RenFront->AddActor(m_Border);
 
