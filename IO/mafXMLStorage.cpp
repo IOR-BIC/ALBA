@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-29 14:19:50 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-10-22 14:37:20 $
+  Version:   $Revision: 1.21.2.1 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -209,7 +209,8 @@ int mafXMLStorage::ResolveInputURL(const char * url, mafString &filename, mafObs
     filename=url;
   }
   
-  return MAF_OK;
+  bool file_exist = wxFileExists(filename.GetCStr());
+  return file_exist ? MAF_OK : MAF_WAIT;
 }
 //------------------------------------------------------------------------------
 int mafXMLStorage::StoreToURL(const char * filename, const char * url)
