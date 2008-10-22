@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.61 $
+  Date:      $Date: 2008-10-22 11:46:55 $
+  Version:   $Revision: 1.61.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,7 @@
 #include "mafVMEGizmo.h"
 #include "mafPipeSurfaceSlice.h"
 #include "medVisualPipeSlicerSlice.h"
+#include "mafPipePolylineSlice.h"
 #include "mmdMouse.h"
 
 #include "vtkDataSet.h"
@@ -166,6 +167,35 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
 			((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->UpdateSurfacesList(node);
 		}
 	}
+  else if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
+  {
+    
+    mafPipePolylineSlice *pipeSliceX = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node);
+    if(pipeSliceX) 
+    {
+      pipeSliceX->SplineModeOn();
+      pipeSliceX->FillOn();
+      pipeSliceX->SetAlphaFilling(4.0);
+    }
+
+    mafPipePolylineSlice *pipeSliceY = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node);
+    if(pipeSliceY) 
+    {
+      pipeSliceY->SplineModeOn();
+      pipeSliceY->FillOn();
+      pipeSliceY->SetAlphaFilling(4.0);
+    }
+    
+    mafPipePolylineSlice *pipeSliceZ = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node);
+    if(pipeSliceZ) 
+    {
+      pipeSliceZ->SplineModeOn();
+      pipeSliceZ->FillOn();
+      pipeSliceZ->SetAlphaFilling(4.0);
+    }
+
+  }
+
 	//CameraUpdate();
 	EnableWidgets(m_CurrentVolume != NULL);
 }
@@ -364,6 +394,8 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
       m_Views[v]->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
+      m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
+      m_Views[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice");
     }
     else
     {
