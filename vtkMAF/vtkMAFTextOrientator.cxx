@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextOrientator.cxx,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 10:01:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-10-22 08:45:51 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 #include "vtkPolyData.h"
 
 
-vtkCxxRevisionMacro(vtkMAFTextOrientator, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMAFTextOrientator, "$Revision: 1.3.2.1 $");
 vtkStandardNewMacro(vtkMAFTextOrientator);
 //------------------------------------------------------------------------------
 vtkMAFTextOrientator::vtkMAFTextOrientator()
@@ -51,6 +51,12 @@ vtkMAFTextOrientator::vtkMAFTextOrientator()
 
 
   m_Dimension = 10;
+  m_AttachPositionFlag = false;
+
+  m_DisplayOffsetUp[0] = m_DisplayOffsetUp[1] = 0;  
+  m_DisplayOffsetRight[0] = m_DisplayOffsetRight[1] = 0;
+  m_DisplayOffsetDown[0] = m_DisplayOffsetDown[1] = 0;
+  m_DisplayOffsetLeft[0] = m_DisplayOffsetLeft[1] = 0;
 
   OrientatorCreate();
 }
@@ -196,22 +202,112 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
   int middleX = renderSize[0]/2;
   int middleY = renderSize[1]/2;
   
-  //left
-  m_TextSourceLeftActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-  m_TextSourceLeftActor->SetPosition(m_Dimension/4 , middleY-m_Dimension/2);
+  if(m_AttachPositionFlag == false)
+  {
+    //left
+    m_TextSourceLeftActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    m_TextSourceLeftActor->SetPosition(m_Dimension/4 + m_DisplayOffsetLeft[0], middleY-m_Dimension/2 + m_DisplayOffsetLeft[1]);
 
-  //down
-  m_TextSourceDownActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-  m_TextSourceDownActor->SetPosition(middleX - m_Dimension/4 , m_Dimension/4);
+    //down
+    m_TextSourceDownActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    m_TextSourceDownActor->SetPosition(middleX - m_Dimension/4 + m_DisplayOffsetDown[0], m_Dimension/4 + m_DisplayOffsetDown[1]);
 
-  //right
-  m_TextSourceRightActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-  m_TextSourceRightActor->SetPosition(renderSize[0] - 1.5*m_Dimension , middleY-m_Dimension/2);
+    //right
+    m_TextSourceRightActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    m_TextSourceRightActor->SetPosition(renderSize[0] - 1.5*m_Dimension + m_DisplayOffsetRight[0] , middleY-m_Dimension/2 + m_DisplayOffsetRight[1]);
 
-  //up
-  m_TextSourceUpActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-  m_TextSourceUpActor->SetPosition(middleX - m_Dimension/4 , renderSize[1]-2*m_Dimension);
+    //up
+    m_TextSourceUpActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    m_TextSourceUpActor->SetPosition(middleX - m_Dimension/4 + m_DisplayOffsetUp[0], renderSize[1]-2*m_Dimension + m_DisplayOffsetUp[1]);
+  }
+  else
+  {
+    
 
+    double displayUp[3];
+    ren->SetWorldPoint(m_AttachPositionUp[0],m_AttachPositionUp[1],m_AttachPositionUp[2],1.);
+    ren->WorldToDisplay();
+    ren->GetDisplayPoint(displayUp);
+    int temporaryXUp,temporaryYUp;
+    temporaryXUp = displayUp[0] + m_DisplayOffsetUp[0];
+    temporaryYUp = displayUp[1]+ m_DisplayOffsetUp[1];
+
+    if(temporaryXUp < 10)
+      temporaryXUp = 10;
+    if(temporaryXUp > renderSize[0] - 10)
+      temporaryXUp = renderSize[0] - 10;
+
+    if(temporaryYUp < 15)
+      temporaryYUp = 15;
+    if(temporaryYUp > renderSize[1] - 15)
+      temporaryYUp = renderSize[1] - 15;
+
+    m_TextSourceUpActor->SetPosition(temporaryXUp, temporaryYUp);
+
+
+    double displayRight[3];
+    ren->SetWorldPoint(m_AttachPositionRight[0],m_AttachPositionRight[1],m_AttachPositionRight[2],1.);
+    ren->WorldToDisplay();
+    ren->GetDisplayPoint(displayRight);
+    int temporaryXRight,temporaryYRight;
+    temporaryXRight = displayRight[0] + m_DisplayOffsetRight[0];
+    temporaryYRight = displayRight[1]+ m_DisplayOffsetRight[1];
+
+    if(temporaryXRight < 10)
+      temporaryXRight = 10;
+    if(temporaryXRight > renderSize[0] - 10)
+      temporaryXRight = renderSize[0] - 10;
+
+    if(temporaryYRight < 15)
+      temporaryYRight = 15;
+    if(temporaryYRight > renderSize[1] - 15)
+      temporaryYRight = renderSize[1] - 15;
+
+
+    m_TextSourceRightActor->SetPosition(temporaryXRight, temporaryYRight);
+
+    double displayDown[3];
+    ren->SetWorldPoint(m_AttachPositionDown[0],m_AttachPositionDown[1],m_AttachPositionDown[2],1.);
+    ren->WorldToDisplay();
+    ren->GetDisplayPoint(displayDown);
+    int temporaryXDown,temporaryYDown;
+    temporaryXDown = displayDown[0] + m_DisplayOffsetDown[0];
+    temporaryYDown = displayDown[1] + m_DisplayOffsetDown[1];
+
+    if(temporaryXDown < 10)
+      temporaryXDown = 10;
+    if(temporaryXDown > renderSize[0] - 10)
+      temporaryXDown = renderSize[0] - 10;
+
+    if(temporaryYDown < 15)
+      temporaryYDown = 15;
+    if(temporaryYDown > renderSize[1] - 15)
+      temporaryYDown = renderSize[1] - 15;
+
+    m_TextSourceDownActor->SetPosition(temporaryXDown, temporaryYDown);
+
+    double displayLeft[3];
+    ren->SetWorldPoint(m_AttachPositionLeft[0],m_AttachPositionLeft[1],m_AttachPositionLeft[2],1.);
+    ren->WorldToDisplay();
+    ren->GetDisplayPoint(displayLeft);
+    int temporaryXLeft,temporaryYLeft;
+    temporaryXLeft = displayLeft[0] + m_DisplayOffsetLeft[0];
+    temporaryYLeft = displayLeft[1] + m_DisplayOffsetLeft[1];
+
+    if(temporaryXLeft < 10)
+      temporaryXLeft = 10;
+    if(temporaryXLeft > renderSize[0] - 10)
+      temporaryXLeft = renderSize[0] - 10;
+
+    if(temporaryYLeft < 15)
+      temporaryYLeft = 15;
+    if(temporaryYLeft > renderSize[1] - 15)
+      temporaryYLeft = renderSize[1] - 15;
+
+
+    m_TextSourceLeftActor->SetPosition(temporaryXLeft, temporaryYLeft);
+  }
+  
 }
 //----------------------------------------------------------------------------
 void vtkMAFTextOrientator::SetBackgroundVisibility(bool show)
@@ -316,4 +412,24 @@ void vtkMAFTextOrientator::SetSingleActorVisibility(int actor, bool show)
     m_TextSourceUpActor->Modified();
     break;
   }
+}
+//----------------------------------------------------------------------------
+void vtkMAFTextOrientator::SetAttachPositions(double up[3], double right[3], double Down[3], double left[3])
+//----------------------------------------------------------------------------
+{
+   m_AttachPositionUp[0] = up[0];
+   m_AttachPositionUp[1] = up[1];
+   m_AttachPositionUp[2] = up[2];
+
+   m_AttachPositionRight[0] = right[0];
+   m_AttachPositionRight[1] = right[1];
+   m_AttachPositionRight[2] = right[2];
+
+   m_AttachPositionDown[0] = Down[0];
+   m_AttachPositionDown[1] = Down[1];
+   m_AttachPositionDown[2] = Down[2];
+
+   m_AttachPositionLeft[0] = left[0];
+   m_AttachPositionLeft[1] = left[1];
+   m_AttachPositionLeft[2] = left[2];
 }

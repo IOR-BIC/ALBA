@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextOrientator.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-17 10:01:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-10-22 08:45:51 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -83,6 +83,13 @@ class VTK_vtkMAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
   /** Set scale actor*/
   void SetScale(double multiple);
 
+  void SetAttachPositionFlag(bool enable){m_AttachPositionFlag = enable;};
+
+  void SetAttachPositions(double up[3], double right[3], double Down[3], double left[3]);
+  void SetDisplayOffsetUp(int x, int y){m_DisplayOffsetUp[0] = x; m_DisplayOffsetUp[1]=y;};
+  void SetDisplayOffsetRight(int x, int y){m_DisplayOffsetRight[0] = x; m_DisplayOffsetRight[1]=y;};
+  void SetDisplayOffsetDown(int x, int y){m_DisplayOffsetDown[0] = x; m_DisplayOffsetDown[1]=y;};
+  void SetDisplayOffsetLeft(int x, int y){m_DisplayOffsetLeft[0] = x; m_DisplayOffsetLeft[1]=y;};
 protected:
 					vtkMAFTextOrientator();
 					~vtkMAFTextOrientator();
@@ -97,6 +104,17 @@ protected:
 
   //variables
   int                     m_Dimension;
+
+  bool m_AttachPositionFlag;
+  double m_AttachPositionUp[3];
+  double m_AttachPositionRight[3];
+  double m_AttachPositionDown[3];
+  double m_AttachPositionLeft[3];
+
+  int m_DisplayOffsetUp[2];  
+  int m_DisplayOffsetRight[2];
+  int m_DisplayOffsetDown[2];
+  int m_DisplayOffsetLeft[2];
 
   vtkActor2D						 *m_TextSourceLeftActor;
   vtkPolyDataMapper2D		 *m_TextSourceLeftMapper;
