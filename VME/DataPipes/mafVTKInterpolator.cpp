@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVTKInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-27 16:25:10 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-10-22 14:38:52 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -61,7 +61,8 @@ vtkDataSet *mafVTKInterpolator::GetVTKData()
 //------------------------------------------------------------------------------
 {
   m_VTKDataPipe->UpdateInformation();
-  return m_VTKDataPipe->GetOutput();
+  vtkDataSet *data = m_VTKDataPipe->GetInput();
+  return (data != NULL) ? m_VTKDataPipe->GetOutput() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -87,8 +88,12 @@ void mafVTKInterpolator::PreExecute()
     mtime>m_VTKDataPipe->GetInformationTime() ||
     !m_CurrentItem->IsDataPresent()))
   {
-    m_VTKDataPipe->SetNthInput(0,GetCurrentItem()->GetData());
-    m_UpdateTime.Modified();
+    vtkDataSet *data = GetCurrentItem()->GetData();
+    if (data != NULL)
+    {
+      m_VTKDataPipe->SetNthInput(0,data);
+      m_UpdateTime.Modified();
+    }
   } 
 }
 
