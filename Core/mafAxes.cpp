@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAxes.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-10-22 08:44:51 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -101,7 +101,8 @@ mafAxes::~mafAxes()
 void mafAxes::SetVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-  m_AxesActor->SetVisibility(show);
+  if(m_AxesActor)
+    m_AxesActor->SetVisibility(show);
 }
 //----------------------------------------------------------------------------
 void mafAxes::SetPose( vtkMatrix4x4 *abs_pose_matrix )
