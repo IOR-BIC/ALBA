@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2008-10-22 14:24:44 $
+  Version:   $Revision: 1.35.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -235,7 +235,13 @@ void mafSideBar::UpdateVmePanel()
       mafVME *v = (mafVME*) m_SelectedVme;
       vme_out = v->GetOutput();
       if(!vme_out->IsA("mafVMEOutputNULL")) // Paolo 2005-05-05
-        vme_out_gui = vme_out->GetGui();
+      {
+      	vme_out_gui = vme_out->GetGui();
+        if (!v->IsDataAvailable())
+        {
+          vme_out->Update();
+        }
+      }
       else
         vme_out = NULL;
     }
