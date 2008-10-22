@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:38 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2008-10-22 08:45:11 $
+Version:   $Revision: 1.6.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -57,13 +57,20 @@ class mafGizmoPathRuler : public mafGizmoInterface
 public:
   
   mafGizmoPathRuler(mafVME *input, mafObserver* listener = NULL, int ticksNumber = 1, \
-      int originTickId = 0, double ticksHeigth = 50, double ticksDistance = 20);
+      int originTickId = 0, double ticksHeigth = 50, double ticksDistance = 20, bool enableLongerTicks = true);
   virtual ~mafGizmoPathRuler(); 
 
   /** Set position of the origin tick along constraint polyline; other ticks will follow*/
   void SetCurvilinearAbscissa(double s);
   double GetCurvilinearAbscissa() {return m_CurvilinearAbscissa;};
-  double GetGizmoPathCurvilinearAbscissa(int index) {return m_GizmoPathVector[index]->GetCurvilinearAbscissa();};
+  double GetGizmoPathCurvilinearAbscissa(int index) 
+  {
+    if(index >= m_GizmoPathVector.size())
+    {
+      index = m_GizmoPathVector.size() - 1;
+    }
+    return m_GizmoPathVector[index]->GetCurvilinearAbscissa();
+  };
 
   /** Set the constraint polyline: any VME can be provided but its output must be a
   mafVMEOutputPolyline*/
@@ -80,6 +87,12 @@ public:
   /** Set the gizmo color */
   void SetColor(double col[3]);
 	void SetColor(int idGizmo,double col[3]);
+
+  void SetColor(double abscissa,double col[3]);
+
+  void HighlightExtremes(double col[3], int bound1, int bound2, int center, bool inside = false);
+  void HighlightExtremes(double col[3], double bound1, double bound2, double center, bool inside = false);
+  
 
   /** This method is used to change the input: this VME is used only to reparent the gizmo
   to the root*/
@@ -108,6 +121,10 @@ public:
 
   void SetGizmoLabelsVisibility(bool value);
 
+  void ResetLabelsVisibility();
+
+  void CustomIndexLabelVisibility(int index, int flag);
+
 protected:
 
   void BuildGizmos();
@@ -118,6 +135,7 @@ protected:
   double m_TicksHeigth;
   double m_TicksDistance;
   double m_CurvilinearAbscissa;
+  bool m_EnableLongerTicks;
 
   /** Gizmo gui events handling; not yet implemented... */
   void OnEventGizmoGui(mafEventBase *maf_event);
@@ -126,6 +144,7 @@ protected:
   void OnEventGizmoComponents(mafEventBase *maf_event);
 	
   std::vector<mafGizmoPath *> m_GizmoPathVector;
+
 
 };
 

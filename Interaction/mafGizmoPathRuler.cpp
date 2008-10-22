@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-13 07:59:55 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2008-10-22 08:45:11 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 mafGizmoPathRuler::mafGizmoPathRuler(mafVME *input, mafObserver* listener, \
-                 int ticksNumber, int originTickID, double ticksHeigth,double ticksDistance)
+                 int ticksNumber, int originTickID, double ticksHeigth,double ticksDistance, bool enableLongerTicks)
 {
   assert(input);
   m_InputVME = input;
@@ -42,7 +42,7 @@ mafGizmoPathRuler::mafGizmoPathRuler(mafVME *input, mafObserver* listener, \
   m_TicksHeigth = ticksHeigth;
   m_TicksDistance = ticksDistance;
   m_CurvilinearAbscissa = 0;
-
+  m_EnableLongerTicks = enableLongerTicks;
   // create gizmos and put their references in the vector 
   BuildGizmos();
 
@@ -132,7 +132,7 @@ void mafGizmoPathRuler::BuildGizmos()
     // set the constraint
     // ...
 
-    if(gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1)
+    if(m_EnableLongerTicks && (gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1))
     {
       gp->SetLineLength(m_TicksHeigth);
     }
@@ -165,7 +165,7 @@ void mafGizmoPathRuler::SetTicksHeigth( double height )
 {
   for (int i = 0; i < m_GizmoPathVector.size();i++)
   {
-    if(i == 0 || i == m_TicksNumber/2 || i == m_TicksNumber-1)
+    if(m_EnableLongerTicks && (i == 0 || i == m_TicksNumber/2 || i == m_TicksNumber-1))
     {
       m_GizmoPathVector[i]->SetLineLength(height);
     }
@@ -232,6 +232,65 @@ void mafGizmoPathRuler::SetColor( int idGizmo,double col[3] )
 {
 	m_GizmoPathVector[idGizmo]->SetColor(col);
 }
+
+void mafGizmoPathRuler::SetColor( double abscissa,double col[3] )
+{
+  double centerAbscissa = m_CurvilinearAbscissa;
+  double difference = abscissa - m_CurvilinearAbscissa;
+  int gizmoID;
+  int middle = m_GizmoPathVector.size() / 2;
+  gizmoID = middle + difference / m_TicksDistance;
+
+  SetColor(gizmoID, col);
+}
+
+void mafGizmoPathRuler::HighlightExtremes(double col[3], int bound1, int bound2, int center, bool inside)
+{
+  int size = m_GizmoPathVector.size();
+  int minBound = center - bound1;
+  if(minBound < 0)
+  {
+    minBound = 0;
+  }
+
+  int maxBound = center + bound2;
+  if(maxBound > size - 1)
+  {
+    maxBound = size - 1;
+  }
+
+  
+
+  if(inside == true)
+  {
+    for(int i = minBound ; i<= maxBound; i++)
+    {
+      m_GizmoPathVector[i]->SetColor(col);
+    }
+  }
+  else
+  {
+    m_GizmoPathVector[minBound]->SetColor(col);
+    m_GizmoPathVector[maxBound]->SetColor(col);
+  }
+
+  
+
+}
+void mafGizmoPathRuler::HighlightExtremes(double col[3], double bound1, double bound2, double center, bool inside)
+{ 
+  double centerAbscissa = m_CurvilinearAbscissa;
+  double difference = center - m_CurvilinearAbscissa;
+  int gizmoID;
+  int middle = m_GizmoPathVector.size() / 2;
+  gizmoID = middle + difference / m_TicksDistance;
+
+  int bound1Int = bound1 /  m_TicksDistance;
+  int bound2Int = bound2 /  m_TicksDistance;
+  HighlightExtremes(col, bound1Int, bound2Int, gizmoID, inside);
+}
+
+
 void mafGizmoPathRuler::SetGizmoLabelsVisibility(bool value)
 {
   for (int gizmoID = 0; gizmoID < m_GizmoPathVector.size();gizmoID++)
@@ -245,4 +304,17 @@ void mafGizmoPathRuler::SetGizmoLabelsVisibility(bool value)
       m_GizmoPathVector[gizmoID]->GetOutput()->SetTextVisibility(value);
     
   }
+}
+void mafGizmoPathRuler::ResetLabelsVisibility()
+{
+  for (int gizmoID = 0; gizmoID < m_GizmoPathVector.size();gizmoID++)
+  {
+    m_GizmoPathVector[gizmoID]->GetOutput()->SetTextVisibility(FALSE);
+  }
+}
+
+void mafGizmoPathRuler::CustomIndexLabelVisibility(int index, int flag)
+{
+  if(index >= 0 || index <=m_GizmoPathVector.size()-1)
+    m_GizmoPathVector[index]->GetOutput()->SetTextVisibility(flag);
 }
