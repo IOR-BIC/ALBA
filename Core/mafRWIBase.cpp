@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2008-10-23 08:50:34 $
+  Version:   $Revision: 1.33.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -797,10 +797,13 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
     }
 
   }
+
+  GetRenderWindow()->OffScreenRenderingOn();
   vtkMAFSmartPointer<vtkWindowToImageFilter> w2i;
   w2i->SetInput(GetRenderWindow());
   w2i->SetMagnification(magnification);
   w2i->Update();
+  GetRenderWindow()->OffScreenRenderingOff();
   
   wxSplitPath(filename.GetCStr(),&path,&name,&ext);
   ext.MakeLower();
