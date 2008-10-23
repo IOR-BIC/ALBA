@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-23 07:54:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-10-23 09:10:54 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni	
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -41,6 +41,7 @@ mmiSelectPoint::mmiSelectPoint()
 //------------------------------------------------------------------------------
 {
 	m_IsPicking = false;
+  m_UseCtrlModifier = true;
 }
 //------------------------------------------------------------------------------
 mmiSelectPoint::~mmiSelectPoint()
@@ -65,7 +66,7 @@ void mmiSelectPoint::OnMouseMove()
 void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e) 
 //----------------------------------------------------------------------------
 {
-	if (e->GetModifier(MAF_CTRL_KEY)) 
+	if (e->GetModifier(MAF_CTRL_KEY) && m_UseCtrlModifier) 
 	{
 		// picking mode on
 		m_IsPicking = true;
@@ -73,6 +74,14 @@ void mmiSelectPoint::OnLeftButtonDown(mafEventInteraction *e)
 		// perform picking
 		PickCell((mafDevice *)e->GetSender());
 	}
+  else if (!m_UseCtrlModifier)
+  {
+    // picking mode on
+    m_IsPicking = true;
+
+    // perform picking
+    PickCell((mafDevice *)e->GetSender());
+  }
 	else
 	{
 		m_IsPicking = false;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.h,v $
 Language:  C++
-Date:      $Date: 2007-05-14 09:51:09 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2008-10-23 09:10:54 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -52,6 +52,9 @@ public:
 	/** redefined to end pick modality */
 	virtual void OnButtonUp(mafEventInteraction *e);
 
+  void SetCtrlModifierOn(){m_UseCtrlModifier = true;};
+  void SetCtrlModifierOff(){m_UseCtrlModifier = false;};
+
 protected:
 	mmiSelectPoint();
 	virtual ~mmiSelectPoint();
@@ -60,6 +63,8 @@ protected:
 	void PickCell(mafDevice *device);
 
 	bool m_IsPicking;
+
+  bool m_UseCtrlModifier;
 
 private:
 	mmiSelectPoint(const mmiSelectPoint&);  // Not implemented.
