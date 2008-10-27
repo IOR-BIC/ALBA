@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:51 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2008-10-27 14:47:39 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,8 +35,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUIPicButton.h"
 #include "mafGUIFloatSlider.h"
 
+#include "mafNodeIterator.h"
 #include "mafVME.h"
 #include "mafVMESurface.h"
+#include "mafVMEGroup.h"
 #include "mafVMEOutput.h"
 #include "mmiExtractIsosurface.h"
 #include "mmaVolumeMaterial.h"
@@ -82,6 +84,7 @@ mafOp(label)
 
   m_IsoSlider   = NULL;
   m_SliceSlider = NULL;
+  m_OutputGroup = NULL;
 
   m_Dialog = NULL;
   m_Rwi = NULL;
@@ -114,18 +117,23 @@ mafOp(label)
   m_OutlineMapper  = NULL;
 
   m_DensityPicker  = NULL;
-  m_IsosurfaceVme.clear();
 }
 //----------------------------------------------------------------------------
 mafOpExtractIsosurface::~mafOpExtractIsosurface()
 //----------------------------------------------------------------------------
 {
-  for (int i = 0; i < m_IsosurfaceVme.size(); i++)
+  if (m_OutputGroup != NULL)
   {
-    mafDEL(m_IsosurfaceVme[i]);
+    mafNodeIterator *iter = m_OutputGroup->NewIterator();
+    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+    {
+      if (node != NULL)
+      {
+        mafDEL(node);
+      }
+    }
+    iter->Delete();
   }
-  m_IsosurfaceVme.clear();
-//  mafDEL(m_IsosurfaceVme);
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExtractIsosurface::Copy()
@@ -161,27 +169,7 @@ void mafOpExtractIsosurface::OpRun()
 
   mafEventMacro(mafEvent(this,result));
 }
-//----------------------------------------------------------------------------
-void mafOpExtractIsosurface::OpDo()
-//----------------------------------------------------------------------------
-{
-  for (int i = 0; i < m_IsosurfaceVme.size(); i++)
-  {
-    m_IsosurfaceVme[i]->ReparentTo(m_Input);
-  }
-  //mafEventMacro(mafEvent(this,VME_ADD,m_IsosurfaceVme));
-}
-//----------------------------------------------------------------------------
-void mafOpExtractIsosurface::OpUndo()
-//----------------------------------------------------------------------------
-{
-  assert(m_IsosurfaceVme.size() > 0);
-  for (int i = 0; i < m_IsosurfaceVme.size(); i++)
-  {
-    mafEventMacro(mafEvent(this,VME_REMOVE,m_IsosurfaceVme[i]));
-  }
-//  mafEventMacro(mafEvent(this,VME_REMOVE,m_IsosurfaceVme));
-}
+
 //----------------------------------------------------------------------------
 // widget ID's
 //----------------------------------------------------------------------------
@@ -831,6 +819,12 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
 
   m_ContourVolumeMapper->SetEnableContourAnalysis(clean);
 
+  if (m_NumberOfContours > 1)
+  {
+    mafNEW(m_OutputGroup);
+    m_OutputGroup->SetName("Extract isosurface output");
+  }
+
   // IMPORTANT, extract the isosurface from m_ContourVolumeMapper in this way
   // and then call surface->Delete() when the VME is created
   int divisor = m_NumberOfContours - 1;
@@ -878,6 +872,18 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
     mafNEW(vme_surf);
     vme_surf->SetName(name.c_str());
     vme_surf->SetDataByDetaching(surface,0);
-    m_IsosurfaceVme.push_back(vme_surf);
+
+    if (m_OutputGroup != NULL)
+    {
+      vme_surf->ReparentTo(m_OutputGroup);
+    }
+    else
+    {
+      m_Output = vme_surf;      
+    }
+  }
+  if (m_OutputGroup != NULL)
+  {
+    m_Output = m_OutputGroup;
   }
 }

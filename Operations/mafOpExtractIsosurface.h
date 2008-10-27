@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-10-27 14:47:39 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 class mafGUIDialog;
 class mafGUIFloatSlider;
 class mafVMESurface;
+class mafVMEGroup;
 class mafNode;
 class mafRWI;
 
@@ -67,15 +68,9 @@ public:
 	/** Builds operation's interface by calling CreateOpDialog() method. */
   void OpRun();
 
-	/** Execute the operation. */
-  void OpDo();
-
-	/** Makes the undo for the operation. */
-  void OpUndo();
 
 protected:
-  std::vector<mafVMESurface *> m_IsosurfaceVme;   // surface VME vector
-
+  mafVMEGroup *m_OutputGroup; 
   mafGUIDialog		*m_Dialog;
 	mafRWI      *m_Rwi;
   vtkRenderer *m_PIPRen;
