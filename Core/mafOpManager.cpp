@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:53:01 $
-  Version:   $Revision: 1.40.2.1 $
+  Date:      $Date: 2008-10-27 11:59:30 $
+  Version:   $Revision: 1.40.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,6 +42,8 @@
 #include "mafTagItem.h"
 #include "mafNode.h"
 #include "mafVMEGenericAbstract.h"
+
+#include <time.h>
 
 //------------------------------------------------------------------------------
 // Events
@@ -752,16 +754,24 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
 //----------------------------------------------------------------------------
 {
   char dateStr[9];
+  char tmpbuf[9];
 
   mafString trialEvent = "Modify";
   mafString operationName;
+  mafString dateAndTime;
   mafString appStamp;
   mafString userID;
   mafString isNatural;
   wxString revision;
 
   _strdate(dateStr);
+  _strtime_s( tmpbuf, 9 );
   operationName = op->GetTypeName();
+  dateAndTime = dateStr;
+  dateAndTime << " ";
+  dateAndTime << tmpbuf;
+
+
 
   if (m_User != NULL && m_User->IsAuthenticated())
       userID = m_User->GetName();
@@ -776,57 +786,69 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
       in_node->SetAttribute("TrialAttribute", traceability);
     }
 
-    wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\lhpBuilder"));
-    if(RegKey.Exists())
-    {
-      RegKey.Create();
-      RegKey.QueryValue(wxString("DisplayVersion"), revision);
-    }
     if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
       appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
 
-    appStamp.Append(" ");
-    appStamp.Append(revision.c_str());
 
+    mafString regKeyPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
+    regKeyPath.Append(appStamp.GetCStr());
+
+    wxRegKey RegKey(wxString(regKeyPath.GetCStr()));
+    if(RegKey.Exists())
+    {
+      RegKey.Create();
+      RegKey.QueryValue(wxString("DisplayName"), revision);
+    }
+   
     if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
       isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
 
-    traceability->AddTraceabilityEvent(trialEvent, operationName, dateStr, appStamp, userID, isNatural);
+    traceability->AddTraceabilityEvent(trialEvent, operationName, dateAndTime, revision, userID, isNatural);
   }
 
   if (out_node != NULL)
   {
-    mafAttributeTraceability *traceability = (mafAttributeTraceability *)out_node->GetAttribute("TrialAttribute");
-    if (traceability == NULL)
+    mafNodeIterator *iter = out_node->NewIterator();
+    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
-      trialEvent = "Create";
-      traceability = mafAttributeTraceability::New();
-      traceability->SetName("TrialAttribute");
-      out_node->SetAttribute("TrialAttribute", traceability);
+      if (node != NULL)
+      {
+        mafAttributeTraceability *traceability = (mafAttributeTraceability *)node->GetAttribute("TrialAttribute");
+        if (traceability == NULL)
+        {
+          trialEvent = "Create";
+          traceability = mafAttributeTraceability::New();
+          traceability->SetName("TrialAttribute");
+          node->SetAttribute("TrialAttribute", traceability);
+        }
+        else
+        {
+          mafString trial = traceability->GetLastTrialEvent();
+          if (trial.IsEmpty())
+            trialEvent = "Create";
+        }
+
+        if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
+          appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
+
+
+        mafString regKeyPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
+        regKeyPath.Append(appStamp.GetCStr());
+
+        wxRegKey RegKey(wxString(regKeyPath.GetCStr()));
+        if(RegKey.Exists())
+        {
+          RegKey.Create();
+          RegKey.QueryValue(wxString("DisplayName"), revision);
+        }
+
+        if(node->GetTagArray()->IsTagPresent("VME_NATURE"))
+          isNatural = node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
+
+        traceability->AddTraceabilityEvent(trialEvent, operationName, dateAndTime, revision, userID, isNatural);
+      }
     }
-    else
-    {
-      mafString trial = traceability->GetLastTrialEvent();
-      if (trial.IsEmpty())
-        trialEvent = "Create";
-    }
-
-    wxRegKey RegKey(wxString("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\lhpBuilder"));
-    if(RegKey.Exists())
-    {
-      RegKey.Create();
-      RegKey.QueryValue(wxString("DisplayVersion"), revision);
-    }
-    if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
-      appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
-
-    appStamp.Append(" ");
-    appStamp.Append(revision.c_str());
-
-    if(out_node->GetTagArray()->IsTagPresent("VME_NATURE"))
-      isNatural = out_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
-
-    traceability->AddTraceabilityEvent(trialEvent, operationName, dateStr, appStamp, userID, isNatural);
+    iter->Delete();
   }
 }
 //----------------------------------------------------------------------------
@@ -862,11 +884,19 @@ void mafOpManager::OpUndo()
 
   if (out_node != NULL)
   {
-    mafAttributeTraceability *traceability = (mafAttributeTraceability *)out_node->GetAttribute("TrialAttribute");
-    if (traceability != NULL)
+    mafNodeIterator *iter = out_node->NewIterator();
+    for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
-      traceability->RemoveTraceabilityEvent();
+      if (node != NULL)
+      {
+        mafAttributeTraceability *traceability = (mafAttributeTraceability *)node->GetAttribute("TrialAttribute");
+        if (traceability != NULL)
+        {
+          traceability->RemoveTraceabilityEvent();
+        }
+      }
     }
+    iter->Delete();
   }
 
 	op->OpUndo();
