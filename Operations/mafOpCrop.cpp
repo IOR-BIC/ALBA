@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-10-27 16:46:08 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -141,9 +141,10 @@ void mafOpCrop::Crop()
 	//m_Input->Modified();
 	mafVME *volume = mafVME::SafeDownCast(m_Input);
 
-	if (volume->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))	
+  mafVMEOutput *output = volume->GetOutput();
+	if (output->GetVTKData()->IsA("vtkRectilinearGrid"))	
 	{
-		vtkRectilinearGrid *rgData = vtkRectilinearGrid::SafeDownCast(volume->GetOutput()->GetVTKData());
+		vtkRectilinearGrid *rgData = vtkRectilinearGrid::SafeDownCast(output->GetVTKData());
 
 		// get cropping bounds
 		double gizmoBounds[6] = {0,0,0,0,0,0};
@@ -195,7 +196,7 @@ void mafOpCrop::Crop()
 		extractRG->Delete();
 		extractRG = NULL;
 	}
-	else if (volume->GetOutput()->GetVTKData()->IsA("vtkStructuredPoints"))
+	else if (output->GetVTKData()->IsA("vtkStructuredPoints"))
 	{
 		int voi_dim[6];
 		voi_dim[0] = ceil((m_CroppingBoxBounds[0] - m_InputBounds[0])/(m_XSpacing));
