@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-27 11:59:30 $
-  Version:   $Revision: 1.40.2.2 $
+  Date:      $Date: 2008-10-27 14:48:54 $
+  Version:   $Revision: 1.40.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,8 +42,6 @@
 #include "mafTagItem.h"
 #include "mafNode.h"
 #include "mafVMEGenericAbstract.h"
-
-#include <time.h>
 
 //------------------------------------------------------------------------------
 // Events
@@ -753,25 +751,16 @@ void mafOpManager::SetMafUser(mafUser *user)
 void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNode *out_node)
 //----------------------------------------------------------------------------
 {
-  char dateStr[9];
-  char tmpbuf[9];
-
   mafString trialEvent = "Modify";
   mafString operationName;
-  mafString dateAndTime;
   mafString appStamp;
   mafString userID;
   mafString isNatural;
   wxString revision;
+  wxString dateAndTime;
 
-  _strdate(dateStr);
-  _strtime_s( tmpbuf, 9 );
-  operationName = op->GetTypeName();
-  dateAndTime = dateStr;
-  dateAndTime << " ";
-  dateAndTime << tmpbuf;
-
-
+  wxDateTime time = wxDateTime::UNow();
+  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth(), time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
 
   if (m_User != NULL && m_User->IsAuthenticated())
       userID = m_User->GetName();
