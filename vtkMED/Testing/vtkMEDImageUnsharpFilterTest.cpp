@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDImageUnsharpFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-28 10:37:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-10-27 09:36:38 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Daniele Giunchi
 
 ================================================================================
@@ -83,8 +83,8 @@ void vtkMEDImageUnsharpFilterTest::RenderData(vtkActor *actor)
   renderWindowInteractor->Delete();
   renderWindow->Delete();
   renderer->Delete();
-  
-  
+
+
 
 }
 //------------------------------------------------------------
@@ -99,7 +99,7 @@ void vtkMEDImageUnsharpFilterTest::TestUnsharp()
 //--------------------------------------------
 {
   m_TestNumber = ID_UNSHARP_TEST;
-  
+
   mafString filename = MED_DATA_ROOT;
   filename<<"/ImageFilters/unsharpTest.bmp";
 
@@ -109,13 +109,13 @@ void vtkMEDImageUnsharpFilterTest::TestUnsharp()
   r->Allow8BitBMPOn();
   r->SetDataScalarTypeToDouble();
   r->Update();
-  
+
   //create vtkImageData from zero and set the correct parameters (spacing, dimension) ...
   vtkImageData *originalImage = vtkImageData::New();
   originalImage->SetSpacing(r->GetOutput()->GetSpacing());
   originalImage->SetDimensions(r->GetOutput()->GetDimensions());
   originalImage->AllocateScalars();
-  
+
   // and scalars
   for(int i=0; i<originalImage->GetNumberOfPoints();i++)
   {
@@ -167,10 +167,10 @@ void vtkMEDImageUnsharpFilterTest::TestUnsharp()
   imageTexture->SetQualityTo32Bit();
   imageTexture->SetInput(unsharpImage);
 
-  
+
   imageTexture->SetLookupTable(imageLUT);
   imageTexture->MapColorScalarsThroughLookupTableOn();
-  
+
   imageTexture->Modified();
 
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
@@ -182,16 +182,19 @@ void vtkMEDImageUnsharpFilterTest::TestUnsharp()
   actor->SetTexture(imageTexture);
 
   RenderData(actor);
-  
+
+  filter->SetInput(NULL);
+  filter->SetOutput(NULL);
+
   actor->Delete();
   mapper->Delete();
   imageTexture->Delete();
   imageLUT->Delete();
   imagePlane->Delete();
   unsharpImage->Delete();
-  filter->Delete();
   originalImage->Delete();
-  
+  filter->Delete();
+
 }
 
 //----------------------------------------------------------------------------
@@ -203,7 +206,7 @@ void vtkMEDImageUnsharpFilterTest::CompareImages(vtkRenderWindow * renwin)
   std::string path(file);
   int slashIndex =  name.find_last_of('\\');
 
-  
+
   name = name.substr(slashIndex+1);
   path = path.substr(0,slashIndex);
 
@@ -264,6 +267,8 @@ void vtkMEDImageUnsharpFilterTest::CompareImages(vtkRenderWindow * renwin)
   if(!controlStream)
   {
     controlStream.close();
+    vtkDEL(w2i);
+    vtkDEL(w);
     return;
   }
   controlStream.close();
