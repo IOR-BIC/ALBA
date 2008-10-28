@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-10-28 13:15:33 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -51,6 +51,9 @@
 #include <list>
 #define OUTRANGE_SCALAR -1000
 
+//----------------------------------------------------------------------------
+mafCxxTypeMacro(mafOpLabelExtractor);
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 mafOpLabelExtractor::mafOpLabelExtractor(const wxString& label) :

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpLabelExtractor.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-10-28 13:15:33 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Paolo Quadrani - porting Roberto Mucci 
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,6 +39,10 @@ class mafOpLabelExtractor: public mafOp
 public:
   mafOpLabelExtractor(const wxString& label = "LabelExtractor");
  ~mafOpLabelExtractor(); 
+
+  mafTypeMacro(mafOpLabelExtractor, mafOp);
+
+
 	virtual void OnEvent(mafEventBase *maf_event);
   mafOp* Copy();
 
