@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-10-28 13:08:16 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,6 +86,12 @@ public:
 
   /** Set the alpha of Delaunay Filter*/
   void SetAlphaFilling(double alpha){if(m_Delaunay)m_Delaunay->SetAlpha(alpha);UpdateProperty();}
+
+  /** Show actor of sliced polyline*/
+  void ShowActorOn();
+
+  /** Hide actor of sliced polyline*/
+  void ShowActorOff();
 
   /** IDs for the GUI */
   enum PIPE_SURFACE_WIDGET_ID

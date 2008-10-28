@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-10-28 13:08:16 $
+  Version:   $Revision: 1.16.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -401,6 +401,7 @@ void mafPipePolylineSlice::UpdateProperty()
   out_polyline->Update();
   vtkPolyData *data = vtkPolyData::SafeDownCast(out_polyline->GetVTKData());
   if(data == NULL) return;
+  data->Modified();
   data->Update();
 
   if(m_SplineMode)
@@ -522,4 +523,22 @@ vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
   vtkDEL(cellArray);
 
   return m_PolySpline;
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice::ShowActorOn()
+//----------------------------------------------------------------------------
+{
+  if(m_Actor != NULL)
+  {
+    m_Actor->SetVisibility(true);
+  }
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice::ShowActorOff()
+//----------------------------------------------------------------------------
+{
+  if(m_Actor != NULL)
+  {
+    m_Actor->SetVisibility(false);
+  }
 }
