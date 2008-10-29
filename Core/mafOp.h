@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2008-10-29 11:02:43 $
+  Version:   $Revision: 1.24.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,9 @@ public:
 
   /** Initialize operation's variables according to the parameter's list. */
   virtual void SetParameters(void *param) {};
+
+  /** Return parameters used by operation. */
+  virtual mafString GetParameters() {mafString parameters; return parameters;};
 
 	/** Execute the operation. */
 	virtual void OpDo();
