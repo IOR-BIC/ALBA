@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-22 14:16:13 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-10-29 10:36:37 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -61,6 +61,9 @@ public:
 	/**
 	Resample the input volume*/
 	void Resample();
+
+  /** Return parameters used by operation. */
+  mafString GetParameters();
 
 protected:
 	virtual void OpStop(int result);
