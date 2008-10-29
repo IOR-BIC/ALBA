@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-27 14:47:39 $
-Version:   $Revision: 1.5.2.1 $
+Date:      $Date: 2008-10-29 11:04:07 $
+Version:   $Revision: 1.5.2.2 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -117,6 +117,8 @@ mafOp(label)
   m_OutlineMapper  = NULL;
 
   m_DensityPicker  = NULL;
+  m_IsoValueVector.clear();
+
 }
 //----------------------------------------------------------------------------
 mafOpExtractIsosurface::~mafOpExtractIsosurface()
@@ -134,6 +136,9 @@ mafOpExtractIsosurface::~mafOpExtractIsosurface()
     }
     iter->Delete();
   }
+
+  m_IsoValueVector.clear();
+
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExtractIsosurface::Copy()
@@ -760,6 +765,7 @@ void mafOpExtractIsosurface::UpdateSurface(bool use_lod)
   if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
   {
     m_ContourVolumeMapper->SetContourValue(m_IsoValue);
+    m_IsoValueVector.push_back(m_IsoValue);
     m_ContourVolumeMapper->Update();
     vtkPolyData *contour;/* = vtkPolyData::New();
     m_IsosurfaceCutter->SetInput(contour);
@@ -835,6 +841,7 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
     if (m_MultiContoursFlag != 0)
     {
       m_IsoValue = m_MinRange + step * contour;
+      m_IsoValueVector.push_back(m_IsoValue);
       m_ContourVolumeMapper->SetContourValue(m_IsoValue);
       m_ContourVolumeMapper->Update();
     }
@@ -886,4 +893,19 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
   {
     m_Output = m_OutputGroup;
   }
+}
+//----------------------------------------------------------------------------
+mafString mafOpExtractIsosurface::GetParameters()
+//----------------------------------------------------------------------------
+{
+  wxString parameter;
+  for (int contour = 0; contour < m_NumberOfContours; contour++)
+  {
+    parameter.Append("Contour value = ");
+    parameter.Append(wxString::Format("%f", m_IsoValueVector[contour]));
+    parameter.Append(", ");
+  }
+  parameter.RemoveLast(2);
+
+  return parameter;
 }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-27 14:47:39 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2008-10-29 11:04:07 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -69,6 +69,10 @@ public:
   void OpRun();
 
 
+  /** Return parameters used by operation. */
+  mafString GetParameters();
+
+
 protected:
   mafVMEGroup *m_OutputGroup; 
   mafGUIDialog		*m_Dialog;
@@ -91,6 +95,8 @@ protected:
   double       m_SliceOrigin[3];
   float        m_SliceXVect[3];
   float        m_SliceYVect[3];
+
+  std::vector<double> m_IsoValueVector;
 
   int m_MultiContoursFlag;
   int m_NumberOfContours;
