@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-27 14:48:54 $
-  Version:   $Revision: 1.40.2.3 $
+  Date:      $Date: 2008-10-29 11:03:00 $
+  Version:   $Revision: 1.40.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -713,6 +713,7 @@ void mafOpManager::OpDo(mafOp *op)
   op->OpDo();
   mafNode *in_node = op->GetInput();
   mafNode *out_node = op->GetOutput();
+
   if (in_node != NULL)
   {
     mafLogMessage("executed operation '%s' on input data: %s",op->m_Label.c_str(), in_node->GetName());
@@ -753,11 +754,15 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
 {
   mafString trialEvent = "Modify";
   mafString operationName;
+  mafString parameters;
   mafString appStamp;
   mafString userID;
   mafString isNatural;
   wxString revision;
   wxString dateAndTime;
+
+  operationName = op->GetTypeName();
+  parameters = op->GetParameters();
 
   wxDateTime time = wxDateTime::UNow();
   dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth(), time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
@@ -792,16 +797,19 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
     if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
       isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
 
-    traceability->AddTraceabilityEvent(trialEvent, operationName, dateAndTime, revision, userID, isNatural);
+    traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, revision, userID, isNatural);
   }
 
   if (out_node != NULL)
   {
+    int c = 0; //counter not to write single parameter on first VME which is a group
+    wxString singleParameter = parameters;
     mafNodeIterator *iter = out_node->NewIterator();
     for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
       if (node != NULL)
       {
+        c++;
         mafAttributeTraceability *traceability = (mafAttributeTraceability *)node->GetAttribute("TrialAttribute");
         if (traceability == NULL)
         {
@@ -834,7 +842,21 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
         if(node->GetTagArray()->IsTagPresent("VME_NATURE"))
           isNatural = node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
 
-        traceability->AddTraceabilityEvent(trialEvent, operationName, dateAndTime, revision, userID, isNatural);
+        if (out_node->GetNumberOfChildren() == 0 || c == 1)
+        {
+           traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, revision, userID, isNatural);
+        }
+        else
+        {
+          int count = singleParameter.find_first_of('=');
+          wxString par = singleParameter.Mid(0, count);
+          singleParameter = singleParameter.AfterFirst('=');
+          count = singleParameter.Find(par.c_str());
+          par.Append("=");
+          par.Append(singleParameter.substr(0, count-2));
+          singleParameter = singleParameter.Mid(count);
+          traceability->AddTraceabilityEvent(trialEvent, operationName, par, dateAndTime, revision, userID, isNatural);
+        }
       }
     }
     iter->Delete();
@@ -907,6 +929,7 @@ void mafOpManager::OpRedo()
 	mafOp* op = m_Context.Redo_Pop();
   mafNode *in_node = op->GetInput();
   mafNode *out_node = op->GetOutput();
+  mafString parameters = op->GetParameters();
   if (in_node != NULL)
   {
     mafLogMessage("redo = %s on input data: %s",op->m_Label.c_str(), in_node->GetName());
