@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttributeTraceability.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:52:05 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-10-29 11:03:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -41,12 +41,13 @@ mafAttributeTraceability::~mafAttributeTraceability()
 }
 
 //----------------------------------------------------------------------------
-void mafAttributeTraceability::AddTraceabilityEvent(mafString trialEvent, mafString operationName, mafString date, mafString appStamp, mafString operatorID, mafString isNatural)
+void mafAttributeTraceability::AddTraceabilityEvent(mafString trialEvent, mafString operationName, mafString parmaters, mafString date, mafString appStamp, mafString operatorID, mafString isNatural)
 //----------------------------------------------------------------------------
 {  
   m_Traceability traceability;
   traceability.m_TrialEvent = trialEvent;
   traceability.m_OperationName = operationName;
+  traceability.m_Parameters = parmaters;
   traceability.m_Date = date;
   traceability.m_AppStamp = appStamp;
   traceability.m_OperatorID = operatorID;
@@ -75,6 +76,7 @@ void mafAttributeTraceability::DeepCopy(const mafAttribute *a)
     m_Traceability traceability;
     traceability.m_TrialEvent = ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_TrialEvent;
     traceability.m_OperationName = ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_OperationName;
+    traceability.m_Parameters = ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_Parameters;
     traceability.m_Date = ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_Date;
     traceability.m_AppStamp = ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_AppStamp;
     traceability.m_OperatorID = ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_OperatorID;
@@ -97,6 +99,7 @@ bool mafAttributeTraceability::Equals(const mafAttribute *a) const
     {
       if(m_TraceabilityVector[i].m_TrialEvent != ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_TrialEvent ||
         m_TraceabilityVector[i].m_OperationName != ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_OperationName ||
+        m_TraceabilityVector[i].m_Parameters != ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_Parameters ||
         m_TraceabilityVector[i].m_Date != ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_Date ||
         m_TraceabilityVector[i].m_AppStamp != ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_AppStamp ||
         m_TraceabilityVector[i].m_OperatorID != ((mafAttributeTraceability *)a)->m_TraceabilityVector[i].m_OperatorID)
@@ -122,6 +125,7 @@ int mafAttributeTraceability::InternalStore(mafStorageElement *parent)
     {
       parent->StoreText("TrialEvent", m_TraceabilityVector[i].m_TrialEvent.GetCStr());
       parent->StoreText("Operation", m_TraceabilityVector[i].m_OperationName.GetCStr());
+      parent->StoreText("Parameters", m_TraceabilityVector[i].m_Parameters.GetCStr());
       parent->StoreText("Date", m_TraceabilityVector[i].m_Date.GetCStr());
       parent->StoreText("Application", m_TraceabilityVector[i].m_AppStamp.GetCStr());
       parent->StoreText("OperatorID",  m_TraceabilityVector[i].m_OperatorID.GetCStr());
@@ -148,6 +152,9 @@ int mafAttributeTraceability::InternalRestore(mafStorageElement *node)
     std::vector<mafStorageElement*> listOperation;
     node->GetNestedElementsByName("Operation", listOperation);
 
+    std::vector<mafStorageElement*> listParameters;
+    node->GetNestedElementsByName("Parameters", listParameters);
+
     std::vector<mafStorageElement*> listDate;
     node->GetNestedElementsByName("Date", listDate);
 
@@ -164,6 +171,7 @@ int mafAttributeTraceability::InternalRestore(mafStorageElement *node)
       m_Traceability traceability;
       listTrialEvent[i]->RestoreText(traceability.m_TrialEvent);
       listOperation[i]->RestoreText(traceability.m_OperationName);
+      listParameters[i]->RestoreText(traceability.m_Parameters);
       listDate[i]->RestoreText(traceability.m_Date);
       listApplication[i]->RestoreText(traceability.m_AppStamp);
       listOperatorID[i]->RestoreText(traceability.m_OperatorID);

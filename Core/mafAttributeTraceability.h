@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttributeTraceability.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:52:05 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-10-29 11:03:21 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,8 +30,8 @@ public:
   mafTypeMacro(mafAttributeTraceability,mafAttribute);
 
   /** add a create event */
-  void AddTraceabilityEvent(mafString m_TrialEvent, mafString operationName, mafString date, mafString appStamp, mafString operatorID, mafString isNatural = "");
-
+  void AddTraceabilityEvent(mafString m_TrialEvent, mafString operationName, mafString parmaters, mafString date, mafString appStamp, mafString operatorID, mafString isNatural = "");
+ 
   /** remove a traceability event */
   void RemoveTraceabilityEvent(); 
 
@@ -51,6 +51,7 @@ public:
   {
     mafString m_TrialEvent;
     mafString m_OperationName;
+    mafString m_Parameters;
     mafString m_Date;
     mafString m_AppStamp;
     mafString m_OperatorID;
