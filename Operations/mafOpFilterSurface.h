@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-10-29 11:03:51 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -48,6 +48,10 @@ public:
 	/** Makes the undo for the operation. */
 	void OpUndo();
 
+  /** Return parameters used by operation. */
+  mafString GetParameters();
+
+
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
@@ -61,6 +65,11 @@ protected:
 
 	bool m_ClearInterfaceFlag;
 	bool m_PreviewResultFlag;
+  bool m_StripFlag;
+  bool m_TriangulateFlag;
+  bool m_CleanFlag;
+  bool m_ConnectivityFlag;
+
 
 	vtkPolyData											*m_ResultPolydata;
 	vtkPolyData											*m_OriginalPolydata;

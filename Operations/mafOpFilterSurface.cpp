@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-10-29 11:03:51 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,8 +50,12 @@ mafOp(label)
 
 	m_InputPreserving = false;
 
-  m_PreviewResultFlag	= false;
-	m_ClearInterfaceFlag= false;
+  m_PreviewResultFlag	 = false;
+	m_ClearInterfaceFlag = false;
+  m_StripFlag          = false;
+  m_TriangulateFlag    = false;
+  m_CleanFlag          = false;
+  m_ConnectivityFlag   = false;
   
 	m_TopologyFlag= 0;
 	m_Reduction		= 50;
@@ -251,6 +255,7 @@ void mafOpFilterSurface::OnClean()
 	m_Gui->Enable(ID_CLEAR,true);
 	m_Gui->Enable(wxOK,true);
 
+  m_CleanFlag = true;
 	m_PreviewResultFlag = true;
 }
 //----------------------------------------------------------------------------
@@ -271,6 +276,7 @@ void mafOpFilterSurface::OnVtkConnect()
 	m_Gui->Enable(ID_CLEAR,true);
 	m_Gui->Enable(wxOK,true);
 
+  m_ConnectivityFlag = true;
 	m_PreviewResultFlag = true;
 }
 //----------------------------------------------------------------------------
@@ -346,6 +352,7 @@ void mafOpFilterSurface::OnStripper()
 	m_Gui->Enable(ID_CLEAR,true);
 	m_Gui->Enable(wxOK,true);
 
+  m_StripFlag = true;
 	m_PreviewResultFlag = true;
 }
 //----------------------------------------------------------------------------
@@ -366,6 +373,7 @@ void mafOpFilterSurface::OnTriangulate()
 	m_Gui->Enable(ID_CLEAR,true);
 	m_Gui->Enable(wxOK,true);
 
+  m_TriangulateFlag = true;
 	m_PreviewResultFlag = true;
 }
 //----------------------------------------------------------------------------
@@ -486,8 +494,52 @@ void mafOpFilterSurface::OnClear()
 	m_Gui->Enable(wxOK,false);
 	m_Gui->Update();
 
-	m_PreviewResultFlag = false;
-	m_ClearInterfaceFlag= false;
+  m_StripFlag          = false;
+  m_TriangulateFlag    = false;
+  m_CleanFlag          = false;
+  m_ConnectivityFlag   = false;
+	m_PreviewResultFlag  = false;
+	m_ClearInterfaceFlag = false;
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+}
+
+//----------------------------------------------------------------------------
+mafString mafOpFilterSurface::GetParameters()
+//----------------------------------------------------------------------------
+{
+  wxString parameter;
+
+  parameter.Append("n.iteraction = ");
+  parameter.Append(wxString::Format("%i", m_Iterations));
+  parameter.Append(", ");
+  parameter.Append("preserve topology = ");
+  parameter.Append(wxString::Format("%i", m_TopologyFlag));
+
+  parameter.Append(", ");
+  parameter.Append("reduc. to % = ");
+  parameter.Append(wxString::Format("%i", m_Reduction));
+  parameter.Append(", ");
+  parameter.Append("angle = ");
+  parameter.Append(wxString::Format("%i", m_Angle));
+  parameter.Append(", ");
+  parameter.Append("edge splitting = ");
+  parameter.Append(wxString::Format("%i", m_EdgeSplit));
+  parameter.Append(", ");
+  parameter.Append("flip normals = ");
+  parameter.Append(wxString::Format("%i", m_FlipNormals));
+  parameter.Append(", ");
+  parameter.Append("strip = ");
+  parameter.Append(wxString::Format("%i", m_StripFlag));
+  parameter.Append(", ");
+  parameter.Append("triangulate = ");
+  parameter.Append(wxString::Format("%i", m_TriangulateFlag));
+  parameter.Append(", ");
+  parameter.Append("clean = ");
+  parameter.Append(wxString::Format("%i", m_CleanFlag));
+  parameter.Append(", ");
+  parameter.Append("connectivity = ");
+  parameter.Append(wxString::Format("%i", m_ConnectivityFlag));
+
+  return parameter;
 }
