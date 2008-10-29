@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 10:36:37 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2008-10-29 14:39:50 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1119,28 +1119,40 @@ mafString medOpVolumeResample::GetParameters()
 
   parameter.Append("Bounding Box Extent X = ");
   parameter.Append(wxString::Format("%f ", m_MaxBoundX));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Extent Y = ");
   parameter.Append(wxString::Format("%f ", m_MaxBoundY));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Extent Z = ");
   parameter.Append(wxString::Format("%f ", m_MaxBoundZ));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Origin X = ");
   parameter.Append(wxString::Format("%f ", m_ROIPosition[0]));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Origin Y = ");
   parameter.Append(wxString::Format("%f ", m_ROIPosition[1]));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Origin Z = ");
   parameter.Append(wxString::Format("%f ", m_ROIPosition[2]));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Orientation X = ");
   parameter.Append(wxString::Format("%f ", m_ROIOrientation[0]));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Orientation Y = ");
   parameter.Append(wxString::Format("%f ", m_ROIOrientation[1]));
+  parameter.Append(", ");
   parameter.Append("Bounding Box Orientation Z = ");
   parameter.Append(wxString::Format("%f ", m_ROIOrientation[2]));
+  parameter.Append(", ");
   parameter.Append("Volume Spacing X = ");
   parameter.Append(wxString::Format("%f ", m_VolumeSpacing[0]));
+  parameter.Append(", ");
   parameter.Append("Volume Spacing Y = ");
   parameter.Append(wxString::Format("%f ", m_VolumeSpacing[1]));
+  parameter.Append(", ");
   parameter.Append("Volume Spacing Z = ");
   parameter.Append(wxString::Format("%f ", m_VolumeSpacing[2]));
+  parameter.Append(", ");
   parameter.Append("Padding Value = ");
   parameter.Append(wxString::Format("%f", m_ZeroPadValue));
 
