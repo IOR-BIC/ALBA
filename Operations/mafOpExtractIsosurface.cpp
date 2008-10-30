@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-29 11:04:07 $
-Version:   $Revision: 1.5.2.2 $
+Date:      $Date: 2008-10-30 09:01:14 $
+Version:   $Revision: 1.5.2.3 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -399,6 +399,7 @@ void mafOpExtractIsosurface::CreateVolumePipeline()
     value += 0.05f * (range[1] + range[0]) + 1.f;
 
   m_IsoValue=value;
+  m_IsoValueVector.push_back(m_IsoValue);
   m_ContourVolumeMapper->SetContourValue(m_IsoValue);
 
   /*vtkPolyData *contour = vtkPolyData::New();
@@ -765,6 +766,7 @@ void mafOpExtractIsosurface::UpdateSurface(bool use_lod)
   if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
   {
     m_ContourVolumeMapper->SetContourValue(m_IsoValue);
+    m_IsoValueVector.clear();
     m_IsoValueVector.push_back(m_IsoValue);
     m_ContourVolumeMapper->Update();
     vtkPolyData *contour;/* = vtkPolyData::New();
