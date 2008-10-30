@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 11:03:00 $
-  Version:   $Revision: 1.40.2.4 $
+  Date:      $Date: 2008-10-30 09:31:22 $
+  Version:   $Revision: 1.40.2.5 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -784,6 +784,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
       appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
 
 
+#ifdef _WIN32
     mafString regKeyPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
     regKeyPath.Append(appStamp.GetCStr());
 
@@ -791,13 +792,16 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
     if(RegKey.Exists())
     {
       RegKey.Create();
-      RegKey.QueryValue(wxString("DisplayName"), revision);
+      RegKey.QueryValue(wxString("DisplayVersion"), revision);
     }
+    appStamp.Append(" ");
+    appStamp.Append(revision.c_str());
+#endif
    
     if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
       isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
 
-    traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, revision, userID, isNatural);
+    traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp, userID, isNatural);
   }
 
   if (out_node != NULL)
@@ -844,7 +848,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
 
         if (out_node->GetNumberOfChildren() == 0 || c == 1)
         {
-           traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, revision, userID, isNatural);
+           traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp, userID, isNatural);
         }
         else
         {
@@ -855,7 +859,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
           par.Append("=");
           par.Append(singleParameter.substr(0, count-2));
           singleParameter = singleParameter.Mid(count);
-          traceability->AddTraceabilityEvent(trialEvent, operationName, par, dateAndTime, revision, userID, isNatural);
+          traceability->AddTraceabilityEvent(trialEvent, operationName, par, dateAndTime, appStamp, userID, isNatural);
         }
       }
     }
