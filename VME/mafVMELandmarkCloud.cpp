@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMELandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 10:19:38 $
-  Version:   $Revision: 1.39 $
+  Date:      $Date: 2008-10-30 09:35:43 $
+  Version:   $Revision: 1.39.2.1 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -769,8 +769,8 @@ void mafVMELandmarkCloud::Close()
 
   long progress = 0;
 
-  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
-  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Collapsing cloud")));
+  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
+  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Collapsing cloud")));
 
   for (int c = 0; c < numberOfChildren;c++)
   {
@@ -870,7 +870,7 @@ void mafVMELandmarkCloud::Close()
       landmarks.push_back(lm); 
     }
     progress = c * 100 / numberOfChildren;
-    ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
+    ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
 
   }
   
@@ -888,7 +888,7 @@ void mafVMELandmarkCloud::Close()
     
   Modified();
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
-  ForwardUpEvent(mafEvent(this,PROGRESSBAR_HIDE));
+  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
 
   if (busyCursor)
   {
@@ -919,8 +919,8 @@ void mafVMELandmarkCloud::Open()
     mafLogMessage(stringStream.str().c_str());
   }
 
-  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SHOW));
-  ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
+  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SHOW));
+  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_TEXT, &mafString("Exploding cloud")));
   long progress  = 0;
 
   int i,numlm = GetNumberOfLandmarks();
@@ -967,7 +967,7 @@ void mafVMELandmarkCloud::Open()
       }
 		}
     progress = i * 100 / numlm;
-    ForwardUpEvent(mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
+    ForwardUpEvent(&mafEvent(this,PROGRESSBAR_SET_VALUE, progress));
 
 	}
   // remove all items and tags...
@@ -981,7 +981,7 @@ void mafVMELandmarkCloud::Open()
   GetEventSource()->InvokeEvent(this, mafVMELandmarkCloud::CLOUD_OPEN_CLOSE);
 
   
-  ForwardUpEvent(mafEvent(this,PROGRESSBAR_HIDE));
+  ForwardUpEvent(&mafEvent(this,PROGRESSBAR_HIDE));
 
   if (busyCursor)
   {
