@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomXA.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:36:24 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-10-31 13:05:33 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,6 +99,8 @@ protected:
 
 	/** Return the slice number from the heightId and sliceId*/
   int GetImageId(int heightId, int timeId);
+
+  bool m_SingleFileModality; //<< If in a single file DICOM there are more frames
 
   mmiDICOMImporterInteractor *m_DicomInteractor;
 

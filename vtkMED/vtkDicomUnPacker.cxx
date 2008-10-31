@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.1 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -44,6 +44,10 @@ vtkDicomUnPacker::vtkDicomUnPacker()
 	UnPackFromFileOn();
   DICT_line = 0;
 	Status = 0;
+
+  NumOfFrameToGet = 0;
+  NumberOfFrames = 1;
+  ModeSingleFile = false;
 }
 //----------------------------------------------------------------------------
 vtkDicomUnPacker::~vtkDicomUnPacker()
@@ -559,7 +563,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 }
 //----------------------------------------------------------------------------
 template <class T>
-int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double intercept_value, int rows, int cols, int flip=0, int Signed=1)
+int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double intercept_value, int rows, int cols, int flip=0, int Signed=1,int NumOfFrameToGet=0)
 //----------------------------------------------------------------------------
 {
 	bool    time_to_exit = false;
@@ -686,6 +690,7 @@ int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double
 			}
 			else
 			{
+        fseek(fp,sizeof(T)*NumOfFrameToGet*rows*cols,SEEK_CUR);
 				for (r = 0; r < rows; r++) 
 				{
 					for (c = 0; c < cols; c++)
@@ -840,6 +845,8 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 			m_Orientation[2]=(double) VALUES[p].num[2];
 		}
 
+    if ((RESULT[p].Group==40) & (RESULT[p].Element==8)) 
+      NumberOfFrames=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==256)) 
       m_BitsAllocated=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==257)) 
@@ -928,12 +935,12 @@ int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageDat
 	{
 		case 8:
 		{
-			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage);
+			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage,1,NumOfFrameToGet);
 		}
 		break;
 		case 16:
 		{
-			ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage,m_PixelRepresentation);
+			ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage,m_PixelRepresentation,NumOfFrameToGet);
 		}
 		break;
 	}

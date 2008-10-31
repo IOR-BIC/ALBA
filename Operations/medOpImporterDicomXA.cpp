@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomXA.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:36:08 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-10-31 13:05:33 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -151,6 +151,8 @@ medOpImporterDicomXA::medOpImporterDicomXA(wxString label) : mafOp(label)
   m_BoxCorrect = false;
 
   m_TimeFrame = 1.0;
+
+  m_SingleFileModality = false;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicomXA::~medOpImporterDicomXA()
@@ -914,6 +916,8 @@ void medOpImporterDicomXA::ShowSlice(int slice_num)
 	m_DicomReader->Modified();
 	m_DicomReader->Update();
 	
+  int numberOfFrames = m_DicomReader->GetNumberOfFrames();
+
 	m_DicomReader->GetSliceLocation(loc);
 	//double bounds[6];
   
@@ -1229,14 +1233,35 @@ void medOpImporterDicomXA::	OnEvent(mafEventBase *maf_event)
           }
         }
 
-        m_NumberOfTimeFrames=i+1;
+        if (m_ListSelected->GetCount() == 1 || m_NumberOfTimeFrames == 1)//If there is only one file
+        {
+          int j=0;
+          while(j<m_ListSelected->GetCount())
+          {
+            m_DicomReader->SetFileName((char *)m_ListSelected->Item(j)->GetData()->GetFileName());
+            m_DicomReader->Modified();
+            m_DicomReader->Update();
+            if(m_DicomReader->GetNumberOfFrames()!=m_NumberOfTimeFrames)
+            {
+              m_NumberOfTimeFrames = m_DicomReader->GetNumberOfFrames();
+              m_SingleFileModality = true;
+              m_DicomReader->SetModeSingleFile(m_SingleFileModality);
+            }
+            j++;
+          }
+        }
+        else
+        {
+          m_NumberOfTimeFrames=i+1;
+        }
+          
         if(m_NumberOfTimeFrames>1)
         {
           m_TimeLabel->Enable(true);
           m_TimeText->Enable(true);
           m_TimeScanner->Enable(true);
         }
-        if(m_NumberOfTimeFrames > 1) //If cMRI
+        if(m_NumberOfTimeFrames > 1 && !m_SingleFileModality) //If cMRI
 					m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
 				else
 					m_NumberOfSlices = m_ListSelected->GetCount();
@@ -1679,8 +1704,14 @@ int medOpImporterDicomXA::GetImageId(int timeId, int heigthId)
   medOpImporterDicomXAListElement *element0;
   element0 = (medOpImporterDicomXAListElement *)m_ListSelected->Item(0)->GetData();
 
-  if(m_NumberOfTimeFrames==1)
+  if(m_NumberOfTimeFrames==1 || m_SingleFileModality)
+  {
+    if(m_SingleFileModality)
+    {
+      m_DicomReader->SetNumOfFrameToGet(timeId);
+    }
     return heigthId;
+  }
 
   return (heigthId * m_NumberOfTimeFrames + timeId); 
 }

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2006-07-05 10:16:17 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-10-31 13:03:53 $
+  Version:   $Revision: 1.3.4.1 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -186,12 +186,26 @@ public:
   DICOM *GetDictionary() {return this->DICT;}
   int GetDictionarySize() {return this->DICT_line;}
 
+  /**	Modality single file*/
+  vtkBooleanMacro(ModeSingleFile,bool);
+  vtkSetMacro(ModeSingleFile,bool);
+  vtkGetMacro(ModeSingleFile,bool);
+
+  /** Return the number of frame */
+  vtkGetMacro(NumberOfFrames,int);
+
+  vtkSetMacro(NumOfFrameToGet,int);
+
 protected:
 	vtkDicomUnPacker();
 	~vtkDicomUnPacker();
 
   vtkDicomUnPacker(const vtkDicomUnPacker&);
   void operator=(const vtkDicomUnPacker&);
+
+  bool ModeSingleFile;//<<Set modality if in the file is a single DICOM time variant
+  int NumberOfFrames;
+  int NumOfFrameToGet;
 
 	uint32 TAGNumbers;
 	DICOM  RESULT[SIZE_TAG];
