@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-11-03 13:59:28 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,10 +40,6 @@ public:
 
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
   virtual void Select(bool select);
-
-  /** Get assembly front/back */
-  virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
-  virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
   void SetBoundsMode(int mode){if(mode>=BOUNDS_3D && mode<=BOUNDS_4D_SUBTREE)m_BoundsMode=mode;};
   int  GetBoundsMode(){return m_BoundsMode;};
