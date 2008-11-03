@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipe.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-11-03 13:58:31 $
+  Version:   $Revision: 1.18.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,6 +61,10 @@ public:
 
 	/** Update the properties according to the vme's tags. */
 	virtual	void UpdateProperty(bool fromTag = false)		{};
+
+  /** Get assembly front/back */
+  virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
   /** IDs for the GUI */
   enum VISUAL_PIPE_WIDGET_ID
