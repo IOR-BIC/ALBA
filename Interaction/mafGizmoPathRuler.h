@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoPathRuler.h,v $
 Language:  C++
-Date:      $Date: 2008-10-22 08:45:11 $
-Version:   $Revision: 1.6.2.1 $
+Date:      $Date: 2008-11-03 14:46:57 $
+Version:   $Revision: 1.6.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -57,7 +57,7 @@ class mafGizmoPathRuler : public mafGizmoInterface
 public:
   
   mafGizmoPathRuler(mafVME *input, mafObserver* listener = NULL, int ticksNumber = 1, \
-      int originTickId = 0, double ticksHeigth = 50, double ticksDistance = 20, bool enableLongerTicks = true);
+      int originTickId = 0, double ticksHeigth = 50, double ticksDistance = 20, bool enableShorterTicks = true);
   virtual ~mafGizmoPathRuler(); 
 
   /** Set position of the origin tick along constraint polyline; other ticks will follow*/
@@ -135,7 +135,7 @@ protected:
   double m_TicksHeigth;
   double m_TicksDistance;
   double m_CurvilinearAbscissa;
-  bool m_EnableLongerTicks;
+  bool m_EnableShorterTicks;
 
   /** Gizmo gui events handling; not yet implemented... */
   void OnEventGizmoGui(mafEventBase *maf_event);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-22 08:45:11 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2008-11-03 14:46:57 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 mafGizmoPathRuler::mafGizmoPathRuler(mafVME *input, mafObserver* listener, \
-                 int ticksNumber, int originTickID, double ticksHeigth,double ticksDistance, bool enableLongerTicks)
+                 int ticksNumber, int originTickID, double ticksHeigth,double ticksDistance, bool enableShorterTicks)
 {
   assert(input);
   m_InputVME = input;
@@ -42,7 +42,7 @@ mafGizmoPathRuler::mafGizmoPathRuler(mafVME *input, mafObserver* listener, \
   m_TicksHeigth = ticksHeigth;
   m_TicksDistance = ticksDistance;
   m_CurvilinearAbscissa = 0;
-  m_EnableLongerTicks = enableLongerTicks;
+  m_EnableShorterTicks = enableShorterTicks;
   // create gizmos and put their references in the vector 
   BuildGizmos();
 
@@ -132,14 +132,22 @@ void mafGizmoPathRuler::BuildGizmos()
     // set the constraint
     // ...
 
-    if(m_EnableLongerTicks && (gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1))
+    if(m_EnableShorterTicks)
     {
-      gp->SetLineLength(m_TicksHeigth);
+      if((gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1))
+      {
+        gp->SetLineLength(m_TicksHeigth);
+      }
+      else
+      {
+        gp->SetLineLength(m_TicksHeigth/2.);
+      }
     }
     else
     {
-      gp->SetLineLength(m_TicksHeigth/2.);
+      gp->SetLineLength(m_TicksHeigth);
     }
+    
     
 
     // put pointer to gizmo in the vector;
@@ -163,15 +171,22 @@ void mafGizmoPathRuler::DestroyGizmos()
 
 void mafGizmoPathRuler::SetTicksHeigth( double height )
 {
-  for (int i = 0; i < m_GizmoPathVector.size();i++)
+  for (int gizmoID = 0; gizmoID < m_GizmoPathVector.size();gizmoID++)
   {
-    if(m_EnableLongerTicks && (i == 0 || i == m_TicksNumber/2 || i == m_TicksNumber-1))
+    if(m_EnableShorterTicks)
     {
-      m_GizmoPathVector[i]->SetLineLength(height);
+      if((gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1))
+      {
+        m_GizmoPathVector[gizmoID]->SetLineLength(m_TicksHeigth);
+      }
+      else
+      {
+        m_GizmoPathVector[gizmoID]->SetLineLength(m_TicksHeigth/2.);
+      }
     }
     else
     {
-      m_GizmoPathVector[i]->SetLineLength(height/2.);
+      m_GizmoPathVector[gizmoID]->SetLineLength(m_TicksHeigth);
     }
   }
 }
