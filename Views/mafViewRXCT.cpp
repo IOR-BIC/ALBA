@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 16:07:01 $
-  Version:   $Revision: 1.45.2.1 $
+  Date:      $Date: 2008-11-03 12:21:45 $
+  Version:   $Revision: 1.45.2.2 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -739,6 +739,7 @@ void mafViewRXCT::PackageView()
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "medVisualPipeSlicerSlice",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeProjected",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
   }
@@ -756,6 +757,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice",MUTEX);
  
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);
