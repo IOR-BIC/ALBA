@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2008-11-04 18:03:33 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,7 +70,7 @@ class mafMatrix;
 class mafGizmoRotate : public mafGizmoInterface 
 {
 public:
-           mafGizmoRotate(mafVME *input, mafObserver* listener = NULL);
+           mafGizmoRotate(mafVME *input, mafObserver* listener = NULL, bool buildGUI = true);
   virtual ~mafGizmoRotate(); 
 
   /** 
@@ -110,12 +110,13 @@ public:
 
   /** Set the vme to be used as reference system, the vme is referenced; default ref sys is vme abs matrix */
   void SetRefSys(mafVME *refSys);
-  mafVME* GetRefSys();
+  mafVME* GetRefSys();;
 
   mafGUI *GetGui() {return m_GuiGizmoRotate->GetGui();};
 
   /** Modify radius of circles*/
   void SetCircleFanRadius(double radius);
+  double GetCircleFanRadius();
 
 protected:
   mafGUIGizmoRotate *m_GuiGizmoRotate;
@@ -144,5 +145,14 @@ protected:
 
   /** The rotating fan gizmo*/
   mafGizmoRotateFan *m_GRFan[3];
+
+  /** Build Gizmo GUI */
+  bool m_BuildGUI;
+
+  /** test friend */
+  friend class mafGizmoRotateTest;
+  
+  double m_CircleFanRadius;
+
 };
 #endif

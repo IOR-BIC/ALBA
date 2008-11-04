@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-09 09:43:50 $
-  Version:   $Revision: 1.8.4.1 $
+  Date:      $Date: 2008-11-04 18:03:33 $
+  Version:   $Revision: 1.8.4.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -54,11 +54,12 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   this->SetIsActive(false);
   
   // default axis is X
-  ActiveAxis = X;
-  IsaComp = NULL;
+  m_ActiveAxis = X;
+  m_IsaComp = NULL;
+  m_Radius = -1;
 
   m_Listener = listener;
-  InputVme = input;
+  m_InputVme = input;
 
   //-----------------
   // create pipeline stuff
@@ -72,42 +73,42 @@ mafGizmoRotateCircle::mafGizmoRotateCircle(mafVME *input, mafObserver *listener)
   //-----------------
   
   // the circle gizmo
-  Gizmo = mafVMEGizmo::New();
-  Gizmo->SetName("circle");
-  Gizmo->SetData(RotatePDF->GetOutput());
+  m_Gizmo = mafVMEGizmo::New();
+  m_Gizmo->SetName("circle");
+  m_Gizmo->SetData(m_RotatePDF->GetOutput());
 
   // assign isa to S1 and S2;
-  Gizmo->SetBehavior(IsaComp);
+  m_Gizmo->SetBehavior(m_IsaComp);
   
   // set the axis to X axis
-  this->SetAxis(ActiveAxis);
+  this->SetAxis(m_ActiveAxis);
 
-  m_AbsInputMatrix = InputVme->GetOutput()->GetAbsMatrix();
-  InputVme->GetOutput()->Update();
+  m_AbsInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
+  m_InputVme->GetOutput()->Update();
   SetAbsPose(m_AbsInputMatrix);
   SetRefSysMatrix(m_AbsInputMatrix);
 
   // add the gizmo to the tree, this should increase reference count  
-  Gizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  m_Gizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 
 }
 //----------------------------------------------------------------------------
 mafGizmoRotateCircle::~mafGizmoRotateCircle() 
 //----------------------------------------------------------------------------
 {
-  Gizmo->SetBehavior(NULL);
+  m_Gizmo->SetBehavior(NULL);
   
-  vtkDEL(Circle);
-  vtkDEL(CleanCircle);
-  vtkDEL(CircleTF);
-  vtkDEL(RotationTr); 
-  vtkDEL(RotatePDF); 
+  vtkDEL(m_Circle);
+  vtkDEL(m_CleanCircle);
+  vtkDEL(m_CircleTF);
+  vtkDEL(m_RotationTr); 
+  vtkDEL(m_RotatePDF); 
 	//----------------------
 	// No leaks so somebody is performing this...
 	//----------------------
-  vtkDEL(IsaComp); 
+  vtkDEL(m_IsaComp); 
   
-	Gizmo->ReparentTo(NULL);
+	m_Gizmo->ReparentTo(NULL);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::CreatePipeline() 
@@ -115,10 +116,10 @@ void mafGizmoRotateCircle::CreatePipeline()
 {
   // calculate diagonal of InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-	if(InputVme->IsA("mafVMEGizmo"))
-		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	if(m_InputVme->IsA("mafVMEGizmo"))
+		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
-		InputVme->GetOutput()->GetBounds(b);
+		m_InputVme->GetOutput()->GetBounds(b);
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
@@ -126,30 +127,33 @@ void mafGizmoRotateCircle::CreatePipeline()
   p2[1] = b[3];
   p2[2] = b[5];
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
-  
+    
   // create circle
-  Circle = vtkDiskSource::New();
-	Circle->SetCircumferentialResolution(50);
-	Circle->SetInnerRadius(d / 2);
-	Circle->SetOuterRadius(d / 2);
+  m_Circle = vtkDiskSource::New();
+	m_Circle->SetCircumferentialResolution(50);
+	m_Circle->SetInnerRadius(d / 2);
+	m_Circle->SetOuterRadius(d / 2);
+
+  m_Radius = d / 2;
 
   // clean the circle polydata
-  CleanCircle = vtkCleanPolyData::New();
-	CleanCircle->SetInput(Circle->GetOutput());
+  m_CleanCircle = vtkCleanPolyData::New();
+	m_CleanCircle->SetInput(m_Circle->GetOutput());
 
   // tube filter the circle 
-  CircleTF = vtkTubeFilter::New();
-  CircleTF->SetInput(CleanCircle->GetOutput());
-  CircleTF->SetRadius(d / 200);
-  CircleTF->SetNumberOfSides(20);
+  m_CircleTF = vtkTubeFilter::New();
+  m_CircleTF->SetInput(m_CleanCircle->GetOutput());
+  m_CircleTF->SetRadius(d / 200);
+  m_CircleTF->SetNumberOfSides(20);
   
   // create rotation transform and rotation TPDF
-  RotationTr = vtkTransform::New();
-  RotationTr->Identity();
+  m_RotationTr = vtkTransform::New();
+  m_RotationTr->Identity();
 
-  RotatePDF = vtkTransformPolyDataFilter::New();
-  RotatePDF->SetTransform(RotationTr);
-  RotatePDF->SetInput(CircleTF->GetOutput());
+  m_RotatePDF = vtkTransformPolyDataFilter::New();
+  m_RotatePDF->SetTransform(m_RotationTr);
+  m_RotatePDF->SetInput(m_CircleTF->GetOutput());
+
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::CreateISA()
@@ -157,19 +161,19 @@ void mafGizmoRotateCircle::CreateISA()
 {
   // Create isa compositor and assign behaviors to IsaGen ivar.
   // Default isa constrain rotation around X axis.
-  IsaComp = mmiCompositorMouse::New();
+  m_IsaComp = mmiCompositorMouse::New();
 
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  IsaGen = IsaComp->CreateBehavior(MOUSE_LEFT);
-  IsaGen->SetVME(InputVme);
-  IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK); 
-  IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
-  IsaGen->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
-  IsaGen->EnableRotation(true);
+  m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
+  m_IsaGen->SetVME(m_InputVme);
+  m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK); 
+  m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
+  m_IsaGen->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
+  m_IsaGen->EnableRotation(true);
 
   //isa will send events to this
-  IsaGen->SetListener(this);
+  m_IsaGen->SetListener(this);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetAxis(int axis) 
@@ -179,43 +183,43 @@ void mafGizmoRotateCircle::SetAxis(int axis)
   // is created; gizmos are not highlighted
   
   // register the axis
-  ActiveAxis = axis;
+  m_ActiveAxis = axis;
   
   // rotate the gizmo components to match the specified axis
-  if (ActiveAxis == X)
+  if (m_ActiveAxis == X)
   {
     // set rotation to move gizmo normal to X
-    RotationTr->Identity();
-    RotationTr->RotateY(90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateY(90);
     
     // set the color to red
     this->SetColor(1, 0, 0);
 
      // change the axis constrain  
-    IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
   }
-  else if (ActiveAxis == Y)
+  else if (m_ActiveAxis == Y)
   {
     // set rotation to move gizmo normal to Y 
-    RotationTr->Identity();
-    RotationTr->RotateX(90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateX(90);
  
     // set the color to green
     this->SetColor(0, 1, 0);
 
     // change the Gizmo constrain
-    IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
+    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
   }
-  else if (ActiveAxis == Z)
+  else if (m_ActiveAxis == Z)
   {
     // reset circle orientation to move gizmo normal to Z
-    RotationTr->Identity();
+    m_RotationTr->Identity();
   
     // set the color to blue
     this->SetColor(0, 0, 1);
    
     // change the Gizmo constrain
-    IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
   }    
 }
 //----------------------------------------------------------------------------
@@ -230,17 +234,17 @@ void mafGizmoRotateCircle::Highlight(bool highlight)
   else
   {
    // restore original color 
-   if (ActiveAxis == X)
+   if (m_ActiveAxis == X)
    {
     // X circle to red
     this->SetColor(1, 0, 0);
    } 
-   else if (ActiveAxis == Y)
+   else if (m_ActiveAxis == Y)
    {
      // Y circle to green
     this->SetColor(0, 1, 0);
    }
-   else if (ActiveAxis == Z)
+   else if (m_ActiveAxis == Z)
    {     
     // Z circle to blue
     this->SetColor(0, 0, 1);
@@ -251,8 +255,9 @@ void mafGizmoRotateCircle::Highlight(bool highlight)
 void  mafGizmoRotateCircle::SetRadius(double radius)
 //----------------------------------------------------------------------------
 {
-  Circle->SetInnerRadius(radius);
-	Circle->SetOuterRadius(radius);
+  m_Radius = radius;
+  m_Circle->SetInnerRadius(radius);
+	m_Circle->SetOuterRadius(radius);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::OnEvent(mafEventBase *maf_event)
@@ -282,10 +287,10 @@ void mafGizmoRotateCircle::OnEvent(mafEventBase *maf_event)
 void mafGizmoRotateCircle::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  Gizmo->GetMaterial()->m_Prop->SetColor(col);
-	Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_Gizmo->GetMaterial()->m_Prop->SetColor(col);
+	m_Gizmo->GetMaterial()->m_Prop->SetAmbient(0);
+	m_Gizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+	m_Gizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
@@ -298,43 +303,68 @@ void mafGizmoRotateCircle::SetColor(double colR, double colG, double colB)
 void mafGizmoRotateCircle::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,Gizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo,show));
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  Gizmo->SetAbsMatrix(*absPose);
+  m_Gizmo->SetAbsMatrix(*absPose);
   SetRefSysMatrix(absPose);
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetRefSysMatrix(mafMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-  IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-  IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix);
+  m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+  m_IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix);
 }
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoRotateCircle::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return Gizmo->GetOutput()->GetAbsMatrix();
+  return m_Gizmo->GetOutput()->GetAbsMatrix();
 }
 //----------------------------------------------------------------------------
 void mafGizmoRotateCircle::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->InputVme = vme; 
+  this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
 mmiGenericInterface *mafGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
-  return IsaGen;
+  return m_IsaGen;
 }
 
 int mafGizmoRotateCircle::GetAxis()
 {
- return ActiveAxis;
+ return m_ActiveAxis;
+}
+
+double mafGizmoRotateCircle::GetRadius()
+{
+  return m_Radius;
+}
+
+void mafGizmoRotateCircle::SetListener( mafObserver *Listener )
+{
+  m_Listener = Listener;
+}
+
+void mafGizmoRotateCircle::SetIsActive( bool highlight )
+{
+  m_IsActive = highlight;
+}
+
+bool mafGizmoRotateCircle::GetIsActive()
+{
+  return m_IsActive;
+}
+
+mafVME * mafGizmoRotateCircle::GetInput()
+{
+  return this->m_InputVme;
 }

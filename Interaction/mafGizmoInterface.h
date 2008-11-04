@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-11-04 18:03:33 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,6 +52,7 @@ public:
   /**
   Set the event receiver object*/
   void SetListener(mafObserver *listener) {m_Listener = listener;};
+  mafObserver *GetListener();
 
   /**
   Events handling*/        

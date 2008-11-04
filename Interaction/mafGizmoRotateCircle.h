@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-09 09:43:51 $
-  Version:   $Revision: 1.2.22.1 $
+  Date:      $Date: 2008-11-04 18:03:33 $
+  Version:   $Revision: 1.2.22.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,14 +49,14 @@ public:
    /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput();
 
   //----------------------------------------------------------------------------
   // events handling 
   //----------------------------------------------------------------------------
   
   /** Set the event receiver object*/
-  void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  void  SetListener(mafObserver *Listener);
   
   /** Events handling*/        
   virtual void OnEvent(mafEventBase *maf_event);
@@ -98,8 +98,8 @@ public:
 
   /** Set/Get the activation status of the gizmo, When the gizmo is active
   it is sending pose matrices to the listener */
-  void SetIsActive(bool highlight) {IsActive = highlight;};
-  bool GetIsActive() {return IsActive;}
+  void SetIsActive(bool highlight);
+  bool GetIsActive();
  
   /** 
   Set the abs pose */
@@ -120,10 +120,10 @@ protected:
   mafAutoPointer<mafMatrix> m_AbsInputMatrix;
   
   /** Circle gizmo */
-  mafVMEGizmo *Gizmo;
+  mafVMEGizmo *m_Gizmo;
 
   /** Register input vme*/
-  mafVME *InputVme;
+  mafVME *m_InputVme;
 
   /**
 
@@ -140,25 +140,22 @@ protected:
   enum GIZMO_STATUS {SELECTED = 0, NOT_SELECTED};
   
   /** Register the gizmo axis */
-  int ActiveAxis;
+  int m_ActiveAxis;
   
   /** Create the circle polydata*/
-  vtkDiskSource *Circle;
+  vtkDiskSource *m_Circle;
 
   /** Clean the circle polydata */
-  vtkCleanPolyData *CleanCircle;
+  vtkCleanPolyData *m_CleanCircle;
     
   /** Tube filter for circle */
-  vtkTubeFilter *CircleTF;
-
-  /** gizmo data */
-  //mafVmeData *GizmoData;
+  vtkTubeFilter *m_CircleTF;
  
   /** rotate PDF for gizmo */
-  vtkTransformPolyDataFilter *RotatePDF;
+  vtkTransformPolyDataFilter *m_RotatePDF;
 
   /** rotation transform */
-  vtkTransform *RotationTr;
+  vtkTransform *m_RotationTr;
   
   /** Create vtk objects needed*/
   void CreatePipeline();
@@ -167,10 +164,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *IsaComp;
+  mmiCompositorMouse *m_IsaComp;
 
   /** isa generic*/
-  mmiGenericMouse *IsaGen;
+  mmiGenericMouse *m_IsaGen;
 
   /** Gizmo color setting facilities for gizmo segments;*/
   void SetColor(double col[3]);
@@ -181,8 +178,11 @@ protected:
   mafObserver *m_Listener;
 
   /** Register Gizmo status*/
-  bool IsActive;
+  bool m_IsActive;
   
+  /** Register gizmo radius */
+  double m_Radius;
+
   /** friend test */
   friend class mafGizmoRotateCircleTest;
 };

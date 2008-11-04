@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-11-04 18:03:33 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,4 +52,9 @@ void mafGizmoInterface::SendTransformMatrix(mafMatrix* matrix, int eventId, long
   e2s.SetArg(arg);
 
   mafEventMacro(e2s);
+}
+
+mafObserver * mafGizmoInterface::GetListener()
+{
+  return m_Listener;
 }
