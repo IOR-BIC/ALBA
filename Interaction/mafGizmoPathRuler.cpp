@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-03 14:46:57 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2008-11-04 13:27:18 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -177,16 +177,16 @@ void mafGizmoPathRuler::SetTicksHeigth( double height )
     {
       if((gizmoID == 0 || gizmoID == m_TicksNumber/2 || gizmoID == m_TicksNumber-1))
       {
-        m_GizmoPathVector[gizmoID]->SetLineLength(m_TicksHeigth);
+        m_GizmoPathVector[gizmoID]->SetLineLength(height);
       }
       else
       {
-        m_GizmoPathVector[gizmoID]->SetLineLength(m_TicksHeigth/2.);
+        m_GizmoPathVector[gizmoID]->SetLineLength(height/2.);
       }
     }
     else
     {
-      m_GizmoPathVector[gizmoID]->SetLineLength(m_TicksHeigth);
+      m_GizmoPathVector[gizmoID]->SetLineLength(height);
     }
   }
 }
