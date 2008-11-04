@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:30 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2008-11-04 17:14:44 $
+  Version:   $Revision: 1.16.2.1 $
   Authors:   Paolo Quadrani - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -131,11 +131,11 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	RXTexture->SetInterpolate(1);
 	RXTexture->SetMapColorScalarsThroughLookupTable(1);
 
-	if (vtk_data->IsA("vtkStructuredPoints"))
+	if (vtk_data->IsA("vtkImageData")) //BES: 4.11.2008 - vtkStructuredPoints are derived from vtkImageData
 	{
 		SPProjection = vtkMAFProjectSP::New();
     mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,SPProjection));
-		SPProjection->SetInput(((vtkStructuredPoints *)vtk_data));
+		SPProjection->SetInput(((vtkImageData *)vtk_data)); //BES: 4.11.2008
 		if (m_CamPosition == CAMERA_RX_FRONT )
 			SPProjection->SetProjectionModeToY();
 		else
