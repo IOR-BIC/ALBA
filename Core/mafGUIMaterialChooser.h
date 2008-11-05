@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMaterialChooser.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-11-05 17:07:21 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -18,6 +18,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 #include "mafEvent.h"
 #include "mafObserver.h"
+#include "mafStorable.h"
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -122,5 +123,18 @@ protected:
 	int				m_Wire;
 
 	mafString m_Filename;
+};
+//------------------------------------------------------------------------------
+class mafStorableMaterialLibrary: public mafObject, public mafStorable
+//------------------------------------------------------------------------------
+{
+public:
+  mafTypeMacro(mafStorableMaterialLibrary,mafObject);
+  mafStorableMaterialLibrary(){};
+  mafStorableMaterialLibrary(std::vector<mmaMaterial *> *mat_list);
+  ~mafStorableMaterialLibrary(){};
+  int InternalStore(mafStorageElement *parent);
+  int InternalRestore(mafStorageElement *node);
+  std::vector<mmaMaterial *> *m_MaterialList;
 };
 #endif // _mafGUIMaterialChooser_H_
