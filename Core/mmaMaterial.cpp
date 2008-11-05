@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:05 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2008-11-05 17:12:57 $
+  Version:   $Revision: 1.18.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -111,7 +111,7 @@ mmaMaterial::~mmaMaterial()
 wxBitmap *mmaMaterial::MakeIcon()
 //----------------------------------------------------------------------------
 {
-  UpdateProp();
+  //UpdateProp();
 
 	vtkMAFSmartPointer<vtkCamera> camera;
   camera->ParallelProjectionOff();
