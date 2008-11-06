@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttributeTraceability.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 11:03:21 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2008-11-06 09:57:01 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -166,21 +166,32 @@ int mafAttributeTraceability::InternalRestore(mafStorageElement *node)
 
     std::vector<mafStorageElement*> listIsNatural;
     node->GetNestedElementsByName("IsNatural", listIsNatural);
-    for (int i  = 0; i < listTrialEvent.size(); i++)
+
+    try
     {
-      m_Traceability traceability;
-      listTrialEvent[i]->RestoreText(traceability.m_TrialEvent);
-      listOperation[i]->RestoreText(traceability.m_OperationName);
-      listParameters[i]->RestoreText(traceability.m_Parameters);
-      listDate[i]->RestoreText(traceability.m_Date);
-      listApplication[i]->RestoreText(traceability.m_AppStamp);
-      listOperatorID[i]->RestoreText(traceability.m_OperatorID);
-      if (traceability.m_TrialEvent == "Create")
+      for (int i  = 0; i < listTrialEvent.size(); i++)
       {
-        listIsNatural[i]->RestoreText(traceability.m_IsNatural);  
+        m_Traceability traceability;
+
+        listTrialEvent[i]->RestoreText(traceability.m_TrialEvent);
+        listOperation[i]->RestoreText(traceability.m_OperationName);
+        if (listParameters.size() > i)
+          listParameters[i]->RestoreText(traceability.m_Parameters);
+        listDate[i]->RestoreText(traceability.m_Date);
+        listApplication[i]->RestoreText(traceability.m_AppStamp);
+        listOperatorID[i]->RestoreText(traceability.m_OperatorID);
+        if (traceability.m_TrialEvent == "Create")
+        {
+          listIsNatural[i]->RestoreText(traceability.m_IsNatural);  
+        }
+        m_TraceabilityVector.push_back(traceability);
       }
-      m_TraceabilityVector.push_back(traceability);
     }
+    catch (...)
+    {
+      mafLogMessage("Problems restoring audit trials attribute");
+    }
+    
    
     return MAF_OK;
   }
