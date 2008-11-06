@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:30:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-11-06 09:06:01 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,13 +42,13 @@ medOpMMLModelView::medOpMMLModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtk
 	//Model->GetRenderer()->AddActor(TextActor);
 
 	// 2d display by default
-	m_3dDisplay = 0;
+	m_3DDisplay = 0;
 
 	// 3 landmarks by default for initial mapping
 	m_4Landmarks = 0;
 
 	//
-	scans = volume;
+	m_Scans = volume;
 
 	// display tubes
 	m_TubeFilterRadius = 0.5 ;
@@ -913,19 +913,19 @@ void medOpMMLModelView::FindSizeAndResolutionOfSyntheticScans()
 
 				// size
 				if (fabs(bounds[0]) > fabs(bounds[1]))
-					m_nSyntheticScansXSize = Factor * 2.0 * fabs(bounds[0]);
+					m_NSyntheticScansXSize = Factor * 2.0 * fabs(bounds[0]);
 				else
-					m_nSyntheticScansXSize = Factor * 2.0 * fabs(bounds[1]);
+					m_NSyntheticScansXSize = Factor * 2.0 * fabs(bounds[1]);
 
 				if (fabs(bounds[2]) > fabs(bounds[3]))
-					m_nSyntheticScansYSize = Factor * 2.0 * fabs(bounds[2]);
+					m_NSyntheticScansYSize = Factor * 2.0 * fabs(bounds[2]);
 				else
-					m_nSyntheticScansYSize = Factor * 2.0 * fabs(bounds[3]);
+					m_NSyntheticScansYSize = Factor * 2.0 * fabs(bounds[3]);
 				break;
 
 		case 2: // slicing axis is two lines
-				m_nSyntheticScansXSize = 200.0;
-				m_nSyntheticScansYSize = 200.0;
+				m_NSyntheticScansXSize = 200.0;
+				m_NSyntheticScansYSize = 200.0;
 				break;
 	}
 
@@ -936,31 +936,31 @@ void medOpMMLModelView::FindSizeAndResolutionOfSyntheticScans()
 	// set
 	if (m_SyntheticScansGrain == 1) // x 1/3
 	{
-		m_nSyntheticScansXResolution = 0.3 * m_nSyntheticScansXSize;
-		m_nSyntheticScansYResolution = 0.3 * m_nSyntheticScansYSize;
+		m_NSyntheticScansXResolution = 0.3 * m_NSyntheticScansXSize;
+		m_NSyntheticScansYResolution = 0.3 * m_NSyntheticScansYSize;
 	}
 	else
 	if (m_SyntheticScansGrain == 2) // x 1/2
 	{
-		m_nSyntheticScansXResolution = 0.5 * m_nSyntheticScansXSize;
-		m_nSyntheticScansYResolution = 0.5 * m_nSyntheticScansYSize;
+		m_NSyntheticScansXResolution = 0.5 * m_NSyntheticScansXSize;
+		m_NSyntheticScansYResolution = 0.5 * m_NSyntheticScansYSize;
 	}
 	else
  if (m_SyntheticScansGrain == 3) // x1
 	{
-		m_nSyntheticScansXResolution = 1.0 * m_nSyntheticScansXSize;
-		m_nSyntheticScansYResolution = 1.0 * m_nSyntheticScansYSize;
+		m_NSyntheticScansXResolution = 1.0 * m_NSyntheticScansXSize;
+		m_NSyntheticScansYResolution = 1.0 * m_NSyntheticScansYSize;
 	}
 	else
 	if (m_SyntheticScansGrain == 4) // x2
 	{
-		m_nSyntheticScansXResolution = 2.0 * m_nSyntheticScansXSize;
-		m_nSyntheticScansYResolution = 2.0 * m_nSyntheticScansYSize;
+		m_NSyntheticScansXResolution = 2.0 * m_NSyntheticScansXSize;
+		m_NSyntheticScansYResolution = 2.0 * m_NSyntheticScansYSize;
 	}
 	else // x3
 	{
-		m_nSyntheticScansXResolution = 3.0 * m_nSyntheticScansXSize;
-		m_nSyntheticScansYResolution = 3.0 * m_nSyntheticScansYSize;
+		m_NSyntheticScansXResolution = 3.0 * m_NSyntheticScansXSize;
+		m_NSyntheticScansYResolution = 3.0 * m_NSyntheticScansYSize;
 	}
 }
 
@@ -1061,7 +1061,7 @@ void medOpMMLModelView::SetUpSyntheticScans()
 		assert(!(m_PSyntheticScansActorTransform[i] == NULL));
 
 		// plane source resolution
-		m_PSyntheticScansPlaneSource[i]->SetResolution(m_nSyntheticScansXResolution, m_nSyntheticScansYResolution);
+		m_PSyntheticScansPlaneSource[i]->SetResolution(m_NSyntheticScansXResolution, m_NSyntheticScansYResolution);
 		
 		// plane source transformation matrix
 		m_PSyntheticScansPlaneSourceTransform[i]->SetMatrix(this->GetPlaneSourceTransformOfSyntheticScans(i));
@@ -1077,7 +1077,7 @@ void medOpMMLModelView::SetUpSyntheticScans()
 
 		// probe
 		m_PSyntheticScansProbeFilter[i]->SetInput(m_PSyntheticScansPlaneSourceTransformPolyDataFilter[i]->GetOutput());
-		m_PSyntheticScansProbeFilter[i]->SetSource(scans);
+		m_PSyntheticScansProbeFilter[i]->SetSource(m_Scans);
 		m_PSyntheticScansProbeFilter[i]->Update();
 
 		// asjust min/max scalar values
@@ -1137,7 +1137,7 @@ void medOpMMLModelView::SetUpSyntheticScans()
 	delete m_PSyntheticScansPolyDataMapper;
 
 	// set to scan 0 display
-	m_nSyntheticScansCurrentId = 0; // current id
+	m_NSyntheticScansCurrentId = 0; // current id
 	m_PSyntheticScansActor[0]->VisibilityOn(); // actor on
 }
 
@@ -1228,8 +1228,8 @@ vtkMatrix4x4* medOpMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 				// s-th synthetic scan: plane source size
 				// (as a scaling transformation)
 				scalem->Identity();
-				scalem->SetElement(0, 0, m_nSyntheticScansXSize);
-				scalem->SetElement(1, 1, m_nSyntheticScansYSize);
+				scalem->SetElement(0, 0, m_NSyntheticScansXSize);
+				scalem->SetElement(1, 1, m_NSyntheticScansYSize);
 
 				// s-th synthetic scan: plane source origin
 				// (as a translation transformation)
@@ -1254,8 +1254,8 @@ vtkMatrix4x4* medOpMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 				// s-th synthetic scan: plane source size
 				// (as a scaling transformation)
 				scalem->Identity();
-				scalem->SetElement(0, 0, m_nSyntheticScansXSize);
-				scalem->SetElement(1, 1, m_nSyntheticScansYSize);
+				scalem->SetElement(0, 0, m_NSyntheticScansXSize);
+				scalem->SetElement(1, 1, m_NSyntheticScansYSize);
 
 				// s-th synthetic scan: plane source origin
 				// (as a translation transformation)
@@ -1855,29 +1855,29 @@ vtkLODActor* medOpMMLModelView::GetMuscleLODActor()
 void medOpMMLModelView::SetTotalNumberOfSyntheticScans(int n)
 //----------------------------------------------------------------------------
 {
-	m_nSyntheticScansTotalNumber = n;
+	m_NSyntheticScansTotalNumber = n;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::SetResolutionOfSyntheticScans(int x, int y)
 //----------------------------------------------------------------------------
 {
-	m_nSyntheticScansXResolution = x;
-	m_nSyntheticScansYResolution = y;
+	m_NSyntheticScansXResolution = x;
+	m_NSyntheticScansYResolution = y;
 }
 //----------------------------------------------------------------------------
 int medOpMMLModelView::GetTotalNumberOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
-	assert(m_nSyntheticScansTotalNumber > 3); // at least 3 synthetic scans
-	return m_nSyntheticScansTotalNumber;
+	assert(m_NSyntheticScansTotalNumber > 3); // at least 3 synthetic scans
+	return m_NSyntheticScansTotalNumber;
 }
 
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetResolutionOfSyntheticScans(int *x, int *y)
 //----------------------------------------------------------------------------
 {
-	*x = m_nSyntheticScansXResolution;
-	*y = m_nSyntheticScansYResolution;
+	*x = m_NSyntheticScansXResolution;
+	*y = m_NSyntheticScansYResolution;
 }
 
 //----------------------------------------------------------------------------
@@ -1890,13 +1890,13 @@ vtkActor* medOpMMLModelView::GetActorOfSyntheticScans(int s)
 void medOpMMLModelView::SetCurrentIdOfSyntheticScans(int n)
 //----------------------------------------------------------------------------
 {
-	m_nSyntheticScansCurrentId = n;
+	m_NSyntheticScansCurrentId = n;
 }
 //----------------------------------------------------------------------------
 int medOpMMLModelView::GetCurrentIdOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
-	return m_nSyntheticScansCurrentId;
+	return m_NSyntheticScansCurrentId;
 }
 //----------------------------------------------------------------------------
 vtkWindowLevelLookupTable* medOpMMLModelView::GetWindowLevelLookupTableOfSyntheticScans()
@@ -1908,15 +1908,15 @@ vtkWindowLevelLookupTable* medOpMMLModelView::GetWindowLevelLookupTableOfSynthet
 void medOpMMLModelView::SetSizeOfSyntheticScans(float x, float y)
 //----------------------------------------------------------------------------
 {
-	m_nSyntheticScansXSize = x;
-	m_nSyntheticScansYSize = y;
+	m_NSyntheticScansXSize = x;
+	m_NSyntheticScansYSize = y;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetSizeOfSyntheticScans(float *x, float *y)
 //----------------------------------------------------------------------------
 {
-	*x = m_nSyntheticScansXSize;
-	*y = m_nSyntheticScansYSize;
+	*x = m_NSyntheticScansXSize;
+	*y = m_NSyntheticScansYSize;
 }
 //----------------------------------------------------------------------------
 vtkMatrix4x4* medOpMMLModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b)
@@ -1955,15 +1955,15 @@ vtkMatrix4x4* medOpMMLModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4
 void medOpMMLModelView::SetXYScalingFactorsOfMuscle(double x, double y)
 //----------------------------------------------------------------------------
 {
-	m_flMuscleXScalingFactor = x;
-	m_flMuscleYScalingFactor = y;
+	m_FlMuscleXScalingFactor = x;
+	m_FlMuscleYScalingFactor = y;
 }
 //----------------------------------------------------------------------------
 void medOpMMLModelView::GetXYScalingFactorsOfMuscle(double *x, double *y)
 //----------------------------------------------------------------------------
 {
-	*x = m_flMuscleXScalingFactor;
-	*y = m_flMuscleYScalingFactor;
+	*x = m_FlMuscleXScalingFactor;
+	*y = m_FlMuscleYScalingFactor;
 }
 //----------------------------------------------------------------------------
 vtkTransformPolyDataFilter* medOpMMLModelView::GetContourCutterTransformPolyDataFilter()
@@ -2186,7 +2186,7 @@ float medOpMMLModelView::GetContourAxesLengthScale()
 void medOpMMLModelView::UpdateContourCuttingPlane()
 //----------------------------------------------------------------------------
 {
-	if (m_3dDisplay == 0) // standard display
+	if (m_3DDisplay == 0) // standard display
 	{
 		// get z level
 		double z = GetCurrentZOfSyntheticScans();
@@ -2320,7 +2320,7 @@ void medOpMMLModelView::UpdateContourAxesTransform()
 void medOpMMLModelView::SetContourAxesVisibility()
 //----------------------------------------------------------------------------
 {
-	if (m_3dDisplay == 1)
+	if (m_3DDisplay == 1)
 	{
 		GetContourPositiveXAxisActor()->VisibilityOff();
 		GetContourNegativeXAxisActor()->VisibilityOff();
@@ -2413,7 +2413,7 @@ void medOpMMLModelView::UpdateGlobalAxesTransform()
 void medOpMMLModelView::SetGlobalAxesVisibility()
 //----------------------------------------------------------------------------
 {
-	if (m_3dDisplay == 1)
+	if (m_3DDisplay == 1)
 	{
 		GetPositiveXAxisActor()->VisibilityOff();
 		GetNegativeXAxisActor()->VisibilityOff();
@@ -2903,7 +2903,7 @@ bool medOpMMLModelView::SetUpGlobalCoordinateAxes()
 	m_PPosXAxisAxesTubeFilter->SetRadius(0.5);
     m_PPosXAxisAxesTubeFilter->SetNumberOfSides(6);
 	m_PPosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_PPosXAxisLineSource->SetPoint2(m_nSyntheticScansXSize / 2.0, 0.0, 0.0);
+	m_PPosXAxisLineSource->SetPoint2(m_NSyntheticScansXSize / 2.0, 0.0, 0.0);
 	m_PPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
 	m_PPosXAxisActor->VisibilityOn();
 
@@ -2911,7 +2911,7 @@ bool medOpMMLModelView::SetUpGlobalCoordinateAxes()
 	m_PPosYAxisAxesTubeFilter->SetRadius(0.5);
     m_PPosYAxisAxesTubeFilter->SetNumberOfSides(6);
 	m_PPosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_PPosYAxisLineSource->SetPoint2(0.0, m_nSyntheticScansYSize / 2.0, 0.0);
+	m_PPosYAxisLineSource->SetPoint2(0.0, m_NSyntheticScansYSize / 2.0, 0.0);
 	m_PPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
 	m_PPosYAxisActor->VisibilityOn();
 	
@@ -2919,7 +2919,7 @@ bool medOpMMLModelView::SetUpGlobalCoordinateAxes()
 	m_PNegXAxisAxesTubeFilter->SetRadius(0.5);
     m_PNegXAxisAxesTubeFilter->SetNumberOfSides(6);
 	m_PNegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_PNegXAxisLineSource->SetPoint2(-1.0 * m_nSyntheticScansXSize / 2.0, 0.0, 0.0);
+	m_PNegXAxisLineSource->SetPoint2(-1.0 * m_NSyntheticScansXSize / 2.0, 0.0, 0.0);
 	m_PNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
 	m_PNegXAxisActor->VisibilityOn();
 	
@@ -2927,7 +2927,7 @@ bool medOpMMLModelView::SetUpGlobalCoordinateAxes()
 	m_PNegYAxisAxesTubeFilter->SetRadius(0.5);
     m_PNegYAxisAxesTubeFilter->SetNumberOfSides(6);
 	m_PNegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_PNegYAxisLineSource->SetPoint2(0.0, -1.0 * m_nSyntheticScansYSize / 2.0, 0.0);
+	m_PNegYAxisLineSource->SetPoint2(0.0, -1.0 * m_NSyntheticScansYSize / 2.0, 0.0);
 	m_PNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
 	m_PNegYAxisActor->VisibilityOn();
 
@@ -2939,7 +2939,7 @@ void medOpMMLModelView::Switch3dDisplayOn()
 //----------------------------------------------------------------------------
 {
  	// 3d display flag
- 	m_3dDisplay = 1;
+ 	m_3DDisplay = 1;
  
  	// interactor style for 3d display
  	m_PRenderWindowInteractor->SetInteractorStyle(GetInteractorStyleTrackballCamera());
@@ -2988,14 +2988,14 @@ void medOpMMLModelView::Switch3dDisplayOn()
 	m_PPosZAxisAxesTubeFilter->SetRadius(1.0);
     m_PPosZAxisAxesTubeFilter->SetNumberOfSides(6);
 	m_PPosZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_PPosZAxisLineSource->SetPoint2(0.0, 0.0, (m_nSyntheticScansXSize + m_nSyntheticScansYSize) / 2.0);
+	m_PPosZAxisLineSource->SetPoint2(0.0, 0.0, (m_NSyntheticScansXSize + m_NSyntheticScansYSize) / 2.0);
 	m_PPosZAxisActor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
 
 	// negative z axis set up
 	m_PNegZAxisAxesTubeFilter->SetRadius(1.0);
     m_PNegZAxisAxesTubeFilter->SetNumberOfSides(6);
 	m_PNegZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-	m_PNegZAxisLineSource->SetPoint2(0.0, 0.0, -1.0 * (m_nSyntheticScansXSize + m_nSyntheticScansYSize) / 2.0);
+	m_PNegZAxisLineSource->SetPoint2(0.0, 0.0, -1.0 * (m_NSyntheticScansXSize + m_NSyntheticScansYSize) / 2.0);
 	m_PNegZAxisActor->GetProperty()->SetColor(1.0, 1.0, 1.0); // white
 
 	// axes off

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:30:49 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-11-06 09:06:01 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -328,22 +328,22 @@ public:
 	float m_TubeFilterRadius;
 
 	// 3d display flag
-	int m_3dDisplay;
+	int m_3DDisplay;
 
 	// 4 landmarks flag
 	int m_4Landmarks;
 
 	// patient scans
-	vtkDataSet* scans;
+	vtkDataSet* m_Scans;
 
 	// synthetic scans
 	int m_SyntheticScansGrain;
-	int m_nSyntheticScansTotalNumber;
-	int m_nSyntheticScansCurrentId;
-	int m_nSyntheticScansXResolution;
-	int m_nSyntheticScansYResolution;
-	float m_nSyntheticScansXSize;
-	float m_nSyntheticScansYSize;
+	int m_NSyntheticScansTotalNumber;
+	int m_NSyntheticScansCurrentId;
+	int m_NSyntheticScansXResolution;
+	int m_NSyntheticScansYResolution;
+	float m_NSyntheticScansXSize;
+	float m_NSyntheticScansYSize;
 	float m_SyntheticScansMinScalarValue;
 	float m_SyntheticScansMaxScalarValue;
 	vtkPlaneSource **m_PSyntheticScansPlaneSource; // planes
@@ -371,11 +371,11 @@ public:
 	vtkTransformPolyDataFilter *m_PMuscleTransform2PolyDataFilter;
 	vtkPolyDataNormals *m_PMusclePolyDataNormals;                   // adds normals to polydata
 
-	double m_flMuscleXScalingFactor;
-	double m_flMuscleYScalingFactor;
-	float m_flMusclePolyDataBounds[6];
-	float m_flMusclePolyDataCenter[3];
-	float m_flMusclePolyDataExtent[3];
+	double m_FlMuscleXScalingFactor;
+	double m_FlMuscleYScalingFactor;
+	float m_FlMusclePolyDataBounds[6];
+	float m_FlMusclePolyDataCenter[3];
+	float m_FlMusclePolyDataExtent[3];
 
 	// final transform
 	vtkMatrix4x4 *m_PFinalm;
