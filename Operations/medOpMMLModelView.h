@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-06 09:06:01 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2008-11-06 09:13:10 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -384,7 +384,7 @@ public:
 	vtkMatrix4x4 *m_PSlicesm;
 
 	// type of muscles
-	int m_nTypeOfMuscles;
+	int m_NTypeOfMuscles;
 
 	// window/level
 	float m_PWindow;

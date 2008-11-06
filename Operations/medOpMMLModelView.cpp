@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMMLModelView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-06 09:06:01 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2008-11-06 09:13:10 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -904,7 +904,7 @@ void medOpMMLModelView::FindSizeAndResolutionOfSyntheticScans()
 	// to define compute scans size and resolution
 	float Factor = 1.75; // 75% extra
 
-	switch (m_nTypeOfMuscles)
+	switch (m_NTypeOfMuscles)
 	{
 		case 1: // slicing axis is single line
 				// bounds
@@ -1157,7 +1157,7 @@ void medOpMMLModelView::GetPlaneSourceOriginOfSyntheticScans(int s, double p[])
 	this->GetLandmark2OfPatient(l2);
 	this->GetLandmark3OfPatient(l3);
 
-	switch (m_nTypeOfMuscles)
+	switch (m_NTypeOfMuscles)
 	{
 		case 1: // slicing axis is single line
 				// start from landmark 2 (low)
@@ -1221,7 +1221,7 @@ vtkMatrix4x4* medOpMMLModelView::GetPlaneSourceTransformOfSyntheticScans(int s)
 	vtkMatrix4x4 *inversealignm =  vtkMatrix4x4::New();
 	vtkMatrix4x4 *finalm =  vtkMatrix4x4::New();
 
-	switch (m_nTypeOfMuscles)
+	switch (m_NTypeOfMuscles)
 	{
 		case 1: // slicing axis is single line
 				
@@ -1348,7 +1348,7 @@ vtkMatrix4x4* medOpMMLModelView::GetActorTransformOfSyntheticScans(int s)
 	vtkMatrix4x4 *inversem_pslicesm = vtkMatrix4x4::New();
 	vtkMatrix4x4 *finalm =  vtkMatrix4x4::New();
 
-	switch (m_nTypeOfMuscles)
+	switch (m_NTypeOfMuscles)
 	{
 		case 1: // slicing axis is single line
 				
@@ -2139,13 +2139,13 @@ float medOpMMLModelView::GetHighScalar()
 void medOpMMLModelView::SetTypeOfMuscles(int t)
 //----------------------------------------------------------------------------
 {
-	m_nTypeOfMuscles = t;
+	m_NTypeOfMuscles = t;
 }
 //----------------------------------------------------------------------------
 int medOpMMLModelView::GetTypeOfMuscles()
 //----------------------------------------------------------------------------
 {
-	return m_nTypeOfMuscles;
+	return m_NTypeOfMuscles;
 }
 //----------------------------------------------------------------------------
 vtkPlane* medOpMMLModelView::GetCuttingPlaneNorth()
