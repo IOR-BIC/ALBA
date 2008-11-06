@@ -18,17 +18,17 @@
 #include "vtkTriangleStrip.h"
 #include "vtkPolyDataNormals.h"
 
-vtkCxxRevisionMacro(vtkMEDPolyDataMirror, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataMirror, "$Revision: 1.3.2.1 $");
 vtkStandardNewMacro(vtkMEDPolyDataMirror);
 
 //----------------------------------------------------------------------------
 vtkMEDPolyDataMirror::vtkMEDPolyDataMirror()
 //----------------------------------------------------------------------------
 {
-  this->m_FlipNormals = 0;
-  this->m_MirrorXCoordinate = 0;
-  this->m_MirrorYCoordinate = 0;
-  this->m_MirrorZCoordinate = 0;
+  this->FlipNormals = 0;
+  this->MirrorXCoordinate = 0;
+  this->MirrorYCoordinate = 0;
+  this->MirrorZCoordinate = 0;
 }
 //----------------------------------------------------------------------------
 void vtkMEDPolyDataMirror::Execute()
@@ -66,9 +66,9 @@ void vtkMEDPolyDataMirror::Execute()
   for(int i=0; i<numPts; i++ )
   {
      p1 = inPts->GetPoint(i);
-     p2[0] = this->m_MirrorXCoordinate ? -p1[0] : p1[0];
-     p2[1] = this->m_MirrorYCoordinate ? -p1[1] : p1[1];
-     p2[2] = this->m_MirrorZCoordinate ? -p1[2] : p1[2];
+     p2[0] = this->MirrorXCoordinate ? -p1[0] : p1[0];
+     p2[1] = this->MirrorYCoordinate ? -p1[1] : p1[1];
+     p2[2] = this->MirrorZCoordinate ? -p1[2] : p1[2];
   	 newPts->SetPoint(i,p2);
      if(i%50 == 0) this->UpdateProgress (i/numPts); 
   }
@@ -118,9 +118,9 @@ void vtkMEDPolyDataMirror::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Flip Normals: "      << (this->m_FlipNormals       ? "On\n" : "Off\n");
-  os << indent << "m_MirrorXCoordinate: " << (this->m_MirrorXCoordinate ? "On\n" : "Off\n");
-  os << indent << "m_MirrorYCoordinate: " << (this->m_MirrorYCoordinate ? "On\n" : "Off\n");
-  os << indent << "m_MirrorZCoordinate: " << (this->m_MirrorZCoordinate ? "On\n" : "Off\n");
+  os << indent << "Flip Normals: "      << (this->FlipNormals       ? "On\n" : "Off\n");
+  os << indent << "MirrorXCoordinate: " << (this->MirrorXCoordinate ? "On\n" : "Off\n");
+  os << indent << "MirrorYCoordinate: " << (this->MirrorYCoordinate ? "On\n" : "Off\n");
+  os << indent << "MirrorZCoordinate: " << (this->MirrorZCoordinate ? "On\n" : "Off\n");
 }
 

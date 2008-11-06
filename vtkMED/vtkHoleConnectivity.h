@@ -3,7 +3,7 @@
 Program:   Visualization Toolkit
 Module:    vtkHoleConnectivity.h
 Language:  C++
-Version:   $Id: vtkHoleConnectivity.h,v 1.4 2008-07-25 10:22:53 lut01 Exp $
+Version:   $Id: vtkHoleConnectivity.h,v 1.4.2.1 2008-11-06 09:27:27 ior02 Exp $
 
 Copyright (c) Goodwin Lawlor 2003-2004
 All rights reserved.
@@ -33,8 +33,8 @@ public:
 
 	vtkSetMacro(PointID,vtkIdType);
   vtkGetMacro(PointID,vtkIdType);
-	vtkSetVector3Macro(point,double);
-  vtkGetVector3Macro(point,double);
+	vtkSetVector3Macro(Point,double);
+  vtkGetVector3Macro(Point,double);
 
 protected:
 	vtkHoleConnectivity(vtkPolyData *input=NULL,vtkIdType ID=-1);
@@ -43,7 +43,7 @@ protected:
 	void Execute();
 
 	vtkIdType PointID;
-	double point[3];
+	double Point[3];
 };
 
 #endif

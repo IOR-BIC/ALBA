@@ -31,25 +31,25 @@ public:
 
   static vtkMEDPolyDataMirror *New();
   
-  void SetMirrorXCoordinate(int value){m_MirrorXCoordinate = value;};
-  int GetMirrorXCoordinate(){return m_MirrorXCoordinate;};
-  void MirrorXCoordinateOn(){m_MirrorXCoordinate = 1;}
-  void MirrorXCoordinateOff(){m_MirrorXCoordinate = 0;}
+  void SetMirrorXCoordinate(int value){MirrorXCoordinate = value;};
+  int GetMirrorXCoordinate(){return MirrorXCoordinate;};
+  void MirrorXCoordinateOn(){MirrorXCoordinate = 1;}
+  void MirrorXCoordinateOff(){MirrorXCoordinate = 0;}
 
-  void SetMirrorYCoordinate(int value){m_MirrorYCoordinate = value;};
-  int GetMirrorYCoordinate(){return m_MirrorYCoordinate;};
-  void MirrorYCoordinateOn(){m_MirrorYCoordinate = 1;}
-  void MirrorYCoordinateOff(){m_MirrorYCoordinate = 0;}
+  void SetMirrorYCoordinate(int value){MirrorYCoordinate = value;};
+  int GetMirrorYCoordinate(){return MirrorYCoordinate;};
+  void MirrorYCoordinateOn(){MirrorYCoordinate = 1;}
+  void MirrorYCoordinateOff(){MirrorYCoordinate = 0;}
 
-  void SetMirrorZCoordinate(int value){m_MirrorZCoordinate = value;};
-  int GetMirrorZCoordinate(){return m_MirrorZCoordinate;};
-  void MirrorZCoordinateOn(){m_MirrorZCoordinate = 1;}
-  void MirrorZCoordinateOff(){m_MirrorZCoordinate = 0;}
+  void SetMirrorZCoordinate(int value){MirrorZCoordinate = value;};
+  int GetMirrorZCoordinate(){return MirrorZCoordinate;};
+  void MirrorZCoordinateOn(){MirrorZCoordinate = 1;}
+  void MirrorZCoordinateOff(){MirrorZCoordinate = 0;}
 
-  void SetFlipNormals(int value){m_FlipNormals = value;};
-  int GetFlipNormals(){return m_FlipNormals;};
-  void FlipNormalsOn(){m_FlipNormals = 1;}
-  void FlipNormalsOff(){m_FlipNormals = 0;}
+  void SetFlipNormals(int value){FlipNormals = value;};
+  int GetFlipNormals(){return FlipNormals;};
+  void FlipNormalsOn(){FlipNormals = 1;}
+  void FlipNormalsOff(){FlipNormals = 0;}
 
 protected:
   vtkMEDPolyDataMirror();
@@ -58,10 +58,10 @@ protected:
   // Usual data generation method
   void Execute();
 
-  int m_FlipNormals;
-  int m_MirrorXCoordinate;
-  int m_MirrorYCoordinate;
-  int m_MirrorZCoordinate;
+  int FlipNormals;
+  int MirrorXCoordinate;
+  int MirrorYCoordinate;
+  int MirrorZCoordinate;
 
 private:
   vtkMEDPolyDataMirror(const vtkMEDPolyDataMirror&);  // Not implemented.

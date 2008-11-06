@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkTriangleQualityRatio.cxx,v $
 Language:  C++
-Date:      $Date: 2007-07-25 09:41:03 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-11-06 09:27:28 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -64,14 +64,14 @@ vtkTriangleQualityRatio* vtkTriangleQualityRatio::New()
 vtkTriangleQualityRatio::vtkTriangleQualityRatio()
 //-------------------------------------------------------------------------
 {
-	m_Input = NULL;
+	Input = NULL;
 }
 //-------------------------------------------------------------------------
 vtkTriangleQualityRatio::~vtkTriangleQualityRatio()
 //-------------------------------------------------------------------------
 {
-	m_Input = NULL;
-	m_Output->Delete();
+	Input = NULL;
+	Output->Delete();
 
 }
 //-------------------------------------------------------------------------
@@ -79,21 +79,21 @@ void vtkTriangleQualityRatio::Update()
 //-------------------------------------------------------------------------
 {
 	// check inputs
-	if (!m_Input) return;
+	if (!Input) return;
 
-	m_Output = vtkPolyData::New();
-	m_Output->DeepCopy(m_Input);
+	Output = vtkPolyData::New();
+	Output->DeepCopy(Input);
 
 	vtkDoubleArray *array=vtkDoubleArray::New();
 	array->SetName("quality");
-	m_Output->GetCellData()->SetScalars(array);
+	Output->GetCellData()->SetScalars(array);
   array->Delete();
 	// name variables
 	double qualitySum = 0.0;
 	double longestEdge;
 	double perimeter;
 
-	long cellsNumber = m_Input->GetNumberOfCells();
+	long cellsNumber = Input->GetNumberOfCells();
 
 	double vertex1[3];
 	double vertex2[3];
@@ -101,19 +101,19 @@ void vtkTriangleQualityRatio::Update()
 
 	double qualityRatioNormalize = 2.0 * sqrt(3.0);
 
-	m_MaxRatio = 0.0;
-	m_MeanRatio = 0.0;
-	m_MinRatio = 999.0;
+	MaxRatio = 0.0;
+	MeanRatio = 0.0;
+	MinRatio = 999.0;
 
 	for (long currentCell=0;currentCell<cellsNumber;currentCell++)
 	{
 		longestEdge = 0.0;
 		perimeter = 0.0;
 
-		vtkIdList *ID=m_Output->GetCell(currentCell)->GetPointIds();
-		m_Output->GetPoint(ID->GetId(0),vertex1);
-		m_Output->GetPoint(ID->GetId(1),vertex2);
-		m_Output->GetPoint(ID->GetId(2),vertex3);
+		vtkIdList *ID=Output->GetCell(currentCell)->GetPointIds();
+		Output->GetPoint(ID->GetId(0),vertex1);
+		Output->GetPoint(ID->GetId(1),vertex2);
+		Output->GetPoint(ID->GetId(2),vertex3);
 
 		// perimeter calculation
 		double tempEdge = sqrt(vtkMath::Distance2BetweenPoints(vertex1,vertex2));
@@ -135,10 +135,10 @@ void vtkTriangleQualityRatio::Update()
 		if(qualityLocal>0.00001)
 		{
 			qualitySum += qualityLocal;
-			if(qualityLocal>m_MaxRatio)
-				m_MaxRatio = qualityLocal;
-			if(qualityLocal<m_MinRatio)
-				m_MinRatio = qualityLocal;
+			if(qualityLocal>MaxRatio)
+				MaxRatio = qualityLocal;
+			if(qualityLocal<MinRatio)
+				MinRatio = qualityLocal;
 		}
 		else
 		{
@@ -146,8 +146,8 @@ void vtkTriangleQualityRatio::Update()
 			qualityLocal=0.0;
 		}
 		
-		m_Output->GetCellData()->GetScalars()->InsertNextTuple1(qualityLocal);
+		Output->GetCellData()->GetScalars()->InsertNextTuple1(qualityLocal);
 
 	}
-	m_MeanRatio = qualitySum / (cellsNumber);
+	MeanRatio = qualitySum / (cellsNumber);
 }

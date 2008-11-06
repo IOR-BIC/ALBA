@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPastValuesList.h,v $
 Language:  C++
-Date:      $Date: 2008-04-09 11:05:30 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-11-06 09:27:28 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -42,9 +42,9 @@ public:
   void PrintSelf(std::ostream& os) const ;
 
 private:
-  int m_CurrentNumberOfValues ;
-  int m_MaxNumberOfValues ;
-  double *m_Values ;
+  int CurrentNumberOfValues ;
+  int MaxNumberOfValues ;
+  double *Values ;
 };
 
 

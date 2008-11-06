@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkTriangleQualityRatio.h,v $
 Language:  C++
-Date:      $Date: 2007-04-17 08:56:44 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-11-06 09:27:28 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -65,31 +65,31 @@ public:
 	vtkTypeMacro(vtkTriangleQualityRatio,vtkObject);
 
 	// To get average value
-	double GetMeanRatio() {return this->m_MeanRatio;};
+	double GetMeanRatio() {return this->MeanRatio;};
 
 	// To get the max value
-	double GetMaxRatio() {return this->m_MaxRatio;};
+	double GetMaxRatio() {return this->MaxRatio;};
 
 	// To get the min value
-	double GetMinRatio() {return this->m_MinRatio;};
+	double GetMinRatio() {return this->MinRatio;};
 
 	// Set a PolyData as input
-	void SetInput(vtkPolyData *UserSetInput) {this->m_Input = UserSetInput;};  
+	void SetInput(vtkPolyData *UserSetInput) {this->Input = UserSetInput;};  
 
 	void Update();
 
-	vtkPolyData* GetOutput(){return m_Output;};
+	vtkPolyData* GetOutput(){return Output;};
 
 protected:
 	vtkTriangleQualityRatio();
 	~vtkTriangleQualityRatio();
 
-	double m_MeanRatio;
-	double m_MaxRatio;
-	double m_MinRatio;
+	double MeanRatio;
+	double MaxRatio;
+	double MinRatio;
 
-	vtkPolyData *m_Input;
-	vtkPolyData *m_Output;
+	vtkPolyData *Input;
+	vtkPolyData *Output;
 };
 
 #endif

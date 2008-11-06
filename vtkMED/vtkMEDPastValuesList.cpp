@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPastValuesList.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-09 11:05:30 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2008-11-06 09:27:27 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -25,10 +25,10 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // Constructor
-vtkMEDPastValuesList::vtkMEDPastValuesList(int NumberOfvtkMEDPastValues) : m_MaxNumberOfValues(NumberOfvtkMEDPastValues), m_CurrentNumberOfValues(0)
+vtkMEDPastValuesList::vtkMEDPastValuesList(int NumberOfvtkMEDPastValues) : MaxNumberOfValues(NumberOfvtkMEDPastValues), CurrentNumberOfValues(0)
 //------------------------------------------------------------------------------
 {
-  m_Values = new double[NumberOfvtkMEDPastValues] ;
+  Values = new double[NumberOfvtkMEDPastValues] ;
 }
 
 
@@ -37,7 +37,7 @@ vtkMEDPastValuesList::vtkMEDPastValuesList(int NumberOfvtkMEDPastValues) : m_Max
 vtkMEDPastValuesList::~vtkMEDPastValuesList()
 //------------------------------------------------------------------------------
 {
-  delete [] m_Values ;
+  delete [] Values ;
 }
 
 
@@ -46,12 +46,12 @@ vtkMEDPastValuesList::~vtkMEDPastValuesList()
 vtkMEDPastValuesList::vtkMEDPastValuesList(const vtkMEDPastValuesList& stats)
 //------------------------------------------------------------------------------
 {
-  this->m_CurrentNumberOfValues = stats.m_CurrentNumberOfValues ;
-  this->m_MaxNumberOfValues = stats.m_MaxNumberOfValues ;
+  this->CurrentNumberOfValues = stats.CurrentNumberOfValues ;
+  this->MaxNumberOfValues = stats.MaxNumberOfValues ;
 
-  m_Values = new double[m_MaxNumberOfValues] ;
-  for (int i = 0 ;  i < m_CurrentNumberOfValues ;  i++)
-    this->m_Values[i] = stats.m_Values[i] ;
+  Values = new double[MaxNumberOfValues] ;
+  for (int i = 0 ;  i < CurrentNumberOfValues ;  i++)
+    this->Values[i] = stats.Values[i] ;
 }
 
 
@@ -61,7 +61,7 @@ vtkMEDPastValuesList::vtkMEDPastValuesList(const vtkMEDPastValuesList& stats)
 void vtkMEDPastValuesList::Clear()
 //------------------------------------------------------------------------------
 {
-  m_CurrentNumberOfValues = 0 ;
+  CurrentNumberOfValues = 0 ;
 }
 
 
@@ -70,13 +70,13 @@ void vtkMEDPastValuesList::Clear()
 void vtkMEDPastValuesList::AddNewValue(double newValue)
 //------------------------------------------------------------------------------
 {
-  if (m_CurrentNumberOfValues < m_MaxNumberOfValues)
-    m_CurrentNumberOfValues++ ;
+  if (CurrentNumberOfValues < MaxNumberOfValues)
+    CurrentNumberOfValues++ ;
 
-  for (int i = m_CurrentNumberOfValues-1 ;  i > 0 ;  i--)
-    m_Values[i] = m_Values[i-1] ;
+  for (int i = CurrentNumberOfValues-1 ;  i > 0 ;  i--)
+    Values[i] = Values[i-1] ;
 
-  m_Values[0] = newValue ;
+  Values[0] = newValue ;
 }
 
 
@@ -85,12 +85,12 @@ void vtkMEDPastValuesList::AddNewValue(double newValue)
 double vtkMEDPastValuesList::GetValue(int i) const
 //------------------------------------------------------------------------------
 {
-  if ((i < 0) || (i >= m_CurrentNumberOfValues)){
+  if ((i < 0) || (i >= CurrentNumberOfValues)){
     std::cout << "vtkMEDPastValuesList::GetValue() - index " << i << " out of range" << std::endl ;
     assert(false) ;
   }
 
-  return m_Values[i] ;
+  return Values[i] ;
 }
 
 
@@ -100,15 +100,15 @@ double vtkMEDPastValuesList::GetValue(int i) const
 double vtkMEDPastValuesList::GetMin() const
 //------------------------------------------------------------------------------
 {
-  if (m_CurrentNumberOfValues == 0){
+  if (CurrentNumberOfValues == 0){
     std::cout << "vtkMEDPastValuesList::GetMin() - no values found" << std::endl ;
     assert(false) ;
   }
 
-  double minval = m_Values[0] ;
-  for (int i = 1 ;  i < m_CurrentNumberOfValues ;  i++){
-    if (m_Values[i] < minval)
-      minval = m_Values[i] ;
+  double minval = Values[0] ;
+  for (int i = 1 ;  i < CurrentNumberOfValues ;  i++){
+    if (Values[i] < minval)
+      minval = Values[i] ;
   }
   return minval ;
 }
@@ -119,15 +119,15 @@ double vtkMEDPastValuesList::GetMin() const
 double vtkMEDPastValuesList::GetMax() const
 //------------------------------------------------------------------------------
 {
-  if (m_CurrentNumberOfValues == 0){
+  if (CurrentNumberOfValues == 0){
     std::cout << "vtkMEDPastValuesList::GetMax() - no values found" << std::endl ;
     assert(false) ;
   }
 
-  double maxval = m_Values[0] ;
-  for (int i = 1 ;  i < m_CurrentNumberOfValues ;  i++){
-    if (m_Values[i] > maxval)
-      maxval = m_Values[i] ;
+  double maxval = Values[0] ;
+  for (int i = 1 ;  i < CurrentNumberOfValues ;  i++){
+    if (Values[i] > maxval)
+      maxval = Values[i] ;
   }
   return maxval ;
 }
@@ -138,15 +138,15 @@ double vtkMEDPastValuesList::GetMax() const
 double vtkMEDPastValuesList::GetMean() const
 //------------------------------------------------------------------------------
 {
-  if (m_CurrentNumberOfValues == 0){
+  if (CurrentNumberOfValues == 0){
     std::cout << "vtkMEDPastValuesList::GetMean() - no values found" << std::endl ;
     assert(false) ;
   }
 
   double sum = 0.0 ;
-  for (int i = 0 ;  i < m_CurrentNumberOfValues ;  i++)
-    sum += m_Values[i] ;
-  sum /= (double)m_CurrentNumberOfValues ;
+  for (int i = 0 ;  i < CurrentNumberOfValues ;  i++)
+    sum += Values[i] ;
+  sum /= (double)CurrentNumberOfValues ;
   return sum ;
 }
 
@@ -157,24 +157,24 @@ double vtkMEDPastValuesList::GetMean() const
 double vtkMEDPastValuesList::GetMedian() const
 //------------------------------------------------------------------------------
 {
-  if (m_CurrentNumberOfValues == 0){
+  if (CurrentNumberOfValues == 0){
     std::cout << "vtkMEDPastValuesList::GetMedian() - no values found" << std::endl ;
     assert(false) ;
   }
 
   // copy to array and sort
-  double *temp = new double[m_CurrentNumberOfValues] ;
+  double *temp = new double[CurrentNumberOfValues] ;
 
-  for (int i = 0 ;  i < m_CurrentNumberOfValues ;  i++)
-    temp[i] = m_Values[i] ;
-  std::sort<double*>(temp, temp+m_CurrentNumberOfValues) ;
+  for (int i = 0 ;  i < CurrentNumberOfValues ;  i++)
+    temp[i] = Values[i] ;
+  std::sort<double*>(temp, temp+CurrentNumberOfValues) ;
 
   double median ;
-  int odd = m_CurrentNumberOfValues - 2*int(m_CurrentNumberOfValues / 2) ;
+  int odd = CurrentNumberOfValues - 2*int(CurrentNumberOfValues / 2) ;
   if (odd)
-    median = temp[(m_CurrentNumberOfValues-1) / 2] ;
+    median = temp[(CurrentNumberOfValues-1) / 2] ;
   else{
-    int idx = m_CurrentNumberOfValues / 2 ;
+    int idx = CurrentNumberOfValues / 2 ;
     median = (temp[idx] + temp[idx-1]) / 2.0 ;
   }
 
@@ -191,9 +191,9 @@ double vtkMEDPastValuesList::GetMedian() const
 void vtkMEDPastValuesList::PrintSelf(std::ostream& os) const
 //------------------------------------------------------------------------------
 {
-  os << "vtkMEDPastValuesList: no. of values = " << m_CurrentNumberOfValues << " max no. of values = " << m_MaxNumberOfValues << std::endl ;
-  for (int i = 0 ;  i < m_CurrentNumberOfValues ;  i++)
-    os << i << " " << m_Values[i] << std::endl ;
+  os << "vtkMEDPastValuesList: no. of values = " << CurrentNumberOfValues << " max no. of values = " << MaxNumberOfValues << std::endl ;
+  for (int i = 0 ;  i < CurrentNumberOfValues ;  i++)
+    os << i << " " << Values[i] << std::endl ;
   os << std::endl ;
 }
 

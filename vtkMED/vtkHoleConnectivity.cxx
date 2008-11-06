@@ -3,7 +3,7 @@
 Program:   Visualization Toolkit
 Module:    vtkHoleConnectivity.cxx
 Language:  C++
-Version:   $Id: vtkHoleConnectivity.cxx,v 1.3 2008-07-03 12:09:26 ior02 Exp $
+Version:   $Id: vtkHoleConnectivity.cxx,v 1.3.2.1 2008-11-06 09:27:27 ior02 Exp $
 
 Copyright (c) 2003-2004 Goodwin Lawlor
 All rights reserved.
@@ -44,7 +44,7 @@ void vtkHoleConnectivity::Execute()
 	vtkPolyDataConnectivityFilter *connectivityFilter = vtkPolyDataConnectivityFilter::New();
 	connectivityFilter->SetInput(input);
 	connectivityFilter->SetExtractionModeToClosestPointRegion ();
-	connectivityFilter->SetClosestPoint(point);
+	connectivityFilter->SetClosestPoint(Point);
 	connectivityFilter->Modified();
 	connectivityFilter->Update();
 
