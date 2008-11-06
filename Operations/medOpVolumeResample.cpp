@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 14:49:42 $
-  Version:   $Revision: 1.12.2.3 $
+  Date:      $Date: 2008-11-06 12:22:38 $
+  Version:   $Revision: 1.12.2.4 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -355,6 +355,7 @@ void medOpVolumeResample::InizializeVMEDummy()
 	m_VMEDummy->GetTagArray()->SetTag(mafTagItem("VISIBLE_IN_THE_TREE", 0.0));
 	m_VMEDummy->ReparentTo(m_Input->GetRoot());
 	m_VMEDummy->SetAbsMatrix(*(((mafVME*)m_Input)->GetOutput()->GetAbsMatrix()));
+  m_VMEDummy->SetName("Dummy");
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::OpRun()   
@@ -1107,6 +1108,7 @@ void medOpVolumeResample::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	HideGui();
+  m_VMEDummy->ReparentTo(NULL);
 	mafDEL(m_VMEDummy);
 	mafEventMacro(mafEvent(this,result));
 }
