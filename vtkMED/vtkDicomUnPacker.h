@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2008-10-31 13:03:53 $
-  Version:   $Revision: 1.3.4.1 $
+  Date:      $Date: 2008-11-06 10:22:50 $
+  Version:   $Revision: 1.3.4.2 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -270,20 +270,20 @@ long find (long Group, long Element , DICOM DICT[], long n_line);
 
 //uint16 read16 (FILE* fp, char little_endian) ;
 //uint32 read32 (FILE* fp, char little_endian);
-int m_BitsAllocated;
-int m_BitsStored;
-int m_HighBit;
-int m_PixelRepresentation;
-int m_SmallestImagePixelValue;
-int m_LargestImagePixelValue;
-int m_DimX;
-int m_DimY;
-char m_PhotometricInterpretation[11];
-double m_Intercept;
-double m_Slope;
-double m_Spacing[2];
-double m_Position[3];
-double m_Orientation[3];
+int BitsAllocated;
+int BitsStored;
+int HighBit;
+int PixelRepresentation;
+int SmallestImagePixelValue;
+int LargestImagePixelValue;
+int DimX;
+int DimY;
+char PhotometricInterpretation[11];
+double Intercept;
+double Slope;
+double Spacing[2];
+double Position[3];
+double Orientation[3];
 
 void  read_dicom_header(char * input, DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
 void  parser_multepl(tipo str , FILE * fp, long Length, VALUE * VALUES);

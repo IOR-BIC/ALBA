@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-29 09:08:27 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-11-06 10:22:28 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -396,7 +396,7 @@ void medOpExtrusionHoles::SelectHole(int pointID)
 	m_ResultPolydata->GetPoint(pointID,coordPointSelected);
 
 	m_ExtractHole->SetInput(m_ExtractFreeEdges->GetOutput());
-	m_ExtractHole->Setpoint(coordPointSelected);
+	m_ExtractHole->SetPoint(coordPointSelected);
 	m_ExtractHole->Update();
 
 	if(!m_TestMode)

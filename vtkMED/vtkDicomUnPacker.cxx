@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.1 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.2 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE *
 long vtkDicomUnPacker::find (long Group, long Element , DICOM DICT[], long n_line)
 //----------------------------------------------------------------------------
 {
-	/* FROM (Group, Element)  returns the m_Position of rispective pattern into Dictionary */ 
+	/* FROM (Group, Element)  returns the Position of rispective pattern into Dictionary */ 
   long n;
   long index=-1;
   if ((Group>20479) & (Group<20736)) Group=20480; /*  repeating groups 0x50xx */ 
@@ -578,8 +578,8 @@ int read_dicom_string_image(char *filename, T *IMAGE, double slope_value, double
 	char    little_endian = 1;  /* set default little endian */ 
 	double  HU_value;
 	T value;
-	// int cols = m_DimX;
-	// int rows = m_DimY;
+	// int cols = DimX;
+	// int rows = DimY;
 
   /*********************************   INIT   ***************************/
   t = (uint8 *) calloc(4,sizeof(uint8));
@@ -748,26 +748,26 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 		}
 	}	
 
-	m_BitsAllocated=16;
-	m_BitsStored=16;
-	m_DimX=512;
-	m_DimY=512;
-	m_HighBit=15;
-	m_PixelRepresentation=0;
-	m_SmallestImagePixelValue=0;
-	m_LargestImagePixelValue=0;
-	m_Slope=1;
-	m_Intercept=0;
-	m_Spacing[0]=2.0;
-	m_Spacing[1]=2.0;
-	m_Position[0]=0.0;
-	m_Position[1]=0.0;
-	m_Position[2]=0.0;
+	BitsAllocated=16;
+	BitsStored=16;
+	DimX=512;
+	DimY=512;
+	HighBit=15;
+	PixelRepresentation=0;
+	SmallestImagePixelValue=0;
+	LargestImagePixelValue=0;
+	Slope=1;
+	Intercept=0;
+	Spacing[0]=2.0;
+	Spacing[1]=2.0;
+	Position[0]=0.0;
+	Position[1]=0.0;
+	Position[2]=0.0;
 //	SliceLocation=0.0;
-	m_Orientation[0]=0.0;
-	m_Orientation[1]=0.0;
-	m_Orientation[2]=0.0;
-	strcpy(m_PhotometricInterpretation,"          ");
+	Orientation[0]=0.0;
+	Orientation[1]=0.0;
+	Orientation[2]=0.0;
+	strcpy(PhotometricInterpretation,"          ");
 
 	for (p=0; p<TAGNumbers; p++)
   {
@@ -826,70 +826,70 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 			strncpy(Study, (char *)&(VALUES[p].stringa[0]), 79);
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==50)) 
 		{
-			m_Position[0]=(double) VALUES[p].num[0];
-			m_Position[1]=(double) VALUES[p].num[1];
-			m_Position[2]=(double) VALUES[p].num[2];
+			Position[0]=(double) VALUES[p].num[0];
+			Position[1]=(double) VALUES[p].num[1];
+			Position[2]=(double) VALUES[p].num[2];
 		}
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==4161)) 
 		{
 			//SliceLocation=(double) VALUES[p].num[0];
-			m_Position[0]=0.0;
-			m_Position[1]=0.0;
-			//m_Position[2]=SliceLocation;
-			m_Position[2] = VALUES[p].num[0];
+			Position[0]=0.0;
+			Position[1]=0.0;
+			//Position[2]=SliceLocation;
+			Position[2] = VALUES[p].num[0];
 		}
 		if ((RESULT[p].Group==32) & (RESULT[p].Element==55))
 		{	
-			m_Orientation[0]=(double) VALUES[p].num[0];
-			m_Orientation[1]=(double) VALUES[p].num[1];
-			m_Orientation[2]=(double) VALUES[p].num[2];
+			Orientation[0]=(double) VALUES[p].num[0];
+			Orientation[1]=(double) VALUES[p].num[1];
+			Orientation[2]=(double) VALUES[p].num[2];
 		}
 
     if ((RESULT[p].Group==40) & (RESULT[p].Element==8)) 
       NumberOfFrames=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==256)) 
-      m_BitsAllocated=(int) VALUES[p].num[0];
+      BitsAllocated=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==257)) 
-      m_BitsStored=(int) VALUES[p].num[0];  
+      BitsStored=(int) VALUES[p].num[0];  
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==258)) 
-      m_HighBit=(int) VALUES[p].num[0];
+      HighBit=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==259)) 
-      m_PixelRepresentation=(int) VALUES[p].num[0];
+      PixelRepresentation=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==262)) 
-      m_SmallestImagePixelValue=(int) VALUES[p].num[0];
+      SmallestImagePixelValue=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==263)) 
-      m_LargestImagePixelValue=(int) VALUES[p].num[0];
+      LargestImagePixelValue=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==16)) 
-      m_DimY=(int) VALUES[p].num[0];                       
+      DimY=(int) VALUES[p].num[0];                       
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==17)) 
-      m_DimX=(int) VALUES[p].num[0];
+      DimX=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4178)) 
-      m_Intercept=(int) VALUES[p].num[0];
+      Intercept=(int) VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4179)) 
-      m_Slope= VALUES[p].num[0];
+      Slope= VALUES[p].num[0];
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==4)) 
-      strcpy(m_PhotometricInterpretation, (char *)&(VALUES[p].stringa[0]));
+      strcpy(PhotometricInterpretation, (char *)&(VALUES[p].stringa[0]));
 		if ((RESULT[p].Group==40) & (RESULT[p].Element==48)) 
 		{
-			m_Spacing[0]=(double) VALUES[p].num[0];
-			m_Spacing[1]=(double) VALUES[p].num[1];
+			Spacing[0]=(double) VALUES[p].num[0];
+			Spacing[1]=(double) VALUES[p].num[1];
 		}
   }
 
-/*	if (m_BitsStored != 16 && m_BitsStored != 8 && m_BitsStored != 12)
+/*	if (BitsStored != 16 && BitsStored != 8 && BitsStored != 12)
 		{
 			vtkErrorMacro("Supports only 8, 12, 16 bits DICOM images.");
 			return -1;
 		}*/
-	if (m_BitsAllocated != 8 && m_BitsAllocated != 16)
+	if (BitsAllocated != 8 && BitsAllocated != 16)
 		{
 			vtkErrorMacro("Unsupported DICOM image.");
 			return -1;
 		}
 
 	// Set the image parameters necessary for cache allocation
-	SetDataExtent(0,m_DimX-1,0,m_DimY-1,0,0);
-	switch (m_BitsAllocated)
+	SetDataExtent(0,DimX-1,0,DimY-1,0,0);
+	switch (BitsAllocated)
 	{
 	case 8:
 		SetDataScalarType(VTK_CHAR);
@@ -901,8 +901,8 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 
 	SetNumberOfScalarComponents(1); // Only gray scale CT images supported
 
-	GetOutput()->SetSpacing(m_Spacing);
-	GetOutput()->SetOrigin(m_Position);
+	GetOutput()->SetSpacing(Spacing);
+	GetOutput()->SetOrigin(Position);
 
 	return 0;
 }
@@ -931,16 +931,16 @@ int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageDat
 
 	int *ext=data->GetExtent();
 
-	switch (m_BitsAllocated) 
+	switch (BitsAllocated) 
 	{
 		case 8:
 		{
-			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage,1,NumOfFrameToGet);
+			ret = read_dicom_string_image(FileName, (char *)data->GetScalarPointer(), Slope, Intercept, DimY, DimX,FlipImage,1,NumOfFrameToGet);
 		}
 		break;
 		case 16:
 		{
-			ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), m_Slope, m_Intercept, m_DimY, m_DimX,FlipImage,m_PixelRepresentation,NumOfFrameToGet);
+			ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), Slope, Intercept, DimY, DimX,FlipImage,PixelRepresentation,NumOfFrameToGet);
 		}
 		break;
 	}
@@ -969,7 +969,7 @@ char *vtkDicomUnPacker::GetImageType(int id_caracrteristic)
 void vtkDicomUnPacker::GetSliceLocation(double pos[3])
 //----------------------------------------------------------------------------
 {
-  pos[0] = m_Position[0];
-  pos[1] = m_Position[1];
-  pos[2] = m_Position[2];
+  pos[0] = Position[0];
+  pos[1] = Position[1];
+  pos[2] = Position[2];
 }

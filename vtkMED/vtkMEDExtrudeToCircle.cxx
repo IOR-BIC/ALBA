@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.cxx,v $
 Language:  C++
-Date:      $Date: 2008-06-19 08:46:32 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2008-11-06 10:22:50 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -35,7 +35,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.1 $");
 vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 //------------------------------------------------------------------------------
 
@@ -44,9 +44,9 @@ vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 
 //------------------------------------------------------------------------------
 // Constructor
-vtkMEDExtrudeToCircle::vtkMEDExtrudeToCircle() : m_definedLength(false), m_definedDirection(false), m_definedVector(false),
-m_definedExtrusionPoint(false), m_definedMinNumEndPts(false), m_builtCells(false),
-m_mesh(NULL), m_defaultDirectionSign(1)
+vtkMEDExtrudeToCircle::vtkMEDExtrudeToCircle() : DefinedLength(false), DefinedDirection(false), DefinedVector(false),
+DefinedExtrusionPoint(false), DefinedMinNumEndPts(false), BuiltCells(false),
+Mesh(NULL), DefaultDirectionSign(1)
 //------------------------------------------------------------------------------
 {
 }
@@ -57,8 +57,8 @@ m_mesh(NULL), m_defaultDirectionSign(1)
 vtkMEDExtrudeToCircle::~vtkMEDExtrudeToCircle()
 //------------------------------------------------------------------------------
 {  
-  if (m_mesh != NULL)
-    delete m_mesh ;
+  if (Mesh != NULL)
+    delete Mesh ;
 }
 
 
@@ -68,12 +68,12 @@ vtkMEDExtrudeToCircle::~vtkMEDExtrudeToCircle()
 void vtkMEDExtrudeToCircle::Initialize()
 //------------------------------------------------------------------------------
 {
-  if (m_mesh != NULL){
-    delete m_mesh ;
-    m_mesh = NULL ;
+  if (Mesh != NULL){
+    delete Mesh ;
+    Mesh = NULL ;
   }
 
-  m_output->Initialize() ;
+  Output->Initialize() ;
 }
 
 
@@ -87,8 +87,8 @@ void vtkMEDExtrudeToCircle::Execute()
   vtkDebugMacro(<< "Executing ExtrudeToCircle Filter") ;
 
   // pointers to input and output
-  m_input = this->GetInput() ;
-  m_output = this->GetOutput() ;
+  Input = this->GetInput() ;
+  Output = this->GetOutput() ;
 
   // Make sure the filter is cleared of previous data before you run it !
   Initialize() ;
@@ -100,7 +100,7 @@ void vtkMEDExtrudeToCircle::Execute()
   //----------------------------------------------------------------------------
 
   // Calculate the parameters of the input hole (centre, normal and radius)
-  CalcHoleParameters(m_input) ;
+  CalcHoleParameters(Input) ;
 
   // Calculate the direction, length etc of the extrusion
   CalculateExtrusionVector() ;
@@ -110,14 +110,14 @@ void vtkMEDExtrudeToCircle::Execute()
   // because the hole will be an elliptical slice with a greater radius than the vessel.
   // If you slice a circular tube with radius r, at an angle a to the normal,
   // the rms radius of the elliptical slice will be r * sqrt(1+sec^2(a)) / sqrt(2)
-  double cosa = DotProduct(m_holeNormal, m_direction) ;
-  m_endRadius = m_holeRadius * sqrt(2.0) * fabs(cosa) / sqrt(1.0 + cosa*cosa) ;
+  double cosa = DotProduct(HoleNormal, Direction) ;
+  EndRadius = HoleRadius * sqrt(2.0) * fabs(cosa) / sqrt(1.0 + cosa*cosa) ;
 
 
   //----------------------------------------------------------------------------
   // Calculate the mesh structure
   //----------------------------------------------------------------------------
-  m_mesh = new MeshData ;
+  Mesh = new MeshData ;
   CalcExtrusionRings() ;
   CalcExtrusionVertices() ;
 
@@ -127,12 +127,12 @@ void vtkMEDExtrudeToCircle::Execute()
   //----------------------------------------------------------------------------
   vtkPoints *points = vtkPoints::New() ;
   VerticesToVtkPoints(points) ;
-  m_output->SetPoints(points) ;
+  Output->SetPoints(points) ;
   points->Delete() ;
 
   vtkCellArray *triangles = vtkCellArray::New() ;
   VerticesToVtkTriangles(triangles) ;
-  m_output->SetPolys(triangles) ;
+  Output->SetPolys(triangles) ;
   triangles->Delete() ;
 }
 
@@ -144,12 +144,12 @@ void vtkMEDExtrudeToCircle::SetLength(double len)
 //------------------------------------------------------------------------------
 {
   // set the length
-  m_length = len ;
-  m_definedLength = true ;
+  Length = len ;
+  DefinedLength = true ;
 
   // extrusion vector and extrusion point are no longer defined
-  m_definedVector = false ;
-  m_definedExtrusionPoint = false ;
+  DefinedVector = false ;
+  DefinedExtrusionPoint = false ;
 
   this->Modified() ;
 }
@@ -163,12 +163,12 @@ void vtkMEDExtrudeToCircle::SetDirection(const double *direc)
 //------------------------------------------------------------------------------
 {
   // copy vector and normalize
-  Normalize(direc, m_direction) ;
-  m_definedDirection = true ;
+  Normalize(direc, Direction) ;
+  DefinedDirection = true ;
 
   // extrusion vector and extrusion point are no longer defined
-  m_definedVector = false ;
-  m_definedExtrusionPoint = false ;
+  DefinedVector = false ;
+  DefinedExtrusionPoint = false ;
 
   this->Modified() ;
 }
@@ -181,16 +181,16 @@ void vtkMEDExtrudeToCircle::SetDirection(double x, double y, double z)
 //------------------------------------------------------------------------------
 {
   // copy vector and normalize
-  m_direction[0] = x ;
-  m_direction[1] = y ;
-  m_direction[2] = z ;
+  Direction[0] = x ;
+  Direction[1] = y ;
+  Direction[2] = z ;
 
-  Normalize(m_direction, m_direction) ;
-  m_definedDirection = true ;
+  Normalize(Direction, Direction) ;
+  DefinedDirection = true ;
 
   // extrusion vector and extrusion point are no longer defined
-  m_definedVector = false ;
-  m_definedExtrusionPoint = false ;
+  DefinedVector = false ;
+  DefinedExtrusionPoint = false ;
 
   this->Modified() ;
 }
@@ -201,13 +201,13 @@ void vtkMEDExtrudeToCircle::SetDirection(double x, double y, double z)
 void vtkMEDExtrudeToCircle::SetExtrusionPoint(const double *extrPoint)
 //------------------------------------------------------------------------------
 {
-  CopyVector(extrPoint, m_extrusionPoint) ;
-  m_definedExtrusionPoint = true ;
+  CopyVector(extrPoint, ExtrusionPoint) ;
+  DefinedExtrusionPoint = true ;
 
   // everything else is undefined until we know the centre of the hole
-  m_definedLength = false ;
-  m_definedDirection = false ;
-  m_definedVector = false ;
+  DefinedLength = false ;
+  DefinedDirection = false ;
+  DefinedVector = false ;
 
   this->Modified() ;
 }
@@ -218,15 +218,15 @@ void vtkMEDExtrudeToCircle::SetExtrusionPoint(const double *extrPoint)
 void vtkMEDExtrudeToCircle::SetExtrusionVector(const double *extrVector)
 //------------------------------------------------------------------------------
 {
-  CopyVector(extrVector, m_extrusionVector) ;
-  m_definedVector = true ;
+  CopyVector(extrVector, ExtrusionVector) ;
+  DefinedVector = true ;
 
   // need to calculate length and direction later
-  m_definedLength = false ;
-  m_definedDirection = false ;
+  DefinedLength = false ;
+  DefinedDirection = false ;
 
   // extrusion point is no longer defined
-  m_definedExtrusionPoint = false ;
+  DefinedExtrusionPoint = false ;
 
   this->Modified() ;
 }
@@ -237,8 +237,8 @@ void vtkMEDExtrudeToCircle::SetExtrusionVector(const double *extrVector)
 void vtkMEDExtrudeToCircle::SetMinNumberofEndPoints(int minNumEndPoints)
 //------------------------------------------------------------------------------
 {
-  m_minNumEndPts = minNumEndPoints ;
-  m_definedMinNumEndPts = true ;
+  MinNumEndPts = minNumEndPoints ;
+  DefinedMinNumEndPts = true ;
 
   this->Modified() ;
 }
@@ -253,15 +253,15 @@ void vtkMEDExtrudeToCircle::SetDirectionToDefault(int directionSign)
 //------------------------------------------------------------------------------
 {
   // set any existing vector data to undefined
-  m_definedDirection = false ;
-  m_definedVector = false ;
-  m_definedExtrusionPoint = false ;
+  DefinedDirection = false ;
+  DefinedVector = false ;
+  DefinedExtrusionPoint = false ;
 
   // set the flag for the sign of the direction
   if (directionSign == -1)
-    m_defaultDirectionSign = -1 ;
+    DefaultDirectionSign = -1 ;
   else
-    m_defaultDirectionSign = 1 ;
+    DefaultDirectionSign = 1 ;
 
   this->Modified() ;
 
@@ -277,61 +277,61 @@ void vtkMEDExtrudeToCircle::SetDirectionToDefault(int directionSign)
 void vtkMEDExtrudeToCircle::CalculateExtrusionVector()
 //------------------------------------------------------------------------------
 {
-  if (m_definedVector){
+  if (DefinedVector){
     // calculate length, direction and extrusion point from vector
-    if (!m_definedLength){
+    if (!DefinedLength){
       // back calculate length
-      m_length = GetNorm(m_extrusionVector) ;
-      m_definedLength = true ;
+      Length = GetNorm(ExtrusionVector) ;
+      DefinedLength = true ;
     }
 
-    if (!m_definedDirection){
+    if (!DefinedDirection){
       // back-calculate direction
-      Normalize(m_extrusionVector, m_direction) ;
-      m_definedDirection = true ;
+      Normalize(ExtrusionVector, Direction) ;
+      DefinedDirection = true ;
     }
 
-    if (!m_definedExtrusionPoint){
+    if (!DefinedExtrusionPoint){
       // calculate extrusion point
-      AddVector(m_holeCentre, m_extrusionVector, m_extrusionPoint) ;
-      m_definedExtrusionPoint = true ;
+      AddVector(HoleCentre, ExtrusionVector, ExtrusionPoint) ;
+      DefinedExtrusionPoint = true ;
     }
   }
-  else if (m_definedExtrusionPoint){
+  else if (DefinedExtrusionPoint){
     // calculate vector, length and direction from extrusion point
-    SubtractVector(m_extrusionPoint, m_holeCentre, m_extrusionVector) ;
-    m_length = GetNorm(m_extrusionVector) ;
-    Normalize(m_extrusionVector, m_direction) ;
-    m_definedLength = true ;
-    m_definedDirection = true ;
-    m_definedVector = true ;
+    SubtractVector(ExtrusionPoint, HoleCentre, ExtrusionVector) ;
+    Length = GetNorm(ExtrusionVector) ;
+    Normalize(ExtrusionVector, Direction) ;
+    DefinedLength = true ;
+    DefinedDirection = true ;
+    DefinedVector = true ;
   }
   else{
-    if (!m_definedLength){
+    if (!DefinedLength){
       // if no length defined, set to 5 * hole radius
-      m_length = 5.0 * m_holeRadius ;
-      m_definedLength = true ;
+      Length = 5.0 * HoleRadius ;
+      DefinedLength = true ;
     }
 
-    if (!m_definedDirection){
+    if (!DefinedDirection){
       // if no direction defined, set to normal of hole
-      Normalize(m_holeNormal, m_direction) ;
+      Normalize(HoleNormal, Direction) ;
 
       // check if the direction needs to be reversed
-      if (m_defaultDirectionSign == -1){
-        MultVectorByScalar(-1.0, m_direction, m_direction) ;
+      if (DefaultDirectionSign == -1){
+        MultVectorByScalar(-1.0, Direction, Direction) ;
       }
 
-      m_definedDirection = true ;
+      DefinedDirection = true ;
     }
 
     // calculate vector from length and direction
-    MultVectorByScalar(m_length, m_direction, m_extrusionVector) ;
-    m_definedVector = true ;
+    MultVectorByScalar(Length, Direction, ExtrusionVector) ;
+    DefinedVector = true ;
 
     // calculate extrusion point
-    AddVector(m_holeCentre, m_extrusionVector, m_extrusionPoint) ;
-    m_definedExtrusionPoint = true ;
+    AddVector(HoleCentre, ExtrusionVector, ExtrusionPoint) ;
+    DefinedExtrusionPoint = true ;
   }
 }
 
@@ -346,21 +346,21 @@ void vtkMEDExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
   int i, j ;
   double sumsq, x[3] ;
   vtkPoints *pts = hole->GetPoints() ;
-  int numPts = m_input->GetNumberOfPoints() ;
+  int numPts = Input->GetNumberOfPoints() ;
 
   //----------------------------------------------------------------------------
   // get the centre
   //----------------------------------------------------------------------------
 
   // get the mean centre
-  SetVector(m_holeCentre, 0, 0, 0) ;
+  SetVector(HoleCentre, 0, 0, 0) ;
   for (i = 0 ;  i < numPts ; i++){
     pts->GetPoint(i, x) ;
-    AddVector(m_holeCentre, x, m_holeCentre) ;
+    AddVector(HoleCentre, x, HoleCentre) ;
   }
-  m_holeCentre[0] /= (double)numPts ;
-  m_holeCentre[1] /= (double)numPts ;
-  m_holeCentre[2] /= (double)numPts ;
+  HoleCentre[0] /= (double)numPts ;
+  HoleCentre[1] /= (double)numPts ;
+  HoleCentre[2] /= (double)numPts ;
 
 
   //----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ void vtkMEDExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
   for (i = 0, sumsq = 0.0 ;  i < numPts ; i++){
     // get point relative to hole centre
     pts->GetPoint(i, x) ;
-    SubtractVector(x, m_holeCentre, dx) ;
+    SubtractVector(x, HoleCentre, dx) ;
 
     // add to sum squared radius
     for (j = 0 ;  j < 3 ;  j++)
@@ -380,7 +380,7 @@ void vtkMEDExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
 
   // get the rms radius
   sumsq /= (double)numPts ;
-  m_holeRadius = sqrt(sumsq) ;
+  HoleRadius = sqrt(sumsq) ;
 
 
   //----------------------------------------------------------------------------
@@ -397,18 +397,18 @@ void vtkMEDExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
   vtkMEDPastValuesList vecProd0(1000), vecProd1(1000), vecProd2(1000) ;
 
   // Build cell links if not already done
-  if (!m_builtCells){
-    m_input->BuildCells() ;
-    m_builtCells = true ;
+  if (!BuiltCells){
+    Input->BuildCells() ;
+    BuiltCells = true ;
   }
 
-  for (int i = 0 ;  i < m_input->GetNumberOfCells() ;  i++){
-    m_input->GetCellPoints(i, numPtsInCell, ptlist) ;
+  for (int i = 0 ;  i < Input->GetNumberOfCells() ;  i++){
+    Input->GetCellPoints(i, numPtsInCell, ptlist) ;
     if (numPtsInCell == 2){
-      m_input->GetPoint(ptlist[0], pt0) ;
-      m_input->GetPoint(ptlist[1], pt1) ;
-      SubtractVector(pt0, m_holeCentre, pt0) ;
-      SubtractVector(pt1, m_holeCentre, pt1) ;
+      Input->GetPoint(ptlist[0], pt0) ;
+      Input->GetPoint(ptlist[1], pt1) ;
+      SubtractVector(pt0, HoleCentre, pt0) ;
+      SubtractVector(pt1, HoleCentre, pt1) ;
 
       // get cross product and add to list
       double cp[3] ;
@@ -420,17 +420,17 @@ void vtkMEDExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
   }
 
   // set normal to median cross product
-  m_holeNormal[0] = vecProd0.GetMedian() ;
-  m_holeNormal[1] = vecProd1.GetMedian() ;
-  m_holeNormal[2] = vecProd2.GetMedian() ;
-  Normalize(m_holeNormal, m_holeNormal) ;
+  HoleNormal[0] = vecProd0.GetMedian() ;
+  HoleNormal[1] = vecProd1.GetMedian() ;
+  HoleNormal[2] = vecProd2.GetMedian() ;
+  Normalize(HoleNormal, HoleNormal) ;
 
 
 
   //----------------------------------------------------------------------------
   // get the number of points around the hole
   //----------------------------------------------------------------------------
-  m_holeNumVerts = pts->GetNumberOfPoints() ;
+  HoleNumVerts = pts->GetNumberOfPoints() ;
 }
 
 
@@ -446,8 +446,8 @@ void vtkMEDExtrudeToCircle::CalcUpVector(vtkIdList *holepts)
   double x[3] ;
   int ptId ;
   ptId = holepts->GetId(0) ;
-  m_input->GetPoint(ptId, x) ;
-  SubtractVector(x, m_holeCentre, m_upVector) ;
+  Input->GetPoint(ptId, x) ;
+  SubtractVector(x, HoleCentre, UpVector) ;
 }
 
 
@@ -463,38 +463,38 @@ void vtkMEDExtrudeToCircle::CalcExtrusionRings()
 
   // set the requested min. value for the no. of end points to something sensible.
   // default is the same as the no. of vertices on the hole.
-  if (!m_definedMinNumEndPts || (m_minNumEndPts < m_holeNumVerts)){
+  if (!DefinedMinNumEndPts || (MinNumEndPts < HoleNumVerts)){
     // set min no. of end vertices to default
-    m_minNumEndPts = m_holeNumVerts ;
-    m_definedMinNumEndPts = true ;
+    MinNumEndPts = HoleNumVerts ;
+    DefinedMinNumEndPts = true ;
   }
 
   // calculate circumference of extrusion
-  double circumf = 2*M_PI * m_endRadius ;
+  double circumf = 2*M_PI * EndRadius ;
 
   // try increasing the no. of rings k until we get a number which gives the right length.
   k = 2 ;
   double m, sumL;
   while (k < 1000){
     // calculate slope m where no. of vertices ni in ring i is given by ni = n0 + m*i
-    m = (double)(m_minNumEndPts - m_holeNumVerts) / (double)(k-1) ;
+    m = (double)(MinNumEndPts - HoleNumVerts) / (double)(k-1) ;
 
     // calculate the total length of the extrusion
     for (i = 1, sumL = 0.0 ;  i < k ;  i++){
-      int ni = m_holeNumVerts + (int)(m*(double)i) ; 
+      int ni = HoleNumVerts + (int)(m*(double)i) ; 
       double Li = circumf / (double)ni ;
       sumL += Li ;
     }
 
     // stop when the length reaches the desired length
-    if (sumL >= m_length)
+    if (sumL >= Length)
       break ;
 
     k++ ;
   }
 
   // tweak the circumference so that the total length will be the same as the requested length
-  circumf *= m_length / sumL ;
+  circumf *= Length / sumL ;
 
 
   //----------------------------------------------------------------------------
@@ -502,25 +502,25 @@ void vtkMEDExtrudeToCircle::CalcExtrusionRings()
   //----------------------------------------------------------------------------
 
   // allocate the rings
-  m_mesh->AllocateRings(k) ;
+  Mesh->AllocateRings(k) ;
 
   // first ring is same as start hole
-  m_mesh->ring[0].AllocateVertices(m_holeNumVerts) ;
-  m_mesh->ring[0].z = 0.0 ;
+  Mesh->Ring[0].AllocateVertices(HoleNumVerts) ;
+  Mesh->Ring[0].Z = 0.0 ;
 
   // allocate the number of vertices in each ring
   double z = 0.0 ;
   for (i = 1 ;  i < k-1 ;  i++){
-    int ni = m_holeNumVerts + (int)(m*(double)i) ; 
+    int ni = HoleNumVerts + (int)(m*(double)i) ; 
     z += circumf / (double)ni ;
 
-    m_mesh->ring[i].AllocateVertices(ni) ;
-    m_mesh->ring[i].z = z ;
+    Mesh->Ring[i].AllocateVertices(ni) ;
+    Mesh->Ring[i].Z = z ;
   }
 
   // last ring as requested
-  m_mesh->ring[k-1].AllocateVertices(m_minNumEndPts) ;
-  m_mesh->ring[k-1].z = m_length ;
+  Mesh->Ring[k-1].AllocateVertices(MinNumEndPts) ;
+  Mesh->Ring[k-1].Z = Length ;
 }
 
 
@@ -536,13 +536,13 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
 
   // get indices of points around hole, in correct order
   vtkIdList *holepts = vtkIdList::New() ;
-  GetPointsAroundHole(m_input, holepts) ;
+  GetPointsAroundHole(Input, holepts) ;
 
   // Calculate the up vector for the cylindrical coord system
   CalcUpVector(holepts) ;
 
   // Reverse order of points if the list of points contains decreasing phi
-  int sense = CalcSenseOfPointsAroundHole(holepts, m_holeCentre, m_extrusionVector, m_upVector) ;
+  int sense = CalcSenseOfPointsAroundHole(holepts, HoleCentre, ExtrusionVector, UpVector) ;
   if (sense < 0){
     ReverseIdList(holepts) ;
     CircularShiftIdList(holepts, 1) ; // rotate list to put zero phi back at first entry
@@ -557,9 +557,9 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
   double x[3] ;
   for (j = 0 ;  j < holepts->GetNumberOfIds() ;  j++){
     ptId = holepts->GetId(j) ;
-    m_input->GetPoint(ptId, x) ;  // cartesian coords of hole point
-    CalcCylinderCoords(x, m_holeCentre, m_extrusionVector, m_upVector, &r, &phi, &z) ;
-    m_mesh->ring[0].vertex[j].SetCylCoords(r, phi, z) ;
+    Input->GetPoint(ptId, x) ;  // cartesian coords of hole point
+    CalcCylinderCoords(x, HoleCentre, ExtrusionVector, UpVector, &r, &phi, &z) ;
+    Mesh->Ring[0].Vertex[j].SetCylCoords(r, phi, z) ;
   }
 
   // Remove unwanted jumps of 2pi from the data
@@ -567,25 +567,25 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
 
   // calculate the cylindrical coords of the end ring, which is of course a 
   // perfect circle, normal to the z axis
-  int iend = m_mesh->numRings - 1 ;
-  double dphi = 2*M_PI / (double)m_mesh->ring[iend].numVerts ;
-  for (j = 0 ;  j < m_mesh->ring[iend].numVerts ;  j++){
-    r = m_endRadius ;
+  int iend = Mesh->NumRings - 1 ;
+  double dphi = 2*M_PI / (double)Mesh->Ring[iend].NumVerts ;
+  for (j = 0 ;  j < Mesh->Ring[iend].NumVerts ;  j++){
+    r = EndRadius ;
     phi = (double)j * dphi ;
-    z = m_mesh->ring[iend].z ;
-    m_mesh->ring[iend].vertex[j].SetCylCoords(r, phi, z) ;
+    z = Mesh->Ring[iend].Z ;
+    Mesh->Ring[iend].Vertex[j].SetCylCoords(r, phi, z) ;
   }
 
   // Tricky bit: now we have to interpolate the vertices on the middle rings
-  for (i = 1 ;  i < m_mesh->numRings-1 ;  i++){
-    for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
+  for (i = 1 ;  i < Mesh->NumRings-1 ;  i++){
+    for (j = 0 ;  j < Mesh->Ring[i].NumVerts ;  j++){
       // find the point on the end ring which corresponds to point j
-      double factor1 = (double)m_mesh->ring[iend].numVerts / (double)m_mesh->ring[i].numVerts ;
+      double factor1 = (double)Mesh->Ring[iend].NumVerts / (double)Mesh->Ring[i].NumVerts ;
       int jend = (int)((double)j * factor1 + 0.5) ;
 
       // find the points on the start ring which correspond to point j
       // and the relative weighting for each
-      double factor2 = (double)m_mesh->ring[0].numVerts / (double)m_mesh->ring[i].numVerts ;
+      double factor2 = (double)Mesh->Ring[0].NumVerts / (double)Mesh->Ring[i].NumVerts ;
       double jdouble = (double)j * (double)factor2 ;
       int jstart0 = (int)jdouble ;
       int jstart1 = (jstart0 + 1) ;
@@ -594,12 +594,12 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
       double w1 = rmdr ;
 
       // make sure indices are in correct range
-      jend = jend % m_mesh->ring[iend].numVerts ;
-      jstart0 = jstart0 % m_mesh->ring[0].numVerts ;
-      jstart1 = jstart1 % m_mesh->ring[0].numVerts ;
+      jend = jend % Mesh->Ring[iend].NumVerts ;
+      jstart0 = jstart0 % Mesh->Ring[0].NumVerts ;
+      jstart1 = jstart1 % Mesh->Ring[0].NumVerts ;
 
       // get the total weights for the three points
-      double lambda = m_mesh->ring[i].z / m_mesh->ring[iend].z ;
+      double lambda = Mesh->Ring[i].Z / Mesh->Ring[iend].Z ;
       double w_end = lambda ;
       double w_start0 = (1.0 - lambda)*w0 ;
       double w_start1 = (1.0 - lambda)*w1 ;
@@ -608,9 +608,9 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
       double r_start0, phi_start0, z_start0 ;
       double r_start1, phi_start1, z_start1 ;
       double r_end, phi_end, z_end ;
-      m_mesh->ring[0].vertex[jstart0].GetCylCoords(&r_start0, &phi_start0, &z_start0) ;
-      m_mesh->ring[0].vertex[jstart1].GetCylCoords(&r_start1, &phi_start1, &z_start1) ;
-      m_mesh->ring[iend].vertex[jend].GetCylCoords(&r_end, &phi_end, &z_end) ;
+      Mesh->Ring[0].Vertex[jstart0].GetCylCoords(&r_start0, &phi_start0, &z_start0) ;
+      Mesh->Ring[0].Vertex[jstart1].GetCylCoords(&r_start1, &phi_start1, &z_start1) ;
+      Mesh->Ring[iend].Vertex[jend].GetCylCoords(&r_end, &phi_end, &z_end) ;
       if (jstart1 == 0){
         // special case: deal with phi wrapping round from 2pi to zero
         phi_start1 += + 2.0*M_PI ;
@@ -620,16 +620,16 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
       r = w_start0*r_start0 + w_start1*r_start1 + w_end*r_end ;
       phi = w_start0*phi_start0 + w_start1*phi_start1 + w_end*phi_end ;
       z = w_start0*z_start0 + w_start1*z_start1 + w_end*z_end ;
-      m_mesh->ring[i].vertex[j].SetCylCoords(r, phi, z) ;    
+      Mesh->Ring[i].Vertex[j].SetCylCoords(r, phi, z) ;    
     }
   }
 
   // finally calculate the cartesian coords of each vertex
-  for (i = 0 ;  i < m_mesh->numRings ;  i++){
-    for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
-      m_mesh->ring[i].vertex[j].GetCylCoords(&r, &phi, &z) ;
-      CalcCartesianCoords(r, phi, z, m_holeCentre, m_extrusionVector, m_upVector, x) ;
-      m_mesh->ring[i].vertex[j].SetCartCoords(x) ;
+  for (i = 0 ;  i < Mesh->NumRings ;  i++){
+    for (j = 0 ;  j < Mesh->Ring[i].NumVerts ;  j++){
+      Mesh->Ring[i].Vertex[j].GetCylCoords(&r, &phi, &z) ;
+      CalcCartesianCoords(r, phi, z, HoleCentre, ExtrusionVector, UpVector, x) ;
+      Mesh->Ring[i].Vertex[j].SetCartCoords(x) ;
     }
   }
 
@@ -648,19 +648,19 @@ void vtkMEDExtrudeToCircle::VerticesToVtkPoints(vtkPoints *points) const
   int i, j, k, totalpts ;
 
   // pre-allocate memory for total no. of vertices
-  for (i = 0, totalpts = 0 ;  i < m_mesh->numRings ;  i++)
-    totalpts += m_mesh->ring[i].numVerts ;
+  for (i = 0, totalpts = 0 ;  i < Mesh->NumRings ;  i++)
+    totalpts += Mesh->Ring[i].NumVerts ;
   points->Allocate(totalpts) ;       // allocate space for n points (ie 3 * n floats)
 
-  for (i = 0, k = 0 ;  i < m_mesh->numRings ;  i++){
-    for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
+  for (i = 0, k = 0 ;  i < Mesh->NumRings ;  i++){
+    for (j = 0 ;  j < Mesh->Ring[i].NumVerts ;  j++){
       // insert vertex into points array
       double x[3] ;
-      m_mesh->ring[i].vertex[j].GetCartCoords(x) ;
+      Mesh->Ring[i].Vertex[j].GetCartCoords(x) ;
       points->InsertPoint(k, x) ; 
 
       // make a note of the polydata index so we can find it again
-      m_mesh->ring[i].vertex[j].SetId(k++) ;     
+      Mesh->Ring[i].Vertex[j].SetId(k++) ;     
     }
   }
 
@@ -679,17 +679,17 @@ void vtkMEDExtrudeToCircle::VerticesToVtkTriangles(vtkCellArray *triangles) cons
   vtkIdType id0, id1, id2, thisTriangle[3] ;
 
   // pre-allocate memory for total no. of vertices
-  for (i = 0, totalTriangles = 0 ;  i < m_mesh->numRings-1 ;  i++)
-    totalTriangles += m_mesh->ring[i].numVerts + m_mesh->ring[i+1].numVerts ;
+  for (i = 0, totalTriangles = 0 ;  i < Mesh->NumRings-1 ;  i++)
+    totalTriangles += Mesh->Ring[i].NumVerts + Mesh->Ring[i+1].NumVerts ;
   triangles->Allocate(3*totalTriangles) ;       // allocate space for indices 
 
-  for (i = 0 ;  i < m_mesh->numRings-1 ;  i++){
-    int nthis = m_mesh->ring[i].numVerts ;      // no. vertices in this ring
-    int nnext = m_mesh->ring[i+1].numVerts ;    // no. vertices in previous ring
+  for (i = 0 ;  i < Mesh->NumRings-1 ;  i++){
+    int nthis = Mesh->Ring[i].NumVerts ;      // no. vertices in this ring
+    int nnext = Mesh->Ring[i+1].NumVerts ;    // no. vertices in previous ring
     double nratio = (double)nnext / (double)nthis ;
 
     // loop through the vertices
-    for (j = 0 ;  j < m_mesh->ring[i].numVerts ;  j++){
+    for (j = 0 ;  j < Mesh->Ring[i].NumVerts ;  j++){
       // get the range of vertices which will be connected to this one on the next ring
       // n.b. need to use floor() because (int) moves negative numbers towards zero.
       int jjminus = floor(nratio * (double)(j-0.5) + 0.5) ;
@@ -702,9 +702,9 @@ void vtkMEDExtrudeToCircle::VerticesToVtkTriangles(vtkCellArray *triangles) cons
 
         // construct triangle.
         // this goes anticlock if ring index goes left to right and j axis points down.
-        id0 = m_mesh->ring[i].vertex[j].GetId() ;
-        id1 = m_mesh->ring[i+1].vertex[jj1].GetId() ;
-        id2 = m_mesh->ring[i+1].vertex[jj0].GetId() ;
+        id0 = Mesh->Ring[i].Vertex[j].GetId() ;
+        id1 = Mesh->Ring[i+1].Vertex[jj1].GetId() ;
+        id2 = Mesh->Ring[i+1].Vertex[jj0].GetId() ;
 
         thisTriangle[0] = id0 ; thisTriangle[1] = id1 ; thisTriangle[2] = id2 ;
         triangles->InsertNextCell(3, thisTriangle) ;
@@ -714,9 +714,9 @@ void vtkMEDExtrudeToCircle::VerticesToVtkTriangles(vtkCellArray *triangles) cons
       int j1 = Modulo(j+1, nthis) ;
       int jjp = Modulo(jjplus, nnext) ;
 
-      id0 = m_mesh->ring[i].vertex[j].GetId() ;
-      id1 = m_mesh->ring[i].vertex[j1].GetId() ;
-      id2 = m_mesh->ring[i+1].vertex[jjp].GetId() ;
+      id0 = Mesh->Ring[i].Vertex[j].GetId() ;
+      id1 = Mesh->Ring[i].Vertex[j1].GetId() ;
+      id2 = Mesh->Ring[i+1].Vertex[jjp].GetId() ;
 
       thisTriangle[0] = id0 ; thisTriangle[1] = id1 ; thisTriangle[2] = id2 ;
       triangles->InsertNextCell(3, thisTriangle) ;
@@ -990,8 +990,8 @@ int vtkMEDExtrudeToCircle::CalcSenseOfPointsAroundHole(vtkIdList *holepts, const
 
   for (j = 0, Eplus = 0.0, Eneg = 0.0 ;  j < n ;  j++){
     vtkIdType ptId = holepts->GetId(j) ;
-    x = m_input->GetPoint(ptId) ;  // cartesian coords of hole point
-    CalcCylinderCoords(x, m_holeCentre, m_extrusionVector, m_upVector, &r, &phi, &z) ;
+    x = Input->GetPoint(ptId) ;  // cartesian coords of hole point
+    CalcCylinderCoords(x, HoleCentre, ExtrusionVector, UpVector, &r, &phi, &z) ;
 
     // Get calculated phi for each line
     double phicalc_plus = mplus*(double)j ;
@@ -1026,13 +1026,13 @@ void vtkMEDExtrudeToCircle::Remove2PiArtefactsFromFirstRing()
 //------------------------------------------------------------------------------
 {
   int j ;
-  int n = m_mesh->ring[0].numVerts ;
+  int n = Mesh->Ring[0].NumVerts ;
 
   // slope of model line phi = m*j + c where c = 0
   double m = 2.0*M_PI / (double)n ;
 
   for (j = 0 ;  j < n ;  j++){
-    double phi = m_mesh->ring[0].vertex[j].GetCylPhi() ;
+    double phi = Mesh->Ring[0].Vertex[j].GetCylPhi() ;
     double phicalc = m * (double)j ;
     double dphi = phi - phicalc ;
 
@@ -1042,7 +1042,7 @@ void vtkMEDExtrudeToCircle::Remove2PiArtefactsFromFirstRing()
     else if (dphi < -M_PI)
       phi += 2.0*M_PI ;
 
-    m_mesh->ring[0].vertex[j].SetCylPhi(phi) ;
+    Mesh->Ring[0].Vertex[j].SetCylPhi(phi) ;
   }
 }
 
@@ -1252,8 +1252,8 @@ void vtkMEDExtrudeToCircle::PrintSelf(ostream& os, vtkIndent indent) const
   os << std::endl ;
 
   os << indent << "mesh structure..." << std::endl ;
-  os << indent << "requested end pts: " << m_minNumEndPts << std::endl ; 
-  m_mesh->PrintSelf(os, indent) ;
+  os << indent << "requested end pts: " << MinNumEndPts << std::endl ; 
+  Mesh->PrintSelf(os, indent) ;
   os << std::endl ;
 }
 
@@ -1264,11 +1264,11 @@ void vtkMEDExtrudeToCircle::PrintSelf(ostream& os, vtkIndent indent) const
 void vtkMEDExtrudeToCircle::MeshData::PrintSelf(ostream& os, vtkIndent indent) const
 //------------------------------------------------------------------------------
 {
-  os << indent << "no. rings = " << numRings << std::endl ;
+  os << indent << "no. rings = " << NumRings << std::endl ;
 
-  for (int i = 0 ;  i < numRings ;  i++){
+  for (int i = 0 ;  i < NumRings ;  i++){
     os << indent << "ring " << i << "\t" ;
-    ring[i].PrintSelf(os, 0) ;
+    Ring[i].PrintSelf(os, 0) ;
     os << std::endl ;
   }
 }
@@ -1279,10 +1279,10 @@ void vtkMEDExtrudeToCircle::MeshData::PrintSelf(ostream& os, vtkIndent indent) c
 void vtkMEDExtrudeToCircle::RingData::PrintSelf(ostream& os, vtkIndent indent) const
 //------------------------------------------------------------------------------
 {
-  os << indent << "no. vertices = " << numVerts << "\t" << "z = " << z << std::endl ;
-  for (int j = 0 ;  j < numVerts ;  j++){
+  os << indent << "no. vertices = " << NumVerts << "\t" << "z = " << Z << std::endl ;
+  for (int j = 0 ;  j < NumVerts ;  j++){
     os << indent << "vertex " << j << "\t" ;
-    vertex[j].PrintSelf(os, 0) ;
+    Vertex[j].PrintSelf(os, 0) ;
   }
 }
 
@@ -1292,6 +1292,6 @@ void vtkMEDExtrudeToCircle::RingData::PrintSelf(ostream& os, vtkIndent indent) c
 void vtkMEDExtrudeToCircle::VertexData::PrintSelf(ostream& os, vtkIndent indent) const
 //------------------------------------------------------------------------------
 {
-  os << indent << "cyl " << m_cylcoord[0] << "\t" << m_cylcoord[1] << "\t" << m_cylcoord[2] << "\t"
-    << "cart " << m_cartcoord[0] << "\t" << m_cartcoord[1] << "\t" << m_cartcoord[2] << std::endl ;
+  os << indent << "cyl " << Cylcoord[0] << "\t" << Cylcoord[1] << "\t" << Cylcoord[2] << "\t"
+    << "cart " << Cartcoord[0] << "\t" << Cartcoord[1] << "\t" << Cartcoord[2] << std::endl ;
 }
