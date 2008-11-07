@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIListBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-11-07 13:12:24 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,7 +50,7 @@ public:
 	wxString GetStringSelection() {return m_ListBox->GetStringSelection();};
 	int GetNumberOfItems()	{return m_ListBox->GetCount();};
   void SetListener(mafObserver *listener) {m_Listener = listener;};
-  void Select(int id) {m_ListBox->SetSelection(id);};
+  void Select(int id);
 
   wxListBox *m_ListBox;
 

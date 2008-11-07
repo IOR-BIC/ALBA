@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-11-07 13:12:24 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,8 @@
 
 
 #include "mafGUIListBox.h"
+#include "mafGUIValidator.h"
+
 //----------------------------------------------------------------------------
 // constants :
 //----------------------------------------------------------------------------
@@ -127,4 +129,14 @@ void mafGUIListBox::OnSize(wxSizeEvent& event)
 //----------------------------------------------------------------------------
 { 
    m_ListBox->SetSize(event.GetSize());
+}
+//----------------------------------------------------------------------------
+void mafGUIListBox::Select( int id )
+//----------------------------------------------------------------------------
+{
+  m_ListBox->SetSelection(id);// needed line below because 
+                              // SetSelection doesn't rise event
+                              // wxEVT_COMMAND_LISTBOX_SELECTED
+                              // trapped from mafGUI
+  ((mafGUIValidator *)m_ListBox->GetValidator())->TransferFromWindow();
 }
