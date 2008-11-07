@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-07 13:13:33 $
-  Version:   $Revision: 1.15.2.1 $
+  Date:      $Date: 2008-11-07 14:46:21 $
+  Version:   $Revision: 1.15.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -31,6 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
+#include "mafXMLStorage.h"
 
 #include "vtkMath.h"
 #include "vtkCamera.h"
@@ -92,7 +93,9 @@ enum ANIMATE_KIT_WIDGET_ID
 	ID_DELETE,
 	ID_RENAME,
   ID_ANIMATE,
-  ID_REFRESH
+  ID_REFRESH,
+  ID_IMPORT,
+  ID_EXPORT
 };
 //----------------------------------------------------------------------------
 void mafAnimate::CreateGui()
@@ -107,24 +110,21 @@ void mafAnimate::CreateGui()
   int lm = m_Gui->GetMetrics(GUI_LABEL_MARGIN);
   int wm = m_Gui->GetMetrics(GUI_WIDGET_MARGIN);
   int bh = m_Gui->GetMetrics(GUI_BUTTON_HEIGHT);
-  wxSize bs(dw/3-wm,bh);
+  wxSize bs(dw/2-wm,bh);
 	wxPoint dp = wxDefaultPosition;
 
 	wxStaticText *lab = new wxStaticText(m_Gui,-1,"fly pose",dp,wxSize(lw,bh));
   lab->SetFont(m_Gui->GetBoldFont());
 
-	m_StorePositionButton  = new mafGUIButton (m_Gui,ID_STORE, "store", dp,bs);
-  m_RenamePositionButton = new mafGUIButton (m_Gui,ID_RENAME,"rename",dp,bs);
-  m_DeletePositionButton = new mafGUIButton (m_Gui,ID_DELETE,"delete",dp,bs);
+	m_StorePositionButton  = new mafGUIButton (m_Gui,ID_STORE, "add", dp,bs);
+  m_DeletePositionButton = new mafGUIButton (m_Gui,ID_DELETE,"remove",dp,bs);
   
   m_StorePositionButton->SetListener(this);
-	m_RenamePositionButton->SetListener(this);
 	m_DeletePositionButton->SetListener(this);
 
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
 	sizer->Add(lab,      0, wxRIGHT, lm);
 	sizer->Add(m_StorePositionButton,   0, wxRIGHT, wm);
-	sizer->Add(m_RenamePositionButton,  0, wxRIGHT, wm);
 	sizer->Add(m_DeletePositionButton,  0, wxRIGHT, wm);
   m_Gui->Add(sizer,0,wxALL,rm); 
 
@@ -132,12 +132,31 @@ void mafAnimate::CreateGui()
 
   wxStaticText *labRefresh = new wxStaticText(m_Gui,-1,"        ",dp,wxSize(lw,bh));
   m_RefreshPositionButton = new mafGUIButton (m_Gui,ID_REFRESH,"refresh",dp,bs);
+  m_RenamePositionButton = new mafGUIButton (m_Gui,ID_RENAME,"rename",dp,bs);
+
+
   m_RefreshPositionButton->SetListener(this);
+  m_RenamePositionButton->SetListener(this);
 
   wxBoxSizer *sizerRefresh = new wxBoxSizer(wxHORIZONTAL);
   sizerRefresh->Add(labRefresh,      0, wxRIGHT, lm);
   sizerRefresh->Add(m_RefreshPositionButton,  0, wxRIGHT, wm);
+  sizerRefresh->Add(m_RenamePositionButton,  0, wxRIGHT, wm);
   m_Gui->Add(sizerRefresh,0,wxALL,rm); 
+
+
+  wxStaticText *labImport = new wxStaticText(m_Gui,-1,"        ",dp,wxSize(lw,bh));
+  m_ImportPositionButton = new mafGUIButton (m_Gui,ID_IMPORT,"import",dp,bs);
+  m_ExportPositionButton = new mafGUIButton (m_Gui,ID_EXPORT,"export",dp,bs);
+
+  m_ImportPositionButton->SetListener(this);
+  m_ExportPositionButton->SetListener(this);
+
+  wxBoxSizer *sizerImport = new wxBoxSizer(wxHORIZONTAL);
+  sizerImport->Add(labImport,      0, wxRIGHT, lm);
+  sizerImport->Add(m_ImportPositionButton,  0, wxRIGHT, wm);
+  sizerImport->Add(m_ExportPositionButton,  0, wxRIGHT, wm);
+  m_Gui->Add(sizerImport,0,wxALL,rm); 
 
 	m_Gui->Bool(ID_INTERPOLATE,_("interpolate"),&m_InterpolateFlag, 1);
   
@@ -154,8 +173,11 @@ void mafAnimate::CreateGui()
 void mafAnimate::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
+  
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
+    wxString wildcard = "xml file (*.xml)|*.xml|all files (*.*)|*.*";
+    mafString fileName = "";
     switch(e->GetId())
     {
       case ID_STORE:
@@ -182,6 +204,19 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         RetrieveStoredPositions();
         EnableWidgets();
         break;
+      case ID_IMPORT:
+        fileName = mafGetOpenFile("", wildcard).c_str();
+        if (fileName != "")
+        {
+          LoadPoseFromFile(fileName);
+          EnableWidgets();
+        }
+      break;
+      case ID_EXPORT:
+        fileName = mafGetSaveFile("", wildcard).c_str();
+        if (fileName != "")
+          StorePoseToFile(fileName);
+      break;
       case TIME_SET:
         SetCurrentSelection((int)e->GetDouble());
         FlyTo();
@@ -201,6 +236,39 @@ void mafAnimate::EnableWidgets()
   m_Gui->Enable( ID_INTERPOLATE, m_Tags != NULL && m_PositionList->GetCount()>0 );
   m_AnimatePlayer->Enable(m_PositionList->GetCount()>1);
   m_AnimatePlayer->SetFrameBounds(0,m_PositionList->GetCount()-1);
+}
+//----------------------------------------------------------------------------
+void mafAnimate::LoadPoseFromFile(mafString &fileName)
+//----------------------------------------------------------------------------
+{
+  mafTagArray *newCam = new mafTagArray();
+
+  // XML storage to restore
+  mafXMLStorage restore;
+  restore.SetURL(fileName.GetCStr());
+  restore.SetFileType("CAM");
+  restore.SetVersion("1.0");
+  restore.SetDocument(newCam);
+  restore.Restore();
+
+  SetStoredPositions(newCam);
+ 
+  cppDEL(newCam);
+}
+//----------------------------------------------------------------------------
+void mafAnimate::StorePoseToFile(mafString &fileName)
+//----------------------------------------------------------------------------
+{	
+  int i = 0;
+  if(m_StoredPositions->GetNumberOfTags() == 0) return;
+
+  // XML storage to restore
+  mafXMLStorage restore;
+  restore.SetURL(fileName.GetCStr());
+  restore.SetFileType("CAM");
+  restore.SetVersion("1.0");
+  restore.SetDocument(m_StoredPositions);
+  restore.Store();
 }
 //----------------------------------------------------------------------------
 void mafAnimate::FlyTo(const char *fly_position)
@@ -563,8 +631,10 @@ void mafAnimate::ResetKit()
   int num_items = m_PositionList->GetCount();
   for (int i=0; i<num_items;i++)
   {
-    DeleteViewPoint(i);
+    DeleteViewPoint(0);
   }
+  mafDEL(m_StoredPositions); // Initialize the tag array.
+  mafNEW(m_StoredPositions);
   EnableWidgets(); // disable all
   m_Gui->Update();
 }
@@ -608,7 +678,7 @@ void mafAnimate::SetStoredPositions(mafTagArray *positions)
 
   for(int t=0; t<tag_list.size(); t++)
   {
-    mafTagItem *item = m_Tags->GetTag(tag_list[t].c_str());
+    mafTagItem *item = positions->GetTag(tag_list[t].c_str());
     m_Tags->SetTag(*item);
   }
   
@@ -624,7 +694,7 @@ void mafAnimate::SetStoredPositions(mafTagArray *positions)
 void mafAnimate::SetCurrentSelection( int pos )
 //----------------------------------------------------------------------------
 {
-  m_PositionList->SetSelection(0);// needed line below because 
+  m_PositionList->SetSelection(pos);// needed line below because 
                                   // SetSelection doesn't rise event
                                   // wxEVT_COMMAND_LISTBOX_SELECTED
                                   // trapped from mafGUI

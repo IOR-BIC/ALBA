@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-07 13:13:33 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2008-11-07 14:46:21 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,6 +82,16 @@ protected:
 
 	/** Enable-Disable the GUI's widgets */
 	void EnableWidgets();
+
+
+  /** Load poses from file. */
+  void LoadPoseFromFile(mafString &fileName);
+
+  /** Store poses to file. */
+  void StorePoseToFile(mafString &fileName);
+
+
+
 	mafObserver	*m_Listener;
 
   mafNode *m_Vme;
@@ -98,7 +108,9 @@ protected:
 	mafGUIButton			*m_DeletePositionButton;
 	mafGUIButton			*m_RenamePositionButton;
   mafGUIButton			*m_RefreshPositionButton;
-  mafGUIMovieCtrl  *m_AnimatePlayer;
+  mafGUIButton			*m_ImportPositionButton;
+  mafGUIButton			*m_ExportPositionButton;
+  mafGUIMovieCtrl   *m_AnimatePlayer;
 	int						 m_InterpolateFlag;
 };
-#endif
+#endif // __mafAnimate_H__
