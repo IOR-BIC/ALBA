@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 10:25:53 $
-  Version:   $Revision: 1.49 $
+  Date:      $Date: 2008-11-07 15:14:08 $
+  Version:   $Revision: 1.49.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -306,11 +306,11 @@ void mafRWI::CameraSet(int cam_position, double zoom)
   {
     case CAMERA_FRONT:
     case CAMERA_PERSPECTIVE_FRONT:
-      x=0; y=0; z=1; vx=0; vy=1; vz=0;
+      x=0; y=0; z=-1; vx=0; vy=1; vz=0;
     break;
     case CAMERA_BACK:
     case CAMERA_PERSPECTIVE_BACK:
-      x=0; y=0; z=-1;vx=0; vy=1; vz=0;
+      x=0; y=0; z=1;vx=0; vy=1; vz=0;
     break;
     case CAMERA_LEFT:
     case CAMERA_PERSPECTIVE_LEFT:
