@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-17 14:03:38 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2008-11-07 13:13:33 $
+  Version:   $Revision: 1.12.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,10 @@ public:
   void SetStoredPositions(mafTagArray *positions);
 
 protected:
-	/** Move the camera to the target position */
+	/** Select the item into the listbox and update the validator of the widget.*/
+  void SetCurrentSelection(int pos);
+
+  /** Move the camera to the target position */
 	void FlyTo();
 
   /** Read root node's tags to retrieve previous stored camera positions.  */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAnimate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-17 14:03:38 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2008-11-07 13:13:33 $
+  Version:   $Revision: 1.15.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mmuIdFactory.h"
 #include "mafDecl.h"
 #include "mafGUI.h"
+#include "mafGUIValidator.h"
 #include "mafGUIButton.h"
 #include "mafGUIMovieCtrl.h"
 
@@ -78,23 +79,6 @@ void mafAnimate::SetInputVME(mafNode *vme)
   m_Tags = m_Root->GetTagArray();
 	
   RetrieveStoredPositions();
-  /*if(!m_Tags) return;
-
-  std::vector<std::string> tag_list;
-  m_Tags->GetTagList(tag_list);
-	
-  for(int t=0; t<tag_list.size(); t++)
-	{
-    mafTagItem *item = m_Tags->GetTag(tag_list[t].c_str());
-		if(item && ((item->GetNumberOfComponents() == 9) || (item->GetNumberOfComponents() == 10)))
-		{
-			wxString name = item->GetName();
-      if(name.Find("FLY_TO_") != -1)
-			  name = name.Remove(0,7);
-			m_PositionList->Append(name);
-		}
-	}*/
-
   EnableWidgets(); 
 }
 //----------------------------------------------------------------------------
@@ -176,25 +160,20 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
     {
       case ID_STORE:
       case MOVIE_RECORD:
-        m_PositionList->Clear();
-        RetrieveStoredPositions();
         StoreViewPoint();
+        RetrieveStoredPositions(false);
         EnableWidgets();
       break;
       case ID_DELETE:
-        m_PositionList->Clear();
-        RetrieveStoredPositions();
         DeleteViewPoint(m_PositionList->GetSelection());
+        RetrieveStoredPositions(false);
         EnableWidgets();
       break;
       case ID_RENAME:
-        m_PositionList->Clear();
-        RetrieveStoredPositions();
         RenameViewPoint();
+        RetrieveStoredPositions(false);
       break;
       case ID_LIST:
-        m_PositionList->Clear();
-        RetrieveStoredPositions();
         FlyTo();
         EnableWidgets();
       break;
@@ -204,7 +183,7 @@ void mafAnimate::OnEvent(mafEventBase *maf_event)
         EnableWidgets();
         break;
       case TIME_SET:
-        m_PositionList->SetSelection((int)e->GetDouble());
+        SetCurrentSelection((int)e->GetDouble());
         FlyTo();
       break;
     }
@@ -506,8 +485,7 @@ void mafAnimate::StoreViewPoint()
 	m_Tags->SetTag(item);
 
 	m_PositionList->Append(m_SelectedPosition);
-  m_PositionList->SetSelection(m_PositionList->GetCount() - 1);
-	m_Gui->Update();
+  SetCurrentSelection(m_PositionList->GetCount() - 1);
 }
 //----------------------------------------------------------------------------
 void mafAnimate::RenameViewPoint()
@@ -565,7 +543,6 @@ void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
     pos = 0;
   };
 
-//	int n = m_PositionList->GetSelection();
 	m_PositionList->Delete(pos);
 
 	wxString flyto_tagName = "FLY_TO_" + m_SelectedPosition;
@@ -575,12 +552,9 @@ void mafAnimate::DeleteViewPoint(int pos /*= 0*/)
 	m_SelectedPosition = "";
   if(m_PositionList->GetCount()) 
 	{
-		m_PositionList->SetSelection(0);
-
+		SetCurrentSelection(0);
 	  m_SelectedPosition = m_PositionList->GetStringSelection();
 	}
-  m_Gui->Update();
-
 }
 //----------------------------------------------------------------------------
 void mafAnimate::ResetKit()
@@ -590,9 +564,7 @@ void mafAnimate::ResetKit()
   for (int i=0; i<num_items;i++)
   {
     DeleteViewPoint(i);
-    //m_PositionList->Delete(0);
   }
-  //m_Tags = NULL;
   EnableWidgets(); // disable all
   m_Gui->Update();
 }
@@ -625,8 +597,6 @@ void mafAnimate::RetrieveStoredPositions(bool update_listbox /*= true*/)
       }
     }
   }
-  m_Gui->Update();
-
 }
 //----------------------------------------------------------------------------
 void mafAnimate::SetStoredPositions(mafTagArray *positions)
@@ -645,8 +615,18 @@ void mafAnimate::SetStoredPositions(mafTagArray *positions)
   if (tag_list.size() > 0)
   {
     RetrieveStoredPositions();
-    m_PositionList->SetSelection(0);
+    SetCurrentSelection(0);
     m_SelectedPosition = m_PositionList->GetStringSelection();
     FlyTo();
   }
+}
+//----------------------------------------------------------------------------
+void mafAnimate::SetCurrentSelection( int pos )
+//----------------------------------------------------------------------------
+{
+  m_PositionList->SetSelection(0);// needed line below because 
+                                  // SetSelection doesn't rise event
+                                  // wxEVT_COMMAND_LISTBOX_SELECTED
+                                  // trapped from mafGUI
+  ((mafGUIValidator *)m_PositionList->GetValidator())->TransferFromWindow();
 }
