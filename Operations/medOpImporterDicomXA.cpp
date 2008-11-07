@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomXA.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-31 13:05:33 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2008-11-07 13:56:11 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -459,7 +459,7 @@ void medOpImporterDicomXA::BuildDicomFileList(const char *dir)
 				ct_mode.MakeUpper();
 				ct_mode.Trim(FALSE);
 				ct_mode.Trim();
-				if (strcmp( reader->GetModality(), "CT" ) == 0 || strcmp( reader->GetModality(), "XA" )==0)
+				if (strcmp( reader->GetModality(), "CT" ) == 0 || strcmp( reader->GetModality(), "XA" )==0 || strcmp( reader->GetModality(), "RF" )==0)
 				{
 					//if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
 					if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
