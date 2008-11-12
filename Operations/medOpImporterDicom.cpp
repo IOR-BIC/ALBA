@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:35:29 $
-Version:   $Revision: 1.21 $
+Date:      $Date: 2008-11-12 14:43:51 $
+Version:   $Revision: 1.21.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1388,63 +1388,63 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 			str_tmp.Append("\\");
 			str_tmp.Append(m_CurrentSliceName);
 
-			vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
-			reader->SetFileName((char *)str_tmp.c_str());
-			reader->UseDefaultDictionaryOff();
-			reader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-			reader->UpdateInformation();
-			reader->Modified();
-			reader->Update();
+			//vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
+			m_DicomReader->SetFileName((char *)str_tmp.c_str());
+			m_DicomReader->UseDefaultDictionaryOff();
+			m_DicomReader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
+			m_DicomReader->UpdateInformation();
+			m_DicomReader->Modified();
+			m_DicomReader->Update();
 			
-			((medGUIDicomSettings*)GetSetting())->EnableToRead(reader->GetModality());
+			((medGUIDicomSettings*)GetSetting())->EnableToRead(m_DicomReader->GetModality());
 
-			ct_mode = reader->GetCTMode();
+			ct_mode = m_DicomReader->GetCTMode();
 			ct_mode.MakeUpper();
 			ct_mode.Trim(FALSE);
 			ct_mode.Trim();
-			if (((medGUIDicomSettings*)GetSetting())->EnableToRead(reader->GetModality())&& strcmp( reader->GetModality(), "MR" ) != 0)
+			if (((medGUIDicomSettings*)GetSetting())->EnableToRead(m_DicomReader->GetModality())&& strcmp( m_DicomReader->GetModality(), "MR" ) != 0)
 			{
-				if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+				if(ct_mode.Find("SCOUT") != -1 || m_DicomReader->GetStatus() == -1)
 				{
-					reader->Delete();
+					//m_DicomReader->Delete();
 					continue;
 				}
-				row = m_StudyListbox->FindString(reader->GetStudyUID());
+				row = m_StudyListbox->FindString(m_DicomReader->GetStudyUID());
 				if (row == -1)
 				{
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
 					m_FilesList = new medListDicomFiles;
-					m_StudyListbox->Append(reader->GetStudyUID());
+					m_StudyListbox->Append(m_DicomReader->GetStudyUID());
 					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-					reader->GetSliceLocation(slice_pos);
-					m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput()));
+					m_DicomReader->GetSliceLocation(slice_pos);
+					m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,m_DicomReader->GetOutput()));
 					m_NumberOfStudy++;
 				}
 				else 
 				{
-					reader->GetSliceLocation(slice_pos);
-					((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput()));
+					m_DicomReader->GetSliceLocation(slice_pos);
+					((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,m_DicomReader->GetOutput()));
 				}
 			}
-			else if ( ((medGUIDicomSettings*)GetSetting())->EnableToRead(reader->GetModality())&& strcmp( reader->GetModality(), "MR" ) == 0)
+			else if ( ((medGUIDicomSettings*)GetSetting())->EnableToRead(m_DicomReader->GetModality())&& strcmp( m_DicomReader->GetModality(), "MR" ) == 0)
 			{
-				if( reader->GetStatus() == -1)
+				if( m_DicomReader->GetStatus() == -1)
 				{
-					reader->Delete();
+					//m_DicomReader->Delete();
 					continue;
 				}
-				row = m_StudyListbox->FindString(reader->GetStudyUID());
+				row = m_StudyListbox->FindString(m_DicomReader->GetStudyUID());
 				if (row == -1)
 				{
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
 					m_FilesList = new medListDicomFiles;
-					m_StudyListbox->Append(reader->GetStudyUID());
+					m_StudyListbox->Append(m_DicomReader->GetStudyUID());
 					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-					reader->GetSliceLocation(slice_pos);
-					imageNumber=reader->GetInstanceNumber();
-					numberOfImages = reader->GetCardiacNumberOfImages();
+					m_DicomReader->GetSliceLocation(slice_pos);
+					imageNumber=m_DicomReader->GetInstanceNumber();
+					numberOfImages = m_DicomReader->GetCardiacNumberOfImages();
 					if(numberOfImages>1)
 					{
 						if (m_DicomTypeRead==-1)
@@ -1467,22 +1467,22 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 							return;
 						}
 					}
-					trigTime = reader->GetTriggerTime();
-					m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput(),imageNumber, numberOfImages, trigTime));
+					trigTime = m_DicomReader->GetTriggerTime();
+					m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,m_DicomReader->GetOutput(),imageNumber, numberOfImages, trigTime));
 					m_NumberOfStudy++;
 				}
 				else 
 				{
-					reader->GetSliceLocation(slice_pos);
-					imageNumber=reader->GetInstanceNumber();
-					numberOfImages = reader->GetCardiacNumberOfImages();
-					trigTime = reader->GetTriggerTime();
-					((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,reader->GetOutput(),imageNumber,numberOfImages,trigTime));
+					m_DicomReader->GetSliceLocation(slice_pos);
+					imageNumber=m_DicomReader->GetInstanceNumber();
+					numberOfImages = m_DicomReader->GetCardiacNumberOfImages();
+					trigTime = m_DicomReader->GetTriggerTime();
+					((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,m_DicomReader->GetOutput(),imageNumber,numberOfImages,trigTime));
 				}
 			}
 			progress = i * 100 / m_DirectoryReader->GetNumberOfFiles();
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-			reader->Delete();
+			//m_DicomReader->Delete();
 		}
 	}
 	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
@@ -1723,6 +1723,8 @@ void medOpImporterDicom::ImportDicomTags()
 		mafNEW(m_TagArray);
 
 	m_TagArray->SetName("TagArray");
+
+  m_DicomReader->Update();
 
 	for (int i=0;i<m_DicomReader->GetNumberOfTags();i++)
 	{
