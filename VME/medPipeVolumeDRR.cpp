@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeDRR.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2008-11-13 11:40:38 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Paolo Quadrani - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -90,7 +90,7 @@ void medPipeVolumeDRR::Create(mafSceneNode *n)
 
   m_Selected = false;
 
-  wxBusyCursor wait;
+  //wxBusyCursor wait;
 
   // image pipeline
   m_Vme->GetOutput()->Update();
@@ -398,7 +398,7 @@ void medPipeVolumeDRR::SetCameraAngle(double value)
 {
 	m_CameraAngle=value;
 
-	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	vtkCamera *camera = this->m_RenFront->GetActiveCamera();
 	camera->SetViewAngle(this->m_CameraAngle);
 
 	if(m_Gui)
@@ -412,7 +412,7 @@ void medPipeVolumeDRR::SetCameraPosition(double value[3])
 	m_CameraPosition[1]=value[1];
 	m_CameraPosition[2]=value[2];
 
-	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	vtkCamera *camera = this->m_RenFront->GetActiveCamera();
 	camera->SetPosition(this->m_CameraPosition);
 
 	if(m_Gui)
@@ -426,7 +426,7 @@ void medPipeVolumeDRR::SetCameraFocus(double value[3])
 	m_CameraFocus[1]=value[1];
 	m_CameraFocus[2]=value[2];
 
-	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	vtkCamera *camera = this->m_RenFront->GetActiveCamera();
 	camera->SetFocalPoint(this->m_CameraFocus);
 
 	if (m_Gui)
@@ -438,7 +438,7 @@ void medPipeVolumeDRR::SetCameraRoll(double value)
 {
 	m_CameraRoll=value;
 	
-	vtkCamera *camera = this->m_Sg->m_RenFront->GetActiveCamera();
+	vtkCamera *camera = this->m_RenFront->GetActiveCamera();
 	camera->SetRoll(this->m_CameraRoll);
 
 	if(m_Gui)

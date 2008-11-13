@@ -124,7 +124,7 @@ class VTK_vtkMAF_EXPORT vtkXRayVolumeMapper : public vtkVolumeMapper {
 
     void InitializeRender(bool setup);
     void FindMajorAxis(vtkRenderer *renderer, vtkVolume *volume);
-    bool PrepareTextures();
+    bool PrepareTextures(bool force = false);
     bool CacheScaledVolume();
     void EnableClipPlanes(bool enable);
     int  FindColorResolution();

@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkXRayVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 14:26:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-11-13 11:39:41 $
+  Version:   $Revision: 1.3.2.1 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -94,7 +94,7 @@ float vtkXRayVolumeMapper::Color[4] = { 0.5f, 0.5f, 0.5f, 1.f };
 
 void ProjectBoxToViewport(const vtkMatrix4x4 *matrixObject, const double (&boundingBox)[6], double (&minMaxViewportCoordinates)[4]);
   
-vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3.2.1 $");
 vtkStandardNewMacro(vtkXRayVolumeMapper);
 
 //------------------------------------------------------------------------------
@@ -371,7 +371,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
     }
   
   //--------------------------- prepare for rendering
-  if (!PrepareTextures())
+  if (!PrepareTextures(renderer->GetRenderWindow()->GetOffScreenRendering()))
     return;
 
   InitializeRender(true); // this should be called after the color depth is known
@@ -526,7 +526,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
         }
       glEnd();
       glFlush();
-      assert(glGetError() == GL_NO_ERROR);
+      //assert(glGetError() == GL_NO_ERROR);
       }
 
     // is this the time to pass the values to the accumulation buffer?
@@ -555,7 +555,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
       iAccumBufferInitialized = true;
       }
     } // for (slice)
-  assert(glGetError() == GL_NO_ERROR);
+  //assert(glGetError() == GL_NO_ERROR);
 
   // copy int buffer to double buffer
   const unsigned int *iBuffer = iAccumBuffer;
@@ -699,7 +699,7 @@ void vtkXRayVolumeMapper::InitializeRender(bool setup) {
     glPixelStorei(GL_PACK_ALIGNMENT, 4);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     }
-  assert(glGetError() == 0);
+  //assert(glGetError() == 0);
   }
 
 
@@ -737,10 +737,10 @@ void vtkXRayVolumeMapper::EnableClipPlanes(bool enable) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 // generate opengl textures from input data set
-bool vtkXRayVolumeMapper::PrepareTextures() {
+bool vtkXRayVolumeMapper::PrepareTextures(bool force) {
 
   // Is data the same?
-  if (this->GetInput() != NULL && this->GetInput()->GetMTime() > this->BuildTime)
+  if (this->GetInput() != NULL && (this->GetInput()->GetMTime() > this->BuildTime || force))
     ResetTextures();
   else if (this->NumberOfTextures[0] > 0 && this->NumberOfTextures[1] > 0 && this->NumberOfTextures[2] > 0)
     return true; // nothing to do
