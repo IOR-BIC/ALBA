@@ -26,6 +26,11 @@ ADD_TEST(medPipeVolumeMIPTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeMIPTest)
 ADD_EXECUTABLE(medPipeFactoryVMETest medPipeFactoryVMETest.h medPipeFactoryVMETest.cpp)
 ADD_TEST(medPipeFactoryVMETest  ${EXECUTABLE_OUTPUT_PATH}/medPipeFactoryVMETest)
 
+ADD_EXECUTABLE(medPipeVolumeDRRTest medPipeVolumeDRRTest.h medPipeVolumeDRRTest.cpp)
+ADD_TEST(medPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeDRRTest)
+
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
