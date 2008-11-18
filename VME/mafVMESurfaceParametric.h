@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-06 10:00:00 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2008-11-18 12:46:51 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -54,6 +54,8 @@ public:
 
   /** Return the radius of the parametric sphere.*/
   double GetSphereRadius() {return m_SphereRadius;};
+  /** Return the radius of the parametric cylinder.*/
+  double GetCylinderRadius() {return m_CylinderRadius;};
 
   /** Copy the contents of another mafVMESurfaceParametric into this one. */
   virtual int DeepCopy(mafNode *a);
