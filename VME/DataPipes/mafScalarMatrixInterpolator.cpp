@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarMatrixInterpolator.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-11-19 14:04:17 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,10 +72,15 @@ void mafScalarMatrixInterpolator::PreExecute()
   // more specialized interpolators could redefine this to have more inputs (e.g. when 
   // interpolating different items)
   if ( m_CurrentItem && (m_CurrentItem != m_OldItem || \
-      mtime > m_UpdateTime.GetMTime() ))
+    mtime > m_UpdateTime.GetMTime() ||
+    !m_CurrentItem->IsDataPresent() ))
   {
-    m_ScalarData = GetCurrentItem()->GetData();
-    m_UpdateTime.Modified();
+    vnl_matrix<double> scalar = GetCurrentItem()->GetData();
+    if (scalar.size() != 0)
+    {
+      m_ScalarData = GetCurrentItem()->GetData();
+      m_UpdateTime.Modified();
+    }
   } 
 }
 
