@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-14 09:08:26 $
-  Version:   $Revision: 1.21 $
+  Date:      $Date: 2008-11-21 14:39:17 $
+  Version:   $Revision: 1.21.2.1 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -79,6 +79,9 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_Axis      = GIZMO_SLICE_Z;
   m_SnapArray = NULL;
   m_Id        = 0;
+
+	m_CustomizedSnapArrayFlag = false;
+	m_CustomizedArrayStep = 1.0;
   
 
   mafNEW(m_VmeGizmo);
@@ -275,6 +278,51 @@ mafVME *mafGizmoSlice::GetOutput()
 void mafGizmoSlice::InitSnapArray(mafVME *vol, int axis)
 //----------------------------------------------------------------------------
 {
+	if(true == m_CustomizedSnapArrayFlag)
+	{
+    //generate snaparray with step criterion
+		this->m_SnapArray = vtkDoubleArray::New();
+		if (vtkDataSet *vol_data = vol->GetOutput()->GetVTKData())
+		{
+			double b[6];
+			vol_data->Update();
+			vol_data->GetBounds(b);
+			
+			if(axis == GIZMO_SLICE_X)
+			{
+				this->m_SnapArray->InsertNextTuple1(b[0]);
+				double currentBound = b[0];
+				while(currentBound < b[1])
+				{
+          currentBound += m_CustomizedArrayStep;
+          this->m_SnapArray->InsertNextTuple1(currentBound);
+				}
+			}
+			else if(axis == GIZMO_SLICE_Y)
+			{
+				this->m_SnapArray->InsertNextTuple1(b[2]);
+				double currentBound = b[2];
+				while(currentBound < b[3])
+				{
+					currentBound += m_CustomizedArrayStep;
+					this->m_SnapArray->InsertNextTuple1(currentBound);
+				}
+			}
+			else if(axis == GIZMO_SLICE_Z)
+			{
+				this->m_SnapArray->InsertNextTuple1(b[4]);
+				double currentBound = b[4];
+				while(currentBound < b[5])
+				{
+					currentBound += m_CustomizedArrayStep;
+					this->m_SnapArray->InsertNextTuple1(currentBound);
+				}
+			}
+			
+		}
+		return;
+	}
+
   if (vtkDataSet *vol_data = vol->GetOutput()->GetVTKData())
   {
     double b[6], z;
@@ -349,6 +397,7 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
 				double slicePlaneOrigin[3];
 				mafTransform::GetPosition(*m_GizmoHandleCenterMatrix, slicePlaneOrigin);
 
+				
 				// position sent as vtk point
         if(m_Axis == GIZMO_SLICE_X)
         {
@@ -366,8 +415,10 @@ void mafGizmoSlice::OnEvent(mafEventBase *maf_event)
           slicePlaneOrigin[1] = 0.;
         }
 
+				
 				m_Point->SetPoint(0,slicePlaneOrigin);
 				mafEventMacro(mafEvent(this,MOUSE_MOVE, m_Point, m_Id));
+
 
       }
       break;
