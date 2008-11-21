@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-30 09:31:22 $
-  Version:   $Revision: 1.40.2.5 $
+  Date:      $Date: 2008-11-21 15:37:41 $
+  Version:   $Revision: 1.40.2.6 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1042,4 +1042,17 @@ void mafOpManager::RefreshMenu()
 //----------------------------------------------------------------------------
 {
   EnableOp(!Running());
+}
+//----------------------------------------------------------------------------
+mafOp *mafOpManager::GetOperationById(int id)
+//----------------------------------------------------------------------------
+{
+  std::vector<mafOp *>::iterator it = m_OpList.begin();
+  for(int i=0;i<m_OpList.size(); i++)
+  {
+    if(m_OpList[i]->m_Id == id)
+      return m_OpList[i];
+  }
+
+  return NULL;
 }

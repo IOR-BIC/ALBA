@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:53:01 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2008-11-21 15:37:41 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -114,6 +114,9 @@ public:
 
   /** Return the current running operation. Return NULL if no operation is running.*/
   mafOp *GetRunningOperation();
+
+  /** Return an instance of operation from id.*/
+  mafOp *GetOperationById(int id);
 
   /** 
   Initialize the action for the mouse device. */
