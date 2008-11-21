@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2008-11-21 15:38:02 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -104,6 +104,11 @@ public:
   void SetStepVariable(double step){if(m_StepText) *m_StepVariable = step;m_StepText->SetValue(wxString::Format("%.2f", *m_StepVariable));}
 
   void LayoutStyle(const char *label);
+
+  void SetTextButtonTop(const char *text);
+  void SetTextButtonBottom(const char *text);
+  void SetTextButtonLeft(const char *text);
+  void SetTextButtonRight(const char *text);
 
 private:
 

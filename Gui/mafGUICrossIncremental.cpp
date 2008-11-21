@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-11-21 15:38:02 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -234,6 +234,42 @@ void mafGUICrossIncremental::EnableStep(bool value)
 	}
 }
 //----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetTextButtonTop(const char *text)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_ButtonTop)
+  {
+    m_ButtonTop->SetLabel(text);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetTextButtonBottom(const char *text)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_ButtonBottom)
+  {
+    m_ButtonBottom->SetLabel(text);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetTextButtonLeft(const char *text)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_ButtonLeft)
+  {
+    m_ButtonLeft->SetLabel(text);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetTextButtonRight(const char *text)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_ButtonRight)
+  {
+    m_ButtonRight->SetLabel(text);
+  }
+}
+//----------------------------------------------------------------------------
 void mafGUICrossIncremental::LayoutStyle(const char* label)
 //----------------------------------------------------------------------------
 {
@@ -244,7 +280,7 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
       wxStaticText *lab  = new wxStaticText(this, -1, label, dp, wxSize(2*LW, LH), wxALIGN_LEFT | wxST_NO_AUTORESIZE );
       wxFont font = wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
 #if WIN32   
-      font.SetPointSize(9);
+      font.SetPointSize(8);
 #endif
       if(m_Bold)
       {
