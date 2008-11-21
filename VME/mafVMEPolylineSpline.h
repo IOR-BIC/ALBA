@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-11-21 15:39:06 $
+  Version:   $Revision: 1.10.2.1 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -116,6 +116,7 @@ public:
 
   /** Get Coefficient used for calculated number of points*/ 
   int GetSplineCoefficient(){return m_SplineCoefficient;}
+  void SetSplineCoefficient(int coeff){m_SplineCoefficient = coeff;}
 
   void SetOrderByAxisFlag(int axis){m_OrderByAxisMode = axis;};
   
