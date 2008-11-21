@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 08:59:14 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-11-21 15:38:49 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -177,7 +177,7 @@ public:
   void Radio(int id,wxString label, int *var, int numchoices = 0, const wxString choices[] = NULL, int dim = 1, wxString tooltip = "", int style = wxRA_SPECIFY_COLS);
 
   /** Combo widget. */
-  void Combo(int id,mafString label, int *var, int numchoices = 0, const wxString choices[] = NULL, mafString tooltip = "");
+  wxComboBox *Combo(int id,mafString label, int *var, int numchoices = 0, const wxString choices[] = NULL, mafString tooltip = "");
 
   /** File open dialog widget. */
   void FileOpen(int id,mafString label,mafString *var, const mafString wildcard = "", mafString tooltip = "");

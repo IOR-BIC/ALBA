@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 08:59:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-11-21 15:38:49 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -665,7 +665,7 @@ void mafGUI::String(int id,wxString label,wxString* var, wxString tooltip, bool 
   long e_style = m_EntryStyle;
   if(multiline)
   {
-    sw *= 2;
+    sw *= 5;
     e_style |= wxTE_MULTILINE|wxTE_WORDWRAP;
   }
   if(password)
@@ -695,6 +695,7 @@ void mafGUI::String(int id,wxString label,wxString* var, wxString tooltip, bool 
     text = new wxTextCtrl  (this, w_id, ""   , dp, wxSize(DW,sw), e_style  );
 		text->SetValidator( mafGUIValidator(this,w_id,text,var) );
     text->SetFont(m_Font);
+
 		if(tooltip != "")
 			text->SetToolTip(tooltip);
 		wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -711,7 +712,7 @@ void mafGUI::String(int id,mafString label, mafString *var, mafString tooltip, b
   long e_style = m_EntryStyle;
   if(multiline)
   {
-    sw *= 2;
+    sw *= 5;
     e_style |= wxTE_MULTILINE|wxTE_WORDWRAP;
   }
   if(password)
@@ -977,7 +978,7 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
 	  text->SetFont(m_Font);
     text->Enable(textBoxEnable);
     w_id_sli  = GetWidgetId(id);
-		sli  = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
+		sli  = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, size);
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
 	  text->SetValidator(mafGUIValidator(this,w_id_text,text,var,sli,min,max));
@@ -998,7 +999,7 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,wxString label,double *var,double 
     text->SetFont(m_Font);
     text->Enable(textBoxEnable);
     w_id_sli = GetWidgetId(id);
-		sli = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
+		sli = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, size);
     if(m_UseBackgroundColor) 
       sli->SetBackgroundColour(m_BackgroundColor);
 
@@ -1037,7 +1038,7 @@ mafGUIFloatSlider *mafGUI::FloatSlider(int id,double *var, double min, double ma
   maxText->SetFont(m_Font);
 
   w_id_sli = GetWidgetId(id);
-  sli = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, wxSize(slider_w,LH));
+  sli = new mafGUIFloatSlider(this, w_id_sli,*var,min,max, dp, size);
   if(m_UseBackgroundColor) 
     sli->SetBackgroundColour(m_BackgroundColor);
 
@@ -1100,7 +1101,7 @@ void mafGUI::Radio(int id,wxString label,int* var, int numchoices, const wxStrin
     radio->SetToolTip(tooltip);
 }
 //----------------------------------------------------------------------------
-void mafGUI::Combo(int id,mafString label,int* var,int numchoices, const wxString choices[], mafString tooltip)
+wxComboBox *mafGUI::Combo(int id,mafString label,int* var,int numchoices, const wxString choices[], mafString tooltip)
 //----------------------------------------------------------------------------
 {
 	wxComboBox *combo = NULL;
@@ -1131,7 +1132,8 @@ void mafGUI::Combo(int id,mafString label,int* var,int numchoices, const wxStrin
 	if(!tooltip.IsEmpty()) 
     combo->SetToolTip(tooltip.GetCStr());
 
-	Add(sizer,0,wxALL, M); 
+	Add(sizer,0,wxALL, M);
+  return combo;
 }
 //----------------------------------------------------------------------------
 void mafGUI::FileOpen(int id,mafString label,mafString* var, const mafString wildcard, mafString tooltip)
