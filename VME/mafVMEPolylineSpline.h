@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 15:39:06 $
-  Version:   $Revision: 1.10.2.1 $
+  Date:      $Date: 2008-11-24 15:14:22 $
+  Version:   $Revision: 1.10.2.2 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -119,11 +119,14 @@ public:
   void SetSplineCoefficient(int coeff){m_SplineCoefficient = coeff;}
 
   void SetOrderByAxisFlag(int axis){m_OrderByAxisMode = axis;};
-  
+ 
+  //void SetMinimumSpacingOptimization(double spacing){m_MinimumSpacing = spacing;}
 
 protected:
   mafVMEPolylineSpline();
   virtual ~mafVMEPolylineSpline();
+
+  //void OptimizeMinimumSpacingSpline();
 
   virtual int InternalStore(mafStorageElement *parent);
   virtual int InternalRestore(mafStorageElement *node);
@@ -143,6 +146,7 @@ protected:
 	vtkPoints					*m_PointsSplined;
 
 	int								m_SplineCoefficient;
+  //double            m_MinimumSpacing;
 
 	mafString					m_PolylineLinkName;
   int               m_OrderByAxisMode;

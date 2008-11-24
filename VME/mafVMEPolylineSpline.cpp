@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2008-11-24 15:14:22 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -38,6 +38,7 @@
 #include "vtkCellArray.h"
 #include "vtkTransformPolyDataFilter.h"
 
+#include "vtkMath.h"
 
 #include <assert.h>
 
@@ -68,8 +69,10 @@ mafVMEPolylineSpline::mafVMEPolylineSpline()
 	m_PointsSplined = NULL;
 	vtkNEW(m_PointsSplined);
 
-	m_SplineCoefficient = 5;
+	m_SplineCoefficient = 100;
   m_OrderByAxisMode   = AXIS_NONE;
+
+  //m_MinimumSpacing = 0.;
 }
 //-------------------------------------------------------------------------
 mafVMEPolylineSpline::~mafVMEPolylineSpline()
@@ -397,10 +400,46 @@ void mafVMEPolylineSpline::SplinePolyline(vtkPolyData *polyline)
 
   }
 
+  /*if(m_MinimumSpacing != 0.)
+    OptimizeMinimumSpacingSpline();*/
+
   polyline->SetPoints(m_PointsSplined);
   polyline->Update();
 
 }
+/*/-------------------------------------------------------------------------
+void mafVMEPolylineSpline::OptimizeMinimumSpacingSpline()
+//-------------------------------------------------------------------------
+{
+  vtkPoints *points = vtkPoints::New();
+
+  double minimumSpacing2 = m_MinimumSpacing * m_MinimumSpacing;
+  double previousPoint[3];
+  for(int i = 0; i< m_PointsSplined->GetNumberOfPoints(); i++)
+  {
+    if(i == 0)
+    {
+      m_PointsSplined->GetPoint(i,previousPoint);
+      points->InsertNextPoint(previousPoint);
+    }
+    else
+    {
+      double controlPoint[3];
+      m_PointsSplined->GetPoint(i,controlPoint);
+      double distance2 = vtkMath::Distance2BetweenPoints(controlPoint,previousPoint);
+      if(minimumSpacing2 < distance2)
+      {
+        points->InsertNextPoint(controlPoint);
+        m_PointsSplined->GetPoint(i,previousPoint);
+      }
+    }
+    
+
+  }
+
+  m_PointsSplined->DeepCopy(points);
+  vtkDEL(points);
+}*/
 //-------------------------------------------------------------------------
 mmaMaterial *mafVMEPolylineSpline::GetMaterial()
 //-------------------------------------------------------------------------
