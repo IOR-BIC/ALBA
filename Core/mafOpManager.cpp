@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 15:37:41 $
-  Version:   $Revision: 1.40.2.6 $
+  Date:      $Date: 2008-11-25 11:01:19 $
+  Version:   $Revision: 1.40.2.7 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -757,7 +757,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
   mafString parameters;
   mafString appStamp;
   mafString userID;
-  mafString isNatural;
+  mafString isNatural = "false";
   wxString revision;
   wxString dateAndTime;
 
@@ -799,8 +799,13 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
 #endif
    
     if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
+    {
       isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
-
+      if (isNatural.Compare("NATURAL") == 0)
+        isNatural = "true";
+      else
+        isNatural = "false";
+    }
     traceability->AddTraceabilityEvent(trialEvent, operationName, parameters, dateAndTime, appStamp, userID, isNatural);
   }
 
@@ -843,8 +848,14 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
           RegKey.QueryValue(wxString("DisplayName"), revision);
         }
 
-        if(node->GetTagArray()->IsTagPresent("VME_NATURE"))
-          isNatural = node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
+        if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
+        {
+          isNatural = in_node->GetTagArray()->GetTag("VME_NATURE")->GetValue();
+          if (isNatural.Compare("NATURAL") == 0 )
+            isNatural = "true";
+          else
+            isNatural = "false";
+        }
 
         if (out_node->GetNumberOfChildren() == 0 || c == 1)
         {
