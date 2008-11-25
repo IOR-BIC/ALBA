@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:05 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2008-11-25 14:47:32 $
+  Version:   $Revision: 1.20.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -143,6 +143,9 @@ public:
 protected:
   /** Create a compressed msf file: zmsf.*/
   bool MakeZip(const mafString &zipname, wxArrayString *files);
+
+  /** Set tag with creation date for the node passed as argument.*/
+  void AddCreationDate(mafNode *vme);
 
   bool              m_Modified;     ///< Used to known when the tree has been modified...
 

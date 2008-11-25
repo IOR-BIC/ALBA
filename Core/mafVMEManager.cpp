@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-26 14:57:25 $
-  Version:   $Revision: 1.43 $
+  Date:      $Date: 2008-11-25 14:47:32 $
+  Version:   $Revision: 1.43.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,6 +199,7 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
 		tag_appstamp.SetName("APP_STAMP");
 		tag_appstamp.SetValue(this->m_AppStamp.GetCStr());
 		m_Storage->GetRoot()->GetTagArray()->SetTag(tag_appstamp);
+    AddCreationDate(m_Storage->GetRoot());
 		mafEventMacro(mafEvent(this,VME_ADDED,m_Storage->GetRoot()));
 		mafEventMacro(mafEvent(this,VME_SELECTED,m_Storage->GetRoot()));
 	}
@@ -206,6 +207,21 @@ void mafVMEManager::MSFNew(bool notify_root_creation)
   m_MSFFile = ""; //next MSFSave will ask for a filename
   m_ZipFile = ""; 
 }
+
+//----------------------------------------------------------------------------
+void mafVMEManager::AddCreationDate(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  wxString dateAndTime;
+  wxDateTime time = wxDateTime::UNow();
+  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth(), time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
+ 
+  mafTagItem tag_creationDate;
+  tag_creationDate.SetName("Creation_Date");
+  tag_creationDate.SetValue(dateAndTime);
+  vme->GetTagArray()->SetTag(tag_creationDate);
+}
+
 //----------------------------------------------------------------------------
 void mafVMEManager::MSFOpen(int file_id)
 //----------------------------------------------------------------------------
