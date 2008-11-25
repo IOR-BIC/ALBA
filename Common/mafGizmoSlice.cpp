@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 14:39:17 $
-  Version:   $Revision: 1.21.2.1 $
+  Date:      $Date: 2008-11-25 09:47:58 $
+  Version:   $Revision: 1.21.2.2 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -81,7 +81,7 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_Id        = 0;
 
 	m_CustomizedSnapArrayFlag = false;
-	m_CustomizedArrayStep = 1.0;
+	m_CustomizedArrayStep = 0.1;
   
 
   mafNEW(m_VmeGizmo);
