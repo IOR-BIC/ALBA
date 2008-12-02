@@ -57,6 +57,13 @@ SET(PROJECT_SRCS
   medVisualPipePolylineGraph.cpp
   medVisualPipePolylineGraph.h
 
+  medVMEComputeWrapping.h
+  medVMEComputeWrapping.cpp
+  medPipeComputeWrapping.h
+  medPipeComputeWrapping.cpp
+  medVMEOutputComputeWrapping.cpp
+  medVMEOutputComputeWrapping.h 
+
 )
 
 IF (MAF_USE_ITK)

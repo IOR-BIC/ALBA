@@ -62,6 +62,9 @@ SET(PROJECT_SRCS
   medOpCreateWrappedMeter.cpp
   medOpCreateWrappedMeter.h
   
+  medOpComputeWrapping.h
+  medOpComputeWrapping.cpp  
+  
   medOpExporterWrappedMeter.cpp
   medOpExporterWrappedMeter.h
 
