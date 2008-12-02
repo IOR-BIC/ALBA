@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:05:59 $
-Version:   $Revision: 1.24 $
+Date:      $Date: 2008-12-02 15:07:55 $
+Version:   $Revision: 1.24.2.1 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -270,4 +270,11 @@ void mafPipeIsosurface::SetAlphaValue(double value)
 	m_ContourMapper->SetAlpha(m_AlphaValue);
 	m_ContourMapper->Modified();
 	m_Vme->ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
+}
+//----------------------------------------------------------------------------
+void mafPipeIsosurface::SetActorVisibility(int visibility)
+//----------------------------------------------------------------------------
+{
+  m_Volume->SetVisibility(visibility);
+  m_Volume->Modified();
 }
