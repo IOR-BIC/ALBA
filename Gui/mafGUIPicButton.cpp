@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIPicButton.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-02 15:07:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,27 +36,27 @@ END_EVENT_TABLE()
 
 IMPLEMENT_DYNAMIC_CLASS(mafGUIPicButton,wxBitmapButton)
 //----------------------------------------------------------------------------
-mafGUIPicButton::mafGUIPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id, mafObserver *listener)
+mafGUIPicButton::mafGUIPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id, mafObserver *listener, int offset)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
   m_Id = id;
 
   wxBitmap b = mafPics.GetBmp(BitmapId);
-  wxSize size(b.GetWidth(),b.GetHeight());
+  wxSize size(b.GetWidth()+offset,b.GetHeight()+offset);
 
   //Create(parent, m_Id, b, wxDefaultPosition, size,0);
   Create(parent, m_Id, b, wxDefaultPosition, size);
   SetBitmap(BitmapId,id);
 }
 //----------------------------------------------------------------------------
-mafGUIPicButton::mafGUIPicButton(wxWindow *parent, wxBitmap *b, wxWindowID id, mafObserver *listener)
+mafGUIPicButton::mafGUIPicButton(wxWindow *parent, wxBitmap *b, wxWindowID id, mafObserver *listener, int offset)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
   m_Id = id;
 
-  wxSize size(b->GetWidth(),b->GetHeight());
+  wxSize size(b->GetWidth()+offset,b->GetHeight()+offset);
   //Create(parent, m_Id, *b, wxDefaultPosition, size,0);
   Create(parent, m_Id, *b, wxDefaultPosition, size);
 

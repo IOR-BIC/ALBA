@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIPicButton.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-02 15:07:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,8 +37,8 @@ DECLARE_DYNAMIC_CLASS(mafGUIPicButton)
 
 public:
   mafGUIPicButton() {};
-  mafGUIPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0, mafObserver *listener = NULL);
-  mafGUIPicButton(wxWindow *parent, wxBitmap *b, wxWindowID id = 0, mafObserver *listener = NULL);
+  mafGUIPicButton(wxWindow *parent, wxString BitmapId, wxWindowID id = 0, mafObserver *listener = NULL, int offset = 0);
+  mafGUIPicButton(wxWindow *parent, wxBitmap *b, wxWindowID id = 0, mafObserver *listener = NULL, int offset = 0);
 
   /** Set the Listener that will receive event-notification. */
   void SetListener(mafObserver *listener);
