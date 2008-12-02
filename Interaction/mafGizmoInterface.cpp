@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-04 18:03:33 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2008-12-02 15:58:35 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-
+#include <stdio.h>
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
@@ -57,4 +57,61 @@ void mafGizmoInterface::SendTransformMatrix(mafMatrix* matrix, int eventId, long
 mafObserver * mafGizmoInterface::GetListener()
 {
   return m_Listener;
+}
+
+void mafGizmoInterface::SetListener( mafObserver *listener )
+{
+
+
+  m_Listener = listener;
+}
+
+void mafGizmoInterface::SetInput( mafVME *vme )
+{
+  m_InputVME = vme;
+}
+
+void mafGizmoInterface::OnEvent( mafEventBase *maf_event )
+{
+  // Not implemented
+}
+
+void mafGizmoInterface::Show( bool show )
+{
+  // Not implemented
+}
+
+mafVME * mafGizmoInterface::GetInput()
+{
+  return this->m_InputVME;
+}
+
+void mafGizmoInterface::SetModalityToLocal()
+{
+  this->m_Modality = G_LOCAL;
+}
+
+void mafGizmoInterface::SetModalityToGlobal()
+{
+  this->m_Modality = G_GLOBAL;
+}
+
+int mafGizmoInterface::GetModality()
+{
+  return this->m_Modality;
+}
+
+void mafGizmoInterface::SetAbsPose( mafMatrix *absPose )
+{
+  // not implemented
+}
+
+mafMatrix * mafGizmoInterface::GetAbsPose()
+{
+  return NULL;
+}
+
+mafGUI * mafGizmoInterface::GetGui()
+{
+  return NULL;
 }
