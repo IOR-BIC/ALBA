@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttributeTraceability.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-06 09:57:01 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2008-12-02 14:06:07 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -169,6 +169,7 @@ int mafAttributeTraceability::InternalRestore(mafStorageElement *node)
 
     try
     {
+      int iCreateIdx = 0;   //BES: 27.11.2008 - BUG FIX
       for (int i  = 0; i < listTrialEvent.size(); i++)
       {
         m_Traceability traceability;
@@ -182,7 +183,8 @@ int mafAttributeTraceability::InternalRestore(mafStorageElement *node)
         listOperatorID[i]->RestoreText(traceability.m_OperatorID);
         if (traceability.m_TrialEvent == "Create")
         {
-          listIsNatural[i]->RestoreText(traceability.m_IsNatural);  
+          //BES: 27.11.2008 - BUG FIX - listIsNatural can contain less items than listTrialEvent
+          listIsNatural[iCreateIdx++]->RestoreText(traceability.m_IsNatural);  
         }
         m_TraceabilityVector.push_back(traceability);
       }
