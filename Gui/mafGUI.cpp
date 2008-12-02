@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 15:38:49 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2008-12-02 15:05:17 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1295,7 +1295,24 @@ mafGUILutSwatch *mafGUI::Lut(int id,wxString label,vtkLookupTable *lut)
   return luts;
 }
 #endif             //:::::::::::::::::::::::::::::::::
+//----------------------------------------------------------------------------
+void mafGUI::TwoButtons(int firstID, int secondID, const char* label1, const char* label2, int alignment /* = wxALL */)
+//----------------------------------------------------------------------------
+{
+  int w_idFirst = GetWidgetId(firstID);
+  int w_idSecond = GetWidgetId(secondID);
+  mafGUIButton    *b1 = new mafGUIButton(this, w_idFirst, label1,dp, wxSize(FW/2,BH) );
+  b1->SetValidator( mafGUIValidator(this,w_idFirst,b1) );
+  b1->SetFont(m_Font);
+  mafGUIButton    *b2 = new mafGUIButton(this, w_idSecond, label2, dp, wxSize(FW/2,BH) );
+  b2->SetValidator( mafGUIValidator(this,w_idSecond,b2) );
+  b2->SetFont(m_Font);
 
+  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+  sizer->Add( b1, 0);
+  sizer->Add( b2, 0);
+  Add(sizer,0,wxALL|alignment, M);
+}
 //----------------------------------------------------------------------------
 void mafGUI::OkCancel(int alignment)
 //----------------------------------------------------------------------------
