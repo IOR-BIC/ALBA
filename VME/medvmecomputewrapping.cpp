@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medvmecomputewrapping.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 11:57:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-12-02 12:27:59 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@
 #include "vtkCellArray.h"
 #include <math.h>
 #include <assert.h>
-#include <vld.h>
+//#include <vld.h>
 
 MAF_ID_IMP(medVMEComputeWrapping::LENGTH_THRESHOLD_EVENT);
 
