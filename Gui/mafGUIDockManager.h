@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-02 15:06:44 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -782,11 +782,11 @@ class WXDLLEXPORT mafGUIDockManager : public wxFrameManager
 //---------------------------------------------------------------------------
 {
 public:
-  virtual bool AddPane(wxWindow* window,const wxPaneInfo& pane_info);
-  virtual bool AddPane(wxWindow* window,int direction = wxLEFT,const wxString& caption = wxEmptyString);
+  virtual bool AddPane(wxWindow* window,const wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
+  virtual bool AddPane(wxWindow* window,int direction = wxLEFT,const wxString& caption = wxEmptyString);	
   virtual void Update();
 protected:
-  void AddMenuItem(wxWindow* window,const wxString& caption = wxEmptyString);
+	void AddMenuItem(wxWindow* window,const wxString& caption = wxEmptyString, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString );
   void UpdateMenuItems();
 };  
 

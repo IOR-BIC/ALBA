@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-02 15:06:44 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -471,10 +471,10 @@ void mafGUIMDIFrame::ShowDockSettings()
 }
 */
 //-----------------------------------------------------------
-void mafGUIMDIFrame::AddDockPane(wxWindow *window, wxPaneInfo& pane_info)
+void mafGUIMDIFrame::AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu, const wxString &subMenu)
 //-----------------------------------------------------------
 {
-  m_DockManager.AddPane(window,pane_info);
+  m_DockManager.AddPane(window,pane_info, menu, subMenu);
   m_DockManager.Update();
 }
 //-----------------------------------------------------------

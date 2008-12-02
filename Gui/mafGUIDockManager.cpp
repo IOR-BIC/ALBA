@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-02 15:06:44 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -4181,10 +4181,10 @@ void wxFrameManager::OnPaneButton(wxFrameManagerEvent& event)
 
 
 //--------------------------------------------------------------------------
-bool mafGUIDockManager::AddPane(wxWindow* window,const wxPaneInfo& pane_info)
+bool mafGUIDockManager::AddPane(wxWindow* window,const wxPaneInfo& pane_info, const wxString &menu, const wxString &subMenu)
 //--------------------------------------------------------------------------
 {
-  AddMenuItem(window,pane_info.caption);
+  AddMenuItem(window,pane_info.caption, menu, subMenu);
   return wxFrameManager::AddPane(window,pane_info);
 }
 //--------------------------------------------------------------------------
@@ -4202,7 +4202,7 @@ void mafGUIDockManager::Update()
   UpdateMenuItems();
 }
 //--------------------------------------------------------------------------
-void mafGUIDockManager::AddMenuItem(wxWindow* window,const wxString& caption)
+void mafGUIDockManager::AddMenuItem(wxWindow* window,const wxString& caption , const wxString &menu, const wxString &subMenu)
 //--------------------------------------------------------------------------
 {
   if (!caption.IsEmpty())
@@ -4210,11 +4210,23 @@ void mafGUIDockManager::AddMenuItem(wxWindow* window,const wxString& caption)
     wxMenuBar* menubar = this->m_Frame->GetMenuBar();
     if ( menubar )
     {
-      int idx = menubar->FindMenu(_("&View"));
+      int idx = menubar->FindMenu(menu);
       if( idx != wxNOT_FOUND)
       {
         wxMenu *m = menubar->GetMenu(idx);
-        m->Append(window->GetId(), caption, "", wxITEM_CHECK);
+				if(subMenu != wxEmptyString)
+				{
+					int ids = m->FindItem(subMenu);
+					wxMenuItem *sm = m->FindItem(ids);
+					if( ids != wxNOT_FOUND && sm->GetSubMenu())
+					{		
+						sm->GetSubMenu()->Append(window->GetId(), caption, "", wxITEM_CHECK);
+					}
+				}
+				else
+				{
+          m->Append(window->GetId(), caption, "", wxITEM_CHECK);
+				}
         //m_MenuBar->Check(id,);
       }
     }

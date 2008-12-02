@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-02 15:06:44 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -53,7 +53,7 @@ class mafGUIMDIFrame: public wxMDIParentFrame
 
   /** add a new Dockable Pane containig the given Window.
   pane_info specify the Pane settings */
-  void AddDockPane(wxWindow *window, wxPaneInfo& pane_info);
+  void AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
   
   /** remove a Dockable Pane  - the contained window is not destroyed */
   void RemoveDockPane(wxString pane_name);
