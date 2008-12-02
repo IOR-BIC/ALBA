@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 15:38:02 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2008-12-02 15:05:31 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -144,7 +144,7 @@ void mafGUICrossIncremental::CreateWidgetTextEntry(double min , double max , int
 {
 	
 	//w_id = ((mafGUI *) parent)->GetWidgetId(w_id);
-	m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.2f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
+	m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.1f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
 	m_StepText->SetValidator( mafGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,decimal_digit)  );
 	//m_StepText->SetFont(m_Font);
 	//if(!tooltip.IsEmpty())
