@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFDataPipe.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-22 16:58:40 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2008-12-09 18:38:19 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "mafEventBase.h"
 
 #include "mafVTKInterpolator.h"
+#include "mafVME.h"
 
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
@@ -157,9 +158,8 @@ void vtkMAFDataPipe::Execute()
 {
   if (GetInput())
   {
-    // forward event to MAF data pipe
-    m_DataPipe->OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_UPDATE));
-
+    if(m_DataPipe->IsA("mafDataPipeCustom"))
+      m_DataPipe->OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_UPDATE));
     for (int i=0;i<GetNumberOfInputs();i++)
     {
       if (GetNumberOfOutputs()>i)
@@ -173,5 +173,8 @@ void vtkMAFDataPipe::Execute()
         vtkErrorMacro("DEBUG: NULL output pointer!");
       }
     }
+    // forward event to MAF data pipe
+    if(!m_DataPipe->IsA("mafDataPipeCustom"))
+      m_DataPipe->OnEvent(&mafEventBase(this,VME_OUTPUT_DATA_UPDATE));
   }
 }
