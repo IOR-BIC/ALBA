@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVOIDensity.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2008-12-10 14:28:55 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -13,18 +13,13 @@
 #ifndef __mafOpVOIDensity_H__
 #define __mafOpVOIDensity_H__
 
-#include "mafVME.h"
-#include "mafEvent.h"
-#include "mafVMEVolume.h"
-#include "mafVMEOutputSurface.h"
 #include "mafOp.h"
+#include "mafVME.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mafNode;
 class vtkDoubleArray;
-class mafString;
 
 //----------------------------------------------------------------------------
 // mafOpVOIDensity :

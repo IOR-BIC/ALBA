@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpVOIDensity.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2008-12-10 14:28:55 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,19 +17,16 @@
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
-#include "mafEvent.h"
-#include "mafGUI.h"
-#include "mafOp.h"
-#include "mafString.h"
+
 #include "mafOpVOIDensity.h"
-#include "mafEventBase.h"
+#include "mafGUI.h"
+
+#include "mafNode.h"
 
 #include "mafVMEOutputSurface.h"
-
 #include "mafAbsMatrixPipe.h"
 
 #include "vtkMAFSmartPointer.h"
-#include "mafNode.h"
 
 #include "vtkFeatureEdges.h"
 #include "vtkDataArray.h"
