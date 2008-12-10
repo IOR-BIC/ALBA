@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPath.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2008-12-10 15:19:47 $
+  Version:   $Revision: 1.10.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -196,7 +196,7 @@ void mafGizmoPath::SetCurvilinearAbscissa( double s )
   }
 
   m_VmeGizmoPath->SetTextPosition(pos);
-  m_VmeGizmoPath->SetTextValue(wxString::Format("%.0f", m_CurvilinearAbscissa>0?floor(m_CurvilinearAbscissa + 0.5):0.0));
+  m_VmeGizmoPath->SetTextValue(wxString::Format("%.1f", m_CurvilinearAbscissa>0?floor(m_CurvilinearAbscissa + 0.5):0.0));
   
 }
 
