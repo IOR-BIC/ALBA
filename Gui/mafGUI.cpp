@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:05:17 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2008-12-10 15:19:19 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -402,12 +402,12 @@ void mafGUI::Button  (int id,mafString *label,mafString button_text, mafString t
 	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */, bool boldLabel /* = true */)
+mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */, bool boldLabel /* = true */, bool comboStep /* = false*/)
 //----------------------------------------------------------------------------
 {
   int width = (label == "") ? FW : DW;
   
-  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp);
+  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp, wxDefaultSize, MINFLOAT, MAXFLOAT, -1,wxTAB_TRAVERSAL|wxCLIP_CHILDREN, comboStep);
   cI->SetListener(this);
   
 	Add(cI,0,wxALL, M); 
@@ -1312,6 +1312,29 @@ void mafGUI::TwoButtons(int firstID, int secondID, const char* label1, const cha
   sizer->Add( b1, 0);
   sizer->Add( b2, 0);
   Add(sizer,0,wxALL|alignment, M);
+}
+//----------------------------------------------------------------------------
+void mafGUI::MultipleButtons(int numButtons, int numColumns, std::vector<int> &ids, std::vector<const char*> &labels, int alignment)
+//----------------------------------------------------------------------------
+{
+  std::vector<int> w_ids;
+  std::vector<mafGUIButton *> button_list;
+  for(int i=0; i< ids.size(); i++)
+  {
+    w_ids.push_back(GetWidgetId(ids[i]));
+    button_list.push_back(new mafGUIButton(this, w_ids[i], labels[i] ,dp, wxSize(FW/numColumns,BH) ));
+    button_list[i]->SetValidator( mafGUIValidator(this,w_ids[i],button_list[i]));
+    button_list[i]->SetFont(m_Font);
+  }
+
+  int rows = numButtons / numColumns;
+  wxFlexGridSizer *fgSizer=  new wxFlexGridSizer( rows, numColumns, 1, 1 );
+  for(int i = 0; i < button_list.size(); i++)
+  {
+    fgSizer->Add(button_list[i],0,0);
+  }
+
+  Add(fgSizer,0,wxALL|alignment, M);
 }
 //----------------------------------------------------------------------------
 void mafGUI::OkCancel(int alignment)
