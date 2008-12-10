@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 16:07:01 $
-  Version:   $Revision: 1.26.2.1 $
+  Date:      $Date: 2008-12-10 14:54:00 $
+  Version:   $Revision: 1.26.2.2 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,7 +117,11 @@ public:
   /* Function for the correction of slice pose in case of currentvolume pose matrix is different from identity */
   void VolumePositionCorrection(double *point);
 
+  /* Update the visualization of the border */
   void BorderUpdate();
+  
+  /* Set the opacity of the border if exist */
+  void SetBorderOpacity(double value);
 
 protected:
   virtual mafGUI *CreateGui();

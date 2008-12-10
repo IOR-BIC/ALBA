@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 16:07:01 $
-  Version:   $Revision: 1.51.2.1 $
+  Date:      $Date: 2008-12-10 14:54:00 $
+  Version:   $Revision: 1.51.2.2 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -718,6 +718,17 @@ void mafViewSlice::BorderCreate(double col[3])
   vtkDEL(coord);
   vtkDEL(pdmd);
   vtkDEL(pd);
+}
+//----------------------------------------------------------------------------
+void mafViewSlice::SetBorderOpacity(double value)
+//----------------------------------------------------------------------------
+{
+  if(m_Border)
+  {
+    m_Border->GetProperty()->SetOpacity(value);
+    m_Border->Modified();
+  }
+
 }
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderDelete()
