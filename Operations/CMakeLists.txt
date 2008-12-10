@@ -89,6 +89,8 @@ IF (MAF_USE_VTK)
     mafOpVolumeResample.h
     mafOpVOIDensity.cpp
     mafOpVOIDensity.h
+    mafOpVOIDensityEditor.cpp
+    mafOpVOIDensityEditor.h
     mafOpImporterVRML.cpp
     mafOpImporterVRML.h
     mafOpExporterVTK.cpp
