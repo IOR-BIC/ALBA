@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 15:38:02 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2008-12-10 15:19:33 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -24,6 +24,7 @@
 // Forward refs:
 //----------------------------------------------------------------------------
 class mafGUIButton;
+class mafGUIComboBox;
 
 //----------------------------------------------------------------------------
 // constant
@@ -59,7 +60,8 @@ public:
                   const wxPoint& pos = wxDefaultPosition, 
                   const wxSize& size = wxDefaultSize,
                   double min = MINFLOAT, double max = MAXFLOAT, int decimal_digit = -1,
-                  long style = wxTAB_TRAVERSAL | wxCLIP_CHILDREN);
+                  long style = wxTAB_TRAVERSAL | wxCLIP_CHILDREN,
+                  bool comboStep = false);
 
   virtual ~mafGUICrossIncremental();
 
@@ -85,11 +87,9 @@ public:
     ID_BUTTON_RIGHT,
     ID_BUTTON_BOTTOM,
     ID_STEP_ENTRY,
+    ID_COMBO_ENTRY,
   };
 
-  void CreateWidgetTopBottom();
-	void CreateWidgetLeftRight();
-	void CreateWidgetTextEntry(double min, double max, int decimal_digit);
 	
 	void EnableStep(bool value);
 
@@ -102,6 +102,7 @@ public:
 
 
   void SetStepVariable(double step){if(m_StepText) *m_StepVariable = step;m_StepText->SetValue(wxString::Format("%.2f", *m_StepVariable));}
+  void SetComboBoxItems(wxArrayString &array, int selected = 0);
 
   void LayoutStyle(const char *label);
 
@@ -110,13 +111,21 @@ public:
   void SetTextButtonLeft(const char *text);
   void SetTextButtonRight(const char *text);
 
+  mafGUIComboBox *GetComboBox(){return m_StepComboBox;}
+
 private:
+  void CreateWidgetTopBottom();
+  void CreateWidgetLeftRight();
+  void CreateWidgetTextEntry(double min, double max, int decimal_digit);
+  void CreateWidgetComboBox();
+  void ConvertStepComboIntoStepVariable();
 
   mafGUIButton    *m_ButtonTop;
   mafGUIButton    *m_ButtonBottom;
   mafGUIButton    *m_ButtonLeft;
   mafGUIButton    *m_ButtonRight;
   wxTextCtrl   *m_StepText;
+  mafGUIComboBox *m_StepComboBox;
 
 	wxBoxSizer      *m_Sizer;
 
@@ -132,6 +141,8 @@ private:
   double            *m_StepVariable;
   mafObserver*      m_Listener;
 	int               m_IdLayout;
+
+  bool m_IsComboStep;
 
   DECLARE_EVENT_TABLE()
 };

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:05:31 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2008-12-10 15:19:33 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -27,6 +27,7 @@
 #include "mafGUICrossIncremental.h"
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"
+#include "mafGUIComboBox.h"
 
 //----------------------------------------------------------------------------
 // costants :
@@ -63,7 +64,7 @@ END_EVENT_TABLE()
 #define FONTSIZE 9
 
 //----------------------------------------------------------------------------
-mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, const char * label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, bool boldLabel /* = true */, int modality /* = ID_COMPLETE_LAYOUT */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, double min /* = MINFLOAT */, double max /* = MAXFLOAT */, int decimal_digit /* = -1 */, long style /* = wxTAB_TRAVERSAL | wxCLIP_CHILDREN */)
+mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, const char * label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, bool boldLabel /* = true */, int modality /* = ID_COMPLETE_LAYOUT */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxDefaultSize */, double min /* = MINFLOAT */, double max /* = MAXFLOAT */, int decimal_digit /* = -1 */, long style /* = wxTAB_TRAVERSAL | wxCLIP_CHILDREN */, bool comboStep /* = false */)
 :mafGUIPanel(parent,id,pos,size,style) 
 //----------------------------------------------------------------------------
 {
@@ -79,15 +80,22 @@ mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, 
 	m_ButtonLeft= NULL;
 	m_ButtonRight= NULL;
 	m_StepText= NULL;
+  m_StepComboBox = NULL;
 
 	m_Sizer = NULL;
   m_Increment = 0;
 	m_Bold = boldLabel;
+
+  m_IsComboStep = comboStep;
 	
 	
   CreateWidgetTopBottom();
 	CreateWidgetLeftRight();
-	CreateWidgetTextEntry(min, max, decimal_digit );
+
+  if(!comboStep)
+	  CreateWidgetTextEntry(min, max, decimal_digit );
+  else
+    CreateWidgetComboBox();
 
   LayoutStyle(label);
   
@@ -149,6 +157,28 @@ void mafGUICrossIncremental::CreateWidgetTextEntry(double min , double max , int
 	//m_StepText->SetFont(m_Font);
 	//if(!tooltip.IsEmpty())
 	//  text->SetToolTip(tooltip.GetCStr());
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::CreateWidgetComboBox()
+//----------------------------------------------------------------------------
+{
+  wxArrayString array;
+  m_StepComboBox= new mafGUIComboBox(this, ID_COMBO_ENTRY ,array ,wxDefaultPosition, wxSize(EW,BH),wxCB_READONLY );
+  m_StepComboBox->SetListener(this);
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetComboBoxItems(wxArrayString &array, int selected)
+//----------------------------------------------------------------------------
+{
+  if(m_StepComboBox)
+  {
+    m_StepComboBox->Clear();
+    for(int i=0; i< array.Count(); i++)
+    {
+      m_StepComboBox->Insert(array[i], i);
+    }
+    m_StepComboBox->SetSelection(selected);
+  }
 }
 //----------------------------------------------------------------------------
 mafGUICrossIncremental::~mafGUICrossIncremental( ) 
@@ -213,14 +243,24 @@ void mafGUICrossIncremental::OnEvent(mafEventBase *maf_event)
       m_TopBottomVariation = 0.0;
       m_LeftRightVariation = 0.0;
 			break;
+    case ID_COMBO_ENTRY:
+      {
+        ConvertStepComboIntoStepVariable();
+        /*mafString value;
+        value << *m_StepVariable;
+        wxMessageBox(value.GetCStr());*/
+      }
+      break;
     default:
       e->Log();
       break;
     }
 
-    
-		e->SetId(GetId());
-		mafEventMacro(*e);
+    if(eventId != ID_COMBO_ENTRY)
+    {
+		  e->SetId(GetId());
+		  mafEventMacro(*e);
+    }
   }
 }
 //----------------------------------------------------------------------------
@@ -306,7 +346,10 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
 
       sizerMiddle->AddSpacer(LM);    
       //sizerMiddle->AddSpacer(EW);
-      sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
+      if(!m_IsComboStep)
+        sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
+      else
+        sizerMiddle->Add( m_StepComboBox, 0, wxALIGN_CENTRE, 0);
       
       sizerBottom->AddSpacer(LM);
       sizerBottom->Add( m_ButtonBottom, 0, wxALIGN_LEFT, 0);
@@ -348,7 +391,10 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
       m_Sizer->Add(lab, 0, wxALIGN_LEFT, 0);
 
       m_Sizer->Add( m_ButtonLeft, 0, wxALIGN_LEFT, 0);
-      m_Sizer->Add( m_StepText, 0, wxALIGN_LEFT, 0);
+      if(!m_IsComboStep)
+        m_Sizer->Add( m_StepText, 0, wxALIGN_LEFT, 0);
+      else
+        m_Sizer->Add( m_StepComboBox, 0, wxALIGN_LEFT, 0);
       m_Sizer->Add( m_ButtonRight, 0, wxALIGN_LEFT, 0);
 
       //((mafGUI *)parent)->Add(sizer,0,wxALL, 0);
@@ -388,6 +434,7 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
       if(m_ButtonLeft != NULL) sizerMiddle->Add( m_ButtonLeft, 0, wxALIGN_CENTRE, 0);
       //sizerMiddle->AddSpacer(EW);
       if(m_StepText != NULL) sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
+      if(m_StepComboBox != NULL) sizerMiddle->Add( m_StepComboBox, 0, wxALIGN_CENTRE, 0);
       if(m_ButtonRight != NULL) sizerMiddle->Add( m_ButtonRight, 0, wxALIGN_CENTRE, 0);
 
 
@@ -408,6 +455,14 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
 
     }
     break;
+  } 
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::ConvertStepComboIntoStepVariable()
+//----------------------------------------------------------------------------
+{
+  if(m_StepComboBox)
+  {
+    *m_StepVariable = atof(m_StepComboBox->GetValue());
   }
-  
 }
