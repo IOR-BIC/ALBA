@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-25 09:47:58 $
-  Version:   $Revision: 1.21.2.2 $
+  Date:      $Date: 2008-12-11 16:09:22 $
+  Version:   $Revision: 1.21.2.3 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -136,7 +136,7 @@ mafGizmoSlice::~mafGizmoSlice()
   DestroyGizmoSlice();
 }
 //----------------------------------------------------------------------------
-void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double localPositionOnAxis)
+void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int axis, double localPositionOnAxis, bool visibleCubeHandler)
 //----------------------------------------------------------------------------
 {
   //register gizmo axis
@@ -163,7 +163,13 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 	  vtkMAFSmartPointer<vtkPlaneSource> ps;
 	  ps->SetOrigin(cubeHandleLocalPosition);
 
+    
     double borderCube = VolumeVTKData->GetLength()/50;
+
+    if(visibleCubeHandler == false)
+    {
+      borderCube = 0;
+    }
 
     double inversion = 1.;
     if(false == m_InverseHandle)
@@ -238,7 +244,8 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 
     // append outline and handle
 	  vtkMAFSmartPointer<vtkAppendPolyData> apd;
-    apd->AddInput(cs->GetOutput());
+    if(visibleCubeHandler == true)
+      apd->AddInput(cs->GetOutput());
 	  apd->AddInput(of->GetOutput());
 	  apd->Update();
 
