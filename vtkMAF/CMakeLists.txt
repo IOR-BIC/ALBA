@@ -16,6 +16,8 @@ SET(vtkMAF_SRCS
   vtkMAFClipSurfaceBoundingBox.h
   vtkMAFContourVolumeMapper.cxx
   vtkMAFContourVolumeMapper.h
+  vtkMAFContourVolumeMapperGPU.cxx
+  vtkMAFContourVolumeMapperGPU.h
 #  vtkMAFContourVolumeMapperAdv.cxx
   vtkMAFDistanceFilter.cxx
   vtkMAFDistanceFilter.h
@@ -77,6 +79,7 @@ SET(vtkMAF_LIBS
   vtkRendering
   vtkFiltering
   vtkGraphics
+  GPUAPI
 )
 
 #-----------------------------------------------------------------------------
