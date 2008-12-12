@@ -1,0 +1,77 @@
+uniform sampler3D function_tex;
+uniform float threshold;
+//uniform vec3 delta 
+
+void main()
+{
+	vec2 foo = vec2(HP_COLS,HP_ROWS)*gl_TexCoord[0].xy;
+	float slice = dot(vec2(1.0,float(HP_COLS)), floor(foo));
+	
+	
+	if(slice < (FUNC_SLICES-1)) 
+	{
+		vec3 delta = vec3( 1.0/FUNC_TSIZE, 1.0/FUNC_TSIZE, 1.0/FUNC_SLICES);
+		vec3 tp = vec3( fract(foo), delta.z *(slice+0.5) );
+
+		vec3 ll[3];
+
+		vec2 xy=delta.xy*0.5;
+		tp.xy -=xy;
+
+		for(int j=0;j<3;j++)//y
+		{
+			vec3 coor =tp;
+
+			coor.y +=delta.y *j;
+
+			ll[j].x = texture3D( function_tex, coor ).a;
+			coor.x+=delta.x;
+			ll[j].y = texture3D( function_tex, coor ).a;
+			coor.x+=delta.x;
+			ll[j].z = texture3D( function_tex, coor ).a;
+		}
+		vec3 l0 =greaterThan(ll[0], threshold);
+		vec3 l1 =greaterThan(ll[1], threshold);
+		vec3 l2 =greaterThan(ll[2], threshold);
+
+
+
+		tp.z+=delta.z;
+		for(int j=0;j<3;j++)//y
+		{
+			vec3 coor =tp;
+
+			coor.y +=delta.y *j;
+
+			ll[j].x = texture3D( function_tex, coor ).a;
+			coor.x+=delta.x;
+			ll[j].y = texture3D( function_tex, coor ).a;
+			coor.x+=delta.x;
+			ll[j].z = texture3D( function_tex, coor ).a;
+		}
+
+		
+
+		l0 +=greaterThan(ll[0], threshold);
+		l1 +=greaterThan(ll[1], threshold);
+		l2 +=greaterThan(ll[2], threshold);
+
+
+		vec4 codes = vec4(		   l0.x+l0.y+l1.x +l1.y,
+						 			   l0.y+l0.z+l1.y +l1.z,
+									   l1.x+l1.y+l2.x +l2.y,
+						 			   l1.y+l1.z+l2.y +l2.z );
+						 			   
+						 			   
+		codes= mod( vec4(codes), 8.0);		
+		gl_FragColor = vec4(notEqual(codes,  vec4(0,0,0,0)));
+
+
+	} 
+	else
+	{
+		gl_FragColor = vec4(0.0,0.0,0.0,0.0 );
+	}
+	
+	//gl_FragColor =  vec4(1.0,1.0,1.0,1.0 );
+}

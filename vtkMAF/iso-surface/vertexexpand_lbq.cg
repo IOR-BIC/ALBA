@@ -1,0 +1,137 @@
+
+uniform sampler2D hp_tex;
+uniform float key_off;
+uniform vec3 threshold;
+uniform vec3 ms_eye;//eye pos in modelspace
+uniform vec3 ms_spacing;
+uniform vec3 ms_lookat;
+
+varying vec4 ms_point_center;
+//uniform vec4 func_delta;
+
+
+void
+main()
+{
+	float key_ix = gl_Vertex.x + key_off;
+	//float key_ix = gl_Vertex.x ;
+	
+	vec2 texpos = vec2(0.5);
+	vec4 delta_x = vec4( -0.5,  0.5, -0.5, 0.25 );
+	vec4 delta_y = vec4(  0.0, -0.5,  0.0, 0.25 );
+
+	vec4 sums,hist,mask;
+	for(int i=HP_MIPS; i>0; i--) 
+	{
+		vec4 sums = texture2DLod( hp_tex, texpos, float(i) );
+		vec4 hist = sums;
+		hist.w   += hist.z;
+		hist.zw  += hist.yy;
+		hist.yzw += hist.xxx;
+		vec4 mask = vec4( lessThan( vec4(key_ix), hist ) );
+		texpos   += vec2( dot( mask, delta_x ), dot( mask, delta_y ) );
+		key_ix   -= dot( sums.xyz, vec3(1.0)-mask.xyz );
+		delta_x  *= 0.5;
+		delta_y  *= 0.5;
+	}
+
+	vec4 raw  = texture2DLod( hp_tex, texpos, 0.0 );
+	sums = floor(raw);
+	hist = sums;
+	hist.w   += hist.z;
+	hist.zw  += hist.yy;
+	hist.yzw += hist.xxx;
+	mask = vec4( lessThan( vec4(key_ix), hist ) );
+	texpos   += vec2( dot( mask, delta_x ), dot( mask, delta_y ) );
+
+	vec2 foo = vec2(HP_COLS,HP_ROWS)*texpos;
+	vec2 tp = fract(foo);
+	float slice = dot( vec2(1.0,HP_COLS), floor(foo));
+
+	vec2 xy = tp *(FUNC_TSIZE);
+
+	vec3 p1=vec3(xy, slice+0.5);
+
+	xy=floor(xy);
+	if(xy.x>FUNC_TSIZE-2 || xy.y>FUNC_TSIZE-2) 
+	{
+		gl_Position = vec4(-10000,-10000,-10000,1.0);
+		gl_PointSize=1.0;
+		return;
+	}
+
+	
+
+
+
+
+
+
+
+		//vec3 p1 = vec3(tp, slice); //only x,y are from [0,1], z is the integer slice number
+		//p1.z = (p1.z+0.5)*(1.0/FUNC_SLICES);
+		//vec3 halfVec=0.5*func_delta.xyz;
+		//float halfLen=func_delta.w; 
+		
+
+		
+
+		vec3 halfVec=vec3(0.5,0.5,0.5);
+		//float halfLen=0.5*1.732; 
+		p1+=halfVec;
+
+		p1*= ms_spacing; //into obj space
+
+		ms_point_center.xyz=p1;//center of the cell in obj space
+
+
+		//gl_PointSize=16;//size length == diameter = 2* r;
+		//gl_Position = gl_ModelViewProjectionMatrix * vec4(p1 ,1.0);
+		//return;
+
+
+
+		ms_point_center.w=0.5*ms_spacing.x;
+
+		//float R=0.5*1.732*ms_spacing.x; //cell radius
+
+		float R=1.732*ms_point_center.w; //cell radius
+
+		ms_point_center.w=3 * (ms_point_center.w*ms_point_center.w); //R*R
+		
+		vec3 eyeDir =(p1 - ms_eye);
+		float d=length(eyeDir);
+		eyeDir/=d;//normalize
+		//eyeDir=eyeDir/d;//normalize
+
+		float sinAlpha=R/d;
+		float cosAlpha=sqrt(1 - sinAlpha*sinAlpha);
+
+		vec3 H=p1 - (R*sinAlpha)*eyeDir;
+
+		//vec3 lookat=vec3(0.5*FUNC_TSIZE,0.5*FUNC_TSIZE,0.5*FUNC_SLICES);
+		vec3 opticalAxis =(ms_lookat - ms_eye);
+		vec3 nPlane=( cross(opticalAxis,eyeDir));
+		vec3 HA =normalize( cross(nPlane,eyeDir));
+		vec3 A = H + HA*(R*cosAlpha);
+		vec3 B = H - HA*(R*cosAlpha);
+
+
+		vec4 Ap = gl_ModelViewProjectionMatrix * vec4(A,1.0);
+		Ap.xyz/=Ap.w;
+
+		vec4 Bp = gl_ModelViewProjectionMatrix * vec4(B,1.0);
+		Bp.xyz/=Bp.w;
+
+		gl_Position=vec4( (Ap.xyz+Bp.xyz)*0.5, 1);
+
+		vec2 diff=Ap.xy - Bp.xy;
+
+		float halfLen= length(diff*threshold.yz);// [-1,1]
+
+		gl_PointSize=halfLen*0.5;//size length == diameter = 2* r;
+		//ms_point_center.w=max(floor(gl_PointSize),4.0);
+
+}
+
+

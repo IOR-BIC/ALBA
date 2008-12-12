@@ -1,0 +1,12 @@
+uniform sampler2D hp_tex;
+uniform vec2 delta;
+
+void main()
+{
+	vec4 II =  vec4(1.0,1.0,1.0,1.0 );
+	gl_FragColor = vec4( dot(II, texture2D( hp_tex, gl_TexCoord[0].xy+delta.xx ).rgba  ),
+					  dot(II, texture2D( hp_tex, gl_TexCoord[0].xy+delta.yx ).rgba  ),
+					  dot(II, texture2D( hp_tex, gl_TexCoord[0].xy+delta.xy ).rgba  ),
+					  dot(II, texture2D( hp_tex, gl_TexCoord[0].xy+delta.yy ).rgba  ) );
+	//gl_FragColor = texture2D( hp_tex, gl_TexCoord[0].xy+delta.yy ).rgba;
+}

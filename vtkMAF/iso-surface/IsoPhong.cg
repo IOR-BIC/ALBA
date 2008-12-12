@@ -1,0 +1,180 @@
+uniform sampler3D function_tex;
+
+uniform vec3 threshold;
+uniform vec4 func_delta;
+uniform vec3 ms_eye;//eye pos in modelspace
+
+varying vec4 ms_point_center;
+uniform vec3 ms_spacing;
+
+
+void main()
+{
+
+	//gl_FragColor =vec4(gl_FragCoord.xy/threshold.yz,0,1);
+	//gl_FragColor =vec4(1,1,1,1);
+	//gl_FragColor.xyz =threshold.z;
+	//return;
+	
+	
+
+
+
+	vec4 objpos;//ms space
+	objpos.xy=2* ((gl_FragCoord.xy)/threshold.yz)  -1;
+	objpos.z =(gl_FragCoord.z*2.0 - 1.0); 
+	objpos.w=1;
+
+	objpos = gl_ModelViewProjectionMatrixInverse *objpos;
+	objpos/=objpos.w;
+		
+
+
+	
+	vec3 eyeDir=normalize(objpos.xyz-ms_eye);
+	
+	vec3 pMinusC=ms_eye-ms_point_center.xyz;
+	float b= dot(eyeDir, pMinusC);
+	//float c=dot(pMinusC,pMinusC) -  func_delta.w *func_delta.w;
+
+	float c=dot(pMinusC,pMinusC) - ms_point_center.w;
+
+	float discrm=b*b-c;
+	int rootN=0;
+	vec2 root;
+	
+	if(discrm<=0)
+	{		
+		discard;
+		return;
+	}
+	//gl_FragColor =vec4(0.8, 0.8, 0.0, 1.0);
+	//return;
+
+
+	//else if(discrm>0)
+	{
+		float sq=sqrt(discrm);
+		root.x=-b-sq;
+		root.y=-b+sq;
+		rootN=2;
+	}
+	//else if(discrm==0)
+	//{
+	//	root.x=-b
+	//	rootN=1;
+	//}
+		
+
+	
+	vec3 pNear=ms_eye+ root.x*eyeDir;
+	vec3 pFar=ms_eye+ root.y*eyeDir;
+	
+	//gl_FragColor =vec4(0,0,1,1.11111111);
+	//return;
+	vec3 obj2tex_space=func_delta.xyz/ms_spacing;
+	
+
+	//linear searching:
+	float nearValue=texture3D( function_tex, pNear*obj2tex_space).a;
+	float flagNear=nearValue-threshold.x;
+
+	//float fstep=ms_point_center.w;
+	int fstep=5;
+	vec3 distStep=(pFar-pNear)/fstep;
+
+	vec3 pMid; 
+	float midValue;
+	float flagMid;
+
+	int success=0;
+
+	for(int i=0;i<fstep;i++)
+	{
+		pMid= pNear +distStep;
+		midValue=texture3D( function_tex, pMid*obj2tex_space).a;
+		flagMid=midValue-threshold.x;
+		if(flagMid*flagNear<=0)
+		{
+			success=1;
+			break;
+		}
+		pNear=pMid;
+		nearValue=midValue;
+		flagNear=flagMid;
+	}
+	if(success==0)
+	{
+			discard;
+			//return;
+	}
+
+
+
+
+
+	//binary searching:
+	pFar=pMid;
+	float farValue=midValue;
+
+
+	for(int i=0;i<3;i++)
+	{
+		float t = flagNear/(nearValue-farValue);
+		pMid = mix(pNear , pFar, t );
+		midValue=texture3D( function_tex, pMid*obj2tex_space).a;
+		flagMid=midValue-threshold.x;
+		if(flagMid*flagNear>0)
+		{
+			pNear=pMid;
+			nearValue=midValue;
+			flagNear=flagMid;
+		}
+		else 
+		{
+			pFar=pMid;
+			farValue=midValue;
+			//flagFar=flagMid;
+		}
+	}
+
+
+
+
+	pMid*=obj2tex_space;
+
+
+	vec3 n = vec3( 
+	(texture3D( function_tex, pMid + vec3( 1, 0, 0.0)*func_delta.xyz ).a  ),
+	(texture3D( function_tex, pMid + vec3( 0, 1, 0.0)*func_delta.xyz ).a  ),
+	(texture3D( function_tex, pMid + vec3( 0, 0, 1.0)*func_delta.xyz ).a ) );
+	n = vec3(midValue)- n;
+
+	//vec3 n = vec3(    (texture3D( function_tex, pMid + vec3(0, 0, 0.0)*n_delta.xyz ).a ) -
+	//	(texture3D( function_tex, pMid + vec3( 1, 0, 0.0)*n_delta.xyz ).a  ),
+	//	(texture3D( function_tex, pMid + vec3( 0, 0, 0.0)*n_delta.xyz ).a ) -
+	//	(texture3D( function_tex, pMid + vec3( 0, 1, 0.0)*n_delta.xyz ).a  ),
+	//	(texture3D( function_tex, pMid + vec3( 0, 0, 0.0)*n_delta.xyz ).a  ) -
+	//	(texture3D( function_tex, pMid + vec3( 0, 0, 1.0)*n_delta.xyz ).a ) );
+	
+	//vec3 n = vec3(    (texture3D( function_tex, pMid + vec3(-1, 0, 0.0)*n_delta.xyz ).a ) -
+	//	(texture3D( function_tex, pMid + vec3( 1, 0, 0.0)*n_delta.xyz ).a  ),
+	//	(texture3D( function_tex, pMid + vec3( 0, -1, 0.0)*n_delta.xyz ).a ) -
+	//	(texture3D( function_tex, pMid + vec3( 0, 1, 0.0)*n_delta.xyz ).a  ),
+	//	(texture3D( function_tex, pMid + vec3( 0, 0, -1.0)*n_delta.xyz ).a  ) -
+	//	(texture3D( function_tex, pMid + vec3( 0, 0, 1.0)*n_delta.xyz ).a ) );
+
+
+	//vec3 n = texture3D( function_tex, pMid ).rgb;
+	//n=1-2*n;
+
+	n = gl_NormalMatrix * normalize( n);
+	vec3 l1 = normalize(vec3(1,1,3));
+	vec3 h1 = normalize( l1+vec3(0,0,1) );
+	//vec4 diffuse = max( dot(l1, n), 0.0) ; // +
+	//vec4 specular = pow(max( dot(h1, n), 0.0), 50.0) *	vec4(0.4, 0.45, 0.5, 0.0);// +
+	float diffuse = abs( dot(l1, n)) ; // +
+	vec4 specular = pow(abs( dot(h1, n)), 50.0) *	vec4(0.4, 0.45, 0.5, 0.0);// +
+
+	gl_FragColor = diffuse + specular;
+}
