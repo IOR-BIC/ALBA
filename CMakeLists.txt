@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-04-29 15:17:59 $
-# Version:   $Revision: 1.44 $
+# Date:      $Date: 2008-12-12 11:02:56 $
+# Version:   $Revision: 1.44.2.1 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -38,7 +38,7 @@ SET (EXECUTABLE_OUTPUT_PATH ${MAF_BINARY_DIR}/bin/ CACHE INTERNAL
 
 MARK_AS_ADVANCED (
   LIBRARY_OUTPUT_PATH 
-  EXECUTABLE_OUTPUT_PATH
+  #EXECUTABLE_OUTPUT_PATH
 )
 
 #-----------------------------------------------------------------------------
@@ -119,12 +119,15 @@ IF (MAF_CAN_BUILD)
   ###############add all subdirs but "modules"
   SET(INCLUDE_DIRS "${MAF_BINARY_DIR}" "${MAF_SOURCE_DIR}/Base" "${MAF_BINARY_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction" "${MAF_SOURCE_DIR}/Interaction/Drivers" 
               "${MAF_SOURCE_DIR}/Core" "${MAF_SOURCE_DIR}/Gui" "${MAF_SOURCE_DIR}/IO" "${MAF_SOURCE_DIR}/Operations" "${MAF_SOURCE_DIR}/VME" 
-              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF")
+              "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/GPUAPI")
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
+	LINK_DIRECTORIES(${MAF_SOURCE_DIR}/GPUAPI/GLEW)
+	
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
+  SUBDIRS (GPUAPI)
   SUBDIRS (Base)
   IF (MAF_USE_VTK)
     SUBDIRS (Interaction)
