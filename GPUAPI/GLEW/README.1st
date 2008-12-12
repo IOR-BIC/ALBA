@@ -1,0 +1,15 @@
+Downloaded from glew.sourceforge.net
+Current version 1.5.0
+
+IMPORTANT: When a new version is downloaded both glew files must be patched
+
+.c file must contain this folder includes (not #include <gl/glew.h>):
+
+#include "glew.h"
+#if defined(_WIN32)
+#  include "wglew.h"
+#elif !defined(__APPLE__) || defined(GLEW_APPLE_GLX)
+#  include "glxew.h"
+#endif
+
+.h file must contain #define GLEW_STATIC (as soon as possible)
