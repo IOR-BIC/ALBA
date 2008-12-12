@@ -77,6 +77,8 @@ IF (MAF_USE_VTK)
   mafPipeImage3D.h
   mafPipeIsosurface.cpp
   mafPipeIsosurface.h
+  mafPipeIsosurfaceGPU.cpp
+  mafPipeIsosurfaceGPU.h
   mafPipeLandmarkCloud.cpp
   mafPipeLandmarkCloud.h
   mafPipeMeter.cpp
