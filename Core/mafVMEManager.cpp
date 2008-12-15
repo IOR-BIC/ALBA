@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-25 14:47:32 $
-  Version:   $Revision: 1.43.2.1 $
+  Date:      $Date: 2008-12-15 16:45:58 $
+  Version:   $Revision: 1.43.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -214,7 +214,7 @@ void mafVMEManager::AddCreationDate(mafNode *vme)
 {
   wxString dateAndTime;
   wxDateTime time = wxDateTime::UNow();
-  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth(), time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
+  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
  
   mafTagItem tag_creationDate;
   tag_creationDate.SetName("Creation_Date");

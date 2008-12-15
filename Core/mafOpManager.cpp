@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-25 11:01:19 $
-  Version:   $Revision: 1.40.2.7 $
+  Date:      $Date: 2008-12-15 16:45:58 $
+  Version:   $Revision: 1.40.2.8 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -765,7 +765,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
   parameters = op->GetParameters();
 
   wxDateTime time = wxDateTime::UNow();
-  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth(), time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
+  dateAndTime  = wxString::Format("%02d/%02d/%02d %02d:%02d:%02d",time.GetDay(), time.GetMonth()+1, time.GetYear(), time.GetHour(), time.GetMinute(),time.GetSecond());
 
   if (m_User != NULL && m_User->IsAuthenticated())
       userID = m_User->GetName();
