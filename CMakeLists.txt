@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-12-12 11:02:56 $
-# Version:   $Revision: 1.44.2.1 $
+# Date:      $Date: 2008-12-16 15:00:19 $
+# Version:   $Revision: 1.44.2.2 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -122,12 +122,16 @@ IF (MAF_CAN_BUILD)
               "${MAF_SOURCE_DIR}/VME/DataPipes" "${MAF_SOURCE_DIR}/vtkMAF" "${MAF_BINARY_DIR}/vtkMAF" "${MAF_SOURCE_DIR}/GPUAPI")
   INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 
+IF(WIN32)
 	LINK_DIRECTORIES(${MAF_SOURCE_DIR}/GPUAPI/GLEW)
+ENDIF(WIN32)
 	
   # Configuring MAF kits
   DBG_MESSAGE("MAF: Configuring MAF Kits")
   MESSAGE(STATUS "MAF: Configuring MAF Kits")
+IF(WIN32)
   SUBDIRS (GPUAPI)
+ENDIF(WIN32)
   SUBDIRS (Base)
   IF (MAF_USE_VTK)
     SUBDIRS (Interaction)
