@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-27 16:46:08 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2008-12-16 10:27:05 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -399,14 +399,6 @@ void mafOpCrop::OpStop(int result)
 {  
   HideGui();
   m_GizmoROI->Show(false);
-
-	if(m_OutputSP)
-		((mafVMEVolume*)m_Input)->SetData(m_OutputSP,((mafVME*)m_Input)->GetTimeStamp());
-	else if(m_OutputRG)
-		((mafVMEVolume*)m_Input)->SetData(m_OutputRG,((mafVME*)m_Input)->GetTimeStamp());
-
-	((mafVMEVolume*)m_Input)->GetOutput()->Update();
-	((mafVMEVolume*)m_Input)->Update();
 
 	cppDEL(m_GizmoROI);
 	m_GizmoROI = NULL;
