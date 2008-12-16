@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: GPU_OGL.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2008-12-12 11:00:02 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2008-12-16 13:22:26 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -11,7 +11,9 @@
   =========================================================================
 */
 
+#if WIN32
 #include <Windows.h>
+#endif
 #include "GPU_OGL.h"
 
 /*static*/bool mafGPUOGL::m_bGPUOGLSupported = false;
