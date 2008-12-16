@@ -77,8 +77,6 @@ IF (MAF_USE_VTK)
   mafPipeImage3D.h
   mafPipeIsosurface.cpp
   mafPipeIsosurface.h
-  mafPipeIsosurfaceGPU.cpp
-  mafPipeIsosurfaceGPU.h
   mafPipeLandmarkCloud.cpp
   mafPipeLandmarkCloud.h
   mafPipeMeter.cpp
@@ -161,6 +159,14 @@ IF (MAF_USE_VTK)
   mmaMeter.h
   )
 ENDIF (MAF_USE_VTK)
+
+IF(WIN32)
+  SET(PROJECT_SRCS
+  ${PROJECT_SRCS}
+  mafPipeIsosurfaceGPU.cpp
+  mafPipeIsosurfaceGPU.h
+  )
+ENDIF(WIN32)
 
 SUBDIRS(DataPipes)
 

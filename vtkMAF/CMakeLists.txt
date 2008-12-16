@@ -16,8 +16,6 @@ SET(vtkMAF_SRCS
   vtkMAFClipSurfaceBoundingBox.h
   vtkMAFContourVolumeMapper.cxx
   vtkMAFContourVolumeMapper.h
-  vtkMAFContourVolumeMapperGPU.cxx
-  vtkMAFContourVolumeMapperGPU.h
 #  vtkMAFContourVolumeMapperAdv.cxx
   vtkMAFDistanceFilter.cxx
   vtkMAFDistanceFilter.h
@@ -73,14 +71,30 @@ SET(vtkMAF_SRCS
   vtkMAFProfilingActor.h
 )
 
+IF(WIN32)
+SET(vtkMAF_SRCS
+	${vtkMAF_SRCS}
+  vtkMAFContourVolumeMapperGPU.cxx
+  vtkMAFContourVolumeMapperGPU.h
+  )
+ENDIF(WIN32)
+
+
 # List the kits from VTK that are needed by this project.
 SET(vtkMAF_LIBS
   vtkCommon
   vtkRendering
   vtkFiltering
   vtkGraphics
-  GPUAPI
 )
+
+IF(WIN32)
+SET(vtkMAF_LIBS
+  ${vtkMAF_LIBS}
+  GPUAPI
+  )
+ENDIF(WIN32)
+
 
 #-----------------------------------------------------------------------------
 # Most users should not need to change anything below this line.
