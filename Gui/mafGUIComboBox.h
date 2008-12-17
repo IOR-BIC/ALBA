@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIComboBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:04:57 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-12-17 08:14:44 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,7 +41,9 @@ public:
     virtual  ~mafGUIComboBox();
 
     void SetListener(mafObserver *listener){m_Listener = listener;}
+#ifdef WIN32
     /*virtual*/ bool MSWCommand(WXUINT param, WXWORD id);
+#endif
     /*virtual*/ void SetSelection(int n);
 
 protected:

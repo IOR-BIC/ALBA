@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIComboBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:04:57 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-12-17 08:14:44 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@ mafGUIComboBox::~mafGUIComboBox( )
 //----------------------------------------------------------------------------
 {
 }
+#ifdef WIN32
 //----------------------------------------------------------------------------
 bool mafGUIComboBox::MSWCommand(WXUINT param, WXWORD id)
 //----------------------------------------------------------------------------
@@ -63,6 +64,7 @@ bool mafGUIComboBox::MSWCommand(WXUINT param, WXWORD id)
   }
   return result;
 }
+#endif
 //----------------------------------------------------------------------------
 void mafGUIComboBox:: SetSelection(int n)
 //----------------------------------------------------------------------------
