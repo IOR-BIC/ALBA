@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-12-02 15:07:55 $
-Version:   $Revision: 1.24.2.1 $
+Date:      $Date: 2008-12-18 08:57:31 $
+Version:   $Revision: 1.24.2.2 $
 Authors:   Alexander Savenko  -  Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -245,15 +245,20 @@ void mafPipeIsosurface::ExctractIsosurface()
 	m_ContourMapper->GetOutput(0, surface);
 	m_ContourMapper->Update();
 
-	wxString name = wxString::Format(_("Isosurface %g"),m_ContourValue);
-
+  if(m_ExtractIsosurfaceName.Equals(""))
+  {
+    wxString name = wxString::Format(_("Isosurface %g"),m_ContourValue);
+    m_ExtractIsosurfaceName = name;
+  }
+	
 	mafNEW(m_IsosurfaceVme);
-	m_IsosurfaceVme->SetName(name.c_str());
+	m_IsosurfaceVme->SetName(m_ExtractIsosurfaceName.GetCStr());
 	m_IsosurfaceVme->SetDataByDetaching(surface,0);
 
 	m_IsosurfaceVme->ReparentTo(m_Vme);
 
-	surface->Delete(); 
+	surface->Delete();
+  m_ExtractIsosurfaceName = "";
 	mafDEL(m_IsosurfaceVme);
 }
 //----------------------------------------------------------------------------
