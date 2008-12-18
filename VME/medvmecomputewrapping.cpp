@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medvmecomputewrapping.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-18 13:30:15 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2008-12-18 13:37:43 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -72,12 +72,12 @@ medVMEComputeWrapping::medVMEComputeWrapping()
   m_EndVme2Name   = "";
   m_WrappedVmeName   = "";
   m_WrappedVmeName2 = "";
-  m_viaPointName = "";
+  m_ViaPointName = "";
   m_AbCurve = 0;
 
   m_Gui = NULL;
   m_ListBox = NULL;
-  m_idx = 0;
+  m_Idx = 0;
   
   mafNEW(m_Transform);
   mafNEW(m_TmpTransform2);
@@ -3808,7 +3808,7 @@ mafGUI* medVMEComputeWrapping::CreateGui()
   m_WrappedVmeName2 = wrapped_vme2 ? wrapped_vme2->GetName() : _("none");
 
   mafVME *viaPointvme2 = GetViaPointVME();
-  m_viaPointName = viaPointvme2 ? viaPointvme2->GetName() : _("none");
+  m_ViaPointName = viaPointvme2 ? viaPointvme2->GetName() : _("none");
 
   m_Gui->Button(ID_WRAPPED_METER_LINK,&m_WrappedVmeName,_("Wrapped sphere"), _("Select the vme representing Vme to be wrapped1"));
   m_Gui->Button(ID_WRAPPED_METER_LINK2,&m_WrappedVmeName2,_("Wrapped cylinder"), _("Select the vme representing Vme to be wrapped2"));
@@ -3882,7 +3882,7 @@ void medVMEComputeWrapping::eventWraped(mafEvent *e){
 		{
 			SetMeterLink("viaPoint", n);
 			//n->SetName("wrapped2");
-			m_viaPointName = n->GetName();
+			m_ViaPointName = n->GetName();
 		}
 		
 		m_Gui->Update();

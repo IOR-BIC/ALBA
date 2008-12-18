@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEComputeWrapping.H,v $
   Language:  C++
-  Date:      $Date: 2008-12-18 13:30:15 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2008-12-18 13:37:43 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,9 +105,9 @@ public:
   class Apoint
   {
   public:
-	  double  x;
-	  double  y;
-	  double  z;
+	  double  m_X;
+	  double  m_Y;
+	  double  m_Z;
   };
 
   static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
@@ -449,15 +449,15 @@ protected:
   double m_WrappedTangent1[3];
   double m_WrappedTangent2[3];
   double m_ViaPoint[3];
-  double m_cosA;
+  double m_CosA;
   double m_Rm;
   double m_AbCurve;
   std::vector<Apoint *>  m_APointList;
   std::vector<Apoint *>  m_BPointList;
   std::vector<Apoint *>  m_CPointList;
   //std::vector<double[2]>
-  double m_aList[100][3];
-  int m_idx ;
+  double m_AList[100][3];
+  int m_Idx ;
 
   mafTransform *m_Transform;
 
@@ -481,7 +481,7 @@ protected:
   mafString m_EndVme2Name;
   mafString m_WrappedVmeName;
   mafString m_WrappedVmeName2;
-  mafString m_viaPointName;
+  mafString m_ViaPointName;
   
 
   vtkMAFSmartPointer<vtkPlaneSource> m_PlaneSource;
