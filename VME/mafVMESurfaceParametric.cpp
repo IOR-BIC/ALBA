@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-14 08:09:50 $
-  Version:   $Revision: 1.17.2.2 $
+  Date:      $Date: 2008-12-18 08:57:03 $
+  Version:   $Revision: 1.17.2.3 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -494,32 +494,32 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
 	if (Superclass::InternalRestore(node)==MAF_OK)
 	{
     mafMatrix matrix;
-    if (
-      node->RestoreMatrix("Transform",&matrix)==MAF_OK &&
-      node->RestoreInteger("Geometry",m_GeometryType) == MAF_OK && 
-      node->RestoreDouble("ShereRadius",m_SphereRadius) == MAF_OK && 
-      node->RestoreDouble("SpherePhiRes",m_SpherePhiRes) == MAF_OK && 
-      node->RestoreDouble("SphereThetaRes",m_SphereTheRes) == MAF_OK && 
-      node->RestoreDouble("ConeHieght",m_ConeHeight) == MAF_OK && 
-      node->RestoreDouble("ConeRadius",m_ConeRadius) == MAF_OK && 
-      node->RestoreInteger("ConeCapping",m_ConeCapping) == MAF_OK && 
-      node->RestoreDouble("ConeRes",m_ConeRes) == MAF_OK &&
-      node->RestoreInteger("ConeOrientationAxis",m_ConeOrientationAxis) == MAF_OK &&
-      node->RestoreDouble("CylinderHeight",m_CylinderHeight) == MAF_OK && 
-      node->RestoreDouble("CylinderRadius",m_CylinderRadius) == MAF_OK && 
-      node->RestoreDouble("CylinderRes",m_CylinderRes) == MAF_OK &&
-      node->RestoreInteger("CylinderOrientationAxis",m_CylinderOrientationAxis) == MAF_OK &&
-      node->RestoreDouble("CubeXLength",m_CubeXLength) == MAF_OK && 
-      node->RestoreDouble("CubeYLength",m_CubeYLength) == MAF_OK && 
-      node->RestoreDouble("CubeZLength",m_CubeZLength) == MAF_OK && 
-      node->RestoreDouble("PlaneXRes",m_PlaneXRes) == MAF_OK && 
-      node->RestoreDouble("PlaneYRes",m_PlaneYRes) == MAF_OK && 
-      node->RestoreVectorN("PlaneOrigin",m_PlaneOrigin,3) == MAF_OK && 
-      node->RestoreVectorN("PlanePoint1",m_PlanePoint1,3) == MAF_OK && 
-      node->RestoreVectorN("PlanePoint2",m_PlanePoint2,3) == MAF_OK
-    )
-    m_Transform->SetMatrix(matrix); 
-		return MAF_OK;
+    if (node->RestoreMatrix("Transform",&matrix)==MAF_OK)
+    {
+      m_Transform->SetMatrix(matrix); 
+      node->RestoreInteger("Geometry",m_GeometryType);
+      node->RestoreDouble("ShereRadius",m_SphereRadius);
+      node->RestoreDouble("SpherePhiRes",m_SpherePhiRes);
+      node->RestoreDouble("SphereThetaRes",m_SphereTheRes);
+      node->RestoreDouble("ConeHieght",m_ConeHeight);
+      node->RestoreDouble("ConeRadius",m_ConeRadius);
+      node->RestoreInteger("ConeCapping",m_ConeCapping);
+      node->RestoreDouble("ConeRes",m_ConeRes);
+      node->RestoreInteger("ConeOrientationAxis",m_ConeOrientationAxis);
+      node->RestoreDouble("CylinderHeight",m_CylinderHeight);
+      node->RestoreDouble("CylinderRadius",m_CylinderRadius);
+      node->RestoreDouble("CylinderRes",m_CylinderRes);
+      node->RestoreInteger("CylinderOrientationAxis",m_CylinderOrientationAxis);
+      node->RestoreDouble("CubeXLength",m_CubeXLength);
+      node->RestoreDouble("CubeYLength",m_CubeYLength);
+      node->RestoreDouble("CubeZLength",m_CubeZLength);
+      node->RestoreDouble("PlaneXRes",m_PlaneXRes);
+      node->RestoreDouble("PlaneYRes",m_PlaneYRes);
+      node->RestoreVectorN("PlaneOrigin",m_PlaneOrigin,3);
+      node->RestoreVectorN("PlanePoint1",m_PlanePoint1,3);
+      node->RestoreVectorN("PlanePoint2",m_PlanePoint2,3);
+      return MAF_OK;
+    }
 	}
   return MAF_ERROR;
 }
