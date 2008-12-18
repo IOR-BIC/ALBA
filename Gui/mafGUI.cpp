@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 15:19:19 $
-  Version:   $Revision: 1.2.2.3 $
+  Date:      $Date: 2008-12-18 08:58:49 $
+  Version:   $Revision: 1.2.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -816,7 +816,7 @@ void mafGUI::Float(int id,mafString label,float* var,float min, float max, int f
 	}
 }
 //----------------------------------------------------------------------------
-void mafGUI::Double(int id,mafString label,double* var,double min, double max, int decimal_digit, mafString tooltip)
+void mafGUI::Double(int id,mafString label,double* var,double min, double max, int decimal_digit, mafString tooltip, bool labelAlwaysEnable)
 //----------------------------------------------------------------------------
 {
   int w_id;
@@ -832,7 +832,7 @@ void mafGUI::Double(int id,mafString label,double* var,double min, double max, i
 	}
 	else
 	{
-		wxStaticText *lab = new wxStaticText(this, GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
+    wxStaticText *lab = new wxStaticText(this, labelAlwaysEnable?-1:GetWidgetId(id), label.GetCStr(), dp, wxSize(LW,LH), wxALIGN_RIGHT | wxST_NO_AUTORESIZE );
     if(m_UseBackgroundColor) 
       lab->SetBackgroundColour(m_BackgroundColor);
     lab->SetFont(m_Font);

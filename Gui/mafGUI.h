@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 15:19:19 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2008-12-18 08:58:49 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -144,7 +144,7 @@ public:
   void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, mafString tooltip = "");
 
   /** Double entry widget. */
-  void Double(int id,mafString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, mafString tooltip = "");
+  void Double(int id,mafString label,double *var, double	min = MINDOUBLE, double max = MAXDOUBLE, int decimal_digit = -1, mafString tooltip = "", bool labelAlwaysEnable = false);
 
   /** Integer vector3 entry widget. */
   void Vector(int id,wxString label, int var[3], int min = MININT, int max = MAXINT, wxString tooltip = "", wxColour *bg_colour = NULL);
