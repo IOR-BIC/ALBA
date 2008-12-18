@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-15 16:45:58 $
-  Version:   $Revision: 1.40.2.8 $
+  Date:      $Date: 2008-12-18 16:06:03 $
+  Version:   $Revision: 1.40.2.9 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -812,7 +812,7 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
   if (out_node != NULL)
   {
     int c = 0; //counter not to write single parameter on first VME which is a group
-    wxString singleParameter = parameters;
+    wxString singleParameter = parameters.GetCStr();
     mafNodeIterator *iter = out_node->NewIterator();
     for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
     {
@@ -836,17 +836,6 @@ void mafOpManager::FillTraceabilityAttribute(mafOp *op, mafNode *in_node, mafNod
 
         if(in_node->GetRoot()->GetTagArray()->IsTagPresent("APP_STAMP"))
           appStamp = in_node->GetRoot()->GetTagArray()->GetTag("APP_STAMP")->GetValue();
-
-
-        mafString regKeyPath = "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\";
-        regKeyPath.Append(appStamp.GetCStr());
-
-        wxRegKey RegKey(wxString(regKeyPath.GetCStr()));
-        if(RegKey.Exists())
-        {
-          RegKey.Create();
-          RegKey.QueryValue(wxString("DisplayName"), revision);
-        }
 
         if(in_node->GetTagArray()->IsTagPresent("VME_NATURE"))
         {
