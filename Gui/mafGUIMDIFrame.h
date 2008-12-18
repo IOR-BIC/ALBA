@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:06:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-12-18 08:58:32 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -139,6 +139,9 @@ protected:
 
 	/** Update the memory status on the status bas. */
   void OnIdle(wxIdleEvent& event);
+
+  /** Update the memory status on the status bas , with information that needs to walk the heap (bad performances)*/
+  void FreeMemorySizeOnIdle(wxIdleEvent& event);
 
   /** Send an event to open the msf or zip file. */
   void OnDropFile(wxDropFilesEvent &event);

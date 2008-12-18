@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:06:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-12-18 08:58:32 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -307,6 +307,29 @@ void mafGUIMDIFrame::OnIdle(wxIdleEvent& event)
 //----------------------------------------------------------------------------
 { 
 #ifdef __WIN32__
+  MEMORYSTATUS ms;
+  GlobalMemoryStatus( &ms );
+  wxString s;
+  int current_free_memory = ms.dwAvailPhys/1000000;
+  s << "free mem " << current_free_memory << " mb";   
+  SetStatusText(s,5);
+  if (current_free_memory < m_MemoryLimitAlert && !m_UserAlerted)
+  {
+    m_UserAlerted = true;
+    int answere = wxMessageBox(_("Program is running with few free memory!! \nFree memory used by UnDo stack?."), _("Warning"), wxYES_NO);
+    if (answere == wxYES)
+    {
+      // Clear UnDo stack to gain memory.
+      mafEventMacro(mafEvent(this, CLEAR_UNDO_STACK));
+    }
+  }
+#endif
+}
+//----------------------------------------------------------------------------
+void mafGUIMDIFrame::FreeMemorySizeOnIdle(wxIdleEvent& event)
+//----------------------------------------------------------------------------
+{
+#ifdef __WIN32__
 
   //BES: 30.5.2008 - do not refresh the memory status all the time
   static DWORD dwLastTime = 0;
@@ -314,16 +337,16 @@ void mafGUIMDIFrame::OnIdle(wxIdleEvent& event)
   if (dwCurTime - dwLastTime < 1000)
     return; //1 second is the minimal time
 
-//BES: 30.5.2008 - GlobalMemoryStatus actually measures available free physical 
-//memory in the whole system, it only tells you that your next memory operations
-//may be slow as some data will have to be swapped on disk and vice versa.
-//it is NOT related to the memory consumption of the running application
-//	MEMORYSTATUS ms;
-//	GlobalMemoryStatus( &ms );         
+  //BES: 30.5.2008 - GlobalMemoryStatus actually measures available free physical 
+  //memory in the whole system, it only tells you that your next memory operations
+  //may be slow as some data will have to be swapped on disk and vice versa.
+  //it is NOT related to the memory consumption of the running application
+  //	MEMORYSTATUS ms;
+  //	GlobalMemoryStatus( &ms );         
 
   size_t nLargest;
   int current_free_memory = (int)(GetFreeMemorySize(&nLargest) / (1024*1024));
-    //ms.dwAvailPhys/1000000;
+  //ms.dwAvailPhys/1000000;
 
   static bool bShowTotal = false;
   if (bShowTotal)
@@ -362,7 +385,7 @@ void mafGUIMDIFrame::OnIdle(wxIdleEvent& event)
       mafEventMacro(mafEvent(this, CLEAR_UNDO_STACK));
     }
   }
-	#endif
+#endif
 }
 //-----------------------------------------------------------
 void mafGUIMDIFrame::Busy()
