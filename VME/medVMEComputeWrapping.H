@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEComputeWrapping.H,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 11:57:18 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2008-12-18 13:30:15 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -438,10 +438,10 @@ protected:
   double m_APoint[3];
   double m_BPoint[3];
   double m_CPoint[3];
-  double m_iPoint[3];
-  double m_mPoint[3];
+  double m_IPoint[3];
+  double m_MPoint[3];
 
-  double m_sphereWrapLocal[3],m_startWrapLocal[3],m_viaWrapLocal[3];
+  double m_SphereWrapLocal[3],m_StartWrapLocal[3],m_ViaWrapLocal[3];
   
   double m_WrappedVMECenter[3];
   double m_WrappedVMECenter1[3];
@@ -451,7 +451,7 @@ protected:
   double m_ViaPoint[3];
   double m_cosA;
   double m_Rm;
-  double m_abCurve;
+  double m_AbCurve;
   std::vector<Apoint *>  m_APointList;
   std::vector<Apoint *>  m_BPointList;
   std::vector<Apoint *>  m_CPointList;
@@ -490,10 +490,10 @@ protected:
   vtkMAFSmartPointer<vtkPlane> m_PlaneClip;
   vtkMAFSmartPointer<vtkClipPolyData> m_Clip;
 
-  mafMatrix3x3 *m_mat;
-  mafMatrix3x3 *m_imat;
-  mafMatrix m_inMx,m_inMy;
-  mafMatrix m_outMx,m_outMy;
+  mafMatrix3x3 *m_Mat;
+  mafMatrix3x3 *m_Imat;
+  mafMatrix m_InMx,m_InMy;
+  mafMatrix m_OutMx,m_OutMy;
 
   wxListBox *m_ListBox;
 	int        m_WrappedMode;

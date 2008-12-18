@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medvmecomputewrapping.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 12:27:59 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2008-12-18 13:30:15 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -73,7 +73,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
   m_WrappedVmeName   = "";
   m_WrappedVmeName2 = "";
   m_viaPointName = "";
-  m_abCurve = 0;
+  m_AbCurve = 0;
 
   m_Gui = NULL;
   m_ListBox = NULL;
@@ -86,8 +86,8 @@ medVMEComputeWrapping::medVMEComputeWrapping()
   SetOutput(output);
   
 
-  m_mat = new mafMatrix3x3();
-  m_imat = new mafMatrix3x3();
+  m_Mat = new mafMatrix3x3();
+  m_Imat = new mafMatrix3x3();
 
   vtkNEW(m_LineSource);
   vtkNEW(m_LineSource2);
@@ -118,8 +118,8 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
   mafDEL(m_TmpTransform);
   mafDEL(m_TmpTransform2);
 
-  mafDEL(m_mat);
-  mafDEL(m_imat);
+  mafDEL(m_Mat);
+  mafDEL(m_Imat);
 
 	for(int i=0; i< m_MiddlePointList.size(); i++)
 	{
@@ -296,16 +296,16 @@ void medVMEComputeWrapping::dispatch(){
 		{
 
 			//------------prepare matrix--------------
-			getWrapMatrix(m_inMx,m_inMy);
-			mafMatrix::Invert(m_inMy,m_outMy);
-			mafMatrix::Invert(m_inMx,m_outMx);
+			getWrapMatrix(m_InMx,m_InMy);
+			mafMatrix::Invert(m_InMy,m_OutMy);
+			mafMatrix::Invert(m_InMx,m_OutMx);
 
 			cosA=0;sinA=0;cosB=0;sinB=0;
 			//step1
 			getAngleAandB(cosA,sinA,cosB,sinB);
 			//step2
-			getTransFormMatrix(cosA,sinA,cosB,sinB,m_mat);//after this function mat has element value
-			mafMatrix3x3::Invert(m_mat->GetElements(),m_imat->GetElements());//imat->Invert();
+			getTransFormMatrix(cosA,sinA,cosB,sinB,m_Mat);//after this function mat has element value
+			mafMatrix3x3::Invert(m_Mat->GetElements(),m_Imat->GetElements());//imat->Invert();
 			
 
 			//-----------------------------------------
@@ -414,7 +414,7 @@ bool medVMEComputeWrapping::getCcoordinate2(double *bCoord,double *cCoord1,doubl
 	//getGlobalSphereCenter(RCoord);//coordinate of sphere center;
 
 	Xb = bCoord[0];Yb = bCoord[1];Zb = bCoord[2];
-	Xr = m_sphereWrapLocal[0];Yr = m_sphereWrapLocal[1];Zr = m_sphereWrapLocal[2];
+	Xr = m_SphereWrapLocal[0];Yr = m_SphereWrapLocal[1];Zr = m_SphereWrapLocal[2];
 
 
 	a = (Yb*Yb) + (Xb*Xb);//Yb*Yb + Xb*Xb;
@@ -461,13 +461,13 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 	double Rm1,Rm2;
 	sphereR = getSphereRadius();
 	//-----get o global coord---------
-	ogCoord[0]=m_startWrapLocal[0];
-	ogCoord[1]=m_startWrapLocal[1];
-	ogCoord[2]=m_startWrapLocal[2];
+	ogCoord[0]=m_StartWrapLocal[0];
+	ogCoord[1]=m_StartWrapLocal[1];
+	ogCoord[2]=m_StartWrapLocal[2];
 
-	igCoord[0]=m_viaWrapLocal[0];
-	igCoord[1]=m_viaWrapLocal[1];
-	igCoord[2]=m_viaWrapLocal[2];
+	igCoord[0]=m_ViaWrapLocal[0];
+	igCoord[1]=m_ViaWrapLocal[1];
+	igCoord[2]=m_ViaWrapLocal[2];
 	//--------------------------------
 	
 	Rm =0;
@@ -476,7 +476,7 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 
 	
 	//step3 o global --> o local so we can use equation(10)
-	getLocalTransformedCoord(olCoord,ogCoord,m_imat);
+	getLocalTransformedCoord(olCoord,ogCoord,m_Imat);
 	//step4 get A point local coordinate;
 	bool aFlag = getAcoordinateInLocal(alCoord1,alCoord2,olCoord,sphereR,x);
 	if (aFlag)
@@ -485,8 +485,8 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 		//step5 a local --> a global
 		double agCoord1[3],agCoord2[3],aGcoord1[3],aGcoord2[3],sphereCenter[3];
 
-		getGlobalTransformedCoord(alCoord1,agCoord1,m_mat);
-		getGlobalTransformedCoord(alCoord2,agCoord2,m_mat);
+		getGlobalTransformedCoord(alCoord1,agCoord1,m_Mat);
+		getGlobalTransformedCoord(alCoord2,agCoord2,m_Mat);
 		getGlobalSphereCenter(sphereCenter);
 
 	//----------------check if OA is tangent to sphere----------------
@@ -519,9 +519,9 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 		{
 			
 			if (m_WrapSide==WRAP_FRONT || m_WrapSide == WRAP_BACK){
-				filterVector2[0] = agCoord1[0] - m_sphereWrapLocal[0];
-				filterVector2[1] = agCoord1[1] - m_sphereWrapLocal[1];
-				filterVector2[2] = agCoord1[2] - m_sphereWrapLocal[2];
+				filterVector2[0] = agCoord1[0] - m_SphereWrapLocal[0];
+				filterVector2[1] = agCoord1[1] - m_SphereWrapLocal[1];
+				filterVector2[2] = agCoord1[2] - m_SphereWrapLocal[2];
 				filterFlag2 = vtkMath::Dot(filterPlaneNormal,filterVector2);
 				if ( (m_WrapSide==WRAP_FRONT && filterFlag2*filterFlag>0) || (m_WrapSide==WRAP_BACK && filterFlag2*filterFlag<0) )
 				{
@@ -539,9 +539,9 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 			
 			if (m_WrapSide==WRAP_FRONT || m_WrapSide == WRAP_BACK){
 
-				filterVector2[0] = agCoord2[0] - m_sphereWrapLocal[0];
-				filterVector2[1] = agCoord2[1] - m_sphereWrapLocal[1];
-				filterVector2[2] = agCoord2[2] - m_sphereWrapLocal[2];
+				filterVector2[0] = agCoord2[0] - m_SphereWrapLocal[0];
+				filterVector2[1] = agCoord2[1] - m_SphereWrapLocal[1];
+				filterVector2[2] = agCoord2[2] - m_SphereWrapLocal[2];
 				filterFlag2 = vtkMath::Dot(filterPlaneNormal,filterVector2);
 				if ( (m_WrapSide==WRAP_FRONT && filterFlag2*filterFlag>0) || (m_WrapSide==WRAP_BACK && filterFlag2*filterFlag<0) )
 				{
@@ -555,8 +555,8 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 		}
 			
 		//step6 o,i,a global --> sphere center based local
-		getLocalCenterCoord(oCoordR,m_startWrapLocal);
-		getLocalCenterCoord(iCoordR,m_viaWrapLocal);
+		getLocalCenterCoord(oCoordR,m_StartWrapLocal);
+		getLocalCenterCoord(iCoordR,m_ViaWrapLocal);
 
 		int ibflag = 1;
 		if ( !aFlag2 && !aFlag1)
@@ -685,9 +685,9 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 void medVMEComputeWrapping::computeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord){
 	double oa[3],ba1[3],ba2[3];
 	double d1,d2,cosA1,cosA2;
-	oa[0] = m_startWrapLocal[0] - aCoord[0];
-	oa[1] = m_startWrapLocal[1] - aCoord[1];
-	oa[2] = m_startWrapLocal[2] - aCoord[2];
+	oa[0] = m_StartWrapLocal[0] - aCoord[0];
+	oa[1] = m_StartWrapLocal[1] - aCoord[1];
+	oa[2] = m_StartWrapLocal[2] - aCoord[2];
 
 	ba1[0] = bCoord1[0] - aCoord[0];
 	ba1[1] = bCoord1[1] - aCoord[1];
@@ -724,7 +724,7 @@ bool medVMEComputeWrapping::getBcoordinateUpdate2(double *aCoord,double *bCoord,
 	double aCoordR[3],oCoordR[3],cCoordR[3],mCoordR[3],iCoordR[3];
 
 	getLocalCenterCoord(aCoordR,aCoord);
-	getLocalCenterCoord(oCoordR,m_startWrapLocal);
+	getLocalCenterCoord(oCoordR,m_StartWrapLocal);
 	getLocalCenterCoord(cCoordR,cCoord);
 	getIntersectCircle(aCoordR,oCoordR,cCoordR,mCoordR,Rm);//Rm is computed by global coord
 
@@ -823,11 +823,11 @@ void medVMEComputeWrapping::getEveryABCpoint(const int step){
 	getGlobalSphereCenter(sphereCenter);
 	getGlobalCylinderCenter(cylinderCenter);
 
-	getWrapLocalTransform(sphereCenter,m_sphereWrapLocal);
+	getWrapLocalTransform(sphereCenter,m_SphereWrapLocal);
 	//double convertCoord[3];
 	//getWrapGlobalTransform(m_sphereWrapLocal,convertCoord);
-	getWrapLocalTransform(m_StartPoint,m_startWrapLocal);
-	getWrapLocalTransform(m_ViaPoint,m_viaWrapLocal);
+	getWrapLocalTransform(m_StartPoint,m_StartWrapLocal);
+	getWrapLocalTransform(m_ViaPoint,m_ViaWrapLocal);
 
 //------------transform start ,sphere center,insertion 
 
@@ -871,13 +871,13 @@ void medVMEComputeWrapping::getEveryABCpoint(const int step){
 
 		if (y1 != -1)
 		{
-		testValue = testPlane(aCoord,bCoord,m_startWrapLocal,m_viaWrapLocal);
+		testValue = testPlane(aCoord,bCoord,m_StartWrapLocal,m_ViaWrapLocal);
 
 		for (int i=0;i<10;i++)
 		{
 			cflag = getCcoordinate2(bCoord,cCoord1,cCoord2);
-			d1 = computeDistanceOfLm2(m_startWrapLocal,m_viaWrapLocal,aCoord,bCoord,cCoord1,rm);
-			d2 = computeDistanceOfLm2(m_startWrapLocal,m_viaWrapLocal,aCoord,bCoord,cCoord2,rm);
+			d1 = computeDistanceOfLm2(m_StartWrapLocal,m_ViaWrapLocal,aCoord,bCoord,cCoord1,rm);
+			d2 = computeDistanceOfLm2(m_StartWrapLocal,m_ViaWrapLocal,aCoord,bCoord,cCoord2,rm);
 			cCoord[0] = cCoord1[0];cCoord[1] = cCoord1[1];cCoord[2] = cCoord1[2];
 			if (d1>d2)
 			{
@@ -899,8 +899,8 @@ void medVMEComputeWrapping::getEveryABCpoint(const int step){
 				tanCost1 = fabs(tanValue1-(cylinderR*cylinderR));
 				tanCost2 = fabs(tanValue2 - (cylinderR*cylinderR));
 				
-				d1 = computeDistanceOfLm2(m_startWrapLocal,m_viaWrapLocal,aCoord,bCoord1,cCoord,rm);
-				d2 = computeDistanceOfLm2(m_startWrapLocal,m_viaWrapLocal,aCoord,bCoord2,cCoord,rm);
+				d1 = computeDistanceOfLm2(m_StartWrapLocal,m_ViaWrapLocal,aCoord,bCoord1,cCoord,rm);
+				d2 = computeDistanceOfLm2(m_StartWrapLocal,m_ViaWrapLocal,aCoord,bCoord2,cCoord,rm);
 				if (fabs((d2-d1)/d2)<0.01 )
 				{
 					if (tanCost1<tanCost2)
@@ -930,8 +930,8 @@ void medVMEComputeWrapping::getEveryABCpoint(const int step){
 				testValue1 = cCoord[0]*cCoord[0]+cCoord[1]*cCoord[1];//Xc*Xc +Yc*Yc = r*r
 				testValue2 = bCoord[0]*cCoord[0]+bCoord[1]*cCoord[1];//Xc*Xb + Yc*Yb = r*r;
 			}
-			testValue = testPlane(aCoord,bCoord,m_startWrapLocal,cCoord1);
-			testValue = testPlane(aCoord,bCoord,m_startWrapLocal,cCoord2);
+			testValue = testPlane(aCoord,bCoord,m_StartWrapLocal,cCoord1);
+			testValue = testPlane(aCoord,bCoord,m_StartWrapLocal,cCoord2);
 		}//end of for
 		
 		testValue1 = cCoord[0]*cCoord[0]+cCoord[1]*cCoord[1];//Xc*Xc +Yc*Yc = r*r
@@ -954,7 +954,7 @@ void medVMEComputeWrapping::getEveryABCpoint(const int step){
 
 		if (idx==0 || (tmpLm<LmFinal) )//first time
 		{
-			if (!(cCoord[2]<m_viaWrapLocal[2])){
+			if (!(cCoord[2]<m_ViaWrapLocal[2])){
 				idx++;
 				angleFinal = j;
 				LmFinal = tmpLm;
@@ -1032,19 +1032,19 @@ double medVMEComputeWrapping::getFilterFlag(double *filterPlaneNormal){
 	double cylinderCenterWrapLocal[3],filterVector1[3];
 	double rtn = 0;
 	cylinderCenterWrapLocal[0] = 0;cylinderCenterWrapLocal[1] = 0;cylinderCenterWrapLocal[2] = 0;
-	copyPointValue(m_viaWrapLocal,viaProjectWrapLocal);
-	viaProjectWrapLocal[2] = m_sphereWrapLocal[2];
-	get90DegreePointOnCylinder(viaProjectWrapLocal,m_sphereWrapLocal,viaProject90WrapLocal);
+	copyPointValue(m_ViaWrapLocal,viaProjectWrapLocal);
+	viaProjectWrapLocal[2] = m_SphereWrapLocal[2];
+	get90DegreePointOnCylinder(viaProjectWrapLocal,m_SphereWrapLocal,viaProject90WrapLocal);
 
 	vtkPlaneSource *planeSource;
 	vtkNEW(planeSource);
 	planeSource->SetOrigin(viaProject90WrapLocal);
-	planeSource->SetPoint1(m_sphereWrapLocal);
+	planeSource->SetPoint1(m_SphereWrapLocal);
 	planeSource->SetPoint2(cylinderCenterWrapLocal);
 	planeSource->GetNormal(filterPlaneNormal);
-	filterVector1[0] = m_viaWrapLocal[0] - m_sphereWrapLocal[0];
-	filterVector1[1] = m_viaWrapLocal[1] - m_sphereWrapLocal[1];
-	filterVector1[2] = m_viaWrapLocal[2] - m_sphereWrapLocal[2];
+	filterVector1[0] = m_ViaWrapLocal[0] - m_SphereWrapLocal[0];
+	filterVector1[1] = m_ViaWrapLocal[1] - m_SphereWrapLocal[1];
+	filterVector1[2] = m_ViaWrapLocal[2] - m_SphereWrapLocal[2];
 	rtn = vtkMath::Dot(filterPlaneNormal,filterVector1);
 	//----------------test------------------
 	/*double viaProject90[3];
@@ -1351,7 +1351,7 @@ double medVMEComputeWrapping::computeDistanceOfLm(double *oCoord,double *iCoord,
 	BI = sqrt(vtkMath::Distance2BetweenPoints(bCoord,iCoord));
 
 	//rtn = OA+AB+BI;
-	m_abCurve = ABcurve;
+	m_AbCurve = ABcurve;
 	rtn = OA+ABcurve+BI;
 
 	return rtn;
@@ -1367,23 +1367,23 @@ double medVMEComputeWrapping::computeDistanceOfLm2(double *oCoord,double *iCoord
 	BC = sqrt(vtkMath::Distance2BetweenPoints(bCoord,cCoord));
 	CI = sqrt(vtkMath::Distance2BetweenPoints(cCoord,iCoord));
 
-	rtn = OA+ m_abCurve+ BC +CI;
+	rtn = OA+ m_AbCurve+ BC +CI;
 	
 	return rtn;
 }
 
 void medVMEComputeWrapping::getLocalCenterCoord(double *localCoord,double *globalCoord){
 	double sphCoord[3], tmpCoord[3];
-	localCoord[0] = globalCoord[0] - m_sphereWrapLocal[0];
-	localCoord[1] = globalCoord[1] - m_sphereWrapLocal[1];
-	localCoord[2] = globalCoord[2] - m_sphereWrapLocal[2];
+	localCoord[0] = globalCoord[0] - m_SphereWrapLocal[0];
+	localCoord[1] = globalCoord[1] - m_SphereWrapLocal[1];
+	localCoord[2] = globalCoord[2] - m_SphereWrapLocal[2];
 	
 }
 void medVMEComputeWrapping::getGlobalCenterCoord(double *globalCoord,double *localCoord){
 	double sphCoord[3],tmpCoord[3];
-	globalCoord[0] = localCoord[0] + m_sphereWrapLocal[0];
-	globalCoord[1] = localCoord[1] + m_sphereWrapLocal[1];
-	globalCoord[2] = localCoord[2] + m_sphereWrapLocal[2];
+	globalCoord[0] = localCoord[0] + m_SphereWrapLocal[0];
+	globalCoord[1] = localCoord[1] + m_SphereWrapLocal[1];
+	globalCoord[2] = localCoord[2] + m_SphereWrapLocal[2];
 	
 }
 void medVMEComputeWrapping::getGlobalSphereCenter(double *sphCoord){
@@ -1412,7 +1412,7 @@ void medVMEComputeWrapping::getLocalTransformedCoord(double *localCoord,double *
 		ele0 = imat->GetElement(i,0);
 		ele1 = imat->GetElement(i,1);
 		ele2 = imat->GetElement(i,2);
-		localCoord[i] = ele0*(globalCoord[0]-m_sphereWrapLocal[0]) + ele1*(globalCoord[1]-m_sphereWrapLocal[1]) + ele2*(globalCoord[2]-m_sphereWrapLocal[2]);	
+		localCoord[i] = ele0*(globalCoord[0]-m_SphereWrapLocal[0]) + ele1*(globalCoord[1]-m_SphereWrapLocal[1]) + ele2*(globalCoord[2]-m_SphereWrapLocal[2]);	
 	}
 }
 //|x|     |x''|  |Xr|
@@ -1426,7 +1426,7 @@ void medVMEComputeWrapping::getGlobalTransformedCoord(double *localCoord,double 
 		ele0 = mat->GetElement(i,0);
 		ele1 = mat->GetElement(i,1);
 		ele2 = mat->GetElement(i,2);
-		globalCoord[i] = ele0*localCoord[0] + ele1*localCoord[1] + ele2*localCoord[2] + m_sphereWrapLocal[i];
+		globalCoord[i] = ele0*localCoord[0] + ele1*localCoord[1] + ele2*localCoord[2] + m_SphereWrapLocal[i];
 	}
 }
 void medVMEComputeWrapping::getTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat){
@@ -1535,13 +1535,13 @@ void medVMEComputeWrapping::getWrapLocalTransform(double *inCoord,double *outCoo
 	
 	//x` = Rx * T * X
 	xInCoordLocal[0] = inCoordLocal[0];
-	xInCoordLocal[1] = inCoordLocal[1] * m_inMx.GetElement(1,1) + inCoordLocal[2]*m_inMx.GetElement(1,2);
-	xInCoordLocal[2] = inCoordLocal[1] * m_inMx.GetElement(2,1) + inCoordLocal[2]*m_inMx.GetElement(2,2);
+	xInCoordLocal[1] = inCoordLocal[1] * m_InMx.GetElement(1,1) + inCoordLocal[2]*m_InMx.GetElement(1,2);
+	xInCoordLocal[2] = inCoordLocal[1] * m_InMx.GetElement(2,1) + inCoordLocal[2]*m_InMx.GetElement(2,2);
 	
 	//x` = Ry * Rx * T * X
-	outCoord[0] = m_inMy.GetElement(0,0)*xInCoordLocal[0]+m_inMy.GetElement(0,2)*xInCoordLocal[2];
+	outCoord[0] = m_InMy.GetElement(0,0)*xInCoordLocal[0]+m_InMy.GetElement(0,2)*xInCoordLocal[2];
 	outCoord[1] = xInCoordLocal[1];
-	outCoord[2] = m_inMy.GetElement(2,0)*xInCoordLocal[0]+m_inMy.GetElement(2,2)*xInCoordLocal[2];
+	outCoord[2] = m_InMy.GetElement(2,0)*xInCoordLocal[0]+m_InMy.GetElement(2,2)*xInCoordLocal[2];
 	
 	
 }
@@ -1560,13 +1560,13 @@ void medVMEComputeWrapping::getWrapGlobalTransform(double *inCoord,double *outCo
 	
 	//X = Ry(-1)*X
 	//step1 move to origin
-	yInCoordLocal[0] = inCoord[0]*m_outMy.GetElement(0,0) + inCoord[2]*m_outMy.GetElement(0,2);
+	yInCoordLocal[0] = inCoord[0]*m_OutMy.GetElement(0,0) + inCoord[2]*m_OutMy.GetElement(0,2);
 	yInCoordLocal[1] = inCoord[1];
-	yInCoordLocal[2] = inCoord[0]*m_outMy.GetElement(2,0) + inCoord[2]*m_outMy.GetElement(2,2);
+	yInCoordLocal[2] = inCoord[0]*m_OutMy.GetElement(2,0) + inCoord[2]*m_OutMy.GetElement(2,2);
 	//X = Rx(-1)*Ry(-1)*X
 	xyInCoordLocal[0] = yInCoordLocal[0];
-	xyInCoordLocal[1] = yInCoordLocal[1]*m_outMx.GetElement(1,1) + yInCoordLocal[2]*m_outMx.GetElement(1,2);
-	xyInCoordLocal[2] = yInCoordLocal[1]*m_outMx.GetElement(2,1) + yInCoordLocal[2]*m_outMx.GetElement(2,2);
+	xyInCoordLocal[1] = yInCoordLocal[1]*m_OutMx.GetElement(1,1) + yInCoordLocal[2]*m_OutMx.GetElement(1,2);
+	xyInCoordLocal[2] = yInCoordLocal[1]*m_OutMx.GetElement(2,1) + yInCoordLocal[2]*m_OutMx.GetElement(2,2);
 
 	outCoord[0] = xyInCoordLocal[0] + cylinderCenter[0];
 	outCoord[1] = xyInCoordLocal[1] + cylinderCenter[1];
@@ -1622,9 +1622,9 @@ void medVMEComputeWrapping::getAngleAandB(double & cosA,double & sinA,double & c
 	double paraA[3],paraB[3];
 	double distance;
     
-	olCoord[0] = m_startWrapLocal[0] - m_sphereWrapLocal[0];
-	olCoord[1] = m_startWrapLocal[1] - m_sphereWrapLocal[1];
-	olCoord[2] = m_startWrapLocal[2] - m_sphereWrapLocal[2];
+	olCoord[0] = m_StartWrapLocal[0] - m_SphereWrapLocal[0];
+	olCoord[1] = m_StartWrapLocal[1] - m_SphereWrapLocal[1];
+	olCoord[2] = m_StartWrapLocal[2] - m_SphereWrapLocal[2];
 	
 	paraA[0] = 0; paraA[1] = 0; paraA[2] = -1;
 	paraB[0] = 0; paraB[1] = 1; paraB[2] = 0;
@@ -1718,7 +1718,7 @@ void medVMEComputeWrapping::getIntersectCircle(double *Ap,double *oCoord,double 
 	testValue = testPlane(Ap,oCoord,iCoord,Ap);
 	//------------------------
 	getGlobalCenterCoord(mgCoord,mCoord);
-	m_mPoint[0] = mgCoord[0];m_mPoint[1] = mgCoord[1];m_mPoint[2] = mgCoord[2];
+	m_MPoint[0] = mgCoord[0];m_MPoint[1] = mgCoord[1];m_MPoint[2] = mgCoord[2];
 	getGlobalCenterCoord(agCoord,Ap);
 	Rm = sqrt(vtkMath::Distance2BetweenPoints(agCoord,  mgCoord)) ;
 	Rm = sqrt( (mgCoord[0]-agCoord[0])*(mgCoord[0]-agCoord[0]) + (mgCoord[1]-agCoord[1])*(mgCoord[1]-agCoord[1]) + (mgCoord[2]-agCoord[2])*(mgCoord[2]-agCoord[2]) );
