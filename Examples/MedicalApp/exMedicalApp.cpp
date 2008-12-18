@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: exMedicalApp.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-29 11:59:09 $
-Version:   $Revision: 1.15 $
+Date:      $Date: 2008-12-18 11:22:38 $
+Version:   $Revision: 1.15.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -75,7 +75,7 @@ MafMedical is partially based on OpenMAF.
 	#include "mafOpImporterMesh.h"
 	#ifdef MAF_USE_ITK
 		#include "mafOpImporterASCII.h"
-		#include "medOpImporterEMGWS.h"
+		#include "medOpImporterAnalogWS.h"
 		#include "medOpImporterGRFWS.h"
 	#endif
 	#include "mmoDICOMImporter.h"
@@ -206,7 +206,7 @@ bool exMedicalApp::OnInit()
 	m_Logic->Plug(new medOpImporterLandmarkWS("Landmark WS"),"Landmark Suite");
 	m_Logic->Plug(new medOpImporterC3D("C3D"),"Landmark Suite");
 #ifdef MAF_USE_ITK
-		m_Logic->Plug(new medOpImporterEMGWS("EMG"));
+		m_Logic->Plug(new medOpImporterAnalogWS("EMG"));
 		m_Logic->Plug(new medOpImporterGRFWS("GRF"));
 #endif
 	m_Logic->Plug(new medOpImporterRAWImages("RAW Images"));
