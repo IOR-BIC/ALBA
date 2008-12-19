@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-03 12:21:45 $
-  Version:   $Revision: 1.61.2.2 $
+  Date:      $Date: 2008-12-19 16:07:16 $
+  Version:   $Revision: 1.61.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -175,7 +175,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     {
       pipeSliceX->SplineModeOn();
       pipeSliceX->FillOn();
-      pipeSliceX->SetAlphaFilling(4.0);
+      
     }
 
     mafPipePolylineSlice *pipeSliceY = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node);
@@ -183,7 +183,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     {
       pipeSliceY->SplineModeOn();
       pipeSliceY->FillOn();
-      pipeSliceY->SetAlphaFilling(4.0);
+      
     }
     
     mafPipePolylineSlice *pipeSliceZ = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node);
@@ -191,7 +191,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     {
       pipeSliceZ->SplineModeOn();
       pipeSliceZ->FillOn();
-      pipeSliceZ->SetAlphaFilling(4.0);
+      
     }
 
   }
