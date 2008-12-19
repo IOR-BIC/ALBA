@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-28 13:08:16 $
-  Version:   $Revision: 1.11.2.1 $
+  Date:      $Date: 2008-12-19 16:05:47 $
+  Version:   $Revision: 1.11.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,7 +17,7 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafPipe.h"
-#include "vtkDelaunay2D.h"
+
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -33,6 +33,8 @@ class vtkTubeFilter;
 class vtkPolyData;
 class vtkMAFPolyDataToSinglePolyLine;
 class vtkMAFToLinearTransform;
+class vtkClipPolyData;
+class vtkAppendPolyData;
 
 //----------------------------------------------------------------------------
 // mafPipePolylineSlice :
@@ -84,9 +86,6 @@ public:
   /** Function that retrieve a spline polyline when  input is a polyline */ 
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
-  /** Set the alpha of Delaunay Filter*/
-  void SetAlphaFilling(double alpha){if(m_Delaunay)m_Delaunay->SetAlpha(alpha);UpdateProperty();}
-
   /** Show actor of sliced polyline*/
   void ShowActorOn();
 
@@ -110,7 +109,16 @@ public:
   virtual mafGUI  *CreateGui();
   void UpdateProperty();
 
+  void ROIEnable(bool enable){m_RoiEnable = enable;}
+  void SetROI(double bounds[6]);
+  void SetMaximumROI();
+
 protected:
+
+  vtkPolyData *RegionsCapping(vtkPolyData* inputCutters);
+  vtkPolyData *CappingFilter(vtkPolyData* inputBorder);
+  vtkPolyData *ExecuteROI(vtkPolyData *polydata);
+
   vtkPolyDataMapper	      *m_Mapper;
   vtkActor                *m_Actor;
 	vtkTubeFilter           *m_Tube;
@@ -123,7 +131,6 @@ protected:
   vtkPlane				        *m_Plane;
   vtkMAFFixedCutter		      *m_Cutter;
   vtkPolyData             *m_PolySpline;
-  vtkDelaunay2D           *m_Delaunay;
   vtkMAFPolyDataToSinglePolyLine *m_PolydataToPolylineFilter;
   vtkMAFToLinearTransform *m_VTKTransform;
   double				           m_Border;
@@ -131,11 +138,22 @@ protected:
   int                      m_SplineMode;
   int                      m_Fill;
 
+  vtkClipPolyData          *m_ClipPolyData;
+  vtkClipPolyData          *m_ClipPolyDataUp;
+  vtkClipPolyData          *m_ClipPolyDataDown;
+
   double	m_Origin[3];
   double	m_Normal[3];
   double  m_SplineCoefficient;
+  
+  vtkPolyData *m_PolyData;
+  vtkAppendPolyData * m_AppendPolyData;
 
   int m_ScalarVisibility;
   int m_RenderingDisplayListFlag;
+
+  int m_RoiEnable;
+  double  m_ROI[6];
+  
 };  
 #endif // __mafPipePolylineSlice_H__

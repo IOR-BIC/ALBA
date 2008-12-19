@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-28 13:08:16 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2008-12-19 16:05:47 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,8 +49,13 @@
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkMAFSmartPointer.h"
-#include "vtkTransform.h"
 #include "vtkMAFPolyDataToSinglePolyLine.h"
+#include "vtkClipPolyData.h"
+#include "vtkMAFImplicitPolyData.h"
+#include "vtkCubeSource.h"
+#include "vtkPolyDataConnectivityFilter.h"
+#include "vtkAppendPolyData.h"
+
 
 #include <vector>
 
@@ -70,6 +75,9 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_OutlineProperty = NULL;
   m_OutlineActor    = NULL;
   m_Cutter          = NULL;
+  m_ClipPolyData    = NULL;
+  m_ClipPolyDataUp    = NULL;
+  m_ClipPolyDataDown    = NULL;
   m_Plane	    = NULL;
   m_Tube = NULL;
 //m_TubeRadial = NULL;
@@ -93,6 +101,12 @@ mafPipePolylineSlice::mafPipePolylineSlice()
   m_Fill = 0;
 
   m_PolydataToPolylineFilter = NULL;
+
+  m_RoiEnable = FALSE;
+  m_ROI[0] = m_ROI[2] = m_ROI[4] = VTK_DOUBLE_MIN;
+  m_ROI[1] = m_ROI[3] = m_ROI[5] = VTK_DOUBLE_MAX;
+
+  m_AppendPolyData = NULL;
 }
 //----------------------------------------------------------------------------
 void mafPipePolylineSlice::Create(mafSceneNode *n)
@@ -159,17 +173,29 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
 
   m_Mapper = vtkPolyDataMapper::New();
 
-  vtkNEW(m_Delaunay);
-  m_Delaunay->SetInput(m_Cutter->GetOutput());
-	m_Delaunay->SetTolerance(0);
-  m_Delaunay->Update();
+  vtkNEW(m_AppendPolyData);
 
   if(m_Fill)
-    m_Mapper->SetInput(m_Delaunay->GetOutput());
+    m_PolyData = RegionsCapping(m_Cutter->GetOutput());
   else
-    m_Mapper->SetInput(m_Cutter->GetOutput());
- 
-  
+    m_PolyData = m_Cutter->GetOutput();
+
+  vtkNEW(m_ClipPolyData);
+  vtkNEW(m_ClipPolyDataUp);
+  vtkNEW(m_ClipPolyDataDown);
+
+  vtkPolyData *intermediatePolyData = NULL;
+  if(m_RoiEnable)
+  {
+    intermediatePolyData = ExecuteROI(m_PolyData);
+    m_Mapper->SetInput(intermediatePolyData);
+  }
+  else
+  {
+    m_Mapper->SetInput(m_PolyData);
+  }
+
+
   m_Mapper->SetScalarVisibility(m_ScalarVisibility);
   m_Mapper->SetScalarRange(sr);
   
@@ -183,6 +209,7 @@ void mafPipePolylineSlice::Create(mafSceneNode *n)
     m_RenderingDisplayListFlag = 0;
     m_Mapper->ImmediateModeRenderingOff();
   }
+  m_Mapper->Update();
 
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_Mapper);
@@ -239,8 +266,11 @@ mafPipePolylineSlice::~mafPipePolylineSlice()
   vtkDEL(m_OutlineMapper);
   vtkDEL(m_OutlineProperty);
   vtkDEL(m_OutlineActor);
-  vtkDEL(m_Delaunay);
   vtkDEL(m_Cutter);
+  vtkDEL(m_AppendPolyData);
+  vtkDEL(m_ClipPolyData);
+  vtkDEL(m_ClipPolyDataUp);
+  vtkDEL(m_ClipPolyDataDown);
   vtkDEL(m_Plane);
   vtkDEL(m_VTKTransform);
   vtkDEL(m_Tube);
@@ -301,7 +331,7 @@ void mafPipePolylineSlice::OnEvent(mafEventBase *maf_event)
     case ID_FILL:
       {
         if(m_Fill)
-          m_Mapper->SetInput(m_Delaunay->GetOutput());
+          m_Mapper->SetInput(RegionsCapping(m_Cutter->GetOutput()));
         else
           m_Mapper->SetInput(m_Cutter->GetOutput());
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -419,45 +449,21 @@ void mafPipePolylineSlice::UpdateProperty()
   m_Cutter->SetInput(m_Tube->GetOutput());
   m_Cutter->Update();
   
-  vtkMAFSmartPointer<vtkTransform> transform;
-	double alphaZ; 
-	double alphaY;
-	double alphaX;
-	
-  if(m_Normal[2] >= 0)
-    alphaZ= acos(m_Normal[2]);
-  else
-    alphaZ= -acos(m_Normal[2]);
-
-  if(m_Normal[1] >= 0)
-    alphaY= acos(m_Normal[1]);
-  else
-    alphaY= -acos(m_Normal[1]);
-
-  if(m_Normal[0] >= 0)
-    alphaX= acos(m_Normal[0]);
-  else
-    alphaX= -acos(m_Normal[0]);
-
-
-  const double pi = 3.14159;
-
-	transform->RotateX(alphaX*180/pi);
-	transform->RotateY(alphaY*180/pi);
-	transform->RotateZ(alphaZ*180/pi);
-
-	transform->Update();
-
-  m_Delaunay->SetInput(m_Cutter->GetOutput());
-	if(m_Normal[0] == 0 && m_Normal[1] == 0 && m_Normal[2] == 1);
-	else
-	  m_Delaunay->SetTransform(transform);
-  m_Delaunay->Update();
-
   if(m_Fill)
-    m_Mapper->SetInput(m_Delaunay->GetOutput());
+    m_PolyData = RegionsCapping(m_Cutter->GetOutput());
   else
-    m_Mapper->SetInput(m_Cutter->GetOutput());
+    m_PolyData = m_Cutter->GetOutput();
+
+  vtkPolyData *intermediatePolyData = NULL;
+  if(m_RoiEnable)
+  {
+    intermediatePolyData = ExecuteROI(m_PolyData);
+    m_Mapper->SetInput(intermediatePolyData);
+  }
+  else
+  {
+    m_Mapper->SetInput(m_PolyData);
+  }
 
   m_Mapper->Update();
 
@@ -541,4 +547,180 @@ void mafPipePolylineSlice::ShowActorOff()
   {
     m_Actor->SetVisibility(false);
   }
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice::SetROI(double bounds[6])
+//----------------------------------------------------------------------------
+{
+  m_ROI[0] = bounds[0];
+  m_ROI[1] = bounds[1];
+  m_ROI[2] = bounds[2];
+  m_ROI[3] = bounds[3];
+  m_ROI[4] = bounds[4];
+  m_ROI[5] = bounds[5];
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice::SetMaximumROI()
+//----------------------------------------------------------------------------
+{
+  if(m_PolyData)
+  {
+    double bb[6];
+    m_PolyData->GetBounds(bb);
+
+    m_ROI[0] = bb[0];
+    m_ROI[1] = bb[1];
+
+    m_ROI[2] = bb[2];
+    m_ROI[3] = bb[3];
+
+    m_ROI[4] = bb[4];
+    m_ROI[5] = bb[5];
+  }
+}
+//----------------------------------------------------------------------------
+vtkPolyData *mafPipePolylineSlice::ExecuteROI(vtkPolyData *polydata)
+//----------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkCubeSource> cube;
+  cube->SetBounds(m_ROI);
+  cube->Modified();
+  cube->Update();
+
+  vtkMAFSmartPointer<vtkMAFImplicitPolyData> implicitDataset;
+  implicitDataset->SetInput(cube->GetOutput());
+
+  m_ClipPolyData->SetInput(polydata);
+  m_ClipPolyData->InsideOutOn();
+  m_ClipPolyData->SetClipFunction(implicitDataset);
+  m_ClipPolyData->Update();
+
+  vtkMAFSmartPointer<vtkPlane> planeDown;
+  planeDown->SetOrigin(m_ROI[0], m_ROI[2], m_ROI[4]);
+  double normaldown[3] = {0,0,-1};
+  planeDown->SetNormal(normaldown);
+  planeDown->Modified();
+
+  m_ClipPolyDataUp->SetInput(m_ClipPolyData->GetOutput());
+  m_ClipPolyDataUp->SetClipFunction(planeDown);
+  m_ClipPolyDataUp->InsideOutOn();
+  m_ClipPolyDataUp->Update();
+
+  vtkMAFSmartPointer<vtkPlane> planeUp;
+  planeUp->SetOrigin(m_ROI[1], m_ROI[3], m_ROI[5]);
+  double normalUp[3] = {0,0,1};
+  planeUp->SetNormal(normalUp);
+  planeUp->Modified();
+
+  m_ClipPolyDataDown->SetInput(m_ClipPolyDataUp->GetOutput());
+  m_ClipPolyDataDown->SetClipFunction(planeUp);
+  m_ClipPolyDataDown->InsideOutOn();
+  m_ClipPolyDataDown->Update();
+
+  vtkPolyData *resultPolyData = m_ClipPolyDataDown->GetOutput();
+
+  return resultPolyData;
+}
+//----------------------------------------------------------------------------
+vtkPolyData *mafPipePolylineSlice::RegionsCapping(vtkPolyData* inputBorder)
+//----------------------------------------------------------------------------
+{
+  m_AppendPolyData->RemoveAllInputs();
+  vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+  connectivityFilter->SetInput(inputBorder);
+  connectivityFilter->SetExtractionModeToSpecifiedRegions();
+  connectivityFilter->Update();
+  int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
+
+  for(int region = 0; region < regionNumbers; region++)
+  {
+    connectivityFilter->InitializeSpecifiedRegionList();
+    connectivityFilter->AddSpecifiedRegion(region);
+    connectivityFilter->Update();
+    connectivityFilter->GetOutput()->Update();
+
+    vtkMAFSmartPointer<vtkPolyData> p;
+    
+    //write polydata
+    
+    p->SetPoints(connectivityFilter->GetOutput()->GetPoints());
+    p->SetLines(connectivityFilter->GetOutput()->GetLines());
+    p->Update();
+    /*mafString filename1 = "C:\\conn_";
+    filename1 << region;
+    filename1 << ".vtk";
+    vtkMAFSmartPointer<vtkPolyDataWriter> pdWriter;
+    pdWriter->SetInput(p);
+    pdWriter->SetFileName(filename1);
+    pdWriter->Update();*/
+    //end write polydata
+
+    p->DeepCopy(CappingFilter(p));
+
+    /*mafString filename2 = "C:\\connCAPP_";
+    filename2 << region;
+    filename2 << ".vtk";
+
+    pdWriter->SetInput(p);
+    pdWriter->SetFileName(filename2);
+    pdWriter->Update();*/
+    //end write polydata
+    
+    m_AppendPolyData->AddInput(p);
+    m_AppendPolyData->Update();
+  }
+
+  return m_AppendPolyData->GetOutput();
+}
+//----------------------------------------------------------------------------
+vtkPolyData *mafPipePolylineSlice::CappingFilter(vtkPolyData* inputBorder)
+//----------------------------------------------------------------------------
+{
+  int i, iCell;
+  inputBorder->Update();
+  // prerequisites: connected polydata with line cells that represent the edge of the hole to be capped. 
+  // search average point
+  double averagePoint[3] = {0.0,0.0,0.0};
+  vtkMAFSmartPointer<vtkPoints>outputPoints;
+  vtkMAFSmartPointer<vtkCellArray> outputCellArray;
+  vtkPolyData *output;
+  vtkNEW(output);
+  outputPoints->DeepCopy(inputBorder->GetPoints());
+
+  for(i = 0;i<inputBorder->GetNumberOfPoints();i++)
+  {
+    double currentPoint[3];
+    inputBorder->GetPoint(i, currentPoint);
+    averagePoint[0] += currentPoint[0];
+    averagePoint[1] += currentPoint[1];
+    averagePoint[2] += currentPoint[2];
+  }
+  // the new polydata that represents capping has input->NPoints + 1 points: the averagePoint
+  double center[3];
+  inputBorder->GetCenter(center);
+
+  averagePoint[0] /= inputBorder->GetNumberOfPoints(); 
+  averagePoint[1] /= inputBorder->GetNumberOfPoints();
+  averagePoint[2] /= inputBorder->GetNumberOfPoints();
+  outputPoints->InsertNextPoint(center);
+  output->SetPoints(outputPoints);
+  // create triangular cells with the new point.
+  for(int i=0; i<inputBorder->GetNumberOfCells();i++)
+  {
+    //each line of the inputPolydata should be transformed into a triangle.
+    vtkMAFSmartPointer<vtkIdList> currentCellIds;
+    for (iCell = 0; iCell < inputBorder->GetCell(i)->GetNumberOfPoints(); iCell++)
+    {
+      currentCellIds->InsertNextId(inputBorder->GetCell(i)->GetPointIds()->GetId(iCell));
+    }
+    // write the last id (the averagePoint) in the current cell Id list
+    currentCellIds->InsertNextId(inputBorder->GetNumberOfPoints());
+    // insert the Id list in the cell array
+    outputCellArray->InsertNextCell(currentCellIds);
+  }
+  // set the cell array to the polydata
+  output->SetPolys(outputCellArray);
+  output->Update();
+
+  return output;
 }
