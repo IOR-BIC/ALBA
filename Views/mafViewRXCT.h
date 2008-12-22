@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2008-12-22 17:52:38 $
+  Version:   $Revision: 1.17.2.1 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,6 +75,8 @@ public:
 
   /* Method for determine if the pick is over a Slice view or not*/
   bool IsPickedSliceView();
+
+  virtual void			OnSize(wxSizeEvent &size_event);
 
 protected:
   /**

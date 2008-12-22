@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-03 12:21:45 $
-  Version:   $Revision: 1.45.2.2 $
+  Date:      $Date: 2008-12-22 17:52:38 $
+  Version:   $Revision: 1.45.2.3 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -789,6 +789,11 @@ void mafViewRXCT::LayoutSubViewCustom(int width, int height)
     i++;
   }
   ((mafViewCompound *)m_ChildViewList[i-1])->OnLayout();
+
+  for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+  {
+    ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderUpdate();
+  }
 }
 //----------------------------------------------------------------------------
 void mafViewRXCT::MaximizeSubView(int subview_id, bool maximize)
@@ -979,4 +984,10 @@ bool mafViewRXCT::IsPickedSliceView()
     }
   }
   return false;
+}
+//-------------------------------------------------------------------------
+void mafViewRXCT::OnSize(wxSizeEvent &size_event)
+//-------------------------------------------------------------------------
+{
+  mafViewCompound::OnSize(size_event);
 }
