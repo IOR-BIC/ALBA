@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-18 08:58:49 $
-  Version:   $Revision: 1.3.2.4 $
+  Date:      $Date: 2008-12-22 11:49:54 $
+  Version:   $Revision: 1.3.2.5 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2005
@@ -138,7 +138,7 @@ public:
   void String(int id,mafString label,mafString *var, mafString tooltip = "", bool multiline = false, bool password = false);
   
   /** Integer entry widget. */
-  void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "");
+  void Integer(int id,mafString label,int *var, int min = MININT, int max = MAXINT, mafString tooltip = "", bool labelAlwaysEnable = false);
 
   /** Float entry widget. */
   void Float(int id,mafString label,float *var, float min = MINFLOAT, float max = MAXFLOAT, int flag=0, int decimal_digit = -1, mafString tooltip = "");
