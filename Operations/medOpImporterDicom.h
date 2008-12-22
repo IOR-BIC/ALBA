@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:35:29 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2008-12-22 12:40:01 $
+Version:   $Revision: 1.12.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -125,7 +125,7 @@ protected:
 	void ResetSliders();
 
 	/** Build the list of dicom filer recognized. */
-	void BuildDicomFileList(const char *dir);
+	bool BuildDicomFileList(const char *dir);
 
 	/** Return the slice number from the heightId and sliceId*/
 	int GetImageId(int heightId, int timeId);
@@ -153,7 +153,7 @@ protected:
 
 	void CameraReset();
 
-  void OpenDir();
+  bool OpenDir();
 
 	void OnWizardPageChanging(){};
 

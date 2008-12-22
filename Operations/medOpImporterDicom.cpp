@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-11-12 14:43:51 $
-Version:   $Revision: 1.21.2.1 $
+Date:      $Date: 2008-12-22 12:40:01 $
+Version:   $Revision: 1.21.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -251,17 +251,27 @@ void medOpImporterDicom::OpRun()
 	m_Wizard->SetFirstPage(m_LoadPage);
 
   //wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
-  wxString path;
-  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
-  dialog.SetReturnCode(wxID_OK);
-  int ret_code = dialog.ShowModal();
-  if (ret_code == wxID_OK)
+
+  bool result = false;
+  do 
   {
-    path = dialog.GetPath();
-    m_DicomDirectory = path.c_str();
-    GuiUpdate();
-    OpenDir();
-  }
+	  wxString path;
+	  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
+	  dialog.SetReturnCode(wxID_OK);
+	  int ret_code = dialog.ShowModal();
+	  if (ret_code == wxID_OK)
+	  {
+	    path = dialog.GetPath();
+	    m_DicomDirectory = path.c_str();
+	    GuiUpdate();
+	    result = OpenDir();
+	  }
+    else
+    {
+      OpStop(OP_RUN_CANCEL);
+      return;
+    }
+  } while(!result);
 
 	if(m_Wizard->Run())
 	{
@@ -685,12 +695,16 @@ void medOpImporterDicom::CreateGui()
 	m_Gui = new mafGUI(this);
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicom::OpenDir()
+bool medOpImporterDicom::OpenDir()
 //----------------------------------------------------------------------------
 {
   ResetStructure();
   // scan dicom directory
-  BuildDicomFileList(m_DicomDirectory.GetCStr());
+  if (!BuildDicomFileList(m_DicomDirectory.GetCStr()))
+  {
+    return false;
+  }
+  
   if(m_NumberOfStudy>0)
   {
     if(m_NumberOfStudy == 1)
@@ -710,6 +724,8 @@ void medOpImporterDicom::OpenDir()
       m_CropPage->GetRWI()->CameraReset();
     }
     m_BoxCorrect=true;
+
+    return true;
   }
 }
 //----------------------------------------------------------------------------
@@ -1352,7 +1368,7 @@ void medOpImporterDicom::CreatePipeline()
 	m_Mouse->AddObserver(m_DicomInteractor, MCH_INPUT);
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicom::BuildDicomFileList(const char *dir)
+bool medOpImporterDicom::BuildDicomFileList(const char *dir)
 //----------------------------------------------------------------------------
 {
 	int row, i;
@@ -1365,7 +1381,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 	if (m_DirectoryReader->Open(dir) == 0)
 	{
 		wxMessageBox(wxString::Format("Directory <%s> can not be opened",dir),"Warning!!");
-		return;
+		return false;
 	}
 
 	mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
@@ -1453,7 +1469,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 						{
 							wxString msg = _("cMRI damaged !");
 							wxMessageBox(msg,"Confirm", wxOK , NULL);
-							return;
+							return false;
 						}
 					}
 					else
@@ -1464,7 +1480,7 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 						{
 							wxString msg = _("cMRI damaged !");
 							wxMessageBox(msg,"Confirm", wxOK , NULL);
-							return;
+							return false;
 						}
 					}
 					trigTime = m_DicomReader->GetTriggerTime();
@@ -1490,7 +1506,12 @@ void medOpImporterDicom::BuildDicomFileList(const char *dir)
 	{
 		wxString msg = "No study found!";
 		wxMessageBox(msg,"Confirm", wxOK , NULL);
+    return false;
 	}
+  else
+  {
+    return true;
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::ResetStructure()
