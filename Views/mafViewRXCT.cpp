@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-22 17:52:38 $
-  Version:   $Revision: 1.45.2.3 $
+  Date:      $Date: 2008-12-23 08:58:21 $
+  Version:   $Revision: 1.45.2.4 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -788,7 +788,10 @@ void mafViewRXCT::LayoutSubViewCustom(int width, int height)
     m_ChildViewList[i]->GetWindow()->SetSize(x_pos, 0, step_width, height);
     i++;
   }
-  ((mafViewCompound *)m_ChildViewList[i-1])->OnLayout();
+  wxSize sizeToSend = m_ChildViewList[i-1]->GetWindow()->GetSize();
+  wxSizeEvent event(sizeToSend);
+  ((mafViewCompound *)m_ChildViewList[i-1])->OnSize(event);
+  //((mafViewCompound *)m_ChildViewList[i-1])->OnLayout();
 
   for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
   {
@@ -813,7 +816,7 @@ void mafViewRXCT::MaximizeSubView(int subview_id, bool maximize)
   }
 
   for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
-  {  
+  {
     ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->BorderUpdate();
   }
 
@@ -950,7 +953,9 @@ void mafViewRXCT::BoundsValidate(double *pos)
 		}
 	}
 }
+//----------------------------------------------------------------------------
 void mafViewRXCT::ResetSlicesPosition( mafNode *node )
+//----------------------------------------------------------------------------
 {
   // workaround... :(
   // maybe we need some mechanism to execute view code from op?
