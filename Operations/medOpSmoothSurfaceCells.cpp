@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:14:48 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2008-12-30 11:04:48 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -79,6 +79,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkAppendPolyData.h"
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkCleanPolyData.h"
+#include "vtkWindowedSincPolyDataFilter.h"
 
 
 
@@ -118,19 +119,26 @@ mafOp(label)
   m_PolydataMapper = NULL;
   m_PolydataActor = NULL;
 
-  m_SmoothParameterNumberOfInteractions = 1;
+  m_SmoothParameterNumberOfInteractions = 250;
   m_SmoothParameterBoundary = 0;
-  m_SmoothParameterFeatureAngle = 90.;
+  m_SmoothParameterFeatureAngle = 45.;
 
   m_RemoveSelectedCells = NULL;
   m_RemoveUnSelectedCells = NULL;
   m_SelectCellInteractor = NULL;
+  m_VisitedCells = NULL;
+  m_VisitedPoints = NULL;
+  	// only one region with ID 0
+  m_RegionNumber = ID_REGION;
+
 	
 }
 //----------------------------------------------------------------------------
 medOpSmoothSurfaceCells::~medOpSmoothSurfaceCells()
 //----------------------------------------------------------------------------
 {
+	if (m_VisitedCells) delete []m_VisitedCells;
+	if (m_VisitedPoints) delete []m_VisitedPoints;
 	vtkDEL(m_Mesh);
 	vtkDEL(m_ResultPolydata);
 	vtkDEL(m_OriginalPolydata);
@@ -167,6 +175,21 @@ void medOpSmoothSurfaceCells::OpRun()
 	CreateSurfacePipeline();
 	
 	InitializeMesh();
+	int maxVisitedCells = m_OriginalPolydata->GetNumberOfCells();
+	m_VisitedCells = new int[maxVisitedCells];
+	for ( int i=0; i < maxVisitedCells; i++ )
+	{
+		m_VisitedCells[i] = -1;
+	}
+
+	// heuristic
+	int maxVisitedPoints = m_OriginalPolydata->GetNumberOfPoints();
+	m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
+	for (int i=0; i < maxVisitedPoints; i++ )
+	{
+		m_VisitedPoints[i] = -1;
+	}
+
 
 	if (m_TestMode == false)
 	{
@@ -260,14 +283,14 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 	wxCheckBox *unselect =   new wxCheckBox(m_Dialog, ID_DELETE,         "unselect", p, wxSize(80,20));
   wxStaticText *foo1  = new wxStaticText(m_Dialog,-1, " ");
 
-  wxStaticText *smoothNumberIterations  = new wxStaticText(m_Dialog,-1, "number of iterations: ");
-  wxTextCtrl   *smoothIterations = new wxTextCtrl  (m_Dialog,ID_ITERATIONS, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
+  //wxStaticText *smoothNumberIterations  = new wxStaticText(m_Dialog,-1, "number of iterations: ");
+  //wxTextCtrl   *smoothIterations = new wxTextCtrl  (m_Dialog,ID_ITERATIONS, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
 	
-  wxStaticText *foo2  = new wxStaticText(m_Dialog,-1, " ");
-  wxCheckBox *boundaryEnable =   new wxCheckBox(m_Dialog, ID_BOUNDARY,         "boundary", p, wxSize(80,20));
+  //wxStaticText *foo2  = new wxStaticText(m_Dialog,-1, " ");
+  //wxCheckBox *boundaryEnable =   new wxCheckBox(m_Dialog, ID_BOUNDARY,         "boundary", p, wxSize(80,20));
 
-  wxStaticText *featureAngleTitle  = new wxStaticText(m_Dialog,-1, " feature angle:");
-  wxTextCtrl   *featureAngle = new wxTextCtrl  (m_Dialog,ID_FEATURE_ANGLE, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
+  //wxStaticText *featureAngleTitle  = new wxStaticText(m_Dialog,-1, " feature angle:");
+  //wxTextCtrl   *featureAngle = new wxTextCtrl  (m_Dialog,ID_FEATURE_ANGLE, "",								 		p,wxSize(50, 16 ), wxNO_BORDER );
 
 
   wxStaticText *help  = new wxStaticText(m_Dialog,-1, "Use CTRL to select cells");
@@ -285,9 +308,9 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 	diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
 	unselect->SetValidator(mafGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
-  smoothIterations->SetValidator(mafGUIValidator(this,ID_ITERATIONS,smoothIterations,&m_SmoothParameterNumberOfInteractions,0));
-  boundaryEnable->SetValidator(mafGUIValidator(this, ID_BOUNDARY, boundaryEnable, &m_SmoothParameterBoundary));
-  featureAngle->SetValidator(mafGUIValidator(this, ID_FEATURE_ANGLE, featureAngle, &m_SmoothParameterFeatureAngle));
+  //smoothIterations->SetValidator(mafGUIValidator(this,ID_ITERATIONS,smoothIterations,&m_SmoothParameterNumberOfInteractions,0));
+  //boundaryEnable->SetValidator(mafGUIValidator(this, ID_BOUNDARY, boundaryEnable, &m_SmoothParameterBoundary));
+  //featureAngle->SetValidator(mafGUIValidator(this, ID_FEATURE_ANGLE, featureAngle, &m_SmoothParameterFeatureAngle));
 
 	unselectAllButton->SetValidator(mafGUIValidator(this,ID_UNSELECT,unselectAllButton));
 	b_fit->SetValidator(mafGUIValidator(this,ID_FIT,b_fit));
@@ -307,12 +330,12 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 	h_sizer1->Add(unselect,     0,wxRIGHT);
   
   h_sizer1->Add(foo1,     0,wxRIGHT);
-  h_sizer1->Add(smoothNumberIterations,     0,wxRIGHT);
-  h_sizer1->Add(smoothIterations, 0, wxRIGHT);
-  h_sizer1->Add(foo2, 0, wxRIGHT);
-  h_sizer1->Add(boundaryEnable, 0, wxRIGHT);
-  h_sizer1->Add(featureAngleTitle, 0, wxRIGHT);
-  h_sizer1->Add(featureAngle, 0, wxRIGHT);
+  //h_sizer1->Add(smoothNumberIterations,     0,wxRIGHT);
+  //h_sizer1->Add(smoothIterations, 0, wxRIGHT);
+  //h_sizer1->Add(foo2, 0, wxRIGHT);
+  //h_sizer1->Add(boundaryEnable, 0, wxRIGHT);
+  //h_sizer1->Add(featureAngleTitle, 0, wxRIGHT);
+  //h_sizer1->Add(featureAngle, 0, wxRIGHT);
   
 
 	wxBoxSizer *h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
@@ -443,7 +466,7 @@ void medOpSmoothSurfaceCells::OnEvent(mafEventBase *maf_event)
 
 		case VME_PICKED:
 			{
-				double pos[3];
+				double pos[3];  
 				vtkPoints *pts = NULL; 
 				pts = (vtkPoints *)e->GetVtkObj();
 				pts->GetPoint(0,pos);
@@ -467,7 +490,7 @@ void medOpSmoothSurfaceCells::OnEvent(mafEventBase *maf_event)
 
 		case ID_DELETE:
 			{
-
+            m_RegionNumber = -m_UnselectCells;
 			}     
 			break ;
 
@@ -481,9 +504,23 @@ void medOpSmoothSurfaceCells::OnEvent(mafEventBase *maf_event)
 			{
 				m_ResultPolydata->DeepCopy(m_OriginalPolydata);
 				m_ResultPolydata->Update();
-        DestroyCellFilters();
-        CreateSurfacePipeline();
-        InitializeMesh();
+				DestroyCellFilters();
+				CreateSurfacePipeline();
+				InitializeMesh();
+				int maxVisitedCells = m_OriginalPolydata->GetNumberOfCells();
+				m_VisitedCells = new int[maxVisitedCells];
+				for ( int i=0; i < maxVisitedCells; i++ )
+				{
+					m_VisitedCells[i] = -1;
+				}
+
+				// heuristic
+				int maxVisitedPoints = m_OriginalPolydata->GetNumberOfPoints();
+				m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
+				for (int i=0; i < maxVisitedPoints; i++ )
+				{
+					m_VisitedPoints[i] = -1;
+				}
 				m_Rwi->m_RenderWindow->Render();
 			}     
 			break ;
@@ -514,7 +551,7 @@ void medOpSmoothSurfaceCells::TraverseMeshAndMark( double radius )
 		for ( idCellInWave=0; idCellInWave < numIds; idCellInWave++ )
 		{
 			cellId = m_Wave->GetId(idCellInWave);
-			if ( m_VisitedCells[cellId] < 0 )
+			if ( m_VisitedCells[cellId] != m_RegionNumber )
 			{
 				// mark it as visited
 				m_VisitedCells[cellId] = m_RegionNumber;
@@ -579,7 +616,7 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 
 	m_NeighborCellPointIds->Allocate(3);
 
-	vtkIdType i;
+	//vtkIdType i;
 	vtkIdType numPts, numCells;
 	vtkPoints *inPts;
 	vtkPolyData *polydata = m_ResultPolydata;
@@ -607,20 +644,20 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 	//
 
 	// heuristic
-	int maxVisitedCells = numCells;
-	m_VisitedCells = new int[maxVisitedCells];
-	for ( i=0; i < maxVisitedCells; i++ )
-	{
-		m_VisitedCells[i] = -1;
-	}
+	//int maxVisitedCells = numCells;
+	////m_VisitedCells = new int[maxVisitedCells];
+	//for ( i=0; i < maxVisitedCells; i++ )
+	//{
+	//	m_VisitedCells[i] = -1;
+	//}
 
-	// heuristic
-	int maxVisitedPoints = numPts;
-	m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
-	for ( i=0; i < maxVisitedPoints; i++ )
-	{
-		m_VisitedPoints[i] = -1;
-	}
+	//// heuristic
+	//int maxVisitedPoints = numPts;
+	////m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
+	//for ( i=0; i < maxVisitedPoints; i++ )
+	//{
+	//	m_VisitedPoints[i] = -1;
+	//}
 
 	// Traverse all cells marking those visited. Connected region grows 
 	// using a connected wave propagation.
@@ -634,7 +671,7 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 	m_PointNumber = 0;
 
 	// only one region with ID 0
-	m_RegionNumber = ID_REGION;
+	//m_RegionNumber = ID_REGION;
 
 	m_Wave->InsertNextId(m_CellSeed);
 
@@ -644,8 +681,8 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 	m_Wave->Reset();
 	m_Wave2->Reset();
 
-	delete [] m_VisitedCells;
-	delete [] m_VisitedPoints;
+	//delete [] m_VisitedCells;
+	//delete [] m_VisitedPoints;
 
 	vtkDEL(m_NeighborCellPointIds);
 	vtkDEL(m_Wave);
@@ -728,9 +765,9 @@ void medOpSmoothSurfaceCells::SmoothCells()
 
   vtkMAFSmartPointer<vtkSmoothPolyDataFilter> smoothFilter;
   smoothFilter->SetInput(toSmoothPolyData);
-  smoothFilter->FeatureEdgeSmoothingOn();
   smoothFilter->SetNumberOfIterations(m_SmoothParameterNumberOfInteractions);
-  smoothFilter->SetBoundarySmoothing(m_SmoothParameterBoundary);
+  smoothFilter->BoundarySmoothingOff();//always true
+  smoothFilter->FeatureEdgeSmoothingOn();
   smoothFilter->SetFeatureAngle(m_SmoothParameterFeatureAngle);
   smoothFilter->Update();
 
@@ -753,6 +790,23 @@ void medOpSmoothSurfaceCells::SmoothCells()
 
   CreateSurfacePipeline();
   InitializeMesh();
+  // reset structures
+  int maxVisitedCells = m_OriginalPolydata->GetNumberOfCells();
+  m_VisitedCells = new int[maxVisitedCells];
+	for ( int i=0; i < maxVisitedCells; i++ )
+	{
+		m_VisitedCells[i] = -1;
+	}
+
+	// heuristic
+	int maxVisitedPoints = m_OriginalPolydata->GetNumberOfPoints();
+	m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
+	for (int i=0; i < maxVisitedPoints; i++ )
+	{
+		m_VisitedPoints[i] = -1;
+	}
+
+
 }
 //----------------------------------------------------------------------------
 void medOpSmoothSurfaceCells::MarkCells()
