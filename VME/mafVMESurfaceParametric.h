@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-18 12:46:51 $
-  Version:   $Revision: 1.7.2.2 $
+  Date:      $Date: 2009-01-07 09:48:01 $
+  Version:   $Revision: 1.7.2.3 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,6 +44,7 @@ public:
     PARAMETRIC_CYLINDER,
     PARAMETRIC_CUBE,
     PARAMETRIC_PLANE,
+    PARAMETRIC_ELLIPSOID,
   };
 
   /** Set the geometry type to be generated: use PARAMETRIC_SURFACE_TYPE_ID as arg*/
@@ -107,6 +108,7 @@ protected:
     CHANGE_VALUE_CYLINDER,
     CHANGE_VALUE_CUBE,
     CHANGE_VALUE_PLANE,
+    CHANGE_VALUE_ELLIPSOID,
     ID_GEOMETRY_TYPE,
     ID_LAST
   };
@@ -148,12 +150,16 @@ protected:
 
   void CreateGuiSphere();
   void EnableGuiSphere();
+
+  void CreateGuiEllipsoid();
+  void EnableGuiEllipsoid();
   
   mafGUI *m_GuiSphere;
   mafGUI *m_GuiCone;
   mafGUI *m_GuiCylinder;
   mafGUI *m_GuiCube;
   mafGUI *m_GuiPlane;
+  mafGUI *m_GuiEllipsoid;
 
 	mafTransform *m_Transform; 
 	vtkPolyData  *m_PolyData;
@@ -179,6 +185,12 @@ protected:
   double m_PlaneOrigin[3];
   double m_PlanePoint1[3];
   double m_PlanePoint2[3];
+  double m_EllipsoidXLenght;
+  double m_EllipsoidYLenght;
+  double m_EllipsoidZLenght;
+  double m_EllipsoidPhiRes;
+  double m_EllipsoidTheRes;
+  int m_EllipsoidOrientationAxis;
   
 private:
   mafVMESurfaceParametric(const mafVMESurfaceParametric&); // Not implemented

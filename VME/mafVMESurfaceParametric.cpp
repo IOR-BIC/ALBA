@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-07 09:25:32 $
-  Version:   $Revision: 1.17.2.4 $
+  Date:      $Date: 2009-01-07 09:48:01 $
+  Version:   $Revision: 1.17.2.5 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -90,12 +90,12 @@ mafVMESurfaceParametric::mafVMESurfaceParametric()
   m_PlanePoint1[1] = m_PlanePoint1[2] = 0.0;
   m_PlanePoint2[1] = 3.0;
   m_PlanePoint2[0] = m_PlanePoint2[2] = 0.0;
-  m_EllipsoideXLenght = 1.0;
-  m_EllipsoideYLenght = 2.0;
-  m_EllipsoideZLenght = 3.0;
-  m_EllipsoidePhiRes = 10.0;
-  m_EllipsoideTheRes = 10.0;
-  m_EllipsoideOrientationAxis = ID_X_AXIS;
+  m_EllipsoidXLenght = 1.0;
+  m_EllipsoidYLenght = 2.0;
+  m_EllipsoidZLenght = 3.0;
+  m_EllipsoidPhiRes = 10.0;
+  m_EllipsoidTheRes = 10.0;
+  m_EllipsoidOrientationAxis = ID_X_AXIS;
 
 	mafNEW(m_Transform);
 	mafVMEOutputSurface *output=mafVMEOutputSurface::New(); // an output with no data
@@ -173,12 +173,12 @@ int mafVMESurfaceParametric::DeepCopy(mafNode *a)
     this->m_PlanePoint2[1] = vmeParametricSurface->m_PlanePoint2[1];
     this->m_PlanePoint2[2] = vmeParametricSurface->m_PlanePoint2[2];
 
-    this->m_EllipsoideXLenght = vmeParametricSurface->m_EllipsoideXLenght;
-    this->m_EllipsoideYLenght = vmeParametricSurface->m_EllipsoideYLenght;
-    this->m_EllipsoideZLenght = vmeParametricSurface->m_EllipsoideZLenght;
-    this->m_EllipsoidePhiRes = vmeParametricSurface->m_EllipsoidePhiRes;
-    this->m_EllipsoideTheRes = vmeParametricSurface->m_EllipsoideTheRes;
-    this->m_EllipsoideOrientationAxis = vmeParametricSurface->m_EllipsoideOrientationAxis;
+    this->m_EllipsoidXLenght = vmeParametricSurface->m_EllipsoidXLenght;
+    this->m_EllipsoidYLenght = vmeParametricSurface->m_EllipsoidYLenght;
+    this->m_EllipsoidZLenght = vmeParametricSurface->m_EllipsoidZLenght;
+    this->m_EllipsoidPhiRes = vmeParametricSurface->m_EllipsoidPhiRes;
+    this->m_EllipsoidTheRes = vmeParametricSurface->m_EllipsoidTheRes;
+    this->m_EllipsoidOrientationAxis = vmeParametricSurface->m_EllipsoidOrientationAxis;
 
     mafDataPipeCustom *dpipe = mafDataPipeCustom::SafeDownCast(GetDataPipe());
     if (dpipe)
@@ -231,12 +231,12 @@ bool mafVMESurfaceParametric::Equals(mafVME *vme)
       this->m_PlanePoint2[1] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint2[1]  &&
       this->m_PlanePoint2[2] == ((mafVMESurfaceParametric *)vme)->m_PlanePoint2[2] &&
 
-      this->m_EllipsoideXLenght == ((mafVMESurfaceParametric *)vme)->m_EllipsoideXLenght &&
-      this->m_EllipsoideYLenght == ((mafVMESurfaceParametric *)vme)->m_EllipsoideYLenght &&
-      this->m_EllipsoideZLenght == ((mafVMESurfaceParametric *)vme)->m_EllipsoideZLenght &&
-      this->m_EllipsoidePhiRes == ((mafVMESurfaceParametric *)vme)->m_EllipsoidePhiRes &&
-      this->m_EllipsoideTheRes == ((mafVMESurfaceParametric *)vme)->m_EllipsoideTheRes &&
-      this->m_EllipsoideOrientationAxis == ((mafVMESurfaceParametric *)vme)->m_EllipsoideOrientationAxis
+      this->m_EllipsoidXLenght == ((mafVMESurfaceParametric *)vme)->m_EllipsoidXLenght &&
+      this->m_EllipsoidYLenght == ((mafVMESurfaceParametric *)vme)->m_EllipsoidYLenght &&
+      this->m_EllipsoidZLenght == ((mafVMESurfaceParametric *)vme)->m_EllipsoidZLenght &&
+      this->m_EllipsoidPhiRes == ((mafVMESurfaceParametric *)vme)->m_EllipsoidPhiRes &&
+      this->m_EllipsoidTheRes == ((mafVMESurfaceParametric *)vme)->m_EllipsoidTheRes &&
+      this->m_EllipsoidOrientationAxis == ((mafVMESurfaceParametric *)vme)->m_EllipsoidOrientationAxis
       )
     {
       ret = true;
@@ -278,7 +278,7 @@ mafGUI* mafVMESurfaceParametric::CreateGui()
   mafVME::CreateGui();
   if(m_Gui)
   {
-    wxString geometryType[6] = {"Sphere", "Cone", "Cylinder", "Cube", "Plane", "Ellipsoide"};
+    wxString geometryType[6] = {"Sphere", "Cone", "Cylinder", "Cube", "Plane", "Ellipsoid"};
     m_Gui->Combo(ID_GEOMETRY_TYPE, "", &m_GeometryType, 6, geometryType);
     m_Gui->Divider(2);
 
@@ -292,7 +292,7 @@ mafGUI* mafVMESurfaceParametric::CreateGui()
     m_Gui->Divider(2);
     CreateGuiPlane();
     m_Gui->Divider(2);
-    CreateGuiEllipsoide();
+    CreateGuiEllipsoid();
    
     m_Gui->FitGui();
     
@@ -325,7 +325,7 @@ void mafVMESurfaceParametric::OnEvent(mafEventBase *maf_event)
       case CHANGE_VALUE_CONE:
       case CHANGE_VALUE_CYLINDER:
       case CHANGE_VALUE_PLANE:
-      case CHANGE_VALUE_ELLIPSOIDE:
+      case CHANGE_VALUE_ELLIPSOID:
       {
         InternalUpdate();
         e->SetId(CAMERA_UPDATE);
@@ -471,17 +471,17 @@ void mafVMESurfaceParametric::InternalUpdate()
     }
     break;
 
-  case PARAMETRIC_ELLIPSOIDE:
+  case PARAMETRIC_ELLIPSOID:
     {
       vtkMAFSmartPointer<vtkSphereSource> surf;
-      surf->SetRadius(m_EllipsoideYLenght);
-      surf->SetPhiResolution(m_EllipsoidePhiRes);
-      surf->SetThetaResolution(m_EllipsoideTheRes);
+      surf->SetRadius(m_EllipsoidYLenght);
+      surf->SetPhiResolution(m_EllipsoidPhiRes);
+      surf->SetThetaResolution(m_EllipsoidTheRes);
       surf->Update();
 
       vtkMAFSmartPointer<vtkTransform> t;
 
-      switch(m_EllipsoideOrientationAxis)
+      switch(m_EllipsoidOrientationAxis)
       {
       case ID_X_AXIS:
         //do nothing
@@ -496,7 +496,7 @@ void mafVMESurfaceParametric::InternalUpdate()
         break;
       }
 
-      t->Scale(m_EllipsoideXLenght/m_EllipsoideYLenght,1,m_EllipsoideZLenght/m_EllipsoideYLenght);
+      t->Scale(m_EllipsoidXLenght/m_EllipsoidYLenght,1,m_EllipsoidZLenght/m_EllipsoidYLenght);
       t->Update();
 
       vtkMAFSmartPointer<vtkTransformPolyDataFilter> ptf;
@@ -542,12 +542,12 @@ int mafVMESurfaceParametric::InternalStore(mafStorageElement *parent)
     parent->StoreVectorN("PlaneOrigin",m_PlaneOrigin,3) == MAF_OK &&
     parent->StoreVectorN("PlanePoint1",m_PlanePoint1,3) == MAF_OK &&
     parent->StoreVectorN("PlanePoint2",m_PlanePoint2,3) == MAF_OK &&
-    parent->StoreDouble("EllipsoideXLenght",m_EllipsoideXLenght) == MAF_OK &&
-    parent->StoreDouble("EllipsoideYLenght",m_EllipsoideYLenght) == MAF_OK &&
-    parent->StoreDouble("EllipsoideZLenght",m_EllipsoideZLenght) == MAF_OK &&
-    parent->StoreDouble("EllipsoideTheRes",m_EllipsoideTheRes) == MAF_OK &&
-    parent->StoreDouble("EllipsoidePhiRes",m_EllipsoidePhiRes) == MAF_OK &&
-    parent->StoreInteger("EllipsoideOrientationAxis",m_CylinderOrientationAxis) == MAF_OK
+    parent->StoreDouble("EllipsoidXLenght",m_EllipsoidXLenght) == MAF_OK &&
+    parent->StoreDouble("EllipsoidYLenght",m_EllipsoidYLenght) == MAF_OK &&
+    parent->StoreDouble("EllipsoidZLenght",m_EllipsoidZLenght) == MAF_OK &&
+    parent->StoreDouble("EllipsoidTheRes",m_EllipsoidTheRes) == MAF_OK &&
+    parent->StoreDouble("EllipsoidPhiRes",m_EllipsoidPhiRes) == MAF_OK &&
+    parent->StoreInteger("EllipsoidOrientationAxis",m_CylinderOrientationAxis) == MAF_OK
     )
 		return MAF_OK;
 	}
@@ -585,12 +585,12 @@ int mafVMESurfaceParametric::InternalRestore(mafStorageElement *node)
       node->RestoreVectorN("PlaneOrigin",m_PlaneOrigin,3);
       node->RestoreVectorN("PlanePoint1",m_PlanePoint1,3);
       node->RestoreVectorN("PlanePoint2",m_PlanePoint2,3);
-      node->RestoreDouble("EllipsoideXLenght",m_EllipsoideXLenght);
-      node->RestoreDouble("EllipsoideYLenght",m_EllipsoideYLenght);
-      node->RestoreDouble("EllipsoideZLenght",m_EllipsoideZLenght);
-      node->RestoreDouble("EllipsoideTheRes",m_EllipsoideTheRes);
-      node->RestoreDouble("EllipsoidePhiRes",m_EllipsoidePhiRes);
-      node->RestoreInteger("EllipsoideOrientationAxis",m_CylinderOrientationAxis);
+      node->RestoreDouble("EllipsoidXLenght",m_EllipsoidXLenght);
+      node->RestoreDouble("EllipsoidYLenght",m_EllipsoidYLenght);
+      node->RestoreDouble("EllipsoidZLenght",m_EllipsoidZLenght);
+      node->RestoreDouble("EllipsoidTheRes",m_EllipsoidTheRes);
+      node->RestoreDouble("EllipsoidPhiRes",m_EllipsoidPhiRes);
+      node->RestoreInteger("EllipsoidOrientationAxis",m_CylinderOrientationAxis);
       return MAF_OK;
     }
 	}
@@ -681,19 +681,19 @@ void mafVMESurfaceParametric::CreateGuiSphere()
   m_Gui->AddGui(m_GuiSphere);
 }
 
-void mafVMESurfaceParametric::CreateGuiEllipsoide()
+void mafVMESurfaceParametric::CreateGuiEllipsoid()
 {
-  m_GuiEllipsoide = new mafGUI(this);
-  m_GuiEllipsoide->Label("Ellipsoide");
-  m_GuiEllipsoide->Double(CHANGE_VALUE_ELLIPSOIDE,_("X Length"), &m_EllipsoideXLenght);
-  m_GuiEllipsoide->Double(CHANGE_VALUE_ELLIPSOIDE,_("Y Length"), &m_EllipsoideYLenght);
-  m_GuiEllipsoide->Double(CHANGE_VALUE_ELLIPSOIDE,_("Z Length"), &m_EllipsoideZLenght);
-  m_GuiEllipsoide->Double(CHANGE_VALUE_ELLIPSOIDE,_("Phi res"), &m_EllipsoidePhiRes);
-  m_GuiEllipsoide->Double(CHANGE_VALUE_ELLIPSOIDE,_("Theta res"), &m_EllipsoideTheRes);
+  m_GuiEllipsoid = new mafGUI(this);
+  m_GuiEllipsoid->Label("Ellipsoid");
+  m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("X Length"), &m_EllipsoidXLenght);
+  m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Y Length"), &m_EllipsoidYLenght);
+  m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Z Length"), &m_EllipsoidZLenght);
+  m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Phi res"), &m_EllipsoidPhiRes);
+  m_GuiEllipsoid->Double(CHANGE_VALUE_ELLIPSOID,_("Theta res"), &m_EllipsoidTheRes);
   wxString orientationArray[3] = {_("X axis"),_("Y axis"),_("Z axis")};
-  m_GuiEllipsoide->Radio(CHANGE_VALUE_ELLIPSOIDE,"Orientation", &m_EllipsoideOrientationAxis, 3,orientationArray);
+  m_GuiEllipsoid->Radio(CHANGE_VALUE_ELLIPSOID,"Orientation", &m_EllipsoidOrientationAxis, 3,orientationArray);
   assert(m_Gui);
-  m_Gui->AddGui(m_GuiEllipsoide);
+  m_Gui->AddGui(m_GuiEllipsoid);
 }
 
 void mafVMESurfaceParametric::EnableGuiPlane()
@@ -703,7 +703,7 @@ void mafVMESurfaceParametric::EnableGuiPlane()
   m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
   m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
   m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
-  m_GuiEllipsoide->Enable(CHANGE_VALUE_ELLIPSOIDE, false);
+  m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, false);
 }
 
 void mafVMESurfaceParametric::EnableGuiCube()
@@ -713,7 +713,7 @@ void mafVMESurfaceParametric::EnableGuiCube()
   m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
   m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
   m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
-  m_GuiEllipsoide->Enable(CHANGE_VALUE_ELLIPSOIDE, false);
+  m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, false);
 }
 
 void mafVMESurfaceParametric::EnableGuiCylinder()
@@ -723,7 +723,7 @@ void mafVMESurfaceParametric::EnableGuiCylinder()
   m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, true);
   m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
   m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
-  m_GuiEllipsoide->Enable(CHANGE_VALUE_ELLIPSOIDE, false);
+  m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, false);
 }
 
 void mafVMESurfaceParametric::EnableGuiCone()
@@ -733,7 +733,7 @@ void mafVMESurfaceParametric::EnableGuiCone()
   m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
   m_GuiCone->Enable(CHANGE_VALUE_CONE, true);
   m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
-  m_GuiEllipsoide->Enable(CHANGE_VALUE_ELLIPSOIDE, false);
+  m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, false);
 }
 
 void mafVMESurfaceParametric::EnableGuiSphere()
@@ -743,17 +743,17 @@ void mafVMESurfaceParametric::EnableGuiSphere()
   m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
   m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
   m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, true);
-  m_GuiEllipsoide->Enable(CHANGE_VALUE_ELLIPSOIDE, false);
+  m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, false);
 }
 
-void mafVMESurfaceParametric::EnableGuiEllipsoide()
+void mafVMESurfaceParametric::EnableGuiEllipsoid()
 {
   m_GuiPlane->Enable(CHANGE_VALUE_PLANE, false);
   m_GuiCube->Enable(CHANGE_VALUE_CUBE, false);
   m_GuiCylinder->Enable(CHANGE_VALUE_CYLINDER, false);
   m_GuiCone->Enable(CHANGE_VALUE_CONE, false);
   m_GuiSphere->Enable(CHANGE_VALUE_SPHERE, false);
-  m_GuiEllipsoide->Enable(CHANGE_VALUE_ELLIPSOIDE, true);
+  m_GuiEllipsoid->Enable(CHANGE_VALUE_ELLIPSOID, true);
 }
 
 void mafVMESurfaceParametric::EnableParametricSurfaceGui( int surfaceTypeID )
@@ -815,12 +815,12 @@ void mafVMESurfaceParametric::EnableParametricSurfaceGui( int surfaceTypeID )
 
     break;
 
-    case PARAMETRIC_ELLIPSOIDE:
-      EnableGuiEllipsoide();
+    case PARAMETRIC_ELLIPSOID:
+      EnableGuiEllipsoid();
       if (DEBUG_MODE)
       {
         std::ostringstream stringStream;
-        stringStream << "enabling Ellipsoide gui" << std::endl;
+        stringStream << "enabling Ellipsoid gui" << std::endl;
         mafLogMessage(stringStream.str().c_str());
       }
 
