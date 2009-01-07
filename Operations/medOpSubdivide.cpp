@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSubdivide.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-01-07 13:42:06 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2008
@@ -99,14 +99,6 @@ mafOp *medOpSubdivide::Copy()
 //----------------------------------------------------------------------------
 // Constants:
 //----------------------------------------------------------------------------
-enum U_OP_SUBDIVIDE_ID
-{
-	ID_MY_OP = MINID,
-  // ToDO: add your custom IDs...
-  ID_NUMBER_OF_SUBDIVISION,
-  ID_PREVIEW,
-  ID_SUBDIVIDE,
-};
 //----------------------------------------------------------------------------
 void medOpSubdivide::OpRun()   
 //----------------------------------------------------------------------------
@@ -129,7 +121,8 @@ void medOpSubdivide::OpRun()
   {
     if(polydataInput->GetCell(i)->GetNumberOfPoints()!=3)
     {
-      wxMessageBox(_("The mesh will be triangolarized to be subdivide"));
+      if(m_TestMode == false)
+        wxMessageBox(_("The mesh will be triangolarized to be subdivide"));
 
       vtkTriangleFilter *triangleFilter;
       vtkNEW(triangleFilter);
@@ -149,7 +142,8 @@ void medOpSubdivide::OpRun()
     }
   }
 
-  CreateGui();
+  if(m_TestMode == false)
+    CreateGui();
 }
 //----------------------------------------------------------------------------
 void medOpSubdivide::CreateGui()
@@ -189,7 +183,8 @@ void medOpSubdivide::OnEvent(mafEventBase *maf_event)
         {
           if (m_NumberOfSubdivision >5)
           {
-            wxMessageBox("Warning! the number of subdivision is hight, it could require too many memory!");
+            if(m_TestMode == false)
+              wxMessageBox("Warning! the number of subdivision is hight, it could require too many memory!");
           }
         }
         break;

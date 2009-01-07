@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSubdivide.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-28 12:09:31 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-01-07 13:42:06 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2008
@@ -66,6 +66,15 @@ public:
 
   mafTypeMacro(medOpSubdivide, mafOp);
 
+  enum U_OP_SUBDIVIDE_ID
+  {
+    ID_MY_OP = MINID,
+    // ToDO: add your custom IDs...
+    ID_NUMBER_OF_SUBDIVISION,
+    ID_PREVIEW,
+    ID_SUBDIVIDE,
+  };
+
   /*virtual*/ mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -79,6 +88,8 @@ public:
 
   /** Makes the undo for the operation. */
   /*virtual*/ void OpUndo();
+
+  void SetNumberOfSubdivision(int number){ m_NumberOfSubdivision = number;}
 
 protected:
 
