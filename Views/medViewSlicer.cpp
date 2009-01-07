@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2009-01-07 22:44:20 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -129,6 +129,7 @@ void medViewSlicer::PackageView()
 {
 	m_ViewArbitrary = new mafViewVTK("",CAMERA_PERSPECTIVE);
 	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+	m_ViewArbitrary->PlugVisualPipe("mafVMESurface","mafPipeSurfaceTextured");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
   m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
 	m_ViewSlice = new mafViewVTK("",CAMERA_CT);

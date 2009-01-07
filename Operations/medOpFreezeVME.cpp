@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-08 14:27:33 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-01-07 22:45:02 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,6 +48,7 @@
 
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
+
 
 
 //----------------------------------------------------------------------------
@@ -260,7 +261,9 @@ void medOpFreezeVME::OpRun()
       mafSmartPointer<mafVMESurface> newSurface;
       newSurface->SetName(slicer->GetName());
       newSurface->SetData(polyData,slicer->GetTimeStamp());
-      newSurface->GetSurfaceOutput()->SetTexture(slicer->GetSurfaceOutput()->GetTexture());
+			vtkMAFSmartPointer<vtkImageData> text;
+			text->DeepCopy(slicer->GetSurfaceOutput()->GetTexture());
+      newSurface->GetSurfaceOutput()->SetTexture(text);
       newSurface->Update();
 
       if(material)
