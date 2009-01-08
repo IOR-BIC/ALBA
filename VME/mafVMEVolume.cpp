@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-20 14:00:15 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-01-08 15:17:26 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -109,6 +109,16 @@ int mafVMEVolume::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   assert(data);
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid")||data->IsA("vtkUnstructuredGrid"))
   {
+    mafVMEItem *item = GetDataVector()->GetItem(t);
+    if (item != NULL)
+    {
+      mafString dt = item->GetDataType();
+      if (!dt.Equals(data->GetClassName()))
+      {
+        mafLogMessage("Warning!! Trying to set different volume data type.");
+        return MAF_ERROR;
+      }
+    }
     return Superclass::SetData(data,t,mode);
   }
   
