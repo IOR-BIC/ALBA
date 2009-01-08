@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkMAFCellsFilter.cxx
   Language:  C++
-  Version:   $Id: vtkMAFCellsFilter.cxx,v 1.1 2008-07-03 11:27:45 aqd0 Exp $
+  Version:   $Id: vtkMAFCellsFilter.cxx,v 1.1.2.1 2009-01-08 11:42:44 ior01 Exp $
 
   Copyright (c) 2004 Goodwin Lawlor
   All rights reserved.
@@ -28,7 +28,7 @@
 #include "vtkCharArray.h"
 #include "vtkLookupTable.h"
 
-vtkCxxRevisionMacro(vtkMAFCellsFilter, "$Revision: 1.1 $");  
+vtkCxxRevisionMacro(vtkMAFCellsFilter, "$Revision: 1.1.2.1 $");  
 vtkStandardNewMacro(vtkMAFCellsFilter);
 
 // Constructs with initial  values.
@@ -228,7 +228,20 @@ void vtkMAFCellsFilter::UnmarkCell(vtkIdType cellid_at_output)
 void vtkMAFCellsFilter::MarkCell(vtkIdType cellid_at_output)
 {
   vtkIdType cellid_at_input;
-  
+
+  // see comment below
+  cellid_at_input = this->CellIdList->GetId(cellid_at_output);
+
+  //check if the cell is already present in marked cells list
+  int size = this->MarkedCellIdList->GetNumberOfIds();
+  for(int i = 0; i< size; i++)
+  {
+    if(this->MarkedCellIdList->GetId(i) == cellid_at_input)
+    {
+      return; // cell already present in the list
+    }
+  }
+   
   if (!this->IsInitialized)
     {
     this->Initialize();
@@ -240,10 +253,8 @@ void vtkMAFCellsFilter::MarkCell(vtkIdType cellid_at_output)
     this->InitializeScalars();
     }
 
-  // see comment below
-  cellid_at_input = this->CellIdList->GetId(cellid_at_output);
   
-  
+
   this->MarkedCellIdList->InsertNextId(cellid_at_input); 
   this->Scalars->SetValue(cellid_at_output, 1);
   
