@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-12-30 11:04:48 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2009-01-08 11:24:24 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -79,8 +79,6 @@ MafMedical is partially based on OpenMAF.
 #include "vtkAppendPolyData.h"
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkCleanPolyData.h"
-#include "vtkWindowedSincPolyDataFilter.h"
-
 
 
 const int ID_REGION = 0;
@@ -127,7 +125,7 @@ mafOp(label)
   m_RemoveUnSelectedCells = NULL;
   m_SelectCellInteractor = NULL;
   m_VisitedCells = NULL;
-  m_VisitedPoints = NULL;
+  
   	// only one region with ID 0
   m_RegionNumber = ID_REGION;
 
@@ -138,7 +136,7 @@ medOpSmoothSurfaceCells::~medOpSmoothSurfaceCells()
 //----------------------------------------------------------------------------
 {
 	if (m_VisitedCells) delete []m_VisitedCells;
-	if (m_VisitedPoints) delete []m_VisitedPoints;
+	
 	vtkDEL(m_Mesh);
 	vtkDEL(m_ResultPolydata);
 	vtkDEL(m_OriginalPolydata);
@@ -180,14 +178,6 @@ void medOpSmoothSurfaceCells::OpRun()
 	for ( int i=0; i < maxVisitedCells; i++ )
 	{
 		m_VisitedCells[i] = -1;
-	}
-
-	// heuristic
-	int maxVisitedPoints = m_OriginalPolydata->GetNumberOfPoints();
-	m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
-	for (int i=0; i < maxVisitedPoints; i++ )
-	{
-		m_VisitedPoints[i] = -1;
 	}
 
 
@@ -514,13 +504,6 @@ void medOpSmoothSurfaceCells::OnEvent(mafEventBase *maf_event)
 					m_VisitedCells[i] = -1;
 				}
 
-				// heuristic
-				int maxVisitedPoints = m_OriginalPolydata->GetNumberOfPoints();
-				m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
-				for (int i=0; i < maxVisitedPoints; i++ )
-				{
-					m_VisitedPoints[i] = -1;
-				}
 				m_Rwi->m_RenderWindow->Render();
 			}     
 			break ;
@@ -575,12 +558,8 @@ void medOpSmoothSurfaceCells::TraverseMeshAndMark( double radius )
 				for (idPoint=0; idPoint < numCellPoints; idPoint++) 
 				{
 					// if the point has not been yet visited
-					if ( m_VisitedPoints[ptId=cellPointsList[idPoint]] < 0 )
-					{
-						// mark it as visited
-						m_VisitedPoints[ptId] = m_PointNumber++;
-					}
-
+					ptId=cellPointsList[idPoint];
+					
 					// get neighbor cells from cell point
 					m_Mesh->GetPointCells(ptId,ncells,cellsFromPoint);
 
@@ -651,14 +630,6 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 	//	m_VisitedCells[i] = -1;
 	//}
 
-	//// heuristic
-	//int maxVisitedPoints = numPts;
-	////m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
-	//for ( i=0; i < maxVisitedPoints; i++ )
-	//{
-	//	m_VisitedPoints[i] = -1;
-	//}
-
 	// Traverse all cells marking those visited. Connected region grows 
 	// using a connected wave propagation.
 
@@ -667,8 +638,6 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 
 	vtkNEW(m_Wave2);
 	m_Wave2->Allocate(numPts);
-
-	m_PointNumber = 0;
 
 	// only one region with ID 0
 	//m_RegionNumber = ID_REGION;
@@ -682,7 +651,6 @@ void medOpSmoothSurfaceCells::MarkCellsInRadius(double radius)
 	m_Wave2->Reset();
 
 	//delete [] m_VisitedCells;
-	//delete [] m_VisitedPoints;
 
 	vtkDEL(m_NeighborCellPointIds);
 	vtkDEL(m_Wave);
@@ -797,15 +765,6 @@ void medOpSmoothSurfaceCells::SmoothCells()
 	{
 		m_VisitedCells[i] = -1;
 	}
-
-	// heuristic
-	int maxVisitedPoints = m_OriginalPolydata->GetNumberOfPoints();
-	m_VisitedPoints = new vtkIdType[maxVisitedPoints];  
-	for (int i=0; i < maxVisitedPoints; i++ )
-	{
-		m_VisitedPoints[i] = -1;
-	}
-
 
 }
 //----------------------------------------------------------------------------

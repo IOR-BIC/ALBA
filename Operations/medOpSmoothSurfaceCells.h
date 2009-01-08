@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:14:48 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-01-08 11:24:25 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -122,9 +122,8 @@ protected:
 	// used to support algorithm execution
 	vtkIdList						*m_NeighborCellPointIds;
 	int									*m_VisitedCells;
-	vtkIdType						*m_VisitedPoints;
-	int									 m_RegionNumber;
-	vtkIdType						 m_PointNumber;    
+	
+	int									 m_RegionNumber;   
 	vtkIdType						 m_CellSeed;
 	vtkIdList						*m_Wave;
 	vtkIdList						*m_Wave2;
