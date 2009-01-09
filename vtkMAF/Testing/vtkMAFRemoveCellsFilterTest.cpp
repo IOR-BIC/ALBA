@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFRemoveCellsFilterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:34:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-01-09 09:36:26 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -85,6 +85,7 @@ void vtkMAFRemoveCellsFilterTest::TestRemoveMarkedCells()
 
 	vtkMAFSmartPointer<vtkMAFRemoveCellsFilter> rc;
   rc->SetInput(sphere->GetOutput());
+  rc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
   assert(nc != 0);
@@ -112,6 +113,7 @@ void vtkMAFRemoveCellsFilterTest::TestMarkCell()
 
   vtkMAFSmartPointer<vtkMAFRemoveCellsFilter> rc;
   rc->SetInput(sphere->GetOutput());
+  rc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
   assert(nc != 0);
@@ -136,6 +138,7 @@ void vtkMAFRemoveCellsFilterTest::TestUndoMarks()
 
   vtkMAFSmartPointer<vtkMAFRemoveCellsFilter> rc;
   rc->SetInput(sphere->GetOutput());
+  rc->Update();
 
   int nc = sphere->GetOutput()->GetNumberOfCells();
   assert(nc != 0);
