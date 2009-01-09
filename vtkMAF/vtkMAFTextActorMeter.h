@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextActorMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-01-09 08:29:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -55,6 +55,8 @@ class VTK_vtkMAF_EXPORT vtkMAFTextActorMeter : public vtkActor2D
   void 	  SetText(const char * inputString){TextActor->SetInput(inputString);}
   void    SetTextPosition(double pos[3]){TextPosition[0]=pos[0];TextPosition[1]=pos[1];TextPosition[2]=pos[2];TextPosition[3]=1;}
   double* GetTextPosition();
+
+  void SetColor(double r,double g,double b);
 	
   
 protected:

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextActorMeter.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-01-09 08:29:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkMAFTextActorMeter, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFTextActorMeter, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFTextActorMeter);
 //------------------------------------------------------------------------------
 vtkMAFTextActorMeter::vtkMAFTextActorMeter()
@@ -102,4 +102,10 @@ double *vtkMAFTextActorMeter::GetTextPosition()
 //----------------------------------------------------------------------------
 {
 	return TextPosition;
+}
+//----------------------------------------------------------------------------
+void vtkMAFTextActorMeter::SetColor(double r,double g,double b)
+//----------------------------------------------------------------------------
+{
+  TextActor->GetTextProperty()->SetColor(r,g,b);
 }
