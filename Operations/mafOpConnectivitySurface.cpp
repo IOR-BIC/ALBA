@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpConnectivitySurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-01-09 13:29:24 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -91,6 +91,79 @@ enum FILTER_SURFACE_ID
 	ID_EXTRACT_BIGGEST_SURFACE,
 };
 //----------------------------------------------------------------------------
+void mafOpConnectivitySurface::CreateGui()   
+//----------------------------------------------------------------------------
+{
+  m_Gui = new mafGUI(this);
+
+
+  double bounds[6];
+  m_OriginalPolydata->GetBounds(bounds);
+
+  m_Gui->Label("");
+  m_Gui->Label(_("Extract the largest surface"),true);
+
+  m_Gui->Bool(ID_EXTRACT_BIGGEST_SURFACE,_("Enable"),&m_ExtractBiggestSurface);
+  m_Gui->Divider(2);
+  //-------------------------------------
+
+  m_Gui->Label(_("Filter Output by Size"),true);
+  m_Gui->Label(_("Size Thresh."));
+  //m_Gui->Double(ID_THRESOLD,"", &m_Thresold,0,MAXDOUBLE,-1,_("The operation will get rid of surfaces which are under this size"));
+  m_Gui->Slider(ID_THRESOLD,"",&m_Thresold,0,100);
+
+  m_Gui->Label("Input bounds dimensions:",true);
+
+  mafString labelX;
+  labelX.Append(wxString::Format(_("DimX:  %.2f"),(bounds[1]-bounds[0])));
+  m_Gui->Label(labelX);
+
+  mafString labelY;
+  labelY.Append(wxString::Format(_("DimY:  %.2f"),(bounds[3]-bounds[2])));
+  m_Gui->Label(labelY);
+
+  mafString labelZ;
+  labelZ.Append(wxString::Format(_("DimZ:  %.2f"),(bounds[5]-bounds[4])));
+  m_Gui->Label(labelZ);
+
+
+
+  m_Gui->Divider(2);
+  //-------------------------------------
+
+
+  m_Gui->Button(ID_VTK_CONNECT,_("run connectivity"));
+
+  m_Gui->Label("");
+  m_Gui->Label(_("Extracted:"), &m_NumberOfExtractedSurfaces);
+
+
+  vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+  connectivityFilter->SetInput(m_OriginalPolydata);
+  connectivityFilter->SetExtractionModeToAllRegions();
+  connectivityFilter->Update();
+
+  int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
+  m_NumberOfExtractedSurfaces = wxString::Format("%d", regionNumbers);
+
+  if(regionNumbers > 100)
+  {
+    m_Alert= _("Warning: process time will be heavy");
+  }
+  else
+    m_Alert = "";
+
+  m_Gui->Label(&m_Alert, true, true);
+  m_Gui->Label("");
+
+  m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,false);
+
+  m_Gui->Divider();
+  //m_Gui->Update();
+  ShowGui();
+}
+//----------------------------------------------------------------------------
 void mafOpConnectivitySurface::OpRun()   
 //----------------------------------------------------------------------------
 {  	
@@ -100,71 +173,7 @@ void mafOpConnectivitySurface::OpRun()
 	// interface:
   if(!m_TestMode)
   {
-	  m_Gui = new mafGUI(this);
-
-    
-	  double bounds[6];
-	  m_OriginalPolydata->GetBounds(bounds);
-
-	  m_Gui->Label("");
-	  m_Gui->Label(_("Extract the largest surface"),true);
-
-	  m_Gui->Bool(ID_EXTRACT_BIGGEST_SURFACE,_("Enable"),&m_ExtractBiggestSurface);
-	  m_Gui->Divider(2);
-	 //-------------------------------------
-
-	  m_Gui->Label(_("Filter Output by Size"),true);
-	  m_Gui->Label(_("Size Thresh."));
-	  m_Gui->Double(ID_THRESOLD,"", &m_Thresold,0,MAXDOUBLE,-1,_("The operation will get rid of surfaces which are under this size"));
-		m_Gui->Label("Input bounds dimensions:",true);
-	  mafString labelX;
-	  labelX.Append(wxString::Format(_("DimX:  %.2f"),(bounds[1]-bounds[0])));
-	  m_Gui->Label(labelX);
-
-	  mafString labelY;
-	  labelY.Append(wxString::Format(_("DimY:  %.2f"),(bounds[3]-bounds[2])));
-	  m_Gui->Label(labelY);
-
-	  mafString labelZ;
-	  labelZ.Append(wxString::Format(_("DimZ:  %.2f"),(bounds[5]-bounds[4])));
-	  m_Gui->Label(labelZ);
-
-  	
-
-	  m_Gui->Divider(2);
-	//-------------------------------------
-
-
-	  m_Gui->Button(ID_VTK_CONNECT,_("run connectivity"));
-
-	  m_Gui->Label("");
-	  m_Gui->Label(_("Extracted:"), &m_NumberOfExtractedSurfaces);
-		
-
-    vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
-    connectivityFilter->SetInput(m_OriginalPolydata);
-    connectivityFilter->SetExtractionModeToAllRegions();
-    connectivityFilter->Update();
-
-    int regionNumbers = connectivityFilter->GetNumberOfExtractedRegions();
-    m_NumberOfExtractedSurfaces = wxString::Format("%d", regionNumbers);
-
-    if(regionNumbers > 100)
-    {
-      m_Alert= _("Warning: process time will be heavy");
-    }
-    else
-      m_Alert = "";
-
-    m_Gui->Label(&m_Alert, true, true);
-	  m_Gui->Label("");
-  	
-	  m_Gui->OkCancel();
-	  m_Gui->Enable(wxOK,false);
-
-	  m_Gui->Divider();
-    //m_Gui->Update();
-	  ShowGui();
+	  CreateGui();
   }
 }
 //----------------------------------------------------------------------------
@@ -261,15 +270,17 @@ void mafOpConnectivitySurface::OnVtkConnect()
   dimZ = (bounds[5] - bounds[4]);
 
   double maxBound = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
-  if(m_Thresold > maxBound)
-  {
-    m_NumberOfExtractedSurfaces = _("0");
-    m_Alert= _("Over max bound you've no extraction");
-    m_Gui->Enable(ID_VTK_CONNECT,true);
-    m_Gui->Enable(wxOK,true);
-    m_Gui->Update();
-    return;
-  }
+  double valueBoundThreshold = m_Thresold*maxBound/100;
+
+//   if(m_Thresold > maxBound)
+//   {
+//     m_NumberOfExtractedSurfaces = _("0");
+//     m_Alert= _("Over max bound you've no extraction");
+//     m_Gui->Enable(ID_VTK_CONNECT,true);
+//     m_Gui->Enable(wxOK,true);
+//     m_Gui->Update();
+//     return;
+//   }
 	vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
 	connectivityFilter->SetInput(m_OriginalPolydata);
 	int regionNumbers;
@@ -300,7 +311,7 @@ void mafOpConnectivitySurface::OnVtkConnect()
 
 		double maxBound = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
 		
-		if(m_Thresold <= maxBound)
+		if(valueBoundThreshold <= maxBound)
 		{
 			mafVMESurface *surf;
 			mafNEW(surf);

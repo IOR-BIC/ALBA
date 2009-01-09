@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpConnectivitySurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-11 09:51:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-01-09 13:29:24 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,7 +62,9 @@ protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 
-	double m_Thresold;
+  void CreateGui();
+
+	int m_Thresold;
 	std::vector<mafVME*> m_ExtractedVmes;
 	vtkPolyData		*m_OriginalPolydata;
 	mafString m_NumberOfExtractedSurfaces;
