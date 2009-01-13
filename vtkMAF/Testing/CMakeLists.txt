@@ -63,3 +63,10 @@ ADD_TEST(vtkMAFLocalAxisCoordinateTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFLocalAxis
 IF (WIN32)
   SET_TARGET_PROPERTIES(vtkMAFLocalAxisCoordinateTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFPolyDataSingleSourceShortestPathTest
+ADD_EXECUTABLE(vtkMAFPolyDataSingleSourceShortestPathTest vtkMAFPolyDataSingleSourceShortestPathTest.h vtkMAFPolyDataSingleSourceShortestPathTest.cpp)
+ADD_TEST(vtkMAFPolyDataSingleSourceShortestPathTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFPolyDataSingleSourceShortestPathTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(vtkMAFPolyDataSingleSourceShortestPathTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
