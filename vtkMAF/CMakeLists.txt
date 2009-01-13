@@ -41,6 +41,8 @@ SET(vtkMAF_SRCS
   vtkMAFImageMapToWidgetColors.h
   vtkMAFMeshCutter.cxx
   vtkMAFMeshCutter.h
+  vtkMAFPolyDataSingleSourceShortestPath.cxx
+  vtkMAFPolyDataSingleSourceShortestPath.h
   vtkMAFProjectRG.cxx
   vtkMAFProjectRG.h
   vtkMAFProjectSP.cxx
