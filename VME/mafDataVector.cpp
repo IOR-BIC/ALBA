@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-25 19:45:31 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2009-01-14 17:09:10 $
+  Version:   $Revision: 1.19.2.1 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -88,6 +88,34 @@ void mafDataVector::SetCrypting(bool flag)
   Modified();
 }
 
+//-------------------------------------------------------------------------
+mafID mafDataVector::GetVectorID()
+//-------------------------------------------------------------------------
+{
+  if (m_VectorID < 0)
+  {
+    // retrieve the tree root
+    mafEventIO e(this,NODE_GET_ROOT);
+    InvokeEvent(e);
+
+    mafVMERoot *root = mafVMERoot::SafeDownCast(e.GetRoot());
+    m_VectorID = root ? root->GetNextItemId():-1;
+  }
+  return m_VectorID;
+}
+
+//-------------------------------------------------------------------------
+void mafDataVector::UpdateVectorId()
+//-------------------------------------------------------------------------
+{
+  // retrieve the tree root
+  mafEventIO e(this,NODE_GET_ROOT);
+  InvokeEvent(e);
+
+  mafVMERoot *root = mafVMERoot::SafeDownCast(e.GetRoot());
+  m_VectorID = root ? root->GetNextItemId():-1;
+}
+
 //-----------------------------------------------------------------------
 void mafDataVector::ShallowCopy(mafDataVector *array)
 //-----------------------------------------------------------------------
@@ -148,8 +176,7 @@ int mafDataVector::InternalStore(mafStorageElement *parent)
   mafVMERoot *root = mafVMERoot::SafeDownCast(e.GetRoot());
   assert(root);
 
-  if (GetVectorID()<0)
-    m_VectorID = root->GetNextItemId();
+  m_VectorID = GetVectorID();
 
   // the DataVector ID
   parent->SetAttribute("VectorID",mafString(m_VectorID));

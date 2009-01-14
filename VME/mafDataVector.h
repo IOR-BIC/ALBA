@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:17:20 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-01-14 17:09:10 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -81,7 +81,10 @@ public:
   void OnEvent(mafEventBase *maf_event);
 
   /** return ID used to store this vector into a file when in SingleFileMode */
-  mafID GetVectorID() {return m_VectorID;}
+  mafID GetVectorID();
+
+  /** update ID used to store this vector into a file when in SingleFileMode */
+  void UpdateVectorId();
   
   /** redefined to set the DataModified flag */
   virtual void Modified() {m_DataModified = true; Superclass::Modified();}
