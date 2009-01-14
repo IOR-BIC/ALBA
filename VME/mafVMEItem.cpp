@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 12:49:03 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2009-01-14 17:08:45 $
+  Version:   $Revision: 1.13.2.1 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005
@@ -26,6 +26,7 @@
 #include <wx/wfstream.h>
 #include <wx/fs_zip.h>
 
+#include "mafVMERoot.h"
 #include "mafTagArray.h"
 #include "mafIndent.h"
 #include "mafStorageElement.h"
@@ -351,6 +352,21 @@ void mafVMEItem::SetInputMemory(const char *int_str,unsigned long size)
   m_InputMemorySize = size;
 }
 
+//-------------------------------------------------------------------------
+void mafVMEItem::UpdateItemId()
+//-------------------------------------------------------------------------
+{
+  // retrieve the tree root
+  mafEventIO e(this,NODE_GET_ROOT);
+  InvokeEvent(e);
+
+  mafVMERoot *root = mafVMERoot::SafeDownCast(e.GetRoot());
+  mafID itemId = root ? root->GetNextItemId():-1;
+
+  SetId(itemId);
+}
+
+
 //----------------------------------------------------------------------------
 //     ****************  mafVMEItemAsynchObserver  ****************
 //----------------------------------------------------------------------------
@@ -377,3 +393,5 @@ void mafVMEItemAsynchObserver::OnEvent(mafEventBase *maf_event)
     m_Item->ReadData(m_Filename);
   }
 }
+
+

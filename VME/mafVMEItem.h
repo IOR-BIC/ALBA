@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItem.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-07 12:48:36 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2009-01-14 17:08:45 $
+  Version:   $Revision: 1.20.2.1 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -246,6 +246,9 @@ public:
 
   /** Return the temp file name used by the item.*/
   const char *GetTempFileName() {return m_TmpFileName.GetCStr();};
+
+  /** Update Item Id  */
+  void UpdateItemId();
 
 protected:
   mafVMEItem(); // to be allocated with New()
