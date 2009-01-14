@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:25:33 $
-Version:   $Revision: 1.11 $
+Date:      $Date: 2009-01-14 16:43:34 $
+Version:   $Revision: 1.11.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -73,6 +73,34 @@ public:
 	medGeometryEditorPolylineGraph(mafVME *input=NULL, mafObserver *listener = NULL, medVMEPolylineGraph *polyline=NULL,bool testMode=false);
 	virtual ~medGeometryEditorPolylineGraph(); 
 
+  enum EDITOR_GRAPH_ID
+  {
+    ID_POINT_TOOL = MINID,
+    ID_BRANCH_TOOL,
+    ID_ACTION,
+    ID_BUTTON_POINT_DELETE,
+    ID_BUTTON_BRANCH_DELETE,
+    ID_SPHERE_RADIUS,
+  };
+
+  enum POINT_TOOL_ID
+  {
+	ID_ADD_POINT = 0,
+	ID_INSERT_POINT,
+	ID_MOVE_POINT,
+	ID_SELECT_POINT,
+  };
+  enum BRANCH_TOOL_ID
+  {
+	ID_ADD_BRANCH = 0,
+	ID_SELECT_BRANCH,
+  };
+  enum ACTION_ID
+  {
+	ID_POINT_ACTION = 0,
+	ID_BRANCH_ACTION,
+  };
+
 	/** Set the event receiver object*/
 	void  SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
@@ -125,6 +153,8 @@ public:
 
 	void SetTestModeOn(){m_TestMode=true;};
 	void SetTestModeOff(){m_TestMode=false;};
+
+  void SetRadius(double radius){m_SphereRadius = radius; OnEvent(&mafEvent(this,ID_SPHERE_RADIUS));}
 
 protected:
 
