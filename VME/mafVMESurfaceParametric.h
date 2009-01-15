@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESurfaceParametric.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-07 09:48:01 $
-  Version:   $Revision: 1.7.2.3 $
+  Date:      $Date: 2009-01-15 10:53:44 $
+  Version:   $Revision: 1.7.2.4 $
   Authors:   Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -49,6 +49,9 @@ public:
 
   /** Set the geometry type to be generated: use PARAMETRIC_SURFACE_TYPE_ID as arg*/
   void SetGeometryType(int parametricSurfaceTypeID);
+
+  /** Return the type of the parametric object.*/
+  int GetGeometryType(){return m_GeometryType;};
 
   /** Set the radius for the parametric sphere.*/
   void SetSphereRadius(double radius);
