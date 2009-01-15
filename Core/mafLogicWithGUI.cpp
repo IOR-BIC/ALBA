@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-17 11:52:48 $
-  Version:   $Revision: 1.44.2.1 $
+  Date:      $Date: 2009-01-15 11:07:13 $
+  Version:   $Revision: 1.44.2.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -126,7 +126,7 @@ void mafLogicWithGUI::ShowSplashScreen(wxBitmap &splashImage)
   long splash_style = wxSIMPLE_BORDER | wxSTAY_ON_TOP;
   wxSplashScreen* splash = new wxSplashScreen(splashImage,
     wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT,
-    4000, NULL, -1, wxDefaultPosition, wxDefaultSize,
+    2000, NULL, -1, wxDefaultPosition, wxDefaultSize,
     splash_style);
   mafYield();
 }
