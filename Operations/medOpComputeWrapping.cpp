@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpComputeWrapping.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 12:00:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-01-15 15:33:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,7 +65,7 @@ void medOpComputeWrapping::OpRun()
 //----------------------------------------------------------------------------
 {
   mafNEW(m_Meter);
-  m_Meter->SetName("Multi-Obj wrapping");
+  m_Meter->SetName("Multi-Obj Wrapped Meter");
   m_Output = m_Meter;
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
