@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogLogin.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-01-15 11:07:33 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,6 +29,9 @@ enum LOGIN_ID
   USERNAME_ID = MINID,
   PWD_ID,
   REMEMBER_ME_ID,
+  PROXY_FLAG_ID,
+  PROXY_HOST_ID,
+  PROXY_PORT_ID,
 };
 //----------------------------------------------------------------------------
 mafGUIDialogLogin::mafGUIDialogLogin(const wxString& title, long style)
@@ -40,14 +43,21 @@ mafGUIDialogLogin::mafGUIDialogLogin(const wxString& title, long style)
   m_Pwd = "";
   m_UsernameOld = m_Username;
   m_PwdOld = m_Pwd;
+  m_ProxyFlag = 0;
+  m_ProxyHost = "";
+  m_ProxyPort = 0;
   m_InformationsInserted = false;
 
   m_Gui = new mafGUI(this);
   m_Gui->String(USERNAME_ID,_("user: "), &m_Username);
   m_Gui->String(PWD_ID,_("pwd: "), &m_Pwd, "", false, true);
+  m_Gui->Bool(PROXY_FLAG_ID,_("using proxy"),&m_ProxyFlag,1);
+  m_Gui->String(PROXY_HOST_ID,_("Host"),&m_ProxyHost,"");
+  m_Gui->Integer(PROXY_PORT_ID,_("Port"),&m_ProxyPort,1);
   m_Gui->Bool(REMEMBER_ME_ID, _("remember me"), &m_RememberMe, 1);
   m_Gui->Divider();
 
+  EnableItems();
   Add(m_Gui,1);
 }
 //----------------------------------------------------------------------------
@@ -81,6 +91,14 @@ void mafGUIDialogLogin::OnEvent(mafEventBase *maf_event)
     default:
       mafGUIDialog::OnEvent(maf_event);
   }
+  EnableItems();
+}
+//----------------------------------------------------------------------------
+void mafGUIDialogLogin::EnableItems()
+//----------------------------------------------------------------------------
+{
+  m_Gui->Enable(PROXY_HOST_ID,m_ProxyFlag != 0);
+  m_Gui->Enable(PROXY_PORT_ID,m_ProxyFlag != 0);
 }
 //----------------------------------------------------------------------------
 mafString &mafGUIDialogLogin::GetUser()
@@ -95,7 +113,19 @@ mafString &mafGUIDialogLogin::GetPwd()
   return m_Pwd;
 }
 //----------------------------------------------------------------------------
-void mafGUIDialogLogin::SetUserCredentials(mafString &usename, mafString &pwd, int &remember_me)
+mafString &mafGUIDialogLogin::GetProxyHost()
+//----------------------------------------------------------------------------
+{
+  return m_ProxyHost;
+}
+//----------------------------------------------------------------------------
+int mafGUIDialogLogin::GetProxyPort()
+//----------------------------------------------------------------------------
+{ 
+  return m_ProxyPort;
+}
+//----------------------------------------------------------------------------
+void mafGUIDialogLogin::SetUserCredentials(mafString &usename, mafString &pwd, int &proxyFlag, mafString &proxyHost, int &proxyPort, int &remember_me)
 //----------------------------------------------------------------------------
 {
   if (!usename.IsEmpty())
@@ -107,6 +137,14 @@ void mafGUIDialogLogin::SetUserCredentials(mafString &usename, mafString &pwd, i
     if (m_Pwd != pwd)
     {
       m_Pwd = pwd;
+    }
+    if (!proxyHost.IsEmpty() && m_ProxyHost != proxyHost)
+    {
+      m_ProxyHost = proxyHost; 
+    }
+    if (m_ProxyPort != proxyPort)
+    {
+      m_ProxyPort = proxyPort; 
     }
     m_InformationsInserted = true;
   }
