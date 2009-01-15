@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.h,v $
 Language:  C++
-Date:      $Date: 2008-10-21 15:53:46 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-01-15 11:06:52 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -44,13 +44,22 @@ public:
 
   /** Set the user's credentials. 
   Return 'true' if the users' credentials are correctly initialized, otherwise 'flase' value is returned. */
-  bool SetCredentials(mafString &name, mafString &pwd, int &remember_me);
+  bool SetCredentials(mafString &name, mafString &pwd, int &proxyFlag, mafString &proxyHost, mafString &proxyPort, int &remember_me);
 
   /** Return the information on user name.*/
   mafString &GetName();
 
   /** Return the information on users' password.*/
   mafString &GetPwd();
+
+  /** Return the information on proxy host.*/
+  mafString &GetProxyHost();
+
+  /** Return the information on proxy port.*/
+  int &GetProxyPort();
+
+  /** Return the information on proxy flag.*/
+  int &GetProxyFlag();
 
   /** Return information to allow saving or not users' information.*/
   int GetRememberUserCredentials();
@@ -69,6 +78,9 @@ protected:
   // User credentials
   mafString m_Username;
   mafString m_Password;
+  mafString   m_ProxyHost;///< Proxy Host
+  int         m_ProxyFlag;///< Flag used to for enable proxy. 
+  int   m_ProxyPort;///< Proxy Host
   mafString m_UserHome;
   mafString m_UserInfoFile;
   int m_RememberCredentials;

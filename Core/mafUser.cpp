@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafUser.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-21 15:53:46 $
-Version:   $Revision: 1.7.2.1 $
+Date:      $Date: 2009-01-15 11:06:52 $
+Version:   $Revision: 1.7.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -36,6 +36,9 @@ mafUser::mafUser()
   m_Username = "";
   m_Password = "";
   m_UserHome = "";
+  m_ProxyHost = "";
+  m_ProxyPort = 0;
+  m_ProxyFlag = 0;
   m_UserInfoFile = "/.usrInfo";
   m_Initialized = false;
   m_RememberCredentials = false;
@@ -54,11 +57,14 @@ int mafUser::ShowLoginDialog()
     InitializeUserInformations();
   }
   mafGUIDialogLogin login_dialog(_("User authentication"));
-  login_dialog.SetUserCredentials(m_Username, m_Password, m_RememberCredentials);
+  login_dialog.SetUserCredentials(m_Username, m_Password, m_ProxyFlag, m_ProxyHost, m_ProxyPort, m_RememberCredentials);
   int result = login_dialog.ShowModal();
   if(result != wxID_OK) return wxID_CANCEL;
   m_Username = login_dialog.GetUser();
   m_Password = login_dialog.GetPwd();
+  m_ProxyFlag = login_dialog.GetProxyFlag();
+  m_ProxyHost = login_dialog.GetProxyHost();
+  m_ProxyPort = login_dialog.GetProxyPort();
   m_RememberCredentials = login_dialog.GetRememberUserCredentials();
   UpdateUserCredentialsFile();
   return wxID_OK;
@@ -104,6 +110,7 @@ void mafUser::InitializeUserInformations()
     decrypt_credentials.clear();
     decrypt_success = mafDefaultDecryptFileInMemory(m_UserInfoFile.GetCStr(), decrypt_credentials);
     if (!decrypt_success)
+
     {
       mafLogMessage(_("Error on Decryption!!"));
       return;
@@ -120,15 +127,34 @@ void mafUser::InitializeUserInformations()
   {
     mafString usr;
     mafString pwd;
-
+    mafString proxyHost;
+    mafString proxyPort;
+    mafString useProxy;
+    
     wxStringTokenizer tkz(credentials, "\n");
     usr = tkz.GetNextToken().c_str();
     if (tkz.HasMoreTokens())
     {
       pwd = tkz.GetNextToken().c_str();
     }
+    if (tkz.HasMoreTokens())
+    {
+      proxyHost = tkz.GetNextToken().c_str();
+    }
+    if (tkz.HasMoreTokens())
+    {
+      proxyPort = tkz.GetNextToken().c_str();
+    }
+    if (tkz.HasMoreTokens())
+    {
+      useProxy = tkz.GetNextToken().c_str();
+    }
+
     m_Username = usr;
     m_Password = pwd;
+    m_ProxyHost = proxyHost;
+    m_ProxyPort = atoi(proxyPort.GetCStr());
+    m_ProxyFlag = atoi(useProxy.GetCStr());
     m_RememberCredentials = 1;
   }
   else
@@ -141,12 +167,15 @@ void mafUser::InitializeUserInformations()
   m_Initialized = true;
 }
 //----------------------------------------------------------------------------
-bool mafUser::SetCredentials(mafString &name, mafString &pwd, int &remember_me)
+bool mafUser::SetCredentials(mafString &name, mafString &pwd, int &proxyFlag,  mafString &proxyHost, mafString &proxyPort, int &remember_me)
 //----------------------------------------------------------------------------
 {
   m_Username = name;
   m_Password = pwd;
   m_RememberCredentials = remember_me;
+  m_ProxyFlag = proxyFlag;
+  m_ProxyHost = proxyHost;
+  m_ProxyPort = atoi(proxyPort);
   
   // empty username is not accepted!!
   m_Initialized = !m_Username.IsEmpty();
@@ -180,6 +209,40 @@ mafString &mafUser::GetPwd()
   }
   return m_Password;
 }
+
+//----------------------------------------------------------------------------
+mafString &mafUser::GetProxyHost()
+//----------------------------------------------------------------------------
+{
+  if (!m_Initialized)
+  {
+    InitializeUserInformations();
+  }
+  return m_ProxyHost;
+}
+
+//----------------------------------------------------------------------------
+int &mafUser::GetProxyPort()
+//----------------------------------------------------------------------------
+{
+  if (!m_Initialized)
+  {
+    InitializeUserInformations();
+  }
+  return m_ProxyPort;
+}
+
+//----------------------------------------------------------------------------
+int &mafUser::GetProxyFlag()
+//----------------------------------------------------------------------------
+{
+  if (!m_Initialized)
+  {
+    InitializeUserInformations();
+  }
+  return m_ProxyFlag;
+}
+
 //----------------------------------------------------------------------------
 int mafUser::GetRememberUserCredentials()
 //----------------------------------------------------------------------------
@@ -200,6 +263,12 @@ void mafUser::UpdateUserCredentialsFile()
     credentials = m_Username;
     credentials << "\n";
     credentials << m_Password;
+    credentials << "\n";
+    credentials << m_ProxyHost;
+    credentials << "\n";
+    credentials << m_ProxyPort;
+    credentials << "\n";
+    credentials << m_ProxyFlag;
 #ifdef MAF_USE_CRYPTO
     bool encrypt_success = false;
     encrypt_success = mafDefaultEncryptFileFromMemory(credentials.c_str(), credentials.Length(), m_UserInfoFile.GetCStr());
