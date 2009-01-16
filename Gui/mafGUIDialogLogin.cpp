@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogLogin.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-15 11:07:33 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2009-01-16 09:24:06 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -146,11 +146,16 @@ void mafGUIDialogLogin::SetUserCredentials(mafString &usename, mafString &pwd, i
     {
       m_ProxyPort = proxyPort; 
     }
+    if (m_ProxyFlag != proxyFlag)
+    {
+      m_ProxyFlag = proxyFlag; 
+    }
     m_InformationsInserted = true;
   }
   if (m_RememberMe != remember_me)
   {
     m_RememberMe = remember_me;
   }
+  EnableItems();
   m_Gui->Update();
 }
