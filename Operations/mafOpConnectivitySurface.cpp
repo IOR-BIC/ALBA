@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpConnectivitySurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-09 13:29:24 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-01-16 09:25:34 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -35,6 +35,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTriangleFilter.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkPolyDataConnectivityFilter.h"
+#include "vtkCleanPolyData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpConnectivitySurface);
@@ -313,9 +314,14 @@ void mafOpConnectivitySurface::OnVtkConnect()
 		
 		if(valueBoundThreshold <= maxBound)
 		{
+
+      vtkMAFSmartPointer<vtkCleanPolyData> clean;
+      clean->SetInput(connectivityFilter->GetOutput());
+      clean->Update();
+
 			mafVMESurface *surf;
 			mafNEW(surf);
-			surf->SetData(connectivityFilter->GetOutput(),surf->GetTimeStamp());
+			surf->SetData(clean->GetOutput(),surf->GetTimeStamp());
 			surf->SetName(wxString::Format("%d_extr",region));
 			m_ExtractedVmes.push_back(surf);
 		}
