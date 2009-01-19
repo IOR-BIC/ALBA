@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 15:19:33 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2009-01-19 12:00:05 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -85,6 +85,7 @@ mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, 
 	m_Sizer = NULL;
   m_Increment = 0;
 	m_Bold = boldLabel;
+  m_Digits = decimal_digit;
 
   m_IsComboStep = comboStep;
 	
@@ -93,7 +94,7 @@ mafGUICrossIncremental::mafGUICrossIncremental(wxWindow* parent, wxWindowID id, 
 	CreateWidgetLeftRight();
 
   if(!comboStep)
-	  CreateWidgetTextEntry(min, max, decimal_digit );
+	  CreateWidgetTextEntry(min, max );
   else
     CreateWidgetComboBox();
 
@@ -111,13 +112,13 @@ void mafGUICrossIncremental::CreateWidgetTopBottom()
 {
 	if(m_IdLayout == ID_TOP_BOTTOM_LAYOUT || m_IdLayout == ID_COMPLETE_LAYOUT )
 	{
-		m_ButtonTop = new mafGUIButton   (this, ID_BUTTON_TOP/*w_id*/, "+",dp, wxSize(EW, BH) );
+		m_ButtonTop = new mafGUIButton   (this, ID_BUTTON_TOP/*w_id*/, "+",dp, wxSize(EW, BH + 2) );
 		m_ButtonTop->SetValidator( mafGUIValidator(this,ID_BUTTON_TOP/*w_id*/,m_ButtonTop) );
 		//  m_ButtonTop->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
 		//  m_ButtonTop->SetToolTip(tooltip.GetCStr());
 
-		m_ButtonBottom = new mafGUIButton   (this, ID_BUTTON_BOTTOM/*w_id*/, "-",dp, wxSize(EW, BH) );
+		m_ButtonBottom = new mafGUIButton   (this, ID_BUTTON_BOTTOM/*w_id*/, "-",dp, wxSize(EW, BH+2) );
 
 		m_ButtonBottom->SetValidator( mafGUIValidator(this,ID_BUTTON_BOTTOM/*w_id*/,m_ButtonBottom) );
 		//m_ButtonBottom->SetFont(m_Font);
@@ -133,13 +134,13 @@ void mafGUICrossIncremental::CreateWidgetLeftRight()
 {
 	if(m_IdLayout == ID_LEFT_RIGHT_LAYOUT || m_IdLayout == ID_COMPLETE_LAYOUT)
 	{
-		m_ButtonLeft = new mafGUIButton   (this, ID_BUTTON_LEFT/*w_id*/, "-",dp, wxSize(EW, BH) );
+		m_ButtonLeft = new mafGUIButton   (this, ID_BUTTON_LEFT/*w_id*/, "-",dp, wxSize(EW, BH+2) );
 		m_ButtonLeft->SetValidator( mafGUIValidator(this,ID_BUTTON_LEFT/*w_id*/,m_ButtonLeft) );
 		//m_ButtonLeft->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
 		//  m_ButtonTop->SetToolTip(tooltip.GetCStr());
 
-		m_ButtonRight = new mafGUIButton   (this, ID_BUTTON_RIGHT/*w_id*/, "+",dp, wxSize(EW, BH) );
+		m_ButtonRight = new mafGUIButton   (this, ID_BUTTON_RIGHT/*w_id*/, "+",dp, wxSize(EW, BH+2) );
 		m_ButtonRight->SetValidator( mafGUIValidator(this,ID_BUTTON_RIGHT/*w_id*/,m_ButtonRight) );
 		//m_ButtonRight->SetFont(m_Font);
 		//if(!tooltip.IsEmpty()) 
@@ -147,13 +148,22 @@ void mafGUICrossIncremental::CreateWidgetLeftRight()
 	}
 }
 //----------------------------------------------------------------------------
-void mafGUICrossIncremental::CreateWidgetTextEntry(double min , double max , int decimal_digit )
+void mafGUICrossIncremental::CreateWidgetTextEntry(double min , double max )
 //----------------------------------------------------------------------------
 {
 	
 	//w_id = ((mafGUI *) parent)->GetWidgetId(w_id);
-	m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.1f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
-	m_StepText->SetValidator( mafGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,decimal_digit)  );
+  if(m_Digits != 0)
+  {
+    m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.1f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
+    m_StepText->SetValidator( mafGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,m_Digits)  );
+  }
+  else
+  {
+    m_StepText = new wxTextCtrl  (this, ID_STEP_ENTRY/*w_id*/, wxString::Format("%.0f", *m_StepVariable)   , dp, wxSize(EW,BH)/*, m_EntryStyle  */);
+    m_StepText->SetValidator( mafGUIValidator(this,ID_STEP_ENTRY/*w_id*/,m_StepText,m_StepVariable,min,max,m_Digits)  );
+  }
+	
 	//m_StepText->SetFont(m_Font);
 	//if(!tooltip.IsEmpty())
 	//  text->SetToolTip(tooltip.GetCStr());
@@ -349,7 +359,10 @@ void mafGUICrossIncremental::LayoutStyle(const char* label)
       if(!m_IsComboStep)
         sizerMiddle->Add( m_StepText, 0, wxALIGN_CENTRE, 0);
       else
+      {
         sizerMiddle->Add( m_StepComboBox, 0, wxALIGN_CENTRE, 0);
+        sizerMiddle->AddSpacer(4);
+      }
       
       sizerBottom->AddSpacer(LM);
       sizerBottom->Add( m_ButtonBottom, 0, wxALIGN_LEFT, 0);
@@ -464,5 +477,32 @@ void mafGUICrossIncremental::ConvertStepComboIntoStepVariable()
   if(m_StepComboBox)
   {
     *m_StepVariable = atof(m_StepComboBox->GetValue());
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetComboValue(int index)
+//----------------------------------------------------------------------------
+{
+  m_StepComboBox->SetSelection(index);
+  m_StepComboBox->Update();
+
+  ConvertStepComboIntoStepVariable();
+}
+//----------------------------------------------------------------------------
+void mafGUICrossIncremental::SetStepVariable(double step)
+//----------------------------------------------------------------------------
+{
+  if(m_StepText)
+  {
+    *m_StepVariable = step;
+    if(m_Digits != 0)
+    {
+      m_StepText->SetValue(wxString::Format("%.1f", *m_StepVariable));
+    }
+    else
+    {
+      m_StepText->SetValue(wxString::Format("%.0f", *m_StepVariable));
+    }
+    
   }
 }

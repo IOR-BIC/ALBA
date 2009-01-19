@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-22 11:49:54 $
-  Version:   $Revision: 1.2.2.5 $
+  Date:      $Date: 2009-01-19 12:00:05 $
+  Version:   $Revision: 1.2.2.6 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -402,12 +402,12 @@ void mafGUI::Button  (int id,mafString *label,mafString button_text, mafString t
 	Add(sizer,0,wxALL, M); 
 }
 //----------------------------------------------------------------------------
-mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */, bool boldLabel /* = true */, bool comboStep /* = false*/)
+mafGUICrossIncremental *mafGUI::CrossIncremental(int id,const char* label, double *stepVariable, double *topBottomVariable, double *leftRightVariable, int modality ,wxString tooltip /* = */, bool boldLabel /* = true */, bool comboStep /* = false*/, int digits /* = -1*/)
 //----------------------------------------------------------------------------
 {
   int width = (label == "") ? FW : DW;
   
-  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp, wxDefaultSize, MINFLOAT, MAXFLOAT, -1,wxTAB_TRAVERSAL|wxCLIP_CHILDREN, comboStep);
+  mafGUICrossIncremental *cI =  new mafGUICrossIncremental(this, GetWidgetId(id), label, stepVariable, topBottomVariable, leftRightVariable, boldLabel, modality, dp, wxDefaultSize, MINFLOAT, MAXFLOAT, digits,wxTAB_TRAVERSAL|wxCLIP_CHILDREN, comboStep);
   cI->SetListener(this);
   
 	Add(cI,0,wxALL, M); 

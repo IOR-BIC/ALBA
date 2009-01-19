@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 15:19:33 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2009-01-19 12:00:05 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -101,7 +101,7 @@ public:
   double GetLeftRightVariation(){return m_LeftRightVariation;};
 
 
-  void SetStepVariable(double step){if(m_StepText) *m_StepVariable = step;m_StepText->SetValue(wxString::Format("%.2f", *m_StepVariable));}
+  void SetStepVariable(double step);
   void SetComboBoxItems(wxArrayString &array, int selected = 0);
 
   void LayoutStyle(const char *label);
@@ -113,10 +113,12 @@ public:
 
   mafGUIComboBox *GetComboBox(){return m_StepComboBox;}
 
+  void SetComboValue(int index);
+
 private:
   void CreateWidgetTopBottom();
   void CreateWidgetLeftRight();
-  void CreateWidgetTextEntry(double min, double max, int decimal_digit);
+  void CreateWidgetTextEntry(double min, double max);
   void CreateWidgetComboBox();
   void ConvertStepComboIntoStepVariable();
 
@@ -143,6 +145,7 @@ private:
 	int               m_IdLayout;
 
   bool m_IsComboStep;
+  int m_Digits;
 
   DECLARE_EVENT_TABLE()
 };
