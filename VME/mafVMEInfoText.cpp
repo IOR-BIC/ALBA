@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEInfoText.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-01-19 11:58:30 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Fedor Moiseev
 ==========================================================================
   Copyright (c) 2001/2007 
@@ -297,7 +297,15 @@ const char *mafVMEInfoText::GetPosLabel(int index)
     return NULL; 
   return m_PosLabels[index].GetCStr();
 }
-
+//-------------------------------------------------------------------------
+const char *mafVMEInfoText::GetPosText(int index)
+//-------------------------------------------------------------------------
+{
+  assert(index >= 0 && index <= 2); 
+  if(index < 0 || index > 2)
+    return NULL; 
+  return m_PositionText[index].GetCStr();
+}
 //-------------------------------------------------------------------------
 char** mafVMEInfoText::GetIcon() 
 //-------------------------------------------------------------------------
