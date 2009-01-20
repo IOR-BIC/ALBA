@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-19 16:07:16 $
-  Version:   $Revision: 1.61.2.3 $
+  Date:      $Date: 2009-01-20 10:59:08 $
+  Version:   $Revision: 1.61.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -509,7 +509,6 @@ void mafViewOrthoSlice::SetSlicePosition(long activeGizmoId, vtkPoints *p)
   
   // always update the perspective view
 
-  
   mafVME *g[3];
   double pos[3], orient[3];
 
@@ -632,6 +631,9 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
     return;
   }
 
+  double colorsX[]    = {1,0,0};
+  double colorsY[]    = {0,1,0};
+  double colorsZ[]    = {0,0,1};
 	mmaVolumeMaterial *currentVolumeMaterial = ((mafVMEOutputVolume *)m_CurrentVolume->GetOutput())->GetMaterial();
 	double sr[2],vtkDataCenter[3];
 	vtkDataSet *vtkData = m_CurrentVolume->GetOutput()->GetVTKData();
@@ -649,8 +651,11 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
 		p->SetColorLookupTable(m_ColorLUT);
 	}
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetTextColor(colorsX);
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->SetTextColor(colorsY);
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
+  ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->SetTextColor(colorsZ);
 	GizmoCreate();
 }
 //-------------------------------------------------------------------------
