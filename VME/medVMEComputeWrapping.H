@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-01-15 15:18:49 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-01-22 20:50:44 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -68,7 +68,8 @@ public:
 		SINGLE_CYLINDER2 = 3,
 		WRAP_CYLINDER_CYLINDER = 4,
 		WRAP_SPHERE_CYLINDER = 5,
-		WRAP_SPHERE_CYLINDER_2 = 6
+		WRAP_SPHERE_CYLINDER_2 = 6,
+		INSIDE_FLAG = -1
 	};
 	enum WRAP_MODE_ID{
 		SPHERE_CYLINDER = 0,
@@ -394,7 +395,7 @@ protected:
 	//-------------------new functions begin------------------
 	void dispatch();
 	int prepareData(int wrappedFlag,double *local_start,double *local_end,double *local_wrapped_center, vtkOBBTree *locator);
-	void prepareData2();
+	bool prepareData2();
 	void singleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator);
 	void getTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2);
 	double detValue(double *col1,double *col2,double *col3);
@@ -471,6 +472,11 @@ protected:
 	double getPlaneValue(double *a,double *b,double *c,double *d);
 	double getDistanceValue(double *start,double *cCoord,double *end);
 	void getSphereCylinderWrapAdvance(const int step);
+	void transformOutput(vtkPolyData *pData );
+	void transformOutputPoint( double *point);
+	void transformOutputClipData(vtkPolyData *clipData);
+	bool checkAlign();
+	bool checkTwoRadius();
 	//------------------new function -------------------
 
 
@@ -497,6 +503,8 @@ protected:
 	double m_WrappedVMECenter2[3];
 	double m_WrappedTangent1[3];
 	double m_WrappedTangent2[3];
+	double m_CylinderAxis[3];
+
 	double m_ViaPoint[3];
 	double m_CosA;
 	int m_PathNum;
