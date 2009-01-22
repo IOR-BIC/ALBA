@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-01 13:47:19 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-01-22 18:16:53 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,7 +84,11 @@ class vtkPlaneSource;
 class mafGizmoHandle: public mafObserver 
 {
 public:
-           mafGizmoHandle(mafVME *input, mafObserver *listener = NULL, int constraintModality=BOUNDS,mafVME *parent=NULL, bool showShadingPlane = false);
+
+  /** Create a handle, input vme must be different from NULL and default handle type
+  is XMIN */
+  mafGizmoHandle(mafVME *input, mafObserver *listener = NULL,\
+    int constraintModality=BOUNDS,mafVME *parent=NULL, bool showShadingPlane = false);
   virtual ~mafGizmoHandle(); 
   
   /** Set the gizmo generating vme; the gizmo will be centered on this vme*/
@@ -97,7 +101,10 @@ public:
   
   /** Set the event receiver object*/
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  
+
+  /** Get the event receiver object*/
+  mafObserver *GetListener() {return m_Listener;};
+
   /** Events handling*/        
   virtual void OnEvent(mafEventBase *maf_event);
     
@@ -105,33 +112,44 @@ public:
   // highlight and show 
   //----------------------------------------------------------------------------
 
-  /** Highlight the gizmo*/
+  /** Highlight the gizmo: this change its color to yellow*/
   void Highlight(bool highlight);
     
   /** Show the gizmo */
   void Show(bool show);
-  
-  /** Set/Get the length of the handle*/
+  void ShowOn() {this->Show(true);};
+  void ShowOff() {this->Show(false);};
+  bool GetShow() {return m_Show;};
+
+  /** Set/Get the length of the handle 
+  The handle dimensions are: (Length) x (Length) ax (Length/2) */
   void   SetLength(double length);
   double GetLength();
    
   /** Set the gizmo abs pose */
   void SetAbsPose(mafMatrix *absPose);
+  /** Get the gizmo abs pose */
   mafMatrix *GetAbsPose();
 
   /** Set the gizmo local pose*/
   void SetPose(mafMatrix *pose);
+  /** Get the gizmo abs pose */
   mafMatrix *GetPose();
 
   /** Set the constrain ref sys */
   void SetConstrainRefSys(mafMatrix *constrain);
-	
+  /** Get the constrain ref sys */
+  mafMatrix *GetConstrainRefSys();
+
 	enum CONSTRAINT_MODALITY {BOUNDS = 0, FREE};
 
-  /** Set the pivot matrix */
+
+  /** DEPRECATED: To be removed!  
+  Set the pivot matrix */
   void SetPivotMatrix(mafMatrix &matrix) {m_PivotMatrix = matrix;};
   
-  /** Get the pivot matrix */
+  /** DEPRECATED: To be removed! 
+  Get the pivot matrix */
   mafMatrix &GetPivotMatrix() {return m_PivotMatrix;};
 
   enum GIZMOTYPE {XMIN = 0, XMAX, YMIN, YMAX, ZMIN, ZMAX};
@@ -143,24 +161,30 @@ public:
   
   /** Return the gizmo's type*/
   int GetType() {return m_GizmoType;};
-
-  /** Set the bounding box centers from its bounds*/
-  void SetBBCenters(double bounds[6]);
   
-  /** Set translation intervals*/
-  void SetTranslationIntervals(double bounds[6]);
-
-  /** Return the center of the handle*/
-	void GetHandleCenter(int type, double HandleCenter[3]);
-
+  /** Show shading plane */
+  void ShowShadingPlane(bool show);
+  void ShowShadingPlaneOn() {this->ShowShadingPlane(true);};
+  void ShowShadingPlaneOff() {this->ShowShadingPlane(false);};
+  bool GetShowShadingPlaneOn(){return m_ShowShadingPlane;};
+  
   /** Since handles position has changed shading plane bounds must be recomputed */
   void UpdateShadingPlaneDimension(double b[6]);
 
-  void ShowShadingPlane(bool show);
+  /** Update the handle position given the bounding box */
+  void SetBounds(double bounds[6]);
+  void GetBounds(double bounds[6]);
 
-  bool GetShowShadingPlaneOn(){return m_ShowShadingPlane;};
+  /** Return the center of the handle*/
+  void GetHandleCenter(int type, double HandleCenter[3]);
+  
+  /** DEPRECATED: To be removed, use SetBounds instead*/
+  void SetBBCenters(double bounds[6]);
 
 protected:
+  
+  /** Set translation intervals*/
+  void SetTranslationIntervals(double bounds[6]);
 
   mafVME *m_InputVme;///<Register input vme
 
@@ -200,6 +224,9 @@ protected:
   /** Set the gizmo color */
   void SetColor(double colR, double colG, double colB);
   
+  /** Get the gizmo color */
+  void GetColor(double color[3]);
+
   mafObserver *m_Listener; ///<Register the event receiver object
 
   int m_GizmoType; ///<Register the gizmo type
@@ -224,6 +251,13 @@ protected:
 
   /** friend test */
   friend class mafGizmoROITest;
+  
+  double m_Color[3];
+  
+  bool m_Show;
 
+  friend class mafGizmoHandleTest;
+  
+  double m_Bounds[6];
 };
 #endif

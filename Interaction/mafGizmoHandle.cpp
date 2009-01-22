@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:36:53 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2009-01-22 18:16:53 $
+  Version:   $Revision: 1.12.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener /* = NULL */
 	m_ConstraintModality = constraintModality;
   m_IsaComp = NULL;
   m_Cube = NULL;
-
+  
   m_ShowShadingPlane = showShadingPlane;
 
 	for(int i=0;i<6;i++)
@@ -67,6 +67,7 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener /* = NULL */
 			m_BBCenters[i][j]=0;
 
   m_Listener = listener;
+  assert(input != NULL);
   m_InputVme = input;
 
   ////-----------------
@@ -284,6 +285,11 @@ void mafGizmoHandle::SetLength(double length)
   m_TranslateBoxTr->Translate(- length / 4, 0,0);
 }
 
+double mafGizmoHandle::GetLength()
+{
+  return m_Cube->GetZLength();
+}
+
 //----------------------------------------------------------------------------
 void mafGizmoHandle::Highlight(bool highlight)
 //----------------------------------------------------------------------------
@@ -306,6 +312,10 @@ void mafGizmoHandle::OnEvent(mafEventBase *maf_event)
 void mafGizmoHandle::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
+  m_Color[0] = col[0];
+  m_Color[1] = col[1];
+  m_Color[2] = col[2];
+
   m_BoxGizmo->GetMaterial()->m_Prop->SetColor(col);
 	m_BoxGizmo->GetMaterial()->m_Prop->SetAmbient(0);
 	m_BoxGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
@@ -331,6 +341,7 @@ void mafGizmoHandle::Show(bool show)
   {
     m_ShadingPlaneGizmo->GetMaterial()->m_Prop->SetOpacity(opacity*0.5);
   }
+  m_Show = show;
 }
 //----------------------------------------------------------------------------
 void mafGizmoHandle::ShowShadingPlane(bool show)
@@ -348,6 +359,12 @@ void mafGizmoHandle::SetConstrainRefSys(mafMatrix *constrain)
 //----------------------------------------------------------------------------
 {  
   m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
+}
+
+
+mafMatrix * mafGizmoHandle::GetConstrainRefSys()
+{
+  return m_IsaGen->GetTranslationConstraint()->GetRefSys()->GetMatrix();
 }
 
 //----------------------------------------------------------------------------
@@ -431,7 +448,12 @@ void mafGizmoHandle::UpdateShadingPlaneDimension(double b[6])
 void mafGizmoHandle::SetBBCenters(double bounds[6])
 //----------------------------------------------------------------------------
 {
-    // calculate the center of each face
+  for (int i = 0; i < 6; i++) 
+  { 
+    m_Bounds[i] = bounds[i];
+  }
+
+  // calculate the center of each face
   
 /**
         5                   5
@@ -463,7 +485,7 @@ void mafGizmoHandle::SetBBCenters(double bounds[6])
   XY
 
 */
-
+  
   
   // fill m_BBCenters ivar
   double xmin = bounds[0];
@@ -731,4 +753,26 @@ void mafGizmoHandle::GetHandleCenter(int type,double HandleCenter[3])
 {
 	for(int i=0;i<3;i++)
 		HandleCenter[i]=m_BBCenters[type][i];
+}
+
+void mafGizmoHandle::GetColor( double color[3] )
+{
+  color[0] = m_Color[0];
+  color[1] = m_Color[1];
+  color[2] = m_Color[2];
+}
+
+
+void mafGizmoHandle::SetBounds( double bounds[6] )
+{
+  this->SetBBCenters(bounds);
+}
+
+void mafGizmoHandle::GetBounds( double bounds[6] )
+{
+  for (int i = 0; i < 6; i++) 
+  { 
+    bounds[i] = m_Bounds[i];
+  }
+
 }
