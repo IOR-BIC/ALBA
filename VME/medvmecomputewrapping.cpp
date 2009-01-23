@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-22 20:50:34 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-01-23 11:19:52 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -2240,6 +2240,22 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 	double endWrapLocal[3],endWrapGlobal[3],startWrapLocal[3],startWrapGlobal[3];
 
 
+	getWrapLocalTransform(m_EndPoint,endWrapLocal);
+	getWrapLocalTransform(m_StartPoint,startWrapLocal);
+	m_Tolerance = getCylinderRadius()/20.00; // choose a suitable value
+	bool nearFlagEnd = isEndPonintOnCylinder(m_Tolerance,endWrapLocal);
+	bool nearFlagStart = isEndPonintOnCylinder(m_Tolerance,startWrapLocal);
+
+	if (nearFlagEnd)
+	{
+		getWrapGlobalTransform(endWrapLocal,m_EndPoint);//change end Point
+	}
+	if (nearFlagStart)
+	{
+		getWrapGlobalTransform(startWrapLocal,m_StartPoint);//change end Point
+	}
+
+
 
 	vtkMAFSmartPointer<vtkPoints> temporaryIntersection;
 	vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
@@ -2315,11 +2331,7 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 		objInsideFlag2 = true;
 
 	}
-	getWrapLocalTransform(m_EndPoint,endWrapLocal);
-	getWrapLocalTransform(m_StartPoint,startWrapLocal);
-	m_Tolerance = getCylinderRadius()/20.00; // choose a suitable value
-	bool nearFlagEnd = isEndPonintOnCylinder(m_Tolerance,endWrapLocal);
-	bool nearFlagStart = isEndPonintOnCylinder(m_Tolerance,startWrapLocal);
+
 	//choose SPHERE_CYLINDER and first object is sphere,second object is cylinder 
 	if (m_WrappedMode == SPHERE_CYLINDER && (type1 == mafVMESurfaceParametric::PARAMETRIC_SPHERE && type2 == mafVMESurfaceParametric::PARAMETRIC_CYLINDER))
 	{
@@ -2345,7 +2357,13 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 				}
 			}else if (objFlag2 || nearFlagEnd || nearFlagStart)//intersect cylinder or on surface
 			{
-				rtn = SINGLE_CYLINDER;
+				if (!objInsideFlag2)
+				{
+					rtn = SINGLE_CYLINDER;
+				}else{
+					rtn = INSIDE_FLAG;
+				}
+				
 			}else if (objInsideFlag2)
 			{
 				rtn = INSIDE_FLAG;
