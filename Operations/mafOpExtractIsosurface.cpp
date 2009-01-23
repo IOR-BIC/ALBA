@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-30 09:01:14 $
-Version:   $Revision: 1.5.2.3 $
+Date:      $Date: 2009-01-23 16:06:22 $
+Version:   $Revision: 1.5.2.4 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -69,6 +69,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkVolume.h"
 #include "vtkTriangleFilter.h"
 #include "vtkCleanPolyData.h"
+
+const bool DEBUG_MODE = false;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpExtractIsosurface);
@@ -769,6 +771,15 @@ void mafOpExtractIsosurface::UpdateSurface(bool use_lod)
     m_IsoValueVector.clear();
     m_IsoValueVector.push_back(m_IsoValue);
     m_ContourVolumeMapper->Update();
+
+    if (DEBUG_MODE)
+    {
+      mafLogMessage(m_Input->GetName());
+      std::ostringstream stringStream;
+      m_ContourVolumeMapper->Print(stringStream);
+      mafLogMessage(stringStream.str().c_str());
+    }
+          
     vtkPolyData *contour;/* = vtkPolyData::New();
     m_IsosurfaceCutter->SetInput(contour);
     m_IsosurfaceCutter->Update();*/

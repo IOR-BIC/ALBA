@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:27:45 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-01-23 16:06:02 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkMAFContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFContourVolumeMapper);
 
 
@@ -231,7 +231,40 @@ void vtkMAFContourVolumeMapper::ClearCachesAndStats()
 //------------------------------------------------------------------------------
 void vtkMAFContourVolumeMapper::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
-{}
+{
+  os << "------------------------------------------------------------------------------" << std::endl;
+  os << "Parameters of the mapper:" << std::endl;
+  os << "ContourValue: " << ContourValue << std::endl;
+  os << "AutoLODRender: " << AutoLODRender << std::endl;
+  os << "AutoLODCreate: " << AutoLODCreate << std::endl;
+  os << "EnableContourAnalysis: " << EnableContourAnalysis << std::endl;
+
+  os << std::endl;
+  os << "Volume info" << std::endl;
+  os << "DataOrigin: " <<  DataOrigin[0]  << " , " << DataOrigin[1] << " , " << DataOrigin[2] << std::endl;
+  os << "DataSpacing: " << DataSpacing[0]  << " , " << DataSpacing[1] << " , " << DataSpacing[2] << std::endl;
+  os << "DataDimensions: " << DataDimensions[0]  << " , " << DataDimensions[1] << " , " << DataDimensions[2] << std::endl;
+
+  os << std::endl;
+  os << "statistics:" << std::endl;
+  os << "VoxelsRendered: " << VoxelsRendered << std::endl;
+  os << "VoxelsSkipped: " << VoxelsSkipped << std::endl;
+
+  os << "SkippedVoxelBlocks (%): " << SkippedVoxelBlocks << std::endl;
+  os << "NumberOfLods: " << NumberOfLods << std::endl;
+  os<< std::endl;
+  for (int i = 0; i < NumberOfLods; i++) 
+  {
+    os << "Statistics for LOD Number: " << i << std::endl;
+    os << "TimeToDrawRMC (RenderMCubes): " << TimeToDrawRMC[i] << std::endl;
+    os << "TimeToDrawDC (DrawCache): " << TimeToDrawDC[i] << std::endl;
+    os << "NumberOfTriangles: " << NumberOfTriangles[i] << std::endl;
+    os<< std::endl;
+  }
+  
+  os << "MCubes CreatedTriangles: " << CreatedTriangles << std::endl;
+  os << "------------------------------------------------------------------------------" << std::endl;
+}
 
 
 
