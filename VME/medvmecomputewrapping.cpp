@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-23 11:19:52 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-01-27 14:10:32 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1728,8 +1728,92 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step){
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 }
-
 void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
+
+	double filterPlaneNormal[3];
+	double filterFlag;
+	double cCoord1[3],cCoord2[3],cGlobal1[3],viaCoord1[3],viaCoord2[3];
+	double endLocal[3],startLocal[3],sphereCenter[3],sphereCenterLocal[3],tmpCoord[3];
+	double Zh,Zl,dstep;
+	double testVia1[3],testVia2[3];
+
+
+	
+	getGlobalSphereCenter(sphereCenter);
+	getWrapLocalTransform(sphereCenter,sphereCenterLocal);
+	getWrapLocalTransform(m_EndPoint,endLocal);
+
+	filterFlag = 1;//getFilterFlag(filterPlaneNormal);
+
+	Zh = sphereCenterLocal[2]-getSphereRadius();
+	Zl = endLocal[2];
+	dstep = (Zh-Zl)/10;
+	//------------------compute insertion point---------------------
+	if (filterFlag == WRAP_FRONT) 
+	{
+		//----------wrap sphere only
+	}else if (filterFlag == WRAP_BACK)
+	{
+		getCcoordinateForCylinder(endLocal,cCoord1,cCoord2);
+		cCoord1[2] = endLocal[2];
+		cCoord2[2] = endLocal[2];
+		getWrapGlobalTransform(cCoord1,testVia1);
+		getWrapGlobalTransform(cCoord2,testVia2);
+
+		
+	}
+	vtkLineSource *L1,*L2;
+	vtkNEW(L1);
+	vtkNEW(L2);
+	transformOutputPoint(m_EndPoint);
+	transformOutputPoint(m_StartPoint);
+	transformOutputPoint(testVia1);
+	transformOutputPoint(testVia2);
+
+	L1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
+	L1->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
+	
+	L2->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
+	L2->SetPoint2(testVia1[0],testVia1[1],testVia1[2]);
+	m_Goniometer->AddInput(L1->GetOutput());
+	m_Goniometer->AddInput(L2->GetOutput());
+
+
+	vtkDEL(L1);
+	vtkDEL(L2);
+
+	/*for (int j=Zl;j<Zh;j=j+dstep)
+	{
+		vtkLineSource *L1,*L2;
+		vtkNEW(L1);
+		vtkNEW(L2);
+
+		cCoord1[2] = j;
+		cCoord2[2] = j;
+		copyPointValue(cCoord1,viaCoord1);
+		copyPointValue(cCoord2,viaCoord2);
+		getWrapGlobalTransform(viaCoord1,testVia1);
+		getWrapGlobalTransform(viaCoord2,testVia2);
+
+		transformOutputPoint(m_EndPoint);
+		transformOutputPoint(testVia1);
+
+		L1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
+		L1->SetPoint2(testVia1[0],testVia1[1],testVia1[2]);
+
+		m_Goniometer->AddInput(L1->GetOutput());
+
+		getWrapGlobalTransform(viaCoord1,m_ViaPoint);
+		getSphereCylinderWrap(m_PathNum);
+	}*/
+
+	//--------------------------------------------------------------
+	//test z coordinate from end point to end of intersection 
+	//for every z compute whole path by default 10 pathes and then compute angle between
+	//c-via and via-end
+
+}
+/*void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 	//get via point first
 	double endLocal[3],startLocal[3],sphereCenter[3],tmpCoord[3];
 	double cCoord1[3],cCoord2[3],cGlobal1[3],viaCoord[3];
@@ -1828,7 +1912,7 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 
 
 
-}
+}*/
 
 void medVMEComputeWrapping::getSphereCylinderWrap(const int step){
 	//const int step = 36;
@@ -2184,18 +2268,43 @@ bool medVMEComputeWrapping::checkAlign(){
 	vtkNEW(centerline);
 	double cylinderCenter[3];
 	double sphereCenter[3];
-	double sphereCylinderVector[3];
+	double sphereCylinderVector[3],axisVector[3];
 	double axis[3];
 	copyPointValue(m_CylinderAxis,axis);
+	//getWrapGlobalTransform(m_CylinderAxis,axis);
 	getGlobalCylinderCenter(cylinderCenter);
 	getGlobalSphereCenter(sphereCenter);
-	transformOutputPoint(axis);
-	transformOutputPoint(cylinderCenter);
-	transformOutputPoint(sphereCenter);
+	//transformOutputPoint(axis);
+	//transformOutputPoint(cylinderCenter);
+	//transformOutputPoint(sphereCenter);
 
 	sphereCylinderVector[0] = sphereCenter[0]-cylinderCenter[0];
 	sphereCylinderVector[1] = sphereCenter[1]-cylinderCenter[1];
 	sphereCylinderVector[2] = sphereCenter[2]-cylinderCenter[2];
+
+	axisVector[0] = axis[0] - cylinderCenter[0];
+	axisVector[1] = axis[1] - cylinderCenter[1];
+	axisVector[2] = axis[2] - cylinderCenter[2];
+	
+	vtkMath::Normalize(sphereCylinderVector);
+	vtkMath::Normalize(axisVector);
+	double value = vtkMath::Dot(sphereCylinderVector,axisVector);
+	double d = vtkMath::Distance2BetweenPoints(sphereCenter,cylinderCenter);
+
+	if (  fabs(d-0.0)<0.000001)
+	{
+		if (value<0.000001)
+		{
+			rtn =true;
+		}
+	}
+	else if ( fabs(fabs(value) - 1.0) < getCylinderRadius()/1000)
+	{
+		rtn = true;
+
+	}
+	
+	
 	//-------------------test code---------------------------
 	cAxis->SetPoint1(cylinderCenter[0],cylinderCenter[1],cylinderCenter[2]);
 	cAxis->SetPoint2(m_CylinderAxis[0],m_CylinderAxis[1],m_CylinderAxis[2]);
@@ -2205,14 +2314,6 @@ bool medVMEComputeWrapping::checkAlign(){
 	m_Goniometer->AddInput(cAxis->GetOutput());
 	m_Goniometer->AddInput(centerline->GetOutput());
 	//-------------------test over---------------------------
-	vtkMath::Normalize(sphereCylinderVector);
-	vtkMath::Normalize(axis);
-	double value = vtkMath::Dot(sphereCylinderVector,axis);
-	if ( fabs(value - 1.0) < getCylinderRadius()/1000)
-	{
-		rtn = true;
-
-	}
 	return rtn;
 
 }
@@ -2354,6 +2455,10 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 					rtn = WRAP_SPHERE_CYLINDER;
 				}else{
 					rtn = SINGLE_SPHERE;
+					/*if (objFlag2)
+					{
+						rtn = WRAP_SPHERE_CYLINDER_2;
+					}*/
 				}
 			}else if (objFlag2 || nearFlagEnd || nearFlagStart)//intersect cylinder or on surface
 			{
