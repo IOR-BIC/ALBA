@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-27 14:10:32 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-01-27 14:27:13 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -85,7 +85,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	m_Idx = 0;
 	m_PathNum = 36;
 
-	m_Tolerance = getCylinderRadius()/20.0;
+	m_Tolerance = getCylinderRadius()/4.0;
 
 	mafNEW(m_Transform);
 	mafNEW(m_TmpTransform2);
@@ -634,7 +634,7 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 	getWrapLocalTransform(m_EndPoint,endLocal);
 	getWrapLocalTransform(m_StartPoint,startLocal);
 
-	m_Tolerance = getCylinderRadius()/20.0;
+	m_Tolerance = getCylinderRadius()/4.0;
 
 	if (isEndPonintOnCylinder(m_Tolerance,endLocal) && isEndPonintOnCylinder(m_Tolerance,startLocal))//both on surface
 	{
@@ -2343,7 +2343,7 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 
 	getWrapLocalTransform(m_EndPoint,endWrapLocal);
 	getWrapLocalTransform(m_StartPoint,startWrapLocal);
-	m_Tolerance = getCylinderRadius()/20.00; // choose a suitable value
+	m_Tolerance = getCylinderRadius()/4.0; // choose a suitable value
 	bool nearFlagEnd = isEndPonintOnCylinder(m_Tolerance,endWrapLocal);
 	bool nearFlagStart = isEndPonintOnCylinder(m_Tolerance,startWrapLocal);
 
