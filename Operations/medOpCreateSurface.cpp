@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:31:18 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2009-01-29 10:12:51 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -68,12 +68,14 @@ mafOp(label)
 	m_OpType  = OPTYPE_OP;
 	m_Canundo = true;
 	m_InputPreserving = true;
+	m_Surface = NULL;
+
 }
 //----------------------------------------------------------------------------
 medOpCreateSurface::~medOpCreateSurface()
 //----------------------------------------------------------------------------
 {
-
+	mafDEL(m_Surface);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpCreateSurface::Copy()
@@ -93,12 +95,13 @@ void medOpCreateSurface::OpRun()
 //----------------------------------------------------------------------------
 {
 	mafVMESurfaceParametric *inputSurface=mafVMESurfaceParametric::SafeDownCast(m_Input);
-	mafSmartPointer<mafVMESurface> newSurface;
-	newSurface->SetName(inputSurface->GetName());
-	newSurface->SetData(vtkPolyData::SafeDownCast(inputSurface->GetOutput()->GetVTKData()),inputSurface->GetTimeStamp());
-	newSurface->Update();
+	
+	mafNEW(m_Surface);
+	m_Surface->SetName(inputSurface->GetName());
+	m_Surface->SetData(vtkPolyData::SafeDownCast(inputSurface->GetOutput()->GetVTKData()),inputSurface->GetTimeStamp());
+	m_Surface->Update();
 
-	m_Output=newSurface;
+	m_Output=m_Surface;
 	
 	OpStop(OP_RUN_OK);
 }

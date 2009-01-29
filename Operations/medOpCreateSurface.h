@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-10-19 14:17:49 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-01-29 10:12:52 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -49,6 +49,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
+class mafVMESurface;
 
 //----------------------------------------------------------------------------
 // medOpCreateSurface :
@@ -78,6 +79,8 @@ protected:
 
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	virtual void OpStop(int result);
+
+	mafVMESurface *m_Surface;
 
 };
 #endif
