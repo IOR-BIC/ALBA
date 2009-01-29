@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFPolyDataSingleSourceShortestPath.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-13 09:40:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-01-29 11:17:14 $
+  Version:   $Revision: 1.1.2.2 $
 
   This class is not mature enough to enter the official VTK release.
 =========================================================================*/
@@ -51,7 +51,7 @@ public:
 	
 	// Description:
 	// Get the summed weight for all vertices
-	vtkGetObjectMacro(d, vtkFloatArray);
+	vtkGetObjectMacro(D, vtkFloatArray);
 	
 	// Description:
 	// The vertex at the start of the shortest path
@@ -129,21 +129,21 @@ protected:
 							 vtkIdType startv, vtkIdType endv);
 	
 	// the number of vertices
-	int n;
+	int N;
 	
 	// d(v) current summed weight for path to vertex v
-	vtkFloatArray *d;
+	vtkFloatArray *D;
 	
 	// pre(v) predecessor of v
-	vtkIntArray *pre;
+	vtkIntArray *Pre;
 	
 	// f is the set of vertices wich has not a shortest path yet but has a path
 	// ie. the front set (f(v) == 1 means that vertex v is in f)
-	vtkIntArray *f;
+	vtkIntArray *F;
 	
 	// s is the set of vertices with allready determined shortest path
 	// s(v) == 1 means that vertex v is in s
-	vtkIntArray *s;
+	vtkIntArray *S;
 	
 	// the priority que (a binary heap) with vertex indices
 	vtkIntArray *H;
@@ -152,7 +152,7 @@ protected:
 	int Hsize;
 	
 	// p(v) the position of v in H (p and H are kindoff inverses)
-	vtkIntArray *p;
+	vtkIntArray *P;
 	
 	// The vertex ids on the shortest path
 	vtkIdList *IdList;

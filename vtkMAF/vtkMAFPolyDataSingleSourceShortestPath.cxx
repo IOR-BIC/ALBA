@@ -3,8 +3,8 @@
   Program:	 Visualization Toolkit
   Module:	 $RCSfile: vtkMAFPolyDataSingleSourceShortestPath.cxx,v $
   Language:  C++
-  Date: 	 $Date: 2009-01-13 09:40:44 $
-  Version:	 $Revision: 1.1.2.1 $
+  Date: 	 $Date: 2009-01-29 11:17:14 $
+  Version:	 $Revision: 1.1.2.2 $
 
   This class is not mature enough to enter the official VTK release.
 =========================================================================*/
@@ -21,26 +21,26 @@
 #include "vtkPointData.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkMAFPolyDataSingleSourceShortestPath, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFPolyDataSingleSourceShortestPath, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFPolyDataSingleSourceShortestPath);
 
 //----------------------------------------------------------------------------
 vtkMAFPolyDataSingleSourceShortestPath::vtkMAFPolyDataSingleSourceShortestPath()
 {
 	this->IdList = vtkIdList::New();
-	this->d 	 = vtkFloatArray::New();
-	this->pre	 = vtkIntArray::New();
-	this->f 	 = vtkIntArray::New();
-	this->s 	 = vtkIntArray::New();
+	this->D 	 = vtkFloatArray::New();
+	this->Pre	 = vtkIntArray::New();
+	this->F 	 = vtkIntArray::New();
+	this->S 	 = vtkIntArray::New();
 	this->H 	 = vtkIntArray::New();
-	this->p 	 = vtkIntArray::New();
+	this->P 	 = vtkIntArray::New();
 	this->Hsize  = 0;
 	this->StartVertex = 0;
 	this->EndVertex   = 0;	
 	this->StopWhenEndReached = 0;
 	this->UseScalarWeights = 0;
 	this->Adj = NULL;
-	this->n = 0;
+	this->N = 0;
 	this->AdjacencyGraphSize = 0;
 }
 
@@ -49,18 +49,18 @@ vtkMAFPolyDataSingleSourceShortestPath::~vtkMAFPolyDataSingleSourceShortestPath(
 {
 	if (this->IdList)
 		this->IdList->Delete();
-	if (this->d)
-		this->d->Delete();
-	if (this->pre)
-		this->pre->Delete();
-	if (this->f)
-		this->f->Delete();
-	if (this->s)
-		this->s->Delete();
+	if (this->D)
+		this->D->Delete();
+	if (this->Pre)
+		this->Pre->Delete();
+	if (this->F)
+		this->F->Delete();
+	if (this->S)
+		this->S->Delete();
 	if (this->H)
 		this->H->Delete();
-	if (this->p)
-		this->p->Delete();
+	if (this->P)
+		this->P->Delete();
 	
 	DeleteAdjacency();
 }
@@ -93,22 +93,22 @@ void vtkMAFPolyDataSingleSourceShortestPath::init()
 	
 	IdList->Reset();
 	
-	this->n = this->GetInput()->GetNumberOfPoints();
+	this->N = this->GetInput()->GetNumberOfPoints();
 	
-	this->d->SetNumberOfComponents(1);
-	this->d->SetNumberOfTuples(this->n);
-	this->pre->SetNumberOfComponents(1);
-	this->pre->SetNumberOfTuples(this->n);
-	this->f->SetNumberOfComponents(1);
-	this->f->SetNumberOfTuples(this->n);
-	this->s->SetNumberOfComponents(1);
-	this->s->SetNumberOfTuples(this->n);
-	this->p->SetNumberOfComponents(1);
-	this->p->SetNumberOfTuples(this->n);
+	this->D->SetNumberOfComponents(1);
+	this->D->SetNumberOfTuples(this->N);
+	this->Pre->SetNumberOfComponents(1);
+	this->Pre->SetNumberOfTuples(this->N);
+	this->F->SetNumberOfComponents(1);
+	this->F->SetNumberOfTuples(this->N);
+	this->S->SetNumberOfComponents(1);
+	this->S->SetNumberOfTuples(this->N);
+	this->P->SetNumberOfComponents(1);
+	this->P->SetNumberOfTuples(this->N);
 	
 	// The heap has elements from 1 to n
 	this->H->SetNumberOfComponents(1);
-	this->H->SetNumberOfTuples(this->n+1);
+	this->H->SetNumberOfTuples(this->N+1);
 	
 	Hsize = 0;
 }
@@ -211,7 +211,7 @@ void vtkMAFPolyDataSingleSourceShortestPath::TraceShortestPath(vtkPolyData *inPd
 	vtkCellArray *lines = vtkCellArray::New();
 	
 	// n is far to many. Adjusted later
-	lines->InsertNextCell(this->n);
+	lines->InsertNextCell(this->N);
 	
 	// trace backward
 	int npoints = 0;
@@ -227,7 +227,7 @@ void vtkMAFPolyDataSingleSourceShortestPath::TraceShortestPath(vtkPolyData *inPd
 		lines->InsertCellPoint(id);
 		npoints++;
 		
-		v = this->pre->GetValue(v);
+		v = this->Pre->GetValue(v);
 	}
 	IdList->InsertNextId(v);
 	
@@ -246,25 +246,25 @@ void vtkMAFPolyDataSingleSourceShortestPath::TraceShortestPath(vtkPolyData *inPd
 
 void vtkMAFPolyDataSingleSourceShortestPath::InitSingleSource(int startv)
 {
-	for (int v = 0; v < this->n; v++)
+	for (int v = 0; v < this->N; v++)
 	{
 		// d will be updated with first visit of vertex
-		this->d->SetValue(v, -1);
-		this->pre->SetValue(v, -1);
-		this->s->SetValue(v, 0);
-		this->f->SetValue(v, 0);
+		this->D->SetValue(v, -1);
+		this->Pre->SetValue(v, -1);
+		this->S->SetValue(v, 0);
+		this->F->SetValue(v, 0);
 	}
 	
-	this->d->SetValue(startv, 0);
+	this->D->SetValue(startv, 0);
 }
 
 
 void vtkMAFPolyDataSingleSourceShortestPath::Relax(int u, int v, double w)
 {
-	if (this->d->GetValue(v) > this->d->GetValue(u) + w)
+	if (this->D->GetValue(v) > this->D->GetValue(u) + w)
 	{
-		this->d->SetValue(v, this->d->GetValue(u) + w);
-		this->pre->SetValue(v, u);
+		this->D->SetValue(v, this->D->GetValue(u) + w);
+		this->Pre->SetValue(v, u);
 		
 		HeapDecreaseKey(v);
 	}
@@ -277,15 +277,15 @@ void vtkMAFPolyDataSingleSourceShortestPath::ShortestPath(int startv, int endv)
 	InitSingleSource(startv);
 	
 	HeapInsert(startv);
-	this->f->SetValue(startv, 1);
+	this->F->SetValue(startv, 1);
 	
 	int stop = 0;
 	while ((u = HeapExtractMin()) >= 0 && !stop)
 	{
 		// u is now in s since the shortest path to u is determined
-		this->s->SetValue(u, 1);
+		this->S->SetValue(u, 1);
 		// remove u from the front set
-		this->f->SetValue(u, 0);
+		this->F->SetValue(u, 0);
 		
 		if (u == endv && StopWhenEndReached)
 			stop = 1;
@@ -296,23 +296,23 @@ void vtkMAFPolyDataSingleSourceShortestPath::ShortestPath(int startv, int endv)
 			v = Adj[u]->GetId(i);
 			
 			// s is the set of vertices with determined shortest path...do not use them again
-			if (!this->s->GetValue(v))
+			if (!this->S->GetValue(v))
 			{
 				// Only relax edges where the end is not in s and edge is in the front set
 				double w = EdgeCost(this->GetInput(), u, v);
 				
-				if (this->f->GetValue(v))
+				if (this->F->GetValue(v))
 				{
 					Relax(u, v, w);
 				}
 				// add edge v to front set
 				else
 				{
-					this->f->SetValue(v, 1);
-					this->d->SetValue(v, this->d->GetValue(u) + w);
+					this->F->SetValue(v, 1);
+					this->D->SetValue(v, this->D->GetValue(u) + w);
 					
 					// Set Predecessor of v to be u
-					this->pre->SetValue(v, u);
+					this->Pre->SetValue(v, u);
 					
 					HeapInsert(v);
 				}
@@ -334,12 +334,12 @@ void vtkMAFPolyDataSingleSourceShortestPath::Heapify(int i)
 	
 	// The value of element v is d(v)
 	// the heap stores the vertex numbers
-	if (l <= Hsize && this->d->GetValue(this->H->GetValue(l)) < this->d->GetValue(this->H->GetValue(i)))
+	if (l <= Hsize && this->D->GetValue(this->H->GetValue(l)) < this->D->GetValue(this->H->GetValue(i)))
 		smallest = l;
 	else
 		smallest = i;
 	
-	if (r <= Hsize && this->d->GetValue(this->H->GetValue(r))< this->d->GetValue(this->H->GetValue(smallest)))
+	if (r <= Hsize && this->D->GetValue(this->H->GetValue(r))< this->D->GetValue(this->H->GetValue(smallest)))
 		smallest = r;
 	
 	if (smallest != i)
@@ -349,11 +349,11 @@ void vtkMAFPolyDataSingleSourceShortestPath::Heapify(int i)
 		this->H->SetValue(i, this->H->GetValue(smallest));
 		
 		// where is H(i)
-		this->p->SetValue(this->H->GetValue(i), i);
+		this->P->SetValue(this->H->GetValue(i), i);
 		
 		// H and p is kinda inverse
 		this->H->SetValue(smallest, t);
-		this->p->SetValue(t, smallest);
+		this->P->SetValue(t, smallest);
 		
 		Heapify(smallest);
 	}
@@ -369,15 +369,15 @@ void vtkMAFPolyDataSingleSourceShortestPath::HeapInsert(int v)
 	Hsize++;
 	int i = Hsize;
 	
-	while (i > 1 && this->d->GetValue(this->H->GetValue(i/2)) > this->d->GetValue(v))
+	while (i > 1 && this->D->GetValue(this->H->GetValue(i/2)) > this->D->GetValue(v))
 	{
 		this->H->SetValue(i, this->H->GetValue(i/2));
-		this->p->SetValue(this->H->GetValue(i), i);
+		this->P->SetValue(this->H->GetValue(i), i);
 		i /= 2;
 	}
 	// H and p is kinda inverse
 	this->H->SetValue(i, v);
-	this->p->SetValue(v, i);
+	this->P->SetValue(v, i);
 }
 
 int vtkMAFPolyDataSingleSourceShortestPath::HeapExtractMin()
@@ -386,10 +386,10 @@ int vtkMAFPolyDataSingleSourceShortestPath::HeapExtractMin()
 		return -1;
 	
 	int minv = this->H->GetValue(1);
-	this->p->SetValue(minv, -1);
+	this->P->SetValue(minv, -1);
 	
 	this->H->SetValue(1, this->H->GetValue(Hsize));
-	this->p->SetValue(this->H->GetValue(1), 1);
+	this->P->SetValue(this->H->GetValue(1), 1);
 	
 	Hsize--;
 	Heapify(1);
@@ -400,20 +400,20 @@ int vtkMAFPolyDataSingleSourceShortestPath::HeapExtractMin()
 void vtkMAFPolyDataSingleSourceShortestPath::HeapDecreaseKey(int v)
 {
 	// where in H is vertex v
-	int i = this->p->GetValue(v);
+	int i = this->P->GetValue(v);
 	if (i < 1 || i > Hsize)
 		return;
 	
-	while (i > 1 && this->d->GetValue(this->H->GetValue(i/2)) > this->d->GetValue(v))
+	while (i > 1 && this->D->GetValue(this->H->GetValue(i/2)) > this->D->GetValue(v))
 	{
 		this->H->SetValue(i, this->H->GetValue(i/2));
-		this->p->SetValue(this->H->GetValue(i), i);
+		this->P->SetValue(this->H->GetValue(i), i);
 		i /= 2;
 	}
 	
 	// H and p is kinda inverse
 	this->H->SetValue(i, v);
-	this->p->SetValue(v, i);
+	this->P->SetValue(v, i);
 }
 
 void vtkMAFPolyDataSingleSourceShortestPath::PrintSelf(ostream& os, vtkIndent indent)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFRayCast3DPicker.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-01-29 11:17:14 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -35,7 +35,7 @@
 #include "vtkVolumeMapper.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkMAFRayCast3DPicker, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFRayCast3DPicker, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFRayCast3DPicker);
 //------------------------------------------------------------------------------
 
@@ -379,14 +379,14 @@ double vtkMAFRayCast3DPicker::IntersectWithLine(double p1[3], double p2[3], doub
   {
     input->GetCell(cellId, this->Cell);
 
-    if ( this->Cell->IntersectWithLine(p1, p2, tol, t, this->x, pcoords, subId) //le coordinate del punto sul triangolo sono in x
+    if ( this->Cell->IntersectWithLine(p1, p2, tol, t, this->X, pcoords, subId) //le coordinate del punto sul triangolo sono in x
     && t < tMin )
     {
       minCellId = cellId;
       minSubId = subId;
       for (i=0; i<3; i++)
       {
-        minXYZ[i] = this->x[i];
+        minXYZ[i] = this->X[i];
         minPcoords[i] = pcoords[i];
       }
       tMin = t;

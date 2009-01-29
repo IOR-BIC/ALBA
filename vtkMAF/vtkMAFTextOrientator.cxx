@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextOrientator.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-10-22 08:45:51 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-01-29 11:17:14 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,36 +27,36 @@
 #include "vtkPolyData.h"
 
 
-vtkCxxRevisionMacro(vtkMAFTextOrientator, "$Revision: 1.3.2.1 $");
+vtkCxxRevisionMacro(vtkMAFTextOrientator, "$Revision: 1.3.2.2 $");
 vtkStandardNewMacro(vtkMAFTextOrientator);
 //------------------------------------------------------------------------------
 vtkMAFTextOrientator::vtkMAFTextOrientator()
 //------------------------------------------------------------------------------
 {
-  m_TextSourceLeftActor = NULL;
-  m_TextSourceLeftMapper = NULL;
-  m_TextSourceLeft = NULL;
+  TextSourceLeftActor = NULL;
+  TextSourceLeftMapper = NULL;
+  TextSourceLeft = NULL;
 
-  m_TextSourceDownActor = NULL;
-  m_TextSourceDownMapper = NULL;
-  m_TextSourceDown = NULL;
+  TextSourceDownActor = NULL;
+  TextSourceDownMapper = NULL;
+  TextSourceDown = NULL;
 
-  m_TextSourceRightActor = NULL;
-  m_TextSourceRightMapper = NULL;
-  m_TextSourceRight = NULL;
+  TextSourceRightActor = NULL;
+  TextSourceRightMapper = NULL;
+  TextSourceRight = NULL;
 
-  m_TextSourceUpActor = NULL;
-  m_TextSourceUpMapper = NULL;
-  m_TextSourceUp = NULL;
+  TextSourceUpActor = NULL;
+  TextSourceUpMapper = NULL;
+  TextSourceUp = NULL;
 
 
-  m_Dimension = 10;
-  m_AttachPositionFlag = false;
+  Dimension = 10;
+  AttachPositionFlag = false;
 
-  m_DisplayOffsetUp[0] = m_DisplayOffsetUp[1] = 0;  
-  m_DisplayOffsetRight[0] = m_DisplayOffsetRight[1] = 0;
-  m_DisplayOffsetDown[0] = m_DisplayOffsetDown[1] = 0;
-  m_DisplayOffsetLeft[0] = m_DisplayOffsetLeft[1] = 0;
+  DisplayOffsetUp[0] = DisplayOffsetUp[1] = 0;  
+  DisplayOffsetRight[0] = DisplayOffsetRight[1] = 0;
+  DisplayOffsetDown[0] = DisplayOffsetDown[1] = 0;
+  DisplayOffsetLeft[0] = DisplayOffsetLeft[1] = 0;
 
   OrientatorCreate();
 }
@@ -64,21 +64,21 @@ vtkMAFTextOrientator::vtkMAFTextOrientator()
 vtkMAFTextOrientator::~vtkMAFTextOrientator()
 //------------------------------------------------------------------------------
 {
-  if(m_TextSourceLeftActor) m_TextSourceLeftActor->Delete();
-  if(m_TextSourceLeftMapper) m_TextSourceLeftMapper->Delete();
-  if(m_TextSourceLeft) m_TextSourceLeft->Delete();
+  if(TextSourceLeftActor) TextSourceLeftActor->Delete();
+  if(TextSourceLeftMapper) TextSourceLeftMapper->Delete();
+  if(TextSourceLeft) TextSourceLeft->Delete();
 
-  if(m_TextSourceDownActor) m_TextSourceDownActor->Delete();
-  if(m_TextSourceDownMapper) m_TextSourceDownMapper->Delete();
-  if(m_TextSourceDown) m_TextSourceDown->Delete();
+  if(TextSourceDownActor) TextSourceDownActor->Delete();
+  if(TextSourceDownMapper) TextSourceDownMapper->Delete();
+  if(TextSourceDown) TextSourceDown->Delete();
 
-  if(m_TextSourceRightActor) m_TextSourceRightActor->Delete();
-  if(m_TextSourceRightMapper) m_TextSourceRightMapper->Delete();
-  if(m_TextSourceRight) m_TextSourceRight->Delete();
+  if(TextSourceRightActor) TextSourceRightActor->Delete();
+  if(TextSourceRightMapper) TextSourceRightMapper->Delete();
+  if(TextSourceRight) TextSourceRight->Delete();
 
-  if(m_TextSourceUpActor) m_TextSourceUpActor->Delete();
-  if(m_TextSourceUpMapper) m_TextSourceUpMapper->Delete();
-  if(m_TextSourceUp) m_TextSourceUp->Delete();
+  if(TextSourceUpActor) TextSourceUpActor->Delete();
+  if(TextSourceUpMapper) TextSourceUpMapper->Delete();
+  if(TextSourceUp) TextSourceUp->Delete();
 	
 }
 //------------------------------------------------------------------------------
@@ -100,14 +100,14 @@ int vtkMAFTextOrientator::RenderOverlay(vtkViewport *viewport)
   OrientatorUpdate(ren);
   this->Modified();
 
-  if(m_TextSourceLeftActor->GetVisibility())
-    m_TextSourceLeftActor->RenderOverlay(viewport);
-  if(m_TextSourceDownActor->GetVisibility())
-    m_TextSourceDownActor->RenderOverlay(viewport);
-  if(m_TextSourceRightActor->GetVisibility())
-    m_TextSourceRightActor->RenderOverlay(viewport);
-  if(m_TextSourceUpActor->GetVisibility())
-    m_TextSourceUpActor->RenderOverlay(viewport);
+  if(TextSourceLeftActor->GetVisibility())
+    TextSourceLeftActor->RenderOverlay(viewport);
+  if(TextSourceDownActor->GetVisibility())
+    TextSourceDownActor->RenderOverlay(viewport);
+  if(TextSourceRightActor->GetVisibility())
+    TextSourceRightActor->RenderOverlay(viewport);
+  if(TextSourceUpActor->GetVisibility())
+    TextSourceUpActor->RenderOverlay(viewport);
 
   return 1;
   
@@ -121,14 +121,14 @@ int vtkMAFTextOrientator::RenderOpaqueGeometry(vtkViewport *viewport)
 	OrientatorUpdate(ren);
 	this->Modified();
 
-  if(m_TextSourceLeftActor->GetVisibility())
-    m_TextSourceLeftActor->RenderOpaqueGeometry(viewport);
-  if(m_TextSourceDownActor->GetVisibility())
-    m_TextSourceDownActor->RenderOpaqueGeometry(viewport);
-  if(m_TextSourceRightActor->GetVisibility())
-    m_TextSourceRightActor->RenderOpaqueGeometry(viewport);
-  if(m_TextSourceUpActor->GetVisibility())
-    m_TextSourceUpActor->RenderOpaqueGeometry(viewport);
+  if(TextSourceLeftActor->GetVisibility())
+    TextSourceLeftActor->RenderOpaqueGeometry(viewport);
+  if(TextSourceDownActor->GetVisibility())
+    TextSourceDownActor->RenderOpaqueGeometry(viewport);
+  if(TextSourceRightActor->GetVisibility())
+    TextSourceRightActor->RenderOpaqueGeometry(viewport);
+  if(TextSourceUpActor->GetVisibility())
+    TextSourceUpActor->RenderOpaqueGeometry(viewport);
    
 	return 0;
 }
@@ -137,60 +137,60 @@ void vtkMAFTextOrientator::OrientatorCreate()
 //------------------------------------------------------------------------------
 {
   //left
-  m_TextSourceLeft = vtkTextSource::New();
-  m_TextSourceLeft->BackingOn();
-  m_TextSourceLeft->SetText("");
-  m_TextSourceLeft->SetForegroundColor(1.0,1.0,1.0);
-  m_TextSourceLeft->SetBackgroundColor(0.0,0.0,0.0);
-  m_TextSourceLeft->Update();
+  TextSourceLeft = vtkTextSource::New();
+  TextSourceLeft->BackingOn();
+  TextSourceLeft->SetText("");
+  TextSourceLeft->SetForegroundColor(1.0,1.0,1.0);
+  TextSourceLeft->SetBackgroundColor(0.0,0.0,0.0);
+  TextSourceLeft->Update();
 
-  m_TextSourceLeftMapper = vtkPolyDataMapper2D::New();
-  m_TextSourceLeftMapper->SetInput(m_TextSourceLeft->GetOutput());
+  TextSourceLeftMapper = vtkPolyDataMapper2D::New();
+  TextSourceLeftMapper->SetInput(TextSourceLeft->GetOutput());
   
-  m_TextSourceLeftActor = vtkActor2D::New();
-  m_TextSourceLeftActor->SetMapper(m_TextSourceLeftMapper);
+  TextSourceLeftActor = vtkActor2D::New();
+  TextSourceLeftActor->SetMapper(TextSourceLeftMapper);
 
   //down
-  m_TextSourceDown = vtkTextSource::New();
-  m_TextSourceDown->BackingOn();
-  m_TextSourceDown->SetText("");
-  m_TextSourceDown->SetForegroundColor(1.0,1.0,1.0);
-  m_TextSourceDown->SetBackgroundColor(0.0,0.0,0.0);
-  m_TextSourceDown->Update();
+  TextSourceDown = vtkTextSource::New();
+  TextSourceDown->BackingOn();
+  TextSourceDown->SetText("");
+  TextSourceDown->SetForegroundColor(1.0,1.0,1.0);
+  TextSourceDown->SetBackgroundColor(0.0,0.0,0.0);
+  TextSourceDown->Update();
 
-  m_TextSourceDownMapper = vtkPolyDataMapper2D::New();
-  m_TextSourceDownMapper->SetInput(m_TextSourceDown->GetOutput());
+  TextSourceDownMapper = vtkPolyDataMapper2D::New();
+  TextSourceDownMapper->SetInput(TextSourceDown->GetOutput());
 
-  m_TextSourceDownActor = vtkActor2D::New();
-  m_TextSourceDownActor->SetMapper(m_TextSourceDownMapper);
+  TextSourceDownActor = vtkActor2D::New();
+  TextSourceDownActor->SetMapper(TextSourceDownMapper);
 
   //right
-  m_TextSourceRight = vtkTextSource::New();
-  m_TextSourceRight->BackingOn();
-  m_TextSourceRight->SetText("");
-  m_TextSourceRight->SetForegroundColor(1.0,1.0,1.0);
-  m_TextSourceRight->SetBackgroundColor(0.0,0.0,0.0);
-  m_TextSourceRight->Update();
+  TextSourceRight = vtkTextSource::New();
+  TextSourceRight->BackingOn();
+  TextSourceRight->SetText("");
+  TextSourceRight->SetForegroundColor(1.0,1.0,1.0);
+  TextSourceRight->SetBackgroundColor(0.0,0.0,0.0);
+  TextSourceRight->Update();
 
-  m_TextSourceRightMapper = vtkPolyDataMapper2D::New();
-  m_TextSourceRightMapper->SetInput(m_TextSourceRight->GetOutput());
+  TextSourceRightMapper = vtkPolyDataMapper2D::New();
+  TextSourceRightMapper->SetInput(TextSourceRight->GetOutput());
 
-  m_TextSourceRightActor = vtkActor2D::New();
-  m_TextSourceRightActor->SetMapper(m_TextSourceRightMapper);
+  TextSourceRightActor = vtkActor2D::New();
+  TextSourceRightActor->SetMapper(TextSourceRightMapper);
 
   //up
-  m_TextSourceUp = vtkTextSource::New();
-  m_TextSourceUp->BackingOn();
-  m_TextSourceUp->SetText("");
-  m_TextSourceUp->SetForegroundColor(1.0,1.0,1.0);
-  m_TextSourceUp->SetBackgroundColor(0.0,0.0,0.0);
-  m_TextSourceUp->Update();
+  TextSourceUp = vtkTextSource::New();
+  TextSourceUp->BackingOn();
+  TextSourceUp->SetText("");
+  TextSourceUp->SetForegroundColor(1.0,1.0,1.0);
+  TextSourceUp->SetBackgroundColor(0.0,0.0,0.0);
+  TextSourceUp->Update();
 
-  m_TextSourceUpMapper = vtkPolyDataMapper2D::New();
-  m_TextSourceUpMapper->SetInput(m_TextSourceUp->GetOutput());
+  TextSourceUpMapper = vtkPolyDataMapper2D::New();
+  TextSourceUpMapper->SetInput(TextSourceUp->GetOutput());
 
-  m_TextSourceUpActor = vtkActor2D::New();
-  m_TextSourceUpActor->SetMapper(m_TextSourceUpMapper);
+  TextSourceUpActor = vtkActor2D::New();
+  TextSourceUpActor->SetMapper(TextSourceUpMapper);
 }
 //----------------------------------------------------------------------------
 void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
@@ -202,35 +202,35 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
   int middleX = renderSize[0]/2;
   int middleY = renderSize[1]/2;
   
-  if(m_AttachPositionFlag == false)
+  if(AttachPositionFlag == false)
   {
     //left
-    m_TextSourceLeftActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-    m_TextSourceLeftActor->SetPosition(m_Dimension/4 + m_DisplayOffsetLeft[0], middleY-m_Dimension/2 + m_DisplayOffsetLeft[1]);
+    TextSourceLeftActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    TextSourceLeftActor->SetPosition(Dimension/4 + DisplayOffsetLeft[0], middleY-Dimension/2 + DisplayOffsetLeft[1]);
 
     //down
-    m_TextSourceDownActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-    m_TextSourceDownActor->SetPosition(middleX - m_Dimension/4 + m_DisplayOffsetDown[0], m_Dimension/4 + m_DisplayOffsetDown[1]);
+    TextSourceDownActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    TextSourceDownActor->SetPosition(middleX - Dimension/4 + DisplayOffsetDown[0], Dimension/4 + DisplayOffsetDown[1]);
 
     //right
-    m_TextSourceRightActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-    m_TextSourceRightActor->SetPosition(renderSize[0] - 1.5*m_Dimension + m_DisplayOffsetRight[0] , middleY-m_Dimension/2 + m_DisplayOffsetRight[1]);
+    TextSourceRightActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    TextSourceRightActor->SetPosition(renderSize[0] - 1.5*Dimension + DisplayOffsetRight[0] , middleY-Dimension/2 + DisplayOffsetRight[1]);
 
     //up
-    m_TextSourceUpActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
-    m_TextSourceUpActor->SetPosition(middleX - m_Dimension/4 + m_DisplayOffsetUp[0], renderSize[1]-2*m_Dimension + m_DisplayOffsetUp[1]);
+    TextSourceUpActor->GetPositionCoordinate()->SetCoordinateSystemToDisplay();
+    TextSourceUpActor->SetPosition(middleX - Dimension/4 + DisplayOffsetUp[0], renderSize[1]-2*Dimension + DisplayOffsetUp[1]);
   }
   else
   {
     
 
     double displayUp[3];
-    ren->SetWorldPoint(m_AttachPositionUp[0],m_AttachPositionUp[1],m_AttachPositionUp[2],1.);
+    ren->SetWorldPoint(AttachPositionUp[0],AttachPositionUp[1],AttachPositionUp[2],1.);
     ren->WorldToDisplay();
     ren->GetDisplayPoint(displayUp);
     int temporaryXUp,temporaryYUp;
-    temporaryXUp = displayUp[0] + m_DisplayOffsetUp[0];
-    temporaryYUp = displayUp[1]+ m_DisplayOffsetUp[1];
+    temporaryXUp = displayUp[0] + DisplayOffsetUp[0];
+    temporaryYUp = displayUp[1]+ DisplayOffsetUp[1];
 
     if(temporaryXUp < 10)
       temporaryXUp = 10;
@@ -242,16 +242,16 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
     if(temporaryYUp > renderSize[1] - 15)
       temporaryYUp = renderSize[1] - 15;
 
-    m_TextSourceUpActor->SetPosition(temporaryXUp, temporaryYUp);
+    TextSourceUpActor->SetPosition(temporaryXUp, temporaryYUp);
 
 
     double displayRight[3];
-    ren->SetWorldPoint(m_AttachPositionRight[0],m_AttachPositionRight[1],m_AttachPositionRight[2],1.);
+    ren->SetWorldPoint(AttachPositionRight[0],AttachPositionRight[1],AttachPositionRight[2],1.);
     ren->WorldToDisplay();
     ren->GetDisplayPoint(displayRight);
     int temporaryXRight,temporaryYRight;
-    temporaryXRight = displayRight[0] + m_DisplayOffsetRight[0];
-    temporaryYRight = displayRight[1]+ m_DisplayOffsetRight[1];
+    temporaryXRight = displayRight[0] + DisplayOffsetRight[0];
+    temporaryYRight = displayRight[1]+ DisplayOffsetRight[1];
 
     if(temporaryXRight < 10)
       temporaryXRight = 10;
@@ -264,15 +264,15 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
       temporaryYRight = renderSize[1] - 15;
 
 
-    m_TextSourceRightActor->SetPosition(temporaryXRight, temporaryYRight);
+    TextSourceRightActor->SetPosition(temporaryXRight, temporaryYRight);
 
     double displayDown[3];
-    ren->SetWorldPoint(m_AttachPositionDown[0],m_AttachPositionDown[1],m_AttachPositionDown[2],1.);
+    ren->SetWorldPoint(AttachPositionDown[0],AttachPositionDown[1],AttachPositionDown[2],1.);
     ren->WorldToDisplay();
     ren->GetDisplayPoint(displayDown);
     int temporaryXDown,temporaryYDown;
-    temporaryXDown = displayDown[0] + m_DisplayOffsetDown[0];
-    temporaryYDown = displayDown[1] + m_DisplayOffsetDown[1];
+    temporaryXDown = displayDown[0] + DisplayOffsetDown[0];
+    temporaryYDown = displayDown[1] + DisplayOffsetDown[1];
 
     if(temporaryXDown < 10)
       temporaryXDown = 10;
@@ -284,15 +284,15 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
     if(temporaryYDown > renderSize[1] - 15)
       temporaryYDown = renderSize[1] - 15;
 
-    m_TextSourceDownActor->SetPosition(temporaryXDown, temporaryYDown);
+    TextSourceDownActor->SetPosition(temporaryXDown, temporaryYDown);
 
     double displayLeft[3];
-    ren->SetWorldPoint(m_AttachPositionLeft[0],m_AttachPositionLeft[1],m_AttachPositionLeft[2],1.);
+    ren->SetWorldPoint(AttachPositionLeft[0],AttachPositionLeft[1],AttachPositionLeft[2],1.);
     ren->WorldToDisplay();
     ren->GetDisplayPoint(displayLeft);
     int temporaryXLeft,temporaryYLeft;
-    temporaryXLeft = displayLeft[0] + m_DisplayOffsetLeft[0];
-    temporaryYLeft = displayLeft[1] + m_DisplayOffsetLeft[1];
+    temporaryXLeft = displayLeft[0] + DisplayOffsetLeft[0];
+    temporaryYLeft = displayLeft[1] + DisplayOffsetLeft[1];
 
     if(temporaryXLeft < 10)
       temporaryXLeft = 10;
@@ -305,7 +305,7 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
       temporaryYLeft = renderSize[1] - 15;
 
 
-    m_TextSourceLeftActor->SetPosition(temporaryXLeft, temporaryYLeft);
+    TextSourceLeftActor->SetPosition(temporaryXLeft, temporaryYLeft);
   }
   
 }
@@ -313,14 +313,14 @@ void vtkMAFTextOrientator::OrientatorUpdate(vtkRenderer *ren)
 void vtkMAFTextOrientator::SetBackgroundVisibility(bool show)
 //----------------------------------------------------------------------------
 {
-  m_TextSourceLeft->SetBacking(show);
-  m_TextSourceLeft->Update();
-  m_TextSourceDown->SetBacking(show);
-  m_TextSourceDown->Update();
-  m_TextSourceRight->SetBacking(show);
-  m_TextSourceRight->Update();
-  m_TextSourceUp->SetBacking(show);
-  m_TextSourceUp->Update();
+  TextSourceLeft->SetBacking(show);
+  TextSourceLeft->Update();
+  TextSourceDown->SetBacking(show);
+  TextSourceDown->Update();
+  TextSourceRight->SetBacking(show);
+  TextSourceRight->Update();
+  TextSourceUp->SetBacking(show);
+  TextSourceUp->Update();
 }
 
 
@@ -328,33 +328,33 @@ void vtkMAFTextOrientator::SetBackgroundVisibility(bool show)
 void vtkMAFTextOrientator::SetTextColor(double red, double green, double blue)
 //----------------------------------------------------------------------------
 {
-  m_TextSourceLeft->SetForegroundColor(red,green,blue);
-  m_TextSourceLeft->Update();
-  m_TextSourceDown->SetForegroundColor(red,green,blue);
-  m_TextSourceDown->Update();
-  m_TextSourceRight->SetForegroundColor(red,green,blue);
-  m_TextSourceRight->Update();
-  m_TextSourceUp->SetForegroundColor(red,green,blue);
-  m_TextSourceUp->Update();
+  TextSourceLeft->SetForegroundColor(red,green,blue);
+  TextSourceLeft->Update();
+  TextSourceDown->SetForegroundColor(red,green,blue);
+  TextSourceDown->Update();
+  TextSourceRight->SetForegroundColor(red,green,blue);
+  TextSourceRight->Update();
+  TextSourceUp->SetForegroundColor(red,green,blue);
+  TextSourceUp->Update();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTextOrientator::SetBackgroundColor(double red, double green, double blue)
 //----------------------------------------------------------------------------
 {
-  m_TextSourceLeft->SetBackgroundColor(red,green,blue);
-  m_TextSourceLeft->Update();
-  m_TextSourceDown->SetBackgroundColor(red,green,blue);
-  m_TextSourceDown->Update();
-  m_TextSourceRight->SetBackgroundColor(red,green,blue);
-  m_TextSourceRight->Update();
-  m_TextSourceUp->SetBackgroundColor(red,green,blue);
-  m_TextSourceUp->Update();
+  TextSourceLeft->SetBackgroundColor(red,green,blue);
+  TextSourceLeft->Update();
+  TextSourceDown->SetBackgroundColor(red,green,blue);
+  TextSourceDown->Update();
+  TextSourceRight->SetBackgroundColor(red,green,blue);
+  TextSourceRight->Update();
+  TextSourceUp->SetBackgroundColor(red,green,blue);
+  TextSourceUp->Update();
 }
 //----------------------------------------------------------------------------
 void vtkMAFTextOrientator::SetScale(double multiple)
 //----------------------------------------------------------------------------
 {
-  m_Dimension *= multiple;
+  Dimension *= multiple;
   vtkTransform *transform = vtkTransform::New();
   transform->Scale(multiple,multiple,multiple);
   transform->Update();
@@ -362,29 +362,29 @@ void vtkMAFTextOrientator::SetScale(double multiple)
   vtkTransformPolyDataFilter *tpdf = vtkTransformPolyDataFilter::New();
   tpdf->SetTransform(transform);
   //left
-  tpdf->SetInput(m_TextSourceLeft->GetOutput());
+  tpdf->SetInput(TextSourceLeft->GetOutput());
   tpdf->Update();
   
-  m_TextSourceLeft->GetOutput()->DeepCopy(tpdf->GetOutput());
-  m_TextSourceLeft->GetOutput()->Update();
+  TextSourceLeft->GetOutput()->DeepCopy(tpdf->GetOutput());
+  TextSourceLeft->GetOutput()->Update();
   //down
-  tpdf->SetInput(m_TextSourceDown->GetOutput());
+  tpdf->SetInput(TextSourceDown->GetOutput());
   tpdf->Update();
   
-  m_TextSourceDown->GetOutput()->DeepCopy(tpdf->GetOutput());
-  m_TextSourceDown->GetOutput()->Update();
+  TextSourceDown->GetOutput()->DeepCopy(tpdf->GetOutput());
+  TextSourceDown->GetOutput()->Update();
   //right
-  tpdf->SetInput(m_TextSourceRight->GetOutput());
+  tpdf->SetInput(TextSourceRight->GetOutput());
   tpdf->Update();
 
-  m_TextSourceRight->GetOutput()->DeepCopy(tpdf->GetOutput());
-  m_TextSourceRight->GetOutput()->Update();
+  TextSourceRight->GetOutput()->DeepCopy(tpdf->GetOutput());
+  TextSourceRight->GetOutput()->Update();
   //up
-  tpdf->SetInput(m_TextSourceUp->GetOutput());
+  tpdf->SetInput(TextSourceUp->GetOutput());
   tpdf->Update();
 
-  m_TextSourceUp->GetOutput()->DeepCopy(tpdf->GetOutput());
-  m_TextSourceUp->GetOutput()->Update();
+  TextSourceUp->GetOutput()->DeepCopy(tpdf->GetOutput());
+  TextSourceUp->GetOutput()->Update();
 
   tpdf->Delete();
   transform->Delete();
@@ -396,20 +396,20 @@ void vtkMAFTextOrientator::SetSingleActorVisibility(int actor, bool show)
   switch(actor)
   {
   case ID_ACTOR_LEFT:
-    m_TextSourceLeftActor->SetVisibility(show);
-    m_TextSourceLeftActor->Modified();
+    TextSourceLeftActor->SetVisibility(show);
+    TextSourceLeftActor->Modified();
     break;
   case ID_ACTOR_DOWN:
-    m_TextSourceDownActor->SetVisibility(show);
-    m_TextSourceDownActor->Modified();
+    TextSourceDownActor->SetVisibility(show);
+    TextSourceDownActor->Modified();
     break;
   case ID_ACTOR_RIGHT:
-    m_TextSourceRightActor->SetVisibility(show);
-    m_TextSourceRightActor->Modified();
+    TextSourceRightActor->SetVisibility(show);
+    TextSourceRightActor->Modified();
     break;
   case ID_ACTOR_UP:
-    m_TextSourceUpActor->SetVisibility(show);
-    m_TextSourceUpActor->Modified();
+    TextSourceUpActor->SetVisibility(show);
+    TextSourceUpActor->Modified();
     break;
   }
 }
@@ -417,19 +417,19 @@ void vtkMAFTextOrientator::SetSingleActorVisibility(int actor, bool show)
 void vtkMAFTextOrientator::SetAttachPositions(double up[3], double right[3], double Down[3], double left[3])
 //----------------------------------------------------------------------------
 {
-   m_AttachPositionUp[0] = up[0];
-   m_AttachPositionUp[1] = up[1];
-   m_AttachPositionUp[2] = up[2];
+   AttachPositionUp[0] = up[0];
+   AttachPositionUp[1] = up[1];
+   AttachPositionUp[2] = up[2];
 
-   m_AttachPositionRight[0] = right[0];
-   m_AttachPositionRight[1] = right[1];
-   m_AttachPositionRight[2] = right[2];
+   AttachPositionRight[0] = right[0];
+   AttachPositionRight[1] = right[1];
+   AttachPositionRight[2] = right[2];
 
-   m_AttachPositionDown[0] = Down[0];
-   m_AttachPositionDown[1] = Down[1];
-   m_AttachPositionDown[2] = Down[2];
+   AttachPositionDown[0] = Down[0];
+   AttachPositionDown[1] = Down[1];
+   AttachPositionDown[2] = Down[2];
 
-   m_AttachPositionLeft[0] = left[0];
-   m_AttachPositionLeft[1] = left[1];
-   m_AttachPositionLeft[2] = left[2];
+   AttachPositionLeft[0] = left[0];
+   AttachPositionLeft[1] = left[1];
+   AttachPositionLeft[2] = left[2];
 }

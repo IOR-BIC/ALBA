@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFRayCast3DPicker.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-01-29 11:17:14 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -114,7 +114,7 @@ public:
   
   vtkGetVectorMacro(PCoords, double,3);
   
-  double x[3];
+  double X[3];
 //**********************************************************************************************************
  
   vtkTransform *GetTransform(){ return this->Transform; };

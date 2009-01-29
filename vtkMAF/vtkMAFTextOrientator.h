@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextOrientator.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-22 08:45:51 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-01-29 11:17:14 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -59,15 +59,15 @@ class VTK_vtkMAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
     ID_ACTOR_UP
   };
   
-  const char*   GetTextLeft(){return m_TextSourceLeft->GetText();}
-  const char*   GetTextDown(){return m_TextSourceDown->GetText();} 
-  const char*   GetTextRight(){return m_TextSourceRight->GetText();}
-  const char*   GetTextUp(){return m_TextSourceUp->GetText();}
+  const char*   GetTextLeft(){return TextSourceLeft->GetText();}
+  const char*   GetTextDown(){return TextSourceDown->GetText();} 
+  const char*   GetTextRight(){return TextSourceRight->GetText();}
+  const char*   GetTextUp(){return TextSourceUp->GetText();}
 
-  void 	  SetTextLeft(const char * inputString){m_TextSourceLeft->SetText(inputString);}
-  void 	  SetTextDown(const char * inputString){m_TextSourceDown->SetText(inputString);} 
-  void 	  SetTextRight(const char * inputString){m_TextSourceRight->SetText(inputString);}
-  void 	  SetTextUp(const char * inputString){m_TextSourceUp->SetText(inputString);}
+  void 	  SetTextLeft(const char * inputString){TextSourceLeft->SetText(inputString);}
+  void 	  SetTextDown(const char * inputString){TextSourceDown->SetText(inputString);} 
+  void 	  SetTextRight(const char * inputString){TextSourceRight->SetText(inputString);}
+  void 	  SetTextUp(const char * inputString){TextSourceUp->SetText(inputString);}
   
   void SetSingleActorVisibility(int actor, bool show);
   
@@ -83,13 +83,13 @@ class VTK_vtkMAF_EXPORT vtkMAFTextOrientator : public vtkActor2D
   /** Set scale actor*/
   void SetScale(double multiple);
 
-  void SetAttachPositionFlag(bool enable){m_AttachPositionFlag = enable;};
+  void SetAttachPositionFlag(bool enable){AttachPositionFlag = enable;};
 
   void SetAttachPositions(double up[3], double right[3], double Down[3], double left[3]);
-  void SetDisplayOffsetUp(int x, int y){m_DisplayOffsetUp[0] = x; m_DisplayOffsetUp[1]=y;};
-  void SetDisplayOffsetRight(int x, int y){m_DisplayOffsetRight[0] = x; m_DisplayOffsetRight[1]=y;};
-  void SetDisplayOffsetDown(int x, int y){m_DisplayOffsetDown[0] = x; m_DisplayOffsetDown[1]=y;};
-  void SetDisplayOffsetLeft(int x, int y){m_DisplayOffsetLeft[0] = x; m_DisplayOffsetLeft[1]=y;};
+  void SetDisplayOffsetUp(int x, int y){DisplayOffsetUp[0] = x; DisplayOffsetUp[1]=y;};
+  void SetDisplayOffsetRight(int x, int y){DisplayOffsetRight[0] = x; DisplayOffsetRight[1]=y;};
+  void SetDisplayOffsetDown(int x, int y){DisplayOffsetDown[0] = x; DisplayOffsetDown[1]=y;};
+  void SetDisplayOffsetLeft(int x, int y){DisplayOffsetLeft[0] = x; DisplayOffsetLeft[1]=y;};
 protected:
 					vtkMAFTextOrientator();
 					~vtkMAFTextOrientator();
@@ -103,34 +103,34 @@ protected:
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;}
 
   //variables
-  int                     m_Dimension;
+  int                     Dimension;
 
-  bool m_AttachPositionFlag;
-  double m_AttachPositionUp[3];
-  double m_AttachPositionRight[3];
-  double m_AttachPositionDown[3];
-  double m_AttachPositionLeft[3];
+  bool AttachPositionFlag;
+  double AttachPositionUp[3];
+  double AttachPositionRight[3];
+  double AttachPositionDown[3];
+  double AttachPositionLeft[3];
 
-  int m_DisplayOffsetUp[2];  
-  int m_DisplayOffsetRight[2];
-  int m_DisplayOffsetDown[2];
-  int m_DisplayOffsetLeft[2];
+  int DisplayOffsetUp[2];  
+  int DisplayOffsetRight[2];
+  int DisplayOffsetDown[2];
+  int DisplayOffsetLeft[2];
 
-  vtkActor2D						 *m_TextSourceLeftActor;
-  vtkPolyDataMapper2D		 *m_TextSourceLeftMapper;
-  vtkTextSource          *m_TextSourceLeft;
+  vtkActor2D						 *TextSourceLeftActor;
+  vtkPolyDataMapper2D		 *TextSourceLeftMapper;
+  vtkTextSource          *TextSourceLeft;
 
-  vtkActor2D						 *m_TextSourceDownActor;
-  vtkPolyDataMapper2D		 *m_TextSourceDownMapper;
-  vtkTextSource          *m_TextSourceDown;
+  vtkActor2D						 *TextSourceDownActor;
+  vtkPolyDataMapper2D		 *TextSourceDownMapper;
+  vtkTextSource          *TextSourceDown;
 
-  vtkActor2D						 *m_TextSourceRightActor;
-  vtkPolyDataMapper2D		 *m_TextSourceRightMapper;
-  vtkTextSource          *m_TextSourceRight;
+  vtkActor2D						 *TextSourceRightActor;
+  vtkPolyDataMapper2D		 *TextSourceRightMapper;
+  vtkTextSource          *TextSourceRight;
 
-  vtkActor2D						 *m_TextSourceUpActor;
-  vtkPolyDataMapper2D		 *m_TextSourceUpMapper;
-  vtkTextSource          *m_TextSourceUp;
+  vtkActor2D						 *TextSourceUpActor;
+  vtkPolyDataMapper2D		 *TextSourceUpMapper;
+  vtkTextSource          *TextSourceUp;
 	
 private:
   // hide the two paraOrientator Render() method from the user and the compiler.

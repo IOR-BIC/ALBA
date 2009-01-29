@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFProfilingActor.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-18 10:25:19 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-01-29 11:17:14 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -55,12 +55,12 @@ protected:
 	void			FPSCreate();	
 	void			FPSUpdate(vtkRenderer *ren);
    //variables
-  vtkTextActor *m_TextFPS;
-  vtkTimerLog  *m_Timer;
-  double        m_UpdateTime;
-  double        m_UpdateFrequency;
+  vtkTextActor *TextFPS;
+  vtkTimerLog  *Timer;
+  double        UpdateTime;
+  double        UpdateFrequency;
 
-	char m_TextBuff[128];
+	char TextBuff[128];
 	
 private:
   // hide the two paraOrientator Render() method from the user and the compiler.
