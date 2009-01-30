@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-01-22 20:50:44 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-01-30 11:58:53 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -426,7 +426,7 @@ protected:
 	//double computeHelixCost(double tc,double to,double c,double k);
 	//void changeXZ(double *dCoord ,double *scoord);
 	double drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag);
-	void getSphereCylinderWrap(const int step);
+	void getSphereCylinderWrap(const int step,double *viaPoint);
 
 	double getFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm);
 	double getCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *outCurve);
