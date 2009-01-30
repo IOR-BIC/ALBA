@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSelectCell.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-22 12:00:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-01-30 10:08:04 $
+  Version:   $Revision: 1.3.4.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@
 class vtkCellPicker;
 class vtkCamera;
 
-/** implements mouse move of camera in the scene or perform continuous cell picking
+/** Implements mouse move of camera in the scene or perform continuous cell picking
   when using CTRL modifier.
   This class implements a mouse move of the renderer camera in the scene. The interaction
   modality is a mouse manipulation, where movements of the mouse are mapped
@@ -36,6 +36,9 @@ class vtkCamera;
   pointFromEvent = (vtkPoints *)e->GetVtkObj();
   pointFromEvent->GetPoint(0,pointCoordinates);
   int cellID = e->GetArg();
+
+  @sa mafOpRemoveCells for a usage example 
+
 
 */
 class mmiSelectCell : public mmiCameraMove

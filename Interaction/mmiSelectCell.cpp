@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSelectCell.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-20 18:45:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-01-30 10:08:04 $
+  Version:   $Revision: 1.2.4.1 $
   Authors:   Stefano Perticoni	
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -107,15 +107,15 @@ void mmiSelectCell::PickCell( mafDevice *device )
     
     if(cellPicker->Pick(x,y,0,m_Renderer))
     {
+      //BES: 29.1.2009 - get the picked coordinates
+      cellPicker->GetPickedPositions()->GetPoint(0, pos_picked);
+
       vtkPoints *pickedPoint = vtkPoints::New();
       pickedPoint->SetNumberOfPoints(1);
       pickedPoint->SetPoint(0,pos_picked);
       mafEventMacro(mafEvent(this,VME_PICKED,(vtkObject *)pickedPoint,cellPicker->GetCellId()));
       pickedPoint->Delete();
-
-     //  wxString msg = "picked something";
-     //  int res = wxMessageBox(msg,"debug info", wxOK, NULL);
-    
+      
     }
   
     vtkDEL(cellPicker);
