@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-30 11:56:17 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-01-30 15:06:37 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1723,10 +1723,15 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step){
 		vtkDEL(clipData);
 
 		m_Distance = LmFinal;
+
+		m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+		GetWrappedMeterOutput()->Update(); 
+	}else{
+		directConnectSE();
+
 	}
 
-	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
-	GetWrappedMeterOutput()->Update(); 
+
 }
 
 void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
