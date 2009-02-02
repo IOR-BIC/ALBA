@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputMeter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-02-02 10:23:05 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,12 @@ public:
 
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
+
+	/* Get Distance String*/
+	const char *GetDistance(){return m_Distance.GetCStr();}
+
+	/* Get Angle String*/
+	const char *GetAngle(){return m_Angle.GetCStr();}
 
 protected:
   mafGUI *CreateGui();
