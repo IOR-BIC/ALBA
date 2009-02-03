@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-02-03 15:26:42 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -87,6 +87,9 @@ public:
 	/** Select image type during saving of the views*/
 	int GetImageTypeId(){return m_ImageTypeId;};
 
+  void EnableLogDirChoices(){m_EnableLogDirChoices = true;};
+  void DisableLogDirChoices(){m_EnableLogDirChoices = false;};
+
 protected:
   /** Create the GUI for the setting panel.*/
   void CreateGui();
@@ -109,5 +112,7 @@ protected:
   mafString m_PassPhrase;
 
 	int       m_ImageTypeId;
+
+  bool m_EnableLogDirChoices;
 };
 #endif

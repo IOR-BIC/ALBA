@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-17 11:51:53 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-02-03 15:26:42 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -43,6 +43,8 @@ mafGUISettings(Listener, label)
   m_PassPhrase = mafDefaultPassPhrase();
 
   InitializeSettings();
+
+  m_EnableLogDirChoices = true;
 }
 //----------------------------------------------------------------------------
 mafGUIApplicationSettings::~mafGUIApplicationSettings()
@@ -60,7 +62,10 @@ void mafGUIApplicationSettings::CreateGui()
   m_Gui->Divider(2);
   m_Gui->Bool(ID_LOG_TO_FILE,_("log to file"),&m_LogToFile,1);
   m_Gui->Bool(ID_LOG_VERBOSE,_("log verbose"),&m_VerboseLog,1);
-  m_Gui->DirOpen(ID_LOG_DIR,_("log dir"),&m_LogFolder);
+  if (m_EnableLogDirChoices)
+  {
+  	m_Gui->DirOpen(ID_LOG_DIR,_("log dir"),&m_LogFolder);
+  }
   m_Gui->Divider(2);
   m_Gui->Bool(ID_WARN_UNDO, _("warn on undoable"), &m_WarnUserFlag, 1, _("If checked the use is warned when an operation \nthat not support the undo is executed."));
   EnableItems();
