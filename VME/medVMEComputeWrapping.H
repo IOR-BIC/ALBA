@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-01-30 11:58:53 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-02-05 12:34:38 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -69,13 +69,16 @@ public:
 		WRAP_CYLINDER_CYLINDER = 4,
 		WRAP_SPHERE_CYLINDER = 5,
 		WRAP_SPHERE_CYLINDER_2 = 6,
+		SINGLE_SPHERE2=7,
 		INSIDE_FLAG = -1
 	};
 	enum WRAP_MODE_ID{
 		SPHERE_CYLINDER = 0,
-		DOUBLE_CYLINDER = 1,
+		SPHERE_ONLY = 1,
 		CYLINDER_ONLY = 2,
-		SPHERE_ONLY = 3
+		DOUBLE_CYLINDER = 3
+		
+		
 
 	};
 	enum METER_WRAP_TYPE_ID{
@@ -459,7 +462,7 @@ protected:
 	double computeCurveLength(double *aCoord,double *bCoord,double rm);
 	void wrapCylinderOnly(const int step);
 	void wrapSingleCylinder(double vId);//for double wrap cylinder
-	void wrapSphereOnly(const int step);
+	void wrapSphereOnly(const int step,bool allowIntersectFlag);//allowIntersectFlag if allow intersect with cylinder
 	double computeDistanceOfLm3(double *start,double *cCoord,double *iCoord);
 	double getCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData);
 	double goldenSectionSearch2(double a,double b,double x,double accuracy);
@@ -504,6 +507,7 @@ protected:
 	double m_WrappedTangent1[3];
 	double m_WrappedTangent2[3];
 	double m_CylinderAxis[3];
+	double m_SphereAxis[3];
 
 	double m_ViaPoint[3];
 	double m_CosA;
