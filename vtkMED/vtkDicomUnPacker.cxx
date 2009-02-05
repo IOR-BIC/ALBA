@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.2 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.3 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -287,6 +287,12 @@ void read (FILE* fp, char little_endian, char &value)
 }
 //----------------------------------------------------------------------------
 void read (FILE* fp, char little_endian, short &value) 
+//----------------------------------------------------------------------------
+{
+	value = read16(fp, little_endian);
+}
+//----------------------------------------------------------------------------
+void read (FILE* fp, char little_endian, unsigned short &value) 
 //----------------------------------------------------------------------------
 {
 	value = read16(fp, little_endian);
@@ -895,7 +901,14 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 		SetDataScalarType(VTK_CHAR);
 		break;
 	case 16:
-		SetDataScalarType(VTK_SHORT);
+		if (PixelRepresentation == 0 && Intercept >= 0)
+		{
+			SetDataScalarType(VTK_UNSIGNED_SHORT);
+		}
+		else		
+		{
+			SetDataScalarType(VTK_SHORT);
+		}
 		break;
 	}
 
@@ -940,7 +953,15 @@ int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageDat
 		break;
 		case 16:
 		{
-			ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), Slope, Intercept, DimY, DimX,FlipImage,PixelRepresentation,NumOfFrameToGet);
+		if (PixelRepresentation == 0 && Intercept >= 0)
+		{
+		ret = read_dicom_string_image(FileName, ( unsigned short *)data->GetScalarPointer(), Slope, Intercept, DimY, DimX,FlipImage,PixelRepresentation,NumOfFrameToGet);
+		}
+		else
+		{
+		ret = read_dicom_string_image(FileName, ( short *)data->GetScalarPointer(), Slope, Intercept, DimY, DimX,FlipImage,PixelRepresentation,NumOfFrameToGet);
+		}
+			
 		}
 		break;
 	}
