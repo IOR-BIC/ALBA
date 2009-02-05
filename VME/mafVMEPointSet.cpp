@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPointSet.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-02-03 16:35:45 $
-  Version:   $Revision: 1.8.4.1 $
+  Date:      $Date: 2009-02-05 10:58:28 $
+  Version:   $Revision: 1.8.4.2 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -405,7 +405,7 @@ int mafVMEPointSet::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
   //return Superclass::SetData(data,t,mode);
-  return this->SetData((vtkDataSet*)data,t,mode);
+  return mafVMEPointSet::SetData((vtkDataSet*)data,t,mode);
 }
 //-------------------------------------------------------------------------
 int mafVMEPointSet::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
