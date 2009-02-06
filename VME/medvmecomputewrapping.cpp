@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-05 13:24:31 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2009-02-06 11:12:44 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -85,7 +85,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	m_Idx = 0;
 	m_PathNum = 36;
 
-	m_Tolerance = getCylinderRadius()/4.0;
+	//m_Tolerance = getCylinderRadius()/4.0;
 
 	mafNEW(m_Transform);
 	mafNEW(m_TmpTransform2);
@@ -328,6 +328,7 @@ void medVMEComputeWrapping::dispatch(){
 	{
 
 
+		
 		vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
 		vtkMAFSmartPointer<vtkPoints> pointsIntersection2;
 		bool aligned = false;
@@ -374,6 +375,8 @@ void medVMEComputeWrapping::dispatch(){
 					getTransFormMatrix(cosA,sinA,cosB,sinB,m_Mat);//after this function mat has element value
 					mafMatrix3x3::Invert(m_Mat->GetElements(),m_Imat->GetElements());//imat->Invert();
 				}
+
+
 				if (vFlag == WRAP_SPHERE_CYLINDER)
 				{
 					getSphereCylinderWrap(m_PathNum,m_EndPoint);
@@ -651,7 +654,7 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 	getWrapLocalTransform(m_EndPoint,endLocal);
 	getWrapLocalTransform(m_StartPoint,startLocal);
 
-	m_Tolerance = getCylinderRadius()/4.0;
+	//m_Tolerance = getCylinderRadius()/4.0;
 
 	if (isEndPonintOnCylinder(m_Tolerance,endLocal) && isEndPonintOnCylinder(m_Tolerance,startLocal))//both on surface
 	{
@@ -2418,7 +2421,7 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 		getWrapLocalTransform(m_EndPoint,endWrapLocal);
 		getWrapLocalTransform(m_StartPoint,startWrapLocal);
 
-		m_Tolerance = getCylinderRadius()/4.0; // choose a suitable value
+		//m_Tolerance = getCylinderRadius()/4.0; // choose a suitable value
 		nearFlagEnd = isEndPonintOnCylinder(m_Tolerance,endWrapLocal);
 		nearFlagStart = isEndPonintOnCylinder(m_Tolerance,startWrapLocal);
 
@@ -3772,6 +3775,11 @@ bool medVMEComputeWrapping::prepareData2(){
 			//------------------------over------------------------------
 
 		}
+	}
+
+	if (m_WrappedMode == SPHERE_CYLINDER || m_WrappedMode == SINGLE_CYLINDER)
+	{
+		m_Tolerance = getCylinderRadius()*getCylinderRadius()/16.0 ;
 	}
 	rtn = true;
 
