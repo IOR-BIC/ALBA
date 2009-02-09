@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-02-09 11:31:43 $
+  Version:   $Revision: 1.1.2.1 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -40,12 +40,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkMAFRGSliceAccumulate.h"
 #include "vtkDoubleArray.h"
+#include "vtkUnsignedShortArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkCharArray.h"
 #include "vtkShortArray.h"
+#include "vtkFloatArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -238,7 +242,30 @@ void vtkMAFRGSliceAccumulate::Allocate()
 	for (int iz = 0; iz < Dimensions[2]; iz++)
 		vz->SetValue(iz, 0);
 
-	vtkShortArray *data = vtkShortArray::New();
+	vtkDataArray *data = 0;
+	int scalar_type = this->GetDataType();
+    // data array should consistent with scalar type:
+	switch (scalar_type) 
+		{
+			case VTK_CHAR:
+				data = vtkCharArray::New();
+			break;
+			case VTK_UNSIGNED_CHAR:
+				data = vtkUnsignedCharArray::New();
+			break;
+			case VTK_SHORT:
+				data = vtkShortArray::New();
+			break;
+			case VTK_UNSIGNED_SHORT:
+				data = vtkUnsignedShortArray::New();
+			break;
+			case VTK_FLOAT:
+				data = vtkFloatArray::New();
+			break;
+			default:
+				vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
+		}
+	
 	data->SetNumberOfTuples(Dimensions[0] * Dimensions[1] * Dimensions[2]);
 	this->Slices->SetDimensions(Dimensions);
 	this->Slices->SetXCoordinates(vx);
