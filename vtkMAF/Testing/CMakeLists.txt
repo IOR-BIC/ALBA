@@ -70,3 +70,11 @@ ADD_TEST(vtkMAFPolyDataSingleSourceShortestPathTest ${EXECUTABLE_OUTPUT_PATH}/vt
 IF (WIN32)
   SET_TARGET_PROPERTIES(vtkMAFPolyDataSingleSourceShortestPathTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+
+############ vtkMAFVolumeResampleTest
+ADD_EXECUTABLE(vtkMAFVolumeResampleTest vtkMAFVolumeResampleTest.h vtkMAFVolumeResampleTest.cpp)
+ADD_TEST(vtkMAFVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFVolumeResampleTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(vtkMAFVolumeResampleTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
