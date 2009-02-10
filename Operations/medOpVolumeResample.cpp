@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-06 12:22:38 $
-  Version:   $Revision: 1.12.2.4 $
+  Date:      $Date: 2009-02-10 19:32:45 $
+  Version:   $Revision: 1.12.2.5 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -53,6 +53,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkCubeSource.h"
+
 
 #include <vector>
 #include <algorithm>
@@ -121,7 +122,7 @@ bool medOpVolumeResample::Accept(mafNode* vme)
 {
 	mafEvent e(this,VIEW_SELECTED);
 	mafEventMacro(e);
-  return (vme && vme->IsMAFType(mafVMEVolumeGray) /*&& e.GetBool()*/);
+  return (vme && vme->IsMAFType(mafVMEVolumeGray));
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::InternalUpdateBounds(double bounds[6], bool center)
@@ -182,8 +183,8 @@ void medOpVolumeResample::CreateGizmos()
 
 	mafTransform::GetOrientation(*(((mafVME*)m_Input)->GetOutput()->GetAbsMatrix()),m_VolumeOrientation);
 
-	mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_Input);
-	volume->GetOutput()->GetVTKData()->GetCenter(m_VolumeCenterPosition);
+	mafVMEVolumeGray *inputVolume = mafVMEVolumeGray::SafeDownCast(m_Input);
+	inputVolume->GetOutput()->GetVTKData()->GetCenter(m_VolumeCenterPosition);
 
 	//Compute the center of Volume in absolute coordinate to center gizmo
 	vtkMAFSmartPointer<vtkPoints> point;
@@ -192,7 +193,7 @@ void medOpVolumeResample::CreateGizmos()
 	polydata->SetPoints(point);
 	vtkMAFSmartPointer<vtkTransform> transform;
 	transform->Identity();
-	transform->SetMatrix(volume->GetOutput()->GetMatrix()->GetVTKMatrix());
+	transform->SetMatrix(inputVolume->GetOutput()->GetMatrix()->GetVTKMatrix());
 	transform->Update();
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFilter;
 	transformFilter->SetInput(polydata);
@@ -329,12 +330,23 @@ void medOpVolumeResample::SetBoundsToVMELocalBounds()
 void medOpVolumeResample::GizmoDelete()
 //----------------------------------------------------------------------------
 {	
-	m_GizmoTranslate->Show(false);
-	m_GizmoRotate->Show(false);
-	m_GizmoROI->Show(false);
-	cppDEL(m_GizmoTranslate);
-	cppDEL(m_GizmoRotate);
-	cppDEL(m_GizmoROI);
+  if (m_GizmoTranslate)
+  {
+    m_GizmoTranslate->Show(false);
+    cppDEL(m_GizmoTranslate);
+  }
+  
+  if (m_GizmoRotate)
+  {
+    m_GizmoRotate->Show(false);
+    cppDEL(m_GizmoRotate);
+  }
+  
+  if (m_GizmoROI)
+  {
+    m_GizmoROI->Show(false);
+    cppDEL(m_GizmoROI);
+  }	
 
 	mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
@@ -378,27 +390,22 @@ void medOpVolumeResample::OpDo()
 void medOpVolumeResample::Resample()
 //----------------------------------------------------------------------------
 {
-  mafSmartPointer<mafTransform> box_pose;
-  box_pose->SetOrientation(m_ROIOrientation);
-  box_pose->SetPosition(m_NewVolumePosition);
+  mafSmartPointer<mafTransform> resamplingBoxPose;
+  resamplingBoxPose->SetOrientation(m_ROIOrientation);
+  resamplingBoxPose->SetPosition(m_NewVolumePosition);
 
-  mafSmartPointer<mafTransformFrame> local_pose;
-  local_pose->SetInput(box_pose);
+  mafSmartPointer<mafTransformFrame> localPoseTransformFrame;
+  localPoseTransformFrame->SetInput(resamplingBoxPose);
   
-  mafSmartPointer<mafTransformFrame> output_to_input;
+  mafSmartPointer<mafTransformFrame> outputToInputTransformFrame;
   
-  // In a future version if not a "Natural" data the filter should operate in place.
-	mafString new_vme_name = "resampled_";
-	new_vme_name += m_Input->GetName();
+  mafString outputVmeName = "resampled_";
+	outputVmeName += m_Input->GetName();
 
-	/*mafNEW(m_ResampledVme);
-	m_ResampledVme->SetName(new_vme_name);
-
-	m_Input->Modified();
-	mafVME *Node = mafVME::SafeDownCast(m_Input);*/
   m_ResampledVme = (mafVMEVolumeGray *)m_Input->NewInstance();
   m_ResampledVme->Register(m_ResampledVme);
-  m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray()); // copy tags
+  m_ResampledVme->GetTagArray()->DeepCopy(m_Input->GetTagArray());
+  
   mafTagItem *ti = NULL;
   ti = m_ResampledVme->GetTagArray()->GetTag("VME_NATURE");
   if(ti)
@@ -414,110 +421,110 @@ void medOpVolumeResample::Resample()
     m_ResampledVme->GetTagArray()->SetTag(tag_Nature);
   }
 
-  m_ResampledVme->SetName(new_vme_name);
-
+  m_ResampledVme->SetName(outputVmeName);
   m_ResampledVme->ReparentTo(m_Input->GetParent());
-  m_ResampledVme->SetMatrix(box_pose->GetMatrix());
+  m_ResampledVme->SetMatrix(resamplingBoxPose->GetMatrix());
 
-  int output_extent[6];
-  output_extent[0] = 0;
-  output_extent[1] = (m_VolumeBounds[1] - m_VolumeBounds[0]) / m_VolumeSpacing[0];
-  output_extent[2] = 0;
-  output_extent[3] = (m_VolumeBounds[3] - m_VolumeBounds[2]) / m_VolumeSpacing[1];
-  output_extent[4] = 0;
-  output_extent[5] = (m_VolumeBounds[5] - m_VolumeBounds[4]) / m_VolumeSpacing[2];
+  int outputSPExtent[6];
+  outputSPExtent[0] = 0;
+  outputSPExtent[1] = (m_VolumeBounds[1] - m_VolumeBounds[0]) / m_VolumeSpacing[0];
+  outputSPExtent[2] = 0;
+  outputSPExtent[3] = (m_VolumeBounds[3] - m_VolumeBounds[2]) / m_VolumeSpacing[1];
+  outputSPExtent[4] = 0;
+  outputSPExtent[5] = (m_VolumeBounds[5] - m_VolumeBounds[4]) / m_VolumeSpacing[2];
 
   double w,l,sr[2];
   for (int i = 0; i < ((mafVMEGenericAbstract *)m_Input)->GetDataVector()->GetNumberOfItems(); i++)
   {
     if (mafVMEItemVTK *input_item = mafVMEItemVTK::SafeDownCast(((mafVMEGenericAbstract *)m_Input)->GetDataVector()->GetItemByIndex(i)))
     {
-      if (vtkDataSet *input_data = input_item->GetData())
+      if (vtkDataSet *inputData = input_item->GetData())
       {
         // the resample filter
-        vtkMAFSmartPointer<vtkMAFVolumeResample> resampler;
-        resampler->SetZeroValue(m_ZeroPadValue);
+        vtkMAFSmartPointer<vtkMAFVolumeResample> volumeResampleFilter;
+        volumeResampleFilter->SetZeroValue(m_ZeroPadValue);
 
         // Set the target be vme's parent frame. And Input frame to the root. I've to 
         // set at each iteration since I'm using the SetMatrix, which doesn't support
         // transform pipelines.
-        mafSmartPointer<mafMatrix> output_parent_abs_pose;
-        m_ResampledVme->GetParent()->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        local_pose->SetInputFrame(output_parent_abs_pose);
+        mafSmartPointer<mafMatrix> outputParentAbsPose;
+        m_ResampledVme->GetParent()->GetOutput()->GetAbsMatrix(*outputParentAbsPose.GetPointer(),input_item->GetTimeStamp());
+        localPoseTransformFrame->SetInputFrame(outputParentAbsPose);
 
-        mafSmartPointer<mafMatrix> input_parent_abs_pose;
-        ((mafVME *)m_Input->GetParent())->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        local_pose->SetTargetFrame(input_parent_abs_pose);
-        local_pose->Update();
+        mafSmartPointer<mafMatrix> inputParentAbsPose;
+        ((mafVME *)m_Input->GetParent())->GetOutput()->GetAbsMatrix(*inputParentAbsPose.GetPointer(),input_item->GetTimeStamp());
+        localPoseTransformFrame->SetTargetFrame(inputParentAbsPose);
+        localPoseTransformFrame->Update();
 
-        mafSmartPointer<mafMatrix> output_abs_pose;
-        m_ResampledVme->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        output_to_input->SetInputFrame(box_pose->GetMatrixPointer());
+        mafSmartPointer<mafMatrix> outputAbsPose;
+        m_ResampledVme->GetOutput()->GetAbsMatrix(*outputAbsPose.GetPointer(),input_item->GetTimeStamp());
+        outputToInputTransformFrame->SetInputFrame(resamplingBoxPose->GetMatrixPointer());
 
-        mafSmartPointer<mafMatrix> input_abs_pose;
-				input_abs_pose->Identity();
-        //((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        output_to_input->SetTargetFrame(input_abs_pose);
-        output_to_input->Update();
-
-        double orient_input[3],orient_target[3];
-        mafTransform::GetOrientation(*output_abs_pose.GetPointer(),orient_target);
-        mafTransform::GetOrientation(*input_abs_pose.GetPointer(),orient_input);
+        mafSmartPointer<mafMatrix> inputAbsPose;
+				inputAbsPose->Identity();
+        outputToInputTransformFrame->SetTargetFrame(inputAbsPose);
+        outputToInputTransformFrame->Update();
 
         double origin[3];
         origin[0] = m_VolumeBounds[0];
         origin[1] = m_VolumeBounds[2];
         origin[2] = m_VolumeBounds[4];
 
-        output_to_input->TransformPoint(origin,origin);
+        outputToInputTransformFrame->TransformPoint(origin,origin);
 
-        resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
-
-        vtkMatrix4x4 *mat = output_to_input->GetMatrix().GetVTKMatrix();
-
-        double local_orient[3],local_position[3];
-        mafTransform::GetOrientation(output_to_input->GetMatrix(),local_orient);
-        mafTransform::GetPosition(output_to_input->GetMatrix(),local_position);
-
-        // extract versors
-        double x_axis[3],y_axis[3];
-
-        mafMatrix::GetVersor(0,mat,x_axis);
-        mafMatrix::GetVersor(1,mat,y_axis);
+        volumeResampleFilter->SetVolumeOrigin(origin[0],origin[1],origin[2]);
         
-        resampler->SetVolumeAxisX(x_axis);
-        resampler->SetVolumeAxisY(y_axis);
+        vtkMatrix4x4 *outputToInputTransformFrameMatrix = outputToInputTransformFrame->GetMatrix().GetVTKMatrix();
+     
+        double xAxis[3],yAxis[3];
+
+        mafMatrix::GetVersor(0,outputToInputTransformFrameMatrix,xAxis);
+        mafMatrix::GetVersor(1,outputToInputTransformFrameMatrix,yAxis);
         
-        vtkMAFSmartPointer<vtkStructuredPoints> output_data;
-        output_data->SetSpacing(m_VolumeSpacing);
-        // TODO: here I probably should allow a data type casting... i.e. a GUI widget
-        output_data->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
-        output_data->SetExtent(output_extent);
-        output_data->SetUpdateExtent(output_extent);
+        volumeResampleFilter->SetVolumeAxisX(xAxis);
+        volumeResampleFilter->SetVolumeAxisY(yAxis);
         
-        input_data->GetScalarRange(sr);
+        vtkMAFSmartPointer<vtkStructuredPoints> outputSPVtkData;
+        outputSPVtkData->SetSpacing(m_VolumeSpacing);
+        outputSPVtkData->SetScalarType(inputData->GetPointData()->GetScalars()->GetDataType());
+        outputSPVtkData->SetExtent(outputSPExtent);
+        outputSPVtkData->SetUpdateExtent(outputSPExtent);
+        
+        inputData->GetScalarRange(sr);
 
         w = sr[1] - sr[0];
         l = (sr[1] + sr[0]) * 0.5;
 
-        resampler->SetWindow(w);
-        resampler->SetLevel(l);
-        resampler->SetInput(input_data);
-        resampler->SetOutput(output_data);
-        resampler->AutoSpacingOff();
-        resampler->Update();
+        volumeResampleFilter->SetWindow(w);
+        volumeResampleFilter->SetLevel(l);
+        volumeResampleFilter->SetInput(inputData);
+        volumeResampleFilter->SetOutput(outputSPVtkData);
+        volumeResampleFilter->AutoSpacingOff();
+        volumeResampleFilter->Update();
         
-        output_data->SetSource(NULL);
-        output_data->SetOrigin(m_VolumeBounds[0],m_VolumeBounds[2],m_VolumeBounds[4]);
+        std::ostringstream stringStream;
+        volumeResampleFilter->PrintSelf(stringStream,NULL);
+        mafLogMessage(stringStream.str().c_str());
 
-        m_ResampledVme->SetDataByDetaching(output_data, input_item->GetTimeStamp());
+        stringStream.str("");
+        this->PrintSelf(stringStream);
+        mafLogMessage(stringStream.str().c_str());
+
+        outputSPVtkData->SetSource(NULL);
+        outputSPVtkData->SetOrigin(m_VolumeBounds[0],m_VolumeBounds[2],m_VolumeBounds[4]);
+
+        m_ResampledVme->SetDataByDetaching(outputSPVtkData, input_item->GetTimeStamp());
         m_ResampledVme->Update();
       }
     }
   }
-	mafMatrix identity_matrix;
-	m_ResampledVme->SetMatrix(identity_matrix);
+	mafMatrix identity;
+	m_ResampledVme->SetMatrix(identity);
 	m_Output = m_ResampledVme;
+
+  std::ostringstream stringStream;
+  PrintVolume(stringStream, m_Output,"Output Volume");
+  mafLogMessage(stringStream.str().c_str(), "Output Volume");
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::OpUndo()
@@ -547,14 +554,6 @@ enum VOLUME_RESAMPLE_WIDGET_ID
 	ID_CHOOSE_GIZMO,
 	ID_SHOW_HANDLE,
 	ID_SHOW_GIZMO_TRANSFORM,
-};
-
-enum BOUNDS
-{
-	ID_VME4DBOUNDS = 0,
-	ID_VMELOCALBOUNDS,
-	ID_VMEBOUNDS,
-	ID_PERSONALBOUNDS,
 };
 
 enum GIZMOS
@@ -678,14 +677,14 @@ void medOpVolumeResample::CreateGui()
 	chooses_gizmo[1]="Rotate Volume";
 	m_Gui->Combo(ID_CHOOSE_GIZMO,"",&m_GizmoChoose,2,chooses_gizmo);
   
-	m_Gui->Label("Bouding Box Origin");
+	m_Gui->Label("Bounding Box Origin");
 
   m_Gui->Vector(ID_VOLUME_ORIGIN, "", m_ROIPosition,MINFLOAT,MAXFLOAT,2,"output volume origin");
 	m_Gui->Enable(ID_VOLUME_ORIGIN,m_GizmoChoose==ID_GIZMO_TRANSLATE);
   if(m_GizmoTranslate)
 		m_GizmoTranslate->Show(m_GizmoChoose==ID_GIZMO_TRANSLATE);
 
-  m_Gui->Label("Bouding Box Orientation");
+  m_Gui->Label("Bounding Box Orientation");
   m_Gui->Vector(ID_VOLUME_ORIENTATION, "", m_ROIOrientation,MINFLOAT,MAXFLOAT,2,"output volume orientation");
 	m_Gui->Enable(ID_VOLUME_ORIENTATION,m_GizmoChoose==ID_GIZMO_ROTATE);
 	if(m_GizmoRotate)
@@ -724,7 +723,7 @@ void medOpVolumeResample::CreateGui()
 void medOpVolumeResample::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-	if (maf_event->GetSender() == this->m_Gui) // from this operation gui
+	if (maf_event->GetSender() == this->m_Gui)
 	{
 		OnEventThis(maf_event); 
 	}
@@ -834,16 +833,16 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
       case ID_VOLUME_DIR_Y:
       case ID_VOLUME_DIR_Z:
 				{
-					double volumeCenterPositionVTK[3];
+					double inputVolumeBBCentre[3];
 					mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_Input);
-					volume->GetOutput()->GetVTKData()->GetCenter(volumeCenterPositionVTK);
+					volume->GetOutput()->GetVTKData()->GetCenter(inputVolumeBBCentre);
 
-					m_VolumeBounds[0] = volumeCenterPositionVTK[0] - (m_MaxBoundX/2);
-					m_VolumeBounds[1] = volumeCenterPositionVTK[0] + (m_MaxBoundX/2);
-					m_VolumeBounds[2] = volumeCenterPositionVTK[1] - (m_MaxBoundY/2);
-					m_VolumeBounds[3] = volumeCenterPositionVTK[1] + (m_MaxBoundY/2);
-					m_VolumeBounds[4] = volumeCenterPositionVTK[2] - (m_MaxBoundZ/2);
-					m_VolumeBounds[5] = volumeCenterPositionVTK[2] + (m_MaxBoundZ/2);
+					m_VolumeBounds[0] = inputVolumeBBCentre[0] - (m_MaxBoundX/2);
+					m_VolumeBounds[1] = inputVolumeBBCentre[0] + (m_MaxBoundX/2);
+					m_VolumeBounds[2] = inputVolumeBBCentre[1] - (m_MaxBoundY/2);
+					m_VolumeBounds[3] = inputVolumeBBCentre[1] + (m_MaxBoundY/2);
+					m_VolumeBounds[4] = inputVolumeBBCentre[2] - (m_MaxBoundZ/2);
+					m_VolumeBounds[5] = inputVolumeBBCentre[2] + (m_MaxBoundZ/2);
 					m_GizmoROI->SetBounds(m_VolumeBounds);
 
 					mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -1030,49 +1029,71 @@ void medOpVolumeResample::PostMultiplyEventMatrix(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetSpacing(double Spacing[3]) 
+void medOpVolumeResample::SetSpacing(double spacing[3]) 
 //----------------------------------------------------------------------------
 {
-	m_VolumeSpacing[0] = Spacing[0];
-	m_VolumeSpacing[1] = Spacing[1];
-	m_VolumeSpacing[2] = Spacing[2];
+	m_VolumeSpacing[0] = spacing[0];
+	m_VolumeSpacing[1] = spacing[1];
+	m_VolumeSpacing[2] = spacing[2];
+}
+
+void medOpVolumeResample::GetSpacing( double spacing[3] )
+{
+  spacing[0] = m_VolumeSpacing[0];
+  spacing[1] = m_VolumeSpacing[1];
+  spacing[2] = m_VolumeSpacing[2];
 }
 //----------------------------------------------------------------------------
-void medOpVolumeResample::SetBounds(double Bounds[6],int Type) 
+void medOpVolumeResample::SetBounds(double bounds[6],int type) 
 //----------------------------------------------------------------------------
 {
-	switch (Type)
-	{
-	case ID_VME4DBOUNDS:
-		SetBoundsToVME4DBounds();
-		break;
-	case ID_VMELOCALBOUNDS:
-		SetBoundsToVMELocalBounds();
-		break;
-	case ID_VMEBOUNDS:
-		this->SetBoundsToVMEBounds();
-		break;
-	case ID_PERSONALBOUNDS:
-		m_VolumeBounds[0] = Bounds[0];
-		m_VolumeBounds[1] = Bounds[1];
-		m_VolumeBounds[2] = Bounds[2];
-		m_VolumeBounds[3] = Bounds[3];
-		m_VolumeBounds[4] = Bounds[4];
-		m_VolumeBounds[5] = Bounds[5];
-		break;
-	}
+  switch (type)
+  {
+  case VME4DBOUNDS:
+    SetBoundsToVME4DBounds();
+    break;
+  case VMELOCALBOUNDS:
+    SetBoundsToVMELocalBounds();
+    break;
+  case VMEBOUNDS:
+    this->SetBoundsToVMEBounds();
+    break;
+  case CUSTOMBOUNDS:
+    m_VolumeBounds[0] = bounds[0];
+    m_VolumeBounds[1] = bounds[1];
+    m_VolumeBounds[2] = bounds[2];
+    m_VolumeBounds[3] = bounds[3];
+    m_VolumeBounds[4] = bounds[4];
+    m_VolumeBounds[5] = bounds[5];
+    break;
+  }
 }
+
+void medOpVolumeResample::SetROIOrientation(double ROIOrientation[3]) 
+{
+  m_ROIOrientation[0] = ROIOrientation[0];
+  m_ROIOrientation[1] = ROIOrientation[1];
+  m_ROIOrientation[2] = ROIOrientation[2];
+}
+
+void medOpVolumeResample::SetVolumePosition(double  volumePosition[3]) 
+{
+  m_VolumePosition[0] = volumePosition[0];
+  m_VolumePosition[1] = volumePosition[1];
+  m_VolumePosition[2] = volumePosition[2];
+}
+
 //----------------------------------------------------------------------------
 void medOpVolumeResample::ShiftCenterResampled() 
 //----------------------------------------------------------------------------
 {
 
-	double centerVolume[3];
+	double inputVolumeLocalVTKBBCenter[3];
 
-	((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCenter(centerVolume);
+	((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetCenter(inputVolumeLocalVTKBBCenter);
 
 	vtkMAFSmartPointer<vtkPoints> points;
-	points->InsertNextPoint(centerVolume);
+	points->InsertNextPoint(inputVolumeLocalVTKBBCenter);
 
 	vtkMAFSmartPointer<vtkPolyData> poly;
 	poly->SetPoints(points);
@@ -1084,7 +1105,6 @@ void medOpVolumeResample::ShiftCenterResampled()
 	t->RotateZ(m_ROIOrientation[2]);
 	t->Update();
 
-
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> ptf;
 	ptf->SetTransform(t);
 	ptf->SetInput(poly);
@@ -1093,11 +1113,10 @@ void medOpVolumeResample::ShiftCenterResampled()
 	double pt[3];
 	ptf->GetOutput()->GetPoint(0,pt);
 
-	//3 components
 	double difference[3];
-	difference[0] = centerVolume[0] - pt[0];
-	difference[1] = centerVolume[1] - pt[1];
-	difference[2] = centerVolume[2] - pt[2];
+	difference[0] = inputVolumeLocalVTKBBCenter[0] - pt[0];
+	difference[1] = inputVolumeLocalVTKBBCenter[1] - pt[1];
+	difference[2] = inputVolumeLocalVTKBBCenter[2] - pt[2];
 
 	m_NewVolumePosition[0] = difference[0] + m_VolumePosition[0];
 	m_NewVolumePosition[1] = difference[1] + m_VolumePosition[1];
@@ -1114,49 +1133,195 @@ void medOpVolumeResample::OpStop(int result)
 }
 
 //----------------------------------------------------------------------------
-mafString medOpVolumeResample::GetParameters()
+void medOpVolumeResample::PrintSelf(ostream& os)
 //----------------------------------------------------------------------------
 {
-  wxString parameter;
+  os << "-------------------------------------------------------" << std::endl;
+  os << "medOpVolumeResample PrintSelf:" << std::endl;
 
-  parameter.Append("Bounding Box Extent X = ");
+  PrintVolume(os, m_Input, "Input Volume");
+  
+  mafString parameter;
+  
+  parameter.Append("m_MaxBoundX = ");
   parameter.Append(wxString::Format("%f", m_MaxBoundX));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Extent Y = ");
+  parameter.Append("\n");
+  parameter.Append("m_MaxBoundY = ");
   parameter.Append(wxString::Format("%f", m_MaxBoundY));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Extent Z = ");
+  parameter.Append("\n");
+  parameter.Append("m_MaxBoundZ = ");
   parameter.Append(wxString::Format("%f", m_MaxBoundZ));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Origin X = ");
+  parameter.Append("\n");
+  parameter.Append("m_ROIPosition[0] = ");
   parameter.Append(wxString::Format("%f", m_ROIPosition[0]));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Origin Y = ");
+  parameter.Append("\n");
+  parameter.Append("m_ROIPosition[1] = ");
   parameter.Append(wxString::Format("%f", m_ROIPosition[1]));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Origin Z = ");
+  parameter.Append("\n");
+  parameter.Append("m_ROIPosition[2] = ");
   parameter.Append(wxString::Format("%f", m_ROIPosition[2]));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Orientation X = ");
+  parameter.Append("\n");
+  parameter.Append("m_ROIOrientation[0] = ");
   parameter.Append(wxString::Format("%f", m_ROIOrientation[0]));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Orientation Y = ");
+  parameter.Append("\n");
+  parameter.Append("m_ROIOrientation[1] = ");
   parameter.Append(wxString::Format("%f", m_ROIOrientation[1]));
-  parameter.Append(", ");
-  parameter.Append("Bounding Box Orientation Z = ");
+  parameter.Append("\n");
+  parameter.Append("m_ROIOrientation[2] = ");
   parameter.Append(wxString::Format("%f", m_ROIOrientation[2]));
-  parameter.Append(", ");
-  parameter.Append("Volume Spacing X = ");
+  parameter.Append("\n");
+  parameter.Append("m_NewVolumePosition[0] = ");
+  parameter.Append(wxString::Format("%f", m_NewVolumePosition[0]));
+  parameter.Append("\n");
+  parameter.Append("m_NewVolumePosition[1] = ");
+  parameter.Append(wxString::Format("%f", m_NewVolumePosition[1]));
+  parameter.Append("\n");
+  parameter.Append("m_NewVolumePosition[2] = ");
+  parameter.Append(wxString::Format("%f", m_NewVolumePosition[2]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeBounds[0] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeBounds[0]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeBounds[1] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeBounds[1]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeBounds[2] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeBounds[2]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeBounds[3] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeBounds[3]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeBounds[4] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeBounds[4]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeBounds[5] = ");
+  parameter.Append("\n");
+  parameter.Append(wxString::Format("%f", m_VolumeBounds[5]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeSpacing[0] = ");
   parameter.Append(wxString::Format("%f", m_VolumeSpacing[0]));
-  parameter.Append(", ");
-  parameter.Append("Volume Spacing Y = ");
+  parameter.Append("\n");
+  parameter.Append("m_VolumeSpacing[1] = ");
   parameter.Append(wxString::Format("%f", m_VolumeSpacing[1]));
-  parameter.Append(", ");
-  parameter.Append("Volume Spacing Z = ");
+  parameter.Append("\n");
+  parameter.Append("m_VolumeSpacing[2] = ");
   parameter.Append(wxString::Format("%f", m_VolumeSpacing[2]));
-  parameter.Append(", ");
-  parameter.Append("Padding Value = ");
+  parameter.Append("\n");
+  parameter.Append("m_VolumePosition[0] = ");
+  parameter.Append(wxString::Format("%f", m_VolumePosition[0]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumePosition[1] = ");
+  parameter.Append(wxString::Format("%f", m_VolumePosition[1]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumePosition[2] = ");
+  parameter.Append(wxString::Format("%f",m_VolumePosition[2]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeOrientation[0] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeOrientation[0]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeOrientation[1] = ");
+  parameter.Append(wxString::Format("%f", m_VolumeOrientation[1]));
+  parameter.Append("\n");
+  parameter.Append("m_VolumeOrientation[2] = ");
+  parameter.Append(wxString::Format("%f",m_VolumeOrientation[2]));
+
+  parameter.Append("\n");
+  parameter.Append("m_ZeroPadValue = ");
   parameter.Append(wxString::Format("%f", m_ZeroPadValue));
 
-  return parameter;
+  os << parameter.GetCStr();
+  os << std::endl;
+  os << "-------------------------------------------------------" << std::endl;
 }
+
+
+void medOpVolumeResample::PrintDouble6( ostream& os, double array[6], const char *logMessage /*= NULL */ )
+{
+
+  if (logMessage) os << logMessage << std::endl;
+  os << "xmin, xmax [" << array[0] << " , " << array[1] << "]" << std::endl;
+  os << "ymin, ymax [" << array[2] << " , " << array[3] << "]" << std::endl;
+  os << "zmin, zmax [" << array[4] << " , " << array[5] << "]" << std::endl;
+  os << std::endl;
+}
+
+void medOpVolumeResample::PrintDouble3( ostream& os, double array[3], const char *logMessage /*= NULL*/ )
+{
+  if (logMessage) os << logMessage << " [" << array[0] << " , " << array[1] << " , " << array[2] << " ]" << std::endl;
+  os << std::endl;
+}
+
+
+void medOpVolumeResample::PrintInt3( ostream& os, int array[3], const char *logMessage /*= NULL*/ )
+{
+  if (logMessage) os << logMessage << " [" << array[0] << " , " << array[1] << " , " << array[2] << " ]" << std::endl;
+  os << std::endl;
+}
+
+void medOpVolumeResample::PrintVolume( ostream& os , mafNode *volume , const char *logMessage /*= NULL*/ )
+{
+  mafVMEVolumeGray *input = mafVMEVolumeGray::SafeDownCast(volume);
+  input->GetOutput()->GetVTKData()->Update();
+  vtkDataSet *inputDataSet = input->GetOutput()->GetVTKData();
+  if (logMessage) os << logMessage << std::endl;
+  os << "data is: ";
+  if (inputDataSet->IsA("vtkStructuredPoints"))
+  {
+    os << "vtkStructuredPoints" << std::endl;
+    vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(inputDataSet);
+    double origin[3];
+    sp->GetOrigin(origin);
+    PrintDouble3(os, origin, "origin");
+    double spacing[3];
+    sp->GetSpacing(spacing);
+    PrintDouble3(os, spacing, "spacing");
+    int dim[3];
+    sp->GetDimensions(dim);
+    PrintInt3(os, dim, "dim");
+
+  } 
+  else if (inputDataSet->IsA("vtkRectilinearGrid"))
+  {
+    os << "vtkRectilinearGrid" << std::endl;
+    vtkRectilinearGrid *rg = vtkRectilinearGrid::SafeDownCast(inputDataSet);
+    int dimensions[3];
+    rg->GetDimensions(dimensions);
+    PrintInt3(os, dimensions, "dim");
+  }
+
+
+  double inBounds[6];
+  inputDataSet->GetBounds(inBounds);
+  PrintDouble6(os, inBounds, "vtk data bounds");
+  double boundingBoxCenter[6];
+  inputDataSet->GetCenter(boundingBoxCenter);
+  PrintDouble3(os, boundingBoxCenter, "vtk data BB centre");
+
+  double absBounds[6];
+  input->GetOutput()->GetVMEBounds(absBounds);
+  PrintDouble6(os, absBounds, "vme abs bounds");
+  
+}
+
+void medOpVolumeResample::SetNewVolumePosition( double newVolumePosition[3] )
+{
+  m_NewVolumePosition[0] = newVolumePosition[0];
+  m_NewVolumePosition[1] = newVolumePosition[1];
+  m_NewVolumePosition[2] = newVolumePosition[2];
+}
+
+void medOpVolumeResample::SetMaxBounds( double maxBound[3] )
+{
+  m_MaxBoundX = maxBound[0];
+  m_MaxBoundY = maxBound[1];
+  m_MaxBoundZ = maxBound[2];
+}
+
+void medOpVolumeResample::SetROIPosition( double roiPosition[3] )
+{
+  m_ROIPosition[0] = roiPosition[0];
+  m_ROIPosition[1] = roiPosition[1];
+  m_ROIPosition[2] = roiPosition[2];
+
+}
+

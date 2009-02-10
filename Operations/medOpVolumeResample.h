@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 10:36:37 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-02-10 19:32:45 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,6 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medOpVolumeResample_H__
 #define __medOpVolumeResample_H__
 
+using namespace std;
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
@@ -45,27 +46,61 @@ public:
 
   mafOp* Copy();
 
-	bool Accept(mafNode* vme);
-	void OpRun();	
-	void OpDo();
-	void OpUndo();  
+  bool Accept(mafNode* vme);
+  void OpRun();	
+  void OpDo();
+  void OpUndo();  
+  
+  void PrintSelf(ostream& os);
+  
 
-	/**
-	Set spacing for test mode*/
-	void SetSpacing(double Spacing[3]);
+  /**
+  Set spacing in test mode*/
+  void SetSpacing(double spacing[3]);
+  void GetSpacing(double spacing[3]);
 
-	/**
-	Set bounds for test mode*/
-	void SetBounds(double Bounds[6],int Type);
+  /**
+  type of output volume bounds */
+  enum BOUNDS
+  {
+    VME4DBOUNDS = 0,
+    VMELOCALBOUNDS,
+    VMEBOUNDS,
+    CUSTOMBOUNDS,
+  };
 
-	/**
-	Resample the input volume*/
-	void Resample();
+  /**
+  Set bounds for test mode: boundsType is one of
+  VME4DBOUNDS 
+  VMELOCALBOUNDS
+  VMEBOUNDS
+  PERSONALBOUNDS
+  */
+  void SetBounds(double bounds[6],int boundsType);
 
-  /** Return parameters used by operation. */
-  mafString GetParameters();
+  /**
+  Perform resample in test mode*/
+  void Resample();
 
 protected:
+  
+  /** Test facilities */
+
+  void SetROIOrientation(double roiOrientation[3]);
+  void SetROIPosition(double roiPosition[3]);
+
+  void SetVolumePosition(double volumePosition[3]);
+
+  // used by ShiftCenterResampled
+  void SetNewVolumePosition(double position[3]);
+
+  void SetMaxBounds(double maxBounds[3]);
+
+  /** end test facilities */
+
+
+  void ShiftCenterResampled();
+
 	virtual void OpStop(int result);
 
 	void OnEventThis(mafEventBase *maf_event);
@@ -94,7 +129,7 @@ protected:
 	//gizmo's functions
 	void CreateGizmos();
   virtual void CreateGui();
-	void ShiftCenterResampled();
+	
 	void UpdateGizmoData(mafEvent *e);
 	void UpdateGui();
 	void GizmoDelete();
@@ -109,7 +144,7 @@ protected:
   void InternalUpdateBounds(double bounds[6],bool center);
 
 	void InizializeVMEDummy();
-
+  
 	int m_GizmoChoose;
 
 	mafGizmoTranslate	*m_GizmoTranslate;
@@ -126,7 +161,13 @@ protected:
 	double	m_MaxBoundZ;
 
   bool    m_ViewSelectedMessage;
-  bool  m_ShowShadingPlane;
+  bool    m_ShowShadingPlane;
   
+  void PrintVolume( ostream& os , mafNode *volume , const char *logMessage = NULL );
+  static void PrintDouble6(ostream& os, double array[6], const char *logMessage = NULL );
+  static void PrintDouble3(ostream& os, double array[3], const char *logMessage = NULL);
+  static void PrintInt3(ostream& os, int array[3], const char *logMessage = NULL);
+
+  friend class medOpVolumeResampleTest;
 };
 #endif
