@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-02-10 16:03:54 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Alexander Savenko
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -75,6 +75,8 @@ class VTK_vtkMAF_EXPORT vtkMAFVolumeResample: public vtkDataSetToDataSetFilter {
 public:
   static vtkMAFVolumeResample*New();
   vtkTypeRevisionMacro(vtkMAFVolumeResample, vtkDataSetToDataSetFilter);
+  
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   /**
   Specify a point defining the origin of the plane.*/
@@ -134,8 +136,6 @@ protected:
 
   template<typename InputDataType, typename OutputDataType> void CreateImage(const InputDataType *input, OutputDataType *output, vtkImageData *outputObject);
 
-  void myDBG(const char *msg,int index);
-
   // plane coordinates
   double VolumeOrigin[3];
   double VolumeAxisX[3];
@@ -144,13 +144,10 @@ protected:
 
   double ZeroValue;
 
-//  vtkMatrix4x4 *ResampleAxis;
-
   // color mapping
   double Window;
   double Level;
 
-//  int Num;
   int   AutoSpacing;
 
   // look-up tables and caches
@@ -159,7 +156,7 @@ protected:
   double*       VoxelCoordinates[3];
   double        DataOrigin[3];
   double        DataBounds[3][2];
-  int          DataDimensions[3];
+  int           DataDimensions[3];
   double        SamplingTableMultiplier[3];
 
 private:

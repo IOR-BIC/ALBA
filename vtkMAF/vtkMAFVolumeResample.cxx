@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeResample.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-02-10 16:03:54 $
+  Version:   $Revision: 1.1.2.1 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
@@ -21,7 +21,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeResample, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFVolumeResample, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFVolumeResample);
 
 typedef unsigned short u_short;
@@ -576,3 +576,23 @@ void vtkMAFVolumeResample::CalculateTextureCoordinates(const double point[3], co
   ts[0] =  tx / (size[0] * spacing[0]);
   ts[1] = -ty / (size[1] * spacing[1]);
   }
+
+void vtkMAFVolumeResample::PrintSelf( ostream& os, vtkIndent indent )
+{
+  os << "-------------------------------------------------------" << std::endl;
+  os << "vtkMAFVolumeResample PrintSelf:" << std::endl;
+  
+  os << "VolumeOrigin: " << VolumeOrigin[0] << '\t' << VolumeOrigin[1]<< '\t'  << VolumeOrigin[2] << std::endl;
+  os << "VolumeAxisX: " << VolumeAxisX[0]<< '\t'  << VolumeAxisX[1]<< '\t'  << VolumeAxisX[2] << std::endl;
+  os << "VolumeAxisY: " << VolumeAxisY[0]<< '\t'  << VolumeAxisY[1]<< '\t'  << VolumeAxisY[2] << std::endl;
+  os << "VolumeAxisZ: " << VolumeAxisZ[0]<< '\t'  << VolumeAxisZ[1]<< '\t'  << VolumeAxisZ[2] << std::endl;
+
+  os << "ZeroValue: " << ZeroValue << std::endl;
+  
+  os << "Window: " << Window << std::endl;
+  os << "Level: " << Level << std::endl;
+
+  os << "AutoSpacing: " << AutoSpacing << std::endl;
+  
+  os << "-------------------------------------------------------" << std::endl;
+}
