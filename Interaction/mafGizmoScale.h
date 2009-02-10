@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-02-10 11:33:01 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -230,10 +230,9 @@ private:
       VME_RS = mflTr->GetTransform();
 
   2) Postmultiply scale matrix to VME_RS matrix
-      vtkTr *tr;
-      tr->PostMultiply()
-      tr->SetMatrix(VME_RS)
-      tr->Concatenate(S)
+      transform->PostMultiply()
+      transform->SetMatrix(VME_RS)
+      transform->Concatenate(S)
         
   3) Express S * VME_RS in W refsys: this is new vme abs pose
       

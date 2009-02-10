@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-02-10 11:33:01 $
+  Version:   $Revision: 1.9.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -251,10 +251,9 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
           //        // At MOUSE_MOVE
           //        1) Generate scale matrix        
           //        2) Postmultiply scale matrix to VME_RS matrix
-          //            vtkTr *tr;
-          //            tr->PostMultiply()
-          //            tr->SetMatrix(VME_RS)
-          //            tr->Concatenate(S)
+          //            transform->PostMultiply()
+          //            transform->SetMatrix(VME_RS)
+          //            transform->Concatenate(S)
 
           vtkMAFSmartPointer<vtkTransform> scaleTrans;
           scaleTrans->PostMultiply();
