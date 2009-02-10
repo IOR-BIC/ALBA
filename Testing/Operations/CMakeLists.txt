@@ -64,6 +64,8 @@ ADD_TEST(medOpSubdivideTest ${EXECUTABLE_OUTPUT_PATH}/medOpSubdivideTest)
 ADD_EXECUTABLE(medOpCreateSurfaceTest medOpCreateSurfaceTest.h medOpCreateSurfaceTest.cpp)
 ADD_TEST(medOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateSurfaceTest)
 
+ADD_EXECUTABLE(medOpVolumeResampleTest medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp)
+ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
