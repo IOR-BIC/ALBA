@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-02-05 12:34:38 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-02-11 15:26:00 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -141,9 +141,9 @@ public:
 	class Apoint
 	{
 	public:
-		double  x;
-		double  y;
-		double  z;
+		double  m_X;
+		double  m_Y;
+		double  m_Z;
 	};
 
 	static bool VMEAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVME));};
