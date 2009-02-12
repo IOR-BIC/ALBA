@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFGlobalAxisCoordinate.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-02-12 10:53:24 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -18,7 +18,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-//vtkCxxRevisionMacro(vtkMAFGlobalAxisCoordinate, "$Revision: 1.1 $");
+//vtkCxxRevisionMacro(vtkMAFGlobalAxisCoordinate, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFGlobalAxisCoordinate);
 
 //----------------------------------------------------------------------------
@@ -27,20 +27,20 @@ vtkMAFGlobalAxisCoordinate::vtkMAFGlobalAxisCoordinate()
 {
   this->CoordinateSystem = VTK_USERDEFINED;
 
-	camera = vtkCamera::New();
-	renderer = vtkRenderer::New();
-  renderer->SetActiveCamera(camera);
-	renderwindow = vtkRenderWindow::New();
-  renderwindow->AddRenderer(renderer);
-  renderwindow->SetSize(40,40);
+	Camera = vtkCamera::New();
+	Renderer = vtkRenderer::New();
+  Renderer->SetActiveCamera(Camera);
+	Renderwindow = vtkRenderWindow::New();
+  Renderwindow->AddRenderer(Renderer);
+  Renderwindow->SetSize(40,40);
 }
 //----------------------------------------------------------------------------
 vtkMAFGlobalAxisCoordinate::~vtkMAFGlobalAxisCoordinate()
 //----------------------------------------------------------------------------
 {
-	camera->Delete();
-  renderer->Delete();
-  renderwindow->Delete();
+	Camera->Delete();
+  Renderer->Delete();
+  Renderwindow->Delete();
 }
 //----------------------------------------------------------------------------
 double *vtkMAFGlobalAxisCoordinate::GetComputedUserDefinedValue(vtkViewport *viewport)
@@ -49,15 +49,15 @@ double *vtkMAFGlobalAxisCoordinate::GetComputedUserDefinedValue(vtkViewport *vie
 	vtkRenderer *r = (vtkRenderer *)viewport;
   vtkCamera *c = r->GetActiveCamera();
 
-  camera->SetViewAngle(c->GetViewAngle());
-  camera->SetPosition(c->GetPosition());
-  camera->SetFocalPoint(c->GetFocalPoint());
-  camera->SetViewUp(c->GetViewUp());
-  camera->SetParallelProjection(c->GetParallelProjection());
-  camera->SetParallelScale(c->GetParallelScale());
+  Camera->SetViewAngle(c->GetViewAngle());
+  Camera->SetPosition(c->GetPosition());
+  Camera->SetFocalPoint(c->GetFocalPoint());
+  Camera->SetViewUp(c->GetViewUp());
+  Camera->SetParallelProjection(c->GetParallelProjection());
+  Camera->SetParallelScale(c->GetParallelScale());
 
 	double b = 0.5;
-	renderer->ResetCamera(-b,b,-b,b,-b,b);
+	Renderer->ResetCamera(-b,b,-b,b,-b,b);
 
   double w[4];
 	w[0] = this->Value[0];
@@ -65,9 +65,9 @@ double *vtkMAFGlobalAxisCoordinate::GetComputedUserDefinedValue(vtkViewport *vie
 	w[2] = this->Value[2];
 	w[3] = 1;
 
-	renderer->SetWorldPoint(w);
-	renderer->WorldToDisplay();
-	renderer->GetDisplayPoint(ComputedUserDefinedValue);  
+	Renderer->SetWorldPoint(w);
+	Renderer->WorldToDisplay();
+	Renderer->GetDisplayPoint(ComputedUserDefinedValue);  
 
   return this->ComputedUserDefinedValue;
 }

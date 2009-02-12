@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkMAFRemoveCellsFilter.h
   Language:  C++
-  Version:   $Id: vtkMAFRemoveCellsFilter.h,v 1.1 2008-07-03 11:27:45 aqd0 Exp $
+  Version:   $Id: vtkMAFRemoveCellsFilter.h,v 1.1.2.1 2009-02-12 10:53:24 aqd0 Exp $
 
   Copyright (c) Goodwin Lawlor 2003-2004
   All rights reserved.
@@ -71,15 +71,15 @@ public:
 
  //Description
  //Set the m_ReverseRemove variable to 0 or 1 , if 1 reverse the removal
- void ReverseRemoveOn(){m_ReverseRemove = 1;}
- void ReverseRemoveOff(){m_ReverseRemove = 0;}
+ void ReverseRemoveOn(){ReverseRemove = 1;}
+ void ReverseRemoveOff(){ReverseRemove = 0;}
 
 protected:
 
   vtkMAFRemoveCellsFilter();
   ~vtkMAFRemoveCellsFilter(){};
 
-  int m_ReverseRemove; //< if On remove all the cells that are  that are not marked
+  int ReverseRemove; //< if On remove all the cells that are  that are not marked
   
 
 private:

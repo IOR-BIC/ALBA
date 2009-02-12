@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2009-01-23 16:06:02 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-02-12 10:53:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkMAFContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFContourVolumeMapper);
 
 
@@ -115,7 +115,7 @@ vtkStandardNewMacro(vtkMAFContourVolumeMapper);
 vtkMAFContourVolumeMapper::vtkMAFContourVolumeMapper()
 //------------------------------------------------------------------------------
 {
-  m_Alpha=1.0;
+  Alpha=1.0;
 
   this->AutoLODRender = true;
   this->AutoLODCreate = true;
@@ -141,7 +141,7 @@ vtkMAFContourVolumeMapper::vtkMAFContourVolumeMapper()
     this->TriangleCacheSize[lod] = 0;
 
     // sorting triangles
-    this->ordered_vertices[lod] = NULL ;
+    this->OrderedVertices[lod] = NULL ;
   }
 
   this->TimePerTriangle = -1.0 ;
@@ -190,8 +190,8 @@ void vtkMAFContourVolumeMapper::ReleaseData()
     this->TriangleCacheSize[lod] = 0;
 
     // delete vertex order array
-    delete[] ordered_vertices[lod] ;
-    ordered_vertices[lod] = NULL ;
+    delete[] OrderedVertices[lod] ;
+    OrderedVertices[lod] = NULL ;
   }
 
 
@@ -213,8 +213,8 @@ void vtkMAFContourVolumeMapper::ClearCachesAndStats()
     this->TriangleCacheSize[lod] = 0;
 
     // delete vertex order array
-    delete[] ordered_vertices[lod] ;
-    ordered_vertices[lod] = NULL ;
+    delete[] OrderedVertices[lod] ;
+    OrderedVertices[lod] = NULL ;
 
     // set stats to undefined
     this->NumberOfTriangles[lod] = -1 ;
@@ -276,7 +276,7 @@ void vtkMAFContourVolumeMapper::SetInput(vtkDataSet *input)
   this->ReleaseData();
   double b[2];
   input->GetScalarRange(b);
-  m_MAXScalar=b[1];
+  MAXScalar=b[1];
   this->vtkProcessObject::SetNthInput(0, input);
 }
 
@@ -847,9 +847,9 @@ void vtkMAFContourVolumeMapper::InitializeRender(bool setup, vtkRenderer *render
     float ambientColor  = volume->GetProperty()->GetAmbient();
     float diffuseColor  = volume->GetProperty()->GetDiffuse();
     float specularColor = volume->GetProperty()->GetSpecular();
-    float ambientColor3[4] = { ambientColor, ambientColor, ambientColor, m_Alpha};
-    float diffuseColor3[4] = { diffuseColor, diffuseColor, diffuseColor, m_Alpha};
-    float specularColor3[4] = { specularColor, specularColor, specularColor, m_Alpha};
+    float ambientColor3[4] = { ambientColor, ambientColor, ambientColor, Alpha};
+    float diffuseColor3[4] = { diffuseColor, diffuseColor, diffuseColor, Alpha};
+    float specularColor3[4] = { specularColor, specularColor, specularColor, Alpha};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  ambientColor3);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  diffuseColor3);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specularColor3);
@@ -889,7 +889,7 @@ void vtkMAFContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volu
 
   bool sortall = false ;
 
-  if (this->m_Alpha < 1.0){
+  if (this->Alpha < 1.0){
     // transparency enabled so sort triangles and render
 
     sortall = (renderer->GetAllocatedRenderTime() > (float)(SortFraction)*this->TimeToDrawDC[lod]) ;
@@ -899,7 +899,7 @@ void vtkMAFContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volu
       glDisable(GL_DEPTH_TEST) ;
       glInterleavedArrays(GL_N3F_V3F, 0, this->TriangleCache[lod]);
       if (this->NumberOfTriangles[lod] > 0)
-        glDrawElements(GL_TRIANGLES, nvert, GL_UNSIGNED_INT, ordered_vertices[lod]);
+        glDrawElements(GL_TRIANGLES, nvert, GL_UNSIGNED_INT, OrderedVertices[lod]);
     }
   }
   else{
@@ -919,7 +919,7 @@ void vtkMAFContourVolumeMapper::DrawCache(vtkRenderer *renderer, vtkVolume *volu
   // note time taken to draw triangles
   this->TimeToDraw = (float)this->Timer->GetElapsedTime();
 
-  if ((this->m_Alpha < 1.0) && sortall){
+  if ((this->Alpha < 1.0) && sortall){
     // transparency on: sorting all triangles at once is not supposed to be typical, 
     // and should only happen when time is not critical,
     // so we only save a fraction of the time taken.
@@ -1212,7 +1212,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
 
                 // calculate case, each bit of caseIndex is set if corner > contour value
                 int caseIndex = voxelVals[0] > ContourValue; 
-                if(m_MAXScalar==ContourValue)
+                if(MAXScalar==ContourValue)
                 {
                   // This allows you to get contour at max of range, else can't get last slice in test volume (Matteo 27.06.06) 
                   caseIndex = voxelVals[0] != ContourValue;
@@ -1634,7 +1634,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::CreateMCubes(int LOD
 
             // calculate case, each bit of caseIndex is set if corner > contour value
             int caseIndex = voxelVals[0] > ContourValue; 
-            if(m_MAXScalar==ContourValue)
+            if(MAXScalar==ContourValue)
             {
               // This allows you to get contour at max of range, else can't get last slice in test volume (Matteo 27.06.06) 
               caseIndex = voxelVals[0] != ContourValue;
@@ -2562,14 +2562,14 @@ void vtkMAFContourVolumeMapper::SortTriangles(int lod, bool sortall)
 
   // allocate vertex order array, if necessary
   // (deallocated in the destructor)
-  if ((this->ordered_vertices[lod] == NULL) || (this->ContourValue != this->PrevContourValue)){
+  if ((this->OrderedVertices[lod] == NULL) || (this->ContourValue != this->PrevContourValue)){
     // allocate if undefined or no. of triangles has changed
-    delete[] ordered_vertices[lod] ;
-    this->ordered_vertices[lod] = new unsigned int[nvert] ;
+    delete[] OrderedVertices[lod] ;
+    this->OrderedVertices[lod] = new unsigned int[nvert] ;
 
     // put array into default order
     for (int j = 0 ;  j < nvert ; j++)
-      this->ordered_vertices[lod][j] = j ;
+      this->OrderedVertices[lod][j] = j ;
   }
 
   // loop through triangles and calculate depth of 1st vertex of each triangle
@@ -2577,7 +2577,7 @@ void vtkMAFContourVolumeMapper::SortTriangles(int lod, bool sortall)
   int i, j, jj ;
   float *v, depth ;
   for (i = 0, j = 0 ;  i < ntri ;  i++, j+=3){
-    jj = ordered_vertices[lod][j] ;             // get index jj of next vertex in depth order
+    jj = OrderedVertices[lod][j] ;             // get index jj of next vertex in depth order
     v = this->TriangleCache[lod] + 6*jj + 3 ;   // get pointer to vertex jj
     depth = DepthOfVertex(PM, v) ;              // calculate depth
     depthlist[i].depth = depth ;                // store depth and 1st vertex of triangle i
@@ -2609,7 +2609,7 @@ void vtkMAFContourVolumeMapper::SortTriangles(int lod, bool sortall)
 
   // create ordered list of all vertices
   int index ;
-  unsigned int *ov = this->ordered_vertices[lod] ;
+  unsigned int *ov = this->OrderedVertices[lod] ;
   for (i = 0, j = 0 ;  i < ntri ;  i++, j += 3){
     index = depthlist[i].index ;
     ov[j] = index ;

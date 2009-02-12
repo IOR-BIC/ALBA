@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:27:45 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-02-12 10:53:24 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -191,9 +191,9 @@ public:
   float EstimateRelevantVolume(const double value);
 
   /** To set the value of transparency */
-  void SetAlpha(double alpha){m_Alpha=alpha;};
+  void SetAlpha(double alpha){Alpha=alpha;};
 
-  void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
+  void SetMaxScalar(double scalar){MAXScalar=scalar;};
 
   /** Return the index increments in xy and z given the lod index
   For lod = 0,1,2,3... lodxy = 2^n = 1,2,4,8...
@@ -326,8 +326,8 @@ private:
   int            EnableContourAnalysis;  ///< shall we optimize the surface?
 
   // to set the alpha parameter
-  double         m_Alpha;
-  double         m_MAXScalar;
+  double         Alpha;
+  double         MAXScalar;
 
   // volume info
   double         DataOrigin[3];
@@ -352,7 +352,7 @@ private:
   unsigned int   TriangleCacheSize[NumberOfLods];   // in triangles (there are 6 floats per vertex, 18 floats per triangle)
 
   // sorting triangles
-  unsigned int *ordered_vertices[NumberOfLods] ;    // indices of vertices in sort order
+  unsigned int *OrderedVertices[NumberOfLods] ;    // indices of vertices in sort order
 
   // helping objects
   float          ViewportDimensions[2];

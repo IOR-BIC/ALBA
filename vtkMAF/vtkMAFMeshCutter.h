@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.h,v $
 Language:  C++
-Date:      $Date: 2008-01-24 13:05:41 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2009-02-12 10:53:24 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -200,29 +200,29 @@ protected:
     double lambda ;      // fractional distance of interpolated point along edge
     mapping_type mtype ; // mapping is point-to-edge or point-to-point
   } EdgeMapping ;
-  std::vector<EdgeMapping>m_edgeMapping ;
+  std::vector<EdgeMapping> EdgeMappings ;
 
   // This is a list of the input cells which have been touched by the plane.
   // NB this includes some grazing incidence cells which do not create any output polygons,
   // so don't use it to map input and output cells.
-  std::vector<vtkIdType> m_intersectedCells ;
+  std::vector<vtkIdType> IntersectedCells ;
 
   // This is a list of the output point id's in EVERY input cell, including all the empty ones.
   // It is a list of lists.
   typedef std::vector<vtkIdType> IdList;
-  std::vector<IdList> m_pointsInCells ;
+  std::vector<IdList> PointsInCells ;
 
   // This is a mapping from the output cells to the input cells: 
   // cellid_in = m_cellMapping[cellid_out]
   // It is set in CreateSlice()
-  std::vector<vtkIdType>m_cellMapping ;
+  std::vector<vtkIdType> CellMapping ;
 
   // cutting function
   vtkPlane *m_cutFunction ;
 
   // input and output
-  vtkUnstructuredGrid *m_unstructGrid ;
-  vtkPolyData *m_polydata ;
+  vtkUnstructuredGrid *UnstructGrid ;
+  vtkPolyData *Polydata ;
 } ;
 
 #endif

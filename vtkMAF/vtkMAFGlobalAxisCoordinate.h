@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFGlobalAxisCoordinate.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 15:04:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-02-12 10:53:24 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -76,9 +76,9 @@ protected:
   vtkMAFGlobalAxisCoordinate();
 
 private:
-	vtkRenderWindow *renderwindow;
-	vtkRenderer *renderer;
-	vtkCamera *camera;
+	vtkRenderWindow *Renderwindow;
+	vtkRenderer *Renderer;
+	vtkCamera *Camera;
 
 	vtkMAFGlobalAxisCoordinate(const vtkMAFGlobalAxisCoordinate&);  // Not implemented.
   void operator=(const vtkMAFGlobalAxisCoordinate&);     // Not implemented.

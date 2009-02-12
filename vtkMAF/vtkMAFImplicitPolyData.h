@@ -71,11 +71,11 @@ protected:
 	double NoValue;
 	double NoGradient[3];
 
-	vtkTriangleFilter *tri;
-	vtkPolyData *input;
-	PointLocator *locator;
-  vtkPolygon *poly;
-  vtkIdList *cells;
+	vtkTriangleFilter *Tri;
+	vtkPolyData *Input;
+	PointLocator *Locator;
+  vtkPolygon *Poly;
+  vtkIdList *Cells;
 
   double EvaluateBounds[6];
   int   EvaluateBoundsSet;
