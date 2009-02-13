@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-02 13:53:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-02-13 12:44:29 $
+  Version:   $Revision: 1.3.4.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -52,7 +52,7 @@ double mafVMEVector::GetModule()
 int mafVMEVector::SetData(vtkPolyData *data, mafTimeStamp t, int mode)
 //-------------------------------------------------------------------------
 {
-  return Superclass::SetData(data,t,mode);
+  return this->SetData((vtkDataSet*)data,t,mode);
 }
 //-------------------------------------------------------------------------
 int mafVMEVector::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
