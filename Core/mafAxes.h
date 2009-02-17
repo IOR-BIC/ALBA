@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAxes.h,v $
   Language:  C++
-  Date:      $Date: 2005-09-19 13:40:05 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-02-17 15:28:15 $
+  Version:   $Revision: 1.1.22.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,16 +36,23 @@ the local vme-reference system.
 
 If vme is NULL, the axes will represent the global
 reference system
+
+@sa mafAxesTest for example usage
+
+@todo API improvements needed, see mafAxesTest for api improvement use cases
 */
 {
 public:
+
+  /** Constructor note: given renderer ren cannot be NULL */
            mafAxes(vtkRenderer *ren, mafVME* vme = NULL);
   virtual ~mafAxes();
 	
 	/** Set the axes visibility. */
   void     SetVisibility(bool show);
 
-  /** force the position of the Axes, if omitted the ABS vme matrix is used instead. Work only if vme was specified */
+  /** Force the position of the Axes, if omitted the ABS vme matrix is used instead. 
+  Works only if a vme was specified in the constructor*/
   void     SetPose( vtkMatrix4x4 *abs_pose_matrix = NULL);
 
 protected:
@@ -57,5 +64,8 @@ protected:
 	vtkCoordinate 				 *m_Coord;
 	vtkActor2D						 *m_AxesActor;
 	vtkLookupTable				 *m_AxesLUT;
+  
+  /** friend test class */
+  friend class mafAxesTest;
 };
 #endif
