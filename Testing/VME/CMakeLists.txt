@@ -29,6 +29,8 @@ ADD_TEST(medPipeFactoryVMETest  ${EXECUTABLE_OUTPUT_PATH}/medPipeFactoryVMETest)
 ADD_EXECUTABLE(medPipeVolumeDRRTest medPipeVolumeDRRTest.h medPipeVolumeDRRTest.cpp)
 ADD_TEST(medPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeDRRTest)
 
+ADD_EXECUTABLE(medVMEAnalogTest medVMEAnalogTest.h medVMEAnalogTest.cpp)
+ADD_TEST(medVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEAnalogTest)
 
 
 # wxWidgets specific classes
