@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafXMLStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-22 14:37:20 $
-  Version:   $Revision: 1.21.2.1 $
+  Date:      $Date: 2009-02-23 14:48:28 $
+  Version:   $Revision: 1.21.2.2 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -17,6 +17,7 @@
 #include "mafXMLString.h"
 #include "mafStorable.h"
 #include "mafDirectory.h"
+#include "mmuDOMTreeErrorReporter.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -28,72 +29,12 @@
 //#include <xercesc/dom/DOMErrorHandler.hpp>
 //#include <xercesc/dom/DOMError.hpp>
 #include <xercesc/util/XercesDefs.hpp>
-#include <xercesc/sax/ErrorHandler.hpp>
-#include <xercesc/sax/SAXParseException.hpp>
 
 #include <assert.h>
 
 #ifndef MAF_USE_WX
 #error "XML Storage cannot be compiled without wxWidgets"
 #endif
-
-//------------------------------------------------------------------------------
-// mmuDOMTreeErrorReporter
-//------------------------------------------------------------------------------
-/** Utility class to catch XML error rised while parsing XML */
-class mmuDOMTreeErrorReporter : public XERCES_CPP_NAMESPACE_QUALIFIER ErrorHandler
-{
-public:
-    mmuDOMTreeErrorReporter() : m_SawErrors(false) {}
-    ~mmuDOMTreeErrorReporter() {}
-
-    /** Implementation of the error handler interface */
-    void warning(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch);
-    void error(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch);
-    void fatalError(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch);
-    void resetErrors();
-
-    bool GetSawErrors() const {return m_SawErrors;}
-private:
-    bool    m_SawErrors; ///< Set if we get any errors, used by the main code to suppress output if there are errors.
-};
-
-//------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::warning(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException&)
-//------------------------------------------------------------------------------
-{
-  // Ignore all warnings.
-}
-//------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::error(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch)
-//------------------------------------------------------------------------------
-{
-  m_SawErrors = true;
-  mafErrorMessageMacro("Error at file \"" << toCatch.getSystemId() \
-	 << "\", line " << toCatch.getLineNumber() \
-	 << ", column " << toCatch.getColumnNumber() \
-   << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
-  );
-}
-//------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::fatalError(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch)
-//------------------------------------------------------------------------------
-{
-  m_SawErrors = true;
-  mafString err;
-  mafErrorMessageMacro("Fatal Error at file \"" << mafXMLString(toCatch.getSystemId()) \
-	 << "\", line " << toCatch.getLineNumber() \
-	 << ", column " << toCatch.getColumnNumber() \
-   << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
-  );
-  
-}
-//------------------------------------------------------------------------------
-void mmuDOMTreeErrorReporter::resetErrors()
-//------------------------------------------------------------------------------
-{
-  m_SawErrors = false;
-}
 
 //------------------------------------------------------------------------------
 // mafXMLStorage
