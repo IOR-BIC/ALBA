@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-23 16:00:37 $
-Version:   $Revision: 1.21.2.3 $
+Date:      $Date: 2009-02-23 16:25:29 $
+Version:   $Revision: 1.21.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -388,7 +388,27 @@ int medOpImporterDicom::BuildVolume()
 		mafDEL(m_TagArray);
 
 		accumulate->Update();
-		m_Image->SetData(m_SliceTexture->GetInput(),0);
+
+    double scaleFactor;
+    if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::NONE)
+    {
+      scaleFactor = 1.0;
+    }
+    else if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::mm2m)
+    {
+      scaleFactor = 0.001;
+    }
+    
+    double spacing[3];
+    vtkMAFSmartPointer<vtkImageData> im;
+    im->DeepCopy(m_SliceTexture->GetInput());
+    im->GetSpacing(spacing);
+    spacing[0]*=scaleFactor;
+    spacing[1]*=scaleFactor;
+    spacing[2]*=scaleFactor;
+    im->SetSpacing(spacing);
+    im->Update();
+		m_Image->SetData(im,0);
 
 		mafTagItem tag_Nature;
 		tag_Nature.SetName("VME_NATURE");
@@ -566,7 +586,37 @@ int medOpImporterDicom::BuildVolumeCineMRI()
 			targetVolumeSliceId++;
 		}
 		accumulate->Update();
-		m_Volume->SetDataByDetaching(accumulate->GetOutput(),tsDouble);
+
+    vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
+    rg_out->DeepCopy(accumulate->GetOutput());
+    rg_out->Update();
+
+    double scaleFactor;
+    if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::NONE)
+    {
+      scaleFactor = 1.0;
+    }
+    else if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::mm2m)
+    {
+      scaleFactor = 0.001;
+    }
+
+    vtkDataArray *daVector[3] = {rg_out->GetXCoordinates(), rg_out->GetYCoordinates(), rg_out->GetZCoordinates()};
+
+    for (int arrayId = 0; arrayId<3; arrayId ++)
+    {
+
+      int numTuples = daVector[arrayId]->GetNumberOfTuples();
+
+      for (int tupleId = 0; tupleId<numTuples; tupleId++)
+      {
+        double oldVal = daVector[arrayId]->GetComponent(tupleId, 0);
+        daVector[arrayId]->SetComponent(tupleId, 0, oldVal * scaleFactor);
+      }
+    }
+    rg_out->Modified();
+
+		m_Volume->SetDataByDetaching(rg_out,tsDouble);
 	}
 
 	// update m_tag_array ivar
