@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:27:22 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2009-02-23 16:00:24 $
+Version:   $Revision: 1.7.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,13 +32,14 @@ mafGUISettings(Listener, label)
 {
 	m_Dictionary = "";
 
-	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = true;
+	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = true;
 
 	m_AutoCropPos = FALSE;
 	m_EnableNumberOfSlice = FALSE;
 	m_EnableNumberOfTime = FALSE; 
   m_EnableChangeSide = FALSE;
 	m_Step = ID_4X;
+  m_UnitsConversion = NONE;
 
 	InitializeSettings();
 }
@@ -64,7 +65,10 @@ void medGUIDicomSettings::CreateGui()
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),m_CheckOnOff[1] != 0);
 	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),m_CheckOnOff[2] != 0);
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3] != 0);
+  m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
 	m_Gui->Divider(1);
+  wxString choices_conversion[2] = {"NONE","mm2m"};
+  m_Gui->Combo(ID_CONVERT_UNITS,_("Convert Data in SI units"),&m_UnitsConversion,2,choices_conversion);
 
 	m_Gui->Update();
 }
@@ -116,6 +120,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_SIDE:
     {
       m_Config->Write("EnableSide",m_EnableChangeSide);
+    }
+    break;
+  case ID_CONVERT_UNITS:
+    {
+      m_Config->Write("ConversionUnits",m_UnitsConversion);
     }
     break;
 	default:
@@ -195,6 +204,15 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableReadXA",m_CheckOnOff[3]);
 	}
 
+  if(m_Config->Read("EnableReadOT", &long_item))
+  {
+    m_CheckOnOff[4]=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableReadOT",m_CheckOnOff[4]);
+  }
+
 	if(m_Config->Read("AutoCropPos", &long_item))
 	{
 		m_AutoCropPos=long_item;
@@ -222,6 +240,15 @@ void medGUIDicomSettings::InitializeSettings()
 		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
 	}
 
+  if(m_Config->Read("ConversionUnits", &long_item))
+  {
+    m_UnitsConversion=long_item;
+  }
+  else
+  {
+    m_Config->Write("ConversionUnits",m_UnitsConversion);
+  }
+
 	m_Config->Flush();
 }
 //----------------------------------------------------------------------------
@@ -244,6 +271,10 @@ bool medGUIDicomSettings::EnableToRead(char* type)
 	{	
 		return true;
 	}
+  if (strcmp( type, "OT" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY)))
+  {	
+    return true;
+  }
 
 	return false;
 }

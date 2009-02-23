@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:27:22 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2009-02-23 16:00:24 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -40,6 +40,7 @@ public:
 		ID_ENALBLE_NUMBER_OF_SLICE,
 		ID_STEP,
     ID_SIDE,
+    ID_CONVERT_UNITS,
 	};
 
 	enum DICOM_MODALITY
@@ -48,6 +49,7 @@ public:
 		ID_SC_MODALITY,
 		ID_MRI_MODALITY,
 		ID_XA_MODALITY,
+    ID_OT_MODALITY,
 		ID_CMRI_MODALITY,
 	};
 
@@ -59,6 +61,12 @@ public:
 		ID_4X,
 	};
 
+  enum DICOM_CONVERSION
+  {
+    NONE = 0,
+    mm2m,
+  };
+
 	/** Answer to the messages coming from interface. */
 	void OnEvent(mafEventBase *maf_event);
 
@@ -69,6 +77,7 @@ public:
 	int EnableNumberOfSlice(){return m_EnableNumberOfSlice;};
   int GetBuildStep(){return m_Step;};
   int EnableChangeSide(){return m_EnableChangeSide;};
+  int GetConversionType(){return m_UnitsConversion;};
 
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
@@ -86,12 +95,13 @@ protected:
 	mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
 
-	int m_CheckOnOff[4];
+	int m_CheckOnOff[5];
 
 	int m_AutoCropPos;
 	int m_EnableNumberOfTime;
 	int m_EnableNumberOfSlice;
 	int m_Step;
   int m_EnableChangeSide;
+  int m_UnitsConversion;
 };
 #endif

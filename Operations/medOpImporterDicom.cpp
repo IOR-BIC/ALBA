@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2008-12-22 12:40:01 $
-Version:   $Revision: 1.21.2.2 $
+Date:      $Date: 2009-02-23 16:00:37 $
+Version:   $Revision: 1.21.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -80,6 +80,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkProbeFilter.h"
 #include "vtkRenderer.h"
 #include "vtkMAFRGSliceAccumulate.h"
+#include "vtkTransform.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicom);
@@ -431,7 +432,37 @@ int medOpImporterDicom::BuildVolume()
 		mafDEL(m_TagArray);
 
 		accumulate->Update();
-		m_Volume->SetDataByDetaching(accumulate->GetOutput(),0);
+
+    vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
+    rg_out->DeepCopy(accumulate->GetOutput());
+    rg_out->Update();
+
+    double scaleFactor;
+    if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::NONE)
+    {
+      scaleFactor = 1.0;
+    }
+    else if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::mm2m)
+    {
+      scaleFactor = 0.001;
+    }
+
+    vtkDataArray *daVector[3] = {rg_out->GetXCoordinates(), rg_out->GetYCoordinates(), rg_out->GetZCoordinates()};
+
+    for (int arrayId = 0; arrayId<3; arrayId ++)
+    {
+
+      int numTuples = daVector[arrayId]->GetNumberOfTuples();
+
+      for (int tupleId = 0; tupleId<numTuples; tupleId++)
+      {
+        double oldVal = daVector[arrayId]->GetComponent(tupleId, 0);
+        daVector[arrayId]->SetComponent(tupleId, 0, oldVal * scaleFactor);
+      }
+    }
+    rg_out->Modified();
+
+    m_Volume->SetDataByDetaching(rg_out,0);
 
 		mafTagItem tag_Nature;
 		tag_Nature.SetName("VME_NATURE");
