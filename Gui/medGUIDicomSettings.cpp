@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-23 16:00:24 $
-Version:   $Revision: 1.7.2.1 $
+Date:      $Date: 2009-02-25 16:43:09 $
+Version:   $Revision: 1.7.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -39,7 +39,6 @@ mafGUISettings(Listener, label)
 	m_EnableNumberOfTime = FALSE; 
   m_EnableChangeSide = FALSE;
 	m_Step = ID_4X;
-  m_UnitsConversion = NONE;
 
 	InitializeSettings();
 }
@@ -67,8 +66,6 @@ void medGUIDicomSettings::CreateGui()
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3] != 0);
   m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
 	m_Gui->Divider(1);
-  wxString choices_conversion[2] = {"NONE","mm2m"};
-  m_Gui->Combo(ID_CONVERT_UNITS,_("Convert Data in SI units"),&m_UnitsConversion,2,choices_conversion);
 
 	m_Gui->Update();
 }
@@ -120,11 +117,6 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_SIDE:
     {
       m_Config->Write("EnableSide",m_EnableChangeSide);
-    }
-    break;
-  case ID_CONVERT_UNITS:
-    {
-      m_Config->Write("ConversionUnits",m_UnitsConversion);
     }
     break;
 	default:
@@ -239,15 +231,6 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
 	}
-
-  if(m_Config->Read("ConversionUnits", &long_item))
-  {
-    m_UnitsConversion=long_item;
-  }
-  else
-  {
-    m_Config->Write("ConversionUnits",m_UnitsConversion);
-  }
 
 	m_Config->Flush();
 }

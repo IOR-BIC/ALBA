@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-23 16:25:29 $
-Version:   $Revision: 1.21.2.4 $
+Date:      $Date: 2009-02-25 16:43:34 $
+Version:   $Revision: 1.21.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -63,6 +63,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafGUICheckListBox.h"
 #include "medGUIDicomSettings.h"
 #include "mafGUIButton.h"
+#include "medGUISettingsAdvanced.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkDicomUnPacker.h"
@@ -390,11 +391,13 @@ int medOpImporterDicom::BuildVolume()
 		accumulate->Update();
 
     double scaleFactor;
-    if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::NONE)
+    medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+
+    if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
     {
       scaleFactor = 1.0;
     }
-    else if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::mm2m)
+    else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
     {
       scaleFactor = 0.001;
     }
@@ -457,12 +460,14 @@ int medOpImporterDicom::BuildVolume()
     rg_out->DeepCopy(accumulate->GetOutput());
     rg_out->Update();
 
+    medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+
     double scaleFactor;
-    if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::NONE)
+    if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
     {
       scaleFactor = 1.0;
     }
-    else if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::mm2m)
+    else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
     {
       scaleFactor = 0.001;
     }
@@ -591,12 +596,14 @@ int medOpImporterDicom::BuildVolumeCineMRI()
     rg_out->DeepCopy(accumulate->GetOutput());
     rg_out->Update();
 
+    medGUISettingsAdvanced *guiAdv = new medGUISettingsAdvanced(this);
+
     double scaleFactor;
-    if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::NONE)
+    if(guiAdv->GetConversionType() == medGUIDicomSettings::NONE)
     {
       scaleFactor = 1.0;
     }
-    else if(((medGUIDicomSettings*)GetSetting())->GetConversionType() == medGUIDicomSettings::mm2m)
+    else if(guiAdv->GetConversionType() == medGUIDicomSettings::mm2m)
     {
       scaleFactor = 0.001;
     }

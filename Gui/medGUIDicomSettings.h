@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-02-23 16:00:24 $
-Version:   $Revision: 1.5.2.1 $
+Date:      $Date: 2009-02-25 16:43:09 $
+Version:   $Revision: 1.5.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -77,7 +77,6 @@ public:
 	int EnableNumberOfSlice(){return m_EnableNumberOfSlice;};
   int GetBuildStep(){return m_Step;};
   int EnableChangeSide(){return m_EnableChangeSide;};
-  int GetConversionType(){return m_UnitsConversion;};
 
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
@@ -102,6 +101,5 @@ protected:
 	int m_EnableNumberOfSlice;
 	int m_Step;
   int m_EnableChangeSide;
-  int m_UnitsConversion;
 };
 #endif

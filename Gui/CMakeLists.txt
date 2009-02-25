@@ -18,6 +18,8 @@ SET(PROJECT_SRCS
   medGUIDicomSettings.h
   medGUIContextualMenu.cpp
   medGUIContextualMenu.h
+  medGUISettingsAdvanced.cpp
+  medGUISettingsAdvanced.h
 )
 
 
