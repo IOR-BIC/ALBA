@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.h,v $
 Language:  C++
-Date:      $Date: 2009-02-12 10:53:24 $
-Version:   $Revision: 1.5.2.1 $
+Date:      $Date: 2009-02-26 11:33:37 $
+Version:   $Revision: 1.5.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -218,7 +218,7 @@ protected:
   std::vector<vtkIdType> CellMapping ;
 
   // cutting function
-  vtkPlane *m_cutFunction ;
+  vtkPlane *CutFunction ;
 
   // input and output
   vtkUnstructuredGrid *UnstructGrid ;

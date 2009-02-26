@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter.cxx,v $
 Language:  C++
-Date:      $Date: 2009-02-12 10:53:24 $
-Version:   $Revision: 1.5.2.1 $
+Date:      $Date: 2009-02-26 11:33:37 $
+Version:   $Revision: 1.5.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -33,7 +33,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.5.2.1 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter, "$Revision: 1.5.2.2 $");
 vtkStandardNewMacro(vtkMAFMeshCutter);
 //------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ vtkStandardNewMacro(vtkMAFMeshCutter);
 vtkMAFMeshCutter::vtkMAFMeshCutter()
 //------------------------------------------------------------------------------
 {
-  m_cutFunction = NULL ;
+  CutFunction = NULL ;
   UnstructGrid = vtkUnstructuredGrid::New() ;
 }
 
@@ -63,9 +63,9 @@ unsigned long vtkMAFMeshCutter::GetMTime()
   unsigned long mTime = this->vtkUnstructuredGridToPolyDataFilter::GetMTime();
   unsigned long time;
 
-  if (m_cutFunction != NULL )
+  if (CutFunction != NULL )
   {
-    time = m_cutFunction->GetMTime();
+    time = CutFunction->GetMTime();
     mTime = ( time > mTime ? time : mTime );
   }
 
@@ -102,7 +102,7 @@ void vtkMAFMeshCutter::Execute()
 void vtkMAFMeshCutter::SetCutFunction(vtkPlane *P)
 //------------------------------------------------------------------------------
 {
-  m_cutFunction = P ;
+  CutFunction = P ;
 }
 
 //------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void vtkMAFMeshCutter::SetCutFunction(vtkPlane *P)
 vtkPlane* vtkMAFMeshCutter::GetCutFunction()
 //------------------------------------------------------------------------------
 {
-  return m_cutFunction ;
+  return CutFunction ;
 }
 
 //------------------------------------------------------------------------------
@@ -321,7 +321,7 @@ int vtkMAFMeshCutter::GetIntersectionOfEdgeWithPlane(const Edge& edge, double *c
   UnstructGrid->GetPoint(edge.id0, p0) ;
   UnstructGrid->GetPoint(edge.id1, p1) ;
 
-  return GetIntersectionOfLineWithPlane(p0, p1, m_cutFunction->GetOrigin(), m_cutFunction->GetNormal(), coords, lambda) ;
+  return GetIntersectionOfLineWithPlane(p0, p1, CutFunction->GetOrigin(), CutFunction->GetNormal(), coords, lambda) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -704,7 +704,7 @@ bool vtkMAFMeshCutter::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList *po
   // find the normal and compare it with the normal of the cutting plane
   double normply[3], normpln[3] ;
   CalculatePolygonNormal(polygon, normply) ;
-  m_cutFunction->GetNormal(normpln) ;
+  CutFunction->GetNormal(normpln) ;
   double dotprod = normply[0]*normpln[0] + normply[1]*normpln[1] + normply[2]*normpln[2] ;
 
   if (dotprod < 0.0){
@@ -920,8 +920,8 @@ void vtkMAFMeshCutter::PrintSelf(ostream& os, vtkIndent indent)
 
   // print cutting plane
   os << indent << "cutting plane..." << std::endl ;
-  double *po = m_cutFunction->GetOrigin() ;
-  double *pn = m_cutFunction->GetNormal() ;
+  double *po = CutFunction->GetOrigin() ;
+  double *pn = CutFunction->GetNormal() ;
   os << indent << "origin: " << po[0] << " " << po[1] << " " << po[2] << std::endl ;
   os << indent << "normal: " << pn[0] << " " << pn[1] << " " << pn[2] << std::endl ;
   os << indent << std::endl ;

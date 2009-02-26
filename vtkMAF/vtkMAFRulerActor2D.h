@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:37:57 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-02-26 11:33:37 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -76,7 +76,7 @@ class VTK_vtkMAF_EXPORT vtkMAFRulerActor2D : public vtkActor2D
 	{
 		for(int i=0; i<3;i++)
 		{
-			m_Text[i] = labels[i];
+			Text[i] = labels[i];
 		}  
 	}
 protected:
@@ -102,20 +102,20 @@ protected:
   vtkTextActor     *Labx[NUM_LAB];
   vtkTextActor     *Laby[NUM_LAB];
 
-  int rwWidth;
-  int rwHeight;
-  int shortTickLen;
-  int midTickLen;
-  int longTickLen;
+  int RwWidth;
+  int RwHeight;
+  int ShortTickLen;
+  int MidTickLen;
+  int LongTickLen;
   double DesiredTickSpacing;
 
-  int xOffSet;
-  int yOffSet;
+  int XOffSet;
+  int YOffSet;
 
-  int margin;
-  int ntick;
-  int x_index;
-  int y_index;
+  int Margin;
+  int Ntick;
+  int Xindex;
+  int Yindex;
   
   bool   GlobalAxes;
   bool   ScaleLabelVisibility;
@@ -125,7 +125,7 @@ protected:
   bool   InverseTicks;
   double ScaleFactor;
   char  *Legend;
-	const char *m_Text[3];
+	const char *Text[3];
 
   int    Position[3];
   double PositionDisplay[3];
