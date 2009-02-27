@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputPolyline.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-02-27 12:55:31 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,6 +54,12 @@ public:
 
 	/** Calculate Length of polyline*/
 	double CalculateLength();
+
+  /** Return the Length*/
+  mafString GetLengthSTR(){return m_Length;};
+
+  /** Return the Number Of Points*/
+  mafString GetNumberOfPointsSTR(){return m_NumberOfPoints;};
 
 protected:
   mmaMaterial *m_Material; ///< material object used to store shading propertied to render the polyline
