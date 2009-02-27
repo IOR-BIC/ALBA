@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2008-12-22 12:40:01 $
-Version:   $Revision: 1.12.2.1 $
+Date:      $Date: 2009-02-27 08:59:27 $
+Version:   $Revision: 1.12.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -104,6 +104,8 @@ public:
 
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  void SetDicomDirectory(const char *directory){m_DicomDirectory = directory;}
+
 protected:
 
 	/** Create the pipeline to read the images. */
@@ -165,6 +167,8 @@ protected:
   
   /** Performe Undo crop of dicom data */
   void UndoCrop();
+
+  void Destroy();
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkDicomUnPacker	*m_DicomReader;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-25 16:43:34 $
-Version:   $Revision: 1.21.2.5 $
+Date:      $Date: 2009-02-27 08:59:27 $
+Version:   $Revision: 1.21.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -167,6 +167,7 @@ mafOp(label)
 
 	m_FilesList = NULL;
 
+  m_DicomDirectory = "";
 	m_DicomTypeRead = -1;
 	m_DicomModality = 0;
 	m_BuildStepValue = 0;
@@ -253,25 +254,37 @@ void medOpImporterDicom::OpRun()
 	m_Wizard->SetFirstPage(m_LoadPage);
 
   //wxSplitPath(m_MafStringVar->GetCStr(), &path, &name, &ext);
-
+  
   bool result = false;
   do 
   {
-	  wxString path;
-	  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
-	  dialog.SetReturnCode(wxID_OK);
-	  int ret_code = dialog.ShowModal();
-	  if (ret_code == wxID_OK)
-	  {
-	    path = dialog.GetPath();
-	    m_DicomDirectory = path.c_str();
-	    GuiUpdate();
-	    result = OpenDir();
-	  }
+    if(m_DicomDirectory.Equals(""))
+    {
+	    wxString path;
+	    wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
+	    dialog.SetReturnCode(wxID_OK);
+	    int ret_code = dialog.ShowModal();
+	    if (ret_code == wxID_OK)
+	    {
+	      path = dialog.GetPath();
+	      m_DicomDirectory = path.c_str();
+	      GuiUpdate();
+	      result = OpenDir();
+	    }
+      else
+      {
+        OpStop(OP_RUN_CANCEL);
+        return;
+      }
+    }
     else
     {
-      OpStop(OP_RUN_CANCEL);
-      return;
+      GuiUpdate();
+      result = OpenDir();
+      if(result == false)
+      {
+        m_DicomDirectory = "";
+      }
     }
   } while(!result);
 
@@ -292,54 +305,75 @@ void medOpImporterDicom::OpDo()
 //----------------------------------------------------------------------------
 {
 	if(m_Image != NULL)
+  {
 		mafEventMacro(mafEvent(this,VME_ADD,m_Image));
+  }
 	if(m_Volume != NULL)
+  {
 		mafEventMacro(mafEvent(this,VME_ADD,m_Volume));
+  }
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::OpStop(int result)
 //----------------------------------------------------------------------------
 {
-	if(m_DicomInteractor)
-		m_Mouse->RemoveObserver(m_DicomInteractor);
-
-	//close dialog
-	for (int i=0; i < m_NumberOfStudy;i++)
-	{
-		((medListDicomFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(TRUE);
-		((medListDicomFiles *)m_StudyListbox->GetClientData(i))->Clear();
-	}
-
-  if(m_LoadPage)
-	  m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);  
-
-  if(m_CropPage)
-	  //m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-	  m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);   
-
-  if(m_BuildPage)
-	  m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
-
-	vtkDEL(m_SliceTexture);
-	vtkDEL(m_DirectoryReader);
-	vtkDEL(m_DicomReader);
-	vtkDEL(m_SliceLookupTable);
-	vtkDEL(m_SlicePlane);
-	vtkDEL(m_SliceMapper);
-	vtkDEL(m_SliceActor);
-	vtkDEL(m_CropPlane);
-	vtkDEL(m_CropActor);
-
-	mafDEL(m_TagArray);
-	mafDEL(m_DicomInteractor);
-
-	cppDEL(m_LoadPage);
-	cppDEL(m_CropPage);
-	cppDEL(m_BuildPage);
-
-	cppDEL(m_FilesList);
+  if(result == OP_RUN_OK)
+  {
+    if(m_Image != NULL)
+    {
+      m_Output = m_Image;
+    }
+    if(m_Volume != NULL)
+    {
+      m_Output = m_Volume;
+    }
+  }
+  Destroy();
 
 	mafEventMacro(mafEvent(this,result));
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicom::Destroy()
+//----------------------------------------------------------------------------
+{
+  if(m_DicomInteractor)
+    m_Mouse->RemoveObserver(m_DicomInteractor);
+
+  //close dialog
+  for (int i=0; i < m_NumberOfStudy;i++)
+  {
+    ((medListDicomFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(TRUE);
+    ((medListDicomFiles *)m_StudyListbox->GetClientData(i))->Clear();
+  }
+
+  if(m_LoadPage)
+    m_LoadPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);  
+
+  if(m_CropPage)
+    //m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
+    m_CropPage->GetRWI()->m_RenFront->RemoveActor(m_CropActor);   
+
+  if(m_BuildPage)
+    m_BuildPage->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);
+
+  vtkDEL(m_SliceTexture);
+  vtkDEL(m_DirectoryReader);
+  vtkDEL(m_DicomReader);
+  vtkDEL(m_SliceLookupTable);
+  vtkDEL(m_SlicePlane);
+  vtkDEL(m_SliceMapper);
+  vtkDEL(m_SliceActor);
+  vtkDEL(m_CropPlane);
+  vtkDEL(m_CropActor);
+
+  mafDEL(m_TagArray);
+  mafDEL(m_DicomInteractor);
+
+  cppDEL(m_LoadPage);
+  cppDEL(m_CropPage);
+  cppDEL(m_BuildPage);
+
+  cppDEL(m_FilesList);
 }
 //----------------------------------------------------------------------------
 int medOpImporterDicom::BuildVolume()
@@ -780,7 +814,7 @@ void medOpImporterDicom::GuiUpdate()
 void medOpImporterDicom::CreateGui()
 //----------------------------------------------------------------------------
 {
-	m_Gui = new mafGUI(this);
+	
 }
 //----------------------------------------------------------------------------
 bool medOpImporterDicom::OpenDir()
