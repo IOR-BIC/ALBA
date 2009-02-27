@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-02-27 15:32:04 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,6 +65,9 @@ public:
     ID_LAST
   };
   */
+
+  /** Retrive number of trinagles (polys) of the polydata*/
+  const char *GetNumberOfTriangles(){return m_NumTriangles;}
 
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
