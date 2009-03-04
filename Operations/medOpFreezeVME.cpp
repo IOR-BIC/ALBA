@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpFreezeVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-07 22:45:02 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2009-03-04 13:35:36 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -93,7 +93,10 @@ void medOpFreezeVME::OpRun()
 //----------------------------------------------------------------------------
 {
   if(!m_TestMode)
+  {
     m_Gui = new mafGUI(this);
+    ShowGui();
+  }
 
 	//control the output and create the right vme
 	mafVME *vme = mafVME::SafeDownCast(m_Input);
