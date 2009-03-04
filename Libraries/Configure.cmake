@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2006-12-13 09:17:48 $
-# Version:   $Revision: 1.2 $
+# Date:      $Date: 2009-03-04 15:17:50 $
+# Version:   $Revision: 1.2.2.1 $
 #
 # Description:
 # Project file for configuring the the Multimod Fundation Layer.
@@ -14,6 +14,7 @@ SET (DEBUG FALSE)
 
 # options for configuring MedFL libraries
 OPTION(MED_USE_Offis "Find and Link the Offis library." ON)
+OPTION(MED_USE_Grassroots "Find and Link the Grassroots library." ON)
 
 #
 # configure CMake modules for MedFL
@@ -26,6 +27,13 @@ MedFL_SUBPROJECT (MedFL_MODULES modules)
 IF (MED_USE_Offis)
   MedFL_SUBPROJECT(Offis Offis)
 ENDIF(MED_USE_Offis)
+
+#
+# Grassroots Library
+#
+IF (MED_USE_Grassroots)
+  MedFL_SUBPROJECT(Grassroots Grassroots)
+ENDIF(MED_USE_Grassroots)
 
 # Create module files in build directory
 IF (NOT CONFIGURE_ERROR)

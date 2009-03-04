@@ -1,0 +1,23 @@
+#Include utility macro for debug messages printing
+#INCLUDE (@MAF_SOURCE_DIR@/modules/DebugMacro.cmake)
+
+#Set DEBUG variable to TRUE or FALSE according printing debug messages intention or use the value
+#in file ${MAF_SOURCE_DIR}/modules/DebugMacro.cmake
+#SET (DEBUG TRUE)
+
+#MY_BUILD_TYPE result from the substituttion of "" to ".\" in the variable MY_BUILD_PATH that indicate the build_type (es. Debug, Release. ...)
+STRING(REGEX REPLACE "^.\\\\" ""  MY_BUILD_TYPE ${MY_BUILD_PATH})
+
+#substitute "Release" with the actual build type and ";" with space
+STRING (REGEX REPLACE ";" " "  MYCOMMAND "@Grassroots_MAKECOMMAND@")
+STRING (REGEX REPLACE "Release"  ${MY_BUILD_TYPE} CURRENT_MAKECOMMAND ${MYCOMMAND})
+
+#DBG_MESSAGE("build.cmake: MY_BUILD_PATH--> ${MY_BUILD_PATH}" ${DEBUG})
+#DBG_MESSAGE("build.cmake: MY_BUILD_TYPE--> ${MY_BUILD_TYPE}" ${DEBUG})
+#DBG_MESSAGE("build.cmake: Grassroots_MAKECOMMAND-->@Grassroots_MAKECOMMAND@" ${DEBUG})
+#DBG_MESSAGE("build.cmake: MYCOMMAND--> ${MYCOMMAND}" ${DEBUG})
+#DBG_MESSAGE("build.cmake: CURRENT_MAKECOMMAND--> ${CURRENT_MAKECOMMAND}" ${DEBUG})
+
+EXEC_PROGRAM(${CURRENT_MAKECOMMAND} @Grassroots_BINARY_PATH@)
+
+
