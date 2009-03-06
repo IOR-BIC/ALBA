@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: CMakeLists.txt,v $
 # Language:  CMake 2.0
-# Date:      $Date: 2008-12-16 15:00:19 $
-# Version:   $Revision: 1.44.2.2 $
+# Date:      $Date: 2009-03-06 12:38:11 $
+# Version:   $Revision: 1.44.2.3 $
 #
 # Description:
 # CMake Project file for the MAF.
@@ -181,6 +181,10 @@ ENDIF(WIN32)
   #### Include directory for binary distribution of MAF
   SET(MAF_INSTALL_INCLUDE_DIRS ${MAF_BINARY_DIR}/Include)
   FILE(MAKE_DIRECTORY ${MAF_INSTALL_INCLUDE_DIRS})
+  FILE(GLOB files_to_remove "${MAF_INSTALL_INCLUDE_DIRS}/*.*")
+  FOREACH(f ${files_to_remove})
+    FILE(REMOVE "${f}")
+  ENDFOREACH(f ${files_to_remove})
   
   FOREACH(dirs ${INCLUDE_DIRS})
     FILE(GLOB include_file_list "${dirs}/*.h")
