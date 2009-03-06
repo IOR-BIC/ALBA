@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2009-02-27 08:59:27 $
-Version:   $Revision: 1.12.2.2 $
+Date:      $Date: 2009-03-06 09:47:14 $
+Version:   $Revision: 1.12.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -104,7 +104,14 @@ public:
 
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Assign the dicom directory*/
   void SetDicomDirectory(const char *directory){m_DicomDirectory = directory;}
+
+  /** Set if output must be in imagedata(resampled) or original rectilinear grid*/
+  void SetResampleFlag(int enable){m_ResampleFlag = enable;}
+
+  /** Retrieve resample flag*/
+  int GetResampleFlag(){return m_ResampleFlag;};
 
 protected:
 
@@ -168,7 +175,11 @@ protected:
   /** Performe Undo crop of dicom data */
   void UndoCrop();
 
+  /** Delete all istances of used objects*/
   void Destroy();
+
+  /** function that resample volume with rectilinear grid output*/
+  void ResampleVolume();
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkDicomUnPacker	*m_DicomReader;
@@ -238,6 +249,8 @@ protected:
 	bool	m_BoxCorrect;
 	bool	m_CropFlag;
 	bool	m_CroppedExetuted; //<<<To check if a crop as been executed
+
+  int m_ResampleFlag;
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;

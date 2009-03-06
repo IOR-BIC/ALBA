@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-27 08:59:27 $
-Version:   $Revision: 1.21.2.6 $
+Date:      $Date: 2009-03-06 09:47:14 $
+Version:   $Revision: 1.21.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -64,7 +64,13 @@ MafMedical is partially based on OpenMAF.
 #include "medGUIDicomSettings.h"
 #include "mafGUIButton.h"
 #include "medGUISettingsAdvanced.h"
+#include "mafVMEItemVTK.h"
+#include "mafDataVector.h"
+#include "mafTransform.h"
+#include "mafTransformFrame.h"
+#include "mafSmartPointer.h"
 
+#include "vtkMAFVolumeResample.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkDicomUnPacker.h"
 #include "vtkDirectory.h"
@@ -82,6 +88,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkRenderer.h"
 #include "vtkMAFRGSliceAccumulate.h"
 #include "vtkTransform.h"
+#include "vtkImageData.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicom);
@@ -201,6 +209,7 @@ mafOp(label)
   m_CurrentSlice = VTK_INT_MAX;
 
   //m_SettingPanel = new medGUIDicomSettings(this);
+  m_ResampleFlag = FALSE;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicom::~medOpImporterDicom()
@@ -220,7 +229,10 @@ medOpImporterDicom::~medOpImporterDicom()
 mafOp *medOpImporterDicom::Copy()
 //----------------------------------------------------------------------------
 {
-	return new medOpImporterDicom(m_Label);
+  medOpImporterDicom *importer = new medOpImporterDicom(m_Label);
+  importer->m_ResampleFlag = m_ResampleFlag;
+  importer->m_DicomDirectory = m_DicomDirectory;
+	return importer;
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicom::OpRun()
@@ -523,6 +535,12 @@ int medOpImporterDicom::BuildVolume()
 
     m_Volume->SetDataByDetaching(rg_out,0);
 
+    if(m_ResampleFlag == TRUE)
+    {
+      ResampleVolume();
+    }
+    
+
 		mafTagItem tag_Nature;
 		tag_Nature.SetName("VME_NATURE");
 		tag_Nature.SetValue("NATURAL");
@@ -658,6 +676,11 @@ int medOpImporterDicom::BuildVolumeCineMRI()
     rg_out->Modified();
 
 		m_Volume->SetDataByDetaching(rg_out,tsDouble);
+
+    if(m_ResampleFlag == TRUE)
+    {
+      ResampleVolume();
+    }
 	}
 
 	// update m_tag_array ivar
@@ -1938,6 +1961,163 @@ void medOpImporterDicom::ImportDicomTags()
 			}
 		}
 	}
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicom::ResampleVolume()
+//----------------------------------------------------------------------------
+{
+  double m_VolumePosition[3],m_VolumeOrientation[3], m_VolumeSpacing[3];
+  m_VolumeSpacing[0] = m_VolumeSpacing[1] = m_VolumeSpacing[2] = VTK_DOUBLE_MAX;
+
+  m_VolumePosition[0]    = m_VolumePosition[1]    = m_VolumePosition[2]    = 0;
+  m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
+
+  mafVMEVolumeGray *vrg;
+  mafNEW(vrg);
+
+  mafSmartPointer<mafTransform> box_pose;
+  box_pose->SetOrientation(m_VolumeOrientation);
+  box_pose->SetPosition(m_VolumePosition);
+  //box_pose->SetPosition(m_VolumePosition);
+
+  mafSmartPointer<mafTransformFrame> local_pose;
+  local_pose->SetInput(box_pose);
+
+  mafSmartPointer<mafTransformFrame> output_to_input;
+
+  // In a future version if not a "Natural" data the filter should operate in place.
+  mafString new_vme_name = "resampled_";
+  new_vme_name += m_Input->GetName();
+
+  vrg->SetMatrix(box_pose->GetMatrix());
+
+  double volumeBounds[6];
+  vtkRectilinearGrid *rgrid;
+  rgrid = vtkRectilinearGrid::SafeDownCast(m_Volume->GetVolumeOutput()->GetVTKData());
+  rgrid->Update();
+  rgrid->GetBounds(volumeBounds);
+
+  for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
+  {
+    double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
+    if (m_VolumeSpacing[0] > spcx)
+      m_VolumeSpacing[0] = spcx;
+  }
+
+  for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
+  {
+    double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
+    if (m_VolumeSpacing[1] > spcy)
+      m_VolumeSpacing[1] = spcy;
+  }
+
+  for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
+  {
+    double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
+    if (m_VolumeSpacing[2] > spcz)
+      m_VolumeSpacing[2] = spcz;
+  }
+
+  int output_extent[6];
+  output_extent[0] = 0;
+  output_extent[1] = (volumeBounds[1] - volumeBounds[0]) / m_VolumeSpacing[0];
+  output_extent[2] = 0;
+  output_extent[3] = (volumeBounds[3] - volumeBounds[2]) / m_VolumeSpacing[1];
+  output_extent[4] = 0;
+  output_extent[5] = (volumeBounds[5] - volumeBounds[4]) / m_VolumeSpacing[2];
+
+  double w,l,sr[2];
+  for (int i = 0; i < m_Volume->GetDataVector()->GetNumberOfItems(); i++)
+  {
+    if (mafVMEItemVTK *input_item = mafVMEItemVTK::SafeDownCast(m_Volume->GetDataVector()->GetItemByIndex(i)))
+    {
+      if (vtkDataSet *input_data = input_item->GetData())
+      {
+        // the resample filter
+        vtkMAFSmartPointer<vtkMAFVolumeResample> resampler;
+        double m_ZeroPadValue = 0.;
+        resampler->SetZeroValue(m_ZeroPadValue);
+
+        // Set the target be vme's parent frame. And Input frame to the root. I've to 
+        // set at each iteration since I'm using the SetMatrix, which doesn't support
+        // transform pipelines.
+        mafSmartPointer<mafMatrix> output_parent_abs_pose;
+        mafVME::SafeDownCast(m_Input)->GetOutput()->GetAbsMatrix(*output_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        local_pose->SetInputFrame(output_parent_abs_pose);
+
+        mafSmartPointer<mafMatrix> input_parent_abs_pose;
+        ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        local_pose->SetTargetFrame(input_parent_abs_pose);
+        local_pose->Update();
+
+        mafSmartPointer<mafMatrix> output_abs_pose;
+        m_Volume->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        output_to_input->SetInputFrame(output_abs_pose);
+
+        mafSmartPointer<mafMatrix> input_abs_pose;
+        ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        output_to_input->SetTargetFrame(input_abs_pose);
+        output_to_input->Update();
+
+        double orient_input[3],orient_target[3];
+        mafTransform::GetOrientation(*output_abs_pose.GetPointer(),orient_target);
+        mafTransform::GetOrientation(*input_abs_pose.GetPointer(),orient_input);
+
+        double origin[3];
+        origin[0] = volumeBounds[0];
+        origin[1] = volumeBounds[2];
+        origin[2] = volumeBounds[4];
+
+        output_to_input->TransformPoint(origin,origin);
+
+        resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
+
+        vtkMatrix4x4 *mat = output_to_input->GetMatrix().GetVTKMatrix();
+
+        double local_orient[3],local_position[3];
+        mafTransform::GetOrientation(output_to_input->GetMatrix(),local_orient);
+        mafTransform::GetPosition(output_to_input->GetMatrix(),local_position);
+
+        // extract versors
+        double x_axis[3],y_axis[3];
+
+        mafMatrix::GetVersor(0,mat,x_axis);
+        mafMatrix::GetVersor(1,mat,y_axis);
+
+        resampler->SetVolumeAxisX(x_axis);
+        resampler->SetVolumeAxisY(y_axis);
+
+        vtkMAFSmartPointer<vtkStructuredPoints> output_data;
+        output_data->SetSpacing(m_VolumeSpacing);
+        // TODO: here I probably should allow a data type casting... i.e. a GUI widget
+        output_data->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
+        output_data->SetExtent(output_extent);
+        output_data->SetUpdateExtent(output_extent);
+
+        input_data->GetScalarRange(sr);
+
+        w = sr[1] - sr[0];
+        l = (sr[1] + sr[0]) * 0.5;
+
+        resampler->SetWindow(w);
+        resampler->SetLevel(l);
+        resampler->SetInput(input_data);
+        resampler->SetOutput(output_data);
+        resampler->AutoSpacingOff();
+        resampler->Update();
+
+        output_data->SetSource(NULL);
+        output_data->SetOrigin(volumeBounds[0],volumeBounds[2],volumeBounds[4]);
+
+        vrg->SetDataByDetaching(output_data, input_item->GetTimeStamp());
+        vrg->Update();
+      }
+    }
+  }
+  m_Volume->DeepCopy(vrg);
+  m_Volume->Update();
+
+  mafDEL(vrg);
 }
 //----------------------------------------------------------------------------
 int compareX(const medImporterDICOMListElement **arg1,const medImporterDICOMListElement **arg2)
