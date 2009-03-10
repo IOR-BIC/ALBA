@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: UseMedFL.cmake.in,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2006-12-13 09:17:48 $
-# Version:   $Revision: 1.2 $
+# Date:      $Date: 2009-03-10 08:29:15 $
+# Version:   $Revision: 1.2.2.1 $
 #
 # Description:
 # This module add the MFL include paths to a project
@@ -12,6 +12,8 @@
 #
 
 SET(MED_USE_Offis @MED_USE_Offis@)
+SET(MED_USE_GDCM @MED_USE_GDCM@)
+
 
 #
 # Offis library
@@ -24,3 +26,15 @@ IF (MED_USE_Offis)
     INCLUDE (${Offis_USE_FILE}) # currently only local library is supported
   ENDIF (Offis_USE_FILE)
 ENDIF (MED_USE_Offis)
+
+#
+# GDCM library
+#
+IF (MED_USE_GDCM)
+  SET (GDCM_POSSIBLE_ROOT_PATHS @MedFL_BINARY_DIR@/GDCM/Build @MedFL_SOURCE_DIR@/GDCM/Sources)
+  FIND_FILE(GDCM_USE_FILE UseGDCM.cmake ${GDCM_POSSIBLE_ROOT_PATHS})
+  FIND_PATH(GDCM_BINARY_PATH UseGDCM.cmake ${GDCM_POSSIBLE_ROOT_PATHS})
+  IF (GDCM_USE_FILE)
+    INCLUDE (${GDCM_USE_FILE}) # currently only local library is supported
+  ENDIF (GDCM_USE_FILE)
+ENDIF (MED_USE_GDCM)
