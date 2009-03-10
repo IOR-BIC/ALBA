@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:51 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-03-10 15:16:26 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -128,6 +128,12 @@ void mafOpRemoveCells::OpRun()
   m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
   int result = OP_RUN_CANCEL;
+  // default size for the brush (depends on the input dimensions)
+  double bounds[6]= {0.,0.,0.,0.,0.,0.};
+  ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetBounds(bounds);
+   // bounds x0 x1 y0 y1 z0 z1
+   m_Diameter = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0])+(bounds[3]-bounds[2])*(bounds[3]-bounds[2])+(bounds[5]-bounds[4])*(bounds[5]-bounds[4]))/10.0;
+
 
   CreateSurfacePipeline();
   CreateHelperStructures();
@@ -236,8 +242,8 @@ void mafOpRemoveCells::CreateOpDialog()
 
 	
   b_clip->SetValidator(mafGUIValidator(this,ID_AUTOCLIP,b_clip,(int*)&m_AutoClip));
-
-  diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
+  // AACC: 10-03-2009 please add more decimal digits...
+  diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize, 4));
   unselect->SetValidator(mafGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
   unselectAllButton->SetValidator(mafGUIValidator(this,ID_UNSELECT,unselectAllButton));
