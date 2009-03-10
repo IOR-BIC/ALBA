@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-10 14:07:14 $
-Version:   $Revision: 1.3.2.3 $
+Date:      $Date: 2009-03-10 14:37:55 $
+Version:   $Revision: 1.3.2.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -170,10 +170,10 @@ void medOpSmoothSurfaceCells::OpRun()
  
 	int result = OP_RUN_CANCEL;
      // default size for the brush (depends on the input dimensions)
-  double bounds[6]= {0.,0.,0.,0.,0.,0.};
-  ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetBounds(bounds);
-  m_Diameter = vtkMath::Distance2BetweenPoints(bounds, bounds + 3)/ 2.0;
-
+   double bounds[6]= {0.,0.,0.,0.,0.,0.};
+   ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetBounds(bounds);
+   // bounds x0 x1 y0 y1 z0 z1
+   m_Diameter = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0])+(bounds[3]-bounds[2])*(bounds[3]-bounds[2])+(bounds[5]-bounds[4])*(bounds[5]-bounds[4]))/10.0;
 	CreateSurfacePipeline();
 	
 	InitializeMesh();
