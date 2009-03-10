@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-08 11:24:24 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2009-03-10 14:07:14 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -167,8 +167,12 @@ void medOpSmoothSurfaceCells::OpRun()
 
 	vtkNEW(m_OriginalPolydata);
 	m_OriginalPolydata->DeepCopy((vtkPolyData*)((mafVME *)m_Input)->GetOutput()->GetVTKData());
-
+ 
 	int result = OP_RUN_CANCEL;
+     // default size for the brush (depends on the input dimensions)
+  double bounds[6]= {0.,0.,0.,0.,0.,0.};
+  ((mafVME *)m_Input)->GetOutput()->GetVTKData()->GetBounds(bounds);
+  m_Diameter = vtkMath::Distance2BetweenPoints(bounds, bounds + 3)/ 2.0;
 
 	CreateSurfacePipeline();
 	
@@ -294,8 +298,8 @@ void medOpSmoothSurfaceCells::CreateOpDialog()
 	mafGUIButton  *ok =     new mafGUIButton(m_Dialog, ID_OK,     "ok", p, wxSize(80,20));
 	mafGUIButton  *cancel = new mafGUIButton(m_Dialog, ID_CANCEL, "cancel", p, wxSize(80,20));
 
-  
-	diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize));
+     // AACC: 10-03-2009 please add more decimal digits...
+    diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,m_MinBrushSize,m_MaxBrushMSize, 4));
 	unselect->SetValidator(mafGUIValidator(this, ID_DELETE, unselect, &m_UnselectCells));
 
   //smoothIterations->SetValidator(mafGUIValidator(this,ID_ITERATIONS,smoothIterations,&m_SmoothParameterNumberOfInteractions,0));
