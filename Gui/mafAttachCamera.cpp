@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAttachCamera.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.20 $
+  Date:      $Date: 2009-03-10 14:55:25 $
+  Version:   $Revision: 1.20.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,18 +37,23 @@
 mafAttachCamera::mafAttachCamera(wxWindow* parent, mafRWI *rwi, mafObserver *Listener)
 //----------------------------------------------------------------------------
 {
-	m_Rwi = rwi;
+  m_Gui = NULL;
+
+  m_RenderWindow = rwi;
 	
 	m_Listener		= Listener;
 	m_ParentPanel = parent;
 
-  m_CameraAttach = 0;
+  m_EnableAttachCamera = 0;
   
   m_AttachedVme       = NULL;
   m_AttachedVmeMatrix = NULL;
   vtkNEW(m_StartingMatrix);
 
-	CreateGui();
+  if (parent)
+  {
+    CreateGui();
+  }
 }
 //----------------------------------------------------------------------------
 mafAttachCamera::~mafAttachCamera() 
@@ -78,7 +83,7 @@ void mafAttachCamera::CreateGui()
 {
 	m_Gui = new mafGUI(this);
 	m_Gui->Show(true);
-  m_Gui->Bool(ID_CAMERA_ATTACH,"attach",&m_CameraAttach,0,"Attach the camera to selected vme");
+  m_Gui->Bool(ID_CAMERA_ATTACH,"attach",&m_EnableAttachCamera,0,"Attach the camera to selected vme");
 	m_Gui->Divider();
 	m_Gui->Update();
 }
@@ -91,12 +96,12 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_CAMERA_ATTACH:
-        if(m_CameraAttach)
+        if(m_EnableAttachCamera)
         {
-          mafVME *sel_vme = mafVME::SafeDownCast(m_Rwi->m_Sg->GetSelectedVme());
+          mafVME *sel_vme = mafVME::SafeDownCast(m_RenderWindow->m_Sg->GetSelectedVme());
           if(sel_vme == NULL) 
           {
-            m_CameraAttach = 0;
+            m_EnableAttachCamera = 0;
             m_Gui->Update();
             return;
           }
@@ -117,7 +122,7 @@ void mafAttachCamera::OnEvent(mafEventBase *maf_event)
       case NODE_DETACHED_FROM_TREE:
       case NODE_DESTROYED:
         // the VME observed will be removed on the destructor.
-        m_CameraAttach = 0;
+        m_EnableAttachCamera = 0;
         m_Gui->Update();
       break;
       case VME_TIME_SET:
@@ -138,7 +143,7 @@ void mafAttachCamera::SetVme(mafNode *node)
     }
     vtkDEL(m_AttachedVmeMatrix);
     m_AttachedVme = NULL;
-    m_CameraAttach = 0;
+    m_EnableAttachCamera = 0;
     if (m_Gui != NULL)
     {
       m_Gui->Update();
@@ -160,9 +165,12 @@ void mafAttachCamera::SetVme(mafNode *node)
   delta->PreMultiply();
   delta->Concatenate(m_StartingMatrix);
 
-  m_Rwi->m_Camera->ApplyTransform(delta);
+  if (m_RenderWindow)
+  {
+    m_RenderWindow->m_Camera->ApplyTransform(delta);
+    m_RenderWindow->CameraUpdate();
+  }
 
-  m_Rwi->CameraUpdate();
   m_AttachedVme->GetEventSource()->AddObserver(this);
 }
 //----------------------------------------------------------------------------
@@ -176,7 +184,7 @@ void mafAttachCamera::SetStartingMatrix(mafMatrix *matrix)
 void mafAttachCamera::UpdateCameraMatrix()
 //----------------------------------------------------------------------------
 {
-  if (m_CameraAttach == 0)
+  if (m_EnableAttachCamera == 0)
   {
     return;
   }
@@ -192,7 +200,75 @@ void mafAttachCamera::UpdateCameraMatrix()
     delta->Concatenate(new_matrix);
     delta->Concatenate(m_AttachedVmeMatrix);
 
-    m_Rwi->m_Camera->ApplyTransform(delta);
+    m_RenderWindow->m_Camera->ApplyTransform(delta);
     m_AttachedVmeMatrix->DeepCopy(new_matrix);
   }
+}
+
+void mafAttachCamera::PrintSelf( ostream& os)
+{
+  os << "-------------------------------------------------------" << std::endl;
+  os << "mafAttachCamera " << this << " PrintSelf:" << std::endl;
+  
+  os << "Camera attach enabled flag m_EnableAttachCamera: " << m_EnableAttachCamera << std::endl;
+  os << "Vme to follow with camera m_AttachedVme: " << (m_AttachedVme ? m_AttachedVme->GetName() : "NULL") << std::endl; 
+  os << "m_AttachedVmeMatrix: " << m_AttachedVmeMatrix << std::endl;
+  if (m_AttachedVmeMatrix)
+  {
+    m_AttachedVmeMatrix->PrintSelf(os, NULL);
+  }
+
+
+  os << "m_StartingMatrix: " << m_StartingMatrix << std::endl;
+  
+  if (m_StartingMatrix)
+  {
+    m_StartingMatrix->PrintSelf(os,NULL);
+  }
+
+  os << "m_Listener: " << m_Listener << std::endl;
+  os << "m_Gui: " << m_Gui << std::endl;
+  os << "m_RenderWindow: " << m_RenderWindow << std::endl;
+  os << "m_ParentPanel: " << m_ParentPanel << std::endl;
+  os << "-------------------------------------------------------" << std::endl;
+}
+
+mafMatrix mafAttachCamera::GetStartingMatrix()
+{
+  return mafMatrix(m_StartingMatrix);
+}
+
+void mafAttachCamera::SetListener( mafObserver *Listener )
+{
+  m_Listener = Listener;
+}
+
+mafObserver * mafAttachCamera::GetListener()
+{
+  return m_Listener;
+}
+
+void mafAttachCamera::EnableAttachCamera()
+{
+  m_EnableAttachCamera = TRUE;
+}
+
+void mafAttachCamera::DisableAttachCamera()
+{
+  m_EnableAttachCamera = FALSE;
+}
+
+int mafAttachCamera::GetEnableAttachCamera()
+{
+  return m_EnableAttachCamera;
+}
+
+void mafAttachCamera::SetEnableAttachCamera( int enable )
+{
+  m_EnableAttachCamera = enable;
+}
+
+mafNode * mafAttachCamera::GetVme()
+{
+  return m_AttachedVme;
 }
