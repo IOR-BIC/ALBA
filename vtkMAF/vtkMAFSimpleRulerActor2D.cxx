@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:37:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-03-11 11:40:06 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,21 +34,21 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.3 $");
+vtkCxxRevisionMacro(vtkMAFSimpleRulerActor2D, "$Revision: 1.3.2.1 $");
 vtkStandardNewMacro(vtkMAFSimpleRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
 //------------------------------------------------------------------------------
 {
-  margin   = 15; 
-  shortTickLen = 5;
-  longTickLen  = 10;
+  Margin   = 15; 
+  ShortTickLen = 5;
+  LongTickLen  = 10;
   DesiredTickSpacing = 15;
-  ntick    = 800; // enough for a tick spacing = 15 on a 1600x1200 screen
+  Ntick    = 800; // enough for a tick spacing = 15 on a 1600x1200 screen
   ScaleFactor = 1.0;
 
-	xOffSet = -2;
-	yOffSet =  4;
+	XOffSet = -2;
+	YOffSet =  4;
 
   ScaleLabelVisibility  = true;
   AxesLabelVisibility   = true;
@@ -66,8 +66,8 @@ vtkMAFSimpleRulerActor2D::vtkMAFSimpleRulerActor2D()
   Legend = NULL;
   Axis = Tick = ScaleLabel = NULL;
   Points = NULL;
-  x_index = 0;
-  y_index = 1;
+  XIndex = 0;
+  YIndex = 1;
 
 	RulerCreate();
 
@@ -109,8 +109,8 @@ int vtkMAFSimpleRulerActor2D::RenderOverlay(vtkViewport *viewport)
 {
   vtkRenderer *ren = static_cast<vtkRenderer *>(viewport);
   
-  rwWidth  = ren->GetRenderWindow()->GetSize()[0];
-  rwHeight = ren->GetRenderWindow()->GetSize()[1];
+  RwWidth  = ren->GetRenderWindow()->GetSize()[0];
+  RwHeight = ren->GetRenderWindow()->GetSize()[1];
 
   vtkCamera *cam = ren->GetActiveCamera();
   if(!cam->GetParallelProjection()) return 0;
@@ -153,13 +153,13 @@ bool vtkMAFSimpleRulerActor2D::CheckProjectionPlane(vtkCamera *cam)
   {
     if (abs(vtkMath::Dot(vu,y_axes)) > threshold)
     {
-      x_index = 2;
-      y_index = 1;
+      XIndex = 2;
+      YIndex = 1;
     }
     else if (abs(vtkMath::Dot(vu,z_axes)) > threshold)
     {
-      x_index = 1;
-      y_index = 2;
+      XIndex = 1;
+      YIndex = 2;
     }
     else
       return false;
@@ -168,13 +168,13 @@ bool vtkMAFSimpleRulerActor2D::CheckProjectionPlane(vtkCamera *cam)
   {
     if (abs(vtkMath::Dot(vu,x_axes)) > threshold)
     {
-      x_index = 2;
-      y_index = 0;
+      XIndex = 2;
+      YIndex = 0;
     }
     else if (abs(vtkMath::Dot(vu,z_axes)) > threshold)
     {
-      x_index = 0;
-      y_index = 2;
+      XIndex = 0;
+      YIndex = 2;
     }
     else
       return false;
@@ -183,13 +183,13 @@ bool vtkMAFSimpleRulerActor2D::CheckProjectionPlane(vtkCamera *cam)
   {
     if (abs(vtkMath::Dot(vu,y_axes)) > threshold)
     {
-      x_index = 0;
-      y_index = 1;
+      XIndex = 0;
+      YIndex = 1;
     }
     else if (abs(vtkMath::Dot(vu,x_axes)) > threshold)
     {
-      x_index = 1;
-      y_index = 0;
+      XIndex = 1;
+      YIndex = 0;
     }
     else
       return false;
@@ -204,16 +204,16 @@ void vtkMAFSimpleRulerActor2D::RulerCreate()
 //----------------------------------------------------------------------------
 {
 	Points = vtkPoints::New();
-	Points->SetNumberOfPoints(4*ntick);
+	Points->SetNumberOfPoints(4*Ntick);
   
   vtkCellArray  *tick_cell = vtkCellArray::New(); 
-  tick_cell->Allocate(tick_cell->EstimateSize(2*ntick,2));
+  tick_cell->Allocate(tick_cell->EstimateSize(2*Ntick,2));
 
-  double m0 = margin;
-  double m1 = margin - 2;
+  double m0 = Margin;
+  double m1 = Margin - 2;
 
   int i, id=0, cp[2];
-  for(i=0; i<ntick; i++)
+  for(i=0; i<Ntick; i++)
 	{
 			Points->SetPoint(id,     i, m0,	0);
       Points->SetPoint(id+1,   i, m1, 0);
@@ -251,9 +251,9 @@ void vtkMAFSimpleRulerActor2D::RulerCreate()
   // Axis ///////////////////
   vtkCellArray *axis_cell = vtkCellArray::New(); 
   axis_cell->Allocate(axis_cell->EstimateSize(2,2));
-  cp[0]=0, cp[1]=4*(ntick-1);
+  cp[0]=0, cp[1]=4*(Ntick-1);
   axis_cell->InsertNextCell(2,cp);    
-  cp[0]=2, cp[1]=4*(ntick-1)+2;
+  cp[0]=2, cp[1]=4*(Ntick-1)+2;
   axis_cell->InsertNextCell(2,cp);    
 
   vtkPolyData *axis_pd = vtkPolyData::New();
@@ -285,7 +285,7 @@ void vtkMAFSimpleRulerActor2D::RulerCreate()
   ScaleLabel->GetTextProperty()->SetFontFamilyToArial();
   ScaleLabel->GetTextProperty()->SetJustificationToLeft();
 	ScaleLabel->ScaledTextOff();
-	ScaleLabel->SetDisplayPosition(Position[0] + margin + 4, Position[1] + margin + 4);
+	ScaleLabel->SetDisplayPosition(Position[0] + Margin + 4, Position[1] + Margin + 4);
 	ScaleLabel->SetInput("");
 
   HorizontalAxesLabel = vtkTextActor::New();
@@ -499,14 +499,14 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
 		ren->WorldToDisplay();
 		ren->GetDisplayPoint(PositionDisplay);
 
-		Position[0] = PositionDisplay[0] - margin;
-		Position[1] = PositionDisplay[1] - margin;
+		Position[0] = PositionDisplay[0] - Margin;
+		Position[1] = PositionDisplay[1] - Margin;
 		Position[2] = PositionDisplay[2];
 	}
 
   double p[4],p0[4],p1[4];
 
-  ren->SetDisplayPoint(Position[0] + margin,Position[1] + margin,0);
+  ren->SetDisplayPoint(Position[0] + Margin,Position[1] + Margin,0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p);
 
@@ -514,7 +514,7 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   ren->DisplayToWorld();
   ren->GetWorldPoint(p0);
 
-  ren->SetDisplayPoint(Position[0] + rwWidth, Position[1] + rwHeight, 0);
+  ren->SetDisplayPoint(Position[0] + RwWidth, Position[1] + RwHeight, 0);
   ren->DisplayToWorld();
   ren->GetWorldPoint(p1);
 
@@ -529,12 +529,12 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   double w0X, w0Y, w1X, w1Y, wpX, wpY, vx[3], vy[3];
   if (GlobalAxes) 
   {
-    w0X =  p0[x_index];
-    w0Y =  p0[y_index];
-    w1X =  p1[x_index];
-    w1Y =  p1[y_index];
-    wpX =   p[x_index];
-    wpY =   p[y_index];
+    w0X =  p0[XIndex];
+    w0Y =  p0[YIndex];
+    w1X =  p1[XIndex];
+    w1Y =  p1[YIndex];
+    wpX =   p[XIndex];
+    wpY =   p[YIndex];
   }
   else
   {
@@ -550,7 +550,7 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     wpY = vtkMath::Dot(vy,p);
   }
 
-  double w2dX = rwWidth /(w1X-w0X), w2dY = rwHeight/(w1Y-w0Y);  // world to display
+  double w2dX = RwWidth /(w1X-w0X), w2dY = RwHeight/(w1Y-w0Y);  // world to display
   double d2wX = 1/w2dX,             d2wY = 1/w2dY;              // display to world along Y
   
   // determine tick spacing
@@ -569,18 +569,18 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   // find last tick pos
   double dx_max;
   double dy_max;
-  for(i=0; i<ntick; i++)
+  for(i=0; i<Ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
     double wy = worldFirstTickY + i * worldTickSpacingY;
     double dx = (wx - w0X ) * w2dX;  
     double dy = (wy - w0Y ) * w2dY;
-    if( dx < rwWidth  - margin ) dx_max = dx;
-    if( dy < rwHeight - margin ) dy_max = dy;
+    if( dx < RwWidth  - Margin ) dx_max = dx;
+    if( dy < RwHeight - Margin ) dy_max = dy;
   }
 
-  double axesOffsetX = (CenterAxes) ? rwWidth/2 -margin : ren->GetOrigin()[0];
-  double axesOffsetY = (CenterAxes) ? rwHeight/2 -margin : ren->GetOrigin()[1];
+  double axesOffsetX = (CenterAxes) ? RwWidth/2 -Margin : ren->GetOrigin()[0];
+  double axesOffsetY = (CenterAxes) ? RwHeight/2 -Margin : ren->GetOrigin()[1];
   
 
   double t0;              // tick begin
@@ -590,22 +590,22 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
 
   if(false == InverseTicks)
   {
-    t0  = margin;              // tick begin
-    ta  = margin-shortTickLen; // short tick end 
-    tc  = margin-longTickLen;  // long  tick end 
+    t0  = Margin;              // tick begin
+    ta  = Margin-ShortTickLen; // short tick end 
+    tc  = Margin-LongTickLen;  // long  tick end 
   }
   else
   {
-    t0  = margin-longTickLen;              // tick begin
-    ta  = margin-longTickLen+shortTickLen; // short tick end 
-    tc  = margin-longTickLen+longTickLen;  // long  tick end 
+    t0  = Margin-LongTickLen;              // tick begin
+    ta  = Margin-LongTickLen+ShortTickLen; // short tick end 
+    tc  = Margin-LongTickLen+LongTickLen;  // long  tick end 
   }
 
   
   int id=0;
 
   // Update Axis and Ticks Points
-  for(i=0; i<ntick; i++)
+  for(i=0; i<Ntick; i++)
   {
     double wx = worldFirstTickX + i * worldTickSpacingX;
     double wy = worldFirstTickY + i * worldTickSpacingY;
@@ -618,8 +618,8 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
     double dx = (wx - w0X ) * w2dX;  // bring to Display coordinates
     double dy = (wy - w0Y ) * w2dY;
 
-    if( dx > rwWidth  - margin ) { dx = dx_max ; t1x = t0; } // discard tick
-    if( dy > rwHeight - margin ) { dy = dy_max ; t1y = t0; } 
+    if( dx > RwWidth  - Margin ) { dx = dx_max ; t1x = t0; } // discard tick
+    if( dy > RwHeight - Margin ) { dy = dy_max ; t1y = t0; } 
 
     Points->SetPoint(id++, Position[0] + dx,  Position[1] + t0 +axesOffsetY,  0);
     Points->SetPoint(id++, Position[0] + dx,	Position[1] + t1x+axesOffsetY,  0);
@@ -631,18 +631,18 @@ void vtkMAFSimpleRulerActor2D::RulerUpdate(vtkCamera *camera, vtkRenderer *ren)
   {
     char *alab[] = {"x","y","z","-x","-y","-z"};
     int direction = ( w1X-w0X > 0 ) ? 0 : 3;
-    HorizontalAxesLabel->SetInput(alab[ x_index + direction]);
-    HorizontalAxesLabel->SetDisplayPosition(Position[0] + rwWidth - margin , Position[1] + axesOffsetY + margin + 4);
+    HorizontalAxesLabel->SetInput(alab[ XIndex + direction]);
+    HorizontalAxesLabel->SetDisplayPosition(Position[0] + RwWidth - Margin , Position[1] + axesOffsetY + Margin + 4);
 
     direction = ( w1Y-w0Y > 0 ) ? 0 : 3;
-    VerticalAxesLabel->SetInput(alab[ y_index + direction]);
-    VerticalAxesLabel->SetDisplayPosition(Position[0] +  axesOffsetX + margin + 4,Position[1] +  rwHeight - margin );
+    VerticalAxesLabel->SetInput(alab[ YIndex + direction]);
+    VerticalAxesLabel->SetDisplayPosition(Position[0] +  axesOffsetX + Margin + 4,Position[1] +  RwHeight - Margin );
   }
 
   char lab[50];
   sprintf(lab,"%g %s", abs( worldTickSpacingX ) ,Legend);
   ScaleLabel->SetInput(lab);
-  ScaleLabel->SetDisplayPosition(Position[0] +  axesOffsetX + margin + 4,Position[1] +  axesOffsetY + margin + 4 );
+  ScaleLabel->SetDisplayPosition(Position[0] +  axesOffsetX + Margin + 4,Position[1] +  axesOffsetY + Margin + 4 );
 }
 //----------------------------------------------------------------------------
 void vtkMAFSimpleRulerActor2D::SetAttachPosition(double position[3])
@@ -662,12 +662,12 @@ void vtkMAFSimpleRulerActor2D::SetAttachPositionFlag(bool value)
 void vtkMAFSimpleRulerActor2D::ChangeRulerMarginsAndLengths(int marginArg, int shortTickLenArg, int midTickLenArg, int longTickLenArg, int xOffSetArg, int yOffSetArg)
 //----------------------------------------------------------------------------
 {
-	margin   = marginArg; 
-	shortTickLen = shortTickLenArg;
+	Margin   = marginArg; 
+	ShortTickLen = shortTickLenArg;
 	//midTickLen   = midTickLenArg;
-	longTickLen  = longTickLenArg;
+	LongTickLen  = longTickLenArg;
 
-	xOffSet = xOffSetArg;
-	yOffSet = yOffSetArg;
+	XOffSet = xOffSetArg;
+	YOffSet = yOffSetArg;
 }
 

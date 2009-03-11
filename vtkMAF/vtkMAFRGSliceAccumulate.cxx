@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-02-09 11:31:43 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-03-11 11:40:06 $
+  Version:   $Revision: 1.1.2.2 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -49,7 +49,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ vtkMAFRGSliceAccumulate::vtkMAFRGSliceAccumulate()
 {
   this->Slices = NULL;
   this->NumberOfSlices = 0;
-  this->allocated = 0;
+  this->Allocated = 0;
 	this->BuildingAxes = 2;
   SetDimensions(1,1,1);
   SetSpacing(1,1,1);
@@ -88,7 +88,7 @@ void vtkMAFRGSliceAccumulate::AddSlice(vtkImageData * slice)
 	slice->GetDimensions(dimensions);
 	slice->GetSpacing(spacing);
 
-	if (!this->allocated)
+	if (!this->Allocated)
 	{
 		this->SetSpacing(spacing[0], spacing[1], 1);
 		this->SetDimensions(dimensions);
@@ -158,7 +158,7 @@ void vtkMAFRGSliceAccumulate::SetSlice(int slice_num,vtkImageData * slice)
 	
 	if (slice_num >=0 && slice_num < this->NumberOfSlices)
 	{
-		if (!this->allocated)
+		if (!this->Allocated)
 		{
 			this->SetSpacing(spacing[0], spacing[1], 1);
 			this->SetDimensions(dimensions);
@@ -223,7 +223,7 @@ void vtkMAFRGSliceAccumulate::Allocate()
 	if (this->NumberOfSlices == 0)
 		return;
 	
-	this->allocated = 1;
+	this->Allocated = 1;
 
 	vtkDoubleArray *vx = vtkDoubleArray::New();
 	vtkDoubleArray *vy = vtkDoubleArray::New();

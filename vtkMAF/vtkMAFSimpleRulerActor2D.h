@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFSimpleRulerActor2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:37:40 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-03-11 11:40:06 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -93,19 +93,19 @@ protected:
   vtkTextActor     *HorizontalAxesLabel;
   vtkTextActor     *VerticalAxesLabel;
 
-  int rwWidth;
-  int rwHeight;
-  int shortTickLen;
-  int longTickLen;
+  int RwWidth;
+  int RwHeight;
+  int ShortTickLen;
+  int LongTickLen;
   double DesiredTickSpacing;
 
-	int xOffSet;
-	int yOffSet;
+	int XOffSet;
+	int YOffSet;
 
-  int margin;
-  int ntick;
-  int x_index;
-  int y_index;
+  int Margin;
+  int Ntick;
+  int XIndex;
+  int YIndex;
   
   bool   GlobalAxes;
   bool   CenterAxes;

@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFRGSliceAccumulate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-11 11:40:06 $
+  Version:   $Revision: 1.1.2.1 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -114,7 +114,7 @@ public:
   vtkRectilinearGrid* GetOutput(){return Slices;};
 
 protected:
-  bool allocated;
+  bool Allocated;
   int NumberOfSlices;
   int Dimensions[3];
   double Spacing[3];
