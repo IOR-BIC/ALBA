@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-09 16:30:09 $
-Version:   $Revision: 1.21.2.8 $
+Date:      $Date: 2009-03-11 11:27:27 $
+Version:   $Revision: 1.21.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -271,21 +271,33 @@ void medOpImporterDicom::OpRun()
   bool firstTime = true;
   do 
   {
-	  wxString path = (mafGetApplicationDirectory()+"/data/external/").c_str();
-	  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
-	  dialog.SetReturnCode(wxID_OK);
-	  int ret_code = dialog.ShowModal();
-	  if (ret_code == wxID_OK)
+	  if (m_DicomDirectory == "")
 	  {
-	    path = dialog.GetPath();
-	    m_DicomDirectory = path.c_str();
-	    GuiUpdate();
-	    result = OpenDir();
+		  wxString path = (mafGetApplicationDirectory()+"/data/external/").c_str();
+		  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
+		  dialog.SetReturnCode(wxID_OK);
+		  int ret_code = dialog.ShowModal();
+		  if (ret_code == wxID_OK)
+		  {
+		    path = dialog.GetPath();
+		    m_DicomDirectory = path.c_str();
+		    GuiUpdate();
+		    result = OpenDir();
+		  }
+	    else
+	    {
+	      OpStop(OP_RUN_CANCEL);
+	      return;
+	    }
 	  }
     else
     {
-      OpStop(OP_RUN_CANCEL);
-      return;
+      GuiUpdate();
+      result = OpenDir();
+      if (result == false)
+      {
+        m_DicomDirectory = "";
+      }
     }
   } while(!result);
 
