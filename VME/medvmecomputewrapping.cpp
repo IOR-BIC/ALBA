@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-06 11:12:44 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2009-03-12 17:37:09 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -3273,7 +3273,7 @@ bool medVMEComputeWrapping::isEndPonintOnCylinder(double tolerance,double *endWr
 	d1 = vtkMath::Distance2BetweenPoints(sphereCenterLocal,endWrapLocal);
 	d2 = vtkMath::Distance2BetweenPoints(cylinderCenterLocal,endWrapLocal);
 
-	if (   (fabs(testValue - r*r) < tolerance ) && d2<d1)
+	if (   (fabs( sqrt(testValue ) - r) < tolerance ) && d2<d1)
 	{
 
 		//------try x---------
@@ -3779,7 +3779,7 @@ bool medVMEComputeWrapping::prepareData2(){
 
 	if (m_WrappedMode == SPHERE_CYLINDER || m_WrappedMode == SINGLE_CYLINDER)
 	{
-		m_Tolerance = getCylinderRadius()*getCylinderRadius()/16.0 ;
+		m_Tolerance = getCylinderRadius()/4.0 ;
 	}
 	rtn = true;
 
