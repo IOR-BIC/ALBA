@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICheckListBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-20 08:21:58 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -105,6 +105,12 @@ public:
 
   /** Return the number of inserted items.*/
   int GetNumberOfItems() {return m_CheckListBox->GetCount();};
+
+  /** Set Flag used to distinguish between Check item and Select item event*/
+  void SetCheckEvent(bool enable){m_CheckEvent = enable;}
+
+  /** Highlight Item*/
+  void HighlightItem(int index,  int rgbText[3], int rgbBack[3]);
 
 protected:
   /** Send an event to the listener to notify that an item has been selected. */

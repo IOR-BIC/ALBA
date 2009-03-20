@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICheckListBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-20 08:21:58 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -166,6 +166,7 @@ void mafGUICheckListBox::Select(int id)
 {
   m_PreventNotify = true;
   m_CheckListBox->Select(id);
+  m_SelectedItem = id;
   m_PreventNotify = false;
 }
 //----------------------------------------------------------------------------
@@ -244,4 +245,11 @@ void mafGUICheckListBox::OnSelect(wxCommandEvent &event)
 
   m_CheckEvent = false;
   mafEventMacro(mafEvent(this, widget_id, (long)item_id ));
+}
+//----------------------------------------------------------------------------
+void mafGUICheckListBox::HighlightItem(int index, int rgbText[3], int rgbBack[3])
+//----------------------------------------------------------------------------
+{
+   m_CheckListBox->GetItem(index)->SetTextColour(wxColor(rgbText[0], rgbText[1], rgbText[2]));
+   m_CheckListBox->GetItem(index)->SetBackgroundColour(wxColor(rgbBack[0], rgbBack[1], rgbBack[2]));
 }
