@@ -35,7 +35,8 @@ ADD_TEST(medVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEAnalogTest)
 ADD_EXECUTABLE(medVMEFactoryTest medVMEFactoryTest.h medVMEFactoryTest.cpp)
 ADD_TEST(medVMEFactoryTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEFactoryTest)
 
-
+ADD_EXECUTABLE(medVMEOutputSurfaceEditorTest medVMEOutputSurfaceEditorTest.h medVMEOutputSurfaceEditorTest.cpp)
+ADD_TEST(medVMEOutputSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputSurfaceEditorTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
