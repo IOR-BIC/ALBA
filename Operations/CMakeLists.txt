@@ -8,8 +8,6 @@ PROJECT(medOperations)
 SET(PROJECT_SRCS
   medOpCreateLabeledVolume.cpp
   medOpCreateLabeledVolume.h
-  medOpInteractionDebugger.cpp
-  medOpInteractionDebugger.h
   mmoDICOMImporter.cpp
   mmoDICOMImporter.h
   medOpImporterCTA.cpp
@@ -102,9 +100,9 @@ SET(PROJECT_SRCS
   
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
-
-  medOpExporterMeters.cpp
-  medOpExporterMeters.h
+  
+  medOpImporterDicomGrassroots.cpp
+  medOpImporterDicomGrassroots.h
 )
 
 IF (MAF_USE_ITK)
@@ -124,6 +122,10 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   medOpImporterAnalogWS.h
   medOpSmoothSurfaceCells.cpp
   medOpSmoothSurfaceCells.h
+  medOpExporterMeters.cpp
+  medOpExporterMeters.h
+  medOpInteractionDebugger.cpp
+  medOpInteractionDebugger.h
 )
 ENDIF (MAF_USE_ITK)
 
