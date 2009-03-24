@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalar.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-03-24 13:53:00 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,9 @@ public:
 
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
+
+	/** Retrieve scalar data written in a string*/
+	const char* GetScalarDataString(){return m_ScalarDataString.GetCStr();};
     
 protected:
   mafVMEOutputScalar(); // to be allocated with New()
