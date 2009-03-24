@@ -23,8 +23,6 @@ SET(PROJECT_SRCS
   medPipeVolumeDRR.h
   medPipeVolumeVR.cpp
   medPipeVolumeVR.h
-  medVMEAnalog.cpp
-  medVMEAnalog.h
 
   mafPolylineGraph.cpp
   mafPolylineGraph.h
@@ -72,6 +70,8 @@ SET(PROJECT_SRCS  ${PROJECT_SRCS}
   mafVMERawMotionData.h
   medPipeGraph.cpp
   medPipeGraph.h
+  medVMEAnalog.cpp
+  medVMEAnalog.h
 )
 ENDIF (MAF_USE_ITK)
 

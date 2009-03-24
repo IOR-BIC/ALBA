@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-04 15:53:42 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2009-03-24 14:57:13 $
+  Version:   $Revision: 1.13.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,12 +25,13 @@
 #include "medVMEWrappedMeter.h"
 #include "medVMEPolylineGraph.h"
 #include "medVMEPolylineEditor.h"
-#include "medVMEAnalog.h"
+
 #include "medVMESurfaceEditor.h"
 #include "medVMELabeledVolume.h"
 
 #ifdef MAF_USE_ITK
   #include "mafVMERawMotionData.h"
+  #include "medVMEAnalog.h"
 #endif
 
 
@@ -81,12 +82,12 @@ medVMEFactory::medVMEFactory()
   mafPlugNodeMacro(medVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
   mafPlugNodeMacro(medVMEPolylineGraph,"VME for Graph and Polyline");
 	mafPlugNodeMacro(medVMEPolylineEditor,"VME for Editing Graph and Polyline");
-  mafPlugNodeMacro(medVMEAnalog,"VME rapresenting EMG scalar data");
-	mafPlugNodeMacro(medVMESurfaceEditor,"VME for Editing Surface");
+ 	mafPlugNodeMacro(medVMESurfaceEditor,"VME for Editing Surface");
   mafPlugNodeMacro(medVMELabeledVolume,"VME representing a label put on a volume");
 
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
+  mafPlugNodeMacro(medVMEAnalog,"VME rapresenting EMG scalar data");
 #endif
   //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
 }
