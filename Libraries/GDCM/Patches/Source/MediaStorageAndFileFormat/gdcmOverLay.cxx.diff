@@ -1,0 +1,46 @@
+6c6
+<   Copyright (c) 2006-2008 Mathieu Malaterre
+---
+>   Copyright (c) 2006-2009 Mathieu Malaterre
+123,124c123,129
+<       // Yeah this is a potential overlay element, let's check this is not a broken LEADTOOL image:
+<       ++numoverlays;
+---
+>       // Yeah this is a potential overlay element, let's check this is not a broken LEADTOOL image,
+>       // or prova0001.dcm:
+>       // (5000,0000) UL 0                                        #   4, 1 GenericGroupLength
+>       // (6000,0000) UL 0                                        #   4, 1 GenericGroupLength
+>       // (6001,0000) UL 28                                       #   4, 1 PrivateGroupLength
+>       // (6001,0010) LT [PAPYRUS 3.0]                            #  12, 1 PrivateCreator
+>       // (6001,1001) LT (no value available)                     #   0, 0 Unknown Tag & Data
+129c134
+<         if( overlaydata.IsEmpty() )
+---
+>         if( !overlaydata.IsEmpty() )
+131,132c136
+<           gdcmWarningMacro( "Overlay is empty" );
+<           --numoverlays;
+---
+>           ++numoverlays;
+135,140c139,144
+<       // Store found tag in overlay:
+<       overlay = de.GetTag();
+<       // Move on to the next possible one:
+<       overlay.SetGroup( overlay.GetGroup() + 2 );
+<       // reset to element 0x0 just in case...
+<       overlay.SetElement( 0 );
+---
+>         // Store found tag in overlay:
+>         overlay = de.GetTag();
+>         // Move on to the next possible one:
+>         overlay.SetGroup( overlay.GetGroup() + 2 );
+>         // reset to element 0x0 just in case...
+>         overlay.SetElement( 0 );
+286c290
+< void Overlay::GrabOverlayFromPixelData(DataSet const &ds)
+---
+> bool Overlay::GrabOverlayFromPixelData(DataSet const &ds)
+329a334
+>     return false;
+330a336
+>   return true;
