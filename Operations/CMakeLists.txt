@@ -101,8 +101,8 @@ SET(PROJECT_SRCS
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
   
-  medOpImporterDicomGrassroots.cpp
-  medOpImporterDicomGrassroots.h
+  #medOpImporterDicomGrassroots.cpp
+  #medOpImporterDicomGrassroots.h
 )
 
 IF (MAF_USE_ITK)
