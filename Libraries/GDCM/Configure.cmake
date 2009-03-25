@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2009-03-25 08:22:09 $
-# Version:   $Revision: 1.1.2.2 $
+# Date:      $Date: 2009-03-25 17:18:08 $
+# Version:   $Revision: 1.1.2.3 $
 #
 # Description:
 # Project file for configuring the GDCM library as an external project.
@@ -14,6 +14,7 @@
 
 INCLUDE (${MFL_SOURCE_PATH}/modules/PackagesMacro.cmake)
 INCLUDE (${MFL_SOURCE_PATH}/modules/PatchMacro.cmake)
+
 
 # this is to build GDCM inside the MAF tree
 IF (EXISTS "${GDCM_SOURCE_DIR}/Sources")   
@@ -53,7 +54,8 @@ IF (GDCM_SOURCE_PATH)
     # Run configuration of GDCM library
     MESSAGE(STATUS "GDCM: Configuring external GDCM project")
     EXEC_PROGRAM(${CMAKE_COMMAND} "${GDCM_BINARY_PATH}" ARGS "${GDCM_SOURCE_PATH}" -G"${CMAKE_GENERATOR}" -DLIBRARY_OUTPUT_PATH:PATH="${LIBRARY_OUTPUT_PATH}" -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
+    -DEXECUTABLE_OUTPUT_PATH:PATH="${EXECUTABLE_OUTPUT_PATH}" -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS} -DVTK_INSTALL_PACKAGE_DIR:PATH="${MAF_BINARY_PATH}/Libraries/VTK/Build" -DVTK_DIR:PATH="${MAF_BINARY_PATH}/Libraries/VTK/Build"
+    -DGDCM_USE_VTK:BOOL=ON
      OUTPUT_VARIABLE CMAKE_OUTPUT RETURN_VALUE CMAKE_RETURN)
     
     # write configure log file
