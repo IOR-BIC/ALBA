@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2009-03-10 08:42:37 $
-# Version:   $Revision: 1.1.2.1 $
+# Date:      $Date: 2009-03-25 08:22:09 $
+# Version:   $Revision: 1.1.2.2 $
 #
 # Description:
 # Project file for configuring the GDCM library as an external project.
@@ -33,6 +33,7 @@ IF (EXISTS "${GDCM_SOURCE_DIR}/Packages")
   IF (NOT EXISTS "${GDCM_SOURCE_PATH}")
 	  FIND_AND_UNPACK_PACKAGE (gdcm-2.0.10 ${GDCM_PACKAGE_PATH} "${GDCM_BINARY_DIR}/Sources" ${GDCM_SOURCE_PATH})
       FIND_AND_UNPACK_PACKAGE (gdcm_Extras ${GDCM_Extension_PACKAGE_PATH} "${GDCM_BINARY_DIR}/Sources" ${GDCM_SOURCE_PATH})
+      FIND_AND_APPLAY_PATCHES (gdcm-2.0.10 ${GDCM_PATCH_PATH} "${GDCM_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${GDCM_SOURCE_PATH}")
 ENDIF (EXISTS "${GDCM_SOURCE_DIR}/Packages")
 
