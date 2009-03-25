@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFDOFMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-25 15:01:56 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni (perticoni@tecno.ior.it)
   Project:   Multimod Project (http://www.ior.it/multimod/)
 
@@ -73,18 +73,21 @@ DIAGNOSTIC TOOL.
 //                DOFMatrix[3][3]
 // ----------------------------------------------
 // |                                             |
-// |                         axis                |
-// |                 -------------------------   |
-// |                 |  X        Y       Z       |
-// |      -----------|------------------------   |
-// | m t  |TRANSLATE |[0,0]    [0,1]   [0,2]     |
-// | o y  |ROTATE    |[1,0]    [1,1]   [1,2]     |
-// | v p  |SCALE     |[2,0]    [2,1]   [2,2]     |
-// | e e                                         |
+// | t                        axis               |
+// | r               -------------------------   |
+// | a               |  X        Y       Z       |
+// | n    -----------|------------------------   |
+// | s t  |TRANSLATE |[0,0]    [0,1]   [0,2]     |
+// | f y  |ROTATE    |[1,0]    [1,1]   [1,2]     |
+// | o p  |SCALE     |[2,0]    [2,1]   [2,2]     |
+// | r e                                         |
+// | m                                           |
 // |                                             |
 // | DOFMatrix[i][j] = element                   |
 // -----------------------------------------------     
 // 
+// Default values for all elements is LOCK
+//
 // .SECTION See Also
 //  mafISAGeneric.h
 // 
@@ -159,76 +162,76 @@ public:
   /**
   Set the state of the constrain for the given dof; allowed state are:
   LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY.*/
-  void SetState(int transform, int axis, int state);
+  void SetState(int transformType, int axis, int state);
 
   /** 
   Get the state of the constrain for the given dof*/
-  int GetState(int transform, int axis);
+  int GetState(int transformType, int axis);
 
   /**
   Set the lower bound for bound constrain type for the given dof*/
-  void SetLowerBound(int transform, int axis, double lbound);
+  void SetLowerBound(int transformType, int axis, double lbound);
 
   /**
   Get the lower bound for bound constrain type for the given dof*/
-  double GetLowerBound(int transform, int axis);
+  double GetLowerBound(int transformType, int axis);
 
   /**
   Set the upper bound for bound constrain type for the given dof*/
-  void SetUpperBound(int transform, int axis, double ubound);
+  void SetUpperBound(int transformType, int axis, double ubound);
 
   /**
   Get the upper bound for bound constrain type for the given dof*/
-  double GetUpperBound(int transform, int axis);
+  double GetUpperBound(int transformType, int axis);
 
   /** 
   Set the min value for snap step constrain type for the given dof*/
-  void SetMin(int transform, int axis, double min);
+  void SetMin(int transformType, int axis, double min);
       
   /**      
   Get the min value for snap step constrain type for the given dof*/
-  double GetMin(int transform, int axis);
+  double GetMin(int transformType, int axis);
 
   /**
   Set the max value for snap step constrain type for the given dof*/
-  void SetMax(int transform, int axis, double min);
+  void SetMax(int transformType, int axis, double min);
       
   /** 
   Get the max value for snap step constrain type for the given dof*/
-  double GetMax(int transform, int axis);
+  double GetMax(int transformType, int axis);
     
   /** 
   Set the step value for snap step constrain type for the given dof*/
-  void SetStep(int transform, int axis, double step);
+  void SetStep(int transformType, int axis, double step);
       
   /**      
   Get the step value for snap step constrain type for the given dof*/
-  double GetStep(int transform, int axis);
+  double GetStep(int transformType, int axis);
  
   /**   
   Set the array which contains the allowed positions for snap.
   The array is not copied, only the pointer is stored*/
-  void SetArray(int transform, int axis, vtkDoubleArray *array);
+  void SetArray(int transformType, int axis, vtkDoubleArray *array);
        
   /**      
   Get the array which contains the allowed positions for snap.*/
-  vtkDoubleArray *GetArray(int transform, int axis);
+  vtkDoubleArray *GetArray(int transformType, int axis);
 
   /**
   Get the number of axis on which movement is allowed (ie unlocked
   axis) for the given transform type (ROTATE, TRANSLATE or SCALE)*/
-  int GetDOFNumber(int transform);
+  int GetDOFNumber(int transformType);
   
   /**
   Return constrain axis when there is only one degree of freedom for the
-  given movement type. If there is more than one dof returns -1.*/
-  int GetConstrainAxis(int transform);  
+  given transform type. If there is more than one dof returns -1.*/
+  int GetConstrainAxis(int transformType);  
     
   /**
   Return the constrain plane ie an integer from the enum {XY= 0, XZ, YZ} 
-  when there are two degree of freedom for the given movement type. Returns 
+  when there are two degree of freedom for the given transform type. Returns 
   -1 if dof number is different from 2.*/
-  int GetConstrainPlane(int transform);
+  int GetConstrainPlane(int transformType);
 
 protected:
   vtkMAFDOFMatrix();
@@ -251,7 +254,7 @@ protected:
   } element;   
  
   // element access
-  element GetElement(int transform, int axis)  {return DOFMatrix[transform][axis];}
+  element GetElement(int transformType, int axis)  {return DOFMatrix[transformType][axis];}
 
   // The DOF Matrix
   element DOFMatrix[3][3];
