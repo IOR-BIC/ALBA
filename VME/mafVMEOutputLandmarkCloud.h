@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-03-26 10:38:47 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -48,6 +48,8 @@ public:
 
   /** Redefined to update gui.*/
   virtual void Update();
+
+  mafString GetNumberOfLandmarksSTR(){return m_NumLandmarks;};
 
 protected:
   mafGUI *CreateGui();
