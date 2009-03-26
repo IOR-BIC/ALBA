@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-02-11 15:26:00 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-03-26 11:45:21 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -53,6 +53,7 @@ class vtkPoints;
 class mafMatrix3x3;
 class vtkTransformPolyDataFilter;
 class vtkCellArray;
+class mafGUIRollOut;
 /** medVMEComputeWrapping - 
 */
 class MAF_EXPORT medVMEComputeWrapping : public mafVME
@@ -79,7 +80,17 @@ public:
 		DOUBLE_CYLINDER = 3
 		
 		
-
+	};
+	enum METER_MODALITY_TYPE_ID
+	{
+		MANUAL_WRAP=0,
+		AUTOMATED_WRAP,
+		IOR_AUTOMATED_WRAP,
+	};
+	enum WRAP_MODE_CLASS_ID
+	{
+		OLD_METER = 0,
+		NEW_METER = 1,
 	};
 	enum METER_WRAP_TYPE_ID{
 		WRAP_FRONT =0,
@@ -92,13 +103,13 @@ public:
 		//  LINE_DISTANCE,
 		//  LINE_ANGLE
 	};
-	enum METER_MODALITY_TYPE_ID
+	/*enum METER_MODALITY_TYPE_ID
 	{
 
 		IOR_AUTOMATED_WRAP=0,
 		//MANUAL_WRAP,
 		//AUTOMATED_WRAP,
-	};
+	};*/
 	enum METER_COLOR_TYPE_ID
 	{
 		ONE_COLOR=0,
@@ -121,12 +132,14 @@ public:
 		ID_START_METER_LINK = Superclass::ID_LAST,
 		ID_END1_METER_LINK,
 		ID_END2_METER_LINK,
-		ID_WRAPPED_METER_LINK,
+		ID_WRAPPED_METER_LINK1,
 		ID_WRAPPED_METER_LINK2,
+		ID_WRAPPED_METER_LINK,
 		ID_VIA_POINT,
 		ID_METER_MODE,
 		ID_WRAPPED_METER_MODE,
 		ID_WRAPPED_METER_TYPE,
+		ID_WRAPPED_METER_CLASS,
 		ID_WRAPPED_METER_NUM,
 		ID_WRAPPED_SIDE,
 		ID_WRAPPED_REVERSE,
@@ -136,7 +149,9 @@ public:
 		ID_UP,
 		ID_DOWN,
 		ID_SAVE_FILE_BUTTON,
-		ID_LAST
+		ID_LAST,
+		ID_ROLLOUT_NEW,
+		ID_ROLLOUT_OLD,
 	};
 	class Apoint
 	{
@@ -186,7 +201,7 @@ public:
 	/** return an xpm-icon that can be used to represent this node */
 	//static char ** GetIcon();
 
-	void EnableManualModeWidget(bool flag);
+	void EnableManualModeWidget(mafGUI *gui,bool flag);
 
 	/**
 	Get/Set the kind of measure  performed: distance between points (POINT) or
@@ -298,6 +313,9 @@ public:
 
 	mafVME *GetWrappedVME1();
 	mafVME *GetWrappedVME2();
+	mafVME *GetWrappedVME();
+	
+
 	mafVME *GetViaPointVME();
 	std::vector<mafVME *> GetWrappedVMEList();
 
@@ -332,6 +350,9 @@ public:
 	int GetWrappedMode(){return m_WrappedMode;};
 	void SetWrappedMode(int value){m_WrappedMode = value;};
 
+	  int GetWrappedClass(){return m_WrappedClass;};
+	  void SetWrappedClass(int value){m_WrappedClass = value;};
+
 	/**Set\Get side of geometric wrapping: the side where search tangent over parametric surface*/
 	int GetWrapSide(){return m_WrapSide;};
 	void SetWrapSide(int value){m_WrapSide = value;};
@@ -344,8 +365,14 @@ public:
 
 protected:
 	medVMEComputeWrapping();
-	virtual ~medVMEComputeWrapping();
 
+//-------------------old functions begin------------------
+	/** update the output data structure */
+	virtual void InternalUpdate();
+	
+	
+
+	virtual ~medVMEComputeWrapping();
 	virtual int InternalStore(mafStorageElement *parent);
 	virtual int InternalRestore(mafStorageElement *node);
 
@@ -355,8 +382,7 @@ protected:
 	/** called to prepare the update of the output */
 	virtual void InternalPreUpdate();
 
-	/** update the output data structure */
-	virtual void InternalUpdate();
+
 
 	/** update the output data structure for manual wrapped mode */
 	virtual void InternalUpdateManual();
@@ -474,12 +500,15 @@ protected:
 	double getAngleValue(double *A ,double *b,double *c);
 	double getPlaneValue(double *a,double *b,double *c,double *d);
 	double getDistanceValue(double *start,double *cCoord,double *end);
+	double getDistanceSumValue(double *start,double *cCoord,double *end);
 	void getSphereCylinderWrapAdvance(const int step);
 	void transformOutput(vtkPolyData *pData );
 	void transformOutputPoint( double *point);
 	void transformOutputClipData(vtkPolyData *clipData);
 	bool checkAlign();
 	bool checkTwoRadius();
+	mafGUI* CreateGuiForNewMeter( mafGUI *gui );
+	mafGUI* CreateGuiForOldMeter( mafGUI *gui );
 	//------------------new function -------------------
 
 
@@ -536,14 +565,17 @@ protected:
 	std::vector<double *> m_MiddlePointList; // list of coordinates
 	std::vector<int> m_OrderMiddlePointsVMEList; //order list of VME ID
 	std::vector<mafString> m_OrderMiddlePointsNameVMEList; //order list of VME Name
+	std::vector<mafString> m_testList;
+	
 
 	int              m_OrderMiddlePointsVMEListNumberOfElements;
 
 	mafString m_StartVmeName;
 	mafString m_EndVme1Name;
 	mafString m_EndVme2Name;
-	mafString m_WrappedVmeName;
+	mafString m_WrappedVmeName1;
 	mafString m_WrappedVmeName2;
+	mafString m_WrappedVmeName;
 	mafString m_ViaPointName;
 
 
@@ -560,9 +592,18 @@ protected:
 
 	wxListBox *m_ListBox;
 	int        m_WrappedMode;
+	int      m_WrappedClass;
 	int        m_WrapSide;
 	int        m_WrapReverse;
+	//---------------interface -------------
+	wxBoxSizer* bSizer;
+	mafGUI *m_GuiNewMeter;
+	mafGUI *m_GuiOldMeter; 
 
+	mafGUIRollOut *m_RollOutNewMeter;
+	mafGUIRollOut *m_RollOutOldMeter;
+
+	
 private:
 	medVMEComputeWrapping(const medVMEComputeWrapping&); // Not implemented
 	void operator=(const medVMEComputeWrapping&); // Not implemented
