@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFlagSplitter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-26 16:52:47 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ mafGUIFlagSplitter::mafGUIFlagSplitter(wxWindow* parent,wxWindowID id)
   m_XPos1 = 33;
 	m_XPos2 = 66;
   m_XPosOld = 0;
-	m_margin = 20;
+	m_Margin = 20;
   m_Dragging = drag_none;
 }
 //----------------------------------------------------------------------------
@@ -88,11 +88,11 @@ void mafGUIFlagSplitter::OnSize(wxSizeEvent& event)
 void mafGUIFlagSplitter::SetSplitPos(int x1,int x2)
 //----------------------------------------------------------------------------
 {
-  if (m_XPos1 < m_margin)          m_XPos1 =         m_margin;
-  if (m_XPos1 > m_With - 2*m_margin)  m_XPos1 = m_With - 2*m_margin;
-  if (m_XPos2 < 2*m_margin)        m_XPos2 =       2*m_margin;
-  if (m_XPos2 > m_With - m_margin)    m_XPos2 = m_With - m_margin;
-  if (m_XPos1 > m_XPos2 - m_margin)   m_XPos1 = m_XPos2 - m_margin;
+  if (m_XPos1 < m_Margin)          m_XPos1 =         m_Margin;
+  if (m_XPos1 > m_With - 2*m_Margin)  m_XPos1 = m_With - 2*m_Margin;
+  if (m_XPos2 < 2*m_Margin)        m_XPos2 =       2*m_Margin;
+  if (m_XPos2 > m_With - m_Margin)    m_XPos2 = m_With - m_Margin;
+  if (m_XPos1 > m_XPos2 - m_Margin)   m_XPos1 = m_XPos2 - m_Margin;
 
   m_XPos1 = x1;
   m_XPos2 = x2;
@@ -158,13 +158,13 @@ void mafGUIFlagSplitter::OnMouseMotion(wxMouseEvent &event)
     int x = event.GetX();
     if(m_Dragging == drag_x1)
 		{
-			if (x < m_margin)        x =        m_margin;
-			if (x > m_XPos2 - m_margin) x = m_XPos2 - m_margin;
+			if (x < m_Margin)        x =        m_Margin;
+			if (x > m_XPos2 - m_Margin) x = m_XPos2 - m_Margin;
 		}
     if(m_Dragging == drag_x2)
 		{
-			if (x < m_XPos1 + m_margin + 1) x = m_XPos1 + m_margin + 1;
-			if (x > m_With  - m_margin) x = m_With  - m_margin;
+			if (x < m_XPos1 + m_Margin + 1) x = m_XPos1 + m_Margin + 1;
+			if (x > m_With  - m_Margin) x = m_With  - m_Margin;
 		}
 
     DrawTracker(m_XPosOld);    
@@ -181,11 +181,11 @@ void mafGUIFlagSplitter::OnMouseMotion(wxMouseEvent &event)
 void mafGUIFlagSplitter::OnLayout()
 //----------------------------------------------------------------------------
 {
-  if (m_XPos1 < m_margin)          m_XPos1 =         m_margin;
-  if (m_XPos1 > m_With - 2*m_margin)  m_XPos1 = m_With - 2*m_margin;
-  if (m_XPos2 < 2*m_margin)        m_XPos2 =       2*m_margin;
-  if (m_XPos2 > m_With - m_margin)    m_XPos2 = m_With - m_margin;
-  if (m_XPos1 > m_XPos2 - m_margin)   m_XPos1 = m_XPos2 - m_margin;
+  if (m_XPos1 < m_Margin)          m_XPos1 =         m_Margin;
+  if (m_XPos1 > m_With - 2*m_Margin)  m_XPos1 = m_With - 2*m_Margin;
+  if (m_XPos2 < 2*m_Margin)        m_XPos2 =       2*m_Margin;
+  if (m_XPos2 > m_With - m_Margin)    m_XPos2 = m_With - m_Margin;
+  if (m_XPos1 > m_XPos2 - m_Margin)   m_XPos1 = m_XPos2 - m_Margin;
 
   int m  = 3;
   int w  = (m_With -2*m)/3;

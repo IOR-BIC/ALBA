@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-04 17:14:44 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2009-03-26 16:53:06 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Paolo Quadrani - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -287,16 +287,16 @@ void mafPipeVolumeProjected::Create(mafSceneNode *n)
 	m_UsedAssembly->AddPart(m_VolumeBoxActor);
 
 	//create something invisible in the front renderer so that ResetCamera will work
-  m_ghost = NULL;
+  m_Ghost = NULL;
   if(m_UsedAssembly == m_AssemblyBack)
 	{
-		m_ghost = vtkActor::New();
-		m_ghost->SetMapper(RXPlaneMapper);
-		m_ghost->PickableOff();
-    m_ghost->GetProperty()->SetOpacity(0.1);
-    m_ghost->GetProperty()->SetRepresentationToPoints();
-    m_ghost->GetProperty()->SetInterpolationToFlat();
-		m_AssemblyFront->AddPart(m_ghost);
+		m_Ghost = vtkActor::New();
+		m_Ghost->SetMapper(RXPlaneMapper);
+		m_Ghost->PickableOff();
+    m_Ghost->GetProperty()->SetOpacity(0.1);
+    m_Ghost->GetProperty()->SetRepresentationToPoints();
+    m_Ghost->GetProperty()->SetInterpolationToFlat();
+		m_AssemblyFront->AddPart(m_Ghost);
   }
   vtkDEL(CTLinesPoints);
   vtkDEL(CTCells);
@@ -318,13 +318,13 @@ mafPipeVolumeProjected::~mafPipeVolumeProjected()
     m_UsedAssembly->RemovePart(m_VolumeBoxActor);
 	m_UsedAssembly->RemovePart(m_TickActor);
 	m_UsedAssembly->RemovePart(m_RXActor);
-  if(m_ghost) 
-    m_AssemblyFront->RemovePart(m_ghost);
+  if(m_Ghost) 
+    m_AssemblyFront->RemovePart(m_Ghost);
 
   vtkDEL(m_Lut);
 	vtkDEL(m_TickActor);
 	vtkDEL(m_RXActor);
-  vtkDEL(m_ghost);
+  vtkDEL(m_Ghost);
 
 	vtkDEL(m_VolumeBoxActor);
 }

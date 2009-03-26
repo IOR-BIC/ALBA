@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.h,v $
   Language:  C++
-  Date:      $Date: 2006-03-16 09:19:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-03-26 16:52:57 $
+  Version:   $Revision: 1.5.18.1 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -139,8 +139,8 @@ protected:
   class DeviceItem
   {
   public:
-    mafVME *VME;
-    int     Button;
+    mafVME *m_VME;
+    int     m_Button;
   };
   
   std::map<mafID,DeviceItem> m_Devices; ///< Stores the list of devices currently interacting

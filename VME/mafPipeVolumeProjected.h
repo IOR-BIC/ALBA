@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeProjected.h,v $
   Language:  C++
-  Date:      $Date: 2008-02-01 13:59:03 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-03-26 16:53:06 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Paolo Quadrani - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -65,7 +65,7 @@ protected:
 	int       m_CamPosition;
   vtkActor *m_RXActor;
   vtkActor *m_TickActor;
-  vtkActor *m_ghost;
+  vtkActor *m_Ghost;
 
 	vtkOutlineCornerFilter *m_VolumeBox;
   vtkPolyDataMapper			 *m_VolumeBoxMapper;

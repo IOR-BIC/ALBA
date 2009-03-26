@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:12:35 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2009-03-26 16:52:57 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -91,12 +91,12 @@ bool mmiPER::IsInteracting(mafDevice *device, int button)
     {
       // if optional button parameter is positive report if interaction
       // has been started by a specific button.
-      return (button<0)?true:(*iter).second.Button==button;
+      return (button<0)?true:(*iter).second.m_Button==button;
     }
     else
     {
       // simply check if one or more button has been pressed.
-      return (*iter).second.Button>0;
+      return (*iter).second.m_Button>0;
     }
   }
   return false;
@@ -108,8 +108,8 @@ void mmiPER::InsertDevice(mafDevice *device,int button)
 {
   if (m_Mode == SINGLE_BUTTON)
   {
-    m_Devices[device->GetID()].Button = button;
-    m_Devices[device->GetID()].VME = NULL; // initially set picked VME to NULL
+    m_Devices[device->GetID()].m_Button = button;
+    m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
   }
   else
   {
@@ -117,14 +117,14 @@ void mmiPER::InsertDevice(mafDevice *device,int button)
     if (iter == m_Devices.end())
     {
 //      if ((*iter).first==device->GetID())
-      m_Devices[device->GetID()].VME = NULL; // initially set picked VME to NULL
-      m_Devices[device->GetID()].Button = 1;
+      m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
+      m_Devices[device->GetID()].m_Button = 1;
 
     }
     else
     {
       //int prebuttonDevice = m_Devices[device->GetID()].Button;
-      m_Devices[device->GetID()].Button++;
+      m_Devices[device->GetID()].m_Button++;
       //int postbuttonDevice = m_Devices[device->GetID()].Button;//only for debug
     }
   }
@@ -141,7 +141,7 @@ void mmiPER::RemoveDevice(mafDevice *device)
     return;
   }
   
-  m_Devices[device->GetID()].VME = NULL; // initially set picked VME to NULL
+  m_Devices[device->GetID()].m_VME = NULL; // initially set picked VME to NULL
   
   if(m_Mode == SINGLE_BUTTON)
   {
@@ -150,7 +150,7 @@ void mmiPER::RemoveDevice(mafDevice *device)
   else
   {
     // decrease counter, if counter gets to zero delete the item
-    int cnt = (--m_Devices[device->GetID()].Button);
+    int cnt = (--m_Devices[device->GetID()].m_Button);
     if (cnt <= 0)
     {
       m_Devices.erase(iter);
@@ -167,7 +167,7 @@ void mmiPER::SetPickedVME(mafDevice *device,mafVME *vme)
     std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
     //assert(iter != m_Devices.end()); // check the device has started an interaction
     if (iter != m_Devices.end())
-      (*iter).second.VME = vme;
+      (*iter).second.m_VME = vme;
   }
   else
   {
@@ -183,7 +183,7 @@ mafVME *mmiPER::GetPickedVME(mafDevice *device)
   {
     std::map<mafID,DeviceItem>::iterator iter = m_Devices.find(device->GetID());
     //assert(iter != m_Devices.end()); // check the device has started an interaction
-    return (iter != m_Devices.end()) ? (*iter).second.VME : NULL;
+    return (iter != m_Devices.end()) ? (*iter).second.m_VME : NULL;
   }
   else
   {

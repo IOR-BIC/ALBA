@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockSettings.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-26 16:52:47 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,29 +49,29 @@ enum DOCK_SETTINGS_ID
 };
 //----------------------------------------------------------------------------
 mafGUIDockSettings::mafGUIDockSettings(wxFrameManager& mgr, const mafString &label):
-m_mgr(mgr), mafGUISettings(NULL, label)
+m_Mgr(mgr), mafGUISettings(NULL, label)
 //----------------------------------------------------------------------------
 {
-  m_PaneBorderSize                = m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_PANE_BORDER_SIZE);
-  m_SashSize                      = m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_SASH_SIZE);
-  m_CaptionSize                   = m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_CAPTION_SIZE);
-  m_BackgroundColor               = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_BACKGROUND_COLOUR);
-  m_SashColor                     = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_SASH_COLOUR);
-  m_InactiveCaptionColor          = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR);
-  m_InactiveCaptionGradientColor  = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR);
-  m_InactiveCaptionTextColor      = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR);
-  m_ActiveCaptionColor            = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR);
-  m_ActiveCaptionGradientColor    = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR);
-  m_ActiveCaptionTextColor        = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR);
-  m_BorderColor                   = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_BORDER_COLOUR);
-  m_GripperColor                  = m_mgr.GetArtProvider()->GetColor(wxAUI_ART_GRIPPER_COLOUR);
+  m_PaneBorderSize                = m_Mgr.GetArtProvider()->GetMetric(wxAUI_ART_PANE_BORDER_SIZE);
+  m_SashSize                      = m_Mgr.GetArtProvider()->GetMetric(wxAUI_ART_SASH_SIZE);
+  m_CaptionSize                   = m_Mgr.GetArtProvider()->GetMetric(wxAUI_ART_CAPTION_SIZE);
+  m_BackgroundColor               = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_BACKGROUND_COLOUR);
+  m_SashColor                     = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_SASH_COLOUR);
+  m_InactiveCaptionColor          = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR);
+  m_InactiveCaptionGradientColor  = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR);
+  m_InactiveCaptionTextColor      = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR);
+  m_ActiveCaptionColor            = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR);
+  m_ActiveCaptionGradientColor    = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR);
+  m_ActiveCaptionTextColor        = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR);
+  m_BorderColor                   = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_BORDER_COLOUR);
+  m_GripperColor                  = m_Mgr.GetArtProvider()->GetColor(wxAUI_ART_GRIPPER_COLOUR);
 
-  m_AllowFloating   = (m_mgr.GetFlags() & wxAUI_MGR_ALLOW_FLOATING)    ? 1 : 0;
-  m_AllowActivePane = (m_mgr.GetFlags() & wxAUI_MGR_ALLOW_ACTIVE_PANE) ? 1 : 0;
+  m_AllowFloating   = (m_Mgr.GetFlags() & wxAUI_MGR_ALLOW_FLOATING)    ? 1 : 0;
+  m_AllowActivePane = (m_Mgr.GetFlags() & wxAUI_MGR_ALLOW_ACTIVE_PANE) ? 1 : 0;
 
-  if( m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_GRADIENT_TYPE) == wxAUI_GRADIENT_NONE)        m_CaptionMode = 0;
-  if( m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_GRADIENT_TYPE) == wxAUI_GRADIENT_VERTICAL)    m_CaptionMode = 1;
-  if( m_mgr.GetArtProvider()->GetMetric(wxAUI_ART_GRADIENT_TYPE) == wxAUI_GRADIENT_HORIZONTAL)  m_CaptionMode = 2;
+  if( m_Mgr.GetArtProvider()->GetMetric(wxAUI_ART_GRADIENT_TYPE) == wxAUI_GRADIENT_NONE)        m_CaptionMode = 0;
+  if( m_Mgr.GetArtProvider()->GetMetric(wxAUI_ART_GRADIENT_TYPE) == wxAUI_GRADIENT_VERTICAL)    m_CaptionMode = 1;
+  if( m_Mgr.GetArtProvider()->GetMetric(wxAUI_ART_GRADIENT_TYPE) == wxAUI_GRADIENT_HORIZONTAL)  m_CaptionMode = 2;
 
   m_CaptionModeLabels[0] = "paint caption with flat color";
   m_CaptionModeLabels[1] = "paint caption with horizontal gradient";
@@ -131,65 +131,65 @@ void mafGUIDockSettings::OnEvent(mafEventBase *evt)
     switch(e->GetId())
     {
     case ID_PaneBorderSize:
-      m_mgr.GetArtProvider()->SetMetric(wxAUI_ART_PANE_BORDER_SIZE,m_PaneBorderSize);
+      m_Mgr.GetArtProvider()->SetMetric(wxAUI_ART_PANE_BORDER_SIZE,m_PaneBorderSize);
       break;
     case ID_SashSize:
-      m_mgr.GetArtProvider()->SetMetric(wxAUI_ART_SASH_SIZE,m_SashSize);
+      m_Mgr.GetArtProvider()->SetMetric(wxAUI_ART_SASH_SIZE,m_SashSize);
       break;
     case ID_CaptionSize:
-      m_mgr.GetArtProvider()->SetMetric(wxAUI_ART_CAPTION_SIZE,m_CaptionSize);
+      m_Mgr.GetArtProvider()->SetMetric(wxAUI_ART_CAPTION_SIZE,m_CaptionSize);
       break;
     case ID_BackgroundColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_BACKGROUND_COLOUR,m_BackgroundColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_BACKGROUND_COLOUR,m_BackgroundColor);
       break;
     case ID_SashColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_SASH_COLOUR,m_SashColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_SASH_COLOUR,m_SashColor);
       break;
     case ID_InactiveCaptionColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR,m_InactiveCaptionColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_COLOUR,m_InactiveCaptionColor);
       break;
     case ID_InactiveCaptionGradientColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR,m_InactiveCaptionGradientColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_GRADIENT_COLOUR,m_InactiveCaptionGradientColor);
       break;
     case ID_InactiveCaptionTextColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR,m_InactiveCaptionTextColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_INACTIVE_CAPTION_TEXT_COLOUR,m_InactiveCaptionTextColor);
       break;
     case ID_ActiveCaptionColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR,m_ActiveCaptionColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_ACTIVE_CAPTION_COLOUR,m_ActiveCaptionColor);
       break;
     case ID_ActiveCaptionGradientColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR,m_ActiveCaptionGradientColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_ACTIVE_CAPTION_GRADIENT_COLOUR,m_ActiveCaptionGradientColor);
       break;
     case ID_ActiveCaptionTextColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR,m_ActiveCaptionTextColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_ACTIVE_CAPTION_TEXT_COLOUR,m_ActiveCaptionTextColor);
       break;
     case ID_BorderColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_BORDER_COLOUR,m_BorderColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_BORDER_COLOUR,m_BorderColor);
       break;
     case ID_GripperColor:
-      m_mgr.GetArtProvider()->SetColor(wxAUI_ART_GRIPPER_COLOUR,m_GripperColor);
+      m_Mgr.GetArtProvider()->SetColor(wxAUI_ART_GRIPPER_COLOUR,m_GripperColor);
       break;
     case ID_AllowFloating:
       if(m_AllowFloating)
-        m_mgr.SetFlags(m_mgr.GetFlags() | wxAUI_MGR_ALLOW_FLOATING);
+        m_Mgr.SetFlags(m_Mgr.GetFlags() | wxAUI_MGR_ALLOW_FLOATING);
       else
-        m_mgr.SetFlags(m_mgr.GetFlags() & ~ wxAUI_MGR_ALLOW_FLOATING);
+        m_Mgr.SetFlags(m_Mgr.GetFlags() & ~ wxAUI_MGR_ALLOW_FLOATING);
       break;
     case ID_AllowActivePane:
       if(m_AllowActivePane)
-        m_mgr.SetFlags(m_mgr.GetFlags() | wxAUI_MGR_ALLOW_ACTIVE_PANE);
+        m_Mgr.SetFlags(m_Mgr.GetFlags() | wxAUI_MGR_ALLOW_ACTIVE_PANE);
       else
-        m_mgr.SetFlags(m_mgr.GetFlags() & ~ wxAUI_MGR_ALLOW_ACTIVE_PANE);
+        m_Mgr.SetFlags(m_Mgr.GetFlags() & ~ wxAUI_MGR_ALLOW_ACTIVE_PANE);
       break;
     case ID_CaptionMode:
-      if(m_CaptionMode == 0) m_mgr.GetArtProvider()->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
-      if(m_CaptionMode == 1) m_mgr.GetArtProvider()->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_VERTICAL);
-      if(m_CaptionMode == 2) m_mgr.GetArtProvider()->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_HORIZONTAL);
+      if(m_CaptionMode == 0) m_Mgr.GetArtProvider()->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
+      if(m_CaptionMode == 1) m_Mgr.GetArtProvider()->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_VERTICAL);
+      if(m_CaptionMode == 2) m_Mgr.GetArtProvider()->SetMetric(wxAUI_ART_GRADIENT_TYPE, wxAUI_GRADIENT_HORIZONTAL);
       break;
     default: 
       e->Log();
     break;
     }
-    m_mgr.Update();
+    m_Mgr.Update();
   }
 }

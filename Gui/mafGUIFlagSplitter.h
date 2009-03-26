@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFlagSplitter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-26 16:52:47 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,7 +62,7 @@ protected:
   
   FlagSplitterDragModes m_Dragging;
 
-  int m_margin;
+  int m_Margin;
   int m_With,m_Height;
   int m_XPos1,m_XPos2;
   int m_XPosOld;

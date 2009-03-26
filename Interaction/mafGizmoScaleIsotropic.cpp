@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:58:10 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-03-26 16:52:57 $
+  Version:   $Revision: 1.7.4.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -48,10 +48,10 @@
 mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
-  IsaComp = NULL;
+  m_IsaComp = NULL;
 
   m_Listener = listener;
-  InputVme = input;
+  m_InputVme = input;
   
   // create pipeline stuff
   CreatePipeline();
@@ -64,30 +64,30 @@ mafGizmoScaleIsotropic::mafGizmoScaleIsotropic(mafVME *input, mafObserver *liste
   //-----------------
 
   // cube gizmo
-  CubeGizmo = mafVMEGizmo::New();  
-  CubeGizmo->SetName("CubeGizmo");
-  CubeGizmo->SetData(Cube->GetOutput());
+  m_CubeGizmo = mafVMEGizmo::New();  
+  m_CubeGizmo->SetName("CubeGizmo");
+  m_CubeGizmo->SetData(m_Cube->GetOutput());
   
   // assign isa to cube
-  CubeGizmo->SetBehavior(IsaComp); 
+  m_CubeGizmo->SetBehavior(m_IsaComp); 
   
-  SetAbsPose(InputVme->GetOutput()->GetAbsMatrix());
+  SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
   
   // set cube gizmo material property and initial color to light blue
   this->SetColor(0, 1, 1);
 
   //-----------------
-  CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  m_CubeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleIsotropic::~mafGizmoScaleIsotropic() 
 //----------------------------------------------------------------------------
 {
-  CubeGizmo->SetBehavior(NULL);
-  vtkDEL(Cube);
-  vtkDEL(IsaComp); 
+  m_CubeGizmo->SetBehavior(NULL);
+  vtkDEL(m_Cube);
+  vtkDEL(m_IsaComp); 
 
-	CubeGizmo->ReparentTo(NULL);
+	m_CubeGizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -95,13 +95,13 @@ void mafGizmoScaleIsotropic::CreatePipeline()
 //----------------------------------------------------------------------------
 {
   // create pipeline for cube-cylinder gizmo along global X axis
-  InputVme->Update();
+  m_InputVme->Update();
   // calculate diagonal of InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-	if(InputVme->IsA("mafVMEGizmo"))
-		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	if(m_InputVme->IsA("mafVMEGizmo"))
+		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
-		InputVme->GetOutput()->GetBounds(b);
+		m_InputVme->GetOutput()->GetBounds(b);
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
@@ -111,7 +111,7 @@ void mafGizmoScaleIsotropic::CreatePipeline()
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
   
   // create the cube
-  Cube = vtkCubeSource::New();
+  m_Cube = vtkCubeSource::New();
 
   // place the cube; default cube length is 1/16 of vme bb diagonal
   this->SetCubeLength(d / 16);
@@ -122,19 +122,19 @@ void mafGizmoScaleIsotropic::CreateISA()
 //----------------------------------------------------------------------------
 {
   
-  // create isa compositor and assign behaviors to IsaGen ivar
-  IsaComp = mmiCompositorMouse::New();
+  // create isa compositor and assign behaviors to m_IsaGen ivar
+  m_IsaComp = mmiCompositorMouse::New();
 
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
-  IsaGen = IsaComp->CreateBehavior(MOUSE_LEFT);
+  m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
 
-  IsaGen->SetVME(InputVme);
-  IsaGen->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
-  IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
+  m_IsaGen->SetVME(m_InputVme);
+  m_IsaGen->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+  m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
     
   //isa will send events to this
-  IsaGen->SetListener(this);
+  m_IsaGen->SetListener(this);
 }
 
 //----------------------------------------------------------------------------
@@ -157,16 +157,16 @@ void  mafGizmoScaleIsotropic::SetCubeLength(double cubeLength)
 //----------------------------------------------------------------------------
 {
   // set the cube length
-  Cube->SetXLength(cubeLength);
-  Cube->SetYLength(cubeLength);
-  Cube->SetZLength(cubeLength);
+  m_Cube->SetXLength(cubeLength);
+  m_Cube->SetYLength(cubeLength);
+  m_Cube->SetZLength(cubeLength);
 }
 
 //----------------------------------------------------------------------------
 double mafGizmoScaleIsotropic::GetCubeLength() const
 //----------------------------------------------------------------------------
 {
-  return Cube->GetXLength();
+  return m_Cube->GetXLength();
 }
 
 //----------------------------------------------------------------------------
@@ -183,10 +183,10 @@ void mafGizmoScaleIsotropic::OnEvent(mafEventBase *maf_event)
 void mafGizmoScaleIsotropic::SetColor(double col[3])
 //----------------------------------------------------------------------------
 {
-  CubeGizmo->GetMaterial()->m_Prop->SetColor(col);
-  CubeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-	CubeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-	CubeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+  m_CubeGizmo->GetMaterial()->m_Prop->SetColor(col);
+  m_CubeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+	m_CubeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+	m_CubeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
 }
 
 //----------------------------------------------------------------------------
@@ -202,14 +202,14 @@ void mafGizmoScaleIsotropic::SetColor(double colR, double colG, double colB)
 void mafGizmoScaleIsotropic::Show(bool show)
 //----------------------------------------------------------------------------
 {
-	mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
+	mafEventMacro(mafEvent(this,VME_SHOW,m_CubeGizmo,show));
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoScaleIsotropic::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  CubeGizmo->SetAbsMatrix(*absPose); 
+  m_CubeGizmo->SetAbsMatrix(*absPose); 
   SetRefSysMatrix(absPose);
 }
 
@@ -217,22 +217,22 @@ void mafGizmoScaleIsotropic::SetAbsPose(mafMatrix *absPose)
 void mafGizmoScaleIsotropic::SetRefSysMatrix(mafMatrix *matrix)
 //----------------------------------------------------------------------------
 {  
-  IsaGen->GetTranslationConstraint()->GetRefSys()->SetMatrix(matrix);
-  IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix); 
+  m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetMatrix(matrix);
+  m_IsaGen->GetPivotRefSys()->SetTypeToCustom(matrix); 
 }
 
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoScaleIsotropic::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return CubeGizmo->GetOutput()->GetAbsMatrix();
+  return m_CubeGizmo->GetOutput()->GetAbsMatrix();
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoScaleIsotropic::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->InputVme = vme; 
+  this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetRefSysMatrix(vme->GetOutput()->GetAbsMatrix());
 }

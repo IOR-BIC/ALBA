@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.h,v $
   Language:  C++
-  Date:      $Date: 2008-05-21 10:11:32 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-03-26 16:52:57 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -44,7 +44,7 @@ public:
   /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -85,19 +85,19 @@ protected:
   void SetRefSysMatrix(mafMatrix *constrain);
 
   /** Cube gizmo */
-  mafVMEGizmo *CubeGizmo;
+  mafVMEGizmo *m_CubeGizmo;
 
   /** Register input vme*/
-  mafVME *InputVme;
+  mafVME *m_InputVme;
   
   /** Cube source*/
-  vtkCubeSource *Cube;
+  vtkCubeSource *m_Cube;
     
   /** Cylinder and cube gizmo vme data*/
   //mafVmeData *GizmoData;
 
   /** translate PDF for cylinder and cube*/
-  vtkTransformPolyDataFilter *TranslatePDF;
+  vtkTransformPolyDataFilter *m_TranslatePDF;
   
   /** Create vtk objects needed*/
   void CreatePipeline();
@@ -106,10 +106,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *IsaComp;
+  mmiCompositorMouse *m_IsaComp;
 
   /** isa generic*/
-  mmiGenericMouse *IsaGen;
+  mmiGenericMouse *m_IsaGen;
 
   /** Gizmo color setting facilities*/
   void SetColor(double col[3]);

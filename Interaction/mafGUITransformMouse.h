@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-03-26 16:52:57 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,8 +78,8 @@ public:
   void AttachInteractorToVme();
   void DetachInteractorFromVme();
 
-  void SetRotationConstraintId(int value){RotationConstraintId = value;};
-  void SetTranslationConstraintId(int value){TranslationConstraintId = value;};
+  void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
+  void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
 protected:  
   mafInteractor* OldInteractor;
@@ -90,14 +90,14 @@ protected:
   /** Override superclass */
   void CreateGui();
 
-  mmiCompositorMouse *IsaCompositor;
+  mmiCompositorMouse *m_IsaCompositor;
 
-  mmiGenericMouse *IsaRotate;
-  mmiGenericMouse *IsaTranslate;
-  mmiGenericMouse *IsaRoll;
+  mmiGenericMouse *m_IsaRotate;
+  mmiGenericMouse *m_IsaTranslate;
+  mmiGenericMouse *m_IsaRoll;
 
-  int RotationConstraintId;
-	int TranslationConstraintId;
+  int m_RotationConstraintId;
+	int m_TranslationConstraintId;
   
   /** Override superclass */;
   void RefSysVmeChanged();

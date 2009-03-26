@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-03-26 16:52:47 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -117,7 +117,7 @@ void mafLightKit::CreateGui()
 	{
 		item = m_LightItemList[i];
 		if(item)
-			m_LightList->Append(item->name, item);
+			m_LightList->Append(item->m_Name, item);
 	}
 	m_Gui->Divider();
 
@@ -150,11 +150,11 @@ void mafLightKit::OnEvent(mafEventBase *maf_event)
         if (sel != -1)
         {
           m_SelectedLight   = (LightItem *)m_LightList->GetClientData(sel);
-          m_LightOnOff			= m_SelectedLight->on_off;
-          m_LightAzimuth		= m_SelectedLight->azimuth;
-          m_LightElevation	= m_SelectedLight->elevation;
-          m_LightIntensity	= m_SelectedLight->intensity;
-          m_LightColor			= m_SelectedLight->colour;
+          m_LightOnOff			= m_SelectedLight->m_OnOff;
+          m_LightAzimuth		= m_SelectedLight->m_Azimuth;
+          m_LightElevation	= m_SelectedLight->m_Elevation;
+          m_LightIntensity	= m_SelectedLight->m_Intensity;
+          m_LightColor			= m_SelectedLight->m_Colour;
           m_Gui->Update();
         }
       }
@@ -180,31 +180,31 @@ void mafLightKit::OnEvent(mafEventBase *maf_event)
       case ID_LIGHT_ON_OFF:
         if(m_SelectedLight)
         {
-          m_SelectedLight->light->SetSwitch(m_LightOnOff);
-          m_SelectedLight->on_off = m_LightOnOff;
+          m_SelectedLight->m_Light->SetSwitch(m_LightOnOff);
+          m_SelectedLight->m_OnOff = m_LightOnOff;
         }
       break;
       case ID_LIGHT_AZIMUTH:
       case ID_LIGHT_ELEVATION:
         if(m_SelectedLight)
         {
-          m_SelectedLight->light->SetDirectionAngle(m_LightElevation, m_LightAzimuth);
-          m_SelectedLight->azimuth = m_LightAzimuth;
-          m_SelectedLight->elevation = m_LightElevation;
+          m_SelectedLight->m_Light->SetDirectionAngle(m_LightElevation, m_LightAzimuth);
+          m_SelectedLight->m_Azimuth = m_LightAzimuth;
+          m_SelectedLight->m_Elevation = m_LightElevation;
         }
       break;
       case ID_LIGHT_INTENSITY:
         if(m_SelectedLight)
         {
-          m_SelectedLight->light->SetIntensity(m_LightIntensity);
-          m_SelectedLight->intensity = m_LightIntensity;
+          m_SelectedLight->m_Light->SetIntensity(m_LightIntensity);
+          m_SelectedLight->m_Intensity = m_LightIntensity;
         }
       break;
       case ID_LIGHT_COLOR:
         if(m_SelectedLight)
         {
-          m_SelectedLight->light->SetColor(m_LightColor.Red()/255.0,m_LightColor.Green()/255.0,m_LightColor.Blue()/255.0);
-          m_SelectedLight->colour = m_LightColor;
+          m_SelectedLight->m_Light->SetColor(m_LightColor.Red()/255.0,m_LightColor.Green()/255.0,m_LightColor.Blue()/255.0);
+          m_SelectedLight->m_Colour = m_LightColor;
         }
       break;
     }
@@ -236,7 +236,7 @@ void mafLightKit::AddLight()
 	m_LightList->Append(light_name,m_SelectedLight);  
   //m_LightList->SetSelection(m_LightList->Number() - 1,true);
   m_LightList->SetSelection(m_LightList->GetCount() - 1,true);
-	m_LightRenderer->AddLight(m_SelectedLight->light);
+	m_LightRenderer->AddLight(m_SelectedLight->m_Light);
 
 	m_LightCounter++;
 	EnableWidget(true);
@@ -254,7 +254,7 @@ void mafLightKit::RemoveLight(int sel)
 			break;
 		}
 	}
-	m_LightRenderer->RemoveLight(m_SelectedLight->light);
+	m_LightRenderer->RemoveLight(m_SelectedLight->m_Light);
 	m_LightList->Delete(sel);
 	delete m_SelectedLight;
 	m_SelectedLight = NULL;

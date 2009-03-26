@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLightKit.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-03-26 16:52:47 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -50,14 +50,14 @@ public:
 protected:
 	class LightItem {
 		public:
-			LightItem(wxString n, int onoff,float az,float el,float inten,wxColour c, vtkLight *l) {name = n; on_off = onoff; azimuth = az; elevation = el; intensity = inten; colour = c; light = l;};
+			LightItem(wxString n, int onoff,float az,float el,float inten,wxColour c, vtkLight *l) {m_Name = n; m_OnOff = onoff; m_Azimuth = az; m_Elevation = el; m_Intensity = inten; m_Colour = c; m_Light = l;};
 			~LightItem() {};
 
-			wxString name;
-			int on_off;
-			float	azimuth,elevation,intensity;
-			wxColour colour;
-			vtkLight *light;
+			wxString m_Name;
+			int m_OnOff;
+			float	m_Azimuth,m_Elevation,m_Intensity;
+			wxColour m_Colour;
+			vtkLight *m_Light;
 	};
 	
 	/** Add a light to the scene. */
