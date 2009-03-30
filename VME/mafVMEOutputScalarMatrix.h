@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputScalarMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-03-30 10:11:38 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -59,6 +59,12 @@ public:
 
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
+
+  /** Retrieve Number Of Rows  written in a string*/
+  const char *GetNumberOfRows(){return m_NumberOfRows.GetCStr();}
+
+  /** Retrieve Number Of Columns  written in a string*/
+  const char *GetNumberOfColumns(){return m_NumberOfColumns.GetCStr();}
     
 protected:
   mafVMEOutputScalarMatrix(); // to be allocated with New()
