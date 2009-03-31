@@ -101,9 +101,16 @@ SET(PROJECT_SRCS
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
   
-  #medOpImporterDicomGrassroots.cpp
-  #medOpImporterDicomGrassroots.h
 )
+
+IF (MED_USE_GDCM)
+SET(PROJECT_SRCS ${PROJECT_SRCS}
+  medOpImporterDicomGrassroots.cpp
+  medOpImporterDicomGrassroots.h
+ )
+ENDIF (MED_USE_GDCM)
+
+  
 
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
