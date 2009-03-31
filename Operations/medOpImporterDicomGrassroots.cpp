@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-24 16:38:31 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-03-31 15:46:26 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,7 +43,7 @@
 #include "gdcmImageReader.h"
 #include "gdcmDataElement.h"
 #include "vtkMedicalImageProperties.h"
-//#include "gdcmReader.h"
+#include "gdcmReader.h"
 #include "gdcmFileMetaInformation.h"
 #include "gdcmGlobal.h"
 #include "gdcmDicts.h"
@@ -494,14 +494,8 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
     return;
   }
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  //mafProgressBarShowMacro();
-  //mafProgressBarSetTextMacro("Reading CT directory...");
   long progress = 0;
   // get the dicom files from the directory
-  /*if(m_DICOM==0)
-    wxBusyInfo wait_info("Reading CT directory: please wait");
-  if(m_DICOM==1)
-    wxBusyInfo wait_info("Reading MRI directory: please wait");*/
   wxBusyInfo wait_info("Reading DICOM directory: please wait");
 
   m_DICOMType=ID_CT;
@@ -521,8 +515,6 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
       str_tmp.Append("\\");
       str_tmp.Append(m_CurrentSliceName);
 
-
-      //vtkGDCMImageReader *reader1 = vtkGDCMImageReader::New();
       if (m_DicomReader->CanReadFile(str_tmp.c_str()))
       {
         m_DicomReader->SetFileName(str_tmp.c_str());
@@ -533,135 +525,109 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
         continue;
       }
 
-     
-     /* vtkDicomUnPacker *reader = vtkDicomUnPacker::New();
-      reader->SetFileName((char *)str_tmp.c_str());
-      reader->UseDefaultDictionaryOff();
-      reader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-      reader->UpdateInformation();*/
-
-      //ct_mode = reader->GetCTMode();
-
-      ct_mode = m_DicomReader->GetMedicalImageProperties()->GetModality();//Robbi
-     // ct_mode.MakeUpper();
-     // ct_mode.Trim(FALSE);
-     // ct_mode.Trim();
-      /*if (strcmp( reader->GetModality(), "CT" ) == 0 || strcmp( reader->GetModality(), "XA" )==0)
+      ct_mode = m_DicomReader->GetMedicalImageProperties()->GetModality();
+      row = m_StudyListbox->FindString(m_DicomReader->GetMedicalImageProperties()->GetStudyID());//StudyUID
+      if (row == -1)
       {
-        //if (strcmp(reader->GetCTMode(),"SCOUT MODE") == 0 || reader->GetStatus() == -1)
-        if(ct_mode.Find("SCOUT") != -1 || reader->GetStatus() == -1)
+        // the study is not present into the listbox, so need to create new
+        // list of files related to the new studyID
+        m_FilesList = new ListDicomFiles;
+        m_StudyListbox->Append(m_DicomReader->GetMedicalImageProperties()->GetStudyID());
+        m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+        m_DicomReader->GetImagePositionPatient(slice_pos);
+        if (strcmp(ct_mode.c_str(),"MRI") == 0)
         {
-          reader->Delete();
-          continue;
-        }*/
+          //attribute stuff
+          gdcm::Reader imageReader;
+          imageReader.SetFileName(m_DicomReader->GetFileName());
+          imageReader.Read();
 
-        //row = m_StudyListbox->FindString(reader->GetStudy());
-        //row = m_StudyListbox->FindString(reader->GetStudyUID());
-        row = m_StudyListbox->FindString(m_DicomReader->GetMedicalImageProperties()->GetStudyID());//StudyUID
-        if (row == -1)
-        {
-          // the study is not present into the listbox, so need to create new
-          // list of files related to the new studyID
-          m_FilesList = new ListDicomFiles;
-          //m_StudyListbox->Append(reader->GetStudy());
-          m_StudyListbox->Append(m_DicomReader->GetMedicalImageProperties()->GetStudyID());
-          m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-          //reader->GetSliceLocation(slice_pos);
-          m_DicomReader->GetImagePositionPatient(slice_pos);
-          if (strcmp(ct_mode.c_str(),"MRI") == 0)
+          gdcm::DataSet const& ds = imageReader.GetFile().GetDataSet();
+          const gdcm::DataElement &ref  = ds.GetDataElement(gdcm::Tag(0x020,0x013));
+          wxString instanceNumber = ref.GetByteValue()->GetPointer();
+          instanceNumber.Truncate(ref.GetByteValue()->GetLength());
+
+          const gdcm::DataElement &ref1  = ds.GetDataElement(gdcm::Tag(0x018,0x1090));
+          wxString cardiacNumberOfImages = ref1.GetByteValue()->GetPointer();
+          cardiacNumberOfImages.Truncate(ref1.GetByteValue()->GetLength());
+
+          const gdcm::DataElement &ref2  = ds.GetDataElement(gdcm::Tag(0x018,0x1060));
+          wxString triggerTime = ref2.GetByteValue()->GetPointer();
+          triggerTime.Truncate(ref2.GetByteValue()->GetLength());
+
+          imageNumber = printf("%d", instanceNumber.c_str());
+          cardNumImages = printf("%d", cardiacNumberOfImages.c_str());
+          if(cardNumImages>1)
           {
-            //attribute stuff
-            gdcm::Reader imageReader;
-            imageReader.SetFileName(m_DicomReader->GetFileName());
-            imageReader.Read();
-
-            gdcm::DataSet const& ds = imageReader.GetFile().GetDataSet();
-            const gdcm::DataElement &ref  = ds.GetDataElement(gdcm::Tag(0x020,0x013));
-            wxString instanceNumber = ref.GetByteValue()->GetPointer();
-            instanceNumber.Truncate(ref.GetByteValue()->GetLength());
-
-            const gdcm::DataElement &ref1  = ds.GetDataElement(gdcm::Tag(0x018,0x1090));
-            wxString cardiacNumberOfImages = ref1.GetByteValue()->GetPointer();
-            cardiacNumberOfImages.Truncate(ref1.GetByteValue()->GetLength());
-
-            const gdcm::DataElement &ref2  = ds.GetDataElement(gdcm::Tag(0x018,0x1060));
-            wxString triggerTime = ref2.GetByteValue()->GetPointer();
-            triggerTime.Truncate(ref2.GetByteValue()->GetLength());
-
-            imageNumber = printf("%d", instanceNumber.c_str());
-            cardNumImages = printf("%d", cardiacNumberOfImages.c_str());
-            if(cardNumImages>1)
+            if (m_DICOMType==-1)
+              m_DICOMType=ID_CMRI;
+            else if(m_DICOMType!=ID_CMRI)
             {
-              if (m_DICOMType==-1)
-                m_DICOMType=ID_CMRI;
-              else if(m_DICOMType!=ID_CMRI)
-              {
-                wxString msg = "cMRI damaged !";
-                wxMessageBox(msg,"Confirm", wxOK , NULL);
-                return;
-              }
+              wxString msg = "cMRI damaged !";
+              wxMessageBox(msg,"Confirm", wxOK , NULL);
+              return;
             }
-            else
-            {
-              if (m_DICOMType==-1)
-                m_DICOMType=ID_MRI;
-              else if(m_DICOMType!=ID_MRI)
-              {
-                wxString msg = "cMRI damaged !";
-                wxMessageBox(msg,"Confirm", wxOK , NULL);
-                return;
-              }
-            }
-            trigTime = printf("%d", triggerTime.c_str());
-            m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
-            m_NumberOfStudy++;
           }
           else
           {
-            m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
-            m_NumberOfStudy++;
+            if (m_DICOMType==-1)
+              m_DICOMType=ID_MRI;
+            else if(m_DICOMType!=ID_MRI)
+            {
+              wxString msg = "cMRI damaged !";
+              wxMessageBox(msg,"Confirm", wxOK , NULL);
+              return;
+            }
           }
+          trigTime = printf("%d", triggerTime.c_str());
+          m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
+          m_NumberOfStudy++;
         }
-        else 
+        else
         {
-          m_DicomReader->GetImagePositionPatient(slice_pos);
-          if (strcmp(ct_mode.c_str(),"MRI") == 0)
-          {
-            //attribute stuff
-            gdcm::Reader imageReader;
-            imageReader.SetFileName(m_DicomReader->GetFileName());
-            imageReader.Read();
-
-            gdcm::DataSet const& ds = imageReader.GetFile().GetDataSet();
-            const gdcm::DataElement &ref  = ds.GetDataElement(gdcm::Tag(0x020,0x013));
-            wxString instanceNumber = ref.GetByteValue()->GetPointer();
-            instanceNumber.Truncate(ref.GetByteValue()->GetLength());
-
-            const gdcm::DataElement &ref1  = ds.GetDataElement(gdcm::Tag(0x018,0x1090));
-            wxString cardiacNumberOfImages = ref1.GetByteValue()->GetPointer();
-            cardiacNumberOfImages.Truncate(ref1.GetByteValue()->GetLength());
-
-            const gdcm::DataElement &ref2  = ds.GetDataElement(gdcm::Tag(0x018,0x1060));
-            wxString triggerTime = ref2.GetByteValue()->GetPointer();
-            triggerTime.Truncate(ref2.GetByteValue()->GetLength());
-
-            imageNumber = printf("%d", instanceNumber.c_str());
-            cardNumImages = printf("%d", cardiacNumberOfImages.c_str());
-            trigTime = printf("%d", triggerTime.c_str());
-            ((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
-          }
-          else
-          {
-            ((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
-          }         
+          m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+          m_NumberOfStudy++;
         }
       }
-      progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+      else 
+      {
+        m_DicomReader->GetImagePositionPatient(slice_pos);
+        if (strcmp(ct_mode.c_str(),"MRI") == 0)
+        {
+          //attribute stuff
+          gdcm::Reader imageReader;
+          imageReader.SetFileName(m_DicomReader->GetFileName());
+          imageReader.Read();
+
+          gdcm::DataSet const& ds = imageReader.GetFile().GetDataSet();
+          const gdcm::DataElement &ref  = ds.GetDataElement(gdcm::Tag(0x020,0x013));
+          wxString instanceNumber = ref.GetByteValue()->GetPointer();
+          instanceNumber.Truncate(ref.GetByteValue()->GetLength());
+
+          const gdcm::DataElement &ref1  = ds.GetDataElement(gdcm::Tag(0x018,0x1090));
+          wxString cardiacNumberOfImages = ref1.GetByteValue()->GetPointer();
+          cardiacNumberOfImages.Truncate(ref1.GetByteValue()->GetLength());
+
+          const gdcm::DataElement &ref2  = ds.GetDataElement(gdcm::Tag(0x018,0x1060));
+          wxString triggerTime = ref2.GetByteValue()->GetPointer();
+          triggerTime.Truncate(ref2.GetByteValue()->GetLength());
+
+          imageNumber = printf("%d", instanceNumber.c_str());
+          cardNumImages = printf("%d", cardiacNumberOfImages.c_str());
+          trigTime = printf("%d", triggerTime.c_str());
+          ((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
+        }
+        else
+        {
+          ((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+        }         
+      }
     }
+    progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+  }
 
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-  //mafProgressBarHideMacro();
   if(m_NumberOfStudy == 0)
   {
     wxString msg = "No study found!";
@@ -1000,10 +966,20 @@ void medOpImporterDicomGrassroots::ImportDicomTags()
 
     const gdcm::DictEntry& de = pub.GetDictEntry( gdcm::Tag(ref.GetTag()));
     const char *attributeName = de.GetName();
-    if (!attributeValue.IsEmpty())
+    if (!attributeValue.IsEmpty() && attributeValue.IsAscii())
     {
-      m_TagArray->SetTag(mafTagItem(attributeName,""));
-      m_TagArray->GetTag(attributeName)->SetValue(attributeValue);
+      if(attributeValue.Length()==1)
+      {
+        if (attributeValue.IsWord() || attributeValue.IsNumber())
+        {
+          m_TagArray->SetTag(mafTagItem(attributeName,attributeValue.c_str()));
+        }
+      }
+      else
+      {
+        m_TagArray->SetTag(mafTagItem(attributeName,attributeValue.c_str()));
+        //m_TagArray->GetTag(attributeName)->SetValue(attributeValue.c_str());
+      }
     }
   }
 }
@@ -1229,7 +1205,7 @@ int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMIm
 		return 0;
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicomGrassroots::	OnEvent(mafEventBase *maf_event) 
+void medOpImporterDicomGrassroots::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
