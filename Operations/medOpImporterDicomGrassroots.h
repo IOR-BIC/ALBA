@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-24 16:38:31 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-03-31 15:45:48 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,6 @@ class mafGUIDialogPreview;
 class mmoDICOMImporterListElement;
 class mmiDICOMImporterInteractor;
 class vtkPlaneSource;
-//class vtkDicomUnPacker;
 class vtkGDCMImageReader;
 class vtkDirectory;
 class vtkTexture;
@@ -161,7 +160,6 @@ protected:
 	//mafString									m_DictionaryFilename;
 	mafString									m_DICOMDir;
 	mafString									m_CurrentSliceName;
-  mafString									m_current_slice_name;
   //int												m_DICOM;
 	
 	// slices related informations
