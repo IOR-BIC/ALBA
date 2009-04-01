@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-04-01 13:05:40 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,14 @@ public:
 
   /** Used to add a landmark to the cloud */
   void AddLandmark(double pos[3]);
+
+  void SetPickingActiveFlag(bool picking){m_PickingActiveFlag = picking;}
+  bool GetPickingActiveFlag(){return m_PickingActiveFlag;}
+
+  mafVME* GetPickedVme(){return m_PickedVme;};
+  mafVMELandmarkCloud* GetCloud(){return m_Cloud;};
+
+  void SetLandmarkName(mafString name){m_LandmarkName = name;};
 
 protected:
 	/** Create the AddLandmarks interface. */

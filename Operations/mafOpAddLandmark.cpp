@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-04-01 13:05:40 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,10 @@ mafOp(label)
 mafOpAddLandmark::~mafOpAddLandmark()
 //----------------------------------------------------------------------------
 {
+  for (int i=0;i<m_LandmarkAdded.size();i++)
+  {
+    mafDEL(m_LandmarkAdded[i]);
+  }
 	m_LandmarkAdded.clear();
   mafDEL(m_LandmarkPicker);
 	if(m_CloudCreatedFlag) 
@@ -111,7 +115,7 @@ bool mafOpAddLandmark::Accept(mafNode *node)
 	}
 
 	m_PickingActiveFlag = false;
-  return true;
+  return false;
 }
 //----------------------------------------------------------------------------
 // Widgets ID's
@@ -187,51 +191,54 @@ void mafOpAddLandmark::OpRun()
 		}
 	}
   
-  mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
-
-  // setup gui_panel
-  m_GuiPanel = new mafGUINamedPanel(mafGetFrame(),-1);
-  m_GuiPanel->SetTitle(_("Add Landmark:"));
-
-  // setup splitter
-  mafGUISplittedPanel *sp = new mafGUISplittedPanel(m_GuiPanel,-1);
-  m_GuiPanel->Add(sp,1,wxEXPAND);
-
-  // setup dictionary
-  m_Dict = new mafGUIDictionaryWidget(sp,-1);
-  m_Dict->SetListener(this);
-  m_Dict->SetCloud(m_Cloud);
-  sp->PutOnTop(m_Dict->GetWidget());
-
-  // setup GuiHolder
-  m_Guih = new mafGUIHolder(sp,-1,false,true);
-  
-
-  // setup Gui
-  m_Gui = new mafGUI(this);
-  m_Gui->SetListener(this);
-  m_Gui->Button(ID_LOAD,_("load dictionary"));
-  m_Gui->Divider();
-  m_Gui->Label(_("landmark name"));
-  m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
-  m_Gui->Divider();
-  m_Gui->Button(ID_ADD_LANDMARK,_("add landmark"));
-  m_Gui->Divider();
-  m_Gui->Bool(ID_ADD_TO_CURRENT_TIME, _("current time"),&m_AddToCurrentTime,1,tooltip);
-  m_Gui->Divider();
-  m_Gui->Label(_("choose a name from the dictionary"));
-  m_Gui->Label(_("and place landmark by"));
-  m_Gui->Label(_("clicking on the parent surface"));
-  m_Gui->Divider();
-  m_Gui->Vector(ID_CHANGE_POSITION, _("Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
-  m_Gui->OkCancel();
-  m_Gui->Enable(wxOK, false);
-
-  // Show Gui
-  m_Guih->Put(m_Gui);
-
-  sp->PutOnBottom(m_Guih);
-  mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_GuiPanel));
+  if (!GetTestMode())
+  {
+	  mafString tooltip(_("If checked, add the landmark to the current time. \nOtherwise add the landmark at time = 0"));
+	
+	  // setup gui_panel
+	  m_GuiPanel = new mafGUINamedPanel(mafGetFrame(),-1);
+	  m_GuiPanel->SetTitle(_("Add Landmark:"));
+	
+	  // setup splitter
+	  mafGUISplittedPanel *sp = new mafGUISplittedPanel(m_GuiPanel,-1);
+	  m_GuiPanel->Add(sp,1,wxEXPAND);
+	
+	  // setup dictionary
+	  m_Dict = new mafGUIDictionaryWidget(sp,-1);
+	  m_Dict->SetListener(this);
+	  m_Dict->SetCloud(m_Cloud);
+	  sp->PutOnTop(m_Dict->GetWidget());
+	
+	  // setup GuiHolder
+	  m_Guih = new mafGUIHolder(sp,-1,false,true);
+	  
+	
+	  // setup Gui
+	  m_Gui = new mafGUI(this);
+	  m_Gui->SetListener(this);
+	  m_Gui->Button(ID_LOAD,_("load dictionary"));
+	  m_Gui->Divider();
+	  m_Gui->Label(_("landmark name"));
+	  m_Gui->String(ID_LM_NAME,"",&m_LandmarkName);
+	  m_Gui->Divider();
+	  m_Gui->Button(ID_ADD_LANDMARK,_("add landmark"));
+	  m_Gui->Divider();
+	  m_Gui->Bool(ID_ADD_TO_CURRENT_TIME, _("current time"),&m_AddToCurrentTime,1,tooltip);
+	  m_Gui->Divider();
+	  m_Gui->Label(_("choose a name from the dictionary"));
+	  m_Gui->Label(_("and place landmark by"));
+	  m_Gui->Label(_("clicking on the parent surface"));
+	  m_Gui->Divider();
+	  m_Gui->Vector(ID_CHANGE_POSITION, _("Position"), m_LandmarkPosition,MINFLOAT,MAXFLOAT,2,_("landmark position"));
+	  m_Gui->OkCancel();
+	  m_Gui->Enable(wxOK, false);
+	
+	  // Show Gui
+	  m_Guih->Put(m_Gui);
+	
+	  sp->PutOnBottom(m_Guih);
+	  mafEventMacro(mafEvent(this,OP_SHOW_GUI,(wxWindow *)m_GuiPanel));
+  }
 
 }
 //----------------------------------------------------------------------------
@@ -370,6 +377,10 @@ void mafOpAddLandmark::OpStop(int result)
 void mafOpAddLandmark::AddLandmark(double pos[3])
 //----------------------------------------------------------------------------
 {
+  m_LandmarkPosition[0] = pos[0];
+  m_LandmarkPosition[1] = pos[1];
+  m_LandmarkPosition[2] = pos[2];
+
   bool cloud_was_open = m_Cloud->IsOpen();
   if (!cloud_was_open)
   {
@@ -397,7 +408,11 @@ void mafOpAddLandmark::AddLandmark(double pos[3])
   {
     m_Cloud->Close();
   }
-  m_Gui->Enable(wxOK, true);
+
+  if (m_Gui && !GetTestMode())
+  {
+  	m_Gui->Enable(wxOK, true);
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpAddLandmark::AddLandmark()
