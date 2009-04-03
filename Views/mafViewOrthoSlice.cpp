@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-03 07:06:33 $
-  Version:   $Revision: 1.61.2.5 $
+  Date:      $Date: 2009-04-03 07:09:28 $
+  Version:   $Revision: 1.61.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -189,8 +189,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     if(pipeSliceZ) 
     {
       pipeSliceZ->SplineModeOn();
-      pipeSliceZ->FillOn();
-      
+      pipeSliceZ->FillOn(); 
     }
 
   }
