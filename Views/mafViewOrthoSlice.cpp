@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-20 10:59:08 $
-  Version:   $Revision: 1.61.2.4 $
+  Date:      $Date: 2009-04-03 07:06:33 $
+  Version:   $Revision: 1.61.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -170,15 +170,14 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   else if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
   {
     
-    mafPipePolylineSlice *pipeSliceX = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node);
+    mafPipePolylineSlice *pipeSliceX = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
     if(pipeSliceX) 
     {
       pipeSliceX->SplineModeOn();
       pipeSliceX->FillOn();
-      
     }
 
-    mafPipePolylineSlice *pipeSliceY = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node);
+    mafPipePolylineSlice *pipeSliceY = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
     if(pipeSliceY) 
     {
       pipeSliceY->SplineModeOn();
@@ -186,7 +185,7 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
       
     }
     
-    mafPipePolylineSlice *pipeSliceZ = (mafPipePolylineSlice*)((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node);
+    mafPipePolylineSlice *pipeSliceZ = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
     if(pipeSliceZ) 
     {
       pipeSliceZ->SplineModeOn();
