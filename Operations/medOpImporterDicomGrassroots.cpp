@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-31 15:46:26 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-04-06 12:21:20 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -65,6 +65,7 @@
 #include "vtkWindowLevelLookupTable.h"
 #include "vtkProbeFilter.h"
 #include "vtkStructuredPoints.h"
+#include "vtkImageData.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkOutlineFilter.h"
@@ -73,7 +74,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
 #include "vtkPointData.h"
 #include "mafStorage.h"
 #include "mafEventIO.h"
@@ -82,19 +83,19 @@
 #include "../../openMAF/vtkMAF/vtkMAFLargeImageData.h"
 #include "../../openMAF/vtkMAF/vtkMAFLargeDataSetCallback.h"
 #include "../../openMAF/vtkMAF/vtkMAFFileDataProvider.h"
-#endif // VME_VOLUME_LARGE
+#endif // VME_VOLUME_LARGE*/
 
 
 
 
 
-int compareX(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
-int compareY(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
-int compareZ(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
-int compareTriggerTime(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
-int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2);
+int compareX(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2);
+int compareY(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2);
+int compareZ(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2);
+int compareTriggerTime(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2);
+int compareImageNumber(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2);
 
-WX_DEFINE_LIST(ListDicomFiles);
+WX_DEFINE_LIST(ListDicomFilesGrassroots);
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicomGrassroots);
@@ -129,12 +130,9 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 	m_NumberOfStudy		= 0;
 	m_NumberOfSlices	= 0;
 	m_NumberOfTimeFrames = 0;
-	//m_DICOM = 0;
 	m_DICOMType = -1;
+  m_CurrentID = -1;
 
-  /*wxString dictionary = mafGetApplicationDirectory().c_str();
-  dictionary += "\\Config\\Dictionary\\";
-	dictionary.Append("dicom3.dic");*/
 
 	m_DICOMDir	= mafGetApplicationDirectory().c_str();
   m_DICOMDir += "\\Data\\External\\";
@@ -180,18 +178,18 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 
   m_BoxCorrect = false;
 
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   m_VolumeLarge = NULL;
   m_MemLimit = 16;	//memory limit in MB, default is 16 MB
-#endif // VME_VOLUME_LARGE
+#endif // VME_VOLUME_LARGE*/
 }
 //----------------------------------------------------------------------------
 medOpImporterDicomGrassroots::~medOpImporterDicomGrassroots()
 //----------------------------------------------------------------------------
 {
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   vtkDEL(m_VolumeLarge);
-#endif
+#endif*/
 	vtkDEL(m_Volume);
   vtkDEL(m_Image);
 }
@@ -218,8 +216,8 @@ void medOpImporterDicomGrassroots::OpStop(int result)
   //close dialog
 	for (int i=0; i < m_NumberOfStudy;i++)
 	{
-		((ListDicomFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(TRUE);
-		((ListDicomFiles *)m_StudyListbox->GetClientData(i))->Clear();
+		((ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(i))->DeleteContents(TRUE);
+		((ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(i))->Clear();
 	}
 
   m_DicomDialog->GetRWI()->m_RenFront->RemoveActor(m_SliceActor);   //SIL. 28-11-2003: - you must always remove actors from the Renderer before cleaning
@@ -242,13 +240,13 @@ void medOpImporterDicomGrassroots::OpStop(int result)
 	cppDEL(m_FilesList);
 
 	mafEventMacro(mafEvent(this,result));
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   if (result == OP_RUN_OK && m_VolumeLarge != NULL)
   {
     //save the VME data, it should not prompt for saving
     mafEventMacro( mafEvent(this, MENU_FILE_SAVE));
   }
-#endif
+#endif*/
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomGrassroots::OpDo()
@@ -260,10 +258,10 @@ void medOpImporterDicomGrassroots::OpDo()
 	  mafEventMacro(mafEvent(this,VME_ADD,m_Image));
   if(m_Volume != NULL)
     mafEventMacro(mafEvent(this,VME_ADD,m_Volume));
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   if(m_VolumeLarge != NULL)
     mafEventMacro(mafEvent(this,VME_ADD,m_VolumeLarge));
-#endif
+#endif*/
 
 }
 //----------------------------------------------------------------------------
@@ -276,18 +274,18 @@ void medOpImporterDicomGrassroots::OpUndo()
 	  mafEventMacro(mafEvent(this,VME_REMOVE,m_Image));
   if(m_Volume != NULL)
     mafEventMacro(mafEvent(this,VME_REMOVE,m_Volume));
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   if(m_VolumeLarge != NULL)
     mafEventMacro(mafEvent(this,VME_REMOVE,m_VolumeLarge));
-#endif
+#endif*/
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomGrassroots::CreatePipeline()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_CTDirectoryReader);
+	//vtkNEW(m_CTDirectoryReader);
 
-	vtkNEW(m_DicomReader);
+	//vtkNEW(m_DicomReader);
 	vtkNEW(m_SliceLookupTable);
 
 	vtkNEW(m_SliceTexture);
@@ -326,7 +324,6 @@ void medOpImporterDicomGrassroots::CreatePipeline()
 enum DICOM_IMPORTER_ID
 {
 	ID_FIRST = MINID,
-	ID_DICTIONARY,
 	ID_OPEN_DIR,
 	ID_SCAN_SLICE,
 	ID_CROP_MODE_BUTTON,
@@ -361,11 +358,7 @@ void medOpImporterDicomGrassroots::CreateGui()
 	m_Gui = new mafGUI(this);
 	m_Gui->SetListener(this);
 
-	//wxString TypeOfDICOM[2]={"CT","MRI"};
-//	m_Gui->Label("Type of DICOM",true);
-	//m_Gui->Combo(ID_TYPE_DICOM,"",&m_DICOM,2,TypeOfDICOM);
 	m_Gui->Label("data files:",true);
-	//m_Gui->FileOpen (ID_DICTIONARY,	"dictionary",	&m_DictionaryFilename, wildcard);
 	m_Gui->DirOpen(ID_OPEN_DIR, "Folder",	&m_DICOMDir);
 	m_Gui->Divider();
 	m_Gui->Label("patient info:",true);
@@ -386,7 +379,7 @@ void medOpImporterDicomGrassroots::CreateGui()
     _("if the DICOM data is stored in a regular grid and this option is not checked, "  \
     "the data will be imported as a regular grid; otherwise it will be imported as a rectilinear grid"));
 
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
 #ifdef __WIN32__
   MEMORYSTATUSEX ms; 
   ms.dwLength = sizeof(ms);
@@ -405,7 +398,7 @@ void medOpImporterDicomGrassroots::CreateGui()
     "it will be loaded as VolumeLarge VME"));
 
   m_Gui->Divider(0);
-#endif // VME_VOLUME_LARGE
+#endif // VME_VOLUME_LARGE*/
 
 	m_Gui->Button(ID_BUILD_BUTTON,"build", "");
 	m_Gui->Divider();
@@ -476,27 +469,44 @@ void medOpImporterDicomGrassroots::CreateGui()
 	OpStop(res);
 	return;
 }
+
+//----------------------------------------------------------------------------
+void medOpImporterDicomGrassroots::FillListBox()
+//----------------------------------------------------------------------------
+{
+  int row = m_StudyListbox->FindString(m_DicomReader->GetMedicalImageProperties()->GetStudyID());//StudyUID
+  if (row == -1)
+  {
+    m_StudyListbox->Append(m_DicomReader->GetMedicalImageProperties()->GetStudyID());
+    m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+  }
+}
+
 //----------------------------------------------------------------------------
 void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
 //----------------------------------------------------------------------------
 {
-  int row, i;
+  int i;
   double slice_pos[3];
   int imageNumber = -1;
   int cardNumImages = -1;
   double trigTime = -1.0;
   m_DICOMType = -1;
 
-
+  vtkNEW(m_CTDirectoryReader);
+  vtkNEW(m_DicomReader);
   if (m_CTDirectoryReader->Open(dir) == 0)
   {
     wxMessageBox(wxString::Format("Directory <%s> can not be opened",dir),"Warning!!");
     return;
   }
-  mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-  long progress = 0;
-  // get the dicom files from the directory
-  wxBusyInfo wait_info("Reading DICOM directory: please wait");
+  if(!this->m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    long progress = 0;
+    // get the dicom files from the directory
+    wxBusyInfo wait_info("Reading DICOM directory: please wait");
+  }
 
   m_DICOMType=ID_CT;
   for (i=0; i < m_CTDirectoryReader->GetNumberOfFiles(); i++)
@@ -526,14 +536,28 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
       }
 
       ct_mode = m_DicomReader->GetMedicalImageProperties()->GetModality();
-      row = m_StudyListbox->FindString(m_DicomReader->GetMedicalImageProperties()->GetStudyID());//StudyUID
-      if (row == -1)
+      
+      //row = m_StudyListbox->FindString(m_DicomReader->GetMedicalImageProperties()->GetStudyID());//StudyUID
+      //if (row == -1)
+      int id = atoi( m_DicomReader->GetMedicalImageProperties()->GetStudyID());
+      if(m_DicomMap.find(id) == m_DicomMap.end()) 
       {
         // the study is not present into the listbox, so need to create new
         // list of files related to the new studyID
-        m_FilesList = new ListDicomFiles;
-        m_StudyListbox->Append(m_DicomReader->GetMedicalImageProperties()->GetStudyID());
-        m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+        m_FilesList = new ListDicomFilesGrassroots;
+        //m_DicomMap.insert(id, m_FilesList);
+
+
+
+        m_DicomMap.insert(std::pair<int,ListDicomFilesGrassroots*>(id,m_FilesList));
+
+        if (!this->m_TestMode)
+        {
+          FillListBox();
+        }
+        
+        //m_StudyListbox->Append(m_DicomReader->GetMedicalImageProperties()->GetStudyID());
+        //m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
         m_DicomReader->GetImagePositionPatient(slice_pos);
         if (strcmp(ct_mode.c_str(),"MRI") == 0)
         {
@@ -580,12 +604,12 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
             }
           }
           trigTime = printf("%d", triggerTime.c_str());
-          m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
+          m_FilesList->Append(new mmoDICOMImporterListElementGrassroots(str_tmp,slice_pos,imageNumber, cardNumImages, trigTime));
           m_NumberOfStudy++;
         }
         else
         {
-          m_FilesList->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+          m_FilesList->Append(new mmoDICOMImporterListElementGrassroots(str_tmp,slice_pos));
           m_NumberOfStudy++;
         }
       }
@@ -615,19 +639,27 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
           imageNumber = printf("%d", instanceNumber.c_str());
           cardNumImages = printf("%d", cardiacNumberOfImages.c_str());
           trigTime = printf("%d", triggerTime.c_str());
-          ((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
+          m_DicomMap[id]->Append(new mmoDICOMImporterListElementGrassroots(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
+          //((ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElementGrassroots(str_tmp,slice_pos,imageNumber,cardNumImages,trigTime));
         }
         else
         {
-          ((ListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElement(str_tmp,slice_pos));
+          //((ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(row))->Append(new mmoDICOMImporterListElementGrassroots(str_tmp,slice_pos));
+          m_DicomMap[id]->Append(new mmoDICOMImporterListElementGrassroots(str_tmp,slice_pos));
         }         
       }
     }
-    progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+    if(!this->m_TestMode)
+    {
+      long progress = i * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+    }
   }
 
-  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+  if(!this->m_TestMode)
+  {
+    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+  }
   if(m_NumberOfStudy == 0)
   {
     wxString msg = "No study found!";
@@ -649,7 +681,7 @@ void medOpImporterDicomGrassroots::BuildVolumeCineMRI()
 
 	int n_slices = m_NumberOfSlices / step;
 
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   if (IsVolumeLarge(n_slices))
   {
     wxString msg = _("WARNING: The selected VOI is too large to fit the given memory limit, however, "      
@@ -661,7 +693,7 @@ void medOpImporterDicomGrassroots::BuildVolumeCineMRI()
       wxYES_NO | wxCENTRE | wxICON_QUESTION) != wxYES)
       return;    
   }
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
 
 	wxBusyInfo wait_info("Building volume: please wait");
 
@@ -687,8 +719,8 @@ void medOpImporterDicomGrassroots::BuildVolumeCineMRI()
       assert(FALSE);
     }
     
-    mmoDICOMImporterListElement *element0;
-    element0 = (mmoDICOMImporterListElement *)m_ListSelected->Item(tsImageId)->GetData();
+    mmoDICOMImporterListElementGrassroots *element0;
+    element0 = (mmoDICOMImporterListElementGrassroots *)m_ListSelected->Item(tsImageId)->GetData();
     //double tsDouble = ((double) (element0->GetTriggerTime())) / 1000.0;
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
@@ -762,17 +794,17 @@ void medOpImporterDicomGrassroots::BuildVolume()
     step = m_BuildStepValue + 1;
 
   int n_slices = m_NumberOfSlices / step;
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   if (!VolumeLargeCheck(n_slices))
     return; //the volume is large but the user cancel it
 
   bool bIsLarge = IsVolumeLarge(n_slices);    
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
 
   wxBusyInfo wait_info("Building volume: please wait");
 
   vtkMAFSmartPointer<vtkMAFRGSliceAccumulate> accumulate;
-#ifdef VME_VOLUME_LARGE   
+/*#ifdef VME_VOLUME_LARGE   
   vtkMAFSmartPointer<vtkDoubleArray> s_coords;
   s_coords->Allocate(n_slices);
   double* pSCoords = s_coords->WritePointer(0, n_slices);
@@ -790,27 +822,30 @@ void medOpImporterDicomGrassroots::BuildVolume()
     }
     else
     {
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
       accumulate->SetNumberOfSlices(n_slices);
       accumulate->BuildVolumeOnAxes(m_SortAxes);
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
     }
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
 
-    mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-    //mafProgressBarShowMacro();
-    //mafProgressBarSetTextMacro("Reading CT directory...");
+    if(!this->m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+    }
+
     long progress = 0;
     int count,s_count;
     for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
     {
       if (s_count == n_slices) {break;}
       ShowSlice(count);
-#ifdef VME_VOLUME_LARGE
+
+/*#ifdef VME_VOLUME_LARGE
       if (!bIsLarge)
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
         accumulate->SetSlice(s_count, m_SliceTexture->GetInput());
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
       else
       {
         //store the texture into the temporary file
@@ -821,14 +856,21 @@ void medOpImporterDicomGrassroots::BuildVolume()
 
         pSCoords[s_count] = pImgData->GetOrigin()[m_SortAxes];
       }
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
       s_count++;
-      progress = count * 100 / m_CTDirectoryReader->GetNumberOfFiles();
-      mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-      //mafProgressBarSetValueMacro(progress);
+      if(!this->m_TestMode)
+      {
+        progress = count * 100 / m_CTDirectoryReader->GetNumberOfFiles();
+        mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+      }
+
     }
-    mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-#ifdef VME_VOLUME_LARGE
+    if(!this->m_TestMode)
+    {
+      mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    }
+
+/*#ifdef VME_VOLUME_LARGE
     if (bIsLarge)    
       pLargeFile->Delete(); //will close the file    
   }
@@ -840,14 +882,14 @@ void medOpImporterDicomGrassroots::BuildVolume()
     pLargeFile->Delete();
     return; //fatal error    
   }
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
 
   ImportDicomTags();
   if(m_NumberOfSlices == 1)
   {
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
     assert(bIsLarge == false);
-#endif
+#endif*/
     //imageCase
     mafNEW(m_Image);
     m_Image->GetTagArray()->DeepCopy(m_TagArray);
@@ -867,14 +909,15 @@ void medOpImporterDicomGrassroots::BuildVolume()
     m_Image->GetTagArray()->SetTag(tag_Surgeon);
 
     //Nome VME = CTDir + IDStudio
-    wxString name = m_DICOMDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+    wxString name = m_DICOMDir + " - ";
+    name.Append(wxString::Format("%d", m_CurrentID));		
     m_Image->SetName(name.c_str());
   }
   else if(m_NumberOfSlices > 1)
   {
     //Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
     mafVME* pOutVME;
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
     if (bIsLarge)
     {
       if (!ImportLargeRAWFile(szLargeFileName, s_coords.GetPointer()))      
@@ -884,7 +927,7 @@ void medOpImporterDicomGrassroots::BuildVolume()
     }
     else
     {
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
       mafNEW(m_Volume);
       m_Volume->GetTagArray()->DeepCopy(m_TagArray);
       //mafDEL(m_TagArray);
@@ -902,9 +945,9 @@ void medOpImporterDicomGrassroots::BuildVolume()
       }      
 
       pOutVME = m_Volume;
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
     }
-#endif //VME_VOLUME_LARGE
+#endif //VME_VOLUME_LARGE*/
 
 
     pOutVME->GetTagArray()->DeepCopy(m_TagArray);
@@ -921,7 +964,8 @@ void medOpImporterDicomGrassroots::BuildVolume()
     pOutVME->GetTagArray()->SetTag(tag_Surgeon);
 
     //Nome VME = CTDir + IDStudio
-    wxString name = m_DICOMDir + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());			
+    wxString name = m_DICOMDir + " - ";
+    name.Append(wxString::Format("%d", m_CurrentID));	
     pOutVME->SetName(name.c_str());
   }
 }
@@ -1077,6 +1121,15 @@ void medOpImporterDicomGrassroots::ShowSlice(int slice_num)
 	m_SliceActor->VisibilityOn();
 }
 //----------------------------------------------------------------------------
+vtkImageData* medOpImporterDicomGrassroots::GetSliceImageData(int slice_num)
+//----------------------------------------------------------------------------
+{
+  m_DicomReader->SetFileName((char *)m_ListSelected->Item(slice_num)->GetData()->GetFileName());
+  m_DicomReader->Update();
+
+  return (vtkImageData *)m_DicomReader->GetOutput();
+}
+//----------------------------------------------------------------------------
 void medOpImporterDicomGrassroots::ResetSliders()
 //----------------------------------------------------------------------------
 {
@@ -1112,8 +1165,9 @@ void medOpImporterDicomGrassroots::ResetStructure()
 	// delete the previous studyes detected and reset the related variables
 	for (int i=0; i < m_NumberOfStudy;i++)
 	{
-		((ListDicomFiles *)m_StudyListbox->GetClientData(i))->DeleteContents(true);
-		((ListDicomFiles *)m_StudyListbox->GetClientData(i))->Clear();
+		((ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(i))->DeleteContents(true);
+		((ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(i))->Clear();
+    m_DicomMap.clear();
 	}
 	m_StudyListbox->Clear();
 	m_NumberOfStudy		= 0;
@@ -1129,13 +1183,13 @@ void medOpImporterDicomGrassroots::ResetStructure()
 	mafYield();
 }
 //----------------------------------------------------------------------------
-int compareX(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+int compareX(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the x coordinate of both arguments
 	// return:
-	double x1 = (*(mmoDICOMImporterListElement **)arg1)->GetCoordinate(0);
-	double x2 = (*(mmoDICOMImporterListElement **)arg2)->GetCoordinate(0);
+	double x1 = (*(mmoDICOMImporterListElementGrassroots **)arg1)->GetCoordinate(0);
+	double x2 = (*(mmoDICOMImporterListElementGrassroots **)arg2)->GetCoordinate(0);
 	if (x1 > x2)
 		return 1;
 	if (x1 < x2)
@@ -1144,13 +1198,13 @@ int compareX(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
-int compareY(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+int compareY(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the y coordinate of both arguments
 	// return:
-	double y1 = (*(mmoDICOMImporterListElement **)arg1)->GetCoordinate(1);
-	double y2 = (*(mmoDICOMImporterListElement **)arg2)->GetCoordinate(1);
+	double y1 = (*(mmoDICOMImporterListElementGrassroots **)arg1)->GetCoordinate(1);
+	double y2 = (*(mmoDICOMImporterListElementGrassroots **)arg2)->GetCoordinate(1);
 	if (y1 > y2)
 		return 1;
 	if (y1 < y2)
@@ -1159,13 +1213,13 @@ int compareY(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
-int compareZ(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+int compareZ(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the z coordinate of both arguments
 	// return:
-	double z1 = (*(mmoDICOMImporterListElement **)arg1)->GetCoordinate(2);
-	double z2 = (*(mmoDICOMImporterListElement **)arg2)->GetCoordinate(2);
+	double z1 = (*(mmoDICOMImporterListElementGrassroots **)arg1)->GetCoordinate(2);
+	double z2 = (*(mmoDICOMImporterListElementGrassroots **)arg2)->GetCoordinate(2);
 	if (z1 > z2)
 		return 1;
 	if (z1 < z2)
@@ -1174,13 +1228,13 @@ int compareZ(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterList
 		return 0;
 }
 //----------------------------------------------------------------------------
-int compareTriggerTime(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+int compareTriggerTime(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
-	float t1 = (*(mmoDICOMImporterListElement **)arg1)->GetTriggerTime();
-	float t2 = (*(mmoDICOMImporterListElement **)arg2)->GetTriggerTime();;
+	float t1 = (*(mmoDICOMImporterListElementGrassroots **)arg1)->GetTriggerTime();
+	float t2 = (*(mmoDICOMImporterListElementGrassroots **)arg2)->GetTriggerTime();;
 	if (t1 > t2)
 		return 1;
 	if (t1 < t2)
@@ -1190,13 +1244,13 @@ int compareTriggerTime(const mmoDICOMImporterListElement **arg1,const mmoDICOMIm
 }
 
 //----------------------------------------------------------------------------
-int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMImporterListElement **arg2)
+int compareImageNumber(const mmoDICOMImporterListElementGrassroots **arg1,const mmoDICOMImporterListElementGrassroots **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
-	float i1 = (*(mmoDICOMImporterListElement **)arg1)->GetImageNumber();
-	float i2 = (*(mmoDICOMImporterListElement **)arg2)->GetImageNumber();;
+	float i1 = (*(mmoDICOMImporterListElementGrassroots **)arg1)->GetImageNumber();
+	float i2 = (*(mmoDICOMImporterListElementGrassroots **)arg2)->GetImageNumber();;
 	if (i1 > i2)
 		return 1;
 	if (i1 < i2)
@@ -1204,6 +1258,128 @@ int compareImageNumber(const mmoDICOMImporterListElement **arg1,const mmoDICOMIm
 	else
 		return 0;
 }
+//----------------------------------------------------------------------------
+void medOpImporterDicomGrassroots::ImportDicom(const char *dir) 
+//----------------------------------------------------------------------------
+{
+  // scan dicom directory
+  BuildDicomFileList(dir);
+
+  if(!this->m_TestMode)
+  {
+    if(m_NumberOfStudy == 1)
+    {
+      m_StudyListbox->SetSelection(0);
+      OnEvent(&mafEvent(this, ID_STUDY));
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void medOpImporterDicomGrassroots::ReadDicom() 
+//----------------------------------------------------------------------------
+{
+  int sel = 0;
+  if(!this->m_TestMode)
+  {
+    sel = m_StudyListbox->GetSelection();
+    m_ListSelected = (ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(sel);
+  }
+  else
+  {
+    sel = m_DicomMap.begin()->first;
+    m_ListSelected = m_DicomMap[sel];
+  }
+  
+  // sort dicom slices
+  if(m_ListSelected->GetCount() > 1)
+  {
+    double item1_pos[3],item2_pos[3],d[3];
+    mmoDICOMImporterListElementGrassroots *element1;
+    mmoDICOMImporterListElementGrassroots *element2;
+    element1 = (mmoDICOMImporterListElementGrassroots *)m_ListSelected->Item(0)->GetData();
+    element2 = (mmoDICOMImporterListElementGrassroots *)m_ListSelected->Item(1)->GetData();
+    item1_pos[0] = element1->GetCoordinate(0);
+    item1_pos[1] = element1->GetCoordinate(1);
+    item1_pos[2] = element1->GetCoordinate(2);
+    item2_pos[0] = element2->GetCoordinate(0);
+    item2_pos[1] = element2->GetCoordinate(1);
+    item2_pos[2] = element2->GetCoordinate(2);
+    d[0] = fabs(item1_pos[0] - item2_pos[0]);
+    d[1] = fabs(item1_pos[1] - item2_pos[1]);
+    d[2] = fabs(item1_pos[2] - item2_pos[2]);
+    if(d[0] > d[1] && d[0] > d[2])
+      m_SortAxes = 0;
+    else if(d[1] > d[0] && d[1] > d[2])
+      m_SortAxes = 1;
+    else if(d[2] > d[0] && d[2] > d[1])
+      m_SortAxes = 2;
+  }
+  switch (m_SortAxes)
+  {
+  case 0:
+    m_ListSelected->Sort(compareX);
+    break;
+  case 1:
+    m_ListSelected->Sort(compareY);
+    break;
+  case 2:
+    m_ListSelected->Sort(compareZ);
+    break;
+  }
+
+  m_NumberOfTimeFrames = ((mmoDICOMImporterListElementGrassroots *)m_ListSelected->Item(0)->GetData())->GetCardiacNumberOfImages();
+  if(m_DICOMType == ID_CMRI) //If cMRI
+    m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
+  else
+    m_NumberOfSlices = m_ListSelected->GetCount();
+  // reset the current slice number to view the first slice
+  m_CurrentSlice = 0;
+  m_CurrentTime = 0;
+  m_CropFlag = false;
+  int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+
+  if(!this->m_TestMode)
+  {
+    if (currImageId != -1) 
+    {
+      // show the selected slice
+      ShowSlice(currImageId);
+    }
+  }
+
+  //modified by STEFY 9-7-2003(begin)
+  ImportDicomTags();
+  mafTagItem *patient_name;
+  mafTagItem *patient_id;
+
+  const char* p_name;
+  double p_id = 0;
+
+  bool position = m_TagArray->IsTagPresent("PatientName");
+  if (position)
+  {
+    patient_name = m_TagArray->GetTag("PatientName");
+    p_name = patient_name->GetValue();
+  }
+  else 
+    p_name = NULL;
+
+  position = m_TagArray->IsTagPresent("PatientID");
+  if (position)
+  {
+    patient_id = m_TagArray->GetTag("PatientID");
+    p_id = patient_id->GetValueAsDouble();
+    m_Identifier = mafString(p_id);
+  }
+  if (p_name)
+    m_PatientName = p_name;
+
+  int tmp = m_PatientName.FindChr('^');
+  if(tmp != -1 && tmp >= 0 && tmp < m_PatientName.GetSize())
+    m_PatientName[tmp] = ' ';
+}
+
 //----------------------------------------------------------------------------
 void medOpImporterDicomGrassroots::OnEvent(mafEventBase *maf_event) 
 //----------------------------------------------------------------------------
@@ -1216,127 +1392,43 @@ void medOpImporterDicomGrassroots::OnEvent(mafEventBase *maf_event)
         m_DicomDialog->EndModal(wxID_CANCEL);
         //OpStop(OP_RUN_CANCEL); //mafEventMacro(mafEvent(this,OP_RUN_CANCEL));
       break;
-      case ID_DICTIONARY:
-       // m_DicomReader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-        m_Gui->Enable(ID_OPEN_DIR,1);
-      break;
       case ID_OPEN_DIR:
         m_Gui->Update();
         ResetStructure();
+        ImportDicom(m_DICOMDir.GetCStr());
+        
         // scan dicom directory
-        BuildDicomFileList(m_DICOMDir.GetCStr());
+       /* BuildDicomFileList(m_DICOMDir.GetCStr());
         if(m_NumberOfStudy == 1)
         {
           m_StudyListbox->SetSelection(0);
           OnEvent(&mafEvent(this, ID_STUDY));
-        }
+        }*/
       break;
       case ID_STUDY:
       {
-        //m_Gui->Enable(ID_SCAN_SLICE,1);
-        m_SliceLabel->Enable(true);
-        m_SliceText->Enable(true);
-        m_SliceScanner->Enable(true);
-				if(m_DICOMType == ID_CMRI)//If cMRI
-				{
-					m_TimeLabel->Enable(true);
-					m_TimeText->Enable(true);
-					m_TimeScanner->Enable(true);
-				}
-
-        m_Gui->Enable(ID_CROP_MODE_BUTTON,1);
-        m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
-        m_Gui->Enable(ID_BUILDVOLUME_MODE_BUTTON,1);
-        int sel = m_StudyListbox->GetSelection();
-        m_ListSelected = (ListDicomFiles *)m_StudyListbox->GetClientData(sel);
-        // sort dicom slices
-        if(m_ListSelected->GetCount() > 1)
+        m_CurrentID = atoi(m_StudyListbox->GetString(m_StudyListbox->GetSelection()));
+        if(!this->m_TestMode)
         {
-          double item1_pos[3],item2_pos[3],d[3];
-          mmoDICOMImporterListElement *element1;
-          mmoDICOMImporterListElement *element2;
-          element1 = (mmoDICOMImporterListElement *)m_ListSelected->Item(0)->GetData();
-          element2 = (mmoDICOMImporterListElement *)m_ListSelected->Item(1)->GetData();
-          item1_pos[0] = element1->GetCoordinate(0);
-          item1_pos[1] = element1->GetCoordinate(1);
-          item1_pos[2] = element1->GetCoordinate(2);
-          item2_pos[0] = element2->GetCoordinate(0);
-          item2_pos[1] = element2->GetCoordinate(1);
-          item2_pos[2] = element2->GetCoordinate(2);
-          d[0] = fabs(item1_pos[0] - item2_pos[0]);
-          d[1] = fabs(item1_pos[1] - item2_pos[1]);
-          d[2] = fabs(item1_pos[2] - item2_pos[2]);
-          if(d[0] > d[1] && d[0] > d[2])
-            m_SortAxes = 0;
-          else if(d[1] > d[0] && d[1] > d[2])
-            m_SortAxes = 1;
-          else if(d[2] > d[0] && d[2] > d[1])
-            m_SortAxes = 2;
+          //m_Gui->Enable(ID_SCAN_SLICE,1);
+          m_SliceLabel->Enable(true);
+          m_SliceText->Enable(true);
+          m_SliceScanner->Enable(true);
+				  if(m_DICOMType == ID_CMRI)//If cMRI
+				  {
+					  m_TimeLabel->Enable(true);
+					  m_TimeText->Enable(true);
+					  m_TimeScanner->Enable(true);
+				  }
+          m_Gui->Enable(ID_CROP_MODE_BUTTON,1);
+          m_Gui->Enable(ID_UNDO_CROP_BUTTON,0);
+          m_Gui->Enable(ID_BUILDVOLUME_MODE_BUTTON,1);
         }
-        switch (m_SortAxes)
-        {
-        case 0:
-          m_ListSelected->Sort(compareX);
-          break;
-        case 1:
-          m_ListSelected->Sort(compareY);
-          break;
-        case 2:
-          m_ListSelected->Sort(compareZ);
-          break;
-        }
-				m_NumberOfTimeFrames = ((mmoDICOMImporterListElement *)m_ListSelected->Item(0)->GetData())->GetCardiacNumberOfImages();
-        if(m_DICOMType == ID_CMRI) //If cMRI
-					m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
-				else
-					m_NumberOfSlices = m_ListSelected->GetCount();
-				// reset the current slice number to view the first slice
-        m_CurrentSlice = 0;
-				m_CurrentTime = 0;
-        m_CropFlag = false;
-				int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
-				if (currImageId != -1) 
-				{
-					// show the selected slice
-					ShowSlice(currImageId);
-				}
 
+        ReadDicom();
         m_DicomDialog->GetRWI()->CameraReset();
         ResetSliders();
         m_DicomDialog->GetRWI()->CameraUpdate();
-
-        //modified by STEFY 9-7-2003(begin)
-        ImportDicomTags();
-        mafTagItem *patient_name;
-        mafTagItem *patient_id;
-
-        const char* p_name;
-        double p_id = 0;
-
-       
-        bool position = m_TagArray->IsTagPresent("PatientName");
-        if (position)
-        {
-          patient_name = m_TagArray->GetTag("PatientName");
-          p_name = patient_name->GetValue();
-        }
-        else 
-          p_name = NULL;
-
-        position = m_TagArray->IsTagPresent("PatientID");
-        if (position)
-        {
-          patient_id = m_TagArray->GetTag("PatientID");
-          p_id = patient_id->GetValueAsDouble();
-          m_Identifier = mafString(p_id);
-        }
-        if (p_name)
-          m_PatientName = p_name;
-
-        int tmp = m_PatientName.FindChr('^');
-        if(tmp != -1 && tmp >= 0 && tmp < m_PatientName.GetSize())
-          m_PatientName[tmp] = ' ';
-
         m_Gui->Update();
       }
       break;
@@ -1728,10 +1820,10 @@ int medOpImporterDicomGrassroots::GetImageId(int timeId, int heigthId)
   if (m_StudyListbox == NULL)
     return -1;  //error
 
-  m_ListSelected = (ListDicomFiles *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+  m_ListSelected = (ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
   
-  mmoDICOMImporterListElement *element0;
-  element0 = (mmoDICOMImporterListElement *)m_ListSelected->Item(0)->GetData();
+  mmoDICOMImporterListElementGrassroots *element0;
+  element0 = (mmoDICOMImporterListElementGrassroots *)m_ListSelected->Item(0)->GetData();
   
   int cardiacNumberOfImages =  element0->GetCardiacNumberOfImages();
 
@@ -1751,13 +1843,13 @@ int medOpImporterDicomGrassroots::GetImageId(int timeId, int heigthId)
   return (heigthId * cardiacNumberOfImages + timeId); 
 }
 
-#ifdef VME_VOLUME_LARGE
+//#ifdef VME_VOLUME_LARGE
 //------------------------------------------------------------------------
 //Detects whether the currently selected volume is large
 //Returns true, if chosen ROI*given number of slices is larger than memory limit
-/*virtual*/ bool mmoDICOMImporter_BES::IsVolumeLarge(int nSlices)
+/*virtual*/ //bool mmoDICOMImporter_BES::IsVolumeLarge(int nSlices)
 //------------------------------------------------------------------------
-{
+/*{
   //m_SliceTexture must exist and contain valid slice
   vtkImageData* pImg = m_SliceTexture->GetInput();
   assert(pImg != NULL);
@@ -1892,7 +1984,7 @@ bool mmoDICOMImporter_BES::ImportLargeRAWFile(const char* lpszFileName, vtkDoubl
   _unlink(lpszFileName);
   return true;
 }
-#endif // VME_VOLUME_LARGE
+#endif // VME_VOLUME_LARGE*/
 
 //------------------------------------------------------------------------
 //Converts the given rectilinear grid into a regular grid.

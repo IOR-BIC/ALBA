@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-31 15:45:48 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-04-06 12:21:33 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -17,14 +17,15 @@
 // Include :
 //----------------------------------------------------------------------------
 #include "mafOp.h"
+#include <map>
 
 //#define VME_VOLUME_LARGE
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
 #include "vtkObject.h"
 #include "../openMAF/vtkMAF/vtkMAFIdType64.h"
 #include "../openMAF/VME/mafVMEVolumeLarge.h"
 #include "../openMAF/VME/mafVMEVolumeLargeUtils.h"
-#endif
+#endif*/
 
 
 //----------------------------------------------------------------------------
@@ -32,7 +33,7 @@
 //----------------------------------------------------------------------------
 class mafNode;
 class mafGUIDialogPreview;
-class mmoDICOMImporterListElement;
+class mmoDICOMImporterListElementGrassroots;
 class mmiDICOMImporterInteractor;
 class vtkPlaneSource;
 class vtkGDCMImageReader;
@@ -50,7 +51,7 @@ class vtkDoubleArray;
 
 
 //WX_DECLARE_LIST(mmoCineMRIImporterListElement, ListDicomCineMRIFiles);
-WX_DECLARE_LIST(mmoDICOMImporterListElement, ListDicomFiles);
+WX_DECLARE_LIST(mmoDICOMImporterListElementGrassroots, ListDicomFilesGrassroots);
 //----------------------------------------------------------------------------
 // medOpImporterDicomGrassroots :
 //----------------------------------------------------------------------------
@@ -87,9 +88,30 @@ public:
 	/** Create the dialog interface for the importer. */
   virtual void CreateGui();  
 
+  /** Set the directory name which contains DICOM slices to import */
+  void SetDirName(const char *dirName){m_DICOMDir = dirName;};
+
+  /** Return the directory name which contains DICOM slices to import. */
+  const char *GetDirName() const {return m_DICOMDir.GetCStr();};
+
+  /** Import data contained in DICOM dir */
+  void ImportDicom(const char *dir);
+
+  /** Read Dicom file */
+  void ReadDicom();
+
+  void SetCurrentID(int id){m_CurrentID = id;};
+
+  /** Return vtkImageData of the selected slice */
+  vtkImageData* GetSliceImageData(int slice_num);
+
+
 protected:
 	/** Build the list of dicom filer recognized. */
 	void BuildDicomFileList(const char *dir);
+
+  /** Fill listbox. */
+  void FillListBox();
 
 	/** Build the volume starting from the list of dicom files. */
 	void BuildVolume();
@@ -112,23 +134,25 @@ protected:
 	/** Return the slice number from the heightId and sliceId*/
   int GetImageId(int heightId, int timeId);
 
-#ifdef VME_VOLUME_LARGE
+
+
+//#ifdef VME_VOLUME_LARGE
   /** Detects whether the currently selected volume is large
   Returns true, if chosen ROI*given number of slices is larger than memory limit*/
-  virtual bool IsVolumeLarge(int nSlices);
+  //virtual bool IsVolumeLarge(int nSlices);
 
   /** 
   if the volume (or VOI) is large, it displays a warning that the volume 
   to be imported is large and returns true, if the operation should continue,
   false otherwise (user canceled the import)*/
-  bool VolumeLargeCheck(int nSlices);
+  //bool VolumeLargeCheck(int nSlices);
 
   /** Creates VMEVolumeLarge by importing data from the given lpszFileName
   pSCoord contain the grid coordinates in m_SortAxis direction (its count must correspond
   to the number of slices stored in the RAW file lpszFileName
   N.B. File is deleted upon the return. The routine returns false, if an error occurs*/
-  bool ImportLargeRAWFile(const char* lpszFileName, vtkDoubleArray* pSCoords);
-#endif
+  //bool ImportLargeRAWFile(const char* lpszFileName, vtkDoubleArray* pSCoords);
+//#endif
 
   /** Converts the given rectilinear grid into a regular grid.
   If the operation cannot be successfully completed (e.g., because
@@ -157,7 +181,6 @@ protected:
 	vtkActor					*m_CropActor;	
 
   // gui related variables
-	//mafString									m_DictionaryFilename;
 	mafString									m_DICOMDir;
 	mafString									m_CurrentSliceName;
   //int												m_DICOM;
@@ -165,8 +188,9 @@ protected:
 	// slices related informations
 	wxListBox								 *m_StudyListbox;
 	wxString									m_StudySelected;
-	ListDicomFiles					 *m_ListSelected;
-	ListDicomFiles					 *m_FilesList;
+	ListDicomFilesGrassroots					 *m_ListSelected;
+	ListDicomFilesGrassroots					 *m_FilesList;
+  std::map<int,ListDicomFilesGrassroots*> m_DicomMap;
 	//ListDicomCineMRIFiles		 *m_FilesListCineMRI;
 	int												m_NumberOfStudy;
 	int												m_NumberOfSlices;
@@ -174,6 +198,7 @@ protected:
 	int												m_CurrentTime;
 	int												m_SortAxes;
 	int												m_NumberOfTimeFrames;
+  int                       m_CurrentID;
 
 	// crop mode variables
 	bool											m_CropFlag;
@@ -198,11 +223,11 @@ protected:
 	int												m_DICOMType;
   int                       m_BuildRLG;   //<non-zero, if a rectilinear grid is the preferred output
 
-#ifdef VME_VOLUME_LARGE
+/*#ifdef VME_VOLUME_LARGE
   mafVMEVolumeLarge				 *m_VolumeLarge;
   mafString                 m_OutputFileName;    
   int                       m_MemLimit;   //<memory limit in MB
-#endif // VME_VOLUME_LARGE
+#endif // VME_VOLUME_LARGE*/
 
   wxTextCtrl   *m_SliceText;
 	wxSlider		 *m_SliceScanner;
@@ -214,12 +239,12 @@ protected:
   
 };
 
-/*class mmoDICOMImporterListElement
+/*class mmoDICOMImporterListElementGrassroots
 {
 public:
-	mmoDICOMImporterListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
-	mmoDICOMImporterListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
-	~mmoDICOMImporterListElement() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
+	mmoDICOMImporterListElementGrassroots() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
+	mmoDICOMImporterListElementGrassroots(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
+	~mmoDICOMImporterListElementGrassroots() {m_SliceFilename = ""; m_SlicePosition[0] = 0.0;m_SlicePosition[1] = 0.0;m_SlicePosition[2] = 0.0;};
 
 	/** Add the filename and the image coordinates to the list. */
 	//void SetListElement(const char *filename, double coord[3]) {m_SliceFilename = filename; m_SlicePosition[0] = coord[0];m_SlicePosition[1] = coord[1];m_SlicePosition[2] = coord[2];};
@@ -235,10 +260,10 @@ public:
 	mafString m_SliceFilename;
 };*/
 
-class mmoDICOMImporterListElement
+class mmoDICOMImporterListElementGrassroots
 {
 public:
-	mmoDICOMImporterListElement() 
+	mmoDICOMImporterListElementGrassroots() 
   {
     m_SliceFilename = "";
     m_Pos[0] = -9999;
@@ -249,7 +274,7 @@ public:
     m_CardiacNumberOfImages = -1;
   };
 
-	mmoDICOMImporterListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
+	mmoDICOMImporterListElementGrassroots(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0)  
   {
     m_SliceFilename = filename;
     m_Pos[0] = coord[0];
@@ -260,7 +285,7 @@ public:
     m_TriggerTime = trigTime;
   };
 
-  ~mmoDICOMImporterListElement() {};
+  ~mmoDICOMImporterListElementGrassroots() {};
 
 	/** Add the filename and the image coordinates to the list. */
 	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int cardNumImages=-1, double trigTime=-1.0) 
