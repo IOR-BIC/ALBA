@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMaterialChooser.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-05 17:07:21 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2009-04-06 14:11:03 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -94,6 +94,8 @@ mafGUIMaterialChooser::mafGUIMaterialChooser(wxString dialog_title)
 mafGUIMaterialChooser::~mafGUIMaterialChooser()
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_ChoosedMaterial); //BES: 31.3.2009 - fixed memory leak
+
   ClearList();
   m_RWI->m_RenFront->RemoveActor(m_Actor);
 
