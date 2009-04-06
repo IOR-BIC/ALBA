@@ -8,4 +8,7 @@
 //--------------------------------------------------------------------------
 #define MED_DATA_ROOT "@MED_DATA_ROOT@"
 
+#cmakedefine MED_USE_GDCM
+
+
 #endif // __medDefines_h
