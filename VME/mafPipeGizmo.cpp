@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-06 14:09:19 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2009-04-07 09:34:40 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,30 +133,33 @@ void mafPipeGizmo::Create(mafSceneNode *n)
   m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
 
 
-  double h,w;
-  int *size = m_RenFront->GetSize();
-  h = m_CaptionActor->GetHeight();
-  w = m_CaptionActor->GetWidth();
-
-  if(w < h)
+  if (m_RenFront != NULL)
   {
-    w *= size[0];
-    h = w*size[1];
+	  double h,w;
+	  int *size = m_RenFront->GetSize();
+	  h = m_CaptionActor->GetHeight();
+	  w = m_CaptionActor->GetWidth();
+	
+	  if(w < h)
+	  {
+	    w *= size[0];
+	    h = w*size[1];
+	  }
+	  else
+	  {
+	    w = h*size[0];
+	    h *= size[1];
+	  }
+	
+	
+	  double newPosition[2];
+	  newPosition[0] =  - w/2.;
+	  newPosition[1] =  - h/2.;
+	
+	  m_CaptionActor->SetPosition(newPosition);
+	
+	  m_CaptionActor->LeaderOff();
   }
-  else
-  {
-    w = h*size[0];
-    h *= size[1];
-  }
-
-
-  double newPosition[2];
-  newPosition[0] =  - w/2.;
-  newPosition[1] =  - h/2.;
-
-  m_CaptionActor->SetPosition(newPosition);
-
-  m_CaptionActor->LeaderOff();
 
   if(NULL != m_RenFront)
     m_RenFront->AddActor2D(m_CaptionActor);
