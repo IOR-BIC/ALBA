@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-08 10:28:40 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2009-04-08 14:33:00 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1880,7 +1880,8 @@ int medOpImporterDicomGrassroots::GetImageId(int timeId, int heigthId)
   if (m_StudyListbox == NULL)
     return -1;  //error
 
-  m_ListSelected = (ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+   m_ListSelected = m_DicomMap[m_DicomMap.begin()->first];
+  //m_ListSelected = (ListDicomFilesGrassroots *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
   
   mmoDICOMImporterListElementGrassroots *element0;
   element0 = (mmoDICOMImporterListElementGrassroots *)m_ListSelected->Item(0)->GetData();
