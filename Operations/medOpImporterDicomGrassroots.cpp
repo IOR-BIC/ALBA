@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-08 14:33:00 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2009-04-08 16:40:09 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -132,6 +132,7 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 	m_NumberOfTimeFrames = 0;
 	m_DICOMType = -1;
   m_CurrentID = -1;
+  m_BuildRLG = 1;
 
 
 	m_DICOMDir	= mafGetApplicationDirectory().c_str();
@@ -163,6 +164,9 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 	//m_FilesListCineMRI = NULL;
 	m_DicomDialog	= NULL;
 	m_TagArray 		= NULL;
+
+  m_ListSelected = NULL;
+  m_FilesList = NULL;
 
   m_SliceTexture      = NULL;
   m_CTDirectoryReader	= NULL;
@@ -2074,8 +2078,7 @@ vtkImageData* medOpImporterDicomGrassroots::GetImageData(vtkRectilinearGrid* pIn
   }
 
   //we can convert it to image data
-  //vtkImageData* pRet = vtkImageData::New();
-  vtkMAFSmartPointer<vtkImageData> pRet;
+  vtkImageData* pRet = vtkImageData::New();
   pRet->SetDimensions(pInput->GetDimensions());
   pRet->SetOrigin(origin);
   pRet->SetSpacing(sp);
