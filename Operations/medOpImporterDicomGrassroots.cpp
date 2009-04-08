@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-08 10:18:03 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2009-04-08 10:28:40 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1412,19 +1412,19 @@ void medOpImporterDicomGrassroots::ReadDicom()
   const char* p_name;
   double p_id = 0;
 
-  bool position = m_TagArray->IsTagPresent("PatientName");
+  bool position = m_TagArray->IsTagPresent("Patient's Name");
   if (position)
   {
-    patient_name = m_TagArray->GetTag("PatientName");
+    patient_name = m_TagArray->GetTag("Patient's Name");
     p_name = patient_name->GetValue();
   }
   else 
     p_name = NULL;
 
-  position = m_TagArray->IsTagPresent("PatientID");
+  position = m_TagArray->IsTagPresent("Patient ID");
   if (position)
   {
-    patient_id = m_TagArray->GetTag("PatientID");
+    patient_id = m_TagArray->GetTag("Patient ID");
     p_id = patient_id->GetValueAsDouble();
     m_Identifier = mafString(p_id);
   }
