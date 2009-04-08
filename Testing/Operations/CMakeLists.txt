@@ -4,6 +4,8 @@ LINK_LIBRARIES(medVME)
 LINK_LIBRARIES(medOperations)
 LINK_LIBRARIES(medCommon)
 
+
+
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
@@ -67,6 +69,11 @@ ADD_TEST(medOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateSurfaceTest
 ADD_EXECUTABLE(medOpVolumeResampleTest medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp)
 ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTest)
 
+IF (MED_USE_GDCM)
+ADD_EXECUTABLE(medOpImporterDicomGrassrootsTest medOpImporterDicomGrassrootsTest.h medOpImporterDicomGrassrootsTest.cpp)
+ADD_TEST(medOpImporterDicomGrassrootsTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomGrassrootsTest)
+ENDIF (MED_USE_GDCM)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
@@ -78,3 +85,4 @@ ENDIF (MAF_USE_VTK)
 # classes using VTK+wxWidgets
 #IF (MAF_USE_WX AND MAF_USE_VTK)
 #ENDIF (MAF_USE_WX AND MAF_USE_VTK)
+
