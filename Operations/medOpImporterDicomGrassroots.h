@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-06 12:21:33 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-04-08 10:18:03 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -105,28 +105,30 @@ public:
   /** Return vtkImageData of the selected slice */
   vtkImageData* GetSliceImageData(int slice_num);
 
+  /** Build the volume starting from the list of dicom files. */
+  void BuildVolume();
+
+  /** Build the volume starting from the list of CineMRI files. */
+  void BuildVolumeCineMRI();
+
+  /** Create the slice slice_num. */
+  void CreateSlice(int slice_num);
 
 protected:
 	/** Build the list of dicom filer recognized. */
 	void BuildDicomFileList(const char *dir);
 
+  /** Show the slice slice_num. */
+  void ShowSlice();
+
   /** Fill listbox. */
   void FillListBox();
-
-	/** Build the volume starting from the list of dicom files. */
-	void BuildVolume();
-
-	/** Build the volume starting from the list of CineMRI files. */
-	void BuildVolumeCineMRI();
 
 	/** Reset the list of files and all the structures that own images information. */
 	void ResetStructure();
 
 	/** Reset the slider that allow to scan the slices. */
 	void ResetSliders();
-
-	/** Show the slice slice_num. */
-	void ShowSlice(int slice_num);
 
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
