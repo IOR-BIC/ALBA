@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:27:22 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-04-09 14:26:18 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -119,11 +119,13 @@ medGUILandmark::~medGUILandmark()
     for (int i = 0; i < m_LMCloud->GetNumberOfLandmarks(); i++)
     {
       mafNode *lm = m_LMCloud->GetChild(i);
+      mafEventMacro(mafEvent(this, VME_SHOW, lm, false));
       mafEventMacro(mafEvent(this, VME_REMOVE, lm));
       mafDEL(lm);
       //vtkDEL(lm);
     }
 
+    mafEventMacro(mafEvent(this, VME_SHOW, m_LMCloud, false));
     mafEventMacro(mafEvent(this, VME_REMOVE, m_LMCloud));
     mafDEL(m_LMCloud);
     //vtkDEL(m_LMCloud);
@@ -317,7 +319,7 @@ void medGUILandmark::OnVmePicked(mafEvent& e)
     m_LMCloud->Open();
 		m_LMCloud->SetName(m_LMCloudName);
     double b[6];
-    mafVME::SafeDownCast(m_InputVME)->GetOutput()->GetBounds(b);
+    mafVME::SafeDownCast(m_InputVME)->GetOutput()->GetVTKData()->GetBounds(b);
 
     double diffX = fabs(b[1] - b[0]);
     double diffY = fabs(b[3] - b[2]);
