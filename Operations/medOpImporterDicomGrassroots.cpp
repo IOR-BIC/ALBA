@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-08 16:40:09 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2009-04-09 07:26:50 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -133,6 +133,8 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 	m_DICOMType = -1;
   m_CurrentID = -1;
   m_BuildRLG = 1;
+  m_CurrentSlice = 0;
+  m_CurrentTime = 0;
 
 
 	m_DICOMDir	= mafGetApplicationDirectory().c_str();
@@ -165,6 +167,7 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 	m_DicomDialog	= NULL;
 	m_TagArray 		= NULL;
 
+  m_StudyListbox = NULL;
   m_ListSelected = NULL;
   m_FilesList = NULL;
 
@@ -172,6 +175,7 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
   m_CTDirectoryReader	= NULL;
 	m_DicomReader			  = NULL;
 	m_CropPlane		 			= NULL;
+  m_CropActor         = NULL;
   m_SlicePlane 				= NULL;
 	m_SliceMapper				= NULL;
 	m_SliceActor				= NULL;
