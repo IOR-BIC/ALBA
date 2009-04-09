@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEOutputSurfaceEditor.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-04-09 14:32:01 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -67,7 +67,7 @@ public:
 	of stored Items is 0. Also special VME could not support VTK dataset output.
 	An event is rised when the output data changes to allow attached classes to 
 	update their input.*/
-	virtual vtkPolyData *GetPolylineData();
+	virtual vtkPolyData *GetSurfaceData();
 
 	/** Update all the output data structures (data, bounds, matrix and abs matrix).*/
 	virtual void Update();

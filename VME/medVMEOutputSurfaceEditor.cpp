@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEOutputSurfaceEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-04-09 14:32:01 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -72,7 +72,7 @@ medVMEOutputSurfaceEditor::~medVMEOutputSurfaceEditor()
 }
 
 //-------------------------------------------------------------------------
-vtkPolyData *medVMEOutputSurfaceEditor::GetPolylineData()
+vtkPolyData *medVMEOutputSurfaceEditor::GetSurfaceData()
 //-------------------------------------------------------------------------
 {
 	return (vtkPolyData *)GetVTKData();
