@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomGrassroots.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-09 07:26:50 $
-  Version:   $Revision: 1.1.2.8 $
+  Date:      $Date: 2009-04-09 09:41:52 $
+  Version:   $Revision: 1.1.2.9 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -181,6 +181,7 @@ medOpImporterDicomGrassroots::medOpImporterDicomGrassroots(wxString label) : maf
 	m_SliceActor				= NULL;
 	m_SliceLookupTable	= NULL;
   m_DicomInteractor = NULL;
+  m_DicomMap.clear();
 	
 	m_GizmoStatus = GIZMO_NOT_EXIST;
 	m_SideToBeDragged = 0;
@@ -591,7 +592,7 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
           m_DICOMType=-1;
           //attribute stuff
           gdcm::Reader imageReader;
-          imageReader.SetFileName(m_DicomReader->GetFileName());
+          imageReader.SetFileName(str_tmp.c_str());
           imageReader.Read();
 
           gdcm::DataSet const& ds = imageReader.GetFile().GetDataSet();
@@ -648,7 +649,7 @@ void medOpImporterDicomGrassroots::BuildDicomFileList(const char *dir)
         {
           //attribute stuff
           gdcm::Reader imageReader;
-          imageReader.SetFileName(m_DicomReader->GetFileName());
+          imageReader.SetFileName(str_tmp.c_str());
           imageReader.Read();
 
           gdcm::DataSet const& ds = imageReader.GetFile().GetDataSet();
@@ -1239,6 +1240,8 @@ void medOpImporterDicomGrassroots::ResetStructure()
   m_NumberOfTimeFrames = 0;
   m_CurrentTime      = 0; 
 	m_DICOMType				 = -1;
+  m_BuildRLG         = 1;
+  cppDEL(m_FilesList);
 
 	m_CropFlag				= false;
 	
