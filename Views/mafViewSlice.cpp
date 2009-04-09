@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-10 14:54:00 $
-  Version:   $Revision: 1.51.2.2 $
+  Date:      $Date: 2009-04-09 14:26:53 $
+  Version:   $Revision: 1.51.2.3 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -592,7 +592,7 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 	{
 		for(int i=0;i<m_CurrentSurface.size();i++)
 		{
-			if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
+      		if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
 			{
 				mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
 				if (pipe_name.Equals("mafPipeSurfaceSlice"))
@@ -821,7 +821,7 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     //CameraReset(node);
     //m_Rwi->CameraUpdate();
   }
-	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh"))
+	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud") /*|| node->IsA("mafVMEMeter")*/)
 	{
 		this->UpdateSurfacesList(node);
 	}
