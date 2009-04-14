@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-03 07:09:28 $
-  Version:   $Revision: 1.61.2.6 $
+  Date:      $Date: 2009-04-14 15:30:40 $
+  Version:   $Revision: 1.61.2.7 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -173,14 +173,24 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     mafPipePolylineSlice *pipeSliceX = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
     if(pipeSliceX) 
     {
-      pipeSliceX->SplineModeOn();
+      /*if(node->IsA("mafVMEMeter"))
+      {
+        pipeSliceX->SplineModeOff();
+      }
+      else
+        pipeSliceX->SplineModeOn();*/
       pipeSliceX->FillOn();
     }
 
     mafPipePolylineSlice *pipeSliceY = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
     if(pipeSliceY) 
     {
-      pipeSliceY->SplineModeOn();
+      /*if(node->IsA("mafVMEMeter"))
+      {
+        pipeSliceY->SplineModeOff();
+      }
+      else
+        pipeSliceY->SplineModeOn();*/
       pipeSliceY->FillOn();
       
     }
@@ -188,7 +198,12 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     mafPipePolylineSlice *pipeSliceZ = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
     if(pipeSliceZ) 
     {
-      pipeSliceZ->SplineModeOn();
+      /*if(node->IsA("mafVMEMeter"))
+      {
+        pipeSliceZ->SplineModeOff();
+      }
+      else*/
+        pipeSliceZ->SplineModeOn();
       pipeSliceZ->FillOn(); 
     }
 
@@ -395,6 +410,7 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
       m_Views[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice");
+      m_Views[v]->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice");
     }
     else
     {
