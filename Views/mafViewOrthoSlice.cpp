@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-14 15:30:40 $
-  Version:   $Revision: 1.61.2.7 $
+  Date:      $Date: 2009-04-15 14:09:57 $
+  Version:   $Revision: 1.61.2.8 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,6 +41,7 @@
 #include "mafPipeSurfaceSlice.h"
 #include "medVisualPipeSlicerSlice.h"
 #include "mafPipePolylineSlice.h"
+#include "mafPipePolyline.h"
 #include "mmdMouse.h"
 
 #include "vtkDataSet.h"
@@ -170,27 +171,55 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
   else if(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
   {
     
+    mafPipePolyline *pipePolyX = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
+    if(pipePolyX)
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        pipePolyX->SetRepresentationToTube();
+        pipePolyX->SetOpacity(0.3);
+      }
+    }
+    mafPipePolyline *pipePolyY = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
+    if(pipePolyY)
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        pipePolyY->SetRepresentationToTube();
+        pipePolyY->SetOpacity(0.3);
+      }
+    }
+    mafPipePolyline *pipePolyZ = mafPipePolyline::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
+    if(pipePolyZ)
+    {
+      if(node->IsA("mafVMEMeter"))
+      {
+        pipePolyZ->SetRepresentationToTube();
+        pipePolyZ->SetOpacity(0.3);
+      }
+    }
+
     mafPipePolylineSlice *pipeSliceX = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->GetNodePipe(node));
     if(pipeSliceX) 
     {
-      /*if(node->IsA("mafVMEMeter"))
+      if(node->IsA("mafVMEMeter"))
       {
-        pipeSliceX->SplineModeOff();
+        //pipeSliceX->SplineModeOff();
       }
       else
-        pipeSliceX->SplineModeOn();*/
+        pipeSliceX->SplineModeOn();
       pipeSliceX->FillOn();
     }
 
     mafPipePolylineSlice *pipeSliceY = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_YN_VIEW]))->GetNodePipe(node));
     if(pipeSliceY) 
     {
-      /*if(node->IsA("mafVMEMeter"))
+      if(node->IsA("mafVMEMeter"))
       {
-        pipeSliceY->SplineModeOff();
+        //pipeSliceY->SplineModeOff();
       }
       else
-        pipeSliceY->SplineModeOn();*/
+        pipeSliceY->SplineModeOn();
       pipeSliceY->FillOn();
       
     }
@@ -198,11 +227,11 @@ void mafViewOrthoSlice::VmeShow(mafNode *node, bool show)
     mafPipePolylineSlice *pipeSliceZ = mafPipePolylineSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_ZN_VIEW]))->GetNodePipe(node));
     if(pipeSliceZ) 
     {
-      /*if(node->IsA("mafVMEMeter"))
+      if(node->IsA("mafVMEMeter"))
       {
-        pipeSliceZ->SplineModeOff();
+        //pipeSliceZ->SplineModeOff();
       }
-      else*/
+      else
         pipeSliceZ->SplineModeOn();
       pipeSliceZ->FillOn(); 
     }
@@ -410,7 +439,7 @@ void mafViewOrthoSlice::PackageView()
       m_Views[v]->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice",MUTEX);
       m_Views[v]->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice");
       m_Views[v]->PlugVisualPipe("mafVMEPolylineSpline", "mafPipePolylineSlice");
-      m_Views[v]->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice");
+      m_Views[v]->PlugVisualPipe("mafVMEMeter", "mafPipePolyline");
     }
     else
     {
