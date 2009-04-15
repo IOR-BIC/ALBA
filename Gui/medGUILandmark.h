@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:27:22 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-04-15 14:11:22 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -95,6 +95,8 @@ public:
 
   static bool VmeAccept(mafNode* node) {return(node != NULL);};
 
+  void SetRadiusFromBoundsFraction(int fraction){m_BoundsFraction = fraction;}
+
 protected: 
   /** Create interactors */
   void CreateTranslateISACompositor();
@@ -152,6 +154,7 @@ protected:
 
   int m_GUIStatus;
   int m_SpawnLM;
+  int m_BoundsFraction;
 
 };
 #endif

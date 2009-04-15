@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-09 14:26:18 $
-Version:   $Revision: 1.4.2.1 $
+Date:      $Date: 2009-04-15 14:11:22 $
+Version:   $Revision: 1.4.2.2 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -80,6 +80,7 @@ medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener)
   m_PickerInteractor->SetListener(this);
 
   m_Position[0] = m_Position[1] = m_Position[2] = 0;
+  m_BoundsFraction = 60;
 
   SpawnLMOff();
  
@@ -193,6 +194,7 @@ void medGUILandmark::OnEvent(mafEventBase *maf_event)
 
         //m_Landmark->SetAbsPose(mat);
         m_Landmark->SetAbsMatrix(mat);
+        //mafLogMessage("%.2f %.2f %.2f", e->GetMatrix()->GetVTKMatrix()->GetElement(0,3),e->GetMatrix()->GetVTKMatrix()->GetElement(1,3),e->GetMatrix()->GetVTKMatrix()->GetElement(2,3));
         SetGuiAbsPosition(mat.GetVTKMatrix(), -1);
 
         //UpdateIsa();
@@ -326,7 +328,7 @@ void medGUILandmark::OnVmePicked(mafEvent& e)
     double diffZ = fabs(b[5] - b[4]);
 
     double maxBound = diffX > diffY ? (diffX > diffZ ? diffX : diffZ ) : (diffY > diffZ ? diffY : diffZ );
-    m_LMCloud->SetRadius(maxBound/60);
+    m_LMCloud->SetRadius(maxBound/m_BoundsFraction);
 		m_LMCloud->ReparentTo(m_InputVME);
  
      /** 
