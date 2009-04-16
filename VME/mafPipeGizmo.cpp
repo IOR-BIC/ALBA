@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-07 09:34:40 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2009-04-16 12:49:21 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -128,7 +128,9 @@ void mafPipeGizmo::Create(mafSceneNode *n)
   m_CaptionActor->GetCaptionTextProperty()->ShadowOn();
   m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
 
-  m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
+  double *colour;
+  colour = gizmo->GetTextColour();
+  m_CaptionActor->GetCaptionTextProperty()->SetColor(colour);
   m_CaptionActor->SetCaption(gizmo->GetTextValue());
   m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());
 
@@ -221,6 +223,9 @@ void mafPipeGizmo::UpdatePipe()
 
   if(m_CaptionActor != NULL)
   {
+    double *colour;
+    colour = gizmo->GetTextColour();
+    m_CaptionActor->GetCaptionTextProperty()->SetColor(colour);
     m_CaptionActor->SetVisibility(gizmo->GetTextVisibility());
     m_CaptionActor->SetCaption(gizmo->GetTextValue());
     m_CaptionActor->SetAttachmentPoint(gizmo->GetTextPosition());

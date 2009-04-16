@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:06:08 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-04-16 12:49:21 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -56,6 +56,8 @@ mafVMEGizmo::mafVMEGizmo()
 
   m_TextValue = "";
   m_TextVisibility = FALSE;
+
+  m_TextColour[0] = m_TextColour[1] = m_TextColour[2] = 1.0;
 }
 
 //-------------------------------------------------------------------------
@@ -182,4 +184,20 @@ double *mafVMEGizmo::GetTextPosition()
 //-------------------------------------------------------------------------
 {
   return m_TextPosition;
+}
+//-------------------------------------------------------------------------
+double *mafVMEGizmo::GetTextColour()
+//-------------------------------------------------------------------------
+{
+  return m_TextColour;
+}
+
+//-------------------------------------------------------------------------
+void mafVMEGizmo::SetTextColour(double colour[3])
+//-------------------------------------------------------------------------
+{
+  m_TextColour[0] = colour[0];
+  m_TextColour[1] = colour[1];
+  m_TextColour[2] = colour[2];
+  GetEventSource()->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 }

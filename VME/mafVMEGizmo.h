@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEGizmo.h,v $
   Language:  C++
-  Date:      $Date: 2008-06-05 14:06:08 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-04-16 12:49:21 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Marco Petrone, Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -94,6 +94,10 @@ public:
   void SetTextVisibility(int visibility);
   int GetTextVisibility(){return m_TextVisibility;};
 
+  /**Set/Get Colour of Text*/
+  void SetTextColour(double colour[3]);
+  double *GetTextColour();
+
 
 protected:
   mafVMEGizmo();
@@ -110,6 +114,7 @@ protected:
 
   mafString m_TextValue;
   double m_TextPosition[3];
+  double m_TextColour[3];
   int    m_TextVisibility;
 
 private:
