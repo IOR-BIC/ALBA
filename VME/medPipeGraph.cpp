@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2009-04-16 13:32:22 $
+  Version:   $Revision: 1.37.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,6 +63,7 @@ medPipeGraph::medPipeGraph()
 
   m_TitileX		= "";
   m_TitileY		= "";
+  m_Title     = "";
   m_ItemName  = "analog_";
   m_FitPlot = 1;
   m_Legend = 0;
@@ -757,4 +758,12 @@ void medPipeGraph::SetTitleY(mafString title)
   m_PlotActor->SetYTitle(m_TitileY);
   m_PlotTimeLineActor->SetYTitle(m_TitileY);
   ChangeAxisTitle();
+}
+//----------------------------------------------------------------------------
+void medPipeGraph::SetTitle(mafString title)
+//----------------------------------------------------------------------------
+{
+  m_Title = title.GetCStr();
+  m_PlotActor->SetTitle(m_Title);
+  m_PlotTimeLineActor->SetTitle(m_Title);
 }

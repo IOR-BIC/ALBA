@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2009-04-16 13:32:22 $
+  Version:   $Revision: 1.19.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,7 @@ public:
 
   void SetTitleX(mafString title);
   void SetTitleY(mafString title);
+  void SetTitle(mafString title);
   
 protected:
   mafGUI* CreateGui();
@@ -110,6 +111,7 @@ private:
   mafString   m_ItemName;
   wxString		m_TitileX;
   wxString		m_TitileY;
+  wxString    m_Title;
 
   std::vector<vtkRectilinearGrid*> m_VtkData;
 
