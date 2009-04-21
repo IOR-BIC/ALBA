@@ -74,6 +74,9 @@ ADD_EXECUTABLE(medOpImporterDicomGrassrootsTest medOpImporterDicomGrassrootsTest
 ADD_TEST(medOpImporterDicomGrassrootsTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomGrassrootsTest)
 ENDIF (MED_USE_GDCM)
 
+ADD_EXECUTABLE(itkRawMotionImporterUtilityTest itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp)
+ADD_TEST(itkRawMotionImporterUtilityTest ${EXECUTABLE_OUTPUT_PATH}/itkRawMotionImporterUtilityTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
