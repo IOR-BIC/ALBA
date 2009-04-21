@@ -100,8 +100,16 @@ SET(PROJECT_SRCS
   
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
-  
 )
+  
+IF (MED_USE_OFFIS)
+SET(PROJECT_SRCS ${PROJECT_SRCS}
+  medOpImporterDicomOffis.h
+  medOpImporterDicomOffis.cpp
+)
+ENDIF (MED_USE_OFFIS)
+  
+
 
 IF (MED_USE_GDCM)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
@@ -111,7 +119,6 @@ SET(PROJECT_SRCS ${PROJECT_SRCS}
 ENDIF (MED_USE_GDCM)
 
   
-
 IF (MAF_USE_ITK)
 SET(PROJECT_SRCS  ${PROJECT_SRCS}
   itkRawMotionImporterUtility.cxx
