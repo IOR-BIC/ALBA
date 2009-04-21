@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-03-26 11:45:21 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2009-04-21 13:01:09 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -565,7 +565,7 @@ protected:
 	std::vector<double *> m_MiddlePointList; // list of coordinates
 	std::vector<int> m_OrderMiddlePointsVMEList; //order list of VME ID
 	std::vector<mafString> m_OrderMiddlePointsNameVMEList; //order list of VME Name
-	std::vector<mafString> m_testList;
+	std::vector<mafString> m_TestList;
 	
 
 	int              m_OrderMiddlePointsVMEListNumberOfElements;
@@ -596,7 +596,7 @@ protected:
 	int        m_WrapSide;
 	int        m_WrapReverse;
 	//---------------interface -------------
-	wxBoxSizer* bSizer;
+	wxBoxSizer* m_BSizer;
 	mafGUI *m_GuiNewMeter;
 	mafGUI *m_GuiOldMeter; 
 

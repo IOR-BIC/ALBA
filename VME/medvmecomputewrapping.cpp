@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-26 11:36:44 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2009-04-21 13:01:09 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -4360,11 +4360,11 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 				
 				if (m_WrappedClass == OLD_METER)
 				{
-					bSizer->Show( m_Gui,true);
+					m_BSizer->Show( m_Gui,true);
 					//m_Gui->Add(bSizer, 1, wxEXPAND);
 				}else{
 					//m_Gui->Remove(bSizer);
-					bSizer->Show( m_Gui,false);
+					m_BSizer->Show( m_Gui,false);
 				}
 				m_Gui->Update();
 
@@ -4591,7 +4591,7 @@ void medVMEComputeWrapping::SetMeterLink(const char *link_name, mafNode *n)
 		mafString(link_name) != mafString("WrappedVME2"))
 	{
 		m_OrderMiddlePointsNameVMEList.push_back(n->GetName());
-		m_testList.push_back(n->GetName());
+		m_TestList.push_back(n->GetName());
 	}
 }
 
