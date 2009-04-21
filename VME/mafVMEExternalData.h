@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEExternalData.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-20 09:51:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-04-21 15:39:18 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Marco Petrone - Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -53,6 +53,8 @@ void PrintSelf(std::ostream& os,const int indent);
   mafString GetAbsoluteFileName();
   void GetAbsoluteFileName(char *fname);
 
+  /** TODO: REFACTOR THIS 
+  This API is not clear */
   void SetCurrentPath(mafString &path) {this->m_TmpPath=path;};
   void SetCurrentPath(const char *path) {this->m_TmpPath=path;};
 
@@ -94,6 +96,11 @@ protected:
 private:
   mafVMEExternalData(const mafVMEExternalData&); // Not implemented
   void operator=(const mafVMEExternalData&); // Not implemented
+
+  // test friend
+  friend class mafVMEExternalDataTest;
+
 };
+
 
 #endif
