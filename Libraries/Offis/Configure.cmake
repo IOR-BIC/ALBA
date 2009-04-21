@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2006-12-13 09:18:02 $
-# Version:   $Revision: 1.2 $
+# Date:      $Date: 2009-04-21 12:31:39 $
+# Version:   $Revision: 1.2.2.1 $
 #
 # Description:
 # Project file for configuring the Offis library as an external project.
@@ -32,7 +32,7 @@ IF (EXISTS "${Offis_SOURCE_DIR}/Packages")
   IF (NOT EXISTS "${Offis_SOURCE_PATH}")
 	  FIND_AND_UNPACK_PACKAGE (dcmtk-3.5.4 ${Offis_PACKAGE_PATH} "${Offis_BINARY_DIR}/Sources" ${Offis_SOURCE_PATH})
 	  FIND_AND_UNPACK_PACKAGE (dcmtk_Extras ${Offis_Extension_PACKAGE_PATH} "${Offis_BINARY_DIR}/Sources" ${Offis_SOURCE_PATH})
-#	  FIND_AND_APPLAY_PATCHES(dcmtk-3.5.4 ${Offis_PATCH_PATH} "${Offis_SOURCE_PATH}")
+	  FIND_AND_APPLAY_PATCHES(dcmtk-3.5.4 ${Offis_PATCH_PATH} "${Offis_SOURCE_PATH}")
   ENDIF (NOT EXISTS "${Offis_SOURCE_PATH}")
 ENDIF (EXISTS "${Offis_SOURCE_DIR}/Packages")
 
