@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-11 11:27:27 $
-Version:   $Revision: 1.21.2.9 $
+Date:      $Date: 2009-04-22 14:28:46 $
+Version:   $Revision: 1.21.2.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1799,6 +1799,10 @@ void medOpImporterDicom::ShowSlice(int slice_num)
 	// Description:
 	// read the slice number 'slice_num' and generate the texture
 	double spacing[3], crop_bounds[6], range[2], loc[3];
+
+  m_DicomReader->SetFileName((char *)m_ListSelected->Item(slice_num)->GetData()->GetFileName());
+  m_DicomReader->Modified();
+  m_DicomReader->Update();
 
 	m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
 
