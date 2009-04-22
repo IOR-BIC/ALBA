@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafWXLog.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-17 11:50:33 $
-  Version:   $Revision: 1.2.22.1 $
+  Date:      $Date: 2009-04-22 09:43:04 $
+  Version:   $Revision: 1.2.22.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,8 +36,8 @@ private:
   virtual void DoLogString(const wxChar *szString, time_t t);
 
   // the control we use
-  wxTextCtrl *m_pTextCtrl;
-  FILE    	 *m_fp;
+  wxTextCtrl *m_PTextCtrl;
+  FILE    	 *m_Fp;
   bool        m_LogToFile;
 };
 #endif

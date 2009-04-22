@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-04-22 09:43:04 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,7 +96,7 @@ protected:
   vtkMAFTransferFunction2D *m_TransferFunction;
   
   // slice preview
-  wxNotebook            *m_preview_book;
+  wxNotebook            *m_PreviewBook;
   mafRWIBase    				*m_SliceRwi;
   vtkRenderWindow       *m_SliceWindow;
   vtkTextActor          *m_WaitActor;
@@ -107,11 +107,11 @@ protected:
   vtkActor2D            *m_SliceActor;
 
   // 3d preview
-  mafRWIBase    				  *m_3DRwi;
-  vtkRenderer             *m_3DRenderer;
-  vtkRenderWindow         *m_3DWindow;
-  vtkMAFAdaptiveVolumeMapper *m_3DMapper;
-  vtkVolume               *m_3DVolume;
+  mafRWIBase    				  *m_Rwi3D;
+  vtkRenderer             *m_Renderer3D;
+  vtkRenderWindow         *m_Window3D;
+  vtkMAFAdaptiveVolumeMapper *m_Mapper3D;
+  vtkVolume               *m_Volume3D;
 
   // graph/widget window
   mafRWIBase  		*m_GraphRwi;
@@ -145,7 +145,7 @@ protected:
   
 	bool m_DataReady;
   int  m_SlicePipeStatus;
-  int  m_3DPipeStatus;
+  int  m_PipeStatus3D;
 
   static VTK_THREAD_RETURN_TYPE CreatePipe(void *ptr);
 

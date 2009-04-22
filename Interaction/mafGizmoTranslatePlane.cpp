@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-18 16:05:10 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.12.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,19 +49,19 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
 {
   this->SetIsActive(false);
   
-  IsaComp[0]  = IsaComp[1] =  NULL;
+  m_IsaComp[0]  = m_IsaComp[1] =  NULL;
   m_Listener  = listener;
-  InputVme    = input;
+  m_InputVme    = input;
   m_Length = 1;
   
   // default plane is YZ
-  ActivePlane = YZ;
+  m_ActivePlane = YZ;
   
   //-----------------
   // pivot stuff
   //-----------------
   // pivotTransform is useless for this operation but required by isa generic
-  PivotTransform = vtkTransform::New();
+  m_PivotTransform = vtkTransform::New();
 
   // create pipeline stuff
   CreatePipeline();
@@ -77,17 +77,17 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   for (i = 0; i < 3; i++)
   {
     // the ith gizmo
-    Gizmo[i] = mafVMEGizmo::New();
+    m_Gizmo[i] = mafVMEGizmo::New();
     vmeName = "part";
     vmeName << i;
-    Gizmo[i]->SetName(vmeName.GetCStr());
-    Gizmo[i]->SetData(RotatePDF[i]->GetOutput());
+    m_Gizmo[i]->SetName(vmeName.GetCStr());
+    m_Gizmo[i]->SetData(m_RotatePDF[i]->GetOutput());
   }
   // assign isa to S1 and S2;
-  Gizmo[S1]->SetBehavior(IsaComp[S1]);
-  Gizmo[S2]->SetBehavior(IsaComp[S2]);
+  m_Gizmo[S1]->SetBehavior(m_IsaComp[S1]);
+  m_Gizmo[S2]->SetBehavior(m_IsaComp[S2]);
 
-  mafMatrix *absInputMatrix = InputVme->GetOutput()->GetAbsMatrix();
+  mafMatrix *absInputMatrix = m_InputVme->GetOutput()->GetAbsMatrix();
   SetAbsPose(absInputMatrix);
   SetConstrainRefSys(absInputMatrix);
 
@@ -110,36 +110,36 @@ mafGizmoTranslatePlane::mafGizmoTranslatePlane(mafVME *input, mafObserver *liste
   // add the gizmo to the tree, this should increase reference count 
   for (i = 0; i < 3; i++)
   {
-    Gizmo[i]->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+    m_Gizmo[i]->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
   }
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslatePlane::~mafGizmoTranslatePlane() 
 //----------------------------------------------------------------------------
 {
-  Gizmo[S1]->SetBehavior(NULL);
-  Gizmo[S2]->SetBehavior(NULL);
-  Gizmo[SQ]->SetBehavior(NULL);
+  m_Gizmo[S1]->SetBehavior(NULL);
+  m_Gizmo[S2]->SetBehavior(NULL);
+  m_Gizmo[SQ]->SetBehavior(NULL);
   
-  vtkDEL(Line[S1]);
-  vtkDEL(Line[S2]);
-  vtkDEL(Plane);
-  vtkDEL(RotationTr);
+  vtkDEL(m_Line[S1]);
+  vtkDEL(m_Line[S2]);
+  vtkDEL(m_Plane);
+  vtkDEL(m_RotationTr);
 
   // clean up
   int i;
   for (i = 0; i < SQ; i++)
   {
-    vtkDEL(LineTF[i]);
-    vtkDEL(IsaComp[i]); 
+    vtkDEL(m_LineTF[i]);
+    vtkDEL(m_IsaComp[i]); 
   }
 
-  PivotTransform->Delete();
+  m_PivotTransform->Delete();
 
   for (i = 0; i < 3; i++)
   {
-    vtkDEL(RotatePDF[i]);
-		Gizmo[i]->ReparentTo(NULL);
+    vtkDEL(m_RotatePDF[i]);
+		m_Gizmo[i]->ReparentTo(NULL);
   }
 }
 
@@ -149,10 +149,10 @@ void mafGizmoTranslatePlane::CreatePipeline()
 {
   // calculate diagonal of InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-	if(InputVme->IsA("mafVMEGizmo"))
-		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	if(m_InputVme->IsA("mafVMEGizmo"))
+		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
-		InputVme->GetOutput()->GetBounds(b);
+		m_InputVme->GetOutput()->GetBounds(b);
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
@@ -177,29 +177,29 @@ void mafGizmoTranslatePlane::CreatePipeline()
   // create pipeline for cone-cylinder gizmo along global X axis
   
   // create S1
-  Line[S1] = vtkLineSource::New();  
-  Line[S1]->SetPoint1(0, 1, 0);
-  Line[S1]->SetPoint2(0, 1, 1);
+  m_Line[S1] = vtkLineSource::New();  
+  m_Line[S1]->SetPoint1(0, 1, 0);
+  m_Line[S1]->SetPoint2(0, 1, 1);
 
   // create S2
-  Line[S2] = vtkLineSource::New();
-  Line[S2]->SetPoint1(0, 0, 1);
-  Line[S2]->SetPoint2(0, 1, 1);
+  m_Line[S2] = vtkLineSource::New();
+  m_Line[S2]->SetPoint1(0, 0, 1);
+  m_Line[S2]->SetPoint2(0, 1, 1);
 
   // create SQ
-  Plane = vtkPlaneSource::New();
-  Plane->SetOrigin(0, 0, 0);
-  Plane->SetPoint1(0, 1, 0);
-  Plane->SetPoint2(0, 0, 1);
+  m_Plane = vtkPlaneSource::New();
+  m_Plane->SetOrigin(0, 0, 0);
+  m_Plane->SetPoint1(0, 1, 0);
+  m_Plane->SetPoint2(0, 0, 1);
 
   // create tube filter for the segments
   int i;
   for (i = 0; i < SQ; i++)
   {
-    LineTF[i] = vtkTubeFilter::New();
-    LineTF[i]->SetInput(Line[i]->GetOutput());
-    LineTF[i]->SetRadius(d / 200);
-    LineTF[i]->SetNumberOfSides(20);
+    m_LineTF[i] = vtkTubeFilter::New();
+    m_LineTF[i]->SetInput(m_Line[i]->GetOutput());
+    m_LineTF[i]->SetRadius(d / 200);
+    m_LineTF[i]->SetNumberOfSides(20);
   }
 
   //-----------------
@@ -208,19 +208,19 @@ void mafGizmoTranslatePlane::CreatePipeline()
   this->SetSizeLength(d / 8);
 
   //-----------------
-  RotationTr = vtkTransform::New();
-  RotationTr->Identity();
+  m_RotationTr = vtkTransform::New();
+  m_RotationTr->Identity();
 
   // create rotation transform and rotation TPDF 
   for (i = 0; i < SQ; i++)
   {
-    RotatePDF[i] = vtkTransformPolyDataFilter::New();
-    RotatePDF[i]->SetTransform(RotationTr);
-    RotatePDF[i]->SetInput(LineTF[i]->GetOutput());
+    m_RotatePDF[i] = vtkTransformPolyDataFilter::New();
+    m_RotatePDF[i]->SetTransform(m_RotationTr);
+    m_RotatePDF[i]->SetInput(m_LineTF[i]->GetOutput());
   }
-  RotatePDF[SQ] = vtkTransformPolyDataFilter::New();
-  RotatePDF[SQ]->SetTransform(RotationTr);
-  RotatePDF[SQ]->SetInput(Plane->GetOutput());
+  m_RotatePDF[SQ] = vtkTransformPolyDataFilter::New();
+  m_RotatePDF[SQ]->SetTransform(m_RotationTr);
+  m_RotatePDF[SQ]->SetInput(m_Plane->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -231,16 +231,16 @@ void mafGizmoTranslatePlane::CreateISA()
   // Default isa is constrained to plane XZ.
   for (int i = 0; i < SQ; i++)
   {
-    IsaComp[i] = mmiCompositorMouse::New();
+    m_IsaComp[i] = mmiCompositorMouse::New();
 
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    IsaGen[i] = IsaComp[i]->CreateBehavior(MOUSE_LEFT);
-    IsaGen[i]->SetVME(InputVme);
-    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);     
+    m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
+    m_IsaGen[i]->SetVME(m_InputVme);
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);     
     
     //isa will send events to this
-    IsaGen[i]->SetListener(this);
+    m_IsaGen[i]->SetListener(this);
   }
 }
 
@@ -252,13 +252,13 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
   // is created; gizmos are not highlighted
   
   // register the plane
-  ActivePlane = plane;
+  m_ActivePlane = plane;
   
   // rotate the gizmo components to match the specified plane
-  if (ActivePlane == YZ)
+  if (m_ActivePlane == YZ)
   {
     // reset cyl and cone rotation
-    RotationTr->Identity();
+    m_RotationTr->Identity();
   
     // set S1 and S2 color
     this->SetColor(S1, 0, 1, 0);
@@ -267,14 +267,14 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::FREE);
     }
   }
-  else if (ActivePlane == XZ)
+  else if (m_ActivePlane == XZ)
   {
     // set rotation to move con and cyl on Y 
-    RotationTr->Identity();
-    RotationTr->RotateZ(-90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateZ(-90);
    
     // set S1 and S2 color
     this->SetColor(S1, 1, 0, 0);
@@ -283,14 +283,14 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);
     }
   }  
-  else if (ActivePlane == XY)
+  else if (m_ActivePlane == XY)
   {
     // set rotation to move con and cyl on Z
-    RotationTr->Identity();
-    RotationTr->RotateY(90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateY(90);
     
     // set S1 and S2 color
     this->SetColor(S1, 0, 1, 0);
@@ -299,7 +299,7 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
     }
   }  
 }
@@ -321,19 +321,19 @@ void mafGizmoTranslatePlane::Highlight(bool highlight)
   else
   {
    // restore original color 
-   if (ActivePlane == YZ)
+   if (m_ActivePlane == YZ)
    {
     // set S1 and S2 color
     this->SetColor(S1, 0, 1, 0);
     this->SetColor(S2, 0, 0, 1);
    } 
-   else if (ActivePlane == XZ)
+   else if (m_ActivePlane == XZ)
    {
      // set S1 and S2 color
     this->SetColor(S1, 1, 0, 0);
     this->SetColor(S2, 0, 0, 1);
    }
-   else if (ActivePlane == XY)
+   else if (m_ActivePlane == XY)
    {     
     // set S1 and S2 color
     this->SetColor(S1, 0, 1, 0);
@@ -365,17 +365,17 @@ void  mafGizmoTranslatePlane::SetSizeLength(double length)
   m_Length = length;
   double L = length;
   // update S1
-  Line[S1]->SetPoint1(0, L, 0);
-  Line[S1]->SetPoint2(0, L, L);
+  m_Line[S1]->SetPoint1(0, L, 0);
+  m_Line[S1]->SetPoint2(0, L, L);
 
   // update S2
-  Line[S2]->SetPoint1(0, 0, L);
-  Line[S2]->SetPoint2(0, L, L);
+  m_Line[S2]->SetPoint1(0, 0, L);
+  m_Line[S2]->SetPoint2(0, L, L);
 
   // update SQ
-  Plane->SetOrigin(0, 0, 0);
-  Plane->SetPoint1(0, L, 0);
-  Plane->SetPoint2(0, 0, L);
+  m_Plane->SetOrigin(0, 0, 0);
+  m_Plane->SetPoint1(0, L, 0);
+  m_Plane->SetPoint2(0, 0, L);
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::OnEvent(mafEventBase *maf_event)
@@ -403,10 +403,10 @@ void mafGizmoTranslatePlane::SetColor(int part, double col[3])
 {
   if (part == S1 || part == S2 || part == SQ)
   {
-    Gizmo[part]->GetMaterial()->m_Prop->SetColor(col);
-	  Gizmo[part]->GetMaterial()->m_Prop->SetAmbient(0);
-	  Gizmo[part]->GetMaterial()->m_Prop->SetDiffuse(1);
-	  Gizmo[part]->GetMaterial()->m_Prop->SetSpecular(0);
+    m_Gizmo[part]->GetMaterial()->m_Prop->SetColor(col);
+	  m_Gizmo[part]->GetMaterial()->m_Prop->SetAmbient(0);
+	  m_Gizmo[part]->GetMaterial()->m_Prop->SetDiffuse(1);
+	  m_Gizmo[part]->GetMaterial()->m_Prop->SetSpecular(0);
   }
 }
 //----------------------------------------------------------------------------
@@ -421,14 +421,14 @@ void mafGizmoTranslatePlane::Show(bool show)
 //----------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
-		mafEventMacro(mafEvent(this,VME_SHOW,Gizmo[i],show));
+		mafEventMacro(mafEvent(this,VME_SHOW,m_Gizmo[i],show));
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::ShowSquare(bool show)
 //----------------------------------------------------------------------------
 {
   double opacity = ((show == TRUE) ? 0.5 : 0);
-  Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(opacity);
+  m_Gizmo[SQ]->GetMaterial()->m_Prop->SetOpacity(opacity);
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetAbsPose(mafMatrix *absPose)
@@ -436,7 +436,7 @@ void mafGizmoTranslatePlane::SetAbsPose(mafMatrix *absPose)
 {
   for (int i = 0; i < 3; i++)
   {  
-    Gizmo[i]->SetAbsMatrix(*absPose);
+    m_Gizmo[i]->SetAbsMatrix(*absPose);
   }
   
   SetConstrainRefSys(absPose);
@@ -447,20 +447,20 @@ void mafGizmoTranslatePlane::SetConstrainRefSys(mafMatrix *constrain)
 {  
   for (int i = 0; i < SQ; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
+    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(constrain);
   }
 }
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoTranslatePlane::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return Gizmo[S1]->GetOutput()->GetAbsMatrix();
+  return m_Gizmo[S1]->GetOutput()->GetAbsMatrix();
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslatePlane::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->InputVme = vme; 
+  this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetConstrainRefSys(vme->GetOutput()->GetAbsMatrix());
 }
@@ -470,7 +470,7 @@ void mafGizmoTranslatePlane::SetConstraintModality(int axis, int constrainModali
 {
   for (int i = 0; i < SQ; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
   }
 }
 //----------------------------------------------------------------------------
@@ -479,6 +479,6 @@ void mafGizmoTranslatePlane::SetStep(int axis, double step)
 {
   for (int i = 0; i < SQ; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
+    m_IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
   }
 }

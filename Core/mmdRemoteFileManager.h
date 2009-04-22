@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdRemoteFileManager.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-21 14:33:53 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-04-22 09:42:51 $
+  Version:   $Revision: 1.1.4.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -89,7 +89,7 @@ protected:
   CURL      *m_Curl;
   CURLcode   m_Result;
   struct curl_slist *m_Headerlist;
-  struct stat FileInfo;
+  struct stat m_FileInfo;
   FILE      *m_LocalStream;
   double     m_SpeedUpload;
   double     m_TotalTime;

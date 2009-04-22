@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterBmp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-04-22 09:42:30 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -49,7 +49,7 @@ mafOp(label)
   m_Canundo = true;
   m_Input = NULL;
   m_Offset = 0;
-  m_8bit = 1;
+  m_Bit8 = 1;
 	m_DirName = "";
 }
 //----------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void mafOpExporterBmp::OpRun()
     
     m_Gui->DirOpen(ID_DIROPEN, "export dir", &m_DirName, _("choose dir") );
    
-    m_Gui->Bool(ID_8BIT, "grayscale", &m_8bit, 0, _("export in 8 bit gray scale format"));
+    m_Gui->Bool(ID_8BIT, "grayscale", &m_Bit8, 0, _("export in 8 bit gray scale format"));
     m_Gui->Integer(ID_INT,"offset: ", &m_Offset,MININT,MAXINT, _("only if 8 bit"));
 
     m_Gui->Label("");
@@ -207,7 +207,7 @@ void mafOpExporterBmp::SaveBmp()
 			prefix = wxString::Format("%s%s_%dx%d",path,name,xdim,ydim);
 
 
-  if (m_8bit == 0)
+  if (m_Bit8 == 0)
   {
     vtkMAFSmartPointer<vtkImageFlip> imageFlip;
     imageFlip->SetFilteredAxis(1);
@@ -290,7 +290,7 @@ void mafOpExporterBmp::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_8BIT:
-        m_Gui->Enable(ID_INT, m_8bit != 0);
+        m_Gui->Enable(ID_INT, m_Bit8 != 0);
         break;
       case ID_DIROPEN:
         m_Gui->Enable(wxOK, !m_DirName.IsEmpty());

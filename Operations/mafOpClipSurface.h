@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:29:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-04-22 09:42:30 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -148,11 +148,11 @@ protected:
 
   int		m_ClipModality;
 	int		m_GizmoType;
-  int		ClipInside;
+  int		m_ClipInside;
 	int   m_UseGizmo;
 	int		m_GenerateClippedOutput;
 	int		m_ClipBoundBox;
-  bool	PlaneCreated;
+  bool	m_PlaneCreated;
 
 	double m_PlaneWidth;
 	double m_PlaneHeight;

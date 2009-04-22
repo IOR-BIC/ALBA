@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmdRemoteFileManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-23 08:51:11 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-04-22 09:42:51 $
+  Version:   $Revision: 1.2.4.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -198,7 +198,7 @@ int mmdRemoteFileManager::UploadLocalFile(mafString local_filename, mafString re
     }
 
     // get the file size
-    stat(local_filename.GetCStr(), &FileInfo); 
+    stat(local_filename.GetCStr(), &m_FileInfo); 
 
     mafString auth = m_UserName;
     auth += ":";
@@ -209,7 +209,7 @@ int mmdRemoteFileManager::UploadLocalFile(mafString local_filename, mafString re
     curl_easy_setopt(m_Curl, CURLOPT_UPLOAD, TRUE);
     curl_easy_setopt(m_Curl, CURLOPT_READFUNCTION,FileUpload);
     curl_easy_setopt(m_Curl, CURLOPT_READDATA, m_LocalStream);
-    curl_easy_setopt(m_Curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)FileInfo.st_size);
+    curl_easy_setopt(m_Curl, CURLOPT_INFILESIZE_LARGE,(curl_off_t)m_FileInfo.st_size);
 
     if (is_remote)
     {

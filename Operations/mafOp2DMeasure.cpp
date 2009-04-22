@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-04-22 09:42:30 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,8 +54,8 @@ mafOp2DMeasure::mafOp2DMeasure(const wxString &label)
   m_MeasureText = "";
   m_MeasureList = NULL;
 
-  m_2DDistanceInteractor = NULL;
-	m_2DAngleInteractor    = NULL;
+  m_DistanceInteractor2D = NULL;
+	m_AngleInteractor2D    = NULL;
 
   m_ManualDistance = "";
   m_ManualAngle    = "";
@@ -104,14 +104,14 @@ enum MEASURE2D_ID
 void mafOp2DMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
-  m_2DDistanceInteractor = mmi2DDistance::New();
-  mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DDistanceInteractor));
-  m_2DDistanceInteractor->SetListener(this);
+  m_DistanceInteractor2D = mmi2DDistance::New();
+  mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_DistanceInteractor2D));
+  m_DistanceInteractor2D->SetListener(this);
 
-	m_2DAngleInteractor = mmi2DAngle::New();
+	m_AngleInteractor2D = mmi2DAngle::New();
 	//mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DAngleInteractor));
 	//m_2DAngleInteractor->SetListener(this);
-  m_2DIndicatorInteractor = mmi2DIndicator::New();
+  m_IndicatorInteractor2D = mmi2DIndicator::New();
   
   wxString measure[5] = {_("points"), _("lines"), _("angle by lines"), _("angle by points"), _("indicator")};
   
@@ -172,11 +172,11 @@ void mafOp2DMeasure::OpRun()
     m_Gui->Enable(ID_REMOVE_MEASURE,false);
   }
   m_Gui->Enable(ID_PLOT_PROFILE, m_MeasureType == 0);
-  m_Gui->Enable(ID_MANUAL_DISTANCE, m_2DDistanceInteractor->SizeMeasureVector() != 0);
-  m_Gui->Enable(ID_MANUAL_ANGLE, m_2DAngleInteractor->SizeMeasureVector() != 0);
-  m_Gui->Enable(ID_MANUAL_INDICATOR, m_2DIndicatorInteractor->SizeMeasureVector() != 0);
+  m_Gui->Enable(ID_MANUAL_DISTANCE, m_DistanceInteractor2D->SizeMeasureVector() != 0);
+  m_Gui->Enable(ID_MANUAL_ANGLE, m_AngleInteractor2D->SizeMeasureVector() != 0);
+  m_Gui->Enable(ID_MANUAL_INDICATOR, m_IndicatorInteractor2D->SizeMeasureVector() != 0);
   
-  m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
+  m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
   
 	m_Gui->Divider();
 
@@ -196,16 +196,16 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
 					if(m_MeasureType == 0 || m_MeasureType == 1)
 					{
 						mafEventMacro(mafEvent(this,PER_POP));	
-						mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DDistanceInteractor));
-						m_2DDistanceInteractor->SetListener(this);
+						mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_DistanceInteractor2D));
+						m_DistanceInteractor2D->SetListener(this);
 
-						if(m_2DDistanceInteractor->SizeMeasureVector() != 0)
-							m_DistanceMeasure = mafString(wxString::Format("%.2f" ,RoundValue(m_2DDistanceInteractor->GetLastDistance())));
+						if(m_DistanceInteractor2D->SizeMeasureVector() != 0)
+							m_DistanceMeasure = mafString(wxString::Format("%.2f" ,RoundValue(m_DistanceInteractor2D->GetLastDistance())));
 						else
 							m_DistanceMeasure = mafString("0");
 
 
-						if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+						if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
 						{           
 							wxMessageBox("Fix the label in the window");
 							m_MeasureType = 0;
@@ -213,25 +213,25 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
 						}
 						else
 						{
-							m_2DDistanceInteractor->SetMeasureType(m_MeasureType - m_FirstPositionInteractor[0]);
+							m_DistanceInteractor2D->SetMeasureType(m_MeasureType - m_FirstPositionInteractor[0]);
 							m_Gui->Enable(ID_PLOT_PROFILE, m_MeasureType == 0);
 						}
-						m_Gui->Enable(ID_MANUAL_DISTANCE, m_2DDistanceInteractor->SizeMeasureVector() != 0);
+						m_Gui->Enable(ID_MANUAL_DISTANCE, m_DistanceInteractor2D->SizeMeasureVector() != 0);
 						m_Gui->Enable(ID_MANUAL_ANGLE, false);
 						m_Gui->Update();
 					}
 					else if(m_MeasureType == 2 || m_MeasureType == 3)
 					{
 						mafEventMacro(mafEvent(this,PER_POP));	
-						mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DAngleInteractor));
-						m_2DAngleInteractor->SetListener(this);
+						mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_AngleInteractor2D));
+						m_AngleInteractor2D->SetListener(this);
 
-						if(m_2DAngleInteractor->SizeMeasureVector() != 0)
-							m_AcuteAngle = mafString(wxString::Format("%.2f" ,RoundValue(m_2DAngleInteractor->GetLastAngle())));
+						if(m_AngleInteractor2D->SizeMeasureVector() != 0)
+							m_AcuteAngle = mafString(wxString::Format("%.2f" ,RoundValue(m_AngleInteractor2D->GetLastAngle())));
 						else
 							m_AcuteAngle = mafString("0");
 
-						if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+						if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
 						{           
 							wxMessageBox("Fix the label in the window");
 							m_MeasureType = 0;
@@ -239,19 +239,19 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
 						}
 						else
 						{
-							m_2DAngleInteractor->SetMeasureType(m_MeasureType - m_FirstPositionInteractor[1]);
+							m_AngleInteractor2D->SetMeasureType(m_MeasureType - m_FirstPositionInteractor[1]);
 							m_Gui->Enable(ID_PLOT_PROFILE, m_MeasureType == 0);
 						}
 						m_Gui->Enable(ID_MANUAL_DISTANCE, false);
-						m_Gui->Enable(ID_MANUAL_ANGLE, m_2DAngleInteractor->SizeMeasureVector() != 0 && (m_MeasureType == 2 || m_MeasureType == 3));
+						m_Gui->Enable(ID_MANUAL_ANGLE, m_AngleInteractor2D->SizeMeasureVector() != 0 && (m_MeasureType == 2 || m_MeasureType == 3));
 						m_Gui->Update();
 					
 					}
           else if(m_MeasureType == 4)
           {
             mafEventMacro(mafEvent(this,PER_POP));	
-						mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DIndicatorInteractor));
-						m_2DIndicatorInteractor->SetListener(this);
+						mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_IndicatorInteractor2D));
+						m_IndicatorInteractor2D->SetListener(this);
             m_Gui->Enable(ID_PLOT_PROFILE, false);
             m_Gui->Update();
           }
@@ -261,21 +261,21 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           }
         break;
         case ID_PLOT_PROFILE:
-          m_2DDistanceInteractor->GenerateHistogram(m_GenerateHistogramFlag != 0);
+          m_DistanceInteractor2D->GenerateHistogram(m_GenerateHistogramFlag != 0);
         break;
         case ID_UNDO_MEASURE:
-          if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+          if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
             wxMessageBox("Fix the label in the window");
           else
           {
 						if(m_InteractorType[m_InteractorType.size()-1] == ID_DISTANCE_TYPE)
 						  {
-							  m_2DDistanceInteractor->UndoMeasure();
+							  m_DistanceInteractor2D->UndoMeasure();
                 m_InteractorType.pop_back();
   							
 							  if(m_InteractorType.size() != 0 && m_InteractorType[m_InteractorType.size()-1] == ID_DISTANCE_TYPE)
                 {
-								  m_ManualDistance = m_2DDistanceInteractor->GetLabel();
+								  m_ManualDistance = m_DistanceInteractor2D->GetLabel();
                   m_ManualAngle    = "";   
                   m_ManualIndicator= "";
                   m_Gui->Enable(ID_MANUAL_DISTANCE, true);
@@ -286,7 +286,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 {
                   m_ManualDistance = "";
                   m_ManualIndicator= "";
-                  m_ManualAngle = m_2DAngleInteractor->GetLabel();
+                  m_ManualAngle = m_AngleInteractor2D->GetLabel();
                   m_Gui->Enable(ID_MANUAL_ANGLE, true);
                   m_Gui->Enable(ID_MANUAL_DISTANCE, false);
                   m_Gui->Enable(ID_MANUAL_INDICATOR, false);
@@ -295,7 +295,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 {
                   m_ManualDistance = "";
                   m_ManualAngle = "";
-                  m_ManualIndicator= m_2DIndicatorInteractor->GetLabel();
+                  m_ManualIndicator= m_IndicatorInteractor2D->GetLabel();
                   m_Gui->Enable(ID_MANUAL_ANGLE, false);
                   m_Gui->Enable(ID_MANUAL_DISTANCE, false);
                   m_Gui->Enable(ID_MANUAL_INDICATOR, true);
@@ -315,18 +315,18 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 }
 
 
-                m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
+                m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
 				
 							  m_Gui->Update();
 						  }
 						else if(m_InteractorType[m_InteractorType.size()-1] == ID_ANGLE_TYPE)
 						  {
-							  m_2DAngleInteractor->UndoMeasure();
+							  m_AngleInteractor2D->UndoMeasure();
                 m_InteractorType.pop_back();
   		
 							  if(m_InteractorType.size() != 0 && m_InteractorType[m_InteractorType.size()-1] == ID_DISTANCE_TYPE)
                 {
-								  m_ManualDistance = m_2DDistanceInteractor->GetLabel();
+								  m_ManualDistance = m_DistanceInteractor2D->GetLabel();
                   m_ManualAngle    = "";   
                   m_ManualIndicator= "";
                   m_Gui->Enable(ID_MANUAL_DISTANCE, true);
@@ -337,7 +337,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 {
                   m_ManualDistance = "";
                   m_ManualIndicator= "";
-                  m_ManualAngle = m_2DAngleInteractor->GetLabel();
+                  m_ManualAngle = m_AngleInteractor2D->GetLabel();
                   m_Gui->Enable(ID_MANUAL_ANGLE, true);
                   m_Gui->Enable(ID_MANUAL_DISTANCE, false);
                   m_Gui->Enable(ID_MANUAL_INDICATOR, false);
@@ -346,7 +346,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 {
                   m_ManualDistance = "";
                   m_ManualAngle = "";
-                  m_ManualIndicator= m_2DIndicatorInteractor->GetLabel();
+                  m_ManualIndicator= m_IndicatorInteractor2D->GetLabel();
                   m_Gui->Enable(ID_MANUAL_ANGLE, false);
                   m_Gui->Enable(ID_MANUAL_DISTANCE, false);
                   m_Gui->Enable(ID_MANUAL_INDICATOR, true);
@@ -365,19 +365,19 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                   return;
                 }
 
-                m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
+                m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
 				
 							  m_Gui->Update();
 						 
             } 
             else if(m_InteractorType[m_InteractorType.size()-1] == ID_INDICATOR_TYPE)
             {
-                m_2DIndicatorInteractor->UndoMeasure();
+                m_IndicatorInteractor2D->UndoMeasure();
                 m_InteractorType.pop_back();
   		
 							  if(m_InteractorType.size() != 0 && m_InteractorType[m_InteractorType.size()-1] == ID_DISTANCE_TYPE)
                 {
-								  m_ManualDistance = m_2DDistanceInteractor->GetLabel();
+								  m_ManualDistance = m_DistanceInteractor2D->GetLabel();
                   m_ManualAngle    = "";   
                   m_ManualIndicator= "";
                   m_Gui->Enable(ID_MANUAL_DISTANCE, true);
@@ -388,7 +388,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 {
                   m_ManualDistance = "";
                   m_ManualIndicator= "";
-                  m_ManualAngle = m_2DAngleInteractor->GetLabel();
+                  m_ManualAngle = m_AngleInteractor2D->GetLabel();
                   m_Gui->Enable(ID_MANUAL_ANGLE, true);
                   m_Gui->Enable(ID_MANUAL_DISTANCE, false);
                   m_Gui->Enable(ID_MANUAL_INDICATOR, false);
@@ -397,7 +397,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                 {
                   m_ManualDistance = "";
                   m_ManualAngle = "";
-                  m_ManualIndicator= m_2DIndicatorInteractor->GetLabel();
+                  m_ManualIndicator= m_IndicatorInteractor2D->GetLabel();
                   m_Gui->Enable(ID_MANUAL_ANGLE, false);
                   m_Gui->Enable(ID_MANUAL_DISTANCE, false);
                   m_Gui->Enable(ID_MANUAL_INDICATOR, true);
@@ -416,7 +416,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
                   return;
                 }
 
-                m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
+                m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
 				
 							  m_Gui->Update();
             
@@ -424,47 +424,47 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           }
         break;
         case ID_MANUAL_DISTANCE:
-          if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+          if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
             wxMessageBox("Fix the label in the window");
           else if(wxString(m_ManualDistance).ToDouble(m_Unused) != false)
           {
 						if(atof(m_ManualDistance) > 0)
 						{
             m_DistanceMeasure = mafString(m_ManualDistance);
-            m_2DDistanceInteractor->SetManualDistance(atof(m_ManualDistance));
+            m_DistanceInteractor2D->SetManualDistance(atof(m_ManualDistance));
             m_Gui->Update();
 						}
           }
 					else
 					{
 						//wxMessageBox(L"label");
-						m_2DDistanceInteractor->SetLabel(m_ManualDistance);
+						m_DistanceInteractor2D->SetLabel(m_ManualDistance);
 					}
         break;
         case ID_MANUAL_ANGLE:
-          if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+          if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
             wxMessageBox("Fix the label in the window");
           else if(wxString(m_ManualAngle).ToDouble(m_Unused) != false)
 					{
 						if(atof(m_ManualAngle) >= 0 && atof(m_ManualAngle) <= 180)
 						{
 							m_AcuteAngle = mafString(m_ManualAngle);
-							m_2DAngleInteractor->SetManualAngle(atof(m_ManualAngle));
+							m_AngleInteractor2D->SetManualAngle(atof(m_ManualAngle));
 							m_Gui->Update();
 						}
 					}
 					else
 					{
 						//wxMessageBox(L"label");
-						m_2DAngleInteractor->SetLabel(m_ManualAngle);
+						m_AngleInteractor2D->SetLabel(m_ManualAngle);
 					}
         break;
         case ID_MANUAL_INDICATOR:
-          if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+          if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
             wxMessageBox("Fix the label in the window");
           else
           {
-            m_2DIndicatorInteractor->SetLabel(m_ManualIndicator);
+            m_IndicatorInteractor2D->SetLabel(m_ManualIndicator);
             m_Gui->Update();
           }
         break;
@@ -504,7 +504,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
         break;
         case wxOK:
         case wxCANCEL:
-          if(m_2DDistanceInteractor->IsDisableUndoAndOkCancel() || m_2DIndicatorInteractor->IsDisableUndoAndOkCancel())
+          if(m_DistanceInteractor2D->IsDisableUndoAndOkCancel() || m_IndicatorInteractor2D->IsDisableUndoAndOkCancel())
             wxMessageBox("Fix the label in the window");
           else
             OpStop(OP_RUN_CANCEL);
@@ -521,11 +521,11 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           m_DistanceMeasure = wxString::Format("%g", measure);
           m_AcuteAngle = "0";
           m_ObtuseAngle = "0";
-          m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
-          m_Gui->Enable(ID_MANUAL_DISTANCE, m_2DDistanceInteractor->SizeMeasureVector() != 0);
+          m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
+          m_Gui->Enable(ID_MANUAL_DISTANCE, m_DistanceInteractor2D->SizeMeasureVector() != 0);
           m_Gui->Enable(ID_MANUAL_ANGLE,false);
           m_Gui->Enable(ID_MANUAL_INDICATOR,false);
-          if(m_2DDistanceInteractor->GetRegisterMeasure())
+          if(m_DistanceInteractor2D->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_DISTANCE_TYPE);
 					}
@@ -537,13 +537,13 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
         {
           double measure = RoundValue(e->GetDouble());
           m_DistanceMeasure = "0";
-          m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
-          m_Gui->Enable(ID_MANUAL_ANGLE, m_2DAngleInteractor->SizeMeasureVector() != 0);
+          m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
+          m_Gui->Enable(ID_MANUAL_ANGLE, m_AngleInteractor2D->SizeMeasureVector() != 0);
           m_Gui->Enable(ID_MANUAL_DISTANCE, false);
           m_Gui->Enable(ID_MANUAL_INDICATOR,false);
           m_AcuteAngle = wxString::Format("%g",measure);
           m_ObtuseAngle = wxString::Format("%g", 180.0 - measure);
-					if(m_2DAngleInteractor->GetRegisterMeasure())
+					if(m_AngleInteractor2D->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_ANGLE_TYPE);
 					}
@@ -555,9 +555,9 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
         {
           m_Gui->Enable(ID_MANUAL_ANGLE, false);
           m_Gui->Enable(ID_MANUAL_DISTANCE, false);
-          m_Gui->Enable(ID_MANUAL_INDICATOR,m_2DIndicatorInteractor->SizeMeasureVector() != 0);
-          m_Gui->Enable(ID_UNDO_MEASURE, m_2DAngleInteractor->SizeMeasureVector() != 0 || m_2DDistanceInteractor->SizeMeasureVector() != 0 || m_2DIndicatorInteractor->SizeMeasureVector() != 0);        
-          if(m_2DIndicatorInteractor->GetRegisterMeasure())
+          m_Gui->Enable(ID_MANUAL_INDICATOR,m_IndicatorInteractor2D->SizeMeasureVector() != 0);
+          m_Gui->Enable(ID_UNDO_MEASURE, m_AngleInteractor2D->SizeMeasureVector() != 0 || m_DistanceInteractor2D->SizeMeasureVector() != 0 || m_IndicatorInteractor2D->SizeMeasureVector() != 0);        
+          if(m_IndicatorInteractor2D->GetRegisterMeasure())
 					{
 						m_InteractorType.push_back(ID_INDICATOR_TYPE);
             m_ManualIndicator = "Label";
@@ -589,15 +589,15 @@ void mafOp2DMeasure::OpStop(int result)
   root->GetTagArray()->SetTag(measure_item);
   mafEventMacro(mafEvent(this,VME_MODIFIED,root));
 
-	m_2DDistanceInteractor->RemoveMeter();  
-	m_2DAngleInteractor->RemoveMeter();
-  m_2DIndicatorInteractor->RemoveMeter();
+	m_DistanceInteractor2D->RemoveMeter();  
+	m_AngleInteractor2D->RemoveMeter();
+  m_IndicatorInteractor2D->RemoveMeter();
  
 	HideGui();
   mafEventMacro(mafEvent(this,PER_POP));	
-  mafDEL(m_2DDistanceInteractor);
-	mafDEL(m_2DAngleInteractor);
-  mafDEL(m_2DIndicatorInteractor);
+  mafDEL(m_DistanceInteractor2D);
+	mafDEL(m_AngleInteractor2D);
+  mafDEL(m_IndicatorInteractor2D);
 
 	mafEventMacro(mafEvent(this,result));
 }

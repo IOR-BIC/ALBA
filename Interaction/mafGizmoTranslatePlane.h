@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-18 16:05:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,7 +47,7 @@ public:
   /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
   
   //----------------------------------------------------------------------------
   // events handling 
@@ -70,7 +70,7 @@ public:
   void SetPlane(int axis); 
   
   /** Get gizmo Plane*/
-  int  GetPlane() {return ActivePlane;}; 
+  int  GetPlane() {return m_ActivePlane;}; 
   
   //----------------------------------------------------------------------------
   // highlight and show 
@@ -98,8 +98,8 @@ public:
 
   /** Set/Get the activation status of the gizmo, When the gizmo is active
   it is sending pose matrices to the listener */
-  void SetIsActive(bool highlight) {IsActive = highlight;};
-  bool GetIsActive() {return IsActive;}
+  void SetIsActive(bool highlight) {m_IsActive = highlight;};
+  bool GetIsActive() {return m_IsActive;}
 
    /** 
   Set the abs pose */
@@ -120,10 +120,10 @@ public:
 
 protected:
   /** Segments gizmo */
-  mafVMEGizmo *Gizmo[3];
+  mafVMEGizmo *m_Gizmo[3];
 
   /** Register input vme*/
-  mafVME *InputVme;
+  mafVME *m_InputVme;
 
   /**
 
@@ -149,28 +149,28 @@ protected:
   enum GIZMO_STATUS {SELECTED = 0, NOT_SELECTED};
   
   /** Register the gizmo plane */
-  int ActivePlane;
+  int m_ActivePlane;
  
   /** Register the gizmo square plane side length*/
   double m_Length;
 
   /** Line source*/
-  vtkLineSource *Line[2];
+  vtkLineSource *m_Line[2];
 
   /** Tube filter for lines */
-  vtkTubeFilter *LineTF[2];
+  vtkTubeFilter *m_LineTF[2];
 
   /** Plane source*/
-  vtkPlaneSource *Plane;
+  vtkPlaneSource *m_Plane;
   
   /** S1, S2 and SQ gizmo data*/
   //mafVmeData *GizmoData[3];
  
   /** rotate PDF for gizmo parts */
-  vtkTransformPolyDataFilter *RotatePDF[3];
+  vtkTransformPolyDataFilter *m_RotatePDF[3];
 
   /** rotation transform for cylinder and cone*/
-  vtkTransform *RotationTr;
+  vtkTransform *m_RotationTr;
   
   /** Create vtk objects needed*/
   void CreatePipeline();
@@ -179,13 +179,13 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *IsaComp[2];
+  mmiCompositorMouse *m_IsaComp[2];
 
   /** isa generic*/
-  mmiGenericMouse *IsaGen[2];
+  mmiGenericMouse *m_IsaGen[2];
 
   /** Used by mmiGenericMouse */
-  vtkTransform *PivotTransform;
+  vtkTransform *m_PivotTransform;
 
   /** Gizmo color setting facilities for gizmo segments;*/
   void SetColor(int part, double col[3]);
@@ -198,7 +198,7 @@ protected:
   void ShowSquare(bool show);
 
   /** Register Gizmo status*/
-  bool IsActive;
+  bool m_IsActive;
 
   friend class mafGizmoTranslatePlaneTest;
 };

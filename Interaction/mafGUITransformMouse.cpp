@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:57 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,7 +56,7 @@ mafGUITransformMouse::mafGUITransformMouse(mafVME *input, mafObserver *listener)
   m_TranslationConstraintId = VIEW_PLANE;
   
   m_RefSysVME = m_InputVME;
-  OldInteractor = NULL;
+  m_OldInteractor = NULL;
 
   CreateISA();
   CreateGui();
@@ -270,7 +270,7 @@ void mafGUITransformMouse::OnEvent(mafEventBase *maf_event)
 void mafGUITransformMouse::CreateISA()
 //----------------------------------------------------------------------------
 {
-  OldInteractor = m_InputVME->GetBehavior();
+  m_OldInteractor = m_InputVME->GetBehavior();
 
   // Create the isa compositor:
   m_IsaCompositor = mmiCompositorMouse::New();
@@ -363,7 +363,7 @@ void mafGUITransformMouse::AttachInteractorToVme()
 void mafGUITransformMouse::DetachInteractorFromVme()
 //----------------------------------------------------------------------------
 {
-  m_InputVME->SetBehavior(OldInteractor);
+  m_InputVME->SetBehavior(m_OldInteractor);
 }
 
 //----------------------------------------------------------------------------

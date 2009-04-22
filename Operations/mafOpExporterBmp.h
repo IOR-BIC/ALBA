@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterBmp.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-04-22 09:42:30 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,7 +55,7 @@ public:
   void SetDirName(const char *dir_name){m_DirName = dir_name;};
 
   /** Set the format of exported bmp file: "false" for 24 bit file, "true" for 8 bit gray scale file. */
-  void SetGrayscale(bool grayScale){m_8bit = grayScale;};
+  void SetGrayscale(bool grayScale){m_Bit8 = grayScale;};
 
   /** Export the volume as a stack of 24 bit bmp images. */
   void SaveBmp();
@@ -70,6 +70,6 @@ protected:
   int m_Offset;
   double m_ScalarRange[2];
   vtkImageData *m_Image;
-  int m_8bit;
+  int m_Bit8;
  };
 #endif

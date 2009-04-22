@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-06 13:50:26 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.1.22.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,7 +47,7 @@ public:
   /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -109,36 +109,36 @@ protected:
   void SetRefSysMatrix(mafMatrix *constrain);
 
   /** Cube gizmo */
-  mafVMEGizmo *CubeGizmo;
+  mafVMEGizmo *m_CubeGizmo;
 
   /** cylinder gizmo*/
-  mafVMEGizmo *CylGizmo;
+  mafVMEGizmo *m_CylGizmo;
 
   /** Register input vme*/
-  mafVME *InputVme;
+  mafVME *m_InputVme;
 
   enum GIZMOPARTS {CYLINDER = 0, CUBE};
   
   /** Register the gizmo axis */
-  int Axis;
+  int m_Axis;
   
   /** Cube source*/
-  vtkCubeSource *Cube;
+  vtkCubeSource *m_Cube;
   
   /** Cylinder source*/
-  vtkCylinderSource *Cylinder;
+  vtkCylinderSource *m_Cylinder;
   
   /** translate PDF for cylinder and cube*/
-  vtkTransformPolyDataFilter *TranslatePDF[2];
+  vtkTransformPolyDataFilter *m_TranslatePDF[2];
   
   /** translation transform for cylinder and cube*/
-  vtkTransform *TranslateTr[2];
+  vtkTransform *m_TranslateTr[2];
  
   /** rotate PDF for cylinder and cube*/
-  vtkTransformPolyDataFilter *RotatePDF[2];
+  vtkTransformPolyDataFilter *m_RotatePDF[2];
 
   /** rotation transform for cylinder and cube*/
-  vtkTransform *RotationTr;
+  vtkTransform *m_RotationTr;
   
   /** Create vtk objects needed*/
   void CreatePipeline();
@@ -147,10 +147,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *IsaComp[2];
+  mmiCompositorMouse *m_IsaComp[2];
 
   /** isa generic*/
-  mmiGenericMouse *IsaGen[2];
+  mmiGenericMouse *m_IsaGen[2];
 
   /** Gizmo color setting facilities; part can be CYLINDER or CUBE*/
   void SetColor(int part, double col[3]);

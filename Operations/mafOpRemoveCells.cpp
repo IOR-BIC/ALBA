@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-10 15:16:26 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2009-04-22 09:42:30 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ mafOp(label)
 
   m_SelectCellInteractor  = NULL;
 
-  m_rcf = NULL;
+  m_Rcf = NULL;
 
   m_Diameter = 20;
   m_MinBrushSize = 0;
@@ -290,12 +290,12 @@ void mafOpRemoveCells::CreateSurfacePipeline()
 {
   vtkPolyData *polydata = vtkPolyData::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
 
-  m_rcf = vtkMAFRemoveCellsFilter::New();
-  m_rcf->SetInput(polydata);
-  m_rcf->Update();
+  m_Rcf = vtkMAFRemoveCellsFilter::New();
+  m_Rcf->SetInput(polydata);
+  m_Rcf->Update();
 
   m_PolydataMapper	= vtkPolyDataMapper::New();
-  m_PolydataMapper->SetInput(m_rcf->GetOutput());
+  m_PolydataMapper->SetInput(m_Rcf->GetOutput());
   m_PolydataMapper->ScalarVisibilityOn();
 
   m_PolydataActor = vtkActor::New();
@@ -312,7 +312,7 @@ void mafOpRemoveCells::DeleteOpDialog()
 
   vtkDEL(m_PolydataMapper);
   vtkDEL(m_PolydataActor);
-  vtkDEL(m_rcf);
+  vtkDEL(m_Rcf);
 
   cppDEL(m_Rwi); 
   cppDEL(m_Dialog);
@@ -336,7 +336,7 @@ void mafOpRemoveCells::OnEvent(mafEventBase *maf_event)
       break;
    
       case ID_UNSELECT:
-        m_rcf->UndoMarks();
+        m_Rcf->UndoMarks();
         m_Rwi->m_RenderWindow->Render();
       break;
 
@@ -439,7 +439,7 @@ void mafOpRemoveCells::ExecuteMark( double radius )
         if (vtkMath::Distance2BetweenPoints(seedCenter, currentCellCenter)
           < (m_Diameter*m_Diameter / 4))
         {
-          m_UnselectCells ? m_rcf->UnmarkCell(cellId) : m_rcf->MarkCell(cellId);
+          m_UnselectCells ? m_Rcf->UnmarkCell(cellId) : m_Rcf->MarkCell(cellId);
         }
 
         // get its points
@@ -536,11 +536,11 @@ void mafOpRemoveCells::FindTriangleCellCenter(vtkIdType id, double center[3])
 
   m_Mesh->GetCellPoints(id, m_TriangeCentreComputationList);
 
-  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(0),p0);
-  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(1),p1);
-  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(2),p2);
+  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(0),m_P0);
+  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(1),m_P1);
+  m_Mesh->GetPoint(m_TriangeCentreComputationList->GetId(2),m_P2);
 
-  vtkTriangle::TriangleCenter(p0,p1,p2,center);
+  vtkTriangle::TriangleCenter(m_P0,m_P1,m_P2,center);
 
 }
 
@@ -600,10 +600,10 @@ void mafOpRemoveCells::RemoveCells()
       wxBusyInfo("removing cells...");
     }
 
-    m_rcf->RemoveMarkedCells();
-    m_rcf->Update();
+    m_Rcf->RemoveMarkedCells();
+    m_Rcf->Update();
 
-    m_ResultPolydata->DeepCopy(m_rcf->GetOutput());
+    m_ResultPolydata->DeepCopy(m_Rcf->GetOutput());
 }
 
 void mafOpRemoveCells::MarkCells()

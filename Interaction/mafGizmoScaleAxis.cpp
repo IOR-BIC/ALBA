@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-05-17 15:56:42 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.7.4.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,13 +47,13 @@
 mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
-  IsaComp[0] = IsaComp[1] = NULL;
+  m_IsaComp[0] = m_IsaComp[1] = NULL;
 
   m_Listener = listener;
-  InputVme = input;
+  m_InputVme = input;
   
   // default axis is X
-  Axis = X;
+  m_Axis = X;
   
   // create pipeline stuff
   CreatePipeline();
@@ -66,53 +66,53 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
   //-----------------
 
   // cylinder gizmo
-  CylGizmo = mafVMEGizmo::New();
-  CylGizmo->SetName("CylGizmo");
-  CylGizmo->SetData(RotatePDF[CYLINDER]->GetOutput());
+  m_CylGizmo = mafVMEGizmo::New();
+  m_CylGizmo->SetName("CylGizmo");
+  m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
   
   // cube gizmo
-  CubeGizmo = mafVMEGizmo::New();  
-  CubeGizmo->SetName("CubeGizmo");
-  CubeGizmo->SetData(RotatePDF[CUBE]->GetOutput());
+  m_CubeGizmo = mafVMEGizmo::New();  
+  m_CubeGizmo->SetName("CubeGizmo");
+  m_CubeGizmo->SetData(m_RotatePDF[CUBE]->GetOutput());
 
   // assign isa to cylinder and cube
-  CylGizmo->SetBehavior(IsaComp[0]);
-  CubeGizmo->SetBehavior(IsaComp[1]);
+  m_CylGizmo->SetBehavior(m_IsaComp[0]);
+  m_CubeGizmo->SetBehavior(m_IsaComp[1]);
 
-  InputVme->Update();
-  SetAbsPose(InputVme->GetOutput()->GetAbsMatrix());
+  m_InputVme->Update();
+  SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
   
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0, 1, 0, 0);
 
-  CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-  CubeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  m_CylGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_CubeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleAxis::~mafGizmoScaleAxis() 
 //----------------------------------------------------------------------------
 {
-  CylGizmo->SetBehavior(NULL);
-  CubeGizmo->SetBehavior(NULL);
+  m_CylGizmo->SetBehavior(NULL);
+  m_CubeGizmo->SetBehavior(NULL);
    
-  vtkDEL(Cube);
-  vtkDEL(Cylinder);
+  vtkDEL(m_Cube);
+  vtkDEL(m_Cylinder);
   
   // clean up
   for (int i = 0; i < 2; i++)
   {
-    vtkDEL(TranslateTr[i]);
-    vtkDEL(TranslatePDF[i]);
-    vtkDEL(RotationTr);
-    vtkDEL(RotatePDF[i]);
+    vtkDEL(m_TranslateTr[i]);
+    vtkDEL(m_TranslatePDF[i]);
+    vtkDEL(m_RotationTr);
+    vtkDEL(m_RotatePDF[i]);
 	//----------------------
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData[i]);
 	//----------------------
-    vtkDEL(IsaComp[i]); 
+    vtkDEL(m_IsaComp[i]); 
   }
-	CylGizmo->ReparentTo(NULL);
-	CubeGizmo->ReparentTo(NULL);
+	m_CylGizmo->ReparentTo(NULL);
+	m_CubeGizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -120,12 +120,12 @@ void mafGizmoScaleAxis::CreatePipeline()
 //----------------------------------------------------------------------------
 {
   // create pipeline for cube-cylinder gizmo along global X axis
-  // calculate diagonal of InputVme space bounds 
+  // calculate diagonal of m_InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-	if(InputVme->IsA("mafVMEGizmo"))
-		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	if(m_InputVme->IsA("mafVMEGizmo"))
+		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
-		InputVme->GetOutput()->GetBounds(b);
+		m_InputVme->GetOutput()->GetBounds(b);
 
   p1[0] = b[0];
   p1[1] = b[2];
@@ -136,8 +136,8 @@ void mafGizmoScaleAxis::CreatePipeline()
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
   
   // create the cylinder
-  Cylinder = vtkCylinderSource::New();
-  Cylinder->SetRadius(d / 200);
+  m_Cylinder = vtkCylinderSource::New();
+  m_Cylinder->SetRadius(d / 200);
   
   //-----------------
   // rotate the cylinder on the X axis (default axis is Z)
@@ -147,7 +147,7 @@ void mafGizmoScaleAxis::CreatePipeline()
   cylInitTr->RotateZ(-90);	
   
   vtkTransformPolyDataFilter *cylInitTrPDF = vtkTransformPolyDataFilter::New();
-  cylInitTrPDF->SetInput(Cylinder->GetOutput());
+  cylInitTrPDF->SetInput(m_Cylinder->GetOutput());
   cylInitTrPDF->SetTransform(cylInitTr);
 
   /*
@@ -166,20 +166,20 @@ void mafGizmoScaleAxis::CreatePipeline()
   //-----------------
 
   // create the cube
-  Cube = vtkCubeSource::New();
-  //Cube->SetRadius(InputVme->GetCurrentData()->GetLength() / 30);
+  m_Cube = vtkCubeSource::New();
+  //Cube->SetRadius(m_InputVme->GetCurrentData()->GetLength() / 30);
 
   // create the translation transform
-  TranslateTr[CUBE] = vtkTransform::New();
-  TranslateTr[CYLINDER] = vtkTransform::New();
+  m_TranslateTr[CUBE] = vtkTransform::New();
+  m_TranslateTr[CYLINDER] = vtkTransform::New();
 
   // create cube translation transform pdf
-  TranslatePDF[CUBE] = vtkTransformPolyDataFilter::New();
-  TranslatePDF[CUBE]->SetInput(Cube->GetOutput());
+  m_TranslatePDF[CUBE] = vtkTransformPolyDataFilter::New();
+  m_TranslatePDF[CUBE]->SetInput(m_Cube->GetOutput());
   
   // create cylinder translation transform
-  TranslatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
-  TranslatePDF[CYLINDER]->SetInput(cylInitTrPDF->GetOutput());
+  m_TranslatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
+  m_TranslatePDF[CYLINDER]->SetInput(cylInitTrPDF->GetOutput());
 
   //-----------------
   // update translate transform
@@ -194,8 +194,8 @@ void mafGizmoScaleAxis::CreatePipeline()
   //-----------------
 
   // translate transform setting
-  TranslatePDF[CUBE]->SetTransform(TranslateTr[CUBE]);
-  TranslatePDF[CYLINDER]->SetTransform(TranslateTr[CYLINDER]);
+  m_TranslatePDF[CUBE]->SetTransform(m_TranslateTr[CUBE]);
+  m_TranslatePDF[CYLINDER]->SetTransform(m_TranslateTr[CYLINDER]);
 
 /*
   ^           ________          
@@ -211,19 +211,19 @@ void mafGizmoScaleAxis::CreatePipeline()
   */  
 
   // create rotation transform and rotation TPDF 
-  RotatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
-  RotatePDF[CUBE] = vtkTransformPolyDataFilter::New();
-  RotationTr = vtkTransform::New();
-  RotationTr->Identity(); 
+  m_RotatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
+  m_RotatePDF[CUBE] = vtkTransformPolyDataFilter::New();
+  m_RotationTr = vtkTransform::New();
+  m_RotationTr->Identity(); 
 
-  RotatePDF[CYLINDER]->SetTransform(RotationTr);
-  RotatePDF[CUBE]->SetTransform(RotationTr);
+  m_RotatePDF[CYLINDER]->SetTransform(m_RotationTr);
+  m_RotatePDF[CUBE]->SetTransform(m_RotationTr);
 
-  RotatePDF[CYLINDER]->SetInput(TranslatePDF[CYLINDER]->GetOutput());
-  RotatePDF[CUBE]->SetInput(TranslatePDF[CUBE]->GetOutput());
+  m_RotatePDF[CYLINDER]->SetInput(m_TranslatePDF[CYLINDER]->GetOutput());
+  m_RotatePDF[CUBE]->SetInput(m_TranslatePDF[CUBE]->GetOutput());
 
-  RotatePDF[CYLINDER]->Update();
-  RotatePDF[CYLINDER]->Update();
+  m_RotatePDF[CYLINDER]->Update();
+  m_RotatePDF[CYLINDER]->Update();
 
   //clean up
   cylInitTr->Delete();
@@ -237,18 +237,18 @@ void mafGizmoScaleAxis::CreateISA()
   // create isa compositor and assign behaviors to IsaGen ivar
   for (int i = 0; i < 2; i++)
   {
-    IsaComp[i] = mmiCompositorMouse::New();
+    m_IsaComp[i] = mmiCompositorMouse::New();
 
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    IsaGen[i] = IsaComp[i]->CreateBehavior(MOUSE_LEFT);
+    m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
 
-    IsaGen[i]->SetVME(InputVme);
-    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
-  	IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
+    m_IsaGen[i]->SetVME(m_InputVme);
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+  	m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
       
     //isa will send events to this
-    IsaGen[i]->SetListener(this);
+    m_IsaGen[i]->SetListener(this);
   }
 }
 
@@ -260,13 +260,13 @@ void mafGizmoScaleAxis::SetAxis(int axis)
   // is created; gizmos are not highlighted
   
   // register the axis
-  Axis = axis;
+  m_Axis = axis;
   
   // rotate the cylinder and the cube to match given axis
-  if (Axis == X)
+  if (m_Axis == X)
   {
     // reset cyl and cube rotation
-    RotationTr->Identity();
+    m_RotationTr->Identity();
   
     // set cyl and cube color to red
     this->SetColor(1, 0, 0, 1, 0, 0);
@@ -274,14 +274,14 @@ void mafGizmoScaleAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
     }
   }
   else if (axis == Y)
   {
     // set rotation to move con and cyl on Y 
-    RotationTr->Identity();
-    RotationTr->RotateZ(90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateZ(90);
    
     // set cyl and cube color to green
     this->SetColor(0, 1, 0, 0, 1, 0);
@@ -289,14 +289,14 @@ void mafGizmoScaleAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
     }
   }  
   else if (axis == Z)
   {
     // set rotation to move con and cyl on Z
-    RotationTr->Identity();
-    RotationTr->RotateY(-90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateY(-90);
     
     // set cyl and cube color to blue
      this->SetColor(0, 0, 1, 0, 0, 1);
@@ -304,7 +304,7 @@ void mafGizmoScaleAxis::SetAxis(int axis)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
     }
   }  
 }
@@ -321,17 +321,17 @@ void mafGizmoScaleAxis::Highlight(bool highlight)
   else
   {
    // deactivate the cylinder 
-   if (Axis == X)
+   if (m_Axis == X)
    {
      // set cyl col to red
      this->SetColor(CYLINDER, 1, 0, 0);
    } 
-   else if (Axis == Y)
+   else if (m_Axis == Y)
    {
      // set cyl col to green
      this->SetColor(CYLINDER, 0, 1, 0);
    }
-   else if (Axis == Z)
+   else if (m_Axis == Z)
    {
      // set cyl col to blue
      this->SetColor(CYLINDER, 0, 0, 1);
@@ -357,20 +357,20 @@ void  mafGizmoScaleAxis::SetCubeLength(double cubeLength)
   */  
 
   // set the cube length
-  Cube->SetXLength(cubeLength);
-  Cube->SetYLength(cubeLength);
-  Cube->SetZLength(cubeLength);
+  m_Cube->SetXLength(cubeLength);
+  m_Cube->SetYLength(cubeLength);
+  m_Cube->SetZLength(cubeLength);
 
   // translate the cube in (cylLen + cubeLen/2)
-  TranslateTr[CUBE]->Identity();
-  TranslateTr[CUBE]->Translate(Cylinder->GetHeight() + cubeLength / 2, 0, 0);
+  m_TranslateTr[CUBE]->Identity();
+  m_TranslateTr[CUBE]->Translate(m_Cylinder->GetHeight() + cubeLength / 2, 0, 0);
 }
 
 //----------------------------------------------------------------------------
 double mafGizmoScaleAxis::GetCubeLength() const
 //----------------------------------------------------------------------------
 {
-  return Cube->GetXLength();
+  return m_Cube->GetXLength();
 }
 
 //----------------------------------------------------------------------------
@@ -391,22 +391,22 @@ void mafGizmoScaleAxis::SetCylinderLength(double cylLength)
   */  
 
   // set cylLen to cylLength
-  Cylinder->SetHeight(cylLength);
+  m_Cylinder->SetHeight(cylLength);
 
   // translate the cyl in (cylLen / 2)
-  TranslateTr[CYLINDER]->Identity();
-  TranslateTr[CYLINDER]->Translate(cylLength / 2, 0, 0);
+  m_TranslateTr[CYLINDER]->Identity();
+  m_TranslateTr[CYLINDER]->Translate(cylLength / 2, 0, 0);
 
   // translate the cube in (cylLen + (cubeLen / 2)) 
-  TranslateTr[CUBE]->Identity();
-  TranslateTr[CUBE]->Translate(cylLength + Cube->GetXLength() / 2, 0, 0);
+  m_TranslateTr[CUBE]->Identity();
+  m_TranslateTr[CUBE]->Translate(cylLength + m_Cube->GetXLength() / 2, 0, 0);
 }
 
 //----------------------------------------------------------------------------
 double mafGizmoScaleAxis::GetCylinderLength() const
 //----------------------------------------------------------------------------
 {
-  return Cylinder->GetHeight();
+  return m_Cylinder->GetHeight();
 }
 
 //----------------------------------------------------------------------------
@@ -425,17 +425,17 @@ void mafGizmoScaleAxis::SetColor(int part, double col[3])
 {
   if (part == CYLINDER)
   {
-    CylGizmo->GetMaterial()->m_Prop->SetColor(col);
-    CylGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-    CylGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-    CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+    m_CylGizmo->GetMaterial()->m_Prop->SetColor(col);
+    m_CylGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+    m_CylGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+    m_CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
   }
   else
   {
-    CubeGizmo->GetMaterial()->m_Prop->SetColor(col);
-    CubeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-    CubeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-    CubeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+    m_CubeGizmo->GetMaterial()->m_Prop->SetColor(col);
+    m_CubeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+    m_CubeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+    m_CubeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
   }
 }
 
@@ -467,16 +467,16 @@ void mafGizmoScaleAxis::SetColor(double cylR, double cylG, double cylB, double c
 void mafGizmoScaleAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
-  mafEventMacro(mafEvent(this,VME_SHOW,CubeGizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_CylGizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_CubeGizmo,show));
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoScaleAxis::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  CubeGizmo->SetAbsMatrix(*absPose); 
-  CylGizmo->SetAbsMatrix(*absPose); 
+  m_CubeGizmo->SetAbsMatrix(*absPose); 
+  m_CylGizmo->SetAbsMatrix(*absPose); 
   SetRefSysMatrix(absPose);
 }
 
@@ -486,8 +486,8 @@ void mafGizmoScaleAxis::SetRefSysMatrix(mafMatrix *matrix)
 {  
   for (int i = 0; i < 2; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-    IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
+    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+    m_IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
   } 
 }
 
@@ -495,14 +495,14 @@ void mafGizmoScaleAxis::SetRefSysMatrix(mafMatrix *matrix)
 mafMatrix *mafGizmoScaleAxis::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return CylGizmo->GetOutput()->GetAbsMatrix();
+  return m_CylGizmo->GetOutput()->GetAbsMatrix();
 }
 
 //----------------------------------------------------------------------------
 void mafGizmoScaleAxis::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->InputVme = vme; 
+  this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetRefSysMatrix(vme->GetOutput()->GetAbsMatrix());
 }

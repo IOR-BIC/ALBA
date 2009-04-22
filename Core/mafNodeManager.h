@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-04-22 09:42:51 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,22 +86,22 @@ public:
 	bool AskConfirmAndSave();
  
 	/** Set the filename for the current tree. */
-  void SetFileName (wxString& filename) {m_msffile = filename;};
+  void SetFileName (wxString& filename) {m_MsfFile = filename;};
  
 	/** Get the filename of the current tree. */
-  wxString& GetFileName () {return m_msffile;};
+  wxString& GetFileName () {return m_MsfFile;};
  
 	/** Link to the main menù the file history manager. */
   void SetFileHistoryMenu(wxMenu *menu);
  
 	/** Return the tree's root. */
-  mafVMERoot *GetRoot() { return m_root;};		
+  mafVMERoot *GetRoot() { return m_Root;};		
 
 	/** Set the application stamp; this is the mark of the specific vertical application (must be equal to the application name). */
   void SetApplicationStamp(wxString appstamp) {m_AppStamp = appstamp;};
 
 	/** Set the flag for .bak file generation on saving .msf file. */
-	void MakeBakFileOnSave(bool bakfile = true) {m_make_bak_file = bakfile;}
+	void MakeBakFileOnSave(bool bakfile = true) {m_MakeBakFile = bakfile;}
 
   /** Update vme client data interface from tag. if vme == NULL, the update is propagated from root vme to all the tree. */
   void UpdateFromTag(mafNode *n = NULL);
@@ -109,18 +109,18 @@ public:
 protected:
   bool m_modified;
 
-  mafVMERoot      *m_root;
+  mafVMERoot      *m_Root;
   mafObserver     *m_Listener;
   wxConfigBase		*m_Config;
   mafGUIFileHistory	 m_FileHistory;
 
-  bool      m_make_bak_file;
-  wxString  m_msf_dir;
-  wxString  m_wildc;
+  bool      m_MakeBakFile;
+  wxString  m_MsfDir;
+  wxString  m_Wildc;
   wxString  m_AppStamp;
-  wxString  m_msffile;
-  wxString  m_zipfile;
-  wxString  m_mergefile;
+  wxString  m_MsfFile;
+  wxString  m_ZipFile;
+  wxString  m_MergeFile;
 
   /*
   bool m_Crypting;

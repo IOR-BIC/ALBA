@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:57 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -82,7 +82,7 @@ public:
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
 protected:  
-  mafInteractor* OldInteractor;
+  mafInteractor* m_OldInteractor;
    
   /** Create interactors */
   void CreateISA();

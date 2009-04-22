@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafNodeManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 12:02:52 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-04-22 09:42:51 $
+  Version:   $Revision: 1.7.22.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -41,17 +41,17 @@ mafNodeManager::mafNodeManager()
 //----------------------------------------------------------------------------
 {
   m_modified      = false;
-	m_make_bak_file = true;
+	m_MakeBakFile = true;
 	m_Listener      = NULL;
 //@@	m_storage   = NULL;
-	m_root          = NULL;
+	m_Root          = NULL;
 
-	m_msf_dir   = mafGetApplicationDirectory().c_str();
-  m_msf_dir   += "/Data/MSF/";
-	m_msffile   = "";
-	m_zipfile   = "";
-	m_mergefile = "";
-	m_wildc     = "Multimod Storage Format file (*.msf)|*.msf";
+	m_MsfDir   = mafGetApplicationDirectory().c_str();
+  m_MsfDir   += "/Data/MSF/";
+	m_MsfFile   = "";
+	m_ZipFile   = "";
+	m_MergeFile = "";
+	m_Wildc     = "Multimod Storage Format file (*.msf)|*.msf";
 
   m_Config = wxConfigBase::Get();
 }
@@ -59,8 +59,8 @@ mafNodeManager::mafNodeManager()
 mafNodeManager::~mafNodeManager()
 //----------------------------------------------------------------------------
 {
-  if(m_root) NotifyRemove( (mafNode*)m_root ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
-  mafDEL(m_root);
+  if(m_Root) NotifyRemove( (mafNode*)m_Root ); // //SIL. 11-4-2005:  - cast root to node -- maybe to be removed
+  mafDEL(m_Root);
 
   //@@ if(m_storage)	m_storage->Delete();
   delete m_Config;  
@@ -76,15 +76,15 @@ void mafNodeManager::MSFNew(bool notify_root_creation)
 //----------------------------------------------------------------------------
 {
   m_modified = false;
-  if(m_root) NotifyRemove( (mafNode*) m_root);  //SIL. 11-4-2005: cast root to node - maybe to be removed
-  mafDEL(m_root);
-  mafNEW(m_root);
-  m_root->SetName("root");
+  if(m_Root) NotifyRemove( (mafNode*) m_Root);  //SIL. 11-4-2005: cast root to node - maybe to be removed
+  mafDEL(m_Root);
+  mafNEW(m_Root);
+  m_Root->SetName("root");
 
   //@@ if(m_storage) m_storage->Delete(); 
   //@@ m_storage = mafNodeStorage::New();
-  //@@ m_root = m_storage->GetOutput();
-  //@@ m_root->SetName("root");
+  //@@ m_Root = m_storage->GetOutput();
+  //@@ m_Root->SetName("root");
 
   if(notify_root_creation)
 	{
@@ -92,12 +92,12 @@ void mafNodeManager::MSFNew(bool notify_root_creation)
 		//vtkTagItem tag_appstamp;
 		//tag_appstamp.SetName("APP_STAMP");
 		//tag_appstamp.SetValue(this->m_AppStamp.c_str());
-		//m_root->GetTagArray()->AddTag(tag_appstamp);
-		mafEventMacro(mafEvent(this,VME_ADDED,m_root));
-		mafEventMacro(mafEvent(this,VME_SELECTED,m_root)); 
+		//m_Root->GetTagArray()->AddTag(tag_appstamp);
+		mafEventMacro(mafEvent(this,VME_ADDED,m_Root));
+		mafEventMacro(mafEvent(this,VME_SELECTED,m_Root)); 
 	}
 
-  m_msffile = ""; //next MSFSave will ask for a filename
+  m_MsfFile = ""; //next MSFSave will ask for a filename
 }
 //----------------------------------------------------------------------------
 void mafNodeManager::MSFOpen(int file_id)   
@@ -147,35 +147,35 @@ void mafNodeManager::MSFOpen(wxString filename)
   int res = m_storage->Load();  //modified by Stefano 29-10-2004
 
   mflTimeStamp b[2];
-  m_root->GetTimeBounds(b);
-  m_root->SetTreeTime(b[0]);
-  m_root->SetName("root");
+  m_Root->GetTimeBounds(b);
+  m_Root->SetTreeTime(b[0]);
+  m_Root->SetName("root");
 
 	////////////////////////////////  Application Stamp managing ////////////////////
-	if(m_root->GetTagArray()->FindTag("APP_STAMP") == -1)
+	if(m_Root->GetTagArray()->FindTag("APP_STAMP") == -1)
 	{
 		//update the old data files to support Application Stamp
 		vtkTagItem tag_appstamp;
 		tag_appstamp.SetName("APP_STAMP");
 		tag_appstamp.SetValue(this->m_AppStamp.c_str());
-		m_root->GetTagArray()->AddTag(tag_appstamp);
+		m_Root->GetTagArray()->AddTag(tag_appstamp);
 	}
 	
-	wxString app_stamp(m_root->GetTagArray()->GetTag("APP_STAMP")->GetValue());
+	wxString app_stamp(m_Root->GetTagArray()->GetTag("APP_STAMP")->GetValue());
 	if(app_stamp == "INVALID" || ((app_stamp != m_AppStamp) && (m_AppStamp != "DataManager") && (m_AppStamp != "OPEN_ALL_DATA")))
 	{
 		//Application stamp not valid
 		wxMessageBox("File not valid for this application!","Warning", wxOK, NULL);
 		m_modified = false;
 		m_storage->Delete();
-		m_root = NULL;
+		m_Root = NULL;
 		m_storage = NULL;
 		MSFNew();
 		return;
 	}
 	///////////////////////////////////////////////////////////////////////////////// 
 
-  NotifyAdd(m_root);
+  NotifyAdd(m_Root);
 
   // modified by Stefano 29-10-2004 (beg)
   // if some problems occurred during import give feedback to the user
@@ -187,7 +187,7 @@ void mafNodeManager::MSFOpen(wxString filename)
   //modified by Stefano 29-10-2004 (end)
 
 
-	mafEventMacro(mafEvent(this,VME_SELECTED,m_root)); 
+	mafEventMacro(mafEvent(this,VME_SELECTED,m_Root)); 
   mafEventMacro(mafEvent(this,CAMERA_RESET)); 
 
 	m_FileHistory.AddFileToHistory(m_msffile);
@@ -356,9 +356,9 @@ void mafNodeManager::VmeAdd(mafNode *n)
   if(n != NULL)
   {
     mafNode *vp = n->GetParent();  
-    assert( vp == NULL || m_root->IsInTree(vp) );
+    assert( vp == NULL || m_Root->IsInTree(vp) );
     if(vp == NULL) 
-			n->ReparentTo(m_root);
+			n->ReparentTo(m_Root);
     NotifyAdd(n);
     m_modified = true;
   }
@@ -367,7 +367,7 @@ void mafNodeManager::VmeAdd(mafNode *n)
 void mafNodeManager::VmeRemove(mafNode *n)
 //----------------------------------------------------------------------------
 {
-  if(n != NULL && m_root /*&& m_root->IsInTree(n)*/) 
+  if(n != NULL && m_Root /*&& m_Root->IsInTree(n)*/) 
   {
     NotifyRemove(n);
     n->ReparentTo(NULL); // may kill the vme
@@ -378,7 +378,7 @@ void mafNodeManager::VmeRemove(mafNode *n)
 void mafNodeManager::TimeSet(double time)
 //----------------------------------------------------------------------------
 {
-  //if(m_root) m_root->SetTreeTime(time);
+  //if(m_Root) m_Root->SetTreeTime(time);
 }
 //----------------------------------------------------------------------------
 void mafNodeManager::TimeGetBounds(double *min, double *max)
@@ -386,9 +386,9 @@ void mafNodeManager::TimeGetBounds(double *min, double *max)
 {
   /*
   mflTimeStamp b[2];
-  if(m_root) 
+  if(m_Root) 
   {
-    m_root->GetTimeBounds(b);
+    m_Root->GetTimeBounds(b);
     *min = b[0];
     *max = b[1];
   }
@@ -452,7 +452,7 @@ void mafNodeManager::UpdateFromTag(mafNode *n)
   }
   else
   {
-    mafNodeIterator *iter = m_root->NewIterator();
+    mafNodeIterator *iter = m_Root->NewIterator();
     for (mafNode *n = iter->GetFirstNode(); n; n = iter->GetNextNode())
     {
       mafVmeData *vd = (mafVmeData *)n->GetClientData();

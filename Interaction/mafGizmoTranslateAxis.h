@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-18 16:05:10 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -45,7 +45,7 @@ public:
   /** 
   Set the gizmo generating vme; the gizmo will be centered on this vme*/
   void SetInput(mafVME *vme); 
-  mafVME *GetInput() {return this->InputVme;};
+  mafVME *GetInput() {return this->m_InputVme;};
 
   //----------------------------------------------------------------------------
   // events handling 
@@ -66,7 +66,7 @@ public:
   
   /** Set/Get gizmo axis, default axis is X*/        
   void SetAxis(int axis); 
-  int  GetAxis() {return Axis;}; 
+  int  GetAxis() {return m_Axis;}; 
   
   //----------------------------------------------------------------------------
   // highlight and show 
@@ -84,7 +84,7 @@ public:
     
   /** Set/Get the length of the cone*/
   void   SetConeLength(double length);
-  double GetConeLength() {return ConeLength;};
+  double GetConeLength() {return m_ConeLength;};
  
   //----------------------------------------------------------------------------
   // cylinder stuff
@@ -92,7 +92,7 @@ public:
  
   /** Set/Get the length of the cylinder*/
   void   SetCylinderLength(double length);
-  double GetCylinderLength() {return CylinderLength;};
+  double GetCylinderLength() {return m_CylinderLength;};
   
   /** 
   Set the abs pose */
@@ -113,45 +113,45 @@ protected:
   void SetRefSysMatrix(mafMatrix *constrain);
 
   /** Cone gizmo */
-  mafVMEGizmo *ConeGizmo;
+  mafVMEGizmo *m_ConeGizmo;
 
   /** cylinder gizmo*/
-  mafVMEGizmo *CylGizmo;
+  mafVMEGizmo *m_CylGizmo;
 
   /** Register input vme*/
-  mafVME *InputVme;
+  mafVME *m_InputVme;
 
   enum GIZMOPARTS {CYLINDER = 0, CONE};
   
   /** Register the gizmo axis */
-  int Axis;
+  int m_Axis;
   
   /** Cone source*/
-  vtkConeSource *Cone;
+  vtkConeSource *m_Cone;
 
   /** Cone length*/
-  double ConeLength;
+  double m_ConeLength;
 
   /** Cylinder source*/
-  vtkCylinderSource *Cylinder;
+  vtkCylinderSource *m_Cylinder;
   
   /** Cylinder length*/
-  double CylinderLength;
+  double m_CylinderLength;
 
   /** Cylinder and cone gizmo vme data*/
   //mafVmeData *GizmoData[2];
 
   /** translate PDF for cylinder and cone*/
-  vtkTransformPolyDataFilter *TranslatePDF[2];
+  vtkTransformPolyDataFilter *m_TranslatePDF[2];
   
   /** translation transform for cylinder and cone*/
-  vtkTransform *TranslateTr[2];
+  vtkTransform *m_TranslateTr[2];
  
   /** rotate PDF for cylinder and cone*/
-  vtkTransformPolyDataFilter *RotatePDF[2];
+  vtkTransformPolyDataFilter *m_RotatePDF[2];
 
   /** rotation transform for cylinder and cone*/
-  vtkTransform *RotationTr;
+  vtkTransform *m_RotationTr;
   
   /** Create vtk objects needed*/
   void CreatePipeline();
@@ -160,10 +160,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *IsaComp[2];
+  mmiCompositorMouse *m_IsaComp[2];
 
   /** isa generic*/
-  mmiGenericMouse *IsaGen[2];
+  mmiGenericMouse *m_IsaGen[2];
 
   /** Gizmo color setting facilities; part can be CYLINDER or CONE*/
   void SetColor(int part, double col[3]);

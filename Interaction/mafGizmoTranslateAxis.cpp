@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-18 16:05:10 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2009-04-22 09:42:43 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,16 +47,16 @@
 mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listener)
 //----------------------------------------------------------------------------
 {
-  ConeLength = 0.5;
-  CylinderLength = 0.5;
+  m_ConeLength = 0.5;
+  m_CylinderLength = 0.5;
 
-  IsaComp[0] = IsaComp[1] = NULL;
+  m_IsaComp[0] = m_IsaComp[1] = NULL;
 
   m_Listener = listener;
-  InputVme = input;
+  m_InputVme = input;
   
   // default axis is X
-  Axis = X;
+  m_Axis = X;
   
   // create pipeline stuff
   CreatePipeline();
@@ -68,20 +68,20 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   // create vme gizmos stuff
   //-----------------
   // cylinder gizmo
-  CylGizmo = mafVMEGizmo::New();
-  CylGizmo->SetName("CylGizmo");
-  CylGizmo->SetData(RotatePDF[CYLINDER]->GetOutput());
+  m_CylGizmo = mafVMEGizmo::New();
+  m_CylGizmo->SetName("CylGizmo");
+  m_CylGizmo->SetData(m_RotatePDF[CYLINDER]->GetOutput());
   
   // cone gizmo
-  ConeGizmo = mafVMEGizmo::New();  
-  ConeGizmo->SetName("ConeGizmo");
-  ConeGizmo->SetData(RotatePDF[CONE]->GetOutput());
+  m_ConeGizmo = mafVMEGizmo::New();  
+  m_ConeGizmo->SetName("ConeGizmo");
+  m_ConeGizmo->SetData(m_RotatePDF[CONE]->GetOutput());
 
   // assign isa to cylinder and cone
-  CylGizmo->SetBehavior(IsaComp[CYLINDER]);
-  ConeGizmo->SetBehavior(IsaComp[CONE]);
+  m_CylGizmo->SetBehavior(m_IsaComp[CYLINDER]);
+  m_ConeGizmo->SetBehavior(m_IsaComp[CONE]);
 
-  SetAbsPose(InputVme->GetOutput()->GetAbsMatrix());
+  SetAbsPose(m_InputVme->GetOutput()->GetAbsMatrix());
   
   // set come gizmo material property and initial color to red
   this->SetColor(1, 0, 0, 1, 0, 0);
@@ -89,34 +89,34 @@ mafGizmoTranslateAxis::mafGizmoTranslateAxis(mafVME *input, mafObserver *listene
   //-----------------
   // ReparentTo will add also the gizmos to the tree!!
   // add the gizmo to the tree, this should increase reference count 
-  CylGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
-  ConeGizmo->ReparentTo(mafVME::SafeDownCast(InputVme->GetRoot()));
+  m_CylGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+  m_ConeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
 }
 //----------------------------------------------------------------------------
 mafGizmoTranslateAxis::~mafGizmoTranslateAxis() 
 //----------------------------------------------------------------------------
 {
-  CylGizmo->SetBehavior(NULL);
-  ConeGizmo->SetBehavior(NULL);
+  m_CylGizmo->SetBehavior(NULL);
+  m_ConeGizmo->SetBehavior(NULL);
    
-  vtkDEL(Cone);
-  vtkDEL(Cylinder);
+  vtkDEL(m_Cone);
+  vtkDEL(m_Cylinder);
   
   // clean up
   for (int i = 0; i < 2; i++)
   {
-    vtkDEL(TranslateTr[i]);
-    vtkDEL(TranslatePDF[i]);
-    vtkDEL(RotationTr);
-    vtkDEL(RotatePDF[i]);
+    vtkDEL(m_TranslateTr[i]);
+    vtkDEL(m_TranslatePDF[i]);
+    vtkDEL(m_RotationTr);
+    vtkDEL(m_RotatePDF[i]);
 	//----------------------
 	// No leaks so somebody is performing this...
 	// wxDEL(GizmoData[i]);
 	//----------------------
-    vtkDEL(IsaComp[i]); 
+    vtkDEL(m_IsaComp[i]); 
   }
-	CylGizmo->ReparentTo(NULL);
-	ConeGizmo->ReparentTo(NULL);
+	m_CylGizmo->ReparentTo(NULL);
+	m_ConeGizmo->ReparentTo(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -124,12 +124,12 @@ void mafGizmoTranslateAxis::CreatePipeline()
 //----------------------------------------------------------------------------
 {
   // create pipeline for cone-cylinder gizmo along global X axis
-  // calculate diagonal of InputVme space bounds 
+  // calculate diagonal of m_InputVme space bounds 
   double b[6],p1[3],p2[3],d;
-	if(InputVme->IsA("mafVMEGizmo"))
-		InputVme->GetOutput()->GetVTKData()->GetBounds(b);
+	if(m_InputVme->IsA("mafVMEGizmo"))
+		m_InputVme->GetOutput()->GetVTKData()->GetBounds(b);
 	else
-		InputVme->GetOutput()->GetBounds(b);
+		m_InputVme->GetOutput()->GetBounds(b);
   p1[0] = b[0];
   p1[1] = b[2];
   p1[2] = b[4];
@@ -139,8 +139,8 @@ void mafGizmoTranslateAxis::CreatePipeline()
   d = sqrt(vtkMath::Distance2BetweenPoints(p1,p2));
   
   // create the cylinder
-  Cylinder = vtkCylinderSource::New();
-  Cylinder->SetRadius(d / 200);
+  m_Cylinder = vtkCylinderSource::New();
+  m_Cylinder->SetRadius(d / 200);
   
   //-----------------
   // rotate the cylinder on the X axis (default axis is Z)
@@ -149,7 +149,7 @@ void mafGizmoTranslateAxis::CreatePipeline()
   cylInitTr->RotateZ(-90);	
   
   vtkTransformPolyDataFilter *cylInitTrPDF = vtkTransformPolyDataFilter::New();
-  cylInitTrPDF->SetInput(Cylinder->GetOutput());
+  cylInitTrPDF->SetInput(m_Cylinder->GetOutput());
   cylInitTrPDF->SetTransform(cylInitTr);
 
   /*
@@ -166,21 +166,21 @@ void mafGizmoTranslateAxis::CreatePipeline()
   
   //-----------------
   // create the cone
-  Cone = vtkConeSource::New();
-  Cone->SetRadius(d / 40);
-  Cone->SetResolution(20);
+  m_Cone = vtkConeSource::New();
+  m_Cone->SetRadius(d / 40);
+  m_Cone->SetResolution(20);
 
   // create the translation transform
-  TranslateTr[CONE] = vtkTransform::New();
-  TranslateTr[CYLINDER] = vtkTransform::New();
+  m_TranslateTr[CONE] = vtkTransform::New();
+  m_TranslateTr[CYLINDER] = vtkTransform::New();
 
   // create cone translation transform pdf
-  TranslatePDF[CONE] = vtkTransformPolyDataFilter::New();
-  TranslatePDF[CONE]->SetInput(Cone->GetOutput());
+  m_TranslatePDF[CONE] = vtkTransformPolyDataFilter::New();
+  m_TranslatePDF[CONE]->SetInput(m_Cone->GetOutput());
   
   // create cylinder translation transform
-  TranslatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
-  TranslatePDF[CYLINDER]->SetInput(cylInitTrPDF->GetOutput());
+  m_TranslatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
+  m_TranslatePDF[CYLINDER]->SetInput(cylInitTrPDF->GetOutput());
 
   //-----------------
   // update translate transform
@@ -193,8 +193,8 @@ void mafGizmoTranslateAxis::CreatePipeline()
 
   //-----------------
   // translate transform setting
-  TranslatePDF[CONE]->SetTransform(TranslateTr[CONE]);
-  TranslatePDF[CYLINDER]->SetTransform(TranslateTr[CYLINDER]);
+  m_TranslatePDF[CONE]->SetTransform(m_TranslateTr[CONE]);
+  m_TranslatePDF[CYLINDER]->SetTransform(m_TranslateTr[CYLINDER]);
 
   /*
   ^          * 
@@ -210,19 +210,19 @@ void mafGizmoTranslateAxis::CreatePipeline()
   */    
 
   // create rotation transform and rotation TPDF 
-  RotatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
-  RotatePDF[CONE] = vtkTransformPolyDataFilter::New();
-  RotationTr = vtkTransform::New();
-  RotationTr->Identity(); 
+  m_RotatePDF[CYLINDER] = vtkTransformPolyDataFilter::New();
+  m_RotatePDF[CONE] = vtkTransformPolyDataFilter::New();
+  m_RotationTr = vtkTransform::New();
+  m_RotationTr->Identity(); 
 
-  RotatePDF[CYLINDER]->SetTransform(RotationTr);
-  RotatePDF[CONE]->SetTransform(RotationTr);
+  m_RotatePDF[CYLINDER]->SetTransform(m_RotationTr);
+  m_RotatePDF[CONE]->SetTransform(m_RotationTr);
 
-  RotatePDF[CYLINDER]->SetInput(TranslatePDF[CYLINDER]->GetOutput());
-  RotatePDF[CONE]->SetInput(TranslatePDF[CONE]->GetOutput());
+  m_RotatePDF[CYLINDER]->SetInput(m_TranslatePDF[CYLINDER]->GetOutput());
+  m_RotatePDF[CONE]->SetInput(m_TranslatePDF[CONE]->GetOutput());
 
-  RotatePDF[CYLINDER]->Update();
-  RotatePDF[CYLINDER]->Update();
+  m_RotatePDF[CYLINDER]->Update();
+  m_RotatePDF[CYLINDER]->Update();
 
   //clean up
   cylInitTr->Delete();
@@ -235,18 +235,18 @@ void mafGizmoTranslateAxis::CreateISA()
   // create isa compositor and assign behaviors to IsaGen ivar
   for (int i = 0; i < 2; i++)
   {
-    IsaComp[i] = mmiCompositorMouse::New();
+    m_IsaComp[i] = mmiCompositorMouse::New();
 
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
-    IsaGen[i] = IsaComp[i]->CreateBehavior(MOUSE_LEFT);
+    m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
 
-    IsaGen[i]->SetVME(InputVme);
-    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
-  	IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
+    m_IsaGen[i]->SetVME(m_InputVme);
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+  	m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
       
     //isa will send events to this
-    IsaGen[i]->SetListener(this);
+    m_IsaGen[i]->SetListener(this);
   }
 }
 //----------------------------------------------------------------------------
@@ -256,13 +256,13 @@ void mafGizmoTranslateAxis::SetAxis(int axis)
   // this should be called when the translation gizmo
   // is created; gizmos are not highlighted
   // register the axis
-  Axis = axis;
+  m_Axis = axis;
   
   // rotate the cylinder and the cone to match given axis
-  if (Axis == X)
+  if (m_Axis == X)
   {
     // reset cyl and cone rotation
-    RotationTr->Identity();
+    m_RotationTr->Identity();
   
     // set cyl and cone color to red
     this->SetColor(1, 0, 0, 1, 0, 0);
@@ -270,14 +270,14 @@ void mafGizmoTranslateAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
     }
   }
   else if (axis == Y)
   {
     // set rotation to move con and cyl on Y 
-    RotationTr->Identity();
-    RotationTr->RotateZ(90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateZ(90);
    
     // set cyl and cone color to green
     this->SetColor(0, 1, 0, 0, 1, 0);
@@ -285,14 +285,14 @@ void mafGizmoTranslateAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
     }
   }  
   else if (axis == Z)
   {
     // set rotation to move con and cyl on Z
-    RotationTr->Identity();
-    RotationTr->RotateY(-90);
+    m_RotationTr->Identity();
+    m_RotationTr->RotateY(-90);
     
     // set cyl and cone color to blue
      this->SetColor(0, 0, 1, 0, 0, 1);
@@ -300,7 +300,7 @@ void mafGizmoTranslateAxis::SetAxis(int axis)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
     }
   }  
 }
@@ -316,17 +316,17 @@ void mafGizmoTranslateAxis::Highlight(bool highlight)
   else
   {
    // deactivate the cylinder 
-   if (Axis == X)
+   if (m_Axis == X)
    {
      // set cyl col to red
      this->SetColor(CYLINDER, 1, 0, 0);
    } 
-   else if (Axis == Y)
+   else if (m_Axis == Y)
    {
      // set cyl col to green
      this->SetColor(CYLINDER, 0, 1, 0);
    }
-   else if (Axis == Z)
+   else if (m_Axis == Z)
    {
      // set cyl col to blue
      this->SetColor(CYLINDER, 0, 0, 1);
@@ -350,12 +350,12 @@ void  mafGizmoTranslateAxis::SetConeLength(double length)
      cylLen    conLen
   */  
   // set the cone length
-  ConeLength = length;
-  Cone->SetHeight(length);
+  m_ConeLength = length;
+  m_Cone->SetHeight(length);
 
   // translate the cone in (cylLen + conLen/2)
-  TranslateTr[CONE]->Identity();
-  TranslateTr[CONE]->Translate(Cylinder->GetHeight() + length / 2, 0, 0);
+  m_TranslateTr[CONE]->Identity();
+  m_TranslateTr[CONE]->Translate(m_Cylinder->GetHeight() + length / 2, 0, 0);
   
 }
 //----------------------------------------------------------------------------
@@ -376,16 +376,16 @@ void mafGizmoTranslateAxis::SetCylinderLength(double length)
   */  
 
   // set cylLen to length
-  CylinderLength = length;
-  Cylinder->SetHeight(length);
+  m_CylinderLength = length;
+  m_Cylinder->SetHeight(length);
 
   // translate the cyl in (cylLen / 2)
-  TranslateTr[CYLINDER]->Identity();
-  TranslateTr[CYLINDER]->Translate(length / 2, 0, 0);
+  m_TranslateTr[CYLINDER]->Identity();
+  m_TranslateTr[CYLINDER]->Translate(length / 2, 0, 0);
 
   // translate the cone in (cylLen + (conLen / 2)) 
-  TranslateTr[CONE]->Identity();
-  TranslateTr[CONE]->Translate(length + Cone->GetHeight() / 2, 0, 0);
+  m_TranslateTr[CONE]->Identity();
+  m_TranslateTr[CONE]->Translate(length + m_Cone->GetHeight() / 2, 0, 0);
 
 }
 //----------------------------------------------------------------------------
@@ -403,17 +403,17 @@ void mafGizmoTranslateAxis::SetColor(int part, double col[3])
 {
   if (part == CONE)
   {
-    ConeGizmo->GetMaterial()->m_Prop->SetColor(col);
-    ConeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-    ConeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-    ConeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+    m_ConeGizmo->GetMaterial()->m_Prop->SetColor(col);
+    m_ConeGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+    m_ConeGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+    m_ConeGizmo->GetMaterial()->m_Prop->SetSpecular(0);
   }
   else
   {
-    CylGizmo->GetMaterial()->m_Prop->SetColor(col);
-    CylGizmo->GetMaterial()->m_Prop->SetAmbient(0);
-    CylGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
-    CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
+    m_CylGizmo->GetMaterial()->m_Prop->SetColor(col);
+    m_CylGizmo->GetMaterial()->m_Prop->SetAmbient(0);
+    m_CylGizmo->GetMaterial()->m_Prop->SetDiffuse(1);
+    m_CylGizmo->GetMaterial()->m_Prop->SetSpecular(0);
   }
 }
 //----------------------------------------------------------------------------
@@ -441,15 +441,15 @@ void mafGizmoTranslateAxis::SetColor(double cylR, double cylG, double cylB, doub
 void mafGizmoTranslateAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
-  mafEventMacro(mafEvent(this,VME_SHOW,CylGizmo,show));
-	mafEventMacro(mafEvent(this,VME_SHOW,ConeGizmo,show));
+  mafEventMacro(mafEvent(this,VME_SHOW,m_CylGizmo,show));
+	mafEventMacro(mafEvent(this,VME_SHOW,m_ConeGizmo,show));
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetAbsPose(mafMatrix *absPose)
 //----------------------------------------------------------------------------
 {
-  ConeGizmo->SetAbsMatrix(*absPose); 
-  CylGizmo->SetAbsMatrix(*absPose); 
+  m_ConeGizmo->SetAbsMatrix(*absPose); 
+  m_CylGizmo->SetAbsMatrix(*absPose); 
   SetRefSysMatrix(absPose);
 }
 //----------------------------------------------------------------------------
@@ -458,21 +458,21 @@ void mafGizmoTranslateAxis::SetRefSysMatrix(mafMatrix *matrix)
 {  
   for (int i = 0; i < 2; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
-    IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
+    m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToCustom(matrix);
+    m_IsaGen[i]->GetPivotRefSys()->SetTypeToCustom(matrix);
   } 
 }
 //----------------------------------------------------------------------------
 mafMatrix *mafGizmoTranslateAxis::GetAbsPose()
 //----------------------------------------------------------------------------
 {
-  return CylGizmo->GetOutput()->GetAbsMatrix();
+  return m_CylGizmo->GetOutput()->GetAbsMatrix();
 }
 //----------------------------------------------------------------------------
 void mafGizmoTranslateAxis::SetInput(mafVME *vme)
 //----------------------------------------------------------------------------
 {
-  this->InputVme = vme; 
+  this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetRefSysMatrix(vme->GetOutput()->GetAbsMatrix());
 }
@@ -482,7 +482,7 @@ void mafGizmoTranslateAxis::SetConstraintModality(int axis, int constrainModalit
 {
   for (int i = 0; i < 2; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(axis,constrainModality);
   } 
 }
 //----------------------------------------------------------------------------
@@ -491,6 +491,6 @@ void mafGizmoTranslateAxis::SetStep(int axis, double step)
 {
   for (int i = 0; i < 2; i++)
   {
-    IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
+    m_IsaGen[i]->GetTranslationConstraint()->SetStep(axis,step);
   } 
 }

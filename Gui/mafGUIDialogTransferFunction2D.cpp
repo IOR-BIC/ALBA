@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDialogTransferFunction2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:23 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-04-22 09:43:04 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Alexander Savenko
 ==========================================================================
   Copyright (c) 2002/2004
@@ -154,10 +154,10 @@ void mafGUIDialogTransferFunction2D::ShowModal(mafVME *vme)
   this->m_SliceFilter    = NULL;
   this->m_SliceActor     = NULL;
 
-  this->m_3DRwi = NULL;
-  this->m_3DRenderer = NULL;
-  this->m_3DMapper = NULL;
-  this->m_3DVolume = NULL;
+  this->m_Rwi3D = NULL;
+  this->m_Renderer3D = NULL;
+  this->m_Mapper3D = NULL;
+  this->m_Volume3D = NULL;
 
   this->m_GraphRwi = NULL;
   this->m_GraphRenderer = NULL;
@@ -172,7 +172,7 @@ void mafGUIDialogTransferFunction2D::ShowModal(mafVME *vme)
 
   this->m_DataReady = false;
   this->m_SlicePipeStatus = PipeNotReady;
-  this->m_3DPipeStatus = PipeNotReady;
+  this->m_PipeStatus3D = PipeNotReady;
 
   this->m_WidgetActor = NULL;
 
@@ -208,21 +208,21 @@ void mafGUIDialogTransferFunction2D::ShowModal(mafVME *vme)
   vtkDEL(this->m_SliceActor);
   vtkDEL(this->m_WaitActor);
 
-  m_3DRenderer->GetVolumes();    //Paolo 23-06-2004 flushes the volumes
-  vtkDEL(m_3DRenderer);
-  vtkDEL(m_3DMapper);
-  vtkDEL(m_3DVolume);
+  m_Renderer3D->GetVolumes();    //Paolo 23-06-2004 flushes the volumes
+  vtkDEL(m_Renderer3D);
+  vtkDEL(m_Mapper3D);
+  vtkDEL(m_Volume3D);
 
   m_GraphRenderer->GetActors();  //Paolo 23-06-2004 flushes the actors
   vtkDEL(m_GraphRenderer);
   vtkDEL(this->m_WidgetActor);
 
   m_SliceRwi->SetRenderWindow(NULL);
-  m_3DRwi->SetRenderWindow(NULL);
+  m_Rwi3D->SetRenderWindow(NULL);
   m_GraphRwi->SetRenderWindow(NULL);
 
   cppDEL(this->m_SliceRwi); 
-  cppDEL(this->m_3DRwi);
+  cppDEL(this->m_Rwi3D);
   cppDEL(this->m_GraphRwi);
 
   vtkDEL(this->m_CriticalSection);
@@ -252,11 +252,11 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
 
   //////////////////////////////////////// create left pane
   // slice preview notebook
-  this->m_preview_book = new wxNotebook(this, -1, wxDefaultPosition, wxSize(360, 360));
-  leftPane->Add(this->m_preview_book, 2, wxEXPAND, 0);
+  this->m_PreviewBook = new wxNotebook(this, -1, wxDefaultPosition, wxSize(360, 360));
+  leftPane->Add(this->m_PreviewBook, 2, wxEXPAND, 0);
   // first page: slice preview
-  wxPanel *previewPage = new wxPanel(this->m_preview_book);
-  this->m_preview_book->AddPage(previewPage, "XY");
+  wxPanel *previewPage = new wxPanel(this->m_PreviewBook);
+  this->m_PreviewBook->AddPage(previewPage, "XY");
   wxFlexGridSizer *gridSizer = new wxFlexGridSizer(2, 2);
   gridSizer->AddGrowableCol(0);
   gridSizer->AddGrowableRow(0);
@@ -302,25 +302,25 @@ void mafGUIDialogTransferFunction2D::CreateGUI()
   gridSizer->Add(this->m_WindowingSlider, 0, wxEXPAND, 0);
 
   // second page: 3D preview
-  previewPage = new wxPanel(this->m_preview_book);
-  this->m_preview_book->AddPage(previewPage, "3D");
+  previewPage = new wxPanel(this->m_PreviewBook);
+  this->m_PreviewBook->AddPage(previewPage, "3D");
   wxBoxSizer *tabSizer = new wxBoxSizer(wxVERTICAL);
   previewPage->SetAutoLayout(TRUE);
   previewPage->SetSizer(tabSizer);
   tabSizer->Fit(previewPage);
   tabSizer->SetSizeHints(previewPage);
   // render window
- 	m_3DWindow = vtkRenderWindow::New();
-  this->m_3DRenderer	= vtkRenderer::New();
-  m_3DWindow->AddRenderer(this->m_3DRenderer);
-  this->m_3DRenderer->SetBackground(0.f,0.f,0.f);
-  this->m_3DRwi = new mafRWIBase(previewPage, -1);
-	this->m_3DRwi->SetRenderWindow(m_3DWindow);
-  m_3DWindow->SetInteractor(NULL);
-  vtkDEL(m_3DWindow);
-  this->m_3DRwi->Show(true);
-	((wxWindow *)this->m_3DRwi)->SetSize(0, 0, 350, 350);
-  tabSizer->Add(this->m_3DRwi, 1, wxEXPAND, 0);
+ 	m_Window3D = vtkRenderWindow::New();
+  this->m_Renderer3D	= vtkRenderer::New();
+  m_Window3D->AddRenderer(this->m_Renderer3D);
+  this->m_Renderer3D->SetBackground(0.f,0.f,0.f);
+  this->m_Rwi3D = new mafRWIBase(previewPage, -1);
+	this->m_Rwi3D->SetRenderWindow(m_Window3D);
+  m_Window3D->SetInteractor(NULL);
+  vtkDEL(m_Window3D);
+  this->m_Rwi3D->Show(true);
+	((wxWindow *)this->m_Rwi3D)->SetSize(0, 0, 350, 350);
+  tabSizer->Add(this->m_Rwi3D, 1, wxEXPAND, 0);
 
   // graph window
  	m_GraphWindow = vtkRenderWindow::New();
@@ -660,9 +660,9 @@ VTK_THREAD_RETURN_TYPE mafGUIDialogTransferFunction2D::CreatePipe(void *argDialo
   dialog->m_CriticalSection->Lock();
 
   // 3d pipe
-  dialog->m_3DVolume = vtkVolume::New();
-  dialog->m_3DVolume->SetProperty(dialog->m_VolumeProperty);
-  dialog->m_3DMapper = vtkMAFAdaptiveVolumeMapper::New();
+  dialog->m_Volume3D = vtkVolume::New();
+  dialog->m_Volume3D->SetProperty(dialog->m_VolumeProperty);
+  dialog->m_Mapper3D = vtkMAFAdaptiveVolumeMapper::New();
 
   vtkImageCast *chardata = vtkImageCast::New();
   chardata->SetOutputScalarTypeToShort();
@@ -720,25 +720,25 @@ VTK_THREAD_RETURN_TYPE mafGUIDialogTransferFunction2D::CreatePipe(void *argDialo
   {
     chardata->SetInput(imageData);
     chardata->Update();
-    dialog->m_3DMapper->SetInput(chardata->GetOutput());
+    dialog->m_Mapper3D->SetInput(chardata->GetOutput());
   }
   else
   {
-    dialog->m_3DMapper->SetInput((vtkDataSet *)data);
+    dialog->m_Mapper3D->SetInput((vtkDataSet *)data);
   }
-  dialog->m_3DMapper->Update();
-  dialog->m_3DVolume->SetMapper(dialog->m_3DMapper);
-  dialog->m_3DRenderer->GetActiveCamera()->ParallelProjectionOff();
-  dialog->m_3DRenderer->GetActiveCamera()->SetPosition(0., 0., 0.);
-  dialog->m_3DRenderer->GetActiveCamera()->SetFocalPoint(0., 0., 1.);
-  dialog->m_3DRenderer->ResetCamera(dialog->m_3DMapper->GetBounds());
-  const int *range = dialog->m_3DMapper->GetDataRange();
+  dialog->m_Mapper3D->Update();
+  dialog->m_Volume3D->SetMapper(dialog->m_Mapper3D);
+  dialog->m_Renderer3D->GetActiveCamera()->ParallelProjectionOff();
+  dialog->m_Renderer3D->GetActiveCamera()->SetPosition(0., 0., 0.);
+  dialog->m_Renderer3D->GetActiveCamera()->SetFocalPoint(0., 0., 1.);
+  dialog->m_Renderer3D->ResetCamera(dialog->m_Mapper3D->GetBounds());
+  const int *range = dialog->m_Mapper3D->GetDataRange();
   dialog->m_DataRange[0] = double(range[0]);
   dialog->m_DataRange[1] = double(range[1]);
   dialog->m_GradientRange[0] = 0.f;
-  dialog->m_GradientRange[1] = dialog->m_3DMapper->GetGradientRange()[1];
+  dialog->m_GradientRange[1] = dialog->m_Mapper3D->GetGradientRange()[1];
   dialog->m_DataReady = true;
-  dialog->m_3DPipeStatus = PipeReady;
+  dialog->m_PipeStatus3D = PipeReady;
 
   // create slice preview
   dialog->m_SliceActor = vtkActor2D::New();
@@ -875,7 +875,7 @@ void mafGUIDialogTransferFunction2D::OnEvent(mafEventBase *maf_event)
       if (this->m_CurrentWidget >= 0 && this->m_CurrentWidget < this->m_TransferFunction->GetNumberOfWidgets() &&
           this->m_TransferFunction->SetWidgetDiffuse(this->m_CurrentWidget, this->m_Widget.Diffuse)) 
 			{
-        if (this->m_preview_book->GetSelection() == 1)
+        if (this->m_PreviewBook->GetSelection() == 1)
           this->UpdatePreview();
       }
       else 
@@ -892,10 +892,10 @@ void mafGUIDialogTransferFunction2D::OnEvent(mafEventBase *maf_event)
         this->m_Widget.Range[0][0] = this->m_ValueSlider->GetValue(0);
         this->m_Widget.Range[0][1] = this->m_ValueSlider->GetValue(2);
         this->m_Widget.Range[0][2] = this->m_ValueSlider->GetValue(1);
-        if (this->m_preview_book->GetSelection() == 1 && this->m_ValueSlider->IsDragging()) 
+        if (this->m_PreviewBook->GetSelection() == 1 && this->m_ValueSlider->IsDragging()) 
 				{
-          framerate = this->m_3DRenderer->GetRenderWindow()->GetDesiredUpdateRate();
-          this->m_3DRenderer->GetRenderWindow()->SetDesiredUpdateRate(15.f);
+          framerate = this->m_Renderer3D->GetRenderWindow()->GetDesiredUpdateRate();
+          this->m_Renderer3D->GetRenderWindow()->SetDesiredUpdateRate(15.f);
         }
       }
       if (this->m_CurrentWidget >= 0 && this->m_CurrentWidget < this->m_TransferFunction->GetNumberOfWidgets() &&
@@ -904,7 +904,7 @@ void mafGUIDialogTransferFunction2D::OnEvent(mafEventBase *maf_event)
         this->UpdatePreview();
       }
       if (framerate != 0)
-        this->m_3DRenderer->GetRenderWindow()->SetDesiredUpdateRate(framerate);
+        this->m_Renderer3D->GetRenderWindow()->SetDesiredUpdateRate(framerate);
       this->InitializeControls();
     break;
     case ID_TF_GRADIENT:
@@ -981,10 +981,10 @@ void mafGUIDialogTransferFunction2D::OnIdle(wxIdleEvent& event)
     this->m_SliceRenderer->AddActor(this->m_SliceActor);
     this->UpdatePreview();
   }
-  if (this->m_3DPipeStatus == PipeReady) 
+  if (this->m_PipeStatus3D == PipeReady) 
 	{
-    this->m_3DPipeStatus = PipePlugged;
-    this->m_3DRenderer->AddVolume(this->m_3DVolume);
+    this->m_PipeStatus3D = PipePlugged;
+    this->m_Renderer3D->AddVolume(this->m_Volume3D);
     this->UpdatePreview();
   }
 }
@@ -995,11 +995,11 @@ void mafGUIDialogTransferFunction2D::UpdatePreview()
   if (!this->m_Vme)
     return;
 
-  const int page = this->m_preview_book->GetSelection();
+  const int page = this->m_PreviewBook->GetSelection();
   if (page == 0 && this->m_SlicePipeStatus == PipePlugged && this->m_SliceRenderer)
     this->m_SliceRenderer->GetRenderWindow()->Render();
-  else if (page == 1  && this->m_3DPipeStatus == PipePlugged)
-    this->m_3DRenderer->GetRenderWindow()->Render();
+  else if (page == 1  && this->m_PipeStatus3D == PipePlugged)
+    this->m_Renderer3D->GetRenderWindow()->Render();
   this->UpdateWidgets();
   this->m_GraphRenderer->GetRenderWindow()->Render();
 }
