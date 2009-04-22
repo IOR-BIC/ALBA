@@ -102,12 +102,12 @@ SET(PROJECT_SRCS
   medOpImporterDicomXA.h
 )
   
-IF (MED_USE_OFFIS)
+IF (MED_USE_Offis)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
   medOpImporterDicomOffis.h
   medOpImporterDicomOffis.cpp
 )
-ENDIF (MED_USE_OFFIS)
+ENDIF (MED_USE_Offis)
   
 
 
