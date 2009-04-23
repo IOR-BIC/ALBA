@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-23 13:54:40 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-04-23 14:58:17 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -128,7 +128,6 @@ mafCxxTypeMacro(medOpImporterDicomOffis);
 enum DICOM_IMPORTER_GUI_ID
 {
 	ID_FIRST = medGUIWizard::ID_LAST,
-	//ID_DICTIONARY,
 	ID_OPEN_DIR,
 	ID_STUDY,
 	ID_CROP_BUTTON,
@@ -261,13 +260,6 @@ mafOp *medOpImporterDicomOffis::Copy()
 void medOpImporterDicomOffis::OpRun()
 //----------------------------------------------------------------------------
 {
-	m_DictionaryFilename = ((medGUIDicomSettings*)GetSetting())->GetDictionary();
-  if(!wxFileExists(m_DictionaryFilename.GetCStr()))
-  {
-    wxMessageBox(_("Missing Dictionary"));
-    OpStop(OP_RUN_CANCEL);
-    return;
-  }
   m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
 
 	CreateGui();
@@ -769,7 +761,6 @@ void medOpImporterDicomOffis::CreateLoadPage()
   }
 
   m_LoadGuiCenter->DirOpen(ID_OPEN_DIR, _("Folder"),	&m_DicomDirectory,_("Sel. DICOM Folder"));
-  m_LoadGuiCenter->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));//If there isn't a dictionary is impossible open DICOM Directory
   m_LoadGuiCenter->Divider();
 
   m_StudyListbox = m_LoadGuiRight->ListBox(ID_STUDY,_("study id"),70,"",wxLB_HSCROLL);
@@ -959,11 +950,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				CameraUpdate();
 			}
 			break;
-		/*case ID_DICTIONARY:
-			m_DicomReader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-			m_LoadGuiLeft->Enable(ID_OPEN_DIR,strcmp(m_DictionaryFilename.GetCStr(),""));
-			break;*/
-		case ID_OPEN_DIR:
+			case ID_OPEN_DIR:
 			{
 				OpenDir();
 			}
@@ -1511,8 +1498,6 @@ void medOpImporterDicomOffis::CreatePipeline()
 	vtkNEW(m_DirectoryReader);
 
 	vtkNEW(m_DicomReader);
-	m_DicomReader->SetDictionaryFileName(m_DictionaryFilename.GetCStr());
-	m_DicomReader->UseDefaultDictionaryOff();
 
 	vtkNEW(m_SliceLookupTable);
 
@@ -1591,7 +1576,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
 //      DcmFileFormat m_DicomImg;
-      OFCondition status = m_DicomImg.loadFile(str_tmp, EXS_Unknown, EGL_noChange, DCM_MaxReadLength, ERM_autoDetect );//load data into offis structure
+      OFCondition status = m_DicomImg.loadFile(str_tmp);//load data into offis structure
 
       if (!status.good())
         return false;
@@ -2037,16 +2022,22 @@ void medOpImporterDicomOffis::ImportDicomTags()
   while (status.good())
   {
     dobject = stack.top();
-    DcmTag tag = dobject->getTag();
-    mafString tagName = tag.getTagName();
+    if (dobject->verify().good())
+    { 
+      DcmTag tag = dobject->getTag();
+      mafString tagName = tag.getTagName();
 
-    delem = (DcmElement *)dobject;
-    delem->getOFStringArray(string);
+      delem = dynamic_cast<DcmElement*>(dobject);
+      if (delem != NULL)
+      {
+        delem->getOFStringArray(string);
 
-    if (tagName.Compare("PixelData") == 0)
-      m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),""));
-    else
-      m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),string.c_str()));
+        if (tagName.Compare("PixelData") == 0)
+          m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),""));
+        else
+          m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),string.c_str()));
+      }
+    }
    
     status = ds->nextObject(stack, OFTrue);
   } 
