@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-04-21 12:33:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-04-23 13:54:40 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -46,6 +46,8 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 #include "mafOp.h"
 #include "vtkImageData.h"
+#include "dcmtk/dcmdata/dctk.h"
+
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -66,6 +68,7 @@ class vtkPlaneSource;
 class vtkPolyDataMapper;
 class vtkTexture;
 class vtkActor;
+
 
 WX_DECLARE_LIST(medImporterDICOMListElement, medListDicomFiles);
 //----------------------------------------------------------------------------
@@ -183,6 +186,7 @@ protected:
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkDicomUnPacker	*m_DicomReader;
+  DcmFileFormat      m_DicomImg;
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
 	vtkPolyDataMapper	*m_SliceMapper;

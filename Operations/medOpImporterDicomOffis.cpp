@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-23 10:28:03 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-04-23 13:54:40 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -92,7 +92,6 @@ MafMedical is partially based on OpenMAF.
 
 #include "vtkDataSetWriter.h"
 #include "vtkRectilinearGrid.h"
-//#include "vtkRGSliceAccumulate.h"
 #include "vtkPointData.h"
 #include "vtkShortArray.h"
 
@@ -1591,12 +1590,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       m_DicomReader->Update();
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
-      DcmFileFormat dicom_img;
-      OFCondition status = dicom_img.loadFile(str_tmp, EXS_Unknown, EGL_noChange, DCM_MaxReadLength, ERM_autoDetect );//load data into offis structure
+//      DcmFileFormat m_DicomImg;
+      OFCondition status = m_DicomImg.loadFile(str_tmp, EXS_Unknown, EGL_noChange, DCM_MaxReadLength, ERM_autoDetect );//load data into offis structure
 
       if (!status.good())
         return false;
-      DcmDataset *ds = dicom_img.getDataset();//obtain dataset information from dicom file (loaded into memory)
+      DcmDataset *ds = m_DicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
  
       // decompress data set if compressed
       ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
@@ -2023,82 +2022,34 @@ void medOpImporterDicomOffis::ShowSlice(int slice_num)
 void medOpImporterDicomOffis::ImportDicomTags()
 //----------------------------------------------------------------------------
 {
-	if (m_TagArray == NULL) 
-		mafNEW(m_TagArray);
+  if (m_TagArray == NULL) 
+    mafNEW(m_TagArray);
 
-	m_TagArray->SetName("TagArray");
+  m_TagArray->SetName("TagArray");
 
-  m_DicomReader->Update();
+  DcmDataset *ds = m_DicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
 
-	for (int i=0;i<m_DicomReader->GetNumberOfTags();i++)
-	{
-		char tmp[256];
-		const char *keyword;
+  OFString string;
+  DcmStack stack;
+  DcmObject *dobject = NULL;
+  DcmElement *delem = NULL;
+  OFCondition status = ds->nextObject(stack, OFTrue);
+  while (status.good())
+  {
+    dobject = stack.top();
+    DcmTag tag = dobject->getTag();
+    mafString tagName = tag.getTagName();
 
-		const vtkDicomUnPacker::DICOM *tag = m_DicomReader->GetTag(i);
+    delem = (DcmElement *)dobject;
+    delem->getOFStringArray(string);
 
-		if (!strcmp(tag->Keyword,""))
-		{
-			if (tag->intoDictionary == vtkDicomUnPacker::no)
-			{
-				int group=tag->Group;
-				int element=tag->Element;
-				sprintf(tmp,"G%d_E%d",group,element);
-				keyword=tmp;
-			}
-		}
-		else
-		{
-			keyword=(char *)tag->Keyword;
-			if (tag->intoDictionary==vtkDicomUnPacker::no)
-			{
-				mafLogMessage("Hmmm Keyword not in dictionary???");
-			}
-		}
-
-		int mult=m_DicomReader->GetTagElement(i)->mult;
-
-		const vtkDicomUnPacker::VALUE *tagElement=m_DicomReader->GetTagElement(i);
-
-		if (tagElement->type == vtkDicomUnPacker::string)
-		{
-			// String TAG
-			m_TagArray->SetTag(mafTagItem(keyword,""));
-			if (mult>=0)
-			{
-				// Fill the Element components
-				m_TagArray->GetTag(keyword)->SetNumberOfComponents(mult+1);
-
-				for (int j=0;j<=mult;j++)
-				{
-					const char *value = tagElement->stringa[j];
-					m_TagArray->GetTag(keyword)->SetValue(value,j);
-				}
-			}
-			else
-			{
-				m_TagArray->GetTag(keyword)->SetNumberOfComponents(0);
-				cerr << "empty string...\n";
-			}
-		}
-		else
-		{
-			// NUMERIC TAG
-			double *value = (double *)tagElement->num;
-
-			if (mult>0)
-			{
-				m_TagArray->SetTag(mafTagItem(keyword,value,mult+1));
-			}
-			else
-			{
-				// This is a atg with an emptt value...
-				mafTagItem empty(keyword,"",MAF_MISSING_TAG);
-				//empty.SetNumberOfComponents(0);
-				m_TagArray->SetTag(empty);
-			}
-		}
-	}
+    if (tagName.Compare("PixelData") == 0)
+      m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),""));
+    else
+      m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),string.c_str()));
+   
+    status = ds->nextObject(stack, OFTrue);
+  } 
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::ResampleVolume()
