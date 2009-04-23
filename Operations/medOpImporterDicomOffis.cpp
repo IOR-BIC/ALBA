@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-21 12:33:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-04-23 10:28:03 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -107,6 +107,7 @@ MafMedical is partially based on OpenMAF.
 #include "dcmtk/dcmdata/dcistrmz.h"    /* for dcmZlibExpectRFC1950Encoding */
 #include "dcmtk/dcmimgle/dcmimage.h."
 #include "dcmtk/dcmjpeg/djdecode.h."
+
 
 #define INCLUDE_CSTDLIB
 #define INCLUDE_CSTRING
@@ -232,7 +233,6 @@ mafOp(label)
 
   m_CurrentSlice = VTK_INT_MAX;
 
-  //m_SettingPanel = new medGUIDicomSettings(this);
   m_ResampleFlag = FALSE;
 }
 //----------------------------------------------------------------------------
@@ -1592,15 +1592,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
       DcmFileFormat dicom_img;
-      OFCondition status = dicom_img.loadFile(str_tmp);//load data into offis structure
+      OFCondition status = dicom_img.loadFile(str_tmp, EXS_Unknown, EGL_noChange, DCM_MaxReadLength, ERM_autoDetect );//load data into offis structure
 
       if (!status.good())
         return false;
-      DcmDataset *ds = dicom_img.getDataset();//obatin dataset information from dicom file (loaded into memory)
-      
+      DcmDataset *ds = dicom_img.getDataset();//obtain dataset information from dicom file (loaded into memory)
+ 
       // decompress data set if compressed
       ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-
       DJDecoderRegistration::cleanup(); // deregister JPEG codecs
 
       //now are used findAndGet* method to get dicom information
@@ -1616,10 +1615,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
        ds->findAndGetFloat64(DCM_ImagePositionPatient,position[1],1);
        ds->findAndGetFloat64(DCM_ImagePositionPatient,position[0],2);
 
-      double spacing[2];
-      ds->findAndGetFloat64(DCM_PixelSpacing,spacing[0],0);
-      ds->findAndGetFloat64(DCM_PixelSpacing,spacing[1],1);
-
+      double spacing[3];
+      spacing[2] = 0;
+  
+      if(ds->findAndGetFloat64(DCM_PixelSpacing,spacing[0],0).bad())
+      {
+        //Unable to get element: DCM_PixelSpacing[0];
+        spacing[0] = 1.0;// for RGB??
+      } 
+      if(ds->findAndGetFloat64(DCM_PixelSpacing,spacing[1],1).bad())
+      {
+        //Unable to get element: DCM_PixelSpacing[0];
+        spacing[1] = 1.0;// for RGB??
+      } 
+      
       double slope,intercept;
       ds->findAndGetFloat64(DCM_RescaleSlope,slope);
       ds->findAndGetFloat64(DCM_RescaleIntercept,intercept);
@@ -1642,44 +1651,27 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         imageData->SetScalarType(VTK_CHAR);
       imageData->AllocateScalars();
       imageData->GetPointData()->GetScalars()->SetName("Scalars");
+      imageData->Update();
       unsigned short *vtk_buf = (unsigned short*)imageData->GetScalarPointer();
 
-      //unsigned short *dicom_buf_short;
       const Uint16 *dicom_buf_short = NULL;
-      const Uint8* dicom_buf_char;
+      const Uint8* dicom_buf_char = NULL;
       unsigned long nObject;
       if (val_long==16)
       {
-        const unsigned short *dicom_buf = NULL;
-        ds->findAndGetUint16Array(DCM_PixelData, dicom_buf);
-
-        //unsigned short *slice_buf = vtk_buf + sliceNum * width * height;
+        ds->findAndGetUint16Array(DCM_PixelData, dicom_buf_short);
 
         // Copy the data from DcmTK to VTK
-       // memcpy(slice_buf, dicom_buf, 2 * width * height);
-
-
-       // ds->findAndGetUint16Array(DCM_PixelData, dicom_buf_short,&nObject);//get array of scalars from dicom dataset
-       // nObject=nObject/(width*height);
-        // Copy the data from DcmTK to VTK
-        memcpy(vtk_buf, dicom_buf, val_long/8 * width * height);//copy array of scalars from dicom dataset to vtkImageData scalars array
+        memcpy(vtk_buf, dicom_buf_short, val_long/8 * width * height);//copy array of scalars from dicom dataset to vtkImageData scalars array
       }
       else
       {
-        ds->findAndGetUint8Array(DCM_PixelData, dicom_buf_char,&nObject);
-        nObject=nObject/(width*height);
+        ds->findAndGetUint8Array(DCM_PixelData, dicom_buf_char);
+
         // Copy the data from DcmTK to VTK
         memcpy(vtk_buf, dicom_buf_char, val_long/8 * width * height);//copy array of scalars from dicom dataset to vtkImageData scalars array
       }
-      
 
-      imageData->Update();
-
-      vtkShortArray *scalars=vtkShortArray::SafeDownCast(imageData->GetPointData()->GetScalars());
-      for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
-      {
-        scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
-      }
       imageData->Update();
 ////////////////////////////////////////////////////
 
@@ -1692,7 +1684,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			ct_mode.MakeUpper();
 			ct_mode.Trim(FALSE);
 			ct_mode.Trim();
-      //mafString mode = mdoe;
+
       if (((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)mode)&& strcmp((char *)mode, "MR" ) != 0)
 			{
         wxString stringMode = mode;
@@ -1702,8 +1694,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					continue;
 				}
 
-        
-        
 				row = m_StudyListbox->FindString(studyUID);
 				if (row == -1)
 				{
@@ -1712,7 +1702,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					m_FilesList = new medListDicomFiles;
 					m_StudyListbox->Append(studyUID);
 					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
-          //for(int k=0;k<3;k++)
+
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
@@ -1731,11 +1721,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			}
 			else if ( ((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)mode)&& strcmp( (char *)mode, "MR" ) == 0)
 			{
-				/*if( m_DicomReader->GetStatus() == -1)
-				{
-					//m_DicomReader->Delete();
-					continue;
-				}*/
 				row = m_StudyListbox->FindString(studyUID);
 				if (row == -1)
 				{
@@ -1745,7 +1730,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					m_StudyListbox->Append(studyUID);
 					m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
 					
-          //for(int k=0;k<3;k++)
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
@@ -1782,20 +1766,16 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				}
 				else 
 				{
-          //for(int k=0;k<3;k++)
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
-					//m_DicomReader->GetSliceLocation(slice_pos);
 
           ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
-					//imageNumber=m_DicomReader->GetInstanceNumber();
 
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
-					//numberOfImages = m_DicomReader->GetCardiacNumberOfImages();
 
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
-          //trigTime = m_DicomReader->GetTriggerTime();
+
 					((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData,imageNumber,numberOfImages,trigTime));
 				}
 			}
