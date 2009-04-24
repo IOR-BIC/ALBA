@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-04-23 13:54:40 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-04-24 07:50:17 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -61,7 +61,6 @@ class mafTagArray;
 class mafVMEImage;
 class mafVMEVolumeGray;
 class mafGUICheckListBox;
-class vtkDicomUnPacker;
 class vtkDirectory;
 class vtkWindowLevelLookupTable;
 class vtkPlaneSource;
@@ -185,7 +184,6 @@ protected:
   void ResampleVolume();
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
-	vtkDicomUnPacker	*m_DicomReader;
   DcmFileFormat      m_DicomImg;
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;

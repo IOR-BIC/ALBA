@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-23 14:58:17 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-04-24 07:50:17 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -183,7 +183,7 @@ mafOp(label)
 	m_CropGuiLeft = NULL;
 	m_LoadGuiLeft = NULL;
 
-	m_DicomReader = NULL;
+  m_DicomImg = NULL;
 	m_DirectoryReader = NULL;
 	m_SliceLookupTable = NULL;
 	m_SlicePlane = NULL;
@@ -242,7 +242,6 @@ medOpImporterDicomOffis::~medOpImporterDicomOffis()
 
 	cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
-	vtkDEL(m_DicomReader);
 
 	mafDEL(m_Volume);
 	mafDEL(m_Image);
@@ -386,7 +385,6 @@ void medOpImporterDicomOffis::Destroy()
 
   vtkDEL(m_SliceTexture);
   vtkDEL(m_DirectoryReader);
-  vtkDEL(m_DicomReader);
   vtkDEL(m_SliceLookupTable);
   vtkDEL(m_SlicePlane);
   vtkDEL(m_SliceMapper);
@@ -1040,10 +1038,10 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 				const char* p_name;
 				double p_id = 0;
 
-				bool position = m_TagArray->IsTagPresent("PatientName");
+				bool position = m_TagArray->IsTagPresent("PatientsName");
 				if (position)
 				{
-					patient_name = m_TagArray->GetTag("PatientName");
+					patient_name = m_TagArray->GetTag("PatientsName");
 					p_name = patient_name->GetValue();
 				}
 				else 
@@ -1497,8 +1495,6 @@ void medOpImporterDicomOffis::CreatePipeline()
 {
 	vtkNEW(m_DirectoryReader);
 
-	vtkNEW(m_DicomReader);
-
 	vtkNEW(m_SliceLookupTable);
 
 	vtkNEW(m_SliceTexture);
@@ -1570,9 +1566,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			str_tmp.Append("\\");
 			str_tmp.Append(m_CurrentSliceName);
 
-      m_DicomReader->SetFileName(str_tmp);
-      m_DicomReader->Modified();
-      m_DicomReader->Update();
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
 //      DcmFileFormat m_DicomImg;
@@ -1674,7 +1667,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         wxString stringMode = mode;
 				if(stringMode.Find("SCOUT") != -1)
 				{
-					//m_DicomReader->Delete();
 					continue;
 				}
 
@@ -1765,7 +1757,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			}
 			progress = i * 100 / m_DirectoryReader->GetNumberOfFiles();
 			mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
-			//m_DicomReader->Delete();
 		}
 	}
 	mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
@@ -1924,7 +1915,6 @@ void medOpImporterDicomOffis::ShowSlice(int slice_num)
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
 
-	// switch from m_DicomReader and v_dicom_probe on m_CropFlag
 	if (m_CropFlag) 
 	{
 		double Origin[3];
@@ -2021,23 +2011,32 @@ void medOpImporterDicomOffis::ImportDicomTags()
   OFCondition status = ds->nextObject(stack, OFTrue);
   while (status.good())
   {
-    dobject = stack.top();
-    if (dobject->verify().good())
-    { 
-      DcmTag tag = dobject->getTag();
-      mafString tagName = tag.getTagName();
+    try
+    {
 
-      delem = dynamic_cast<DcmElement*>(dobject);
-      if (delem != NULL)
-      {
-        delem->getOFStringArray(string);
+      dobject = stack.top();
+      if (dobject->verify().good())
+      { 
+        DcmTag tag = dobject->getTag();
+        mafString tagName = tag.getTagName();
 
-        if (tagName.Compare("PixelData") == 0)
-          m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),""));
-        else
-          m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),string.c_str()));
+        delem = dynamic_cast<DcmElement*>(dobject);
+        if (delem != NULL)
+        {
+          delem->getOFStringArray(string);
+
+          if (tagName.Compare("PixelData") == 0)
+            m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),""));
+          else
+            m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),string.c_str()));
+        }
       }
     }
+    catch (...)
+    {
+      mafLogMessage("Can not read Dicom tag.");
+    }
+
    
     status = ds->nextObject(stack, OFTrue);
   } 
