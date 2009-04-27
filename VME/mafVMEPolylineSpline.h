@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-24 15:14:22 $
-  Version:   $Revision: 1.10.2.2 $
+  Date:      $Date: 2009-04-27 10:38:37 $
+  Version:   $Revision: 1.10.2.3 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,16 +20,15 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class vtkMAFVolumeSlicer;
 class vtkPolyData;
 class mafNode;
 class vtkPoints;
 class mmaMaterial;
 
-/** mafVMEPolylineSpline - a procedural VME computing the slice of its parent VME.
-  mafVMEPolylineSpline is a node implementing a slicer of a VME (currently only VME-Volume).
-  The sliced volume is the parent VME.
-  @sa mafVMEVolume
+/** mafVMEPolylineSpline - a procedural VME computing the spline by a given polyline as link
+  mafVMEPolylineSpline is a node implementing a spline starting from a polyline using vtkCardinalSpline
+  algorithm.
+  @sa mafVMEPolyline
   @todo
   - 
   */
@@ -50,10 +49,10 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);
 
-  /** Copy the contents of another VME-Slicer into this one. */
+  /** Copy the contents of another VME-Spline into this one. */
   virtual int DeepCopy(mafNode *a);
 
-  /** Compare with another VME-Slicer. */
+  /** Compare with another VME-Spline. */
   virtual bool Equals(mafVME *vme);
 
   /** return the right type of output */  
@@ -71,7 +70,7 @@ public:
     obtained merging timestamps for matrices and VME items*/
   virtual void GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes);
 
-  /** return always false since (currently) the slicer is not an animated VME (position 
+  /** return always false since (currently) the spline is not an animated VME (position 
       is the same for all timestamps). */
   virtual bool IsAnimated();
 
@@ -120,6 +119,7 @@ public:
 
   void SetOrderByAxisFlag(int axis){m_OrderByAxisMode = axis;};
  
+  // obsolete function
   //void SetMinimumSpacingOptimization(double spacing){m_MinimumSpacing = spacing;}
 
 protected:
@@ -140,7 +140,7 @@ protected:
 	/** Internally used to create a new instance of the GUI.*/
   virtual mafGUI *CreateGui();
 
-  mafTransform*     m_Transform; ///< pose matrix for the slicer plane
+  mafTransform*     m_Transform; ///< pose matrix for the spline 
 
   vtkPolyData				*m_Polyline;
 	vtkPoints					*m_PointsSplined;
