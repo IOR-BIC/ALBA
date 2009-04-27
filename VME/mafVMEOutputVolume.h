@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-04-27 10:38:06 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -51,6 +51,9 @@ public:
 
   /** Update all the output data structures (data, bounds, matrix and abs matrix).*/
   virtual void Update();
+
+  /** Retrieve as string the dataset type*/
+  const char* GetVTKDataTypeAsString(){return m_VtkDataType.GetCStr();}
 
 protected:
   mafString m_VtkDataType;
