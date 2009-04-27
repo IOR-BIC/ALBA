@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEPolylineSpline.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-24 15:14:22 $
-  Version:   $Revision: 1.11.2.1 $
+  Date:      $Date: 2009-04-27 10:39:03 $
+  Version:   $Revision: 1.11.2.2 $
   Authors:   Daniele Giunchi & Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -203,16 +203,7 @@ void mafVMEPolylineSpline::InternalUpdate() //Multi
 void mafVMEPolylineSpline::InternalPreUpdate()
 //-----------------------------------------------------------------------
 {
-  /*mafVME *vol = mafVMEVolume::SafeDownCast(GetParent());
-  if(vol)
-  {
-    vol->Update();
-    if (vtkDataSet *vtkdata=vol->GetOutput()->GetVTKData())
-    {
-      m_PSlicer->Update();
-      m_ISlicer->Update();
-    }
-  }*/
+  
 }
 //-----------------------------------------------------------------------
 int mafVMEPolylineSpline::InternalStore(mafStorageElement *parent)
@@ -260,8 +251,8 @@ void mafVMEPolylineSpline::Print(std::ostream& os, const int tabs)
 char** mafVMEPolylineSpline::GetIcon() 
 //-------------------------------------------------------------------------
 {
-  #include "mafVMESurface.xpm"
-  return mafVMESurface_xpm;
+  #include "mafVMEProcedural.xpm"
+  return mafVMEProcedural_xpm;
 }
 //-------------------------------------------------------------------------
 void mafVMEPolylineSpline::SetPolylineLink(mafNode *n)
