@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-04-24 07:50:17 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-04-28 12:07:30 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -47,6 +47,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafOp.h"
 #include "vtkImageData.h"
 #include "dcmtk/dcmdata/dctk.h"
+#include <map>
 
 
 //----------------------------------------------------------------------------
@@ -67,6 +68,7 @@ class vtkPlaneSource;
 class vtkPolyDataMapper;
 class vtkTexture;
 class vtkActor;
+
 
 
 WX_DECLARE_LIST(medImporterDICOMListElement, medListDicomFiles);
@@ -104,6 +106,12 @@ public:
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
 
+  /** Set the directory name which contains DICOM slices to import */
+  void SetDirName(const char *dirName){m_DicomDirectory = dirName;};
+
+  /** Return the directory name which contains DICOM slices to import. */
+  const char *GetDirName() const {return m_DicomDirectory.GetCStr();};
+
 	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Assign the dicom directory*/
@@ -115,10 +123,27 @@ public:
   /** Retrieve resample flag*/
   int GetResampleFlag(){return m_ResampleFlag;};
 
-protected:
+  /** Read Dicom file */
+  void ReadDicom();
 
-	/** Create the pipeline to read the images. */
+  /** Create the slice slice_num. */
+  void CreateSlice(int slice_num);
+
+  /** Return vtkImageData of the selected slice */
+  vtkImageData* GetSliceImageData(int slice_num);
+
+  /** Build the volume starting from the list of dicom files. */
+  int BuildVolume();
+
+  /** Build the volume starting from the list of CineMRI files. */
+  int BuildVolumeCineMRI();
+  
+  /** Create the pipeline to read the images. */
 	virtual void CreatePipeline();
+
+  bool OpenDir();
+
+protected:
 
 	/** Create load page and his GUI for the wizard */
 	void CreateLoadPage();
@@ -142,16 +167,13 @@ protected:
 	int GetImageId(int heightId, int timeId);
 
 	/** Show the slice slice_num. */
-	void ShowSlice(int slice_num);
+	void ShowSlice();
+
+  /** Fill listbox. */
+  void FillListBox(mafString StudyUID);
 
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
-
-	/** Build the volume starting from the list of dicom files. */
-	int BuildVolume();
-
-	/** Build the volume starting from the list of CineMRI files. */
-	int BuildVolumeCineMRI();
 
 	/** Perform update of guis of 3 pages of the wizard */
 	void GuiUpdate();
@@ -163,8 +185,6 @@ protected:
 	void CameraUpdate();
 
 	void CameraReset();
-
-  bool OpenDir();
 
 	void OnWizardPageChanging(){};
 
@@ -210,7 +230,7 @@ protected:
   mafGUI	*m_BuildGuiCenter;
 
 	int				m_DicomModality; ///<Modality to set witch type of DICOM to read
-	mafString	m_DictionaryFilename;
+	//mafString	m_DictionaryFilename;
 	mafString	m_DicomDirectory;
 	mafString m_PatientName;
 	mafString m_SurgeonName;
@@ -222,6 +242,7 @@ protected:
 
 	medListDicomFiles	*m_FilesList;
 	medListDicomFiles	*m_ListSelected;
+  std::map<mafString,medListDicomFiles*> m_DicomMap;
 
 	mafString	m_CurrentSliceName;
 	mafString	m_VolumeName;
