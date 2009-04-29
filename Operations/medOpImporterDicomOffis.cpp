@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-28 12:07:30 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-04-29 08:27:05 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -260,8 +260,6 @@ medOpImporterDicomOffis::~medOpImporterDicomOffis()
 	m_Volume = NULL;
 	m_Image = NULL;
   mafDEL(m_Output);
-  
-  m_DicomImg.clear();
 }
 //----------------------------------------------------------------------------
 mafOp *medOpImporterDicomOffis::Copy()
@@ -1649,6 +1647,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 	double trigTime = -1.0;
   bool enableToRead = true; //true for test mode
 	m_DicomTypeRead = -1;
+  DcmFileFormat dicomImg;    
   
 
 	if (m_DirectoryReader->Open(dir) == 0)
@@ -1673,21 +1672,24 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 		else
 		{
       sliceNum++;
+      m_FileName = "";
 			m_CurrentSliceName = m_DirectoryReader->GetFile(i);
 			// Append of the path at the dicom file
-			wxString str_tmp, ct_mode;
-			str_tmp.Append(dir);
-			str_tmp.Append("\\");
-			str_tmp.Append(m_CurrentSliceName);
+			wxString ct_mode;
+			m_FileName.Append(dir);
+			m_FileName.Append("\\");
+			m_FileName.Append(m_CurrentSliceName);
 
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
-//      DcmFileFormat m_DicomImg;
-      OFCondition status = m_DicomImg.loadFile(str_tmp);//load data into offis structure
+      OFCondition status = dicomImg.loadFile(m_FileName);//load data into offis structure
 
       if (!status.good())
-        return false;
-      DcmDataset *ds = m_DicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
+      {
+        wxMessageBox(wxString::Format("File <%s> can not be opened",m_FileName),"Warning!!");
+        continue;
+      }
+      DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
  
       // decompress data set if compressed
       ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
@@ -1810,7 +1812,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
 
-					m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData));
+					m_FilesList->Append(new medImporterDICOMListElement(m_FileName,slice_pos,imageData));
 					m_NumberOfStudy++;
 				}
 				else 
@@ -1819,8 +1821,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
-					//((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData));
-          m_DicomMap[studyUID]->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData));
+					//((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(m_FileName,slice_pos,imageData));
+          m_DicomMap[studyUID]->Append(new medImporterDICOMListElement(m_FileName,slice_pos,imageData));
 				}
 			}
 			else if ( enableToRead && strcmp( (char *)mode, "MR" ) == 0)
@@ -1870,7 +1872,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 						}
 					}
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
-					m_FilesList->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData,imageNumber, numberOfImages, trigTime));
+					m_FilesList->Append(new medImporterDICOMListElement(m_FileName,slice_pos,imageData,imageNumber, numberOfImages, trigTime));
 					m_NumberOfStudy++;
 				}
 				else 
@@ -1885,8 +1887,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
 
-					//((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData,imageNumber,numberOfImages,trigTime));
-           m_DicomMap[studyUID]->Append(new medImporterDICOMListElement(str_tmp,slice_pos,imageData,imageNumber,numberOfImages,trigTime));
+					//((medListDicomFiles *)m_StudyListbox->GetClientData(row))->Append(new medImporterDICOMListElement(m_FileName,slice_pos,imageData,imageNumber,numberOfImages,trigTime));
+           m_DicomMap[studyUID]->Append(new medImporterDICOMListElement(m_FileName,slice_pos,imageData,imageNumber,numberOfImages,trigTime));
 				}
 			}
       if (!this->m_TestMode)
@@ -1896,6 +1898,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       }
 		}
 	}
+  dicomImg.clear();
   if (!this->m_TestMode)
   {
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
@@ -2170,13 +2173,27 @@ void medOpImporterDicomOffis::ImportDicomTags()
 
   m_TagArray->SetName("TagArray");
 
-  DcmDataset *ds = m_DicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
+  DcmFileFormat dicomImg;  
+  DJDecoderRegistration::registerCodecs(); // register JPEG codecs
+  OFCondition status = dicomImg.loadFile(m_FileName);//load data into offis structure
 
+  if (!status.good()) 
+  {
+    wxMessageBox(wxString::Format("File <%s> can not be opened",m_FileName),"Warning!!");
+    return;
+  }
+  DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
+
+  // decompress data set if compressed
+  ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+  DJDecoderRegistration::cleanup(); // deregister JPEG codecs
+
+  
   OFString string;
   DcmStack stack;
   DcmObject *dobject = NULL;
   DcmElement *delem = NULL;
-  OFCondition status = ds->nextObject(stack, OFTrue);
+  status = ds->nextObject(stack, OFTrue);
   while (status.good())
   {
     try
@@ -2208,6 +2225,7 @@ void medOpImporterDicomOffis::ImportDicomTags()
    
     status = ds->nextObject(stack, OFTrue);
   } 
+  dicomImg.clear();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::ResampleVolume()
