@@ -2,22 +2,22 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2008-07-23 12:51:04 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2009-04-30 15:08:27 $
+Version:   $Revision: 1.9.2.1 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
-=========================================================================*/
+=========================================================================
+Modified by Josef Kohout to strip off MAF stuff from it making it possible
+to use in VTK filters (=> wxString was replaced by char*)*/
 #ifndef __mafPolylineGraph_h
 #define __mafPolylineGraph_h
 
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "vtkSystemIncludes.h"
 #include "vtkPolydata.h"
-#include "wx/wx.h"
 #include <ostream>
 #include <vector>
 
@@ -25,13 +25,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-
-
-//----------------------------------------------------------------------------
-/** consts for undefined index values */
-const vtkIdType UndefinedId = VTK_LARGE_ID ;
-const int UndefinedInt = -1 ;
-const wxString UndefinedName = "****" ;
 
 
 
@@ -72,7 +65,14 @@ Adding and deleting items from branches has no effect on the graph connectivity.
 */
 
 //----------------------------------------------------------------------------
-class mafPolylineGraph{
+class mafPolylineGraph
+{
+public:  
+  /** consts for undefined index values */
+  const static vtkIdType UndefinedId;
+  const static int UndefinedInt;
+  const static char* UndefinedName;
+
 public:
   //-----------------------------------------------------------------------------
   // public methods
@@ -89,10 +89,10 @@ public:
   void GetVertexCoords(vtkIdType v, double *coords) const ;      ///< get coords of vertex
   void SetVertexCoords(vtkIdType v, const double *coords) ;      ///< set coords of vertex
 
-  void GetBranchName(vtkIdType b, wxString *name) const ; ///< get name of branch
-  void SetBranchName(vtkIdType b, const wxString *name) ; ///< set name of branch
-  void UnsetBranchName(vtkIdType b) ;                     ///< unset name of branch to undefined
-  vtkIdType FindBranchName(const wxString *name) const ;  ///< find branch with name
+  const char* GetBranchName(vtkIdType b) const ;      ///< get name of branch
+  void SetBranchName(vtkIdType b, const char* name) ; ///< set name of branch
+  void UnsetBranchName(vtkIdType b) ;                 ///< unset name of branch to undefined
+  vtkIdType FindBranchName(const char* name) const ;  ///< find branch with name
 
   double GetBranchLength(vtkIdType b) const;              ///< return the length of the branch
   double GetBranchIntervalLength(vtkIdType b, vtkIdType startVertexId, vtkIdType endVertexId) const;
@@ -113,8 +113,8 @@ public:
   bool AddNewVertex(vtkIdType v0, double *coords = NULL) ;  ///< add new vertex, connecting to existing vertex
 
   /** Add new branch to graph */
-  void AddNewBranch(const wxString *name = NULL) ;               ///< add new empty branch with optional name
-  bool AddNewBranch(vtkIdType v0, const wxString *name = NULL) ; ///< add new branch with start vertex and optional name
+  void AddNewBranch(const char* name = NULL) ;               ///< add new empty branch with optional name
+  bool AddNewBranch(vtkIdType v0, const char* name = NULL) ; ///< add new branch with start vertex and optional name
 
   /** Read graph from vtkPolyData (polyline only).
   Each polydata point becomes a graph vertex.
@@ -215,7 +215,15 @@ public:
   bool SelfCheck() const ;                                  ///< check internal consistency
   void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
 
+protected:
+  ///** Logs messages. Formatted */
+  //void LogMessageF(const char* format, ...);
 
+  ///** Logs message.  */
+  //virtual void LogMessage(const char* szMessage) {
+  //  //default implementation is to do nothing
+  //}
+public:
   //----------------------------------------------------------------------------
   /** Nested Vertex class 
   This is a list of the edges and vertices which are joined to this vertex.
@@ -302,14 +310,16 @@ public:
   //----------------------------------------------------------------------------
   class Branch{
   public:
-    Branch(const wxString *name = NULL) ;                                 ///< constructor: empty branch with optional name
-    explicit Branch(vtkIdType startvertex, const wxString *name = NULL) ; ///< constructor: branch with initial vertex and optional name
+    Branch(const char* name = NULL) ;                                     ///< constructor: empty branch with optional name
+    explicit Branch(vtkIdType startvertex, const char* name = NULL) ; ///< constructor: branch with initial vertex and optional name
+    Branch(const Branch& src);
+    
     ~Branch() ;                                                           ///< destructor
     int GetNumberOfVertices() const ;                   ///< get number of vertices
     int GetNumberOfEdges() const ;                      ///< get number of edges (should be vertices - 1)
-    void GetName(wxString *name) const ;                ///< get name of branch
-    const wxString* GetName() const ;                   ///< get name of branch
-    void SetName(const wxString *name) ;                ///< set name of branch
+    void GetName(char* name) const ;                    ///< get name of branch
+    const char* GetName() const ;                       ///< get name of branch
+    void SetName(const char *name) ;                   ///< set name of branch
     void UnsetName() ;                                  ///< unset name of branch to undefined
     vtkIdType GetEdgeId(int i) const ;                  ///< get index of ith edge
     void SetEdgeId(int i, vtkIdType e) ;                ///< set ith edge
@@ -332,7 +342,7 @@ public:
     bool SelfCheck() const ;                                  ///< check self consistency (empty branches are allowed)
     void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
   private:
-    wxString m_Name ;                                   ///< name of branch
+    char* m_Name ;                                        ///< name of branch
     std::vector<vtkIdType> m_VertexId ;                   ///< list by vertices
     std::vector<vtkIdType> m_EdgeId ;                     ///< list by edges
 

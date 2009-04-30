@@ -2,25 +2,25 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-19 17:00:58 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2009-04-30 15:08:27 $
+Version:   $Revision: 1.10.2.1 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
 CINECA - Interuniversity Consortium (www.cineca.it)
-=========================================================================*/
+=========================================================================
+Modified by Josef Kohout to strip off MAF stuff from it making it possible
+to use in VTK filters, etc. (=> wxString was replaced by char*) and
+hack for mafLogMessage was used.
+*/
 
 
-#include "mafDefines.h" 
-//----------------------------------------------------------------------------
-// NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
-// This force to include Window,wxWidgets and VTK exactly in this order.
-// Failing in doing this will result in a run-time error saying:
-// "Failure#0: The value of ESP was not properly saved across a function call"
-//----------------------------------------------------------------------------
+//IMPORTANT NOTE: This class is supposed to be pure C++ class
+//do not include not use wxWidgets or MAF stuff, its use
+//would lead into application crash!
+//#include "mafDefines.h"
 
 #include "mafPolylineGraph.h"
-#include "vtkSystemIncludes.h"
 #include "vtkPolydata.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
@@ -28,11 +28,25 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkIdType.h"
 #include "vtkIdList.h"
 #include "vtkMath.h"
-#include "mafIndent.h"
-#include "wx/wx.h"
+#include "vtkIndent.h"
 #include <ostream>
 #include <vector>
 
+#ifndef _NO_MAF //MAF platform is used  
+/** write a message in the log area */
+extern void mafLogMessage(const char *format, ...);
+#define LogMessage mafLogMessage
+#else
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+#define LogMessage  __noop
+#else
+#define LogMessage  (void)0
+#endif
+#endif
+
+const /*static*/ vtkIdType mafPolylineGraph::UndefinedId = VTK_LARGE_ID ;
+const /*static*/ int mafPolylineGraph::UndefinedInt = -1 ;
+const /*static*/ char* mafPolylineGraph::UndefinedName = "****" ;
 
 //-------------------------------------------------------------------------
 // CONTENTS
@@ -262,7 +276,7 @@ bool mafPolylineGraph::Vertex::DeleteEdgeId(vtkIdType e)
   // find the position of the edge on the vertex
   int j = FindEdgeId(e) ;
   if (j == UndefinedInt){
-    mafLogMessage("Vertex::DeleteEdgeId() can't find edge index %d", e) ;
+    LogMessage("Vertex::DeleteEdgeId() can't find edge index %d", e) ;
     return false ;
   }
 
@@ -329,7 +343,7 @@ bool mafPolylineGraph::Vertex::DeleteVertexId(vtkIdType v)
   // find the position of the edge on the vertex
   int j = FindVertexId(v) ;
   if (j == UndefinedInt){
-    mafLogMessage("Vertex::DeleteVertexId() can't find vertex index %d", v) ;
+    LogMessage("Vertex::DeleteVertexId() can't find vertex index %d", v) ;
     return false ;
   }
 
@@ -397,7 +411,7 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
 {
   // arrays should be of the same length
   if (m_EdgeId.size() != m_VertexId.size()){
-    mafLogMessage("mismatched list sizes in vertex %d %d", m_EdgeId.size(), m_VertexId.size()) ;
+    LogMessage("mismatched list sizes in vertex %d %d", m_EdgeId.size(), m_VertexId.size()) ;
     return false ;
   }
 
@@ -405,7 +419,7 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
   for (int i = 0 ;  i < GetDegree()-1 ;  i++){
     for (int j = i+1 ;  j < GetDegree() ;  j++){
       if (GetEdgeId(i) == GetEdgeId(j)){
-        mafLogMessage("repeated edge %d at %d and %d on vertex", GetEdgeId(i), i, j) ;
+        LogMessage("repeated edge %d at %d and %d on vertex", GetEdgeId(i), i, j) ;
         return false ;
       }
     }
@@ -415,7 +429,7 @@ bool mafPolylineGraph::Vertex::SelfCheck() const
   for (int i = 0 ;  i < GetDegree()-1 ;  i++){
     for (int j = i+1 ;  j < GetDegree() ;  j++){
       if (GetVertexId(i) == GetVertexId(j)){
-        mafLogMessage("repeated vertex %d at %d and %d on vertex", GetVertexId(i), i, j) ;
+        LogMessage("repeated vertex %d at %d and %d on vertex", GetVertexId(i), i, j) ;
         return false ;
       }
     }
@@ -432,8 +446,8 @@ void mafPolylineGraph::Vertex::PrintSelf(std::ostream& os, const int tabs) const
 {
   int i ;
 
-  mafIndent indent(tabs);
-
+  vtkIndent indent(tabs);
+  
   os << indent << "edges " ;
   for (i = 0 ;  i < GetDegree() ;  i++){
     os << GetEdgeId(i) << " " ;
@@ -674,7 +688,7 @@ bool mafPolylineGraph::Edge::SelfCheck() const
 {
   // edge must not be empty
   if ((m_VertexId[0] == UndefinedId) || (m_VertexId[1] == UndefinedId)){
-    mafLogMessage("undefined vertex or vertices %d %d on edge", m_VertexId[0], m_VertexId[1]) ;
+    LogMessage("undefined vertex or vertices %d %d on edge", m_VertexId[0], m_VertexId[1]) ;
     return false ;
   }
 
@@ -686,8 +700,8 @@ bool mafPolylineGraph::Edge::SelfCheck() const
 // Print edge
 void mafPolylineGraph::Edge::PrintSelf(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
-{
-  mafIndent indent(tabs);
+{  
+  vtkIndent indent(tabs);
 
   os << indent << "vertices= " << GetVertexId(0) << " " << GetVertexId(1) ;
 
@@ -705,31 +719,58 @@ void mafPolylineGraph::Edge::PrintSelf(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 // Branch Constructor
 // Empty branch with optional name
-mafPolylineGraph::Branch::Branch(const wxString *name) : m_OutputPolydataCell(UndefinedId)
+mafPolylineGraph::Branch::Branch(const char *name) : m_OutputPolydataCell(UndefinedId)
 //-------------------------------------------------------------------------
 {
-  if (name != NULL)
-    m_Name = *name ;
-  else
-    m_Name = UndefinedName ;
+  if (name == NULL)
+    name = UndefinedName;
+    
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  m_Name = _strdup(name);
+#else
+  int nLen = (int)strlen(name);
+  m_Name = new char[nLen + 1];
+  strcpy(m_Name, name);
+#endif  
 }
 
 
 //-------------------------------------------------------------------------
 // Branch Constructor with initial vertex and optional name
-mafPolylineGraph::Branch::Branch(vtkIdType v, const wxString *name) : m_OutputPolydataCell(UndefinedId)
+mafPolylineGraph::Branch::Branch(vtkIdType v, const char *name) : m_OutputPolydataCell(UndefinedId)
 //-------------------------------------------------------------------------
 {
   // insert first vertex id
   m_VertexId.push_back(v) ;
+  
+  if (name == NULL)
+    name = UndefinedName;
 
-  if (name != NULL)
-    m_Name = *name ;
-  else
-    m_Name = UndefinedName ;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  m_Name = _strdup(name);
+#else
+  int nLen = (int)strlen(name);
+  m_Name = new char[nLen + 1];
+  strcpy(m_Name, name);
+#endif  
 }
 
+//------------------------------------------------------------------------
+mafPolylineGraph::Branch::Branch(const Branch& src)
+//------------------------------------------------------------------------
+{
+  m_OutputPolydataCell = src.m_OutputPolydataCell;
+  m_VertexId = src.m_VertexId;
+  m_EdgeId = src.m_EdgeId;
 
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  m_Name = _strdup(src.m_Name);
+#else
+  int nLen = (int)strlen(src.m_Name);
+  m_Name = new char[nLen + 1];
+  strcpy(m_Name, src.m_Name);
+#endif 
+}
 
 //-------------------------------------------------------------------------
 // Branch Destructor
@@ -738,6 +779,13 @@ mafPolylineGraph::Branch::~Branch()
 {
   m_EdgeId.clear() ;
   m_VertexId.clear() ;
+
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  free(m_Name);
+#else
+  delete[] m_Name;
+#endif
+  m_Name = NULL;
 }
 
 
@@ -746,7 +794,7 @@ mafPolylineGraph::Branch::~Branch()
 int mafPolylineGraph::Branch::GetNumberOfVertices() const
 //-------------------------------------------------------------------------
 {
-  return m_VertexId.size() ;
+  return (int)m_VertexId.size() ;
 }
 
 //-------------------------------------------------------------------------
@@ -754,38 +802,46 @@ int mafPolylineGraph::Branch::GetNumberOfVertices() const
 int mafPolylineGraph::Branch::GetNumberOfEdges() const
 //-------------------------------------------------------------------------
 {
-  return m_EdgeId.size() ;
+  return (int)m_EdgeId.size() ;
 }
 
 
 //-------------------------------------------------------------------------
 // Get name
-void mafPolylineGraph::Branch::GetName(wxString *name) const
+const char* mafPolylineGraph::Branch::GetName() const
 //-------------------------------------------------------------------------
 {
-  *name = m_Name ;
+  return m_Name ;
 }
-
-//-------------------------------------------------------------------------
-// Get name
-const wxString* mafPolylineGraph::Branch::GetName() const
-//-------------------------------------------------------------------------
-{
-  return &m_Name ;
-}
-
 
 //-------------------------------------------------------------------------
 // Set or reset name
-void mafPolylineGraph::Branch::SetName(const wxString *name)
+void mafPolylineGraph::Branch::SetName(const char *name)
 //-------------------------------------------------------------------------
 {
-  if (name == NULL){
-    mafLogMessage("SetName() called with NULL argument") ;
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+  free(m_Name);
+#else
+  delete[] m_Name;
+#endif
+  
+  if (name == NULL)
+  {
+    LogMessage("SetName() called with NULL argument") ;  
     assert(false) ;
-  }
 
-  m_Name = *name ;
+    m_Name = NULL;
+  }
+  else
+  {
+#if defined(_MSC_VER) && _MSC_VER >= 1400
+    m_Name = _strdup(name);
+#else
+    int nLen = (int)strlen(name);
+    m_Name = new char[nLen + 1];
+    strcpy(m_Name, name);
+#endif 
+  }
 }
 
 //-------------------------------------------------------------------------
@@ -793,7 +849,7 @@ void mafPolylineGraph::Branch::SetName(const wxString *name)
 void mafPolylineGraph::Branch::UnsetName()
 //-------------------------------------------------------------------------
 {
-  m_Name = UndefinedName ;
+  SetName(UndefinedName);
 }
 
 
@@ -951,13 +1007,13 @@ void mafPolylineGraph::Branch::ReverseDirection()
   vtkIdType tempId ;
   int i, j ;
 
-  for (i = 0, j = m_EdgeId.size()-1 ;  i < j ;  i++, j--){
+  for (i = 0, j = (int)m_EdgeId.size()-1 ;  i < j ;  i++, j--){
     tempId = m_EdgeId.at(i) ;
     m_EdgeId.at(i) = m_EdgeId.at(j) ;
     m_EdgeId.at(j) = tempId ;
   }
 
-  for (i = 0, j = m_VertexId.size()-1 ;  i < j ;  i++, j--){
+  for (i = 0, j = (int)m_VertexId.size()-1 ;  i < j ;  i++, j--){
     tempId = m_VertexId.at(i) ;
     m_VertexId.at(i) = m_VertexId.at(j) ;
     m_VertexId.at(j) = tempId ;
@@ -1005,13 +1061,13 @@ bool mafPolylineGraph::Branch::SelfCheck() const
   // n.b this assumes that an empty branch is ok.
   if (GetNumberOfVertices() == 0){
     if (GetNumberOfEdges() != 0){
-      mafLogMessage("empty branch contains %d edges", GetNumberOfEdges()) ;
+      LogMessage("empty branch contains %d edges", GetNumberOfEdges()) ;
       return false ;
     }
   }
   else{
     if (GetNumberOfEdges() != GetNumberOfVertices()-1){
-      mafLogMessage("mismatched list lengths in branch: %d vertices %d edges", GetNumberOfVertices(), GetNumberOfEdges()) ;
+      LogMessage("mismatched list lengths in branch: %d vertices %d edges", GetNumberOfVertices(), GetNumberOfEdges()) ;
       return false ;
     }
   }
@@ -1020,7 +1076,7 @@ bool mafPolylineGraph::Branch::SelfCheck() const
   for (int i = 0 ;  i < GetNumberOfEdges()-1 ;  i++){
     for (int j = i+1 ;  j < GetNumberOfEdges() ;  j++){
       if (GetEdgeId(i) == GetEdgeId(j)){
-        mafLogMessage("duplicate edge %d found in branch at %d and %d", GetEdgeId(i), i, j) ;
+        LogMessage("duplicate edge %d found in branch at %d and %d", GetEdgeId(i), i, j) ;
         return false ;
       }
     }
@@ -1038,8 +1094,8 @@ void mafPolylineGraph::Branch::PrintSelf(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   int i ;
-
-  mafIndent indent(tabs);
+  
+  vtkIndent indent(tabs);
 
   os << indent << "edges " ;
   for (i = 0 ;  i < GetNumberOfEdges() ;  i++){
@@ -1087,7 +1143,7 @@ mafPolylineGraph::~mafPolylineGraph()
 int mafPolylineGraph::GetNumberOfVertices() const
 //-------------------------------------------------------------------------
 {
-  return m_Vertex.size() ;
+  return (int)m_Vertex.size() ;
 }
 
 //-------------------------------------------------------------------------
@@ -1095,7 +1151,7 @@ int mafPolylineGraph::GetNumberOfVertices() const
 int mafPolylineGraph::GetNumberOfEdges() const
 //-------------------------------------------------------------------------
 {
-  return m_Edge.size() ;
+  return (int)m_Edge.size() ;
 }
 
 //-------------------------------------------------------------------------
@@ -1103,7 +1159,7 @@ int mafPolylineGraph::GetNumberOfEdges() const
 int mafPolylineGraph::GetNumberOfBranches() const
 //-------------------------------------------------------------------------
 {
-  return m_Branch.size() ;
+  return (int)m_Branch.size() ;
 }
 
 
@@ -1157,15 +1213,15 @@ void mafPolylineGraph::SetVertexCoords(vtkIdType v, const double *coords)
 
 //-------------------------------------------------------------------------
 // get name of branch
-void mafPolylineGraph::GetBranchName(vtkIdType b, wxString *name) const
+const char* mafPolylineGraph::GetBranchName(vtkIdType b) const
 //-------------------------------------------------------------------------
 {
-  GetConstBranchPtr(b)->GetName(name) ;
+  return GetConstBranchPtr(b)->GetName() ;
 }
 
 //-------------------------------------------------------------------------
 // set name of branch
-void mafPolylineGraph::SetBranchName(vtkIdType b, const wxString *name)
+void mafPolylineGraph::SetBranchName(vtkIdType b, const char* name)
 //-------------------------------------------------------------------------
 {
   GetBranchPtr(b)->SetName(name) ;
@@ -1183,14 +1239,13 @@ void mafPolylineGraph::UnsetBranchName(vtkIdType b)
 //-------------------------------------------------------------------------
 // find id of branch with name
 // return undefinedId if not found
-vtkIdType mafPolylineGraph::FindBranchName(const wxString *name) const
+vtkIdType mafPolylineGraph::FindBranchName(const char *name) const
 //-------------------------------------------------------------------------
-{
-  wxString namei ;
-
-  for (int i = 0 ;  i < GetNumberOfBranches() ;  i++){
-    GetConstBranchPtr(i)->GetName(&namei) ;
-    if (namei == *name)
+{  
+  for (int i = 0 ;  i < GetNumberOfBranches();  i++)
+  {
+    const char* namei = GetConstBranchPtr(i)->GetName() ;
+    if (strcmp(namei, name) == 0)
       return i ;
   }
 
@@ -1358,7 +1413,7 @@ bool mafPolylineGraph::CopyFromPolydata(vtkPolyData *polydata)
   int ncells = polydata->GetNumberOfCells() ;
   int nlines = polydata->GetNumberOfLines() ;
   if (nlines != ncells){
-    mafLogMessage("Input data is not polyline") ;
+    LogMessage("Input data is not polyline") ;
     return false ;
   }
 
@@ -1517,8 +1572,8 @@ void mafPolylineGraph::GetOutputCellCorrespondingToEdge(vtkIdType edgeid, vtkIdT
 
   // undefined values - fatal error
   if ((*cellid == UndefinedId) || (*index == UndefinedId)){
-    mafLogMessage("GetOutputCellCorrespondingToEdge() can't find output cell corresponding to edge %d", edgeid) ;
-    mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
+    LogMessage("GetOutputCellCorrespondingToEdge() can't find output cell corresponding to edge %d", edgeid) ;
+    LogMessage("Perhaps CopyToPolydata() has not been called ?") ;
     assert(false) ;
   }
 }
@@ -1539,8 +1594,8 @@ vtkIdType mafPolylineGraph::GetEdgeCorrespondingToOutputCell(vtkIdType cellid, v
   }
 
   // output cell and index not found in edge mapping - fatal error
-  mafLogMessage("GetEdgeCorrespondingToOutputCell() can't find output cell corresponding to edge %d", edgeid) ;
-  mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
+  LogMessage("GetEdgeCorrespondingToOutputCell() can't find output cell corresponding to edge %d", edgeid) ;
+  LogMessage("Perhaps CopyToPolydata() has not been called ?") ;
   assert(false) ;
   return -1 ;
 }
@@ -1556,8 +1611,8 @@ void mafPolylineGraph::GetOutputCellCorrespondingToBranch(vtkIdType branchid, vt
 
   // undefined values - fatal error
   if (*cellid == UndefinedId){
-    mafLogMessage("GetOutputCellCorrespondingToBranch() can't find output cell corresponding to branch %d", branchid) ;
-    mafLogMessage("Perhaps CopyToPolydata() has not been called ?") ;
+    LogMessage("GetOutputCellCorrespondingToBranch() can't find output cell corresponding to branch %d", branchid) ;
+    LogMessage("Perhaps CopyToPolydata() has not been called ?") ;
     assert(false) ;
   }
 }
@@ -1605,7 +1660,7 @@ bool mafPolylineGraph::SelfCheck() const
   // self-check the vertices
   for (v = 0 ;  v < GetNumberOfVertices() ;  v++){
     if (!GetConstVertexPtr(v)->SelfCheck()){
-      mafLogMessage("graph self-check error: vertex %d failed self check", v) ;
+      LogMessage("graph self-check error: vertex %d failed self check", v) ;
       return false ;
     }
   }
@@ -1613,7 +1668,7 @@ bool mafPolylineGraph::SelfCheck() const
   // self-check the edges
   for (e = 0 ;  e < GetNumberOfEdges() ;  e++){
     if (!GetConstEdgePtr(e)->SelfCheck()){
-      mafLogMessage("graph self-check error: edge %d failed self check", e) ;
+      LogMessage("graph self-check error: edge %d failed self check", e) ;
       return false ;
     }
   }
@@ -1621,7 +1676,7 @@ bool mafPolylineGraph::SelfCheck() const
   // self-check the branches
   for (b = 0 ;  b < GetNumberOfBranches() ;  b++){
     if (!GetConstBranchPtr(b)->SelfCheck()){
-      mafLogMessage("graph self-check error: branch %d failed self check", b) ;
+      LogMessage("graph self-check error: branch %d failed self check", b) ;
       return false ;
     }
   }
@@ -1632,7 +1687,7 @@ bool mafPolylineGraph::SelfCheck() const
   for (v = 0, sumdeg = 0 ;  v < GetNumberOfVertices() ;  v++)
     sumdeg += GetConstVertexPtr(v)->GetDegree() ;
   if (sumdeg != 2*GetNumberOfEdges()){
-    mafLogMessage("graph self check error: sum of degrees %d != 2 * no. of edges %d", sumdeg, GetNumberOfEdges()) ;
+    LogMessage("graph self check error: sum of degrees %d != 2 * no. of edges %d", sumdeg, GetNumberOfEdges()) ;
     return false ;
   }
 
@@ -1645,7 +1700,7 @@ bool mafPolylineGraph::SelfCheck() const
       sum2++ ;
   }
   if (sum1 != sum2){
-    mafLogMessage("graph self check error: no. of edges in branches %d != no. of branches in edges %d", sum1, sum2) ;
+    LogMessage("graph self check error: no. of edges in branches %d != no. of branches in edges %d", sum1, sum2) ;
     return false ;
   }
 
@@ -1660,13 +1715,13 @@ bool mafPolylineGraph::SelfCheck() const
 
       // indices read from vertex must point to valid objects
       if ((GetConstEdgePtr(ke) == NULL) || (GetConstVertexPtr(kv) == NULL)){
-        mafLogMessage("graph self check error: edge index %d or vertex index %d on vertex %d out of range", ke, kv, v) ;
+        LogMessage("graph self check error: edge index %d or vertex index %d on vertex %d out of range", ke, kv, v) ;
         return false ;
       }
 
       // edge ke must be the vertex pair (v, kv)
       if (!GetConstEdgePtr(ke)->IsVertexPair(v, kv)){
-        mafLogMessage("graph self check error: edge %d is not vertex pair %d %d from vertex %d", ke, v, kv, v) ;
+        LogMessage("graph self check error: edge %d is not vertex pair %d %d from vertex %d", ke, v, kv, v) ;
         return false ;
       }
     }
@@ -1683,26 +1738,26 @@ bool mafPolylineGraph::SelfCheck() const
 
       // vertices read from edge must point at valid objects
       if (GetConstVertexPtr(kv) == NULL){
-        mafLogMessage("graph self check error: vertex index %d out of range in edge %d", kv, e) ;
+        LogMessage("graph self check error: vertex index %d out of range in edge %d", kv, e) ;
         return false ;
       }
 
       // vertex kv must contain this edge
       if (GetConstVertexPtr(kv)->FindEdgeId(e) == UndefinedInt){
-        mafLogMessage("graph self check error: vertex %d does not contain edge %d", kv, e) ;
+        LogMessage("graph self check error: vertex %d does not contain edge %d", kv, e) ;
         return false ;
       }
 
       if (kb != UndefinedId){
         // branch index must be valid
         if (GetConstBranchPtr(kb) == NULL){
-          mafLogMessage("graph self check error: branch index %d out of range in edge %d", kb, e) ;
+          LogMessage("graph self check error: branch index %d out of range in edge %d", kb, e) ;
           return false ;
         }
 
         // branch kb must contain this edge
         if (GetConstBranchPtr(kb)->FindEdgeId(e) == UndefinedInt){
-          mafLogMessage("graph self check error: branch %d does not contain edge %d", kb, e) ;
+          LogMessage("graph self check error: branch %d does not contain edge %d", kb, e) ;
           return false ;
         }
       }
@@ -1719,13 +1774,13 @@ bool mafPolylineGraph::SelfCheck() const
 
       // indices read from branch must point to valid objects
       if (GetConstEdgePtr(ke) == NULL){
-        mafLogMessage("graph self check error: edge index %d out of range in branch %d", ke, b) ;
+        LogMessage("graph self check error: edge index %d out of range in branch %d", ke, b) ;
         return false ;
       }
 
       // edge ke must point back at this branch
       if (GetConstEdgePtr(ke)->GetBranchId() != b){
-        mafLogMessage("graph self check error: edge %d does not point back at branch %d", ke, b) ;
+        LogMessage("graph self check error: edge %d does not point back at branch %d", ke, b) ;
         return false ;
       }
     }
@@ -1735,7 +1790,7 @@ bool mafPolylineGraph::SelfCheck() const
 
       // indices read from branch must point to valid objects
       if (GetConstVertexPtr(kv) == NULL){
-        mafLogMessage("graph self check error: vertex index %d out of range in branch %d", kv, b) ;
+        LogMessage("graph self check error: vertex index %d out of range in branch %d", kv, b) ;
         return false ;
       }
     }
@@ -1753,7 +1808,7 @@ bool mafPolylineGraph::SelfCheck() const
 
       // edge ke must join kv0 and kv1
       if (!GetConstEdgePtr(ke)->IsVertexPair(kv0,kv1)){
-        mafLogMessage("graph self check error: edge %d in branch %d does not join vertices %d and %d", ke, b, kv0, kv1) ;
+        LogMessage("graph self check error: edge %d in branch %d does not join vertices %d and %d", ke, b, kv0, kv1) ;
         return false ;
       }
     }
@@ -1770,8 +1825,8 @@ void mafPolylineGraph::PrintSelf(std::ostream& os, const int tabs) const
 //-------------------------------------------------------------------------
 {
   int i ;
-
-  mafIndent indent(tabs);
+  
+  vtkIndent indent(tabs);
 
   os << indent << "Polyline graph" << std::endl ;
   os << indent << "no. of vertices " << GetNumberOfVertices() << std::endl ;
@@ -1843,7 +1898,7 @@ bool mafPolylineGraph::IsConnected() const
     }
 
     // add to total found so far
-    nfound += vertexlist1.size() ;
+    nfound += (unsigned int)vertexlist1.size() ;
 
     // copy new list back to old list
     vertexlist0 = vertexlist1 ;
@@ -1885,7 +1940,7 @@ bool mafPolylineGraph::AddNewEdge(vtkIdType v0, vtkIdType v1)
   Vertex *vert0 = GetVertexPtr(v0) ;
   Vertex *vert1 = GetVertexPtr(v1) ;
   if ((vert0 == NULL) || (vert1 == NULL)){
-    mafLogMessage("AddNewEdge() failed: vertex indices %d %d out of range", v0, v1) ;
+    LogMessage("AddNewEdge() failed: vertex indices %d %d out of range", v0, v1) ;
     return false ;
   }
 
@@ -1928,7 +1983,7 @@ bool mafPolylineGraph::AddNewVertex(vtkIdType v0, double *coords)
   // check that input indices are in range
   Vertex *vert0 = GetVertexPtr(v0) ;
   if (vert0 == NULL){
-    mafLogMessage("AddNewVertex(v0) failed: vertex index %d out of range", v0) ;
+    LogMessage("AddNewVertex(v0) failed: vertex index %d out of range", v0) ;
     return false ;
   }
 
@@ -1949,7 +2004,7 @@ bool mafPolylineGraph::AddNewVertex(vtkIdType v0, double *coords)
 
 //-------------------------------------------------------------------------
 // Add a new empty branch to the graph
-void mafPolylineGraph::AddNewBranch(const wxString *name)
+void mafPolylineGraph::AddNewBranch(const char *name)
 //-------------------------------------------------------------------------
 {
   Branch br(name) ;
@@ -1958,13 +2013,13 @@ void mafPolylineGraph::AddNewBranch(const wxString *name)
 
 //-------------------------------------------------------------------------
 // Add a new empty branch to the graph
-bool mafPolylineGraph::AddNewBranch(vtkIdType v0, const wxString *name)
+bool mafPolylineGraph::AddNewBranch(vtkIdType v0, const char *name)
 //-------------------------------------------------------------------------
 {
   // check that input indices are in range
   Vertex *vert0 = GetVertexPtr(v0) ;
   if (vert0 == NULL){
-    mafLogMessage("AddNewBranch(v0) failed: vertex index %d out of range", v0) ;
+    LogMessage("AddNewBranch(v0) failed: vertex index %d out of range", v0) ;
     return false ;
   }
 
@@ -1974,8 +2029,6 @@ bool mafPolylineGraph::AddNewBranch(vtkIdType v0, const wxString *name)
 
   return true ;
 }
-
-
 
 
 //-------------------------------------------------------------------------
@@ -1996,7 +2049,7 @@ bool mafPolylineGraph::SplitBranchAtEdge(vtkIdType b, vtkIdType e)
   // find the position of the edge
   i = bold->FindEdgeId(e) ;
   if (i == UndefinedInt){
-    mafLogMessage("SplitBranchAtEdge() can't find edge %d in branch %d", e, b) ;
+    LogMessage("SplitBranchAtEdge() can't find edge %d in branch %d", e, b) ;
     return false ;
   }
 
@@ -2031,8 +2084,6 @@ bool mafPolylineGraph::SplitBranchAtEdge(vtkIdType b, vtkIdType e)
     GetEdgePtr(ei)->SetBranchId(GetMaxBranchId()) ;
   }
 
-
-
   return true ;
 }
 
@@ -2056,7 +2107,7 @@ bool mafPolylineGraph::SplitBranchAtVertex(vtkIdType b, vtkIdType v)
   // find the position of the vertex
   i = bold->FindVertexId(v) ;
   if (i == UndefinedInt){
-    mafLogMessage("SplitBranchAtVertex() can't find vertex %d in branch %d", v, b) ;
+    LogMessage("SplitBranchAtVertex() can't find vertex %d in branch %d", v, b) ;
     return false ;
   }
 
@@ -2143,12 +2194,12 @@ bool mafPolylineGraph::AddExistingVertexToBranch(vtkIdType b, vtkIdType v, vtkId
   Branch *Br = GetBranchPtr(b) ;
 
   if (Br == NULL){
-    mafLogMessage("AddExistingVertexToBranch() found branch %d out of range", b) ;
+    LogMessage("AddExistingVertexToBranch() found branch %d out of range", b) ;
     return false ;
   }
 
   if (GetVertexPtr(v) == NULL){
-    mafLogMessage("AddExistingVertexToBranch() found vertex %d out of range", v) ;
+    LogMessage("AddExistingVertexToBranch() found vertex %d out of range", v) ;
     return false ;
   }
 
@@ -2164,7 +2215,7 @@ bool mafPolylineGraph::AddExistingVertexToBranch(vtkIdType b, vtkIdType v, vtkId
       // find the edge which joins vlast to v
       int j = GetVertexPtr(vlast)->FindVertexId(v) ;
       if (j == UndefinedInt){
-        mafLogMessage("AddExistingVertexToBranch() can't find edge joining %d to %d", vlast, v) ;
+        LogMessage("AddExistingVertexToBranch() can't find edge joining %d to %d", vlast, v) ;
         return false ;
       }
       e = GetVertexPtr(vlast)->GetEdgeId(j) ;
@@ -2172,14 +2223,14 @@ bool mafPolylineGraph::AddExistingVertexToBranch(vtkIdType b, vtkIdType v, vtkId
     else{
       // check that the given edge really joins vlast to v
       if (!GetEdgePtr(e)->IsVertexPair(vlast, v)){
-        mafLogMessage("AddExistingVertexToBranch(): edge %d does not join vertices %d and %d", e, vlast, v) ;
+        LogMessage("AddExistingVertexToBranch(): edge %d does not join vertices %d and %d", e, vlast, v) ;
         return false ;
       }
     }
 
     // check that e does not already belong to a branch
     if (GetEdgePtr(e)->GetBranchId() != UndefinedId){
-      mafLogMessage("AddExistingVertexToBranch(): edge %d already belongs to a branch", e) ;
+      LogMessage("AddExistingVertexToBranch(): edge %d already belongs to a branch", e) ;
       return false ;
     }
 
@@ -2205,24 +2256,24 @@ bool mafPolylineGraph::AddExistingEdgeToBranch(vtkIdType b, vtkIdType e)
   Edge *Ed = GetEdgePtr(e) ;
 
   if (Br == NULL){
-    mafLogMessage("AddExistingEdgeToBranch() found branch %d out of range", b) ;
+    LogMessage("AddExistingEdgeToBranch() found branch %d out of range", b) ;
     return false ;
   }
 
   if (Ed == NULL){
-    mafLogMessage("AddExistingEdgeToBranch() found edge %d out of range", e) ;
+    LogMessage("AddExistingEdgeToBranch() found edge %d out of range", e) ;
     return false ;
   }
 
   // check that edge does not already belong to a branch
   if (GetEdgePtr(e)->GetBranchId() != UndefinedId){
-    mafLogMessage("AddExistingEdgeToBranch(): edge %d already belongs to a branch", e) ;
+    LogMessage("AddExistingEdgeToBranch(): edge %d already belongs to a branch", e) ;
     return false ;
   }
 
   if (Br->GetNumberOfVertices() == 0){
     // empty branch - don't know which vertex is the start of the branch
-    mafLogMessage("AddExistingEdgeToBranch(): branch %d is empty, need at least one start vertex", b) ;
+    LogMessage("AddExistingEdgeToBranch(): branch %d is empty, need at least one start vertex", b) ;
     return false ;
   }
 
@@ -2234,7 +2285,7 @@ bool mafPolylineGraph::AddExistingEdgeToBranch(vtkIdType b, vtkIdType e)
   vtkIdType vend = Ed->GetOtherEndVertexId(vlast) ;
 
   if (vend == UndefinedId){
-    mafLogMessage("AddExistingEdgeToBranch() can't join edge %d to branch %d", e, b) ;
+    LogMessage("AddExistingEdgeToBranch() can't join edge %d to branch %d", e, b) ;
     return false ;
   }
 
@@ -2271,7 +2322,7 @@ bool mafPolylineGraph::DeleteEdge(vtkIdType i)
     return false ;
 
   if (!DeleteLastEdge()){
-    mafLogMessage("DeleteEdge() cant delete edge %d", i) ;
+    LogMessage("DeleteEdge() cant delete edge %d", i) ;
     return false ;
   }
 
@@ -2326,7 +2377,7 @@ bool mafPolylineGraph::DeleteVertex(vtkIdType i)
     return false ;
 
   if (!DeleteLastVertex()){
-    mafLogMessage("DeleteVertex() cant delete vertex %d", i) ;
+    LogMessage("DeleteVertex() cant delete vertex %d", i) ;
     return false ;
   }
 
@@ -2348,7 +2399,7 @@ bool mafPolylineGraph::DeleteLastVertex()
 
   Vertex *vert = GetVertexPtr(vlast) ;
   if (vert->GetDegree() != 0){
-    mafLogMessage("DeleteLastVertex() attempt to delete vertex %d of degree %d", vlast, vert->GetDegree()) ;
+    LogMessage("DeleteLastVertex() attempt to delete vertex %d of degree %d", vlast, vert->GetDegree()) ;
     return false ;
   }
 
@@ -2359,7 +2410,7 @@ bool mafPolylineGraph::DeleteLastVertex()
     if (j != UndefinedInt){
       if (br->GetNumberOfVertices() != 1){
         // found a branch with the vertex, but it should be the only only one in the branch
-        mafLogMessage("DeleteLastVertex() found branch %d with %d vertices", b, br->GetNumberOfVertices()) ;
+        LogMessage("DeleteLastVertex() found branch %d with %d vertices", b, br->GetNumberOfVertices()) ;
         return false ;
       }
 
@@ -2388,7 +2439,7 @@ bool mafPolylineGraph::DeleteBranch(vtkIdType i)
     return false ;
 
   if (!DeleteLastBranch()){
-    mafLogMessage("DeleteBranch() cant delete branch %d", i) ;
+    LogMessage("DeleteBranch() cant delete branch %d", i) ;
     return false ;
   }
 
@@ -2433,7 +2484,7 @@ bool mafPolylineGraph::SwapVertexIndices(vtkIdType v0, vtkIdType v1)
   int j ;
 
   if ((GetVertexPtr(v0) == NULL) || (GetVertexPtr(v1) == NULL)){
-    mafLogMessage("invalid input indices %d %d in SwapVertexIndices()", v0, v1) ;
+    LogMessage("invalid input indices %d %d in SwapVertexIndices()", v0, v1) ;
     return false ;
   }
 
@@ -2494,7 +2545,7 @@ bool mafPolylineGraph::SwapEdgeIndices(vtkIdType e0, vtkIdType e1)
   int j ;
 
   if ((GetEdgePtr(e0) == NULL) || (GetEdgePtr(e1) == NULL)){
-    mafLogMessage("invalid input indices %d %d in SwapEdgeIndices()", e0, e1) ;
+    LogMessage("invalid input indices %d %d in SwapEdgeIndices()", e0, e1) ;
     return false ;
   }
 
@@ -2543,7 +2594,7 @@ bool mafPolylineGraph::SwapBranchIndices(vtkIdType b0, vtkIdType b1)
   vtkIdType e ;
 
   if ((GetBranchPtr(b0) == NULL) || (GetBranchPtr(b1) == NULL)){
-    mafLogMessage("invalid input indices %d %d in SwapBranchIndices()", b0, b1) ;
+    LogMessage("invalid input indices %d %d in SwapBranchIndices()", b0, b1) ;
     return false ;
   }
 
@@ -2597,8 +2648,7 @@ double mafPolylineGraph::GetBranchLength(vtkIdType b) const
   }
 
   // clean up
-  vtkDEL(verticesIdList);
-
+  verticesIdList->Delete();  
   return sum;
 }
 
@@ -2666,8 +2716,7 @@ double mafPolylineGraph::GetBranchIntervalLength(vtkIdType b, vtkIdType startVer
   }
 
   // clean up
-  vtkDEL(verticesIdList);
-
+  verticesIdList->Delete();
   return sum;
 }
 
@@ -2685,7 +2734,7 @@ bool mafPolylineGraph::MergeBranches(vtkIdType b1, vtkIdType b2)
  Branch* br2 = GetBranchPtr(b2);
 
   if (br1 == NULL || br2 == NULL){
-    mafLogMessage("invalid input branches %d %d in MergeBranches()", b1, b2) ;
+    LogMessage("invalid input branches %d %d in MergeBranches()", b1, b2) ;
     return false ;
   }
 
@@ -2703,7 +2752,7 @@ bool mafPolylineGraph::MergeBranches(vtkIdType b1, vtkIdType b2)
       this->ReverseBranch(b1);  //we need to connect to the end of the second branch
     else if (iPos != 0)
     {
-      mafLogMessage("branches %d %d does not share common vertex in MergeBranches()", b1, b2) ;
+      LogMessage("branches %d %d does not share common vertex in MergeBranches()", b1, b2) ;
       return false ;
     }
 
@@ -2767,3 +2816,32 @@ void mafPolylineGraph::MergeSimpleJoinedBranches()
   }
 }
 #pragma endregion
+
+////------------------------------------------------------------------------
+////Logs error messages. Default implementation uses VTK stream. 
+///*virtual*/ void mafPolylineGraph::LogMessageF(const char* format, ...)
+////------------------------------------------------------------------------
+//{
+//  va_list marker;
+//  va_start(marker, format);
+//  
+//  char szStBuffer[128]; //this should be enough to deal with majority of calls   
+//  
+//  if (vsnprintf(szStBuffer, 127, format, marker) >= 0)
+//    LogMessage(szStBuffer);  //fast static buffer is long enough
+//  else
+//  {
+//    int nDynSize = 256;
+//    char* szDynBuffer = (char*)malloc(nDynSize);
+//    while (vsnprintf(szDynBuffer, nDynSize - 1, format, marker) < 0)
+//    {
+//      nDynSize *= 2;
+//      szDynBuffer = (char*)realloc(szDynBuffer, nDynSize);
+//    }
+//
+//    LogMessage(szDynBuffer);
+//    free(szDynBuffer);
+//  }
+//  
+//  va_end(marker);
+//}

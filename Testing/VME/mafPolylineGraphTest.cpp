@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-07-03 15:38:01 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-04-30 15:08:40 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -759,24 +759,24 @@ void mafPolylineGraphTest::TestBranchName()
   wxString nameout ;
 
   // name an old branch
-  Graph->SetBranchName(4, &name0) ;
-  Graph->GetBranchName(4, &nameout) ;
+  Graph->SetBranchName(4, name0) ;
+  Graph->GetBranchName(4, nameout) ;
   CPPUNIT_ASSERT(nameout == name0) ;
 
   // create a new branch with a name
-  Graph->AddNewBranch(7, &name1) ;
-  Graph->GetBranchName(7, &nameout) ;
+  Graph->AddNewBranch(7, name1) ;
+  nameout =  Graph->GetBranchName(7) ;
   CPPUNIT_ASSERT(nameout == name1) ;
 
   // find names
-  vtkIdType i0 = Graph->FindBranchName(&name0) ;
-  vtkIdType i1 = Graph->FindBranchName(&name1) ;
+  vtkIdType i0 = Graph->FindBranchName(name0) ;
+  vtkIdType i1 = Graph->FindBranchName(name1) ;
   CPPUNIT_ASSERT(i0 == 4) ;
   CPPUNIT_ASSERT(i1 == Graph->GetMaxBranchId()) ;
 
   // remove name from branch 4
   Graph->UnsetBranchName(4) ;
-  i0 = Graph->FindBranchName(&name0) ;
+  i0 = Graph->FindBranchName(name0) ;
   CPPUNIT_ASSERT(i0 == UndefinedId) ;
 
   delete Graph ;
