@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-04 13:04:46 $
-Version:   $Revision: 1.5.2.1 $
+Date:      $Date: 2009-05-04 13:24:49 $
+Version:   $Revision: 1.5.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -111,7 +111,7 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
     m_GuiView->Add(m_LutSlider);
     m_GuiView->Reparent(this);
 
-    m_RwiSizer->Add(m_Rwi->m_RwiBase,0,wxEXPAND);
+    m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
     m_SizerAll->Add(m_RwiSizer,0,wxEXPAND);
 
     m_LUTSizer->Add(m_GuiView,1, wxEXPAND);

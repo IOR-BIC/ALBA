@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-04 13:07:26 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-05-04 13:24:50 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -865,12 +865,13 @@ void medOpImporterDicomOffis::CreateBuildPage()
 	  m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
   }
 
-  m_BuildGuiCenter->String(ID_VOLUME_NAME,_("volume name"),&m_VolumeName);
+  m_BuildGuiCenter->Label(_("volume name"));
+  m_BuildGuiCenter->String(ID_VOLUME_NAME,"",&m_VolumeName);
   
   m_BuildGuiLeft->FitGui();
   m_BuildGuiCenter->FitGui();
 	m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
-  m_BuildPage->AddGuiLowerCenter(m_BuildGuiCenter);
+  m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
 
 	m_BuildPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
