@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:27:22 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-05-04 13:04:46 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,6 +52,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class medGUIWizard;
 class mafGUI;
+class mafGUILutSlider;
 
 //----------------------------------------------------------------------------
 // Const:
@@ -60,6 +61,12 @@ enum DIALOG_EXSTYLES
 {
 	medUSEGUI = 1,
 	medUSERWI = 2,
+};
+
+/** IDs for the view GUI */
+enum GUI_WIZARD_WIDGET_ID
+{
+  ID_LUT_CHOOSER = 3,
 };
 
 //----------------------------------------------------------------------------
@@ -80,27 +87,39 @@ public:
 	void AddGuiLowerLeft(mafGUI *gui);
   void AddGuiLowerRight(mafGUI *gui);
   void AddGuiLowerCenter(mafGUI *gui);
+  void AddGuiLowerUnderLeft(mafGUI *gui);
 
   void RemoveGuiLowerLeft(mafGUI *gui);
 
 	/** Create a chain between this page ad nextPage */
 	void SetNextPage(medGUIWizardPage *nextPage);
 
+  void UpdateWindowing();
+
+  void UpdateActor();
+
 	mafRWI* GetRWI(){return m_Rwi;};
 
 private:
 
+ 
+
 	wxWizardPageSimple *m_FirstPage;
 
 	wxBoxSizer *m_GUISizer; ///< Sizer used for the Lower GUI
+  wxBoxSizer *m_GUIUnderSizer; ///< Sizer used for the under Lower GUI
+  wxBoxSizer *m_LUTSizer; ///< Sizer used for the LUT Slider GUI
   wxBoxSizer *m_RwiSizer; ///< Sizer used for the vtk render window and if you want to plug any gui on bottom of the RWI
   wxBoxSizer *m_SizerAll; ///< Vertical sizer used to include all other sizer
 
 	mafRWI     *m_Rwi; ///< Render window
 
   mafGUI     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
-  mafGUI     *m_GuiLowerRight; ///< Gui variable used to plug custom widgets localized in LOWER RIGHT
   mafGUI     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
+  mafGUI     *m_GuiLowerUnderLeft; ///< Gui variable used to plug custom widgets localized under LOWER LEFT
+
+  mafGUILutSlider		*m_LutSlider;
+  vtkLookupTable	*m_ColorLUT;
 
 	//DECLARE_EVENT_TABLE()
 };
