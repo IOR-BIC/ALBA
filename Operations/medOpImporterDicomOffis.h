@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-04-29 08:27:05 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-05-04 13:07:26 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -221,8 +221,7 @@ protected:
 	medGUIWizardPage	*m_BuildPage;
 
 	mafGUI	*m_LoadGuiLeft;
-  mafGUI	*m_LoadGuiRight;
-  mafGUI	*m_LoadGuiCenter;
+  mafGUI	*m_LoadGuiUnderLeft;
 	mafGUI	*m_CropGuiLeft;
   mafGUI	*m_CropGuiCenter;
 	mafGUI	*m_BuildGuiLeft;
@@ -233,6 +232,7 @@ protected:
 	mafString m_PatientName;
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
+
 	int				m_BuildStepValue;
 	int				m_DicomTypeRead; ///<Type DICOM Read from file
 	int				m_SortAxes;
