@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2009-05-05 14:33:13 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2009-05-05 14:40:46 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -70,14 +70,14 @@ enum DIALOG_EXSTYLES
 class medGUIWizardPage : public wxWizardPageSimple, public mafObserver  
 {
 public:
-  medGUIWizardPage (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="");
-  virtual ~medGUIWizardPage (); 
-  void SetListener(mafObserver *Listener) {m_Listener = Listener;};
-  void OnEvent(mafEventBase *maf_event);
+	medGUIWizardPage (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="");
+	virtual ~medGUIWizardPage (); 
+	void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+	void OnEvent(mafEventBase *maf_event);
 
-  mafObserver *m_Listener;
+	mafObserver *m_Listener;
 
-  void AddGuiLowerLeft(mafGUI *gui);
+	void AddGuiLowerLeft(mafGUI *gui);
   void AddGuiLowerRight(mafGUI *gui);
   void AddGuiLowerCenter(mafGUI *gui);
 

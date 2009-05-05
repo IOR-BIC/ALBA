@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 14:33:13 $
-Version:   $Revision: 1.5.2.3 $
+Date:      $Date: 2009-05-05 14:40:46 $
+Version:   $Revision: 1.5.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,17 +52,6 @@ MafMedical is partially based on OpenMAF.
 #include "medGUIWizard.h"
 #include "mafGUI.h"
 #include "mafGUIValidator.h"
-#include "mafGUILutSlider.h"
-#include "mafSceneGraph.h"
-#include "mafVME.h"
-#include "mafVMEOutputVolume.h"
-
-#include "vtkLookupTable.h"
-#include "vtkRenderer.h"
-#include "vtkMapper.h"
-#include "vtkTexture.h"
-#include "vtkImageData.h"
-#include "mmaVolumeMaterial.h"
 
 //----------------------------------------------------------------------------
 // Event Table:
@@ -81,41 +70,25 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 : wxWizardPageSimple(wizardParent)
 //----------------------------------------------------------------------------
 {
-  m_Listener = NULL;
+	m_Listener = NULL;
 
-  m_FirstPage = NULL;
-  m_ColorLUT = NULL;
+	m_FirstPage = NULL;
 
-  m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
-  m_GUIUnderSizer = new wxBoxSizer( wxHORIZONTAL );
-  m_LUTSizer = new wxBoxSizer( wxHORIZONTAL );
-  m_RwiSizer = new wxBoxSizer( wxHORIZONTAL );
+	m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
+	m_RwiSizer = new wxBoxSizer( wxHORIZONTAL );
   m_SizerAll = new wxBoxSizer( wxVERTICAL );
 
-  m_Rwi = NULL;
+	m_Rwi = NULL;
+	m_GuiLowerRight = NULL;
   m_GuiLowerLeft = NULL;
-  m_GuiLowerCenter = NULL;
-  m_GuiLowerUnderLeft = NULL;
 
 	if(style & medUSERWI)
-  {
-    m_Rwi = new mafRWI(this);
-    m_Rwi->SetSize(0,0,512,512);
-    m_Rwi->Show(true);
-    m_Rwi->CameraUpdate();
-
-    mafGUI *m_GuiView= new mafGUI(this);
-    m_LutSlider = new mafGUILutSlider(this,-1,wxPoint(0,0),wxSize(300,24));
-    m_LutSlider->SetListener(this);
-    
-    m_GuiView->Add(m_LutSlider);
-    m_GuiView->Reparent(this);
-
-    m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
-    m_SizerAll->Add(m_RwiSizer,0,wxEXPAND);
-
-    m_LUTSizer->Add(m_GuiView,1, wxEXPAND);
-    m_SizerAll->Add(m_LUTSizer,0,wxEXPAND|wxALL);
+	{
+		m_Rwi = new mafRWI(this);
+		m_Rwi->SetSize(0,0,600,600);
+		m_Rwi->Show(true);
+		m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
+    m_SizerAll->Add(m_RwiSizer,1,wxEXPAND);
 	}
 	if(style & medUSEGUI)
 	{
@@ -123,27 +96,24 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
     m_GuiLowerLeft->FitGui();
 		m_GuiLowerLeft->Reparent(this);
 
+    m_GuiLowerRight = new mafGUI(this);
+    m_GuiLowerRight->FitGui();
+    m_GuiLowerRight->Reparent(this);
+
     m_GuiLowerCenter = new mafGUI(this);
     m_GuiLowerCenter->FitGui();
     m_GuiLowerCenter->Reparent(this);
 
-    m_GuiLowerUnderLeft = new mafGUI(this);
-    m_GuiLowerUnderLeft->FitGui();
-    m_GuiLowerUnderLeft->Reparent(this);
-
 		m_GUISizer->Add(m_GuiLowerLeft,0,wxEXPAND);
     m_GUISizer->Add(m_GuiLowerCenter,0,wxEXPAND);
+    m_GUISizer->Add(m_GuiLowerRight,0,wxEXPAND);
 
-    m_GUIUnderSizer->Add(m_GuiLowerUnderLeft,1,wxALL);
-  
     m_SizerAll->Add(m_GUISizer,0,wxEXPAND|wxALL);
-    m_SizerAll->Add(m_GUIUnderSizer,0,wxEXPAND|wxALL);
 	}
 	
 	SetSizer(m_SizerAll,true);
 	m_SizerAll->Fit(this);
 }
-
 //----------------------------------------------------------------------------
 medGUIWizardPage::~medGUIWizardPage()
 //----------------------------------------------------------------------------
@@ -154,49 +124,18 @@ medGUIWizardPage::~medGUIWizardPage()
 void medGUIWizardPage::OnEvent(mafEventBase *maf_event)
 //--------------------------------------------------------------------------------
 {
-  switch(maf_event->GetId()) 
-  {
-  case ID_RANGE_MODIFIED:
-    {
-      //Windowing
-      UpdateActor();
-    }
-    break;
-
-  default:
-    mafEventMacro(*maf_event);
-  }
+	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+	{
+			mafEventMacro(*e);
+	}
 }
-//----------------------------------------------------------------------------
-void medGUIWizardPage::UpdateWindowing()
-//----------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+void medGUIWizardPage::AddGuiLowerRight(mafGUI *gui)
+//--------------------------------------------------------------------------------
 {
-  double tableRange[2];
-  double scalarRange[2];
-
-  vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
-  actorCollection->InitTraversal();
-  actorCollection->GetNextItem();
-  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->GetTableRange(tableRange);
-
-  actorCollection->InitTraversal();
-  actorCollection->GetNextItem();
-  actorCollection->GetNextItem()->GetTexture()->GetInput()->GetScalarRange(scalarRange);
-
-  m_LutSlider->SetRange(scalarRange[0],scalarRange[1]);
-  m_LutSlider->SetSubRange(tableRange[0], tableRange[1]);
-}
-//----------------------------------------------------------------------------
-void medGUIWizardPage::UpdateActor()
-//----------------------------------------------------------------------------
-{
-  double low, hi;
-  m_LutSlider->GetSubRange(&low,&hi);
-  vtkActorCollection *actorCollection = m_Rwi->m_RenFront->GetActors();
-  actorCollection->InitTraversal();
-  actorCollection->GetNextItem();
-  actorCollection->GetNextItem()->GetTexture()->GetLookupTable()->SetTableRange(low,hi);
-  m_Rwi->CameraUpdate();
+  m_GuiLowerRight->AddGui(gui);
+  m_GuiLowerRight->FitGui();
+  m_GuiLowerRight->Update();
 }
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::AddGuiLowerLeft(mafGUI *gui)
@@ -214,7 +153,6 @@ void medGUIWizardPage::RemoveGuiLowerLeft(mafGUI *gui)
   m_GuiLowerLeft->FitGui();
   m_GuiLowerLeft->Update();
 }
-
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::AddGuiLowerCenter(mafGUI *gui)
 //--------------------------------------------------------------------------------
@@ -223,19 +161,10 @@ void medGUIWizardPage::AddGuiLowerCenter(mafGUI *gui)
   m_GuiLowerCenter->FitGui();
   m_GuiLowerCenter->Update();
 }
-
-//--------------------------------------------------------------------------------
-void medGUIWizardPage::AddGuiLowerUnderLeft(mafGUI *gui)
-//--------------------------------------------------------------------------------
-{
-  m_GuiLowerUnderLeft->AddGui(gui);
-  m_GuiLowerUnderLeft->FitGui();
-  m_GuiLowerUnderLeft->Update();
-}
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::SetNextPage(medGUIWizardPage *nextPage)
 //--------------------------------------------------------------------------------
 {
 	this->SetNext(nextPage);
-  nextPage->SetPrev(this);
+	nextPage->SetPrev(this);
 }
