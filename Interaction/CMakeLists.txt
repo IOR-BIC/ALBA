@@ -14,6 +14,8 @@ SET(PROJECT_SRCS
   medInteractor2DDistance.h
   medInteractor2DIndicator.cpp
   medInteractor2DIndicator.h
+  mmiVTKPicker.cpp
+  mmiVTKPicker.h
 )
 
 
