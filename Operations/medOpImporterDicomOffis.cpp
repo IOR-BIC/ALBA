@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 08:32:28 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-05-05 09:52:24 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1117,18 +1117,21 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_STUDY:
 			{
-        m_VolumeName = m_StudyListbox->GetString(m_StudyListbox->GetSelection());
-       // m_VolumeName.Append(" -  ");
-        if(!this->m_TestMode)
-        {
-				  m_BuildGuiLeft->Update();
-				  EnableSliceSlider(true);
-				  if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
-				  {
-					  EnableTimeSlider(true);
-				  }
+        if (m_VolumeName.Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
+        {     
+          m_VolumeName = m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+          // m_VolumeName.Append(" -  ");
+          if(!this->m_TestMode)
+          {
+				    m_BuildGuiLeft->Update();
+				    EnableSliceSlider(true);
+				    if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
+				    {
+					    EnableTimeSlider(true);
+				    }
+          }
+          ReadDicom();
         }
-        ReadDicom();
 			}
 			break;
 			case MOUSE_DOWN:
@@ -1662,25 +1665,27 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 		else
 		{
       sliceNum++;
-      m_FileName = "";
+      mafString file = "";
 			m_CurrentSliceName = m_DirectoryReader->GetFile(i);
 			// Append of the path at the dicom file
 			wxString ct_mode;
-			m_FileName.Append(dir);
-			m_FileName.Append("\\");
-			m_FileName.Append(m_CurrentSliceName);
+			file.Append(dir);
+			file.Append("\\");
+			file.Append(m_CurrentSliceName);
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
-      OFCondition status = dicomImg.loadFile(m_FileName);//load data into offis structure
+      OFCondition status = dicomImg.loadFile(file);//load data into offis structure
 
       if (!status.good())
       {
         if(!this->m_TestMode)
         {
-          wxMessageBox(wxString::Format("File <%s> can not be opened",m_FileName),"Warning!!");
+          wxMessageBox(wxString::Format("File <%s> can not be opened",file),"Warning!!");
         }
         continue;
       }
+      m_FileName = file;
+
       DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
  
       // decompress data set if compressed
