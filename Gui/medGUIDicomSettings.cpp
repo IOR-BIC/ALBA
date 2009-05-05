@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-25 16:43:09 $
-Version:   $Revision: 1.7.2.2 $
+Date:      $Date: 2009-05-05 09:53:33 $
+Version:   $Revision: 1.7.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,10 +35,10 @@ mafGUISettings(Listener, label)
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = true;
 
 	m_AutoCropPos = FALSE;
-	m_EnableNumberOfSlice = FALSE;
-	m_EnableNumberOfTime = FALSE; 
+	m_EnableNumberOfSlice = true;
+	m_EnableNumberOfTime = true; 
   m_EnableChangeSide = FALSE;
-	m_Step = ID_4X;
+	m_Step = ID_1X;
 
 	InitializeSettings();
 }
@@ -62,7 +62,7 @@ void medGUIDicomSettings::CreateGui()
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
 	m_DicomModalityListBox->AddItem(ID_CT_MODALITY,_("CT"),m_CheckOnOff[0] != 0);
 	m_DicomModalityListBox->AddItem(ID_SC_MODALITY,_("SC"),m_CheckOnOff[1] != 0);
-	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MI"),m_CheckOnOff[2] != 0);
+	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MRI"),m_CheckOnOff[2] != 0);
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3] != 0);
   m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
 	m_Gui->Divider(1);
