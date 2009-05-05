@@ -74,6 +74,11 @@ ADD_EXECUTABLE(medOpImporterDicomGrassrootsTest medOpImporterDicomGrassrootsTest
 ADD_TEST(medOpImporterDicomGrassrootsTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomGrassrootsTest)
 ENDIF (MED_USE_GDCM)
 
+IF (MED_USE_Offis)
+ADD_EXECUTABLE(medOpImporterDicomOffisTest medOpImporterDicomOffisTest.h medOpImporterDicomOffisTest.cpp)
+ADD_TEST(medOpImporterDicomOffisTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomOffisTest)
+ENDIF (MED_USE_Offis)
+
 ADD_EXECUTABLE(itkRawMotionImporterUtilityTest itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp)
 ADD_TEST(itkRawMotionImporterUtilityTest ${EXECUTABLE_OUTPUT_PATH}/itkRawMotionImporterUtilityTest)
 
