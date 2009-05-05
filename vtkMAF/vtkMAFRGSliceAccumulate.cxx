@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-03-11 11:40:06 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-05-05 12:15:58 $
+  Version:   $Revision: 1.1.2.3 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -49,7 +49,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ vtkMAFRGSliceAccumulate::vtkMAFRGSliceAccumulate()
 vtkMAFRGSliceAccumulate::~vtkMAFRGSliceAccumulate()
 //--------------------------------------------------------------------------------------
 {
-	//SetSlices(NULL);
+  SetSlices(NULL);
 }
 //--------------------------------------------------------------------------------------
 void vtkMAFRGSliceAccumulate::AddSlice(vtkImageData * slice)
