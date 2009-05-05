@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-05 11:50:42 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-05-05 11:56:41 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -31,7 +31,7 @@
 #include "vtkPoints.h"
 
 #include "mafMemDbg.h"
-#include "../mafDbg.h"
+//#include "../mafDbg.h"
 
 
 //------------------------------------------------------------------------------
