@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 13:36:20 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2009-05-05 14:45:26 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,7 +52,7 @@ MafMedical is partially based on OpenMAF.
 #include "medOpImporterDicomOffis.h"
 
 #include "medGUIWizard.h"
-#include "medGUIWizardPage.h"
+#include "medGUIWizardPageNew.h"
 #include "mafGUIValidator.h"
 #include "mmdMouse.h"
 #include "mmiDICOMImporterInteractor.h"
@@ -788,7 +788,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 void medOpImporterDicomOffis::CreateLoadPage()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("First Step"));
+	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("First Step"));
 	m_LoadGuiLeft = new mafGUI(this);
   m_LoadGuiUnderLeft = new mafGUI(this);
 
@@ -816,7 +816,7 @@ void medOpImporterDicomOffis::CreateLoadPage()
 void medOpImporterDicomOffis::CreateCropPage()
 //----------------------------------------------------------------------------
 {
-	m_CropPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("Second Step"));
+	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Second Step"));
 	m_CropGuiLeft = new mafGUI(this);
   m_CropGuiCenter = new mafGUI(this);
 
@@ -849,7 +849,7 @@ void medOpImporterDicomOffis::CreateCropPage()
 void medOpImporterDicomOffis::CreateBuildPage()
 //----------------------------------------------------------------------------
 {
-	m_BuildPage = new medGUIWizardPage(m_Wizard,medUSEGUI|medUSERWI,_("Third Step"));
+	m_BuildPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Third Step"));
 	m_BuildGuiLeft = new mafGUI(this);
   m_BuildGuiCenter = new mafGUI(this);
 
