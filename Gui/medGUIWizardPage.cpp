@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-04 13:24:49 $
-Version:   $Revision: 1.5.2.2 $
+Date:      $Date: 2009-05-05 14:33:13 $
+Version:   $Revision: 1.5.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -81,18 +81,18 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 : wxWizardPageSimple(wizardParent)
 //----------------------------------------------------------------------------
 {
-	m_Listener = NULL;
+  m_Listener = NULL;
 
-	m_FirstPage = NULL;
+  m_FirstPage = NULL;
   m_ColorLUT = NULL;
 
-	m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
+  m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
   m_GUIUnderSizer = new wxBoxSizer( wxHORIZONTAL );
   m_LUTSizer = new wxBoxSizer( wxHORIZONTAL );
-	m_RwiSizer = new wxBoxSizer( wxHORIZONTAL );
+  m_RwiSizer = new wxBoxSizer( wxHORIZONTAL );
   m_SizerAll = new wxBoxSizer( wxVERTICAL );
 
-	m_Rwi = NULL;
+  m_Rwi = NULL;
   m_GuiLowerLeft = NULL;
   m_GuiLowerCenter = NULL;
   m_GuiLowerUnderLeft = NULL;
