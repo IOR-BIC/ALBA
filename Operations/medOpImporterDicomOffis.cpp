@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 09:52:24 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2009-05-05 13:36:20 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -793,9 +793,11 @@ void medOpImporterDicomOffis::CreateLoadPage()
   m_LoadGuiUnderLeft = new mafGUI(this);
 
 	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  m_SliceScannerLoadPage->SetPageSize(1);
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
     m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+    m_TimeScannerLoadPage->SetPageSize(1);
   }
 
   m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY,_("study id"),70,"",wxLB_HSCROLL,300);
@@ -819,9 +821,11 @@ void medOpImporterDicomOffis::CreateCropPage()
   m_CropGuiCenter = new mafGUI(this);
 
 	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  m_SliceScannerCropPage->SetPageSize(1);
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
     m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+    m_TimeScannerCropPage->SetPageSize(1);
   }
 
   if(((medGUIDicomSettings*)GetSetting())->EnableChangeSide())
@@ -850,10 +854,12 @@ void medOpImporterDicomOffis::CreateBuildPage()
   m_BuildGuiCenter = new mafGUI(this);
 
 	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+  m_SliceScannerBuildPage->SetPageSize(1);
   
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
 	  m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,VTK_INT_MAX);
+    m_TimeScannerBuildPage->SetPageSize(1);
   }
 
   m_BuildGuiCenter->Label(_("volume name"));
@@ -1970,9 +1976,11 @@ void medOpImporterDicomOffis::ResetSliders()
     delete m_LoadGuiLeft;
     m_LoadGuiLeft = new mafGUI(this);
     m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    m_SliceScannerLoadPage->SetPageSize(1);
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
       m_TimeScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+      m_TimeScannerLoadPage->SetPageSize(1);
     }
     m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
   }
@@ -1983,9 +1991,11 @@ void medOpImporterDicomOffis::ResetSliders()
     delete m_CropGuiLeft;
     m_CropGuiLeft = new mafGUI(this);
     m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    m_SliceScannerCropPage->SetPageSize(1);
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
       m_TimeScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+      m_TimeScannerCropPage->SetPageSize(1);
     }
     m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
   }
@@ -1997,9 +2007,11 @@ void medOpImporterDicomOffis::ResetSliders()
     delete m_BuildGuiLeft;
     m_BuildGuiLeft = new mafGUI(this);
     m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_NumberOfSlices-1,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
+    m_SliceScannerBuildPage->SetPageSize(1);
     if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
     {
       m_TimeScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_TIME,_("time "),&m_CurrentTime,0,m_NumberOfTimeFrames);
+      m_TimeScannerBuildPage->SetPageSize(1);
     }
     m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
   }
