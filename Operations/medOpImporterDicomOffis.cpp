@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-04 13:24:50 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2009-05-05 08:32:28 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -176,6 +176,10 @@ mafOp(label)
   for (int i = 0; i < 6; i++) 
     m_DicomBounds[i] = 0;
 
+  m_PatientPosition = "";
+  m_ImagePositionPatient[3] = 0;
+  m_ImageOrientationPatient[6] = 0;
+
 	m_Wizard = NULL;
 	m_LoadPage = NULL;
 	m_CropPage = NULL;
@@ -185,9 +189,7 @@ mafOp(label)
 	m_CropGuiLeft = NULL;
 	m_LoadGuiLeft = NULL;
   m_LoadGuiUnderLeft = NULL;
-//  m_BuildGuiCenter = NULL;
   m_CropGuiCenter = NULL;
-  //m_LoadGuiCenter = NULL;
 
   m_TimeScannerLoadPage = NULL;
   m_TimeScannerCropPage = NULL;
@@ -772,11 +774,6 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     }
   }
 
-	//Nome VME = CTDir + IDStudio
-	/*wxString name = m_DicomDirectory;
-  name.Append(" -  ");
-  if(!this->m_TestMode)
-    name.Append(m_StudyListbox->GetString(m_StudyListbox->GetSelection()));*/
 	m_Volume->SetName(m_VolumeName);
 
   if(m_Volume != NULL)
@@ -821,9 +818,6 @@ void medOpImporterDicomOffis::CreateCropPage()
 	m_CropGuiLeft = new mafGUI(this);
   m_CropGuiCenter = new mafGUI(this);
 
-	//m_CropGuiLeft->Label(_("crop"),true);
-	//m_CropGuiLeft->Button(ID_CROP_BUTTON,_("crop"));
-	//m_CropGuiLeft->Button(ID_UNDO_CROP_BUTTON,_("undo crop"));
 	m_SliceScannerCropPage=m_CropGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
   {
@@ -855,9 +849,6 @@ void medOpImporterDicomOffis::CreateBuildPage()
 	m_BuildGuiLeft = new mafGUI(this);
   m_BuildGuiCenter = new mafGUI(this);
 
-	//wxString buildStepChoices[4] = {_("1x"),_("2x"),_("3x"),_("4x")};
-	//m_BuildGuiLeft->Label(_("build volume"),true);
-	//m_BuildGuiLeft->Combo(ID_BUILD_STEP, _("step"), &m_BuildStepValue, 4, buildStepChoices);
 	m_SliceScannerBuildPage=m_BuildGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,VTK_INT_MAX,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
   
   if(((medGUIDicomSettings*)GetSetting())->EnableNumberOfTime())
@@ -1679,7 +1670,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			m_FileName.Append("\\");
 			m_FileName.Append(m_CurrentSliceName);
 
-
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
       OFCondition status = dicomImg.loadFile(m_FileName);//load data into offis structure
 
@@ -1704,11 +1694,16 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetLongInt(DCM_Rows, val_long);
       int height = val_long;
 
-      double position[3];
-      //for(int k=0;k<3;k++)
-       ds->findAndGetFloat64(DCM_ImagePositionPatient,position[2],0);
-       ds->findAndGetFloat64(DCM_ImagePositionPatient,position[1],1);
-       ds->findAndGetFloat64(DCM_ImagePositionPatient,position[0],2);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[2],0);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[1],1);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[0],2);
+
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[0],0);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[1],1);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[2],2);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[3],3);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[4],4);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[5],5);
 
       double spacing[3];
       spacing[2] = 0;
@@ -1737,7 +1732,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       imageData->SetUpdateExtent(0,width-1,0,height-1,0,0);
       imageData->SetExtent(imageData->GetUpdateExtent());
       imageData->SetNumberOfScalarComponents(1);
-      imageData->SetOrigin(position);
+      imageData->SetOrigin(m_ImagePositionPatient);
       imageData->SetSpacing(spacing);
 
       ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
@@ -1773,6 +1768,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       const char *mode = "?";
       ds->findAndGetString(DCM_Modality,mode);
+
+      const char *patPos = "?";
+      ds->findAndGetString(DCM_PatientPosition,patPos);
+      m_PatientPosition = patPos;
 
       const char *studyUID = "?";
       ds->findAndGetString(DCM_StudyInstanceUID,studyUID);
@@ -1904,8 +1903,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
   }
 	if(m_NumberOfStudy == 0)
 	{
-		wxString msg = "No study found!";
-		wxMessageBox(msg,"Confirm", wxOK , NULL);
+    if (!this->m_TestMode)
+    {
+		  wxString msg = "No study found!";
+		  wxMessageBox(msg,"Confirm", wxOK , NULL);
+    }
     return false;
 	}
   else
@@ -2187,7 +2189,6 @@ void medOpImporterDicomOffis::ImportDicomTags()
   ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
   DJDecoderRegistration::cleanup(); // deregister JPEG codecs
 
-  
   OFString string;
   DcmStack stack;
   DcmObject *dobject = NULL;
@@ -2202,17 +2203,23 @@ void medOpImporterDicomOffis::ImportDicomTags()
       if (dobject->verify().good())
       { 
         DcmTag tag = dobject->getTag();
-        mafString tagName = tag.getTagName();
+        wxString tagName = tag.getTagName();
 
         delem = dynamic_cast<DcmElement*>(dobject);
         if (delem != NULL)
         {
           delem->getOFStringArray(string);
 
-          if (tagName.Compare("PixelData") == 0)
-            m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),""));
+          if (tagName.compare("PixelData") == 0)
+            m_TagArray->SetTag(mafTagItem(tagName.c_str(),""));
           else
-            m_TagArray->SetTag(mafTagItem(tagName.GetCStr(),string.c_str()));
+          {
+            m_TagArray->SetTag(mafTagItem(tagName.c_str(),string.c_str()));
+            if (tagName.compare("PatientPosition") == 0)
+            {
+              m_PatientPosition = string.c_str();
+            }
+          }         
         }
       }
     }

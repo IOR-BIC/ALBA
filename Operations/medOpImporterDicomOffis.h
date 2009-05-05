@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-05-04 13:07:26 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-05-05 08:32:28 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -232,6 +232,10 @@ protected:
 	mafString m_PatientName;
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
+
+  mafString m_PatientPosition;
+  double m_ImagePositionPatient[3];
+  double m_ImageOrientationPatient[6];
 
 	int				m_BuildStepValue;
 	int				m_DicomTypeRead; ///<Type DICOM Read from file
