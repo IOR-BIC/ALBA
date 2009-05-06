@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraphTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-06 08:02:57 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2009-05-06 10:47:35 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -759,7 +759,7 @@ void mafPolylineGraphTest::TestBranchName()
   wxString nameout ;
 
   // name an old branch
-  name0 = Graph->SetBranchName(4) ;
+  Graph->SetBranchName(4, name0) ;
   nameout = Graph->GetBranchName(4) ;
   CPPUNIT_ASSERT(nameout == name0) ;
 
