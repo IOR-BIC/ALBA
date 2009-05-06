@@ -71,6 +71,7 @@ INPUT                  = "@MAF_SOURCE_DIR@/Base/" \
                          "@MAF_SOURCE_DIR@/VME/" \
                          "@MAF_SOURCE_DIR@/VME/DataPipes/" \
                          "@MAF_SOURCE_DIR@/Operations/" \
+			 "@MAF_SOURCE_DIR@/vtkMAF/" \
                          "@MAF_SOURCE_DIR@/Interaction/"
 FILE_PATTERNS          = *.h
 RECURSIVE              = NO
