@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2009-04-30 15:08:27 $
-Version:   $Revision: 1.9.2.1 $
+Date:      $Date: 2009-05-06 14:22:15 $
+Version:   $Revision: 1.9.2.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -341,6 +341,8 @@ public:
     void Clear() ;                                          ///< clear data from branch
     bool SelfCheck() const ;                                  ///< check self consistency (empty branches are allowed)
     void PrintSelf(std::ostream& os, const int tabs) const ;  ///< print self
+
+    Branch& operator=(const Branch& src);
   private:
     char* m_Name ;                                        ///< name of branch
     std::vector<vtkIdType> m_VertexId ;                   ///< list by vertices

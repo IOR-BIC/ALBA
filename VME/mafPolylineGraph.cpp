@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 07:40:25 $
-Version:   $Revision: 1.10.2.2 $
+Date:      $Date: 2009-05-06 14:22:15 $
+Version:   $Revision: 1.10.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -760,6 +760,13 @@ mafPolylineGraph::Branch::Branch(vtkIdType v, const char *name) : m_OutputPolyda
 mafPolylineGraph::Branch::Branch(const Branch& src)
 //------------------------------------------------------------------------
 {
+  *this = src;  
+}
+
+//------------------------------------------------------------------------
+mafPolylineGraph::Branch& mafPolylineGraph::Branch::operator=(const Branch& src)
+//------------------------------------------------------------------------
+{
   m_OutputPolydataCell = src.m_OutputPolydataCell;
   m_VertexId = src.m_VertexId;
   m_EdgeId = src.m_EdgeId;
@@ -771,6 +778,7 @@ mafPolylineGraph::Branch::Branch(const Branch& src)
   m_Name = new char[nLen + 1];
   strcpy(m_Name, src.m_Name);
 #endif 
+  return *this;
 }
 
 //-------------------------------------------------------------------------
