@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 14:45:26 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2009-05-07 12:10:11 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -286,6 +286,7 @@ void medOpImporterDicomOffis::OpRun()
 	CreateLoadPage();
 	CreateCropPage();
 	CreateBuildPage();
+  m_Wizard->SetButtonString("Crop >");
 	EnableSliceSlider(false);
 	EnableTimeSlider(false);
 
@@ -788,7 +789,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 void medOpImporterDicomOffis::CreateLoadPage()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("First Step"));
+	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("First step"));
 	m_LoadGuiLeft = new mafGUI(this);
   m_LoadGuiUnderLeft = new mafGUI(this);
 
@@ -816,7 +817,7 @@ void medOpImporterDicomOffis::CreateLoadPage()
 void medOpImporterDicomOffis::CreateCropPage()
 //----------------------------------------------------------------------------
 {
-	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Second Step"));
+	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Second step"));
 	m_CropGuiLeft = new mafGUI(this);
   m_CropGuiCenter = new mafGUI(this);
 
@@ -849,7 +850,7 @@ void medOpImporterDicomOffis::CreateCropPage()
 void medOpImporterDicomOffis::CreateBuildPage()
 //----------------------------------------------------------------------------
 {
-	m_BuildPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Third Step"));
+	m_BuildPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Third step"));
 	m_BuildGuiLeft = new mafGUI(this);
   m_BuildGuiCenter = new mafGUI(this);
 
@@ -1070,17 +1071,21 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
-				if(m_Wizard->GetCurrentPage()==m_LoadPage && m_NumberOfStudy<1)//From Load page to Crop Page
+				if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
 				{
-					m_Wizard->EnableChangePageOff();
-					wxMessageBox(_("No study found!"));
-					return;
-				}
-				else
-				{
-					m_Wizard->EnableChangePageOn();
-          m_CropPage->UpdateActor();
-				}
+          if(m_NumberOfStudy<1)
+          {
+					  m_Wizard->EnableChangePageOff();
+					  wxMessageBox(_("No study found!"));
+					  return;
+          }
+          else
+          {
+            m_Wizard->SetButtonString("Build >");
+            m_Wizard->EnableChangePageOn();
+            m_CropPage->UpdateActor();
+          }
+        }
 
         if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to build page
         {
@@ -1088,10 +1093,12 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
           {
             if(m_CropPage)
             Crop();
+            m_Wizard->SetButtonString("Import >"); 
             m_BuildPage->UpdateActor();
           } 
           else
           {
+            m_Wizard->SetButtonString("Crop >"); 
             m_LoadPage->UpdateActor();
           }
         }
@@ -1099,6 +1106,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
         if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))//From build page to crop page
         {
           UndoCrop();
+          m_Wizard->SetButtonString("Build >");
           m_CropPage->UpdateActor();
         }
 
@@ -1454,7 +1462,6 @@ void medOpImporterDicomOffis::UndoCrop()
   //m_CropGuiLeft->Enable(ID_UNDO_CROP_BUTTON,false);
   m_CropActor->VisibilityOn();
   m_CroppedExetuted=false;
-  CameraUpdate();
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::Crop()
@@ -1541,12 +1548,9 @@ void medOpImporterDicomOffis::CameraUpdate()
 //----------------------------------------------------------------------------
 {
   m_LoadPage->UpdateActor();
-	//m_LoadPage->GetRWI()->CameraUpdate();
   m_CropPage->UpdateActor();
-  //m_CropPage->GetRWI()->CameraUpdate();
   m_BuildPage->UpdateActor();
-	//m_BuildPage->GetRWI()->CameraUpdate();
-  }
+}
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CameraReset()
 //----------------------------------------------------------------------------
@@ -1734,6 +1738,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetFloat64(DCM_RescaleSlope,slope);
       ds->findAndGetFloat64(DCM_RescaleIntercept,intercept);
 
+
+
 ///////////////////CREATE VTKIMAGEDATA////////////////////////////
       //initialize vtkImageData
       //vtkImageData *imageData = vtkImageData::New();
@@ -1745,6 +1751,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       imageData->SetNumberOfScalarComponents(1);
       imageData->SetOrigin(m_ImagePositionPatient);
       imageData->SetSpacing(spacing);
+
 
       ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
       if(val_long==16)
