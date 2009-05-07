@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafScalarMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:22:24 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-05-07 14:48:43 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,9 @@
 //----------------------------------------------------------------------------
 class mafVMEItemScalarMatrix;
 
-/** data interpolator specialized for mafVMEScalarMatrix (for VNL matrix data).
+/**
+  Class Name: mafScalarMatrixInterpolator.
+  Data interpolator specialized for mafVMEScalarMatrix (for VNL matrix data).
   This interpolator is specialized for scalar data. By default selects the 
   right VMEItem, extracts the inner VNL matrix and set it as input of the 
   DataPipe.
@@ -35,6 +37,7 @@ class mafVMEItemScalarMatrix;
 class MAF_EXPORT mafScalarMatrixInterpolator : public mafDataInterpolator
 {
 public:
+  /** type macro for RTTI and instance creation*/
   mafTypeMacro(mafScalarMatrixInterpolator,mafDataInterpolator);
 
   /** This DataPipe accepts only VME's with internal DataArray. */
@@ -54,17 +57,24 @@ public:
   virtual vnl_matrix<double> &GetScalarData();
 
 protected:
+  /** constructor */
   mafScalarMatrixInterpolator();
+  /** destructor */
   virtual ~mafScalarMatrixInterpolator();
 
+  /** Set m_ScalarData to current item data*/
   virtual void PreExecute();
+
+  /** Execute possible procedural code: Empty function */
   virtual void Execute() {}
 
   vnl_matrix<double> m_ScalarData;
 
 private:
-  mafScalarMatrixInterpolator(const mafScalarMatrixInterpolator&); // Not implemented
-  void operator=(const mafScalarMatrixInterpolator&); // Not implemented  
+  /** copy constructor not implemented */
+  mafScalarMatrixInterpolator(const mafScalarMatrixInterpolator&); 
+  /** assignment operator not implemeted */
+  void operator=(const mafScalarMatrixInterpolator&); 
 };
 
 #endif /* __mafScalarInterpolator_h */
