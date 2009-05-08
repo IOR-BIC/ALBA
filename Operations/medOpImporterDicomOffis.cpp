@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-07 12:10:11 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2009-05-08 10:44:58 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1753,9 +1753,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       imageData->SetSpacing(spacing);
 
 
+      long pixel_rep;
+      ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
+
       ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
-      if(val_long==16)
+      if(val_long==16 && pixel_rep == 1)
         imageData->SetScalarType(VTK_SHORT);
+      else if(val_long==16 && pixel_rep == 0)
+        imageData->SetScalarType(VTK_UNSIGNED_SHORT);
       else if(val_long==8)
         imageData->SetScalarType(VTK_CHAR);
       imageData->AllocateScalars();
