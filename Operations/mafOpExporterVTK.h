@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterVTK.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-05-08 11:32:02 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,5 +67,6 @@ protected:
   mafVME   *m_Vme; 
 	int				m_Binary;
 	int				m_ABSMatrixFlag;
+  int       m_ForceUnsignedShortScalarOutputForStructuredPoints;
 };
 #endif
