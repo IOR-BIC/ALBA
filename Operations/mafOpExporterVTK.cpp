@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-08 11:32:02 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2009-05-08 11:39:05 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -253,4 +253,9 @@ void mafOpExporterVTK::SaveVTKData()
   writer->Write();
   
   mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+
+  if (busyCursor)
+  {
+    delete busyCursor;
+  }
 }
