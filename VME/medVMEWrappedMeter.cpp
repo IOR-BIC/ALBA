@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-14 08:08:19 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2009-05-11 15:31:49 $
+  Version:   $Revision: 1.33.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1739,12 +1739,15 @@ int medVMEWrappedMeter::InternalStore(mafStorageElement *parent)
 
 			if(mafVMELandmarkCloud *lc = mafVMELandmarkCloud::SafeDownCast(node))
 			{
-				//mafVMELandmark *landmark= lc->GetLandmark(m_ListBox->GetString(i));
 				int index = -1;
 				for(int j=0; j< lc->GetNumberOfLandmarks(); j++)
 				{
-					mafVME *child = lc->GetLandmark(j);
-					if(mafString(child->GetName()).Equals(m_OrderMiddlePointsNameVMEList[i])) index = j;
+
+          mafString name = "";
+          name  = lc->GetLandmarkName(j);
+          
+          if(name.Equals(m_OrderMiddlePointsNameVMEList[i])) index = j;
+          
 				}
 				
         PushIdVector(index);
