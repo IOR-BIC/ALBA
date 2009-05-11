@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkXRayVolumeMapper.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-11-13 11:39:41 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-05-11 13:47:36 $
+  Version:   $Revision: 1.3.2.2 $
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -94,7 +94,7 @@ float vtkXRayVolumeMapper::Color[4] = { 0.5f, 0.5f, 0.5f, 1.f };
 
 void ProjectBoxToViewport(const vtkMatrix4x4 *matrixObject, const double (&boundingBox)[6], double (&minMaxViewportCoordinates)[4]);
   
-vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3.2.1 $");
+vtkCxxRevisionMacro(vtkXRayVolumeMapper, "$Revision: 1.3.2.2 $");
 vtkStandardNewMacro(vtkXRayVolumeMapper);
 
 //------------------------------------------------------------------------------
@@ -409,16 +409,16 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
   
   int updateBox[4];
   updateBox[0] = int(0.5f * (volumeProjection[0] + 1.f) * RenderingViewport[2]) - 1;
-  updateBox[0] = (updateBox[0] > 0 && updateBox[0] <= RenderingViewport[2]) ? updateBox[0] : 0;
+  updateBox[0] = (updateBox[0] > 0 && updateBox[0] < RenderingViewport[2]) ? updateBox[0] : 0;  //BES: 11.5.2009 - changed <= to < in order to fix a crash bug
   
   updateBox[1] = int(0.5f * (volumeProjection[1] + 1.f) * RenderingViewport[2]) + 1;
-  updateBox[1] = (updateBox[1] > 0 && updateBox[1] <= RenderingViewport[2]) ? updateBox[1] : (RenderingViewport[2] - 1);
+  updateBox[1] = (updateBox[1] > 0 && updateBox[1] < RenderingViewport[2]) ? updateBox[1] : (RenderingViewport[2] - 1);
   
   updateBox[2] = int(0.5f * (volumeProjection[2] + 1.f) * RenderingViewport[3]) - 1;
-  updateBox[2] = (updateBox[2] > 0 && updateBox[2] <= RenderingViewport[3]) ? updateBox[2] : 0;
+  updateBox[2] = (updateBox[2] > 0 && updateBox[2] < RenderingViewport[3]) ? updateBox[2] : 0;
   
   updateBox[3] = int(0.5f * (volumeProjection[3] + 1.f) * RenderingViewport[3]) + 1;
-  updateBox[3] = (updateBox[3] > 0 && updateBox[3] <= RenderingViewport[3]) ? updateBox[3] : (RenderingViewport[3] - 1);
+  updateBox[3] = (updateBox[3] > 0 && updateBox[3] < RenderingViewport[3]) ? updateBox[3] : (RenderingViewport[3] - 1);
   
   const int width  = updateBox[1] - updateBox[0] + 1;
   const int height = updateBox[3] - updateBox[2] + 1;
@@ -569,7 +569,7 @@ void vtkXRayVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume) {
       double *fBuffer = AccumBuffer + y * RenderingViewport[2] + updateBox[0];
       for (int x = updateBox[0]; x <= updateBox[1]; x++, iBuffer++, fBuffer++)
         *fBuffer += double(accumValueMultiplier * double(*iBuffer));
-      }
+    }
     }
   else {
     for (int y = updateBox[2]; y <= updateBox[3]; y++) {
