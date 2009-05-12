@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-08 10:44:58 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2009-05-12 13:12:53 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -494,6 +494,7 @@ int medOpImporterDicomOffis::BuildVolume()
       im->Update();
     }
     
+
 		m_Image->SetData(im,0);
 
 		mafTagItem tag_Nature;
@@ -522,18 +523,6 @@ int medOpImporterDicomOffis::BuildVolume()
       }
     }
 
-		//Nome VME = CTDir + IDStudio
-		//wxString name = m_DicomDirectory + " - " + m_StudyListbox->GetString(m_StudyListbox->GetSelection());
-    /*if(!m_PatientName.IsEmpty())
-      m_VolumeName=m_PatientName;
-    else
-    {
-      //Patient ID + Study ID
-      m_VolumeName=m_Identifier;
-      m_VolumeName.Append(" -  ");
-      if(!this->m_TestMode)
-        m_VolumeName.Append(m_StudyListbox->GetString(m_StudyListbox->GetSelection()));
-    }*/
 		m_Image->SetName(m_VolumeName);
     if(m_Image != NULL)
     {
@@ -809,7 +798,6 @@ void medOpImporterDicomOffis::CreateLoadPage()
   m_LoadPage->AddGuiLowerUnderLeft(m_LoadGuiUnderLeft);
   
   
-	m_LoadPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 }
@@ -840,7 +828,6 @@ void medOpImporterDicomOffis::CreateCropPage()
   m_CropPage->AddGuiLowerLeft(m_CropGuiLeft);
 	m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
 
-	m_CropPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
   
 	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
@@ -871,7 +858,6 @@ void medOpImporterDicomOffis::CreateBuildPage()
 	m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
   m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
 
-	m_BuildPage->GetRWI()->CameraSet(CAMERA_CT);
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_BuildPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
 }
@@ -1774,19 +1760,23 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       if (val_long==16)
       {
         ds->findAndGetUint16Array(DCM_PixelData, dicom_buf_short);
-
-        // Copy the data from DcmTK to VTK
-        memcpy(vtk_buf, dicom_buf_short, val_long/8 * width * height);//copy array of scalars from dicom dataset to vtkImageData scalars array
       }
       else
       {
         ds->findAndGetUint8Array(DCM_PixelData, dicom_buf_char);
-
-        // Copy the data from DcmTK to VTK
-        memcpy(vtk_buf, dicom_buf_char, val_long/8 * width * height);//copy array of scalars from dicom dataset to vtkImageData scalars array
       }
 
+      int counter=0;
+      for(int y=height-1;y>=0;y--) //due to the different coordinate system (DICOM and VTK) the resulting image are flipped in the Y axis
+      {
+        for(int x=0;x<width;x++)
+        {
+          imageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[width*y+x]);
+          counter++;
+        }
+      }
       imageData->Update();
+
 ////////////////////////////////////////////////////
 
       const char *mode = "?";
@@ -2121,7 +2111,7 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		if(crop_bounds[3] > m_DicomBounds[3]) 
 			crop_bounds[3] = m_DicomBounds[3];
 
-		int k = 0;
+		/*int k = 0;
 		while(k * spacing[0] +Origin[0]<crop_bounds[0])
 		{
 			k++;
@@ -2133,10 +2123,10 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		{
 			k++;
 		}
-		crop_bounds[2] = (k-1) * spacing[1] +Origin[1];
+		crop_bounds[2] = (k-1) * spacing[1] +Origin[1];*/
 
-		double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0]) + 1));
-		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
+		double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0])));//+ 1));
+		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1])));//+ 1));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
 		clip->SetOrigin(crop_bounds[0], crop_bounds[2], loc[m_SortAxes]);	//modified by Paolo 12-11-2003
@@ -2150,6 +2140,7 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
     probe->Update();
     probe->GetOutput()->GetBounds(m_DicomBounds);
 		probe->GetOutput()->GetScalarRange(range);
+    
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
 	else 
@@ -2184,7 +2175,7 @@ void medOpImporterDicomOffis::ShowSlice()
   }
 
 //----------------------------------------------------------------------------
-vtkImageData* medOpImporterDicomOffis::GetSliceImageData(int slice_num)
+vtkImageData* medOpImporterDicomOffis::GetSlice(int slice_num)
 //----------------------------------------------------------------------------
 {
  	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();

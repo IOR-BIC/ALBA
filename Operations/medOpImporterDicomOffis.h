@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-05-05 14:45:26 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-05-12 13:12:53 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -129,7 +129,7 @@ public:
   void CreateSlice(int slice_num);
 
   /** Return vtkImageData of the selected slice */
-  vtkImageData* GetSliceImageData(int slice_num);
+  vtkImageData* GetSlice(int slice_num);
 
   /** Build the volume starting from the list of dicom files. */
   int BuildVolume();
