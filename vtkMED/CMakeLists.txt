@@ -32,6 +32,8 @@ SET(vtkMED_SRCS
   vtkMEDPolyDataMirror.h
   vtkMEDImageUnsharpFilter.cxx
   vtkMEDImageUnsharpFilter.h
+  vtkFillingHole.cxx
+  vtkFillingHole.h
 )
 
 IF (MAF_USE_ITK)
