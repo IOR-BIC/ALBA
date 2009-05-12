@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-09 14:26:53 $
-  Version:   $Revision: 1.51.2.3 $
+  Date:      $Date: 2009-05-12 16:22:43 $
+  Version:   $Revision: 1.51.2.4 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -410,8 +410,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 					((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
 				else
 					((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();
-				((medPipePolylineGraphEditor *)pipe)->SetSlice(positionSlice);
-				((medPipePolylineGraphEditor *)pipe)->SetNormal(normal);
+				((medPipePolylineGraphEditor *)pipe)->SetSlice(positionSlice, normal);				
 			}
       else if(pipe_name.Equals("mafPipeMeshSlice"))
       {
@@ -628,7 +627,7 @@ void mafViewSlice::SetSliceLocalOrigin(double origin[3])
 		if (pipe_name.Equals("medPipePolylineGraphEditor"))
 		{
 			medPipePolylineGraphEditor *pipe = (medPipePolylineGraphEditor *)m_CurrentPolylineGraphEditor[i]->m_Pipe;
-			pipe->SetSlice(coord); 
+			pipe->SetOrigin(coord); 
 		}
 	}
 

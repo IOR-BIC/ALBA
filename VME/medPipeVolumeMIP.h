@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeMIP.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-14 09:17:13 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2009-05-12 16:21:46 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,13 +29,14 @@ class vtkImageCast;
 class vtkPiecewiseFunction;
 class vtkVolumeProperty;
 class vtkVolumeRayCastMIPFunction;
-class vtkVolumeRayCastMapper;
+class vtkMAFVolumeRayCastMapper;
 class vtkActor;
 class vtkLODProp3D;
 class vtkLookupTable;
 class vtkVolume;
 class vtkImageResample;
 class vtkLookupTable;
+class vtkColorTransferFunction;
 class vtkImageCast;
 //----------------------------------------------------------------------------
 // medPipeVolumeMIP :
@@ -81,9 +82,10 @@ protected:
   vtkImageCast                *m_Caster;
   vtkImageResample			  *m_ResampleFilter;	
   vtkPiecewiseFunction        *m_OpacityTransferFunction;
+  vtkColorTransferFunction    *m_ColorTransferFunction;
   vtkVolumeProperty           *m_VolumeProperty;
   vtkVolumeRayCastMIPFunction *m_MIPFunction;
-  vtkVolumeRayCastMapper      *m_VolumeMapper;
+  vtkMAFVolumeRayCastMapper      *m_VolumeMapper;
   vtkVolume					  *m_Volume;
   vtkLookupTable      *m_ColorLUT;
 

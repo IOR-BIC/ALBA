@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.38 $
+  Date:      $Date: 2009-05-12 16:22:43 $
+  Version:   $Revision: 1.38.2.1 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -334,8 +334,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
         surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
         surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-        PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
-        PipeSliceViewPolylineEditor->SetNormal(normal);
+        PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);        
         //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     }
@@ -545,8 +544,7 @@ void mafViewArbitrarySlice::OnEventGizmoTranslate(mafEventBase *maf_event)
           surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
           surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-          PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
-          PipeSliceViewPolylineEditor->SetNormal(normal);
+          PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
           //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
       }
@@ -644,8 +642,7 @@ void mafViewArbitrarySlice::OnEventGizmoRotate(mafEventBase *maf_event)
           surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
           surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-          PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
-          PipeSliceViewPolylineEditor->SetNormal(normal);
+          PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);          
           //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
       }
@@ -775,8 +772,7 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
             surfaceOriginTranslated[1] = m_SliceCenterSurface[1] + normal[1] * 0.1;
             surfaceOriginTranslated[2] = m_SliceCenterSurface[2] + normal[2] * 0.1;
 
-            PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated);
-            PipeSliceViewPolylineEditor->SetNormal(normal);
+            PipeSliceViewPolylineEditor->SetSlice(surfaceOriginTranslated, normal);            
             //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
           }
         }

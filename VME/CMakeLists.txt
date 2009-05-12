@@ -62,6 +62,8 @@ SET(PROJECT_SRCS
   medVMEOutputComputeWrapping.cpp
   medVMEOutputComputeWrapping.h 
 
+	mafPipeSlice.cpp
+	mafPipeSlice.h
 )
 
 IF (MAF_USE_ITK)

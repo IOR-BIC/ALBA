@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.9 $
+Date:      $Date: 2009-05-12 16:21:46 $
+Version:   $Revision: 1.9.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -76,9 +76,11 @@ MafMedical is partially based on OpenMAF.
 mafCxxTypeMacro(medPipePolylineGraphEditor);
 //----------------------------------------------------------------------------
 
+#include "mafMemDbg.h"
+
 //----------------------------------------------------------------------------
 medPipePolylineGraphEditor::medPipePolylineGraphEditor()
-:mafPipe()
+:mafPipeSlice()
 //----------------------------------------------------------------------------
 {
 
@@ -212,36 +214,34 @@ void medPipePolylineGraphEditor::SetModalitySlice()
 	}
 }
 //----------------------------------------------------------------------------
-void medPipePolylineGraphEditor::SetSlice(double *Origin)
+//Set the origin and normal of the slice.
+//Both, Origin and Normal may be NULL, if the current value is to be preserved. 
+/*virtual*/ void medPipePolylineGraphEditor::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
-	m_Origin[0] = Origin[0];
-	m_Origin[1] = Origin[1];
-	m_Origin[2] = Origin[2];
+  if (Origin != NULL)
+  {
+    m_Origin[0] = Origin[0];
+    m_Origin[1] = Origin[1];
+    m_Origin[2] = Origin[2];
+  }
 
-	if(m_Plane && m_Cutter)
-	{
-		m_Plane->SetOrigin(m_Origin);
-		m_Cutter->SetCutFunction(m_Plane);
-		m_Cutter->Update();
-	}
+  if (Normal != NULL)
+  {
+    m_Normal[0] = Normal[0];
+    m_Normal[1] = Normal[1];
+    m_Normal[2] = Normal[2];
+  }
+
+  if (m_Plane != NULL && m_Cutter != NULL)
+  {
+    m_Plane->SetNormal(m_Normal);
+    m_Plane->SetOrigin(m_Origin);
+    m_Cutter->SetCutFunction(m_Plane);
+    m_Cutter->Update();     
+  }
 }
-//----------------------------------------------------------------------------
-void medPipePolylineGraphEditor::SetNormal(double *Normal)
-//----------------------------------------------------------------------------
-{
-	m_Normal[0] = Normal[0];
-	m_Normal[1] = Normal[1];
-	m_Normal[2] = Normal[2];
 
-
-	if(m_Plane && m_Cutter)
-	{
-		m_Plane->SetNormal(m_Normal);
-		m_Cutter->SetCutFunction(m_Plane);
-		m_Cutter->Update();
-	}
-}
 //----------------------------------------------------------------------------
 void medPipePolylineGraphEditor::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------

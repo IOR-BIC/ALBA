@@ -34,6 +34,10 @@ SET(vtkMED_SRCS
   vtkMEDImageUnsharpFilter.h
   vtkFillingHole.cxx
   vtkFillingHole.h
+  vtkMAFVolumeRayCastMapper.cxx
+  vtkMAFVolumeRayCastMapper.h
+  vtkMAFVolumeTextureMapper2D.cxx
+  vtkMAFVolumeTextureMapper2D.h
 )
 
 IF (MAF_USE_ITK)

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-03 12:26:42 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-05-12 16:21:46 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
 class vtkVolumeProperty;
 class vtkProperty;
-class vtkVolumeTextureMapper2D;
+class vtkMAFVolumeTextureMapper2D;
 class vtkLODProp3D;
 class vtkImageShiftScale;
 class vtkProbeFilter;
@@ -104,10 +104,10 @@ protected:
   vtkPiecewiseFunction				*m_GradientFunction;
 
   vtkVolumeProperty						*m_VolumePropertyHigh;
-  vtkVolumeTextureMapper2D		*m_VolumeTextureMapperHigh;
+  vtkMAFVolumeTextureMapper2D		*m_VolumeTextureMapperHigh;
 
   vtkVolumeProperty						*m_VolumePropertyLow;
-  vtkVolumeTextureMapper2D		*m_VolumeTextureMapperLow; 
+  vtkMAFVolumeTextureMapper2D		*m_VolumeTextureMapperLow; 
   
   vtkLODProp3D								*m_ActorLOD;
   vtkProperty									*m_PropertyLOD;

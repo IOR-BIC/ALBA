@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipePolylineGraphEditor.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2009-05-12 16:21:46 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,7 +45,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Include :
 //----------------------------------------------------------------------------
-#include "mafPipe.h"
+#include "mafPipeSlice.h"
 
 //----------------------------------------------------------------------------
 // forward refs :
@@ -63,7 +63,7 @@ class vtkPlane;
 //----------------------------------------------------------------------------
 // medPipePolylineGraphEditor :
 //----------------------------------------------------------------------------
-class medPipePolylineGraphEditor : public mafPipe
+class medPipePolylineGraphEditor : public mafPipeSlice
 {
 public:
 	mafTypeMacro(medPipePolylineGraphEditor,mafPipe);
@@ -92,8 +92,9 @@ public:
 	void Show(bool show); 
 	virtual void Select(bool select);
 
-	void SetSlice(double *Origin);
-	void SetNormal(double *Normal);
+  /** Set the origin and normal of the slice.
+  Both, Origin and Normal may be NULL, if the current value is to be preserved. */
+  /*virtual*/ void SetSlice(double* Origin, double* Normal);  
 
 	void SetModalitySlice();
 	void SetModalityPerspective();
@@ -104,10 +105,7 @@ protected:
 	vtkPolyDataMapper	*m_Mapper;
 	vtkActor					*m_Actor;
 	vtkMAFFixedCutter		*m_Cutter;
-	vtkPlane				  *m_Plane;
-
-	double						m_Normal[3];
-	double						m_Origin[3];
+	vtkPlane				  *m_Plane;	
 
 	int	m_Modality;
 

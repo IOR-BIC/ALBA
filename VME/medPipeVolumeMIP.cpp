@@ -1,10 +1,10 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
-  Language:  C++
-  Date:      $Date: 2008-10-14 09:17:13 $
-  Version:   $Revision: 1.18 $
-  Authors:   Paolo Quadrani
+Program:   Multimod Application Framework
+Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
+Language:  C++
+Date:      $Date: 2009-05-12 16:21:46 $
+Version:   $Revision: 1.18.2.1 $
+Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -37,7 +37,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
 #include "vtkVolumeRayCastMIPFunction.h"
-#include "vtkVolumeRayCastMapper.h"
 #include "vtkLODProp3D.h"
 #include "vtkPlaneSource.h"
 #include "vtkPolyDataMapper.h"
@@ -52,6 +51,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
+#include "vtkColorTransferFunction.h"
+#include "vtkMAFVolumeRayCastMapper.h"
 #include "mafEventSource.h"
 
 //----------------------------------------------------------------------------
@@ -63,20 +64,21 @@ medPipeVolumeMIP::medPipeVolumeMIP()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
+  m_ColorTransferFunction = NULL;
   m_OpacityTransferFunction = NULL;
   m_VolumeProperty    = NULL;
   m_MIPFunction       = NULL;
   m_VolumeMapper      = NULL;
-   m_Volume	         = NULL;
+  m_Volume	         = NULL;
   m_ResampleFactor = 0.5;
   m_ResampleFilter = NULL;
 
   m_ColorLUT          = NULL;
   m_Caster            = NULL;
 
-	m_Box = NULL;
-	m_Mapper = NULL;
-	m_Actor =  NULL;
+  m_Box = NULL;
+  m_Mapper = NULL;
+  m_Actor =  NULL;
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeMIP::Create(mafSceneNode *n)
@@ -91,32 +93,32 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   // image pipeline
   double sr[2];
   m_Vme->GetOutput()->Update();
- 
+
   if(m_Vme->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
   {
     wxMessageBox(_("Resample the RectilinearGrid before Visualizing in MIP View"));
 
-		double b[6];
-		m_Vme->GetOutput()->Update();
-		m_Vme->GetOutput()->GetVMELocalBounds(b);
+    double b[6];
+    m_Vme->GetOutput()->Update();
+    m_Vme->GetOutput()->GetVMELocalBounds(b);
 
-		vtkNEW(m_Box);
-		m_Box->SetBounds(b);
+    vtkNEW(m_Box);
+    m_Box->SetBounds(b);
 
-		vtkNEW(m_Mapper);
-		m_Mapper->SetInput(m_Box->GetOutput());
+    vtkNEW(m_Mapper);
+    m_Mapper->SetInput(m_Box->GetOutput());
 
-		if(m_Vme->IsAnimated())
-			m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
-		else
-			m_Mapper->ImmediateModeRenderingOff();
+    if(m_Vme->IsAnimated())
+      m_Mapper->ImmediateModeRenderingOn();	 //avoid Display-Lists for animated items.
+    else
+      m_Mapper->ImmediateModeRenderingOff();
 
-		vtkNEW(m_Actor);
-		m_Actor->SetMapper(m_Mapper);
+    vtkNEW(m_Actor);
+    m_Actor->SetMapper(m_Mapper);
 
-		m_AssemblyFront->AddPart(m_Actor);
+    m_AssemblyFront->AddPart(m_Actor);
 
-	  return;
+    return;
   }
 
   vtkImageData *image_data = vtkImageData::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
@@ -142,21 +144,24 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_Caster->SetOutputScalarType(VTK_UNSIGNED_SHORT);
   m_Caster->ClampOverflowOn();
   m_Caster->Update();
- 
-	
+
+
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
-  
+
   m_OpacityTransferFunction = material->m_OpacityTransferFunction;
+  m_ColorTransferFunction = material->m_ColorTransferFunction;			//BES 19.2.2008
+
   vtkNEW(m_ColorLUT);
   m_ColorLUT->DeepCopy(material->m_ColorLut);
-  
+
   UpdateMIPFromLUT();
-  
+
   /*m_OpacityTransferFunction->AddPoint(sr[0],0.01);
   m_OpacityTransferFunction->AddPoint((sr[1]-sr[0])/2,0.2);
   m_OpacityTransferFunction->AddPoint(sr[1],0.3);*/
 
   vtkNEW(m_VolumeProperty);
+  m_VolumeProperty->SetColor(m_ColorTransferFunction);
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
@@ -165,7 +170,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 
   vtkNEW(m_VolumeMapper);
   m_VolumeMapper->SetInput(m_Caster->GetOutput());
-  
+
   m_VolumeMapper->SetVolumeRayCastFunction(m_MIPFunction);
   m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
   m_VolumeMapper->SetImageSampleDistance(1/m_ResampleFactor);
@@ -187,20 +192,20 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
 medPipeVolumeMIP::~medPipeVolumeMIP()
 //----------------------------------------------------------------------------
 {
-	if(m_Volume)
-		m_AssemblyFront->RemovePart(m_Volume);
-	
-	if(m_Actor)
-		m_AssemblyFront->RemovePart(m_Actor);
+  if(m_Volume)
+    m_AssemblyFront->RemovePart(m_Volume);
 
-	vtkDEL(m_Box);
-	vtkDEL(m_Mapper);
-	vtkDEL(m_Actor);
+  if(m_Actor)
+    m_AssemblyFront->RemovePart(m_Actor);
 
-	//BES: 2.2.2008 - vtkImageResample does not release object set by
-	//SetInputSetInformationInput - fixed here
-	if (m_ResampleFilter != NULL)
-		m_ResampleFilter->SetInformationInput(NULL);
+  vtkDEL(m_Box);
+  vtkDEL(m_Mapper);
+  vtkDEL(m_Actor);
+
+  //BES: 2.2.2008 - vtkImageResample does not release object set by
+  //SetInputSetInformationInput - fixed here
+  if (m_ResampleFilter != NULL)
+    m_ResampleFilter->SetInformationInput(NULL);
   vtkDEL(m_ResampleFilter);
   vtkDEL(m_VolumeProperty);
   vtkDEL(m_ColorLUT);
@@ -213,18 +218,18 @@ medPipeVolumeMIP::~medPipeVolumeMIP()
 void medPipeVolumeMIP::Select(bool sel)
 //----------------------------------------------------------------------------
 {
-	m_Selected = sel;
+  m_Selected = sel;
 }
 //----------------------------------------------------------------------------
 mafGUI *medPipeVolumeMIP::CreateGui()
 //----------------------------------------------------------------------------
 {
-	
+
   assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
-  
-	if(mafVMEVolume::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
-		return m_Gui;
+
+  if(mafVMEVolume::SafeDownCast(m_Vme)->GetOutput()->GetVTKData()->IsA("vtkRectilinearGrid"))
+    return m_Gui;
   lutPreset(15,m_ColorLUT);
   m_Gui->Lut(ID_LUT_CHOOSER,_("lut"),m_ColorLUT);
   UpdateMIPFromLUT();
@@ -237,29 +242,29 @@ mafGUI *medPipeVolumeMIP::CreateGui()
 void medPipeVolumeMIP::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {	
-	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-	{
-		switch(e->GetId()) 
-		{
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(e->GetId()) 
+    {
     case ID_LUT_CHOOSER:
       UpdateMIPFromLUT();
       break;
-		case ID_RESAMPLE_FACTOR:
-			if(m_ResampleFilter!=0)
-			{
-				m_VolumeMapper->SetImageSampleDistance(1/m_ResampleFactor);
-				m_VolumeMapper->SetMaximumImageSampleDistance(10);
-				m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
- 
-				m_Volume->Update();
-				mafEventMacro(mafEvent(this, CAMERA_UPDATE));
-			}
-				break;
-		default:
-			Superclass::OnEvent(maf_event);
-		}
-	}
-	
+    case ID_RESAMPLE_FACTOR:
+      if(m_ResampleFilter!=0)
+      {
+        m_VolumeMapper->SetImageSampleDistance(1/m_ResampleFactor);
+        m_VolumeMapper->SetMaximumImageSampleDistance(10);
+        m_VolumeMapper->SetMinimumImageSampleDistance(1/m_ResampleFactor);
+
+        m_Volume->Update();
+        mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      }
+      break;
+    default:
+      Superclass::OnEvent(maf_event);
+    }
+  }
+
 }
 //----------------------------------------------------------------------------
 void medPipeVolumeMIP::SetResampleFactor(double value)
@@ -283,6 +288,7 @@ void medPipeVolumeMIP::UpdateMIPFromLUT()
   if(m_Caster)
   {
     m_OpacityTransferFunction->RemoveAllPoints();
+    m_ColorTransferFunction->RemoveAllPoints();
 
     int tv = m_ColorLUT->GetNumberOfTableValues();
     double rgba[4], sr[2],w,p;
@@ -292,10 +298,12 @@ void medPipeVolumeMIP::UpdateMIPFromLUT()
     {
       m_ColorLUT->GetTableValue(v,rgba);
       p = v*w/tv+sr[0];
+
+      m_ColorTransferFunction->AddRGBPoint(p, rgba[0], rgba[1], rgba[2]);
       m_OpacityTransferFunction->AddPoint(p, (double)v/(double)tv);
     }
     m_OpacityTransferFunction->Update();
     mafEventMacro(mafEvent(this,CAMERA_UPDATE));
   }
-  
+
 }
