@@ -16,6 +16,8 @@ SET(PROJECT_SRCS
   medInteractor2DIndicator.h
   mmiVTKPicker.cpp
   mmiVTKPicker.h
+  medGizmoPolylineGraph.cpp
+  medGizmoPolylineGraph.h
 )
 
 

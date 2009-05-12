@@ -100,6 +100,9 @@ SET(PROJECT_SRCS
   
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
+  
+  mmoFillHoles.cpp
+  mmoFillHoles.h
 )
   
 IF (MED_USE_Offis)
