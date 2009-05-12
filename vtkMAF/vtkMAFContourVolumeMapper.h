@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2009-02-12 10:53:24 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-05-12 14:54:02 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -228,6 +228,13 @@ protected:
   Calculates coords of every voxel, and offsets between neighbouring voxels.
   Divides volume into 8x8x8 blocks and calculates the min and max of each block. */
   template <typename DataType> bool PrepareAccelerationDataTemplate(const DataType *dataPointer);
+
+  //calls everything
+  template <typename DataType> 
+  inline void PrepareADTAndRenderMCubes(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer) {
+    if (PrepareAccelerationDataTemplate(dataPointer))
+      RenderMCubes(renderer, volume, dataPointer);
+  }
 
   template <typename DataType> void PrepareContoursTemplate(const int slice, const DataType *imageData);
   void PrepareContours(const int slice, const void *imageData, ListOfPolyline2D&);

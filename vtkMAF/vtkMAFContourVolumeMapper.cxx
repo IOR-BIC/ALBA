@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2009-02-12 10:53:24 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-05-12 14:54:02 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkMAFContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFContourVolumeMapper);
 
 
@@ -379,36 +379,12 @@ void vtkMAFContourVolumeMapper::Render(vtkRenderer *renderer, vtkVolume *volume)
     return;
   }
 
-  const void *dataPointer = this->GetInput()->GetPointData()->GetScalars()->GetVoidPointer(0);
-
+  const void *dataPointer = this->GetInput()->GetPointData()->GetScalars()->GetVoidPointer(0);  
   switch (this->GetDataType()) {
-    case VTK_CHAR:
-      if (PrepareAccelerationDataTemplate((const char*)dataPointer))
-        this->RenderMCubes(renderer, volume, (const char*)dataPointer);
-      break;
-    case VTK_UNSIGNED_CHAR:
-      if (PrepareAccelerationDataTemplate((const unsigned char*)dataPointer)){
-        this->RenderMCubes(renderer, volume, (const unsigned char*)dataPointer);
-      }
-      break;
-    case VTK_SHORT:
-      if (PrepareAccelerationDataTemplate((const short*)dataPointer))
-        this->RenderMCubes(renderer, volume, (const short*)dataPointer);
-      break;
-    case VTK_UNSIGNED_SHORT:
-      if (PrepareAccelerationDataTemplate((const unsigned short*)dataPointer))
-        this->RenderMCubes(renderer, volume, (const unsigned short*)dataPointer);
-      break;
-    case VTK_FLOAT:
-      if (PrepareAccelerationDataTemplate((const float*)dataPointer))
-        this->RenderMCubes(renderer, volume, (const float*)dataPointer);
-      break;
-    case VTK_DOUBLE:
-      if (PrepareAccelerationDataTemplate((const double*)dataPointer))
-        this->RenderMCubes(renderer, volume, (const double*)dataPointer);
-      break;
+    vtkTemplateMacro(PrepareADTAndRenderMCubes(renderer, volume, (VTK_TT*)dataPointer));
+
     default:
-      vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
+      vtkErrorMacro(<< "Unsupported scalar data type.");  
   }
 }
 
@@ -659,13 +635,13 @@ bool vtkMAFContourVolumeMapper::IsDataValid(bool warnings)
     return false;
   }
 
-  int dataType = this->GetDataType();
-  if (dataType != VTK_SHORT && dataType != VTK_UNSIGNED_SHORT &&
-    dataType != VTK_CHAR && dataType != VTK_UNSIGNED_CHAR && dataType != VTK_FLOAT && dataType != VTK_DOUBLE) {
-      if (warnings)
-        vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
-      return false;
-    }
+  //int dataType = this->GetDataType();
+  //if (dataType != VTK_SHORT && dataType != VTK_UNSIGNED_SHORT &&
+  //  dataType != VTK_CHAR && dataType != VTK_UNSIGNED_CHAR && dataType != VTK_FLOAT && dataType != VTK_DOUBLE) {
+  //    if (warnings)
+  //      vtkErrorMacro(<< "Only 8/16 bit integers and 32 bit floats are supported.");
+  //    return false;
+  //  }
 
     // check image data
     if (imageData) {
@@ -709,7 +685,8 @@ bool vtkMAFContourVolumeMapper::IsDataValid(bool warnings)
 int vtkMAFContourVolumeMapper::GetDataType()
 //------------------------------------------------------------------------------
 {
-  if (this->GetInput() && this->GetInput()->GetPointData())
+  if (this->GetInput() != NULL && this->GetInput()->GetPointData() != NULL &&
+    this->GetInput()->GetPointData()->GetScalars() != NULL)
     return this->GetInput()->GetPointData()->GetScalars()->GetDataType();
 
   return VTK_VOID;
@@ -978,7 +955,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
     // allocate caches for each lod in range
     // since we are caching, NumberOfTriangles[LODLevel] must be valid, so we allocate all caches to this value
     for (lod = firstLOD ; lod <= lastLOD ;  lod++) {
-      if (this->TriangleCacheSize[lod] < this->NumberOfTriangles[LODLevel] || this->TriangleCache[lod] == NULL) {
+      if ((int)this->TriangleCacheSize[lod] < this->NumberOfTriangles[LODLevel] || this->TriangleCache[lod] == NULL) {
         // if cache not big enough, or not defined, reallocate cache
         // 3 vertices per triangle, 3 normals + 3 coords per vertex = 18
         delete [] this->TriangleCache[lod];
@@ -1256,7 +1233,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
                 // loop through all edges in list
                 while(*edge >= 0) {
                   // check that memory is not about to be exceeded
-                  if (createCache && (numTrianglesRunningTotal[lod] >= this->TriangleCacheSize[lod])){
+                  if (createCache && (numTrianglesRunningTotal[lod] >= (int)this->TriangleCacheSize[lod])){
                     vtkErrorMacro("no. of triangles exceeded allocated cache size\n") ;
                     break ;
                   }
