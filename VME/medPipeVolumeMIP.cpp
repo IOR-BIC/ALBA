@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-12 16:21:46 $
-Version:   $Revision: 1.18.2.1 $
+Date:      $Date: 2009-05-13 08:46:36 $
+Version:   $Revision: 1.18.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -161,7 +161,8 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_OpacityTransferFunction->AddPoint(sr[1],0.3);*/
 
   vtkNEW(m_VolumeProperty);
-  m_VolumeProperty->SetColor(m_ColorTransferFunction);
+  //TODO: uncomment this (May 13 2009), it is test what causes TestUnit to fail
+  //m_VolumeProperty->SetColor(m_ColorTransferFunction);
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
   m_VolumeProperty->SetInterpolationTypeToLinear();
 
