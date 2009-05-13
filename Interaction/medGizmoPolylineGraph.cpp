@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-12 08:48:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-05-13 08:27:28 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -52,7 +52,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafMemDbg.h"
 
-medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *listener, const char* name) 
+medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *listener, const char* name, bool showOnlyDirectionAxis) 
 { 
   m_Name = name;
   m_InputVME = mafVME::SafeDownCast(imputVme);
@@ -69,6 +69,7 @@ medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *lis
     m_Axis[i] = NULL;
     m_AxisSource[i] = NULL;
   }
+  m_ShowOnlyDirectionAxis = showOnlyDirectionAxis;
 }
 
 //------------------------------------------------------------------------
@@ -146,6 +147,8 @@ void medGizmoPolylineGraph::DestroyVMEGizmo()
   m_SphereSource = vtkSphereSource::New();
   m_AppendPolyData->SetInput(m_SphereSource->GetOutput());
 
+  if(m_ShowOnlyDirectionAxis == false)
+  {
   for (int i = 0; i < 3; i++)
   {
     m_AxisSource[i] = vtkArrowSource::New();    
@@ -177,10 +180,40 @@ void medGizmoPolylineGraph::DestroyVMEGizmo()
     PDF->Delete();
 
     m_AppendPolyData->AddInput(m_Axis[i]->GetOutput());
-  }
 
   m_PlaneSource = vtkPlaneSource::New();
   m_AppendPolyData->AddInput(m_PlaneSource->GetOutput());    
+    }
+  }
+  else
+  {
+    m_AxisSource[2] = vtkArrowSource::New();    
+
+    //-----------------
+    // rotate the axis on the i axis (default axis is X)
+    //-----------------  
+    vtkTransform* trans = vtkTransform::New();  
+    //medCurvilinear places z in the direction to the viewer => rotate it
+    //rotate the whole system
+    trans->RotateY(180);
+    trans->RotateY(-90);
+
+    vtkTransformPolyDataFilter* PDF = vtkTransformPolyDataFilter::New();
+    PDF->SetInput(m_AxisSource[2]->GetOutput());
+    PDF->SetTransform(trans);
+    trans->Delete();
+
+    //Scaling (to be set in SetLength)
+    trans = vtkTransform::New();
+    m_Axis[2] = vtkTransformPolyDataFilter::New();
+    m_Axis[2]->SetInput(PDF->GetOutput());
+    m_Axis[2]->SetTransform(trans);
+    trans->Delete();
+    PDF->Delete();
+
+    m_AppendPolyData->AddInput(m_Axis[2]->GetOutput());
+  }
+   
   m_AppendPolyData->Update();
 }
 
@@ -190,12 +223,22 @@ void medGizmoPolylineGraph::DestroyVMEGizmo()
 //----------------------------------------------------------------------------
 {  
   m_SphereSource->Delete();
+  if(m_ShowOnlyDirectionAxis == false)
+  {
   for (int i = 0; i < 3; i++)
   {
     m_AxisSource[i]->Delete();
     m_Axis[i]->Delete();
   }
   m_PlaneSource->Delete();
+  }
+  else
+  {
+    m_AxisSource[2]->Delete();
+    m_Axis[2]->Delete();
+  }
+  
+  
   m_AppendPolyData->Delete();
 }
 
@@ -239,6 +282,8 @@ void medGizmoPolylineGraph::DestroyVMEGizmo()
 {
   m_SphereSource->SetRadius(lineLength / 8);
 
+  if(m_ShowOnlyDirectionAxis == false)
+  {
   for (int i = 0; i < 3; i++)
   {
     vtkTransform* trans = vtkTransform::New();
@@ -255,6 +300,22 @@ void medGizmoPolylineGraph::DestroyVMEGizmo()
 
   m_PlaneSource->SetPoint1(-0.5*lineLength, 0, 0);
   m_PlaneSource->SetPoint2(0, 0.5*lineLength, 0);
+  }
+  else
+  {
+    
+    vtkTransform* trans = vtkTransform::New();
+    //if (i != 2)
+    //  trans->Scale(lineLength, lineLength, lineLength);
+    //else
+    //  trans->Scale(1.5*lineLength, 1.5*lineLength, 2*lineLength);
+    double dblScale = 1.5*lineLength;
+    trans->Scale(dblScale, dblScale, dblScale);
+
+    m_Axis[2]->SetTransform(trans);
+    trans->Delete();
+  }
+  
 }
 
 //------------------------------------------------------------------------

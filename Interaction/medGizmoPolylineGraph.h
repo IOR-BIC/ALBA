@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoPolylineGraph.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-12 08:48:38 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-05-13 08:27:28 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,9 +47,9 @@ class medGizmoPolylineGraph : public mafGizmoInterface
 public:
   /** The only way to construct correctly the instance */
   inline static medGizmoPolylineGraph* New(mafNode* inputVme, 
-    mafObserver *Listener = NULL, const char *name = "GizmoPath")
+    mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false)
   {
-    medGizmoPolylineGraph* pThis = new medGizmoPolylineGraph(inputVme,Listener, name);
+    medGizmoPolylineGraph* pThis = new medGizmoPolylineGraph(inputVme,Listener, name, showOnlyDirectionAxis);
     pThis->InternalInitInstance();
     return pThis;
   }
@@ -65,7 +65,7 @@ public:
   }
 
 protected:
-  medGizmoPolylineGraph(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath");
+  medGizmoPolylineGraph(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false);
   
   /** Initializes the object. May not be called twice (unless Done method was called).  */
   virtual void InternalInitInstance();
@@ -142,6 +142,8 @@ protected:
 
   vtkPlaneSource *m_PlaneSource;
   vtkAppendPolyData *m_AppendPolyData;
+
+  bool                m_ShowOnlyDirectionAxis; //< if true visualize only directional arrow source and hides the perpendiculars
   
   medCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;
 
