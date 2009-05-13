@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.h,v $
 Language:  C++
-Date:      $Date: 2009-05-05 08:13:00 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-05-13 12:56:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -66,6 +66,7 @@ public:
   CPPUNIT_TEST( TestAccept );
   CPPUNIT_TEST( TestSetDirName );
   CPPUNIT_TEST( TestCreateVolume );
+  CPPUNIT_TEST( TestCompareDicomImage );
   CPPUNIT_TEST_SUITE_END();
 
 protected:

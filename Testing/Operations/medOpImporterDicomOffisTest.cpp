@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 08:13:00 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-05-13 12:56:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -50,6 +50,10 @@ MafMedical is partially based on OpenMAF.
 
 
 #include <cppunit/config/SourcePrefix.h>
+#include <wx/txtstrm.h>
+#include <wx/tokenzr.h>
+#include <wx/wfstream.h>
+
 #include "medOpImporterDicomOffisTest.h"
 
 #include "medOpImporterDicomOffis.h"
@@ -59,11 +63,11 @@ MafMedical is partially based on OpenMAF.
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkImageData.h"
-//#include "vtkJPEGReader.h" 
-//#include "vtkBMPReader.h"
-//#include "vtkImageMathematics.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkLookupTable.h"
+#include "vtkImageFlip.h"; 
+
 
 #include <wx/dir.h>
 
@@ -161,6 +165,88 @@ void medOpImporterDicomOffisTest::TestCreateVolume()
     importer->OpStop(OP_RUN_OK);
     mafDEL(importer);
     VME = NULL;
+
+    cont = dir.GetNext(&dicomDir);
+  }
+
+  delete wxLog::SetActiveTarget(NULL);
+}
+
+//-----------------------------------------------------------
+void medOpImporterDicomOffisTest::TestCompareDicomImage() 
+//-----------------------------------------------------------
+{
+  double pixelValue = 0;
+  std::vector<double> pixelVector;
+  mafString dirName=MED_DATA_ROOT;
+  dirName<<"/Dicom/";
+
+  wxDir dir(dirName.GetCStr());
+  wxString dicomDir;
+
+  bool cont = dir.GetFirst(&dicomDir, "", wxDIR_DIRS);
+  while ( cont )
+  {
+    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
+    importer->TestModeOn();
+    wxString dicomPath = dirName + dicomDir;
+    importer->SetDirName(dicomPath.c_str());
+    importer->CreatePipeline();
+    importer->OpenDir();
+    importer->ReadDicom();
+    importer->CreateSlice(0);
+
+    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetSlice(0);
+
+    wxDir dirDicom(dicomPath);
+    wxArrayString files;
+    wxString ext = "txt";
+    const wxString FileSpec = "*" + ext;
+
+    if (dicomPath != wxEmptyString && wxDirExists(dicomPath))
+    {
+      // Get all .zip files
+      wxDir::GetAllFiles(dicomPath, &files, FileSpec);
+    }
+    
+    CPPUNIT_ASSERT(files.GetCount() == 1);
+
+    wxString txtFilePath = files[0];
+    wxFileInputStream inputFile( txtFilePath );
+    wxTextInputStream text( inputFile );
+    wxString line = text.ReadLine();
+
+    do 
+    {
+      wxStringTokenizer tkz(line,wxT('\t'),wxTOKEN_RET_EMPTY_ALL);
+
+      while (tkz.HasMoreTokens())
+      {
+        pixelValue = atof(tkz.GetNextToken().c_str());
+        pixelVector.push_back(pixelValue);
+      }
+      line = text.ReadLine();
+
+    } while (!inputFile.Eof());
+
+
+    CPPUNIT_ASSERT(imageImported->GetNumberOfPoints() == pixelVector.size());
+
+    //Flip image to start reading scalars from the same origin
+    vtkMAFSmartPointer<vtkImageFlip> imageFlip;
+    imageFlip->SetFilteredAxis(1);
+    imageFlip->PreserveImageExtentOn();
+    imageFlip->SetInput(imageImported);
+    imageFlip->GetOutput()->Update();
+
+    for(int i=0 ; i<imageImported->GetNumberOfPoints();i++)
+    {
+      CPPUNIT_ASSERT(imageFlip->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i]);
+    }
+
+    importer->OpStop(OP_RUN_OK);
+    mafDEL(importer);
+    pixelVector.clear();
 
     cont = dir.GetNext(&dicomDir);
   }
