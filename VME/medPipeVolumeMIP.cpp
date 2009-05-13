@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeMIP.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-13 08:46:36 $
-Version:   $Revision: 1.18.2.2 $
+Date:      $Date: 2009-05-13 15:48:46 $
+Version:   $Revision: 1.18.2.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkOutlineCornerFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
-#include "vtkColorTransferFunction.h"
+//#include "vtkColorTransferFunction.h"
 #include "vtkMAFVolumeRayCastMapper.h"
 #include "mafEventSource.h"
 
@@ -64,7 +64,7 @@ medPipeVolumeMIP::medPipeVolumeMIP()
 :mafPipe()
 //----------------------------------------------------------------------------
 {
-  m_ColorTransferFunction = NULL;
+  //m_ColorTransferFunction = NULL;
   m_OpacityTransferFunction = NULL;
   m_VolumeProperty    = NULL;
   m_MIPFunction       = NULL;
@@ -149,7 +149,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
 
   m_OpacityTransferFunction = material->m_OpacityTransferFunction;
-  m_ColorTransferFunction = material->m_ColorTransferFunction;			//BES 19.2.2008
+//  m_ColorTransferFunction = material->m_ColorTransferFunction;			//BES 19.2.2008
 
   vtkNEW(m_ColorLUT);
   m_ColorLUT->DeepCopy(material->m_ColorLut);
@@ -160,8 +160,7 @@ void medPipeVolumeMIP::Create(mafSceneNode *n)
   m_OpacityTransferFunction->AddPoint((sr[1]-sr[0])/2,0.2);
   m_OpacityTransferFunction->AddPoint(sr[1],0.3);*/
 
-  vtkNEW(m_VolumeProperty);
-  //TODO: uncomment this (May 13 2009), it is test what causes TestUnit to fail
+  vtkNEW(m_VolumeProperty);  
   //m_VolumeProperty->SetColor(m_ColorTransferFunction);
   m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
   m_VolumeProperty->SetInterpolationTypeToLinear();
@@ -289,7 +288,7 @@ void medPipeVolumeMIP::UpdateMIPFromLUT()
   if(m_Caster)
   {
     m_OpacityTransferFunction->RemoveAllPoints();
-    m_ColorTransferFunction->RemoveAllPoints();
+  //  m_ColorTransferFunction->RemoveAllPoints();
 
     int tv = m_ColorLUT->GetNumberOfTableValues();
     double rgba[4], sr[2],w,p;
@@ -300,7 +299,7 @@ void medPipeVolumeMIP::UpdateMIPFromLUT()
       m_ColorLUT->GetTableValue(v,rgba);
       p = v*w/tv+sr[0];
 
-      m_ColorTransferFunction->AddRGBPoint(p, rgba[0], rgba[1], rgba[2]);
+//      m_ColorTransferFunction->AddRGBPoint(p, rgba[0], rgba[1], rgba[2]);
       m_OpacityTransferFunction->AddPoint(p, (double)v/(double)tv);
     }
     m_OpacityTransferFunction->Update();

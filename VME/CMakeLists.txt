@@ -64,6 +64,14 @@ SET(PROJECT_SRCS
 
 	mafPipeSlice.cpp
 	mafPipeSlice.h
+	mafPipeMeshSlice_BES.cpp
+	mafPipeMeshSlice_BES.h
+	mafPipePolylineSlice_BES.cpp
+	mafPipePolylineSlice_BES.h
+	mafPipeSurfaceSlice_BES.cpp
+	mafPipeSurfaceSlice_BES.h
+	mafPipeVolumeSlice_BES.cpp
+	mafPipeVolumeSlice_BES.h
 )
 
 IF (MAF_USE_ITK)

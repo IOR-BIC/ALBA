@@ -38,6 +38,10 @@ SET(vtkMED_SRCS
   vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx
   vtkMAFVolumeTextureMapper2D.h
+  vtkMAFVolumeSlicer_BES.cxx
+  vtkMAFVolumeSlicer_BES.h
+  vtkMAFMeshCutter_BES.cxx 
+  vtkMAFMeshCutter_BES.h
 )
 
 IF (MAF_USE_ITK)
