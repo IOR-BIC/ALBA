@@ -8,5 +8,7 @@ VME/mafPipeVolumeSlice_BES.cpp 		VME/mafPipeVolumeSlice_BES.h
 VME/mafPipeMeshSlice_BES.cpp 		VME/mafPipeMeshSlice_BES.h
 vtkMED/vtkMAFVolumeSlicer_BES.cpp	vtkMED/vtkMAFVolumeSlicer_BES.h
 vtkMED/vtkMAFMeshSlicer_BES.cpp		vtkMED/vtkMAFMeshSlicer_BES.h
+Common/mafDbg.h
+Common/mafDataChecksum.h
 
 
