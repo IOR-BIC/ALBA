@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-14 13:45:11 $
-  Version:   $Revision: 1.13.2.1 $
+  Date:      $Date: 2009-05-14 15:26:48 $
+  Version:   $Revision: 1.13.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,6 +50,7 @@
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipeVolumeSlice_BES.h"
+#include "mafVMEVolumeLarge.h"
 
 
 #include <string>
@@ -119,7 +120,10 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(mafPipeVolumeSlice_BES, "BES: mafPipeVolumeSlice_BES.");
   mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
-  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");  
+  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES."); 
+
+  //TODO: to be committed down
+  mafPlugPipeMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
 }
 /*
 //------------------------------------------------------------------------------

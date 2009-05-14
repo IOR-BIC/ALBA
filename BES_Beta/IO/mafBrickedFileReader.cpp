@@ -3,7 +3,7 @@
 File:    	 mafBrickedFileReader.cpp
 Language:  C++
 Date:      13:2:2008   14:25
-Version:   $Revision: 1.1.2.1 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
 
 Copyright (c) 2008
@@ -28,7 +28,7 @@ mafCxxTypeMacro(mafBrickedFileReader);
 #include "vtkPointData.h"
 
 #include "mafMemDbg.h"
-#include "../vtkMAF/vtkMAFIdType64.h"
+#include "vtkMAFIdType64.h"
 
 #define BBF_DATACACHE_MAXCOUNT	7	//central brick + bricks around (L1 resample only)
 

@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeReader.cpp
   Language:  C++
   Date:      20:2:2008   14:36
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafVolumeLargeReader.h"
-#include "../vtkMAF/vtkMAFIdType64.h"
+#include "vtkMAFIdType64.h"
 #include "vtkPointData.h"
 
 mafCxxTypeMacro(mafVolumeLargeReader);
