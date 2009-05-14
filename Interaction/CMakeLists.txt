@@ -18,6 +18,8 @@ SET(PROJECT_SRCS
   mmiVTKPicker.h
   medGizmoPolylineGraph.cpp
   medGizmoPolylineGraph.h
+  mafGizmoROI_BES.cpp
+  mafGizmoROI_BES.h  
 )
 
 

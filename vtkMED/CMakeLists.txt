@@ -42,12 +42,38 @@ SET(vtkMED_SRCS
   vtkMAFVolumeSlicer_BES.h
   vtkMAFMeshCutter_BES.cxx 
   vtkMAFMeshCutter_BES.h  	
-	vtkMAFPolyDataDeformation.cpp
-	vtkMAFPolyDataDeformation.h
-	vtkMAFPolyDataDeformation_M1.cpp
-	vtkMAFPolyDataDeformation_M1.h
-	vtkMAFPolyDataDeformation_M2.cpp
-	vtkMAFPolyDataDeformation_M2.h  
+  vtkMAFPolyDataDeformation.cpp
+  vtkMAFPolyDataDeformation.h
+  vtkMAFPolyDataDeformation_M1.cpp
+  vtkMAFPolyDataDeformation_M1.h
+  vtkMAFPolyDataDeformation_M2.cpp
+  vtkMAFPolyDataDeformation_M2.h  
+  
+  ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
+  vtkMAFIdType64.h
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.cxx
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.h	
+  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.cxx
+  ../BES_Beta/vtkMAF/vtkMAFFileDataProvider.h  
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataProvider.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSet.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeDataSetCallback.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageData.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageReader.h
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.cxx
+  ../BES_Beta/vtkMAF/vtkMAFLargeImageSource.h
+  ../BES_Beta/vtkMAF/vtkMAFFile.cxx
+  ../BES_Beta/vtkMAF/vtkMAFFile.h	
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.cpp
+  ../BES_Beta/vtkMAF/vtkMAFDataArrayLayout.h
+  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.cpp
+  ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.h
+  ###############################################################
 )
 
 IF (MAF_USE_ITK)

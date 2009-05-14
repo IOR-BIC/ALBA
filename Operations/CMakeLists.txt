@@ -105,6 +105,15 @@ SET(PROJECT_SRCS
   mmoFillHoles.h
   mafOpMeshDeformation.cpp
   mafOpMeshDeformation.h
+  
+  medOpImporterRAWImages_BES.cpp
+  medOpImporterRAWImages_BES.h
+  mmoDICOMImporter_BES.cpp
+  mmoDICOMImporter_BES.h
+  mafOpImporterRAWVolume_BES.cpp
+  mafOpImporterRAWVolume_BES.h  
+  mafOpImporterBBF.cpp
+  mafOpImporterBBF.h
 )
   
 IF (MED_USE_Offis)
