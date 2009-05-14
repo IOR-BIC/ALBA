@@ -41,7 +41,13 @@ SET(vtkMED_SRCS
   vtkMAFVolumeSlicer_BES.cxx
   vtkMAFVolumeSlicer_BES.h
   vtkMAFMeshCutter_BES.cxx 
-  vtkMAFMeshCutter_BES.h
+  vtkMAFMeshCutter_BES.h  	
+	vtkMAFPolyDataDeformation.cpp
+	vtkMAFPolyDataDeformation.h
+	vtkMAFPolyDataDeformation_M1.cpp
+	vtkMAFPolyDataDeformation_M1.h
+	vtkMAFPolyDataDeformation_M2.cpp
+	vtkMAFPolyDataDeformation_M2.h  
 )
 
 IF (MAF_USE_ITK)

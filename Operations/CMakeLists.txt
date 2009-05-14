@@ -103,6 +103,8 @@ SET(PROJECT_SRCS
   
   mmoFillHoles.cpp
   mmoFillHoles.h
+  mafOpMeshDeformation.cpp
+  mafOpMeshDeformation.h
 )
   
 IF (MED_USE_Offis)
