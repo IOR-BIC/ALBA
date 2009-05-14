@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkDicomUnPackerTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-04-17 13:54:43 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-05-14 09:22:37 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -41,7 +41,7 @@ void vtkDicomUnPackerTest::ReadTest()
 	//Inizialize DICOM DIRECTORY
 	vtkMAFSmartPointer<vtkDirectory> DicomDirectory;
 	mafString DicomPath=MED_DATA_ROOT;
-	DicomPath<<"/Dicom/TestDicomUnpacker";
+	DicomPath<<"/DicomUnpacker/TestDicomUnpacker";
 	DicomDirectory->Open(DicomPath);
   mafString DictonaryFilename=MED_DATA_ROOT;  
 	DictonaryFilename<<"/Dictionaries/dicom3.dic";
