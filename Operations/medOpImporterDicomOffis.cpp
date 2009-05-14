@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-12 13:12:53 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2009-05-14 08:49:45 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -94,6 +94,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkRectilinearGrid.h"
 #include "vtkPointData.h"
 #include "vtkShortArray.h"
+#include "vtkUnsignedShortArray.h"
+#include "vtkCharArray.h"
 
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
 #include "dcmtk/ofstd/ofstream.h"
@@ -1720,10 +1722,17 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         spacing[1] = 1.0;// for RGB??
       } 
       
-      double slope,intercept;
-      ds->findAndGetFloat64(DCM_RescaleSlope,slope);
-      ds->findAndGetFloat64(DCM_RescaleIntercept,intercept);
-
+      double slope, intercept;
+      if(ds->findAndGetFloat64(DCM_RescaleSlope,slope).bad())
+      {
+        //Unable to get element: DCM_RescaleSlope[0];
+        slope = 1;
+      } 
+      if(ds->findAndGetFloat64(DCM_RescaleIntercept,intercept).bad())
+      {
+        //Unable to get element: DCM_RescaleIntercept[0];
+        intercept = 0;
+      } 
 
 
 ///////////////////CREATE VTKIMAGEDATA////////////////////////////
@@ -1738,21 +1747,25 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       imageData->SetOrigin(m_ImagePositionPatient);
       imageData->SetSpacing(spacing);
 
-
       long pixel_rep;
       ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
-
       ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
+
       if(val_long==16 && pixel_rep == 1)
+      {
         imageData->SetScalarType(VTK_SHORT);
+      }
       else if(val_long==16 && pixel_rep == 0)
+      {
         imageData->SetScalarType(VTK_UNSIGNED_SHORT);
+      }
       else if(val_long==8)
+      {
         imageData->SetScalarType(VTK_CHAR);
+      }
       imageData->AllocateScalars();
       imageData->GetPointData()->GetScalars()->SetName("Scalars");
       imageData->Update();
-      unsigned short *vtk_buf = (unsigned short*)imageData->GetScalarPointer();
 
       const Uint16 *dicom_buf_short = NULL;
       const Uint8* dicom_buf_char = NULL;
@@ -1776,6 +1789,40 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         }
       }
       imageData->Update();
+      for(int i=0 ; i<imageData->GetNumberOfPoints();i++)
+      {
+        double p = imageData->GetPointData()->GetScalars()->GetTuple1(i);
+      }
+
+      if (slope != 1 || intercept != 0)
+      {
+        if (imageData->GetScalarType() == VTK_UNSIGNED_SHORT)
+        {
+          vtkUnsignedShortArray *scalars=vtkUnsignedShortArray::SafeDownCast(imageData->GetPointData()->GetScalars());
+          for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
+          {
+            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
+          }
+        }
+        else if (imageData->GetScalarType() == VTK_SHORT)
+        {
+          vtkShortArray *scalars=vtkShortArray::SafeDownCast(imageData->GetPointData()->GetScalars());
+          for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
+          {
+            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
+          }
+        }
+        else if (imageData->GetScalarType() == VTK_CHAR)
+        {
+          vtkCharArray *scalars=vtkCharArray::SafeDownCast(imageData->GetPointData()->GetScalars());
+          for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
+          {
+            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
+          }
+        }
+        
+        imageData->Update();
+      }
 
 ////////////////////////////////////////////////////
 
