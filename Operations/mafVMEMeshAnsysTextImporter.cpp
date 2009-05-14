@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-14 16:21:12 $
-Version:   $Revision: 1.10 $
+Date:      $Date: 2009-05-14 22:25:34 $
+Version:   $Revision: 1.10.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -179,7 +179,10 @@ int mafVMEMeshAnsysTextImporter::ParseNodesFile(vtkUnstructuredGrid *grid)
 
   for (int i = 0; i < M.rows(); i++)    
     {
-    points->SetPoint(i, M(i, x_col), M(i, y_col), M(i, z_col));
+      double xCoord = M(i, x_col);
+      double yCoord = M(i, y_col);
+      double zCoord = M(i, z_col);
+      points->SetPoint(i, xCoord, yCoord, zCoord);
     }
 
   // fill the POINT section of the Mesh
