@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-12 16:22:43 $
-  Version:   $Revision: 1.51.2.4 $
-  Authors:   Paolo Quadrani,Stefano Perticoni
+  Date:      $Date: 2009-05-14 11:18:45 $
+  Version:   $Revision: 1.51.2.5 $
+  Authors:   Paolo Quadrani,Stefano Perticoni, modified by Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -21,10 +21,10 @@
 
 #include "mafIndent.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice.h"
-#include "mafPipeSurfaceSlice.h"
-#include "mafPipePolylineSlice.h"
-#include "mafPipeMeshSlice.h"
+#include "mafPipeVolumeSlice_BES.h"
+#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeMeshSlice_BES.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
@@ -57,6 +57,8 @@
 mafCxxTypeMacro(mafViewSlice);
 //----------------------------------------------------------------------------
 
+#include "mafMemDbg.h"
+
 //----------------------------------------------------------------------------
 mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo,bool showTICKs)
 :mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
@@ -66,7 +68,8 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
   m_Border        = NULL;
   
   m_Slice[0] = m_Slice[1] = m_Slice[2] = 0.0;
-  m_SliceInitialized = false;
+  InitializeSlice(m_Slice);     //to correctly set the normal  
+  m_SliceInitialized = false;   //reset initialized to false 
 
   m_TextActor=NULL;
   m_TextMapper=NULL;
@@ -79,7 +82,7 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
 	m_CurrentPolylineGraphEditor.clear();
   m_CurrentMesh.clear();
 
-	m_ShowVolumeTICKs =showTICKs;
+	m_ShowVolumeTICKs = showTICKs;
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
@@ -160,32 +163,32 @@ void mafViewSlice::UpdateText(int ID)
     switch(m_CameraPositionId)
     {
     case CAMERA_OS_X:
-      slice_mode = SLICE_X;
+      slice_mode = mafPipeVolumeSlice_BES::SLICE_X;
       break;
     case CAMERA_OS_Y:
-      slice_mode = SLICE_Y;
+      slice_mode = mafPipeVolumeSlice_BES::SLICE_Y;
       break;
     case CAMERA_OS_P:
-      slice_mode = SLICE_ORTHO;
+      slice_mode = mafPipeVolumeSlice_BES::SLICE_ORTHO;
       break;
     case CAMERA_PERSPECTIVE:
-      slice_mode = SLICE_ARB;
+      slice_mode = mafPipeVolumeSlice_BES::SLICE_ARB;
       break;
 		case CAMERA_ARB:
-			slice_mode = SLICE_ARB;
+			slice_mode = mafPipeVolumeSlice_BES::SLICE_ARB;
 			break;
     default:
-      slice_mode = SLICE_Z;
+      slice_mode = mafPipeVolumeSlice_BES::SLICE_Z;
     }
     //set the init coordinates value
-    if(slice_mode == SLICE_X)
+    if(slice_mode == mafPipeVolumeSlice_BES::SLICE_X)
       m_Text = "X = ";
-    else if(slice_mode == SLICE_Y)
+    else if(slice_mode == mafPipeVolumeSlice_BES::SLICE_Y)
       m_Text = "Y = ";
-    else if(slice_mode == SLICE_Z)
+    else if(slice_mode == mafPipeVolumeSlice_BES::SLICE_Z)
       m_Text = "Z = ";
 
-    if((slice_mode != SLICE_ORTHO) && (slice_mode != SLICE_ARB))
+    if((slice_mode != mafPipeVolumeSlice_BES::SLICE_ORTHO) && (slice_mode != mafPipeVolumeSlice_BES::SLICE_ARB))
       m_Text += wxString::Format("%.1f",m_Slice[slice_mode]);
 
     m_TextMapper->SetInput(m_Text.c_str());
@@ -200,10 +203,38 @@ void mafViewSlice::UpdateText(int ID)
 }
 
 //----------------------------------------------------------------------------
-void mafViewSlice::InitializeSlice(double slice[3])
+//Give an initial origin and normal (optionally) for the slice.
+void mafViewSlice::InitializeSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
-  memcpy(m_Slice,slice,sizeof(m_Slice));
+  memcpy(m_Slice,Origin,sizeof(m_Slice));
+  if (Normal != NULL) {
+    memcpy(m_SliceNormal,Normal,sizeof(m_SliceNormal));
+  }
+  else
+  {
+    if (m_CameraPositionId == CAMERA_ARB)
+      this->GetRWI()->GetCamera()->GetViewPlaneNormal(m_SliceNormal);
+    else
+    {
+      m_SliceNormal[0] = m_SliceNormal[1] = m_SliceNormal[2] = 0.0;
+
+      switch(m_CameraPositionId)
+      {    
+      case CAMERA_OS_X:
+        m_SliceNormal[0] = 1;      
+        break;
+      case CAMERA_OS_Y:      
+        m_SliceNormal[1] = 1;      
+        break;
+        //case CAMERA_OS_Z:  
+      default:
+        m_SliceNormal[2] = 1;
+        break;
+      }
+    }
+  }
+
   m_SliceInitialized = true;
 }
 //----------------------------------------------------------------------------
@@ -218,12 +249,11 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
 
   if (pipe_name != "")
   {
-    if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 1)
-    {
-      m_NumberOfVisibleVme = 1;
+    if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || 
+      vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 1) {
+        m_NumberOfVisibleVme = 1;
     }
-    else
-    {
+    else {
       m_NumberOfVisibleVme++;
     }
     mafPipeFactory *pipe_factory  = mafPipeFactory::GetInstance();
@@ -231,10 +261,10 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
     mafObject *obj= NULL;
     obj = pipe_factory->CreateInstance(pipe_name);
     mafPipe *pipe = (mafPipe*)obj;
-    if (pipe)
+    if (pipe != NULL)
     {
       pipe->SetListener(this);
-      if (pipe_name.Equals("mafPipeVolumeSlice"))
+      if (pipe->IsA("mafPipeVolumeSlice_BES"))  //BES: 3.4.2009 - changed to support inheritance
       {
         m_CurrentVolume = n;
         if (m_AttachCamera)
@@ -245,228 +275,90 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
         data->Update();
         switch(m_CameraPositionId)
         {
-          case CAMERA_OS_X:
-            slice_mode = SLICE_X;
-            m_Normal[0] = 1.0;
-            m_Normal[1] = 0.0;
-            m_Normal[2] = 0.0;
-        	break;
-          case CAMERA_OS_Y:
-            slice_mode = SLICE_Y;
-            m_Normal[0] = 0.0;
-            m_Normal[1] = 1.0;
-            m_Normal[2] = 0.0;
+        case CAMERA_OS_X:
+          slice_mode = mafPipeVolumeSlice_BES::SLICE_X;
           break;
-          case CAMERA_OS_P:
-            slice_mode = SLICE_ORTHO;
+        case CAMERA_OS_Y:
+          slice_mode = mafPipeVolumeSlice_BES::SLICE_Y;
           break;
-          case CAMERA_PERSPECTIVE:
-            slice_mode = SLICE_ARB;
+        case CAMERA_OS_P:
+          slice_mode = mafPipeVolumeSlice_BES::SLICE_ORTHO;
           break;
-          default:
-            slice_mode = SLICE_Z;
-            m_Normal[0] = 0.0;
-            m_Normal[1] = 0.0;
-            m_Normal[2] = 1.0;
+        case CAMERA_PERSPECTIVE:
+          slice_mode = mafPipeVolumeSlice_BES::SLICE_ARB;
+          break;
+        default:
+          slice_mode = mafPipeVolumeSlice_BES::SLICE_Z;
         }
         if (m_SliceInitialized)
         {
-          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,m_Slice,false);
+          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode, m_Slice, false);
+          ((mafPipeVolumeSlice_BES *)pipe)->SetNormal(m_SliceNormal);
         }
         else
         {
-          ((mafPipeVolumeSlice *)pipe)->InitializeSliceParameters(slice_mode,false);
+          ((mafPipeVolumeSlice_BES *)pipe)->InitializeSliceParameters(slice_mode,false);
         }
 
-				if(m_ShowVolumeTICKs)
-					((mafPipeVolumeSlice *)pipe)->ShowTICKsOn();
-				else
-					((mafPipeVolumeSlice *)pipe)->ShowTICKsOff();
+        if(m_ShowVolumeTICKs)
+          ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOn();
+        else
+          ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOff();
 
         UpdateText();
       }
-      else if(pipe_name.Equals("mafPipeSurfaceSlice"))
+      else 
       {
-        double normal[3];
-				switch(m_CameraPositionId)
-				{
-				case CAMERA_OS_X:
-					normal[0] = 1;
-				  normal[1] = 0;
- 					normal[2] = 0;
-					break;
-				case CAMERA_OS_Y:
-					normal[0] = 0;
-					normal[1] = 1;
-					normal[2] = 0;
-					break;
-				case CAMERA_OS_Z:
-					normal[0] = 0;
-					normal[1] = 0;
-					normal[2] = 1;
-					break;
-				case CAMERA_OS_P:
-					break;
-        //case CAMERA_OS_REP:
-				//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-				case CAMERA_PERSPECTIVE:
-					break;
-				default:
-					normal[0] = 0;
-					normal[1] = 0;
-					normal[2] = 1;
-				}
-		    m_CurrentSurface.push_back(n);
+        //not a VolumeSlice pipe, check, if it is some slicer
+        mafPipeSlice* spipe = mafPipeSlice::SafeDownCast(pipe);
+        if (spipe != NULL)
+        { 
+          //it is slicing pipe
+          //initialize supported slicing pipes
+          if(pipe->IsA("mafPipeSurfaceSlice_BES")){
+            m_CurrentSurface.push_back(n);        
+          }
+          else if(pipe->IsA("mafPipePolylineSlice_BES")){
+            m_CurrentPolyline.push_back(n);        
+          }
+          else if(pipe->IsA("medPipePolylineGraphEditor"))
+          {
+            m_CurrentPolylineGraphEditor.push_back(n);
 
-        double positionSlice[3];
-        positionSlice[0] = m_Slice[0];
-        positionSlice[1] = m_Slice[1];
-        positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice);
-		    ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
-				((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+            if(m_CameraPositionId==CAMERA_OS_P)
+              ((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
+            else
+              ((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();				
+          }
+          else if(pipe->IsA("mafPipeMeshSlice_BES"))  {
+            m_CurrentMesh.push_back(n);        
+          }
 
-      }
-			else if(pipe_name.Equals("mafPipePolylineSlice"))
-			{
-				double normal[3];
-				switch(m_CameraPositionId)
-				{
-				case CAMERA_OS_X:
-					normal[0] = 1;
-					normal[1] = 0;
-					normal[2] = 0;
-					break;
-				case CAMERA_OS_Y:
-					normal[0] = 0;
-					normal[1] = 1;
-					normal[2] = 0;
-					break;
-				case CAMERA_OS_Z:
-					normal[0] = 0;
-					normal[1] = 0;
-					normal[2] = 1;
-					break;
-				case CAMERA_OS_P:
-					break;
-				case CAMERA_ARB:
-						this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-					break;
-				case CAMERA_PERSPECTIVE:
-					//this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-					break;
-				default:
-					normal[0] = 0;
-					normal[1] = 0;
-					normal[2] = 1;
-				}
-				m_CurrentPolyline.push_back(n);
-        double positionSlice[3];
-        positionSlice[0] = m_Slice[0];
-        positionSlice[1] = m_Slice[1];
-        positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice);
-				((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
-				((mafPipePolylineSlice *)pipe)->SetNormal(normal);
-			}
-			else if(pipe_name.Equals("medPipePolylineGraphEditor"))
-			{
-				double normal[3];
-				switch(m_CameraPositionId)
-				{
-				case CAMERA_OS_X:
-					normal[0] = 1;
-					normal[1] = 0;
-					normal[2] = 0;
-					break;
-				case CAMERA_OS_Y:
-					normal[0] = 0;
-					normal[1] = 1;
-					normal[2] = 0;
-					break;
-				case CAMERA_OS_Z:
-					normal[0] = 0;
-					normal[1] = 0;
-					normal[2] = 1;
-					break;
-				case CAMERA_OS_P:
-					break;
-					//case CAMERA_OS_REP:
-					//	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-				case CAMERA_PERSPECTIVE:
-					break;
-				default:
-					normal[0] = 0;
-					normal[1] = 0;
-					normal[2] = 1;
-				}
-				m_CurrentPolylineGraphEditor.push_back(n);
-        double positionSlice[3];
-        positionSlice[0] = m_Slice[0];
-        positionSlice[1] = m_Slice[1];
-        positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice);
-				if(m_CameraPositionId==CAMERA_OS_P)
-					((medPipePolylineGraphEditor *)pipe)->SetModalityPerspective();
-				else
-					((medPipePolylineGraphEditor *)pipe)->SetModalitySlice();
-				((medPipePolylineGraphEditor *)pipe)->SetSlice(positionSlice, normal);				
-			}
-      else if(pipe_name.Equals("mafPipeMeshSlice"))
-      {
-        double normal[3];
-        switch(m_CameraPositionId)
-        {
-        case CAMERA_OS_X:
-          normal[0] = 1;
-          normal[1] = 0;
-          normal[2] = 0;
-          break;
-        case CAMERA_OS_Y:
-          normal[0] = 0;
-          normal[1] = 1;
-          normal[2] = 0;
-          break;
-        case CAMERA_OS_Z:
-          normal[0] = 0;
-          normal[1] = 0;
-          normal[2] = 1;
-          break;
-        case CAMERA_OS_P:
-          break;
-        case CAMERA_ARB:
-          this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-          break;
-        case CAMERA_PERSPECTIVE:
-          //this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-          break;
-        default:
-          normal[0] = 0;
-          normal[1] = 0;
-          normal[2] = 1;
+          //common stuff
+          double positionSlice[3];
+          positionSlice[0] = m_Slice[0];
+          positionSlice[1] = m_Slice[1];
+          positionSlice[2] = m_Slice[2];
+          VolumePositionCorrection(positionSlice);
+          spipe->SetSlice(positionSlice, m_SliceNormal);
         }
-        m_CurrentMesh.push_back(n);
-        double positionSlice[3];
-        positionSlice[0] = m_Slice[0];
-        positionSlice[1] = m_Slice[1];
-        positionSlice[2] = m_Slice[2];
-        VolumePositionCorrection(positionSlice);
-        ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
-        ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
-      }
-			pipe->Create(n);
+      } //end else [it is not volume slicing]                     
+
+      pipe->Create(n);
       n->m_Pipe = (mafPipe*)pipe;
     }
     else
       mafErrorMessage("Cannot create visual pipe object of type \"%s\"!",pipe_name.GetCStr());
   }
 }
+
 //----------------------------------------------------------------------------
 void mafViewSlice::VmeDeletePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
   mafSceneNode *n = m_Sg->Vme2Node(vme);
-  if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
+  if((vme->IsMAFType(mafVMELandmarkCloud) && ((mafVMELandmarkCloud*)vme)->IsOpen()) || 
+    vme->IsMAFType(mafVMELandmark) && m_NumberOfVisibleVme == 0)
     m_NumberOfVisibleVme = 0;
   else
     m_NumberOfVisibleVme--;
@@ -528,151 +420,129 @@ mafGUI *mafViewSlice::CreateGui()
 void mafViewSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  /*if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
-  {
-    switch(e->GetId()) 
-    {
-      default:
-        mafEventMacro(*maf_event);
-      break;
-    }
-  }
-  else
-  {
-    mafEventMacro(*maf_event);
-  }*/
   mafEventMacro(*maf_event);
 }
+
 //----------------------------------------------------------------------------
 void mafViewSlice::SetLutRange(double low_val, double high_val)
 //----------------------------------------------------------------------------
 {
   if(!m_CurrentVolume) 
     return;
-  mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-  if (pipe_name.Equals("mafPipeVolumeSlice"))
-  {
-    mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
+  
+  mafPipeVolumeSlice_BES *pipe = mafPipeVolumeSlice_BES::SafeDownCast(m_CurrentVolume->m_Pipe);
+  if (pipe != NULL) {    
     pipe->SetLutRange(low_val, high_val); 
   }
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::SetSliceLocalOrigin(double origin[3])
+void mafViewSlice::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
-  if(m_CurrentVolume)
+  //set slice origin and normal
+  if (Origin != NULL)
+    memcpy(m_Slice,Origin,sizeof(m_Slice));
+
+  if (Normal != NULL)
+    memcpy(m_SliceNormal,Normal,sizeof(m_Slice));
+
+  //and now set it for every VME
+  if (m_CurrentVolume)
 	{
-		memcpy(m_Slice,origin,sizeof(m_Slice));
-		mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-		if (pipe_name.Equals("mafPipeVolumeSlice"))
+    mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentVolume->m_Pipe);
+		if (pipe != NULL)
 		{
-			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
-			pipe->SetSlice(origin); 
+			pipe->SetSlice(Origin, Normal); 
 
 			// update text
 			this->UpdateText();
 		}
 	}
   
+  //BES 1.5.2008 - I don't understand why GetViewPlaneNormal is used
+  //so I leave it untouched
   double normal[3];
+  if (Normal != NULL)
+    memcpy(normal,Normal,sizeof(m_Slice));
+  else
   this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
-	double coord[3];
-	coord[0]=origin[0];
-	coord[1]=origin[1];
-  coord[2]=origin[2];
-
+	
+  double coord[3];
+  coord[0]=Origin[0];
+  coord[1]=Origin[1];
+  coord[2]=Origin[2];
   VolumePositionCorrection(coord);
 
-  m_Slice[0] = coord[0];
-  m_Slice[1] = coord[1];
-  m_Slice[2] = coord[2];
-  
-  if(!m_CurrentSurface.empty())
-	{
-		for(int i=0;i<m_CurrentSurface.size();i++)
-		{
-      		if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
-			{
-				mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
-				if (pipe_name.Equals("mafPipeSurfaceSlice"))
-				{
-					mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
-          pipe->SetSlice(coord); 
-          pipe->SetNormal(normal); 
-
-				}
-			}
-		}
-	}
-
-	if(!m_CurrentPolyline.empty())
-	{
-		for(int i=0;i<m_CurrentPolyline.size();i++)
-		{
-			if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
-			{
-				mafString pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
-				if (pipe_name.Equals("mafPipePolylineSlice"))
-				{
-					mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
-					pipe->SetSlice(coord); 
-				}
-			}
-		}
-	}
-
-	for(int i=0;i<m_CurrentPolylineGraphEditor.size();i++)
-	{
-		mafString pipe_name = m_CurrentPolylineGraphEditor.at(i)->m_Pipe->GetTypeName();
-		if (pipe_name.Equals("medPipePolylineGraphEditor"))
-		{
-			medPipePolylineGraphEditor *pipe = (medPipePolylineGraphEditor *)m_CurrentPolylineGraphEditor[i]->m_Pipe;
-			pipe->SetOrigin(coord); 
-		}
-	}
-
-
-  if(!m_CurrentMesh.empty())
+  for(int i = 0; i < m_CurrentSurface.size(); i++)
   {
-    for(int i=0;i<m_CurrentMesh.size();i++)
+    if (m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
     {
-      if(m_CurrentMesh.at(i) && m_CurrentMesh.at(i)->m_Pipe)
-      {
-        mafString pipe_name = m_CurrentMesh.at(i)->m_Pipe->GetTypeName();
-        if (pipe_name.Equals("mafPipeMeshSlice"))
-        {
-          mafPipeMeshSlice *pipe = (mafPipeMeshSlice *)m_CurrentMesh[i]->m_Pipe;
-          pipe->SetSlice(coord); 
-        }
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentSurface.at(i)->m_Pipe);
+      if (pipe != NULL){
+        pipe->SetSlice(coord, normal); 
       }
     }
+  }	
+
+
+  for(int i = 0;i < m_CurrentPolyline.size();i++)
+  {
+    if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
+    {
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolyline.at(i)->m_Pipe);
+      if (pipe != NULL){
+        pipe->SetSlice(coord, normal); 
+      }
+    }
+  }	
+
+	for(int i = 0; i < m_CurrentPolylineGraphEditor.size();i++)
+	{
+    if (m_CurrentPolylineGraphEditor.at(i) && m_CurrentPolylineGraphEditor.at(i)->m_Pipe)
+    {
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolylineGraphEditor.at(i)->m_Pipe);
+      if (pipe != NULL){
+        pipe->SetSlice(coord, normal); 
+      }
+    }   
+	}
+
+  for(int i = 0; i < m_CurrentMesh.size();i++)
+  {
+    if (m_CurrentMesh.at(i) && m_CurrentMesh.at(i)->m_Pipe)
+    {
+      mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->m_Pipe);
+      if (pipe != NULL){
+        pipe->SetSlice(coord, normal); 
+      }
+    }   
   }
 
   // update text
   this->UpdateText();
 }
 //----------------------------------------------------------------------------
-void mafViewSlice::GetSlice(double slice[3])
+//Get the slice origin coordinates and normal.
+void mafViewSlice::GetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
-  memcpy(slice,m_Slice,sizeof(m_Slice));
+  if (Origin != NULL)
+    memcpy(Origin, m_Slice, sizeof(m_Slice));
+
+  if (Normal != NULL)
+    memcpy(Normal, m_SliceNormal, sizeof(m_SliceNormal));
 }
-//----------------------------------------------------------------------------
-double *mafViewSlice::GetSlice()
-//----------------------------------------------------------------------------
-{
-  return m_Slice;
-}
+
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderUpdate()
 //----------------------------------------------------------------------------
 {
-  if(NULL != m_Border)
+  if (NULL != m_Border)
   {
     BorderCreate(m_BorderColor);
   }
-  
 }
+
 //----------------------------------------------------------------------------
 void mafViewSlice::BorderCreate(double col[3])
 //----------------------------------------------------------------------------
@@ -831,7 +701,8 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
 void mafViewSlice::VmeRemove(mafNode *vme)
 //----------------------------------------------------------------------------
 {
-  if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||vme->IsA("medVMEPolylineEditor")||vme->IsA("mafVMEMesh"))
+  if(vme->IsA("mafVMEPolyline")||vme->IsA("mafVMESurface")||
+    vme->IsA("medVMEPolylineEditor")||vme->IsA("mafVMEMesh"))
   {
     this->UpdateSurfacesList(vme);
   }
@@ -849,90 +720,7 @@ void mafViewSlice::Print(std::ostream& os, const int tabs)// const
   os << std::endl;
   m_Sg->Print(os,1);
 }
-//-------------------------------------------------------------------------
-void mafViewSlice::SetNormal(double normal[3])
-//-------------------------------------------------------------------------
-{
-	/*if(m_CurrentVolume)
-	{
-		mafString pipe_name = m_CurrentVolume->m_Pipe->GetTypeName();
-		if (pipe_name.Equals("mafPipeVolumeSlice"))
-		{
-			mafPipeVolumeSlice *pipe = (mafPipeVolumeSlice *)m_CurrentVolume->m_Pipe;
-			pipe->SetSlice(origin); 
 
-			// update text
-			this->UpdateText();
-		}
-	}*/
-  m_Normal[0] = normal[0];
-  m_Normal[1] = normal[1];
-  m_Normal[2] = normal[2];
-
-	if(!m_CurrentSurface.empty())
-	{
-		for(int i=0;i<m_CurrentSurface.size();i++)
-		{
-			if(m_CurrentSurface.at(i) && m_CurrentSurface.at(i)->m_Pipe)
-			{
-				mafString pipe_name = m_CurrentSurface.at(i)->m_Pipe->GetTypeName();
-				if (pipe_name.Equals("mafPipeSurfaceSlice"))
-				{
-					mafPipeSurfaceSlice *pipe = (mafPipeSurfaceSlice *)m_CurrentSurface[i]->m_Pipe;
-					pipe->SetNormal(normal); 
-				}
-			}
-		}
-	}
-
-	if(!m_CurrentPolyline.empty())
-	{
-		for(int i=0;i<m_CurrentPolyline.size();i++)
-		{
-			if(m_CurrentPolyline.at(i) && m_CurrentPolyline.at(i)->m_Pipe)
-			{
-				mafString pipe_name = m_CurrentPolyline.at(i)->m_Pipe->GetTypeName();
-				if (pipe_name.Equals("mafPipePolylineSlice"))
-				{
-					mafPipePolylineSlice *pipe = (mafPipePolylineSlice *)m_CurrentPolyline[i]->m_Pipe;
-					pipe->SetNormal(normal); 
-				}
-			}
-		}
-	}
-
-	if(!m_CurrentPolylineGraphEditor.empty())
-	{
-		for(int i=0;i<m_CurrentPolylineGraphEditor.size();i++)
-		{
-			if(m_CurrentPolylineGraphEditor.at(i) && m_CurrentPolylineGraphEditor.at(i)->m_Pipe)
-			{
-				mafString pipe_name = m_CurrentPolylineGraphEditor.at(i)->m_Pipe->GetTypeName();
-				if (pipe_name.Equals("medPipePolylineGraphEditor"))
-				{
-					medPipePolylineGraphEditor *pipe = (medPipePolylineGraphEditor *)m_CurrentPolylineGraphEditor[i]->m_Pipe;
-					pipe->SetNormal(normal); 
-				}
-			}
-		}
-	}
-
-  if(!m_CurrentMesh.empty())
-  {
-    for(int i=0;i<m_CurrentMesh.size();i++)
-    {
-      if(m_CurrentMesh.at(i) && m_CurrentMesh.at(i)->m_Pipe)
-      {
-        mafString pipe_name = m_CurrentMesh.at(i)->m_Pipe->GetTypeName();
-        if (pipe_name.Equals("mafPipeMeshSlice"))
-        {
-          mafPipeMeshSlice *pipe = (mafPipeMeshSlice *)m_CurrentMesh[i]->m_Pipe;
-          pipe->SetNormal(normal); 
-        }
-      }
-    }
-  }
-}
 //-------------------------------------------------------------------------
 void mafViewSlice::VolumePositionCorrection(double *point)
 //-------------------------------------------------------------------------
@@ -954,6 +742,5 @@ void mafViewSlice::VolumePositionCorrection(double *point)
     point[0] = result[0];
     point[1] = result[1];
     point[2] = result[2];
-  }
-  
+  } 
 }

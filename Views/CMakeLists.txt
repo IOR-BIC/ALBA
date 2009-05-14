@@ -38,6 +38,8 @@ SET(PROJECT_SRCS
   #medViewEmgGraph.h
   medViewSlicer.cpp
   medViewSlicer.h
+  mafViewSliceOnCurve.cpp
+  mafViewSliceOnCurve.h
 )
 
 # List libraries that are needed by this project.
