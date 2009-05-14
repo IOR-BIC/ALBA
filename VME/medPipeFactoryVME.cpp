@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-02-08 09:59:07 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2009-05-14 13:45:11 $
+  Version:   $Revision: 1.13.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,6 +44,13 @@
 #endif
 
 #include "medPipePolylineGraphEditor.h"
+
+//TODO: commit down to openMAF
+#include "mafPipeMeshSlice_BES.h"
+#include "mafPipePolylineSlice_BES.h"
+#include "mafPipeSurfaceSlice_BES.h"
+#include "mafPipeVolumeSlice_BES.h"
+
 
 #include <string>
 #include <ostream>
@@ -108,7 +115,11 @@ medPipeFactoryVME::medPipeFactoryVME()
 
 #endif
 
-
+  //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
+  mafPlugPipeMacro(mafPipeVolumeSlice_BES, "BES: mafPipeVolumeSlice_BES.");
+  mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
+  mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
+  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");  
 }
 /*
 //------------------------------------------------------------------------------
