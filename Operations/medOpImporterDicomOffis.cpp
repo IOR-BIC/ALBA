@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-14 08:49:45 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2009-05-14 12:34:30 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1682,13 +1682,22 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         }
         continue;
       }
-      m_FileName = file;
+      m_FileName = file; 
 
       DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
  
       // decompress data set if compressed
       ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
       DJDecoderRegistration::cleanup(); // deregister JPEG codecs
+
+      const char *option = "?";
+      ds->findAndGetString(DCM_ScanOptions,option);
+      wxString scanOption = option;
+
+      if (scanOption.Find("SCOUT") != -1)//check if it is a scout image
+      {
+        continue;
+      }
 
       //now are used findAndGet* method to get dicom information
       long int val_long;
