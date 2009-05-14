@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-05-12 13:12:53 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2009-05-14 08:48:59 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -85,6 +85,7 @@ public:
 
 	mafTypeMacro(medOpImporterDicomOffis, mafOp);
 
+  /** Copy. */
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -105,21 +106,22 @@ public:
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
 
-  /** Set the directory name which contains DICOM slices to import */
+  /** Set the directory name which contains DICOM slices to import. */
   void SetDirName(const char *dirName){m_DicomDirectory = dirName;};
 
   /** Return the directory name which contains DICOM slices to import. */
   const char *GetDirName() const {return m_DicomDirectory.GetCStr();};
 
+  /** OnEvent. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Assign the dicom directory*/
   void SetDicomDirectory(const char *directory){m_DicomDirectory = directory;}
 
-  /** Set if output must be in imagedata(resampled) or original rectilinear grid*/
+  /** Set if output must be in imagedata(resampled) or original rectilinear grid. */
   void SetResampleFlag(int enable){m_ResampleFlag = enable;}
 
-  /** Retrieve resample flag*/
+  /** Retrieve resample flag. */
   int GetResampleFlag(){return m_ResampleFlag;};
 
   /** Read Dicom file */
@@ -140,17 +142,18 @@ public:
   /** Create the pipeline to read the images. */
 	virtual void CreatePipeline();
 
+  /** Open dir containing Dicom images. */
   bool OpenDir();
 
 protected:
 
-	/** Create load page and his GUI for the wizard */
+	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
 	
-	/** Create crop page and his GUI for the wizard */
+	/** Create crop page and his GUI for the wizard. */
 	void CreateCropPage();
 
-	/** Create build page and his GUI for the wizard */
+	/** Create build page and his GUI for the wizard. */
 	void CreateBuildPage();
 
 	/** Reset the list of files and all the structures that own images information. */
@@ -177,33 +180,38 @@ protected:
 	/** Perform update of guis of 3 pages of the wizard */
 	void GuiUpdate();
 
-	void EnableSliceSlider(bool enable);
+	
+  /** Enable slice slider. */
+  void EnableSliceSlider(bool enable);
 
+  /** Enable time slider. */
 	void EnableTimeSlider(bool enable);
 
+  /** Update camera. */
 	void CameraUpdate();
 
+  /** reset camera. */
 	void CameraReset();
 
+  /** On page changing. */
 	void OnWizardPageChanging(){};
 
-	/** Auto position of the crop plane in way of Volume side */
+	/** Auto position of the crop plane in way of Volume side. */
 	void AutoPositionCropPlane();
 
-	/** Performe crop of dicom data */
+	/** Performe crop of dicom data. */
 	void Crop();
   
-  /** Performe Undo crop of dicom data */
+  /** Performe Undo crop of dicom data. */
   void UndoCrop();
 
-  /** Delete all istances of used objects*/
+  /** Delete all istances of used objects. */
   void Destroy();
 
-  /** function that resample volume with rectilinear grid output*/
+  /** function that resample volume with rectilinear grid output. */
   void ResampleVolume();
 
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
-  //DcmFileFormat      m_DicomImg;
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
 	vtkPolyDataMapper	*m_SliceMapper;
