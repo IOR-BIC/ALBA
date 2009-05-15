@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkDicomUnPackerTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-14 09:22:37 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2009-05-15 13:28:56 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -93,7 +93,7 @@ void vtkDicomUnPackerTest::ReadTest()
 	}
 	//Check dimension Z
 	CPPUNIT_ASSERT(MinZ+DELTA>-40.5 && MinZ-DELTA<-40.5);
-	CPPUNIT_ASSERT(MaxZ+DELTA>-34.5 && MaxZ-DELTA<-34.5);
+	CPPUNIT_ASSERT(MaxZ+DELTA>-36.5 && MaxZ-DELTA<-36.5);
 	//Chcek scalar range
 	CPPUNIT_ASSERT(MinScalar==-3024 && MaxScalar==1699);
 	//Check the reader has read all images
