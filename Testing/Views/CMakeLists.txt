@@ -3,6 +3,7 @@ PROJECT (MedicalViews_TEST)
 LINK_LIBRARIES(medViews)
 LINK_LIBRARIES(medCommon)
 LINK_LIBRARIES(medVME)
+LINK_LIBRARIES(medInteraction)
 
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
