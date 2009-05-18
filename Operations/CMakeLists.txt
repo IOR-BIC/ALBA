@@ -103,6 +103,8 @@ IF (MAF_USE_VTK)
     mafOpBooleanSurface.h
     mafOpEditNormals.cpp
     mafOpEditNormals.h
+    mafOpApplyTrajectory.cpp
+    mafOpApplyTrajectory.h
   )
 ENDIF (MAF_USE_VTK)
 
