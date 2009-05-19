@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 15:51:38 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-05-19 15:06:25 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alexander Savenko, Josef Kohout (major change)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -12,7 +12,8 @@
 //it must be included before gl.h and glu.h
 #ifdef _WIN32
 #include <Windows.h>
-#include "../GPUAPI/GPU_OGL.h"  //openMAF/GPUAPI
+//#include "../GPUAPI/GPU_OGL.h"  //openMAF/GPUAPI
+#include "GPU_OGL.h"
 #endif
 
 #include "vtkMAFVolumeSlicer_BES.h"
@@ -26,7 +27,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
 
 #include "mafMemDbg.h"
