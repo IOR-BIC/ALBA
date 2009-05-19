@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpApplyTrajectory.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-18 14:49:32 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-05-19 11:52:42 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -62,7 +62,10 @@ mafOp(label)
 mafOpApplyTrajectory::~mafOpApplyTrajectory()
 //----------------------------------------------------------------------------
 {
-  //mafDEL(m_OriginalMatrix);
+  if (m_OriginalMatrix != NULL)
+  {
+    mafDEL(m_OriginalMatrix);
+  }
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpApplyTrajectory::Copy()   
@@ -150,6 +153,9 @@ int mafOpApplyTrajectory::Read()
     wxBusyInfo wait("Please wait, working...");
   }
 
+  mafNEW(m_OriginalMatrix);
+  m_OriginalMatrix->DeepCopy(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+
   wxString path, name, ext;
   wxSplitPath(m_File.c_str(),&path,&name,&ext);
 
@@ -183,9 +189,6 @@ int mafOpApplyTrajectory::Read()
         mafMessage(_("Error reading trajectory file. Incorrect number of parameter."), _("I/O Error"), wxICON_ERROR );
       return MAF_ERROR;
     }
-
-    mafNEW(m_OriginalMatrix);
-    m_OriginalMatrix = ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
 
     mafSmartPointer<mafTransform> boxPose;
     boxPose->RotateY(newOrientation[1], POST_MULTIPLY);
