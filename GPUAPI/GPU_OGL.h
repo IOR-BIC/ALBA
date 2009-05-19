@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: GPU_OGL.h,v $ 
   Language: C++ 
-  Date: $Date: 2008-12-12 11:00:02 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-05-19 15:06:02 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -18,7 +18,7 @@
 
 #ifdef _WIN32
 //	#define GLEW_STATIC
-	#include "glew/glew.h"    //must be included before gl.h and glu.h
+	#include "glew.h"    //must be included before gl.h and glu.h
 	
 //	#pragma message("Information: application must be linked with the static GLEW library")
 #ifdef _DEBUG
@@ -29,7 +29,7 @@
 //	#pragma comment( lib, "glew32s.lib" ) 
 #endif
 
-	#include "FBO/framebufferObject.h"	
+	#include "framebufferObject.h"	
 #else
 	#pragma message ("GPU_OGL is supported for WIN32 platform only");
 #endif
