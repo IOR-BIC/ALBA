@@ -38,7 +38,7 @@ OF SUCH DAMAGE.
 */
 
 #include "glErrorUtil.h"
-#include "../glew/glew.h"
+#include "glew.h"
 using namespace std;
 
 #ifndef NDEBUG

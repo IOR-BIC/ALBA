@@ -42,7 +42,7 @@
 #ifndef UCDAVIS_FRAMEBUFFER_OBJECT_H
 #define UCDAVIS_FRAMEBUFFER_OBJECT_H
 
-#include "../glew/glew.h"
+#include "glew.h"
 #include <iostream>
 
 /*!
