@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2008-08-26 08:37:11 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2009-05-20 15:03:01 $
+Version:   $Revision: 1.13.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -98,6 +98,21 @@ public:
 
   /**Set if actor is pickable */
   void SetActorPicking(int enable);
+
+  /** Set Tube Capping */
+  void SetTubeCapping(int capping){m_Capping = capping;};
+  /** Set/Get Tube Capping */
+  int GetTubeCapping(){return m_Capping;};
+
+  /** Set Tube Resolution */
+  void SetTubeResolution(double resolution){m_TubeResolution = resolution;};
+  /** Get Tube Resolution */
+  double GetTubeResolution(){return m_TubeResolution;};
+
+  /** Set Glyph Resolution */
+  void SetGlyphResolution(double resolution){m_SphereResolution = resolution;};
+  /** Get Glyph Resolution */
+  double GetGlyphResolution(){return m_SphereResolution;};
 
 	/** IDs for the GUI */
 	enum PIPE_POLYLINE_WIDGET_ID

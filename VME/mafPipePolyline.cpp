@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-26 08:37:11 $
-Version:   $Revision: 1.20 $
+Date:      $Date: 2009-05-20 15:03:01 $
+Version:   $Revision: 1.20.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -818,6 +818,11 @@ vtkPolyData *mafPipePolyline::SplineProcess(vtkPolyData *polyData)
   //cleaned point list
   vtkMAFSmartPointer<vtkPoints> pts;
   vtkMAFSmartPointer<vtkPoints> ptsSplined;
+
+  if (m_PolySpline)
+  {
+  	vtkDEL(m_PolySpline);
+  }
 
   vtkNEW(m_PolySpline);
 
