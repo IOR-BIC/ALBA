@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpApplyTrajectory.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-19 11:52:42 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-05-21 09:48:53 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,7 +85,8 @@ mafOp* mafOpApplyTrajectory::Copy()
 bool mafOpApplyTrajectory::Accept(mafNode* vme)
 //----------------------------------------------------------------------------
 {  
-  return !((mafVME *)vme)->IsAnimated();
+  return !((mafVME *)vme)->IsAnimated() && !vme->IsA("mafVMERoot") 
+    && !vme->IsA("mafVMEExternalData") && !vme->IsA("mafVMERefSys");
 }
 
 //----------------------------------------------------------------------------
