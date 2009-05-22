@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-05-14 08:48:59 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-05-22 15:51:05 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,7 +52,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medImporterDICOMListElement;
+class medImporterDICOMListElements;
 class mmiDICOMImporterInteractor;
 class medGUIWizard;
 class medGUIWizardPageNew;
@@ -70,7 +70,7 @@ class vtkActor;
 
 
 
-WX_DECLARE_LIST(medImporterDICOMListElement, medListDicomFiles);
+WX_DECLARE_LIST(medImporterDICOMListElements, medListDICOMFiles);
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
 //----------------------------------------------------------------------------
@@ -250,9 +250,9 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medListDicomFiles	*m_FilesList;
-	medListDicomFiles	*m_ListSelected;
-  std::map<mafString,medListDicomFiles*> m_DicomMap;
+	medListDICOMFiles	*m_FilesList;
+	medListDICOMFiles	*m_ListSelected;
+  std::map<mafString,medListDICOMFiles*> m_DicomMap;
 
 	mafString	m_CurrentSliceName;
 	mafString	m_VolumeName;
@@ -295,12 +295,12 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-// medImporterDICOMListElement :
+// medImporterDICOMListElements :
 //----------------------------------------------------------------------------
-class medImporterDICOMListElement
+class medImporterDICOMListElements
 {
 public:
-	medImporterDICOMListElement() 
+	medImporterDICOMListElements() 
 	{
 		m_SliceFilename = "";
 		m_Pos[0] = -9999;
@@ -311,7 +311,7 @@ public:
 		m_NumberOfImages = -1;
 	};
 
-	medImporterDICOMListElement(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
+	medImporterDICOMListElements(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceFilename = filename;
 		m_Pos[0] = coord[0];
@@ -324,7 +324,7 @@ public:
 		m_Data->DeepCopy(data);
 	};
 
-	~medImporterDICOMListElement() {vtkDEL(m_Data);};
+	~medImporterDICOMListElements() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
 	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
