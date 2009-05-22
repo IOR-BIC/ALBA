@@ -69,10 +69,6 @@ ADD_TEST(medOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateSurfaceTest
 ADD_EXECUTABLE(medOpVolumeResampleTest medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp)
 ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTest)
 
-IF (MED_USE_GDCM)
-ADD_EXECUTABLE(medOpImporterDicomGrassrootsTest medOpImporterDicomGrassrootsTest.h medOpImporterDicomGrassrootsTest.cpp)
-ADD_TEST(medOpImporterDicomGrassrootsTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomGrassrootsTest)
-ENDIF (MED_USE_GDCM)
 
 IF (MED_USE_Offis)
 ADD_EXECUTABLE(medOpImporterDicomOffisTest medOpImporterDicomOffisTest.h medOpImporterDicomOffisTest.cpp)
