@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2009-04-22 10:55:54 $
-# Version:   $Revision: 1.2.2.7 $
+# Date:      $Date: 2009-05-22 08:36:51 $
+# Version:   $Revision: 1.2.2.8 $
 #
 # Description:
 # Project file for configuring the the Multimod Fundation Layer.
@@ -14,7 +14,6 @@ SET (DEBUG FALSE)
 
 # options for configuring MedFL libraries
 OPTION(MED_USE_Offis "Find and Link the Offis library." ON)
-OPTION(MED_USE_GDCM "Find and Link the GDCM library." OFF)
 
 #
 # configure CMake modules for MedFL
@@ -28,12 +27,6 @@ IF (MED_USE_Offis)
   MedFL_SUBPROJECT(Offis Offis)
 ENDIF(MED_USE_Offis)
 
-#
-# GDCM Library
-#
-IF (MED_USE_GDCM)
-  MedFL_SUBPROJECT(GDCM GDCM)
-ENDIF(MED_USE_GDCM)
 
 # Create module files in build directory
 IF (NOT CONFIGURE_ERROR)
