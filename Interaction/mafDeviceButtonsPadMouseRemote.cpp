@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdRemoteMouse.cpp,v $
+  Module:    $RCSfile: mafDeviceButtonsPadMouseRemote.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:08:16 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmdRemoteMouse.h"
+#include "mafDeviceButtonsPadMouseRemote.h"
 #include "mafEventBase.h"
 #include "mafView.h"
 #include "mafSceneGraph.h"
@@ -32,21 +32,21 @@
 #include "vtkRenderWindowInteractor.h"
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mmdRemoteMouse)
+mafCxxTypeMacro(mafDeviceButtonsPadMouseRemote)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mmdRemoteMouse::mmdRemoteMouse()
+mafDeviceButtonsPadMouseRemote::mafDeviceButtonsPadMouseRemote()
 //------------------------------------------------------------------------------
 {
 }
 //------------------------------------------------------------------------------
-mmdRemoteMouse::~mmdRemoteMouse()
+mafDeviceButtonsPadMouseRemote::~mafDeviceButtonsPadMouseRemote()
 //------------------------------------------------------------------------------
 {
 }
 //------------------------------------------------------------------------------
-void mmdRemoteMouse::OnEvent(mafEventBase *event)
+void mafDeviceButtonsPadMouseRemote::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
@@ -61,7 +61,7 @@ void mmdRemoteMouse::OnEvent(mafEventBase *event)
     e->Get2DPosition(pos);
   }
 
-  if (id == mmdMouse::MOUSE_2D_MOVE)
+  if (id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
   {
     NormalizedDisplayToDisplay(pos);
     SetLastPosition(pos[0],pos[1],e->GetModifiers());
@@ -103,13 +103,13 @@ void mmdRemoteMouse::OnEvent(mafEventBase *event)
     m_SelectedView = NULL;
     m_SelectedRWI  = NULL;
   }
-  else if (id == mmdMouse::MOUSE_CHAR_EVENT)
+  else if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
   {
     mafEvent *ev = mafEvent::SafeDownCast(event);
     if (ev)
     {
       unsigned char key = (unsigned char)ev->GetArg();
-      mafEventInteraction ei(this, mmdMouse::MOUSE_CHAR_EVENT);
+      mafEventInteraction ei(this, mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT);
       ei.SetKey(key);
       InvokeEvent(ei,MCH_INPUT);
     }

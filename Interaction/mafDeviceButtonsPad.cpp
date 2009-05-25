@@ -1,16 +1,16 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdButtonsPad.cpp,v $
+  Module:    $RCSfile: mafDeviceButtonsPad.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-21 07:57:09 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#include "mmdButtonsPad.h"
+#include "mafDeviceButtonsPad.h"
 #include "mmuIdFactory.h"
 
 #include "mafEventInteraction.h"
@@ -19,13 +19,13 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mmdButtonsPad::BUTTON_DOWN)
-MAF_ID_IMP(mmdButtonsPad::BUTTON_UP)
+MAF_ID_IMP(mafDeviceButtonsPad::BUTTON_DOWN)
+MAF_ID_IMP(mafDeviceButtonsPad::BUTTON_UP)
 
-mafCxxTypeMacro(mmdButtonsPad)
+mafCxxTypeMacro(mafDeviceButtonsPad)
 
 //------------------------------------------------------------------------------
-mmdButtonsPad::mmdButtonsPad()
+mafDeviceButtonsPad::mafDeviceButtonsPad()
 //------------------------------------------------------------------------------
 {
   m_ButtonState = NULL;
@@ -33,7 +33,7 @@ mmdButtonsPad::mmdButtonsPad()
 }
 
 //------------------------------------------------------------------------------
-mmdButtonsPad::~mmdButtonsPad()
+mafDeviceButtonsPad::~mafDeviceButtonsPad()
 //------------------------------------------------------------------------------
 {
   if (m_ButtonState)
@@ -42,7 +42,7 @@ mmdButtonsPad::~mmdButtonsPad()
   }
 }
 //------------------------------------------------------------------------------
-void mmdButtonsPad::SetNumberOfButtons(int num)
+void mafDeviceButtonsPad::SetNumberOfButtons(int num)
 //------------------------------------------------------------------------------
 {
   if (m_ButtonState)
@@ -62,7 +62,7 @@ void mmdButtonsPad::SetNumberOfButtons(int num)
 }
 
 //------------------------------------------------------------------------------
-int mmdButtonsPad::FlagCheck(bool event,bool &flag)
+int mafDeviceButtonsPad::FlagCheck(bool event,bool &flag)
 //------------------------------------------------------------------------------
 {
   if (event)
@@ -86,7 +86,7 @@ int mmdButtonsPad::FlagCheck(bool event,bool &flag)
 
 
 //------------------------------------------------------------------------------
-void mmdButtonsPad::SetButtonState(int num, bool value, unsigned long modifiers)
+void mafDeviceButtonsPad::SetButtonState(int num, bool value, unsigned long modifiers)
 //------------------------------------------------------------------------------
 {
   if (num<0||num>=m_NumberOfButtons)
@@ -114,14 +114,14 @@ void mmdButtonsPad::SetButtonState(int num, bool value, unsigned long modifiers)
 }
 
 //------------------------------------------------------------------------------
-void mmdButtonsPad::SendButtonEvent(mafEventInteraction *e)
+void mafDeviceButtonsPad::SendButtonEvent(mafEventInteraction *e)
 //------------------------------------------------------------------------------
 {
   this->InvokeEvent(e,MCH_INPUT);
 }
 
 //------------------------------------------------------------------------------
-bool mmdButtonsPad::GetButtonState(int num)
+bool mafDeviceButtonsPad::GetButtonState(int num)
 //------------------------------------------------------------------------------
 {
   return (num>=0&&num<m_NumberOfButtons)?m_ButtonState[num]:false;

@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdP5Glove.cpp,v $
+  Module:    $RCSfile: mafDeviceButtonsPadTrackerP5Glove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:18:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,7 @@
 
 #include "mafDefines.h"
 
-#include "mmdP5Glove.h"
+#include "mafDeviceButtonsPadTrackerP5Glove.h"
 #include "mafTransform.h"
 #include "mafSmartPointer.h"
 #include "mafEvent.h"
@@ -23,19 +23,19 @@
 
 #include "mafMatrix.h"
 
-mafCxxTypeMacro(mmdP5Glove)
+mafCxxTypeMacro(mafDeviceButtonsPadTrackerP5Glove)
 
 //------------------------------------------------------------------------------
 // PIMPL declarations
 //------------------------------------------------------------------------------
-CP5DLL *mmdP5Glove::m_P5=NULL;
+CP5DLL *mafDeviceButtonsPadTrackerP5Glove::m_P5=NULL;
 
 //------------------------------------------------------------------------------
-//vtkStandardNewMacro(mmdP5Glove)
+//vtkStandardNewMacro(mafDeviceButtonsPadTrackerP5Glove)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mmdP5Glove::mmdP5Glove()
+mafDeviceButtonsPadTrackerP5Glove::mafDeviceButtonsPadTrackerP5Glove()
 //------------------------------------------------------------------------------
 {
   this->SetThreaded(1);
@@ -54,14 +54,14 @@ mmdP5Glove::mmdP5Glove()
 }
 
 //------------------------------------------------------------------------------
-mmdP5Glove::~mmdP5Glove()
+mafDeviceButtonsPadTrackerP5Glove::~mafDeviceButtonsPadTrackerP5Glove()
 //------------------------------------------------------------------------------
 {
   mafDEL(m_TmpPose);
 }
 
 //------------------------------------------------------------------------------
-int mmdP5Glove::InternalInitialize()
+int mafDeviceButtonsPadTrackerP5Glove::InternalInitialize()
 //------------------------------------------------------------------------------
 {
   if (m_P5==NULL)
@@ -117,7 +117,7 @@ int mmdP5Glove::InternalInitialize()
 }
 
 //------------------------------------------------------------------------------
-void mmdP5Glove::InternalShutdown()
+void mafDeviceButtonsPadTrackerP5Glove::InternalShutdown()
 //------------------------------------------------------------------------------
 {
   Superclass::InternalShutdown(); // stop thread
@@ -130,7 +130,7 @@ void mmdP5Glove::InternalShutdown()
 }
 
 //------------------------------------------------------------------------------
-int mmdP5Glove::InternalUpdate()
+int mafDeviceButtonsPadTrackerP5Glove::InternalUpdate()
 //------------------------------------------------------------------------------
 { 
   //float xyz[3];

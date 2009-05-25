@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmdClientMAF.cpp,v $
+Module:    $RCSfile: mafDeviceClientMAF.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:38 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2009-05-25 14:48:12 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -18,16 +18,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmdClientMAF.h"
+#include "mafDeviceClientMAF.h"
 #include "mmuIdFactory.h"
 #include "mafGUI.h"
 
 #include "mafEventSender.h"
 
-mafCxxTypeMacro(mmdClientMAF)
+mafCxxTypeMacro(mafDeviceClientMAF)
 
 //------------------------------------------------------------------------------
-mmdClientMAF::mmdClientMAF()
+mafDeviceClientMAF::mafDeviceClientMAF()
 //------------------------------------------------------------------------------
 {
   SetThreaded(0);
@@ -39,14 +39,14 @@ mmdClientMAF::mmdClientMAF()
 }
 
 //------------------------------------------------------------------------------
-mmdClientMAF::~mmdClientMAF()
+mafDeviceClientMAF::~mafDeviceClientMAF()
 //------------------------------------------------------------------------------
 {
   cppDEL(m_Client);
 }
 
 //---------------------------------------------------------------------------
-void mmdClientMAF::CreateGui()
+void mafDeviceClientMAF::CreateGui()
 //----------------------------------------------------------------------------
 {
   Superclass::CreateGui();
@@ -59,7 +59,7 @@ void mmdClientMAF::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mmdClientMAF::OnEvent(mafEventBase *maf_event)
+void mafDeviceClientMAF::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (maf_event->GetSender() == m_Client) 
@@ -85,7 +85,7 @@ void mmdClientMAF::OnEvent(mafEventBase *maf_event)
 }
 
 //------------------------------------------------------------------------------
-int mmdClientMAF::InternalInitialize()
+int mafDeviceClientMAF::InternalInitialize()
 //------------------------------------------------------------------------------
 {
   if(Superclass::InternalInitialize()!=MAF_OK)
@@ -103,7 +103,7 @@ int mmdClientMAF::InternalInitialize()
   return m_Connected ? MAF_OK : MAF_ERROR;
 }
 //------------------------------------------------------------------------------
-void mmdClientMAF::InternalShutdown()
+void mafDeviceClientMAF::InternalShutdown()
 //------------------------------------------------------------------------------
 {
   m_Connected = !(DisconnectClient() == MAF_OK);
@@ -113,7 +113,7 @@ void mmdClientMAF::InternalShutdown()
   Superclass::InternalShutdown();
 }
 //------------------------------------------------------------------------------
-int mmdClientMAF::ConnectClient(wxIPV4address &addr)
+int mafDeviceClientMAF::ConnectClient(wxIPV4address &addr)
 //------------------------------------------------------------------------------
 {
   if (m_Client->ConnectClient(addr)) 
@@ -123,7 +123,7 @@ int mmdClientMAF::ConnectClient(wxIPV4address &addr)
   return MAF_ERROR;
 }
 //------------------------------------------------------------------------------
-int mmdClientMAF::DisconnectClient()
+int mafDeviceClientMAF::DisconnectClient()
 //------------------------------------------------------------------------------
 {
   if (m_Client->DisconnectClient()) 
@@ -133,7 +133,7 @@ int mmdClientMAF::DisconnectClient()
   return MAF_ERROR;
 }
 //------------------------------------------------------------------------------
-void mmdClientMAF::SendMessageToServer(mafString &cmd)
+void mafDeviceClientMAF::SendMessageToServer(mafString &cmd)
 //------------------------------------------------------------------------------
 {
   if (m_Connected)

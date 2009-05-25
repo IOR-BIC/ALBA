@@ -1,17 +1,17 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdButtonsPad.h,v $
+  Module:    $RCSfile: mafDeviceButtonsPad.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-30 14:34:56 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmdButtonsPad_h
-#define __mmdButtonsPad_h
+#ifndef __mafDeviceButtonsPad_h
+#define __mafDeviceButtonsPad_h
 
 #include "mafDevice.h"
 
@@ -21,13 +21,13 @@
 class mafEventInteraction;
 
 /** Device implementing interface for buttons.
-  mmdButtonsPad is a class providing interface for a button device.
+  mafDeviceButtonsPad is a class providing interface for a button device.
   @sa mafDevice 
 */
-class mmdButtonsPad : public mafDevice
+class mafDeviceButtonsPad : public mafDevice
 {
 public:
-  mafTypeMacro(mmdButtonsPad,mafDevice); 
+  mafTypeMacro(mafDeviceButtonsPad,mafDevice); 
 
   //------------------------------------------------------------------------------
   // Events
@@ -57,8 +57,8 @@ public:
   void SetNumberOfButtons(int num);
 
 protected:
-  mmdButtonsPad();
-  virtual ~mmdButtonsPad();
+  mafDeviceButtonsPad();
+  virtual ~mafDeviceButtonsPad();
 
   /** 
     Internally used to issue the event rised by a button pressure,
@@ -73,8 +73,8 @@ protected:
   int   m_NumberOfButtons;
 
 private:
-  mmdButtonsPad(const mmdButtonsPad&);  // Not implemented.
-  void operator=(const mmdButtonsPad&);  // Not implemented.
+  mafDeviceButtonsPad(const mafDeviceButtonsPad&);  // Not implemented.
+  void operator=(const mafDeviceButtonsPad&);  // Not implemented.
 };
 
 #endif 

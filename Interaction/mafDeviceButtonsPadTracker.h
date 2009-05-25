@@ -1,19 +1,19 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdTracker.h,v $
+  Module:    $RCSfile: mafDeviceButtonsPadTracker.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmdTracker_h
-#define __mmdTracker_h
+#ifndef __mafDeviceButtonsPadTracker_h
+#define __mafDeviceButtonsPadTracker_h
 
-#include "mmdButtonsPad.h"
+#include "mafDeviceButtonsPad.h"
 #include "mafMutexLock.h"
 #include "mafSmartPointer.h"
 #include "mafOBB.h"
@@ -26,7 +26,7 @@ class mafAvatar;
 class mafOBB;
 
 /** Generic spatial position tracking device.
-  mmdTracker is a class providing basic functionalities for space trackers, 
+  mafDeviceButtonsPadTracker is a class providing basic functionalities for space trackers, 
   i.e. devices which track an object in space. Specialized classes for
   specific devices should add their own data structures and reimplemented
   InternalInitialize and InternalShutdow to activate/stop the device.
@@ -49,19 +49,19 @@ class mafOBB;
   [-.5,.5,-2,2,-.1,.1] would be scaled to [-.25,.25,-1,1,-.05,.05].
   Each tracker can be assigned an avatar (mafAvatar) showing a graphical object
   moved by tracker's input.
-  The mmdTracker class has a specialized settings class which implements gui for
+  The mafDeviceButtonsPadTracker class has a specialized settings class which implements gui for
   setting the avatar and the tracker's tracked volume.
-  The mmdTracker is also a mmdButtonsPad supporting buttons.
-  @sa mmdButtonsPad mafGUITrackerSettings mafAvatar
+  The mafDeviceButtonsPadTracker is also a mafDeviceButtonsPad supporting buttons.
+  @sa mafDeviceButtonsPad mafGUITrackerSettings mafAvatar
   @todo 
     - manage fusion of position matrices (not working any more)
     - manage multiple button press (rewrite mflActionEvent)
     - use an action event also for move events (rewrite SetLastPoseMatrix() ). 
 */
-class mmdTracker : public mmdButtonsPad
+class mafDeviceButtonsPadTracker : public mafDeviceButtonsPad
 {
 public:
-  mafTypeMacro(mmdTracker,mmdButtonsPad);
+  mafTypeMacro(mafDeviceButtonsPadTracker,mafDeviceButtonsPad);
 
   //------------------------------------------------------------------------------
   // Events
@@ -181,8 +181,8 @@ public:
   virtual void UpdateGui();
   
 protected:
-  mmdTracker();
-  virtual ~mmdTracker();
+  mafDeviceButtonsPadTracker();
+  virtual ~mafDeviceButtonsPadTracker();
 
   virtual int InternalStore(mafStorageElement *node);
   virtual int InternalRestore(mafStorageElement *node);
@@ -216,13 +216,13 @@ protected:
   double m_TBPosition[3];           ///< Used to store the tracked box center
 
 private:
-  mmdTracker(const mmdTracker&);  // Not implemented.
-  void operator=(const mmdTracker&);  // Not implemented.
+  mafDeviceButtonsPadTracker(const mafDeviceButtonsPadTracker&);  // Not implemented.
+  void operator=(const mafDeviceButtonsPadTracker&);  // Not implemented.
 };
 
 //------------------------------------------------------------------------------
 // Return the maximum value among two.
-inline double mmdTracker::GetMax(double x,double y)
+inline double mafDeviceButtonsPadTracker::GetMax(double x,double y)
 //------------------------------------------------------------------------------
 {
   return (x>=y)?x:y;
@@ -230,7 +230,7 @@ inline double mmdTracker::GetMax(double x,double y)
 
 //------------------------------------------------------------------------------
 // Return the maximum value among the 3 values for X,Y and Z axes.
-inline double mmdTracker::GetMax3(double x,double y, double z)
+inline double mafDeviceButtonsPadTracker::GetMax3(double x,double y, double z)
 //------------------------------------------------------------------------------
 {
   return (x>=y)?x:((y>=z)?y:z);

@@ -1,19 +1,19 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdRemoteMouse.h,v $
+  Module:    $RCSfile: mafDeviceButtonsPadMouseRemote.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-06 09:43:35 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmdRemoteMouse_h
-#define __mmdRemoteMouse_h
+#ifndef __mafDeviceButtonsPadMouseRemote_h
+#define __mafDeviceButtonsPadMouseRemote_h
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -27,25 +27,25 @@ class vtkRenderWindowInteractor;
 class mafRWIBase;
 
 /** Tracking 2D device, i.e. "Mouse".
-  mmdRemoteMouse is a class implementing interface for a Mouse. Current implementation 
+  mafDeviceButtonsPadMouseRemote is a class implementing interface for a Mouse. Current implementation 
   receives its inputs by means of ProcessEvent and forward to all listeners. Any 
   widget or windows toolkit can inject events into this centralized mouse.
-  @sa mmdButtonsPad mafRWI
+  @sa mafDeviceButtonsPad mafRWI
 */
-class mmdRemoteMouse : public mmdMouse
+class mafDeviceButtonsPadMouseRemote : public mafDeviceButtonsPadMouse
 {
 public:
-  mafTypeMacro(mmdRemoteMouse, mmdMouse); 
+  mafTypeMacro(mafDeviceButtonsPadMouseRemote, mafDeviceButtonsPadMouse); 
 
   /**  Reimplemented to manage fusion of move events. */
   virtual void OnEvent(mafEventBase *event);
 
 protected:
-  mmdRemoteMouse();
-  virtual ~mmdRemoteMouse();
+  mafDeviceButtonsPadMouseRemote();
+  virtual ~mafDeviceButtonsPadMouseRemote();
 
 private:
-  mmdRemoteMouse(const mmdRemoteMouse&);  // Not implemented.
-  void operator=(const mmdRemoteMouse&);  // Not implemented.
+  mafDeviceButtonsPadMouseRemote(const mafDeviceButtonsPadMouseRemote&);  // Not implemented.
+  void operator=(const mafDeviceButtonsPadMouseRemote&);  // Not implemented.
 };
 #endif 

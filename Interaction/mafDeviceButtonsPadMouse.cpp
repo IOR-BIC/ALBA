@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdMouse.cpp,v $
+  Module:    $RCSfile: mafDeviceButtonsPadMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:07:46 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafEventBase.h"
 #include "mafView.h"
 #include "mafSceneGraph.h"
@@ -36,16 +36,16 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mmdMouse::MOUSE_2D_MOVE)
-MAF_ID_IMP(mmdMouse::MOUSE_CHAR_EVENT)
-MAF_ID_IMP(mmdMouse::MOUSE_DCLICK)
+MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
+MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
+MAF_ID_IMP(mafDeviceButtonsPadMouse::MOUSE_DCLICK)
 
 //------------------------------------------------------------------------------
-mafCxxTypeMacro(mmdMouse)
+mafCxxTypeMacro(mafDeviceButtonsPadMouse)
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-mmdMouse::mmdMouse()
+mafDeviceButtonsPadMouse::mafDeviceButtonsPadMouse()
 //------------------------------------------------------------------------------
 {
   SetThreaded(0);
@@ -61,12 +61,12 @@ mmdMouse::mmdMouse()
 }
 
 //------------------------------------------------------------------------------
-mmdMouse::~mmdMouse()
+mafDeviceButtonsPadMouse::~mafDeviceButtonsPadMouse()
 //------------------------------------------------------------------------------
 {
 }
 //------------------------------------------------------------------------------
-void mmdMouse::OnEvent(mafEventBase *event)
+void mafDeviceButtonsPadMouse::OnEvent(mafEventBase *event)
 //------------------------------------------------------------------------------
 {
   assert(event);
@@ -149,7 +149,7 @@ void mmdMouse::OnEvent(mafEventBase *event)
 }
 
 //------------------------------------------------------------------------------
-void mmdMouse::SetLastPosition(double x,double y,unsigned long modifiers)
+void mafDeviceButtonsPadMouse::SetLastPosition(double x,double y,unsigned long modifiers)
 //------------------------------------------------------------------------------
 {
   m_LastPosition[0] = x;
@@ -177,14 +177,14 @@ void mmdMouse::SetLastPosition(double x,double y,unsigned long modifiers)
 }
 
 //------------------------------------------------------------------------------
-void mmdMouse::SendButtonEvent(mafEventInteraction *event)
+void mafDeviceButtonsPadMouse::SendButtonEvent(mafEventInteraction *event)
 //------------------------------------------------------------------------------
 {
   event->Set2DPosition(GetLastPosition());
   Superclass::SendButtonEvent(event);
 }
 //------------------------------------------------------------------------------
-vtkRenderer *mmdMouse::GetRenderer()
+vtkRenderer *mafDeviceButtonsPadMouse::GetRenderer()
 //------------------------------------------------------------------------------
 {
   vtkRenderer *r = NULL;
@@ -196,13 +196,13 @@ vtkRenderer *mmdMouse::GetRenderer()
   return r;
 }
 //------------------------------------------------------------------------------
-mafView *mmdMouse::GetView()
+mafView *mafDeviceButtonsPadMouse::GetView()
 //------------------------------------------------------------------------------
 {
   return m_SelectedView;
 }
 //------------------------------------------------------------------------------
-vtkRenderWindowInteractor *mmdMouse::GetInteractor()
+vtkRenderWindowInteractor *mafDeviceButtonsPadMouse::GetInteractor()
 //------------------------------------------------------------------------------
 {
   if (m_SelectedRWI)
@@ -211,13 +211,13 @@ vtkRenderWindowInteractor *mmdMouse::GetInteractor()
   return (vtkRenderWindowInteractor *)NULL;
 }
 //------------------------------------------------------------------------------
-mafRWIBase *mmdMouse::GetRWI()
+mafRWIBase *mafDeviceButtonsPadMouse::GetRWI()
 //------------------------------------------------------------------------------
 {
   return m_SelectedRWI;
 }
 //------------------------------------------------------------------------------
-void mmdMouse::DisplayToNormalizedDisplay(double display[2])
+void mafDeviceButtonsPadMouse::DisplayToNormalizedDisplay(double display[2])
 //------------------------------------------------------------------------------
 {
   vtkRenderer *r = GetRenderer();
@@ -236,7 +236,7 @@ void mmdMouse::DisplayToNormalizedDisplay(double display[2])
   //r->DisplayToNormalizedDisplay(display[0],display[1]);
 }
 //------------------------------------------------------------------------------
-void mmdMouse::NormalizedDisplayToDisplay(double normalized[2])
+void mafDeviceButtonsPadMouse::NormalizedDisplayToDisplay(double normalized[2])
 //------------------------------------------------------------------------------
 {
   vtkRenderer *r = GetRenderer();

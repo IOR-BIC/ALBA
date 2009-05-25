@@ -1,19 +1,19 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdP5Glove.h,v $
+  Module:    $RCSfile: mafDeviceButtonsPadTrackerP5Glove.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-13 18:18:39 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmdP5Glove_h
-#define __mmdP5Glove_h
+#ifndef __mafDeviceButtonsPadTrackerP5Glove_h
+#define __mafDeviceButtonsPadTrackerP5Glove_h
 
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -25,7 +25,7 @@ class CP5DLL;
   .SECTION Description
   This class implements Device P5 management as a Tracker device. It currently
   support only one P5 device!
-  @sa  mmdTracker mafDevice
+  @sa  mafDeviceButtonsPadTracker mafDevice
   @todo
   - create base class for gloves
   - create GUI with specific settings
@@ -34,10 +34,10 @@ class CP5DLL;
   - improve stability
   - support multiple P5 gloves
 */
-class mmdP5Glove : public mmdTracker
+class mafDeviceButtonsPadTrackerP5Glove : public mafDeviceButtonsPadTracker
 {
 public:
-  mafTypeMacro(mmdP5Glove,mmdTracker);
+  mafTypeMacro(mafDeviceButtonsPadTrackerP5Glove,mafDeviceButtonsPadTracker);
 
   /** Get the finger bend sensor current value, range [0,63] */
   int GetIndexValue() {return m_IndexValue;}
@@ -73,8 +73,8 @@ public:
   int GetThumbSensitivity(int value) {m_ThumbSensitivity=value;}
 
 protected:
-  mmdP5Glove();
-  virtual ~mmdP5Glove();
+  mafDeviceButtonsPadTrackerP5Glove();
+  virtual ~mafDeviceButtonsPadTrackerP5Glove();
 
   /** performs polling of P5 glove */
   int InternalUpdate();
@@ -100,8 +100,8 @@ protected:
   static CP5DLL *m_P5;
 
 private:
-  mmdP5Glove(const mmdP5Glove&);  // Not implemented.
-  void operator=(const mmdP5Glove&);  // Not implemented.
+  mafDeviceButtonsPadTrackerP5Glove(const mafDeviceButtonsPadTrackerP5Glove&);  // Not implemented.
+  void operator=(const mafDeviceButtonsPadTrackerP5Glove&);  // Not implemented.
 };
 
 #endif

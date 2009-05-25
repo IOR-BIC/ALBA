@@ -1,9 +1,9 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdTracker.cpp,v $
+  Module:    $RCSfile: mafDeviceButtonsPadTracker.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 // base
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 
 // gui
 #include "mafGUI.h"
@@ -40,13 +40,13 @@
 //------------------------------------------------------------------------------
 // Events
 //------------------------------------------------------------------------------
-MAF_ID_IMP(mmdTracker::TRACKER_3D_MOVE)
-MAF_ID_IMP(mmdTracker::TRACKER_BOUNDS_UPDATED)
+MAF_ID_IMP(mafDeviceButtonsPadTracker::TRACKER_3D_MOVE)
+MAF_ID_IMP(mafDeviceButtonsPadTracker::TRACKER_BOUNDS_UPDATED)
 
-mafCxxTypeMacro(mmdTracker)
+mafCxxTypeMacro(mafDeviceButtonsPadTracker)
 
 //------------------------------------------------------------------------------
-mmdTracker::mmdTracker()
+mafDeviceButtonsPadTracker::mafDeviceButtonsPadTracker()
 //------------------------------------------------------------------------------
 {
   mafNEW(m_TrackerToCanonicalTransform);
@@ -66,7 +66,7 @@ mmdTracker::mmdTracker()
 }
 
 //------------------------------------------------------------------------------
-mmdTracker::~mmdTracker()
+mafDeviceButtonsPadTracker::~mafDeviceButtonsPadTracker()
 //------------------------------------------------------------------------------
 {
   SetDefaultAvatar(NULL);
@@ -75,7 +75,7 @@ mmdTracker::~mmdTracker()
 }
 
 //------------------------------------------------------------------------------
-int mmdTracker::InternalStore(mafStorageElement *node)
+int mafDeviceButtonsPadTracker::InternalStore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
   if (Superclass::InternalStore(node))
@@ -94,7 +94,7 @@ int mmdTracker::InternalStore(mafStorageElement *node)
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
-int mmdTracker::InternalRestore(mafStorageElement *node)
+int mafDeviceButtonsPadTracker::InternalRestore(mafStorageElement *node)
 //------------------------------------------------------------------------------
 {
   assert(node);
@@ -117,7 +117,7 @@ int mmdTracker::InternalRestore(mafStorageElement *node)
         }
         else
         {
-          mafErrorMessage("find wrong type of Avatar (%s) while restoring mmdTracker.",obj->GetTypeName());
+          mafErrorMessage("find wrong type of Avatar (%s) while restoring mafDeviceButtonsPadTracker.",obj->GetTypeName());
           obj->Delete();
         }
       }
@@ -130,7 +130,7 @@ int mmdTracker::InternalRestore(mafStorageElement *node)
 }
 
 //------------------------------------------------------------------------------
-int mmdTracker::InternalInitialize()
+int mafDeviceButtonsPadTracker::InternalInitialize()
 //------------------------------------------------------------------------------
 {
   if (Superclass::InternalInitialize()!=MAF_OK)
@@ -146,7 +146,7 @@ int mmdTracker::InternalInitialize()
   return MAF_OK;
 }
 //------------------------------------------------------------------------------
-void mmdTracker::InternalShutdown()
+void mafDeviceButtonsPadTracker::InternalShutdown()
 //------------------------------------------------------------------------------
 {
   if (m_Avatar)
@@ -159,7 +159,7 @@ void mmdTracker::InternalShutdown()
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::SetAvatar(mafAvatar *avatar)
+void mafDeviceButtonsPadTracker::SetAvatar(mafAvatar *avatar)
 //------------------------------------------------------------------------------
 {
   if (m_Avatar)
@@ -197,7 +197,7 @@ void mmdTracker::SetAvatar(mafAvatar *avatar)
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::SetDefaultAvatar(mafAvatar *avatar)
+void mafDeviceButtonsPadTracker::SetDefaultAvatar(mafAvatar *avatar)
 //------------------------------------------------------------------------------
 {
   m_DefaultAvatar=avatar;
@@ -205,14 +205,14 @@ void mmdTracker::SetDefaultAvatar(mafAvatar *avatar)
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::RestoreDefaultAvatar()
+void mafDeviceButtonsPadTracker::RestoreDefaultAvatar()
 //------------------------------------------------------------------------------
 {
   SetAvatar(m_DefaultAvatar);
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
+void mafDeviceButtonsPadTracker::SetLastPoseMatrix(const mafMatrix &matrix)
 //------------------------------------------------------------------------------
 { 
   // I had to add a test on elapsed time since it seems sometimes
@@ -279,14 +279,14 @@ void mmdTracker::SetLastPoseMatrix(const mafMatrix &matrix)
 }
 
 //------------------------------------------------------------------------------
-mafMatrix &mmdTracker::GetLastPoseMatrix()
+mafMatrix &mafDeviceButtonsPadTracker::GetLastPoseMatrix()
 //------------------------------------------------------------------------------
 {
   return *m_LastPoseMatrix;
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::SendButtonEvent(mafEventInteraction *event)
+void mafDeviceButtonsPadTracker::SendButtonEvent(mafEventInteraction *event)
 //------------------------------------------------------------------------------
 {
   if (m_Avatar&&m_Avatar->GetMode()==mafAvatar::MODE_2D)
@@ -301,7 +301,7 @@ void mmdTracker::SendButtonEvent(mafEventInteraction *event)
   AsyncInvokeEvent(event,MCH_INPUT);
 }
 //------------------------------------------------------------------------------
-void mmdTracker::ComputeTrackerToCanonicalTansform()
+void mafDeviceButtonsPadTracker::ComputeTrackerToCanonicalTansform()
 //------------------------------------------------------------------------------
 {
 	double scale,center[3],dims[3];
@@ -347,7 +347,7 @@ void mmdTracker::ComputeTrackerToCanonicalTansform()
 }
 
 //------------------------------------------------------------------------------
-mafOBB &mmdTracker::GetCanonicalBounds()
+mafOBB &mafDeviceButtonsPadTracker::GetCanonicalBounds()
 //------------------------------------------------------------------------------
 {
   if (m_CanonicalBounds.GetMTime()<m_TrackedBounds.GetMTime())
@@ -357,7 +357,7 @@ mafOBB &mmdTracker::GetCanonicalBounds()
 }
 
 //------------------------------------------------------------------------------
-mafTransform *mmdTracker::GetTrackerToCanonicalTransform()
+mafTransform *mafDeviceButtonsPadTracker::GetTrackerToCanonicalTransform()
 //------------------------------------------------------------------------------
 {
   if (m_CanonicalBounds.GetMTime()<m_TrackedBounds.GetMTime())
@@ -367,7 +367,7 @@ mafTransform *mmdTracker::GetTrackerToCanonicalTransform()
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::TrackerToCanonical(const mafMatrix &source,mafMatrix &dest)
+void mafDeviceButtonsPadTracker::TrackerToCanonical(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
   mafMatrix::Multiply4x4(GetTrackerToCanonicalTransform()->GetMatrix(),
@@ -378,14 +378,14 @@ void mmdTracker::TrackerToCanonical(const mafMatrix &source,mafMatrix &dest)
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::TrackerToCanonical(mafTransform *trans)
+void mafDeviceButtonsPadTracker::TrackerToCanonical(mafTransform *trans)
 //------------------------------------------------------------------------------
 {
   trans->Concatenate(GetTrackerToCanonicalTransform()->GetMatrix(),POST_MULTIPLY);
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::CanonicalToTracker(const mafMatrix &source,mafMatrix &dest)
+void mafDeviceButtonsPadTracker::CanonicalToTracker(const mafMatrix &source,mafMatrix &dest)
 //------------------------------------------------------------------------------
 {
   mafMatrix canonical_to_tracker;
@@ -398,7 +398,7 @@ void mmdTracker::CanonicalToTracker(const mafMatrix &source,mafMatrix &dest)
 }
 
 //------------------------------------------------------------------------------
-void mmdTracker::CanonicalToTracker(mafTransform *trans)
+void mafDeviceButtonsPadTracker::CanonicalToTracker(mafTransform *trans)
 //------------------------------------------------------------------------------
 {
   mafMatrix canonical_to_tracker;
@@ -408,7 +408,7 @@ void mmdTracker::CanonicalToTracker(mafTransform *trans)
 }
 
 //----------------------------------------------------------------------------
-int mmdTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
+int mafDeviceButtonsPadTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
 //----------------------------------------------------------------------------
 {
   mafInteractionFactory *iFactory=mafInteractionFactory::GetInstance();
@@ -452,7 +452,7 @@ int mmdTracker::AvatarChooser(wxString &avatar_name,wxString &avatar_type)
   return index;
 }
 //----------------------------------------------------------------------------
-void mmdTracker::CreateGui()
+void mafDeviceButtonsPadTracker::CreateGui()
 //----------------------------------------------------------------------------
 {
   Superclass::CreateGui();
@@ -473,7 +473,7 @@ void mmdTracker::CreateGui()
 }
 
 //----------------------------------------------------------------------------
-void mmdTracker::UpdateGui()
+void mafDeviceButtonsPadTracker::UpdateGui()
 //----------------------------------------------------------------------------
 {
   if (m_AvatarFlag=GetAvatar()!=NULL) 
@@ -488,7 +488,7 @@ void mmdTracker::UpdateGui()
 }
 
 //----------------------------------------------------------------------------
-void mmdTracker::OnEvent(mafEventBase *event)
+void mafDeviceButtonsPadTracker::OnEvent(mafEventBase *event)
 //----------------------------------------------------------------------------
 {
   mafEvent *e=mafEvent::SafeDownCast(event);

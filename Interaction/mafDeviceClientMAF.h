@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: mmdClientMAF.h,v $
+Module:    $RCSfile: mafDeviceClientMAF.h,v $
 Language:  C++
-Date:      $Date: 2008-04-22 16:58:11 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-05-25 14:48:12 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmdClientMAF_h
-#define __mmdClientMAF_h
+#ifndef __mafDeviceClientMAF_h
+#define __mafDeviceClientMAF_h
 
 #include "mafDevice.h"
 #include "ClientUnit.h"
@@ -22,14 +22,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 /** Device implementing interface for PLASTIC hub.
-  mmdClientMAF is a class providing interface for MAFServer (socket communication).
+  mafDeviceClientMAF is a class providing interface for MAFServer (socket communication).
   @sa mafDevice
 */
 
-class mmdClientMAF : public mafDevice
+class mafDeviceClientMAF : public mafDevice
 {
 public:
-  mafTypeMacro(mmdClientMAF, mafDevice); 
+  mafTypeMacro(mafDeviceClientMAF, mafDevice); 
 
   virtual void OnEvent(mafEventBase *maf_event);
 
@@ -62,8 +62,8 @@ public:
   bool IsBusy() {return m_Client->IsBusy();};
 
 protected:
-  mmdClientMAF();
-  virtual ~mmdClientMAF();
+  mafDeviceClientMAF();
+  virtual ~mafDeviceClientMAF();
 
   virtual int InternalInitialize();
   virtual void InternalShutdown();
@@ -73,7 +73,7 @@ protected:
   int         m_PortNumber;
   bool        m_Connected;
 private:
-  mmdClientMAF(const mmdClientMAF&);  // Not implemented.
-  void operator=(const mmdClientMAF&);  // Not implemented.
+  mafDeviceClientMAF(const mafDeviceClientMAF&);  // Not implemented.
+  void operator=(const mafDeviceClientMAF&);  // Not implemented.
 };
 #endif

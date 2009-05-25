@@ -1,19 +1,19 @@
 /*=========================================================================
   Program:   Multimod Application Framework
-  Module:    $RCSfile: mmdMouse.h,v $
+  Module:    $RCSfile: mafDeviceButtonsPadMouse.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-18 14:07:46 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-05-25 14:48:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
   CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __mmdMouse_h
-#define __mmdMouse_h
+#ifndef __mafDeviceButtonsPadMouse_h
+#define __mafDeviceButtonsPadMouse_h
 
-#include "mmdButtonsPad.h"
+#include "mafDeviceButtonsPad.h"
 
 //----------------------------------------------------------------------------
 // forward declarations :
@@ -24,15 +24,15 @@ class vtkRenderer;
 class vtkRenderWindowInteractor;
 
 /** Tracking 2D device, i.e. "Mouse".
-  mmdMouse is a class implementing interface for a Mouse. Current implementation 
+  mafDeviceButtonsPadMouse is a class implementing interface for a Mouse. Current implementation 
   receive its inputs by means of ProcessEvent and forward to all listeners. Any 
   widget or windows toolkit can inject events into this centralized mouse.
-  @sa mmdButtonsPad mafRWI
+  @sa mafDeviceButtonsPad mafRWI
 */
-class mmdMouse : public mmdButtonsPad
+class mafDeviceButtonsPadMouse : public mafDeviceButtonsPad
 {
 public:
-  mafTypeMacro(mmdMouse,mmdButtonsPad); 
+  mafTypeMacro(mafDeviceButtonsPadMouse,mafDeviceButtonsPad); 
 
   //------------------------------------------------------------------------------
   // Events
@@ -86,8 +86,8 @@ public:
   bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
 
 protected:
-  mmdMouse();
-  virtual ~mmdMouse();
+  mafDeviceButtonsPadMouse();
+  virtual ~mafDeviceButtonsPadMouse();
 
   /** add position to the event */ 
   virtual void SendButtonEvent(mafEventInteraction *event);
@@ -101,7 +101,7 @@ protected:
   mafRWIBase *m_SelectedRWI;
 
 private:
-  mmdMouse(const mmdMouse&);  // Not implemented.
-  void operator=(const mmdMouse&);  // Not implemented.
+  mafDeviceButtonsPadMouse(const mafDeviceButtonsPadMouse&);  // Not implemented.
+  void operator=(const mafDeviceButtonsPadMouse&);  // Not implemented.
 };
 #endif 
