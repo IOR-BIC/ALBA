@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMatrixInterpolator.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-07 15:25:37 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-05-25 14:45:39 $
+  Version:   $Revision: 1.5.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,31 +22,29 @@
 //----------------------------------------------------------------------------
 class mafMatrix;
 
-/** superclass for computing the VME output data out of the internal VME-Items.
-  mafMatrixInterpolator is a data pipe producing as output a dataset interpolated
+/** Class Name: mafMatrixInterpolator.
+  mafMatrixInterpolator is used for computing the position of VME in terms 
+  of matrix that is an element of vector of items.
+  mafMatrixInterpolator is a matrix pipe producing as output a matrix interpolated
   against the ones stored in the array associated to the VME itself (only for VMEs
-  with data array like mafVMEGeneric). The class also provides the mechanism to 
-  obtain the 3D bounds for any time.
+  with matrix array like mafVMEGenericAbstract). 
 
-  @sa mflDataPipe mafVMEGeneric
-  
-  @todo
- 
 */
 class MAF_EXPORT mafMatrixInterpolator:public mafMatrixPipe
 {
 public:
+  /** type macro for RTTI and instance creation.*/
   mafTypeMacro(mafMatrixInterpolator,mafMatrixPipe);
 
-  /** This DataPipe accepts only VME's with internal DataArray. */
+  /** This matrix pipe accepts only VME's with internal matrix Array. */
   virtual bool Accept(mafVME *vme);
 
-  /**  Get the output of the interpolator item*/
+  /**  Get the output of the interpolator item. */
   mafMatrix *GetCurrentItem() {return m_CurrentItem;}
 
   /**
-  Set the current time. Overidden to allow the output not to change whem 
-  not necessary, e.g. constant data (in time) being interpolated should not
+  Set the current time. Overidden to allow the output not to change when 
+  not necessary, e.g. constant pose (in time) being interpolated should not
   produce a change in the output data when time is changed.*/
   virtual void SetTimeStamp(mafTimeStamp time);
 
@@ -54,10 +52,13 @@ public:
   Get the MTime: this is the bit of magic that makes everything work.*/
   virtual unsigned long GetMTime();
 
+  /** Force update of the pipe.*/
   virtual void Update();
 
 protected:
+  /** constructor.*/
   mafMatrixInterpolator();
+  /** destructor.*/
   virtual ~mafMatrixInterpolator();
 
   //virtual void PreExecute(){};
@@ -68,10 +69,13 @@ protected:
   interpolator rules. It should be reimplemented in sub-classes.*/
   virtual void InternalItemUpdate();
 
-  /** update the output matrix */
+  /** update the output matrix. */
   virtual void InternalUpdate();
 
+  /** Set the current matrix of the pipe. */
   void SetCurrentItem(mafMatrix *data);
+
+  /** request the update of the current matrix of the pipe. */
   void UpdateCurrentItem(mafMatrix *item);
 
   mafAutoPointer<mafMatrix>    m_CurrentItem; ///< the item currently selected for the current time
@@ -80,7 +84,9 @@ protected:
 
   mafTimeStamp  m_OldTimeStamp; ///< previous time
 private:
-  mafMatrixInterpolator(const mafMatrixInterpolator&); // Not implemented
+  /** copy constructor not implemented. */
+  mafMatrixInterpolator(const mafMatrixInterpolator&);
+  /** assignment operator not implemeted. */
   void operator=(const mafMatrixInterpolator&); // Not implemented
   
 };
