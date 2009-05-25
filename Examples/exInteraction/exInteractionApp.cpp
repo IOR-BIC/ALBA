@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exInteractionApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:00:43 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-05-25 14:50:49 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -55,7 +55,7 @@
 
 //#include "mmdIntersense.h"
 #ifdef MAF_USE_P5_GLOVE
-  #include "mmdP5Glove.h"
+  #include "mafDeviceButtonsPadTrackerP5Glove.h"
 #endif
 
 #ifdef MAF_USE_WIIMOTE
@@ -89,13 +89,13 @@ bool exInteractionApp::OnInit()
   //---------- devices --------
 //  mafPlugDevice<mmdVirtualTracker>("Virtual Tracker");
 //  mafPlugDevice<mmdVicon>("Vicon");
-//  mafPlugObject<mmdTracker>("TrackerTool"); // used to allow Intersense to create its tools
+//  mafPlugObject<mafDeviceButtonsPadTracker>("TrackerTool"); // used to allow Intersense to create its tools
 //  mafPlugObject<mmdViconTracker>("ViconTrackerTool"); // used to allow Intersense to create its tools  
 //  mafPlugDevice<mmdSUHapticDevice>("SU Haptic");
 
   //mafPlugDevice<mmdIntersense>("Intersense");
 #ifdef MAF_USE_P5_GLOVE
-  mafPlugDevice<mmdP5Glove>("P5 Glove");
+  mafPlugDevice<mafDeviceButtonsPadTrackerP5Glove>("P5 Glove");
 #endif
 
 #ifdef MAF_USE_WIIMOTE

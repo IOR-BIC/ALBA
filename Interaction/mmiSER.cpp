@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSER.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-21 12:03:50 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-05-25 14:49:04 $
+  Version:   $Revision: 1.5.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 #include "mmiSER.h"
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 #include "mafStorageElement.h"
 
 #include <assert.h>

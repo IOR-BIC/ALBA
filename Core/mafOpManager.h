@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-21 15:37:41 $
-  Version:   $Revision: 1.16.2.2 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.16.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@ class mafOpCopy;
 class mafOpPaste;
 class mafOpTransform;
 class vtkMatrix4x4;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class mafGUISettings;
 class mafGUISettingsDialog;
 class mafUser;
@@ -120,7 +120,7 @@ public:
 
   /** 
   Initialize the action for the mouse device. */
-  void SetMouse(mmdMouse *mouse);
+  void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
 
   /** Turn On/Off the collaboration status. */
@@ -167,7 +167,7 @@ protected:
 
   void SetAccelerator(mafOp *op);
 
-  mmdMouse          *m_Mouse; ///< Pointer to the mouse devices.
+  mafDeviceButtonsPadMouse          *m_Mouse; ///< Pointer to the mouse devices.
   bool               m_Warn; ///< Flag to warn the user when an operation that can not undo is starting.
 	mafOpContextStack  m_Context;
   mafOp             *m_RunningOp; ///< Pointer to the current running operation.

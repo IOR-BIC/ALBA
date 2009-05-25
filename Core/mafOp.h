@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 11:02:43 $
-  Version:   $Revision: 1.24.2.1 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.24.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,7 +25,7 @@
 class mafNode;
 class mafGUI;
 class mafGUIHolder;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class mafGUISettings;
 //----------------------------------------------------------------------------
 // constants :
@@ -133,8 +133,8 @@ public:
   virtual const char **GetActions() {return NULL;}; 
 
   /** Initialize the mouse device. */
-  void SetMouse(mmdMouse *mouse);
-  mmdMouse *GetMouse(){return m_Mouse;};
+  void SetMouse(mafDeviceButtonsPadMouse *mouse);
+  mafDeviceButtonsPadMouse *GetMouse(){return m_Mouse;};
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status);
@@ -173,7 +173,7 @@ protected:
 	int 						m_OpType; ///< Store the type of the operation: OPTYPE_OP, OPTYPE_IMPORTER, OPTYPE_EXPORTER
 	bool						m_InputPreserving; ///< Flag to say if the operation change the input data (m_InputPreserving = false) or not.
 	mafObserver    *m_Listener;
-  mmdMouse       *m_Mouse;
+  mafDeviceButtonsPadMouse       *m_Mouse;
   bool            m_CollaborateStatus;
   mafGUISettings *m_SettingPanel;
   bool            m_TestMode; ///< Flag used with cppunitTest: put this flag at true when executing tests to avoid busy-info or splash screen to be created, default is false.

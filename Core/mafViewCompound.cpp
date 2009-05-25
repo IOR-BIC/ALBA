@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.32 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.32.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,8 +29,8 @@
 #include "mafInteractor.h"
 #include "mafAvatar.h"
 #include "mafAvatar3D.h"
-#include "mmdTracker.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadTracker.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewCompound);
@@ -424,7 +424,7 @@ void mafViewCompound::LayoutSubView(int width, int height)
   }
 }
 //----------------------------------------------------------------------------
-void mafViewCompound::SetMouse(mmdMouse *mouse)
+void mafViewCompound::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 {
   m_Mouse = mouse;

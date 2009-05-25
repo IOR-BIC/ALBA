@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-22 09:42:30 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2009-05-25 14:49:29 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafRWIBase.h"
 #include "mafRWI.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"

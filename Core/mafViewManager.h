@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2009-05-25 14:51:14 $
+  Version:   $Revision: 1.16.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,7 @@ class mafVMERoot;
 class mafView;
 class mafGUIViewPanel;
 class mafRWIBase;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 //----------------------------------------------------------------------------
 // mafViewManager :
 //----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ public:
   mafView *GetView(int id, int mult) {return m_ViewMatrixID[id][mult];};
 
   /** Initialize the action for the mouse device.*/
-  void SetMouse(mmdMouse *mouse);
+  void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
   /** Turn On/Off the collaboration status.*/
   void Collaborate(bool status) {m_CollaborateStatus = status;};
@@ -129,7 +129,7 @@ public:
   bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
 
 protected:
-  mmdMouse      *m_Mouse;
+  mafDeviceButtonsPadMouse      *m_Mouse;
   mafView       *m_ViewList;  // created view list
 
   mafView       *m_ViewTemplate[MAXVIEW];   // view template vector

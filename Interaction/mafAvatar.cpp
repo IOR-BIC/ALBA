@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,7 +14,7 @@
 #include "mafAvatar.h"
 
 // interactors & devices
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 
 // gui
 #include "mafGUI.h"
@@ -111,13 +111,13 @@ void mafAvatar::UpdateGui()
 }
 
 //------------------------------------------------------------------------------
-mmdTracker *mafAvatar::GetTracker()
+mafDeviceButtonsPadTracker *mafAvatar::GetTracker()
 //------------------------------------------------------------------------------
 {
-  return mmdTracker::SafeDownCast(GetDevice());
+  return mafDeviceButtonsPadTracker::SafeDownCast(GetDevice());
 }
 //------------------------------------------------------------------------------
-void mafAvatar::SetTracker(mmdTracker *tracker)
+void mafAvatar::SetTracker(mafDeviceButtonsPadTracker *tracker)
 //------------------------------------------------------------------------------
 {
   // Note tracker is always set before initializing...

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.24 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.24.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -209,7 +209,7 @@ void mafOp::ForceStopWithCancel()
   OnEvent(&e);
 }
 //----------------------------------------------------------------------------
-void mafOp::SetMouse(mmdMouse *mouse)
+void mafOp::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 {
   m_Mouse = mouse;

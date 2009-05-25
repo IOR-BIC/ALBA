@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.cpp,v $
 Language:  C++
-Date:      $Date: 2008-02-19 12:52:23 $
-Version:   $Revision: 1.13 $
+Date:      $Date: 2009-05-25 14:51:13 $
+Version:   $Revision: 1.13.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,9 +30,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafOp.h"
 
 #include "mafEventBase.h"
-#include "mmdMouse.h"
-#include "mmdRemoteMouse.h"
-#include "mmdClientMAF.h"
+#include "mafDeviceButtonsPadMouse.h"
+#include "mafDeviceButtonsPadMouseRemote.h"
+#include "mafDeviceClientMAF.h"
 
 #include "mafNodeIterator.h"
 #include "mafVME.h"
@@ -175,9 +175,9 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
-    if (id == mmdButtonsPad::BUTTON_DOWN ||
-      id == mmdButtonsPad::BUTTON_UP   ||
-      id == mmdMouse::MOUSE_2D_MOVE)
+    if (id == mafDeviceButtonsPad::BUTTON_DOWN ||
+      id == mafDeviceButtonsPad::BUTTON_UP   ||
+      id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
     {
       unsigned long modifiers = ei->GetModifiers();
       double pos[2];
@@ -194,7 +194,7 @@ void mafRemoteLogic::OnEvent(mafEventBase *event)
       m_RemoteMsg << m_CommandSeparator;
       m_RemoteMsg << ei->GetButton();
     }
-    else if (id == mmdMouse::MOUSE_CHAR_EVENT)
+    else if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT)
     {
     }
   }
@@ -535,13 +535,13 @@ void mafRemoteLogic::Disconnect()
   }
 }
 //----------------------------------------------------------------------------
-void mafRemoteLogic::SetRemoteMouse(mmdRemoteMouse *rMouse)
+void mafRemoteLogic::SetRemoteMouse(mafDeviceButtonsPadMouseRemote *rMouse)
 //----------------------------------------------------------------------------
 {
   m_RemoteMouse = rMouse;
 }
 //----------------------------------------------------------------------------
-void mafRemoteLogic::SetClientUnit(mmdClientMAF *clientUnit)
+void mafRemoteLogic::SetClientUnit(mafDeviceClientMAF *clientUnit)
 //----------------------------------------------------------------------------
 {
   m_ClientUnit = clientUnit;

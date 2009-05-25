@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.16.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,8 +34,8 @@ class mafAvatar;
 class mafDevice;
 class mafDeviceManager;
 class mafDeviceSet;
-class mmdMouse;
-class mmdRemoteMouse;
+class mafDeviceButtonsPadMouse;
+class mafDeviceButtonsPadMouseRemote;
 class mafGUIInteractionSettings;
 class vtkRenderer;
 class vtkRendererWindow;
@@ -52,7 +52,7 @@ class mafGUITree;
 class mafGUICheckListBox;
 class mafGUIHolder;
 class mafGUINamedPanel;
-class mmdClientMAF;
+class mafDeviceClientMAF;
 
 
 /** This class takes care of mastering the interaction inside views.
@@ -86,13 +86,13 @@ public:
   mafDeviceManager *GetDeviceManager() {return m_DeviceManager;}
 
   /** return the mouse device */
-  mmdMouse *GetMouseDevice();
+  mafDeviceButtonsPadMouse *GetMouseDevice();
 
   /** return the remote mouse device */
-  mmdRemoteMouse *GetRemoteMouseDevice();
+  mafDeviceButtonsPadMouseRemote *GetRemoteMouseDevice();
 
   /** return the ClientMAF device */
-  mmdClientMAF *GetClientDevice();
+  mafDeviceClientMAF *GetClientDevice();
 
   /** return the mouse action, an action to which mouse is bound by default */
   //mafAction *GetMouseAction();
@@ -253,7 +253,7 @@ protected:
   mmiPER*                 m_PositionalEventRouter;
   mmiSER*                 m_StaticEventRouter;
   
-  mmdClientMAF           *m_ClientDevice;
+  mafDeviceClientMAF           *m_ClientDevice;
   
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
   std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing

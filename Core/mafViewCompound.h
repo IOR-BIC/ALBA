@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.27 $
+  Date:      $Date: 2009-05-25 14:51:14 $
+  Version:   $Revision: 1.27.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class mafSceneGraph;
 class mafGUI;
 class mafRWIBase;
@@ -112,7 +112,7 @@ public:
   Set the size of the windowing double slider according to the size of the view. */
   virtual void OnLayout();
 
-  virtual void SetMouse(mmdMouse *mouse);
+  virtual void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
   virtual mafSceneGraph *GetSceneGraph();
   virtual mafRWIBase    *GetRWI();
@@ -220,7 +220,7 @@ protected:
   wxSize  m_Size; ///< size of the compound view
   mafGUI *m_GuiView;
   wxWindow *m_GuiViewWindow;
-  mmdMouse *m_Mouse;
+  mafDeviceButtonsPadMouse *m_Mouse;
 
 
   std::vector<mafView *> m_ChildViewList; ///< Child views vector

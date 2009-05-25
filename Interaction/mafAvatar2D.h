@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar2D.h,v $
   Language:  C++
-  Date:      $Date: 2005-06-25 11:53:45 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -18,7 +18,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 
 /**
   Avatars are entities moving in the virtual world according to user's 
@@ -44,10 +44,10 @@ public:
   virtual void OnEvent(mafEventBase *event);
 
   /** return the Mouse device associated to this avatar */
-  mmdMouse *GetMouse();
+  mafDeviceButtonsPadMouse *GetMouse();
 
   /** set the mouse to be used for this avatar2D */
-  void SetMouse(mmdMouse *mouse);
+  void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
 protected:
   mafAvatar2D();

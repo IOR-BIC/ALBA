@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-18 16:06:03 $
-  Version:   $Revision: 1.40.2.9 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.40.2.10 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,7 +33,7 @@
 #include "mafOpSelect.h"
 #include "mafGUISettingsDialog.h"
 #include "mafAttributeTraceability.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafStorage.h"
 #include "mafEventIO.h"
@@ -1023,7 +1023,7 @@ bool mafOpManager::ForceStopWithCancel()
   return m_RunningOp != to_be_killed;
 }
 //----------------------------------------------------------------------------
-void mafOpManager::SetMouse(mmdMouse *mouse)
+void mafOpManager::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 {
   m_Mouse = mouse;

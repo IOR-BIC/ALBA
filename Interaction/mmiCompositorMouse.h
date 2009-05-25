@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -87,7 +87,7 @@ public:
   mafTypeMacro(mmiCompositorMouse, mafInteractor);
 
   /** Start the interaction with the selected object; set m_CurrentCamera and Renderer ivar */
-  virtual int StartInteraction(mmdMouse *mouse);
+  virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
 
   /**  Process events coming from tracker */
   virtual void OnEvent(mafEventBase *event);

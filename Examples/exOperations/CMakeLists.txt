@@ -34,3 +34,24 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_LIBS})
 IF (WIN32)
   SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+#####################################################################################
+#### Copy GPU shaders to the executable output path of the application.
+FOREACH(config ${CMAKE_CONFIGURATION_TYPES})
+	SET(OUT_SHADER_DIR ${EXECUTABLE_OUTPUT_PATH}/${config}/Shaders/iso-surface)
+	FILE(MAKE_DIRECTORY ${OUT_SHADER_DIR})
+	
+	FILE(GLOB cg_shading_file_list "${MAF_SOURCE_DIR}/vtkMAF/iso-surface/*.cg")
+	FILE(GLOB glshader_shading_file_list "${MAF_SOURCE_DIR}/vtkMAF/iso-surface/*.glshader")
+	
+	FOREACH(file ${cg_shading_file_list})
+	  FILE(RELATIVE_PATH file_name "${MAF_SOURCE_DIR}/vtkMAF/iso-surface/" "${file}")
+	  CONFIGURE_FILE("${file}" "${OUT_SHADER_DIR}/${file_name}" @ONLY)
+	ENDFOREACH(file ${cg_shading_file_list})
+	
+	FOREACH(file ${glshader_shading_file_list})
+	  FILE(RELATIVE_PATH file_name "${MAF_SOURCE_DIR}/vtkMAF/iso-surface/" "${file}")
+	  CONFIGURE_FILE("${file}" "${OUT_SHADER_DIR}/${file_name}" @ONLY)
+	ENDFOREACH(file ${glshader_shading_file_list})
+ENDFOREACH(config)
+#####################################################################################

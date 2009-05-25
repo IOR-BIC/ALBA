@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 08:36:19 $
-  Version:   $Revision: 1.139 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.139.2.1 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -43,8 +43,8 @@
   #include "mafInteractor.h"
   #include "mafDeviceManager.h"
   #include "mafAction.h"
-  #include "mmdMouse.h"
-  #include "mmdClientMAF.h"
+  #include "mafDeviceButtonsPadMouse.h"
+  #include "mafDeviceClientMAF.h"
   #include "mmiPER.h"
   #include "mmiPER.h"
   #include "mafGUITreeContextualMenu.h"
@@ -74,7 +74,7 @@
 #include "mafGUISettingsDialog.h"
 
 #ifdef WIN32
-  #include "mmdClientMAF.h"
+  #include "mafDeviceClientMAF.h"
 #endif
 
 #include "mmdRemoteFileManager.h"

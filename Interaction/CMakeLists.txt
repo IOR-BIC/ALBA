@@ -11,14 +11,6 @@ SET(PROJECT_SRCS
   
   #mafAvatar3D2DPicker.cpp
   #mafAvatar3D2DPicker.h
-  #mmdTrackerSet.cpp
-  #mmdTrackerSet.h
-  #mmi6DOFMove.cpp
-  #mmi6DOFMove.h
-  #mmiCompositorDevice.cpp
-  #mmiCompositorDevice.h
-  #mmiGeneric.cpp
-  #mmiGeneric.h
   
   mafAction.cpp
   mafAction.h
@@ -103,14 +95,14 @@ SET(PROJECT_SRCS
   mafRefSys.cpp
   mafRefSys.h
   
-  mmdButtonsPad.cpp
-  mmdButtonsPad.h
-  mmdMouse.cpp
-  mmdMouse.h
-  mmdRemoteMouse.cpp
-  mmdRemoteMouse.h
-  mmdTracker.cpp
-  mmdTracker.h
+  mafDeviceButtonsPad.cpp
+  mafDeviceButtonsPad.h
+  mafDeviceButtonsPadMouse.cpp
+  mafDeviceButtonsPadMouse.h
+  mafDeviceButtonsPadMouseRemote.cpp
+  mafDeviceButtonsPadMouseRemote.h
+  mafDeviceButtonsPadTracker.cpp
+  mafDeviceButtonsPadTracker.h
   
   mmi2DAngle.cpp
   mmi2DAngle.h
@@ -150,16 +142,16 @@ SET(PROJECT_SRCS
 ## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only
 SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mmdClientMAF.cpp
-  mmdClientMAF.h
+  mafDeviceClientMAF.cpp
+  mafDeviceClientMAF.h
   )
 
 
 IF (MAF_USE_P5_GLOVE)
   SET(PROJECT_SRCS
   ${PROJECT_SRCS}
-  mmdP5Glove.cpp
-  mmdP5Glove.h
+  mafDeviceButtonsPadTrackerP5Glove.cpp
+  mafDeviceButtonsPadTrackerP5Glove.h
   )
 ENDIF (MAF_USE_P5_GLOVE)
 

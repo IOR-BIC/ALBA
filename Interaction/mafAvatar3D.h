@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:06 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -20,7 +20,7 @@
 // forward declarations :
 //----------------------------------------------------------------------------
 class mmi6DOF;
-class mmdTracker;
+class mafDeviceButtonsPadTracker;
 class mafTransform;
 class mafCameraTransform;
 class mafView;
@@ -138,7 +138,7 @@ public:
   virtual void OnEvent(mafEventBase *event);
 
   /** return the tracker this avatar is the tracker attached to this avatar */
-  virtual void SetTracker(mmdTracker *tracker);
+  virtual void SetTracker(mafDeviceButtonsPadTracker *tracker);
 
   /**  Transform a matrix from Canonical to World space*/
   void CanonicalToWorld(const mafMatrix &pose,mafMatrix &dest);
@@ -212,7 +212,7 @@ protected:
   virtual void OnMove3DEvent(mafEventInteraction *e);
   
   /** process an event signaling a change of the tracked bounds */
-  void OnUpdateBoundsEvent(mmdTracker *tracker);
+  void OnUpdateBoundsEvent(mafDeviceButtonsPadTracker *tracker);
 
   /** process event sent after a camera reset */
   virtual void OnPostResetCamera(mafEventBase *event);

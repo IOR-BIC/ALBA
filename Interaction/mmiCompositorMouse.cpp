@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:06 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,7 +21,7 @@
 
 #include "mmiCompositorMouse.h"
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafDecl.h"
 #include "mafEventInteraction.h"
 #include "mafView.h"
@@ -73,7 +73,7 @@ mmiCompositorMouse::~mmiCompositorMouse()
 }
 
 //------------------------------------------------------------------------------
-int mmiCompositorMouse::StartInteraction(mmdMouse *mouse)
+int mmiCompositorMouse::StartInteraction(mafDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   // fill this object m_Renderer ivar and get the camera
@@ -168,7 +168,7 @@ void mmiCompositorMouse::OnLeftButtonUp(mafEventInteraction *e)
 
   if (m_ActiveMMIGeneric)
   {
-    mmdMouse *mouse = (mmdMouse *)e->GetSender();
+    mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender();
     if (m_ActiveMMIGeneric->StopInteraction(mouse)) // stop interaction
     {
       m_ActiveMMIGeneric->OnButtonUpAction();
@@ -178,7 +178,7 @@ void mmiCompositorMouse::OnLeftButtonUp(mafEventInteraction *e)
 
   // stop interacting with the mouse when a button is released
   
-  //mmdMouse *mouse = (mmdMouse *)e->GetSender(); 
+  //mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender(); 
  
   // Set the m_Renderer and m_CurrentCamera ivar
   //StopInteraction(mouse);
@@ -245,7 +245,7 @@ void mmiCompositorMouse::InitInteraction(int buttonPressed, mafEventInteraction 
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  mmdMouse *mouse = (mmdMouse *)e->GetSender(); 
+  mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender(); 
 
   // get info from picked vme
   mafVME        *picked_vme  = NULL;
@@ -314,7 +314,7 @@ void mmiCompositorMouse::OnButtonDown(mafEventInteraction *e)
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  //mmdMouse *mouse = (mmdMouse *)e->GetSender();
+  //mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender();
   //StartInteraction(mouse);
 
   switch(m_ButtonPressed) 
@@ -372,11 +372,11 @@ void mmiCompositorMouse::OnEvent(mafEventBase *event)
   if (channel == MCH_INPUT && m_InteractionFlag)
   {
     mafEventInteraction *e = (mafEventInteraction *)event;
-    mmdMouse *mouse = mmdMouse::SafeDownCast(GetDevice());
+    mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(GetDevice());
     
     // if the event comes from tracker which started the interaction continue...
     // Move2DEvent handling
-    if (id == mmdMouse::MOUSE_2D_MOVE && mouse)
+    if (id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE && mouse)
     {
       
       if (!m_CurrentCamera)

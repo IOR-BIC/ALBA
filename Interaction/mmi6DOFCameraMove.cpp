@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOFCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-09-15 09:49:23 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.4.22.1 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 #include "mmi6DOFCameraMove.h"
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 #include "mafAvatar3D.h"
 #include "mafTransform.h"
 #include "mafCameraTransform.h"
@@ -55,17 +55,17 @@ void mmi6DOFCameraMove::OnEvent(mafEventBase *event)
   if (channel==MCH_INPUT && m_InteractionFlag)
   {
     mafEventInteraction *e=(mafEventInteraction *)event;
-    mmdTracker *tracker=GetTracker();
+    mafDeviceButtonsPadTracker *tracker=GetTracker();
     
     if (tracker==NULL)
     {
-      tracker=mmdTracker::SafeDownCast((mafObject *)event->GetSender());
+      tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafObject *)event->GetSender());
       SetTracker(tracker);
       
     }  
     
     // if the event comes from tracker which started the interaction continue...
-    if (id==mmdTracker::TRACKER_3D_MOVE && tracker)
+    if (id==mafDeviceButtonsPadTracker::TRACKER_3D_MOVE && tracker)
     {
       if (!m_CurrentCamera)
         return;
@@ -81,7 +81,7 @@ void mmi6DOFCameraMove::OnEvent(mafEventBase *event)
   Superclass::OnEvent(event);
 }
 //------------------------------------------------------------------------------
-int mmi6DOFCameraMove::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
+int mmi6DOFCameraMove::StartInteraction(mafDeviceButtonsPadTracker *tracker,mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   //assert(ObjectPoseMatrix);

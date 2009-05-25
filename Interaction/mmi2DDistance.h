@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:38 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2009-05-25 14:49:03 $
+Version:   $Revision: 1.6.2.1 $
 Authors:   Daniele Giunchi - Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,7 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class vtkCamera;
 
 class vtkLineSource;
@@ -208,7 +208,7 @@ protected:
   bool m_DisableUndoAndOkCancel;
 	bool m_RegisterMeasure;
 
-	mmdMouse *m_Mouse;
+	mafDeviceButtonsPadMouse *m_Mouse;
 
   std::vector<int> m_FlagMeasureType;
   std::vector<double> m_Measure;

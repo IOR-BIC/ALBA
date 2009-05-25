@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:18:49 $
-  Version:   $Revision: 1.16 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.16.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,7 +15,7 @@
 #include "mafDecl.h"
 #include "mafDevice.h"
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafView.h"
 #include "mafEventInteraction.h"
@@ -870,7 +870,7 @@ void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseActi
   }
   else
   {
-    event.SetId(mmdMouse::MOUSE_2D_MOVE);
+    event.SetId(mafDeviceButtonsPadMouse::MOUSE_2D_MOVE);
   }
 
   mafEventMacro(event);
@@ -953,7 +953,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
   m_MousePose[1] = m_LastMousePose[1] = Y;
 
   // perform picking on current renderer
-  mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+  mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(m_Device);
   if (mouse)
   {
     mafView *v = mouse->GetView();
@@ -1208,7 +1208,7 @@ void mmiGenericMouse::NormalOnSurface()
 
 	bool picked = false;
 	double newAbsPickPos[3];
-	mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(m_Device);
 	if (mouse)
 	{
 		mafView *v = mouse->GetView();
@@ -1264,7 +1264,7 @@ void mmiGenericMouse::NormalOnSurface()
 
 	bool picked = false;
 	double newAbsPickPos[3];
-	mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(m_Device);
 	mafVME *pickedVme;
 	if (mouse)
 	{
@@ -1387,7 +1387,7 @@ void mmiGenericMouse::SnapOnSurface()
   
   bool picked = false;
   double newAbsPickPos[3];
-  mmdMouse *mouse = mmdMouse::SafeDownCast(m_Device);
+  mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(m_Device);
   if (mouse)
   {
     mafView *v = mouse->GetView();

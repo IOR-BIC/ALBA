@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 16:56:51 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.5.4.1 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,7 +31,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class vtkCamera;
 
 /** implements mouse move of camera in the scene.
@@ -44,7 +44,7 @@ public:
   mafTypeMacro(mmiCameraMove,mafInteractor);
 
   /** Start the interaction with the selected object */
-  virtual int StartInteraction(mmdMouse *mouse);
+  virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
 
   /**  Process events coming from tracker */
   virtual void OnEvent(mafEventBase *event);

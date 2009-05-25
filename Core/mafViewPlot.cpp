@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-05-25 14:51:14 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 #include "mafPipe.h"
 #include "mafPipeFactory.h"
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafVME.h"
 
@@ -74,7 +74,7 @@ void mafViewPlot::Create()
   m_Sg->SetListener(this);
 }
 //----------------------------------------------------------------------------
-void mafViewPlot::SetMouse(mmdMouse *mouse)
+void mafViewPlot::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 {
 }

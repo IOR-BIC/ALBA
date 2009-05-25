@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPicker.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-27 12:56:05 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2009-05-25 14:49:04 $
+  Version:   $Revision: 1.18.2.1 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,8 +25,8 @@
 
 #include "mafView.h"
 //#include "mafViewCompound.h"
-#include "mmdTracker.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadTracker.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 
 #include "mafEventInteraction.h"
@@ -71,7 +71,7 @@ void mmiPicker::OnEvent(mafEventBase *event)
   Superclass::OnEvent(event);
   if (m_ContinuousPickingFlag)
   {
-    if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)event->GetSender()))
+    if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)event->GetSender()))
     { 
       double mouse_pos[2];
       ((mafEventInteraction *)event)->Get2DPosition(mouse_pos);
@@ -83,7 +83,7 @@ void mmiPicker::OnEvent(mafEventBase *event)
 void mmiPicker::OnButtonDown(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  if (mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)e->GetSender()))
+  if (mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)e->GetSender()))
   { // is it a tracker?
     mafMatrix *tracker_pose = e->GetMatrix();
     // extract device avatar's renderer, no avatar == no picking
@@ -100,7 +100,7 @@ void mmiPicker::OnButtonDown(mafEventInteraction *e)
       SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
     }
   }
-  else if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)e->GetSender()))
+  else if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender()))
   { 
     double mouse_pos[2];
     e->Get2DPosition(mouse_pos);
@@ -114,7 +114,7 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
 {
   if (m_ContinuousPickingFlag)
   {
-    if (mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)e->GetSender()))
+    if (mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)e->GetSender()))
     { // is it a tracker?
       mafMatrix *tracker_pose = e->GetMatrix();
       // extract device avatar's renderer, no avatar == no picking
@@ -131,7 +131,7 @@ void mmiPicker::OnButtonUp(mafEventInteraction *e)
         SendPickingInformation(avatar->GetView(),NULL,VME_PICKED,&world_pose,false);
       }
     }
-    else if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)e->GetSender()))
+    else if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender()))
     { 
       double mouse_pos[2];
       e->Get2DPosition(mouse_pos);

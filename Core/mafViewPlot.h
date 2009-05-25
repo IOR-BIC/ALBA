@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewPlot.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:51:14 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafVME;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 
 //----------------------------------------------------------------------------
 // mafViewPlot :
@@ -106,7 +106,7 @@ public:
   mafPipeMap m_PipeMap; ///< Map used to store visual pipeline associated with vme types
 
   /** Set the mouse device to use inside the view */
-  void SetMouse(mmdMouse *mouse);
+  void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
   /** Print this view.*/
   virtual void Print(wxDC *dc, wxRect margins);

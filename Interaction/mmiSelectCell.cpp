@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiSelectCell.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-30 10:08:04 $
-  Version:   $Revision: 1.2.4.1 $
+  Date:      $Date: 2009-05-25 14:49:04 $
+  Version:   $Revision: 1.2.4.2 $
   Authors:   Stefano Perticoni	
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #include "mafDefines.h"
 
 #include "mmiSelectCell.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 #include "mafInteractor.h"
 #include "mafRWIBase.h"
@@ -96,7 +96,7 @@ void mmiSelectCell::PickCell( mafDevice *device )
   int x = m_LastMousePose[0];
   int y = m_LastMousePose[1];
 
-  mmdMouse *mouse = mmdMouse::SafeDownCast(device);
+  mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
   if( mouse && m_Renderer)
   {
     double pos_picked[3];
@@ -135,7 +135,7 @@ void mmiSelectCell::OnEvent(mafEventBase *event)
     if (eventInteraction != NULL)
     {
       // is it coming from the mouse?
-      if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)eventInteraction->GetSender()))
+      if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)eventInteraction->GetSender()))
       { 
         PickCell(mouse);
       }

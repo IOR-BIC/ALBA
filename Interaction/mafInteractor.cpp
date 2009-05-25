@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-08-27 12:53:45 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,11 +22,11 @@
 
 #include "mafInteractor.h"
 
-//#include "mmdButtonsPad.h"
-#include "mmdTracker.h"
+//#include "mafDeviceButtonsPad.h"
+#include "mafDeviceButtonsPadTracker.h"
 #include "mafAvatar.h"
 #include "mafAvatar3D.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafEventInteraction.h"
 #include "mafVME.h"
 #include "mmuIdFactory.h"
@@ -63,8 +63,8 @@ mafInteractor::mafInteractor()
   m_DeviceIsSet           = false;
   m_IgnoreTriggerEvents   = false;
   m_InteractionFlag       = false;
-  m_StartInteractionEvent = mmdButtonsPad::BUTTON_DOWN;
-  m_StopInteractionEvent  = mmdButtonsPad::BUTTON_UP;
+  m_StartInteractionEvent = mafDeviceButtonsPad::BUTTON_DOWN;
+  m_StopInteractionEvent  = mafDeviceButtonsPad::BUTTON_UP;
   m_StartButton           = 0;// Button 0
   m_Modifiers             = 0;// no modifiers
   m_ButtonMode            = SINGLE_BUTTON_MODE;
@@ -276,7 +276,7 @@ void mafInteractor::OnEvent(mafEventBase *event)
   if (ch==MCH_INPUT)
   {
     // Start the interaction if not disabled
-    if ((id == m_StartInteractionEvent || id == mmdMouse::MOUSE_DCLICK) && !m_IgnoreTriggerEvents)
+    if ((id == m_StartInteractionEvent || id == mafDeviceButtonsPadMouse::MOUSE_DCLICK) && !m_IgnoreTriggerEvents)
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       assert(e);
@@ -375,12 +375,12 @@ void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double d
 //----------------------------------------------------------------------------
 {
   mafView *v = NULL;
-  mmdTracker *tracker = NULL;
-  mmdMouse   *mouse   = NULL;
+  mafDeviceButtonsPadTracker *tracker = NULL;
+  mafDeviceButtonsPadMouse   *mouse   = NULL;
   mafMatrix world_pose;
   int mouse_pos[2];
 
-  if (tracker = mmdTracker::SafeDownCast(device))
+  if (tracker = mafDeviceButtonsPadTracker::SafeDownCast(device))
   {
     mafMatrix &tracker_pose = point_pose;
     mafAvatar *avatar = tracker->GetAvatar();
@@ -394,7 +394,7 @@ void mafInteractor::ComputeWorldToDisplay(double x, double y, double z, double d
       v = avatar->GetView();
     }
   }
-  else if (mouse = mmdMouse::SafeDownCast(device))
+  else if (mouse = mafDeviceButtonsPadMouse::SafeDownCast(device))
   { 
     mouse_pos[1] = (int)point_pose.GetElement(1,3);
     mouse_pos[0] = (int)point_pose.GetElement(0,3);

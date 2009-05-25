@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceTrackerWIIMote.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-17 16:01:04 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafDeviceTrackerWIIMote_h
 #define __mafDeviceTrackerWIIMote_h
 
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 
 #include "Utils.h"
 #include "Wiimote.h"
@@ -31,10 +31,10 @@ class Wiimote;
   This class implements Device WII Mote management as a Tracker device. It currently
   support only one WII Mote!
 */
-class mafDeviceTrackerWIIMote : public mmdTracker
+class mafDeviceTrackerWIIMote : public mafDeviceButtonsPadTracker
 {
 public:
-  mafTypeMacro(mafDeviceTrackerWIIMote,mmdTracker);
+  mafTypeMacro(mafDeviceTrackerWIIMote,mafDeviceButtonsPadTracker);
 
 protected:
   mafDeviceTrackerWIIMote();

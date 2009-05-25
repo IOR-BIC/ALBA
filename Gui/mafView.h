@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:24 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2009-05-25 14:50:29 $
+  Version:   $Revision: 1.23.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class mafDevice;
 class mafInteractor;
 
@@ -95,7 +95,7 @@ public:
 
   virtual void			CameraReset(mafNode *node = NULL)  											{};
   virtual void			CameraUpdate()																					{};
-  virtual void      SetMouse(mmdMouse *mouse)                               {};
+  virtual void      SetMouse(mafDeviceButtonsPadMouse *mouse)                               {};
   virtual mafRWIBase *GetRWI()                                              {return NULL;};
   virtual mafSceneGraph *GetSceneGraph()                                    {return NULL;};
   virtual void      GetImage(wxBitmap &bmp, int magnification = 1)          {};

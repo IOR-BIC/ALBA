@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DIndicator.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:30:06 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-05-25 14:49:03 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 
 class vtkLineSource;
 class vtkCoordinate;
@@ -161,7 +161,7 @@ protected:
   bool m_RegisterMeasure;
 	
 
-	mmdMouse *m_Mouse;
+	mafDeviceButtonsPadMouse *m_Mouse;
 
 	double  m_PickedPoint[3]; ///< 3D position of the picked point; used to assign position to the m_ProbingLine
 	mafVME *m_ProbedVME; ///< VME probed by the m_ProbingLine

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-09 14:18:48 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.9.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 //forward ref
 //----------------------------------------------------------------------------
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class mafMatrix;
 
 class vtkCamera;

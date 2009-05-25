@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOF.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -11,7 +11,7 @@
 =========================================================================*/
 
 #include "mmi6DOF.h"
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 #include "mafAvatar3D.h"
 
 #include "mafMatrix.h"
@@ -60,7 +60,7 @@ void mmi6DOF::SetRenderer(vtkRenderer *ren)
 }
 
 //------------------------------------------------------------------------------
-void mmi6DOF::SetTracker(mmdTracker *tracker)
+void mmi6DOF::SetTracker(mafDeviceButtonsPadTracker *tracker)
 //------------------------------------------------------------------------------
 {
   SetDevice(tracker);
@@ -70,7 +70,7 @@ void mmi6DOF::SetTracker(mmdTracker *tracker)
 void mmi6DOF::HideAvatar()
 //------------------------------------------------------------------------------
 {
-  mmdTracker *tracker=GetTracker();
+  mafDeviceButtonsPadTracker *tracker=GetTracker();
   if (tracker)
   {
     mafAvatar *avatar=tracker->GetAvatar();
@@ -85,7 +85,7 @@ void mmi6DOF::HideAvatar()
 void mmi6DOF::ShowAvatar()
 //------------------------------------------------------------------------------
 {
-  mmdTracker *tracker=GetTracker();
+  mafDeviceButtonsPadTracker *tracker=GetTracker();
   if (tracker)
   {
     mafAvatar *avatar=tracker->GetAvatar();
@@ -97,7 +97,7 @@ void mmi6DOF::ShowAvatar()
 }
 
 //------------------------------------------------------------------------------
-int mmi6DOF::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
+int mmi6DOF::StartInteraction(mafDeviceButtonsPadTracker *tracker,mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   if (Superclass::StartInteraction(tracker))
@@ -126,7 +126,7 @@ int mmi6DOF::StartInteraction(mmdTracker *tracker,mafMatrix *pose)
 }
 
 //------------------------------------------------------------------------------
-int mmi6DOF::StopInteraction(mmdTracker *tracker,mafMatrix *pose)
+int mmi6DOF::StopInteraction(mafDeviceButtonsPadTracker *tracker,mafMatrix *pose)
 //------------------------------------------------------------------------------
 {
   if (Superclass::StopInteraction(tracker))
@@ -218,7 +218,7 @@ void mmi6DOF::UpdateDeltaTransform()
 int mmi6DOF::OnStartInteraction(mafEventInteraction *event)
 //------------------------------------------------------------------------------
 {
-  mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)event->GetSender());
+  mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)event->GetSender());
   assert(tracker);
   mafMatrix *start_tracker_pose=event->GetMatrix();
   return StartInteraction(tracker,start_tracker_pose);
@@ -227,7 +227,7 @@ int mmi6DOF::OnStartInteraction(mafEventInteraction *event)
 int mmi6DOF::OnStopInteraction(mafEventInteraction *event)
 //------------------------------------------------------------------------------
 {
-  mmdTracker *tracker=mmdTracker::SafeDownCast((mafDevice *)event->GetSender());
+  mafDeviceButtonsPadTracker *tracker=mafDeviceButtonsPadTracker::SafeDownCast((mafDevice *)event->GetSender());
   assert(tracker);
   mafMatrix *stop_tracker_pose=event->GetMatrix();
   return StopInteraction(tracker,stop_tracker_pose);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCameraMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-11-29 16:56:51 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.6.4.1 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #include "mafDefines.h"
 
 #include "mmiCameraMove.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 #include "mafInteractor.h"
 
@@ -64,10 +64,10 @@ void mmiCameraMove::OnEvent(mafEventBase *event)
   if (channel == MCH_INPUT && m_InteractionFlag)
   {
     mafEventInteraction *e = (mafEventInteraction *)event;
-    mmdMouse *mouse = mmdMouse::SafeDownCast(GetDevice());
+    mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(GetDevice());
     
     // if the event comes from tracker which started the interaction continue...
-    if (id == mmdMouse::MOUSE_2D_MOVE && mouse)
+    if (id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE && mouse)
     {
       if (!m_CurrentCamera)
         return;
@@ -89,7 +89,7 @@ void mmiCameraMove::OnEvent(mafEventBase *event)
   Superclass::OnEvent(event);
 }
 //------------------------------------------------------------------------------
-int mmiCameraMove::StartInteraction(mmdMouse *mouse)
+int mmiCameraMove::StartInteraction(mafDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   SetRenderer(mouse->GetRenderer());
@@ -112,7 +112,7 @@ void mmiCameraMove::OnButtonDown(mafEventInteraction *e)
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  mmdMouse *mouse = (mmdMouse *)e->GetSender();
+  mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender();
   StartInteraction(mouse);
 
   switch(m_ButtonPressed) 

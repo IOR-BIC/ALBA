@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: exOperationApp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:00:01 $
-  Version:   $Revision: 1.46 $
+  Date:      $Date: 2009-05-25 14:50:58 $
+  Version:   $Revision: 1.46.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -43,6 +43,7 @@
 #include "mafOpCreateProber.h"
 #include "mafOpCreateRefSys.h"
 #include "mafOpCreateSlicer.h"
+#include "mafOpCreateVolume.h"
 #include "mafOpCrop.h"
 #include "mafOpEditMetadata.h"
 #include "mafOpExplodeCollapse.h"
@@ -65,6 +66,8 @@
 #include "mafOpValidateTree.h"
 #include "mafOpRemoveCells.h"
 #include "mafOpEditNormals.h"
+#include "mafOpVOIDensityEditor.h"
+#include "mafOpExporterRaw.h"
 
 #ifdef MAF_USE_ITK
   #include "mafOpImporterASCII.h"
@@ -113,7 +116,7 @@ bool exOperationApp::OnInit()
   //m_Logic->PlugVMEManager(false);  // the VmeManager at the moment cause 4 leaks of 200+32+24+56 bytes  //SIL. 20-4-2005: 
   m_Logic->Configure();
 
-  SetTopWindow(mafGetFrame());  
+  SetTopWindow(mafGetFrame());
 
   //------------------------------------------------------------
   // Importer Menu':
@@ -136,6 +139,7 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mafOpExporterMSF("MSF"));
   m_Logic->Plug(new mafOpExporterSTL("STL"));
   m_Logic->Plug(new mafOpExporterVTK("VTK"));
+  m_Logic->Plug(new mafOpExporterRAW("RAW"));
   //------------------------------------------------------------
 
   //------------------------------------------------------------
@@ -154,11 +158,13 @@ bool exOperationApp::OnInit()
   m_Logic->Plug(new mafOpCreateRefSys("RefSys"),"Create");
   m_Logic->Plug(new mafOpCreateProber("Prober"),"Create");
   m_Logic->Plug(new mafOpCreateSlicer("Slicer"),"Create");
+  m_Logic->Plug(new mafOpCreateVolume("Constant Volume"),"Create");
   m_Logic->Plug(new mafOpEditMetadata("Metadata Editor"));
   m_Logic->Plug(new mafOpExplodeCollapse("Explode/Collapse cloud"));
   m_Logic->Plug(new mafOpExtractIsosurface("Extract Isosurface"));
   m_Logic->Plug(new mafOpFilterSurface("Surface"),"Filter");
   m_Logic->Plug(new mafOpFilterVolume("Volume"),"Filter/Volume");
+  m_Logic->Plug(new mafOpVOIDensityEditor(), "Filter");
   m_Logic->Plug(new mafOpMAFTransform("Transform  \tCtrl+T"));
   m_Logic->Plug(new mafOpReparentTo("Reparent to...  \tCtrl+R"));
   m_Logic->Plug(new mafOpVolumeResample("Resample Volume"));
@@ -179,6 +185,9 @@ bool exOperationApp::OnInit()
   mafViewVTK *viso = new mafViewVTK("Isosurface view");
   viso->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurface",MUTEX);
   m_Logic->Plug(viso);
+  mafViewVTK *visoGPU = new mafViewVTK("Isosurface View (GPU)");
+  visoGPU->PlugVisualPipe("mafVMEVolumeGray", "mafPipeIsosurfaceGPU",MUTEX);
+  m_Logic->Plug(visoGPU);
   //m_Logic->Plug(new mafViewPlot("Plot view"));
 
   mafViewCompound *vc = new mafViewCompound("view compound",3);

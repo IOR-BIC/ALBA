@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafRemoteLogic.h,v $
 Language:  C++
-Date:      $Date: 2008-02-19 12:52:23 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-05-25 14:51:13 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,10 +20,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
-class mmdRemoteMouse;
+class mafDeviceButtonsPadMouseRemote;
 class mafViewManager;
 class mafOpManager;
-class mmdClientMAF;
+class mafDeviceClientMAF;
 
 //----------------------------------------------------------------------------
 // mafRemoteLogic :
@@ -52,7 +52,7 @@ public:
   /** Disconnect the client from the server. */
   void Disconnect();
 
-  void SetRemoteMouse(mmdRemoteMouse *rMouse);
+  void SetRemoteMouse(mafDeviceButtonsPadMouseRemote *rMouse);
 
   /** Prepare VME_SELECTED message to be sent to remote clients.*/
   void VmeSelected(mafNode *vme);
@@ -60,7 +60,7 @@ public:
   /** Prepare VME_SHOW message to be sent to remote clients.*/
   void VmeShow(mafNode *vme, bool show_vme);
 
-  void SetClientUnit(mmdClientMAF *clientUnit);
+  void SetClientUnit(mafDeviceClientMAF *clientUnit);
 
   /** In collaborative modality this is used to synchronize the local application with remote ones.*/
   void SynchronizeApplication();
@@ -69,8 +69,8 @@ protected:
   mafObserver     *m_Listener;          ///< MAF local listener
   mafViewManager  *m_ViewManager;       ///< Object listened
   mafOpManager    *m_OperationManager;  ///< Object listened
-  mmdClientMAF    *m_ClientUnit;        ///< Used to connect the application to a remote server
-  mmdRemoteMouse  *m_RemoteMouse;
+  mafDeviceClientMAF    *m_ClientUnit;        ///< Used to connect the application to a remote server
+  mafDeviceButtonsPadMouseRemote  *m_RemoteMouse;
 
   mafString        m_RemoteMsg;   ///< Command string sent to the server
   mafString        m_CommandSeparator;

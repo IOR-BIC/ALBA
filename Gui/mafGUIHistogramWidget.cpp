@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-05-25 14:50:29 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -25,8 +25,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUI.h"
 #include "mafGUIRangeSlider.h"
 
-#include "mmdButtonsPad.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPad.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafEventInteraction.h"
 #include "mmuIdFactory.h"
 
@@ -197,7 +197,7 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
   }
   else if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(event))
   {
-    if (ei->GetId() == mmdMouse::MOUSE_2D_MOVE)
+    if (ei->GetId() == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
     {
       if(m_Histogram->GetInputData() == NULL) return;
       double pos[2];
@@ -216,7 +216,7 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
       }
       m_HistogramRWI->CameraUpdate();
     }
-    else if (ei->GetId() == mmdButtonsPad::BUTTON_DOWN)
+    else if (ei->GetId() == mafDeviceButtonsPad::BUTTON_DOWN)
     {
       if (ei->GetButton() == MAF_RIGHT_BUTTON)
       {
@@ -230,7 +230,7 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
         }
       }
     }
-    else if (ei->GetId() == mmdButtonsPad::BUTTON_UP)
+    else if (ei->GetId() == mafDeviceButtonsPad::BUTTON_UP)
     {
       if (ei->GetButton() == MAF_RIGHT_BUTTON)
       {

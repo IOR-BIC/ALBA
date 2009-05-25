@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.35 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.35.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,9 +51,9 @@
 #include "mafAvatar3D.h"
 #include "mafAction.h"
 #include "mafDeviceSet.h"
-#include "mmdMouse.h"
-#include "mmdRemoteMouse.h"
-#include "mmdClientMAF.h"
+#include "mafDeviceButtonsPadMouse.h"
+#include "mafDeviceButtonsPadMouseRemote.h"
+#include "mafDeviceClientMAF.h"
   
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
@@ -127,18 +127,18 @@ mafInteractionManager::mafInteractionManager()
   // create a Mouse device
   // the device is plugged here instead of App::Init() since mouse is plugged 
   // by default in all applications!
-  mafPlugDevice<mmdMouse>("Mouse");
-  mmdMouse *mouse_device = (mmdMouse *)m_DeviceManager->AddDevice("mmdMouse",true); // add as persistent device
+  mafPlugDevice<mafDeviceButtonsPadMouse>("Mouse");
+  mafDeviceButtonsPadMouse *mouse_device = (mafDeviceButtonsPadMouse *)m_DeviceManager->AddDevice("mafDeviceButtonsPadMouse",true); // add as persistent device
   assert(mouse_device);
   //mafAction *mouse_action = m_StaticEventRouter->AddAction("Mouse"); // action for RWIs output
   //mouse_action->BindDevice(mouse_device); // bind mouse to mouse action
   pointing_action->BindDevice(mouse_device); // bind mouse to point&manipulate action
 
-  mafPlugDevice<mmdClientMAF>("Client MAF");
-  m_ClientDevice = (mmdClientMAF *)m_DeviceManager->AddDevice("mmdClientMAF",true);
+  mafPlugDevice<mafDeviceClientMAF>("Client MAF");
+  m_ClientDevice = (mafDeviceClientMAF *)m_DeviceManager->AddDevice("mafDeviceClientMAF",true);
 
-  mafPlugDevice<mmdRemoteMouse>("RemoteMouse");
-  mmdRemoteMouse *remote_mouse_device = (mmdRemoteMouse *)m_DeviceManager->AddDevice("mmdRemoteMouse", true); // add as persistent device
+  mafPlugDevice<mafDeviceButtonsPadMouseRemote>("RemoteMouse");
+  mafDeviceButtonsPadMouseRemote *remote_mouse_device = (mafDeviceButtonsPadMouseRemote *)m_DeviceManager->AddDevice("mafDeviceButtonsPadMouseRemote", true); // add as persistent device
   assert(remote_mouse_device);
   pointing_action->BindDevice(remote_mouse_device); // bind mouse to point&manipulate action
 }
@@ -242,20 +242,20 @@ void mafInteractionManager::EnableSelect(bool enable)
 }
 
 //------------------------------------------------------------------------------
-mmdMouse *mafInteractionManager::GetMouseDevice()
+mafDeviceButtonsPadMouse *mafInteractionManager::GetMouseDevice()
 //------------------------------------------------------------------------------
 {
-  return mmdMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
+  return mafDeviceButtonsPadMouse::SafeDownCast(m_DeviceManager->GetDevice("Mouse"));
 }
 
 //------------------------------------------------------------------------------
-mmdRemoteMouse *mafInteractionManager::GetRemoteMouseDevice()
+mafDeviceButtonsPadMouseRemote *mafInteractionManager::GetRemoteMouseDevice()
 //------------------------------------------------------------------------------
 {
-  return mmdRemoteMouse::SafeDownCast(m_DeviceManager->GetDevice("RemoteMouse"));
+  return mafDeviceButtonsPadMouseRemote::SafeDownCast(m_DeviceManager->GetDevice("RemoteMouse"));
 }
 //------------------------------------------------------------------------------
-mmdClientMAF *mafInteractionManager::GetClientDevice()
+mafDeviceClientMAF *mafInteractionManager::GetClientDevice()
 //------------------------------------------------------------------------------
 {
   return m_ClientDevice;

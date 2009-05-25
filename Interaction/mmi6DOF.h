@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOF.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:50 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@ class vtkProp3D;
 class vtkRenderer;
 class mafMatrix;
 class mafTransform;
-class mmdTracker;
+class mafDeviceButtonsPadTracker;
 class mafOBB;
 class mafAvatar3D;
 
@@ -35,10 +35,10 @@ public:
   mafAbstractTypeMacro(mmi6DOF,mmiGenericInterface);
   
   /**  Start the interaction with the selected object */
-  virtual int StartInteraction(mmdTracker *tracker,mafMatrix *pose=NULL);
+  virtual int StartInteraction(mafDeviceButtonsPadTracker *tracker,mafMatrix *pose=NULL);
   
   /**  Stop the interaction */
-  virtual int StopInteraction(mmdTracker *tracker,mafMatrix *pose=NULL);
+  virtual int StopInteraction(mafDeviceButtonsPadTracker *tracker,mafMatrix *pose=NULL);
   
   /**  Set/Get the current pose matrix */
   virtual void SetTrackerPoseMatrix(mafMatrix *pose);
@@ -52,8 +52,8 @@ public:
   void UpdateDeltaTransform();
 
   /**  Return pointer to the current input tracker */
-  mmdTracker *GetTracker() {return (mmdTracker *)m_Device;}
-  void SetTracker(mmdTracker *tracker);
+  mafDeviceButtonsPadTracker *GetTracker() {return (mafDeviceButtonsPadTracker *)m_Device;}
+  void SetTracker(mafDeviceButtonsPadTracker *tracker);
 
   /** 
     Enable/Disable trigger events processing. Trigger events are StartInteraction

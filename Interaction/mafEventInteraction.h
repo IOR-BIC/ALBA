@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2006-07-07 08:22:03 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.6.10.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@
   can also store an optional button argument, used to store the button 
   indexs when events for button down and button up are issued. Also an
   optional word of modifiers can be used.
-  @sa mafEventBase mmdTracker MoveEvent ButtonDownEvent ButtonUpEvent
+  @sa mafEventBase mafDeviceButtonsPadTracker MoveEvent ButtonDownEvent ButtonUpEvent
 */
 class mafEventInteraction : public mafEventBase
 {

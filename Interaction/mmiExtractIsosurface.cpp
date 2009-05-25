@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-11-10 11:49:25 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.4.6.1 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #include "mafDefines.h"
 
 #include "mmiExtractIsosurface.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 #include "mafInteractor.h"
 #include "mafRWIBase.h"
@@ -49,7 +49,7 @@ mmiExtractIsosurface::~mmiExtractIsosurface()
 {
 }
 //------------------------------------------------------------------------------
-int mmiExtractIsosurface::StartInteraction(mmdMouse *mouse)
+int mmiExtractIsosurface::StartInteraction(mafDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   return Superclass::StartInteraction(mouse);
@@ -99,7 +99,7 @@ void mmiExtractIsosurface::PickIsoValue(mafDevice *device)
   int x = m_LastMousePose[0];
   int y = m_LastMousePose[1];
 
-  mmdMouse *mouse = mmdMouse::SafeDownCast(device);
+  mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
   if( mouse && m_Renderer)
   {
     double pos_picked[3];

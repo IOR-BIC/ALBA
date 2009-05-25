@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar2D.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-06-25 11:53:44 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #include "mafAvatar2D.h"  
 
 // interactors & devices
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 // events
 #include "mafEventInteraction.h"
@@ -40,14 +40,14 @@ mafAvatar2D::~mafAvatar2D()
 }
 
 //------------------------------------------------------------------------------
-mmdMouse *mafAvatar2D::GetMouse()
+mafDeviceButtonsPadMouse *mafAvatar2D::GetMouse()
 //------------------------------------------------------------------------------
 {
-  return mmdMouse::SafeDownCast(GetDevice());
+  return mafDeviceButtonsPadMouse::SafeDownCast(GetDevice());
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar2D::SetMouse(mmdMouse *mouse)
+void mafAvatar2D::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   // Note device is always set before initializing...

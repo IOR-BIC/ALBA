@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi6DOFCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2005-05-21 07:55:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@ public:
   mafTypeMacro(mmi6DOFCameraMove,mmi6DOF);
 
   /** Start the interaction with the selected object */
-  virtual int StartInteraction(mmdTracker *tracker,mafMatrix *pose=NULL);
+  virtual int StartInteraction(mafDeviceButtonsPadTracker *tracker,mafMatrix *pose=NULL);
 
   /**  Process events coming from tracker */
   virtual void OnEvent(mafEventBase *event);

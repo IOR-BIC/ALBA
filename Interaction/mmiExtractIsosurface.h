@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-16 15:16:20 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -32,7 +32,7 @@ public:
   mafTypeMacro(mmiExtractIsosurface,mmiCameraMove);
 
   /** Start the interaction with the selected object */
-  virtual int StartInteraction(mmdMouse *mouse);
+  virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
 
   /** redefined to set the picking iso-value flag */
   virtual void OnMouseMove();

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-26 14:22:23 $
-  Version:   $Revision: 1.18 $
+  Date:      $Date: 2009-05-25 14:51:13 $
+  Version:   $Revision: 1.18.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@ class wxKeyEvent;
 class wxSizeEvent;
 class vtkInteractorObserver;
 class vtkCamera;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class vtkImageAppend;
 class vtkPNGWriter;
 class vtkWindowToImageFilter;
@@ -73,7 +73,7 @@ public:
   void NotifyClick();
 
   /** set the mouse device to which forward events from the view */
-  void SetMouse(mmdMouse *mouse);
+  void SetMouse(mafDeviceButtonsPadMouse *mouse);
 
   /** Set the directory for the Stereo Movie*/
   void SetStereoMovieDirectory(const char *dir);
@@ -184,7 +184,7 @@ protected:
   
   mafString  m_SaveDir;
   vtkCamera *m_Camera;
-  mmdMouse  *m_Mouse;
+  mafDeviceButtonsPadMouse  *m_Mouse;
   bool       m_CustomInteractorStyle;
   mafObserver *m_Listener;
 

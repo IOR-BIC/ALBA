@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Marco Petrone & Michele Diegoli
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,7 +24,7 @@ class mafGUI;
 class mafEvent;
 class mafEventBase;
 class mafMatrix;
-class mmdTracker;
+class mafDeviceButtonsPadTracker;
 class mafView;
 class vtkProp3D;
 class vtkActor;
@@ -136,11 +136,11 @@ public:
    /** 
      return the tracker attached to this avatar: the avatar usually follows the 
      movements of the tracker*/
-  mmdTracker *GetTracker();
+  mafDeviceButtonsPadTracker *GetTracker();
    /** 
      set the tracker attached to this avatar: the avatar usually follows the 
      movements of the tracker*/
-  virtual void SetTracker(mmdTracker *tracker);
+  virtual void SetTracker(mafDeviceButtonsPadTracker *tracker);
 
   /** Set Avatar modality: MODE_2D or MODE_3D*/
   void SetMode(int mode) {m_Mode=mode;}

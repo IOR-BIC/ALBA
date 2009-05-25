@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.79 $
+  Date:      $Date: 2009-05-25 14:51:14 $
+  Version:   $Revision: 1.79.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,8 +34,8 @@
 #include "mafInteractor.h"
 #include "mafAvatar.h"
 #include "mafAvatar3D.h"
-#include "mmdTracker.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadTracker.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafVME.h"
 #include "mafVMELandmarkCloud.h"
@@ -128,7 +128,7 @@ void mafViewVTK::Create()
   //m_Picker2D->InitializePickList();
 }
 //----------------------------------------------------------------------------
-void mafViewVTK::SetMouse(mmdMouse *mouse)
+void mafViewVTK::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 {
   assert(m_Rwi->m_RwiBase);
@@ -392,8 +392,8 @@ void mafViewVTK::SetWindowSize(int w, int h)
 bool mafViewVTK::FindPokedVme(mafDevice *device,mafMatrix &point_pose,vtkProp3D *&picked_prop,mafVME *&picked_vme,mafInteractor *&picked_behavior)
 //----------------------------------------------------------------------------
 {
-  mmdTracker *tracker = mmdTracker::SafeDownCast(device);
-  mmdMouse   *mouse   = mmdMouse::SafeDownCast(device);
+  mafDeviceButtonsPadTracker *tracker = mafDeviceButtonsPadTracker::SafeDownCast(device);
+  mafDeviceButtonsPadMouse   *mouse   = mafDeviceButtonsPadMouse::SafeDownCast(device);
   int mouse_pos[2];
   bool picked_something = false;
 

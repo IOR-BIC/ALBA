@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.33 $
+  Date:      $Date: 2009-05-25 14:51:14 $
+  Version:   $Revision: 1.33.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@
 
 #include "mafEvent.h"
 #include "mafRWIBase.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 /*
 #include "typeinfo.h"
@@ -91,7 +91,7 @@ mafViewManager::~mafViewManager()
 }
 
 //----------------------------------------------------------------------------
-void mafViewManager::SetMouse(mmdMouse *mouse)
+void mafViewManager::SetMouse(mafDeviceButtonsPadMouse *mouse)
 //----------------------------------------------------------------------------
 {
   m_Mouse = mouse;

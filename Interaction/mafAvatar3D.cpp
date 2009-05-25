@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.12.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -14,7 +14,7 @@
 #include "mafAvatar3D.h"
 
 // interactors & devices
-#include "mmdTracker.h"
+#include "mafDeviceButtonsPadTracker.h"
 //#include "mmi6DOFMove.h"
 
 // events
@@ -163,7 +163,7 @@ void mafAvatar3D::SetPicker3D(vtkMAFRayCast3DPicker *picker)
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::SetTracker(mmdTracker *tracker)
+void mafAvatar3D::SetTracker(mafDeviceButtonsPadTracker *tracker)
 //------------------------------------------------------------------------------
 {
   Superclass::SetTracker(tracker);
@@ -599,7 +599,7 @@ void mafAvatar3D::OnMove3DEvent(mafEventInteraction *e)
 }
 
 //------------------------------------------------------------------------------
-void mafAvatar3D::OnUpdateBoundsEvent(mmdTracker *tracker)
+void mafAvatar3D::OnUpdateBoundsEvent(mafDeviceButtonsPadTracker *tracker)
 //------------------------------------------------------------------------------
 {
   assert(tracker);
@@ -693,11 +693,11 @@ void mafAvatar3D::OnEvent(mafEventBase* event)
     {
       mafEventInteraction *e = (mafEventInteraction *)event;
 
-      if (id==mmdTracker::TRACKER_3D_MOVE) // manage changes in the bounds of the tracker
+      if (id==mafDeviceButtonsPadTracker::TRACKER_3D_MOVE) // manage changes in the bounds of the tracker
       {
         OnMove3DEvent(e);
       }
-      else if (id==mmdTracker::TRACKER_BOUNDS_UPDATED)
+      else if (id==mafDeviceButtonsPadTracker::TRACKER_BOUNDS_UPDATED)
       {
         OnUpdateBoundsEvent(GetTracker());          
       }

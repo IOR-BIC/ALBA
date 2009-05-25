@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-23 16:06:22 $
-Version:   $Revision: 1.5.2.4 $
+Date:      $Date: 2009-05-25 14:49:29 $
+Version:   $Revision: 1.5.2.5 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,7 +28,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafRWIBase.h"
 #include "mafRWI.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"

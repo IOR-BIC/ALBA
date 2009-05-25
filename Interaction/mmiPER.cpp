@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:57 $
-  Version:   $Revision: 1.14.2.1 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.14.2.2 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,8 +23,8 @@
 #include "mmiPER.h"
 
 #include "mafView.h"
-#include "mmdTracker.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadTracker.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 #include "mmi6DOFCameraMove.h"
 #include "mmiCameraMove.h"
@@ -200,7 +200,7 @@ void mmiPER::OnChar(mafEventInteraction *e)
     case 'r' :      
     case 'R' :
     {
-      mmdMouse *mouse = mmdMouse::SafeDownCast((mafDevice *)e->GetSender());
+      mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)e->GetSender());
       if (mouse)
       {
         mafView *view = mouse->GetView();
@@ -276,7 +276,7 @@ void mmiPER::OnRightButtonUp(mafEventInteraction *e)
   //  m_FlyToFlag = false; //SIL. 2-7-2004: - moved in FlyTo because if activated throught the voice label
                         //we receive a Mouseup right after
 
-  mmdMouse *mouse = mmdMouse::SafeDownCast((mafDevice*)e->GetSender());
+  mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast((mafDevice*)e->GetSender());
 
 	if(m_ShowContextMenu && mouse)
 	{
@@ -306,8 +306,8 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
   mafMatrix     point_pose;
   double        pos_2d[2];
 
-  mmdMouse   *mouse   = mmdMouse::SafeDownCast(device);
-  mmdTracker *tracker = mmdTracker::SafeDownCast(device);
+  mafDeviceButtonsPadMouse   *mouse   = mafDeviceButtonsPadMouse::SafeDownCast(device);
+  mafDeviceButtonsPadTracker *tracker = mafDeviceButtonsPadTracker::SafeDownCast(device);
 
   if (tracker)
   {
@@ -332,7 +332,7 @@ void mmiPER::OnButtonDown(mafEventInteraction *e)
     SetPickedVME(device, picked_vme);
     // if a VME is picked its pointer is written in PickedVME
     int but_down_id = e->GetId();
-    if (but_down_id == mmdMouse::MOUSE_DCLICK && !picked_vme->IsA("mafVMEGizmo"))
+    if (but_down_id == mafDeviceButtonsPadMouse::MOUSE_DCLICK && !picked_vme->IsA("mafVMEGizmo"))
     {
       // Send event to inform Logic that a double click event is rised on a VME
       InvokeEvent(VME_DCLICKED,MCH_UP,picked_vme);
@@ -495,7 +495,7 @@ void mmiPER::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
-    if (id == mmdMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
+    if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
@@ -504,7 +504,7 @@ void mmiPER::OnEvent(mafEventBase *event)
     if (IsInteracting(device))
     {
       // process the Move event
-      if (id == mmdTracker::TRACKER_3D_MOVE || id == mmdMouse::MOUSE_2D_MOVE)
+      if (id == mafDeviceButtonsPadTracker::TRACKER_3D_MOVE || id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
       {
         mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);
@@ -546,8 +546,8 @@ void mmiPER::FlyTo(mafEventInteraction *e,int numstep, double zoom)
   mafMatrix     *point_pose  = e->GetMatrix();
   double         pose_2d[2];
 
-  mmdTracker *tracker = mmdTracker::SafeDownCast((mafDevice*)e->GetSender());
-  mmdMouse   *mouse   = mmdMouse::SafeDownCast((mafDevice*)e->GetSender());
+  mafDeviceButtonsPadTracker *tracker = mafDeviceButtonsPadTracker::SafeDownCast((mafDevice*)e->GetSender());
+  mafDeviceButtonsPadMouse   *mouse   = mafDeviceButtonsPadMouse::SafeDownCast((mafDevice*)e->GetSender());
   assert(tracker || mouse);
 
   if (point_pose && tracker && tracker->GetAvatar())

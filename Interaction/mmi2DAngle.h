@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmi2DAngle.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:30:06 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-05-25 14:49:03 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 class vtkLineSource;
 class vtkCoordinate;
 class vtkPolyDataMapper2D;
@@ -179,7 +179,7 @@ protected:
   bool m_Clockwise;
   bool m_DisableUndoAndOkCancel;
 	bool m_RegisterMeasure;
-	mmdMouse *m_Mouse;
+	mafDeviceButtonsPadMouse *m_Mouse;
 
   std::vector<int> m_FlagMeasureType;
   std::vector<double> m_Measure;

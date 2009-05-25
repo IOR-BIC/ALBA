@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmi2DIndicator.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:30:06 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 14:49:03 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,7 +12,7 @@
 
 #include "mmi2DIndicator.h"
 #include "mafDecl.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafRWI.h"
 #include "mafView.h"
 #include "mafVME.h"
@@ -174,7 +174,7 @@ void mmi2DIndicator::OnLeftButtonDown(mafEventInteraction *e)
   }
   
   mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
-  mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
+  mafDeviceButtonsPadMouse  *mouse  = mafDeviceButtonsPadMouse::SafeDownCast(device);
   if (m_Mouse == NULL)
   {
     m_Mouse = mouse;
