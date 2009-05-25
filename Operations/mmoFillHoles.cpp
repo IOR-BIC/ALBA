@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: mmoFillHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-12 08:44:17 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -25,7 +25,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mmiSelectPoint.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"
 #include "mafVMESurface.h"

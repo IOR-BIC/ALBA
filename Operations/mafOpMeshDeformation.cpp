@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: mafOpMeshDeformation.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-14 14:19:23 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -24,7 +24,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafGUIDialog.h"
 #include "mafRWIBase.h"
 #include "mafRWI.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafEvent.h"
 
 #include "mafGUIButton.h"

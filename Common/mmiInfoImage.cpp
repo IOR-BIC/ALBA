@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-11-10 11:47:22 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-05-25 15:41:18 $
+  Version:   $Revision: 1.7.8.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,8 +24,8 @@
 
 #include "mafView.h"
 #include "mafViewCompound.h"
-#include "mmdTracker.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadTracker.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 #include "mmi6DOFCameraMove.h"
 #include "mmiCameraMove.h"
@@ -67,7 +67,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
     mafDevice *device = (mafDevice *)event->GetSender();
     assert(device);
 
-    if (id == mmdMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
+    if (id == mafDeviceButtonsPadMouse::MOUSE_CHAR_EVENT && !IsInteracting(device))
     {
       mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
       OnChar(e);
@@ -76,7 +76,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
     if (IsInteracting(device))
     {
       // process the Move event
-      if (id == mmdTracker::TRACKER_3D_MOVE || id == mmdMouse::MOUSE_2D_MOVE)
+      if (id == mafDeviceButtonsPadTracker::TRACKER_3D_MOVE || id == mafDeviceButtonsPadMouse::MOUSE_2D_MOVE)
       {
         mafEventInteraction *e = mafEventInteraction::SafeDownCast(event);
         OnMove(e);
@@ -104,7 +104,7 @@ void mmiInfoImage::OnEvent(mafEventBase *event)
     else
     {
       // Send to status bar text containing the pixel picked position and its density value
-      mmdMouse *mouse = mmdMouse::SafeDownCast(device);
+      mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
       if (mouse)
       {
         if (!mouse->IsUpdateRWIDuringMotion())

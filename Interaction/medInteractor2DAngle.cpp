@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medInteractor2DAngle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:00:56 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-25 15:41:38 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,7 +12,7 @@
 
 #include "medInteractor2DAngle.h"
 #include "mafDecl.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafRWI.h"
 #include "mafView.h"
 #include "mafVME.h"
@@ -172,7 +172,7 @@ void medInteractor2DAngle::OnLeftButtonDown(mafEventInteraction *e)
   }
   
   mafDevice *device = mafDevice::SafeDownCast((mafDevice*)e->GetSender());
-  mmdMouse  *mouse  = mmdMouse::SafeDownCast(device);
+  mafDeviceButtonsPadMouse  *mouse  = mafDeviceButtonsPadMouse::SafeDownCast(device);
   if (m_Mouse == NULL)
   {
     m_Mouse = mouse;
@@ -232,7 +232,7 @@ void medInteractor2DAngle::OnMiddleButtonUp(mafEventInteraction *e)
 void medInteractor2DAngle::OnRightButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
-  mmdMouse *mouse = mmdMouse::SafeDownCast((mafDevice*)e->GetSender());
+  mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast((mafDevice*)e->GetSender());
 
   if(m_ShowContextMenu && mouse)
   {

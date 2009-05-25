@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-15 14:09:57 $
-  Version:   $Revision: 1.61.2.8 $
+  Date:      $Date: 2009-05-25 15:42:28 $
+  Version:   $Revision: 1.61.2.9 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -42,7 +42,7 @@
 #include "medVisualPipeSlicerSlice.h"
 #include "mafPipePolylineSlice.h"
 #include "mafPipePolyline.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "vtkDataSet.h"
 #include "vtkPointData.h"

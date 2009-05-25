@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiDICOMImporterInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 14:01:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-05-25 15:41:18 $
+  Version:   $Revision: 1.1.1.1.8.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -31,7 +31,7 @@ public:
   mafTypeMacro(mmiDICOMImporterInteractor,mmiCameraMove);
 
   /** Start the interaction with the selected object */
-  virtual int StartInteraction(mmdMouse *mouse);
+  virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
 
   /** redefined to set the picking iso-value flag */
   virtual void OnMouseMove();

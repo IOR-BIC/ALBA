@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterDicomXA.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-07 13:56:11 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2009-05-25 15:42:01 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@
 #include "mafRWI.h"
 #include "mafGUIDialogPreview.h"
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mmiDICOMImporterInteractor.h"
 
 #include "mafVMEVolumeGray.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterCTMRI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:35:28 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-05-25 15:42:01 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Paolo Quadrani    Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,7 +30,7 @@
 #include "mafRWI.h"
 #include "mafGUIDialogPreview.h"
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mmiDICOMImporterInteractor.h"
 
 #include "mafVMEVolumeGray.h"

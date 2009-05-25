@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterRAWImages.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-14 16:46:51 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Stefania Paperini porting Matteo Giacomoni
 Modified by Josef Kohout to support large volumes 
 ==========================================================================
@@ -34,7 +34,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mafGUIDialogPreview.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mmiDICOMImporterInteractor.h"
 #include "mafTagArray.h"
 #include "mafVMEVolumeGray.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiDICOMImporterInteractor.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-10-13 14:01:02 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-05-25 15:41:18 $
+  Version:   $Revision: 1.1.1.1.8.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #include "mafDefines.h"
 
 #include "mmiDICOMImporterInteractor.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafInteractor.h"
 
 #include "mafEventInteraction.h"
@@ -42,7 +42,7 @@ mmiDICOMImporterInteractor::~mmiDICOMImporterInteractor()
 {
 }
 //------------------------------------------------------------------------------
-int mmiDICOMImporterInteractor::StartInteraction(mmdMouse *mouse)
+int mmiDICOMImporterInteractor::StartInteraction(mafDeviceButtonsPadMouse *mouse)
 //------------------------------------------------------------------------------
 {
   return Superclass::StartInteraction(mouse);

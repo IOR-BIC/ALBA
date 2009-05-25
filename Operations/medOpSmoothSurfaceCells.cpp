@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-10 14:37:55 $
-Version:   $Revision: 1.3.2.4 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.3.2.5 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,7 +52,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafDecl.h"
 
 #include "mafRWI.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafGUIDialog.h"
 #include "mafGUIButton.h"

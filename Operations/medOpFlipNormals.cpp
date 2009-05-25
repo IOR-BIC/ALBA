@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:32:50 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,7 +52,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafDecl.h"
 
 #include "mafRWI.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "mafGUIDialog.h"
 #include "mafGUIButton.h"

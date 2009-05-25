@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmoDICOMImporter.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-14 16:46:51 $
-Version:   $Revision: 1.26.2.1 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.26.2.2 $
 Authors:   Paolo Quadrani    Stefano Perticoni
 Modified by Josef Kohout to support large volumes
 ==========================================================================
@@ -31,7 +31,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafRWI.h"
 #include "mafGUIDialogPreview.h"
 
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mmiDICOMImporterInteractor.h"
 
 #include "mafVMEVolumeGray.h"

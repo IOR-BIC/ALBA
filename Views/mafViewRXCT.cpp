@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-23 08:58:21 $
-  Version:   $Revision: 1.45.2.4 $
+  Date:      $Date: 2009-05-25 15:42:28 $
+  Version:   $Revision: 1.45.2.5 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@
 #include "mafVMESurface.h"
 #include "mafVMESurfaceParametric.h"
 #include "medVisualPipeSlicerSlice.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 
 #include "vtkDataSet.h"
 #include "vtkLookupTable.h"

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DDistance.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:00:56 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-05-25 15:41:38 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,7 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward refs
 //----------------------------------------------------------------------------
 class mafRWI;
-class mmdMouse;
+class mafDeviceButtonsPadMouse;
 
 class vtkLineSource;
 class vtkCoordinate;
@@ -204,7 +204,7 @@ protected:
   bool m_DisableUndoAndOkCancel;
 	bool m_RegisterMeasure;
 
-	mmdMouse *m_Mouse;
+	mafDeviceButtonsPadMouse *m_Mouse;
 
   std::vector<int> m_FlagMeasureType;
   std::vector<double> m_Measure;

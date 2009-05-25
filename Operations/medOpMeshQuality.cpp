@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:12:22 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-05-25 15:42:01 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,7 +54,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mmiCameraMove.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"
 #include "mafVMESurface.h"

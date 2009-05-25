@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mmiSelectPoint.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-23 09:10:54 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-05-25 15:41:18 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Matteo Giacomoni	
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDefines.h"
 
 #include "mmiSelectPoint.h"
-#include "mmdMouse.h"
+#include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
 #include "mafInteractor.h"
 #include "mafRWIBase.h"
@@ -104,7 +104,7 @@ void mmiSelectPoint::PickCell( mafDevice *device )
 	int x = m_LastMousePose[0];
 	int y = m_LastMousePose[1];
 
-	mmdMouse *mouse = mmdMouse::SafeDownCast(device);
+	mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(device);
 	if( mouse && m_Renderer)
 	{
 		double pos_picked[3];
@@ -145,7 +145,7 @@ void mmiSelectPoint::OnEvent(mafEventBase *event)
 		if (eventInteraction != NULL)
 		{
 			// is it coming from the mouse?
-			if (mmdMouse *mouse=mmdMouse::SafeDownCast((mafDevice *)eventInteraction->GetSender()))
+			if (mafDeviceButtonsPadMouse *mouse=mafDeviceButtonsPadMouse::SafeDownCast((mafDevice *)eventInteraction->GetSender()))
 			{ 
 				PickCell(mouse);
 			}
