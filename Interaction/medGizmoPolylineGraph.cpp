@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-13 08:27:28 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-05-26 12:55:06 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -181,9 +181,11 @@ void medGizmoPolylineGraph::DestroyVMEGizmo()
 
     m_AppendPolyData->AddInput(m_Axis[i]->GetOutput());
 
-  m_PlaneSource = vtkPlaneSource::New();
-  m_AppendPolyData->AddInput(m_PlaneSource->GetOutput());    
+  
     }
+
+  m_PlaneSource = vtkPlaneSource::New();
+  m_AppendPolyData->AddInput(m_PlaneSource->GetOutput());  
   }
   else
   {
