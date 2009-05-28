@@ -48,6 +48,8 @@ SET(vtkMED_SRCS
   vtkMAFPolyDataDeformation_M1.h
   vtkMAFPolyDataDeformation_M2.cpp
   vtkMAFPolyDataDeformation_M2.h  
+  vtkMEDErythrocyteSource.cpp
+  vtkMEDErythrocyteSource.h
   
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
   vtkMAFIdType64.h
