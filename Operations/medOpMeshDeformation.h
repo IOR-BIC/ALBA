@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   @neufuse
-Module:    $RCSfile: mafOpMeshDeformation.h,v $
+Module:    $RCSfile: medOpMeshDeformation.h,v $
 Language:  C++
-Date:      $Date: 2009-05-14 14:19:23 $
+Date:      $Date: 2009-05-29 08:36:13 $
 Version:   $Revision: 1.1.2.1 $
 Authors:   Josef Kohout
 ==========================================================================
@@ -10,13 +10,13 @@ Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#ifndef __mafOpMeshDeformation_H__
-#define __mafOpMeshDeformation_H__
+#ifndef __medOpMeshDeformation_H__
+#define __medOpMeshDeformation_H__
 
 #include "mafOp.h"
 #include "mmiVTKPicker.h"
 
-#define DEBUG_mafOpMeshDeformation
+#define DEBUG_medOpMeshDeformation
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -36,10 +36,10 @@ class vtkSphereSource;
 class vtkCellPicker;
 
 //----------------------------------------------------------------------------
-// mafOpMeshDeformation :
+// medOpMeshDeformation :
 //----------------------------------------------------------------------------
 /** */
-class mafOpMeshDeformation: public mafOp
+class medOpMeshDeformation: public mafOp
 {
 protected:
   //----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ protected:
     EDM_ADD_CORRESPONDENCE,
     EDM_DELETE_CORRESPONDENCE,
     EDM_DELETE_CURVE,  
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
     EDM_SELECT_MESH_VERTEX,    
 #endif
   };
@@ -133,12 +133,12 @@ protected:
 #pragma endregion //Help structures
 
 public:
-	mafOpMeshDeformation(const wxString &label = "Mesh deformation");
-	~mafOpMeshDeformation(); 
+	medOpMeshDeformation(const wxString &label = "Mesh deformation");
+	~medOpMeshDeformation(); 
 
 	/*virtual*/ void OnEvent(mafEventBase *maf_event);
 
-	mafTypeMacro(mafOpMeshDeformation, mafOp);
+	mafTypeMacro(medOpMeshDeformation, mafOp);
 
 	/*virtual*/ mafOp* Copy();
 
@@ -457,7 +457,7 @@ protected:
 //Specifies the n-th control curve. 
 //See: SetNthOriginalControlCurve, SetNthDeformedControlCurve and
 //SetNthControlCurveCorrespondence for detailed information
-inline /*virtual*/ void mafOpMeshDeformation::SetNthControlCurve(int num,  mafVME* original,
+inline /*virtual*/ void medOpMeshDeformation::SetNthControlCurve(int num,  mafVME* original,
                                        mafVME* modified, vtkIdList* correspondence)
 //------------------------------------------------------------------------
 {

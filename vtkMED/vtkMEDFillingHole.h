@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkFillingHole.h,v $
+Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2009-05-12 08:33:17 $
+Date:      $Date: 2009-05-29 08:38:43 $
 Version:   $Revision: 1.1.2.1 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
@@ -10,8 +10,8 @@ Copyright (c) 2001/2005
 CINECA - Interuniversity Consortium (www.cineca.it)
 =========================================================================*/
 
-#ifndef __vtkFillingHole_h
-#define __vtkFillingHole_h
+#ifndef __vtkMEDFillingHole_h
+#define __vtkMEDFillingHole_h
 
 //----------------------------------------------------------------------------
 // Include:
@@ -29,9 +29,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //#define _FILLING_DBG
 
 //----------------------------------------------------------------------------
-// vtkFillingHole class 
+// vtkMEDFillingHole class 
 //----------------------------------------------------------------------------
-class VTK_GRAPHICS_EXPORT vtkFillingHole : public vtkPolyDataToPolyDataFilter
+class VTK_GRAPHICS_EXPORT vtkMEDFillingHole : public vtkPolyDataToPolyDataFilter
 {
 public:
 #pragma region Nested classes
@@ -121,9 +121,9 @@ public:
   //-----------------------------------------------------------------------------
   // public methods
   //-----------------------------------------------------------------------------
-  static vtkFillingHole *New();
+  static vtkMEDFillingHole *New();
 
-  vtkTypeRevisionMacro(vtkFillingHole,vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkMEDFillingHole,vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetFillAllHole();      ///< Set filling all holes on the mesh.
@@ -158,8 +158,8 @@ public:
   }
 
 protected:
-  vtkFillingHole();           
-  ~vtkFillingHole();
+  vtkMEDFillingHole();           
+  ~vtkMEDFillingHole();
 
   int		**Lambda;
   
@@ -262,8 +262,8 @@ protected:
   void DoneMesh();
 
 private:
-  vtkFillingHole(const vtkFillingHole&);  // Not implemented.
-  void operator=(const vtkFillingHole&);  // Not implemented.
+  vtkMEDFillingHole(const vtkMEDFillingHole&);  // Not implemented.
+  void operator=(const vtkMEDFillingHole&);  // Not implemented.
 };
 
 #endif

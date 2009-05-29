@@ -1,8 +1,8 @@
 /*========================================================================= 
 Program: Multimod Application Framework RELOADED 
-Module: $RCSfile: mafViewSliceOnCurve.cpp,v $ 
+Module: $RCSfile: medViewSliceOnCurve.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-05-14 11:18:45 $ 
+Date: $Date: 2009-05-29 08:37:18 $ 
 Version: $Revision: 1.1.2.1 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
@@ -20,7 +20,7 @@ See the COPYINGS file for license details
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafViewSliceOnCurve.h"
+#include "medViewSliceOnCurve.h"
 #include "mafViewSlice.h"
 
 #include "mafGUI.h"
@@ -64,13 +64,13 @@ See the COPYINGS file for license details
 #include "mafVMEGizmo.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafViewSliceOnCurve);
+mafCxxTypeMacro(medViewSliceOnCurve);
 //----------------------------------------------------------------------------
 #include "mafMemDbg.h"
 
 
 //3D volume pipes to be plugged
-/*static*/ const mafViewSliceOnCurve::VPIPE_ENTRY mafViewSliceOnCurve::m_VolumePipes[] = 
+/*static*/ const medViewSliceOnCurve::VPIPE_ENTRY medViewSliceOnCurve::m_VolumePipes[] = 
 {
   {"medPipeVolumeDRR", "DRR"},
   {"medPipeVolumeMIP", "MIP"},
@@ -80,7 +80,7 @@ mafCxxTypeMacro(mafViewSliceOnCurve);
 };
 
 //layout names
-/*static*/ const char* mafViewSliceOnCurve::m_LayoutNames[] = 
+/*static*/ const char* medViewSliceOnCurve::m_LayoutNames[] = 
 {
   "one row",
   "Mps horz", "Mps vert", 
@@ -90,10 +90,10 @@ mafCxxTypeMacro(mafViewSliceOnCurve);
 
 
 //----------------------------------------------------------------------------
-mafViewSliceOnCurve::mafViewSliceOnCurve(wxString label) : mafViewCompound(label, 1, 3)
+medViewSliceOnCurve::medViewSliceOnCurve(wxString label) : mafViewCompound(label, 1, 3)
 //----------------------------------------------------------------------------
 {  
-  m_LayoutConfiguration = mafViewSliceOnCurve::LAYOUT_MPS_VERT; 
+  m_LayoutConfiguration = medViewSliceOnCurve::LAYOUT_MPS_VERT; 
   m_VolumePipeConfiguration = 0;		//DRR by the default
   m_ShowPolylineInMainView = 0;     //Polyline is not visible in main view (by the default)
   m_ShowGizmoCoords = 1;
@@ -118,7 +118,7 @@ mafViewSliceOnCurve::mafViewSliceOnCurve(wxString label) : mafViewCompound(label
 
 #include "mafVMERoot.h"
 //----------------------------------------------------------------------------
-mafViewSliceOnCurve::~mafViewSliceOnCurve()
+medViewSliceOnCurve::~medViewSliceOnCurve()
 //----------------------------------------------------------------------------
 {  
   if (m_Gizmo != NULL)
@@ -152,10 +152,10 @@ mafViewSliceOnCurve::~mafViewSliceOnCurve()
 }
 
 //----------------------------------------------------------------------------
-mafView *mafViewSliceOnCurve::Copy(mafObserver *Listener)
+mafView *medViewSliceOnCurve::Copy(mafObserver *Listener)
 //----------------------------------------------------------------------------
 {  
-  mafViewSliceOnCurve *v = this->NewInstance(); 
+  medViewSliceOnCurve *v = this->NewInstance(); 
   v->m_Label = m_Label;
   v->m_Listener = Listener;
   v->m_Id = m_Id;
@@ -173,7 +173,7 @@ mafView *mafViewSliceOnCurve::Copy(mafObserver *Listener)
 #pragma region VmeAdd, VmeRemove, VmeShow, GetNodeStatus
 
 //----------------------------------------------------------------------------
-void mafViewSliceOnCurve::VmeShow(mafNode *node, bool show)
+void medViewSliceOnCurve::VmeShow(mafNode *node, bool show)
 //----------------------------------------------------------------------------
 {
   wxWindowDisabler wait1;
@@ -237,7 +237,7 @@ void mafViewSliceOnCurve::VmeShow(mafNode *node, bool show)
 //------------------------------------------------------------------------
 //Hides VMEs of the same type as pNode that are currently displayed in pView
 //The display status of pNode is not changed
-void mafViewSliceOnCurve::HideSameVMEs(mafView* pView, mafNode* pNode)
+void medViewSliceOnCurve::HideSameVMEs(mafView* pView, mafNode* pNode)
 //------------------------------------------------------------------------
 {
   if (pView == NULL || mafVME::SafeDownCast(pNode) == NULL ||
@@ -268,7 +268,7 @@ void mafViewSliceOnCurve::HideSameVMEs(mafView* pView, mafNode* pNode)
 //----------------------------------------------------------------------------
 //return the status of the node within this view. es: NON_VISIBLE,VISIBLE_ON, ... 
 //having mafViewCompound::GetNodeStatus allow mafGUICheckTree to not know about mafSceneGraph
-int mafViewSliceOnCurve::GetNodeStatus(mafNode *node)
+int medViewSliceOnCurve::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
   if (((mafVME*)node)->GetOutput()->IsA("mafVMEOutputPolyline"))
@@ -289,7 +289,7 @@ int mafViewSliceOnCurve::GetNodeStatus(mafNode *node)
 
 //------------------------------------------------------------------------
 //return the current pipe for the specified vme (if any exist at this moment) */
-/*virtual*/ mafPipe* mafViewSliceOnCurve::GetNodePipe(mafNode *vme)
+/*virtual*/ mafPipe* medViewSliceOnCurve::GetNodePipe(mafNode *vme)
 //------------------------------------------------------------------------
 {
   return m_ChildViewList[MAIN_VIEW]->GetNodePipe(vme);
@@ -301,7 +301,7 @@ int mafViewSliceOnCurve::GetNodeStatus(mafNode *node)
 #pragma region GUI stuff
 //-------------------------------------------------------------------------
 //Creates views and text mappers
-/*virtual*/ void mafViewSliceOnCurve::Create()
+/*virtual*/ void medViewSliceOnCurve::Create()
 //-------------------------------------------------------------------------
 {
   Superclass::Create();
@@ -327,7 +327,7 @@ int mafViewSliceOnCurve::GetNodeStatus(mafNode *node)
 }
 
 //-------------------------------------------------------------------------
-mafGUI* mafViewSliceOnCurve::CreateGui()
+mafGUI* medViewSliceOnCurve::CreateGui()
 //-------------------------------------------------------------------------
 {	
   assert(m_Gui == NULL);
@@ -383,7 +383,7 @@ mafGUI* mafViewSliceOnCurve::CreateGui()
 
 //------------------------------------------------------------------------
 // Redefine this method to define a custom layout.
-/*virtual*/ void mafViewSliceOnCurve::LayoutSubViewCustom(int width, int height)
+/*virtual*/ void medViewSliceOnCurve::LayoutSubViewCustom(int width, int height)
 //------------------------------------------------------------------------
 {
   int border = 2;
@@ -439,7 +439,7 @@ mafGUI* mafViewSliceOnCurve::CreateGui()
 #pragma endregion	//GUI stuff
 
 //----------------------------------------------------------------------------
-void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
+void medViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -493,7 +493,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 #pragma region Gizmo stuff
 //------------------------------------------------------------------------
 //creates the gizmo path
-/*virtual*/ void mafViewSliceOnCurve::CreateGizmo(mafNode* node)
+/*virtual*/ void medViewSliceOnCurve::CreateGizmo(mafNode* node)
 //------------------------------------------------------------------------
 {
   assert(m_Gizmo == NULL);
@@ -505,7 +505,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 
   if (polyline == NULL && polyline_gr == NULL)
   {
-    mafLogMessage("Unsupported VME for mafViewSliceOnCurve::CreateGizmo");
+    mafLogMessage("Unsupported VME for medViewSliceOnCurve::CreateGizmo");
     return;
   }     
     
@@ -590,7 +590,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //destroys the gizmo path
-/*virtual*/ void mafViewSliceOnCurve::DestroyGizmo()
+/*virtual*/ void medViewSliceOnCurve::DestroyGizmo()
 //------------------------------------------------------------------------
 {
   if (m_Gizmo != NULL)
@@ -616,7 +616,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //this method is called to set slice for the slice child view
-/*virtual*/ void mafViewSliceOnCurve::SetSlice(double* Origin, double* Normal)
+/*virtual*/ void medViewSliceOnCurve::SetSlice(double* Origin, double* Normal)
 //------------------------------------------------------------------------
 {
   mafViewSlice* vs = mafViewSlice::SafeDownCast(m_ChildViewList[SLICE_VIEW]);
@@ -626,7 +626,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //handles the change of gizmo on the "curve"
-/*virtual*/ void mafViewSliceOnCurve::OnGizmoMoved()
+/*virtual*/ void medViewSliceOnCurve::OnGizmoMoved()
 //------------------------------------------------------------------------
 {
   double pos[3], normal[3];
@@ -711,7 +711,7 @@ void mafViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
 
 
 //Update the slice according to the new position.
-void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
+void medViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 {
   if (m_Gizmo == NULL)
     return;	//we have no polyline	
@@ -731,7 +731,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 //Visualization Pipe Construction
 #pragma region Visualization Pipe Construction
 //----------------------------------------------------------------------------
-/*virtual*/ void mafViewSliceOnCurve::PackageView()
+/*virtual*/ void medViewSliceOnCurve::PackageView()
 //----------------------------------------------------------------------------
 {
   //create child views
@@ -747,7 +747,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 }
 
 //plugs a new volume visualization pipe
-/*virtual*/ void mafViewSliceOnCurve::PlugVolumePipe()
+/*virtual*/ void medViewSliceOnCurve::PlugVolumePipe()
 {	
   for (int i = 0; i < 2; i++)
   {
@@ -773,7 +773,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 }
 
 //plugs a new surface visualization pipe
-/*virtual*/ void mafViewSliceOnCurve::PlugSurfacePipe()
+/*virtual*/ void medViewSliceOnCurve::PlugSurfacePipe()
 {
   for (int i = 0; i < 2; i++)
   {
@@ -788,7 +788,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 }
 
 //plugs a new mesh visualization pipe
-/*virtual*/ void mafViewSliceOnCurve::PlugMeshPipe()
+/*virtual*/ void medViewSliceOnCurve::PlugMeshPipe()
 {
   for (int i = 0; i < 2; i++)
   {
@@ -803,7 +803,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 
 //------------------------------------------------------------------------
 //plugs a new polyline (graph) visualization pipe
-/*virtual*/ void mafViewSliceOnCurve::PlugPolylinePipe()
+/*virtual*/ void medViewSliceOnCurve::PlugPolylinePipe()
 //------------------------------------------------------------------------
 {
   //Plug polyline pipe
@@ -820,7 +820,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 }
 
 //change the visualization pipe for volumes
-/*virtual*/ void mafViewSliceOnCurve::ChangeVolumePipe(const char* pipename)
+/*virtual*/ void medViewSliceOnCurve::ChangeVolumePipe(const char* pipename)
 {
   //hide items forcing so the destruction of previous visualization pipeline
   if (m_CurrentVolume != NULL)      
@@ -843,7 +843,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 #pragma region Misc
 //------------------------------------------------------------------------
 //Returns number of volumes pipes available for the user
-/*virtual*/ int mafViewSliceOnCurve::GetNumberOfVolumePipes()
+/*virtual*/ int medViewSliceOnCurve::GetNumberOfVolumePipes()
 //------------------------------------------------------------------------
 {
   int nRet = 0;
@@ -860,7 +860,7 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 
 //------------------------------------------------------------------------
 //update the text displayed in the polyline view
-/*virtual*/ void mafViewSliceOnCurve::UpdateGizmoStatusText(const char* szText)
+/*virtual*/ void medViewSliceOnCurve::UpdateGizmoStatusText(const char* szText)
 //------------------------------------------------------------------------
 {
   m_TextMapper->SetInput(szText);
@@ -868,11 +868,11 @@ void mafViewSliceOnCurve::SetSlicePosition(double abscisa, vtkIdType branchId)
 }
 
 //-------------------------------------------------------------------------
-void mafViewSliceOnCurve::Print(std::ostream& os, const int tabs)// const
+void medViewSliceOnCurve::Print(std::ostream& os, const int tabs)// const
 //-------------------------------------------------------------------------
 {
   mafIndent indent(tabs);
-  os << indent << "mafViewSliceOnCurve" << '\t' << this << std::endl;
+  os << indent << "medViewSliceOnCurve" << '\t' << this << std::endl;
 
   //print components view information
 
@@ -887,7 +887,7 @@ void mafViewSliceOnCurve::Print(std::ostream& os, const int tabs)// const
 #pragma region Event Handlers
 //------------------------------------------------------------------------
 //handles the change of the visibility of polyline in the main view 
-/*virtual*/ void mafViewSliceOnCurve::OnShowPolylineInMainView()
+/*virtual*/ void medViewSliceOnCurve::OnShowPolylineInMainView()
 //------------------------------------------------------------------------
 {
   if (m_CurrentPolyLine != NULL)
@@ -900,7 +900,7 @@ void mafViewSliceOnCurve::Print(std::ostream& os, const int tabs)// const
 
 //------------------------------------------------------------------------
 //handles the change of the visibility of gizmo status text
-/*virtual*/ void mafViewSliceOnCurve::OnShowGizmoCoords()
+/*virtual*/ void medViewSliceOnCurve::OnShowGizmoCoords()
 //------------------------------------------------------------------------
 {
   if (!m_ShowGizmoCoords || m_Gizmo == NULL)

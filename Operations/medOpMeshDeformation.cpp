@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   @neufuse
-Module:    $RCSfile: mafOpMeshDeformation.cpp,v $
+Module:    $RCSfile: medOpMeshDeformation.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 15:42:01 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-05-29 08:36:13 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -18,7 +18,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mafOpMeshDeformation.h"
+#include "medOpMeshDeformation.h"
 #include "wx/busyinfo.h"
 
 #include "mafGUIDialog.h"
@@ -54,11 +54,11 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkCellPicker.h"
 
 #include "vtkMath.h"
-#include "vtkMAFPolyDataDeformation.h"
-#include "vtkMAFPolyDataDeformation_M1.h"
-#include "vtkMAFPolyDataDeformation_M2.h"
+#include "vtkMEDPolyDataDeformation.h"
+#include "vtkMEDPolyDataDeformation_M1.h"
+#include "vtkMEDPolyDataDeformation_M2.h"
 
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
 #include "vtkCharArray.h"
 #include "vtkPointData.h"
 #include "vtkLookupTable.h"
@@ -71,7 +71,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mafOpMeshDeformation);
+mafCxxTypeMacro(medOpMeshDeformation);
 //----------------------------------------------------------------------------
 
 #define CHANGE_OC   1
@@ -90,7 +90,7 @@ mafCxxTypeMacro(mafOpMeshDeformation);
 #define SELECT_CC_COR   4
 
 //----------------------------------------------------------------------------
-mafOpMeshDeformation::mafOpMeshDeformation(const wxString &label) : mafOp(label)
+medOpMeshDeformation::medOpMeshDeformation(const wxString &label) : mafOp(label)
 //----------------------------------------------------------------------------
 {
   m_OpType	= OPTYPE_OP;
@@ -129,7 +129,7 @@ mafOpMeshDeformation::mafOpMeshDeformation(const wxString &label) : mafOp(label)
   m_bDoNotCreateUndo = false;
 }
 //----------------------------------------------------------------------------
-mafOpMeshDeformation::~mafOpMeshDeformation()
+medOpMeshDeformation::~medOpMeshDeformation()
 //----------------------------------------------------------------------------
 {  
   for (int i = 0; i < m_NumberOfCurves; i++)
@@ -150,20 +150,20 @@ mafOpMeshDeformation::~mafOpMeshDeformation()
   mafDEL(m_Output);
 }
 //----------------------------------------------------------------------------
-bool mafOpMeshDeformation::Accept(mafNode *node)
+bool medOpMeshDeformation::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
   return (node && node->IsA("mafVMESurface"));
 }
 //----------------------------------------------------------------------------
-mafOp *mafOpMeshDeformation::Copy()   
+mafOp *medOpMeshDeformation::Copy()   
 //----------------------------------------------------------------------------
 {
-  return (new mafOpMeshDeformation(m_Label));
+  return (new medOpMeshDeformation(m_Label));
 }
 
 //----------------------------------------------------------------------------
-void mafOpMeshDeformation::OpRun()   
+void medOpMeshDeformation::OpRun()   
 //----------------------------------------------------------------------------
 { 
   //create internal structures for the visualization
@@ -187,7 +187,7 @@ void mafOpMeshDeformation::OpRun()
 }
 
 //----------------------------------------------------------------------------
-void mafOpMeshDeformation::OpDo()
+void medOpMeshDeformation::OpDo()
 //----------------------------------------------------------------------------
 {
   if (m_Output != NULL)
@@ -210,7 +210,7 @@ void mafOpMeshDeformation::OpDo()
 }
 
 //----------------------------------------------------------------------------
-void mafOpMeshDeformation::OpUndo()
+void medOpMeshDeformation::OpUndo()
 //----------------------------------------------------------------------------
 {
   if (m_Output != NULL)
@@ -239,7 +239,7 @@ void mafOpMeshDeformation::OpUndo()
 }
 
 //----------------------------------------------------------------------------
-void mafOpMeshDeformation::OpStop(int result)
+void medOpMeshDeformation::OpStop(int result)
 //----------------------------------------------------------------------------
 {
   mafEventMacro(mafEvent(this,result));        
@@ -247,7 +247,7 @@ void mafOpMeshDeformation::OpStop(int result)
 
 //----------------------------------------------------------------------------
 //Destroys GUI
-void mafOpMeshDeformation::CreateOpDialog()
+void medOpMeshDeformation::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
   wxBusyCursor wait;
@@ -414,7 +414,7 @@ void mafOpMeshDeformation::CreateOpDialog()
   editMode->Append( wxT("add correspondence") );
   editMode->Append( wxT("delete correspondence") );
   editMode->Append( wxT("delete curve") );
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
   editMode->Append( wxT("select mesh vertex") );
 #endif
   editMode->SetToolTip( wxT("Selects edit mode. ") );
@@ -624,7 +624,7 @@ void mafOpMeshDeformation::CreateOpDialog()
 
 //----------------------------------------------------------------------------
 //Creates GUI including renderer window
-void mafOpMeshDeformation::DeleteOpDialog()
+void medOpMeshDeformation::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
   m_Mouse->RemoveObserver(m_Picker);
@@ -638,7 +638,7 @@ void mafOpMeshDeformation::DeleteOpDialog()
 }
 
 //----------------------------------------------------------------------------
-void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
+void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -723,7 +723,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------
 //Generates control curves for the mesh.
 //All existing control curves are removed
-/*virtual*/ void mafOpMeshDeformation::OnCreateCurves()
+/*virtual*/ void medOpMeshDeformation::OnCreateCurves()
 //------------------------------------------------------------------------
 {
   //TODO: automatically detect skeleton of mesh
@@ -805,7 +805,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Opens VMEChoose dialog and selects new original curve.
-/*virtual*/ void mafOpMeshDeformation::OnSelectOC()
+/*virtual*/ void medOpMeshDeformation::OnSelectOC()
 //------------------------------------------------------------------------
 {
   mafVME* vme = SelectCurveVME();
@@ -821,7 +821,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Opens VMEChoose dialog and selects new deformed curve.
-/*virtual*/ void mafOpMeshDeformation::OnSelectDC()
+/*virtual*/ void medOpMeshDeformation::OnSelectDC()
 //------------------------------------------------------------------------
 {
   mafVME* vme = SelectCurveVME();
@@ -837,14 +837,14 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------
 //Selects VME of supported type for control curve
 //Returns NULL, if the user cancels the selection.
-/*virtual*/ mafVME* mafOpMeshDeformation::SelectCurveVME()
+/*virtual*/ mafVME* medOpMeshDeformation::SelectCurveVME()
 //------------------------------------------------------------------------
 {
   mafString title = "Choose VME with control curve";
   
   mafEvent ev(this, VME_CHOOSE);   
   ev.SetString(&title);
-  ev.SetArg((long)&mafOpMeshDeformation::SelectCurveVMECallback);
+  ev.SetArg((long)&medOpMeshDeformation::SelectCurveVMECallback);
 
   mafEventMacro(ev);
   return mafVME::SafeDownCast(ev.GetVme());
@@ -852,7 +852,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Callback for VME_CHOOSE that accepts polylines only
-/*static*/ bool mafOpMeshDeformation::SelectCurveVMECallback(mafNode *node) 
+/*static*/ bool medOpMeshDeformation::SelectCurveVMECallback(mafNode *node) 
 //------------------------------------------------------------------------
 {
   mafVME* vme = mafVME::SafeDownCast(node);
@@ -861,7 +861,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Clears everything form OC, DC and CC edits.
-/*virtual*/ void mafOpMeshDeformation::OnResetCurve()
+/*virtual*/ void medOpMeshDeformation::OnResetCurve()
 //------------------------------------------------------------------------
 {
   m_OCNameCtrl->SetLabel(wxEmptyString);
@@ -877,7 +877,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Adds new control curve.
-/*virtual*/ void mafOpMeshDeformation::OnAddCurve()
+/*virtual*/ void medOpMeshDeformation::OnAddCurve()
 //------------------------------------------------------------------------
 { 
   mafPolylineGraph *pOC, *pDC;
@@ -1003,7 +1003,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------
 //Called when the edit mode changes.
 //Updates the EditModeHelp text
-/*virtual*/ void mafOpMeshDeformation::OnEditMode()
+/*virtual*/ void medOpMeshDeformation::OnEditMode()
 //------------------------------------------------------------------------
 {
   //this must correspond to EDIT_MODES
@@ -1018,7 +1018,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
     "CTRL + click on a tube representing the correspondence to delete this correspondence.",
     "CTRL + click on a vertex, an original or a deformed curve or a correspondence tube "
     "to remove the underlaying control curve.",
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
     "CTRL + click on a mesh vertex to get information",    
 #endif
   };
@@ -1029,7 +1029,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
   //reset correspondence construction
   m_bCorrespondenceActive = false;
 
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
   if (m_EditMode == EDM_SELECT_MESH_VERTEX)
   {
     m_Meshes[0]->pActor->PickableOn();
@@ -1046,7 +1046,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------
 //Called when the deformation mode changes.
 //Updates the DeformationModeHelp text
-/*virtual*/ void mafOpMeshDeformation::OnDeformationMode()
+/*virtual*/ void medOpMeshDeformation::OnDeformationMode()
 //------------------------------------------------------------------------
 {
   //this must correspond to EDIT_MODES
@@ -1082,7 +1082,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Called when the user picks something. 
-/*virtual*/ void mafOpMeshDeformation::OnPick(vtkCellPicker* cellPicker)
+/*virtual*/ void medOpMeshDeformation::OnPick(vtkCellPicker* cellPicker)
 //------------------------------------------------------------------------
 {  
   double pickedPos[3];    //place where the pick was done
@@ -1152,7 +1152,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
     }
   }
 
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
   if (m_EditMode == EDM_SELECT_MESH_VERTEX)
   {
     vtkPolyData* pPoly = vtkPolyData::SafeDownCast(pickedObj);
@@ -1190,7 +1190,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //Undoes every action performed after the last adding/deletion of control curve 
 //It undoes movement of points, adding/deletion of vertices and correspondences
 //N.B. The default implementation calls OnUndo 
-/*virtual*/ void mafOpMeshDeformation::OnReset()
+/*virtual*/ void medOpMeshDeformation::OnReset()
 //------------------------------------------------------------------------
 {
   while (!m_UndoStack.empty())
@@ -1206,7 +1206,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Undoes the last action
-/*virtual*/ void mafOpMeshDeformation::OnUndo()
+/*virtual*/ void medOpMeshDeformation::OnUndo()
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(!m_UndoStack.empty());
@@ -1299,12 +1299,12 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Performs the deformation using the current settings.
-/*virtual*/ void mafOpMeshDeformation::OnPreview()
+/*virtual*/ void medOpMeshDeformation::OnPreview()
 //------------------------------------------------------------------------
 {  
   DeformMesh();
   
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
  /* CONTROL_CURVE* pCurve = m_Curves[0];
   CreateUndo(0, EDM_ADD_CORRESPONDENCE, CHANGE_ALL);
   
@@ -1399,7 +1399,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 #endif
 
 //Volume preservation feature
-#ifdef DEBUG_mafOpMeshDeformation
+#ifdef DEBUG_medOpMeshDeformation
   vtkMassProperties* props = vtkMassProperties::New();
   props->SetInput(m_Meshes[0]->pPoly); //GetVolume calls Update    
   double dblOrigVolume = props->GetVolume();
@@ -1423,7 +1423,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Performs the deformation and creates outputs
-/*virtual*/ void mafOpMeshDeformation::OnOk()
+/*virtual*/ void medOpMeshDeformation::OnOk()
 //------------------------------------------------------------------------
 {
   DeformMesh();
@@ -1489,7 +1489,7 @@ void mafOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 #pragma region //Edit operations
 //------------------------------------------------------------------------
 //Creates an undo item for the given curve.
-void mafOpMeshDeformation::CreateUndo(int index, int nAction, int nFlags)
+void medOpMeshDeformation::CreateUndo(int index, int nAction, int nFlags)
 {
   if (m_bDoNotCreateUndo)
     return; //the construction of undo item is forbidden (typically because of OnUndo)
@@ -1541,7 +1541,7 @@ void mafOpMeshDeformation::CreateUndo(int index, int nAction, int nFlags)
 //Adds a new control curve.
 //N.B. this does everything. It creates VTK pipeline, internal structures,
 //undo item for this operation and also updates the visibility.
-void mafOpMeshDeformation::AddControlCurve(mafPolylineGraph* pOC, 
+void medOpMeshDeformation::AddControlCurve(mafPolylineGraph* pOC, 
                      mafPolylineGraph* pDC, vtkIdList* pCC)
 //------------------------------------------------------------------------
 {
@@ -1562,7 +1562,7 @@ void mafOpMeshDeformation::AddControlCurve(mafPolylineGraph* pOC,
 //Deletes the control curve at the given index.
 //N.B. this does everything. It destroys VTK pipeline and
 //creates undo item for this operation.
-void mafOpMeshDeformation::DeleteControlCurve(int index)
+void medOpMeshDeformation::DeleteControlCurve(int index)
 //------------------------------------------------------------------------
 {
   //create undo item
@@ -1605,7 +1605,7 @@ void mafOpMeshDeformation::DeleteControlCurve(int index)
 //------------------------------------------------------------------------
 //Finds the point on iType curve (0 for OC, 1 for DC) closest to the given position.
 //Returns -1, if there is no point within the glyph tolerance
-int mafOpMeshDeformation::FindPoint(CONTROL_CURVE* pCurve, int iType, double pos[3])
+int medOpMeshDeformation::FindPoint(CONTROL_CURVE* pCurve, int iType, double pos[3])
 //------------------------------------------------------------------------
 {
   if (iType == 2)
@@ -1631,7 +1631,7 @@ int mafOpMeshDeformation::FindPoint(CONTROL_CURVE* pCurve, int iType, double pos
 //Selects an original curve, a deformed curve, a vertex or a correspondence.  
 //The selection is done for the given control curve and iType is 0 for OC,
 //1 for DC and 2 for CC; pos is the position where the pick event happened
-void mafOpMeshDeformation::SelectControlCurve(CONTROL_CURVE* pCurve, 
+void medOpMeshDeformation::SelectControlCurve(CONTROL_CURVE* pCurve, 
                                               int iType, double pos[3])
 //------------------------------------------------------------------------
 {  
@@ -1667,7 +1667,7 @@ void mafOpMeshDeformation::SelectControlCurve(CONTROL_CURVE* pCurve,
 //The curve is defined by its index and iType is 0 for OC, 1 for DC
 //After the calling of this routine, any number of MovePoint routines
 //is called to move the point. The process ends when EndMovePoint is called
-void mafOpMeshDeformation::BeginMovePoint(int index, int iType, double pos[3])
+void medOpMeshDeformation::BeginMovePoint(int index, int iType, double pos[3])
 //------------------------------------------------------------------------
 { 
   if (iType == 2 || (iType == 0 && !m_ChckEditOC->IsChecked()))
@@ -1722,7 +1722,7 @@ void mafOpMeshDeformation::BeginMovePoint(int index, int iType, double pos[3])
 //------------------------------------------------------------------------
 //Finalizes the movement of the point
 //N.B. see BeginMovePoint
-void mafOpMeshDeformation::EndMovePoint()
+void medOpMeshDeformation::EndMovePoint()
 //------------------------------------------------------------------------
 {
   m_Picker->SetContinuousPicking(false);
@@ -1732,7 +1732,7 @@ void mafOpMeshDeformation::EndMovePoint()
 //------------------------------------------------------------------------
 //Moves the current point into the new position
 //N.B. see BeginMovePoint
-void mafOpMeshDeformation::MovePoint(double pos[3])
+void medOpMeshDeformation::MovePoint(double pos[3])
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(m_bPointMoveActive && m_SelectedCurve != NULL);    
@@ -1761,7 +1761,7 @@ void mafOpMeshDeformation::MovePoint(double pos[3])
 //Adds a new point with the specified coordinates on a curve. 
 //The curve is defined by its index and iType is 0 for OC, 1 for DC
 //The point is inserted into the closest segment
-void mafOpMeshDeformation::AddPoint(int index, int iType, double pos[3])
+void medOpMeshDeformation::AddPoint(int index, int iType, double pos[3])
 //------------------------------------------------------------------------
 {
   if (iType == 2 || (iType == 0 && !m_ChckEditOC->IsChecked()))
@@ -1852,7 +1852,7 @@ void mafOpMeshDeformation::AddPoint(int index, int iType, double pos[3])
 //------------------------------------------------------------------------
 //Removes the existing point with the specified coordinates from a curve
 //The curve is defined by its index and iType is 0 for OC, 1 for DC
-void mafOpMeshDeformation::DeletePoint(int index, int iType, double pos[3])
+void medOpMeshDeformation::DeletePoint(int index, int iType, double pos[3])
 //------------------------------------------------------------------------
 {
   if (iType == 2 || (iType == 0 && !m_ChckEditOC->IsChecked()))
@@ -1997,7 +1997,7 @@ void mafOpMeshDeformation::DeletePoint(int index, int iType, double pos[3])
 //------------------------------------------------------------------------
 //Finds a correspondence for the given point from the specified curve
 //It returns -1, if there is no such correspondence; index to CC list otherwise
-int mafOpMeshDeformation::FindCorrespondence(vtkIdList* pCL, int ptIndex, int iCurve)
+int medOpMeshDeformation::FindCorrespondence(vtkIdList* pCL, int ptIndex, int iCurve)
 //------------------------------------------------------------------------
 {
   if (pCL == NULL)
@@ -2016,7 +2016,7 @@ int mafOpMeshDeformation::FindCorrespondence(vtkIdList* pCL, int ptIndex, int iC
 
 //------------------------------------------------------------------------
 //Deletes the correspondence at the given index
-void mafOpMeshDeformation::DeleteCorrespondence(vtkIdList*& pCL, int index)
+void medOpMeshDeformation::DeleteCorrespondence(vtkIdList*& pCL, int index)
 //------------------------------------------------------------------------
 {
   _ASSERT(pCL != NULL);
@@ -2041,7 +2041,7 @@ void mafOpMeshDeformation::DeleteCorrespondence(vtkIdList*& pCL, int index)
 
 //------------------------------------------------------------------------
 //Initializes the correspondence construction
-void mafOpMeshDeformation::BeginAddCorrespondence( int index, int iType, double pos[3] )
+void medOpMeshDeformation::BeginAddCorrespondence( int index, int iType, double pos[3] )
 //------------------------------------------------------------------------
 {
   CONTROL_CURVE* pCurve = m_Curves[index];
@@ -2060,7 +2060,7 @@ void mafOpMeshDeformation::BeginAddCorrespondence( int index, int iType, double 
 
 //------------------------------------------------------------------------
 //Finalizes the correspondence construction
-void mafOpMeshDeformation::EndAddCorrespondence( int index, int iType, double pos[3] )
+void medOpMeshDeformation::EndAddCorrespondence( int index, int iType, double pos[3] )
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(m_bCorrespondenceActive && m_SelectedCurve != NULL);  
@@ -2106,7 +2106,7 @@ void mafOpMeshDeformation::EndAddCorrespondence( int index, int iType, double po
 //------------------------------------------------------------------------
 //Deletes the correspondence close to the given point coordinates
 //The control curve to be modified is denoted by the given index
-void mafOpMeshDeformation::DeleteCorrespondence(int index, double pos[3])
+void medOpMeshDeformation::DeleteCorrespondence(int index, double pos[3])
 //------------------------------------------------------------------------
 {  
   CONTROL_CURVE* pCurve = m_Curves[index];
@@ -2171,19 +2171,19 @@ void mafOpMeshDeformation::DeleteCorrespondence(int index, double pos[3])
 
 //------------------------------------------------------------------------
 //Deforms the input mesh producing output mesh
-void mafOpMeshDeformation::DeformMesh()
+void medOpMeshDeformation::DeformMesh()
 //------------------------------------------------------------------------
 {
   switch (m_DeformationMode)
   {
   case DEM_BLANCO:
-    DeformMeshT< vtkMAFPolyDataDeformation_M1 >(); 
+    DeformMeshT< vtkMEDPolyDataDeformation_M1 >(); 
     break;
   case DEM_SEPPLANES:
-    DeformMeshT< vtkMAFPolyDataDeformation_M2 >(); 
+    DeformMeshT< vtkMEDPolyDataDeformation_M2 >(); 
     break;
   default:
-    DeformMeshT< vtkMAFPolyDataDeformation >(); 
+    DeformMeshT< vtkMEDPolyDataDeformation >(); 
     break;
   }
 }
@@ -2191,7 +2191,7 @@ void mafOpMeshDeformation::DeformMesh()
 //------------------------------------------------------------------------
 //Template for various methods
 template < class T >
-void mafOpMeshDeformation::DeformMeshT()
+void medOpMeshDeformation::DeformMeshT()
 //------------------------------------------------------------------------
 {
   vtkMAFSmartPointer< T > md;
@@ -2214,7 +2214,7 @@ void mafOpMeshDeformation::DeformMeshT()
 //------------------------------------------------------------------------
 //Creates internal data structures used in the editor.
 //Returns false, if an error occurs (e.g. unsupported input)
-/*virtual*/ bool mafOpMeshDeformation::CreateInternalStructures()
+/*virtual*/ bool medOpMeshDeformation::CreateInternalStructures()
 //------------------------------------------------------------------------
 {
   mafVMESurface* surface = mafVMESurface::SafeDownCast(m_Input); 
@@ -2274,7 +2274,7 @@ void mafOpMeshDeformation::DeformMeshT()
 
 //------------------------------------------------------------------------
 //Destroys internal data structures created by CreateInternalStructures
-/*virtual*/ void mafOpMeshDeformation::DeleteInternalStructures()
+/*virtual*/ void medOpMeshDeformation::DeleteInternalStructures()
 //------------------------------------------------------------------------
 {
   //destroy undo stack
@@ -2331,7 +2331,7 @@ void mafOpMeshDeformation::DeformMeshT()
 
 //------------------------------------------------------------------------
 //Creates mafPolyLineGraph for the given vme
-mafPolylineGraph* mafOpMeshDeformation::CreatePolylineGraph(mafVME* vme)
+mafPolylineGraph* medOpMeshDeformation::CreatePolylineGraph(mafVME* vme)
 //------------------------------------------------------------------------
 {
   if (vme == NULL)
@@ -2357,7 +2357,7 @@ mafPolylineGraph* mafOpMeshDeformation::CreatePolylineGraph(mafVME* vme)
 
 //------------------------------------------------------------------------
 //Creates a deep copy of polylinegraph 
-mafPolylineGraph* mafOpMeshDeformation::CreateCopyOfPolylineGraph(mafPolylineGraph* input)
+mafPolylineGraph* medOpMeshDeformation::CreateCopyOfPolylineGraph(mafPolylineGraph* input)
 //------------------------------------------------------------------------
 {
   if (input == NULL)
@@ -2385,7 +2385,7 @@ mafPolylineGraph* mafOpMeshDeformation::CreateCopyOfPolylineGraph(mafPolylineGra
 //------------------------------------------------------------------------
 //This method creates the internal mesh structure.
 //It constructs also the VTK pipeline.
-mafOpMeshDeformation::MESH* mafOpMeshDeformation::CreateMesh(vtkPolyData* pMesh)
+medOpMeshDeformation::MESH* medOpMeshDeformation::CreateMesh(vtkPolyData* pMesh)
 //------------------------------------------------------------------------
 {
   MESH* pRet = new MESH;
@@ -2404,7 +2404,7 @@ mafOpMeshDeformation::MESH* mafOpMeshDeformation::CreateMesh(vtkPolyData* pMesh)
 //------------------------------------------------------------------------
 //Creates the control curve structure.
 //It constructs also the VTK pipeline.
-mafOpMeshDeformation::CONTROL_CURVE* mafOpMeshDeformation::
+medOpMeshDeformation::CONTROL_CURVE* medOpMeshDeformation::
   CreateControlCurve(mafPolylineGraph* pOC, mafPolylineGraph* pDC, vtkIdList* pCC)
 //------------------------------------------------------------------------
 {
@@ -2463,7 +2463,7 @@ mafOpMeshDeformation::CONTROL_CURVE* mafOpMeshDeformation::
 //------------------------------------------------------------------------
 //Updates the VTK pipeline for the given curve.
 //N.B. It does not connects actors into the renderer.
-void mafOpMeshDeformation::UpdateMesh(MESH* pMesh)
+void medOpMeshDeformation::UpdateMesh(MESH* pMesh)
 //------------------------------------------------------------------------
 {
   if (pMesh->pPoly == NULL)
@@ -2482,7 +2482,7 @@ void mafOpMeshDeformation::UpdateMesh(MESH* pMesh)
 //Flags define what needs to be updated, bit 0 corresponds to the
 //original curve, 1 to deformed and 2 to correspondence 
 //N.B. It does not connects actors into the renderer.
-void mafOpMeshDeformation::UpdateControlCurve(CONTROL_CURVE* pCurve, int flags)
+void medOpMeshDeformation::UpdateControlCurve(CONTROL_CURVE* pCurve, int flags)
 //------------------------------------------------------------------------
 {
   for (int i = 0; i < 3; i++)
@@ -2586,7 +2586,7 @@ void mafOpMeshDeformation::UpdateControlCurve(CONTROL_CURVE* pCurve, int flags)
 //It adds/removes actors from the renderer according to the status of curves
 //and the visual options specified by the user in the GUI.
 //N.B. This is typically called when curve was updated. 
-void mafOpMeshDeformation::UpdateControlCurveVisibility(CONTROL_CURVE* pCurve)
+void medOpMeshDeformation::UpdateControlCurveVisibility(CONTROL_CURVE* pCurve)
 //------------------------------------------------------------------------
 {
   for (int j = 0; j < 3; j++)
@@ -2609,7 +2609,7 @@ void mafOpMeshDeformation::UpdateControlCurveVisibility(CONTROL_CURVE* pCurve)
 //specified by the user in the GUI.
 //This method is typically calls after UpdateMesh or 
 //UpdateControlCurve is finished
-void mafOpMeshDeformation::UpdateVisibility()
+void medOpMeshDeformation::UpdateVisibility()
 //------------------------------------------------------------------------
 {
   //remove all actors and 
@@ -2649,7 +2649,7 @@ void mafOpMeshDeformation::UpdateVisibility()
 //------------------------------------------------------------------------
 //Updates the visibility of the selected items.
 //Called automatically from UpdateVisibility and UpdateControlCurveVisibility
-void mafOpMeshDeformation::UpdateSelectionVisibility()
+void medOpMeshDeformation::UpdateSelectionVisibility()
 //------------------------------------------------------------------------
 {
   m_Rwi->m_RenFront->RemoveActor(m_SelPointActor);  
@@ -2682,7 +2682,7 @@ void mafOpMeshDeformation::UpdateSelectionVisibility()
 
 //------------------------------------------------------------------------
 //Removes all actors from the renderer.
-void mafOpMeshDeformation::RemoveAllActors()
+void medOpMeshDeformation::RemoveAllActors()
 //------------------------------------------------------------------------
 {  
   m_Rwi->m_RenFront->RemoveActor(m_Meshes[0]->pActor);
@@ -2707,7 +2707,7 @@ void mafOpMeshDeformation::RemoveAllActors()
 // Sets the number of control curves.
 //Sets the number of control VMEs (polylines or polylinegraphs).
 //Old VMEs are copied (and preserved) 
-/*virtual*/ void mafOpMeshDeformation::SetNumberOfControlCurves(int nCount)
+/*virtual*/ void medOpMeshDeformation::SetNumberOfControlCurves(int nCount)
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(nCount >= 0);
@@ -2765,7 +2765,7 @@ void mafOpMeshDeformation::RemoveAllActors()
 
 //------------------------------------------------------------------------
 //Specifies the n-th control curve in its original (undeformed) state. 
-/*virtual*/ void mafOpMeshDeformation::SetNthOriginalControlCurve(int num, mafVME* input)
+/*virtual*/ void medOpMeshDeformation::SetNthOriginalControlCurve(int num, mafVME* input)
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(num >= 0);
@@ -2788,7 +2788,7 @@ void mafOpMeshDeformation::RemoveAllActors()
 
 //------------------------------------------------------------------------
 //Specifies the n-th control curve in its deformed state. 
-/*virtual*/ void mafOpMeshDeformation::SetNthDeformedControlCurve(int num, mafVME* input)
+/*virtual*/ void medOpMeshDeformation::SetNthDeformedControlCurve(int num, mafVME* input)
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(num >= 0);
@@ -2812,7 +2812,7 @@ void mafOpMeshDeformation::RemoveAllActors()
 //The list contains pairs of indices of vertices of original-deformed 
 //curve that correspond to each other.
 //N.B. if not specified, it is assumed that first vertices correspond. 
-/*virtual*/ void mafOpMeshDeformation::SetNthControlCurveCorrespondence(int num, vtkIdList* matchlist)
+/*virtual*/ void medOpMeshDeformation::SetNthControlCurveCorrespondence(int num, vtkIdList* matchlist)
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(num >= 0);
@@ -2831,7 +2831,7 @@ void mafOpMeshDeformation::RemoveAllActors()
 #pragma endregion //Input Control Curves
 
 ////TODO: to be removed
-//void mafOpMeshDeformation::TestCode()
+//void medOpMeshDeformation::TestCode()
 //{
 //  {
 //  mafEvent ev(this, VME_SELECT, (long)24/*14*//*5*//*12*/);
@@ -2850,7 +2850,7 @@ void mafOpMeshDeformation::RemoveAllActors()
 //  /*OnSelectOC();
 //  OnSelectDC();*/  
 //  OnAddCurve();
-//#ifdef DEBUG_mafOpMeshDeformation
+//#ifdef DEBUG_medOpMeshDeformation
 //  m_EditMode = EDM_SELECT_MESH_VERTEX;
 //  m_Dialog->Update();
 //  OnEditMode();

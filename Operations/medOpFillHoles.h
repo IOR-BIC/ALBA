@@ -1,17 +1,17 @@
 /*=========================================================================
 Program:   @neufuse
-Module:    $RCSfile: mmoFillHoles.h,v $
+Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2009-05-12 08:44:17 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-05-29 08:36:13 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 =========================================================================*/
 
-#ifndef __mmoFillHoles_H__
-#define __mmoFillHoles_H__
+#ifndef __medOpFillHoles_H__
+#define __medOpFillHoles_H__
 
 #include "mafOp.h"
 
@@ -34,18 +34,18 @@ class vtkPolyData;
 class vtkGlyph3D;
 
 //----------------------------------------------------------------------------
-// mmoFillHoles :
+// medOpFillHoles :
 //----------------------------------------------------------------------------
 /** */
-class mmoFillHoles: public mafOp
+class medOpFillHoles: public mafOp
 {
 public:
-	mmoFillHoles(const wxString &label = "Fill Holes");
-	~mmoFillHoles(); 
+	medOpFillHoles(const wxString &label = "Fill Holes");
+	~medOpFillHoles(); 
 
 	/*virtual*/ void OnEvent(mafEventBase *maf_event);
 
-	mafTypeMacro(mmoFillHoles, mafOp);
+	mafTypeMacro(medOpFillHoles, mafOp);
 
 	/*virtual*/ mafOp* Copy();
 

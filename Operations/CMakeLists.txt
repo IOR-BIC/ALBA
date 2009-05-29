@@ -101,14 +101,17 @@ SET(PROJECT_SRCS
   medOpImporterDicomXA.cpp
   medOpImporterDicomXA.h
   
-  mmoFillHoles.cpp
-  mmoFillHoles.h
-  mafOpMeshDeformation.cpp
-  mafOpMeshDeformation.h        
+  medOpFillHoles.cpp
+  medOpFillHoles.h
+  medOpMeshDeformation.cpp
+  medOpMeshDeformation.h      
+  
+  #### VolumeLarge - TO BE COMMITTED DOWN    ####
   mafOpImporterBBF.cpp
   mafOpImporterBBF.h
   mafOpImporterRAWVolume_BES.cpp
   mafOpImporterRAWVolume_BES.h  
+  ###############################################
 )
   
 IF (MED_USE_Offis)

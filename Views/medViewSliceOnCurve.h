@@ -1,8 +1,8 @@
 /*========================================================================= 
   Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: mafViewSliceOnCurve.h,v $ 
+  Module: $RCSfile: medViewSliceOnCurve.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 11:18:45 $ 
+  Date: $Date: 2009-05-29 08:37:18 $ 
   Version: $Revision: 1.1.2.1 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
@@ -12,8 +12,8 @@
 */
 
 
-#ifndef __mafViewSliceOnCurve_H__
-#define __mafViewSliceOnCurve_H__
+#ifndef __medViewSliceOnCurve_H__
+#define __medViewSliceOnCurve_H__
 
 //#define GIZMO_PATH
 
@@ -39,18 +39,18 @@ class vtkActor2D;
 class vtkTextMapper;
 
 //----------------------------------------------------------------------------
-// mafViewSliceOnCurve :
+// medViewSliceOnCurve :
 //----------------------------------------------------------------------------
 /** 
 This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class mafViewSliceOnCurve: public mafViewCompound
+class medViewSliceOnCurve: public mafViewCompound
 {
 public:
 
-  mafViewSliceOnCurve(wxString label = "View Slice on Curve");
-  virtual ~mafViewSliceOnCurve(); 
+  medViewSliceOnCurve(wxString label = "View Slice on Curve");
+  virtual ~medViewSliceOnCurve(); 
 
-  mafTypeMacro(mafViewSliceOnCurve, mafViewCompound);
+  mafTypeMacro(medViewSliceOnCurve, mafViewCompound);
 
 	/** IDs for the GUI */
 	enum VIEW_SLICE_ON_CURVE_WIDGET_ID
@@ -152,13 +152,13 @@ public:
 
   /** Returns number of layouts available for the user */
   inline virtual int GetNumberOfLayouts() {
-    return mafViewSliceOnCurve::MAX_LAYOUTS;
+    return medViewSliceOnCurve::MAX_LAYOUTS;
   }
 
   /** Returns the array of layouts names.
   The list is terminated by NULL item. */
   inline virtual const char** GetLayoutsNames() {    
-    return mafViewSliceOnCurve::m_LayoutNames;
+    return medViewSliceOnCurve::m_LayoutNames;
   }  
 
   /** Returns number of volumes pipes available for the user */
@@ -167,7 +167,7 @@ public:
   /** Returns the array of volume pipes descriptor.
   The list is terminated by NULL item. */
   inline virtual const VPIPE_ENTRY* GetVolumePipesDesc() {    
-    return mafViewSliceOnCurve::m_VolumePipes;
+    return medViewSliceOnCurve::m_VolumePipes;
   }  
 
 	//change the visualization pipe for volumes

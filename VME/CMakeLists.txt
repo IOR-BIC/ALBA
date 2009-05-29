@@ -61,9 +61,12 @@ SET(PROJECT_SRCS
   medPipeComputeWrapping.cpp
   medVMEOutputComputeWrapping.cpp
   medVMEOutputComputeWrapping.h 
-
+  
+  ### TO BE COMMITTED DOWN ###
   mafPipeSlice.cpp
   mafPipeSlice.h
+  ############################
+  
   mafPipeMeshSlice_BES.cpp
   mafPipeMeshSlice_BES.h
   mafPipePolylineSlice_BES.cpp

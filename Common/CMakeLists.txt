@@ -23,8 +23,11 @@ SET(PROJECT_SRCS
   medCurvilinearAbscissaOnSkeletonHelper.h
   medGizmoInteractionDebugger.cpp
   medGizmoInteractionDebugger.h
+  
+	#### SHOULD BE COMMITTED DOWN ######
 	mafDbg.h
 	mafDataChecksum.h
+	##################################
 )
 
 # List libraries that are needed by this project.

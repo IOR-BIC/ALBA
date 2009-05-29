@@ -1,15 +1,15 @@
 /*========================================================================= 
   Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: vtkMAFPolyDataDeformation.h,v $ 
+  Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 14:18:46 $ 
+  Date: $Date: 2009-05-29 08:38:43 $ 
   Version: $Revision: 1.1.2.1 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
   See the COPYINGS file for license details 
   =========================================================================
-  vtkMAFPolyDataDeformation performs a skeleton based deformation
+  vtkMEDPolyDataDeformation performs a skeleton based deformation
   of the input poly data set (mesh). The deformation is driven by 
   two skeletons, here aka the original and the deformed curves. 
   The original curve(skeleton) corresponds to the input (original)
@@ -39,8 +39,8 @@
 
   The Hungarian algorithm (http://en.wikipedia.org/wiki/Hungarian_algorithm)
 */
-#ifndef vtkMAFPolyDataDeformation_h__
-#define vtkMAFPolyDataDeformation_h__
+#ifndef vtkMEDPolyDataDeformation_h__
+#define vtkMEDPolyDataDeformation_h__
 
 #pragma once
 
@@ -52,23 +52,23 @@
 #include <vector>
 #include <list>
 
-//#define DEBUG_vtkMAFPolyDataDeformation
+//#define DEBUG_vtkMEDPolyDataDeformation
 
 class vtkUnstructuredGrid;
 class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
 
-class VTK_GRAPHICS_EXPORT vtkMAFPolyDataDeformation : public vtkPolyDataToPolyDataFilter
+class VTK_GRAPHICS_EXPORT vtkMEDPolyDataDeformation : public vtkPolyDataToPolyDataFilter
 {
 public:
-  static vtkMAFPolyDataDeformation *New();
+  static vtkMEDPolyDataDeformation *New();
 
-  vtkTypeRevisionMacro(vtkMAFPolyDataDeformation, vtkPolyDataToPolyDataFilter);  
+  vtkTypeRevisionMacro(vtkMEDPolyDataDeformation, vtkPolyDataToPolyDataFilter);  
 
 protected:
-  vtkMAFPolyDataDeformation();           
-  virtual ~vtkMAFPolyDataDeformation();
+  vtkMEDPolyDataDeformation();           
+  virtual ~vtkMEDPolyDataDeformation();
 
 protected:
 #pragma region //Nested Classes
@@ -569,10 +569,10 @@ protected:
   void CreatePolyDataFromSkeleton(CSkeleton* pSkel, vtkPolyData* output); 
 
 private:
-  vtkMAFPolyDataDeformation(const vtkMAFPolyDataDeformation&);  // Not implemented.
-  void operator = (const vtkMAFPolyDataDeformation&);  // Not implemented.  
+  vtkMEDPolyDataDeformation(const vtkMEDPolyDataDeformation&);  // Not implemented.
+  void operator = (const vtkMEDPolyDataDeformation&);  // Not implemented.  
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation
+#ifdef DEBUG_vtkMEDPolyDataDeformation
 public:
   vtkPolyData* m_MATCHED_POLYS[2];  //new polys for the first skeleton
   vtkIdList* m_MATCHED_FULLCC;      //and their correspondences
@@ -587,7 +587,7 @@ protected:
 };
 
 #pragma region //Munkres INLINES
-inline bool vtkMAFPolyDataDeformation::
+inline bool vtkMEDPolyDataDeformation::
 CMunkres::find_uncovered_in_matrix(double item, int &row, int &col) 
 {
   for ( row = 0 ; row < matrix->GetNumberOfRows() ; row++ )
@@ -605,7 +605,7 @@ CMunkres::find_uncovered_in_matrix(double item, int &row, int &col)
   return false;
 }
 
-inline bool vtkMAFPolyDataDeformation::
+inline bool vtkMEDPolyDataDeformation::
 CMunkres::pair_in_list(const vtkstd::pair<int,int> &needle, 
                        const vtkstd::list<std::pair<int,int> > &haystack) 
 {
@@ -619,4 +619,4 @@ CMunkres::pair_in_list(const vtkstd::pair<int,int> &needle,
 }
 #pragma endregion //Munkres INLINES
 
-#endif // vtkMAFPolyDataDeformation_h__
+#endif // vtkMEDPolyDataDeformation_h__

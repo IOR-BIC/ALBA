@@ -1,9 +1,9 @@
 /*=========================================================================
 Program:   @neufuse
-Module:    $RCSfile: mmoFillHoles.cpp,v $
+Module:    $RCSfile: medOpFillHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 15:42:01 $
-Version:   $Revision: 1.2.2.2 $
+Date:      $Date: 2009-05-29 08:36:13 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -18,7 +18,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "mmoFillHoles.h"
+#include "medOpFillHoles.h"
 #include "wx/busyinfo.h"
 
 #include "mafGUIDialog.h"
@@ -48,14 +48,14 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkSphereSource.h"
 #include "vtkProperty.h"
 #include "vtkAppendPolyData.h"
-#include "vtkFillingHole.h"
+#include "vtkMEDFillingHole.h"
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(mmoFillHoles);
+mafCxxTypeMacro(medOpFillHoles);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-mmoFillHoles::mmoFillHoles(const wxString &label) :
+medOpFillHoles::medOpFillHoles(const wxString &label) :
 mafOp(label)
 //----------------------------------------------------------------------------
 {
@@ -86,7 +86,7 @@ mafOp(label)
   m_ThinPlateSmoothingSteps = 500;
 }
 //----------------------------------------------------------------------------
-mmoFillHoles::~mmoFillHoles()
+medOpFillHoles::~medOpFillHoles()
 //----------------------------------------------------------------------------
 {
   for(int i=0;i<m_VTKResult.size();i++)
@@ -98,16 +98,16 @@ mmoFillHoles::~mmoFillHoles()
 	vtkDEL(m_OriginalPolydata);
 }
 //----------------------------------------------------------------------------
-bool mmoFillHoles::Accept(mafNode *node)
+bool medOpFillHoles::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
 	return (node && node->IsA("mafVMESurface"));
 }
 //----------------------------------------------------------------------------
-mafOp *mmoFillHoles::Copy()   
+mafOp *medOpFillHoles::Copy()   
 //----------------------------------------------------------------------------
 {
-	return (new mmoFillHoles(m_Label));
+	return (new medOpFillHoles(m_Label));
 }
 //----------------------------------------------------------------------------
 // Constants:
@@ -126,7 +126,7 @@ enum FILTER_SURFACE_ID
   ID_UNDO,
 };
 //----------------------------------------------------------------------------
-void mmoFillHoles::OpRun()   
+void medOpFillHoles::OpRun()   
 //----------------------------------------------------------------------------
 {	
 	mafVMESurface *surface=mafVMESurface::SafeDownCast(m_Input);
@@ -155,7 +155,7 @@ void mmoFillHoles::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::OpDo()
+void medOpFillHoles::OpDo()
 //----------------------------------------------------------------------------
 {
 	/*((mafVMESurface*)m_Input)->SetData(m_ResultPolydata,((mafVME*)m_Input)->GetTimeStamp());
@@ -167,7 +167,7 @@ void mmoFillHoles::OpDo()
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::OpUndo()
+void medOpFillHoles::OpUndo()
 //----------------------------------------------------------------------------
 {
 	((mafVMESurface*)m_Input)->SetData(m_OriginalPolydata,((mafVME*)m_Input)->GetTimeStamp());
@@ -176,7 +176,7 @@ void mmoFillHoles::OpUndo()
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::OnEvent(mafEventBase *maf_event)
+void medOpFillHoles::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
 	if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
@@ -245,13 +245,13 @@ void mmoFillHoles::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::OpStop(int result)
+void medOpFillHoles::OpStop(int result)
 //----------------------------------------------------------------------------
 {
 	mafEventMacro(mafEvent(this,result));        
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::DeleteOpDialog()
+void medOpFillHoles::DeleteOpDialog()
 //----------------------------------------------------------------------------
 {
 	m_Mouse->RemoveObserver(m_Picker);
@@ -281,7 +281,7 @@ void mmoFillHoles::DeleteOpDialog()
 
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::CreateOpDialog()
+void medOpFillHoles::CreateOpDialog()
 //----------------------------------------------------------------------------
 {
 	wxBusyCursor wait;
@@ -384,13 +384,13 @@ void mmoFillHoles::CreateOpDialog()
 
 #include "vtkUnstructuredGrid.h"
 //----------------------------------------------------------------------------
-void mmoFillHoles::Fill()
+void medOpFillHoles::Fill()
 //----------------------------------------------------------------------------
 {
   wxBusyCursor busy;
 
 	//fill the boundary polydata
-	vtkFillingHole *fillingHoleFilter;
+	vtkMEDFillingHole *fillingHoleFilter;
 	vtkNEW(fillingHoleFilter);
 	//fillingHoleFilter->SetInput(m_ResultPolydata);
   fillingHoleFilter->SetInput(m_VTKResult[m_VTKResult.size()-1]);
@@ -455,7 +455,7 @@ void mmoFillHoles::Fill()
 	
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::SelectHole(int pointID)
+void medOpFillHoles::SelectHole(int pointID)
 //----------------------------------------------------------------------------
 {
 	/*m_ResultPolydata->Update();
@@ -492,7 +492,7 @@ void mmoFillHoles::SelectHole(int pointID)
 	b_fill->Enable(m_SelectedPoint);  
 }
 //----------------------------------------------------------------------------
-void mmoFillHoles::CreatePolydataPipeline()
+void medOpFillHoles::CreatePolydataPipeline()
 //----------------------------------------------------------------------------
 {
 	double bounds[6];

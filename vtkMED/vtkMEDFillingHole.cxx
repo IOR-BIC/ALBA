@@ -1,8 +1,8 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: vtkFillingHole.cxx,v $
+Module:    $RCSfile: vtkMEDFillingHole.cxx,v $
 Language:  C++
-Date:      $Date: 2009-05-12 08:33:17 $
+Date:      $Date: 2009-05-29 08:38:43 $
 Version:   $Revision: 1.1.2.1 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
@@ -13,7 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "vtkFillingHole.h"
+#include "vtkMEDFillingHole.h"
 
 #include "vtkDoubleArray.h"
 #include "vtkLine.h"
@@ -33,8 +33,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <float.h>
 
 
-vtkCxxRevisionMacro(vtkFillingHole, "$Revision: 1.1.2.1 $");
-vtkStandardNewMacro(vtkFillingHole);
+vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.1 $");
+vtkStandardNewMacro(vtkMEDFillingHole);
 
 #include "mafMemDbg.h"
 
@@ -47,7 +47,7 @@ vtkStandardNewMacro(vtkFillingHole);
 #pragma region Nested classes
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CVertex::CVertex(double *pCoord)
+vtkMEDFillingHole::CVertex::CVertex(double *pCoord)
 //----------------------------------------------------------------------------
 {
   dCoord[0] = pCoord[0];
@@ -58,7 +58,7 @@ vtkFillingHole::CVertex::CVertex(double *pCoord)
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CVertex::~CVertex()
+vtkMEDFillingHole::CVertex::~CVertex()
 //----------------------------------------------------------------------------
 {
   OneRingVertex.clear();
@@ -68,7 +68,7 @@ vtkFillingHole::CVertex::~CVertex()
 }
 
 //----------------------------------------------------------------------------
-bool vtkFillingHole::CVertex::IsTwoRingVertex(int id)
+bool vtkMEDFillingHole::CVertex::IsTwoRingVertex(int id)
 //----------------------------------------------------------------------------
 {
   vtkstd::vector<int>::iterator end;
@@ -79,7 +79,7 @@ bool vtkFillingHole::CVertex::IsTwoRingVertex(int id)
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CTriangle::CTriangle()
+vtkMEDFillingHole::CTriangle::CTriangle()
 //----------------------------------------------------------------------------
 {
   aEdge[0]=aEdge[1]=aEdge[2]=-1;
@@ -87,7 +87,7 @@ vtkFillingHole::CTriangle::CTriangle()
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CTriangle::CTriangle(int v0,int v1,int v2)
+vtkMEDFillingHole::CTriangle::CTriangle(int v0,int v1,int v2)
 //----------------------------------------------------------------------------
 {
   aVertex[0]=v0;
@@ -99,7 +99,7 @@ vtkFillingHole::CTriangle::CTriangle(int v0,int v1,int v2)
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::CTriangle::SetEdge(int e0,int e1,int e2)
+void vtkMEDFillingHole::CTriangle::SetEdge(int e0,int e1,int e2)
 //----------------------------------------------------------------------------
 {
   aEdge[0]=e0;
@@ -108,7 +108,7 @@ void vtkFillingHole::CTriangle::SetEdge(int e0,int e1,int e2)
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CEdge::CEdge()
+vtkMEDFillingHole::CEdge::CEdge()
 //----------------------------------------------------------------------------
 {
   aVertex[0]=aVertex[1]=aVertex[2]=aVertex[3]=-1;
@@ -117,7 +117,7 @@ vtkFillingHole::CEdge::CEdge()
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CEdge::CEdge(int v0,int v1)
+vtkMEDFillingHole::CEdge::CEdge(int v0,int v1)
 //----------------------------------------------------------------------------
 {
   aVertex[0] = v0;
@@ -128,7 +128,7 @@ vtkFillingHole::CEdge::CEdge(int v0,int v1)
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CEdge::CEdge(int v0,int v1,int v2,int v3)
+vtkMEDFillingHole::CEdge::CEdge(int v0,int v1,int v2,int v3)
 //----------------------------------------------------------------------------
 {
   aVertex[0] = v0;
@@ -140,7 +140,7 @@ vtkFillingHole::CEdge::CEdge(int v0,int v1,int v2,int v3)
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::CEdge::SetTriangle(int t0,int t1)
+void vtkMEDFillingHole::CEdge::SetTriangle(int t0,int t1)
 //----------------------------------------------------------------------------
 {
   aTriangle[0]=t0;
@@ -148,7 +148,7 @@ void vtkFillingHole::CEdge::SetTriangle(int t0,int t1)
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CLaplacian::CLaplacian(int size)
+vtkMEDFillingHole::CLaplacian::CLaplacian(int size)
 //----------------------------------------------------------------------------
 {
   dLaplacian = 0;
@@ -159,7 +159,7 @@ vtkFillingHole::CLaplacian::CLaplacian(int size)
 }
 
 //----------------------------------------------------------------------------
-vtkFillingHole::CLaplacian::~CLaplacian()
+vtkMEDFillingHole::CLaplacian::~CLaplacian()
 //----------------------------------------------------------------------------
 {
   delete aLaplacian;
@@ -169,7 +169,7 @@ vtkFillingHole::CLaplacian::~CLaplacian()
 //------------------------------------------------------------------------
 //Computes the normalized normal of the triangle. 
 //The triangle is defined by the three given vertices 
-void  vtkFillingHole::ComputeNormal(const double *v1, const double *v2, 
+void  vtkMEDFillingHole::ComputeNormal(const double *v1, const double *v2, 
                                     const double *v3, double *n)
 //------------------------------------------------------------------------
 {
@@ -185,7 +185,7 @@ void  vtkFillingHole::ComputeNormal(const double *v1, const double *v2,
 //Planes are defined by their normal vectors (n1, n2). The function does not 
 //return the angle in degrees but a value ranging from -1 to 3
 //that is proportional to this angle
-double vtkFillingHole::ComputeDihedralAngleF(const double* n1, const double* n2)
+double vtkMEDFillingHole::ComputeDihedralAngleF(const double* n1, const double* n2)
 //------------------------------------------------------------------------
 {
   double nn[3];
@@ -210,7 +210,7 @@ double vtkFillingHole::ComputeDihedralAngleF(const double* n1, const double* n2)
 //Returns true, if the point v4 lies outside the circum-circle subscribed
 //to the triangle formed by points v1, v2 and v3.
 //N.B. points v2, v1 and v4 must form the adjacent triangle 
-bool vtkFillingHole::CircumCircleTest(double *v1,double *v2,double *v3, double *v4)
+bool vtkMEDFillingHole::CircumCircleTest(double *v1,double *v2,double *v3, double *v4)
 //------------------------------------------------------------------------
 {   
   double u_1[3], v_1[3], u_2[3], v_2[3];
@@ -243,7 +243,7 @@ bool vtkFillingHole::CircumCircleTest(double *v1,double *v2,double *v3, double *
 
 //----------------------------------------------------------------------------
 // Compute a triangle area
-double vtkFillingHole::TriangleArea(double *pCoordv0,double *pCoordv1,double *pCoordv2)
+double vtkMEDFillingHole::TriangleArea(double *pCoordv0,double *pCoordv1,double *pCoordv2)
 //----------------------------------------------------------------------------
 {
   double a[3],b[3],c[3];
@@ -265,8 +265,8 @@ double vtkFillingHole::TriangleArea(double *pCoordv0,double *pCoordv1,double *pC
 }
 
 //----------------------------------------------------------------------------
-// vtkFillingHole Constructor
-vtkFillingHole::vtkFillingHole()
+// vtkMEDFillingHole Constructor
+vtkMEDFillingHole::vtkMEDFillingHole()
 //----------------------------------------------------------------------------
 {
   FillingType = Flat;    //flat filling
@@ -276,8 +276,8 @@ vtkFillingHole::vtkFillingHole()
 }
 
 //----------------------------------------------------------------------------
-// vtkFillingHole Destructor
-vtkFillingHole::~vtkFillingHole()
+// vtkMEDFillingHole Destructor
+vtkMEDFillingHole::~vtkMEDFillingHole()
 //----------------------------------------------------------------------------
 {
   HolePointIDs.clear();
@@ -288,14 +288,14 @@ vtkFillingHole::~vtkFillingHole()
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMEDFillingHole::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::ClearPatch()
+void vtkMEDFillingHole::ClearPatch()
 //----------------------------------------------------------------------------
 {
   int i, nCount;
@@ -334,7 +334,7 @@ void vtkFillingHole::ClearPatch()
 
 //----------------------------------------------------------------------------
 // initialize the internal relationship of vertices, triangles and edges of a patch.
-void vtkFillingHole::BuildPatch()
+void vtkMEDFillingHole::BuildPatch()
 //----------------------------------------------------------------------------
 {
   int i,j,t;
@@ -390,7 +390,7 @@ void vtkFillingHole::BuildPatch()
       {
         //we might have produced non-manifold due to numeric instability of hole filling
         //this would cause severe troubles in smoothing, so hot fix it
-        vtkErrorMacro(<< "vtkFillingHole::BuildPatch detected non-manifold");
+        vtkErrorMacro(<< "vtkMEDFillingHole::BuildPatch detected non-manifold");
 #ifdef _MSC_VER
         _RPTF2(_CRT_WARN, "Non-manifold edge %d, %d detected!\n", sv1, sv2);
 #endif
@@ -455,7 +455,7 @@ void vtkFillingHole::BuildPatch()
 //----------------------------------------------------------------------------
 // See: G. Barequet,  M. Sharir: Filling Gaps in the Boundary of a Polyhedron. 
 // Computer-Aided Geometric Design, 12(2):207-229, March 1995
-void vtkFillingHole::Trace(int i,int k)
+void vtkMEDFillingHole::Trace(int i,int k)
 //----------------------------------------------------------------------------
 {
   int j;
@@ -492,7 +492,7 @@ void vtkFillingHole::Trace(int i,int k)
 //
 // See also: G. Barequet,  M. Sharir: Filling Gaps in the Boundary of a Polyhedron. 
 // Computer-Aided Geometric Design, 12(2):207-229, March 1995
-void vtkFillingHole::CreatePatch()
+void vtkMEDFillingHole::CreatePatch()
 //----------------------------------------------------------------------------
 {
   int i,j,k,m;
@@ -702,7 +702,7 @@ void vtkFillingHole::CreatePatch()
 //----------------------------------------------------------------------------
 // Insert a point into a triangle and divide the triangle to three small triangles
 // Update the relationship of vertices, triangles and edges
-vtkFillingHole::CVertex* vtkFillingHole::AddOnePointToTriangle(double *pCoord,CTriangle*pTriangle)
+vtkMEDFillingHole::CVertex* vtkMEDFillingHole::AddOnePointToTriangle(double *pCoord,CTriangle*pTriangle)
 //----------------------------------------------------------------------------
 {
   CVertex		*pNewVertex;
@@ -782,7 +782,7 @@ vtkFillingHole::CVertex* vtkFillingHole::AddOnePointToTriangle(double *pCoord,CT
 //----------------------------------------------------------------------------
 // The edge is adjacent to two triangles
 // Now, swap the edge to two non-mutual vertices of the triangles.
-bool vtkFillingHole::RelaxOneEdge(CEdge *pEdge)
+bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
 //----------------------------------------------------------------------------
 {
   int		pVertexIndex[4],i,j;
@@ -1006,7 +1006,7 @@ bool vtkFillingHole::RelaxOneEdge(CEdge *pEdge)
 }
 
 #ifdef _FILLING_DBG
-void vtkFillingHole::CheckPatchEdges(int& nStartEdgeId)
+void vtkMEDFillingHole::CheckPatchEdges(int& nStartEdgeId)
 {
   nStartEdgeId = 0;
 
@@ -1087,7 +1087,7 @@ void vtkFillingHole::CheckPatchEdges(int& nStartEdgeId)
 // divide all large triangles to smaller triangles
 // then, relax all interior edges of the patching mesh
 // repeat the above procedure until the patch match the surrounding mesh
-void vtkFillingHole::RefinePatch()
+void vtkMEDFillingHole::RefinePatch()
 //----------------------------------------------------------------------------
 {
   bool bFlag;
@@ -1253,7 +1253,7 @@ void vtkFillingHole::RefinePatch()
 //----------------------------------------------------------------------------
 // extend the patch and include some surrounding vertices and triangles
 // for smoothing the patch and making it match the curvature of the surrounding mesh
-void vtkFillingHole::ExtendPatch()
+void vtkMEDFillingHole::ExtendPatch()
 //----------------------------------------------------------------------------
 {
   int i,step;
@@ -1300,11 +1300,11 @@ void vtkFillingHole::ExtendPatch()
       //need too much memory for store
       //we should have a out-of-core version.    
 #ifdef _MSC_VER
-      _RPT1(_CRT_WARN, "vtkFillingHole::SmoothPatch - the maximum number of points "
+      _RPT1(_CRT_WARN, "vtkMEDFillingHole::SmoothPatch - the maximum number of points "
         "for smoothing (%d) has been reached\n", end);
 #endif
 
-      vtkWarningMacro("vtkFillingHole::SmoothPatch - the maximum number of points "
+      vtkWarningMacro("vtkMEDFillingHole::SmoothPatch - the maximum number of points "
         "for smoothing has been reached");
 
       break;  
@@ -1402,7 +1402,7 @@ void vtkFillingHole::ExtendPatch()
 //
 // the matrix is stored efficiently in PatchLaplacian, where is N entries
 // and every entry contains just an array of all non-zero values but -1
-void vtkFillingHole::BuildPatchLaplacian()
+void vtkMEDFillingHole::BuildPatchLaplacian()
 {
   int           i,j,nOneRingNum;  
   CLaplacian    *pVertexLaplaican;
@@ -1471,7 +1471,7 @@ void vtkFillingHole::BuildPatchLaplacian()
 
 //----------------------------------------------------------------------------
 //Multiplies transpose L matrix and L matrix, i.e., A =  L^T*L 
-void vtkFillingHole::ComputeLTransposeLMatrix(double *A)
+void vtkMEDFillingHole::ComputeLTransposeLMatrix(double *A)
 //----------------------------------------------------------------------------
 {
   int i,j,index;
@@ -1545,7 +1545,7 @@ void vtkFillingHole::ComputeLTransposeLMatrix(double *A)
 
 //----------------------------------------------------------------------------
 // Multiplies transpose L matrix and vector, i.e., result = L^T*source
-void vtkFillingHole::LTransposeMatrixVector( double *source,double *result )
+void vtkMEDFillingHole::LTransposeMatrixVector( double *source,double *result )
 //------------------------------------------------------------------------
 {
   int i,j;
@@ -1585,7 +1585,7 @@ void vtkFillingHole::LTransposeMatrixVector( double *source,double *result )
 //----------------------------------------------------------------------------
 // Multiplies matrix A and vector xyz, i.e., result = A*xyz
 // N.B. A is L^T*L + some constraints on diagonal
-void vtkFillingHole::LTransposeLMatrixVector( double *A,double *xyz,double *result )
+void vtkMEDFillingHole::LTransposeLMatrixVector( double *A,double *xyz,double *result )
 //------------------------------------------------------------------------
 {
   int i,j,index;
@@ -1633,7 +1633,7 @@ void vtkFillingHole::LTransposeLMatrixVector( double *A,double *xyz,double *resu
 //b = L^T*b0 (+ some weights)
 //N.B. A must be symmetric and positive definite, otherwise, the method may 
 //not produce good results (it may not converge)
-void vtkFillingHole::LTransposeLConjugateGradient(double *A,double *xyz,double *b)
+void vtkMEDFillingHole::LTransposeLConjugateGradient(double *A,double *xyz,double *b)
 //----------------------------------------------------------------------------
 {
 //Pseudocode:
@@ -1714,11 +1714,11 @@ void vtkFillingHole::LTransposeLConjugateGradient(double *A,double *xyz,double *
   if (k == step)
   {
 #ifdef _MSC_VER
-    _RPT1(_CRT_WARN, "vtkFillingHole::LTransposeLConjugateGradient - "
+    _RPT1(_CRT_WARN, "vtkMEDFillingHole::LTransposeLConjugateGradient - "
                      "the method does not converge, error: %.2f", r_r);
 #endif
 
-    vtkWarningMacro("vtkFillingHole::LTransposeLConjugateGradient - the method does not converge, error:"  << r_r);    
+    vtkWarningMacro("vtkMEDFillingHole::LTransposeLConjugateGradient - the method does not converge, error:"  << r_r);    
   }
 
   delete Ap;
@@ -1728,7 +1728,7 @@ void vtkFillingHole::LTransposeLConjugateGradient(double *A,double *xyz,double *
 
 //----------------------------------------------------------------------------
 // smooth a patch and make its curvature match the surrounding mesh
-void vtkFillingHole::SmoothPatch()
+void vtkMEDFillingHole::SmoothPatch()
 //----------------------------------------------------------------------------
 {  
   if( FillingType == Flat )   
@@ -1793,7 +1793,7 @@ void vtkFillingHole::SmoothPatch()
 
 //------------------------------------------------------------------------
 //The core of smoothing by the minimization of membrane energy
-void vtkFillingHole::MembraneSmoothing()
+void vtkMEDFillingHole::MembraneSmoothing()
 //------------------------------------------------------------------------
 {
   const static double Wp = 3.0;  
@@ -1874,7 +1874,7 @@ void vtkFillingHole::MembraneSmoothing()
 
 //------------------------------------------------------------------------
 //The core of smoothing by the minimization of thin plate energy
-void vtkFillingHole::ThinPlateSmoothing()
+void vtkMEDFillingHole::ThinPlateSmoothing()
 //------------------------------------------------------------------------
 {
   //Brute Force approach implemented according to: Leif Kobbelt, Swen
@@ -2036,7 +2036,7 @@ void vtkFillingHole::ThinPlateSmoothing()
 }
 //----------------------------------------------------------------------------
 // Merge the patch for a hole to origin mesh
-void vtkFillingHole::MergePatch()
+void vtkMEDFillingHole::MergePatch()
 //----------------------------------------------------------------------------
 {
   CVertex	*pVertex,*pNewVertex;
@@ -2088,7 +2088,7 @@ void vtkFillingHole::MergePatch()
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::ClearMesh()
+void vtkMEDFillingHole::ClearMesh()
 //----------------------------------------------------------------------------
 {
   int i;
@@ -2115,7 +2115,7 @@ void vtkFillingHole::ClearMesh()
 /*
 //----------------------------------------------------------------------------
 //Build internal mesh structure filtering out invalid, non-manifold triangles
-void vtkFillingHole::InitManifoldMesh()
+void vtkMEDFillingHole::InitManifoldMesh()
 //----------------------------------------------------------------------------
 {
   //create initial mesh
@@ -2425,7 +2425,7 @@ void vtkFillingHole::InitManifoldMesh()
 
 //----------------------------------------------------------------------------
 // Initialize the internal relationship of a mesh
-void vtkFillingHole::BuildMesh()
+void vtkMEDFillingHole::BuildMesh()
 //----------------------------------------------------------------------------
 {
   int i,j,t;
@@ -2558,7 +2558,7 @@ void vtkFillingHole::BuildMesh()
 
 //----------------------------------------------------------------------------
 // update the internal relationship of a mesh
-void vtkFillingHole::UpdateMesh(int id)
+void vtkMEDFillingHole::UpdateMesh(int id)
 //----------------------------------------------------------------------------
 {
   int i,j,t;
@@ -2681,7 +2681,7 @@ void vtkFillingHole::UpdateMesh(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::SetFillAHole(int id)
+void vtkMEDFillingHole::SetFillAHole(int id)
 //----------------------------------------------------------------------------
 {
   //filling a hole
@@ -2690,7 +2690,7 @@ void vtkFillingHole::SetFillAHole(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::SetFillAllHole()
+void vtkMEDFillingHole::SetFillAllHole()
 //----------------------------------------------------------------------------
 {
   //filling all holes
@@ -2698,7 +2698,7 @@ void vtkFillingHole::SetFillAllHole()
 }
 
 //----------------------------------------------------------------------------
-bool vtkFillingHole::FindAHole()
+bool vtkMEDFillingHole::FindAHole()
 //----------------------------------------------------------------------------
 {
   int *pEdgeVertex;
@@ -2753,7 +2753,7 @@ bool vtkFillingHole::FindAHole()
 }
 
 //----------------------------------------------------------------------------
-bool vtkFillingHole::FindNextHole()
+bool vtkMEDFillingHole::FindNextHole()
 //----------------------------------------------------------------------------
 {
   int i;
@@ -2778,7 +2778,7 @@ bool vtkFillingHole::FindNextHole()
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::InitMesh()
+void vtkMEDFillingHole::InitMesh()
 //----------------------------------------------------------------------------
 {
   int i;
@@ -2826,7 +2826,7 @@ void vtkFillingHole::InitMesh()
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::DoneMesh()
+void vtkMEDFillingHole::DoneMesh()
 //----------------------------------------------------------------------------
 {
   int i;
@@ -2854,7 +2854,7 @@ void vtkFillingHole::DoneMesh()
 }
 
 //----------------------------------------------------------------------------
-void vtkFillingHole::Execute()
+void vtkMEDFillingHole::Execute()
 //----------------------------------------------------------------------------
 {  
   //InitManifoldMesh();

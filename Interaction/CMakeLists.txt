@@ -18,8 +18,11 @@ SET(PROJECT_SRCS
   mmiVTKPicker.h
   medGizmoPolylineGraph.cpp
   medGizmoPolylineGraph.h
+  
+  ##### Introduced with VolumeLarge - to be committed down ###
   mafGizmoROI_BES.cpp
   mafGizmoROI_BES.h  
+  ############################################################
 )
 
 

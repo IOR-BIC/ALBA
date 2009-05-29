@@ -1,8 +1,8 @@
 /*========================================================================= 
 Program: Multimod Application Framework RELOADED 
-Module: $RCSfile: vtkMAFPolyDataDeformation_M2.cpp,v $ 
+Module: $RCSfile: vtkMEDPolyDataDeformation_M2.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-05-14 14:18:46 $ 
+Date: $Date: 2009-05-29 08:38:43 $ 
 Version: $Revision: 1.1.2.1 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
@@ -11,7 +11,7 @@ See the COPYINGS file for license details
 =========================================================================
 */
 
-#include "vtkMAFPolyDataDeformation_M2.h"
+#include "vtkMEDPolyDataDeformation_M2.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 #include "vtkIdList.h"
@@ -29,14 +29,14 @@ See the COPYINGS file for license details
 #include "vtkConvexPointSet.h"
 #include <float.h>
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
 #include "vtkCharArray.h"
 #endif
 
 
 
-vtkCxxRevisionMacro(vtkMAFPolyDataDeformation_M2, "$Revision: 1.1.2.1 $");
-vtkStandardNewMacro(vtkMAFPolyDataDeformation_M2);
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M2, "$Revision: 1.1.2.1 $");
+vtkStandardNewMacro(vtkMEDPolyDataDeformation_M2);
 
 #include "mafMemDbg.h"
 #include "mafDbg.h"
@@ -45,7 +45,7 @@ vtkStandardNewMacro(vtkMAFPolyDataDeformation_M2);
 
 //Returns length of the edge. 
 //If the edge does not have both vertices defined, it returns 0.0
-double vtkMAFPolyDataDeformation_M2::CSkeletonEdge::GetLength()
+double vtkMEDPolyDataDeformation_M2::CSkeletonEdge::GetLength()
 {
   if (m_Verts[0] == NULL || m_Verts[1] == NULL)
     return 0.0;
@@ -54,7 +54,7 @@ double vtkMAFPolyDataDeformation_M2::CSkeletonEdge::GetLength()
     m_Verts[0]->m_Coords, m_Verts[1]->m_Coords));
 }
 
-vtkMAFPolyDataDeformation_M2::CSkeleton::~CSkeleton()
+vtkMEDPolyDataDeformation_M2::CSkeleton::~CSkeleton()
 {
   int nCount = (int)m_Vertices.size();
   for (int i = 0; i < nCount; i++)
@@ -74,7 +74,7 @@ vtkMAFPolyDataDeformation_M2::CSkeleton::~CSkeleton()
 
 //------------------------------------------------------------------------
 //Computes topology weights for vertices
-void vtkMAFPolyDataDeformation_M2::CSkeleton::ComputeTW()
+void vtkMEDPolyDataDeformation_M2::CSkeleton::ComputeTW()
 //------------------------------------------------------------------------
 {     
   int nVertices = (int)m_Vertices.size();
@@ -107,7 +107,7 @@ void vtkMAFPolyDataDeformation_M2::CSkeleton::ComputeTW()
 //------------------------------------------------------------------------
 //Computes the weight for the given edge.
 //The computation is recursive in the given direction.
-int vtkMAFPolyDataDeformation_M2::CSkeleton::ComputeEdgeWeight(CSkeletonEdge* pEdge, int iDir)
+int vtkMEDPolyDataDeformation_M2::CSkeleton::ComputeEdgeWeight(CSkeletonEdge* pEdge, int iDir)
 //------------------------------------------------------------------------
 {
   CSkeletonVertex* pVertex = pEdge->m_Verts[iDir];
@@ -135,7 +135,7 @@ int vtkMAFPolyDataDeformation_M2::CSkeleton::ComputeEdgeWeight(CSkeletonEdge* pE
 
 //------------------------------------------------------------------------
 //Computes the bounding box
-void vtkMAFPolyDataDeformation_M2::CSkeleton::GetBoundingBox(double bnds[6])
+void vtkMEDPolyDataDeformation_M2::CSkeleton::GetBoundingBox(double bnds[6])
 //------------------------------------------------------------------------
 {  
   bnds[0] = bnds[2] = bnds[4] = 0xFFFFFFFF;
@@ -168,7 +168,7 @@ void vtkMAFPolyDataDeformation_M2::CSkeleton::GetBoundingBox(double bnds[6])
 }
 
 template <class T>
-vtkMAFPolyDataDeformation_M2::CMatrix<T>::CMatrix(int rows, int columns) 
+vtkMEDPolyDataDeformation_M2::CMatrix<T>::CMatrix(int rows, int columns) 
 {  
   // alloc arrays
   m_Matrix = new T*[rows]; // rows
@@ -183,7 +183,7 @@ vtkMAFPolyDataDeformation_M2::CMatrix<T>::CMatrix(int rows, int columns)
 }
 
 template <class T>
-vtkMAFPolyDataDeformation_M2::CMatrix<T>::~CMatrix() 
+vtkMEDPolyDataDeformation_M2::CMatrix<T>::~CMatrix() 
 {
   if ( m_Matrix != NULL ) 
   {
@@ -201,7 +201,7 @@ vtkMAFPolyDataDeformation_M2::CMatrix<T>::~CMatrix()
 #define Z_STAR 1
 #define Z_PRIME 2
 
-int vtkMAFPolyDataDeformation_M2::CMunkres::step1(void) 
+int vtkMEDPolyDataDeformation_M2::CMunkres::step1(void) 
 {
   for ( int row = 0 ; row < (*matrix).GetNumberOfRows() ; row++ )
     for ( int col = 0 ; col < (*matrix).GetNumberOfColumns() ; col++ )
@@ -225,7 +225,7 @@ int vtkMAFPolyDataDeformation_M2::CMunkres::step1(void)
       return 2;
 }
 
-int vtkMAFPolyDataDeformation_M2::CMunkres::step2(void) 
+int vtkMEDPolyDataDeformation_M2::CMunkres::step2(void) 
 {
   int covercount = 0;
   for ( int row = 0 ; row < (*matrix).GetNumberOfRows() ; row++ )
@@ -243,7 +243,7 @@ int vtkMAFPolyDataDeformation_M2::CMunkres::step2(void)
       return 3;
 }
 
-int vtkMAFPolyDataDeformation_M2::CMunkres::step3(void) 
+int vtkMEDPolyDataDeformation_M2::CMunkres::step3(void) 
 {
   /*
   Main Zero Search
@@ -268,7 +268,7 @@ int vtkMAFPolyDataDeformation_M2::CMunkres::step3(void)
     return 4; // no starred zero in the row containing this primed zero
 }
 
-int vtkMAFPolyDataDeformation_M2::CMunkres::step4(void) 
+int vtkMEDPolyDataDeformation_M2::CMunkres::step4(void) 
 {
   std::list<std::pair<int,int> > seq;
   // use saverow, savecol from step 3.
@@ -352,7 +352,7 @@ int vtkMAFPolyDataDeformation_M2::CMunkres::step4(void)
   return 2;
 }
 
-int vtkMAFPolyDataDeformation_M2::CMunkres::step5(void) {
+int vtkMEDPolyDataDeformation_M2::CMunkres::step5(void) {
   /*
   New Zero Manufactures
 
@@ -386,7 +386,7 @@ int vtkMAFPolyDataDeformation_M2::CMunkres::step5(void) {
     return 3;
 }
 
-void vtkMAFPolyDataDeformation_M2::CMunkres::Solve( CMatrix< double >* m, CMatrix< int >* matches )
+void vtkMEDPolyDataDeformation_M2::CMunkres::Solve( CMatrix< double >* m, CMatrix< int >* matches )
 {
   // Linear assignment problem solution
   // [modifies matrix in-place.]
@@ -453,7 +453,7 @@ void vtkMAFPolyDataDeformation_M2::CMunkres::Solve( CMatrix< double >* m, CMatri
 #pragma endregion //CMunkres algorithm
 #pragma endregion //Nested Classes
 
-vtkMAFPolyDataDeformation_M2::vtkMAFPolyDataDeformation_M2()
+vtkMEDPolyDataDeformation_M2::vtkMEDPolyDataDeformation_M2()
 {
   m_Skeletons = NULL;
   m_SuperSkeleton = NULL;
@@ -468,13 +468,13 @@ vtkMAFPolyDataDeformation_M2::vtkMAFPolyDataDeformation_M2()
   DivideSkeletonEdges = 0;
   PreserveVolume = 1;
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
   m_MATCHED_CC = NULL; m_MATCHED_FULLCC = NULL;
   m_MATCHED_POLYS[0] = NULL; m_MATCHED_POLYS[1] = NULL;
 #endif
 }
 
-vtkMAFPolyDataDeformation_M2::~vtkMAFPolyDataDeformation_M2()
+vtkMEDPolyDataDeformation_M2::~vtkMEDPolyDataDeformation_M2()
 {
   //destroy skeletons
   SetNumberOfSkeletons(0);  
@@ -483,7 +483,7 @@ vtkMAFPolyDataDeformation_M2::~vtkMAFPolyDataDeformation_M2()
   _ASSERT(m_SuperSkeleton == NULL);
   DestroySuperSkeleton();
   
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
   DestroyMATCHEDData();  
 #endif  
 
@@ -494,7 +494,7 @@ vtkMAFPolyDataDeformation_M2::~vtkMAFPolyDataDeformation_M2()
 }
 
 //----------------------------------------------------------------------------
-void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMEDPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 {
   this->Superclass::PrintSelf(os,indent);
@@ -503,7 +503,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------
 //Sets the number of control skeletons.  
 //Old skeletons are copied (and preserved)
-/*virtual*/ void vtkMAFPolyDataDeformation_M2::SetNumberOfSkeletons( int nCount )
+/*virtual*/ void vtkMEDPolyDataDeformation_M2::SetNumberOfSkeletons( int nCount )
 //------------------------------------------------------------------------
 {
   _VERIFY_RET(nCount >= 0);
@@ -548,7 +548,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 
 //------------------------------------------------------------------------
 //Specifies the n-th control skeleton.
-/*virtual*/ void vtkMAFPolyDataDeformation_M2
+/*virtual*/ void vtkMEDPolyDataDeformation_M2
 ::SetNthSkeleton( int idx, vtkPolyData* original, 
                  vtkPolyData* modified, vtkIdList* correspondence )
 //------------------------------------------------------------------------
@@ -594,7 +594,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 
 //------------------------------------------------------------------------
 //Return this object's modified time.
-/*virtual*/ unsigned long int vtkMAFPolyDataDeformation_M2::GetMTime()
+/*virtual*/ unsigned long int vtkMEDPolyDataDeformation_M2::GetMTime()
 //------------------------------------------------------------------------
 {
   unsigned long mtime = Superclass::GetMTime();
@@ -629,14 +629,14 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------
 //By default, UpdateInformation calls this method to copy information
 //unmodified from the input to the output.
-/*virtual*/void vtkMAFPolyDataDeformation_M2::ExecuteInformation()
+/*virtual*/void vtkMEDPolyDataDeformation_M2::ExecuteInformation()
 //------------------------------------------------------------------------
 {
   //check input
   vtkPolyData* input = GetInput();
   if (input == NULL)
   {
-    vtkErrorMacro(<< "Invalid input for vtkMAFPolyDataDeformation_M2.");
+    vtkErrorMacro(<< "Invalid input for vtkMEDPolyDataDeformation_M2.");
     return;   //we have no input
   }
 
@@ -652,7 +652,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------
 //This method is the one that should be used by subclasses, right now the 
 //default implementation is to call the backwards compatibility method
-/*virtual*/void vtkMAFPolyDataDeformation_M2::ExecuteData(vtkDataObject *output)
+/*virtual*/void vtkMEDPolyDataDeformation_M2::ExecuteData(vtkDataObject *output)
 {
   //check whether output is valid
   vtkPolyData* input = GetInput();
@@ -665,7 +665,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 
   if (pPoly == NULL || pPoly->GetPoints() == NULL || pPoly->GetPoints()->GetNumberOfPoints() == 0)
   {
-    vtkWarningMacro(<< "Invalid output for vtkMAFPolyDataDeformation_M2.");
+    vtkWarningMacro(<< "Invalid output for vtkMEDPolyDataDeformation_M2.");
     return;   //we have no valid output
   }  
 
@@ -673,7 +673,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
   //super skeleton where everything is matched
   if (!CreateSuperSkeleton())
   {
-    vtkWarningMacro(<< "Missing control skeleton for vtkMAFPolyDataDeformation_M2.");
+    vtkWarningMacro(<< "Missing control skeleton for vtkMEDPolyDataDeformation_M2.");
     return;
   }
 
@@ -714,7 +714,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
   //and finally, deform the output mesh
   DeformMesh(pPoly);
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
   vtkCharArray* scalar = vtkCharArray::New();  
   nCount = input->GetNumberOfPoints();
   scalar->SetNumberOfTuples(nCount);
@@ -777,7 +777,7 @@ void vtkMAFPolyDataDeformation_M2::PrintSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------
 //Creates a single skeleton that describes the deformation
 //Returns false, if it cannot be created
-bool vtkMAFPolyDataDeformation_M2::CreateSuperSkeleton()
+bool vtkMEDPolyDataDeformation_M2::CreateSuperSkeleton()
 //------------------------------------------------------------------------
 { 
   double dblEdgeFactor = DivideSkeletonEdges ?
@@ -803,7 +803,7 @@ bool vtkMAFPolyDataDeformation_M2::CreateSuperSkeleton()
     return false;
   }
   
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2  
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2  
   DestroyMATCHEDData();    
   CreatePolyDataFromSuperskeleton();
 #endif
@@ -859,7 +859,7 @@ bool vtkMAFPolyDataDeformation_M2::CreateSuperSkeleton()
 //creating new vertices as needed. It also computes local frames.
 //The combined information is then appended into super skeleton.
 //If the super skeleton does not exist, it is created. 
-void vtkMAFPolyDataDeformation_M2::CreateSuperSkeleton(
+void vtkMEDPolyDataDeformation_M2::CreateSuperSkeleton(
   vtkPolyData* pOC, vtkPolyData* pDC, vtkIdList* pCC,
   double dblEdgeFactor)
 //------------------------------------------------------------------------
@@ -977,7 +977,7 @@ void vtkMAFPolyDataDeformation_M2::CreateSuperSkeleton(
 //Only junctions and terminal nodes are matched. The caller can optionally 
 //specify some (or all) correspondences. The routine returns the list containing
 //pairs of corresponding vertices.
-vtkIdList* vtkMAFPolyDataDeformation_M2::MatchSkeletons(CSkeleton* pOC, 
+vtkIdList* vtkMEDPolyDataDeformation_M2::MatchSkeletons(CSkeleton* pOC, 
                                                      CSkeleton* pDC, vtkIdList* pCC)
 //------------------------------------------------------------------------
 {  
@@ -1139,7 +1139,7 @@ vtkIdList* vtkMAFPolyDataDeformation_M2::MatchSkeletons(CSkeleton* pOC,
 //or end-point is reached (those vertices have mark >= 0). The routine 
 //returns the number of vertices stored in the buffer. 
 //N.B. this routine is supposed to be called from CreateSuperSkeleton
-int vtkMAFPolyDataDeformation_M2::TraceSkeletonCurve(
+int vtkMEDPolyDataDeformation_M2::TraceSkeletonCurve(
                         CSkeletonVertex* pStartVertex, int iDir, CSkeletonVertex** pOutBuf)
 //------------------------------------------------------------------------
 { 
@@ -1167,7 +1167,7 @@ int vtkMAFPolyDataDeformation_M2::TraceSkeletonCurve(
 
 //------------------------------------------------------------------------
 //Marks every edge of the given skeleton curve
-void vtkMAFPolyDataDeformation_M2::MarkCurveEdges(CSkeletonVertex** pCurve, int nCount)
+void vtkMEDPolyDataDeformation_M2::MarkCurveEdges(CSkeletonVertex** pCurve, int nCount)
 //------------------------------------------------------------------------
 {
   //first and last vertex may have more than one or more edges as they may
@@ -1201,7 +1201,7 @@ void vtkMAFPolyDataDeformation_M2::MarkCurveEdges(CSkeletonVertex** pCurve, int 
 
 
 //this structure is used in MatchCurves
-typedef struct vtkMAFPolyDataDeformation_M2::CURVE_VERTEX
+typedef struct vtkMEDPolyDataDeformation_M2::CURVE_VERTEX
 {
   double t;             //<time parameter
   CSkeletonVertex* pVertex;     //<skeleton vertex
@@ -1220,7 +1220,7 @@ typedef struct vtkMAFPolyDataDeformation_M2::CURVE_VERTEX
 //both vertices and edges. The caller is responsible for deletion of all 
 //objects when they are no longer needed.
 //N.B. the original vertices are not destroyed, the routine damages buffers only
-int vtkMAFPolyDataDeformation_M2::MatchCurves(CSkeletonVertex** pOC, int nOCVerts, 
+int vtkMEDPolyDataDeformation_M2::MatchCurves(CSkeletonVertex** pOC, int nOCVerts, 
                                            CSkeletonVertex** pDC, int nDCVerts)
 //------------------------------------------------------------------------
 {
@@ -1392,7 +1392,7 @@ int vtkMAFPolyDataDeformation_M2::MatchCurves(CSkeletonVertex** pOC, int nOCVert
 
 //------------------------------------------------------------------------
 //Create edges for the given array of vertices.
-void vtkMAFPolyDataDeformation_M2::CreateCurveEdges(CSkeletonVertex** pVerts, int nVerts)
+void vtkMEDPolyDataDeformation_M2::CreateCurveEdges(CSkeletonVertex** pVerts, int nVerts)
 //------------------------------------------------------------------------
 {
   for (int i = 0; i < nVerts - 1; i++) {  //create left to right edges
@@ -1407,7 +1407,7 @@ void vtkMAFPolyDataDeformation_M2::CreateCurveEdges(CSkeletonVertex** pVerts, in
 //------------------------------------------------------------------------
 //Gets the number of vertices belonging to the given curve.
 //N.B. curve must be compatible with curves constructed by CreateCurveEdges.
-int vtkMAFPolyDataDeformation_M2::GetNumberOfCurveVertices(CSkeletonVertex* pCurve)
+int vtkMEDPolyDataDeformation_M2::GetNumberOfCurveVertices(CSkeletonVertex* pCurve)
 //------------------------------------------------------------------------
 {
   int nCount = 0;  
@@ -1425,7 +1425,7 @@ int vtkMAFPolyDataDeformation_M2::GetNumberOfCurveVertices(CSkeletonVertex* pCur
 //Every skeleton edge larger than sqrt(dblEdgeFactor) is split recursively into 
 //two shorter edges. The matching curve is split appropriately.
 //N.B. the routine is intended to be called after CreateCurveEdges
-void vtkMAFPolyDataDeformation_M2::RefineCurve(CSkeletonVertex* pCurve, double dblEdgeFactor)
+void vtkMEDPolyDataDeformation_M2::RefineCurve(CSkeletonVertex* pCurve, double dblEdgeFactor)
 //------------------------------------------------------------------------
 {
   CSkeletonEdge* pOCEdge = pCurve->m_OneRingEdges[0];
@@ -1484,7 +1484,7 @@ void vtkMAFPolyDataDeformation_M2::RefineCurve(CSkeletonVertex* pCurve, double d
 //Stores vertices and edges from the given curve and the matched one into the superskeleton 
 //The routine also constructs automatically joints for end-points of curves.
 //N.B. both curves must be compatible with curves constructed by CreateCurveEdges.
-void vtkMAFPolyDataDeformation_M2::AddCurveToSuperSkeleton(CSkeletonVertex* pOCCurve)
+void vtkMEDPolyDataDeformation_M2::AddCurveToSuperSkeleton(CSkeletonVertex* pOCCurve)
 //------------------------------------------------------------------------
 {
   int nPoints = (int)m_SuperSkeleton->m_pOC_Skel->m_Vertices.size();  
@@ -1565,7 +1565,7 @@ void vtkMAFPolyDataDeformation_M2::AddCurveToSuperSkeleton(CSkeletonVertex* pOCC
 //The algorithm is based on the paper: Blanco FR, Oliveira MM: Instant mesh deformation.
 //In: Proceedings of the 2008 symposium on Interactive 3D graphics and games,
 //Redwood City, California, 2008, ptEnd. 71-78
-void vtkMAFPolyDataDeformation_M2::ComputeLFS(CSkeletonVertex* pOC)
+void vtkMEDPolyDataDeformation_M2::ComputeLFS(CSkeletonVertex* pOC)
 //------------------------------------------------------------------------
 {
   CSkeletonVertex* pDC = pOC->m_pMatch;
@@ -1717,7 +1717,7 @@ void vtkMAFPolyDataDeformation_M2::ComputeLFS(CSkeletonVertex* pOC)
 //is computed for each pair of edges adjacent to every vertex on the curve.
 //Joined edges are also taken into account. The plane is always
 //perpendicular to both edges and the axis of both edges lies on the plane
-void vtkMAFPolyDataDeformation_M2::ComputeSeparatingPlanes(CSkeletonVertex* pOC_Curve)
+void vtkMEDPolyDataDeformation_M2::ComputeSeparatingPlanes(CSkeletonVertex* pOC_Curve)
 //------------------------------------------------------------------------
 { 
   for (int iCurve = 0; iCurve < 2; iCurve++)
@@ -1775,7 +1775,7 @@ void vtkMAFPolyDataDeformation_M2::ComputeSeparatingPlanes(CSkeletonVertex* pOC_
 //edges lies on the plane. The angle between the computed normal and the 
 //vector pVert1 - pCenterVert2 is not obtuse (i.e., the normal directs
 //the same way as the other vector). The returned normal is normalized.
-void vtkMAFPolyDataDeformation_M2::ComputeSeparatingPlane(CSkeletonVertex* pVert1, 
+void vtkMEDPolyDataDeformation_M2::ComputeSeparatingPlane(CSkeletonVertex* pVert1, 
   CSkeletonVertex* pCenterVert, CSkeletonVertex* pVert2, double* out_normal)
 //------------------------------------------------------------------------
 {
@@ -1829,7 +1829,7 @@ void vtkMAFPolyDataDeformation_M2::ComputeSeparatingPlane(CSkeletonVertex* pVert
 //Computes the region of interest (ROI) for the given edge of curve.
 //It detects every mesh vertex in the zone of influence of the given edge. 
 //Note: one of end-points of the edge may be NULL to specify half-space
-void vtkMAFPolyDataDeformation_M2::ComputeROI(CSkeletonEdge* pEdge)
+void vtkMEDPolyDataDeformation_M2::ComputeROI(CSkeletonEdge* pEdge)
 //------------------------------------------------------------------------
 {  
   vtkPoints* input = GetInput()->GetPoints();
@@ -1880,7 +1880,7 @@ void vtkMAFPolyDataDeformation_M2::ComputeROI(CSkeletonEdge* pEdge)
 //Refines ROIs for curves.
 //Refines the mapping of vertices of the input mesh to edges in such a manner 
 //that every vertex is present only in one edge ROI. 
-void vtkMAFPolyDataDeformation_M2::RefineCurveROIs()
+void vtkMEDPolyDataDeformation_M2::RefineCurveROIs()
 //------------------------------------------------------------------------
 {
   //this detection will need a cell locator  
@@ -2059,7 +2059,7 @@ void vtkMAFPolyDataDeformation_M2::RefineCurveROIs()
 //computation exceeds the given dblMaxDist, the algorithm stops (and returns
 //the distance measured so far) - this is to speed up the process.
 //N.B. cellLocator must be initialized with the input mesh.
-double vtkMAFPolyDataDeformation_M2::GetDistance( vtkIdType nPtStartId, 
+double vtkMEDPolyDataDeformation_M2::GetDistance( vtkIdType nPtStartId, 
           double ptEnd[3], vtkCellLocator* cellLocator, double dblMaxDist )
 //------------------------------------------------------------------------
 {
@@ -2141,7 +2141,7 @@ double vtkMAFPolyDataDeformation_M2::GetDistance( vtkIdType nPtStartId,
 }
 
 //this structure is used in GetPathLength
-typedef struct vtkMAFPolyDataDeformation_M2::DIJKSTRA_ITEM
+typedef struct vtkMEDPolyDataDeformation_M2::DIJKSTRA_ITEM
 {
   //vtkIdType nId;      //<pointId
   double dblWeight;   //<weight
@@ -2155,7 +2155,7 @@ typedef struct vtkMAFPolyDataDeformation_M2::DIJKSTRA_ITEM
 //The computation is not precise (because of speed). If there is no path, or the
 //path would be too long, the routine returns dblMaxDist. 
 //N.B. the found path may not be the shortest one!
-double vtkMAFPolyDataDeformation_M2::GetPathLength(vtkIdType nPtFrom, 
+double vtkMEDPolyDataDeformation_M2::GetPathLength(vtkIdType nPtFrom, 
                                       vtkIdType nPtTo, double dblMaxDist)
 //------------------------------------------------------------------------
 {
@@ -2285,7 +2285,7 @@ double vtkMAFPolyDataDeformation_M2::GetPathLength(vtkIdType nPtFrom,
 //Constructs the matrix for rotation of vectors around the vector r by the
 //angle theta. The angle is given indirectly as cos(theta).
 //N.B. vector r must be normalized. 
-void vtkMAFPolyDataDeformation_M2
+void vtkMEDPolyDataDeformation_M2
 ::BuildGeneralRotationMatrix(double r[3], double cos_theta, double M[3][3])
 //------------------------------------------------------------------------
 {
@@ -2327,7 +2327,7 @@ void vtkMAFPolyDataDeformation_M2
 //------------------------------------------------------------------------
 //Parametrize the input mesh using the super-skeleton.
 //N.B. edges ROI must be build and refined before this routine may be called.
-void vtkMAFPolyDataDeformation_M2::ComputeMeshParametrization()
+void vtkMEDPolyDataDeformation_M2::ComputeMeshParametrization()
 //------------------------------------------------------------------------
 { 
   vtkPolyData* input = GetInput();      
@@ -2403,7 +2403,7 @@ void vtkMAFPolyDataDeformation_M2::ComputeMeshParametrization()
       pParams->m_PCoords[0] = (M[0][3] - pParams->m_PCoords[2]*M[0][2] - 
         pParams->m_PCoords[1]*M[0][1]) / M[0][0];
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
       double backprj[3];
       for (int k = 0; k < 3; k++)
       {
@@ -2484,7 +2484,7 @@ void vtkMAFPolyDataDeformation_M2::ComputeMeshParametrization()
 //parametrization in respect to the superskeleton. 
 //
 //N.B. the given output polydata must be compatible with the input polydata
-void vtkMAFPolyDataDeformation_M2::DeformMesh(vtkPolyData* output)
+void vtkMEDPolyDataDeformation_M2::DeformMesh(vtkPolyData* output)
 //------------------------------------------------------------------------
 {  
   vtkPoints* points = output->GetPoints();
@@ -2614,8 +2614,8 @@ void vtkMAFPolyDataDeformation_M2::DeformMesh(vtkPolyData* output)
 
 //------------------------------------------------------------------------
 //Creates the internal skeleton data structure for the given polydata
-vtkMAFPolyDataDeformation_M2::CSkeleton* 
-vtkMAFPolyDataDeformation_M2::CreateSkeleton(vtkPolyData* pPoly)
+vtkMEDPolyDataDeformation_M2::CSkeleton* 
+vtkMEDPolyDataDeformation_M2::CreateSkeleton(vtkPolyData* pPoly)
 //------------------------------------------------------------------------
 {  
   int nVerts = pPoly->GetNumberOfPoints();  
@@ -2664,7 +2664,7 @@ vtkMAFPolyDataDeformation_M2::CreateSkeleton(vtkPolyData* pPoly)
 
 //------------------------------------------------------------------------
 //Creates polydata from the given skeleton.
-void vtkMAFPolyDataDeformation_M2::CreatePolyDataFromSkeleton(
+void vtkMEDPolyDataDeformation_M2::CreatePolyDataFromSkeleton(
                                     CSkeleton* pSkel, vtkPolyData* output)
 //------------------------------------------------------------------------
 { 
@@ -2716,7 +2716,7 @@ void vtkMAFPolyDataDeformation_M2::CreatePolyDataFromSkeleton(
 
 //------------------------------------------------------------------------
 //Computes the average length of edges of the input mesh
-double vtkMAFPolyDataDeformation_M2::ComputeInputMeshAvgEdgeLength()
+double vtkMEDPolyDataDeformation_M2::ComputeInputMeshAvgEdgeLength()
 //------------------------------------------------------------------------
 {
   //compute the average length of edges of the input mesh
@@ -2747,10 +2747,10 @@ double vtkMAFPolyDataDeformation_M2::ComputeInputMeshAvgEdgeLength()
   return dblEdgeLen;
 }
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M2
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
 //------------------------------------------------------------------------
 //Debug routine that creates polydata from superskeleton
-void vtkMAFPolyDataDeformation_M2::CreatePolyDataFromSuperskeleton()
+void vtkMEDPolyDataDeformation_M2::CreatePolyDataFromSuperskeleton()
 //------------------------------------------------------------------------
 {
   m_MATCHED_FULLCC = vtkIdList::New(); 
@@ -2770,7 +2770,7 @@ void vtkMAFPolyDataDeformation_M2::CreatePolyDataFromSuperskeleton()
 
 //------------------------------------------------------------------------
 //Destroys the debug data
-void vtkMAFPolyDataDeformation_M2::DestroyMATCHEDData()
+void vtkMEDPolyDataDeformation_M2::DestroyMATCHEDData()
 //------------------------------------------------------------------------
 {
   if (m_MATCHED_CC != NULL)

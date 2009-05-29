@@ -1,15 +1,15 @@
 /*========================================================================= 
   Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: vtkMAFPolyDataDeformation_M1.h,v $ 
+  Module: $RCSfile: vtkMEDPolyDataDeformation_M2.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 14:18:46 $ 
+  Date: $Date: 2009-05-29 08:38:43 $ 
   Version: $Revision: 1.1.2.1 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
   See the COPYINGS file for license details 
   =========================================================================
-  vtkMAFPolyDataDeformation_M1 performs a skeleton based deformation
+  vtkMEDPolyDataDeformation_M2 performs a skeleton based deformation
   of the input poly data set (mesh). The deformation is driven by 
   two skeletons, here aka the original and the deformed curves. 
   The original curve(skeleton) corresponds to the input (original)
@@ -39,8 +39,8 @@
 
   The Hungarian algorithm (http://en.wikipedia.org/wiki/Hungarian_algorithm)
 */
-#ifndef vtkMAFPolyDataDeformation_M1_h__
-#define vtkMAFPolyDataDeformation_M1_h__
+#ifndef vtkMEDPolyDataDeformation_M2_h__
+#define vtkMEDPolyDataDeformation_M2_h__
 
 #pragma once
 
@@ -52,23 +52,24 @@
 #include <vector>
 #include <list>
 
-//#define DEBUG_vtkMAFPolyDataDeformation_M1
+//#define DEBUG_vtkMEDPolyDataDeformation_M2
 
+class vtkUnstructuredGrid;
 class vtkPolyData;
 class vtkIdList;
 class vtkCellLocator;
 
-class VTK_GRAPHICS_EXPORT vtkMAFPolyDataDeformation_M1 : public vtkPolyDataToPolyDataFilter
+class VTK_GRAPHICS_EXPORT vtkMEDPolyDataDeformation_M2 : public vtkPolyDataToPolyDataFilter
 {
 public:
-  static vtkMAFPolyDataDeformation_M1 *New();
+  static vtkMEDPolyDataDeformation_M2 *New();
 
-  vtkTypeRevisionMacro(vtkMAFPolyDataDeformation_M1, vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkMEDPolyDataDeformation_M2, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
-  vtkMAFPolyDataDeformation_M1();           
-  virtual ~vtkMAFPolyDataDeformation_M1();
+  vtkMEDPolyDataDeformation_M2();           
+  virtual ~vtkMEDPolyDataDeformation_M2();
 
 protected:
 #pragma region //Nested Classes
@@ -78,19 +79,15 @@ protected:
   class CMeshVertex
   {
   public:
-    //vertex parametrization
-    typedef struct VERTEX_PARAM
-    {
-      CSkeletonEdge* pEdge;   //<the governing edge      
-      double pcoords[3];      //<a,b,c parametric coordinates
-      double dblRm;           //<elongation factor, 0.0, if there is no elongation
-
-      double dblWeight;       //<weight of this parametrization
-    } VERTEX_PARAM;
-  public:    
-    vtkstd::vector< VERTEX_PARAM > m_Parametrization;  //<parametrization
-  };
-      
+    CSkeletonEdge* m_pEdge;   //<the governing edge      
+    double m_PCoords[3];      //<a,b,c parametric coordinates
+    short m_nPlanes[2];       //indices of governing planes of the edge
+    double m_dblRm;           //<elongation factor, 0.0, if there is no elongation    
+  public:
+    CMeshVertex() {
+      memset(this, 0, sizeof(CMeshVertex));
+    }
+  };      
 
   //internal structure for one vertex in the skeleton
   class CSkeletonVertex
@@ -106,10 +103,17 @@ protected:
       double w[3];      //<base vector 3  
     } LOCAL_FRAME;
 
-    LOCAL_FRAME m_LF;   //<local frame system
+    LOCAL_FRAME m_LF;             //<local frame system
     CSkeletonVertex* m_pMatch;    //<matched vertex
     
     vtkstd::vector< CSkeletonEdge* > m_OneRingEdges;    //<edges around this vertex
+    vtkstd::vector< CSkeletonVertex* > m_JoinedVertices;//<vertices of other curves with the same coordinates
+    
+    //N.B. planes are computed in relationship to skeleton edge that goes from this vertex!
+    //=> if the vertex is the terminal node for another edge, normals must be inverse
+    int m_nPlanes;                //<number of separating planes
+    typedef double VCoord[3];
+    VCoord* m_pPlaneNormals;      //<normals of those planes    
 
     double m_WT;          //<topology weight
     int m_nMark;          //<vertex tag for internal use
@@ -131,9 +135,18 @@ protected:
       m_Coords[2] = coords[2];
     }
 
+    ~CSkeletonVertex() {
+      delete[] m_pPlaneNormals;
+    }
+
     /** Gets the degree of this vertex */
     inline int GetDegree() {
       return (int)m_OneRingEdges.size();
+    }
+
+    /** Gets the number of vertices having the same coordinate */
+    inline int GetNumberOfJoinedVertices() {
+      return (int)m_JoinedVertices.size();
     }
 
     /** 
@@ -151,7 +164,7 @@ protected:
   {
   public:
     int m_Id;                     //<ID of this edge
-    CSkeletonVertex* m_Verts[2];  //<end points (may be NULL)            
+    CSkeletonVertex* m_Verts[2];  //<end points (may be NULL)
 
     CSkeletonEdge* m_pMatch;      //<matched edge
     int m_nMark;                  //<edge tag for internal use        
@@ -182,7 +195,7 @@ protected:
     /** Returns true, if the edge is internal */
     inline bool IsInternal() {
       return m_Verts[0]->GetDegree() != 1 && m_Verts[1]->GetDegree() != 1;
-    }
+    }    
 
     /** Returns length of the edge. 
     If the edge does not have both vertices defined, it returns 0.0 */
@@ -302,10 +315,10 @@ protected:
   double MatchTopologyWeight;       //<weight (0-1) for topology matching of skeletons
   double MatchTolerance;            //<weight (0-1) for the matching of vertices of curves
 
-  int DivideSkeletonEdges;          //<1 if large skeleton edges should be divided  
+  int DivideSkeletonEdges;          //<1 if large skeleton edges should be divided
   int PreserveVolume;               //<1, if volume should be preserved
 
-  vtkstd::vector< CMeshVertex > m_MeshVertices; //<internal data structure describing the mesh  
+  CMeshVertex* m_MeshVertices;      //<internal data structure describing the mesh  
 
 public:  
   /** Gets the weight using to match geometry of skeletons */
@@ -435,7 +448,7 @@ protected:
   int MatchCurves(CSkeletonVertex** pOC, int nOCVerts, CSkeletonVertex** pDC, int nDCVerts);
 
   /** Create edges for the given array of vertices. */
-  void CreateCurveEdges(CSkeletonVertex** pVerts, int nVerts);
+  void CreateCurveEdges(CSkeletonVertex** pVerts, int nVerts);  
 
   /** Refines the given curve (and its corresponding one) by adding more vertices.
   Every skeleton edge larger than sqrt(dblEdgeFactor) is split recursively into 
@@ -443,12 +456,13 @@ protected:
   N.B. the routine is intended to be called after CreateCurveEdges */
   void RefineCurve(CSkeletonVertex* pCurve, double dblEdgeFactor);
 
-  /** Computes the average length of edges of the input mesh */
-  double ComputeInputMeshAvgEdgeLength();
+  /** Stores vertices and edges from the given curve and the matched one into the superskeleton 
+  The routine also constructs automatically joints for end-points of curves.
+  N.B. both curves must be compatible with curves constructed by CreateCurveEdges.  */
+  void AddCurveToSuperSkeleton(CSkeletonVertex* pOCCurve);
 
-  /** Stores vertices and edges from the given curve into superskeleton 
-  N.B. curve must be compatible with curves constructed by CreateCurveEdges.  */
-  void AddCurveToSuperSkeleton(CSkeletonVertex* pCurve, bool bOriginal);
+  /** Computes the average length of edges of the input mesh */
+  double ComputeInputMeshAvgEdgeLength();  
 
   /** Gets the previous vertex on the curve.
   Returns NULL, if the given vertex is the first one. */
@@ -494,6 +508,24 @@ protected:
   Redwood City, California, 2008, pp. 71-78 */
   void ComputeLFS(CSkeletonVertex* pOC);  
 
+  /** 
+  Computes separating planes for every vertex on both curves, the original
+  and the deformed ones. The original curve starts at the given vertex.
+  This routine is supposed to be called together with ComputeLFS. A planes
+  is computed for each pair of edges adjacent to every vertex on the curve.
+  Joined edges are also taken into account. The plane is always
+  perpendicular to both edges and the axis of both edges lies on the plane */
+  void ComputeSeparatingPlanes(CSkeletonVertex* pOC_Curve);  
+
+  /** Computes normal of the separating plane at pCenterVert.
+  Vertices pVert1, pCenterVert2 and pVert2 form a polyline composed of two 
+  edges. The plane is perpendicular to both edges and the axis of both 
+  edges lies on the plane. The angle between the computed normal and the 
+  vector pVert1 - pCenterVert2 is not obtuse (i.e., the normal directs
+  the same way as the other vector). The returned normal is normalized.*/
+  void ComputeSeparatingPlane(CSkeletonVertex* pVert1, 
+    CSkeletonVertex* pCenterVert, CSkeletonVertex* pVert2, double* out_normal);
+
   /** Computes the region of interest (ROI) for the given edge of curve.
   It detects every mesh vertex in the zone of influence of the given edge. 
   Note: one of end-points of the edge may be NULL to specify half-space */
@@ -501,26 +533,30 @@ protected:
 
   /** Refines ROIs of curves.
   Refines the mapping of vertices of the input mesh to edges in such a manner 
-  that every vertex is present only in one edge ROI. 
-  The routine requires locator for cells, initialized with the input mesh */
-  void RefineCurveROIs(vtkCellLocator* locator);
+  that every vertex is present only in one edge ROI. */
+  void RefineCurveROIs(); 
 
-  /** Validates ROIs of curves.
-  It checks whether the current LFs&ROIs configuration is safe enough not
-  to lead into self-intersection of the deformed mesh (see Blanco paper).
-  If the outcome of this test is negative, LFs of the skeleton vertex where 
-  the violation was detected is rotated and the routine returns false.
-  The caller typically recomputes ROIs (as one of LFs has changed).
-  The routine returns true, if there is no problem with the current configuration. */
-  bool ValidateCurveROIs();
+  /** Computes an approximate geodesic distance between two points.
+  If the straight line between both points does not intersect the input mesh,
+  the returned distance is the Euclidian distance between those two points;
+  otherwise it is the sum of the length of the shortest (surface) path from 
+  nPtStartId to the surface point closest to the intersection and the distance
+  that returned by GetDistance with the first parameter to be the surface 
+  point closest to the intersection. If the total distance during the 
+  computation exceeds the given dblMaxDist, the algorithm stops (and returns
+  the distance measured so far) - this is to speed up the process. 
+  N.B. cellLocator must be initialized with the input mesh. */
+  double GetDistance(vtkIdType nPtStartId, double ptEnd[3], 
+    vtkCellLocator* cellLocator, double dblMaxDist);
 
-  /** 
-  Checks whether the part of mesh associated with given (adjacent) edges will 
-  not self intersect after the deformation.
-  If the outcome of the test is positive, the LFs at the point shared by those
-  edges is modified to avoid such intersection and the routine returns false. 
-  It returns true, if everything is OK. The algorithm is based on Blanco's paper. */
-  bool CheckSelfIntersection(CSkeletonEdge* pEdge1, CSkeletonEdge* pEdge2);  
+  //this structure is used in GetPathLength
+  typedef struct DIJKSTRA_ITEM;
+
+  /** Computes the length of the path between nPtFrom to nPtTo vertices.
+  The computation is not precise (because of speed). If there is no path, or the
+  path would be too long, the routine returns dblMaxDist. 
+  N.B. the found path may not be the shortest one! */
+  double GetPathLength(vtkIdType nPtFrom, vtkIdType nPtTo, double dblMaxDist);
 
   /** Gets the number of vertices belonging to the given curve.
   N.B. curve must be compatible with curves constructed by CreateCurveEdges.*/
@@ -530,9 +566,6 @@ protected:
   The angle is given indirectly as cos(theta). 
   N.B. vector r must be normalized. */
   void BuildGeneralRotationMatrix(double r[3], double cos_theta, double M[3][3]);
-
-  //this struct is used in ComputeMeshParametrization
-  typedef struct JOIN_VERTEX;
 
   /** Parametrize the input mesh using the super-skeleton.
   N.B. edges ROI must be build and refined before this routine may be called. */
@@ -558,16 +591,19 @@ protected:
   N.B. the given output polydata must be compatible with the input polydata */
   void DeformMesh(vtkPolyData* output);
   
-private:
-  vtkMAFPolyDataDeformation_M1(const vtkMAFPolyDataDeformation_M1&);  // Not implemented.
-  void operator = (const vtkMAFPolyDataDeformation_M1&);  // Not implemented.  
+  /** Creates polydata from the given skeleton.   */
+  void CreatePolyDataFromSkeleton(CSkeleton* pSkel, vtkPolyData* output); 
 
-#ifdef DEBUG_vtkMAFPolyDataDeformation_M1
+private:
+  vtkMEDPolyDataDeformation_M2(const vtkMEDPolyDataDeformation_M2&);  // Not implemented.
+  void operator = (const vtkMEDPolyDataDeformation_M2&);  // Not implemented.  
+
+#ifdef DEBUG_vtkMEDPolyDataDeformation_M2
 public:
   vtkPolyData* m_MATCHED_POLYS[2];  //new polys for the first skeleton
   vtkIdList* m_MATCHED_FULLCC;      //and their correspondences
   vtkIdList* m_MATCHED_CC;          //first skeleton correspondences
-protected:
+protected:  
   /** Debug routine that creates polydata from superskeleton */
   void CreatePolyDataFromSuperskeleton();
 
@@ -577,7 +613,7 @@ protected:
 };
 
 #pragma region //Munkres INLINES
-inline bool vtkMAFPolyDataDeformation_M1::
+inline bool vtkMEDPolyDataDeformation_M2::
 CMunkres::find_uncovered_in_matrix(double item, int &row, int &col) 
 {
   for ( row = 0 ; row < matrix->GetNumberOfRows() ; row++ )
@@ -595,7 +631,7 @@ CMunkres::find_uncovered_in_matrix(double item, int &row, int &col)
   return false;
 }
 
-inline bool vtkMAFPolyDataDeformation_M1::
+inline bool vtkMEDPolyDataDeformation_M2::
 CMunkres::pair_in_list(const vtkstd::pair<int,int> &needle, 
                        const vtkstd::list<std::pair<int,int> > &haystack) 
 {
@@ -609,4 +645,4 @@ CMunkres::pair_in_list(const vtkstd::pair<int,int> &needle,
 }
 #pragma endregion //Munkres INLINES
 
-#endif // vtkMAFPolyDataDeformation_M1_h__
+#endif // vtkMEDPolyDataDeformation_M2_h__

@@ -32,8 +32,10 @@ SET(vtkMED_SRCS
   vtkMEDPolyDataMirror.h
   vtkMEDImageUnsharpFilter.cxx
   vtkMEDImageUnsharpFilter.h
-  vtkFillingHole.cxx
-  vtkFillingHole.h
+  vtkMEDFillingHole.cxx
+  vtkMEDFillingHole.h
+  
+  ########## Should be committed down ###########
   vtkMAFVolumeRayCastMapper.cxx
   vtkMAFVolumeRayCastMapper.h
   vtkMAFVolumeTextureMapper2D.cxx
@@ -42,15 +44,17 @@ SET(vtkMED_SRCS
   vtkMAFVolumeSlicer_BES.h
   vtkMAFMeshCutter_BES.cxx 
   vtkMAFMeshCutter_BES.h  	
-  vtkMAFPolyDataDeformation.cpp
-  vtkMAFPolyDataDeformation.h
-  vtkMAFPolyDataDeformation_M1.cpp
-  vtkMAFPolyDataDeformation_M1.h
-  vtkMAFPolyDataDeformation_M2.cpp
-  vtkMAFPolyDataDeformation_M2.h  
-  vtkMEDErythrocyteSource.cpp
-  vtkMEDErythrocyteSource.h
+  ###############################################
   
+  ########## Probably could be committed down ###
+  vtkMEDPolyDataDeformation.cpp
+  vtkMEDPolyDataDeformation.h
+  vtkMEDPolyDataDeformation_M1.cpp
+  vtkMEDPolyDataDeformation_M1.h
+  vtkMEDPolyDataDeformation_M2.cpp
+  vtkMEDPolyDataDeformation_M2.h  
+  ###############################################
+    
   ############# VolumeLarge Files - TO BE COMMITTED DOWN ########
   vtkMAFIdType64.h
   ../BES_Beta/vtkMAF/vtkMAFDataArrayDescriptor.cxx
@@ -76,6 +80,9 @@ SET(vtkMED_SRCS
   ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.cpp
   ../BES_Beta/vtkMAF/vtkMAFMultiFileDataProvider.h
   ###############################################################
+  
+  vtkMEDErythrocyteSource.cpp
+  vtkMEDErythrocyteSource.h  
 )
 
 IF (MAF_USE_ITK)
