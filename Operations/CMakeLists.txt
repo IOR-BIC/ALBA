@@ -20,6 +20,7 @@ SET(PROJECT_SRCS
   medOpImporterLandmarkTXT.h
   medOpImporterLandmarkWS.cpp
   medOpImporterLandmarkWS.h
+
   medOpMML.cpp
   medOpMML.h
   medOpMMLContourWidget.cpp
@@ -28,6 +29,15 @@ SET(PROJECT_SRCS
   medOpMMLModelView.h
   medOpMMLParameterView.cpp
   medOpMMLParameterView.h
+  medOpMML3.cpp
+  medOpMML3.h
+  medOpMML3ContourWidget.cpp
+  medOpMML3ContourWidget.h
+  medOpMML3ModelView.cpp
+  medOpMML3ModelView.h
+  medOpMML3ParameterView.cpp
+  medOpMML3ParameterView.h
+
   medOpRegisterClusters.cpp
   medOpRegisterClusters.h
   medOpVolumeMeasure.cpp
