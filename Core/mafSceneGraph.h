@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2009-05-29 12:06:50 $
+  Version:   $Revision: 1.15.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,6 +99,13 @@ public:
   /** print a dump of this object */
   virtual void Print(std::ostream& os, const int tabs=0);// const;
 
+  /** Set information pipe  enable, if yes PipeVisibilityInformation must be used*/
+  void SetInformationPipeModalityEnable(bool enable){m_InformationPipeModality = enable;}
+
+  /** Get flag for information pipe modality. */
+  bool GetInformationPipeModalityEnable(){return m_InformationPipeModality;}
+
+
 protected:
   /** 
   recursively kill all node - starting from the tail of the list. */
@@ -116,5 +123,6 @@ protected:
   mafObserver	 *m_Listener;
 	mafGUI			 *m_Gui;
 	mafNode      *m_SelectedVme;
+  bool         m_InformationPipeModality;
 };
 #endif

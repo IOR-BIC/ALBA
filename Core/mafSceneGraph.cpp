@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSceneGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.26 $
+  Date:      $Date: 2009-05-29 12:06:50 $
+  Version:   $Revision: 1.26.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,7 @@ mafSceneGraph::mafSceneGraph(mafView *view, vtkRenderer *ren1, vtkRenderer *ren2
 	for(i = 0; i<NUM_OF_BASETYPE; i++) m_autoshow[i] = 0;
 	for(i = 0; i<NUM_OF_BASETYPE; i++) m_shown_mutex_vme[i] = NULL;
 */
+  m_InformationPipeModality = false;
 }
 //----------------------------------------------------------------------------
 mafSceneGraph::~mafSceneGraph( ) 
@@ -262,13 +263,27 @@ void mafSceneGraph::VmeShow(mafNode *vme, bool show)
 	{	
     if(node->m_Mutex)
 		{
-      // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
-      // they are of different type: only one MUTEX VME per time is visible into the view.
-			for(mafSceneNode *n = m_List; n; n=n->m_Next)
-        //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
-        if(vme->GetTypeId() == n->m_Vme->GetTypeId() && n->m_Pipe != NULL && n->m_Vme != vme)
-					mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
+      if(!m_InformationPipeModality)
+      {
+        // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
+        // they are of different type: only one MUTEX VME per time is visible into the view.
+        for(mafSceneNode *n = m_List; n; n=n->m_Next)
+          //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
+          if(vme->GetTypeId() == n->m_Vme->GetTypeId() && n->m_Pipe != NULL && n->m_Vme != vme)
+            mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
+      }
+      else
+      {
+        // Changed code below to allow all MUTEX VMEs to behave at the same manner also if 
+        // they are of different type: only one MUTEX VME per time is visible into the view.
+        for(mafSceneNode *n = m_List; n; n=n->m_Next)
+          //if(n->m_Pipe != NULL && n->m_Vme != vme && n->m_Mutex)
+          if(n->m_Pipe != NULL && n->m_Vme != vme)
+            mafEventMacro(mafEvent(this,VME_SHOW,n->m_Vme,false));
+      }
+
 		}
+    
 		if(!node->m_Pipe) 
 		{
 			m_View->VmeCreatePipe(vme);
@@ -470,7 +485,7 @@ void mafSceneGraph::OnOpenCloseEvent(mafSceneNode *node)
 int mafSceneGraph::GetNodeStatus(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  if (node->IsMAFType(mafVMERoot))
+  if (!m_InformationPipeModality && node->IsMAFType(mafVMERoot))
   {
     return NODE_NON_VISIBLE;
   }
