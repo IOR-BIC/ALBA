@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMERoot.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:05 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2009-05-29 14:59:36 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -85,6 +85,10 @@ public:
 
   /** return an xpm-icon that can be used to represent this node */
   static char ** GetIcon();   //SIL. 11-4-2005:  
+
+  /** Return the suggested pipe-typename for the visualization of this vme */
+  virtual mafString GetVisualPipe() {return mafString("mafPipeBox");};
+
 
 protected:
   /** allowed only dynamic allocation via New() */
