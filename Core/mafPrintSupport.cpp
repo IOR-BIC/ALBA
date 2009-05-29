@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPrintSupport.cpp,v $
 Language:  C++
-Date:      $Date: 2006-01-12 10:29:36 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-05-29 12:06:25 $
+Version:   $Revision: 1.2.22.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mafPrintout_H__
 #define __mafPrintout_H__
 
+#include "mafSceneGraph.h"
 #include <wx/print.h>
+#include <wx/html/htmprint.h>
 
 //----------------------------------------------------------------------------
 // mafPrintout :
@@ -137,7 +139,22 @@ void mafPrintSupport::OnPrintPreview(mafView *v)
   wxPoint br = m_PageSetupData->GetMarginBottomRight();
   wxRect margins(tl,br);
 
-  wxPrintPreview *preview = new wxPrintPreview(new mafPrintout(v,margins), new mafPrintout(v,margins), & printDialogData);
+  wxPrintout *printout, *printOutForPrinting;
+  if(v->GetSceneGraph()->GetInformationPipeModalityEnable())
+  {
+    printout = new wxHtmlPrintout();
+    ((wxHtmlPrintout *)printout)->SetHtmlText(v->GetHTMLText());
+
+    printOutForPrinting= new wxHtmlPrintout();
+    ((wxHtmlPrintout *)printOutForPrinting)->SetHtmlText(v->GetHTMLText());
+  }
+  else
+  {
+    printout = new mafPrintout(v,margins);
+    printOutForPrinting= new mafPrintout(v,margins);
+  }
+
+  wxPrintPreview *preview = new wxPrintPreview(printout, printOutForPrinting, & printDialogData);
   preview->SetZoom(20);
   if (!preview->Ok())
   {
@@ -156,23 +173,45 @@ void mafPrintSupport::OnPrint(mafView *v)
 //----------------------------------------------------------------------------
 {
   if (!v)return;
+  
   wxPrintDialogData printDialogData(*m_PrintData);
   wxPrinter printer(& printDialogData);
   wxPoint tl = m_PageSetupData->GetMarginTopLeft();
   wxPoint br = m_PageSetupData->GetMarginBottomRight();
   wxRect margins(tl,br);
-  mafPrintout printout(v,margins);
-  if (!printer.Print( mafGetFrame(), &printout, TRUE))
+
+  if(v->GetSceneGraph()->GetInformationPipeModalityEnable())
   {
-    if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-      wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
+    wxHtmlPrintout printout;
+    printout.SetHtmlText(v->GetHTMLText());
+    if (!printer.Print( mafGetFrame(), &printout, TRUE))
+    {
+      if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+        wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
+      else
+        wxMessageBox("You canceled printing", "Printing", wxOK);
+    }
     else
-      wxMessageBox("You canceled printing", "Printing", wxOK);
+    {
+      (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
+    }
   }
   else
   {
-    (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
+    mafPrintout printout(v,margins);
+    if (!printer.Print( mafGetFrame(), &printout, TRUE))
+    {
+      if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
+        wxMessageBox("There was a problem printing.\nPerhaps your current printer is not set correctly?", "Printing", wxOK);
+      else
+        wxMessageBox("You canceled printing", "Printing", wxOK);
+    }
+    else
+    {
+      (*m_PrintData) = printer.GetPrintDialogData().GetPrintData();
+    }
   }
+  
 }
 //----------------------------------------------------------------------------
 void mafPrintSupport::OnPrintSetup()
