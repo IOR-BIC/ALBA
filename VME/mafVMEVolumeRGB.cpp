@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVolumeRGB.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-08-17 11:31:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-29 10:01:50 $
+  Version:   $Revision: 1.3.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -86,7 +86,8 @@ int mafVMEVolumeRGB::SetData(vtkDataSet *data, mafTimeStamp t, int mode)
   if (data->IsA("vtkImageData")||data->IsA("vtkRectilinearGrid"))
   {
     data->Update();
-    if (data->GetPointData()&&data->GetPointData()->GetNumberOfComponents()==3)
+    if (data->GetPointData()&&data->GetPointData()->GetScalars() != NULL &&
+      data->GetPointData()->GetScalars()->GetNumberOfComponents()==3)  //BES: 28.5.2009 - GetNumberOfComponents must be called on scalars
       return Superclass::SetData(data,t,mode);
   }
   
