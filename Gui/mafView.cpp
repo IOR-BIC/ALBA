@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:24 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2009-05-29 12:07:47 $
+  Version:   $Revision: 1.17.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,6 +67,8 @@ mafView::mafView(const wxString &label)
   //parameters
   m_Slice[0] = m_Slice[1] = m_Slice[2] =  0.;
   m_Normal[0] = m_Normal[1] = m_Normal[2] =  0.;
+
+  m_HTMLText = "";
 }
 //----------------------------------------------------------------------------
 mafView::~mafView()

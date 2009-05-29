@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafView.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:50:29 $
-  Version:   $Revision: 1.23.2.1 $
+  Date:      $Date: 2009-05-29 12:07:47 $
+  Version:   $Revision: 1.23.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -166,6 +166,9 @@ public:
     ID_LAST
   };
 
+  /** Retrieve html information */
+  virtual const char *GetHTMLText(){return m_HTMLText.GetCStr();};
+
 protected:
   mafObserver   *m_Listener;
   wxString       m_Label;
@@ -184,6 +187,7 @@ protected:
   int            m_NumberOfVisibleVme; ///< perform ResetCamera only for the first vme shown into the view
 
   wxPrintData   *m_PrintData;
+  mafString      m_HTMLText;
 
   /** Find the VME picked */
   bool FindPickedVme(vtkAssemblyPath *ap = NULL);
