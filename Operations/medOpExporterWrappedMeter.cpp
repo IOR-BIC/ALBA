@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:32:50 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-05-29 15:57:34 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -26,6 +26,7 @@
 
 #include "medVMEWrappedMeter.h"
 #include "medVMEOutputWrappedMeter.h"
+#include "medVMEComputeWrapping.h"
 
 #include <fstream>
 
@@ -65,7 +66,7 @@ mafOp* medOpExporterWrappedMeter::Copy()
 bool medOpExporterWrappedMeter::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 {
-  return (node && node->IsMAFType(medVMEWrappedMeter));
+  return (node && node->IsMAFType(medVMEComputeWrapping));
 }
 //----------------------------------------------------------------------------
 // constants
@@ -100,7 +101,7 @@ void medOpExporterWrappedMeter::OnEvent(mafEventBase *maf_event)
 				{
           mafString initialFileName;
           initialFileName = mafGetApplicationDirectory().c_str();
-          initialFileName.Append("\\WrapperMeter.txt");
+          initialFileName.Append("\\ActionLine.txt");
 
           mafString wildc = "configuration file (*.txt)|*.txt";
           m_File = mafGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
@@ -134,10 +135,15 @@ void medOpExporterWrappedMeter::OpStop(int result)
 void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
 //----------------------------------------------------------------------------
 {
-  medVMEWrappedMeter *vmeWrappedMeter =  medVMEWrappedMeter::SafeDownCast(m_Input);
+  /*medVMEWrappedMeter *vmeWrappedMeter =  medVMEWrappedMeter::SafeDownCast(m_Input);
   vmeWrappedMeter->Update();
   medVMEOutputWrappedMeter *out_wm = medVMEOutputWrappedMeter::SafeDownCast(vmeWrappedMeter->GetOutput());
-  out_wm->Update();
+  out_wm->Update();*/
+
+  medVMEComputeWrapping *vmeMeter = medVMEComputeWrapping::SafeDownCast(m_Input);
+  vmeMeter->Update();
+  medVMEOutputComputeWrapping *out_cm = medVMEOutputComputeWrapping::SafeDownCast(vmeMeter->GetOutput());
+  out_cm->Update();
 
   std::ofstream outputFile(m_File, std::ios::out);
 
@@ -146,7 +152,43 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
     return ;
   }
 
-  if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
+  if (vmeMeter->GetWrappedClass()==medVMEComputeWrapping::NEW_METER)
+  {
+		/*if (vmeMeter->GetWrappedMode()==  medVMEComputeWrapping )
+		{
+		}*/
+	  outputFile<< vmeMeter->GetStartPointCoordinate()[0]<< '\t'
+		  <<vmeMeter->GetStartPointCoordinate()[1]<<'\t'
+		  <<vmeMeter->GetStartPointCoordinate()[1]<<std::endl;
+	  outputFile<< vmeMeter->GetEndPointCoordinate()[0]<< '\t'
+		  <<vmeMeter->GetEndPointCoordinate()[1]<<'\t'
+		  <<vmeMeter->GetEndPointCoordinate()[1]<<std::endl;
+
+  }else if (vmeMeter->GetWrappedClass()==medVMEComputeWrapping::OLD_METER)
+  {
+	  if (vmeMeter->GetWrappedMode() == medVMEComputeWrapping::MANUAL_WRAP)
+	{
+		for(int i=0; i<vmeMeter->GetNumberMiddlePoints();i++)
+		{
+			outputFile << vmeMeter->GetMiddlePointCoordinate(i)[0] << '\t'
+				<< vmeMeter->GetMiddlePointCoordinate(i)[1] << '\t'
+				<< vmeMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
+		}
+	}else if (vmeMeter->GetWrappedMode() == medVMEComputeWrapping::AUTOMATED_WRAP)
+	{
+		outputFile << vmeMeter->GetWrappedGeometryTangent1()[0] << '\t'
+			<< vmeMeter->GetWrappedGeometryTangent1()[1] << '\t'
+			<< vmeMeter->GetWrappedGeometryTangent1()[2] << std::endl;
+
+		outputFile << vmeMeter->GetWrappedGeometryTangent2()[0] << '\t'
+			<< vmeMeter->GetWrappedGeometryTangent2()[1] << '\t'
+			<< vmeMeter->GetWrappedGeometryTangent2()[2] << std::endl;
+	}
+  }
+  
+
+
+  /*if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
   {
     for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
     {
@@ -164,7 +206,7 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
     outputFile << vmeWrappedMeter->GetWrappedGeometryTangent2()[0] << '\t'
       << vmeWrappedMeter->GetWrappedGeometryTangent2()[1] << '\t'
       << vmeWrappedMeter->GetWrappedGeometryTangent2()[2] << std::endl;
-  }
+  }*/
   
   outputFile.close();
 
