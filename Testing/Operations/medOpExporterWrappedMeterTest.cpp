@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 08:58:51 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-06-02 09:02:26 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,7 +22,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medOpExporterWrappedMeterTest.h"
 #include "medOpExporterWrappedMeter.h"
 
-#include "medVMEWrappedMeter.h"
+#include "medVMEComputeWrapping.h"
 #include "mafVMELandmarkCloud.h"
 #include "mafVMELandmark.h"
 #include "medOpImporterLandmark.h"
@@ -59,7 +59,7 @@ void medOpExporterWrappedMeterTest::Test()
 
   //cloud->SetParent(storage->GetRoot());
 
-  medVMEWrappedMeter *wrappedMeter;
+  medVMEComputeWrapping *wrappedMeter;
   mafNEW(wrappedMeter);
 
   wrappedMeter->SetMeterLink("StartVME",cloud->GetLandmark(0));
