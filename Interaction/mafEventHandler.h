@@ -3,8 +3,8 @@
   Program:   Multimod Foundation Library
   Module:    $RCSfile: mafEventHandler.h,v $
   Language:  C++
-  Date:      $Date: 2005-04-28 16:10:11 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-03 15:28:53 $
+  Version:   $Revision: 1.1.22.1 $
   Authors:   Marco Petrone m.petrone@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -31,7 +31,11 @@
 // Forward declarations
 //------------------------------------------------------------------------------
 class mafWXEventHandler;
-
+/**
+  Class Name: mafEventHandler.
+   A class that can handle events from the windowing system, via bridge class 
+   mafWXEventHandler.
+*/
 class mafEventHandler : public mflEventQueue
 {
 public:
@@ -39,23 +43,28 @@ public:
   // Events
   //------------------------------------------------------------------------------
   
-
+  /** static function for create new instance of the class. */
   static mafEventHandler *New();
+  /** RTTI macro. */
   vtkTypeMacro(mafEventHandler,mflEventQueue);
   
 protected:
+  /** constructor.*/
   mafEventHandler();
+  /** destructor. */
   virtual ~mafEventHandler();
 
-  // Description:
-  // Internal function used to request the dispatching
+  
+  /**Internal function used to request the dispatching. */
   virtual void RequestForDispatching();
   
   mafWXEventHandler *m_EventHandler;
 
 private:
-  mafEventHandler(const mafEventHandler&);  // Not implemented.
-  void operator=(const mafEventHandler&);  // Not implemented.
+  /**copy constructor not implemeted .*/
+  mafEventHandler(const mafEventHandler&);
+  /**assignment operator  not implemeted .*/
+  void operator=(const mafEventHandler&);
 
 };
 

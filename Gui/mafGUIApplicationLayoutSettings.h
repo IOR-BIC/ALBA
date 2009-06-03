@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationLayoutSettings.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-06-03 15:28:47 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -29,13 +29,22 @@ class mafVMERoot;
 // mafGUIApplicationLayoutSettings :
 //----------------------------------------------------------------------------
 /**
+  Class Name: mafGUIApplicationLayoutSettings.
+  Class that handles the option and operation like load or save regardings  layout like:
+  - views layout
+  - vmes visibility 
+  - camera position
+  - gui layout (toolbar, logbar, sidebar)
 */
 class mafGUIApplicationLayoutSettings : public mafGUISettings
 {
 public:
+  /** constructor .*/
 	mafGUIApplicationLayoutSettings(mafObserver *listener, const mafString &label = _("Application Layout"));
+  /** destructor .*/
 	~mafGUIApplicationLayoutSettings(); 
 
+  /** GUI IDs*/
   enum APPLICATION_LAYOUT_WIDGET_ID
   {
     SAVE_TREE_LAYOUT_ID = MINID,
@@ -54,6 +63,7 @@ public:
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
+  /** Assign ViewManager pointer to member variable. */
   void SetViewManager(mafViewManager *view_manager) {m_ViewManager = view_manager;};
 
   /** Set a reference to the interface elements to store their visibility.*/

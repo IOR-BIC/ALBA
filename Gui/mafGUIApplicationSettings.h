@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-02-03 15:26:42 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-03 15:28:47 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -23,13 +23,24 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // mafGUIApplicationSettings :
 //----------------------------------------------------------------------------
 /**
+   Class Name: mafGUIApplicationSettings.
+   Class that contains several application options like: 
+   - logging to file
+   - logging verbosity
+   - logging directory
+   - Undo warning
+   - passphrase for data encryption
+   - default image type when saving a snapshot
 */
 class mafGUIApplicationSettings : public mafGUISettings
 {
 public:
+  /** constructor .*/
 	mafGUIApplicationSettings(mafObserver *Listener, const mafString &label = _("Application"));
+  /** destructor .*/
 	~mafGUIApplicationSettings(); 
 
+  /** GUI IDs */
   enum APP_SETTINGS_WIDGET_ID
   {
     ID_LOG_TO_FILE = MINID,
@@ -41,6 +52,7 @@ public:
 		IMAGE_TYPE_ID,
   };
 
+  /** Image Type IDs */
 	enum IMAGE_TYPE_LIST
 	{
 		JPG = 0,
@@ -87,7 +99,9 @@ public:
 	/** Select image type during saving of the views*/
 	int GetImageTypeId(){return m_ImageTypeId;};
 
+  /** Enable the possibility to choose log directory. */
   void EnableLogDirChoices(){m_EnableLogDirChoices = true;};
+  /** Disable the possibility to choose log directory. */
   void DisableLogDirChoices(){m_EnableLogDirChoices = false;};
 
 protected:

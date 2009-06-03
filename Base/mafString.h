@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafString.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-07 16:12:24 $
-  Version:   $Revision: 1.17 $
+  Date:      $Date: 2009-06-03 15:28:37 $
+  Version:   $Revision: 1.17.2.1 $
   Authors:   originally based on vtkString (www.vtk.org), rewritten Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -273,10 +273,14 @@ protected:
   mafID m_Size;
 };
 
-// this string class is thought to simply wrap a c-string: no memory copy.
+/**
+     Class Name : mafCString.
+     this string class is thought to simply wrap a c-string: no memory copy.
+*/
 class mafCString : public mafString
 {
 public:
+  /** constructor. */
   mafCString(const char *str) {Set(str);}
 };
 
