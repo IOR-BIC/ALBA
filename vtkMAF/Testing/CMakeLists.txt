@@ -85,3 +85,11 @@ ADD_TEST(vtkMAFDOFMatrixTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFDOFMatrixTest)
 IF (WIN32)
   SET_TARGET_PROPERTIES(vtkMAFDOFMatrixTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFImplicitPolyDataTest
+ADD_EXECUTABLE(vtkMAFImplicitPolyDataTest vtkMAFImplicitPolyDataTest.h vtkMAFImplicitPolyDataTest.cpp)
+ADD_TEST(vtkMAFImplicitPolyDataTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFImplicitPolyDataTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFImplicitPolyDataTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
