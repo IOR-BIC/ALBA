@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 15:42:01 $
-Version:   $Revision: 1.1.2.20 $
+Date:      $Date: 2009-06-03 13:33:26 $
+Version:   $Revision: 1.1.2.21 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1760,9 +1760,38 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
       ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
 
-      if(val_long==16 && pixel_rep == 1)
+      long pixel_max;
+      long pixel_min;
+      ds->findAndGetLongInt(DCM_SmallestImagePixelValue, pixel_min);
+      ds->findAndGetLongInt(DCM_LargestImagePixelValue, pixel_max);
+
+      if(val_long==16 && pixel_rep == 0)
       {
-        imageData->SetScalarType(VTK_SHORT);
+        if(pixel_min*slope+intercept >= VTK_UNSIGNED_SHORT_MIN || pixel_max*slope+intercept >= VTK_UNSIGNED_SHORT_MAX)
+        {
+          imageData->SetScalarType(VTK_UNSIGNED_SHORT);
+        }
+        else if (pixel_min*slope+intercept >= VTK_SHORT_MIN || pixel_max*slope+intercept >= VTK_SHORT_MAX)
+        {
+            imageData->SetScalarType(VTK_SHORT);;
+        }
+        else
+        {
+          wxMessageBox("Inconsistent scalar values. Can not import file.","Error!!");
+          return false;
+        }
+      }
+      else if(val_long==16 && pixel_rep == 1 )
+      {
+        if (pixel_min*slope+intercept >= VTK_SHORT_MIN || pixel_max*slope+intercept >= VTK_SHORT_MAX)
+          {
+            imageData->SetScalarType(VTK_SHORT);
+          }
+        else
+        {
+          wxMessageBox("Inconsistent scalar values. Can not import file.","Error!!");
+          return false;
+        }
       }
       else if(val_long==16 && pixel_rep == 0)
       {
@@ -1799,6 +1828,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       }
       imageData->Update();
 
+      double range[2];
+      imageData->GetPointData()->GetScalars()->GetRange(range);
+
+
       if (slope != 1 || intercept != 0)
       {
         if (imageData->GetScalarType() == VTK_UNSIGNED_SHORT)
@@ -1817,7 +1850,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
           }
         }
-        else if (imageData->GetScalarType() == VTK_CHAR)
+        else if (imageData->GetScalarType() == VTK_CHAR )
         {
           vtkCharArray *scalars=vtkCharArray::SafeDownCast(imageData->GetPointData()->GetScalars());
           for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)

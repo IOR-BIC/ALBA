@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-05-22 15:51:05 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2009-06-03 13:33:26 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -61,6 +61,7 @@ class mafTagArray;
 class mafVMEImage;
 class mafVMEVolumeGray;
 class mafGUICheckListBox;
+
 class vtkDirectory;
 class vtkWindowLevelLookupTable;
 class vtkPlaneSource;
@@ -221,6 +222,7 @@ protected:
 	vtkActor					*m_CropActor;
 	vtkActor					*m_SliceActorInCropPage;
 
+
 	mmiDICOMImporterInteractor *m_DicomInteractor;
 
 	medGUIWizard			*m_Wizard;
@@ -243,7 +245,7 @@ protected:
 
   mafString m_PatientPosition;
   double m_ImagePositionPatient[3];
-  double m_ImageOrientationPatient[6];
+  double m_ImageOrientationPatient[9];
 
 	int				m_BuildStepValue;
 	int				m_DicomTypeRead; ///<Type DICOM Read from file
