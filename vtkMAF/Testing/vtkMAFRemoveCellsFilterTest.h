@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFRemoveCellsFilterTest.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 11:34:43 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-06-03 12:31:21 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Matteo Giacomoni, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -51,14 +51,13 @@ class vtkMAFRemoveCellsFilterTest : public CPPUNIT_NS::TestFixture
 };
 
 
-int 
-main( int argc, char* argv[] )
+int main( int argc, char* argv[] )
 {
 
   // Create the event manager and test controller
   CPPUNIT_NS::TestResult controller;
 
-  // Add a listener that colllects test result
+  // Add a listener that collects test result
   CPPUNIT_NS::TestResultCollector result;
   controller.addListener( &result );        
 
