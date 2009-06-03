@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:42:28 $
-  Version:   $Revision: 1.61.2.9 $
+  Date:      $Date: 2009-06-03 12:01:11 $
+  Version:   $Revision: 1.61.2.10 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,7 +21,7 @@
 
 #include "mafViewOrthoSlice.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeSlice_BES.h"
 #include "mafGUILutSwatch.h"
 #include "mafGUILutPreset.h"
 #include "mafGUI.h"
@@ -309,7 +309,7 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         currentVolumeMaterial->UpdateFromTables();
         for(int i=0; i<m_NumOfChildView; i++)
         {
-          mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+          mafPipeVolumeSlice_BES *p = (mafPipeVolumeSlice_BES *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
           p->SetColorLookupTable(m_ColorLUT);
         }
         double *sr;
@@ -425,9 +425,9 @@ void mafViewOrthoSlice::PackageView()
   for(int v=PERSPECTIVE_VIEW; v<VIEWS_NUMBER; v++)
   {
     m_Views[v] = new mafViewSlice(viewName[v], cam_pos[v],false,false,false,0,TICKs[v]);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice", MUTEX);    
-    m_Views[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice", MUTEX);
-    m_Views[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice", MUTEX);   //BES: 3.11.2009
+    m_Views[v]->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES", MUTEX);    
+    m_Views[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES", MUTEX);
+    m_Views[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES", MUTEX);   //BES: 3.11.2009
 		m_Views[v]->PlugVisualPipe("mafVMEImage", "mafPipeBox", NON_VISIBLE);
     // plug surface slice visual pipe in not perspective views
     if (v != PERSPECTIVE_VIEW)
@@ -481,9 +481,10 @@ void mafViewOrthoSlice::GizmoCreate()
 		for(gizmoId=GIZMO_XN; gizmoId<GIZMOS_NUMBER; gizmoId++) 
 		{
 			double sliceOrigin[3];
-			mafPipeVolumeSlice *p = NULL;
-			p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
-			p->GetSliceOrigin(sliceOrigin);
+			mafPipeVolumeSlice_BES *p = NULL;
+			p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[0]))->GetNodePipe(m_CurrentVolume));
+      double normal[3];
+			p->GetSlice(sliceOrigin,normal);
 
 			m_Gizmo[gizmoId] = new mafGizmoSlice(m_CurrentVolume, this);
 			m_Gizmo[gizmoId]->CreateGizmoSliceInLocalPositionOnAxis(gizmoId, direction[gizmoId], sliceOrigin[gizmoId]);
@@ -690,7 +691,7 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
 	m_LutSlider->SetSubRange((long)currentVolumeMaterial->m_TableRange[0],(long)currentVolumeMaterial->m_TableRange[1]);
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
-		mafPipeVolumeSlice *p = (mafPipeVolumeSlice *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+		mafPipeVolumeSlice_BES *p = (mafPipeVolumeSlice_BES *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
 		p->SetColorLookupTable(m_ColorLUT);
 	}
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
