@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-02 09:02:26 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-06-03 15:32:20 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -41,23 +41,23 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 void medOpExporterWrappedMeterTest::Test() 
 //-----------------------------------------------------------
 {
-  /*mafVMEStorage *storage = mafVMEStorage::New();
-  storage->GetRoot()->SetName("root");
-  storage->GetRoot()->Initialize();*/
 
 
   //create landmarks and relative landmark cloud
   medOpImporterLandmark *importer=new medOpImporterLandmark("importer");
   importer->TestModeOn();
-  //importer->SetInput(storage->GetRoot());
+  
+
   mafString filename=MED_DATA_ROOT;
   filename<<"/RAW_MAL/cloud_to_be_imported";
+
+  //mafString filename = "C:\\MAF\\Medical\\Testing\\unittestData\\RAW_MAL\\cloud_to_be_imported";
   importer->SetFileName(filename.GetCStr());
   importer->Read();
   mafVMELandmarkCloud *cloud=(mafVMELandmarkCloud *)importer->GetOutput();
   cloud->Open();
 
-  //cloud->SetParent(storage->GetRoot());
+  
 
   medVMEComputeWrapping *wrappedMeter;
   mafNEW(wrappedMeter);
@@ -68,9 +68,7 @@ void medOpExporterWrappedMeterTest::Test()
   wrappedMeter->SetMeterLink(cloud->GetLandmark(2)->GetName(),cloud->GetLandmark(2));
   wrappedMeter->SetMeterLink(cloud->GetLandmark(3)->GetName(),cloud->GetLandmark(3));
   wrappedMeter->SetMeterLink(cloud->GetLandmark(4)->GetName(),cloud->GetLandmark(4));
-  //wrappedMeter->PushIdVector(cloud->GetId()); // for landmark middlepoint is memorized as sequence of cloud id and interal id of the landmark
-  //wrappedMeter->PushIdVector(2); //this is for the vector syncronized with the gui widget, that is not used in gui test
-
+ 
 
   wrappedMeter->SetParent(cloud);
   wrappedMeter->GetOutput()->GetVTKData()->Update();
