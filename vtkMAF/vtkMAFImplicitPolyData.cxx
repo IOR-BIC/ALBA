@@ -13,7 +13,7 @@ ToDo:
 #include "vtkMAFImplicitPolyData.h"
 #include "vtkPolygon.h"
 
-vtkCxxRevisionMacro(vtkMAFImplicitPolyData, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFImplicitPolyData, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFImplicitPolyData);
 
 // Constructor
@@ -31,7 +31,6 @@ vtkMAFImplicitPolyData::vtkMAFImplicitPolyData()
   this->Poly    = NULL;
   this->Cells   = NULL;
 
-  this->EvaluateBoundsSet=0;
 }
 //----------------------------------------------------------------------------
 void vtkMAFImplicitPolyData::SetInput(vtkPolyData *input) 
@@ -71,15 +70,7 @@ void vtkMAFImplicitPolyData::SetInput(vtkPolyData *input)
   }
 }
 // used to extend bounds of point locator
-//----------------------------------------------------------------------------
-void vtkMAFImplicitPolyData::SetEvaluateBounds( double eBounds[6] )
-//----------------------------------------------------------------------------
-{
-  int i;
-  for( i=0; i<6; i++ ) 
-    this->EvaluateBounds[i] = eBounds[i];
-  this->EvaluateBoundsSet = 1;
-}
+
 //----------------------------------------------------------------------------
 unsigned long vtkMAFImplicitPolyData::GetMTime()
 //----------------------------------------------------------------------------

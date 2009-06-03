@@ -32,8 +32,6 @@ public:
   vtkTypeRevisionMacro(vtkMAFImplicitPolyData, vtkImplicitFunction);
 
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  void SetEvaluateBounds( double eBounds[6] );
   
   /**
   Evaluate plane equation of nearest triangle to point x[3].*/
@@ -77,7 +75,7 @@ protected:
   vtkPolygon *Poly;
   vtkIdList *Cells;
 
-  double EvaluateBounds[6];
-  int   EvaluateBoundsSet;
+  /** friend test class */
+  friend class vtkMAFImplicitPolyDataTest;
 };
 #endif
