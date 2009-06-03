@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-02-25 16:43:09 $
-Version:   $Revision: 1.5.2.2 $
+Date:      $Date: 2009-06-03 15:59:06 $
+Version:   $Revision: 1.5.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -20,17 +20,27 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafGUICheckListBox;
 
-//----------------------------------------------------------------------------
-// medGUIDicomSettings :
-//----------------------------------------------------------------------------
 /**
+  Class Name : medGUIDicomSettings.
+  Class that contain specific variables regard DICOM, that can be changed from Application Settings, in GUI.
+  - Dictionary path
+  - DICOM type
+  - automatic crop position
+  - time bar enable
+  - number of slice enable
+  - step 
+  - side
+  - conversion units
 */
 class medGUIDicomSettings : public mafGUISettings
 {
 public:
+  /** constructor.*/
 	medGUIDicomSettings(mafObserver *Listener, const mafString &label = _("Dicom"));
+  /** destructor.*/
 	~medGUIDicomSettings(); 
 
+  /** GUI IDs*/
 	enum DICOM_SETTINGS_WIDGET_ID
 	{
 		ID_DICTONARY = MINID,
@@ -43,6 +53,7 @@ public:
     ID_CONVERT_UNITS,
 	};
 
+  /** Modality IDs*/
 	enum DICOM_MODALITY
 	{
 		ID_CT_MODALITY = 0,
@@ -53,6 +64,7 @@ public:
 		ID_CMRI_MODALITY,
 	};
 
+  /** Step IDs*/
 	enum DICOM_STEP
 	{
 		ID_1X = 0,
@@ -61,6 +73,7 @@ public:
 		ID_4X,
 	};
 
+  /** Conversion IDs*/
   enum DICOM_CONVERSION
   {
     NONE = 0,
@@ -70,12 +83,18 @@ public:
 	/** Answer to the messages coming from interface. */
 	void OnEvent(mafEventBase *maf_event);
 
+  /** Retrieve Dictionary path name. */
 	mafString GetDictionary(){return m_Dictionary;};
 
+  /** Retrieve Automatic Crop Position Flag. */
 	int AutoCropPosition(){return m_AutoCropPos;};
+  /** Retrieve if is enabled the flag for setting the number of timestamps */
 	int EnableNumberOfTime(){return m_EnableNumberOfTime;};
+  /** Retrieve if is enabled the the flag for setting the number of slices */
 	int EnableNumberOfSlice(){return m_EnableNumberOfSlice;};
+  /** Retrieve the build step. */
   int GetBuildStep(){return m_Step;};
+  /** Retrieve if the flag of changing side is enabled */
   int EnableChangeSide(){return m_EnableChangeSide;};
 
 	/** Return if a particular type of Dicom is Enabled to be read */

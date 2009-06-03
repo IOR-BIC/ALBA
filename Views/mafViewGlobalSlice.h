@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-06-03 15:59:26 $
+  Version:   $Revision: 1.9.2.1 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,16 +35,21 @@ class vtkProperty;
 class vtkPolyDataMapper;
 class vtkActor;
 
-//----------------------------------------------------------------------------
-// mafViewGlobalSlice :
-//----------------------------------------------------------------------------
+/**
+  Class Name: mafViewGlobalSlice.
+  View class that visualize actors sliced from an implicit plane that operates in all
+  the 3d world.
+*/
 
 class mafViewGlobalSlice: public mafViewVTK
 {
 public:
+  /** constructor. */
   mafViewGlobalSlice(wxString label = "Global Slice", int camera_position = CAMERA_PERSPECTIVE, bool show_axes = false, bool show_grid = false, bool show_ruler = false, int stereo = 0);
+  /** destructor. */
   virtual ~mafViewGlobalSlice(); 
 
+  /** RTTI macro. */
   mafTypeMacro(mafViewGlobalSlice, mafViewVTK);
 
 	/** IDs for the view GUI */
@@ -55,9 +60,11 @@ public:
 		ID_OPACITY_SLIDER,
     ID_LAST
   };
-
+  
+  /** Function that clones instance of the object. */
 	virtual mafView *Copy(mafObserver *Listener);
 
+  /** Function that creates renderwindow, scenegraph, specific actors and interactors. */
 	virtual void Create();
 
 	/** 
@@ -69,8 +76,10 @@ public:
 	/** Delete vme's visual pipe. It is called when vme is removed from visualization.*/
   virtual void VmeDeletePipe(mafNode *vme);
 
+  /** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Function called when select a vme different from selected one.*/
 	virtual void VmeSelect(mafNode *node, bool select);
 
 	/** Set slicer parameter to generate the slice. */
@@ -82,15 +91,22 @@ public:
 	/** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
 
+  /** Force the updating of the camera. */
 	virtual void CameraUpdate();
 
 protected:
+  /** Force the updating of several slice parameters like origin, vectors and gui components. */
 	void UpdateSliceParameters();
+  /** Calculate for every actor the correct slice. */
 	void UpdateSlice();
+  /** Update the correct value corresponding to specific slice; this value is visualized with an actor.*/
 	void UpdateText();
+  /** Initialize position of the plane and actor properties.*/
 	void InizializePlane();
+  /** Update origin, point1 and point2 of the vtkPlaneSource. */
 	void UpdatePlane();
 
+  /** Create gui widgets that will be attached in view settings tab in side bar.*/
 	virtual mafGUI  *CreateGui();
 
 	double		m_SliceOrigin[3];
