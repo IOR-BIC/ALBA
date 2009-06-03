@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-29 15:57:55 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-06-03 15:30:37 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -47,6 +47,8 @@ public:
   
   /** Export the Wrapped meter coordinates in file. */
   void ExportWrappedMeterCoordinates();
+  /** test method copy from test medOpExporterWrappedMeterTest**/
+  void Test() ;
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
