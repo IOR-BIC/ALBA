@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-03 13:33:26 $
-Version:   $Revision: 1.1.2.21 $
+Date:      $Date: 2009-06-04 12:05:40 $
+Version:   $Revision: 1.1.2.22 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -97,7 +97,21 @@ MafMedical is partially based on OpenMAF.
 #include "vtkUnsignedShortArray.h"
 #include "vtkCharArray.h"
 
+
+//BES: 4.7.2009 - VS 2008 cannot compile it due to the following error
+//C:\MAF\Medical\Libraries\Offis\Sources\dcmtk-3.5.4\config\include\dcmtk/config/cfwin32.h(362) : error C2371: 'ssize_t' : redefinition; different basic types
+//  C:\MAF\openMAF\Libraries\wxWin\Sources\include\wx/defs.h(1018) : see declaration of 'ssize_t'
+//this here is to patch it
+#if _MSC_VER >= 1500
+#define ssize_t VS2008_ssize_t_HACK 
+#endif
+
 #include "dcmtk/config/osconfig.h"    /* make sure OS specific configuration is included first */
+
+#if _MSC_VER >= 1500
+#undef VS2008_ssize_t_HACK
+#endif
+
 #include "dcmtk/ofstd/ofstream.h"
 #include "dcmtk/ofstd/ofstring.h"
 #include "dcmtk/dcmdata/dctk.h"
