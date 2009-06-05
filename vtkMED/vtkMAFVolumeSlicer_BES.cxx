@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-05-19 15:06:25 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-06-05 12:07:15 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alexander Savenko, Josef Kohout (major change)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
 
 #include "mafMemDbg.h"
@@ -237,7 +237,7 @@ void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output)
     imageData->GetSpacing(dataSpacing);
     for (int i = 0; i < 3; i++)
     {
-      dataSpacing[i] *= this->DataDimensions[i];
+      dataSpacing[i] *= (this->DataDimensions[i] - 1);
 #ifdef _WIN32
       this->m_GPUDataDimensions[i] = dataSpacing[i];
 #endif
@@ -829,24 +829,27 @@ unsigned int vtkMAFVolumeSlicer_BES::GetGLDataType(int nVTKdata_type)
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
     glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP); 
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP); 
+    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);//GL_CLAMP); 
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);//GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);//GL_CLAMP); 
     
-    /*glTexImage3D(GL_TEXTURE_3D, 0, nComps, this->DataDimensions[0],
-      this->DataDimensions[1], this->DataDimensions[2], 0, 
-      (nComps == 1 ? GL_RED : GL_RGB), inGLDtype, 
-      input->GetPointData()->GetScalars()->GetVoidPointer(0)); */
+    //glTexImage3D(GL_TEXTURE_3D, 0, nComps, this->DataDimensions[0],
+    //  this->DataDimensions[1], this->DataDimensions[2], 0, 
+    //  (nComps == 1 ? GL_RED : GL_RGB), inGLDtype, 
+    //  input->GetPointData()->GetScalars()->GetVoidPointer(0)); 
 
     GLint iformat;
     if (inDType == VTK_CHAR || inDType == VTK_UNSIGNED_CHAR)
        iformat = GL_ALPHA;
-    if (inDType == VTK_SHORT || inDType == VTK_UNSIGNED_SHORT)
+    else if (inDType == VTK_SHORT || inDType == VTK_UNSIGNED_SHORT)
       iformat = GL_ALPHA16;
     else
       iformat = GL_ALPHA32F_ARB;
@@ -855,7 +858,15 @@ unsigned int vtkMAFVolumeSlicer_BES::GetGLDataType(int nVTKdata_type)
       this->DataDimensions[1], this->DataDimensions[2], 0, 
       (nComps == 1 ? GL_ALPHA : GL_RGB), inGLDtype, 
       input->GetPointData()->GetScalars()->GetVoidPointer(0)); 
-    
+ 
+    //memset(input->GetPointData()->GetScalars()->GetVoidPointer(0),
+    //  -1, 64*64*64);
+
+    //glTexImage3D(GL_TEXTURE_3D, 0, iformat, 64,
+    //  64, 64, 0, 
+    //  (nComps == 1 ? GL_ALPHA : GL_RGB), inGLDtype, 
+    //  input->GetPointData()->GetScalars()->GetVoidPointer(0)); 
+
     if (glGetError() != GL_NO_ERROR) 
     {
       vtkWarningMacro(<< "Unexpected GPU failure,  CPU will be used.");
@@ -1257,6 +1268,15 @@ bool vtkMAFVolumeSlicer_BES::CreateGPUProvider()
     "  gl_FragColor = texture3D(voxels, tcoord);  \n"
     "}\n";
 
+  //wxString ps;
+  //FILE* f = fopen("g:\\shader.glsl", "rt");
+  //char buffer[MAX_PATH + 1];
+  //while (fgets(buffer, MAX_PATH, f))
+  //{
+  //  ps += buffer;
+  //}
+  //fclose(f);
+
   wxString err;
   if (!m_pGPUProvider->CreateShaders(NULL, ps, &err))
   {
@@ -1322,7 +1342,9 @@ void vtkMAFVolumeSlicer_BES::CreateImageGPU(OutputDataType* output, vtkImageData
     m_pGPUProvider->SetParameter("dimension", m_GPUDataDimensions);
 
     //bind our texture is in the first texture unit
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, m_TextureId);
+
     m_pGPUProvider->SetParameter("voxels", (int)0);
 
     m_pGPUProvider->InitializeComputation();             
