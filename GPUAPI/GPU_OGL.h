@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: GPU_OGL.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-19 15:06:02 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-06-05 13:03:44 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -58,11 +58,11 @@ protected:
 
   friend class mafGPUOGLContext;
 
+  int m_nGPUGLContextRef;  //<larger than 0, if our OpenGL context is active
 
   HWND m_hRWnd;         //<rendering window
   HDC m_hRWndHDC;       //<Windows device context  
   HGLRC m_hRWndGL;      //<OpenGL rendering device context
-  int m_nGPUGLContextRef;  //<larger than 0, if our OpenGL context is active
 
   HDC m_hPrevRWndDC;    //<previous Windows device context associated with the current thread
   HGLRC m_hPrevRWndGL;  //<previous OpenGL rendering device context associated with the current thread
@@ -246,6 +246,7 @@ public:
   void DisableRenderingContext();
 
 protected:
+#ifdef _WIN32
   /** Results true if the given OpenGL extension is supported */
   bool IsExtSupported(const char* extension);  
 
@@ -265,6 +266,7 @@ protected:
 
   /** Formats Windows LastError into err */
   void GetLastErrorText(wxString* err);
+#endif // _WIN32
 };
 
 #endif // GPU_OGL_h__

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: GPU_OGL.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2008-12-16 13:22:26 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-06-05 13:03:44 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -11,14 +11,15 @@
   =========================================================================
 */
 
-#if WIN32
+#ifdef _WIN32
 #include <Windows.h>
-#endif
+#endif // _WIN32
 #include "GPU_OGL.h"
 
 /*static*/bool mafGPUOGL::m_bGPUOGLSupported = false;
 /*static*/bool mafGPUOGL::m_bGPUOGLInitialized = false;
 
+#ifdef _WIN32
 #ifdef _DEBUG
 // Define targa header.
 #pragma pack(1)
@@ -113,6 +114,7 @@ GLint gltWriteTGA(const char *szFileName, GLenum gltyp)
   return 1;
 }
 #endif // _DEBUG
+#endif // _WIN32
 
 
 
@@ -165,20 +167,19 @@ mafGPUOGL::mafGPUOGL()
 mafGPUOGL::~mafGPUOGL()
 {
   DestroyShaders();
+#ifdef _WIN32
   DestroyRenderingContext();
+#endif // _WIN32
 }
 
+#ifdef _WIN32
 //------------------------------------------------------------------------
 // Results true if the given OpenGL extension is supported
 bool mafGPUOGL::IsExtSupported(const char* extension)
 //------------------------------------------------------------------------
 {
-#ifndef _WIN32
-  return false;
-#else
   mafGPUOGLContext context(this);
   return glewGetExtension(extension) == GL_TRUE;
-#endif
 }
 
 //------------------------------------------------------------------------
@@ -225,6 +226,7 @@ void mafGPUOGL::DestroyRenderingContext()
 
   DestroyRenderingWindow();
 }
+#endif // _WIN32
 
 //------------------------------------------------------------------------
 //Initializes simple vertex and fragment shader 
@@ -235,7 +237,7 @@ bool mafGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
 {
 #ifndef _WIN32
   if (err != NULL)
-    *err = _("GPU OGL is not supported on the current OS platform");
+    *err = "GPU OGL is not supported on the current OS platform";
   return false;
 #else
   //we have to create rendering context (if it does not already exists)
@@ -311,6 +313,7 @@ bool mafGPUOGL::CreateShaders(const char* vs, const char* ps, wxString* err)
 void mafGPUOGL::DestroyShaders()
 //------------------------------------------------------------------------
 {
+#ifdef _WIN32
   //activate our rendering context
   mafGPUOGLContext myContext(this);  
 
@@ -328,6 +331,7 @@ void mafGPUOGL::DestroyShaders()
     glDeleteObjectARB(m_progObj);
     m_progObj = 0;
   }
+#endif // _WIN32
 }
 
 //------------------------------------------------------------------------
@@ -382,8 +386,10 @@ bool mafGPUOGL::BeginExecute(wxString* err)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);      
 
   //BES: some problems may arise according to Baoquan because of internal format (GL_RGBA8) used in combination with GL_FLOAT
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_TargetWidth, m_TargetHeight, 0, GL_RGB, GL_FLOAT, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F_ARB, m_TargetWidth, m_TargetHeight, 0, GL_RGBA, GL_FLOAT, 0);
 
+  if (glGetError() != GL_NO_ERROR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_TargetWidth, m_TargetHeight, 0, GL_RGBA, GL_FLOAT, 0);
   m_pFBO->Bind(); // Bind framebuffer object.
 
   // Attach texture to framebuffer color buffer
@@ -544,6 +550,7 @@ bool mafGPUOGL::ExecuteProgram(wxString* err)
   return true;
 }
 
+#ifdef _WIN32
 //------------------------------------------------------------------------
 //Copies the result from the framebuffer (target) into the given buffer
 //The buffer must be capable to hold W*H pixels, i.e., W*H bytes if 
@@ -551,7 +558,6 @@ bool mafGPUOGL::ExecuteProgram(wxString* err)
 void mafGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
 //------------------------------------------------------------------------
 {
-#ifdef _WIN32
   //switch to our context
   mafGPUOGLContext context(this);
 
@@ -561,7 +567,7 @@ void mafGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
   //we will read from the texture
   glBindTexture(GL_TEXTURE_2D, m_TextureId);
   glGetTexImage(GL_TEXTURE_2D, 0, 
-     (bGetVector ? GL_RGB : GL_RED), data_type, pBuffer);
+     (bGetVector ? GL_RGB : GL_ALPHA), data_type, pBuffer);
 
 #ifdef _DEBUG
   GLenum err = glGetError();
@@ -572,7 +578,6 @@ void mafGPUOGL::GetResult(void* pBuffer, GLenum data_type, bool bGetVector)
   //if (++nCurImage == 100)
   //  nCurImage = 0;  //wrap
 #endif // _DEBUG
-#endif
 
   //restore pixel storei to original one
   glPixelStorei(GL_PACK_ALIGNMENT, 4);   
@@ -704,7 +709,6 @@ void mafGPUOGL::DestroyRenderingWindow()
 void mafGPUOGL::GetLastErrorText(wxString* err)
 //------------------------------------------------------------------------
 {
-#ifdef _WIN32
   if (err != NULL)
   {
     LPVOID lpMsgBuf;
@@ -723,7 +727,6 @@ void mafGPUOGL::GetLastErrorText(wxString* err)
     err->Printf("%s", lpMsgBuf);
     LocalFree(lpMsgBuf);
   }
-#endif
 }
 
 //------------------------------------------------------------------------
@@ -769,3 +772,4 @@ void mafGPUOGL::DisableRenderingContext()
   mafGPUOGLContext context(this);
   m_nGPUGLContextRef--;
 }
+#endif // _WIN32
