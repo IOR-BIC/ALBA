@@ -62,6 +62,16 @@ SET(PROJECT_SRCS
   medVMEOutputComputeWrapping.cpp
   medVMEOutputComputeWrapping.h 
   
+  medPipeVectorField.cpp
+  medPipeVectorField.h
+  medPipeCompound.cpp
+  medPipeCompound.h
+  medPipeCompoundVolume.cpp
+  medPipeCompoundVolume.h
+  medPipeCompoundVolumeFixedScalars.cpp
+  medPipeCompoundVolumeFixedScalars.h
+  
+  
   ### TO BE COMMITTED DOWN ###
   mafPipeSlice.cpp
   mafPipeSlice.h
