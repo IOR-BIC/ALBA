@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-14 15:26:48 $
-  Version:   $Revision: 1.13.2.2 $
+  Date:      $Date: 2009-06-08 15:11:33 $
+  Version:   $Revision: 1.13.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -50,8 +50,10 @@
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipeVolumeSlice_BES.h"
-#include "mafVMEVolumeLarge.h"
+///////
 
+#include "medPipeCompoundVolume.h"
+#include "medPipeCompoundVolumeFixedScalars.h"
 
 #include <string>
 #include <ostream>
@@ -116,14 +118,18 @@ medPipeFactoryVME::medPipeFactoryVME()
 
 #endif
 
+  mafPlugPipeMacro(medPipeCompoundVolume, "Compound pipe for rendering volumes.");
+  mafPlugPipeMacro(medPipeCompoundVolumeIsosurface,"Compound Pipe for render vtk volumes as a iso-surface");
+  mafPlugPipeMacro(medPipeCompoundVolumeMIP, "Compound pipe for render vtk volumes with MIP ray cast method.");
+  mafPlugPipeMacro(medPipeCompoundVolumeDRR, "Compound pipe for render vtk volumes with XRay cast method.");
+  mafPlugPipeMacro(medPipeCompoundVolumeVR, "Compound pipe for render vtk volumes with Volume Rendere cast method.");
+
+
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future
   mafPlugPipeMacro(mafPipeVolumeSlice_BES, "BES: mafPipeVolumeSlice_BES.");
   mafPlugPipeMacro(mafPipeSurfaceSlice_BES, "BES: mafPipeSurfaceSlice.");
   mafPlugPipeMacro(mafPipePolylineSlice_BES, "BES: mafPipePolylineSlice_BES.");
-  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES."); 
-
-  //TODO: to be committed down
-  mafPlugPipeMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
+  mafPlugPipeMacro(mafPipeMeshSlice_BES, "BES: mafPipeMeshSlice_BES.");   
 }
 /*
 //------------------------------------------------------------------------------

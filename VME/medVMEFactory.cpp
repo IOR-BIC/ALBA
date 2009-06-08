@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-24 14:57:13 $
-  Version:   $Revision: 1.13.2.1 $
+  Date:      $Date: 2009-06-08 15:11:33 $
+  Version:   $Revision: 1.13.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -34,6 +34,7 @@
   #include "medVMEAnalog.h"
 #endif
 
+#include "mafVMEVolumeLarge.h"
 
 #include "mafIndent.h"
 #include <string>
@@ -90,6 +91,9 @@ medVMEFactory::medVMEFactory()
   mafPlugNodeMacro(medVMEAnalog,"VME rapresenting EMG scalar data");
 #endif
   //mafPlugNodeMacro(mafVMEthing,"VME representing a thing");
+  
+  //TODO: to be committed down
+  mafPlugNodeMacro(mafVMEVolumeLarge, "VME storing large volume datasets with one scalar component");
 }
 
 //------------------------------------------------------------------------------
