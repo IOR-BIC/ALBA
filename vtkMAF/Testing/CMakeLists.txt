@@ -93,3 +93,9 @@ IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFImplicitPolyDataTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ vtkMAFTextOrientatorTest
+ADD_EXECUTABLE(vtkMAFTextActorMeterTest vtkMAFTextActorMeterTest.h vtkMAFTextActorMeterTest.cpp)
+ADD_TEST(vtkMAFTextActorMeterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTextActorMeterTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFTextActorMeterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
