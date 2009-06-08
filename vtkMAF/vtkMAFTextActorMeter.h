@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFTextActorMeter.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-09 08:29:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-06-08 14:54:55 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -20,62 +20,79 @@
 #ifndef __vtkMAFTextActorMeter_h
 #define __vtkMAFTextActorMeter_h
 
-
+//------------------------------------------------------------------------------
+// Includes:
+//------------------------------------------------------------------------------
 #include "vtkMAFConfigure.h" //??
-
 #include "vtkActor.h"
 #include "vtkActor2D.h"
 #include "vtkTextActor.h"
 
+//------------------------------------------------------------------------------
+// Forward declarations
+//------------------------------------------------------------------------------
 class vtkViewport;
 class vtkCamera;
 class vtkRenderer;
 
-
-
 /**
-an actor displaying world X and Y axes as an Actor2D.
-Camera must be in ParallelProjection and aligned with world axis
+class vtkMAFTextActorMeter:
+  An actor displaying world X and Y axes as an Actor2D.
+  Camera must be in ParallelProjection and aligned with world axis.
 */
-
 //-----------------------------------------------------------------------------
 class VTK_vtkMAF_EXPORT vtkMAFTextActorMeter : public vtkActor2D
 //-----------------------------------------------------------------------------
 {
  public:
+  /** RTTI macro. */
   vtkTypeRevisionMacro(vtkMAFTextActorMeter,vtkActor2D);
+  /** Print useful information. */
   void PrintSelf(ostream& os, vtkIndent indent);
+  /** Create an instance of the object. */
   static	vtkMAFTextActorMeter *New();
   
+  /** Method is intended for rendering. */
   int	 RenderOverlay(vtkViewport *viewport);
-  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
+  /** Method is intended for rendering Opaque Geometry */
+  int	 RenderOpaqueGeometry(vtkViewport *viewport);
+  /** Method is intended for rendering Translucent Geometry */
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;}
  
+  /** Retrieve text actor input. */
   char*   GetText(){return TextActor->GetInput();}
+  /** Modify text actor input. */
   void 	  SetText(const char * inputString){TextActor->SetInput(inputString);}
+  /** Modify text actor position. */
   void    SetTextPosition(double pos[3]){TextPosition[0]=pos[0];TextPosition[1]=pos[1];TextPosition[2]=pos[2];TextPosition[3]=1;}
+  /** Retrieve text actor position. */
   double* GetTextPosition();
 
+  /** Modify text actor color. */
   void SetColor(double r,double g,double b);
 	
-  
 protected:
-					vtkMAFTextActorMeter();
-					~vtkMAFTextActorMeter();
-	//methods
+  /** constructor. */
+	vtkMAFTextActorMeter();
+  /** destructor. */
+	~vtkMAFTextActorMeter();
 	
+  /** Create Instances of text actor. */
 	void			MeterCreate();	
+  /** Update 2d Position of the meter */
 	void			MeterUpdate(vtkRenderer *ren);
-   //variables
-    vtkTextActor *TextActor;
-    double TextPosition[4];
+   
+  //variables
+  vtkTextActor *TextActor;
+  double TextPosition[4];
 
 	
 private:
-  // hide the two parameter Render() method from the user and the compiler.
+  /** Hide the two parameter Render() method from the user and the compiler. */
   virtual void Render(vtkRenderer *, vtkMapper *) {};
-private:
-  vtkMAFTextActorMeter(const vtkMAFTextActorMeter&);  	// Not implemented.
-  void operator=(const vtkMAFTextActorMeter&);  // Not implemented.
+  /** Copy Constructor Not implemented. */
+  vtkMAFTextActorMeter(const vtkMAFTextActorMeter&);
+  /** Assign Operator Not implemented. */
+  void operator=(const vtkMAFTextActorMeter&);
 };
 #endif
