@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEFactoryTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-03-11 14:53:24 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-09 09:58:16 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -93,6 +93,10 @@ void medVMEFactoryTest::CreateVMEInstance()
   medVMEFactory *vme_factory = NULL;
   vme_factory = (medVMEFactory*) medVMEFactory::GetInstance();
 
+  std::vector<std::string> orig_vmes = vme_factory->GetNodeNames();
+  int orig_s1 = (int)orig_vmes.size();
+
+
   mafPlugNode<medVMECustom>("a custom vme"); // plug a vme in the main node factory
 
   mafVME *vme0 = vme_factory->CreateVMEInstance("medVMENotExisting");
@@ -105,15 +109,14 @@ void medVMEFactoryTest::CreateVMEInstance()
 
   std::vector<std::string> vmes = vme_factory->GetNodeNames();
   int s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 32); //24 VMES are registered in mafVMEFActory constructor actually + 7 from medVMEFactory, 
-                            //please modify also the test when (un)plugged inside maf and update this number
-           
+  CPPUNIT_ASSERT(s1 == orig_s1 + 1);
+
   // test factory contents
   //poor proof to register again an already registered vme
   mafPlugNode<medVMECustom>("a custom vme"); // plug a vme in the main node factory again
   vmes = vme_factory->GetNodeNames();
   s1 = vmes.size();
-  CPPUNIT_ASSERT(s1 == 32);
+  CPPUNIT_ASSERT(s1 == orig_s1 + 1);
 
   bool found=false;
   for (int i=0;i<vmes.size();i++)
