@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffistoMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-04 12:05:40 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-06-09 15:05:23 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -498,11 +498,23 @@ int medOpImporterDicomOffisToMesh::BuildVolumeCineMRI()
 
       // show the current slice
       int currImageId = GetImageId(ts, sourceVolumeSliceId);
-      m_ListSelected->Item(currImageId)->GetData()->GetOutput()->Update();
+      //m_ListSelected->Item(currImageId)->GetData()->GetOutput()->Update();
+
+      if (currImageId != -1) 
+      {
+        // update v_texture ivar
+        //ShowSlice(currImageId);
+        CreateSlice(currImageId);
+      }
+
+
+
 
 
       vtkMAFSmartPointer<vtkImageReslice> reslice;
-      reslice->SetInput(m_ListSelected->Item(currImageId)->GetData()->GetOutput());
+      //reslice->SetInput(m_ListSelected->Item(currImageId)->GetData()->GetOutput());
+      reslice->SetInput(m_SliceTexture->GetInput());
+
       reslice->SetResliceAxesDirectionCosines(m_ImageOrientationPatient);
       reslice->SetOutputSpacing(reslice->GetInput()->GetSpacing());
       reslice->SetOutputOrigin(reslice->GetInput()->GetOrigin());
@@ -1949,7 +1961,7 @@ void medOpImporterDicomOffisToMesh::CreateSlice(int slice_num)
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
 		clip->SetOrigin(crop_bounds[0], crop_bounds[2], loc[m_SortAxes]);	//modified by Paolo 12-11-2003
-		clip->SetSpacing(spacing[0], spacing[1], (crop_bounds[5]-crop_bounds[4]));
+		clip->SetSpacing(spacing[0], spacing[1], 0);
 		clip->SetDimensions(dim_x_clip, dim_y_clip, 1);
 		clip->Update();
 
