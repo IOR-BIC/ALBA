@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-08 15:34:14 $
-  Version:   $Revision: 1.13.2.4 $
+  Date:      $Date: 2009-06-09 16:04:32 $
+  Version:   $Revision: 1.13.2.5 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -54,7 +54,9 @@
 
 #include "medPipeCompoundVolume.h"
 #include "medPipeCompoundVolumeFixedScalars.h"
-#include "medPipeVectorField.h"
+#include "medPipeVectorFieldGlyphs.h"
+#include "medPipeVectorFieldSurface.h"
+#include "medPipeVectorFieldSlice.h"
 
 #include <string>
 #include <ostream>
@@ -124,7 +126,9 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(medPipeCompoundVolumeMIP, "Compound pipe for render vtk volumes with MIP ray cast method.");
   mafPlugPipeMacro(medPipeCompoundVolumeDRR, "Compound pipe for render vtk volumes with XRay cast method.");
   mafPlugPipeMacro(medPipeCompoundVolumeVR, "Compound pipe for render vtk volumes with Volume Rendere cast method.");
-  mafPlugPipeMacro(medPipeVectorField, "Pipe for rendering of vector fields using various glyphs.");
+  mafPlugPipeMacro(medPipeVectorFieldGlyphs, "Pipe for rendering of vector fields using various glyphs.");
+  mafPlugPipeMacro(medPipeVectorFieldSurface, "Pipe for rendering of vector fields using color mapping on the object surface.");
+  mafPlugPipeMacro(medPipeVectorFieldSlice, "Pipe for rendering of vector fields using color mapping on the slice of the object.");
 
 
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future

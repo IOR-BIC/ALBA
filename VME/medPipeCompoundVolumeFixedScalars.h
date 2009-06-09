@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolumeFixedScalars.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:10:54 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-06-09 16:04:32 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -51,7 +51,7 @@ protected:
 
   /** Gets the default scalar visual pipe */
   virtual const char* GetDefaultVectorVisualPipe() {
-    return "medPipeVectorField";  //no visual pipe available
+    return "medPipeVectorFieldGlyphs";  //no visual pipe available
   }
 
   /** Gets the default scalar visual pipe */
