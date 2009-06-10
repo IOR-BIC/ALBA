@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medGUIDynamicVP.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:09:17 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-06-10 15:29:13 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -55,6 +55,7 @@ medGUIDynamicVP::medGUIDynamicVP( wxWindow* parent, wxWindowID id, long GUIstyle
   m_VPipes = NULL;
   m_VPipe = NULL;    
   m_comboVP = NULL;
+  m_VPipeIndex = -1; 
   
   //create items
   wxBoxSizer* bSizerMain = new wxBoxSizer( wxVERTICAL );
