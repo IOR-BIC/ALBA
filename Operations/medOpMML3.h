@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-05-29 11:05:29 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-10 14:22:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,6 +26,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUIButton.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
+#include "mafVMELandmark.h"
 #include "mafTagItem.h"
 #include "mafRWI.h"
 
@@ -36,14 +37,15 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //----------------------------------------------------------------------------
-// TODO 28.5.09
+// TODO 10.6.09
 // Replace "grain" in dialog with actual resolution
 // Calculation of slice size and position is very poor - sort it out
-// Possible mistakes in setting translation matrices.
-// Why is the output only transformed by inv(finalm), which doesn't include "transform 1" ?
 // Contour widget can be too big, so you lose the scaling handles.
 // Restore commented-out sections.
 // Is it ok to have only 3 slices ?
+// Add accept() to landmark selection.
+// Range covered by slices only goes between landmarks - might not reach ends of bone.
+// Too many options in input dialog - need to explain or simplify.
 //----------------------------------------------------------------------------
 
 
@@ -52,7 +54,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 /// Muscle Modelling Lab. \n
 /// This operation allows the user to deform a polydata model of a muscle or bone
 /// to fit a volume image of the feature. \n
-/// The inputs are a volume (the patient data) and a surface (the model).
+/// The inputs are a volume (the patient data) and a muscle surface (the model).
+/// Global registration is performed by matching a set of 3 or 4 landmarks on patient and model.
 //------------------------------------------------------------------------------
 class medOpMML3: public mafOp
 {
@@ -66,6 +69,17 @@ public:
   void OpStop(int result);
   void OpDo();
   void OpUndo();
+
+
+  /// static callback which allows vme selector to select only this type
+  static bool AcceptVMELandmark(mafNode *node)
+  {
+    mafVME* vme = mafVME::SafeDownCast(node);
+    bool hello1 = (vme != NULL) ;
+    bool hello2 = vme->GetOutput()->IsA("mafVMELandmark") ;
+    return ((vme != NULL) && vme->IsA("mafVMELandmark")) ;
+  }
+
 
 protected:
   void CreateInputsDlg();         ///< Dialog to select the polydata surface
@@ -85,14 +99,38 @@ protected:
   /// visual pipe for labelling.
   mafRWI* CreateParameterViewmafRWI(vtkTextSource *ts, wxString lab, float r, float g, float b);
 
+  /// Get absolute position of landmark. \n
+  /// Required because landmark->GetPoint() only returns pos relative to parent.
+  void GetAbsPosOfLandmark(mafVMELandmark *landmark, double point[3]) ;
 
+  /// Create default set of landmarks
+  void CreateFakeLandmarks() ;
+
+  /// Set inputs to model view, including landmarks
+  bool SetUpModelViewInputs();
+
+
+  void ApplyRegistrationOps();        ///< Apply the deformations to the model
+  void ApplyInverseRegistrationOps(); ///< Apply inverse deformations (not implemented)
+
+  void Update();
+
+  void ResetOperation();
+
+  /// Set up a specific set of landmarks (not currently used)
+  void SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
+
+
+  //----------------------------------------------------------------------------
+  // Event handlers
+  //----------------------------------------------------------------------------
   void OnEvent(mafEventBase *e); ///< Event handler
   void OnSOperationButton();
   void OnROperationButton();
   void OnTOperationButton();
   void OnPOperationButton();
   void OnRegistrationCANCEL();
-  void OnRegistrationOK();  ///< Registration ok - create ouput VME
+  void OnRegistrationOK();  ///< Registration ok - create output VME
 
   void OnSlider();
   void OnLut();
@@ -107,18 +145,11 @@ protected:
   void OnLandmark3AtlasPatientSelection();
   void OnLandmark4AtlasPatientSelection();
 
-  void ApplyInverseRegistrationOps();
-  void ApplyRegistrationOps();        ///< Apply the deformations to the model
-
-  void Update();
-
-  void    CreateFakeLandmarks();
-  bool    SetUpInputs();
-  void	  SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
-
-  void	ResetOperation();
 
 
+  //----------------------------------------------------------------------------
+  // Member variables
+  //----------------------------------------------------------------------------
 
   // dialogs
   mafGUIDialog	*m_ChooseDlg;		///< inputs dialog
@@ -131,95 +162,123 @@ protected:
   vtkPolyData         *m_Muscle;     ///< input surface vtk * pose matrix
 
   // parameter views
-  medOpMML3ParameterView *m_PH; // PH parameter view
-  medOpMML3ParameterView *m_PV; // PV parameter view
-  medOpMML3ParameterView *m_TH; // TH parameter view
-  medOpMML3ParameterView *m_TV; // TV parameter view
-  medOpMML3ParameterView *m_RA; // RA parameter view
-  medOpMML3ParameterView *m_SN; // SN parameter view
-  medOpMML3ParameterView *m_SS; // SS parameter view
-  medOpMML3ParameterView *m_SE; // SE parameter view
-  medOpMML3ParameterView *m_SW; // SW parameter view
+  medOpMML3ParameterView *m_PH; ///< PH parameter view
+  medOpMML3ParameterView *m_PV; ///< PV parameter view
+  medOpMML3ParameterView *m_TH; ///< TH parameter view
+  medOpMML3ParameterView *m_TV; ///< TV parameter view
+  medOpMML3ParameterView *m_RA; ///< RA parameter view
+  medOpMML3ParameterView *m_SN; ///< SN parameter view
+  medOpMML3ParameterView *m_SS; ///< SS parameter view
+  medOpMML3ParameterView *m_SE; ///< SE parameter view
+  medOpMML3ParameterView *m_SW; ///< SW parameter view
 
   // parameter views maf RWIs
-  mafRWI      *m_PHmafRWI;		// PH parameter view maf RWI
-  mafRWI      *m_PVmafRWI;		// PV parameter view maf RWI
-  mafRWI      *m_THmafRWI;		// TH parameter view maf RWI
-  mafRWI      *m_TVmafRWI;		// TV parameter view maf RWI
-  mafRWI      *m_RAmafRWI;		// RA parameter view maf RWI
-  mafRWI      *m_SNmafRWI;		// SN parameter view maf RWI
-  mafRWI      *m_SSmafRWI;		// SS parameter view maf RWI
-  mafRWI      *m_SEmafRWI;		// SE parameter view maf RWI
-  mafRWI      *m_SWmafRWI;		// SW parameter view maf RWI
+  mafRWI      *m_PHmafRWI;		///< PH parameter view maf RWI
+  mafRWI      *m_PVmafRWI;		///< PV parameter view maf RWI
+  mafRWI      *m_THmafRWI;		///< TH parameter view maf RWI
+  mafRWI      *m_TVmafRWI;		///< TV parameter view maf RWI
+  mafRWI      *m_RAmafRWI;		///< RA parameter view maf RWI
+  mafRWI      *m_SNmafRWI;		///< SN parameter view maf RWI
+  mafRWI      *m_SSmafRWI;		///< SS parameter view maf RWI
+  mafRWI      *m_SEmafRWI;		///< SE parameter view maf RWI
+  mafRWI      *m_SWmafRWI;		///< SW parameter view maf RWI
 
-  // model view
-  medOpMML3ModelView     *m_Model;
-
-  // model view maf RWI
-  mafRWI		*m_ModelmafRWI;
-
-  //
-  medOpMML3ContourWidget *m_Widget;  // interactive contour widget
+  medOpMML3ModelView *m_Model;	///< model view
+  mafRWI *m_ModelmafRWI;		///< model view maf RWI
+  medOpMML3ContourWidget *m_Widget;  ///< contour widget which controls contours in model view
 
 
-  int             m_Slice;
-  mafGUILutSlider   *m_Lut;
-  wxRadioBox     *m_Radio;
+  // flags etc
+  int m_CurrentSlice;	///< id of current slice 
+  int m_State;			///< current operation (used to validate a radio button, now defunct)
+  int m_ShowAxes;		///< show contour axes flag
+  int m_ContourVisibility ; ///< show contour
+  int m_MuscleType;	///< muscle type (axis is single line or piecewise 2 lines)
+  int m_RegistrationStatus;	///< flag indicating if registration has taken place
+  int m_3DFlag;	///< flag indicating if model view is 2D or 3D
+  int m_LandmarksFlag;	///< flag indicating if 4th landmark is used
 
-  int             m_State;
-  int             m_ShowAxes;
-  int             m_ContourVisibility ;
+  // parameters of scans (slices)
+  //double m_ScansDistance;
+  int m_ScansNumber ; ///< number of scans
+  int m_ScansGrain;
+  double m_ScansSize[2]; ///< size of scans (does this class need its own copy ?)
+  double m_ScansResolution[2]; ///< res of scans
+  double m_RegistrationXYScalingFactor ; ///< factor used in model
+  double m_ScansDistance ;  ///< spacing of scans (Nigel 9.6.09)
 
-  wxString             m_VolName;
-  wxString             m_SurfaceName;
+  vtkTextSource *m_textSource[9] ;  ///< text sources used in CreateParameterViewmafRWI()
+
+
+
+  //----------------------------------------------------------------------------
+  // Names and tags
+  //----------------------------------------------------------------------------
 
   // msf file sections
-  wxString			   m_AtlasMSFSectionName;
-  wxString			   m_PatientMSFSectionName;
+  wxString m_AtlasMSFSectionName;
+  wxString m_PatientMSFSectionName;
 
-  //atlas landmarks
-  //names
-  wxString             m_L1Name;
-  wxString             m_L2Name;
-  wxString             m_L3Name;
-  wxString             m_L4Name;
-  // points
-  double			   m_L1Point[3];
-  double			   m_L2Point[3];
-  double			   m_L3Point[3];
-  double			   m_L4Point[3];
+  // volume and surface names
+  wxString m_VolName;
+  wxString m_SurfaceName;
 
-  //patient landmarks
-  // names
-  wxString             m_P1Name;
-  wxString             m_P2Name;
-  wxString             m_P3Name;
-  wxString             m_P4Name;
-  // points
-  double			   m_P1[3];
-  double			   m_P2[3];
-  double			   m_P3[3];
-  double			   m_P4[3];
+  // operation tags
+  mafTagItem *m_CurrentSliceIdStackTag;
+  mafTagItem *m_ZValueStackTag;
+  mafTagItem *m_OperationTypeStackTag;
+  mafTagItem *m_Parameter1StackTag;
+  mafTagItem *m_Parameter2StackTag;
 
-  // muscle type
-  int m_MuscleType;
+  // coords tags
+  mafTagItem *m_CoordsXTag;
+  mafTagItem *m_CoordsYTag;
+  mafTagItem *m_CoordsZTag;
 
-  // registration status
-  int m_RegistrationStatus;
 
-  // 3d flag
-  int m_3DFlag;
 
-  // 4 landmarks flag
-  int m_LandmarksFlag;
+  //----------------------------------------------------------------------------
+  // Landmarks
+  //----------------------------------------------------------------------------
 
-  // other parameters
-  //double m_ScansDistance;
-  int	 m_ScansNumber, m_ScansNumber2;
-  double m_RegistrationXYScalingFactor, m_RegistrationXYScalingFactor2;
-  double m_ScansSize[2];
-  double m_ScansResolution[2];
-  int m_ScansGrain;
+  // atlas landmarks defined
+  bool m_L1Defined ;
+  bool m_L2Defined ;
+  bool m_L3Defined ;
+  bool m_L4Defined ;
+
+  // atlas landmark names
+  wxString m_L1Name;
+  wxString m_L2Name;
+  wxString m_L3Name;
+  wxString m_L4Name;
+
+  // atlas landmark points
+  double m_L1Point[3];
+  double m_L2Point[3];
+  double m_L3Point[3];
+  double m_L4Point[3];
+
+  // patient landmark names
+  wxString m_P1Name;
+  wxString m_P2Name;
+  wxString m_P3Name;
+  wxString m_P4Name;
+
+  // patient landmark points
+  double m_P1Point[3];
+  double m_P2Point[3];
+  double m_P3Point[3];
+  double m_P4Point[3];
+
+
+
+  //----------------------------------------------------------------------------
+  // Widgets
+  //----------------------------------------------------------------------------
+
+  mafGUILutSlider *m_Lut;
+  wxRadioBox *m_Radio;
 
   mafGUIButton *m_ChooseOk;
   mafGUIButton *m_AxesOnOffButton;
@@ -236,23 +295,8 @@ protected:
 
   wxColour m_ButtonBackgroundColour;
 
-  // operation tags
-  mafTagItem *m_SliceIdStackTag;
-  mafTagItem *m_ZValueStackTag;
-  mafTagItem *m_OperationTypeStackTag;
-  mafTagItem *m_Parameter1StackTag;
-  mafTagItem *m_Parameter2StackTag;
-
-  // coords tags
-  mafTagItem *m_CoordsXTag;
-  mafTagItem *m_CoordsYTag;
-  mafTagItem *m_CoordsZTag;
-
-  wxTextCtrl   *m_ScansNumberTxt;
-  wxTextCtrl   *m_RegistrationXYSxalingFactorTxt;
-
-  // text sources used in CreateParameterViewmafRWI()
-  vtkTextSource *m_textSource[9] ;
+  wxTextCtrl *m_ScansNumberTxt;
+  wxTextCtrl *m_RegistrationXYSxalingFactorTxt;
 
 };
 #endif

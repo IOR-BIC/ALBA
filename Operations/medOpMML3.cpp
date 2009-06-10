@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-29 11:05:29 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-10 14:22:46 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,12 +68,14 @@ enum
 
   // set up dlg events
   ID_CHOOSE_SURFACE,
-  /*
+
+  // Nigel A
   ID_CHOOSE_L1,
   ID_CHOOSE_L2,
   ID_CHOOSE_L3,
   ID_CHOOSE_L4,
-  */
+  // Nigel A end
+
   ID_CHOOSE_FAKE, // dummy id with no associated event
   ID_CHOOSE_OK,
   ID_CHOOSE_CANCEL,
@@ -94,7 +96,11 @@ enum
   //
   ID_STATE,
   ID_CHOOSE_SCANS_DISTANCE,
-  //ID_FAKE,
+
+  // Nigel A
+  ID_FAKE,
+  // Nigel A end
+
 };
 
 
@@ -129,7 +135,7 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_RotateOpButton = NULL;
   m_ScaleOpButton = NULL;
 
-  m_Slice = 1; // start up slice
+  m_CurrentSlice = 0; // start up slice
   m_State = 0; // start up operation (place)
   m_ShowAxes = 1; // contour line axes switched on
   m_ContourVisibility = 1; // contour switched on
@@ -290,6 +296,12 @@ void medOpMML3::CreateInputsDlg()
   // vertical stacker for the rows of widgets
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
 
+  // set flags to indicate that no landmarks have been defined
+  m_L1Defined = false ;
+  m_L2Defined = false ;
+  m_L3Defined = false ;
+  m_L4Defined = false ;
+
 
   // select muscle surface vme
   wxStaticText *lab_1  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Surface", wxPoint(0,0), wxSize(150,20));
@@ -305,13 +317,12 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_1, 0, wxEXPAND | wxALL, 2);
 
 
-
-  /*
+  // Nigel A
   // landmarks
-  wxStaticText *lab_5  = new wxStaticText(m_choose_dlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_5 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_5->SetValidator(mafGUIValidator(this,ID_CHOOSE_L1,text_5,&m_l1_name));
-  mafGUIButton *b_5       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L1,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_5  = new wxStaticText(m_ChooseDlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_5 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_5->SetValidator(mafGUIValidator(this,ID_CHOOSE_L1,text_5,&m_L1Name));
+  mafGUIButton *b_5       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L1,"select",wxPoint(0,0), wxSize(50,20));
   b_5->SetListener(this);
   wxBoxSizer *hs_5 = new wxBoxSizer(wxHORIZONTAL);
   hs_5->Add(lab_5,0);
@@ -319,10 +330,10 @@ void medOpMML3::CreateInputsDlg()
   hs_5->Add(b_5,0);
   vs1->Add(hs_5,0,wxEXPAND | wxALL, 2);
 
-  wxStaticText *lab_6  = new wxStaticText(m_choose_dlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_6 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_6->SetValidator(mafGUIValidator(this,ID_CHOOSE_L2,text_6,&m_l2_name));
-  mafGUIButton *b_6       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L2,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_6  = new wxStaticText(m_ChooseDlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_6 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_6->SetValidator(mafGUIValidator(this,ID_CHOOSE_L2,text_6,&m_L2Name));
+  mafGUIButton *b_6       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L2,"select",wxPoint(0,0), wxSize(50,20));
   b_6->SetListener(this);
   wxBoxSizer *hs_6 = new wxBoxSizer(wxHORIZONTAL);
   hs_6->Add(lab_6,0);
@@ -330,10 +341,10 @@ void medOpMML3::CreateInputsDlg()
   hs_6->Add(b_6,0);
   vs1->Add(hs_6,0,wxEXPAND | wxALL, 2);
 
-  wxStaticText *lab_7  = new wxStaticText(m_choose_dlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_7 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_7->SetValidator(mafGUIValidator(this,ID_CHOOSE_L3,text_7,&m_l3_name));
-  mafGUIButton *b_7       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L3,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_7  = new wxStaticText(m_ChooseDlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_7 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_7->SetValidator(mafGUIValidator(this,ID_CHOOSE_L3,text_7,&m_L3Name));
+  mafGUIButton *b_7       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L3,"select",wxPoint(0,0), wxSize(50,20));
   b_7->SetListener(this);
   wxBoxSizer *hs_7 = new wxBoxSizer(wxHORIZONTAL);
   hs_7->Add(lab_7,0);
@@ -341,45 +352,45 @@ void medOpMML3::CreateInputsDlg()
   hs_7->Add(b_7,0);
   vs1->Add(hs_7,0,wxEXPAND | wxALL, 2);
 
-  #ifdef TestingVersion
-  wxStaticText *lab_8  = new wxStaticText(m_choose_dlg, -1, "Landmark 4", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_8 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_8->SetValidator(mafGUIValidator(this,ID_CHOOSE_L4,text_8,&m_l4_name));
-  mafGUIButton *b_8       = new mafGUIButton(m_choose_dlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
+#ifdef TestingVersion
+  wxStaticText *lab_8  = new wxStaticText(m_ChooseDlg, -1, "Landmark 4", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_8 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_8->SetValidator(mafGUIValidator(this,ID_CHOOSE_L4,text_8,&m_L4Name));
+  mafGUIButton *b_8       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
   b_8->SetListener(this);
   wxBoxSizer *hs_8 = new wxBoxSizer(wxHORIZONTAL);
   hs_8->Add(lab_8,0);
   hs_8->Add(text_8,1,wxEXPAND);
   hs_8->Add(b_8,0);
   vs1->Add(hs_8,0,wxEXPAND | wxALL, 2);
-  #endif
+#endif
 
   // registration xy scaling factor
-  wxStaticText *RegistrationXYSxalingFactorLab  = new wxStaticText(m_choose_dlg, -1, "XY scale (0.01 - 2.0)", wxPoint(0,0), wxSize(150,20));
-  RegistrationXYSxalingFactorTxt = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  RegistrationXYSxalingFactorTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor,0.01,2.0)); // min/max values
+  wxStaticText *RegistrationXYSxalingFactorLab  = new wxStaticText(m_ChooseDlg, -1, "XY scale (0.01 - 2.0)", wxPoint(0,0), wxSize(150,20));
+  m_RegistrationXYSxalingFactorTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
+  m_RegistrationXYSxalingFactorTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor,0.01,2.0)); // min/max values
   wxBoxSizer *RegistrationXYSxalingFactorSizer = new wxBoxSizer(wxHORIZONTAL);
   RegistrationXYSxalingFactorSizer->Add(RegistrationXYSxalingFactorLab,0);
-  RegistrationXYSxalingFactorSizer->Add(RegistrationXYSxalingFactorTxt,1,wxEXPAND);
+  RegistrationXYSxalingFactorSizer->Add(m_RegistrationXYSxalingFactorTxt,1,wxEXPAND);
   vs1->Add(RegistrationXYSxalingFactorSizer,0,wxEXPAND | wxALL, 2);
 
 
   // scans distance
-  wxStaticText *ScansDistanceLab  = new wxStaticText(m_choose_dlg, -1, "Slice distance (0.1 - 100.0)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansDistanceTxt = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
+  wxStaticText *ScansDistanceLab  = new wxStaticText(m_ChooseDlg, -1, "Slice distance (0.1 - 100.0)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *ScansDistanceTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
   ScansDistanceTxt->SetValidator(mafGUIValidator(this,ID_FAKE,ScansDistanceTxt,&m_ScansDistance,0.1,100)); // min/max values
   wxBoxSizer *ScansDistanceHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansDistanceHorizontalSizer->Add(ScansDistanceLab,0);
   ScansDistanceHorizontalSizer->Add(ScansDistanceTxt,1,wxEXPAND);
   vs1->Add(ScansDistanceHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  */
+  // Nigel A end
 
 
 
   // scans number
   wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice number (3 - 100)", wxPoint(0,0), wxSize(150,20));
   m_ScansNumberTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  m_ScansNumberTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_ScansNumberTxt,& m_ScansNumber, 3, 100)); // min/max values
+  m_ScansNumberTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_ScansNumberTxt, &m_ScansNumber, 3, 100)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
   ScansNumberHorizontalSizer->Add(m_ScansNumberTxt,1,wxEXPAND);
@@ -388,10 +399,10 @@ void medOpMML3::CreateInputsDlg()
 
   /*
   // scans x y size (now done automatically)
-  wxStaticText *ScansSizeLab  = new wxStaticText(m_choose_dlg, -1, "Slice size (1 - 128)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansSizeTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  wxStaticText *ScansSizeLab  = new wxStaticText(m_ChooseDlg, -1, "Slice size (1 - 128)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *ScansSizeTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
   ScansSizeTxt1->SetValidator(mafGUIValidator(this,ID_FAKE,ScansSizeTxt1,&m_ScansSize[0],1,128)); //min/max values
-  wxTextCtrl   *ScansSizeTxt2 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  wxTextCtrl   *ScansSizeTxt2 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
   ScansSizeTxt2->SetValidator(mafGUIValidator(this,ID_FAKE,ScansSizeTxt2,&m_ScansSize[1],1,128)); // min/max values
   wxBoxSizer *ScansSizeHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansSizeHorizontalSizer->Add(ScansSizeLab,0);
@@ -421,24 +432,24 @@ void medOpMML3::CreateInputsDlg()
   flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(flagHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
-  /*
+  // Nigel A
   // 4 landmarks flag
-  wxStaticText *LandmarksflagLab  = new wxStaticText(m_choose_dlg, -1, "4 Landmarks (0/1)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *LandmarksflagTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  LandmarksflagTxt1->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,LandmarksflagTxt1,&m_Landmarksflag,0,1));
+  wxStaticText *LandmarksflagLab  = new wxStaticText(m_ChooseDlg, -1, "4 Landmarks (0/1)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *LandmarksflagTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  LandmarksflagTxt1->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,LandmarksflagTxt1,&m_LandmarksFlag,0,1));
   wxBoxSizer *LandmarksflagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   LandmarksflagHorizontalSizer->Add(LandmarksflagLab, 0);
   LandmarksflagHorizontalSizer->Add(LandmarksflagTxt1,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(LandmarksflagHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  */
+  // Nigel A end
 #endif
 
   /*
   // scans x y resolution  (set automatically from scans x, y size)
-  wxStaticText *ScansResolutionLab  = new wxStaticText(m_choose_dlg, -1, "Slice resolution (8 - 256)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansResolutionTxt1 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  wxStaticText *ScansResolutionLab  = new wxStaticText(m_ChooseDlg, -1, "Slice resolution (8 - 256)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *ScansResolutionTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
   ScansResolutionTxt1->SetValidator(mafGUIValidator(this,ID_FAKE,ScansResolutionTxt1,&m_ScansResolution[0],8,256));
-  wxTextCtrl   *ScansResolutionTxt2 = new wxTextCtrl(m_choose_dlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
+  wxTextCtrl   *ScansResolutionTxt2 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
   ScansResolutionTxt2->SetValidator(mafGUIValidator(this,ID_FAKE,ScansResolutionTxt2,&m_ScansResolution[1],8,256));
   wxBoxSizer *ScansResolutionHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansResolutionHorizontalSizer->Add(ScansResolutionLab,0);
@@ -594,17 +605,20 @@ void medOpMML3::CreateRegistrationDlg()
 
   // create mml model view
   m_Model = new medOpMML3ModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, m_Muscle, m_Volume);
-  // initialise
-  CreateFakeLandmarks();
-  SetUpInputs();
+
+
+  // set up landmarks
+  if (!m_L1Defined || !m_L2Defined || !m_L3Defined)
+    CreateFakeLandmarks(); // create default landmarks if full set is not defined
+  SetUpModelViewInputs(); // pass landmarks to model view
 
 
   // maf slider widget 
   wxStaticText *lab  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(-1, 16));
   wxTextCtrl   *text = new wxTextCtrl  (m_OpDlg, ID_SLICE, "hello",  wxPoint(0,0), wxSize(20, 16),wxNO_BORDER |wxTE_READONLY );
 
-  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 1, m_Model->GetTotalNumberOfSyntheticScans(), wxPoint(0,0), wxSize(269,-1));
-  sli->SetValidator(mafGUIValidator(this,ID_SLICE,(wxSlider*)sli,&m_Slice,text));
+  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 0, m_Model->GetTotalNumberOfSyntheticScans()-1, wxPoint(0,0), wxSize(269,-1));
+  sli->SetValidator(mafGUIValidator(this, ID_SLICE, (wxSlider*)sli, &m_CurrentSlice, text));
 
 
   // maf parameter views RWI's
@@ -791,6 +805,22 @@ void medOpMML3::GetVtkInputs()
 
 
 //------------------------------------------------------------------------------
+// Get absolute position of landmark.
+// Required because landmark->GetPoint() only returns pos relative to parent.
+void medOpMML3::GetAbsPosOfLandmark(mafVMELandmark *landmark, double point[3])
+//------------------------------------------------------------------------------
+{
+  vtkMatrix4x4 *mat = landmark->GetOutput()->GetAbsMatrix()->GetVTKMatrix() ;
+  point[0] = mat->GetElement(0,3) ;
+  point[1] = mat->GetElement(1,3) ;
+  point[2] = mat->GetElement(2,3) ;
+}
+
+
+
+
+
+//------------------------------------------------------------------------------
 // Event handler
 void medOpMML3::OnEvent(mafEventBase *maf_event) 
 //------------------------------------------------------------------------------
@@ -802,28 +832,24 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
       //
       OnMuscleSelection();
       break;
-      /*
 
-      case ID_CHOOSE_L1: // set up dlg L1
-      //
+      // Nigel A
+    case ID_CHOOSE_L1: // set up dlg L1
       OnLandmark1AtlasPatientSelection();
       break;
 
-      case ID_CHOOSE_L2: // set up dlg L2
-      //
+    case ID_CHOOSE_L2: // set up dlg L2
       OnLandmark2AtlasPatientSelection();
       break;
 
-      case ID_CHOOSE_L3: // set up dlg L3
-      //
+    case ID_CHOOSE_L3: // set up dlg L3
       OnLandmark3AtlasPatientSelection();
       break;
 
-      case ID_CHOOSE_L4: // set up dlg L4
-      //
+    case ID_CHOOSE_L4: // set up dlg L4
       OnLandmark4AtlasPatientSelection();
       break;
-      */
+      // Nigel A end
 
     case ID_CHOOSE_OK: // set up dlg ok
       m_ChooseDlg->EndModal(wxID_OK);
@@ -1093,25 +1119,25 @@ void medOpMML3::OnSlider()
 //----------------------------------------------------------------------------
 {
   //
-  m_Model->SetCurrentIdOfSyntheticScans(m_Slice - 1);
+  m_Model->SetCurrentIdOfSyntheticScans(m_CurrentSlice);
 
   // switch off non-relevant scans
   for (int j = 0; j < m_Model->GetTotalNumberOfSyntheticScans(); j++)
     m_Model->GetActorOfSyntheticScans(j)->VisibilityOff();
 
   // switch on current scan
-  m_Model->GetActorOfSyntheticScans(m_Slice - 1)->VisibilityOn();
+  m_Model->GetActorOfSyntheticScans(m_CurrentSlice)->VisibilityOn();
 
   // update line actors
-  m_PH->SetLineActorX(m_Slice - 1);
-  m_PV->SetLineActorX(m_Slice - 1);
-  m_TH->SetLineActorX(m_Slice - 1);
-  m_TV->SetLineActorX(m_Slice - 1);
-  m_RA->SetLineActorX(m_Slice - 1);
-  m_SN->SetLineActorX(m_Slice - 1);
-  m_SS->SetLineActorX(m_Slice - 1);
-  m_SE->SetLineActorX(m_Slice - 1);
-  m_SW->SetLineActorX(m_Slice - 1);
+  m_PH->SetLineActorX(m_CurrentSlice);
+  m_PV->SetLineActorX(m_CurrentSlice);
+  m_TH->SetLineActorX(m_CurrentSlice);
+  m_TV->SetLineActorX(m_CurrentSlice);
+  m_RA->SetLineActorX(m_CurrentSlice);
+  m_SN->SetLineActorX(m_CurrentSlice);
+  m_SS->SetLineActorX(m_CurrentSlice);
+  m_SE->SetLineActorX(m_CurrentSlice);
+  m_SW->SetLineActorX(m_CurrentSlice);
 
   //
   Update();
@@ -1210,6 +1236,7 @@ void medOpMML3::OnMuscleSelection()
     // flag (active)
     m_RegistrationStatus = 1;
 
+
     // tag 2: number of slices
     if(vme->GetTagArray()->IsTagPresent("NUMBER_OF_SLICES_TAG") == false)
     {
@@ -1220,9 +1247,9 @@ void medOpMML3::OnMuscleSelection()
     NumberOfSlicesTag = vme->GetTagArray()->GetTag("NUMBER_OF_SLICES_TAG");
     m_ScansNumber = NumberOfSlicesTag->GetComponentAsDouble(0);
 
-    // can not change slice number
-    m_ScansNumber2 = m_ScansNumber;
-    m_ScansNumberTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_ScansNumberTxt,&m_ScansNumber2,3,100)); // min/max values
+    // Disable widget so no. of slices can't be changed
+    m_ScansNumberTxt->Enable(false) ;
+
 
     // tag 3: xy scaling factors
     if(vme->GetTagArray()->IsTagPresent("XY_SCALING_FACTORS_TAG") == false)
@@ -1234,9 +1261,9 @@ void medOpMML3::OnMuscleSelection()
     XYScalingFactorsTag = vme->GetTagArray()->GetTag("XY_SCALING_FACTORS_TAG");
     m_RegistrationXYScalingFactor = XYScalingFactorsTag->GetValueAsDouble(0);
 
-    // can not change xy scaling factor
-    m_RegistrationXYScalingFactor2 = m_RegistrationXYScalingFactor;
-    m_RegistrationXYSxalingFactorTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor2,0.01,2.0)); // min/max values
+    // Disable widget so scaling factor can't be changed
+    m_RegistrationXYSxalingFactorTxt->Enable(false) ;
+
 
     // tag 4: operation stack
     //
@@ -1246,7 +1273,7 @@ void medOpMML3::OnMuscleSelection()
       wxMessageBox("Slice id tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
       return;
     }
-    m_SliceIdStackTag = vme->GetTagArray()->GetTag("SLICE_ID_STACK_TAG");
+    m_CurrentSliceIdStackTag = vme->GetTagArray()->GetTag("SLICE_ID_STACK_TAG");
 
     // z value
     if(vme->GetTagArray()->IsTagPresent("Z_VALUE_STACK_TAG") == false)
@@ -1280,6 +1307,7 @@ void medOpMML3::OnMuscleSelection()
     }
     m_Parameter2StackTag = vme->GetTagArray()->GetTag("PARAMETER_2_STACK_TAG");
 
+
     // tag 5: type of muscle
     if(vme->GetTagArray()->IsTagPresent("TYPE_OF_MUSCLE_TAG") == false)
     {
@@ -1298,7 +1326,7 @@ void medOpMML3::OnMuscleSelection()
   }
 
   // set up landmarks (parameters are .msf section names)
-  // SetUpLandmarks(m_AtlasMSFSectionName, m_PatientMSFSectionName);
+  // SetUpLandmarks1(m_AtlasMSFSectionName, m_PatientMSFSectionName);
 
   //
   mafVME *RootVME;
@@ -1322,7 +1350,7 @@ void medOpMML3::OnMuscleSelection()
   }
 
 
-  // set muscle data to input * pose matrix
+  // set muscle data to input * abs pose matrix
   vtkTransform *transform = vtkTransform::New();
   vtkTransformPolyDataFilter *musclepd = vtkTransformPolyDataFilter::New();
   transform->SetMatrix(m_SurfaceVME->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
@@ -1338,9 +1366,9 @@ void medOpMML3::OnMuscleSelection()
 
   //
   //	// if all landmarks chosen
-  //	if (m_l1_name.compare("none") != 0 &&
-  //		m_l2_name.compare("none") != 0 &&
-  //		m_l3_name.compare("none") != 0
+  //	if (m_L1Name.compare("none") != 0 &&
+  //		m_L2Name.compare("none") != 0 &&
+  //		m_L3Name.compare("none") != 0
   //	   )
   //	{
   //		// activate ok button
@@ -1836,10 +1864,8 @@ void medOpMML3::OnOperation()
 //----------------------------------------------------------------------------
 {
   // operations
-  if (m_State == 0) // place
-  {
-    if (m_Model->GetScalingOccured())
-    {
+  if (m_State == 0){ // place
+    if (m_Model->GetScalingOccured()){
       m_State = 3;
       m_OpDlg->TransferDataToWindow();
       wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
@@ -1855,64 +1881,56 @@ void medOpMML3::OnOperation()
 
     m_Widget->CenterModeOn();
   }
-  else
-    if (m_State == 1) // translate
-    {
-      if (m_Model->GetScalingOccured())
-      {
-        m_State = 3;
-        m_OpDlg->TransferDataToWindow();
-        wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
-        return;
-      }
-
-      //
-      ResetOperation();
-
-      // prepare display information
-      m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-      m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
-
-      // prepare widget
-      m_Widget->TranslationModeOn();
+  else if (m_State == 1){ // translate
+    if (m_Model->GetScalingOccured()){
+      m_State = 3;
+      m_OpDlg->TransferDataToWindow();
+      wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
+      return;
     }
-    else
-      if (m_State == 2) // rotate
-      {
-        if (m_Model->GetScalingOccured())
-        {
-          m_State = 3;
-          m_OpDlg->TransferDataToWindow();
-          wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
-          return;
-        }
 
-        //
-        ResetOperation();
+    //
+    ResetOperation();
 
-        m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    // prepare display information
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
+    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-        m_Widget->UpdateRotationHandle();
-        m_Widget->RotationHandleOn();
-        m_Widget->RotationModeOn();
-      }
-      else
-        if (m_State == 3) // scale
-        {
-          m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    // prepare widget
+    m_Widget->TranslationModeOn();
+  }
+  else if (m_State == 2){ // rotate
+    if (m_Model->GetScalingOccured()){
+      m_State = 3;
+      m_OpDlg->TransferDataToWindow();
+      wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
+      return;
+    }
 
-          //
-          ResetOperation();
+    //
+    ResetOperation();
 
-          m_Widget->UpdateScalingHandles();
-          m_Widget->ScalingHandlesOn();
-          m_Widget->ScalingModeOn();
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
-          // on successful scaling, ScalingOccured flag in Model
-          // is set to true, medOpMML3ContourWidget::OnLeftButtonUp
-        }
-        else
-          wxMessageBox("Unknown operation","alert",wxICON_WARNING);
+    m_Widget->UpdateRotationHandle();
+    m_Widget->RotationHandleOn();
+    m_Widget->RotationModeOn();
+  }
+  else if (m_State == 3){ // scale
+    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+
+    //
+    ResetOperation();
+
+    m_Widget->UpdateScalingHandles();
+    m_Widget->ScalingHandlesOn();
+    m_Widget->ScalingModeOn();
+
+    // on successful scaling, ScalingOccured flag in Model
+    // is set to true, medOpMML3ContourWidget::OnLeftButtonUp
+  }
+  else
+    wxMessageBox("Unknown operation","alert",wxICON_WARNING);
 
   //
   m_Model->Render();
@@ -2005,12 +2023,10 @@ void medOpMML3::OnContourVisibility()
       // handle
       m_Widget->RotationHandleOn();
     }
-    else
-      if (m_Widget->GetScalingMode())
-      {
-        // handles
-        m_Widget->ScalingHandlesOn();
-      }
+    else if (m_Widget->GetScalingMode()){
+      // handles
+      m_Widget->ScalingHandlesOn();
+    }
   }
   else // non-visible
   {
@@ -2026,12 +2042,10 @@ void medOpMML3::OnContourVisibility()
       // handle
       m_Widget->RotationHandleOff();
     }
-    else
-      if (m_Widget->GetScalingMode())
-      {
-        // handles
-        m_Widget->ScalingHandlesOff();
-      }
+    else if (m_Widget->GetScalingMode()){
+      // handles
+      m_Widget->ScalingHandlesOff();
+    }
   }
 
   m_Model->Render();
@@ -2054,6 +2068,7 @@ void medOpMML3::OnLandmark1AtlasPatientSelection()
   mafString title = "Select Landmark 1 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = (mafVME*)e.GetVme();
   if(!vme) return;
@@ -2117,6 +2132,7 @@ void medOpMML3::OnLandmark1AtlasPatientSelection()
     wxMessageBox("Landmark missing from " + m_PatientMSFSectionName + " section","alert",wxICON_WARNING);
     return;
   }
+
   // get landmark
   mafVMELandmark *L1PatientVMELandmark = mafVMELandmark::SafeDownCast(L1PatientVME);
   if(L1PatientVMELandmark == NULL)
@@ -2126,25 +2142,27 @@ void medOpMML3::OnLandmark1AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_L1Point);
-  L1PatientVMELandmark->GetPoint(m_P1);
+  GetAbsPosOfLandmark(lm, m_L1Point); // nb we need abs pos of landmark
+  L1PatientVMELandmark->GetPoint(m_P1Point);
 
   // set name
   m_L1Name = vme->GetName();
   m_P1Name = L1PatientVME->GetName();
 
+  // set flag
+  m_L1Defined = (m_L1Name.compare("none") != 0) ;
+
+
   // if all landmarks chosen
-  if (m_L1Name.compare("none") != 0 &&
-    m_L2Name.compare("none") != 0 &&
-    m_L3Name.compare("none") != 0
-    )
+  if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0)
   {
     // activate ok button
     m_ChooseOk->Enable(true);
   }
-  else
+  else{
     // de-activate ok button
     m_ChooseOk->Enable(false);
+  }
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -2230,6 +2248,7 @@ void medOpMML3::OnLandmark2AtlasPatientSelection()
     wxMessageBox("Landmark missing from " + m_PatientMSFSectionName + " section","alert",wxICON_WARNING);
     return;
   }
+
   // get landmark
   mafVMELandmark *L2PatientVMELandmark = mafVMELandmark::SafeDownCast(L2PatientVME);
   if(L2PatientVMELandmark == NULL)
@@ -2239,25 +2258,26 @@ void medOpMML3::OnLandmark2AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_L2Point);
-  L2PatientVMELandmark->GetPoint(m_P2);
+  GetAbsPosOfLandmark(lm, m_L2Point); // nb we need abs pos of landmark
+  L2PatientVMELandmark->GetPoint(m_P2Point);
 
   // set name
   m_L2Name = vme->GetName();
   m_P2Name = L2PatientVME->GetName();
 
+  // set flag
+  m_L2Defined = (m_L2Name.compare("none") != 0) ;
+
+
   // if all landmarks chosen
-  if (m_L1Name.compare("none") != 0 &&
-    m_L2Name.compare("none") != 0 &&
-    m_L3Name.compare("none") != 0
-    )
-  {
+  if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0){
     // activate ok button
     m_ChooseOk->Enable(true);
   }
-  else
+  else{
     // de-activate ok button
     m_ChooseOk->Enable(false);
+  }
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -2343,6 +2363,7 @@ void medOpMML3::OnLandmark3AtlasPatientSelection()
     wxMessageBox("Landmark missing from " + m_PatientMSFSectionName + " section","alert",wxICON_WARNING);
     return;
   }
+
   // get landmark
   mafVMELandmark *L3PatientVMELandmark = mafVMELandmark::SafeDownCast(L3PatientVME);
   if(L3PatientVMELandmark == NULL)
@@ -2352,25 +2373,26 @@ void medOpMML3::OnLandmark3AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_L3Point);
-  L3PatientVMELandmark->GetPoint(m_P3);
+  GetAbsPosOfLandmark(lm, m_L3Point); // nb we need abs pos of landmark
+  L3PatientVMELandmark->GetPoint(m_P3Point);
 
   // set name
   m_L3Name = vme->GetName();
   m_P3Name = L3PatientVME->GetName();
 
+  // set flag
+  m_L3Defined = (m_L3Name.compare("none") != 0) ;
+
+
   // if all landmarks chosen
-  if (m_L1Name.compare("none") != 0 &&
-    m_L2Name.compare("none") != 0 &&
-    m_L3Name.compare("none") != 0
-    )
-  {
+  if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0){
     // activate ok button
     m_ChooseOk->Enable(true);
   }
-  else
+  else{
     // de-activate ok button
     m_ChooseOk->Enable(false);
+  }
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -2456,6 +2478,7 @@ void medOpMML3::OnLandmark4AtlasPatientSelection()
     wxMessageBox("Landmark missing from " + m_PatientMSFSectionName + " section","alert",wxICON_WARNING);
     return;
   }
+
   // get landmark
   mafVMELandmark *L3PatientVMELandmark = mafVMELandmark::SafeDownCast(L3PatientVME);
   if(L3PatientVMELandmark == NULL)
@@ -2465,25 +2488,26 @@ void medOpMML3::OnLandmark4AtlasPatientSelection()
   }
 
   // coordinates
-  lm->GetPoint(m_L3Point);
-  L3PatientVMELandmark->GetPoint(m_P3);
+  GetAbsPosOfLandmark(lm, m_L4Point); // nb we need abs pos of landmark
+  L3PatientVMELandmark->GetPoint(m_P3Point);
 
   // set name
   m_L3Name = vme->GetName();
   m_P3Name = L3PatientVME->GetName();
 
+  // set flag
+  m_L4Defined = (m_L4Name.compare("none") != 0) ;
+
+
   // if all landmarks chosen
-  if (m_L1Name.compare("none") != 0 &&
-    m_L2Name.compare("none") != 0 &&
-    m_L3Name.compare("none") != 0
-    )
-  {
+  if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0){
     // activate ok button
     m_ChooseOk->Enable(true);
   }
-  else
+  else{
     // de-activate ok button
     m_ChooseOk->Enable(false);
+  }
 
   // update window
   m_ChooseDlg->TransferDataToWindow();
@@ -2492,26 +2516,74 @@ void medOpMML3::OnLandmark4AtlasPatientSelection()
 
 
 
+
+
 //----------------------------------------------------------------------------
-bool medOpMML3::SetUpInputs()
+// Create default set of landmarks
+void medOpMML3::CreateFakeLandmarks() 
 //----------------------------------------------------------------------------
 {
+  double inputBounds[6]; 
+
+  assert(m_Input);
+  ((mafVME*)m_Input)->GetOutput()->GetBounds(inputBounds);
+  double xmed = (inputBounds[0] + inputBounds[1])/2;
+  double ymed = (inputBounds[2] + inputBounds[3])/2;
+
+  double lm1[3] = {xmed ,ymed ,inputBounds[5]}; //high
+  double lm2[3] = {xmed ,ymed, inputBounds[4]}; //low
+  double lm3[3] = {inputBounds[1], inputBounds[3], inputBounds[4]}; 
+
+  // copy default landmarks to patient and atlas
+  for (int i = 0 ;  i < 3 ;  i++){
+    m_L1Point[i] = lm1[i] ;
+    m_L2Point[i] = lm2[i] ;
+    m_L3Point[i] = lm3[i] ;
+    m_L4Point[i] = 0.0 ;
+
+    m_P1Point[i] = lm1[i] ;
+    m_P2Point[i] = lm2[i] ;
+    m_P3Point[i] = lm3[i] ;
+    m_P4Point[i] = 0.0 ;
+  }
+
+  // set flags indicating which landmarks are defined
+  m_L1Defined = true ;
+  m_L2Defined = true ;
+  m_L3Defined = true ;
+  m_L4Defined = false ;
+  m_LandmarksFlag = 0 ;
+}
+
+
+
+
+
+//----------------------------------------------------------------------------
+// Set inputs to model view, including landmarks
+bool medOpMML3::SetUpModelViewInputs()
+//----------------------------------------------------------------------------
+{
+  // Check that landmarks are defined
+  assert(m_L1Defined && m_L2Defined && m_L3Defined) ;
+
+
   // set muscle type (1 - one slicing axis, 2 - two slicing axes)
   m_Model->SetTypeOfMuscles(m_MuscleType);
-  /*
 
+  // Nigel A
   // set atlas landmarks
-  Model->SetLandmark1OfAtlas(m_l1_point); //high
-  Model->SetLandmark2OfAtlas(m_l2_point); //low
-  Model->SetLandmark3OfAtlas(m_l3_point);
-  Model->SetLandmark4OfAtlas(m_l4_point);
+  m_Model->SetLandmark1OfAtlas(m_L1Point); //high
+  m_Model->SetLandmark2OfAtlas(m_L2Point); //low
+  m_Model->SetLandmark3OfAtlas(m_L3Point);
+  m_Model->SetLandmark4OfAtlas(m_L4Point);
 
   // set patient landmarks
-  Model->SetLandmark1OfPatient(m_p1); //high
-  Model->SetLandmark2OfPatient(m_p2); //low
-  Model->SetLandmark3OfPatient(m_p3);
-  Model->SetLandmark4OfPatient(m_p4);
-  */
+  m_Model->SetLandmark1OfPatient(m_P1Point); //high
+  m_Model->SetLandmark2OfPatient(m_P2Point); //low
+  m_Model->SetLandmark3OfPatient(m_P3Point);
+  m_Model->SetLandmark4OfPatient(m_P4Point);
+  // Nigel A end
 
   // landmark flag
   m_Model->Set4LandmarksFlag(m_LandmarksFlag);
@@ -2667,7 +2739,7 @@ bool medOpMML3::SetUpParameterViews()
   {
 
     int NumberOfOperations;
-    NumberOfOperations = m_SliceIdStackTag->GetNumberOfComponents();
+    NumberOfOperations = m_CurrentSliceIdStackTag->GetNumberOfComponents();
 
     int MaxScanId;
     MaxScanId = m_Model->GetTotalNumberOfSyntheticScans() - 1;
@@ -2683,7 +2755,7 @@ bool medOpMML3::SetUpParameterViews()
       assert(NextOperationId < 2000);
 
       // values
-      params[0] = m_SliceIdStackTag->GetComponentAsDouble(i);
+      params[0] = m_CurrentSliceIdStackTag->GetComponentAsDouble(i);
       params[1] = m_ZValueStackTag->GetComponentAsDouble(i);
       params[2] = m_OperationTypeStackTag->GetComponentAsDouble(i);
       params[3] = m_Parameter1StackTag->GetComponentAsDouble(i);
@@ -2930,7 +3002,8 @@ mafRWI* medOpMML3::CreateParameterViewmafRWI(vtkTextSource *ts, wxString lab, fl
 
 
 //----------------------------------------------------------------------------
-void medOpMML3::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSectionVMEName)
+// Set up a specific set of landmarks
+void medOpMML3::SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSectionVMEName)
 //----------------------------------------------------------------------------
 {
   int i;
@@ -2978,8 +3051,7 @@ void medOpMML3::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSec
   m_P4Name      = "none";
 
   // select strings
-  if (m_SurfaceName.compare("obturator externus") == 0)
-  {
+  if (m_SurfaceName.compare("obturator externus") == 0){
     // landmarks
     Landmark1VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
     Landmark2VMEName = "bottom of inferior cavity in trochanteric fossa";
@@ -2989,476 +3061,428 @@ void medOpMML3::SetUpLandmarks(wxString AtlasSectionVMEName, wxString PatientSec
     b = 0.10; // 0.14
     m_MuscleType = 1;
   }
+  else if (m_SurfaceName.compare("gamellus inferior") == 0){
+    // landmarks
+    Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
+    Landmark2VMEName = "bottom of superior cavity in trochanteric fossa";
+    Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.15; // 1.07
+    b = 0.20; // 0.28
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("gamellus superior") == 0){
+    // landmarks
+    Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
+    Landmark2VMEName = "bottom of superior cavity in trochanteric fossa";
+    Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.65; // 1.60
+    b = 0.25; // 0.32
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("piriformis") == 0){
+    // landmarks
+    Landmark1VMEName = "Anterior surface of the Right sacrum between second and third foramen midway between line of foramen and lateral border (first sacral foramen is most superior)";
+    Landmark2VMEName = "most anterior superior point on greater trochanter";
+    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.20; // 1.14
+    b = 0.20; // 0.27
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("gluteus minimus") == 0){
+    // landmarks
+    Landmark1VMEName = "Top of ridge on lateral surface of the Right ilium between superior tubercle of iliac crest (pt. 39) and acetabulum (pt. 5) along a line from anterior superior iliac spine ASIS (pt. 1) to posterior superior iliac spine PSIS (pt. 3) ";
+    Landmark2VMEName = "center of depression on anterior surface of greater trochanter";
+    Landmark3VMEName = "Bottom of posterior depression on lateral surface of the Right ilium along a line from anterior superior iliac spine ASIS (pt. 1) to posterior superior iliac spine PSIS (pt. 3) ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.30; // 1.25
+    b = -0.05;// 0.00
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("tensor fasciae latae") == 0){
+    // landmarks
+    Landmark1VMEName = "Midpoint along Right lateral superior ridge of iliac crest between the anterior superior iliac spine ASIS and most lateral point on superior tubercle of the iliac crest ";
+    Landmark2VMEName = "impression for iliotibial tract on lateral anterior surface of superior end of tibia at height of fibular facet just below epiphysial line";
+    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.00; // 0.95
+    b = 0.60; // 0.69
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("adductor longus") == 0){
+    // landmarks
+    Landmark1VMEName = "Anterior corner of inferior surface of the Right pubic tubercle ";
+    Landmark2VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
+    Landmark3VMEName = "anterior medial corner of femoral shaft cross-section directly superior to medial border of patellar groove joins at height of juncture of medial supracondylar line and adductor tubercle ridge ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.00; // 0.92
+    b = -0.20;// -0.16
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("adductor brevis") == 0){
+    // landmarks
+    Landmark1VMEName = "Midpoint of lateral surface of the Right inferior pubic ramus ";
+    Landmark2VMEName = "on linea aspera at juncture of pectineal/gluteal lines";
+    Landmark3VMEName = "most medial corner of femoral shaft cross-section at height of midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.15; // 1.09
+    b = -0.20;// -0.14
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("rectus femoris") == 0){
+    // landmarks
+    Landmark1VMEName = "Right Anterior Inferior Iliac Spine ";
+    Landmark2VMEName = "Midside point on superior patella surface";
+    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
+    Landmark4VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
+    a = 1.05; // 0.97
+    b = 0.15; // 0.19
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("semitendinous") == 0){
+    // landmarks
+    Landmark1VMEName = "Posterior most point on medial border of posterior surface of the Right ischial tuberosity";
+    Landmark2VMEName = "medial corner near back of shaft inferior to base of tibial tubercle - near pes anserine bursa";
+    Landmark3VMEName = "most medial point on medial epicondyle";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.05; // 0.98
+    b = 0.25; // 0.32
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("gluteus maximus") == 0){
+    // landmarks
+    Landmark1VMEName = "Lateral corner of Right sacral-coccygeal facet  ";
+    Landmark2VMEName = "on gluteal line at height of inferior base of lesser trochanter";
+    Landmark3VMEName = "Right Posterior Superior Iliac Spine PSIS (repeat of pt. 3) ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.25; // 1.18
+    b = -0.20;// -0.15
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("gluteus medius") == 0){
+    // landmarks
+    Landmark1VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+    Landmark2VMEName = "lateral posterior prominence of greater trochanter";
+    Landmark3VMEName = "Bottom of posterior depression on lateral surface of the Right ilium along a line from most lateral point on superior tubercle of iliac crest to posterior superior iliac spine PSIS  ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.30; // 1.25
+    b = -0.25;// -0.18
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("pectineus") == 0){
+    // landmarks
+    Landmark1VMEName = "Base of the Right superior pubic ramus on superior surface lateral to pectineal line ";
+    Landmark2VMEName = "inferior base of lesser trochanter on pectineal line";
+    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.10; // 1.05
+    b = -0.15;// -0.09
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("adductor magnus") == 0){
+    // landmarks
+    Landmark1VMEName = "Most lateral aspect at posterior corner of lateral surface of Right ischial tuberosity ";
+    Landmark2VMEName = "superior corner of adductor tubercle above medial epicondyle";
+    Landmark3VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.10; // 1.05
+    b = 0.10; // 0.15
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("quadratus femoris") == 0){
+    // landmarks
+    Landmark1VMEName = "On lateral surface of Right ischial tuberosity at midpoint between obturator foramen and lateral posterior corner ";
+    Landmark2VMEName = "quadrate tubercle on intertrochanteric crest";
+    Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.05; // 1.00
+    b = -0.20;// -0.14
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("sartorius") == 0){
+    // landmarks
+    Landmark1VMEName = "Right Anterior Superior Iliac Spine (repeat of pt. 1) ";
+    Landmark2VMEName = "most medial point on medial epicondyle";
+    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
+    Landmark4VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
+    a = 1.05; // 1.00
+    b = -0.15;// -0.10
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("vastus medialis") == 0){
+    // landmarks
+    Landmark1VMEName = "most medial corner of femoral shaft cross-section at height of midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
+    Landmark2VMEName = "anterior medial corner of femoral shaft cross-section directly superior to medial border of patellar groove joins at height of juncture of medial supracondylar line and adductor tubercle ridge ";
+    Landmark3VMEName = "Most medial point on superior patella surface";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.85; // 1.80
+    b = -0.30;// -0.25
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("semimembranous") == 0){
+    // landmarks
+    Landmark1VMEName = "Bottom of superior depression on posterior surface of Right ischial tuberosity ";
+    Landmark2VMEName = "superior lip of depression on posterior surface of medial tibial condyle";
+    Landmark3VMEName = "superior medial corner of medial condyle";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 0.80; // 0.74
+    b = 0.00; // 0.06
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("obturator internal") == 0){
+    // DAVID P. 19-01-2005: This is not the permanent solution.
+    // landmarks
+    // old solution
+    //Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
+    //Landmark2VMEName = "bottom of superior cavity in trochanteric fossa";
+    //Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+
+    // re-shuffled solution (according to david's email)
+    Landmark2VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
+    Landmark3VMEName = "bottom of superior cavity in trochanteric fossa";
+    Landmark1VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.75; // 1.70
+    b = 0.50; // 0.58
+    m_MuscleType = 2;
+  }
+  else if (m_SurfaceName.compare("long head of the biceps") == 0){
+    // landmarks
+    Landmark1VMEName = "Posterior most point on medial border of posterior surface of the Right ischial tuberosity";
+    Landmark2VMEName = "superior most point on fibula (apex, styloid process)";
+    Landmark3VMEName = "superior medial corner of medial condyle";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.00; // 0.94
+    b = 0.15; // 0.20
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("short head of the biceps") == 0){
+    // landmarks
+    Landmark1VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
+    Landmark2VMEName = "superior most point on fibula (apex, styloid process)";
+    Landmark3VMEName = "superior medial corner of medial condyle";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.10; // 1.03
+    b = 0.00; // 0.07
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("gracilis") == 0){
+    // landmarks
+    Landmark1VMEName = "Inferior margin of lateral surface of right inferior pubic ramus ";
+    Landmark2VMEName = "medial corner near back of shaft inferior to base of tibial tubercle - near pes anserine bursa";
+    Landmark3VMEName = "on linea aspera at juncture of pectineal/gluteal lines";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.05; // 0.97
+    b = 0.25; // 0.30
+    m_MuscleType = 1;
+  }
+  else if (m_SurfaceName.compare("vastus lateralis and intermedius") == 0){
+    // landmarks
+    Landmark1VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
+    Landmark2VMEName = "Midside point on superior patella surface";
+    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
+    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
+    a = 1.50; // 1.44
+    b = -0.05;// 0.00
+    m_MuscleType = 1;
+  }
+  else{
+    wxMessageBox("Muscle not in built in dictionary!","alert",wxICON_WARNING);
+    return;
+  }
+
+  // get root node
+  mafVME *RootVME = mafVME::SafeDownCast(m_Input->GetRoot());
+
+  // get atlas section node
+  mafVME *AtlasSectionVME = (mafVME*)(RootVME->FindInTreeByName(AtlasSectionVMEName));
+  if(AtlasSectionVME == NULL)
+  {
+    wxMessageBox("No section" + AtlasSectionVMEName,"alert",wxICON_WARNING);
+    return;
+  }
+
+  // get patient section node
+  mafVME *PatientSectionVME = (mafVME*)(RootVME->FindInTreeByName(PatientSectionVMEName));
+  if(PatientSectionVME == NULL)
+  {
+    wxMessageBox("No section" + PatientSectionVMEName,"alert",wxICON_WARNING);
+    return;
+  }
+
+  // atlas - landmark 1
+  // get landmark node
+  mafVME *Landmark1AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark1VMEName));
+  if(Landmark1AtlasVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark1VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
   else
-    if (m_SurfaceName.compare("gamellus inferior") == 0)
-    {
-      // landmarks
-      Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
-      Landmark2VMEName = "bottom of superior cavity in trochanteric fossa";
-      Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
-      Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-      a = 1.15; // 1.07
-      b = 0.20; // 0.28
-      m_MuscleType = 1;
-    }
-    else
-      if (m_SurfaceName.compare("gamellus superior") == 0)
-      {
-        // landmarks
-        Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
-        Landmark2VMEName = "bottom of superior cavity in trochanteric fossa";
-        Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
-        Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-        a = 1.65; // 1.60
-        b = 0.25; // 0.32
-        m_MuscleType = 1;
-      }
-      else
-        if (m_SurfaceName.compare("piriformis") == 0)
-        {
-          // landmarks
-          Landmark1VMEName = "Anterior surface of the Right sacrum between second and third foramen midway between line of foramen and lateral border (first sacral foramen is most superior)";
-          Landmark2VMEName = "most anterior superior point on greater trochanter";
-          Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
-          Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-          a = 1.20; // 1.14
-          b = 0.20; // 0.27
-          m_MuscleType = 1;
-        }
-        else
-          if (m_SurfaceName.compare("gluteus minimus") == 0)
-          {
-            // landmarks
-            Landmark1VMEName = "Top of ridge on lateral surface of the Right ilium between superior tubercle of iliac crest (pt. 39) and acetabulum (pt. 5) along a line from anterior superior iliac spine ASIS (pt. 1) to posterior superior iliac spine PSIS (pt. 3) ";
-            Landmark2VMEName = "center of depression on anterior surface of greater trochanter";
-            Landmark3VMEName = "Bottom of posterior depression on lateral surface of the Right ilium along a line from anterior superior iliac spine ASIS (pt. 1) to posterior superior iliac spine PSIS (pt. 3) ";
-            Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-            a = 1.30; // 1.25
-            b = -0.05;// 0.00
-            m_MuscleType = 1;
-          }
-          else
-            if (m_SurfaceName.compare("tensor fasciae latae") == 0)
-            {
-              // landmarks
-              Landmark1VMEName = "Midpoint along Right lateral superior ridge of iliac crest between the anterior superior iliac spine ASIS and most lateral point on superior tubercle of the iliac crest ";
-              Landmark2VMEName = "impression for iliotibial tract on lateral anterior surface of superior end of tibia at height of fibular facet just below epiphysial line";
-              Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
-              Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-              a = 1.00; // 0.95
-              b = 0.60; // 0.69
-              m_MuscleType = 1;
-            }
-            else
-              if (m_SurfaceName.compare("adductor longus") == 0)
-              {
-                // landmarks
-                Landmark1VMEName = "Anterior corner of inferior surface of the Right pubic tubercle ";
-                Landmark2VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
-                Landmark3VMEName = "anterior medial corner of femoral shaft cross-section directly superior to medial border of patellar groove joins at height of juncture of medial supracondylar line and adductor tubercle ridge ";
-                Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                a = 1.00; // 0.92
-                b = -0.20;// -0.16
-                m_MuscleType = 1;
-              }
-              else
-                if (m_SurfaceName.compare("adductor brevis") == 0)
-                {
-                  // landmarks
-                  Landmark1VMEName = "Midpoint of lateral surface of the Right inferior pubic ramus ";
-                  Landmark2VMEName = "on linea aspera at juncture of pectineal/gluteal lines";
-                  Landmark3VMEName = "most medial corner of femoral shaft cross-section at height of midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
-                  Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                  a = 1.15; // 1.09
-                  b = -0.20;// -0.14
-                  m_MuscleType = 1;
-                }
-                else
-                  if (m_SurfaceName.compare("rectus femoris") == 0)
-                  {
-                    // landmarks
-                    Landmark1VMEName = "Right Anterior Inferior Iliac Spine ";
-                    Landmark2VMEName = "Midside point on superior patella surface";
-                    Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
-                    Landmark4VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
-                    a = 1.05; // 0.97
-                    b = 0.15; // 0.19
-                    m_MuscleType = 1;
-                  }
-                  else
-                    if (m_SurfaceName.compare("semitendinous") == 0)
-                    {
-                      // landmarks
-                      Landmark1VMEName = "Posterior most point on medial border of posterior surface of the Right ischial tuberosity";
-                      Landmark2VMEName = "medial corner near back of shaft inferior to base of tibial tubercle - near pes anserine bursa";
-                      Landmark3VMEName = "most medial point on medial epicondyle";
-                      Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                      a = 1.05; // 0.98
-                      b = 0.25; // 0.32
-                      m_MuscleType = 1;
-                    }
-                    else
-                      if (m_SurfaceName.compare("gluteus maximus") == 0)
-                      {
-                        // landmarks
-                        Landmark1VMEName = "Lateral corner of Right sacral-coccygeal facet  ";
-                        Landmark2VMEName = "on gluteal line at height of inferior base of lesser trochanter";
-                        Landmark3VMEName = "Right Posterior Superior Iliac Spine PSIS (repeat of pt. 3) ";
-                        Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                        a = 1.25; // 1.18
-                        b = -0.20;// -0.15
-                        m_MuscleType = 1;
-                      }
-                      else
-                        if (m_SurfaceName.compare("gluteus medius") == 0)
-                        {
-                          // landmarks
-                          Landmark1VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
-                          Landmark2VMEName = "lateral posterior prominence of greater trochanter";
-                          Landmark3VMEName = "Bottom of posterior depression on lateral surface of the Right ilium along a line from most lateral point on superior tubercle of iliac crest to posterior superior iliac spine PSIS  ";
-                          Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                          a = 1.30; // 1.25
-                          b = -0.25;// -0.18
-                          m_MuscleType = 1;
-                        }
-                        else
-                          if (m_SurfaceName.compare("pectineus") == 0)
-                          {
-                            // landmarks
-                            Landmark1VMEName = "Base of the Right superior pubic ramus on superior surface lateral to pectineal line ";
-                            Landmark2VMEName = "inferior base of lesser trochanter on pectineal line";
-                            Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
-                            Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                            a = 1.10; // 1.05
-                            b = -0.15;// -0.09
-                            m_MuscleType = 1;
-                          }
-                          else
-                            if (m_SurfaceName.compare("adductor magnus") == 0)
-                            {
-                              // landmarks
-                              Landmark1VMEName = "Most lateral aspect at posterior corner of lateral surface of Right ischial tuberosity ";
-                              Landmark2VMEName = "superior corner of adductor tubercle above medial epicondyle";
-                              Landmark3VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
-                              Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                              a = 1.10; // 1.05
-                              b = 0.10; // 0.15
-                              m_MuscleType = 1;
-                            }
-                            else
-                              if (m_SurfaceName.compare("quadratus femoris") == 0)
-                              {
-                                // landmarks
-                                Landmark1VMEName = "On lateral surface of Right ischial tuberosity at midpoint between obturator foramen and lateral posterior corner ";
-                                Landmark2VMEName = "quadrate tubercle on intertrochanteric crest";
-                                Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
-                                Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                a = 1.05; // 1.00
-                                b = -0.20;// -0.14
-                                m_MuscleType = 1;
-                              }
-                              else
-                                if (m_SurfaceName.compare("sartorius") == 0)
-                                {
-                                  // landmarks
-                                  Landmark1VMEName = "Right Anterior Superior Iliac Spine (repeat of pt. 1) ";
-                                  Landmark2VMEName = "most medial point on medial epicondyle";
-                                  Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
-                                  Landmark4VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
-                                  a = 1.05; // 1.00
-                                  b = -0.15;// -0.10
-                                  m_MuscleType = 1;
-                                }
-                                else
-                                  if (m_SurfaceName.compare("vastus medialis") == 0)
-                                  {
-                                    // landmarks
-                                    Landmark1VMEName = "most medial corner of femoral shaft cross-section at height of midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
-                                    Landmark2VMEName = "anterior medial corner of femoral shaft cross-section directly superior to medial border of patellar groove joins at height of juncture of medial supracondylar line and adductor tubercle ridge ";
-                                    Landmark3VMEName = "Most medial point on superior patella surface";
-                                    Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                    a = 1.85; // 1.80
-                                    b = -0.30;// -0.25
-                                    m_MuscleType = 1;
-                                  }
-                                  else
-                                    if (m_SurfaceName.compare("semimembranous") == 0)
-                                    {
-                                      // landmarks
-                                      Landmark1VMEName = "Bottom of superior depression on posterior surface of Right ischial tuberosity ";
-                                      Landmark2VMEName = "superior lip of depression on posterior surface of medial tibial condyle";
-                                      Landmark3VMEName = "superior medial corner of medial condyle";
-                                      Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                      a = 0.80; // 0.74
-                                      b = 0.00; // 0.06
-                                      m_MuscleType = 1;
-                                    }
-                                    else
-                                      if (m_SurfaceName.compare("obturator internal") == 0)
-                                      {
-                                        // DAVID P. 19-01-2005: This is not the permanent solution.
-                                        // landmarks
-                                        // old solution
-                                        //Landmark1VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
-                                        //Landmark2VMEName = "bottom of superior cavity in trochanteric fossa";
-                                        //Landmark3VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+  {
+    // get landmark
+    mafVMELandmark *Landmark1AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark1AtlasVME);
 
-                                        // re-shuffled solution (according to david's email)
-                                        Landmark2VMEName = "Most superior point on posterior surface of Right ischial tuberosity at height of lesser sciatic notch ";
-                                        Landmark3VMEName = "bottom of superior cavity in trochanteric fossa";
-                                        Landmark1VMEName = "Lateral surface of the Right ilium at midpoint between most lateral point on superior tubercle of iliac crest (pt. 39) and origin of Gluteus Medius posterior fibers (pt. 41).   ";
+    // get coordinates
+    Landmark1AtlasVMELandmark->GetPoint(a1);
 
+    // set name
+    m_L1Name = Landmark1AtlasVMELandmark->GetName();
+  }
 
+  // atlas - landmark 2
+  // get landmark node
+  mafVME *Landmark2AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark2VMEName));
+  if(Landmark2AtlasVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark2VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark2AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark2AtlasVME);
 
-                                        Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                        a = 1.75; // 1.70
-                                        b = 0.50; // 0.58
-                                        m_MuscleType = 2;
-                                      }
-                                      else
-                                        if (m_SurfaceName.compare("long head of the biceps") == 0)
-                                        {
-                                          // landmarks
-                                          Landmark1VMEName = "Posterior most point on medial border of posterior surface of the Right ischial tuberosity";
-                                          Landmark2VMEName = "superior most point on fibula (apex, styloid process)";
-                                          Landmark3VMEName = "superior medial corner of medial condyle";
-                                          Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                          a = 1.00; // 0.94
-                                          b = 0.15; // 0.20
-                                          m_MuscleType = 1;
-                                        }
-                                        else
-                                          if (m_SurfaceName.compare("short head of the biceps") == 0)
-                                          {
-                                            // landmarks
-                                            Landmark1VMEName = "on linea aspera at midpoint between juncture of pectineal/gluteal lines and juncture of medial/lateral supracondylar lines";
-                                            Landmark2VMEName = "superior most point on fibula (apex, styloid process)";
-                                            Landmark3VMEName = "superior medial corner of medial condyle";
-                                            Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                            a = 1.10; // 1.03
-                                            b = 0.00; // 0.07
-                                            m_MuscleType = 1;
-                                          }
-                                          else
-                                            if (m_SurfaceName.compare("gracilis") == 0)
-                                            {
-                                              // landmarks
-                                              Landmark1VMEName = "Inferior margin of lateral surface of right inferior pubic ramus ";
-                                              Landmark2VMEName = "medial corner near back of shaft inferior to base of tibial tubercle - near pes anserine bursa";
-                                              Landmark3VMEName = "on linea aspera at juncture of pectineal/gluteal lines";
-                                              Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                              a = 1.05; // 0.97
-                                              b = 0.25; // 0.30
-                                              m_MuscleType = 1;
-                                            }
-                                            else
-                                              if (m_SurfaceName.compare("vastus lateralis and intermedius") == 0)
-                                              {
-                                                // landmarks
-                                                Landmark1VMEName = "most anterior point on anterior surface of femoral shaft at height of juncture of pectineal/gluteal lines";
-                                                Landmark2VMEName = "Midside point on superior patella surface";
-                                                Landmark3VMEName = "Superior edge of lateral surface of the Right ischial ramus at juncture with inferior pubic ramus ";
-                                                Landmark4VMEName = "Right Anterior Inferior Iliac Spine ";
-                                                a = 1.50; // 1.44
-                                                b = -0.05;// 0.00
-                                                m_MuscleType = 1;
-                                              }
-                                              else
-                                              {
-                                                wxMessageBox("Muscle not in built in dictionary!","alert",wxICON_WARNING);
-                                                return;
-                                              }
+    // get coordinates
+    Landmark2AtlasVMELandmark->GetPoint(a2);
 
-                                              // get root node
-                                              mafVME *RootVME = mafVME::SafeDownCast(m_Input->GetRoot());
+    // set name
+    m_L2Name = Landmark2AtlasVMELandmark->GetName();
+  }
 
-                                              // get atlas section node
-                                              mafVME *AtlasSectionVME = (mafVME*)(RootVME->FindInTreeByName(AtlasSectionVMEName));
-                                              if(AtlasSectionVME == NULL)
-                                              {
-                                                wxMessageBox("No section" + AtlasSectionVMEName,"alert",wxICON_WARNING);
-                                                return;
-                                              }
+  // atlas - landmark 3
+  // get landmark node
+  mafVME *Landmark3AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark3VMEName));
+  if(Landmark3AtlasVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark3VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark3AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark3AtlasVME);
 
-                                              // get patient section node
-                                              mafVME *PatientSectionVME = (mafVME*)(RootVME->FindInTreeByName(PatientSectionVMEName));
-                                              if(PatientSectionVME == NULL)
-                                              {
-                                                wxMessageBox("No section" + PatientSectionVMEName,"alert",wxICON_WARNING);
-                                                return;
-                                              }
+    // get coordinates
+    Landmark3AtlasVMELandmark->GetPoint(a3);
 
-                                              // atlas - landmark 1
-                                              // get landmark node
-                                              mafVME *Landmark1AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark1VMEName));
-                                              if(Landmark1AtlasVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark1VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark1AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark1AtlasVME);
+    // set name
+    m_L3Name = Landmark3AtlasVMELandmark->GetName();
+  }
 
-                                                // get coordinates
-                                                Landmark1AtlasVMELandmark->GetPoint(a1);
+  // atlas - landmark 4
+  // get landmark node
+  mafVME *Landmark4AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark4VMEName));
+  if(Landmark4AtlasVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark4VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark4AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark4AtlasVME);
 
-                                                // set name
-                                                m_L1Name = Landmark1AtlasVMELandmark->GetName();
-                                              }
+    // get coordinates
+    Landmark4AtlasVMELandmark->GetPoint(a4);
 
-                                              // atlas - landmark 2
-                                              // get landmark node
-                                              mafVME *Landmark2AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark2VMEName));
-                                              if(Landmark2AtlasVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark2VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark2AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark2AtlasVME);
+    // set name
+    m_L4Name = Landmark4AtlasVMELandmark->GetName();
+  }
 
-                                                // get coordinates
-                                                Landmark2AtlasVMELandmark->GetPoint(a2);
+  // patient - landmark 1
+  // get landmark node
+  mafVME *Landmark1PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark1VMEName));
+  if(Landmark1PatientVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark1VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark1PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark1PatientVME);
 
-                                                // set name
-                                                m_L2Name = Landmark2AtlasVMELandmark->GetName();
-                                              }
+    // get coordinates
+    Landmark1PatientVMELandmark->GetPoint(p1);
 
-                                              // atlas - landmark 3
-                                              // get landmark node
-                                              mafVME *Landmark3AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark3VMEName));
-                                              if(Landmark3AtlasVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark3VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark3AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark3AtlasVME);
+    // set name
+    m_P1Name = Landmark1PatientVMELandmark->GetName();
+  }
 
-                                                // get coordinates
-                                                Landmark3AtlasVMELandmark->GetPoint(a3);
+  // patient - landmark 2
+  // get landmark node
+  mafVME *Landmark2PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark2VMEName));
+  if(Landmark2PatientVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark2VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark2PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark2PatientVME);
 
-                                                // set name
-                                                m_L3Name = Landmark3AtlasVMELandmark->GetName();
-                                              }
+    // get coordinates
+    Landmark2PatientVMELandmark->GetPoint(p2);
 
-                                              // atlas - landmark 4
-                                              // get landmark node
-                                              mafVME *Landmark4AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark4VMEName));
-                                              if(Landmark4AtlasVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark4VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark4AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark4AtlasVME);
+    // set name
+    m_P2Name = Landmark2PatientVMELandmark->GetName();
+  }
 
-                                                // get coordinates
-                                                Landmark4AtlasVMELandmark->GetPoint(a4);
+  // patient - landmark 3
+  // get landmark node
+  mafVME *Landmark3PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark3VMEName));
+  if(Landmark3PatientVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark3VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark3PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark3PatientVME);
 
-                                                // set name
-                                                m_L4Name = Landmark4AtlasVMELandmark->GetName();
-                                              }
+    // get coordinates
+    Landmark3PatientVMELandmark->GetPoint(p3);
 
-                                              // patient - landmark 1
-                                              // get landmark node
-                                              mafVME *Landmark1PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark1VMEName));
-                                              if(Landmark1PatientVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark1VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark1PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark1PatientVME);
+    // set name
+    m_P3Name = Landmark3PatientVMELandmark->GetName();
+  }
 
-                                                // get coordinates
-                                                Landmark1PatientVMELandmark->GetPoint(p1);
+  // patient - landmark 4
+  // get landmark node
+  mafVME *Landmark4PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark4VMEName));
+  if(Landmark4PatientVME == NULL)
+  {
+    wxMessageBox("Expected " + Landmark4VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else
+  {
+    // get landmark
+    mafVMELandmark *Landmark4PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark4PatientVME);
 
-                                                // set name
-                                                m_P1Name = Landmark1PatientVMELandmark->GetName();
-                                              }
+    // get coordinates
+    Landmark4PatientVMELandmark->GetPoint(p4);
 
-                                              // patient - landmark 2
-                                              // get landmark node
-                                              mafVME *Landmark2PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark2VMEName));
-                                              if(Landmark2PatientVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark2VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark2PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark2PatientVME);
+    // set name
+    m_P4Name = Landmark4PatientVMELandmark->GetName();
+  }
 
-                                                // get coordinates
-                                                Landmark2PatientVMELandmark->GetPoint(p2);
+  // use weights to relocate landmarks 1, 2
+  for(i = 0; i < 3; i++)
+  {
+    m_L1Point[i] = a * a1[i] + (1 - a) * a2[i];
+    m_L2Point[i] = b * a1[i] + (1 - b) * a2[i];
 
-                                                // set name
-                                                m_P2Name = Landmark2PatientVMELandmark->GetName();
-                                              }
+    m_P1Point[i] = a * p1[i] + (1 - a) * p2[i];
+    m_P2Point[i] = b * p1[i] + (1 - b) * p2[i];
+  }
 
-                                              // patient - landmark 3
-                                              // get landmark node
-                                              mafVME *Landmark3PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark3VMEName));
-                                              if(Landmark3PatientVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark3VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark3PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark3PatientVME);
+  // landmarks 3 / 4
+  for(i = 0; i < 3; i++)
+  {
+    m_L3Point[i] = a3[i];
+    m_L4Point[i] = a4[i];
 
-                                                // get coordinates
-                                                Landmark3PatientVMELandmark->GetPoint(p3);
-
-                                                // set name
-                                                m_P3Name = Landmark3PatientVMELandmark->GetName();
-                                              }
-
-                                              // patient - landmark 4
-                                              // get landmark node
-                                              mafVME *Landmark4PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark4VMEName));
-                                              if(Landmark4PatientVME == NULL)
-                                              {
-                                                wxMessageBox("Expected " + Landmark4VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
-                                              }
-                                              else
-                                              {
-                                                // get landmark
-                                                mafVMELandmark *Landmark4PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark4PatientVME);
-
-                                                // get coordinates
-                                                Landmark4PatientVMELandmark->GetPoint(p4);
-
-                                                // set name
-                                                m_P4Name = Landmark4PatientVMELandmark->GetName();
-                                              }
-
-                                              // use weights to relocate landmarks 1, 2
-                                              for(i = 0; i < 3; i++)
-                                              {
-                                                m_L1Point[i] = a * a1[i] + (1 - a) * a2[i];
-                                                m_L2Point[i] = b * a1[i] + (1 - b) * a2[i];
-
-                                                m_P1[i] = a * p1[i] + (1 - a) * p2[i];
-                                                m_P2[i] = b * p1[i] + (1 - b) * p2[i];
-                                              }
-
-                                              // landmarks 3 / 4
-                                              for(i = 0; i < 3; i++)
-                                              {
-                                                m_L3Point[i] = a3[i];
-                                                m_L4Point[i] = a4[i];
-
-                                                m_P3[i] = p3[i];
-                                                m_P4[i] = p4[i];
-                                              }
+    m_P3Point[i] = p3[i];
+    m_P4Point[i] = p4[i];
+  }
 }
 
 
@@ -3826,27 +3850,20 @@ void medOpMML3::ApplyRegistrationOps()
     Transform->TransformPoint(pt, temppt);
     if (temppt[0] > 0.0 && temppt[1] > 0.0) // 1st quadrant (+, +)
       Transform->Scale(se, sn, 1.0);
-    else
-      if (temppt[0] < 0.0 && temppt[1] > 0.0) // 2nd quadrant (-, +)
-        Transform->Scale(sw, sn, 1.0);
-      else
-        if (temppt[0] < 0.0 && temppt[1] < 0.0) // 3rd quadrant (-, -)
-          Transform->Scale(sw, ss, 1.0);
-        else
-          if (temppt[0] > 0.0 && temppt[1] < 0.0) // 4th quadrant (+, -)
-            Transform->Scale(se, ss, 1.0);
-          else
-            if (temppt[0] > 0.0 && temppt[1] == 0.0) // positive x axis
-              Transform->Scale(se, 1.0, 1.0);
-            else
-              if (temppt[0] < 0.0 && temppt[1] == 0.0) // negative x axis
-                Transform->Scale(sw, 1.0, 1.0);
-              else
-                if (temppt[1] > 0.0 && temppt[0] == 0.0) // positive y axis
-                  Transform->Scale(1.0, sn, 1.0);
-                else
-                  if (temppt[1] > 0.0 && temppt[0] == 0.0) // negative y axis
-                    Transform->Scale(1.0, ss, 1.0);
+    else if (temppt[0] < 0.0 && temppt[1] > 0.0) // 2nd quadrant (-, +)
+      Transform->Scale(sw, sn, 1.0);
+    else if (temppt[0] < 0.0 && temppt[1] < 0.0) // 3rd quadrant (-, -)
+      Transform->Scale(sw, ss, 1.0);
+    else if (temppt[0] > 0.0 && temppt[1] < 0.0) // 4th quadrant (+, -)
+      Transform->Scale(se, ss, 1.0);
+    else if (temppt[0] > 0.0 && temppt[1] == 0.0) // positive x axis
+      Transform->Scale(se, 1.0, 1.0);
+    else if (temppt[0] < 0.0 && temppt[1] == 0.0) // negative x axis
+      Transform->Scale(sw, 1.0, 1.0);
+    else if (temppt[1] > 0.0 && temppt[0] == 0.0) // positive y axis
+      Transform->Scale(1.0, sn, 1.0);
+    else if (temppt[1] > 0.0 && temppt[0] == 0.0) // negative y axis
+      Transform->Scale(1.0, ss, 1.0);
 
     Transform->RotateZ(-1.0 * ra); // inverse r operation
     Transform->Translate(-1.0 * ph, -1.0 * pv, 0.0); // inverse p operation
@@ -3889,27 +3906,3 @@ void medOpMML3::ApplyInverseRegistrationOps()
 }
 
 
-
-
-void medOpMML3::CreateFakeLandmarks() 
-{
-  double inputBounds[6]; 
-
-  assert(m_Input);
-  ((mafVME*)m_Input)->GetOutput()->GetBounds(inputBounds);
-  double xmed = (inputBounds[0] + inputBounds[1])/2;
-  double ymed = (inputBounds[2] + inputBounds[3])/2;
-
-
-  double lm1[3] = {xmed ,ymed ,inputBounds[5]}; //high
-  double lm2[3] = {xmed ,ymed, inputBounds[4]}; //low
-  double lm3[3] = {inputBounds[1], inputBounds[3], inputBounds[4]}; 
-
-  m_Model->SetLandmark1OfPatient(lm1);
-  m_Model->SetLandmark2OfPatient(lm2);
-  m_Model->SetLandmark3OfPatient(lm3); 
-
-  m_Model->SetLandmark1OfAtlas(lm1);
-  m_Model->SetLandmark2OfAtlas(lm2);
-  m_Model->SetLandmark3OfAtlas(lm3);  
-}

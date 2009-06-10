@@ -1,13 +1,13 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpMML3ModelView.h,v $
-  Language:  C++
-  Date:      $Date: 2009-05-29 11:05:29 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Mel Krokos
+Program:   Multimod Application Framework
+Module:    $RCSfile: medOpMML3ModelView.h,v $
+Language:  C++
+Date:      $Date: 2009-06-10 14:22:46 $
+Version:   $Revision: 1.1.2.2 $
+Authors:   Mel Krokos
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 
@@ -162,7 +162,9 @@ public:
 
   void FindUnitVectorsAndLengthsOfLandmarkLines();
 
-  /// Muscle transform 1 set from landmarks
+  /// Muscle transform 1 - global registration using landmarks. \n
+  /// This is the transform which moves the muscle landmarks to the corresponding 
+  /// points on the volume.
   bool MapAtlasToPatient();
 
 
@@ -286,11 +288,11 @@ protected:
   double GetContourAxesLengthScale() const {return m_ContourAxesLengthScale ;} ///< get length of contour axes
   void SetContourAxesLengthScale(double length) {m_ContourAxesLengthScale = length ;} ///< set length of contour axes
 
-	vtkPlane* GetCuttingPlaneWest() const {return m_Y0ZWPlane ;}
-	vtkPlane* GetCuttingPlaneEast() const {return m_Y0ZEPlane ;}
+  vtkPlane* GetCuttingPlaneWest() const {return m_Y0ZWPlane ;}
+  vtkPlane* GetCuttingPlaneEast() const {return m_Y0ZEPlane ;}
   vtkPlane* GetCuttingPlaneNorth() const {return m_X0ZNPlane ;}
-	vtkPlane* GetCuttingPlaneSouth() const {return m_X0ZSPlane ;}
-	
+  vtkPlane* GetCuttingPlaneSouth() const {return m_X0ZSPlane ;}
+
   vtkTubeFilter* GetPositiveXAxisTubeFilter() const {return m_PosXAxisAxesTubeFilter ;}
   vtkTubeFilter* GetNegativeXAxisTubeFilter() const {return m_NegXAxisAxesTubeFilter ;}
   vtkTubeFilter* GetPositiveYAxisTubeFilter() const {return m_PosYAxisAxesTubeFilter ;}
@@ -299,7 +301,7 @@ protected:
   vtkTubeFilter* GetContourPositiveXAxisTubeFilter() const {return m_ContourPosXAxisAxesTubeFilter ;}
   vtkTubeFilter* GetContourNegativeXAxisTubeFilter() const {return m_ContourNegXAxisAxesTubeFilter ;}
   vtkTubeFilter* GetContourPositiveYAxisTubeFilter() const {return m_ContourPosYAxisAxesTubeFilter ;}
-	vtkTubeFilter* GetContourNegativeYAxisTubeFilter() const {return m_ContourNegYAxisAxesTubeFilter ;}
+  vtkTubeFilter* GetContourNegativeYAxisTubeFilter() const {return m_ContourNegYAxisAxesTubeFilter ;}
 
   vtkLineSource* GetPositiveXAxisLineSource() const {return m_PosXAxisLineSource ;}
   vtkLineSource* GetNegativeXAxisLineSource() const {return m_NegXAxisLineSource ;}
@@ -307,29 +309,29 @@ protected:
   vtkLineSource* GetNegativeYAxisLineSource() const {return m_NegYAxisLineSource ;}
 
   vtkLineSource* GetContourPositiveXAxisLineSource() const {return m_ContourPosXAxisLineSource ;}
-	vtkLineSource* GetContourNegativeXAxisLineSource() const {return m_ContourNegXAxisLineSource ;}
+  vtkLineSource* GetContourNegativeXAxisLineSource() const {return m_ContourNegXAxisLineSource ;}
   vtkLineSource* GetContourPositiveYAxisLineSource() const {return m_ContourPosYAxisLineSource ;}
-	vtkLineSource* GetContourNegativeYAxisLineSource() const {return m_ContourNegYAxisLineSource ;}
+  vtkLineSource* GetContourNegativeYAxisLineSource() const {return m_ContourNegYAxisLineSource ;}
 
   vtkTransform* GetContourCutterTransform() const {return m_ContourCutterTransform ;}
   vtkTransformPolyDataFilter* GetContourCutterTransformPolyDataFilter() const {return m_ContourCutterTransformPolyDataFilter ;}
 
   vtkLODActor* GetMuscleLODActor() const {return m_MuscleLODActor ;}
-	void WriteMatrix(char *pch, vtkMatrix4x4 *m) const ;
-	void SetNegativeLineActorX(double p1[3], double p2[3]);
-	void SetPositiveLineActorY(double p1[3], double p2[3]);
-	void SetNegativeLineActorY(double p1[3], double p2[3]);
-	void SetPositiveLineActorX(double p1[3], double p2[3]);
-	void AddActor(vtkActor* a);
-	void RetrieveCameraViewUp(double* vu);
-	void RetrieveCameraClippingRange(double *cr);
-	void RetrieveCameraPosition(double *cp);
-	void RetrieveCameraFocalPoint(double *fp);
-	void SaveCameraViewUp(double *vu);
-	void SaveCameraClippingRange(double *cr);
-	void SaveCameraPosition(double *cp);
-	void SaveCameraFocalPoint(double *fp);
-	vtkCamera* GetActiveCamera();
+  void WriteMatrix(char *pch, vtkMatrix4x4 *m) const ;
+  void SetNegativeLineActorX(double p1[3], double p2[3]);
+  void SetPositiveLineActorY(double p1[3], double p2[3]);
+  void SetNegativeLineActorY(double p1[3], double p2[3]);
+  void SetPositiveLineActorX(double p1[3], double p2[3]);
+  void AddActor(vtkActor* a);
+  void RetrieveCameraViewUp(double* vu);
+  void RetrieveCameraClippingRange(double *cr);
+  void RetrieveCameraPosition(double *cp);
+  void RetrieveCameraFocalPoint(double *fp);
+  void SaveCameraViewUp(double *vu);
+  void SaveCameraClippingRange(double *cr);
+  void SaveCameraPosition(double *cp);
+  void SaveCameraFocalPoint(double *fp);
+  vtkCamera* GetActiveCamera();
 
   /// multiply matrices c = ab
   /// c can be the same as a or b
@@ -365,230 +367,230 @@ protected:
   vtkDoubleArray* RopStack;
   vtkDoubleArray* SopStack;*/
 
-	
-	// splines variables
-	vtkKochanekSpline *m_CenterHorizontalOffsetSpline;
-	vtkKochanekSpline *m_CenterVerticalOffsetSpline;
-	vtkKochanekSpline *m_TwistSpline;
-	vtkKochanekSpline *m_HorizontalTranslationSpline;
-	vtkKochanekSpline *m_VerticalTranslationSpline;
-	vtkKochanekSpline *m_NorthScalingSpline;
-	vtkKochanekSpline *m_SouthScalingSpline;
-	vtkKochanekSpline *m_EastScalingSpline;
-	vtkKochanekSpline *m_WestScalingSpline;
 
-	// atlas landmarks variables
-	double m_DMuscleAtlasInsertionPoint1[3];
-	double m_DMuscleAtlasInsertionPoint2[3];
-	double m_DMuscleAtlasReferencePoint1[3];
-	double m_DMuscleAtlasReferencePoint2[3];
+  // splines variables
+  vtkKochanekSpline *m_CenterHorizontalOffsetSpline;
+  vtkKochanekSpline *m_CenterVerticalOffsetSpline;
+  vtkKochanekSpline *m_TwistSpline;
+  vtkKochanekSpline *m_HorizontalTranslationSpline;
+  vtkKochanekSpline *m_VerticalTranslationSpline;
+  vtkKochanekSpline *m_NorthScalingSpline;
+  vtkKochanekSpline *m_SouthScalingSpline;
+  vtkKochanekSpline *m_EastScalingSpline;
+  vtkKochanekSpline *m_WestScalingSpline;
 
-	// patient landmarks variables
-	double m_DMuscleScansInsertionPoint1[3];
-	double m_DMuscleScansInsertionPoint2[3];
-	double m_DMuscleScansReferencePoint1[3];
-	double m_DMuscleScansReferencePoint2[3];
-	
+  // atlas landmarks variables
+  double m_DMuscleAtlasInsertionPoint1[3];
+  double m_DMuscleAtlasInsertionPoint2[3];
+  double m_DMuscleAtlasReferencePoint1[3];
+  double m_DMuscleAtlasReferencePoint2[3];
+
+  // patient landmarks variables
+  double m_DMuscleScansInsertionPoint1[3];
+  double m_DMuscleScansInsertionPoint2[3];
+  double m_DMuscleScansReferencePoint1[3];
+  double m_DMuscleScansReferencePoint2[3];
 
 
-	// 2d axes - action line system
-	vtkLineSource *m_PosXAxisLineSource; // positive x
-	vtkActor *m_PosXAxisActor;
-	vtkTubeFilter *m_PosXAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_PosXAxisPolyDataMapper;
-	vtkLineSource *m_PosYAxisLineSource; // positive y
-	vtkActor *m_PosYAxisActor;
-	vtkTubeFilter *m_PosYAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_PosYAxisPolyDataMapper;
-	vtkLineSource *m_NegXAxisLineSource; // negative x
-	vtkActor *m_NegXAxisActor;
-	vtkTubeFilter *m_NegXAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_NegXAxisPolyDataMapper;
-	vtkLineSource *m_NegYAxisLineSource; // negative y
-	vtkActor *m_NegYAxisActor;
-	vtkTubeFilter *m_NegYAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_NegYAxisPolyDataMapper;
-	vtkLineSource *m_PosZAxisLineSource; // positive z (3d display only)
-	vtkActor *m_PosZAxisActor;
-	vtkTubeFilter *m_PosZAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_PosZAxisPolyDataMapper;
-	vtkLineSource *m_NegZAxisLineSource; // negative z (3d display only)
-	vtkActor *m_NegZAxisActor;
-	vtkTubeFilter *m_NegZAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_NegZAxisPolyDataMapper;
 
-	// 2d axes - contour system
-	vtkLineSource *m_ContourPosXAxisLineSource; // positive x
-	vtkActor *m_ContourPosXAxisActor;
-	vtkTubeFilter *m_ContourPosXAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_ContourPosXAxisPolyDataMapper;
-	vtkLineSource *m_ContourPosYAxisLineSource; // positive y
-	vtkActor *m_ContourPosYAxisActor;
-	vtkTubeFilter *m_ContourPosYAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_ContourPosYAxisPolyDataMapper;
-	vtkLineSource *m_ContourNegXAxisLineSource; // negative x
-	vtkActor *m_ContourNegXAxisActor;
-	vtkTubeFilter *m_ContourNegXAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_ContourNegXAxisPolyDataMapper;
-	vtkLineSource *m_ContourNegYAxisLineSource; // negative y
-	vtkActor *m_ContourNegYAxisActor;
-	vtkTubeFilter *m_ContourNegYAxisAxesTubeFilter;
-	vtkPolyDataMapper *m_ContourNegYAxisPolyDataMapper;
+  // 2d axes - action line system
+  vtkLineSource *m_PosXAxisLineSource; // positive x
+  vtkActor *m_PosXAxisActor;
+  vtkTubeFilter *m_PosXAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_PosXAxisPolyDataMapper;
+  vtkLineSource *m_PosYAxisLineSource; // positive y
+  vtkActor *m_PosYAxisActor;
+  vtkTubeFilter *m_PosYAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_PosYAxisPolyDataMapper;
+  vtkLineSource *m_NegXAxisLineSource; // negative x
+  vtkActor *m_NegXAxisActor;
+  vtkTubeFilter *m_NegXAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_NegXAxisPolyDataMapper;
+  vtkLineSource *m_NegYAxisLineSource; // negative y
+  vtkActor *m_NegYAxisActor;
+  vtkTubeFilter *m_NegYAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_NegYAxisPolyDataMapper;
+  vtkLineSource *m_PosZAxisLineSource; // positive z (3d display only)
+  vtkActor *m_PosZAxisActor;
+  vtkTubeFilter *m_PosZAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_PosZAxisPolyDataMapper;
+  vtkLineSource *m_NegZAxisLineSource; // negative z (3d display only)
+  vtkActor *m_NegZAxisActor;
+  vtkTubeFilter *m_NegZAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_NegZAxisPolyDataMapper;
 
-	// tube filters radius
-	float m_TubeFilterRadius;
+  // 2d axes - contour system
+  vtkLineSource *m_ContourPosXAxisLineSource; // positive x
+  vtkActor *m_ContourPosXAxisActor;
+  vtkTubeFilter *m_ContourPosXAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_ContourPosXAxisPolyDataMapper;
+  vtkLineSource *m_ContourPosYAxisLineSource; // positive y
+  vtkActor *m_ContourPosYAxisActor;
+  vtkTubeFilter *m_ContourPosYAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_ContourPosYAxisPolyDataMapper;
+  vtkLineSource *m_ContourNegXAxisLineSource; // negative x
+  vtkActor *m_ContourNegXAxisActor;
+  vtkTubeFilter *m_ContourNegXAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_ContourNegXAxisPolyDataMapper;
+  vtkLineSource *m_ContourNegYAxisLineSource; // negative y
+  vtkActor *m_ContourNegYAxisActor;
+  vtkTubeFilter *m_ContourNegYAxisAxesTubeFilter;
+  vtkPolyDataMapper *m_ContourNegYAxisPolyDataMapper;
 
-	// 3d display flag
-	int m_3DDisplay;
+  // tube filters radius
+  float m_TubeFilterRadius;
 
-	// 4 landmarks flag
-	int m_4Landmarks;
+  // 3d display flag
+  int m_3DDisplay;
 
-	// patient scans
-	vtkDataSet* m_Scans;
+  // 4 landmarks flag
+  int m_4Landmarks;
 
-	// synthetic scans
-	int m_SyntheticScansGrain;
-	int m_NSyntheticScansTotalNumber;
-	int m_NSyntheticScansCurrentId;
-	int m_NSyntheticScansXResolution; // resolution of slice image is no. of quads
-	int m_NSyntheticScansYResolution;
-	float m_NSyntheticScansXSize;
-	float m_NSyntheticScansYSize;
-	float m_SyntheticScansMinScalarValue;
-	float m_SyntheticScansMaxScalarValue;
+  // patient scans
+  vtkDataSet* m_Scans;
+
+  // synthetic scans
+  int m_SyntheticScansGrain;
+  int m_NSyntheticScansTotalNumber;
+  int m_NSyntheticScansCurrentId;
+  int m_NSyntheticScansXResolution; // resolution of slice image is no. of quads
+  int m_NSyntheticScansYResolution;
+  float m_NSyntheticScansXSize;
+  float m_NSyntheticScansYSize;
+  float m_SyntheticScansMinScalarValue;
+  float m_SyntheticScansMaxScalarValue;
 
   vtkWindowLevelLookupTable *m_SyntheticScansWindowLevelLookupTable; // lut
   vtkActor **m_SyntheticScansActor; ///< actors for synthetic scans
 
 
-	// muscle
-	//vtkSTLReader *m_MuscleSTLReader;
-	vtkSTLWriter *m_MuscleSTLWriter;
-	vtkPolyDataWriter *m_MusclePolyDataWriter;
-	vtkPolyData* m_MusclePolyData;
-	vtkPolyDataMapper *m_MusclePolyDataMapper;
-	vtkLODActor *m_MuscleLODActor;
+  // muscle
+  //vtkSTLReader *m_MuscleSTLReader;
+  vtkSTLWriter *m_MuscleSTLWriter;
+  vtkPolyDataWriter *m_MusclePolyDataWriter;
+  vtkPolyData* m_MusclePolyData;
+  vtkPolyDataMapper *m_MusclePolyDataMapper;
+  vtkLODActor *m_MuscleLODActor;
 
   // three transforms which are pipelined together
-	vtkTransform *m_MuscleTransform1;
-	vtkTransform *m_MuscleTransform2;
-	vtkTransformPolyDataFilter *m_MuscleTransform1PolyDataFilter;  // input is vtkPolydata* muscle
-	vtkTransformPolyDataFilter *m_MuscleTransform2PolyDataFilter;
-	vtkPolyDataNormals *m_MusclePolyDataNormals;                   // adds normals to polydata
+  vtkTransform *m_MuscleTransform1;
+  vtkTransform *m_MuscleTransform2;
+  vtkTransformPolyDataFilter *m_MuscleTransform1PolyDataFilter;  // input is vtkPolydata* muscle
+  vtkTransformPolyDataFilter *m_MuscleTransform2PolyDataFilter;
+  vtkPolyDataNormals *m_MusclePolyDataNormals;                   // adds normals to polydata
 
-	double m_FlMuscleXScalingFactor;
-	double m_FlMuscleYScalingFactor;
-	float m_FlMusclePolyDataBounds[6];
-	float m_FlMusclePolyDataCenter[3];
-	float m_FlMusclePolyDataExtent[3];
+  double m_FlMuscleXScalingFactor;
+  double m_FlMuscleYScalingFactor;
+  float m_FlMusclePolyDataBounds[6];
+  float m_FlMusclePolyDataCenter[3];
+  float m_FlMusclePolyDataExtent[3];
 
 
-	// window/level
-	double m_Window;
-	double m_Level;
+  // window/level
+  double m_Window;
+  double m_Level;
 
-	// contour
-	vtkPlane *m_ContourPlane;
-	vtkCutter *m_ContourCutter;
-	vtkTransform* m_ContourCutterTransform;
-	vtkTransformPolyDataFilter *m_ContourCutterTransformPolyDataFilter;
-	vtkTubeFilter *m_ContourTubeFilter;
-	vtkPolyDataMapper *m_ContourPolyDataMapper;
-	vtkActor *m_ContourActor;
-	vtkSphereSource *m_ContourGlyphSphereSource;
-	vtkGlyph3D *m_ContourGlyph3D;
-	vtkPolyDataMapper *m_ContourGlyphPolyDataMapper;
-	vtkActor *m_ContourGlyphActor;
+  // contour
+  vtkPlane *m_ContourPlane;
+  vtkCutter *m_ContourCutter;
+  vtkTransform* m_ContourCutterTransform;
+  vtkTransformPolyDataFilter *m_ContourCutterTransformPolyDataFilter;
+  vtkTubeFilter *m_ContourTubeFilter;
+  vtkPolyDataMapper *m_ContourPolyDataMapper;
+  vtkActor *m_ContourActor;
+  vtkSphereSource *m_ContourGlyphSphereSource;
+  vtkGlyph3D *m_ContourGlyph3D;
+  vtkPolyDataMapper *m_ContourGlyphPolyDataMapper;
+  vtkActor *m_ContourGlyphActor;
 
-	// landmarks
-	vtkSphereSource *m_Landmark1SphereSource;
-	vtkPolyDataMapper *m_Landmark1PolyDataMapper;
-	vtkActor *m_Landmark1Actor;
-	vtkSphereSource *m_Landmark2SphereSource;
-	vtkPolyDataMapper *m_Landmark2PolyDataMapper;
-	vtkActor *m_Landmark2Actor;
-	vtkSphereSource *m_Landmark3SphereSource;
-	vtkPolyDataMapper *m_Landmark3PolyDataMapper;
-	vtkActor *m_Landmark3Actor;
-	vtkSphereSource *m_Landmark4SphereSource;
-	vtkPolyDataMapper *m_Landmark4PolyDataMapper;
-	vtkActor *m_Landmark4Actor;
+  // landmarks
+  vtkSphereSource *m_Landmark1SphereSource;
+  vtkPolyDataMapper *m_Landmark1PolyDataMapper;
+  vtkActor *m_Landmark1Actor;
+  vtkSphereSource *m_Landmark2SphereSource;
+  vtkPolyDataMapper *m_Landmark2PolyDataMapper;
+  vtkActor *m_Landmark2Actor;
+  vtkSphereSource *m_Landmark3SphereSource;
+  vtkPolyDataMapper *m_Landmark3PolyDataMapper;
+  vtkActor *m_Landmark3Actor;
+  vtkSphereSource *m_Landmark4SphereSource;
+  vtkPolyDataMapper *m_Landmark4PolyDataMapper;
+  vtkActor *m_Landmark4Actor;
 
-	// L1 to L2 line (action)
-	vtkLineSource *m_L1L2LineSource;
-	vtkTubeFilter *m_L1L2TubeFilter;
-	vtkPolyDataMapper *m_L1L2PolyDataMapper;
-	vtkActor *m_L1L2Actor;
+  // L1 to L2 line (action)
+  vtkLineSource *m_L1L2LineSource;
+  vtkTubeFilter *m_L1L2TubeFilter;
+  vtkPolyDataMapper *m_L1L2PolyDataMapper;
+  vtkActor *m_L1L2Actor;
 
-	// L2 to L3 line
-	vtkLineSource *m_L2L3LineSource;
-	vtkTubeFilter *m_L2L3TubeFilter;
-	vtkPolyDataMapper *m_L2L3PolyDataMapper;
-	vtkActor *m_L2L3Actor;
+  // L2 to L3 line
+  vtkLineSource *m_L2L3LineSource;
+  vtkTubeFilter *m_L2L3TubeFilter;
+  vtkPolyDataMapper *m_L2L3PolyDataMapper;
+  vtkActor *m_L2L3Actor;
 
-	// scaling contours stuff
-	vtkPlane *m_X0ZNPlane; // pointing N
-	vtkPlane *m_X0ZSPlane; // pointing S
-	vtkPlane *m_Y0ZEPlane; // pointing E
-	vtkPlane *m_Y0ZWPlane; // pointing W
+  // scaling contours stuff
+  vtkPlane *m_X0ZNPlane; // pointing N
+  vtkPlane *m_X0ZSPlane; // pointing S
+  vtkPlane *m_Y0ZEPlane; // pointing E
+  vtkPlane *m_Y0ZWPlane; // pointing W
 
-	// north-east
-	vtkTubeFilter *m_NEContourTubeFilter;
-	vtkTransformPolyDataFilter *m_NEContourTransformPolyDataFilter;
-	vtkClipPolyData *m_NEContourX0ZPlaneClipPolyData;
-	vtkClipPolyData *m_NEContourY0ZPlaneClipPolyData;
-	vtkPolyDataMapper *m_NEContourPolyDataMapper;
-	vtkActor *m_NEContourActor;
+  // north-east
+  vtkTubeFilter *m_NEContourTubeFilter;
+  vtkTransformPolyDataFilter *m_NEContourTransformPolyDataFilter;
+  vtkClipPolyData *m_NEContourX0ZPlaneClipPolyData;
+  vtkClipPolyData *m_NEContourY0ZPlaneClipPolyData;
+  vtkPolyDataMapper *m_NEContourPolyDataMapper;
+  vtkActor *m_NEContourActor;
 
-	// south-east
-	vtkTubeFilter *m_SEContourTubeFilter;
-	vtkTransformPolyDataFilter *m_SEContourTransformPolyDataFilter;
-	vtkClipPolyData *m_SEContourX0ZPlaneClipPolyData;
-	vtkClipPolyData *m_SEContourY0ZPlaneClipPolyData;
-	vtkPolyDataMapper *m_SEContourPolyDataMapper;
-	vtkActor *m_SEContourActor;
+  // south-east
+  vtkTubeFilter *m_SEContourTubeFilter;
+  vtkTransformPolyDataFilter *m_SEContourTransformPolyDataFilter;
+  vtkClipPolyData *m_SEContourX0ZPlaneClipPolyData;
+  vtkClipPolyData *m_SEContourY0ZPlaneClipPolyData;
+  vtkPolyDataMapper *m_SEContourPolyDataMapper;
+  vtkActor *m_SEContourActor;
 
-	// north-west
-	vtkTubeFilter *m_NWContourTubeFilter;
-	vtkTransformPolyDataFilter *m_NWContourTransformPolyDataFilter;
-	vtkClipPolyData *m_NWContourX0ZPlaneClipPolyData;
-	vtkClipPolyData *m_NWContourY0ZPlaneClipPolyData;
-	vtkPolyDataMapper *m_NWContourPolyDataMapper;
-	vtkActor *m_NWContourActor;
+  // north-west
+  vtkTubeFilter *m_NWContourTubeFilter;
+  vtkTransformPolyDataFilter *m_NWContourTransformPolyDataFilter;
+  vtkClipPolyData *m_NWContourX0ZPlaneClipPolyData;
+  vtkClipPolyData *m_NWContourY0ZPlaneClipPolyData;
+  vtkPolyDataMapper *m_NWContourPolyDataMapper;
+  vtkActor *m_NWContourActor;
 
-	// south-west
-	vtkTubeFilter *m_SWContourTubeFilter;
-	vtkTransformPolyDataFilter *m_SWContourTransformPolyDataFilter;
-	vtkClipPolyData *m_SWContourX0ZPlaneClipPolyData;
-	vtkClipPolyData *m_SWContourY0ZPlaneClipPolyData;
-	vtkPolyDataMapper *m_SWContourPolyDataMapper;
-	vtkActor *m_SWContourActor;
+  // south-west
+  vtkTubeFilter *m_SWContourTubeFilter;
+  vtkTransformPolyDataFilter *m_SWContourTransformPolyDataFilter;
+  vtkClipPolyData *m_SWContourX0ZPlaneClipPolyData;
+  vtkClipPolyData *m_SWContourY0ZPlaneClipPolyData;
+  vtkPolyDataMapper *m_SWContourPolyDataMapper;
+  vtkActor *m_SWContourActor;
 
-	// information display
-	vtkTextMapper *m_TextMapperX;
-	vtkScaledTextActor *m_ScaledTextActorX;
+  // information display
+  vtkTextMapper *m_TextMapperX;
+  vtkScaledTextActor *m_ScaledTextActorX;
 
-	vtkTextMapper *m_TextMapperY;
-	vtkScaledTextActor *m_ScaledTextActorY;
+  vtkTextMapper *m_TextMapperY;
+  vtkScaledTextActor *m_ScaledTextActorY;
 
-	// rendering
-	vtkRenderWindow *m_RenderWindow;
-	vtkRenderer *m_Renderer;
-	vtkRenderWindowInteractor *m_RenderWindowInteractor;
+  // rendering
+  vtkRenderWindow *m_RenderWindow;
+  vtkRenderer *m_Renderer;
+  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
-	// camera
-	double m_CameraFocalPoint[3];
-	double m_CameraPosition[3];
-	double m_CameraClippingRange[2];
-	double m_CameraViewUp[3];
+  // camera
+  double m_CameraFocalPoint[3];
+  double m_CameraPosition[3];
+  double m_CameraClippingRange[2];
+  double m_CameraViewUp[3];
 
-	// unit vectors and lengths of landmark lines
-	double m_DUnitVector12[3];
-	double m_DUnitVector23[3];
-	double m_DLength12;
-	double m_DLength23;
-	double m_DOverallLength;
+  // unit vectors and lengths of landmark lines
+  double m_DUnitVector12[3];
+  double m_DUnitVector23[3];
+  double m_DLength12;
+  double m_DLength23;
+  double m_DOverallLength;
 
   // scaling occured flags
   bool m_ScalingOccured ;
