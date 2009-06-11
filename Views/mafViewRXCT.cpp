@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:42:28 $
-  Version:   $Revision: 1.45.2.5 $
+  Date:      $Date: 2009-06-11 15:03:54 $
+  Version:   $Revision: 1.45.2.6 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,7 +23,7 @@
 #include "mafViewVTK.h"
 #include "mafViewRX.h"
 #include "mafViewSlice.h"
-#include "mafPipeVolumeSlice.h"
+#include "mafPipeVolumeSlice_BES.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafNodeIterator.h"
 #include "mafGUILutPreset.h"
@@ -268,9 +268,9 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetTextColor(m_BorderColor[i]);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->VmeShow(node,show);
 
-        mafPipeVolumeSlice *p = NULL;
+        mafPipeVolumeSlice_BES *p = NULL;
         // set pipe lookup table
-        p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
+        p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
         //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
         p->SetColorLookupTable(m_Lut);
         m_Pos[i] = b[5]-step*(i+1);
@@ -399,8 +399,8 @@ void mafViewRXCT::OnEventRangeModified(mafEventBase *maf_event)
       m_Lut->SetRange(low,hi);
       for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
       {
-        mafPipeVolumeSlice *p = NULL;
-        p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+        mafPipeVolumeSlice_BES *p = NULL;
+        p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
         //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
         p->SetColorLookupTable(m_Lut);
       }
@@ -746,8 +746,8 @@ void mafViewRXCT::PackageView()
 
   m_ViewCTCompound = new mafViewCompound("CT view",3,2);
   mafViewSlice *vs = new mafViewSlice("Slice view", CAMERA_CT);
-  vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice",MUTEX);
-  vs->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES",MUTEX);
+  vs->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES",MUTEX);
   vs->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEPolyline", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice",MUTEX);
@@ -757,7 +757,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMESlicer", "mafPipeSurfaceSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
-  vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice",MUTEX);
+  vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES",MUTEX);
  
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);
@@ -829,10 +829,10 @@ void mafViewRXCT::GizmoCreate()
 {
   for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++) 
   {
-    double slice[3];
-    mafPipeVolumeSlice *p = NULL;
-    p = mafPipeVolumeSlice::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
-    p->GetSliceOrigin(slice);
+    double slice[3],normal[3];
+    mafPipeVolumeSlice_BES *p = NULL;
+    p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+    p->GetSlice(slice,normal);
     m_GizmoSlice[i] = new mafGizmoSlice(m_CurrentVolume, this);
     m_GizmoSlice[i]->CreateGizmoSliceInLocalPositionOnAxis(i,mafGizmoSlice::GIZMO_SLICE_Z,slice[2]);
     m_GizmoSlice[i]->SetColor(m_BorderColor[i]);
