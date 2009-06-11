@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-06-11 09:47:55 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -75,6 +75,7 @@ medOpMove::medOpMove(const wxString &label) :
 mafOpTransformInterface(label)
 //----------------------------------------------------------------------------
 {
+  m_EnableScaling = FALSE;
   m_OpType = OPTYPE_OP;
   m_Canundo = true;
 

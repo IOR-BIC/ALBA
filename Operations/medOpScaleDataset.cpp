@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-06-11 09:47:55 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,7 +49,6 @@ enum MAF_TRANSFORM_ID
 {
 	ID_SHOW_GIZMO = MINID,
   ID_RESET,
-//  ID_AUX_REF_SYS,
   ID_ENABLE_SCALING,
 };
 
@@ -66,18 +65,14 @@ mafOpTransformInterface(label)
   m_Canundo = true;
 
   m_GizmoScale              = NULL;
-//  m_GuiTransform            = NULL;
   m_GuiSaveRestorePose      = NULL;
-//  m_GuiTransformTextEntries = NULL;
 }
 //----------------------------------------------------------------------------
 medOpScaleDataset::~medOpScaleDataset()
 //----------------------------------------------------------------------------
 {
   cppDEL(m_GizmoScale);
-//  cppDEL(m_GuiTransform);
   cppDEL(m_GuiSaveRestorePose);
-//  cppDEL(m_GuiTransformTextEntries);
 }
 //----------------------------------------------------------------------------
 bool medOpScaleDataset::Accept(mafNode* vme)
@@ -96,7 +91,6 @@ mafOp* medOpScaleDataset::Copy()
 void medOpScaleDataset::OpRun()
 //----------------------------------------------------------------------------
 {
-  // progress bar stuff
   wxBusyInfo wait("creating gui...");
 
   assert(m_Input);
@@ -113,8 +107,6 @@ void medOpScaleDataset::OpRun()
 void medOpScaleDataset::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
-  // perform different actions depending on sender
-  // process events: 
   if (maf_event->GetSender() == this->m_Gui) // from this operation gui
   {
     OnEventThis(maf_event); 
@@ -131,7 +123,6 @@ void medOpScaleDataset::OnEvent(mafEventBase *maf_event)
   }
   else
   {
-    // if no one can handle this event send it to the operation listener
     mafEventMacro(*maf_event); 
   }	
 }
@@ -153,13 +144,10 @@ void medOpScaleDataset::OpUndo()
 void medOpScaleDataset::OpStop(int result)
 //----------------------------------------------------------------------------
 {  
-  // progress bar stuff
   wxBusyInfo wait("destroying gui...");
 
   m_GizmoScale->Show(false);
   cppDEL(m_GizmoScale);
-
-//  m_GuiTransform->DetachInteractorFromVme();
 
   // HideGui seems not to work  with plugged guis :(; using it generate a SetFocusToChild
   // error when operation tab is selected after the operation has ended
@@ -210,8 +198,6 @@ void medOpScaleDataset::OnEventGizmoScale(mafEventBase *maf_event)
     case ID_TRANSFORM:
   	{ 
       m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
-      // update gui 
-//      m_GuiTransformTextEntries->SetAbsPose(&m_NewAbsMatrix);
       mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 	  }
     break;
