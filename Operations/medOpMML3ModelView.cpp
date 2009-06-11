@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-10 14:22:46 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-06-11 17:20:08 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,10 +56,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_TubeFilterRadius = 0.5 ;
 
   // final transform
-  m_Finalm = vtkMatrix4x4::New();
+  m_FinalMat = vtkMatrix4x4::New();
 
   // synthetic slices transform
-  m_Slicesm = vtkMatrix4x4::New();
+  m_SliceRotationMat = vtkMatrix4x4::New();
 
   //
   m_ScalingOccured = FALSE;
@@ -754,8 +754,8 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 medOpMML3ModelView::~medOpMML3ModelView()
 //----------------------------------------------------------------------------
 {
-  m_Finalm->Delete() ;
-  m_Slicesm->Delete() ;
+  m_FinalMat->Delete() ;
+  m_SliceRotationMat->Delete() ;
 
   // splines
   m_CenterHorizontalOffsetSpline->Delete() ;
@@ -943,19 +943,20 @@ medOpMML3ModelView::~medOpMML3ModelView()
 
 
 
+
 //----------------------------------------------------------------------------
-// Calculate size and resolution
+// Calculate size and resolution from user-defined grain
 // Must be called prior to CreateSyntheticScans
 //
 // Size is determined by the bounds of MuscleTransform2PDFilter->GetOutput()
 //      or just (200, 200) if muscle type is 2
 //
-// Resolution is 0.3, 0.5, 1, 2 or 3 * the size, for grain values 1-5.
 // Resolution is the no. of cells when the polydata slice is created from vtkPlaneSource().
+// The resolution is a fraction of the image size, which is calculated from the grain
 void medOpMML3ModelView::FindSizeAndResolutionOfSyntheticScans()
 //----------------------------------------------------------------------------
 {
-  float Factor = 1.75; // 75% extra
+  float Factor = 1.1 ; // 10% extra
 
   switch (m_NTypeOfMuscles)
   {
@@ -965,15 +966,9 @@ void medOpMML3ModelView::FindSizeAndResolutionOfSyntheticScans()
     m_MuscleTransform2PolyDataFilter->GetOutput()->GetBounds(bounds);
 
     // size
-    if (fabs(bounds[0]) > fabs(bounds[1]))
-      m_NSyntheticScansXSize = Factor * 2.0 * fabs(bounds[0]);
-    else
-      m_NSyntheticScansXSize = Factor * 2.0 * fabs(bounds[1]);
+    m_NSyntheticScansXSize = 2.0 * Factor * fabs(bounds[1]-bounds[0]) ;
+    m_NSyntheticScansYSize = 2.0 * Factor * fabs(bounds[3]-bounds[2]) ;
 
-    if (fabs(bounds[2]) > fabs(bounds[3]))
-      m_NSyntheticScansYSize = Factor * 2.0 * fabs(bounds[2]);
-    else
-      m_NSyntheticScansYSize = Factor * 2.0 * fabs(bounds[3]);
     break;
 
   case 2: // slicing axis is two lines
@@ -982,35 +977,21 @@ void medOpMML3ModelView::FindSizeAndResolutionOfSyntheticScans()
     break;
   }
 
-  //
-  // resolution
-  assert(m_SyntheticScansGrain > 0 && m_SyntheticScansGrain < 6);
 
-  // set
-  if (m_SyntheticScansGrain == 1) // x 1/3
-  {
-    m_NSyntheticScansXResolution = 0.3 * m_NSyntheticScansXSize;
-    m_NSyntheticScansYResolution = 0.3 * m_NSyntheticScansYSize;
+  // resolution (this will be the no. of quads in the polydata probe)
+  double aspectRatio = m_NSyntheticScansYSize / m_NSyntheticScansXSize ;
+
+  if (m_NSyntheticScansXSize > m_NSyntheticScansYSize){
+    m_NSyntheticScansXResolution = m_SyntheticScansGrain ;
+    m_NSyntheticScansYResolution = (int)((double)m_SyntheticScansGrain * aspectRatio) ;
   }
-  else if (m_SyntheticScansGrain == 2) // x 1/2
-  {
-    m_NSyntheticScansXResolution = 0.5 * m_NSyntheticScansXSize;
-    m_NSyntheticScansYResolution = 0.5 * m_NSyntheticScansYSize;
+  else if (m_NSyntheticScansXSize < m_NSyntheticScansYSize){
+    m_NSyntheticScansXResolution = (int)((double)m_SyntheticScansGrain / aspectRatio) ;
+    m_NSyntheticScansYResolution = m_SyntheticScansGrain ;
   }
-  else if (m_SyntheticScansGrain == 3) // x1
-  {
-    m_NSyntheticScansXResolution = 1.0 * m_NSyntheticScansXSize;
-    m_NSyntheticScansYResolution = 1.0 * m_NSyntheticScansYSize;
-  }
-  else if (m_SyntheticScansGrain == 4) // x2
-  {
-    m_NSyntheticScansXResolution = 2.0 * m_NSyntheticScansXSize;
-    m_NSyntheticScansYResolution = 2.0 * m_NSyntheticScansYSize;
-  }
-  else // x3
-  {
-    m_NSyntheticScansXResolution = 3.0 * m_NSyntheticScansXSize;
-    m_NSyntheticScansYResolution = 3.0 * m_NSyntheticScansYSize;
+  else{
+    m_NSyntheticScansXResolution = m_SyntheticScansGrain ;
+    m_NSyntheticScansYResolution = m_SyntheticScansGrain ;
   }
 }
 
@@ -1038,6 +1019,11 @@ void medOpMML3ModelView::CreateSyntheticScans()
   float scalarrange[2];
   scans->GetScalarRange(scalarrange); // (-3024, 1892)
   */
+
+  // Nigel: temporary style so we can see what's going on in 3D
+  //vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New() ;
+  //this->GetRenderWindowInteractor()->SetInteractorStyle(style) ;
+  //style->Delete() ;
 
   //
   int n;
@@ -1210,6 +1196,9 @@ void medOpMML3ModelView::DeleteSyntheticScans()
 
 
 //----------------------------------------------------------------------------
+// Calculate the origin of the slice, 
+// ie the intersection of the axis with the slice
+// The axis goes from (patient) landmark 2 to landmark 1.
 void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double p[])
 //----------------------------------------------------------------------------
 {
@@ -1232,7 +1221,7 @@ void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double
     // ending at landmark 1 (high)
 
     // current length
-    currentlength = m_DLength12 / (n - 1) * scanId ;
+    currentlength = ((double)scanId / (double)(n-1)) * m_DLength12 ;
 
     // origin
     for(i = 0; i < 3; i++)
@@ -1244,7 +1233,7 @@ void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double
     // ending at landmark 1 (high)
 
     // current length
-    currentlength = m_DOverallLength / (n - 1) * scanId ;
+    currentlength = ((double)scanId / (double)(n-1)) * m_DOverallLength ;
 
     // origin
     for(i = 0; i < 3; i++)
@@ -1266,24 +1255,19 @@ void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double
 
 
 //----------------------------------------------------------------------------
-// Create and calculate new transform matrix for the
-// slices polydata plane source
+// Create and calculate new transform matrix for the slices polydata plane source
+// NB this assumes that the origin of vtkPlaneSource is the same as the centre.
 vtkMatrix4x4* medOpMML3ModelView::CreatePlaneSourceTransformOfSyntheticScans(int scanId)
 //----------------------------------------------------------------------------
 {
-  //
   int i;
   int n;
-
-  //
   double p[3];
-
-  //
   double currentlength;
   double normal[3];
   double d;
 
-  //
+  // allocate matrices
   vtkMatrix4x4 *rotaxm = vtkMatrix4x4::New();
   vtkMatrix4x4 *rotaym = vtkMatrix4x4::New();
   vtkMatrix4x4 *scalem = vtkMatrix4x4::New();
@@ -1293,10 +1277,40 @@ vtkMatrix4x4* medOpMML3ModelView::CreatePlaneSourceTransformOfSyntheticScans(int
   vtkMatrix4x4 *inversealignm =  vtkMatrix4x4::New();
   vtkMatrix4x4 *finalm =  vtkMatrix4x4::New();
 
+  
+
   switch (m_NTypeOfMuscles)
   {
   case 1: // slicing axis is single line
 
+    // synthetic scan: plane source size
+    // as a scaling transformation
+    scalem->Identity();
+    scalem->SetElement(0, 0, m_NSyntheticScansXSize);
+    scalem->SetElement(1, 1, m_NSyntheticScansYSize);
+
+    // synthetic scan: plane source origin
+    // as a translation transformation
+    // assumes origin is same as centre
+    this->GetPlaneSourceOriginOfSyntheticScans(scanId, p); 
+    transm->Identity();
+    transm->SetElement(0, 3, p[0]); // x
+    transm->SetElement(1, 3, p[1]); // y
+    transm->SetElement(2, 3, p[2]); // z
+
+    // get matrix which rotates slice (inverse of that which rotates muscle to slice stack coords)
+    inversem_pslicesm->Identity();
+    inversem_pslicesm->Invert(m_SliceRotationMat, inversem_pslicesm);
+
+    // synthetic scan: plane source transformation matrix
+    finalm->Identity();
+    MultiplyMatrix4x4(transm, finalm, finalm); // 3. translation
+    MultiplyMatrix4x4(inversem_pslicesm, finalm, finalm); // 2. alignment: inverse (rotx * roty)
+    MultiplyMatrix4x4(scalem, finalm, finalm); // 1. scaling
+
+    break;
+
+  case 2: // slicing axis is double line
     // synthetic scan: plane source size
     // (as a scaling transformation)
     scalem->Identity();
@@ -1304,34 +1318,8 @@ vtkMatrix4x4* medOpMML3ModelView::CreatePlaneSourceTransformOfSyntheticScans(int
     scalem->SetElement(1, 1, m_NSyntheticScansYSize);
 
     // synthetic scan: plane source origin
-    // (as a translation transformation)
-    this->GetPlaneSourceOriginOfSyntheticScans(scanId, p); 
-    transm->Identity();
-    transm->SetElement(0, 3, p[0]); // x
-    transm->SetElement(1, 3, p[1]); // y
-    transm->SetElement(2, 3, p[2]); // z
-
-    //
-    inversem_pslicesm->Identity();
-    inversem_pslicesm->Invert(m_Slicesm, inversem_pslicesm);
-
-    //  s-th synthetic scan: plane source transformation matrix
-    finalm->Identity();
-    MultiplyMatrix4x4(transm, finalm, finalm); // 3. translation
-    MultiplyMatrix4x4(inversem_pslicesm, finalm, finalm); // 2. alignement: inverse (rotx * roty)
-    MultiplyMatrix4x4(scalem, finalm, finalm); // 1. scaling
-
-    break;
-
-  case 2: // slicing axis is double line
-    // s-th synthetic scan: plane source size
-    // (as a scaling transformation)
-    scalem->Identity();
-    scalem->SetElement(0, 0, m_NSyntheticScansXSize);
-    scalem->SetElement(1, 1, m_NSyntheticScansYSize);
-
-    // s-th synthetic scan: plane source origin
-    // (as a translation transformation)
+    // as a translation transformation
+    // assumes origin is same as centre
     this->GetPlaneSourceOriginOfSyntheticScans(scanId, p); 
     transm->Identity();
     transm->SetElement(0, 3, p[0]); // x
@@ -1415,16 +1403,17 @@ vtkMatrix4x4* medOpMML3ModelView::CreatePlaneSourceTransformOfSyntheticScans(int
 
 //----------------------------------------------------------------------------
 // Create and calculate new transform matrix
+// This matrix is the inverse of the PlaneSourceTransform (except for scaling)
+// So it transforms the slice actor into the xy plane with the centre at (0,0)
 vtkMatrix4x4* medOpMML3ModelView::CreateActorTransformOfSyntheticScans(int scanId)
 //----------------------------------------------------------------------------
 {
-  //
   double p[3];
 
-  //
   vtkMatrix4x4 *transm = vtkMatrix4x4::New();
   vtkMatrix4x4 *inversem_pslicesm = vtkMatrix4x4::New();
   vtkMatrix4x4 *finalm =  vtkMatrix4x4::New();
+
 
   switch (m_NTypeOfMuscles)
   {
@@ -1440,7 +1429,7 @@ vtkMatrix4x4* medOpMML3ModelView::CreateActorTransformOfSyntheticScans(int scanI
 
     //
     inversem_pslicesm->Identity();
-    inversem_pslicesm->Invert(m_Slicesm, inversem_pslicesm);
+    inversem_pslicesm->Invert(m_SliceRotationMat, inversem_pslicesm);
 
     finalm->Identity();
     MultiplyMatrix4x4(transm, finalm, finalm); // 2. translation
@@ -1697,7 +1686,7 @@ bool medOpMML3ModelView::MapAtlasToPatient()
 // is aligned with muscle line axis as defined by insertion points
 // in patient, and origin being the middle of this muscle line axis.
 //
-// Calculate matrices m_Slicesm and m_Finalm
+// Calculate matrices m_SliceRotationMat and m_FinalMat
 // Set m_MuscleTransform2
 bool medOpMML3ModelView::MakeActionLineZAxis()
 //----------------------------------------------------------------------------
@@ -1776,19 +1765,19 @@ bool medOpMML3ModelView::MakeActionLineZAxis()
   scalem->SetElement(2, 2, 1.0);
 
   // synthetic slices transform
-  m_Slicesm->Identity();
-  MultiplyMatrix4x4(rotaym, m_Slicesm, m_Slicesm); // rotation y
-  MultiplyMatrix4x4(rotaxm, m_Slicesm, m_Slicesm); // rotation x
+  m_SliceRotationMat->Identity();
+  MultiplyMatrix4x4(rotaym, m_SliceRotationMat, m_SliceRotationMat); // rotation y
+  MultiplyMatrix4x4(rotaxm, m_SliceRotationMat, m_SliceRotationMat); // rotation x
 
   // transformation matrix
-  m_Finalm->Identity();
-  MultiplyMatrix4x4(scalem, m_Finalm, m_Finalm); // 4. scaling
-  MultiplyMatrix4x4(rotaym, m_Finalm, m_Finalm); // 3. rotation y
-  MultiplyMatrix4x4(rotaxm, m_Finalm, m_Finalm); // 2. rotation x
-  MultiplyMatrix4x4(transm, m_Finalm, m_Finalm); // 1. translation
+  m_FinalMat->Identity();
+  MultiplyMatrix4x4(scalem, m_FinalMat, m_FinalMat); // 4. scaling
+  MultiplyMatrix4x4(rotaym, m_FinalMat, m_FinalMat); // 3. rotation y
+  MultiplyMatrix4x4(rotaxm, m_FinalMat, m_FinalMat); // 2. rotation x
+  MultiplyMatrix4x4(transm, m_FinalMat, m_FinalMat); // 1. translation
 
   // Set transform 2 of muscle (see constructor)
-  m_MuscleTransform2->SetMatrix(m_Finalm);
+  m_MuscleTransform2->SetMatrix(m_FinalMat);
 
 
   double newp1[3];
@@ -1796,7 +1785,7 @@ bool medOpMML3ModelView::MakeActionLineZAxis()
 
   // transform insertions (tests)
   vtkTransform *transf = vtkTransform::New();
-  transf->SetMatrix(m_Finalm);
+  transf->SetMatrix(m_FinalMat);
   transf->TransformPoint(p1, newp1); // landmark 1
   transf->TransformPoint(p2, newp2); // landmark 2
   transf->Delete();
@@ -2169,45 +2158,6 @@ void medOpMML3ModelView::GetSizeOfSyntheticScans(float *x, float *y)
   *y = m_NSyntheticScansYSize;
 }
 
-
-//----------------------------------------------------------------------------
-// Multiply matrices c = ab
-// c can be the same as a or b
-// This is a column major multiply, but vtkMatrix4x4 is row major,
-// so this actually does c = ba.
-void medOpMML3ModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b, vtkMatrix4x4 *c) const
-//----------------------------------------------------------------------------
-{
-  //
-  // matrix notation (i is row, j is col)
-  // matrices are column major, ie mat->GetElement[col][row]
-  //
-  // C0 C1 C2 C3 |
-  // -------------
-  // 00 10 20 30 | R0
-  // 01 11 21 31 | R1
-  // 02 12 22 32 | R2
-  // 03 13 23 33 | R3
-  //
-  // ji element of product is irow
-  // of a combined with jcol of b
-
-  vtkMatrix4x4* ctemp = vtkMatrix4x4::New();
-
-  for (int i = 0; i < 4; i++){
-    for(int j = 0; j < 4; j++){
-      ctemp->SetElement(j, i, 
-        a->GetElement(0, i) * b->GetElement(j, 0) +
-        a->GetElement(1, i) * b->GetElement(j, 1) +
-        a->GetElement(2, i) * b->GetElement(j, 2) +
-        a->GetElement(3, i) * b->GetElement(j, 3));		
-    }
-  }
-
-  // copy result to output matrix
-  c->DeepCopy(ctemp) ;
-  ctemp->Delete() ;
-}
 
 
 
@@ -3140,6 +3090,76 @@ void medOpMML3ModelView::Switch3dDisplayOn()
   m->Delete() ;
   t->Delete() ;
 }
+
+
+
+
+//----------------------------------------------------------------------------
+// Multiply matrices c = ab
+// c can be the same as a or b
+// This is a column major multiply, but vtkMatrix4x4 is row major,
+// so this actually does c = ba.
+void medOpMML3ModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b, vtkMatrix4x4 *c) const
+//----------------------------------------------------------------------------
+{
+  //
+  // matrix notation (i is row, j is col)
+  // matrices are column major, ie mat->GetElement[col][row]
+  //
+  // C0 C1 C2 C3 |
+  // -------------
+  // 00 10 20 30 | R0
+  // 01 11 21 31 | R1
+  // 02 12 22 32 | R2
+  // 03 13 23 33 | R3
+  //
+  // ji element of product is irow
+  // of a combined with jcol of b
+
+  vtkMatrix4x4* ctemp = vtkMatrix4x4::New();
+
+  for (int i = 0; i < 4; i++){
+    for(int j = 0; j < 4; j++){
+      ctemp->SetElement(j, i, 
+        a->GetElement(0, i) * b->GetElement(j, 0) +
+        a->GetElement(1, i) * b->GetElement(j, 1) +
+        a->GetElement(2, i) * b->GetElement(j, 2) +
+        a->GetElement(3, i) * b->GetElement(j, 3));		
+    }
+  }
+
+  // copy result to output matrix
+  c->DeepCopy(ctemp) ;
+  ctemp->Delete() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Calculate centre of any plane created by vtkPlaneSource and scaled by sizx, sizy
+void medOpMML3ModelView::CalculateCentreOfVtkPlane(double sizx, double sizy, double p[3]) const
+//------------------------------------------------------------------------------
+{
+  vtkPlaneSource *plane = vtkPlaneSource::New() ;
+
+  vtkTransform *t = vtkTransform::New() ;
+  t->Scale(sizx, sizy, 1) ;
+
+  vtkTransformPolyDataFilter *tpdf = vtkTransformPolyDataFilter::New() ;
+  tpdf->SetInput(plane->GetOutput()) ;
+  tpdf->SetTransform(t) ;
+
+  tpdf->GetOutput()->Update() ;
+  tpdf->GetOutput()->GetCenter(p) ;
+  double b[6] ;
+  tpdf->GetOutput()->GetBounds(b) ;
+
+  t->Delete() ;
+  tpdf->Delete() ;
+  plane->Delete() ;
+}
+
+
 
 
 

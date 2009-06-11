@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-10 14:22:46 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-06-11 17:20:08 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -68,14 +68,11 @@ enum
 
   // set up dlg events
   ID_CHOOSE_SURFACE,
-
-  // Nigel A
   ID_CHOOSE_L1,
   ID_CHOOSE_L2,
   ID_CHOOSE_L3,
   ID_CHOOSE_L4,
-  // Nigel A end
-
+  ID_CHOOSE_FLAG3D,
   ID_CHOOSE_FAKE, // dummy id with no associated event
   ID_CHOOSE_OK,
   ID_CHOOSE_CANCEL,
@@ -93,13 +90,10 @@ enum
   ID_UNDO,
   ID_SLICE,
 
-  //
   ID_STATE,
   ID_CHOOSE_SCANS_DISTANCE,
 
-  // Nigel A
   ID_FAKE,
-  // Nigel A end
 
 };
 
@@ -158,16 +152,18 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   // no 3d view
   m_3DFlag = 0;
 
-  // no 4th landmark
-  m_LandmarksFlag = 0;
-
   // unregistered
   m_RegistrationStatus = 0;
 
-  //
+  // set flags to indicate that no landmarks have been defined
+  m_L1Defined = false ;
+  m_L2Defined = false ;
+  m_L3Defined = false ;
+  m_L4Defined = false ;
+
   //m_ScansDistance = 30.0;
-  m_ScansGrain = 2;
-  m_ScansNumber = 12;
+  m_ScansGrain = 128 ;
+  m_ScansNumber = 12 ;
   //m_muscle_type = 1;
   m_RegistrationXYScalingFactor = 1.0;
   m_ScansSize[0] = 90;
@@ -261,12 +257,14 @@ void medOpMML3::OpRun()
   if (returnCode != wxID_OK){
     // delete dialog and cancel operation
     OpStop(OP_RUN_CANCEL);
+    return ;
   }
 
   if (!m_SurfaceVME){
     // vme not selected so warn and cancel
     wxMessageBox("Not all parameters have been set up","alert",wxICON_WARNING);
     OpStop(OP_RUN_CANCEL);
+    return ;
   }
 
 
@@ -296,13 +294,6 @@ void medOpMML3::CreateInputsDlg()
   // vertical stacker for the rows of widgets
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
 
-  // set flags to indicate that no landmarks have been defined
-  m_L1Defined = false ;
-  m_L2Defined = false ;
-  m_L3Defined = false ;
-  m_L4Defined = false ;
-
-
   // select muscle surface vme
   wxStaticText *lab_1  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Surface", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_1 = new wxTextCtrl(m_ChooseDlg , ID_CHOOSE_SURFACE, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
@@ -317,8 +308,7 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_1, 0, wxEXPAND | wxALL, 2);
 
 
-  // Nigel A
-  // landmarks
+  // landmark 1
   wxStaticText *lab_5  = new wxStaticText(m_ChooseDlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_5 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_5->SetValidator(mafGUIValidator(this,ID_CHOOSE_L1,text_5,&m_L1Name));
@@ -330,6 +320,7 @@ void medOpMML3::CreateInputsDlg()
   hs_5->Add(b_5,0);
   vs1->Add(hs_5,0,wxEXPAND | wxALL, 2);
 
+  // landmark 2
   wxStaticText *lab_6  = new wxStaticText(m_ChooseDlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_6 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_6->SetValidator(mafGUIValidator(this,ID_CHOOSE_L2,text_6,&m_L2Name));
@@ -341,6 +332,7 @@ void medOpMML3::CreateInputsDlg()
   hs_6->Add(b_6,0);
   vs1->Add(hs_6,0,wxEXPAND | wxALL, 2);
 
+  // landmark 3
   wxStaticText *lab_7  = new wxStaticText(m_ChooseDlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_7 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_7->SetValidator(mafGUIValidator(this,ID_CHOOSE_L3,text_7,&m_L3Name));
@@ -352,8 +344,8 @@ void medOpMML3::CreateInputsDlg()
   hs_7->Add(b_7,0);
   vs1->Add(hs_7,0,wxEXPAND | wxALL, 2);
 
-#ifdef TestingVersion
-  wxStaticText *lab_8  = new wxStaticText(m_ChooseDlg, -1, "Landmark 4", wxPoint(0,0), wxSize(150,20));
+  // landmark 4
+  wxStaticText *lab_8  = new wxStaticText(m_ChooseDlg, -1, "Landmark 4 (optional)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl   *text_8 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_8->SetValidator(mafGUIValidator(this,ID_CHOOSE_L4,text_8,&m_L4Name));
   mafGUIButton *b_8       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
@@ -363,7 +355,7 @@ void medOpMML3::CreateInputsDlg()
   hs_8->Add(text_8,1,wxEXPAND);
   hs_8->Add(b_8,0);
   vs1->Add(hs_8,0,wxEXPAND | wxALL, 2);
-#endif
+
 
   // registration xy scaling factor
   wxStaticText *RegistrationXYSxalingFactorLab  = new wxStaticText(m_ChooseDlg, -1, "XY scale (0.01 - 2.0)", wxPoint(0,0), wxSize(150,20));
@@ -373,7 +365,7 @@ void medOpMML3::CreateInputsDlg()
   RegistrationXYSxalingFactorSizer->Add(RegistrationXYSxalingFactorLab,0);
   RegistrationXYSxalingFactorSizer->Add(m_RegistrationXYSxalingFactorTxt,1,wxEXPAND);
   vs1->Add(RegistrationXYSxalingFactorSizer,0,wxEXPAND | wxALL, 2);
-
+  m_RegistrationXYSxalingFactorTxt->Enable(false) ;
 
   // scans distance
   wxStaticText *ScansDistanceLab  = new wxStaticText(m_ChooseDlg, -1, "Slice distance (0.1 - 100.0)", wxPoint(0,0), wxSize(150,20));
@@ -383,12 +375,11 @@ void medOpMML3::CreateInputsDlg()
   ScansDistanceHorizontalSizer->Add(ScansDistanceLab,0);
   ScansDistanceHorizontalSizer->Add(ScansDistanceTxt,1,wxEXPAND);
   vs1->Add(ScansDistanceHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  // Nigel A end
+  ScansDistanceTxt->Enable(false) ;
 
 
-
-  // scans number
-  wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice number (3 - 100)", wxPoint(0,0), wxSize(150,20));
+  // number of scans
+  wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Number of slices (3 - 100)", wxPoint(0,0), wxSize(150,20));
   m_ScansNumberTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
   m_ScansNumberTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_ScansNumberTxt, &m_ScansNumber, 3, 100)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -412,37 +403,31 @@ void medOpMML3::CreateInputsDlg()
   */
 
 
-  // scans grain
-  wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice grain (1 - 5)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *ScansGrainTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansGrainTxt1->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, ScansGrainTxt1, &m_ScansGrain, 1, 5));
-  wxBoxSizer *ScansGrainHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  ScansGrainHorizontalSizer->Add(ScansGrainLab,0);
-  ScansGrainHorizontalSizer->Add(ScansGrainTxt1,1,wxEXPAND | wxRIGHT, 3);
-  vs1->Add(ScansGrainHorizontalSizer,0,wxEXPAND | wxALL, 2);
+
+  // scans resolution
+  wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice resolution (64-1024)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *ScansGrainTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
+  ScansGrainTxt1->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, ScansGrainTxt1, &m_ScansGrain, 64, 1024));
+  wxBoxSizer *ScansGrainHorizontalSizer2 = new wxBoxSizer(wxHORIZONTAL);
+  ScansGrainHorizontalSizer2->Add(ScansGrainLab, 0);
+  ScansGrainHorizontalSizer2->Add(ScansGrainTxt1,1,wxEXPAND | wxRIGHT, 3);
+  vs1->Add(ScansGrainHorizontalSizer2,0,wxEXPAND | wxALL, 2);
 
 
-#ifdef TestingVersion
-  // 3d flag
-  wxStaticText *flagLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "3D (0/1)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *flagTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
-  flagTxt1->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, flagTxt1, &m_3DFlag, 0, 1));
+
+  // 3d flag (note that check box needs a valid id)
+  wxStaticText *flag3dLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "3D display", wxPoint(0,0), wxSize(150,20));
+  wxCheckBox *flag3dCheckBox = new wxCheckBox(m_ChooseDlg, ID_CHOOSE_FLAG3D, "", wxPoint(0,0), wxSize(80,20)) ;
+  flag3dCheckBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_FLAG3D, flag3dCheckBox, &m_3DFlag));
+
+  //wxTextCtrl *flagTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
+  //flagTxt1->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, flagTxt1, &m_3DFlag, 0, 1));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  flagHorizontalSizer->Add(flagLab, 0);
-  flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
+  flagHorizontalSizer->Add(flag3dLab, 0);
+  //flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
+  flagHorizontalSizer->Add(flag3dCheckBox,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(flagHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
-  // Nigel A
-  // 4 landmarks flag
-  wxStaticText *LandmarksflagLab  = new wxStaticText(m_ChooseDlg, -1, "4 Landmarks (0/1)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *LandmarksflagTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  LandmarksflagTxt1->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,LandmarksflagTxt1,&m_LandmarksFlag,0,1));
-  wxBoxSizer *LandmarksflagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  LandmarksflagHorizontalSizer->Add(LandmarksflagLab, 0);
-  LandmarksflagHorizontalSizer->Add(LandmarksflagTxt1,1,wxEXPAND | wxRIGHT, 3);
-  vs1->Add(LandmarksflagHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  // Nigel A end
-#endif
 
   /*
   // scans x y resolution  (set automatically from scans x, y size)
@@ -2552,7 +2537,6 @@ void medOpMML3::CreateFakeLandmarks()
   m_L2Defined = true ;
   m_L3Defined = true ;
   m_L4Defined = false ;
-  m_LandmarksFlag = 0 ;
 }
 
 
@@ -2564,14 +2548,13 @@ void medOpMML3::CreateFakeLandmarks()
 bool medOpMML3::SetUpModelViewInputs()
 //----------------------------------------------------------------------------
 {
-  // Check that landmarks are defined
+  // Check that at least 3 landmarks are defined
   assert(m_L1Defined && m_L2Defined && m_L3Defined) ;
 
 
   // set muscle type (1 - one slicing axis, 2 - two slicing axes)
   m_Model->SetTypeOfMuscles(m_MuscleType);
 
-  // Nigel A
   // set atlas landmarks
   m_Model->SetLandmark1OfAtlas(m_L1Point); //high
   m_Model->SetLandmark2OfAtlas(m_L2Point); //low
@@ -2583,10 +2566,9 @@ bool medOpMML3::SetUpModelViewInputs()
   m_Model->SetLandmark2OfPatient(m_P2Point); //low
   m_Model->SetLandmark3OfPatient(m_P3Point);
   m_Model->SetLandmark4OfPatient(m_P4Point);
-  // Nigel A end
 
-  // landmark flag
-  m_Model->Set4LandmarksFlag(m_LandmarksFlag);
+  // landmark 4 flag
+  m_Model->Set4LandmarksFlag(m_L4Defined);
 
   // set x, y scaling factors
   m_Model->SetXYScalingFactorsOfMuscle(m_RegistrationXYScalingFactor, m_RegistrationXYScalingFactor);

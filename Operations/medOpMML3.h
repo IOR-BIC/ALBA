@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-06-10 14:22:46 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-06-11 17:20:08 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,15 +37,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //----------------------------------------------------------------------------
-// TODO 10.6.09
-// Replace "grain" in dialog with actual resolution
-// Calculation of slice size and position is very poor - sort it out
-// Contour widget can be too big, so you lose the scaling handles.
+// TODO 11.6.09
 // Restore commented-out sections.
 // Is it ok to have only 3 slices ?
-// Add accept() to landmark selection.
 // Range covered by slices only goes between landmarks - might not reach ends of bone.
-// Too many options in input dialog - need to explain or simplify.
+// Too many options in input dialog - need to explain, simplify and remove unwanted items.
+//   What is XY scale ?
+//   What is Slice distance ?
+// Contour widget not rendered on first slice until you change to another slice and back.
 //----------------------------------------------------------------------------
 
 
@@ -56,6 +55,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 /// to fit a volume image of the feature. \n
 /// The inputs are a volume (the patient data) and a muscle surface (the model).
 /// Global registration is performed by matching a set of 3 or 4 landmarks on patient and model.
+/// The line between landmarks 1 and 2 defines the slicing axis.
 //------------------------------------------------------------------------------
 class medOpMML3: public mafOp
 {
@@ -75,8 +75,6 @@ public:
   static bool AcceptVMELandmark(mafNode *node)
   {
     mafVME* vme = mafVME::SafeDownCast(node);
-    bool hello1 = (vme != NULL) ;
-    bool hello2 = vme->GetOutput()->IsA("mafVMELandmark") ;
     return ((vme != NULL) && vme->IsA("mafVMELandmark")) ;
   }
 
@@ -196,7 +194,6 @@ protected:
   int m_MuscleType;	///< muscle type (axis is single line or piecewise 2 lines)
   int m_RegistrationStatus;	///< flag indicating if registration has taken place
   int m_3DFlag;	///< flag indicating if model view is 2D or 3D
-  int m_LandmarksFlag;	///< flag indicating if 4th landmark is used
 
   // parameters of scans (slices)
   //double m_ScansDistance;

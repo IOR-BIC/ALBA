@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.h,v $
 Language:  C++
-Date:      $Date: 2009-06-10 14:22:46 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-06-11 17:20:08 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Mel Krokos
 ==========================================================================
 Copyright (c) 2002/2004
@@ -77,7 +77,7 @@ public:
   //----------------------------------------------------------------------------
 
   /// Get the total transform of the muscle from input to output
-  vtkMatrix4x4* GetFinalM() const {return m_Finalm ;}
+  vtkMatrix4x4* GetFinalM() const {return m_FinalMat ;}
 
   /// Get the output muscle polydata
   vtkPolyData* GetOutputPolydata() const {return m_MuscleTransform2PolyDataFilter->GetOutput() ;}
@@ -95,7 +95,7 @@ public:
   /// Calculate size and resolution of synthetic scans. \n
   /// Must be called prior to CreateSyntheticScans. \n
   /// Size depends on bounds of muscle. \n
-  /// Resolution is 0.3, 0.5, 1, 2 or 3 * the size, depending on the "grain" value.
+  /// Resolution is 1/16 to 2 times the image size, depending on the "grain" value.
   void FindSizeAndResolutionOfSyntheticScans();
 
   /// Construct the visual pipes for all the slices
@@ -282,8 +282,11 @@ protected:
   //----------------------------------------------------------------------------
   vtkMatrix4x4* CreateActorTransformOfSyntheticScans(int scanId);  ///< allocate and calculate new transform matrix
   vtkMatrix4x4* CreatePlaneSourceTransformOfSyntheticScans(int scanId);  ///< allocate and calculate new transform matrix
-  void GetPlaneSourceOriginOfSyntheticScans(int scanId, double p[3]); ///< calculate origin of polydata slice
 
+  /// Calculate the origin of the slice, \n
+  /// ie the intersection of the axis with the slice. \n
+  /// The axis goes from (patient) landmark 2 to landmark 1.
+  void GetPlaneSourceOriginOfSyntheticScans(int scanId, double p[3]);
 
   double GetContourAxesLengthScale() const {return m_ContourAxesLengthScale ;} ///< get length of contour axes
   void SetContourAxesLengthScale(double length) {m_ContourAxesLengthScale = length ;} ///< set length of contour axes
@@ -337,19 +340,26 @@ protected:
   /// c can be the same as a or b
   void MultiplyMatrix4x4(vtkMatrix4x4* a, vtkMatrix4x4* b, vtkMatrix4x4* c) const ;
 
+  /// Calculate centre of any plane created by vtkPlaneSource and scaled by sizx, sizy
+  void CalculateCentreOfVtkPlane(double sizx, double sizy, double p[3]) const ;
+
   void Print(vtkObject *obj, wxString msg = "") const ; //SIL. 24-12-2004: 
+
 
 
   //----------------------------------------------------------------------------
   // member variables
   //----------------------------------------------------------------------------
 
-  // final transform, set in MakeActionLineZAxis(), and equal to transform 2
-  vtkMatrix4x4 *m_Finalm;
+  // Final transform, set in MakeActionLineZAxis(), and equal to transform 2.
+  // This transforms the muscle to the coord system of the stack of slices.
+  vtkMatrix4x4 *m_FinalMat;
 
-  // synthetic slices transform, 
-  // actually just the rotation component of m_Finalm
-  vtkMatrix4x4 *m_Slicesm;
+  // synthetic slices transform, set in MakeActionLineZAxis().
+  // This is the rotation component of m_FinalMat.
+  // This rotates the muscle to the slice plane.
+  // Its inverse rotates the slice plane to the required slicing direction.
+  vtkMatrix4x4 *m_SliceRotationMat;
 
   // type of muscles
   int m_NTypeOfMuscles;
