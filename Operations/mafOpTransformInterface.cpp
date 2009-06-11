@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-29 07:57:38 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-06-11 09:47:23 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -170,12 +170,10 @@ void mafOpTransformInterface::OpDo()
 
     vtkDataSet *dataSet = inVME->GetOutput()->GetVTKData();
     
-    if (true)
-    {
-        std::ostringstream stringStream;
-        stringStream << "mafOpTransformInterface : Applying scaling to dataset..."  << std::endl;
-        mafLogMessage(stringStream.str().c_str());
-    }
+    std::ostringstream stringStream;
+    stringStream << "mafOpTransformInterface : Applying scaling to vtk dataset..."  << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+
     if (dataSet->IsA("vtkPolyData"))
     {
       // apply fast vtkPolyDataTransformFilter
