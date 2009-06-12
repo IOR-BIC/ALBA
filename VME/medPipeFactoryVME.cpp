@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeFactoryVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-09 16:04:32 $
-  Version:   $Revision: 1.13.2.5 $
+  Date:      $Date: 2009-06-12 16:34:48 $
+  Version:   $Revision: 1.13.2.6 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -57,6 +57,9 @@
 #include "medPipeVectorFieldGlyphs.h"
 #include "medPipeVectorFieldSurface.h"
 #include "medPipeVectorFieldSlice.h"
+#include "medPipeTensorFieldGlyphs.h"
+#include "medPipeTensorFieldSurface.h"
+#include "medPipeTensorFieldSlice.h"
 
 #include <string>
 #include <ostream>
@@ -129,6 +132,9 @@ medPipeFactoryVME::medPipeFactoryVME()
   mafPlugPipeMacro(medPipeVectorFieldGlyphs, "Pipe for rendering of vector fields using various glyphs.");
   mafPlugPipeMacro(medPipeVectorFieldSurface, "Pipe for rendering of vector fields using color mapping on the object surface.");
   mafPlugPipeMacro(medPipeVectorFieldSlice, "Pipe for rendering of vector fields using color mapping on the slice of the object.");
+  mafPlugPipeMacro(medPipeTensorFieldGlyphs, "Pipe for rendering of tensor fields using glyphs.");
+  mafPlugPipeMacro(medPipeTensorFieldSurface, "Pipe for rendering of tensor fields using color mapping on the object surface.");
+  mafPlugPipeMacro(medPipeTensorFieldSlice, "Pipe for rendering of tensor fields using color mapping on the slice of the object.");
 
 
   //BES: 16.4.2008 - these pipes are to be committed down (without _BES suffix) to openMAF in the future

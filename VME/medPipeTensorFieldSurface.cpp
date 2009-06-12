@@ -1,9 +1,9 @@
 /*========================================================================= 
   Program: Multimod Application Framework RELOADED 
-  Module: $RCSfile: medPipeVectorFieldSurface.cpp,v $ 
+  Module: $RCSfile: medPipeTensorFieldSurface.cpp,v $ 
   Language: C++ 
   Date: $Date: 2009-06-12 16:34:48 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Version: $Revision: 1.1.2.1 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 #include "mafDecl.h"
-#include "medPipeVectorFieldSurface.h"
+#include "medPipeTensorFieldSurface.h"
 
 #include "mafSceneNode.h"
 #include "mafPipeFactory.h"
@@ -50,11 +50,11 @@
 
 
 //----------------------------------------------------------------------------
-mafCxxTypeMacro(medPipeVectorFieldSurface);
+mafCxxTypeMacro(medPipeTensorFieldSurface);
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-medPipeVectorFieldSurface::medPipeVectorFieldSurface() : medPipeVectorField()
+medPipeTensorFieldSurface::medPipeTensorFieldSurface() : medPipeTensorField()
 //----------------------------------------------------------------------------
 {     
   m_ColorMappingLUT = NULL;  
@@ -68,7 +68,7 @@ medPipeVectorFieldSurface::medPipeVectorFieldSurface() : medPipeVectorField()
 }
 
 //----------------------------------------------------------------------------
-medPipeVectorFieldSurface::~medPipeVectorFieldSurface()
+medPipeTensorFieldSurface::~medPipeTensorFieldSurface()
 //----------------------------------------------------------------------------
 {  
   m_AssemblyFront->RemovePart(m_SurfaceActor);  
@@ -84,53 +84,50 @@ medPipeVectorFieldSurface::~medPipeVectorFieldSurface()
 
 
 //----------------------------------------------------------------------------
-mafGUI *medPipeVectorFieldSurface::CreateGui()
+mafGUI *medPipeTensorFieldSurface::CreateGui()
 //----------------------------------------------------------------------------
 {
-  int nVectors = GetNumberOfVectors();
+  int nTensors = GetNumberOfTensors();
   
   m_Gui = new mafGUI(this);
      
   wxBoxSizer* bSizerMain = new wxBoxSizer( wxVERTICAL );
-  if (nVectors == 0)  //no vector field available, this pipe does not work
-    bSizerMain->Add(new wxStaticText( m_Gui, wxID_ANY, _("No vector field to visualize.")));
+  if (nTensors == 0)  //no tensor field available, this pipe does not work
+    bSizerMain->Add(new wxStaticText( m_Gui, wxID_ANY, _("No tensor field to visualize.")));
   else
   {
-    if (nVectors > 1)      
+    if (nTensors > 1)      
     {
       wxBoxSizer* bSizer1 = new wxBoxSizer( wxHORIZONTAL );
-      bSizer1->Add( new wxStaticText( m_Gui, wxID_ANY, _("Vector Field:"), 
+      bSizer1->Add( new wxStaticText( m_Gui, wxID_ANY, _("Tensor Field:"), 
         wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
       wxComboBox* comboField = new wxComboBox( m_Gui, ID_VECTORFIELD, wxEmptyString, 
         wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-      comboField->SetToolTip( _("Selects the vector field to be visualized.") );
-      PopulateCombo(comboField, true);  //at least one vector is available
+      comboField->SetToolTip( _("Selects the tensor field to be visualized.") );
+      PopulateCombo(comboField, true);  //at least one tensor is available
       bSizer1->Add( comboField, 1, wxALL, 1 );
       bSizerMain->Add( bSizer1, 0, wxEXPAND, 0 );
 
       //and validator
-      comboField->SetValidator(mafGUIValidator(this, ID_VECTORFIELD, comboField, &m_VectorFieldIndex));
+      comboField->SetValidator(mafGUIValidator(this, ID_VECTORFIELD, comboField, &m_TensorFieldIndex));
     }
-
     
     wxBoxSizer* bSizer2 = new wxBoxSizer( wxHORIZONTAL );
     bSizer2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Color by:"), 
       wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
-    wxComboBox* comboColorBy = new wxComboBox( m_Gui, ID_COLOR_MAPPING_MODE, 
+    m_comboColorBy = new wxComboBox( m_Gui, ID_COLOR_MAPPING_MODE, 
       wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
-    comboColorBy->Append( _("magnitude") );
-    comboColorBy->Append( _("X component") );
-    comboColorBy->Append( _("Y component") );
-    comboColorBy->Append( _("Z component") );
-    comboColorBy->SetToolTip( 
-      _("Specifies how the specified vector field should be transformed into colors.") );
-    bSizer2->Add( comboColorBy, 1, wxALL, 0 );
+    UpdateColorByCombo();      
+    
+    m_comboColorBy->SetToolTip( 
+      _("Specifies how the specified tensor field should be transformed into colors.") );
+    bSizer2->Add( m_comboColorBy, 1, wxALL, 0 );
     bSizerMain->Add( bSizer2, 0, wxEXPAND, 5 );
 
     //and validator
-    comboColorBy->SetValidator(mafGUIValidator(this, ID_COLOR_MAPPING_MODE, comboColorBy, &m_ColorMappingMode));
+    m_comboColorBy->SetValidator(mafGUIValidator(this, ID_COLOR_MAPPING_MODE, m_comboColorBy, &m_ColorMappingMode));
   
     wxBoxSizer* bSizer3 = new wxBoxSizer( wxHORIZONTAL );    
     bSizer3->Add( new wxStaticText( m_Gui, wxID_ANY, _("LUT:")), 0, wxALL, 5 );
@@ -160,13 +157,16 @@ mafGUI *medPipeVectorFieldSurface::CreateGui()
 
 
 //----------------------------------------------------------------------------
-void medPipeVectorFieldSurface::OnEvent(mafEventBase *maf_event)
+void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {			
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {	
     if (e->GetId() >= Superclass::ID_LAST && e->GetId() < ID_LAST)
     {
+      if (e->GetId() == ID_VECTORFIELD)
+        UpdateColorByCombo(); //we need to update list of components
+
       UpdateVTKPipe(); 
     
       mafEventMacro(mafEvent(this,CAMERA_UPDATE));
@@ -180,7 +180,7 @@ void medPipeVectorFieldSurface::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Constructs VTK pipeline.
-/*virtual*/ void medPipeVectorFieldSurface::CreateVTKPipe()
+/*virtual*/ void medPipeTensorFieldSurface::CreateVTKPipe()
 //------------------------------------------------------------------------
 {  
   //build LUT
@@ -221,29 +221,49 @@ void medPipeVectorFieldSurface::OnEvent(mafEventBase *maf_event)
 
 //------------------------------------------------------------------------
 //Updates VTK pipeline (setting radius, etc.). 
-/*virtual*/ void medPipeVectorFieldSurface::UpdateVTKPipe()
+/*virtual*/ void medPipeTensorFieldSurface::UpdateVTKPipe()
 //------------------------------------------------------------------------
 {
-  const char* vector_name = GetVectorFieldName(m_VectorFieldIndex);
-  m_SurfaceMapper->SelectColorArray(vector_name);
+  const char* tensor_name = GetTensorFieldName(m_TensorFieldIndex);
+  m_SurfaceMapper->SelectColorArray(tensor_name);
 
   vtkDataArray* da = m_Vme->GetOutput()->GetVTKData()->
-    GetPointData()->GetVectors(vector_name);
+    GetPointData()->GetTensors(tensor_name);
 
-  double sr[2];  
+  int idx = m_ColorMappingMode - CMM_COMPONENT1;  //index of component
+
+  double sr[2];
   if (m_ColorMappingMode == CMM_MAGNITUDE)      
     m_ColorMappingLUT->SetVectorModeToMagnitude();    //magnitude
   else
   {
-    //X, Y or Z component
+    //some component
     m_ColorMappingLUT->SetVectorModeToComponent();
-    m_ColorMappingLUT->SetVectorComponent(m_ColorMappingMode - CMM_X);    
+    m_ColorMappingLUT->SetVectorComponent(idx);    
   }
 
   //get range for the given component / magnitude
   //RELASE NOTE: GetRange has an undocumented feature to compute
   //magnitude, if the component parameter is negative
-  da->GetRange(sr, m_ColorMappingMode - CMM_X);
+  //BUT it has also a BUG, it cannot support more than 3 components
+  if (idx < CMM_COMPONENT3)
+    da->GetRange(sr, idx);
+  else
+  {    
+    //we need to compute scalar range (because of a BUG in vtkDataArray)
+    sr[0] = DBL_MAX; sr[1] = -DBL_MAX;
+    
+    int nCount = da->GetNumberOfTuples();
+    for (int i = 0; i < nCount; i++)
+    {
+      double value = da->GetComponent(i, idx);
+      if (value < sr[0])
+        sr[0] = value;
+
+      if (value > sr[1])
+        sr[1] = value;
+    }
+  }
 
   m_ColorMappingLUT->SetTableRange(sr);
   m_SurfaceMapper->SetScalarRange(sr);
@@ -251,4 +271,37 @@ void medPipeVectorFieldSurface::OnEvent(mafEventBase *maf_event)
   
 //  m_MappingActor->SetTitle(scalar_name);
   m_MappingActor->SetVisibility(m_ShowMapping);  
+}
+
+//------------------------------------------------------------------------
+//Updates the content of m_comboColorBy combobox
+//"magnitude" and 0..NumberOfComponents-1 will be listed.
+/*virtual*/ void medPipeTensorFieldSurface::UpdateColorByCombo()
+//------------------------------------------------------------------------
+{
+  int nOldColorMode = m_ColorMappingMode;
+
+  m_comboColorBy->Clear();
+  m_comboColorBy->Append( _("magnitude") );
+
+  if (m_TensorFieldIndex >= 0)
+  {
+    vtkDataArray* da = m_Vme->GetOutput()->GetVTKData()->
+      GetPointData()->GetTensors(GetTensorFieldName(m_TensorFieldIndex));
+
+    if (da != NULL)
+    {
+      int nComps = da->GetNumberOfComponents();
+      for (int i = 0; i < nComps; i++){
+        m_comboColorBy->Append(wxString::Format("%d", i));
+      }
+    }
+  } //end if [valid selection of tensor field]
+
+  int nCount = m_comboColorBy->GetCount();
+  if (nOldColorMode >= nCount)
+    nOldColorMode = 0;
+
+  m_ColorMappingMode = nOldColorMode;
+  m_comboColorBy->SetSelection(m_ColorMappingMode);
 }

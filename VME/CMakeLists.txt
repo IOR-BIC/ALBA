@@ -70,6 +70,14 @@ SET(PROJECT_SRCS
   medPipeVectorFieldSurface.h
   medPipeVectorFieldSlice.cpp
   medPipeVectorFieldSlice.h
+  medPipeTensorField.cpp
+  medPipeTensorField.h
+  medPipeTensorFieldGlyphs.cpp
+  medPipeTensorFieldGlyphs.h
+  medPipeTensorFieldSurface.cpp
+  medPipeTensorFieldSurface.h
+  medPipeTensorFieldSlice.cpp
+  medPipeTensorFieldSlice.h
   medPipeCompound.cpp
   medPipeCompound.h
   medPipeCompoundVolume.cpp

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolume.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:10:54 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-06-12 16:34:48 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -25,6 +25,7 @@ protected:
   ///default volume pipes to be used with the 
   static const medGUIDynamicVP::SUPPORTED_VP_ENTRY m_ScalarVolumeVP[];
   static const medGUIDynamicVP::SUPPORTED_VP_ENTRY m_VectorVolumeVP[];
+  static const medGUIDynamicVP::SUPPORTED_VP_ENTRY m_TensorVolumeVP[];
 
 public:	
   medPipeCompoundVolume() {
@@ -71,7 +72,7 @@ protected:
   /** Returns visual pipes available for the volume.
   To be overriden in inherited classes to support different things. */
   inline virtual const medGUIDynamicVP::SUPPORTED_VP_ENTRY* GetTensorVisualPipes() {
-    return NULL;  //default is no tensor pipe
+    return m_TensorVolumeVP;  //default is no tensor pipe
   }
 
   /** Helper that gets the index of pipe in pList, or -1 if no such pipe is available */

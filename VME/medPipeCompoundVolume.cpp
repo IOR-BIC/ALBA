@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompoundVolume.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-09 16:04:32 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-06-12 16:34:48 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -44,6 +44,16 @@ medPipeCompoundVolume::m_VectorVolumeVP[] =
   {"medPipeVectorFieldGlyphs", "glyphs"},  
   {"medPipeVectorFieldSurface", "surface"},  
   {"medPipeVectorFieldSlice", "slice"}, 
+  {NULL, NULL},
+};
+
+///visual pipes for volumes
+/*static*/ const medGUIDynamicVP::SUPPORTED_VP_ENTRY 
+medPipeCompoundVolume::m_TensorVolumeVP[] = 
+{
+  {"medPipeTensorFieldGlyphs", "glyphs"},  
+  {"medPipeTensorFieldSurface", "surface"},  
+  {"medPipeTensorFieldSlice", "slice"}, 
   {NULL, NULL},
 };
 
