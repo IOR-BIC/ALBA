@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 14:50:29 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-12 14:57:56 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -206,7 +206,10 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
       {
         int dy = pos[1]-m_DragStart;
         m_ScaleFactor *= ( 1 + dy/100.0 );
-        m_Gui->Update();
+        if(m_Gui)
+        {
+          m_Gui->Update();
+        }
         m_Histogram->SetScaleFactor(m_ScaleFactor);
       }
       else
