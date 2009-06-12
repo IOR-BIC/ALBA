@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-14 11:18:45 $
-  Version:   $Revision: 1.51.2.5 $
+  Date:      $Date: 2009-06-12 18:04:58 $
+  Version:   $Revision: 1.51.2.6 $
   Authors:   Paolo Quadrani,Stefano Perticoni, modified by Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,11 @@
 #include "mafPipeSurfaceSlice_BES.h"
 #include "mafPipePolylineSlice_BES.h"
 #include "mafPipeMeshSlice_BES.h"
+
+#include "mafPipeSurfaceSlice.h"
+#include "mafPipePolylineSlice.h"
+#include "mafPipeMeshSlice.h"
+
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
@@ -342,6 +347,139 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           VolumePositionCorrection(positionSlice);
           spipe->SetSlice(positionSlice, m_SliceNormal);
         }
+        else
+        {
+          //BES: 12.6.2009 - TODO: this code should be removed when
+          //mafPipeSurfaceSlice_BES, mafPipePolylineSlice_BES and mafPipeMeshSlice_BES
+          //are committed down and instead of it, the code above should work (after _BES suffices are stripped)
+
+          if(pipe_name.Equals("mafPipeSurfaceSlice"))
+          {
+            double normal[3];
+            switch(m_CameraPositionId)
+            {
+            case CAMERA_OS_X:
+              normal[0] = 1;
+              normal[1] = 0;
+              normal[2] = 0;
+              break;
+            case CAMERA_OS_Y:
+              normal[0] = 0;
+              normal[1] = 1;
+              normal[2] = 0;
+              break;
+            case CAMERA_OS_Z:
+              normal[0] = 0;
+              normal[1] = 0;
+              normal[2] = 1;
+              break;
+            case CAMERA_OS_P:
+              break;
+              //case CAMERA_OS_REP:
+              //	this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+            case CAMERA_PERSPECTIVE:
+              break;
+            default:
+              normal[0] = 0;
+              normal[1] = 0;
+              normal[2] = 1;
+            }
+            m_CurrentSurface.push_back(n);
+
+            double positionSlice[3];
+            positionSlice[0] = m_Slice[0];
+            positionSlice[1] = m_Slice[1];
+            positionSlice[2] = m_Slice[2];
+            VolumePositionCorrection(positionSlice);
+            ((mafPipeSurfaceSlice *)pipe)->SetSlice(positionSlice);
+            ((mafPipeSurfaceSlice *)pipe)->SetNormal(normal);
+
+          }
+          else if(pipe_name.Equals("mafPipePolylineSlice"))
+          {
+            double normal[3];
+            switch(m_CameraPositionId)
+            {
+            case CAMERA_OS_X:
+              normal[0] = 1;
+              normal[1] = 0;
+              normal[2] = 0;
+              break;
+            case CAMERA_OS_Y:
+              normal[0] = 0;
+              normal[1] = 1;
+              normal[2] = 0;
+              break;
+            case CAMERA_OS_Z:
+              normal[0] = 0;
+              normal[1] = 0;
+              normal[2] = 1;
+              break;
+            case CAMERA_OS_P:
+              break;
+            case CAMERA_ARB:
+              this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+              break;
+            case CAMERA_PERSPECTIVE:
+              //this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+              break;
+            default:
+              normal[0] = 0;
+              normal[1] = 0;
+              normal[2] = 1;
+            }
+            m_CurrentPolyline.push_back(n);
+            double positionSlice[3];
+            positionSlice[0] = m_Slice[0];
+            positionSlice[1] = m_Slice[1];
+            positionSlice[2] = m_Slice[2];
+            VolumePositionCorrection(positionSlice);
+            ((mafPipePolylineSlice *)pipe)->SetSlice(positionSlice);
+            ((mafPipePolylineSlice *)pipe)->SetNormal(normal);
+          }          
+          else if(pipe_name.Equals("mafPipeMeshSlice"))
+          {
+            double normal[3];
+            switch(m_CameraPositionId)
+            {
+            case CAMERA_OS_X:
+              normal[0] = 1;
+              normal[1] = 0;
+              normal[2] = 0;
+              break;
+            case CAMERA_OS_Y:
+              normal[0] = 0;
+              normal[1] = 1;
+              normal[2] = 0;
+              break;
+            case CAMERA_OS_Z:
+              normal[0] = 0;
+              normal[1] = 0;
+              normal[2] = 1;
+              break;
+            case CAMERA_OS_P:
+              break;
+            case CAMERA_ARB:
+              this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+              break;
+            case CAMERA_PERSPECTIVE:
+              //this->GetRWI()->GetCamera()->GetViewPlaneNormal(normal);
+              break;
+            default:
+              normal[0] = 0;
+              normal[1] = 0;
+              normal[2] = 1;
+            }
+            m_CurrentMesh.push_back(n);
+            double positionSlice[3];
+            positionSlice[0] = m_Slice[0];
+            positionSlice[1] = m_Slice[1];
+            positionSlice[2] = m_Slice[2];
+            VolumePositionCorrection(positionSlice);
+            ((mafPipeMeshSlice *)pipe)->SetSlice(positionSlice);
+            ((mafPipeMeshSlice *)pipe)->SetNormal(normal);
+          }
+        }
       } //end else [it is not volume slicing]                     
 
       pipe->Create(n);
@@ -481,6 +619,16 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
       }
+      else
+      {
+        //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
+        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(m_CurrentSurface[i]->m_Pipe);
+        if (pipe != NULL) 
+        {
+          pipe->SetSlice(coord); 
+          pipe->SetNormal(normal); 
+        }
+      }
     }
   }	
 
@@ -492,6 +640,16 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentPolyline.at(i)->m_Pipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
+      }
+      else
+      {
+        //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
+        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(m_CurrentSurface[i]->m_Pipe);
+        if (pipe != NULL) 
+        {
+          pipe->SetSlice(coord); 
+          pipe->SetNormal(normal); 
+        }
       }
     }
   }	
@@ -514,6 +672,16 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
       mafPipeSlice* pipe = mafPipeSlice::SafeDownCast(m_CurrentMesh.at(i)->m_Pipe);
       if (pipe != NULL){
         pipe->SetSlice(coord, normal); 
+      }
+      else
+      {
+        //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
+        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(m_CurrentSurface[i]->m_Pipe);
+        if (pipe != NULL) 
+        {
+          pipe->SetSlice(coord); 
+          pipe->SetNormal(normal); 
+        }
       }
     }   
   }
