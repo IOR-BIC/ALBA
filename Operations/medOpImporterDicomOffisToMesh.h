@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisToMesh.h,v $
 Language:  C++
-Date:      $Date: 2009-06-03 10:44:51 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-15 14:33:23 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -68,6 +68,7 @@ class vtkPlaneSource;
 class vtkPolyDataMapper;
 class vtkTexture;
 class vtkActor;
+class vtkPolyData;
 
 
 
@@ -212,6 +213,9 @@ protected:
   /** function that resample volume with rectilinear grid output. */
   void ResampleVolume();
 
+  /** Extract a rotated polydata from original dicom image. */
+  vtkPolyData * ExtractPolyData(int ts, int silceId);
+
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
@@ -244,8 +248,6 @@ protected:
 	mafString	m_Identifier;
 
   mafString m_PatientPosition;
-  double m_ImagePositionPatient[3];
-  double m_ImageOrientationPatient[9];
 
 	int				m_BuildStepValue;
 	int				m_DicomTypeRead; ///<Type DICOM Read from file
@@ -308,17 +310,35 @@ public:
 		m_Pos[0] = -9999;
 		m_Pos[1] = -9999;
 		m_Pos[2] = -9999;
+    m_Orientation[0] = 0.0;
+    m_Orientation[1] = 0.0; 
+    m_Orientation[2] = 0.0; 
+    m_Orientation[3] = 0.0; 
+    m_Orientation[4] = 0.0; 
+    m_Orientation[5] = 0.0; 
+    m_Orientation[6] = 0.0; 
+    m_Orientation[7] = 0.0; 
+    m_Orientation[8] = 0.0; 
 		m_ImageNumber = -1;
 		m_TriggerTime = -1.0;
 		m_NumberOfImages = -1;
 	};
 
-	medOpImporterDicomOffisToMeshToMesh(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
+	medOpImporterDicomOffisToMeshToMesh(mafString filename,double coord[3], double orientation[9], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceFilename = filename;
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
+    m_Orientation[0] = orientation[0];
+    m_Orientation[1] = orientation[1];
+    m_Orientation[2] = orientation[2];
+    m_Orientation[3] = orientation[3];
+    m_Orientation[4] = orientation[4];
+    m_Orientation[5] = orientation[5];
+    m_Orientation[6] = orientation[6];
+    m_Orientation[7] = orientation[7];
+    m_Orientation[8] = orientation[8];
 		m_ImageNumber = imageNumber;
 		m_NumberOfImages = numberOfImages;
 		m_TriggerTime = trigTime;
@@ -329,12 +349,21 @@ public:
 	~medOpImporterDicomOffisToMeshToMesh() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
-	void SetListElement(mafString filename,double coord[3], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
+	void SetListElement(mafString filename,double coord[3], double orientation[9], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
 	{
 		m_SliceFilename = filename; 
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
+    m_Orientation[0] = orientation[0];
+    m_Orientation[1] = orientation[1];
+    m_Orientation[2] = orientation[2];
+    m_Orientation[3] = orientation[3];
+    m_Orientation[4] = orientation[4];
+    m_Orientation[5] = orientation[5];
+    m_Orientation[6] = orientation[6];
+    m_Orientation[7] = orientation[7];
+    m_Orientation[8] = orientation[8];
 		m_ImageNumber = imageNumber;
 		m_NumberOfImages = numberOfImages;
 		m_TriggerTime = trigTime;
@@ -345,8 +374,8 @@ public:
 
 	/**	Return the Coordinate along a specified axes of the dicom slice	*/
 	double	GetCoordinate(int i) const {return m_Pos[i];};
-
-	/** Return the image number of the dicom slice*/
+  
+ 	/** Return the image number of the dicom slice*/
 	int GetImageNumber() const {return m_ImageNumber;};
 
 	/** Return the image number of the dicom slice*/
@@ -355,12 +384,28 @@ public:
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
 
+  
+
 	vtkImageData* GetOutput(){return m_Data;};
 
+  /** Return the position of a slice*/
 	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};
+
+  /** Return the orientation patient of a slice*/
+  void GetSliceOrientation(double orientation[9]){
+    orientation[0]= m_Orientation[0];
+    orientation[1]= m_Orientation[1];
+    orientation[2]= m_Orientation[2];
+    orientation[3]= m_Orientation[3];
+    orientation[4]= m_Orientation[4];
+    orientation[5]= m_Orientation[5];
+    orientation[6]= m_Orientation[6];
+    orientation[7]= m_Orientation[7];
+    orientation[8]= m_Orientation[8];};
 
 protected:
 	double m_Pos[3];
+  double m_Orientation[9];
 	mafString m_SliceFilename;
 
 	double m_TriggerTime;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffistoMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-09 15:05:23 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-06-15 14:33:23 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -94,6 +94,15 @@ MafMedical is partially based on OpenMAF.
 #include "vtkAppendFilter.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageClip.h"
+#include "vtkImageDataGeometryFilter.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkAppendPolyData.h" 
+#include "vtkHexahedron.h"
+#include "vtkFloatArray.h"
+#include "vtkCellData.h"
+#include "vtkIdTypeArray.h"
+#include "vtkCellArray.h"
 
 #include "vtkDataSetWriter.h"
 #include "vtkRectilinearGrid.h"
@@ -196,9 +205,6 @@ mafOp(label)
     m_DicomBounds[i] = 0;
 
   m_PatientPosition = "";
-  m_ImagePositionPatient[3] = 0;
-  for (int i = 0; i < 9; i++) 
-    m_ImageOrientationPatient[i] = 0;
 
 	m_Wizard = NULL;
 	m_LoadPage = NULL;
@@ -453,13 +459,12 @@ int medOpImporterDicomOffisToMesh::BuildVolume()
   {     
     vtkMAFSmartPointer<vtkImageData> imageData;
 
-    // show the current slice
-    m_ListSelected->Item(sourceVolumeSliceId)->GetData()->GetOutput()->Update();
-
-
     vtkMAFSmartPointer<vtkImageReslice> reslice;
-    reslice->SetInput(m_ListSelected->Item(sourceVolumeSliceId)->GetData()->GetOutput());
-    reslice->SetResliceAxesDirectionCosines(m_ImageOrientationPatient);
+    reslice->SetInput(m_SliceTexture->GetInput());
+
+    double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+    m_ListSelected->Item(sourceVolumeSliceId)->GetData()->GetSliceOrientation(orientation);
+    reslice->SetResliceAxesDirectionCosines(orientation);
     reslice->SetOutputSpacing(reslice->GetInput()->GetSpacing());
     reslice->SetOutputOrigin(reslice->GetInput()->GetOrigin());
     reslice->Update();
@@ -487,51 +492,163 @@ int medOpImporterDicomOffisToMesh::BuildVolumeCineMRI()
   else
     step = m_BuildStepValue + 1;
 
+  int dim[3];
+  m_SliceTexture->GetInput()->GetDimensions(dim);
 
+ 
   mafNEW(m_Mesh);
   for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
   {
-    vtkMAFSmartPointer<vtkAppendFilter> appendFilter;
+    vtkCellArray *Cells = vtkCellArray::New();
+    vtkUnstructuredGrid *grid = vtkUnstructuredGrid::New();
+    vtkPoints *points = vtkPoints::New();
+    vtkFloatArray *newScalars = vtkFloatArray::New();
+    int pointsCounter = 0;
+    int scalarCounter = 0;
+    vtkPolyData *poly1;
+
     for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
-    {     
-      vtkMAFSmartPointer<vtkImageData> imageData;
+    {
+       poly1 = ExtractPolyData(ts,sourceVolumeSliceId);
+       poly1->Update();
 
-      // show the current slice
-      int currImageId = GetImageId(ts, sourceVolumeSliceId);
-      //m_ListSelected->Item(currImageId)->GetData()->GetOutput()->Update();
-
-      if (currImageId != -1) 
-      {
-        // update v_texture ivar
-        //ShowSlice(currImageId);
-        CreateSlice(currImageId);
-      }
-
-
-
-
-
-      vtkMAFSmartPointer<vtkImageReslice> reslice;
-      //reslice->SetInput(m_ListSelected->Item(currImageId)->GetData()->GetOutput());
-      reslice->SetInput(m_SliceTexture->GetInput());
-
-      reslice->SetResliceAxesDirectionCosines(m_ImageOrientationPatient);
-      reslice->SetOutputSpacing(reslice->GetInput()->GetSpacing());
-      reslice->SetOutputOrigin(reslice->GetInput()->GetOrigin());
-      reslice->Update();
-      imageData = reslice->GetOutput();
-
-      appendFilter->AddInput(imageData);
+       for(int n = 0; n < poly1->GetNumberOfPoints(); n++)
+       {
+         points->InsertPoint(pointsCounter, poly1->GetPoint(n));
+         pointsCounter++;
+       }
+       for(int x=0;x<poly1->GetPointData()->GetNumberOfTuples();x++)
+       {
+         newScalars->InsertValue(scalarCounter, poly1->GetPointData()->GetScalars()->GetTuple1(x));
+         scalarCounter++;
+       }
     }
-    m_Mesh->SetData(appendFilter->GetOutput(), ts);
-    m_Mesh->SetName(m_VolumeName);
+    
+    grid->SetPoints(points);
+    grid->GetPointData()->SetScalars(newScalars);
+    grid->GetPointData()->GetScalars()->SetName(m_SliceTexture->GetInput()->GetPointData()->GetScalars()->GetName());
+    grid->Update();
+
+    int counter= 0;
+    int total = dim[0]*dim[1];
+    for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
+    { 
+      if (sourceVolumeSliceId+1>=m_NumberOfSlices)
+        break;
+      int lineCounter = 1;
+      for(int n = 0; n < poly1->GetNumberOfPoints()-dim[0]-1; n++)
+      {
+        if (n == lineCounter*dim[0] )
+        {
+          lineCounter++;
+        }
+        vtkHexahedron *hexahedron = vtkHexahedron::New();
+
+        if (n == (lineCounter-1)*dim[0]+(dim[0]-1) && n != 0) //on the edge
+        {
+          continue;
+        }
+        hexahedron->GetPointIds()->SetId(0,counter*(total)+n);
+        hexahedron->GetPointIds()->SetId(1,counter*(total)+n+1);
+        hexahedron->GetPointIds()->SetId(2,counter*(total)+n+dim[0]+1);
+        hexahedron->GetPointIds()->SetId(3,counter*(total)+n+dim[0]);
+        hexahedron->GetPointIds()->SetId(4,((counter+1)*(total)+n));
+        hexahedron->GetPointIds()->SetId(5,((counter+1)*(total)+n+1));
+        hexahedron->GetPointIds()->SetId(6,((counter+1)*(total)+n+dim[0]+1));
+        hexahedron->GetPointIds()->SetId(7,((counter+1)*(total)+n+dim[0]));
+
+        Cells->InsertNextCell(hexahedron->GetPointIds());
+        grid->Update();
+        hexahedron->Delete();
+      }
+      counter++;
+    }
+    grid->SetCells(VTK_HEXAHEDRON,Cells);  
+
+
+    int currImageId = GetImageId(ts, sourceVolumeSliceId);
+    medOpImporterDicomOffisToMeshToMesh *element0;
+    element0 = (medOpImporterDicomOffisToMeshToMesh *)m_ListSelected->Item(currImageId)->GetData();
+    mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
+    m_Mesh->SetData(grid, tsDouble);
+    points->Delete();
+    grid->Delete();
   }
+ 
+  m_Mesh->SetName(m_VolumeName);
+  
 
   m_Output = m_Mesh;
   return OP_RUN_OK;
-  
-
 }
+
+//----------------------------------------------------------------------------
+vtkPolyData* medOpImporterDicomOffisToMesh::ExtractPolyData(int ts, int silceId)
+//----------------------------------------------------------------------------
+{
+  // show the current slice
+  int currImageId = GetImageId(ts, silceId);
+  if (currImageId != -1) 
+  {
+    // update v_texture ivar
+    CreateSlice(currImageId);
+  }
+
+  vtkMAFSmartPointer<vtkImageData> imageData;
+  imageData = m_SliceTexture->GetInput();
+
+
+
+  for(int x=0;x<imageData->GetPointData()->GetNumberOfTuples();x++)
+  {
+    double i = imageData->GetPointData()->GetScalars()->GetTuple1(x);
+  }
+
+  double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  m_ListSelected->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
+
+  double origin[3];
+  m_SliceTexture->GetInput()->GetOrigin(origin);
+  vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+  mat->Identity();
+
+  mat->SetElement(0,0,orientation[0]);
+  mat->SetElement(1,0,orientation[1]);
+  mat->SetElement(2,0,orientation[2]);
+  mat->SetElement(3,0,0);
+  mat->SetElement(0,1,orientation[3]);
+  mat->SetElement(1,1,orientation[4]);
+  mat->SetElement(2,1,orientation[5]);
+  mat->SetElement(3,1,0);
+  mat->SetElement(0,2,orientation[6]);
+  mat->SetElement(1,2,orientation[7]);
+  mat->SetElement(2,2,orientation[8]);
+  mat->SetElement(3,2,0);
+
+  mat->SetElement(0,3,origin[0]);
+  mat->SetElement(1,3,origin[1]);
+  mat->SetElement(2,3,origin[2]);
+
+  vtkTransform *trans = vtkTransform::New();
+  trans->SetMatrix(mat);
+
+  vtkImageDataGeometryFilter *surface = vtkImageDataGeometryFilter::New();
+  surface->SetInput(imageData);
+  surface->Update();
+
+  vtkTransformPolyDataFilter *TranslateFilter = vtkTransformPolyDataFilter::New();
+  TranslateFilter->SetTransform(trans);
+  TranslateFilter->SetInput(surface->GetOutput());
+  
+  TranslateFilter->Update();
+
+  mat->Delete();
+  trans->Delete();
+  vtkDEL(surface);
+  
+  return TranslateFilter->GetOutput();
+}
+
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffisToMesh::CreateLoadPage()
 //----------------------------------------------------------------------------
@@ -1390,6 +1507,8 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
 	long int imageNumber = -1;
 	long int numberOfImages = -1;
 	double trigTime = -1.0;
+  double imageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  double imagePositionPatient[3] = {0.0,0.0,0.0};
   bool enableToRead = true; //true for test mode
 	m_DicomTypeRead = -1;
   DcmFileFormat dicomImg;    
@@ -1463,16 +1582,16 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
       ds->findAndGetLongInt(DCM_Rows, val_long);
       int height = val_long;
 
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[2],0);
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[1],1);
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[0],2);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[2],0);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[1],1);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[0],2);
 
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[0],0);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[1],1);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[2],2);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[3],3);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[4],4);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[5],5);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[0],0);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[1],1);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[2],2);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[3],3);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
+      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
 
       double spacing[3];
       spacing[2] = 0;
@@ -1510,7 +1629,7 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
       imageData->SetUpdateExtent(0,width-1,0,height-1,0,0);
       imageData->SetExtent(imageData->GetUpdateExtent());
       imageData->SetNumberOfScalarComponents(1);
-      imageData->SetOrigin(m_ImagePositionPatient);
+      imageData->SetOrigin(imagePositionPatient);
       imageData->SetSpacing(spacing);
 
       long pixel_rep;
@@ -1634,7 +1753,7 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
 
-          m_FilesList->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos,imageData));
+          m_FilesList->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos, imageOrientationPatient, imageData));
 
 
           m_DicomMap.insert(std::pair<mafString,medListDICOMFilesToMesh*>(studyUID,m_FilesList));
@@ -1654,7 +1773,7 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
-          m_DicomMap[studyUID]->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos,imageData));
+          m_DicomMap[studyUID]->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos, imageOrientationPatient, imageData));
 				}
 			}
 			else if ( enableToRead && strcmp( (char *)mode, "MR" ) == 0)
@@ -1697,7 +1816,7 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
             }
           }
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
-          m_FilesList->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos,imageData,imageNumber, numberOfImages, trigTime));
+          m_FilesList->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos, imageOrientationPatient, imageData,imageNumber, numberOfImages, trigTime));
 
           m_DicomMap.insert(std::pair<mafString,medListDICOMFilesToMesh*>(studyUID,m_FilesList));
           if (!this->m_TestMode)
@@ -1720,7 +1839,7 @@ bool medOpImporterDicomOffisToMesh::BuildDicomFileList(const char *dir)
 
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
 
-           m_DicomMap[studyUID]->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos,imageData,imageNumber,numberOfImages,trigTime));
+           m_DicomMap[studyUID]->Append(new medOpImporterDicomOffisToMeshToMesh(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
 				}
 			}
       if (!this->m_TestMode)
