@@ -99,3 +99,10 @@ ADD_TEST(vtkMAFTextActorMeterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTextActorMeter
 IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFTextActorMeterTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFCellsFilterTest
+ADD_EXECUTABLE(vtkMAFCellsFilterTest vtkMAFCellsFilterTest.h vtkMAFCellsFilterTest.cpp)
+ADD_TEST(vtkMAFCellsFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFCellsFilterTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFCellsFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
