@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIValidator.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-16 09:14:49 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,13 +60,13 @@ public:
   mafGUIValidator (mafObserver* listener,int mid,wxStaticText *win, mafString* var);  //String
   mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,wxString* var);   //String
   mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,mafString* var);  //String
-  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-32000,			 int		max=32000);     //Integer
-  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-2000000000, float	max=2000000000, int dec_digits = 2);//Float
-  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   double* var, double min=-2000000000, double max=2000000000, int dec_digits = 2);//Double
+  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*		var, int		min=-2147483647-1,			 int		max=2147483647);     //Integer
+  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   float*	var, float	min=-1.0e+38F, float	max=1.0e+38F, int dec_digits = 2);//Float
+  mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   double* var, double min=-1.0e+299, double max=1.0e+299, int dec_digits = 2);//Double
   mafGUIValidator (mafObserver* listener,int mid,wxSlider     *win,   int*   var, wxTextCtrl* lab);
-	mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*   var, wxSlider* lab, int min=-32000,	int max=32000);
+	mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl   *win,   int*   var, wxSlider* lab, int min=-2147483647-1,	int max=2147483647);
   mafGUIValidator (mafObserver* listener,int mid,mafGUIFloatSlider *win, double* var, wxTextCtrl* lab);
-	mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl		*win,	 double* var, mafGUIFloatSlider* lab, double min=-2000000000, double	max=2000000000);
+	mafGUIValidator (mafObserver* listener,int mid,wxTextCtrl		*win,	 double* var, mafGUIFloatSlider* lab, double min=-1.0e+299, double	max=1.0e+299);
   mafGUIValidator (mafObserver* listener,int mid,wxCheckBox   *win,   int*   var);
   mafGUIValidator (mafObserver* listener,int mid,wxRadioBox   *win,   int*   var);
   mafGUIValidator (mafObserver* listener,int mid,wxComboBox   *win,   int*   var);

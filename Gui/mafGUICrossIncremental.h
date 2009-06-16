@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUICrossIncremental.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-19 12:00:05 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2009-06-16 09:14:49 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2008
@@ -30,10 +30,10 @@ class mafGUIComboBox;
 // constant
 //----------------------------------------------------------------------------
 
-#define MININT    -32000
-#define MAXINT     32000
-#define MINFLOAT  -2000000000 
-#define MAXFLOAT   2000000000
+#define MININT    -2147483647-1
+#define MAXINT     2147483647
+#define MINFLOAT  -1.0e+38F 
+#define MAXFLOAT   1.0e+38F
 #define MINDOUBLE -1.0e+299
 #define MAXDOUBLE 1.0e+299
 
