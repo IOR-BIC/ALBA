@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-04 12:05:40 $
-Version:   $Revision: 1.1.2.22 $
+Date:      $Date: 2009-06-16 10:40:36 $
+Version:   $Revision: 1.1.2.23 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1720,9 +1720,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetLongInt(DCM_Rows, val_long);
       int height = val_long;
 
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[2],0);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[0],0);
       ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[1],1);
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[0],2);
+      ds->findAndGetFloat64(DCM_ImagePositionPatient,m_ImagePositionPatient[2],2);
 
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[0],0);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,m_ImageOrientationPatient[1],1);
@@ -1757,10 +1757,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         intercept = 0;
       } 
 
+      long pixel_rep;
+      ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
+      ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
 
 ///////////////////CREATE VTKIMAGEDATA////////////////////////////
       //initialize vtkImageData
-      //vtkImageData *imageData = vtkImageData::New();
       vtkMAFSmartPointer<vtkImageData> imageData;
       imageData->SetDimensions(height, width,1);
       imageData->SetWholeExtent(0,width-1,0,height-1,0,0);
@@ -1768,11 +1770,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       imageData->SetExtent(imageData->GetUpdateExtent());
       imageData->SetNumberOfScalarComponents(1);
       imageData->SetOrigin(m_ImagePositionPatient);
-      imageData->SetSpacing(spacing);
+      imageData->SetSpacing(spacing[0], spacing[1], 0);
 
-      long pixel_rep;
-      ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
-      ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
+     
 
       long pixel_max;
       long pixel_min;
@@ -2193,7 +2193,7 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 	// read the slice number 'slice_num' and generate the texture
 	double spacing[3], crop_bounds[6], range[2], loc[3];
 
-	m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
+	//m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
 
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
@@ -2238,7 +2238,7 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1])));//+ 1));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
-		clip->SetOrigin(crop_bounds[0], crop_bounds[2], loc[m_SortAxes]);	//modified by Paolo 12-11-2003
+		clip->SetOrigin(crop_bounds[0], crop_bounds[2], Origin[m_SortAxes]);	//modified by Paolo 12-11-2003
 		clip->SetSpacing(spacing[0], spacing[1], 0);
 		clip->SetDimensions(dim_x_clip, dim_y_clip, 1);
 		clip->Update();
