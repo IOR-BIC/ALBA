@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-06-11 17:20:08 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Mel Krokos
+Date:      $Date: 2009-06-16 15:11:52 $
+Version:   $Revision: 1.1.2.4 $
+Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -37,14 +37,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //----------------------------------------------------------------------------
-// TODO 11.6.09
-// Restore commented-out sections.
+// TODO 16.6.09
 // Is it ok to have only 3 slices ?
-// Range covered by slices only goes between landmarks - might not reach ends of bone.
-// Too many options in input dialog - need to explain, simplify and remove unwanted items.
-//   What is XY scale ?
-//   What is Slice distance ?
 // Contour widget not rendered on first slice until you change to another slice and back.
+// Does MML still work if the muscle model is scaled ?
+// Adjust axis scaling by 1/2
+// Windowing range might not be right.
 //----------------------------------------------------------------------------
 
 
@@ -78,6 +76,13 @@ public:
     return ((vme != NULL) && vme->IsA("mafVMELandmark")) ;
   }
 
+  /// static callback which allows vme selector to select only this type
+  static bool AcceptVMESurface(mafNode *node)
+  {
+    mafVME* vme = mafVME::SafeDownCast(node);
+    return ((vme != NULL) && vme->IsA("mafVMESurface")) ;
+  }
+
 
 protected:
   void CreateInputsDlg();         ///< Dialog to select the polydata surface
@@ -97,16 +102,8 @@ protected:
   /// visual pipe for labelling.
   mafRWI* CreateParameterViewmafRWI(vtkTextSource *ts, wxString lab, float r, float g, float b);
 
-  /// Get absolute position of landmark. \n
-  /// Required because landmark->GetPoint() only returns pos relative to parent.
-  void GetAbsPosOfLandmark(mafVMELandmark *landmark, double point[3]) ;
-
-  /// Create default set of landmarks
-  void CreateFakeLandmarks() ;
-
-  /// Set inputs to model view, including landmarks
-  bool SetUpModelViewInputs();
-
+  /// Transfer setup parameters from input dialog and landmarks to model view
+  void SetUpModelViewInputs();
 
   void ApplyRegistrationOps();        ///< Apply the deformations to the model
   void ApplyInverseRegistrationOps(); ///< Apply inverse deformations (not implemented)
@@ -115,14 +112,39 @@ protected:
 
   void ResetOperation();
 
+
+
+  //----------------------------------------------------------------------------
+  // Landmark methods
+  //----------------------------------------------------------------------------
+
+  /// Get absolute position of landmark. \n
+  /// Required because landmark->GetPoint() only returns pos relative to parent.
+  void GetAbsPosOfLandmark(mafVMELandmark *landmark, double point[3]) ;
+
+  /// Create default set of landmarks
+  void CreateDefaultRegistrationLandmarks() ;
+
+  /// Create default set of landmarks
+  void CreateDefaultAxisLandmarks() ;
+
+  /// Apply scaling factor to axis landmarks
+  /// Do this before uploading the landmarks to the model view.
+  void ApplyAxisScalingFactor() ;
+
   /// Set up a specific set of landmarks (not currently used)
   void SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
+
 
 
   //----------------------------------------------------------------------------
   // Event handlers
   //----------------------------------------------------------------------------
   void OnEvent(mafEventBase *e); ///< Event handler
+
+  void OnChooseOk() ; ///< Inputs dialog ok - tidy up
+  void OnSliceXYZ() ; ///< Action when use reg check box changes
+
   void OnSOperationButton();
   void OnROperationButton();
   void OnTOperationButton();
@@ -135,13 +157,15 @@ protected:
   void OnMuscleSelection();
   void OnResetView();
   void OnUndo();
-  void OnOperation();
   void OnContourLineAxesVisibility();
   void OnContourVisibility();
   void OnLandmark1AtlasPatientSelection();
   void OnLandmark2AtlasPatientSelection();
   void OnLandmark3AtlasPatientSelection();
   void OnLandmark4AtlasPatientSelection();
+  void OnLandmarkAxis1AtlasSelection();
+  void OnLandmarkAxis2AtlasSelection();
+  void OnLandmarkAxis3AtlasSelection();
 
 
 
@@ -186,23 +210,23 @@ protected:
   medOpMML3ContourWidget *m_Widget;  ///< contour widget which controls contours in model view
 
 
-  // flags etc
+  // parameters and flags
   int m_CurrentSlice;	///< id of current slice 
-  int m_State;			///< current operation (used to validate a radio button, now defunct)
   int m_ShowAxes;		///< show contour axes flag
   int m_ContourVisibility ; ///< show contour
   int m_MuscleType;	///< muscle type (axis is single line or piecewise 2 lines)
   int m_RegistrationStatus;	///< flag indicating if registration has taken place
   int m_3DFlag;	///< flag indicating if model view is 2D or 3D
-
-  // parameters of scans (slices)
-  //double m_ScansDistance;
+  int m_slicexyz ;  ///< validator for default slice direction
   int m_ScansNumber ; ///< number of scans
-  int m_ScansGrain;
-  double m_ScansSize[2]; ///< size of scans (does this class need its own copy ?)
-  double m_ScansResolution[2]; ///< res of scans
-  double m_RegistrationXYScalingFactor ; ///< factor used in model
-  double m_ScansDistance ;  ///< spacing of scans (Nigel 9.6.09)
+  int m_ScansGrain; ///< set by user, used to calculate size and resolution of scans
+  double m_AxisScalingFactor ; ///< stretch factor set by user to increase range of axis
+
+  /// flag to remember how axis landmarks were created. \n
+  /// 1 for default (patient space)
+  /// 2 for selected (from atlas)
+  int m_AxisLandmarksFlag ; 
+
 
   vtkTextSource *m_textSource[9] ;  ///< text sources used in CreateParameterViewmafRWI()
 
@@ -236,6 +260,8 @@ protected:
 
   //----------------------------------------------------------------------------
   // Landmarks
+  // Registration landmarks: 4 from atlas, 4 from patient
+  // Axis landmarks: 2 from the patient
   //----------------------------------------------------------------------------
 
   // atlas landmarks defined
@@ -268,6 +294,21 @@ protected:
   double m_P3Point[3];
   double m_P4Point[3];
 
+  // axis landmarks defined
+  bool m_Axis1Defined ;
+  bool m_Axis2Defined ;
+  bool m_Axis3Defined ;
+
+  // axis landmark names
+  wxString m_Axis1Name;
+  wxString m_Axis2Name;
+  wxString m_Axis3Name;
+
+  // axis landmark points
+  double m_Axis1Point[3];
+  double m_Axis2Point[3];
+  double m_Axis3Point[3];
+
 
 
   //----------------------------------------------------------------------------
@@ -275,7 +316,6 @@ protected:
   //----------------------------------------------------------------------------
 
   mafGUILutSlider *m_Lut;
-  wxRadioBox *m_Radio;
 
   mafGUIButton *m_ChooseOk;
   mafGUIButton *m_AxesOnOffButton;
@@ -293,8 +333,8 @@ protected:
   wxColour m_ButtonBackgroundColour;
 
   wxTextCtrl *m_ScansNumberTxt;
-  wxTextCtrl *m_RegistrationXYSxalingFactorTxt;
 
+  wxRadioBox *m_radio_slicexyz ;
 };
 #endif
 

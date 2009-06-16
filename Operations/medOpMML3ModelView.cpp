@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-11 17:20:08 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Mel Krokos
+Date:      $Date: 2009-06-16 15:11:52 $
+Version:   $Revision: 1.1.2.4 $
+Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -949,7 +949,6 @@ medOpMML3ModelView::~medOpMML3ModelView()
 // Must be called prior to CreateSyntheticScans
 //
 // Size is determined by the bounds of MuscleTransform2PDFilter->GetOutput()
-//      or just (200, 200) if muscle type is 2
 //
 // Resolution is the no. of cells when the polydata slice is created from vtkPlaneSource().
 // The resolution is a fraction of the image size, which is calculated from the grain
@@ -958,27 +957,16 @@ void medOpMML3ModelView::FindSizeAndResolutionOfSyntheticScans()
 {
   float Factor = 1.1 ; // 10% extra
 
-  switch (m_NTypeOfMuscles)
-  {
-  case 1: // slicing axis is single line
-    // bounds
-    double bounds[6];
-    m_MuscleTransform2PolyDataFilter->GetOutput()->GetBounds(bounds);
+  double bounds[6];
+  m_MuscleTransform2PolyDataFilter->GetOutput()->GetBounds(bounds);
 
-    // size
-    m_NSyntheticScansXSize = 2.0 * Factor * fabs(bounds[1]-bounds[0]) ;
-    m_NSyntheticScansYSize = 2.0 * Factor * fabs(bounds[3]-bounds[2]) ;
-
-    break;
-
-  case 2: // slicing axis is two lines
-    m_NSyntheticScansXSize = 200.0;
-    m_NSyntheticScansYSize = 200.0;
-    break;
-  }
+  // set size to bounds of muscle
+  m_NSyntheticScansXSize = 2.0 * Factor * fabs(bounds[1]-bounds[0]) ;
+  m_NSyntheticScansYSize = 2.0 * Factor * fabs(bounds[3]-bounds[2]) ;
 
 
-  // resolution (this will be the no. of quads in the polydata probe)
+  // set resolution to that requested by user.
+  // resolution is no. of quads in the polydata probe.
   double aspectRatio = m_NSyntheticScansYSize / m_NSyntheticScansXSize ;
 
   if (m_NSyntheticScansXSize > m_NSyntheticScansYSize){
@@ -1120,7 +1108,6 @@ void medOpMML3ModelView::CreateSyntheticScans()
     m_SyntheticScansActor[i]->VisibilityOff();
     m_Renderer->AddActor(m_SyntheticScansActor[i]);
 
-
     // adjust min/max scalar values
     ProbeFilter[i]->Update();
     ProbeFilter[i]->GetPolyDataOutput()->GetScalarRange(scalars);
@@ -1210,13 +1197,13 @@ void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double
   double l3[3];
 
   n = this->GetTotalNumberOfSyntheticScans();
-  this->GetLandmark1OfPatient(l1);
-  this->GetLandmark2OfPatient(l2);
-  this->GetLandmark3OfPatient(l3);
+  this->GetLandmark1OfAxis(l1);
+  this->GetLandmark2OfAxis(l2);
 
   switch (m_NTypeOfMuscles)
   {
-  case 1: // slicing axis is single line
+  case 1: 
+    // slicing axis is single line
     // start from landmark 2 (low)
     // ending at landmark 1 (high)
 
@@ -1228,9 +1215,13 @@ void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double
       p[i] = l2[i] + currentlength * m_DUnitVector12[i];
     break;
 
-  case 2: // slicing axis is double line
+  case 2: 
+    // slicing axis is double line
     // start from landmark 3 (low)
     // ending at landmark 1 (high)
+
+    // get 3rd landmark
+    this->GetLandmark3OfAxis(l3);
 
     // current length
     currentlength = ((double)scanId / (double)(n-1)) * m_DOverallLength ;
@@ -1463,9 +1454,8 @@ void medOpMML3ModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
   double l1[3];
   double l2[3];
   double l3[3];
-  this->GetLandmark1OfPatient(l1);
-  this->GetLandmark2OfPatient(l2);
-  this->GetLandmark3OfPatient(l3);
+  this->GetLandmark1OfAxis(l1);
+  this->GetLandmark2OfAxis(l2);
 
   // vector l1 - l2
   for(i = 0; i < 3; i++)
@@ -1478,19 +1468,32 @@ void medOpMML3ModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
   for(i = 0; i < 3; i++)
     m_DUnitVector12[i] = m_DUnitVector12[i] / m_DLength12;
 
-  // vector l2 - l3
-  for(i = 0; i < 3; i++)
-    m_DUnitVector23[i] = l2[i] - l3[i];
 
-  // length of vector l2 - l3
-  m_DLength23 = sqrt(pow(m_DUnitVector23[0], 2.0) + pow(m_DUnitVector23[1], 2.0) + pow(m_DUnitVector23[2], 2.0));
+  switch(m_NTypeOfMuscles){
+    case 1:
+      m_DOverallLength = m_DLength12 ;
+      break ;
 
-  // unit vector along l2 - l3
-  for(i = 0; i < 3; i++)
-    m_DUnitVector23[i] = m_DUnitVector23[i] / m_DLength23;
+    case 2:
+      // get 3rd landmark
+      this->GetLandmark3OfAxis(l3);
 
-  // overall length
-  m_DOverallLength = m_DLength12 + m_DLength23;
+      // vector l2 - l3
+      for(i = 0; i < 3; i++)
+        m_DUnitVector23[i] = l2[i] - l3[i];
+
+      // length of vector l2 - l3
+      m_DLength23 = sqrt(pow(m_DUnitVector23[0], 2.0) + pow(m_DUnitVector23[1], 2.0) + pow(m_DUnitVector23[2], 2.0));
+
+      // unit vector along l2 - l3
+      for(i = 0; i < 3; i++)
+        m_DUnitVector23[i] = m_DUnitVector23[i] / m_DLength23;
+
+      // overall length
+      m_DOverallLength = m_DLength12 + m_DLength23;
+
+      break ;
+  }
 }
 
 
@@ -1680,7 +1683,39 @@ bool medOpMML3ModelView::MapAtlasToPatient()
 
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Do global registration transform on axis landmarks.
+// Axis landmarks come from the atlas,
+// So they must transform with the muscle polydata.
+// You must do MapAtlasToPatient() first to create the transform.
+void medOpMML3ModelView::TransformAxisLandmarksToPatient()
+//------------------------------------------------------------------------------
+{
+  vtkMatrix4x4 *mat = m_MuscleTransform1->GetMatrix() ;
+
+  // get axis landmarks as homogeneous vectors
+  double a1[4], a2[4], a3[4] ;
+
+  GetLandmark1OfAxis(a1) ;  a1[3] = 1.0 ;
+  MultiplyMatrixPoint(mat, a1, a1) ;
+  SetLandmark1OfAxis(a1) ;
+
+  GetLandmark2OfAxis(a2) ;  a2[3] = 1.0 ;
+  MultiplyMatrixPoint(mat, a2, a2) ;
+  SetLandmark2OfAxis(a2) ;
+
+  if (m_NTypeOfMuscles == 2){
+    GetLandmark3OfAxis(a3) ;  a3[3] = 1.0 ;
+    MultiplyMatrixPoint(mat, a3, a3) ;
+    SetLandmark3OfAxis(a3) ;
+  }
+}
+
+
+
+
+
+//------------------------------------------------------------------------------
 // Transform 2
 // transform coordinates into a coordinate system, in which z-axis
 // is aligned with muscle line axis as defined by insertion points
@@ -1688,16 +1723,18 @@ bool medOpMML3ModelView::MapAtlasToPatient()
 //
 // Calculate matrices m_SliceRotationMat and m_FinalMat
 // Set m_MuscleTransform2
+//
+// NB This does not include any option for muscle type 2 !
 bool medOpMML3ModelView::MakeActionLineZAxis()
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   int i;
 
   // insertions
   double p1[3];
   double p2[3];
-  GetLandmark1OfPatient(p1); // high
-  GetLandmark2OfPatient(p2); // low
+  GetLandmark1OfAxis(p1); // high
+  GetLandmark2OfAxis(p2); // low
 
   // middle
   double m[3];
@@ -1754,15 +1791,10 @@ bool medOpMML3ModelView::MakeActionLineZAxis()
   //reflzm->Identity();
   //reflzm->SetElement(2, 2, -1.0);
 
-  double factorX, factorY;
-  GetXYScalingFactorsOfMuscle(&factorX, &factorY);
 
   // scaling
   vtkMatrix4x4 *scalem = vtkMatrix4x4::New();
   scalem->Identity();
-  scalem->SetElement(0, 0, factorX);
-  scalem->SetElement(1, 1, factorY);
-  scalem->SetElement(2, 2, 1.0);
 
   // synthetic slices transform
   m_SliceRotationMat->Identity();
@@ -1812,6 +1844,9 @@ bool medOpMML3ModelView::MakeActionLineZAxis()
 
 
 //----------------------------------------------------------------------------
+// Calculate distance z along slice axis from landmark 1 to landmark 2
+// Assumes z is a linear function of scan id with range -L/2 to +L/2 where L is length
+// NB No option for muscle type 2
 double medOpMML3ModelView::GetZOfSyntheticScans(int s)
 //----------------------------------------------------------------------------
 {
@@ -1820,8 +1855,8 @@ double medOpMML3ModelView::GetZOfSyntheticScans(int s)
   double p2[3]; // high insertion
 
   n = GetTotalNumberOfSyntheticScans();
-  GetLandmark1OfPatient(p1);
-  GetLandmark2OfPatient(p2);
+  GetLandmark1OfAxis(p1);
+  GetLandmark2OfAxis(p2);
 
   double length;
   vtkMath *pMath = vtkMath::New();
@@ -1829,9 +1864,9 @@ double medOpMML3ModelView::GetZOfSyntheticScans(int s)
   pMath->Delete();
 
   double start; // first z (slice id = 0)
-  start = -1.0 * length / 2.0;
+  start = -length / 2.0;
 
-  return start + length / (n - 1) * s;
+  return start + ((double)s / (double)(n-1)) * length ;
 }
 
 
@@ -2150,6 +2185,8 @@ void medOpMML3ModelView::SetSizeOfSyntheticScans(float x, float y)
   m_NSyntheticScansXSize = x;
   m_NSyntheticScansYSize = y;
 }
+
+
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetSizeOfSyntheticScans(float *x, float *y)
 //----------------------------------------------------------------------------
@@ -2157,28 +2194,6 @@ void medOpMML3ModelView::GetSizeOfSyntheticScans(float *x, float *y)
   *x = m_NSyntheticScansXSize;
   *y = m_NSyntheticScansYSize;
 }
-
-
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetXYScalingFactorsOfMuscle(double x, double y)
-//----------------------------------------------------------------------------
-{
-  m_FlMuscleXScalingFactor = x;
-  m_FlMuscleYScalingFactor = y;
-}
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::GetXYScalingFactorsOfMuscle(double *x, double *y) const
-//----------------------------------------------------------------------------
-{
-  *x = m_FlMuscleXScalingFactor;
-  *y = m_FlMuscleYScalingFactor;
-}
-
-
 
 
 
@@ -2209,8 +2224,8 @@ void medOpMML3ModelView::UpdateContourCuttingPlane()
     // insertions
     double p1[3];
     double p2[3];
-    GetLandmark1OfPatient(p1); // high
-    GetLandmark2OfPatient(p2); // low
+    GetLandmark1OfAxis(p1); // high
+    GetLandmark2OfAxis(p2); // low
 
     // unit vector along muscle axis
     double u[3];
@@ -2737,145 +2752,201 @@ void medOpMML3ModelView::UpdateSegmentSouthWestTransform()
 void medOpMML3ModelView::SetLandmark1OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleAtlasInsertionPoint1[0] = xyz[0];
-  m_DMuscleAtlasInsertionPoint1[1] = xyz[1];
-  m_DMuscleAtlasInsertionPoint1[2] = xyz[2];
+  m_AtlasLandmark1[0] = xyz[0];
+  m_AtlasLandmark1[1] = xyz[1];
+  m_AtlasLandmark1[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark2OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleAtlasInsertionPoint2[0] = xyz[0];
-  m_DMuscleAtlasInsertionPoint2[1] = xyz[1];
-  m_DMuscleAtlasInsertionPoint2[2] = xyz[2];
+  m_AtlasLandmark2[0] = xyz[0];
+  m_AtlasLandmark2[1] = xyz[1];
+  m_AtlasLandmark2[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark3OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleAtlasReferencePoint1[0] = xyz[0];
-  m_DMuscleAtlasReferencePoint1[1] = xyz[1];
-  m_DMuscleAtlasReferencePoint1[2] = xyz[2];
+  m_AtlasLandmark3[0] = xyz[0];
+  m_AtlasLandmark3[1] = xyz[1];
+  m_AtlasLandmark3[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark4OfAtlas(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleAtlasReferencePoint2[0] = xyz[0];
-  m_DMuscleAtlasReferencePoint2[1] = xyz[1];
-  m_DMuscleAtlasReferencePoint2[2] = xyz[2];
+  m_AtlasLandmark4[0] = xyz[0];
+  m_AtlasLandmark4[1] = xyz[1];
+  m_AtlasLandmark4[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark1OfAtlas(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleAtlasInsertionPoint1[0];
-  xyz[1] = m_DMuscleAtlasInsertionPoint1[1];
-  xyz[2] = m_DMuscleAtlasInsertionPoint1[2];
+  xyz[0] = m_AtlasLandmark1[0];
+  xyz[1] = m_AtlasLandmark1[1];
+  xyz[2] = m_AtlasLandmark1[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark2OfAtlas(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleAtlasInsertionPoint2[0];
-  xyz[1] = m_DMuscleAtlasInsertionPoint2[1];
-  xyz[2] = m_DMuscleAtlasInsertionPoint2[2];
+  xyz[0] = m_AtlasLandmark2[0];
+  xyz[1] = m_AtlasLandmark2[1];
+  xyz[2] = m_AtlasLandmark2[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark3OfAtlas(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleAtlasReferencePoint1[0];
-  xyz[1] = m_DMuscleAtlasReferencePoint1[1];
-  xyz[2] = m_DMuscleAtlasReferencePoint1[2];
+  xyz[0] = m_AtlasLandmark3[0];
+  xyz[1] = m_AtlasLandmark3[1];
+  xyz[2] = m_AtlasLandmark3[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark4OfAtlas(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleAtlasReferencePoint2[0];
-  xyz[1] = m_DMuscleAtlasReferencePoint2[1];
-  xyz[2] = m_DMuscleAtlasReferencePoint2[2];
+  xyz[0] = m_AtlasLandmark4[0];
+  xyz[1] = m_AtlasLandmark4[1];
+  xyz[2] = m_AtlasLandmark4[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark1OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleScansInsertionPoint1[0] = xyz[0];
-  m_DMuscleScansInsertionPoint1[1] = xyz[1];
-  m_DMuscleScansInsertionPoint1[2] = xyz[2];
+  m_PatientLandmark1[0] = xyz[0];
+  m_PatientLandmark1[1] = xyz[1];
+  m_PatientLandmark1[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark2OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleScansInsertionPoint2[0] = xyz[0];
-  m_DMuscleScansInsertionPoint2[1] = xyz[1];
-  m_DMuscleScansInsertionPoint2[2] = xyz[2];
+  m_PatientLandmark2[0] = xyz[0];
+  m_PatientLandmark2[1] = xyz[1];
+  m_PatientLandmark2[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark3OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleScansReferencePoint1[0] = xyz[0];
-  m_DMuscleScansReferencePoint1[1] = xyz[1];
-  m_DMuscleScansReferencePoint1[2] = xyz[2];
+  m_PatientLandmark3[0] = xyz[0];
+  m_PatientLandmark3[1] = xyz[1];
+  m_PatientLandmark3[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::SetLandmark4OfPatient(double *xyz)
 //----------------------------------------------------------------------------
 {
-  m_DMuscleScansReferencePoint2[0] = xyz[0];
-  m_DMuscleScansReferencePoint2[1] = xyz[1];
-  m_DMuscleScansReferencePoint2[2] = xyz[2];
+  m_PatientLandmark4[0] = xyz[0];
+  m_PatientLandmark4[1] = xyz[1];
+  m_PatientLandmark4[2] = xyz[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark1OfPatient(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleScansInsertionPoint1[0];
-  xyz[1] = m_DMuscleScansInsertionPoint1[1];
-  xyz[2] = m_DMuscleScansInsertionPoint1[2];
+  xyz[0] = m_PatientLandmark1[0];
+  xyz[1] = m_PatientLandmark1[1];
+  xyz[2] = m_PatientLandmark1[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark2OfPatient(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleScansInsertionPoint2[0];
-  xyz[1] = m_DMuscleScansInsertionPoint2[1];
-  xyz[2] = m_DMuscleScansInsertionPoint2[2];
+  xyz[0] = m_PatientLandmark2[0];
+  xyz[1] = m_PatientLandmark2[1];
+  xyz[2] = m_PatientLandmark2[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark3OfPatient(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleScansReferencePoint1[0];
-  xyz[1] = m_DMuscleScansReferencePoint1[1];
-  xyz[2] = m_DMuscleScansReferencePoint1[2];
+  xyz[0] = m_PatientLandmark3[0];
+  xyz[1] = m_PatientLandmark3[1];
+  xyz[2] = m_PatientLandmark3[2];
 }
 
 //----------------------------------------------------------------------------
 void medOpMML3ModelView::GetLandmark4OfPatient(double *xyz) const 
 //----------------------------------------------------------------------------
 {
-  xyz[0] = m_DMuscleScansReferencePoint2[0];
-  xyz[1] = m_DMuscleScansReferencePoint2[1];
-  xyz[2] = m_DMuscleScansReferencePoint2[2];
+  xyz[0] = m_PatientLandmark4[0];
+  xyz[1] = m_PatientLandmark4[1];
+  xyz[2] = m_PatientLandmark4[2];
 }
+
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::SetLandmark1OfAxis(double *xyz)
+//----------------------------------------------------------------------------
+{
+  m_AxisLandmark1[0] = xyz[0];
+  m_AxisLandmark1[1] = xyz[1];
+  m_AxisLandmark1[2] = xyz[2];
+}
+
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::SetLandmark2OfAxis(double *xyz)
+//----------------------------------------------------------------------------
+{
+  m_AxisLandmark2[0] = xyz[0];
+  m_AxisLandmark2[1] = xyz[1];
+  m_AxisLandmark2[2] = xyz[2];
+}
+
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::SetLandmark3OfAxis(double *xyz)
+//----------------------------------------------------------------------------
+{
+  m_AxisLandmark3[0] = xyz[0];
+  m_AxisLandmark3[1] = xyz[1];
+  m_AxisLandmark3[2] = xyz[2];
+}
+
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::GetLandmark1OfAxis(double *xyz) const 
+//----------------------------------------------------------------------------
+{
+  xyz[0] = m_AxisLandmark1[0];
+  xyz[1] = m_AxisLandmark1[1];
+  xyz[2] = m_AxisLandmark1[2];
+}
+
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::GetLandmark2OfAxis(double *xyz) const 
+//----------------------------------------------------------------------------
+{
+  xyz[0] = m_AxisLandmark2[0];
+  xyz[1] = m_AxisLandmark2[1];
+  xyz[2] = m_AxisLandmark2[2];
+}
+
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::GetLandmark3OfAxis(double *xyz) const 
+//----------------------------------------------------------------------------
+{
+  xyz[0] = m_AxisLandmark3[0];
+  xyz[1] = m_AxisLandmark3[1];
+  xyz[2] = m_AxisLandmark3[2];
+}
+
+
 
 //----------------------------------------------------------------------------
 bool medOpMML3ModelView::SetUpContourCoordinateAxes()
@@ -3028,17 +3099,21 @@ void medOpMML3ModelView::Switch3dDisplayOn()
   m_PosZAxisActor->VisibilityOff();
   m_NegZAxisActor->VisibilityOff();
 
-  // landmarks
-  double p1[3]; this->GetLandmark1OfPatient(p1);
-  double p2[3]; this->GetLandmark2OfPatient(p2);
-  double p3[3]; this->GetLandmark3OfPatient(p3);
-  double p4[3]; this->GetLandmark4OfPatient(p4);
+
+
+  // patient landmarks
+  double p1[3], p2[3], p3[3], p4[3] ;
+  this->GetLandmark1OfPatient(p1);
+  this->GetLandmark2OfPatient(p2);
+  this->GetLandmark3OfPatient(p3);
+  if (m_4Landmarks == 1)
+    this->GetLandmark4OfPatient(p4);
 
   // 1st landmark set up and switch on
   m_Landmark1SphereSource->SetRadius(2.0);
   m_Landmark1SphereSource->SetThetaResolution(10);
   m_Landmark1SphereSource->SetPhiResolution(10);
-  m_Landmark1SphereSource->SetCenter(p1[0], p1[1], p1[2]);
+  m_Landmark1SphereSource->SetCenter(p1);
   m_Landmark1Actor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
   m_Landmark1Actor->VisibilityOn();
 
@@ -3046,7 +3121,7 @@ void medOpMML3ModelView::Switch3dDisplayOn()
   m_Landmark2SphereSource->SetRadius(2.0);
   m_Landmark2SphereSource->SetThetaResolution(10);
   m_Landmark2SphereSource->SetPhiResolution(10);
-  m_Landmark2SphereSource->SetCenter(p2[0], p2[1], p2[2]);
+  m_Landmark2SphereSource->SetCenter(p2);
   m_Landmark2Actor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
   m_Landmark2Actor->VisibilityOn();
 
@@ -3054,36 +3129,52 @@ void medOpMML3ModelView::Switch3dDisplayOn()
   m_Landmark3SphereSource->SetRadius(2.0);
   m_Landmark3SphereSource->SetThetaResolution(10);
   m_Landmark3SphereSource->SetPhiResolution(10);
-  m_Landmark3SphereSource->SetCenter(p3[0], p3[1], p3[2]);
+  m_Landmark3SphereSource->SetCenter(p3);
   m_Landmark3Actor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
   m_Landmark3Actor->VisibilityOn();
 
   // 4th landmark set up and switch on
-  if (m_4Landmarks == 1)
-  {
+  if (m_4Landmarks == 1){
     m_Landmark4SphereSource->SetRadius(2.0);
     m_Landmark4SphereSource->SetThetaResolution(10);
     m_Landmark4SphereSource->SetPhiResolution(10);
-    m_Landmark4SphereSource->SetCenter(p4[0], p4[1], p4[2]);
+    m_Landmark4SphereSource->SetCenter(p4);
     m_Landmark4Actor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
     m_Landmark4Actor->VisibilityOn();	
   }
+  else
+    m_Landmark4Actor->VisibilityOff();	
+
+
+
+
+  // axis landmarks
+  double a1[3], a2[3], a3[3] ;
+  this->GetLandmark1OfAxis(a1) ;
+  this->GetLandmark2OfAxis(a2) ;
+  if (m_NTypeOfMuscles == 2)
+    this->GetLandmark3OfAxis(a3) ;
 
   // line of action (L1 to L2) set up and switch on
   m_L1L2TubeFilter->SetRadius(1.0);
   m_L1L2TubeFilter->SetNumberOfSides(6);
-  m_L1L2LineSource->SetPoint1(p1[0], p1[1], p1[2]);
-  m_L1L2LineSource->SetPoint2(p2[0], p2[1], p2[2]);
+  m_L1L2LineSource->SetPoint1(a1);
+  m_L1L2LineSource->SetPoint2(a2);
   m_L1L2Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
   m_L1L2Actor->VisibilityOn();
 
-  // L2 to L3 line set up and switch on
-  m_L2L3TubeFilter->SetRadius(1.0);
-  m_L2L3TubeFilter->SetNumberOfSides(6);
-  m_L2L3LineSource->SetPoint1(p2[0], p2[1], p2[2]);
-  m_L2L3LineSource->SetPoint2(p3[0], p3[1], p3[2]);
-  m_L2L3Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_L2L3Actor->VisibilityOn();
+  if (m_NTypeOfMuscles == 2){
+    // L2 to L3 line set up and switch on
+    m_L2L3TubeFilter->SetRadius(1.0);
+    m_L2L3TubeFilter->SetNumberOfSides(6);
+    m_L2L3LineSource->SetPoint1(a2);
+    m_L2L3LineSource->SetPoint2(a3);
+    m_L2L3Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+    m_L2L3Actor->VisibilityOn();
+  }
+  else
+    m_L2L3Actor->VisibilityOff();
+
 
 
   // clean up
@@ -3094,13 +3185,13 @@ void medOpMML3ModelView::Switch3dDisplayOn()
 
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Multiply matrices c = ab
 // c can be the same as a or b
 // This is a column major multiply, but vtkMatrix4x4 is row major,
 // so this actually does c = ba.
 void medOpMML3ModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b, vtkMatrix4x4 *c) const
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   //
   // matrix notation (i is row, j is col)
@@ -3132,6 +3223,28 @@ void medOpMML3ModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b, vtk
   c->DeepCopy(ctemp) ;
   ctemp->Delete() ;
 }
+
+
+
+//------------------------------------------------------------------------------
+// multiply point by matrix c = Ab. \n
+// c can be the same as b
+void medOpMML3ModelView::MultiplyMatrixPoint(vtkMatrix4x4* A, double b[3], double c[3]) const
+//------------------------------------------------------------------------------
+{
+  int i, j ;
+  double ctemp[4] ;
+
+  for (i = 0 ;  i < 4 ;  i++){
+    for (j = 0, ctemp[i] = 0.0 ;  j < 4;  j++)
+      ctemp[i] += A->GetElement(i,j) * b[j] ;
+  }
+
+  // copy to output matrix
+  for (i = 0 ;  i < 4 ;  i++)
+    c[i] = ctemp[i] ;
+}
+
 
 
 

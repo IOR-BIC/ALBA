@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-11 17:20:08 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Mel Krokos
+Date:      $Date: 2009-06-16 15:11:52 $
+Version:   $Revision: 1.1.2.4 $
+Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -62,6 +62,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 //----------------------------------------------------------------------------
 // MML id's
+//----------------------------------------------------------------------------
 enum 
 {
   ID = MINID,
@@ -72,6 +73,10 @@ enum
   ID_CHOOSE_L2,
   ID_CHOOSE_L3,
   ID_CHOOSE_L4,
+  ID_CHOOSE_AXIS1,
+  ID_CHOOSE_AXIS2,
+  ID_CHOOSE_AXIS3,
+  ID_CHOOSE_SLICEXYZ,
   ID_CHOOSE_FLAG3D,
   ID_CHOOSE_FAKE, // dummy id with no associated event
   ID_CHOOSE_OK,
@@ -90,7 +95,6 @@ enum
   ID_UNDO,
   ID_SLICE,
 
-  ID_STATE,
   ID_CHOOSE_SCANS_DISTANCE,
 
   ID_FAKE,
@@ -113,9 +117,7 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_SurfaceVME     = NULL;
 
   m_OpDlg      = NULL; // registration dialog
-  m_Radio       = NULL; // radio buttons
-
-  //
+  
   m_AxesOnOffButton = NULL;
   m_ContourOnOffButton = NULL;
   m_ResetViewButton = NULL;
@@ -130,7 +132,6 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_ScaleOpButton = NULL;
 
   m_CurrentSlice = 0; // start up slice
-  m_State = 0; // start up operation (place)
   m_ShowAxes = 1; // contour line axes switched on
   m_ContourVisibility = 1; // contour switched on
 
@@ -148,9 +149,16 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_P2Name      = "none";
   m_P3Name      = "none";
   m_P4Name      = "none";
+  m_Axis1Name      = "none";
+  m_Axis2Name      = "none";
+  m_Axis3Name      = "none";
+
 
   // no 3d view
   m_3DFlag = 0;
+
+  // default axis is z
+  m_slicexyz = 2 ;
 
   // unregistered
   m_RegistrationStatus = 0;
@@ -160,16 +168,17 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_L2Defined = false ;
   m_L3Defined = false ;
   m_L4Defined = false ;
+  m_Axis1Defined = false ;
+  m_Axis2Defined = false ;
+  m_Axis3Defined = false ;
 
-  //m_ScansDistance = 30.0;
-  m_ScansGrain = 128 ;
-  m_ScansNumber = 12 ;
-  //m_muscle_type = 1;
-  m_RegistrationXYScalingFactor = 1.0;
-  m_ScansSize[0] = 90;
-  m_ScansSize[1] = 90;
-  m_ScansResolution[0] = 2 * m_ScansSize[0];
-  m_ScansResolution[1] = 2 * m_ScansSize[1];
+  // set flag indicating how axis landmarks were created
+  m_AxisLandmarksFlag = 1 ;
+
+  m_ScansGrain = 128 ;  // resolution of slices
+  m_ScansNumber = 12 ;  // no. of slices
+  m_AxisScalingFactor = 1.1 ; // stretch factor for axis
+  m_MuscleType = 1;     // 1 for simple axis, 2 for piecewise axis
 
   // Model maf RWIs
   m_ModelmafRWI = NULL;
@@ -204,9 +213,6 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_ChooseOk = NULL;
 
   m_Muscle = vtkPolyData::New() ;
-
-  // Stefano
-  m_MuscleType = 1;
 }
 
 
@@ -306,7 +312,13 @@ void medOpMML3::CreateInputsDlg()
   hs_1->Add(text_1, 1, wxEXPAND);
   hs_1->Add(b_1,0);
   vs1->Add(hs_1, 0, wxEXPAND | wxALL, 2);
+  vs1->AddSpacer(20) ;
 
+
+
+  // Registration landmarks
+  wxStaticText *lab_RegLandmarksTitle = new wxStaticText(m_ChooseDlg, -1, "Registration Landmarks (select from atlas)", wxPoint(0,0), wxSize(150,20));
+  vs1->Add(lab_RegLandmarksTitle, 0, wxEXPAND | wxALL, 2);
 
   // landmark 1
   wxStaticText *lab_5  = new wxStaticText(m_ChooseDlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
@@ -355,27 +367,63 @@ void medOpMML3::CreateInputsDlg()
   hs_8->Add(text_8,1,wxEXPAND);
   hs_8->Add(b_8,0);
   vs1->Add(hs_8,0,wxEXPAND | wxALL, 2);
+  vs1->AddSpacer(20) ;
 
 
-  // registration xy scaling factor
-  wxStaticText *RegistrationXYSxalingFactorLab  = new wxStaticText(m_ChooseDlg, -1, "XY scale (0.01 - 2.0)", wxPoint(0,0), wxSize(150,20));
-  m_RegistrationXYSxalingFactorTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  m_RegistrationXYSxalingFactorTxt->SetValidator(mafGUIValidator(this,ID_CHOOSE_FAKE,m_RegistrationXYSxalingFactorTxt,&m_RegistrationXYScalingFactor,0.01,2.0)); // min/max values
-  wxBoxSizer *RegistrationXYSxalingFactorSizer = new wxBoxSizer(wxHORIZONTAL);
-  RegistrationXYSxalingFactorSizer->Add(RegistrationXYSxalingFactorLab,0);
-  RegistrationXYSxalingFactorSizer->Add(m_RegistrationXYSxalingFactorTxt,1,wxEXPAND);
-  vs1->Add(RegistrationXYSxalingFactorSizer,0,wxEXPAND | wxALL, 2);
-  m_RegistrationXYSxalingFactorTxt->Enable(false) ;
 
-  // scans distance
-  wxStaticText *ScansDistanceLab  = new wxStaticText(m_ChooseDlg, -1, "Slice distance (0.1 - 100.0)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansDistanceTxt = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER );
-  ScansDistanceTxt->SetValidator(mafGUIValidator(this,ID_FAKE,ScansDistanceTxt,&m_ScansDistance,0.1,100)); // min/max values
-  wxBoxSizer *ScansDistanceHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  ScansDistanceHorizontalSizer->Add(ScansDistanceLab,0);
-  ScansDistanceHorizontalSizer->Add(ScansDistanceTxt,1,wxEXPAND);
-  vs1->Add(ScansDistanceHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  ScansDistanceTxt->Enable(false) ;
+  // Axis slice direction
+  wxStaticText *lab_AxisLandmarksTitle = new wxStaticText(m_ChooseDlg, -1, "Select Slice Direction", wxPoint(0,0), wxSize(150,20));
+  vs1->Add(lab_AxisLandmarksTitle, 0, wxEXPAND | wxALL, 2);
+
+  // Default slice direction x, y or z
+  wxArrayString radioStrings ;
+  radioStrings.Add(wxT("x")) ;
+  radioStrings.Add(wxT("y")) ;
+  radioStrings.Add(wxT("z")) ;
+  m_radio_slicexyz = new wxRadioBox(m_ChooseDlg, ID_CHOOSE_SLICEXYZ, "Default direction", wxPoint(0,0), wxSize(150,50), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
+  m_radio_slicexyz->SetValidator(mafGUIValidator(this, ID_CHOOSE_SLICEXYZ, m_radio_slicexyz, &m_slicexyz));
+  wxBoxSizer *sliceXYZHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
+  sliceXYZHorizontalSizer->Add(m_radio_slicexyz,1,wxEXPAND | wxRIGHT, 3);
+  vs1->Add(sliceXYZHorizontalSizer,0,wxEXPAND | wxALL, 2);
+
+  // landmark axis 1
+  wxStaticText *lab_axis1 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 1", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *text_axis1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_axis1->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS1, text_axis1, &m_Axis1Name));
+  mafGUIButton *button_axis1 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS1, "select", wxPoint(0,0), wxSize(50,20));
+  button_axis1->SetListener(this);
+  wxBoxSizer *hs_axis1 = new wxBoxSizer(wxHORIZONTAL);
+  hs_axis1->Add(lab_axis1,0);
+  hs_axis1->Add(text_axis1,1,wxEXPAND);
+  hs_axis1->Add(button_axis1,0);
+  vs1->Add(hs_axis1,0,wxEXPAND | wxALL, 2);
+
+  // landmark axis 2
+  wxStaticText *lab_axis2 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 2", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *text_axis2 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_axis2->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS2, text_axis2, &m_Axis2Name));
+  mafGUIButton *button_axis2 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS2, "select", wxPoint(0,0), wxSize(50,20));
+  button_axis2->SetListener(this);
+  wxBoxSizer *hs_axis2 = new wxBoxSizer(wxHORIZONTAL);
+  hs_axis2->Add(lab_axis2,0);
+  hs_axis2->Add(text_axis2,1,wxEXPAND);
+  hs_axis2->Add(button_axis2,0);
+  vs1->Add(hs_axis2,0,wxEXPAND | wxALL, 2);
+
+  // landmark axis 3
+  wxStaticText *lab_axis3 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 3", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *text_axis3 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_axis3->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS3, text_axis3, &m_Axis3Name));
+  mafGUIButton *button_axis3 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS3, "select", wxPoint(0,0), wxSize(50,20));
+  button_axis3->SetListener(this);
+  wxBoxSizer *hs_axis3 = new wxBoxSizer(wxHORIZONTAL);
+  hs_axis3->Add(lab_axis3,0);
+  hs_axis3->Add(text_axis3,1,wxEXPAND);
+  hs_axis3->Add(button_axis3,0);
+  vs1->Add(hs_axis3,0,wxEXPAND | wxALL, 2);
+  text_axis3->Enable(m_MuscleType == 2) ;   // enable only if muscle has a piecewise axis with 3 landmarks
+  button_axis3->Enable(m_MuscleType == 2) ;
+  vs1->AddSpacer(20) ;
 
 
   // number of scans
@@ -387,23 +435,6 @@ void medOpMML3::CreateInputsDlg()
   ScansNumberHorizontalSizer->Add(m_ScansNumberTxt,1,wxEXPAND);
   vs1->Add(ScansNumberHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
-
-  /*
-  // scans x y size (now done automatically)
-  wxStaticText *ScansSizeLab  = new wxStaticText(m_ChooseDlg, -1, "Slice size (1 - 128)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansSizeTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansSizeTxt1->SetValidator(mafGUIValidator(this,ID_FAKE,ScansSizeTxt1,&m_ScansSize[0],1,128)); //min/max values
-  wxTextCtrl   *ScansSizeTxt2 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansSizeTxt2->SetValidator(mafGUIValidator(this,ID_FAKE,ScansSizeTxt2,&m_ScansSize[1],1,128)); // min/max values
-  wxBoxSizer *ScansSizeHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  ScansSizeHorizontalSizer->Add(ScansSizeLab,0);
-  ScansSizeHorizontalSizer->Add(ScansSizeTxt1,1,wxEXPAND | wxRIGHT, 3);
-  ScansSizeHorizontalSizer->Add(ScansSizeTxt2,1,wxEXPAND);
-  vs1->Add(ScansSizeHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  */
-
-
-
   // scans resolution
   wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice resolution (64-1024)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl *ScansGrainTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
@@ -413,35 +444,25 @@ void medOpMML3::CreateInputsDlg()
   ScansGrainHorizontalSizer2->Add(ScansGrainTxt1,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(ScansGrainHorizontalSizer2,0,wxEXPAND | wxALL, 2);
 
+  // axis scaling factor
+  wxStaticText *AxisScalingLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Axis scaling factor (1-5)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *AxisScalingTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
+  AxisScalingTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, AxisScalingTxt, &m_AxisScalingFactor, 1.0, 5.0)); // min/max values
+  wxBoxSizer *AxisScalingHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
+  AxisScalingHorizontalSizer->Add(AxisScalingLab,0);
+  AxisScalingHorizontalSizer->Add(AxisScalingTxt,1,wxEXPAND);
+  vs1->Add(AxisScalingHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
 
   // 3d flag (note that check box needs a valid id)
   wxStaticText *flag3dLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "3D display", wxPoint(0,0), wxSize(150,20));
   wxCheckBox *flag3dCheckBox = new wxCheckBox(m_ChooseDlg, ID_CHOOSE_FLAG3D, "", wxPoint(0,0), wxSize(80,20)) ;
   flag3dCheckBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_FLAG3D, flag3dCheckBox, &m_3DFlag));
-
-  //wxTextCtrl *flagTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
-  //flagTxt1->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, flagTxt1, &m_3DFlag, 0, 1));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   flagHorizontalSizer->Add(flag3dLab, 0);
-  //flagHorizontalSizer->Add(flagTxt1,1,wxEXPAND | wxRIGHT, 3);
   flagHorizontalSizer->Add(flag3dCheckBox,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(flagHorizontalSizer,0,wxEXPAND | wxALL, 2);
-
-
-  /*
-  // scans x y resolution  (set automatically from scans x, y size)
-  wxStaticText *ScansResolutionLab  = new wxStaticText(m_ChooseDlg, -1, "Slice resolution (8 - 256)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *ScansResolutionTxt1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansResolutionTxt1->SetValidator(mafGUIValidator(this,ID_FAKE,ScansResolutionTxt1,&m_ScansResolution[0],8,256));
-  wxTextCtrl   *ScansResolutionTxt2 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(75,20),wxNO_BORDER );
-  ScansResolutionTxt2->SetValidator(mafGUIValidator(this,ID_FAKE,ScansResolutionTxt2,&m_ScansResolution[1],8,256));
-  wxBoxSizer *ScansResolutionHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  ScansResolutionHorizontalSizer->Add(ScansResolutionLab,0);
-  ScansResolutionHorizontalSizer->Add(ScansResolutionTxt1,1,wxEXPAND | wxRIGHT, 3);
-  ScansResolutionHorizontalSizer->Add(ScansResolutionTxt2,1,wxEXPAND);
-  vs1->Add(ScansResolutionHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  */
+  vs1->AddSpacer(20) ;
 
 
   // ok/cancel buttons
@@ -559,18 +580,6 @@ void medOpMML3::CreateRegistrationDlg()
     m_ScaleOpButton->Enable(false) ;
 
 
-  //wxString choices[4];
-  //choices[0] = "PLACE       >>>";
-  //choices[1] = "TRANSLATE   >>>";
-  //choices[2] = "ROTATE     >>>";
-  //choices[3] = "SCALE";
-  //m_radio = new wxRadioBox(m_op_dlg, ID_STATE, "", wxPoint(0,0), wxSize(500,40), 4,choices,4,wxRA_SPECIFY_COLS|wxNO_BORDER|wxTAB_TRAVERSAL);
-  //m_radio->SetValidator( mafGUIValidator(this,ID_STATE,m_radio,&m_state) );
-  //if (m_3dflag == 0)
-  //	m_radio->Enable(TRUE);
-  //LeftVerticalBoxSizer->Add(m_radio,0,wxLEFT,5);
-
-
   // maf model view RWI
   m_ModelmafRWI = new mafRWI(m_OpDlg);
   m_ModelmafRWI->SetListener(this);
@@ -591,18 +600,17 @@ void medOpMML3::CreateRegistrationDlg()
   // create mml model view
   m_Model = new medOpMML3ModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, m_Muscle, m_Volume);
 
-
   // set up landmarks
   if (!m_L1Defined || !m_L2Defined || !m_L3Defined)
-    CreateFakeLandmarks(); // create default landmarks if full set is not defined
-  SetUpModelViewInputs(); // pass landmarks to model view
-
+    CreateDefaultRegistrationLandmarks(); // create default landmarks if full set is not defined
+  if (!m_Axis1Defined || !m_Axis2Defined || ((m_MuscleType == 2) && !m_Axis3Defined))
+    CreateDefaultAxisLandmarks(); // create default landmarks if full set is not defined
 
   // maf slider widget 
   wxStaticText *lab  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(-1, 16));
   wxTextCtrl   *text = new wxTextCtrl  (m_OpDlg, ID_SLICE, "hello",  wxPoint(0,0), wxSize(20, 16),wxNO_BORDER |wxTE_READONLY );
 
-  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 0, m_Model->GetTotalNumberOfSyntheticScans()-1, wxPoint(0,0), wxSize(269,-1));
+  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 0, m_ScansNumber-1, wxPoint(0,0), wxSize(269,-1));
   sli->SetValidator(mafGUIValidator(this, ID_SLICE, (wxSlider*)sli, &m_CurrentSlice, text));
 
 
@@ -676,7 +684,6 @@ void medOpMML3::CreateRegistrationDlg()
   WindowHorizontalBoxSizer->Add(RightVerticalBoxSizer,0,wxALL,0);
 
 
-
   // add to dialog
   m_OpDlg->Add(WindowHorizontalBoxSizer);    
   WindowHorizontalBoxSizer->Fit(m_OpDlg);
@@ -700,14 +707,13 @@ void medOpMML3::CreateRegistrationDlg()
   // create mml contour widget
   m_Widget = medOpMML3ContourWidget::New();
 
-  //
   SetUpContourWidget();
+  SetUpModelViewInputs(); // pass input parameters and landmarks to model view
   SetUpModelView();
   SetUpParameterViews();
-  //
+  
   mafEventMacro(mafEvent(this, ID_T_OPERATION));
-  //
-
+  
   m_OpDlg->ShowModal();	
 }
 
@@ -805,6 +811,7 @@ void medOpMML3::GetAbsPosOfLandmark(mafVMELandmark *landmark, double point[3])
 
 
 
+
 //------------------------------------------------------------------------------
 // Event handler
 void medOpMML3::OnEvent(mafEventBase *maf_event) 
@@ -818,7 +825,6 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
       OnMuscleSelection();
       break;
 
-      // Nigel A
     case ID_CHOOSE_L1: // set up dlg L1
       OnLandmark1AtlasPatientSelection();
       break;
@@ -834,7 +840,18 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
     case ID_CHOOSE_L4: // set up dlg L4
       OnLandmark4AtlasPatientSelection();
       break;
-      // Nigel A end
+
+    case ID_CHOOSE_SLICEXYZ: // radio box to choose default slice direction
+      OnSliceXYZ() ;
+      break ;
+
+    case ID_CHOOSE_AXIS1: // set up dlg to select axis 1
+      OnLandmarkAxis1AtlasSelection();
+      break;
+
+    case ID_CHOOSE_AXIS2: // set up dlg to select axis 2
+      OnLandmarkAxis2AtlasSelection();
+      break;
 
     case ID_CHOOSE_OK: // set up dlg ok
       m_ChooseDlg->EndModal(wxID_OK);
@@ -905,11 +922,6 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
       OnSlider();
       break;
 
-    case ID_STATE:
-      //
-      OnOperation();
-      break;
-
     case ID_CHOOSE_SCANS_DISTANCE:
       //wxLogMessage("ttt");
       //wxLogMessage("arg1 changed to %d", m_arg1)
@@ -921,6 +933,25 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
     }
   }
 }
+
+
+
+//------------------------------------------------------------------------------
+// Action if check box UseReg changes
+void medOpMML3::OnSliceXYZ()
+//------------------------------------------------------------------------------
+{
+}
+
+
+
+//------------------------------------------------------------------------------
+// Inputs dialog ok - tidy up
+void medOpMML3::OnChooseOk()
+//------------------------------------------------------------------------------
+{
+}
+
 
 
 
@@ -969,16 +1000,6 @@ void medOpMML3::OnRegistrationOK()
   noofslices.SetName("NUMBER_OF_SLICES_TAG");
   noofslices.SetValue(m_Model->GetTotalNumberOfSyntheticScans());
   vme->GetTagArray()->SetTag(noofslices);
-
-  // tag 3: xy scaling factors
-  mafTagItem xyscalingfactors;
-  xyscalingfactors.SetName("XY_SCALING_FACTORS_TAG");
-  xyscalingfactors.SetNumberOfComponents(2);
-  double x, y;
-  m_Model->GetXYScalingFactorsOfMuscle(&x, &y);
-  xyscalingfactors.SetComponent(x, 0);
-  xyscalingfactors.SetComponent(y, 1);
-  vme->GetTagArray()->SetTag(xyscalingfactors);
 
   // tag 4: operations stack
   mafTagItem SliceId_StackTag;
@@ -1187,6 +1208,7 @@ void medOpMML3::OnLut()
 
 
 
+
 //----------------------------------------------------------------------------
 // Select the muscle polydata
 // Transform the muscle with the pose matrix.
@@ -1197,6 +1219,7 @@ void medOpMML3::OnMuscleSelection()
   mafString title = "Select Muscle (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMESurface)) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = (mafVME*)e.GetVme();
   if(!vme) return;
@@ -1235,19 +1258,6 @@ void medOpMML3::OnMuscleSelection()
     // Disable widget so no. of slices can't be changed
     m_ScansNumberTxt->Enable(false) ;
 
-
-    // tag 3: xy scaling factors
-    if(vme->GetTagArray()->IsTagPresent("XY_SCALING_FACTORS_TAG") == false)
-    {
-      wxMessageBox("XY scaling factors tag in already registered muscle vme is missing!","alert",wxICON_WARNING);
-      return;
-    }
-    mafTagItem *XYScalingFactorsTag;
-    XYScalingFactorsTag = vme->GetTagArray()->GetTag("XY_SCALING_FACTORS_TAG");
-    m_RegistrationXYScalingFactor = XYScalingFactorsTag->GetValueAsDouble(0);
-
-    // Disable widget so scaling factor can't be changed
-    m_RegistrationXYSxalingFactorTxt->Enable(false) ;
 
 
     // tag 4: operation stack
@@ -1844,85 +1854,6 @@ void medOpMML3::OnUndo()
 
 
 
-//----------------------------------------------------------------------------
-void medOpMML3::OnOperation() 
-//----------------------------------------------------------------------------
-{
-  // operations
-  if (m_State == 0){ // place
-    if (m_Model->GetScalingOccured()){
-      m_State = 3;
-      m_OpDlg->TransferDataToWindow();
-      wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
-      return;
-    }
-
-    //
-    ResetOperation();
-
-    // prepare display information
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
-
-    m_Widget->CenterModeOn();
-  }
-  else if (m_State == 1){ // translate
-    if (m_Model->GetScalingOccured()){
-      m_State = 3;
-      m_OpDlg->TransferDataToWindow();
-      wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
-      return;
-    }
-
-    //
-    ResetOperation();
-
-    // prepare display information
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
-
-    // prepare widget
-    m_Widget->TranslationModeOn();
-  }
-  else if (m_State == 2){ // rotate
-    if (m_Model->GetScalingOccured()){
-      m_State = 3;
-      m_OpDlg->TransferDataToWindow();
-      wxMessageBox("Operation Unavailable (Scaling Occured)","alert",wxICON_WARNING);
-      return;
-    }
-
-    //
-    ResetOperation();
-
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
-
-    m_Widget->UpdateRotationHandle();
-    m_Widget->RotationHandleOn();
-    m_Widget->RotationModeOn();
-  }
-  else if (m_State == 3){ // scale
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
-
-    //
-    ResetOperation();
-
-    m_Widget->UpdateScalingHandles();
-    m_Widget->ScalingHandlesOn();
-    m_Widget->ScalingModeOn();
-
-    // on successful scaling, ScalingOccured flag in Model
-    // is set to true, medOpMML3ContourWidget::OnLeftButtonUp
-  }
-  else
-    wxMessageBox("Unknown operation","alert",wxICON_WARNING);
-
-  //
-  m_Model->Render();
-}
-
-
-
 
 //----------------------------------------------------------------------------
 void medOpMML3::ResetOperation() 
@@ -2156,6 +2087,8 @@ void medOpMML3::OnLandmark1AtlasPatientSelection()
 
 
 
+
+
 //----------------------------------------------------------------------------
 void medOpMML3::OnLandmark2AtlasPatientSelection() 
 //----------------------------------------------------------------------------
@@ -2170,6 +2103,7 @@ void medOpMML3::OnLandmark2AtlasPatientSelection()
   mafString title = "Select Landmark 2 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = (mafVME*)e.GetVme();
   if(!vme) return;
@@ -2271,6 +2205,8 @@ void medOpMML3::OnLandmark2AtlasPatientSelection()
 
 
 
+
+
 //----------------------------------------------------------------------------
 void medOpMML3::OnLandmark3AtlasPatientSelection() 
 //----------------------------------------------------------------------------
@@ -2285,6 +2221,7 @@ void medOpMML3::OnLandmark3AtlasPatientSelection()
   mafString title = "Select Landmark 3 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = (mafVME*)e.GetVme();
   if(!vme) return;
@@ -2386,6 +2323,8 @@ void medOpMML3::OnLandmark3AtlasPatientSelection()
 
 
 
+
+
 //----------------------------------------------------------------------------
 void medOpMML3::OnLandmark4AtlasPatientSelection() 
 //----------------------------------------------------------------------------
@@ -2400,6 +2339,7 @@ void medOpMML3::OnLandmark4AtlasPatientSelection()
   mafString title = "Select Landmark 3 (Atlas)";
   mafEvent e(this,VME_CHOOSE);
   e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
   mafEventMacro(e);
   mafVME *vme = (mafVME*)e.GetVme();
   if(!vme) return;
@@ -2502,21 +2442,312 @@ void medOpMML3::OnLandmark4AtlasPatientSelection()
 
 
 
-
 //----------------------------------------------------------------------------
-// Create default set of landmarks
-void medOpMML3::CreateFakeLandmarks() 
+// Select landmark axis1
+void medOpMML3::OnLandmarkAxis1AtlasSelection() 
 //----------------------------------------------------------------------------
 {
-  double inputBounds[6]; 
+  //
+  if(m_SurfaceVME == NULL)
+  {
+    wxMessageBox("No muscle selected","alert",wxICON_WARNING);
+    return;
+  }
 
+  mafString title = "Select Landmark Axis1 (Atlas)";
+  mafEvent e(this,VME_CHOOSE);
+  e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  mafEventMacro(e);
+  mafVME *vme = (mafVME*)e.GetVme();
+  if(!vme) return;
+
+  mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+  if(lm == NULL)
+  {
+    wxMessageBox("wrong type of vme, a Landmark VME is required","alert",wxICON_WARNING);
+    return;
+  }
+
+  // get root node
+  mafVME *root = mafVME::SafeDownCast(m_Input->GetRoot());
+
+  // get landmarks parent node
+  mafVME* parentvme = vme->GetParent();
+
+  // search vme tree upwards
+  wxString   parentvmename;
+  bool inatlasmsfsection = 0;
+
+  while (parentvme != root)
+  {
+    parentvme = parentvme->GetParent();
+    parentvmename = parentvme->GetName();
+
+    if (parentvmename.compare(m_AtlasMSFSectionName) == 0)
+    {
+      inatlasmsfsection = 1;
+      break;
+    }
+  }
+
+  if (!inatlasmsfsection)
+  {
+    wxMessageBox("Landmark chosen is not from the " + m_AtlasMSFSectionName + " section","alert",wxICON_WARNING);
+    return;
+  }
+
+  // if identical to another landmark
+  wxString   Name = vme->GetName();
+  if ((Name.compare(m_Axis2Name) == 0) || (Name.compare(m_Axis3Name) == 0))
+  {
+    wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
+    return;
+  }
+
+
+  // coordinates
+  GetAbsPosOfLandmark(lm, m_Axis1Point); // nb we need abs pos of landmark
+
+  // set name
+  m_Axis1Name = vme->GetName();
+
+  // set flag
+  m_Axis1Defined = (m_Axis1Name.compare("none") != 0) ;
+
+
+  // Now selecting axis by landmarks, so disable the default direction radio box
+  m_radio_slicexyz->Enable(false) ;
+
+  // if all landmarks chosen
+  if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
+    // note that the landmarks have been selected from the atlas
+    m_AxisLandmarksFlag = 2 ;
+
+    // activate ok button
+    m_ChooseOk->Enable(true);
+  }
+  else{
+    // de-activate ok button
+    m_ChooseOk->Enable(false);
+  }
+
+  // update window
+  m_ChooseDlg->TransferDataToWindow();
+}
+
+
+
+
+//----------------------------------------------------------------------------
+// Select landmark axis2
+void medOpMML3::OnLandmarkAxis2AtlasSelection() 
+//----------------------------------------------------------------------------
+{
+  //
+  if(m_SurfaceVME == NULL)
+  {
+    wxMessageBox("No muscle selected","alert",wxICON_WARNING);
+    return;
+  }
+
+  mafString title = "Select Landmark Axis2 (Atlas)";
+  mafEvent e(this,VME_CHOOSE);
+  e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  mafEventMacro(e);
+  mafVME *vme = (mafVME*)e.GetVme();
+  if(!vme) return;
+
+  mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+  if(lm == NULL)
+  {
+    wxMessageBox("wrong type of vme, a Landmark VME is required","alert",wxICON_WARNING);
+    return;
+  }
+
+  // get root node
+  mafVME *root = mafVME::SafeDownCast(m_Input->GetRoot());
+
+  // get landmarks parent node
+  mafVME* parentvme = vme->GetParent();
+
+  // search vme tree upwards
+  wxString   parentvmename;
+  bool inatlasmsfsection = 0;
+
+  while (parentvme != root)
+  {
+    parentvme = parentvme->GetParent();
+    parentvmename = parentvme->GetName();
+
+    if (parentvmename.compare(m_AtlasMSFSectionName) == 0)
+    {
+      inatlasmsfsection = 1;
+      break;
+    }
+  }
+
+  if (!inatlasmsfsection)
+  {
+    wxMessageBox("Landmark chosen is not from the " + m_AtlasMSFSectionName + " section","alert",wxICON_WARNING);
+    return;
+  }
+
+  // if identical to another landmark
+  wxString   Name = vme->GetName(); 
+  if ((Name.compare(m_Axis1Name) == 0) || (Name.compare(m_Axis3Name) == 0))
+  {
+    wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
+    return;
+  }
+
+
+  // coordinates
+  GetAbsPosOfLandmark(lm, m_Axis2Point); // nb we need abs pos of landmark
+
+  // set name
+  m_Axis2Name = vme->GetName();
+
+  // set flag
+  m_Axis2Defined = (m_Axis2Name.compare("none") != 0) ;
+
+
+  // Now selecting axis by landmarks, so disable the default direction radio box
+  m_radio_slicexyz->Enable(false) ;
+
+  // if all landmarks chosen
+  if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
+    // note that the landmarks have been selected from the atlas
+    m_AxisLandmarksFlag = 2 ;
+
+    // activate ok button
+    m_ChooseOk->Enable(true);
+  }
+  else{
+    // de-activate ok button
+    m_ChooseOk->Enable(false);
+  }
+
+  // update window
+  m_ChooseDlg->TransferDataToWindow();
+}
+
+
+
+
+//----------------------------------------------------------------------------
+// Select landmark axis3
+void medOpMML3::OnLandmarkAxis3AtlasSelection() 
+//----------------------------------------------------------------------------
+{
+  //
+  if(m_SurfaceVME == NULL)
+  {
+    wxMessageBox("No muscle selected","alert",wxICON_WARNING);
+    return;
+  }
+
+  mafString title = "Select Landmark Axis3 (Atlas)";
+  mafEvent e(this,VME_CHOOSE);
+  e.SetString(&title);
+  e.SetArg((long)(&medOpMML3::AcceptVMELandmark)) ; // accept only landmark vme's
+  mafEventMacro(e);
+  mafVME *vme = (mafVME*)e.GetVme();
+  if(!vme) return;
+
+  mafVMELandmark *lm = mafVMELandmark::SafeDownCast(vme);
+  if(lm == NULL)
+  {
+    wxMessageBox("wrong type of vme, a Landmark VME is required","alert",wxICON_WARNING);
+    return;
+  }
+
+  // get root node
+  mafVME *root = mafVME::SafeDownCast(m_Input->GetRoot());
+
+  // get landmarks parent node
+  mafVME* parentvme = vme->GetParent();
+
+  // search vme tree upwards
+  wxString   parentvmename;
+  bool inatlasmsfsection = 0;
+
+  while (parentvme != root)
+  {
+    parentvme = parentvme->GetParent();
+    parentvmename = parentvme->GetName();
+
+    if (parentvmename.compare(m_AtlasMSFSectionName) == 0)
+    {
+      inatlasmsfsection = 1;
+      break;
+    }
+  }
+
+  if (!inatlasmsfsection)
+  {
+    wxMessageBox("Landmark chosen is not from the " + m_AtlasMSFSectionName + " section","alert",wxICON_WARNING);
+    return;
+  }
+
+  // if identical to another landmark
+  wxString   Name = vme->GetName(); 
+  if ((Name.compare(m_Axis1Name) == 0) || (Name.compare(m_Axis2Name) == 0))
+  {
+    wxMessageBox("landmarks must be distinct", "alert", wxICON_WARNING);
+    return;
+  }
+
+
+  // coordinates
+  GetAbsPosOfLandmark(lm, m_Axis3Point); // nb we need abs pos of landmark
+
+  // set name
+  m_Axis3Name = vme->GetName();
+
+  // set flag
+  m_Axis3Defined = (m_Axis3Name.compare("none") != 0) ;
+
+
+  // Now selecting axis by landmarks, so disable the default direction radio box
+  m_radio_slicexyz->Enable(false) ;
+
+  // if all landmarks chosen
+  if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
+    // note that the landmarks have been selected from the atlas
+    m_AxisLandmarksFlag = 2 ;
+
+    // activate ok button
+    m_ChooseOk->Enable(true);
+  }
+  else{
+    // de-activate ok button
+    m_ChooseOk->Enable(false);
+  }
+
+  // update window
+  m_ChooseDlg->TransferDataToWindow();
+}
+
+
+
+
+
+//----------------------------------------------------------------------------
+// Create default set of registration landmarks
+void medOpMML3::CreateDefaultRegistrationLandmarks() 
+//----------------------------------------------------------------------------
+{
   assert(m_Input);
-  ((mafVME*)m_Input)->GetOutput()->GetBounds(inputBounds);
-  double xmed = (inputBounds[0] + inputBounds[1])/2;
-  double ymed = (inputBounds[2] + inputBounds[3])/2;
 
-  double lm1[3] = {xmed ,ymed ,inputBounds[5]}; //high
-  double lm2[3] = {xmed ,ymed, inputBounds[4]}; //low
+  double inputBounds[6]; 
+  ((mafVME*)m_Input)->GetOutput()->GetBounds(inputBounds);
+  double xmed = (inputBounds[0] + inputBounds[1]) / 2.0;
+  double ymed = (inputBounds[2] + inputBounds[3]) / 2.0;
+
+  double lm1[3] = {xmed, ymed, inputBounds[5]}; //high
+  double lm2[3] = {xmed, ymed, inputBounds[4]}; //low
   double lm3[3] = {inputBounds[1], inputBounds[3], inputBounds[4]}; 
 
   // copy default landmarks to patient and atlas
@@ -2544,90 +2775,117 @@ void medOpMML3::CreateFakeLandmarks()
 
 
 //----------------------------------------------------------------------------
-// Set inputs to model view, including landmarks
-bool medOpMML3::SetUpModelViewInputs()
+// Create default set of axis landmarks
+void medOpMML3::CreateDefaultAxisLandmarks() 
 //----------------------------------------------------------------------------
 {
-  // Check that at least 3 landmarks are defined
-  assert(m_L1Defined && m_L2Defined && m_L3Defined) ;
+  assert(m_Input);
 
+  double bnds[6]; 
+  ((mafVME*)m_Input)->GetOutput()->GetBounds(bnds);
+  double xmed = (bnds[0] + bnds[1]) / 2.0 ;
+  double ymed = (bnds[2] + bnds[3]) / 2.0 ;
+  double zmed = (bnds[4] + bnds[5]) / 2.0 ;
 
-  // set muscle type (1 - one slicing axis, 2 - two slicing axes)
-  m_Model->SetTypeOfMuscles(m_MuscleType);
+  if (m_MuscleType == 1){
+    if (m_slicexyz == 0){
+      // x axis
+      m_Axis1Point[0] = bnds[0] ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = zmed ;
+      m_Axis2Point[0] = bnds[1] ;  m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = zmed ;
+    }
+    else if (m_slicexyz == 1){
+      // y axis
+      m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = bnds[2] ;  m_Axis1Point[2] = zmed ;
+      m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = bnds[3] ;  m_Axis2Point[2] = zmed ;
+    }
+    else if (m_slicexyz == 2){
+      // z axis
+      m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = bnds[4] ;
+      m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = bnds[5] ;
+    }
+    else{
+      // unknown slice direction
+      assert(false) ;
+    }
 
-  // set atlas landmarks
-  m_Model->SetLandmark1OfAtlas(m_L1Point); //high
-  m_Model->SetLandmark2OfAtlas(m_L2Point); //low
-  m_Model->SetLandmark3OfAtlas(m_L3Point);
-  m_Model->SetLandmark4OfAtlas(m_L4Point);
+    // set flags indicating which landmarks are defined
+    m_Axis1Defined = true ;
+    m_Axis2Defined = true ;
+    m_Axis3Defined = false ;
+  }
+  else if (m_MuscleType == 2){
+    if (m_slicexyz == 0){
+      m_Axis1Point[0] = bnds[0] ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = zmed ;
+      m_Axis2Point[0] = xmed ;     m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = zmed ;
+      m_Axis3Point[0] = bnds[1] ;  m_Axis3Point[1] = ymed ;  m_Axis3Point[2] = zmed ;
+    }
+    else if (m_slicexyz == 1){
+      m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = bnds[2] ;  m_Axis1Point[2] = zmed ;
+      m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = ymed ;     m_Axis2Point[2] = zmed ;
+      m_Axis3Point[0] = xmed ;  m_Axis3Point[1] = bnds[3] ;  m_Axis3Point[2] = zmed ;
+    }
+    else if (m_slicexyz == 2){
+      m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = bnds[4] ;
+      m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = zmed ;
+      m_Axis3Point[0] = xmed ;  m_Axis3Point[1] = ymed ;  m_Axis3Point[2] = bnds[5];
+    }
+    else{
+      // unknown slice direction
+      assert(false) ;
+    }
 
-  // set patient landmarks
-  m_Model->SetLandmark1OfPatient(m_P1Point); //high
-  m_Model->SetLandmark2OfPatient(m_P2Point); //low
-  m_Model->SetLandmark3OfPatient(m_P3Point);
-  m_Model->SetLandmark4OfPatient(m_P4Point);
-
-  // landmark 4 flag
-  m_Model->Set4LandmarksFlag(m_L4Defined);
-
-  // set x, y scaling factors
-  m_Model->SetXYScalingFactorsOfMuscle(m_RegistrationXYScalingFactor, m_RegistrationXYScalingFactor);
-
-  //// set number of scans based on scans distance
-  //double length; // length between scans insertions
-  //length = sqrt(pow(m_p2[2] - m_p1[2], 2.0) +
-  //			  pow(m_p2[1] - m_p1[1], 2.0) +
-  //			  pow(m_p2[0] - m_p1[0], 2.0));
-  //Model->SetTotalNumberOfSyntheticScans((int) (length / m_ScansDistance));
-
-  // set number of scans
-  m_Model->SetTotalNumberOfSyntheticScans(m_ScansNumber);
-
-  // set x, y, scans size
-  m_Model->SetSizeOfSyntheticScans(m_ScansSize[0], m_ScansSize[1]);
-
-  // set x, y scans resolution
-  m_Model->SetResolutionOfSyntheticScans(2.0 * m_ScansSize[0], 2.0 * m_ScansSize[1]/*m_ScansResolution[0], m_ScansResolution[1]*/);
-
-  // set scans grain
-  m_Model->SetGrainOfScans(m_ScansGrain);
-
-  // landmarks
-  //double la1[3]; // low
-  //double la2[3]; // high
-  //double la3[3]; // ref
-  //Model->GetLandmark1OfAtlas(la1);
-  //Model->GetLandmark2OfAtlas(la2);
-  //Model->GetLandmark3OfAtlas(la3);
-
-  //double lp1[3]; // low
-  //double lp2[3]; // high
-  //double lp3[3]; // ref
-  //Model->GetLandmark1OfPatient(lp1);
-  //Model->GetLandmark2OfPatient(lp2);
-  //Model->GetLandmark3OfPatient(lp3);
-
-  //double factorX, factorY;
-  //Model->GetXYScalingFactorsOfMuscle(&factorX, &factorY);
-
-  //int n;
-  //n = Model->GetTotalNumberOfSyntheticScans();
-  //
-  //int rx, ry;
-  //Model->GetResolutionOfSyntheticScans(&rx, &ry);
-  //
-  //float sx, sy;
-  //Model->GetSizeOfSyntheticScans(&sx, &sy);
-
-  return 1;
+    // set flags indicating which landmarks are defined
+    m_Axis1Defined = true ;
+    m_Axis2Defined = true ;
+    m_Axis3Defined = true ;
+  }
+  else{
+    // unknown muscle type
+    assert(false) ;
+  }
 }
 
 
 
+//------------------------------------------------------------------------------
+// Apply scaling factor to axis landmarks.
+// Do this before uploading the landmarks to the model view.
+void medOpMML3::ApplyAxisScalingFactor()
+//------------------------------------------------------------------------------
+{
+  int i ;
+  double s = m_AxisScalingFactor ;
 
-//----------------------------------------------------------------------------
+  switch(m_MuscleType){
+    case 1:
+      // stretch landmarks 1 and 2 along the vector direction between them
+      for (i = 0 ;  i < 3 ;  i++){
+        double dv = (s-1.0)*(m_Axis2Point[i] - m_Axis1Point[i]) ;
+        m_Axis1Point[i] -= dv ;
+        m_Axis2Point[i] += dv ;
+      }
+      break ;
+    case 2:
+      // stretch landmarks 1 and 3 away from the central landmark 2
+      for (i = 0 ;  i < 3 ;  i++){
+        double dv12 = (s-1.0)*(m_Axis1Point[i] - m_Axis2Point[i]) ;
+        double dv32 = (s-1.0)*(m_Axis3Point[i] - m_Axis2Point[i]) ;
+        m_Axis1Point[i] += dv12 ;
+        m_Axis2Point[i] += dv32 ;
+      }
+      break ;
+    default:
+      // unknown muscle type
+      assert(false) ;
+  }
+  
+}
+
+
+
+//------------------------------------------------------------------------------
 bool medOpMML3::SetUpParameterViews() 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   // size of synthetic scans
   float sx, sy;
@@ -2877,13 +3135,73 @@ bool medOpMML3::SetUpContourWidget()
 
 
 
+
+
+//------------------------------------------------------------------------------
+// Transfer setup parameters from input dialog and landmarks to model view
+void medOpMML3::SetUpModelViewInputs()
+//------------------------------------------------------------------------------
+{
+  // Check that at least 3 registration landmarks are defined
+  assert(m_L1Defined && m_L2Defined && m_L3Defined) ;
+
+  // Check that axis landmarks are defined
+  assert(m_Axis1Defined && m_Axis2Defined) ;
+  if (m_MuscleType == 2)
+    assert(m_Axis3Defined) ;
+
+
+  // set muscle type (1 - one slicing axis, 2 - two slicing axes)
+  m_Model->SetTypeOfMuscles(m_MuscleType);
+
+  // set atlas landmarks
+  m_Model->SetLandmark1OfAtlas(m_L1Point);
+  m_Model->SetLandmark2OfAtlas(m_L2Point);
+  m_Model->SetLandmark3OfAtlas(m_L3Point);
+  m_Model->SetLandmark4OfAtlas(m_L4Point);
+
+  // set patient landmarks
+  m_Model->SetLandmark1OfPatient(m_P1Point);
+  m_Model->SetLandmark2OfPatient(m_P2Point);
+  m_Model->SetLandmark3OfPatient(m_P3Point);
+  m_Model->SetLandmark4OfPatient(m_P4Point);
+
+  // apply stretch to axis before uploading to model view
+  // do this only if axis is calculated from selected landmarks
+  if (m_AxisLandmarksFlag == 2)
+    ApplyAxisScalingFactor() ;
+
+  // set axis landmarks
+  m_Model->SetLandmark1OfAxis(m_Axis1Point) ;
+  m_Model->SetLandmark2OfAxis(m_Axis2Point) ;
+  if (m_MuscleType == 2)
+    m_Model->SetLandmark3OfAxis(m_Axis3Point) ;
+
+  // landmark 4 flag
+  m_Model->Set4LandmarksFlag(m_L4Defined);
+
+  // set number of scans
+  m_Model->SetTotalNumberOfSyntheticScans(m_ScansNumber);
+
+  // set scans grain
+  m_Model->SetGrainOfScans(m_ScansGrain);
+
+}
+
+
+
+
 //----------------------------------------------------------------------------
 bool medOpMML3::SetUpModelView() 
 //----------------------------------------------------------------------------
 {
-  // pre-process muscle
-  m_Model->FindUnitVectorsAndLengthsOfLandmarkLines();
+  // global registration
   m_Model->MapAtlasToPatient();
+  if (m_AxisLandmarksFlag == 2)
+    m_Model->TransformAxisLandmarksToPatient() ;  // transform landmarks if they came from the atlas
+
+  // calculate slicing axis
+  m_Model->FindUnitVectorsAndLengthsOfLandmarkLines();
   m_Model->MakeActionLineZAxis();
 
   // pre-process scans
@@ -2921,16 +3239,11 @@ bool medOpMML3::SetUpModelView()
   m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
 
   // 3d display?
-  if (m_3DFlag == 1)
-  {
-    //
+  if (m_3DFlag == 1){
     m_Widget->Off();
-
-    //
     m_Model->Switch3dDisplayOn();
   }
 
-  //
   Update();
 
   // initialise

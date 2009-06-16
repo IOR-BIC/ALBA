@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.h,v $
 Language:  C++
-Date:      $Date: 2009-06-11 17:20:08 $
-Version:   $Revision: 1.1.2.3 $
-Authors:   Mel Krokos
+Date:      $Date: 2009-06-16 15:11:52 $
+Version:   $Revision: 1.1.2.4 $
+Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -111,27 +111,26 @@ public:
   /// Get look up table for scans
   vtkWindowLevelLookupTable* GetWindowLevelLookupTableOfSyntheticScans() const {return m_SyntheticScansWindowLevelLookupTable ;}
 
-  int GetTotalNumberOfSyntheticScans() const ;
-  void SetTotalNumberOfSyntheticScans(int n) {m_NSyntheticScansTotalNumber = n ;}
+  int GetTotalNumberOfSyntheticScans() const ;  ///< get number of scans
+  void SetTotalNumberOfSyntheticScans(int n) {m_NSyntheticScansTotalNumber = n ;}   ///< set number of scans
 
+  /// Calculate distance z along slice axis from landmark 1 to landmark 2
+  /// Assumes z is a linear function of scan id with range -L/2 to +L/2 where L is length
+  double GetZOfSyntheticScans(int s);
   double GetCurrentZOfSyntheticScans();
 
-  int GetCurrentIdOfSyntheticScans() const {return m_NSyntheticScansCurrentId ;}
-  void SetCurrentIdOfSyntheticScans(int n) {m_NSyntheticScansCurrentId = n ;}
+  int GetCurrentIdOfSyntheticScans() const {return m_NSyntheticScansCurrentId ;}  ///< get the current scan id
+  void SetCurrentIdOfSyntheticScans(int n) {m_NSyntheticScansCurrentId = n ;} ///< set the current scan id
 
-  double GetZOfSyntheticScans(int s);
+  double GetSyntheticScansLevel() const {return m_Window ;} ///< get the level value of the scalar lut
+  double GetSyntheticScansWindow() const {return m_Level ;} ///< get the window value of the scalar lut
+  float GetLowScalar() const {return m_SyntheticScansMinScalarValue ;} ///< get the min scalr value
+  float GetHighScalar() const {return m_SyntheticScansMaxScalarValue ;} ///< get the max scalar value
 
-  double GetSyntheticScansLevel() const {return m_Window ;}
-  double GetSyntheticScansWindow() const {return m_Level ;}
-
-  void SetSizeOfSyntheticScans(float x, float y);
-  void GetSizeOfSyntheticScans(float *x, float *y);
-  void GetResolutionOfSyntheticScans(int *x, int *y);
-  void SetResolutionOfSyntheticScans(int x, int y);
-
-  float GetLowScalar() const {return m_SyntheticScansMinScalarValue ;}
-  float GetHighScalar() const {return m_SyntheticScansMaxScalarValue ;}
-
+  void SetSizeOfSyntheticScans(float x, float y);     ///< set the size of the polydata slice probe
+  void GetSizeOfSyntheticScans(float *x, float *y);   ///< get the size of the polydata slice probe
+  void SetResolutionOfSyntheticScans(int x, int y);   ///< set the resolution of the slice (no. of quads)
+  void GetResolutionOfSyntheticScans(int *x, int *y); ///< get the resolution of the slice (no. of quads)
 
 
 
@@ -160,12 +159,32 @@ public:
   void SetLandmark4OfAtlas(double *xyz) ;
   void GetLandmark4OfAtlas(double *xyz) const ;
 
+  // axis landmarks functions
+  void SetLandmark1OfAxis(double *xyz) ;
+  void GetLandmark1OfAxis(double *xyz) const ;
+  void SetLandmark2OfAxis(double *xyz) ;
+  void GetLandmark2OfAxis(double *xyz) const ;
+  void SetLandmark3OfAxis(double *xyz) ;
+  void GetLandmark3OfAxis(double *xyz) const ;
+
   void FindUnitVectorsAndLengthsOfLandmarkLines();
 
+
+
+  //----------------------------------------------------------------------------
+  // Global registration methods
+  //----------------------------------------------------------------------------
+
   /// Muscle transform 1 - global registration using landmarks. \n
-  /// This is the transform which moves the muscle landmarks to the corresponding 
+  /// This creates the transform which moves the muscle landmarks to the corresponding 
   /// points on the volume.
   bool MapAtlasToPatient();
+
+  /// Do global registration transform on axis landmarks. \n
+  /// Axis landmarks come from the atlas, \n
+  /// So they must transform with the muscle polydata. \n
+  /// You must do MapAtlasToPatient() first to create the transform.
+  void TransformAxisLandmarksToPatient() ;
 
 
 
@@ -228,9 +247,6 @@ public:
   vtkTransformPolyDataFilter* GetNWContourTransformPolyDataFilter() const {return m_NWContourTransformPolyDataFilter ;}
   vtkTransformPolyDataFilter* GetSEContourTransformPolyDataFilter() const {return m_SEContourTransformPolyDataFilter ;}
   vtkTransformPolyDataFilter* GetSWContourTransformPolyDataFilter() const {return m_SWContourTransformPolyDataFilter ;}
-
-  void GetXYScalingFactorsOfMuscle(double* x, double *y) const ;
-  void SetXYScalingFactorsOfMuscle(double x, double y);
 
   void UpdateContourAxesTransform();
   void UpdateGlobalAxesTransform();
@@ -336,9 +352,13 @@ protected:
   void SaveCameraFocalPoint(double *fp);
   vtkCamera* GetActiveCamera();
 
-  /// multiply matrices c = ab
+  /// multiply matrices c = ab. \n
   /// c can be the same as a or b
   void MultiplyMatrix4x4(vtkMatrix4x4* a, vtkMatrix4x4* b, vtkMatrix4x4* c) const ;
+
+  /// multiply point by matrix c = Ab. \n
+  /// c can be the same as b
+  void MultiplyMatrixPoint(vtkMatrix4x4* A, double b[3], double c[3]) const ;
 
   /// Calculate centre of any plane created by vtkPlaneSource and scaled by sizx, sizy
   void CalculateCentreOfVtkPlane(double sizx, double sizy, double p[3]) const ;
@@ -362,6 +382,7 @@ protected:
   vtkMatrix4x4 *m_SliceRotationMat;
 
   // type of muscles
+  // 1 for single axis, 2 for piecewise axis in 2 pieces
   int m_NTypeOfMuscles;
 
   double m_ContourAxesLengthScale; ///< length of contour axes
@@ -390,16 +411,21 @@ protected:
   vtkKochanekSpline *m_WestScalingSpline;
 
   // atlas landmarks variables
-  double m_DMuscleAtlasInsertionPoint1[3];
-  double m_DMuscleAtlasInsertionPoint2[3];
-  double m_DMuscleAtlasReferencePoint1[3];
-  double m_DMuscleAtlasReferencePoint2[3];
+  double m_AtlasLandmark1[3];
+  double m_AtlasLandmark2[3];
+  double m_AtlasLandmark3[3];
+  double m_AtlasLandmark4[3];
 
   // patient landmarks variables
-  double m_DMuscleScansInsertionPoint1[3];
-  double m_DMuscleScansInsertionPoint2[3];
-  double m_DMuscleScansReferencePoint1[3];
-  double m_DMuscleScansReferencePoint2[3];
+  double m_PatientLandmark1[3];
+  double m_PatientLandmark2[3];
+  double m_PatientLandmark3[3];
+  double m_PatientLandmark4[3];
+
+  // axis landmarks
+  double m_AxisLandmark1[3] ;
+  double m_AxisLandmark2[3] ;
+  double m_AxisLandmark3[3] ;
 
 
 
@@ -489,8 +515,6 @@ protected:
   vtkTransformPolyDataFilter *m_MuscleTransform2PolyDataFilter;
   vtkPolyDataNormals *m_MusclePolyDataNormals;                   // adds normals to polydata
 
-  double m_FlMuscleXScalingFactor;
-  double m_FlMuscleYScalingFactor;
   float m_FlMusclePolyDataBounds[6];
   float m_FlMusclePolyDataCenter[3];
   float m_FlMusclePolyDataExtent[3];
