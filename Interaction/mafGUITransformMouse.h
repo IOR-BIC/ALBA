@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:43 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-06-16 13:32:13 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
 #include "mafGUITransformInterface.h"
+#include "mmiCompositorMouse.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -25,7 +26,6 @@
 class mafGUI;
 class mafGUIButton;
 class mmiGenericMouse;
-class mmiCompositorMouse;
 class mafInteractor;
 class mafVME;
 
@@ -80,6 +80,8 @@ public:
 
   void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
+
+  mmiGenericMouse* CreateBehavior(MMI_ACTIVATOR activator);
 
 protected:  
   mafInteractor* m_OldInteractor;

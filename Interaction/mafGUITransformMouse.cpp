@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:43 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-06-16 13:32:13 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,7 +27,6 @@
 #include "mafGUIButton.h"
 
 #include "mmiGenericMouse.h"
-#include "mmiCompositorMouse.h"
 
 #include "mafMatrix.h"
 #include "mafAbsMatrixPipe.h"
@@ -378,4 +377,10 @@ void mafGUITransformMouse::RefSysVmeChanged()
 
   m_IsaRoll->GetRotationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
   m_IsaRoll->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetAbsMatrix());
+}
+//----------------------------------------------------------------------------
+mmiGenericMouse* mafGUITransformMouse::CreateBehavior(MMI_ACTIVATOR activator)
+//----------------------------------------------------------------------------
+{
+  return m_IsaCompositor->CreateBehavior(activator);
 }
