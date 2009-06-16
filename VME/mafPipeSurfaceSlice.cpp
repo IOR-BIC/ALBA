@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.14 $
+  Date:      $Date: 2009-06-16 09:10:10 $
+  Version:   $Revision: 1.14.2.1 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -113,6 +113,8 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
 
 	m_Vme->GetEventSource()->AddObserver(this);
   
+  vtkMAFSmartPointer<vtkMAFExtendedGlyph3D> glyph;
+
   if(m_Vme->GetOutput()->IsMAFType(mafVMEOutputSurface))
   {
     mafVMEOutputSurface *surface_output = mafVMEOutputSurface::SafeDownCast(m_Vme->GetOutput());
@@ -137,7 +139,6 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
       m_SphereSource->SetPhiResolution(((mafVMELandmarkCloud *)m_Vme)->GetSphereResolution());
       m_SphereSource->Update();
 
-      vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
       glyph->SetSource(m_SphereSource->GetOutput());
       glyph->SetInput(landmark_cloud_output->GetVTKData());
       glyph->OrientOff();
@@ -163,7 +164,7 @@ void mafPipeSurfaceSlice::Create(mafSceneNode *n/*, bool use_axes*/)
       m_SphereSource->SetPhiResolution(((mafVMELandmark *)m_Vme)->GetSphereResolution());
       m_SphereSource->Update();
 
-      vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
+      //vtkMAFExtendedGlyph3D *glyph = vtkMAFExtendedGlyph3D::New();
       glyph->SetSource(m_SphereSource->GetOutput());
       glyph->SetInput(pointset_output->GetVTKData());
       glyph->OrientOff();
