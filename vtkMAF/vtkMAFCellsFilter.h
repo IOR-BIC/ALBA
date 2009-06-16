@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkMAFCellsFilter.h
   Language:  C++
-  RCS:   $Id: vtkMAFCellsFilter.h,v 1.1 2008-07-03 11:27:45 aqd0 Exp $
+  RCS:   $Id: vtkMAFCellsFilter.h,v 1.1.2.1 2009-06-16 09:12:31 aqd0 Exp $
 
   Copyright (c) Goodwin Lawlor 2004
   All rights reserved.
@@ -16,12 +16,6 @@
   under MAF (www.openmaf.org)
 
 =========================================================================*/
-// .NAME vtkMAFCellsFilter- abstract superclass for removing/selecting cells.
-// .SECTION Description
-// vtkMAFCellsFilter is an abstract superclass for classes the remove or select cells.r
-
-// .SECTION Thanks
-// Goodwin Lawlor, University College Dublin
 
 #ifndef __vtkMAFCellsFilter_h
 #define __vtkMAFCellsFilter_h
@@ -34,6 +28,16 @@
 
 class vtkLookupTable;
 
+/** 
+ vtkMAFCellsFilter- superclass for selecting cells.
+ 
+ vtkMAFCellsFilter is a superclass for classes to perform operations on selected cells.
+
+ @sa
+ vtkMAFRemoveCellsFilter
+*/ 
+
+
 class VTK_vtkMAF_EXPORT vtkMAFCellsFilter : public vtkPolyDataToPolyDataFilter
 {
 
@@ -41,53 +45,39 @@ public:
   static vtkMAFCellsFilter *New();
   vtkTypeRevisionMacro(vtkMAFCellsFilter, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
-  // Description:
-  // Remove a cell from the input polydata.  cellid is a cell id from the input to the filter
-  // A recursive trick remaps the new cellids (from the output) to the old cellids (at the input) 
-  // so that the cellid returned by vtkCellPicker is the correct one to use.
- //void RemoveCell(vtkIdType cellid);
- 
-   // Description:
-  // Mark a cell to be removed by RemoveMarkedCells later.  
+   
+ /** Mark a cell */ 
  void MarkCell(vtkIdType cellid);
  
-   // Description:
-  // Unmark any cell that has been marked already
+ /** Unmark any cell that has been marked already */
  void UnmarkCell(vtkIdType cellid);
  
-   // Description:
-  // If a cells is unmarked- mark it... if its marked- unmark it.
+ /** If a cells is unmarked- mark it... if its marked- unmark it. */
  void ToggleCell(vtkIdType cellid); 
  
- // Description:
- // Undo all the marks made on cells
+ /** Undo all the marks made on cells */
  void UndoMarks(){this->InitializeScalars(); this->MarkedCellIdList->Reset(); this->Scalars->Modified();}
 
- //int GetNumberOfDeletedCells(){return this->GetInput()->GetNumberOfCells() - this->GetOutput()->GetNumberOfCells();}
- 
-  // Description:
-  // Set/Get the marked color... default is red
+  /** Set/Get the marked color... default is red */
   void SetMarkedColor(double r, double g, double b);
   void SetMarkedColor(double rgb[3]) {this->SetMarkedColor(rgb[0], rgb[1], rgb[2]);};
   vtkGetVector3Macro(MarkedColor, double);
 
-
-  // Description:
-  // Set/Get the umarked color... default is white. You could set this to the same color as the vtkProperty
-  // and users won't know they are seeing scalars.
+  /** Set/Get the umarked color... default is white. You could set this to the same color as the vtkProperty
+  and users won't know they are seeing scalars */
   void SetUnmarkedColor(double r, double g, double b);
   void SetUnmarkedColor(double rgb[3]) {this->SetUnmarkedColor(rgb[0], rgb[1], rgb[2]);};
   vtkGetVector3Macro(UnmarkedColor, double);
 
-  // Description:
-  // Set/Get the marked opacity... default is 1.0 By setting this to 0.0 you can temporally remove the cells
-  // and then permanently remove them with RemoveMarkedCells
+  /** Set/Get the marked opacity... default is 1.0 By setting this to 0.0 you can temporally remove the cells
+  and then permanently remove them with RemoveMarkedCells */
   void SetMarkedOpacity(double opacity);
   vtkGetMacro(MarkedOpacity, double);
-
+  
+  /** Get the number of marked cells */
 	int GetNumberOfMarkedCells(){return MarkedCellIdList->GetNumberOfIds();};
 
+  /** Get the marked cell id from the MarkedCellIdList */
 	vtkIdType GetIdMarkedCell(int i){return MarkedCellIdList->GetId(i);};
 
 
