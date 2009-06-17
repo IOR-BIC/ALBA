@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-12 14:58:48 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-06-17 11:56:57 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,6 +20,7 @@
 #include <wx/datetime.h>
 #include "wx/filefn.h"
 #include "wx/stdpaths.h"
+#include <wx/app.h>
 
 //----------------------------------------------------------------------------
 mafExpirationDate::mafExpirationDate(int trialNumberOfDays)
@@ -109,17 +110,28 @@ mafExpirationDate::~mafExpirationDate()
 void mafExpirationDate::InitializePathFileName()
 //----------------------------------------------------------------------------
 {
-  std::string dir;
-  wxStandardPaths std_paths;
-  dir = std_paths.GetUserLocalDataDir().c_str();
-  if (!wxDirExists(dir.c_str()))
+  if(wxApp::GetInstance() != NULL)
   {
-    wxMkdir(dir.c_str());
+    std::string dir;
+    wxStandardPaths std_paths;
+    dir = std_paths.GetUserLocalDataDir().c_str();
+    if (!wxDirExists(dir.c_str()))
+    {
+      wxMkdir(dir.c_str());
+    } 
+    m_ControlFileName = dir.c_str();
+    std::string appname = wxApp::GetInstance()->GetAppName();
+    m_ControlFileName.append("/.2000-1456-DPNA-HLCKUSER-FFA6"); //fantasy name
+    m_PermanentExpirationFileName = dir.c_str();
+    m_PermanentExpirationFileName.append("/.CRC-9801-1344-MACH-FF55"); //fantasy name
   }
-  m_ControlFileName = dir.c_str();
-  m_ControlFileName.append("/../.2000-1456-DPNA-HLCKUSER-FFA6"); //fantasy name
-  m_PermanentExpirationFileName = dir.c_str();
-  m_PermanentExpirationFileName.append("/../.CRC-9801-1344-MACH-FF55"); //fantasy name
+  else
+  {
+    m_ControlFileName = wxGetCwd();
+    m_ControlFileName.append("/.2000-1456-DPNA-HLCKUSER-FFA6"); //fantasy name
+    m_PermanentExpirationFileName = wxGetCwd();
+    m_PermanentExpirationFileName.append("/.CRC-9801-1344-MACH-FF55"); //fantasy name
+  }
 }
 //----------------------------------------------------------------------------
 bool mafExpirationDate::HasExpired()
