@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: itkRawMotionImporterUtility.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-29 13:01:46 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-17 13:05:42 $
+  Version:   $Revision: 1.1.2.1 $
   Thanks:    Thanks to Sebastien Barre who developed this class. Thanks to
              Tim Hutton too for the idea.
 
@@ -46,20 +46,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef __itkRawMotionImporterUtility_h
 #define __itkRawMotionImporterUtility_h
-
+//-----------------------------------------------
+// Include:
+//-----------------------------------------------
 #include "vnl/vnl_matrix.h"
 
-//----------------------------------------------------------------------------
+/**
+  Class Name: itkRawMotionImporterUtility.
+  Utility class for reading matrix from file.  Depends from vnl library.
+*/
 class itkRawMotionImporterUtility
-//----------------------------------------------------------------------------
 {
 public:
+  /** constructor. */
   itkRawMotionImporterUtility(){};
+  /** destructor. */
   ~itkRawMotionImporterUtility() {};
   
-  // Description:
-  // Read the matrix by means of the VNL library
-
+  
+  /** Read the matrix by means of the VNL library. */
   int ReadMatrix(vnl_matrix<double> &M, const char *fname);
 };
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUIContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-29 14:31:58 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-17 13:05:30 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,18 +20,23 @@ class mafView;
 class mafEvent;
 class mafObserver;
 
-//----------------------------------------------------------------------------
-// medGUIContextualMenu :
-//----------------------------------------------------------------------------
+/**
+  Class Name: medGUIContextualMenu.
+  Represents the contexctual menu' which compares when click right button 
+  over a viewport.
+*/
 class medGUIContextualMenu : public wxMenu
 {
 public:
+  /** constructor. */
   medGUIContextualMenu();
+  /** destructor. */
   virtual ~medGUIContextualMenu();
+  /** Set the listener object, i.e. the object receiving events sent by this object */
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
 	/** 
-  Visualize contextual menù for the MDI child and selected view. */
+  Visualize contextual menu for the MDI child and selected view. */
   void ShowContextualMenu(wxFrame *child, mafView *view, bool vme_menu);		
 
 protected:
@@ -39,9 +44,10 @@ protected:
   mafView     *m_ViewActive;
   mafObserver *m_Listener;
 
-	/** 
-  Answer contextual menù's selection. */
+	/** Answer contextual menu's selection. */
 	void OnContextualViewMenu(wxCommandEvent& event);
+
+  /** Event Table Declaration. */
   DECLARE_EVENT_TABLE()
 };
 #endif

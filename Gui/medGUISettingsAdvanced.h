@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUISettingsAdvanced.h,v $
 Language:  C++
-Date:      $Date: 2009-02-25 16:43:09 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-06-17 13:05:30 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -41,6 +41,10 @@ MafMedical is partially based on OpenMAF.
 #ifndef __medGUISettingsAdvanced_H__
 #define __medGUISettingsAdvanced_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+
 #include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
@@ -51,18 +55,25 @@ MafMedical is partially based on OpenMAF.
 // medGUISettingsAdvanced :
 //----------------------------------------------------------------------------
 /**
+  Class Name: medGUISettingsAdvanced.
+  Represents advanced settings which can be modified accessing to option menu.
+  - conversion units 
 */
 class medGUISettingsAdvanced : public mafGUISettings
 {
 public:
+  /** constructor.  */
   medGUISettingsAdvanced(mafObserver *Listener, const mafString &label = _("Advanced"));
+  /** destructor.  */
   ~medGUISettingsAdvanced(); 
 
+  /** GUI IDs*/
   enum MEASURE_UNIT_WIDGET_ID
   {
     ID_CONVERSION_UNITS = MINID,
   };
 
+  /** Conversion IDs*/
   enum CONVERSION_UNITS
   {
     NONE = 0,
@@ -72,6 +83,7 @@ public:
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
+  /** Retrieve conversion unit parameter */
   int GetConversionType(){return m_ConversionUnits;};
 
 protected:
