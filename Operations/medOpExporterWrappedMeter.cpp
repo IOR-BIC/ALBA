@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-03 15:31:10 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2009-06-17 16:44:17 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -108,17 +108,17 @@ void medOpExporterWrappedMeter::OnEvent(mafEventBase *maf_event)
     {
       case wxOK:
 				{
-          mafString initialFileName;
-          initialFileName = mafGetApplicationDirectory().c_str();
-          initialFileName.Append("\\ActionLine.txt");
+				  mafString initialFileName;
+				  initialFileName = mafGetApplicationDirectory().c_str();
+				  initialFileName.Append("\\ActionLine.txt");
 
-          mafString wildc = "configuration file (*.txt)|*.txt";
-          m_File = mafGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
+				  mafString wildc = "configuration file (*.txt)|*.txt";
+				  m_File = mafGetSaveFile(initialFileName.GetCStr(), wildc).c_str();
 
-          if (m_File == "") return;
+				  if (m_File == "") return;
 
-		  //Test();		  //using this method to try test case
-		  ExportWrappedMeterCoordinates();
+				  //Test();		  //using this method to try test case
+				  Export();
 				  
 				  OpStop(OP_RUN_OK);
 				}
@@ -142,14 +142,201 @@ void medOpExporterWrappedMeter::OpStop(int result)
 	HideGui();
 	mafEventMacro(mafEvent(this,result));        
 }
+
+//----------------------------------------------------------------------------
+void medOpExporterWrappedMeter::Export()
+//----------------------------------------------------------------------------
+{
+
+	wxBusyInfo *wait;
+	if(!m_TestMode)
+	{
+		wait = new wxBusyInfo("Please wait, Exporting...");
+	}
+
+
+	m_OutputFile.open(m_File, std::ios::out);
+	if (m_OutputFile == NULL) {
+		wxMessageBox("Error opening configuration file");
+		return ;
+	}
+
+	//must be a cicle in all vme of a msf
+	/*mafNodeIterator *iter = NULL;
+	iter = m_Input->GetRoot()->NewIterator();
+
+	for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+	{
+			m_Meters.push_back(node);
+	}
+	iter->Delete();
+	*/
+	
+	m_Meters.push_back(m_Input);
+
+	if(m_Meters.size() != 0)
+	{
+		ExportWrappedMeter();
+	}
+
+	m_Meters.clear();
+	if(!m_TestMode)
+	{
+		delete wait;
+	}
+
+
+}
+//----------------------------------------------------------------------------
+void medOpExporterWrappedMeter::ExportWrappedMeter()
+//----------------------------------------------------------------------------
+{
+
+	mafVMERoot *root = ((mafVMERoot*)m_Meters[0]->GetRoot());
+	root->GetTimeStamps(m_Times);
+
+	//for(int j=0; j< 10; j++)//for test output format
+	for(int j=0; j< m_Times.size(); j++)
+	{
+		m_CurrentTime = m_Times[j];
+		mafEventMacro(mafEvent(this, TIME_SET, m_CurrentTime, 0));
+
+		for(int i=0;i< m_Meters.size();i++)
+		{
+			m_CurrentVme = m_Meters[i];
+
+			if(medVMEComputeWrapping::SafeDownCast(m_CurrentVme))
+			{
+				ExportWrappedMeterCoordinates(i,j);
+			}
+		}
+	}
+
+	WriteOnFile();
+}
+//----------------------------------------------------------------------------
+void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int indexTime)
+//----------------------------------------------------------------------------
+{
+
+	medVMEComputeWrapping *vmeWrappedMeter =  medVMEComputeWrapping::SafeDownCast(m_CurrentVme);
+	vmeWrappedMeter->GetOutput()->GetVTKData()->Modified();
+	vmeWrappedMeter->GetOutput()->GetVTKData()->Update();
+	vmeWrappedMeter->Modified();
+	vmeWrappedMeter->Update();
+	int size;
+	int numberOfKeyPoints;
+
+	if(indexTime == 0)
+	{
+		vnl_matrix<double> M;
+		size = medVMEComputeWrapping::SafeDownCast(m_CurrentVme)->GetNumberExportPoints();
+		
+		int numberOfRows = m_Times.size();
+		int numberOfColumns = (2+4) *3;//(start + 4 key points + end )*3
+		
+		M.set_size(numberOfRows, numberOfColumns);
+		
+		m_MetersCoordinatesList.push_back(M);
+	}
+	
+	if (vmeWrappedMeter->GetWrappedClass()==medVMEComputeWrapping::NEW_METER)
+	{
+		//origin
+		double *value = vmeWrappedMeter->GetStartPointCoordinate();
+		m_MetersCoordinatesList[index].put(indexTime,0,value[0]);
+		m_MetersCoordinatesList[index].put(indexTime,1,value[1]);
+		m_MetersCoordinatesList[index].put(indexTime,2,value[2]);
+
+		//middle points
+		numberOfKeyPoints = vmeWrappedMeter->GetNumberExportPoints();//vmeWrappedMeter->GetNumberMiddlePoints();
+		for(int k=0; k< numberOfKeyPoints;k++)
+		{
+			value = vmeWrappedMeter->GetExportPointCoordinate(k);
+			m_MetersCoordinatesList[index].put(indexTime,3*(k+1),value[0]);
+			m_MetersCoordinatesList[index].put(indexTime,3*(k+1)+1,value[1]);
+			m_MetersCoordinatesList[index].put(indexTime,3*(k+1)+2,value[2]);
+		}
+
+		//end point
+		value = vmeWrappedMeter->GetEndPointCoordinate();
+		m_MetersCoordinatesList[index].put(indexTime,3*5,value[0]);
+		m_MetersCoordinatesList[index].put(indexTime,3*5+1,value[1]);
+		m_MetersCoordinatesList[index].put(indexTime,3*5+2,value[2]);
+	}else if (vmeWrappedMeter->GetWrappedClass()==medVMEComputeWrapping::OLD_METER)
+	{
+
+	}
+	m_keyNumList.push_back(numberOfKeyPoints);
+	//WriteOnFile(numberOfKeyPoints);
+}
+
+
+//----------------------------------------------------------------------------
+//num is number of key points
+void medOpExporterWrappedMeter::WriteOnFile()
+//----------------------------------------------------------------------------
+{
+	
+	unsigned int columns;
+	unsigned int rows;
+	int nKey = 4; 
+	double value ;
+
+
+	for(int i=0; i< m_Meters.size(); i++)
+	{
+		m_OutputFile << m_Meters[i]->GetName() << std::endl; // vme name
+		m_OutputFile << std::setw(6)<<"time"<<std::setw(4)<<std::setw(30)<<"origin"<< std::setw(30)<< "viaPoint1"<< std::setw(30)<<"viaPoint2"<< std::setw(30)<<"viaPoint3"<< std::setw(30)<<"viaPoint4"<< std::setw(30)<<"insertion"<<'\t'<<std::endl;
+		columns = m_MetersCoordinatesList[i].columns();
+		rows = m_MetersCoordinatesList[i].rows();
+
+		for(int m=0; m< rows; m++){
+			m_OutputFile << std::fixed << std::setw(6) << m<<std::setw(4)<< '\t';//output time
+			int num = m_keyNumList[m];
+
+			for(int n=0; n< columns; n++)
+			{
+				if ( n<(num+1)*3  ||   n>= (nKey+1)*3  )//start and key points and end point
+				{
+					value =  m_MetersCoordinatesList[i].get(m,n);
+					if (n%3 == 0)
+					{
+						//m_OutputFile << std::fixed << std::setprecision(3) << std::setw(8) << '['<<value <<','<< '\t' ;
+						m_OutputFile << std::fixed << std::setprecision(3) << '['<< std::setw(8)<<value <<','<< '\t' ;
+					}else if (n%3 == 1)
+					{
+						m_OutputFile << std::fixed << std::setprecision(3) << std::setw(8)<<  value <<','<< "\t";
+					}else if (n%3 == 2)
+					{
+						m_OutputFile << std::fixed << std::setprecision(3) << std::setw(8)<< value <<']'<< "\t";
+					}	
+				}else if (  n >= (num+1)*3  && n< (nKey+1)*3 )
+				{
+					if ( n%3 == 0)
+					{
+						m_OutputFile << std::fixed << std::setprecision(3) << std::setw(16) << "NAN"<<std::setw(13)<< '\t' ;
+					}
+				}				
+			}
+			m_OutputFile << std::endl;
+		}
+		m_OutputFile.close();
+	}
+	
+	
+}
+
+/*medVMEWrappedMeter *vmeWrappedMeter =  medVMEWrappedMeter::SafeDownCast(m_Input);
+vmeWrappedMeter->Update();
+medVMEOutputWrappedMeter *out_wm = medVMEOutputWrappedMeter::SafeDownCast(vmeWrappedMeter->GetOutput());
+out_wm->Update();*/
+/*
 //----------------------------------------------------------------------------
 void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
 //----------------------------------------------------------------------------
 {
-  /*medVMEWrappedMeter *vmeWrappedMeter =  medVMEWrappedMeter::SafeDownCast(m_Input);
-  vmeWrappedMeter->Update();
-  medVMEOutputWrappedMeter *out_wm = medVMEOutputWrappedMeter::SafeDownCast(vmeWrappedMeter->GetOutput());
-  out_wm->Update();*/
+
 
   medVMEComputeWrapping *vmeMeter = medVMEComputeWrapping::SafeDownCast(m_Input);
   vmeMeter->Update();
@@ -165,19 +352,39 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
 
   if (vmeMeter->GetWrappedClass()==medVMEComputeWrapping::NEW_METER)
   {
-		/*if (vmeMeter->GetWrappedMode()==  medVMEComputeWrapping )
+
+	  outputFile<<std::setw(10)<<"time"<< std::setw(30)<<"origin"<< std::setw(30)<< "viaPoint1"<< std::setw(30)<<"viaPoint2"<< std::setw(30)<<"viaPointn"<< std::setw(30)<<"viaPointn"<< std::setw(30)<<"insertion"<<'\t'<<std::endl;
+
+	  outputFile<< '1' << '[' <<
+		   std::fixed << std::setprecision(3) << std::setw(8)<< vmeMeter->GetStartPointCoordinate()[0]<<'\t'<<','<<
+		   std::fixed << std::setprecision(3) << std::setw(8)<< vmeMeter->GetStartPointCoordinate()[1]<<'\t' <<','<<
+		   std::fixed << std::setprecision(3) << std::setw(8)<< vmeMeter->GetStartPointCoordinate()[2]<<']';
+
+	  int size = vmeMeter->GetNumberExportPoints();
+	  double *point;
+	  if (size>0)
+	  {
+		  for (int i=0;i<size;i++)
+		  {
+			  outputFile <<'['<<
+				  std::fixed << std::setprecision(3) << std::setw(8) << vmeMeter->GetExportPointCoordinate(i)[0]  << '\t'<<','<<
+				  std::fixed << std::setprecision(3) << std::setw(8) << vmeMeter->GetExportPointCoordinate(i)[1] << '\t'<<','<< 
+				  std::fixed << std::setprecision(3) << std::setw(8) << vmeMeter->GetExportPointCoordinate(i)[2] << '\t'<<']';
+		  }
+	  }
+		for (int j=0;j<4-size;j++)
 		{
-		}*/
-	  outputFile<< vmeMeter->GetStartPointCoordinate()[0]<< '\t'
-		  <<vmeMeter->GetStartPointCoordinate()[1]<<'\t'
-		  <<vmeMeter->GetStartPointCoordinate()[1]<<std::endl;
-	  outputFile<< vmeMeter->GetEndPointCoordinate()[0]<< '\t'
-		  <<vmeMeter->GetEndPointCoordinate()[1]<<'\t'
-		  <<vmeMeter->GetEndPointCoordinate()[1]<<std::endl;
+			outputFile<< std::setw(30)<<"NAN"<<'\t';
+		}
+
+	  outputFile<<'['<<
+		  std::fixed<<std::setprecision(3)<<std::setw(8)<<vmeMeter->GetEndPointCoordinate()[0]<< '\t'<<','<<
+		  std::fixed<<std::setprecision(3)<<std::setw(8)<<vmeMeter->GetEndPointCoordinate()[1]<< '\t'<<','<<
+		  std::fixed<<std::setprecision(3)<<std::setw(8)<<vmeMeter->GetEndPointCoordinate()[2]<< '\t'<<']'<<std::endl;
 
   }else if (vmeMeter->GetWrappedClass()==medVMEComputeWrapping::OLD_METER)
   {
-	  if (vmeMeter->GetWrappedMode() == medVMEComputeWrapping::MANUAL_WRAP)
+	  if (vmeMeter->GetWrappedMode2() == medVMEComputeWrapping::MANUAL_WRAP)
 	{
 		for(int i=0; i<vmeMeter->GetNumberMiddlePoints();i++)
 		{
@@ -185,7 +392,7 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
 				<< vmeMeter->GetMiddlePointCoordinate(i)[1] << '\t'
 				<< vmeMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
 		}
-	}else if (vmeMeter->GetWrappedMode() == medVMEComputeWrapping::AUTOMATED_WRAP)
+	}else if (vmeMeter->GetWrappedMode2() == medVMEComputeWrapping::AUTOMATED_WRAP)
 	{
 		outputFile << vmeMeter->GetWrappedGeometryTangent1()[0] << '\t'
 			<< vmeMeter->GetWrappedGeometryTangent1()[1] << '\t'
@@ -199,31 +406,32 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates()
   
 
 
-  /*if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
-  {
-    for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
-    {
-      outputFile << vmeWrappedMeter->GetMiddlePointCoordinate(i)[0] << '\t'
-        << vmeWrappedMeter->GetMiddlePointCoordinate(i)[1] << '\t'
-        << vmeWrappedMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
-    }
-  }
-  else if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
-  {
-    outputFile << vmeWrappedMeter->GetWrappedGeometryTangent1()[0] << '\t'
-      << vmeWrappedMeter->GetWrappedGeometryTangent1()[1] << '\t'
-      << vmeWrappedMeter->GetWrappedGeometryTangent1()[2] << std::endl;
 
-    outputFile << vmeWrappedMeter->GetWrappedGeometryTangent2()[0] << '\t'
-      << vmeWrappedMeter->GetWrappedGeometryTangent2()[1] << '\t'
-      << vmeWrappedMeter->GetWrappedGeometryTangent2()[2] << std::endl;
-  }*/
   
   outputFile.close();
   
 
 }
+*/
+/*if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::MANUAL_WRAP)
+{
+for(int i=0; i<vmeWrappedMeter->GetNumberMiddlePoints();i++)
+{
+outputFile << vmeWrappedMeter->GetMiddlePointCoordinate(i)[0] << '\t'
+<< vmeWrappedMeter->GetMiddlePointCoordinate(i)[1] << '\t'
+<< vmeWrappedMeter->GetMiddlePointCoordinate(i)[2] << std::endl;
+}
+}
+else if(vmeWrappedMeter->GetWrappedMode() == medVMEWrappedMeter::AUTOMATED_WRAP)
+{
+outputFile << vmeWrappedMeter->GetWrappedGeometryTangent1()[0] << '\t'
+<< vmeWrappedMeter->GetWrappedGeometryTangent1()[1] << '\t'
+<< vmeWrappedMeter->GetWrappedGeometryTangent1()[2] << std::endl;
 
+outputFile << vmeWrappedMeter->GetWrappedGeometryTangent2()[0] << '\t'
+<< vmeWrappedMeter->GetWrappedGeometryTangent2()[1] << '\t'
+<< vmeWrappedMeter->GetWrappedGeometryTangent2()[2] << std::endl;
+}*/
 //-----------------------------------------------------------
 void medOpExporterWrappedMeter::Test() 
 //-----------------------------------------------------------
@@ -290,7 +498,7 @@ void medOpExporterWrappedMeter::Test()
 	fileExp<<"/RAW_MAL/ExportWrappedMeter.txt";
 	exporter->TestModeOn();
 	exporter->SetFileName(fileExp);
-	exporter->ExportWrappedMeterCoordinates();
+	exporter->ExportWrappedMeterCoordinates(0,0);
 
 	std::fstream control(fileExp);
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-03 15:30:37 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-06-17 16:44:08 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -14,7 +14,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #define __medOpExporterWrappedMeter_H__
 
 #include "mafOp.h"
-
+#include <vnl/vnl_matrix.h>
+#include "wx/busyinfo.h"
+#include "mafNodeIterator.h"
+#include <fstream>
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
@@ -31,6 +34,14 @@ public:
   medOpExporterWrappedMeter(const wxString &label = "ActionLine");
   ~medOpExporterWrappedMeter(); 
 
+  std::vector<mafNode *> m_Meters;
+  std::vector< vnl_matrix<double> > m_MetersCoordinatesList ;
+  mafTimeStamp       m_CurrentTime;
+  std::vector<mafTimeStamp> m_Times ;
+  mafNode            *m_CurrentVme ;
+  std::ofstream      m_OutputFile;
+  std::vector<int>  m_keyNumList;
+
   mafTypeMacro(medOpExporterWrappedMeter, mafOp);
 
   mafOp* Copy();
@@ -46,9 +57,13 @@ public:
   void SetFileName(const char *file_name) {m_File = file_name;};
   
   /** Export the Wrapped meter coordinates in file. */
-  void ExportWrappedMeterCoordinates();
+  void ExportWrappedMeterCoordinates(int index, int indexTime);
   /** test method copy from test medOpExporterWrappedMeterTest**/
   void Test() ;
+
+  void ExportWrappedMeter();
+  void Export();
+  void WriteOnFile();
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
