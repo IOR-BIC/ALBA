@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIMeasureUnitSettings.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-06-17 13:24:52 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -13,23 +13,29 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __mafGUIMeasureUnitSettings_H__
 #define __mafGUIMeasureUnitSettings_H__
 
+//----------------------------------------------------------------------------
+// Include:
+//----------------------------------------------------------------------------
+
 #include "mafGUISettings.h"
 
 //----------------------------------------------------------------------------
 // forward reference
 //----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-// mafGUIMeasureUnitSettings :
-//----------------------------------------------------------------------------
 /**
+  Class Name: mafGUIMeasureUnitSettings.
+  Represent a gui setting (reachable from option menu) in which data unit parameters can be customized.
 */
 class mafGUIMeasureUnitSettings : public mafGUISettings
 {
 public:
+  /** constructor. */
 	mafGUIMeasureUnitSettings(mafObserver *Listener, const mafString &label = _("Measure Unit"));
+  /** destructor. */
 	~mafGUIMeasureUnitSettings(); 
 
+  /** Measure Ids */
   enum MEASURE_UNIT_WIDGET_ID
   {
     MEASURE_DATA_STRING_ID = MINID,

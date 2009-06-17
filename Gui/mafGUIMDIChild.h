@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIChild.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-17 13:24:52 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,14 +25,19 @@
 //----------------------------------------------------------------------------
 class mafView;
 
-//----------------------------------------------------------------------------
-// mafGUIMDIChild :
-//----------------------------------------------------------------------------
+/**
+  Class Name: mafGUIMDIChild.
+  Represents the child frame in a MDI system. In MAF it is used in combination with views that support
+  viewport and eventually a gui area in which some widgets can be used, like windowing widgets.
+*/
 class mafGUIMDIChild: public wxMDIChildFrame
 {
 public:
+  /** constructor. */
   mafGUIMDIChild(wxMDIParentFrame* parent, mafView *view); 
+  /** destructor. */
   virtual ~mafGUIMDIChild();
+  /** Set the listener object, i.e. the object receiving events sent by this object */
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
 	/** Set the quitting flag. */
@@ -69,6 +74,7 @@ protected:
   bool         m_AllowCloseFlag;
   bool         m_EnableResize;
 
+  /** Event table declaration */
   DECLARE_EVENT_TABLE()
 };
 #endif

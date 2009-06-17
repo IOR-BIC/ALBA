@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMutexPanel.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-17 13:24:52 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,13 +19,16 @@
 #include "mafGUIScrolledPanel.h"
 #include "mafGUI.h"
 
-//----------------------------------------------------------------------------
-// mafGUIMutexPanel :
-//----------------------------------------------------------------------------
+/**
+  Class Name: mafGUIMutexPanel.
+  Represents a Panel that can plug on it only one panel at time. When put the current gui, it remove the previous one.
+*/
 class mafGUIMutexPanel: public mafGUIPanel
 {
 public:
-           mafGUIMutexPanel(wxWindow* parent,wxWindowID id );
+  /** constructor. */
+  mafGUIMutexPanel(wxWindow* parent,wxWindowID id );
+  /** destructor. */
   virtual ~mafGUIMutexPanel();
   
 	/** Put the gui onto the panel removing the previous GUI. */
@@ -34,11 +37,13 @@ public:
 	/** Remove the current gui. */
   bool RemoveCurrentClient();
 
+  /** retrieve the current gui on panel. */
   wxWindow *GetCurrentClient();
 
 protected:
   //wxWindow *m_Client;
   wxBoxSizer *m_Sizer;
-DECLARE_EVENT_TABLE()
+  //Event Table Declaration
+  DECLARE_EVENT_TABLE()
 };
 #endif

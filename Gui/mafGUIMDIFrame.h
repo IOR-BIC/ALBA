@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIMDIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-18 08:58:32 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-06-17 13:24:52 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -30,18 +30,22 @@ class vtkObject;
 class mafGUIMDIFrameCallback; 
 //class mafGUIDockSettings;
 class mafGUI;
-//----------------------------------------------------------------------------
-// mafGUIMDIFrame :
-//----------------------------------------------------------------------------
+/**
+  Class Name: mafGUIMDIFrame.
+  Represents the main frame of a MAF Application. On this frame  they'll be plugged  toolbars,  panels, progress bar etc...
+  Closing this frame is equal to close the application.
+*/
 class mafGUIMDIFrame: public wxMDIParentFrame
 {
  public:
+  /** constructor. */
   mafGUIMDIFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+  /** destructor. */
  ~mafGUIMDIFrame(); 
   
+  /** Set the listener object, i.e. the object receiving events sent by this object */
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
   
-
   /** Show the Docking Settings Dialog */
   mafGUI* GetDockSettingGui() {return m_DockSettings->GetGui();};  
 
@@ -52,18 +56,20 @@ class mafGUIMDIFrame: public wxMDIParentFrame
   void OnQuit();
 
   /** add a new Dockable Pane containig the given Window.
-  pane_info specify the Pane settings */
+     pane_info specify the Pane settings */
   void AddDockPane(wxWindow *window, wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
   
   /** remove a Dockable Pane  - the contained window is not destroyed */
   void RemoveDockPane(wxString pane_name);
 
-  /** Show/Hide a Dockable Pane -- the Pane can be specified by name or by its contents */
+  /** Show/Hide a Dockable Pane -- the Pane is specified by name */
   void ShowDockPane(wxString pane_name, bool show = true);
+  /** Show/Hide a Dockable Pane -- the Pane is specified by content */
   void ShowDockPane(wxWindow *window, bool show = true);
 
-  /** tell if a given Dockable Pane is shown -- the Pane can be specified by name or by its contents */
+  /** tell if a given Dockable Pane is shown -- the Paneis specified by name */
   bool DockPaneIsShown(wxString pane_name);
+  /** tell if a given Dockable Pane is shown -- the Pane is specified by content */
   bool DockPaneIsShown(wxWindow *window);
 
 	/** Show the 'Busy' text on the status bar. */
@@ -167,6 +173,7 @@ protected:
   mafGUIDockManager    m_DockManager;
   mafGUIDockSettings  *m_DockSettings;
 
+  /** Event Table Declaration*/
   DECLARE_EVENT_TABLE()
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUINamedPanel.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-17 13:24:52 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,9 +16,9 @@
 //----------------------------------------------------------------------------
 #include "mafGUILab.h"
 #include "mafGUIPanel.h"
-//----------------------------------------------------------------------------
-// mafGUINamedPanel :
+
 /**
+ Class Name: mafGUINamedPanel.
 - mafGUINamedPanel is a wxPanel with a title bar.
 - the title bar has a title and an optional close button.
 - mafGUINamedPanel provide a default BoxSizer making easy to place widgets on it,
@@ -27,12 +27,12 @@
 \todo
 decide the ID to associate with the close button
 */
-//----------------------------------------------------------------------------
 class mafGUINamedPanel: public mafGUIPanel
 {
 public:
-  /** set CloseButton to show the close button */
+  /** constructor.  set CloseButton to show the close button */
   mafGUINamedPanel (wxWindow* parent,wxWindowID id = -1,bool CloseButton = false,bool HideTitle = false); 
+  /** destructor. */
   virtual ~mafGUINamedPanel();
   
   /** Add a widget to the panel. */
@@ -60,7 +60,8 @@ protected:
   wxBoxSizer      *m_TopSizer;
   mafGUINamedPanel   *m_NextPanel;
   wxColour         m_Color; 
-
-DECLARE_EVENT_TABLE()
+  
+  /** Event Table Declaration*/
+  DECLARE_EVENT_TABLE()
 };
 #endif
