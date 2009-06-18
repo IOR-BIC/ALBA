@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-06-16 15:11:52 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-06-18 16:57:24 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -37,21 +37,23 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //----------------------------------------------------------------------------
-// TODO 16.6.09
+// TODO 18.6.09
 // Is it ok to have only 3 slices ?
 // Contour widget not rendered on first slice until you change to another slice and back.
 // Does MML still work if the muscle model is scaled ?
-// Adjust axis scaling by 1/2
 // Windowing range might not be right.
+// Cross hairs of contour widget not always centred - prone to noise
+// Contour scaling widgets do not act along x and y axes.
 //----------------------------------------------------------------------------
 
 
 //------------------------------------------------------------------------------
 /// medOpMML3. \n
 /// Muscle Modelling Lab. \n
-/// This operation allows the user to deform a polydata model of a muscle or bone
-/// to fit a volume image of the feature. \n
+/// Manual registration operation.
+/// This operation registers a polydata model of a muscle or bone onto a volume image of the feature. \n
 /// The inputs are a volume (the patient data) and a muscle surface (the model).
+/// Optional inputs 
 /// Global registration is performed by matching a set of 3 or 4 landmarks on patient and model.
 /// The line between landmarks 1 and 2 defines the slicing axis.
 //------------------------------------------------------------------------------
@@ -130,11 +132,13 @@ protected:
 
   /// Apply scaling factor to axis landmarks
   /// Do this before uploading the landmarks to the model view.
-  void ApplyAxisScalingFactor() ;
+  void ApplyAxisRangeFactor() ;
 
   /// Set up a specific set of landmarks (not currently used)
   void SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
 
+  /// Set up a specific set of landmarks (not currently used)
+  void SetUpLandmarks2(wxString AtlasSectionVMEName, wxString PatientSectionVMEName);
 
 
   //----------------------------------------------------------------------------
@@ -153,6 +157,10 @@ protected:
   void OnRegistrationOK();  ///< Registration ok - create output VME
 
   void OnSlider();
+  void OnMinus10() ;
+  void OnMinus1() ;
+  void OnPlus1() ;
+  void OnPlus10() ;
   void OnLut();
   void OnMuscleSelection();
   void OnResetView();
@@ -220,7 +228,7 @@ protected:
   int m_slicexyz ;  ///< validator for default slice direction
   int m_ScansNumber ; ///< number of scans
   int m_ScansGrain; ///< set by user, used to calculate size and resolution of scans
-  double m_AxisScalingFactor ; ///< stretch factor set by user to increase range of axis
+  double m_AxisRangeFactor ; ///< factor which extends range of axis beyond landmarks
 
   /// flag to remember how axis landmarks were created. \n
   /// 1 for default (patient space)

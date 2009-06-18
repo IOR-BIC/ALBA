@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-16 15:11:52 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-06-18 16:57:24 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -114,11 +114,17 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   */
 
 
+  //----------------------------------------------------------------------------
   // Set style for 2d display by default
+  //----------------------------------------------------------------------------
   vtkInteractorStyleImage *style = vtkInteractorStyleImage::New() ;
   m_RenderWindowInteractor->SetInteractorStyle(style);
   style->Delete() ;
 
+
+  //----------------------------------------------------------------------------
+  // set up spline functions
+  //----------------------------------------------------------------------------
   m_CenterHorizontalOffsetSpline = vtkKochanekSpline::New();
   m_CenterHorizontalOffsetSpline->ClosedOff();
 
@@ -147,13 +153,21 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_WestScalingSpline->ClosedOff();
 
 
+
+  //----------------------------------------------------------------------------
+  // Slice actors and lut
+  //----------------------------------------------------------------------------
   // synthetic slices
-  m_SyntheticScansActor = NULL; // actors, allocated in CreateSyntheticScans()
+  m_SyntheticScansActor = NULL; // array of actors, allocated in CreateSyntheticScans()
 
   // synthetic slices lut
   m_SyntheticScansWindowLevelLookupTable = vtkWindowLevelLookupTable::New();
 
-  //
+
+
+  //----------------------------------------------------------------------------
+  // Stack
+  //----------------------------------------------------------------------------
   m_ScalingFlagStack = vtkIntArray::New();
   m_ScalingFlagStack->SetNumberOfComponents(1);
 
@@ -238,7 +252,7 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_PosXAxisActor = vtkActor::New();
   m_PosXAxisActor->SetMapper(m_PosXAxisPolyDataMapper);
   m_Renderer->AddActor(m_PosXAxisActor);
-  m_PosXAxisActor->VisibilityOff();
+  m_PosXAxisActor->VisibilityOn();
 
   // north global axis
   m_PosYAxisLineSource = vtkLineSource::New();
@@ -249,7 +263,7 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_PosYAxisActor = vtkActor::New();
   m_PosYAxisActor->SetMapper(m_PosYAxisPolyDataMapper);
   m_Renderer->AddActor(m_PosYAxisActor);
-  m_PosYAxisActor->VisibilityOff();
+  m_PosYAxisActor->VisibilityOn();
 
   // west global axis
   m_NegXAxisLineSource = vtkLineSource::New();
@@ -260,7 +274,7 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_NegXAxisActor = vtkActor::New();
   m_NegXAxisActor->SetMapper(m_NegXAxisPolyDataMapper);
   m_Renderer->AddActor(m_NegXAxisActor);
-  m_NegXAxisActor->VisibilityOff();
+  m_NegXAxisActor->VisibilityOn();
 
   // south global axis
   m_NegYAxisLineSource = vtkLineSource::New();
@@ -271,7 +285,7 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_NegYAxisActor = vtkActor::New();
   m_NegYAxisActor->SetMapper(m_NegYAxisPolyDataMapper);
   m_Renderer->AddActor(m_NegYAxisActor);
-  m_NegYAxisActor->VisibilityOff();
+  m_NegYAxisActor->VisibilityOn();
 
 
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-16 15:11:52 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-06-18 16:57:24 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -86,19 +86,19 @@ enum
   ID_SHOW_AXES, 
   ID_SHOW_CONTOUR,
   ID_RESET_VIEW,
-  ID_OK,
-  ID_CANCEL,
   ID_P_OPERATION,
   ID_T_OPERATION,
   ID_R_OPERATION,
   ID_S_OPERATION,
   ID_UNDO,
   ID_SLICE,
-
-  ID_CHOOSE_SCANS_DISTANCE,
-
-  ID_FAKE,
-
+  ID_MINUS10,
+  ID_MINUS1,
+  ID_PLUS1,
+  ID_PLUS10,
+  ID_FAKE, // dummy id with no associated event
+  ID_OK,
+  ID_CANCEL
 };
 
 
@@ -177,7 +177,7 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
 
   m_ScansGrain = 128 ;  // resolution of slices
   m_ScansNumber = 12 ;  // no. of slices
-  m_AxisScalingFactor = 1.1 ; // stretch factor for axis
+  m_AxisRangeFactor = 1.1 ; // range factor for axis
   m_MuscleType = 1;     // 1 for simple axis, 2 for piecewise axis
 
   // Model maf RWIs
@@ -322,7 +322,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark 1
   wxStaticText *lab_5  = new wxStaticText(m_ChooseDlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_5 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl   *text_5 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_5->SetValidator(mafGUIValidator(this,ID_CHOOSE_L1,text_5,&m_L1Name));
   mafGUIButton *b_5       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L1,"select",wxPoint(0,0), wxSize(50,20));
   b_5->SetListener(this);
@@ -334,7 +334,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark 2
   wxStaticText *lab_6  = new wxStaticText(m_ChooseDlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_6 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl   *text_6 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_6->SetValidator(mafGUIValidator(this,ID_CHOOSE_L2,text_6,&m_L2Name));
   mafGUIButton *b_6       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L2,"select",wxPoint(0,0), wxSize(50,20));
   b_6->SetListener(this);
@@ -346,7 +346,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark 3
   wxStaticText *lab_7  = new wxStaticText(m_ChooseDlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_7 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl   *text_7 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_7->SetValidator(mafGUIValidator(this,ID_CHOOSE_L3,text_7,&m_L3Name));
   mafGUIButton *b_7       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L3,"select",wxPoint(0,0), wxSize(50,20));
   b_7->SetListener(this);
@@ -358,7 +358,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark 4
   wxStaticText *lab_8  = new wxStaticText(m_ChooseDlg, -1, "Landmark 4 (optional)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_8 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl   *text_8 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_8->SetValidator(mafGUIValidator(this,ID_CHOOSE_L4,text_8,&m_L4Name));
   mafGUIButton *b_8       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
   b_8->SetListener(this);
@@ -388,7 +388,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark axis 1
   wxStaticText *lab_axis1 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 1", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *text_axis1 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl *text_axis1 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_axis1->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS1, text_axis1, &m_Axis1Name));
   mafGUIButton *button_axis1 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS1, "select", wxPoint(0,0), wxSize(50,20));
   button_axis1->SetListener(this);
@@ -400,7 +400,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark axis 2
   wxStaticText *lab_axis2 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 2", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *text_axis2 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl *text_axis2 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_axis2->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS2, text_axis2, &m_Axis2Name));
   mafGUIButton *button_axis2 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS2, "select", wxPoint(0,0), wxSize(50,20));
   button_axis2->SetListener(this);
@@ -412,7 +412,7 @@ void medOpMML3::CreateInputsDlg()
 
   // landmark axis 3
   wxStaticText *lab_axis3 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 3", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *text_axis3 = new wxTextCtrl(m_ChooseDlg ,  -1, "",        wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  wxTextCtrl *text_axis3 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
   text_axis3->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS3, text_axis3, &m_Axis3Name));
   mafGUIButton *button_axis3 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS3, "select", wxPoint(0,0), wxSize(50,20));
   button_axis3->SetListener(this);
@@ -427,9 +427,9 @@ void medOpMML3::CreateInputsDlg()
 
 
   // number of scans
-  wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Number of slices (3 - 100)", wxPoint(0,0), wxSize(150,20));
+  wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Number of slices (3 or more)", wxPoint(0,0), wxSize(150,20));
   m_ScansNumberTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  m_ScansNumberTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_ScansNumberTxt, &m_ScansNumber, 3, 100)); // min/max values
+  m_ScansNumberTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_ScansNumberTxt, &m_ScansNumber, 3, 10000)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
   ScansNumberHorizontalSizer->Add(m_ScansNumberTxt,1,wxEXPAND);
@@ -445,9 +445,9 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(ScansGrainHorizontalSizer2,0,wxEXPAND | wxALL, 2);
 
   // axis scaling factor
-  wxStaticText *AxisScalingLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Axis scaling factor (1-5)", wxPoint(0,0), wxSize(150,20));
+  wxStaticText *AxisScalingLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Axis range factor (1-2)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl *AxisScalingTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  AxisScalingTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, AxisScalingTxt, &m_AxisScalingFactor, 1.0, 5.0)); // min/max values
+  AxisScalingTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, AxisScalingTxt, &m_AxisRangeFactor, 1.0, 2.0)); // min/max values
   wxBoxSizer *AxisScalingHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   AxisScalingHorizontalSizer->Add(AxisScalingLab,0);
   AxisScalingHorizontalSizer->Add(AxisScalingTxt,1,wxEXPAND);
@@ -584,14 +584,10 @@ void medOpMML3::CreateRegistrationDlg()
   m_ModelmafRWI = new mafRWI(m_OpDlg);
   m_ModelmafRWI->SetListener(this);
   m_ModelmafRWI->m_RwiBase->SetInteractorStyle(NULL);
-
-  // width/height
   m_ModelmafRWI->SetSize(0,0,420,420);
-  //((vtkRenderWindow*)(m_ModelmafRWI->m_RenderWindow))->SetSize(420,420);
-  //m_ModelmafRWI->m_RwiBase->Show();
-
   m_ModelmafRWI->Show(true);
   m_ModelmafRWI->CameraUpdate();
+
 
   // maf lut
   m_Lut = new mafGUILutSlider(m_OpDlg,-1,wxPoint(0,0),wxSize(420,24));
@@ -606,12 +602,20 @@ void medOpMML3::CreateRegistrationDlg()
   if (!m_Axis1Defined || !m_Axis2Defined || ((m_MuscleType == 2) && !m_Axis3Defined))
     CreateDefaultAxisLandmarks(); // create default landmarks if full set is not defined
 
-  // maf slider widget 
-  wxStaticText *lab  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(-1, 16));
-  wxTextCtrl   *text = new wxTextCtrl  (m_OpDlg, ID_SLICE, "hello",  wxPoint(0,0), wxSize(20, 16),wxNO_BORDER |wxTE_READONLY );
 
-  wxSlider *sli  = new wxSlider(m_OpDlg, ID_SLICE,0, 0, m_ScansNumber-1, wxPoint(0,0), wxSize(269,-1));
-  sli->SetValidator(mafGUIValidator(this, ID_SLICE, (wxSlider*)sli, &m_CurrentSlice, text));
+  // slice position slider and buttons
+  wxStaticText *lab_slicepos  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(40, 20));
+  wxTextCtrl   *text_slicepos = new wxTextCtrl(m_OpDlg, ID_SLICE, "", wxPoint(0,0), wxSize(40, 20), wxNO_BORDER | wxTE_READONLY );
+  mafGUIButton *button_Minus10 = new mafGUIButton(m_OpDlg, ID_MINUS10, "<<", wxPoint(0,0), wxSize(30,20)) ;
+  button_Minus10->SetListener(this) ;
+  mafGUIButton *button_Minus1 = new mafGUIButton(m_OpDlg, ID_MINUS1, "<", wxPoint(0,0), wxSize(30,20)) ; 
+  button_Minus1->SetListener(this) ;
+  mafGUIButton *button_Plus1 = new mafGUIButton(m_OpDlg, ID_PLUS1, ">", wxPoint(0,0), wxSize(30,20)) ; 
+  button_Plus1->SetListener(this) ;
+  mafGUIButton *button_Plus10 = new mafGUIButton(m_OpDlg, ID_PLUS10, ">>", wxPoint(0,0), wxSize(30,20)) ; 
+  button_Plus10->SetListener(this) ;
+  wxSlider *slider_slicepos  = new wxSlider(m_OpDlg, ID_SLICE, 0, 0, m_ScansNumber-1, wxPoint(0,0), wxSize(269,-1));
+  slider_slicepos->SetValidator(mafGUIValidator(this, ID_SLICE, (wxSlider*)slider_slicepos, &m_CurrentSlice, text_slicepos));
 
 
   // maf parameter views RWI's
@@ -651,8 +655,12 @@ void medOpMML3::CreateRegistrationDlg()
 
   // slider label and value
   wxBoxSizer *hs4 = new wxBoxSizer(wxHORIZONTAL);
-  hs4->Add(lab,  0, wxLEFT, 85);
-  hs4->Add(text, 0, wxLEFT, 10);
+  hs4->Add(button_Minus10,  0, wxLEFT);
+  hs4->Add(button_Minus1,  0, wxLEFT);
+  hs4->Add(lab_slicepos,  0, wxLEFT, 5);
+  hs4->Add(text_slicepos, 0, wxLEFT, 5);
+  hs4->Add(button_Plus1,  0, wxLEFT);
+  hs4->Add(button_Plus10,  0, wxLEFT);
 
 
   // left vertical sizer (rows of buttons + render window)
@@ -660,13 +668,13 @@ void medOpMML3::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(TopHorizontalBoxSizer);
   LeftVerticalBoxSizer->Add(OperationHorizontalBoxSizer);
   LeftVerticalBoxSizer->Add(m_ModelmafRWI->m_RwiBase, 1, wxEXPAND | wxALL, 5);
-  LeftVerticalBoxSizer->Add(m_Lut,0,wxEXPAND ,6);
+  LeftVerticalBoxSizer->Add(m_Lut, 0, wxEXPAND, 6);
 
 
   // right vertical sizer (pos slider + param view widgets)
   wxBoxSizer *RightVerticalBoxSizer = new wxBoxSizer(wxVERTICAL) ;
-  RightVerticalBoxSizer->Add(hs4, 0, wxTOP, 25);  // label and value
-  RightVerticalBoxSizer->Add(sli, 0, wxLEFT, -9); // slice position slider
+  RightVerticalBoxSizer->Add(hs4, 0, wxEXPAND | wxTOP | wxLEFT, 3);  // slice pos buttons, label and value
+  RightVerticalBoxSizer->Add(slider_slicepos, 0, wxEXPAND | wxTOP, 3); // slice position slider
   RightVerticalBoxSizer->Add(m_PHmafRWI->m_RwiBase, 0, wxTOP, 10);
   RightVerticalBoxSizer->Add(m_PVmafRWI->m_RwiBase, 0, wxTOP, 3);
   RightVerticalBoxSizer->Add(m_THmafRWI->m_RwiBase, 0, wxTOP, 3);
@@ -676,6 +684,7 @@ void medOpMML3::CreateRegistrationDlg()
   RightVerticalBoxSizer->Add(m_SSmafRWI->m_RwiBase, 0, wxTOP, 3);
   RightVerticalBoxSizer->Add(m_SEmafRWI->m_RwiBase, 0, wxTOP, 3);
   RightVerticalBoxSizer->Add(m_SWmafRWI->m_RwiBase, 0, wxTOP, 3);
+
 
 
   // registration window horizontal sizer
@@ -913,18 +922,31 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
       break;
 
     case ID_RANGE_MODIFIED: // registration dlg lut
-      //
       OnLut();
       break;
 
     case ID_SLICE: // registration dlg slice slider
-      //
       OnSlider();
       break;
 
-    case ID_CHOOSE_SCANS_DISTANCE:
-      //wxLogMessage("ttt");
-      //wxLogMessage("arg1 changed to %d", m_arg1)
+    case ID_MINUS10: // registration dlg slice button
+      OnMinus10();
+      OnSlider(); // need to call this manually
+      break;
+
+    case ID_MINUS1: // registration dlg slice button
+      OnMinus1();
+      OnSlider(); // need to call this manually
+      break;
+
+    case ID_PLUS1: // registration dlg slice button
+      OnPlus1();
+      OnSlider(); // need to call this manually
+      break;
+
+    case ID_PLUS10: // registration dlg slice button
+      OnPlus10();
+      OnSlider(); // need to call this manually
       break;
 
     default:
@@ -1120,6 +1142,7 @@ void medOpMML3::OnRegistrationCANCEL()
 
 }
 
+
 //----------------------------------------------------------------------------
 void medOpMML3::OnSlider() 
 //----------------------------------------------------------------------------
@@ -1191,6 +1214,78 @@ void medOpMML3::OnSlider()
   // render model view
   m_Model->Render();
 }
+
+
+
+//------------------------------------------------------------------------------
+void medOpMML3::OnMinus10() 
+//------------------------------------------------------------------------------
+{
+  int tens = m_CurrentSlice / 10 ;
+  int units = m_CurrentSlice - 10*tens ;
+
+  // subtract 10, or amount required to go to next lowest 10
+  if (units == 0)
+    m_CurrentSlice -= 10 ;
+  else
+    m_CurrentSlice -= units ;
+
+  // clamp the value
+  if (m_CurrentSlice < 0)
+    m_CurrentSlice = 0 ;
+
+  m_OpDlg->TransferDataToWindow() ;
+}
+
+
+//------------------------------------------------------------------------------
+void medOpMML3::OnMinus1() 
+//------------------------------------------------------------------------------
+{
+  // subtract 1
+  m_CurrentSlice -= 1 ;
+
+  // clamp the value
+  if (m_CurrentSlice < 0)
+    m_CurrentSlice = 0 ;
+
+  m_OpDlg->TransferDataToWindow() ;
+}
+
+
+//------------------------------------------------------------------------------
+void medOpMML3::OnPlus1() 
+//------------------------------------------------------------------------------
+{
+  // add 1
+  m_CurrentSlice += 1 ;
+
+  // clamp the value
+  if (m_CurrentSlice >= m_ScansNumber)
+    m_CurrentSlice = m_ScansNumber-1 ;
+
+  m_OpDlg->TransferDataToWindow() ;
+}
+
+
+//------------------------------------------------------------------------------
+void medOpMML3::OnPlus10() 
+//------------------------------------------------------------------------------
+{
+  int tens = m_CurrentSlice / 10 ;
+  int units = m_CurrentSlice - 10*tens ;
+
+  // add 10, or amount required to go to next highest 10
+  m_CurrentSlice += (10-units) ;
+
+  // clamp the value
+  if (m_CurrentSlice >= m_ScansNumber)
+    m_CurrentSlice = m_ScansNumber-1 ;
+
+  m_OpDlg->TransferDataToWindow() ;
+}
+
+
 
 //----------------------------------------------------------------------------
 void medOpMML3::OnLut() 
@@ -1320,8 +1415,9 @@ void medOpMML3::OnMuscleSelection()
     m_SurfaceName = ParentVMEName;
   }
 
-  // set up landmarks (parameters are .msf section names)
-  // SetUpLandmarks1(m_AtlasMSFSectionName, m_PatientMSFSectionName);
+
+  // set up specific set of landmarks (parameters are .msf section names)
+  //SetUpLandmarks2(m_AtlasMSFSectionName, m_PatientMSFSectionName);
 
   //
   mafVME *RootVME;
@@ -2850,17 +2946,17 @@ void medOpMML3::CreateDefaultAxisLandmarks()
 //------------------------------------------------------------------------------
 // Apply scaling factor to axis landmarks.
 // Do this before uploading the landmarks to the model view.
-void medOpMML3::ApplyAxisScalingFactor()
+void medOpMML3::ApplyAxisRangeFactor()
 //------------------------------------------------------------------------------
 {
   int i ;
-  double s = m_AxisScalingFactor ;
+  double s = (m_AxisRangeFactor - 1.0) / 2.0 ;
 
   switch(m_MuscleType){
     case 1:
       // stretch landmarks 1 and 2 along the vector direction between them
       for (i = 0 ;  i < 3 ;  i++){
-        double dv = (s-1.0)*(m_Axis2Point[i] - m_Axis1Point[i]) ;
+        double dv = s*(m_Axis2Point[i] - m_Axis1Point[i]) ;
         m_Axis1Point[i] -= dv ;
         m_Axis2Point[i] += dv ;
       }
@@ -2868,8 +2964,8 @@ void medOpMML3::ApplyAxisScalingFactor()
     case 2:
       // stretch landmarks 1 and 3 away from the central landmark 2
       for (i = 0 ;  i < 3 ;  i++){
-        double dv12 = (s-1.0)*(m_Axis1Point[i] - m_Axis2Point[i]) ;
-        double dv32 = (s-1.0)*(m_Axis3Point[i] - m_Axis2Point[i]) ;
+        double dv12 = s*(m_Axis1Point[i] - m_Axis2Point[i]) ;
+        double dv32 = s*(m_Axis3Point[i] - m_Axis2Point[i]) ;
         m_Axis1Point[i] += dv12 ;
         m_Axis2Point[i] += dv32 ;
       }
@@ -3126,7 +3222,7 @@ bool medOpMML3::SetUpContourWidget()
   m_Widget->GetPlaneProperty()->SetOpacity(0.001);
   m_Widget->GetSelectedPlaneProperty()->SetColor(1.0, 1.0, 1.0);
   m_Widget->GetSelectedPlaneProperty()->SetOpacity(0.001);
-  //Widget->CenterModeOn();
+  //m_Widget->CenterModeOn();
   m_Widget->On(); // nb adds 1 to ref count of renderer, which is removed by Off() or deconstructor
 
   return 1;
@@ -3169,7 +3265,7 @@ void medOpMML3::SetUpModelViewInputs()
   // apply stretch to axis before uploading to model view
   // do this only if axis is calculated from selected landmarks
   if (m_AxisLandmarksFlag == 2)
-    ApplyAxisScalingFactor() ;
+    ApplyAxisRangeFactor() ;
 
   // set axis landmarks
   m_Model->SetLandmark1OfAxis(m_Axis1Point) ;
@@ -3292,6 +3388,8 @@ mafRWI* medOpMML3::CreateParameterViewmafRWI(vtkTextSource *ts, wxString lab, fl
 
   return rwi;
 }
+
+
 
 
 
@@ -3620,10 +3718,11 @@ void medOpMML3::SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSe
     mafVMELandmark *Landmark1AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark1AtlasVME);
 
     // get coordinates
-    Landmark1AtlasVMELandmark->GetPoint(a1);
+    GetAbsPosOfLandmark(Landmark1AtlasVMELandmark, a1) ;
 
     // set name
     m_L1Name = Landmark1AtlasVMELandmark->GetName();
+    m_L1Defined = true ;
   }
 
   // atlas - landmark 2
@@ -3639,10 +3738,12 @@ void medOpMML3::SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSe
     mafVMELandmark *Landmark2AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark2AtlasVME);
 
     // get coordinates
-    Landmark2AtlasVMELandmark->GetPoint(a2);
+    GetAbsPosOfLandmark(Landmark2AtlasVMELandmark, a2) ;
 
     // set name
     m_L2Name = Landmark2AtlasVMELandmark->GetName();
+    m_L2Defined = true ;
+
   }
 
   // atlas - landmark 3
@@ -3658,10 +3759,11 @@ void medOpMML3::SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSe
     mafVMELandmark *Landmark3AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark3AtlasVME);
 
     // get coordinates
-    Landmark3AtlasVMELandmark->GetPoint(a3);
+    GetAbsPosOfLandmark(Landmark3AtlasVMELandmark, a3) ;
 
     // set name
     m_L3Name = Landmark3AtlasVMELandmark->GetName();
+    m_L3Defined = true ;
   }
 
   // atlas - landmark 4
@@ -3681,6 +3783,7 @@ void medOpMML3::SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSe
 
     // set name
     m_L4Name = Landmark4AtlasVMELandmark->GetName();
+    m_L4Defined = true ;
   }
 
   // patient - landmark 1
@@ -3779,6 +3882,129 @@ void medOpMML3::SetUpLandmarks1(wxString AtlasSectionVMEName, wxString PatientSe
     m_P4Point[i] = p4[i];
   }
 }
+
+
+
+
+//----------------------------------------------------------------------------
+// Set up a specific set of landmarks
+void medOpMML3::SetUpLandmarks2(wxString AtlasSectionVMEName, wxString PatientSectionVMEName)
+//----------------------------------------------------------------------------
+{
+  // landmarks (names)
+  wxString Landmark1VMEName = "L1" ;
+  wxString Landmark2VMEName = "L2" ;
+  wxString Landmark3VMEName = "L3" ;
+
+  // names of atlas landmarks
+  m_L1Name = "none";
+  m_L2Name = "none";
+  m_L3Name = "none";
+  m_L4Name = "none";
+
+  // get root node
+  mafVME *RootVME = mafVME::SafeDownCast(m_Input->GetRoot());
+
+  // get atlas section node
+  mafVME *AtlasSectionVME = (mafVME*)(RootVME->FindInTreeByName(AtlasSectionVMEName));
+  if(AtlasSectionVME == NULL)
+  {
+    wxMessageBox("Can't find atlas section" + AtlasSectionVMEName,"alert",wxICON_WARNING);
+    return;
+  }
+
+  // get patient section node
+  mafVME *PatientSectionVME = (mafVME*)(RootVME->FindInTreeByName(PatientSectionVMEName));
+  if(PatientSectionVME == NULL)
+  {
+    wxMessageBox("Can't find patient section" + PatientSectionVMEName,"alert",wxICON_WARNING);
+    return;
+  }
+
+
+  // atlas - landmark 1
+  // get landmark node
+  mafVME *Landmark1AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark1VMEName));
+  if(Landmark1AtlasVME == NULL){
+    wxMessageBox("Expected " + Landmark1VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else{
+    // get landmark
+    mafVMELandmark *Landmark1AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark1AtlasVME);
+    GetAbsPosOfLandmark(Landmark1AtlasVMELandmark, m_L1Point) ;
+    m_L1Name = Landmark1AtlasVMELandmark->GetName();
+    m_L1Defined = true ;
+  }
+
+  // atlas - landmark 2
+  // get landmark node
+  mafVME *Landmark2AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark2VMEName));
+  if(Landmark2AtlasVME == NULL){
+    wxMessageBox("Expected " + Landmark2VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else{
+    // get landmark
+    mafVMELandmark *Landmark2AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark2AtlasVME);
+    GetAbsPosOfLandmark(Landmark2AtlasVMELandmark, m_L2Point) ;
+    m_L2Name = Landmark2AtlasVMELandmark->GetName();
+    m_L2Defined = true ;
+  }
+
+  // atlas - landmark 3
+  // get landmark node
+  mafVME *Landmark3AtlasVME = (mafVME*)(AtlasSectionVME->FindInTreeByName(Landmark3VMEName));
+  if(Landmark3AtlasVME == NULL){
+    wxMessageBox("Expected " + Landmark3VMEName + " in section " + AtlasSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else{
+    // get landmark
+    mafVMELandmark *Landmark3AtlasVMELandmark = mafVMELandmark::SafeDownCast(Landmark3AtlasVME);
+    GetAbsPosOfLandmark(Landmark3AtlasVMELandmark, m_L3Point) ;
+    m_L3Name = Landmark3AtlasVMELandmark->GetName();
+    m_L3Defined = true ;
+  }
+
+
+  // patient - landmark 1
+  // get landmark node
+  mafVME *Landmark1PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark1VMEName));
+  if(Landmark1PatientVME == NULL){
+    wxMessageBox("Expected " + Landmark1VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else{
+    // get landmark
+    mafVMELandmark *Landmark1PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark1PatientVME);
+    Landmark1PatientVMELandmark->GetPoint(m_P1Point);
+    m_P1Name = Landmark1PatientVMELandmark->GetName();
+  }
+
+  // patient - landmark 2
+  // get landmark node
+  mafVME *Landmark2PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark2VMEName));
+  if(Landmark2PatientVME == NULL){
+    wxMessageBox("Expected " + Landmark2VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else{
+    // get landmark
+    mafVMELandmark *Landmark2PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark2PatientVME);
+    Landmark2PatientVMELandmark->GetPoint(m_P2Point);
+    m_P2Name = Landmark2PatientVMELandmark->GetName();
+  }
+
+  // patient - landmark 3
+  // get landmark node
+  mafVME *Landmark3PatientVME = (mafVME*)(PatientSectionVME->FindInTreeByName(Landmark3VMEName));
+  if(Landmark3PatientVME == NULL){
+    wxMessageBox("Expected " + Landmark3VMEName + " in section " + PatientSectionVMEName + " is missing!","alert",wxICON_WARNING);
+  }
+  else{
+    // get landmark
+    mafVMELandmark *Landmark3PatientVMELandmark = mafVMELandmark::SafeDownCast(Landmark3PatientVME);
+    Landmark3PatientVMELandmark->GetPoint(m_P3Point);
+    m_P3Name = Landmark3PatientVMELandmark->GetName();
+  }
+}
+
 
 
 
