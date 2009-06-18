@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-18 10:15:56 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2009-06-18 17:43:20 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -1927,21 +1927,21 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 
 
-	double viaLocal[3],startLocal[3],endLocal[3],cCoord1[3],cCoord2[3],cCoord3[3],cCoord4[3],tmpCoord[3];
+	double viaLocal[3],startLocal[3],endLocal[3],cCoord1[3],cCoord2[3];//,tmpCoord[3],cCoord4[3],cCoord3[3]
 	double cCoord1_1[3],cCoord1_2[3],cCoord2_1[3],cCoord2_2[3],cCoord4_1[3],cCoord4_2[3];
-	double Zi,Zo,Zl,Zh;
+	double Zl,Zh;//Zi,Zo,
 
 	double zValue1,zValue2;
-	double cCoordGlobal1[3],cCoordGlobal2[3],cCoordGlobal3[3],cCoordGlobal4[3];
+	double cCoordGlobal1[3],cCoordGlobal2[3];//cCoordGlobal3[3],,cCoordGlobal4[3]
 	double p1[3],p12[3],p13[3],p4[3],p22[3],p23[3],p2Global[3],p1Global[3],p3Global[3],p4Global[3],v1[3],v2[3];
-	double testP2[3],testP3[3],flagP2[3];
-	double CIcurve,CIcurve1,CIcurve2 ;
+	double flagP2[3];//testP2[3],testP3[3],
+	//double CIcurve ;//,CIcurve1,CIcurve2
 	double d1,d2,dCurve12,dCurve34;
 	double center1[3],center2[3];
 	bool stopFlag = false;
-	double planeAB[3],planeAC[3];
+	//double planeAB[3];//,planeAC[3]
 	vtkPolyData *hCurve12,*hCurve34;
-	vtkLineSource *Line1,*Line2,*Line3,*Line4,*Line5;
+	vtkLineSource *Line1,*Line2,*Line3;//,*Line5;,*Line4
 	int idx1,idx2;
 	//--------------check distance between end point and center of object--------------
 	getGlobalCylinderCenter(center1,1);
@@ -2004,7 +2004,7 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 	//goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord3,NULL,4);//use distanceSum 4,use plane 2 or angleValue 1
 	//goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4,NULL,4);
 	//----------check match cCoord1-cCoord3 or cCoord1-cCoord4
-	d1 = sqrt(vtkMath::Distance2BetweenPoints(cCoord2_1,startLocal));
+/*	d1 = sqrt(vtkMath::Distance2BetweenPoints(cCoord2_1,startLocal));
 	d2 = sqrt(vtkMath::Distance2BetweenPoints(cCoord2_2,startLocal));
 	d1 += sqrt(vtkMath::Distance2BetweenPoints(cCoord2_1,p1));
 	d2 += sqrt(vtkMath::Distance2BetweenPoints(cCoord2_2,p1));
@@ -2016,12 +2016,16 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 	}
 	getWrapGlobalTransform(p1,p1Global,idx2);
 	getWrapGlobalTransform(p22,p2Global,idx2);
+*/
+	getWrapGlobalTransform(p1,p1Global,idx2);
+	getWrapGlobalTransform(cCoord2_1,cCoordGlobal1,idx2);
+	getWrapGlobalTransform(cCoord2_2,cCoordGlobal2,idx2);
+
+	chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,idx2,p2Global);
 	/*getWrapGlobalTransform(cCoord1,cCoordGlobal1,2);
 	getWrapGlobalTransform(cCoord3,cCoordGlobal3,2);
 	getWrapGlobalTransform(cCoord2,cCoordGlobal2,2);
 	getWrapGlobalTransform(cCoord4,cCoordGlobal4,2);*/
-
-
 	//-------------*get p4 from start point to vme 1*--------------------------
 	getWrapLocalTransform(m_EndPoint,endLocal,idx1);//last parameter means object index
 	getWrapLocalTransform(m_StartPoint,startLocal,idx1);//last parameter means object index
@@ -2176,6 +2180,9 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 		getWrapGlobalTransform(cCoord1,cCoordGlobal1,idx1);
 		getWrapGlobalTransform(cCoord2,cCoordGlobal2,idx1);
 
+		//choose by same side
+		chooseSameSidePoint(m_StartPoint,p4Global,cCoordGlobal1,cCoordGlobal2,idx1,p3Global);
+		/*choose by angle
 		v1[0]=m_EndPoint[0]-p1Global[0];v1[1] = m_EndPoint[1]-p1Global[1];v1[2]=m_EndPoint[2]-p1Global[2];//end-p1
 		v2[0]=cCoordGlobal1[0]-p2Global[0];  v2[1] = cCoordGlobal1[1]-p2Global[1];  v2[2]=cCoordGlobal1[2]-p2Global[2];	//p3-p2
 		// a dot b =|a|*|b|cosA
@@ -2190,7 +2197,7 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 			copyPointValue(cCoordGlobal1,p3Global);
 		}else{
 			copyPointValue(cCoordGlobal2,p3Global);
-		}
+		}*/
 		//-----------------test code------p2-p3------------------------------------
 		/*copyPointValue(p3Global,testP3);
 		copyPointValue(p2Global,testP2);
@@ -4202,7 +4209,7 @@ bool medVMEComputeWrapping::prepareData2(){
 	mafVMESurfaceParametric *surface2 = mafVMESurfaceParametric::SafeDownCast(wrapped_vme2);
 
 	double orientation[3];
-	int type1,type2;
+	int type1;//,type2;
 	bool rtn = false;
 	if (start_vme )
 	{
