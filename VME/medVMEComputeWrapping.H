@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-04-21 13:01:09 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-06-18 10:13:08 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -71,6 +71,7 @@ public:
 		WRAP_SPHERE_CYLINDER = 5,
 		WRAP_SPHERE_CYLINDER_2 = 6,
 		SINGLE_SPHERE2=7,
+		CYLINDER_CYLINDER=8,
 		INSIDE_FLAG = -1
 	};
 	enum WRAP_MODE_ID{
@@ -319,6 +320,7 @@ public:
 	mafVME *GetViaPointVME();
 	std::vector<mafVME *> GetWrappedVMEList();
 
+
 	/** Get the link to the surface.*/
 	mafNode::mafLinksMap *GetMidPointsLinks();
 
@@ -347,8 +349,10 @@ public:
 	double *GetWrappedGeometryTangent2(){ return m_WrappedTangent2;};
 
 	/**Set\Get modality of wrapped vme (AUTOMATIC OR MANUAL)*/
-	int GetWrappedMode(){return m_WrappedMode;};
-	void SetWrappedMode(int value){m_WrappedMode = value;};
+	int GetWrappedMode1(){return m_WrappedMode1;};
+	void SetWrappedMode1(int value){m_WrappedMode1 = value;};
+	int GetWrappedMode2(){return m_WrappedMode2;};
+	void SetWrappedMode2(int value){m_WrappedMode2 = value;};
 
 	  int GetWrappedClass(){return m_WrappedClass;};
 	  void SetWrappedClass(int value){m_WrappedClass = value;};
@@ -362,6 +366,9 @@ public:
 	void SetWrapReverse(int value){m_WrapReverse = value;};
 
 	void AddMidPoint(mafNode *node);
+	double *GetExportPointCoordinate(int index);
+	/**Return Number of export points*/
+	int GetNumberExportPoints(){return m_ExportPointList.size();};
 
 protected:
 	medVMEComputeWrapping();
@@ -439,6 +446,7 @@ protected:
 	double getPi();
 	void getGlobalSphereCenter(double *sphCoord);
 	void getGlobalCylinderCenter(double *cylCoord);
+	void getGlobalCylinderCenter(double *cylCoord,int objIdx);
 	double goldenSectionSearch(double a,double b,double x,double accuracy);
 	//double getFunctionValue(double x,double *aCoord,double *bCoord);
 	double computeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm);
@@ -451,16 +459,22 @@ protected:
 	double getCutPlane();
 	double getSphereRadius();
 	double getCylinderRadius();
+	double getCylinderRadius(int objIdx);
 	//double caculateHelix(vtkPolyData * hCurve);
 	//double computeHelixCost(double tc,double to,double c,double k);
 	//void changeXZ(double *dCoord ,double *scoord);
 	double drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag);
+	double drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx);
 	void getSphereCylinderWrap(const int step,double *viaPoint);
+	void getCylinderCylinderWrap(const int step);
+	double getPointLineDistance(double *point,double *Lpoint1,double *Lpoint2);
 
 	double getFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm);
 	double getCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *outCurve);
 	double caculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag);
+	double caculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx);
 	bool getCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2);
+		bool getCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2,int objIdx);
 	bool getBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2);
 	double testPlane(double *a,double *b,double *c,double *d);
 	double computeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord);
@@ -474,10 +488,13 @@ protected:
 	void processViaPoint();
 
 	void getWrapLocalTransform(double *inCoord,double *outCoord);
+	void getWrapLocalTransform(double *inCoord,double *outCoord,int objIdx);
 	void getWrapGlobalTransform(double *inCoord,double *outCoord);
+	void getWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx);
 	void getWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB);
 	// void getWrapMatrix(mafMatrix *inMx,mafMatrix *inMy);
 	void getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy);
+	void getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx);
 
 	int GetViaPoint(double *viaPoint,bool isNearEndflag);
 	void computeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord);
@@ -489,10 +506,13 @@ protected:
 	void wrapCylinderOnly(const int step);
 	void wrapSingleCylinder(double vId);//for double wrap cylinder
 	void wrapSphereOnly(const int step,bool allowIntersectFlag);//allowIntersectFlag if allow intersect with cylinder
+
+	//void wrapSphereCylinderSeparately(const int step,bool allowIntersectFlag);
+	
 	double computeDistanceOfLm3(double *start,double *cCoord,double *iCoord);
 	double getCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData);
 	double goldenSectionSearch2(double a,double b,double x,double accuracy);
-	void getCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2);
+	void getCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx);
 	bool isEndPonintOnCylinder(double tolerance,double *endWrapLocal);
 	bool isLineInterSectObject(mafVME *wrapVME,double *point1,double *point2);
 
@@ -507,9 +527,16 @@ protected:
 	void transformOutputClipData(vtkPolyData *clipData);
 	bool checkAlign();
 	bool checkTwoRadius();
+	bool checkNearEnough(double *firstPoint,double *secondPoint);
+
 	mafGUI* CreateGuiForNewMeter( mafGUI *gui );
 	mafGUI* CreateGuiForOldMeter( mafGUI *gui );
+	void getCylinderAxis(mafVME *wrapped_vme,int objIdx);
+	void chooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint);
+	
+
 	//------------------new function -------------------
+
 
 
 
@@ -535,7 +562,8 @@ protected:
 	double m_WrappedVMECenter2[3];
 	double m_WrappedTangent1[3];
 	double m_WrappedTangent2[3];
-	double m_CylinderAxis[3];
+	double m_CylinderAxis1[3];
+	double m_CylinderAxis2[3];
 	double m_SphereAxis[3];
 
 	double m_ViaPoint[3];
@@ -563,9 +591,10 @@ protected:
 	std::vector<vtkLineSource *> m_LineSourceList; //list of PolyData
 
 	std::vector<double *> m_MiddlePointList; // list of coordinates
+	std::vector<double *> m_ExportPointList; // list of coordinates
 	std::vector<int> m_OrderMiddlePointsVMEList; //order list of VME ID
 	std::vector<mafString> m_OrderMiddlePointsNameVMEList; //order list of VME Name
-	std::vector<mafString> m_TestList;
+	std::vector<mafString> m_testList;
 	
 
 	int              m_OrderMiddlePointsVMEListNumberOfElements;
@@ -587,16 +616,17 @@ protected:
 
 	mafMatrix3x3 *m_Mat;
 	mafMatrix3x3 *m_Imat;
-	mafMatrix m_InMx,m_InMy;
-	mafMatrix m_OutMx,m_OutMy;
+	mafMatrix m_InMx2,m_InMy2,m_InMx1,m_InMy1;
+	mafMatrix m_OutMx2,m_OutMy2,m_OutMx1,m_OutMy1;
 
 	wxListBox *m_ListBox;
-	int        m_WrappedMode;
+	int        m_WrappedMode1;
+	int        m_WrappedMode2;
 	int      m_WrappedClass;
 	int        m_WrapSide;
 	int        m_WrapReverse;
 	//---------------interface -------------
-	wxBoxSizer* m_BSizer;
+	wxBoxSizer* bSizer;
 	mafGUI *m_GuiNewMeter;
 	mafGUI *m_GuiOldMeter; 
 
