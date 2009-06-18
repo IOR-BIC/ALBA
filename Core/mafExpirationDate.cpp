@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-17 11:56:57 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-06-18 08:43:22 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,15 @@
 #include "wx/filefn.h"
 #include "wx/stdpaths.h"
 #include <wx/app.h>
+
+#define ZERO 0x30 
+#define NINE 0x39
+
+#define AUP 0x41 
+#define ZUP 0x5A
+
+#define ADOWN 0x61 
+#define ZDOWN 0x7A
 
 //----------------------------------------------------------------------------
 mafExpirationDate::mafExpirationDate(int trialNumberOfDays)
@@ -65,7 +74,7 @@ m_ExpirationDate(NULL)
   short j=0, sizeC = check.length();
   for(; j<sizeC; j++)
   {
-    if(((char)check[j]) < 0x30 || ((char)check[j]) > 0x39) //is not a digit
+    if(((char)check[j]) < ZERO || ((char)check[j]) > NINE) //is not a digit
     {
       indexOfSeparator = j;
       break;
@@ -120,17 +129,39 @@ void mafExpirationDate::InitializePathFileName()
       wxMkdir(dir.c_str());
     } 
     m_ControlFileName = dir.c_str();
-    std::string appname = wxApp::GetInstance()->GetAppName();
-    m_ControlFileName.append("/.2000-1456-DPNA-HLCKUSER-FFA6"); //fantasy name
-    m_PermanentExpirationFileName = dir.c_str();
-    m_PermanentExpirationFileName.append("/.CRC-9801-1344-MACH-FF55"); //fantasy name
+    m_ControlFileName.append("/../");
+		std::string dirAppname = wxApp::GetInstance()->GetAppName();
+		Obfuscate(dirAppname);
+    m_ControlFileName.append(dirAppname);
+    m_ControlFileName.append("/");
+		if (!wxDirExists(m_ControlFileName.c_str()))
+		{
+			wxMkdir(m_ControlFileName.c_str());
+		} 
+		std::string fileAppname = wxApp::GetInstance()->GetAppName();
+		Obfuscate(fileAppname);
+		m_ControlFileName.append(fileAppname);
+    m_PermanentExpirationFileName = m_ControlFileName;
+    m_PermanentExpirationFileName.append("f");
   }
   else
   {
     m_ControlFileName = wxGetCwd();
-    m_ControlFileName.append("/.2000-1456-DPNA-HLCKUSER-FFA6"); //fantasy name
-    m_PermanentExpirationFileName = wxGetCwd();
-    m_PermanentExpirationFileName.append("/.CRC-9801-1344-MACH-FF55"); //fantasy name
+		m_ControlFileName.append("/../");
+    std::string dirConsole = "console";
+		Obfuscate(dirConsole);
+		m_ControlFileName.append(dirConsole);
+		m_ControlFileName.append("/");
+		if (!wxDirExists(m_ControlFileName.c_str()))
+		{
+			wxMkdir(m_ControlFileName.c_str());
+		} 
+		std::string fileConsole = "console";
+		Obfuscate(fileConsole);
+    m_ControlFileName.append(fileConsole); 
+		
+		m_PermanentExpirationFileName = m_ControlFileName;
+		m_PermanentExpirationFileName.append("f");
   }
 }
 //----------------------------------------------------------------------------
@@ -342,4 +373,35 @@ void mafExpirationDate::ActivatePermanentExpiration()
   std::ofstream os;
   os.open(m_PermanentExpirationFileName.c_str());
   os.close();
+}
+//----------------------------------------------------------------------------
+void mafExpirationDate::Obfuscate(std::string &toObfuscate) 
+//----------------------------------------------------------------------------
+{
+  int i=0, size = toObfuscate.size();
+	int number = 0;
+  for( ; i < size; ++i )
+  {
+		number += (int) toObfuscate[i];
+    if(toObfuscate[i] >= ZERO && toObfuscate[i] <= NINE)
+		{
+			toObfuscate[i] = (toObfuscate[i]-ZERO)>(NINE-toObfuscate[i])?(NINE-(toObfuscate[i]-ZERO)):(ZERO+(NINE-toObfuscate[i]));
+		}
+		else if (toObfuscate[i] >= AUP && toObfuscate[i] <= ZUP)
+    {
+      toObfuscate[i] = (toObfuscate[i]-AUP)>(ZUP-toObfuscate[i])?(ZUP-(toObfuscate[i]-AUP)):(AUP+(ZUP-toObfuscate[i]));
+    }
+		else if((toObfuscate[i] >= ADOWN && toObfuscate[i] <= ZDOWN))
+		{
+			toObfuscate[i] = (toObfuscate[i]-ADOWN)>(ZDOWN-toObfuscate[i])?(ZDOWN-(toObfuscate[i]-ADOWN)):(ADOWN+(ZDOWN-toObfuscate[i]));
+			toObfuscate[i] -= 0x20; //upper case
+		}
+		else
+		{
+      toObfuscate[i] = ZERO;
+		}
+  }
+	char num[10];
+	sprintf(num,"%d",number);
+	toObfuscate.append(num);
 }

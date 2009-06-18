@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-12 14:58:48 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-06-18 08:43:22 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -58,6 +58,9 @@ private:
   bool CheckPermanentExpiration();
   /** activate permanent expiration. */
   void ActivatePermanentExpiration();
+	/** Simple Obfuscator for filename*/
+  void Obfuscate(std::string &toObfuscate);
+
   
   wxDateTime *m_CurrentDateTime;
   wxDateTime *m_LastDateTime;
