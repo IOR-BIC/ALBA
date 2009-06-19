@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFGridActor.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-06-19 12:48:08 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -50,15 +50,21 @@ POSSIBILITY OF SUCH DAMAGES.
 
 #define DEFAULT_GRID_COLOR 0.5
 
+//-----------------------------------------------------------------------------
+// Includes:
+//-----------------------------------------------------------------------------
 #include "vtkMAFConfigure.h"
-
 #include "vtkActor.h"
 #include "vtkTextActor.h"
 
+//-----------------------------------------------------------------------------
+// Forward declarations:
+//-----------------------------------------------------------------------------
 class vtkViewport;
 class vtkCamera;
+
 //-----------------------------------------------------------------------------
-// constants:
+// Constants:
 //-----------------------------------------------------------------------------
 enum GRID_ACTOR_ORIENTATION
 { 
@@ -82,26 +88,41 @@ class VTK_vtkMAF_EXPORT vtkMAFGridActor : public vtkActor
 //-----------------------------------------------------------------------------
 {
  public:
+  /** RTTI macro. */
   vtkTypeRevisionMacro(vtkMAFGridActor,vtkActor);
+  /** Print information regarding the status of the object. */
   void PrintSelf(ostream& os, vtkIndent indent);
+  /** Create an instance of the object. */
   static	vtkMAFGridActor *New();
+  
+  /** Set the normal of the grid.*/
+	void			SetGridNormal   (int normal_id = GRID_Z);
+  /** Set the position of the grid regarding along the normal.*/
+	void			SetGridPosition (double position);
+  /** Set grid color .*/
+	void			SetGridColor    (double r,double g,double b);
+  /** Retrieve the label actor that is initialized with grid scale value.*/
+	vtkTextActor		 *GetLabelActor() {return Label;};
 
-					 void			SetGridNormal   (int normal_id = GRID_Z);
-					 void			SetGridPosition (double position);
-					 void			SetGridColor    (double r,double g,double b);
-	 vtkTextActor		 *GetLabelActor() {return Label;};
-
+  /** Adjust the clipping range (this method is empty).*/
   virtual  void 		AdjustClippingRange(vtkViewport *viewport);
+  /** Method is intended for rendering Opaque Geometry.*/
   virtual  int			RenderOpaqueGeometry(vtkViewport *viewport);
+  /** Method is intended for rendering Translucent Geometry. */
   virtual  int			RenderTranslucentGeometry(vtkViewport *viewport);
 
 protected:
-										vtkMAFGridActor();
-									 ~vtkMAFGridActor();
+  /** constructor. */
+  vtkMAFGridActor();
+  /** destructor. */
+  ~vtkMAFGridActor();
 
-					 void			GridCreate ();
-           void			GridUpdate(vtkCamera *camera);
-          double		Round(double val);
+  /** Create an instance of the grid that is a polydata.*/
+	void			GridCreate ();
+  /** Update grid position, label , scale.*/
+  void			GridUpdate(vtkCamera *camera);
+  /** Round a double value. Used to calculate the grid scale*/
+  double		Round(double val);
 
 	int 							GridSize;
 	float 						GridScale;
@@ -113,10 +134,11 @@ protected:
 	vtkTextActor     *Label; 
 
 private:
-  // hide the two parameter Render() method from the user and the compiler.
+  /** Hide the two parameter Render() method from the user and the compiler.*/
   virtual void Render(vtkRenderer *, vtkMapper *) {};
-private:
+  /** Copy Constructor Not implemented. */
   vtkMAFGridActor(const vtkMAFGridActor&);  	// Not implemented.
+  /** Assign Operator Not implemented. */
   void operator=(const vtkMAFGridActor&);  // Not implemented.
 };
 #endif
