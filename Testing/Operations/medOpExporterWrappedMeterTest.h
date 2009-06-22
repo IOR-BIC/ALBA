@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterWrappedMeterTest.h,v $
 Language:  C++
-Date:      $Date: 2007-08-27 13:02:23 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-06-22 17:08:51 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -30,6 +30,7 @@ class medOpExporterWrappedMeterTest : public CPPUNIT_NS::TestFixture
 
   protected:
     void Test();
+	void meterImplement();
 };
 
 
