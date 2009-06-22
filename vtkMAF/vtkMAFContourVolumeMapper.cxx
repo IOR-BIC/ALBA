@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2009-06-22 11:09:37 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-06-22 13:29:05 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,9 +105,8 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkMAFContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.4 $");
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkMAFContourVolumeMapper);
-
 
 
 //------------------------------------------------------------------------------
@@ -955,7 +954,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
     // allocate caches for each lod in range
     // since we are caching, NumberOfTriangles[LODLevel] must be valid, so we allocate all caches to this value
     for (lod = firstLOD ; lod <= lastLOD ;  lod++) {
-      if ((int)this->TriangleCacheSize[lod] < this->NumberOfTriangles[LODLevel] || this->TriangleCache[lod] == NULL) {
+      if (this->TriangleCacheSize[lod] < this->NumberOfTriangles[LODLevel] || this->TriangleCache[lod] == NULL) {
         // if cache not big enough, or not defined, reallocate cache
         // 3 vertices per triangle, 3 normals + 3 coords per vertex = 18
         delete [] this->TriangleCache[lod];
@@ -1233,7 +1232,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
                 // loop through all edges in list
                 while(*edge >= 0) {
                   // check that memory is not about to be exceeded
-                  if (createCache && (numTrianglesRunningTotal[lod] >= (int)this->TriangleCacheSize[lod])){
+                  if (createCache && (numTrianglesRunningTotal[lod] >= this->TriangleCacheSize[lod])){
                     vtkErrorMacro("no. of triangles exceeded allocated cache size\n") ;
                     break ;
                   }
@@ -1279,7 +1278,7 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
                       // float scalars the normals are not computed correctly because of the cast to int. 
                       // any assignment to gradient array should not be casted to int.
                       // (bug 1673)
-                      DataType gradient[2][3];
+                      float gradient[2][3];
                       for (int vi = 0; vi < 2; vi++) {
                         // calculate pointer to vert0 or vert1
                         // you can check that this corresponds to (vx,vy,vz) using PointerFromIndices()
@@ -1288,29 +1287,29 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
                         // gradient in x
                         const int vx = x + lodxy*vertIndeces[vi][0];    // x index of vertex
                         if (vx == 0)
-                          gradient[vi][0] = (DataType)(verticePtr[1] - verticePtr[0]) ;
+                          gradient[vi][0] = (float)(verticePtr[1] - verticePtr[0]) ;
                         else if (vx >= lastIndex[0])
-                          gradient[vi][0] = (DataType)(verticePtr[0] - verticePtr[-1]) ;
+                          gradient[vi][0] = (float)(verticePtr[0] - verticePtr[-1]) ;
                         else
-                          gradient[vi][0] = ((DataType)(verticePtr[1] - verticePtr[-1])) /2 ;
+                          gradient[vi][0] = ((float)(verticePtr[1] - verticePtr[-1])) /2 ;
 
                         // gradient in y
                         const int vy = y + lodxy*vertIndeces[vi][1];    // y index of vertex
                         if (vy == 0)
-                          gradient[vi][1] = (DataType)(verticePtr[rowSize] - verticePtr[0]) ;
+                          gradient[vi][1] = (float)(verticePtr[rowSize] - verticePtr[0]) ;
                         else if (vy >= lastIndex[1])
-                          gradient[vi][1] = (DataType)(verticePtr[0] - verticePtr[-rowSize]) ;
+                          gradient[vi][1] = (float)(verticePtr[0] - verticePtr[-rowSize]) ;
                         else
-                          gradient[vi][1] = ((DataType)(verticePtr[rowSize] - verticePtr[-rowSize])) /2 ;
+                          gradient[vi][1] = ((float)(verticePtr[rowSize] - verticePtr[-rowSize])) /2 ;
 
                         // gradient in z
                         const int vz = z + lodz*vertIndeces[vi][2];     // z index of vertex
                         if (vz == 0)
-                          gradient[vi][2] = (DataType)(verticePtr[sliceSize] - verticePtr[0]) ;
+                          gradient[vi][2] = (float)(verticePtr[sliceSize] - verticePtr[0]) ;
                         else if (vz >= lastIndex[2])
-                          gradient[vi][2] = (DataType)(verticePtr[0] - verticePtr[-sliceSize]) ;
+                          gradient[vi][2] = (float)(verticePtr[0] - verticePtr[-sliceSize]) ;
                         else
-                          gradient[vi][2] = ((DataType)(verticePtr[sliceSize] - verticePtr[-sliceSize])) /2 ;
+                          gradient[vi][2] = ((float)(verticePtr[sliceSize] - verticePtr[-sliceSize])) /2 ;
 
                       }
 
