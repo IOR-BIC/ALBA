@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.cxx,v $
 Language:  C++
-Date:      $Date: 2009-05-12 14:54:02 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-06-22 11:09:37 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -105,7 +105,7 @@ static const vtkMarchingCubesTriangleCases* marchingCubesCases = vtkMarchingCube
 
 using namespace vtkMAFContourVolumeMapperNamespace;
 
-vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMAFContourVolumeMapper, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMAFContourVolumeMapper);
 
 
@@ -1274,7 +1274,12 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
                       // estimate gradients at vert0 and vert1
                       // use central difference except at edges
                       // reminder: x, y and z are indices of voxel in volume
-                      int gradient[2][3];
+
+                      //achiarini: I'm using DataType array instead of int, as for 
+                      // float scalars the normals are not computed correctly because of the cast to int. 
+                      // any assignment to gradient array should not be casted to int.
+                      // (bug 1673)
+                      DataType gradient[2][3];
                       for (int vi = 0; vi < 2; vi++) {
                         // calculate pointer to vert0 or vert1
                         // you can check that this corresponds to (vx,vy,vz) using PointerFromIndices()
@@ -1283,29 +1288,29 @@ template<typename DataType> void vtkMAFContourVolumeMapper::RenderMCubes(vtkRend
                         // gradient in x
                         const int vx = x + lodxy*vertIndeces[vi][0];    // x index of vertex
                         if (vx == 0)
-                          gradient[vi][0] = (int)(verticePtr[1] - verticePtr[0]) ;
+                          gradient[vi][0] = (DataType)(verticePtr[1] - verticePtr[0]) ;
                         else if (vx >= lastIndex[0])
-                          gradient[vi][0] = (int)(verticePtr[0] - verticePtr[-1]) ;
+                          gradient[vi][0] = (DataType)(verticePtr[0] - verticePtr[-1]) ;
                         else
-                          gradient[vi][0] = ((int)(verticePtr[1] - verticePtr[-1])) >> 1 ;
+                          gradient[vi][0] = ((DataType)(verticePtr[1] - verticePtr[-1])) /2 ;
 
                         // gradient in y
                         const int vy = y + lodxy*vertIndeces[vi][1];    // y index of vertex
                         if (vy == 0)
-                          gradient[vi][1] = (int)(verticePtr[rowSize] - verticePtr[0]) ;
+                          gradient[vi][1] = (DataType)(verticePtr[rowSize] - verticePtr[0]) ;
                         else if (vy >= lastIndex[1])
-                          gradient[vi][1] = (int)(verticePtr[0] - verticePtr[-rowSize]) ;
+                          gradient[vi][1] = (DataType)(verticePtr[0] - verticePtr[-rowSize]) ;
                         else
-                          gradient[vi][1] = ((int)(verticePtr[rowSize] - verticePtr[-rowSize])) >> 1 ;
+                          gradient[vi][1] = ((DataType)(verticePtr[rowSize] - verticePtr[-rowSize])) /2 ;
 
                         // gradient in z
                         const int vz = z + lodz*vertIndeces[vi][2];     // z index of vertex
                         if (vz == 0)
-                          gradient[vi][2] = (int)(verticePtr[sliceSize] - verticePtr[0]) ;
+                          gradient[vi][2] = (DataType)(verticePtr[sliceSize] - verticePtr[0]) ;
                         else if (vz >= lastIndex[2])
-                          gradient[vi][2] = (int)(verticePtr[0] - verticePtr[-sliceSize]) ;
+                          gradient[vi][2] = (DataType)(verticePtr[0] - verticePtr[-sliceSize]) ;
                         else
-                          gradient[vi][2] = ((int)(verticePtr[sliceSize] - verticePtr[-sliceSize])) >> 1 ;
+                          gradient[vi][2] = ((DataType)(verticePtr[sliceSize] - verticePtr[-sliceSize])) /2 ;
 
                       }
 
