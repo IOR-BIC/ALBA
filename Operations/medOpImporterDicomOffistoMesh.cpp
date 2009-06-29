@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffistoMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-15 14:33:23 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-06-29 10:33:43 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -507,7 +507,9 @@ int medOpImporterDicomOffisToMesh::BuildVolumeCineMRI()
     int scalarCounter = 0;
     vtkPolyData *poly1;
 
-    for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+    int sourceVolumeSliceId ;
+    int targetVolumeSliceId ;
+    for (sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
     {
        poly1 = ExtractPolyData(ts,sourceVolumeSliceId);
        poly1->Update();
