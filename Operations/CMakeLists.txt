@@ -128,10 +128,7 @@ IF (MED_USE_Offis)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
   medOpImporterDicomOffis.h
   medOpImporterDicomOffis.cpp
-  
-  medOpImporterDicomOffistoMesh.cpp
-  medOpImporterDicomOffistoMesh.h
-)
+   )
 ENDIF (MED_USE_Offis)
 
   
