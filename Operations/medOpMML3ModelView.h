@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.h,v $
 Language:  C++
-Date:      $Date: 2009-06-16 15:11:52 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-06-30 15:35:59 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,7 +52,6 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTextMapper.h"
 
 #define MAX_CHARS 512
-#define MAX_SLICES 250
 
 
 
@@ -233,12 +232,12 @@ public:
   vtkKochanekSpline* GetSSSpline() const {return m_SouthScalingSpline ;}
   vtkKochanekSpline* GetSNSpline() const {return m_NorthScalingSpline ;}
 
-  vtkActor* GetPositiveXAxisActor() const {return m_PosXAxisActor ;}
-  vtkActor* GetNegativeXAxisActor() const {return m_NegXAxisActor ;}
-  vtkActor* GetPositiveYAxisActor() const {return m_PosYAxisActor ;}
-  vtkActor* GetNegativeYAxisActor() const {return m_NegYAxisActor ;}
-  vtkActor* GetPositiveZAxisActor() const {return m_PosZAxisActor ;}
-  vtkActor* GetNegativeZAxisActor() const {return m_NegZAxisActor ;}
+  vtkActor* GetPositiveXAxisActor() const {return m_GlobalPosXAxisActor ;}
+  vtkActor* GetNegativeXAxisActor() const {return m_GlobalNegXAxisActor ;}
+  vtkActor* GetPositiveYAxisActor() const {return m_GlobalPosYAxisActor ;}
+  vtkActor* GetNegativeYAxisActor() const {return m_GlobalNegYAxisActor ;}
+  vtkActor* GetPositiveZAxisActor() const {return m_GlobalPosZAxisActor ;}
+  vtkActor* GetNegativeZAxisActor() const {return m_GlobalNegZAxisActor ;}
 
   vtkActor* GetContourActor() const {return m_ContourActor ;}
 
@@ -431,27 +430,27 @@ protected:
 
   // 2d axes - action line system
   vtkLineSource *m_PosXAxisLineSource; // positive x
-  vtkActor *m_PosXAxisActor;
+  vtkActor *m_GlobalPosXAxisActor;
   vtkTubeFilter *m_PosXAxisAxesTubeFilter;
   vtkPolyDataMapper *m_PosXAxisPolyDataMapper;
   vtkLineSource *m_PosYAxisLineSource; // positive y
-  vtkActor *m_PosYAxisActor;
+  vtkActor *m_GlobalPosYAxisActor;
   vtkTubeFilter *m_PosYAxisAxesTubeFilter;
   vtkPolyDataMapper *m_PosYAxisPolyDataMapper;
   vtkLineSource *m_NegXAxisLineSource; // negative x
-  vtkActor *m_NegXAxisActor;
+  vtkActor *m_GlobalNegXAxisActor;
   vtkTubeFilter *m_NegXAxisAxesTubeFilter;
   vtkPolyDataMapper *m_NegXAxisPolyDataMapper;
   vtkLineSource *m_NegYAxisLineSource; // negative y
-  vtkActor *m_NegYAxisActor;
+  vtkActor *m_GlobalNegYAxisActor;
   vtkTubeFilter *m_NegYAxisAxesTubeFilter;
   vtkPolyDataMapper *m_NegYAxisPolyDataMapper;
   vtkLineSource *m_PosZAxisLineSource; // positive z (3d display only)
-  vtkActor *m_PosZAxisActor;
+  vtkActor *m_GlobalPosZAxisActor;
   vtkTubeFilter *m_PosZAxisAxesTubeFilter;
   vtkPolyDataMapper *m_PosZAxisPolyDataMapper;
   vtkLineSource *m_NegZAxisLineSource; // negative z (3d display only)
-  vtkActor *m_NegZAxisActor;
+  vtkActor *m_GlobalNegZAxisActor;
   vtkTubeFilter *m_NegZAxisAxesTubeFilter;
   vtkPolyDataMapper *m_NegZAxisPolyDataMapper;
 

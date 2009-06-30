@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-18 16:57:24 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-06-30 15:35:59 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -78,6 +78,7 @@ enum
   ID_CHOOSE_AXIS3,
   ID_CHOOSE_SLICEXYZ,
   ID_CHOOSE_FLAG3D,
+  ID_CHOOSE_NONUNIFORM,
   ID_CHOOSE_FAKE, // dummy id with no associated event
   ID_CHOOSE_OK,
   ID_CHOOSE_CANCEL,
@@ -176,9 +177,10 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_AxisLandmarksFlag = 1 ;
 
   m_ScansGrain = 128 ;  // resolution of slices
-  m_ScansNumber = 12 ;  // no. of slices
+  m_NumberOfSlices = 12 ;  // no. of slices
+  m_NonUniformSliceSpacing = 0 ; // switch off non-uniform slicing
   m_AxisRangeFactor = 1.1 ; // range factor for axis
-  m_MuscleType = 1;     // 1 for simple axis, 2 for piecewise axis
+  m_MuscleType = 1 ;     // 1 for simple axis, 2 for piecewise axis
 
   // Model maf RWIs
   m_ModelmafRWI = NULL;
@@ -254,7 +256,9 @@ void medOpMML3::OpStop(int result) {	mafEventMacro(mafEvent(this,result));}
 void medOpMML3::OpRun()   
 //----------------------------------------------------------------------------
 {
+  //----------------------------------------------------------------------------
   // create inputs dialog
+  //----------------------------------------------------------------------------
   CreateInputsDlg() ;  
 
   int returnCode = m_ChooseDlg->GetReturnCode() ;
@@ -274,10 +278,32 @@ void medOpMML3::OpRun()
   }
 
 
+  //----------------------------------------------------------------------------
   // get the vtk inputs
+  //----------------------------------------------------------------------------
   GetVtkInputs() ;
 
+
+  //----------------------------------------------------------------------------
+  // create the non-uniform slices dialog
+  //----------------------------------------------------------------------------
+  if (m_NonUniformSliceSpacing == 1){
+    CreateNonUniformSlicesDlg() ;
+
+    //int returnCode = m_NonUniformSlicesDlg->GetReturnCode() ;
+    DeleteNonUniformSlicesDlg() ;
+
+    if (returnCode != wxID_OK){
+      // not ok, but no need to stop whole operation
+      // just set back to uniform slicing
+      m_NonUniformSliceSpacing = false ;
+    }
+  }
+
+
+  //----------------------------------------------------------------------------
   // create registration dialog
+  //----------------------------------------------------------------------------
   CreateRegistrationDlg(); 
 
   int res = (m_OpDlg->GetReturnCode() == wxID_OK) ? OP_RUN_OK : OP_RUN_CANCEL;
@@ -426,14 +452,23 @@ void medOpMML3::CreateInputsDlg()
   vs1->AddSpacer(20) ;
 
 
-  // number of scans
+  // number of slices
   wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Number of slices (3 or more)", wxPoint(0,0), wxSize(150,20));
-  m_ScansNumberTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  m_ScansNumberTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_ScansNumberTxt, &m_ScansNumber, 3, 10000)); // min/max values
+  m_NumberOfSlicesTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
+  m_NumberOfSlicesTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_NumberOfSlicesTxt, &m_NumberOfSlices, 3, 10000)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
-  ScansNumberHorizontalSizer->Add(m_ScansNumberTxt,1,wxEXPAND);
+  ScansNumberHorizontalSizer->Add(m_NumberOfSlicesTxt,1,wxEXPAND);
+  ScansNumberHorizontalSizer->AddSpacer(20) ;
+
+  // non-uniform slice spacing check box
+  wxStaticText *nonUniformLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Non-uniform slicing", wxPoint(0,0), wxSize(150,20));
+  wxCheckBox *nonUniformCheckBox = new wxCheckBox(m_ChooseDlg, ID_CHOOSE_NONUNIFORM, "", wxPoint(0,0), wxSize(80,20)) ;
+  nonUniformCheckBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_NONUNIFORM, nonUniformCheckBox, &m_NonUniformSliceSpacing));
+  ScansNumberHorizontalSizer->Add(nonUniformLab, 0);
+  ScansNumberHorizontalSizer->Add(nonUniformCheckBox,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(ScansNumberHorizontalSizer,0,wxEXPAND | wxALL, 2);
+
 
   // scans resolution
   wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice resolution (64-1024)", wxPoint(0,0), wxSize(150,20));
@@ -614,7 +649,7 @@ void medOpMML3::CreateRegistrationDlg()
   button_Plus1->SetListener(this) ;
   mafGUIButton *button_Plus10 = new mafGUIButton(m_OpDlg, ID_PLUS10, ">>", wxPoint(0,0), wxSize(30,20)) ; 
   button_Plus10->SetListener(this) ;
-  wxSlider *slider_slicepos  = new wxSlider(m_OpDlg, ID_SLICE, 0, 0, m_ScansNumber-1, wxPoint(0,0), wxSize(269,-1));
+  wxSlider *slider_slicepos  = new wxSlider(m_OpDlg, ID_SLICE, 0, 0, m_NumberOfSlices-1, wxPoint(0,0), wxSize(269,-1));
   slider_slicepos->SetValidator(mafGUIValidator(this, ID_SLICE, (wxSlider*)slider_slicepos, &m_CurrentSlice, text_slicepos));
 
 
@@ -783,6 +818,35 @@ void medOpMML3::DeleteRegistrationDlg()
 
 
 
+
+
+//------------------------------------------------------------------------------
+// Dialog to input non-uniform slice spacing
+void medOpMML3::CreateNonUniformSlicesDlg()
+//------------------------------------------------------------------------------
+{
+  // initialize the numbers in each section so that they add up to m_NumberOfSlices
+  // and the distribution is as uniform as possible
+  for (int i = 0 ;  i < NumberOfNonUniformSections ;  i++)
+    m_SlicesInSection[i] = 0 ;
+  for (int ntotal = 0 ;  ntotal < m_NumberOfSlices ;  ntotal++){
+    int i = ntotal % NumberOfNonUniformSections ; // index of section
+    m_SlicesInSection[i]++ ;
+  }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Delete non-uniform slice spacing dialog
+void medOpMML3::DeleteNonUniformSlicesDlg()
+//------------------------------------------------------------------------------
+{
+}
+
+
+
 //------------------------------------------------------------------------------
 // Get vtk data for volume and surface
 // Must run inputs dialog first 
@@ -860,6 +924,10 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
 
     case ID_CHOOSE_AXIS2: // set up dlg to select axis 2
       OnLandmarkAxis2AtlasSelection();
+      break;
+
+    case ID_CHOOSE_AXIS3: // set up dlg to select axis 2
+      OnLandmarkAxis3AtlasSelection();
       break;
 
     case ID_CHOOSE_OK: // set up dlg ok
@@ -1261,8 +1329,8 @@ void medOpMML3::OnPlus1()
   m_CurrentSlice += 1 ;
 
   // clamp the value
-  if (m_CurrentSlice >= m_ScansNumber)
-    m_CurrentSlice = m_ScansNumber-1 ;
+  if (m_CurrentSlice >= m_NumberOfSlices)
+    m_CurrentSlice = m_NumberOfSlices-1 ;
 
   m_OpDlg->TransferDataToWindow() ;
 }
@@ -1279,8 +1347,8 @@ void medOpMML3::OnPlus10()
   m_CurrentSlice += (10-units) ;
 
   // clamp the value
-  if (m_CurrentSlice >= m_ScansNumber)
-    m_CurrentSlice = m_ScansNumber-1 ;
+  if (m_CurrentSlice >= m_NumberOfSlices)
+    m_CurrentSlice = m_NumberOfSlices-1 ;
 
   m_OpDlg->TransferDataToWindow() ;
 }
@@ -1348,10 +1416,10 @@ void medOpMML3::OnMuscleSelection()
     }
     mafTagItem *NumberOfSlicesTag;
     NumberOfSlicesTag = vme->GetTagArray()->GetTag("NUMBER_OF_SLICES_TAG");
-    m_ScansNumber = NumberOfSlicesTag->GetComponentAsDouble(0);
+    m_NumberOfSlices = NumberOfSlicesTag->GetComponentAsDouble(0);
 
     // Disable widget so no. of slices can't be changed
-    m_ScansNumberTxt->Enable(false) ;
+    m_NumberOfSlicesTxt->Enable(false) ;
 
 
 
@@ -1417,7 +1485,7 @@ void medOpMML3::OnMuscleSelection()
 
 
   // set up specific set of landmarks (parameters are .msf section names)
-  //SetUpLandmarks2(m_AtlasMSFSectionName, m_PatientMSFSectionName);
+  SetUpLandmarks2(m_AtlasMSFSectionName, m_PatientMSFSectionName);
 
   //
   mafVME *RootVME;
@@ -3277,7 +3345,7 @@ void medOpMML3::SetUpModelViewInputs()
   m_Model->Set4LandmarksFlag(m_L4Defined);
 
   // set number of scans
-  m_Model->SetTotalNumberOfSyntheticScans(m_ScansNumber);
+  m_Model->SetTotalNumberOfSyntheticScans(m_NumberOfSlices);
 
   // set scans grain
   m_Model->SetGrainOfScans(m_ScansGrain);

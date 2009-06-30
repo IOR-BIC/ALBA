@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-18 16:57:24 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-06-30 15:35:59 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -249,10 +249,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_PosXAxisAxesTubeFilter->SetInput(m_PosXAxisLineSource->GetOutput());
   m_PosXAxisPolyDataMapper = vtkPolyDataMapper::New();
   m_PosXAxisPolyDataMapper->SetInput(m_PosXAxisAxesTubeFilter->GetOutput());
-  m_PosXAxisActor = vtkActor::New();
-  m_PosXAxisActor->SetMapper(m_PosXAxisPolyDataMapper);
-  m_Renderer->AddActor(m_PosXAxisActor);
-  m_PosXAxisActor->VisibilityOn();
+  m_GlobalPosXAxisActor = vtkActor::New();
+  m_GlobalPosXAxisActor->SetMapper(m_PosXAxisPolyDataMapper);
+  m_Renderer->AddActor(m_GlobalPosXAxisActor);
+  m_GlobalPosXAxisActor->VisibilityOn();
 
   // north global axis
   m_PosYAxisLineSource = vtkLineSource::New();
@@ -260,10 +260,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_PosYAxisAxesTubeFilter->SetInput(m_PosYAxisLineSource->GetOutput());
   m_PosYAxisPolyDataMapper = vtkPolyDataMapper::New();
   m_PosYAxisPolyDataMapper->SetInput(m_PosYAxisAxesTubeFilter->GetOutput());
-  m_PosYAxisActor = vtkActor::New();
-  m_PosYAxisActor->SetMapper(m_PosYAxisPolyDataMapper);
-  m_Renderer->AddActor(m_PosYAxisActor);
-  m_PosYAxisActor->VisibilityOn();
+  m_GlobalPosYAxisActor = vtkActor::New();
+  m_GlobalPosYAxisActor->SetMapper(m_PosYAxisPolyDataMapper);
+  m_Renderer->AddActor(m_GlobalPosYAxisActor);
+  m_GlobalPosYAxisActor->VisibilityOn();
 
   // west global axis
   m_NegXAxisLineSource = vtkLineSource::New();
@@ -271,10 +271,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_NegXAxisAxesTubeFilter->SetInput(m_NegXAxisLineSource->GetOutput());
   m_NegXAxisPolyDataMapper = vtkPolyDataMapper::New();
   m_NegXAxisPolyDataMapper->SetInput(m_NegXAxisAxesTubeFilter->GetOutput());
-  m_NegXAxisActor = vtkActor::New();
-  m_NegXAxisActor->SetMapper(m_NegXAxisPolyDataMapper);
-  m_Renderer->AddActor(m_NegXAxisActor);
-  m_NegXAxisActor->VisibilityOn();
+  m_GlobalNegXAxisActor = vtkActor::New();
+  m_GlobalNegXAxisActor->SetMapper(m_NegXAxisPolyDataMapper);
+  m_Renderer->AddActor(m_GlobalNegXAxisActor);
+  m_GlobalNegXAxisActor->VisibilityOn();
 
   // south global axis
   m_NegYAxisLineSource = vtkLineSource::New();
@@ -282,10 +282,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_NegYAxisAxesTubeFilter->SetInput(m_NegYAxisLineSource->GetOutput());
   m_NegYAxisPolyDataMapper = vtkPolyDataMapper::New();
   m_NegYAxisPolyDataMapper->SetInput(m_NegYAxisAxesTubeFilter->GetOutput());
-  m_NegYAxisActor = vtkActor::New();
-  m_NegYAxisActor->SetMapper(m_NegYAxisPolyDataMapper);
-  m_Renderer->AddActor(m_NegYAxisActor);
-  m_NegYAxisActor->VisibilityOn();
+  m_GlobalNegYAxisActor = vtkActor::New();
+  m_GlobalNegYAxisActor->SetMapper(m_NegYAxisPolyDataMapper);
+  m_Renderer->AddActor(m_GlobalNegYAxisActor);
+  m_GlobalNegYAxisActor->VisibilityOn();
 
 
 
@@ -299,10 +299,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_PosZAxisAxesTubeFilter->SetInput(m_PosZAxisLineSource->GetOutput());
   m_PosZAxisPolyDataMapper = vtkPolyDataMapper::New();
   m_PosZAxisPolyDataMapper->SetInput(m_PosZAxisAxesTubeFilter->GetOutput());
-  m_PosZAxisActor = vtkActor::New();
-  m_PosZAxisActor->SetMapper(m_PosZAxisPolyDataMapper);
-  m_PosZAxisActor->VisibilityOff();
-  m_Renderer->AddActor(m_PosZAxisActor);
+  m_GlobalPosZAxisActor = vtkActor::New();
+  m_GlobalPosZAxisActor->SetMapper(m_PosZAxisPolyDataMapper);
+  m_GlobalPosZAxisActor->VisibilityOff();
+  m_Renderer->AddActor(m_GlobalPosZAxisActor);
 
   // negative z global axis
   m_NegZAxisLineSource = vtkLineSource::New();
@@ -310,10 +310,10 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_NegZAxisAxesTubeFilter->SetInput(m_NegZAxisLineSource->GetOutput());
   m_NegZAxisPolyDataMapper = vtkPolyDataMapper::New();
   m_NegZAxisPolyDataMapper->SetInput(m_NegZAxisAxesTubeFilter->GetOutput());
-  m_NegZAxisActor = vtkActor::New();
-  m_NegZAxisActor->SetMapper(m_NegZAxisPolyDataMapper);
-  m_NegZAxisActor->VisibilityOff();
-  m_Renderer->AddActor(m_NegZAxisActor);
+  m_GlobalNegZAxisActor = vtkActor::New();
+  m_GlobalNegZAxisActor->SetMapper(m_NegZAxisPolyDataMapper);
+  m_GlobalNegZAxisActor->VisibilityOff();
+  m_Renderer->AddActor(m_GlobalNegZAxisActor);
 
 
 
@@ -816,25 +816,25 @@ medOpMML3ModelView::~medOpMML3ModelView()
   m_PosXAxisLineSource->Delete() ;
   m_PosXAxisAxesTubeFilter->Delete() ;
   m_PosXAxisPolyDataMapper->Delete() ;
-  m_PosXAxisActor->Delete() ;
+  m_GlobalPosXAxisActor->Delete() ;
 
   // north global axis
   m_PosYAxisLineSource->Delete() ;
   m_PosYAxisAxesTubeFilter->Delete() ;
   m_PosYAxisPolyDataMapper->Delete() ; 
-  m_PosYAxisActor->Delete() ;
+  m_GlobalPosYAxisActor->Delete() ;
 
   // west global axis
   m_NegXAxisLineSource->Delete() ;
   m_NegXAxisAxesTubeFilter->Delete() ;
   m_NegXAxisPolyDataMapper->Delete() ; 
-  m_NegXAxisActor->Delete() ; 
+  m_GlobalNegXAxisActor->Delete() ; 
 
   // south global axis
   m_NegYAxisLineSource->Delete() ;
   m_NegYAxisAxesTubeFilter->Delete() ;
   m_NegYAxisPolyDataMapper->Delete() ; 
-  m_NegYAxisActor->Delete() ; 
+  m_GlobalNegYAxisActor->Delete() ; 
 
   // 1st landmark
   m_Landmark1SphereSource->Delete() ;
@@ -871,13 +871,13 @@ medOpMML3ModelView::~medOpMML3ModelView()
   m_PosZAxisLineSource->Delete() ;
   m_PosZAxisAxesTubeFilter->Delete() ; 
   m_PosZAxisPolyDataMapper->Delete() ;
-  m_PosZAxisActor->Delete() ;
+  m_GlobalPosZAxisActor->Delete() ;
 
   // negative z global axis
   m_NegZAxisLineSource->Delete() ;
   m_NegZAxisAxesTubeFilter->Delete() ; 
   m_NegZAxisPolyDataMapper->Delete() ;
-  m_NegZAxisActor->Delete() ;
+  m_GlobalNegZAxisActor->Delete() ;
 
   // Transform1 -> Transform2 -> Normals -> Mapper
   m_MuscleTransform1->Delete() ;
@@ -3006,32 +3006,32 @@ bool medOpMML3ModelView::SetUpGlobalCoordinateAxes()
   m_PosXAxisAxesTubeFilter->SetNumberOfSides(6);
   m_PosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
   m_PosXAxisLineSource->SetPoint2(m_NSyntheticScansXSize / 2.0, 0.0, 0.0);
-  m_PosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-  m_PosXAxisActor->VisibilityOn();
+  m_GlobalPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
+  m_GlobalPosXAxisActor->VisibilityOn();
 
   // north
   m_PosYAxisAxesTubeFilter->SetRadius(0.5);
   m_PosYAxisAxesTubeFilter->SetNumberOfSides(6);
   m_PosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
   m_PosYAxisLineSource->SetPoint2(0.0, m_NSyntheticScansYSize / 2.0, 0.0);
-  m_PosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-  m_PosYAxisActor->VisibilityOn();
+  m_GlobalPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
+  m_GlobalPosYAxisActor->VisibilityOn();
 
   // west
   m_NegXAxisAxesTubeFilter->SetRadius(0.5);
   m_NegXAxisAxesTubeFilter->SetNumberOfSides(6);
   m_NegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
   m_NegXAxisLineSource->SetPoint2(-1.0 * m_NSyntheticScansXSize / 2.0, 0.0, 0.0);
-  m_NegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
-  m_NegXAxisActor->VisibilityOn();
+  m_GlobalNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
+  m_GlobalNegXAxisActor->VisibilityOn();
 
   // south
   m_NegYAxisAxesTubeFilter->SetRadius(0.5);
   m_NegYAxisAxesTubeFilter->SetNumberOfSides(6);
   m_NegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
   m_NegYAxisLineSource->SetPoint2(0.0, -1.0 * m_NSyntheticScansYSize / 2.0, 0.0);
-  m_NegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-  m_NegYAxisActor->VisibilityOn();
+  m_GlobalNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
+  m_GlobalNegYAxisActor->VisibilityOn();
 
   return 1;
 }
@@ -3096,22 +3096,22 @@ void medOpMML3ModelView::Switch3dDisplayOn()
   m_PosZAxisAxesTubeFilter->SetNumberOfSides(6);
   m_PosZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
   m_PosZAxisLineSource->SetPoint2(0.0, 0.0, (m_NSyntheticScansXSize + m_NSyntheticScansYSize) / 2.0);
-  m_PosZAxisActor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
+  m_GlobalPosZAxisActor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
 
   // negative z axis set up
   m_NegZAxisAxesTubeFilter->SetRadius(1.0);
   m_NegZAxisAxesTubeFilter->SetNumberOfSides(6);
   m_NegZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
   m_NegZAxisLineSource->SetPoint2(0.0, 0.0, -1.0 * (m_NSyntheticScansXSize + m_NSyntheticScansYSize) / 2.0);
-  m_NegZAxisActor->GetProperty()->SetColor(1.0, 1.0, 1.0); // white
+  m_GlobalNegZAxisActor->GetProperty()->SetColor(1.0, 1.0, 1.0); // white
 
   // axes off
-  m_PosXAxisActor->VisibilityOff();
-  m_NegXAxisActor->VisibilityOff();
-  m_PosYAxisActor->VisibilityOff();
-  m_NegYAxisActor->VisibilityOff();
-  m_PosZAxisActor->VisibilityOff();
-  m_NegZAxisActor->VisibilityOff();
+  m_GlobalPosXAxisActor->VisibilityOff();
+  m_GlobalNegXAxisActor->VisibilityOff();
+  m_GlobalPosYAxisActor->VisibilityOff();
+  m_GlobalNegYAxisActor->VisibilityOff();
+  m_GlobalPosZAxisActor->VisibilityOff();
+  m_GlobalNegZAxisActor->VisibilityOff();
 
 
 

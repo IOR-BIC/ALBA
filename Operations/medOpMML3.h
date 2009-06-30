@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-06-18 16:57:24 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-06-30 15:35:59 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -36,15 +36,46 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // TODO 18.6.09
 // Is it ok to have only 3 slices ?
 // Contour widget not rendered on first slice until you change to another slice and back.
 // Does MML still work if the muscle model is scaled ?
 // Windowing range might not be right.
 // Cross hairs of contour widget not always centred - prone to noise
-// Contour scaling widgets do not act along x and y axes.
-//----------------------------------------------------------------------------
+// Two-part axis: slice is not positioned properly in 2D view, contour not in slice plane in 3D view.
+//------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// MODELVIEW ACTORS (2D + 3D)
+// m_SyntheticScansActor[numScans]
+
+// MODELVIEW ACTORS (2D only)
+// m_GlobalPosXAxisActor (PosX, NegX, PosY, NegY) (global axes)
+// m_ContourPosXAxisActor (PosX, NegX, PosY, NegY) (contour axes)
+// m_ContourGlyphActor (not used)
+// m_NEContourActor (NE, SE, NW, SW) (contour in 4 quarters)
+// m_ScaledTextActorX (X, Y)
+
+// MODELVIEW ACTORS (3D only)
+// m_MuscleLODActor (muscle surface)
+// m_ContourActor (whole contour for 3d display)
+// m_GlobalPosZAxisActor (PosZ, NegZ) (global z axis)
+// m_L1L2Actor, m_L2L3Actor (action lines)
+// m_Landmark1Actor (1, 2, 3, 4) (landmarks)
+
+// CONTOURWIDGET ACTORS
+// m_PlaneActor
+// m_Handle[4]
+// m_RotationalHandle
+// m_CenterHandle
+// m_LineActor
+// m_ConeActor
+// m_LineActor2
+// m_ConeActor2
+//------------------------------------------------------------------------------
+
 
 
 //------------------------------------------------------------------------------
@@ -89,8 +120,10 @@ public:
 protected:
   void CreateInputsDlg();         ///< Dialog to select the polydata surface
   void CreateRegistrationDlg();   ///< Dialog to perform the model fitting
+  void CreateNonUniformSlicesDlg();   ///< Dialog to input non-uniform slice spacing
   void DeleteInputsDlg() ;        ///< Delete inputs dialog
   void DeleteRegistrationDlg() ;  ///< Delete registration dialog
+  void DeleteNonUniformSlicesDlg();   ///< Delete slice spacing dialog
 
   /// Get vtk data for volume and surface with pose matrices \n
   /// Must run inputs dialog first 
@@ -182,8 +215,9 @@ protected:
   //----------------------------------------------------------------------------
 
   // dialogs
-  mafGUIDialog	*m_ChooseDlg;		///< inputs dialog
-  mafGUIDialog	*m_OpDlg;			  ///< operation dialog
+  mafGUIDialog *m_ChooseDlg;		         ///< inputs dialog
+  mafGUIDialog *m_NonUniformSlicesDlg ;  ///< non-uniform slices dialog
+  mafGUIDialog *m_OpDlg;			           ///< operation dialog
 
   // input vme and vtk data for volume and selected muscle polydata
   mafVMEVolumeGray    *m_VolumeVME;  ///< input volume vme  
@@ -226,17 +260,24 @@ protected:
   int m_RegistrationStatus;	///< flag indicating if registration has taken place
   int m_3DFlag;	///< flag indicating if model view is 2D or 3D
   int m_slicexyz ;  ///< validator for default slice direction
-  int m_ScansNumber ; ///< number of scans
   int m_ScansGrain; ///< set by user, used to calculate size and resolution of scans
   double m_AxisRangeFactor ; ///< factor which extends range of axis beyond landmarks
 
   /// flag to remember how axis landmarks were created. \n
-  /// 1 for default (patient space)
+  /// 1 for default (patient space) \n
   /// 2 for selected (from atlas)
   int m_AxisLandmarksFlag ; 
 
-
   vtkTextSource *m_textSource[9] ;  ///< text sources used in CreateParameterViewmafRWI()
+
+
+  //----------------------------------------------------------------------------
+  // number of slices
+  //----------------------------------------------------------------------------
+  int m_NumberOfSlices ;                              ///< total number of slices
+  static const int NumberOfNonUniformSections = 10 ;  ///< number of non-uniform sections
+  int m_NonUniformSliceSpacing ;                     ///< is slice spacing non-uniform
+  int m_SlicesInSection[NumberOfNonUniformSections] ; ///< no. of slices per section, if non-uniform
 
 
 
@@ -340,7 +381,7 @@ protected:
 
   wxColour m_ButtonBackgroundColour;
 
-  wxTextCtrl *m_ScansNumberTxt;
+  wxTextCtrl *m_NumberOfSlicesTxt;
 
   wxRadioBox *m_radio_slicexyz ;
 };
