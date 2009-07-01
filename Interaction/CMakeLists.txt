@@ -18,6 +18,8 @@ SET(PROJECT_SRCS
   mmiVTKPicker.h
   medGizmoPolylineGraph.cpp
   medGizmoPolylineGraph.h
+  mafDeviceButtonsPadMouseDialog.h
+  mafDeviceButtonsPadMouseDialog.cpp
   
   ##### Introduced with VolumeLarge - to be committed down ###
   mafGizmoROI_BES.cpp
