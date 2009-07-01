@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:27:22 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-07-01 13:07:00 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -49,6 +49,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------
+/** Dialog Ids */
 enum DIALOG_STYLES
 {
 	mafRESIZABLE    =  1,  // make the Dialog Resizable  
@@ -57,26 +58,35 @@ enum DIALOG_STYLES
 	mafCANCEL       =  8,  // to create a cancel button 
 	mafCLOSE        = 16, // to create a close button
 };
-//----------------------------------------------------------------------------
-// medGUIWizard :
-//----------------------------------------------------------------------------
 /**
+  Class Name: medGUIWizard.
+  This class is the container of wizard pages in order to handle typical gui wizard widget.
+  It can set first page and enable changing pages.
 */
 class medGUIWizard : public wxWizard, public mafObserver  
 {
 public:
+  /** constructor. */
 	medGUIWizard (const wxString& title);
+  /** destructor. */
 	virtual ~medGUIWizard (); 
+  /** Set the Listener that will receive event-notification. */
 	void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  /** Precess events coming from other objects. */
 	void OnEvent(mafEventBase *maf_event);
 
+  /** Call wxWizard::RunWizard.  */
 	bool Run();
 
+  /** Set the first page of the wizard. */
 	void SetFirstPage(wxWizardPageSimple *firstPage);
 
+  /** Enable the changing of the page. */
 	void EnableChangePageOn(){m_EnableChangePage=true;};
+  /** Disable the changing of the page. */
 	void EnableChangePageOff(){m_EnableChangePage=false;};
 
+  /** Message Ids */
 	enum ID_MESSAGES
 	{
 		MED_WIZARD_CHANGE_PAGE = MINID,
@@ -91,10 +101,14 @@ private:
 
 	bool m_EnableChangePage;
 
+  /** event handler function for closing the window. */
 	void nvOnCloseWindow(wxCloseEvent &event) {OnCloseWindow(event);};
-	void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();}; //calls nvOnCloseWindow
+  /** event handler function for close the dialog that call nvOnCloseWindow. */
+	void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();};
+  /** event handler function for changing page in the wizard. */
 	void OnWizardPageChanging(wxWizardEvent& event);
 
+  /** event table declaration */
 	DECLARE_EVENT_TABLE()
 };
 #endif

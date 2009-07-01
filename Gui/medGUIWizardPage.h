@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2009-05-05 14:40:46 $
-Version:   $Revision: 1.4.2.3 $
+Date:      $Date: 2009-07-01 13:07:00 $
+Version:   $Revision: 1.4.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -62,30 +62,42 @@ enum DIALOG_EXSTYLES
 	medUSERWI = 2,
 };
 
-//----------------------------------------------------------------------------
-// medGUIWizardPage :
-//----------------------------------------------------------------------------
 /**
+  Class Name: medGUIWizardPage.
+  This class is the simplest possible medGUIWizard implementation.
+  Add gui in panel positions:
+  - lower left
+  - lower right
+  - lower center
 */
 class medGUIWizardPage : public wxWizardPageSimple, public mafObserver  
 {
 public:
+  /** constructor. */
 	medGUIWizardPage (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="");
-	virtual ~medGUIWizardPage (); 
+  /** destructor. */
+	virtual ~medGUIWizardPage ();
+  /** Set the Listener that will receive event-notification. */
 	void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  /** Precess events coming from other objects. */
 	void OnEvent(mafEventBase *maf_event);
 
 	mafObserver *m_Listener;
 
+  /** Add in wizard gui, another gui in lower left position. */
 	void AddGuiLowerLeft(mafGUI *gui);
+  /** Add in wizard gui, another gui in lower right position. */
   void AddGuiLowerRight(mafGUI *gui);
+  /** Add in wizard gui, another gui in lower center position. */
   void AddGuiLowerCenter(mafGUI *gui);
 
+  /** Remove in wizard gui, another gui in lower left position. */
   void RemoveGuiLowerLeft(mafGUI *gui);
 
-	/** Create a chain between this page ad nextPage */
+	/** Create a chain between this page ad nextPage. */
 	void SetNextPage(medGUIWizardPage *nextPage);
 
+  /** Retrieve the current Render Window. */
 	mafRWI* GetRWI(){return m_Rwi;};
 
 private:

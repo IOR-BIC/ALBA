@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2009-05-05 13:58:04 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-01 13:07:00 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -57,6 +57,7 @@ class mafGUILutSlider;
 //----------------------------------------------------------------------------
 // Const:
 //----------------------------------------------------------------------------
+/** IDs for the Dialog Style */
 enum DIALOG_EXSTYLES
 {
 	medUSEGUI = 1,
@@ -69,40 +70,53 @@ enum GUI_WIZARD_WIDGET_ID
   ID_LUT_CHOOSER = 3,
 };
 
-//----------------------------------------------------------------------------
-// medGUIWizardPageNew :
-//----------------------------------------------------------------------------
 /**
+  Class Name: medGUIWizardPageNew.
+  This class is the simplest possible medGUIWizard implementation. 
+  Add gui in panel positions:
+  - lower left
+  - lower right
+  - lower center
+  - lower center bottom
 */
 class medGUIWizardPageNew : public wxWizardPageSimple, public mafObserver  
 {
 public:
+  /** construct. */
 	medGUIWizardPageNew (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="");
-	virtual ~medGUIWizardPageNew (); 
+  /** destructor. */
+	virtual ~medGUIWizardPageNew ();
+  /** Set the Listener that will receive event-notification. */
 	void SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  /** Precess events coming from other objects. */
 	void OnEvent(mafEventBase *maf_event);
 
 	mafObserver *m_Listener;
-
+  
+  /** Add in wizard gui, another gui in lower left position. */
 	void AddGuiLowerLeft(mafGUI *gui);
+  /** Add in wizard gui, another gui in lower right position. */
   void AddGuiLowerRight(mafGUI *gui);
+  /** Add in wizard gui, another gui in lower center position. */
   void AddGuiLowerCenter(mafGUI *gui);
+  /** Add in wizard gui, another gui in lower center bottom position. */
   void AddGuiLowerUnderLeft(mafGUI *gui);
 
+  /** Remove in wizard gui, another gui in lower left position. */
   void RemoveGuiLowerLeft(mafGUI *gui);
 
-	/** Create a chain between this page ad nextPage */
+	/** Create a chain between this page ad nextPage. */
 	void SetNextPage(medGUIWizardPageNew *nextPage);
 
+  /** Update windowing in order to set correct values in lut slider. */
   void UpdateWindowing();
-
+  /** Update Actor Texture from current lut slider values. */
   void UpdateActor();
 
+  /** Retrieve the current Render Window. */
 	mafRWI* GetRWI(){return m_Rwi;};
 
 private:
-
- 
 
 	wxWizardPageSimple *m_FirstPage;
 
