@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-12 18:04:58 $
-  Version:   $Revision: 1.51.2.6 $
+  Date:      $Date: 2009-07-01 12:37:12 $
+  Version:   $Revision: 1.51.2.7 $
   Authors:   Paolo Quadrani,Stefano Perticoni, modified by Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -622,7 +622,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
       else
       {
         //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
-        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(m_CurrentSurface[i]->m_Pipe);
+        mafPipeSurfaceSlice* pipe = mafPipeSurfaceSlice::SafeDownCast(m_CurrentSurface.at(i)->m_Pipe);
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
@@ -644,7 +644,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
       else
       {
         //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
-        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(m_CurrentSurface[i]->m_Pipe);
+        mafPipePolylineSlice* pipe = mafPipePolylineSlice::SafeDownCast(m_CurrentPolyline.at(i)->m_Pipe);
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
@@ -676,7 +676,7 @@ void mafViewSlice::SetSlice(double* Origin, double* Normal)
       else
       {
         //BES: 12.6.2009 - TODO: this branch should be removed when mafPipeSurfaceSlice_BES committed down
-        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(m_CurrentSurface[i]->m_Pipe);
+        mafPipeMeshSlice* pipe = mafPipeMeshSlice::SafeDownCast(m_CurrentMesh.at(i)->m_Pipe);
         if (pipe != NULL) 
         {
           pipe->SetSlice(coord); 
