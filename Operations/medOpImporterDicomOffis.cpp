@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 14:14:31 $
-Version:   $Revision: 1.1.2.28 $
+Date:      $Date: 2009-07-02 14:38:35 $
+Version:   $Revision: 1.1.2.29 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -296,7 +296,8 @@ medOpImporterDicomOffis::~medOpImporterDicomOffis()
 
   m_ImagesGroup = NULL;
 
-  mafDEL(m_Output);
+  //mafDEL(m_Output);  //achiarini(giaco): removed because useless and potentially dangerous
+
 }
 //----------------------------------------------------------------------------
 mafOp *medOpImporterDicomOffis::Copy()
@@ -1108,7 +1109,8 @@ int medOpImporterDicomOffis::BuildMesh()
 
   int counter= 0;
   int total = dim[0]*dim[1];
-  for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
+  int sourceVolumeSliceId = 0;//achiarini compilation issue
+  for ( int targetVolumeSliceId = 0, sourceVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
   { 
     if(!this->m_TestMode)
     {
@@ -1231,7 +1233,8 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
     int counter= 0;
     int total = dim[0]*dim[1];
-    for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
+    int sourceVolumeSliceId;//achiarini: compilation issue
+    for (int targetVolumeSliceId = 0, sourceVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
     { 
       if(!this->m_TestMode)
       {
