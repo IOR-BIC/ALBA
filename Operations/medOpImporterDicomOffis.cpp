@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:19:20 $
-Version:   $Revision: 1.1.2.25 $
+Date:      $Date: 2009-07-02 08:31:37 $
+Version:   $Revision: 1.1.2.26 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2497,7 +2497,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
           ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
-          numberOfImages = 37;
 
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
 
@@ -2541,7 +2540,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
           ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
-          numberOfImages = 37;
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
 
            m_DicomMap[studyUID]->Append(new medImporterDICOMListElements(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
