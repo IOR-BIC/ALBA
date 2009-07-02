@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeWriter.cpp
   Language:  C++
   Date:      8:2:2008   11:27
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -33,10 +33,10 @@ mafCxxTypeMacro(mafVolumeLargeWriter);
 mafVolumeLargeWriter::mafVolumeLargeWriter()
 {
   m_InputDataSet = NULL;	
-  m_pInputXYZCoords[0] = NULL;
-  m_pInputXYZCoords[1] = NULL;
-  m_pInputXYZCoords[2] = NULL;
-	m_dblLimitCoef = 1.35;	//NB. upper bound is lest than 2, 
+  m_PInputXYZCoords[0] = NULL;
+  m_PInputXYZCoords[1] = NULL;
+  m_PInputXYZCoords[2] = NULL;
+	m_DblLimitCoef = 1.35;	//NB. upper bound is lest than 2, 
 							            //even 30 levels has 1.2+
 	m_Listener = NULL;
 }
@@ -45,9 +45,9 @@ mafVolumeLargeWriter::~mafVolumeLargeWriter()
 {	
 	//all should be removed in Update
 	vtkDEL(m_InputDataSet);
-  vtkDEL(m_pInputXYZCoords[0]);
-  vtkDEL(m_pInputXYZCoords[1]);
-  vtkDEL(m_pInputXYZCoords[2]);
+  vtkDEL(m_PInputXYZCoords[0]);
+  vtkDEL(m_PInputXYZCoords[1]);
+  vtkDEL(m_PInputXYZCoords[2]);
 }
 
 //Sets a new associated input data set
@@ -68,11 +68,11 @@ void mafVolumeLargeWriter::SetInputDataSet(vtkMAFLargeImageData* ds)
 void mafVolumeLargeWriter::SetInputXCoordinates(vtkDoubleArray* pCoords)
 //------------------------------------------------------------------------
 {
-  if (pCoords != m_pInputXYZCoords[0])
+  if (pCoords != m_PInputXYZCoords[0])
   {
-    vtkDEL(m_pInputXYZCoords[0]);  
-    if (NULL != (m_pInputXYZCoords[0] = pCoords))    
-      m_pInputXYZCoords[0]->Register(NULL);    
+    vtkDEL(m_PInputXYZCoords[0]);  
+    if (NULL != (m_PInputXYZCoords[0] = pCoords))    
+      m_PInputXYZCoords[0]->Register(NULL);    
   }
 }
 
@@ -81,11 +81,11 @@ void mafVolumeLargeWriter::SetInputXCoordinates(vtkDoubleArray* pCoords)
 void mafVolumeLargeWriter::SetInputYCoordinates(vtkDoubleArray* pCoords)
 //------------------------------------------------------------------------
 {
-  if (pCoords != m_pInputXYZCoords[1])
+  if (pCoords != m_PInputXYZCoords[1])
   {
-    vtkDEL(m_pInputXYZCoords[1]);  
-    if (NULL != (m_pInputXYZCoords[1] = pCoords))    
-      m_pInputXYZCoords[1]->Register(NULL);
+    vtkDEL(m_PInputXYZCoords[1]);  
+    if (NULL != (m_PInputXYZCoords[1] = pCoords))    
+      m_PInputXYZCoords[1]->Register(NULL);
   }
 }
 
@@ -94,11 +94,11 @@ void mafVolumeLargeWriter::SetInputYCoordinates(vtkDoubleArray* pCoords)
 void mafVolumeLargeWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 //------------------------------------------------------------------------
 {
-  if (pCoords != m_pInputXYZCoords[2])
+  if (pCoords != m_PInputXYZCoords[2])
   {
-    vtkDEL(m_pInputXYZCoords[2]);  
-    if (NULL != (m_pInputXYZCoords[2] = pCoords))
-      m_pInputXYZCoords[2]->Register(NULL);    
+    vtkDEL(m_PInputXYZCoords[2]);  
+    if (NULL != (m_PInputXYZCoords[2] = pCoords))
+      m_PInputXYZCoords[2]->Register(NULL);    
   }
 }
 
@@ -171,7 +171,7 @@ int mafVolumeLargeWriter::ComputeSampleRate(vtkIdType64 nSize, vtkIdType64 nMemL
 			/*m_InputDataSet->GetMemoryLimit()*/);		
 		
 		//compute the limit for our LODs
-		nTotalSize = (vtkIdType64)(nTotalSize*m_dblLimitCoef);
+		nTotalSize = (vtkIdType64)(nTotalSize*m_DblLimitCoef);
 		vtkIdType64 nNewTotalSize = nTotalSize;
     int nLevels = CreateLODs(max_sample, nNewTotalSize);
 
@@ -253,9 +253,9 @@ int mafVolumeLargeWriter::CreateLODs(int nMaxSampleRate, vtkIdType64& nTotalMaxS
 	mafBrickedFileWriter bf;
 	bf.SetListener(m_Listener);	
 	bf.SetInputDataSet(m_InputDataSet);
-  bf.SetInputXCoordinates(m_pInputXYZCoords[0]);
-  bf.SetInputYCoordinates(m_pInputXYZCoords[1]);
-  bf.SetInputZCoordinates(m_pInputXYZCoords[2]);
+  bf.SetInputXCoordinates(m_PInputXYZCoords[0]);
+  bf.SetInputYCoordinates(m_PInputXYZCoords[1]);
+  bf.SetInputZCoordinates(m_PInputXYZCoords[2]);
 
 #ifdef _PROFILE_LARGEDATA_
   int VOI[6];
@@ -353,7 +353,7 @@ vtkIdType64 mafVolumeLargeWriter
 		nSize += nBrckDims[0]*nBrckDims[1]*nBrckDims[2]*nVoxelSize;
 		nSize += nBrckDims[1]*nBrckDims[2]*sizeof(mafBrickedFile::BBF_IDX_MAINITEM);
 		nSize += sizeof(mafBrickedFile::BBF_HEADER);
-    if (m_pInputXYZCoords[0] != NULL || m_pInputXYZCoords[1] != NULL || m_pInputXYZCoords[2] != NULL){
+    if (m_PInputXYZCoords[0] != NULL || m_PInputXYZCoords[1] != NULL || m_PInputXYZCoords[2] != NULL){
       nSize += sizeof(double)*(nCurDims[0] + nCurDims[1] + nCurDims[2]);
     }
 

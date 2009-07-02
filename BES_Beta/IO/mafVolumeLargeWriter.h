@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeWriter.h
   Language:  C++
   Date:      8:2:2008   11:26
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -31,13 +31,13 @@ protected:
 
 	//input data set that should be bricked
 	vtkMAFLargeImageData* m_InputDataSet;
-  vtkDoubleArray* m_pInputXYZCoords[3];   //<X,Y,Z-coordinates for rectilinear grids
+  vtkDoubleArray* m_PInputXYZCoords[3];   //<X,Y,Z-coordinates for rectilinear grids
 
 	//listener that should receive events
 	mafObserver* m_Listener;
 
 	//the maximal allowed ratio of the output and input data
-	double m_dblLimitCoef;
+	double m_DblLimitCoef;
 
 public:
 	mafVolumeLargeWriter();
@@ -79,7 +79,7 @@ public:
 	
 	//Gets the current size limit coefficient
 	inline double GetLimitConst() {
-		return m_dblLimitCoef;
+		return m_DblLimitCoef;
 	}
 
 	//Sets the maximal allowed ratio of the output and input data,
@@ -88,7 +88,7 @@ public:
 	//no higher resolution level will be constructed after the total size of
 	//levels constructed previously exceeds 4.8 GB
 	inline void SetLimitConst(double dblLimitCoef) {
-		m_dblLimitCoef = dblLimitCoef;
+		m_DblLimitCoef = dblLimitCoef;
 	}
 
 	//returns estimated total size for the current VOI and number of levels
