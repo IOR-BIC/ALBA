@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 09:53:33 $
-Version:   $Revision: 1.7.2.3 $
+Date:      $Date: 2009-07-02 09:27:50 $
+Version:   $Revision: 1.7.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -38,6 +38,7 @@ mafGUISettings(Listener, label)
 	m_EnableNumberOfSlice = true;
 	m_EnableNumberOfTime = true; 
   m_EnableChangeSide = FALSE;
+  m_EnableDiscardPosition= FALSE;
 	m_Step = ID_1X;
 
 	InitializeSettings();
@@ -57,6 +58,7 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
 	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
   m_Gui->Bool(ID_SIDE,_("Enable Change Side"),&m_EnableChangeSide,1);
+  m_Gui->Bool(ID_DISCARD_ORIGIN,_("Enable Discard Origin"),&m_EnableDiscardPosition,1);
 	wxString choices[4]={_("1x"),_("2x"),_("3x"),_("4x")};
 	m_Gui->Combo(ID_STEP,_("Build Step"),&m_Step,4,choices);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
@@ -119,6 +121,11 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("EnableSide",m_EnableChangeSide);
     }
     break;
+  case ID_DISCARD_ORIGIN:
+    {
+      m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
+    }
+    break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -140,6 +147,15 @@ void medGUIDicomSettings::InitializeSettings()
   else
   {
     m_Config->Write("EnableSide",m_EnableChangeSide);
+  }
+
+  if(m_Config->Read("EnableDiscardPosition", &long_item))
+  {
+    m_EnableDiscardPosition=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
   }
 
   if(m_Config->Read("StepOfBuild", &long_item))
@@ -231,6 +247,7 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
 	}
+
 
 	m_Config->Flush();
 }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-06-03 15:59:06 $
-Version:   $Revision: 1.5.2.3 $
+Date:      $Date: 2009-07-02 09:27:50 $
+Version:   $Revision: 1.5.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -31,6 +31,7 @@ class mafGUICheckListBox;
   - step 
   - side
   - conversion units
+  - discard position (origin)
 */
 class medGUIDicomSettings : public mafGUISettings
 {
@@ -51,6 +52,7 @@ public:
 		ID_STEP,
     ID_SIDE,
     ID_CONVERT_UNITS,
+    ID_DISCARD_ORIGIN,
 	};
 
   /** Modality IDs*/
@@ -96,6 +98,8 @@ public:
   int GetBuildStep(){return m_Step;};
   /** Retrieve if the flag of changing side is enabled */
   int EnableChangeSide(){return m_EnableChangeSide;};
+  /** Enable discarding origin. */
+  int EnableDiscardPosition(){return m_EnableDiscardPosition;};
 
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
@@ -120,5 +124,6 @@ protected:
 	int m_EnableNumberOfSlice;
 	int m_Step;
   int m_EnableChangeSide;
+  int m_EnableDiscardPosition;
 };
 #endif
