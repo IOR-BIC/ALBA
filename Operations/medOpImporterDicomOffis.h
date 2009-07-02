@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:19:20 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2009-07-02 09:28:28 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -161,7 +161,7 @@ public:
   bool OpenDir();
 
   /** Enable discarding spatial position of the volume. */
-  void SetDiscardSpacialPosition(int enable){m_DiscardSpatialPosition = enable;}
+  void SetDiscardPosition(int enable){m_DiscardPosition = enable;}
 
 protected:
 
@@ -311,7 +311,7 @@ protected:
 
   int m_ResampleFlag;
 
-  int m_DiscardSpatialPosition;
+  int m_DiscardPosition;
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;

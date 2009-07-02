@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:31:37 $
-Version:   $Revision: 1.1.2.26 $
+Date:      $Date: 2009-07-02 09:28:28 $
+Version:   $Revision: 1.1.2.27 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -278,7 +278,7 @@ mafOp(label)
 
   m_ResampleFlag = FALSE;
 
-  m_DiscardSpatialPosition = FALSE;
+  m_DiscardPosition = FALSE;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicomOffis::~medOpImporterDicomOffis()
@@ -305,7 +305,7 @@ mafOp *medOpImporterDicomOffis::Copy()
   medOpImporterDicomOffis *importer = new medOpImporterDicomOffis(m_Label);
   importer->m_ResampleFlag = m_ResampleFlag;
   importer->m_DicomDirectory = m_DicomDirectory;
-  importer->m_DiscardSpatialPosition = m_DiscardSpatialPosition;
+  importer->m_DiscardPosition = m_DiscardPosition;
 
 	return importer;
 }
@@ -314,6 +314,7 @@ void medOpImporterDicomOffis::OpRun()
 //----------------------------------------------------------------------------
 {
   m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
+  m_DiscardPosition = ((medGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
 
 	CreateGui();
 	CreatePipeline();
@@ -3037,7 +3038,7 @@ void medOpImporterDicomOffis::ResampleVolume()
         resampler->Update();
 
         output_data->SetSource(NULL);
-        if(m_DiscardSpatialPosition == TRUE)
+        if(m_DiscardPosition == TRUE)
         {
           output_data->SetOrigin(0,0,0);
         }
