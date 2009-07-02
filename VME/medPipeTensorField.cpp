@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorField.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-12 16:34:48 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-07-02 08:58:02 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -40,7 +40,7 @@ medPipeTensorField::medPipeTensorField() : mafPipe()
 {  
   m_TensorFieldIndex = 0;  
   m_ScalarFieldIndex = 0;  
-  m_bCreateVTKPipeAlways = false;
+  m_BCreateVTKPipeAlways = false;
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void medPipeTensorField::Create(mafSceneNode *n)
         m_TensorFieldIndex = 0; //no default tensor field, use the first one         
   }
 
-  if (nTensors > 0 || m_bCreateVTKPipeAlways)
+  if (nTensors > 0 || m_BCreateVTKPipeAlways)
   {
     //now let us create VTK pipe
     CreateVTKPipe();  

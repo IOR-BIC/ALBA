@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorField.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-09 16:04:32 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-07-02 08:58:02 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -40,7 +40,7 @@ medPipeVectorField::medPipeVectorField() : mafPipe()
 {  
   m_VectorFieldIndex = 0;  
   m_ScalarFieldIndex = 0;  
-  m_bCreateVTKPipeAlways = false;
+  m_BCreateVTKPipeAlways = false;
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void medPipeVectorField::Create(mafSceneNode *n)
         m_VectorFieldIndex = 0; //no default vector field, use the first one         
   }
 
-  if (nVectors > 0 || m_bCreateVTKPipeAlways)
+  if (nVectors > 0 || m_BCreateVTKPipeAlways)
   {
     //now let us create VTK pipe
     CreateVTKPipe();  

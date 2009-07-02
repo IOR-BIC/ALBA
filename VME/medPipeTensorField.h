@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorField.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-12 16:34:48 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-07-02 08:58:02 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -25,7 +25,7 @@ public:
   mafAbstractTypeMacro(medPipeTensorField, mafPipe);
 
 protected:
-  bool m_bCreateVTKPipeAlways;      ///<true, if the VTK pipe should be created always, no matter, if VME contains tensor
+  bool m_BCreateVTKPipeAlways;      ///<true, if the VTK pipe should be created always, no matter, if VME contains tensor
   int m_TensorFieldIndex;           ///<index of tensor field to be processed
   int m_ScalarFieldIndex;           ///<index of scalar field to be used (e.g. for colouring)
 
@@ -41,13 +41,13 @@ public:
 
   /** Gets the current status of m_bCreateVTKPipeAlways. */
   inline bool GetCreateVTKPipeAlways() {
-    return m_bCreateVTKPipeAlways;
+    return m_BCreateVTKPipeAlways;
   }
 
   /** Sets a new status of m_bCreateVTKPipeAlways.
   N.B. it has only effect when called before Create. */
   inline void SetCreateVTKPipeAlways(bool bCreate = true) {
-    m_bCreateVTKPipeAlways = bCreate;
+    m_BCreateVTKPipeAlways = bCreate;
   }
 
 protected:  
