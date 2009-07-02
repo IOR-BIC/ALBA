@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-30 13:58:59 $
-Version:   $Revision: 1.1.2.24 $
+Date:      $Date: 2009-07-02 08:19:20 $
+Version:   $Revision: 1.1.2.25 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -277,6 +277,8 @@ mafOp(label)
   m_CurrentSlice = VTK_INT_MAX;
 
   m_ResampleFlag = FALSE;
+
+  m_DiscardSpatialPosition = FALSE;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicomOffis::~medOpImporterDicomOffis()
@@ -303,6 +305,8 @@ mafOp *medOpImporterDicomOffis::Copy()
   medOpImporterDicomOffis *importer = new medOpImporterDicomOffis(m_Label);
   importer->m_ResampleFlag = m_ResampleFlag;
   importer->m_DicomDirectory = m_DicomDirectory;
+  importer->m_DiscardSpatialPosition = m_DiscardSpatialPosition;
+
 	return importer;
 }
 //----------------------------------------------------------------------------
@@ -2325,9 +2329,39 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
       ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
 
-      if(val_long==16 && pixel_rep == 1)
+      long pixel_max;
+      long pixel_min;
+      ds->findAndGetLongInt(DCM_SmallestImagePixelValue, pixel_min);
+      ds->findAndGetLongInt(DCM_LargestImagePixelValue, pixel_max);
+
+
+      if(val_long==16 && pixel_rep == 0)
       {
-        imageData->SetScalarType(VTK_SHORT);
+        if(pixel_min*slope+intercept >= VTK_UNSIGNED_SHORT_MIN || pixel_max*slope+intercept >= VTK_UNSIGNED_SHORT_MAX)
+        {
+          imageData->SetScalarType(VTK_UNSIGNED_SHORT);
+        }
+        else if (pixel_min*slope+intercept >= VTK_SHORT_MIN || pixel_max*slope+intercept >= VTK_SHORT_MAX)
+        {
+          imageData->SetScalarType(VTK_SHORT);;
+        }
+        else
+        {
+          wxMessageBox("Inconsistent scalar values. Can not import file.","Error!!");
+          return false;
+        }
+      }
+      else if(val_long==16 && pixel_rep == 1 )
+      {
+        if (pixel_min*slope+intercept >= VTK_SHORT_MIN || pixel_max*slope+intercept >= VTK_SHORT_MAX)
+        {
+          imageData->SetScalarType(VTK_SHORT);
+        }
+        else
+        {
+          wxMessageBox("Inconsistent scalar values. Can not import file.","Error!!");
+          return false;
+        }
       }
       else if(val_long==16 && pixel_rep == 0)
       {
@@ -2337,6 +2371,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       {
         imageData->SetScalarType(VTK_CHAR);
       }
+
+
+
       imageData->AllocateScalars();
       imageData->GetPointData()->GetScalars()->SetName("Scalars");
       imageData->Update();
@@ -3002,7 +3039,15 @@ void medOpImporterDicomOffis::ResampleVolume()
         resampler->Update();
 
         output_data->SetSource(NULL);
-        output_data->SetOrigin(volumeBounds[0],volumeBounds[2],volumeBounds[4]);
+        if(m_DiscardSpatialPosition == TRUE)
+        {
+          output_data->SetOrigin(0,0,0);
+        }
+        else
+        {
+          output_data->SetOrigin(volumeBounds[0],volumeBounds[2],volumeBounds[4]);
+        }
+        
 
         vrg->SetDataByDetaching(output_data, input_item->GetTimeStamp());
         vrg->Update();
