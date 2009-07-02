@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSurface.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-12 16:34:48 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-07-02 09:10:48 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -117,17 +117,17 @@ mafGUI *medPipeTensorFieldSurface::CreateGui()
     bSizer2->Add( new wxStaticText( m_Gui, wxID_ANY, _("Color by:"), 
       wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 
-    m_comboColorBy = new wxComboBox( m_Gui, ID_COLOR_MAPPING_MODE, 
+    m_ComboColorBy = new wxComboBox( m_Gui, ID_COLOR_MAPPING_MODE, 
       wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
     UpdateColorByCombo();      
     
-    m_comboColorBy->SetToolTip( 
+    m_ComboColorBy->SetToolTip( 
       _("Specifies how the specified tensor field should be transformed into colors.") );
-    bSizer2->Add( m_comboColorBy, 1, wxALL, 0 );
+    bSizer2->Add( m_ComboColorBy, 1, wxALL, 0 );
     bSizerMain->Add( bSizer2, 0, wxEXPAND, 5 );
 
     //and validator
-    m_comboColorBy->SetValidator(mafGUIValidator(this, ID_COLOR_MAPPING_MODE, m_comboColorBy, &m_ColorMappingMode));
+    m_ComboColorBy->SetValidator(mafGUIValidator(this, ID_COLOR_MAPPING_MODE, m_ComboColorBy, &m_ColorMappingMode));
   
     wxBoxSizer* bSizer3 = new wxBoxSizer( wxHORIZONTAL );    
     bSizer3->Add( new wxStaticText( m_Gui, wxID_ANY, _("LUT:")), 0, wxALL, 5 );
@@ -281,8 +281,8 @@ void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
 {
   int nOldColorMode = m_ColorMappingMode;
 
-  m_comboColorBy->Clear();
-  m_comboColorBy->Append( _("magnitude") );
+  m_ComboColorBy->Clear();
+  m_ComboColorBy->Append( _("magnitude") );
 
   if (m_TensorFieldIndex >= 0)
   {
@@ -293,15 +293,15 @@ void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
     {
       int nComps = da->GetNumberOfComponents();
       for (int i = 0; i < nComps; i++){
-        m_comboColorBy->Append(wxString::Format("%d", i));
+        m_ComboColorBy->Append(wxString::Format("%d", i));
       }
     }
   } //end if [valid selection of tensor field]
 
-  int nCount = m_comboColorBy->GetCount();
+  int nCount = m_ComboColorBy->GetCount();
   if (nOldColorMode >= nCount)
     nOldColorMode = 0;
 
   m_ColorMappingMode = nOldColorMode;
-  m_comboColorBy->SetSelection(m_ColorMappingMode);
+  m_ComboColorBy->SetSelection(m_ColorMappingMode);
 }
