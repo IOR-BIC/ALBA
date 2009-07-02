@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-29 08:36:13 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-02 08:15:31 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -197,7 +197,7 @@ void medOpFillHoles::OnEvent(mafEventBase *maf_event)
         vtkDEL(m_VTKResult[m_VTKResult.size()-1]);
         m_VTKResult.pop_back();
         
-        b_undo->Enable(m_VTKResult.size()>1);
+        m_ButtonUndo->Enable(m_VTKResult.size()>1);
 
         this->m_Rwi->CameraUpdate();
       }
@@ -218,7 +218,7 @@ void medOpFillHoles::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_ALL:
 			{
-				b_fill->Enable((m_AllHoles && m_ExctractFreeEdges->GetOutput()->GetNumberOfPoints()!=0) || m_SelectedPoint);
+				m_ButtonFill->Enable((m_AllHoles && m_ExctractFreeEdges->GetOutput()->GetNumberOfPoints()!=0) || m_SelectedPoint);
 			}
 		break;
 
@@ -307,10 +307,10 @@ void medOpFillHoles::CreateOpDialog()
   wxStaticText* diam_label = new wxStaticText(m_Dialog, ID_DIAMETER_LABEL, _("  sphere size: "));
 	wxTextCtrl *diameter = new wxTextCtrl(m_Dialog,ID_DIAMETER, _("sphere dim."),p,wxSize(50, 16 ), wxNO_BORDER );
 
-	b_ok			= new mafGUIButton(m_Dialog, ID_OK,_("ok"), p, wxSize(80,20));
+	m_ButtonOk			= new mafGUIButton(m_Dialog, ID_OK,_("ok"), p, wxSize(80,20));
 	mafGUIButton  *b_cancel	= new mafGUIButton(m_Dialog, ID_CANCEL,_("cancel"), p, wxSize(80,20));
-	b_fill		= new mafGUIButton(m_Dialog, ID_FILL,_("fill"), p, wxSize(80,20));
-  b_undo    = new mafGUIButton(m_Dialog,ID_UNDO,_("undo"),p,wxSize(80,20));
+	m_ButtonFill		= new mafGUIButton(m_Dialog, ID_FILL,_("fill"), p, wxSize(80,20));
+  m_ButtonUndo    = new mafGUIButton(m_Dialog,ID_UNDO,_("undo"),p,wxSize(80,20));
 
 	wxCheckBox *c_all		= new wxCheckBox(m_Dialog, ID_ALL,_("all holes"), p, wxSize(80,20));
 	wxCheckBox *c_smooth	= new wxCheckBox(m_Dialog, ID_SMOOTH,_("smooth"), p, wxSize(70,20));
@@ -333,13 +333,13 @@ void medOpFillHoles::CreateOpDialog()
     wxT("Number of steps for thin plate smoothing. Larger value means smoother patch.") );
 
 
-	b_ok->SetValidator(mafGUIValidator(this,ID_OK,b_ok));
-	b_ok->Enable(false);
+	m_ButtonOk->SetValidator(mafGUIValidator(this,ID_OK,m_ButtonOk));
+	m_ButtonOk->Enable(false);
 	b_cancel->SetValidator(mafGUIValidator(this,ID_CANCEL,b_cancel));
-	b_fill->SetValidator(mafGUIValidator(this,ID_FILL,b_fill));
-	b_fill->Enable(false);
-  b_undo->SetValidator(mafGUIValidator(this,ID_UNDO,b_undo));
-  b_undo->Enable(false);
+	m_ButtonFill->SetValidator(mafGUIValidator(this,ID_FILL,m_ButtonFill));
+	m_ButtonFill->Enable(false);
+  m_ButtonUndo->SetValidator(mafGUIValidator(this,ID_UNDO,m_ButtonUndo));
+  m_ButtonUndo->Enable(false);
 
 	diameter->SetValidator(mafGUIValidator(this,ID_DIAMETER,diameter,&m_Diameter,0.0,9999.0));
 
@@ -361,9 +361,9 @@ void medOpFillHoles::CreateOpDialog()
 	h_sizer2->Add(diameter,0,wxRIGHT);
 
 	wxBoxSizer *h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
-	h_sizer3->Add(b_fill,0,wxRIGHT);
-  h_sizer3->Add(b_undo,0,wxRIGHT);
-	h_sizer3->Add(b_ok,0,wxRIGHT);
+	h_sizer3->Add(m_ButtonFill,0,wxRIGHT);
+  h_sizer3->Add(m_ButtonUndo,0,wxRIGHT);
+	h_sizer3->Add(m_ButtonOk,0,wxRIGHT);
 	h_sizer3->Add(b_cancel,0,wxRIGHT);
 
 	wxBoxSizer *v_sizer =  new wxBoxSizer( wxVERTICAL );
@@ -435,7 +435,7 @@ void medOpFillHoles::Fill()
   newPoly->Update();
   m_VTKResult.push_back(newPoly);
 
-  b_undo->Enable(m_VTKResult.size()>1);
+  m_ButtonUndo->Enable(m_VTKResult.size()>1);
 
   m_MapperSurface->SetInput(m_VTKResult[m_VTKResult.size()-1]);
   m_MapperSurface->Update();
@@ -448,8 +448,8 @@ void medOpFillHoles::Fill()
 
 	this->m_Rwi->CameraUpdate();
 
-	b_ok->Enable(true);
-	b_fill->Enable(m_SelectedPoint);
+	m_ButtonOk->Enable(true);
+	m_ButtonFill->Enable(m_SelectedPoint);
 
 	vtkDEL(fillingHoleFilter);
 	
@@ -489,7 +489,7 @@ void medOpFillHoles::SelectHole(int pointID)
 	vtkDEL(glyph);
 
 	m_SelectedPoint = m_ExctractHole->GetOutput()->GetNumberOfPoints()!=0;
-	b_fill->Enable(m_SelectedPoint);  
+	m_ButtonFill->Enable(m_SelectedPoint);  
 }
 //----------------------------------------------------------------------------
 void medOpFillHoles::CreatePolydataPipeline()

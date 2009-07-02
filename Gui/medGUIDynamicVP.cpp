@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medGUIDynamicVP.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-10 15:29:13 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-07-02 08:18:15 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -54,7 +54,7 @@ medGUIDynamicVP::medGUIDynamicVP( wxWindow* parent, wxWindowID id, long GUIstyle
   m_Listener = NULL;
   m_VPipes = NULL;
   m_VPipe = NULL;    
-  m_comboVP = NULL;
+  m_ComboVP = NULL;
   m_VPipeIndex = -1; 
   
   //create items
@@ -92,7 +92,7 @@ medGUIDynamicVP::~medGUIDynamicVP()
 /*virtual*/ wxSizer* medGUIDynamicVP::CreateGUI(long style)
 //------------------------------------------------------------------------
 {
-  m_comboVP = NULL;
+  m_ComboVP = NULL;
 
   wxBoxSizer* bSizerGT = new wxBoxSizer( wxVERTICAL );
 
@@ -120,21 +120,21 @@ medGUIDynamicVP::~medGUIDynamicVP()
       bSizer2->Add( new wxStaticText( m_GUI_This, wxID_ANY, 
         _("Visual Pipe:"), wxDefaultPosition, wxSize( 60,-1 )), 0, wxALL, 5 );
 
-      m_comboVP = new wxComboBox( m_GUI_This, ID_CREATE_VP, 
+      m_ComboVP = new wxComboBox( m_GUI_This, ID_CREATE_VP, 
         wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY ); 
-      m_comboVP->SetToolTip( _("Selects the visual pipe to be created.") );
+      m_ComboVP->SetToolTip( _("Selects the visual pipe to be created.") );
       if (m_VPipes != NULL)
       {
         const SUPPORTED_VP_ENTRY* pEntry = m_VPipes;
         while (pEntry->szClassName != NULL) 
         {
-          m_comboVP->Append(pEntry->szUserFriendlyName, (void*)pEntry->szClassName);
+          m_ComboVP->Append(pEntry->szUserFriendlyName, (void*)pEntry->szClassName);
           pEntry++;
         }
       }
 
-      m_comboVP->SetValidator(mafGUIValidator(this, ID_CREATE_VP, m_comboVP, &m_VPipeIndex));
-      bSizer2->Add( m_comboVP, 1, wxALL, 1 );
+      m_ComboVP->SetValidator(mafGUIValidator(this, ID_CREATE_VP, m_ComboVP, &m_VPipeIndex));
+      bSizer2->Add( m_ComboVP, 1, wxALL, 1 );
     }
 
     if ((style & GS_NO_CLOSE_VP) == 0)
@@ -168,15 +168,15 @@ void medGUIDynamicVP::SetVPipesList(const SUPPORTED_VP_ENTRY* pList)
     m_VPipes = pList;
     m_VPipeIndex = -1;       
 
-    if (m_comboVP != NULL)
+    if (m_ComboVP != NULL)
     {
-      m_comboVP->Clear(); 
+      m_ComboVP->Clear(); 
       if (m_VPipes != NULL)
       {
         const SUPPORTED_VP_ENTRY* pEntry = m_VPipes;
         while (pEntry->szClassName != NULL) 
         {
-          m_comboVP->Append(pEntry->szUserFriendlyName, (void*)pEntry->szClassName);
+          m_ComboVP->Append(pEntry->szUserFriendlyName, (void*)pEntry->szClassName);
           pEntry++;
         }
       }
@@ -273,8 +273,8 @@ void medGUIDynamicVP::OnEvent(mafEventBase *maf_event)
 
     m_VPipeIndex = nOldIndex;
 
-    if (m_comboVP != NULL)
-      m_comboVP->SetSelection(m_VPipeIndex);
+    if (m_ComboVP != NULL)
+      m_ComboVP->SetSelection(m_VPipeIndex);
   }
     
   _ASSERT(m_VPipe == NULL);
@@ -314,8 +314,8 @@ void medGUIDynamicVP::OnEvent(mafEventBase *maf_event)
     DestroyVisualPipe();  //this will also destroy the GUI
 
     m_VPipeIndex = -1;
-    if (m_comboVP != NULL)
-      m_comboVP->SetSelection(m_VPipeIndex);
+    if (m_ComboVP != NULL)
+      m_ComboVP->SetSelection(m_VPipeIndex);
 
     m_GUI_VP->Layout();
     this->Layout();    

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-17 17:17:21 $
-  Version:   $Revision: 1.3.2.4 $
+  Date:      $Date: 2009-07-02 08:15:31 $
+  Version:   $Revision: 1.3.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -284,7 +284,7 @@ void medOpExporterWrappedMeter::ExportWrappedMeterCoordinates(int index, int ind
 				<< vmeWrappedMeter->GetWrappedGeometryTangent2()[2] << std::endl;
 		}
 	}
-	m_keyNumList.push_back(numberOfKeyPoints);
+	m_KeyNumList.push_back(numberOfKeyPoints);
 	//WriteOnFile(numberOfKeyPoints);
 }
 
@@ -310,7 +310,7 @@ void medOpExporterWrappedMeter::WriteOnFile()
 
 		for(int m=0; m< rows; m++){
 			m_OutputFile << std::fixed << std::setw(6) << m<<std::setw(4)<< '\t';//output time
-			int num = m_keyNumList[m];
+			int num = m_KeyNumList[m];
 
 			for(int n=0; n< columns; n++)
 			{

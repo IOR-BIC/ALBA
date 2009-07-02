@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2009-05-29 08:36:13 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-02 08:15:31 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -100,9 +100,9 @@ protected:
 
 	double	m_Diameter;
 
-	mafGUIButton  *b_ok;
-	mafGUIButton  *b_fill;
-  mafGUIButton  *b_undo;
+	mafGUIButton  *m_ButtonOk;
+	mafGUIButton  *m_ButtonFill;
+  mafGUIButton  *m_ButtonUndo;
 
   //GUI controls
   wxComboBox* m_SmoothTypeCtrl; 

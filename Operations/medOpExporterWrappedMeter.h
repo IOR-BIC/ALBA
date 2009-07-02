@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-17 16:44:08 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-07-02 08:15:31 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ public:
   std::vector<mafTimeStamp> m_Times ;
   mafNode            *m_CurrentVme ;
   std::ofstream      m_OutputFile;
-  std::vector<int>  m_keyNumList;
+  std::vector<int>  m_KeyNumList;
 
   mafTypeMacro(medOpExporterWrappedMeter, mafOp);
 

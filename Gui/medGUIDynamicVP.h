@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medGUIDynamicVP.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:09:17 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-07-02 08:18:15 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -114,13 +114,13 @@ protected:
   mafString m_Name;             ///<user name associated with this panel
 
 #pragma region GUI
-  wxComboBox* m_comboVP;
+  wxComboBox* m_ComboVP;
 
   wxPanel* m_GUI_This;
   mafGUIScrolledPanel* m_GUI_VP;  
 #pragma endregion GUI
 
-  bool m_bGUI_ThisShown;      ///<true, if the GUIThis is shown
+  bool m_BGUIThisShown;      ///<true, if the GUIThis is shown
 
 protected:
   DECLARE_EVENT_TABLE();
