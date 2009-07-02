@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 09:28:28 $
-Version:   $Revision: 1.1.2.27 $
+Date:      $Date: 2009-07-02 14:14:31 $
+Version:   $Revision: 1.1.2.28 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1437,7 +1437,7 @@ void medOpImporterDicomOffis::CreateBuildPage()
 
   m_BuildGuiCenter->Divider();
   wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
-  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray);
+  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, "", wxRA_SPECIFY_ROWS);
   
   m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
   
