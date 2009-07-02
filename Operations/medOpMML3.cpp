@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-30 15:35:59 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-07-02 09:39:34 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -159,7 +159,7 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_3DFlag = 0;
 
   // default axis is z
-  m_slicexyz = 2 ;
+  m_Slicexyz = 2 ;
 
   // unregistered
   m_RegistrationStatus = 0;
@@ -406,10 +406,10 @@ void medOpMML3::CreateInputsDlg()
   radioStrings.Add(wxT("x")) ;
   radioStrings.Add(wxT("y")) ;
   radioStrings.Add(wxT("z")) ;
-  m_radio_slicexyz = new wxRadioBox(m_ChooseDlg, ID_CHOOSE_SLICEXYZ, "Default direction", wxPoint(0,0), wxSize(150,50), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
-  m_radio_slicexyz->SetValidator(mafGUIValidator(this, ID_CHOOSE_SLICEXYZ, m_radio_slicexyz, &m_slicexyz));
+  m_RadioSlicexyz = new wxRadioBox(m_ChooseDlg, ID_CHOOSE_SLICEXYZ, "Default direction", wxPoint(0,0), wxSize(150,50), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
+  m_RadioSlicexyz->SetValidator(mafGUIValidator(this, ID_CHOOSE_SLICEXYZ, m_RadioSlicexyz, &m_Slicexyz));
   wxBoxSizer *sliceXYZHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  sliceXYZHorizontalSizer->Add(m_radio_slicexyz,1,wxEXPAND | wxRIGHT, 3);
+  sliceXYZHorizontalSizer->Add(m_RadioSlicexyz,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(sliceXYZHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
   // landmark axis 1
@@ -655,16 +655,16 @@ void medOpMML3::CreateRegistrationDlg()
 
   // maf parameter views RWI's
   for (int i = 0 ;  i < 9 ;  i++)
-    m_textSource[i] = vtkTextSource::New() ;
-  m_PHmafRWI = CreateParameterViewmafRWI(m_textSource[0], "P-H", 1,1,1); // white
-  m_PVmafRWI = CreateParameterViewmafRWI(m_textSource[1], "P-V", 1,1,1); // white
-  m_THmafRWI = CreateParameterViewmafRWI(m_textSource[2], "T-H", 1,1,1); // white
-  m_TVmafRWI = CreateParameterViewmafRWI(m_textSource[3], "T-V", 1,1,1); // white
-  m_RAmafRWI = CreateParameterViewmafRWI(m_textSource[4], "R-A", 1,1,1); // white
-  m_SNmafRWI = CreateParameterViewmafRWI(m_textSource[5], "S-N", 1,0,0); // red
-  m_SSmafRWI = CreateParameterViewmafRWI(m_textSource[6], "S-S", 0,1,0); // green
-  m_SEmafRWI = CreateParameterViewmafRWI(m_textSource[7], "S-E", 0,0,1); // blue
-  m_SWmafRWI = CreateParameterViewmafRWI(m_textSource[8], "S-W", 1,0,1); // magenta
+    m_TextSource[i] = vtkTextSource::New() ;
+  m_PHmafRWI = CreateParameterViewmafRWI(m_TextSource[0], "P-H", 1,1,1); // white
+  m_PVmafRWI = CreateParameterViewmafRWI(m_TextSource[1], "P-V", 1,1,1); // white
+  m_THmafRWI = CreateParameterViewmafRWI(m_TextSource[2], "T-H", 1,1,1); // white
+  m_TVmafRWI = CreateParameterViewmafRWI(m_TextSource[3], "T-V", 1,1,1); // white
+  m_RAmafRWI = CreateParameterViewmafRWI(m_TextSource[4], "R-A", 1,1,1); // white
+  m_SNmafRWI = CreateParameterViewmafRWI(m_TextSource[5], "S-N", 1,0,0); // red
+  m_SSmafRWI = CreateParameterViewmafRWI(m_TextSource[6], "S-S", 0,1,0); // green
+  m_SEmafRWI = CreateParameterViewmafRWI(m_TextSource[7], "S-E", 0,0,1); // blue
+  m_SWmafRWI = CreateParameterViewmafRWI(m_TextSource[8], "S-W", 1,0,1); // magenta
 
 
 
@@ -794,7 +794,7 @@ void medOpMML3::DeleteRegistrationDlg()
 
   // delete the parameter view render windows
   for (int i = 0 ;  i < 9 ;  i++)
-    m_textSource[i]->Delete() ;
+    m_TextSource[i]->Delete() ;
   delete m_PHmafRWI ;
   delete m_PVmafRWI ;
   delete m_THmafRWI ;
@@ -2681,7 +2681,7 @@ void medOpMML3::OnLandmarkAxis1AtlasSelection()
 
 
   // Now selecting axis by landmarks, so disable the default direction radio box
-  m_radio_slicexyz->Enable(false) ;
+  m_RadioSlicexyz->Enable(false) ;
 
   // if all landmarks chosen
   if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
@@ -2778,7 +2778,7 @@ void medOpMML3::OnLandmarkAxis2AtlasSelection()
 
 
   // Now selecting axis by landmarks, so disable the default direction radio box
-  m_radio_slicexyz->Enable(false) ;
+  m_RadioSlicexyz->Enable(false) ;
 
   // if all landmarks chosen
   if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
@@ -2875,7 +2875,7 @@ void medOpMML3::OnLandmarkAxis3AtlasSelection()
 
 
   // Now selecting axis by landmarks, so disable the default direction radio box
-  m_radio_slicexyz->Enable(false) ;
+  m_RadioSlicexyz->Enable(false) ;
 
   // if all landmarks chosen
   if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
@@ -2952,17 +2952,17 @@ void medOpMML3::CreateDefaultAxisLandmarks()
   double zmed = (bnds[4] + bnds[5]) / 2.0 ;
 
   if (m_MuscleType == 1){
-    if (m_slicexyz == 0){
+    if (m_Slicexyz == 0){
       // x axis
       m_Axis1Point[0] = bnds[0] ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = zmed ;
       m_Axis2Point[0] = bnds[1] ;  m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = zmed ;
     }
-    else if (m_slicexyz == 1){
+    else if (m_Slicexyz == 1){
       // y axis
       m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = bnds[2] ;  m_Axis1Point[2] = zmed ;
       m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = bnds[3] ;  m_Axis2Point[2] = zmed ;
     }
-    else if (m_slicexyz == 2){
+    else if (m_Slicexyz == 2){
       // z axis
       m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = bnds[4] ;
       m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = bnds[5] ;
@@ -2978,17 +2978,17 @@ void medOpMML3::CreateDefaultAxisLandmarks()
     m_Axis3Defined = false ;
   }
   else if (m_MuscleType == 2){
-    if (m_slicexyz == 0){
+    if (m_Slicexyz == 0){
       m_Axis1Point[0] = bnds[0] ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = zmed ;
       m_Axis2Point[0] = xmed ;     m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = zmed ;
       m_Axis3Point[0] = bnds[1] ;  m_Axis3Point[1] = ymed ;  m_Axis3Point[2] = zmed ;
     }
-    else if (m_slicexyz == 1){
+    else if (m_Slicexyz == 1){
       m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = bnds[2] ;  m_Axis1Point[2] = zmed ;
       m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = ymed ;     m_Axis2Point[2] = zmed ;
       m_Axis3Point[0] = xmed ;  m_Axis3Point[1] = bnds[3] ;  m_Axis3Point[2] = zmed ;
     }
-    else if (m_slicexyz == 2){
+    else if (m_Slicexyz == 2){
       m_Axis1Point[0] = xmed ;  m_Axis1Point[1] = ymed ;  m_Axis1Point[2] = bnds[4] ;
       m_Axis2Point[0] = xmed ;  m_Axis2Point[1] = ymed ;  m_Axis2Point[2] = zmed ;
       m_Axis3Point[0] = xmed ;  m_Axis3Point[1] = ymed ;  m_Axis3Point[2] = bnds[5];

@@ -3,7 +3,7 @@
   File:    	 mafBrickedFileReader.h
   Language:  C++
   Date:      13:2:2008   9:11
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -49,7 +49,7 @@ protected:
 	int m_VOI[6];		
 
 	//false denotes that information in m_ValidROI is obsolete 
-	bool m_bROIValid;
+	bool m_BROIValid;
 	
 	//region that is currently in output data set and is valid,
 	//i.e., the data from this ROI can be reused (no need to load them)
@@ -59,7 +59,7 @@ protected:
 	mafString m_LUBrickFileName;
 
 	//small cache for one brick
-	char* m_pBrickDataCache;
+	char* m_PBrickDataCache;
 
 public:
 	mafBrickedFileReader();

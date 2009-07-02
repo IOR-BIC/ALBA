@@ -3,7 +3,7 @@
 File:    	 mafBrickedFileReader.cpp
 Language:  C++
 Date:      13:2:2008   14:25
-Version:   $Revision: 1.1.2.2 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
 
 Copyright (c) 2008
@@ -36,9 +36,9 @@ mafBrickedFileReader::mafBrickedFileReader()
 {				 
 	m_DataSet = NULL;
   m_DataSetRLG = NULL;
-	m_bROIValid = false;
+	m_BROIValid = false;
 	
-	m_pBrickDataCache = NULL;
+	m_PBrickDataCache = NULL;
 	
 	m_VOI[0] = m_VOI[2] = m_VOI[4] = 0;
 	m_VOI[1] = m_VOI[3] = m_VOI[5] = 0xFFFF;	//short max
@@ -63,7 +63,7 @@ void mafBrickedFileReader::SetOutputDataSet(vtkImageData* ds)
 		if ((m_DataSet = ds) != NULL)
 			m_DataSet->Register(NULL);
 
-		m_bROIValid = false;
+		m_BROIValid = false;
 		this->Modified();
 	}
 }
@@ -81,7 +81,7 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
     if ((m_DataSetRLG = ds) != NULL)
       m_DataSetRLG->Register(NULL);
 
-    m_bROIValid = false;
+    m_BROIValid = false;
     this->Modified();
   }
 }
@@ -170,7 +170,7 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
     }
   }
 
-	m_pBrickDataCache = new char[m_nBrickSizeInB[2]];	
+	m_PBrickDataCache = new char[m_nBrickSizeInB[2]];	
 
 
 
@@ -186,7 +186,7 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 //deallocates the buffers created in AllocateBuffers
 /*virtual*/ void mafBrickedFileReader::DeallocateBuffers()  throw(...)
 {
-	cppDEL(m_pBrickDataCache);
+	cppDEL(m_PBrickDataCache);
 	cppDEL(m_pLowResLevel);
 	cppDEL(m_pMainIdxTable);
   cppDEL(m_pExIdxTable);
@@ -251,7 +251,7 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 	//if the resample mode and resample rate is the same as the one 
 	//used during the last update, we might have already some data
 	//loaded in the output data set
-	if (m_bROIValid)
+	if (m_BROIValid)
 	{
 		//data in the intersection of the current VOI and ValidROI
 		//can be reused (no need to reload it)				
@@ -266,18 +266,18 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 				m_ValidROI[2*i + 1] = m_VOI[2*i + 1];
 
 			if (m_ValidROI[2*i + 1] < m_ValidROI[2*i]) {
-				m_bROIValid = false;	//we are out
+				m_BROIValid = false;	//we are out
 				break;
 			}
 		}
 
-		if (m_bROIValid)
+		if (m_BROIValid)
 		{
 			//store scalars, to be used later
 			vtkPointData* pp = output->GetPointData();
 			outLScalars = pp->GetScalars();
 			if (outLScalars == NULL)
-				m_bROIValid = false;
+				m_BROIValid = false;
 			else
 			{
 				outLScalars->Register(NULL);
@@ -317,7 +317,7 @@ void mafBrickedFileReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 	output->SetNumberOfScalarComponents(m_FileHeader.numcomps);		
 	output->AllocateScalars();
 
-	if (m_bROIValid)
+	if (m_BROIValid)
 	{
 		//copy the appropriate part from previous scalars
 		int srcPos[3], dstPos[3], cpySize[3];	//extent to be copied
@@ -392,7 +392,7 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 	int bndBExt[6], bndVBExt[6];
 	GetBricksExtent(m_VOI, inBExt, bndBExt);
 
-	if (m_bROIValid)	//if ROI is valid, get extents for it as well
+	if (m_BROIValid)	//if ROI is valid, get extents for it as well
 		GetBricksExtent(m_ValidROI, inVBExt, bndVBExt);
 	else
 	{
@@ -497,12 +497,12 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 					//unfortunately, this brick has to be processed
 					//compute index of this current cell					 
 					if (bUniform)
-						FillBrick(m_pBrickDataCache, &m_pLowResLevel[nLRIdx]);						
+						FillBrick(m_PBrickDataCache, &m_pLowResLevel[nLRIdx]);						
 					else					
-						LoadBrick(nBrickIndex - nSkippedBricks, m_pBrickDataCache);					
+						LoadBrick(nBrickIndex - nSkippedBricks, m_PBrickDataCache);					
 
 					//having the data in pBrickData, copy its bytes													
-					CopyBrickData(m_pBrickDataCache, brckExt, pOutPtrX, outIncrInB);
+					CopyBrickData(m_PBrickDataCache, brckExt, pOutPtrX, outIncrInB);
 				} //end if - check of validity
 
 				//advance addresses
@@ -517,7 +517,7 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 	} //end for xyzb[2]
 
 	memcpy(&m_ValidROI[0], &m_VOI[0], sizeof(int)*6);
-	m_bROIValid = true;  
+	m_BROIValid = true;  
 }
 
 /** processes data by converting m_DataSet into m_DataSetRLG */
@@ -586,7 +586,7 @@ void mafBrickedFileReader::GetBricksExtent(int VOI[6], int inBExt[6], int bndBEx
 			OpenBrickFile();	//if not open new one
 
 			m_LUBrickFileName = m_BrickFileName;
-			m_bROIValid = false;
+			m_BROIValid = false;
 		}
 
 		ExecuteInformation();	//initialize variables				

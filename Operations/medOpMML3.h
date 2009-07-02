@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-06-30 15:35:59 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-07-02 09:39:34 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -259,7 +259,7 @@ protected:
   int m_MuscleType;	///< muscle type (axis is single line or piecewise 2 lines)
   int m_RegistrationStatus;	///< flag indicating if registration has taken place
   int m_3DFlag;	///< flag indicating if model view is 2D or 3D
-  int m_slicexyz ;  ///< validator for default slice direction
+  int m_Slicexyz ;  ///< validator for default slice direction
   int m_ScansGrain; ///< set by user, used to calculate size and resolution of scans
   double m_AxisRangeFactor ; ///< factor which extends range of axis beyond landmarks
 
@@ -268,7 +268,7 @@ protected:
   /// 2 for selected (from atlas)
   int m_AxisLandmarksFlag ; 
 
-  vtkTextSource *m_textSource[9] ;  ///< text sources used in CreateParameterViewmafRWI()
+  vtkTextSource *m_TextSource[9] ;  ///< text sources used in CreateParameterViewmafRWI()
 
 
   //----------------------------------------------------------------------------
@@ -383,7 +383,7 @@ protected:
 
   wxTextCtrl *m_NumberOfSlicesTxt;
 
-  wxRadioBox *m_radio_slicexyz ;
+  wxRadioBox *m_RadioSlicexyz ;
 };
 #endif
 
