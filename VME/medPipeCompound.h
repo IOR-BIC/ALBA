@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompound.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:10:54 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-07-02 08:37:13 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -57,7 +57,7 @@ protected:
   std::vector< int > m_PagesGroupIndex;   ///<group associated with the the page
 
   mafSceneNode* m_SceneNode;  ///<current scene node to be used  
-  wxBoxSizer* m_sbMainSizer;  ///<gui main container, can include either m_Notebook or m_FirstPage
+  wxBoxSizer* m_SbMainSizer;  ///<gui main container, can include either m_Notebook or m_FirstPage
   wxNotebook* m_Notebook;     ///<gui container for pages
   medGUIDynamicVP* m_FirstPage; ///<reference to the only one page (if not included in the notebook)
   wxString m_FirstPageName;     ///<name of the only page (if not included in the notebook)

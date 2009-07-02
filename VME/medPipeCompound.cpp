@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompound.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-06-08 15:10:54 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-07-02 08:37:13 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -119,12 +119,12 @@ mafGUI *medPipeCompound::CreateGui()
   m_Gui = new mafGUIAutoResized(this);
 
 #pragma region GUI Controls
-  m_sbMainSizer = new wxBoxSizer( wxVERTICAL );
+  m_SbMainSizer = new wxBoxSizer( wxVERTICAL );
   m_Notebook = new wxNotebook( m_Gui, ID_TABCTRL, 
     wxDefaultPosition, wxDefaultSize, wxNB_TOP | wxNB_FLAT );
 
-  m_sbMainSizer->Add( m_Notebook, 1, wxEXPAND | wxALL, 0 );
-  m_Gui->Add(m_sbMainSizer, 1, wxEXPAND);  
+  m_SbMainSizer->Add( m_Notebook, 1, wxEXPAND | wxALL, 0 );
+  m_Gui->Add(m_SbMainSizer, 1, wxEXPAND);  
 #pragma endregion GUI Controls
   
   return m_Gui;
@@ -393,8 +393,8 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
     m_Notebook->RemovePage(0);
 
     m_FirstPage->Reparent(m_Gui);
-    m_sbMainSizer->Detach(m_Notebook);
-    m_sbMainSizer->Add(m_FirstPage, 1, wxEXPAND | wxALL, 0 );
+    m_SbMainSizer->Detach(m_Notebook);
+    m_SbMainSizer->Add(m_FirstPage, 1, wxEXPAND | wxALL, 0 );
 
     m_Notebook->Reparent(mafGetFrame());
     m_Notebook->Show(false);
@@ -405,10 +405,10 @@ void medPipeCompound::OnEvent(mafEventBase *maf_event)
     m_Notebook->Show(true);
 
     m_FirstPage->Reparent(m_Notebook);
-    m_sbMainSizer->Detach(m_FirstPage);
+    m_SbMainSizer->Detach(m_FirstPage);
     
     m_Notebook->InsertPage(0, m_FirstPage, m_FirstPageName);
-    m_sbMainSizer->Add( m_Notebook, 1, wxEXPAND | wxALL, 0 );
+    m_SbMainSizer->Add( m_Notebook, 1, wxEXPAND | wxALL, 0 );
     m_FirstPage = NULL;
   }
 }
