@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpMeshDeformation.h,v $
 Language:  C++
-Date:      $Date: 2009-05-29 08:36:13 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-02 09:23:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -424,12 +424,12 @@ protected:
   int m_DeformationMode;        //<method that should be used for the deformation
   int m_SaveODC[2];             //<non-zero, if the original (0) or deformed (1) curves should be saved
 
-  bool m_bPointMoveActive;          //<true, if the point is currently in the move 
+  bool m_BPointMoveActive;          //<true, if the point is currently in the move 
   double m_PointMoveCorrection[3];  //<correction of the movement
 
-  bool m_bCorrespondenceActive;     //<true, if the correspondence construction is active
+  bool m_BCorrespondenceActive;     //<true, if the correspondence construction is active
 
-  bool m_bDoNotCreateUndo;          //<true, if new items should not be created
+  bool m_BDoNotCreateUndo;          //<true, if new items should not be created
 
 #pragma region //GUI Controls  
   wxButton* m_BttnReset;

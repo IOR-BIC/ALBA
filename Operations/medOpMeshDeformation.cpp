@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpMeshDeformation.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-29 08:36:13 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-02 09:23:59 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -124,9 +124,9 @@ medOpMeshDeformation::medOpMeshDeformation(const wxString &label) : mafOp(label)
   m_DeformationMode = 2;
   m_SaveODC[0] = m_SaveODC[1] = 0;
 
-  m_bPointMoveActive = false;
-  m_bCorrespondenceActive = false;
-  m_bDoNotCreateUndo = false;
+  m_BPointMoveActive = false;
+  m_BCorrespondenceActive = false;
+  m_BDoNotCreateUndo = false;
 }
 //----------------------------------------------------------------------------
 medOpMeshDeformation::~medOpMeshDeformation()
@@ -1027,7 +1027,7 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
   m_EditModeHelp->SetValue(szHelp[m_EditMode]);
 
   //reset correspondence construction
-  m_bCorrespondenceActive = false;
+  m_BCorrespondenceActive = false;
 
 #ifdef DEBUG_medOpMeshDeformation
   if (m_EditMode == EDM_SELECT_MESH_VERTEX)
@@ -1103,10 +1103,10 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
       if (pickedObj == pDS)
       {
         //the current pCurve was picked at picketObj
-        if (m_EditMode != EDM_MOVE_POINTS && m_bPointMoveActive)
+        if (m_EditMode != EDM_MOVE_POINTS && m_BPointMoveActive)
           EndMovePoint(); //this is to prevent wrong behavior
-        if (m_EditMode != EDM_ADD_CORRESPONDENCE && m_bCorrespondenceActive)
-          m_bCorrespondenceActive = false;  //fix
+        if (m_EditMode != EDM_ADD_CORRESPONDENCE && m_BCorrespondenceActive)
+          m_BCorrespondenceActive = false;  //fix
 
         switch(m_EditMode)
         {
@@ -1119,7 +1119,7 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
           break;        
 
         case EDM_MOVE_POINTS:
-          if (!m_bPointMoveActive)
+          if (!m_BPointMoveActive)
             BeginMovePoint(i, j , pickedPos);
           else
             EndMovePoint();
@@ -1134,7 +1134,7 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
           break;
 
         case EDM_ADD_CORRESPONDENCE:
-          if (!m_bCorrespondenceActive)
+          if (!m_BCorrespondenceActive)
             BeginAddCorrespondence(i, j, pickedPos);
           else
             EndAddCorrespondence(i, j, pickedPos);
@@ -1218,16 +1218,16 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
   if (nAction == EDM_ADD_CURVE)
   {
     //we will remove the curve and everything related to it
-    m_bDoNotCreateUndo = true;
+    m_BDoNotCreateUndo = true;
     DeleteControlCurve(pUndo->nCurveIndex);
-    m_bDoNotCreateUndo = false;
+    m_BDoNotCreateUndo = false;
   }
   else if (nAction == EDM_DELETE_CURVE)
   {
     //we will add the curve at the proper position
-    m_bDoNotCreateUndo = true;
+    m_BDoNotCreateUndo = true;
     AddControlCurve(pUndo->pOC_DC[0], pUndo->pOC_DC[1], pUndo->pCC);
-    m_bDoNotCreateUndo = false;
+    m_BDoNotCreateUndo = false;
 
     pUndo->pOC_DC[0] = pUndo->pOC_DC[1] = NULL;
     pUndo->pCC = NULL;
@@ -1491,7 +1491,7 @@ void medOpMeshDeformation::OnEvent(mafEventBase *maf_event)
 //Creates an undo item for the given curve.
 void medOpMeshDeformation::CreateUndo(int index, int nAction, int nFlags)
 {
-  if (m_bDoNotCreateUndo)
+  if (m_BDoNotCreateUndo)
     return; //the construction of undo item is forbidden (typically because of OnUndo)
 
   CONTROL_CURVE* pCurve = m_Curves[index];
@@ -1714,7 +1714,7 @@ void medOpMeshDeformation::BeginMovePoint(int index, int iType, double pos[3])
     for (int i = 0; i < 3; i++) {
       m_PointMoveCorrection[i] = pcoords[i] - pos[i];
     }
-    m_bPointMoveActive = true;
+    m_BPointMoveActive = true;
     m_Picker->SetContinuousPicking(true);
   }  
 }
@@ -1726,7 +1726,7 @@ void medOpMeshDeformation::EndMovePoint()
 //------------------------------------------------------------------------
 {
   m_Picker->SetContinuousPicking(false);
-  m_bPointMoveActive = false;
+  m_BPointMoveActive = false;
 }
 
 //------------------------------------------------------------------------
@@ -1735,7 +1735,7 @@ void medOpMeshDeformation::EndMovePoint()
 void medOpMeshDeformation::MovePoint(double pos[3])
 //------------------------------------------------------------------------
 {
-  _VERIFY_RET(m_bPointMoveActive && m_SelectedCurve != NULL);    
+  _VERIFY_RET(m_BPointMoveActive && m_SelectedCurve != NULL);    
 
   double ptPos[3];
   for (int i = 0; i < 3; i++) {
@@ -2054,7 +2054,7 @@ void medOpMeshDeformation::BeginAddCorrespondence( int index, int iType, double 
 
     //there is a point => we can start the construction
     SelectControlCurve(pCurve, iType, pos);
-    m_bCorrespondenceActive = true;
+    m_BCorrespondenceActive = true;
   }
 }
 
@@ -2063,7 +2063,7 @@ void medOpMeshDeformation::BeginAddCorrespondence( int index, int iType, double 
 void medOpMeshDeformation::EndAddCorrespondence( int index, int iType, double pos[3] )
 //------------------------------------------------------------------------
 {
-  _VERIFY_RET(m_bCorrespondenceActive && m_SelectedCurve != NULL);  
+  _VERIFY_RET(m_BCorrespondenceActive && m_SelectedCurve != NULL);  
   if (iType == m_SelectedObjType - SELECT_OC_VERT)
     return; //the second point must lie on the other curve
 
@@ -2096,7 +2096,7 @@ void medOpMeshDeformation::EndAddCorrespondence( int index, int iType, double po
     
     pCurve->pCCList->InsertNextId(nOCPtID);
     pCurve->pCCList->InsertNextId(nDCPtID);
-    m_bCorrespondenceActive = false;
+    m_BCorrespondenceActive = false;
 
     UpdateControlCurve(pCurve, CHANGE_CC);
     UpdateControlCurveVisibility(pCurve);

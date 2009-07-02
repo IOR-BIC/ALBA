@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeReader.h
   Language:  C++
   Date:      20:2:2008   14:04
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -46,13 +46,13 @@ protected:
 	mafObserver* m_Listener;
 
 	//list of bricked readers (levels)
-	mafBrickedFileReader** m_pLevels;
-	int m_nLevels;	
+	mafBrickedFileReader** m_PLevels;
+	int m_NLevels;	
 
 	//last update stamp
 	mafMTime m_LastUpdateTime;	
 
-	int m_nCurrentLevel;	//level currently used to process
+	int m_NCurrentLevel;	//level currently used to process
 public:	
 	mafVolumeLargeReader();
 	virtual ~mafVolumeLargeReader();
@@ -60,17 +60,17 @@ public:
 public:
 	//returns number of levels
 	inline int GetNumberOfLevels() {
-		return m_nLevels;
+		return m_NLevels;
 	}
 
 	//returns the level file (corresponds to sample rate)
 	inline mafBrickedFileReader* GetLevelFile(int nLevel) {
-		return m_pLevels != NULL ? m_pLevels[nLevel] : NULL;
+		return m_PLevels != NULL ? m_PLevels[nLevel] : NULL;
 	}
 
 	//Gets the current sample rate
 	inline int GetSampleRate() {
-		return m_nCurrentLevel;
+		return m_NCurrentLevel;
 	}  
 
 	//Gets the associated brick file

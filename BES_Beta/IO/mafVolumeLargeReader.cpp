@@ -3,7 +3,7 @@
   File:    	 mafVolumeLargeReader.cpp
   Language:  C++
   Date:      20:2:2008   14:36
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -31,15 +31,15 @@ mafVolumeLargeReader::mafVolumeLargeReader(void)
 {
 	m_DataSet = NULL;
   m_DataSetRLG = NULL;
-	m_pLevels = NULL;
-	m_nLevels = 0;
+	m_PLevels = NULL;
+	m_NLevels = 0;
 
 	m_VOI[0] = m_VOI[2] = m_VOI[4] = 0;
 	m_VOI[1] = m_VOI[3] = m_VOI[5] = 0xFFFF;	//short max
 	m_VOI_Initialized = false;
 
 	m_MemoryLimit = 16384;		//16M - experimentally found to be a good constant
-	m_nCurrentLevel = 0;
+	m_NCurrentLevel = 0;
 	m_Listener = NULL;
 }
 
@@ -104,24 +104,24 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 	}
 			
 	//detect the coarsest level we have
-	m_nLevels = 99;
+	m_NLevels = 99;
 	while (!::wxFileExists(wxString::Format("%s_%02d.bbf",
-		szFNamePrefix, m_nLevels))) {
-			m_nLevels--;
+		szFNamePrefix, m_NLevels))) {
+			m_NLevels--;
 	}
 	
 	//and populate it
-	m_pLevels = new mafBrickedFileReader*[++m_nLevels];
-	memset(m_pLevels, 0, m_nLevels*sizeof(m_pLevels[0]));
-	for (int i = 1; i < m_nLevels; i++)
+	m_PLevels = new mafBrickedFileReader*[++m_NLevels];
+	memset(m_PLevels, 0, m_NLevels*sizeof(m_PLevels[0]));
+	for (int i = 1; i < m_NLevels; i++)
 	{
 		szFName = wxString::Format("%s_%02d.bbf", szFNamePrefix, i);
 		if (::wxFileExists(szFName))
 		{
-			m_pLevels[i] = new mafBrickedFileReader();
-			m_pLevels[i]->SetFileName(szFName);
-			m_pLevels[i]->SetEmptyVOI();
-			m_pLevels[i]->Update();				//force the validation
+			m_PLevels[i] = new mafBrickedFileReader();
+			m_PLevels[i]->SetFileName(szFName);
+			m_PLevels[i]->SetEmptyVOI();
+			m_PLevels[i]->Update();				//force the validation
 		}
 	}
 }
@@ -129,14 +129,14 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 //Releases every level
 /*virtual*/ void mafVolumeLargeReader::DestroyLODs()
 {
-	while (m_nLevels > 0) 
+	while (m_NLevels > 0) 
 	{		
-		m_nLevels--;
-		cppDEL(m_pLevels[m_nLevels]);		
+		m_NLevels--;
+		cppDEL(m_PLevels[m_NLevels]);		
 	}
 
-	cppDEL(m_pLevels);
-	m_nLevels = 0;
+	cppDEL(m_PLevels);
+	m_NLevels = 0;
 }
 
 //------------------------------------------------------------------------
@@ -146,8 +146,8 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 {
   vtkIdType64 nTotalSize = ((vtkIdType64)(VOI[1] - VOI[0] + 1))*
     (VOI[3] - VOI[2] + 1)*(VOI[5] - VOI[4] + 1)*
-    m_pLevels[1]->GetNumberOfComponents()*
-    m_pLevels[1]->GetDataTypeSize() / 1024;
+    m_PLevels[1]->GetNumberOfComponents()*
+    m_PLevels[1]->GetDataTypeSize() / 1024;
 
   int sr = 1;
   vtkIdType64 nCurSize = nTotalSize;
@@ -157,11 +157,11 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
     nCurSize = nTotalSize / (sr*sr*sr);
   }
 
-  if (sr >= m_nLevels)	//oops, we are out
-    sr = m_nLevels - 1;
+  if (sr >= m_NLevels)	//oops, we are out
+    sr = m_NLevels - 1;
   else
   {
-    while (m_pLevels[sr] == NULL) {
+    while (m_PLevels[sr] == NULL) {
       sr++;	//find the first coarser
     }
   }
@@ -172,14 +172,14 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 //Called by Update to fill some internal structures
 /*virtual*/ void mafVolumeLargeReader::ExecuteInformation() throw(...)
 {
-	if (m_nLevels == 0)
+	if (m_NLevels == 0)
 		CreateLODs();	//creates level of details
 
 	//if VOI is not initialized, set it to the whole extent
 	if (!m_VOI_Initialized) 
 	{
 		int nDims[3];	//m_pLevels[1] keeps the highest resolution data
-		m_pLevels[1]->GetDataDimensions(nDims);
+		m_PLevels[1]->GetDataDimensions(nDims);
 		for (int i = 0; i < 3; i++)
 		{
 			m_VOI[2*i] = 0;
@@ -191,25 +191,25 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
   int sr = ComputeSampleRate(m_VOI, m_MemoryLimit);
 
 	//sr denotes now the best level  
-  if (m_nCurrentLevel != sr && m_nCurrentLevel != 0)
+  if (m_NCurrentLevel != sr && m_NCurrentLevel != 0)
   {
-    m_pLevels[m_nCurrentLevel]->SetEmptyVOI();
-    m_pLevels[m_nCurrentLevel]->Update();
+    m_PLevels[m_NCurrentLevel]->SetEmptyVOI();
+    m_PLevels[m_NCurrentLevel]->Update();
   }
 
-	m_pLevels[sr]->SetListener(this->GetListener());
-	m_pLevels[sr]->SetVOI(m_VOI);  
-	m_nCurrentLevel = sr;
+	m_PLevels[sr]->SetListener(this->GetListener());
+	m_PLevels[sr]->SetVOI(m_VOI);  
+	m_NCurrentLevel = sr;
 }
 
 //processes data
 /*virtual*/ void mafVolumeLargeReader::ExecuteData() throw(...)
 {	
-	m_pLevels[m_nCurrentLevel]->Update();
+	m_PLevels[m_NCurrentLevel]->Update();
 
 	//copy data to output port
 	vtkImageData* output = GetOutputDataSet();
-	vtkImageData* input = m_pLevels[m_nCurrentLevel]->GetOutputDataSet();
+	vtkImageData* input = m_PLevels[m_NCurrentLevel]->GetOutputDataSet();
 
 	output->ShallowCopy(input);
 	output->SetUpdateExtentToWholeExtent();
@@ -217,14 +217,14 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
   if (this->IsRectilinearGrid())
   {
     vtkRectilinearGrid* outputRLG = GetOutputRLGDataSet();
-    vtkRectilinearGrid* inputRLG = m_pLevels[m_nCurrentLevel]->GetOutputRLGDataSet();
+    vtkRectilinearGrid* inputRLG = m_PLevels[m_NCurrentLevel]->GetOutputRLGDataSet();
 
     outputRLG->ShallowCopy(inputRLG);
     outputRLG->SetUpdateExtentToWholeExtent();
   }
 
 	//get modified VOI for the data (it might change)
-	m_pLevels[m_nCurrentLevel]->GetVOI(m_VOI);
+	m_PLevels[m_NCurrentLevel]->GetVOI(m_VOI);
 }
 
 //This method updates the output (i.e., it performs the retrieval)	
@@ -291,11 +291,11 @@ void mafVolumeLargeReader::SetOutputRLGDataSet(vtkRectilinearGrid* ds)
 vtkIdType64 mafVolumeLargeReader::GetLevelFilesSize()
 {
 	vtkIdType64 nRet = 0;
-	for (int i = 1; i < m_nLevels; i++)
+	for (int i = 1; i < m_NLevels; i++)
 	{
-		if (m_pLevels[i] != NULL)
+		if (m_PLevels[i] != NULL)
 		{
-			nRet += vtkMAFFile::GetFileSize(m_pLevels[i]->GetFileName());
+			nRet += vtkMAFFile::GetFileSize(m_PLevels[i]->GetFileName());
 		}
 	}
 
