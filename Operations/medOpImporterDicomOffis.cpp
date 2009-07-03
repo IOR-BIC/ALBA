@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 14:38:35 $
-Version:   $Revision: 1.1.2.29 $
+Date:      $Date: 2009-07-03 16:49:01 $
+Version:   $Revision: 1.1.2.30 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -142,8 +142,6 @@ MafMedical is partially based on OpenMAF.
 #include "dcmtk/ofstd/ofstdinc.h"
 
 
-
-
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicomOffis);
 //----------------------------------------------------------------------------
@@ -243,6 +241,10 @@ mafOp(label)
 
   m_DicomDirectory = "";
 	m_DicomTypeRead = -1;
+
+  m_HighBit = 0;
+  m_RescaleIntercept = 0;
+
 	m_BuildStepValue = 0;
   m_OutputType = 0;
 
@@ -255,7 +257,6 @@ mafOp(label)
 	m_BoxCorrect = false;
 	m_CropFlag = false;
   m_CroppedExetuted = false;
-  m_ResampleFlag = false;
   m_IsRotated = false;
   m_SideToBeDragged = 0; 
 
@@ -279,6 +280,8 @@ mafOp(label)
   m_ResampleFlag = FALSE;
 
   m_DiscardPosition = FALSE;
+
+  m_RescaleTo16Bit = FALSE;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicomOffis::~medOpImporterDicomOffis()
@@ -307,7 +310,8 @@ mafOp *medOpImporterDicomOffis::Copy()
   importer->m_ResampleFlag = m_ResampleFlag;
   importer->m_DicomDirectory = m_DicomDirectory;
   importer->m_DiscardPosition = m_DiscardPosition;
-
+  importer->m_RescaleTo16Bit = m_RescaleTo16Bit;
+  
 	return importer;
 }
 //----------------------------------------------------------------------------
@@ -316,6 +320,8 @@ void medOpImporterDicomOffis::OpRun()
 {
   m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
   m_DiscardPosition = ((medGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
+  m_ResampleFlag = ((medGUIDicomSettings*)GetSetting())->EnableResampleVolume();
+  m_RescaleTo16Bit = ((medGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
 
 	CreateGui();
 	CreatePipeline();
@@ -394,8 +400,34 @@ int medOpImporterDicomOffis::RunWizard()
           }
         }
       }
-      if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
 
+      //rescale to 16 bit all the rest of the dataset
+      if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
+      {
+        int i=0, size = m_ListSelected->size();
+
+        wxBusyInfo *wait = NULL;
+        if(!this->m_TestMode)
+        {
+          wait = new wxBusyInfo("Conversion to Unsigned Short: please wait...");
+          mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+        }
+
+        long progress = 0;
+        for(int slice_num=0;slice_num<size;slice_num++)
+        {
+          RescaleTo16Bit(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+          if(!this->m_TestMode)
+          {
+            progress = slice_num * 100 / (double)size;
+            mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+          }
+        }
+        mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+        if(wait) delete wait;
+      }
+
+      if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
         result = BuildVolume();
       else
         result = BuildVolumeCineMRI();
@@ -714,6 +746,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
         im->SetSpacing(spacing);
         im->Update();
       }
+
       ((mafVMEImage*)m_ImagesGroup->GetChild(sourceVolumeSliceId))->SetData(im,ts);
       
       m_ImagesGroup->GetChild(sourceVolumeSliceId)->GetTagArray()->DeepCopy(m_TagArray);
@@ -882,7 +915,8 @@ int medOpImporterDicomOffis::BuildVolume()
     }
   }
 
-  m_Volume->SetName(m_VolumeName);
+  m_Volume->SetName(m_VolumeName);  
+
   if(m_Volume != NULL)
   {
     m_Output = m_Volume;
@@ -2268,7 +2302,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       int width = val_long;
       ds->findAndGetLongInt(DCM_Rows, val_long);
       int height = val_long;
-
+      
       ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[0],0);
       ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[1],1);
       ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[2],2);
@@ -2306,17 +2340,28 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         spacing[1] = 1.0;// for RGB??
       } 
       
-      double slope, intercept;
+      double slope;
       if(ds->findAndGetFloat64(DCM_RescaleSlope,slope).bad())
       {
         //Unable to get element: DCM_RescaleSlope[0];
         slope = 1;
       } 
+      
+      long highBit; 
+      double intercept;
+      if(ds->findAndGetLongInt(DCM_HighBit,highBit).bad())
+      {
+        //Unable to get element: DCM_RescaleIntercept[0];
+        highBit = 0;
+      } 
+      m_HighBit = highBit;
+      
       if(ds->findAndGetFloat64(DCM_RescaleIntercept,intercept).bad())
       {
         //Unable to get element: DCM_RescaleIntercept[0];
         intercept = 0;
-      } 
+      }
+      m_RescaleIntercept = intercept;
 
 ///////////////////CREATE VTKIMAGEDATA////////////////////////////
       //initialize vtkImageData
@@ -2782,12 +2827,23 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		probe->SetSource(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
     probe->Update();
     probe->GetOutput()->GetBounds(m_DicomBounds);
-		probe->GetOutput()->GetScalarRange(range);
+
+    //rescale to 16 bit
+    if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
+    {
+      RescaleTo16Bit(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+    }
     
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
 	else 
 	{
+    //rescale to 16 bit
+    if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
+    {
+      RescaleTo16Bit(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+    }
+
 		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetScalarRange(range);
 		m_SliceTexture->SetInput(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
 	}
@@ -3060,6 +3116,25 @@ void medOpImporterDicomOffis::ResampleVolume()
   m_Volume->Update();
 
   mafDEL(vrg);
+}
+//----------------------------------------------------------------------------
+void medOpImporterDicomOffis::RescaleTo16Bit(vtkImageData *dataSet)
+//----------------------------------------------------------------------------
+{
+  if(dataSet->GetScalarType() == VTK_UNSIGNED_SHORT) return;
+  
+  int i=0, size = dataSet->GetNumberOfPoints();
+  vtkMAFSmartPointer<vtkUnsignedShortArray> newScalars;
+  for(;i<size;i++)
+  {
+    double value = dataSet->GetPointData()->GetScalars()->GetTuple1(i);
+    value = (value - m_RescaleIntercept) * ((double)VTK_UNSIGNED_SHORT_MAX) / (4095.);
+    newScalars->InsertNextTuple1(value);
+  }
+  dataSet->GetPointData()->SetScalars(newScalars);
+  dataSet->SetScalarTypeToUnsignedShort();
+  dataSet->Update();
+
 }
 //----------------------------------------------------------------------------
 int CompareX(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2)

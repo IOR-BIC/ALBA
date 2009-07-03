@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-07-02 09:28:28 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2009-07-03 16:49:01 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -160,9 +160,6 @@ public:
   /** Open dir containing Dicom images. */
   bool OpenDir();
 
-  /** Enable discarding spatial position of the volume. */
-  void SetDiscardPosition(int enable){m_DiscardPosition = enable;}
-
 protected:
 
 	/** Create load page and his GUI for the wizard. */
@@ -234,6 +231,9 @@ protected:
   /** Extract a rotated polydata from original dicom image. */
   vtkPolyData * ExtractPolyData(int ts, int silceId);
 
+  /** Rescale to 16 Bit */
+  void RescaleTo16Bit(vtkImageData *dataSet);
+
 	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
@@ -271,6 +271,8 @@ protected:
 
 	int				m_BuildStepValue;
 	int				m_DicomTypeRead; ///<Type DICOM Read from file
+  long		  m_HighBit; ///<High bit DICOM Read from file
+  double	  m_RescaleIntercept; ///<Rescale Intercept DICOM Read from file
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
@@ -310,8 +312,8 @@ protected:
   bool m_IsRotated;
 
   int m_ResampleFlag;
-
   int m_DiscardPosition;
+  int m_RescaleTo16Bit;
 
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
