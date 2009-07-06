@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-04 16:38:46 $
-Version:   $Revision: 1.1.2.31 $
+Date:      $Date: 2009-07-06 09:51:43 $
+Version:   $Revision: 1.1.2.32 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -320,8 +320,8 @@ void medOpImporterDicomOffis::OpRun()
 {
   m_BuildStepValue = ((medGUIDicomSettings*)GetSetting())->GetBuildStep();
   m_DiscardPosition = ((medGUIDicomSettings*)GetSetting())->EnableDiscardPosition();
-  m_ResampleFlag = false;//achiarini: need to have a compiled version, this should be fixed by pdating medGUIDicomSettings ((medGUIDicomSettings*)GetSetting())->EnableResampleVolume();
-  m_RescaleTo16Bit = false;// achiarini: same as above((medGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
+  m_ResampleFlag = ((medGUIDicomSettings*)GetSetting())->EnableResampleVolume();
+  m_RescaleTo16Bit = ((medGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
 
 	CreateGui();
 	CreatePipeline();
