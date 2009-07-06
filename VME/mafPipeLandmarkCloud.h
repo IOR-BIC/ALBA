@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-07-06 11:29:21 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,6 +51,9 @@ public:
 
 	/** Change the visibility of the bounding box actor representing the selection for the vme. */
   virtual void Select(bool select); 
+
+  /** Set the scalar visibility. */
+  void SetScalarVisibility(int visibility){m_ScalarVisibility = visibility;};
 
   /** IDs for the GUI */
   enum PIPE_LM_CLOUD_WIDGET_ID
