@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeLandmarkCloud.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:05:59 $
-  Version:   $Revision: 1.15 $
+  Date:      $Date: 2009-07-06 11:30:16 $
+  Version:   $Revision: 1.15.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,9 +56,15 @@ mafPipeLandmarkCloud::mafPipeLandmarkCloud()
   m_Landmark = NULL;
   m_Cloud    = NULL;
   m_MaterialButton  = NULL;
+  m_SphereSource  = NULL;
+  m_Normals       = NULL;
+  m_Glyph         = NULL;
+  m_CloudMapper   = NULL;
+  m_CloudActor    = NULL;
+  m_CloudSelectionActor     = NULL;
 
   m_Radius = 1.0;
-  m_ScalarVisibility = 0;
+  m_ScalarVisibility = FALSE;
   m_RenderingDisplayListFlag = 0;
 }
 //----------------------------------------------------------------------------
@@ -111,7 +117,10 @@ void mafPipeLandmarkCloud::Create(mafSceneNode *n)
 mafPipeLandmarkCloud::~mafPipeLandmarkCloud()
 //----------------------------------------------------------------------------
 {
-  m_Vme->GetEventSource()->RemoveObserver(this);
+  if (m_Vme)
+  {
+  	m_Vme->GetEventSource()->RemoveObserver(this);
+  }
 
   if (m_Cloud && m_Cloud->IsOpen())
   {
