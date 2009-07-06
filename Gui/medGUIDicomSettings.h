@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-07-02 09:27:50 $
-Version:   $Revision: 1.5.2.4 $
+Date:      $Date: 2009-07-06 06:55:53 $
+Version:   $Revision: 1.5.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,6 +32,8 @@ class mafGUICheckListBox;
   - side
   - conversion units
   - discard position (origin)
+  - resample volume
+  - rescale to 16Bit
 */
 class medGUIDicomSettings : public mafGUISettings
 {
@@ -53,6 +55,8 @@ public:
     ID_SIDE,
     ID_CONVERT_UNITS,
     ID_DISCARD_ORIGIN,
+    ID_RESAMPLE_VOLUME,
+    ID_RESCALE_TO_16_BIT,
 	};
 
   /** Modality IDs*/
@@ -100,6 +104,10 @@ public:
   int EnableChangeSide(){return m_EnableChangeSide;};
   /** Enable discarding origin. */
   int EnableDiscardPosition(){return m_EnableDiscardPosition;};
+  /** Enable resampling volume. */
+  int EnableResampleVolume(){return m_EnableResampleVolume;};
+  /** Enable rescaling to 16 bit. */
+  int EnableRescaleTo16Bit(){return m_EnableRescaleTo16Bit;};
 
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
@@ -125,5 +133,7 @@ protected:
 	int m_Step;
   int m_EnableChangeSide;
   int m_EnableDiscardPosition;
+  int m_EnableResampleVolume;
+  int m_EnableRescaleTo16Bit;
 };
 #endif

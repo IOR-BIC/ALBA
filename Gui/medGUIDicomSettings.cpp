@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 09:27:50 $
-Version:   $Revision: 1.7.2.4 $
+Date:      $Date: 2009-07-06 06:55:53 $
+Version:   $Revision: 1.7.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -38,8 +38,10 @@ mafGUISettings(Listener, label)
 	m_EnableNumberOfSlice = true;
 	m_EnableNumberOfTime = true; 
   m_EnableChangeSide = FALSE;
-  m_EnableDiscardPosition= FALSE;
-	m_Step = ID_1X;
+  m_EnableDiscardPosition = FALSE;
+  m_EnableResampleVolume = FALSE;
+  m_EnableRescaleTo16Bit = FALSE;
+  m_Step = ID_1X;
 
 	InitializeSettings();
 }
@@ -59,6 +61,8 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
   m_Gui->Bool(ID_SIDE,_("Enable Change Side"),&m_EnableChangeSide,1);
   m_Gui->Bool(ID_DISCARD_ORIGIN,_("Enable Discard Origin"),&m_EnableDiscardPosition,1);
+  m_Gui->Bool(ID_RESAMPLE_VOLUME,_("Enable Resample Volume"),&m_EnableResampleVolume,1);
+  m_Gui->Bool(ID_RESCALE_TO_16_BIT,_("Enable Rescaling to 16 Bit"),&m_EnableRescaleTo16Bit,1);
 	wxString choices[4]={_("1x"),_("2x"),_("3x"),_("4x")};
 	m_Gui->Combo(ID_STEP,_("Build Step"),&m_Step,4,choices);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
@@ -126,6 +130,16 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
     }
     break;
+  case ID_RESAMPLE_VOLUME:
+    {
+      m_Config->Write("EnableResampleVolume",m_EnableResampleVolume);
+    }
+    break;
+  case ID_RESCALE_TO_16_BIT:
+    {
+      m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
+    }
+    break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -157,6 +171,25 @@ void medGUIDicomSettings::InitializeSettings()
   {
     m_Config->Write("EnableDiscardPosition",m_EnableDiscardPosition);
   }
+
+  if(m_Config->Read("EnableResampleVolume", &long_item))
+  {
+    m_EnableResampleVolume=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableResampleVolume",m_EnableResampleVolume);
+  }
+
+  if(m_Config->Read("EnableRescaleTo16Bit", &long_item))
+  {
+    m_EnableRescaleTo16Bit=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
+  }
+
 
   if(m_Config->Read("StepOfBuild", &long_item))
   {
