@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafVMEMeshAnsysTextExporter.h,v $
 Language:  C++
-Date:      $Date: 2008-07-08 10:33:03 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-07-08 11:48:44 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -31,6 +31,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
   nodes file ( geometry )
   elements file ( connectivity )
   materials file ( materials )
+
+  If the input vme mesh  does not contain enough information in order to build a valid
+  ansys-like output this component will try to generate the  missing information for
+  the export, anyway the input data is not modified.
 
   BEWARE Hybrid meshes are not upported
 
