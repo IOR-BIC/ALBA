@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-13 12:56:59 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-07-10 12:34:09 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -66,8 +66,6 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkLookupTable.h"
-#include "vtkImageFlip.h"; 
-
 
 #include <wx/dir.h>
 
@@ -232,16 +230,9 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
 
     CPPUNIT_ASSERT(imageImported->GetNumberOfPoints() == pixelVector.size());
 
-    //Flip image to start reading scalars from the same origin
-    vtkMAFSmartPointer<vtkImageFlip> imageFlip;
-    imageFlip->SetFilteredAxis(1);
-    imageFlip->PreserveImageExtentOn();
-    imageFlip->SetInput(imageImported);
-    imageFlip->GetOutput()->Update();
-
     for(int i=0 ; i<imageImported->GetNumberOfPoints();i++)
     {
-      CPPUNIT_ASSERT(imageFlip->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i]);
+      CPPUNIT_ASSERT(imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i]);
     }
 
     importer->OpStop(OP_RUN_OK);
