@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-06 09:51:43 $
-Version:   $Revision: 1.1.2.32 $
+Date:      $Date: 2009-07-10 06:59:57 $
+Version:   $Revision: 1.1.2.33 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2440,7 +2440,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       }
 
       int counter=0;
-      for(int y=height-1;y>=0;y--) //due to the different coordinate system (DICOM and VTK) the resulting image are flipped in the Y axis
+      for(int y=0;y<height;y++)
       {
         for(int x=0;x<width;x++)
         {

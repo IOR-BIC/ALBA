@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 13:58:04 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-10 06:59:32 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -102,6 +102,7 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style,w
     m_Rwi = new mafRWI(this);
     m_Rwi->SetSize(0,0,512,512);
     m_Rwi->Show(true);
+    m_Rwi->CameraSet(CAMERA_CT);
     m_Rwi->CameraUpdate();
 
     mafGUI *m_GuiView= new mafGUI(this);
