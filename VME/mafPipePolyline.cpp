@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-20 15:03:01 $
-Version:   $Revision: 1.20.2.1 $
+Date:      $Date: 2009-07-13 12:23:23 $
+Version:   $Revision: 1.20.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,6 +38,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafDataPipe.h"
 #include "mafVMEItem.h"
 #include "mafVMEItemVTK.h"
+#include "mafTransform.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkRenderer.h"
@@ -54,12 +55,14 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "vtkDoubleArray.h"
 #include "vtkScalarBarActor.h"
 #include "vtkColorTransferFunction.h"
-#include "vtkCardinalSpline.h"
+#include "vtkCardinalSpline.h" 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPoints.h"
-#include "vtkCellArray.h"
+#include "vtkCellArray.h" 
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
+#include "vtkCaptionActor2D.h"
+#include "vtkTextProperty.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafPipePolyline);
@@ -100,6 +103,9 @@ mafPipePolyline::mafPipePolyline()
   m_SplineCoefficient = 10.0;
   m_DistanceBorder = 0.0;
   m_ScalarsName = NULL;
+  m_HalfNumberOfBorders = 0;
+
+  m_TextIdentifierBorderVisibility = FALSE;
 }
 //----------------------------------------------------------------------------
 void mafPipePolyline::Create(mafSceneNode *n)
@@ -266,9 +272,13 @@ void mafPipePolyline::Create(mafSceneNode *n)
   m_BorderActor->SetProperty(m_BorderProperty);
   m_BorderActor->PickableOff();
   
-  if(m_DistanceBorder == 0.0)
+  if(m_HalfNumberOfBorders == 0)
   {
     m_BorderActor->VisibilityOff();
+    for(int j=0;j<m_CaptionActorList.size();j++)
+    {
+      m_CaptionActorList[j]->SetVisibility(false);
+    }
   }
   else
   {
@@ -282,13 +292,12 @@ void mafPipePolyline::Create(mafSceneNode *n)
 mafPipePolyline::~mafPipePolyline()
 //----------------------------------------------------------------------------
 {
-
 	m_Vme->GetEventSource()->RemoveObserver(this);
 
 	m_AssemblyFront->RemovePart(m_Actor);
 	m_AssemblyFront->RemovePart(m_OutlineActor);
   m_AssemblyFront->RemovePart(m_BorderActor);
-  
+  DeleteCaptionActorList();
 
 	vtkDEL(m_Sphere);
 	vtkDEL(m_Glyph);
@@ -661,9 +670,13 @@ void mafPipePolyline::UpdateProperty(bool fromTag)
 
   if(m_BorderMapper)
   {
-    if(m_DistanceBorder == 0.0)
+    if(m_HalfNumberOfBorders == 0)
     {
       m_BorderActor->VisibilityOff();
+      for(int j=0;j<m_CaptionActorList.size();j++)
+      {
+        m_CaptionActorList[j]->SetVisibility(false);
+      }
     }
     else
     {
@@ -951,147 +964,171 @@ vtkPolyData *mafPipePolyline::BorderCreation()
     m_BorderData->RemoveAllInputs();
 
   //calculate and create the two parallel lines
-  
-  //Up Polyline
-  vtkMAFSmartPointer<vtkPolyData> polyUp;
-  polyUp->DeepCopy(data); //value original
+  int s = 0;
+ 
+  DeleteCaptionActorList();
 
-  vtkPoints *points = polyUp->GetPoints();
-  vtkMAFSmartPointer<vtkPoints> temporaryPointsUp;
-
-  vtkMAFSmartPointer<vtkPolyData> polyDown;
-  vtkMAFSmartPointer<vtkPoints> temporaryPointsDown;
-
-  if(polyUp->GetNumberOfPoints() == 0)
+  for(; s < m_HalfNumberOfBorders; s++)
   {
-    ;
-  }
-  else
-  {
+    vtkMAFSmartPointer<vtkPolyData> polyUp;
+    polyUp->DeepCopy(data); //value original
 
-    temporaryPointsUp->DeepCopy(points);
-    temporaryPointsDown->DeepCopy(points);
+    vtkPoints *points = polyUp->GetPoints();
+    vtkMAFSmartPointer<vtkPoints> temporaryPointsUp;
 
-    double preiousNormal[3]; //used only for last point
+    vtkMAFSmartPointer<vtkPolyData> polyDown;
+    vtkMAFSmartPointer<vtkPoints> temporaryPointsDown;
 
-    for(long int j = 0; j < temporaryPointsUp->GetNumberOfPoints(); j++)
+    if(polyUp->GetNumberOfPoints() == 0)
+    {
+      ;
+    }
+    else
     {
 
-      double tempPoint1[3];
-      double tempPoint2[3];
-      if(j != temporaryPointsUp->GetNumberOfPoints()-1)
+      temporaryPointsUp->DeepCopy(points);
+      temporaryPointsDown->DeepCopy(points);
+
+      double preiousNormal[3]; //used only for last point
+
+      for(long int j = 0; j < temporaryPointsUp->GetNumberOfPoints(); j++)
       {
-        temporaryPointsUp->GetPoint(j, tempPoint1);
-        temporaryPointsUp->GetPoint(j+1, tempPoint2);
+        
+        double tempPoint1[3];
+        double tempPoint2[3];
+        if(j != temporaryPointsUp->GetNumberOfPoints()-1)
+        {
+          temporaryPointsUp->GetPoint(j, tempPoint1);
+          temporaryPointsUp->GetPoint(j+1, tempPoint2);
+        }
+        else
+        {
+          temporaryPointsUp->GetPoint(j-1, tempPoint1);
+          temporaryPointsUp->GetPoint(j, tempPoint2);
+        }
+
+
+        //search the versor
+        double versor[3];
+        versor[0] = (tempPoint2[0] - tempPoint1[0]);
+        versor[1] = (tempPoint2[1] - tempPoint1[1]);
+        versor[2] = (tempPoint2[2] - tempPoint1[2]);
+
+        double zAxis[3] = {0,0,1};
+
+        //vectorial product beetween my versor and zAxis
+        double perpendicular[3];
+        double *u , *v;
+        u = versor;
+        v = zAxis;
+
+        vtkMath::Cross(versor,zAxis,perpendicular);
+
+        if(j == temporaryPointsUp->GetNumberOfPoints()-2)
+        {
+          preiousNormal[0] = perpendicular[0];
+          preiousNormal[1] = perpendicular[1];
+          preiousNormal[2] = perpendicular[2];
+        }
+
+        double coord[3];
+        coord[0] = perpendicular[0];
+        coord[1] = perpendicular[1];
+        coord[2] = perpendicular[2];
+
+
+        if(j == temporaryPointsUp->GetNumberOfPoints()-1)
+        {
+          coord[0] = preiousNormal[0];
+          coord[1] = preiousNormal[1];
+          coord[2] = preiousNormal[2];
+        }
+
+        vtkMath::Normalize(coord);
+
+        //now I can calculate the the coordinate of the point, distanced by the step
+        double newPointUp[3], newPointDown[3];
+
+        if(j != temporaryPointsUp->GetNumberOfPoints()-1)
+        {
+          newPointDown[0] = ((m_DistanceBorder*(s+1))) * (coord[0]) + tempPoint1[0];
+          newPointDown[1] = ((m_DistanceBorder*(s+1))) * (coord[1]) + tempPoint1[1];
+          newPointDown[2] = ((m_DistanceBorder*(s+1))) * (coord[2]) + tempPoint1[2];
+
+          newPointUp[0] = ((-m_DistanceBorder*(s+1))) * (coord[0]) + tempPoint1[0];
+          newPointUp[1] = ((-m_DistanceBorder*(s+1))) * (coord[1]) + tempPoint1[1];
+          newPointUp[2] = ((-m_DistanceBorder*(s+1))) * (coord[2]) + tempPoint1[2];
+
+
+        }
+        else //the last point
+        {
+          newPointDown[0] = ((m_DistanceBorder*(s+1))) * (coord[0]) + tempPoint2[0];
+          newPointDown[1] = ((m_DistanceBorder*(s+1))) * (coord[1]) + tempPoint2[1];
+          newPointDown[2] = ((m_DistanceBorder*(s+1))) * (coord[2]) + tempPoint2[2];
+
+          newPointUp[0] = ((-m_DistanceBorder*(s+1))) * (coord[0]) + tempPoint2[0];
+          newPointUp[1] = ((-m_DistanceBorder*(s+1))) * (coord[1]) + tempPoint2[1];
+          newPointUp[2] = ((-m_DistanceBorder*(s+1))) * (coord[2]) + tempPoint2[2];
+        }
+
+        if(j==0)
+        {
+          mafTransform t;
+          t.SetMatrix(*m_Vme->GetOutput()->GetAbsMatrix());
+          
+          if(s == 0)
+          {
+            double p0[3];
+            t.TransformPoint(tempPoint1, p0);
+            SetCaptionActorBorder(s, p0);
+          }
+          double pUp[3];
+          t.TransformPoint(newPointUp, pUp);
+          SetCaptionActorBorder(2*s+1,pUp);
+
+          double pDown[3];
+          t.TransformPoint(newPointDown, pDown);
+          SetCaptionActorBorder(2*s+2,pDown);
+        }
+
+        temporaryPointsUp->SetPoint(j, newPointUp);
+        temporaryPointsDown->SetPoint(j, newPointDown);
+
       }
-      else
-      {
-        temporaryPointsUp->GetPoint(j-1, tempPoint1);
-        temporaryPointsUp->GetPoint(j, tempPoint2);
-      }
-
-
-      //search the versor
-      double versor[3];
-      versor[0] = (tempPoint2[0] - tempPoint1[0]);
-      versor[1] = (tempPoint2[1] - tempPoint1[1]);
-      versor[2] = (tempPoint2[2] - tempPoint1[2]);
-
-      double zAxis[3] = {0,0,1};
-
-      //vectorial product beetween my versor and zAxis
-      double perpendicular[3];
-      double *u , *v;
-      u = versor;
-      v = zAxis;
-
-      vtkMath::Cross(versor,zAxis,perpendicular);
-
-      if(j == temporaryPointsUp->GetNumberOfPoints()-2)
-      {
-        preiousNormal[0] = perpendicular[0];
-        preiousNormal[1] = perpendicular[1];
-        preiousNormal[2] = perpendicular[2];
-      }
-
-      double coord[3];
-      coord[0] = perpendicular[0];
-      coord[1] = perpendicular[1];
-      coord[2] = perpendicular[2];
-
-
-      if(j == temporaryPointsUp->GetNumberOfPoints()-1)
-      {
-        coord[0] = preiousNormal[0];
-        coord[1] = preiousNormal[1];
-        coord[2] = preiousNormal[2];
-      }
-
-      vtkMath::Normalize(coord);
-
-      //now I can calculate the the coordinate of the point, distanced by the step
-      double newPointUp[3], newPointDown[3];
-      
-      if(j != temporaryPointsUp->GetNumberOfPoints()-1)
-      {
-        newPointDown[0] = ((m_DistanceBorder)) * (coord[0]) + tempPoint1[0];
-        newPointDown[1] = ((m_DistanceBorder)) * (coord[1]) + tempPoint1[1];
-        newPointDown[2] = ((m_DistanceBorder)) * (coord[2]) + tempPoint1[2];
-
-        newPointUp[0] = ((-m_DistanceBorder)) * (coord[0]) + tempPoint1[0];
-        newPointUp[1] = ((-m_DistanceBorder)) * (coord[1]) + tempPoint1[1];
-        newPointUp[2] = ((-m_DistanceBorder)) * (coord[2]) + tempPoint1[2];
-
-
-      }
-      else //the last point
-      {
-        newPointDown[0] = ((m_DistanceBorder)) * (coord[0]) + tempPoint2[0];
-        newPointDown[1] = ((m_DistanceBorder)) * (coord[1]) + tempPoint2[1];
-        newPointDown[2] = ((m_DistanceBorder)) * (coord[2]) + tempPoint2[2];
-
-        newPointUp[0] = ((-m_DistanceBorder)) * (coord[0]) + tempPoint2[0];
-        newPointUp[1] = ((-m_DistanceBorder)) * (coord[1]) + tempPoint2[1];
-        newPointUp[2] = ((-m_DistanceBorder)) * (coord[2]) + tempPoint2[2];
-      }
-
-      temporaryPointsUp->SetPoint(j, newPointUp);
-      temporaryPointsDown->SetPoint(j, newPointDown);
 
     }
 
-  }
+    vtkMAFSmartPointer<vtkCellArray> cellArrayUp;
+    vtkMAFSmartPointer<vtkCellArray> cellArrayDown;
 
-  vtkMAFSmartPointer<vtkCellArray> cellArrayUp;
-  vtkMAFSmartPointer<vtkCellArray> cellArrayDown;
-
-  int pointId[2];
-  for(int i = 0; i< temporaryPointsUp->GetNumberOfPoints();i++)
-  {
-    if (i > 0)
-    {             
-      pointId[0] = i - 1;
-      pointId[1] = i;
-      cellArrayUp->InsertNextCell(2 , pointId);  
-      cellArrayDown->InsertNextCell(2 , pointId);  
+    int pointId[2];
+    for(int i = 0; i< temporaryPointsUp->GetNumberOfPoints();i++)
+    {
+      if (i > 0)
+      {             
+        pointId[0] = i - 1;
+        pointId[1] = i;
+        cellArrayUp->InsertNextCell(2 , pointId);  
+        cellArrayDown->InsertNextCell(2 , pointId);  
+      }
     }
+
+    polyUp->SetPoints(temporaryPointsUp);
+    polyUp->SetLines(cellArrayUp);
+    polyUp->Modified();
+    polyUp->Update();
+
+    polyDown->SetPoints(temporaryPointsDown);
+    polyDown->SetLines(cellArrayDown);
+    polyDown->Modified();
+    polyDown->Update();
+
+    m_BorderData->AddInput(polyUp);
+    m_BorderData->AddInput(polyDown);
+    m_BorderData->Update();
   }
 
-  polyUp->SetPoints(temporaryPointsUp);
-  polyUp->SetLines(cellArrayUp);
-  polyUp->Modified();
-  polyUp->Update();
-
-  polyDown->SetPoints(temporaryPointsDown);
-  polyDown->SetLines(cellArrayDown);
-  polyDown->Modified();
-  polyDown->Update();
-
-  m_BorderData->AddInput(polyUp);
-  m_BorderData->AddInput(polyDown);
-  m_BorderData->Update();
-
-  
   return m_BorderData->GetOutput();
 }
 //----------------------------------------------------------------------------
@@ -1110,4 +1147,66 @@ void mafPipePolyline::SetActorPicking(int enable)
 {
   m_Actor->SetPickable(enable);
   m_Actor->Modified();
+}
+
+//----------------------------------------------------------------------------
+void mafPipePolyline::SetCaptionActorBorder(int index, double position[3])
+//----------------------------------------------------------------------------
+{
+  //caption
+  vtkCaptionActor2D *caption = NULL;
+  if(m_CaptionActorList.size() != m_HalfNumberOfBorders * 2 + 1)
+  {
+    m_CaptionActorList.push_back(vtkCaptionActor2D::New());
+     caption = m_CaptionActorList[m_CaptionActorList.size()-1];
+    caption->SetPosition(0,0);
+    caption->GetCaptionTextProperty()->SetFontFamilyToArial();
+    caption->GetCaptionTextProperty()->BoldOn();
+    caption->GetCaptionTextProperty()->AntiAliasingOn();
+    caption->GetCaptionTextProperty()->ItalicOff();
+    caption->GetCaptionTextProperty()->ShadowOn();
+    caption->SetPadding(0);
+
+    caption->ThreeDimensionalLeaderOff();
+    
+
+    caption->SetHeight(0.01);
+    //m_CaptionActor->SetWidth(0.05);
+    caption->BorderOff();
+
+    caption->GetCaptionTextProperty()->ShadowOn();
+    caption->GetCaptionTextProperty()->SetColor(1.0,1.0,1.0);
+  }
+  else
+  {
+    caption = m_CaptionActorList[index];
+  }
+  
+  if(caption)
+  {
+    if(m_RenFront)
+    {
+      m_RenFront->AddActor2D(caption);
+    }
+    
+    caption->SetVisibility(m_TextIdentifierBorderVisibility);
+    caption->SetCaption(wxString::Format("%d", index));
+    caption->SetAttachmentPoint(position[0],position[1],position[2]);
+  }
+  
+}
+//----------------------------------------------------------------------------
+void mafPipePolyline::DeleteCaptionActorList()
+//----------------------------------------------------------------------------
+{
+  int i=0,size=m_CaptionActorList.size();
+  for(;i<size;i++)
+  {
+    if(m_RenFront)
+    {
+      m_RenFront->RemoveActor2D(m_CaptionActorList[i]);
+    }
+    vtkDEL(m_CaptionActorList[i]);
+  }
+  m_CaptionActorList.clear();
 }

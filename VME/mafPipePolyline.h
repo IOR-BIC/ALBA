@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.h,v $
 Language:  C++
-Date:      $Date: 2009-05-20 15:03:01 $
-Version:   $Revision: 1.13.2.1 $
+Date:      $Date: 2009-07-13 12:23:23 $
+Version:   $Revision: 1.13.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -30,22 +30,36 @@ class vtkColorTransferFunction;
 class vtkPolyData;
 class mmaMaterial;
 class mafGUIMaterialButton;
+class vtkCaptionActor2D;
 
-//----------------------------------------------------------------------------
-// mafPipePolyline :
-//----------------------------------------------------------------------------
+/**
+  Class Name: mafPipePolyline
+  Visualize Polyline inside a VTK Render Window with several modality:
+  - line
+  - glyph connected
+  - glyph unconnected
+  - tube
+  It can be set tube and glyph dimension and resolution.
+  It is also possible to create a spline of the polyline or visualize polyline resulted by a
+  deformation of the original one.
+*/
 class mafPipePolyline : public mafPipe
 {
 public:
+  /** RTTI Macro. */
 	mafTypeMacro(mafPipePolyline,mafPipe);
 
+  /** constructor.*/
 	mafPipePolyline();
+  /** destructor. */
 	virtual     ~mafPipePolyline ();
 
 	/** process events coming from gui */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** create the pipeline. */
 	virtual void Create(mafSceneNode *n);
+  /** when vme is selected, it can be catch the event in select funztion. */
 	virtual void Select(bool select); 
 
 	/** Set the visual representation of the polyline.
@@ -73,22 +87,37 @@ public:
 	/** Set color of the polyline */
 	void SetMapperScalarRange(double range[2]);
 
+  /* Set lookup table color range*/
 	void SetLookupTableColorRange(double range[2], double colorMin[3], double colorMax[3]);
 
 
   /** Set spline mode of the polyline */
   void SetSplineMode(int flag){m_SplineMode = flag;};
+  /** Get spline mode of the polyline */
   int GetSplineMode(){return m_SplineMode;};
 
+  /** Enable spline mode */
   void SplineModeOn(){SetSplineMode(1);UpdateProperty();};
+  /** Disable spline mode */
   void SplineModeOff(){SetSplineMode(0);UpdateProperty();};
 
 	/** Calculate the cardinal spline over original polyline*/
   vtkPolyData *SplineProcess(vtkPolyData *polyData);
 
-  /** Set/Get Border Distance*/
-  void SetDistanceBorder(double value){m_DistanceBorder = value;UpdateProperty();};
+  /** Set Border Distance*/
+  void SetDistanceBorder(double value){m_DistanceBorder = value;};
+  /** Get Border Distance*/
   double GetDistanceBorder(){return m_DistanceBorder;};
+
+  /** Set the half number of borders. Actually it will be created a number of border equal  to halfNumberOfBorders,
+      in order to have 2n+1 number of splines in which the middle one is the original. */
+  void SetHalfNumberOfBorders(int halfNumberOfBorders)
+  {
+    if(halfNumberOfBorders >= 0)
+    {
+      m_HalfNumberOfBorders = halfNumberOfBorders;
+    }
+  };
 
   /** Modify data in order to create a up & down border */
   vtkPolyData *BorderCreation();
@@ -113,6 +142,12 @@ public:
   void SetGlyphResolution(double resolution){m_SphereResolution = resolution;};
   /** Get Glyph Resolution */
   double GetGlyphResolution(){return m_SphereResolution;};
+
+  /** Show/Hide Text Identify Border */
+  void SetTextIdentifierBorderVisibility(int visibility){m_TextIdentifierBorderVisibility = visibility;};
+
+  /** Update visual properties*/
+  void UpdateProperty(bool fromTag = false);
 
 	/** IDs for the GUI */
 	enum PIPE_POLYLINE_WIDGET_ID
@@ -159,14 +194,17 @@ protected:
   mmaMaterial              *m_PolylineMaterial;
 	vtkPolyData              *m_PolySpline;
   mafGUIMaterialButton        *m_MaterialButton;
-
+  std::vector<vtkCaptionActor2D *> m_CaptionActorList;
+  
 	wxString *m_ScalarsName;
-
+  
 	int m_Scalar;
 	int m_ScalarDim;
 	int m_Representation;
 	int m_Capping;
   int m_SplineMode;
+  int m_HalfNumberOfBorders;
+  int m_TextIdentifierBorderVisibility;
 	double m_TubeRadius;
 	double m_SphereRadius;
 	double m_TubeResolution;
@@ -178,14 +216,20 @@ protected:
 	/** Initialize representation, capping, radius and resolution variables.*/
 	void InitializeFromTag();
 
+  /** Update data structures. */
 	void UpdateData();
 
+  /** Update attributes of the vme */
 	void UpdateScalars();
 
+  /** update specific scalar array*/
   void UpdatePipeFromScalars();
+  /** create/edit caption actor of the borders*/
+  void SetCaptionActorBorder(int index, double position[3]);
+  /** destroy all caption actors*/
+  void DeleteCaptionActorList();
 
-	/** Update visual properties*/
-	void UpdateProperty(bool fromTag = false);
+	/** create gui */
 	virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipePolyline_H__
