@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-10 06:59:57 $
-Version:   $Revision: 1.1.2.33 $
+Date:      $Date: 2009-07-14 13:18:04 $
+Version:   $Revision: 1.1.2.34 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1144,7 +1144,7 @@ int medOpImporterDicomOffis::BuildMesh()
   int counter= 0;
   int total = dim[0]*dim[1];
   int sourceVolumeSliceId = 0;//achiarini compilation issue
-  for ( int targetVolumeSliceId = 0, sourceVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
+  for ( int targetVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
   { 
     if(!this->m_TestMode)
     {
@@ -1267,7 +1267,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
     int counter= 0;
     int total = dim[0]*dim[1];
-    int sourceVolumeSliceId;//achiarini: compilation issue
+    int sourceVolumeSliceId = 0;//achiarini: compilation issue
     for (int targetVolumeSliceId = 0, sourceVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
     { 
       if(!this->m_TestMode)
