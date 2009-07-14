@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-13 12:23:23 $
-Version:   $Revision: 1.20.2.2 $
+Date:      $Date: 2009-07-14 10:03:45 $
+Version:   $Revision: 1.20.2.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1081,15 +1081,16 @@ vtkPolyData *mafPipePolyline::BorderCreation()
           {
             double p0[3];
             t.TransformPoint(tempPoint1, p0);
-            SetCaptionActorBorder(s, p0);
+            SetCaptionActorBorder(m_HalfNumberOfBorders, p0);
           }
+
           double pUp[3];
           t.TransformPoint(newPointUp, pUp);
-          SetCaptionActorBorder(2*s+1,pUp);
+          SetCaptionActorBorder(m_HalfNumberOfBorders-s-1,pUp);
 
           double pDown[3];
           t.TransformPoint(newPointDown, pDown);
-          SetCaptionActorBorder(2*s+2,pDown);
+          SetCaptionActorBorder(m_HalfNumberOfBorders+s+1,pDown);
         }
 
         temporaryPointsUp->SetPoint(j, newPointUp);
