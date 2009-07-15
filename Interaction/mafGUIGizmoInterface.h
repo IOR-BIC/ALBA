@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-15 14:26:41 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,6 +45,16 @@ public:
 
   /** Enable-Disable the GUI's widgets */
   virtual void EnableWidgets(bool enable) {};
+  
+  /** Turn On m_TestMode flag. 
+  The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
+  void TestModeOn() {m_TestMode = true;};
+
+  /** Used to turn off m_TestMode flag.*/
+  void TestModeOff() {m_TestMode = false;};
+
+  /** Get TestMode*/
+  bool GetTestMode(){return m_TestMode;};
 
 protected:
   virtual void CreateGui() {};
@@ -53,5 +63,7 @@ protected:
 
   mafObserver *m_Listener;
   mafGUI      *m_Gui;    
+  bool m_TestMode;
+
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-15 14:26:41 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,7 @@ mafGUIGizmoInterface::mafGUIGizmoInterface(mafObserver *listener)
 {
   m_Listener = listener;
   m_Gui = NULL;
+  m_TestMode = false;
 }
 //----------------------------------------------------------------------------
 mafGUIGizmoInterface::~mafGUIGizmoInterface() 

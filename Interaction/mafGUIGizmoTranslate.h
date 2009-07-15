@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-15 14:26:49 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,7 +36,7 @@ class mafGUIGizmoTranslate : public mafGUIGizmoInterface
 {
 public:
 
-  mafGUIGizmoTranslate(mafObserver *listener = NULL);
+  mafGUIGizmoTranslate(mafObserver *listener = NULL, bool testMode = false);
 	~mafGUIGizmoTranslate(); 
 
   void OnEvent(mafEventBase *maf_event);
@@ -71,6 +71,9 @@ protected:
   /**
   Gizmo abs pose*/
   double m_Position[3];
+
+  /** test friend */
+  friend class mafGUIGizmoTranslateTest;
 
 };
 #endif

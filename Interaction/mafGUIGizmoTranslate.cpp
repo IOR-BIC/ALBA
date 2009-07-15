@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-15 14:26:49 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,13 +33,19 @@
 #include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
-mafGUIGizmoTranslate::mafGUIGizmoTranslate(mafObserver *listener)
+mafGUIGizmoTranslate::mafGUIGizmoTranslate(mafObserver *listener, bool testMode)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
 
   m_Position[0] = m_Position[1] = m_Position[2] = 0;
-  CreateGui();
+
+  m_TestMode = testMode;
+
+  if (m_TestMode == false)
+  {
+    CreateGui();
+  }
 }
 //----------------------------------------------------------------------------
 mafGUIGizmoTranslate::~mafGUIGizmoTranslate() 
@@ -115,7 +121,10 @@ void mafGUIGizmoTranslate::SetAbsPosition(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   mafTransform::GetPosition(*pose, m_Position);
-
-  assert(m_Gui);
-  m_Gui->Update();
+  
+  if (m_TestMode == false)
+  {
+    assert(m_Gui);
+    m_Gui->Update();
+  }
 }
