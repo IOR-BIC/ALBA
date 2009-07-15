@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-06-05 12:07:15 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-07-15 08:50:47 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Alexander Savenko, Josef Kohout (major change)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
 
 #include "mafMemDbg.h"
@@ -333,7 +333,12 @@ void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output)
                 this->GlobalPlaneAxisZ[i];
 
               // check that p[i] is in inside the box
-              if (p[i] < this->DataBounds[i][0] || p[i] > this->DataBounds[i][1])
+              float dbi0 = ((float)(this->DataBounds[i][0]));//Added by Losi 07/15/2009:	Bug #1721 fix
+              float dbi1 = ((float)(this->DataBounds[i][1]));//Added by Losi 07/15/2009:	Bug #1721 fix
+              //Bug #1721: No image at the boundary box extremes
+              //http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1721
+              //cause: float, double comparsion
+              if (p[i] < dbi0 || p[i] > dbi1)
                 continue; //the supporting line intersects the plane but the edge does not
 
               numberOfPoints++;    //some intersection detected
@@ -500,9 +505,14 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
           this->GlobalPlaneAxisZ[i];
 
         // check that p[i] is in inside the box
-        if (p[i] < this->DataBounds[i][0] || p[i] > this->DataBounds[i][1])
+        float dbi0 = ((float)(this->DataBounds[i][0]));//Added by Losi 07/15/2009:	Bug #1721 fix
+        float dbi1 = ((float)(this->DataBounds[i][1]));//Added by Losi 07/15/2009:	Bug #1721 fix
+        //Bug #1721: No image at the boundary box extremes
+        //http://bugzilla.hpc.cineca.it/show_bug.cgi?id=1721
+        //cause: float, double comparsion
+        if (p[i] < dbi0 || p[i] > dbi1)
           continue; //the supporting line intersects the plane but the edge does not
-       
+      
         // add point
         numberOfPoints++;
       }
