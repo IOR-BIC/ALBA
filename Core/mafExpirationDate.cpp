@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-18 08:43:22 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-07-16 14:16:55 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -339,16 +339,15 @@ bool mafExpirationDate::CheckLocalTimeExpiration()
   }
   else if (days == 1)
   {
-    m_Information = "Remain 1 day to the end of the Trail period";
+    m_Information = "1 day remaining to the end of the trial period";
   }
   else
   {
     char temp[5];
     sprintf(temp,"%d",days);
 
-    m_Information.append("Remain ");
     m_Information.append(temp);
-    m_Information.append(" days to the end of the Trail period");
+    m_Information.append(" days remaining to the end of the trial period");
   }
 
   return false;
