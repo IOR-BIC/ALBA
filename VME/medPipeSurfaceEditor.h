@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeSurfaceEditor.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:19:42 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-07-16 08:43:31 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -60,26 +60,34 @@ class vtkLookupTable;
 class vtkMAFFixedCutter;
 class vtkPlane;
 
-//----------------------------------------------------------------------------
-// medPipeSurfaceEditor :
-//----------------------------------------------------------------------------
+/**
+  Class Name: medPipeSurfaceEditor.
+  Default pipe of the medVMESurfaceEditor, that is a vme that permit the editing of topology.
+*/
 class medPipeSurfaceEditor : public mafPipe
 {
 public:
+  /** RTTI Macro */
 	mafTypeMacro(medPipeSurfaceEditor,mafPipe);
 
+  /** constructor. */
 	medPipeSurfaceEditor();
+  /** destructor. */
 	virtual ~medPipeSurfaceEditor();
 
 	/** process events coming from gui */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** function that create the pipeline instancing vtk graphic pipe. */
 	virtual void Create(mafSceneNode *n);
+  /** Show can be used for hide or show elements (actually empty) */
 	void Show(bool show); 
+  /** During selection of vme, it can visualize graphic element (actually empty)*/
 	virtual void Select(bool select);
 
 
 protected:
+  /** Creation of the gui that will be attached to visual prop panel.*/
 	virtual mafGUI  *CreateGui();
 
 	vtkPolyDataMapper	*m_Mapper;
