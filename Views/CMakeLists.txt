@@ -34,6 +34,10 @@ SET(PROJECT_SRCS
   mafViewImageCompound.h
   mafViewCT.cpp
   mafViewCT.h
+  medViewCompoundWindowing.cpp
+  medViewCompoundWindowing.h
+  medViewVTKCompound.cpp
+  medViewVTKCompound.h
   #medViewEmgGraph.cpp
   #medViewEmgGraph.h
   medViewSlicer.cpp
