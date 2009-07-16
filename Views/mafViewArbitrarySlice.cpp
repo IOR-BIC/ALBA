@@ -3,12 +3,12 @@
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
 <<<<<<< mafViewArbitrarySlice.cpp
-  Date:      $Date: 2009-07-16 09:34:24 $
-  Version:   $Revision: 1.38.2.3 $
+  Date:      $Date: 2009-07-16 15:43:12 $
+  Version:   $Revision: 1.38.2.4 $
   Authors:   Eleonora Mambrini
 =======
-  Date:      $Date: 2009-07-16 09:34:24 $
-  Version:   $Revision: 1.38.2.3 $
+  Date:      $Date: 2009-07-16 15:43:12 $
+  Version:   $Revision: 1.38.2.4 $
   Authors:   Matteo Giacomoni
 >>>>>>> 1.38.2.2
 ==========================================================================
@@ -229,7 +229,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
-      m_Slicer->GetMaterial()->m_ColorLut = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut;
+      m_Slicer->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 			m_Slicer->Update();
 
 // 			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();

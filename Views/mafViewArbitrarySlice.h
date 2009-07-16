@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:34:24 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2009-07-16 15:43:12 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,17 +34,21 @@ class mafGUILutSlider;
 class mafGUILutSwatch;
 class medVMEPolylineEditor;
 
-//----------------------------------------------------------------------------
-// mafViewOrthoSlice :
-//----------------------------------------------------------------------------
 /** 
-  This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
+Class Name: mafViewArbitrarySlice.
+  This compound view is made of two child views used to analyze arbitrary slice of the volume.
+ */
+
 class mafViewArbitrarySlice: public medViewCompoundWindowing
 {
 public:
+  /** constructor*/
   mafViewArbitrarySlice(wxString label = "View Arbitrary Slice with Windowing", bool show_ruler = false);
+
+  /** destructor*/
   virtual ~mafViewArbitrarySlice(); 
 
+  /** RTTI macro.*/
   mafTypeMacro(mafViewArbitrarySlice, medViewCompoundWindowing);
 
 	enum ID_GUI
@@ -72,8 +76,10 @@ public:
   /** Function that clones instance of the object. */
 	virtual mafView* Copy(mafObserver *Listener);
 
+  /** Force the updating of the camera. */
 	virtual void CameraUpdate();
 
+  /* Update slicer settings according to m_CurrentVolume*/
   void UpdateSlicerBehavior();
 
 protected:
@@ -89,6 +95,7 @@ protected:
 	/** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
+  /** Handling events sent from other objects. Called by public method OnEvent().*/
 	void OnEventThis(mafEventBase *maf_event);  
 
 	/** This function is called when a rotate gizmo is moved*/
@@ -97,6 +104,7 @@ protected:
 	/**	This function is called when a translate gizmo is moved*/
 	void OnEventGizmoTranslate(mafEventBase *maf_event);
 
+  /** Post multiply matrix for incoming transform events */
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
 
 	mafViewVTK *m_ViewSlice;
