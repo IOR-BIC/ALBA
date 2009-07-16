@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIFrame.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-16 14:19:31 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,15 +21,22 @@
 //----------------------------------------------------------------------------
 class mafObserver;
 
-//----------------------------------------------------------------------------
-// mafGUIFrame :
-//----------------------------------------------------------------------------
+/**
+  Class Name: mafGUIFrame.
+  A frame is a window whose position and size can be changed by the user.
+  It can have borders and a title bar, and can optionally contain a menu bar, 
+  toolbar and status bar. Inherit from wxFrame and override several methods of it.
+
+*/
 class mafGUIFrame: public wxFrame
 {
 public:
-         mafGUIFrame (const wxString& title, const wxPoint& pos, const wxSize& size);
-        ~mafGUIFrame (); 
+  /** constructor. */
+  mafGUIFrame (const wxString& title, const wxPoint& pos, const wxSize& size);
+  /** destructor. */
+  ~mafGUIFrame (); 
   
+  /** Set the Listener that will receive event-notification. */
 	void SetListener (mafObserver *Listener) {m_Listener = Listener;};
   
   /** Set the window shown on the Client Area, (hide the previous contents). */
@@ -69,6 +76,7 @@ protected:
   mafObserver *m_Listener;
   wxWindow    *m_ClientWin;
 
+  /** Event Table Declaration*/
 DECLARE_EVENT_TABLE()
 };
 #endif

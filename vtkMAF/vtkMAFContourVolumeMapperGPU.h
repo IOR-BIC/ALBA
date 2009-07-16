@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapperGPU.h,v $
 Language:  C++
-Date:      $Date: 2008-12-12 11:04:21 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-16 14:19:55 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alexander Savenko, Nigel McFarlane, Baoquan Liu (GPU)
 
 ================================================================================
@@ -532,17 +532,18 @@ namespace Baoquan
     Point verticesBuffer[VERTICES_BUFFER_SIZE];
   };
 
-
-
-  //------------------------------------------------------------------------------
-  // class ListOfPolyline2D
-  // This is a std::vector of polyline pointers, with 3 extra functions
-  //------------------------------------------------------------------------------
+/**
+  Class Name:ListOfPolyline2D.
+  This is a std::vector of polyline pointers, with 3 extra functions.
+*/
   class ListOfPolyline2D : public std::vector<Polyline2D*> 
   {
   public:
-    void clear();                                                ///< Clear the list of polylines
+    /** Clear the list of polylines. */
+    void clear();
+    /** check if point is inside the contour */
     bool IsInside(int x, int y, int polylineLengthThreshold);
+    /** retrieve contour polyline */
     Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
   };
 }//end baoquan space

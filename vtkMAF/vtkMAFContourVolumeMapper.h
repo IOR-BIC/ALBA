@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapper.h,v $
 Language:  C++
-Date:      $Date: 2009-05-12 14:54:02 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-07-16 14:19:55 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alexander Savenko, Nigel McFarlane
 
 ================================================================================
@@ -110,12 +110,16 @@ namespace vtkMAFContourVolumeMapperNamespace
 };
 
 
-// container type for sorting depth values
+/*
+Class Name: Idepth.
+  Container type for sorting depth values
+*/
 class Idepth
 {
 public:
   float depth ;
   int index ;
+  /** redefine < operator in order to check depth variable. */
   bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
 };
 
@@ -437,16 +441,18 @@ protected:
 };
 
 
-
-//------------------------------------------------------------------------------
-// class ListOfPolyline2D
-// This is a std::vector of polyline pointers, with 3 extra functions
-//------------------------------------------------------------------------------
+/**
+Class Name:ListOfPolyline2D.
+This is a std::vector of polyline pointers, with 3 extra functions.
+*/
 class ListOfPolyline2D : public std::vector<Polyline2D*> 
 {
 public:
-  void clear();                                                ///< Clear the list of polylines
+  /** Clear the list of polylines. */
+  void clear();
+  /** check if point is inside the contour */
   bool IsInside(int x, int y, int polylineLengthThreshold);
+  /** retrieve contour polyline */
   Polyline2D *FindContour(int x, int y, int polylineLengthThreshold, int distance = 1);
 };
 
