@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-01-23 13:50:13 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-07-16 14:18:46 $
+  Version:   $Revision: 1.6.6.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,6 +24,9 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 
 #include "mafVME.h"
+#include "mafVMEOutputImage.h"
+
+#include "mmaMaterial.h"
 
 #include "vtkMAFAssembly.h"
 #include "vtkPlaneSource.h"
@@ -97,11 +100,16 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   w = range[1] - range[0];
   l = (range[1] + range[0]) * .5;
 
-  m_ImageLUT = vtkWindowLevelLookupTable::New();
+//m_ImageLUT = vtkWindowLevelLookupTable::New();
+//m_ImageLUT->SetWindow(w);
+//m_ImageLUT->SetLevel(l);
+////m_ImageLUT->InverseVideoOn();
+//m_ImageLUT->Build();
+
+  mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
+  m_ImageLUT = (vtkWindowLevelLookupTable *)output->GetMaterial()->m_ColorLut;
   m_ImageLUT->SetWindow(w);
   m_ImageLUT->SetLevel(l);
-  //m_ImageLUT->InverseVideoOn();
-  m_ImageLUT->Build();
 
   m_ImageTexture = vtkTexture::New();
   m_ImageTexture->RepeatOff();
@@ -180,7 +188,7 @@ mafPipeImage3D::~mafPipeImage3D()
     m_AssemblyFront->RemovePart(m_GhostActor);
 
   vtkDEL(m_ImagePlane);
-  vtkDEL(m_ImageLUT);
+  //vtkDEL(m_ImageLUT);
   vtkDEL(m_ImageTexture);
   vtkDEL(m_ImageMapper);
   vtkDEL(m_ImageActor);
