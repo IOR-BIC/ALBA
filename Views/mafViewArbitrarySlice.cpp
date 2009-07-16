@@ -2,9 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-13 13:47:22 $
-  Version:   $Revision: 1.38.2.2 $
+<<<<<<< mafViewArbitrarySlice.cpp
+  Date:      $Date: 2009-07-16 09:34:24 $
+  Version:   $Revision: 1.38.2.3 $
+  Authors:   Eleonora Mambrini
+=======
+  Date:      $Date: 2009-07-16 09:34:24 $
+  Version:   $Revision: 1.38.2.3 $
   Authors:   Matteo Giacomoni
+>>>>>>> 1.38.2.2
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -26,6 +32,7 @@
 #include "mafVMESlicer.h"
 #include "mafMatrix.h"
 #include "mafTransform.h"
+#include "mafPipeImage3D.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
@@ -55,6 +62,7 @@
 
 #include "vtkTransform.h"
 #include "vtkLookupTable.h"
+#include "vtkWindowLevelLookupTable.h"
 #include "vtkDataSet.h"
 #include "vtkMath.h"
 #include "vtkTransformPolyDataFilter.h"
@@ -94,21 +102,19 @@ enum AXIS_ID
 
 //----------------------------------------------------------------------------
 mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
-: mafViewCompound(label, 1, 2)
+: medViewCompoundWindowing(label, 1, 2)
 //----------------------------------------------------------------------------
 {
-	m_ViewArbitrary = NULL;
-	m_ViewSlice = NULL;
-	m_GizmoTranslate = NULL;
-	m_GizmoRotate = NULL;
-	m_MatrixReset = NULL;
-	m_CurrentVolume = NULL;
-	m_Slicer = NULL;
-	m_GuiGizmos = NULL;
-	m_AttachCamera = NULL;
-	m_LutSlider = NULL;
-	m_LutWidget = NULL;
-	m_ColorLUT= NULL;
+	m_ViewArbitrary   = NULL;
+	m_ViewSlice       = NULL;
+	m_GizmoTranslate  = NULL;
+	m_GizmoRotate     = NULL;
+	m_MatrixReset     = NULL;
+	m_CurrentVolume   = NULL;
+  m_CurrentImage    = NULL;
+	m_Slicer          = NULL;
+	m_GuiGizmos       = NULL;
+	m_AttachCamera    = NULL;
   m_CurrentPolylineGraphEditor = NULL;
 
 	m_SliceCenterSurface[0] = 0.0;
@@ -126,9 +132,11 @@ mafViewArbitrarySlice::mafViewArbitrarySlice(wxString label, bool show_ruler)
 mafViewArbitrarySlice::~mafViewArbitrarySlice()
 //----------------------------------------------------------------------------
 {
-	m_MatrixReset = NULL;
+	m_MatrixReset   = NULL;
 	m_CurrentVolume = NULL;
-	m_ColorLUT = NULL;
+  m_CurrentImage  = NULL;
+	m_ColorLUT      = NULL;
+  
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::PackageView()
@@ -138,13 +146,13 @@ void mafViewArbitrarySlice::PackageView()
 	//m_ViewArbitrary->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
   m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
+	
 	m_ViewSlice = new mafViewVTK("",CAMERA_OS_Z);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
 	m_ViewSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", NON_VISIBLE);
-
   m_ViewSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
 	
@@ -227,10 +235,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 // 			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
 // 			m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
 //       m_ColorLUT->SetTableRange(sr[0], sr[1]);
-      m_ColorLUT = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut;
-      m_LutWidget->SetLut(m_ColorLUT);
-      m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-      m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
 
       //Show Slicer
 			m_ChildViewList[ARBITRARY_VIEW]->VmeShow(m_Slicer, show);
@@ -363,6 +367,14 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
         //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
     }
+    
+    else if(Vme->IsA("mafVMEImage"))
+	  {	
+		  mafVME *Image  = mafVME::SafeDownCast(Vme);
+		  m_CurrentImage = Image;
+		
+	  }
+
 	}
 	else//if show=false
 	{
@@ -393,30 +405,26 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			cppDEL(m_GuiGizmos);
 			mafDEL(m_MatrixReset);
 
-			//find if some surfaces are show , if yes show off
-			/*mafNode *root=m_CurrentVolume->GetRoot();
-			mafNodeIterator *iter = root->NewIterator();
-			for (mafNode *Inode = iter->GetFirstNode(); Inode; Inode = iter->GetNextNode())
-			{
-			 if(Inode->IsA("mafVMESurface") || Inode->IsA("mafVMESurfaceParametric"))
-				{
-					mafPipeSurfaceSlice *PipeSliceViewSurface = mafPipeSurfaceSlice::SafeDownCast(((mafViewSlice *)m_ChildViewList[SLICE_VIEW])->GetNodePipe(Inode));
-					mafPipeSurface *PipeArbitraryViewSurface = mafPipeSurface::SafeDownCast(((mafViewSlice *)m_ChildViewList[ARBITRARY_VIEW])->GetNodePipe(Inode));
-					if(PipeSliceViewSurface && PipeArbitraryViewSurface)
-					{
-						//mafEventMacro(mafEvent(this, VME_SHOW, Inode, false));
-					}
-				}
-			}
-			iter->Delete();*/
-
 			m_CurrentVolume = NULL;
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
+
+    if( (mafVME *)Vme->IsA("mafVMEImage")) 
+    {
+      m_CurrentImage = NULL;
+			m_ColorLUT = NULL;
+			m_LutWidget->SetLut(m_ColorLUT);
+    }
 	}
-	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-	EnableWidgets(m_CurrentVolume != NULL);
+
+  UpdateWindowing( 
+    (GetSceneGraph()->GetSelectedVme()==node && show && this->ActivateWindowing(node)), 
+    node);
+
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+	//EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage != NULL));
 }
 //----------------------------------------------------------------------------
 void mafViewArbitrarySlice::OnEvent(mafEventBase *maf_event)
@@ -684,7 +692,9 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 			break;
 		case ID_RANGE_MODIFIED:
       {
-        if(m_CurrentVolume)
+        mafVME *node = mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme());
+
+        if( (m_CurrentVolume || m_CurrentImage) && node)
         {
           double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
@@ -696,8 +706,11 @@ void mafViewArbitrarySlice::OnEventThis(mafEventBase *maf_event)
 		case ID_LUT_CHOOSER:
       {
         double *sr;
-        sr = m_ColorLUT->GetRange();
-        m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+
+        if(m_CurrentVolume || m_CurrentImage) {
+          sr = m_ColorLUT->GetRange();
+          m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+        }
       }
 			break;
 		case ID_RESET:
@@ -818,7 +831,7 @@ mafGUI* mafViewArbitrarySlice::CreateGui()
 	m_Gui->Divider();
 	m_Gui->Update();
 	
-	EnableWidgets(m_CurrentVolume != NULL);
+	EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage != NULL) );
 	return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -833,6 +846,10 @@ void mafViewArbitrarySlice::VmeRemove(mafNode *node)
 		cppDEL(m_GizmoTranslate);
 		m_GizmoRotate->Show(false);
 		cppDEL(m_GizmoRotate);
+  }
+
+  if (m_CurrentImage && node == m_CurrentImage){
+    m_CurrentImage = NULL;
   }
 
   Superclass::VmeRemove(node);
@@ -894,7 +911,7 @@ void mafViewArbitrarySlice::CreateGuiView()
   m_LutSlider->SetListener(this);
   m_LutSlider->SetSize(500,24);
   m_LutSlider->SetMinSize(wxSize(500,24));
-  EnableWidgets(m_CurrentVolume != NULL);
+  EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage!=NULL) );
   m_GuiView->Add(m_LutSlider);
   m_GuiView->Reparent(m_Win);
 }

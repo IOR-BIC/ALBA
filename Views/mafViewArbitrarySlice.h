@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.8 $
-  Authors:   Matteo Giacomoni
+  Date:      $Date: 2009-07-16 09:34:24 $
+  Version:   $Revision: 1.8.2.1 $
+  Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafViewCompound.h"
+#include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -39,19 +39,18 @@ class medVMEPolylineEditor;
 //----------------------------------------------------------------------------
 /** 
   This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class mafViewArbitrarySlice: public mafViewCompound
+class mafViewArbitrarySlice: public medViewCompoundWindowing
 {
 public:
-  mafViewArbitrarySlice(wxString label = "View Arbitrary Slice", bool show_ruler = false);
+  mafViewArbitrarySlice(wxString label = "View Arbitrary Slice with Windowing", bool show_ruler = false);
   virtual ~mafViewArbitrarySlice(); 
 
-  mafTypeMacro(mafViewArbitrarySlice, mafViewCompound);
+  mafTypeMacro(mafViewArbitrarySlice, medViewCompoundWindowing);
 
 	enum ID_GUI
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
 		ID_RESET,
-		ID_LUT_CHOOSER,
 		ID_LAST,
 	};
 
@@ -67,8 +66,10 @@ public:
 	/** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
 
+  /** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Function that clones instance of the object. */
 	virtual mafView* Copy(mafObserver *Listener);
 
 	virtual void CameraUpdate();
@@ -104,21 +105,20 @@ protected:
 	mafGizmoTranslate *m_GizmoTranslate;
 	mafGizmoRotate		*m_GizmoRotate;
 	mafVME          	*m_CurrentVolume;
+  mafVME				    *m_CurrentImage;
 	mafVMESlicer			*m_Slicer;
 	mafMatrix					*m_MatrixReset;
 	mafAttachCamera		*m_AttachCamera;
-
-	vtkLookupTable    *m_ColorLUT;
 
 	double	m_SliceCenterSurface[3];
 	double	m_SliceCenterSurfaceReset[3];
 	double	m_SliceAngleReset[3];
 	int			m_TypeGizmo;
 
-	mafGUILutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
-	mafGUILutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
 	mafGUI				*m_GuiGizmos;
 
   medVMEPolylineEditor *m_CurrentPolylineGraphEditor;
+
+
 };
 #endif

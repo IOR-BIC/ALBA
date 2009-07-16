@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSingleSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.16 $
-  Authors:   Daniele Giunchi
+  Date:      $Date: 2009-07-16 09:34:24 $
+  Version:   $Revision: 1.16.2.1 $
+  Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -57,12 +57,12 @@ mafCxxTypeMacro(mafViewSingleSliceCompound);
 
 //----------------------------------------------------------------------------
 mafViewSingleSliceCompound::mafViewSingleSliceCompound( wxString label, int num_row, int num_col)
-: mafViewCompound(label,num_row,num_col)
+: medViewCompoundWindowing(label,num_row,num_col)
 //----------------------------------------------------------------------------
 {
-	m_LutWidget = NULL;
+	/*m_LutWidget = NULL;
 	m_LutSlider = NULL;
-	m_ColorLUT = NULL;
+	m_ColorLUT = NULL;*/
 }
 //----------------------------------------------------------------------------
 mafViewSingleSliceCompound::~mafViewSingleSliceCompound()
@@ -86,49 +86,6 @@ mafView *mafViewSingleSliceCompound::Copy(mafObserver *Listener)
   v->m_NumOfPluggedChildren = m_NumOfPluggedChildren;
   v->Create();
   return v;
-}
-//----------------------------------------------------------------------------
-void mafViewSingleSliceCompound::CreateGuiView()
-//----------------------------------------------------------------------------
-{
-	m_GuiView = new mafGUI(this);
-  
-  m_LutSlider = new mafGUILutSlider(m_GuiView,-1,wxPoint(0,0),wxSize(500,24));
-  m_LutSlider->SetListener(this);
-  m_LutSlider->SetSize(500,24);
-  m_LutSlider->SetMinSize(wxSize(500,24));
-  EnableWidgets(false);
-  m_GuiView->Add(m_LutSlider);
-  m_GuiView->Reparent(m_Win);
-}
-//----------------------------------------------------------------------------
-void mafViewSingleSliceCompound::OnEvent(mafEventBase *maf_event)
-//----------------------------------------------------------------------------
-{
-  switch(maf_event->GetId()) 
-  {
-		case ID_RANGE_MODIFIED:
-			{
-				//Windowing
-				if(mafVME::SafeDownCast(GetSceneGraph()->GetSelectedVme()))
-				{
-					double low, hi;
-					m_LutSlider->GetSubRange(&low,&hi);
-					m_ColorLUT->SetTableRange(low,hi);
-					mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-				}
-			}
-			break;
-		case ID_LUT_CHOOSER:
-			{
-				double *sr;
-				sr = m_ColorLUT->GetRange();
-				m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-			}
-			break;
-    default:
-      mafEventMacro(*maf_event);
-  }
 }
 //-------------------------------------------------------------------------
 mafGUI* mafViewSingleSliceCompound::CreateGui()
@@ -158,65 +115,7 @@ void mafViewSingleSliceCompound::PackageView()
 
 	PlugChildView(m_ViewSingleSlice);
 }
-//----------------------------------------------------------------------------
-void mafViewSingleSliceCompound::VmeShow(mafNode *node, bool show)
-//----------------------------------------------------------------------------
-{
-	for(int i=0; i<this->GetNumberOfSubView(); i++)
-    m_ChildViewList[i]->VmeShow(node, show);
 
-	if(GetSceneGraph()->GetSelectedVme()==node)
-	{
-		//UpdateWindowing(show,node);
-		UpdateWindowing(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") && show && (GetSceneGraph()->GetSelectedVme() == node),node);
-	}
-
-	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-}
-//----------------------------------------------------------------------------
-void mafViewSingleSliceCompound::EnableWidgets(bool enable)
-//----------------------------------------------------------------------------
-{
-	//if a volume is visualized enable the widgets
-	if(m_Gui)
-		m_Gui->Enable(ID_LUT_CHOOSER,enable);
-  m_LutSlider->Enable(enable);
-}
-//----------------------------------------------------------------------------
-void mafViewSingleSliceCompound::VmeSelect(mafNode *node, bool select)
-//----------------------------------------------------------------------------
-{
-  for(int i=0; i<m_NumOfChildView; i++)
-    m_ChildViewList[i]->VmeSelect(node, select);
-
-	UpdateWindowing(((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume") && select && m_ChildViewList[ID_VIEW_SINGLE_SLICE]->GetNodePipe(node),node);
-}
-//----------------------------------------------------------------------------
-void mafViewSingleSliceCompound::UpdateWindowing(bool enable,mafNode *node)
-//----------------------------------------------------------------------------
-{
-	if(enable)
-	{
-		EnableWidgets(enable);
-		mafVME *Volume=mafVME::SafeDownCast(node);
-    mafVMEOutputVolume *volumeOutput = mafVMEOutputVolume::SafeDownCast(Volume->GetOutput());
-		double sr[2];
-		volumeOutput->GetVTKData()->GetScalarRange(sr);
-		mmaVolumeMaterial *currentSurfaceMaterial = volumeOutput->GetMaterial();
-		m_ColorLUT = volumeOutput->GetMaterial()->m_ColorLut;
-		volumeOutput->GetMaterial()->UpdateProp();
-		m_LutWidget->SetLut(m_ColorLUT);
-		m_LutWidget->Enable(true);
-		m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-		m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
-	}
-	else
-	{
-		EnableWidgets(enable);
-		m_LutSlider->SetRange(-100,100);
-		m_LutSlider->SetSubRange(-100,100);
-	}
-}
 //----------------------------------------------------------------------------
 void mafViewSingleSliceCompound::OnLayout()
 //----------------------------------------------------------------------------
