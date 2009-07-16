@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputImage.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:50:01 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-07-16 14:18:12 $
+  Version:   $Revision: 1.2.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -20,6 +20,7 @@
 //----------------------------------------------------------------------------
 class mafVMEGerericVTK;
 class vtkImageData;
+class mmaMaterial;
 
 /** NULL output for VME node with a VTK image output data.
   mafVMEOutputImage is the output produced by a node generating an output
@@ -42,6 +43,16 @@ public:
     An event is rised when the output data changes to allow attached classes to 
     update their input.*/
   virtual vtkImageData *GetImageData();
+
+  /** return material attribute*/
+  mmaMaterial *GetMaterial();
+
+  /** set the material of the output image data*/ 
+  void SetMaterial(mmaMaterial *material);
+
+protected:
+  mmaMaterial *m_Material;
+  int test;
 
 private:
   mafVMEOutputImage(const mafVMEOutputImage&); // Not implemented

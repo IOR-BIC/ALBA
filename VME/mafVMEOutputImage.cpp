@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-12 19:31:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-16 14:18:12 $
+  Version:   $Revision: 1.1.24.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,8 +22,10 @@
 
 #include "mafVMEOutputImage.h"
 #include "mafVME.h"
+#include "mmaMaterial.h"
 
 #include "vtkImageData.h"
+#include "vtkWindowLevelLookupTable.h"
 
 #include <assert.h>
 
@@ -35,6 +37,7 @@ mafCxxTypeMacro(mafVMEOutputImage)
 mafVMEOutputImage::mafVMEOutputImage()
 //-------------------------------------------------------------------------
 {
+  m_Material = NULL;
 }
 
 //-------------------------------------------------------------------------
@@ -48,4 +51,35 @@ vtkImageData *mafVMEOutputImage::GetImageData()
 //-------------------------------------------------------------------------
 {
   return (vtkImageData *)GetVTKData();
+}
+
+//-------------------------------------------------------------------------
+mmaMaterial *mafVMEOutputImage::GetMaterial()
+//-------------------------------------------------------------------------
+{
+  // if the VME set the material directly in the output return it
+  if (m_Material)
+    return  m_Material;
+
+  m_Material = new mmaMaterial();
+
+  vtkWindowLevelLookupTable* lut = vtkWindowLevelLookupTable::New();
+
+  double range[2];
+  ((vtkDataSet *)GetVTKData())->GetScalarRange(range);
+  lut->SetTableRange(range[0], range[1]); // min and max of the data in tCoord
+  lut->SetHueRange(0., 0.5);
+  lut->SetSaturationRange(1., 1.);
+  lut->SetValueRange(1., 1.);
+  lut->Build();
+
+  m_Material->m_ColorLut = lut;
+
+  return m_Material;
+}
+//-------------------------------------------------------------------------
+void mafVMEOutputImage::SetMaterial(mmaMaterial *material)
+//-------------------------------------------------------------------------
+{
+  m_Material = material;
 }
