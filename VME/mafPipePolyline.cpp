@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-14 10:03:45 $
-Version:   $Revision: 1.20.2.3 $
+Date:      $Date: 2009-07-16 14:17:19 $
+Version:   $Revision: 1.20.2.4 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1160,7 +1160,7 @@ void mafPipePolyline::SetCaptionActorBorder(int index, double position[3])
   {
     m_CaptionActorList.push_back(vtkCaptionActor2D::New());
      caption = m_CaptionActorList[m_CaptionActorList.size()-1];
-    caption->SetPosition(0,0);
+    caption->SetPosition(-5,-10);
     caption->GetCaptionTextProperty()->SetFontFamilyToArial();
     caption->GetCaptionTextProperty()->BoldOn();
     caption->GetCaptionTextProperty()->AntiAliasingOn();
@@ -1168,6 +1168,7 @@ void mafPipePolyline::SetCaptionActorBorder(int index, double position[3])
     caption->GetCaptionTextProperty()->ShadowOn();
     caption->SetPadding(0);
 
+    caption->LeaderOff();
     caption->ThreeDimensionalLeaderOff();
     
 
@@ -1175,7 +1176,6 @@ void mafPipePolyline::SetCaptionActorBorder(int index, double position[3])
     //m_CaptionActor->SetWidth(0.05);
     caption->BorderOff();
 
-    caption->GetCaptionTextProperty()->ShadowOn();
     caption->GetCaptionTextProperty()->SetColor(1.0,1.0,1.0);
   }
   else
