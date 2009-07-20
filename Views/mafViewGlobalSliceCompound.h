@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:34:24 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2009-07-20 11:45:43 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -49,18 +49,6 @@ public:
 
   /** Function that clones instance of the object. */
   virtual mafView *Copy(mafObserver *Listener);
-  
-  /**  Create the GUI on the bottom of the compounded view. */
-  //virtual void     CreateGuiView();
-  
-  /** Function that handles events sent from other objects. */
-  //virtual void     OnEvent(mafEventBase *maf_event);
-
-	/** Show/Hide VMEs into plugged sub-views. */
-  //virtual void VmeShow(mafNode *node, bool show);
-
-  /** Function called when select a vme different from selected one.*/
-	//virtual void VmeSelect(mafNode *node, bool select);
 
 protected:
   /**
@@ -74,9 +62,6 @@ protected:
 
   /** Function for enable/disable all gui widgets. */
 	//void EnableWidgets(bool enable);
-
-  /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
-	//void UpdateWindowing(bool enable,mafNode *node);
 
 	mafViewGlobalSlice	*m_ViewGlobalSlice;
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:02:56 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-07-20 11:45:43 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -200,7 +200,9 @@ void medViewCompoundWindowing::UpdateWindowing(bool enable,mafNode *node)
 	}
 }
 
+//----------------------------------------------------------------------------
 bool medViewCompoundWindowing::ActivateWindowing(mafNode *node)
+//----------------------------------------------------------------------------
 {
   bool conditions     = false;
   bool nodeHasPipe    = false;
