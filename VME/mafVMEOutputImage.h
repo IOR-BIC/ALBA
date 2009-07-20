@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputImage.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 14:18:12 $
-  Version:   $Revision: 1.2.22.1 $
+  Date:      $Date: 2009-07-20 14:38:40 $
+  Version:   $Revision: 1.2.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,16 +22,22 @@ class mafVMEGerericVTK;
 class vtkImageData;
 class mmaMaterial;
 
-/** NULL output for VME node with a VTK image output data.
-  mafVMEOutputImage is the output produced by a node generating an output
+/** 
+Class Name: mafVMEOutputImage.
+NULL output for VME node with a VTK image output data. mafVMEOutputImage is the output produced by a node generating an output
   with a VTK dataset.
 */
 class MAF_EXPORT mafVMEOutputImage : public mafVMEOutputVTK
 {
 public:
+
+   /** constructor. */
   mafVMEOutputImage();
+  
+   /** destructor. */
   virtual ~mafVMEOutputImage();
 
+  /** RTTI macro.*/
   mafTypeMacro(mafVMEOutputImage,mafVMEOutputVTK);
 
   /**
