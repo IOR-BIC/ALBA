@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:06:45 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-07-20 11:30:45 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,11 +108,13 @@ mafGUI* medViewVTKCompound::CreateGui()
 void medViewVTKCompound::PackageView()
 //-------------------------------------------------------------------------
 {
-	m_ViewVTK = new mafViewVTK("",CAMERA_PERSPECTIVE);	
+  assert(m_ViewVTK);
 	PlugChildView(m_ViewVTK);
 }
 
+//-------------------------------------------------------------------------
 bool medViewVTKCompound::ActivateWindowing(mafNode *node)
+//-------------------------------------------------------------------------
 {
   bool conditions     = false;
   
@@ -131,12 +133,11 @@ bool medViewVTKCompound::ActivateWindowing(mafNode *node)
   return conditions;
 }
 
-//----------------------------------------------------------------------------
-void medViewVTKCompound::AddVisualPipe(mafString vme_type, mafString pipe_type, long visibility)
-//----------------------------------------------------------------------------
+//-------------------------------------------------------------------------
+void medViewVTKCompound::SetExternalView(mafViewVTK *childView)
+//-------------------------------------------------------------------------
 {
-  if(m_ViewVTK != NULL){
-
-    m_ViewVTK->PlugVisualPipe(vme_type, pipe_type, visibility);
+  if(m_ViewVTK == NULL) {
+    m_ViewVTK = childView;
   }
 }

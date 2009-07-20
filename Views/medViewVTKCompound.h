@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:06:45 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-07-20 11:30:45 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -55,12 +55,11 @@ public:
   /**  Redefine this method to package the compounded view */
   virtual void PackageView();
 
+  /** Function to set customized mafViewVTK as child view. To be called before PackageView. */
+  virtual void SetExternalView(mafViewVTK *childView);
+
   /** Function that clones instance of the object. */
   virtual mafView *Copy(mafObserver *Listener);
-
-  /** Function to be called after PackageView() to plug the right visual pipes. */
-  virtual void AddVisualPipe(mafString vme_type, mafString pipe_type, long visibility);
-
 
 protected:
   /**
