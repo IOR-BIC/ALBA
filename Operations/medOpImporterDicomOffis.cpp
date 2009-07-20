@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-20 13:21:48 $
-Version:   $Revision: 1.1.2.35 $
+Date:      $Date: 2009-07-20 15:21:10 $
+Version:   $Revision: 1.1.2.36 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -258,6 +258,7 @@ mafOp(label)
 	m_CropFlag = false;
   m_CroppedExetuted = false;
   m_IsRotated = false;
+  m_ConstantRotation = true;
   m_SideToBeDragged = 0; 
 
 	m_GizmoStatus = GIZMO_NOT_EXIST;
@@ -884,6 +885,29 @@ int medOpImporterDicomOffis::BuildVolume()
   }
   m_Volume->SetDataByDetaching(rg_out,0);
 
+  if (m_ConstantRotation && m_IsRotated)
+  {
+    double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+    m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
+    vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+    mat->Identity();
+
+    mat->SetElement(0,0,orientation[0]);
+    mat->SetElement(1,0,orientation[1]);
+    mat->SetElement(2,0,orientation[2]);
+    mat->SetElement(0,1,orientation[3]);
+    mat->SetElement(1,1,orientation[4]);
+    mat->SetElement(2,1,orientation[5]);
+    mat->SetElement(0,2,orientation[6]);
+    mat->SetElement(1,2,orientation[7]);
+    mat->SetElement(2,2,orientation[8]);
+
+    mafSmartPointer<mafTransform> boxPose;
+    boxPose->SetMatrix(mat);
+
+    m_Volume->SetAbsMatrix(boxPose->GetMatrix());
+  }
+
   if(m_ResampleFlag == TRUE)
   {
     ResampleVolume();
@@ -951,6 +975,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
   // create the time varying vme
   mafNEW(m_Volume);
 
+  int currImageId = 0;
   long progress = 0;
   int totalNumberOfImages = m_NumberOfSlices*m_NumberOfTimeFrames;
   int progressCounter = 0;
@@ -987,7 +1012,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       if (targetVolumeSliceId == n_slices) {break;}
 
       // show the current slice
-      int currImageId = GetImageId(ts, sourceVolumeSliceId);
+      currImageId = GetImageId(ts, sourceVolumeSliceId);
       if (currImageId != -1) 
       {
         // update v_texture ivar
@@ -1039,6 +1064,31 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     if(m_ResampleFlag == TRUE)
     {
       ResampleVolume();
+    }
+
+    if (m_ConstantRotation && m_IsRotated)
+    {
+      double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+      m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
+
+      vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+      mat->Identity();
+
+      mat->SetElement(0,0,orientation[0]);
+      mat->SetElement(1,0,orientation[1]);
+      mat->SetElement(2,0,orientation[2]);
+      mat->SetElement(0,1,orientation[3]);
+      mat->SetElement(1,1,orientation[4]);
+      mat->SetElement(2,1,orientation[5]);
+      mat->SetElement(0,2,orientation[6]);
+      mat->SetElement(1,2,orientation[7]);
+      mat->SetElement(2,2,orientation[8]);
+
+
+      mafSmartPointer<mafTransform> boxPose;
+      boxPose->SetMatrix(mat);
+
+      m_Volume->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
     }
   }
   if(!this->m_TestMode)
@@ -2230,6 +2280,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 	long int numberOfImages = -1;
 	double trigTime = -1.0;
   double imageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  double firstImageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
   double imagePositionPatient[3] = {0.0,0.0,0.0};
   bool enableToRead = true; //true for test mode
 	m_DicomTypeRead = -1;
@@ -2314,6 +2365,25 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
 
+      
+
+      if (sliceNum == 0)
+      {
+        for (int i = 0; i < 6; i++)
+        {
+         firstImageOrientationPatient[i] = imageOrientationPatient[i];
+        }
+      }
+
+      if (m_ConstantRotation)
+      {
+        for (int i = 0; i < 6; i++)
+        {
+          if(firstImageOrientationPatient[i] != imageOrientationPatient[i])
+            m_ConstantRotation = false;
+        }
+      }
+      
       if (!m_IsRotated)
       {
         for (int i = 0; i < 6; i++)

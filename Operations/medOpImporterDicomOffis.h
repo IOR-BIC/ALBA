@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-07-03 16:49:01 $
-Version:   $Revision: 1.1.2.16 $
+Date:      $Date: 2009-07-20 15:21:11 $
+Version:   $Revision: 1.1.2.17 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -310,6 +310,7 @@ protected:
 	bool	m_CropFlag;
 	bool	m_CroppedExetuted; //<<<To check if a crop as been executed
   bool m_IsRotated;
+  bool m_ConstantRotation;
 
   int m_ResampleFlag;
   int m_DiscardPosition;
