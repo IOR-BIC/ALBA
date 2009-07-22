@@ -114,7 +114,10 @@ SET(PROJECT_SRCS
   medOpFillHoles.cpp
   medOpFillHoles.h
   medOpMeshDeformation.cpp
-  medOpMeshDeformation.h      
+  medOpMeshDeformation.h
+  
+  medOpMakeVMETimevarying.cpp
+  medOpMakeVMETimevarying.h
   
   #### VolumeLarge - TO BE COMMITTED DOWN    ####
   mafOpImporterBBF.cpp
