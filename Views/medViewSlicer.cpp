@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-07 22:44:20 $
-  Version:   $Revision: 1.14.2.1 $
+  Date:      $Date: 2009-07-23 07:10:38 $
+  Version:   $Revision: 1.14.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,6 +25,7 @@
 #include "mafVMESlicer.h"
 #include "mafMatrix.h"
 #include "mafTransform.h"
+#include "mafPipeImage3D.h"
 #include "mafPipeVolumeSlice.h"
 #include "mafPipeSurfaceSlice.h"
 #include "mafPipeSurface.h"
@@ -91,19 +92,17 @@ enum AXIS_ID
 
 //----------------------------------------------------------------------------
 medViewSlicer::medViewSlicer(wxString label, bool show_ruler)
-: mafViewCompound(label, 1, 2)
+: medViewCompoundWindowing(label, 1, 2)
 //----------------------------------------------------------------------------
 {
 	m_ViewArbitrary = NULL;
 	m_ViewSlice = NULL;
 
 	m_CurrentVolume = NULL;
+  m_CurrentImage  = NULL;
 	m_CurrentSlicer = NULL;
 	
 	m_AttachCamera = NULL;
-	m_LutSlider = NULL;
-	m_LutWidget = NULL;
-	m_ColorLUT= NULL;
 
 	m_SliceCenterSurface[0] = 0.0;
 	m_SliceCenterSurface[1] = 0.0;
@@ -118,9 +117,6 @@ medViewSlicer::medViewSlicer(wxString label, bool show_ruler)
 medViewSlicer::~medViewSlicer()
 //----------------------------------------------------------------------------
 {
-	m_CurrentVolume = NULL;
-	m_ColorLUT = NULL;
-
   cppDEL(m_AttachCamera);
 }
 //----------------------------------------------------------------------------
@@ -132,7 +128,8 @@ void medViewSlicer::PackageView()
 	m_ViewArbitrary->PlugVisualPipe("mafVMESurface","mafPipeSurfaceTextured");
 	m_ViewArbitrary->PlugVisualPipe("mafVMEVolumeGray", "mafPipeBox", MUTEX);
   m_ViewArbitrary->PlugVisualPipe("mafVMELabeledVolume", "mafPipeBox", MUTEX);
-	m_ViewSlice = new mafViewVTK("",CAMERA_CT);
+	
+  m_ViewSlice = new mafViewVTK("",CAMERA_CT);
 	m_ViewSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
   m_ViewSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
 	m_ViewSlice->PlugVisualPipe("mafVMEGizmo", "mafPipeGizmo", NON_VISIBLE);
@@ -173,28 +170,6 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
     {
       //Show Slicer
       m_CurrentSlicer = mafVMESlicer::SafeDownCast(node);
-      double sr[2];
-      mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetSlicedVMELink());
-      if(vol)
-      {
-        vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
-        
-        mmaMaterial *currentSurfaceMaterial = m_CurrentSlicer->GetMaterial();
-        m_ColorLUT = m_CurrentSlicer->GetMaterial()->m_ColorLut;
-        m_CurrentSlicer->GetMaterial()->UpdateProp();
-        m_ColorLUT->SetTableRange(sr[0], sr[1]);
-        
-        if(m_LutWidget)
-        {
-          m_LutWidget->SetLut(m_ColorLUT);
-          if(m_LutSlider)
-          {
-            m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-            m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-          }
-        }
-
-      }
         
       //Set camera of slice view in way that it will follow the volume
       if(!m_AttachCamera)
@@ -203,28 +178,47 @@ void medViewSlicer::VmeShow(mafNode *node, bool show)
       m_AttachCamera->SetVme(m_CurrentSlicer);
       ((mafViewVTK*)m_ChildViewList[SLICE_VIEW])->CameraReset(m_CurrentSlicer);
     }
-	}
+    else if(Vme->IsA("mafVMEImage")) {
+      m_CurrentImage = mafVMEImage::SafeDownCast(node);
+	  }
+  }
 	else//if show=false
 	{
 		
-        if (((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
+    if (((mafVME *)Vme)->GetOutput()->IsA("mafVMEOutputVolume"))
 		{		
 			m_CurrentVolume = NULL;
-			m_ColorLUT = NULL;
+      m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
     else if(Vme->IsA("mafVMESlicer"))
     {
       m_AttachCamera->SetVme(NULL);
       m_CurrentSlicer = NULL;
-
+      m_ColorLUT = NULL;
+      m_LutWidget->SetLut(m_ColorLUT);
+      m_LutSlider->Enable(false);
+      double normal[3] = {0,0,1};
+      ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
+    }
+    else if(Vme->IsA("mafVMEImage"))
+    {
+      m_CurrentImage = NULL;
+      m_ColorLUT = NULL;
+      m_LutWidget->SetLut(m_ColorLUT);
       m_LutSlider->Enable(false);
       double normal[3] = {0,0,1};
       ((mafViewSlice*)m_ChildViewList[SLICE_VIEW])->CameraSet(CAMERA_CT);
     }
 	}
-	//mafEventMacro(mafEvent(this,CAMERA_UPDATE));
-	EnableWidgets(m_CurrentVolume != NULL);
+
+  UpdateWindowing(  show && this->ActivateWindowing(GetSceneGraph()->GetSelectedVme()), 
+                    GetSceneGraph()->GetSelectedVme()
+    );
+
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+	//EnableWidgets(m_CurrentVolume != NULL);
 }
 //----------------------------------------------------------------------------
 void medViewSlicer::OnEvent(mafEventBase *maf_event)
@@ -251,7 +245,7 @@ void medViewSlicer::OnEventThis(mafEventBase *maf_event)
     {
     case ID_RANGE_MODIFIED:
       {
-        if(m_CurrentVolume)
+        if(m_CurrentVolume || m_CurrentImage)
         {
           double low, hi;
           m_LutSlider->GetSubRange(&low,&hi);
@@ -411,7 +405,8 @@ void medViewSlicer::EnableWidgets(bool enable)
 		m_Gui->Update();
   }
   
-  m_LutSlider->Enable(m_CurrentSlicer != NULL);
+  //m_LutSlider->Enable(m_CurrentSlicer != NULL);
+  m_LutSlider->Enable(enable);
 
 }
 //-------------------------------------------------------------------------
@@ -444,4 +439,115 @@ int medViewSlicer::GetNodeStatus(mafNode *vme)
     }
   }
   return sgArb ? sgArb->GetNodeStatus(vme) : NODE_NON_VISIBLE;
+}
+
+//-------------------------------------------------------------------------
+void medViewSlicer::UpdateWindowing(bool enable,mafNode *node)
+//-------------------------------------------------------------------------
+{
+  EnableWidgets(enable);
+
+  //Windowing can be applied on Slicers or on Images
+  mafVMESlicer  *Slicer		= NULL;
+  mafVMEImage   *Image	  = NULL;
+
+  mafVME *Vme = mafVME::SafeDownCast(node);
+
+  if(Vme->IsA("mafVMESlicer")) {
+    Slicer = mafVMESlicer::SafeDownCast(node);
+  }
+  else if(Vme->IsA("mafVMEImage")) {
+    Image = mafVMEImage::SafeDownCast(node);
+  }
+
+  if(Slicer) {
+    if(enable)
+    {
+      SlicerWindowing(Slicer);
+    }
+    else
+    {
+      m_LutSlider->SetRange(-100,100);
+      m_LutSlider->SetSubRange(-100,100);
+    }
+  }
+  else if(Image) {
+    if(enable)
+    {      
+      ImageWindowing(Image);
+    }
+    else
+    {
+      m_LutSlider->SetRange(-100,100);
+      m_LutSlider->SetSubRange(-100,100);
+    }
+  }
+
+}
+
+
+//-------------------------------------------------------------------------
+bool medViewSlicer::ActivateWindowing(mafNode *node) 
+//-------------------------------------------------------------------------
+{
+  bool conditions     = false;
+  bool nodeHasPipe    = false;
+
+  mafVME *Vme=mafVME::SafeDownCast(node);
+  Vme->Update();
+
+  if(Vme->IsA("mafVMESlicer") && m_CurrentSlicer){
+
+    mafVMESlicer *slicer = mafVMESlicer::SafeDownCast(node);
+    mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(m_CurrentSlicer->GetSlicedVMELink());
+    if(vol) {
+      conditions = true;
+    }
+    conditions = conditions && m_CurrentVolume;
+  }
+
+  else if(((mafVME *)node)->IsA("mafVMEImage")){
+
+    conditions = true;
+
+    for(int i=0; i<m_NumOfChildView; i++) {
+
+      mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(node);
+      conditions = (conditions && (pipe && pipe->IsGrayImage()));
+    }
+    //conditions = conditions & m_CurrentImage;
+  }
+
+  return conditions;
+}
+
+
+//-------------------------------------------------------------------------
+void medViewSlicer::SlicerWindowing(mafVMESlicer *slicer)
+//-------------------------------------------------------------------------
+{
+
+  mafVMEVolumeGray *vol = mafVMEVolumeGray::SafeDownCast(
+    slicer->GetSlicedVMELink());
+  if(vol)
+  {
+    double sr[2];
+    vol->GetOutput()->GetVTKData()->GetScalarRange(sr);
+
+    mmaMaterial *currentSurfaceMaterial = m_CurrentSlicer->GetMaterial();
+    m_ColorLUT = m_CurrentSlicer->GetMaterial()->m_ColorLut;
+    m_CurrentSlicer->GetMaterial()->UpdateProp();
+    m_ColorLUT->SetTableRange(sr[0], sr[1]);
+
+    if(m_LutWidget)
+    {
+      m_LutWidget->SetLut(m_ColorLUT);
+      if(m_LutSlider)
+      {
+        m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+        m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+      }
+    }
+
+  }
 }

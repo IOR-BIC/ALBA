@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:11 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-07-23 07:10:38 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,7 +16,7 @@
 //----------------------------------------------------------------------------
 // Include:
 //----------------------------------------------------------------------------
-#include "mafViewCompound.h"
+#include "medViewCompoundWindowing.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -27,6 +27,7 @@ class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafVMEVolumeGray;
 class mafVMESlicer;
+class mafVMEImage;
 class mafMatrix;
 class mafAttachCamera;
 class mafGUI;
@@ -38,19 +39,18 @@ class mafGUILutSwatch;
 //----------------------------------------------------------------------------
 /** 
   This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
-class medViewSlicer: public mafViewCompound
+class medViewSlicer: public medViewCompoundWindowing
 {
 public:
   medViewSlicer(wxString label = "View Arbitrary Slice", bool show_ruler = false);
   virtual ~medViewSlicer(); 
 
-  mafTypeMacro(medViewSlicer, mafViewCompound);
+  mafTypeMacro(medViewSlicer, medViewCompoundWindowing);
 
 	enum ID_GUI
 	{
 		ID_COMBO_GIZMOS = Superclass::ID_LAST,
 		ID_RESET,
-		ID_LUT_CHOOSER,
 		ID_LAST,
 	};
 
@@ -71,11 +71,17 @@ public:
 	/** Create the GUI on the bottom of the compounded view. */
   virtual void CreateGuiView();
 
+  /** Function that handles events sent from other objects. */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+   /** Function that clones instance of the object. */
 	virtual mafView* Copy(mafObserver *Listener);
 
+  /** Force the updating of the camera. */
 	virtual void CameraUpdate();
+
+  //virtual void VmeSelect(mafNode *node, bool select);
+
 
 protected:
 
@@ -90,27 +96,33 @@ protected:
 	/** Enable/disable view widgets.*/
   void EnableWidgets(bool enable = true);
 
+  /** Handling events sent from other objects. Called by public method OnEvent().*/
 	void OnEventThis(mafEventBase *maf_event);  
+
+  /**Protected method returning true if windowing can be enabled.
+  It overrides superclass method.*/
+  bool ActivateWindowing(mafNode *node);
+
+  /**Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
+  void UpdateWindowing(bool enable, mafNode *node);
+
+  /** Update windowing on slicer visualization. */
+  void SlicerWindowing(mafVMESlicer *slicer);
 
 	
 	mafViewVTK *m_ViewSlice;
 	mafViewVTK *m_ViewArbitrary;
 
 	
-	mafVME	*m_CurrentVolume;
-	mafVMESlicer			*m_CurrentSlicer;
+	mafVME	      *m_CurrentVolume;
+  mafVMEImage   *m_CurrentImage;
+	mafVMESlicer  *m_CurrentSlicer;
 
 	mafAttachCamera		*m_AttachCamera;
-
-	vtkLookupTable    *m_ColorLUT;
 
 	double	m_SliceCenterSurface[3];
 	double	m_SliceCenterSurfaceReset[3];
 	double	m_SliceAngleReset[3];
-	
-
-	mafGUILutSlider	*m_LutSlider; ///< Double slider used to change brightness and contrast of the image
-	mafGUILutSwatch	*m_LutWidget; ///< LUT widget in view side panel 
 	
 };
 #endif
