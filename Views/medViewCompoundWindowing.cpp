@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-20 11:45:43 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-07-23 07:06:44 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -136,7 +136,8 @@ void medViewCompoundWindowing::VmeSelect(mafNode *node, bool select)
   for(int i=0; i<m_NumOfChildView; i++)
     m_ChildViewList[i]->VmeSelect(node, select);
 
-  UpdateWindowing( select && this->ActivateWindowing(node), node);
+  //UpdateWindowing( select && ActivateWindowing(node), node);
+  UpdateWindowing( select && ActivateWindowing(GetSceneGraph()->GetSelectedVme()), GetSceneGraph()->GetSelectedVme());
 }
 
 //----------------------------------------------------------------------------
@@ -161,17 +162,12 @@ void medViewCompoundWindowing::UpdateWindowing(bool enable,mafNode *node)
   if(Volume) {
 		if(enable && (mafVMEOutputVolume::SafeDownCast(Volume->GetOutput())))
 		{
-			double sr[2];
-			Volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
-			mmaVolumeMaterial *currentSurfaceMaterial = ((mafVMEOutputVolume *)Volume->GetOutput())->GetMaterial();
-      m_ColorLUT = mafVMEVolumeGray::SafeDownCast(Volume)->GetMaterial()->m_ColorLut;
-			m_LutWidget->SetLut(m_ColorLUT);
-			m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-      m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-			//m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+      VolumeWindowing(Volume);
 		}
 		else
 		{
+      m_ColorLUT = NULL;
+      m_LutWidget->SetLut(m_ColorLUT);
 			m_LutSlider->SetRange(-100,100);
 			m_LutSlider->SetSubRange(-100,100);
 		}
@@ -179,21 +175,12 @@ void medViewCompoundWindowing::UpdateWindowing(bool enable,mafNode *node)
 	else if(Image) {
 		if(enable)
 		{
-			double sr[2];
-			vtkDataSet *data = ((mafVME *)node)->GetOutput()->GetVTKData();
-			data->Update();
-
-			//Get scalar range of the image
-			data->GetScalarRange(sr);
-
-      m_ColorLUT = (vtkLookupTable*)((mafPipeImage3D *)m_ChildViewList[0]->GetNodePipe(node))->GetLUT();
-      m_LutWidget->SetLut(m_ColorLUT);
-			m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
-			m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
-
+      ImageWindowing(Image);
 		}
 		else
 		{
+      m_ColorLUT = NULL;
+      m_LutWidget->SetLut(m_ColorLUT);
 			m_LutSlider->SetRange(-100,100);
 			m_LutSlider->SetSubRange(-100,100);
 		}
@@ -212,7 +199,6 @@ bool medViewCompoundWindowing::ActivateWindowing(mafNode *node)
     conditions = true;
 
     for(int i=0; i<m_NumOfChildView; i++) {
-      //m_ChildViewList[i]->VmeSelect(node, select);
       
       if(m_ChildViewList[i]->GetNodePipe(node)) {
         nodeHasPipe = true;
@@ -226,7 +212,6 @@ bool medViewCompoundWindowing::ActivateWindowing(mafNode *node)
     conditions = true;
 
     for(int i=0; i<m_NumOfChildView; i++) {
-      //m_ChildViewList[i]->VmeSelect(node, select);
 
       mafPipeImage3D *pipe = (mafPipeImage3D *)m_ChildViewList[i]->GetNodePipe(node);
       conditions = (conditions && (pipe && pipe->IsGrayImage()));
@@ -234,4 +219,37 @@ bool medViewCompoundWindowing::ActivateWindowing(mafNode *node)
   }
 
   return conditions;
+}
+
+//----------------------------------------------------------------------------
+void medViewCompoundWindowing::ImageWindowing(mafVMEImage *image)
+//----------------------------------------------------------------------------
+{
+  double sr[2];
+  vtkDataSet *data = image->GetOutput()->GetVTKData();
+  data->Update();
+
+  //Get scalar range of the image
+  data->GetScalarRange(sr);
+
+  m_ColorLUT = (vtkLookupTable*)((mafPipeImage3D *)m_ChildViewList[0]->GetNodePipe(image))->GetLUT();
+  m_LutWidget->SetLut(m_ColorLUT);
+  m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+  m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+}
+
+//----------------------------------------------------------------------------
+void medViewCompoundWindowing::VolumeWindowing(mafVME *volume)
+//----------------------------------------------------------------------------
+{
+  double sr[2];
+  volume->GetOutput()->GetVTKData()->GetScalarRange(sr);
+  
+  mmaVolumeMaterial *currentSurfaceMaterial = ((mafVMEOutputVolume *)volume->GetOutput())->GetMaterial();
+  m_ColorLUT = mafVMEVolumeGray::SafeDownCast(volume)->GetMaterial()->m_ColorLut;
+  m_LutWidget->SetLut(m_ColorLUT);
+  m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+  //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+  m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+
 }

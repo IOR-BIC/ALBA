@@ -3,12 +3,12 @@
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
 <<<<<<< mafViewArbitrarySlice.cpp
-  Date:      $Date: 2009-07-16 15:43:12 $
-  Version:   $Revision: 1.38.2.4 $
+  Date:      $Date: 2009-07-23 07:06:44 $
+  Version:   $Revision: 1.38.2.5 $
   Authors:   Eleonora Mambrini
 =======
-  Date:      $Date: 2009-07-16 15:43:12 $
-  Version:   $Revision: 1.38.2.4 $
+  Date:      $Date: 2009-07-23 07:06:44 $
+  Version:   $Revision: 1.38.2.5 $
   Authors:   Matteo Giacomoni
 >>>>>>> 1.38.2.2
 ==========================================================================
@@ -229,7 +229,7 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			//m_Slicer->SetName("Slicer");
 			m_Slicer->SetAbsMatrix(*m_MatrixReset);
 			m_Slicer->SetSlicedVMELink(mafVME::SafeDownCast(node));
-      m_Slicer->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
+      		m_Slicer->GetMaterial()->m_ColorLut->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume)->GetMaterial()->m_ColorLut);
 			m_Slicer->Update();
 
 // 			mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
@@ -323,7 +323,6 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
       //a surface is visible only if there is a volume in the view
       if(m_CurrentVolume)
       {
-
         m_CurrentPolylineGraphEditor = (medVMEPolylineEditor*)node;
 
         double normal[3];
@@ -409,20 +408,21 @@ void mafViewArbitrarySlice::VmeShow(mafNode *node, bool show)
 			m_ColorLUT = NULL;
 			m_LutWidget->SetLut(m_ColorLUT);
 		}
-
-    if( (mafVME *)Vme->IsA("mafVMEImage")) 
-    {
+    else if(Vme->IsA("mafVMEImage")) {
       m_CurrentImage = NULL;
-			m_ColorLUT = NULL;
-			m_LutWidget->SetLut(m_ColorLUT);
+      m_ColorLUT = NULL;
+      m_LutWidget->SetLut(m_ColorLUT);
     }
+
 	}
 
-  UpdateWindowing( 
-    (GetSceneGraph()->GetSelectedVme()==node && show && this->ActivateWindowing(node)), 
-    node);
+  if(GetSceneGraph()->GetSelectedVme()==node) {
+    UpdateWindowing( show && this->ActivateWindowing(node), node);
+    //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  }
 
-  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
+  //mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 
 	//EnableWidgets( (m_CurrentVolume != NULL) || (m_CurrentImage != NULL));
 }
@@ -951,3 +951,22 @@ void mafViewArbitrarySlice::UpdateSlicerBehavior()
     pSli->SetActorPicking(false);
   }
 };
+
+//----------------------------------------------------------------------------
+void mafViewArbitrarySlice::VolumeWindowing(mafVME *volume)
+//----------------------------------------------------------------------------
+{
+
+  double sr[2];
+  vtkDataSet *data = ((mafVME *)volume)->GetOutput()->GetVTKData();
+  data->Update();
+  data->GetScalarRange(sr);
+
+  mmaMaterial *currentSurfaceMaterial = m_Slicer->GetMaterial();
+  m_ColorLUT = m_Slicer->GetMaterial()->m_ColorLut;
+  m_LutWidget->SetLut(m_ColorLUT);
+  m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
+  //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
+  m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+
+}

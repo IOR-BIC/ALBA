@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 15:43:12 $
-  Version:   $Revision: 1.8.2.2 $
+  Date:      $Date: 2009-07-23 07:06:44 $
+  Version:   $Revision: 1.8.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,6 +106,9 @@ protected:
 
   /** Post multiply matrix for incoming transform events */
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
+
+  /** Windowing for volumes data. This function overrides superclass method.*/
+  void VolumeWindowing(mafVME *volume);
 
 	mafViewVTK *m_ViewSlice;
 	mafViewVTK *m_ViewArbitrary;

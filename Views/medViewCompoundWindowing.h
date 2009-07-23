@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 09:02:56 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-07-23 07:06:44 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,6 +27,7 @@ class mafRWIBase;
 class mafGUILutSlider;
 class mafGUILutSwatch;
 class mafGUIFloatSlider;
+class mafVMEImage;
 class vtkLookupTable;
 class vtkWindowLevelLookupTable;
 
@@ -83,13 +84,20 @@ protected:
   virtual mafGUI  *CreateGui()=0;
 
   /** Function for enable/disable all gui widgets. */
-	void EnableWidgets(bool enable);
-
-  /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
-	void UpdateWindowing(bool enable,mafNode *node);
+	//virtual void EnableWidgets(bool enable);
+  void EnableWidgets(bool enable);
 
   /** A function with windowing activate/deactivate conditions*/
   virtual bool ActivateWindowing(mafNode *node);
+
+  /** Update lutslider with correct values in case of bool variable is true, otherwise disable the widget. */
+	virtual void UpdateWindowing(bool enable,mafNode *node);
+
+  /** Update windowing for image data*/
+  virtual void ImageWindowing(mafVMEImage *image);
+
+  /** Update windowing for volume data*/
+  virtual void VolumeWindowing(mafVME *volume);
 
 	mafGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
 	mafGUILutSlider		*m_LutSlider;
