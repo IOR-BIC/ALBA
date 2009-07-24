@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-20 15:21:10 $
-Version:   $Revision: 1.1.2.36 $
+Date:      $Date: 2009-07-24 08:59:24 $
+Version:   $Revision: 1.1.2.37 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -349,7 +349,7 @@ void medOpImporterDicomOffis::OpRun()
 	  if (m_DicomDirectory == "")
 	  {
 		  wxString path = (mafGetApplicationDirectory()+"/data/external/").c_str();
-		  wxDirDialog dialog(m_Wizard->GetParent(),"", path, 0, m_Wizard->GetPosition());
+		  wxDirDialog dialog(m_Wizard->GetParent(),"", path,wxRESIZE_BORDER, m_Wizard->GetPosition());
 		  dialog.SetReturnCode(wxID_OK);
 		  int ret_code = dialog.ShowModal();
 		  if (ret_code == wxID_OK)
