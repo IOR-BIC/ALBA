@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-24 08:59:24 $
-Version:   $Revision: 1.1.2.37 $
+Date:      $Date: 2009-07-24 09:47:20 $
+Version:   $Revision: 1.1.2.38 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -885,7 +885,7 @@ int medOpImporterDicomOffis::BuildVolume()
   }
   m_Volume->SetDataByDetaching(rg_out,0);
 
-  if (m_ConstantRotation && m_IsRotated)
+  /*if (m_ConstantRotation && m_IsRotated)
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
@@ -906,7 +906,7 @@ int medOpImporterDicomOffis::BuildVolume()
     boxPose->SetMatrix(mat);
 
     m_Volume->SetAbsMatrix(boxPose->GetMatrix());
-  }
+  }*/
 
   if(m_ResampleFlag == TRUE)
   {
@@ -1066,7 +1066,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       ResampleVolume();
     }
 
-    if (m_ConstantRotation && m_IsRotated)
+    /*if (m_ConstantRotation && m_IsRotated)
     {
       double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
       m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
@@ -1089,7 +1089,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       boxPose->SetMatrix(mat);
 
       m_Volume->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
-    }
+    }*/
   }
   if(!this->m_TestMode)
   {
