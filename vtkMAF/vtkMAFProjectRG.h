@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFProjectRG.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-07-26 08:16:39 $
+  Version:   $Revision: 1.1.2.1 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -68,26 +68,45 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define VTK_PROJECT_FROM_Y 2
 #define VTK_PROJECT_FROM_Z 3
 
+/**
+Class Name: vtkMAFProjectRG.
+ vtkMAFProjectRG makes a voxel projection of structured points dataset 
+ along axis directions considering opacity.  The output of
+ this filter is a structured points dataset. The filter treats input data
+ of any topological dimension (i.e., point, line, image, or volume) and 
+ generates image output data.
 
+ To use this filter set the projection mode  ivar. 
+ specify a rectangular region in the data. (Note that these are 0-offset.)
+ You can also specify a sampling rate to subsample the data.
+
+ Typical applications of this filter are to produce an image from a volume
+ for image processing or visualization.
+*/
 class VTK_vtkMAF_EXPORT vtkMAFProjectRG : public vtkMAFRectilinearGridToRectilinearGridFilter
 {
 public:
+  /** RTTI Macro */
   vtkTypeRevisionMacro(vtkMAFProjectRG,vtkMAFRectilinearGridToRectilinearGridFilter);
+  /** Print object information */
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  /** Static Function for object instantiation */
   static vtkMAFProjectRG *New();
 
-  /**
-  Control the projection direction.*/
+  /** Set Projection Direction to X */
   void SetProjectionModeToX()
     {this->SetProjectionMode(VTK_PROJECT_FROM_X);};
  
+  /** Set Projection Direction to Y */
   void SetProjectionModeToY()
     {this->SetProjectionMode(VTK_PROJECT_FROM_Y);};
  
+  /** Set Projection Direction to Z */
   void SetProjectionModeToZ()
     {this->SetProjectionMode(VTK_PROJECT_FROM_Z);};
  
+  /** Retrieve the direction of projection as string */
   char *GetProjectionModeAsString(void)
   {
      switch (this->ProjectionMode) {
@@ -97,18 +116,25 @@ public:
      return "Z";
   };
 
+  /** Macro for Set Projection Mode */
   vtkSetMacro(ProjectionMode,int);
+  /** Macro for Get Projection Mode */
   vtkGetMacro(ProjectionMode,int);
     
 
 protected:
-  
-  vtkMAFProjectRG() ;
- ~vtkMAFProjectRG() {};
+  /** constructor */
+  vtkMAFProjectRG();
+  /** destructor */
+ ~vtkMAFProjectRG(){};
+ /** copy constructor not implemented*/
   vtkMAFProjectRG(const vtkMAFProjectRG&);
+  /** assign operator not implemented*/
   void operator=(const vtkMAFProjectRG&);
 
+  /** Update dimensions and whole extents */
   void ExecuteInformation();
+  /** Execute the projection and fill output scalars */
   void Execute();
 
   int ProjectionMode;  
