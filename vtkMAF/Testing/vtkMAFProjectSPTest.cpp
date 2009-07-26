@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFProjectSPTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-14 10:05:03 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-07-26 08:19:48 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -190,7 +190,7 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToY()
 
   //check Control
   vtkStructuredPoints *projectedImage = filter->GetOutput();
-  for(int j=0;j<dimension[1]*dimension[2];j++)
+  for(int j=0;j<dimension[0]*dimension[2];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
@@ -264,7 +264,7 @@ void vtkMAFProjectSPTest::TestExecutionProjectionModeToZ()
 
   //check Control
   vtkStructuredPoints *projectedImage = filter->GetOutput();
-  for(int j=0;j<dimension[1]*dimension[2];j++)
+  for(int j=0;j<dimension[0]*dimension[1];j++)
   {
     float value1 = arrayControl->GetTuple1(j);
     float value2 = projectedImage->GetPointData()->GetScalars()->GetTuple1(j);
