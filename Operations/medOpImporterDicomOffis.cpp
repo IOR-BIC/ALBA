@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-24 09:47:20 $
-Version:   $Revision: 1.1.2.38 $
+Date:      $Date: 2009-08-06 10:27:26 $
+Version:   $Revision: 1.1.2.39 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -289,14 +289,13 @@ medOpImporterDicomOffis::~medOpImporterDicomOffis()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_SliceActor);
-	vtkDEL(m_SliceLookupTable);
+	//vtkDEL(m_SliceLookupTable);
 
 	cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
-
-	m_Volume = NULL;
-	m_Image = NULL;
-  m_Mesh = NULL;
+	mafDEL(m_Image);
+  mafDEL(m_Mesh);
+  mafDEL(m_Volume);
 
   m_ImagesGroup = NULL;
 
@@ -885,6 +884,7 @@ int medOpImporterDicomOffis::BuildVolume()
   }
   m_Volume->SetDataByDetaching(rg_out,0);
 
+
   /*if (m_ConstantRotation && m_IsRotated)
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
@@ -1276,8 +1276,6 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
     wxBusyInfo wait_info("Building mesh: please wait");
     mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   }
-
- 
   mafNEW(m_Mesh);
 
   long progress = 0;
@@ -2365,8 +2363,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
 
-      
-
       if (sliceNum == 0)
       {
         for (int i = 0; i < 6; i++)
@@ -2619,8 +2615,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
 					m_FilesList = new medListDICOMFiles;
-
-
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
           ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
@@ -2653,7 +2647,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             }
           }
          
-          m_FilesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData,imageNumber, numberOfImages, trigTime));
+          m_FilesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData, imageNumber, numberOfImages, trigTime));
 
           m_DicomMap.insert(std::pair<mafString,medListDICOMFiles*>(studyUID,m_FilesList));
           if (!this->m_TestMode)
