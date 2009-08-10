@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExporterWrappedMeterTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-22 17:08:45 $
-Version:   $Revision: 1.2.2.3 $
+Date:      $Date: 2009-08-10 12:59:34 $
+Version:   $Revision: 1.2.2.4 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -101,9 +101,16 @@ void medOpExporterWrappedMeterTest::meterImplement(){
 	wrappedMeter->Modified();
 	wrappedMeter->Update();
 
-    double testValue = wrappedMeter->GetDistance();
+  double testValue = wrappedMeter->GetDistance();
 	CPPUNIT_ASSERT(wrappedMeter->GetDistance() > 17.4 && wrappedMeter->GetDistance() < 17.5);
+
 	wrappedMeter->SetParent(NULL);
+  vmeSphere->SetParent(NULL);
+  vmeSTART->SetParent(NULL);
+  vmeEND->SetParent(NULL);
+  mafDEL(vmeSphere);
+  mafDEL(vmeSTART);
+  mafDEL(vmeEND);
 	mafDEL(wrappedMeter);
 	mafDEL(storage);
 
