@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpVolumeMeasureTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-28 09:01:31 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-08-10 14:35:55 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -38,22 +38,23 @@ void medOpVolumeMeasureTest::Test()
   cube->SetZLength(30.0);
   cube->Update();
   	
-  mafVMESurface *vmeSurface;
-  mafNEW(vmeSurface);
+  mafSmartPointer<mafVMESurface> vmeSurface;
+  //mafNEW(vmeSurface);
   vmeSurface->SetData(cube->GetOutput(), 0);
   vmeSurface->Update();
   	
 	medOpVolumeMeasure *volumeMeasureOp=new medOpVolumeMeasure("Volume Measure");
 	volumeMeasureOp->TestModeOn();
   mafString result;
- volumeMeasureOp->VolumeCompute(vmeSurface);
- result = volumeMeasureOp->GetVolume();
+  volumeMeasureOp->VolumeCompute(vmeSurface);
+  result = volumeMeasureOp->GetVolume();
+  volumeMeasureOp->OpStop(MAF_OK);
 	
   //printf("%s", result);
   CPPUNIT_ASSERT(result == mafString("6000"));
 
   
-  mafDEL(vmeSurface);
   vtkDEL(cube);
+  mafDEL(volumeMeasureOp);
   
 }
