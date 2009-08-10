@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:52:52 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-08-10 14:36:21 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -62,12 +62,13 @@ public:
 	mafString GetVolume(){return m_VolumeMeasure;};
 
   void OpDo();
+  void OpStop(int result);	
 
   static bool SurfaceAccept(mafNode* node) {return(node != NULL && (node->IsMAFType(mafVMESurface) || node->IsMAFType(mafVMESurfaceParametric) ));};
 
 protected:
 
-  void OpStop(int result);	
+  
 
   mafVMESurface  *m_VmeSurface;
   

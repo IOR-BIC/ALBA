@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-08-10 14:36:21 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -250,7 +250,10 @@ void medOpVolumeMeasure::OpStop(int result)
 
     vtkDEL(m_TriangleFilter);
 	  vtkDEL(m_MassProperties);
-	  HideGui();
+    if(!this->m_TestMode)
+    {
+      HideGui();
+    }
 	  mafEventMacro(mafEvent(this,result));
 }
 
