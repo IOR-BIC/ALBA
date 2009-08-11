@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFreezeVMETest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-03-07 09:42:57 $
-Version:   $Revision: 1.7 $
+Date:      $Date: 2009-08-11 07:44:19 $
+Version:   $Revision: 1.7.2.1 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -256,9 +256,6 @@ void medOpFreezeVMETest::TestFreezeVMEWrappedMeter()
 	vmeParametricSurfaceEND1->SetParent(NULL);
 	
 	polyline1->SetParent(NULL);
-	
-
-	
 	mafDEL(wrappedMeter);
 	mafDEL(vmeParametricSurfaceSTART);
 	mafDEL(vmeParametricSurfaceEND1);
@@ -423,7 +420,9 @@ void medOpFreezeVMETest::TestFreezeVMEProber()
 	volume->SetParent(NULL);	
 	prober->SetParent(NULL);
 	probSurface->SetParent(NULL);
-	
+
+  vmeParametricSurfaceSTART->SetParent(NULL);
+  mafDEL(vmeParametricSurfaceSTART);
 	cppDEL(importer);	
 	mafDEL(prober);
 	cppDEL(freezeOp);
@@ -529,7 +528,7 @@ void medOpFreezeVMETest::TestFreezeVMERefSys()
   vmeRefSys->SetParent(storage->GetRoot());
   vmeRefSys->Update();
 
-  /* test surface parametric *//////////////////////////////////////////////////////////////////////////
+  // test surface parametric //////////////////////////////////////////////////////////////////////////
   medOpFreezeVME *freezeOp=new medOpFreezeVME("freeze");
   freezeOp->TestModeOn();
   freezeOp->SetInput(vmeRefSys);
