@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpDecomposeTimeVarVME.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-08-18 08:51:02 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -483,6 +483,7 @@ void mafOpDecomposeTimeVarVME::CreateStaticVME(mafTimeStamp timeSt)
       matrixCopy->DeepCopy(matrix);
       vmeGeneric->GetMatrixVector()->SetMatrix(matrixCopy);
       oldTime = matrix->GetTimeStamp();
+      mafDEL(matrixCopy);
     }
   }
 
