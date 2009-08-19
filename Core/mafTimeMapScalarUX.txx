@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTimeMapScalarUX.txx,v $
   Language:  C++
-  Date:      $Date: 2008-02-19 14:15:29 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-08-19 15:13:27 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -173,22 +173,37 @@ template <class T>
 typename mafTimeMapScalar<T>::TimeMapScalars::iterator mafTimeMapScalar<T>::FindNearestItem(mafTimeStamp t)
 //-------------------------------------------------------------------------
 {
-  std::pair<typename mafTimeMapScalar<T>::TimeMapScalars::iterator,typename mafTimeMapScalar<T>::TimeMapScalars::iterator> range=m_TimeMap.equal_range(t);
-  if (range.first!=m_TimeMap.end())
-  {
-    if (range.second!=m_TimeMap.end())
-    {
-      if (fabs(range.first->first-t)>fabs(range.second->first-t))
-         return range.second;
-    }    
-    return range.first;
-  }
-  else if (range.second!=m_TimeMap.end())
-  {
-    return range.second;
-  }
+/** Added by Losi 08/17/2009:
+After creating the test class mafScalarVectorTest I saw that the GetNearestScalar method returned the scalar with the
+minimum timestamp greater or equal to the specified one instead of the scalar with the timestamp nearest to the specified one.
+GetNearestScalar method of mafScalarVectorTest class only call this method of mafTimeMapScalar. */
 
-  return --range.second;
+  mafTimeMapScalar<T>::TimeMapScalars::iterator lowIt;
+  mafTimeMapScalar<T>::TimeMapScalars::iterator upIt;
+	
+  lowIt = FindItemBefore(t); // find first item < t
+  upIt = m_TimeMap.lower_bound(t); // find first item >= t
+
+  if(lowIt != m_TimeMap.end())
+  {
+    if(upIt != m_TimeMap.end())
+    {
+      if(fabs(lowIt->first - t) < fabs(upIt->first - t))
+      {
+        return lowIt;
+      }
+      else
+      {
+        return upIt;
+      }
+    }
+    return lowIt;
+  }
+  else if(upIt != m_TimeMap.end())
+  {
+    return upIt;
+  }
+  return --upIt;
 }
 
 
