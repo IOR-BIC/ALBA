@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITreeContextualMenu.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-08-20 08:13:35 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ class mafEvent;
 class mafObserver;
 class mafGUICheckTree;
 class mafNode;
+class mafSceneGraph;
 class mafVME;
 
 //----------------------------------------------------------------------------
@@ -48,6 +49,8 @@ protected:
   mafNode       *m_NodeActive;
   mafGUICheckTree  *m_NodeTree;
   mafObserver   *m_Listener;
+
+  mafSceneGraph *m_SceneGraph;
   
   bool m_Autosort;
   bool m_CryptoCheck;

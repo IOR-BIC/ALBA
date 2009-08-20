@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITreeContextualMenu.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:54 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-08-20 08:13:35 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -86,6 +86,7 @@ mafGUITreeContextualMenu::mafGUITreeContextualMenu()
   m_NodeActive  = NULL;
   m_Listener    = NULL;
   m_NodeTree    = NULL;
+  m_SceneGraph  = NULL;
 
   m_Autosort    = false;
   m_CryptoCheck = false;
@@ -110,13 +111,27 @@ void mafGUITreeContextualMenu::CreateContextualMenu(mafGUICheckTree *tree, mafVi
     this->Append(RMENU_ADD_TREE_LAYOUT,  "Save MSF Layout");
     this->AppendSeparator();
 
-    if(m_ViewActive != NULL && mafViewVTK::SafeDownCast(m_ViewActive))
+    if(m_ViewActive != NULL && (mafViewVTK::SafeDownCast(m_ViewActive) || mafViewCompound::SafeDownCast(m_ViewActive)))
     {
-      mafSceneGraph *sg = NULL;
-	    sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
-      if (sg != NULL)
+      //mafSceneGraph *sg = NULL;
+
+      int numOfChild = 0;
+      if(mafViewCompound::SafeDownCast(m_ViewActive)) {
+        numOfChild = ((mafViewCompound *)m_ViewActive)->GetNumberOfSubView();
+      }
+
+      for(int i=0;i<numOfChild && m_SceneGraph==NULL ;i++) {
+        if(mafViewCompound::SafeDownCast(m_ViewActive)) {
+          m_SceneGraph = ((mafViewCompound *)m_ViewActive)->GetSubView(i)->GetSceneGraph();
+        }
+        else {
+          m_SceneGraph = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
+        }
+      }
+
+      if (m_SceneGraph != NULL)
       {
-        mafSceneNode *n = sg->Vme2Node(m_VmeActive);
+        mafSceneNode *n = m_SceneGraph->Vme2Node(m_VmeActive);
 
         
         this->Append(RMENU_SHOW_VME, "Hide/Show","");
@@ -195,17 +210,17 @@ void mafGUITreeContextualMenu::ShowContextualMenu()
 void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
 //----------------------------------------------------------------------------
 {
-	mafSceneGraph *sg = NULL;
+	/*mafSceneGraph *sg = NULL;
   if(m_ViewActive != NULL && mafViewVTK::SafeDownCast(m_ViewActive))
-		sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();
+		sg = ((mafViewVTK *)m_ViewActive)->GetSceneGraph();*/
 	
 	switch(event.GetId())
 	{
 	  case RMENU_SHOW_VME:
 		{
       mafSceneNode *n = NULL;
-      if(sg)
-        n = sg->Vme2Node(m_VmeActive);
+      if(m_SceneGraph)
+        n = m_SceneGraph->Vme2Node(m_VmeActive);
       bool show = true;
       if(n)
         show = !n->IsVisible();
@@ -216,16 +231,16 @@ void mafGUITreeContextualMenu::OnContextualMenu(wxCommandEvent &event)
       mafEventMacro(mafEvent(this, mafGUIApplicationLayoutSettings::SAVE_TREE_LAYOUT_ID));
     break;
 		case RMENU_SHOW_SUBTREE:
-			sg->VmeShowSubTree(m_VmeActive, true);
+			m_SceneGraph->VmeShowSubTree(m_VmeActive, true);
 		break;
 		case RMENU_HIDE_SUBTREE:
-			sg->VmeShowSubTree(m_VmeActive, false);
+			m_SceneGraph->VmeShowSubTree(m_VmeActive, false);
 		break;
 		case RMENU_SHOW_SAMETYPE:
-			sg->VmeShowByType(m_VmeActive, true);
+			m_SceneGraph->VmeShowByType(m_VmeActive, true);
 		break;
 		case RMENU_HIDE_SAMETYPE:
-			sg->VmeShowByType(m_VmeActive, false);
+			m_SceneGraph->VmeShowByType(m_VmeActive, false);
 		break;
     case RMENU_CRYPT_VME:
     {
