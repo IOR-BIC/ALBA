@@ -44,6 +44,8 @@ ADD_TEST(medVMEOutputPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputP
 ADD_EXECUTABLE(medVMESurfaceEditorTest medVMESurfaceEditorTest.h medVMESurfaceEditorTest.cpp)
 ADD_TEST(medVMESurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMESurfaceEditorTest)
 
+ADD_EXECUTABLE(medPipePolylineGraphEditorTest medPipePolylineGraphEditorTest.h medPipePolylineGraphEditorTest.cpp)
+ADD_TEST(medPipePolylineGraphEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipePolylineGraphEditorTest)
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
