@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 11:04:07 $
-  Version:   $Revision: 1.5.2.2 $
+  Date:      $Date: 2009-08-20 10:17:29 $
+  Version:   $Revision: 1.5.2.3 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -68,10 +68,26 @@ public:
 	/** Builds operation's interface by calling CreateOpDialog() method. */
   void OpRun();
 
-
   /** Return parameters used by operation. */
   mafString GetParameters();
 
+  /** Set iso value used by operation. */
+  void SetIsoValue(double isoValue);
+
+  /** Extract the isosurface and build the related vme. */
+  void ExtractSurface(bool clean=true);
+
+  /** Create the pipeline to generate the isosurface of the volume. */
+  void CreateVolumePipeline();
+
+  /** Re-generate the surface according to the new threshold value. */
+  void UpdateSurface(bool use_lod = false);
+
+  /** Set the triangulate flag.*/
+  void SetTriangulate(bool triangulate);
+
+  /** Set the clean flag.*/
+  void SetClean(bool clean);
 
 protected:
   mafVMEGroup *m_OutputGroup; 
@@ -103,6 +119,8 @@ protected:
   double m_MinRange;
   double m_MaxRange;
 
+  mafVMESurface *vme_surf;
+
   mafGUIFloatSlider *m_IsoSlider;
   mafGUIFloatSlider *m_SliceSlider;
   
@@ -133,17 +151,11 @@ protected:
 	/** Remove operation's interface. */
   void DeleteOpDialog();
 
-	/** Create the pipeline to generate the isosurface of the volume. */
-  void CreateVolumePipeline();
 
 	/** Create the pipeline to generate the slice of the volume. */
   void CreateSlicePipeline();
 
-	/** Extract the isosurface and build the related vme. */
-  void ExtractSurface(bool clean=true);
 
-	/** Re-generate the surface according to the new threshold value. */
-  void UpdateSurface(bool use_lod = false);
 
 	/** Re-slice the volume according to the new coordinate value. */
   void UpdateSlice();
