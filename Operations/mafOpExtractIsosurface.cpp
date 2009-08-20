@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 14:49:29 $
-Version:   $Revision: 1.5.2.5 $
+Date:      $Date: 2009-08-20 10:17:39 $
+Version:   $Revision: 1.5.2.6 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -140,7 +140,8 @@ mafOpExtractIsosurface::~mafOpExtractIsosurface()
   }
 
   m_IsoValueVector.clear();
-
+  vtkDEL(m_ContourVolumeMapper);
+  m_Output = NULL;
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExtractIsosurface::Copy()
@@ -164,8 +165,11 @@ void mafOpExtractIsosurface::OpRun()
 //----------------------------------------------------------------------------
 {
   int result = OP_RUN_CANCEL;
-
+  
   CreateOpDialog();
+  CreateVolumePipeline();
+  CreateSlicePipeline();
+  
   int ret_dlg = m_Dialog->ShowModal();
   if( ret_dlg == wxID_OK )
   {
@@ -376,8 +380,6 @@ void mafOpExtractIsosurface::CreateOpDialog()
   m_Dialog->GetSize(&w,&h);
   m_Dialog->SetSize(x_pos+5,y_pos+5,w,h);
 
-  CreateVolumePipeline();
-  CreateSlicePipeline();
   this->m_Rwi->CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -413,36 +415,39 @@ void mafOpExtractIsosurface::CreateVolumePipeline()
 
   contour->Delete();*/
 
-  m_ContourActor = vtkVolume::New();
-  m_ContourActor->SetMapper(m_ContourVolumeMapper);
-  m_ContourActor->PickableOff();
+  if (!m_TestMode)
+  {
+    m_ContourActor = vtkVolume::New();
+    m_ContourActor->SetMapper(m_ContourVolumeMapper);
+    m_ContourActor->PickableOff();
 
-  m_ContourVolumeMapper->Modified();
-  m_ContourVolumeMapper->Update();
-  m_Rwi->m_RenFront->AddActor(m_ContourActor);
+    m_ContourVolumeMapper->Modified();
+    m_ContourVolumeMapper->Update();
+    m_Rwi->m_RenFront->AddActor(m_ContourActor);
 
-  // bounding box actor
-  m_OutlineFilter = vtkOutlineCornerFilter::New();
-  m_OutlineFilter->SetInput(dataset);
+    // bounding box actor
+    m_OutlineFilter = vtkOutlineCornerFilter::New();
+    m_OutlineFilter->SetInput(dataset);
 
-  m_OutlineMapper = vtkPolyDataMapper::New();
-  m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
+    m_OutlineMapper = vtkPolyDataMapper::New();
+    m_OutlineMapper->SetInput(m_OutlineFilter->GetOutput());
 
-  m_Box = vtkActor::New();
-  m_Box->SetMapper(m_OutlineMapper);
-  m_Box->VisibilityOn();
-  m_Box->PickableOff();
-  m_Box->GetProperty()->SetColor(0,0,0.8);
-  m_Box->GetProperty()->SetAmbient(1);
-  m_Box->GetProperty()->SetRepresentationToWireframe();
-  m_Box->GetProperty()->SetInterpolationToFlat();
-  m_Rwi->m_RenFront->AddActor(m_Box);
+    m_Box = vtkActor::New();
+    m_Box->SetMapper(m_OutlineMapper);
+    m_Box->VisibilityOn();
+    m_Box->PickableOff();
+    m_Box->GetProperty()->SetColor(0,0,0.8);
+    m_Box->GetProperty()->SetAmbient(1);
+    m_Box->GetProperty()->SetRepresentationToWireframe();
+    m_Box->GetProperty()->SetInterpolationToFlat();
+    m_Rwi->m_RenFront->AddActor(m_Box);
 
-  m_Box->GetBounds(m_BoundingBox);
-  m_Rwi->SetGridPosition(m_BoundingBox[4]);
-  m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
-  m_Rwi->m_Camera->Dolly(1.2);
-  m_Rwi->m_RenFront->ResetCameraClippingRange();
+    m_Box->GetBounds(m_BoundingBox);
+    m_Rwi->SetGridPosition(m_BoundingBox[4]);
+    m_Rwi->m_RenFront->ResetCamera(m_BoundingBox);
+    m_Rwi->m_Camera->Dolly(1.2);
+    m_Rwi->m_RenFront->ResetCameraClippingRange();
+  }
 
 }
 //----------------------------------------------------------------------------
@@ -477,6 +482,7 @@ void mafOpExtractIsosurface::CreateSlicePipeline()
   m_PolydataSlicer->SetPlaneAxisY(m_SliceYVect);
   m_VolumeSlicer->SetInput(dataset);
   m_PolydataSlicer->SetInput(dataset);
+
 
   m_SliceImage = vtkImageData::New();
 
@@ -569,6 +575,7 @@ void mafOpExtractIsosurface::CreateSlicePipeline()
 
   m_PIPRen->AddActor(m_PolydataActor);
   m_PIPRen->ResetCamera();
+
 }
 //----------------------------------------------------------------------------
 void mafOpExtractIsosurface::DeleteOpDialog()
@@ -582,7 +589,6 @@ void mafOpExtractIsosurface::DeleteOpDialog()
   //vtkDEL(m_ContourMapper);
   vtkDEL(m_ContourActor);
   vtkDEL(m_Box);
-  vtkDEL(m_ContourVolumeMapper);
   vtkDEL(m_OutlineFilter);
   vtkDEL(m_OutlineMapper);
   mafDEL(m_DensityPicker);
@@ -764,7 +770,10 @@ void mafOpExtractIsosurface::OnEvent(mafEventBase *maf_event)
 void mafOpExtractIsosurface::UpdateSurface(bool use_lod)
 //------------------------------------------------------------------------------
 {
-  m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
+  if (!m_TestMode)
+  {
+    m_Rwi->m_RenderWindow->SetDesiredUpdateRate(0.001f);
+  }
   if (m_ContourVolumeMapper->GetContourValue() != m_IsoValue) 
   {
     m_ContourVolumeMapper->SetContourValue(m_IsoValue);
@@ -779,28 +788,34 @@ void mafOpExtractIsosurface::UpdateSurface(bool use_lod)
       m_ContourVolumeMapper->Print(stringStream);
       mafLogMessage(stringStream.str().c_str());
     }
-          
-    vtkPolyData *contour;/* = vtkPolyData::New();
-    m_IsosurfaceCutter->SetInput(contour);
-    m_IsosurfaceCutter->Update();*/
-    //m_ContourMapper->SetInput(contour);
-    if (m_ShowSlice)
+    
+    if (!m_TestMode)
     {
-      contour = m_ContourVolumeMapper->GetOutput();
-      if(contour == NULL)
-      {
-        m_Rwi->m_RenderWindow->Render();
-        wxMessageBox("Operation out of memory");
-        return;
-      }
+      vtkPolyData *contour;/* = vtkPolyData::New();
       m_IsosurfaceCutter->SetInput(contour);
-      m_IsosurfaceCutter->Update();
+      m_IsosurfaceCutter->Update();*/
+      //m_ContourMapper->SetInput(contour);
+      if (m_ShowSlice)
+      {
+        contour = m_ContourVolumeMapper->GetOutput();
+        if(contour == NULL)
+        {
+          m_Rwi->m_RenderWindow->Render();
+          wxMessageBox("Operation out of memory");
+          return;
+        }
+        m_IsosurfaceCutter->SetInput(contour);
+        m_IsosurfaceCutter->Update();
 
-      contour->Delete();
+        contour->Delete();
+      }
     }
   }
 
-  m_Rwi->m_RenderWindow->Render();
+  if (!m_TestMode)
+  {
+    m_Rwi->m_RenderWindow->Render();
+  }
 }
 
 
@@ -834,7 +849,10 @@ void mafOpExtractIsosurface::UpdateSlice()
 void mafOpExtractIsosurface::ExtractSurface(bool clean) 
 //------------------------------------------------------------------------------
 {
-  wxBusyInfo wait(_("Extracting Isosurface: please wait ..."));
+  if (!m_TestMode)
+  {
+    wxBusyInfo wait(_("Extracting Isosurface: please wait ..."));
+  }
 
   m_ContourVolumeMapper->SetEnableContourAnalysis(clean);
 
@@ -861,10 +879,11 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
     vtkPolyData *surface;
     surface = m_ContourVolumeMapper->GetOutput();
     vtkMAFSmartPointer<vtkCleanPolyData>clearFilter;
-    vtkMAFSmartPointer<vtkTriangleFilter >triangleFilter;
+    vtkMAFSmartPointer<vtkTriangleFilter>triangleFilter;
     if(m_Clean)
     {
       clearFilter->SetInput(surface);
+      surface->Delete();
       clearFilter->ConvertLinesToPointsOff();
       clearFilter->ConvertPolysToLinesOff();
       clearFilter->ConvertStripsToPolysOff();
@@ -875,6 +894,8 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
     if(m_Triangulate)
     {
       triangleFilter->SetInput(surface);
+      if (!m_Clean)
+        surface->Delete();
       triangleFilter->Update();
       surface = triangleFilter->GetOutput();
     }
@@ -891,7 +912,12 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
     mafVMESurface *vme_surf;
     mafNEW(vme_surf);
     vme_surf->SetName(name.c_str());
-    vme_surf->SetDataByDetaching(surface,0);
+    //vme_surf->SetDataByDetaching(surface,0);
+    vme_surf->SetData(surface,0);
+    vme_surf->GetOutput()->Update();
+    if(!m_Clean && !m_Triangulate) {
+      surface->Delete();
+    }
 
     if (m_OutputGroup != NULL)
     {
@@ -906,6 +932,8 @@ void mafOpExtractIsosurface::ExtractSurface(bool clean)
   {
     m_Output = m_OutputGroup;
   }
+  
+
 }
 //----------------------------------------------------------------------------
 mafString mafOpExtractIsosurface::GetParameters()
@@ -922,3 +950,30 @@ mafString mafOpExtractIsosurface::GetParameters()
 
   return parameter;
 }
+
+//----------------------------------------------------------------------------
+void mafOpExtractIsosurface::SetIsoValue(double isoValue)
+//----------------------------------------------------------------------------
+{
+  vtkDataSet *dataset = ((mafVME *)m_Input)->GetOutput()->GetVTKData();
+  double sr[2];
+  dataset->GetScalarRange(sr);
+  m_MinDensity = sr[0];
+  m_MaxDensity = sr[1];
+
+  if (isoValue >= m_MinDensity && isoValue <= m_MaxDensity)
+  {
+    m_IsoValue = isoValue;
+  }
+}
+
+void mafOpExtractIsosurface::SetTriangulate( bool triangulate )
+{
+  m_Triangulate = triangulate;
+}
+
+void mafOpExtractIsosurface::SetClean( bool clean )
+{
+  m_Clean = clean;
+}
+
