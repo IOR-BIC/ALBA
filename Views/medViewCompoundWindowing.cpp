@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-23 07:06:44 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-08-21 12:16:43 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -137,7 +137,8 @@ void medViewCompoundWindowing::VmeSelect(mafNode *node, bool select)
     m_ChildViewList[i]->VmeSelect(node, select);
 
   //UpdateWindowing( select && ActivateWindowing(node), node);
-  UpdateWindowing( select && ActivateWindowing(GetSceneGraph()->GetSelectedVme()), GetSceneGraph()->GetSelectedVme());
+  if(m_Gui)
+    UpdateWindowing( select && ActivateWindowing(GetSceneGraph()->GetSelectedVme()), GetSceneGraph()->GetSelectedVme());
 }
 
 //----------------------------------------------------------------------------
