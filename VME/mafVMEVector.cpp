@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-02-13 12:44:29 $
-  Version:   $Revision: 1.3.4.1 $
+  Date:      $Date: 2009-08-21 13:19:44 $
+  Version:   $Revision: 1.3.4.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -46,6 +46,7 @@ mafVMEVector::~mafVMEVector()
 double mafVMEVector::GetModule()
 //-------------------------------------------------------------------------
 {
+  this->Update();
   return GetPolylineOutput()->CalculateLength();
 }
 //-------------------------------------------------------------------------
