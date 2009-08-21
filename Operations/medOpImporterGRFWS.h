@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 08:39:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-08-21 12:56:13 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafVMEVector;
 class mafVMESurface;
+class mafVMEGroup;
 
 //----------------------------------------------------------------------------
 // medOpImporterGRFWS :
@@ -34,10 +35,9 @@ public:
 	medOpImporterGRFWS(const wxString &label = "GRF Importer");
 	~medOpImporterGRFWS(); 
 
-  void medOpImporterGRFWS::OpDo();
-
   void medOpImporterGRFWS::OpUndo();
 
+  /** Copy the operation. */
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -58,6 +58,7 @@ protected:
   mafVMESurface       *m_PlatformRight;
   mafVMEVector        *m_VectorLeft;
   mafVMEVector        *m_VectorRight;
+  mafVMEGroup         *m_Group;
 
   wxString             m_FileDir;
 	wxString             m_File;

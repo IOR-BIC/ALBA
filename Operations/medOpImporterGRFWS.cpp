@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterGRFWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:10:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-08-21 12:56:13 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@
 
 #include "mafVMEVector.h"
 #include "mafVMESurface.h"
+#include "mafVMEGroup.h"
 
 #include "mafGUI.h"
 
@@ -56,6 +57,7 @@ mafOp(label)
   m_PlatformRight = NULL;
   m_VectorLeft    = NULL;
   m_VectorRight   = NULL;
+  m_Group         = NULL;
 }
 //----------------------------------------------------------------------------
 medOpImporterGRFWS::~medOpImporterGRFWS()
@@ -65,25 +67,9 @@ medOpImporterGRFWS::~medOpImporterGRFWS()
   mafDEL(m_PlatformRight);
   mafDEL(m_VectorLeft);
   mafDEL(m_VectorRight);
+  mafDEL(m_Group);
 }
-//----------------------------------------------------------------------------
-void medOpImporterGRFWS::OpDo()
-//----------------------------------------------------------------------------
-{
-  if(m_PlatformLeft != NULL)
-  {
-    m_PlatformLeft->ReparentTo(m_Input);
-    mafEventMacro(mafEvent(this,VME_ADD,m_PlatformLeft));
-    m_VectorLeft->ReparentTo(m_PlatformLeft);
-  }
 
-  if(m_PlatformRight != NULL)
-  {
-    m_PlatformRight->ReparentTo(m_Input);
-    mafEventMacro(mafEvent(this,VME_ADD,m_PlatformRight));
-    m_VectorRight->ReparentTo(m_PlatformRight);
-  }
-}
 //----------------------------------------------------------------------------
 void medOpImporterGRFWS::OpUndo()
 //----------------------------------------------------------------------------
@@ -110,7 +96,6 @@ void medOpImporterGRFWS::OpRun()
 //----------------------------------------------------------------------------
 {
   int result = OP_RUN_CANCEL;
-  m_File = "";
   wxString pgd_wildc	= "GRF File (*.*)|*.*";
   wxString f;
   f = mafGetOpenFile(m_FileDir,pgd_wildc).c_str(); 
@@ -127,7 +112,7 @@ void medOpImporterGRFWS::OpRun()
 void medOpImporterGRFWS::Read()   
 //----------------------------------------------------------------------------
 {
-  //if (!m_TestMode)
+  if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
 
   wxString path, name, ext;
@@ -192,6 +177,9 @@ void medOpImporterGRFWS::Read()
 
    m_PlatformLeft->SetName(PlatNameLeft);
    m_PlatformRight->SetName(platNameRight);
+
+   mafNEW(m_Group);
+   m_Group->SetName(name);
   
   double thickness1 = platform1[2]-DELTA;
   double thickness2 = platform2[2]-DELTA;
@@ -357,4 +345,18 @@ void medOpImporterGRFWS::Read()
   //Create the mafVMESurface for the platforms
   m_PlatformLeft->SetData(platformLeft->GetOutput(), 0);
   m_PlatformRight->SetData(platformRight->GetOutput(), 0);
+
+  if(m_PlatformLeft != NULL)
+  {
+    m_PlatformLeft->ReparentTo(m_Group);
+    m_VectorLeft->ReparentTo(m_PlatformLeft);
+  }
+
+  if(m_PlatformRight != NULL)
+  {
+    m_PlatformRight->ReparentTo(m_Group);
+    m_VectorRight->ReparentTo(m_PlatformRight);
+  }
+  m_Output = m_Group;
+  m_Output->ReparentTo(m_Input);
 }
