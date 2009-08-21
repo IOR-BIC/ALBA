@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 14:16:55 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2009-08-21 14:23:59 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,8 +14,8 @@
 #include "mafCrypt.h"
 
 #include <sstream>
-#include <string>
 #include <fstream>
+
 
 #include <wx/datetime.h>
 #include "wx/filefn.h"
@@ -143,6 +143,8 @@ void mafExpirationDate::InitializePathFileName()
 		m_ControlFileName.append(fileAppname);
     m_PermanentExpirationFileName = m_ControlFileName;
     m_PermanentExpirationFileName.append("f");
+    m_ApplicationVersionFileName = m_ControlFileName;
+    m_ApplicationVersionFileName.append("v");
   }
   else
   {
@@ -162,6 +164,9 @@ void mafExpirationDate::InitializePathFileName()
 		
 		m_PermanentExpirationFileName = m_ControlFileName;
 		m_PermanentExpirationFileName.append("f");
+
+    m_ApplicationVersionFileName = m_ControlFileName;
+    m_ApplicationVersionFileName.append("v");
   }
 }
 //----------------------------------------------------------------------------
@@ -170,6 +175,7 @@ bool mafExpirationDate::HasExpired()
 {
   InitializePathFileName();
   //fill variables
+  CheckApplicationVersion();
 	CheckFile();
 
   bool result = CheckLocalTimeExpiration();
@@ -265,6 +271,93 @@ void mafExpirationDate::CheckFile()
     << ":" << m_CurrentDateTime->GetSecond() << "\n";
 
   os2.close();*/
+}
+//----------------------------------------------------------------------------
+void mafExpirationDate::CheckApplicationVersion()
+//----------------------------------------------------------------------------
+{
+  if(!::wxFileExists(m_ApplicationVersionFileName.c_str()))
+  {
+    //create it
+    std::string toEncrypt;
+    toEncrypt.append(m_ApplicationVersion);
+
+    mafEncryptFileFromMemory(toEncrypt.c_str(),toEncrypt.length(),m_ApplicationVersionFileName.c_str(), "fattinonfostepervivercomebruti");
+  }
+
+  //read it
+  std::string toDecrypt;
+  mafDecryptFileInMemory(m_ApplicationVersionFileName.c_str(), toDecrypt, "fattinonfostepervivercomebruti");
+
+  std::stringstream ss;
+  ss << toDecrypt;
+
+  std::string oldApplicationVersion;
+  ss >> oldApplicationVersion;
+  
+  // the string for version is ${APP_MAJOR_VERSION}_${APP_MINOR_VERSION}_TS_${APP_BUILD_TIMESTAMP}_BUILD_${APP_BUILD_NUMBER}
+  // generated during cmake script
+  
+  enum
+  {
+    APP_MAJOR_VERSION = 0,
+    APP_MINOR_VERSION,
+    APP_TS,
+    APP_BUILD_TIMESTAMP,
+    APP_BUILD,
+    APP_BUILD_NUMBER,
+    APP_FIELDS_NUMBER,
+  };
+
+  std::vector<std::string> substringsOld;
+  SplitString(oldApplicationVersion, '_', substringsOld);
+  std::vector<std::string> substringsCurrent;
+  SplitString(m_ApplicationVersion, '_', substringsCurrent);
+
+  //build revision format not supported
+  if(substringsCurrent.size() < APP_FIELDS_NUMBER)
+  {
+    return;
+  }
+
+  //build revision format bind to parabuild and cmake
+  if(substringsOld[APP_BUILD_TIMESTAMP].compare(substringsCurrent[APP_BUILD_TIMESTAMP]) < 0)
+  {
+    //remove all files of directory
+    ::wxRemoveFile(m_ControlFileName.c_str());
+    ::wxRemoveFile(m_PermanentExpirationFileName.c_str());
+    ::wxRemoveFile(m_ApplicationVersionFileName.c_str());
+
+    if(!::wxFileExists(m_ApplicationVersionFileName.c_str()))
+    {
+      //create it
+      std::string toEncrypt;
+      toEncrypt.append(m_ApplicationVersion);
+
+      mafEncryptFileFromMemory(toEncrypt.c_str(),toEncrypt.length(),m_ApplicationVersionFileName.c_str(), "fattinonfostepervivercomebruti");
+    }
+  }
+  else
+  {
+    //do nothing, the version is current or older.
+  }
+}
+//----------------------------------------------------------------------------
+int mafExpirationDate::SplitString(std::string input, const char separator, std::vector<std::string> &outputSubStrings)
+//----------------------------------------------------------------------------
+{
+  outputSubStrings.clear();
+  std::string::size_type prev_pos = 0, pos = 0;
+  while( (pos = input.find(separator, pos)) != std::string::npos )
+  {
+    std::string substring( input.substr(prev_pos, pos-prev_pos) );
+    outputSubStrings.push_back(substring);
+    prev_pos = ++pos;
+  }
+  std::string substring( input.substr(prev_pos, pos-prev_pos) ); // Last word
+  outputSubStrings.push_back(substring);
+
+  return outputSubStrings.size();
 }
 //----------------------------------------------------------------------------
 bool mafExpirationDate::CheckLocalTimeExpiration()

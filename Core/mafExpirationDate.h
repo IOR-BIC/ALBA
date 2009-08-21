@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-18 08:43:22 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-08-21 14:23:59 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ class wxDateTime;
 //----------------------------------------------------------------------
 #include "mafExpiration.h"
 #include <string>
+#include <vector>
 
 /**
 Class Name: mafExpirationDate.
@@ -44,6 +45,9 @@ public:
   /** constructor, that accept a string formatted as YYYY-MM-DD */ 
   mafExpirationDate(const char *dateString);
 
+  /** set version of application*/
+  void SetApplicationVersion(const char* version){m_ApplicationVersion = version;}
+
   /** destructor. */
 	virtual ~mafExpirationDate();
 
@@ -60,6 +64,11 @@ private:
   void ActivatePermanentExpiration();
 	/** Simple Obfuscator for filename*/
   void Obfuscate(std::string &toObfuscate);
+  /** Check version application, if different remove all time check  files */
+  void CheckApplicationVersion();
+  /** Giving a string as parameter and a vector of strings, it clean the vector and fill it with splitted substring controlling the separator.
+  It returns the number of elements*/
+  static int SplitString(std::string input, const char separator, std::vector<std::string> &outputSubStrings);
 
   
   wxDateTime *m_CurrentDateTime;
@@ -71,6 +80,9 @@ private:
 
   std::string m_ControlFileName;
   std::string m_Information;
+
+  std::string m_ApplicationVersion;
+  std::string m_ApplicationVersionFileName;
 
   std::string m_PermanentExpirationFileName;
 	
