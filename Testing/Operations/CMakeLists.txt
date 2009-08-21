@@ -16,6 +16,8 @@ IF (MAF_USE_ITK)
   ADD_EXECUTABLE(medOpImporterLandmarkTest medOpImporterLandmarkTest.h medOpImporterLandmarkTest.cpp)
   ADD_TEST(medOpImporterLandmarkTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterLandmarkTest)
   
+  ADD_EXECUTABLE(medOpImporterGRFWSTest medOpImporterGRFWSTest.h medOpImporterGRFWSTest.cpp)
+  ADD_TEST(medOpImporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterGRFWSTest) 
 ENDIF (MAF_USE_ITK)
 
 ADD_EXECUTABLE(medOpVolumeMeasureTest medOpVolumeMeasureTest.h medOpVolumeMeasureTest.cpp)
