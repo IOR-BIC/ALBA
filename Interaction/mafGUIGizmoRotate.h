@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-08-24 07:36:10 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class mafGUIGizmoRotate : public mafGUIGizmoInterface
 {
 public:
 
-  mafGUIGizmoRotate(mafObserver *listener);
+  mafGUIGizmoRotate(mafObserver *listener, bool testMode = false);
   ~mafGUIGizmoRotate(); 
 
   void OnEvent(mafEventBase *maf_event);
@@ -73,5 +73,9 @@ protected:
   /** 
   Send position to listener as vtkMatrix */
   void SendAbsOrientation(mafEventBase *sourceEvent);
+
+  /** friend test */
+  friend class mafGUIGizmoRotateTest;
+
 };
 #endif

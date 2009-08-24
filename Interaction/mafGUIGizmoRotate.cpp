@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-08-24 07:36:10 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,14 +32,20 @@
 #include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
-mafGUIGizmoRotate::mafGUIGizmoRotate(mafObserver *listener)
+mafGUIGizmoRotate::mafGUIGizmoRotate(mafObserver *listener, bool testMode)
 //----------------------------------------------------------------------------
 {
+  m_TestMode = testMode;
   m_Listener = listener;
 
   m_Orientation[0] = m_Orientation[1] = m_Orientation[2] = 0;
-  CreateGui();
+
+  if (m_TestMode == false)
+  {
+    CreateGui();
+  }
 }
+
 //----------------------------------------------------------------------------
 mafGUIGizmoRotate::~mafGUIGizmoRotate() 
 //----------------------------------------------------------------------------
@@ -113,7 +119,10 @@ void mafGUIGizmoRotate::SetAbsOrientation(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   mafTransform::GetOrientation(*pose, m_Orientation);
-
-  assert(m_Gui);
-  m_Gui->Update();
+  
+  if (m_TestMode == false)
+  {
+    assert(m_Gui);
+    m_Gui->Update();
+  }
 }
