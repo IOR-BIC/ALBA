@@ -2,15 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-<<<<<<< mafViewArbitrarySlice.cpp
-  Date:      $Date: 2009-07-23 07:06:44 $
-  Version:   $Revision: 1.38.2.5 $
+  Date:      $Date: 2009-08-24 12:14:22 $
+  Version:   $Revision: 1.38.2.6 $
   Authors:   Eleonora Mambrini
-=======
-  Date:      $Date: 2009-07-23 07:06:44 $
-  Version:   $Revision: 1.38.2.5 $
-  Authors:   Matteo Giacomoni
->>>>>>> 1.38.2.2
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -921,9 +915,10 @@ void mafViewArbitrarySlice::EnableWidgets(bool enable)
 {
   if (m_Gui)
   {
-		m_Gui->Enable(ID_RESET,enable);
-		m_Gui->Enable(ID_COMBO_GIZMOS,enable);
-    m_Gui->Enable(ID_LUT_CHOOSER,enable);
+    bool tmp_enable = (m_CurrentVolume || m_CurrentImage);
+		m_Gui->Enable(ID_RESET, tmp_enable);
+		m_Gui->Enable(ID_COMBO_GIZMOS, tmp_enable);
+    m_Gui->Enable(ID_LUT_CHOOSER, tmp_enable);
 		m_Gui->FitGui();
 		m_Gui->Update();
   }

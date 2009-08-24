@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-23 07:06:44 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-08-24 12:14:22 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -84,8 +84,7 @@ protected:
   virtual mafGUI  *CreateGui()=0;
 
   /** Function for enable/disable all gui widgets. */
-	//virtual void EnableWidgets(bool enable);
-  void EnableWidgets(bool enable);
+  virtual void EnableWidgets(bool enable);
 
   /** A function with windowing activate/deactivate conditions*/
   virtual bool ActivateWindowing(mafNode *node);
