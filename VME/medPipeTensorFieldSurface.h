@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSurface.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 09:10:48 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-08-26 14:47:12 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -22,6 +22,7 @@ class vtkDataSet;
 class vtkLookupTable;
 class vtkActor;
 class vtkScalarBarActor;
+class vtkStructuredPoints;
 
 /** Displays the surface of input VME (even, if it is volume),
 using color mapping according to X,Y,Z or magnitude of associated
@@ -45,6 +46,9 @@ protected:
   enum COLOR_MAPPING_MODES
   {
     CMM_MAGNITUDE,
+	CMM_EIGENVALUE0,
+	CMM_EIGENVALUE1,
+	CMM_EIGENVALUE2,
     CMM_COMPONENT1,
     CMM_COMPONENT2,
     CMM_COMPONENT3,
@@ -66,6 +70,9 @@ protected:
   vtkActor* m_SurfaceActor;            ///<actor for glyphs  
 
   wxComboBox* m_ComboColorBy;           ///<combo box with list of components
+  double m_covariance[3][3] ;
+  double m_lambda[3] ;
+  double m_V[3][3] ;
 public:	
   medPipeTensorFieldSurface();
   virtual ~medPipeTensorFieldSurface();
@@ -73,6 +80,9 @@ public:
 public:  
   /** Processes events coming from GUI */
   /*virtual*/ void OnEvent(mafEventBase *maf_event);
+  void EigenVectors3x3(double A[3][3], double lambda[3], double V[3][3]);
+  void MultiplyColumnsByScalars(const double *s, const double *A, double *B) const;
+  bool ComputeEigenvalues(vtkStructuredPoints* tensorVolume,double sr[2],int mode);
 
 protected:
   /*virtual*/ mafGUI  *CreateGui();

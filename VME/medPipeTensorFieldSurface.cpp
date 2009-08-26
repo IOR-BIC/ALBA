@@ -2,9 +2,10 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSurface.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 09:10:48 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-08-26 14:47:00 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
+  modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
   See the COPYINGS file for license details 
@@ -42,6 +43,10 @@
 #include "vtkActor.h"
 #include "vtkScalarBarActor.h"
 #include "vtkRenderer.h"
+#include "vtkMath.h"
+#include "vtkFloatArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkStructuredPoints.h"
 
 //#include "vtkArrayCalculator.h"
 
@@ -164,8 +169,9 @@ void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
   {	
     if (e->GetId() >= Superclass::ID_LAST && e->GetId() < ID_LAST)
     {
-      if (e->GetId() == ID_VECTORFIELD)
-        UpdateColorByCombo(); //we need to update list of components
+		if (e->GetId() == ID_VECTORFIELD){
+			UpdateColorByCombo(); //we need to update list of components
+		}	  
 
       UpdateVTKPipe(); 
     
@@ -224,19 +230,70 @@ void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
 /*virtual*/ void medPipeTensorFieldSurface::UpdateVTKPipe()
 //------------------------------------------------------------------------
 {
+ 
+  /*vtkFloatArray *tensors ;
+
+  tensors = vtkFloatArray::New() ;
+  tensors->SetNumberOfComponents(9) ;
+  
   const char* tensor_name = GetTensorFieldName(m_TensorFieldIndex);
-  m_SurfaceMapper->SelectColorArray(tensor_name);
+  tensors->SetName(tensor_name); //("tensors") ;
 
-  vtkDataArray* da = m_Vme->GetOutput()->GetVTKData()->
-    GetPointData()->GetTensors(tensor_name);
+  vtkDataArray* da = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetTensors(tensor_name);
+  
+  int num =  m_Vme->GetOutput()->GetVTKData()->GetNumberOfPoints();
+  for (int i=0;i<num;i++)
+  {
+	double *tens = da->GetTuple9(i);
+	m_covariance[0][0] = tens[0];
+	m_covariance[1][0] = tens[1];
+	m_covariance[2][0] = tens[2];
+	m_covariance[0][1] = tens[3];
+	m_covariance[1][1] = tens[4];
+	m_covariance[2][1] = tens[5];
+	m_covariance[0][2] = tens[6];
+	m_covariance[1][2] = tens[7];
+	m_covariance[2][2] = tens[8];
 
-  int idx = m_ColorMappingMode - CMM_COMPONENT1;  //index of component
+	EigenVectors3x3(m_covariance, m_lambda, m_V) ;
+
+	double sd[3] ;
+	sd[0] = sqrt(m_lambda[0]) ;
+	sd[1] = sqrt(m_lambda[1]) ;
+	sd[2] = sqrt(m_lambda[2]) ;
+
+	//double Vmat[9] ;
+	MultiplyColumnsByScalars(sd,tens,tens);
+	tensors->InsertNextTuple(tens);
+  }
+
+  m_Vme->GetOutput()->GetVTKData()->GetPointData()->SetTensors(tensors);
+  */
+
+  const char* tensor_name = GetTensorFieldName(m_TensorFieldIndex);
 
   double sr[2];
-  if (m_ColorMappingMode == CMM_MAGNITUDE)      
-    m_ColorMappingLUT->SetVectorModeToMagnitude();    //magnitude
-  else
+  vtkDataArray* da ;
+  vtkStructuredPoints *orgData =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;  
+  da = orgData->GetPointData()->GetTensors(tensor_name);
+  
+  m_SurfaceMapper->SelectColorArray(tensor_name);
+
+  int idx ;//= m_ColorMappingMode - CMM_COMPONENT1;  //index of component
+  
+  if (m_ColorMappingMode == CMM_MAGNITUDE )//magnitude
+  {      
+     idx = -1;
+	 m_ColorMappingLUT->SetVectorModeToMagnitude();    
+	 da->GetRange(sr, idx);
+  }
+  else if ( m_ColorMappingMode>CMM_MAGNITUDE && m_ColorMappingMode<CMM_COMPONENT1)    // eigenvalue ¦Ë
   {
+	  ComputeEigenvalues(orgData,sr,m_ColorMappingMode-1);
+  }
+  else //component
+  {
+    idx = m_ColorMappingMode - CMM_COMPONENT1;
     //some component
     m_ColorMappingLUT->SetVectorModeToComponent();
     m_ColorMappingLUT->SetVectorComponent(idx);    
@@ -246,31 +303,140 @@ void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
   //RELASE NOTE: GetRange has an undocumented feature to compute
   //magnitude, if the component parameter is negative
   //BUT it has also a BUG, it cannot support more than 3 components
-  if (idx < CMM_COMPONENT3)
-    da->GetRange(sr, idx);
-  else
-  {    
-    //we need to compute scalar range (because of a BUG in vtkDataArray)
-    sr[0] = DBL_MAX; sr[1] = -DBL_MAX;
-    
-    int nCount = da->GetNumberOfTuples();
-    for (int i = 0; i < nCount; i++)
-    {
-      double value = da->GetComponent(i, idx);
-      if (value < sr[0])
-        sr[0] = value;
+  
+  if (m_ColorMappingMode >= CMM_COMPONENT1)
+  {
+	  if(idx < 3)//CMM_COMPONENT3)
+		da->GetRange(sr, idx);
+	  else
+	  {    
+		//we need to compute scalar range (because of a BUG in vtkDataArray)
+		sr[0] = DBL_MAX; sr[1] = -DBL_MAX;
+	    
+		int nCount = da->GetNumberOfTuples();
+		for (int i = 0; i < nCount; i++)
+		{
+		  double value = da->GetComponent(i, idx);
+		  if (value < sr[0])
+			sr[0] = value;
 
-      if (value > sr[1])
-        sr[1] = value;
-    }
+		  if (value > sr[1])
+			sr[1] = value;
+		}
+	  }
   }
-
   m_ColorMappingLUT->SetTableRange(sr);
   m_SurfaceMapper->SetScalarRange(sr);
   m_SurfaceMapper->Update();  
   
 //  m_MappingActor->SetTitle(scalar_name);
   m_MappingActor->SetVisibility(m_ShowMapping);  
+}
+
+//------------------------------------------------------------------------------
+// Multiply matrix columns by scalars
+// no. of scalars must equal no. of columns (3 or 4)
+// This is useful for multiplying column eigenvectors by eigenvalues
+void medPipeTensorFieldSurface::MultiplyColumnsByScalars(const double *s, const double *A, double *B) const
+//------------------------------------------------------------------------------
+{
+	int k = 0 ;
+	for (int j = 0 ;  j < 3 ;  j++)
+			for (int i = 0 ;  i < 3 ;  i++, k++)
+				B[k] = s[j]*A[k] ;
+	
+}
+//------------------------------------------------------------------------------
+bool medPipeTensorFieldSurface::ComputeEigenvalues(vtkStructuredPoints* tensorVolume,double sr[2],int mode)
+//------------------------------------------------------------------------------
+{
+	vtkDoubleArray* tensorArray =  vtkDoubleArray::SafeDownCast(tensorVolume->GetPointData()->GetTensors());
+	//double sr[2];
+	sr[0] = DBL_MAX; sr[1] = -DBL_MAX;
+	int counter = 0;
+    vtkDataArray* da ;
+	vtkFloatArray *scalars ;
+	scalars = vtkFloatArray::New() ;
+	vtkPointData *allPoints = tensorVolume->GetPointData();
+	//double *pCoord;
+
+	if (!tensorArray)
+		return false;
+	int numTensors = tensorArray->GetNumberOfTuples();
+
+	vtkDoubleArray* eigenvalueArray = vtkDoubleArray::New();
+	eigenvalueArray->SetNumberOfComponents(3);//tensorArray->GetNumberOfComponents()
+	eigenvalueArray->SetNumberOfTuples(numTensors);
+
+	double Tensor[3][3];  // matrix representing the current tensor
+	double Evalues[3];        // array of eigenvalues
+	double Evectors[3][3];     // matrix representing the eigenvectors
+
+	for (int i=0; i<numTensors; i++)
+	{
+		//pCoord = allPoints->GetTuple(i);
+
+		tensorArray->GetTuple(i, (double*)Tensor);
+		vtkMath::Diagonalize3x3(Tensor, Evalues, Evectors);// calculate eigenvalues
+		eigenvalueArray->SetTuple(i, Evalues);//eigenvalueArray->InsertNextTuple(Evalues);
+		
+		double tmpScale ;//sqrt(Evalues[0]*Evalues[0]+Evalues[1]*Evalues[1]+Evalues[2]*Evalues[2]);		
+		if (mode <3)
+		{
+			tmpScale = Evalues[mode];
+		}
+		if (tmpScale < sr[0])
+				sr[0] = tmpScale;
+		if (tmpScale > sr[1])
+				sr[1] = tmpScale;
+		scalars->InsertNextTuple((float*)&tmpScale);
+	}
+	tensorVolume->GetPointData()->SetScalars(scalars);
+	da = tensorVolume->GetPointData()->GetScalars();
+	
+	// set the tensors to the Volume dataset
+	tensorVolume->GetPointData()->SetVectors(eigenvalueArray);
+	tensorVolume->GetPointData()->SetTensors(eigenvalueArray);
+	tensorVolume->GetPointData()->SetScalars(scalars) ;
+	tensorVolume->Update();
+	eigenvalueArray->Delete();
+	return true;
+}
+//----------------------------------------------------------------------------
+// Find eigenvalues and eigenvectors of 3x3 matrix
+// eigenvalues are sorted in order of largest to smallest
+// eigenvectors are the columns of V[row][col]
+// Symmetric matrices only !
+void medPipeTensorFieldSurface:: EigenVectors3x3(double A[3][3], double lambda[3], double V[3][3]) 
+//----------------------------------------------------------------------------
+{
+	vtkMath *mth = vtkMath::New() ;
+
+	// vtk function finds eigenvalues and eigenvectors of a symmetric matrix
+	mth->Diagonalize3x3(A, lambda, V) ;
+
+	// sort into order of increasing eigenvalue
+	// irritating that the vtk function does not do this
+	if (lambda[1] < lambda[2]){
+		std::swap(lambda[1], lambda[2]) ;
+		std::swap(V[0][1], V[0][2]) ;
+		std::swap(V[1][1], V[1][2]) ;
+		std::swap(V[2][1], V[2][2]) ;
+	}
+
+	if (lambda[0] < lambda[1]){
+		std::swap(lambda[0], lambda[1]) ;
+		std::swap(V[0][0], V[0][1]) ;
+		std::swap(V[1][0], V[1][1]) ;
+		std::swap(V[2][0], V[2][1]) ;
+	}
+
+	if (lambda[1] < lambda[2]){
+		std::swap(lambda[1], lambda[2]) ;
+		std::swap(V[0][1], V[0][2]) ;
+		std::swap(V[1][1], V[1][2]) ;
+		std::swap(V[2][1], V[2][2]) ;
+	}
 }
 
 //------------------------------------------------------------------------
@@ -283,6 +449,11 @@ void medPipeTensorFieldSurface::OnEvent(mafEventBase *maf_event)
 
   m_ComboColorBy->Clear();
   m_ComboColorBy->Append( _("magnitude") );
+  m_ComboColorBy->Append(_("¦Ë0"));
+  m_ComboColorBy->Append(_("¦Ë1"));
+  m_ComboColorBy->Append(_("¦Ë2"));
+
+  
 
   if (m_TensorFieldIndex >= 0)
   {
