@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-08-26 14:23:34 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-08-26 14:46:41 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -677,10 +677,10 @@ void medPipeTensorFieldGlyphs::doFilter(double *rangeValue){
 	vtkDataArray *old_vectors = allPoints->GetVectors();
 	vtkDataArray *old_tensors = allPoints->GetTensors();
 
-	mafString logFname2 = "coordFile.txt";
-	std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);
-	outputFile2.clear();
-	outputFile2<<"-----------------------------------------------"<<std::endl;
+	//mafString logFname2 = "coordFile.txt";//if debug
+	//std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
+	//outputFile2.clear();//if debug
+	//outputFile2<<"-----------------------------------------------"<<std::endl;//if debug
 	int pointsNum = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfTuples();
 	int idxPoints = 0;
 	int idxScales = 0;
@@ -727,8 +727,7 @@ void medPipeTensorFieldGlyphs::doFilter(double *rangeValue){
 							vectors->InsertNextTuple(old_vectors->GetTuple3(idxPoints));
 							tensors->InsertNextTuple(old_tensors->GetTuple9(idxPoints));
 
-							//outputFile2<< "  tmpScale="<<scaleValue<<"  x:"<<pCoord[0]<<"   y:"<<pCoord[1]<<"  z:"<<pCoord[2]<<std::endl;
-							outputFile2<< "  Scale="<<scaleValue<<" idxPoints="<<idxPoints<<"   idxScales"<<idxScales<<std::endl;
+							//outputFile2<< "  Scale="<<scaleValue<<" idxPoints="<<idxPoints<<"   idxScales"<<idxScales<<std::endl;//if debug
 						}		
 					}
 				}
@@ -749,8 +748,8 @@ void medPipeTensorFieldGlyphs::doFilter(double *rangeValue){
 	m_Output->Update();
 	m_Glyphs->SetInput(m_Output);
 	m_Glyphs->Update();
-	outputFile2<< "  sr[0]="<<sr[0]<<"  sr[1]="<<sr[1]<<std::endl;
-	outputFile2.close();
+	//outputFile2<< "  sr[0]="<<sr[0]<<"  sr[1]="<<sr[1]<<std::endl;//if debug
+	//outputFile2.close();//if debug
 
 
 }
