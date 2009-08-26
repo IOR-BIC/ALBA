@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-08-13 08:40:30 $
-Version:   $Revision: 1.1.2.40 $
+Date:      $Date: 2009-08-26 14:48:41 $
+Version:   $Revision: 1.1.2.41 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -136,6 +136,7 @@ MafMedical is partially based on OpenMAF.
 #include "dcmtk/dcmdata/dcistrmz.h"    /* for dcmZlibExpectRFC1950Encoding */
 #include "dcmtk/dcmimgle/dcmimage.h."
 #include "dcmtk/dcmjpeg/djdecode.h."
+#include "dcmtk/dcmdata/dcrledrg.h"
 
 #define INCLUDE_CSTDLIB
 #define INCLUDE_CSTRING
@@ -2320,6 +2321,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			file.Append(m_CurrentSliceName);
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
+      DcmRLEDecoderRegistration ::registerCodecs(OFFalse, OFFalse,OFFalse); // register RLE codecs
       OFCondition status = dicomImg.loadFile(file);//load data into offis structure
 
       if (!status.good())
@@ -2336,8 +2338,17 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
  
       // decompress data set if compressed
       //ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-      ds->chooseRepresentation(EXS_Unknown, NULL);
+      OFCondition error = ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+
+
       DJDecoderRegistration::cleanup(); // deregister JPEG codecs
+      DcmRLEDecoderRegistration::cleanup();
+
+      if (!error.good())
+      {
+          wxMessageBox("Error decoding the image");
+          return false;
+      }
 
       const char *option = "?";
       ds->findAndGetString(DCM_ScanOptions,option);
@@ -2365,46 +2376,67 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[3],3);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
+      // comment by achiarini: why ImageOrientationPatient from 6 to 8 are not retrieved (and checked?)
+      // I am not sure that the below check is wrong, I expect that three cosin are 1.0 and the other three are 0.0
 
-      if (sliceNum == 0)
-      {
-        for (int i = 0; i < 6; i++)
-        {
-         firstImageOrientationPatient[i] = imageOrientationPatient[i];
-        }
-      }
 
-      if (m_ConstantRotation)
-      {
-        for (int i = 0; i < 6; i++)
+
+
+      // check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
+      /*m_IsRotated = !( \
+                        (imageOrientationPatient[0] == 1.0) && \
+                        (imageOrientationPatient[4] == imageOrientationPatient[0]) &&\
+                        (imageOrientationPatient[1] == 0.0) &&\
+                        (imageOrientationPatient[1] == imageOrientationPatient[2]) &&\
+                        (imageOrientationPatient[1] == imageOrientationPatient[3]) &&\
+                        (imageOrientationPatient[1] == imageOrientationPatient[5]) \
+                        );*/
+
+      for (int i = 0;(sliceNum == 0) && i < 6; i++)
         {
-          if(firstImageOrientationPatient[i] != imageOrientationPatient[i])
-            m_ConstantRotation = false;
+            firstImageOrientationPatient[i] = imageOrientationPatient[i];
         }
-      }
+
+      for (int i = 0; (sliceNum > 0) && m_ConstantRotation && (i < 6); i++)
+        {
+            m_ConstantRotation = (firstImageOrientationPatient[i] == imageOrientationPatient[i]);
+        }
       
-      if (!m_IsRotated)
-      {
-        for (int i = 0; i < 6; i++)
-        {
-          if (i != 0 && i != 4)
-          {
-            if(imageOrientationPatient[i] != 0) //values for non-rotated image are 1,0,0,0,1,0
-            {
-              m_IsRotated = true;
-              break;
-            }
-          }
-          else
-          {
-            if (imageOrientationPatient[i] != 1)
-            {
-              m_IsRotated = true;
-              break;
-            }     
-          }
-        }
-      }
+
+      m_IsRotated || =  !( \
+                        (imageOrientationPatient[0] == 1.0) && \
+                        (imageOrientationPatient[4] == imageOrientationPatient[0]) &&\
+                        (imageOrientationPatient[1] == 0.0) &&\
+                        (imageOrientationPatient[1] == imageOrientationPatient[2]) &&\
+                        (imageOrientationPatient[1] == imageOrientationPatient[3]) &&\
+                        (imageOrientationPatient[1] == imageOrientationPatient[5]) \
+                        );
+
+
+
+      //if (!m_IsRotated)
+      //{
+      //  for (int i = 0; i < 6; i++)
+      //  {
+      //    if (i != 0 && i != 4)
+      //    {
+      //      if(imageOrientationPatient[i] != 0) //values for non-rotated image are 1,0,0,0,1,0
+      //      {
+      //        m_IsRotated = true;
+      //        break;
+      //      }
+      //    }
+      //    else
+      //    {
+      //      if (imageOrientationPatient[i] != 1)
+      //      {
+      //        m_IsRotated = true;
+      //        break;
+      //      }     
+      //    }
+      //  }
+      //}
+
 
       double spacing[3];
       spacing[2] = 0;
@@ -2970,6 +3002,7 @@ void medOpImporterDicomOffis::ImportDicomTags()
 
   DcmFileFormat dicomImg;  
   DJDecoderRegistration::registerCodecs(); // register JPEG codecs
+  DcmRLEDecoderRegistration::registerCodecs();
   OFCondition status = dicomImg.loadFile(m_FileName);//load data into offis structure
 
   if (!status.good()) 
@@ -2985,7 +3018,7 @@ void medOpImporterDicomOffis::ImportDicomTags()
   // decompress data set if compressed
   ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
   DJDecoderRegistration::cleanup(); // deregister JPEG codecs
-
+  DcmRLEDecoderRegistration::cleanup();
   OFString string;
   DcmStack stack;
   DcmObject *dobject = NULL;
