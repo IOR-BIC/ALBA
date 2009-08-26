@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-08-26 14:48:41 $
-Version:   $Revision: 1.1.2.41 $
+Date:      $Date: 2009-08-26 16:53:51 $
+Version:   $Revision: 1.1.2.42 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2403,7 +2403,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         }
       
 
-      m_IsRotated || =  !( \
+      m_IsRotated  =  m_IsRotated || !( \
                         (imageOrientationPatient[0] == 1.0) && \
                         (imageOrientationPatient[4] == imageOrientationPatient[0]) &&\
                         (imageOrientationPatient[1] == 0.0) &&\
