@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.29 $
+  Date:      $Date: 2009-08-27 13:38:26 $
+  Version:   $Revision: 1.29.2.1 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -763,7 +763,7 @@ void mafViewGlobalSlice::VmeShow(mafNode *node, bool show)
 	Superclass::VmeShow(node,show);
 
   m_SelectedVolume = m_Sg->Vme2Node(node);
-  if (m_SelectedVolume->m_Pipe)
+  if (m_SelectedVolume && m_SelectedVolume->m_Pipe)
   {
     //m_Gui->Enable(ID_LUT,true);
     m_Gui->Enable(ID_POS_SLIDER,true);
