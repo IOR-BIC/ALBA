@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-08-26 16:53:51 $
-Version:   $Revision: 1.1.2.42 $
+Date:      $Date: 2009-08-27 12:19:44 $
+Version:   $Revision: 1.1.2.43 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1640,7 +1640,8 @@ void medOpImporterDicomOffis::ReadDicom()
      break;
    }
 
-   m_ListSelected->Sort(CompareImageNumber);
+   //Build a wrong volume with this line!!!
+   //m_ListSelected->Sort(CompareImageNumber);
 
   m_NumberOfTimeFrames = ((medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
   if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
