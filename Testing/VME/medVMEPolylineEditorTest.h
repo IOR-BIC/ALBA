@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEPolylineEditorTest.h,v $
 Language:  C++
-Date:      $Date: 2009-08-31 11:51:48 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-08-31 15:23:29 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
+class vtkPolyData;
 
 class medVMEPolylineEditorTest : public CPPUNIT_NS::TestFixture
 {
@@ -41,7 +42,7 @@ protected:
   void TestDynamicAllocation();
   void TestSetData();
   void TestSetGetVisualPipe();
-  bool m_Result;
+  void CreateExamplePolydata(vtkPolyData *polydata);
 };
 
 
