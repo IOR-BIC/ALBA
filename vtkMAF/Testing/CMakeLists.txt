@@ -90,40 +90,47 @@ ENDIF (WIN32)
 ADD_EXECUTABLE(vtkMAFImplicitPolyDataTest vtkMAFImplicitPolyDataTest.h vtkMAFImplicitPolyDataTest.cpp)
 ADD_TEST(vtkMAFImplicitPolyDataTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFImplicitPolyDataTest)
 IF (WIN32)
- SET_TARGET_PROPERTIES(vtkMAFImplicitPolyDataTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFImplicitPolyDataTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ vtkMAFTextOrientatorTest
 ADD_EXECUTABLE(vtkMAFTextActorMeterTest vtkMAFTextActorMeterTest.h vtkMAFTextActorMeterTest.cpp)
 ADD_TEST(vtkMAFTextActorMeterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTextActorMeterTest)
 IF (WIN32)
- SET_TARGET_PROPERTIES(vtkMAFTextActorMeterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFTextActorMeterTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ vtkMAFCellsFilterTest
 ADD_EXECUTABLE(vtkMAFCellsFilterTest vtkMAFCellsFilterTest.h vtkMAFCellsFilterTest.cpp)
 ADD_TEST(vtkMAFCellsFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFCellsFilterTest)
 IF (WIN32)
- SET_TARGET_PROPERTIES(vtkMAFCellsFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFCellsFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ vtkMAFGridActorTest
 ADD_EXECUTABLE(vtkMAFGridActorTest vtkMAFGridActorTest.h vtkMAFGridActorTest.cpp)
 ADD_TEST(vtkMAFGridActorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFGridActorTest)
 IF (WIN32)
- SET_TARGET_PROPERTIES(vtkMAFGridActorTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFGridActorTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ vtkMAFProjectSPTest
 ADD_EXECUTABLE(vtkMAFProjectSPTest vtkMAFProjectSPTest.h vtkMAFProjectSPTest.cpp)
 ADD_TEST(vtkMAFProjectSPTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFProjectSPTest)
 IF (WIN32)
-SET_TARGET_PROPERTIES(vtkMAFProjectSPTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFProjectSPTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
 ############ vtkMAFProjectRGTest
 ADD_EXECUTABLE(vtkMAFProjectRGTest vtkMAFProjectRGTest.h vtkMAFProjectRGTest.cpp)
 ADD_TEST(vtkMAFProjectRGTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFProjectRGTest)
 IF (WIN32)
-SET_TARGET_PROPERTIES(vtkMAFProjectRGTest PROPERTIES LINK_FLAGS "/MANIFEST")
+  SET_TARGET_PROPERTIES(vtkMAFProjectRGTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ vtkMAFClipSurfaceBoundingBoxTest
+ADD_EXECUTABLE(vtkMAFClipSurfaceBoundingBoxTest vtkMAFClipSurfaceBoundingBoxTest.h vtkMAFClipSurfaceBoundingBoxTest.cpp)
+ADD_TEST(vtkMAFClipSurfaceBoundingBoxTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFClipSurfaceBoundingBoxTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(vtkMAFClipSurfaceBoundingBoxTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
