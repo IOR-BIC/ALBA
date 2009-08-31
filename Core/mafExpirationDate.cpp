@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-21 14:23:59 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2009-08-31 17:24:44 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -52,9 +52,9 @@ m_ExpirationDate(NULL)
 //----------------------------------------------------------------------------
 {	
   m_ExpirationDate = new wxDateTime(wxDateTime::UNow());
-  m_ExpirationDate->SetYear(year);
-  m_ExpirationDate->SetMonth((wxDateTime::Month)(month-1)); //need to handle the correct array range of wxDateTime (0-11)
   m_ExpirationDate->SetDay(day);
+  m_ExpirationDate->SetMonth((wxDateTime::Month)(month-1)); //need to handle the correct array range of wxDateTime (0-11)
+  m_ExpirationDate->SetYear(year);
   m_ExpirationDate->SetHour(0);
   m_ExpirationDate->SetMinute(0);
   m_ExpirationDate->SetSecond(0);
@@ -92,11 +92,22 @@ m_ExpirationDate(NULL)
     year = check.substr(0,foundFirst);
     month = check.substr(foundFirst+1,foundLast-foundFirst-1);
     day = check.substr(foundLast+1);
+
+    std::stringstream ss;
+    int dayInt,monthEnum,yearInt;
+    ss << day;
+    ss >> dayInt;
+    ss.clear();
+    ss << month;
+    ss >> monthEnum;
+    ss.clear();
+    ss << year;
+    ss >> yearInt;
     
     m_ExpirationDate = new wxDateTime(wxDateTime::UNow());
-    m_ExpirationDate->SetYear(atoi(year.c_str()));
-    m_ExpirationDate->SetMonth((wxDateTime::Month)(atoi(month.c_str())-1));//need to handle the correct array range of wxDateTime (0-11)
-    m_ExpirationDate->SetDay(atoi(day.c_str()));
+    m_ExpirationDate->SetDay(dayInt);
+    m_ExpirationDate->SetMonth((wxDateTime::Month)(monthEnum-1));//need to handle the correct array range of wxDateTime (0-11)
+    m_ExpirationDate->SetYear(yearInt);
     m_ExpirationDate->SetHour(0);
     m_ExpirationDate->SetMinute(0);
     m_ExpirationDate->SetSecond(0);
