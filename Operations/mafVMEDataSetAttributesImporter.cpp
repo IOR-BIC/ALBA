@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-02 11:10:46 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-09-01 13:58:07 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,7 +18,7 @@
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-const int DEBUG_MODE = true;
+const int DEBUG_MODE = false;
 
 #include "mafVMEDataSetAttributesImporter.h"
 
