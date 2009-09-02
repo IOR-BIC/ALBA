@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMESlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:06:00 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2009-09-02 12:30:40 $
+  Version:   $Revision: 1.28.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -360,6 +360,18 @@ void mafVMESlicer::InternalUpdate()
     {
       m_PSlicer->Update();
       m_ISlicer->Update();
+
+      vtkDataArray *scalars = vtkdata->GetPointData()->GetScalars();
+      if (scalars == NULL)
+      {
+        return;
+      }
+
+      vtkImageData *texture = m_PSlicer->GetTexture();
+
+      GetMaterial()->SetMaterialTexture(texture);
+      texture->GetScalarRange(GetMaterial()->m_TableRange);
+      GetMaterial()->UpdateProp();
     }
   }
 }
