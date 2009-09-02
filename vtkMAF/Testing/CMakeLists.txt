@@ -134,3 +134,18 @@ ADD_TEST(vtkMAFClipSurfaceBoundingBoxTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFClipSu
 IF (WIN32)
   SET_TARGET_PROPERTIES(vtkMAFClipSurfaceBoundingBoxTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFRGSliceAccumulateTest
+ADD_EXECUTABLE(vtkMAFRGSliceAccumulateTest vtkMAFRGSliceAccumulateTest.h vtkMAFRGSliceAccumulateTest.cpp)
+ADD_TEST(vtkMAFRGSliceAccumulateTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFRGSliceAccumulateTest)
+IF (WIN32)
+  SET_TARGET_PROPERTIES(vtkMAFRGSliceAccumulateTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+############ vtkMAFRectilinearGridToRectilinearGridFilterTest
+ADD_EXECUTABLE(vtkMAFRectilinearGridToRectilinearGridFilterTest vtkMAFRectilinearGridToRectilinearGridFilterTest.h vtkMAFRectilinearGridToRectilinearGridFilterTest.cpp
+vtkMAFDummyRectilinearGridToRectilinearGridFilter.h vtkMAFDummyRectilinearGridToRectilinearGridFilter.cpp)
+ADD_TEST(vtkMAFRectilinearGridToRectilinearGridFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFRectilinearGridToRectilinearGridFilterTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFRectilinearGridToRectilinearGridFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
