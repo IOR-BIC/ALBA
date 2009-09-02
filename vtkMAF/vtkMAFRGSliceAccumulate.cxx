@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFRGSliceAccumulate.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-05-05 12:15:58 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-09-02 12:33:20 $
+  Version:   $Revision: 1.1.2.4 $
 
 
 Copyright (c) 1993-1998 Ken Martin, Will Schroeder, Bill Lorensen.
@@ -49,7 +49,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
-vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMAFRGSliceAccumulate, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMAFRGSliceAccumulate);
 
 //--------------------------------------------------------------------------------------
@@ -95,13 +95,20 @@ void vtkMAFRGSliceAccumulate::AddSlice(vtkImageData * slice)
 		this->SetOrigin(origin);
 		this->SetDataType(slice->GetPointData()->GetScalars()->GetDataType());
 
-		this->NumberOfSlices++;
+		this->NumberOfSlices = 1;
 		this->Allocate();
 
 		this->Slices->GetPointData()->SetScalars(slice->GetPointData()->GetScalars());
 		//((vtkFloatArray *)this->Slices->GetZCoordinates())->SetValue(0, origin[2]);
 		((vtkDoubleArray *)this->Slices->GetZCoordinates())->SetValue(0, origin[this->BuildingAxes]);
 	} else {
+    
+
+    for(int i=0;i<dimensions[0]*dimensions[1];i++)
+    {
+      ((vtkDoubleArray *)Slices->GetPointData()->GetScalars())->InsertNextTuple1(0.0);
+    }
+
 		vz=(vtkDoubleArray *)this->Slices->GetZCoordinates();
 		
 		int start;
