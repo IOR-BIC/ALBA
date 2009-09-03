@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-16 10:27:05 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2009-09-03 15:53:00 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -172,13 +172,13 @@ void mafOpCrop::Crop()
 
 			while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray])
 			{
-				minId = coordId+1;
+				minId = coordId + 1;
 				coordId++;
 			}
 			//coordId++;
 			while (coordArray[numArray]->GetComponent(coordId,0) < gizmoBounds[2*numArray + 1])
 			{
-				maxId = coordId - 1;
+				maxId = coordId + 1;
 				coordId++;
 			}
 
@@ -227,7 +227,7 @@ void mafOpCrop::Crop()
 		{
 			wxBusyInfo wait(_("please wait, cropping..."));
 		}
-
+    
 		vtkMAFSmartPointer<vtkProbeFilter> probeFilter;
 		probeFilter->SetInput(v_esp);
 		probeFilter->SetSource(m_InputSP);
