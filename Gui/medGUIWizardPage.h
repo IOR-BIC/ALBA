@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2009-07-01 13:07:00 $
-Version:   $Revision: 1.4.2.4 $
+Date:      $Date: 2009-09-03 14:48:18 $
+Version:   $Revision: 1.4.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -94,6 +94,12 @@ public:
   /** Remove in wizard gui, another gui in lower left position. */
   void RemoveGuiLowerLeft(mafGUI *gui);
 
+  /** Remove in wizard gui, another gui in lower right position. */
+  void RemoveGuiLowerRight(mafGUI *gui);
+
+  /** Remove in wizard gui, another gui in lower center position. */
+  void RemoveGuiLowerCenter(mafGUI *gui);
+
 	/** Create a chain between this page ad nextPage. */
 	void SetNextPage(medGUIWizardPage *nextPage);
 
@@ -113,6 +119,8 @@ private:
   mafGUI     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
   mafGUI     *m_GuiLowerRight; ///< Gui variable used to plug custom widgets localized in LOWER RIGHT
   mafGUI     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
+
+  long m_Style;
 
 	//DECLARE_EVENT_TABLE()
 };

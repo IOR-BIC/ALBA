@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-05 14:40:46 $
-Version:   $Revision: 1.5.2.4 $
+Date:      $Date: 2009-09-03 14:48:18 $
+Version:   $Revision: 1.5.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -70,6 +70,9 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 : wxWizardPageSimple(wizardParent)
 //----------------------------------------------------------------------------
 {
+
+  m_Style = style;
+
 	m_Listener = NULL;
 
 	m_FirstPage = NULL;
@@ -81,6 +84,7 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 	m_Rwi = NULL;
 	m_GuiLowerRight = NULL;
   m_GuiLowerLeft = NULL;
+  m_GuiLowerCenter = NULL;
 
 	if(style & medUSERWI)
 	{
@@ -119,6 +123,15 @@ medGUIWizardPage::~medGUIWizardPage()
 //----------------------------------------------------------------------------
 {
 	cppDEL(m_Rwi);
+
+  if(!(m_Style & medUSERWI))
+  {
+    delete m_RwiSizer;
+  }
+  if(!(m_Style & medUSEGUI))
+  {
+    delete m_GUISizer;
+  }
 }
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::OnEvent(mafEventBase *maf_event)
@@ -152,6 +165,22 @@ void medGUIWizardPage::RemoveGuiLowerLeft(mafGUI *gui)
   m_GuiLowerLeft->Remove(gui);
   m_GuiLowerLeft->FitGui();
   m_GuiLowerLeft->Update();
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPage::RemoveGuiLowerCenter(mafGUI *gui)
+//--------------------------------------------------------------------------------
+{
+  m_GuiLowerCenter->Remove(gui);
+  m_GuiLowerCenter->FitGui();
+  m_GuiLowerCenter->Update();
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPage::RemoveGuiLowerRight(mafGUI *gui)
+//--------------------------------------------------------------------------------
+{
+  m_GuiLowerRight->Remove(gui);
+  m_GuiLowerRight->FitGui();
+  m_GuiLowerRight->Update();
 }
 //--------------------------------------------------------------------------------
 void medGUIWizardPage::AddGuiLowerCenter(mafGUI *gui)
