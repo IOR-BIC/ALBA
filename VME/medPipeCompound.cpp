@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompound.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 08:37:13 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-04 10:29:43 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -20,6 +20,25 @@
 //----------------------------------------------------------------------------
 
 #include "mafDecl.h"
+
+#include "vtkMAFAssembly.h"
+#include "vtkMAFSmartPointer.h"
+#include "vtkImageData.h"
+#include "vtkImageCast.h"
+#include "vtkPiecewiseFunction.h"
+#include "vtkVolumeProperty.h"
+#include "vtkXRayVolumeMapper.h"
+#include "vtkPlaneSource.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkActor.h"
+#include "vtkVolume.h" 
+#include "vtkProperty.h"
+#include "vtkOutlineCornerFilter.h"
+#include "vtkLookupTable.h"
+#include "mmaVolumeMaterial.h"
+#include "mafVMEVolume.h"
+#include "vtkImageResample.h"
+
 #include "medPipeCompound.h"
 
 #include "mafSceneNode.h"
@@ -73,9 +92,53 @@ void medPipeCompound::Create(mafSceneNode *n)
 
   //creates initial pages for each group
   CreatePages();
+
+  //AddActor();
 }
+//------------------------------------------------------------
+//add an actor in the view to show init vme with a default type
+void medPipeCompound::AddActor(){
+	m_ResampleFactor = 1.0;
+	m_Selected = false;
+	m_Vme->GetOutput()->Update();
+	vtkDataSet* data = m_Vme->GetOutput()->GetVTKData();
 
+	double sr[2];
+	data->GetScalarRange(sr);
 
+	vtkNEW(m_ColorLUT);
+	m_ColorLUT->SetTableRange(sr);
+
+	//vtkNEW(m_OpacityTransferFunction);
+	mmaVolumeMaterial *material = ((mafVMEVolume *)m_Vme)->GetMaterial();
+	m_OpacityTransferFunction = material->m_OpacityTransferFunction;
+
+	vtkNEW(m_VolumeProperty);
+	m_VolumeProperty->SetScalarOpacity(m_OpacityTransferFunction);
+	m_VolumeProperty->SetInterpolationTypeToLinear();
+
+	vtkNEW(m_ResampleFilter);
+	vtkNEW(m_VolumeMapper);
+	if(vtkImageData::SafeDownCast(data))
+	{
+		m_ResampleFilter->SetInput((vtkImageData*)data);
+		for(int i=0;i<3;i++)
+			m_ResampleFilter->SetAxisMagnificationFactor(i,m_ResampleFactor);
+		m_ResampleFilter->Update();
+		m_VolumeMapper->SetInput(m_ResampleFilter->GetOutput());
+	}
+	else
+		m_VolumeMapper->SetInput(data);
+
+	m_VolumeMapper->SetCroppingRegionPlanes(0, 1, 0, 1, 0, 1);
+
+	vtkNEW(m_Volume);
+	m_Volume->SetMapper(m_VolumeMapper);
+	m_Volume->PickableOff();
+
+	m_AssemblyFront->AddPart(m_Volume);
+
+}
 
 #pragma region A special GUI with autoresize feature
 /** This small helper class is denoted to autoresize 

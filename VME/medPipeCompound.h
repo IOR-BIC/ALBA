@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompound.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 08:37:13 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-04 10:30:19 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -18,8 +18,14 @@
 //----------------------------------------------------------------------------
 // forward refs :
 //----------------------------------------------------------------------------
-class mafGUI;
-
+class vtkPiecewiseFunction;
+class vtkVolumeProperty;
+class vtkXRayVolumeMapper;
+class vtkActor;
+class vtkVolume;
+class vtkLookupTable;
+class vtkImageResample;
+class mafGUIFloatSlider;
 //----------------------------------------------------------------------------
 // medPipeCompound :
 //----------------------------------------------------------------------------
@@ -105,5 +111,14 @@ protected:
   any tab). The change of layout can be forced, no matter on how many pages
   are valid, if bForce is true. Use this carefully. */
   virtual void UpdateGUILayout(bool bForce = false);
+
+  vtkLookupTable              *m_ColorLUT;
+  vtkPiecewiseFunction        *m_OpacityTransferFunction;
+  vtkVolumeProperty           *m_VolumeProperty;
+  vtkXRayVolumeMapper         *m_VolumeMapper;
+  vtkVolume                   *m_Volume;
+  vtkImageResample						*m_ResampleFilter;
+  double  m_ResampleFactor;
+   void AddActor();
 };  
 #endif // __medPipeCompound_H__
