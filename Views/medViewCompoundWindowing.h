@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.h,v $
   Language:  C++
-  Date:      $Date: 2009-08-24 12:14:22 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-09-04 10:35:55 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -100,7 +100,10 @@ protected:
 
 	mafGUILutSwatch		*m_LutWidget; ///< LUT widget in view side panel 
 	mafGUILutSlider		*m_LutSlider;
-
 	vtkLookupTable	        *m_ColorLUT;
+	
+	/** Function that get node pipe of first child     */
+	virtual mafPipe* GetNodePipe(mafNode *vme);
+
 };
 #endif

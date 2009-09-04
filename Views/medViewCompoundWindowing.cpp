@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewCompoundWindowing.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-21 12:16:43 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2009-09-04 10:35:55 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -252,5 +252,18 @@ void medViewCompoundWindowing::VolumeWindowing(mafVME *volume)
   m_LutSlider->SetRange((long)sr[0],(long)sr[1]);
   //m_LutSlider->SetSubRange((long)sr[0],(long)sr[1]);
   m_LutSlider->SetSubRange((long)currentSurfaceMaterial->m_TableRange[0],(long)currentSurfaceMaterial->m_TableRange[1]);
+
+}
+
+//-------------------------------------------------------------------------
+mafPipe* medViewCompoundWindowing::GetNodePipe(mafNode *vme)
+//-------------------------------------------------------------------------
+{
+	mafPipe* rtn = NULL;
+	if (m_NumOfChildView ==1)
+	{
+	rtn = m_ChildViewList[0]->GetNodePipe(vme);
+	}
+	return rtn;
 
 }
