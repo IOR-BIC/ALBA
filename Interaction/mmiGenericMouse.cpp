@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2009-09-07 11:13:51 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -270,6 +270,8 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         SendTransformMatrix(matr);
            
       }
+      break;
+
       case (mmiConstraint::SNAP_STEP):
       {
         double step = GetTranslationConstraint()->GetStep(axis);
