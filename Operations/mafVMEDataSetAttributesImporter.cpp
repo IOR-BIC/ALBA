@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEDataSetAttributesImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-01 13:58:07 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2009-09-07 10:30:51 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Stefano Perticoni     
 ==========================================================================
   Copyright (c) 2002/2004
@@ -229,8 +229,11 @@ int mafVMEDataSetAttributesImporter::Read()
     if (m_TimeVarying) ithAttributesFileName.Append(number.str().c_str()) ;
     ithAttributesFileName.Append(m_FileExtension);
      
-    vtkGenericWarningMacro(<< "reading "<< ithAttributesFileName.GetCStr() << endl);
-    
+    // DEBUG
+    std::ostringstream stringStream;
+    stringStream << "reading "<< ithAttributesFileName.GetCStr() << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+          
     // open the ith file
     vcl_ifstream ithAttributesFileStream(ithAttributesFileName.GetCStr(), std::ios::in);
     if (ithAttributesFileStream.is_open() == false)
@@ -439,24 +442,28 @@ int mafVMEDataSetAttributesImporter::Read()
         if (idArray == NULL)
         {
           // try active scalar
-          idArray = vtkIntArray::
-            SafeDownCast(
-            targetAttributeData->GetScalars(m_IdArrayName.GetCStr())
-            );
-
+          mafString activeScalarName = targetAttributeData->GetScalars()->GetName();
+          
+          if (activeScalarName.Equals(m_IdArrayName.GetCStr()))
+          {
+            idArray = vtkIntArray::
+              SafeDownCast(
+              targetAttributeData->GetScalars()
+              );
+          }
         }
         if (idArray == NULL)
           {
             std::ostringstream stringStream;
             stringStream << "Point Data Array " << m_IdArrayName.GetCStr() << " does not exist!" << std::endl;
-            stringStream << "exiting with MAF_ERROR" << std::endl;
-            return MAF_ERROR;
+            stringStream << "Cannot map vtk points ID to user defined one. Exiting with MAF_ERROR" << std::endl;
             mafLogMessage(stringStream.str().c_str());
+            return MAF_ERROR;
           }
         
         assert(idArray);
       }
-      else
+      else // CELL_DATA
       {
         idArray = vtkIntArray::
           SafeDownCast(
@@ -466,20 +473,24 @@ int mafVMEDataSetAttributesImporter::Read()
         if (idArray == NULL)
         {
           // try active scalar
-          idArray = vtkIntArray::
-            SafeDownCast(
-            targetAttributeData->GetScalars(m_IdArrayName.GetCStr())
-            );
+          mafString activeScalarName = targetAttributeData->GetScalars()->GetName();
+          if (activeScalarName.Equals(m_IdArrayName.GetCStr()))
+          {
+            idArray = vtkIntArray::
+              SafeDownCast(
+              targetAttributeData->GetScalars()
+              );
+          }
         }
+     
         if (idArray == NULL)
         {
           std::ostringstream stringStream;
           stringStream << "Cell Data Array " << m_IdArrayName.GetCStr() << " does not exist!" << std::endl;
-          stringStream << "exiting with MAF_ERROR" << std::endl;
-          return MAF_ERROR;
+          stringStream << "Cannot map vtk cells ID to user defined one. Exiting with MAF_ERROR" << std::endl;
           mafLogMessage(stringStream.str().c_str());
+          return MAF_ERROR;
         }
-
         assert(idArray);
       }
       
