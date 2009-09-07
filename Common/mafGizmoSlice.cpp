@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-11 16:09:22 $
-  Version:   $Revision: 1.21.2.3 $
+  Date:      $Date: 2009-09-07 09:38:55 $
+  Version:   $Revision: 1.21.2.4 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,6 +41,7 @@
 #include "vtkOutlineFilter.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredPoints.h"
+#include "vtkOutlineCornerFilter.h"
 #include "vtkPoints.h"
 #include "vtkCubeSource.h"
 #include "vtkAppendPolyData.h"
@@ -52,13 +53,13 @@
 
 
 //----------------------------------------------------------------------------
-mafGizmoSlice::mafGizmoSlice(mafNode* inputVme, mafObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */)
+mafGizmoSlice::mafGizmoSlice(mafNode* inputVme, mafObserver *Listener /* = NULL */, const char *name /* =  */, bool inverseHandle /* = false */, double centralClipfactor /* = 0 */)
 //----------------------------------------------------------------------------
 {
-  CreateGizmoSlice(inputVme, Listener, name, inverseHandle);
+  CreateGizmoSlice(inputVme, Listener, name, inverseHandle, centralClipfactor);
 }
 //----------------------------------------------------------------------------
-void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char* name, bool inverseHandle)
+void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name, bool inverseHandle, double centralClipfactor)
 //----------------------------------------------------------------------------
 {
   m_Name = name;
@@ -71,6 +72,8 @@ void mafGizmoSlice::CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, c
   m_InputVME = mafVME::SafeDownCast(imputVme);
 
   m_InverseHandle = inverseHandle;
+
+  m_CentralClipFactor = centralClipfactor;
 
   mafNEW(m_GizmoHandleCenterMatrix);
 
@@ -230,10 +233,24 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 		  break;
 	  }
 
-    // create the gizmo outline 
-	  vtkMAFSmartPointer<vtkOutlineFilter> of;
-	  of->SetInput(ps->GetOutput());
-	  of->Update();
+    vtkDataSetToPolyDataFilter *cornerFilter;
+
+    if(m_CentralClipFactor == 0)
+    {
+      // create the gizmo outline 
+      cornerFilter = vtkOutlineFilter::New();
+      cornerFilter->SetInput(ps->GetOutput());
+      cornerFilter->Update();
+    }
+    else
+    {
+      // create the gizmo outline 
+      cornerFilter = vtkOutlineCornerFilter::New();
+      cornerFilter->SetInput(ps->GetOutput());
+      ((vtkOutlineCornerFilter*)cornerFilter)->SetCornerFactor(m_CentralClipFactor);
+      cornerFilter->Update();
+    }
+    
 
     // create the gizmo handle
 	  vtkMAFSmartPointer<vtkCubeSource> cs;
@@ -246,8 +263,10 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 	  vtkMAFSmartPointer<vtkAppendPolyData> apd;
     if(visibleCubeHandler == true)
       apd->AddInput(cs->GetOutput());
-	  apd->AddInput(of->GetOutput());
+	  apd->AddInput(cornerFilter->GetOutput());
 	  apd->Update();
+
+    cornerFilter->Delete();
 
     m_VmeGizmo->SetData(apd->GetOutput());
 
@@ -585,7 +604,7 @@ void mafGizmoSlice::SetInput( mafVME *vme )
   if (m_VmeGizmo != NULL)
   {
     DestroyGizmoSlice();
-    CreateGizmoSlice(vme, m_Listener, m_Name, m_InverseHandle);
+    CreateGizmoSlice(vme, m_Listener, m_Name, m_InverseHandle, m_CentralClipFactor);
   }
 }
 //----------------------------------------------------------------------------

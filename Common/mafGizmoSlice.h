@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-11 16:09:22 $
-  Version:   $Revision: 1.11.2.2 $
+  Date:      $Date: 2009-09-07 09:38:55 $
+  Version:   $Revision: 1.11.2.3 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -34,7 +34,7 @@ class mafGizmoSlice : public mafGizmoInterface
 {
 public:
 
-	mafGizmoSlice(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice", bool inverseHandle = false);
+	mafGizmoSlice(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoSlice", bool inverseHandle = false, double centralClipfactor = 0);
 
   virtual	~mafGizmoSlice();
 
@@ -47,6 +47,9 @@ public:
 
   /** Set the gizmo color */
   void SetColor(double col[3]);
+
+  /** Set the central clip length in order to create a less invasive gizmo*/
+  void SetCentralClipFactor(double factor){m_CentralClipFactor = factor;};
 
   /** return the gizmo slice object */
   mafVME *GetOutput(); 
@@ -82,7 +85,7 @@ public:
 
 protected:
 
-  void CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name, bool inverseHandle);
+  void CreateGizmoSlice(mafNode *imputVme, mafObserver *listener, const char *name, bool inverseHandle, double centralClipfactor);
 
   void DestroyGizmoSlice();
 
@@ -121,5 +124,7 @@ protected:
   mmiGenericMouse *m_MouseBH;
 
   bool m_InverseHandle;
+
+  double m_CentralClipFactor;
 };
 #endif
