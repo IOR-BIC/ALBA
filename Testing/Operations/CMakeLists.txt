@@ -18,6 +18,9 @@ IF (MAF_USE_ITK)
   
   ADD_EXECUTABLE(medOpImporterGRFWSTest medOpImporterGRFWSTest.h medOpImporterGRFWSTest.cpp)
   ADD_TEST(medOpImporterGRFWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterGRFWSTest) 
+  
+  ADD_EXECUTABLE(medOpImporterAnalogWSTest medOpImporterAnalogWSTest.h medOpImporterAnalogWSTest.cpp)
+  ADD_TEST(medOpImporterAnalogWSTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterAnalogWSTest)
 ENDIF (MAF_USE_ITK)
 
 ADD_EXECUTABLE(medOpVolumeMeasureTest medOpVolumeMeasureTest.h medOpVolumeMeasureTest.cpp)
@@ -70,6 +73,8 @@ ADD_TEST(medOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateSurfaceTest
 
 ADD_EXECUTABLE(medOpVolumeResampleTest medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp)
 ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTest)
+
+
 
 
 IF (MED_USE_Offis)
