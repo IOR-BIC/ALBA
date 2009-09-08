@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterAnalogWS.h,v $
   Language:  C++
-  Date:      $Date: 2008-01-09 10:24:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-09-08 16:21:42 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -32,7 +32,7 @@ class medVMEAnalog;
 class medOpImporterAnalogWS : public mafOp
 {
 public:
-	medOpImporterAnalogWS(const wxString &label);
+	medOpImporterAnalogWS(const wxString &label = "Analog Importer");
 	~medOpImporterAnalogWS(); 
 	mafOp* Copy();
 

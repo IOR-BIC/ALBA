@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterAnalogWS.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:34:22 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-09-08 16:21:42 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -79,7 +79,7 @@ void medOpImporterAnalogWS::OpRun()
 void medOpImporterAnalogWS::Read()   
 //----------------------------------------------------------------------------
 {
-  //if (!m_TestMode)
+  if (!m_TestMode)
     wxBusyInfo wait("Please wait, working...");
   
   mafNEW(m_EmgScalar);
