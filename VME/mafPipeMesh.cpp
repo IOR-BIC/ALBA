@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-29 08:57:46 $
-Version:   $Revision: 1.15 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2009-09-08 13:03:47 $
+Version:   $Revision: 1.15.2.1 $
+Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -78,7 +78,7 @@ mafPipeMesh::mafPipeMesh()
   m_ActiveScalarType = POINT_TYPE;
   m_PointCellArraySeparation = 0;
 
-	m_ScalarsName = NULL;
+	m_ScalarsInComboBoxNames = NULL;
 	m_ScalarsVTKName = NULL;
   m_MaterialButton = NULL;
 
@@ -278,7 +278,7 @@ mafPipeMesh::~mafPipeMesh()
 	cppDEL(m_Axes);
   cppDEL(m_MaterialButton);
 	
-	delete[] m_ScalarsName;			//BES: 4.3.2008 - memory leak bug fix - NB. do not use cppDEL!
+	delete[] m_ScalarsInComboBoxNames;			//BES: 4.3.2008 - memory leak bug fix - NB. do not use cppDEL!
 	delete[] m_ScalarsVTKName;		//BES: 4.3.2008 - memory leak bug fix
 }
 //----------------------------------------------------------------------------
@@ -311,7 +311,7 @@ mafGUI *mafPipeMesh::CreateGui()
   m_Gui->AddGui(m_MaterialButton->GetGui());
   m_MaterialButton->Enable(m_UseVTKProperty != 0);
 
-  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsName);	
+  m_Gui->Combo(ID_SCALARS,"",&m_ScalarIndex,m_NumberOfArrays,m_ScalarsInComboBoxNames);	
   
 
   m_Gui->Bool(ID_SCALAR_MAP_ACTIVE,_("enable scalar field mapping"), &m_ScalarMapActive, 1);
@@ -359,7 +359,7 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
           {
             m_ActiveScalarType = CELL_TYPE;
           }
-          UpdateScalars();
+          UpdateActiveScalarsInVMEDataVectorItems();
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         break;
@@ -399,7 +399,7 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
           m_Gui->Enable(ID_LUT, m_ScalarMapActive != 0);
           m_Gui->Update();
 
-          UpdateScalars();
+          UpdateActiveScalarsInVMEDataVectorItems();
           mafEventMacro(mafEvent(this,CAMERA_UPDATE));
         }
         break;
@@ -426,7 +426,7 @@ void mafPipeMesh::OnEvent(mafEventBase *maf_event)
 	}
   else if(maf_event->GetId() == VME_TIME_SET)
   {
-    UpdateScalars();
+    UpdateActiveScalarsInVMEDataVectorItems();
     UpdateProperty();
   }
 }
@@ -471,7 +471,7 @@ void mafPipeMesh::SetWiredActorVisibilityOff()
   mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
 //----------------------------------------------------------------------------
-void mafPipeMesh::UpdateScalars()
+void mafPipeMesh::UpdateActiveScalarsInVMEDataVectorItems()
 //----------------------------------------------------------------------------
 {
   
@@ -491,6 +491,7 @@ void mafPipeMesh::UpdateScalars()
     m_Vme->GetOutput()->GetVTKData()->GetCellData()->GetScalars()->Modified();
     m_LinearizationFilter->GetOutput()->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
     m_LinearizationFilter->GetOutput()->GetCellData()->GetScalars()->Modified();
+
   }
   m_Vme->Modified();
   m_Vme->GetOutput()->GetVTKData()->Update();
@@ -507,12 +508,37 @@ void mafPipeMesh::UpdateScalars()
     {
       if(m_ActiveScalarType == POINT_TYPE)
       {
+        wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
+        vtkDataArray *scalarsArray = outputVTK->GetPointData()->GetArray(scalarsToActivate);
+
+        if (scalarsArray == NULL)
+        {
+          std::ostringstream stringStream;
+          stringStream << scalarsToActivate.c_str() << " POINT_DATA array does not exist for timestamp " \
+            << item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
+          mafLogMessage(stringStream.str().c_str());
+          continue;
+        }
+
         outputVTK->GetPointData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
         outputVTK->GetPointData()->GetScalars()->Modified();
       }
       else if(m_ActiveScalarType == CELL_TYPE)
       {
-        outputVTK->GetCellData()->SetActiveScalars(m_ScalarsVTKName[m_ScalarIndex].c_str());
+        wxString scalarsToActivate = m_ScalarsVTKName[m_ScalarIndex].c_str();
+        vtkDataArray *scalarsArray = outputVTK->GetCellData()->GetArray(scalarsToActivate);
+        
+        if (scalarsArray == NULL)
+        {
+          std::ostringstream stringStream;
+          stringStream << scalarsToActivate.c_str() << "  CELL_DATA array does not exist for timestamp " \
+          << item->GetTimeStamp() << " . Skipping SetActiveScalars for this timestamp" << std::endl;
+          mafLogMessage(stringStream.str().c_str());
+          continue;
+        }
+        
+
+        outputVTK->GetCellData()->SetActiveScalars(scalarsToActivate.c_str());
         outputVTK->GetCellData()->GetScalars()->Modified();
       }
       outputVTK->Modified();
@@ -525,12 +551,11 @@ void mafPipeMesh::UpdateScalars()
   m_LinearizationFilter->Modified();
   m_LinearizationFilter->Update();
   
-  UpdatePipeFromScalars();
-  
+  UpdateVisualizationWithNewSelectedScalars();
   
 }
 //----------------------------------------------------------------------------
-void mafPipeMesh::UpdatePipeFromScalars()
+void mafPipeMesh::UpdateVisualizationWithNewSelectedScalars()
 //----------------------------------------------------------------------------
 {
   vtkUnstructuredGrid *data = vtkUnstructuredGrid::SafeDownCast(m_Vme->GetOutput()->GetVTKData());
@@ -595,16 +620,16 @@ void mafPipeMesh::CreateFieldDataControlArrays()
     }
   }
 
-  m_ScalarsName = new wxString[count];
+  m_ScalarsInComboBoxNames = new wxString[count];
   m_ScalarsVTKName = new wxString[count];
 
   for(int j=0;j<count;j++)
   {
     m_ScalarsVTKName[j]=tempScalarsPointsName[j];
     if(j<pointArrayNumber)
-      m_ScalarsName[j]="[POINT] " + tempScalarsPointsName[j];
+      m_ScalarsInComboBoxNames[j]="[POINT] " + tempScalarsPointsName[j];
     else
-      m_ScalarsName[j]="[CELL] " + tempScalarsPointsName[j];
+      m_ScalarsInComboBoxNames[j]="[CELL] " + tempScalarsPointsName[j];
   }
 
   m_PointCellArraySeparation = pointArrayNumber;

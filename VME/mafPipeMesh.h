@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMesh.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:05:59 $
-Version:   $Revision: 1.7 $
-Authors:   Daniele Giunchi
+Date:      $Date: 2009-09-08 13:03:47 $
+Version:   $Revision: 1.7.2.1 $
+Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -99,10 +99,12 @@ public:
 
   /** Set scalar map active, so you can see scalar associated to points or cells*/
   void SetScalarMapActive(int value){m_ScalarMapActive = value;};
+  
   /** Set VTK Property to visualize the material of vme*/
   void SetUseVTKProperty(int value){m_UseVTKProperty = value;};
 
 protected:
+
 	mmaMaterial             *m_MeshMaterial;
 	vtkGeometryFilter                  *m_GeometryFilter;
   mafParabolicMeshToLinearMeshFilter *m_LinearizationFilter;
@@ -115,13 +117,16 @@ protected:
   vtkLookupTable          *m_Table;
 
   void CreateFieldDataControlArrays();
-	void UpdateProperty(bool fromTag = false);
-	/**Update data value to selected scalar */
-  void UpdateScalars();
+	
+  void UpdateProperty(bool fromTag = false);
+	
+  /** Update data value to selected scalar */
+  void UpdateActiveScalarsInVMEDataVectorItems();
+  
   /** Update the visualization with changed scalar*/
-  void UpdatePipeFromScalars();
+  void UpdateVisualizationWithNewSelectedScalars();
 
-  wxString                *m_ScalarsName;
+  wxString                *m_ScalarsInComboBoxNames;
   wxString                *m_ScalarsVTKName;
 
   mafGUIMaterialButton       *m_MaterialButton;
