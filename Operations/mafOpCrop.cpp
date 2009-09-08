@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpCrop.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-03 15:53:00 $
-  Version:   $Revision: 1.4.2.3 $
+  Date:      $Date: 2009-09-08 12:41:43 $
+  Version:   $Revision: 1.4.2.4 $
   Authors:   Matteo Giacomoni & Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,14 +199,71 @@ void mafOpCrop::Crop()
 	else if (output->GetVTKData()->IsA("vtkStructuredPoints"))
 	{
 		int voi_dim[6];
-		voi_dim[0] = ceil((m_CroppingBoxBounds[0] - m_InputBounds[0])/(m_XSpacing));
-		voi_dim[1] = floor((m_CroppingBoxBounds[1] - m_InputBounds[0])/ m_XSpacing);
+        int original_vol_dim[6];
+		m_InputSP->GetExtent(original_vol_dim);
+		
+		double xBoundLength, yBoundLength, zBoundLength;
+		xBoundLength = fabs(m_InputBounds[1] - m_InputBounds[0]);
+		yBoundLength = fabs(m_InputBounds[3] - m_InputBounds[2]);
+		zBoundLength = fabs(m_InputBounds[5] - m_InputBounds[4]);
+		
+		double tolerance = 1e-3; //base tolerance
+        
+
+		if(fabs(m_CroppingBoxBounds[0] - m_InputBounds[0])/xBoundLength < tolerance)
+		{
+          voi_dim[0] = original_vol_dim[0];
+		}
+		else
+		{
+          voi_dim[0] = ceil((m_CroppingBoxBounds[0] - m_InputBounds[0])/(m_XSpacing));
+		}
+		
+		if(fabs(m_CroppingBoxBounds[1] - m_InputBounds[1])/xBoundLength < tolerance)
+		{
+			voi_dim[1] = original_vol_dim[1];
+		}
+		else
+		{
+			voi_dim[1] = floor((m_CroppingBoxBounds[1] - m_InputBounds[0])/ m_XSpacing);
+		}
+
+		if(fabs(m_CroppingBoxBounds[2] - m_InputBounds[2])/yBoundLength < tolerance)
+		{
+			voi_dim[2] = original_vol_dim[2];
+		}
+		else
+		{
+		    voi_dim[2] = ceil((m_CroppingBoxBounds[2] - m_InputBounds[2])/(m_YSpacing));
+		}
 	 
-		voi_dim[2] = ceil((m_CroppingBoxBounds[2] - m_InputBounds[2])/(m_YSpacing));
-		voi_dim[3] = floor((m_CroppingBoxBounds[3] - m_InputBounds[2])/ m_YSpacing);
-			
-		voi_dim[4] = ceil((m_CroppingBoxBounds[4] - m_InputBounds[4])/(m_ZSpacing));
-		voi_dim[5] = floor((m_CroppingBoxBounds[5] - m_InputBounds[4])/ m_ZSpacing);
+		if(fabs(m_CroppingBoxBounds[3] - m_InputBounds[3])/yBoundLength < tolerance)
+		{
+			voi_dim[3] = original_vol_dim[3];
+		}
+		else
+		{
+			voi_dim[3] = floor((m_CroppingBoxBounds[3] - m_InputBounds[2])/ m_YSpacing);
+		}
+		
+		if(fabs(m_CroppingBoxBounds[4] - m_InputBounds[4])/zBoundLength < tolerance)
+		{
+			voi_dim[4] = original_vol_dim[4];
+		}
+		else
+		{
+			voi_dim[4] = ceil((m_CroppingBoxBounds[4] - m_InputBounds[4])/(m_ZSpacing));
+		}	
+		
+		if(fabs(m_CroppingBoxBounds[5] - m_InputBounds[5])/zBoundLength < tolerance)
+		{
+			voi_dim[5] = original_vol_dim[5];
+		}
+		else
+		{
+			voi_dim[5] = floor((m_CroppingBoxBounds[5] - m_InputBounds[4])/ m_ZSpacing);
+		}
+		
 			
 		double in_org[3];
 		m_InputSP->GetOrigin(in_org);
