@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-09-08 12:39:45 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -33,13 +33,18 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGUIGizmoScale::mafGUIGizmoScale(mafObserver *listener)
+mafGUIGizmoScale::mafGUIGizmoScale(mafObserver *listener, bool testMode)
 //----------------------------------------------------------------------------
 {
   m_Listener = listener;
+  m_TestMode = testMode;
 
   m_Scaling[0] = m_Scaling[1] = m_Scaling[2] = 1;
-  CreateGui();
+
+  if (m_TestMode == false)
+  {
+    CreateGui();
+  }  
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +121,10 @@ void mafGUIGizmoScale::SetAbsScaling(mafMatrix *pose)
 //----------------------------------------------------------------------------
 {
   mafTransform::GetScale(*pose, m_Scaling);
-
-  assert(m_Gui);
-  m_Gui->Update();
+  
+  if (m_TestMode == false)
+  {
+    assert(m_Gui);
+    m_Gui->Update();
+  }
 }

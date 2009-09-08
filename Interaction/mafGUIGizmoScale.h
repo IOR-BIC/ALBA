@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-09-08 12:39:45 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,7 +26,7 @@ class mafGUIButton;
 class mafGUI;
 
 //----------------------------------------------------------------------------
-/** gui class for translation gizmo
+/** GUI class for scaling gizmo
 
   @sa
  
@@ -37,7 +37,7 @@ class mafGUIGizmoScale : public mafGUIGizmoInterface
 {
 public:
 
-  mafGUIGizmoScale(mafObserver *listener = NULL);
+  mafGUIGizmoScale(mafObserver *listener = NULL, bool testMode = false);
 	~mafGUIGizmoScale(); 
 
   void OnEvent(mafEventBase *maf_event);
@@ -72,6 +72,9 @@ protected:
   /**
   Gizmo abs pose*/
   double m_Scaling[3];
+
+  /** test friend */
+  friend class mafGUIGizmoScaleTest;
 
 };
 #endif
