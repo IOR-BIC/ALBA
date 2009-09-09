@@ -149,3 +149,10 @@ ADD_TEST(vtkMAFRectilinearGridToRectilinearGridFilterTest ${EXECUTABLE_OUTPUT_PA
 IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFRectilinearGridToRectilinearGridFilterTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFProfilingActorTest
+ADD_EXECUTABLE(vtkMAFProfilingActorTest vtkMAFProfilingActorTest.h vtkMAFProfilingActorTest.cpp)
+ADD_TEST(vtkMAFProfilingActorTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFProfilingActorTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFProfilingActorTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
