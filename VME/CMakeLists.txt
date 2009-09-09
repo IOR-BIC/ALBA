@@ -34,6 +34,8 @@ SET(PROJECT_SRCS
   medPipePolylineGraphEditor.h
   medVMEOutputPolylineEditor.cpp
   medVMEOutputPolylineEditor.h
+  medVMEMaps.cpp
+  medVMEMaps.h
   
   medVMEWrappedMeter.cpp
   medVMEWrappedMeter.h
