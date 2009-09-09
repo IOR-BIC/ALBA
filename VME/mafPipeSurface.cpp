@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-06 10:24:07 $
-  Version:   $Revision: 1.52.2.1 $
+  Date:      $Date: 2009-09-09 16:15:39 $
+  Version:   $Revision: 1.52.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -345,7 +345,8 @@ mafGUI *mafPipeSurface::CreateGui()
   double sr[2];
   m_Mapper->GetScalarRange(sr);
   m_SurfaceMaterial->m_ColorLut->SetTableRange(sr);
-	//m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
+	m_Gui->Lut(ID_LUT,"lut",m_SurfaceMaterial->m_ColorLut);
+  //m_Gui->Bool(ID_LUT, "new lut", &m_UseLookupTable);
   m_Gui->Bool(ID_SCALAR_VISIBILITY,"scalar vis.", &m_ScalarVisibility,0,"turn on/off the scalar visibility");
 	m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
   //m_Gui->Divider(2);
@@ -388,7 +389,10 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
       }
     	break;
       case ID_LUT:
-        mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        {
+          m_SurfaceMaterial->UpdateFromLut();
+          mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+        }
       break;
       case ID_ENABLE_LOD:
         //m_Actor->SetEnableHighThreshold(m_EnableActorLOD);
@@ -432,6 +436,9 @@ void mafPipeSurface::OnEvent(mafEventBase *maf_event)
 					CreateEdgesPipe();
 				mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       break;
+      case ID_USE_LOOKUP_TABLE:
+        m_Gui->Enable(ID_LUT,m_UseLookupTable != 0);
+        break;
       default:
         mafEventMacro(*e);
       break;
