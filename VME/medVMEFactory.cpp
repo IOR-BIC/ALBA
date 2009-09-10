@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-08 15:11:33 $
-  Version:   $Revision: 1.13.2.2 $
+  Date:      $Date: 2009-09-10 08:38:05 $
+  Version:   $Revision: 1.13.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -25,6 +25,7 @@
 #include "medVMEWrappedMeter.h"
 #include "medVMEPolylineGraph.h"
 #include "medVMEPolylineEditor.h"
+#include "medVMEMaps.h"
 
 #include "medVMESurfaceEditor.h"
 #include "medVMELabeledVolume.h"
@@ -85,6 +86,7 @@ medVMEFactory::medVMEFactory()
 	mafPlugNodeMacro(medVMEPolylineEditor,"VME for Editing Graph and Polyline");
  	mafPlugNodeMacro(medVMESurfaceEditor,"VME for Editing Surface");
   mafPlugNodeMacro(medVMELabeledVolume,"VME representing a label put on a volume");
+  mafPlugNodeMacro(medVMEMaps, "VME representing density-distace surface scalars");
 
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");
