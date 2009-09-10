@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-01 13:05:40 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2009-09-10 11:54:02 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -115,7 +115,7 @@ bool mafOpAddLandmark::Accept(mafNode *node)
 	}
 
 	m_PickingActiveFlag = false;
-  return false;
+  return true; //accept all other vmes
 }
 //----------------------------------------------------------------------------
 // Widgets ID's
