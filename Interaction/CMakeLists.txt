@@ -20,6 +20,8 @@ SET(PROJECT_SRCS
   medGizmoPolylineGraph.h
   medDeviceButtonsPadMouseDialog.h
   medDeviceButtonsPadMouseDialog.cpp
+  medGUITransformSliders.cpp
+  medGUITransformSliders.h
   
   ##### Introduced with VolumeLarge - to be committed down ###
   mafGizmoROI_BES.cpp
