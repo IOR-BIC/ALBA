@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-08-26 14:47:27 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-14 16:40:38 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -59,8 +59,9 @@
 #include "mafGUIDialog.h"
 #include "mafGUIValidator.h"
 #include "mafGUIButton.h"
+#include "vtkRectilinearGrid.h"
 
-
+#include "vtkImageData.h"
 //#include "vtkStructuredPointsToPolyDataFilter.h"
 //#include "medPointsFilter.h"
 
@@ -622,16 +623,16 @@ bool medPipeVectorFieldGlyphs::AddItem(){
 	{
 		dValue1 = m_sr[0];
 	}*/
-	if (fabs(dValue2 - m_sr[1]) < 0.00005)
+	if (fabs(dValue2 - m_Sr[1]) < 0.00005)
 	{
-		dValue2 = m_sr[1];
+		dValue2 = m_Sr[1];
 	}
-	if (fabs(dValue1- m_sr[0]) < 0.00005)
+	if (fabs(dValue1- m_Sr[0]) < 0.00005)
 	{
-		dValue1 = m_sr[0];
+		dValue1 = m_Sr[0];
 	}
 
-	if (dValue1<=dValue2 && dValue1>=m_sr[0] && dValue2<=m_sr[1] )
+	if (dValue1<=dValue2 && dValue1>=m_Sr[0] && dValue2<=m_Sr[1] )
 	{
 		FILTER_ITEM* pItem = new FILTER_ITEM;
 		memset(pItem, 0, sizeof(FILTER_ITEM));
@@ -680,12 +681,12 @@ void medPipeVectorFieldGlyphs::createAddItemDlg(){
 	textNameValue->SetValidator(mafGUIValidator(this, ID_RANGE_NAME, textNameValue, &m_FilterName));
 
 	//-----------------filter value1----------------
-	m_FilterValue1 = wxString::Format("%.4f",m_sr[0]);
+	m_FilterValue1 = wxString::Format("%.4f",m_Sr[0]);
 	wxStaticText *textValue1Name = new wxStaticText(m_AddItemDlg,wxID_ANY,label2,wxPoint(0,0),wxSize(50,20));
 	wxTextCtrl   *textValue1Value = new wxTextCtrl(m_AddItemDlg,ID_RANGE_VALUE1,"",wxPoint(0,0), wxSize(50,20),wxNO_BORDER);
 	textValue1Value->SetValidator(mafGUIValidator(this, ID_RANGE_VALUE1, textValue1Value, &m_FilterValue1));
 	//-----------------filter value2----------------
-	m_FilterValue2 = wxString::Format("%.4f",m_sr[1]);
+	m_FilterValue2 = wxString::Format("%.4f",m_Sr[1]);
 	wxStaticText *textValue2Name = new wxStaticText(m_AddItemDlg,wxID_ANY,label3,wxPoint(0,0),wxSize(50,20));
 	wxTextCtrl   *textValue2Value = new wxTextCtrl(m_AddItemDlg,ID_RANGE_VALUE2,"",wxPoint(0,0), wxSize(50,20),wxNO_BORDER);
 	textValue2Value->SetValidator(mafGUIValidator(this, ID_RANGE_VALUE2, textValue2Value, &m_FilterValue2));
@@ -774,66 +775,139 @@ void medPipeVectorFieldGlyphs::doFilter(double *rangeValue){
 	tensors = vtkFloatArray::New() ;
 	tensors->SetNumberOfComponents(9) ;
 	tensors->SetName("tensors") ;
+	double *pCoord;
+	float xValue,yValue,zValue;
+	double xDvalue,yDvalue,zDvalue;
 
-	vtkStructuredPoints *orgData =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
-
+	
+	vtkDataSet *orgData = m_Vme->GetOutput()->GetVTKData();
 	vtkPointData *allPoints = orgData->GetPointData();
 	vtkDataArray *old_scalars = allPoints->GetScalars();
 	vtkDataArray *old_vectors = allPoints->GetVectors();
 	vtkDataArray *old_tensors = allPoints->GetTensors();
 
 	vtkDataArray *allArray = allPoints->GetScalars();
-
 	int nPoints = allArray->GetSize();
-	double origin[3],spacing[3];
-	int dim[3],increment[3];
-	orgData->GetOrigin(origin) ;
-	orgData->GetSpacing(spacing) ;
-	orgData->GetDimensions(dim);
-	orgData->GetIncrements(increment);
-
-	double *pCoord;
-	//mafString logFname2 = "coordFile.txt";//if debug
-	//std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
-	//outputFile2.clear();//if debug
-	//outputFile2<<"-----------------------------------------------"<<std::endl;//if debug
-
 	int idx,num=0 ;
-	if (nPoints>0)
-	{
-		for (int iz=0;iz<dim[2];iz++)
+
+	if(orgData->IsA("vtkRectilinearGrid")){
+		
+		
+		//vtkImageData* pImgData = GetImageData(orgDataR);
+		
+		mafString logFname2 = "coordFile.txt";//if debug
+		std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
+		outputFile2.clear();//if debug
+		outputFile2<<"---------------begin--------------------------------"<<std::endl;//if debug
+		int dim[3];
+
+		vtkRectilinearGrid *orgDataR = vtkRectilinearGrid::SafeDownCast(orgData);
+		vtkFloatArray *xCoord = vtkFloatArray::SafeDownCast(orgDataR->GetXCoordinates());//@todo
+		vtkFloatArray *yCoord = vtkFloatArray::SafeDownCast(orgDataR->GetYCoordinates());
+		vtkFloatArray *zCoord = vtkFloatArray::SafeDownCast(orgDataR->GetZCoordinates());
+		//-----------test code ------------------
+		orgDataR->GetDimensions(dim);
+		int numberOfTuple = old_scalars->GetNumberOfTuples();
+		float  fMin,fMax;
+		
+		if (nPoints>0)
 		{
-			for (int iy=0;iy<dim[1];iy++)
+			for (int iz=0;iz<dim[2];iz++)
 			{
-				for (int ix=0;ix<dim[0];ix++)
+				for (int iy=0;iy<dim[1];iy++)
 				{
-					idx = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
-					//double tmpScale = old_scalars->GetTuple1(idx);
-					pCoord = allPoints->GetTuple(idx);
-					//double tmpScale =  sqrt(pCoord[0]*pCoord[0]+pCoord[1]*pCoord[1]+pCoord[2]*pCoord[2]);	 
-					double *vet = old_vectors->GetTuple3(idx);
-					double tmpScale =  sqrt(vet[0]*vet[0]+vet[1]*vet[1]+vet[2]*vet[2]);
-					
-					if (tmpScale>=dMin && tmpScale<=dMax)
-				 {
-					 pCoord[0] = origin[0] + pCoord[0] + ix * spacing[0];
-					 pCoord[1] = origin[1] + pCoord[1] + iy * spacing[1];
-					 pCoord[2] = origin[2] + pCoord[2] + iz * spacing[2];
-								 
-					 points->InsertNextPoint(pCoord);
-					 scalars->InsertNextTuple((float*)&tmpScale);
+					for (int ix=0;ix<dim[0];ix++)
+					{
+						idx = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
+						
+						outputFile2<< "  tmpScale="<<old_scalars->GetTuple1(idx)<<std::endl;//if debug
+						
+						xDvalue = old_vectors->GetTuple3(idx)[0];
+						yDvalue = old_vectors->GetTuple3(idx)[1];
+						zDvalue = old_vectors->GetTuple3(idx)[2];
+						float tmpScale = sqrt(xDvalue*xDvalue + yDvalue*yDvalue + zDvalue*zDvalue);
+						double oldSvalue = old_scalars->GetTuple1(idx);
 
-					 //outputFile2<< "  tmpScale="<<tmpScale<<"  x:"<<pCoord[0]<<"   y:"<<pCoord[1]<<"  z:"<<pCoord[2]<<std::endl;//if debug
+						if (tmpScale>=dMin && tmpScale<=dMax)
+						{
 
-					 vectors->InsertNextTuple(vet);
-					 tensors->InsertNextTuple(old_tensors->GetTuple9(idx));
-					 num++;
-				 }
+							pCoord = allPoints->GetTuple(idx);
+
+							pCoord[0] = xCoord->GetValue(ix);
+							pCoord[1] = yCoord->GetValue(iy);
+							pCoord[2] = zCoord->GetValue(iz);
+
+							points->InsertNextPoint(pCoord);
+							vectors->InsertNextTuple(old_vectors->GetTuple3(idx));
+							scalars->InsertNextTuple((float*)&oldSvalue);
+							num++;
+
+						}
+					}
 				}
 			}
+			
 		}
-
+		outputFile2.close();//if debug
 	}
+	else if (orgData->IsA("vtkStructuredPoints") || orgData->IsA("vtkImageData"))
+	{
+		vtkStructuredPoints *orgDataS =vtkStructuredPoints::SafeDownCast(orgData) ;
+		double origin[3],spacing[3];
+		int dim[3],increment[3];
+		orgDataS->GetOrigin(origin) ;
+		orgDataS->GetSpacing(spacing) ;
+		orgDataS->GetDimensions(dim);
+		orgDataS->GetIncrements(increment);
+
+		
+		//mafString logFname2 = "coordFile.txt";//if debug
+		//std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
+		//outputFile2.clear();//if debug
+		//outputFile2<<"-----------------------------------------------"<<std::endl;//if debug
+
+		
+		if (nPoints>0)
+		{
+			for (int iz=0;iz<dim[2];iz++)
+			{
+				for (int iy=0;iy<dim[1];iy++)
+				{
+					for (int ix=0;ix<dim[0];ix++)
+					{
+						idx = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
+						//double tmpScale = old_scalars->GetTuple1(idx);
+						pCoord = allPoints->GetTuple(idx);
+						//double tmpScale =  sqrt(pCoord[0]*pCoord[0]+pCoord[1]*pCoord[1]+pCoord[2]*pCoord[2]);	 
+						double *vet = old_vectors->GetTuple3(idx);
+						double tmpScale =  sqrt(vet[0]*vet[0]+vet[1]*vet[1]+vet[2]*vet[2]);
+
+						if (tmpScale>=dMin && tmpScale<=dMax)
+						{
+							pCoord[0] = origin[0] + pCoord[0] + ix * spacing[0];
+							pCoord[1] = origin[1] + pCoord[1] + iy * spacing[1];
+							pCoord[2] = origin[2] + pCoord[2] + iz * spacing[2];
+										 
+							points->InsertNextPoint(pCoord);
+							scalars->InsertNextTuple((float*)&tmpScale);
+
+							//outputFile2<< "  tmpScale="<<tmpScale<<"  x:"<<pCoord[0]<<"   y:"<<pCoord[1]<<"  z:"<<pCoord[2]<<std::endl;//if debug
+
+							vectors->InsertNextTuple(vet);
+							tensors->InsertNextTuple(old_tensors->GetTuple9(idx));
+							num++;
+						}
+					}
+				}
+			}
+
+		}
+	}//end of else if
+
+
+
+
+
 	scalars->Squeeze();
 	vectors->Squeeze();
 	tensors->Squeeze();
@@ -874,6 +948,88 @@ void medPipeVectorFieldGlyphs::doFilter(double *rangeValue){
 
 
 	
+}
+
+
+//------------------------------------------------------------------------
+//Converts the given rectilinear grid into a regular grid.
+//If the operation cannot be successfully completed (e.g., because
+//it is not allowed or it would needed sampling of data),
+//it returns NULL, otherwise it constructs a new object
+vtkImageData* medPipeVectorFieldGlyphs::GetImageData(vtkRectilinearGrid* pInput)
+//------------------------------------------------------------------------
+{
+
+
+	vtkFloatArray* pXYZ[3];
+	/*pXYZ[0] = vtkDoubleArray::SafeDownCast(pInput->GetXCoordinates());
+	pXYZ[1] = vtkDoubleArray::SafeDownCast(pInput->GetYCoordinates());
+	pXYZ[2] = vtkDoubleArray::SafeDownCast(pInput->GetZCoordinates());*/
+	
+	pXYZ[0] = vtkFloatArray::SafeDownCast(pInput->GetXCoordinates());
+	pXYZ[1] = vtkFloatArray::SafeDownCast(pInput->GetYCoordinates());
+	pXYZ[2] = vtkFloatArray::SafeDownCast(pInput->GetZCoordinates());
+
+	double sp[3];     //spacing
+	double origin[3]; //origin
+	for (int i = 0; i < 3; i++) 
+	{
+		if (pXYZ[i] == NULL || !DetectSpacing(pXYZ[i], &sp[i]))
+			return NULL;  //cannot continue
+
+		origin[i] = *(pXYZ[i]->GetPointer(0));
+	}
+
+	//we can convert it to image data
+	vtkImageData* pRet = vtkImageData::New();
+	pRet->SetDimensions(pInput->GetDimensions());
+	pRet->SetOrigin(origin);
+	pRet->SetSpacing(sp);
+
+	vtkDataArray *scalars = pInput->GetPointData()->GetScalars();
+	pRet->SetNumberOfScalarComponents(scalars->GetNumberOfComponents());
+	pRet->SetScalarType(scalars->GetDataType());
+	pRet->GetPointData()->SetScalars(scalars);
+	pRet->SetUpdateExtentToWholeExtent();
+
+	return pRet;
+}
+
+//------------------------------------------------------------------------
+//Detects spacing in the given array of coordinates.
+//It returns false, if the spacing between values is non-uniform
+bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOutSpacing)
+//------------------------------------------------------------------------
+{
+	int nCount = pCoords->GetNumberOfTuples();
+	if (nCount <= 1)        //one slice
+	{
+		*pOutSpacing = 1.0;
+		return true;
+	}
+
+	//at least 2 slices => detect min and max spacing
+	float* pData = pCoords->GetPointer(0);  
+	double dblMin, dblMax;
+	dblMax = dblMin = pData[1] - pData[0];
+
+	for (int i = 2; i < nCount; i++)
+	{
+		double dblSp = pData[i] - pData[i - 1];    
+		if (dblSp < dblMin)
+			dblMin = dblSp;
+		else if (dblSp > dblMax)
+			dblMax = dblSp;
+	}
+
+	//if the difference between min and max spacing is insignificant,
+	//then we can assume the coordinates have uniform spacing
+	*pOutSpacing = (pData[nCount - 1] - pData[0]) / nCount;
+	if ((dblMax - dblMin) / *pOutSpacing <= 1e-3)  
+		return true;  
+
+	*pOutSpacing = 0.0;
+	return false;
 }
 
 //------------------------------------------------------------------------
@@ -994,7 +1150,7 @@ void medPipeVectorFieldGlyphs::doFilter(double *rangeValue){
   {
 	  if (medPipeVectorFieldGlyphs::count==1)
 	  {
-		da->GetRange(m_sr);
+		da->GetRange(m_Sr);
 	  }
 	  
 	  da->GetRange(sr);

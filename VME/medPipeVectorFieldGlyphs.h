@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-08-26 14:47:40 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-14 16:40:38 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -32,6 +32,10 @@ class vtkScalarBarActor;
 class vtkPolyData;
 class mafGUIDialog;
 class mafGUIButton;
+class vtkImageData;
+class vtkRectilinearGrid;
+//class vtkDoubleArray;
+class vtkFloatArray;
 
 /** General class for Volumes with compound pipes */
 class medPipeVectorFieldGlyphs : public medPipeVectorField
@@ -115,7 +119,7 @@ protected:
   wxString m_FilterName;
   wxString m_FilterValue1;
   wxString m_FilterValue2;
-  double m_sr[2];
+  double m_Sr[2];
   int m_ShowAll;                     //1 do not use filter,0 use filter
 
 #pragma region GUI controls
@@ -173,6 +177,8 @@ protected:
   /** Handles change of material. */
   virtual void OnChangeMaterial(); 
 
+  vtkImageData* GetImageData(vtkRectilinearGrid* pInput);
+  bool DetectSpacing(vtkFloatArray* pCoords, double* pOutSpacing);
 
 };
 #endif // medPipeVectorFieldGlyphs_h__

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldSurface.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-08-26 14:47:12 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2009-09-14 16:40:26 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -70,8 +70,8 @@ protected:
   vtkActor* m_SurfaceActor;            ///<actor for glyphs  
 
   wxComboBox* m_ComboColorBy;           ///<combo box with list of components
-  double m_covariance[3][3] ;
-  double m_lambda[3] ;
+  double m_Covariance[3][3] ;
+  double m_Lambda[3] ;
   double m_V[3][3] ;
 public:	
   medPipeTensorFieldSurface();
