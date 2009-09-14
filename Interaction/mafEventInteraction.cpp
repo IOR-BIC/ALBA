@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-07-14 17:42:28 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-09-14 12:02:20 $
+  Version:   $Revision: 1.5.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -126,6 +126,7 @@ void mafEventInteraction::DeepCopy(const mafEventBase *event)
     const_maf_interaction_event *e=(const_maf_interaction_event *)event;
     
     Superclass::DeepCopy(e);
+    m_Button=e->m_Button;
     m_Matrix=e->m_Matrix;
     m_XYFlag=e->m_XYFlag;
     m_X=e->m_X;;
