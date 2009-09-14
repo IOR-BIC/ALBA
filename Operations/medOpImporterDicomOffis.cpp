@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-08-27 12:19:44 $
-Version:   $Revision: 1.1.2.43 $
+Date:      $Date: 2009-09-14 13:57:10 $
+Version:   $Revision: 1.1.2.44 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1009,7 +1009,6 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
         progress = progressCounter * 100 / totalNumberOfImages;
         mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
       }
-
       if (targetVolumeSliceId == n_slices) {break;}
 
       // show the current slice
@@ -1026,6 +1025,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     }
     accumulate->Update();
 
+  
     vtkMAFSmartPointer<vtkRectilinearGrid> rg_out;
     rg_out->DeepCopy(accumulate->GetOutput());
     rg_out->Update();
@@ -1061,6 +1061,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     }
 
     m_Volume->SetDataByDetaching(rg_out,tsDouble);
+    m_Volume->Update();
 
     if(m_ResampleFlag == TRUE)
     {
@@ -2377,23 +2378,42 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[3],3);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
-      // comment by achiarini: why ImageOrientationPatient from 6 to 8 are not retrieved (and checked?)
-      // I am not sure that the below check is wrong, I expect that three cosin are 1.0 and the other three are 0.0
-
-
-
 
       // check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
-      /*m_IsRotated = !( \
-                        (imageOrientationPatient[0] == 1.0) && \
-                        (imageOrientationPatient[4] == imageOrientationPatient[0]) &&\
-                        (imageOrientationPatient[1] == 0.0) &&\
-                        (imageOrientationPatient[1] == imageOrientationPatient[2]) &&\
-                        (imageOrientationPatient[1] == imageOrientationPatient[3]) &&\
-                        (imageOrientationPatient[1] == imageOrientationPatient[5]) \
-                        );*/
+      /* FROM David Clunie's note
+      2.2.2 Orientation of DICOM images
+      Another question that is frequently asked in comp.protocols.dicom is how to determine which side of an image is which 
+      (e.g. left, right) and so on. The short answer is that for projection radiographs this is specified explicitly using 
+      the Patient Orientation attribute, and for cross-sectional images it needs to be derived from the Image Orientation (Patient)
+      direction cosines. In the standard these are explained as follows:
 
-      for (int i = 0;(sliceNum == 0) && i < 6; i++)
+      "C.7.6.1.1.1 Patient Orientation. The Patient Orientation (0020,0020) relative to the image plane shall be specified by two values 
+      that designate the anatomical direction of the positive row axis (left to right) and the positive column axis (top to bottom).
+      The first entry is the direction of the rows, given by the direction of the last pixel in the first row from the first pixel
+      in that row. The second entry is the direction of the columns, given by the direction of the last pixel in the first column from 
+      the first pixel in that column. Anatomical direction shall be designated by the capital letters: A (anterior), P (posterior),
+      R (right), L (left), H (head), F (foot). Each value of the orientation attribute shall contain at least one of these characters.
+      If refinements in the orientation descriptions are to be specified, then they shall be designated by one or two additional letters
+      in each value. Within each value, the letters shall be ordered with the principal orientation designated in the first character." 
+      "C.7.6.2.1.1 Image Position And Image Orientation. The Image Position (0020,0032) specifies the x, y, and z coordinates of the upper 
+      left hand corner of the image; it is the center of the first voxel transmitted. Image Orientation (0020,0037) specifies the direction 
+      cosines of the first row and the first column with respect to the patient. These Attributes shall be provide as a pair. Row value for 
+      the x, y, and z axes respectively followed by the Column value for the x, y, and z axes respectively. The direction of the axes is 
+      defined fully by the patient's orientation. The x-axis is increasing to the left hand side of the patient. The y-axis is increasing 
+      to the posterior side of the patient. The z-axis is increasing toward the head of the patient. The patient based coordinate system 
+      is a right handed system, i.e. the vector cross product of a unit vector along the positive x-axis and a unit vector along the 
+      positive y-axis is equal to a unit vector along the positive z-axis." */
+
+      m_IsRotated  =  m_IsRotated || !( \
+      fabs(imageOrientationPatient[0] - 1.0) < 0.0001 && \
+      fabs(imageOrientationPatient[4] - imageOrientationPatient[0]) < 0.0001 &&\
+      fabs(imageOrientationPatient[1] - 0.0) < 0.0001 &&\
+      fabs(imageOrientationPatient[1] - imageOrientationPatient[2]) < 0.0001 &&\
+      fabs(imageOrientationPatient[1] - imageOrientationPatient[3]) < 0.0001 &&\
+      fabs(imageOrientationPatient[1] - imageOrientationPatient[5]) < 0.0001 \
+      );
+
+      /*for (int i = 0;(sliceNum == 0) && i < 6; i++)
         {
             firstImageOrientationPatient[i] = imageOrientationPatient[i];
         }
@@ -2401,43 +2421,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       for (int i = 0; (sliceNum > 0) && m_ConstantRotation && (i < 6); i++)
         {
             m_ConstantRotation = (firstImageOrientationPatient[i] == imageOrientationPatient[i]);
-        }
+        }*/
       
-
-      m_IsRotated  =  m_IsRotated || !( \
-                        (imageOrientationPatient[0] == 1.0) && \
-                        (imageOrientationPatient[4] == imageOrientationPatient[0]) &&\
-                        (imageOrientationPatient[1] == 0.0) &&\
-                        (imageOrientationPatient[1] == imageOrientationPatient[2]) &&\
-                        (imageOrientationPatient[1] == imageOrientationPatient[3]) &&\
-                        (imageOrientationPatient[1] == imageOrientationPatient[5]) \
-                        );
-
-
-
-      //if (!m_IsRotated)
-      //{
-      //  for (int i = 0; i < 6; i++)
-      //  {
-      //    if (i != 0 && i != 4)
-      //    {
-      //      if(imageOrientationPatient[i] != 0) //values for non-rotated image are 1,0,0,0,1,0
-      //      {
-      //        m_IsRotated = true;
-      //        break;
-      //      }
-      //    }
-      //    else
-      //    {
-      //      if (imageOrientationPatient[i] != 1)
-      //      {
-      //        m_IsRotated = true;
-      //        break;
-      //      }     
-      //    }
-      //  }
-      //}
-
 
       double spacing[3];
       spacing[2] = 0;
@@ -2928,8 +2913,8 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1])));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
-		clip->SetOrigin(crop_bounds[0], crop_bounds[2], Origin[m_SortAxes]);	//modified by Paolo 12-11-2003
-		clip->SetSpacing(spacing[0], spacing[1], 0);
+		clip->SetOrigin(crop_bounds[0], crop_bounds[2], loc[m_SortAxes]);// Origin[m_SortAxes]);	
+    clip->SetSpacing(spacing[0], spacing[1], 0);
 		clip->SetDimensions(dim_x_clip, dim_y_clip, 1);
 		clip->Update();
 
@@ -2958,6 +2943,7 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetScalarRange(range);
 		m_SliceTexture->SetInput(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
 	}
+
 
 	m_SliceTexture->Modified();
 
