@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataProvider.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-14 15:55:39 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -47,7 +47,7 @@ protected:
 
 protected:
 	//General tags
-	vtkFieldData* TagArray;
+	vtkFieldData* m_TagArray;
 
 	//descriptor of data
 	typedef std::vector< DALD > DescriptorVector;
@@ -67,7 +67,7 @@ protected:
   bool DefaultLayout;
 
 	//the size of header in bytes (before the first data array - it will be skipped)
-	vtkIdType64 HeaderSize;
+	vtkIdType64 m_HeaderSize;
 
   //global offsets
   vtkTimeStamp m_OffsetsComputeTime;
@@ -86,13 +86,13 @@ public:
 
 	//Get/Sets the header size (in bytes) - only for Default Layout
 	inline virtual vtkIdType64 GetHeaderSize() {
-		return HeaderSize;
+		return m_HeaderSize;
 	}
 
 	inline virtual void SetHeaderSize(vtkIdType64 header) 
 	{
-		if (HeaderSize != header) {
-			HeaderSize = header;
+		if (m_HeaderSize != header) {
+			m_HeaderSize = header;
 			this->Modified();
 		}
 	}
@@ -100,7 +100,7 @@ public:
 	//Returns an array of tags associated with the given data (i.e., name of file, URL,
 	//configurations, etc.
 	inline virtual vtkFieldData* GetTagArray() {
-		return TagArray;
+		return m_TagArray;
 	}
 	
 public:

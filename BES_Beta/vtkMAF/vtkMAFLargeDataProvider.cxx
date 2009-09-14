@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataProvider.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-14 15:55:39 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -22,16 +22,16 @@
 
 
 
-vtkCxxRevisionMacro(vtkMAFLargeDataProvider, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFLargeDataProvider, "$Revision: 1.1.2.2 $");
 
 #include "mafMemDbg.h"
 #include <assert.h>
 
 vtkMAFLargeDataProvider::vtkMAFLargeDataProvider()
 {
-	TagArray = vtkFieldData::New();
+	m_TagArray = vtkFieldData::New();
 	
-	HeaderSize = 0;
+	m_HeaderSize = 0;
 	SwapBytes = false;
   DefaultLayout = true;
 
@@ -40,7 +40,7 @@ vtkMAFLargeDataProvider::vtkMAFLargeDataProvider()
 
 vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider() 
 {
-	TagArray->Delete();	
+	m_TagArray->Delete();	
 	InitializeDescriptors();
 }
 
@@ -996,7 +996,7 @@ void vtkMAFLargeDataProvider::InternalDataCopy(vtkMAFLargeDataProvider *src)
 	memcpy(this->m_SpecDescPos, src->m_SpecDescPos, sizeof(m_SpecDescPos));
 	this->m_OffsetsComputeTime = src->m_OffsetsComputeTime;
 	this->SwapBytes = src->SwapBytes;
-	this->HeaderSize = src->HeaderSize;
+	this->m_HeaderSize = src->m_HeaderSize;
   this->DefaultLayout = src->DefaultLayout;
 
 	for (StringToIntMap::iterator it = src->m_DescriptorsMap.begin();

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFFileDataProvider.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-14 15:55:39 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -16,7 +16,7 @@
 #include "vtkMAFFileDataProvider.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMAFFileDataProvider, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFFileDataProvider, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFFileDataProvider);
 
 #include "mafMemDbg.h"
@@ -24,14 +24,14 @@ vtkStandardNewMacro(vtkMAFFileDataProvider);
 //ctor / dtor
 vtkMAFFileDataProvider::vtkMAFFileDataProvider() 
 {
-	this->FileName = NULL;	
-  this->File = NULL;
+	this->m_FileName = NULL;	
+  this->m_File = NULL;
 }
 
 vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
 { 
 	CloseFile();
-	delete[] this->FileName;
+	delete[] this->m_FileName;
 }
 
 
@@ -43,13 +43,13 @@ vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
 {
 	CloseFile();	//close the current underlaying file
 	
-	this->File = fhandle;
+	this->m_File = fhandle;
   if (fhandle != NULL)
     fhandle->Register(this);
 
 	if (fname != NULL) {
-		this->FileName = new char[strlen(fname) + 1];
-		strcpy(this->FileName, fname);
+		this->m_FileName = new char[strlen(fname) + 1];
+		strcpy(this->m_FileName, fname);
 	}
 
 	this->CloseAttachedFile = bAutoClose;
@@ -59,11 +59,11 @@ vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
 //Detaches the underlaying file
 /*virtual*/ vtkMAFFile* vtkMAFFileDataProvider::DetachFile() 
 {
-	vtkMAFFile* ret = File;
-	File = NULL;
+	vtkMAFFile* ret = m_File;
+	m_File = NULL;
 
-	delete[] FileName;
-	FileName = NULL;
+	delete[] m_FileName;
+	m_FileName = NULL;
 	return ret;
 }
 
@@ -96,7 +96,7 @@ vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
   }
 
 	AttachFile(f, fname, true, bDeleteOnClose);
-	this->Attached = false;
+	this->m_Attached = false;
   f->Delete();  //AttachFile increased reference
 	return true;
 }
@@ -104,22 +104,22 @@ vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
 //Closes the underlaying file.
 /*virtual*/ void vtkMAFFileDataProvider::CloseFile()
 {
-	if (this->File != NULL)
+	if (this->m_File != NULL)
 	{
-		if (!this->Attached || this->CloseAttachedFile) {
-			this->File->Close();
+		if (!this->m_Attached || this->CloseAttachedFile) {
+			this->m_File->Close();
 
 			if (this->DeleteOnClose)
 #pragma warning(suppress: 6031) // warning C6031: Return value ignored: '_unlink'
-				_unlink(FileName);
+				_unlink(m_FileName);
 		}
 
-    this->File->UnRegister(this);
-		this->File = NULL;
+    this->m_File->UnRegister(this);
+		this->m_File = NULL;
 	}
 
-	delete[] FileName;
-	FileName = NULL;
+	delete[] m_FileName;
+	m_FileName = NULL;
 }
 
 
@@ -132,7 +132,7 @@ vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
 	if (!Seek(startOffset))
 		return 0;
 
-	return this->File->Read(buffer, count);
+	return this->m_File->Read(buffer, count);
 }
 
 //Copies the binary data from the given buffer into the underlaying data set at
@@ -145,11 +145,11 @@ vtkMAFFileDataProvider::~vtkMAFFileDataProvider()
 	if (!Seek(startOffset))
 		return 0;
 
-	return this->File->Write(buffer, count);
+	return this->m_File->Write(buffer, count);
 }
 
 //Seeks the underlaying file
 /*virtual*/ bool vtkMAFFileDataProvider::Seek(vtkIdType64 startOffset)
 {
-  return this->File->Seek(startOffset);	 
+  return this->m_File->Seek(startOffset);	 
 }

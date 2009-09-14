@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeImageData.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-14 15:55:39 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -79,7 +79,7 @@ public:
 	// NB: THIS OPERATION MAY BE VERY SLOW
 	virtual void GetCellPoints(vtkIdType64 cellId, vtkIdList *ptIds) {
 		vtkStructuredData::GetCellPoints(cellId, ptIds,
-			this->DataDescription, this->GetDimensions());
+			this->m_DataDescription, this->GetDimensions());
 	}
 
 	// Description:
@@ -177,7 +177,7 @@ public:
 	// Description:
 	// Return the dimensionality of the data.
 	inline int GetDataDimension() {
-		return vtkStructuredData::GetDataDimension(this->DataDescription);
+		return vtkStructuredData::GetDataDimension(this->m_DataDescription);
 	}
 
 	// Description:
@@ -215,17 +215,17 @@ public:
 	// up to date.
 	inline vtkIdType64 *GetIncrements() {
 		this->ComputeIncrements();
-		return this->Increments;
+		return this->m_Increments;
 	}
 
 	inline void GetIncrements(vtkIdType64 &incX, vtkIdType64 &incY, vtkIdType64 &incZ) {
-		this->ComputeIncrements(); incX = this->Increments[0];
-		incY = this->Increments[1];	incZ = this->Increments[2];
+		this->ComputeIncrements(); incX = this->m_Increments[0];
+		incY = this->m_Increments[1];	incZ = this->m_Increments[2];
 	}
 
 	inline void GetIncrements(vtkIdType64 inc[3]) {
-		this->ComputeIncrements(); inc[0] = this->Increments[0]; 
-		inc[1] = this->Increments[1]; inc[2] = this->Increments[2];
+		this->ComputeIncrements(); inc[0] = this->m_Increments[0]; 
+		inc[1] = this->m_Increments[1]; inc[2] = this->m_Increments[2];
 	}
 
 	// Description:
@@ -342,9 +342,9 @@ protected:
 	// The extent of what is currently in the structured grid.
 	// Dimensions is just an array to return a value.
 	// Its contents are out of data until GetDimensions is called.
-	int Dimensions[3];
-	int DataDescription;
-	vtkIdType64 Increments[3];
+	int m_Dimensions[3];
+	int m_DataDescription;
+	vtkIdType64 m_Increments[3];
 
 	double Origin[3];
 	double Spacing[3];

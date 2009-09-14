@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFFileDataProvider.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-14 15:55:39 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -21,26 +21,26 @@
 class VTK_COMMON_EXPORT vtkMAFFileDataProvider : public vtkMAFLargeDataProvider
 {	
 protected:
-  vtkMAFFile* File;				  //<file source, 								
-	char* FileName;				    //<file name	
-	bool Attached;				    //<true, if the file is attached
+  vtkMAFFile* m_File;				  //<file source, 								
+	char* m_FileName;				    //<file name	
+	bool m_Attached;				    //<true, if the file is attached
 	bool CloseAttachedFile;		//<true if the attached file should be closed
 	bool DeleteOnClose;			  //<true if the file should be deleted
 
 public:
 	//returns filename (the returned pointer may not be released)
 	inline const char* GetFileName() {
-		return FileName;
+		return m_FileName;
 	}
 
 	//returns the underlaying file handle
 	inline vtkMAFFile* GetFile() {
-		return File;
+		return m_File;
 	}
 
 	//returns true, if the file is attached
 	inline bool IsAttached() {
-		return Attached;
+		return m_Attached;
 	}
 
 	//Get/Set if attached files can be closed

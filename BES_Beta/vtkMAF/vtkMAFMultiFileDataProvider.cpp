@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFMultiFileDataProvider.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-14 15:55:39 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -14,20 +14,20 @@
 #include "vtkMAFMultiFileDataProvider.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMAFMultiFileDataProvider, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFMultiFileDataProvider, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFMultiFileDataProvider);
 
 #include "mafMemDbg.h"
 
 vtkMAFMultiFileDataProvider::vtkMAFMultiFileDataProvider(void)
 {
-  HeaderSize2 = 0;
-  m_pFDHead = m_pFDTail = m_pFDLastUsed = NULL;
-  InternalFileName = NULL;
-  FilePattern = NULL;
-  FileNameSliceOffset = 0;
-  FileNameSliceSpacing = 1;
-  ReadOnly = true;
+  m_HeaderSize2 = 0;
+  m_PFDHead = m_PFDTail = m_PFDLastUsed = NULL;
+  m_InternalFileName = NULL;
+  m_FilePattern = NULL;
+  m_FileNameSliceOffset = 0;
+  m_FileNameSliceSpacing = 1;
+  m_ReadOnly = true;
   DeleteOnClose = false;    
 }
 
@@ -60,51 +60,51 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
   CloseMultiFile();
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-  FilePattern = _strdup(szFilePattern);
+  m_FilePattern = _strdup(szFilePattern);
 #else
   int nLen = (int)strlen(szFilePattern);
-  FilePattern = new char[nLen + 1];
-  strcpy(FilePattern, szFilePattern);
+  m_FilePattern = new char[nLen + 1];
+  strcpy(m_FilePattern, szFilePattern);
 #endif
 
-  FileNameSliceOffset = nFileNameSliceOffset;
-  FileNameSliceSpacing = nFileNameSliceSpacing;
-  ReadOnly = bOpenForRO;
+  m_FileNameSliceOffset = nFileNameSliceOffset;
+  m_FileNameSliceSpacing = nFileNameSliceSpacing;
+  m_ReadOnly = bOpenForRO;
   DeleteOnClose = bDeleteOnClose;
 
   for (int i = 0; i < nFileCount; i++)
   {
-    m_pFDLastUsed = new FILE_DESC;
-    memset(m_pFDLastUsed, 0, sizeof(*m_pFDLastUsed));
+    m_PFDLastUsed = new FILE_DESC;
+    memset(m_PFDLastUsed, 0, sizeof(*m_PFDLastUsed));
 
-    if (m_pFDTail != NULL)
-      m_pFDTail->pNext = m_pFDLastUsed;
+    if (m_PFDTail != NULL)
+      m_PFDTail->pNext = m_PFDLastUsed;
     else
-      m_pFDHead = m_pFDLastUsed;
-    m_pFDLastUsed->pLast = m_pFDTail;
-    m_pFDTail = m_pFDLastUsed;
+      m_PFDHead = m_PFDLastUsed;
+    m_PFDLastUsed->pLast = m_PFDTail;
+    m_PFDTail = m_PFDLastUsed;
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-    m_pFDLastUsed->szFileName = _strdup(GetInternalFileName(i));
+    m_PFDLastUsed->szFileName = _strdup(GetInternalFileName(i));
 #else
     GetInternalFileName(i); //force construction of InternalFileName
-    nLen = (int)strlen(InternalFileName);
-    m_pFDLastUsed->szFileName = new char[nLen + 1];
-    strcpy(m_pFDLastUsed->szFileName, InternalFileName);
+    nLen = (int)strlen(m_InternalFileName);
+    m_PFDLastUsed->szFileName = new char[nLen + 1];
+    strcpy(m_PFDLastUsed->szFileName, m_InternalFileName);
 #endif
 
-    m_pFDLastUsed->pFile = vtkMAFFile::New();
-    if (!m_pFDLastUsed->pFile->Open(m_pFDLastUsed->szFileName, ReadOnly))
+    m_PFDLastUsed->pFile = vtkMAFFile::New();
+    if (!m_PFDLastUsed->pFile->Open(m_PFDLastUsed->szFileName, m_ReadOnly))
     {
-      vtkWarningMacro(<< "Unable to open file: '" << m_pFDLastUsed->szFileName << "'");
+      vtkWarningMacro(<< "Unable to open file: '" << m_PFDLastUsed->szFileName << "'");
       return false; //error, unable to write file
     }
   }
 
-  if (InternalFileName != NULL)
+  if (m_InternalFileName != NULL)
   {
-    delete[] InternalFileName;
-    InternalFileName = NULL;
+    delete[] m_InternalFileName;
+    m_InternalFileName = NULL;
   }
 
   this->Modified();
@@ -116,37 +116,37 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
 /*virtual*/ void vtkMAFMultiFileDataProvider::CloseMultiFile()
 //------------------------------------------------------------------------
 {
-  while (m_pFDHead != NULL)
+  while (m_PFDHead != NULL)
   {
-    m_pFDLastUsed = m_pFDHead;
-    if (m_pFDLastUsed->pFile != NULL)
+    m_PFDLastUsed = m_PFDHead;
+    if (m_PFDLastUsed->pFile != NULL)
     {
-      m_pFDLastUsed->pFile->Delete();       //this will close the file as well
+      m_PFDLastUsed->pFile->Delete();       //this will close the file as well
       if (DeleteOnClose) {                  //temporary file, remove it
 #pragma warning(suppress: 6031) // warning C6031: Return value ignored: '_unlink'
-        _unlink(m_pFDLastUsed->szFileName);
+        _unlink(m_PFDLastUsed->szFileName);
       }
     }
 
-    if (m_pFDLastUsed->szFileName != NULL) {
-      delete[] m_pFDLastUsed->szFileName;
+    if (m_PFDLastUsed->szFileName != NULL) {
+      delete[] m_PFDLastUsed->szFileName;
     }
 
-    m_pFDHead = m_pFDHead->pNext;
-    delete m_pFDLastUsed;
+    m_PFDHead = m_PFDHead->pNext;
+    delete m_PFDLastUsed;
   }
-  m_pFDTail = m_pFDLastUsed = NULL;
+  m_PFDTail = m_PFDLastUsed = NULL;
 
-  if (FilePattern != NULL)
+  if (m_FilePattern != NULL)
   {
-    delete[] FilePattern;
-    FilePattern = NULL;
+    delete[] m_FilePattern;
+    m_FilePattern = NULL;
   }
 
-  if (InternalFileName != NULL)
+  if (m_InternalFileName != NULL)
   {
-    delete[] InternalFileName;
-    InternalFileName = NULL;
+    delete[] m_InternalFileName;
+    m_InternalFileName = NULL;
   }
 }
 
@@ -157,24 +157,24 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
 //------------------------------------------------------------------------
 {
   // delete any old filename
-  if (this->InternalFileName)
+  if (this->m_InternalFileName)
   {
-    delete [] this->InternalFileName;
-    this->InternalFileName = NULL;
+    delete [] this->m_InternalFileName;
+    this->m_InternalFileName = NULL;
   }
   
-  int slicenum = nFile * this->FileNameSliceSpacing + this->FileNameSliceOffset;       
-  int len = _scprintf(this->FilePattern, slicenum) + 1;        
-  this->InternalFileName = new char [len];  
+  int slicenum = nFile * this->m_FileNameSliceSpacing + this->m_FileNameSliceOffset;       
+  int len = _scprintf(this->m_FilePattern, slicenum) + 1;        
+  this->m_InternalFileName = new char [len];  
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-  sprintf_s(this->InternalFileName, len, 
+  sprintf_s(this->m_InternalFileName, len, 
 #else
-  sprintf(this->InternalFileName, 
+  sprintf(this->m_InternalFileName, 
 #endif            
-    this->FilePattern, slicenum);
+    this->m_FilePattern, slicenum);
 
-  return this->InternalFileName;
+  return this->m_InternalFileName;
 }
 
 //------------------------------------------------------------------------
@@ -188,15 +188,15 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
   //RELEASE NOTE: startOffset is already shifted by HeaderSize
   ComputeOffsets();
 
-  if (m_pFDLastUsed == NULL)
+  if (m_PFDLastUsed == NULL)
     return -1;  //fatal error
 
-  if (m_pFDLastUsed->nStartOffset <= startOffset)
+  if (m_PFDLastUsed->nStartOffset <= startOffset)
   {
     //search forward
-    while (m_pFDLastUsed->pNext != NULL &&
-      m_pFDLastUsed->pNext->nStartOffset <= startOffset) {
-        m_pFDLastUsed = m_pFDLastUsed->pNext;   //advance to the next
+    while (m_PFDLastUsed->pNext != NULL &&
+      m_PFDLastUsed->pNext->nStartOffset <= startOffset) {
+        m_PFDLastUsed = m_PFDLastUsed->pNext;   //advance to the next
     }
   }
   else
@@ -204,24 +204,24 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
     //search backward
     do
     {
-      m_pFDLastUsed = m_pFDLastUsed->pLast;
-      if (m_pFDLastUsed == NULL)
+      m_PFDLastUsed = m_PFDLastUsed->pLast;
+      if (m_PFDLastUsed == NULL)
         return -1;  //fatal error
     }
-    while (m_pFDLastUsed->nStartOffset > startOffset);
+    while (m_PFDLastUsed->nStartOffset > startOffset);
   }
 
   //m_pFDLastUsed now contains the description of file with startOffset
   int nBytesAvailable;
-  if (m_pFDLastUsed->pNext != NULL)
-    nBytesAvailable = m_pFDLastUsed->pNext->nStartOffset - startOffset;
+  if (m_PFDLastUsed->pNext != NULL)
+    nBytesAvailable = m_PFDLastUsed->pNext->nStartOffset - startOffset;
   else
     nBytesAvailable = INT_MAX;  //read as much as possible
   
   if (nBytesAvailable > count)
     nBytesAvailable = count;
   
-  if (!m_pFDLastUsed->pFile->Seek(startOffset + m_pFDLastUsed->nCorrection, SEEK_SET))
+  if (!m_PFDLastUsed->pFile->Seek(startOffset + m_PFDLastUsed->nCorrection, SEEK_SET))
     return -1;  //seek error!
 
   return nBytesAvailable;
@@ -239,24 +239,24 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
   //as Seek is called with startOffset that is already shifted by HeaderSize
   //there is no correction for the offset of the first file
   //for others, the correction = -nStartOffset + HeaderSize2    
-  vtkIdType64 nOfs = HeaderSize;
-  vtkIdType64 nCor = HeaderSize;
+  vtkIdType64 nOfs = m_HeaderSize;
+  vtkIdType64 nCor = m_HeaderSize;
   
-  m_pFDLastUsed = m_pFDHead;
-  while (m_pFDLastUsed != NULL)
+  m_PFDLastUsed = m_PFDHead;
+  while (m_PFDLastUsed != NULL)
   {
-    m_pFDLastUsed->nStartOffset = nOfs;
-    m_pFDLastUsed->nCorrection = nCor - nOfs;
+    m_PFDLastUsed->nStartOffset = nOfs;
+    m_PFDLastUsed->nCorrection = nCor - nOfs;
         
-    nOfs += (vtkIdType64)m_pFDLastUsed->pFile->GetFileSize() - nCor;
-    nCor = HeaderSize2;
+    nOfs += (vtkIdType64)m_PFDLastUsed->pFile->GetFileSize() - nCor;
+    nCor = m_HeaderSize2;
 
-    m_pFDLastUsed = m_pFDLastUsed->pNext;
+    m_PFDLastUsed = m_PFDLastUsed->pNext;
   }
 
-  m_pFDHead->nStartOffset = 0;     
+  m_PFDHead->nStartOffset = 0;     
 
-  m_pFDLastUsed = m_pFDHead;
+  m_PFDLastUsed = m_PFDHead;
   m_OffsetsComputeTime.Modified();
 }
 
@@ -278,7 +278,7 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
     if (nAvail <= 0)
       break;  //error
 
-    int nRead = m_pFDLastUsed->pFile->Read(pBuf, nAvail);
+    int nRead = m_PFDLastUsed->pFile->Read(pBuf, nAvail);
     if (nRead == 0)
       break;  //EOF
     
@@ -310,7 +310,7 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
     if (nAvail <= 0)
       break;  //error
 
-    int nWritten = m_pFDLastUsed->pFile->Write(pBuf, nAvail);
+    int nWritten = m_PFDLastUsed->pFile->Write(pBuf, nAvail);
     if (nWritten == 0)
       break;  //EOF
 

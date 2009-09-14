@@ -3,7 +3,7 @@
   File:    	 vtkMAFFile.h
   Language:  C++
   Date:      11:2:2008   12:36
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -32,9 +32,9 @@ class VTK_COMMON_EXPORT vtkMAFFile : public vtkObject
 {
 protected:
 #ifdef _WIN32
-  HANDLE m_hFile;   //associated file HANDLE
+  HANDLE m_HFile;   //associated file HANDLE
 #else
-  FILE* m_pFile;    //associated FILE
+  FILE* m_PFile;    //associated FILE
 #endif // _WIN32
 
 public:
@@ -44,9 +44,9 @@ public:
 protected:
   vtkMAFFile() {
 #ifdef _WIN32
-    m_hFile = INVALID_HANDLE_VALUE;
+    m_HFile = INVALID_HANDLE_VALUE;
 #else
-    m_pFile = NULL;
+    m_PFile = NULL;
 #endif // _WIN32
   }
 
@@ -103,16 +103,16 @@ public:
 inline void vtkMAFFile::Close()
 {
 #ifdef _WIN32
-  if (m_hFile != INVALID_HANDLE_VALUE)
+  if (m_HFile != INVALID_HANDLE_VALUE)
   {
-    CloseHandle(m_hFile);
-    m_hFile = INVALID_HANDLE_VALUE;
+    CloseHandle(m_HFile);
+    m_HFile = INVALID_HANDLE_VALUE;
   }
 #else
- if (m_pFile != NULL)
+ if (m_PFile != NULL)
   {
-    fclose(m_pFile);
-    m_pFile = NULL;
+    fclose(m_PFile);
+    m_PFile = NULL;
   }
 #endif // _WIN32
 }
@@ -123,12 +123,12 @@ inline int vtkMAFFile::Read(void* buffer, int count)
 {
 #ifdef _WIN32
   DWORD dwRead;
-  if (!ReadFile(m_hFile, buffer, (DWORD)count, &dwRead, NULL))
+  if (!ReadFile(m_HFile, buffer, (DWORD)count, &dwRead, NULL))
     dwRead = 0; //error => set dwRead to zero
 
   return (int)dwRead;
 #else
-  return fread(buffer, 1, count, m_pFile);
+  return fread(buffer, 1, count, m_PFile);
 #endif // _WIN32
 }
 
@@ -138,10 +138,10 @@ inline int vtkMAFFile::Write(void* buffer, int count)
 {
 #ifdef _WIN32
   DWORD dwWritten;
-  WriteFile(m_hFile, buffer, (DWORD)count, &dwWritten, NULL);
+  WriteFile(m_HFile, buffer, (DWORD)count, &dwWritten, NULL);
   return (int)dwWritten;
 #else
-  return fwrite(buffer, 1, count, m_pFile);
+  return fwrite(buffer, 1, count, m_PFile);
 #endif // _WIN32
 }
 
@@ -149,10 +149,10 @@ inline int vtkMAFFile::Write(void* buffer, int count)
 inline bool vtkMAFFile::Seek(long long pos, int origin)
 {
 #ifdef _WIN32  
-  return FALSE != SetFilePointerEx(m_hFile, 
+  return FALSE != SetFilePointerEx(m_HFile, 
       *((LARGE_INTEGER*)&pos), NULL, (DWORD)origin);  
 #else
-  return fseeko64( m_pFile, (off64_t)pos, origin ) >= 0;  
+  return fseeko64( m_PFile, (off64_t)pos, origin ) >= 0;  
 #endif  
 }
 
@@ -162,14 +162,14 @@ inline long long vtkMAFFile::GetCurrentPos() throw(...)
 #ifdef _WIN32
   LARGE_INTEGER liCurPos;
   liCurPos.QuadPart = 0;
-  if (FALSE == SetFilePointerEx(m_hFile, liCurPos, &liCurPos, FILE_CURRENT))
+  if (FALSE == SetFilePointerEx(m_HFile, liCurPos, &liCurPos, FILE_CURRENT))
     return (long long)-1;  //error
 
   return (long long)liCurPos.QuadPart;
 //  __int64 res = _ftelli64( m_pFile);  
 #else
   fpos64_t res;  
-  if (fgetpos64(m_pFile, &res) < 0)  
+  if (fgetpos64(m_PFile, &res) < 0)  
     res = (fpos64_t)-1;
 
   return (long long)res;
@@ -188,9 +188,9 @@ public:
 protected:
   vtkMAFFile2() {
 #ifdef _WIN32
-    m_hFile = INVALID_HANDLE_VALUE;
+    m_HFile = INVALID_HANDLE_VALUE;
 #else
-    m_pFile = NULL;
+    m_PFile = NULL;
 #endif // _WIN32
   }
 
@@ -242,9 +242,9 @@ inline void vtkMAFFile2::Write(void* buffer, int count) throw(...)
 {
 #ifdef _WIN32
   DWORD dwWritten;
-  if (!WriteFile(m_hFile, buffer, (DWORD)count, &dwWritten, NULL))
+  if (!WriteFile(m_HFile, buffer, (DWORD)count, &dwWritten, NULL))
 #else
-  if (fwrite(buffer, 1, count, m_pFile) != count)
+  if (fwrite(buffer, 1, count, m_PFile) != count)
 #endif // _WIN32	
 	{
 		throw std::ios::failure(
@@ -266,16 +266,16 @@ inline void vtkMAFFile2::Read(void* buffer, int count) throw(...)
 {
 #ifdef _WIN32
   DWORD dwRead;
-  if (!ReadFile(m_hFile, buffer, (DWORD)count, &dwRead, NULL))
+  if (!ReadFile(m_HFile, buffer, (DWORD)count, &dwRead, NULL))
     throw std::ios::failure(("Unspecified I/O error while reading data."));
 
   if (dwRead != (DWORD)count)
     throw std::ios::failure(("Reached the end of the file (EOF). The file is corrupted and unreadable."));  
 #else
-	int r = fread(buffer, 1, count, m_pFile);
+	int r = fread(buffer, 1, count, m_PFile);
 	if (r != count)
 	{
-		throw std::ios::failure((feof(m_pFile) ?
+		throw std::ios::failure((feof(m_PFile) ?
 			("Reached the end of the file (EOF). The file is corrupted and unreadable.") :
       ("Unspecified I/O error while reading data."))
 			);	
