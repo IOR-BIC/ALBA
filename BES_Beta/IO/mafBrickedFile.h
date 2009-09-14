@@ -3,7 +3,7 @@
   File:    	 BrickedFile.h
   Language:  C++
   Date:      11:2:2008   11:49
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -85,32 +85,32 @@ protected:
 	BBF_HEADER m_FileHeader;
 
 	//brick maps
-	BBF_IDX_MAINITEM* m_pMainIdxTable;
-	BBF_IDX_EXITEM* m_pExIdxTable;
+	BBF_IDX_MAINITEM* m_PMainIdxTable;
+	BBF_IDX_EXITEM* m_PExIdxTable;
 
 	//low resolution level (brick map)
-	char* m_pLowResLevel;
+	char* m_PLowResLevel;
 
-  vtkDoubleArray* m_pXYZCoords[3];   //<X,Y,Z-coordinates for rectilinear grids  
+  vtkDoubleArray* m_PXYZCoords[3];   //<X,Y,Z-coordinates for rectilinear grids  
 
 #pragma region Values Precomputed to Speed Up Operations
 	//number of bytes per one voxel = element size*number of components
-	int m_nVoxelSizeInB;
+	int m_NVoxelSizeInB;
 
 	//number of voxels in one line, plane, and in the entire brick
 	//and the appropriate number of bytes it occupies
-	int m_nBrickSize[3];
-	int m_nBrickSizeInB[3];
+	int m_NBrickSize[3];
+	int m_NBrickSizeInB[3];
 
 	//number of bricks in every dimension
-	int m_nBricksDim[3];
+	int m_NBricksDim[3];
 
 	//number of bricks in one line, plane, and number of all bricks
 	//and the appropriate number of bytes it occupies
 	//NB: number of bytes for all bricks is not valid
 	//for volumes >= 2GB (or a bit smaller)
-	int m_nBricksDimSize[3];	
-	int m_nBricksDimSizeInB[3];
+	int m_NBricksDimSize[3];	
+	int m_NBricksDimSizeInB[3];
 
 	//time, when it was update last
 	mafMTime m_LastUpdateTime;
@@ -169,7 +169,7 @@ public:
 
 	//Gets the dimension of bricks
 	inline int* GetBricksDimensions() {		
-		return m_nBricksDim;
+		return m_NBricksDim;
 	}
 
 	//Gets the dimension of bricks
@@ -179,7 +179,7 @@ public:
 
 	//Gets the dimension of bricks
 	inline void GetBricksDimensions(int& dim_x, int& dim_y, int& dim_z) {		
-		dim_x = m_nBricksDim[0]; dim_y = m_nBricksDim[1]; dim_z = m_nBricksDim[2];		
+		dim_x = m_NBricksDim[0]; dim_y = m_NBricksDim[1]; dim_z = m_NBricksDim[2];		
 	}
 
 	//Gets the sample rate used to produce the data from the original volume
@@ -226,17 +226,17 @@ public:
 
   //Returns the grid coordinates in the x-direction
   inline vtkDoubleArray* GetXCoordinates() {
-    return m_pXYZCoords[0];
+    return m_PXYZCoords[0];
   }
 
   //Returns the grid coordinates in the y-direction
   inline vtkDoubleArray* GetYCoordinates() {
-    return m_pXYZCoords[1];
+    return m_PXYZCoords[1];
   }
 
   //Returns the grid coordinates in the z-direction
   inline vtkDoubleArray* GetZCoordinates() {
-    return m_pXYZCoords[2];
+    return m_PXYZCoords[2];
   }
 
 	//Gets the VTK data type
@@ -256,7 +256,7 @@ public:
 
 	//Gets the size of one voxel in bytes
 	inline int GetVoxelSize() {
-		return m_nVoxelSizeInB;
+		return m_NVoxelSizeInB;
 	}
 
 public:

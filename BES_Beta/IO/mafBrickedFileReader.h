@@ -3,7 +3,7 @@
   File:    	 mafBrickedFileReader.h
   Language:  C++
   Date:      13:2:2008   9:11
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -213,10 +213,10 @@ inline bool mafBrickedFileReader::IsBrickUniform(int xb, BBF_IDX_MAINITEM* pIdxM
 //fills the entire brick specified by pOutPtr with the value pointed by pConstVal	
 inline void mafBrickedFileReader::FillBrick(char* pOutPtr, const char* pConstVal)
 {
-	for (int i = 0; i < m_nBrickSize[2]; i++)
+	for (int i = 0; i < m_NBrickSize[2]; i++)
 	{
 		const char* pCurConst = pConstVal;
-		for (int j = 0; j < m_nVoxelSizeInB; j++) {
+		for (int j = 0; j < m_NVoxelSizeInB; j++) {
 			*pOutPtr = *pCurConst;
 			pOutPtr++; pCurConst++;
 		}
@@ -227,10 +227,10 @@ inline void mafBrickedFileReader::FillBrick(char* pOutPtr, const char* pConstVal
 //into the memory denoted by pOutPtr
 inline void mafBrickedFileReader::LoadBrick(int nBrickIndex, char* pOutPtr) throw(...)
 {
-	long long offset = ((long long)nBrickIndex)*m_nBrickSizeInB[2] + sizeof(BBF_HEADER);
+	long long offset = ((long long)nBrickIndex)*m_NBrickSizeInB[2] + sizeof(BBF_HEADER);
 
   m_BrickFile->Seek(offset);
-	m_BrickFile->Read(pOutPtr, m_nBrickSizeInB[2]);
+	m_BrickFile->Read(pOutPtr, m_NBrickSizeInB[2]);
 }
 
 //copies the part of brick data that is within brckExt into pOutPtr 
@@ -238,11 +238,11 @@ inline void mafBrickedFileReader::LoadBrick(int nBrickIndex, char* pOutPtr) thro
 inline void mafBrickedFileReader::CopyBrickData(const char* pBrickData, int brckExt[6],
 												char* pOutPtr, int outIncrInB[3])
 {
-	pBrickData += brckExt[4]*m_nBrickSizeInB[1] + 	//move to the first item
-				brckExt[2]*m_nBrickSizeInB[0] +	
-				brckExt[0]*m_nVoxelSizeInB;
+	pBrickData += brckExt[4]*m_NBrickSizeInB[1] + 	//move to the first item
+				brckExt[2]*m_NBrickSizeInB[0] +	
+				brckExt[0]*m_NVoxelSizeInB;
 
-	int nLineSize = (brckExt[1] - brckExt[0] + 1)*m_nVoxelSizeInB;
+	int nLineSize = (brckExt[1] - brckExt[0] + 1)*m_NVoxelSizeInB;
 	for (int z = brckExt[4]; z <= brckExt[5]; z++)
 	{
 		char* pOutPtrY = pOutPtr;
@@ -251,11 +251,11 @@ inline void mafBrickedFileReader::CopyBrickData(const char* pBrickData, int brck
 		{
 			memcpy(pOutPtrY, pBrickDataY, nLineSize);
 			pOutPtrY += outIncrInB[1];
-			pBrickDataY += m_nBrickSizeInB[0];
+			pBrickDataY += m_NBrickSizeInB[0];
 		}
 
 		pOutPtr += outIncrInB[2];
-		pBrickData += m_nBrickSizeInB[1];
+		pBrickData += m_NBrickSizeInB[1];
 	}
 }
 #endif //__mafBrickedFileReader__

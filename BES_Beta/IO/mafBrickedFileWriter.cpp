@@ -3,7 +3,7 @@
   File:    	 mafBrickedFileWriter.cpp
   Language:  C++
   Date:      11:2:2008   12:42
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -36,24 +36,24 @@ mafBrickedFileWriter::mafBrickedFileWriter()
 	m_FileHeader.sample_rate = 1;	//no subsampling by the default
 	
 	m_InputDataSet = NULL;
-  m_pInputXYZCoords[0] = NULL;
-  m_pInputXYZCoords[1] = NULL;
-  m_pInputXYZCoords[2] = NULL;
+  m_PInputXYZCoords[0] = NULL;
+  m_PInputXYZCoords[1] = NULL;
+  m_PInputXYZCoords[2] = NULL;
 
-	m_pBricksBuffer = NULL;
-	m_pBricksValidity = NULL;	
+	m_PBricksBuffer = NULL;
+	m_PBricksValidity = NULL;	
 
-	m_pTuplesBuffer = NULL;
-	m_pSumTuplesBuffer = NULL;		
+	m_PTuplesBuffer = NULL;
+	m_PSumTuplesBuffer = NULL;		
 }
 
 mafBrickedFileWriter::~mafBrickedFileWriter()
 {	
 	//all should be removed in Update
 	vtkDEL(m_InputDataSet);
-  vtkDEL(m_pInputXYZCoords[0]);
-  vtkDEL(m_pInputXYZCoords[1]);
-  vtkDEL(m_pInputXYZCoords[2]);
+  vtkDEL(m_PInputXYZCoords[0]);
+  vtkDEL(m_PInputXYZCoords[1]);
+  vtkDEL(m_PInputXYZCoords[2]);
 }
 
 
@@ -77,17 +77,17 @@ void mafBrickedFileWriter::SetInputDataSet(vtkMAFLargeImageData* ds)
 void mafBrickedFileWriter::SetInputXCoordinates(vtkDoubleArray* pCoords)
 //------------------------------------------------------------------------
 {
-  if (pCoords != m_pInputXYZCoords[0])
+  if (pCoords != m_PInputXYZCoords[0])
   {
-    vtkDEL(m_pInputXYZCoords[0]);  
-    if (NULL != (m_pInputXYZCoords[0] = pCoords))
+    vtkDEL(m_PInputXYZCoords[0]);  
+    if (NULL != (m_PInputXYZCoords[0] = pCoords))
     {
-      m_pInputXYZCoords[0]->Register(NULL);
+      m_PInputXYZCoords[0]->Register(NULL);
       m_FileHeader.rlgrid = 1;
     }
     else
     {
-      if (m_pInputXYZCoords[1] == NULL && m_pInputXYZCoords[2] == NULL)
+      if (m_PInputXYZCoords[1] == NULL && m_PInputXYZCoords[2] == NULL)
         m_FileHeader.rlgrid = 0;
     }
 
@@ -100,17 +100,17 @@ void mafBrickedFileWriter::SetInputXCoordinates(vtkDoubleArray* pCoords)
 void mafBrickedFileWriter::SetInputYCoordinates(vtkDoubleArray* pCoords)
 //------------------------------------------------------------------------
 {
-  if (pCoords != m_pInputXYZCoords[1])
+  if (pCoords != m_PInputXYZCoords[1])
   {
-    vtkDEL(m_pInputXYZCoords[1]);  
-    if (NULL != (m_pInputXYZCoords[1] = pCoords))
+    vtkDEL(m_PInputXYZCoords[1]);  
+    if (NULL != (m_PInputXYZCoords[1] = pCoords))
     {
-      m_pInputXYZCoords[1]->Register(NULL);
+      m_PInputXYZCoords[1]->Register(NULL);
       m_FileHeader.rlgrid = 1;
     }
     else
     {
-      if (m_pInputXYZCoords[0] == NULL && m_pInputXYZCoords[2] == NULL)
+      if (m_PInputXYZCoords[0] == NULL && m_PInputXYZCoords[2] == NULL)
         m_FileHeader.rlgrid = 0;
     }
 
@@ -123,17 +123,17 @@ void mafBrickedFileWriter::SetInputYCoordinates(vtkDoubleArray* pCoords)
 void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 //------------------------------------------------------------------------
 {
-  if (pCoords != m_pInputXYZCoords[2])
+  if (pCoords != m_PInputXYZCoords[2])
   {
-    vtkDEL(m_pInputXYZCoords[2]);  
-    if (NULL != (m_pInputXYZCoords[2] = pCoords))
+    vtkDEL(m_PInputXYZCoords[2]);  
+    if (NULL != (m_PInputXYZCoords[2] = pCoords))
     {
-      m_pInputXYZCoords[2]->Register(NULL);
+      m_PInputXYZCoords[2]->Register(NULL);
       m_FileHeader.rlgrid = 1;
     }
     else
     {
-      if (m_pInputXYZCoords[0] == NULL && m_pInputXYZCoords[1] == NULL)
+      if (m_PInputXYZCoords[0] == NULL && m_PInputXYZCoords[1] == NULL)
         m_FileHeader.rlgrid = 0;
     }
 
@@ -160,7 +160,7 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
       ((VOI[2*i + 1] - VOI[2*i] + 1) % m_FileHeader.sample_rate != 0);
 		m_FileHeader.spacing[i] *= m_FileHeader.sample_rate;
 
-		m_nBricksDim[i] = (m_FileHeader.dims[i] + m_FileHeader.bricksize - 1) / 
+		m_NBricksDim[i] = (m_FileHeader.dims[i] + m_FileHeader.bricksize - 1) / 
 			m_FileHeader.bricksize;
 	}
 	
@@ -170,42 +170,42 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 	m_FileHeader.numcomps = dsc->GetNumberOfComponents();
 	m_FileHeader.datatype = dsc->GetDataType();
 
-	m_nVoxelSizeInB = m_FileHeader.numcomps*dsc->GetDataTypeSize();
+	m_NVoxelSizeInB = m_FileHeader.numcomps*dsc->GetDataTypeSize();
 
 	unsigned short end_test = 0xFFFE;
 	m_FileHeader.endian = (*((unsigned char*)&end_test) == 0xFF);
 
-	m_nBrickSize[0] = m_FileHeader.bricksize;		 
-	m_nBricksDimSize[0] = m_nBricksDim[0]; 
+	m_NBrickSize[0] = m_FileHeader.bricksize;		 
+	m_NBricksDimSize[0] = m_NBricksDim[0]; 
 	for (int i = 1; i < 3; i++)
 	{	
-		m_nBrickSize[i] = m_nBrickSize[i - 1]*m_nBrickSize[0];		
-		m_nBricksDimSize[i] = m_nBricksDim[i]*m_nBricksDimSize[i - 1];
+		m_NBrickSize[i] = m_NBrickSize[i - 1]*m_NBrickSize[0];		
+		m_NBricksDimSize[i] = m_NBricksDim[i]*m_NBricksDimSize[i - 1];
 	}
 	
 	for (int i = 2; i >= 0; i--)
 	{
-		m_nBrickSizeInB[i] = m_nBrickSize[i]*m_nVoxelSizeInB;	
-		m_nBricksDimSizeInB[i] = m_nBricksDimSize[i]*m_nBrickSizeInB[2];
+		m_NBrickSizeInB[i] = m_NBrickSize[i]*m_NVoxelSizeInB;	
+		m_NBricksDimSizeInB[i] = m_NBricksDimSize[i]*m_NBrickSizeInB[2];
 	}
 }
 
 //allocates the required buffers
 /*virtual*/ void mafBrickedFileWriter::AllocateBuffers() throw(...)
 {	
-	m_pDataBuffer = new char[m_nBricksDimSizeInB[1]];
-	m_pBricksBuffer = new char[m_nBricksDimSizeInB[1]];	
-	m_pBricksValidity = new bool[m_nBricksDimSize[1]];
-	m_pLowResLevel = new char[m_nBricksDimSize[2]*m_nVoxelSizeInB];
+	m_PDataBuffer = new char[m_NBricksDimSizeInB[1]];
+	m_PBricksBuffer = new char[m_NBricksDimSizeInB[1]];	
+	m_PBricksValidity = new bool[m_NBricksDimSize[1]];
+	m_PLowResLevel = new char[m_NBricksDimSize[2]*m_NVoxelSizeInB];
 
-	memset(m_pDataBuffer, 0, m_nBricksDimSizeInB[1]);	//to ensure we have zeros
+	memset(m_PDataBuffer, 0, m_NBricksDimSizeInB[1]);	//to ensure we have zeros
 
 	//buffers for tuples
-	m_pTuplesBuffer = new char[16*m_nVoxelSizeInB];
-	m_pSumTuplesBuffer = new double[16*this->GetNumberOfComponents()];
+	m_PTuplesBuffer = new char[16*m_NVoxelSizeInB];
+	m_PSumTuplesBuffer = new double[16*this->GetNumberOfComponents()];
 
-	m_pMainIdxTable = new BBF_IDX_MAINITEM[m_nBricksDim[1]*m_nBricksDim[2]];
-	memset(m_pMainIdxTable, 0, m_nBricksDim[1]*m_nBricksDim[2]*sizeof(BBF_IDX_MAINITEM));
+	m_PMainIdxTable = new BBF_IDX_MAINITEM[m_NBricksDim[1]*m_NBricksDim[2]];
+	memset(m_PMainIdxTable, 0, m_NBricksDim[1]*m_NBricksDim[2]*sizeof(BBF_IDX_MAINITEM));
 	
 	m_ExtraBrckMAP.clear();	
 
@@ -213,9 +213,9 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
   {
     for (int i = 0; i < 3; i++)
     {
-      m_pXYZCoords[i] = vtkDoubleArray::New();
-      m_pXYZCoords[i]->Allocate(m_FileHeader.dims[i]);  
-      m_pXYZCoords[i]->SetNumberOfTuples(m_FileHeader.dims[i]);
+      m_PXYZCoords[i] = vtkDoubleArray::New();
+      m_PXYZCoords[i]->Allocate(m_FileHeader.dims[i]);  
+      m_PXYZCoords[i]->SetNumberOfTuples(m_FileHeader.dims[i]);
     }
   }
 }
@@ -223,16 +223,16 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 //allocates the required buffers
 /*virtual*/ void mafBrickedFileWriter::DeallocateBuffers() throw(...)
 {
-	cppDEL(m_pLowResLevel);
-	cppDEL(m_pMainIdxTable);	
-	cppDEL(m_pDataBuffer);
-	cppDEL(m_pBricksBuffer);
-	cppDEL(m_pBricksValidity);
-	cppDEL(m_pTuplesBuffer);
-	cppDEL(m_pSumTuplesBuffer);
+	cppDEL(m_PLowResLevel);
+	cppDEL(m_PMainIdxTable);	
+	cppDEL(m_PDataBuffer);
+	cppDEL(m_PBricksBuffer);
+	cppDEL(m_PBricksValidity);
+	cppDEL(m_PTuplesBuffer);
+	cppDEL(m_PSumTuplesBuffer);
 
   for (int i = 0; i < 3; i++) {    
-    vtkDEL(m_pXYZCoords[i]);
+    vtkDEL(m_PXYZCoords[i]);
   }
 }
 
@@ -242,7 +242,7 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 	int nSampleRate = this->GetSampleRate();
 
 	mafString szMsg = wxString::Format(_("Sampling and bricking data (sr: %d, bs: %d) ..."),
-		nSampleRate, m_nBrickSize[0]);
+		nSampleRate, m_NBrickSize[0]);
 
 	mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &szMsg));
 	mafEventMacro(mafEvent(this, PROGRESSBAR_SET_VALUE, (long)0));
@@ -265,9 +265,9 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
   char* pLineBuffer = new char[nBytesPerLine];
 	
 	//number of sampled bytes
-	int nSkipBytesX = (m_nBricksDim[0]*m_nBrickSize[0] - nDims[0])*m_nVoxelSizeInB;
-	int nSkipBytesY = m_nBricksDim[0]*m_nBrickSize[0]*
-		(m_nBricksDim[1]*m_nBrickSize[0] - nDims[1])*m_nVoxelSizeInB;
+	int nSkipBytesX = (m_NBricksDim[0]*m_NBrickSize[0] - nDims[0])*m_NVoxelSizeInB;
+	int nSkipBytesY = m_NBricksDim[0]*m_NBrickSize[0]*
+		(m_NBricksDim[1]*m_NBrickSize[0] - nDims[1])*m_NVoxelSizeInB;
 
 	//get increments
 	vtkIdType64 dataIncr[3];
@@ -280,9 +280,9 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
   int nLineBufSkip = 
   //BES: 11.7.2008 - GetIncrements takes number of components into account
     ((int)dataIncrSkip[0] - dsc->GetNumberOfComponents())*
-      (m_nVoxelSizeInB / dsc->GetNumberOfComponents());
+      (m_NVoxelSizeInB / dsc->GetNumberOfComponents());
 
-	char* pDstBuf = m_pDataBuffer;
+	char* pDstBuf = m_PDataBuffer;
 
 	//index to the first element	
 	vtkIdType64 nStartIndex = VOI[0]*dataIncr[0] + VOI[2]*dataIncr[1] + VOI[4]*dataIncr[2];		
@@ -304,7 +304,7 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 			char* pSrcLineBuf = pLineBuffer;
 			for (int xb = 0; xb < nDims[0]; xb++)
 			{
-				for (int i = 0; i < m_nVoxelSizeInB; i++) {
+				for (int i = 0; i < m_NVoxelSizeInB; i++) {
 					*pDstBuf = *pSrcLineBuf;
 					pDstBuf++; pSrcLineBuf++;
 				}
@@ -317,11 +317,11 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 
 		pDstBuf += nSkipBytesY;
 
-		bool bBrickFinished = ((zb + 1) % m_nBrickSize[0]) == 0;
+		bool bBrickFinished = ((zb + 1) % m_NBrickSize[0]) == 0;
 		if (!bBrickFinished && (zb + 1) == nDims[2])
 		{
 			//reset the rest planes
-			memset(pDstBuf, 0, m_nBricksDimSizeInB[1] - (pDstBuf - m_pDataBuffer));
+			memset(pDstBuf, 0, m_NBricksDimSizeInB[1] - (pDstBuf - m_PDataBuffer));
 			bBrickFinished = true;
 		}
 
@@ -331,12 +331,12 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 			ConstructBricks();
 
 			//process the loaded bricks
-			ProcessBricks(zb / m_nBrickSize[0]);
+			ProcessBricks(zb / m_NBrickSize[0]);
 
 			//data written already in ProcessBricks
 			//m_BrickFile->WriteFile( m_pDataBuffer, m_nBricksDimSizeInB[1]);
 
-			pDstBuf = m_pDataBuffer;
+			pDstBuf = m_PDataBuffer;
 		}
 	}	
 
@@ -355,13 +355,13 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
   int nSampleRate = this->GetSampleRate();
   for (int i = 0; i < 3; i++)
   {    
-    int nDstVals = m_pXYZCoords[i]->GetNumberOfTuples();      
-    double* pDstPtr = m_pXYZCoords[i]->WritePointer(0, nDstVals);
+    int nDstVals = m_PXYZCoords[i]->GetNumberOfTuples();      
+    double* pDstPtr = m_PXYZCoords[i]->WritePointer(0, nDstVals);
 
-    if (m_pInputXYZCoords[i] != NULL)
+    if (m_PInputXYZCoords[i] != NULL)
     {
-      int nSrcVals = m_pInputXYZCoords[i]->GetNumberOfTuples();
-      double* pSrcPtr = m_pInputXYZCoords[i]->GetPointer(0);            
+      int nSrcVals = m_PInputXYZCoords[i]->GetNumberOfTuples();
+      double* pSrcPtr = m_PInputXYZCoords[i]->GetPointer(0);            
       
       for (int j = 0; j < nSrcVals && nDstVals > 0; j += nSampleRate)
       {
@@ -400,8 +400,8 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
     }
 
     //now, we need to store them
-    m_BrickFile->Write(m_pXYZCoords[i]->GetPointer(0), 
-      m_pXYZCoords[i]->GetNumberOfTuples()*sizeof(double));
+    m_BrickFile->Write(m_PXYZCoords[i]->GetPointer(0), 
+      m_PXYZCoords[i]->GetNumberOfTuples()*sizeof(double));
   } //end for  
 }
 
@@ -412,26 +412,26 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 //for every brick and determining which bricks are uniform
 /*virtual*/ void mafBrickedFileWriter::ConstructBricks()  throw(...)
 {
-	char* pCurLineBuf = m_pDataBuffer;
+	char* pCurLineBuf = m_PDataBuffer;
 
 	int nBricksBufOfsZ = 0;
-	for (int zb = 0; zb < m_nBrickSize[0]; zb++, nBricksBufOfsZ += m_nBrickSizeInB[1])
+	for (int zb = 0; zb < m_NBrickSize[0]; zb++, nBricksBufOfsZ += m_NBrickSizeInB[1])
 	{				
 		//process every brick line at this plane
 		int nBricksBufOfsY = nBricksBufOfsZ;	
-		for (int yb = 0; yb < m_nBricksDim[1]; yb++, nBricksBufOfsY += m_nBricksDimSizeInB[0])
+		for (int yb = 0; yb < m_NBricksDim[1]; yb++, nBricksBufOfsY += m_NBricksDimSizeInB[0])
 		{				
 			int nBricksBufOfs = nBricksBufOfsY;	
-			for (int y = 0; y < m_nBrickSize[0]; y++, nBricksBufOfs += m_nBrickSizeInB[0])
+			for (int y = 0; y < m_NBrickSize[0]; y++, nBricksBufOfs += m_NBrickSizeInB[0])
 			{					
 				//now copy the read pixel line into bricks					
-				char* pCurBricksBuf = m_pBricksBuffer + nBricksBufOfs;					
-				for (int i = 0; i < m_nBricksDim[0]; i++)
+				char* pCurBricksBuf = m_PBricksBuffer + nBricksBufOfs;					
+				for (int i = 0; i < m_NBricksDim[0]; i++)
 				{
-					memcpy(pCurBricksBuf, pCurLineBuf, m_nBrickSizeInB[0]);
+					memcpy(pCurBricksBuf, pCurLineBuf, m_NBrickSizeInB[0]);
 					
-					pCurBricksBuf += m_nBrickSizeInB[2];
-					pCurLineBuf += m_nBrickSizeInB[0];
+					pCurBricksBuf += m_NBrickSizeInB[2];
+					pCurLineBuf += m_NBrickSizeInB[0];
 				}
 			}
 		}
@@ -463,14 +463,14 @@ void mafBrickedFileWriter::SetInputZCoordinates(vtkDoubleArray* pCoords)
 	}	
 
 	//store every non uniform brick
-	char* pCurBrick = m_pBricksBuffer;
-	for (int i = 0; i < m_nBricksDimSize[1]; i++)
+	char* pCurBrick = m_PBricksBuffer;
+	for (int i = 0; i < m_NBricksDimSize[1]; i++)
 	{
-		if (m_pBricksValidity[i]) {			
-			m_BrickFile->Write( pCurBrick, m_nBrickSizeInB[2]);
+		if (m_PBricksValidity[i]) {			
+			m_BrickFile->Write( pCurBrick, m_NBrickSizeInB[2]);
 		}
 
-		pCurBrick += m_nBrickSizeInB[2];
+		pCurBrick += m_NBrickSizeInB[2];
 	}
 
 	//this updates brick map, i.e., data stucture storing the information which bricks are uniform
@@ -492,21 +492,21 @@ void mafBrickedFileWriter::CreateBricksLowResolution(int nCurBrickPlane)
 	int comps = dsc->GetNumberOfComponents();
 
 	//prepare buffers for min and max
-	T_VAL* pMins = (T_VAL*)m_pTuplesBuffer;
+	T_VAL* pMins = (T_VAL*)m_PTuplesBuffer;
 	T_VAL* pMaxs = pMins + comps;
-	T_SUM* pSums = (T_SUM*)m_pSumTuplesBuffer;
+	T_SUM* pSums = (T_SUM*)m_PSumTuplesBuffer;
 
 	//compute the current index
-	int index = nCurBrickPlane*m_nBricksDimSize[1];
-	T_VAL* pLevelBuf = (T_VAL*)m_pLowResLevel;
+	int index = nCurBrickPlane*m_NBricksDimSize[1];
+	T_VAL* pLevelBuf = (T_VAL*)m_PLowResLevel;
 	pLevelBuf += index*comps;
 
 	//process every brick
-	char* pCurBrick = m_pBricksBuffer;
-	for (int i = 0; i < m_nBricksDimSize[1]; i++, index++)
+	char* pCurBrick = m_PBricksBuffer;
+	for (int i = 0; i < m_NBricksDimSize[1]; i++, index++)
 	{		
 		T_VAL* pData = (T_VAL*)pCurBrick;
-		pCurBrick += m_nBrickSizeInB[2];
+		pCurBrick += m_NBrickSizeInB[2];
 
 		//initialize the first tuple
 		for (int j = 0; j < comps; j++) 
@@ -540,11 +540,11 @@ void mafBrickedFileWriter::CreateBricksLowResolution(int nCurBrickPlane)
 			}
 		}
 
-		if (!(m_pBricksValidity[i] = !bUniform))
+		if (!(m_PBricksValidity[i] = !bUniform))
 		{
 			//brick is not uniform => compute average
 			for (int j = 0; j < comps; j++) {
-				pMins[j] = (T_VAL)(pSums[j] / m_nBrickSize[2]);				
+				pMins[j] = (T_VAL)(pSums[j] / m_NBrickSize[2]);				
 			}			
 		}
 
@@ -562,46 +562,46 @@ void mafBrickedFileWriter::CreateBricksIndexTable(int nCurBrickPlane)
 {
 	BBF_IDX_EXITEM ssItem;
 	
-	int nIndex = nCurBrickPlane*m_nBricksDim[1];	//base line index
-	for (int y = 0, idx = 0; y < m_nBricksDim[1]; y++)
+	int nIndex = nCurBrickPlane*m_NBricksDim[1];	//base line index
+	for (int y = 0, idx = 0; y < m_NBricksDim[1]; y++)
 	{
 		bool bCurMode = false;		
-		for (int x = 0; x < m_nBricksDim[0]; x++, idx++)
+		for (int x = 0; x < m_NBricksDim[0]; x++, idx++)
 		{
-			if (!m_pBricksValidity[idx])	//increase number of skipped bricks
-				m_pMainIdxTable[nIndex].nPrevSkipped++;
+			if (!m_PBricksValidity[idx])	//increase number of skipped bricks
+				m_PMainIdxTable[nIndex].nPrevSkipped++;
 
-			if (m_pBricksValidity[idx] != bCurMode ||	//change in mode
-				(bCurMode && x + 1 == m_nBricksDim[0]))	//or last item in the line
+			if (m_PBricksValidity[idx] != bCurMode ||	//change in mode
+				(bCurMode && x + 1 == m_NBricksDim[0]))	//or last item in the line
 			{
 				//either begin or end of uniformity
 				if (!bCurMode)
 					ssItem.nFromBrIndex = (unsigned short)x;
 				
-				if (bCurMode || (x + 1 == m_nBricksDim[0]))	//last item
+				if (bCurMode || (x + 1 == m_NBricksDim[0]))	//last item
 				{
 					//ending previous block
 					ssItem.nToBrIndex = (unsigned short)(x - 1);
 
-					if (m_pMainIdxTable[nIndex].nListLength == 0)
+					if (m_PMainIdxTable[nIndex].nListLength == 0)
 					{
 						//first item goes to the main block
-						m_pMainIdxTable[nIndex].nFromBrIndex = ssItem.nFromBrIndex;
-						m_pMainIdxTable[nIndex].nToBrIndex = ssItem.nToBrIndex;
+						m_PMainIdxTable[nIndex].nFromBrIndex = ssItem.nFromBrIndex;
+						m_PMainIdxTable[nIndex].nToBrIndex = ssItem.nToBrIndex;
 					}
 					else 
 					{
 						//first extra item
-						if (m_pMainIdxTable[nIndex].nListLength == 1)
-							m_pMainIdxTable[nIndex].nNextItemIndex = (int)m_ExtraBrckMAP.size();
+						if (m_PMainIdxTable[nIndex].nListLength == 1)
+							m_PMainIdxTable[nIndex].nNextItemIndex = (int)m_ExtraBrckMAP.size();
 
 						m_ExtraBrckMAP.push_back(ssItem);
 					}
 
-					m_pMainIdxTable[nIndex].nListLength++;
+					m_PMainIdxTable[nIndex].nListLength++;
 				}
 
-				bCurMode = !bCurMode && (x + 1 != m_nBricksDim[0]);
+				bCurMode = !bCurMode && (x + 1 != m_NBricksDim[0]);
 			}
 		}
 
@@ -641,7 +641,7 @@ void mafBrickedFileWriter::CreateBricksIndexTable(int nCurBrickPlane)
 		szMsg = _("Writing LOW Resolution map ...");
 		mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &szMsg));    
 		
-		m_BrickFile->Write( m_pLowResLevel, m_nBricksDimSize[2]*m_nVoxelSizeInB);
+		m_BrickFile->Write( m_PLowResLevel, m_NBricksDimSize[2]*m_NVoxelSizeInB);
 
 //		int f = IOFileUtils::CreateFile(wxString::Format("g:\\brckmap_%d_%d_%d.raw",
 //			m_nBricksDim[0], m_nBricksDim[1], m_nBricksDim[2]));
@@ -653,16 +653,16 @@ void mafBrickedFileWriter::CreateBricksIndexTable(int nCurBrickPlane)
 		mafEventMacro(mafEvent(this, PROGRESSBAR_SET_TEXT, &szMsg));
 				
 		int nPrevSum = 0;		
-		int nCount = m_nBricksDim[1]*m_nBricksDim[2];
+		int nCount = m_NBricksDim[1]*m_NBricksDim[2];
 		for (int i = 0; i < nCount; i++) {
-			int nNextVal = m_pMainIdxTable[i].nPrevSkipped;
-			m_pMainIdxTable[i].nPrevSkipped = nPrevSum;
+			int nNextVal = m_PMainIdxTable[i].nPrevSkipped;
+			m_PMainIdxTable[i].nPrevSkipped = nPrevSum;
 			nPrevSum += nNextVal;			
 		}
 		
 
 		m_FileHeader.idxtblofs = m_BrickFile->GetCurrentPos();
-    m_BrickFile->Write(m_pMainIdxTable, nCount*sizeof(BBF_IDX_MAINITEM));
+    m_BrickFile->Write(m_PMainIdxTable, nCount*sizeof(BBF_IDX_MAINITEM));
 
 		m_FileHeader.extra_idx_items = (unsigned long)m_ExtraBrckMAP.size();
 		for (int i = 0; i < (int)m_ExtraBrckMAP.size(); i++) {

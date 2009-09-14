@@ -3,7 +3,7 @@
   File:    	 mafBrickedFileWriter.h
   Language:  C++
   Date:      11:2:2008   12:40
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -26,18 +26,18 @@ public:
 protected:
 	//input data set that should be bricked
 	vtkMAFLargeImageData* m_InputDataSet;
-  vtkDoubleArray* m_pInputXYZCoords[3];   //<X,Y,Z-coordinates for rectilinear grids
+  vtkDoubleArray* m_PInputXYZCoords[3];   //<X,Y,Z-coordinates for rectilinear grids
   
 	//buffer for bricks data
-	char* m_pBricksBuffer;
-	bool* m_pBricksValidity;	//false mean that the brick is uniform
+	char* m_PBricksBuffer;
+	bool* m_PBricksValidity;	//false mean that the brick is uniform
 
 	//buffer for input data set	
-	char* m_pDataBuffer;	//sampled data
+	char* m_PDataBuffer;	//sampled data
 
 	//a small buffers capable to hold 16 tuples (or their sums)
-	char* m_pTuplesBuffer;
-	double* m_pSumTuplesBuffer;
+	char* m_PTuplesBuffer;
+	double* m_PSumTuplesBuffer;
 
 	std::vector< BBF_IDX_EXITEM > m_ExtraBrckMAP;
 	

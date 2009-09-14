@@ -3,7 +3,7 @@
   File:    	 mafBrickedFile.cpp
   Language:  C++
   Date:      11:2:2008   12:18
-  Version:   $Revision: 1.1.2.1 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -28,14 +28,14 @@ mafCxxAbstractTypeMacro(mafBrickedFile);
 //ctor
 mafBrickedFile::mafBrickedFile()
 {
-	m_pMainIdxTable = NULL;
-	m_pExIdxTable = NULL;
-	m_pLowResLevel = NULL;
+	m_PMainIdxTable = NULL;
+	m_PExIdxTable = NULL;
+	m_PLowResLevel = NULL;
   m_BrickFile = NULL;
 	m_Listener = NULL;  
-  m_pXYZCoords[0] = NULL;
-  m_pXYZCoords[1] = NULL;
-  m_pXYZCoords[2] = NULL;
+  m_PXYZCoords[0] = NULL;
+  m_PXYZCoords[1] = NULL;
+  m_PXYZCoords[2] = NULL;
 }
 
 mafBrickedFile::~mafBrickedFile()
