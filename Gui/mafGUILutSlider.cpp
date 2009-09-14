@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-09-14 12:01:10 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -399,5 +399,32 @@ void mafGUILutSlider::SetFixedTextMaxButton(const char* label)
   if(NULL != m_MaxButton)
   {
     m_MaxButton->SetLabel(label);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUILutSlider::EnableMiddleButton(bool enable)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_MiddleButton)
+  {
+    m_MiddleButton->Enable(enable);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUILutSlider::EnableMaxButton(bool enable)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_MaxButton)
+  {
+    m_MaxButton->Enable(enable);
+  }
+}
+//----------------------------------------------------------------------------
+void mafGUILutSlider::EnableMinButton(bool enable)
+//----------------------------------------------------------------------------
+{
+  if(NULL != m_MinButton)
+  {
+    m_MinButton->Enable(enable);
   }
 }

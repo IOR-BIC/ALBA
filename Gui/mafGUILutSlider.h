@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-09-14 12:01:10 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -95,6 +95,15 @@ public:
 
   /** Set the fixed text for max button.*/
   void SetFixedTextMaxButton(const char* label);
+
+  /** Enable/Disable middle button */
+  void EnableMiddleButton(bool enable);
+
+  /** Enable/Disable max button */
+  void EnableMaxButton(bool enable);
+
+  /** Enable/Disable min button */
+  void EnableMinButton(bool enable);
 
 protected:  
   /** Update slider's cursors. */
