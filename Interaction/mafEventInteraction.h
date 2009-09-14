@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafEventInteraction.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.6.10.1 $
+  Date:      $Date: 2009-09-14 12:02:06 $
+  Version:   $Revision: 1.6.10.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -29,6 +29,7 @@
 class mafEventInteraction : public mafEventBase
 {
 public:
+  /** RTTI macro*/
   mafTypeMacro(mafEventInteraction,mafEventBase);
 
   /** Set screen position, for 2D tracking devices */
@@ -45,32 +46,42 @@ public:
   /** get the flag for 2D coords */
   bool GetXYFlag();
   
-  /** Set/Get the triggering button */
+  /** Set the triggering button */
   void SetButton(int button);
+  /** Get the triggering button */
   int GetButton() {return m_Button;}
 
-  /** Set/Get the optional key argument */
+  /** Set the optional key argument */
   void SetKey(unsigned char key);
+  /** Get the optional key argument */
   unsigned char GetKey() {return m_Key;}
 
-  /** Set/Get the pose matrix, for 3D tracking devices */
+  /** Get the pose matrix, for 3D tracking devices */
   mafMatrix *GetMatrix();
+  /** Set the pose matrix, for 3D tracking devices */
   void SetMatrix(mafMatrix *matrix);
 
-  /** Set/Get the given modifier value*/
+  /** Set the given modifier value*/
   void SetModifier(unsigned long idx,bool value=true);
+  /** Get the given modifier value*/
   bool GetModifier(unsigned long idx);
+  /** Set the given modifiers value*/
   void SetModifiers(unsigned long modifiers);
+  /** Get the given modifiers value*/
   unsigned long GetModifiers() {return m_Modifiers;}
 
+  /** Deep Copy of the object*/
   virtual void DeepCopy(const mafEventBase *event);
   
+  /** overloaded constructor */
   mafEventInteraction(void *sender=NULL,mafID id=-1,int button=0,unsigned long modifiers=0):
   mafEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_X(0),m_Y(0),m_XYFlag(false) {}
 
+  /** overloaded constructor */
   mafEventInteraction(void *sender,mafID id,mafMatrix *matrix,int button=0,unsigned long modifiers=0):
   mafEventBase(sender,id),m_Button(button),m_Modifiers(modifiers),m_Key(0),m_Matrix(matrix),m_X(0),m_Y(0),m_XYFlag(false) {}
 
+  /** overloaded constructor */
   mafEventInteraction(void *sender,mafID id,double x,double y,int button=0,unsigned long modifiers=0):
   mafEventBase(sender,id),m_X(x),m_Y(y),m_XYFlag(true),m_Button(button),m_Modifiers(modifiers),m_Key(0) {}
   virtual ~mafEventInteraction() {}
