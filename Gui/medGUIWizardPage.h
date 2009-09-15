@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.h,v $
 Language:  C++
-Date:      $Date: 2009-09-03 14:48:18 $
-Version:   $Revision: 1.4.2.5 $
+Date:      $Date: 2009-09-15 07:39:56 $
+Version:   $Revision: 1.4.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -74,7 +74,7 @@ class medGUIWizardPage : public wxWizardPageSimple, public mafObserver
 {
 public:
   /** constructor. */
-	medGUIWizardPage (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="");
+	medGUIWizardPage (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="",bool plugCentralGui = true,bool plugLeftGui = true,bool plugRightGui = true);
   /** destructor. */
 	virtual ~medGUIWizardPage ();
   /** Set the Listener that will receive event-notification. */

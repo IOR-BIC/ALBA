@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPage.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-03 14:48:18 $
-Version:   $Revision: 1.5.2.5 $
+Date:      $Date: 2009-09-15 07:39:56 $
+Version:   $Revision: 1.5.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -66,7 +66,7 @@ enum ID
 };
 
 //----------------------------------------------------------------------------
-medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxString label)
+medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style /* = medUSEGUI | medUSERWI */,wxString label/* = */,bool plugCentralGui /* = true */,bool plugLeftGui /* = true */,bool plugRightGui /* = true */)
 : wxWizardPageSimple(wizardParent)
 //----------------------------------------------------------------------------
 {
@@ -96,21 +96,29 @@ medGUIWizardPage::medGUIWizardPage(medGUIWizard *wizardParent,long style,wxStrin
 	}
 	if(style & medUSEGUI)
 	{
-		m_GuiLowerLeft = new mafGUI(this);
-    m_GuiLowerLeft->FitGui();
-		m_GuiLowerLeft->Reparent(this);
+		if (plugLeftGui)
+		{
+			m_GuiLowerLeft = new mafGUI(this);
+	    m_GuiLowerLeft->FitGui();
+			m_GuiLowerLeft->Reparent(this);
+	    m_GUISizer->Add(m_GuiLowerLeft,0,wxEXPAND);
+		}
 
-    m_GuiLowerRight = new mafGUI(this);
-    m_GuiLowerRight->FitGui();
-    m_GuiLowerRight->Reparent(this);
+    if (plugCentralGui)
+    {
+      m_GuiLowerCenter = new mafGUI(this);
+      m_GuiLowerCenter->FitGui();
+      m_GuiLowerCenter->Reparent(this);
+      m_GUISizer->Add(m_GuiLowerCenter,0,wxEXPAND);
+    }
 
-    m_GuiLowerCenter = new mafGUI(this);
-    m_GuiLowerCenter->FitGui();
-    m_GuiLowerCenter->Reparent(this);
-
-		m_GUISizer->Add(m_GuiLowerLeft,0,wxEXPAND);
-    m_GUISizer->Add(m_GuiLowerCenter,0,wxEXPAND);
-    m_GUISizer->Add(m_GuiLowerRight,0,wxEXPAND);
+    if (plugRightGui)
+    {
+	    m_GuiLowerRight = new mafGUI(this);
+	    m_GuiLowerRight->FitGui();
+	    m_GuiLowerRight->Reparent(this);
+	    m_GUISizer->Add(m_GuiLowerRight,0,wxEXPAND);
+    }
 
     m_SizerAll->Add(m_GUISizer,0,wxEXPAND|wxALL);
 	}
