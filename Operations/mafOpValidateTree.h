@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-28 11:17:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-09-16 15:27:56 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,12 +26,34 @@ class mafNode;
 /** Class used to validate the correctness of the data tree loaded. 
 The tree to be validated has to be saved, otherwise some elements could not 
 have binary files associated with the VME. This class perform checks on VME id, 
-binary data if exists, correctness of TagArray and links.*/
+binary data if exists, correctness of TagArray and links.
+
+Sample usage:
+
+  mafOpValidateTree *op = new mafOpValidateTree();
+  op->SetInput(anyVMETreeNode);
+  int returnValue = op->ValidateTree();
+  
+Check returnValue against VALIDATE_RETURN_VALUES
+*/
+
 class mafOpValidateTree: public mafOp
 {
 public:
   mafOpValidateTree(const wxString &label = "Validate Tree");
   ~mafOpValidateTree(); 
+  
+  /** Iterate on all tree nodes and check the consistency for each one: 
+  return a VALIDATE_RETURN_VALUES id*/
+  int ValidateTree();
+
+  /** values returned by ValidateTree() */
+  enum VALIDATE_RETURN_VALUES
+  {
+    VALIDATE_ERROR = 0,
+    VALIDATE_SUCCESS,
+    VALIDATE_WARNING,
+  };
 
   mafTypeMacro(mafOpValidateTree, mafOp);
 
@@ -40,13 +62,11 @@ public:
 
   /** This operation accept everything as input.*/
   bool Accept(mafNode *node) {return true;};
-  
+
   /** Create the user interface and initialize variables.*/
   void OpRun();
 
 protected: 
-  /** iterate to all nodes and check correctness for each one.*/
-  int ValidateTree();
 
   /** Log errors into the log area according to the error number reported.*/
   void ErrorLog(int error_num, const char *node_name, const char *description = NULL);
@@ -62,13 +82,6 @@ protected:
     URL_EMPTY,
     BINARY_FILE_NOT_PRESENT,
     ARCHIVE_FILE_NOT_PRESENT,
-  };
-
-  enum VALIDATE_RETURN_VALUES
-  {
-    VALIDATE_ERROR = 0,
-    VALIDATE_SUCCESS,
-    VALIDATE_WARNING,
   };
 
   mafString m_MSFPath;
