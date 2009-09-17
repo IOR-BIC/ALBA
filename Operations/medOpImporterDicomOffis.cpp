@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-14 13:57:10 $
-Version:   $Revision: 1.1.2.44 $
+Date:      $Date: 2009-09-17 14:22:57 $
+Version:   $Revision: 1.1.2.45 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -350,6 +350,7 @@ void medOpImporterDicomOffis::OpRun()
 	  {
 		  wxString path = (mafGetApplicationDirectory()+"/data/external/").c_str();
 		  wxDirDialog dialog(m_Wizard->GetParent(),"", path,wxRESIZE_BORDER, m_Wizard->GetPosition());
+      
 		  dialog.SetReturnCode(wxID_OK);
 		  int ret_code = dialog.ShowModal();
 		  if (ret_code == wxID_OK)
@@ -364,6 +365,7 @@ void medOpImporterDicomOffis::OpRun()
 	      OpStop(OP_RUN_CANCEL);
 	      return;
 	    }
+
 	  }
     else
     {
@@ -375,6 +377,7 @@ void medOpImporterDicomOffis::OpRun()
       }
     }
   } while(!result);
+
 
   int wizardResult = RunWizard();
   OpStop(wizardResult);
@@ -1403,6 +1406,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
   double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
   m_ListSelected->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
 
+
   double origin[3];
   m_SliceTexture->GetInput()->GetOrigin(origin);
   vtkMatrix4x4 *mat = vtkMatrix4x4::New();
@@ -1423,7 +1427,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 
 //   mat->SetElement(0,3,origin[0]);
 //   mat->SetElement(1,3,origin[1]);
-  mat->SetElement(2,3,origin[2]);
+  mat->SetElement(2,3,origin[2]); //origin
 
   vtkTransform *trans = vtkTransform::New();
   trans->SetMatrix(mat);
@@ -2607,9 +2611,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					// list of files related to the new studyID
           m_FilesList = new medListDICOMFiles;
 
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+
+          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          {
+            //Unable to get element: DCM_SliceLocation;
+            slice_pos[0] = imagePositionPatient[0];
+            slice_pos[1] = imagePositionPatient[1];
+            slice_pos[2] = imagePositionPatient[2];
+          } 
+          else
+          {
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          }
 
           m_FilesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
 
@@ -2623,9 +2638,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				}
 				else 
 				{
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          {
+            //Unable to get element: DCM_SliceLocation;
+            slice_pos[0] = imagePositionPatient[0];
+            slice_pos[1] = imagePositionPatient[1];
+            slice_pos[2] = imagePositionPatient[2];
+          } 
+          else
+          {
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          }
+
           m_DicomMap[studyUID]->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
 				}
 			}
@@ -2636,9 +2662,19 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
 					m_FilesList = new medListDICOMFiles;
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          {
+            //Unable to get element: DCM_SliceLocation;
+            slice_pos[0] = imagePositionPatient[0];
+            slice_pos[1] = imagePositionPatient[1];
+            slice_pos[2] = imagePositionPatient[2];
+          } 
+          else
+          {
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          }
 
           ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
@@ -2679,9 +2715,19 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				}
 				else 
 				{
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-          ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          {
+            //Unable to get element: DCM_SliceLocation;
+            slice_pos[0] = imagePositionPatient[0];
+            slice_pos[1] = imagePositionPatient[1];
+            slice_pos[2] = imagePositionPatient[2];
+          } 
+          else
+          {
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
+            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+          }
 
           ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
