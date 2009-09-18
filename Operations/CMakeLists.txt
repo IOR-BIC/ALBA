@@ -21,6 +21,9 @@ SET(PROJECT_SRCS
   medOpImporterLandmarkWS.cpp
   medOpImporterLandmarkWS.h
 
+  medOpMatrixVectorMath.cpp
+  medOpMatrixVectorMath.h
+
   medOpMML.cpp
   medOpMML.h
   medOpMMLContourWidget.cpp
