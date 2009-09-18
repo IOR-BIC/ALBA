@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.h,v $
 Language:  C++
-Date:      $Date: 2009-06-30 15:35:59 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-09-18 08:10:33 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -20,36 +20,22 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkPolyDataWriter.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkScaledTextActor.h"
 #include "vtkDataSet.h"
 #include "vtkKochanekSpline.h"
-#include "vtkTubeFilter.h"
 #include "vtkActor.h"
-#include "vtkWindowLevelLookupTable.h"
 #include "vtkMatrix4x4.h"
-#include "vtkPlane.h"
-#include "vtkLineSource.h"
-#include "vtkTubeFilter.h"
-#include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkInteractorStyleImage.h"
-#include "vtkLODActor.h"
-#include "vtkCamera.h"
 #include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
-#include "vtkProbeFilter.h"
-#include "vtkPlaneSource.h"
 #include "vtkSTLReader.h"
 #include "vtkSTLWriter.h"
-#include "vtkCutter.h"
-#include "vtkTransform.h"
-#include "vtkTransformPolyDataFilter.h"
-#include "vtkSphereSource.h"
-#include "vtkGlyph3D.h"
-#include "vtkClipPolyData.h"
-#include "vtkTextMapper.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkInteractorStyleImage.h"
+
+#include "medOpMML3ModelView2DPipe.h"
+#include "medOpMML3ModelView3DPipe.h"
+
+#include <ostream>
 
 #define MAX_CHARS 512
 
@@ -59,6 +45,27 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 /// medOpMML3ModelView. \n
 /// Helper class for medOpMML3. \n
 /// This class is the visual pipe for the op.
+//
+//
+// Flow of information between widget, model view and visual pipe.
+//                                             
+//                      MODEL VIEW               
+//           slice id                                                                    
+//               |     Original contour <---------------------------------------- initialization
+//               |        centres                                                     only      
+//   WIDGET      |           |                                                          ^
+//               V           V                                                          |
+// Interaction----------> Splines      slice id                                         |
+//     |                     |           / \                                            |
+//     |                     |<---------    ------------                                |
+//     |                     |                           \   VISUAL PIPE 2D             |
+//     V                     V                            \                             |
+// rot. handle     <---- Spline(zeta) -------> Transforms ---> contour --------> contour segments --> 
+// scaling handles <----                                  ---> cut planes ----->                     |
+//                    ^                                   ---> contour axes                          |
+//                    |                                                                              V
+//                     <-----------------------------------------------------------------------------
+//
 //------------------------------------------------------------------------------
 class medOpMML3ModelView
 {
@@ -66,76 +73,47 @@ public:
   //----------------------------------------------------------------------------
   // constructor and destructor
   //----------------------------------------------------------------------------
-  medOpMML3ModelView(vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume); ///< constructor
+  medOpMML3ModelView(vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscleIn, vtkPolyData *muscleOut,
+    vtkDataSet* volume, int numberOfScans) ; ///< constructor
   virtual ~medOpMML3ModelView(); ///< destructor
 
+  /// initialize after input parameters have been set
+  void Initialize() ;
 
 
   //----------------------------------------------------------------------------
-  // Outputs of model view
+  // Display
   //----------------------------------------------------------------------------
 
-  /// Get the total transform of the muscle from input to output
-  vtkMatrix4x4* GetFinalM() const {return m_FinalMat ;}
-
-  /// Get the output muscle polydata
-  vtkPolyData* GetOutputPolydata() const {return m_MuscleTransform2PolyDataFilter->GetOutput() ;}
-
-
-
-  //----------------------------------------------------------------------------
-  // synthetic scans methods
-  //----------------------------------------------------------------------------
-
-  /// Set grain of scans. \n
-  /// The grain value 1-5 is used to set the resolution of the slice images.
-  void SetGrainOfScans(int n) {m_SyntheticScansGrain = n ;}
-
-  /// Calculate size and resolution of synthetic scans. \n
-  /// Must be called prior to CreateSyntheticScans. \n
-  /// Size depends on bounds of muscle. \n
-  /// Resolution is 1/16 to 2 times the image size, depending on the "grain" value.
-  void FindSizeAndResolutionOfSyntheticScans();
-
-  /// Construct the visual pipes for all the slices
-  /// NB must call FindSizeAndResolutionOfSyntheticScans() first
-  void CreateSyntheticScans();
-
-  /// Delete the synthetic scans
-  void DeleteSyntheticScans();
-
-  /// Get slice actor, for setting visibility
-  vtkActor* GetActorOfSyntheticScans(int s) const {return m_SyntheticScansActor[s] ;}
-
-  /// Get look up table for scans
-  vtkWindowLevelLookupTable* GetWindowLevelLookupTableOfSyntheticScans() const {return m_SyntheticScansWindowLevelLookupTable ;}
-
-  int GetTotalNumberOfSyntheticScans() const ;  ///< get number of scans
-  void SetTotalNumberOfSyntheticScans(int n) {m_NSyntheticScansTotalNumber = n ;}   ///< set number of scans
-
-  /// Calculate distance z along slice axis from landmark 1 to landmark 2
-  /// Assumes z is a linear function of scan id with range -L/2 to +L/2 where L is length
-  double GetZOfSyntheticScans(int s);
-  double GetCurrentZOfSyntheticScans();
-
-  int GetCurrentIdOfSyntheticScans() const {return m_NSyntheticScansCurrentId ;}  ///< get the current scan id
-  void SetCurrentIdOfSyntheticScans(int n) {m_NSyntheticScansCurrentId = n ;} ///< set the current scan id
-
-  double GetSyntheticScansLevel() const {return m_Window ;} ///< get the level value of the scalar lut
-  double GetSyntheticScansWindow() const {return m_Level ;} ///< get the window value of the scalar lut
-  float GetLowScalar() const {return m_SyntheticScansMinScalarValue ;} ///< get the min scalr value
-  float GetHighScalar() const {return m_SyntheticScansMaxScalarValue ;} ///< get the max scalar value
-
-  void SetSizeOfSyntheticScans(float x, float y);     ///< set the size of the polydata slice probe
-  void GetSizeOfSyntheticScans(float *x, float *y);   ///< get the size of the polydata slice probe
-  void SetResolutionOfSyntheticScans(int x, int y);   ///< set the resolution of the slice (no. of quads)
-  void GetResolutionOfSyntheticScans(int *x, int *y); ///< get the resolution of the slice (no. of quads)
-
+  void SetDisplay2D() ; ///< set to 2d visual pipe
+  void SetDisplay3D() ; ///< set to 3d visual pipe
+  void SetDisplayToPreview() ; ///< set to preview visual pipe
+  medOpMML3ModelView2DPipe* GetVisualPipe2D() {return m_VisualPipe2D ;} ///< return the 2d visual pipe
+  medOpMML3ModelView3DPipe* GetVisualPipe3D() {return m_VisualPipe3D ;} ///< return the 3d visual pipe
+  medOpMML3ModelView3DPipe* GetVisualPipePreview() {return m_VisualPipePreview ;} ///< return the preview visual pipe
+  void ResetCameraPosition() ; ///< reset the camera position
+  vtkRenderWindowInteractor* GetRenderWindowInteractor() const {return m_Renderer->GetRenderWindow()->GetInteractor() ;}
+  vtkRenderer* GetRenderer() const {return m_Renderer;}
+  void Render();
 
 
 
   //----------------------------------------------------------------------------
-  // landmark methods
+  // Methods which return info required by widget
+  //----------------------------------------------------------------------------
+
+  /// Get the bounds of the untransformed contour on the current slice. \n
+  /// Returns the value saved by CalculateOriginalContourCenters()
+  void GetOriginalContourBounds(double bounds[6]) ; 
+
+  /// Get the center of the untransformed contour on the current slice. \n
+  /// Returns the value saved by CalculateOriginalContourCenters()
+  void GetOriginalContourCenter(double center[3]) ; 
+
+
+  //----------------------------------------------------------------------------
+  // Landmark methods
+  // All landmarks are in patient coords
   //----------------------------------------------------------------------------
 
   // patient landmarks functions
@@ -166,24 +144,38 @@ public:
   void SetLandmark3OfAxis(double *xyz) ;
   void GetLandmark3OfAxis(double *xyz) const ;
 
-  void FindUnitVectorsAndLengthsOfLandmarkLines();
 
 
 
   //----------------------------------------------------------------------------
-  // Global registration methods
+  // synthetic scans methods
   //----------------------------------------------------------------------------
 
-  /// Muscle transform 1 - global registration using landmarks. \n
-  /// This creates the transform which moves the muscle landmarks to the corresponding 
-  /// points on the volume.
-  bool MapAtlasToPatient();
+  /// Get number of scans. \n
+  /// The corresponding set method is protected and can only be used in the constructor
+  int GetTotalNumberOfScans() const ;
 
-  /// Do global registration transform on axis landmarks. \n
-  /// Axis landmarks come from the atlas, \n
-  /// So they must transform with the muscle polydata. \n
-  /// You must do MapAtlasToPatient() first to create the transform.
-  void TransformAxisLandmarksToPatient() ;
+  /// Set positions (fractional and actual) of scans along axis
+  void SetFractionalPosOfScans(double *alpha) ;
+
+  /// Set grain of scans. \n
+  /// The grain value 1-5 is used to set the resolution of the slice images.
+  void SetGrainOfScans(int n) {m_ScansGrain = n ;}
+
+  /// Set the current scan id. \n
+  /// This also sets the corresponding pose matrices in the visual pipes
+  void SetCurrentIdOfScans(int i) ;
+
+  /// Get the current scan id
+  int GetCurrentIdOfScans() const {return m_ScansCurrentId ;}
+
+  double GetZetaOfSlice(int sliceId) const ;  ///< Calculate distance zeta along slice axis
+  double GetZetaOfCurrentSlice() const ;      ///< Calculate distance zeta along slice axis
+
+  void GetSizeOfScans(double *x, double *y) const ; ///< get the size of the polydata slice probe
+  void GetResolutionOfScans(int *x, int *y) const ; ///< get the resolution of the slice (no. of quads)
+
+
 
 
 
@@ -202,28 +194,19 @@ public:
   /// set parameter tuple in operations stack
   void SetOperationsStackTuple(int i, double *params) {m_OperationsStack->SetTuple(i, params) ;}
 
-  /// switch visual pipe to 3d display
-  void Switch3dDisplayOn();
-
-
-
   bool GetScalingOccured() const {return m_ScalingOccured ;} ///< has scaling occured
   void SetScalingOccured(bool scalingOccured) {m_ScalingOccured = scalingOccured ;} ///< set scaling occured flag
 
   int GetScalingOccuredOperationId() const {return m_ScalingOccuredOperationId ;} ///< get id
   void SetScalingOccuredOperationId(int id) {m_ScalingOccuredOperationId = id ;} ///< set id
 
-  void UpdateSegmentNorthEastTransform();
-  void UpdateSegmentNorthWestTransform();
-  void UpdateSegmentSouthEastTransform();
-  void UpdateSegmentSouthWestTransform();
 
-  vtkScaledTextActor* GetScaledTextActor1() const {return m_ScaledTextActorY ;}
-  vtkScaledTextActor* GetScaledTextActor2() const {return m_ScaledTextActorX ;}
 
+  //----------------------------------------------------------------------------
   // splines functions
-  vtkKochanekSpline* GetPHSpline() const {return m_CenterHorizontalOffsetSpline ;}
-  vtkKochanekSpline* GetPVSpline() const {return m_CenterVerticalOffsetSpline ;}
+  //----------------------------------------------------------------------------
+  vtkKochanekSpline* GetPHSpline() const {return m_PlaceHorizontalOffsetSpline ;}
+  vtkKochanekSpline* GetPVSpline() const {return m_PlaceVerticalOffsetSpline ;}
   vtkKochanekSpline* GetTHSpline() const {return m_HorizontalTranslationSpline ;}
   vtkKochanekSpline* GetTVSpline() const {return m_VerticalTranslationSpline ;}
   vtkKochanekSpline* GetRASpline() const {return m_TwistSpline ;}
@@ -231,138 +214,159 @@ public:
   vtkKochanekSpline* GetSESpline() const {return m_EastScalingSpline ;}
   vtkKochanekSpline* GetSSSpline() const {return m_SouthScalingSpline ;}
   vtkKochanekSpline* GetSNSpline() const {return m_NorthScalingSpline ;}
+  vtkKochanekSpline* GetCHSpline() const {return m_CenterHorizontalOffsetSpline ;}
+  vtkKochanekSpline* GetCVSpline() const {return m_CenterVerticalOffsetSpline ;}
 
-  vtkActor* GetPositiveXAxisActor() const {return m_GlobalPosXAxisActor ;}
-  vtkActor* GetNegativeXAxisActor() const {return m_GlobalNegXAxisActor ;}
-  vtkActor* GetPositiveYAxisActor() const {return m_GlobalPosYAxisActor ;}
-  vtkActor* GetNegativeYAxisActor() const {return m_GlobalNegYAxisActor ;}
-  vtkActor* GetPositiveZAxisActor() const {return m_GlobalPosZAxisActor ;}
-  vtkActor* GetNegativeZAxisActor() const {return m_GlobalNegZAxisActor ;}
 
-  vtkActor* GetContourActor() const {return m_ContourActor ;}
 
-  void SetText(int m, double n, int d, int s);
-  vtkTransformPolyDataFilter* GetNEContourTransformPolyDataFilter() const {return m_NEContourTransformPolyDataFilter ;}
-  vtkTransformPolyDataFilter* GetNWContourTransformPolyDataFilter() const {return m_NWContourTransformPolyDataFilter ;}
-  vtkTransformPolyDataFilter* GetSEContourTransformPolyDataFilter() const {return m_SEContourTransformPolyDataFilter ;}
-  vtkTransformPolyDataFilter* GetSWContourTransformPolyDataFilter() const {return m_SWContourTransformPolyDataFilter ;}
 
+  //----------------------------------------------------------------------------
+  // Update methods
+  // These use the current values of the splines to update the contour and axes.
+  //----------------------------------------------------------------------------
+
+  /// Update everything
+  void Update() ;
+
+  /// Update the transform which controls the cutting planes which divide the contour into quadrants. \n
+  /// Applies the current values of the splines.
+  void UpdateCuttingPlanesTransform();
+
+  /// Update the transform which controls the contour axes and the clipping planes. \n
+  /// Applies the current values of the splines.
   void UpdateContourAxesTransform();
+
+  /// Update the transform of the global axes. \n
+  /// Applies the current values of the splines.
   void UpdateGlobalAxesTransform();
-  void UpdateContourCuttingPlane();
-  void UpdateSegmentCuttingPlanes();
 
-  vtkRenderWindowInteractor* GetRenderWindowInteractor() const {return m_RenderWindowInteractor ;}
-  vtkRenderer* GetRenderer() const {return m_Renderer;}
-  void Render();
+  /// Update the contour quadrant. \n
+  /// Applies the current values of the splines.
+  void UpdateSegmentNorthEastTransform();
 
-  int GetTypeOfMuscles() const {return m_NTypeOfMuscles ;}
-  void SetTypeOfMuscles(int t) {m_NTypeOfMuscles = t ;}
+  /// Update the contour quadrant. \n
+  /// Applies the current values of the splines.
+  void UpdateSegmentNorthWestTransform();
 
-  void SetGlobalAxesVisibility();
-  void SetContourAxesVisibility();
+  /// Update the contour quadrant. \n
+  /// Applies the current values of the splines.
+  void UpdateSegmentSouthEastTransform();
 
-  vtkActor* GetContourPositiveXAxisActor() const {return m_ContourPosXAxisActor ;}
-  vtkActor* GetContourNegativeXAxisActor() const {return m_ContourNegXAxisActor ;}
-  vtkActor* GetContourPositiveYAxisActor() const {return m_ContourPosYAxisActor ;}
-  vtkActor* GetContourNegativeYAxisActor() const {return m_ContourNegYAxisActor ;}
-
-  vtkActor* GetNEContourActor() const {return m_NEContourActor ;}
-  vtkActor* GetNWContourActor() const {return m_NWContourActor ;}
-  vtkActor* GetSEContourActor() const {return m_SEContourActor ;}
-  vtkActor* GetSWContourActor() const {return m_SWContourActor ;}
-
-  vtkTextMapper* GetTextMapper1() const {return m_TextMapperY ;}
-  vtkTextMapper* GetTextMapper2() const {return m_TextMapperX ;}
-
-  void Set4LandmarksFlag(int n) {m_4Landmarks = n ;}
+  /// Update the contour quadrant. \n
+  /// Applies the current values of the splines.
+ void UpdateSegmentSouthWestTransform();
 
 
-  /// Muscle transform 2. \n
-  /// Transform coordinates into a coordinate system, in which z-axis \n
-  /// is aligned with muscle line axis as defined by insertion points \n
-  /// in patient, and origin being the middle of this muscle line axis. \n
-  bool MakeActionLineZAxis();
 
 
-  vtkTubeFilter* GetContourTubeFilter() const {return m_ContourTubeFilter ;}
-  bool	SetUpContourCoordinateAxes();
-  bool	SetUpGlobalCoordinateAxes();
+ //----------------------------------------------------------------------------
+ // Methods for calculating the deformed output muscle
+ // The calculations must of course agree with the corresponding methods for integer slices
+ //----------------------------------------------------------------------------
 
-  vtkPlane* GetContourPlane() const {return m_ContourPlane ;}
+ /// calculate the position of the slice for an arbitrary value of zeta
+ void CalculateSlicePosition(double zeta, double *pos) const ;
+
+ /// calculate the normal of the slice for an arbitrary value of zeta
+ void CalculateSliceNormal(double zeta, double *normal) const ;
+
+ /// calculate the pose matrix of the slice for an arbitrary value of zeta
+ void CalculateSlicePoseMatrix(double zeta, vtkMatrix4x4 *mat) const ;
+
+ /// Calculate height of point x above plane
+ /// the value is zero for a point in the plane.
+ double HeightAbovePlane(double *normal, double *origin, double *x) const ;
+
+ /// Calculate height of point x above plane defined by zeta
+ /// the value is zero for a point in the plane.
+ double HeightAbovePlane(double zeta, double *x) const ;
+
+ /// calculate zeta of a point, i.e. which slice plane does point belong to
+ double CalculateZetaOfPoint(double *x) const ;
+
+ /// Apply the registration ops to create the output muscle
+ void ApplyRegistrationOps() ;
+
+
+
+
+ void SetText(int m, double n, int d, int s);
+
+ int GetTypeOfMuscles() const {return m_MuscleType ;}
+ void SetTypeOfMuscles(int t) {m_MuscleType = t ;}
+
+ void Set4LandmarksFlag(int n) {m_4Landmarks = n ;}
+
+ /// Print self. \n
+ /// NB This does not print the visual pipes - \n
+ /// their PrintSelf() methods must be called explicitly.
+ void PrintSelf(ostream &os, int indent) ;
+
+
 
 protected:
   //----------------------------------------------------------------------------
   // synthetic scans methods
   //----------------------------------------------------------------------------
-  vtkMatrix4x4* CreateActorTransformOfSyntheticScans(int scanId);  ///< allocate and calculate new transform matrix
-  vtkMatrix4x4* CreatePlaneSourceTransformOfSyntheticScans(int scanId);  ///< allocate and calculate new transform matrix
+  /// Calculate the origins of the scans along the axis, given the fractional positions. \n
+  /// Must call SetFractionalPosOfScans() first.
+  void CalculatePositionsOfScans() ;
 
-  /// Calculate the origin of the slice, \n
-  /// ie the intersection of the axis with the slice. \n
-  /// The axis goes from (patient) landmark 2 to landmark 1.
-  void GetPlaneSourceOriginOfSyntheticScans(int scanId, double p[3]);
+  /// Calculate the normals of the scans. \n
+  /// Must call SetFractionalPosOfScans() first.
+  void CalculateNormalsOfScans() ;
 
-  double GetContourAxesLengthScale() const {return m_ContourAxesLengthScale ;} ///< get length of contour axes
-  void SetContourAxesLengthScale(double length) {m_ContourAxesLengthScale = length ;} ///< set length of contour axes
+  /// Calculate the pose matrices of the scans. \n
+  /// Must call CalculatePositionsOfScans() and CalculateNormalsOfScans() first.
+  void CalculatePoseMatricesOfScans() ;
 
-  vtkPlane* GetCuttingPlaneWest() const {return m_Y0ZWPlane ;}
-  vtkPlane* GetCuttingPlaneEast() const {return m_Y0ZEPlane ;}
-  vtkPlane* GetCuttingPlaneNorth() const {return m_X0ZNPlane ;}
-  vtkPlane* GetCuttingPlaneSouth() const {return m_X0ZSPlane ;}
+  /// Calculate size and resolution of synthetic scans. \n
+  /// Must call SetGrainOfScans() and CalculatePoseMatricesOfScans() first. \n
+  /// Size depends on bounds of muscle. \n
+  /// Resolution is 1/16 to 2 times the image size, depending on the "grain" value.
+  void FindSizeAndResolutionOfScans();
 
-  vtkTubeFilter* GetPositiveXAxisTubeFilter() const {return m_PosXAxisAxesTubeFilter ;}
-  vtkTubeFilter* GetNegativeXAxisTubeFilter() const {return m_NegXAxisAxesTubeFilter ;}
-  vtkTubeFilter* GetPositiveYAxisTubeFilter() const {return m_PosYAxisAxesTubeFilter ;}
-  vtkTubeFilter* GetNegativeYAxisTubeFilter() const {return m_NegYAxisAxesTubeFilter ;}
+  /// Calculate total length of axis or axes
+  double LengthOfAxis() const ;
 
-  vtkTubeFilter* GetContourPositiveXAxisTubeFilter() const {return m_ContourPosXAxisAxesTubeFilter ;}
-  vtkTubeFilter* GetContourNegativeXAxisTubeFilter() const {return m_ContourNegXAxisAxesTubeFilter ;}
-  vtkTubeFilter* GetContourPositiveYAxisTubeFilter() const {return m_ContourPosYAxisAxesTubeFilter ;}
-  vtkTubeFilter* GetContourNegativeYAxisTubeFilter() const {return m_ContourNegYAxisAxesTubeFilter ;}
+  /// Calculate original centers of contours on each slice. \n
+  /// Do this when everything else is set up, \n
+  /// and before any transforms have been applied. \n
+  /// Don't call it from anywhere except Initialize(). \n
+  /// It sets values which affect the transforms, so don't forget to update after.
+  void CalculateOriginalContourCenters() ;
 
-  vtkLineSource* GetPositiveXAxisLineSource() const {return m_PosXAxisLineSource ;}
-  vtkLineSource* GetNegativeXAxisLineSource() const {return m_NegXAxisLineSource ;}
-  vtkLineSource* GetPositiveYAxisLineSource() const {return m_PosYAxisLineSource ;}
-  vtkLineSource* GetNegativeYAxisLineSource() const {return m_NegYAxisLineSource ;}
 
-  vtkLineSource* GetContourPositiveXAxisLineSource() const {return m_ContourPosXAxisLineSource ;}
-  vtkLineSource* GetContourNegativeXAxisLineSource() const {return m_ContourNegXAxisLineSource ;}
-  vtkLineSource* GetContourPositiveYAxisLineSource() const {return m_ContourPosYAxisLineSource ;}
-  vtkLineSource* GetContourNegativeYAxisLineSource() const {return m_ContourNegYAxisLineSource ;}
 
-  vtkTransform* GetContourCutterTransform() const {return m_ContourCutterTransform ;}
-  vtkTransformPolyDataFilter* GetContourCutterTransformPolyDataFilter() const {return m_ContourCutterTransformPolyDataFilter ;}
+  //----------------------------------------------------------------------------
+  // set positions and properties of axes
+  //----------------------------------------------------------------------------
+  bool	SetUpContourCoordinateAxes(); ///< set properties of contour axes
+  bool	SetUpGlobalCoordinateAxes();  ///< set properties of global axes
 
-  vtkLODActor* GetMuscleLODActor() const {return m_MuscleLODActor ;}
-  void WriteMatrix(char *pch, vtkMatrix4x4 *m) const ;
-  void SetNegativeLineActorX(double p1[3], double p2[3]);
-  void SetPositiveLineActorY(double p1[3], double p2[3]);
-  void SetNegativeLineActorY(double p1[3], double p2[3]);
-  void SetPositiveLineActorX(double p1[3], double p2[3]);
-  void AddActor(vtkActor* a);
-  void RetrieveCameraViewUp(double* vu);
-  void RetrieveCameraClippingRange(double *cr);
-  void RetrieveCameraPosition(double *cp);
-  void RetrieveCameraFocalPoint(double *fp);
-  void SaveCameraViewUp(double *vu);
-  void SaveCameraClippingRange(double *cr);
-  void SaveCameraPosition(double *cp);
-  void SaveCameraFocalPoint(double *fp);
-  vtkCamera* GetActiveCamera();
 
-  /// multiply matrices c = ab. \n
-  /// c can be the same as a or b
-  void MultiplyMatrix4x4(vtkMatrix4x4* a, vtkMatrix4x4* b, vtkMatrix4x4* c) const ;
 
+  //----------------------------------------------------------------------------
+  // useful maths
+  //----------------------------------------------------------------------------
+
+  /// Convenience method for multiplying a non-homo 3-point with a 4x4 matrix
   /// multiply point by matrix c = Ab. \n
   /// c can be the same as b
   void MultiplyMatrixPoint(vtkMatrix4x4* A, double b[3], double c[3]) const ;
 
-  /// Calculate centre of any plane created by vtkPlaneSource and scaled by sizx, sizy
-  void CalculateCentreOfVtkPlane(double sizx, double sizy, double p[3]) const ;
+  /// Calculate center of any plane created by vtkPlaneSource and scaled by sizx, sizy
+  void CalculateCenterOfVtkPlane(double sizx, double sizy, double p[3]) const ;
 
+
+
+
+
+  //----------------------------------------------------------------------------
+  // print debug info
+  //----------------------------------------------------------------------------
   void Print(vtkObject *obj, wxString msg = "") const ; //SIL. 24-12-2004: 
+
 
 
 
@@ -370,44 +374,44 @@ protected:
   // member variables
   //----------------------------------------------------------------------------
 
-  // Final transform, set in MakeActionLineZAxis(), and equal to transform 2.
-  // This transforms the muscle to the coord system of the stack of slices.
-  vtkMatrix4x4 *m_FinalMat;
+  /// input and output muscle polydata
+  vtkPolyData *m_MuscleInput ; ///< input muscle in patient coords
+  vtkPolyData *m_MuscleOutput ; ///< output muscle after registration ops applied.
 
-  // synthetic slices transform, set in MakeActionLineZAxis().
-  // This is the rotation component of m_FinalMat.
-  // This rotates the muscle to the slice plane.
-  // Its inverse rotates the slice plane to the required slicing direction.
-  vtkMatrix4x4 *m_SliceRotationMat;
+
+  // visual pipes and corresponding interactor styles
+  int m_3DDisplay; ///< flag for display mode (0 = 2d, 1 = 3d, 2 = preview)
+  medOpMML3ModelView2DPipe *m_VisualPipe2D ;
+  medOpMML3ModelView3DPipe *m_VisualPipe3D ;
+  medOpMML3ModelView3DPipe *m_VisualPipePreview ;
+  vtkInteractorStyleTrackballCamera *m_Style3D ;
+  vtkInteractorStyleImage *m_Style2D ;
+
+
+
 
   // type of muscles
-  // 1 for single axis, 2 for piecewise axis in 2 pieces
-  int m_NTypeOfMuscles;
-
-  double m_ContourAxesLengthScale; ///< length of contour axes
+  // 1 for single axis, 2 for two-part piecewise axis
+  int m_MuscleType;
 
   vtkDoubleArray* m_OperationsStack; ///< stack of operations for undo purposes
 
   vtkIntArray* m_ScalingFlagStack;
-  /*vtkDoubleArray* SStack;
-  vtkDoubleArray* ZStack;
-
-  vtkDoubleArray* PopStack;
-  vtkDoubleArray* TopStack;
-  vtkDoubleArray* RopStack;
-  vtkDoubleArray* SopStack;*/
 
 
   // splines variables
-  vtkKochanekSpline *m_CenterHorizontalOffsetSpline;
-  vtkKochanekSpline *m_CenterVerticalOffsetSpline;
-  vtkKochanekSpline *m_TwistSpline;
-  vtkKochanekSpline *m_HorizontalTranslationSpline;
+  vtkKochanekSpline *m_PlaceHorizontalOffsetSpline;   ///< place op (translate contour + widget)
+  vtkKochanekSpline *m_PlaceVerticalOffsetSpline;
+  vtkKochanekSpline *m_TwistSpline;                   ///< rotate op 
+  vtkKochanekSpline *m_HorizontalTranslationSpline;   ///< translate op (translate contour only)
   vtkKochanekSpline *m_VerticalTranslationSpline;
-  vtkKochanekSpline *m_NorthScalingSpline;
+  vtkKochanekSpline *m_NorthScalingSpline;            ///< scaling op 
   vtkKochanekSpline *m_SouthScalingSpline;
   vtkKochanekSpline *m_EastScalingSpline;
   vtkKochanekSpline *m_WestScalingSpline;
+  vtkKochanekSpline *m_CenterHorizontalOffsetSpline;  ///< center op (translate to contour centre, not set by user or displayed)
+  vtkKochanekSpline *m_CenterVerticalOffsetSpline;
+
 
   // atlas landmarks variables
   double m_AtlasLandmark1[3];
@@ -427,57 +431,6 @@ protected:
   double m_AxisLandmark3[3] ;
 
 
-
-  // 2d axes - action line system
-  vtkLineSource *m_PosXAxisLineSource; // positive x
-  vtkActor *m_GlobalPosXAxisActor;
-  vtkTubeFilter *m_PosXAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_PosXAxisPolyDataMapper;
-  vtkLineSource *m_PosYAxisLineSource; // positive y
-  vtkActor *m_GlobalPosYAxisActor;
-  vtkTubeFilter *m_PosYAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_PosYAxisPolyDataMapper;
-  vtkLineSource *m_NegXAxisLineSource; // negative x
-  vtkActor *m_GlobalNegXAxisActor;
-  vtkTubeFilter *m_NegXAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_NegXAxisPolyDataMapper;
-  vtkLineSource *m_NegYAxisLineSource; // negative y
-  vtkActor *m_GlobalNegYAxisActor;
-  vtkTubeFilter *m_NegYAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_NegYAxisPolyDataMapper;
-  vtkLineSource *m_PosZAxisLineSource; // positive z (3d display only)
-  vtkActor *m_GlobalPosZAxisActor;
-  vtkTubeFilter *m_PosZAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_PosZAxisPolyDataMapper;
-  vtkLineSource *m_NegZAxisLineSource; // negative z (3d display only)
-  vtkActor *m_GlobalNegZAxisActor;
-  vtkTubeFilter *m_NegZAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_NegZAxisPolyDataMapper;
-
-  // 2d axes - contour system
-  vtkLineSource *m_ContourPosXAxisLineSource; // positive x
-  vtkActor *m_ContourPosXAxisActor;
-  vtkTubeFilter *m_ContourPosXAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_ContourPosXAxisPolyDataMapper;
-  vtkLineSource *m_ContourPosYAxisLineSource; // positive y
-  vtkActor *m_ContourPosYAxisActor;
-  vtkTubeFilter *m_ContourPosYAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_ContourPosYAxisPolyDataMapper;
-  vtkLineSource *m_ContourNegXAxisLineSource; // negative x
-  vtkActor *m_ContourNegXAxisActor;
-  vtkTubeFilter *m_ContourNegXAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_ContourNegXAxisPolyDataMapper;
-  vtkLineSource *m_ContourNegYAxisLineSource; // negative y
-  vtkActor *m_ContourNegYAxisActor;
-  vtkTubeFilter *m_ContourNegYAxisAxesTubeFilter;
-  vtkPolyDataMapper *m_ContourNegYAxisPolyDataMapper;
-
-  // tube filters radius
-  float m_TubeFilterRadius;
-
-  // 3d display flag
-  int m_3DDisplay;
-
   // 4 landmarks flag
   int m_4Landmarks;
 
@@ -485,150 +438,58 @@ protected:
   vtkDataSet* m_Scans;
 
   // synthetic scans
-  int m_SyntheticScansGrain;
-  int m_NSyntheticScansTotalNumber;
-  int m_NSyntheticScansCurrentId;
-  int m_NSyntheticScansXResolution; // resolution of slice image is no. of quads
-  int m_NSyntheticScansYResolution;
-  float m_NSyntheticScansXSize;
-  float m_NSyntheticScansYSize;
-  float m_SyntheticScansMinScalarValue;
-  float m_SyntheticScansMaxScalarValue;
-
-  vtkWindowLevelLookupTable *m_SyntheticScansWindowLevelLookupTable; // lut
-  vtkActor **m_SyntheticScansActor; ///< actors for synthetic scans
-
+  int m_NumberOfScans;
+  int m_ScansGrain;
+  int m_ScansCurrentId;
+  int m_ScansResolutionX; // resolution of slice image is no. of quads
+  int m_ScansResolutionY;
+  double m_ScanSizeX;
+  double m_ScanSizeY;
 
   // muscle
   //vtkSTLReader *m_MuscleSTLReader;
   vtkSTLWriter *m_MuscleSTLWriter;
   vtkPolyDataWriter *m_MusclePolyDataWriter;
-  vtkPolyData* m_MusclePolyData;
-  vtkPolyDataMapper *m_MusclePolyDataMapper;
-  vtkLODActor *m_MuscleLODActor;
-
-  // three transforms which are pipelined together
-  vtkTransform *m_MuscleTransform1;
-  vtkTransform *m_MuscleTransform2;
-  vtkTransformPolyDataFilter *m_MuscleTransform1PolyDataFilter;  // input is vtkPolydata* muscle
-  vtkTransformPolyDataFilter *m_MuscleTransform2PolyDataFilter;
-  vtkPolyDataNormals *m_MusclePolyDataNormals;                   // adds normals to polydata
-
-  float m_FlMusclePolyDataBounds[6];
-  float m_FlMusclePolyDataCenter[3];
-  float m_FlMusclePolyDataExtent[3];
-
-
-  // window/level
-  double m_Window;
-  double m_Level;
-
-  // contour
-  vtkPlane *m_ContourPlane;
-  vtkCutter *m_ContourCutter;
-  vtkTransform* m_ContourCutterTransform;
-  vtkTransformPolyDataFilter *m_ContourCutterTransformPolyDataFilter;
-  vtkTubeFilter *m_ContourTubeFilter;
-  vtkPolyDataMapper *m_ContourPolyDataMapper;
-  vtkActor *m_ContourActor;
-  vtkSphereSource *m_ContourGlyphSphereSource;
-  vtkGlyph3D *m_ContourGlyph3D;
-  vtkPolyDataMapper *m_ContourGlyphPolyDataMapper;
-  vtkActor *m_ContourGlyphActor;
-
-  // landmarks
-  vtkSphereSource *m_Landmark1SphereSource;
-  vtkPolyDataMapper *m_Landmark1PolyDataMapper;
-  vtkActor *m_Landmark1Actor;
-  vtkSphereSource *m_Landmark2SphereSource;
-  vtkPolyDataMapper *m_Landmark2PolyDataMapper;
-  vtkActor *m_Landmark2Actor;
-  vtkSphereSource *m_Landmark3SphereSource;
-  vtkPolyDataMapper *m_Landmark3PolyDataMapper;
-  vtkActor *m_Landmark3Actor;
-  vtkSphereSource *m_Landmark4SphereSource;
-  vtkPolyDataMapper *m_Landmark4PolyDataMapper;
-  vtkActor *m_Landmark4Actor;
-
-  // L1 to L2 line (action)
-  vtkLineSource *m_L1L2LineSource;
-  vtkTubeFilter *m_L1L2TubeFilter;
-  vtkPolyDataMapper *m_L1L2PolyDataMapper;
-  vtkActor *m_L1L2Actor;
-
-  // L2 to L3 line
-  vtkLineSource *m_L2L3LineSource;
-  vtkTubeFilter *m_L2L3TubeFilter;
-  vtkPolyDataMapper *m_L2L3PolyDataMapper;
-  vtkActor *m_L2L3Actor;
-
-  // scaling contours stuff
-  vtkPlane *m_X0ZNPlane; // pointing N
-  vtkPlane *m_X0ZSPlane; // pointing S
-  vtkPlane *m_Y0ZEPlane; // pointing E
-  vtkPlane *m_Y0ZWPlane; // pointing W
-
-  // north-east
-  vtkTubeFilter *m_NEContourTubeFilter;
-  vtkTransformPolyDataFilter *m_NEContourTransformPolyDataFilter;
-  vtkClipPolyData *m_NEContourX0ZPlaneClipPolyData;
-  vtkClipPolyData *m_NEContourY0ZPlaneClipPolyData;
-  vtkPolyDataMapper *m_NEContourPolyDataMapper;
-  vtkActor *m_NEContourActor;
-
-  // south-east
-  vtkTubeFilter *m_SEContourTubeFilter;
-  vtkTransformPolyDataFilter *m_SEContourTransformPolyDataFilter;
-  vtkClipPolyData *m_SEContourX0ZPlaneClipPolyData;
-  vtkClipPolyData *m_SEContourY0ZPlaneClipPolyData;
-  vtkPolyDataMapper *m_SEContourPolyDataMapper;
-  vtkActor *m_SEContourActor;
-
-  // north-west
-  vtkTubeFilter *m_NWContourTubeFilter;
-  vtkTransformPolyDataFilter *m_NWContourTransformPolyDataFilter;
-  vtkClipPolyData *m_NWContourX0ZPlaneClipPolyData;
-  vtkClipPolyData *m_NWContourY0ZPlaneClipPolyData;
-  vtkPolyDataMapper *m_NWContourPolyDataMapper;
-  vtkActor *m_NWContourActor;
-
-  // south-west
-  vtkTubeFilter *m_SWContourTubeFilter;
-  vtkTransformPolyDataFilter *m_SWContourTransformPolyDataFilter;
-  vtkClipPolyData *m_SWContourX0ZPlaneClipPolyData;
-  vtkClipPolyData *m_SWContourY0ZPlaneClipPolyData;
-  vtkPolyDataMapper *m_SWContourPolyDataMapper;
-  vtkActor *m_SWContourActor;
-
-  // information display
-  vtkTextMapper *m_TextMapperX;
-  vtkScaledTextActor *m_ScaledTextActorX;
-
-  vtkTextMapper *m_TextMapperY;
-  vtkScaledTextActor *m_ScaledTextActorY;
 
   // rendering
   vtkRenderWindow *m_RenderWindow;
   vtkRenderer *m_Renderer;
-  vtkRenderWindowInteractor *m_RenderWindowInteractor;
 
-  // camera
-  double m_CameraFocalPoint[3];
-  double m_CameraPosition[3];
-  double m_CameraClippingRange[2];
-  double m_CameraViewUp[3];
-
-  // unit vectors and lengths of landmark lines
-  double m_DUnitVector12[3];
-  double m_DUnitVector23[3];
-  double m_DLength12;
-  double m_DLength23;
-  double m_DOverallLength;
-
-  // scaling occured flags
+  // scaling occurred flags
   bool m_ScalingOccured ;
   int m_ScalingOccuredOperationId ;
 
+
+  //----------------------------------------------------------------------------
+  // variables for slice positions
+  //----------------------------------------------------------------------------
+
+  // fractional distance of slices along axis or axes
+  // 0 <= alpha <= 1, where 0 and 1 are the min and max of the slice range
+  double *m_Alpha ;
+
+  // actual distance of slices along axis or axes
+  // 0 <= zeta <= L, where L is the total length of the axis or axes
+  double *m_Zeta ;
+
+  // positions and normals of scans in patient coords
+  double (*m_SlicePositions)[3] ; // syntax for declaring 2D array m_SlicePositions[][3]
+  double (*m_SliceNormals)[3] ;
+
+  // centers and bounds of contours before transformations have been applied
+  double (*m_OriginalContourCenters)[3] ;
+  double (*m_OriginalContourBounds)[6] ;
+
+  // matrices containing position and orientation of each slice
+  vtkMatrix4x4 **m_SlicePoseMat ;
+  vtkMatrix4x4 **m_SlicePoseInvMat ;
+
+  // saved alpha, zeta and normal of the axis mid point, if the muscle axis is in two parts
+  double m_AlphaMidPoint ;
+  double m_ZetaMidPoint ;
+  double m_NormalStart[3] ;     // value at alpha = 0.0, not value of first slice
+  double m_NormalMidPoint[3] ;  // value at axis mid point
+  double m_NormalEnd[3] ;       // value at alpha = 1.0, not value of last slice
 
 };
 

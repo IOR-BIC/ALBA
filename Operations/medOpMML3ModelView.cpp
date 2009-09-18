@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-30 15:35:59 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-09-18 08:10:33 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,65 +13,63 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDefines.h"
 #include "mafSmartPointer.h"
 
+#include "medOpMatrixVectorMath.h"
 #include "medOpMML3ModelView.h"
+#include "medOpMML3ModelView2DPipe.h"
+#include "medOpMML3ModelView3DPipe.h"
 
 #include "vtkMath.h"
-#include "vtkTextSource.h"
-#include "vtkProperty.h"
-#include "vtkProperty2D.h"
+#include "vtkInteractorStyleImage.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkCamera.h"
 
-//SIL. 24-12-2004: begin
-#ifdef VTK_USE_ANSI_STDLIB
-#include <sstream>
-#endif
-//SIL. 24-12-2004: end
+#include <ostream>
+#include <vector>
+#include <algorithm>
 
 
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // Constructor for model view
-medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume)
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, vtkPolyData *muscleIn, vtkPolyData *muscleOut,
+                                       vtkDataSet* volume, int numberOfScans)
+: m_RenderWindow(rw), m_Renderer(ren), m_MuscleInput(muscleIn),  m_MuscleOutput(muscleOut),
+m_Scans(volume), m_NumberOfScans(numberOfScans), m_4Landmarks(0), m_ScalingOccured(false), m_ScansGrain(1)
 { 
-  //mafSmartPointer <vtkTransform> transf;
+  //----------------------------------------------------------------------------
+  // Set up slices and their pose matrices
+  //----------------------------------------------------------------------------
+  m_Alpha = new double[m_NumberOfScans] ;
+  m_Zeta = new double[m_NumberOfScans] ;
+  m_SlicePositions = new double[m_NumberOfScans][3] ;
+  m_SliceNormals = new double[m_NumberOfScans][3] ;
+  m_OriginalContourCenters = new double[m_NumberOfScans][3] ;
+  m_OriginalContourBounds = new double[m_NumberOfScans][6] ;
 
-  //vtkTextActor* TextActor = vtkTextActor::New();
-  //TextActor->SetInput("Initializing. Please wait...");
-  //vtkCoordinate *c  = TextActor->GetPositionCoordinate();
-  //c->SetCoordinateSystemToNormalizedViewport();
-  //c->SetValue(0.35, 0.5f);
-  //Model->GetRenderer()->AddActor(TextActor);
+  m_SlicePoseMat = new (vtkMatrix4x4 * [m_NumberOfScans]) ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_SlicePoseMat[i] = vtkMatrix4x4::New() ;
 
-  // 2d display by default
-  m_3DDisplay = 0;
-
-  // 3 landmarks by default for initial mapping
-  m_4Landmarks = 0;
-
-  //
-  m_Scans = volume;
-
-  // display tubes
-  m_TubeFilterRadius = 0.5 ;
-
-  // final transform
-  m_FinalMat = vtkMatrix4x4::New();
-
-  // synthetic slices transform
-  m_SliceRotationMat = vtkMatrix4x4::New();
-
-  //
-  m_ScalingOccured = FALSE;
+  m_SlicePoseInvMat = new (vtkMatrix4x4 * [m_NumberOfScans]) ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_SlicePoseInvMat[i] = vtkMatrix4x4::New() ;
 
 
-  // copies of renderer, window and interactor
-  m_Renderer = ren;
-  m_RenderWindow = rw;
-  m_RenderWindowInteractor = rw->GetInteractor();
+  //----------------------------------------------------------------------------
+  // Create visual pipes
+  //----------------------------------------------------------------------------
+  m_VisualPipe2D = new medOpMML3ModelView2DPipe(ren, muscleIn, volume, m_NumberOfScans) ;
+  m_VisualPipe3D = new medOpMML3ModelView3DPipe(ren, muscleIn, volume, m_NumberOfScans) ;
+  m_VisualPipePreview = new medOpMML3ModelView3DPipe(ren, muscleOut, volume, m_NumberOfScans) ;
 
-  //
-  m_Renderer->SetBackground(0.2,0.4,0.6);
+  
+
+
+  //----------------------------------------------------------------------------
+  // Set style and select 2d or 3d
+  //----------------------------------------------------------------------------
 
   int *size = m_RenderWindow->GetSize();
   assert(size[0] > 0);
@@ -79,57 +77,22 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 
   m_RenderWindow->LineSmoothingOn();
 
+  m_Style2D = vtkInteractorStyleImage::New() ;
+  m_Style3D = vtkInteractorStyleTrackballCamera::New() ;
 
-  //// just to test things
-  /*
-  vtkTextSource *ts = vtkTextSource::New();
-  vtkPolyData *polydata = muscle ;
+  SetDisplay2D() ;
 
-  ts->SetForegroundColor(1, 1, 1);
-  ts->BackingOff();
-  ts->SetText("Model View");
-  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(polydata);
-  mapper->Update() ;
-
-  // analyse polydata
-  int npts = polydata->GetPoints()->GetNumberOfPoints() ;
-  int ncells = polydata->GetNumberOfCells() ;
-  double bnds[6] ;
-  polydata->GetBounds(bnds) ;
-
-  // analyse volume data
-  int datatype = volume->GetDataObjectType() ;
-  volume->GetBounds(bnds) ;
-
-
-  vtkActor* labactor = vtkActor::New();
-  labactor->SetMapper(mapper);
-  labactor->SetOrigin(0 , 0 , 0);
-  labactor->SetPosition(0 , 0 , 0);
-  labactor->SetScale(1 , 1 , 1);
-  labactor->SetVisibility(1) ;
-
-  m_pRenderer->AddActor(labactor) ;
-  */
 
 
   //----------------------------------------------------------------------------
-  // Set style for 2d display by default
+  // Set up spline functions.
+  // NB The center op splines are not set by user interaction, nor displayed.
   //----------------------------------------------------------------------------
-  vtkInteractorStyleImage *style = vtkInteractorStyleImage::New() ;
-  m_RenderWindowInteractor->SetInteractorStyle(style);
-  style->Delete() ;
+  m_PlaceHorizontalOffsetSpline = vtkKochanekSpline::New();
+  m_PlaceHorizontalOffsetSpline->ClosedOff();
 
-
-  //----------------------------------------------------------------------------
-  // set up spline functions
-  //----------------------------------------------------------------------------
-  m_CenterHorizontalOffsetSpline = vtkKochanekSpline::New();
-  m_CenterHorizontalOffsetSpline->ClosedOff();
-
-  m_CenterVerticalOffsetSpline = vtkKochanekSpline::New();
-  m_CenterVerticalOffsetSpline->ClosedOff();
+  m_PlaceVerticalOffsetSpline = vtkKochanekSpline::New();
+  m_PlaceVerticalOffsetSpline->ClosedOff();
 
   m_TwistSpline = vtkKochanekSpline::New();
   m_TwistSpline->ClosedOff();
@@ -142,7 +105,7 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 
   m_NorthScalingSpline = vtkKochanekSpline::New();
   m_NorthScalingSpline->ClosedOff();
-
+ 
   m_SouthScalingSpline = vtkKochanekSpline::New();
   m_SouthScalingSpline->ClosedOff();
 
@@ -152,16 +115,12 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   m_WestScalingSpline = vtkKochanekSpline::New();
   m_WestScalingSpline->ClosedOff();
 
+  m_CenterHorizontalOffsetSpline = vtkKochanekSpline::New();
+  m_CenterHorizontalOffsetSpline->ClosedOff();
 
+  m_CenterVerticalOffsetSpline = vtkKochanekSpline::New();
+  m_CenterVerticalOffsetSpline->ClosedOff();
 
-  //----------------------------------------------------------------------------
-  // Slice actors and lut
-  //----------------------------------------------------------------------------
-  // synthetic slices
-  m_SyntheticScansActor = NULL; // array of actors, allocated in CreateSyntheticScans()
-
-  // synthetic slices lut
-  m_SyntheticScansWindowLevelLookupTable = vtkWindowLevelLookupTable::New();
 
 
 
@@ -174,590 +133,6 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
   // allocate the operations stack, used for undo purposes
   AllocateOperationsStack(5, 2000) ;
 
-  /*SStack = vtkDoubleArray::New();
-  SStack->SetNumberOfComponents(1);
-
-  ZStack = vtkDoubleArray::New();
-  ZStack->SetNumberOfComponents(1);
-
-  PopStack = vtkDoubleArray::New();
-  PopStack->SetNumberOfComponents(2);
-
-  TopStack = vtkDoubleArray::New();
-  TopStack->SetNumberOfComponents(2);
-
-  RopStack = vtkDoubleArray::New();
-  RopStack->SetNumberOfComponents(1);
-
-  SopStack = vtkDoubleArray::New();
-  SopStack->SetNumberOfComponents(4);*/
-
-
-
-  //----------------------------------------------------------------------------
-  // standard display
-  // Contour axes and global axes
-  //----------------------------------------------------------------------------
-
-  // east contour axis
-  m_ContourPosXAxisLineSource = vtkLineSource::New();
-  m_ContourPosXAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_ContourPosXAxisAxesTubeFilter->SetInput(m_ContourPosXAxisLineSource->GetOutput());
-  m_ContourPosXAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_ContourPosXAxisPolyDataMapper->SetInput(m_ContourPosXAxisAxesTubeFilter->GetOutput());
-  m_ContourPosXAxisActor = vtkActor::New();
-  m_ContourPosXAxisActor->SetMapper(m_ContourPosXAxisPolyDataMapper);
-  m_Renderer->AddActor(m_ContourPosXAxisActor);
-  m_ContourPosXAxisActor->VisibilityOff();
-
-  // north contour axis
-  m_ContourPosYAxisLineSource = vtkLineSource::New();
-  m_ContourPosYAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_ContourPosYAxisAxesTubeFilter->SetInput(m_ContourPosYAxisLineSource->GetOutput());
-  m_ContourPosYAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_ContourPosYAxisPolyDataMapper->SetInput(m_ContourPosYAxisAxesTubeFilter->GetOutput());
-  m_ContourPosYAxisActor = vtkActor::New();
-  m_ContourPosYAxisActor->SetMapper(m_ContourPosYAxisPolyDataMapper);
-  m_Renderer->AddActor(m_ContourPosYAxisActor);
-  m_ContourPosYAxisActor->VisibilityOff();
-
-  // west contour axis
-  m_ContourNegXAxisLineSource = vtkLineSource::New();
-  m_ContourNegXAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_ContourNegXAxisAxesTubeFilter->SetInput(m_ContourNegXAxisLineSource->GetOutput());
-  m_ContourNegXAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_ContourNegXAxisPolyDataMapper->SetInput(m_ContourNegXAxisAxesTubeFilter->GetOutput());
-  m_ContourNegXAxisActor = vtkActor::New();
-  m_ContourNegXAxisActor->SetMapper(m_ContourNegXAxisPolyDataMapper);
-  m_Renderer->AddActor(m_ContourNegXAxisActor);
-  m_ContourNegXAxisActor->VisibilityOff();
-
-  // south contour axis
-  m_ContourNegYAxisLineSource = vtkLineSource::New();
-  m_ContourNegYAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_ContourNegYAxisAxesTubeFilter->SetInput(m_ContourNegYAxisLineSource->GetOutput());
-  m_ContourNegYAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_ContourNegYAxisPolyDataMapper->SetInput(m_ContourNegYAxisAxesTubeFilter->GetOutput());
-  m_ContourNegYAxisActor = vtkActor::New();
-  m_ContourNegYAxisActor->SetMapper(m_ContourNegYAxisPolyDataMapper);
-  m_Renderer->AddActor(m_ContourNegYAxisActor);
-  m_ContourNegYAxisActor->VisibilityOff();
-
-  // east global axis
-  m_PosXAxisLineSource = vtkLineSource::New();
-  m_PosXAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_PosXAxisAxesTubeFilter->SetInput(m_PosXAxisLineSource->GetOutput());
-  m_PosXAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_PosXAxisPolyDataMapper->SetInput(m_PosXAxisAxesTubeFilter->GetOutput());
-  m_GlobalPosXAxisActor = vtkActor::New();
-  m_GlobalPosXAxisActor->SetMapper(m_PosXAxisPolyDataMapper);
-  m_Renderer->AddActor(m_GlobalPosXAxisActor);
-  m_GlobalPosXAxisActor->VisibilityOn();
-
-  // north global axis
-  m_PosYAxisLineSource = vtkLineSource::New();
-  m_PosYAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_PosYAxisAxesTubeFilter->SetInput(m_PosYAxisLineSource->GetOutput());
-  m_PosYAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_PosYAxisPolyDataMapper->SetInput(m_PosYAxisAxesTubeFilter->GetOutput());
-  m_GlobalPosYAxisActor = vtkActor::New();
-  m_GlobalPosYAxisActor->SetMapper(m_PosYAxisPolyDataMapper);
-  m_Renderer->AddActor(m_GlobalPosYAxisActor);
-  m_GlobalPosYAxisActor->VisibilityOn();
-
-  // west global axis
-  m_NegXAxisLineSource = vtkLineSource::New();
-  m_NegXAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_NegXAxisAxesTubeFilter->SetInput(m_NegXAxisLineSource->GetOutput());
-  m_NegXAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_NegXAxisPolyDataMapper->SetInput(m_NegXAxisAxesTubeFilter->GetOutput());
-  m_GlobalNegXAxisActor = vtkActor::New();
-  m_GlobalNegXAxisActor->SetMapper(m_NegXAxisPolyDataMapper);
-  m_Renderer->AddActor(m_GlobalNegXAxisActor);
-  m_GlobalNegXAxisActor->VisibilityOn();
-
-  // south global axis
-  m_NegYAxisLineSource = vtkLineSource::New();
-  m_NegYAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_NegYAxisAxesTubeFilter->SetInput(m_NegYAxisLineSource->GetOutput());
-  m_NegYAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_NegYAxisPolyDataMapper->SetInput(m_NegYAxisAxesTubeFilter->GetOutput());
-  m_GlobalNegYAxisActor = vtkActor::New();
-  m_GlobalNegYAxisActor->SetMapper(m_NegYAxisPolyDataMapper);
-  m_Renderer->AddActor(m_GlobalNegYAxisActor);
-  m_GlobalNegYAxisActor->VisibilityOn();
-
-
-
-  //----------------------------------------------------------------------------
-  // z axis visual pipes
-  //----------------------------------------------------------------------------
-
-  // positive z global axis
-  m_PosZAxisLineSource = vtkLineSource::New();
-  m_PosZAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_PosZAxisAxesTubeFilter->SetInput(m_PosZAxisLineSource->GetOutput());
-  m_PosZAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_PosZAxisPolyDataMapper->SetInput(m_PosZAxisAxesTubeFilter->GetOutput());
-  m_GlobalPosZAxisActor = vtkActor::New();
-  m_GlobalPosZAxisActor->SetMapper(m_PosZAxisPolyDataMapper);
-  m_GlobalPosZAxisActor->VisibilityOff();
-  m_Renderer->AddActor(m_GlobalPosZAxisActor);
-
-  // negative z global axis
-  m_NegZAxisLineSource = vtkLineSource::New();
-  m_NegZAxisAxesTubeFilter = vtkTubeFilter::New();
-  m_NegZAxisAxesTubeFilter->SetInput(m_NegZAxisLineSource->GetOutput());
-  m_NegZAxisPolyDataMapper = vtkPolyDataMapper::New();
-  m_NegZAxisPolyDataMapper->SetInput(m_NegZAxisAxesTubeFilter->GetOutput());
-  m_GlobalNegZAxisActor = vtkActor::New();
-  m_GlobalNegZAxisActor->SetMapper(m_NegZAxisPolyDataMapper);
-  m_GlobalNegZAxisActor->VisibilityOff();
-  m_Renderer->AddActor(m_GlobalNegZAxisActor);
-
-
-
-  //----------------------------------------------------------------------------
-  // 4 landmarks and 2 action lines (3d only)
-  //----------------------------------------------------------------------------
-  // 1st landmark
-  m_Landmark1SphereSource = vtkSphereSource::New();
-  m_Landmark1PolyDataMapper = vtkPolyDataMapper::New();
-  m_Landmark1PolyDataMapper->SetInput(m_Landmark1SphereSource->GetOutput());
-  m_Landmark1Actor = vtkActor::New();
-  m_Landmark1Actor->SetMapper(m_Landmark1PolyDataMapper);
-  m_Landmark1Actor->VisibilityOff();
-  m_Renderer->AddActor(m_Landmark1Actor);
-
-  // 2nd landmark
-  m_Landmark2SphereSource = vtkSphereSource::New();
-  m_Landmark2PolyDataMapper = vtkPolyDataMapper::New();
-  m_Landmark2PolyDataMapper->SetInput(m_Landmark2SphereSource->GetOutput());
-  m_Landmark2Actor = vtkActor::New();
-  m_Landmark2Actor->SetMapper(m_Landmark2PolyDataMapper);
-  m_Landmark2Actor->VisibilityOff();
-  m_Renderer->AddActor(m_Landmark2Actor);
-
-  // 3rd landmark
-  m_Landmark3SphereSource = vtkSphereSource::New();
-  m_Landmark3PolyDataMapper = vtkPolyDataMapper::New();
-  m_Landmark3PolyDataMapper->SetInput(m_Landmark3SphereSource->GetOutput());
-  m_Landmark3Actor = vtkActor::New();
-  m_Landmark3Actor->SetMapper(m_Landmark3PolyDataMapper);
-  m_Landmark3Actor->VisibilityOff();
-  m_Renderer->AddActor(m_Landmark3Actor);
-
-  // 4th landmark
-  m_Landmark4SphereSource = vtkSphereSource::New();
-  m_Landmark4PolyDataMapper = vtkPolyDataMapper::New();
-  m_Landmark4PolyDataMapper->SetInput(m_Landmark4SphereSource->GetOutput());
-  m_Landmark4Actor = vtkActor::New();
-  m_Landmark4Actor->SetMapper(m_Landmark4PolyDataMapper);
-  m_Landmark4Actor->VisibilityOff();
-  m_Renderer->AddActor(m_Landmark4Actor);
-
-  // L1 to L2 line (action)
-  m_L1L2LineSource = vtkLineSource::New();
-  m_L1L2TubeFilter = vtkTubeFilter::New();
-  m_L1L2TubeFilter->SetInput(m_L1L2LineSource->GetOutput());
-  m_L1L2PolyDataMapper = vtkPolyDataMapper::New();
-  m_L1L2PolyDataMapper->SetInput(m_L1L2TubeFilter->GetOutput());
-  m_L1L2Actor = vtkActor::New();
-  m_L1L2Actor->SetMapper(m_L1L2PolyDataMapper);
-  m_L1L2Actor->VisibilityOff();
-  m_Renderer->AddActor(m_L1L2Actor);
-
-  // L2 to L3 line
-  m_L2L3LineSource = vtkLineSource::New();
-  m_L2L3TubeFilter = vtkTubeFilter::New();
-  m_L2L3TubeFilter->SetInput(m_L2L3LineSource->GetOutput());
-  m_L2L3PolyDataMapper = vtkPolyDataMapper::New();
-  m_L2L3PolyDataMapper->SetInput(m_L2L3TubeFilter->GetOutput());
-  m_L2L3Actor = vtkActor::New();
-  m_L2L3Actor->SetMapper(m_L2L3PolyDataMapper);
-  m_L2L3Actor->VisibilityOff();
-  m_Renderer->AddActor(m_L2L3Actor);
-
-
-
-
-  //----------------------------------------------------------------------------
-  // Muscle transform pipeline
-  //
-  //              muscle
-  //                |           MuscleTransform1 (see MapAtlasToPatient())
-  //                |          /
-  //     MuscleTransform1PDFilter
-  //                |
-  //                |           MuscleTransform2 (see MakeActionLineZAxis())
-  //                |          /
-  //     MuscleTransform2PDFilter ========> Output of Operation
-  //                |
-  //          MusclePDNormals
-  //                |
-  //          MusclePDMapper
-  //                |
-  //                V
-  //          MuscleLODActor (3d only)
-  //
-  //----------------------------------------------------------------------------
-
-  m_MuscleTransform1 = vtkTransform::New();
-  m_MuscleTransform1PolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_MuscleTransform1PolyDataFilter->SetInput(muscle);
-  m_MuscleTransform1PolyDataFilter->SetTransform(m_MuscleTransform1);
-
-  m_MuscleTransform2 = vtkTransform::New();
-  m_MuscleTransform2PolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_MuscleTransform2PolyDataFilter->SetInput(m_MuscleTransform1PolyDataFilter->GetOutput());
-  m_MuscleTransform2PolyDataFilter->SetTransform(m_MuscleTransform2);
-
-  m_MusclePolyDataNormals = vtkPolyDataNormals::New();
-  m_MusclePolyDataNormals->SetInput(m_MuscleTransform2PolyDataFilter->GetOutput());
-  m_MusclePolyDataNormals->FlipNormalsOn();
-
-  m_MusclePolyDataMapper = vtkPolyDataMapper::New();
-  m_MusclePolyDataMapper->SetInput(m_MusclePolyDataNormals->GetOutput());
-
-  m_MuscleLODActor = vtkLODActor::New();
-  m_MuscleLODActor->SetMapper(m_MusclePolyDataMapper);
-  m_MuscleLODActor->VisibilityOff();   // visibility off, but we can switch it on if we want to (see later)
-
-  m_Renderer->AddActor(m_MuscleLODActor);
-
-
-  // 2d axes - contour system
-  SetContourAxesLengthScale(2.0);
-
-
-
-  //----------------------------------------------------------------------------
-  // Contour Pipelines: NE, NW, SE, SW and "standard" ContourActor
-  //
-  //             |
-  // MuscleTransform2PolyDataFilter
-  //             |
-  //             |      ContourPlane (cut function)
-  //             V      /
-  //       ContourCutter
-  //       |  |  |  |  \
-  //       |  |  |  |   \
-  //       NE NW SE SW   \
-  //                      ContourActor (3d only)
-  //----------------------------------------------------------------------------
-
-
-  //----------------------------------------------------------------------------
-  // Standard contour pipeline (3d only)
-  //
-  //             |
-  //        ContourCutter
-  //             |          ContourCutterTransform
-  //             |         /
-  //   ContourCutterTransformPDFilter
-  //             |
-  //             |
-  //      ContourTubeFilter
-  //             |
-  //             |
-  //       ContourPDMapper
-  //             |
-  //             V
-  //        ContourActor (3d only)
-  //
-  //----------------------------------------------------------------------------
-  m_ContourPlane = vtkPlane::New();
-  m_ContourCutter = vtkCutter::New();
-  m_ContourCutter->SetCutFunction(m_ContourPlane);
-  m_ContourCutter->SetInput(m_MuscleTransform2PolyDataFilter->GetOutput());
-
-  m_ContourCutterTransform = vtkTransform::New(); //to put back to z=0 plane
-  m_ContourCutterTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_ContourCutterTransformPolyDataFilter->SetInput(m_ContourCutter->GetOutput());
-  m_ContourCutterTransformPolyDataFilter->SetTransform(m_ContourCutterTransform);
-
-  m_ContourTubeFilter = vtkTubeFilter::New();
-  m_ContourTubeFilter->SetInput(m_ContourCutterTransformPolyDataFilter->GetOutput());
-  m_ContourTubeFilter->SetRadius(m_TubeFilterRadius);
-  m_ContourTubeFilter->SetNumberOfSides(12);
-
-  m_ContourPolyDataMapper = vtkPolyDataMapper::New();
-  m_ContourPolyDataMapper->SetInput(m_ContourTubeFilter->GetOutput());
-
-  m_ContourActor = vtkActor::New();
-  m_ContourActor->SetMapper(m_ContourPolyDataMapper);
-  m_ContourActor->VisibilityOff();
-  m_ContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-
-  m_Renderer->AddActor(m_ContourActor);
-
-
-
-  //----------------------------------------------------------------------------
-  // glyphed contour
-  //----------------------------------------------------------------------------
-  //m_pContourGlyphSphereSource = vtkSphereSource::New();
-  //m_pContourGlyph3D = vtkGlyph3D::New();
-  //m_pContourGlyph3D->SetInput(m_pContourCutter->GetOutput());
-  //m_pContourGlyph3D->SetSource(m_pContourGlyphSphereSource->GetOutput());
-  //m_pContourGlyphPolyDataMapper = vtkPolyDataMapper::New();
-  //m_pContourGlyphPolyDataMapper->SetInput(m_pContourGlyph3D->GetOutput());
-  //m_pContourGlyphActor = vtkActor::New();
-  //m_pContourGlyphActor->SetMapper(m_pContourGlyphPolyDataMapper);
-  //m_pContourGlyphActor->VisibilityOff();
-  //
-
-
-  //----------------------------------------------------------------------------
-  // planes for contour visual pipes
-  //----------------------------------------------------------------------------
-  m_X0ZNPlane = vtkPlane::New(); // xOz north
-  m_X0ZNPlane->SetNormal(0.0, 1.0, 0.0);
-
-  m_X0ZSPlane = vtkPlane::New(); // x0z south
-  m_X0ZSPlane->SetNormal(0.0, -1.0, 0.0);
-
-  m_Y0ZEPlane = vtkPlane::New(); // y0z east
-  m_Y0ZEPlane->SetNormal(1.0, 0.0, 0.0);
-
-  m_Y0ZWPlane = vtkPlane::New(); // y0z west
-  m_Y0ZWPlane->SetNormal(-1.0, 0.0, 0.0);
-
-
-  //----------------------------------------------------------------------------
-  // north-east contour visual pipe
-  //
-  //             |
-  //        ContourCutter
-  //             |              X0ZNplane
-  //             |             /
-  //    NEContourX0ZPlaneClipPD
-  //             |              Y0ZEPlane
-  //             |             /
-  //    NEContourY0ZPlaneClipPD
-  //             |                ?
-  //             |               /
-  //   NEContourTransformPDFilter
-  //             |
-  //             |
-  //      NEContourTubeFilter
-  //             |
-  //             |
-  //       NEContourPDMapper
-  //             |
-  //             V
-  //        NEContourActor
-  //
-  //----------------------------------------------------------------------------
-
-  m_NEContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_NEContourX0ZPlaneClipPolyData->SetInput(m_ContourCutter->GetOutput()); // first cut plane
-  m_NEContourX0ZPlaneClipPolyData->SetClipFunction(m_X0ZNPlane);
-  m_NEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_NEContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_NEContourY0ZPlaneClipPolyData->SetInput(m_NEContourX0ZPlaneClipPolyData->GetOutput()); // second cut plane
-  m_NEContourY0ZPlaneClipPolyData->SetClipFunction(m_Y0ZEPlane);
-  m_NEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_NEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_NEContourTransformPolyDataFilter->SetInput(m_NEContourY0ZPlaneClipPolyData->GetOutput());
-
-  m_NEContourTubeFilter =  vtkTubeFilter::New();
-  m_NEContourTubeFilter->SetInput(m_NEContourTransformPolyDataFilter->GetOutput());
-  m_NEContourTubeFilter->SetRadius(m_TubeFilterRadius);
-  m_NEContourTubeFilter->SetNumberOfSides(12);
-
-  m_NEContourPolyDataMapper = vtkPolyDataMapper::New();
-  m_NEContourPolyDataMapper->SetInput(m_NEContourTubeFilter->GetOutput());
-
-  m_NEContourActor = vtkActor::New();
-  m_NEContourActor->SetMapper(m_NEContourPolyDataMapper);
-  m_NEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_NEContourActor->VisibilityOff();
-
-  m_Renderer->AddActor(m_NEContourActor);
-
-
-  //----------------------------------------------------------------------------
-  // north-west contour visual pipe
-  //
-  //             |
-  //        ContourCutter
-  //             |              X0ZNplane
-  //             |             /
-  //    NWContourX0ZPlaneClipPD
-  //             |              Y0ZWPlane
-  //             |             /
-  //    NWContourY0ZPlaneClipPD
-  //             |                ?
-  //             |               /
-  //   NWContourTransformPDFilter
-  //             |
-  //             |
-  //      NWContourTubeFilter
-  //             |
-  //             |
-  //       NWContourPDMapper
-  //             |
-  //             V
-  //        NWContourActor
-  //
-  //----------------------------------------------------------------------------
-  m_NWContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_NWContourX0ZPlaneClipPolyData->SetInput(m_ContourCutter->GetOutput());
-  m_NWContourX0ZPlaneClipPolyData->SetClipFunction(m_X0ZNPlane);
-  m_NWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_NWContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_NWContourY0ZPlaneClipPolyData->SetInput(m_NWContourX0ZPlaneClipPolyData->GetOutput());
-  m_NWContourY0ZPlaneClipPolyData->SetClipFunction(m_Y0ZWPlane);
-  m_NWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_NWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_NWContourTransformPolyDataFilter->SetInput(m_NWContourY0ZPlaneClipPolyData->GetOutput());
-
-  m_NWContourTubeFilter =  vtkTubeFilter::New();
-  m_NWContourTubeFilter->SetInput(m_NWContourTransformPolyDataFilter->GetOutput());
-  m_NWContourTubeFilter->SetRadius(m_TubeFilterRadius);
-  m_NWContourTubeFilter->SetNumberOfSides(12);
-
-  m_NWContourPolyDataMapper = vtkPolyDataMapper::New();
-  m_NWContourPolyDataMapper->SetInput(m_NWContourTubeFilter->GetOutput());
-
-  m_NWContourActor = vtkActor::New();
-  m_NWContourActor->SetMapper(m_NWContourPolyDataMapper);
-  m_NWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_NWContourActor->VisibilityOff();
-
-  m_Renderer->AddActor(m_NWContourActor);
-
-
-  //----------------------------------------------------------------------------
-  // south-east contour visual pipe
-  //
-  //             |
-  //        ContourCutter
-  //             |              X0ZSplane
-  //             |             /
-  //    SEContourX0ZPlaneClipPD
-  //             |              Y0ZEPlane
-  //             |             /
-  //    SEContourY0ZPlaneClipPD
-  //             |                ?
-  //             |               /
-  //   SEContourTransformPDFilter
-  //             |
-  //             |
-  //      SEContourTubeFilter
-  //             |
-  //             |
-  //       SEContourPDMapper
-  //             |
-  //             V
-  //        SEContourActor
-  //
-  //----------------------------------------------------------------------------
-  m_SEContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_SEContourX0ZPlaneClipPolyData->SetInput(m_ContourCutter->GetOutput());
-  m_SEContourX0ZPlaneClipPolyData->SetClipFunction(m_X0ZSPlane);
-  m_SEContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_SEContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_SEContourY0ZPlaneClipPolyData->SetInput(m_SEContourX0ZPlaneClipPolyData->GetOutput());
-  m_SEContourY0ZPlaneClipPolyData->SetClipFunction(m_Y0ZEPlane);
-  m_SEContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_SEContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_SEContourTransformPolyDataFilter->SetInput(m_SEContourY0ZPlaneClipPolyData->GetOutput());
-
-  m_SEContourTubeFilter =  vtkTubeFilter::New();
-  m_SEContourTubeFilter->SetInput(m_SEContourTransformPolyDataFilter->GetOutput());
-  m_SEContourTubeFilter->SetRadius(m_TubeFilterRadius);
-  m_SEContourTubeFilter->SetNumberOfSides(12);
-
-  m_SEContourPolyDataMapper = vtkPolyDataMapper::New();
-  m_SEContourPolyDataMapper->SetInput(m_SEContourTubeFilter->GetOutput());
-
-  m_SEContourActor = vtkActor::New();
-  m_SEContourActor->SetMapper(m_SEContourPolyDataMapper);
-  m_SEContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_SEContourActor->VisibilityOff();
-
-  m_Renderer->AddActor(m_SEContourActor);
-
-
-  //----------------------------------------------------------------------------
-  // south-west contour visual pipe
-  //
-  //             |
-  //        ContourCutter
-  //             |              X0ZSplane
-  //             |             /
-  //    SWContourX0ZPlaneClipPD
-  //             |              Y0ZWPlane
-  //             |             /
-  //    SWContourY0ZPlaneClipPD
-  //             |                ?
-  //             |               /
-  //   SWContourTransformPDFilter
-  //             |
-  //             |
-  //      SWContourTubeFilter
-  //             |
-  //             |
-  //       SWContourPDMapper
-  //             |
-  //             V
-  //        SWContourActor
-  //
-  //----------------------------------------------------------------------------
-  m_SWContourX0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_SWContourX0ZPlaneClipPolyData->SetInput(m_ContourCutter->GetOutput());
-  m_SWContourX0ZPlaneClipPolyData->SetClipFunction(m_X0ZSPlane);
-  m_SWContourX0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_SWContourY0ZPlaneClipPolyData = vtkClipPolyData::New();
-  m_SWContourY0ZPlaneClipPolyData->SetInput(m_SWContourX0ZPlaneClipPolyData->GetOutput());
-  m_SWContourY0ZPlaneClipPolyData->SetClipFunction(m_Y0ZWPlane);
-  m_SWContourY0ZPlaneClipPolyData->GlobalWarningDisplayOff();
-
-  m_SWContourTransformPolyDataFilter = vtkTransformPolyDataFilter::New();
-  m_SWContourTransformPolyDataFilter->SetInput(m_SWContourY0ZPlaneClipPolyData->GetOutput());
-
-  m_SWContourTubeFilter =  vtkTubeFilter::New();
-  m_SWContourTubeFilter->SetInput(m_SWContourTransformPolyDataFilter->GetOutput());
-  m_SWContourTubeFilter->SetRadius(m_TubeFilterRadius);
-  m_SWContourTubeFilter->SetNumberOfSides(12);
-
-  m_SWContourPolyDataMapper = vtkPolyDataMapper::New();
-  m_SWContourPolyDataMapper->SetInput(m_SWContourTubeFilter->GetOutput());
-
-  m_SWContourActor = vtkActor::New();
-  m_SWContourActor->SetMapper(m_SWContourPolyDataMapper);
-  m_SWContourActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_SWContourActor->VisibilityOff();
-
-  m_Renderer->AddActor(m_SWContourActor);
-
-
-  //----------------------------------------------------------------------------
-  // Display text information visual pipes
-  // Just set the mapper input to the required text
-  //----------------------------------------------------------------------------
-  m_TextMapperX = vtkTextMapper::New();
-  m_ScaledTextActorX = vtkScaledTextActor::New();
-  m_ScaledTextActorX->SetMapper(m_TextMapperX);
-  m_ScaledTextActorX->VisibilityOff();
-  m_ScaledTextActorX->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
-  m_Renderer->AddActor2D(m_ScaledTextActorX);
-
-  m_TextMapperY = vtkTextMapper::New();
-  m_ScaledTextActorY = vtkScaledTextActor::New();
-  m_ScaledTextActorY->SetMapper(m_TextMapperY);
-  m_ScaledTextActorY->VisibilityOff();
-  m_ScaledTextActorY->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
-  m_Renderer->AddActor2D(m_ScaledTextActorY);
 }
 
 
@@ -768,12 +143,34 @@ medOpMML3ModelView::medOpMML3ModelView( vtkRenderWindow *rw, vtkRenderer *ren, v
 medOpMML3ModelView::~medOpMML3ModelView()
 //----------------------------------------------------------------------------
 {
-  m_FinalMat->Delete() ;
-  m_SliceRotationMat->Delete() ;
+  // slice positions etc
+  delete [] m_Alpha ;
+  delete [] m_Zeta ;
+  delete [] m_SlicePositions ;
+  delete [] m_SliceNormals ;
+  delete [] m_OriginalContourCenters ;
+  delete [] m_OriginalContourBounds ;
+
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_SlicePoseMat[i]->Delete() ;
+  delete [] m_SlicePoseMat ;
+
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_SlicePoseInvMat[i]->Delete() ;
+  delete [] m_SlicePoseInvMat ;
+
+
+  // visual pipes and styles
+  delete m_VisualPipe2D ;
+  delete m_VisualPipe3D ;
+  delete m_VisualPipePreview ;
+  m_Style2D->Delete() ;
+  m_Style3D->Delete() ;
+
 
   // splines
-  m_CenterHorizontalOffsetSpline->Delete() ;
-  m_CenterVerticalOffsetSpline->Delete() ;
+  m_PlaceHorizontalOffsetSpline->Delete() ;
+  m_PlaceVerticalOffsetSpline->Delete() ;
   m_TwistSpline->Delete() ;
   m_HorizontalTranslationSpline->Delete() ;
   m_VerticalTranslationSpline->Delete() ;
@@ -781,415 +178,254 @@ medOpMML3ModelView::~medOpMML3ModelView()
   m_SouthScalingSpline->Delete() ;
   m_EastScalingSpline->Delete() ;
   m_WestScalingSpline->Delete() ;
+  m_CenterHorizontalOffsetSpline->Delete() ;
+  m_CenterVerticalOffsetSpline->Delete() ;
 
-  // lookup table
-  m_SyntheticScansWindowLevelLookupTable->Delete() ;
-
+ 
   // scaling stack
   m_ScalingFlagStack->Delete() ;
 
-  // east contour axis
-  m_ContourPosXAxisLineSource->Delete() ;
-  m_ContourPosXAxisAxesTubeFilter->Delete() ;
-  m_ContourPosXAxisPolyDataMapper->Delete() ;
-  m_ContourPosXAxisActor->Delete() ;
-
-  // north contour axis
-  m_ContourPosYAxisLineSource->Delete() ;
-  m_ContourPosYAxisAxesTubeFilter->Delete() ;
-  m_ContourPosYAxisPolyDataMapper->Delete() ;
-  m_ContourPosYAxisActor->Delete() ;
-
-  // west contour axis
-  m_ContourNegXAxisLineSource->Delete() ;
-  m_ContourNegXAxisAxesTubeFilter->Delete() ;
-  m_ContourNegXAxisPolyDataMapper->Delete() ;
-  m_ContourNegXAxisActor->Delete() ;
-
-  // south contour axis
-  m_ContourNegYAxisLineSource->Delete() ;
-  m_ContourNegYAxisAxesTubeFilter->Delete() ;
-  m_ContourNegYAxisPolyDataMapper->Delete() ;
-  m_ContourNegYAxisActor->Delete() ;
-
-  // east global axis
-  m_PosXAxisLineSource->Delete() ;
-  m_PosXAxisAxesTubeFilter->Delete() ;
-  m_PosXAxisPolyDataMapper->Delete() ;
-  m_GlobalPosXAxisActor->Delete() ;
-
-  // north global axis
-  m_PosYAxisLineSource->Delete() ;
-  m_PosYAxisAxesTubeFilter->Delete() ;
-  m_PosYAxisPolyDataMapper->Delete() ; 
-  m_GlobalPosYAxisActor->Delete() ;
-
-  // west global axis
-  m_NegXAxisLineSource->Delete() ;
-  m_NegXAxisAxesTubeFilter->Delete() ;
-  m_NegXAxisPolyDataMapper->Delete() ; 
-  m_GlobalNegXAxisActor->Delete() ; 
-
-  // south global axis
-  m_NegYAxisLineSource->Delete() ;
-  m_NegYAxisAxesTubeFilter->Delete() ;
-  m_NegYAxisPolyDataMapper->Delete() ; 
-  m_GlobalNegYAxisActor->Delete() ; 
-
-  // 1st landmark
-  m_Landmark1SphereSource->Delete() ;
-  m_Landmark1PolyDataMapper->Delete() ;
-  m_Landmark1Actor->Delete() ; 
-  // 2nd landmark
-  m_Landmark2SphereSource->Delete() ; 
-  m_Landmark2PolyDataMapper->Delete() ;
-  m_Landmark2Actor->Delete() ;
-
-  // 3rd landmark
-  m_Landmark3SphereSource->Delete() ;
-  m_Landmark3PolyDataMapper->Delete() ; 
-  m_Landmark3Actor->Delete() ;
-
-  // 4th landmark
-  m_Landmark4SphereSource->Delete() ;
-  m_Landmark4PolyDataMapper->Delete() ; 
-  m_Landmark4Actor->Delete() ;
-
-  // L1 to L2 line (action)
-  m_L1L2LineSource->Delete() ;
-  m_L1L2TubeFilter->Delete() ;
-  m_L1L2PolyDataMapper->Delete() ;
-  m_L1L2Actor->Delete() ;
-
-  // L2 to L3 line
-  m_L2L3LineSource->Delete() ;
-  m_L2L3TubeFilter->Delete() ;
-  m_L2L3PolyDataMapper->Delete() ;
-  m_L2L3Actor->Delete() ;
-
-  // positive z global axis
-  m_PosZAxisLineSource->Delete() ;
-  m_PosZAxisAxesTubeFilter->Delete() ; 
-  m_PosZAxisPolyDataMapper->Delete() ;
-  m_GlobalPosZAxisActor->Delete() ;
-
-  // negative z global axis
-  m_NegZAxisLineSource->Delete() ;
-  m_NegZAxisAxesTubeFilter->Delete() ; 
-  m_NegZAxisPolyDataMapper->Delete() ;
-  m_GlobalNegZAxisActor->Delete() ;
-
-  // Transform1 -> Transform2 -> Normals -> Mapper
-  m_MuscleTransform1->Delete() ;
-  m_MuscleTransform1PolyDataFilter->Delete() ;
-  m_MuscleTransform2->Delete() ;
-  m_MuscleTransform2PolyDataFilter->Delete() ;
-  m_MusclePolyDataNormals->Delete() ; 
-  m_MusclePolyDataMapper->Delete() ; 
-  m_MuscleLODActor->Delete() ;
-
-
-  // standard contour pipeline
-  m_ContourPlane->Delete() ;
-  m_ContourCutter->Delete() ; 
-  m_ContourCutterTransform->Delete() ; 
-  m_ContourCutterTransformPolyDataFilter->Delete() ; 
-  m_ContourTubeFilter->Delete() ; 
-  m_ContourPolyDataMapper->Delete() ; 
-  m_ContourActor->Delete() ; 
-
-  // glyphed contour
-  //m_pContourGlyphSphereSource->Delete() ;
-  //m_pContourGlyph3D->Delete() ;
-  //m_pContourGlyphPolyDataMapper->Delete() ;
-  //m_pContourGlyphActor->Delete() ;
-
-  // scaling contours stuff
-  m_X0ZNPlane->Delete() ;
-  m_X0ZSPlane->Delete() ;
-  m_Y0ZEPlane->Delete() ;
-  m_Y0ZWPlane->Delete() ; 
-
-  // north-east
-  m_NEContourX0ZPlaneClipPolyData->Delete() ; 
-  m_NEContourY0ZPlaneClipPolyData->Delete() ; 
-  m_NEContourTubeFilter->Delete() ;  
-  m_NEContourTransformPolyDataFilter->Delete() ;
-  m_NEContourPolyDataMapper->Delete() ; 
-  m_NEContourActor->Delete() ; 
-
-  // north-west
-  m_NWContourX0ZPlaneClipPolyData->Delete() ; 
-  m_NWContourY0ZPlaneClipPolyData->Delete() ;
-  m_NWContourTubeFilter->Delete() ;  
-  m_NWContourTransformPolyDataFilter->Delete() ; 
-  m_NWContourPolyDataMapper->Delete() ; 
-  m_NWContourActor->Delete() ; 
-
-  // south-east
-  m_SEContourX0ZPlaneClipPolyData->Delete() ; 
-  m_SEContourY0ZPlaneClipPolyData->Delete() ; 
-  m_SEContourTubeFilter->Delete() ;  
-  m_SEContourTransformPolyDataFilter->Delete() ;
-  m_SEContourPolyDataMapper->Delete() ;
-  m_SEContourActor->Delete() ;
-
-  // south-west
-  m_SWContourX0ZPlaneClipPolyData->Delete() ;
-  m_SWContourY0ZPlaneClipPolyData->Delete() ; 
-  m_SWContourTubeFilter->Delete() ;  
-  m_SWContourTransformPolyDataFilter->Delete() ; 
-  m_SWContourPolyDataMapper->Delete() ; 
-  m_SWContourActor->Delete() ;
-
-  // display information
-  m_TextMapperX->Delete() ; 
-  m_ScaledTextActorX->Delete() ; 
-  m_TextMapperY->Delete() ; 
-  m_ScaledTextActorY->Delete() ;
 
   DeleteOperationsStack() ;
 
-  DeleteSyntheticScans() ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// initialize after input parameters have been set
+void medOpMML3ModelView::Initialize()
+//------------------------------------------------------------------------------
+{
+  // Get position, orientation, size and resolution of scans
+  // These methods only set member variables and do not put any results in the visual pipes !
+  CalculatePositionsOfScans() ;
+  CalculateNormalsOfScans() ;
+  CalculatePoseMatricesOfScans() ;
+  FindSizeAndResolutionOfScans();
+
+
+  // transfer landmarks to visual pipes
+  m_VisualPipe3D->AddLandmark(m_PatientLandmark1) ;
+  m_VisualPipe3D->AddLandmark(m_PatientLandmark2) ;
+  m_VisualPipe3D->AddLandmark(m_PatientLandmark3) ;
+  if (m_4Landmarks)
+    m_VisualPipe3D->AddLandmark(m_PatientLandmark4) ;
+  m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark1) ;
+  m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark2) ;
+  if (m_MuscleType == 2)
+    m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark3) ;
+
+
+  // transfer slice parameters to the visual pipes
+  m_VisualPipe2D->SetSliceSize(m_ScanSizeX, m_ScanSizeY) ;
+  m_VisualPipe2D->SetSliceResolution(m_ScansResolutionX, m_ScansResolutionY) ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_VisualPipe2D->SetSliceTransform(i, m_SlicePoseMat[i]) ;
+
+  m_VisualPipe3D->SetSliceSize(m_ScanSizeX, m_ScanSizeY) ;
+  m_VisualPipe3D->SetSliceResolution(m_ScansResolutionX/4, m_ScansResolutionY/4) ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_VisualPipe3D->SetSliceTransform(i, m_SlicePoseMat[i]) ;
+
+  m_VisualPipePreview->SetSliceSize(m_ScanSizeX, m_ScanSizeY) ;
+  m_VisualPipePreview->SetSliceResolution(m_ScansResolutionX/4, m_ScansResolutionY/4) ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++)
+    m_VisualPipePreview->SetSliceTransform(i, m_SlicePoseMat[i]) ;
+
+
+  // set slice id
+  SetCurrentIdOfScans(0) ;
+
+  // pre-process the slices
+  //m_VisualPipe2D->UpdateAllSlices() ;
+  //m_VisualPipe3D->UpdateAllSlices() ;
+  //m_VisualPipePreview->UpdateAllSlices() ;
+
+  // update visual pipes
+  m_VisualPipe2D->Update() ;
+  m_VisualPipe3D->Update() ;
+  m_VisualPipePreview->Update() ;
+
+  // Calculate the centers and bounds of the contours before any transformations take place
+  // and while the default identity transforms are still valid.
+  CalculateOriginalContourCenters() ;
+
+  // The contour centers affect the transforms, so we need to update again.
+  Update() ;
+
+  
+  // initialize camera and render
+  GetRenderer()->ResetCamera(); // must do this before changing the camera settings
+  this->ResetCameraPosition() ;
+
+
+  // copy the input muscle to the output
+  m_MuscleOutput->DeepCopy(m_MuscleInput) ;
+
+
+  // initialize scaling flag stack
+  m_ScalingFlagStack->SetNumberOfTuples(m_NumberOfScans);
+  float a = 0;
+  for(int ii = 0 ;  ii < m_NumberOfScans ;  ii++)
+    m_ScalingFlagStack->SetTuple(ii, &a);
+
 }
 
 
 
 
 
+//------------------------------------------------------------------------------
+// Set display to 2d visual pipe
+void medOpMML3ModelView::SetDisplay2D()
+//------------------------------------------------------------------------------
+{
+  m_3DDisplay = 0 ;
+  m_Renderer->GetRenderWindow()->GetInteractor()->SetInteractorStyle(m_Style2D) ;
+  m_VisualPipe2D->SetVisibility(1) ;
+  m_VisualPipe3D->SetVisibility(0) ;
+  m_VisualPipePreview->SetVisibility(0) ;
+  ResetCameraPosition() ;
+  Render() ;
+}
 
-//----------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+// Set display to 3d visual pipe
+void medOpMML3ModelView::SetDisplay3D()
+//------------------------------------------------------------------------------
+{
+  m_3DDisplay = 1 ;
+  m_Renderer->GetRenderWindow()->GetInteractor()->SetInteractorStyle(m_Style3D) ;
+  m_VisualPipe2D->SetVisibility(0) ;
+  m_VisualPipe3D->SetVisibility(1) ;
+  m_VisualPipePreview->SetVisibility(0) ;
+  ResetCameraPosition() ;
+  Render() ;
+}
+
+
+//------------------------------------------------------------------------------
+// Set display to preview visual pipe
+void medOpMML3ModelView::SetDisplayToPreview()
+//------------------------------------------------------------------------------
+{
+  m_3DDisplay = 2 ;
+
+  // apply registration ops to update the output muscle
+  ApplyRegistrationOps() ;
+
+  m_Renderer->GetRenderWindow()->GetInteractor()->SetInteractorStyle(m_Style3D) ;
+  m_VisualPipe2D->SetVisibility(0) ;
+  m_VisualPipe3D->SetVisibility(0) ;
+  m_VisualPipePreview->SetVisibility(1) ;
+  ResetCameraPosition() ;
+  Render() ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// reset the camera position
+void medOpMML3ModelView::ResetCameraPosition()
+//------------------------------------------------------------------------------
+{
+  double maxSize = std::max(m_ScanSizeX, m_ScanSizeY) ;
+  double r = 2*maxSize ;
+
+  if (m_3DDisplay == 0){
+    // if 2d, set camera to point at (0,0,0) along z axis
+    GetRenderer()->GetActiveCamera()->SetFocalPoint(0,0,0) ;
+    GetRenderer()->GetActiveCamera()->SetPosition(0, 0, r) ;
+    GetRenderer()->GetActiveCamera()->SetViewUp(0,1,0) ;
+  }
+  else{
+    // if 3d or preview, set to a diagonal viewing position
+    double bnds[6], center[3] ;
+    m_VisualPipe3D->GetContourBounds(bnds) ;
+    m_VisualPipe3D->GetContourCenter(center) ;
+    GetRenderer()->GetActiveCamera()->SetFocalPoint(center) ;
+    GetRenderer()->GetActiveCamera()->SetPosition(r, r, r) ;
+    GetRenderer()->GetActiveCamera()->SetViewUp(-1,-1,2) ;
+  }
+
+  GetRenderer()->ResetCameraClippingRange();
+
+}
+
+
+
+//------------------------------------------------------------------------------
+// set the current scan id
+void medOpMML3ModelView::SetCurrentIdOfScans(int i) 
+//------------------------------------------------------------------------------
+{
+  m_ScansCurrentId = i ;
+  m_VisualPipe2D->SetCurrentSliceId(i) ;
+  m_VisualPipe3D->SetCurrentSliceId(i) ;
+  m_VisualPipePreview->SetCurrentSliceId(i) ;
+}
+
+
+
+
+
+//------------------------------------------------------------------------------
 // Calculate size and resolution from user-defined grain
-// Must be called prior to CreateSyntheticScans
+// Must be called prior to CreateScans
 //
-// Size is determined by the bounds of MuscleTransform2PDFilter->GetOutput()
+// Size is determined by the bounds of muscle in slice coords
 //
 // Resolution is the no. of cells when the polydata slice is created from vtkPlaneSource().
 // The resolution is a fraction of the image size, which is calculated from the grain
-void medOpMML3ModelView::FindSizeAndResolutionOfSyntheticScans()
-//----------------------------------------------------------------------------
+void medOpMML3ModelView::FindSizeAndResolutionOfScans()
+//------------------------------------------------------------------------------
 {
-  float Factor = 1.1 ; // 10% extra
+  double Factor = 1.1 ; // 10% extra
+
+  //----------------------------------------------------------------------------
+  // Get the bounds of the muscle in slice coords
+  // Can't get it from the visual pipe because it might not be set up yet
+  //----------------------------------------------------------------------------
+  vtkTransform *tr = vtkTransform::New() ;
+  tr->SetMatrix(m_SlicePoseInvMat[0]) ;
+
+  vtkTransformPolyDataFilter *tpdf = vtkTransformPolyDataFilter::New() ;
+  tpdf->SetInput(m_MuscleInput) ;
+  tpdf->SetTransform(tr) ;
 
   double bounds[6];
-  m_MuscleTransform2PolyDataFilter->GetOutput()->GetBounds(bounds);
+  tpdf->GetOutput()->Update() ;
+  tpdf->GetOutput()->GetBounds(bounds) ;
 
-  // set size to bounds of muscle
-  m_NSyntheticScansXSize = 2.0 * Factor * fabs(bounds[1]-bounds[0]) ;
-  m_NSyntheticScansYSize = 2.0 * Factor * fabs(bounds[3]-bounds[2]) ;
+  tr->Delete() ;
+  tpdf->Delete() ;
+
+
+
+  // set size to (x,y) bounds of muscle
+  m_ScanSizeX = Factor * fabs(bounds[1]-bounds[0]) ;
+  m_ScanSizeY = Factor * fabs(bounds[3]-bounds[2]) ;
 
 
   // set resolution to that requested by user.
   // resolution is no. of quads in the polydata probe.
-  double aspectRatio = m_NSyntheticScansYSize / m_NSyntheticScansXSize ;
+  double aspectRatio = m_ScanSizeY / m_ScanSizeX ;
 
-  if (m_NSyntheticScansXSize > m_NSyntheticScansYSize){
-    m_NSyntheticScansXResolution = m_SyntheticScansGrain ;
-    m_NSyntheticScansYResolution = (int)((double)m_SyntheticScansGrain * aspectRatio) ;
+  if (m_ScanSizeX > m_ScanSizeY){
+    m_ScansResolutionX = m_ScansGrain ;
+    m_ScansResolutionY = (int)((double)m_ScansGrain * aspectRatio) ;
   }
-  else if (m_NSyntheticScansXSize < m_NSyntheticScansYSize){
-    m_NSyntheticScansXResolution = (int)((double)m_SyntheticScansGrain / aspectRatio) ;
-    m_NSyntheticScansYResolution = m_SyntheticScansGrain ;
+  else if (m_ScanSizeX < m_ScanSizeY){
+    m_ScansResolutionX = (int)((double)m_ScansGrain / aspectRatio) ;
+    m_ScansResolutionY = m_ScansGrain ;
   }
   else{
-    m_NSyntheticScansXResolution = m_SyntheticScansGrain ;
-    m_NSyntheticScansYResolution = m_SyntheticScansGrain ;
-  }
-}
-
-
-
-
-//------------------------------------------------------------------------------
-// Construct the visual pipes for all the slices
-// Allocates memory for m_SyntheticScansActor[] + associated reference counted objects
-void medOpMML3ModelView::CreateSyntheticScans()
-//------------------------------------------------------------------------------
-{
-  /*
-  // grid parameters
-  int dims[3];
-  scans->GetDimensions(dims); // (249, 279, 176)
-  double bounds[6];
-  scans->GetBounds(bounds); // (0, 184.063), (100.290, 306.618), (-512.50, -34.50) 
-  float center[3];
-  scans->GetCenter(center); // (92.0313, 203.454, -273.500)
-  int extent[6];
-  scans->GetExtent(extent); // (0, 248), (0, 278), (0, 175)
-  float length;
-  length = scans->GetLength(); // 552.209
-  float scalarrange[2];
-  scans->GetScalarRange(scalarrange); // (-3024, 1892)
-  */
-
-  // Nigel: temporary style so we can see what's going on in 3D
-  //vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New() ;
-  //this->GetRenderWindowInteractor()->SetInteractorStyle(style) ;
-  //style->Delete() ;
-
-  //
-  int n;
-  n = this->GetTotalNumberOfSyntheticScans();
-
-  // initialise scaling flag stack
-  m_ScalingFlagStack->SetNumberOfTuples(n);
-  float a = 0;
-  for(int ii = 0; ii < n; ii++)
-    m_ScalingFlagStack->SetTuple(ii, &a);
-
-
-  // allocate arrays
-  vtkPlaneSource** PlaneSource = new vtkPlaneSource* [n] ;
-  vtkTransform** PlaneSourceTransform = new vtkTransform* [n];
-  vtkTransformPolyDataFilter** PlaneSourceTransformPolyDataFilter = new vtkTransformPolyDataFilter* [n];
-  vtkProbeFilter** ProbeFilter = new vtkProbeFilter* [n];
-  vtkPolyDataMapper** PolyDataMapper = new vtkPolyDataMapper* [n];
-  vtkTransform** ActorTransform = new vtkTransform* [n];
-  m_SyntheticScansActor = new vtkActor* [n];
-
-  // initial scalar value min/max
-  m_SyntheticScansMinScalarValue = 100000;
-  m_SyntheticScansMaxScalarValue = -100000;
-
-  // scalar value holder
-  double scalars[2];
-
-
-  //--------------------------------------------------------------------------
-  //      Visual pipe for slices
-  //
-  //        PlaneSource[i]
-  //             |             CreatePlaneSourceTransformOfSynthScans(i)
-  //             |            / 
-  //             |        PlaneSourceTransform[i]
-  //             |          /
-  //      PlaneSourceTransformPolyDataFilter[i]
-  //             |
-  //        ProbeFilter[i]
-  //             |
-  //       PolyDataMapper[i]
-  //             |
-  //             |            CreateActorTransformOfSynthScans(i) 
-  //             |           /
-  //             |       ActorTransform
-  //             V         /
-  //     m_SyntheticScansActor[i]
-  //
-  //--------------------------------------------------------------------------
-
-
-  //----------------------------------------------------------------------------
-  // Loop over all scans
-  //----------------------------------------------------------------------------
-  for(int i = 0; i < n; i++)
-  {
-    // set plane source resolution
-    PlaneSource[i] = vtkPlaneSource::New();
-    PlaneSource[i]->SetResolution(m_NSyntheticScansXResolution, m_NSyntheticScansYResolution);
-
-
-    // plane source transformation matrix and filter
-    vtkMatrix4x4* pstmatrix = CreatePlaneSourceTransformOfSyntheticScans(i) ;
-    PlaneSourceTransform[i] = vtkTransform::New();
-    PlaneSourceTransform[i]->SetMatrix(pstmatrix);
-    pstmatrix->Delete() ;
-
-    PlaneSourceTransformPolyDataFilter[i] = vtkTransformPolyDataFilter::New();
-    PlaneSourceTransformPolyDataFilter[i]->SetInput(PlaneSource[i]->GetOutput());
-    PlaneSourceTransformPolyDataFilter[i]->SetTransform(PlaneSourceTransform[i]);
-
-
-    // probe filter
-    ProbeFilter[i] = vtkProbeFilter::New();
-    ProbeFilter[i]->SetInput(PlaneSourceTransformPolyDataFilter[i]->GetOutput());
-    ProbeFilter[i]->SetSource(m_Scans);
-
-    // probe mapper 
-    PolyDataMapper[i] = vtkPolyDataMapper::New();
-    PolyDataMapper[i]->SetInput(ProbeFilter[i]->GetPolyDataOutput());
-    //PolyDataMapper[i]->ImmediateModeRenderingOn(); // for large datasets at the expense of slower rendering
-
-
-    // actor and actor transform
-    ActorTransform[i] = vtkTransform::New();
-    vtkMatrix4x4* atmatrix = CreateActorTransformOfSyntheticScans(i) ;
-    ActorTransform[i]->SetMatrix(atmatrix);
-    atmatrix->Delete() ;
-
-    m_SyntheticScansActor[i] = vtkActor::New();
-    m_SyntheticScansActor[i]->SetUserTransform(ActorTransform[i]);
-    m_SyntheticScansActor[i]->SetMapper(PolyDataMapper[i]);
-    m_SyntheticScansActor[i]->VisibilityOff();
-    m_Renderer->AddActor(m_SyntheticScansActor[i]);
-
-    // adjust min/max scalar values
-    ProbeFilter[i]->Update();
-    ProbeFilter[i]->GetPolyDataOutput()->GetScalarRange(scalars);
-    if (scalars[0] < m_SyntheticScansMinScalarValue)
-      m_SyntheticScansMinScalarValue = scalars[0];
-    if (scalars[1] > m_SyntheticScansMaxScalarValue)
-      m_SyntheticScansMaxScalarValue = scalars[1];
-
-
-    // clean up
-    ActorTransform[i]->Delete();
-    PolyDataMapper[i]->Delete();
-    ProbeFilter[i]->Delete();
-    PlaneSourceTransformPolyDataFilter[i]->Delete();
-    PlaneSourceTransform[i]->Delete();
-    PlaneSource[i]->Delete();
-  }
-
-  // window
-  m_Window = (m_SyntheticScansMaxScalarValue - m_SyntheticScansMinScalarValue);
-
-  // level
-  m_Level = 0.5 * (m_SyntheticScansMinScalarValue + m_SyntheticScansMaxScalarValue);
-
-  // lut
-  m_SyntheticScansWindowLevelLookupTable->SetTableRange(m_SyntheticScansMinScalarValue, m_SyntheticScansMaxScalarValue);
-  m_SyntheticScansWindowLevelLookupTable->SetHueRange(0.0, 0.0);
-  m_SyntheticScansWindowLevelLookupTable->SetSaturationRange(0.0, 0.0);
-  m_SyntheticScansWindowLevelLookupTable->SetValueRange(0.0, 1.0);
-  m_SyntheticScansWindowLevelLookupTable->SetNumberOfColors(1024);
-  m_SyntheticScansWindowLevelLookupTable->SetWindow(m_Window);
-  m_SyntheticScansWindowLevelLookupTable->SetLevel(m_Level);
-  m_SyntheticScansWindowLevelLookupTable->Build();
-
-  for(int j = 0; j < n; j++)
-  {
-    PolyDataMapper[j]->SetLookupTable(m_SyntheticScansWindowLevelLookupTable);
-    PolyDataMapper[j]->UseLookupTableScalarRangeOn();
-    PolyDataMapper[j]->SetColorModeToMapScalars();
-  }
-
-  // delete objects
-  delete ActorTransform;
-  delete ProbeFilter;
-  delete PlaneSourceTransformPolyDataFilter;
-  delete PlaneSourceTransform;
-  delete PlaneSource;
-  delete PolyDataMapper;
-
-  // set to scan 0 display
-  m_NSyntheticScansCurrentId = 0; // current id
-  m_SyntheticScansActor[0]->VisibilityOn(); // actor on
-}
-
-
-
-
-//----------------------------------------------------------------------------
-// Delete the synthetic scans
-// ie delete the actors which were allocated in CreateSyntheticScans()
-void medOpMML3ModelView::DeleteSyntheticScans()
-//----------------------------------------------------------------------------
-{
-  if (m_SyntheticScansActor != NULL){
-    for(int i = 0; i < this->GetTotalNumberOfSyntheticScans(); i++)
-      m_SyntheticScansActor[i]->Delete() ;
-    delete [] m_SyntheticScansActor ;
-    m_SyntheticScansActor = NULL ;
+    m_ScansResolutionX = m_ScansGrain ;
+    m_ScansResolutionY = m_ScansGrain ;
   }
 }
 
@@ -1197,699 +433,746 @@ void medOpMML3ModelView::DeleteSyntheticScans()
 
 
 //----------------------------------------------------------------------------
-// Calculate the origin of the slice, 
-// ie the intersection of the axis with the slice
-// The axis goes from (patient) landmark 2 to landmark 1.
-void medOpMML3ModelView::GetPlaneSourceOriginOfSyntheticScans(int scanId, double p[])
+// Calculate total length of axis or axes
+double medOpMML3ModelView::LengthOfAxis() const
 //----------------------------------------------------------------------------
 {
-  int i;
-  int n;
-  double currentlength;
-  double l1[3];
-  double l2[3];
-  double l3[3];
+  double pstart[3] ; // low insertion
+  double pmid[3] ; // mid landmark if two-part axis
+  double pend[3] ; // high insertion
 
-  n = this->GetTotalNumberOfSyntheticScans();
-  this->GetLandmark1OfAxis(l1);
-  this->GetLandmark2OfAxis(l2);
+  double lenTotal, len12, len23 ;
 
-  switch (m_NTypeOfMuscles)
-  {
-  case 1: 
-    // slicing axis is single line
-    // start from landmark 2 (low)
-    // ending at landmark 1 (high)
+  int n = GetTotalNumberOfScans();
 
-    // current length
-    currentlength = ((double)scanId / (double)(n-1)) * m_DLength12 ;
-
-    // origin
-    for(i = 0; i < 3; i++)
-      p[i] = l2[i] + currentlength * m_DUnitVector12[i];
-    break;
-
-  case 2: 
-    // slicing axis is double line
-    // start from landmark 3 (low)
-    // ending at landmark 1 (high)
-
-    // get 3rd landmark
-    this->GetLandmark3OfAxis(l3);
-
-    // current length
-    currentlength = ((double)scanId / (double)(n-1)) * m_DOverallLength ;
-
-    // origin
-    for(i = 0; i < 3; i++)
-    {
-      if (currentlength < m_DLength23)
-      {
-        p[i] = l3[i] + currentlength * m_DUnitVector23[i];
-      }
-      else
-      {
-        p[i] = l2[i] + (currentlength - m_DLength23) * m_DUnitVector12[i];
-      }
-    }
-
-    break;
-  }
-}
+  vtkMath *pMath = vtkMath::New();
 
 
-
-//----------------------------------------------------------------------------
-// Create and calculate new transform matrix for the slices polydata plane source
-// NB this assumes that the origin of vtkPlaneSource is the same as the centre.
-vtkMatrix4x4* medOpMML3ModelView::CreatePlaneSourceTransformOfSyntheticScans(int scanId)
-//----------------------------------------------------------------------------
-{
-  int i;
-  int n;
-  double p[3];
-  double currentlength;
-  double normal[3];
-  double d;
-
-  // allocate matrices
-  vtkMatrix4x4 *rotaxm = vtkMatrix4x4::New();
-  vtkMatrix4x4 *rotaym = vtkMatrix4x4::New();
-  vtkMatrix4x4 *scalem = vtkMatrix4x4::New();
-  vtkMatrix4x4 *transm = vtkMatrix4x4::New();
-  vtkMatrix4x4 *inversem_pslicesm = vtkMatrix4x4::New();
-  vtkMatrix4x4 *alignm =  vtkMatrix4x4::New();
-  vtkMatrix4x4 *inversealignm =  vtkMatrix4x4::New();
-  vtkMatrix4x4 *finalm =  vtkMatrix4x4::New();
-
-  
-
-  switch (m_NTypeOfMuscles)
-  {
-  case 1: // slicing axis is single line
-
-    // synthetic scan: plane source size
-    // as a scaling transformation
-    scalem->Identity();
-    scalem->SetElement(0, 0, m_NSyntheticScansXSize);
-    scalem->SetElement(1, 1, m_NSyntheticScansYSize);
-
-    // synthetic scan: plane source origin
-    // as a translation transformation
-    // assumes origin is same as centre
-    this->GetPlaneSourceOriginOfSyntheticScans(scanId, p); 
-    transm->Identity();
-    transm->SetElement(0, 3, p[0]); // x
-    transm->SetElement(1, 3, p[1]); // y
-    transm->SetElement(2, 3, p[2]); // z
-
-    // get matrix which rotates slice (inverse of that which rotates muscle to slice stack coords)
-    inversem_pslicesm->Identity();
-    inversem_pslicesm->Invert(m_SliceRotationMat, inversem_pslicesm);
-
-    // synthetic scan: plane source transformation matrix
-    finalm->Identity();
-    MultiplyMatrix4x4(transm, finalm, finalm); // 3. translation
-    MultiplyMatrix4x4(inversem_pslicesm, finalm, finalm); // 2. alignment: inverse (rotx * roty)
-    MultiplyMatrix4x4(scalem, finalm, finalm); // 1. scaling
-
-    break;
-
-  case 2: // slicing axis is double line
-    // synthetic scan: plane source size
-    // (as a scaling transformation)
-    scalem->Identity();
-    scalem->SetElement(0, 0, m_NSyntheticScansXSize);
-    scalem->SetElement(1, 1, m_NSyntheticScansYSize);
-
-    // synthetic scan: plane source origin
-    // as a translation transformation
-    // assumes origin is same as centre
-    this->GetPlaneSourceOriginOfSyntheticScans(scanId, p); 
-    transm->Identity();
-    transm->SetElement(0, 3, p[0]); // x
-    transm->SetElement(1, 3, p[1]); // y
-    transm->SetElement(2, 3, p[2]); // z
-
-    //
-    n = this->GetTotalNumberOfSyntheticScans();
-
-    // s-synthetic scan: plane source normal
-    // current length
-    currentlength = m_DOverallLength / (n - 1) * scanId ;
-
-    // current normal
-    for(i = 0; i < 3; i++)
-    {
-      normal[i] = (1.0 / m_DOverallLength) * (currentlength * m_DUnitVector12[i] + 
-        (m_DOverallLength - currentlength)  * m_DUnitVector23[i]);
-    }
-
-    // align transformation
-    // project on y0z plane
-    d = sqrt(pow(normal[1], 2.0) + pow(normal[2], 2.0));
-
-    // rotate around x, then rotate around y
-    if (d  > 0.0)
-    {
-      rotaxm->Identity();
-      rotaxm->SetElement(1, 1, normal[2] / d);
-      rotaxm->SetElement(2, 1, normal[1] / d);
-      rotaxm->SetElement(1, 2, -1.0 * normal[1] / d);
-      rotaxm->SetElement(2, 2, normal[2] / d);
-
-      rotaym->Identity();
-      rotaym->SetElement(0, 0, d);
-      rotaym->SetElement(2, 0, normal[0]);
-      rotaym->SetElement(0, 2, -1.0 * normal[0]);
-      rotaym->SetElement(2, 2, d);
-    }
-    else
-    {
-      rotaym->Identity();
-      rotaym->SetElement(0, 0, normal[2]);
-      rotaym->SetElement(2, 0, -1.0 * normal[0]);
-      rotaym->SetElement(0, 2, normal[0]);
-      rotaym->SetElement(2, 2, normal[2]);
-    }
-
-    // inverse align matrix
-    inversealignm->Identity();
-    MultiplyMatrix4x4(rotaym, inversealignm, inversealignm);
-    MultiplyMatrix4x4(rotaxm, inversealignm, inversealignm);
-
-    // align matrix
-    alignm->Invert(inversealignm, alignm);
-
-    //  s-th synthetic scan: plane source transformation matrix
-    finalm->Identity();
-    MultiplyMatrix4x4(transm, finalm, finalm); // 3. translation
-    MultiplyMatrix4x4(alignm, finalm, finalm); // 2. align
-    MultiplyMatrix4x4(scalem, finalm, finalm); // 1. scaling
-    //
-    break;
-  }
-
-  // clean up
-  rotaxm->Delete();
-  rotaym->Delete();
-  scalem->Delete();
-  transm->Delete();
-  inversem_pslicesm->Delete();
-  alignm->Delete();
-  inversealignm->Delete();
-
-
-  // return the created matrix
-  return finalm;
-}
-
-
-
-//----------------------------------------------------------------------------
-// Create and calculate new transform matrix
-// This matrix is the inverse of the PlaneSourceTransform (except for scaling)
-// So it transforms the slice actor into the xy plane with the centre at (0,0)
-vtkMatrix4x4* medOpMML3ModelView::CreateActorTransformOfSyntheticScans(int scanId)
-//----------------------------------------------------------------------------
-{
-  double p[3];
-
-  vtkMatrix4x4 *transm = vtkMatrix4x4::New();
-  vtkMatrix4x4 *inversem_pslicesm = vtkMatrix4x4::New();
-  vtkMatrix4x4 *finalm =  vtkMatrix4x4::New();
-
-
-  switch (m_NTypeOfMuscles)
-  {
-  case 1: // slicing axis is single line
-
-    // synthetic scan: plane source origin
-    // (as a translation transformation)
-    this->GetPlaneSourceOriginOfSyntheticScans(scanId, p); 
-    transm->Identity();
-    transm->SetElement(0, 3, p[0]); // x
-    transm->SetElement(1, 3, p[1]); // y
-    transm->SetElement(2, 3, p[2]); // z
-
-    //
-    inversem_pslicesm->Identity();
-    inversem_pslicesm->Invert(m_SliceRotationMat, inversem_pslicesm);
-
-    finalm->Identity();
-    MultiplyMatrix4x4(transm, finalm, finalm); // 2. translation
-    MultiplyMatrix4x4(inversem_pslicesm, finalm, finalm); // 1. inverse (rotx * roty)
-    finalm->Invert(finalm, finalm); // invert
-    break;
-
-  case 2: // slicing axis is double line
-    // the opposite of plane transform to put it perpendicular
-    // to the z axis, just for viewing.
-    //
-    break;
-  }
-
-  // clean up
-  transm->Delete();
-  inversem_pslicesm->Delete();
-
-
-  // return the created matrix
-  return finalm;
-}
-
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::FindUnitVectorsAndLengthsOfLandmarkLines()
-//----------------------------------------------------------------------------
-{
-  int i;
-  double l1[3];
-  double l2[3];
-  double l3[3];
-  this->GetLandmark1OfAxis(l1);
-  this->GetLandmark2OfAxis(l2);
-
-  // vector l1 - l2
-  for(i = 0; i < 3; i++)
-    m_DUnitVector12[i] = l1[i] - l2[i];
-
-  // length of vector l1 - l2
-  m_DLength12 = sqrt(pow(m_DUnitVector12[0], 2.0) + pow(m_DUnitVector12[1], 2.0) + pow(m_DUnitVector12[2], 2.0));
-
-  // unit vector along l1 - l2
-  for(i = 0; i < 3; i++)
-    m_DUnitVector12[i] = m_DUnitVector12[i] / m_DLength12;
-
-
-  switch(m_NTypeOfMuscles){
+  switch(m_MuscleType){
     case 1:
-      m_DOverallLength = m_DLength12 ;
+      // single axis
+      GetLandmark1OfAxis(pstart);
+      GetLandmark2OfAxis(pend);
+
+      lenTotal = sqrt(pMath->Distance2BetweenPoints(pstart, pend));
+
       break ;
 
     case 2:
-      // get 3rd landmark
-      this->GetLandmark3OfAxis(l3);
+      // two-part axis
+      GetLandmark1OfAxis(pstart);
+      GetLandmark2OfAxis(pmid);
+      GetLandmark3OfAxis(pend);
 
-      // vector l2 - l3
-      for(i = 0; i < 3; i++)
-        m_DUnitVector23[i] = l2[i] - l3[i];
-
-      // length of vector l2 - l3
-      m_DLength23 = sqrt(pow(m_DUnitVector23[0], 2.0) + pow(m_DUnitVector23[1], 2.0) + pow(m_DUnitVector23[2], 2.0));
-
-      // unit vector along l2 - l3
-      for(i = 0; i < 3; i++)
-        m_DUnitVector23[i] = m_DUnitVector23[i] / m_DLength23;
-
-      // overall length
-      m_DOverallLength = m_DLength12 + m_DLength23;
+      len12 = sqrt(pMath->Distance2BetweenPoints(pstart, pmid));
+      len23 = sqrt(pMath->Distance2BetweenPoints(pmid, pend));
+      lenTotal = len12 + len23 ;
 
       break ;
-  }
-}
 
-
-
-//----------------------------------------------------------------------------
-// Muscle transform 1 - global registration using landmarks.
-// This is the transform which moves the muscle landmarks to the corresponding 
-// points on the volume.
-bool medOpMML3ModelView::MapAtlasToPatient()
-//----------------------------------------------------------------------------
-{
-  // insertions
-  double at1[3];
-  double at2[3];
-  double at3[3];
-  double at4[3];
-  double pt1[3];
-  double pt2[3];
-  double pt3[3];
-  double pt4[3];
-  GetLandmark1OfAtlas(at1);
-  GetLandmark2OfAtlas(at2);
-  GetLandmark3OfAtlas(at3);
-  GetLandmark4OfAtlas(at4);
-  GetLandmark1OfPatient(pt1);
-  GetLandmark2OfPatient(pt2);
-  GetLandmark3OfPatient(pt3);
-  GetLandmark4OfPatient(pt4);
-
-
-  // create transformation matrix 1
-  // translate origin to patient landmark 1
-  // (0,0,0) -> pt1
-  // pt2-pt1 -> pt2
-  // pt3-pt1 -> pt3
-  // pt4-pt1 -> pt4
-  vtkMatrix4x4 *transm1 = vtkMatrix4x4::New();
-  transm1->Identity();
-  transm1->SetElement(0, 3, pt1[0]);
-  transm1->SetElement(1, 3, pt1[1]);
-  transm1->SetElement(2, 3, pt1[2]);
-
-
-  // create transformation matrix 2
-  // origin is pt1, x axis is pt2-pt1, y axis is pt3-pt1, z axis is pt4-pt1
-  // rotate to new axes, so 
-  // (1,0,0) -> pt2-pt1
-  // (0,1,0) -> pt3-pt1
-  // (0,0,1) -> pt4-pt1
-  vtkMatrix4x4 *transm2 = vtkMatrix4x4::New();
-  transm2->Identity();
-  transm2->SetElement(0, 0, pt2[0] - pt1[0]);
-  transm2->SetElement(0, 1, pt3[0] - pt1[0]);
-
-  if (m_4Landmarks == 1)
-    transm2->SetElement(0, 2, pt4[0] - pt1[0]);
-  else{
-    // no landmark 4, so use cross product for z axis
-    transm2->SetElement(0, 2, (pt2[1]-pt1[1])*(pt3[2]-pt1[2])-(pt2[2]-pt1[2])*(pt3[1]-pt1[1]));
+    default:
+      // unknown type
+      assert(false) ;
   }
 
-  transm2->SetElement(1, 0, pt2[1] - pt1[1]);
-  transm2->SetElement(1, 1, pt3[1] - pt1[1]);
-  if (m_4Landmarks == 1)
-    transm2->SetElement(1, 2, pt4[1] - pt1[1]);
-  else
-    transm2->SetElement(1, 2, (pt2[2]-pt1[2])*(pt3[0]-pt1[0])-(pt2[0]-pt1[0])*(pt3[2]-pt1[2]));
+  pMath->Delete() ;
 
-  transm2->SetElement(2, 0, pt2[2] - pt1[2]);
-  transm2->SetElement(2, 1, pt3[2] - pt1[2]);
-  if (m_4Landmarks == 1)
-    transm2->SetElement(2, 2, pt4[2] - pt1[2]);
-  else
-    transm2->SetElement(2, 2, (pt2[0]-pt1[0])*(pt3[1]-pt1[1])-(pt2[1]-pt1[1])*(pt3[0]-pt1[0]));
-
-
-
-  // create transformation matrix 3
-  // same as matrix 2 but with atlas landmarks
-  // origin is at1, x axis is at2-at1, y axis is at3-at1, z axis is at4-at1
-  // rotate to new axes, so 
-  // (1,0,0) -> at2-at1
-  // (0,1,0) -> at3-at1
-  // (0,0,1) -> at4-at1
-  vtkMatrix4x4 *transm3 = vtkMatrix4x4::New();
-  transm3->Identity();
-  transm3->SetElement(0, 0, at2[0] - at1[0]);
-  transm3->SetElement(0, 1, at3[0] - at1[0]);
-  if (m_4Landmarks == 1)
-    transm3->SetElement(0, 2, at4[0] - at1[0]);
-  else
-    transm3->SetElement(0, 2, (at2[1]-at1[1])*(at3[2]-at1[2])-(at2[2]-at1[2])*(at3[1]-at1[1]));
-  transm3->SetElement(1, 0, at2[1] - at1[1]);
-  transm3->SetElement(1, 1, at3[1] - at1[1]);
-  if (m_4Landmarks == 1)
-    transm3->SetElement(1, 2, at4[1] - at1[1]);
-  else
-    transm3->SetElement(1, 2, (at2[2]-at1[2])*(at3[0]-at1[0])-(at2[0]-at1[0])*(at3[2]-at1[2]));
-  transm3->SetElement(2, 0, at2[2] - at1[2]);
-  transm3->SetElement(2, 1, at3[2] - at1[2]);
-  if (m_4Landmarks == 1)
-    transm3->SetElement(2, 2, at4[2] - at1[2]);
-  else
-    transm3->SetElement(2, 2, (at2[0]-at1[0])*(at3[1]-at1[1])-(at2[1]-at1[1])*(at3[0]-at1[0]));
-
-
-  // create inverse transformation matrix 3
-  // The inverse matrix has the effect:
-  // (at2-at1) -> (1,0,0)
-  // (at3-at1) -> (0,1,0)
-  // (at4-at1) -> (0,0,1)
-  vtkMatrix4x4 *inversetransm3 = vtkMatrix4x4::New();
-  inversetransm3->Identity();
-  inversetransm3->Invert(transm3, inversetransm3);
-
-
-  // create transformation matrix 4
-  // translate atlas landmark 1 to the origin
-  // at1 -> (0,0,0)
-  // at2 -> at2-at1
-  // at3 -> at3-at1
-  // at4 -> at4-at1
-  vtkMatrix4x4 *transm4 = vtkMatrix4x4::New();
-  transm4->Identity();
-  transm4->SetElement(0, 3, -1.0 * at1[0]);
-  transm4->SetElement(1, 3, -1.0 * at1[1]);
-  transm4->SetElement(2, 3, -1.0 * at1[2]);
-
-
-  // create final transformation matrix
-  // finalm = transm1 * transm2 * inv(transm3) * transm4
-  vtkMatrix4x4 *finalm = vtkMatrix4x4::New();
-  finalm->Identity();
-  MultiplyMatrix4x4(transm1, finalm, finalm);
-  MultiplyMatrix4x4(transm2, finalm, finalm);
-  MultiplyMatrix4x4(inversetransm3, finalm, finalm);
-  MultiplyMatrix4x4(transm4, finalm, finalm);
-
-
-  double newat1[3];
-  double newat2[3];
-  double newat3[3];
-  double newat4[3];
-
-  // transform insertions (tests)
-  vtkTransform *transf = vtkTransform::New();
-  transf->SetMatrix(finalm);
-  transf->TransformPoint(at1, newat1); // landmark 1
-  transf->TransformPoint(at2, newat2); // landmark 2
-  transf->TransformPoint(at3, newat3); // landmark 3
-  if (m_4Landmarks == 1)
-    transf->TransformPoint(at4, newat4); // landmark 4
-  transf->Delete();
-
-  double diff1[3];
-  double diff2[3];
-  double diff3[3];
-  double diff4[3];
-  for(int i = 0; i < 3; i++)
-  {
-    diff1[i] = pt1[i] - newat1[i];
-    diff2[i] = pt2[i] - newat2[i];
-    diff3[i] = pt3[i] - newat3[i];
-    if (m_4Landmarks == 1)
-      diff4[i] = pt4[i] - newat4[i];
-  }
-  assert(sqrt(pow(diff1[0], 2.0) + pow(diff1[1], 2.0) + pow(diff1[2], 2.0)) < 0.001);
-  assert(sqrt(pow(diff2[0], 2.0) + pow(diff2[1], 2.0) + pow(diff2[2], 2.0)) < 0.001);
-  assert(sqrt(pow(diff3[0], 2.0) + pow(diff3[1], 2.0) + pow(diff3[2], 2.0)) < 0.001);
-  if (m_4Landmarks == 1)
-    assert(sqrt(pow(diff4[0], 2.0) + pow(diff4[1], 2.0) + pow(diff4[2], 2.0)) < 0.001);
-
-  // transform muscle
-  // Set transform 1 of the muscle (see constructor)
-  m_MuscleTransform1->SetMatrix(finalm);
-  finalm->Delete() ;
-
-  // clean up
-  transm1->Delete();
-  transm2->Delete();
-  transm3->Delete();
-  transm4->Delete();
-  inversetransm3->Delete() ;
-
-  return 1;
-}
-
-
-
-//------------------------------------------------------------------------------
-// Do global registration transform on axis landmarks.
-// Axis landmarks come from the atlas,
-// So they must transform with the muscle polydata.
-// You must do MapAtlasToPatient() first to create the transform.
-void medOpMML3ModelView::TransformAxisLandmarksToPatient()
-//------------------------------------------------------------------------------
-{
-  vtkMatrix4x4 *mat = m_MuscleTransform1->GetMatrix() ;
-
-  // get axis landmarks as homogeneous vectors
-  double a1[4], a2[4], a3[4] ;
-
-  GetLandmark1OfAxis(a1) ;  a1[3] = 1.0 ;
-  MultiplyMatrixPoint(mat, a1, a1) ;
-  SetLandmark1OfAxis(a1) ;
-
-  GetLandmark2OfAxis(a2) ;  a2[3] = 1.0 ;
-  MultiplyMatrixPoint(mat, a2, a2) ;
-  SetLandmark2OfAxis(a2) ;
-
-  if (m_NTypeOfMuscles == 2){
-    GetLandmark3OfAxis(a3) ;  a3[3] = 1.0 ;
-    MultiplyMatrixPoint(mat, a3, a3) ;
-    SetLandmark3OfAxis(a3) ;
-  }
+  return lenTotal ;
 }
 
 
 
 
-
 //------------------------------------------------------------------------------
-// Transform 2
-// transform coordinates into a coordinate system, in which z-axis
-// is aligned with muscle line axis as defined by insertion points
-// in patient, and origin being the middle of this muscle line axis.
-//
-// Calculate matrices m_SliceRotationMat and m_FinalMat
-// Set m_MuscleTransform2
-//
-// NB This does not include any option for muscle type 2 !
-bool medOpMML3ModelView::MakeActionLineZAxis()
+// set positions (fractional and actual) of scans along axis
+void medOpMML3ModelView::SetFractionalPosOfScans(double *alpha)
 //------------------------------------------------------------------------------
 {
-  int i;
-
-  // insertions
-  double p1[3];
-  double p2[3];
-  GetLandmark1OfAxis(p1); // high
-  GetLandmark2OfAxis(p2); // low
-
-  // middle
-  double m[3];
-  for(i = 0; i < 3; i++)
-    m[i] = p1[i] + (p2[i] - p1[i]) / 2.0;
-
-  // unit vector along muscle axis
-  double u[3];
-  for(i = 0; i < 3; i++)
-    u[i] = p1[i] - p2[i];
-  double n = sqrt(pow(u[0], 2.0) + pow(u[1], 2.0) + pow(u[2], 2.0));
-  for(i = 0; i < 3; i++)
-    u[i] = u[i] / n;
-
-  // projection of unit vector along muscle axis on y0z plane
-  double d;
-  d = sqrt(pow(u[1], 2.0) + pow(u[2], 2.0));
-
-  // translation
-  vtkMatrix4x4 *transm = vtkMatrix4x4::New();
-  transm->Identity();
-  for(i = 0; i < 3; i++)
-    transm->SetElement(i, 3, -1.0 * m[i]);
-
-  // rotation around x
-  // rotation around y
-  vtkMatrix4x4 *rotaxm = vtkMatrix4x4::New();
-  vtkMatrix4x4 *rotaym = vtkMatrix4x4::New();
-  if (d  > 0.0)
-  {
-    rotaxm->Identity();
-    rotaxm->SetElement(1, 1, u[2] / d);
-    rotaxm->SetElement(2, 1, u[1] / d);
-    rotaxm->SetElement(1, 2, -1.0 * u[1] / d);
-    rotaxm->SetElement(2, 2, u[2] / d);
-
-    rotaym->Identity();
-    rotaym->SetElement(0, 0, d);
-    rotaym->SetElement(2, 0, u[0]);
-    rotaym->SetElement(0, 2, -1.0 * u[0]);
-    rotaym->SetElement(2, 2, d);
+  for (int i = 0 ;  i < GetTotalNumberOfScans() ;  i++){
+    m_Alpha[i] = alpha[i] ;
+    m_Zeta[i] = alpha[i] * LengthOfAxis() ;
   }
-  else
-  {
-    rotaym->Identity();
-    rotaym->SetElement(0, 0, u[2]);
-    rotaym->SetElement(2, 0, -1.0 * u[0]);
-    rotaym->SetElement(0, 2, u[0]);
-    rotaym->SetElement(2, 2, u[2]);
-  }
-
-  //// z = 0 plane reflection
-  //vtkMatrix4x4 *reflzm = vtkMatrix4x4::New();
-  //reflzm->Identity();
-  //reflzm->SetElement(2, 2, -1.0);
-
-
-  // scaling
-  vtkMatrix4x4 *scalem = vtkMatrix4x4::New();
-  scalem->Identity();
-
-  // synthetic slices transform
-  m_SliceRotationMat->Identity();
-  MultiplyMatrix4x4(rotaym, m_SliceRotationMat, m_SliceRotationMat); // rotation y
-  MultiplyMatrix4x4(rotaxm, m_SliceRotationMat, m_SliceRotationMat); // rotation x
-
-  // transformation matrix
-  m_FinalMat->Identity();
-  MultiplyMatrix4x4(scalem, m_FinalMat, m_FinalMat); // 4. scaling
-  MultiplyMatrix4x4(rotaym, m_FinalMat, m_FinalMat); // 3. rotation y
-  MultiplyMatrix4x4(rotaxm, m_FinalMat, m_FinalMat); // 2. rotation x
-  MultiplyMatrix4x4(transm, m_FinalMat, m_FinalMat); // 1. translation
-
-  // Set transform 2 of muscle (see constructor)
-  m_MuscleTransform2->SetMatrix(m_FinalMat);
-
-
-  double newp1[3];
-  double newp2[3];
-
-  // transform insertions (tests)
-  vtkTransform *transf = vtkTransform::New();
-  transf->SetMatrix(m_FinalMat);
-  transf->TransformPoint(p1, newp1); // landmark 1
-  transf->TransformPoint(p2, newp2); // landmark 2
-  transf->Delete();
-
-  //
-  assert((newp1[0] < 0.0001) && (newp1[1] < 0.0001)); // x, y are zero
-  assert((newp2[0] < 0.0001) && (newp2[0] < 0.0001)); // x, y are zero
-  assert((newp1[2] + newp2[2]) < 0.0001); // z are opposite, so sum to zero
-
-  // clean up
-  transm->Delete();
-  rotaym->Delete();
-  rotaxm->Delete();
-  scalem->Delete();
-  //reflzm->Delete() ;
-
-  //
-  m_MuscleTransform2PolyDataFilter->Update();
-
-  return 1;
 }
 
 
 
-
-//----------------------------------------------------------------------------
-// Calculate distance z along slice axis from landmark 1 to landmark 2
-// Assumes z is a linear function of scan id with range -L/2 to +L/2 where L is length
-// NB No option for muscle type 2
-double medOpMML3ModelView::GetZOfSyntheticScans(int s)
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// calculate the positions of the scans in patient coords, given the fractional positions
+// The positions are always along the axis
+void medOpMML3ModelView::CalculatePositionsOfScans()
+//------------------------------------------------------------------------------
 {
-  int n; // number of scans
-  double p1[3]; // low insertion
-  double p2[3]; // high insertion
+  double pstart[3] ; // low insertion
+  double pmid[3] ;   // mid landmark if two-part axis
+  double pend[3] ;   // high insertion
 
-  n = GetTotalNumberOfSyntheticScans();
-  GetLandmark1OfAxis(p1);
-  GetLandmark2OfAxis(p2);
+  int n = GetTotalNumberOfScans();
 
-  double length;
   vtkMath *pMath = vtkMath::New();
-  length = sqrt(pMath->Distance2BetweenPoints(p1, p2));
-  pMath->Delete();
 
-  double start; // first z (slice id = 0)
-  start = -length / 2.0;
+  switch(m_MuscleType){
+    case 1:
+      {
+        // single axis
+        GetLandmark1OfAxis(pstart);
+        GetLandmark2OfAxis(pend);
 
-  return start + ((double)s / (double)(n-1)) * length ;
+        for (int i = 0 ;  i < n ;  i++){
+          for (int j = 0 ;  j < 3 ;  j++){
+            double f = m_Alpha[i] ;
+            m_SlicePositions[i][j] = (1.0 - f)*pstart[j] + f*pend[j] ;
+          }
+        }
+
+        break ;
+      }
+
+    case 2:
+      {
+        // two-part axis
+        GetLandmark1OfAxis(pstart);
+        GetLandmark2OfAxis(pmid);
+        GetLandmark3OfAxis(pend);
+
+        // calculate the fractional distance of pmid, the breakpoint in the axes
+        // so we can know which part a given f is on
+        double len12 = sqrt(pMath->Distance2BetweenPoints(pstart, pmid));
+        double len23 = sqrt(pMath->Distance2BetweenPoints(pmid, pend));
+        double lenTotal = len12 + len23 ; 
+        double fmid = len12/lenTotal ;
+
+        // expensive calculation so save result for future use
+        m_AlphaMidPoint = fmid ;
+        m_ZetaMidPoint = fmid*LengthOfAxis() ;
+
+        // calculate the positions
+        for (int i = 0 ;  i < n ;  i++){
+          double f = m_Alpha[i] ;
+          if (f <= fmid){
+            // pos goes from pstart to pmid as f goes from 0 to fmid
+            for (int j = 0 ;  j < 3 ;  j++)
+              m_SlicePositions[i][j] = (1.0 - f/fmid)*pstart[j] + (f/fmid)*pmid[j] ;
+          }
+          else{
+            // pos goes from pmid to pend as f goes from fmid to 1
+            for (int j = 0 ;  j < 3 ;  j++)
+              m_SlicePositions[i][j] = ((1.0-f)/(1-fmid))*pmid[j] + ((f-fmid)/(1.0-fmid))*pend[j] ;
+          }
+        }
+
+        break ;
+      }
+
+    default:
+      // unknown type
+      assert(false) ;
+  }
+
+  pMath->Delete() ;
 }
 
 
+
+//------------------------------------------------------------------------------
+// calculate the normals of the scans
+void medOpMML3ModelView::CalculateNormalsOfScans()
+//------------------------------------------------------------------------------
+{
+  double pstart[3] ; // low insertion
+  double pmid[3] ;   // mid landmark if two-part axis
+  double pend[3] ;   // high insertion
+
+  int n = GetTotalNumberOfScans();
+
+  vtkMath *pMath = vtkMath::New();
+
+  switch(m_MuscleType){
+    case 1:
+      {
+        // single axis
+        GetLandmark1OfAxis(pstart);
+        GetLandmark2OfAxis(pend);
+
+        // get axis direction
+        double direc[3] ;
+        for (int j = 0 ;  j < 3 ;  j++)
+          direc[j] = pend[j] - pstart[j] ;
+        pMath->Normalize(direc) ;
+
+        // copy axis direction to all normals
+        for (int i = 0 ;  i < n ;  i++)
+          for (int j = 0 ;  j < 3 ;  j++)
+            m_SliceNormals[i][j] = direc[j] ;
+
+        break ;
+      }
+
+    case 2:
+      {
+        // two-part axis
+        GetLandmark1OfAxis(pstart);
+        GetLandmark2OfAxis(pmid);
+        GetLandmark3OfAxis(pend);
+
+        // get axis directions
+        double direc12[3], direc23[3], direcMid[3] ;
+        for (int j = 0 ;  j < 3 ;  j++){
+          direc12[j] = pmid[j] - pstart[j] ;
+          direc23[j] = pend[j] - pmid[j] ;
+          direcMid[j] = (direc12[j] + direc23[j]) / 2.0 ; // mean direction at pmid
+        }
+        pMath->Normalize(direc12) ;
+        pMath->Normalize(direc23) ;
+        pMath->Normalize(direcMid) ;
+
+        // expensive calculation so save results for future use
+        for (int j = 0 ;  j < 3 ;  j++){
+          m_NormalStart[j] = direc12[j] ;
+          m_NormalMidPoint[j] = direcMid[j] ;
+          m_NormalEnd[j] = direc23[j] ;
+        }
+
+        // calculate the fractional distance of pmid, the breakpoint in the axes
+        // so we can know which part a given f is on
+        double len12 = sqrt(pMath->Distance2BetweenPoints(pstart, pmid));
+        double len23 = sqrt(pMath->Distance2BetweenPoints(pmid, pend));
+        double lenTotal = len12 + len23 ; 
+        double fmid = len12/lenTotal ;
+
+        // calculate the normals
+        for (int i = 0 ;  i < n ;  i++){
+          double f = m_Alpha[i] ;
+          if (f <= fmid){
+            // direction goes from direc12 to direcMid as f goes from 0 to fmid
+            for (int j = 0 ;  j < 3 ;  j++)
+              m_SliceNormals[i][j] = (1.0 - f/fmid)*direc12[j] + (f/fmid)*direcMid[j] ;
+          }
+          else{
+            // direction goes from direcMid to direc23 as f goes from fmid to 1
+            for (int j = 0 ;  j < 3 ;  j++)
+              m_SliceNormals[i][j] = ((1.0-f)/(1-fmid))*direcMid[j] + ((f-fmid)/(1.0-fmid))*direc23[j] ;
+          }
+        }
+
+        // renormalise normals
+        for (int i = 0 ;  i < n ;  i++)
+          pMath->Normalize(m_SliceNormals[i]) ;
+
+        break ;
+      }
+
+    default:
+      // unknown type
+      assert(false) ;
+  } 
+
+  pMath->Delete() ;
+
+}
+
+
+
+
 //----------------------------------------------------------------------------
-double medOpMML3ModelView::GetCurrentZOfSyntheticScans()
+// calculate the pose matrices of the scans
+void medOpMML3ModelView::CalculatePoseMatricesOfScans()
 //----------------------------------------------------------------------------
 {
-  return GetZOfSyntheticScans(GetCurrentIdOfSyntheticScans());
+  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
+
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++){
+    vtkMatrix4x4 *mat = m_SlicePoseMat[i] ;
+    mat->Identity() ;
+
+    // set position
+    for (int j = 0 ;  j < 3 ;  j++)
+      mat->SetElement(j, 3, m_SlicePositions[i][j]) ;
+
+    // calculate x and y axes
+    double u[3], v[3] ;
+    vecMath->CalculateNormalsToW(u, v, m_SliceNormals[i]) ;
+    vecMath->NormalizeVector(u) ;
+    vecMath->NormalizeVector(v) ;
+
+    // set x, y and z axes
+    for (int j = 0 ;  j < 3 ;  j++){
+      mat->SetElement(j, 0, u[j]) ;
+      mat->SetElement(j, 1, v[j]) ;
+      mat->SetElement(j, 2, m_SliceNormals[i][j]) ;
+    }
+
+    // also calculate the inverse matrix
+    mat->Invert(mat, m_SlicePoseInvMat[i]) ;
+  }
+
+  delete vecMath ;
 }
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Calculate and save the original centers and bounds of contours on each slice.
+// Do this when everything else is set up, and before any transforms have been applied.
+void medOpMML3ModelView::CalculateOriginalContourCenters()
+//------------------------------------------------------------------------------
+{
+  // save current slice id
+  int saveId = m_ScansCurrentId ;
+
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++){
+    SetCurrentIdOfScans(i) ;
+    GetVisualPipe2D()->CalculateRobustCenterOfContour(m_OriginalContourCenters[i]) ; 
+    GetVisualPipe2D()->GetCurrentContourBounds(m_OriginalContourBounds[i]) ;
+
+    // add value to centre op spline
+    // This allows us to interpolate the centre between slices later
+    double zeta = GetZetaOfCurrentSlice() ;
+    GetCHSpline()->AddPoint(zeta, m_OriginalContourCenters[i][0]) ;
+    GetCVSpline()->AddPoint(zeta, m_OriginalContourCenters[i][1]) ;
+  }
+
+  // restore slice id
+  SetCurrentIdOfScans(saveId) ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Get the bounds of the untransformed contour on the current slice
+// Returns the value saved by CalculateOriginalContourCenters()
+void medOpMML3ModelView::GetOriginalContourBounds(double bounds[6])
+//------------------------------------------------------------------------------
+{
+  for (int i = 0 ;  i < 6 ;  i++)
+    bounds[i] = m_OriginalContourBounds[m_ScansCurrentId][i] ;
+}
+
+
+//------------------------------------------------------------------------------
+// Get the center of the untransformed contour on the current slice
+// Returns the value saved by CalculateOriginalContourCenters()
+void medOpMML3ModelView::GetOriginalContourCenter(double center[3])
+//------------------------------------------------------------------------------
+{
+  for (int i = 0 ;  i < 3 ;  i++)
+    center[i] = m_OriginalContourCenters[m_ScansCurrentId][i] ;
+}
+
+
+
+
+//----------------------------------------------------------------------------
+// Get distance zeta along slice axis
+double medOpMML3ModelView::GetZetaOfSlice(int sliceId) const
+//----------------------------------------------------------------------------
+{
+  return m_Zeta[sliceId] ;
+}
+
+
+
+//----------------------------------------------------------------------------
+// Get distance zeta along slice axis
+double medOpMML3ModelView::GetZetaOfCurrentSlice() const
+//----------------------------------------------------------------------------
+{
+  return m_Zeta[m_ScansCurrentId] ;
+}
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Calculate the position of the slice for an arbitrary value of zeta
+// This assumes that CalculatePositionsOfScans() has been called
+void medOpMML3ModelView::CalculateSlicePosition(double zeta, double *pos) const
+//------------------------------------------------------------------------------
+{
+  double pstart[3] ; // low insertion
+  double pmid[3] ;   // mid landmark if two-part axis
+  double pend[3] ;   // high insertion
+
+  double alpha = zeta / LengthOfAxis() ;
+
+  switch(m_MuscleType){
+    case 1:
+      {
+        // single axis
+        GetLandmark1OfAxis(pstart);
+        GetLandmark2OfAxis(pend);
+
+        for (int j = 0 ;  j < 3 ;  j++)
+          pos[j] = (1.0 - alpha)*pstart[j] + alpha*pend[j] ;
+
+        break ;
+      }
+
+    case 2:
+      {
+        // two-part axis
+        GetLandmark1OfAxis(pstart);
+        GetLandmark2OfAxis(pmid);
+        GetLandmark3OfAxis(pend);
+
+        // calculate the position
+        if (alpha <= m_AlphaMidPoint){
+          // pos goes from pstart to pmid as alpha goes from 0 to m_AlphaMidPoint
+          for (int j = 0 ;  j < 3 ;  j++)
+            pos[j] = (1.0 - alpha/m_AlphaMidPoint)*pstart[j] + (alpha/m_AlphaMidPoint)*pmid[j] ;
+        }
+        else{
+          // pos goes from pmid to pend as alpha goes from m_AlphaMidPoint to 1
+          for (int j = 0 ;  j < 3 ;  j++)
+            pos[j] = ((1.0-alpha)/(1-m_AlphaMidPoint))*pmid[j] + ((alpha-m_AlphaMidPoint)/(1.0-m_AlphaMidPoint))*pend[j] ;
+        }
+
+
+        break ;
+      }
+
+    default:
+      // unknown type
+      assert(false) ;
+  }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Calculate the normal of the slice for an arbitrary value of zeta
+// This assumes that CalculateNormalsOfScans() has already been called
+void medOpMML3ModelView::CalculateSliceNormal(double zeta, double *normal) const
+//------------------------------------------------------------------------------
+{
+  double alpha = zeta / LengthOfAxis() ;
+
+  int n = GetTotalNumberOfScans();
+
+  vtkMath *pMath = vtkMath::New();
+
+  switch(m_MuscleType){
+    case 1:
+      {
+        // single straight axis
+        // all slices have same normal, so just return result for slice 0
+        for (int j = 0 ;  j < 3 ;  j++)
+          normal[j] = m_SliceNormals[0][j] ;
+
+        break ;
+      }
+
+    case 2:
+      {
+        // two-part axis
+        if (alpha <= 0.0){
+          // clamp value to that at alpha = 0.0
+          for (int j = 0 ;  j < 3 ;  j++)
+            normal[j] = m_NormalStart[j] ;
+        }
+        else if (alpha <= m_AlphaMidPoint){
+          // Direction goes from normalStart to normalMid as alpha goes from 0 to m_AlphaMidPoint
+          // We don't use values at slice 0 because it might not be at alpha = 0.0
+          for (int j = 0 ;  j < 3 ;  j++)
+            normal[j] = (1.0 - alpha/m_AlphaMidPoint)*m_NormalStart[j] + (alpha/m_AlphaMidPoint)*m_NormalMidPoint[j] ;
+        }
+        else if (alpha < 1.0){
+          // direction goes from normalMid to normalEnd as alpha goes from m_AlphaMidPoint to 1
+          for (int j = 0 ;  j < 3 ;  j++)
+            normal[j] = ((1.0-alpha)/(1-m_AlphaMidPoint))*m_NormalMidPoint[j] + ((alpha-m_AlphaMidPoint)/(1.0-m_AlphaMidPoint))*m_NormalEnd[j] ;
+        }
+        else{
+          // clamp value to that at alpha = 1.0
+          for (int j = 0 ;  j < 3 ;  j++)
+            normal[j] = m_NormalEnd[j] ;
+        }
+
+        pMath->Normalize(normal) ;
+
+        break ;
+      }
+
+    default:
+      // unknown type
+      assert(false) ;
+  } 
+
+  pMath->Delete() ;
+
+}
+
+
+
+//------------------------------------------------------------------------------
+// calculate the pose matrix of the slice for an arbitrary value of zeta
+void medOpMML3ModelView::CalculateSlicePoseMatrix(double zeta, vtkMatrix4x4 *mat) const
+//------------------------------------------------------------------------------
+{
+  medOpMatrixVectorMath *vecMath = new medOpMatrixVectorMath ;
+
+  double pos[3], normal[3] ;
+  CalculateSlicePosition(zeta, pos) ;
+  CalculateSliceNormal(zeta, normal) ;
+
+  mat->Identity() ;
+
+  // set position
+  for (int j = 0 ;  j < 3 ;  j++)
+    mat->SetElement(j, 3, pos[j]) ;
+
+  // calculate x and y axes
+  double u[3], v[3] ;
+  vecMath->CalculateNormalsToW(u, v, normal) ;
+  vecMath->NormalizeVector(u) ;
+  vecMath->NormalizeVector(v) ;
+
+  // set x, y and z axes
+  for (int j = 0 ;  j < 3 ;  j++){
+    mat->SetElement(j, 0, u[j]) ;
+    mat->SetElement(j, 1, v[j]) ;
+    mat->SetElement(j, 2, normal[j]) ;
+  }
+
+  delete vecMath ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Calculate height of point x above plane
+// the value is zero for a point in the plane.
+double medOpMML3ModelView::HeightAbovePlane(double *normal, double *origin, double *x) const
+//------------------------------------------------------------------------------
+{
+  return (x[0]-origin[0])*normal[0] +  (x[1]-origin[1])*normal[1] + (x[2]-origin[2])*normal[2] ;
+}
+
+
+//------------------------------------------------------------------------------
+// Calculate height of point x above plane defined by zeta
+// the value is zero for a point in the plane.
+double medOpMML3ModelView::HeightAbovePlane(double zeta, double *x) const
+//------------------------------------------------------------------------------
+{
+  double origin[3], normal[3] ;
+  CalculateSlicePosition(zeta, origin) ;
+  CalculateSliceNormal(zeta, normal) ;
+  return HeightAbovePlane(normal, origin, x) ;
+}
+
+
+
+//----------------------------------------------------------------------------
+// calculate zeta of a point, i.e. which slice plane does point belong to
+double medOpMML3ModelView::CalculateZetaOfPoint(double *x) const
+//----------------------------------------------------------------------------
+{
+  double zeta ;
+
+  switch(m_MuscleType){
+    case 1:
+      {
+        // straight axis is very simple - just project point onto axis
+        double pstart[3] ;
+        GetLandmark1OfAxis(pstart);
+
+        zeta = 0.0 ;
+        for (int j = 0 ;  j < 3 ;  j++)
+          zeta += (x[j]-pstart[j])*m_SliceNormals[0][j] ;
+
+        break ;
+      }
+    case 2:
+      {
+        // piecewise axis is more complicated - need to iterate to solution
+        int i, ifound ;
+        bool found ;
+        double htLo, htHi ;
+        double zetaLo, zetaHi ;
+
+        // Try to bracket the zero value by evaluating at integer slice positions
+        // The height ht(zeta) should be a decreasing function.
+        htHi = HeightAbovePlane(m_SliceNormals[0], m_SlicePositions[0], x) ;
+        for (i = 1, found = false ;  i < m_NumberOfScans && !found ;  i++){
+          htLo = htHi ;
+          htHi = HeightAbovePlane(m_SliceNormals[i], m_SlicePositions[i], x) ;
+          if ((htLo >= 0.0) && (htHi <= 0.0)){
+            ifound = i ;
+            found = true ;
+          }
+        }
+
+        if (found){
+          zetaLo = GetZetaOfSlice(ifound-1) ;
+          zetaHi = GetZetaOfSlice(ifound) ;
+        }
+        else if ((htLo <= 0.0) && (htHi <= 0.0)){  
+          // point is below the stack of planes
+          zetaLo = -LengthOfAxis() ;
+          zetaHi = m_Zeta[0] ;
+          htLo = HeightAbovePlane(zetaLo, x) ;
+        }
+        else if ((htLo >= 0.0) && (htHi >= 0.0)){  
+          // point is above the stack of planes
+          zetaLo = m_Zeta[m_NumberOfScans-1] ;
+          zetaHi = m_Zeta[m_NumberOfScans-1] + LengthOfAxis() ;
+          htHi = HeightAbovePlane(zetaHi, x) ;
+        }
+        else{
+          // something went wrong
+          assert(false) ;
+        }
+
+        // check that root is now bracketed
+        assert((htLo >= 0.0) && (htHi <= 0.0)) ;
+
+        // now iterate using regula falsi
+        int maxIterations = 100 ;
+        double tol = 0.0001*LengthOfAxis() ;
+        bool foundRoot = false ;
+        double zetaNext ;
+        double htNext ;
+        for (int i = 0 ;  i < maxIterations && !foundRoot ;  i++) {
+          zetaNext = (htHi*zetaLo - htLo*zetaHi) / (htHi-htLo) ;
+          htNext = HeightAbovePlane(zetaNext, x) ;
+
+          // stop when required accuracy reached
+          foundRoot = ((htNext >= -tol) && (htNext <= tol)) ;
+
+          if (htNext >= 0.0){
+            // new point becomes low point
+            zetaLo = zetaNext ;
+            htLo = htNext ;
+          }
+          else{
+            // new point becomes high point
+            zetaHi = zetaNext ;
+            htHi = htNext ;
+          }
+        }
+
+        zeta = zetaNext ;
+        break ;
+      }
+  }
+
+  return zeta ;
+}
+
+
+
+//----------------------------------------------------------------------------
+// Apply the registration ops to the muscle
+void medOpMML3ModelView::ApplyRegistrationOps()
+//----------------------------------------------------------------------------
+{
+  // number of points
+  int n = this->m_MuscleInput->GetNumberOfPoints();
+
+  vtkMatrix4x4 *slicePlaneMat = vtkMatrix4x4::New() ;
+  vtkMatrix4x4 *slicePlaneInvMat = vtkMatrix4x4::New() ;
+  vtkTransform *transform = vtkTransform::New() ;
+
+  int cnt[4] = {0,0,0,0} ;
+
+  // deform each point
+  for(int i = 0 ;  i < n ;  i++){
+    // get ith point
+    double pt[3] ;
+    m_MuscleInput->GetPoints()->GetPoint(i, pt);
+
+    // get zeta and evaluate the splines
+    double zeta = CalculateZetaOfPoint(pt) ;
+
+    if (zeta > 255.6 && zeta < 256.0)
+      std::cout << "hello" << std::endl ;
+
+    // get spline values
+    double ph = GetPHSpline()->Evaluate(zeta);
+    double pv = GetPVSpline()->Evaluate(zeta);
+    double th = GetTHSpline()->Evaluate(zeta);
+    double tv = GetTVSpline()->Evaluate(zeta);
+    double ra = GetRASpline()->Evaluate(zeta);
+    double se = GetSESpline()->Evaluate(zeta);
+    double sw = GetSWSpline()->Evaluate(zeta);
+    double sn = GetSNSpline()->Evaluate(zeta);
+    double ss = GetSSSpline()->Evaluate(zeta);
+    double ch = GetCHSpline()->Evaluate(zeta);
+    double cv = GetCVSpline()->Evaluate(zeta);
+
+
+    // transform the point from patient space into the plane of the slice
+    CalculateSlicePoseMatrix(zeta, slicePlaneMat) ;
+    vtkMatrix4x4::Invert(slicePlaneMat, slicePlaneInvMat) ;
+    MultiplyMatrixPoint(slicePlaneInvMat, pt, pt) ;
+    
+
+    // test transform to identify which scaling quadrant to use
+    double temppt[3] ;
+    transform->Identity() ;
+    transform->Translate(th,tv,0.0) ;
+    transform->Translate(-ch,-cv,0.0) ;
+    transform->TransformPoint(pt, temppt);
+
+
+    // transform point
+    transform->Identity() ;
+    transform->Translate(ch,cv,0.0) ;
+    transform->Translate(ph,pv,0.0) ;
+    transform->RotateZ(ra) ;
+
+    if (temppt[0] > 0.0 && temppt[1] > 0.0){ // 1st quadrant (+, +)
+      transform->Scale(se, sn, 1.0);
+      cnt[0]++ ;
+    }
+    else if (temppt[0] < 0.0 && temppt[1] > 0.0){ // 2nd quadrant (-, +)
+      transform->Scale(sw, sn, 1.0);
+      cnt[1]++ ;
+    }
+    else if (temppt[0] < 0.0 && temppt[1] < 0.0){ // 3rd quadrant (-, -)
+      transform->Scale(sw, ss, 1.0);
+      cnt[2]++ ;
+    }
+    else if (temppt[0] > 0.0 && temppt[1] < 0.0){ // 4th quadrant (+, -)
+      transform->Scale(se, ss, 1.0);
+      cnt[3]++ ;
+    }
+    else if (temppt[0] > 0.0 && temppt[1] == 0.0) // positive x axis
+      transform->Scale(se, 1.0, 1.0);
+    else if (temppt[0] < 0.0 && temppt[1] == 0.0) // negative x axis
+      transform->Scale(sw, 1.0, 1.0);
+    else if (temppt[0] == 0.0 && temppt[1] > 0.0) // positive y axis
+      transform->Scale(1.0, sn, 1.0);
+    else if (temppt[0] == 0.0 && temppt[1] < 0.0) // negative y axis
+      transform->Scale(1.0, ss, 1.0);
+
+    transform->Translate(th,tv,0.0) ;
+    transform->Translate(-ch,-cv,0.0) ;
+    transform->TransformPoint(pt, pt) ;
+
+
+    // transform back to patient space
+    MultiplyMatrixPoint(slicePlaneMat, pt, pt) ;
+
+
+    // write to output polydata
+    m_MuscleOutput->GetPoints()->SetPoint(i, pt) ;
+  }
+
+  m_MuscleOutput->Modified() ;
+
+  
+  slicePlaneMat->Delete() ;
+  slicePlaneInvMat->Delete() ;
+  transform->Delete() ;
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -2023,589 +1306,288 @@ void medOpMML3ModelView::SetText(int m, double n, int d, int s)
 
   // assign to text mapper
   if (m == 1)
-    GetTextMapper1()->SetInput(text);
-  else
-    if (m == 2)
-      GetTextMapper2()->SetInput(text);
-}
-//----------------------------------------------------------------------------
-vtkCamera* medOpMML3ModelView::GetActiveCamera()
-//----------------------------------------------------------------------------
-{
-  return m_Renderer->GetActiveCamera();
-}
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SaveCameraFocalPoint(double *fp)
-//----------------------------------------------------------------------------
-{
-  m_CameraFocalPoint[0] = *fp;
-  m_CameraFocalPoint[1] = *(fp+1);
-  m_CameraFocalPoint[2] = *(fp+2);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SaveCameraPosition(double *cp)
-//----------------------------------------------------------------------------
-{
-  m_CameraPosition[0] = *cp;
-  m_CameraPosition[1] = *(cp+1);
-  m_CameraPosition[2] = *(cp+2);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SaveCameraClippingRange(double *cr)
-//----------------------------------------------------------------------------
-{
-  m_CameraClippingRange[0] = *cr;
-  m_CameraClippingRange[1] = *(cr+1);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SaveCameraViewUp(double *vu)
-//----------------------------------------------------------------------------
-{
-  m_CameraViewUp[0] = *vu;
-  m_CameraViewUp[1] = *(vu+1);
-  m_CameraViewUp[2] = *(vu+2);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::RetrieveCameraFocalPoint(double *fp)
-//----------------------------------------------------------------------------
-{
-  *fp = m_CameraFocalPoint[0];
-  *(fp+1) = m_CameraFocalPoint[1];
-  *(fp+2) = m_CameraFocalPoint[2];
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::RetrieveCameraPosition(double *cp)
-//----------------------------------------------------------------------------
-{
-  *cp = m_CameraPosition[0];
-  *(cp+1) = m_CameraPosition[1];
-  *(cp+2) = m_CameraPosition[2];
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::RetrieveCameraClippingRange(double *cr)
-//----------------------------------------------------------------------------
-{
-  *cr = m_CameraClippingRange[0];
-  *(cr+1) = m_CameraClippingRange[1];
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::RetrieveCameraViewUp(double *vu)
-//----------------------------------------------------------------------------
-{
-  *vu = m_CameraViewUp[0];
-  *(vu+1) = m_CameraViewUp[1];
-  *(vu+2) = m_CameraViewUp[2];
-}
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::AddActor(vtkActor *a)
-//----------------------------------------------------------------------------
-{
-  m_Renderer->AddActor(a);
-}
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetPositiveLineActorX(double p1[], double p2[])
-//----------------------------------------------------------------------------
-{
-  m_PosXAxisLineSource->SetPoint1(p1);
-  m_PosXAxisLineSource->SetPoint2(p2);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetNegativeLineActorY(double p1[], double p2[])
-//----------------------------------------------------------------------------
-{
-  m_NegYAxisLineSource->SetPoint1(p1);
-  m_NegYAxisLineSource->SetPoint2(p2);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetPositiveLineActorY(double p1[], double p2[])
-//----------------------------------------------------------------------------
-{
-  m_PosYAxisLineSource->SetPoint1(p1);
-  m_PosYAxisLineSource->SetPoint2(p2);
-}
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetNegativeLineActorX(double p1[], double p2[])
-//----------------------------------------------------------------------------
-{
-  m_NegXAxisLineSource->SetPoint1(p1);
-  m_NegXAxisLineSource->SetPoint2(p2);
-}
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::WriteMatrix(char *pch, vtkMatrix4x4 *m) const
-//----------------------------------------------------------------------------
-{
-  int i, j;
-  FILE *stream;
-  char FileName[MAX_CHARS];
-
-  // copy
-  strcpy(FileName, pch);
-
-  stream = fopen( FileName, "w" );
-
-  if( stream == NULL )
-    exit(0);
-  else
-  {
-    for (i = 0; i < 4; i++)
-    {
-      for(j = 0; j < 4; j++)
-      {
-        fprintf(stream, " [%d] [%d] %f\n", i, j, m->GetElement(i, j));
-      }
-      fprintf(stream, "\n");
-    }	
-  }
-  fclose( stream );
-}
-
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetResolutionOfSyntheticScans(int x, int y)
-//----------------------------------------------------------------------------
-{
-  m_NSyntheticScansXResolution = x;
-  m_NSyntheticScansYResolution = y;
-}
-
-//----------------------------------------------------------------------------
-int medOpMML3ModelView::GetTotalNumberOfSyntheticScans() const
-//----------------------------------------------------------------------------
-{
-  assert(m_NSyntheticScansTotalNumber >= 3); // at least 3 synthetic scans
-  return m_NSyntheticScansTotalNumber;
-}
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::GetResolutionOfSyntheticScans(int *x, int *y)
-//----------------------------------------------------------------------------
-{
-  *x = m_NSyntheticScansXResolution;
-  *y = m_NSyntheticScansYResolution;
-}
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetSizeOfSyntheticScans(float x, float y)
-//----------------------------------------------------------------------------
-{
-  m_NSyntheticScansXSize = x;
-  m_NSyntheticScansYSize = y;
-}
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::GetSizeOfSyntheticScans(float *x, float *y)
-//----------------------------------------------------------------------------
-{
-  *x = m_NSyntheticScansXSize;
-  *y = m_NSyntheticScansYSize;
-}
-
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::UpdateContourCuttingPlane()
-//----------------------------------------------------------------------------
-{
-  if (m_3DDisplay == 0) // standard display
-  {
-    // get z level
-    double z = GetCurrentZOfSyntheticScans();
-
-    GetContourPlane()->SetOrigin(0.0, 0.0, z);
-    GetContourPlane()->SetNormal(0.0, 0.0, 1.0); // along z axis
-    GetContourCutterTransform()->Identity();
-    GetContourCutterTransform()->Translate(0.0, 0.0,-1.0 * z); // to put down to z = 0 plane
-  }
-  else // 3d display
-  {
-    // slice no
-    int s = GetCurrentIdOfSyntheticScans();
-
-    // position
-    double p[3];
-    GetPlaneSourceOriginOfSyntheticScans(s, p); // starting from L2 (low) going up to L1 (high)
-    GetContourPlane()->SetOrigin(p);
-
-    // insertions
-    double p1[3];
-    double p2[3];
-    GetLandmark1OfAxis(p1); // high
-    GetLandmark2OfAxis(p2); // low
-
-    // unit vector along muscle axis
-    double u[3];
-    int i;
-    for(i = 0; i < 3; i++)
-      u[i] = p1[i] - p2[i];
-    double n = sqrt(pow(u[0], 2.0) + pow(u[1], 2.0) + pow(u[2], 2.0));
-    for(i = 0; i < 3; i++)
-      u[i] = u[i] / n;
-
-    // normal
-    GetContourPlane()->SetNormal(u[0], u[1], u[2]);
-  }
+    GetVisualPipe2D()->SetTextY(text) ;
+  else if (m == 2)
+    GetVisualPipe2D()->SetTextX(text) ;
 }
 
 
 
 
+
+
+
+
+
 //----------------------------------------------------------------------------
-void medOpMML3ModelView::UpdateSegmentCuttingPlanes()
+int medOpMML3ModelView::GetTotalNumberOfScans() const
 //----------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
+  assert(m_NumberOfScans >= 3); // at least 3 synthetic scans
+  return m_NumberOfScans;
+}
 
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
 
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::GetResolutionOfScans(int *x, int *y) const
+//----------------------------------------------------------------------------
+{
+  *x = m_ScansResolutionX;
+  *y = m_ScansResolutionY;
+}
 
-  // get h/v translation
-  double trans[2];
-  trans[0] = GetTHSpline()->Evaluate(z);
-  trans[1] = GetTVSpline()->Evaluate(z);
 
-  GetCuttingPlaneNorth()->SetOrigin(0.0, center[1] - trans[1], 0.0); // north/south moved by center[1] - vtrans
-  GetCuttingPlaneSouth()->SetOrigin(0.0, center[1] - trans[1], 0.0); // y translation only
-
-  GetCuttingPlaneEast()->SetOrigin(center[0] - trans[0], 0.0, 0.0); // east/west moved by center[0] - htrans
-  GetCuttingPlaneWest()->SetOrigin(center[0] - trans[0], 0.0, 0.0); // x translation only
+//----------------------------------------------------------------------------
+void medOpMML3ModelView::GetSizeOfScans(double *x, double *y) const
+//----------------------------------------------------------------------------
+{
+  *x = m_ScanSizeX;
+  *y = m_ScanSizeY;
 }
 
 
 
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::UpdateContourAxesTransform()
-//----------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Update everything
+void medOpMML3ModelView::Update()
+//------------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
+  // update vertical cuts
+  UpdateCuttingPlanesTransform();
 
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
+  // update transform of contour axes and clipping planes
+  UpdateContourAxesTransform();
 
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
+  // update transform of global axes
+  UpdateGlobalAxesTransform();
 
-  // get center h/v translation
-  double ctrans[2];
-  ctrans[0] = GetPHSpline()->Evaluate(z);
-  ctrans[1] = GetPVSpline()->Evaluate(z);
+  // update north east segment
+  UpdateSegmentNorthEastTransform();
 
-  // get twist
-  double twist = GetRASpline()->Evaluate(z);
+  // update north west segment
+  UpdateSegmentNorthWestTransform();
 
-  // initialise
+  // update south east segment
+  UpdateSegmentSouthEastTransform();
+
+  // update south west segment
+  UpdateSegmentSouthWestTransform();
+
+  // update visual pipes, if they haven't been done already
+  m_VisualPipe2D->Update() ;
+  m_VisualPipe3D->Update() ;
+  m_VisualPipePreview->Update() ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Update the transform which controls the cutting planes which divide the contour into quadrants.
+// Applies the current values of the splines.
+// Applies the operation C - T to the cutting planes, which places them correctly on the original contour.
+void medOpMML3ModelView::UpdateCuttingPlanesTransform()
+//------------------------------------------------------------------------------
+{
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
 
-  Transform->Translate(center[0], center[1], 0.0); // axes origin
+  // get zeta level
+  double zeta = GetZetaOfCurrentSlice();
 
-  // p operation
+  // get h/v translation
+  double trans[2];
+  trans[0] = GetTHSpline()->Evaluate(zeta);
+  trans[1] = GetTVSpline()->Evaluate(zeta);
+
+  // original center
+  double center[3];
+  GetOriginalContourCenter(center) ;
+
+  Transform->Translate(center[0] - trans[0], center[1] - trans[1], 0.0) ;
+
+  GetVisualPipe2D()->SetCuttingPlanesTransform(Transform) ;
+  GetVisualPipe2D()->Update();
+
+  Transform->Delete() ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Update the transform which controls the contour axes.
+// Applies the current values of the splines.
+// This does PCR, where C is the translation to the original contour center.
+// There is no S and T, which are applied to the contour but not the axes.
+// NB remember that the transforms added to vtkTransform are executed in reverse order, like a stack.
+void medOpMML3ModelView::UpdateContourAxesTransform()
+//------------------------------------------------------------------------------
+{
+  // get zeta level
+  double zeta = GetZetaOfCurrentSlice();
+
+  // get center h/v translation
+  double ctrans[2];
+  ctrans[0] = GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = GetPVSpline()->Evaluate(zeta);
+
+  // get twist
+  double twist = GetRASpline()->Evaluate(zeta);
+
+  // Get original center
+  double center[3] ;
+  GetOriginalContourCenter(center) ;
+
+  // set transform to identity
+  vtkTransform* Transform = vtkTransform::New();
+  Transform->Identity();
+
+  // P operation - move contour and widget
   Transform->Translate(ctrans[0], ctrans[1], 0.0);
 
-  // r operation
+  // C operation - move axes to center of contour
+  Transform->Translate(center[0], center[1], 0.0);
+
+  // R operation - rotate about origin
   Transform->RotateZ(twist);
 
-  // set up 2d contour axes first
-  double width = GetContourAxesLengthScale() * (bounds[1] - bounds[0]) / 2.0;
-  double height = GetContourAxesLengthScale() * (bounds[3] - bounds[2]) / 2.0;
+  GetVisualPipe2D()->SetContourAxesTransform(Transform) ;
+  GetVisualPipe2D()->Update();
 
-  if (width > 0.0) // positive/negative x axis
-  {
-    GetContourPositiveXAxisLineSource()->SetPoint2(width, 0.0, 0.0);
-    GetContourNegativeXAxisLineSource()->SetPoint2(-1.0 * width, 0.0, 0.0);
-  }
-
-  if (height > 0.0) // positive/negative y axis
-  {
-    GetContourPositiveYAxisLineSource()->SetPoint2(0.0, height, 0.0);
-    GetContourNegativeYAxisLineSource()->SetPoint2(0.0, -1.0 * height, 0.0);
-  }
-
-  //
-  GetContourPositiveXAxisActor()->SetUserTransform(Transform);
-  GetContourPositiveYAxisActor()->SetUserTransform(Transform);
-  GetContourNegativeXAxisActor()->SetUserTransform(Transform);
-  GetContourNegativeYAxisActor()->SetUserTransform(Transform);
-
-  // clean up
   Transform->Delete();
 }
 
 
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetContourAxesVisibility()
-//----------------------------------------------------------------------------
-{
-  if (m_3DDisplay == 1)
-  {
-    GetContourPositiveXAxisActor()->VisibilityOff();
-    GetContourNegativeXAxisActor()->VisibilityOff();
-    GetContourPositiveYAxisActor()->VisibilityOff();
-    GetContourNegativeYAxisActor()->VisibilityOff();
-    return;
-  }
-
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
-
-  // set up 2d contour axes first
-  double width = GetContourAxesLengthScale() * (bounds[1] - bounds[0]) / 2.0;
-  double height = GetContourAxesLengthScale() * (bounds[3] - bounds[2]) / 2.0;
-
-  if (width > 0.0) // positive/negative x axis
-  {
-    GetContourPositiveXAxisActor()->VisibilityOn();
-    GetContourNegativeXAxisActor()->VisibilityOn();
-  }
-  else
-  {
-    GetContourPositiveXAxisActor()->VisibilityOff();
-    GetContourNegativeXAxisActor()->VisibilityOff();
-  }
-
-  if (height > 0.0) // positive/negative y axis
-  {
-    GetContourPositiveYAxisActor()->VisibilityOn();
-    GetContourNegativeYAxisActor()->VisibilityOn();
-  }
-  else
-  {
-    GetContourPositiveYAxisActor()->VisibilityOff();
-    GetContourNegativeYAxisActor()->VisibilityOff();
-  }
-}
 
 
 
 //----------------------------------------------------------------------------
+// Update the transform of the global axes
 void medOpMML3ModelView::UpdateGlobalAxesTransform()
 //----------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
-
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
-
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
-
-  // get center h/v translation
-  double ctrans[2];
-  ctrans[0] = GetPHSpline()->Evaluate(z);
-  ctrans[1] = GetPVSpline()->Evaluate(z);
-
-  // get twist
-  double twist = GetRASpline()->Evaluate(z);
-
-  // initialise
+  // set transform to identity
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
-
-  // r operation
-  Transform->Translate(center[0], center[1], 0.0); // axes origin
-  Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-  Transform->RotateZ(twist); // r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-
-  // p operation
-  Transform->Translate(ctrans[0], ctrans[1], 0.0);
-
-  //
-  GetPositiveXAxisActor()->SetUserTransform(Transform);
-  GetPositiveYAxisActor()->SetUserTransform(Transform);
-  GetNegativeXAxisActor()->SetUserTransform(Transform);
-  GetNegativeYAxisActor()->SetUserTransform(Transform);
-
-  // clean up
-  Transform->Delete();
+  GetVisualPipe2D()->SetGlobalAxesTransform(Transform) ;
+  GetVisualPipe2D()->Update();
+  Transform->Delete() ;
 }
 
-//----------------------------------------------------------------------------
-void medOpMML3ModelView::SetGlobalAxesVisibility()
-//----------------------------------------------------------------------------
-{
-  if (m_3DDisplay == 1)
-  {
-    GetPositiveXAxisActor()->VisibilityOff();
-    GetNegativeXAxisActor()->VisibilityOff();
-    GetPositiveYAxisActor()->VisibilityOff();
-    GetNegativeYAxisActor()->VisibilityOff();
-    return;
-  }
-}
+
+
 
 //----------------------------------------------------------------------------
+// Apply current state of transforms to the NE contour quadrant
+// Mel's code is (CPRS R-1 P-1 C-1) * (CPR P-1 C-1) *TP
+//                = P C R S (C-1 T)
+// where C-1 T puts the center of rotation at the origin (opposite of UpdateCuttingPlanesTransform)
+// Then scale and rotate, undo the C-1 translation and do P.
 void medOpMML3ModelView::UpdateSegmentNorthEastTransform()
 //----------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
-
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
-
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
+  // get zeta level
+  double zeta = GetZetaOfCurrentSlice();
 
   // get center h/v translation
   double ctrans[2];
-  ctrans[0] = GetPHSpline()->Evaluate(z);
-  ctrans[1] = GetPVSpline()->Evaluate(z);
+  ctrans[0] = GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = GetPVSpline()->Evaluate(zeta);
 
   // get twist
-  double twist = GetRASpline()->Evaluate(z);
+  double twist = GetRASpline()->Evaluate(zeta);
 
   // get h/v translation
   double trans[2];
-  trans[0] = GetTHSpline()->Evaluate(z);
-  trans[1] = GetTVSpline()->Evaluate(z);
+  trans[0] = GetTHSpline()->Evaluate(zeta);
+  trans[1] = GetTVSpline()->Evaluate(zeta);
 
   // get scaling
   double scale[4];
-  scale[0] = GetSESpline()->Evaluate(z); // east
-  scale[1] = GetSWSpline()->Evaluate(z); // west
-  scale[2] = GetSNSpline()->Evaluate(z); // north
-  scale[3] = GetSSSpline()->Evaluate(z); // south;
+  scale[0] = GetSESpline()->Evaluate(zeta); // east
+  scale[1] = GetSWSpline()->Evaluate(zeta); // west
+  scale[2] = GetSNSpline()->Evaluate(zeta); // north
+  scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
-  // initialise
+
+  // original bounds and center
+  double bounds[6], center[3] ;
+  GetOriginalContourBounds(bounds) ;
+  GetOriginalContourCenter(center) ;
+
+
+  // initialize
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
 
-  // s operation
+  // transform
   Transform->Translate(center[0], center[1], 0.0); // axes origin
   Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
   Transform->RotateZ(twist); // r operation
   Transform->Scale(scale[0], scale[2], 1.0); // s operation
-  Transform->RotateZ(-1.0 * twist); // inverse r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  Transform->Translate(trans[0], trans[1], 0.0); // axes origin
+  Transform->Translate(-center[0], -center[1], 0.0); // axes origin
 
-  // r operation
-  Transform->Translate(center[0], center[1], 0.0); // axes origin
-  Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-  Transform->RotateZ(twist); // r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-
-  // t operation
-  Transform->Translate(trans[0], trans[1], 0.0);
-
-  // p operation
-  Transform->Translate(ctrans[0], ctrans[1], 0.0);
-
-  //
-  Transform->Translate(0.0, 0.0, -1.0 * z); // place on Oxy plane for correct display
-
-  //
-  GetNEContourTransformPolyDataFilter()->SetTransform(Transform);
-  GetNEContourTransformPolyDataFilter()->Update();
+  GetVisualPipe2D()->SetNEContourTransform(Transform);
+  GetVisualPipe2D()->Update();
 
   // clean up
   Transform->Delete();
 }
 
 
+
 //----------------------------------------------------------------------------
+// Apply current state of transforms to the NW contour quadrant
 void medOpMML3ModelView::UpdateSegmentNorthWestTransform()
 //----------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
-
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
-
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
+  // get zeta level
+  double zeta = GetZetaOfCurrentSlice();
 
   // get center h/v translation
   double ctrans[2];
-  ctrans[0] = GetPHSpline()->Evaluate(z);
-  ctrans[1] = GetPVSpline()->Evaluate(z);
+  ctrans[0] = GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = GetPVSpline()->Evaluate(zeta);
 
   // get twist
-  double twist = GetRASpline()->Evaluate(z);
+  double twist = GetRASpline()->Evaluate(zeta);
 
   // get h/v translation
   double trans[2];
-  trans[0] = GetTHSpline()->Evaluate(z);
-  trans[1] = GetTVSpline()->Evaluate(z);
+  trans[0] = GetTHSpline()->Evaluate(zeta);
+  trans[1] = GetTVSpline()->Evaluate(zeta);
 
   // get scaling
   double scale[4];
-  scale[0] = GetSESpline()->Evaluate(z); // east
-  scale[1] = GetSWSpline()->Evaluate(z); // west
-  scale[2] = GetSNSpline()->Evaluate(z); // north
-  scale[3] = GetSSSpline()->Evaluate(z); // south;
+  scale[0] = GetSESpline()->Evaluate(zeta); // east
+  scale[1] = GetSWSpline()->Evaluate(zeta); // west
+  scale[2] = GetSNSpline()->Evaluate(zeta); // north
+  scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
-  // initialise
+
+  // original bounds and center
+  double bounds[6], center[3] ;
+  GetOriginalContourBounds(bounds) ;
+  GetOriginalContourCenter(center) ;
+
+
+  // initialize
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
 
-  // s operation
+  // transform
   Transform->Translate(center[0], center[1], 0.0); // axes origin
   Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
   Transform->RotateZ(twist); // r operation
   Transform->Scale(scale[1], scale[2], 1.0); // s operation
-  Transform->RotateZ(-1.0 * twist); // inverse r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  Transform->Translate(trans[0], trans[1], 0.0); // axes origin
+  Transform->Translate(-center[0], -center[1], 0.0); // axes origin
 
-  // r operation
-  Transform->Translate(center[0], center[1], 0.0); // axes origin
-  Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-  Transform->RotateZ(twist); // r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-
-  // t operation
-  Transform->Translate(trans[0], trans[1], 0.0);
-
-  // p operation
-  Transform->Translate(ctrans[0], ctrans[1], 0.0);
-
-  //
-  Transform->Translate(0.0, 0.0, -1.0 * z); // place on Oxy plane for correct display
-
-  //
-  GetNWContourTransformPolyDataFilter()->SetTransform(Transform);
-  GetNWContourTransformPolyDataFilter()->Update();
+  GetVisualPipe2D()->SetNWContourTransform(Transform) ;
+  GetVisualPipe2D()->Update() ;
 
   // clean up
   Transform->Delete();
@@ -2613,74 +1595,54 @@ void medOpMML3ModelView::UpdateSegmentNorthWestTransform()
 
 
 //----------------------------------------------------------------------------
+// Apply current state of transforms to the SE contour quadrant
 void medOpMML3ModelView::UpdateSegmentSouthEastTransform()
 //----------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
-
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
-
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
+  // get zeta level
+  double zeta = GetZetaOfCurrentSlice();
 
   // get center h/v translation
   double ctrans[2];
-  ctrans[0] = GetPHSpline()->Evaluate(z);
-  ctrans[1] = GetPVSpline()->Evaluate(z);
+  ctrans[0] = GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = GetPVSpline()->Evaluate(zeta);
 
   // get twist
-  double twist = GetRASpline()->Evaluate(z);
+  double twist = GetRASpline()->Evaluate(zeta);
 
   // get h/v translation
   double trans[2];
-  trans[0] = GetTHSpline()->Evaluate(z);
-  trans[1] = GetTVSpline()->Evaluate(z);
+  trans[0] = GetTHSpline()->Evaluate(zeta);
+  trans[1] = GetTVSpline()->Evaluate(zeta);
 
   // get scaling
   double scale[4];
-  scale[0] = GetSESpline()->Evaluate(z); // east
-  scale[1] = GetSWSpline()->Evaluate(z); // west
-  scale[2] = GetSNSpline()->Evaluate(z); // north
-  scale[3] = GetSSSpline()->Evaluate(z); // south;
+  scale[0] = GetSESpline()->Evaluate(zeta); // east
+  scale[1] = GetSWSpline()->Evaluate(zeta); // west
+  scale[2] = GetSNSpline()->Evaluate(zeta); // north
+  scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
-  // initialise
+
+  // original bounds and center
+  double bounds[6], center[3] ;
+  GetOriginalContourBounds(bounds) ;
+  GetOriginalContourCenter(center) ;
+
+
+  // initialize
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
 
-  // s operation
+  // transform
   Transform->Translate(center[0], center[1], 0.0); // axes origin
   Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
   Transform->RotateZ(twist); // r operation
   Transform->Scale(scale[0], scale[3], 1.0); // s operation
-  Transform->RotateZ(-1.0 * twist); // inverse r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  Transform->Translate(trans[0], trans[1], 0.0); // axes origin
+  Transform->Translate(-center[0], -center[1], 0.0); // axes origin
 
-  // r operation
-  Transform->Translate(center[0], center[1], 0.0); // axes origin
-  Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-  Transform->RotateZ(twist); // r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-
-  // t operation
-  Transform->Translate(trans[0], trans[1], 0.0);
-
-  // p operation
-  Transform->Translate(ctrans[0], ctrans[1], 0.0);
-
-  //
-  Transform->Translate(0.0, 0.0, -1.0 * z); // place on Oxy plane for correct display
-
-  //
-  GetSEContourTransformPolyDataFilter()->SetTransform(Transform);
-  GetSEContourTransformPolyDataFilter()->Update();
+  GetVisualPipe2D()->SetSEContourTransform(Transform) ;
+  GetVisualPipe2D()->Update() ;
 
   // clean up
   Transform->Delete();
@@ -2688,78 +1650,61 @@ void medOpMML3ModelView::UpdateSegmentSouthEastTransform()
 
 
 //----------------------------------------------------------------------------
+// Apply current state of transforms to the SW contour quadrant
 void medOpMML3ModelView::UpdateSegmentSouthWestTransform()
 //----------------------------------------------------------------------------
 {
-  // get z level
-  double z = GetCurrentZOfSyntheticScans();
-
-  // original bounds
-  double bounds[6];
-  GetContourActor()->GetBounds(bounds);
-
-  // original center
-  double center[3];
-  center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-  center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-  center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
+  // get zeta level
+  double zeta = GetZetaOfCurrentSlice();
 
   // get center h/v translation
   double ctrans[2];
-  ctrans[0] = GetPHSpline()->Evaluate(z);
-  ctrans[1] = GetPVSpline()->Evaluate(z);
+  ctrans[0] = GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = GetPVSpline()->Evaluate(zeta);
 
   // get twist
-  double twist = GetRASpline()->Evaluate(z);
+  double twist = GetRASpline()->Evaluate(zeta);
 
   // get h/v translation
   double trans[2];
-  trans[0] = GetTHSpline()->Evaluate(z);
-  trans[1] = GetTVSpline()->Evaluate(z);
+  trans[0] = GetTHSpline()->Evaluate(zeta);
+  trans[1] = GetTVSpline()->Evaluate(zeta);
 
   // get scaling
   double scale[4];
-  scale[0] = GetSESpline()->Evaluate(z); // east
-  scale[1] = GetSWSpline()->Evaluate(z); // west
-  scale[2] = GetSNSpline()->Evaluate(z); // north
-  scale[3] = GetSSSpline()->Evaluate(z); // south;
+  scale[0] = GetSESpline()->Evaluate(zeta); // east
+  scale[1] = GetSWSpline()->Evaluate(zeta); // west
+  scale[2] = GetSNSpline()->Evaluate(zeta); // north
+  scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
-  // initialise
+
+  // original bounds and center
+  double bounds[6], center[3] ;
+  GetOriginalContourBounds(bounds) ;
+  GetOriginalContourCenter(center) ;
+
+
+  // initialize
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
 
-  // s operation
+  // transform
   Transform->Translate(center[0], center[1], 0.0); // axes origin
   Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
   Transform->RotateZ(twist); // r operation
   Transform->Scale(scale[1], scale[3], 1.0); // s operation
-  Transform->RotateZ(-1.0 * twist); // inverse r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  Transform->Translate(trans[0], trans[1], 0.0); // axes origin
+  Transform->Translate(-center[0], -center[1], 0.0); // axes origin
 
-  // r operation
-  Transform->Translate(center[0], center[1], 0.0); // axes origin
-  Transform->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-  Transform->RotateZ(twist); // r operation
-  Transform->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-  Transform->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-
-  // t operation
-  Transform->Translate(trans[0], trans[1], 0.0);
-
-  // p operation
-  Transform->Translate(ctrans[0], ctrans[1], 0.0);
-
-  //
-  Transform->Translate(0.0, 0.0, -1.0 * z); // place on Oxy plane for correct display
-
-  //
-  GetSWContourTransformPolyDataFilter()->SetTransform(Transform);
-  GetSWContourTransformPolyDataFilter()->Update();
+  GetVisualPipe2D()->SetSWContourTransform(Transform) ;
+  GetVisualPipe2D()->Update() ;
 
   // clean up
   Transform->Delete();
 }
+
+
+
 
 
 //----------------------------------------------------------------------------
@@ -2962,285 +1907,12 @@ void medOpMML3ModelView::GetLandmark3OfAxis(double *xyz) const
 
 
 
-//----------------------------------------------------------------------------
-bool medOpMML3ModelView::SetUpContourCoordinateAxes()
-//----------------------------------------------------------------------------
-{
-  // east
-  m_ContourPosXAxisAxesTubeFilter->SetRadius(0.5);
-  m_ContourPosXAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_ContourPosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_ContourPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-  m_ContourPosXAxisActor->VisibilityOn();
-
-  // north
-  m_ContourPosYAxisAxesTubeFilter->SetRadius(0.5);
-  m_ContourPosYAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_ContourPosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_ContourPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-  m_ContourPosYAxisActor->VisibilityOn();
-
-  // west
-  m_ContourNegXAxisAxesTubeFilter->SetRadius(0.5);
-  m_ContourNegXAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_ContourNegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_ContourNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
-  m_ContourNegXAxisActor->VisibilityOn();
-
-  // south
-  m_ContourNegYAxisAxesTubeFilter->SetRadius(0.5);
-  m_ContourNegYAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_ContourNegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_ContourNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-  m_ContourNegYAxisActor->VisibilityOn();
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-bool medOpMML3ModelView::SetUpGlobalCoordinateAxes()
-//----------------------------------------------------------------------------
-{
-  // east
-  m_PosXAxisAxesTubeFilter->SetRadius(0.5);
-  m_PosXAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_PosXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_PosXAxisLineSource->SetPoint2(m_NSyntheticScansXSize / 2.0, 0.0, 0.0);
-  m_GlobalPosXAxisActor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-  m_GlobalPosXAxisActor->VisibilityOn();
-
-  // north
-  m_PosYAxisAxesTubeFilter->SetRadius(0.5);
-  m_PosYAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_PosYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_PosYAxisLineSource->SetPoint2(0.0, m_NSyntheticScansYSize / 2.0, 0.0);
-  m_GlobalPosYAxisActor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-  m_GlobalPosYAxisActor->VisibilityOn();
-
-  // west
-  m_NegXAxisAxesTubeFilter->SetRadius(0.5);
-  m_NegXAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_NegXAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_NegXAxisLineSource->SetPoint2(-1.0 * m_NSyntheticScansXSize / 2.0, 0.0, 0.0);
-  m_GlobalNegXAxisActor->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
-  m_GlobalNegXAxisActor->VisibilityOn();
-
-  // south
-  m_NegYAxisAxesTubeFilter->SetRadius(0.5);
-  m_NegYAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_NegYAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_NegYAxisLineSource->SetPoint2(0.0, -1.0 * m_NSyntheticScansYSize / 2.0, 0.0);
-  m_GlobalNegYAxisActor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-  m_GlobalNegYAxisActor->VisibilityOn();
-
-  return 1;
-}
-
-
-
-//----------------------------------------------------------------------------
-/// switch visual pipe to 3d display
-void medOpMML3ModelView::Switch3dDisplayOn()
-//----------------------------------------------------------------------------
-{
-  // 3d display flag
-  m_3DDisplay = 1;
-
-  // interactor style for 3d display
-  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New() ;
-  m_RenderWindowInteractor->SetInteractorStyle(style);
-  style->Delete() ;
-
-  // identity transform
-  vtkTransform *t = vtkTransform::New();
-  vtkMatrix4x4 *m = vtkMatrix4x4::New();
-  m->Identity();
-  t->SetMatrix(m);
-
-  // synthetic scans stay in patient space only
-  // thus scan actor transform must be identity
-  int n = GetTotalNumberOfSyntheticScans();
-  for(int i = 0; i < n; i++)
-  {
-    m_SyntheticScansActor[i]->SetUserTransform(t);
-  }
-
-  // muscle mapped to patient space only, using transform 1
-  // thus, transform 2 must simply be an identity transform
-  m_MuscleTransform2PolyDataFilter->SetTransform(t);
-
-  // set up muscle and switch on
-  m_MuscleLODActor->VisibilityOn();
-  m_MuscleLODActor->GetProperty()->SetColor(1.0, 0.0, 0.0);
-  m_MuscleLODActor->GetProperty()->SetOpacity(0.5);
-
-  // standard contour switch on
-  m_ContourActor->VisibilityOn();
-
-  // sub-contours switch off
-  m_NEContourActor->VisibilityOff();
-  m_NWContourActor->VisibilityOff();
-  m_SEContourActor->VisibilityOff();
-  m_SWContourActor->VisibilityOff();
-
-  // axes
-  // east/north/west/south re-set up and switch on
-  // set up performed in SetUpMuscleActionLineAxes
-  m_PosXAxisAxesTubeFilter->SetRadius(1.0);
-  m_PosYAxisAxesTubeFilter->SetRadius(1.0);
-  m_NegXAxisAxesTubeFilter->SetRadius(1.0);
-  m_NegYAxisAxesTubeFilter->SetRadius(1.0);
-
-  // positive z axis set up
-  m_PosZAxisAxesTubeFilter->SetRadius(1.0);
-  m_PosZAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_PosZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_PosZAxisLineSource->SetPoint2(0.0, 0.0, (m_NSyntheticScansXSize + m_NSyntheticScansYSize) / 2.0);
-  m_GlobalPosZAxisActor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
-
-  // negative z axis set up
-  m_NegZAxisAxesTubeFilter->SetRadius(1.0);
-  m_NegZAxisAxesTubeFilter->SetNumberOfSides(6);
-  m_NegZAxisLineSource->SetPoint1(0.0, 0.0, 0.0);
-  m_NegZAxisLineSource->SetPoint2(0.0, 0.0, -1.0 * (m_NSyntheticScansXSize + m_NSyntheticScansYSize) / 2.0);
-  m_GlobalNegZAxisActor->GetProperty()->SetColor(1.0, 1.0, 1.0); // white
-
-  // axes off
-  m_GlobalPosXAxisActor->VisibilityOff();
-  m_GlobalNegXAxisActor->VisibilityOff();
-  m_GlobalPosYAxisActor->VisibilityOff();
-  m_GlobalNegYAxisActor->VisibilityOff();
-  m_GlobalPosZAxisActor->VisibilityOff();
-  m_GlobalNegZAxisActor->VisibilityOff();
-
-
-
-  // patient landmarks
-  double p1[3], p2[3], p3[3], p4[3] ;
-  this->GetLandmark1OfPatient(p1);
-  this->GetLandmark2OfPatient(p2);
-  this->GetLandmark3OfPatient(p3);
-  if (m_4Landmarks == 1)
-    this->GetLandmark4OfPatient(p4);
-
-  // 1st landmark set up and switch on
-  m_Landmark1SphereSource->SetRadius(2.0);
-  m_Landmark1SphereSource->SetThetaResolution(10);
-  m_Landmark1SphereSource->SetPhiResolution(10);
-  m_Landmark1SphereSource->SetCenter(p1);
-  m_Landmark1Actor->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-  m_Landmark1Actor->VisibilityOn();
-
-  // 2nd landmark set up and switch on
-  m_Landmark2SphereSource->SetRadius(2.0);
-  m_Landmark2SphereSource->SetThetaResolution(10);
-  m_Landmark2SphereSource->SetPhiResolution(10);
-  m_Landmark2SphereSource->SetCenter(p2);
-  m_Landmark2Actor->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-  m_Landmark2Actor->VisibilityOn();
-
-  // 3rd landmark set up and switch on
-  m_Landmark3SphereSource->SetRadius(2.0);
-  m_Landmark3SphereSource->SetThetaResolution(10);
-  m_Landmark3SphereSource->SetPhiResolution(10);
-  m_Landmark3SphereSource->SetCenter(p3);
-  m_Landmark3Actor->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
-  m_Landmark3Actor->VisibilityOn();
-
-  // 4th landmark set up and switch on
-  if (m_4Landmarks == 1){
-    m_Landmark4SphereSource->SetRadius(2.0);
-    m_Landmark4SphereSource->SetThetaResolution(10);
-    m_Landmark4SphereSource->SetPhiResolution(10);
-    m_Landmark4SphereSource->SetCenter(p4);
-    m_Landmark4Actor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
-    m_Landmark4Actor->VisibilityOn();	
-  }
-  else
-    m_Landmark4Actor->VisibilityOff();	
-
-
-
-
-  // axis landmarks
-  double a1[3], a2[3], a3[3] ;
-  this->GetLandmark1OfAxis(a1) ;
-  this->GetLandmark2OfAxis(a2) ;
-  if (m_NTypeOfMuscles == 2)
-    this->GetLandmark3OfAxis(a3) ;
-
-  // line of action (L1 to L2) set up and switch on
-  m_L1L2TubeFilter->SetRadius(1.0);
-  m_L1L2TubeFilter->SetNumberOfSides(6);
-  m_L1L2LineSource->SetPoint1(a1);
-  m_L1L2LineSource->SetPoint2(a2);
-  m_L1L2Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_L1L2Actor->VisibilityOn();
-
-  if (m_NTypeOfMuscles == 2){
-    // L2 to L3 line set up and switch on
-    m_L2L3TubeFilter->SetRadius(1.0);
-    m_L2L3TubeFilter->SetNumberOfSides(6);
-    m_L2L3LineSource->SetPoint1(a2);
-    m_L2L3LineSource->SetPoint2(a3);
-    m_L2L3Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-    m_L2L3Actor->VisibilityOn();
-  }
-  else
-    m_L2L3Actor->VisibilityOff();
-
-
-
-  // clean up
-  m->Delete() ;
-  t->Delete() ;
-}
 
 
 
 
 //------------------------------------------------------------------------------
-// Multiply matrices c = ab
-// c can be the same as a or b
-// This is a column major multiply, but vtkMatrix4x4 is row major,
-// so this actually does c = ba.
-void medOpMML3ModelView::MultiplyMatrix4x4(vtkMatrix4x4 *a, vtkMatrix4x4 *b, vtkMatrix4x4 *c) const
-//------------------------------------------------------------------------------
-{
-  //
-  // matrix notation (i is row, j is col)
-  // matrices are column major, ie mat->GetElement[col][row]
-  //
-  // C0 C1 C2 C3 |
-  // -------------
-  // 00 10 20 30 | R0
-  // 01 11 21 31 | R1
-  // 02 12 22 32 | R2
-  // 03 13 23 33 | R3
-  //
-  // ji element of product is irow
-  // of a combined with jcol of b
-
-  vtkMatrix4x4* ctemp = vtkMatrix4x4::New();
-
-  for (int i = 0; i < 4; i++){
-    for(int j = 0; j < 4; j++){
-      ctemp->SetElement(j, i, 
-        a->GetElement(0, i) * b->GetElement(j, 0) +
-        a->GetElement(1, i) * b->GetElement(j, 1) +
-        a->GetElement(2, i) * b->GetElement(j, 2) +
-        a->GetElement(3, i) * b->GetElement(j, 3));		
-    }
-  }
-
-  // copy result to output matrix
-  c->DeepCopy(ctemp) ;
-  ctemp->Delete() ;
-}
-
-
-
-//------------------------------------------------------------------------------
+// Convenience method for multiplying a non-homo 3-point with a 4x4 matrix
 // multiply point by matrix c = Ab. \n
 // c can be the same as b
 void medOpMML3ModelView::MultiplyMatrixPoint(vtkMatrix4x4* A, double b[3], double c[3]) const
@@ -3250,12 +1922,13 @@ void medOpMML3ModelView::MultiplyMatrixPoint(vtkMatrix4x4* A, double b[3], doubl
   double ctemp[4] ;
 
   for (i = 0 ;  i < 4 ;  i++){
-    for (j = 0, ctemp[i] = 0.0 ;  j < 4;  j++)
+    for (j = 0, ctemp[i] = 0.0 ;  j < 3 ;  j++)
       ctemp[i] += A->GetElement(i,j) * b[j] ;
+    ctemp[i] += A->GetElement(i,3) ;
   }
 
   // copy to output matrix
-  for (i = 0 ;  i < 4 ;  i++)
+  for (i = 0 ;  i < 3 ;  i++)
     c[i] = ctemp[i] ;
 }
 
@@ -3263,8 +1936,8 @@ void medOpMML3ModelView::MultiplyMatrixPoint(vtkMatrix4x4* A, double b[3], doubl
 
 
 //------------------------------------------------------------------------------
-// Calculate centre of any plane created by vtkPlaneSource and scaled by sizx, sizy
-void medOpMML3ModelView::CalculateCentreOfVtkPlane(double sizx, double sizy, double p[3]) const
+// Calculate center of any plane created by vtkPlaneSource and scaled by sizx, sizy
+void medOpMML3ModelView::CalculateCenterOfVtkPlane(double sizx, double sizy, double p[3]) const
 //------------------------------------------------------------------------------
 {
   vtkPlaneSource *plane = vtkPlaneSource::New() ;
@@ -3285,6 +1958,7 @@ void medOpMML3ModelView::CalculateCentreOfVtkPlane(double sizx, double sizy, dou
   tpdf->Delete() ;
   plane->Delete() ;
 }
+
 
 
 
@@ -3324,10 +1998,10 @@ void medOpMML3ModelView::Print(vtkObject *obj, wxString msg) const
 
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // allocate operations stack
 void medOpMML3ModelView::AllocateOperationsStack(int numberOfComponents, int numberOfTuples)
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
   m_OperationsStack = vtkDoubleArray::New() ;
   m_OperationsStack->SetNumberOfComponents(numberOfComponents) ;
@@ -3336,11 +2010,79 @@ void medOpMML3ModelView::AllocateOperationsStack(int numberOfComponents, int num
 
 
 
+//------------------------------------------------------------------------------
+// Print self
+void medOpMML3ModelView::PrintSelf(ostream &os, int indent)
+//------------------------------------------------------------------------------
+{
+  os << "MML Model View" << std::endl ;
+  os << std::endl ;
 
-//wxLogMessage("============ALIGN MUSCLE======================");
-//DEL 	//Print(m_pMuscleTransform1 ,               "m_pMuscleTransform1 ");
-//DEL 	//Print(m_pMuscleTransform1PolyDataFilter , "m_pMuscleTransform1PolyDataFilter ");
-//DEL 	//Print(m_pMuscleTransform2 ,               "m_pMuscleTransform2 ");
-//DEL 	//Print(m_pMuscleTransform2PolyDataFilter , "m_pMuscleTransform2PolyDataFilter ");
-//DEL 	//Print(m_pMuscleTransform2PolyDataFilter->GetOutput() , "m_pMuscleTransform2PolyDataFilter->GetOutput()");
-//DEL 	//wxLogMessage("==================================");
+  os << "muscle type = " << m_MuscleType << std::endl ;
+  os << std::endl ;
+
+  os << "atlas landmark 1 " << m_AtlasLandmark1[0] << " " << m_AtlasLandmark1[1] << " " << m_AtlasLandmark1[2] << std::endl ;
+  os << "atlas landmark 2 " << m_AtlasLandmark2[0] << " " << m_AtlasLandmark2[1] << " " << m_AtlasLandmark2[2] << std::endl ;
+  os << "atlas landmark 3 " << m_AtlasLandmark3[0] << " " << m_AtlasLandmark3[1] << " " << m_AtlasLandmark3[2] << std::endl ;
+  if (m_4Landmarks)
+    os << "atlas landmark 4 " << m_AtlasLandmark4[0] << " " << m_AtlasLandmark4[1] << " " << m_AtlasLandmark4[2] << std::endl ;
+
+  os << "patient landmark 1 " << m_PatientLandmark1[0] << " " << m_PatientLandmark1[1] << " " << m_PatientLandmark1[2] << std::endl ;
+  os << "patient landmark 2 " << m_PatientLandmark2[0] << " " << m_PatientLandmark2[1] << " " << m_PatientLandmark2[2] << std::endl ;
+  os << "patient landmark 3 " << m_PatientLandmark3[0] << " " << m_PatientLandmark3[1] << " " << m_PatientLandmark3[2] << std::endl ;
+  if (m_4Landmarks)
+    os << "patient landmark 4 " << m_PatientLandmark4[0] << " " << m_PatientLandmark4[1] << " " << m_PatientLandmark4[2] << std::endl ;
+
+  os << "axis landmark 1 " << m_AxisLandmark1[0] << " " << m_AxisLandmark1[1] << " " << m_AxisLandmark1[2] << std::endl ;
+  os << "axis landmark 2 " << m_AxisLandmark2[0] << " " << m_AxisLandmark2[1] << " " << m_AxisLandmark2[2] << std::endl ;
+  if (m_MuscleType == 2)
+    os << "axis landmark 3 " << m_AxisLandmark3[0] << " " << m_AxisLandmark3[1] << " " << m_AxisLandmark3[2] << std::endl ;
+  os << std::endl ;
+
+  if (m_3DDisplay == 0)
+    os << "display mode = 2D" << std::endl ;
+  else if (m_3DDisplay == 1)
+    os << "display mode = 3D" << std::endl ;
+  else
+    os << "display mode = Preview" << std::endl ;
+  os << std::endl ;
+
+  os << "scaling occurred = " << m_ScalingOccured << " op = " << m_ScalingOccuredOperationId << std::endl ;
+  os << std::endl ;
+
+  os << "no. of scans = " << m_NumberOfScans << std::endl ;
+  os << "current scan id = " << m_ScansCurrentId << std::endl ;
+  os << "scans grain = " << m_ScansGrain << std::endl ;
+  os << "scans resolution = " << m_ScansResolutionX << " " << m_ScansResolutionY << std::endl ;
+  os << "scans size = " << m_ScanSizeX << " " << m_ScanSizeY << std::endl ;
+  os << std::endl ;
+
+  os << "alpha and zeta values of slices" << std::endl ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++){
+    os << "slice " << i << " " << m_Alpha[i] << " " << m_Zeta[i] << std::endl ;
+  }
+  os << std::endl ;
+
+  os << "positions of slices in patient space" << std::endl ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++){
+    os << "slice " << i << " " << m_SlicePositions[i][0] << " " << m_SlicePositions[i][1] << " " << m_SlicePositions[i][2] << " " << std::endl ;
+  }
+  os << std::endl ;
+
+  os << "normals of slices in patient space" << std::endl ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++){
+    os << "slice " << i << " " << m_SliceNormals[i][0] << " " << m_SliceNormals[i][1] << " " << m_SliceNormals[i][2] << std::endl ;
+  }
+  os << std::endl ;
+
+  os << "initial centers of contours in slice coords" << std::endl ;
+  for (int i = 0 ;  i < m_NumberOfScans ;  i++){
+    os << "slice " << i << " " 
+      << m_OriginalContourCenters[i][0] << " " 
+      << m_OriginalContourCenters[i][1] << " " 
+      << m_OriginalContourCenters[i][2] << std::endl ;
+  }
+  os << std::endl ;
+  os << std::endl ;
+
+}

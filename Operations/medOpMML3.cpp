@@ -2,14 +2,13 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 09:39:34 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-09-18 08:10:33 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
 CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
-// CreateRegistrationDlg
 
 #define TestingVersion
 
@@ -33,6 +32,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkMatrix4x4.h"
 #include "vtkTransform.h"
 #include "vtkTransformFilter.h"
+#include "vtkActorCollection.h"
 
 #include "mafOp.h"
 #include "medOpMML3.h"
@@ -45,14 +45,19 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
 #include "mafVMEGroup.h"
-#include "medOpMML3ParameterView.h"
-#include "medOpMML3ModelView.h"
-#include "medOpMML3ContourWidget.h"
 #include "mafVMELandmark.h"
 #include "mafTagArray.h"
 #include "mafTagItem.h"
-
 #include "mafGUI.h"
+
+#include "medOpMML3ParameterView.h"
+#include "medOpMML3ModelView.h"
+#include "medOpMML3ContourWidget.h"
+#include "medOpMML3NonUniformSlicePipe.h"
+#include "medOpMML3GlobalRegistration.h"
+
+#include <fstream>
+
 
 
 
@@ -63,43 +68,50 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 // MML id's
 //----------------------------------------------------------------------------
-enum 
+enum MML_IDS
 {
   ID = MINID,
 
   // set up dlg events
-  ID_CHOOSE_SURFACE,
-  ID_CHOOSE_L1,
-  ID_CHOOSE_L2,
-  ID_CHOOSE_L3,
-  ID_CHOOSE_L4,
-  ID_CHOOSE_AXIS1,
-  ID_CHOOSE_AXIS2,
-  ID_CHOOSE_AXIS3,
-  ID_CHOOSE_SLICEXYZ,
-  ID_CHOOSE_FLAG3D,
-  ID_CHOOSE_NONUNIFORM,
-  ID_CHOOSE_FAKE, // dummy id with no associated event
-  ID_CHOOSE_OK,
-  ID_CHOOSE_CANCEL,
+  ID_INPUTS_SURFACE,
+  ID_INPUTS_L1,
+  ID_INPUTS_L2,
+  ID_INPUTS_L3,
+  ID_INPUTS_L4,
+  ID_INPUTS_AXIS1,
+  ID_INPUTS_AXIS2,
+  ID_INPUTS_AXIS3,
+  ID_INPUTS_SLICEXYZ,
+  ID_INPUTS_FLAG3D,
+  ID_INPUTS_NONUNIFORM,
+  ID_INPUTS_FAKE, // dummy id with no associated event
+  ID_INPUTS_OK,
+  ID_INPUTS_CANCEL,
+
+  // non-uniform slice dlg events
+  ID_NUSLICES_NUMBER_BEGIN,
+  ID_NUSLICES_NUMBER_LAST = ID_NUSLICES_NUMBER_BEGIN + medOpMML3::NumberOfNonUniformSections - 1,
+  ID_NUSLICES_TOTAL,
+  ID_NUSLICES_OK,
+  ID_NUSLICES_CANCEL,
 
   // registration dlg events
-  ID_SHOW_AXES, 
-  ID_SHOW_CONTOUR,
-  ID_RESET_VIEW,
-  ID_P_OPERATION,
-  ID_T_OPERATION,
-  ID_R_OPERATION,
-  ID_S_OPERATION,
-  ID_UNDO,
-  ID_SLICE,
-  ID_MINUS10,
-  ID_MINUS1,
-  ID_PLUS1,
-  ID_PLUS10,
-  ID_FAKE, // dummy id with no associated event
-  ID_OK,
-  ID_CANCEL
+  ID_REG_DISPLAY_MODE, 
+  ID_REG_PREVIEW,
+  ID_REG_RESET_VIEW,
+  ID_REG_P_OPERATION,
+  ID_REG_T_OPERATION,
+  ID_REG_R_OPERATION,
+  ID_REG_S_OPERATION,
+  ID_REG_UNDO,
+  ID_REG_SLICE,
+  ID_REG_MINUS10,
+  ID_REG_MINUS1,
+  ID_REG_PLUS1,
+  ID_REG_PLUS10,
+  ID_REG_FAKE, // dummy id with no associated event
+  ID_REG_OK,
+  ID_REG_CANCEL
 };
 
 
@@ -119,8 +131,8 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
 
   m_OpDlg      = NULL; // registration dialog
   
-  m_AxesOnOffButton = NULL;
-  m_ContourOnOffButton = NULL;
+  m_DisplayModeButton = NULL;
+  m_PreviewButton = NULL;
   m_ResetViewButton = NULL;
   m_UndoButton = NULL;
   m_OkButton = NULL;
@@ -155,8 +167,9 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_Axis3Name      = "none";
 
 
-  // no 3d view
-  m_3DFlag = 0;
+  // initial display 2d, no preview
+  m_3DFlag = 0 ;
+  m_PreviewFlag = 0 ;
 
   // default axis is z
   m_Slicexyz = 2 ;
@@ -177,7 +190,7 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_AxisLandmarksFlag = 1 ;
 
   m_ScansGrain = 128 ;  // resolution of slices
-  m_NumberOfSlices = 12 ;  // no. of slices
+  m_NumberOfScans = 12 ;  // no. of slices
   m_NonUniformSliceSpacing = 0 ; // switch off non-uniform slicing
   m_AxisRangeFactor = 1.1 ; // range factor for axis
   m_MuscleType = 1 ;     // 1 for simple axis, 2 for piecewise axis
@@ -212,9 +225,11 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
 
   //
   m_VolName     = "none";
-  m_ChooseOk = NULL;
+  m_InputsOk = NULL;
 
   m_Muscle = vtkPolyData::New() ;
+  m_MuscleGlobalReg = vtkPolyData::New() ;
+  m_MuscleOutput = vtkPolyData::New() ;
 }
 
 
@@ -223,6 +238,8 @@ medOpMML3::~medOpMML3( )
 //------------------------------------------------------------------------------
 {
   m_Muscle->Delete() ;
+  m_MuscleGlobalReg->Delete() ;
+  m_MuscleOutput->Delete() ;
 }
 
 
@@ -261,7 +278,7 @@ void medOpMML3::OpRun()
   //----------------------------------------------------------------------------
   CreateInputsDlg() ;  
 
-  int returnCode = m_ChooseDlg->GetReturnCode() ;
+  int returnCode = m_InputsDlg->GetReturnCode() ;
   DeleteInputsDlg() ;
 
   if (returnCode != wxID_OK){
@@ -282,6 +299,15 @@ void medOpMML3::OpRun()
   // get the vtk inputs
   //----------------------------------------------------------------------------
   GetVtkInputs() ;
+
+
+
+  //----------------------------------------------------------------------------
+  // Perform the landmark-based global registration.
+  // This creates the global-registered versions of the muscle and landmarks
+  //----------------------------------------------------------------------------
+  ApplyGlobalRegistration() ;
+
 
 
   //----------------------------------------------------------------------------
@@ -321,16 +347,16 @@ void medOpMML3::CreateInputsDlg()
 //----------------------------------------------------------------------------
 {
   // create the dialog
-  m_ChooseDlg = new mafGUIDialog("SetUp"); 
+  m_InputsDlg = new mafGUIDialog("SetUp"); 
 
   // vertical stacker for the rows of widgets
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
 
   // select muscle surface vme
-  wxStaticText *lab_1  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Surface", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_1 = new wxTextCtrl(m_ChooseDlg , ID_CHOOSE_SURFACE, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
-  text_1->SetValidator(mafGUIValidator(this, ID_CHOOSE_SURFACE, text_1, &m_SurfaceName));
-  mafGUIButton *b_1 = new mafGUIButton(m_ChooseDlg , ID_CHOOSE_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_1  = new wxStaticText(m_InputsDlg, wxID_ANY, "Surface", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_1 = new wxTextCtrl(m_InputsDlg , ID_INPUTS_SURFACE, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
+  text_1->SetValidator(mafGUIValidator(this, ID_INPUTS_SURFACE, text_1, &m_SurfaceName));
+  mafGUIButton *b_1 = new mafGUIButton(m_InputsDlg , ID_INPUTS_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
   b_1->SetListener(this);
 
   wxBoxSizer *hs_1 = new wxBoxSizer(wxHORIZONTAL);
@@ -343,14 +369,14 @@ void medOpMML3::CreateInputsDlg()
 
 
   // Registration landmarks
-  wxStaticText *lab_RegLandmarksTitle = new wxStaticText(m_ChooseDlg, -1, "Registration Landmarks (select from atlas)", wxPoint(0,0), wxSize(150,20));
+  wxStaticText *lab_RegLandmarksTitle = new wxStaticText(m_InputsDlg, -1, "Registration Landmarks (select from atlas)", wxPoint(0,0), wxSize(150,20));
   vs1->Add(lab_RegLandmarksTitle, 0, wxEXPAND | wxALL, 2);
 
   // landmark 1
-  wxStaticText *lab_5  = new wxStaticText(m_ChooseDlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_5 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_5->SetValidator(mafGUIValidator(this,ID_CHOOSE_L1,text_5,&m_L1Name));
-  mafGUIButton *b_5       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L1,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_5  = new wxStaticText(m_InputsDlg, -1, "Landmark 1", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_5 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_5->SetValidator(mafGUIValidator(this,ID_INPUTS_L1,text_5,&m_L1Name));
+  mafGUIButton *b_5       = new mafGUIButton(m_InputsDlg ,ID_INPUTS_L1,"select",wxPoint(0,0), wxSize(50,20));
   b_5->SetListener(this);
   wxBoxSizer *hs_5 = new wxBoxSizer(wxHORIZONTAL);
   hs_5->Add(lab_5,0);
@@ -359,10 +385,10 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_5,0,wxEXPAND | wxALL, 2);
 
   // landmark 2
-  wxStaticText *lab_6  = new wxStaticText(m_ChooseDlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_6 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_6->SetValidator(mafGUIValidator(this,ID_CHOOSE_L2,text_6,&m_L2Name));
-  mafGUIButton *b_6       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L2,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_6  = new wxStaticText(m_InputsDlg, -1, "Landmark 2", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_6 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_6->SetValidator(mafGUIValidator(this,ID_INPUTS_L2,text_6,&m_L2Name));
+  mafGUIButton *b_6       = new mafGUIButton(m_InputsDlg ,ID_INPUTS_L2,"select",wxPoint(0,0), wxSize(50,20));
   b_6->SetListener(this);
   wxBoxSizer *hs_6 = new wxBoxSizer(wxHORIZONTAL);
   hs_6->Add(lab_6,0);
@@ -371,10 +397,10 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_6,0,wxEXPAND | wxALL, 2);
 
   // landmark 3
-  wxStaticText *lab_7  = new wxStaticText(m_ChooseDlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_7 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_7->SetValidator(mafGUIValidator(this,ID_CHOOSE_L3,text_7,&m_L3Name));
-  mafGUIButton *b_7       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L3,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_7  = new wxStaticText(m_InputsDlg, -1, "Landmark 3", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_7 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_7->SetValidator(mafGUIValidator(this,ID_INPUTS_L3,text_7,&m_L3Name));
+  mafGUIButton *b_7       = new mafGUIButton(m_InputsDlg ,ID_INPUTS_L3,"select",wxPoint(0,0), wxSize(50,20));
   b_7->SetListener(this);
   wxBoxSizer *hs_7 = new wxBoxSizer(wxHORIZONTAL);
   hs_7->Add(lab_7,0);
@@ -383,10 +409,10 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_7,0,wxEXPAND | wxALL, 2);
 
   // landmark 4
-  wxStaticText *lab_8  = new wxStaticText(m_ChooseDlg, -1, "Landmark 4 (optional)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_8 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_8->SetValidator(mafGUIValidator(this,ID_CHOOSE_L4,text_8,&m_L4Name));
-  mafGUIButton *b_8       = new mafGUIButton(m_ChooseDlg ,ID_CHOOSE_L4,"select",wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_8  = new wxStaticText(m_InputsDlg, -1, "Landmark 4 (optional)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *text_8 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_8->SetValidator(mafGUIValidator(this,ID_INPUTS_L4,text_8,&m_L4Name));
+  mafGUIButton *b_8       = new mafGUIButton(m_InputsDlg ,ID_INPUTS_L4,"select",wxPoint(0,0), wxSize(50,20));
   b_8->SetListener(this);
   wxBoxSizer *hs_8 = new wxBoxSizer(wxHORIZONTAL);
   hs_8->Add(lab_8,0);
@@ -398,7 +424,7 @@ void medOpMML3::CreateInputsDlg()
 
 
   // Axis slice direction
-  wxStaticText *lab_AxisLandmarksTitle = new wxStaticText(m_ChooseDlg, -1, "Select Slice Direction", wxPoint(0,0), wxSize(150,20));
+  wxStaticText *lab_AxisLandmarksTitle = new wxStaticText(m_InputsDlg, -1, "Select Slice Direction", wxPoint(0,0), wxSize(150,20));
   vs1->Add(lab_AxisLandmarksTitle, 0, wxEXPAND | wxALL, 2);
 
   // Default slice direction x, y or z
@@ -406,17 +432,17 @@ void medOpMML3::CreateInputsDlg()
   radioStrings.Add(wxT("x")) ;
   radioStrings.Add(wxT("y")) ;
   radioStrings.Add(wxT("z")) ;
-  m_RadioSlicexyz = new wxRadioBox(m_ChooseDlg, ID_CHOOSE_SLICEXYZ, "Default direction", wxPoint(0,0), wxSize(150,50), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
-  m_RadioSlicexyz->SetValidator(mafGUIValidator(this, ID_CHOOSE_SLICEXYZ, m_RadioSlicexyz, &m_Slicexyz));
+  m_Radio_slicexyz = new wxRadioBox(m_InputsDlg, ID_INPUTS_SLICEXYZ, "Default direction", wxPoint(0,0), wxSize(150,50), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
+  m_Radio_slicexyz->SetValidator(mafGUIValidator(this, ID_INPUTS_SLICEXYZ, m_Radio_slicexyz, &m_Slicexyz));
   wxBoxSizer *sliceXYZHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  sliceXYZHorizontalSizer->Add(m_RadioSlicexyz,1,wxEXPAND | wxRIGHT, 3);
+  sliceXYZHorizontalSizer->Add(m_Radio_slicexyz,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(sliceXYZHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
   // landmark axis 1
-  wxStaticText *lab_axis1 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 1", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *text_axis1 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_axis1->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS1, text_axis1, &m_Axis1Name));
-  mafGUIButton *button_axis1 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS1, "select", wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_axis1 = new wxStaticText(m_InputsDlg, -1, "Landmark Axis 1", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *text_axis1 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_axis1->SetValidator(mafGUIValidator(this, ID_INPUTS_AXIS1, text_axis1, &m_Axis1Name));
+  mafGUIButton *button_axis1 = new mafGUIButton(m_InputsDlg, ID_INPUTS_AXIS1, "select", wxPoint(0,0), wxSize(50,20));
   button_axis1->SetListener(this);
   wxBoxSizer *hs_axis1 = new wxBoxSizer(wxHORIZONTAL);
   hs_axis1->Add(lab_axis1,0);
@@ -425,10 +451,10 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_axis1,0,wxEXPAND | wxALL, 2);
 
   // landmark axis 2
-  wxStaticText *lab_axis2 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 2", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *text_axis2 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_axis2->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS2, text_axis2, &m_Axis2Name));
-  mafGUIButton *button_axis2 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS2, "select", wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_axis2 = new wxStaticText(m_InputsDlg, -1, "Landmark Axis 2", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *text_axis2 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_axis2->SetValidator(mafGUIValidator(this, ID_INPUTS_AXIS2, text_axis2, &m_Axis2Name));
+  mafGUIButton *button_axis2 = new mafGUIButton(m_InputsDlg, ID_INPUTS_AXIS2, "select", wxPoint(0,0), wxSize(50,20));
   button_axis2->SetListener(this);
   wxBoxSizer *hs_axis2 = new wxBoxSizer(wxHORIZONTAL);
   hs_axis2->Add(lab_axis2,0);
@@ -437,10 +463,10 @@ void medOpMML3::CreateInputsDlg()
   vs1->Add(hs_axis2,0,wxEXPAND | wxALL, 2);
 
   // landmark axis 3
-  wxStaticText *lab_axis3 = new wxStaticText(m_ChooseDlg, -1, "Landmark Axis 3", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *text_axis3 = new wxTextCtrl(m_ChooseDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
-  text_axis3->SetValidator(mafGUIValidator(this, ID_CHOOSE_AXIS3, text_axis3, &m_Axis3Name));
-  mafGUIButton *button_axis3 = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_AXIS3, "select", wxPoint(0,0), wxSize(50,20));
+  wxStaticText *lab_axis3 = new wxStaticText(m_InputsDlg, -1, "Landmark Axis 3", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *text_axis3 = new wxTextCtrl(m_InputsDlg ,  -1, "", wxPoint(0,0), wxSize(150,20),wxNO_BORDER |wxTE_READONLY );
+  text_axis3->SetValidator(mafGUIValidator(this, ID_INPUTS_AXIS3, text_axis3, &m_Axis3Name));
+  mafGUIButton *button_axis3 = new mafGUIButton(m_InputsDlg, ID_INPUTS_AXIS3, "select", wxPoint(0,0), wxSize(50,20));
   button_axis3->SetListener(this);
   wxBoxSizer *hs_axis3 = new wxBoxSizer(wxHORIZONTAL);
   hs_axis3->Add(lab_axis3,0);
@@ -453,72 +479,72 @@ void medOpMML3::CreateInputsDlg()
 
 
   // number of slices
-  wxStaticText *ScansNumberLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Number of slices (3 or more)", wxPoint(0,0), wxSize(150,20));
-  m_NumberOfSlicesTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  m_NumberOfSlicesTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, m_NumberOfSlicesTxt, &m_NumberOfSlices, 3, 10000)); // min/max values
+  wxStaticText *ScansNumberLab = new wxStaticText(m_InputsDlg, wxID_ANY, "Number of slices (3 or more)", wxPoint(0,0), wxSize(150,20));
+  m_NumberOfScansTxt = new wxTextCtrl(m_InputsDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
+  m_NumberOfScansTxt->SetValidator(mafGUIValidator(this, ID_INPUTS_FAKE, m_NumberOfScansTxt, &m_NumberOfScans, 3, 10000)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
-  ScansNumberHorizontalSizer->Add(m_NumberOfSlicesTxt,1,wxEXPAND);
+  ScansNumberHorizontalSizer->Add(m_NumberOfScansTxt,1,wxEXPAND);
   ScansNumberHorizontalSizer->AddSpacer(20) ;
 
   // non-uniform slice spacing check box
-  wxStaticText *nonUniformLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Non-uniform slicing", wxPoint(0,0), wxSize(150,20));
-  wxCheckBox *nonUniformCheckBox = new wxCheckBox(m_ChooseDlg, ID_CHOOSE_NONUNIFORM, "", wxPoint(0,0), wxSize(80,20)) ;
-  nonUniformCheckBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_NONUNIFORM, nonUniformCheckBox, &m_NonUniformSliceSpacing));
+  wxStaticText *nonUniformLab = new wxStaticText(m_InputsDlg, wxID_ANY, "Non-uniform slicing", wxPoint(0,0), wxSize(150,20));
+  wxCheckBox *nonUniformCheckBox = new wxCheckBox(m_InputsDlg, ID_INPUTS_NONUNIFORM, "", wxPoint(0,0), wxSize(80,20)) ;
+  nonUniformCheckBox->SetValidator(mafGUIValidator(this, ID_INPUTS_NONUNIFORM, nonUniformCheckBox, &m_NonUniformSliceSpacing));
   ScansNumberHorizontalSizer->Add(nonUniformLab, 0);
   ScansNumberHorizontalSizer->Add(nonUniformCheckBox,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(ScansNumberHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
 
   // scans resolution
-  wxStaticText *ScansGrainLab  = new wxStaticText(m_ChooseDlg, wxID_ANY, "Slice resolution (64-1024)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *ScansGrainTxt1 = new wxTextCtrl(m_ChooseDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
-  ScansGrainTxt1->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, ScansGrainTxt1, &m_ScansGrain, 64, 1024));
+  wxStaticText *ScansGrainLab  = new wxStaticText(m_InputsDlg, wxID_ANY, "Slice resolution (64-1024)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *ScansGrainTxt1 = new wxTextCtrl(m_InputsDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
+  ScansGrainTxt1->SetValidator(mafGUIValidator(this, ID_INPUTS_FAKE, ScansGrainTxt1, &m_ScansGrain, 64, 1024));
   wxBoxSizer *ScansGrainHorizontalSizer2 = new wxBoxSizer(wxHORIZONTAL);
   ScansGrainHorizontalSizer2->Add(ScansGrainLab, 0);
   ScansGrainHorizontalSizer2->Add(ScansGrainTxt1,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(ScansGrainHorizontalSizer2,0,wxEXPAND | wxALL, 2);
 
   // axis scaling factor
-  wxStaticText *AxisScalingLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "Axis range factor (1-2)", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl *AxisScalingTxt = new wxTextCtrl(m_ChooseDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  AxisScalingTxt->SetValidator(mafGUIValidator(this, ID_CHOOSE_FAKE, AxisScalingTxt, &m_AxisRangeFactor, 1.0, 2.0)); // min/max values
+  wxStaticText *AxisScalingLab = new wxStaticText(m_InputsDlg, wxID_ANY, "Axis range factor (1-2)", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl *AxisScalingTxt = new wxTextCtrl(m_InputsDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
+  AxisScalingTxt->SetValidator(mafGUIValidator(this, ID_INPUTS_FAKE, AxisScalingTxt, &m_AxisRangeFactor, 1.0, 2.0)); // min/max values
   wxBoxSizer *AxisScalingHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   AxisScalingHorizontalSizer->Add(AxisScalingLab,0);
   AxisScalingHorizontalSizer->Add(AxisScalingTxt,1,wxEXPAND);
   vs1->Add(AxisScalingHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
-
+/*
   // 3d flag (note that check box needs a valid id)
-  wxStaticText *flag3dLab = new wxStaticText(m_ChooseDlg, wxID_ANY, "3D display", wxPoint(0,0), wxSize(150,20));
-  wxCheckBox *flag3dCheckBox = new wxCheckBox(m_ChooseDlg, ID_CHOOSE_FLAG3D, "", wxPoint(0,0), wxSize(80,20)) ;
-  flag3dCheckBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_FLAG3D, flag3dCheckBox, &m_3DFlag));
+  wxStaticText *flag3dLab = new wxStaticText(m_InputsDlg, wxID_ANY, "3D display", wxPoint(0,0), wxSize(150,20));
+  wxCheckBox *flag3dCheckBox = new wxCheckBox(m_InputsDlg, ID_INPUTS_FLAG3D, "", wxPoint(0,0), wxSize(80,20)) ;
+  flag3dCheckBox->SetValidator(mafGUIValidator(this, ID_INPUTS_FLAG3D, flag3dCheckBox, &m_3DFlag));
   wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   flagHorizontalSizer->Add(flag3dLab, 0);
   flagHorizontalSizer->Add(flag3dCheckBox,1,wxEXPAND | wxRIGHT, 3);
   vs1->Add(flagHorizontalSizer,0,wxEXPAND | wxALL, 2);
   vs1->AddSpacer(20) ;
-
+*/
 
   // ok/cancel buttons
-  m_ChooseOk = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_OK, "OK", wxPoint(0,0), wxSize(50,20));
-  m_ChooseOk->SetListener(this);
-  m_ChooseOk->Enable(false);
+  m_InputsOk = new mafGUIButton(m_InputsDlg, ID_INPUTS_OK, "OK", wxPoint(0,0), wxSize(50,20));
+  m_InputsOk->SetListener(this);
+  m_InputsOk->Enable(false);
 
-  mafGUIButton *b_cancel = new mafGUIButton(m_ChooseDlg, ID_CHOOSE_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
+  mafGUIButton *b_cancel = new mafGUIButton(m_InputsDlg, ID_INPUTS_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
   b_cancel->SetListener(this);
 
-  wxBoxSizer *hs_b = new wxBoxSizer(wxHORIZONTAL);
-  hs_b->Add(m_ChooseOk,0);
-  hs_b->Add(b_cancel,0);
-  vs1->Add(hs_b,0,wxALIGN_CENTER | wxALL, 2);
+  wxBoxSizer *okCancelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  okCancelBoxSizer->Add(m_InputsOk,0);
+  okCancelBoxSizer->Add(b_cancel,0);
+  vs1->Add(okCancelBoxSizer,0,wxALIGN_CENTER | wxALL, 2);
 
 
 
   // put the vertical sizer into the dialog and display
-  vs1->Fit(m_ChooseDlg);	  // fit the window to the min size of the sizer
-  m_ChooseDlg->Add(vs1) ;  // plug the sizer into the dialog
-  m_ChooseDlg->ShowModal();
+  vs1->Fit(m_InputsDlg);	  // fit the window to the min size of the sizer
+  m_InputsDlg->Add(vs1) ;  // plug the sizer into the dialog
+  m_InputsDlg->ShowModal();
 
 }
 
@@ -530,7 +556,7 @@ void medOpMML3::CreateInputsDlg()
 void medOpMML3::DeleteInputsDlg() 
 //----------------------------------------------------------------------------
 {
-  delete m_ChooseDlg ;
+  delete m_InputsDlg ;
 }
 
 
@@ -546,37 +572,44 @@ void medOpMML3::CreateRegistrationDlg()
   Title = "registration of " + m_SurfaceName;
   m_OpDlg = new mafGUIDialog(Title); 
 
-  // axes on/off button
-  m_AxesOnOffButton = new mafGUIButton(m_OpDlg, ID_SHOW_AXES, "Axes Off", wxPoint(0,0), wxSize(75,20));
-  m_AxesOnOffButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_AxesOnOffButton->Enable(false) ;
+  // display mode button
+  m_DisplayModeButton = new mafGUIButton(m_OpDlg, ID_REG_DISPLAY_MODE, "Display 3D", wxPoint(0,0), wxSize(75,20));
+  m_DisplayModeButton->SetListener(this);
+  m_DisplayModeButton->Enable(true);
+  if (m_3DFlag == 0) 
+    m_DisplayModeButton->SetTitle("Display 3D");
+  else 
+    m_DisplayModeButton->SetTitle("Display 2D");
 
-  // contour on/off button
-  m_ContourOnOffButton = new mafGUIButton(m_OpDlg, ID_SHOW_CONTOUR, "Contour Off", wxPoint(0,0), wxSize(75,20));
-  m_ContourOnOffButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_ContourOnOffButton->Enable(false) ;
+
+  // preview button
+  m_PreviewButton = new mafGUIButton(m_OpDlg, ID_REG_PREVIEW, "Preview On", wxPoint(0,0), wxSize(75,20));
+  m_PreviewButton->SetListener(this);
+  m_PreviewButton->Enable(true) ;
+  if (m_PreviewFlag == 0) 
+    m_PreviewButton->SetTitle("Preview On");
+  else
+    m_PreviewButton->SetTitle("Preview Off");
+
 
   // reset view button
-  m_ResetViewButton = new mafGUIButton(m_OpDlg, ID_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
+  m_ResetViewButton = new mafGUIButton(m_OpDlg, ID_REG_RESET_VIEW, "Reset View", wxPoint(0,0), wxSize(75,20));
   m_ResetViewButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_ResetViewButton->Enable(false) ;
+  m_ResetViewButton->Enable(true) ;
+
 
   // undo button
-  m_UndoButton = new mafGUIButton(m_OpDlg, ID_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
+  m_UndoButton = new mafGUIButton(m_OpDlg, ID_REG_UNDO, "Undo", wxPoint(0,0), wxSize(75,20));
   m_UndoButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_UndoButton->Enable(false) ;
+  m_UndoButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
 
 
   // ok button
-  m_OkButton = new mafGUIButton(m_OpDlg, ID_OK, "OK", wxPoint(0,0), wxSize(75,20));
+  m_OkButton = new mafGUIButton(m_OpDlg, ID_REG_OK, "OK", wxPoint(0,0), wxSize(75,20));
   m_OkButton->SetListener(this);
 
   // cancel button
-  m_CancelButton = new mafGUIButton(m_OpDlg, ID_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
+  m_CancelButton = new mafGUIButton(m_OpDlg, ID_REG_CANCEL, "CANCEL", wxPoint(0,0), wxSize(75,20));
   m_CancelButton->SetListener(this);
 
   // button background colour
@@ -584,35 +617,31 @@ void medOpMML3::CreateRegistrationDlg()
 
   // maf check boxes
   //wxBoxSizer *CheckBoxHorizontalBoxSizer = new wxBoxSizer(wxHORIZONTAL);
-  //wxCheckBox *c0 = new wxCheckBox(m_op_dlg,ID_SHOW_AXES,"show axes");
-  //c0->SetValidator( mafGUIValidator(this,ID_SHOW_AXES,c0,&m_show_axes) );
+  //wxCheckBox *c0 = new wxCheckBox(m_Op_dlg,ID_REG_DISPLAY_MODE,"show axes");
+  //c0->SetValidator( mafGUIValidator(this,ID_REG_DISPLAY_MODE,c0,&m_Show_axes) );
   //CheckBoxHorizontalBoxSizer->Add(c0,0,wxALL, 5);
-  //wxCheckBox *c1 = new wxCheckBox(m_op_dlg,ID_SHOW_CONTOUR,"show contour");
-  //c1->SetValidator( mafGUIValidator(this,ID_SHOW_CONTOUR,c1,&m_ContourVisibility));
+  //wxCheckBox *c1 = new wxCheckBox(m_Op_dlg,ID_REG_PREVIEW,"show contour");
+  //c1->SetValidator( mafGUIValidator(this,ID_REG_PREVIEW,c1,&m_ContourVisibility));
   //CheckBoxHorizontalBoxSizer->Add(c1,0,wxALL, 5);
   //LeftVerticalBoxSizer->Add(CheckBoxHorizontalBoxSizer);
 
 
   // create p/t/r/s operation buttons
-  m_PlaceOpButton = new mafGUIButton(m_OpDlg, ID_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
+  m_PlaceOpButton = new mafGUIButton(m_OpDlg, ID_REG_P_OPERATION, "P", wxPoint(0,0), wxSize(75,20));
   m_PlaceOpButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_PlaceOpButton->Enable(false) ;
+  m_PlaceOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
 
-  m_TranslateOpButton = new mafGUIButton(m_OpDlg, ID_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
+  m_TranslateOpButton = new mafGUIButton(m_OpDlg, ID_REG_T_OPERATION,"T", wxPoint(0,0), wxSize(75,20));
   m_TranslateOpButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_TranslateOpButton->Enable(false) ;
+  m_TranslateOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
 
-  m_RotateOpButton = new mafGUIButton(m_OpDlg, ID_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
+  m_RotateOpButton = new mafGUIButton(m_OpDlg, ID_REG_R_OPERATION, "R", wxPoint(0,0), wxSize(75,20));
   m_RotateOpButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_RotateOpButton->Enable(false) ;
+  m_RotateOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
 
-  m_ScaleOpButton = new mafGUIButton(m_OpDlg, ID_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
+  m_ScaleOpButton = new mafGUIButton(m_OpDlg, ID_REG_S_OPERATION, "S", wxPoint(0,0), wxSize(75,20));
   m_ScaleOpButton->SetListener(this);
-  if (m_3DFlag == 1)
-    m_ScaleOpButton->Enable(false) ;
+  m_ScaleOpButton->Enable((m_3DFlag == 0) && (m_PreviewFlag == 0)) ;
 
 
   // maf model view RWI
@@ -629,28 +658,22 @@ void medOpMML3::CreateRegistrationDlg()
   m_Lut->SetListener(this);
 
   // create mml model view
-  m_Model = new medOpMML3ModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, m_Muscle, m_Volume);
-
-  // set up landmarks
-  if (!m_L1Defined || !m_L2Defined || !m_L3Defined)
-    CreateDefaultRegistrationLandmarks(); // create default landmarks if full set is not defined
-  if (!m_Axis1Defined || !m_Axis2Defined || ((m_MuscleType == 2) && !m_Axis3Defined))
-    CreateDefaultAxisLandmarks(); // create default landmarks if full set is not defined
-
+  m_Model = new medOpMML3ModelView(m_ModelmafRWI->m_RenderWindow, m_ModelmafRWI->m_RenFront, 
+    m_MuscleGlobalReg, m_MuscleOutput, m_Volume, m_NumberOfScans);
 
   // slice position slider and buttons
   wxStaticText *lab_slicepos  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(40, 20));
-  wxTextCtrl   *text_slicepos = new wxTextCtrl(m_OpDlg, ID_SLICE, "", wxPoint(0,0), wxSize(40, 20), wxNO_BORDER | wxTE_READONLY );
-  mafGUIButton *button_Minus10 = new mafGUIButton(m_OpDlg, ID_MINUS10, "<<", wxPoint(0,0), wxSize(30,20)) ;
+  wxTextCtrl   *text_slicepos = new wxTextCtrl(m_OpDlg, ID_REG_SLICE, "", wxPoint(0,0), wxSize(40, 20), wxNO_BORDER | wxTE_READONLY );
+  mafGUIButton *button_Minus10 = new mafGUIButton(m_OpDlg, ID_REG_MINUS10, "<<", wxPoint(0,0), wxSize(30,20)) ;
   button_Minus10->SetListener(this) ;
-  mafGUIButton *button_Minus1 = new mafGUIButton(m_OpDlg, ID_MINUS1, "<", wxPoint(0,0), wxSize(30,20)) ; 
+  mafGUIButton *button_Minus1 = new mafGUIButton(m_OpDlg, ID_REG_MINUS1, "<", wxPoint(0,0), wxSize(30,20)) ; 
   button_Minus1->SetListener(this) ;
-  mafGUIButton *button_Plus1 = new mafGUIButton(m_OpDlg, ID_PLUS1, ">", wxPoint(0,0), wxSize(30,20)) ; 
+  mafGUIButton *button_Plus1 = new mafGUIButton(m_OpDlg, ID_REG_PLUS1, ">", wxPoint(0,0), wxSize(30,20)) ; 
   button_Plus1->SetListener(this) ;
-  mafGUIButton *button_Plus10 = new mafGUIButton(m_OpDlg, ID_PLUS10, ">>", wxPoint(0,0), wxSize(30,20)) ; 
+  mafGUIButton *button_Plus10 = new mafGUIButton(m_OpDlg, ID_REG_PLUS10, ">>", wxPoint(0,0), wxSize(30,20)) ; 
   button_Plus10->SetListener(this) ;
-  wxSlider *slider_slicepos  = new wxSlider(m_OpDlg, ID_SLICE, 0, 0, m_NumberOfSlices-1, wxPoint(0,0), wxSize(269,-1));
-  slider_slicepos->SetValidator(mafGUIValidator(this, ID_SLICE, (wxSlider*)slider_slicepos, &m_CurrentSlice, text_slicepos));
+  wxSlider *slider_slicepos  = new wxSlider(m_OpDlg, ID_REG_SLICE, 0, 0, m_NumberOfScans-1, wxPoint(0,0), wxSize(269,-1));
+  slider_slicepos->SetValidator(mafGUIValidator(this, ID_REG_SLICE, (wxSlider*)slider_slicepos, &m_CurrentSlice, text_slicepos));
 
 
   // maf parameter views RWI's
@@ -674,8 +697,8 @@ void medOpMML3::CreateRegistrationDlg()
 
   // top row of buttons
   wxBoxSizer *TopHorizontalBoxSizer = new wxBoxSizer(wxHORIZONTAL);
-  TopHorizontalBoxSizer->Add(m_AxesOnOffButton,0,wxALL, 5);
-  TopHorizontalBoxSizer->Add(m_ContourOnOffButton,0,wxALL, 5);
+  TopHorizontalBoxSizer->Add(m_DisplayModeButton,0,wxALL, 5);
+  TopHorizontalBoxSizer->Add(m_PreviewButton,0,wxALL, 5);
   TopHorizontalBoxSizer->Add(m_ResetViewButton,0,wxALL, 5);
   TopHorizontalBoxSizer->Add(m_OkButton,0,wxALL, 5);
   TopHorizontalBoxSizer->Add(m_CancelButton,0, wxALL, 5);
@@ -751,12 +774,13 @@ void medOpMML3::CreateRegistrationDlg()
   // create mml contour widget
   m_Widget = medOpMML3ContourWidget::New();
 
-  SetUpContourWidget();
-  SetUpModelViewInputs(); // pass input parameters and landmarks to model view
+  // set up the model view, the widget and the parameter views
   SetUpModelView();
   SetUpParameterViews();
-  
-  mafEventMacro(mafEvent(this, ID_T_OPERATION));
+  m_Model->Update() ; // update because SetUpParameterViews intializes the transform splines
+  SetUpContourWidget();
+ 
+  mafEventMacro(mafEvent(this, ID_REG_T_OPERATION));
   
   m_OpDlg->ShowModal();	
 }
@@ -825,14 +849,134 @@ void medOpMML3::DeleteRegistrationDlg()
 void medOpMML3::CreateNonUniformSlicesDlg()
 //------------------------------------------------------------------------------
 {
-  // initialize the numbers in each section so that they add up to m_NumberOfSlices
+  int i, total ;
+
+  // create dialog
+  wxString Title;
+  Title = "Set distribution of non-uniform slice spacing" ;
+  m_NonUniformSlicesDlg = new mafGUIDialog(Title); 
+
+
+  //----------------------------------------------------------------------------
+  // initialize the numbers in each section so that they add up to m_NumberOfScans
   // and the distribution is as uniform as possible
-  for (int i = 0 ;  i < NumberOfNonUniformSections ;  i++)
+  //----------------------------------------------------------------------------
+  for (i = 0 ;  i < NumberOfNonUniformSections ;  i++)
     m_SlicesInSection[i] = 0 ;
-  for (int ntotal = 0 ;  ntotal < m_NumberOfSlices ;  ntotal++){
-    int i = ntotal % NumberOfNonUniformSections ; // index of section
+  for (total = 0 ;  total < m_NumberOfScans ;  total++){
+    i = total % NumberOfNonUniformSections ; // section index
     m_SlicesInSection[i]++ ;
   }
+  for (i = 0, total = 0 ;  i < NumberOfNonUniformSections ;  i++)
+    total += m_SlicesInSection[i] ;
+  assert(total == m_NumberOfScans) ;
+  m_NonUniformSlicesDlg->TransferDataToWindow();
+
+
+
+  //----------------------------------------------------------------------------
+  // vertical column containing RWI
+  //----------------------------------------------------------------------------
+
+  // window size parameters
+  int winSize = 400 ;
+  int sectionHeight = winSize / NumberOfNonUniformSections ;
+  int textHeight = sectionHeight - 2 ;  // slightly smaller because of border width
+
+  // create render window
+  m_SectionsViewRWI = new mafRWI(m_NonUniformSlicesDlg);
+  m_SectionsViewRWI->SetListener(this);
+  m_SectionsViewRWI->m_RwiBase->SetInteractorStyle(NULL);
+  m_SectionsViewRWI->SetSize(0,0,winSize,winSize);
+  m_SectionsViewRWI->Show(true);
+
+  // vertical sizer for rwi 
+  wxBoxSizer *RenWinBoxSizer = new wxBoxSizer(wxVERTICAL);
+  RenWinBoxSizer->Add(m_SectionsViewRWI->m_RwiBase, 0.5, wxEXPAND | wxALL, 1);
+  RenWinBoxSizer->AddSpacer(sectionHeight) ;  // space of one section at bottom to allow for total box
+
+
+
+  //----------------------------------------------------------------------------
+  // column for number entry widgets and total
+  //----------------------------------------------------------------------------
+
+  wxBoxSizer *widgetsBoxSizer = new wxBoxSizer(wxVERTICAL);
+  m_NumSlicesRowBoxSizer = new (wxBoxSizer* [NumberOfNonUniformSections]) ;
+  m_NumSlicesLabel = new (wxStaticText* [NumberOfNonUniformSections]) ;
+  m_NumSlicesEntry = new (wxTextCtrl* [NumberOfNonUniformSections]) ;
+
+  for (int i = 0 ;  i < NumberOfNonUniformSections ;  i++){
+    wxString label = wxString::Format(wxT("%d"),i+1);
+
+    m_NumSlicesLabel[i] = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, label, wxPoint(0,0), wxSize(25,textHeight));
+    m_NumSlicesEntry[i] = new wxTextCtrl(m_NonUniformSlicesDlg , wxID_ANY, "", wxPoint(0,0), wxSize(50,textHeight), wxNO_BORDER);
+    m_NumSlicesEntry[i]->SetValidator(mafGUIValidator(this, (ID_NUSLICES_NUMBER_BEGIN+i), m_NumSlicesEntry[i], &m_SlicesInSection[i]));
+
+    m_NumSlicesRowBoxSizer[i] = new wxBoxSizer(wxHORIZONTAL);
+    m_NumSlicesRowBoxSizer[i]->Add(m_NumSlicesLabel[i], 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
+    m_NumSlicesRowBoxSizer[i]->Add(m_NumSlicesEntry[i], 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
+
+    widgetsBoxSizer->Add(m_NumSlicesRowBoxSizer[i], 0.5, wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
+  }
+
+  // total box
+  wxStaticText *totalSlicesLabel  = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "total", wxPoint(0,0), wxSize(25,textHeight));
+  wxTextCtrl   *totalSlicesTxt = new wxTextCtrl(m_NonUniformSlicesDlg , ID_NUSLICES_TOTAL, "", wxPoint(0,0), wxSize(50,textHeight), wxTE_READONLY | wxNO_BORDER );
+  totalSlicesTxt->SetValidator(mafGUIValidator(this, ID_NUSLICES_TOTAL, totalSlicesTxt, &m_NumberOfScans));
+
+  wxBoxSizer *totalSlicesBoxSizer = new wxBoxSizer(wxHORIZONTAL) ;
+  totalSlicesBoxSizer->Add(totalSlicesLabel, 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
+  totalSlicesBoxSizer->Add(totalSlicesTxt, 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
+
+  widgetsBoxSizer->Add(totalSlicesBoxSizer, 0, wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
+
+
+
+  //----------------------------------------------------------------------------
+  // ok/cancel buttons
+  //----------------------------------------------------------------------------
+  mafGUIButton *SliceOk = new mafGUIButton(m_NonUniformSlicesDlg, ID_NUSLICES_OK, "OK", wxPoint(0,0), wxSize(50,20));
+  SliceOk->SetListener(this);
+
+  mafGUIButton *b_cancel = new mafGUIButton(m_NonUniformSlicesDlg, ID_NUSLICES_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
+  b_cancel->SetListener(this);
+
+  wxBoxSizer *okCancelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  okCancelBoxSizer->Add(SliceOk, 0, wxALIGN_CENTRE_HORIZONTAL, 0);
+  okCancelBoxSizer->Add(b_cancel, 0, wxALIGN_CENTRE_HORIZONTAL, 0);
+
+
+
+
+  //----------------------------------------------------------------------------
+  // put columns together and add to dialog
+  //----------------------------------------------------------------------------
+  wxBoxSizer *twoColumnsBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  twoColumnsBoxSizer->Add(RenWinBoxSizer, 0, wxEXPAND | wxALL, 1) ;
+  twoColumnsBoxSizer->Add(widgetsBoxSizer, 1, wxEXPAND | wxALL, 1) ;
+
+  wxBoxSizer *allBoxSizer = new wxBoxSizer(wxVERTICAL);
+  allBoxSizer->Add(twoColumnsBoxSizer, 0, wxEXPAND | wxALL, 1) ;
+  allBoxSizer->Add(okCancelBoxSizer, 1, wxEXPAND | wxALIGN_CENTRE_HORIZONTAL | wxALL, 1) ;
+
+  m_NonUniformSlicesDlg->Add(allBoxSizer, 1, wxEXPAND | wxALL, 2);    
+  twoColumnsBoxSizer->Fit(m_NonUniformSlicesDlg);
+
+
+
+  //----------------------------------------------------------------------------
+  // create visual pipe
+  //----------------------------------------------------------------------------
+  m_NonUniformSlicePipe = new medOpMML3NonUniformSlicePipe(m_MuscleGlobalReg, m_SectionsViewRWI->m_RenFront, NumberOfNonUniformSections) ;
+  m_NonUniformSlicePipe->SetEndsOfAxis(m_Axis1Point_PatientCoords, m_Axis2Point_PatientCoords) ;
+  m_SectionsViewRWI->CameraUpdate();
+
+
+  m_NonUniformSlicesDlg->ShowModal() ;
+
+
+
 }
 
 
@@ -843,6 +987,13 @@ void medOpMML3::CreateNonUniformSlicesDlg()
 void medOpMML3::DeleteNonUniformSlicesDlg()
 //------------------------------------------------------------------------------
 {
+  delete m_SectionsViewRWI ;
+  delete m_NonUniformSlicePipe ;
+  delete m_NonUniformSlicesDlg ;
+
+  delete [] m_NumSlicesRowBoxSizer ;
+  delete [] m_NumSlicesLabel ;
+  delete [] m_NumSlicesEntry ;
 }
 
 
@@ -882,6 +1033,18 @@ void medOpMML3::GetAbsPosOfLandmark(mafVMELandmark *landmark, double point[3])
 
 
 
+//------------------------------------------------------------------------------
+// Enable/Disable buttons which only work in 2d display mode
+//------------------------------------------------------------------------------
+void medOpMML3::Set2DButtonsEnable(bool enable)
+{
+  m_UndoButton->Enable(enable) ;
+  m_PlaceOpButton->Enable(enable) ;
+  m_TranslateOpButton->Enable(enable) ;
+  m_RotateOpButton->Enable(enable) ;
+  m_ScaleOpButton->Enable(enable) ;
+}
+
 
 
 
@@ -891,128 +1054,135 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
 //------------------------------------------------------------------------------
 {
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event)){
+
+    // check for range of id's corresponding to non-uniform slice entries
+    if ((e->GetId() >= ID_NUSLICES_NUMBER_BEGIN) && (e->GetId() <= ID_NUSLICES_NUMBER_LAST)){
+      OnTextNumberChange(e->GetId());
+      return ;
+    }
+
     switch(e->GetId())
     {
-    case ID_CHOOSE_SURFACE: // set up dlg muscle selection
+    case ID_INPUTS_SURFACE: // set up dlg muscle selection
       //
       OnMuscleSelection();
       break;
 
-    case ID_CHOOSE_L1: // set up dlg L1
+    case ID_INPUTS_L1: // set up dlg L1
       OnLandmark1AtlasPatientSelection();
       break;
 
-    case ID_CHOOSE_L2: // set up dlg L2
+    case ID_INPUTS_L2: // set up dlg L2
       OnLandmark2AtlasPatientSelection();
       break;
 
-    case ID_CHOOSE_L3: // set up dlg L3
+    case ID_INPUTS_L3: // set up dlg L3
       OnLandmark3AtlasPatientSelection();
       break;
 
-    case ID_CHOOSE_L4: // set up dlg L4
+    case ID_INPUTS_L4: // set up dlg L4
       OnLandmark4AtlasPatientSelection();
       break;
 
-    case ID_CHOOSE_SLICEXYZ: // radio box to choose default slice direction
+    case ID_INPUTS_SLICEXYZ: // radio box to choose default slice direction
       OnSliceXYZ() ;
       break ;
 
-    case ID_CHOOSE_AXIS1: // set up dlg to select axis 1
+    case ID_INPUTS_AXIS1: // set up dlg to select axis 1
       OnLandmarkAxis1AtlasSelection();
       break;
 
-    case ID_CHOOSE_AXIS2: // set up dlg to select axis 2
+    case ID_INPUTS_AXIS2: // set up dlg to select axis 2
       OnLandmarkAxis2AtlasSelection();
       break;
 
-    case ID_CHOOSE_AXIS3: // set up dlg to select axis 2
+    case ID_INPUTS_AXIS3: // set up dlg to select axis 2
       OnLandmarkAxis3AtlasSelection();
       break;
 
-    case ID_CHOOSE_OK: // set up dlg ok
-      m_ChooseDlg->EndModal(wxID_OK);
+    case ID_INPUTS_OK: // set up dlg ok
+      OnInputsOk() ;
+      m_InputsDlg->EndModal(wxID_OK);
       break;
 
-    case ID_CHOOSE_CANCEL: // set up dlg cancel
-      m_ChooseDlg->EndModal(wxID_CANCEL);
+    case ID_INPUTS_CANCEL: // set up dlg cancel
+      m_InputsDlg->EndModal(wxID_CANCEL);
       break;
 
-    case ID_SHOW_AXES: // registration dlg axes on/off
-      if (m_3DFlag == 0)
-        OnContourLineAxesVisibility();
+    case ID_NUSLICES_OK:// non-uniform slicing dlg OK
+      m_NonUniformSlicesDlg->EndModal(wxID_OK);
       break;
 
-    case ID_SHOW_CONTOUR: // registration dlg contour on/off
-      if (m_3DFlag == 0)
-        OnContourVisibility();
+    case ID_NUSLICES_CANCEL:// non-uniform slicing dlg cancel
+      m_NonUniformSlicesDlg->EndModal(wxID_CANCEL);
       break;
 
-    case ID_RESET_VIEW: // registration dlg reset view
-      if (m_3DFlag == 0)
-        OnResetView();
+    case ID_REG_DISPLAY_MODE: // registration dlg axes on/off
+      OnDisplayMode();
       break;
 
-    case ID_OK: // registration dlg ok
-      if (m_3DFlag == 0)
-        OnRegistrationOK();
+    case ID_REG_PREVIEW: // registration dlg contour on/off
+      OnPreview();
+      break;
+
+    case ID_REG_RESET_VIEW: // registration dlg reset view
+      OnResetView();
+      break;
+
+    case ID_REG_OK: // registration dlg ok
+      OnRegistrationOK();
       m_OpDlg->EndModal(wxID_OK);
       break;
 
-    case ID_CANCEL: // registration dlg cancel
+    case ID_REG_CANCEL: // registration dlg cancel
       OnRegistrationCANCEL();
       m_OpDlg->EndModal(wxID_CANCEL);
       break;
 
-    case ID_P_OPERATION: // registration dlg p-op
-      if (m_3DFlag == 0)
-        OnPOperationButton();
+    case ID_REG_P_OPERATION: // registration dlg p-op
+      OnPOperationButton();
       break;
 
-    case ID_T_OPERATION: // registration dlg t-op
-      if (m_3DFlag == 0)
-        OnTOperationButton();
+    case ID_REG_T_OPERATION: // registration dlg t-op
+      OnTOperationButton();
       break;
 
-    case ID_R_OPERATION: // registration dlg r-op
-      if (m_3DFlag == 0)
-        OnROperationButton();
+    case ID_REG_R_OPERATION: // registration dlg r-op
+      OnROperationButton();
       break;
 
-    case ID_S_OPERATION: // registration dlg s-op
-      if (m_3DFlag == 0)
-        OnSOperationButton();
+    case ID_REG_S_OPERATION: // registration dlg s-op
+      OnSOperationButton();
       break;
 
-    case ID_UNDO: // registration dlg undo
-      if (m_3DFlag == 0)
-        OnUndo();
+    case ID_REG_UNDO: // registration dlg undo
+      OnUndo();
       break;
 
     case ID_RANGE_MODIFIED: // registration dlg lut
       OnLut();
       break;
 
-    case ID_SLICE: // registration dlg slice slider
+    case ID_REG_SLICE: // registration dlg slice slider
       OnSlider();
       break;
 
-    case ID_MINUS10: // registration dlg slice button
+    case ID_REG_MINUS10: // registration dlg slice button
       OnMinus10();
       OnSlider(); // need to call this manually
       break;
 
-    case ID_MINUS1: // registration dlg slice button
+    case ID_REG_MINUS1: // registration dlg slice button
       OnMinus1();
       OnSlider(); // need to call this manually
       break;
 
-    case ID_PLUS1: // registration dlg slice button
+    case ID_REG_PLUS1: // registration dlg slice button
       OnPlus1();
       OnSlider(); // need to call this manually
       break;
 
-    case ID_PLUS10: // registration dlg slice button
+    case ID_REG_PLUS10: // registration dlg slice button
       OnPlus10();
       OnSlider(); // need to call this manually
       break;
@@ -1022,6 +1192,23 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
       break;
     }
   }
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Event handler when no. of slices in a section is changed
+void medOpMML3::OnTextNumberChange(mafID id)
+//------------------------------------------------------------------------------
+{
+  int i ;
+
+  // update the total number of slices
+  for (i = 0, m_NumberOfScans = 0; i < medOpMML3::NumberOfNonUniformSections; i++)
+    m_NumberOfScans += m_SlicesInSection[i];
+
+  m_NonUniformSlicesDlg->TransferDataToWindow();
 }
 
 
@@ -1037,9 +1224,19 @@ void medOpMML3::OnSliceXYZ()
 
 //------------------------------------------------------------------------------
 // Inputs dialog ok - tidy up
-void medOpMML3::OnChooseOk()
+void medOpMML3::OnInputsOk()
 //------------------------------------------------------------------------------
 {
+  // apply stretch factor to axis landmarks
+  // do this only if axis is calculated from selected landmarks
+  if (m_AxisLandmarksFlag == 2)
+    ApplyAxisRangeFactor() ;
+
+  // calculate default landmarks if not already defined
+  if (!m_L1Defined || !m_L2Defined || !m_L3Defined)
+    CreateDefaultRegistrationLandmarks();
+  if (!m_Axis1Defined || !m_Axis2Defined || ((m_MuscleType == 2) && !m_Axis3Defined))
+    CreateDefaultAxisLandmarks();
 }
 
 
@@ -1050,34 +1247,14 @@ void medOpMML3::OnChooseOk()
 void medOpMML3::OnRegistrationOK() 
 //----------------------------------------------------------------------------
 {
-  // deform
-  ApplyRegistrationOps();
+  // apply deformations
+  m_Model->ApplyRegistrationOps();
 
-
-  // Inverse m_pfinalm matrix
-  // This is the transform which creates the output data.
-  vtkMatrix4x4 *inv_finalm = vtkMatrix4x4::New();
-  inv_finalm->Identity();
-  inv_finalm->Invert(m_Model->GetFinalM(), inv_finalm);
-
-  // transform
-  vtkTransform *deformedt = vtkTransform::New();
-  deformedt->SetMatrix(inv_finalm);
-  inv_finalm->Delete() ;
-
-  // muscle: deformed version
-  vtkTransformPolyDataFilter *deformedpd = vtkTransformPolyDataFilter::New();
-  deformedpd->SetInput(m_Model->GetOutputPolydata());
-  deformedpd->SetTransform(deformedt);
-  deformedt->Delete() ;
-
-  // Update transform now
-  deformedpd->Update();
 
 
   // create vme and set data
   mafSmartPointer<mafVMESurface> vme ;
-  vme->SetData(deformedpd->GetOutput(), ((mafVME *)m_Input)->GetTimeStamp()) ;
+  vme->SetData(m_MuscleOutput, ((mafVME *)m_Input)->GetTimeStamp()) ;
 
 
   // tag 1: status
@@ -1088,7 +1265,7 @@ void medOpMML3::OnRegistrationOK()
   // tag 2: number of slices
   mafTagItem noofslices;
   noofslices.SetName("NUMBER_OF_SLICES_TAG");
-  noofslices.SetValue(m_Model->GetTotalNumberOfSyntheticScans());
+  noofslices.SetValue(m_Model->GetTotalNumberOfScans());
   vme->GetTagArray()->SetTag(noofslices);
 
   // tag 4: operations stack
@@ -1159,11 +1336,11 @@ void medOpMML3::OnRegistrationOK()
 
   // is there a groupVME under the "registered muscles" groupVME with name identical to
   // that of the muscle under registration? If no create it, if yes get a pointer to it
-  mafVMEGroup *OurMuscleVME = (mafVMEGroup *) RegisteredMusclesVME->FindInTreeByName(m_surface_name);
+  mafVMEGroup *OurMuscleVME = (mafVMEGroup *) RegisteredMusclesVME->FindInTreeByName(m_Surface_name);
   if(OurMuscleVME == NULL)
   {
   OurMuscleVME = mafVMEGroup::New();
-  OurMuscleVME->SetName(m_surface_name);
+  OurMuscleVME->SetName(m_Surface_name);
   RegisteredMusclesVME->AddChild(OurMuscleVME);
   mafEventMacro(mafEvent(this, VME_ADD, OurMuscleVME));
   }
@@ -1196,10 +1373,6 @@ void medOpMML3::OnRegistrationOK()
   // add to tree (save now)
   //OurMuscleVME->AddChild(vme);
   mafEventMacro(mafEvent(this, VME_ADD, vme));
-
-
-  // Clean up
-  deformedpd->Delete() ;
 }
 
 
@@ -1215,15 +1388,9 @@ void medOpMML3::OnRegistrationCANCEL()
 void medOpMML3::OnSlider() 
 //----------------------------------------------------------------------------
 {
-  //
-  m_Model->SetCurrentIdOfSyntheticScans(m_CurrentSlice);
-
-  // switch off non-relevant scans
-  for (int j = 0; j < m_Model->GetTotalNumberOfSyntheticScans(); j++)
-    m_Model->GetActorOfSyntheticScans(j)->VisibilityOff();
-
-  // switch on current scan
-  m_Model->GetActorOfSyntheticScans(m_CurrentSlice)->VisibilityOn();
+  // Set the slice in the model view
+  m_Model->SetCurrentIdOfScans(m_CurrentSlice);
+  m_Model->Update() ;
 
   // update line actors
   m_PH->SetLineActorX(m_CurrentSlice);
@@ -1236,37 +1403,20 @@ void medOpMML3::OnSlider()
   m_SE->SetLineActorX(m_CurrentSlice);
   m_SW->SetLineActorX(m_CurrentSlice);
 
-  //
-  Update();
 
-  //
-  if (m_Widget->GetCenterMode())
-  {
-
-  }
-
-  //
-  if (m_Widget->GetTranslationMode())
-  {
-
-  }
-
-  //
-  if (m_Widget->GetRotationMode())
-  {
+  // Update widget bits
+  if (m_Widget->GetRotationMode()){
     // update rotation handle
     m_Widget->UpdateRotationHandle();
-
-    // visibility
     m_Widget->SetRotationHandleVisibility();
   }
 
   // update - scaling mode
-  if (m_Widget->GetScalingMode())
-  {
+  if (m_Widget->GetScalingMode()){
     // update scaling handles
     m_Widget->UpdateScalingHandles();
   }
+
 
   // render parameter views
   m_PH->Render();
@@ -1329,8 +1479,8 @@ void medOpMML3::OnPlus1()
   m_CurrentSlice += 1 ;
 
   // clamp the value
-  if (m_CurrentSlice >= m_NumberOfSlices)
-    m_CurrentSlice = m_NumberOfSlices-1 ;
+  if (m_CurrentSlice >= m_NumberOfScans)
+    m_CurrentSlice = m_NumberOfScans-1 ;
 
   m_OpDlg->TransferDataToWindow() ;
 }
@@ -1347,8 +1497,8 @@ void medOpMML3::OnPlus10()
   m_CurrentSlice += (10-units) ;
 
   // clamp the value
-  if (m_CurrentSlice >= m_NumberOfSlices)
-    m_CurrentSlice = m_NumberOfSlices-1 ;
+  if (m_CurrentSlice >= m_NumberOfScans)
+    m_CurrentSlice = m_NumberOfScans-1 ;
 
   m_OpDlg->TransferDataToWindow() ;
 }
@@ -1362,10 +1512,9 @@ void medOpMML3::OnLut()
   double Low,High;
 
   m_Lut->GetSubRange(&Low, &High);
-
-  m_Model->GetWindowLevelLookupTableOfSyntheticScans()->SetLevel((float) ((High + Low) / 2.0));
-  m_Model->GetWindowLevelLookupTableOfSyntheticScans()->SetWindow((float) (High - Low));
-
+  m_Model->GetVisualPipe2D()->SetLutRange(Low, High) ;
+  m_Model->GetVisualPipe3D()->SetLutRange(Low, High) ;
+  m_Model->GetVisualPipePreview()->SetLutRange(Low, High) ;
   m_Model->Render();
 }
 
@@ -1416,10 +1565,10 @@ void medOpMML3::OnMuscleSelection()
     }
     mafTagItem *NumberOfSlicesTag;
     NumberOfSlicesTag = vme->GetTagArray()->GetTag("NUMBER_OF_SLICES_TAG");
-    m_NumberOfSlices = NumberOfSlicesTag->GetComponentAsDouble(0);
+    m_NumberOfScans = NumberOfSlicesTag->GetComponentAsDouble(0);
 
     // Disable widget so no. of slices can't be changed
-    m_NumberOfSlicesTxt->Enable(false) ;
+    m_NumberOfScansTxt->Enable(false) ;
 
 
 
@@ -1531,17 +1680,17 @@ void medOpMML3::OnMuscleSelection()
   //	   )
   //	{
   //		// activate ok button
-  //    m_choose_ok->Enable(true);
+  //    m_Choose_ok->Enable(true);
   //	}
   //	else
   //		// de-activate ok button
-  //		m_choose_ok->Enable(false);  
+  //		m_Choose_ok->Enable(false);  
 
 
-  m_ChooseOk->Enable(true);
+  m_InputsOk->Enable(true);
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -1551,8 +1700,23 @@ void medOpMML3::OnMuscleSelection()
 void medOpMML3::OnResetView() 
 //----------------------------------------------------------------------------
 {
-  m_Model->GetRenderer()->ResetCamera();
+  int n = m_Model->GetRenderer()->GetActors()->GetNumberOfItems() ;
+  mafLogMessage("no. of actors = %d", n) ;
+
+  m_Model->GetVisualPipe2D()->Update() ;
+  m_Model->GetVisualPipe3D()->Update() ;
+  m_Model->GetVisualPipePreview()->Update() ;
+  m_Model->ResetCameraPosition() ;
   m_Model->Render();
+
+
+  // Write debug info to file
+  /* std::fstream thing ;
+  thing.open("C:/Documents and Settings/Nigel/My Documents/Visual Studio Projects/MAF2/MML3/thing.txt", thing.out | thing.app) ;
+  m_Model->PrintSelf(thing, 0) ;
+  m_Model->GetVisualPipe2D()->PrintSelf(thing, 0) ;
+  m_Widget->PrintSelf(thing, 0) ;
+  thing.close() ; */
 }
 
 
@@ -1577,7 +1741,7 @@ void medOpMML3::OnUndo()
   double params_undo[5];
   m_Model->GetOperationsStackTuple(m_Widget->GetNextOperationId() - 1, params_undo);
 
-  int maxsliceid = m_Model->GetTotalNumberOfSyntheticScans() - 1;
+  int maxsliceid = m_Model->GetTotalNumberOfScans() - 1;
 
   // total number of data points
   int n = m_PH->GetNumberOfDataPoints();
@@ -1655,7 +1819,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_PH->GetValue(params_undo[0]) == 0.0))
       {
@@ -1696,7 +1860,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_TH->GetValue(params_undo[0]) == 0.0))
       {
@@ -1732,7 +1896,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_RA->GetValue(params_undo[0]) == 0.0))
       {
@@ -1761,7 +1925,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_SN->GetValue(params_undo[0]) == 1.0))
       {
@@ -1790,7 +1954,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_SS->GetValue(params_undo[0]) == 1.0))
       {
@@ -1819,7 +1983,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_SE->GetValue(params_undo[0]) == 1.0))
       {
@@ -1848,7 +2012,7 @@ void medOpMML3::OnUndo()
     }
 
     // first/last slice
-    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfSyntheticScans() - 1)))
+    if ((params_undo[0] == 0) || (params_undo[0] == (m_Model->GetTotalNumberOfScans() - 1)))
     {
       if (!(m_SW->GetValue(params_undo[0]) == 1.0))
       {
@@ -1883,10 +2047,10 @@ void medOpMML3::OnUndo()
     ResetOperation();
 
     // prepare display information
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetVisualPipe2D()->SetTextXPosition(0.0, 0.9) ;
+    m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.8) ;
 
-    m_Widget->CenterModeOn();
+    m_Widget->PlaceModeOn();
     break;
 
   case 1: // translate
@@ -1906,8 +2070,8 @@ void medOpMML3::OnUndo()
     ResetOperation();
 
     // prepare display information
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-    m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetVisualPipe2D()->SetTextXPosition(0.0, 0.9) ;
+    m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.8) ;
 
     m_Widget->TranslationModeOn();
     break;
@@ -1929,7 +2093,7 @@ void medOpMML3::OnUndo()
     ResetOperation();
 
     // prepare display information
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.8) ;
 
     m_Widget->UpdateRotationHandle();
     m_Widget->RotationHandleOn();
@@ -1954,7 +2118,7 @@ void medOpMML3::OnUndo()
     m_ScaleOpButton->SetBackgroundColour(Green);
     m_ScaleOpButton->SetTitle(">>S<<");
 
-    m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+    m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.9) ;
 
     //
     ResetOperation();
@@ -1964,37 +2128,14 @@ void medOpMML3::OnUndo()
     m_Widget->ScalingModeOn();
   }
 
-  // update vertical cuts
-  m_Model->UpdateSegmentCuttingPlanes();
+
+  // update model view
+  m_Model->Update() ;
+
 
   // update widget
   m_Widget->UpdateWidgetTransform();
-
-  // update north east segment
-  m_Model->UpdateSegmentNorthEastTransform();
-
-  // update north west segment
-  m_Model->UpdateSegmentNorthWestTransform();
-
-  // update south east segment
-  m_Model->UpdateSegmentSouthEastTransform();
-
-  // update south west segment
-  m_Model->UpdateSegmentSouthWestTransform();
-
-  // update contour axes
-  m_Model->UpdateContourAxesTransform();
-
-  // set visibility
-  m_Model->SetContourAxesVisibility();
-
-  // update global axes
-  m_Model->UpdateGlobalAxesTransform();
-
-  // set visibility
-  m_Model->SetGlobalAxesVisibility();
-
-  //
+ 
   if (m_Widget->GetRotationMode())
   {
     // update rotation handle
@@ -2028,7 +2169,7 @@ void medOpMML3::ResetOperation()
   m_Widget->ScalingHandlesOff();
 
   // reset - modes off
-  m_Widget->CenterModeOff();
+  m_Widget->PlaceModeOff();
   m_Widget->ScalingModeOff();
   m_Widget->RotationModeOff();
   m_Widget->TranslationModeOff();
@@ -2038,44 +2179,26 @@ void medOpMML3::ResetOperation()
 
 
 //----------------------------------------------------------------------------
-void medOpMML3::OnContourLineAxesVisibility() 
+// Display mode button
+void medOpMML3::OnDisplayMode() 
 //----------------------------------------------------------------------------
 {
-  m_ShowAxes = (m_ShowAxes + 1) % 2;
+  m_3DFlag = (m_3DFlag + 1) % 2 ;
 
-  if (m_ShowAxes)
-  {
-    m_AxesOnOffButton->SetTitle("Axes Off");
-    // action line coordinate system
-    //Model->GetPositiveXAxisActor()->VisibilityOn();
-    //Model->GetNegativeXAxisActor()->VisibilityOn();
-    //Model->GetPositiveYAxisActor()->VisibilityOn();
-    //Model->GetNegativeYAxisActor()->VisibilityOn();
-    //Model->GetPositiveZAxisActor()->VisibilityOn();
-    //Model->GetNegativeZAxisActor()->VisibilityOn();
-
-    // contour coordinate system
-    m_Model->GetContourPositiveXAxisActor()->VisibilityOn();
-    m_Model->GetContourNegativeXAxisActor()->VisibilityOn();
-    m_Model->GetContourPositiveYAxisActor()->VisibilityOn();
-    m_Model->GetContourNegativeYAxisActor()->VisibilityOn();
+  if (m_3DFlag == 0){
+    m_Model->SetDisplay2D() ;
+    m_DisplayModeButton->SetTitle("Display 3D");
+    Set2DButtonsEnable(true) ;
   }
-  else
-  {
-    m_AxesOnOffButton->SetTitle("Axes On");
-    // action line coordinate system
-    //Model->GetPositiveXAxisActor()->VisibilityOff();
-    //Model->GetNegativeXAxisActor()->VisibilityOff();
-    //Model->GetPositiveYAxisActor()->VisibilityOff();
-    //Model->GetNegativeYAxisActor()->VisibilityOff();
-    //Model->GetPositiveZAxisActor()->VisibilityOff();
-    //Model->GetNegativeZAxisActor()->VisibilityOff();
-
-    m_Model->GetContourPositiveXAxisActor()->VisibilityOff();
-    m_Model->GetContourNegativeXAxisActor()->VisibilityOff();
-    m_Model->GetContourPositiveYAxisActor()->VisibilityOff();
-    m_Model->GetContourNegativeYAxisActor()->VisibilityOff();
+  else{
+    m_Model->SetDisplay3D() ;
+    m_DisplayModeButton->SetTitle("Display 2D");
+    Set2DButtonsEnable(false) ;
   }
+
+  // switch off the preview
+  m_PreviewFlag = 0 ;
+  m_PreviewButton->SetTitle("Preview On") ;
 
   m_Model->Render();
 }
@@ -2084,50 +2207,32 @@ void medOpMML3::OnContourLineAxesVisibility()
 
 
 //----------------------------------------------------------------------------
-void medOpMML3::OnContourVisibility() 
+// Preview button
+void medOpMML3::OnPreview() 
 //----------------------------------------------------------------------------
-{
-  m_ContourVisibility = (m_ContourVisibility + 1) % 2;
-
-  if (m_ContourVisibility) // visible
-  {
-    m_ContourOnOffButton->SetTitle("Contour Off");
-
-    m_Model->GetNEContourActor()->VisibilityOn();
-    m_Model->GetNWContourActor()->VisibilityOn();
-    m_Model->GetSEContourActor()->VisibilityOn();
-    m_Model->GetSWContourActor()->VisibilityOn();
-
-    if (m_Widget->GetRotationMode())
-    {
-      // handle
-      m_Widget->RotationHandleOn();
+{  
+  m_PreviewFlag = (m_PreviewFlag + 1) % 2 ;
+  
+  if (m_PreviewFlag == 0){
+    // switch off preview and return to previous 2d or 3d view
+    if (m_3DFlag == 0){
+      m_Model->SetDisplay2D() ;
+      Set2DButtonsEnable(true) ;
     }
-    else if (m_Widget->GetScalingMode()){
-      // handles
-      m_Widget->ScalingHandlesOn();
+    else{
+      m_Model->SetDisplay3D() ;
+      Set2DButtonsEnable(false) ;
     }
+
+    m_PreviewButton->SetTitle("Preview On");
   }
-  else // non-visible
-  {
-    m_ContourOnOffButton->SetTitle("Contour On");
-
-    m_Model->GetNEContourActor()->VisibilityOff();
-    m_Model->GetNWContourActor()->VisibilityOff();
-    m_Model->GetSEContourActor()->VisibilityOff();
-    m_Model->GetSWContourActor()->VisibilityOff();
-
-    if (m_Widget->GetRotationMode())
-    {
-      // handle
-      m_Widget->RotationHandleOff();
-    }
-    else if (m_Widget->GetScalingMode()){
-      // handles
-      m_Widget->ScalingHandlesOff();
-    }
+  else{
+    // switch on preview
+    m_Model->SetDisplayToPreview() ;
+    m_PreviewButton->SetTitle("Preview Off");
+    Set2DButtonsEnable(false) ;
   }
-
+  
   m_Model->Render();
 }
 
@@ -2237,15 +2342,15 @@ void medOpMML3::OnLandmark1AtlasPatientSelection()
   if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0)
   {
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2355,15 +2460,15 @@ void medOpMML3::OnLandmark2AtlasPatientSelection()
   // if all landmarks chosen
   if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0){
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2473,15 +2578,15 @@ void medOpMML3::OnLandmark3AtlasPatientSelection()
   // if all landmarks chosen
   if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0){
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2591,15 +2696,15 @@ void medOpMML3::OnLandmark4AtlasPatientSelection()
   // if all landmarks chosen
   if (m_L1Name.compare("none") != 0 && m_L2Name.compare("none") != 0 && m_L3Name.compare("none") != 0){
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2681,7 +2786,7 @@ void medOpMML3::OnLandmarkAxis1AtlasSelection()
 
 
   // Now selecting axis by landmarks, so disable the default direction radio box
-  m_RadioSlicexyz->Enable(false) ;
+  m_Radio_slicexyz->Enable(false) ;
 
   // if all landmarks chosen
   if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
@@ -2689,15 +2794,15 @@ void medOpMML3::OnLandmarkAxis1AtlasSelection()
     m_AxisLandmarksFlag = 2 ;
 
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2778,7 +2883,7 @@ void medOpMML3::OnLandmarkAxis2AtlasSelection()
 
 
   // Now selecting axis by landmarks, so disable the default direction radio box
-  m_RadioSlicexyz->Enable(false) ;
+  m_Radio_slicexyz->Enable(false) ;
 
   // if all landmarks chosen
   if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
@@ -2786,15 +2891,15 @@ void medOpMML3::OnLandmarkAxis2AtlasSelection()
     m_AxisLandmarksFlag = 2 ;
 
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2875,7 +2980,7 @@ void medOpMML3::OnLandmarkAxis3AtlasSelection()
 
 
   // Now selecting axis by landmarks, so disable the default direction radio box
-  m_RadioSlicexyz->Enable(false) ;
+  m_Radio_slicexyz->Enable(false) ;
 
   // if all landmarks chosen
   if (m_Axis1Defined && m_Axis2Defined && (m_Axis3Defined || (m_MuscleType == 1))){
@@ -2883,15 +2988,15 @@ void medOpMML3::OnLandmarkAxis3AtlasSelection()
     m_AxisLandmarksFlag = 2 ;
 
     // activate ok button
-    m_ChooseOk->Enable(true);
+    m_InputsOk->Enable(true);
   }
   else{
     // de-activate ok button
-    m_ChooseOk->Enable(false);
+    m_InputsOk->Enable(false);
   }
 
   // update window
-  m_ChooseDlg->TransferDataToWindow();
+  m_InputsDlg->TransferDataToWindow();
 }
 
 
@@ -2899,7 +3004,8 @@ void medOpMML3::OnLandmarkAxis3AtlasSelection()
 
 
 //----------------------------------------------------------------------------
-// Create default set of registration landmarks
+// Create default set of registration landmarks.
+// Landmarks are based on the bounds of the input volume.
 void medOpMML3::CreateDefaultRegistrationLandmarks() 
 //----------------------------------------------------------------------------
 {
@@ -2939,7 +3045,8 @@ void medOpMML3::CreateDefaultRegistrationLandmarks()
 
 
 //----------------------------------------------------------------------------
-// Create default set of axis landmarks
+// Create default set of axis landmarks.
+// The axis is x, y or z in patient coords, depending on selection made in inputs dialog.
 void medOpMML3::CreateDefaultAxisLandmarks() 
 //----------------------------------------------------------------------------
 {
@@ -3007,6 +3114,9 @@ void medOpMML3::CreateDefaultAxisLandmarks()
     // unknown muscle type
     assert(false) ;
   }
+
+  // set flag indicating that landmarks are in patient coords
+  m_AxisLandmarksFlag = 1 ;
 }
 
 
@@ -3042,101 +3152,228 @@ void medOpMML3::ApplyAxisRangeFactor()
       // unknown muscle type
       assert(false) ;
   }
-  
 }
 
 
 
 //------------------------------------------------------------------------------
+// Calculate fractional slice positions along axis,
+// where the values 0.0 and 1.0 correspond to the min and max of the slicing range
+// NB The first and last slices might not be exactly at 0.0 and 1.0.
+// NB Run ApplyAxisRangeFactor() before this - not after !
+void medOpMML3::CalculateSlicePositionsAlongAxis(double *alpha)
+//------------------------------------------------------------------------------
+{
+  // i indexes the sections, j indexes the slices within each section, k indexes the slice id
+  int i, j, k ;
+
+  if (m_NonUniformSliceSpacing == 1){
+    // non-uniform slicing
+    // calculate fraction of distance along axis for each slice
+    for (i = 0, k = 0 ;  i < NumberOfNonUniformSections ;  i++){
+      double sectionStart = (double)i / (double)NumberOfNonUniformSections ;    // fractional pos of section start
+      double sectionEnd = (double)(i+1) / (double)NumberOfNonUniformSections ;  // fraction pos of section end
+      double s = (sectionEnd - sectionStart) / (double)m_SlicesInSection[i] ;   // slice spacing for this section
+
+      for (j = 0 ;  j < m_SlicesInSection[i] ;  j++)
+        alpha[k++] = sectionStart + ((double)j + 0.5)*s ;
+    }
+
+    // error check that total number of slices is consistent
+    assert(k == m_NumberOfScans) ;
+  }
+  else{
+    // simple uniform slice spacing
+    for (k = 0 ;  k < m_NumberOfScans ;  k++)
+      alpha[k] = (double)k / (double)(m_NumberOfScans-1) ;
+  }
+}
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------
+// Transfer setup parameters from input dialog and landmarks to model view
+bool medOpMML3::SetUpModelView()
+//------------------------------------------------------------------------------
+{
+  // Check that at least 3 registration landmarks are defined
+  assert(m_L1Defined && m_L2Defined && m_L3Defined) ;
+
+  // Check that axis landmarks are defined
+  assert(m_Axis1Defined && m_Axis2Defined) ;
+  if (m_MuscleType == 2)
+    assert(m_Axis3Defined) ;
+
+
+  // set muscle type (1 - one slicing axis, 2 - two slicing axes)
+  m_Model->SetTypeOfMuscles(m_MuscleType);
+
+  // set patient landmarks
+  m_Model->SetLandmark1OfPatient(m_P1Point);
+  m_Model->SetLandmark2OfPatient(m_P2Point);
+  m_Model->SetLandmark3OfPatient(m_P3Point);
+  m_Model->SetLandmark4OfPatient(m_P4Point);
+
+  // set axis landmarks
+  m_Model->SetLandmark1OfAxis(m_Axis1Point_PatientCoords) ;
+  m_Model->SetLandmark2OfAxis(m_Axis2Point_PatientCoords) ;
+  if (m_MuscleType == 2)
+    m_Model->SetLandmark3OfAxis(m_Axis3Point_PatientCoords) ;
+
+  // landmark 4 flag
+  m_Model->Set4LandmarksFlag(m_L4Defined);
+
+  // set scans grain
+  m_Model->SetGrainOfScans(m_ScansGrain);
+
+  // set distribution of slices along axis
+  double *alpha = new double[m_NumberOfScans] ;
+  CalculateSlicePositionsAlongAxis(alpha) ;
+  m_Model->SetFractionalPosOfScans(alpha) ;
+  delete [] alpha ;
+
+  // initialize the model view
+  m_Model->Initialize() ;
+
+  // initialize lut slider 
+  double r[2] ;
+  m_Volume->Update() ;
+  m_Volume->GetScalarRange(r) ;
+  m_Lut->SetRange(r[0], r[1]);
+  m_Lut->SetSubRange(r[0], r[1]);
+
+  // select 2d or 3d view
+  if (m_PreviewFlag == 1)
+    m_Model->SetDisplayToPreview() ;
+  else if (m_3DFlag == 0)
+    m_Model->SetDisplay2D() ;
+  else
+    m_Model->SetDisplay3D() ;
+
+  return true ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
+// Set up the parameter views and initialize spline functions
+// The Model View must be initialized first.
+// However, this changes the spline values, so you must update the model view afterwards.
+// NB The splines for the contour centers have no display, and are initialized in the model view.
 bool medOpMML3::SetUpParameterViews() 
 //------------------------------------------------------------------------------
 {
   // size of synthetic scans
-  float sx, sy;
-  m_Model->GetSizeOfSyntheticScans(&sx, &sy);
+  double sx, sy;
+  m_Model->GetSizeOfScans(&sx, &sy);
+
+  // range of id and zeta
+  int n = m_Model->GetTotalNumberOfScans() ;
+  double zeta0 = m_Model->GetZetaOfSlice(0) ;
+  double zeta1 = m_Model->GetZetaOfSlice(n-1) ;
+
 
   // ph spline
-  m_PH->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_PH->SetRangeX(n);
   m_PH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // pv spline																											   
-  m_PV->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_PV->SetRangeX(n);
   m_PV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // th spline
-  m_TH->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_TH->SetRangeX(n);
   m_TH->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // tv spline
-  m_TV->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_TV->SetRangeX(n);
   m_TV->SetRangeY(-1.0 * (sx + sy)/ 3.0, 0.0, (sx + sy) / 3.0); // average x 2
   // ra spline
-  m_RA->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_RA->SetRangeX(n);
   m_RA->SetRangeY(-70.0, 0.0, 70.0);
   // sn spline
-  m_SN->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_SN->SetRangeX(n);
   m_SN->SetRangeY(0.1, 1.0, 3.0);
   // ss spline
-  m_SS->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_SS->SetRangeX(n);
   m_SS->SetRangeY(0.1, 1.0, 3.0);
   // se spline
-  m_SE->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_SE->SetRangeX(n);
   m_SE->SetRangeY(0.1, 1.0, 3.0);
   // sw spline
-  m_SW->SetRangeX(m_Model->GetTotalNumberOfSyntheticScans());
+  m_SW->SetRangeX(n);
   m_SW->SetRangeY(0.1, 1.0, 3.0);
+
+
 
   // display values
   m_PH->AddPoint(0, 0.0); 
-  m_PH->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0);
+  m_PH->AddPoint(n-1, 0.0);
   // actual values
-  m_Model->GetPHSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, PH = 0
-  m_Model->GetPHSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PH = 0
+  m_Model->GetPHSpline()->AddPoint(zeta0, 0.0); // first slice, PH = 0
+  m_Model->GetPHSpline()->AddPoint(zeta1, 0.0); // last slice, PH = 0
+
   // display values
   m_PV->AddPoint(0, 0.0); // first slice, PV = 0
-  m_PV->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, PV = 0
+  m_PV->AddPoint(n-1, 0.0); // last slice, PV = 0
   // actual values
-  m_Model->GetPVSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - PV = 0
-  m_Model->GetPVSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, PV = 0
+  m_Model->GetPVSpline()->AddPoint(zeta0, 0.0); // first slice - PV = 0
+  m_Model->GetPVSpline()->AddPoint(zeta1, 0.0); // last slice, PV = 0
+
   // display values
   m_TH->AddPoint(0, 0.0); // first slice, TH = 0
-  m_TH->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TH = 0
+  m_TH->AddPoint(n-1, 0.0); // last slice, TH = 0
   // actual values
-  m_Model->GetTHSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - H = 0
-  m_Model->GetTHSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice - H = 0
+  m_Model->GetTHSpline()->AddPoint(zeta0, 0.0); // first slice - H = 0
+  m_Model->GetTHSpline()->AddPoint(zeta1, 0.0); // last slice - H = 0
+
   // display values
   m_TV->AddPoint(0, 0.0); // first slice, V = 0
-  m_TV->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, TV = 0
+  m_TV->AddPoint(n-1, 0.0); // last slice, TV = 0
   // actual values
-  m_Model->GetTVSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice - V = 0
-  m_Model->GetTVSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, TV = 0
+  m_Model->GetTVSpline()->AddPoint(zeta0, 0.0); // first slice - V = 0
+  m_Model->GetTVSpline()->AddPoint(zeta1, 0.0); // last slice, TV = 0
+
   // display values
   m_RA->AddPoint(0, 0.0); // first slice, TA = 0
-  m_RA->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 0.0); // last slice, RA = 0
+  m_RA->AddPoint(n-1, 0.0); // last slice, RA = 0
   // actual values
-  m_Model->GetRASpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 0.0); // first slice, TA = 0
-  m_Model->GetRASpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 0.0); // last slice, RA = 0
+  m_Model->GetRASpline()->AddPoint(zeta0, 0.0); // first slice, TA = 0
+  m_Model->GetRASpline()->AddPoint(zeta1, 0.0); // last slice, RA = 0
+
   // display values
   m_SN->AddPoint(0, 1.0); // first slice, SN = 1.0
-  m_SN->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SN = 1.0
+  m_SN->AddPoint(n-1, 1.0); // last slice, SN = 1.0
   // actual values
-  m_Model->GetSNSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SN = 1.0
-  m_Model->GetSNSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SN = 1.0
+  m_Model->GetSNSpline()->AddPoint(zeta0, 1.0); // first slice, SN = 1.0
+  m_Model->GetSNSpline()->AddPoint(zeta1, 1.0); // last slice, SN = 1.0
+
   // display values
   m_SS->AddPoint(0, 1.0); // first slice, SS = 1.0
-  m_SS->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SS = 1.0
+  m_SS->AddPoint(n-1, 1.0); // last slice, SS = 1.0
   // actual values
-  m_Model->GetSSSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SS = 1.0
-  m_Model->GetSSSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SS = 1.0
+  m_Model->GetSSSpline()->AddPoint(zeta0, 1.0); // first slice, SS = 1.0
+  m_Model->GetSSSpline()->AddPoint(zeta1, 1.0); // last slice, SS = 1.0
+
   // display values
   m_SE->AddPoint(0, 1.0); // first slice, SE = 1.0
-  m_SE->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SE = 1.0
+  m_SE->AddPoint(n-1, 1.0); // last slice, SE = 1.0
   // actual values
-  m_Model->GetSESpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SE = 1.0
-  m_Model->GetSESpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SE = 1.0
+  m_Model->GetSESpline()->AddPoint(zeta0, 1.0); // first slice, SE = 1.0
+  m_Model->GetSESpline()->AddPoint(zeta1, 1.0); // last slice, SE = 1.0
+
   // display values
   m_SW->AddPoint(0, 1.0); // first slice, SW = 1.0
-  m_SW->AddPoint(m_Model->GetTotalNumberOfSyntheticScans() - 1, 1.0); // last slice, SW = 1.0
+  m_SW->AddPoint(n-1, 1.0); // last slice, SW = 1.0
   // actual values
-  m_Model->GetSWSpline()->AddPoint(m_Model->GetCurrentZOfSyntheticScans(), 1.0); // first slice, SW = 1.0
-  m_Model->GetSWSpline()->AddPoint(m_Model->GetZOfSyntheticScans(m_Model->GetTotalNumberOfSyntheticScans() - 1), 1.0); // last slice, SW = 1.0
+  m_Model->GetSWSpline()->AddPoint(zeta0, 1.0); // first slice, SW = 1.0
+  m_Model->GetSWSpline()->AddPoint(zeta1, 1.0); // last slice, SW = 1.0
+
+
+  // testing
+  double scale = m_Model->GetSNSpline()->Evaluate((zeta0+zeta1)/2.0) ;
 
   // apply operations
   if (m_RegistrationStatus == 1)
@@ -3146,7 +3383,7 @@ bool medOpMML3::SetUpParameterViews()
     NumberOfOperations = m_CurrentSliceIdStackTag->GetNumberOfComponents();
 
     int MaxScanId;
-    MaxScanId = m_Model->GetTotalNumberOfSyntheticScans() - 1;
+    MaxScanId = n-1;
 
     int NextOperationId;
     NextOperationId = m_Widget->GetNextOperationId();
@@ -3267,11 +3504,12 @@ bool medOpMML3::SetUpParameterViews()
 
 
 
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// Set up the contour widget
+// The model view should probably be set up first
 bool medOpMML3::SetUpContourWidget()
-//----------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 {
-
   m_Widget->SetModel(m_Model);
   m_Widget->SetInteractor(m_Model->GetRenderWindowInteractor());
 
@@ -3290,132 +3528,36 @@ bool medOpMML3::SetUpContourWidget()
   m_Widget->GetPlaneProperty()->SetOpacity(0.001);
   m_Widget->GetSelectedPlaneProperty()->SetColor(1.0, 1.0, 1.0);
   m_Widget->GetSelectedPlaneProperty()->SetOpacity(0.001);
-  //m_Widget->CenterModeOn();
-  m_Widget->On(); // nb adds 1 to ref count of renderer, which is removed by Off() or deconstructor
 
-  return 1;
-}
-
-
-
-
-
-
-//------------------------------------------------------------------------------
-// Transfer setup parameters from input dialog and landmarks to model view
-void medOpMML3::SetUpModelViewInputs()
-//------------------------------------------------------------------------------
-{
-  // Check that at least 3 registration landmarks are defined
-  assert(m_L1Defined && m_L2Defined && m_L3Defined) ;
-
-  // Check that axis landmarks are defined
-  assert(m_Axis1Defined && m_Axis2Defined) ;
-  if (m_MuscleType == 2)
-    assert(m_Axis3Defined) ;
-
-
-  // set muscle type (1 - one slicing axis, 2 - two slicing axes)
-  m_Model->SetTypeOfMuscles(m_MuscleType);
-
-  // set atlas landmarks
-  m_Model->SetLandmark1OfAtlas(m_L1Point);
-  m_Model->SetLandmark2OfAtlas(m_L2Point);
-  m_Model->SetLandmark3OfAtlas(m_L3Point);
-  m_Model->SetLandmark4OfAtlas(m_L4Point);
-
-  // set patient landmarks
-  m_Model->SetLandmark1OfPatient(m_P1Point);
-  m_Model->SetLandmark2OfPatient(m_P2Point);
-  m_Model->SetLandmark3OfPatient(m_P3Point);
-  m_Model->SetLandmark4OfPatient(m_P4Point);
-
-  // apply stretch to axis before uploading to model view
-  // do this only if axis is calculated from selected landmarks
-  if (m_AxisLandmarksFlag == 2)
-    ApplyAxisRangeFactor() ;
-
-  // set axis landmarks
-  m_Model->SetLandmark1OfAxis(m_Axis1Point) ;
-  m_Model->SetLandmark2OfAxis(m_Axis2Point) ;
-  if (m_MuscleType == 2)
-    m_Model->SetLandmark3OfAxis(m_Axis3Point) ;
-
-  // landmark 4 flag
-  m_Model->Set4LandmarksFlag(m_L4Defined);
-
-  // set number of scans
-  m_Model->SetTotalNumberOfSyntheticScans(m_NumberOfSlices);
-
-  // set scans grain
-  m_Model->SetGrainOfScans(m_ScansGrain);
-
-}
-
-
-
-
-//----------------------------------------------------------------------------
-bool medOpMML3::SetUpModelView() 
-//----------------------------------------------------------------------------
-{
-  // global registration
-  m_Model->MapAtlasToPatient();
-  if (m_AxisLandmarksFlag == 2)
-    m_Model->TransformAxisLandmarksToPatient() ;  // transform landmarks if they came from the atlas
-
-  // calculate slicing axis
-  m_Model->FindUnitVectorsAndLengthsOfLandmarkLines();
-  m_Model->MakeActionLineZAxis();
-
-  // pre-process scans
-  m_Model->FindSizeAndResolutionOfSyntheticScans();
-  m_Model->CreateSyntheticScans();
-
-  // initalise lut slider (called after void medOpMML3ModelView::CreateSyntheticScans()
-  m_Lut->SetRange(m_Model->GetLowScalar(), m_Model->GetHighScalar());
-  m_Lut->SetSubRange(m_Model->GetSyntheticScansLevel() - 0.5 * m_Model->GetSyntheticScansWindow(),
-    m_Model->GetSyntheticScansLevel() + 0.5 * m_Model->GetSyntheticScansWindow());
-  //m_lut->SetText(0, "");
-  //m_lut->SetText(1, ""); 
-  //m_lut->SetText(2, "");
-
-  // sub-contours actors (switch on)
-  m_Model->GetNEContourActor()->VisibilityOn();
-  m_Model->GetNWContourActor()->VisibilityOn();
-  m_Model->GetSEContourActor()->VisibilityOn();
-  m_Model->GetSWContourActor()->VisibilityOn();
-
-  // contour axes
-  m_Model->SetUpContourCoordinateAxes();
-
-  // global axes
-  m_Model->SetUpGlobalCoordinateAxes();
-
-  // set up display information
-  m_Model->GetTextMapper1()->GetTextProperty()->SetFontSize(10);
-  m_Model->GetTextMapper2()->GetTextProperty()->SetFontSize(10);
-  m_Model->GetTextMapper1()->GetTextProperty()->SetFontFamilyToCourier();
-  m_Model->GetTextMapper2()->GetTextProperty()->SetFontFamilyToCourier();
-  m_Model->GetScaledTextActor1()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_Model->GetScaledTextActor2()->GetProperty()->SetColor(1.0, 1.0, 1.0);
-  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-  m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
-
-  // 3d display?
-  if (m_3DFlag == 1){
+  if ((m_3DFlag == 1) || (m_PreviewFlag == 1))
     m_Widget->Off();
-    m_Model->Switch3dDisplayOn();
-  }
+  else
+    m_Widget->On();
 
-  Update();
+  // update widget
+  m_Widget->UpdateWidgetTransform();
 
-  // initialise
-  m_Model->GetRenderer()->ResetCamera();
-
-  return 1;
+  return true ;
 }
 
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------
+// Update model view and widget
+void medOpMML3::Update()
+//----------------------------------------------------------------------------
+{
+  // update model
+  m_Model->Update();
+
+  // update widget
+  m_Widget->UpdateWidgetTransform();
+}
 
 
 
@@ -3435,8 +3577,8 @@ mafRWI* medOpMML3::CreateParameterViewmafRWI(vtkTextSource *ts, wxString lab, fl
   ((vtkRenderWindow*)(rwi->m_RenderWindow))->SetSize(250, 65);
   rwi->m_RwiBase->Show();
 
-  //vtkDEL(rwi->m_c);
-  //rwi->m_c = m_RenderWindow_camera;
+  //vtkDEL(rwi->m_C);
+  //rwi->m_C = m_RenderWindow_camera;
 
   ts->SetForegroundColor(r,g,b);
   ts->BackingOff(); // no background drawn with text
@@ -4077,44 +4219,6 @@ void medOpMML3::SetUpLandmarks2(wxString AtlasSectionVMEName, wxString PatientSe
 
 
 
-//----------------------------------------------------------------------------
-void medOpMML3::Update()
-//----------------------------------------------------------------------------
-{
-  // update sectional cut
-  m_Model->UpdateContourCuttingPlane();
-
-  // update vertical cuts
-  m_Model->UpdateSegmentCuttingPlanes();
-
-  // update widget
-  m_Widget->UpdateWidgetTransform();
-
-  // update north east segment
-  m_Model->UpdateSegmentNorthEastTransform();
-
-  // update north west segment
-  m_Model->UpdateSegmentNorthWestTransform();
-
-  // update south east segment
-  m_Model->UpdateSegmentSouthEastTransform();
-
-  // update south west segment
-  m_Model->UpdateSegmentSouthWestTransform();
-
-  // update contour axes
-  m_Model->UpdateContourAxesTransform();
-
-  // update global axes
-  m_Model->UpdateGlobalAxesTransform();
-
-  // set visibility
-  m_Model->SetContourAxesVisibility();
-
-  // set visibility
-  m_Model->SetGlobalAxesVisibility();
-}
-
 
 
 
@@ -4166,10 +4270,11 @@ void medOpMML3::OnPOperationButton()
   ResetOperation();
 
   // prepare display information
-  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-  m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetVisualPipe2D()->SetTextXPosition(0.0, 0.9) ;
+  m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.8) ;
 
-  m_Widget->CenterModeOn();
+  m_Widget->UpdateWidgetTransform() ;
+  m_Widget->PlaceModeOn();
 
   //
   m_Model->Render();
@@ -4226,9 +4331,10 @@ void medOpMML3::OnTOperationButton()
   ResetOperation();
 
   // prepare display information
-  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.8);
-  m_Model->GetScaledTextActor2()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetVisualPipe2D()->SetTextXPosition(0.0, 0.9) ;
+  m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.8) ;
 
+  m_Widget->UpdateWidgetTransform() ;
   m_Widget->TranslationModeOn();
 
   //
@@ -4286,7 +4392,7 @@ void medOpMML3::OnROperationButton()
   ResetOperation();
 
   // prepare display information
-  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.9) ;
 
   m_Widget->UpdateRotationHandle();
   m_Widget->RotationHandleOn();
@@ -4337,9 +4443,8 @@ void medOpMML3::OnSOperationButton()
   m_ScaleOpButton->SetBackgroundColour(Green);
   m_ScaleOpButton->SetTitle(">>S<<");
 
-  m_Model->GetScaledTextActor1()->GetPositionCoordinate()->SetValue(0.0, 0.9);
+  m_Model->GetVisualPipe2D()->SetTextYPosition(0.0, 0.9) ;
 
-  //
   ResetOperation();
 
   m_Widget->UpdateScalingHandles();
@@ -4349,7 +4454,7 @@ void medOpMML3::OnSOperationButton()
   // on successful scaling, ScalingOccured flag in Model
   // is set to true, medOpMML3ContourWidget::OnLeftButtonUp
 
-  //
+
   m_Model->Render();
 }
 
@@ -4358,140 +4463,68 @@ void medOpMML3::OnSOperationButton()
 
 
 //----------------------------------------------------------------------------
-// Apply the registration operations: translation, rotation, deformation
-// Called when we select "ok" from the registration dialog.
-void medOpMML3::ApplyRegistrationOps()
+// Apply global registration using landmarks
+// Creates patient space versions of muscle polydata and landmarks
+void medOpMML3::ApplyGlobalRegistration()
 //----------------------------------------------------------------------------
 {
-  int i;
-  int n;
+  medOpMML3GlobalRegistration *glob = new medOpMML3GlobalRegistration() ;
 
-  double z;
-  double pt[3];
-  double temppt[3];
+  // If landmarks exist, use them set up the global registration tool.
+  // If there are not enough landmarks, the transformation will default to the identity.
+  if (m_L1Defined && m_L2Defined && m_L3Defined){
+    glob->SetLandmark1OfAtlas(m_L1Point) ;
+    glob->SetLandmark2OfAtlas(m_L2Point) ;
+    glob->SetLandmark3OfAtlas(m_L3Point) ;
+    glob->SetLandmark1OfPatient(m_P1Point) ;
+    glob->SetLandmark2OfPatient(m_P2Point) ;
+    glob->SetLandmark3OfPatient(m_P3Point) ;
 
-  double bounds[6];
-  double cx, cy;
+    if (m_L4Defined){
+      glob->SetLandmark4OfAtlas(m_L4Point) ;
+      glob->SetLandmark4OfPatient(m_P4Point) ;
+    }
 
-  // transform
-  vtkTransform* Transform = vtkTransform::New();
-
-  // number of points
-  n = m_Model->GetOutputPolydata()->GetPoints()->GetNumberOfPoints();
-
-  // deform each point
-  for(i = 0; i < n; i++)
-  {
-    // get ith point
-    m_Model->GetOutputPolydata()->GetPoints()->GetPoint(i, pt);
-
-    // get z level and evaluate the splines at z.
-    z = pt[2];
-
-    // get ph
-    double ph = m_Model->GetPHSpline()->Evaluate(z);
-
-    // get pv
-    double pv = m_Model->GetPVSpline()->Evaluate(z);
-
-    // get ra
-    double ra = m_Model->GetRASpline()->Evaluate(z);
-
-    // get th
-    double th = m_Model->GetTHSpline()->Evaluate(z);
-
-    // get tv
-    double tv = m_Model->GetTVSpline()->Evaluate(z);
-
-    // get se
-    double se = m_Model->GetSESpline()->Evaluate(z);
-
-    // get sw
-    double sw = m_Model->GetSWSpline()->Evaluate(z);
-
-    // get sn
-    double sn = m_Model->GetSNSpline()->Evaluate(z);
-
-    // get ss
-    double ss = m_Model->GetSSSpline()->Evaluate(z);
-
-    // update the contour actor, for z level used currently
-    // doesn't matter to change it as this method is called
-    // only when terminating the registration operation (ok)
-    m_Model->GetContourPlane()->SetOrigin(0.0, 0.0, z);
-
-    // original bounds
-    m_Model->GetContourTubeFilter()->GetOutput()->GetBounds(bounds);
-
-    // original center
-    cx = (bounds[0] + bounds[1]) / 2.0; // x
-    cy = (bounds[2] + bounds[3]) / 2.0; // y
-
-    // initialise
-    Transform->Identity();
-
-    // s operation
-    Transform->Translate(cx, cy, 0.0); // contour bbox axes origin
-    Transform->Translate(ph, pv, 0.0); // p operation
-    Transform->RotateZ(ra); // r operation
-
-    //
-    Transform->TransformPoint(pt, temppt);
-    if (temppt[0] > 0.0 && temppt[1] > 0.0) // 1st quadrant (+, +)
-      Transform->Scale(se, sn, 1.0);
-    else if (temppt[0] < 0.0 && temppt[1] > 0.0) // 2nd quadrant (-, +)
-      Transform->Scale(sw, sn, 1.0);
-    else if (temppt[0] < 0.0 && temppt[1] < 0.0) // 3rd quadrant (-, -)
-      Transform->Scale(sw, ss, 1.0);
-    else if (temppt[0] > 0.0 && temppt[1] < 0.0) // 4th quadrant (+, -)
-      Transform->Scale(se, ss, 1.0);
-    else if (temppt[0] > 0.0 && temppt[1] == 0.0) // positive x axis
-      Transform->Scale(se, 1.0, 1.0);
-    else if (temppt[0] < 0.0 && temppt[1] == 0.0) // negative x axis
-      Transform->Scale(sw, 1.0, 1.0);
-    else if (temppt[1] > 0.0 && temppt[0] == 0.0) // positive y axis
-      Transform->Scale(1.0, sn, 1.0);
-    else if (temppt[1] > 0.0 && temppt[0] == 0.0) // negative y axis
-      Transform->Scale(1.0, ss, 1.0);
-
-    Transform->RotateZ(-1.0 * ra); // inverse r operation
-    Transform->Translate(-1.0 * ph, -1.0 * pv, 0.0); // inverse p operation
-    Transform->Translate(-1.0 * cx, -1.0 * cy, 0.0); // inverse contour bbox axes origin
-
-    // r operation
-    Transform->Translate(cx, cy, 0.0); // contour bbox axes origin
-    Transform->Translate(ph, pv, 0.0); // p operation
-    Transform->RotateZ(ra); // r operation
-    Transform->Translate(-1.0 * ph, -1.0 * pv, 0.0); // inverse p operation
-    Transform->Translate(-1.0 * cx, -1.0 * cy, 0.0); // inverse contour bbox axes origin
-
-    // t operation
-    Transform->Translate(th, tv, 0.0);
-
-    // p operation
-    Transform->Translate(ph, pv, 0.0);
-
-    //
-    Transform->TransformPoint(pt, pt);
-
-    // set
-    m_Model->GetOutputPolydata()->GetPoints()->SetPoint(i, pt);
+    glob->Update() ;
   }
 
-  m_Model->GetOutputPolydata()->Update();
+
+  // transform muscle polydata to patient space
+  vtkPolyData *muscleGR = glob->TransformPolydata(m_Muscle) ;
+  m_MuscleGlobalReg->DeepCopy(muscleGR) ;
+
+
+  // copy or transform axis landmarks to patient coords
+  switch(m_AxisLandmarksFlag){
+    case 1:
+      // axis landmarks are already in patient coords - just copy them
+      for (int i = 0 ;  i < 3 ;  i++){
+        m_Axis1Point_PatientCoords[i] = m_Axis1Point[i] ;
+        m_Axis2Point_PatientCoords[i] = m_Axis2Point[i] ;
+      }
+      break ;
+
+    case 2:
+      // axis landmarks are in atlas coords, so they must be transformed
+      glob->TransformPoint(m_Axis1Point, m_Axis1Point_PatientCoords) ;
+      glob->TransformPoint(m_Axis2Point, m_Axis2Point_PatientCoords) ;
+
+      if (m_Axis3Defined)
+        glob->TransformPoint(m_Axis3Point, m_Axis3Point_PatientCoords) ;
+ 
+      break ;
+
+    default:
+      // unknown axis landmarks flag
+      assert(false) ;
+  }
+
 
   // clean up
-  Transform->Delete();
+  delete glob ;
 }
 
 
 
-
-//----------------------------------------------------------------------------
-void medOpMML3::ApplyInverseRegistrationOps()
-//----------------------------------------------------------------------------
-{
-
-}
 
 

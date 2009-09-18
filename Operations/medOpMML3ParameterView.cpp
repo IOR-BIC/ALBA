@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMML3ParameterView.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-29 11:05:29 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-09-18 08:10:33 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Mel Krokos
 ==========================================================================
   Copyright (c) 2002/2004
@@ -12,7 +12,6 @@
 
 #include "mafDefines.h"
 
-//#include "MuscleRegistrationProject.h"
 #include "medOpMML3ParameterView.h"
 #include "assert.h"
 #include "vtkProperty2D.h"
@@ -149,8 +148,8 @@ void medOpMML3ParameterView::ComputeConvertTommoMMLParameterViewX()
 double medOpMML3ParameterView::ConvertTommoMMLParameterViewX(double X)
 //----------------------------------------------------------------------------
 {
-	//assert(X >= m_dXMin);
-	//assert(X <= m_dXMax);
+	//assert(X >= m_DXMin);
+	//assert(X <= m_DXMax);
 	return m_DXPosConvertRatio * X;
 }
 
@@ -180,8 +179,8 @@ double medOpMML3ParameterView::ConvertTommoMMLParameterViewY(double Y)
 {
 	double dMiddle;
 
-	//assert(Y >= m_dYMin);
-	//assert(Y <= m_dYMax);
+	//assert(Y >= m_DYMin);
+	//assert(Y <= m_DYMax);
 
  	dMiddle = 0.5 * ((double) (m_Height));
 
@@ -343,9 +342,9 @@ void medOpMML3ParameterView::AddPoint(double x, double y)
 {
 	ResetSpline();
 	m_PiecewiseFunction->AddPoint(ConvertTommoMMLParameterViewX(x),ConvertTommoMMLParameterViewY(y));
-   /* m_pDataPointsPolyDataPoints->Modified();
-	m_pPiecewiseFunction->Update();
-	m_pRenderWindow->Modified();*/
+   /* m_PDataPointsPolyDataPoints->Modified();
+	m_PPiecewiseFunction->Update();
+	m_PRenderWindow->Modified();*/
 
 }
 

@@ -1,19 +1,16 @@
 /*=========================================================================
-  Program:   Multimod Application Framework
-  Module:    $RCSfile: medOpMML3ContourWidget.cpp,v $
-  Language:  C++
-  Date:      $Date: 2009-05-29 11:05:29 $
-  Version:   $Revision: 1.1.2.1 $
-  Authors:   Mel Krokos
+Program:   Multimod Application Framework
+Module:    $RCSfile: medOpMML3ContourWidget.cpp,v $
+Language:  C++
+Date:      $Date: 2009-09-18 08:10:33 $
+Version:   $Revision: 1.1.2.2 $
+Authors:   Mel Krokos
 ==========================================================================
-  Copyright (c) 2002/2004
-  CINECA - Interuniversity Consortium (www.cineca.it) 
+Copyright (c) 2002/2004
+CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
 #include "mafDefines.h"
-
-//#include "MuscleRegistrationProject.h"   ///????????????
-#include "medOpMML3ContourWidget.h"
 
 #include "vtkAssemblyNode.h"
 #include "vtkAssemblyPath.h"
@@ -27,8 +24,12 @@
 #include "vtkProperty2D.h"
 #include "vtkCallbackCommand.h"
 
+#include "medOpMML3ContourWidget.h"
+#include "medOpMML3ModelView.h"
+#include "medOpMML3ParameterView.h"
 
-vtkCxxRevisionMacro(medOpMML3ContourWidget, "$Revision: 1.1.2.1 $");
+
+vtkCxxRevisionMacro(medOpMML3ContourWidget, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(medOpMML3ContourWidget);
 vtkCxxSetObjectMacro(medOpMML3ContourWidget, m_PlaneProperty, vtkProperty);
 
@@ -40,95 +41,86 @@ medOpMML3ContourWidget::medOpMML3ContourWidget()
 : vtkPolyDataSourceWidget()
 //----------------------------------------------------------------------------
 {
-  this->m_OperationID = 0; // first operation id is 0
-  this->m_BCenterMode = FALSE; // center mode off
-  this->m_BScalingMode = FALSE; // scaling mode off
-  this->m_BRotatingMode = FALSE; // rotating mode off
-  this->m_BTranslatingMode = FALSE; // translating mode off
+  this->m_OperationID = medOpMML3ContourWidget::NoOp;
+  this->m_PlaceMode = FALSE; // center mode off
+  this->m_ScalingMode = FALSE; // scaling mode off
+  this->m_RotatingMode = FALSE; // rotating mode off
+  this->m_TranslationMode = FALSE; // translating mode off
   this->m_State = medOpMML3ContourWidget::Start;
   this->EventCallbackCommand->SetCallback(medOpMML3ContourWidget::ProcessEvents);
-  
+
   this->m_NormalToXAxis = 0;
   this->m_NormalToYAxis = 0;
   this->m_NormalToZAxis = 0;
-  this->m_Representation = VTK_PLANE_WIREFRAME;
- 
-  
+  this->m_Representation = VTK_PLANE_SURFACE;
+
+
   this->SetHandleRadius(1.5);
 
 
-  //Build the representation of the widget
-  int i;
+  //----------------------------------------------------------------------------
   // Represent the plane
+  //----------------------------------------------------------------------------
   this->m_PlaneSource = vtkPlaneSource::New();
   this->m_PlaneSource->SetXResolution(4);
   this->m_PlaneSource->SetYResolution(4);
-  this->m_PlaneOutline = vtkPolyData::New();
-  this->m_PlaneOutlineTubes = vtkTubeFilter::New(); // MK
-  this->m_PlaneOutlineTubes->SetInput(this->m_PlaneOutline); // Mk
-  
-  vtkPoints *pts = vtkPoints::New();
-  pts->SetNumberOfPoints(4);
-  vtkCellArray *outline = vtkCellArray::New();
-  outline->InsertNextCell(4);
-  outline->InsertCellPoint(0);
-  outline->InsertCellPoint(1);
-  outline->InsertCellPoint(2);
-  outline->InsertCellPoint(3);
-  this->m_PlaneOutline->SetPoints(pts);
-  pts->Delete();
-  this->m_PlaneOutline->SetPolys(outline);
-  outline->Delete();
-  
+
   this->m_PlaneMapper = vtkPolyDataMapper::New();
   this->m_PlaneMapper->SetInput(this->m_PlaneSource->GetOutput());
   this->m_PlaneActor = vtkActor::New();
   this->m_PlaneActor->SetMapper(this->m_PlaneMapper);
 
+
+
+
+  //----------------------------------------------------------------------------
   // Create the handles
-  this->m_Handle = new vtkActor* [4];
+  //----------------------------------------------------------------------------
+  this->m_HandleActor = new vtkActor* [4];
   this->m_HandleMapper = new vtkPolyDataMapper* [4];
   this->m_HandleGeometry = new vtkSphereSource* [4];
-  for (i=0; i<4; i++){
-    this->m_Handle[i] = vtkActor::New();
-    this->m_HandleMapper[i] = vtkPolyDataMapper::New();
+  for (int i=0; i<4; i++){
     this->m_HandleGeometry[i] = vtkSphereSource::New();
     this->m_HandleGeometry[i]->SetThetaResolution(16);
     this->m_HandleGeometry[i]->SetPhiResolution(8);
+
+    this->m_HandleMapper[i] = vtkPolyDataMapper::New();
     this->m_HandleMapper[i]->SetInput(this->m_HandleGeometry[i]->GetOutput());
-    this->m_Handle[i]->SetMapper(this->m_HandleMapper[i]);
+
+    this->m_HandleActor[i] = vtkActor::New();
+    this->m_HandleActor[i]->SetMapper(this->m_HandleMapper[i]);
   }
 
   // handles off
-  for (i=0; i<4; i++)
-    this->m_Handle[i]->VisibilityOff();
+  for (int i=0; i<4; i++)
+    this->m_HandleActor[i]->VisibilityOff();
 
 
   // rotational handle
-  this->m_RotationalHandle = vtkActor::New();
+  this->m_RotationalHandleActor = vtkActor::New();
   this->m_RotationalHandleMapper = vtkPolyDataMapper::New();
   this->m_RotationalHandleGeometry = vtkSphereSource::New();
   this->m_RotationalHandleGeometry->SetThetaResolution(16);
   this->m_RotationalHandleGeometry->SetPhiResolution(8);
   this->m_RotationalHandleMapper->SetInput(this->m_RotationalHandleGeometry->GetOutput());
-  this->m_RotationalHandle->SetMapper(this->m_RotationalHandleMapper);
+  this->m_RotationalHandleActor->SetMapper(this->m_RotationalHandleMapper);
 
   // rotational handle off
-  this->m_RotationalHandle->VisibilityOff();
+  this->m_RotationalHandleActor->VisibilityOff();
 
 
   // center handle
-  this->m_CenterHandle = vtkActor::New();
+  this->m_CenterHandleActor = vtkActor::New();
   this->m_CenterHandleMapper = vtkPolyDataMapper::New();
   this->m_CenterHandleGeometry = vtkSphereSource::New();
   this->m_CenterHandleGeometry->SetThetaResolution(16);
   this->m_CenterHandleGeometry->SetPhiResolution(8);
   this->m_CenterHandleMapper->SetInput(this->m_CenterHandleGeometry->GetOutput());
-  this->m_CenterHandle->SetMapper(this->m_CenterHandleMapper);
+  this->m_CenterHandleActor->SetMapper(this->m_CenterHandleMapper);
 
   // center handle off
-  this->m_CenterHandle->VisibilityOff();
-   
+  this->m_CenterHandleActor->VisibilityOff();
+
 
   // Create the + plane normal
   this->m_LineSource = vtkLineSource::New();
@@ -162,45 +154,46 @@ medOpMML3ContourWidget::medOpMML3ContourWidget()
   this->m_ConeActor2 = vtkActor::New();
   this->m_ConeActor2->SetMapper(this->m_ConeMapper2);
 
-  this->m_Transform = vtkTransform::New();
 
-  // Define the point coordinates
-  double bounds[6];
-  bounds[0] = -0.5;
-  bounds[1] = 0.5;
-  bounds[2] = -0.5;
-  bounds[3] = 0.5;
-  bounds[4] = -0.5;
-  bounds[5] = 0.5;
+  //----------------------------------------------------------------------------
+  // Initialize position of widget and handles
+  //----------------------------------------------------------------------------
+  double bounds[6] = {-0.5, 0.5, -0.5, 0.5, 0.0, 0.0} ;
+  this->PlaceWidget(bounds) ;
+  SetHandle0(0, -0.5, 0) ;
+  SetHandle1(0.5, 0, 0) ;
+  SetHandle2(-0.5, 0, 0) ;
+  SetHandle3(0, 0.5, 0) ;
+  SetRotationalHandle(0,0,0) ;
+  SetCenterHandle(0,0,0) ;
 
-  // Initial creation of the widget, serves to initialize it
-  this->PlaceWidget(bounds);
+
 
   //Manage the picking stuff
   this->m_HandlePicker = vtkCellPicker::New();
   this->m_HandlePicker->SetTolerance(0.001);
-  for (i=0; i<4; i++)
-    {
-    this->m_HandlePicker->AddPickList(this->m_Handle[i]);
-    }
+  for (int i=0; i<4; i++)
+  {
+    this->m_HandlePicker->AddPickList(this->m_HandleActor[i]);
+  }
   this->m_HandlePicker->PickFromListOn();
 
   this->m_PlanePicker = vtkCellPicker::New();
   this->m_PlanePicker->SetTolerance(0.005); //need some fluff
   this->m_PlanePicker->AddPickList(this->m_PlaneActor);
-  this->m_PlanePicker->AddPickList(this->m_RotationalHandle);
-  this->m_PlanePicker->AddPickList(this->m_CenterHandle);
+  this->m_PlanePicker->AddPickList(this->m_RotationalHandleActor);
+  this->m_PlanePicker->AddPickList(this->m_CenterHandleActor);
   //this->PlanePicker->AddPickList(this->ConeActor);
   //this->PlanePicker->AddPickList(this->LineActor);
   //this->PlanePicker->AddPickList(this->ConeActor2);
   //this->PlanePicker->AddPickList(this->LineActor2);
   this->m_PlanePicker->PickFromListOn();
-  
+
   this->m_CurrentHandle = NULL;
 
   // Set up the initial properties
   this->CreateDefaultProperties();
-  
+
   this->SelectRepresentation();
 }
 
@@ -212,25 +205,23 @@ medOpMML3ContourWidget::~medOpMML3ContourWidget()
 //----------------------------------------------------------------------------
 {
   this->m_PlaneSource->Delete();
-  this->m_PlaneOutline->Delete();
-  this->m_PlaneOutlineTubes->Delete();
   this->m_PlaneMapper->Delete();
   this->m_PlaneActor->Delete();
 
   for (int i=0; i<4; i++){
     this->m_HandleGeometry[i]->Delete();
     this->m_HandleMapper[i]->Delete();
-    this->m_Handle[i]->Delete();
+    this->m_HandleActor[i]->Delete();
   }
-  delete [] this->m_Handle;
+  delete [] this->m_HandleActor;
   delete [] this->m_HandleMapper;
   delete [] this->m_HandleGeometry;
 
-  m_RotationalHandle->Delete() ;
+  m_RotationalHandleActor->Delete() ;
   m_RotationalHandleMapper->Delete() ;
   m_RotationalHandleGeometry->Delete() ;
 
-  m_CenterHandle->Delete() ;
+  m_CenterHandleActor->Delete() ;
   m_CenterHandleMapper->Delete() ;
   m_CenterHandleGeometry->Delete() ;
 
@@ -250,11 +241,9 @@ medOpMML3ContourWidget::~medOpMML3ContourWidget()
   this->m_ConeMapper2->Delete();
   this->m_ConeSource2->Delete();
 
-  this->m_Transform->Delete();
-
   this->m_HandlePicker->Delete();
   this->m_PlanePicker->Delete();
-  
+
   DeleteDefaultProperties() ;
 }
 
@@ -265,49 +254,49 @@ void medOpMML3ContourWidget::SetEnabled(int enabling)
 //----------------------------------------------------------------------------
 {
   if ( ! this->Interactor )
-    {
+  {
     vtkErrorMacro(<<"The interactor must be set prior to enabling/disabling widget");
     return;
-    }
+  }
 
   if ( enabling ) 
-    {
+  {
     vtkDebugMacro(<<"Enabling plane widget");
 
     if ( this->Enabled ) //already enabled, just return
-      {
+    {
       return;
-      }
-    
+    }
+
     if ( ! this->CurrentRenderer )
-      {
+    {
       this->SetCurrentRenderer(this->Interactor->FindPokedRenderer(
         this->Interactor->GetLastEventPosition()[0],
         this->Interactor->GetLastEventPosition()[1]));
       if (this->CurrentRenderer == NULL)
-        {
+      {
         return;
-        }
       }
+    }
 
     this->Enabled = 1;
 
     // listen for the following events
     vtkRenderWindowInteractor *i = this->Interactor;
     i->AddObserver(vtkCommand::MouseMoveEvent, this->EventCallbackCommand, 
-                   this->Priority);
+      this->Priority);
     i->AddObserver(vtkCommand::LeftButtonPressEvent, 
-                   this->EventCallbackCommand, this->Priority);
+      this->EventCallbackCommand, this->Priority);
     i->AddObserver(vtkCommand::LeftButtonReleaseEvent, 
-                   this->EventCallbackCommand, this->Priority);
+      this->EventCallbackCommand, this->Priority);
     i->AddObserver(vtkCommand::MiddleButtonPressEvent, 
-                   this->EventCallbackCommand, this->Priority);
+      this->EventCallbackCommand, this->Priority);
     i->AddObserver(vtkCommand::MiddleButtonReleaseEvent, 
-                   this->EventCallbackCommand, this->Priority);
+      this->EventCallbackCommand, this->Priority);
     i->AddObserver(vtkCommand::RightButtonPressEvent, 
-                   this->EventCallbackCommand, this->Priority);
+      this->EventCallbackCommand, this->Priority);
     i->AddObserver(vtkCommand::RightButtonReleaseEvent, 
-                   this->EventCallbackCommand, this->Priority);
+      this->EventCallbackCommand, this->Priority);
 
     // Add the plane
     this->CurrentRenderer->AddActor(this->m_PlaneActor);
@@ -315,22 +304,22 @@ void medOpMML3ContourWidget::SetEnabled(int enabling)
 
     // turn on the handles
     for (int j=0; j<4; j++)
-      {
-      this->CurrentRenderer->AddActor(this->m_Handle[j]);
+    {
+      this->CurrentRenderer->AddActor(this->m_HandleActor[j]);
       //this->Handle[j]->SetProperty(this->HandleProperty);
-      }
+    }
 
-	// colours
-	this->m_Handle[0]->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
-	this->m_Handle[3]->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
-	this->m_Handle[2]->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
-	this->m_Handle[1]->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
+    // colours
+    this->m_HandleActor[0]->GetProperty()->SetColor(0.0, 1.0, 0.0); // green
+    this->m_HandleActor[3]->GetProperty()->SetColor(1.0, 0.0, 0.0); // red
+    this->m_HandleActor[2]->GetProperty()->SetColor(1.0, 0.0, 1.0); // magenta
+    this->m_HandleActor[1]->GetProperty()->SetColor(0.0, 0.0, 1.0); // blue
 
-	this->CurrentRenderer->AddActor(this->m_RotationalHandle);
-	this->m_RotationalHandle->SetProperty(this->m_HandleProperty);
+    this->CurrentRenderer->AddActor(this->m_RotationalHandleActor);
+    this->m_RotationalHandleActor->SetProperty(this->m_HandleProperty);
 
-	this->CurrentRenderer->AddActor(this->m_CenterHandle);
-	this->m_CenterHandle->SetProperty(this->m_HandleProperty);
+    this->CurrentRenderer->AddActor(this->m_CenterHandleActor);
+    this->m_CenterHandleActor->SetProperty(this->m_HandleProperty);
 
     // add the normal vector
     /*this->CurrentRenderer->AddActor(this->LineActor);
@@ -344,17 +333,17 @@ void medOpMML3ContourWidget::SetEnabled(int enabling)
 
     this->SelectRepresentation();
     this->InvokeEvent(vtkCommand::EnableEvent,NULL);
-    }
-  
+  }
+
   else //disabling----------------------------------------------------------
-    {
+  {
     vtkDebugMacro(<<"Disabling plane widget");
 
     if ( ! this->Enabled ) //already disabled, just return
-      {
+    {
       return;
-      }
-    
+    }
+
     this->Enabled = 0;
 
     // don't listen for events any more
@@ -365,14 +354,14 @@ void medOpMML3ContourWidget::SetEnabled(int enabling)
 
     // turn off the handles
     for (int i=0; i<4; i++)
-      {
-      this->CurrentRenderer->RemoveActor(this->m_Handle[i]);
-      }
+    {
+      this->CurrentRenderer->RemoveActor(this->m_HandleActor[i]);
+    }
 
-	this->CurrentRenderer->RemoveActor(this->m_RotationalHandle);
-	this->CurrentRenderer->RemoveActor(this->m_CenterHandle);
+    this->CurrentRenderer->RemoveActor(this->m_RotationalHandleActor);
+    this->CurrentRenderer->RemoveActor(this->m_CenterHandleActor);
     // turn off the normal vector
-   /* this->CurrentRenderer->RemoveActor(this->LineActor);
+    /* this->CurrentRenderer->RemoveActor(this->LineActor);
     this->CurrentRenderer->RemoveActor(this->ConeActor);
     this->CurrentRenderer->RemoveActor(this->LineActor2);
     this->CurrentRenderer->RemoveActor(this->ConeActor2);*/
@@ -380,7 +369,7 @@ void medOpMML3ContourWidget::SetEnabled(int enabling)
     this->m_CurrentHandle = NULL;
     this->InvokeEvent(vtkCommand::DisableEvent,NULL);
     this->SetCurrentRenderer(NULL) ;
-    }
+  }
 
   this->Interactor->Render();
 }
@@ -389,125 +378,42 @@ void medOpMML3ContourWidget::SetEnabled(int enabling)
 
 //----------------------------------------------------------------------------
 void medOpMML3ContourWidget::ProcessEvents(vtkObject* vtkNotUsed(object), 
-                                   unsigned long event,
-                                   void* clientdata, 
-                                   void* vtkNotUsed(calldata))
-//----------------------------------------------------------------------------
+                                           unsigned long event,
+                                           void* clientdata, 
+                                           void* vtkNotUsed(calldata))
+                                           //----------------------------------------------------------------------------
 {
   medOpMML3ContourWidget* self = reinterpret_cast<medOpMML3ContourWidget *>( clientdata );
 
   //okay, let's do the right thing
   switch(event)
-    {
-    case vtkCommand::LeftButtonPressEvent:
-      self->OnLeftButtonDown();
-      break;
-    case vtkCommand::LeftButtonReleaseEvent:
-      self->OnLeftButtonUp();
-      break;
-    case vtkCommand::MiddleButtonPressEvent:
-      //self->OnMiddleButtonDown();
-		self->OnLeftButtonDown();
-      break;
-    case vtkCommand::MiddleButtonReleaseEvent:
-      //self->OnMiddleButtonUp();
-		self->OnLeftButtonUp();
-      break;
-    case vtkCommand::RightButtonPressEvent:
-      //self->OnRightButtonDown();
-		self->OnLeftButtonDown();
-      break;
-    case vtkCommand::RightButtonReleaseEvent:
-      //self->OnRightButtonUp();
-		self->OnLeftButtonUp();
-      break;
-    case vtkCommand::MouseMoveEvent:
-      self->OnMouseMove();
-      break;
-    }
-}
-
-
-
-//----------------------------------------------------------------------------
-// print self
-void medOpMML3ContourWidget::PrintSelf(ostream& os, vtkIndent indent)
-//----------------------------------------------------------------------------
-{
-  this->Superclass::PrintSelf(os,indent);
-
-  if ( this->m_HandleProperty )
-    {
-    os << indent << "Handle Property: " << this->m_HandleProperty << "\n";
-    }
-  else
-    {
-    os << indent << "Handle Property: (none)\n";
-    }
-  if ( this->m_SelectedHandleProperty )
-    {
-    os << indent << "Selected Handle Property: " 
-       << this->m_SelectedHandleProperty << "\n";
-    }
-  else
-    {
-    os << indent << "SelectedHandle Property: (none)\n";
-    }
-
-  if ( this->m_PlaneProperty )
-    {
-    os << indent << "Plane Property: " << this->m_PlaneProperty << "\n";
-    }
-  else
-    {
-    os << indent << "Plane Property: (none)\n";
-    }
-  if ( this->m_SelectedPlaneProperty )
-    {
-    os << indent << "Selected Plane Property: " 
-       << this->m_SelectedPlaneProperty << "\n";
-    }
-  else
-    {
-    os << indent << "Selected Plane Property: (none)\n";
-    }
-
-  os << indent << "Plane Representation: ";
-  if ( this->m_Representation == VTK_PLANE_WIREFRAME )
-    {
-    os << "Wireframe\n";
-    }
-  else if ( this->m_Representation == VTK_PLANE_SURFACE )
-    {
-    os << "Surface\n";
-    }
-  else //( this->Representation == VTK_PLANE_OUTLINE )
-    {
-    os << "Outline\n";
-    }
-
-  os << indent << "Normal To X Axis: " 
-     << (this->m_NormalToXAxis ? "On" : "Off") << "\n";
-  os << indent << "Normal To Y Axis: " 
-     << (this->m_NormalToYAxis ? "On" : "Off") << "\n";
-  os << indent << "Normal To Z Axis: " 
-     << (this->m_NormalToZAxis ? "On" : "Off") << "\n";
-
-  int res = this->m_PlaneSource->GetXResolution();
-  double *o = this->m_PlaneSource->GetOrigin();
-  double *pt1 = this->m_PlaneSource->GetPoint1();
-  double *pt2 = this->m_PlaneSource->GetPoint2();
-
-  os << indent << "Resolution: " << res << "\n";
-  os << indent << "Origin: (" << o[0] << ", "
-     << o[1] << ", "
-     << o[2] << ")\n";
-  os << indent << "Point 1: (" << pt1[0] << ", "
-     << pt1[1] << ", "
-     << pt1[2] << ")\n";
-  os << indent << "Point 2: (" << pt2[0] << ", "
-     << pt2[1] << ", "
-     << pt2[2] << ")\n";
+  {
+  case vtkCommand::LeftButtonPressEvent:
+    self->OnLeftButtonDown();
+    break;
+  case vtkCommand::LeftButtonReleaseEvent:
+    self->OnLeftButtonUp();
+    break;
+  case vtkCommand::MiddleButtonPressEvent:
+    //self->OnMiddleButtonDown();
+    self->OnLeftButtonDown();
+    break;
+  case vtkCommand::MiddleButtonReleaseEvent:
+    //self->OnMiddleButtonUp();
+    self->OnLeftButtonUp();
+    break;
+  case vtkCommand::RightButtonPressEvent:
+    //self->OnRightButtonDown();
+    self->OnLeftButtonDown();
+    break;
+  case vtkCommand::RightButtonReleaseEvent:
+    //self->OnRightButtonUp();
+    self->OnLeftButtonUp();
+    break;
+  case vtkCommand::MouseMoveEvent:
+    self->OnMouseMove();
+    break;
+  }
 }
 
 
@@ -516,7 +422,7 @@ void medOpMML3ContourWidget::PrintSelf(ostream& os, vtkIndent indent)
 void medOpMML3ContourWidget::PositionHandles(float X, float Y)
 //----------------------------------------------------------------------------
 {
- /* //int res = this->PlaneSource->GetXResolution();
+  /* //int res = this->PlaneSource->GetXResolution();
   float *o = this->PlaneSource->GetOrigin();
   float *pt1 = this->PlaneSource->GetPoint1();
   float *pt2 = this->PlaneSource->GetPoint2();
@@ -525,7 +431,7 @@ void medOpMML3ContourWidget::PositionHandles(float X, float Y)
   x[0] = o[0] + (pt1[0]-o[0]) + (pt2[0]-o[0]);
   x[1] = o[1] + (pt1[1]-o[1]) + (pt2[1]-o[1]);
   x[2] = o[2] + (pt1[2]-o[2]) + (pt2[2]-o[2]);
-  
+
   float handle0[3]; // south - green
   handle0[0] = o[0] + X * (pt1[0] - o[0]);
   handle0[1] = o[1] + X * (pt1[1] - o[1]);
@@ -559,13 +465,13 @@ void medOpMML3ContourWidget::PositionHandles(float X, float Y)
 
   // set up the outline
   if ( this->Representation == VTK_PLANE_OUTLINE )
-    {
-    this->PlaneOutline->GetPoints()->SetPoint(0,o);
-    this->PlaneOutline->GetPoints()->SetPoint(1,pt1);
-    this->PlaneOutline->GetPoints()->SetPoint(2,x);
-    this->PlaneOutline->GetPoints()->SetPoint(3,pt2);
-    this->PlaneOutline->Modified();
-    }
+  {
+  this->PlaneOutline->GetPoints()->SetPoint(0,o);
+  this->PlaneOutline->GetPoints()->SetPoint(1,pt1);
+  this->PlaneOutline->GetPoints()->SetPoint(2,x);
+  this->PlaneOutline->GetPoints()->SetPoint(3,pt2);
+  this->PlaneOutline->Modified();
+  }
   this->SelectRepresentation();
 
   // Create the normal vector
@@ -577,8 +483,8 @@ void medOpMML3ContourWidget::PositionHandles(float X, float Y)
   this->PlaneSource->GetNormal(this->Normal);
   vtkMath::Normalize(this->Normal);
   float d = sqrt( 
-    vtkMath::Distance2BetweenPoints(
-      this->PlaneSource->GetPoint1(),this->PlaneSource->GetPoint2()) );
+  vtkMath::Distance2BetweenPoints(
+  this->PlaneSource->GetPoint1(),this->PlaneSource->GetPoint2()) );
 
   p2[0] = center[0] + 0.35 * d * this->Normal[0];
   p2[1] = center[1] + 0.35 * d * this->Normal[1];
@@ -603,26 +509,26 @@ int medOpMML3ContourWidget::HighlightHandle(vtkProp *prop)
 {
   // first unhighlight anything picked
   if ( this->m_CurrentHandle )
-    {
+  {
     //this->CurrentHandle->SetProperty(this->HandleProperty);
-    }
+  }
 
   this->m_CurrentHandle = (vtkActor *)prop;
 
   if ( this->m_CurrentHandle )
-    {
+  {
     this->ValidPick = 1;
     this->m_HandlePicker->GetPickPosition(this->LastPickPosition);
     //this->CurrentHandle->SetProperty(this->SelectedHandleProperty);
     for (int i=0; i<4; i++) //find handle
+    {
+      if ( this->m_CurrentHandle == this->m_HandleActor[i] )
       {
-      if ( this->m_CurrentHandle == this->m_Handle[i] )
-        {
         return i;
-        }
       }
     }
-  
+  }
+
   return -1;
 }
 
@@ -633,21 +539,21 @@ void medOpMML3ContourWidget::HighlightNormal(int highlight)
 //----------------------------------------------------------------------------
 {
   if ( highlight )
-    {
+  {
     this->ValidPick = 1;
     this->m_PlanePicker->GetPickPosition(this->LastPickPosition);
     this->m_LineActor->SetProperty(this->m_SelectedHandleProperty);
     this->m_ConeActor->SetProperty(this->m_SelectedHandleProperty);
     this->m_LineActor2->SetProperty(this->m_SelectedHandleProperty);
     this->m_ConeActor2->SetProperty(this->m_SelectedHandleProperty);
-    }
+  }
   else
-    {
+  {
     this->m_LineActor->SetProperty(this->m_HandleProperty);
     this->m_ConeActor->SetProperty(this->m_HandleProperty);
     this->m_LineActor2->SetProperty(this->m_HandleProperty);
     this->m_ConeActor2->SetProperty(this->m_HandleProperty);
-    }
+  }
 }
 
 
@@ -657,15 +563,15 @@ void medOpMML3ContourWidget::HighlightPlane(int highlight)
 //----------------------------------------------------------------------------
 {
   if ( highlight )
-    {
+  {
     this->ValidPick = 1;
     this->m_PlanePicker->GetPickPosition(this->LastPickPosition);
     this->m_PlaneActor->SetProperty(this->m_SelectedPlaneProperty);
-    }
+  }
   else
-    {
+  {
     this->m_PlaneActor->SetProperty(this->m_PlaneProperty);
-    }
+  }
 }
 
 
@@ -680,101 +586,87 @@ void medOpMML3ContourWidget::OnLeftButtonDown()
   // Okay, make sure that the pick is in the current renderer
   vtkRenderer *ren = this->Interactor->FindPokedRenderer(X,Y);
   if ( ren != this->CurrentRenderer )
-    {
-    this->m_State = medOpMML3ContourWidget::Outside;
+  {
+    this->m_State = medOpMML3ContourWidget::Outside; // Widget state = Outside
     return;
-    }
-  
+  }
+
   // Okay, we can process this. Try to pick handles first;
   // if no handles picked, then try to pick the plane.
+  // Note that the plane picker's objects include the rotational handle.
+  // Note that the widget state "moving" is set for everything except the rotation handle.
   vtkAssemblyPath *path;
   this->m_HandlePicker->Pick(X,Y,0.0,this->CurrentRenderer);
   path = this->m_HandlePicker->GetPath();
-  if ( path != NULL )
-    {
-    this->m_State = medOpMML3ContourWidget::Moving;
+  if ( path != NULL ){
+    this->m_State = medOpMML3ContourWidget::Moving; // Widget state = Moving
+
     this->HighlightHandle(path->GetFirstNode()->GetProp());
 
-	if (GetScalingMode())
-	{
-			if (this->m_CurrentHandle)
-			{
-				if (this->m_CurrentHandle == this->m_Handle[0])
-				{
-					// begin s-s op
-					this->m_Operation = medOpMML3ContourWidget::SouthScale;
-				}
-				else
-				if (this->m_CurrentHandle == this->m_Handle[1])
-				{
-					// begin s-e op
-					this->m_Operation = medOpMML3ContourWidget::EastScale;
-				}
-				else
-				if (this->m_CurrentHandle == this->m_Handle[2])
-				{
-					// begin s-w op
-					this->m_Operation = medOpMML3ContourWidget::WestScale;
-				}
-				else
-				if (this->m_CurrentHandle == this->m_Handle[3])
-				{
-					// begin s-n op
-					this->m_Operation = medOpMML3ContourWidget::NorthScale;
-				}
-			}
-	}
-
+    if (GetScalingMode()){
+      if (this->m_CurrentHandle){
+        if (this->m_CurrentHandle == this->m_HandleActor[0]){
+          // begin s-s op
+          this->m_Operation = medOpMML3ContourWidget::SouthScale;
+        }
+        else if (this->m_CurrentHandle == this->m_HandleActor[1]){
+          // begin s-e op
+          this->m_Operation = medOpMML3ContourWidget::EastScale;
+        }
+        else if (this->m_CurrentHandle == this->m_HandleActor[2]){
+          // begin s-w op
+          this->m_Operation = medOpMML3ContourWidget::WestScale;
+        }
+        else if (this->m_CurrentHandle == this->m_HandleActor[3]){
+          // begin s-n op
+          this->m_Operation = medOpMML3ContourWidget::NorthScale;
+        }
+      }
     }
-  else
-    {
+  }
+  else{
     this->m_PlanePicker->Pick(X,Y,0.0,this->CurrentRenderer);
     path = this->m_PlanePicker->GetPath();
-    if ( path != NULL )
-      {
+    if ( path != NULL ){
       vtkProp *prop = path->GetFirstNode()->GetProp();
       if (/* prop == this->ConeActor || prop == this->LineActor ||
-           prop == this->ConeActor2 || prop == this->LineActor2*/
-		   prop == this->m_RotationalHandle)
-        {
-        this->m_State = medOpMML3ContourWidget::Rotating;
+          prop == this->ConeActor2 || prop == this->LineActor2*/
+          prop == this->m_RotationalHandleActor)
+      {
+        this->m_State = medOpMML3ContourWidget::Rotating; // Widget state = Rotating
         this->HighlightNormal(1);
 
-		// begin r-op
-		this->m_Operation = medOpMML3ContourWidget::Rotation;
-        }
-     /* else
-	  if (prop == this->CenterHandle)
-        {
-        this->State = medOpMML3ContourWidget::Centralising;
-        this->HighlightNormal(1);
-        }*/
-	  else
-        {
-        this->m_State = medOpMML3ContourWidget::Moving;
+        // begin r-op
+        this->m_Operation = medOpMML3ContourWidget::Rotation;
+      }
+      /* else
+      if (prop == this->CenterHandle)
+      {
+      this->State = medOpMML3ContourWidget::Centralising;
+      this->HighlightNormal(1);
+      }*/
+      else{
+        this->m_State = medOpMML3ContourWidget::Moving; // Widget state = Moving
         this->HighlightPlane(1);
 
-		if (GetTranslationMode())
-		{
-			// begin t-op
-			this->m_Operation = medOpMML3ContourWidget::Translation;
-		}
-		else
-		if (GetCenterMode())
-		{
-			// begin p-op
-			this->m_Operation = medOpMML3ContourWidget::Placement;
-		}
-       }
+        if (GetTranslationMode()){
+          // begin t-op
+          this->m_Operation = medOpMML3ContourWidget::Translation;
+        }
+        else if (GetCenterMode()){
+          // begin p-op
+          this->m_Operation = medOpMML3ContourWidget::Placement;
+        }
       }
-    else
-      {
+    }
+    else{
+      // Nothing picked
       this->m_State = medOpMML3ContourWidget::Outside;
       this->HighlightHandle(NULL);
       return;
-      }
     }
-  
+  }
+
   this->EventCallbackCommand->SetAbortFlag(1);
   this->StartInteraction();
   this->InvokeEvent(vtkCommand::StartInteractionEvent,NULL);
@@ -788,193 +680,193 @@ void medOpMML3ContourWidget::OnLeftButtonUp()
 //----------------------------------------------------------------------------
 {
   if ( this->m_State == medOpMML3ContourWidget::Outside ||
-       this->m_State == medOpMML3ContourWidget::Start )
-    {
+    this->m_State == medOpMML3ContourWidget::Start )
+  {
     return;
-    }
+  }
 
   // 1. switch off display information
-  m_Model->GetScaledTextActor1()->VisibilityOff();
-  m_Model->GetScaledTextActor2()->VisibilityOff();
+  m_Model->GetVisualPipe2D()->SetTextXVisibility(0) ;
+  m_Model->GetVisualPipe2D()->SetTextYVisibility(0) ;
 
   // 2. save undo parameters
   double params[5];
   //float flag;
 
   // slice id
-  params[0] = m_Model->GetCurrentIdOfSyntheticScans();
+  params[0] = m_Model->GetCurrentIdOfScans();
 
-  // z level
-  params[1] = m_Model->GetCurrentZOfSyntheticScans();
+  // slice zeta
+  params[1] = m_Model->GetZetaOfCurrentSlice();
 
   // operation type
   params[2] = m_Operation;
 
   switch (m_Operation)
   {
-    case medOpMML3ContourWidget::Placement : //
-		                params[3] = m_Model->GetPHSpline()->Evaluate(params[1]);
-						params[4] = m_Model->GetPVSpline()->Evaluate(params[1]);
-	break;
+  case medOpMML3ContourWidget::Placement : //
+    params[3] = m_Model->GetPHSpline()->Evaluate(params[1]);
+    params[4] = m_Model->GetPVSpline()->Evaluate(params[1]);
+    break;
 
-	case medOpMML3ContourWidget::Translation : //
-						params[3] = m_Model->GetTHSpline()->Evaluate(params[1]);
-						params[4] = m_Model->GetTVSpline()->Evaluate(params[1]);
-	break;
+  case medOpMML3ContourWidget::Translation : //
+    params[3] = m_Model->GetTHSpline()->Evaluate(params[1]);
+    params[4] = m_Model->GetTVSpline()->Evaluate(params[1]);
+    break;
 
-	case medOpMML3ContourWidget::Rotation : //
-						params[3] = m_Model->GetRASpline()->Evaluate(params[1]);
-						params[4] = 0.0;
-	break;
+  case medOpMML3ContourWidget::Rotation : //
+    params[3] = m_Model->GetRASpline()->Evaluate(params[1]);
+    params[4] = 0.0;
+    break;
 
-	case medOpMML3ContourWidget::NorthScale : //
-						params[3] = m_Model->GetSNSpline()->Evaluate(params[1]);
-						params[4] = 0.0;
-						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
-						if (flag == 0.0)
-							flag = 1.0;
-						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
-						if (!m_Model->GetScalingOccured())
-						{
-							m_Model->SetScalingOccured(true) ;
-							m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
+  case medOpMML3ContourWidget::NorthScale : //
+    params[3] = m_Model->GetSNSpline()->Evaluate(params[1]);
+    params[4] = 0.0;
+    /*M->ScalingFlagStack->GetTuple(params[0], &flag);
+    if (flag == 0.0)
+    flag = 1.0;
+    M->ScalingFlagStack->SetTuple(params[0], &flag);*/
+    if (!m_Model->GetScalingOccured())
+    {
+      m_Model->SetScalingOccured(true) ;
+      m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
 
-							// grey out twist, h/v translation views
+      // grey out twist, h/v translation views
 
-							// redraw curves
-							m_CH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CH->Render();
+      // redraw curves
+      m_PH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PH->Render();
 
-							m_CV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CV->Render();
+      m_PV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PV->Render();
 
-							m_T->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_T->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_T->Render();
+      m_RA->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_RA->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_RA->Render();
 
-							m_H->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_H->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_H->Render();
+      m_TH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TH->Render();
 
-							m_V->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_V->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_V->Render();
-						}
+      m_TV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TV->Render();
+    }
 
-	break;
+    break;
 
-	case medOpMML3ContourWidget::SouthScale : //
-						params[3] = m_Model->GetSSSpline()->Evaluate(params[1]);
-						params[4] = 0.0;
-						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
-						if (flag == 0.0)
-							flag = 1.0;
-						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
-						if (!m_Model->GetScalingOccured())
-						{
-							m_Model->SetScalingOccured(true) ;
-							m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
+  case medOpMML3ContourWidget::SouthScale : //
+    params[3] = m_Model->GetSSSpline()->Evaluate(params[1]);
+    params[4] = 0.0;
+    /*M->ScalingFlagStack->GetTuple(params[0], &flag);
+    if (flag == 0.0)
+    flag = 1.0;
+    M->ScalingFlagStack->SetTuple(params[0], &flag);*/
+    if (!m_Model->GetScalingOccured())
+    {
+      m_Model->SetScalingOccured(true) ;
+      m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
 
-							// grey out twist, h/v translation views
+      // grey out twist, h/v translation views
 
-							// redraw curves
-							m_CH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CH->Render();
+      // redraw curves
+      m_PH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PH->Render();
 
-							m_CV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CV->Render();
+      m_PV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PV->Render();
 
-							m_T->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_T->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_T->Render();
+      m_RA->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_RA->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_RA->Render();
 
-							m_H->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_H->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_H->Render();
+      m_TH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TH->Render();
 
-							m_V->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_V->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_V->Render();
-						}
-	break;
+      m_TV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TV->Render();
+    }
+    break;
 
-	case medOpMML3ContourWidget::EastScale : //
-						params[3] = m_Model->GetSESpline()->Evaluate(params[1]);
-						params[4] = 0.0;
-						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
-						if (flag == 0.0)
-							flag = 1.0;
-						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
-						if (!m_Model->GetScalingOccured())
-						{
-							m_Model->SetScalingOccured(true) ;
-							m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
+  case medOpMML3ContourWidget::EastScale : //
+    params[3] = m_Model->GetSESpline()->Evaluate(params[1]);
+    params[4] = 0.0;
+    /*M->ScalingFlagStack->GetTuple(params[0], &flag);
+    if (flag == 0.0)
+    flag = 1.0;
+    M->ScalingFlagStack->SetTuple(params[0], &flag);*/
+    if (!m_Model->GetScalingOccured())
+    {
+      m_Model->SetScalingOccured(true) ;
+      m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
 
-							// grey out twist, h/v translation views
+      // grey out twist, h/v translation views
 
-							// redraw curves
-							m_CH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CH->Render();
+      // redraw curves
+      m_PH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PH->Render();
 
-							m_CV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CV->Render();
+      m_PV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PV->Render();
 
-							m_T->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_T->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_T->Render();
+      m_RA->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_RA->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_RA->Render();
 
-							m_H->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_H->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_H->Render();
+      m_TH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TH->Render();
 
-							m_V->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_V->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_V->Render();
-						}
-	break;
+      m_TV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TV->Render();
+    }
+    break;
 
-	case medOpMML3ContourWidget::WestScale : //
-						params[3] = m_Model->GetSWSpline()->Evaluate(params[1]);
-						params[4] = 0.0;
-						/*M->ScalingFlagStack->GetTuple(params[0], &flag);
-						if (flag == 0.0)
-							flag = 1.0;
-						M->ScalingFlagStack->SetTuple(params[0], &flag);*/
-						if (!m_Model->GetScalingOccured())
-						{
-							m_Model->SetScalingOccured(true) ;
-							m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
+  case medOpMML3ContourWidget::WestScale : //
+    params[3] = m_Model->GetSWSpline()->Evaluate(params[1]);
+    params[4] = 0.0;
+    /*M->ScalingFlagStack->GetTuple(params[0], &flag);
+    if (flag == 0.0)
+    flag = 1.0;
+    M->ScalingFlagStack->SetTuple(params[0], &flag);*/
+    if (!m_Model->GetScalingOccured())
+    {
+      m_Model->SetScalingOccured(true) ;
+      m_Model->SetScalingOccuredOperationId(GetNextOperationId()) ;
 
-							// grey out twist, h/v translation views
+      // grey out twist, h/v translation views
 
-							// redraw curves
-							m_CH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CH->Render();
+      // redraw curves
+      m_PH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PH->Render();
 
-							m_CV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_CV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_CV->Render();
+      m_PV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_PV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_PV->Render();
 
-							m_T->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_T->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_T->Render();
+      m_RA->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_RA->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_RA->Render();
 
-							m_H->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_H->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_H->Render();
+      m_TH->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TH->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TH->Render();
 
-							m_V->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
-							m_V->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
-							m_V->Render();
-						}
-	break;
+      m_TV->GetSplineActor()->GetProperty()->SetColor(0.5, 0.5, 0.5); // grey
+      m_TV->GetPointsActor()->GetProperty()->SetColor(0.5, 0.5, 0.5);
+      m_TV->Render();
+    }
+    break;
 
   }
 
@@ -1012,40 +904,40 @@ void medOpMML3ContourWidget::OnMiddleButtonDown()
   // Okay, make sure that the pick is in the current renderer
   vtkRenderer *ren = this->Interactor->FindPokedRenderer(X,Y);
   if ( ren != this->CurrentRenderer )
-    {
-    this->State = medOpMML3ContourWidget::Outside;
-    return;
-    }
-  
+  {
+  this->State = medOpMML3ContourWidget::Outside;
+  return;
+  }
+
   // Okay, we can process this. If anything is picked, then we
   // can start pushing the plane.
   vtkAssemblyPath *path;
   this->HandlePicker->Pick(X,Y,0.0,this->CurrentRenderer);
   path = this->HandlePicker->GetPath();
   if ( path != NULL )
-    {
-    this->State = medOpMML3ContourWidget::Pushing;
-    this->HighlightPlane(1);
-    this->HighlightNormal(1);
-    this->HighlightHandle(path->GetFirstNode()->GetProp());
-    }
+  {
+  this->State = medOpMML3ContourWidget::Pushing;
+  this->HighlightPlane(1);
+  this->HighlightNormal(1);
+  this->HighlightHandle(path->GetFirstNode()->GetProp());
+  }
   else
-    {
-    this->PlanePicker->Pick(X,Y,0.0,this->CurrentRenderer);
-    path = this->PlanePicker->GetPath();
-    if ( path == NULL ) //nothing picked
-      {
-      this->State = medOpMML3ContourWidget::Outside;
-      return;
-      }
-    else
-      {
-      this->State = medOpMML3ContourWidget::Pushing;
-      this->HighlightNormal(1);
-      this->HighlightPlane(1);
-      }
-    }
-  
+  {
+  this->PlanePicker->Pick(X,Y,0.0,this->CurrentRenderer);
+  path = this->PlanePicker->GetPath();
+  if ( path == NULL ) //nothing picked
+  {
+  this->State = medOpMML3ContourWidget::Outside;
+  return;
+  }
+  else
+  {
+  this->State = medOpMML3ContourWidget::Pushing;
+  this->HighlightNormal(1);
+  this->HighlightPlane(1);
+  }
+  }
+
   this->EventCallbackCommand->SetAbortFlag(1);
   this->StartInteraction();
   this->InvokeEvent(vtkCommand::StartInteractionEvent,NULL);
@@ -1061,17 +953,17 @@ void medOpMML3ContourWidget::OnMiddleButtonUp()
 {
   /*
   if ( this->State == medOpMML3ContourWidget::Outside ||
-       this->State == medOpMML3ContourWidget::Start )
-    {
-    return;
-    }
+  this->State == medOpMML3ContourWidget::Start )
+  {
+  return;
+  }
 
   this->State = medOpMML3ContourWidget::Start;
   this->HighlightPlane(0);
   this->HighlightNormal(0);
   this->HighlightHandle(NULL);
   this->SizeHandles();
-  
+
   this->EventCallbackCommand->SetAbortFlag(1);
   this->EndInteraction();
   this->InvokeEvent(vtkCommand::EndInteractionEvent,NULL);
@@ -1092,38 +984,38 @@ void medOpMML3ContourWidget::OnRightButtonDown()
   // Okay, make sure that the pick is in the current renderer
   vtkRenderer *ren = this->Interactor->FindPokedRenderer(X,Y);
   if ( ren != this->CurrentRenderer )
-    {
-    this->State = medOpMML3ContourWidget::Outside;
-    return;
-    }
-  
+  {
+  this->State = medOpMML3ContourWidget::Outside;
+  return;
+  }
+
   // Okay, we can process this. Try to pick handles first;
   // if no handles picked, then pick the bounding box.
   vtkAssemblyPath *path;
   this->HandlePicker->Pick(X,Y,0.0,this->CurrentRenderer);
   path = this->HandlePicker->GetPath();
   if ( path != NULL )
-    {
-    this->State = medOpMML3ContourWidget::Scaling;
-    this->HighlightPlane(1);
-    this->HighlightHandle(path->GetFirstNode()->GetProp());
-    }
+  {
+  this->State = medOpMML3ContourWidget::Scaling;
+  this->HighlightPlane(1);
+  this->HighlightHandle(path->GetFirstNode()->GetProp());
+  }
   else //see if we picked the plane or a normal
-    {
-    this->PlanePicker->Pick(X,Y,0.0,this->CurrentRenderer);
-    path = this->PlanePicker->GetPath();
-    if ( path == NULL )
-      {
-      this->State = medOpMML3ContourWidget::Outside;
-      return;
-      }
-    else
-      {
-      this->State = medOpMML3ContourWidget::Scaling;
-      this->HighlightPlane(1);
-      }
-    }
-  
+  {
+  this->PlanePicker->Pick(X,Y,0.0,this->CurrentRenderer);
+  path = this->PlanePicker->GetPath();
+  if ( path == NULL )
+  {
+  this->State = medOpMML3ContourWidget::Outside;
+  return;
+  }
+  else
+  {
+  this->State = medOpMML3ContourWidget::Scaling;
+  this->HighlightPlane(1);
+  }
+  }
+
   this->EventCallbackCommand->SetAbortFlag(1);
   this->StartInteraction();
   this->InvokeEvent(vtkCommand::StartInteractionEvent,NULL);
@@ -1139,15 +1031,15 @@ void medOpMML3ContourWidget::OnRightButtonUp()
 {
   /*
   if ( this->State == medOpMML3ContourWidget::Outside ||
-       this->State == medOpMML3ContourWidget::Start )
-    {
-    return;
-    }
+  this->State == medOpMML3ContourWidget::Start )
+  {
+  return;
+  }
 
   this->State = medOpMML3ContourWidget::Start;
   this->HighlightPlane(0);
   this->SizeHandles();
-  
+
   this->EventCallbackCommand->SetAbortFlag(1);
   this->EndInteraction();
   this->InvokeEvent(vtkCommand::EndInteractionEvent,NULL);
@@ -1162,12 +1054,9 @@ void medOpMML3ContourWidget::OnMouseMove()
 //----------------------------------------------------------------------------
 {
   // See whether we're active
-  if ( this->m_State == medOpMML3ContourWidget::Outside || 
-       this->m_State == medOpMML3ContourWidget::Start )
-    {
+  if ( this->m_State == medOpMML3ContourWidget::Outside || this->m_State == medOpMML3ContourWidget::Start )
     return;
-    }
-  
+
   int X = this->Interactor->GetEventPosition()[0];
   int Y = this->Interactor->GetEventPosition()[1];
 
@@ -1179,94 +1068,82 @@ void medOpMML3ContourWidget::OnMouseMove()
   vtkRenderer *renderer = this->Interactor->FindPokedRenderer(X,Y);
   vtkCamera *camera = renderer->GetActiveCamera();
   if ( !camera )
-    {
     return;
-    }
 
   // Compute the two points defining the motion vector
-  this->ComputeWorldToDisplay(this->LastPickPosition[0], this->LastPickPosition[1],
-                              this->LastPickPosition[2], focalPoint);
+  this->ComputeWorldToDisplay(this->LastPickPosition[0], this->LastPickPosition[1], this->LastPickPosition[2], focalPoint);
   z = focalPoint[2];
-  this->ComputeDisplayToWorld(double(this->Interactor->GetLastEventPosition()[0]),
-                              double(this->Interactor->GetLastEventPosition()[1]),
-                              z, prevPickPoint);
-  this->ComputeDisplayToWorld(double(X), double(Y), z, pickPoint);
+  this->ComputeDisplayToWorld((double)(this->Interactor->GetLastEventPosition()[0]), 
+    (double)(this->Interactor->GetLastEventPosition()[1]), z, prevPickPoint);
+  this->ComputeDisplayToWorld((double)X, (double)Y, z, pickPoint);
 
   // Process the motion
-  if ( this->m_State == medOpMML3ContourWidget::Moving )
-  {
-   // interaction operations
-   // using a contour widget
-   if (GetScalingMode()) // scaling
-   {
-    if (this->m_CurrentHandle)
-	{
-	 // display information on.
-	 // off in OnLeftButtonUp()
-	 m_Model->GetScaledTextActor1()->VisibilityOn();
+  if ( this->m_State == medOpMML3ContourWidget::Moving){
+    // interaction operations
+    // using a contour widget
+    if (GetScalingMode()){ // scaling
+      if (this->m_CurrentHandle){
+        // display information on.
+        // off in OnLeftButtonUp()
+        m_Model->GetVisualPipe2D()->SetTextYVisibility(1) ;
 
-     if (this->m_CurrentHandle == this->m_Handle[0]) // south scaling
-	 {
-	  
-      this->ScaleSouth(prevPickPoint, pickPoint);
-	 }
-     else
-	 if (this->m_CurrentHandle == this->m_Handle[1]) // east scaling
-	 {
-      this->ScaleEast(prevPickPoint, pickPoint);
-	 }
-     else
-	 if (this->m_CurrentHandle == this->m_Handle[2]) // west scaling
-	 {
-      this->ScaleWest(prevPickPoint, pickPoint);
-	 }
-     else
-     if (this->m_CurrentHandle == this->m_Handle[3]) // north scaling
-	 {
-      this->ScaleNorth(prevPickPoint, pickPoint);
-	 }
-	}
-   }
-   else
-   if (GetTranslationMode()) // translation
-   {
-	// display information on.
-	// off in OnLeftButtonUp()
-	m_Model->GetScaledTextActor1()->VisibilityOn(); 
-	m_Model->GetScaledTextActor2()->VisibilityOn();
-	this->Translate(prevPickPoint, pickPoint);
-   }
-   else
-   if (GetCenterMode()) // place
-   {
-	// display information on.
-	// off in OnLeftButtonUp()
-	m_Model->GetScaledTextActor1()->VisibilityOn(); 
-	m_Model->GetScaledTextActor2()->VisibilityOn();
+        if (this->m_CurrentHandle == this->m_HandleActor[0]){ // south scaling
+          this->ScaleSouth(prevPickPoint, pickPoint);
+        }
+        else if (this->m_CurrentHandle == this->m_HandleActor[1]) // east scaling
+        {
+          this->ScaleEast(prevPickPoint, pickPoint);
+        }
+        else if (this->m_CurrentHandle == this->m_HandleActor[2]) // west scaling
+        {
+          this->ScaleWest(prevPickPoint, pickPoint);
+        }
+        else if (this->m_CurrentHandle == this->m_HandleActor[3]) // north scaling
+        {
+          this->ScaleNorth(prevPickPoint, pickPoint);
+        }
+      }
+    }
+    else if (GetTranslationMode()) // translation
+    {
+      // display information on.
+      // off in OnLeftButtonUp()
+      m_Model->GetVisualPipe2D()->SetTextXVisibility(1) ;
+      m_Model->GetVisualPipe2D()->SetTextYVisibility(1) ;
 
-	this->Place(prevPickPoint, pickPoint);
-   }
+      this->Translate(prevPickPoint, pickPoint);
+    }
+    else if (GetCenterMode()) // place
+    {
+      // display information on.
+      // off in OnLeftButtonUp()
+      m_Model->GetVisualPipe2D()->SetTextXVisibility(1) ;
+      m_Model->GetVisualPipe2D()->SetTextYVisibility(1) ;
+
+      this->Place(prevPickPoint, pickPoint);
+    }
   }
   else if ( this->m_State == medOpMML3ContourWidget::Scaling )
   {
-   this->Scale(prevPickPoint, pickPoint, X, Y);
+    this->Scale(prevPickPoint, pickPoint, X, Y);
   }
   else if ( this->m_State == medOpMML3ContourWidget::Pushing )
   {
-   this->Push(prevPickPoint, pickPoint);
+    this->Push(prevPickPoint, pickPoint);
   }
   else if ( this->m_State == medOpMML3ContourWidget::Rotating ) // rotation
   {
-   // display information on.
-   // off in OnLeftButtonUp()
-   m_Model->GetScaledTextActor1()->VisibilityOn();
-   this->Rotate(prevPickPoint, pickPoint);
+    // display information on.
+    // off in OnLeftButtonUp()
+    m_Model->GetVisualPipe2D()->SetTextXVisibility(1) ;
+    m_Model->GetVisualPipe2D()->SetTextYVisibility(1) ;
+    this->Rotate(prevPickPoint, pickPoint);
   }
 
   // Interact, if desired
   this->EventCallbackCommand->SetAbortFlag(1);
   this->InvokeEvent(vtkCommand::InteractionEvent,NULL);
-  
+
   this->Interactor->Render();
 }
 
@@ -1295,22 +1172,22 @@ void medOpMML3ContourWidget::Scale(double *p1, double *p2, int vtkNotUsed(X), in
   // Compute the scale factor
   double sf = vtkMath::Norm(v) / sqrt(vtkMath::Distance2BetweenPoints(pt1,pt2));
   if ( Y > this->Interactor->GetLastEventPosition()[1] )
-    {
+  {
     sf = 1.0 + sf;
-    }
+  }
   else
-    {
+  {
     sf = 1.0 - sf;
-    }
-  
+  }
+
   // Move the corner points
   double origin[3], point1[3], point2[3];
   for (int i=0; i<3; i++)
-    {
+  {
     origin[i] = sf * (o[i] - center[i]) + center[i];
     point1[i] = sf * (pt1[i] - center[i]) + center[i];
     point2[i] = sf * (pt2[i] - center[i]) + center[i];
-    }
+  }
 
   this->m_PlaneSource->SetOrigin(origin);
   this->m_PlaneSource->SetPoint1(point1);
@@ -1331,7 +1208,7 @@ void medOpMML3ContourWidget::Push(double *p1, double *p2)
   v[0] = p2[0] - p1[0];
   v[1] = p2[1] - p1[1];
   v[2] = p2[2] - p1[2];
-  
+
   this->m_PlaneSource->Push( vtkMath::Dot(v,this->m_Normal) );
   this->m_PlaneSource->Update();
   this->PositionHandles(0.5, 0.5);
@@ -1389,26 +1266,26 @@ void medOpMML3ContourWidget::PlaceWidget(double bds[6])
   this->AdjustBounds(bds, bounds, center);
 
   if (this->Input || this->Prop3D)
-    {
+  {
     if ( this->m_NormalToYAxis )
-      {
+    {
       this->m_PlaneSource->SetOrigin(bounds[0],center[1],bounds[4]);
       this->m_PlaneSource->SetPoint1(bounds[1],center[1],bounds[4]);
       this->m_PlaneSource->SetPoint2(bounds[0],center[1],bounds[5]);
-      }
+    }
     else if ( this->m_NormalToZAxis )
-      {
+    {
       this->m_PlaneSource->SetOrigin(bounds[0],bounds[2],center[2]);
       this->m_PlaneSource->SetPoint1(bounds[1],bounds[2],center[2]);
       this->m_PlaneSource->SetPoint2(bounds[0],bounds[3],center[2]);
-      }
+    }
     else //default or x-normal
-      {
+    {
       this->m_PlaneSource->SetOrigin(center[0],bounds[2],bounds[4]);
       this->m_PlaneSource->SetPoint1(center[0],bounds[3],bounds[4]);
       this->m_PlaneSource->SetPoint2(center[0],bounds[2],bounds[5]);
-      }
     }
+  }
 
   this->m_PlaneSource->Update();
 
@@ -1416,19 +1293,19 @@ void medOpMML3ContourWidget::PlaceWidget(double bds[6])
   this->PositionHandles(0.5, 0.5);
 
   for (i=0; i<6; i++)
-    {
+  {
     this->InitialBounds[i] = bounds[i];
-    }
-  
+  }
+
 
   if (this->Input || this->Prop3D)
-    {
+  {
     this->InitialLength = sqrt((bounds[1]-bounds[0])*(bounds[1]-bounds[0]) +
-                               (bounds[3]-bounds[2])*(bounds[3]-bounds[2]) +
-                               (bounds[5]-bounds[4])*(bounds[5]-bounds[4]));
-    }
+      (bounds[3]-bounds[2])*(bounds[3]-bounds[2]) +
+      (bounds[5]-bounds[4])*(bounds[5]-bounds[4]));
+  }
   else
-    {
+  {
     // this means we have to make use of the PolyDataSource, so
     // we just calculate the magnitude of the longest diagonal on
     // the plane and use that as InitialLength
@@ -1438,13 +1315,13 @@ void medOpMML3ContourWidget::PlaceWidget(double bds[6])
     this->m_PlaneSource->GetPoint2(point2);
     double sqr1 = 0, sqr2 = 0;
     for (i = 0; i < 3; i++)
-      {
+    {
       sqr1 += (point1[i] - origin[i]) * (point1[i] - origin[i]);
       sqr2 += (point2[i] - origin[i]) * (point2[i] - origin[i]);
-      }
+    }
 
     this->InitialLength = sqrt(sqr1 + sqr2);
-    }
+  }
 
   // Set the radius on the sphere handles
   this->SizeHandles();
@@ -1456,14 +1333,14 @@ void medOpMML3ContourWidget::PlaceWidget(double bds[6])
 void medOpMML3ContourWidget::SizeHandles()
 //----------------------------------------------------------------------------
 {
- // float radius = this->vtk3DWidget::SizeHandles(1.25);
-  
+  // float radius = this->vtk3DWidget::SizeHandles(1.25);
+
   float radius = GetHandleRadius();
 
   for(int i=0; i<4; i++)
-    {
+  {
     this->m_HandleGeometry[i]->SetRadius(radius);
-    }
+  }
 
   this->m_RotationalHandleGeometry->SetRadius(radius);
   this->m_CenterHandleGeometry->SetRadius(radius);
@@ -1481,48 +1358,30 @@ void medOpMML3ContourWidget::SizeHandles()
 void medOpMML3ContourWidget::SelectRepresentation()
 //----------------------------------------------------------------------------
 {
-  if ( ! this->CurrentRenderer )
-    {
-    return;
-    }
-
-  if ( this->m_Representation == VTK_PLANE_OFF )
-    {
-    this->CurrentRenderer->RemoveActor(this->m_PlaneActor);
-    }
-  else if ( this->m_Representation == VTK_PLANE_OUTLINE )
-    {
-    this->CurrentRenderer->RemoveActor(this->m_PlaneActor);
-    this->CurrentRenderer->AddActor(this->m_PlaneActor);
-	
-	//this->PlaneOutlineTubes->SetRadius(3.0);
-    //this->PlaneOutlineTubes->SetNumberOfSides(6);
-	//this->PlaneMapper->SetInput( this->PlaneOutlineTubes->GetOutput());
-
-    this->m_PlaneMapper->SetInput( this->m_PlaneOutline);
-	this->m_PlaneActor->GetProperty()->SetRepresentationToWireframe();
-    }
-  else if ( this->m_Representation == VTK_PLANE_SURFACE )
-    {
-    this->CurrentRenderer->RemoveActor(this->m_PlaneActor);
-    this->CurrentRenderer->AddActor(this->m_PlaneActor);
+  if ( this->m_Representation == VTK_PLANE_OFF ){
+    m_PlaneActor->SetVisibility(0) ;
+  }
+  else if ( this->m_Representation == VTK_PLANE_SURFACE ){
+    m_PlaneActor->SetVisibility(1) ;
     this->m_PlaneMapper->SetInput( this->m_PlaneSource->GetOutput() );
     this->m_PlaneActor->GetProperty()->SetRepresentationToSurface();
-    }
-  else //( this->Representation == VTK_PLANE_WIREFRAME )
-    {
-    this->CurrentRenderer->RemoveActor(this->m_PlaneActor);
-    this->CurrentRenderer->AddActor(this->m_PlaneActor);
+  }
+  else if ( this->m_Representation == VTK_PLANE_WIREFRAME ){
+    m_PlaneActor->SetVisibility(1) ;
     this->m_PlaneMapper->SetInput( this->m_PlaneSource->GetOutput() );
     this->m_PlaneActor->GetProperty()->SetRepresentationToWireframe();
-    }
+  }
+  else{
+    // unknown representation code
+    assert(false) ;
+  }
 }
 
 
 
 //----------------------------------------------------------------------------
 /** Description:
- Set/Get the resolution (number of subdivisions) of the plane. */
+Set/Get the resolution (number of subdivisions) of the plane. */
 void medOpMML3ContourWidget::SetResolution(int r)
 //----------------------------------------------------------------------------
 {
@@ -1758,10 +1617,10 @@ void medOpMML3ContourWidget::GetPlane(vtkPlane *plane)
 //----------------------------------------------------------------------------
 {
   if ( plane == NULL )
-    {
+  {
     return;
-    }
-  
+  }
+
   plane->SetNormal(this->GetNormal());
   plane->SetOrigin(this->GetCenter());
 }
@@ -1777,7 +1636,7 @@ void medOpMML3ContourWidget::UpdatePlacement(void)
 }
 
 
-
+/*
 //----------------------------------------------------------------------------
 // MK BEGIN 26/05/04
 // Description:
@@ -1826,14 +1685,17 @@ void medOpMML3ContourWidget::GetMotionVector(float xyz[3])
   xyz[1] = this->m_Motion[1];
   xyz[2] = this->m_Motion[2];
 }
-
+*/
 
 
 //----------------------------------------------------------------------------
 void medOpMML3ContourWidget::TranslationModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_BTranslatingMode = TRUE;
+  this->m_PlaceMode = FALSE;
+  this->m_ScalingMode = FALSE ;
+  this->m_RotatingMode = FALSE ;
+  this->m_TranslationMode = TRUE;
 }
 
 
@@ -1842,27 +1704,30 @@ void medOpMML3ContourWidget::TranslationModeOn()
 void medOpMML3ContourWidget::TranslationModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_BTranslatingMode = FALSE;
+  this->m_TranslationMode = FALSE;
 }
 
 
 
 //----------------------------------------------------------------------------
-void medOpMML3ContourWidget::CenterModeOn()
+void medOpMML3ContourWidget::PlaceModeOn()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOn();
-  this->m_BCenterMode = TRUE;
+  this->m_PlaceMode = TRUE;
+  this->m_ScalingMode = FALSE ;
+  this->m_RotatingMode = FALSE ;
+  this->m_TranslationMode = FALSE ;
 }
 
 
 
 //----------------------------------------------------------------------------
-void medOpMML3ContourWidget::CenterModeOff()
+void medOpMML3ContourWidget::PlaceModeOff()
 //----------------------------------------------------------------------------
 {
   //this->CenterHandle->VisibilityOff();
-  this->m_BCenterMode = FALSE;
+  this->m_PlaceMode = FALSE;
 }
 
 
@@ -1871,9 +1736,12 @@ void medOpMML3ContourWidget::CenterModeOff()
 void medOpMML3ContourWidget::RotationModeOn()
 //----------------------------------------------------------------------------
 {
-  //this->m_RotationalHandle->VisibilityOn();
+  //this->m_RotationalHandleActor->VisibilityOn();
   //this->Setm_RotationalHandle(50.0, 0.0, 0.0);
-  this->m_BRotatingMode = TRUE;
+  this->m_PlaceMode = FALSE;
+  this->m_ScalingMode = FALSE ;
+  this->m_RotatingMode = TRUE ;
+  this->m_TranslationMode = FALSE ;
 }
 
 
@@ -1882,8 +1750,8 @@ void medOpMML3ContourWidget::RotationModeOn()
 void medOpMML3ContourWidget::RotationModeOff()
 //----------------------------------------------------------------------------
 {
-  //this->m_RotationalHandle->VisibilityOff();
-  this->m_BRotatingMode = FALSE;
+  //this->m_RotationalHandleActor->VisibilityOff();
+  this->m_RotatingMode = FALSE;
 }
 
 
@@ -1892,7 +1760,11 @@ void medOpMML3ContourWidget::RotationModeOff()
 void medOpMML3ContourWidget::ScalingModeOn()
 //----------------------------------------------------------------------------
 {
-  this->m_BScalingMode = TRUE;
+  this->m_PlaceMode = FALSE;
+  this->m_ScalingMode = TRUE ;
+  this->m_RotatingMode = FALSE ;
+  this->m_TranslationMode = FALSE ;
+
   //this->ScalingHandlesOn();
 
   // 
@@ -1910,7 +1782,7 @@ void medOpMML3ContourWidget::ScalingModeOn()
 void medOpMML3ContourWidget::ScalingModeOff()
 //----------------------------------------------------------------------------
 {
-  this->m_BScalingMode = FALSE;
+  this->m_ScalingMode = FALSE;
 
   //
   //this->ScalingHandlesOff();
@@ -2010,8 +1882,8 @@ void medOpMML3ContourWidget::SetHandle3(double x, double y, double z)
 void medOpMML3ContourWidget::SetRotationalHandle(double x, double y, double z)
 //----------------------------------------------------------------------------
 {
-	this->m_RotationalHandleGeometry->SetCenter(x, y, z);
-	this->m_RotationalHandleGeometry->Modified();
+  this->m_RotationalHandleGeometry->SetCenter(x, y, z);
+  this->m_RotationalHandleGeometry->Modified();
 }
 
 
@@ -2020,9 +1892,31 @@ void medOpMML3ContourWidget::SetRotationalHandle(double x, double y, double z)
 void medOpMML3ContourWidget::SetRotationalHandle(double *xyz)
 //----------------------------------------------------------------------------
 {
-	this->m_RotationalHandleGeometry->SetCenter(xyz);
-	this->m_RotationalHandleGeometry->Modified();
+  this->m_RotationalHandleGeometry->SetCenter(xyz);
+  this->m_RotationalHandleGeometry->Modified();
 }
+
+
+
+
+//----------------------------------------------------------------------------
+void medOpMML3ContourWidget::SetCenterHandle(double x, double y, double z)
+//----------------------------------------------------------------------------
+{
+  this->m_CenterHandleGeometry->SetCenter(x, y, z);
+  this->m_CenterHandleGeometry->Modified();
+}
+
+
+
+//----------------------------------------------------------------------------
+void medOpMML3ContourWidget::SetCenterHandle(double *xyz)
+//----------------------------------------------------------------------------
+{
+  this->m_CenterHandleGeometry->SetCenter(xyz);
+  this->m_CenterHandleGeometry->Modified();
+}
+
 
 
 
@@ -2032,11 +1926,9 @@ void medOpMML3ContourWidget::ScalingHandlesOn()
 {
   for(int i=0; i<4; i++)
   {
-    this->m_Handle[i]->VisibilityOn();
+    this->m_HandleActor[i]->VisibilityOn();
   }
 }
-
-
 
 //----------------------------------------------------------------------------
 void medOpMML3ContourWidget::ScalingHandlesOff()
@@ -2044,58 +1936,19 @@ void medOpMML3ContourWidget::ScalingHandlesOff()
 {
   for(int i=0; i<4; i++)
   {
-    this->m_Handle[i]->VisibilityOff();
+    this->m_HandleActor[i]->VisibilityOff();
   }
 }
 
 
-
-//----------------------------------------------------------------------------
-void medOpMML3ContourWidget::SetCenterHandle(double x, double y, double z)
-//----------------------------------------------------------------------------
-{
-	this->m_CenterHandleGeometry->SetCenter(x, y, z);
-	this->m_CenterHandleGeometry->Modified();
-}
-
-
-
-//----------------------------------------------------------------------------
-void medOpMML3ContourWidget::SetCenterHandle(double *xyz)
-//----------------------------------------------------------------------------
-{
-	this->m_CenterHandleGeometry->SetCenter(xyz);
-	this->m_CenterHandleGeometry->Modified();
-}
 
 
 
 //----------------------------------------------------------------------------
 void medOpMML3ContourWidget::SetRotationHandleVisibility()
 //----------------------------------------------------------------------------
-{/*
-	// get z level
-	double z = M->GetCurrentZOfSyntheticScans();
-
-	// original bounds
-	double bounds[6];
-	M->GetContourActor()->GetBounds(bounds);
-
-	// set up 2d contour axes first
-	double width = M->GetContourAxesLengthScale() * (bounds[1] - bounds[0]) / 2.0;
-	double height = M->GetContourAxesLengthScale() * (bounds[3] - bounds[2]) / 2.0;
-	
-	if (width > 0.0 && height > 0.0)
-	{
-		// visible
-		Getm_RotationalHandleActor()->VisibilityOn();	
-	}
-	else
-	{
-		// invisible
-		Getm_RotationalHandleActor()->VisibilityOff();
-	}*/
-	GetRotationalHandleActor()->VisibilityOn();
+{
+  m_RotationalHandleActor->VisibilityOn();
 }
 
 
@@ -2104,7 +1957,7 @@ void medOpMML3ContourWidget::SetRotationHandleVisibility()
 void medOpMML3ContourWidget::RotationHandleOn()
 //----------------------------------------------------------------------------
 {
-	GetRotationalHandleActor()->VisibilityOn();
+  m_RotationalHandleActor->VisibilityOn();
 }
 
 
@@ -2113,240 +1966,148 @@ void medOpMML3ContourWidget::RotationHandleOn()
 void medOpMML3ContourWidget::RotationHandleOff()
 //----------------------------------------------------------------------------
 {
-	GetRotationalHandleActor()->VisibilityOff();
+  m_RotationalHandleActor->VisibilityOff();
 }
 
 
 
-//----------------------------------------------------------------------------
-void medOpMML3ContourWidget::ComputeBounds(double *b)
-//----------------------------------------------------------------------------
-{
-  m_Model->GetContourActor()->GetBounds(b);
-}
-
 
 
 //----------------------------------------------------------------------------
-void medOpMML3ContourWidget::ComputeCenter(double *c)
-//----------------------------------------------------------------------------
-{
-  double b[6];
-
-  ComputeBounds(b);
-
-  c[0] = (b[0] + b[1]) / 2.0; // x
-  c[1] = (b[2] + b[3]) / 2.0; // y
-  c[2] = (b[4] + b[5]) / 2.0; // z
-}
-
-
-
-//----------------------------------------------------------------------------
+// Update the positions of the scaling handles
+// This should place the handles where the cutting planes intersect the contour
 void medOpMML3ContourWidget::UpdateScalingHandles()
 //----------------------------------------------------------------------------
 {
-	// get z level
-	double z = m_Model->GetCurrentZOfSyntheticScans();
+  // get zeta level
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-	// original bounds
-	double bounds[6];
-	m_Model->GetContourActor()->GetBounds(bounds);
+  // get center h/v translation
+  double ctrans[2];
+  ctrans[0] = m_Model->GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = m_Model->GetPVSpline()->Evaluate(zeta);
 
-	// original center
-	double center[3];
-	center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-	center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-	center[2] = (bounds[4] + bounds[5]) / 2.0; // z
+  // get twist
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);
 
-	// get center h/v translation
-	double ctrans[2];
-	ctrans[0] = m_Model->GetPHSpline()->Evaluate(z);
-	ctrans[1] = m_Model->GetPVSpline()->Evaluate(z);
-	
-	// get twist
-	double twist = m_Model->GetRASpline()->Evaluate(z);
+  // get h/v translation
+  double trans[2];
+  trans[0] = m_Model->GetTHSpline()->Evaluate(zeta);
+  trans[1] = m_Model->GetTVSpline()->Evaluate(zeta);
 
-	// get h/v translation
-	double trans[2];
-	trans[0] = m_Model->GetTHSpline()->Evaluate(z);
-	trans[1] = m_Model->GetTVSpline()->Evaluate(z);
+  // get scaling
+  double scale[4];
+  scale[0] = m_Model->GetSSSpline()->Evaluate(zeta); // east
+  scale[1] = m_Model->GetSESpline()->Evaluate(zeta); // west
+  scale[2] = m_Model->GetSWSpline()->Evaluate(zeta); // north
+  scale[3] = m_Model->GetSNSpline()->Evaluate(zeta); // south
 
-	// get scaling
-	double scale[4];
-	scale[0] = m_Model->GetSESpline()->Evaluate(z); // east
-	scale[1] = m_Model->GetSWSpline()->Evaluate(z); // west
-	scale[2] = m_Model->GetSNSpline()->Evaluate(z); // north
-	scale[3] = m_Model->GetSSSpline()->Evaluate(z); // south;
 
-	// original bounds
-	vtkTransform* Transform = vtkTransform::New();
-	Transform->Identity();
-	
-	double SEBounds[6]; // south east
-	m_Model->GetSEContourTransformPolyDataFilter()->SetTransform(Transform);
-	m_Model->GetSEContourTransformPolyDataFilter()->Update();
-	m_Model->GetSEContourTransformPolyDataFilter()->GetOutput()->GetBounds(SEBounds);
-	m_Model->UpdateSegmentSouthEastTransform();
-	
-	double SWBounds[6]; // south west
-	m_Model->GetSWContourTransformPolyDataFilter()->SetTransform(Transform);
-	m_Model->GetSWContourTransformPolyDataFilter()->Update();
-	m_Model->GetSWContourTransformPolyDataFilter()->GetOutput()->GetBounds(SWBounds);
-	m_Model->UpdateSegmentSouthWestTransform();
-	
-	double NEBounds[6]; // north east
-	m_Model->GetNEContourTransformPolyDataFilter()->SetTransform(Transform);
-	m_Model->GetNEContourTransformPolyDataFilter()->Update();
-	m_Model->GetNEContourTransformPolyDataFilter()->GetOutput()->GetBounds(NEBounds);
-	m_Model->UpdateSegmentNorthEastTransform();
-	
-	double NWBounds[6]; // north west
-	m_Model->GetNWContourTransformPolyDataFilter()->SetTransform(Transform);
-	m_Model->GetNWContourTransformPolyDataFilter()->Update();
-	m_Model->GetNWContourTransformPolyDataFilter()->GetOutput()->GetBounds(NWBounds);
-	m_Model->UpdateSegmentNorthWestTransform();
-	Transform->Delete();
 
-	// original handles
-	double h3[3]; // north - red
-	h3[0] = center[0] - trans[0];
+  // Get bounds of contour segments after clipping planes applied, but before transforms
+  double SEBounds[6], SWBounds[6], NEBounds[6], NWBounds[6] ;
+  m_Model->UpdateCuttingPlanesTransform() ;
+  m_Model->GetVisualPipe2D()->GetOriginalSegmentBoundsNE(NEBounds) ;
+  m_Model->GetVisualPipe2D()->GetOriginalSegmentBoundsNW(NWBounds) ;
+  m_Model->GetVisualPipe2D()->GetOriginalSegmentBoundsSE(SEBounds) ;
+  m_Model->GetVisualPipe2D()->GetOriginalSegmentBoundsSW(SWBounds) ;
+
+
+
+  // original center
+  double center[3];
+  m_Model->GetOriginalContourCenter(center);
+
+
+  // get positions of handles on untransformed contour
+  double h3[3]; // north - red
+  h3[0] = center[0] - trans[0];
   h3[1] = std::min(NEBounds[3], NWBounds[3]);
-	h3[2] = 0.0;
-	double h0[3]; // south - green
-	h0[0] = center[0] - trans[0];
+  h3[2] = 0.0;
+  double h0[3]; // south - green
+  h0[0] = center[0] - trans[0];
   h0[1] = std::max(SEBounds[2], SWBounds[2]);
-	h0[2] = 0.0;
-	double h1[3]; // east - blue
+  h0[2] = 0.0;
+  double h1[3]; // east - blue
   h1[0] = std::min(NEBounds[1], SEBounds[1]);
-	h1[1] = center[1] - trans[1];
-	h1[2] = 0.0;
-	double h2[3]; // west - magenta
+  h1[1] = center[1] - trans[1];
+  h1[2] = 0.0;
+  double h2[3]; // west - magenta
   h2[0] = std::max(NWBounds[0], SWBounds[0]);
-	h2[1] = center[1] - trans[1];
-	h2[2] = 0.0;
-
-	// transformed handles
-	// north - red
-	vtkTransform* h3Transf = vtkTransform::New();
-	h3Transf->Identity();
-
-	// r operation
-	h3Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h3Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h3Transf->RotateZ(twist); // r operation
-	h3Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h3Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-  
-	// s operation
-	h3Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h3Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h3Transf->Scale(1.0, scale[2], 1.0); // s operation
-	h3Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h3Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-
-	// t operation
-	h3Transf->Translate(trans[0], trans[1], 0.0);
-  
-	// p operation
-	h3Transf->Translate(ctrans[0], ctrans[1], 0.0);
-
-	h3Transf->TransformPoint(h3, h3);
-	h3Transf->Delete();
-
-	// set
-	SetHandle3(h3[0], h3[1], h3[2]);
+  h2[1] = center[1] - trans[1];
+  h2[2] = 0.0;
 
 
-	// south - green			  
-	vtkTransform* h0Transf = vtkTransform::New();
-	h0Transf->Identity();
-	// r operation
-	h0Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h0Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h0Transf->RotateZ(twist); // r operation
-	h0Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h0Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-  
-	// s operation
-	h0Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h0Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h0Transf->Scale(1.0, scale[3], 1.0); // s operation
-	h0Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h0Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  //----------------------------------------------------------------------------
+  // transform the handles to the final positions
+  //----------------------------------------------------------------------------
 
-	// t operation
-	h0Transf->Translate(trans[0], trans[1], 0.0);
-  
-	// p operation
-	h0Transf->Translate(ctrans[0], ctrans[1], 0.0);
-	h0Transf->TransformPoint(h0, h0);
-	h0Transf->Delete();
+  // north - red
+  vtkTransform* h3Transf = vtkTransform::New();
+  h3Transf->Identity();
 
-	// set
-	SetHandle0(h0[0], h0[1], h0[2]);
+  h3Transf->Translate(ctrans[0], ctrans[1], 0.0) ;
+  h3Transf->Translate(center[0], center[1], 0.0) ;
+  h3Transf->RotateZ(twist) ;
+  h3Transf->Scale(1.0, scale[3], 1.0) ;
+  h3Transf->Translate(-center[0], -center[1], 0.0) ;
+  h3Transf->Translate(trans[0], trans[1], 0.0) ;
 
-	
-	// east - blue
-	vtkTransform* h1Transf = vtkTransform::New();
-	h1Transf->Identity();
-	// r operation
-	h1Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h1Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h1Transf->RotateZ(twist); // r operation
-	h1Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h1Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-  
-	// s operation
-	h1Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h1Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h1Transf->Scale(scale[0], 1.0, 1.0); // s operation
-	h1Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h1Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  h3Transf->TransformPoint(h3, h3);
+  SetHandle3(h3);
 
-	// t operation
-	h1Transf->Translate(trans[0], trans[1], 0.0);
-  
-	// p operation
-	h1Transf->Translate(ctrans[0], ctrans[1], 0.0);
-	h1Transf->TransformPoint(h1, h1);
-	h1Transf->Delete();
+  h3Transf->Delete();
 
-	// set
-	SetHandle1(h1[0], h1[1], h1[2]);
 
-	
-	// west - magenta
-  h2[0] = std::max(NWBounds[0], SWBounds[0]);
-	h2[1] = center[1] - trans[1];
-	h2[2] = 0.0;
-	vtkTransform* h2Transf = vtkTransform::New();
-	h2Transf->Identity();
-	
-	// r operation
-	h2Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h2Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h2Transf->RotateZ(twist); // r operation
-	h2Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h2Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-  
-	// s operation
-	h2Transf->Translate(center[0], center[1], 0.0); // axes origin
-	h2Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	h2Transf->Scale(scale[1], 1.0, 1.0); // s operation
-	h2Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	h2Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
+  // south - green	
+  vtkTransform* h0Transf = vtkTransform::New();
+  h0Transf->Identity();
 
-	// t operation
-	h2Transf->Translate(trans[0], trans[1], 0.0);
-  
-	// p operation
-	h2Transf->Translate(ctrans[0], ctrans[1], 0.0);
-	h2Transf->TransformPoint(h2, h2);
-	h2Transf->Delete();
+  h0Transf->Translate(ctrans[0], ctrans[1], 0.0) ;
+  h0Transf->Translate(center[0], center[1], 0.0) ;
+  h0Transf->RotateZ(twist) ;
+  h0Transf->Scale(1.0, scale[0], 1.0) ;
+  h0Transf->Translate(-center[0], -center[1], 0.0) ;
+  h0Transf->Translate(trans[0], trans[1], 0.0) ;
 
-	// set
-	SetHandle2(h2[0], h2[1], h2[2]);			
+  h0Transf->TransformPoint(h0, h0);
+  SetHandle0(h0);
+
+  h0Transf->Delete();
+
+
+  // east - blue
+  vtkTransform* h1Transf = vtkTransform::New();
+  h1Transf->Identity();
+
+  h1Transf->Translate(ctrans[0], ctrans[1], 0.0) ;
+  h1Transf->Translate(center[0], center[1], 0.0) ;
+  h1Transf->RotateZ(twist) ;
+  h1Transf->Scale(scale[1], 1.0, 1.0) ;
+  h1Transf->Translate(-center[0], -center[1], 0.0) ;
+  h1Transf->Translate(trans[0], trans[1], 0.0) ;
+
+  h1Transf->TransformPoint(h1, h1);
+  SetHandle1(h1);
+
+  h1Transf->Delete();
+
+
+  // west - magenta
+  vtkTransform* h2Transf = vtkTransform::New();
+  h2Transf->Identity();
+
+  h2Transf->Translate(ctrans[0], ctrans[1], 0.0) ;
+  h2Transf->Translate(center[0], center[1], 0.0) ;
+  h2Transf->RotateZ(twist) ;
+  h2Transf->Scale(scale[2], 1.0, 1.0) ;
+  h2Transf->Translate(-center[0], -center[1], 0.0) ;
+  h2Transf->Translate(trans[0], trans[1], 0.0) ;
+
+  h2Transf->TransformPoint(h2, h2);
+  SetHandle2(h2);
+
+  h2Transf->Delete();
 }
 
 
@@ -2355,25 +2116,19 @@ void medOpMML3ContourWidget::UpdateScalingHandles()
 void medOpMML3ContourWidget::UpdateRotationHandle()
 //----------------------------------------------------------------------------
 {
-	// get z level
-	double z = m_Model->GetCurrentZOfSyntheticScans();
+  // get zeta level
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-	// original bounds
-	double bounds[6];
-	m_Model->GetContourActor()->GetBounds(bounds);
+  // original center
+  double center[3];
+  m_Model->GetOriginalContourCenter(center);
 
-	// original center
-	double center[3];
-	center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-	center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-	center[2] = (bounds[4] + bounds[5]) / 2.0; // z
+  // get center h/v translation
+  double ctrans[2];
+  ctrans[0] = m_Model->GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = m_Model->GetPVSpline()->Evaluate(zeta);
 
-	// get center h/v translation
-	double ctrans[2];
-	ctrans[0] = m_Model->GetPHSpline()->Evaluate(z);
-	ctrans[1] = m_Model->GetPVSpline()->Evaluate(z);
-
-	SetRotationalHandle(center[0] + ctrans[0], center[1] + ctrans[1], 0.0);
+  SetRotationalHandle(center[0] + ctrans[0], center[1] + ctrans[1], 0.0);
 }
 
 
@@ -2382,190 +2137,113 @@ void medOpMML3ContourWidget::UpdateRotationHandle()
 void medOpMML3ContourWidget::UpdateWidgetTransform()
 //----------------------------------------------------------------------------
 {
-	// get z level
-	double z = m_Model->GetCurrentZOfSyntheticScans();
+  // get zeta level
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-	// original bounds
-	double bounds[6];
-	m_Model->GetContourActor()->GetBounds(bounds);
+  // original bounds and center
+  double bounds[6], center[3] ;
+  m_Model->GetOriginalContourBounds(bounds);
+  m_Model->GetOriginalContourCenter(center) ;
 
-	// set up 2d contour axes first
-	//double width = M->GetContourAxesLengthScale() * (bounds[1] - bounds[0]) / 2.0;
-	//double height = M->GetContourAxesLengthScale() * (bounds[3] - bounds[2]) / 2.0;
-	
-	// original center
-	double center[3];
-	center[0] = (bounds[0] + bounds[1]) / 2.0; // x
-	center[1] = (bounds[2] + bounds[3]) / 2.0; // y
-	center[2] = (bounds[4] + bounds[5]) / 2.0; // z 
+  // get center h/v translation
+  double ctrans[2];
+  ctrans[0] = m_Model->GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = m_Model->GetPVSpline()->Evaluate(zeta);
 
-	// get center h/v translation
-	double ctrans[2];
-	ctrans[0] = m_Model->GetPHSpline()->Evaluate(z);
-	ctrans[1] = m_Model->GetPVSpline()->Evaluate(z);
+  // get twist
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);
 
-	// get twist
-	double twist = m_Model->GetRASpline()->Evaluate(z);
+  // get h/v translation
+  double trans[2];
+  trans[0] = m_Model->GetTHSpline()->Evaluate(zeta);
+  trans[1] = m_Model->GetTVSpline()->Evaluate(zeta);
 
-	// get h/v translation
-	double trans[2];
-	trans[0] = m_Model->GetTHSpline()->Evaluate(z);
-	trans[1] = m_Model->GetTVSpline()->Evaluate(z);
+  // get scaling
+  double scale[4];
+  scale[0] = m_Model->GetSESpline()->Evaluate(zeta); // east
+  scale[1] = m_Model->GetSWSpline()->Evaluate(zeta); // west
+  scale[2] = m_Model->GetSNSpline()->Evaluate(zeta); // north
+  scale[3] = m_Model->GetSSSpline()->Evaluate(zeta); // south;
 
-	// get scaling
-	double scale[4];
-	scale[0] = m_Model->GetSESpline()->Evaluate(z); // east
-	scale[1] = m_Model->GetSWSpline()->Evaluate(z); // west
-	scale[2] = m_Model->GetSNSpline()->Evaluate(z); // north
-	scale[3] = m_Model->GetSSSpline()->Evaluate(z); // south;
 
-	// original
-	double Origin[3];
-	double Point1[3];
-	double Point2[3];
-	if (center[0] == 0.0 && center[1] == 0.0)
-	{
-		m_Model->GetPositiveXAxisActor()->VisibilityOn();
-		m_Model->GetNegativeXAxisActor()->VisibilityOn();
-		m_Model->GetPositiveYAxisActor()->VisibilityOn();
-		m_Model->GetNegativeYAxisActor()->VisibilityOn();
 
-		Point1[0] = 10.0;
-		Point1[1] = -10.0;
-		Point1[2] = 0.0;
-		Point2[0] = -10.0;
-		Point2[1] = 10.0;
-		Point2[2] = 0.0;
-		Origin[0] = Point2[0];
-		Origin[1] = Point1[1];
-		Origin[2] = 0.0;
-	}
-	else
-	{
-		m_Model->GetPositiveXAxisActor()->VisibilityOff();
-		m_Model->GetNegativeXAxisActor()->VisibilityOff();
-		m_Model->GetPositiveYAxisActor()->VisibilityOff();
-		m_Model->GetNegativeYAxisActor()->VisibilityOff();
-		Point1[0] = bounds[1];
-		Point1[1] = bounds[2];
-		Point1[2] = 0.0;
-		Point2[0] = bounds[0];
-		Point2[1] = bounds[3];
-		Point2[2] = 0.0;
-		Origin[0] = Point2[0];
-		Origin[1] = Point1[1];
-		Origin[2] = 0.0;
-	}
+  // untransformed pose of plane
+  double Point1[3], Point2[3], Origin[3] ;
+  Point1[0] = bounds[1];
+  Point1[1] = bounds[2];
+  Point1[2] = 0.0;
+  Point2[0] = bounds[0];
+  Point2[1] = bounds[3];
+  Point2[2] = 0.0;
+  Origin[0] = Point2[0];
+  Origin[1] = Point1[1];
+  Origin[2] = 0.0;
 
-	// transformed origin
-	vtkTransform *OrTransf = vtkTransform::New();
-	OrTransf->Identity();
-	OrTransf->Translate(center[0], center[1], 0.0); // axes origin
-	OrTransf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	OrTransf->RotateZ(twist); // r operation
-	OrTransf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	OrTransf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-	OrTransf->Translate(center[0], center[1], 0.0); // axes origin
-	OrTransf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	OrTransf->Scale(scale[1], scale[3], 1.0); // s operation
-	OrTransf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	OrTransf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-	OrTransf->Translate(trans[0], trans[1], 0.0);
-	OrTransf->Translate(ctrans[0], ctrans[1], 0.0);
-	OrTransf->TransformPoint(Origin, Origin);
-	OrTransf->Delete();
 
-	// transformed point 1
-	vtkTransform *P1Transf = vtkTransform::New();
-	P1Transf->Identity();
-	P1Transf->Translate(center[0], center[1], 0.0); // axes origin
-	P1Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	P1Transf->RotateZ(twist); // r operation
-	P1Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	P1Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-	P1Transf->Translate(center[0], center[1], 0.0); // axes origin
-	P1Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	P1Transf->Scale(scale[0], scale[3], 1.0); // s operation
-	P1Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	P1Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-	P1Transf->Translate(trans[0], trans[1], 0.0);
-	P1Transf->Translate(ctrans[0], ctrans[1], 0.0);
-	P1Transf->TransformPoint(Point1, Point1);
-	P1Transf->Delete();
+  // transformed origin
+  vtkTransform *OrTransf = vtkTransform::New();
+  OrTransf->Identity();
+  OrTransf->Translate(center[0], center[1], 0.0); // axes origin
+  OrTransf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
+  OrTransf->TransformPoint(Origin, Origin);
+  OrTransf->Delete();
 
-	// transformed point 2
-	vtkTransform *P2Transf = vtkTransform::New();
-	P2Transf->Identity();
-	P2Transf->Translate(center[0], center[1], 0.0); // axes origin
-	P2Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	P2Transf->RotateZ(twist); // r operation
-	P2Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	P2Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-	P2Transf->Translate(center[0], center[1], 0.0); // axes origin
-	P2Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
-	P2Transf->Scale(scale[1], scale[2], 1.0); // s operation
-	P2Transf->Translate(-1.0 * ctrans[0], -1.0 * ctrans[1], 0.0); // inverse p operation
-	P2Transf->Translate(-1.0 * center[0], -1.0 * center[1], 0.0); // inverse axes origin
-	P2Transf->Translate(trans[0], trans[1], 0.0);
-	P2Transf->Translate(ctrans[0], ctrans[1], 0.0);
-	P2Transf->TransformPoint(Point2, Point2);
-	P2Transf->Delete();
-	
-	//
-	SetOrigin(Origin);
-	SetPoint1(Point1);
-	SetPoint2(Point2);
-	m_PlaneSource->Update();
+  // transformed point 1
+  vtkTransform *P1Transf = vtkTransform::New();
+  P1Transf->Identity();
+  P1Transf->Translate(center[0], center[1], 0.0); // axes origin
+  P1Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
+  P1Transf->RotateZ(twist);                       // r operation
+  P1Transf->TransformPoint(Point1, Point1);
+  P1Transf->Delete();
+
+  // transformed point 2
+  vtkTransform *P2Transf = vtkTransform::New();
+  P2Transf->Identity();
+  P2Transf->Translate(center[0], center[1], 0.0); // axes origin
+  P2Transf->Translate(ctrans[0], ctrans[1], 0.0); // p operation
+  P2Transf->RotateZ(twist);                       // r operation
+  P2Transf->Delete();
+
+  SetOrigin(Origin);
+  SetPoint1(Point1);
+  SetPoint2(Point2);
+  m_PlaneMapper->Update() ;
 }
 
 
 
 //----------------------------------------------------------------------------
+// Set the north scaling 
+// Inputs are the previous and current positions of the mouse.
+// The mouse position is projected onto the widget axis and a scaling value calculated.
+// The splines are updated and used to update the widget and the contour.
 void medOpMML3ContourWidget::ScaleNorth(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
-  float v[3];
-  v[0] = p2[0] - p1[0]; 
-  v[1] = p2[1] - p1[1]; 
-  v[2] = 0.0; // no change along z
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0]; 
+  mvec[1] = p2[1] - p1[1]; 
+  mvec[2] = 0.0; // no change along z
 
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  // get current slice id and zeta 
+  int currentId = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
-
-  // get center h translation
-  double chtrans = m_Model->GetPHSpline()->Evaluate(z);
-
-  // get center v translation
-  double cvtrans = m_Model->GetPVSpline()->Evaluate(z);
-  
-  // get twist
-  double twist = m_Model->GetRASpline()->Evaluate(z);
-
-  // get h translation
-  double htrans = m_Model->GetTHSpline()->Evaluate(z);
-
-  // get v translation
-  double vtrans = m_Model->GetTVSpline()->Evaluate(z);
-  
-  // get east scaling
-  double escale = m_Model->GetSESpline()->Evaluate(z);
-
-  // get west scaling
-  double wscale = m_Model->GetSWSpline()->Evaluate(z);
-
-  // get north scaling
-  double nscale = m_Model->GetSNSpline()->Evaluate(z);
-
-  // get south scaling
-  double sscale = m_Model->GetSSSpline()->Evaluate(z);
+  // evaluate splines
+  double chtrans = m_Model->GetPHSpline()->Evaluate(zeta); // place h
+  double cvtrans = m_Model->GetPVSpline()->Evaluate(zeta); // place v
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);   // rotate
+  double htrans = m_Model->GetTHSpline()->Evaluate(zeta);  // translate h
+  double vtrans = m_Model->GetTVSpline()->Evaluate(zeta);  // translate v
+  double nscale = m_Model->GetSNSpline()->Evaluate(zeta);  // scale n
+  double sscale = m_Model->GetSSSpline()->Evaluate(zeta);  // scale s
+  double escale = m_Model->GetSESpline()->Evaluate(zeta);  // scale e
+  double wscale = m_Model->GetSWSpline()->Evaluate(zeta);  // scale w
 
   // rotated y unit vector
-  float y[3];
-  y[0] = 0.0; y[1] = 1.0; y[2] = 0.0;
+  double y[3] = {0.0, 1.0, 0.0} ;
   vtkTransform* TransformY = vtkTransform::New();
   TransformY->Identity();
   TransformY->RotateZ(twist);
@@ -2574,39 +2252,38 @@ void medOpMML3ContourWidget::ScaleNorth(double *p1, double *p2)
 
   // projection on rotated y axis
   vtkMath* Math = vtkMath::New();
-  double yprojection = Math->Dot(v, y);
+  double yprojection = Math->Dot(mvec, y);
   Math->Delete();
- 
+
   if (yprojection == 0.0) // no motion
     return;
 
   // overall scale
-  float scale = yprojection * 0.05;
-  scale = nscale + scale;
-  
+  double scale = nscale + 0.05*yprojection ;
+
+
   // exceeded max limits?
-  if (scale > m_N->GetMaxY())
+  if (scale > m_SN->GetMaxY())
     return;
 
   // exceeded min limits?
-  if (scale < m_N->GetMinY())
+  if (scale < m_SN->GetMinY())
     return;// display information vtrans
   m_Model->SetText(1, scale, 1, 1); // text actor 1, scaling flag 1
 
   // update n spline
   // display values
-  m_N->RemovePoint(s);
-  m_N->AddPoint(s, scale);
-  m_N->Render();
+  m_SN->RemovePoint(currentId);
+  m_SN->AddPoint(currentId, scale);
+  m_SN->Render();
 
   // actual values
-  m_Model->GetSNSpline()->RemovePoint(z);
-  m_Model->GetSNSpline()->AddPoint(z, scale);
+  m_Model->GetSNSpline()->RemovePoint(zeta);
+  m_Model->GetSNSpline()->AddPoint(zeta, scale);
 
-  // update widget
+
+  // update widget and scaling handles
   UpdateWidgetTransform();
-  
-  // 
   UpdateScalingHandles();
 
   // update north east segment
@@ -2625,51 +2302,33 @@ void medOpMML3ContourWidget::ScaleNorth(double *p1, double *p2)
 
 
 //----------------------------------------------------------------------------
+// Set the south scaling 
 void medOpMML3ContourWidget::ScaleSouth(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
-  float v[3];
-  v[0] = p2[0] - p1[0]; 
-  v[1] = p2[1] - p1[1]; 
-  v[2] = 0.0; // no change along z
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0]; 
+  mvec[1] = p2[1] - p1[1]; 
+  mvec[2] = 0.0; // no change along z
 
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  // get current slice id and zeta 
+  int currentId = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
-
-  // get center h translation
-  double chtrans = m_Model->GetPHSpline()->Evaluate(z);
-
-  // get center v translation
-  double cvtrans = m_Model->GetPVSpline()->Evaluate(z);
-  
-  // get twist
-  double twist = m_Model->GetRASpline()->Evaluate(z);
-
-  // get h translation
-  double htrans = m_Model->GetTHSpline()->Evaluate(z);
-
-  // get v translation
-  double vtrans = m_Model->GetTVSpline()->Evaluate(z);
-  
-  // get east scaling
-  double escale = m_Model->GetSESpline()->Evaluate(z);
-
-  // get west scaling
-  double wscale = m_Model->GetSWSpline()->Evaluate(z);
-
-  // get north scaling
-  double nscale = m_Model->GetSNSpline()->Evaluate(z);
-
-  // get south scaling
-  double sscale = m_Model->GetSSSpline()->Evaluate(z);
+  // evaluate splines
+  double chtrans = m_Model->GetPHSpline()->Evaluate(zeta); // place h
+  double cvtrans = m_Model->GetPVSpline()->Evaluate(zeta); // place v
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);   // rotate
+  double htrans = m_Model->GetTHSpline()->Evaluate(zeta);  // translate h
+  double vtrans = m_Model->GetTVSpline()->Evaluate(zeta);  // translate v
+  double nscale = m_Model->GetSNSpline()->Evaluate(zeta);  // scale n
+  double sscale = m_Model->GetSSSpline()->Evaluate(zeta);  // scale s
+  double escale = m_Model->GetSESpline()->Evaluate(zeta);  // scale e
+  double wscale = m_Model->GetSWSpline()->Evaluate(zeta);  // scale w
 
   // rotated y unit vector
-  float y[3];
-  y[0] = 0.0; y[1] = 1.0; y[2] = 0.0;
+  double y[3] = {0.0, 1.0, 0.0} ;
   vtkTransform* TransformY = vtkTransform::New();
   TransformY->Identity();
   TransformY->RotateZ(twist);
@@ -2678,22 +2337,21 @@ void medOpMML3ContourWidget::ScaleSouth(double *p1, double *p2)
 
   // projection on rotated y axis
   vtkMath* Math = vtkMath::New();
-  double yprojection = Math->Dot(v, y);
+  double yprojection = Math->Dot(mvec, y);
   Math->Delete();
- 
+
   if (yprojection == 0.0) // no motion
     return;
 
   // overall scale
-  float scale = -1.0 * yprojection *   0.05;
-  scale = sscale + scale;
-  
+  double scale = sscale - 0.05*yprojection;
+
   // exceeded max limits?
-  if (scale > m_S->GetMaxY())
+  if (scale > m_SS->GetMaxY())
     return;
 
   // exceeded min limits?
-  if (scale < m_S->GetMinY())
+  if (scale < m_SS->GetMinY())
     return;
 
   // display information vtrans
@@ -2701,18 +2359,17 @@ void medOpMML3ContourWidget::ScaleSouth(double *p1, double *p2)
 
   // update s spline
   // display values
-  m_S->RemovePoint(s);
-  m_S->AddPoint(s, scale);
-  m_S->Render();
+  m_SS->RemovePoint(currentId);
+  m_SS->AddPoint(currentId, scale);
+  m_SS->Render();
 
   // actual values
-  m_Model->GetSSSpline()->RemovePoint(z);
-  m_Model->GetSSSpline()->AddPoint(z, scale);
+  m_Model->GetSSSpline()->RemovePoint(zeta);
+  m_Model->GetSSSpline()->AddPoint(zeta, scale);
 
-  // update widget
+
+  // update widget and scaling handles
   UpdateWidgetTransform();
-  
-  // 
   UpdateScalingHandles();
 
   // update north east segment
@@ -2731,51 +2388,33 @@ void medOpMML3ContourWidget::ScaleSouth(double *p1, double *p2)
 
 
 //----------------------------------------------------------------------------
+// Set the east scaling
 void medOpMML3ContourWidget::ScaleEast(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
-  float v[3];
-  v[0] = p2[0] - p1[0]; 
-  v[1] = p2[1] - p1[1]; 
-  v[2] = 0.0; // no change along z
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0]; 
+  mvec[1] = p2[1] - p1[1]; 
+  mvec[2] = 0.0; // no change along z
 
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  // get current slice id and zeta 
+  int currentId = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
-
-  // get center h translation
-  double chtrans = m_Model->GetPHSpline()->Evaluate(z);
-
-  // get center v translation
-  double cvtrans = m_Model->GetPVSpline()->Evaluate(z);
-  
-  // get twist
-  double twist = m_Model->GetRASpline()->Evaluate(z);
-
-  // get h translation
-  double htrans = m_Model->GetTHSpline()->Evaluate(z);
-
-  // get v translation
-  double vtrans = m_Model->GetTVSpline()->Evaluate(z);
-  
-  // get east scaling
-  double escale = m_Model->GetSESpline()->Evaluate(z);
-
-  // get west scaling
-  double wscale = m_Model->GetSWSpline()->Evaluate(z);
-
-  // get north scaling
-  double nscale = m_Model->GetSNSpline()->Evaluate(z);
-
-  // get south scaling
-  double sscale = m_Model->GetSSSpline()->Evaluate(z);
+  // evaluate splines
+  double chtrans = m_Model->GetPHSpline()->Evaluate(zeta); // place h
+  double cvtrans = m_Model->GetPVSpline()->Evaluate(zeta); // place v
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);   // rotate
+  double htrans = m_Model->GetTHSpline()->Evaluate(zeta);  // translate h
+  double vtrans = m_Model->GetTVSpline()->Evaluate(zeta);  // translate v
+  double nscale = m_Model->GetSNSpline()->Evaluate(zeta);  // scale n
+  double sscale = m_Model->GetSSSpline()->Evaluate(zeta);  // scale s
+  double escale = m_Model->GetSESpline()->Evaluate(zeta);  // scale e
+  double wscale = m_Model->GetSWSpline()->Evaluate(zeta);  // scale w
 
   // rotated x unit vector
-  float x[3];
-  x[0] = 1.0; x[1] = 0.0; x[2] = 0.0;
+  double x[3] = {1.0, 0.0, 0.0} ;
   vtkTransform* TransformX = vtkTransform::New();
   TransformX->Identity();
   TransformX->RotateZ(twist);
@@ -2784,22 +2423,22 @@ void medOpMML3ContourWidget::ScaleEast(double *p1, double *p2)
 
   // projection on rotated x axis
   vtkMath* Math = vtkMath::New();
-  double xprojection = Math->Dot(v, x);
+  double xprojection = Math->Dot(mvec, x);
   Math->Delete();
 
   if (xprojection == 0.0) // no motion
     return;
 
   // overall scale
-  float scale = xprojection * 0.05;
-  scale = escale + scale;
-  
+  double scale = escale + 0.05*xprojection ;
+
+
   // exceeded max limits?
-  if (scale > m_E->GetMaxY())
+  if (scale > m_SE->GetMaxY())
     return;
 
   // exceeded min limits?
-  if (scale < m_E->GetMinY())
+  if (scale < m_SE->GetMinY())
     return;
 
   // display information vtrans
@@ -2807,18 +2446,17 @@ void medOpMML3ContourWidget::ScaleEast(double *p1, double *p2)
 
   // update e spline
   // display values
-  m_E->RemovePoint(s);
-  m_E->AddPoint(s, scale);
-  m_E->Render();
+  m_SE->RemovePoint(currentId);
+  m_SE->AddPoint(currentId, scale);
+  m_SE->Render();
 
   // actual values
-  m_Model->GetSESpline()->RemovePoint(z);
-  m_Model->GetSESpline()->AddPoint(z, scale);
+  m_Model->GetSESpline()->RemovePoint(zeta);
+  m_Model->GetSESpline()->AddPoint(zeta, scale);
 
-  // update widget
+
+  // update widget and scaling handles
   UpdateWidgetTransform();
-  
-  // 
   UpdateScalingHandles();
 
   // update north east segment
@@ -2837,51 +2475,33 @@ void medOpMML3ContourWidget::ScaleEast(double *p1, double *p2)
 
 
 //----------------------------------------------------------------------------
+// Set the west scaling
 void medOpMML3ContourWidget::ScaleWest(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // get vector of motion
-  float v[3];
-  v[0] = p2[0] - p1[0]; 
-  v[1] = p2[1] - p1[1]; 
-  v[2] = 0.0; // no change along z
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0]; 
+  mvec[1] = p2[1] - p1[1]; 
+  mvec[2] = 0.0; // no change along z
 
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  // get current slice id and zeta 
+  int currentId = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
-
-  // get center h translation
-  double chtrans = m_Model->GetPHSpline()->Evaluate(z);
-
-  // get center v translation
-  double cvtrans = m_Model->GetPVSpline()->Evaluate(z);
-  
-  // get twist
-  double twist = m_Model->GetRASpline()->Evaluate(z);
-
-  // get h translation
-  double htrans = m_Model->GetTHSpline()->Evaluate(z);
-
-  // get v translation
-  double vtrans = m_Model->GetTVSpline()->Evaluate(z);
-  
-  // get east scaling
-  double escale = m_Model->GetSESpline()->Evaluate(z);
-
-  // get west scaling
-  double wscale = m_Model->GetSWSpline()->Evaluate(z);
-
-  // get north scaling
-  double nscale = m_Model->GetSNSpline()->Evaluate(z);
-
-  // get south scaling
-  double sscale = m_Model->GetSSSpline()->Evaluate(z);
+  // evaluate splines
+  double chtrans = m_Model->GetPHSpline()->Evaluate(zeta); // place h
+  double cvtrans = m_Model->GetPVSpline()->Evaluate(zeta); // place v
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);   // rotate
+  double htrans = m_Model->GetTHSpline()->Evaluate(zeta);  // translate h
+  double vtrans = m_Model->GetTVSpline()->Evaluate(zeta);  // translate v
+  double nscale = m_Model->GetSNSpline()->Evaluate(zeta);  // scale n
+  double sscale = m_Model->GetSSSpline()->Evaluate(zeta);  // scale s
+  double escale = m_Model->GetSESpline()->Evaluate(zeta);  // scale e
+  double wscale = m_Model->GetSWSpline()->Evaluate(zeta);  // scale w
 
   // rotated x unit vector
-  float x[3];
-  x[0] = 1.0; x[1] = 0.0; x[2] = 0.0;
+  double x[3] = {1.0, 0.0, 0.0} ;
   vtkTransform* TransformX = vtkTransform::New();
   TransformX->Identity();
   TransformX->RotateZ(twist);
@@ -2890,22 +2510,21 @@ void medOpMML3ContourWidget::ScaleWest(double *p1, double *p2)
 
   // projection on rotated x axis
   vtkMath* Math = vtkMath::New();
-  double xprojection = Math->Dot(v, x);
+  double xprojection = Math->Dot(mvec, x);
   Math->Delete();
 
   if (xprojection == 0.0) // no motion
     return;
 
   // overall scale
-  float scale = -1.0 * xprojection * 0.05;
-  scale = wscale + scale;
-  
+  double scale = wscale - 0.05*xprojection ;
+
   // exceeded max limits?
-  if (scale > m_W->GetMaxY())
+  if (scale > m_SW->GetMaxY())
     return;
 
   // exceeded min limits?
-  if (scale < m_W->GetMinY())
+  if (scale < m_SW->GetMinY())
     return;
 
   // display information vtrans
@@ -2913,18 +2532,17 @@ void medOpMML3ContourWidget::ScaleWest(double *p1, double *p2)
 
   // update w spline
   // display values
-  m_W->RemovePoint(s);
-  m_W->AddPoint(s, scale);
-  m_W->Render();
+  m_SW->RemovePoint(currentId);
+  m_SW->AddPoint(currentId, scale);
+  m_SW->Render();
 
   // actual values
-  m_Model->GetSWSpline()->RemovePoint(z);
-  m_Model->GetSWSpline()->AddPoint(z, scale);
+  m_Model->GetSWSpline()->RemovePoint(zeta);
+  m_Model->GetSWSpline()->AddPoint(zeta, scale);
 
-  // update widget
+
+  // update widget and scaling handles
   UpdateWidgetTransform();
-  
-  // 
   UpdateScalingHandles();
 
   // update north east segment
@@ -2942,72 +2560,72 @@ void medOpMML3ContourWidget::ScaleWest(double *p1, double *p2)
 
 
 
+
 //----------------------------------------------------------------------------
+// Set the value for the place vector
 void medOpMML3ContourWidget::Place(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
-   // get vector of motion
-  double m[3];
-  m[0] = p2[0] - p1[0];
-  m[1] = p2[1] - p1[1];
-  m[2] = 0.0; // no change along z
+  // get vector of motion
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0];
+  mvec[1] = p2[1] - p1[1];
+  mvec[2] = 0.0; // no change along z
 
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  // get current slice id and zeta 
+  int currentId = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
-
-  // get center h/v translation
+  // evaluate splines
   double ctrans[2];
-  ctrans[0] = m_Model->GetPHSpline()->Evaluate(z);
-  ctrans[1] = m_Model->GetPVSpline()->Evaluate(z);
+  ctrans[0] = m_Model->GetPHSpline()->Evaluate(zeta);
+  ctrans[1] = m_Model->GetPVSpline()->Evaluate(zeta);
 
   // horizontal/vertical displacement
-  double h = m[0];
-  double v = m[1];
+  double dx = mvec[0];
+  double dy = mvec[1];
 
   // exceeded max limits?
-  if ((ctrans[0] + h) > m_CH->GetMaxY())
+  if ((ctrans[0] + dx) > m_PH->GetMaxY())
     return;
-  if ((ctrans[1] + v) > m_CV->GetMaxY())
-	return;
+  if ((ctrans[1] + dy) > m_PV->GetMaxY())
+    return;
 
   // exceeded min limits?
-  if ((ctrans[0] + h) < m_CH->GetMinY())
-	return;
-  if ((ctrans[1] + v) < m_CV->GetMinY())
-	return;
+  if ((ctrans[0] + dx) < m_PH->GetMinY())
+    return;
+  if ((ctrans[1] + dy) < m_PV->GetMinY())
+    return;
 
   // display information vtrans
-  m_Model->SetText(1, ctrans[1] + v, 3, 0); // text actor 1
-  
+  m_Model->SetText(1, ctrans[1] + dy, 3, 0); // text actor 1
+
   // display information htrans
-  m_Model->SetText(2, ctrans[0] + h, 3, 0); // text actor 2
+  m_Model->SetText(2, ctrans[0] + dx, 3, 0); // text actor 2
 
   // update ch spline
   // display values
-  m_CH->RemovePoint(s);
-  m_CH->AddPoint(s, ctrans[0] + h);
-  m_CH->Render();
+  m_PH->RemovePoint(currentId);
+  m_PH->AddPoint(currentId, ctrans[0] + dx);
+  m_PH->Render();
 
   // actual values
-  m_Model->GetPHSpline()->RemovePoint(z);
-  m_Model->GetPHSpline()->AddPoint(z, ctrans[0] + h);
-  
+  m_Model->GetPHSpline()->RemovePoint(zeta);
+  m_Model->GetPHSpline()->AddPoint(zeta, ctrans[0] + dx);
+
   // update cv spline
   // display values
-  m_CV->RemovePoint(s);
-  m_CV->AddPoint(s, ctrans[1] + v);
-  m_CV->Render();
- 
+  m_PV->RemovePoint(currentId);
+  m_PV->AddPoint(currentId, ctrans[1] + dy);
+  m_PV->Render();
+
   // actual values
-  m_Model->GetPVSpline()->RemovePoint(z);
-  m_Model->GetPVSpline()->AddPoint(z, ctrans[1] + v);
+  m_Model->GetPVSpline()->RemovePoint(zeta);
+  m_Model->GetPVSpline()->AddPoint(zeta, ctrans[1] + dy);
 
   // update widget
   UpdateWidgetTransform();
-  
+
   // update north east segment
   m_Model->UpdateSegmentNorthEastTransform();
 
@@ -3029,41 +2647,33 @@ void medOpMML3ContourWidget::Place(double *p1, double *p2)
 
 
 
+
 //----------------------------------------------------------------------------
+// Set the value for the translate vector
 void medOpMML3ContourWidget::Translate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
-  float x[3]; // x axis unit vector
-  x[0] = 1.0;
-  x[1] = 0.0;
-  x[2] = 0.0;
-
-  float y[3]; // y axis unit vector
-  y[0] = 0.0;
-  y[1] = 1.0;
-  y[2] = 0.0;
-
   // get vector of motion
-  float m[3];
-  m[0] = p2[0] - p1[0]; 
-  m[1] = p2[1] - p1[1]; 
-  m[2] = 0.0; // no change along z
-  
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0]; 
+  mvec[1] = p2[1] - p1[1]; 
+  mvec[2] = 0.0; // no change along z
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
+  // get current slice id and zeta
+  double s = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
   // get twist
-  double twist = m_Model->GetRASpline()->Evaluate(z);
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);
 
   // get h/v translation
   double trans[2];
-  trans[0] = m_Model->GetTHSpline()->Evaluate(z);
-  trans[1] = m_Model->GetTVSpline()->Evaluate(z);
+  trans[0] = m_Model->GetTHSpline()->Evaluate(zeta);
+  trans[1] = m_Model->GetTVSpline()->Evaluate(zeta);
 
-  //
+  // rotated x and y unit vectors
+  double x[3] = {1.0, 0.0, 0.0} ;
+  double y[3] = {0.0, 1.0, 0.0} ;
   vtkTransform* Transform = vtkTransform::New();
   Transform->Identity();
   Transform->RotateZ(twist);
@@ -3072,54 +2682,54 @@ void medOpMML3ContourWidget::Translate(double *p1, double *p2)
   Transform->Delete();
 
   vtkMath* Math = vtkMath::New();
-  double h = Math->Dot(m, x); // projection on rotated x axis
-  double v = Math->Dot(m, y); // projection on rotated y axis
+  double h = Math->Dot(mvec, x); // projection on rotated x axis
+  double v = Math->Dot(mvec, y); // projection on rotated y axis
   Math->Delete();
 
   // exceeded max limits?
-  if ((trans[0] + h) > m_H->GetMaxY())
+  if ((trans[0] + h) > m_TH->GetMaxY())
     return;
-  if ((trans[1] + v) > m_V->GetMaxY())
-	return;
+  if ((trans[1] + v) > m_TV->GetMaxY())
+    return;
 
   // exceeded min limits?
-  if ((trans[0] + h) < m_H->GetMinY())
-	return;
-  if ((trans[1] + v) < m_V->GetMinY())
-	return;
+  if ((trans[0] + h) < m_TH->GetMinY())
+    return;
+  if ((trans[1] + v) < m_TV->GetMinY())
+    return;
 
   // display information vtrans
   m_Model->SetText(1, trans[1] + v, 3, 0); // text actor 1
-  
+
   // display information htrans
   m_Model->SetText(2, trans[0] + h, 3, 0); // text actor 2
 
   // update h spline
   // display values
-  m_H->RemovePoint(s);
-  m_H->AddPoint(s, trans[0] + h);
-  m_H->Render();
+  m_TH->RemovePoint(s);
+  m_TH->AddPoint(s, trans[0] + h);
+  m_TH->Render();
 
   // actual values
-  m_Model->GetTHSpline()->RemovePoint(z);
-  m_Model->GetTHSpline()->AddPoint(z, trans[0] + h);
-  
+  m_Model->GetTHSpline()->RemovePoint(zeta);
+  m_Model->GetTHSpline()->AddPoint(zeta, trans[0] + h);
+
   // update v spline
   // display values
-  m_V->RemovePoint(s);
-  m_V->AddPoint(s, trans[1] + v);
-  m_V->Render();
-  
+  m_TV->RemovePoint(s);
+  m_TV->AddPoint(s, trans[1] + v);
+  m_TV->Render();
+
   // actual values
-  m_Model->GetTVSpline()->RemovePoint(z);
-  m_Model->GetTVSpline()->AddPoint(z, trans[1] + v);
+  m_Model->GetTVSpline()->RemovePoint(zeta);
+  m_Model->GetTVSpline()->AddPoint(zeta, trans[1] + v);
 
   // update vertical cuts
-  m_Model->UpdateSegmentCuttingPlanes();
+  m_Model->UpdateCuttingPlanesTransform();
 
   // update widget
   UpdateWidgetTransform();
-  
+
   // update north east segment
   m_Model->UpdateSegmentNorthEastTransform();
 
@@ -3142,52 +2752,50 @@ void medOpMML3ContourWidget::Translate(double *p1, double *p2)
 
 
 //----------------------------------------------------------------------------
+// Set the rotation value
 void medOpMML3ContourWidget::Rotate(double *p1, double *p2)
 //----------------------------------------------------------------------------
 {
   // motion vector (world space)
-  double v[3];
-  v[0] = p2[0] - p1[0];
-  v[1] = p2[1] - p1[1];
-  v[2] = p2[2] - p1[2]; 
-  
-  // get current slice id
-  double s = m_Model->GetCurrentIdOfSyntheticScans();
+  double mvec[3];
+  mvec[0] = p2[0] - p1[0];
+  mvec[1] = p2[1] - p1[1];
+  mvec[2] = p2[2] - p1[2]; 
 
-  // get z level
-  double z = m_Model->GetCurrentZOfSyntheticScans();
+  // get current slice id and zeta
+  double s = m_Model->GetCurrentIdOfScans();
+  double zeta = m_Model->GetZetaOfCurrentSlice();
 
   // get twist
-  double twist = m_Model->GetRASpline()->Evaluate(z);
+  double twist = m_Model->GetRASpline()->Evaluate(zeta);
 
   // rotation angle
-  double theta;
-  theta = v[1]; // y displacement
+  double theta = mvec[1]; // angle depends on y displacement 
 
   // exceeded max limit?
-  if ((twist + theta) > m_T->GetMaxY())
+  if ((twist + theta) > m_RA->GetMaxY())
     return;
 
   // exceeded min limit?
-  if ((twist + theta) < m_T->GetMinY())
-	return;
+  if ((twist + theta) < m_RA->GetMinY())
+    return;
 
   // display information
   m_Model->SetText(1, twist + theta, 2, 0);
 
   // update twist spline
   // display values
-  m_T->RemovePoint(s);
-  m_T->AddPoint(s, twist + theta);
-  m_T->Render();
+  m_RA->RemovePoint(s);
+  m_RA->AddPoint(s, twist + theta);
+  m_RA->Render();
 
   // actual values
-  m_Model->GetRASpline()->RemovePoint(z);
-  m_Model->GetRASpline()->AddPoint(z, twist + theta);
+  m_Model->GetRASpline()->RemovePoint(zeta);
+  m_Model->GetRASpline()->AddPoint(zeta, twist + theta);
 
   // update widget
   UpdateWidgetTransform();
-  
+
   // update north east segment
   m_Model->UpdateSegmentNorthEastTransform();
 
@@ -3217,6 +2825,79 @@ void medOpMML3ContourWidget::SetRepresentation(int representation)
   if (this->m_Representation != (representation<VTK_PLANE_OFF?VTK_PLANE_OFF:(representation>VTK_PLANE_SURFACE?VTK_PLANE_SURFACE:representation))) \
   {
     this->m_Representation = (representation<VTK_PLANE_OFF?VTK_PLANE_OFF:(representation>VTK_PLANE_SURFACE?VTK_PLANE_SURFACE:representation)); \
-    this->Modified(); \
+      this->Modified(); \
   }
 }
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------
+// print self
+void medOpMML3ContourWidget::PrintSelf(ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
+{
+
+  this->UpdatePlacement() ;
+  this->UpdateRotationHandle() ;
+  this->UpdateScalingHandles() ;
+  this->UpdateWidgetTransform() ;
+
+  os << "MML Contour Widget" << std::endl ;
+  os << std::endl ;
+
+  os << "Plane Representation: " ;
+  if (this->m_Representation == VTK_PLANE_OFF)
+    os << "Off\n" ;
+  else if ( this->m_Representation == VTK_PLANE_WIREFRAME )
+    os << "Wireframe\n";
+  else if ( this->m_Representation == VTK_PLANE_SURFACE )
+    os << "Surface\n";
+  else
+    os << m_Representation << " Unknown\n";
+
+  os << "Normal To X Axis: " << (this->m_NormalToXAxis ? "On" : "Off") << "\n";
+  os << "Normal To Y Axis: " << (this->m_NormalToYAxis ? "On" : "Off") << "\n";
+  os << "Normal To Z Axis: " << (this->m_NormalToZAxis ? "On" : "Off") << "\n";
+
+
+  // position of plane
+  int res = this->m_PlaneSource->GetXResolution();
+  double *origin = this->m_PlaneSource->GetOrigin();
+  double *pt1 = this->m_PlaneSource->GetPoint1();
+  double *pt2 = this->m_PlaneSource->GetPoint2();
+
+  os << "Plane visibility: " << m_PlaneActor->GetVisibility() << "\n";
+  os << "Resolution: " << res << "\n";
+  os << "Origin: (" << origin[0] << ", " << origin[1] << ", "<< origin[2] << ")\n";
+  os << "Point 1: (" << pt1[0] << ", " << pt1[1] << ", " << pt1[2] << ")\n";
+  os << "Point 2: (" << pt2[0] << ", " << pt2[1] << ", " << pt2[2] << ")\n";
+  os << "\n" ;
+
+
+
+  // position of handles
+  double *pos ;
+  int vis ;
+
+  vis = m_CenterHandleActor->GetVisibility() ;
+  pos = m_CenterHandleActor->GetCenter() ;
+  os << "center handle: " << "visibility = " << vis << " position: " << pos[0] << " " << pos[1] << " " << pos[2] << std::endl ;
+
+  vis = m_RotationalHandleActor->GetVisibility() ;
+  pos = m_RotationalHandleActor->GetCenter() ;
+  os << "rotation handle: " << "visibility = " << vis << " position: " << pos[0] << " " << pos[1] << " " << pos[2] << std::endl ;
+
+  for (int i = 0 ;  i < 4 ;  i++){
+    vis = m_HandleActor[i]->GetVisibility() ;
+    pos = m_HandleActor[i]->GetCenter() ;
+    os << "handle " << i << ": " << "visibility = " << vis  << " position: " << pos[0] << " " << pos[1] << " " << pos[2] << std::endl ;
+  }
+  os << std::endl ;
+  os << std::endl ;
+
+}
+
