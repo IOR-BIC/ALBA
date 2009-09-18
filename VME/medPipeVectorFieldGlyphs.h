@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-18 12:52:22 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2009-09-18 18:29:19 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -200,7 +200,7 @@ protected:
   void StoreFilterLinks();
   void StoreFilterLinks2();
   /** init filter list  */
-  void InitFilterList();
+  void InitFilterList(int nScalars);
   /** to test if this point in range */
   bool doCondition(int mode ,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2);
   /** Handles change of material. */

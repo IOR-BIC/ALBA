@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-18 12:52:32 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2009-09-18 18:29:19 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -252,67 +252,68 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 	
 	sbSizer3->Add( bSizer6, 0, wxEXPAND, 1 );
 
-	
-	//----------------------second filter list----------
-	m_RangeCtrl2 = new wxListCtrl( m_Gui, ID_LIST_RANGES, wxDefaultPosition, 
-		wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL );
-	m_RangeCtrl2->SetColumnWidth(0,200);//wxLIST_AUTOSIZE_USEHEADER
-	m_RangeCtrl2->SetColumnWidth(1,300);// useless
+	 if (nScalars > 0)
+	 {
+		//----------------------second filter list----------
+		m_RangeCtrl2 = new wxListCtrl( m_Gui, ID_LIST_RANGES, wxDefaultPosition, 
+			wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL );
+		m_RangeCtrl2->SetColumnWidth(0,200);//wxLIST_AUTOSIZE_USEHEADER
+		m_RangeCtrl2->SetColumnWidth(1,300);// useless
 
-	sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("scalar Filter:"), 
-		wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
-	sbSizer3->Add( m_RangeCtrl2, 1, wxALL|wxEXPAND, 1 );
-	//----------------------buttons----------
-	wxBoxSizer* bSizer7 = new wxBoxSizer( wxHORIZONTAL );  
-	bSizer7->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
-		wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
+		sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("scalar Filter:"), 
+			wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+		sbSizer3->Add( m_RangeCtrl2, 1, wxALL|wxEXPAND, 1 );
+		//----------------------buttons----------
+		wxBoxSizer* bSizer7 = new wxBoxSizer( wxHORIZONTAL );  
+		bSizer7->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
+			wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
 
-	m_BttnAddItem2 = new wxButton(m_Gui,ID_ADDITEM2,wxT("Add"),
-		wxDefaultPosition,wxSize( 50,-1 ), 0);
-	m_BttnAddItem2->Enable(true);
-	m_BttnAddItem2->SetToolTip(wxT("Add an item."));
-	m_BttnAddItem2->SetValidator(mafGUIValidator(this, ID_ADDITEM2, m_BttnAddItem2));
+		m_BttnAddItem2 = new wxButton(m_Gui,ID_ADDITEM2,wxT("Add"),
+			wxDefaultPosition,wxSize( 50,-1 ), 0);
+		m_BttnAddItem2->Enable(true);
+		m_BttnAddItem2->SetToolTip(wxT("Add an item."));
+		m_BttnAddItem2->SetValidator(mafGUIValidator(this, ID_ADDITEM2, m_BttnAddItem2));
 
-	m_BttnRemoveItem2 = new wxButton( m_Gui, ID_REMOVEITEM2, wxT("Remove"), 
-		wxDefaultPosition, wxSize( 50,-1 ), 0 );
-	m_BttnRemoveItem2->Enable( false );
-	m_BttnRemoveItem2->SetToolTip( wxT("Removes selected item.") );
-	m_BttnRemoveItem2->SetValidator(mafGUIValidator(this, ID_REMOVEITEM2, m_BttnRemoveItem));
+		m_BttnRemoveItem2 = new wxButton( m_Gui, ID_REMOVEITEM2, wxT("Remove"), 
+			wxDefaultPosition, wxSize( 50,-1 ), 0 );
+		m_BttnRemoveItem2->Enable( false );
+		m_BttnRemoveItem2->SetToolTip( wxT("Removes selected item.") );
+		m_BttnRemoveItem2->SetValidator(mafGUIValidator(this, ID_REMOVEITEM2, m_BttnRemoveItem));
 
-	m_BttnShow2 = new wxButton( m_Gui, ID_SHOWITEM2, wxT("Show"), 
-		wxDefaultPosition, wxSize( 50,-1 ), 0 );
-	m_BttnShow2->Enable( false );
-	m_BttnShow2->SetToolTip( wxT("Show result.") );
-	m_BttnShow2->SetValidator(mafGUIValidator(this, ID_SHOWITEM2, m_BttnShow));
+		m_BttnShow2 = new wxButton( m_Gui, ID_SHOWITEM2, wxT("Show"), 
+			wxDefaultPosition, wxSize( 50,-1 ), 0 );
+		m_BttnShow2->Enable( false );
+		m_BttnShow2->SetToolTip( wxT("Show result.") );
+		m_BttnShow2->SetValidator(mafGUIValidator(this, ID_SHOWITEM2, m_BttnShow));
 
-	bSizer7->Add( m_BttnAddItem2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
-	bSizer7->Add( m_BttnRemoveItem2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
-	bSizer7->Add( m_BttnShow2,0, wxALIGN_CENTER_VERTICAL|wxALL,1);
+		bSizer7->Add( m_BttnAddItem2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
+		bSizer7->Add( m_BttnRemoveItem2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
+		bSizer7->Add( m_BttnShow2,0, wxALIGN_CENTER_VERTICAL|wxALL,1);
 
-	sbSizer3->Add( bSizer7, 0, wxEXPAND, 1 );
+		sbSizer3->Add( bSizer7, 0, wxEXPAND, 1 );
 
-	//-----------------------logic widgets-----------------
-	wxBoxSizer* bSizer8= new wxBoxSizer( wxHORIZONTAL );  
-	bSizer8->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
-		wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
-	wxArrayString radioStrings ;
-	radioStrings.Add(wxT("AND")) ;
-	radioStrings.Add(wxT("OR")) ;
+		//-----------------------logic widgets-----------------
+		wxBoxSizer* bSizer8= new wxBoxSizer( wxHORIZONTAL );  
+		bSizer8->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
+			wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
+		wxArrayString radioStrings ;
+		radioStrings.Add(wxT("AND")) ;
+		radioStrings.Add(wxT("OR")) ;
 
 
-	wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, wxEmptyString, wxDefaultPosition, wxSize(85,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
-	radioBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_ANDOR, radioBox, &m_AndOr));
+		wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, wxEmptyString, wxDefaultPosition, wxSize(85,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
+		radioBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_ANDOR, radioBox, &m_AndOr));
 
-	m_BttnShowAssociate = new wxButton( m_Gui, ID_SHOWITEM, wxT("Show Associate"), 
-		wxDefaultPosition, wxSize( 100,-1 ), 0 );
-	m_BttnShowAssociate->Enable(false);
-	m_BttnShowAssociate->SetToolTip(wxT("Show result from associated two filter."));
-	m_BttnShowAssociate->SetValidator(mafGUIValidator(this, ID_SHOWITEM_ASSOCIATE, m_BttnShowAssociate));
+		m_BttnShowAssociate = new wxButton( m_Gui, ID_SHOWITEM, wxT("Show Associate"), 
+			wxDefaultPosition, wxSize( 100,-1 ), 0 );
+		m_BttnShowAssociate->Enable(false);
+		m_BttnShowAssociate->SetToolTip(wxT("Show result from associated two filter."));
+		m_BttnShowAssociate->SetValidator(mafGUIValidator(this, ID_SHOWITEM_ASSOCIATE, m_BttnShowAssociate));
 
-	bSizer8->Add(radioBox,0,wxALIGN_CENTER_VERTICAL|wxALL, 1);
-	bSizer8->Add(m_BttnShowAssociate,0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
-	sbSizer3->Add( bSizer8, 0, wxEXPAND, 1 );
-
+		bSizer8->Add(radioBox,0,wxALIGN_CENTER_VERTICAL|wxALL, 1);
+		bSizer8->Add(m_BttnShowAssociate,0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
+		sbSizer3->Add( bSizer8, 0, wxEXPAND, 1 );
+	}
 //------------------------check box-------------
 /*	wxBoxSizer* bSizer7 = new wxBoxSizer( wxVERTICAL );  
 */
@@ -332,7 +333,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 	bSizerMain->Add( sbSizer3, 0, wxEXPAND, 1 );
 
 #pragma endregion Glyph range
-    InitFilterList();
+    InitFilterList(nScalars);
 
 //----------weih add end---------
 
@@ -479,12 +480,16 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 
 //----------------------------------------------------------------------------
 // init items of this gui when load vme--[7/31/2009 weih]
-void medPipeVectorFieldGlyphs::InitFilterList(){
+void medPipeVectorFieldGlyphs::InitFilterList(int nScalars){
 //----------------------------------------------------------------------------
 	wxString cols[2] = { wxT("filter name"), wxT("range value") };
 	for (int i = 0; i < 2; i++){
 		m_RangeCtrl->InsertColumn(i, cols[i]);
-		m_RangeCtrl2->InsertColumn(i,cols[i]);
+		if (nScalars > 0)
+		{
+			m_RangeCtrl2->InsertColumn(i,cols[i]);
+		}
+		
 	}
 	mafNode::mafLinksMap* pLinks =  m_Vme->GetLinks();
 	wxString itemName,itemValue1,itemValue2,displayValue;
@@ -529,7 +534,7 @@ void medPipeVectorFieldGlyphs::InitFilterList(){
 			m_RangeCtrl->SetItemData(idx1 , (long)pItem);
 			idx1++;
 
-		}else if (linkName.StartsWith(FILTER_LINK_NAME2))
+		}else if (linkName.StartsWith(FILTER_LINK_NAME2) &&  nScalars>0)
 		{
 			//------insert item----format--"filter-link0:aa:0.100:1.214"
 			FILTER_ITEM* pItem = new FILTER_ITEM;
@@ -642,7 +647,7 @@ void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 			  m_BttnShow->Enable(true);
 			  m_BttnRemoveItem->Enable(true);
 			  
-			  if ( m_RangeCtrl2->GetItemCount()>0)
+			  if ( GetNumberOfScalars()>1 && m_RangeCtrl2->GetItemCount()>0)
 			  {
 				m_BttnShowAssociate->Enable(true);
 			  }
@@ -794,8 +799,7 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 	int nIndex1 = -1;
 	int nIndex2 = -1;
 	nIndex1 = m_RangeCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
-	nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
-
+	
 	if (mode ==1 && nIndex1>=0)
 	{
 		FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl->GetItemData(nIndex1);
@@ -803,25 +807,30 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 		valueRange[0] = pItem->value[0] ;
 		valueRange[1] = pItem->value[1];
 		doFilter(mode,valueRange,NULL);
-	}else if (mode ==2 && nIndex2>=0)
+	}else if (mode ==2 )
 	{
-		FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
-		double valueRange[2];
-		valueRange[0] = pItem->value[0] ;
-		valueRange[1] = pItem->value[1];
-		doFilter(mode,NULL,valueRange);		
-
-	}else if (mode ==3 && nIndex1>=0 && nIndex2>=0)
+		nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
+		if( nIndex2>=0){
+			FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
+			double valueRange[2];
+			valueRange[0] = pItem->value[0] ;
+			valueRange[1] = pItem->value[1];
+			doFilter(mode,NULL,valueRange);		
+		}
+	}else if (mode ==3 && nIndex1>=0 )
 	{
-		double valueRange1[2],valueRange2[2];
-		FILTER_ITEM* pItem1 = (FILTER_ITEM*)m_RangeCtrl->GetItemData(nIndex1);
-		valueRange1[0] = pItem1->value[0];
-		valueRange1[1] = pItem1->value[1];
+		nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
+		if( nIndex2>=0){
+			double valueRange1[2],valueRange2[2];
+			FILTER_ITEM* pItem1 = (FILTER_ITEM*)m_RangeCtrl->GetItemData(nIndex1);
+			valueRange1[0] = pItem1->value[0];
+			valueRange1[1] = pItem1->value[1];
 
-		FILTER_ITEM* pItem2 = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
-		valueRange2[0] = pItem2->value[0];
-		valueRange2[1] = pItem2->value[1];
-		doFilter(mode,valueRange1,valueRange2);	
+			FILTER_ITEM* pItem2 = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
+			valueRange2[0] = pItem2->value[0];
+			valueRange2[1] = pItem2->value[1];
+			doFilter(mode,valueRange1,valueRange2);	
+		}
 	}
 }
 //-----------------------------------------------------------------------
@@ -1156,8 +1165,8 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 	vtkDataArray *old_vectors = allPoints->GetVectors();
 	vtkDataArray *old_tensors = allPoints->GetTensors();
 
-	vtkDataArray *allArray = allPoints->GetScalars();
-	int nPoints = allArray->GetSize();
+	
+	int nPoints = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfTuples();
 	int idx,num=0 ;
 
 	if(orgData->IsA("vtkRectilinearGrid")){
@@ -1251,8 +1260,11 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 						//double tmpScale =  sqrt(pCoord[0]*pCoord[0]+pCoord[1]*pCoord[1]+pCoord[2]*pCoord[2]);	 
 						double *vet = old_vectors->GetTuple3(idx);
 						double tmpVectorValue =  sqrt(vet[0]*vet[0]+vet[1]*vet[1]+vet[2]*vet[2]);
-						double tmpScaleValue = old_scalars->GetTuple1(idx);
-
+						double tmpScaleValue = NULL;
+						if (mode>1)
+						{
+							old_scalars->GetTuple1(idx);
+						}
 						if (doCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))
 						{
 							pCoord[0] = origin[0] + pCoord[0] + ix * spacing[0];
@@ -1517,7 +1529,8 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
 
   vtkDataSet *orgData = m_Vme->GetOutput()->GetVTKData();
   vtkPointData *allPoints = orgData->GetPointData();
-  int nPoints = allPoints->GetScalars()->GetSize();
+//  int nPoints = allPoints->GetScalars()->GetSize();
+  int nPoints = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfTuples();
   vtkDataArray *old_scalars = allPoints->GetScalars();
 
 
@@ -1528,22 +1541,27 @@ bool medPipeVectorFieldGlyphs::DetectSpacing(vtkFloatArray* pCoords, double* pOu
 	  {
 		da->GetRange(m_Sr);//for vtkStructedPoint
 
-		double tmpValue; // for vtkRectilinearGrid
-		m_Sr2[0] = old_scalars->GetTuple1(0);
-		m_Sr2[1] = old_scalars->GetTuple1(0);
-
-		for (int i=0;i<nPoints;i++)
+		int nScalars = GetNumberOfScalars();
+		if ( nScalars>0)
 		{
-			tmpValue = old_scalars->GetTuple1(i);
-			if (tmpValue>m_Sr2[1])
+			double tmpValue; // for vtkRectilinearGrid
+			m_Sr2[0] = old_scalars->GetTuple1(0);
+			m_Sr2[1] = old_scalars->GetTuple1(0);
+
+			for (int i=0;i<nPoints;i++)
 			{
-				m_Sr2[1] = tmpValue;
-			}
-			if (tmpValue<m_Sr2[0])
-			{
-				m_Sr2[0] = tmpValue;
+				tmpValue = old_scalars->GetTuple1(i);
+				if (tmpValue>m_Sr2[1])
+				{
+					m_Sr2[1] = tmpValue;
+				}
+				if (tmpValue<m_Sr2[0])
+				{
+					m_Sr2[0] = tmpValue;
+				}
 			}
 		}
+
 	  }
 	  
 	  da->GetRange(sr);
