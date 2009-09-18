@@ -29,12 +29,21 @@ SET(PROJECT_SRCS
   medOpMMLModelView.h
   medOpMMLParameterView.cpp
   medOpMMLParameterView.h
+
   medOpMML3.cpp
   medOpMML3.h
   medOpMML3ContourWidget.cpp
   medOpMML3ContourWidget.h
+  medOpMML3GlobalRegistration.cpp
+  medOpMML3GlobalRegistration.h
   medOpMML3ModelView.cpp
   medOpMML3ModelView.h
+  medOpMML3ModelView2DPipe.cpp
+  medOpMML3ModelView2DPipe.h
+  medOpMML3ModelView3DPipe.cpp
+  medOpMML3ModelView3DPipe.h
+  medOpMML3NonUniformSlicePipe.cpp
+  medOpMML3NonUniformSlicePipe.h
   medOpMML3ParameterView.cpp
   medOpMML3ParameterView.h
 
