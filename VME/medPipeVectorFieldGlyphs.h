@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 16:40:38 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2009-09-18 12:52:22 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -61,6 +61,7 @@ protected:
     ID_SF_MAPPING_LUT,
     ID_SHOW_SF_MAPPING,
 	ID_LIST_RANGES,
+//------------
 	ID_REMOVEITEM,
 	ID_ADDITEM,
 	ID_SHOWITEM,
@@ -69,6 +70,19 @@ protected:
 	ID_RANGE_VALUE2,
 	ID_ITEM_OK,
 	ID_ITEM_CANCEL,
+
+//------------
+	ID_REMOVEITEM2,
+	ID_ADDITEM2,
+	ID_SHOWITEM2,
+	ID_RANGE_NAME2,
+	ID_RANGE_VALUE1_2,
+	ID_RANGE_VALUE2_2,
+	ID_ITEM_OK2,
+	ID_ITEM_CANCEL2,
+	ID_CHOOSE_ANDOR,
+
+	ID_SHOWITEM_ASSOCIATE,
 	ID_SHOW_ALL,
 	ID_LAST,
   };  
@@ -87,6 +101,7 @@ protected:
     SCALING_SCALARS,
   };
   const static char* FILTER_LINK_NAME;
+  const static char* FILTER_LINK_NAME2;
   static int count ;
   
   int m_GlyphType;                  ///<type of glyph (one of GLYPH_TYPES)
@@ -111,15 +126,24 @@ protected:
   vtkScalarBarActor* m_SFActor;       ///<actor that displays the mapping bat
   vtkPolyData* m_Output;              //output data for m_Glyphs.
   wxListCtrl* m_RangeCtrl;            //control filter range
+  wxListCtrl* m_RangeCtrl2;
   wxButton* m_BttnRemoveItem;         //remove list item
+  wxButton* m_BttnRemoveItem2;         //remove list item
   wxButton* m_BttnAddItem;            //add list item
+  wxButton* m_BttnAddItem2;
   wxButton* m_BttnShow;               //show result of this filter
+  wxButton* m_BttnShow2;               //show result of second filter
   mafGUIButton* m_ItemOK;
+  mafGUIButton* m_ItemOK2;
   mafGUIDialog *m_AddItemDlg;         //dlg for input name and value;
   wxString m_FilterName;
   wxString m_FilterValue1;
   wxString m_FilterValue2;
   double m_Sr[2];
+  double m_Sr2[2];
+  wxButton* m_BttnShowAssociate;      //show result of two filter
+
+  int m_AndOr;
   int m_ShowAll;                     //1 do not use filter,0 use filter
 
 #pragma region GUI controls
@@ -159,21 +183,26 @@ protected:
   /** Updates VTK pipeline (setting radius, etc.). */
   /*virtual*/ void UpdateVTKPipe();
   /** Add an item in the list */
-  void OnAddItem();
+  void OnAddItem(int idx);
   /** create a dialog*/
-  void createAddItemDlg();
+  void createAddItemDlg(int idx);
   /** insert an item into list if values are valid */
   bool AddItem();
+  bool AddItem2();
   /** update data structure and update view */	
-  void OnShowFilter();
+  void OnShowFilter(int mode);
   /** remove an item from range list */
   void OnRemoveItem();
+  void OnRemoveItem2();
   /** use filter */
-  void doFilter(double *value);
+  void doFilter(int mode ,double *rangeValue,double *rangeValue2);
   /** store filter data */
   void StoreFilterLinks();
+  void StoreFilterLinks2();
   /** init filter list  */
   void InitFilterList();
+  /** to test if this point in range */
+  bool doCondition(int mode ,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2);
   /** Handles change of material. */
   virtual void OnChangeMaterial(); 
 
