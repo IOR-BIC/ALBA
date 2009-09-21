@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-09-09 15:33:02 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-21 15:48:09 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ class vtkPolyDataNormals;
 VME with input a surface and a volume, and producing a distance/density scalar surface.  
 */
 
-class MAF_EXPORT medVMEMaps : public mafVMESurface
+class MAF_EXPORT medVMEMaps : public mafVMEGeneric
 {
 public:
   
@@ -41,18 +41,10 @@ public:
   enum VME_MAPS_WIDGET_ID
   {
     ID_DENSITY_DISTANCE = Superclass::ID_LAST,
-    /*ID_FIRST_THRESHOLD,
-    ID_SECOND_THRESHOLD,
-    ID_MAX_DISTANCE,
-    ID_SELECT_VOLUME,
-    ID_NUM_SECTIONS,
-    ID_BAR_TIPOLOGY,
-    ID_AREA,
-    ID_AREA_DISTANCE,*/
     ID_LAST
   };
 
-  mafTypeMacro(medVMEMaps,mafVMESurface);
+  mafTypeMacro(medVMEMaps,mafVMEGeneric);
 
 
   /** print a dump of this object */
@@ -90,7 +82,7 @@ public:
   //virtual bool IsDataAvailable();
 
   /** Return the suggested pipe-typename for the visualization of this vme */
-  //virtual mafString GetVisualPipe() {return mafString("mafPipeSurfaceTextured");};
+  virtual mafString GetVisualPipe() {return mafString("mafPipeSurface");};
 
   /** Return pointer to material attribute. */
   mmaMaterial *GetMaterial();
@@ -106,15 +98,40 @@ public:
   /** Get the source volume. */
   mafVMEVolume *GetVolume();
 
-  /** Set input vtkPolyData. */
-  void SetVTKPolyData(vtkPolyData *data);
-
   /** Get input vtkPolyData. */
-  vtkDataSet *GetVTKPolyData();
+  vtkPolyData *GetPolyData();
 
-  void Selected(bool sel);
+  /** 
+  Set data for the give timestamp. 
+  Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
+  this type of VME. */
+  virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
-protected:
+  /** Get distance-density filter mode. */
+  int GetDensityDistance(){return m_DensityDistance;};
+
+  /** Set distance-density filter mode. */
+  void SetDensityDistance(int densityDistance);
+
+  /** Get first threshold distance-density filter parameter. */
+  int GetFirstThreshold(){return m_FirstThreshold;};
+
+  /** Set first threshold distance-density filter parameter. */
+  void SetFirstThreshold(int firstThreshold);
+
+  /** Get second threshold distance-density filter parameter. */
+  int GetSecondThreshold(){return m_SecondThreshold;};
+
+  /** Set second threshold distance-density filter parameter. */
+  void SetSecondThreshold(int secondThreshold);
+  
+  /** Get max distance distance-density filter parameter. */
+  int GetMaxDistance(){return m_SecondThreshold;};
+
+  /** Set max distance distance-density filter parameter. */
+  void SetMaxDistance(int maxDistance);
+
+private:
 
   medVMEMaps();
   virtual ~medVMEMaps();
@@ -131,14 +148,14 @@ protected:
   /** update the output data structure */
   virtual void InternalUpdate();
 
-  /** update filter mode*/
-  virtual void UpdateMaps();
+  /** private to avoid calling by external classes */
+  virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
   vtkPolyDataNormals        *m_Normals;
   vtkMAFDistanceFilter      *m_DistanceFilter;
   mafVMEVolume              *m_Volume;
   mafTransform              *m_Transform;
-  vtkPolyData               *m_PolyData;;
+  vtkPolyData               *m_PolyData;
 
   int m_DensityDistance;
   int m_FirstThreshold;
