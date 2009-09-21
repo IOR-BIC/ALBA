@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-08 11:39:05 $
-  Version:   $Revision: 1.2.2.2 $
+  Date:      $Date: 2009-09-21 12:56:43 $
+  Version:   $Revision: 1.2.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -36,6 +36,7 @@
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
 #include "vtkStructuredPoints.h"
+#include "vtkPolyData.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpExporterVTK);
@@ -230,7 +231,7 @@ void mafOpExporterVTK::SaveVTKData()
     v_tpdf->SetInput((vtkPolyData *)((mafVME *)m_Input)->GetOutput()->GetVTKData());
     v_tpdf->SetTransform(((mafVME *)m_Input)->GetOutput()->GetTransform()->GetVTKTransform());
     v_tpdf->Update();
-    writer->SetInput(writerInput);
+    writer->SetInput(v_tpdf->GetOutput());
   }
   else
   {
