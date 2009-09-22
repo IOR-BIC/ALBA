@@ -23,7 +23,15 @@ SET(PROJECT_SRCS
   medCurvilinearAbscissaOnSkeletonHelper.h
   medGizmoInteractionDebugger.cpp
   medGizmoInteractionDebugger.h
+
+  medRelationalDatabaseAbstractConnector.cpp
+  medRelationalDatabaseAbstractConnector.h
+
+  medResultQueryAbstractHandler.cpp
+  medResultQueryAbstractHandler.h
   
+  medQueryObject.h
+
 	#### SHOULD BE COMMITTED DOWN ######
 	mafDbg.h
 	mafDataChecksum.h
