@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-21 15:48:09 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-09-22 09:17:57 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -209,13 +209,13 @@ mafVMEOutputSurface *medVMEMaps::GetSurfaceOutput()
   return mafVMEOutputSurface::SafeDownCast(m_Output);
 }
 
-//-------------------------------------------------------------------------
-void medVMEMaps::SetMatrix(const mafMatrix &mat)
-//-------------------------------------------------------------------------
-{
-  m_Transform->SetMatrix(mat);
-  Modified();
-}
+// //-------------------------------------------------------------------------
+// void medVMEMaps::SetMatrix(const mafMatrix &mat)
+// //-------------------------------------------------------------------------
+// {
+//   m_Transform->SetMatrix(mat);
+//   Modified();
+// }
 
 //-------------------------------------------------------------------------
 void medVMEMaps::GetLocalTimeStamps(std::vector<mafTimeStamp> &kframes)

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-09-21 15:48:09 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-09-22 09:17:57 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -67,7 +67,7 @@ public:
   set or get the Pose for a specified time. When setting, if the time does not exist
   the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
   interpolates on the fly according to the matrix interpolator.*/
-  virtual void SetMatrix(const mafMatrix &mat);
+  // virtual void SetMatrix(const mafMatrix &mat);
 
   /**
   Return the list of timestamps for this VME. Timestamps list is 
