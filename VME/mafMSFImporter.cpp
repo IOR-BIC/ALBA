@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafMSFImporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-04-29 15:17:12 $
-  Version:   $Revision: 1.19 $
+  Date:      $Date: 2009-09-23 10:17:41 $
+  Version:   $Revision: 1.19.2.1 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -95,6 +95,8 @@ int mmuMSF1xDocument::InternalRestore(mafStorageElement *node)
       else
       {
         m_Root->AddChild(child_vme);
+
+        child_vme->UnRegister(NULL);
       }
     }    
   }
