@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmaVolumeMaterial.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-04 10:32:02 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-09-23 14:33:54 $
+  Version:   $Revision: 1.9.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -272,7 +272,17 @@ void mmaVolumeMaterial::UpdateFromTables()
   m_ColorLut->GetHueRange(m_HueRange);
   m_ColorLut->GetSaturationRange(m_SaturationRange);
   m_NumValues = m_ColorLut->GetNumberOfTableValues();
-  m_ColorLut->GetTableRange(m_TableRange);
+
+  // Added by Losi 09.23.09
+  // BUG 1809 Fix
+  // When storing the material if m_TableRange attribute represents the invalid range [0, -1] (set in the constructor)
+  // it mustn't be updated from m_ColorLut's GetTableRange method that returns a valid range [0, 1]
+  // This avoids storing a valid range when the invalid range is set
+
+  if(!(m_TableRange[0] == 0 && m_TableRange[1] == -1))
+  {
+	  m_ColorLut->GetTableRange(m_TableRange);
+  }
   m_Window_LUT = m_TableRange[1] - m_TableRange[0];
   m_Level_LUT  = (m_TableRange[1] + m_TableRange[0])* .5;
 }
