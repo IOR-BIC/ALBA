@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-17 14:22:57 $
-Version:   $Revision: 1.1.2.45 $
+Date:      $Date: 2009-09-23 09:02:06 $
+Version:   $Revision: 1.1.2.46 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1425,8 +1425,8 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
   mat->SetElement(2,2,orientation[8]);
   mat->SetElement(3,2,0);
 
-//   mat->SetElement(0,3,origin[0]);
-//   mat->SetElement(1,3,origin[1]);
+  mat->SetElement(0,3,origin[0]);//
+  mat->SetElement(1,3,origin[1]);//
   mat->SetElement(2,3,origin[2]); //origin
 
   vtkTransform *trans = vtkTransform::New();
