@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3ModelView2DPipe.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkSphereSource.h"
 #include "vtkPlaneSource.h"
 #include "vtkTransform.h"
@@ -57,8 +58,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 medOpMML3ModelView2DPipe::medOpMML3ModelView2DPipe(vtkRenderer *ren, vtkPolyData *muscle, vtkDataSet* volume, int numberOfSlices)
 : m_Renderer(ren), m_NumberOfSlices(numberOfSlices), m_CurrentVisibility(0),
 m_CurrentSliceId(0),
-m_GlobalAxesOn(0), m_ContourAxesOn(1), m_TextXOn(0), m_TextYOn(0), m_MusclePolyDataOn(0),
-m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
+m_GlobalAxesOn(0), m_ContourAxesOn(1), m_TextXOn(0), m_TextYOn(0), m_ContourOn(1),
+m_MusclePolyDataOn(0), m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
 {
   //----------------------------------------------------------------------------
   // Calculate scalar lut
@@ -148,7 +149,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   //                |          /
   //        SliceTransformFilter[i]
   //                |
-  //                |       volume
+  //                |       muscle (patient space)
   //                |      /
   //            ProbeFilter[i]
   //                |
@@ -384,19 +385,20 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   //
   //              muscle (patient space)
   //                |
-  //                |           MuscleTransform
-  //                |          /
-  //       MuscleTransformFilter ========> Output of Operation
-  //                |
-  //                |
-  //                |
+  //                |        ContourCutterTransform (inverse of slice transform to get same plane as slice)
+  //                |        /
   //                |      ContourPlane (cut function)
   //                V      /
   //          ContourCutter
-  //          |   |   |   |  
-  //          |   |   |   |   
-  //         NE   NW  SE  SW 
-  //          |   |   |   |   
+  //                |
+  //                |          ContourTransform (transform into coords of current slice)
+  //                V          /
+  //      ContourTransformFilter =====> robust calc. of contour center
+  //           /   / \   \
+  //          /   /   \   \
+  //        NE  NW     SE  SW 
+  //         |   |     |   |  
+  //         V   V     V   V
   //
   //----------------------------------------------------------------------------
 
@@ -405,13 +407,24 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // cutter for contour
   //----------------------------------------------------------------------------
 
+  m_ContourCutterTransform = vtkTransform::New() ;
+  m_ContourCutterTransform->Identity() ;
+
   m_ContourPlane = vtkPlane::New();
   m_ContourPlane->SetOrigin(0,0,0) ;
   m_ContourPlane->SetNormal(0,0,1) ;
+  m_ContourPlane->SetTransform(m_ContourCutterTransform) ;
 
   m_ContourCutter = vtkCutter::New();
   m_ContourCutter->SetCutFunction(m_ContourPlane);
-  m_ContourCutter->SetInput(m_MuscleTransformFilter->GetOutput());
+  m_ContourCutter->SetInput(muscle);
+
+  m_ContourTransform = vtkTransform::New() ;
+  m_ContourTransform->Identity() ;
+
+  m_ContourTransformFilter = vtkTransformPolyDataFilter::New() ;
+  m_ContourTransformFilter->SetInput(m_ContourCutter->GetOutput()) ;
+  m_ContourTransformFilter->SetTransform(m_ContourTransform) ;
 
 
 
@@ -444,8 +457,13 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   //----------------------------------------------------------------------------
   // north-east contour visual pipe
   //
+  //        ContourCutter
   //             |
-  //        ContourCutter      cuttingPlanesTransform
+  //             |          ContourTransform (transform into coords of current slice)
+  //             V          /
+  //      ContourTransformFilter
+  //             |
+  //             |      cuttingPlanesTransform
   //             |              /
   //             |             /
   //             |           cutting plane N
@@ -474,7 +492,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   //----------------------------------------------------------------------------
 
   m_NEContourClipFilterN = vtkClipPolyData::New();
-  m_NEContourClipFilterN->SetInput(m_ContourCutter->GetOutput()); // first cut plane
+  m_NEContourClipFilterN->SetInput(m_ContourTransformFilter->GetOutput()); // first cut plane
   m_NEContourClipFilterN->SetClipFunction(m_CuttingPlaneN);
   m_NEContourClipFilterN->GlobalWarningDisplayOff();
 
@@ -501,7 +519,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_NEContourActor = vtkActor::New();
   m_NEContourActor->SetMapper(m_NEContourMapper);
   m_NEContourActor->GetProperty()->SetColor(1.0, 1.0, 0.0);
-  m_NEContourActor->VisibilityOn();
+  m_NEContourActor->SetVisibility(m_ContourOn);
 
   m_Renderer->AddActor(m_NEContourActor);
 
@@ -511,7 +529,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // north-west contour visual pipe
   //----------------------------------------------------------------------------
   m_NWContourClipFilterN = vtkClipPolyData::New();
-  m_NWContourClipFilterN->SetInput(m_ContourCutter->GetOutput());
+  m_NWContourClipFilterN->SetInput(m_ContourTransformFilter->GetOutput());
   m_NWContourClipFilterN->SetClipFunction(m_CuttingPlaneN);
   m_NWContourClipFilterN->GlobalWarningDisplayOff();
 
@@ -538,7 +556,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_NWContourActor = vtkActor::New();
   m_NWContourActor->SetMapper(m_NWContourMapper);
   m_NWContourActor->GetProperty()->SetColor(0.0, 1.0, 1.0);
-  m_NWContourActor->VisibilityOn();
+  m_NWContourActor->SetVisibility(m_ContourOn);
 
   m_Renderer->AddActor(m_NWContourActor);
 
@@ -547,7 +565,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // south-east contour visual pipe
   //----------------------------------------------------------------------------
   m_SEContourClipFilterS = vtkClipPolyData::New();
-  m_SEContourClipFilterS->SetInput(m_ContourCutter->GetOutput());
+  m_SEContourClipFilterS->SetInput(m_ContourTransformFilter->GetOutput());
   m_SEContourClipFilterS->SetClipFunction(m_CuttingPlaneS);
   m_SEContourClipFilterS->GlobalWarningDisplayOff();
 
@@ -574,7 +592,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_SEContourActor = vtkActor::New();
   m_SEContourActor->SetMapper(m_SEContourMapper);
   m_SEContourActor->GetProperty()->SetColor(0.0, 1.0, 1.0);
-  m_SEContourActor->VisibilityOn();
+  m_SEContourActor->SetVisibility(m_ContourOn);
 
   m_Renderer->AddActor(m_SEContourActor);
 
@@ -583,7 +601,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   // south-west contour visual pipe
   //----------------------------------------------------------------------------
   m_SWContourClipFilterS = vtkClipPolyData::New();
-  m_SWContourClipFilterS->SetInput(m_ContourCutter->GetOutput());
+  m_SWContourClipFilterS->SetInput(m_ContourTransformFilter->GetOutput());
   m_SWContourClipFilterS->SetClipFunction(m_CuttingPlaneS);
   m_SWContourClipFilterS->GlobalWarningDisplayOff();
 
@@ -610,7 +628,7 @@ m_TubeSize(0.01), m_AxisLengthX(1.0), m_AxisLengthY(1.0)
   m_SWContourActor = vtkActor::New();
   m_SWContourActor->SetMapper(m_SWContourMapper);
   m_SWContourActor->GetProperty()->SetColor(1.0, 1.0, 0.0);
-  m_SWContourActor->VisibilityOn();
+  m_SWContourActor->SetVisibility(m_ContourOn);
 
   m_Renderer->AddActor(m_SWContourActor);
 
@@ -758,11 +776,12 @@ medOpMML3ModelView2DPipe::~medOpMML3ModelView2DPipe()
   m_GlobalNegYAxisMapper->Delete() ;
   m_GlobalNegYAxisActor->Delete() ;
 
-
-
   // cutter and clipping planes
   m_ContourPlane->Delete() ;
+  m_ContourCutterTransform->Delete() ;
   m_ContourCutter->Delete() ;
+  m_ContourTransform->Delete() ;
+  m_ContourTransformFilter->Delete() ;
   m_CuttingPlanesTransform->Delete() ;
   m_CuttingPlaneN->Delete() ;
   m_CuttingPlaneS->Delete() ;
@@ -847,10 +866,12 @@ void medOpMML3ModelView2DPipe::SetVisibility(int visibility)
     m_ContourNegYAxisActor->SetVisibility(visibility) ;
   }
 
-  m_NEContourActor->SetVisibility(visibility) ;
-  m_NWContourActor->SetVisibility(visibility) ;
-  m_SEContourActor->SetVisibility(visibility) ;
-  m_SWContourActor->SetVisibility(visibility) ;
+  if (m_ContourOn){
+    m_NEContourActor->SetVisibility(visibility) ;
+    m_NWContourActor->SetVisibility(visibility) ;
+    m_SEContourActor->SetVisibility(visibility) ;
+    m_SWContourActor->SetVisibility(visibility) ;
+  }
 
   if (m_TextXOn)
     m_ScaledTextActorX->SetVisibility(visibility) ;
@@ -866,43 +887,26 @@ void medOpMML3ModelView2DPipe::SetVisibility(int visibility)
 void medOpMML3ModelView2DPipe::Update()
 //------------------------------------------------------------------------------
 {
-  m_MuscleMapper->Update() ;
-  m_SliceMapper[m_CurrentSliceId]->Update() ;
-
-  m_GlobalPosXAxisMapper->Update() ;
-  m_GlobalPosYAxisMapper->Update() ;
-  m_GlobalNegXAxisMapper->Update() ;
-  m_GlobalNegYAxisMapper->Update() ;
-
-  m_ContourPosXAxisMapper->Update() ;
-  m_ContourPosYAxisMapper->Update() ;
-  m_ContourNegXAxisMapper->Update() ;
-  m_ContourNegYAxisMapper->Update() ;
-
-  m_NEContourMapper->Update() ;
-  m_NWContourMapper->Update() ;
-  m_SEContourMapper->Update() ;
-  m_SWContourMapper->Update() ;
-
-  m_Renderer->Render() ;
+  m_Renderer->GetRenderWindow()->Render() ;
 }
 
 
 
 
 //------------------------------------------------------------------------------
-// Update all slices and contours.
+// Force update of all slices and contours.
 // Call this once to pre-process the slices, to avoid sticky processing when moving slider.
 void medOpMML3ModelView2DPipe::UpdateAllSlices()
 //------------------------------------------------------------------------------
 {
   for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
     m_SliceActor[i]->SetVisibility(1) ;    // temporarily switch on actors so that they can update
-    m_SliceMapper[i]->Update() ;
   }
+  m_Renderer->GetRenderWindow()->Render() ;
 
   // set visibility back to normal
   SetVisibility(m_CurrentVisibility) ;
+  m_Renderer->GetRenderWindow()->Render() ;
 }
 
 
@@ -917,6 +921,10 @@ void medOpMML3ModelView2DPipe::SetCurrentSliceId(int i)
 
   // plug the corresponding matrix into the muscle transform
   m_MuscleTransform->SetMatrix(m_Invmat[i]) ;
+
+  // plug the matrix into the contour cutter transforms
+  m_ContourCutterTransform->SetMatrix(m_Invmat[i]) ;  // positions cutting plane in patient space (inverse because it's vtkCutter)
+  m_ContourTransform->SetMatrix(m_Invmat[i]) ; // transforms contour into slice coords
 
   Update() ;
 }
@@ -1404,7 +1412,18 @@ void medOpMML3ModelView2DPipe::SetSWContourTransform(vtkTransform *transform)
 void medOpMML3ModelView2DPipe::CalculateRobustCenterOfContour(double *pos) const
 //------------------------------------------------------------------------------
 {
-  int numPts = m_ContourCutter->GetOutput()->GetPoints()->GetNumberOfPoints() ;
+  m_ContourTransformFilter->GetOutput()->Update() ;
+  vtkPoints *contourPoints = m_ContourTransformFilter->GetOutput()->GetPoints() ;
+
+  int numPts = contourPoints->GetNumberOfPoints() ;
+
+  if (numPts == 0){
+    // no points - set to zero and return
+    pos[0] = 0.0 ;
+    pos[1] = 0.0 ;
+    pos[2] = 0.0 ;
+    return ;
+  }
 
   std::vector<double> posx ;
   std::vector<double> posy ;
@@ -1413,7 +1432,7 @@ void medOpMML3ModelView2DPipe::CalculateRobustCenterOfContour(double *pos) const
   // list the x, y and z values
   for (int i = 0 ;  i < numPts ;  i++){
     double pt[3] ;
-    m_ContourCutter->GetOutput()->GetPoints()->GetPoint(i, pt) ;
+    contourPoints->GetPoint(i, pt) ;
     posx.push_back(pt[0]) ;
     posy.push_back(pt[1]) ;
     posz.push_back(pt[2]) ;
@@ -1433,7 +1452,6 @@ void medOpMML3ModelView2DPipe::CalculateRobustCenterOfContour(double *pos) const
   pos[0] = (posx.at(nLo) + posx.at(nHi)) / 2.0  ;
   pos[1] = (posy.at(nLo) + posy.at(nHi)) / 2.0  ;
   pos[2] = (posz.at(nLo) + posz.at(nHi)) / 2.0  ;
-
 }
 
 

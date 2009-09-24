@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -883,6 +883,9 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   int sectionHeight = winSize / NumberOfNonUniformSections ;
   int textHeight = sectionHeight - 2 ;  // slightly smaller because of border width
 
+  // column title
+  wxStaticText *renWinTitleTxt = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "Section view", wxPoint(0,0), wxSize(25,textHeight)) ;
+
   // create render window
   m_SectionsViewRWI = new mafRWI(m_NonUniformSlicesDlg);
   m_SectionsViewRWI->SetListener(this);
@@ -892,6 +895,7 @@ void medOpMML3::CreateNonUniformSlicesDlg()
 
   // vertical sizer for rwi 
   wxBoxSizer *RenWinBoxSizer = new wxBoxSizer(wxVERTICAL);
+  RenWinBoxSizer->Add(renWinTitleTxt, 0.5, wxEXPAND | wxALL, 1);
   RenWinBoxSizer->Add(m_SectionsViewRWI->m_RwiBase, 0.5, wxEXPAND | wxALL, 1);
   RenWinBoxSizer->AddSpacer(sectionHeight) ;  // space of one section at bottom to allow for total box
 
@@ -906,6 +910,11 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   m_NumSlicesLabel = new (wxStaticText* [NumberOfNonUniformSections]) ;
   m_NumSlicesEntry = new (wxTextCtrl* [NumberOfNonUniformSections]) ;
 
+  // column title
+  wxStaticText *numSlicesTitleTxt = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "Number of slices", wxPoint(0,0), wxSize(75,textHeight)) ;
+  widgetsBoxSizer->Add(numSlicesTitleTxt, 0, wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
+
+  // number of slices entry widgets
   for (int i = 0 ;  i < NumberOfNonUniformSections ;  i++){
     wxString label = wxString::Format(wxT("%d"),i+1);
 
@@ -945,7 +954,6 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   wxBoxSizer *okCancelBoxSizer = new wxBoxSizer(wxHORIZONTAL);
   okCancelBoxSizer->Add(SliceOk, 0, wxALIGN_CENTRE_HORIZONTAL, 0);
   okCancelBoxSizer->Add(b_cancel, 0, wxALIGN_CENTRE_HORIZONTAL, 0);
-
 
 
 
@@ -1634,7 +1642,7 @@ void medOpMML3::OnMuscleSelection()
 
 
   // set up specific set of landmarks (parameters are .msf section names)
-  SetUpLandmarks2(m_AtlasMSFSectionName, m_PatientMSFSectionName);
+  //SetUpLandmarks2(m_AtlasMSFSectionName, m_PatientMSFSectionName);
 
   //
   mafVME *RootVME;

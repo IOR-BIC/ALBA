@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -247,6 +247,7 @@ void medOpMML3ModelView::Initialize()
   m_VisualPipe2D->Update() ;
   m_VisualPipe3D->Update() ;
   m_VisualPipePreview->Update() ;
+
 
   // Calculate the centers and bounds of the contours before any transformations take place
   // and while the default identity transforms are still valid.
@@ -725,11 +726,11 @@ void medOpMML3ModelView::CalculateOriginalContourCenters()
 
   for (int i = 0 ;  i < m_NumberOfScans ;  i++){
     SetCurrentIdOfScans(i) ;
-    GetVisualPipe2D()->CalculateRobustCenterOfContour(m_OriginalContourCenters[i]) ; 
     GetVisualPipe2D()->GetCurrentContourBounds(m_OriginalContourBounds[i]) ;
-
-    // add value to centre op spline
-    // This allows us to interpolate the centre between slices later
+    GetVisualPipe2D()->CalculateRobustCenterOfContour(m_OriginalContourCenters[i]) ; // returns (0,0,0) if no data, which is ok
+ 
+    // add value to center op spline
+    // This allows us to interpolate the center between slices later
     double zeta = GetZetaOfCurrentSlice() ;
     GetCHSpline()->AddPoint(zeta, m_OriginalContourCenters[i][0]) ;
     GetCVSpline()->AddPoint(zeta, m_OriginalContourCenters[i][1]) ;
@@ -1512,9 +1513,8 @@ void medOpMML3ModelView::UpdateSegmentNorthEastTransform()
   scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
 
-  // original bounds and center
-  double bounds[6], center[3] ;
-  GetOriginalContourBounds(bounds) ;
+  // original center
+  double center[3] ;
   GetOriginalContourCenter(center) ;
 
 
@@ -1568,9 +1568,8 @@ void medOpMML3ModelView::UpdateSegmentNorthWestTransform()
   scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
 
-  // original bounds and center
-  double bounds[6], center[3] ;
-  GetOriginalContourBounds(bounds) ;
+  // original center
+  double center[3] ;
   GetOriginalContourCenter(center) ;
 
 
@@ -1623,9 +1622,8 @@ void medOpMML3ModelView::UpdateSegmentSouthEastTransform()
   scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
 
-  // original bounds and center
-  double bounds[6], center[3] ;
-  GetOriginalContourBounds(bounds) ;
+  // original center
+  double center[3] ;
   GetOriginalContourCenter(center) ;
 
 
@@ -1678,9 +1676,8 @@ void medOpMML3ModelView::UpdateSegmentSouthWestTransform()
   scale[3] = GetSSSpline()->Evaluate(zeta); // south;
 
 
-  // original bounds and center
-  double bounds[6], center[3] ;
-  GetOriginalContourBounds(bounds) ;
+  // original center
+  double center[3] ;
   GetOriginalContourCenter(center) ;
 
 

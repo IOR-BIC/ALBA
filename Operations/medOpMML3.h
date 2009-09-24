@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,28 +39,29 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //------------------------------------------------------------------------------
-// TODO 16.9.09
+// TODO 25.9.09
 // 
 // Widget
 // Unify variables m_Operation, m_ScalingMode etc.
 // Problems with text display.
-// Problems caused by pre-setting the endpoints of the splines.
-// Got problems where contour does not respond to T and S, although text is changing.
+// Problems caused by pre-setting the endpoints of the splines.  Should endpoints be fixed ?
+// Sometimes contour does not respond to T and S, although text is changing.
 //
 // Preview
 // Some components are missing, and widget handles are still visible.
 //
-// Final registration
-// Small problem with ops changing results of previous ops
-//
 // Dialog
+// Add explanation to non-uniform slice dialog.
+// Add spinners to non-uniform slice dialog.
 // Add progress bar to show pre-processing of slices.
-// Slice processing is rather slow.  One second per slice at 128 resolution.
-// Crashes with only 12 slices at 256 resolution.  Out of memory ?
+// Add estimates of processing time, and maximum no. of slices and slice size.
 //
 // Bent axis
 // Restore piecewise axis option
 // Test visual pipes with bent axis.
+//
+// Input
+// Modify MML so that it can accept a simpler set of input files.
 //
 // Remove medOpMatrixVectorMath from aneuFuse and lhp.
 //------------------------------------------------------------------------------
@@ -87,6 +88,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Current slice space - the coord system of the current slice.  The 2d view is in current slice space.
 // Alpha and zeta - alpha and zeta are the distance (fractional and actual) of the slice along the axis.  
 // The splines are functions of zeta, but displayed as a function of slice id.
+//
+// Transforms
+// vtkPlane/vtkCutter requires an inverse transform.
+//
 //------------------------------------------------------------------------------
 class medOpMML3: public mafOp
 {

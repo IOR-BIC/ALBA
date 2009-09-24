@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView2DPipe.h,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ public:
   /// Update current visible parts of the pipeline.
   void Update() ;
 
-  /// Update all slices. \n
+  /// Force update of all slices. \n
   /// Call this once to pre-process the slices, to avoid sticky processing later when moving slider.
   void UpdateAllSlices() ;
 
@@ -121,7 +121,8 @@ public:
   void GetCurrentContourCenter(double *center) ;   ///< Get the center of the contour
 
   /// Calculate robust center of the current (untransformed) contour. \n
-  /// Gives much better result than GetCurrentContourCenter().
+  /// Gives much better result than GetCurrentContourCenter(). \n
+  /// Returns (0,0,0) if there is no contour data.
   void CalculateRobustCenterOfContour(double *rcenter) const ; 
 
 
@@ -155,6 +156,7 @@ private:
   int m_MusclePolyDataOn ;  ///< visibility of muscle
   int m_GlobalAxesOn ; ///< visibility of global axes
   int m_ContourAxesOn ; ///< visibility of contour axes
+  int m_ContourOn ; ///< visibility of contour
   int m_TextXOn ; ///< visibility of x text
   int m_TextYOn ; ///< visibility of y text
 
@@ -259,7 +261,10 @@ private:
 
   // contour cutter
   vtkPlane *m_ContourPlane;
+  vtkTransform *m_ContourCutterTransform ;
   vtkCutter *m_ContourCutter;
+  vtkTransform *m_ContourTransform ;
+  vtkTransformPolyDataFilter *m_ContourTransformFilter ;
 
   // cutting planes for contour
   // these cut the contour into 4 quadrants

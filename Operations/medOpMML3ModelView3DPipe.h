@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView3DPipe.h,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,7 +59,7 @@ public:
   /// Update current visible parts of the pipeline.
   void Update() ;
 
-  /// Update all slices and contours. \n
+  /// Force update of all slices and contours. \n
   /// Call this once to pre-process the slices, to avoid sticky processing when moving slider.
   void UpdateAllSlices() ;
 
@@ -187,7 +187,7 @@ private:
 
   // contour
   vtkPlane **m_ContourPlane ;
-  vtkTransform **m_ContourTransform ;  // position and rotation of cutting plane (use inverse !!)
+  vtkTransform **m_ContourCutterTransform ;  // position and rotation of cutting plane (use inverse !!)
   vtkCutter **m_ContourCutter ;
   vtkTubeFilter **m_ContourTubeFilter ;
   vtkPolyDataMapper **m_ContourMapper ;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3ModelView3DPipe.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-24 14:56:34 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,6 +21,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkSphereSource.h"
 #include "vtkPlaneSource.h"
 #include "vtkTransform.h"
@@ -261,7 +262,7 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
   // Contour pipeline
   //
   //              muscle
-  //                |          contourTransform[i] (inverse of slice transform to get same plane as slice)
+  //                |          contourCutterTransform[i] (inverse of slice transform to get same plane as slice)
   //                |           /
   //                |        contourPlane[i]
   //                |         /
@@ -278,7 +279,7 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
   //         
   //----------------------------------------------------------------------------
 
-  m_ContourTransform = new (vtkTransform*[m_NumberOfSlices]) ;
+  m_ContourCutterTransform = new (vtkTransform*[m_NumberOfSlices]) ;
   m_ContourPlane = new (vtkPlane*[m_NumberOfSlices]) ;
   m_ContourCutter = new (vtkCutter*[m_NumberOfSlices]) ;
   m_ContourTubeFilter = new (vtkTubeFilter*[m_NumberOfSlices]) ;
@@ -286,13 +287,13 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
   m_ContourActor = new (vtkActor*[m_NumberOfSlices]) ;
 
   for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
-    m_ContourTransform[i] = vtkTransform::New() ;
-    m_ContourTransform[i]->Identity() ;
+    m_ContourCutterTransform[i] = vtkTransform::New() ;
+    m_ContourCutterTransform[i]->Identity() ;
 
     m_ContourPlane[i] = vtkPlane::New() ;
     m_ContourPlane[i]->SetOrigin(0,0,0) ;
     m_ContourPlane[i]->SetNormal(0,0,1) ;
-    m_ContourPlane[i]->SetTransform(m_ContourTransform[i]) ;
+    m_ContourPlane[i]->SetTransform(m_ContourCutterTransform[i]) ;
 
     m_ContourCutter[i] = vtkCutter::New() ;
     m_ContourCutter[i]->SetInput(muscle) ;
@@ -376,14 +377,14 @@ medOpMML3ModelView3DPipe::~medOpMML3ModelView3DPipe()
 
   // contour
   for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
-    m_ContourTransform[i]->Delete() ;
+    m_ContourCutterTransform[i]->Delete() ;
     m_ContourPlane[i]->Delete() ;
     m_ContourCutter[i]->Delete() ;
     m_ContourTubeFilter[i]->Delete() ;
     m_ContourMapper[i]->Delete() ;
     m_ContourActor[i]->Delete() ;
   }
-  delete [] m_ContourTransform ;
+  delete [] m_ContourCutterTransform ;
   delete [] m_ContourPlane ;
   delete [] m_ContourCutter ;
   delete [] m_ContourTubeFilter ;
@@ -434,26 +435,13 @@ void medOpMML3ModelView3DPipe::SetVisibility(int visibility)
 void medOpMML3ModelView3DPipe::Update()
 //------------------------------------------------------------------------------
 {
-  m_BoxMapper->Update() ;
-  m_MuscleMapper->Update() ;
-
-  for (int i = 0 ;  i < m_NumberOfLandmarks ;  i++){
-    m_LmarkMapper[i]->Update() ;
-  }
-
-  for (int i = 0 ;  i < m_NumberOfAxisLandmarks ;  i++){
-    m_AxisMarkMapper[i]->Update() ;
-  }
-
-  m_AxisLineMapper->Update() ;
-  m_SliceMapper[m_CurrentSliceId]->Update() ;
-  m_ContourMapper[m_CurrentSliceId]->Update() ;
+  m_Renderer->GetRenderWindow()->Render() ;
 }
 
 
 
 //------------------------------------------------------------------------------
-// Update all slices and contours.
+// Force update of all slices and contours.
 // Call this once to pre-process the slices, to avoid sticky processing when moving slider.
 void medOpMML3ModelView3DPipe::UpdateAllSlices()
 //------------------------------------------------------------------------------
@@ -461,13 +449,12 @@ void medOpMML3ModelView3DPipe::UpdateAllSlices()
   for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
     m_SliceActor[i]->SetVisibility(1) ;    // temporarily switch on actors so that they update
     m_ContourActor[i]->SetVisibility(1) ;
-
-    m_SliceMapper[i]->Update() ;
-    m_ContourMapper[i]->Update() ;
   }
+  m_Renderer->GetRenderWindow()->Render() ;
 
   // set visibility back to normal
   SetVisibility(m_CurrentVisibility) ;
+  m_Renderer->GetRenderWindow()->Render() ;
 
 }
 
@@ -499,7 +486,7 @@ void medOpMML3ModelView3DPipe::SetSliceTransform(int i, vtkMatrix4x4 *mat)
   // Therefore we must set the contour transform to the inverse of the slice transform.
   vtkMatrix4x4 *invMat = vtkMatrix4x4::New() ;
   mat->Invert(mat, invMat) ;
-  m_ContourTransform[i]->SetMatrix(invMat) ;
+  m_ContourCutterTransform[i]->SetMatrix(invMat) ;
   invMat->Delete() ;
 }
 
