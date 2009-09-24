@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDataVector.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-14 17:09:10 $
-  Version:   $Revision: 1.19.2.1 $
+  Date:      $Date: 2009-09-24 11:32:13 $
+  Version:   $Revision: 1.19.2.2 $
   Authors:   Marco Petrone - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -127,7 +127,8 @@ void mafDataVector::ShallowCopy(mafDataVector *array)
 	  mafVMEItem *copy = item->NewInstance();
     assert(copy);
 	  copy->ShallowCopy(item);
-    AppendItem(item);
+    AppendItem(copy); //  Changed by Losi 09.24.2009:
+                      //  Before was AppendItem(item) this generated leaks because copy was unreferenced
   }
 
   Modified();
