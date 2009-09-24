@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 10:30:26 $
-Version:   $Revision: 1.1.2.47 $
+Date:      $Date: 2009-09-24 12:15:07 $
+Version:   $Revision: 1.1.2.48 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -924,7 +924,7 @@ int medOpImporterDicomOffis::BuildVolume()
     double src_pos_y -= dst_pos_y;
     double src_pos_z -= dst_pos_z;*/
 
-    double dst_pos_x = dst_row_dircos_x * src_pos_x
+   /* double dst_pos_x = dst_row_dircos_x * src_pos_x
       + dst_row_dircos_y * src_pos_y
       + dst_row_dircos_z * src_pos_z;
 
@@ -934,7 +934,7 @@ int medOpImporterDicomOffis::BuildVolume()
 
     double dst_pos_z = dst_nrm_dircos_x * src_pos_x
       + dst_nrm_dircos_y * src_pos_y
-      + dst_nrm_dircos_z * src_pos_z;
+      + dst_nrm_dircos_z * src_pos_z;*/
 
 
     vtkMatrix4x4 *mat = vtkMatrix4x4::New();
@@ -952,10 +952,6 @@ int medOpImporterDicomOffis::BuildVolume()
     mat->SetElement(1,2,dst_col_dircos_z);
     mat->SetElement(2,2,dst_nrm_dircos_z);
     mat->SetElement(3,2,0);
-
-    mat->SetElement(0,3,dst_pos_x);
-    mat->SetElement(1,3,dst_pos_y);
-    mat->SetElement(2,3,dst_pos_z );
     mat->SetElement(3,3,1);
 
     mafSmartPointer<mafTransform> boxPose;
@@ -1160,7 +1156,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       double src_pos_y -= dst_pos_y;
       double src_pos_z -= dst_pos_z;*/
 
-      double dst_pos_x = dst_row_dircos_x * src_pos_x
+      /*double dst_pos_x = dst_row_dircos_x * src_pos_x
         + dst_row_dircos_y * src_pos_y
         + dst_row_dircos_z * src_pos_z;
 
@@ -1170,7 +1166,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 
       double dst_pos_z = dst_nrm_dircos_x * src_pos_x
         + dst_nrm_dircos_y * src_pos_y
-        + dst_nrm_dircos_z * src_pos_z;
+        + dst_nrm_dircos_z * src_pos_z;*/
 
 
       vtkMatrix4x4 *mat = vtkMatrix4x4::New();
@@ -1189,9 +1185,9 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       mat->SetElement(2,2,dst_nrm_dircos_z);
       mat->SetElement(3,2,0);
 
-      mat->SetElement(0,3,dst_pos_x);
+    /*  mat->SetElement(0,3,dst_pos_x);
       mat->SetElement(1,3,dst_pos_y);
-      mat->SetElement(2,3,dst_pos_z );
+      mat->SetElement(2,3,dst_pos_z );*/
       mat->SetElement(3,3,1);
 
       mafSmartPointer<mafTransform> boxPose;
@@ -1539,11 +1535,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
     double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
     double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
 
-    /*double src_pos_x -= dst_pos_x;
-    double src_pos_y -= dst_pos_y;
-    double src_pos_z -= dst_pos_z;*/
-
-    double dst_pos_x = dst_row_dircos_x * src_pos_x
+   /* double dst_pos_x = dst_row_dircos_x * src_pos_x
       + dst_row_dircos_y * src_pos_y
       + dst_row_dircos_z * src_pos_z;
 
@@ -1553,7 +1545,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 
     double dst_pos_z = dst_nrm_dircos_x * src_pos_x
       + dst_nrm_dircos_y * src_pos_y
-      + dst_nrm_dircos_z * src_pos_z;
+      + dst_nrm_dircos_z * src_pos_z;*/
 
 
     
@@ -1570,36 +1562,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
     mat->SetElement(1,2,dst_col_dircos_z);
     mat->SetElement(2,2,dst_nrm_dircos_z);
     mat->SetElement(3,2,0);
-
-    mat->SetElement(0,3,dst_pos_x);
-    mat->SetElement(1,3,dst_pos_y);
-    mat->SetElement(2,3,dst_pos_z);
     mat->SetElement(3,3,1);
-
- /* double origin[3];
-  m_SliceTexture->GetInput()->GetOrigin(origin);
-  vtkMatrix4x4 *mat = vtkMatrix4x4::New();
-  mat->Identity();
-
-  mat->SetElement(0,0,orientation[0]);
-  mat->SetElement(1,0,orientation[1]);
-  mat->SetElement(2,0,orientation[2]);
-  mat->SetElement(3,0,0);
-  mat->SetElement(0,1,orientation[3]);
-  mat->SetElement(1,1,orientation[4]);
-  mat->SetElement(2,1,orientation[5]);
-  mat->SetElement(3,1,0);
-  mat->SetElement(0,2,orientation[6]);
-  mat->SetElement(1,2,orientation[7]);
-  mat->SetElement(2,2,orientation[8]);
-  mat->SetElement(3,2,0);
-
-  mat->SetElement(0,3,origin[0]);//
-  mat->SetElement(1,3,origin[1]);//
-  mat->SetElement(2,3,origin[2]); //origin
-
-  vtkTransform *trans = vtkTransform::New();
-  trans->SetMatrix(mat);*/
   }
 
   vtkTransform *trans = vtkTransform::New();
