@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafSideBar.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-22 14:24:44 $
-  Version:   $Revision: 1.35.2.1 $
+  Date:      $Date: 2009-09-24 16:16:56 $
+  Version:   $Revision: 1.35.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,18 +67,18 @@ mafSideBar::mafSideBar(wxWindow* parent, int id, mafObserver *Listener, long sty
 
   if (style == DOUBLE_NOTEBOOK)
   {
-    wxNotebook *vme_notebook = new wxNotebook(m_SideSplittedPanel,-1);
-    vme_notebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
+    m_VmeNotebook = new wxNotebook(m_SideSplittedPanel,-1);
+    m_VmeNotebook->SetFont(wxFont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT)));
 
-    m_VmeOutputPanel = new mafGUIHolder(vme_notebook,-1,false,true);
-    vme_notebook->AddPage(m_VmeOutputPanel,_(" vme output "));
-    m_VmePipePanel = new mafGUIHolder(vme_notebook,-1,false,true);
-    vme_notebook->AddPage(m_VmePipePanel,_(" visual props "));
-    m_VmePanel = new mafGUIHolder(vme_notebook,-1,false,true);
-    vme_notebook->AddPage(m_VmePanel,_("vme"));
+    m_VmeOutputPanel = new mafGUIHolder(m_VmeNotebook,-1,false,true);
+    m_VmeNotebook->AddPage(m_VmeOutputPanel,_(" vme output "));
+    m_VmePipePanel = new mafGUIHolder(m_VmeNotebook,-1,false,true);
+    m_VmeNotebook->AddPage(m_VmePipePanel,_(" visual props "));
+    m_VmePanel = new mafGUIHolder(m_VmeNotebook,-1,false,true);
+    m_VmeNotebook->AddPage(m_VmePanel,_("vme"));
 
     m_SideSplittedPanel->SetMinimumPaneSize(50);
-    m_SideSplittedPanel->SplitHorizontally(m_Tree,vme_notebook);
+    m_SideSplittedPanel->SplitHorizontally(m_Tree,m_VmeNotebook);
   }
   else
   {
