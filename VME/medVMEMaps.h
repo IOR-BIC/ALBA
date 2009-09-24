@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-09-22 09:17:57 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-09-24 09:36:17 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ class vtkPolyDataNormals;
 VME with input a surface and a volume, and producing a distance/density scalar surface.  
 */
 
-class MAF_EXPORT medVMEMaps : public mafVMEGeneric
+class MAF_EXPORT medVMEMaps : public mafVME
 {
 public:
   
@@ -44,7 +44,7 @@ public:
     ID_LAST
   };
 
-  mafTypeMacro(medVMEMaps,mafVMEGeneric);
+  mafTypeMacro(medVMEMaps,mafVME);
 
 
   /** print a dump of this object */
@@ -67,7 +67,7 @@ public:
   set or get the Pose for a specified time. When setting, if the time does not exist
   the MatrixVector creates a new KeyMatrix on the fly. When getting, the matrix vector
   interpolates on the fly according to the matrix interpolator.*/
-  // virtual void SetMatrix(const mafMatrix &mat);
+  virtual void SetMatrix(const mafMatrix &mat);
 
   /**
   Return the list of timestamps for this VME. Timestamps list is 
@@ -90,8 +90,6 @@ public:
   /** return an xpm-icon that can be used to represent this node */
   //static char ** GetIcon();
 
-  //static bool VolumeAccept(mafNode* node) {return(node != NULL  && node->IsMAFType(mafVMEVolume));};
-
   /** Set the source volume. */
   void SetVolume(mafVMEVolume *volume);
 
@@ -105,7 +103,7 @@ public:
   Set data for the give timestamp. 
   Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
   this type of VME. */
-  virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
+  //virtual int SetData(vtkPolyData *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
 
   /** Get distance-density filter mode. */
   int GetDensityDistance(){return m_DensityDistance;};
@@ -131,6 +129,18 @@ public:
   /** Set max distance distance-density filter parameter. */
   void SetMaxDistance(int maxDistance);
 
+  /** Set the link to the maps.*/
+  void SetMappedVMELink(mafNode *node);
+
+  /** Get the link to the mapped vme.*/
+  mafNode *GetMappedVMELink();
+
+  /** Set the volume link to the maps.*/
+  void SetSourceVMELink(mafNode *node);
+
+  /** Get the link to the source vme.*/
+  mafNode *GetSourceVMELink();
+
 private:
 
   medVMEMaps();
@@ -149,7 +159,9 @@ private:
   virtual void InternalUpdate();
 
   /** private to avoid calling by external classes */
-  virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
+  //virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);
+
+  mafString                 m_MappedName;
 
   vtkPolyDataNormals        *m_Normals;
   vtkMAFDistanceFilter      *m_DistanceFilter;
