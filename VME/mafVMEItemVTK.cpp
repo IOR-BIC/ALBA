@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEItemVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-09 15:35:52 $
-  Version:   $Revision: 1.28 $
+  Date:      $Date: 2009-09-24 11:31:08 $
+  Version:   $Revision: 1.28.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005
@@ -95,6 +95,7 @@ void mafVMEItemVTK::DeepCopy(mafVMEItem *a)
 void mafVMEItemVTK::ShallowCopy(mafVMEItem *a)
 //-------------------------------------------------------------------------
 {
+  Superclass::ShallowCopy(a); // Added by Losi 09.24.09 ShallowCopy must copy timestamp too
   mafVMEItemVTK *vtk_item=mafVMEItemVTK::SafeDownCast(a);
   assert(vtk_item);
   m_Data=vtk_item->GetData();
