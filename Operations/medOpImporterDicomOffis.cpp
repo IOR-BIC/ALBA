@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-23 09:02:06 $
-Version:   $Revision: 1.1.2.46 $
+Date:      $Date: 2009-09-24 10:30:26 $
+Version:   $Revision: 1.1.2.47 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -91,7 +91,6 @@ MafMedical is partially based on OpenMAF.
 #include "vtkMAFRGSliceAccumulate.h"
 #include "vtkTransform.h"
 #include "vtkImageData.h"
-#include "vtkImageReslice.h"
 #include "vtkAppendFilter.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageClip.h"
@@ -204,6 +203,7 @@ mafOp(label)
   for (int i = 0; i < 6; i++) 
     m_DicomBounds[i] = 0;
 
+  
   m_PatientPosition = "";
 
 	m_Wizard = NULL;
@@ -827,6 +827,7 @@ int medOpImporterDicomOffis::BuildVolume()
   accumulate->SetNumberOfSlices(n_slices);
   accumulate->BuildVolumeOnAxes(m_SortAxes);
 
+  double origin[3];
   long progress = 0;
   int count,s_count;
   for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
@@ -834,6 +835,9 @@ int medOpImporterDicomOffis::BuildVolume()
     if (s_count == n_slices) {break;}
     CreateSlice(count);
     accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
+    if (s_count == 0)
+      m_SliceTexture->GetInput()->GetOrigin(origin);
+
     s_count++;
 
     if(!this->m_TestMode)
@@ -889,28 +893,77 @@ int medOpImporterDicomOffis::BuildVolume()
   m_Volume->SetDataByDetaching(rg_out,0);
 
 
-  /*if (m_ConstantRotation && m_IsRotated)
+  if (m_IsRotated)
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
     m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
+
+
+    //transform direction cosines to be used to set vtkMatrix
+    /* [ dst_row_dircos_x  dst_row_dircos_y  dst_row_dircos_z  -dst_pos_x ] 
+    [ dst_col_dircos_x  dst_col_dircos_y  dst_col_dircos_z  -dst_pos_y ]
+    [ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
+    [ 0                 0                 0                 1          ]*/
+
+    double dst_row_dircos_x = orientation[0];
+    double dst_row_dircos_y = orientation[1];
+    double dst_row_dircos_z = orientation[2];
+    double dst_col_dircos_x = orientation[3];
+    double dst_col_dircos_y = orientation[4];
+    double dst_col_dircos_z = orientation[5];
+
+    double src_pos_x = origin[0];
+    double src_pos_y = origin[1];
+    double src_pos_z = origin[2];
+
+    double dst_nrm_dircos_x = dst_row_dircos_y * dst_col_dircos_z - dst_row_dircos_z * dst_col_dircos_y; 
+    double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
+    double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
+
+    /*double src_pos_x -= dst_pos_x;
+    double src_pos_y -= dst_pos_y;
+    double src_pos_z -= dst_pos_z;*/
+
+    double dst_pos_x = dst_row_dircos_x * src_pos_x
+      + dst_row_dircos_y * src_pos_y
+      + dst_row_dircos_z * src_pos_z;
+
+    double dst_pos_y = dst_col_dircos_x * src_pos_x
+      + dst_col_dircos_y * src_pos_y
+      + dst_col_dircos_z * src_pos_z;
+
+    double dst_pos_z = dst_nrm_dircos_x * src_pos_x
+      + dst_nrm_dircos_y * src_pos_y
+      + dst_nrm_dircos_z * src_pos_z;
+
+
     vtkMatrix4x4 *mat = vtkMatrix4x4::New();
     mat->Identity();
 
-    mat->SetElement(0,0,orientation[0]);
-    mat->SetElement(1,0,orientation[1]);
-    mat->SetElement(2,0,orientation[2]);
-    mat->SetElement(0,1,orientation[3]);
-    mat->SetElement(1,1,orientation[4]);
-    mat->SetElement(2,1,orientation[5]);
-    mat->SetElement(0,2,orientation[6]);
-    mat->SetElement(1,2,orientation[7]);
-    mat->SetElement(2,2,orientation[8]);
+    mat->SetElement(0,0,dst_row_dircos_x);
+    mat->SetElement(1,0,dst_col_dircos_x);
+    mat->SetElement(2,0,dst_nrm_dircos_x);
+    mat->SetElement(3,0,0);
+    mat->SetElement(0,1,dst_row_dircos_y);
+    mat->SetElement(1,1,dst_col_dircos_y);
+    mat->SetElement(2,1,dst_nrm_dircos_y);
+    mat->SetElement(3,1,0);
+    mat->SetElement(0,2,dst_row_dircos_z);
+    mat->SetElement(1,2,dst_col_dircos_z);
+    mat->SetElement(2,2,dst_nrm_dircos_z);
+    mat->SetElement(3,2,0);
+
+    mat->SetElement(0,3,dst_pos_x);
+    mat->SetElement(1,3,dst_pos_y);
+    mat->SetElement(2,3,dst_pos_z );
+    mat->SetElement(3,3,1);
 
     mafSmartPointer<mafTransform> boxPose;
-    boxPose->SetMatrix(mat);
+    boxPose->SetMatrix(mat);     
+    boxPose->Update();
 
     m_Volume->SetAbsMatrix(boxPose->GetMatrix());
-  }*/
+  }
 
   if(m_ResampleFlag == TRUE)
   {
@@ -978,6 +1031,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 
   // create the time varying vme
   mafNEW(m_Volume);
+  double origin[3];
 
   int currImageId = 0;
   long progress = 0;
@@ -1023,6 +1077,9 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       }
 
       accumulate->SetSlice(targetVolumeSliceId, m_SliceTexture->GetInput());
+      if (progressCounter == 0)
+        m_SliceTexture->GetInput()->GetOrigin(origin);
+
       targetVolumeSliceId++;
       progressCounter++;
     }
@@ -1071,30 +1128,78 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       ResampleVolume();
     }
 
-    /*if (m_ConstantRotation && m_IsRotated)
+
+    if (m_IsRotated)
     {
       double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
       m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
 
+  
+      //transform direction cosines to be used to set vtkMatrix
+   /* [ dst_row_dircos_x  dst_row_dircos_y  dst_row_dircos_z  -dst_pos_x ] 
+      [ dst_col_dircos_x  dst_col_dircos_y  dst_col_dircos_z  -dst_pos_y ]
+      [ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
+      [ 0                 0                 0                 1          ]*/
+
+      double dst_row_dircos_x = orientation[0];
+      double dst_row_dircos_y = orientation[1];
+      double dst_row_dircos_z = orientation[2];
+      double dst_col_dircos_x = orientation[3];
+      double dst_col_dircos_y = orientation[4];
+      double dst_col_dircos_z = orientation[5];
+
+      double src_pos_x = origin[0];
+      double src_pos_y = origin[1];
+      double src_pos_z = origin[2];
+      
+      double dst_nrm_dircos_x = dst_row_dircos_y * dst_col_dircos_z - dst_row_dircos_z * dst_col_dircos_y; 
+      double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
+      double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
+
+      /*double src_pos_x -= dst_pos_x;
+      double src_pos_y -= dst_pos_y;
+      double src_pos_z -= dst_pos_z;*/
+
+      double dst_pos_x = dst_row_dircos_x * src_pos_x
+        + dst_row_dircos_y * src_pos_y
+        + dst_row_dircos_z * src_pos_z;
+
+      double dst_pos_y = dst_col_dircos_x * src_pos_x
+        + dst_col_dircos_y * src_pos_y
+        + dst_col_dircos_z * src_pos_z;
+
+      double dst_pos_z = dst_nrm_dircos_x * src_pos_x
+        + dst_nrm_dircos_y * src_pos_y
+        + dst_nrm_dircos_z * src_pos_z;
+
+
       vtkMatrix4x4 *mat = vtkMatrix4x4::New();
       mat->Identity();
+    
+      mat->SetElement(0,0,dst_row_dircos_x);
+      mat->SetElement(1,0,dst_col_dircos_x);
+      mat->SetElement(2,0,dst_nrm_dircos_x);
+      mat->SetElement(3,0,0);
+      mat->SetElement(0,1,dst_row_dircos_y);
+      mat->SetElement(1,1,dst_col_dircos_y);
+      mat->SetElement(2,1,dst_nrm_dircos_y);
+      mat->SetElement(3,1,0);
+      mat->SetElement(0,2,dst_row_dircos_z);
+      mat->SetElement(1,2,dst_col_dircos_z);
+      mat->SetElement(2,2,dst_nrm_dircos_z);
+      mat->SetElement(3,2,0);
 
-      mat->SetElement(0,0,orientation[0]);
-      mat->SetElement(1,0,orientation[1]);
-      mat->SetElement(2,0,orientation[2]);
-      mat->SetElement(0,1,orientation[3]);
-      mat->SetElement(1,1,orientation[4]);
-      mat->SetElement(2,1,orientation[5]);
-      mat->SetElement(0,2,orientation[6]);
-      mat->SetElement(1,2,orientation[7]);
-      mat->SetElement(2,2,orientation[8]);
-
+      mat->SetElement(0,3,dst_pos_x);
+      mat->SetElement(1,3,dst_pos_y);
+      mat->SetElement(2,3,dst_pos_z );
+      mat->SetElement(3,3,1);
 
       mafSmartPointer<mafTransform> boxPose;
-      boxPose->SetMatrix(mat);
+      boxPose->SetMatrix(mat);     
+      boxPose->Update();
 
       m_Volume->SetAbsMatrix(boxPose->GetMatrix(),tsDouble);
-    }*/
+    }
   }
   if(!this->m_TestMode)
   {
@@ -1403,11 +1508,75 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
     double i = imageData->GetPointData()->GetScalars()->GetTuple1(x);
   }
 
+  vtkMatrix4x4 *mat = vtkMatrix4x4::New();
+  mat->Identity();
+  if (m_IsRotated)
+  {
   double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
   m_ListSelected->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
 
-
   double origin[3];
+  m_SliceTexture->GetInput()->GetOrigin(origin);
+
+    //transform direction cosines to be used to set vtkMatrix
+    /* [ dst_row_dircos_x  dst_row_dircos_y  dst_row_dircos_z  -dst_pos_x ] 
+    [ dst_col_dircos_x  dst_col_dircos_y  dst_col_dircos_z  -dst_pos_y ]
+    [ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
+    [ 0                 0                 0                 1          ]*/
+
+    double dst_row_dircos_x = orientation[0];
+    double dst_row_dircos_y = orientation[1];
+    double dst_row_dircos_z = orientation[2];
+    double dst_col_dircos_x = orientation[3];
+    double dst_col_dircos_y = orientation[4];
+    double dst_col_dircos_z = orientation[5];
+
+    double src_pos_x = origin[0];
+    double src_pos_y = origin[1];
+    double src_pos_z = origin[2];
+
+    double dst_nrm_dircos_x = dst_row_dircos_y * dst_col_dircos_z - dst_row_dircos_z * dst_col_dircos_y; 
+    double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
+    double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
+
+    /*double src_pos_x -= dst_pos_x;
+    double src_pos_y -= dst_pos_y;
+    double src_pos_z -= dst_pos_z;*/
+
+    double dst_pos_x = dst_row_dircos_x * src_pos_x
+      + dst_row_dircos_y * src_pos_y
+      + dst_row_dircos_z * src_pos_z;
+
+    double dst_pos_y = dst_col_dircos_x * src_pos_x
+      + dst_col_dircos_y * src_pos_y
+      + dst_col_dircos_z * src_pos_z;
+
+    double dst_pos_z = dst_nrm_dircos_x * src_pos_x
+      + dst_nrm_dircos_y * src_pos_y
+      + dst_nrm_dircos_z * src_pos_z;
+
+
+    
+
+    mat->SetElement(0,0,dst_row_dircos_x);
+    mat->SetElement(1,0,dst_col_dircos_x);
+    mat->SetElement(2,0,dst_nrm_dircos_x);
+    mat->SetElement(3,0,0);
+    mat->SetElement(0,1,dst_row_dircos_y);
+    mat->SetElement(1,1,dst_col_dircos_y);
+    mat->SetElement(2,1,dst_nrm_dircos_y);
+    mat->SetElement(3,1,0);
+    mat->SetElement(0,2,dst_row_dircos_z);
+    mat->SetElement(1,2,dst_col_dircos_z);
+    mat->SetElement(2,2,dst_nrm_dircos_z);
+    mat->SetElement(3,2,0);
+
+    mat->SetElement(0,3,dst_pos_x);
+    mat->SetElement(1,3,dst_pos_y);
+    mat->SetElement(2,3,dst_pos_z);
+    mat->SetElement(3,3,1);
+
+ /* double origin[3];
   m_SliceTexture->GetInput()->GetOrigin(origin);
   vtkMatrix4x4 *mat = vtkMatrix4x4::New();
   mat->Identity();
@@ -1430,7 +1599,12 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
   mat->SetElement(2,3,origin[2]); //origin
 
   vtkTransform *trans = vtkTransform::New();
+  trans->SetMatrix(mat);*/
+  }
+
+  vtkTransform *trans = vtkTransform::New();
   trans->SetMatrix(mat);
+
 
   vtkImageDataGeometryFilter *surface = vtkImageDataGeometryFilter::New();
   surface->SetInput(imageData);
@@ -2382,6 +2556,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[3],3);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
       ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
+
+     /* if (sliceNum == 1)
+      {
+        for (int i = 0; i < 9; i++)
+          m_ImageOrientationPatient[i] = imageOrientationPatient[i];
+      }*/
 
       // check if the dataset is rotated: => different from 1. 0. 0. 0. 1. 0.
       /* FROM David Clunie's note
