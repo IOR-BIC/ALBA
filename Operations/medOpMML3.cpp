@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 14:56:34 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2009-09-25 10:40:36 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -84,6 +84,8 @@ enum MML_IDS
   ID_INPUTS_SLICEXYZ,
   ID_INPUTS_FLAG3D,
   ID_INPUTS_NONUNIFORM,
+  ID_INPUTS_NUMSLICES,
+  ID_INPUTS_RESSLICES,
   ID_INPUTS_FAKE, // dummy id with no associated event
   ID_INPUTS_OK,
   ID_INPUTS_CANCEL,
@@ -481,10 +483,17 @@ void medOpMML3::CreateInputsDlg()
   // number of slices
   wxStaticText *ScansNumberLab = new wxStaticText(m_InputsDlg, wxID_ANY, "Number of slices (3 or more)", wxPoint(0,0), wxSize(150,20));
   m_NumberOfScansTxt = new wxTextCtrl(m_InputsDlg, wxID_ANY, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
-  m_NumberOfScansTxt->SetValidator(mafGUIValidator(this, ID_INPUTS_FAKE, m_NumberOfScansTxt, &m_NumberOfScans, 3, 10000)); // min/max values
+  m_NumberOfScansTxt->SetValidator(mafGUIValidator(this, ID_INPUTS_NUMSLICES, m_NumberOfScansTxt, &m_NumberOfScans, 3, 10000)); // min/max values
   wxBoxSizer *ScansNumberHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
   ScansNumberHorizontalSizer->Add(ScansNumberLab,0);
   ScansNumberHorizontalSizer->Add(m_NumberOfScansTxt,1,wxEXPAND);
+  ScansNumberHorizontalSizer->AddSpacer(20) ;
+
+  // memory warning
+  m_WarningNumberOfSlices = new wxStaticText(m_InputsDlg, wxID_ANY, "Warning: May exceed memory", wxPoint(0,0), wxSize(150,20));
+  wxColour redColour(1,0,0) ;
+  m_WarningNumberOfSlices->Enable(false) ;
+  ScansNumberHorizontalSizer->Add(m_WarningNumberOfSlices,0);
   ScansNumberHorizontalSizer->AddSpacer(20) ;
 
   // non-uniform slice spacing check box
@@ -499,7 +508,7 @@ void medOpMML3::CreateInputsDlg()
   // scans resolution
   wxStaticText *ScansGrainLab  = new wxStaticText(m_InputsDlg, wxID_ANY, "Slice resolution (64-1024)", wxPoint(0,0), wxSize(150,20));
   wxTextCtrl *ScansGrainTxt1 = new wxTextCtrl(m_InputsDlg , wxID_ANY, "", wxPoint(0,0), wxSize(75,20), wxNO_BORDER );
-  ScansGrainTxt1->SetValidator(mafGUIValidator(this, ID_INPUTS_FAKE, ScansGrainTxt1, &m_ScansGrain, 64, 1024));
+  ScansGrainTxt1->SetValidator(mafGUIValidator(this, ID_INPUTS_RESSLICES, ScansGrainTxt1, &m_ScansGrain, 64, 1024));
   wxBoxSizer *ScansGrainHorizontalSizer2 = new wxBoxSizer(wxHORIZONTAL);
   ScansGrainHorizontalSizer2->Add(ScansGrainLab, 0);
   ScansGrainHorizontalSizer2->Add(ScansGrainTxt1,1,wxEXPAND | wxRIGHT, 3);
@@ -938,7 +947,14 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   totalSlicesBoxSizer->Add(totalSlicesLabel, 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
   totalSlicesBoxSizer->Add(totalSlicesTxt, 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
 
+  // memory warning
+  m_WarningTotalSlices = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "Warning: May exceed memory", wxPoint(0,0), wxSize(150,20));
+  m_WarningTotalSlices->Enable(false) ;
+  wxBoxSizer *warningBoxSizer = new wxBoxSizer(wxHORIZONTAL) ;
+  warningBoxSizer->Add(m_WarningTotalSlices, 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
+
   widgetsBoxSizer->Add(totalSlicesBoxSizer, 0, wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
+  widgetsBoxSizer->Add(warningBoxSizer, 0, wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
 
 
 
@@ -1071,6 +1087,14 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
 
     switch(e->GetId())
     {
+    case ID_INPUTS_NUMSLICES: // number of slices changed
+      OnNumberOfSlices();
+      break;
+
+    case ID_INPUTS_RESSLICES: // resolution of slices changed
+      OnResolutionOfSlices();
+      break;
+
     case ID_INPUTS_SURFACE: // set up dlg muscle selection
       //
       OnMuscleSelection();
@@ -1217,9 +1241,48 @@ void medOpMML3::OnTextNumberChange(mafID id)
     m_NumberOfScans += m_SlicesInSection[i];
 
   m_NonUniformSlicesDlg->TransferDataToWindow();
+
+
+  // enable warning if memory threshold exceeded
+  double sliceMemory = (double)m_NumberOfScans * (double)(m_ScansGrain*m_ScansGrain) / (1024.0*1024.0) ;
+
+  if (sliceMemory <= MemoryThreshold)
+    m_WarningTotalSlices->Enable(false) ;
+  else
+    m_WarningTotalSlices->Enable(true) ;
 }
 
 
+
+
+//------------------------------------------------------------------------------
+// Number of slices changed
+void medOpMML3::OnNumberOfSlices()
+//------------------------------------------------------------------------------
+{
+  // enable warning if memory threshold exceeded
+  double sliceMemory = (double)m_NumberOfScans * (double)(m_ScansGrain*m_ScansGrain) / (1024.0*1024.0) ;
+
+  if (sliceMemory <= MemoryThreshold)
+    m_WarningNumberOfSlices->Enable(false) ;
+  else
+    m_WarningNumberOfSlices->Enable(true) ;
+}
+
+
+//------------------------------------------------------------------------------
+// Resolution of slices changed
+void medOpMML3::OnResolutionOfSlices()
+//------------------------------------------------------------------------------
+{
+  // enable warning if memory threshold exceeded
+  double sliceMemory = (double)m_NumberOfScans * (double)(m_ScansGrain*m_ScansGrain) / (1024.0*1024.0) ;
+
+  if (sliceMemory <= MemoryThreshold)
+    m_WarningNumberOfSlices->Enable(false) ;
+  else
+    m_WarningNumberOfSlices->Enable(true) ;
+}
 
 //------------------------------------------------------------------------------
 // Action if check box UseReg changes
@@ -1639,6 +1702,7 @@ void medOpMML3::OnMuscleSelection()
     ParentVMEName = m_SurfaceName.BeforeFirst('.');
     m_SurfaceName = ParentVMEName;
   }
+
 
 
   // set up specific set of landmarks (parameters are .msf section names)

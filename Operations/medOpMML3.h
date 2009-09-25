@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-09-24 14:56:34 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2009-09-25 10:40:36 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,17 +51,21 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Some components are missing, and widget handles are still visible.
 //
 // Dialog
-// Add explanation to non-uniform slice dialog.
 // Add spinners to non-uniform slice dialog.
-// Add progress bar to show pre-processing of slices.
-// Add estimates of processing time, and maximum no. of slices and slice size.
+// Consider adding some interaction to the image in the non-uniform slice dialog.
+// Display reg dialog before pre-processing and add progress bar.
+// Add estimates of maximum no. of slices and slice size.
 //
 // Bent axis
-// Restore piecewise axis option
-// Test visual pipes with bent axis.
+// Restore piecewise axis option and test visual pipes with bent axis.
 //
-// Input
-// Modify MML so that it can accept a simpler set of input files.
+// Output
+// Deform landmarks as well as muscle.  Place all output in folder "Registered".
+// Sort out tags, which have not been changed from original MML.  (Does it have to be backwardly compatible ?)
+//
+// Efficiency
+// Replace polydata slices with better method, eg lhpOpMultiscale and lhpOpTextureOrientation.
+// If axis is straight, consider creating all contours at once with a single vtkCutter execution.
 //
 // Remove medOpMatrixVectorMath from aneuFuse and lhp.
 //------------------------------------------------------------------------------
@@ -216,18 +220,22 @@ protected:
   //----------------------------------------------------------------------------
   void OnEvent(mafEventBase *e); ///< Event handler
 
+  // inputs dialog
+  void OnNumberOfSlices() ;       ///< number of slices changed
+  void OnResolutionOfSlices() ;   ///< resolution of slices changed
+  void OnSliceXYZ() ; ///< Action when use reg check box changes
+  void OnInputsOk() ; ///< Inputs dialog ok - tidy up
+
+  // non-uniform slices dialog
   void OnTextNumberChange(mafID id) ;  ///< non-uniform slice entry changed
 
-  void OnInputsOk() ; ///< Inputs dialog ok - tidy up
-  void OnSliceXYZ() ; ///< Action when use reg check box changes
-
+  // registration dialog
   void OnSOperationButton();
   void OnROperationButton();
   void OnTOperationButton();
   void OnPOperationButton();
   void OnRegistrationCANCEL();
   void OnRegistrationOK();  ///< Registration ok - create output VME
-
   void OnSlider();
   void OnMinus10() ;
   void OnMinus1() ;
@@ -252,6 +260,11 @@ protected:
   //----------------------------------------------------------------------------
   // Member variables
   //----------------------------------------------------------------------------
+
+  // Memory threshold constant
+  // This is a rule of thumb limit in MB for the quantity
+  // n * (res / 1024)^2 <= MemoryMax, where n = no. of slices and res is the resolution (grain).
+  static const int MemoryThreshold = 15 ;
 
   // dialogs
   mafGUIDialog *m_InputsDlg;		         ///< inputs dialog
@@ -314,15 +327,14 @@ protected:
 
 
   //----------------------------------------------------------------------------
-  // number of slices
+  // Number and spacing of slices
   //----------------------------------------------------------------------------
   int m_NumberOfScans ;                              ///< total number of slices
   int m_NonUniformSliceSpacing ;                     ///< is slice spacing non-uniform
   int m_SlicesInSection[NumberOfNonUniformSections] ; ///< no. of slices per section, if non-uniform
 
-  wxBoxSizer **m_NumSlicesRowBoxSizer ;
-  wxStaticText **m_NumSlicesLabel ;
-  wxTextCtrl **m_NumSlicesEntry ;
+  mafRWI *m_SectionsViewRWI ;
+  medOpMML3NonUniformSlicePipe *m_NonUniformSlicePipe ;
 
 
 
@@ -410,10 +422,24 @@ protected:
 
 
 
+
   //----------------------------------------------------------------------------
   // Widgets
   //----------------------------------------------------------------------------
 
+  // inputs dialog
+  wxTextCtrl *m_NumberOfScansTxt;
+  wxRadioBox *m_Radio_slicexyz ;
+  wxStaticText *m_WarningNumberOfSlices ;
+
+  // non-uniform slices dialog
+  wxBoxSizer **m_NumSlicesRowBoxSizer ;
+  wxStaticText **m_NumSlicesLabel ;
+  wxTextCtrl **m_NumSlicesEntry ;
+  wxStaticText *m_WarningTotalSlices ;
+
+
+  // registration dialog
   mafGUILutSlider *m_Lut;
 
   mafGUIButton *m_InputsOk;
@@ -431,14 +457,9 @@ protected:
 
   wxColour m_ButtonBackgroundColour;
 
-  wxTextCtrl *m_NumberOfScansTxt;
-
-  wxRadioBox *m_Radio_slicexyz ;
 
 
 
-  mafRWI *m_SectionsViewRWI ;
-  medOpMML3NonUniformSlicePipe *m_NonUniformSlicePipe ;
 
 
 };
