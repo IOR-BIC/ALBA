@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-09-24 09:36:17 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-09-25 13:44:19 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@ class vtkColorTransferFunction;
 class vtkMAFDistanceFilter;
 class vtkPolyData;
 class vtkPolyDataNormals;
+class vtkLookupTable;
 
 
 /** Class name: medVMEMaps.
@@ -157,6 +158,8 @@ private:
 
   /** update the output data structure */
   virtual void InternalUpdate();
+
+  vtkLookupTable *CreateTable();
 
   /** private to avoid calling by external classes */
   //virtual int SetData(vtkDataSet *data, mafTimeStamp t, int mode=MAF_VME_COPY_DATA);

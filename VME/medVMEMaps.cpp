@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 09:36:17 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-09-25 13:44:19 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -264,6 +264,8 @@ void medVMEMaps::InternalPreUpdate()
     m_DistanceFilter->SetInputMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
     m_DistanceFilter->Update(); 
 
+    //GetMaterial()->m_ColorLut = CreateTable();
+
 
     vtkPolyData *polyout;
     vtkMAFSmartPointer<vtkFloatArray> scalars;
@@ -383,7 +385,8 @@ mmaMaterial *medVMEMaps::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
-    lutPreset(14,GetMaterial()->m_ColorLut);
+    //lutPreset(14,GetMaterial()->m_ColorLut);
+    material->m_ColorLut = CreateTable();
     material->UpdateFromLut();
     material->UpdateProp();
   }
@@ -437,11 +440,12 @@ mmaMaterial *medVMEMaps::GetMaterial()
 void medVMEMaps::SetDensityDistance(int densityDistance)
 //-------------------------------------------------------------------------
 {
-  mafEvent ev1(this, VME_SHOW, this, false);
-  ForwardUpEvent(ev1);
+  //mafEvent ev1(this, VME_SHOW, this, false);
+  //ForwardUpEvent(ev1);
   m_DensityDistance = densityDistance;
-  mafEvent ev2(this, VME_SHOW, this, true);
-  ForwardUpEvent(ev2);
+  GetOutput()->Update();
+  //mafEvent ev2(this, VME_SHOW, this, true);
+  //ForwardUpEvent(ev2);
 }
 
 //-------------------------------------------------------------------------
@@ -485,10 +489,118 @@ mafNode *medVMEMaps::GetSourceVMELink()
 {
   return GetLink("SourceVME");
 }
+
 //-----------------------------------------------------------------------
 void medVMEMaps::SetSourceVMELink(mafNode *node)
 //-----------------------------------------------------------------------
 {
   SetLink("SourceVME", node);
   Modified();
+}
+
+//-----------------------------------------------------------------------
+vtkLookupTable *medVMEMaps::CreateTable()
+//-----------------------------------------------------------------------
+{
+  vtkLookupTable *m_Table;
+  int m_NumSections =3;
+  wxColour m_LowColour, m_HiColour, m_MidColour, m_MidColour1, m_MidColour2;
+
+  vtkNEW(m_Table);
+
+  m_LowColour.Set(255,0,0);
+  m_MidColour.Set(0,255,0);
+  m_HiColour.Set(0,0,255);
+  m_MidColour1.Set(255,255,0);
+  m_MidColour2.Set(0,255,255);
+
+  m_Table->SetNumberOfTableValues(m_NumSections);
+
+  if(m_DensityDistance==0)
+  {
+    int i;
+    for (i=-4*m_MaxDistance;i<-m_MaxDistance;i++)
+      m_Table->SetTableValue(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+    for (i=-m_MaxDistance;i<m_MaxDistance;i++)
+      m_Table->SetTableValue(i,1.0,1.0,1.0);
+    for (i=m_MaxDistance;i<=4*m_MaxDistance;i++)
+      m_Table->SetTableValue(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+  }
+
+  else if(m_DensityDistance==1)
+  {
+
+    double range[2];
+    ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
+
+    /*int i;
+    for (i=range[0];i<m_SecondThreshold;i++)
+      m_Table->SetTableValue(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+    for (i=m_SecondThreshold;i<m_FirstThreshold;i++)
+      m_Table->SetTableValue(i,m_MidColour.Red()/255.0, m_MidColour.Green()/255.0,	m_MidColour.Blue()/255.0);
+    for (i=m_FirstThreshold;i<=range[1];i++)
+      m_Table->SetTableValue(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);*/
+
+    m_Table->SetTableValue(range[0],m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+    m_Table->SetTableValue(m_SecondThreshold,m_MidColour1.Red()/255.0, m_MidColour1.Green()/255.0,	m_MidColour1.Blue()/255.0);
+    m_Table->SetTableValue(m_FirstThreshold,m_MidColour2.Red()/255.0, m_MidColour2.Green()/255.0,	m_MidColour2.Blue()/255.0);
+    m_Table->SetTableValue(range[1],m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+  }
+
+  m_Table->Build();
+
+  return m_Table;
+
+  /*vtkColorTransferFunction *m_Table;
+  vtkScalarBarActor *m_ScalarBar;
+
+  int m_NumSections;
+  xwColour *m_LowColour, *m_HiColour;
+
+  if(m_DensityDistance==0)
+  {
+    m_ScalarBar->SetTitle(_("Distance"));
+    m_ScalarBar->SetMaximumNumberOfColors(m_NumSections);
+    m_ScalarBar->Modified();
+
+    int i;
+    for (i=-4*m_MaxDistance;i<-m_MaxDistance;i++)
+      m_Table->AddRGBPoint(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+    for (i=-m_MaxDistance;i<m_MaxDistance;i++)
+      m_Table->AddRGBPoint(i,1.0,1.0,1.0);
+    for (i=m_MaxDistance;i<=4*m_MaxDistance;i++)
+      m_Table->AddRGBPoint(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+
+    m_ScalarBar->SetMaximumNumberOfColors(3);
+    m_ScalarBar->Modified();
+
+  else if(m_DensityDistance==1)
+  {
+
+    double range[2];
+    ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
+
+    if(m_BarTipology==0)
+    {
+      int i;
+      for (i=range[0];i<m_SecondThreshold;i++)
+        m_Table->AddRGBPoint(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+      for (i=m_SecondThreshold;i<m_FirstThreshold;i++)
+        m_Table->AddRGBPoint(i,m_MidColour.Red()/255.0, m_MidColour.Green()/255.0,	m_MidColour.Blue()/255.0);
+      for (i=m_FirstThreshold;i<=range[1];i++)
+        m_Table->AddRGBPoint(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+    }
+    else if(m_BarTipology==1)
+    {
+      m_Table->AddRGBPoint(range[0],m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
+      m_Table->AddRGBPoint(m_SecondThreshold,m_MidColour1.Red()/255.0, m_MidColour1.Green()/255.0,	m_MidColour1.Blue()/255.0);
+      m_Table->AddRGBPoint(m_FirstThreshold,m_MidColour2.Red()/255.0, m_MidColour2.Green()/255.0,	m_MidColour2.Blue()/255.0);
+      m_Table->AddRGBPoint(range[1],m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);
+    }
+
+    m_Table->Build();
+
+    m_ScalarBar->SetMaximumNumberOfColors(range[1]-range[0]);
+    m_ScalarBar->Modified();
+  }*/
 }
