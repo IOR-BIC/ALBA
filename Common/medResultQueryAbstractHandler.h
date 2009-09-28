@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medResultQueryAbstractHandler.h,v $
 Language:  C++
-Date:      $Date: 2009-09-22 07:33:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-28 05:44:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2008
@@ -32,42 +32,48 @@ typedef std::vector<std::string>               WebRowSetColumnTypeVector;
 typedef std::vector<std::string>               WebRowSetColumnNameVector;
 
 typedef std::vector<std::vector<medQueryObject *> >   WebRowSetQueryObjectsTable;
-
+/**
+  class name: medResultQueryAbstractHandler
+  Interface for handle results from a query to a database
+*/
 class medResultQueryAbstractHandler : public mafObject
 {
 public:
+  /** constructor */
   medResultQueryAbstractHandler();
+  /** destructor */
 	virtual ~medResultQueryAbstractHandler(); 
   
+  /** RTTI macro */
   mafAbstractTypeMacro(medResultQueryAbstractHandler, mafObject);
 
-  //Get result as string matrix
+  /**Get result as string matrix */
   WebRowSetStringDataTable GetResultAsStringMatrix() {return m_MatrixStringResult;};
   
-  //Get column type as list of string
+  /** Get column type as list of string */
   WebRowSetColumnTypeVector GetColumnsTypeInformationAsStringVector() {return m_ColumnsTypeInformation;};
 
-  //Get column name as list of string
+  /** Get column name as list of string */
   WebRowSetColumnNameVector GetColumnsNameInformationAsStringVector() {return m_ColumnsNameInformation;};
 
-  //Get result as string matrix
+  /** Get result as string matrix */
   WebRowSetQueryObjectsTable GetResultAsObjectsMatrix() {return m_MatrixObjectResult;};
 
 
-  //Get number of records (rows)
+  /** Get number of records (rows) */
   int GetNumberOfRecords() const;
 
-  //Get number of fields (columns)
+  /** Get number of fields (columns) */
   int GetNumberOfFields() const;
 
-  //load result of Query
+  /** load result of Query */
   virtual void LoadQueryResult() = 0;
 
-  //load result of Query
+  /** load result of Query */
   virtual bool IsFailed() = 0;
 
 protected:
-  //clear all the results
+  /** clear all the results */
   virtual void InternalResultReset();
 
   WebRowSetStringDataTable m_MatrixStringResult;

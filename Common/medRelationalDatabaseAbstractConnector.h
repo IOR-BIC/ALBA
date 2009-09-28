@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medRelationalDatabaseAbstractConnector.h,v $
 Language:  C++
-Date:      $Date: 2009-09-22 07:33:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-09-28 05:44:24 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2008
@@ -23,7 +23,10 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 // forward references :
 //----------------------------------------------------------------------------
 class medResultQueryAbstractHandler;
-
+/**
+  struct name :medRelationalDatabaseInformation
+  struct that contains database information useful for connection
+*/
 struct medRelationalDatabaseInformation
 {
   std::string m_Url;
@@ -32,49 +35,57 @@ struct medRelationalDatabaseInformation
   std::string m_Certificate;
   std::string m_ConfName;
 };
-
+/**
+  class name : medRelationalDatabaseAbstractConnector
+  class that handle all the process of connection, retrieving data executing query
+  ad by medResultQueryAbstractHandler load them
+*/
 class medRelationalDatabaseAbstractConnector : public mafObject
 {
 public:
+  /** constructor */
   medRelationalDatabaseAbstractConnector(const char *query = "");
+  /** destructor */
 	virtual ~medRelationalDatabaseAbstractConnector(); 
   
+  /** RTTI macro */
   mafAbstractTypeMacro(medRelationalDatabaseAbstractConnector, mafObject);
 
-  //Set Get information for connection to database
+  /** Set Get information for connection to database */
   void SetRelationalDatabaseInformation(medRelationalDatabaseInformation info);
   const medRelationalDatabaseInformation &GetRelationalDatabaseInformation() const;
 
-  // Set the current query that will be used
+  /** Set the current query that will be used */
   void SetQuery(const char* queryString);
+  /** Get the current query that will be used */
   const char* GetQuery() const;
 
-  //execute the query
+  /** execute the query */
   virtual void QueryExecute() = 0;
 
-  //check the validation of execution
+  /** check the validation of execution */
   virtual bool IsFailed() const;
 
-  //return the number of records in terms of row
+  /** return the number of records in terms of row */
   int GetNumberOfRecords() const;
 
-  //return the number of records in terms of row
+  /** return the number of records in terms of row */
   int GetNumberOfFields() const;
 
-  //retrieve result in form of string matrix, 
-  //as WebRowSetStringDataTable (typedef std::vector<std::vector<std::string> >)
+  /** retrieve result in form of string matrix, 
+  as WebRowSetStringDataTable (typedef std::vector<std::vector<std::string> >)*/
   WebRowSetStringDataTable GetQueryResultAsStringMatrix() const;
 
-  //retrieve result in form of string matrix, 
-  //as WebRowSetColumnTypeVector (typedef std::vector<std::string >)
+  /** retrieve result in form of string matrix, 
+  as WebRowSetColumnTypeVector (typedef std::vector<std::string >)*/
   WebRowSetColumnTypeVector GetColumnsTypeAsStringVector() const;
 
-  //retrieve result in form of string matrix, 
-  //as WebRowSetColumnNameVector (typedef std::vector<std::string >)
+  /** retrieve result in form of string matrix, 
+  as WebRowSetColumnNameVector (typedef std::vector<std::string >)*/
   WebRowSetColumnNameVector GetColumnsNameAsStringVector() const;
 
-  //retrieve result in form of object matrix, 
-  //as WebRowSetQueryObjectsTable (typedef std::vector<std::vector<medQueryObject> >)
+  /** retrieve result in form of object matrix, 
+  as WebRowSetQueryObjectsTable (typedef std::vector<std::vector<medQueryObject> >)*/
   WebRowSetQueryObjectsTable GetQueryResultAsObjectsMatrix() const;
 
 protected:
