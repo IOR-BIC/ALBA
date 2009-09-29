@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeImageData.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 15:55:39 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-29 09:33:32 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -25,7 +25,7 @@
 #include "vtkSmartPointer.h"
 
 
-vtkCxxRevisionMacro(vtkMAFLargeImageData, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFLargeImageData, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFLargeImageData);
 
 //----------------------------------------------------------------------------
@@ -33,14 +33,14 @@ vtkMAFLargeImageData::vtkMAFLargeImageData()
 {
 	int idx;
 
-	this->m_DataDescription = VTK_EMPTY;
+	this->DataDescription = VTK_EMPTY;
 
 	for (idx = 0; idx < 3; ++idx)
 	{
-		this->m_Dimensions[idx] = 0;
+		this->Dimensions[idx] = 0;
 		this->Extent[idx*2] = 0;
 		this->Extent[idx*2+1] = -1;    
-		this->m_Increments[idx] = 0;
+		this->Increments[idx] = 0;
 		this->Origin[idx] = 0.0;
 		this->Spacing[idx] = 1.0;
 	}
@@ -80,13 +80,13 @@ vtkMAFLargeImageData::~vtkMAFLargeImageData()
 	{
 		this->Extent[i] = sPts->Extent[i];
 		this->Extent[i+3] = sPts->Extent[i+3];
-		this->m_Dimensions[i] = sPts->m_Dimensions[i];
+		this->Dimensions[i] = sPts->Dimensions[i];
 		this->Spacing[i] = sPts->Spacing[i];
 		this->Origin[i] = sPts->Origin[i];
 	}
 	this->NumberOfScalarComponents = sPts->NumberOfScalarComponents;
 	this->ScalarType = sPts->ScalarType;
-	this->m_DataDescription = sPts->m_DataDescription;
+	this->DataDescription = sPts->DataDescription;
 }
 
 // Description:
@@ -126,7 +126,7 @@ void vtkMAFLargeImageData::GetPoint(vtkIdType64 ptId, double x[3])
 		return;
 	}
 
-	switch (this->m_DataDescription)
+	switch (this->DataDescription)
 	{
 	case VTK_EMPTY: 
 		return ;
@@ -206,7 +206,7 @@ void vtkMAFLargeImageData::GetCell(vtkIdType64 cellId, vtkGenericCell *cell)
 		return;
 	}
 
-	switch (this->m_DataDescription)
+	switch (this->DataDescription)
 	{
 	case VTK_EMPTY: 
 		cell->SetCellTypeToEmptyCell();
@@ -312,7 +312,7 @@ void vtkMAFLargeImageData::GetCellBounds(vtkIdType64 cellId, double bounds[6])
 		return;
 	}
 
-	switch (this->m_DataDescription)
+	switch (this->DataDescription)
 	{
 	case VTK_EMPTY:
 		return;
@@ -404,7 +404,7 @@ void vtkMAFLargeImageData::GetCellBounds(vtkIdType64 cellId, double bounds[6])
 // THE DATASET IS NOT MODIFIED
 int vtkMAFLargeImageData::GetCellType(vtkIdType64 vtkNotUsed(cellId))
 {
-	switch (this->m_DataDescription)
+	switch (this->DataDescription)
 	{
 	case VTK_EMPTY: 
 		return VTK_EMPTY_CELL;
@@ -519,11 +519,11 @@ void vtkMAFLargeImageData::ComputeBounds()
 //----------------------------------------------------------------------------
 int* vtkMAFLargeImageData::GetDimensions()
 {
-	this->m_Dimensions[0] = this->Extent[1] - this->Extent[0] + 1;
-	this->m_Dimensions[1] = this->Extent[3] - this->Extent[2] + 1;
-	this->m_Dimensions[2] = this->Extent[5] - this->Extent[4] + 1;
+	this->Dimensions[0] = this->Extent[1] - this->Extent[0] + 1;
+	this->Dimensions[1] = this->Extent[3] - this->Extent[2] + 1;
+	this->Dimensions[2] = this->Extent[5] - this->Extent[4] + 1;
 
-	return this->m_Dimensions;
+	return this->Dimensions;
 }
 
 
@@ -610,7 +610,7 @@ void vtkMAFLargeImageData::SetExtent(int *extent)
 		return;
 	}
 
-	this->m_DataDescription = description;
+	this->DataDescription = description;
 
 	this->Modified();
 	this->ComputeIncrements();
@@ -627,7 +627,7 @@ void vtkMAFLargeImageData::ComputeIncrements()
 
 	for (idx = 0; idx < 3; ++idx)
 	{
-		this->m_Increments[idx] = inc;
+		this->Increments[idx] = inc;
 		inc *= (this->Extent[idx*2+1] - this->Extent[idx*2] + 1);
 	}
 }
@@ -672,8 +672,8 @@ void vtkMAFLargeImageData::GetContinuousIncrements(int extent[6], vtkIdType64 &i
 	// Make sure the increments are up to date
 	this->ComputeIncrements();
 
-	incY = this->m_Increments[1] - (e1 - e0 + 1)*this->m_Increments[0];
-	incZ = this->m_Increments[2] - (e3 - e2 + 1)*this->m_Increments[1];
+	incY = this->Increments[1] - (e1 - e0 + 1)*this->Increments[0];
+	incZ = this->Increments[2] - (e3 - e2 + 1)*this->Increments[1];
 }
 
 //----------------------------------------------------------------------------
@@ -795,9 +795,9 @@ void vtkMAFLargeImageData::PrintSelf(ostream& os, vtkIndent indent)
 	os << indent << "Dimensions: (" << dims[0] << ", "
 		<< dims[1] << ", "
 		<< dims[2] << ")\n";
-	os << indent << "Increments: (" << this->m_Increments[0] << ", "
-		<< this->m_Increments[1] << ", "
-		<< this->m_Increments[2] << ")\n";
+	os << indent << "Increments: (" << this->Increments[0] << ", "
+		<< this->Increments[1] << ", "
+		<< this->Increments[2] << ")\n";
 	os << indent << "Extent: (" << this->Extent[0];
 	for (idx = 1; idx < 6; ++idx)
 	{
@@ -820,7 +820,7 @@ void vtkMAFLargeImageData::UpdateData()
 	
 	//check if the snapshot requires to be updated
 	unsigned long mtime = this->GetMTime();
-	if (mtime > m_SnapshotTime)
+	if (mtime > SnapshotTime)
 	{
 		this->InvokeEvent(vtkCommand::StartEvent);
 
@@ -834,7 +834,7 @@ void vtkMAFLargeImageData::UpdateData()
 			this->ExecuteSnapshotData();
 			
 			this->Snapshot->Modified();
-			m_SnapshotTime.Modified();
+			SnapshotTime.Modified();
 		}
 
 		this->InvokeEvent(vtkCommand::EndEvent);

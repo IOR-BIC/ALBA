@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFMultiFileDataProvider.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 15:55:39 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-29 09:33:32 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -14,7 +14,7 @@
 #include "vtkMAFMultiFileDataProvider.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkMAFMultiFileDataProvider, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFMultiFileDataProvider, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFMultiFileDataProvider);
 
 #include "mafMemDbg.h"
@@ -239,8 +239,8 @@ vtkMAFMultiFileDataProvider::~vtkMAFMultiFileDataProvider(void)
   //as Seek is called with startOffset that is already shifted by HeaderSize
   //there is no correction for the offset of the first file
   //for others, the correction = -nStartOffset + HeaderSize2    
-  vtkIdType64 nOfs = m_HeaderSize;
-  vtkIdType64 nCor = m_HeaderSize;
+  vtkIdType64 nOfs = HeaderSize;
+  vtkIdType64 nCor = HeaderSize;
   
   m_PFDLastUsed = m_PFDHead;
   while (m_PFDLastUsed != NULL)

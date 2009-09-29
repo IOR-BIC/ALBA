@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataProvider.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 15:55:39 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-29 09:33:32 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -22,16 +22,16 @@
 
 
 
-vtkCxxRevisionMacro(vtkMAFLargeDataProvider, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFLargeDataProvider, "$Revision: 1.1.2.3 $");
 
 #include "mafMemDbg.h"
 #include <assert.h>
 
 vtkMAFLargeDataProvider::vtkMAFLargeDataProvider()
 {
-	m_TagArray = vtkFieldData::New();
+	TagArray = vtkFieldData::New();
 	
-	m_HeaderSize = 0;
+	HeaderSize = 0;
 	SwapBytes = false;
   DefaultLayout = true;
 
@@ -40,7 +40,7 @@ vtkMAFLargeDataProvider::vtkMAFLargeDataProvider()
 
 vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider() 
 {
-	m_TagArray->Delete();	
+	TagArray->Delete();	
 	InitializeDescriptors();
 }
 
@@ -48,27 +48,27 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 // Also, the underlaying data is untouched.
 /*virtual*/ void vtkMAFLargeDataProvider::InitializeDescriptors()
 {
-	StringToIntMap::iterator it = m_DescriptorsMap.begin();
-	while (it != m_DescriptorsMap.end())
+	StringToIntMap::iterator it = DescriptorsMap.begin();
+	while (it != DescriptorsMap.end())
 	{
 		delete[] it->first;
 		it++;
 	}
 
-	m_DescriptorsMap.clear();
+	DescriptorsMap.clear();
 
-	for (int i = 0; i < (int)m_Descriptors.size(); i++)
+	for (int i = 0; i < (int)Descriptors.size(); i++)
 	{
-		if (m_Descriptors[i].pDAD != NULL)
-			m_Descriptors[i].pDAD->UnRegister(this);
+		if (Descriptors[i].pDAD != NULL)
+			Descriptors[i].pDAD->UnRegister(this);
 
-    if (m_Descriptors[i].pDAL != NULL)
-      m_Descriptors[i].pDAL->UnRegister(this);
+    if (Descriptors[i].pDAL != NULL)
+      Descriptors[i].pDAL->UnRegister(this);
 	}
 	
-	m_Descriptors.clear();
+	Descriptors.clear();
 
-	memset(m_SpecDescPos, -1, sizeof(m_SpecDescPos));
+	memset(SpecDescPos, -1, sizeof(SpecDescPos));
 	this->Modified();
 }
 
@@ -76,13 +76,13 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 /*virtual*/ unsigned long vtkMAFLargeDataProvider::GetMTime()
 {
 	unsigned long mt = Superclass::GetMTime();
-	for (int i = 0; i < (int)m_Descriptors.size(); i++) 
+	for (int i = 0; i < (int)Descriptors.size(); i++) 
 	{
-		unsigned long t = m_Descriptors[i].pDAD->GetMTime();
+		unsigned long t = Descriptors[i].pDAD->GetMTime();
 		if (t > mt)
 			mt = t;
 
-    t = m_Descriptors[i].pDAL->GetMTime();
+    t = Descriptors[i].pDAL->GetMTime();
     if (t > mt)
       mt = t;
 	}
@@ -103,8 +103,8 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
   item.pDAD = dad;
 	dad->Register(this);
   item.pDAL = vtkMAFDataArrayLayout::New();
-	m_Descriptors.push_back(item);
-	int index = (int)m_Descriptors.size() - 1;
+	Descriptors.push_back(item);
+	int index = (int)Descriptors.size() - 1;
 
 	ReplaceLookupName(NULL, dad->GetName(), index);
 	this->Modified();	//we have changed it
@@ -117,8 +117,8 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 {
 	assert(name != NULL);
 
-	StringToIntMap::iterator it = m_DescriptorsMap.find(name);
-	if (it == m_DescriptorsMap.end())
+	StringToIntMap::iterator it = DescriptorsMap.find(name);
+	if (it == DescriptorsMap.end())
 		return -1;		//not found
 
 	return it->second;
@@ -130,8 +130,8 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 	if (i < 0 || i >= this->GetNumberOfDescriptors())		
 		return;		//invalid index
 
-	StringToIntMap::iterator itrem, it = m_DescriptorsMap.begin();
-	while (it != m_DescriptorsMap.end())
+	StringToIntMap::iterator itrem, it = DescriptorsMap.begin();
+	while (it != DescriptorsMap.end())
 	{
 		if (it->second >= i) 
 		{
@@ -149,20 +149,20 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 		it++;
 	}
 
-	m_DescriptorsMap.erase(itrem);
-	m_Descriptors[i].pDAD->UnRegister(this);
-  m_Descriptors[i].pDAL->UnRegister(this);
-	m_Descriptors.erase(m_Descriptors.begin() + i);
+	DescriptorsMap.erase(itrem);
+	Descriptors[i].pDAD->UnRegister(this);
+  Descriptors[i].pDAL->UnRegister(this);
+	Descriptors.erase(Descriptors.begin() + i);
 
 	//fix m_SpecDescPos
 	for (int j = 0; j < vtkDataSetAttributes::NUM_ATTRIBUTES; j++) 
 	{
-		if (m_SpecDescPos[j] >= i)
+		if (SpecDescPos[j] >= i)
 		{
-			if (m_SpecDescPos[j] == i)
-				m_SpecDescPos[j] = -1;	//remove it
+			if (SpecDescPos[j] == i)
+				SpecDescPos[j] = -1;	//remove it
 			else
-				m_SpecDescPos[j]--;
+				SpecDescPos[j]--;
 		}
 	}
 }
@@ -180,7 +180,7 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
   }
 
 	if (name == NULL || *name != '\0')
-		return GetDescriptor(m_SpecDescPos[type]);
+		return GetDescriptor(SpecDescPos[type]);
 
 	//if name is specified, try to find it
 	return GetDescriptor(name);
@@ -197,7 +197,7 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
     return -1;
   }
 	
-	int curPos = m_SpecDescPos[type];
+	int curPos = SpecDescPos[type];
 
 	// If there is an existing attribute, replace it
 	if (curPos < 0)
@@ -212,7 +212,7 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 		else
 		{
 			//we will have to modify it
-      DALD& item = m_Descriptors[curPos];
+      DALD& item = Descriptors[curPos];
 			vtkMAFDataArrayDescriptor* old = item.pDAD;
 			ReplaceLookupName(old->GetName(), dad->GetName());
 			old->UnRegister(this);			
@@ -222,7 +222,7 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
 		}
 	}
 	
-	m_SpecDescPos[type] = curPos;
+	SpecDescPos[type] = curPos;
 	this->Modified();
 	return curPos;
 }
@@ -237,7 +237,7 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
     return -1;  //error
   }
 	
-	return m_SpecDescPos[type];
+	return SpecDescPos[type];
 }
 
 //sets index of the special descriptor
@@ -249,8 +249,8 @@ vtkMAFLargeDataProvider::~vtkMAFLargeDataProvider()
     return;  //error
   }
 	
-  assert(idx >= 0 && idx < (int)m_Descriptors.size());  
-	m_SpecDescPos[type] = idx;
+  assert(idx >= 0 && idx < (int)Descriptors.size());  
+	SpecDescPos[type] = idx;
 }
 
 //replaces the name used in the lookup table, if old_name is NULL, then new entry
@@ -263,11 +263,11 @@ void vtkMAFLargeDataProvider
 	
 	if (old_name != NULL)	
 	{
-		StringToIntMap::iterator it = m_DescriptorsMap.find(old_name);
-		if (it != m_DescriptorsMap.end())
+		StringToIntMap::iterator it = DescriptorsMap.find(old_name);
+		if (it != DescriptorsMap.end())
 		{
 			delete[] it->first;
-			m_DescriptorsMap.erase(it);
+			DescriptorsMap.erase(it);
 		}
 	}
 
@@ -280,7 +280,7 @@ void vtkMAFLargeDataProvider
 		new_name_cp = new char[(int)strlen(new_name) + 1];
 		strcpy(new_name_cp, new_name);
 
-		m_DescriptorsMap.insert(StringToIntMap::value_type(new_name_cp, index));	
+		DescriptorsMap.insert(StringToIntMap::value_type(new_name_cp, index));	
 	}	
 }
 
@@ -294,7 +294,7 @@ void vtkMAFLargeDataProvider
     assert(false); return;		//invalid arguments
   }
 
-  DALD& item = this->m_Descriptors[iDsc];
+  DALD& item = this->Descriptors[iDsc];
   if (item.pDAL != pLayout)
   {
     pLayout->Register(this);
@@ -308,19 +308,19 @@ void vtkMAFLargeDataProvider
 //Should be called always before the layout is used
 /*virtual*/ void vtkMAFLargeDataProvider::UpdateDefaultLayout()
 {
-  if (this->DefaultLayout && this->GetMTime() > m_OffsetsComputeTime)
+  if (this->DefaultLayout && this->GetMTime() > OffsetsComputeTime)
   {
     //we have to recalculate global offsets table				
     vtkIdType64 ofs = this->GetHeaderSize();				
-    for (int i = 0; i < (int)m_Descriptors.size(); i++)
+    for (int i = 0; i < (int)Descriptors.size(); i++)
     {
-      DALD& item = m_Descriptors[i];
+      DALD& item = Descriptors[i];
       item.pDAL->SetStartOffset(ofs);
       item.pDAL->SetNumberOfComponents(item.pDAD->GetNumberOfComponents());
       ofs += item.pDAD->GetActualMemorySize();			
     }
 
-    m_OffsetsComputeTime.Modified();
+    OffsetsComputeTime.Modified();
   }  
 }
 
@@ -384,7 +384,7 @@ void vtkMAFLargeDataProvider
   }
 
 	if (name == NULL || *name != '\0')
-		return GetDataArray(m_SpecDescPos[type], startIndex, countTuples);
+		return GetDataArray(SpecDescPos[type], startIndex, countTuples);
 
 	//if name is specified, try to find it
 	return GetDataArray(name, startIndex, countTuples);
@@ -401,7 +401,7 @@ void vtkMAFLargeDataProvider
   }
 
 	if (name == NULL || *name != '\0')
-		GetDataArray(m_SpecDescPos[type], buffer, startIndex, countTuples);
+		GetDataArray(SpecDescPos[type], buffer, startIndex, countTuples);
 	else
 		//if name is specified, try to find it
 		GetDataArray(name, buffer, startIndex, countTuples);
@@ -943,7 +943,7 @@ int vtkMAFLargeDataProvider::GetSetDataArrayNIM(int da_idx, void* buffer,
   }
 
 	if (name == NULL || *name != '\0')
-		SetDataArray(m_SpecDescPos[type], buffer, startIndex);
+		SetDataArray(SpecDescPos[type], buffer, startIndex);
 	else
 		//if name is specified, try to find it
 		SetDataArray(name, buffer, startIndex);
@@ -957,12 +957,12 @@ void vtkMAFLargeDataProvider::ShallowCopy(vtkMAFLargeDataProvider *src)
 	{
 		InternalDataCopy(src);
 
-		for (int i = 0; i < (int)src->m_Descriptors.size(); i++)
+		for (int i = 0; i < (int)src->Descriptors.size(); i++)
 		{
-      DALD& item = src->m_Descriptors[i];
+      DALD& item = src->Descriptors[i];
       item.pDAD->Register(this);
       item.pDAL->Register(this);
-			this->m_Descriptors.push_back(item);
+			this->Descriptors.push_back(item);
 		}
 	}
 }
@@ -974,9 +974,9 @@ void vtkMAFLargeDataProvider::DeepCopy(vtkMAFLargeDataProvider *src)
 	{
 		InternalDataCopy(src);
 
-		for (int i = 0; i < (int)src->m_Descriptors.size(); i++)
+		for (int i = 0; i < (int)src->Descriptors.size(); i++)
 		{
-      DALD item = src->m_Descriptors[i];			
+      DALD item = src->Descriptors[i];			
 			vtkMAFDataArrayDescriptor* dd = vtkMAFDataArrayDescriptor::New();
 			dd->DeepCopy(item.pDAD);
 
@@ -984,7 +984,7 @@ void vtkMAFLargeDataProvider::DeepCopy(vtkMAFLargeDataProvider *src)
       dl->DeepCopy(item.pDAL);
 
 			item.pDAD = dd; item.pDAL = dl;
-			this->m_Descriptors.push_back(item);
+			this->Descriptors.push_back(item);
 		}
 	}
 }
@@ -993,14 +993,14 @@ void vtkMAFLargeDataProvider::InternalDataCopy(vtkMAFLargeDataProvider *src)
 {
 	this->InitializeDescriptors();
 
-	memcpy(this->m_SpecDescPos, src->m_SpecDescPos, sizeof(m_SpecDescPos));
-	this->m_OffsetsComputeTime = src->m_OffsetsComputeTime;
+	memcpy(this->SpecDescPos, src->SpecDescPos, sizeof(SpecDescPos));
+	this->OffsetsComputeTime = src->OffsetsComputeTime;
 	this->SwapBytes = src->SwapBytes;
-	this->m_HeaderSize = src->m_HeaderSize;
+	this->HeaderSize = src->HeaderSize;
   this->DefaultLayout = src->DefaultLayout;
 
-	for (StringToIntMap::iterator it = src->m_DescriptorsMap.begin();
-		it != src->m_DescriptorsMap.end(); it++)
+	for (StringToIntMap::iterator it = src->DescriptorsMap.begin();
+		it != src->DescriptorsMap.end(); it++)
 	{
 		this->ReplaceLookupName(NULL, it->first, it->second);
 	}

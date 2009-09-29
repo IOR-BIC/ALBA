@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataProvider.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 15:55:39 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-09-29 09:33:32 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -47,17 +47,17 @@ protected:
 
 protected:
 	//General tags
-	vtkFieldData* m_TagArray;
+	vtkFieldData* TagArray;
 
 	//descriptor of data
 	typedef std::vector< DALD > DescriptorVector;
-	DescriptorVector m_Descriptors;
+	DescriptorVector Descriptors;
 
 	typedef std::map< const char*, int > StringToIntMap;
-	StringToIntMap m_DescriptorsMap;
+	StringToIntMap DescriptorsMap;
 
 	//special descriptors positions
-	int m_SpecDescPos[vtkDataSetAttributes::NUM_ATTRIBUTES];
+	int SpecDescPos[vtkDataSetAttributes::NUM_ATTRIBUTES];
 
 	// Denotes whether the bytes should be swapped 
 	bool SwapBytes;
@@ -67,10 +67,10 @@ protected:
   bool DefaultLayout;
 
 	//the size of header in bytes (before the first data array - it will be skipped)
-	vtkIdType64 m_HeaderSize;
+	vtkIdType64 HeaderSize;
 
   //global offsets
-  vtkTimeStamp m_OffsetsComputeTime;
+  vtkTimeStamp OffsetsComputeTime;
 
 	//Setters and getters
 public:
@@ -86,13 +86,13 @@ public:
 
 	//Get/Sets the header size (in bytes) - only for Default Layout
 	inline virtual vtkIdType64 GetHeaderSize() {
-		return m_HeaderSize;
+		return HeaderSize;
 	}
 
 	inline virtual void SetHeaderSize(vtkIdType64 header) 
 	{
-		if (m_HeaderSize != header) {
-			m_HeaderSize = header;
+		if (HeaderSize != header) {
+			HeaderSize = header;
 			this->Modified();
 		}
 	}
@@ -100,7 +100,7 @@ public:
 	//Returns an array of tags associated with the given data (i.e., name of file, URL,
 	//configurations, etc.
 	inline virtual vtkFieldData* GetTagArray() {
-		return m_TagArray;
+		return TagArray;
 	}
 	
 public:
@@ -125,7 +125,7 @@ public:
 		if ( i < 0 || i >= this->GetNumberOfDescriptors())		
 			return NULL;		
 
-		return this->m_Descriptors[i].pDAD;
+		return this->Descriptors[i].pDAD;
 	}
 
   //Gets the data array descriptor having the specified name
@@ -149,7 +149,7 @@ public:
 
 	//returns number of descriptors of arrays
 	inline int GetNumberOfDescriptors() {
-		return (int)m_Descriptors.size();
+		return (int)Descriptors.size();
 	}
 
 //SPECIAL DESCRIPTORS
@@ -295,7 +295,7 @@ public:
     if ( iDsc < 0 || iDsc >= this->GetNumberOfDescriptors())		
       return NULL;		
 
-    return this->m_Descriptors[iDsc].pDAL;    
+    return this->Descriptors[iDsc].pDAL;    
   }
 
   /** Gets the physical layout of data array described by the descriptor with the given name */

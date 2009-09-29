@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFLargeDataSetCallback.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:03:31 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-09-29 09:33:32 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -21,7 +21,7 @@
 class vtkMAFLargeDataSetCallback : public vtkCommand
 {
 protected:
-	mafObserver* m_Listener;
+	mafObserver* Listener;
 public:
 	inline static vtkMAFLargeDataSetCallback* New() {
 		return new vtkMAFLargeDataSetCallback();
@@ -29,7 +29,7 @@ public:
 
 	//set the MAF listener that should process the MAF generated events
 	inline void SetListener(mafObserver* listener) {
-		m_Listener = listener;
+		Listener = listener;
 	}
 
 	//callback routine called by VTK, translate events into MAF events
@@ -37,7 +37,7 @@ public:
 
 protected:
 	vtkMAFLargeDataSetCallback() {
-		m_Listener = NULL;
+		Listener = NULL;
 	}
 
 	~vtkMAFLargeDataSetCallback() {
