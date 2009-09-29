@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-07-20 15:21:11 $
-Version:   $Revision: 1.1.2.17 $
+Date:      $Date: 2009-09-29 16:30:15 $
+Version:   $Revision: 1.1.2.18 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -187,7 +187,7 @@ protected:
 	void ShowSlice();
 
   /** Fill listbox. */
-  void FillListBox(mafString StudyUID);
+  void FillListBox(mafString StudyUID, medListDICOMFiles	*filesList);
 
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
@@ -276,7 +276,6 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medListDICOMFiles	*m_FilesList;
 	medListDICOMFiles	*m_ListSelected;
   std::map<mafString,medListDICOMFiles*> m_DicomMap;
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 12:15:07 $
-Version:   $Revision: 1.1.2.48 $
+Date:      $Date: 2009-09-29 16:30:15 $
+Version:   $Revision: 1.1.2.49 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -238,8 +238,6 @@ mafOp(label)
 	m_StudyListbox = NULL;
   m_ListSelected = NULL;
 
-	m_FilesList = NULL;
-
   m_DicomDirectory = "";
 	m_DicomTypeRead = -1;
 
@@ -290,7 +288,6 @@ medOpImporterDicomOffis::~medOpImporterDicomOffis()
 //----------------------------------------------------------------------------
 {
 	vtkDEL(m_SliceActor);
-	//vtkDEL(m_SliceLookupTable);
 
 	cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
@@ -522,7 +519,6 @@ void medOpImporterDicomOffis::Destroy()
   cppDEL(m_CropPage);
   cppDEL(m_BuildPage);
 
-  cppDEL(m_FilesList);
 }
 
 //----------------------------------------------------------------------------
@@ -900,56 +896,28 @@ int medOpImporterDicomOffis::BuildVolume()
 
 
     //transform direction cosines to be used to set vtkMatrix
-    /* [ dst_row_dircos_x  dst_row_dircos_y  dst_row_dircos_z  -dst_pos_x ] 
-    [ dst_col_dircos_x  dst_col_dircos_y  dst_col_dircos_z  -dst_pos_y ]
+    /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
+    [ orientation[3]  orientation[4]  orientation[5]  -dst_pos_y ]
     [ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
     [ 0                 0                 0                 1          ]*/
 
-    double dst_row_dircos_x = orientation[0];
-    double dst_row_dircos_y = orientation[1];
-    double dst_row_dircos_z = orientation[2];
-    double dst_col_dircos_x = orientation[3];
-    double dst_col_dircos_y = orientation[4];
-    double dst_col_dircos_z = orientation[5];
-
-    double src_pos_x = origin[0];
-    double src_pos_y = origin[1];
-    double src_pos_z = origin[2];
-
-    double dst_nrm_dircos_x = dst_row_dircos_y * dst_col_dircos_z - dst_row_dircos_z * dst_col_dircos_y; 
-    double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
-    double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
-
-    /*double src_pos_x -= dst_pos_x;
-    double src_pos_y -= dst_pos_y;
-    double src_pos_z -= dst_pos_z;*/
-
-   /* double dst_pos_x = dst_row_dircos_x * src_pos_x
-      + dst_row_dircos_y * src_pos_y
-      + dst_row_dircos_z * src_pos_z;
-
-    double dst_pos_y = dst_col_dircos_x * src_pos_x
-      + dst_col_dircos_y * src_pos_y
-      + dst_col_dircos_z * src_pos_z;
-
-    double dst_pos_z = dst_nrm_dircos_x * src_pos_x
-      + dst_nrm_dircos_y * src_pos_y
-      + dst_nrm_dircos_z * src_pos_z;*/
-
+    double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
+    double dst_nrm_dircos_y = orientation[2] * orientation[2] - orientation[0] * orientation[5]; 
+    double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
 
     vtkMatrix4x4 *mat = vtkMatrix4x4::New();
     mat->Identity();
 
-    mat->SetElement(0,0,dst_row_dircos_x);
-    mat->SetElement(1,0,dst_col_dircos_x);
+    mat->SetElement(0,0,orientation[0]);
+    mat->SetElement(1,0,orientation[3]);
     mat->SetElement(2,0,dst_nrm_dircos_x);
     mat->SetElement(3,0,0);
-    mat->SetElement(0,1,dst_row_dircos_y);
-    mat->SetElement(1,1,dst_col_dircos_y);
+    mat->SetElement(0,1,orientation[1]);
+    mat->SetElement(1,1,orientation[4]);
     mat->SetElement(2,1,dst_nrm_dircos_y);
     mat->SetElement(3,1,0);
-    mat->SetElement(0,2,dst_row_dircos_z);
-    mat->SetElement(1,2,dst_col_dircos_z);
+    mat->SetElement(0,2,orientation[2]);
+    mat->SetElement(1,2,orientation[5]);
     mat->SetElement(2,2,dst_nrm_dircos_z);
     mat->SetElement(3,2,0);
     mat->SetElement(3,3,1);
@@ -1132,62 +1100,30 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 
   
       //transform direction cosines to be used to set vtkMatrix
-   /* [ dst_row_dircos_x  dst_row_dircos_y  dst_row_dircos_z  -dst_pos_x ] 
-      [ dst_col_dircos_x  dst_col_dircos_y  dst_col_dircos_z  -dst_pos_y ]
+   /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
+      [ orientation[3]  orientation[4]  orientation[5]  -dst_pos_y ]
       [ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
       [ 0                 0                 0                 1          ]*/
 
-      double dst_row_dircos_x = orientation[0];
-      double dst_row_dircos_y = orientation[1];
-      double dst_row_dircos_z = orientation[2];
-      double dst_col_dircos_x = orientation[3];
-      double dst_col_dircos_y = orientation[4];
-      double dst_col_dircos_z = orientation[5];
-
-      double src_pos_x = origin[0];
-      double src_pos_y = origin[1];
-      double src_pos_z = origin[2];
-      
-      double dst_nrm_dircos_x = dst_row_dircos_y * dst_col_dircos_z - dst_row_dircos_z * dst_col_dircos_y; 
-      double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
-      double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
-
-      /*double src_pos_x -= dst_pos_x;
-      double src_pos_y -= dst_pos_y;
-      double src_pos_z -= dst_pos_z;*/
-
-      /*double dst_pos_x = dst_row_dircos_x * src_pos_x
-        + dst_row_dircos_y * src_pos_y
-        + dst_row_dircos_z * src_pos_z;
-
-      double dst_pos_y = dst_col_dircos_x * src_pos_x
-        + dst_col_dircos_y * src_pos_y
-        + dst_col_dircos_z * src_pos_z;
-
-      double dst_pos_z = dst_nrm_dircos_x * src_pos_x
-        + dst_nrm_dircos_y * src_pos_y
-        + dst_nrm_dircos_z * src_pos_z;*/
-
+      double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
+      double dst_nrm_dircos_y = orientation[2] * orientation[2] - orientation[0] * orientation[5]; 
+      double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
 
       vtkMatrix4x4 *mat = vtkMatrix4x4::New();
       mat->Identity();
     
-      mat->SetElement(0,0,dst_row_dircos_x);
-      mat->SetElement(1,0,dst_col_dircos_x);
+      mat->SetElement(0,0,orientation[0]);
+      mat->SetElement(1,0,orientation[3]);
       mat->SetElement(2,0,dst_nrm_dircos_x);
       mat->SetElement(3,0,0);
-      mat->SetElement(0,1,dst_row_dircos_y);
-      mat->SetElement(1,1,dst_col_dircos_y);
+      mat->SetElement(0,1,orientation[1]);
+      mat->SetElement(1,1,orientation[4]);
       mat->SetElement(2,1,dst_nrm_dircos_y);
       mat->SetElement(3,1,0);
-      mat->SetElement(0,2,dst_row_dircos_z);
-      mat->SetElement(1,2,dst_col_dircos_z);
+      mat->SetElement(0,2,orientation[2]);
+      mat->SetElement(1,2,orientation[5]);
       mat->SetElement(2,2,dst_nrm_dircos_z);
       mat->SetElement(3,2,0);
-
-    /*  mat->SetElement(0,3,dst_pos_x);
-      mat->SetElement(1,3,dst_pos_y);
-      mat->SetElement(2,3,dst_pos_z );*/
       mat->SetElement(3,3,1);
 
       mafSmartPointer<mafTransform> boxPose;
@@ -1515,51 +1451,25 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
   m_SliceTexture->GetInput()->GetOrigin(origin);
 
     //transform direction cosines to be used to set vtkMatrix
-    /* [ dst_row_dircos_x  dst_row_dircos_y  dst_row_dircos_z  -dst_pos_x ] 
-    [ dst_col_dircos_x  dst_col_dircos_y  dst_col_dircos_z  -dst_pos_y ]
+ /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
+    [ orientation[3]  orientation[4]  orientation[5]  -dst_pos_y ]
     [ dst_nrm_dircos_x  dst_nrm_dircos_y  dst_nrm_dircos_z  -dst_pos_z ]
     [ 0                 0                 0                 1          ]*/
 
-    double dst_row_dircos_x = orientation[0];
-    double dst_row_dircos_y = orientation[1];
-    double dst_row_dircos_z = orientation[2];
-    double dst_col_dircos_x = orientation[3];
-    double dst_col_dircos_y = orientation[4];
-    double dst_col_dircos_z = orientation[5];
+    double dst_nrm_dircos_x = orientation[1] * orientation[5] - orientation[2] * orientation[4]; 
+    double dst_nrm_dircos_y = orientation[2] * orientation[2] - orientation[0] * orientation[5]; 
+    double dst_nrm_dircos_z = orientation[0] * orientation[4] - orientation[1] * orientation[3]; 
 
-    double src_pos_x = origin[0];
-    double src_pos_y = origin[1];
-    double src_pos_z = origin[2];
-
-    double dst_nrm_dircos_x = dst_row_dircos_y * dst_col_dircos_z - dst_row_dircos_z * dst_col_dircos_y; 
-    double dst_nrm_dircos_y = dst_row_dircos_z * dst_row_dircos_z - dst_row_dircos_x * dst_col_dircos_z; 
-    double dst_nrm_dircos_z = dst_row_dircos_x * dst_col_dircos_y - dst_row_dircos_y * dst_col_dircos_x; 
-
-   /* double dst_pos_x = dst_row_dircos_x * src_pos_x
-      + dst_row_dircos_y * src_pos_y
-      + dst_row_dircos_z * src_pos_z;
-
-    double dst_pos_y = dst_col_dircos_x * src_pos_x
-      + dst_col_dircos_y * src_pos_y
-      + dst_col_dircos_z * src_pos_z;
-
-    double dst_pos_z = dst_nrm_dircos_x * src_pos_x
-      + dst_nrm_dircos_y * src_pos_y
-      + dst_nrm_dircos_z * src_pos_z;*/
-
-
-    
-
-    mat->SetElement(0,0,dst_row_dircos_x);
-    mat->SetElement(1,0,dst_col_dircos_x);
+    mat->SetElement(0,0,orientation[0]);
+    mat->SetElement(1,0,orientation[3]);
     mat->SetElement(2,0,dst_nrm_dircos_x);
     mat->SetElement(3,0,0);
-    mat->SetElement(0,1,dst_row_dircos_y);
-    mat->SetElement(1,1,dst_col_dircos_y);
+    mat->SetElement(0,1,orientation[1]);
+    mat->SetElement(1,1,orientation[4]);
     mat->SetElement(2,1,dst_nrm_dircos_y);
     mat->SetElement(3,1,0);
-    mat->SetElement(0,2,dst_row_dircos_z);
-    mat->SetElement(1,2,dst_col_dircos_z);
+    mat->SetElement(0,2,orientation[2]);
+    mat->SetElement(1,2,orientation[5]);
     mat->SetElement(2,2,dst_nrm_dircos_z);
     mat->SetElement(3,2,0);
     mat->SetElement(3,3,1);
@@ -1740,9 +1650,9 @@ bool medOpImporterDicomOffis::OpenDir()
 void medOpImporterDicomOffis::ReadDicom() 
 //----------------------------------------------------------------------------
 {
-  mafString sel;
-  sel = m_DicomMap.begin()->first;
-  m_ListSelected = m_DicomMap[sel];
+  /*mafString sel;
+  sel = m_DicomMap.begin()->first;*/
+  m_ListSelected = m_DicomMap[m_VolumeName];
 
   // sort dicom slices
   if(m_ListSelected->GetCount() > 1)
@@ -1925,12 +1835,39 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
           {
 				    m_BuildGuiLeft->Update();
 				    EnableSliceSlider(true);
-				    if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
+            m_ListSelected = m_DicomMap[m_VolumeName];
+
+            medImporterDICOMListElements *element0;
+            element0 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
+
+            int numberOfImages =  element0->GetNumberOfImages();
+            m_DicomTypeRead=-1;
+            if(numberOfImages>1)
+            {
+              m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
+              EnableTimeSlider(true);
+            }
+           /* else
+            {
+              m_DicomTypeRead=medGUIDicomSettings::ID_MRI_MODALITY;
+            }*/
+				   /* if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
 				    {
 					    EnableTimeSlider(true);
-				    }
+				    }*/
           }
           ReadDicom();
+          if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+          {
+            AutoPositionCropPlane();
+          }
+          else
+          {
+            m_CropPlane->SetOrigin(0.0,0.0,0.0);
+            m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
+            m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
+            m_CropPage->GetRWI()->CameraReset();
+          }
         }
 			}
 			break;
@@ -2402,14 +2339,14 @@ void medOpImporterDicomOffis::CreatePipeline()
 }
 
 //----------------------------------------------------------------------------
-void medOpImporterDicomOffis::FillListBox(mafString StudyUID)
+void medOpImporterDicomOffis::FillListBox(mafString StudyUID, medListDICOMFiles	*filesList)
 //----------------------------------------------------------------------------
 {
   int row = m_StudyListbox->FindString(StudyUID.GetCStr());
   if (row == -1)
   {
     m_StudyListbox->Append(StudyUID.GetCStr());
-    m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)m_FilesList);
+    m_StudyListbox->SetClientData(m_NumberOfStudy,(void *)filesList);
   }
 }
 
@@ -2752,7 +2689,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         {
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
-          m_FilesList = new medListDICOMFiles;
+          medListDICOMFiles *filesList = new medListDICOMFiles;
 
 
           if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
@@ -2769,13 +2706,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
           }
 
-          m_FilesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
-
-
-          m_DicomMap.insert(std::pair<mafString,medListDICOMFiles*>(studyUID,m_FilesList));
+          filesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
+          m_DicomMap.insert(std::pair<mafString,medListDICOMFiles*>(studyUID,filesList));
           if (!this->m_TestMode)
           {
-            FillListBox(studyUID);
+            FillListBox(studyUID,filesList);
           }
 					m_NumberOfStudy++;
 				}
@@ -2804,7 +2739,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				{
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
-					m_FilesList = new medListDICOMFiles;
+					medListDICOMFiles *filesList = new medListDICOMFiles;
           if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
@@ -2847,12 +2782,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             }
           }
          
-          m_FilesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData, imageNumber, numberOfImages, trigTime));
+          filesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData, imageNumber, numberOfImages, trigTime));
 
-          m_DicomMap.insert(std::pair<mafString,medListDICOMFiles*>(studyUID,m_FilesList));
+          m_DicomMap.insert(std::pair<mafString,medListDICOMFiles*>(studyUID,filesList));
           if (!this->m_TestMode)
           {
-            FillListBox(studyUID);
+            FillListBox(studyUID,filesList);
           }
 					m_NumberOfStudy++;
 				}
@@ -3032,7 +2967,8 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 	if (m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
 
-  m_ListSelected = m_DicomMap[m_DicomMap.begin()->first];
+  //m_ListSelected = m_DicomMap[m_DicomMap.begin()->first];
+  m_ListSelected = m_DicomMap[m_VolumeName];
 
 	medImporterDICOMListElements *element0;
 	element0 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
