@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-18 18:29:19 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2009-09-30 16:17:23 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -220,7 +220,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 	m_RangeCtrl->SetColumnWidth(0,200);//wxLIST_AUTOSIZE_USEHEADER
 	m_RangeCtrl->SetColumnWidth(1,300);// useless
 	
-	sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("first Filter:"), 
+	sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("magnitude value:"), 
 		wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
 	sbSizer3->Add( m_RangeCtrl, 1, wxALL|wxEXPAND, 1 );
 //-------------------------buttons---------
@@ -301,16 +301,16 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 		radioStrings.Add(wxT("OR")) ;
 
 
-		wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, wxEmptyString, wxDefaultPosition, wxSize(85,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;
+		wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, "interaction between filters", wxDefaultPosition, wxSize(140,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;//wxEmptyString
 		radioBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_ANDOR, radioBox, &m_AndOr));
 
-		m_BttnShowAssociate = new wxButton( m_Gui, ID_SHOWITEM, wxT("Show Associate"), 
-			wxDefaultPosition, wxSize( 100,-1 ), 0 );
+		m_BttnShowAssociate = new wxButton( m_Gui, ID_SHOWITEM, wxT("Show"), 
+			wxDefaultPosition, wxSize(50,-1 ), 0 );
 		m_BttnShowAssociate->Enable(false);
 		m_BttnShowAssociate->SetToolTip(wxT("Show result from associated two filter."));
 		m_BttnShowAssociate->SetValidator(mafGUIValidator(this, ID_SHOWITEM_ASSOCIATE, m_BttnShowAssociate));
 
-		bSizer8->Add(radioBox,0,wxALIGN_CENTER_VERTICAL|wxALL, 1);
+		bSizer8->Add(radioBox,0,wxALIGN_LEFT|wxALL, 1);
 		bSizer8->Add(m_BttnShowAssociate,0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
 		sbSizer3->Add( bSizer8, 0, wxEXPAND, 1 );
 	}
@@ -975,7 +975,7 @@ void medPipeVectorFieldGlyphs::createAddItemDlg(int idx){
 	m_FilterName = "";
 
 	if(idx==1){
-		dlgName = "filter editor1";
+		dlgName = "magnitude filter editor";
 		m_FilterValue1 = wxString::Format("%.4f",m_Sr[0]);
 		m_FilterValue2 = wxString::Format("%.4f",m_Sr[1]);
 		okBtn = ID_ITEM_OK;
@@ -1139,23 +1139,23 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 	m_Output->Initialize();
 	vtkPoints *points = vtkPoints::New() ;// Create points and attribute arrays (vector or tensor as requested by user)
 
-	vtkFloatArray *scalars ;
-	vtkFloatArray *vectors ;
-	vtkFloatArray *tensors ;
+	vtkDoubleArray *scalars ;
+	vtkDoubleArray *vectors ;
+	vtkDoubleArray *tensors ;
 
-	scalars = vtkFloatArray::New() ;
+	scalars = vtkDoubleArray::New() ;
 	scalars->SetNumberOfComponents(1) ;
 	scalars->SetName("scalars") ;
 
-	vectors = vtkFloatArray::New() ;
+	vectors = vtkDoubleArray::New() ;
 	vectors->SetNumberOfComponents(3) ;
 	vectors->SetName("vectors") ;
 
-	tensors = vtkFloatArray::New() ;
+	tensors = vtkDoubleArray::New() ;
 	tensors->SetNumberOfComponents(9) ;
 	tensors->SetName("tensors") ;
 	double *pCoord;
-	float xValue,yValue,zValue;
+	//float xValue,yValue,zValue;
 	double xDvalue,yDvalue,zDvalue;
 
 	
@@ -1181,13 +1181,18 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 		int dim[3];
 
 		vtkRectilinearGrid *orgDataR = vtkRectilinearGrid::SafeDownCast(orgData);
-		vtkFloatArray *xCoord = vtkFloatArray::SafeDownCast(orgDataR->GetXCoordinates());//@todo
+/*		vtkFloatArray *xCoord = vtkFloatArray::SafeDownCast(orgDataR->GetXCoordinates());//@todo
 		vtkFloatArray *yCoord = vtkFloatArray::SafeDownCast(orgDataR->GetYCoordinates());
 		vtkFloatArray *zCoord = vtkFloatArray::SafeDownCast(orgDataR->GetZCoordinates());
+*/
+		vtkDataArray *xCoord = orgDataR->GetXCoordinates();
+		vtkDataArray *yCoord = orgDataR->GetYCoordinates();
+		vtkDataArray *zCoord = orgDataR->GetZCoordinates();
+
 		//-----------test code ------------------
 		orgDataR->GetDimensions(dim);
 		int numberOfTuple = old_scalars->GetNumberOfTuples();
-		float  fMin,fMax;
+		//float  fMin,fMax;
 		
 		if (nPoints>0)
 		{
@@ -1204,7 +1209,7 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 						xDvalue = old_vectors->GetTuple3(idx)[0];
 						yDvalue = old_vectors->GetTuple3(idx)[1];
 						zDvalue = old_vectors->GetTuple3(idx)[2];
-						float tmpVectorValue = sqrt(xDvalue*xDvalue + yDvalue*yDvalue + zDvalue*zDvalue);
+						double tmpVectorValue = sqrt(xDvalue*xDvalue + yDvalue*yDvalue + zDvalue*zDvalue);
 						double tmpScaleValue = old_scalars->GetTuple1(idx);
 
 						if (doCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))//tmpScale>=dMin && tmpScale<=dMax
@@ -1212,9 +1217,9 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 
 							pCoord = allPoints->GetTuple(idx);
 
-							pCoord[0] = xCoord->GetValue(ix);
-							pCoord[1] = yCoord->GetValue(iy);
-							pCoord[2] = zCoord->GetValue(iz);
+							pCoord[0] = xCoord->GetTuple1(ix);
+							pCoord[1] = yCoord->GetTuple1(iy);
+							pCoord[2] = zCoord->GetTuple1(iz);
 
 							points->InsertNextPoint(pCoord);
 							vectors->InsertNextTuple(old_vectors->GetTuple3(idx));
@@ -1261,23 +1266,28 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 						double *vet = old_vectors->GetTuple3(idx);
 						double tmpVectorValue =  sqrt(vet[0]*vet[0]+vet[1]*vet[1]+vet[2]*vet[2]);
 						double tmpScaleValue = NULL;
+
 						if (mode>1)
 						{
-							old_scalars->GetTuple1(idx);
+							tmpScaleValue = old_scalars->GetTuple1(idx);
 						}
+
 						if (doCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))
 						{
-							pCoord[0] = origin[0] + pCoord[0] + ix * spacing[0];
-							pCoord[1] = origin[1] + pCoord[1] + iy * spacing[1];
-							pCoord[2] = origin[2] + pCoord[2] + iz * spacing[2];
+							pCoord[0] = origin[0]  + ix * spacing[0];
+							pCoord[1] = origin[1]  + iy * spacing[1];
+							pCoord[2] = origin[2]  + iz * spacing[2];
 										 
 							points->InsertNextPoint(pCoord);
-							scalars->InsertNextTuple((float*)&tmpScaleValue);
+							scalars->InsertNextTuple1(tmpScaleValue);
 
 							//outputFile2<< "  tmpScale="<<tmpScale<<"  x:"<<pCoord[0]<<"   y:"<<pCoord[1]<<"  z:"<<pCoord[2]<<std::endl;//if debug
 
 							vectors->InsertNextTuple(vet);
-							tensors->InsertNextTuple(old_tensors->GetTuple9(idx));
+							if (old_tensors)
+							{
+								tensors->InsertNextTuple(old_tensors->GetTuple9(idx));
+							}
 							num++;
 						}
 					}
