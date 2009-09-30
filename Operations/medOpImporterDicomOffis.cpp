@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-30 08:52:48 $
-Version:   $Revision: 1.1.2.50 $
+Date:      $Date: 2009-09-30 09:11:33 $
+Version:   $Revision: 1.1.2.51 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1650,8 +1650,11 @@ bool medOpImporterDicomOffis::OpenDir()
 void medOpImporterDicomOffis::ReadDicom() 
 //----------------------------------------------------------------------------
 {
-  /*mafString sel;
-  sel = m_DicomMap.begin()->first;*/
+  if (this->m_TestMode)
+  {
+    m_VolumeName = m_DicomMap.begin()->first;
+  }
+
   m_ListSelected = m_DicomMap[m_VolumeName];
 
   // sort dicom slices
@@ -2969,7 +2972,12 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 	if (m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
 
-  //m_ListSelected = m_DicomMap[m_DicomMap.begin()->first];
+
+  if (this->m_TestMode)
+  {
+    m_VolumeName = m_DicomMap.begin()->first;
+  }
+
   m_ListSelected = m_DicomMap[m_VolumeName];
 
 	medImporterDICOMListElements *element0;
