@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-29 16:30:15 $
-Version:   $Revision: 1.1.2.49 $
+Date:      $Date: 2009-09-30 08:52:48 $
+Version:   $Revision: 1.1.2.50 $
 Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2690,6 +2690,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
           medListDICOMFiles *filesList = new medListDICOMFiles;
+          m_DicomTypeRead=-1;
 
 
           if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
@@ -2740,6 +2741,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
 					medListDICOMFiles *filesList = new medListDICOMFiles;
+          m_DicomTypeRead=-1;
           if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
