@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-25 10:40:36 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-10-01 15:51:53 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -1439,7 +1439,7 @@ void medOpMML3::OnRegistrationOK()
   //	ext.Printf("%d", num + 1);
 
   //
-  vme->SetName(m_SurfaceName + " registered");
+  vme->SetName(m_SurfaceName + ".registered");
 
   // add to tree (save now)
   //OurMuscleVME->AddChild(vme);
@@ -1740,6 +1740,7 @@ void medOpMML3::OnMuscleSelection()
 
   // set muscle as output from transform
   musclepd->Update();
+  int numPts = musclepd->GetOutput()->GetPoints()->GetNumberOfPoints() ;
   m_Muscle->DeepCopy(musclepd->GetOutput()) ;
   musclepd->Delete() ;
 

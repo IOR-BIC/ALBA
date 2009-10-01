@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-09-25 10:40:36 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-10-01 15:51:53 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //------------------------------------------------------------------------------
-// TODO 25.9.09
+// TODO 30.9.09
 // 
 // Widget
 // Unify variables m_Operation, m_ScalingMode etc.
@@ -51,17 +51,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Some components are missing, and widget handles are still visible.
 //
 // Dialog
-// Add spinners to non-uniform slice dialog.
-// Consider adding some interaction to the image in the non-uniform slice dialog.
 // Display reg dialog before pre-processing and add progress bar.
-// Add estimates of maximum no. of slices and slice size.
+// The slider is often not synchronised with the numbers on the slider.
+// MML crashes if you change your mind about the input surface.
+// Draw the positions of the slices on the non-uniform slice dialog.
 //
 // Bent axis
 // Restore piecewise axis option and test visual pipes with bent axis.
 //
 // Output
-// Deform landmarks as well as muscle.  Place all output in folder "Registered".
-// Sort out tags, which have not been changed from original MML.  (Does it have to be backwardly compatible ?)
+// Check that the state can still be saved and retrieved using tags.
 //
 // Efficiency
 // Replace polydata slices with better method, eg lhpOpMultiscale and lhpOpTextureOrientation.
