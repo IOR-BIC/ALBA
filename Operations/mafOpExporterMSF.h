@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterMSF.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-01 11:40:13 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ public:
   mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode *vme) { return vme!= NULL;};
+  bool Accept(mafNode *vme);
 
 	/** Builds operation's interface. */
   void OpRun();
@@ -48,8 +48,17 @@ public:
   /** Set the filename for the .msf to export */
   void SetFileName(const char *file_name) {m_MSFFile = file_name;};
 
+  /** Get the filename for the .msf to export */
+  mafString GetFileName() {return m_MSFFile;};
+
   /** Export selected subtree-tree to a .msf file*/
   void ExportMSF();
+
+  typedef struct 
+  {
+    int oldID;
+    int newID;
+  } idValues;
 
 protected:
   mafString m_MSFFile;

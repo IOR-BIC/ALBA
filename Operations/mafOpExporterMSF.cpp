@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-01 11:40:13 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,9 @@
 #include "mafVME.h"
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
+#include "mafNodeIterator.h"
+
+#include <vector>
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpExporterMSF);
@@ -70,10 +73,19 @@ void mafOpExporterMSF::OpRun()
 	mafEventMacro(mafEvent(this,result));
 }
 //----------------------------------------------------------------------------
+bool mafOpExporterMSF::Accept(mafNode *vme)
+//----------------------------------------------------------------------------
+{
+  return (vme != NULL) && (!vme->IsA("mafVMERoot"));
+}
+//----------------------------------------------------------------------------
 void mafOpExporterMSF::ExportMSF()
 //----------------------------------------------------------------------------
 {					
-  wxBusyInfo wait("Saving MSF: Please wait");
+  if (!m_TestMode)
+  {
+  	wxBusyInfo wait("Saving MSF: Please wait");
+  }
   assert(m_MSFFile != "");
 
 	if(!wxFileExists(wxString(m_MSFFile)))
@@ -91,9 +103,70 @@ void mafOpExporterMSF::ExportMSF()
   storage.GetRoot()->SetName("root");
   storage.SetListener(this);
   storage.GetRoot()->Initialize();
+
+  std::vector<idValues> values;
+
+  mafNodeIterator *iter = m_Input->NewIterator();
+  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  {
+    idValues value;
+    value.oldID = node->GetId();
+    values.push_back(value);
+  }
+  iter->Delete();
 //  mafVME *parent = (mafVME *)m_Input->GetParent();
 //  m_Input->ReparentTo(storage.GetRoot());
-	mafNode::CopyTree(m_Input, storage.GetRoot());
+  mafNode::CopyTree(m_Input,storage.GetRoot());
+
+  iter = storage.GetRoot()->GetFirstChild()->NewIterator();
+  int index = 0;
+  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  {
+    idValues value;
+    values[index].newID = node->GetId();
+
+    index++;
+
+    
+  }
+  iter->Delete();
+
+  std::vector<mafString> linkToEliminate;
+  iter = storage.GetRoot()->GetFirstChild()->NewIterator();
+  for (mafNode *node = iter->GetFirstNode(); node; node = iter->GetNextNode())
+  {
+    linkToEliminate.clear();
+
+    for (mafNode::mafLinksMap::iterator it=node->GetLinks()->begin();it!=node->GetLinks()->end();it++)
+    {
+      bool foundID = false;
+      for (int i=0;i<values.size();i++)
+      {
+        int id = it->second.m_NodeId;
+        if (it->second.m_NodeId == values[i].oldID)
+        {
+          it->second.m_NodeId = values[i].newID;
+          foundID = true;
+        }
+      }
+
+      if (!foundID)
+      {
+        linkToEliminate.push_back(it->first.GetCStr());
+      }
+    }
+
+    for (int i=0;i<linkToEliminate.size();i++)
+    {
+      node->RemoveLink(linkToEliminate[i].GetCStr());
+    }
+  }
+  iter->Delete();
+
+//   mafNode *n = m_Input->CopyTree();
+//   n->Register(NULL);
+//   n->ReparentTo(storage.GetRoot());
+	//mafNode::CopyTree(m_Input, storage.GetRoot());
   ((mafVME *)storage.GetRoot()->GetFirstChild())->SetAbsMatrix(*((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());  //Paolo 5-5-2004
   if (storage.Store()!=0)
     wxMessageBox("Error while exporting MSF");
