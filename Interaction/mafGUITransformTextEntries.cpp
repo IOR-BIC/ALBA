@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-02 08:55:43 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
 #include "vtkMatrix4x4.h"
 
 //----------------------------------------------------------------------------
-mafGUITransformTextEntries::mafGUITransformTextEntries(mafVME *input, mafObserver *listener, bool enableScaling /* = true */)
+mafGUITransformTextEntries::mafGUITransformTextEntries(mafVME *input, mafObserver *listener, bool enableScaling, bool testMode)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -58,7 +58,13 @@ mafGUITransformTextEntries::mafGUITransformTextEntries(mafVME *input, mafObserve
 
   m_CurrentTime = m_InputVME->GetTimeStamp();
 
-  CreateGui();
+  m_TestMode = testMode;
+
+  if (m_TestMode == false)
+  {
+    CreateGui();
+  }
+
   SetAbsPose(m_InputVME->GetOutput()->GetAbsMatrix());
 }
 //----------------------------------------------------------------------------
@@ -203,12 +209,17 @@ void mafGUITransformTextEntries::SetAbsPose(mafMatrix* absPose, mafTimeStamp tim
   mflTr->SetInput(absPose);
   mflTr->SetTargetFrame(m_RefSysVME->GetOutput()->GetAbsMatrix());
   mflTr->Update();
-
   
   // update gui with new pose: Position, Orientation, Scale
   mafTransform::GetPosition(mflTr->GetMatrix(), m_Position);
   mafTransform::GetOrientation(mflTr->GetMatrix(), m_Orientation);
   mafTransform::GetScale(mflTr->GetMatrix(), m_Scaling);
+  
+  if (m_TestMode == false)
+  {
+    assert(m_Gui);
+    m_Gui->Update();
+  }
 
-  m_Gui->Update();
+  mafDEL(mflTr);
 }
