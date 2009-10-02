@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-01 15:51:53 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2009-10-02 13:42:38 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -197,6 +197,12 @@ medOpMML3::medOpMML3(const wxString &label) : mafOp(label)
   m_AxisRangeFactor = 1.1 ; // range factor for axis
   m_MuscleType = 1 ;     // 1 for simple axis, 2 for piecewise axis
 
+  // timestamps
+  m_UserTimeStampSet = false ;
+  m_UserTimeStamp = 0.0 ;
+  m_InputTimeStamp = 0.0 ;
+  m_OutputTimeStamp = 0.0 ;
+
   // Model maf RWIs
   m_ModelmafRWI = NULL;
 
@@ -355,17 +361,27 @@ void medOpMML3::CreateInputsDlg()
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
 
   // select muscle surface vme
-  wxStaticText *lab_1  = new wxStaticText(m_InputsDlg, wxID_ANY, "Surface", wxPoint(0,0), wxSize(150,20));
-  wxTextCtrl   *text_1 = new wxTextCtrl(m_InputsDlg , ID_INPUTS_SURFACE, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
-  text_1->SetValidator(mafGUIValidator(this, ID_INPUTS_SURFACE, text_1, &m_SurfaceName));
-  mafGUIButton *b_1 = new mafGUIButton(m_InputsDlg , ID_INPUTS_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
-  b_1->SetListener(this);
+  wxStaticText *selectMuscleLabel  = new wxStaticText(m_InputsDlg, wxID_ANY, "Surface", wxPoint(0,0), wxSize(150,20));
+  wxTextCtrl   *selectMuscleTxt = new wxTextCtrl(m_InputsDlg , ID_INPUTS_SURFACE, "", wxPoint(0,0), wxSize(150,20), wxNO_BORDER |wxTE_READONLY );
+  selectMuscleTxt->SetValidator(mafGUIValidator(this, ID_INPUTS_SURFACE, selectMuscleTxt, &m_SurfaceName));
+  mafGUIButton *selectMuscleButton = new mafGUIButton(m_InputsDlg , ID_INPUTS_SURFACE, "select", wxPoint(0,0), wxSize(50,20));
+  selectMuscleButton->SetListener(this);
 
-  wxBoxSizer *hs_1 = new wxBoxSizer(wxHORIZONTAL);
-  hs_1->Add(lab_1, 0);
-  hs_1->Add(text_1, 1, wxEXPAND);
-  hs_1->Add(b_1,0);
-  vs1->Add(hs_1, 0, wxEXPAND | wxALL, 2);
+  wxBoxSizer *selectMuscleHBox = new wxBoxSizer(wxHORIZONTAL);
+  selectMuscleHBox->Add(selectMuscleLabel, 0);
+  selectMuscleHBox->Add(selectMuscleTxt, 1, wxEXPAND);
+  selectMuscleHBox->Add(selectMuscleButton,0);
+  vs1->Add(selectMuscleHBox, 0, wxEXPAND | wxALL, 2);
+
+  // time stamp
+  wxStaticText *TimeStampLabel  = new wxStaticText(m_InputsDlg, wxID_ANY, "Output time stamp", wxPoint(0,0), wxSize(150,20));
+  m_TimeStampTxt = new wxTextCtrl(m_InputsDlg, wxID_ANY, "0.0", wxPoint(0,0), wxSize(150,20), wxNO_BORDER );
+  m_TimeStampTxt->SetValidator(mafGUIValidator(this, ID_INPUTS_FAKE, m_TimeStampTxt, &m_OutputTimeStamp));
+
+  wxBoxSizer *TimeStampHBox = new wxBoxSizer(wxHORIZONTAL);
+  TimeStampHBox->Add(TimeStampLabel, 0);
+  TimeStampHBox->Add(m_TimeStampTxt, 1, wxEXPAND);
+  vs1->Add(TimeStampHBox, 0, wxEXPAND | wxALL, 2);
   vs1->AddSpacer(20) ;
 
 
@@ -672,7 +688,7 @@ void medOpMML3::CreateRegistrationDlg()
 
   // slice position slider and buttons
   wxStaticText *lab_slicepos  = new wxStaticText(m_OpDlg, -1, "Slice", wxPoint(0,0), wxSize(40, 20));
-  wxTextCtrl   *text_slicepos = new wxTextCtrl(m_OpDlg, ID_REG_SLICE, "", wxPoint(0,0), wxSize(40, 20), wxNO_BORDER | wxTE_READONLY );
+  m_Text_SlicePos = new wxTextCtrl(m_OpDlg, ID_REG_SLICE, "", wxPoint(0,0), wxSize(40, 20), wxNO_BORDER | wxTE_READONLY );
   mafGUIButton *button_Minus10 = new mafGUIButton(m_OpDlg, ID_REG_MINUS10, "<<", wxPoint(0,0), wxSize(30,20)) ;
   button_Minus10->SetListener(this) ;
   mafGUIButton *button_Minus1 = new mafGUIButton(m_OpDlg, ID_REG_MINUS1, "<", wxPoint(0,0), wxSize(30,20)) ; 
@@ -682,7 +698,7 @@ void medOpMML3::CreateRegistrationDlg()
   mafGUIButton *button_Plus10 = new mafGUIButton(m_OpDlg, ID_REG_PLUS10, ">>", wxPoint(0,0), wxSize(30,20)) ; 
   button_Plus10->SetListener(this) ;
   wxSlider *slider_slicepos  = new wxSlider(m_OpDlg, ID_REG_SLICE, 0, 0, m_NumberOfScans-1, wxPoint(0,0), wxSize(269,-1));
-  slider_slicepos->SetValidator(mafGUIValidator(this, ID_REG_SLICE, (wxSlider*)slider_slicepos, &m_CurrentSlice, text_slicepos));
+  slider_slicepos->SetValidator(mafGUIValidator(this, ID_REG_SLICE, (wxSlider*)slider_slicepos, &m_CurrentSlice, m_Text_SlicePos));
 
 
   // maf parameter views RWI's
@@ -725,7 +741,7 @@ void medOpMML3::CreateRegistrationDlg()
   hs4->Add(button_Minus10,  0, wxLEFT);
   hs4->Add(button_Minus1,  0, wxLEFT);
   hs4->Add(lab_slicepos,  0, wxLEFT, 5);
-  hs4->Add(text_slicepos, 0, wxLEFT, 5);
+  hs4->Add(m_Text_SlicePos, 0, wxLEFT, 5);
   hs4->Add(button_Plus1,  0, wxLEFT);
   hs4->Add(button_Plus10,  0, wxLEFT);
 
@@ -1325,7 +1341,7 @@ void medOpMML3::OnRegistrationOK()
 
   // create vme and set data
   mafSmartPointer<mafVMESurface> vme ;
-  vme->SetData(m_MuscleOutput, ((mafVME *)m_Input)->GetTimeStamp()) ;
+  vme->SetData(m_MuscleOutput, m_OutputTimeStamp) ;
 
 
   // tag 1: status
@@ -1459,6 +1475,9 @@ void medOpMML3::OnRegistrationCANCEL()
 void medOpMML3::OnSlider() 
 //----------------------------------------------------------------------------
 {
+  // force immediate update of text display, otherwise it does it after the processing
+  m_Text_SlicePos->Update() ;
+
   // Set the slice in the model view
   m_Model->SetCurrentIdOfScans(m_CurrentSlice);
   m_Model->Update() ;
@@ -1524,6 +1543,7 @@ void medOpMML3::OnMinus10()
     m_CurrentSlice = 0 ;
 
   m_OpDlg->TransferDataToWindow() ;
+  m_Text_SlicePos->Update() ;   // force immediate update of text display
 }
 
 
@@ -1539,6 +1559,7 @@ void medOpMML3::OnMinus1()
     m_CurrentSlice = 0 ;
 
   m_OpDlg->TransferDataToWindow() ;
+  m_Text_SlicePos->Update() ;   // force immediate update of text display
 }
 
 
@@ -1554,6 +1575,7 @@ void medOpMML3::OnPlus1()
     m_CurrentSlice = m_NumberOfScans-1 ;
 
   m_OpDlg->TransferDataToWindow() ;
+  m_Text_SlicePos->Update() ;   // force immediate update of text display
 }
 
 
@@ -1572,6 +1594,7 @@ void medOpMML3::OnPlus10()
     m_CurrentSlice = m_NumberOfScans-1 ;
 
   m_OpDlg->TransferDataToWindow() ;
+  m_Text_SlicePos->Update() ;   // force immediate update of text display
 }
 
 
@@ -1619,6 +1642,13 @@ void medOpMML3::OnMuscleSelection()
 
   // get vme name
   m_SurfaceName = vme->GetName();
+
+  // get vme time stamp and set output stamp to input
+  m_InputTimeStamp = vme->GetTimeStamp() ;
+  m_OutputTimeStamp = m_InputTimeStamp ;
+  m_InputsDlg->TransferDataToWindow();
+
+
 
   // if muscle registered previously
   // read in relevant tags stored in

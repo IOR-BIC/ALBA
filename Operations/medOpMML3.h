@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-10-01 15:51:53 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2009-10-02 13:42:38 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,31 +39,30 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //------------------------------------------------------------------------------
-// TODO 30.9.09
+// TODO 2.10.09
 // 
 // Widget
 // Unify variables m_Operation, m_ScalingMode etc.
 // Problems with text display.
-// Problems caused by pre-setting the endpoints of the splines.  Should endpoints be fixed ?
+// Problems caused by presetting the endpoints of the splines.  Should endpoints be fixed ?
 // Sometimes contour does not respond to T and S, although text is changing.
 //
 // Preview
 // Some components are missing, and widget handles are still visible.
 //
 // Dialog
-// Display reg dialog before pre-processing and add progress bar.
-// The slider is often not synchronised with the numbers on the slider.
-// MML crashes if you change your mind about the input surface.
+// Display progress bar during pre-processing.
 // Draw the positions of the slices on the non-uniform slice dialog.
 //
 // Bent axis
 // Restore piecewise axis option and test visual pipes with bent axis.
 //
 // Output
-// Check that the state can still be saved and retrieved using tags.
+// Tags don't save and restore state correctly.
+// Make process of using tags from previous registration clear to user, and applicable to any input, eg next time frame.
 //
 // Efficiency
-// Replace polydata slices with better method, eg lhpOpMultiscale and lhpOpTextureOrientation.
+// Replace polydata slices with better method, eg one used in lhpOpMultiscale and lhpOpTextureOrientation.
 // If axis is straight, consider creating all contours at once with a single vtkCutter execution.
 //
 // Remove medOpMatrixVectorMath from aneuFuse and lhp.
@@ -81,8 +80,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 /// Global registration is performed by matching a set of 3 or 4 landmarks on patient and model. \n
 /// The user can then manually fit the shape of the model to the patient data. \n
 /// Optional inputs are landmarks used for registration and defining the slicing axis. \n
-/// Two optional axis landmarks can be used to set the slicing direction.
-/// The input landmarks must be in VME folders labelled "Atlas" and "Patient", \n
+/// Two optional axis landmarks can be used to set the slicing direction. \n
+/// The input landmarks must be in VME folders labelled "ATLAS" and "Patient", \n
 /// with the axis landmarks being part of the Atlas section.
 //
 // Coordinate systems.
@@ -349,6 +348,12 @@ protected:
   wxString m_VolName;
   wxString m_SurfaceName;
 
+  // input and output timestamps
+  bool m_UserTimeStampSet ;         // has user set a time stamp
+  mafTimeStamp m_UserTimeStamp ;    // set by user in dialog
+  mafTimeStamp m_InputTimeStamp ;   // read from input vme
+  mafTimeStamp m_OutputTimeStamp ;  // output vme
+
   // operation tags
   mafTagItem *m_CurrentSliceIdStackTag;
   mafTagItem *m_ZValueStackTag;
@@ -427,6 +432,7 @@ protected:
   //----------------------------------------------------------------------------
 
   // inputs dialog
+  wxTextCtrl *m_TimeStampTxt;
   wxTextCtrl *m_NumberOfScansTxt;
   wxRadioBox *m_Radio_slicexyz ;
   wxStaticText *m_WarningNumberOfSlices ;
@@ -453,6 +459,8 @@ protected:
   mafGUIButton *m_UndoButton;
   mafGUIButton *m_OkButton;
   mafGUIButton *m_CancelButton;
+
+  wxTextCtrl   *m_Text_SlicePos ;
 
   wxColour m_ButtonBackgroundColour;
 
