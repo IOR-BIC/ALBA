@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-02 08:49:09 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,6 +44,7 @@ mafGUITransformInterface::mafGUITransformInterface()
   m_InputVME = NULL;
   m_Gui = NULL;
   m_RefSysVME = m_InputVME;
+  m_TestMode = false;
 }
 //----------------------------------------------------------------------------
 mafGUITransformInterface::~mafGUITransformInterface() 

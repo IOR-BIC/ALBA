@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-02 08:49:09 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -56,6 +56,16 @@ public:
   /** Events handling */  
   void OnEvent(mafEventBase *maf_event) {};
   
+  /** Turn On m_TestMode flag. 
+  The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
+  void TestModeOn() {m_TestMode = true;};
+
+  /** Used to turn off m_TestMode flag.*/
+  void TestModeOff() {m_TestMode = false;};
+
+  /** Get TestMode*/
+  bool GetTestMode(){return m_TestMode;};
+
 protected:
   
   mafGUITransformInterface();
@@ -76,5 +86,7 @@ protected:
   virtual void RefSysVmeChanged() {};
 
   mafTimeStamp m_CurrentTime;
+
+  bool m_TestMode;
 };
 #endif
