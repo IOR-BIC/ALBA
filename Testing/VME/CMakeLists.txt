@@ -50,6 +50,10 @@ ADD_TEST(medPipePolylineGraphEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipePolyli
 ADD_EXECUTABLE(medVMEPolylineEditorTest medVMEPolylineEditorTest.h medVMEPolylineEditorTest.cpp)
 ADD_TEST(medVMEPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineEditorTest)
 
+ADD_EXECUTABLE(mafPipeMeshSlice_BESTest mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp)
+ADD_TEST(mafPipeMeshSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeMeshSlice_BESTest)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
