@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3ModelView3DPipe.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 14:56:34 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-05 16:41:58 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -79,7 +79,8 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
 
 
   //----------------------------------------------------------------------------
-  // Calculate size of landmarks and tube
+  // Calculate size of landmarks and tube.
+  // NB If this is preview, make sure the muscle has data in it.
   //----------------------------------------------------------------------------
   double bnds[6], siz[3], minSize ;
   muscle->Update() ;
@@ -116,7 +117,7 @@ medOpMML3ModelView3DPipe::medOpMML3ModelView3DPipe
 
   m_MuscleActor = vtkActor::New() ;
   m_MuscleActor->SetMapper(m_MuscleMapper) ;
-  m_MuscleActor->GetProperty()->SetOpacity(0.1) ;
+  m_MuscleActor->GetProperty()->SetOpacity(0.3) ;
   m_MuscleActor->GetProperty()->SetColor(1,0,0) ; // red
   m_Renderer->AddActor(m_MuscleActor) ;
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3NonUniformSlicePipe.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-18 08:10:33 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-05 16:41:58 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkActor2D.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkCamera.h"
 #include "vtkSphereSource.h"
 #include "vtkMatrix4x4.h"
@@ -33,6 +34,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medOpMatrixVectorMath.h"
 #include "medOpMML3NonUniformSlicePipe.h"
 
+#include <vector>
+
 #ifndef M_PI
 #define _USE_MATH_DEFINES
 #endif
@@ -42,7 +45,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //------------------------------------------------------------------------------
 // constructor
 medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface, vtkRenderer *renderer, int numberOfSections)
-: m_Renderer(renderer), m_NumberOfSections(numberOfSections)
+: m_Renderer(renderer), m_NumberOfSections(numberOfSections), m_NumberOfSlices(0)
 //------------------------------------------------------------------------------
 {
   // default values for end-of-axis landmarks
@@ -96,24 +99,6 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
 
 
 
-  //----------------------------------------------------------------------------
-  // set the surface display pipeline
-  //----------------------------------------------------------------------------
-  vtkTransformPolyDataFilter *surfaceTransform = vtkTransformPolyDataFilter::New() ;
-  surfaceTransform->SetInput(surface) ;
-  surfaceTransform->SetTransform(m_Transform) ;
-
-  vtkPolyDataMapper2D *surfaceMapper = vtkPolyDataMapper2D::New() ;
-  surfaceMapper->SetInput(surfaceTransform->GetOutput()) ;
-  surfaceMapper->SetTransformCoordinate(coordSystem) ;
-
-  m_SurfaceActor = vtkActor2D::New() ;
-  m_SurfaceActor->SetMapper(surfaceMapper) ;
-
-  //m_Renderer->AddActor2D(m_SurfaceActor) ;
-
-
-
 
 
   //----------------------------------------------------------------------------
@@ -148,29 +133,29 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
   //----------------------------------------------------------------------------
   // set the pipeline for the section lines
   //----------------------------------------------------------------------------
-  int nlines = m_NumberOfSections+1 ;
+  int numberOfSectionLines = m_NumberOfSections+1 ;
 
-  vtkPoints *sectionLineEndPts = vtkPoints::New() ;
-  sectionLineEndPts->Initialize() ;
-  for (int i = 0 ;  i < nlines ;  i++){
-    double y = (double)i / (double)(nlines-1) ;
-    sectionLineEndPts->InsertNextPoint(0, y, 0) ;
-    sectionLineEndPts->InsertNextPoint(1, y, 0) ;
+  vtkPoints *sectionLinesEndPts = vtkPoints::New() ;
+  sectionLinesEndPts->Initialize() ;
+  for (int i = 0 ;  i < numberOfSectionLines ;  i++){
+    double y = (double)i / (double)(numberOfSectionLines-1) ;
+    sectionLinesEndPts->InsertNextPoint(0, y, 0) ;
+    sectionLinesEndPts->InsertNextPoint(1, y, 0) ;
   }
 
-  int endPtIndices[2] ;
-  vtkCellArray *lineCells = vtkCellArray::New() ;
-  for (int i = 0 ;  i < nlines ;  i++){
+  vtkCellArray *sectionLinesCells = vtkCellArray::New() ;
+  for (int i = 0 ;  i < numberOfSectionLines ;  i++){
+    int endPtIndices[2] ;
     endPtIndices[0] = 2*i ;
-    endPtIndices[1] = 2*i+1 ;
-    lineCells->InsertNextCell(2, endPtIndices) ;
+    endPtIndices[1] = endPtIndices[0] + 1 ;
+    sectionLinesCells->InsertNextCell(2, endPtIndices) ;
   }
 
   vtkPolyData *sectionLinesPolydata = vtkPolyData::New() ;
-  sectionLinesPolydata->SetPoints(sectionLineEndPts) ;
-  sectionLinesPolydata->SetLines(lineCells) ;
-  sectionLineEndPts->Delete() ;
-  lineCells->Delete() ;
+  sectionLinesPolydata->SetPoints(sectionLinesEndPts) ;
+  sectionLinesPolydata->SetLines(sectionLinesCells) ;
+  sectionLinesEndPts->Delete() ;
+  sectionLinesCells->Delete() ;
 
   vtkPolyDataMapper2D *sectionLinesMapper = vtkPolyDataMapper2D::New() ;
   sectionLinesMapper->SetInput(sectionLinesPolydata) ;
@@ -179,7 +164,38 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
   m_SectionLinesActor = vtkActor2D::New() ;
   m_SectionLinesActor->SetMapper(sectionLinesMapper) ;
   m_SectionLinesActor->GetProperty()->SetColor(1,1,0) ;
+  m_SectionLinesActor->GetProperty()->SetOpacity(1.0) ;
   renderer->AddActor2D(m_SectionLinesActor) ;
+
+
+
+  //----------------------------------------------------------------------------
+  // set the pipeline for the slice lines, initially with no lines
+  //----------------------------------------------------------------------------
+  m_NumberOfSlices = 0 ;
+
+  vtkPoints *sliceLinesEndPts = vtkPoints::New() ;
+  sliceLinesEndPts->Initialize() ;
+
+  vtkCellArray *sliceLinesCells = vtkCellArray::New() ;
+  sliceLinesCells->Initialize() ;
+
+  m_SliceLinesPolydata = vtkPolyData::New() ;
+  m_SliceLinesPolydata->SetPoints(sliceLinesEndPts) ;
+  m_SliceLinesPolydata->SetLines(sliceLinesCells) ;
+  sliceLinesEndPts->Delete() ;
+  sliceLinesCells->Delete() ;
+
+  vtkPolyDataMapper2D *sliceLinesMapper = vtkPolyDataMapper2D::New() ;
+  sliceLinesMapper->SetInput(m_SliceLinesPolydata) ;
+  sliceLinesMapper->SetTransformCoordinate(coordSystem) ;
+
+  m_SliceLinesActor = vtkActor2D::New() ;
+  m_SliceLinesActor->SetMapper(sliceLinesMapper) ;
+  m_SliceLinesActor->GetProperty()->SetColor(1,1,1) ;
+  m_SliceLinesActor->GetProperty()->SetOpacity(0.3) ;
+  renderer->AddActor2D(m_SliceLinesActor) ;
+
 
 
 
@@ -200,11 +216,10 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
   cutter->Delete() ;
   contourMapper->Delete() ;
 
-  surfaceTransform->Delete() ;
-  surfaceMapper->Delete() ;
-
   sectionLinesPolydata->Delete() ;
   sectionLinesMapper->Delete() ;
+
+  sliceLinesMapper->Delete() ; // don't delete slice lines polydata here because we want to use it elsewhere
 
   coordSystem->Delete() ;
 
@@ -223,8 +238,10 @@ medOpMML3NonUniformSlicePipe::~medOpMML3NonUniformSlicePipe()
 {
   m_Transform->Delete() ;
   m_ContourActor->Delete() ;
-  m_SurfaceActor->Delete() ;
   m_SectionLinesActor->Delete() ;
+  m_SliceLinesActor->Delete() ;
+
+  m_SliceLinesPolydata->Delete() ;
 
   for (int i = 0 ;  i < 2 ;  i++){
     m_Sphere[i]->Delete() ;
@@ -322,6 +339,21 @@ void medOpMML3NonUniformSlicePipe::CalculateAxisNormals(double *v,  double *w)
 
 
 
+
+//------------------------------------------------------------------------------
+// set positions of slices
+void medOpMML3NonUniformSlicePipe::SetSlicePositions(int numberOfSlices, double *alpha)
+//------------------------------------------------------------------------------
+{
+  m_Alpha.clear() ;
+
+  m_NumberOfSlices = numberOfSlices ;
+  for (int i = 0 ;  i < m_NumberOfSlices ;  i++)
+    m_Alpha.push_back(alpha[i]) ;
+}
+
+
+
 //------------------------------------------------------------------------------
 // update the transform
 void medOpMML3NonUniformSlicePipe::UpdateTransform()
@@ -398,6 +430,30 @@ void medOpMML3NonUniformSlicePipe::UpdateSpheres()
 
 
 
+//------------------------------------------------------------------------------
+// update slice lines
+void medOpMML3NonUniformSlicePipe::UpdateSliceLines()
+//------------------------------------------------------------------------------
+{
+  vtkPoints *sliceLinesEndPts = m_SliceLinesPolydata->GetPoints() ;
+  sliceLinesEndPts->Initialize() ;
+  for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
+    sliceLinesEndPts->InsertNextPoint(0, m_Alpha.at(i), 0) ;
+    sliceLinesEndPts->InsertNextPoint(1, m_Alpha.at(i), 0) ;
+  }
+
+  vtkCellArray *sliceLinesCells = m_SliceLinesPolydata->GetLines() ;
+  sliceLinesCells->Initialize() ;
+  for (int i = 0 ;  i < m_NumberOfSlices ;  i++){
+    int endPtIndices[2] ;
+    endPtIndices[0] = 2*i ;
+    endPtIndices[1] = 2*i+1 ;
+    sliceLinesCells->InsertNextCell(2, endPtIndices) ;
+  }
+
+  m_SliceLinesPolydata->Modified() ;
+}
+
 
 
 
@@ -408,4 +464,6 @@ void medOpMML3NonUniformSlicePipe::Update()
 {
   UpdateTransform() ;
   UpdateSpheres() ;
+  UpdateSliceLines() ;
+  m_Renderer->GetRenderWindow()->Render() ;
 }

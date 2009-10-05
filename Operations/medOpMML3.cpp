@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-02 13:42:38 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2009-10-05 16:41:57 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -355,7 +355,7 @@ void medOpMML3::CreateInputsDlg()
 //----------------------------------------------------------------------------
 {
   // create the dialog
-  m_InputsDlg = new mafGUIDialog("SetUp"); 
+  m_InputsDlg = new mafGUIDialog("SetUp", mafCLOSEWINDOW | mafRESIZABLE); 
 
   // vertical stacker for the rows of widgets
   wxBoxSizer *vs1 = new wxBoxSizer(wxVERTICAL);
@@ -539,17 +539,6 @@ void medOpMML3::CreateInputsDlg()
   AxisScalingHorizontalSizer->Add(AxisScalingTxt,1,wxEXPAND);
   vs1->Add(AxisScalingHorizontalSizer,0,wxEXPAND | wxALL, 2);
 
-/*
-  // 3d flag (note that check box needs a valid id)
-  wxStaticText *flag3dLab = new wxStaticText(m_InputsDlg, wxID_ANY, "3D display", wxPoint(0,0), wxSize(150,20));
-  wxCheckBox *flag3dCheckBox = new wxCheckBox(m_InputsDlg, ID_INPUTS_FLAG3D, "", wxPoint(0,0), wxSize(80,20)) ;
-  flag3dCheckBox->SetValidator(mafGUIValidator(this, ID_INPUTS_FLAG3D, flag3dCheckBox, &m_3DFlag));
-  wxBoxSizer *flagHorizontalSizer = new wxBoxSizer(wxHORIZONTAL);
-  flagHorizontalSizer->Add(flag3dLab, 0);
-  flagHorizontalSizer->Add(flag3dCheckBox,1,wxEXPAND | wxRIGHT, 3);
-  vs1->Add(flagHorizontalSizer,0,wxEXPAND | wxALL, 2);
-  vs1->AddSpacer(20) ;
-*/
 
   // ok/cancel buttons
   m_InputsOk = new mafGUIButton(m_InputsDlg, ID_INPUTS_OK, "OK", wxPoint(0,0), wxSize(50,20));
@@ -595,7 +584,7 @@ void medOpMML3::CreateRegistrationDlg()
   // create dialog
   wxString Title;
   Title = "registration of " + m_SurfaceName;
-  m_OpDlg = new mafGUIDialog(Title); 
+  m_OpDlg = new mafGUIDialog(Title, mafCLOSEWINDOW | mafRESIZABLE); 
 
   // display mode button
   m_DisplayModeButton = new mafGUIButton(m_OpDlg, ID_REG_DISPLAY_MODE, "Display 3D", wxPoint(0,0), wxSize(75,20));
@@ -879,7 +868,7 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   // create dialog
   wxString Title;
   Title = "Set distribution of non-uniform slice spacing" ;
-  m_NonUniformSlicesDlg = new mafGUIDialog(Title); 
+  m_NonUniformSlicesDlg = new mafGUIDialog(Title, mafCLOSEWINDOW | mafRESIZABLE); 
 
 
   //----------------------------------------------------------------------------
@@ -895,7 +884,6 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   for (i = 0, total = 0 ;  i < NumberOfNonUniformSections ;  i++)
     total += m_SlicesInSection[i] ;
   assert(total == m_NumberOfScans) ;
-  m_NonUniformSlicesDlg->TransferDataToWindow();
 
 
 
@@ -939,9 +927,9 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   wxStaticText *numSlicesTitleTxt = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "Number of slices", wxPoint(0,0), wxSize(75,textHeight)) ;
   widgetsBoxSizer->Add(numSlicesTitleTxt, 0, wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
 
-  // number of slices entry widgets
-  for (int i = 0 ;  i < NumberOfNonUniformSections ;  i++){
-    wxString label = wxString::Format(wxT("%d"),i+1);
+  // number of slices entry widgets (stacked in reverse order)
+  for (int i = NumberOfNonUniformSections-1 ;  i >= 0 ;  i--){
+    wxString label = wxString::Format(wxT("%d"),i);
 
     m_NumSlicesLabel[i] = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, label, wxPoint(0,0), wxSize(25,textHeight));
     m_NumSlicesEntry[i] = new wxTextCtrl(m_NonUniformSlicesDlg , wxID_ANY, "", wxPoint(0,0), wxSize(50,textHeight), wxNO_BORDER);
@@ -1010,12 +998,13 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   //----------------------------------------------------------------------------
   m_NonUniformSlicePipe = new medOpMML3NonUniformSlicePipe(m_MuscleGlobalReg, m_SectionsViewRWI->m_RenFront, NumberOfNonUniformSections) ;
   m_NonUniformSlicePipe->SetEndsOfAxis(m_Axis1Point_PatientCoords, m_Axis2Point_PatientCoords) ;
-  m_SectionsViewRWI->CameraUpdate();
 
+  m_SectionsViewRWI->CameraUpdate();
+  UpdateNonUniformVisualPipe() ; // transfer initial numbers from dialog to visual pipe
+
+  m_NumberOfScansSaved = m_NumberOfScans ;  // save no. of scans so we can undo later if dialog is cancelled
 
   m_NonUniformSlicesDlg->ShowModal() ;
-
-
 
 }
 
@@ -1089,6 +1078,21 @@ void medOpMML3::Set2DButtonsEnable(bool enable)
 
 
 //------------------------------------------------------------------------------
+// Transfer the numbers in the non-uniform slice dialog to the visual pipe
+void medOpMML3::UpdateNonUniformVisualPipe()
+//------------------------------------------------------------------------------
+{
+  double *alpha = new double[m_NumberOfScans] ;
+  CalculateSlicePositionsAlongAxis(alpha) ;
+  m_NonUniformSlicePipe->SetSlicePositions(m_NumberOfScans, alpha) ;
+  m_NonUniformSlicePipe->Update() ;
+  delete [] alpha ;
+}
+
+
+
+
+//------------------------------------------------------------------------------
 // Event handler
 void medOpMML3::OnEvent(mafEventBase *maf_event) 
 //------------------------------------------------------------------------------
@@ -1103,6 +1107,15 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
 
     switch(e->GetId())
     {
+    case ID_NUSLICES_OK:// non-uniform slicing dlg OK
+      m_NonUniformSlicesDlg->EndModal(wxID_OK);
+      break;
+
+    case ID_NUSLICES_CANCEL:// non-uniform slicing dlg cancel
+      OnNonUniformCancel() ;
+      m_NonUniformSlicesDlg->EndModal(wxID_CANCEL);
+      break;
+
     case ID_INPUTS_NUMSLICES: // number of slices changed
       OnNumberOfSlices();
       break;
@@ -1155,14 +1168,6 @@ void medOpMML3::OnEvent(mafEventBase *maf_event)
 
     case ID_INPUTS_CANCEL: // set up dlg cancel
       m_InputsDlg->EndModal(wxID_CANCEL);
-      break;
-
-    case ID_NUSLICES_OK:// non-uniform slicing dlg OK
-      m_NonUniformSlicesDlg->EndModal(wxID_OK);
-      break;
-
-    case ID_NUSLICES_CANCEL:// non-uniform slicing dlg cancel
-      m_NonUniformSlicesDlg->EndModal(wxID_CANCEL);
       break;
 
     case ID_REG_DISPLAY_MODE: // registration dlg axes on/off
@@ -1266,9 +1271,22 @@ void medOpMML3::OnTextNumberChange(mafID id)
     m_WarningTotalSlices->Enable(false) ;
   else
     m_WarningTotalSlices->Enable(true) ;
+
+  // display the slice position on the image
+  UpdateNonUniformVisualPipe() ;
 }
 
 
+
+//------------------------------------------------------------------------------
+// Cancel non-uniform slices dialog
+// This restores the original no. of slices and sets the op to continue with uniform slicing
+void medOpMML3::OnNonUniformCancel()
+//------------------------------------------------------------------------------
+{
+  m_NumberOfScans = m_NumberOfScansSaved ;
+  m_NonUniformSliceSpacing = 0 ;
+}
 
 
 //------------------------------------------------------------------------------
@@ -2290,11 +2308,13 @@ void medOpMML3::OnDisplayMode()
 
   if (m_3DFlag == 0){
     m_Model->SetDisplay2D() ;
+    m_Widget->On() ;
     m_DisplayModeButton->SetTitle("Display 3D");
     Set2DButtonsEnable(true) ;
   }
   else{
     m_Model->SetDisplay3D() ;
+    m_Widget->Off() ;
     m_DisplayModeButton->SetTitle("Display 2D");
     Set2DButtonsEnable(false) ;
   }
@@ -2320,10 +2340,12 @@ void medOpMML3::OnPreview()
     // switch off preview and return to previous 2d or 3d view
     if (m_3DFlag == 0){
       m_Model->SetDisplay2D() ;
+      m_Widget->On() ;
       Set2DButtonsEnable(true) ;
     }
     else{
       m_Model->SetDisplay3D() ;
+      m_Widget->Off() ;
       Set2DButtonsEnable(false) ;
     }
 
@@ -2332,6 +2354,7 @@ void medOpMML3::OnPreview()
   else{
     // switch on preview
     m_Model->SetDisplayToPreview() ;
+    m_Widget->Off() ;
     m_PreviewButton->SetTitle("Preview Off");
     Set2DButtonsEnable(false) ;
   }
@@ -3264,7 +3287,7 @@ void medOpMML3::ApplyAxisRangeFactor()
 // where the values 0.0 and 1.0 correspond to the min and max of the slicing range
 // NB The first and last slices might not be exactly at 0.0 and 1.0.
 // NB Run ApplyAxisRangeFactor() before this - not after !
-void medOpMML3::CalculateSlicePositionsAlongAxis(double *alpha)
+void medOpMML3::CalculateSlicePositionsAlongAxis(double *alpha) const
 //------------------------------------------------------------------------------
 {
   // i indexes the sections, j indexes the slices within each section, k indexes the slice id
@@ -4623,7 +4646,15 @@ void medOpMML3::ApplyGlobalRegistration()
   }
 
 
+  //----------------------------------------------------------------------------
+  // Copy the result to the MML output muscle
+  //----------------------------------------------------------------------------
+  m_MuscleOutput->DeepCopy(m_MuscleGlobalReg) ;
+
+
+  //----------------------------------------------------------------------------
   // clean up
+  //----------------------------------------------------------------------------
   delete glob ;
 }
 

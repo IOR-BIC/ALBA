@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-10-02 13:42:38 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2009-10-05 16:41:57 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //------------------------------------------------------------------------------
-// TODO 2.10.09
+// TODO 5.10.09
 // 
 // Widget
 // Unify variables m_Operation, m_ScalingMode etc.
@@ -47,12 +47,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // Problems caused by presetting the endpoints of the splines.  Should endpoints be fixed ?
 // Sometimes contour does not respond to T and S, although text is changing.
 //
-// Preview
-// Some components are missing, and widget handles are still visible.
-//
 // Dialog
 // Display progress bar during pre-processing.
-// Draw the positions of the slices on the non-uniform slice dialog.
 //
 // Bent axis
 // Restore piecewise axis option and test visual pipes with bent axis.
@@ -169,7 +165,10 @@ protected:
   /// where the values 0.0 and 1.0 correspond to the min and max of the slicing range. \n
   /// NB The first and last slices might not be exactly at 0.0 and 1.0. \n
   /// NB Run ApplyAxisRangeFactor() before this - not after !
-  void CalculateSlicePositionsAlongAxis(double *alpha) ;
+  void CalculateSlicePositionsAlongAxis(double *alpha) const ;
+
+  /// Transfer the numbers in the non-uniform slice dialog to the visual pipe
+  void UpdateNonUniformVisualPipe() ;
 
 
   //----------------------------------------------------------------------------
@@ -226,6 +225,7 @@ protected:
 
   // non-uniform slices dialog
   void OnTextNumberChange(mafID id) ;  ///< non-uniform slice entry changed
+  void OnNonUniformCancel() ; ///< cancel non-uniform slices
 
   // registration dialog
   void OnSOperationButton();
@@ -330,6 +330,7 @@ protected:
   int m_NumberOfScans ;                              ///< total number of slices
   int m_NonUniformSliceSpacing ;                     ///< is slice spacing non-uniform
   int m_SlicesInSection[NumberOfNonUniformSections] ; ///< no. of slices per section, if non-uniform
+  int m_NumberOfScansSaved ;                          ///< save no. of slices on entering non-uniform dialog, for undo purposes
 
   mafRWI *m_SectionsViewRWI ;
   medOpMML3NonUniformSlicePipe *m_NonUniformSlicePipe ;

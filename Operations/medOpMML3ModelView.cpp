@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3ModelView.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 14:56:34 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-10-05 16:41:57 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -206,7 +206,7 @@ void medOpMML3ModelView::Initialize()
   FindSizeAndResolutionOfScans();
 
 
-  // transfer landmarks to visual pipes
+  // transfer landmarks to 3d pipe
   m_VisualPipe3D->AddLandmark(m_PatientLandmark1) ;
   m_VisualPipe3D->AddLandmark(m_PatientLandmark2) ;
   m_VisualPipe3D->AddLandmark(m_PatientLandmark3) ;
@@ -216,6 +216,19 @@ void medOpMML3ModelView::Initialize()
   m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark2) ;
   if (m_MuscleType == 2)
     m_VisualPipe3D->AddAxisLandmark(m_AxisLandmark3) ;
+
+
+  // transfer landmarks to preview pipe
+  m_VisualPipePreview->AddLandmark(m_PatientLandmark1) ;
+  m_VisualPipePreview->AddLandmark(m_PatientLandmark2) ;
+  m_VisualPipePreview->AddLandmark(m_PatientLandmark3) ;
+  if (m_4Landmarks)
+    m_VisualPipePreview->AddLandmark(m_PatientLandmark4) ;
+  m_VisualPipePreview->AddAxisLandmark(m_AxisLandmark1) ;
+  m_VisualPipePreview->AddAxisLandmark(m_AxisLandmark2) ;
+  if (m_MuscleType == 2)
+    m_VisualPipePreview->AddAxisLandmark(m_AxisLandmark3) ;
+
 
 
   // transfer slice parameters to the visual pipes
@@ -233,6 +246,7 @@ void medOpMML3ModelView::Initialize()
   m_VisualPipePreview->SetSliceResolution(m_ScansResolutionX/4, m_ScansResolutionY/4) ;
   for (int i = 0 ;  i < m_NumberOfScans ;  i++)
     m_VisualPipePreview->SetSliceTransform(i, m_SlicePoseMat[i]) ;
+
 
 
   // set slice id
