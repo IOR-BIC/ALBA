@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-09-29 16:30:15 $
-Version:   $Revision: 1.1.2.18 $
-Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
+Date:      $Date: 2009-10-05 12:17:05 $
+Version:   $Revision: 1.1.2.19 $
+Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -68,7 +68,9 @@ class vtkPlaneSource;
 class vtkPolyDataMapper;
 class vtkTexture;
 class vtkActor;
+class vtkActor2D;
 class vtkPolyData;
+class vtkTextMapper;
 class mafVMEGroup;
 
 
@@ -244,6 +246,11 @@ protected:
 	vtkActor					*m_CropActor;
 	vtkActor					*m_SliceActorInCropPage;
 
+  // text stuff
+  vtkActor2D    *m_TextActor;
+  vtkTextMapper	*m_TextMapper;
+  wxString m_Text;
+
 	mmiDICOMImporterInteractor *m_DicomInteractor;
 
 	medGUIWizard			*m_Wizard;
@@ -310,6 +317,7 @@ protected:
 	bool	m_CroppedExetuted; //<<<To check if a crop as been executed
   bool m_IsRotated;
   bool m_ConstantRotation;
+  bool m_ZCrop;
 
   int m_ResampleFlag;
   int m_DiscardPosition;

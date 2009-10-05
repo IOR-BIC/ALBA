@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-30 09:11:33 $
-Version:   $Revision: 1.1.2.51 $
-Authors:   Matteo Giacomoni, Roberto Mucci (DCMTK)
+Date:      $Date: 2009-10-05 12:17:05 $
+Version:   $Revision: 1.1.2.52 $
+Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -81,6 +81,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPolyDataMapper.h"
 #include "vtkTexture.h"
 #include "vtkActor.h"
+#include "vtkActor2D.h"
 #include "vtkProperty.h"
 #include "vtkOutlineFilter.h"
 #include "vtkImageData.h"
@@ -103,6 +104,9 @@ MafMedical is partially based on OpenMAF.
 #include "vtkCellData.h"
 #include "vtkIdTypeArray.h"
 #include "vtkCellArray.h"
+#include "vtkTextMapper.h"
+#include "vtkTextProperty.h"
+#include "vtkProperty2D.h"
 
 #include "vtkDataSetWriter.h"
 #include "vtkRectilinearGrid.h"
@@ -232,6 +236,8 @@ mafOp(label)
   m_SliceActorInCropPage = NULL;
 	m_CropPlane = NULL;
 	m_CropActor = NULL;
+  m_TextActor=NULL;
+  m_TextMapper=NULL;
 
 	m_NumberOfStudy = 0;
   m_NumberOfSlices = -1;
@@ -258,6 +264,7 @@ mafOp(label)
   m_CroppedExetuted = false;
   m_IsRotated = false;
   m_ConstantRotation = true;
+  m_ZCrop = true;
   m_SideToBeDragged = 0; 
 
 	m_GizmoStatus = GIZMO_NOT_EXIST;
@@ -511,6 +518,9 @@ void medOpImporterDicomOffis::Destroy()
   vtkDEL(m_SliceActor);
   vtkDEL(m_CropPlane);
   vtkDEL(m_CropActor);
+
+  vtkDEL(m_TextMapper);
+  vtkDEL(m_TextActor);
 
   mafDEL(m_TagArray);
   mafDEL(m_DicomInteractor);
@@ -1500,7 +1510,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
 void medOpImporterDicomOffis::CreateLoadPage()
 //----------------------------------------------------------------------------
 {
-	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("First step"));
+	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
   m_LoadGuiUnderLeft = new mafGUI(this);
 
@@ -1519,15 +1529,17 @@ void medOpImporterDicomOffis::CreateLoadPage()
   m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
   m_LoadPage->AddGuiLowerUnderLeft(m_LoadGuiUnderLeft);
   
-  
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
-	m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+  m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+  m_LoadPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
+  
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CreateCropPage()
 //----------------------------------------------------------------------------
 {
-	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Second step"));
+	m_CropPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,m_ZCrop);
+  m_CropPage->SetListener(this);
 	m_CropGuiLeft = new mafGUI(this);
   m_CropGuiCenter = new mafGUI(this);
 
@@ -1551,15 +1563,15 @@ void medOpImporterDicomOffis::CreateCropPage()
 	m_CropPage->AddGuiLowerCenter(m_CropGuiCenter);
 
 	m_CropPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
-  
-	m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+  m_CropPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
   m_CropPage->GetRWI()->m_RenFront->AddActor(m_CropActor);
+  m_CropPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::CreateBuildPage()
 //----------------------------------------------------------------------------
 {
-	m_BuildPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI,_("Third step"));
+	m_BuildPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_BuildGuiLeft = new mafGUI(this);
   m_BuildGuiUnderLeft = new mafGUI(this);
   m_BuildGuiCenter = new mafGUI(this);
@@ -1587,6 +1599,7 @@ void medOpImporterDicomOffis::CreateBuildPage()
 
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
 	m_BuildPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
+  m_BuildPage->GetRWI()->m_RenFront->AddActor(m_TextActor);
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::GuiUpdate()
@@ -1638,6 +1651,7 @@ bool medOpImporterDicomOffis::OpenDir()
         m_CropPage->GetRWI()->CameraReset();
       }
       m_BoxCorrect=true;
+      m_LoadPage->GetRWI()->CameraReset();
 
       return true;
     }
@@ -1703,6 +1717,10 @@ void medOpImporterDicomOffis::ReadDicom()
     m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
   else
     m_NumberOfSlices = m_ListSelected->GetCount();
+
+  //Set bounds of ZCrop slider widget
+  m_CropPage->SetZCropBounds(0, m_NumberOfSlices-1);
+
   // reset the current slice number to view the first slice
   m_CurrentSlice = 0;
   m_CurrentTime = 0;
@@ -1768,6 +1786,44 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 					AutoPositionCropPlane();
 			}
 			break;
+    case ID_RANGE_MODIFIED:
+      {
+        //ZCrop slider
+        double ZCropBounds[2];
+        double fractpart, intpart;
+        m_CropPage->GetZCropBounds(ZCropBounds);
+        int min, max;
+
+        //approximate form int to double
+        fractpart = modf (ZCropBounds[0] , &intpart);
+        fractpart >= 0.5 ?  min = ceil(ZCropBounds[0]) : min = floor(ZCropBounds[0]);
+        fractpart = modf (ZCropBounds[1] , &intpart);
+        fractpart >= 0.5 ?  max = ceil(ZCropBounds[1]) : max = floor(ZCropBounds[1]);
+
+        m_SliceScannerBuildPage->SetRange(min, max);
+
+        if(min > m_CurrentSlice || m_CurrentSlice > max)
+        {
+          m_CurrentSlice = min;
+          m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+          // show the current slice
+          int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+          if (currImageId != -1) 
+          {
+            CreateSlice(currImageId);
+            ShowSlice();
+            CameraUpdate();
+          }
+          m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
+          m_SliceScannerLoadPage->Update();
+          m_SliceScannerCropPage->SetValue(m_CurrentSlice);
+          m_SliceScannerCropPage->Update();
+          m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+          m_SliceScannerBuildPage->Update();
+        }
+        GuiUpdate();
+      }
+      break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
 				if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
@@ -1794,6 +1850,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
             Crop();
             m_Wizard->SetButtonString("Import >"); 
             m_BuildPage->UpdateActor();
+            m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
           } 
           else
           {
@@ -1850,14 +1907,6 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
               m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
               EnableTimeSlider(true);
             }
-           /* else
-            {
-              m_DicomTypeRead=medGUIDicomSettings::ID_MRI_MODALITY;
-            }*/
-				   /* if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY)//If cMRI
-				    {
-					    EnableTimeSlider(true);
-				    }*/
           }
           ReadDicom();
           if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
@@ -2319,6 +2368,18 @@ void medOpImporterDicomOffis::CreatePipeline()
 	m_SliceActor->SetMapper(m_SliceMapper);
 	m_SliceActor->SetTexture(m_SliceTexture); 
 	m_SliceActor->VisibilityOff();
+
+  // text stuff
+  m_Text = "Orientation: ";
+  m_TextMapper = vtkTextMapper::New();
+  m_TextMapper->SetInput(m_Text.c_str()); 
+  m_TextMapper->GetTextProperty()->AntiAliasingOn();
+
+  m_TextActor = vtkActor2D::New();
+  m_TextActor->GetProperty()->SetColor(0.8,0,0);
+  m_TextActor->SetMapper(m_TextMapper);
+  m_TextActor->SetPosition(3,3);  
+  m_TextMapper->Modified();
 
 	vtkNEW(m_CropPlane);
 
@@ -3015,6 +3076,7 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 	// Description:
 	// read the slice number 'slice_num' and generate the texture
 	double spacing[3], crop_bounds[6], range[2], loc[3];
+  m_Text = "";
 
 	m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
   m_ListSelected->Item(slice_num)->GetData()->GetFileName();
@@ -3022,10 +3084,18 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
 
+  double Origin[3];
+  m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetOrigin(Origin);
+
+  double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  m_ListSelected->Item(slice_num)->GetData()->GetSliceOrientation(orientation);
+  m_Text.append(wxString::Format("Orientaion: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
+  m_TextMapper->SetInput(m_Text.c_str());
+  m_TextMapper->Modified();
+  
+
 	if (m_CropFlag) 
 	{
-		double Origin[3];
-		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetOrigin(Origin);
 		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetSpacing(spacing);
 
 		m_CropPlane->Update();
