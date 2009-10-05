@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-07 11:13:51 $
-  Version:   $Revision: 1.16.2.2 $
+  Date:      $Date: 2009-10-05 13:01:20 $
+  Version:   $Revision: 1.16.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -49,7 +49,7 @@ mmiGenericMouse::mmiGenericMouse()
    SetResultMatrixConcatenationSemanticToPostMultiply();
   
    // Projection Accumulator
-   m_ProjAcc = 0;
+   m_ProjectionAccumulator = 0;
 
    m_LastX = m_LastY = 0;
 
@@ -61,8 +61,8 @@ mmiGenericMouse::mmiGenericMouse()
    GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
 
    m_CurrentCamera = NULL;
-   m_MousePose[0] = m_MousePose[1] = 0;
-   m_LastMousePose[0] = m_LastMousePose[1] = 0;
+   m_MousePointer2DPosition[0] = m_MousePointer2DPosition[1] = 0;
+   m_LastMousePointer2DPosition[0] = m_LastMousePointer2DPosition[1] = 0;
    m_ConstrainRefSys = NULL;
 }
 //----------------------------------------------------------------------------
@@ -88,17 +88,17 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
     double pos_rp;        // result point projected on constrain axis
     double motVecProj[3]; // projection of motion vector on constrain axis 
     double projVal;       // projection value along constrain axis
-    double constrainVers[3];//current axis versor
+    double constrainVersor[3];//current axis versor
     assert(m_VME);
     mafTransform::GetPosition(*m_VME->GetOutput()->GetMatrix(), rp);    //get the result point pos
     int axis = GetTranslationConstraint()->GetConstraintAxis();         //get the constrain axis
-    mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVers);   //project the motion vector on constrain axis
-    projVal = mafTransform::ProjectVectorOnAxis(motionVec, constrainVers, motVecProj);
+    mafTransform::GetVersor(axis, *m_ConstrainRefSys, constrainVersor);   //project the motion vector on constrain axis
+    projVal = mafTransform::ProjectVectorOnAxis(motionVec, constrainVersor, motVecProj);
 
     // project rp on constrain axis; if target ref-sys is local the projection 
     // is the value along the constrain axis
     if (refSysType == mafRefSys::GLOBAL)
-      pos_rp = mafTransform::ProjectVectorOnAxis(rp, constrainVers);
+      pos_rp = mafTransform::ProjectVectorOnAxis(rp, constrainVersor);
     else
       pos_rp = rp[axis];
 
@@ -119,7 +119,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
                               pos_rp
       ^  
       |
-      C-> constrainVers  
+      C-> constrainVersor  
 
       // C:  constrain ref sys center
       // rp: result point
@@ -138,7 +138,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
                                    pos_rp
       ^  
       |
-      C-> constrainVers              rp
+      C-> constrainVersor              rp
 
       ------------proj-------------->|
                                    projVal      
@@ -163,43 +163,43 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
           -----|------------|-----------|------|---------------|----------->
                O          pos_rp      minb   pos_rp           maxb
 
-          ------------------------>m_ProjAcc
+          ------------------------>m_ProjectionAccumulator
       */ 
 
       //update projection accumulator
-      m_ProjAcc += projVal;
+      m_ProjectionAccumulator += projVal;
 
       if (pos_rp < minb)
       {
-        if (pos_rp + m_ProjAcc > minb)
+        if (pos_rp + m_ProjectionAccumulator > minb)
         {
-          mafTransform::BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(minb - pos_rp, constrainVersor, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);                             
-          m_ProjAcc = 0;
+          m_ProjectionAccumulator = 0;
         }
       }
       else if (pos_rp > maxb)
       { 
-        if (pos_rp + m_ProjAcc < maxb)
+        if (pos_rp + m_ProjectionAccumulator < maxb)
         {
-          mafTransform::BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(maxb - pos_rp, constrainVersor, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);            
-          m_ProjAcc = 0;
+          m_ProjectionAccumulator = 0;
         }
       }
       else if (minb < pos_rp && pos_rp < maxb)
       {
         if (pos_rp + projVal < minb)
         {              
-          mafTransform::BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(minb - pos_rp, constrainVersor, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);                           
-          m_ProjAcc = pos_rp + projVal - minb;
+          m_ProjectionAccumulator = pos_rp + projVal - minb;
         }
         else if (pos_rp + projVal > maxb)
         {            
-          mafTransform::BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+          mafTransform::BuildVector(maxb - pos_rp, constrainVersor, tmpVec, refSysType, axis);
           mafTransform::SetPosition(matr, tmpVec);
-          m_ProjAcc = pos_rp + projVal - maxb;
+          m_ProjectionAccumulator = pos_rp + projVal - maxb;
         }
         else
         {
@@ -220,7 +220,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
     /*                                              
                                                       projVal
                                                   <-------- 
-                                                      m_ProjAcc
+                                                      m_ProjectionAccumulator
                                                   <----|
                                   2   |    1           |  3
         -----|------------------------|----------------|----------->
@@ -230,37 +230,38 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
     */ 
 
 
-          if (pos_rp + m_ProjAcc >= minb)
+          if (pos_rp + m_ProjectionAccumulator >= minb)
           {
-            if (pos_rp + m_ProjAcc <= maxb)
+            if (pos_rp + m_ProjectionAccumulator <= maxb)
             {
-              mafTransform::BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
-              mafTransform::SetPosition(matr, tmpVec);                         
-              m_ProjAcc = 0;
+              mafTransform::BuildVector(m_ProjectionAccumulator, constrainVersor, tmpVec, refSysType, axis);
+              mafTransform::SetPosition(matr, tmpVec);                       
+  
+              m_ProjectionAccumulator = 0;
             }
-            else if (pos_rp + m_ProjAcc > maxb)
+            else if (pos_rp + m_ProjectionAccumulator > maxb)
             {
-              mafTransform::BuildVector(maxb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(maxb - pos_rp, constrainVersor, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);                         
-              m_ProjAcc -= maxb - pos_rp;
+              m_ProjectionAccumulator -= maxb - pos_rp;
             }
           }
         }
         else if (pos_rp == maxb)
         {
-          if (pos_rp + m_ProjAcc <= maxb)
+          if (pos_rp + m_ProjectionAccumulator <= maxb)
           {
-            if (pos_rp + m_ProjAcc >= minb)
+            if (pos_rp + m_ProjectionAccumulator >= minb)
             {
-              mafTransform::BuildVector(m_ProjAcc, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(m_ProjectionAccumulator, constrainVersor, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);     
-              m_ProjAcc = 0;
+              m_ProjectionAccumulator = 0;
             }
-            else if (pos_rp + m_ProjAcc < minb)
+            else if (pos_rp + m_ProjectionAccumulator < minb)
             {
-              mafTransform::BuildVector(minb - pos_rp, constrainVers, tmpVec, refSysType, axis);
+              mafTransform::BuildVector(minb - pos_rp, constrainVersor, tmpVec, refSysType, axis);
               mafTransform::SetPosition(matr, tmpVec);     
-              m_ProjAcc -= minb - pos_rp;
+              m_ProjectionAccumulator -= minb - pos_rp;
             }
 
           }          
@@ -291,9 +292,9 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 
         if (refSysType == mafRefSys::GLOBAL)
         {
-          normalizedVectorToSend[0] = constrainVers[0];
-          normalizedVectorToSend[1] = constrainVers[1];
-          normalizedVectorToSend[2] = constrainVers[2];
+          normalizedVectorToSend[0] = constrainVersor[0];
+          normalizedVectorToSend[1] = constrainVersor[1];
+          normalizedVectorToSend[2] = constrainVersor[2];
         }
         else if (refSysType == mafRefSys::LOCAL)
         {
@@ -306,12 +307,12 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         }
 
 
-        m_ProjAcc += projVal;
+        m_ProjectionAccumulator += projVal;
 
         if (m_HelperPointStatus == ON_GRID_POINT)
         {
 
-//              pos_rp             m_ProjAcc
+//              pos_rp             m_ProjectionAccumulator
 //    ^------------------------->|-------------->        
 //    |                             
 //   -O----------0-------1-------i----------3------N-1---------->
@@ -321,9 +322,9 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 //    m_HelperPointStatus = ON_GRID_POINT;
         
           int status;
-          int ind = BinarySearch(pos_rp + m_ProjAcc, darray, status);    
+          int ind = BinarySearch(pos_rp + m_ProjectionAccumulator, darray, status);    
 
-          if (m_ProjAcc > 0)
+          if (m_ProjectionAccumulator > 0)
           {
             if (ind != m_HelpPIndex)
             {
@@ -333,13 +334,13 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
               SendTransformMatrix(normalizedVectorToSend, trval);  
 
               //UpdateProjAcc  
-              m_ProjAcc -= trval;
+              m_ProjectionAccumulator -= trval;
 
               //update m_HelpPIndex
               m_HelpPIndex = ind;
             }
           }
-          else if (m_ProjAcc < 0)
+          else if (m_ProjectionAccumulator < 0)
           {
             if (ind != m_HelpPIndex - 1)
             {
@@ -349,7 +350,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
               SendTransformMatrix(normalizedVectorToSend, trval);  
   
               //UpdateProjAcc  
-              m_ProjAcc -= trval;
+              m_ProjectionAccumulator -= trval;
    
               //update m_HelpPIndex
               m_HelpPIndex = ind + 1;
@@ -358,7 +359,7 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
         }
         else if (m_HelperPointStatus == NOT_ON_GRID_POINT) 
         {
-//              pos_rp             m_ProjAcc
+//              pos_rp             m_ProjectionAccumulator
 //    ^------------------------->|---------->        
 //    |                          |   
 //   -O----------0-------1-------|------2------N-1---------->
@@ -368,17 +369,17 @@ void mmiGenericMouse::Translate(double *p1, double *p2)
 //    m_HelperPointStatus = NOT_ON_GRID_POINT;
       
           int status;
-          int ind = BinarySearch(pos_rp + m_ProjAcc, darray, status); 
+          int ind = BinarySearch(pos_rp + m_ProjectionAccumulator, darray, status); 
       
           if (ind != m_HelpPIndex)
           {
-            double trval = darray->GetValue(m_ProjAcc > 0 ? ind : ind + 1) - pos_rp;
+            double trval = darray->GetValue(m_ProjectionAccumulator > 0 ? ind : ind + 1) - pos_rp;
 
             //send translation vector from m_HelpPIndex to ind
             SendTransformMatrix(normalizedVectorToSend, trval); 
 
             //UpdateProjAcc  
-            m_ProjAcc -= trval;
+            m_ProjectionAccumulator -= trval;
 
             //update m_HelpPIndex
             m_HelpPIndex = ind;
@@ -857,7 +858,7 @@ void mmiGenericMouse::SendTransformMatrix(const mafMatrix &matrix, int mouseActi
   tmatrix->SetTimeStamp(vtkTimerLog::GetCurrentTime());
 
   event.SetMatrix(tmatrix);
-  event.Set2DPosition(m_MousePose[0],m_MousePose[1]);
+  event.Set2DPosition(m_MousePointer2DPosition[0],m_MousePointer2DPosition[1]);
   if (mouseAction == MOUSE_DOWN)
   {
     event.SetId(BUTTON_DOWN);
@@ -883,8 +884,8 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
 //----------------------------------------------------------------------------
 {
   // picked X and Y in screen coordinates
-  m_MousePose[0] = X;
-  m_MousePose[1] = Y;
+  m_MousePointer2DPosition[0] = X;
+  m_MousePointer2DPosition[1] = Y;
     
    double focalPoint[4], pickPoint[4], prevPickPoint[4], viewUp[3];
    double z;
@@ -901,7 +902,7 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
                                m_LastPickPosition[2], focalPoint);
    z = focalPoint[2];
 
-   ComputeDisplayToWorld((double)m_LastMousePose[0], (double)m_LastMousePose[1],
+   ComputeDisplayToWorld((double)m_LastMousePointer2DPosition[0], (double)m_LastMousePointer2DPosition[1],
                                z, prevPickPoint);
  
    ComputeDisplayToWorld(double(X), double(Y), z, pickPoint);
@@ -935,9 +936,9 @@ void mmiGenericMouse::OnMouseMoveAction(int X, int Y)
      // not yet implemented
    }
 
-  // Update m_LastMousePose
-  m_LastMousePose[0] = m_MousePose[0];
-  m_LastMousePose[1] = m_MousePose[1];
+  // Update m_LastMousePointer2DPosition
+  m_LastMousePointer2DPosition[0] = m_MousePointer2DPosition[0];
+  m_LastMousePointer2DPosition[1] = m_MousePointer2DPosition[1];
 
 }
 
@@ -950,9 +951,9 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
   m_ConstrainRefSys = GetTranslationConstraint()->GetRefSys()->GetMatrix();
 
 
-  // register m_MousePose
-  m_MousePose[0] = m_LastMousePose[0] = X;
-  m_MousePose[1] = m_LastMousePose[1] = Y;
+  // register m_MousePointer2DPosition
+  m_MousePointer2DPosition[0] = m_LastMousePointer2DPosition[0] = X;
+  m_MousePointer2DPosition[1] = m_LastMousePointer2DPosition[1] = Y;
 
   // perform picking on current renderer
   mafDeviceButtonsPadMouse *mouse = mafDeviceButtonsPadMouse::SafeDownCast(m_Device);
@@ -965,7 +966,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
     }
   }
   //reset projection accumulator   
-    m_ProjAcc = 0;
+    m_ProjectionAccumulator = 0;
 
     /*
             ^
@@ -986,7 +987,7 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
     -----|------------|-----------|------|---------------|----------->
         O          pos_rp      minb   pos_rp           maxb
 
-    ------------------------>m_ProjAcc
+    ------------------------>m_ProjectionAccumulator
     */ 
 
 
@@ -1033,8 +1034,8 @@ void mmiGenericMouse::OnButtonDownAction(int X, int Y)
     }
   }
 
-  m_LastX = m_MousePose[0];
-  m_LastY = m_MousePose[1];
+  m_LastX = m_MousePointer2DPosition[0];
+  m_LastY = m_MousePointer2DPosition[1];
 
   // notify the listener about the mouse action that has been performed 
   mafMatrix identity;
@@ -1046,11 +1047,11 @@ void mmiGenericMouse::OnButtonUpAction()
 //----------------------------------------------------------------------------
 {
   // reset projection accumulator
-  m_ProjAcc = 0;
+  m_ProjectionAccumulator = 0;
 
   // register m_LastX and Last
-  m_LastX = m_MousePose[0];
-  m_LastY = m_MousePose[1];
+  m_LastX = m_MousePointer2DPosition[0];
+  m_LastY = m_MousePointer2DPosition[1];
 
   // notify the listener about the mouse action that has been performed 
   mafMatrix identity;
@@ -1068,8 +1069,8 @@ void mmiGenericMouse::TrackballRotate()
    m_ConstrainRefSys = GetRotationConstraint()->GetRefSys()->GetMatrix();
 
    // register last mouse position
-   int x = m_MousePose[0];
-   int y = m_MousePose[1];
+   int x = m_MousePointer2DPosition[0];
+   int y = m_MousePointer2DPosition[1];
 
    // the pivot center
    double pivotPoint[3];
@@ -1116,9 +1117,9 @@ void mmiGenericMouse::TrackballTranslate()
   
   ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], disp_obj_center);
 
-  ComputeDisplayToWorld((double)m_MousePose[0], (double)m_MousePose[1], disp_obj_center[2], new_pick_point);
+  ComputeDisplayToWorld((double)m_MousePointer2DPosition[0], (double)m_MousePointer2DPosition[1], disp_obj_center[2], new_pick_point);
   
-  ComputeDisplayToWorld((double)m_LastMousePose[0], (double)m_LastMousePose[1], disp_obj_center[2], old_pick_point);
+  ComputeDisplayToWorld((double)m_LastMousePointer2DPosition[0], (double)m_LastMousePointer2DPosition[1], disp_obj_center[2], old_pick_point);
   
   motion_vector[0] = new_pick_point[0] - old_pick_point[0];
   motion_vector[1] = new_pick_point[1] - old_pick_point[1];
@@ -1171,12 +1172,12 @@ void mmiGenericMouse::TrackballRoll()
                                disp_refSysCenter);
    
    double newAngle = 
-     atan2((double)m_MousePose[1] - (double)disp_refSysCenter[1],
-           (double)m_MousePose[0] - (double)disp_refSysCenter[0]);
+     atan2((double)m_MousePointer2DPosition[1] - (double)disp_refSysCenter[1],
+           (double)m_MousePointer2DPosition[0] - (double)disp_refSysCenter[0]);
  
    double oldAngle = 
-     atan2((double)m_LastMousePose[1] - (double)disp_refSysCenter[1],
-           (double)m_LastMousePose[0] - (double)disp_refSysCenter[0]);
+     atan2((double)m_LastMousePointer2DPosition[1] - (double)disp_refSysCenter[1],
+           (double)m_LastMousePointer2DPosition[0] - (double)disp_refSysCenter[0]);
    
    newAngle *= vtkMath::RadiansToDegrees();
    oldAngle *= vtkMath::RadiansToDegrees();
@@ -1195,8 +1196,8 @@ void mmiGenericMouse::NormalOnSurface()
 {
 	/*if (m_Renderer == NULL || m_Prop == NULL ) return;
 
-	int x = m_MousePose[0];
-	int y = m_MousePose[1];
+	int x = m_MousePointer2DPosition[0];
+	int y = m_MousePointer2DPosition[1];
 
 	vtkPropCollection *pc = vtkPropCollection::New();
 	m_Prop->GetActors(pc); 
@@ -1251,8 +1252,8 @@ void mmiGenericMouse::NormalOnSurface()
 
 	if (m_Renderer == NULL || m_Prop == NULL ) return;
 
-	int x = m_MousePose[0];
-	int y = m_MousePose[1];
+	int x = m_MousePointer2DPosition[0];
+	int y = m_MousePointer2DPosition[1];
 
 	vtkPropCollection *pc = vtkPropCollection::New();
 	m_Prop->GetActors(pc); 
@@ -1374,8 +1375,8 @@ void mmiGenericMouse::SnapOnSurface()
 {
   if (m_Renderer == NULL || m_Prop == NULL ) return;
 
-  int x = m_MousePose[0];
-  int y = m_MousePose[1];
+  int x = m_MousePointer2DPosition[0];
+  int y = m_MousePointer2DPosition[1];
 
 	vtkPropCollection *pc = vtkPropCollection::New();
 	m_Prop->GetActors(pc); 

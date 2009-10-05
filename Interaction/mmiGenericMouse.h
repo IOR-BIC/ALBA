@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiGenericMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.9.2.1 $
+  Date:      $Date: 2009-10-05 13:01:20 $
+  Version:   $Revision: 1.9.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -197,9 +197,9 @@ private:
   //   
   // P1  P2   P3      PN
   // ->----->----->-------->
-  // -------m_ProjAcc-------->
+  // -------m_ProjectionAccumulator-------->
   //
-  double m_ProjAcc;
+  double m_ProjectionAccumulator;
 
   /**
   Send the transform matrix to the listener. Also concatenate the matrix
@@ -226,9 +226,8 @@ private:
 
   //----------------------------------------------------------------------------
   
-  int m_MousePose[2];
-  int m_LastMousePose[2];
-  int m_ButtonPressed;
+  int m_MousePointer2DPosition[2];
+  int m_LastMousePointer2DPosition[2];
   
   vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
 

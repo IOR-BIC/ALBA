@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2008-04-14 11:42:23 $
-  Version:   $Revision: 1.12 $
+  Date:      $Date: 2009-10-05 13:00:55 $
+  Version:   $Revision: 1.12.2.1 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -197,12 +197,12 @@ class MAF_EXPORT mafTransform : public mafTransformBase
     scale[1] = static_cast<float>(temp[1]); 
     scale[2] = static_cast<float>(temp[2]); };
 
-  /** apply a scale transform. By default the scale matrix is premultiplied */
+  /** Apply a scale transform. By default the scale matrix is premultiplied */
   static void Scale(mafMatrix &matrix,double scalex,double scaley,double scalez,int premultiply);
   void Scale(double scalex,double scaley,double scalez,int premultiply) \
     { Scale(*m_Matrix,scalex,scaley,scalez,premultiply);}
 
-  /** Set/Get given matrix versor*/
+  /** Set/Get internal matrix versor*/
   static void SetVersor(int axis, double versor[3], mafMatrix &matrix);
   
   static void GetVersor(int axis, const mafMatrix &matrix, double versor[3]) {mafMatrix::GetVersor(axis,matrix,versor);}
@@ -213,7 +213,6 @@ class MAF_EXPORT mafTransform : public mafTransformBase
       versor[1] = static_cast<float>(temp[1]); \
       versor[2] = static_cast<float>(temp[2]); };
   
-  /** */
   void GetVersor(int axis, double versor[3]) {GetVersor(axis,GetMatrix(),versor);}
   void GetVersor(int axis, float versor[3]) {GetVersor(axis,GetMatrix(),versor);}
 
@@ -226,35 +225,29 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   static void CopyTranslation(const mafMatrix &source, mafMatrix &target);
   void CopyTranslation(const mafMatrix &source) {this->CopyTranslation(source,*m_Matrix);}
   
-  /** Add two vector 3 */
+  /** Add two vectors */
   static void AddVectors( double inV0[3],double inV1[3],double outSum[3] );
 
-  // Build vector with origin in p1 pointing to p2
-  static void BuildVector(double *p1, double *p2, double *vec)
-  {
-    if (vec)
-    {
-      vec[0] = p2[0] - p1[0];
-      vec[1] = p2[1] - p1[1];
-      vec[2] = p2[2] - p1[2];
-    }
-  }
+  /** Build vector with origin in p1 pointing to p2 */
+  static void BuildVector(double *p1, double *p2, double *out_vector);
 
-  // Build vector [coeff * inVector];
+  /** Build vector [coeff * inVector] */
   static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mmiConstraint::X);
 
-  // Project in_vector on in_axis direction; in_axis does not need to be 
-  // normalised. The projection signed value is returned
-  static double ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *projection = NULL);
+  /** Project in_vector on in_axis direction; in_axis does not need to be 
+  normalised. The projection signed value is returned */
+  static double ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *out_projection = NULL);
 
-  // Project in_vector on the plane identified by the normal vector in_plane_normal;
-  // in_plane_normal does not need to be normalised. The norm of the projection 
-  // is returned and the projection vector is written in out_projection vector if provided.
+  /** Project in_vector on the plane identified by the normal vector in_plane_normal;
+  in_plane_normal does not need to be normalised. The norm of the projection 
+  is returned and the projection vector is written in out_projection vector if provided. */
   static double ProjectVectorOnPlane(const double *in_vector, const double *in_plane_normal, double *out_projection = NULL);
 
-  // Find perpendicular versors to input versor N
+  /** Find perpendicular versors to input versor N */
   static void FindPerpendicularVersors(double inVersorN[3], double outVersorP[3], double outVersorQ[3]);
 
+  /** Multiply vector by scalar */
+  static void MultiplyVectorByScalar(double s, double *vin, double *vout);
 
   /** rotation representation conversion */
 	int MatrixToAttitudeVector(const mafMatrix &matrix,

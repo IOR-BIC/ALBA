@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-06 10:54:34 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-10-05 13:00:54 $
+  Version:   $Revision: 1.9.2.1 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1724,8 +1724,7 @@ void mafTransform::Invert()
 }
 
 //----------------------------------------------------------------------------
-double mafTransform::ProjectVectorOnAxis(const double *in_vector, const double *in_axis, double *out_projection)
-//----------------------------------------------------------------------------
+double mafTransform::ProjectVectorOnAxis( const double *in_vector, const double *in_axis, double *out_projection /*= NULL*/ )
 {
 
   double in_axis_norm[3];
@@ -1847,6 +1846,15 @@ void mafTransform::BuildVector(double coeff, const double *inVector, double *out
   }
 }
 
+void mafTransform::BuildVector( double *p1, double *p2, double *out_vector )
+{
+  if (out_vector)
+  {
+    out_vector[0] = p2[0] - p1[0];
+    out_vector[1] = p2[1] - p1[1];
+    out_vector[2] = p2[2] - p1[2];
+  }
+}
 void mafTransform::FindPerpendicularVersors( double inVersorN[3], double outVersorP[3], double outVersorQ[3] )
 {
   const double sqrt1_2 = 0.707106781186547524401;
@@ -1895,4 +1903,11 @@ void mafTransform::AddVectors( double p0[3],double p1[3],double sum[3] )
   {
     sum[i] = p0[i] + p1[i];
   }
+}
+
+void mafTransform::MultiplyVectorByScalar( double s, double *vin, double *vout )
+{
+  vout[0] = s*vin[0] ;
+  vout[1] = s*vin[1] ;
+  vout[2] = s*vin[2] ;
 }
