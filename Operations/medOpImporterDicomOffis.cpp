@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 12:17:05 $
-Version:   $Revision: 1.1.2.52 $
+Date:      $Date: 2009-10-05 15:29:43 $
+Version:   $Revision: 1.1.2.53 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -206,6 +206,9 @@ mafOp(label)
 
   for (int i = 0; i < 6; i++) 
     m_DicomBounds[i] = 0;
+
+  m_ZCropBounds[0] = 0;
+  m_ZCropBounds[1] = 0;
 
   
   m_PatientPosition = "";
@@ -544,9 +547,9 @@ int medOpImporterDicomOffis::BuildImages()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = m_NumberOfSlices / step;
+  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]) / step;
 
-  if(m_NumberOfSlices % step != 0)
+  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
   {
     n_slices+=1;
   }
@@ -564,7 +567,7 @@ int medOpImporterDicomOffis::BuildImages()
   m_ImagesGroup->SetName(wxString::Format("%s images",m_VolumeName));
   m_ImagesGroup->ReparentTo(m_Input);
   
-  for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
+  for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
   {
     if (s_count == n_slices) {break;}
     CreateSlice(count);
@@ -661,9 +664,9 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = m_NumberOfSlices / step;
+  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]) / step;
 
-  if(m_NumberOfSlices % step != 0)
+  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
   {
     n_slices+=1;
   }
@@ -680,7 +683,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
   m_ImagesGroup->ReparentTo(m_Input);
 
   //create all the animated images
-  for (int i = 0; i < m_NumberOfSlices; i += step)
+  for (int i = m_ZCropBounds[0]; i < m_ZCropBounds[1]+1;i += step)
   {
     mafSmartPointer<mafVMEImage> image;
     wxString name = m_VolumeName;
@@ -690,7 +693,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
   }
 
   long progress = 0;
-  int totalNumberOfImages = m_NumberOfSlices*m_NumberOfTimeFrames;
+  int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
   int progressCounter = 0;
 
   // for every timestamp
@@ -715,7 +718,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
     element0 = (medImporterDICOMListElements *)m_ListSelected->Item(tsImageId)->GetData();
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
-    for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+    for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     {
       if(!this->m_TestMode)
       {
@@ -757,19 +760,19 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
         im->Update();
       }
 
-      ((mafVMEImage*)m_ImagesGroup->GetChild(sourceVolumeSliceId))->SetData(im,ts);
+      ((mafVMEImage*)m_ImagesGroup->GetChild(targetVolumeSliceId))->SetData(im,ts);
       
-      m_ImagesGroup->GetChild(sourceVolumeSliceId)->GetTagArray()->DeepCopy(m_TagArray);
+      m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->DeepCopy(m_TagArray);
 
       mafTagItem tag_Nature;
       tag_Nature.SetName("VME_NATURE");
       tag_Nature.SetValue("NATURAL");
-      m_ImagesGroup->GetChild(sourceVolumeSliceId)->GetTagArray()->SetTag(tag_Nature);
+      m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->SetTag(tag_Nature);
 
       mafTagItem tag_Surgeon;
       tag_Surgeon.SetName("SURGEON_NAME");
       tag_Surgeon.SetValue(m_SurgeonName.GetCStr());
-      m_ImagesGroup->GetChild(sourceVolumeSliceId)->GetTagArray()->SetTag(tag_Surgeon);
+      m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->SetTag(tag_Surgeon);
 
       if(!this->m_TestMode)
       {
@@ -783,7 +786,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
             tagSide.SetValue("RIGHT");
           else if(m_VolumeSide==NON_VALID_SIDE)
             tagSide.SetValue("NON_VALID_SIDE");
-          m_ImagesGroup->GetChild(sourceVolumeSliceId)->GetTagArray()->SetTag(tagSide);
+          m_ImagesGroup->GetChild(targetVolumeSliceId)->GetTagArray()->SetTag(tagSide);
         }
       }
       targetVolumeSliceId++;
@@ -816,9 +819,9 @@ int medOpImporterDicomOffis::BuildVolume()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = m_NumberOfSlices / step;
+  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0])/ step;
 
-  if(m_NumberOfSlices % step != 0)
+  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
   {
     n_slices+=1;
   }
@@ -836,14 +839,11 @@ int medOpImporterDicomOffis::BuildVolume()
   double origin[3];
   long progress = 0;
   int count,s_count;
-  for (count = 0, s_count = 0; count < m_NumberOfSlices; count += step)
+  for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
   {
     if (s_count == n_slices) {break;}
     CreateSlice(count);
     accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
-    if (s_count == 0)
-      m_SliceTexture->GetInput()->GetOrigin(origin);
-
     s_count++;
 
     if(!this->m_TestMode)
@@ -902,7 +902,7 @@ int medOpImporterDicomOffis::BuildVolume()
   if (m_IsRotated)
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-    m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
+    m_ListSelected->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
 
 
     //transform direction cosines to be used to set vtkMatrix
@@ -991,8 +991,8 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = m_NumberOfSlices / step;
-  if(m_NumberOfSlices % step != 0)
+  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]) / step;
+  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
   {
     n_slices+=1;
   }
@@ -1009,7 +1009,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 
   int currImageId = 0;
   long progress = 0;
-  int totalNumberOfImages = m_NumberOfSlices*m_NumberOfTimeFrames;
+  int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
   int progressCounter = 0;
   // for every timestamp
   for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
@@ -1033,7 +1033,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     element0 = (medImporterDICOMListElements *)m_ListSelected->Item(tsImageId)->GetData();
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
-    for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+    for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     {
       if(!this->m_TestMode)
       {
@@ -1106,7 +1106,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     if (m_IsRotated)
     {
       double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-      m_ListSelected->Item(0)->GetData()->GetSliceOrientation(orientation);
+      m_ListSelected->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
 
   
       //transform direction cosines to be used to set vtkMatrix
@@ -1221,7 +1221,7 @@ int medOpImporterDicomOffis::BuildMesh()
   int scalarCounter = 0;
   vtkPolyData *poly1;
 
-  for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+  for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
   {
     poly1 = ExtractPolyData(0,sourceVolumeSliceId);
     poly1->Update();
@@ -1246,7 +1246,7 @@ int medOpImporterDicomOffis::BuildMesh()
   int counter= 0;
   int total = dim[0]*dim[1];
   int sourceVolumeSliceId = 0;//achiarini compilation issue
-  for ( int targetVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
+  for ( int targetVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
   { 
     if(!this->m_TestMode)
     {
@@ -1331,7 +1331,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
   mafNEW(m_Mesh);
 
   long progress = 0;
-  int totalNumberOfImages = m_NumberOfSlices*m_NumberOfTimeFrames;
+  int totalNumberOfImages = (m_ZCropBounds[1]+1)*m_NumberOfTimeFrames;
   int progressCounter = 0;
   for (int ts = 0; ts < m_NumberOfTimeFrames; ts++)
   {
@@ -1343,7 +1343,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
     int scalarCounter = 0;
     vtkPolyData *poly1;
 
-    for (int sourceVolumeSliceId = 0, targetVolumeSliceId = 0; sourceVolumeSliceId < m_NumberOfSlices; sourceVolumeSliceId += step)
+    for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     {
        poly1 = ExtractPolyData(ts,sourceVolumeSliceId);
        poly1->Update();
@@ -1368,7 +1368,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
     int counter= 0;
     int total = dim[0]*dim[1];
     int sourceVolumeSliceId = 0;//achiarini: compilation issue
-    for (int targetVolumeSliceId = 0, sourceVolumeSliceId = 0; sourceVolumeSliceId <m_NumberOfSlices; sourceVolumeSliceId += step)
+    for (int targetVolumeSliceId = m_ZCropBounds[0], sourceVolumeSliceId = 0; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     { 
       if(!this->m_TestMode)
       {
@@ -1719,7 +1719,9 @@ void medOpImporterDicomOffis::ReadDicom()
     m_NumberOfSlices = m_ListSelected->GetCount();
 
   //Set bounds of ZCrop slider widget
-  m_CropPage->SetZCropBounds(0, m_NumberOfSlices-1);
+  m_ZCropBounds[1] = m_NumberOfSlices-1;
+  m_CropPage->SetZCropBounds(0, m_ZCropBounds[1]);
+  
 
   // reset the current slice number to view the first slice
   m_CurrentSlice = 0;
@@ -1789,22 +1791,21 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
     case ID_RANGE_MODIFIED:
       {
         //ZCrop slider
-        double ZCropBounds[2];
         double fractpart, intpart;
-        m_CropPage->GetZCropBounds(ZCropBounds);
-        int min, max;
+        double minMax[2];
+        m_CropPage->GetZCropBounds(minMax);
 
         //approximate form int to double
-        fractpart = modf (ZCropBounds[0] , &intpart);
-        fractpart >= 0.5 ?  min = ceil(ZCropBounds[0]) : min = floor(ZCropBounds[0]);
-        fractpart = modf (ZCropBounds[1] , &intpart);
-        fractpart >= 0.5 ?  max = ceil(ZCropBounds[1]) : max = floor(ZCropBounds[1]);
+        fractpart = modf (minMax[0] , &intpart);
+        fractpart >= 0.5 ?  m_ZCropBounds[0] = ceil(minMax[0]) : m_ZCropBounds[0] = floor(minMax[0]);
+        fractpart = modf (minMax[1] , &intpart);
+        fractpart >= 0.5 ?  m_ZCropBounds[1] = ceil(minMax[1]) : m_ZCropBounds[1] = floor(minMax[1]);
 
-        m_SliceScannerBuildPage->SetRange(min, max);
+        m_SliceScannerBuildPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
 
-        if(min > m_CurrentSlice || m_CurrentSlice > max)
+        if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
         {
-          m_CurrentSlice = min;
+          m_CurrentSlice = m_ZCropBounds[0];
           m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
           // show the current slice
           int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);

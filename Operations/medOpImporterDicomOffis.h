@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-10-05 12:17:05 $
-Version:   $Revision: 1.1.2.19 $
+Date:      $Date: 2009-10-05 15:29:43 $
+Version:   $Revision: 1.1.2.20 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -295,6 +295,7 @@ protected:
 	int				 m_NumberOfSlices;
 	wxListBox	*m_StudyListbox;
 
+  int           m_ZCropBounds[2];
 	int						m_CurrentSlice;
 	wxSlider		 *m_SliceScannerLoadPage;
 	wxSlider		 *m_SliceScannerCropPage;
@@ -308,6 +309,7 @@ protected:
 	mafTagArray	*m_TagArray;
 
 	double	m_DicomBounds[6];
+  
 
 	int	m_GizmoStatus;
 	int	m_SideToBeDragged;
