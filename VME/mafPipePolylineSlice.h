@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-19 16:05:47 $
-  Version:   $Revision: 1.11.2.2 $
+  Date:      $Date: 2009-10-05 11:48:31 $
+  Version:   $Revision: 1.11.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -112,6 +112,9 @@ public:
   void ROIEnable(bool enable){m_RoiEnable = enable;}
   void SetROI(double bounds[6]);
   void SetMaximumROI();
+
+  /**Set if actor is pickable */
+  void SetActorPicking(int enable);
 
 protected:
 

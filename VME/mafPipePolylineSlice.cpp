@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-12-19 16:05:47 $
-  Version:   $Revision: 1.16.2.2 $
+  Date:      $Date: 2009-10-05 11:48:31 $
+  Version:   $Revision: 1.16.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -723,4 +723,11 @@ vtkPolyData *mafPipePolylineSlice::CappingFilter(vtkPolyData* inputBorder)
   output->Update();
 
   return output;
+}
+//----------------------------------------------------------------------------
+void mafPipePolylineSlice::SetActorPicking(int enable)
+//----------------------------------------------------------------------------
+{
+  m_Actor->SetPickable(enable);
+  m_Actor->Modified();
 }
