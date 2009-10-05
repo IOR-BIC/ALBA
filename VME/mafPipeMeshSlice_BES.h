@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-05-13 15:48:46 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-05 14:33:39 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,19 +40,27 @@ class vtkPolyDataNormals;
 
 // TODO: REFACTOR THIS (Note by Stefano) 
 // This class need some cleanup: there are really too many Update methods in cpp file...
-
+/**
+  class name : mafPipeMeshSlice_BES
+  Pipe for sliceing a mesh, modified by University of Bedfordshire.
+*/
 class mafPipeMeshSlice_BES : public mafPipeSlice
 {
 public:
+  /** RTTI macro*/
 	mafTypeMacro(mafPipeMeshSlice_BES,mafPipeSlice);
 
+  /** constructor */
 	mafPipeMeshSlice_BES();
+  /** destructor */
 	virtual     ~mafPipeMeshSlice_BES();
 
 	/** process events coming from gui */
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** creation of the pipe */
 	virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** called when a vme is selected by user */
 	virtual void Select(bool select); 
 
 	/** IDs for the GUI */
@@ -68,6 +76,7 @@ public:
     ID_LAST,  //BES: 3.4.2009 - ID_LAST must be really last
 	};
 
+  /** scalars type based on topology */
   enum PIPE_MESH_TYPE_SCALARS
   {
     POINT_TYPE = 0,
@@ -76,35 +85,41 @@ public:
 
   
   
-  /** Get assembly front/back */
+  /** Get assembly front */
   virtual vtkMAFAssembly *GetAssemblyFront(){return m_AssemblyFront;};
+  /** Get assembly back */
   virtual vtkMAFAssembly *GetAssemblyBack(){return m_AssemblyBack;};
 
 	
   /** Core of the pipe */
   virtual void ExecutePipe();
   
-  /** Add/RemoveTo Assembly Front/back */
+  /** Add/RemoveTo Assembly Front */
   virtual void AddActorsToAssembly(vtkMAFAssembly *assembly);
+  /** Add/RemoveTo Assembly back */
   virtual void RemoveActorsFromAssembly(vtkMAFAssembly *assembly);
   
   /** Set the actor picking*/
 	void SetActorPicking(int enable = true);
 
-  /** Set the actor wireframe*/
+  /** Set the actor wireframe to on*/
   void SetWireframeOn();
+  /** Set the actor wireframe to off*/
   void SetWireframeOff();
 
-  /** Set the actor border visible or not*/
+  /** Set the actor border visible */
   void SetWiredActorVisibilityOn();
+  /** Set the actor border not visible */
   void SetWiredActorVisibilityOff();
 
-  /** Set the flip of normal filter*/
+  /** Set the flip of normal filter to on*/
   void SetFlipNormalOn();
+  /** Set the flip of normal filter to off*/
   void SetFlipNormalOff();
 
-  /** Set/Get Active Scalar */
+  /** Set Active Scalar */
   void SetActiveScalar(int index){m_ScalarIndex = index;};
+  /** Get Active Scalar */
   int GetScalarIndex(){return m_ScalarIndex;};
 
   /** Get Number of Scalars */
@@ -143,12 +158,14 @@ protected:
   vtkMAFMeshCutter_BES		    *m_Cutter;
   vtkPolyDataNormals *m_NormalFilter;
   
-
+  /** create controls checking the field arrays of the data */
   void CreateFieldDataControlArrays();
+  /** Update Properties of actor */
 	void UpdateProperty(bool fromTag = false);
 	/**Update data value to selected scalar */
   void UpdateScalars();
 
+  /** Update the normal filter with changed scalar*/
   void UpdateVtkPolyDataNormalFilterActiveScalar();
   /** Update the visualization with changed scalar*/
   void UpdateLUTAndMapperFromNewActiveScalars();
@@ -170,6 +187,7 @@ protected:
 
   int m_RenderingDisplayListFlag; 
 
+  /** allow the creation of the gui */
 	virtual mafGUI  *CreateGui();
 };  
 #endif // __mafPipeMeshSlice_H__B
