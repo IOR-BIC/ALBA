@@ -6,6 +6,23 @@ PROJECT(medViews)
 
 # Set your list of sources here.
 SET(PROJECT_SRCS
+
+  # Rotated Volumes Debugger Stuff
+  
+  medViewRXRotatedVolumesDebugger.cpp
+  medViewRXRotatedVolumesDebugger.h
+  
+  medViewSliceRotatedVolumesDebugger.cpp
+  medViewSliceRotatedVolumesDebugger.h
+  
+  medViewRXCTRotatedVolumesDebugger.cpp
+  medViewRXCTRotatedVolumesDebugger.h
+  
+  medViewOrthoSliceRotatedVolumesDebugger.cpp
+  medViewOrthoSliceRotatedVolumesDebugger.h
+  
+  # End Rotated Volumes Debugger Stuff
+  
   mafViewArbitrarySlice.cpp
   mafViewArbitrarySlice.h
   mafViewOrthoSlice.cpp
