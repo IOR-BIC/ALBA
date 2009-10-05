@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2009-07-01 13:07:00 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-05 12:23:34 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -83,7 +83,7 @@ class medGUIWizardPageNew : public wxWizardPageSimple, public mafObserver
 {
 public:
   /** construct. */
-	medGUIWizardPageNew (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI,wxString label="");
+	medGUIWizardPageNew (medGUIWizard *wizardParent,long style = medUSEGUI | medUSERWI, bool ZCrop = false, wxString label="");
   /** destructor. */
 	virtual ~medGUIWizardPageNew ();
   /** Set the Listener that will receive event-notification. */
@@ -108,6 +108,12 @@ public:
 	/** Create a chain between this page ad nextPage. */
 	void SetNextPage(medGUIWizardPageNew *nextPage);
 
+  /** Set bounds of ZCrop slider. */
+  void SetZCropBounds(double ZMin = 0, double ZMax = 1);
+
+  /** Return bounds of ZCrop slider. */
+  void GetZCropBounds(double ZCropBpunds[2]);
+
   /** Update windowing in order to set correct values in lut slider. */
   void UpdateWindowing();
   /** Update Actor Texture from current lut slider values. */
@@ -117,8 +123,6 @@ public:
 	mafRWI* GetRWI(){return m_Rwi;};
 
 private:
-
-	wxWizardPageSimple *m_FirstPage;
 
 	wxBoxSizer *m_GUISizer; ///< Sizer used for the Lower GUI
   wxBoxSizer *m_GUIUnderSizer; ///< Sizer used for the under Lower GUI
@@ -133,6 +137,7 @@ private:
   mafGUI     *m_GuiLowerUnderLeft; ///< Gui variable used to plug custom widgets localized under LOWER LEFT
 
   mafGUILutSlider		*m_LutSlider;
+  mafGUILutSlider		*m_ZCropSlider;
   vtkLookupTable	*m_ColorLUT;
 
 	//DECLARE_EVENT_TABLE()

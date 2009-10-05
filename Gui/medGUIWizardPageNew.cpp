@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-10 06:59:32 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-05 12:23:34 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -77,13 +77,11 @@ enum ID
 };
 
 //----------------------------------------------------------------------------
-medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style,wxString label)
+medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, bool ZCrop, wxString label)
 : wxWizardPageSimple(wizardParent)
 //----------------------------------------------------------------------------
 {
 	m_Listener = NULL;
-
-	m_FirstPage = NULL;
   m_ColorLUT = NULL;
 
 	m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
@@ -108,10 +106,16 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style,w
     mafGUI *m_GuiView= new mafGUI(this);
     m_LutSlider = new mafGUILutSlider(this,-1,wxPoint(0,0),wxSize(300,24));
     m_LutSlider->SetListener(this);
-    
-    m_GuiView->Add(m_LutSlider);
-    m_GuiView->Reparent(this);
 
+    m_GuiView->Add(m_LutSlider);
+    if (ZCrop)
+    {
+      m_ZCropSlider = new mafGUILutSlider(this,-1,wxPoint(0,0),wxSize(300,24),0,"Z crop");
+      m_ZCropSlider->SetListener(this);
+      m_GuiView->Add(m_ZCropSlider);
+    }
+    m_GuiView->Reparent(this);
+   
     m_RwiSizer->Add(m_Rwi->m_RwiBase,1,wxEXPAND);
     m_SizerAll->Add(m_RwiSizer,0,wxEXPAND);
 
@@ -159,8 +163,10 @@ void medGUIWizardPageNew::OnEvent(mafEventBase *maf_event)
   {
   case ID_RANGE_MODIFIED:
     {
-      //Windowing
-      UpdateActor();
+      if(maf_event->GetSender() == this->m_LutSlider)
+        UpdateActor();  //Windowing
+      else if(maf_event->GetSender() == this->m_ZCropSlider)
+        mafEventMacro(*maf_event);
     }
     break;
 
@@ -239,4 +245,22 @@ void medGUIWizardPageNew::SetNextPage(medGUIWizardPageNew *nextPage)
 {
 	this->SetNext(nextPage);
   nextPage->SetPrev(this);
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPageNew::SetZCropBounds(double ZMin, double ZMax)
+//--------------------------------------------------------------------------------
+{ 
+  if(ZMin >= 0 && ZMax > ZMin)
+  {
+    m_ZCropSlider->SetRange(ZMin,ZMax);
+    m_ZCropSlider->SetSubRange(ZMin, ZMax);
+    
+  }
+}
+//--------------------------------------------------------------------------------
+void medGUIWizardPageNew::GetZCropBounds(double ZCropBounds[2])
+//--------------------------------------------------------------------------------
+{ 
+  m_ZCropSlider->GetSubRange(&ZCropBounds[0],&ZCropBounds[1]);
+
 }
