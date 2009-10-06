@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-10-06 09:28:37 $ 
-Version: $Revision: 1.1.2.1 $ 
+Date: $Date: 2009-10-06 14:22:36 $ 
+Version: $Revision: 1.1.2.2 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -232,6 +232,14 @@ void medViewSliceOnCurveCompound::VmeShow(mafNode *node, bool show)
         m_ChildViewList[i]->VmeShow(node, show);
     }	
   }  
+
+  if(GetSceneGraph()->GetSelectedVme()==node)
+  {
+    UpdateWindowing( show && this->ActivateWindowing(node), node);
+  }
+
+  mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+
 }
 
 //------------------------------------------------------------------------
