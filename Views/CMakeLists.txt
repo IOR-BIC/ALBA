@@ -61,6 +61,10 @@ SET(PROJECT_SRCS
   medViewSlicer.h
   medViewSliceOnCurve.cpp
   medViewSliceOnCurve.h
+  medViewSliceCompound.cpp
+  medViewSliceCompound.h
+  medViewSliceOnCurveCompound.cpp
+  medViewSliceOnCurveCompound.h
 )
 
 # List libraries that are needed by this project.
