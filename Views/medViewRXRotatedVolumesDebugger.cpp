@@ -2,15 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewRXRotatedVolumesDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 13:03:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-10-06 12:27:56 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
-const DEBUG_MODE = false;
+const bool DEBUG_MODE = false;
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
