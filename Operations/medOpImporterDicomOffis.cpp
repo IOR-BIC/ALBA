@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 15:29:43 $
-Version:   $Revision: 1.1.2.53 $
+Date:      $Date: 2009-10-06 07:59:17 $
+Version:   $Revision: 1.1.2.54 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1851,6 +1851,10 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
             Crop();
             m_Wizard->SetButtonString("Import >"); 
             m_BuildPage->UpdateActor();
+            if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
+            {
+              m_CurrentSlice = m_ZCropBounds[0];
+            }
             m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
           } 
           else
