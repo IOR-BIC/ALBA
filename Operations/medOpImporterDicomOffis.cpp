@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 13:09:35 $
-Version:   $Revision: 1.1.2.55 $
+Date:      $Date: 2009-10-07 13:39:29 $
+Version:   $Revision: 1.1.2.56 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1582,16 +1582,11 @@ void medOpImporterDicomOffis::CreateBuildPage()
     m_TimeScannerBuildPage->SetPageSize(1);
   }
 
-  m_BuildGuiCenter->Divider();
-  wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
-  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, "", wxRA_SPECIFY_ROWS);
-  
   m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
   
   m_BuildGuiLeft->FitGui();
   m_BuildGuiUnderLeft->FitGui();
 	m_BuildPage->AddGuiLowerLeft(m_BuildGuiLeft);
-  m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
   m_BuildPage->AddGuiLowerCenter(m_BuildGuiUnderLeft);
 
 	m_BuildPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
@@ -1853,6 +1848,19 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
               m_CurrentSlice = m_ZCropBounds[0];
             }
             m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+
+            //if only 1 slice, disable radio widget and create a VMEImage
+            if (m_ZCropBounds[1]+1 - m_ZCropBounds[0] >1 )
+            {
+              m_BuildGuiCenter->Divider();
+              wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
+              m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, "", wxRA_SPECIFY_ROWS);
+              m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
+              m_BuildPage->Update();
+              GuiUpdate();
+            }
+            else
+              m_OutputType = 2;
           } 
           else
           {
