@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 15:48:46 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-10-07 10:37:27 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -44,7 +44,10 @@ class mafPipeSurfaceSlice_BES : public mafPipeSlice
 public:
   mafTypeMacro(mafPipeSurfaceSlice_BES,mafPipeSlice);
 
+  /** Constructor. */
                mafPipeSurfaceSlice_BES();
+
+  /** Destructor. */
   virtual     ~mafPipeSurfaceSlice_BES ();
 
   /**Return the thickness of the border*/	
@@ -72,7 +75,10 @@ public:
   /** Remove visual-pipe for closed cloud */
   void RemoveClosedCloudPipe();
 
+  /** Show bounding box when selection is on. */
 	void ShowBoxSelectionOn(){m_ShowSelection=true;};
+
+  /** Hide bounding box when selection is off. */
 	void ShowBoxSelectionOff(){m_ShowSelection=false;};
 
   /** IDs for the GUI */
