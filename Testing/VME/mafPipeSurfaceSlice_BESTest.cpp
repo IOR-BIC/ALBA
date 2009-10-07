@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeSurfaceSlice_BESTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-06 08:13:49 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-07 14:54:51 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2008
@@ -12,6 +12,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 #include "mafDefines.h" 
+#include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
 // This force to include Window,wxWidgets and VTK exactly in this order.
@@ -386,8 +387,8 @@ void mafPipeSurfaceSlice_BESTest::CompareImages(int testIndex)
   int pointIndex =  name.find_last_of('.');
   name = name.substr(0, pointIndex);
 
-  mafString controlOriginFile=MAF_DATA_ROOT;
-  controlOriginFile<<"/Test_PipeSurfaceSlice/";
+  mafString controlOriginFile=MED_DATA_ROOT;
+  controlOriginFile<<"/Test_PipeSurfaceSlice_BES/";
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
   controlOriginFile<<"image";
@@ -410,18 +411,18 @@ void mafPipeSurfaceSlice_BESTest::CompareImages(int testIndex)
   vtkJPEGWriter *w;
   vtkNEW(w);
   w->SetInput(w2i->GetOutput());
-  mafString imageFile=MAF_DATA_ROOT;
+  mafString imageFile=MED_DATA_ROOT;
 
   if(!controlStream)
   {
-    imageFile<<"/Test_PipeSurfaceSlice/";
+    imageFile<<"/Test_PipeSurfaceSlice_BES/";
     imageFile<<name.c_str();
     imageFile<<"_";
     imageFile<<"image";
   }
   else
   {
-    imageFile<<"/Test_PipeSurfaceSlice/";
+    imageFile<<"/Test_PipeSurfaceSlice_BES/";
     imageFile<<name.c_str();
     imageFile<<"_";
     imageFile<<"comp";
@@ -444,8 +445,8 @@ void mafPipeSurfaceSlice_BESTest::CompareImages(int testIndex)
   //read original Image
   vtkJPEGReader *rO;
   vtkNEW(rO);
-  mafString imageFileOrig=MAF_DATA_ROOT;
-  imageFileOrig<<"/Test_PipeSurfaceSlice/";
+  mafString imageFileOrig=MED_DATA_ROOT;
+  imageFileOrig<<"/Test_PipeSurfaceSlice_BES/";
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";
   imageFileOrig<<"image";
