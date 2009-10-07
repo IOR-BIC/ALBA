@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 12:04:05 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-10-07 13:28:04 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -58,6 +58,8 @@ medVMEMaps::medVMEMaps()
   m_Normals         = NULL;
   m_Volume          = NULL;
   m_PolyData        = NULL;
+  
+  m_ColorTransferFunction = NULL;
 
   mafNEW(m_Transform);
   vtkNEW(m_Normals);
@@ -92,6 +94,9 @@ medVMEMaps::~medVMEMaps()
   
   mafDEL(m_Transform);
   vtkDEL(m_PolyData);
+
+  if(m_ColorTransferFunction)
+    vtkDEL(m_ColorTransferFunction);
 
   SetOutput(NULL);
 }
@@ -565,5 +570,7 @@ void medVMEMaps::SetColorTransferFunction(vtkColorTransferFunction *ctf)
 vtkColorTransferFunction *medVMEMaps::GetColorTransferFunction()
 //-----------------------------------------------------------------------
 {
+  if(!m_ColorTransferFunction)
+    vtkNEW(m_ColorTransferFunction);
   return m_ColorTransferFunction;
 }
