@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-14 07:03:53 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-07 10:39:55 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -88,9 +88,9 @@ void medGUITransformSliders::CreateGui()
   m_Gui->FloatSlider(ID_TRANSLATE_X, "Translate X", &m_Position[0], m_TranslationRange[0], m_TranslationRange[1]);
   m_Gui->FloatSlider(ID_TRANSLATE_Y, "Translate Y", &m_Position[1], m_TranslationRange[2], m_TranslationRange[3]);
   m_Gui->FloatSlider(ID_TRANSLATE_Z, "Translate Z", &m_Position[2], m_TranslationRange[4], m_TranslationRange[5]);
-  m_Gui->FloatSlider(ID_ROTATE_X, "Rotate X", &m_Orientation[0], 0, 180);
-  m_Gui->FloatSlider(ID_ROTATE_Y, "Rotate Y", &m_Orientation[1], 0, 180);
-  m_Gui->FloatSlider(ID_ROTATE_Z, "Rotate Z", &m_Orientation[2], 0, 180);
+  m_Gui->FloatSlider(ID_ROTATE_X, "Rotate X", &m_Orientation[0], -90, 90);
+  m_Gui->FloatSlider(ID_ROTATE_Y, "Rotate Y", &m_Orientation[1], -90, 90);
+  m_Gui->FloatSlider(ID_ROTATE_Z, "Rotate Z", &m_Orientation[2], -90, 90);
 
   if (m_EnableScaling == true)
   {
