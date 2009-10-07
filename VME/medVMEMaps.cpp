@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 10:39:05 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-10-07 12:04:05 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -552,4 +552,18 @@ void medVMEMaps::GetScalarRange(double range[2])
   if(m_PolyData->GetPointData() && m_PolyData->GetPointData()->GetScalars())
     m_PolyData->GetPointData()->GetScalars()->GetRange(range);
 
+}
+
+//-----------------------------------------------------------------------
+void medVMEMaps::SetColorTransferFunction(vtkColorTransferFunction *ctf)
+//-----------------------------------------------------------------------
+{
+  m_ColorTransferFunction = ctf;
+}
+
+//-----------------------------------------------------------------------
+vtkColorTransferFunction *medVMEMaps::GetColorTransferFunction()
+//-----------------------------------------------------------------------
+{
+  return m_ColorTransferFunction;
 }
