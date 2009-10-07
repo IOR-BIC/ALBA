@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 13:39:29 $
-Version:   $Revision: 1.1.2.56 $
+Date:      $Date: 2009-10-07 14:30:38 $
+Version:   $Revision: 1.1.2.57 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1582,6 +1582,10 @@ void medOpImporterDicomOffis::CreateBuildPage()
     m_TimeScannerBuildPage->SetPageSize(1);
   }
 
+  m_BuildGuiCenter->Divider();
+  wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
+  m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, "",wxRA_SPECIFY_ROWS);
+
   m_BuildGuiUnderLeft->String(ID_VOLUME_NAME," VME name",&m_VolumeName);
   
   m_BuildGuiLeft->FitGui();
@@ -1852,9 +1856,6 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
             //if only 1 slice, disable radio widget and create a VMEImage
             if (m_ZCropBounds[1]+1 - m_ZCropBounds[0] >1 )
             {
-              m_BuildGuiCenter->Divider();
-              wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
-              m_BuildGuiCenter->Radio(ID_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, "", wxRA_SPECIFY_ROWS);
               m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
               m_BuildPage->Update();
               GuiUpdate();
@@ -1873,6 +1874,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
         {
           UndoCrop();
           m_Wizard->SetButtonString("Build >");
+          m_BuildPage->RemoveGuiLowerUnderLeft(m_BuildGuiCenter);
           m_CropPage->UpdateActor();
         }
 
