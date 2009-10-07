@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 16:41:57 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2009-10-07 11:36:49 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -726,13 +726,13 @@ void medOpMML3::CreateRegistrationDlg()
   OperationHorizontalBoxSizer->Add(m_UndoButton,0,wxALL, 5);
 
   // slider label and value
-  wxBoxSizer *hs4 = new wxBoxSizer(wxHORIZONTAL);
-  hs4->Add(button_Minus10,  0, wxLEFT);
-  hs4->Add(button_Minus1,  0, wxLEFT);
-  hs4->Add(lab_slicepos,  0, wxLEFT, 5);
-  hs4->Add(m_Text_SlicePos, 0, wxLEFT, 5);
-  hs4->Add(button_Plus1,  0, wxLEFT);
-  hs4->Add(button_Plus10,  0, wxLEFT);
+  wxBoxSizer *SliderValueHorizontalBoxSizer = new wxBoxSizer(wxHORIZONTAL);
+  SliderValueHorizontalBoxSizer->Add(button_Minus10,  0, wxLEFT);
+  SliderValueHorizontalBoxSizer->Add(button_Minus1,  0, wxLEFT);
+  SliderValueHorizontalBoxSizer->Add(lab_slicepos,  0, wxLEFT, 5);
+  SliderValueHorizontalBoxSizer->Add(m_Text_SlicePos, 0, wxLEFT, 5);
+  SliderValueHorizontalBoxSizer->Add(button_Plus1,  0, wxLEFT);
+  SliderValueHorizontalBoxSizer->Add(button_Plus10,  0, wxLEFT);
 
 
   // left vertical sizer (rows of buttons + render window)
@@ -743,20 +743,29 @@ void medOpMML3::CreateRegistrationDlg()
   LeftVerticalBoxSizer->Add(m_Lut, 0, wxEXPAND, 6);
 
 
-  // right vertical sizer (pos slider + param view widgets)
+  // right vertical sizer (slider + param view widgets)
   wxBoxSizer *RightVerticalBoxSizer = new wxBoxSizer(wxVERTICAL) ;
-  RightVerticalBoxSizer->Add(hs4, 0, wxEXPAND | wxTOP | wxLEFT, 3);  // slice pos buttons, label and value
-  RightVerticalBoxSizer->Add(slider_slicepos, 0, wxEXPAND | wxTOP, 3); // slice position slider
-  RightVerticalBoxSizer->Add(m_PHmafRWI->m_RwiBase, 0, wxTOP, 10);
-  RightVerticalBoxSizer->Add(m_PVmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_THmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_TVmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_RAmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_SNmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_SSmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_SEmafRWI->m_RwiBase, 0, wxTOP, 3);
-  RightVerticalBoxSizer->Add(m_SWmafRWI->m_RwiBase, 0, wxTOP, 3);
-
+  RightVerticalBoxSizer->Add(SliderValueHorizontalBoxSizer, 0, wxEXPAND | wxALIGN_LEFT | wxTOP | wxLEFT, 3);  // slice pos buttons, label and value
+  RightVerticalBoxSizer->Add(slider_slicepos, 0, wxEXPAND | wxALIGN_LEFT | wxTOP, 3); // slice position slider
+  RightVerticalBoxSizer->AddSpacer(5) ;
+  RightVerticalBoxSizer->Add(m_PHmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_PVmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_THmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_TVmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_RAmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_SNmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_SSmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_SEmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
+  RightVerticalBoxSizer->Add(m_SWmafRWI->m_RwiBase, 0, wxLEFT, 10);
+  RightVerticalBoxSizer->AddSpacer(3) ;
 
 
   // registration window horizontal sizer
@@ -894,7 +903,9 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   // window size parameters
   int winSize = 400 ;
   int sectionHeight = winSize / NumberOfNonUniformSections ;
-  int textHeight = sectionHeight - 2 ;  // slightly smaller because of border width
+  int textHeight = sectionHeight ;
+  int textCtrlHeight = sectionHeight/2 ;
+  int spacerHeight = (sectionHeight - textCtrlHeight) / 2 ;
 
   // column title
   wxStaticText *renWinTitleTxt = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, "Section view", wxPoint(0,0), wxSize(25,textHeight)) ;
@@ -931,15 +942,17 @@ void medOpMML3::CreateNonUniformSlicesDlg()
   for (int i = NumberOfNonUniformSections-1 ;  i >= 0 ;  i--){
     wxString label = wxString::Format(wxT("%d"),i);
 
-    m_NumSlicesLabel[i] = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, label, wxPoint(0,0), wxSize(25,textHeight));
-    m_NumSlicesEntry[i] = new wxTextCtrl(m_NonUniformSlicesDlg , wxID_ANY, "", wxPoint(0,0), wxSize(50,textHeight), wxNO_BORDER);
+    m_NumSlicesLabel[i] = new wxStaticText(m_NonUniformSlicesDlg, wxID_ANY, label, wxPoint(0,0), wxSize(25,textCtrlHeight));
+    m_NumSlicesEntry[i] = new wxTextCtrl(m_NonUniformSlicesDlg , wxID_ANY, "", wxPoint(0,0), wxSize(50,textCtrlHeight), wxNO_BORDER);
     m_NumSlicesEntry[i]->SetValidator(mafGUIValidator(this, (ID_NUSLICES_NUMBER_BEGIN+i), m_NumSlicesEntry[i], &m_SlicesInSection[i]));
 
     m_NumSlicesRowBoxSizer[i] = new wxBoxSizer(wxHORIZONTAL);
     m_NumSlicesRowBoxSizer[i]->Add(m_NumSlicesLabel[i], 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
     m_NumSlicesRowBoxSizer[i]->Add(m_NumSlicesEntry[i], 0.5, wxEXPAND | wxALIGN_RIGHT | wxALIGN_CENTRE_VERTICAL, 1);
 
-    widgetsBoxSizer->Add(m_NumSlicesRowBoxSizer[i], 0.5, wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 1);
+    widgetsBoxSizer->AddSpacer(spacerHeight) ;
+    widgetsBoxSizer->Add(m_NumSlicesRowBoxSizer[i], 0.5, wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTRE_VERTICAL | wxALL, 0);
+    widgetsBoxSizer->AddSpacer(spacerHeight) ;
   }
 
   // total box

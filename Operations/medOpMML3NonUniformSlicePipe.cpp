@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 #include "  Module:    $RCSfile: medOpMML3NonUniformSlicePipe.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 16:41:58 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-07 11:36:49 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -139,15 +139,24 @@ medOpMML3NonUniformSlicePipe::medOpMML3NonUniformSlicePipe(vtkPolyData *surface,
   sectionLinesEndPts->Initialize() ;
   for (int i = 0 ;  i < numberOfSectionLines ;  i++){
     double y = (double)i / (double)(numberOfSectionLines-1) ;
-    sectionLinesEndPts->InsertNextPoint(0, y, 0) ;
-    sectionLinesEndPts->InsertNextPoint(1, y, 0) ;
+    sectionLinesEndPts->InsertNextPoint(0.0, y, 0) ;
+    sectionLinesEndPts->InsertNextPoint(0.05, y, 0) ;
+    sectionLinesEndPts->InsertNextPoint(0.95, y, 0) ;
+    sectionLinesEndPts->InsertNextPoint(1.0, y, 0) ;
   }
 
   vtkCellArray *sectionLinesCells = vtkCellArray::New() ;
   for (int i = 0 ;  i < numberOfSectionLines ;  i++){
     int endPtIndices[2] ;
-    endPtIndices[0] = 2*i ;
-    endPtIndices[1] = endPtIndices[0] + 1 ;
+
+    // left tick mark
+    endPtIndices[0] = 4*i ;
+    endPtIndices[1] = 4*i + 1 ;
+    sectionLinesCells->InsertNextCell(2, endPtIndices) ;
+
+    // right tick mark
+    endPtIndices[0] = 4*i + 2 ;
+    endPtIndices[1] = 4*i + 3 ;
     sectionLinesCells->InsertNextCell(2, endPtIndices) ;
   }
 

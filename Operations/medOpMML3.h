@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMML3.h,v $
 Language:  C++
-Date:      $Date: 2009-10-05 16:41:57 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2009-10-07 11:36:49 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Mel Krokos, Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,7 +39,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 
 //------------------------------------------------------------------------------
-// TODO 5.10.09
+// TODO 7.10.09
 // 
 // Widget
 // Unify variables m_Operation, m_ScalingMode etc.
