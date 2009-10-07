@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 12:23:34 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-07 14:31:22 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -239,6 +239,16 @@ void medGUIWizardPageNew::AddGuiLowerUnderLeft(mafGUI *gui)
   m_GuiLowerUnderLeft->FitGui();
   m_GuiLowerUnderLeft->Update();
 }
+
+//--------------------------------------------------------------------------------
+void medGUIWizardPageNew::RemoveGuiLowerUnderLeft(mafGUI *gui)
+//--------------------------------------------------------------------------------
+{
+  m_GuiLowerUnderLeft->Remove(gui);
+  m_GuiLowerUnderLeft->FitGui();
+  m_GuiLowerUnderLeft->Update();
+}
+
 //--------------------------------------------------------------------------------
 void medGUIWizardPageNew::SetNextPage(medGUIWizardPageNew *nextPage)
 //--------------------------------------------------------------------------------

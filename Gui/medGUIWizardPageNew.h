@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2009-10-05 12:23:34 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-07 14:31:22 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -104,6 +104,9 @@ public:
 
   /** Remove in wizard gui, another gui in lower left position. */
   void RemoveGuiLowerLeft(mafGUI *gui);
+
+  /** Remove in wizard gui, another gui under lower left position. */
+  void RemoveGuiLowerUnderLeft(mafGUI *gui);
 
 	/** Create a chain between this page ad nextPage. */
 	void SetNextPage(medGUIWizardPageNew *nextPage);
