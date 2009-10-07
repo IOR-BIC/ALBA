@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:37:13 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2009-10-07 09:55:06 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -369,6 +369,7 @@ public:
 	double *GetExportPointCoordinate(int index);
 	/**Return Number of export points*/
 	int GetNumberExportPoints(){return m_ExportPointList.size();};
+	double getPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output);
 
 protected:
 	medVMEComputeWrapping();
@@ -533,10 +534,25 @@ protected:
 	mafGUI* CreateGuiForOldMeter( mafGUI *gui );
 	void getCylinderAxis(mafVME *wrapped_vme,int objIdx);
 	void chooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint);
+
+	void getOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal);
+	                                  
+	void getOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global);
 	
 
 	//------------------new function -------------------
-
+//--------------test another way----------
+	void wrapCylinderOnlyObstacleSet(int idx);
+	double getQTsegment(double R,double *Q,double *T);
+	bool wrapCondition(double *Q,double *T);
+	void computeTangentXYQ(double *P,double R,double *rtn);
+	void computeTangentXYT(double *S,double R, double *rtn);
+	double computeQTLength(double *Q,double *T,double R);
+	void computeQz(double *P,double *S,double *Q,double *T,double QTlength);
+	void computeTz(double *P,double *S,double *Q,double *T,double QTlength);
+	void wrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout);
+	void wrapCylinderCylinderObstacleSet();
+//--------------test over----------------
 
 
 

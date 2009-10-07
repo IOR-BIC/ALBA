@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:37:13 $
-Version:   $Revision: 1.1.2.19 $
+Date:      $Date: 2009-10-07 09:55:18 $
+Version:   $Revision: 1.1.2.20 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -280,6 +280,7 @@ void medVMEComputeWrapping::InternalUpdate()
 		}
 		if(invokeFlag){
 			dispatch(); 
+			
 		}
 	}else if (m_WrappedClass == OLD_METER)//old method
 	{
@@ -406,11 +407,13 @@ void medVMEComputeWrapping::dispatch(){
 					mafMatrix::Invert(m_InMy1,m_OutMy1);
 					mafMatrix::Invert(m_InMx1,m_OutMx1);
 
-					getCylinderCylinderWrap(m_PathNum);
+					//getCylinderCylinderWrap(m_PathNum);
+					wrapCylinderCylinderObstacleSet();
 				}
 				else if (vFlag == SINGLE_CYLINDER){
 					//wrapCylinderOnly(0);
 					wrapCylinderOnly(m_PathNum);
+					//wrapCylinderOnlyObstacleSet(2);//second cylinder
 					outputFile<<"---------after wrapCylinderOnly:length="<<m_Distance<<std::endl;
 					outputFile.close();
 				}else if (vFlag == SINGLE_SPHERE)
@@ -689,6 +692,318 @@ double medVMEComputeWrapping::getDistanceValue(double *start,double *cCoord,doub
 
 	return rtn;
 }
+//S-T~H-G~Q-P
+//The obstacle-set Method for Representing Muscle Paths in Musculoskeletal Models
+//Author: BrIAN A.Garner and MARCUS G.Pandy
+void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
+	double segLength1,segLength2;
+	int idx1,idx2;
+	double d1,d2;
+	double S[3],P[3];
+	double T[3],H[3],Tg[3],Hg[3];
+	double G[3],Q[3],Gg[3],Qg[3];
+	double center1[3],center2[3];
+	bool exchangeFlag = false;
+	int step = 10;
+	vtkPolyData *hCurve1,*hCurve2;
+	double curveLength1=0,curveLength2=0;
+	vtkLineSource *Line1,*Line2,*Line3;
+
+	m_Goniometer->RemoveAllInputs();
+
+	copyPointValue(m_StartPoint,S);
+	copyPointValue(m_EndPoint,P);
+
+	idx1 = 1;//by default first cylinder should near start point
+	idx2 = 2;
+	getGlobalCylinderCenter(center1,1);
+	getGlobalCylinderCenter(center2,2);
+	d1 = getPointLineDistance(S,center1,m_CylinderAxis1);//distance from start point to cylinder axis1
+	d2 = getPointLineDistance(S,center2,m_CylinderAxis2);//distance from start point to cylinder axis2
+	if (d1>d2)//start point is near cylinder1
+	{
+		idx1=2;
+		idx2=1;
+		exchangeFlag = true;
+	}
+
+
+	//---test code---------
+/*	mafString logFname = "HCoord.txt";	//for debug
+	std::ofstream outputFile(logFname, std::ios::out);	//for debug
+	outputFile.clear();	//for debug
+*/
+
+	//use S ,P get H first
+	wrapCylinderOnlyObstacleSetBasic(S,P,idx1,segLength1,T,H);
+	//------transform it to global------------
+	getWrapGlobalTransform(T,Tg,idx1);
+	getWrapGlobalTransform(H,Hg,idx1);
+	//outputFile<<" H coord: 0"<<"   "<< H[0]<<"  "<<H[1]<<"  "<<H[2]<<std::endl;	//for debug
+
+	//loop this paragraph
+	for (int i=0;i<step;i++)
+	{
+		//use H ,P get G,Q
+		wrapCylinderOnlyObstacleSetBasic(Hg,P,idx2,segLength1,G,Q);
+		getWrapGlobalTransform(G,Gg,idx2);
+		
+		//use S, G get T,H
+		wrapCylinderOnlyObstacleSetBasic(S,Gg,idx1,segLength1,T,H);
+		getWrapGlobalTransform(H,Hg,idx1);
+		if (i==step-1)
+		{
+			getWrapGlobalTransform(T,Tg,idx1);
+			getWrapGlobalTransform(Q,Qg,idx2);
+		}
+		//outputFile<<" H coord: "<<i<<"   "<< H[0]<<"  "<<H[1]<<"  "<<H[2]<<std::endl;	//for debug
+	}
+	//outputFile.close();	//for debug
+
+	//------------out put result----------------
+
+	vtkNEW(Line1);
+	vtkNEW(Line2);
+	vtkNEW(Line3);
+	vtkNEW(hCurve1);
+	vtkNEW(hCurve2);
+
+	bool wrapObj1 = wrapCondition(T,H);
+	bool wrapObj2 = wrapCondition(G,Q);
+	if (wrapObj1 && wrapObj2)
+	{
+		curveLength1 = caculateHelix2(hCurve1,T,H,true,idx1);
+		curveLength2 = caculateHelix2(hCurve2,G,Q,true,idx2);
+		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Tg));
+		m_Distance += curveLength1;
+		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Hg,Gg));
+		m_Distance += curveLength2;
+		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Qg,P));
+		Line1->SetPoint1(m_StartPoint);
+		Line1->SetPoint2(Tg);
+
+		Line2->SetPoint1(Hg);
+		Line2->SetPoint2(Gg);
+
+		Line3->SetPoint1(Qg);
+		Line3->SetPoint2(P);
+
+		m_Goniometer->AddInput(Line1->GetOutput());
+		m_Goniometer->AddInput(Line2->GetOutput());
+		m_Goniometer->AddInput(Line3->GetOutput());
+		m_Goniometer->AddInput(hCurve1);
+		m_Goniometer->AddInput(hCurve2);
+	}
+	else if (wrapObj1 && !wrapObj2)
+	{
+		curveLength1 = caculateHelix2(hCurve1,T,H,true,idx1);
+		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Tg));
+		m_Distance += curveLength1;
+		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Hg,P));
+
+		Line1->SetPoint1(S);
+		Line1->SetPoint2(Tg);
+	
+		Line2->SetPoint1(Hg);
+		Line2->SetPoint2(P);
+
+		m_Goniometer->AddInput(Line1->GetOutput());
+		m_Goniometer->AddInput(hCurve1);
+		m_Goniometer->AddInput(Line2->GetOutput());
+		
+	}else if ( !wrapObj1 && wrapObj2)
+	{	
+		curveLength2 = caculateHelix2(hCurve2,G,Q,true,idx2);
+		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Gg));
+		m_Distance += curveLength2;
+		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Qg,P));
+
+		Line1->SetPoint1(S);
+		Line1->SetPoint2(Gg);
+
+		Line2->SetPoint1(Qg);
+		Line2->SetPoint2(P);
+
+		m_Goniometer->AddInput(Line1->GetOutput());
+		m_Goniometer->AddInput(hCurve2);
+		m_Goniometer->AddInput(Line2->GetOutput());
+	}else{ //!wrapObj1 && !wrapObj2
+
+		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,P));
+		Line1->SetPoint1(S);
+		Line1->SetPoint2(P);
+		m_Goniometer->AddInput(Line1->GetOutput());
+
+	}
+	vtkDEL(Line1);
+	vtkDEL(Line2);
+	vtkDEL(Line3);
+	vtkDEL(hCurve1);
+	vtkDEL(hCurve2);
+	//m_Goniometer->Update();
+	//m_Goniometer->GetOutput()->Update();
+
+	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+	GetWrappedMeterOutput()->Update(); 
+}
+// S-T~Q-P 
+void medVMEComputeWrapping::wrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout){
+	double P[3],S[3],Q[3],T[3];
+	//express P and S in cylinder frame
+	getWrapLocalTransform(Pg,P,idx);
+	getWrapLocalTransform(Sg,S,idx);
+	double R = getCylinderRadius(idx);
+
+
+	//1.compute xy Coordinate of Q
+	computeTangentXYQ(P,R,Q);
+	// compute xy coordinate of T
+	computeTangentXYT(S,R,T);
+	//2.compute xy coordinate of segment lengths in xy plane
+	segLength = getQTsegment(R,Q,T);
+	//3.compute z coordinates of Q
+	computeQz(P,S,Q,T,segLength);
+	//compute zcoordinates of T
+	computeTz(P,S,Q,T,segLength);
+	//---------we already get Q and T------------
+	copyPointValue(T,Tout);
+	copyPointValue(Q,Qout);
+
+}
+
+void medVMEComputeWrapping::wrapCylinderOnlyObstacleSet(int idx){
+	//P-Q~T-S
+	double P[3],S[3],Q[3],T[3];
+	double Qg[3],Tg[3];
+	double segLength,curveLength;
+	vtkPolyData *hCurve;
+	vtkLineSource *Line1,*Line2;
+	vtkNEW(Line1);
+	vtkNEW(Line2);
+	copyPointValue(m_StartPoint,S);
+	copyPointValue(m_EndPoint,P);
+	wrapCylinderOnlyObstacleSetBasic(m_StartPoint,m_EndPoint,idx,segLength,T,Q);
+	//------transform it to global------------
+	getWrapGlobalTransform(Q,Qg,idx);
+	getWrapGlobalTransform(T,Tg,idx);
+/*
+	//express P and S in cylinder frame
+	getWrapLocalTransform(m_EndPoint,P,idx);
+	getWrapLocalTransform(m_StartPoint,S,idx);
+	double R = getCylinderRadius(idx);
+
+	//1.compute xy Coordinate of Q
+	computeTangentXYQ(P,R,Q);
+	// compute xy coordinate of T
+	computeTangentXYT(S,R,T);
+	//2.compute xy coordinate of segment lengths in xy plane
+	segLength = getQTsegment(R,Q,T);
+	//3.compute z coordinates of Q
+	computeQz(P,S,Q,T,segLength);
+	//compute zcoordinates of T
+	computeTz(P,S,Q,T,segLength);
+	//---------we already get Q and T------------
+	//------transform it to global------------
+	getWrapGlobalTransform(Q,Qg,idx);
+	getWrapGlobalTransform(T,Tg,idx);
+*/
+	//---------------------------------------
+	vtkNEW(hCurve);
+	curveLength = caculateHelix2(hCurve,Q,T,true,idx);
+
+	m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Tg));
+	m_Distance += curveLength;
+	m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Qg,P));
+
+	Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
+	Line1->SetPoint2(Qg[0],Qg[1],Qg[2]);
+
+	//transformOutputPoint( m_StartPoint);
+	//transformOutputPoint(cCoordGlobal4);
+	Line2->SetPoint1(Tg[0],Tg[1],Tg[2]);
+	Line2->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
+	//--------------------------------------
+	m_Goniometer->AddInput(Line1->GetOutput());
+	m_Goniometer->AddInput(Line2->GetOutput());
+	m_Goniometer->AddInput(hCurve);
+
+	vtkDEL(Line1);
+	vtkDEL(Line2);
+	vtkDEL(hCurve);
+
+	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
+	GetWrappedMeterOutput()->Update(); 
+}
+double medVMEComputeWrapping::getQTsegment(double R,double *Q,double *T){
+	double rtn = 0;
+	double value = 0;
+	value = (1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R));
+	rtn = R *  acos(value);
+	return rtn;
+}
+/************************************************************************/
+/*       |X1 Y1 1|   if Det >0 orientation is counter clockwise 
+/*	Det =|X2 Y2 1|   if det =0 points are colinear
+/*       |X3 Y3 1|   if Det<0 orientation is clockwise
+/* for our case (0,0)is the origin of the coordinate system (S--T--Q--P)
+/* so det = Qx*Ty-Qy*Tx
+/************************************************************************/
+
+bool medVMEComputeWrapping::wrapCondition(double *Q,double *T){
+	bool rtn = true;
+	double det = Q[0]*T[1]- Q[1]*T[0];
+	if (det<0)
+	{
+		rtn = false;
+	}
+	return rtn;
+
+}
+/************************************************************************/
+/* P fix point
+/* R cylinder radius
+/* rtn return point with x,y value
+/************************************************************************/
+void medVMEComputeWrapping::computeTangentXYQ(double *P,double R,double *rtn){
+
+	rtn[0] = ( P[0] * R*R + R * P[1] * sqrt( P[0]*P[0] + P[1]*P[1] - R*R ))/( P[0]*P[0] + P[1]*P[1]);
+	rtn[1] = ( P[1] * R*R - R * P[0] * sqrt( P[0]*P[0] + P[1]*P[1] - R*R ))/( P[0]*P[0] + P[1]*P[1]);
+
+}
+void medVMEComputeWrapping::computeTangentXYT(double *S,double R, double *rtn){
+	rtn[0] = ( S[0] * R*R - R * S[1] * sqrt( S[0]*S[0] + S[1]*S[1] - R*R ))/( S[0]*S[0] + S[1]*S[1]);
+	rtn[1] = ( S[1] * R*R + R * S[0] * sqrt( S[0]*S[0] + S[1]*S[1] - R*R ))/( S[0]*S[0] + S[1]*S[1]);
+
+}
+double medVMEComputeWrapping::computeQTLength(double *Q,double *T,double R){
+	double rtn = 0;
+	rtn = R * acos( 1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R) );
+	rtn = fabs(rtn);
+	return rtn;
+}
+/************************************************************************/
+/* point Q and T only has x,y value                                                                     */
+/************************************************************************/
+void medVMEComputeWrapping::computeQz(double *P,double *S,double *Q,double *T,double QTlength){
+
+	double PQxy = 0;
+	double TSxy = 0;
+	PQxy = sqrt( (Q[0]-P[0])*(Q[0]-P[0]) + (Q[1] -P[1])*(Q[1] -P[1]) );
+	TSxy = sqrt( (S[0]-T[0])*(S[0]-T[0]) + (S[1] -T[1])*(S[1] -T[1]) );
+
+	Q[2] = P[2]+ ( (S[2] - P[2])*PQxy / (PQxy + QTlength+ TSxy));
+	
+}
+void medVMEComputeWrapping::computeTz(double *P,double *S,double *Q,double *T,double QTlength){
+
+	double PQxy = 0;
+	double TSxy = 0;
+	PQxy = sqrt( (Q[0]-P[0])*(Q[0]-P[0]) + (Q[1] -P[1])*(Q[1] -P[1]) );
+	TSxy = sqrt( (S[0]-T[0])*(S[0]-T[0]) + (S[1] -T[1])*(S[1] -T[1]) );
+
+	T[2] = S[2]- ( (S[2] - P[2])*TSxy / (PQxy + QTlength+ TSxy));
+}
+
 
 
 //suppose local end z value is smaller than local start value
@@ -1920,6 +2235,97 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 
 	}
 }
+//get a tangent Point from end  
+//we get two point,if mode is 1,use distance,if mode is 2, use same side to choose a point from these two
+//if mode is 2,need p2Global.
+//pointGlobal is return parameter.
+void medVMEComputeWrapping::getOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal){
+
+	
+	double Zl,Zh;//Zi,Zo,
+	double cCoord1_1[3],cCoord1_2[3],cCoordGlobal1[3],cCoordGlobal2[3],pointLocal[3];
+	double d1,d2;
+	
+
+	getCcoordinateForCylinder(endLocal,cCoord1_1,cCoord1_2,vmeIdx);//last parameter shows which vme object
+
+	Zh = startLocal[2];
+	Zl = endLocal[2];
+	if (Zh<Zl)
+	{
+		Zh = endLocal[2];
+		Zl = startLocal[2];
+	}
+
+	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_1,NULL,4);//use distanceSum 4 or angleValue 1
+	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_2,NULL,4);
+
+	//getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,vmeIdx);
+	//getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,vmeIdx);
+	if (mode ==1 && p1Global==NULL)//use distance to choose
+	{
+		d1 =  sqrt(vtkMath::Distance2BetweenPoints(endLocal,cCoord1_1));
+		d2 =  sqrt(vtkMath::Distance2BetweenPoints(endLocal,cCoord1_2));
+		d1 += sqrt(vtkMath::Distance2BetweenPoints(cCoord1_1,startLocal));
+		d2 += sqrt(vtkMath::Distance2BetweenPoints(cCoord1_2,startLocal));//obj 2
+		if (d1<d2)
+		{
+			copyPointValue(cCoord1_1,pointLocal);
+		}else{
+			copyPointValue(cCoord1_2,pointLocal);
+		}
+		getWrapGlobalTransform(pointLocal,pointGlobal,vmeIdx);
+	}else if (mode ==2 && p1Global != NULL)//use plane to choose
+	{
+
+		getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,vmeIdx);
+		getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,vmeIdx);
+		chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,vmeIdx,pointGlobal);
+	}
+
+
+	//getWrapGlobalTransform(point,pointGlobal,vmeIdx);
+}
+//--we want to get p2,because p1 and p2 is on same vme so use local value
+//-get tangent point from start ,and with the same plane of p1
+void medVMEComputeWrapping::getOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global)
+{
+	double Zl,Zh;//Zi,Zo,
+	double cCoord2_1[3],cCoord2_2[3],cCoordGlobal1[3],cCoordGlobal2[3],p1Global[3];
+
+	Zh = startLocal[2];
+	Zl = endLocal[2];
+	if (Zh<Zl)
+	{
+		Zh = endLocal[2];
+		Zl = startLocal[2];
+	}
+
+	getCcoordinateForCylinder(startLocal,cCoord2_1,cCoord2_2,vmeIdx);
+
+	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_1,p1,2);//last parameter use distanceSum 4 or angleValue 1
+	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_2,p1,2);//use plane 2
+
+	getWrapGlobalTransform(p1,p1Global,vmeIdx);
+	getWrapGlobalTransform(cCoord2_1,cCoordGlobal1,vmeIdx);
+	getWrapGlobalTransform(cCoord2_2,cCoordGlobal2,vmeIdx);
+
+	chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,vmeIdx,p2Global);
+}
+/************************************************************************/
+/* to test if need wrap double cylinder.
+/* in general path is end---p1-vme2-p2--p3-vme1-p4-start
+/* if p2-start do not intersect with vme1 for example, path will not touch vme1 at all
+/* these points (start ,end ,p1,p2 are global value)
+/* rtn is length of path, or else  rtn is -1,if path do not intersect with second vme
+/************************************************************************/
+/*double medVMEComputeWrapping::isWrapDoubleCylinder(double *start,double *end,int vmeIdx,double *p1,double *p2){
+
+
+
+}
+*/
+
 //find a tangent line of one cylinder from end point we can get point 1 and 2.
 //then from point 2 as start point to get another tangent line of second cylinder we get point 3 .
 //from point 3 get point 2 and from point 2 get point 3 iteratively.
@@ -1927,22 +2333,24 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 
 
-	double viaLocal[3],startLocal[3],endLocal[3],cCoord1[3],cCoord2[3];//,tmpCoord[3],cCoord4[3],cCoord3[3]
-	double cCoord1_1[3],cCoord1_2[3],cCoord2_1[3],cCoord2_2[3],cCoord4_1[3],cCoord4_2[3];
+	double viaLocal[3],startLocal[3],endLocal[3];//,tmpCoord[3],cCoord4[3],cCoord3[3]
+	double cCoord1_1[3],cCoord1_2[3],cCoord4_1[3],cCoord4_2[3];
 	double Zl,Zh;//Zi,Zo,
 
-	double zValue1,zValue2;
+	double zValue1,zValue2,testValue;
 	double cCoordGlobal1[3],cCoordGlobal2[3];//cCoordGlobal3[3],,cCoordGlobal4[3]
-	double p1[3],p12[3],p13[3],p4[3],p22[3],p23[3],p2Global[3],p1Global[3],p3Global[3],p4Global[3],v1[3],v2[3];
+	double p1[3],p2_1[3],p13[3],p4[3],p22[3],p3_2[3],p2Global[3],p1Global[3],p3Global[3],p4Global[3];
 	double flagP2[3];//testP2[3],testP3[3],
 	//double CIcurve ;//,CIcurve1,CIcurve2
 	double d1,d2,dCurve12,dCurve34;
 	double center1[3],center2[3];
 	bool stopFlag = false;
+	bool exchangeFlag = false;
 	//double planeAB[3];//,planeAC[3]
 	vtkPolyData *hCurve12,*hCurve34;
 	vtkLineSource *Line1,*Line2,*Line3;//,*Line5;,*Line4
 	int idx1,idx2;
+	double lineLength=0.00;
 	//--------------check distance between end point and center of object--------------
 	getGlobalCylinderCenter(center1,1);
 	getGlobalCylinderCenter(center2,2);
@@ -1952,10 +2360,11 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 
 	d1 = getPointLineDistance(m_EndPoint,center1,m_CylinderAxis1);//distance from end point to cylinder axis
 	d2 = getPointLineDistance(m_EndPoint,center2,m_CylinderAxis2);
-	if (d1<d2)
+	if (d1<d2)//end point is near cylinder1
 	{
 		idx1=2;
 		idx2=1;
+		exchangeFlag = true;
 	}
 	//-------------------the shot distance decide obj1 index that is idx1-------------------------------
 	zValue1 = 0.00;
@@ -1969,511 +2378,220 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 
 	//get C coord x,y value
 	//-------------*get p1 from end point vme 2*--------------------------
-	getCcoordinateForCylinder(endLocal,cCoord1_1,cCoord1_2,idx2);//last parameter shows which vme object
 
-	Zh = startLocal[2];
-	Zl = endLocal[2];
-	if (Zh<Zl)
-	{
-		Zh = endLocal[2];
-		Zl = startLocal[2];
-	}
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_1,NULL,4);//use distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_2,NULL,4);
-
-	getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,idx2);
-	getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,idx2);
-
-	d1 =  sqrt(vtkMath::Distance2BetweenPoints(endLocal,cCoord1_1));
-	d2 =  sqrt(vtkMath::Distance2BetweenPoints(endLocal,cCoord1_2));
-	d1 += sqrt(vtkMath::Distance2BetweenPoints(cCoord1_1,startLocal));
-	d2 += sqrt(vtkMath::Distance2BetweenPoints(cCoord1_2,startLocal));//obj 2
-	if (d1<d2)
-	{
-		copyPointValue(cCoord1_1,p1);
-	}else{
-		copyPointValue(cCoord1_2,p1);
-	}
+	getOneSideTangentPointOnCylinder(startLocal,endLocal,idx2,1,NULL,p1Global);//choose by distance,mode 1 .parameter :(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal)
+	getWrapLocalTransform(p1Global,p1,idx2);
 
 	//-------------*get p2 from start point vme2*------------------------
-	getCcoordinateForCylinder(startLocal,cCoord2_1,cCoord2_2,idx2);
+	getOneSideTangentPointOnCylinderWithSamePlane(startLocal,endLocal,p1,idx2,p2Global);//
+	//----------check if line p2-start intersect with vme1
 
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_1,p1,2);//last parameter use distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_2,p1,2);//use plane 2
-	// do not reference cCoord1 or cCoord2
-	//goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord3,NULL,4);//use distanceSum 4,use plane 2 or angleValue 1
-	//goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4,NULL,4);
-	//----------check match cCoord1-cCoord3 or cCoord1-cCoord4
-/*	d1 = sqrt(vtkMath::Distance2BetweenPoints(cCoord2_1,startLocal));
-	d2 = sqrt(vtkMath::Distance2BetweenPoints(cCoord2_2,startLocal));
-	d1 += sqrt(vtkMath::Distance2BetweenPoints(cCoord2_1,p1));
-	d2 += sqrt(vtkMath::Distance2BetweenPoints(cCoord2_2,p1));
-	if (d1<d2)
-	{
-		copyPointValue(cCoord2_1,p22);
-	}else{
-		copyPointValue(cCoord2_2,p22);
-	}
-	getWrapGlobalTransform(p1,p1Global,idx2);
-	getWrapGlobalTransform(p22,p2Global,idx2);
-*/
-	getWrapGlobalTransform(p1,p1Global,idx2);
-	getWrapGlobalTransform(cCoord2_1,cCoordGlobal1,idx2);
-	getWrapGlobalTransform(cCoord2_2,cCoordGlobal2,idx2);
-
-	chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,idx2,p2Global);
-	/*getWrapGlobalTransform(cCoord1,cCoordGlobal1,2);
-	getWrapGlobalTransform(cCoord3,cCoordGlobal3,2);
-	getWrapGlobalTransform(cCoord2,cCoordGlobal2,2);
-	getWrapGlobalTransform(cCoord4,cCoordGlobal4,2);*/
-	//-------------*get p4 from start point to vme 1*--------------------------
-	getWrapLocalTransform(m_EndPoint,endLocal,idx1);//last parameter means object index
-	getWrapLocalTransform(m_StartPoint,startLocal,idx1);//last parameter means object index
-	
-	
-	getCcoordinateForCylinder(startLocal,cCoord4_1,cCoord4_2,idx1);//last parameter shows which vme object
-	Zl = endLocal[2];
-	Zh = startLocal[2];
-	if (Zl>Zh)
-	{
-		Zl = startLocal[2];
-		Zh = endLocal[2];
-	}
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4_1,NULL,4);//use distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4_2,NULL,4);
-	//-------------test code--------------------
-	double firstP4_1[3],firstP4_2[3];
-	copyPointValue(cCoord4_1,firstP4_1);
-	copyPointValue(cCoord4_2,firstP4_2);
-
-	
-	//----------------------check choose which tangent point----------------------
-	getWrapGlobalTransform(cCoord4_1,cCoordGlobal1,idx1);
-	getWrapGlobalTransform(cCoord4_2,cCoordGlobal2,idx1);
-	
-	chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,idx1,p4Global);
-	
-	//-----------------test code---------------------
-	/*double cylinderCenter[3],filterPlaneNormal[3];
-	getGlobalCylinderCenter(cylinderCenter,idx1);
-	vtkLineSource *tmpLine1,*tmpLine2,*tmpLine3,*tmpLine4_1,*tmpLine4_2,*tmpLine4_3;
-	vtkNEW(tmpLine1);
-	vtkNEW(tmpLine2);
-	vtkNEW(tmpLine3);
-	vtkNEW(tmpLine4_1);
-	vtkNEW(tmpLine4_2);
-	vtkNEW(tmpLine4_3);
-
-	double tmpEnd[3],tmpCenter[3],tmpAxis1[3],tmpAxis2[3],tmpP4_1[3],tmpP4_2[3],tmpP4[3],tmpStart[3];
-
-	copyPointValue(m_EndPoint,tmpEnd);
-	copyPointValue(cylinderCenter,tmpCenter);
-	copyPointValue(m_CylinderAxis1,tmpAxis1);
-	copyPointValue(m_CylinderAxis2,tmpAxis2);
-	copyPointValue(cCoordGlobal1,tmpP4_1);
-	copyPointValue(cCoordGlobal2,tmpP4_2);
-	copyPointValue(p4Global,tmpP4);
-	copyPointValue(m_StartPoint,tmpStart);
-
-	transformOutputPoint(tmpEnd);
-	transformOutputPoint(tmpCenter);
-	transformOutputPoint(tmpAxis1);
-	transformOutputPoint(tmpAxis2);
-	transformOutputPoint(tmpP4_1);
-	transformOutputPoint(tmpP4_2);
-	transformOutputPoint(tmpP4);
-	transformOutputPoint(tmpStart);
-
-
-	tmpLine1->SetPoint1(tmpEnd);
-	tmpLine1->SetPoint2(tmpCenter);
-	tmpLine2->SetPoint1(tmpEnd);
-	tmpLine2->SetPoint2(tmpAxis1);
-	tmpLine3->SetPoint1(tmpEnd);
-	tmpLine3->SetPoint2(tmpAxis2);
-	tmpLine4_1->SetPoint1(tmpStart);
-	tmpLine4_1->SetPoint2(tmpP4_1);
-
-	tmpLine4_2->SetPoint1(tmpStart);
-	tmpLine4_2->SetPoint2(tmpP4_2);
-
-	tmpLine4_3->SetPoint1(tmpStart);
-	tmpLine4_3->SetPoint2(tmpP4);
-
-
-	m_Goniometer->AddInput(tmpLine1->GetOutput());//p4--start
-	m_Goniometer->AddInput(tmpLine2->GetOutput());
-	m_Goniometer->AddInput(tmpLine3->GetOutput());
-	m_Goniometer->AddInput(tmpLine4_1->GetOutput());
-	m_Goniometer->AddInput(tmpLine4_2->GetOutput());
-	m_Goniometer->AddInput(tmpLine4_3->GetOutput());
-*/
-	//-----------------test over----------------------
-
-	/*getWrapGlobalTransform(cCoord1,cCoordGlobal1,idx1);
-	
-	v1[0]=m_EndPoint[0]-p1Global[0];v1[1] = m_EndPoint[1]-p1Global[1];v1[2]=m_EndPoint[2]-p1Global[2];
-	v2[0]=m_StartPoint[0]-cCoordGlobal1[0];  v2[1] = m_StartPoint[1]-cCoordGlobal1[1];  v2[2]=m_StartPoint[2]-cCoordGlobal1[2];	
-
-	// a dot b =|a|*|b|cosA
-	vtkMath::Normalize(v1);
-	vtkMath::Normalize(v2);
-	d1 = vtkMath::Dot(v1,v2) ;
-	getWrapGlobalTransform(cCoord2,cCoordGlobal2,idx1);
-	v2[0]=m_StartPoint[0]-cCoordGlobal2[0];  v2[1] = m_StartPoint[1]-cCoordGlobal2[1];  v2[2]=m_StartPoint[2]-cCoordGlobal2[2];	
-	vtkMath::Normalize(v2);
-	d2 = vtkMath::Dot(v1,v2) ;
-
-	if (d1<d2)//get small angle value that means big d value
-	{
-		copyPointValue(cCoordGlobal2,p4Global);
-	}else{
-		copyPointValue(cCoordGlobal1,p4Global);
-	}*/
-	/*getWrapGlobalTransform(cCoord1,cCoordGlobal1,idx1);
-	getWrapGlobalTransform(cCoord2,cCoordGlobal2,idx1);
-	d1 = vtkMath::Distance2BetweenPoints(cCoordGlobal1,p1Global);
-	d2 = vtkMath::Distance2BetweenPoints(cCoordGlobal2,p1Global);
-	if (d1<d2)
-	{
-		copyPointValue(cCoordGlobal1,p4Global);
-	}else{
-		copyPointValue(cCoordGlobal2,p4Global);
-	}*/
-	
-	
 	vtkNEW(Line1);
 	vtkNEW(Line2);
-	vtkNEW(Line3);
-	
-	
-	//relative to vme1 
-	while ( !stopFlag )//if two points is very near
-	{	
-		vtkLineSource *tmpLine;
-		vtkNEW(tmpLine);
-		getWrapLocalTransform(p2Global,p12,idx1);// relative to vme 1
-		getWrapLocalTransform(p1Global,p1,idx1);
-		getWrapLocalTransform(m_StartPoint,startLocal,idx1);
-		getWrapLocalTransform(m_EndPoint,endLocal,idx1);
-		getWrapLocalTransform(p4Global,p4,idx1);
 
+	bool intersectFlag = false;
+	if (exchangeFlag)
+	{
+		intersectFlag = isLineInterSectObject(GetWrappedVME2(),p2Global,m_StartPoint);
+	}else{
+		intersectFlag = isLineInterSectObject(GetWrappedVME1(),p2Global,m_StartPoint);
+	}
+	
+	if (intersectFlag)//if line p2-start intersect vme1 go on
+	{
+		//-------------*get p4 from start point to vme 1*--------------------------
 		
-		copyPointValue(p2Global,flagP2);
+		getWrapLocalTransform(m_EndPoint,endLocal,idx1);//last parameter means object index
+		getWrapLocalTransform(m_StartPoint,startLocal,idx1);//last parameter means object index
+		getOneSideTangentPointOnCylinder(endLocal,startLocal,idx1,2,p1Global,p4Global);//choose by same side ,parameter :(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal)
 		
+		vtkNEW(Line3);
+		
+		//relative to vme1 
+		while ( !stopFlag )//if two points is very near
+		{	
+			vtkLineSource *tmpLine;
+			vtkNEW(tmpLine);
 
-		//-------*get p3 from p2*------------------- 
-		Zh = startLocal[2];
-		Zl = p12[2];
-		if (startLocal[2]<p12[2])
-		{
-			Zh = p12[2];
-			Zl = startLocal[2];
+
+			copyPointValue(p2Global,flagP2);
+
+			//-------*get p3 from p2*------------------- 
+
+			getWrapLocalTransform(p2Global,p2_1,idx1);// relative to vme 1
+			getWrapLocalTransform(p1Global,p1,idx1);
+			getWrapLocalTransform(m_StartPoint,startLocal,idx1);
+			getWrapLocalTransform(m_EndPoint,endLocal,idx1);
+			getWrapLocalTransform(p4Global,p4,idx1);
+			getOneSideTangentPointOnCylinderWithSamePlane(p2_1,startLocal,p1,idx1,p3Global);
+			
+			//-----------*get p2 from p3  relative vme 2*-------------------
+			getWrapLocalTransform(p3Global,p3_2,idx2);//
+			getWrapLocalTransform(p1Global,p1,idx2);//p1 relative vme2
+			getWrapLocalTransform(m_EndPoint,endLocal,idx2);
+			getWrapLocalTransform(m_StartPoint,startLocal,idx2);
+			getWrapLocalTransform(p4Global,p4,idx2);
+			getOneSideTangentPointOnCylinderWithSamePlane(p3_2,endLocal,p4,idx2,p2Global);
+			
+			stopFlag = checkNearEnough(flagP2,p2Global);//@to do check two points
+			
 		}
-		//from p2 get tangent point on second cylinder p2
-		getCcoordinateForCylinder(p12,cCoord1,cCoord2,idx1);//vme 1
-		goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1,p1,2);//use distanceSum 4 or angleValue 1
-		goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2,p1,2);//use plane 2
-		//goldenSectionSearch(Zl,Zh,0.001,p12,p4,cCoord1,NULL,1);//A-b-c  Ac+cb
-		//goldenSectionSearch(Zl,Zh,0.001,p12,p4,cCoord2,NULL,1);
-		//----choose one point from cCoord1 and cCoord2 ,check angle between end-p1 and p2-p3, use the big one---------
-		getWrapGlobalTransform(cCoord1,cCoordGlobal1,idx1);
-		getWrapGlobalTransform(cCoord2,cCoordGlobal2,idx1);
 
-		//choose by same side
-		chooseSameSidePoint(m_StartPoint,p4Global,cCoordGlobal1,cCoordGlobal2,idx1,p3Global);
-		/*choose by angle
-		v1[0]=m_EndPoint[0]-p1Global[0];v1[1] = m_EndPoint[1]-p1Global[1];v1[2]=m_EndPoint[2]-p1Global[2];//end-p1
-		v2[0]=cCoordGlobal1[0]-p2Global[0];  v2[1] = cCoordGlobal1[1]-p2Global[1];  v2[2]=cCoordGlobal1[2]-p2Global[2];	//p3-p2
-		// a dot b =|a|*|b|cosA
-		vtkMath::Normalize(v1);
-		vtkMath::Normalize(v2);
-		d1 = vtkMath::Dot(v1,v2) ;
-		v2[0]=cCoordGlobal2[0]-p2Global[0];  v2[1] = cCoordGlobal2[1]-p2Global[1];  v2[2]=cCoordGlobal2[2]-p2Global[2];	//p3-p2
-		vtkMath::Normalize(v2);
-		d2 = vtkMath::Dot(v1,v2) ;
-		if (d1<d2)//cCoord1 angle is bigger ,we want bigger angle
-		{
-			copyPointValue(cCoordGlobal1,p3Global);
-		}else{
-			copyPointValue(cCoordGlobal2,p3Global);
-		}*/
-		//-----------------test code------p2-p3------------------------------------
-		/*copyPointValue(p3Global,testP3);
-		copyPointValue(p2Global,testP2);
-		transformOutputPoint(cCoordGlobal1);
-		transformOutputPoint(cCoordGlobal2);
-		transformOutputPoint(testP2);
-		vtkLineSource *testLine1,*testLine2;
-		vtkNEW(testLine1);
-		vtkNEW(testLine2);
-		testLine1->SetPoint1(testP2[0],testP2[1],testP2[2]);
-		testLine1->SetPoint2(cCoordGlobal1[0],cCoordGlobal1[1],cCoordGlobal1[2]);
-		testLine2->SetPoint1(testP2[0],testP2[1],testP2[2]);
-		testLine2->SetPoint2(cCoordGlobal2[0],cCoordGlobal2[1],cCoordGlobal2[2]);
-
-		m_Goniometer->AddInput(testLine1->GetOutput());//p2-p3
-		m_Goniometer->AddInput(testLine2->GetOutput());*/
-
-		//-----------*get p2 from p3  relative vme 2*-------------------
-		
-		getWrapLocalTransform(p3Global,p23,idx2);//
-		getWrapLocalTransform(p1Global,p1,idx2);//p1 relative vme2
+		//-----------------get P1 from end point idx2-------------
 		getWrapLocalTransform(m_EndPoint,endLocal,idx2);
+		getWrapLocalTransform(p2Global,p22,idx2);
 		getWrapLocalTransform(m_StartPoint,startLocal,idx2);
-		getWrapLocalTransform(p4Global,p4,idx2);
-
-		Zh = p23[2];
+		getWrapLocalTransform(p3Global,p3_2,idx2);
+		
+		Zh = startLocal[2];
 		Zl = endLocal[2];
 		if (Zh<Zl)
 		{
 			Zh = endLocal[2];
-			Zl = p23[2];
+			Zl = startLocal[2];
 		}
+		testValue = getPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_1);
+		testValue = getPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_2);
 
-		getCcoordinateForCylinder(p23,cCoord1,cCoord2,idx2);//vme 2
-		goldenSectionSearch(Zl,Zh,0.001,startLocal,endLocal,cCoord1,p4,2);//last parameter means using plane 2
-		goldenSectionSearch(Zl,Zh,0.001,startLocal,endLocal,cCoord2,p4,2);//use plane 2
-		getWrapGlobalTransform(cCoord1,cCoordGlobal1,idx2);
-		getWrapGlobalTransform(cCoord2,cCoordGlobal2,idx2);
-		//----choose one point from cCoord1 and cCoord2 ,check angle between start-p4 and p2-p3, use the big one---------
-		v1[0]=m_StartPoint[0]-p4Global[0];v1[1] = m_StartPoint[1]-p4Global[1];v1[2]=m_StartPoint[2]-p4Global[2];
-		v2[0]=cCoordGlobal1[0]-p3Global[0];  v2[1] = cCoordGlobal1[1]-p3Global[1];  v2[2]=cCoordGlobal1[2]-p3Global[2];	
-		vtkMath::Normalize(v1);
-		vtkMath::Normalize(v2);
-		d1 = vtkMath::Dot(v1,v2);
-		v2[0]=cCoordGlobal2[0]-p3Global[0];  v2[1] = cCoordGlobal2[1]-p3Global[1];  v2[2]=cCoordGlobal2[2]-p3Global[2];	
-		vtkMath::Normalize(v2);
-		d2 = vtkMath::Dot(v1,v2);
-		if (d1<d2)//cCoord1 angle is bigger,we want bigger angle
-		{
-			copyPointValue(cCoordGlobal1,p2Global);
-		}else{
-			copyPointValue(cCoordGlobal2,p2Global);
-		}
+		getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,idx2);
+		getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,idx2);
+
+		//---------------choose one point witch at same side as p1--------------------------
+		chooseSameSidePoint(m_EndPoint,p2Global,cCoordGlobal1,cCoordGlobal2,idx2,p1Global);
+		//-----------------get P4 from start point idx------------
 		
-		//----------test code-----------------
+		getWrapLocalTransform(m_EndPoint,endLocal,idx1);
+		getWrapLocalTransform(p3Global,p13,idx1);
+		getWrapLocalTransform(p2Global,p2_1,idx1);
+		getWrapLocalTransform(m_StartPoint,startLocal,idx1);
+
+
+		testValue = getPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_1);
+		testValue = getPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_2);
+
+		getWrapGlobalTransform(cCoord4_1,cCoordGlobal1,idx1);
+		getWrapGlobalTransform(cCoord4_2,cCoordGlobal2,idx1);
+
+		chooseSameSidePoint(m_StartPoint,p3Global,cCoordGlobal1,cCoordGlobal2,idx1,p4Global);	
+		//--------------------------------------------------------
+		getWrapLocalTransform(p1Global,p1,idx2);
+		getWrapLocalTransform(p2Global,p22,idx2);
+		getWrapLocalTransform(p3Global,p13,idx1);
+		getWrapLocalTransform(p4Global,p4,idx1);
+		vtkNEW(hCurve12);
+		dCurve12 = caculateHelix2(hCurve12,p1,p22,true,idx2);
+		//finally, connect with start point
+		vtkNEW(hCurve34);
+		dCurve34 = caculateHelix2(hCurve34,p13,p4,true,idx1);//do transform inside
+	   //----------------------draw line---------------
+		transformOutputPoint(m_EndPoint);
+		transformOutputPoint(p1Global);
+		transformOutputPoint(p2Global);
+		transformOutputPoint(p3Global);
+		transformOutputPoint(p4Global);
+		transformOutputPoint(m_StartPoint);
+		transformOutput(hCurve12);
+		transformOutput(hCurve34);
+
+		m_ExportPointList.push_back(new double[3]);
+		copyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
+
+		m_ExportPointList.push_back(new double[3]);
+		copyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
+
+		m_ExportPointList.push_back(new double[3]);
+		copyPointValue(p3Global,m_ExportPointList[m_ExportPointList.size()-1]);
 		
-		/*copyPointValue(p2Global,testP2);
-		transformOutputPoint(cCoordGlobal1);
-		transformOutputPoint(cCoordGlobal2);
-		transformOutputPoint(testP3);
+		m_ExportPointList.push_back(new double[3]);
+		copyPointValue(p4Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
-		vtkLineSource *testLine3,*testLine4;
-		vtkNEW(testLine3);
-		vtkNEW(testLine4);
-		testLine3->SetPoint1(cCoordGlobal1[0],cCoordGlobal1[1],cCoordGlobal1[2]);
-		testLine3->SetPoint2(testP3[0],testP3[1],testP3[2]);
-		testLine4->SetPoint1(cCoordGlobal2[0],cCoordGlobal2[1],cCoordGlobal2[2]);
-		testLine4->SetPoint2(testP3[0],testP3[1],testP3[2]);
-		m_Goniometer->AddInput(testLine3->GetOutput());//p2-p3
-		m_Goniometer->AddInput(testLine4->GetOutput());*/
-		//----------test over-----------------
-		
-		stopFlag = checkNearEnough(flagP2,p2Global);//@to do check two points
-		
-	}
+		lineLength += sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,p1Global));  //end--p1
+		lineLength += sqrt(vtkMath::Distance2BetweenPoints(p2Global,p3Global));    //p2--p3
+		lineLength += sqrt(vtkMath::Distance2BetweenPoints(p4Global,m_StartPoint));//p4--start
+		lineLength += dCurve12;
+		lineLength += dCurve34;
+		m_Distance = lineLength;
 
-	//-----------------get P1 from end point idx2-------------
-	getWrapLocalTransform(m_EndPoint,endLocal,idx2);
-	getWrapLocalTransform(p2Global,p22,idx2);
-	getWrapLocalTransform(m_StartPoint,startLocal,idx2);
-	Zh = startLocal[2];
-	Zl = endLocal[2];
-	if (Zh<Zl)
-	{
-		Zh = endLocal[2];
-		Zl = startLocal[2];
-	}
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_1,p22,2);//use plane value 2,distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_2,p22,2);//
-	getWrapGlobalTransform(cCoord1_1,cCoordGlobal1);
-	getWrapGlobalTransform(cCoord1_2,cCoordGlobal2);
-	d1 = vtkMath::Distance2BetweenPoints(cCoordGlobal1,p2Global);
-	d2 = vtkMath::Distance2BetweenPoints(cCoordGlobal2,p2Global);
-	if (d1<d2)
-	{
-		copyPointValue(cCoordGlobal1,p1Global);
-	}else{
-		copyPointValue(cCoordGlobal2,p1Global);
-	}
-	
-	//-----------------get P4 from start point idx------------
-	
-	getWrapLocalTransform(m_EndPoint,endLocal,idx1);
-	getWrapLocalTransform(p3Global,p13,idx1);
-	getWrapLocalTransform(m_StartPoint,startLocal,idx1);
-
-	Zh = startLocal[2];
-	Zl = endLocal[2];
-	if (Zh<Zl)
-	{
-		Zh = endLocal[2];
-		Zl = startLocal[2];
-	}
-	//goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4_1,p13,2);//use plane value 2,distanceSum 4 or angleValue 1
-	//goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4_2,p13,2);//
-	
-	goldenSectionSearch(Zl,Zh,0.001,p13,startLocal,cCoord4_1,NULL,4);//use distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,p13,startLocal,cCoord4_2,NULL,4);
-
-	getWrapGlobalTransform(cCoord4_1,cCoordGlobal1,idx1);
-	getWrapGlobalTransform(cCoord4_2,cCoordGlobal2,idx1);
-	
-	chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,idx1,p4Global);
-	/*d1 = vtkMath::Distance2BetweenPoints(cCoordGlobal1,p3Global);
-	d2 = vtkMath::Distance2BetweenPoints(cCoordGlobal2,p3Global);
-	if (d1<d2)
-	{
-		copyPointValue(cCoordGlobal1,p4Global);
-	}else{
-		copyPointValue(cCoordGlobal2,p4Global);
-	}*/
-
-	//-------------test code -----------
-	/*double testX,testValue;
-	testX = Zl;
-	while(testX<Zh){
-		cCoord4_2[2] = testX;
-		testValue = getPlaneValue(endLocal,startLocal,cCoord4_2,p13);
-		testX += 1;
-	}*/
-	
-	//--------------------------------------------------------
-	getWrapLocalTransform(p1Global,p1,idx2);
-	getWrapLocalTransform(p2Global,p22,idx2);
-	getWrapLocalTransform(p3Global,p13,idx1);
-	getWrapLocalTransform(p4Global,p4,idx1);
-	vtkNEW(hCurve12);
-	dCurve12 = caculateHelix2(hCurve12,p1,p22,true,idx2);
-	//finally, connect with start point
-	vtkNEW(hCurve34);
-	dCurve34 = caculateHelix2(hCurve34,p13,p4,true,idx1);//do transform inside
-   //----------------------draw line---------------
-	transformOutputPoint(m_EndPoint);
-	transformOutputPoint(p1Global);
-	transformOutputPoint(p2Global);
-	transformOutputPoint(p3Global);
-	transformOutputPoint(p4Global);
-	transformOutputPoint(m_StartPoint);
-	transformOutput(hCurve12);
-	transformOutput(hCurve34);
-
-	m_ExportPointList.push_back(new double[3]);
-	copyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
-
-	m_ExportPointList.push_back(new double[3]);
-	copyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
-
-	m_ExportPointList.push_back(new double[3]);
-	copyPointValue(p3Global,m_ExportPointList[m_ExportPointList.size()-1]);
-	
-	m_ExportPointList.push_back(new double[3]);
-	copyPointValue(p4Global,m_ExportPointList[m_ExportPointList.size()-1]);
-
-	Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
-	Line1->SetPoint2(p1Global[0],p1Global[1],p1Global[2]);
-	Line2->SetPoint1(p2Global[0],p2Global[1],p2Global[2]);
-	Line2->SetPoint2(p3Global[0],p3Global[1],p3Global[2]);
-	Line3->SetPoint1(p4Global[0],p4Global[1],p4Global[2]);
-	Line3->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
-	m_Goniometer->AddInput(Line1->GetOutput());//end--p1
-	m_Goniometer->AddInput(Line2->GetOutput());//p2--p3
-	m_Goniometer->AddInput(Line3->GetOutput());//p4--start
-	m_Goniometer->AddInput(hCurve12);
-	m_Goniometer->AddInput(hCurve34);
-	//-------------test code--------------
-/*	vtkLineSource *testLine43_1,*testLine43_2;
-	vtkLineSource *testPlaneLine1,*testPlaneLine2,*testplaneLine3;
-	vtkNEW(testLine43_1);
-	vtkNEW(testLine43_2);
-	vtkNEW(testPlaneLine1);
-	vtkNEW(testPlaneLine2);
-	vtkNEW(testplaneLine3);
-	transformOutputPoint(cCoordGlobal1);//p4_1
-	transformOutputPoint(cCoordGlobal2);//p4_2
-	testLine43_1->SetPoint1(cCoordGlobal1);
-	testLine43_1->SetPoint2(m_StartPoint);
-	testLine43_2->SetPoint1(cCoordGlobal2);
-	testLine43_2->SetPoint2(m_StartPoint);
-
-	testPlaneLine1->SetPoint1(m_StartPoint);
-	testPlaneLine1->SetPoint2(p3Global);//p3
-
-	testPlaneLine2->SetPoint1(m_StartPoint);
-	testPlaneLine2->SetPoint2(m_EndPoint);
-
-	testplaneLine3->SetPoint1(m_EndPoint);
-	testplaneLine3->SetPoint2(p3Global);
-
-
-	m_Goniometer->AddInput(testLine43_1->GetOutput());
-	m_Goniometer->AddInput(testLine43_2->GetOutput());
-
-	m_Goniometer->AddInput(testPlaneLine1->GetOutput());
-	m_Goniometer->AddInput(testPlaneLine2->GetOutput());
-	m_Goniometer->AddInput(testplaneLine3->GetOutput());
-
-*/
-	//-------------test code-----
-	/*vtkNEW(Line5);
-	Line5->SetPoint1(p3Global[0],p3Global[1],p3Global[2]);
-	Line5->SetPoint2(p4Global[0],p4Global[1],p4Global[2]);
-	m_Goniometer->AddInput(Line5->GetOutput());
-
-	vtkNEW(Line4);
-	Line4->SetPoint1(p2Global[0],p2Global[1],p2Global[2]);
-	Line4->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
-	m_Goniometer->AddInput(Line4->GetOutput());
-	*/
-	//--------------------------
-
-	/*if (d1<d2)
-	{
-
-		transformOutputPoint( m_EndPoint);
-		transformOutputPoint(cCoordGlobal1);
 		Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
-		Line1->SetPoint2(cCoordGlobal1[0],cCoordGlobal1[1],cCoordGlobal1[2]);
+		Line1->SetPoint2(p1Global[0],p1Global[1],p1Global[2]);
+		Line2->SetPoint1(p2Global[0],p2Global[1],p2Global[2]);
+		Line2->SetPoint2(p3Global[0],p3Global[1],p3Global[2]);
+		Line3->SetPoint1(p4Global[0],p4Global[1],p4Global[2]);
+		Line3->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
+		m_Goniometer->AddInput(Line1->GetOutput());//end--p1
+		m_Goniometer->AddInput(Line2->GetOutput());//p2--p3
+		m_Goniometer->AddInput(Line3->GetOutput());//p4--start
+		m_Goniometer->AddInput(hCurve12);
+		m_Goniometer->AddInput(hCurve34);
+	}else{//only connect end-p1-p2-start
+		transformOutputPoint(m_EndPoint);
+		transformOutputPoint(p1Global);
+		transformOutputPoint(p2Global);
+		transformOutputPoint(m_StartPoint);
+		getWrapLocalTransform(p1Global,p1,idx2);
+		getWrapLocalTransform(p2Global,p22,idx2);
+		
+		vtkNEW(hCurve12);
+		dCurve12 = caculateHelix2(hCurve12,p1,p22,true,idx2);
 
-		transformOutputPoint( m_StartPoint);
-		transformOutputPoint(cCoordGlobal3);
-		Line2->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
-		Line2->SetPoint2(cCoordGlobal3[0],cCoordGlobal3[1],cCoordGlobal3[2]);
+		m_ExportPointList.push_back(new double[3]);
+		copyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
-		CIcurve1 = caculateHelix2(hCurve,cCoord1,cCoord3,true);
-		m_Distance = d1;
-	}else{
+		m_ExportPointList.push_back(new double[3]);
+		copyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
-		transformOutputPoint( m_EndPoint);
-		transformOutputPoint(cCoordGlobal2);
+		lineLength += sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,p1Global));  //end--p1
+		lineLength += dCurve12;
+		lineLength += sqrt(vtkMath::Distance2BetweenPoints(p2Global,m_StartPoint));    //p2--p3
+		m_Distance = lineLength;
+
 		Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
-		Line1->SetPoint2(cCoordGlobal2[0],cCoordGlobal2[1],cCoordGlobal2[2]);
+		Line1->SetPoint2(p1Global[0],p1Global[1],p1Global[2]);
+		Line2->SetPoint1(p2Global[0],p2Global[1],p2Global[2]);
+		Line2->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 
-		transformOutputPoint( m_StartPoint);
-		transformOutputPoint(cCoordGlobal4);
-		Line2->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
-		Line2->SetPoint2(cCoordGlobal4[0],cCoordGlobal4[1],cCoordGlobal4[2]);
+		m_Goniometer->AddInput(Line1->GetOutput());//end--p1
+		m_Goniometer->AddInput(Line2->GetOutput());//p2--p3
+		m_Goniometer->AddInput(hCurve12);
 
-		CIcurve1 = caculateHelix2(hCurve,cCoord2,cCoord4,true);
-		m_Distance = d2;
-	}*/
+	}
 
+	
 
-	/*transformOutput(hCurve);
-
-	m_Goniometer->AddInput(Line1->GetOutput());
-	m_Goniometer->AddInput(Line2->GetOutput());
-	m_Goniometer->AddInput(hCurve);
-
-	vtkDEL(Line1);
-	vtkDEL(Line2);
-	vtkDEL(hCurve);
-	*/
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 
 
+}
+/************************************************************************/
+// output point is input parameter as well,it with x and y value.
+// this method will get z value,which is the nearest point with plane
+/************************************************************************/
+double medVMEComputeWrapping::getPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output){
+	int step = 100;
+	double factor = (zH -zL)/100;
+	double rtn,tmpValue,zValue;
+	int idx = 0;
+	
+	while (zL<zH)
+	{
+		output[2] = zL;
+		tmpValue = getPlaneValue(point1,point2,point3,output);
+		if (idx ==0)
+		{
+			rtn = tmpValue;
+			zValue = zL;
+		}
+		else if (fabs(tmpValue) < fabs(rtn))
+		{
+			rtn = tmpValue;
+			zValue = zL;
+		}
+		zL = zL + factor;
+		idx ++;
+	}
+	output[2] = zValue;
+	return rtn;
 }
 //distance between point and line
 //use area formula
@@ -5169,9 +5287,9 @@ void medVMEComputeWrapping::eventWraped(mafEvent *e){
 
 		m_Gui->Update();
 		InternalUpdate();
-		/*mafID button_id = e->GetId();
+		/*mafID button_id = e->GetId();*/
 		e->SetId(CAMERA_UPDATE);
-		ForwardUpEvent(e);*/
+		ForwardUpEvent(e);
 	}
 
 }
