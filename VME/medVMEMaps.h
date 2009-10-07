@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-09-25 13:44:19 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-10-07 10:39:05 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -97,9 +97,6 @@ public:
   /** Get the source volume. */
   mafVMEVolume *GetVolume();
 
-  /** Get input vtkPolyData. */
-  vtkPolyData *GetPolyData();
-
   /** 
   Set data for the give timestamp. 
   Return MAF_OK if succeeded, MAF_ERROR if they kind of data is not accepted by
@@ -125,7 +122,7 @@ public:
   void SetSecondThreshold(int secondThreshold);
   
   /** Get max distance distance-density filter parameter. */
-  int GetMaxDistance(){return m_SecondThreshold;};
+  int GetMaxDistance(){return m_MaxDistance;};
 
   /** Set max distance distance-density filter parameter. */
   void SetMaxDistance(int maxDistance);
@@ -141,6 +138,8 @@ public:
 
   /** Get the link to the source vme.*/
   mafNode *GetSourceVMELink();
+
+  void GetScalarRange(double range[2]);
 
 private:
 
