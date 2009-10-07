@@ -130,7 +130,8 @@ SET(PROJECT_SRCS
   
   medOpMakeVMETimevarying.cpp
   medOpMakeVMETimevarying.h
-  
+  medOpSegmentationRegionGrowingConnectedThreshold.cpp
+  medOpSegmentationRegionGrowingConnectedThreshold.h
   #### VolumeLarge - TO BE COMMITTED DOWN    ####
   mafOpImporterBBF.cpp
   mafOpImporterBBF.h
