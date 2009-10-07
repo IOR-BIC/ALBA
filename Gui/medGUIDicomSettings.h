@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-07-06 06:55:53 $
-Version:   $Revision: 1.5.2.5 $
+Date:      $Date: 2009-10-07 14:11:37 $
+Version:   $Revision: 1.5.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -67,7 +67,9 @@ public:
 		ID_MRI_MODALITY,
 		ID_XA_MODALITY,
     ID_OT_MODALITY,
+    ID_CR_MODALITY,
 		ID_CMRI_MODALITY,
+    
 	};
 
   /** Step IDs*/
@@ -125,7 +127,7 @@ protected:
 	mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
 
-	int m_CheckOnOff[5];
+	int m_CheckOnOff[6];
 
 	int m_AutoCropPos;
 	int m_EnableNumberOfTime;

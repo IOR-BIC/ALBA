@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-06 06:55:53 $
-Version:   $Revision: 1.7.2.5 $
+Date:      $Date: 2009-10-07 14:11:37 $
+Version:   $Revision: 1.7.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -32,7 +32,7 @@ mafGUISettings(Listener, label)
 {
 	m_Dictionary = "";
 
-	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = true;
+	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = true;
 
 	m_AutoCropPos = FALSE;
 	m_EnableNumberOfSlice = true;
@@ -71,6 +71,7 @@ void medGUIDicomSettings::CreateGui()
 	m_DicomModalityListBox->AddItem(ID_MRI_MODALITY,_("MRI"),m_CheckOnOff[2] != 0);
 	m_DicomModalityListBox->AddItem(ID_XA_MODALITY,_("XA"),m_CheckOnOff[3] != 0);
   m_DicomModalityListBox->AddItem(ID_OT_MODALITY,_("OT"),m_CheckOnOff[4] != 0);
+  m_DicomModalityListBox->AddItem(ID_CR_MODALITY,_("CR"),m_CheckOnOff[5] != 0);
 	m_Gui->Divider(1);
 
 	m_Gui->Update();
@@ -98,6 +99,7 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 			m_Config->Write("EnableReadSC",m_DicomModalityListBox->IsItemChecked(ID_SC_MODALITY));
 			m_Config->Write("EnableReadMI",m_DicomModalityListBox->IsItemChecked(ID_MRI_MODALITY));
 			m_Config->Write("EnableReadXA",m_DicomModalityListBox->IsItemChecked(ID_XA_MODALITY));
+      m_Config->Write("EnableReadCR",m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY));
 		}
 		break;
 	case ID_AUTO_POS_CROP:
@@ -254,6 +256,15 @@ void medGUIDicomSettings::InitializeSettings()
     m_Config->Write("EnableReadOT",m_CheckOnOff[4]);
   }
 
+  if(m_Config->Read("EnableReadCR", &long_item))
+  {
+    m_CheckOnOff[5]=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableReadCR",m_CheckOnOff[5]);
+  }
+
 	if(m_Config->Read("AutoCropPos", &long_item))
 	{
 		m_AutoCropPos=long_item;
@@ -305,6 +316,10 @@ bool medGUIDicomSettings::EnableToRead(char* type)
 		return true;
 	}
   if (strcmp( type, "OT" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_OT_MODALITY)))
+  {	
+    return true;
+  }
+  if (strcmp( type, "CR" ) == 0 && (m_DicomModalityListBox->IsItemChecked(ID_CR_MODALITY)))
   {	
     return true;
   }
