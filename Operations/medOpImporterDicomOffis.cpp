@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-06 07:59:17 $
-Version:   $Revision: 1.1.2.54 $
+Date:      $Date: 2009-10-07 13:09:35 $
+Version:   $Revision: 1.1.2.55 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -836,7 +836,6 @@ int medOpImporterDicomOffis::BuildVolume()
   accumulate->SetNumberOfSlices(n_slices);
   accumulate->BuildVolumeOnAxes(m_SortAxes);
 
-  double origin[3];
   long progress = 0;
   int count,s_count;
   for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
@@ -1245,8 +1244,7 @@ int medOpImporterDicomOffis::BuildMesh()
 
   int counter= 0;
   int total = dim[0]*dim[1];
-  int sourceVolumeSliceId = 0;//achiarini compilation issue
-  for ( int targetVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+  for ( int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
   { 
     if(!this->m_TestMode)
     {
@@ -1367,8 +1365,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
     int counter= 0;
     int total = dim[0]*dim[1];
-    int sourceVolumeSliceId = 0;//achiarini: compilation issue
-    for (int targetVolumeSliceId = m_ZCropBounds[0], sourceVolumeSliceId = 0; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+    for (int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     { 
       if(!this->m_TestMode)
       {
