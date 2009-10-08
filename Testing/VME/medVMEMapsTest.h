@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMapsTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-07 15:17:59 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-08 14:22:18 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -24,6 +24,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class mafVMESurface;
 class mafVMEVolumeGray;
 class medVMEMaps;
+
+class vtkRectilinearGrid;
+class vtkImageData;
+class vtkFloatArray;
+class vtkPolyData;
+class vtkSphereSource;
 
 class medVMEMapsTest : public CPPUNIT_NS::TestFixture
 {
@@ -70,11 +76,19 @@ protected:
   mafVMESurface     *m_SurfaceToMap;
   medVMEMaps        *m_Maps;
 
+  vtkRectilinearGrid *rectilinearGrid;
+  vtkImageData *imageData;
+  vtkFloatArray *xCoordinates;
+  vtkFloatArray *yCoordinates;
+  vtkFloatArray *zCoordinates;
+
+  vtkPolyData       *polydata;
+  vtkSphereSource   *sphere;
+
   int m_FirstThreshold;
   int m_SecondThreshold;
   int m_MaxDistance;
   int m_DensityDistance;
-
 
 };
 

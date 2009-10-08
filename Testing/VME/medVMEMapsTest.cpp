@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMapsTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 15:17:59 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-08 14:22:18 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -35,10 +35,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkRectilinearGrid.h"
-#include "vtkRenderer.h";
-#include "vtkRenderWindow.h""
-#include "vtkRenderWindowInteractor.h";
-#include "vtkDataSetMapper.h";
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkDataSetMapper.h"
 #include "vtkSphereSource.h"
 
 #include <vnl\vnl_matrix.h>
@@ -55,23 +55,56 @@ void medVMEMapsTest::setUp()
   m_SurfaceToMap  = NULL;
   m_Volume        = NULL;
 
+  rectilinearGrid = NULL; 
+  imageData = NULL;
+  xCoordinates = NULL;
+  yCoordinates = NULL;
+  zCoordinates = NULL;
+
+  polydata   = NULL;
+  sphere = NULL;
+
   m_DensityDistance = 0;
   m_FirstThreshold = 10;
   m_SecondThreshold = 200;
   m_MaxDistance = 2;
+
+  mafNEW(m_Maps);
+  mafNEW(m_SurfaceToMap);
+  mafNEW(m_Volume);
+
+  rectilinearGrid = vtkRectilinearGrid::New();
+  imageData = vtkImageData::New();
+  xCoordinates = vtkFloatArray::New();
+  yCoordinates = vtkFloatArray::New();
+  zCoordinates = vtkFloatArray::New();
+
+  vtkNEW(sphere);
 }
 //----------------------------------------------------------------------------
 void medVMEMapsTest::tearDown()
 //----------------------------------------------------------------------------
 {
+  mafDEL(m_Maps);
+  mafDEL(m_SurfaceToMap);
+  mafDEL(m_Volume);
+
+  vtkDEL(sphere);
+
+  vtkDEL(rectilinearGrid);
+  vtkDEL(imageData);
+  vtkDEL(xCoordinates);
+  vtkDEL(yCoordinates);
+  vtkDEL(zCoordinates);
 }
 
 //---------------------------------------------------------
 void medVMEMapsTest::TestDynamicAllocation()
 //---------------------------------------------------------
 {
-  mafNEW(m_Maps);
-  mafDEL(m_Maps);
+  medVMEMaps *maps = NULL;
+  mafNEW(maps);
+  mafDEL(maps);
 }
 //---------------------------------------------------------
 void medVMEMapsTest::TestPrint()
@@ -129,28 +162,21 @@ void medVMEMapsTest::TestGetLocalTimeStamps()
 void medVMEMapsTest::CreateVMEMaps()
 //---------------------------------------------------------
 {
-  vtkPolyData       *data   = NULL;
-  vtkSphereSource   *sphere = NULL;
-  
-  vtkNEW(data);
-  vtkNEW(sphere);
+
   sphere->SetCenter(0,0,0);
   sphere->SetRadius(10);
-  data = sphere->GetOutput();
+  polydata = sphere->GetOutput();
   
-  mafNEW(m_SurfaceToMap);
-  m_SurfaceToMap->SetData(data, 0.0);
+  m_SurfaceToMap->SetData(polydata, 0.0);
 
   CreateVMEVolume();
 
-  mafNEW(m_Maps);
   m_Maps->SetSourceVMELink(m_Volume);
   m_Maps->SetMappedVMELink(m_SurfaceToMap);
 
   m_Maps->SetDensityDistance(m_DensityDistance);
   m_Maps->SetFirstThreshold(m_FirstThreshold);
   m_Maps->SetSecondThreshold(m_SecondThreshold);
-
 }
 
 //---------------------------------------------------------
@@ -159,7 +185,6 @@ void medVMEMapsTest::CreateVMEVolume()
 {
 
   // create some VTK data
-  vtkRectilinearGrid *rectilinearGrid = vtkRectilinearGrid::New() ;
 
   vtkMAFSmartPointer<vtkFloatArray> scalars;
   scalars->SetNumberOfComponents(1);
@@ -169,13 +194,11 @@ void medVMEMapsTest::CreateVMEVolume()
   }
 
   // create structured data
-  vtkImageData *imageData = vtkImageData::New();
   imageData->SetDimensions(5, 5, 5);
   imageData->SetOrigin(-1, -1, -1);
   imageData->SetSpacing(1,1,1);
 
   // create rectilinear grid data
-  vtkFloatArray *xCoordinates = vtkFloatArray::New();
   xCoordinates->SetNumberOfValues(5);
   xCoordinates->SetValue(0, 0.f);
   xCoordinates->SetValue(1, 1.f);
@@ -183,7 +206,6 @@ void medVMEMapsTest::CreateVMEVolume()
   xCoordinates->SetValue(3, 1.f);
   xCoordinates->SetValue(4, 0.f); 
 
-  vtkFloatArray *yCoordinates = vtkFloatArray::New();
   yCoordinates->SetNumberOfValues(5);
   yCoordinates->SetValue(0, 0.f);
   yCoordinates->SetValue(1, 1.f);
@@ -191,7 +213,6 @@ void medVMEMapsTest::CreateVMEVolume()
   yCoordinates->SetValue(3, 1.f);
   yCoordinates->SetValue(4, 0.f); 
 
-  vtkFloatArray *zCoordinates = vtkFloatArray::New();
   zCoordinates->SetNumberOfValues(5);
   zCoordinates->SetValue(0, 0.f);
   zCoordinates->SetValue(1, 1.f);
@@ -204,15 +225,11 @@ void medVMEMapsTest::CreateVMEVolume()
   rectilinearGrid->SetYCoordinates(yCoordinates);
   rectilinearGrid->SetZCoordinates(zCoordinates);
 
-  // create vme volume
-  mafNEW(m_Volume);
-
   // try to set this data to the volume
   int returnValue = -1;
 
   imageData->GetPointData()->SetScalars(scalars);
   m_Volume->SetData(imageData, 0);
-
 }
 
 //---------------------------------------------------------
@@ -289,7 +306,6 @@ void medVMEMapsTest::TestGetSourceVMELink()
 void medVMEMapsTest::TestGetVisualPipe()
 //---------------------------------------------------------
 {
-  mafNEW(m_Maps);
 
   CPPUNIT_ASSERT(strcmp(m_Maps->GetVisualPipe(), "mafPipeSurface") == 0);
 }
