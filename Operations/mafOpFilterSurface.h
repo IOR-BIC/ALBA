@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-29 11:03:51 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-10-08 07:31:50 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,10 +51,31 @@ public:
   /** Return parameters used by operation. */
   mafString GetParameters();
 
+  /** Return the number of iteration of the smooth filter */
+  int GetNumberOfIterations(){return m_Iterations;};
+
+  /** Return target reduction valu of the decimate filter */
+  int GetTargetReduction(){return m_Reduction;};
+
+  /** Return preserve topology flag of the decimate filter */
+  int GetPreserveTopology(){return m_TopologyFlag;};
+
+  /** Return flip normals flag of the generate normals filter */
+  int GetFlipNormals(){return m_FlipNormals;};
+
+  /** Return edge split flag of the generate normals filter */
+  int GetEdgeSplit(){return m_EdgeSplit;};
+
+  /** Return angle value of the generate normals filter */
+  int GetFeatureAngle(){return m_Angle;};
+
 
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
+
+  /** Create the GUI */
+  void CreateGui();
 	
 	int	m_TopologyFlag;
 	int	m_Reduction;
@@ -103,5 +124,7 @@ protected:
 
 	/** Clear all the surface applied filtering. */
 	void OnClear();
+
+  friend class mafOpFilterSurfaceTest;
 };
 #endif
