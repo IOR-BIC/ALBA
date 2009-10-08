@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-24 14:56:34 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-08 13:41:38 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -366,6 +366,28 @@ void medOpMatrixVectorMath::CalculateNormalsToW(double *u,  double *v,  const do
 
 
 
+//------------------------------------------------------------------------------
+// Distance between two vectors
+double medOpMatrixVectorMath::Distance(const double *a,  const double *b) const
+//------------------------------------------------------------------------------
+{
+  double dx = a[0]-b[0] ;
+  double dy = a[1]-b[1] ;
+  double dz = a[2]-b[2] ;
+  return sqrt(dx*dx + dy*dy + dz*dz) ;
+}
+
+
+//------------------------------------------------------------------------------
+// Distance squared between two vectors
+double medOpMatrixVectorMath::DistanceSquared(const double *a,  const double *b) const
+//------------------------------------------------------------------------------
+{
+  double dx = a[0]-b[0] ;
+  double dy = a[1]-b[1] ;
+  double dz = a[2]-b[2] ;
+  return (dx*dx + dy*dy + dz*dz) ;
+}
 
 
 

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2009-09-24 14:56:34 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-08 13:41:38 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -104,8 +104,15 @@ public:
   /// The vectors are not normalised.
   void CalculateNormalsToW(double *u,  double *v,  const double *w) const ;
 
+  /// Distance between two vectors
+  double Distance(const double *a,  const double *b) const ;
+
+  /// Distance squared between two vectors
+  double DistanceSquared(const double *a,  const double *b) const ;
+
   /// print vector
-  void PrintVector(std::ostream& os, const double *a) const ;                                    
+  void PrintVector(std::ostream& os, const double *a) const ;    
+
 
 
   //----------------------------------------------------------------------------
