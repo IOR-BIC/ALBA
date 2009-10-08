@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-01 11:40:13 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-10-08 07:30:52 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,8 +67,10 @@ void mafOpExporterMSF::OpRun()
   int result = OP_RUN_CANCEL;
   if(!m_MSFFile.IsEmpty()) 
 	{
-    ExportMSF();
-		result = OP_RUN_OK;
+    if (ExportMSF() == MAF_OK)
+    {
+      result = OP_RUN_OK;
+    }
 	}
 	mafEventMacro(mafEvent(this,result));
 }
@@ -79,7 +81,7 @@ bool mafOpExporterMSF::Accept(mafNode *vme)
   return (vme != NULL) && (!vme->IsA("mafVMERoot"));
 }
 //----------------------------------------------------------------------------
-void mafOpExporterMSF::ExportMSF()
+int mafOpExporterMSF::ExportMSF()
 //----------------------------------------------------------------------------
 {					
   if (!m_TestMode)
@@ -169,7 +171,15 @@ void mafOpExporterMSF::ExportMSF()
 	//mafNode::CopyTree(m_Input, storage.GetRoot());
   ((mafVME *)storage.GetRoot()->GetFirstChild())->SetAbsMatrix(*((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());  //Paolo 5-5-2004
   if (storage.Store()!=0)
-    wxMessageBox("Error while exporting MSF");
+  {
+    if (!m_TestMode)
+    {
+    	wxMessageBox("Error while exporting MSF");
+    }
+    return MAF_ERROR;
+  }
+
+  return MAF_OK;
 //  m_Input->ReparentTo(parent);
 }
 //----------------------------------------------------------------------------

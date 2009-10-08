@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterMSF.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-01 11:40:13 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-10-08 07:30:52 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -52,7 +52,7 @@ public:
   mafString GetFileName() {return m_MSFFile;};
 
   /** Export selected subtree-tree to a .msf file*/
-  void ExportMSF();
+  int ExportMSF();
 
   typedef struct 
   {
