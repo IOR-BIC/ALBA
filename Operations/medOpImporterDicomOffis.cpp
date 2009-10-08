@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:30:38 $
-Version:   $Revision: 1.1.2.57 $
+Date:      $Date: 2009-10-08 11:58:34 $
+Version:   $Revision: 1.1.2.58 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1716,8 +1716,11 @@ void medOpImporterDicomOffis::ReadDicom()
 
   //Set bounds of ZCrop slider widget
   m_ZCropBounds[1] = m_NumberOfSlices-1;
-  m_CropPage->SetZCropBounds(0, m_ZCropBounds[1]);
-  
+
+  if (!this->m_TestMode)
+  {
+    m_CropPage->SetZCropBounds(0, m_ZCropBounds[1]);
+  }
 
   // reset the current slice number to view the first slice
   m_CurrentSlice = 0;
