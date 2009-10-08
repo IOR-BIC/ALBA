@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:31:22 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-10-08 08:22:05 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -83,12 +83,14 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
 {
 	m_Listener = NULL;
   m_ColorLUT = NULL;
+  m_ZCropOn = false;
 
-	m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
+  m_GUISizer = new wxBoxSizer( wxHORIZONTAL );
   m_GUIUnderSizer = new wxBoxSizer( wxHORIZONTAL );
   m_LUTSizer = new wxBoxSizer( wxHORIZONTAL );
 	m_RwiSizer = new wxBoxSizer( wxHORIZONTAL );
   m_SizerAll = new wxBoxSizer( wxVERTICAL );
+  m_GuiView = new mafGUI(this);
 
 	m_Rwi = NULL;
   m_GuiLowerLeft = NULL;
@@ -103,7 +105,7 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
     m_Rwi->CameraSet(CAMERA_CT);
     m_Rwi->CameraUpdate();
 
-    mafGUI *m_GuiView= new mafGUI(this);
+    
     m_LutSlider = new mafGUILutSlider(this,-1,wxPoint(0,0),wxSize(300,24));
     m_LutSlider->SetListener(this);
 
@@ -113,6 +115,7 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
       m_ZCropSlider = new mafGUILutSlider(this,-1,wxPoint(0,0),wxSize(300,24),0,"Z crop");
       m_ZCropSlider->SetListener(this);
       m_GuiView->Add(m_ZCropSlider);
+      m_ZCropOn = true;
     }
     m_GuiView->Reparent(this);
    
@@ -260,8 +263,18 @@ void medGUIWizardPageNew::SetNextPage(medGUIWizardPageNew *nextPage)
 void medGUIWizardPageNew::SetZCropBounds(double ZMin, double ZMax)
 //--------------------------------------------------------------------------------
 { 
+  if (ZMax <= ZMin && m_ZCropOn)
+  {
+    m_GuiView->Remove(m_ZCropSlider);
+    m_ZCropOn = false;
+  } 
   if(ZMin >= 0 && ZMax > ZMin)
   {
+    if (!m_ZCropOn)
+    {
+      m_GuiView->Add(m_ZCropSlider);
+      m_ZCropOn = true;
+    }
     m_ZCropSlider->SetRange(ZMin,ZMax);
     m_ZCropSlider->SetSubRange(ZMin, ZMax);
     

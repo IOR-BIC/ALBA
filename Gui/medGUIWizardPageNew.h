@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:31:22 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-10-08 08:22:05 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -138,10 +138,13 @@ private:
   mafGUI     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
   mafGUI     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
   mafGUI     *m_GuiLowerUnderLeft; ///< Gui variable used to plug custom widgets localized under LOWER LEFT
+  mafGUI     *m_GuiView;
 
   mafGUILutSlider		*m_LutSlider;
   mafGUILutSlider		*m_ZCropSlider;
   vtkLookupTable	*m_ColorLUT;
+
+  bool m_ZCropOn;
 
 	//DECLARE_EVENT_TABLE()
 };
