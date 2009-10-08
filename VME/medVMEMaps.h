@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.h,v $
 Language:  C++
-Date:      $Date: 2009-10-07 12:04:05 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-10-08 14:21:41 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -139,10 +139,13 @@ public:
   /** Get the link to the source vme.*/
   mafNode *GetSourceVMELink();
 
+  /** Get the scalar range of the output vtkDataSet. */
   void GetScalarRange(double range[2]);
 
+  /** Set vtkColorTransferFunction attribute. */
   void SetColorTransferFunction(vtkColorTransferFunction *ctf);
 
+  /** Get vtkColorTransferFunction attribute. */
   vtkColorTransferFunction *GetColorTransferFunction();
 
 private:
@@ -174,6 +177,7 @@ private:
   mafVMEVolume              *m_Volume;
   mafTransform              *m_Transform;
   vtkPolyData               *m_PolyData;
+  vtkLookupTable            *m_Table;
 
   vtkColorTransferFunction *m_ColorTransferFunction;
 

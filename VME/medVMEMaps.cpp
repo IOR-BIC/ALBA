@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 13:28:04 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-10-08 14:21:41 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -58,6 +58,7 @@ medVMEMaps::medVMEMaps()
   m_Normals         = NULL;
   m_Volume          = NULL;
   m_PolyData        = NULL;
+  m_Table           = NULL;
   
   m_ColorTransferFunction = NULL;
 
@@ -97,6 +98,8 @@ medVMEMaps::~medVMEMaps()
 
   if(m_ColorTransferFunction)
     vtkDEL(m_ColorTransferFunction);
+  if(m_Table)
+    vtkDEL(m_Table);
 
   SetOutput(NULL);
 }
@@ -380,8 +383,8 @@ mmaMaterial *medVMEMaps::GetMaterial()
   {
     material = mmaMaterial::New();
     SetAttribute("MaterialAttributes", material);
-    //lutPreset(14,GetMaterial()->m_ColorLut);
-    material->m_ColorLut = CreateTable();
+    lutPreset(14,GetMaterial()->m_ColorLut);
+    //material->m_ColorLut = CreateTable();
     material->UpdateFromLut();
     material->UpdateProp();
   }
@@ -497,7 +500,6 @@ void medVMEMaps::SetSourceVMELink(mafNode *node)
 vtkLookupTable *medVMEMaps::CreateTable()
 //-----------------------------------------------------------------------
 {
-  vtkLookupTable *m_Table;
   int m_NumSections =3;
   wxColour m_LowColour, m_HiColour, m_MidColour, m_MidColour1, m_MidColour2;
 
