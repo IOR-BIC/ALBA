@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-09 09:24:09 $
-Version:   $Revision: 1.1.2.59 $
+Date:      $Date: 2009-10-09 10:26:42 $
+Version:   $Revision: 1.1.2.60 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -297,8 +297,6 @@ mafOp(label)
 medOpImporterDicomOffis::~medOpImporterDicomOffis()
 //----------------------------------------------------------------------------
 {
-	vtkDEL(m_SliceActor);
-
 	cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
 	mafDEL(m_Image);
@@ -3195,11 +3193,30 @@ void medOpImporterDicomOffis::ShowSlice()
   }
 
 //----------------------------------------------------------------------------
-vtkImageData* medOpImporterDicomOffis::GetSlice(int slice_num)
+vtkImageData* medOpImporterDicomOffis::GetFirstSlice(mafString sliceName)
 //----------------------------------------------------------------------------
 {
- 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
-  return m_ListSelected->Item(slice_num)->GetData()->GetOutput();
+  wxString name, path, short_name, ext;
+  for (int i = 0; i < m_ListSelected->GetCount(); i++)
+  {
+    name = m_ListSelected->Item(i)->GetData()->GetFileName();
+    wxSplitPath(name, &path, &short_name, &ext);
+    if (sliceName.Compare(short_name) == 0)
+    {
+      m_ListSelected->Item(i)->GetData()->GetOutput()->Update();
+      return m_ListSelected->Item(i)->GetData()->GetOutput();
+    }
+    else 
+    {
+      //if dicom file has not extension fit wxSplitPath error
+      short_name = short_name + "." + ext;
+      if (sliceName.Compare(short_name) == 0)
+      {
+        m_ListSelected->Item(i)->GetData()->GetOutput()->Update();
+        return m_ListSelected->Item(i)->GetData()->GetOutput();
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
