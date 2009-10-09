@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-08 11:58:34 $
-Version:   $Revision: 1.1.2.58 $
+Date:      $Date: 2009-10-09 09:24:09 $
+Version:   $Revision: 1.1.2.59 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1193,6 +1193,8 @@ int medOpImporterDicomOffis::BuildMesh()
 {
   long progress = 0;
   int step;
+  int sourceVolumeSliceId ;
+  int targetVolumeSliceId ;
 
   if(m_BuildStepValue == 0)
     step = 1;
@@ -1220,7 +1222,7 @@ int medOpImporterDicomOffis::BuildMesh()
   int scalarCounter = 0;
   vtkPolyData *poly1;
 
-  for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+  for (sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
   {
     poly1 = ExtractPolyData(0,sourceVolumeSliceId);
     poly1->Update();
@@ -1244,7 +1246,7 @@ int medOpImporterDicomOffis::BuildMesh()
 
   int counter= 0;
   int total = dim[0]*dim[1];
-  for ( int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+  for (sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
   { 
     if(!this->m_TestMode)
     {
@@ -1310,6 +1312,8 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 //----------------------------------------------------------------------------
 {
   int step;
+  int sourceVolumeSliceId ;
+  int targetVolumeSliceId ;
 
   if(m_BuildStepValue == 0)
     step = 1;
@@ -1341,7 +1345,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
     int scalarCounter = 0;
     vtkPolyData *poly1;
 
-    for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+    for (sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     {
        poly1 = ExtractPolyData(ts,sourceVolumeSliceId);
        poly1->Update();
@@ -1365,7 +1369,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
     int counter= 0;
     int total = dim[0]*dim[1];
-    for (int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+    for (sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     { 
       if(!this->m_TestMode)
       {
