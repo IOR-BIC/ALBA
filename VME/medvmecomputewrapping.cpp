@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 09:55:18 $
-Version:   $Revision: 1.1.2.20 $
+Date:      $Date: 2009-10-09 14:43:49 $
+Version:   $Revision: 1.1.2.21 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -98,6 +98,9 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	medVMEOutputComputeWrapping *output = medVMEOutputComputeWrapping::New(); // an output with no data
 	output->SetTransform(m_Transform); // force my transform in the output
 	SetOutput(output);
+
+	m_WrappedMode1 = -1;
+	m_WrappedMode2 = -1;
 
 
 	m_Mat = new mafMatrix3x3();
@@ -4843,6 +4846,7 @@ int medVMEComputeWrapping::InternalStore(mafStorageElement *parent)
 		parent->StoreInteger("WrapMode", m_WrappedMode1);
 		parent->StoreInteger("WrapSide", m_WrapSide);
 		parent->StoreInteger("WrapReverse", m_WrapReverse);
+		parent->StoreInteger("WrapClass",m_WrappedClass);
 
 		return MAF_OK;
 	}
@@ -4865,6 +4869,7 @@ int medVMEComputeWrapping::InternalRestore(mafStorageElement *node)
 			node->RestoreInteger("WrapMode", m_WrappedMode1);
 			node->RestoreInteger("WrapSide", m_WrapSide);
 			node->RestoreInteger("WrapReverse", m_WrapReverse);
+			node->RestoreInteger("WrapClass",m_WrappedClass);
 			return MAF_OK;
 		}
 	}
@@ -5026,7 +5031,7 @@ mafGUI* medVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
 	
 	gui->SetListener(this);
 	gui->Divider();
-	m_WrappedMode1 = SPHERE_CYLINDER;
+	//m_WrappedMode1 = SPHERE_CYLINDER;
 	gui->Combo(ID_WRAPPED_METER_MODE,_("wrap"),&m_WrappedMode1,4,wrap_choices_string,_("Choose the meter mode"));
 	//m_Gui->Combo(ID_WRAPPED_METER_TYPE,_("type"),&m_WrapSide,3,wrap_side_string,_("Choose the wrap type"));
 	//m_Gui->Combo(ID_METER_MODE,_("mode"),&(GetMeterAttributes()->m_MeterMode),num_mode,mode_choices_string,_("Choose the meter mode"));
@@ -5073,7 +5078,9 @@ mafGUI* medVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
 	gui->Divider(2);
 	//m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),"" ,"");
 	gui->Divider();
-	
+
+	gui->Enable(ID_WRAPPED_METER_LINK1, m_WrappedMode1==SPHERE_CYLINDER || m_WrappedMode1 == SPHERE_ONLY || m_WrappedMode1 ==DOUBLE_CYLINDER  );//sphere
+	gui->Enable(ID_WRAPPED_METER_LINK2, m_WrappedMode1 ==SPHERE_CYLINDER || m_WrappedMode1 ==DOUBLE_CYLINDER || m_WrappedMode1 == CYLINDER_ONLY );//cylinder
 
 	gui->Update();
 
@@ -5188,6 +5195,12 @@ mafGUI* medVMEComputeWrapping::CreateGuiForOldMeter( mafGUI *gui ){
 	//m_Gui->Button(ID_SAVE_FILE_BUTTON, _("Save in file"),"" ,"");
 	gui->Divider();
 
+	EnableManualModeWidget(gui,m_WrappedMode2 ==MANUAL_WRAP);
+	gui->Enable(ID_WRAPPED_METER_LINK, m_WrappedMode2 == AUTOMATED_WRAP || m_WrappedMode2 == IOR_AUTOMATED_WRAP);
+	gui->Enable(ID_WRAPPED_SIDE, m_WrappedMode2 == AUTOMATED_WRAP );
+	gui->Enable(ID_WRAPPED_REVERSE, m_WrappedMode2 == AUTOMATED_WRAP);
+
+
 	gui->Update();
 
 
@@ -5210,9 +5223,17 @@ mafGUI* medVMEComputeWrapping::CreateGui(){
 
 		CreateGuiForNewMeter(m_GuiNewMeter);
 		CreateGuiForOldMeter(m_GuiOldMeter);
+		if (m_WrappedClass==NEW_METER)
+		{
+			m_RollOutNewMeter = m_Gui->RollOut(ID_ROLLOUT_NEW,_("Geodesic method"), m_GuiNewMeter, true);
+			m_RollOutOldMeter = m_Gui->RollOut(ID_ROLLOUT_OLD,_("Pivot-set method"), m_GuiOldMeter, false);
+		}else if (m_WrappedClass==OLD_METER)
+		{
+			m_RollOutNewMeter = m_Gui->RollOut(ID_ROLLOUT_NEW,_("Geodesic method"), m_GuiNewMeter, false);
+			m_RollOutOldMeter = m_Gui->RollOut(ID_ROLLOUT_OLD,_("Pivot-set method"), m_GuiOldMeter, true);
+		}
 
-		m_RollOutNewMeter = m_Gui->RollOut(ID_ROLLOUT_NEW,_("Geodesic method"), m_GuiNewMeter, true);
-		m_RollOutOldMeter = m_Gui->RollOut(ID_ROLLOUT_OLD,_("Pivot-set method"), m_GuiOldMeter, false);
+
 		
 
 		m_Gui->Update();
@@ -5386,12 +5407,27 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 					m_GuiNewMeter->Enable(ID_WRAPPED_METER_LINK2, m_WrappedMode1 ==SPHERE_CYLINDER || m_WrappedMode1 ==DOUBLE_CYLINDER || m_WrappedMode1 == CYLINDER_ONLY );//cylinder
 					if (m_WrappedMode1 ==DOUBLE_CYLINDER )
 					{
-						m_WrappedVmeName1 = _("cylinder");
-						m_WrappedVmeName2 = _("cylinder");
+						if (m_WrappedVmeName1=="none" || m_WrappedVmeName1 =="")
+						{
+							m_WrappedVmeName1 = _("cylinder");
+						}
+						if (m_WrappedVmeName2=="none" || m_WrappedVmeName2 =="")
+						{
+							m_WrappedVmeName2 = _("cylinder");
+						}
+						
+						
 					}else if (m_WrappedMode1 ==SPHERE_CYLINDER )
 					{
-						m_WrappedVmeName1 = _("sphere");
-						m_WrappedVmeName2 = _("cylinder");
+						if (m_WrappedVmeName1=="none" || m_WrappedVmeName1 ==""){
+							m_WrappedVmeName1 = _("sphere");
+						}
+						if (m_WrappedVmeName2=="none" || m_WrappedVmeName2 =="")
+						{
+							m_WrappedVmeName2 = _("cylinder");
+						}
+						
+						
 					}
 
 				}else if (m_WrappedClass == OLD_METER)
