@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-10 12:34:09 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-09 10:27:15 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -185,31 +185,36 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
   bool cont = dir.GetFirst(&dicomDir, "", wxDIR_DIRS);
   while ( cont )
   {
-    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
-    importer->TestModeOn();
+    //find the .txt file
+    wxString name, path, short_name, ext;
     wxString dicomPath = dirName + dicomDir;
-    importer->SetDirName(dicomPath.c_str());
-    importer->CreatePipeline();
-    importer->OpenDir();
-    importer->ReadDicom();
-    importer->CreateSlice(0);
-
-    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetSlice(0);
-
     wxDir dirDicom(dicomPath);
     wxArrayString files;
-    wxString ext = "txt";
-    const wxString FileSpec = "*" + ext;
+    wxString extension = "txt";
+    const wxString FileSpec = "*" + extension;
 
     if (dicomPath != wxEmptyString && wxDirExists(dicomPath))
     {
       // Get all .zip files
       wxDir::GetAllFiles(dicomPath, &files, FileSpec);
     }
-    
     CPPUNIT_ASSERT(files.GetCount() == 1);
-
     wxString txtFilePath = files[0];
+
+    medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
+    importer->TestModeOn();
+    
+    importer->SetDirName(dicomPath.c_str());
+    importer->CreatePipeline();
+    importer->OpenDir();
+    importer->ReadDicom();
+    importer->CreateSlice(0);
+
+    wxSplitPath(txtFilePath, &path, &short_name, &ext);
+    //mafString dicomPath = txtFilePath.SubString(0, txtFilePath.find_last_of("."));
+    //dicomPath.Append(".dcm");
+    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetFirstSlice(short_name);
+   
     wxFileInputStream inputFile( txtFilePath );
     wxTextInputStream text( inputFile );
     wxString line = text.ReadLine();
@@ -230,8 +235,14 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
 
     CPPUNIT_ASSERT(imageImported->GetNumberOfPoints() == pixelVector.size());
 
+    bool idem = true;
     for(int i=0 ; i<imageImported->GetNumberOfPoints();i++)
     {
+      idem = imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i];
+      if (!idem)
+      {
+        break;
+      }
       CPPUNIT_ASSERT(imageImported->GetPointData()->GetScalars()->GetTuple1(i) == pixelVector[i]);
     }
 
