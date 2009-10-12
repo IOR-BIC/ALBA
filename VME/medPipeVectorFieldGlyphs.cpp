@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-30 16:17:23 $ 
-  Version: $Revision: 1.1.2.6 $ 
+  Date: $Date: 2009-10-12 12:40:10 $ 
+  Version: $Revision: 1.1.2.7 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -301,7 +301,7 @@ mafGUI *medPipeVectorFieldGlyphs::CreateGui()
 		radioStrings.Add(wxT("OR")) ;
 
 
-		wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, "interaction between filters", wxDefaultPosition, wxSize(140,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;//wxEmptyString
+		wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, "interaction logic", wxDefaultPosition, wxSize(120,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;//wxEmptyString
 		radioBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_ANDOR, radioBox, &m_AndOr));
 
 		m_BttnShowAssociate = new wxButton( m_Gui, ID_SHOWITEM, wxT("Show"), 
@@ -625,10 +625,18 @@ void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 	  else if (e->GetId() == ID_REMOVEITEM)//remove an Item
 	  {
 		  OnRemoveItem();
+		  if ( m_RangeCtrl2->GetItemCount()<1 || m_RangeCtrl->GetItemCount()<1)
+		  {
+			  m_BttnShowAssociate->Enable(false);
+		  }
 		  StoreFilterLinks();
 	  }else if(e->GetId() == ID_REMOVEITEM2)
 	  {
 		  OnRemoveItem2();
+		  if ( m_RangeCtrl2->GetItemCount()<1 || m_RangeCtrl->GetItemCount()<1)
+		  {
+			  m_BttnShowAssociate->Enable(false);
+		  }
 		  StoreFilterLinks2();
 	  }
 	  else if (e->GetId()==ID_RANGE_NAME)
@@ -647,7 +655,7 @@ void medPipeVectorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 			  m_BttnShow->Enable(true);
 			  m_BttnRemoveItem->Enable(true);
 			  
-			  if ( GetNumberOfScalars()>1 && m_RangeCtrl2->GetItemCount()>0)
+			  if ( GetNumberOfScalars()>0 && m_RangeCtrl2->GetItemCount()>0)
 			  {
 				m_BttnShowAssociate->Enable(true);
 			  }
