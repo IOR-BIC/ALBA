@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:09:48 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-12 07:51:53 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -85,6 +85,7 @@ medOpSegmentationRegionGrowingConnectedThreshold::medOpSegmentationRegionGrowing
 medOpSegmentationRegionGrowingConnectedThreshold::~medOpSegmentationRegionGrowingConnectedThreshold( ) 
 //----------------------------------------------------------------------------
 {
+  delete []m_Seed;
   mafDEL(m_Picker);
   vtkDEL(m_SphereVTK);
 }
@@ -169,15 +170,18 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
 //----------------------------------------------------------------------------
 {
 
-  wxBusyCursor wait;
-  wxBusyInfo wait_info("Please wait");
+  if (!m_TestMode)
+  {
+	  wxBusyCursor wait;
+	  wxBusyInfo wait_info("Please wait");
+  }
 
  typedef itk::ConnectedThresholdImageFilter<RealImage, RealImage> ITKConnectedThresholdFilter;
   ITKConnectedThresholdFilter::Pointer connectedThreshold = ITKConnectedThresholdFilter::New();
 
   vtkImageData *im = vtkImageData::SafeDownCast(mafVMEVolumeGray::SafeDownCast(m_Input)->GetOutput()->GetVTKData());
   
-  vtkImageCast * vtkImageToFloat = vtkImageCast::New();
+  vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
   vtkImageToFloat->SetOutputScalarTypeToFloat ();
   vtkImageToFloat->SetInput(im);
   vtkImageToFloat->Modified();
@@ -232,8 +236,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   itkTOvtk->SetInput( connectedThreshold->GetOutput() );
   itkTOvtk->Update();
 
-  mafVMEVolumeGray *volumeOut;
-  mafNEW(volumeOut);
+  mafSmartPointer<mafVMEVolumeGray> volumeOut;
   volumeOut->SetName("Connected Threshold");
 
   vtkImageData *image = ((vtkImageData*)itkTOvtk->GetOutput());
@@ -254,8 +257,6 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   volumeOut->Update();
 
   m_Output = volumeOut;
-
-  vtkImageToFloat->Delete();
 
 }
 //----------------------------------------------------------------------------

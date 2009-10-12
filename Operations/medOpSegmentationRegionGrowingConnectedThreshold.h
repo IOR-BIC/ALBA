@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:09:49 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-12 07:51:53 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -62,13 +62,14 @@ public:
     ID_USE_SPACING,
   };
 
+  /** Perform the segmentation algorithm */
+  void Algorithm();
+
 protected:
 
   /*virtual*/ void OpStop(int result);
 
   void CreateGui();
-
-  void Algorithm();
 
   int m_Lower;
   int m_Upper;
