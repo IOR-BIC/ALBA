@@ -74,6 +74,9 @@ ADD_TEST(medOpCreateSurfaceTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateSurfaceTest
 ADD_EXECUTABLE(medOpVolumeResampleTest medOpVolumeResampleTest.h medOpVolumeResampleTest.cpp)
 ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTest)
 
+ADD_EXECUTABLE(medOpSegmentationRegionGrowingConnectedThresholdTest medOpSegmentationRegionGrowingConnectedThresholdTest.h medOpSegmentationRegionGrowingConnectedThresholdTest.cpp)
+ADD_TEST(medOpSegmentationRegionGrowingConnectedThresholdTest ${EXECUTABLE_OUTPUT_PATH}/medOpSegmentationRegionGrowingConnectedThresholdTest)
+
 
 
 
