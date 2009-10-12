@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-12 09:07:37 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-12 13:39:49 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -144,11 +144,11 @@ void medOpSegmentationRegionGrowingConnectedThreshold::CreateGui()
   m_Gui->Label(_("Voxel val:"),&m_SeedScalarValue);
   m_Gui->VectorN(ID_SEED,_("seed"),m_Seed,m_ImageDim,MININT,MAXINT,"seed point to start growing, in image coordinates");
 
-  m_Gui->Label(_("Anisotropic curvature diffusion parameters"));
-  m_Gui->Integer(ID_ITERATIONS,_("iterations"),&m_NumIter,0,MAXINT,_("number of iterations. Default [5]"));
-  m_Gui->Float(ID_TIME_STEP,_("time step"),&m_TimeStep,0,MAXFLOAT,0,-1,_("time step. Default [0.0125]"));
-  m_Gui->Float(ID_CONDUCTANCE,_("conductance"),&m_Conductance,MINFLOAT,MAXFLOAT,0,-1,_("conductance. Default [1.0]"));
-  m_Gui->Bool(ID_USE_SPACING,_("use spacing"),&m_UseSpacing,1,_("do NOT use image spacing when computing filter"));
+//   m_Gui->Label(_("Anisotropic curvature diffusion parameters"));
+//   m_Gui->Integer(ID_ITERATIONS,_("iterations"),&m_NumIter,0,MAXINT,_("number of iterations. Default [5]"));
+//   m_Gui->Float(ID_TIME_STEP,_("time step"),&m_TimeStep,0,MAXFLOAT,0,-1,_("time step. Default [0.0125]"));
+//   m_Gui->Float(ID_CONDUCTANCE,_("conductance"),&m_Conductance,MINFLOAT,MAXFLOAT,0,-1,_("conductance. Default [1.0]"));
+//   m_Gui->Bool(ID_USE_SPACING,_("use spacing"),&m_UseSpacing,1,_("do NOT use image spacing when computing filter"));
 
   m_Gui->OkCancel();
 
@@ -354,5 +354,23 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OnEvent(mafEventBase *maf
       mafEventMacro(*e);
       break;
     }
+  }
+}
+//----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingConnectedThreshold::SetSeed(int *seed)
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_ImageDim;i++)
+  {
+    m_Seed[i]=seed[i];
+  }
+}
+//----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingConnectedThreshold::GetSeed(int *seed)
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_ImageDim;i++)
+  {
+    seed[i]=m_Seed[i];
   }
 }

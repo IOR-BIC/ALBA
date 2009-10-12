@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-10-12 09:07:37 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-12 13:39:49 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -66,6 +66,26 @@ public:
   /** Perform the segmentation algorithm */
   void Algorithm();
 
+  /** Set the lower threshold */
+  void SetLowerThreshold(int lower){m_Lower = lower;};
+  /** Get the lower threshold */
+  int GetLowerThreshold(){return m_Lower;};
+
+  /** Set the upper threshold */
+  void SetUpperThreshold(int upper){m_Upper = upper;};
+  /** Get the upper threshold */
+  int GetUpperThreshold(){return m_Upper;};
+
+  /** Set the replace value */
+  void SetReplaceValue(int replace){m_Replace = replace;};
+  /** Get the replace value */
+  int GetReplaceValue(){return m_Replace;};
+
+  /** Set the seed */
+  void SetSeed(int *seed);
+  /** Get the seed */
+  void GetSeed(int *seed);
+  
 protected:
 
   /*virtual*/ void OpStop(int result);
