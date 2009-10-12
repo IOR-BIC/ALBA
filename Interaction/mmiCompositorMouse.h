@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2009-10-12 09:03:55 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -21,9 +21,6 @@
 #include "mafSmartPointer.h"
 
 #include <map>
-
-//#include "vtkMatrix4x4.h"
-//#include "vtkMAFDOFMatrix.h"
 
 //----------------------------------------------------------------------------
 //forward ref
@@ -73,12 +70,9 @@ enum MOUSE_BUTTON
   mouseMiddleShiftBehavior = behaviorCompositor->CreateBehavior(MOUSE_MIDDLE_SHIFT);
   ...
 
-
   @sa
   - mmiGenericMouse since mmiCompositorMouse is working in pair with this class
   - mafGUITransformMouse component used by mafOpMAFTransform
-  @todo
-  - write test suite
   
 */
 class mmiCompositorMouse : public mafInteractor
@@ -89,12 +83,8 @@ public:
   /** Start the interaction with the selected object; set m_CurrentCamera and Renderer ivar */
   virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);
 
-  /**  Process events coming from tracker */
+  /**  Process events coming from the mouse */
   virtual void OnEvent(mafEventBase *event);
-
-  //----------------------------------------------------------------------------
-  // Transform Enabling:
-  //----------------------------------------------------------------------------
 
   /**
   Create a behavior given the activator*/
@@ -161,6 +151,9 @@ private:
 
   vtkCamera *m_CurrentCamera; ///< Stores camera to which the interaction is currently assigned
   
+  /** friend test class */
+  friend class mmiCompositorMouseTest;
+
 };
 #endif
 
