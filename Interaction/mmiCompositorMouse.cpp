@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiCompositorMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2009-10-12 09:04:28 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -33,7 +33,6 @@
 #include "vtkTransform.h"
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
-//#include "vtkMAFDOFMatrix.h"
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
 
@@ -60,16 +59,6 @@ mmiCompositorMouse::~mmiCompositorMouse()
 	mmuActivatorMap::iterator iter = m_ActivatorMap.begin();
 	mmuActivatorMap::iterator iterEnd = m_ActivatorMap.end();
 
-  //debug 
-  //int nisa = m_ActivatorMap.size();
-  //mmiGenericMouse *opi = ((mmiGenericMouse *)((*iter).second));
-
-   //modified by Marco. 24-5-2005 : removed, changed into an AutoPointer
-	//while ( iter != iterEnd )
-	//{
-	//	vtkDEL((*iter).second);
-	//	iter++;
-	//}
 }
 
 //------------------------------------------------------------------------------
@@ -175,13 +164,6 @@ void mmiCompositorMouse::OnLeftButtonUp(mafEventInteraction *e)
       m_ActiveMMIGeneric = NULL;
     }
   }
-
-  // stop interacting with the mouse when a button is released
-  
-  //mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender(); 
- 
-  // Set the m_Renderer and m_CurrentCamera ivar
-  //StopInteraction(mouse);
 }
 //----------------------------------------------------------------------------
 void mmiCompositorMouse::OnRightButtonDown(mafEventInteraction *e)
@@ -314,9 +296,6 @@ void mmiCompositorMouse::OnButtonDown(mafEventInteraction *e)
   m_LastMousePose[0] = m_MousePose[0] = (int)pos[0];
   m_LastMousePose[1] = m_MousePose[1] = (int)pos[1];
 
-  //mafDeviceButtonsPadMouse *mouse = (mafDeviceButtonsPadMouse *)e->GetSender();
-  //StartInteraction(mouse);
-
   switch(m_ButtonPressed) 
   {
     case MAF_LEFT_BUTTON:
@@ -405,4 +384,3 @@ void mmiCompositorMouse::OnEvent(mafEventBase *event)
     
   Superclass::OnEvent(event);
 }
-//------------------------------------------------------------------------------
