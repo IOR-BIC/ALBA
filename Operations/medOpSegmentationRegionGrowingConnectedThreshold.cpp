@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-12 07:51:53 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-12 09:07:37 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -78,6 +78,7 @@ medOpSegmentationRegionGrowingConnectedThreshold::medOpSegmentationRegionGrowing
 
   m_Sphere = NULL;
   m_SphereVTK = NULL;
+  m_VolumeOut = NULL;
 
   m_SeedScalarValue = "";
 }
@@ -86,6 +87,7 @@ medOpSegmentationRegionGrowingConnectedThreshold::~medOpSegmentationRegionGrowin
 //----------------------------------------------------------------------------
 {
   delete []m_Seed;
+  mafDEL(m_VolumeOut);
   mafDEL(m_Picker);
   vtkDEL(m_SphereVTK);
 }
@@ -236,8 +238,8 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   itkTOvtk->SetInput( connectedThreshold->GetOutput() );
   itkTOvtk->Update();
 
-  mafSmartPointer<mafVMEVolumeGray> volumeOut;
-  volumeOut->SetName("Connected Threshold");
+  mafNEW(m_VolumeOut);
+  m_VolumeOut->SetName("Connected Threshold");
 
   vtkImageData *image = ((vtkImageData*)itkTOvtk->GetOutput());
   image->Update();
@@ -246,17 +248,17 @@ void medOpSegmentationRegionGrowingConnectedThreshold::Algorithm()
   vtkMAFSmartPointer<vtkImageToStructuredPoints> image_to_sp;
   image_to_sp->SetInput(image);
   image_to_sp->Update();
-  volumeOut->SetData(image_to_sp->GetOutput(),mafVME::SafeDownCast(m_Input)->GetTimeStamp());
+  m_VolumeOut->SetData(image_to_sp->GetOutput(),mafVME::SafeDownCast(m_Input)->GetTimeStamp());
 
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("SYNTHETIC");
 
-  volumeOut->GetTagArray()->SetTag(tag_Nature);
+  m_VolumeOut->GetTagArray()->SetTag(tag_Nature);
 
-  volumeOut->Update();
+  m_VolumeOut->Update();
 
-  m_Output = volumeOut;
+  m_Output = m_VolumeOut;
 
 }
 //----------------------------------------------------------------------------

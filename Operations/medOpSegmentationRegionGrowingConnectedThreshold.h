@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-10-12 07:51:53 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-12 09:07:37 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -25,6 +25,7 @@ class mafNode;
 class mmiPicker;
 class mafInteractor;
 class mafVMESurface;
+class mafVMEVolumeGray;
 
 class vtkSphereSource;
 
@@ -86,6 +87,7 @@ protected:
   mmiPicker           *m_Picker;
   mafInteractor       *m_OldBehavior;
 
+  mafVMEVolumeGray *m_VolumeOut;
   mafVMESurface *m_Sphere;
 
   vtkSphereSource *m_SphereVTK;
