@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-08-26 14:46:41 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2009-10-12 12:35:34 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -40,6 +40,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkDataArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkLookupTable.h"
 #include "vtkTensorGlyph.h"
 
@@ -60,12 +61,13 @@
 #include "mafGUIButton.h"
 #include "mafGUIDialog.h"
 #include "vtkStructuredPoints.h"
-
+#include "vtkRectilinearGrid.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medPipeTensorFieldGlyphs);
 //----------------------------------------------------------------------------
 const  char* medPipeTensorFieldGlyphs::FILTER_LINK_NAME = "filter-link-tensor";
+const  char* medPipeTensorFieldGlyphs::FILTER_LINK_NAME2 = "filter-link-scale";
 int medPipeTensorFieldGlyphs::count; 
 
 //----------------------------------------------------------------------------
@@ -94,7 +96,8 @@ medPipeTensorFieldGlyphs::medPipeTensorFieldGlyphs() : medPipeTensorField()
   m_GlyphsActor = NULL;    
   
   m_SFActor = NULL; 
-   m_ShowAll = 1;//that means do not use filter
+  m_AndOr = 0;
+  m_ShowAll = 1;//that means do not use filter
    medPipeTensorFieldGlyphs::count = 0;
 }
 
@@ -204,7 +207,7 @@ mafGUI *medPipeTensorFieldGlyphs::CreateGui()
 
 	//-----------weih add-----------
 #pragma region Glyph range
-	//-------------------------list----------
+	//-------------------------first filter list----------
 	wxStaticBoxSizer* sbSizer3 = new wxStaticBoxSizer( 
 		new wxStaticBox( m_Gui, wxID_ANY, wxT("Range") ), wxVERTICAL );
 	m_RangeCtrl = new wxListCtrl( m_Gui, ID_LIST_RANGES, wxDefaultPosition, 
@@ -241,6 +244,69 @@ mafGUI *medPipeTensorFieldGlyphs::CreateGui()
 	bSizer6->Add( m_BttnShow,0, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
 	sbSizer3->Add( bSizer6, 0, wxEXPAND, 1 );
+
+	if (nScalars > 0)
+	{
+	
+		//----------------------second filter list----------
+		m_RangeCtrl2 = new wxListCtrl( m_Gui, ID_LIST_RANGES, wxDefaultPosition, 
+			wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL );
+		m_RangeCtrl2->SetColumnWidth(0,200);//wxLIST_AUTOSIZE_USEHEADER
+		m_RangeCtrl2->SetColumnWidth(1,300);// useless
+
+		sbSizer3->Add(new wxStaticText( m_Gui, wxID_ANY, _("scalar Filter:"), 
+			wxDefaultPosition, wxSize( 60,-1 ), 0 ), 0, wxALL, 5 );
+		sbSizer3->Add( m_RangeCtrl2, 1, wxALL|wxEXPAND, 1 );
+		//----------------------buttons----------
+		wxBoxSizer* bSizer7 = new wxBoxSizer( wxHORIZONTAL );  
+		bSizer7->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, 
+			wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
+
+		m_BttnAddItem2 = new wxButton(m_Gui,ID_ADDITEM2,wxT("Add"),
+			wxDefaultPosition,wxSize( 50,-1 ), 0);
+		m_BttnAddItem2->Enable(true);
+		m_BttnAddItem2->SetToolTip(wxT("Add an item."));
+		m_BttnAddItem2->SetValidator(mafGUIValidator(this, ID_ADDITEM2, m_BttnAddItem2));
+
+		m_BttnRemoveItem2 = new wxButton( m_Gui, ID_REMOVEITEM2, wxT("Remove"), 
+			wxDefaultPosition, wxSize( 50,-1 ), 0 );
+		m_BttnRemoveItem2->Enable( false );
+		m_BttnRemoveItem2->SetToolTip( wxT("Removes selected item.") );
+		m_BttnRemoveItem2->SetValidator(mafGUIValidator(this, ID_REMOVEITEM2, m_BttnRemoveItem));
+
+		m_BttnShow2 = new wxButton( m_Gui, ID_SHOWITEM2, wxT("Show"), 
+			wxDefaultPosition, wxSize( 50,-1 ), 0 );
+		m_BttnShow2->Enable( false );
+		m_BttnShow2->SetToolTip( wxT("Show result.") );
+		m_BttnShow2->SetValidator(mafGUIValidator(this, ID_SHOWITEM2, m_BttnShow));
+
+		bSizer7->Add( m_BttnAddItem2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
+		bSizer7->Add( m_BttnRemoveItem2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 );
+		bSizer7->Add( m_BttnShow2,0, wxALIGN_CENTER_VERTICAL|wxALL,1);
+
+		sbSizer3->Add( bSizer7, 0, wxEXPAND, 1 );
+		//-----------------------logic widgets-----------------
+		wxBoxSizer* bSizer8= new wxBoxSizer( wxHORIZONTAL );  
+		//bSizer8->Add( new wxPanel( m_Gui, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL ), 1, wxALL, 5 );
+		wxArrayString radioStrings ;
+		radioStrings.Add(wxT("AND")) ;
+		radioStrings.Add(wxT("OR")) ;
+
+
+		wxRadioBox* radioBox = new wxRadioBox(m_Gui, ID_CHOOSE_ANDOR, "interaction logic", wxDefaultPosition, wxSize(120,40), radioStrings, 1, wxRA_SPECIFY_ROWS) ;//wxEmptyString
+		radioBox->SetValidator(mafGUIValidator(this, ID_CHOOSE_ANDOR, radioBox, &m_AndOr));
+
+		m_BttnShowAssociate = new wxButton( m_Gui, ID_SHOWITEM, wxT("Show"), 
+			wxDefaultPosition, wxSize(50,-1 ), 0 );
+		m_BttnShowAssociate->Enable(false);
+		m_BttnShowAssociate->SetToolTip(wxT("Show result from associated two filter."));
+		m_BttnShowAssociate->SetValidator(mafGUIValidator(this, ID_SHOWITEM_ASSOCIATE, m_BttnShowAssociate));
+
+		bSizer8->Add(radioBox,0,wxALIGN_LEFT|wxALL, 1);
+		bSizer8->Add(m_BttnShowAssociate,0,wxALIGN_CENTER_VERTICAL|wxALL, 1 );
+		sbSizer3->Add( bSizer8, 0, wxEXPAND, 1 );
+
+	}
 	//------------------------check box-------------
 	/*	wxBoxSizer* bSizer7 = new wxBoxSizer( wxVERTICAL );  
 	*/
@@ -258,7 +324,7 @@ mafGUI *medPipeTensorFieldGlyphs::CreateGui()
 	bSizerMain->Add( sbSizer3, 0, wxEXPAND, 1 );
 
 #pragma endregion Glyph range
-	InitFilterList();
+	InitFilterList(nScalars);
 
 	//----------weih add end---------
 
@@ -382,16 +448,20 @@ mafGUI *medPipeTensorFieldGlyphs::CreateGui()
 
 //----------------------------------------------------------------------------
 // init items of this gui when load vme--[7/31/2009 weih]
-void medPipeTensorFieldGlyphs::InitFilterList(){
+void medPipeTensorFieldGlyphs::InitFilterList(int nScalars){
 	//----------------------------------------------------------------------------
 	wxString cols[2] = { wxT("filter name T"), wxT("range value") };
 	for (int i = 0; i < 2; i++){
 		m_RangeCtrl->InsertColumn(i, cols[i]);
+		if (nScalars > 0)
+		{
+			m_RangeCtrl2->InsertColumn(i,cols[i]);
+		}
 	}
 	mafNode::mafLinksMap* pLinks =  m_Vme->GetLinks();
 	wxString itemName,itemValue1,itemValue2,displayValue;
 	double dValue1,dValue2;
-	int idx =0;
+	int idx1 =0,idx2=0;
 	for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
 	{
 		mafString linkName = i->first;
@@ -422,23 +492,113 @@ void medPipeTensorFieldGlyphs::InitFilterList(){
 			itemValue2.ToDouble(&dValue2);
 			pItem->value[0] = dValue1;
 			pItem->value[1] = dValue2;
-			m_RangeCtrl->InsertItem(idx,itemName);
+			m_RangeCtrl->InsertItem(idx1,itemName);
 			displayValue =  "["+itemValue1+","+itemValue2+"]";
-			m_RangeCtrl->SetItem(idx ,1,displayValue);
-			m_RangeCtrl->SetItemState(idx , wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED,
+			m_RangeCtrl->SetItem(idx1 ,1,displayValue);
+			m_RangeCtrl->SetItemState(idx1 , wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED,
 				wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-			m_RangeCtrl->EnsureVisible(idx+1);
-			m_RangeCtrl->SetItemData(idx , (long)pItem);
-			idx++;
+			m_RangeCtrl->EnsureVisible(idx1+1);
+			m_RangeCtrl->SetItemData(idx1 , (long)pItem);
+			idx1++;
+
+		}else if (linkName.StartsWith(FILTER_LINK_NAME2) &&  nScalars>0)
+		{
+			//------insert item----format--"filter-link0:aa:0.100:1.214"
+			FILTER_ITEM* pItem = new FILTER_ITEM;
+			memset(pItem, 0, sizeof(FILTER_ITEM));
+
+			wxStringTokenizer tkz(wxT(linkName.GetCStr()), wxT(":"));
+			int j=0;
+			while ( tkz.HasMoreTokens() )
+			{
+				wxString token = tkz.GetNextToken();
+				if (j==1)
+				{
+					itemName = token;
+				}else if (j==2)
+				{
+					itemValue1 = token;
+				}else if (j==3)
+				{
+					itemValue2 = token;
+				}
+				j++;
+			}
+			itemValue1.ToDouble(&dValue1);
+			itemValue2.ToDouble(&dValue2);
+			pItem->value[0] = dValue1;
+			pItem->value[1] = dValue2;
+			m_RangeCtrl2->InsertItem(idx2,itemName);
+			displayValue =  "["+itemValue1+","+itemValue2+"]";
+			m_RangeCtrl2->SetItem(idx2 ,1,displayValue);
+			m_RangeCtrl2->SetItemState(idx2 , wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED,
+				wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
+			m_RangeCtrl2->EnsureVisible(idx2 + 1);
+			m_RangeCtrl2->SetItemData(idx2 , (long)pItem);
+			idx2++;
 
 		}
 	}
-	if (idx>0)
+	if (idx1>0)
 	{
 		m_BttnShow->Enable(true);
 		m_BttnRemoveItem->Enable(true);
 	}
+	if (idx2>0)
+	{
+		m_BttnShow2->Enable(true);
+		m_BttnRemoveItem->Enable(true);
+	}
+	if (idx1>0 && idx2>0)
+	{
+		m_BttnShowAssociate->Enable(true);
+	}
 
+}
+//-----------------------------------------------------------------------
+//Store Filter values into link 
+void medPipeTensorFieldGlyphs::StoreFilterLinks2(){
+	//-----------------------------------------------------------------------
+
+	mafNode::mafLinksMap* pLinks = m_Vme->GetLinks(); 
+	//remove old filter of this link
+	bool bNeedRestart;  
+	do
+	{
+		bNeedRestart = false;
+		for (mafNode::mafLinksMap::iterator i = pLinks->begin(); i != pLinks->end(); i++)
+		{
+			if (i->first.StartsWith(FILTER_LINK_NAME2))
+			{
+				m_Vme->RemoveLink(i->first);
+				bNeedRestart = true;
+				break;
+			}
+		}
+	}while (bNeedRestart);
+
+	//then add new links
+	mafString szName;
+	wxString itemName;
+	int nCount = m_RangeCtrl2->GetItemCount();
+	if (nCount>0)
+	{
+		for (int i=0;i<nCount;i++)
+		{
+			itemName = m_RangeCtrl2->GetItemText(i);
+			FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(i);
+			mafString szName;
+			szName = wxString::Format("%s%d",FILTER_LINK_NAME2,i);
+			szName += ":";
+			szName += itemName;
+			szName += ":";
+			szName +=   wxString::Format("%.4f",pItem->value[0]);//wxString::Format("%.3f%d",szName,pItem->value[0]);
+			szName += ":";
+			szName +=  wxString::Format("%.4f",pItem->value[1]);//wxString::Format("%s%.3f",szName,pItem->value[1]);
+
+			m_Vme->SetLink(szName,m_Vme);
+		}
+	}
 }
 //-----------------------------------------------------------------------
 //Store Filter values into link 
@@ -487,7 +647,7 @@ void medPipeTensorFieldGlyphs::StoreFilterLinks(){
 }
 //-----------------------------------------------------------------------
 //use value of this item to filte data
-void medPipeTensorFieldGlyphs::OnShowFilter(){
+/*void medPipeTensorFieldGlyphs::OnShowFilter(int mode){
 	//-----------------------------------------------------------------------
 	int nIndex = m_RangeCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
 	if (nIndex >= 0)
@@ -502,13 +662,54 @@ void medPipeTensorFieldGlyphs::OnShowFilter(){
 		//valueRange = pItem->value;
 		//m_RangeCtrl->DeleteItem(nIndex);
 	}
+}*/
+//-----------------------------------------------------------------------
+//use value of this item to filte data
+void medPipeTensorFieldGlyphs::OnShowFilter(int mode){
+	//-----------------------------------------------------------------------
+	int nIndex1 = -1;
+	int nIndex2 = -1;
+	nIndex1 = m_RangeCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
+
+	if (mode ==1 && nIndex1>=0)
+	{
+		FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl->GetItemData(nIndex1);
+		double valueRange[2];
+		valueRange[0] = pItem->value[0] ;
+		valueRange[1] = pItem->value[1];
+		doFilter(mode,valueRange,NULL);
+	}else if (mode ==2 )
+	{
+		nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
+		if( nIndex2>=0){
+			FILTER_ITEM* pItem = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
+			double valueRange[2];
+			valueRange[0] = pItem->value[0] ;
+			valueRange[1] = pItem->value[1];
+			doFilter(mode,NULL,valueRange);		
+		}
+	}else if (mode ==3 && nIndex1>=0 )
+	{
+		nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
+		if( nIndex2>=0){
+			double valueRange1[2],valueRange2[2];
+			FILTER_ITEM* pItem1 = (FILTER_ITEM*)m_RangeCtrl->GetItemData(nIndex1);
+			valueRange1[0] = pItem1->value[0];
+			valueRange1[1] = pItem1->value[1];
+
+			FILTER_ITEM* pItem2 = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
+			valueRange2[0] = pItem2->value[0];
+			valueRange2[1] = pItem2->value[1];
+			doFilter(mode,valueRange1,valueRange2);	
+		}
+	}
 }
 //-----------------------------------------------------------------------
 //Add a range item
-void medPipeTensorFieldGlyphs::OnAddItem(){
+void medPipeTensorFieldGlyphs::OnAddItem(int idx){
 	//-----------------------------------------------------------------------
 
-	createAddItemDlg();
+	createAddItemDlg(idx);
 
 }
 //-----------------------------------------------------------------------
@@ -521,6 +722,63 @@ void medPipeTensorFieldGlyphs::OnRemoveItem(){
 		m_RangeCtrl->DeleteItem(nIndex);
 	}
 }
+//Remove a range item
+void medPipeTensorFieldGlyphs::OnRemoveItem2(){
+	//--------------------------------------------------------------------
+	int nIndex = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
+	if (nIndex >= 0)
+	{
+		m_RangeCtrl2->DeleteItem(nIndex);
+		if (m_RangeCtrl->GetItemCount()<1)
+		{
+			m_BttnShowAssociate->Enable(false);
+		}
+	}
+}
+/*---------------------------------------------*/
+//insert item 
+//----------------------------------------------
+bool medPipeTensorFieldGlyphs::AddItem2(){
+
+	double dValue1,dValue2;
+	bool rtn = false;
+	m_FilterValue1.ToDouble(&dValue1);
+	m_FilterValue2.ToDouble(&dValue2);
+
+	if (fabs(dValue2 - m_Sr2[1]) < 0.00005)
+	{
+		dValue2 = m_Sr2[1];
+	}
+	if (fabs(dValue1- m_Sr2[0]) < 0.00005)
+	{
+		dValue1 = m_Sr2[0];
+	}
+
+	if (dValue1<=dValue2 && dValue1>=m_Sr2[0] && dValue2<=m_Sr2[1] )
+	{
+		FILTER_ITEM* pItem = new FILTER_ITEM;
+		memset(pItem, 0, sizeof(FILTER_ITEM));
+		int nListCount = m_RangeCtrl2->GetItemCount();
+		wxString itemName = m_FilterName;
+		m_RangeCtrl2->InsertItem(nListCount, itemName);
+		wxString displayValue = "["+m_FilterValue1+","+m_FilterValue2+"]";
+		m_RangeCtrl2->SetItem(nListCount,1,displayValue);
+		m_RangeCtrl2->SetItemState(nListCount, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED,
+			wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
+		m_RangeCtrl2->EnsureVisible(nListCount);
+
+		pItem->value[0] = dValue1;
+		pItem->value[1] = dValue2;
+
+		m_RangeCtrl2->SetItemData(nListCount, (long)pItem);
+		rtn = true;
+	}else{
+		mafMessage("invalid value,please check");
+		rtn = false;
+	}
+	return rtn;
+}
+
 /*---------------------------------------------*/
 //insert item 
 //----------------------------------------------
@@ -538,16 +796,16 @@ bool medPipeTensorFieldGlyphs::AddItem(){
 	{
 		dValue1 = m_sr[0];
 	}*/
-	if (fabs(dValue2 - m_sr[1]) < 0.00005)
+	if (fabs(dValue2 - m_Sr[1]) < 0.00005)
 	{
-		dValue2 = m_sr[1];
+		dValue2 = m_Sr[1];
 	}
-	if (fabs(dValue1- m_sr[0]) < 0.00005)
+	if (fabs(dValue1- m_Sr[0]) < 0.00005)
 	{
-		dValue1 = m_sr[0];
+		dValue1 = m_Sr[0];
 	}
 
-	if (dValue1<=dValue2 && dValue1>=m_sr[0] && dValue2<=m_sr[1] )
+	if (dValue1<=dValue2 && dValue1>=m_Sr[0] && dValue2<=m_Sr[1] )
 	{
 		FILTER_ITEM* pItem = new FILTER_ITEM;
 		memset(pItem, 0, sizeof(FILTER_ITEM));
@@ -572,12 +830,42 @@ bool medPipeTensorFieldGlyphs::AddItem(){
 	return rtn;
 }
 //-----------------------------------------------------------------------
-//create dialog
-void medPipeTensorFieldGlyphs::createAddItemDlg(){
+//create dialog ,same as vector
+void medPipeTensorFieldGlyphs::createAddItemDlg(int idx){
 	//-----------------------------------------------------------------------
 	/*vtkDataArray *dataArr = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	double range[2];
 	dataArr->GetRange(range);*/
+
+	wxString dlgName = "";
+	int okBtn =0;
+	int canBtn = 0;
+	int rName = 0;
+	int rValue1 = 0;
+	int rValue2 = 0;
+	m_FilterName = "";
+
+	if(idx==1){
+		dlgName = "magnitude filter editor";
+		m_FilterValue1 = wxString::Format("%.4f",m_Sr[0]);
+		m_FilterValue2 = wxString::Format("%.4f",m_Sr[1]);
+		okBtn = ID_ITEM_OK;
+		canBtn = ID_ITEM_CANCEL;
+		rName = ID_RANGE_NAME;
+		rValue1 = ID_RANGE_VALUE1;
+		rValue2 = ID_RANGE_VALUE2;
+
+	}else if (idx==2)
+	{
+		dlgName = "scalar filter editor";
+		m_FilterValue1 = wxString::Format("%.4f",m_Sr2[0]);
+		m_FilterValue2 = wxString::Format("%.4f",m_Sr2[1]);
+		okBtn = ID_ITEM_OK2;
+		canBtn = ID_ITEM_CANCEL2;
+		rName = ID_RANGE_NAME2;
+		rValue1 = ID_RANGE_VALUE1_2;
+		rValue2 = ID_RANGE_VALUE2_2;
+	}
 
 	m_AddItemDlg = new mafGUIDialog("filter editor",mafCLOSEWINDOW | mafRESIZABLE);
 	// vertical stacker for the rows of widgets
@@ -592,32 +880,50 @@ void medPipeTensorFieldGlyphs::createAddItemDlg(){
 
 	//-----------------filter name------------------
 	wxStaticText *textName  = new wxStaticText(m_AddItemDlg, wxID_ANY, label1, wxPoint(0,0), wxSize(50,20));
-	wxTextCtrl   *textNameValue = new wxTextCtrl(m_AddItemDlg , ID_RANGE_NAME, "ddd", wxPoint(0,0), wxSize(50,20), wxNO_BORDER  );
-	textNameValue->SetValidator(mafGUIValidator(this, ID_RANGE_NAME, textNameValue, &m_FilterName));
+	wxTextCtrl   *textNameValue = new wxTextCtrl(m_AddItemDlg , rName, "ddd", wxPoint(0,0), wxSize(50,20), wxNO_BORDER  );
+	textNameValue->SetValidator(mafGUIValidator(this, rName, textNameValue, &m_FilterName));
 
 	//-----------------filter value1----------------
-	m_FilterValue1 = wxString::Format("%.4f",m_sr[0]);
+
 	wxStaticText *textValue1Name = new wxStaticText(m_AddItemDlg,wxID_ANY,label2,wxPoint(0,0),wxSize(50,20));
-	wxTextCtrl   *textValue1Value = new wxTextCtrl(m_AddItemDlg,ID_RANGE_VALUE1,"",wxPoint(0,0), wxSize(50,20),wxNO_BORDER);
-	textValue1Value->SetValidator(mafGUIValidator(this, ID_RANGE_VALUE1, textValue1Value, &m_FilterValue1));
+	wxTextCtrl   *textValue1Value = new wxTextCtrl(m_AddItemDlg,rValue1,"",wxPoint(0,0), wxSize(50,20),wxNO_BORDER);
+	textValue1Value->SetValidator(mafGUIValidator(this, rValue1, textValue1Value, &m_FilterValue1));
 	//-----------------filter value2----------------
-	m_FilterValue2 = wxString::Format("%.4f",m_sr[1]);
+
 	wxStaticText *textValue2Name = new wxStaticText(m_AddItemDlg,wxID_ANY,label3,wxPoint(0,0),wxSize(50,20));
-	wxTextCtrl   *textValue2Value = new wxTextCtrl(m_AddItemDlg,ID_RANGE_VALUE2,"",wxPoint(0,0), wxSize(50,20),wxNO_BORDER);
-	textValue2Value->SetValidator(mafGUIValidator(this, ID_RANGE_VALUE2, textValue2Value, &m_FilterValue2));
+	wxTextCtrl   *textValue2Value = new wxTextCtrl(m_AddItemDlg, rValue2,"",wxPoint(0,0), wxSize(50,20),wxNO_BORDER);
+	textValue2Value->SetValidator(mafGUIValidator(this, rValue2, textValue2Value, &m_FilterValue2));
 	//-----------------ok cancel button-------------
 
-	// ok/cancel buttons
-	m_ItemOK = new mafGUIButton(m_AddItemDlg, ID_ITEM_OK, "OK", wxPoint(0,0), wxSize(50,20));
-	m_ItemOK->SetListener(this);
-	m_ItemOK->Enable(false);
-
-	mafGUIButton *b_cancel = new mafGUIButton(m_AddItemDlg, ID_ITEM_CANCEL, "CANCEL", wxPoint(0,0), wxSize(50,20));
-	b_cancel->SetListener(this);
-
 	wxBoxSizer *hs_b = new wxBoxSizer(wxHORIZONTAL);
-	hs_b->Add(m_ItemOK,0);
-	hs_b->Add(b_cancel, 1, wxEXPAND);
+
+	if (idx==1)
+	{
+		// ok/cancel buttons
+		m_ItemOK = new mafGUIButton(m_AddItemDlg, okBtn, "OK", wxPoint(0,0), wxSize(50,20));
+		m_ItemOK->SetListener(this);
+		m_ItemOK->Enable(false);
+
+		mafGUIButton *b_cancel = new mafGUIButton(m_AddItemDlg, canBtn, "CANCEL", wxPoint(0,0), wxSize(50,20));
+		b_cancel->SetListener(this);
+
+		hs_b->Add(m_ItemOK,0);
+		hs_b->Add(b_cancel, 1, wxEXPAND);
+
+	}else if (idx==2)
+	{
+		// ok/cancel buttons
+		m_ItemOK2 = new mafGUIButton(m_AddItemDlg, okBtn, "OK", wxPoint(0,0), wxSize(50,20));
+		m_ItemOK2->SetListener(this);
+		m_ItemOK2->Enable(false);
+
+		mafGUIButton *b_cancel2 = new mafGUIButton(m_AddItemDlg, canBtn, "CANCEL", wxPoint(0,0), wxSize(50,20));
+		b_cancel2->SetListener(this);
+
+		hs_b->Add(m_ItemOK2,0);
+		hs_b->Add(b_cancel2, 1, wxEXPAND);
+	}
+
 	//-----------------------------------------------
 	hs_1->Add(textName, 0);
 	hs_1->Add(textNameValue, 1, wxEXPAND);
@@ -641,8 +947,37 @@ void medPipeTensorFieldGlyphs::createAddItemDlg(){
 
 
 }
+bool medPipeTensorFieldGlyphs::doCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2){
+	bool rtn = false;
+	bool tensorFlag;
+	bool scaleFlag;
+	if (mode ==1)
+	{
+		rtn = tensorScaleValue >= rangeValue1[0] && tensorScaleValue <= rangeValue1[1] ;
 
-void medPipeTensorFieldGlyphs::doFilter(double *rangeValue){
+	}else if (mode ==2)
+	{
+		rtn = scaleValue >= rangeValue2[0] && scaleValue <= rangeValue2[1];
+	}
+	else if (mode ==3)
+	{
+		tensorFlag = tensorScaleValue >= rangeValue1[0] && tensorScaleValue <= rangeValue1[1] ;
+		scaleFlag = scaleValue >= rangeValue2[0] && scaleValue <= rangeValue2[1];
+
+		if (m_AndOr ==0)//and
+		{
+			rtn = tensorFlag && scaleFlag;
+
+		}else if (m_AndOr == 1)//or
+		{
+			rtn = tensorFlag || scaleFlag;
+		}
+	}
+
+	return rtn;
+
+}
+void medPipeTensorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *rangeValue2){
 	
 
 	double origin[3],spacing[3];
@@ -651,105 +986,197 @@ void medPipeTensorFieldGlyphs::doFilter(double *rangeValue){
 	m_Output->Initialize();
 	vtkPoints *points = vtkPoints::New() ;// Create points and attribute arrays (vector or tensor as requested by user)
 
-	vtkFloatArray *scalars ;
-	vtkFloatArray *vectors ;
-	vtkFloatArray *tensors ;
+	vtkDoubleArray *scalars ;
+	vtkDoubleArray *vectors ;
+	vtkDoubleArray *tensors ;
 
-	scalars = vtkFloatArray::New() ;
+	scalars = vtkDoubleArray::New() ;
 	scalars->SetNumberOfComponents(1) ;
 	scalars->SetName("scalars") ;
 
-	vectors = vtkFloatArray::New() ;
+	vectors = vtkDoubleArray::New() ;
 	vectors->SetNumberOfComponents(3) ;
 	vectors->SetName("vectors") ;
 
-	tensors = vtkFloatArray::New() ;
+	tensors = vtkDoubleArray::New() ;
 	tensors->SetNumberOfComponents(9) ;
 	tensors->SetName("tensors") ;
 
-	vtkStructuredPoints *orgData =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
-	orgData->GetOrigin(origin) ;
-	orgData->GetSpacing(spacing) ;
-	orgData->GetDimensions(dim);
-	orgData->GetIncrements(increment);
+	vtkDataSet *orgData = m_Vme->GetOutput()->GetVTKData();
+
 	vtkPointData *allPoints = orgData->GetPointData();
 	vtkDataArray *old_scalars = allPoints->GetScalars();
 	vtkDataArray *old_vectors = allPoints->GetVectors();
 	vtkDataArray *old_tensors = allPoints->GetTensors();
 
-	//mafString logFname2 = "coordFile.txt";//if debug
-	//std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
-	//outputFile2.clear();//if debug
-	//outputFile2<<"-----------------------------------------------"<<std::endl;//if debug
+	vtkDataArray *pointScalarArray = allPoints->GetScalars();
+	int nPoints = old_tensors->GetSize()/old_tensors->GetNumberOfComponents();
+	int idx,num=0 ;
+	double xDvalue,yDvalue,zDvalue;
+
+	double dMax=0,dMin=0;//test code
+
+
 	int pointsNum = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetNumberOfTuples();
+	vtkIdType numScal = m_DataScale_Copy->GetSize();//vtkIdType num1 = da->GetNumberOfTuples();
+	int step = numScal /pointsNum;
 	int idxPoints = 0;
 	int idxScales = 0;
 
-	
-	//vtkDataArray* daScal = Tmp_Glyphs->GetOutput()->GetPointData()->GetScalars();
-	double sr[2];
+	double tensorScale;
+	double pointScale = NULL;
 
-	if (m_DataScale_Copy != NULL)
-	{
-		m_DataScale_Copy->GetRange(sr);
-		
-		vtkIdType numScal = m_DataScale_Copy->GetSize();//vtkIdType num1 = da->GetNumberOfTuples();
-		int step = numScal /pointsNum;
-		double scaleValue;
-		double *pCoord;
-		double *aTuple;
-		if (pointsNum>0)
-		{
-		
-			for (int iz=0;iz<dim[2];iz++)
+	double *pCoord;
+	double *aTuple;
+
+	int nScalars = GetNumberOfScalars();
+
+	//if (nScalars > 1){
+		if(orgData->IsA("vtkRectilinearGrid")){
+			//vtkImageData* pImgData = GetImageData(orgDataR);
+
+			mafString logFname2 = "coordFile.txt";//if debug
+			std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
+			outputFile2.clear();//if debug
+			outputFile2<<"---------------begin--------------------------------"<<std::endl;//if debug
+			int dim[3];
+
+			vtkRectilinearGrid *orgDataR = vtkRectilinearGrid::SafeDownCast(orgData);
+			/*vtkFloatArray *xCoord = vtkFloatArray::SafeDownCast(orgDataR->GetXCoordinates());//@todo
+			vtkFloatArray *yCoord = vtkFloatArray::SafeDownCast(orgDataR->GetYCoordinates());
+			vtkFloatArray *zCoord = vtkFloatArray::SafeDownCast(orgDataR->GetZCoordinates());*/
+			vtkDataArray *xCoord = orgDataR->GetXCoordinates();
+			vtkDataArray *yCoord = orgDataR->GetYCoordinates();
+			vtkDataArray *zCoord = orgDataR->GetZCoordinates();
+			//-----------test code ------------------
+			orgDataR->GetDimensions(dim);
+			int numberOfTuple = old_scalars->GetNumberOfTuples();//@todo
+			float  fMin,fMax;
+			if (m_DataScale_Copy != NULL)
 			{
-				for (int iy=0;iy<dim[1];iy++)
+
+				if (nPoints>0)
 				{
-					for (int ix=0;ix<dim[0];ix++)
+					for (int iz=0;iz<dim[2];iz++)
 					{
-						idxPoints = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
-						idxScales = idxPoints * step;
-
-						aTuple = m_DataScale_Copy->GetTuple(idxScales);
-						scaleValue = aTuple[0];
-
-						if (scaleValue>=rangeValue[0] && scaleValue<=rangeValue[1])//in range
+						for (int iy=0;iy<dim[1];iy++)
 						{
-							pCoord = allPoints->GetTuple(idxPoints);
-							
-							pCoord[0] = origin[0] + pCoord[0] + ix * spacing[0];
-							pCoord[1] = origin[1] + pCoord[1] + iy * spacing[1];
-							pCoord[2] = origin[2] + pCoord[2] + iz * spacing[2];
-							
-							points->InsertNextPoint(pCoord);
-							scalars->InsertNextTuple((float*)&scaleValue);
+							for (int ix=0;ix<dim[0];ix++)
+							{
+								idxPoints = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
+								idxScales = idxPoints * step;
+								aTuple = m_DataScale_Copy->GetTuple(idxScales);
+								tensorScale = aTuple[0];
+								if (pointScalarArray)
+								{
+									pointScale = pointScalarArray->GetTuple1(idxPoints);
+								}
+								//if (scaleValue>=rangeValue[0] && scaleValue<=rangeValue[1])//in range
+								if (doCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//doCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2)
+								{
+									pCoord = allPoints->GetTuple(idx);//only init
 
-							vectors->InsertNextTuple(old_vectors->GetTuple3(idxPoints));
-							tensors->InsertNextTuple(old_tensors->GetTuple9(idxPoints));
+									pCoord[0] = xCoord->GetTuple1(ix);
+									pCoord[1] = yCoord->GetTuple1(iy);
+									pCoord[2] = zCoord->GetTuple1(iz);
+									
+									points->InsertNextPoint(pCoord);
+									vectors->InsertNextTuple(old_vectors->GetTuple3(idxPoints));
+									scalars->InsertNextTuple((float*)&pointScale);
+									tensors->InsertNextTuple(old_tensors->GetTuple9(idxPoints));
+									num++;
+								}
 
-							//outputFile2<< "  Scale="<<scaleValue<<" idxPoints="<<idxPoints<<"   idxScales"<<idxScales<<std::endl;//if debug
-						}		
+							}
+						}
 					}
 				}
 			}
+
+
+		}else if (orgData->IsA("vtkStructuredPoints") || orgData->IsA("vtkImageData"))
+		{
+			vtkStructuredPoints *orgDataS =vtkStructuredPoints::SafeDownCast(m_Vme->GetOutput()->GetVTKData()) ;
+			orgDataS->GetOrigin(origin) ;
+			orgDataS->GetSpacing(spacing) ;
+			orgDataS->GetDimensions(dim);
+			orgDataS->GetIncrements(increment);
+
+			
+			//vtkDataArray* daScal = Tmp_Glyphs->GetOutput()->GetPointData()->GetScalars();
+			double sr[2];
+
+			if (m_DataScale_Copy != NULL)
+			{
+				m_DataScale_Copy->GetRange(sr);
+
+				
+				if (pointsNum>0)
+				{
+
+					for (int iz=0;iz<dim[2];iz++)
+					{
+						for (int iy=0;iy<dim[1];iy++)
+						{
+							for (int ix=0;ix<dim[0];ix++)
+							{
+								idxPoints = ix+iy*dim[0]+iz*dim[0]*dim[1];//position in whole image
+								idxScales = idxPoints * step;
+
+								aTuple = m_DataScale_Copy->GetTuple(idxScales);
+								tensorScale = aTuple[0];
+								if (pointScalarArray)
+								{
+									pointScale = pointScalarArray->GetTuple1(idxPoints);
+								}
+								if (doCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//in range
+								{
+									pCoord = allPoints->GetTuple(idxPoints);
+
+									pCoord[0] = origin[0] + ix * spacing[0];
+									pCoord[1] = origin[1] + iy * spacing[1];
+									pCoord[2] = origin[2] + iz * spacing[2];
+
+									points->InsertNextPoint(pCoord);
+									scalars->InsertNextTuple((float*)&pointScale);
+
+									vectors->InsertNextTuple(old_vectors->GetTuple3(idxPoints));
+									tensors->InsertNextTuple(old_tensors->GetTuple9(idxPoints));
+
+									//outputFile2<< "  Scale="<<scaleValue<<" idxPoints="<<idxPoints<<"   idxScales"<<idxScales<<std::endl;//if debug
+								}		
+							}
+						}
+					}
+				}
+			}
+
 		}
-	}
-	
+		//
 
-	scalars->Squeeze();
-	vectors->Squeeze();
-	tensors->Squeeze();
 
-	m_Output->SetPoints(points) ;
-	m_Output->GetPointData()->SetScalars(scalars) ;
-	m_Output->GetPointData()->SetVectors(vectors) ;
-	m_Output->GetPointData()->SetTensors(tensors);
+		//mafString logFname2 = "coordFile.txt";//if debug
+		//std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);//if debug
+		//outputFile2.clear();//if debug
+		//outputFile2<<"-----------------------------------------------"<<std::endl;//if debug
+
 		
-	m_Output->Update();
-	m_Glyphs->SetInput(m_Output);
-	m_Glyphs->Update();
-	//outputFile2<< "  sr[0]="<<sr[0]<<"  sr[1]="<<sr[1]<<std::endl;//if debug
-	//outputFile2.close();//if debug
+
+		scalars->Squeeze();
+		vectors->Squeeze();
+		tensors->Squeeze();
+
+		m_Output->SetPoints(points) ;
+		m_Output->GetPointData()->SetScalars(scalars) ;
+		m_Output->GetPointData()->SetVectors(vectors) ;
+		m_Output->GetPointData()->SetTensors(tensors);
+			
+		m_Output->Update();
+		m_Glyphs->SetInput(m_Output);
+		m_Glyphs->Update();
+		//outputFile2<< "  sr[0]="<<sr[0]<<"  sr[1]="<<sr[1]<<std::endl;//if debug
+		//outputFile2.close();//if debug
+	//}//if nscale
 
 
 }
@@ -879,39 +1306,97 @@ void medPipeTensorFieldGlyphs::OnEvent(mafEventBase *maf_event)
 		}
 		else if (e->GetId() == ID_ADDITEM)
 		{
-			OnAddItem();
+			OnAddItem(1);
+		}else if (e->GetId()== ID_ADDITEM2)
+		{
+			OnAddItem(2);
 		}else if (e->GetId() == ID_SHOWITEM)//show result of this filter
 		{
 			m_ShowAll = 0;
-			OnShowFilter();
+			OnShowFilter(1);
 			m_Gui->Update();
-		}else if (e->GetId() == ID_REMOVEITEM)//remove an Item
+		}else if(e->GetId() == ID_SHOWITEM2){
+			m_ShowAll = 0;
+			OnShowFilter(2);
+			m_Gui->Update();
+		}else if (e->GetId() == ID_SHOWITEM_ASSOCIATE)
+		{
+			m_ShowAll = 0;
+			OnShowFilter(3);
+			m_Gui->Update();
+		}
+		else if (e->GetId() == ID_REMOVEITEM)//remove an Item
 		{
 			OnRemoveItem();
+			if ( m_RangeCtrl2->GetItemCount()<1 || m_RangeCtrl->GetItemCount()<1)
+			{
+				m_BttnShowAssociate->Enable(false);
+			}
 			StoreFilterLinks();
+		}else if(e->GetId() == ID_REMOVEITEM2)
+		{
+			OnRemoveItem2();
+			if ( m_RangeCtrl2->GetItemCount()<1 || m_RangeCtrl->GetItemCount()<1)
+			{
+				m_BttnShowAssociate->Enable(false);
+			}
+			StoreFilterLinks2();
 		}
 		else if (e->GetId()==ID_RANGE_NAME)
 		{
 			m_ItemOK->Enable(true);
-		}else if (e->GetId()==ID_ITEM_OK)//check value
+		}
+		else if (e->GetId() == ID_RANGE_NAME2)
+		{
+			m_ItemOK2->Enable(true);
+		}
+		else if (e->GetId()==ID_ITEM_OK)//check value
 		{
 			if (AddItem())//if values are valid ,an item inserted
 			{
 				m_AddItemDlg->EndModal(wxID_OK);
 				m_BttnShow->Enable(true);
 				m_BttnRemoveItem->Enable(true);
+				if ( GetNumberOfScalars()>0 && m_RangeCtrl2->GetItemCount()>0)
+				{
+					m_BttnShowAssociate->Enable(true);
+				}
 				m_Gui->Update();
 				StoreFilterLinks();
 			}	
-		}else if (e->GetId()==ID_ITEM_CANCEL)//close window
+		}else if (e->GetId()==ID_ITEM_OK2)//check value
+		{
+			if (AddItem2())//if values are valid ,an item inserted
+			{
+				m_AddItemDlg->EndModal(wxID_OK);
+				m_BttnShow2->Enable(true);
+				m_BttnRemoveItem2->Enable(true);
+
+				if ( m_RangeCtrl->GetItemCount()>0)
+				{
+					m_BttnShowAssociate->Enable(true);
+				}
+
+				m_Gui->Update();
+				StoreFilterLinks2();
+			}	
+		}
+		else if (e->GetId()==ID_ITEM_CANCEL)//close window
 		{
 			m_AddItemDlg->EndModal(wxID_CANCEL);
-		}else if (e->GetId()==ID_SHOW_ALL)
+		}else if (e->GetId()==ID_ITEM_CANCEL2)
+		{
+			m_AddItemDlg->EndModal(wxID_CANCEL);
+		}
+		else if (e->GetId()==ID_SHOW_ALL)
 		{
 			if (m_ShowAll)
 			{
 				m_Glyphs->SetInput(m_Vme->GetOutput()->GetVTKData());
 			}
+		}else if (e->GetId()==ID_CHOOSE_ANDOR)
+		{
+
 		}
 
         
@@ -1051,13 +1536,40 @@ void medPipeTensorFieldGlyphs::OnEvent(mafEventBase *maf_event)
   m_Glyphs->Update();
 
   vtkDataArray* da = m_Glyphs->GetOutput()->GetPointData()->GetScalars();
+  vtkDataArray* daScalar = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
+
+  //-------------test code----------------
+ /*vtkDataArray* testTensorArray = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetTensors();
+ int tensorSize = testTensorArray->GetSize();
+ int comp = testTensorArray->GetNumberOfComponents();
+ int nPoints = tensorSize/comp;
+ mafString logFname2 = "testTensorFile.txt";
+ std::ofstream outputFile2(logFname2, std::ios::out|std::ios::app);
+ outputFile2.clear();
+ outputFile2<<"-----------------------------------------------"<<std::endl;
+ for (int k=0;k<nPoints;k++)
+ {
+	 outputFile2<<"tensor:"<<k<<std::endl;
+	 for (int i=0;i<9;i++)
+	 {
+		 outputFile2<<testTensorArray->GetTuple9(k)[i];
+	 }
+	 outputFile2<<std::endl;
+ }
+ outputFile2.close();
+ */
+  //-------------test over----------------
   
   if (medPipeTensorFieldGlyphs::count==1)
   {
 	  m_DataScale_Copy = vtkFloatArray::New();
 	  m_DataScale_Copy->DeepCopy(da);
-	  m_DataScale_Copy->GetRange(m_sr);
+	  m_DataScale_Copy->GetRange(m_Sr);
 
+  }
+  if (daScalar)
+  {
+	  daScalar->GetRange(m_Sr2);
   }
   if (m_UseColorMapping != 0)
   {
