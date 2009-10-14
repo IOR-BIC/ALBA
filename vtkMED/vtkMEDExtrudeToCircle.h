@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2009-10-14 11:29:05 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2009-10-14 12:29:32 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -59,7 +59,7 @@ public:
   double GetHoleRadius() const {return m_HoleRadius ;}                                   ///< Get radius of input hole
   int GetHoleNumVerts() const {return m_HoleNumVerts ;}                                  ///< Get number of points around hole
 
-  double Getm_EndRadius() const {return m_EndRadius ;}  ///< Get end radius of extrusion
+  double GetEndRadius() const {return m_EndRadius ;}  ///< Get end radius of extrusion
 
   /// Get matrix reqd to rotate arrow (x axis) to vector direction u
   void GetMatRotArrowToAxis(vtkMatrix4x4 *mat, const double *u) const ;
@@ -82,7 +82,7 @@ protected:
   /// It is the direction from the centre of the hole to the first vertex. \n
   /// This is not necessarily normal to the cylinder axis.  \n
   /// holepts is the list of point ids on the hole. \n
-  void Calcm_UpVector(vtkIdList *holepts) ;
+  void CalcUpVector(vtkIdList *holepts) ;
 
   /// Calculate vertex rings (z position and no. of vertices) along extrusion.  \n
   /// Allocates memory for mesh structure
@@ -188,7 +188,7 @@ protected:
   bool m_DefinedDirection ;       // Is direction defined
   bool m_DefinedVector ;          // Is vector defined
   bool m_DefinedExtrusionPoint ;  // Is extrusion point defined
-  bool m_Definedm_MinNumEndPts ;    // Is no. of end points defined
+  bool m_DefinedMinNumEndPts ;    // Is no. of end points defined
   bool m_BuiltCells ;             // Are polydata cell links built
 
   double m_Length ;             // length of extrusion

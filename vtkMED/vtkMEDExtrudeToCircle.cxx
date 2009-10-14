@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.cxx,v $
 Language:  C++
-Date:      $Date: 2009-10-14 11:29:05 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2009-10-14 12:29:32 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -35,7 +35,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.2 $");
+vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.3 $");
 vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 //------------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 //------------------------------------------------------------------------------
 // Constructor
 vtkMEDExtrudeToCircle::vtkMEDExtrudeToCircle() : m_DefinedLength(false), m_DefinedDirection(false), m_DefinedVector(false),
-m_DefinedExtrusionPoint(false), m_Definedm_MinNumEndPts(false), m_BuiltCells(false),
+m_DefinedExtrusionPoint(false), m_DefinedMinNumEndPts(false), m_BuiltCells(false),
 m_Mesh(NULL), m_DefaultDirectionSign(1)
 //------------------------------------------------------------------------------
 {
@@ -238,7 +238,7 @@ void vtkMEDExtrudeToCircle::SetMinNumberofEndPoints(int minNumEndPoints)
 //------------------------------------------------------------------------------
 {
   m_MinNumEndPts = minNumEndPoints ;
-  m_Definedm_MinNumEndPts = true ;
+  m_DefinedMinNumEndPts = true ;
 
   this->Modified() ;
 }
@@ -440,7 +440,7 @@ void vtkMEDExtrudeToCircle::CalcHoleParameters(vtkPolyData *hole)
 // Calculate "up" vector which defines phi = 0 in cylindrical coords
 // It is the direction from the centre of the hole to the first vertex.
 // This is not necessarily normal to the cylinder axis.
-void vtkMEDExtrudeToCircle::Calcm_UpVector(vtkIdList *holepts)
+void vtkMEDExtrudeToCircle::CalcUpVector(vtkIdList *holepts)
 //------------------------------------------------------------------------------
 {
   double x[3] ;
@@ -463,10 +463,10 @@ void vtkMEDExtrudeToCircle::CalcExtrusionRings()
 
   // set the requested min. value for the no. of end points to something sensible.
   // default is the same as the no. of vertices on the hole.
-  if (!m_Definedm_MinNumEndPts || (m_MinNumEndPts < m_HoleNumVerts)){
+  if (!m_DefinedMinNumEndPts || (m_MinNumEndPts < m_HoleNumVerts)){
     // set min no. of end vertices to default
     m_MinNumEndPts = m_HoleNumVerts ;
-    m_Definedm_MinNumEndPts = true ;
+    m_DefinedMinNumEndPts = true ;
   }
 
   // calculate circumference of extrusion
@@ -539,7 +539,7 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
   GetPointsAroundHole(m_Input, holepts) ;
 
   // Calculate the up vector for the cylindrical coord system
-  Calcm_UpVector(holepts) ;
+  CalcUpVector(holepts) ;
 
   // Reverse order of points if the list of points contains decreasing phi
   int sense = CalcSenseOfPointsAroundHole(holepts, m_HoleCentre, m_ExtrusionVector, m_UpVector) ;
@@ -549,7 +549,7 @@ void vtkMEDExtrudeToCircle::CalcExtrusionVertices()
   }
 
   // Calculate the up vector for the cylindrical coord system
-  Calcm_UpVector(holepts) ;
+  CalcUpVector(holepts) ;
 
   // get the cylindrical coords of the hole points and copy them to the first ring
   double r, phi, z ;
@@ -1248,7 +1248,7 @@ void vtkMEDExtrudeToCircle::PrintSelf(ostream& os, vtkIndent indent) const
   os << indent << "vector: " << vec[0] << " " << vec[1] << " " << vec[2] << std::endl ;
   os << indent << "extrusion point: " << extrPt[0] << " " << extrPt[1] << " " << extrPt[2] << std::endl ;
   os << indent << "length: " << GetLength() << std::endl ;
-  os << indent << "end radius: " << Getm_EndRadius() << std::endl ;
+  os << indent << "end radius: " << GetEndRadius() << std::endl ;
   os << std::endl ;
 
   os << indent << "mesh structure..." << std::endl ;
