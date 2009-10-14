@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-10-09 10:26:42 $
-Version:   $Revision: 1.1.2.21 $
+Date:      $Date: 2009-10-14 11:05:08 $
+Version:   $Revision: 1.1.2.22 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -136,7 +136,7 @@ public:
   void CreateSlice(int slice_num);
 
   /** Return vtkImageData of the selected slice */
-  vtkImageData* GetFirstSlice(mafString  sliceName);
+  vtkImageData* GetFirstSlice(mafString sliceName);
 
   /** Build teh mesh starting from the list of dicom files. */
   int BuildMesh();
@@ -188,8 +188,11 @@ protected:
 	/** Show the slice slice_num. */
 	void ShowSlice();
 
-  /** Fill listbox. */
-  void FillListBox(mafString StudyUID, medListDICOMFiles	*filesList);
+  /** Fill Study listbox. */
+  void FillStudyListBox(std::vector<mafString> StudyAndSeriesVec);
+
+  /** Fill Series listbox. */
+  void FillSeriesListBox();
 
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
@@ -284,7 +287,9 @@ protected:
 	int				m_NumberOfTimeFrames;
 
 	medListDICOMFiles	*m_ListSelected;
-  std::map<mafString,medListDICOMFiles*> m_DicomMap;
+
+  std::vector<mafString> m_VectorSelected;
+  std::map<std::vector<mafString>,medListDICOMFiles*> m_DicomMap;
 
 	mafString	m_CurrentSliceName;
 	mafString	m_VolumeName;
@@ -293,7 +298,8 @@ protected:
 
 	int				 m_NumberOfStudy; ///<Number of study present in the DICOM directory
 	int				 m_NumberOfSlices;
-	wxListBox	*m_StudyListbox;
+  wxListBox	*m_StudyListbox;
+  wxListBox	*m_SeriesListbox;
 
   int           m_ZCropBounds[2];
 	int						m_CurrentSlice;
