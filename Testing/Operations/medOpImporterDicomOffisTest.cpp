@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-09 10:27:15 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-10-14 11:05:40 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -195,7 +195,6 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
 
     if (dicomPath != wxEmptyString && wxDirExists(dicomPath))
     {
-      // Get all .zip files
       wxDir::GetAllFiles(dicomPath, &files, FileSpec);
     }
     CPPUNIT_ASSERT(files.GetCount() == 1);
@@ -211,8 +210,6 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
     importer->CreateSlice(0);
 
     wxSplitPath(txtFilePath, &path, &short_name, &ext);
-    //mafString dicomPath = txtFilePath.SubString(0, txtFilePath.find_last_of("."));
-    //dicomPath.Append(".dcm");
     vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetFirstSlice(short_name);
    
     wxFileInputStream inputFile( txtFilePath );
@@ -231,7 +228,6 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
       line = text.ReadLine();
 
     } while (!inputFile.Eof());
-
 
     CPPUNIT_ASSERT(imageImported->GetNumberOfPoints() == pixelVector.size());
 
