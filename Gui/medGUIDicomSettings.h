@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:11:37 $
-Version:   $Revision: 1.5.2.6 $
+Date:      $Date: 2009-10-14 12:29:20 $
+Version:   $Revision: 1.5.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -57,6 +57,10 @@ public:
     ID_DISCARD_ORIGIN,
     ID_RESAMPLE_VOLUME,
     ID_RESCALE_TO_16_BIT,
+    ID_AUTO_VME_TYPE,
+    ID_SETTING_VME_TYPE,
+    ID_Z_CROP,
+    ID_ENABLE_POS_INFO,
 	};
 
   /** Modality IDs*/
@@ -110,6 +114,15 @@ public:
   int EnableResampleVolume(){return m_EnableResampleVolume;};
   /** Enable rescaling to 16 bit. */
   int EnableRescaleTo16Bit(){return m_EnableRescaleTo16Bit;};
+  /** Enable visualize position. */
+  int EnableVisualizationPosition(){return m_VisualizePosition;};
+  /** EnableZ-direction crop. */
+  int EnableZCrop(){return m_EnableZCrop;};
+  /** Retrive auto VME type flag. */
+  int AutoVMEType(){return m_AutoVMEType;};
+  /** Retrive VME type. */
+  int GetVMEType(){return m_OutputType;};
+
 
 	/** Return if a particular type of Dicom is Enabled to be read */
 	bool EnableToRead(char* type);
@@ -129,6 +142,8 @@ protected:
 
 	int m_CheckOnOff[6];
 
+  int m_OutputType;
+
 	int m_AutoCropPos;
 	int m_EnableNumberOfTime;
 	int m_EnableNumberOfSlice;
@@ -137,5 +152,8 @@ protected:
   int m_EnableDiscardPosition;
   int m_EnableResampleVolume;
   int m_EnableRescaleTo16Bit;
+  int m_EnableZCrop;
+  int m_AutoVMEType;
+  int m_VisualizePosition;
 };
 #endif

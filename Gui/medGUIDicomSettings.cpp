@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 14:11:37 $
-Version:   $Revision: 1.7.2.6 $
+Date:      $Date: 2009-10-14 12:29:20 $
+Version:   $Revision: 1.7.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -41,6 +41,11 @@ mafGUISettings(Listener, label)
   m_EnableDiscardPosition = FALSE;
   m_EnableResampleVolume = FALSE;
   m_EnableRescaleTo16Bit = FALSE;
+  m_VisualizePosition = false;
+  m_EnableZCrop =  true;
+  m_AutoVMEType = false;
+  m_OutputType = 0;
+
   m_Step = ID_1X;
 
 	InitializeSettings();
@@ -57,12 +62,20 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui = new mafGUI(this);
 	m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary);
 	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
-	m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
+  m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
 	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
   m_Gui->Bool(ID_SIDE,_("Enable Change Side"),&m_EnableChangeSide,1);
   m_Gui->Bool(ID_DISCARD_ORIGIN,_("Enable Discard Origin"),&m_EnableDiscardPosition,1);
   m_Gui->Bool(ID_RESAMPLE_VOLUME,_("Enable Resample Volume"),&m_EnableResampleVolume,1);
   m_Gui->Bool(ID_RESCALE_TO_16_BIT,_("Enable Rescaling to 16 Bit"),&m_EnableRescaleTo16Bit,1);
+  m_Gui->Bool(ID_Z_CROP,_("Enable Z-direction Crop"),&m_EnableZCrop,1);
+  m_Gui->Bool(ID_ENABLE_POS_INFO,_("Visualize Position and Orientation"),&m_VisualizePosition,1);
+
+  m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
+  wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
+  m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
+
+  m_Gui->Divider();
 	wxString choices[4]={_("1x"),_("2x"),_("3x"),_("4x")};
 	m_Gui->Combo(ID_STEP,_("Build Step"),&m_Step,4,choices);
 	m_DicomModalityListBox=m_Gui->CheckList(ID_TYPE_DICOM,_("Modality"));
@@ -75,12 +88,14 @@ void medGUIDicomSettings::CreateGui()
 	m_Gui->Divider(1);
 
 	m_Gui->Update();
+  m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
 }
 //----------------------------------------------------------------------------
 void medGUIDicomSettings::EnableItems()
 //----------------------------------------------------------------------------
 {
 	m_Gui->Enable(ID_DICTONARY,true);
+  m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
 }
 //----------------------------------------------------------------------------
 void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
@@ -105,8 +120,15 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 	case ID_AUTO_POS_CROP:
 		{
 			m_Config->Write("AutoCropPos",m_AutoCropPos);
+      EnableItems();
 		}
 		break;
+  case ID_AUTO_VME_TYPE:
+    {
+      m_Config->Write("AutoVMEType",m_AutoVMEType);
+
+    }
+    break;
 	case ID_ENALBLE_NUMBER_OF_SLICE:
 		{
 			m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
@@ -140,6 +162,21 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
   case ID_RESCALE_TO_16_BIT:
     {
       m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
+    }
+    break;
+  case ID_Z_CROP:
+    {
+      m_Config->Write("EnableZCrop",m_EnableZCrop);
+    }
+    break;
+  case ID_ENABLE_POS_INFO:
+    {
+      m_Config->Write("EnableVisualizationPosition",m_VisualizePosition);
+    }
+    break;
+  case ID_SETTING_VME_TYPE:
+    {
+      m_Config->Write("VMEType",m_OutputType);
     }
     break;
 	default:
@@ -190,6 +227,24 @@ void medGUIDicomSettings::InitializeSettings()
   else
   {
     m_Config->Write("EnableRescaleTo16Bit",m_EnableRescaleTo16Bit);
+  }
+
+  if(m_Config->Read("EnableVisualizationPosition", &long_item))
+  {
+    m_EnableRescaleTo16Bit=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableVisualizationPosition",m_EnableRescaleTo16Bit);
+  }
+
+  if(m_Config->Read("EnableZCrop", &long_item))
+  {
+    m_EnableZCrop=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableZCrop",m_EnableZCrop);
   }
 
 
@@ -273,6 +328,24 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("AutoCropPos",m_AutoCropPos);
 	}
+
+  if(m_Config->Read("AutoVMEType", &long_item))
+  {
+    m_AutoVMEType=long_item;
+  }
+  else
+  {
+    m_Config->Write("AutoVMEType",m_AutoVMEType);
+  }
+
+  if(m_Config->Read("VMEType", &long_item))
+  {
+    m_OutputType=long_item;
+  }
+  else
+  {
+    m_Config->Write("VMEType",m_OutputType);
+  }
 
 	if(m_Config->Read("EnableTimeBar", &long_item))
 	{
