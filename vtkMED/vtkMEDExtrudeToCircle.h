@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2008-11-06 10:22:50 $
-Version:   $Revision: 1.4.2.1 $
+Date:      $Date: 2009-10-14 11:29:05 $
+Version:   $Revision: 1.4.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -23,8 +23,9 @@ All rights reserved.
 
 
 //------------------------------------------------------------------------------
-/** vtkMEDExtrudeToCircle - Extrusion filter based on vtkLinearExtrusionFilter, 
-This creates an extrusion terminating in a circle. */
+/// vtkMEDExtrudeToCircle. \n
+/// Extrusion filter based on vtkLinearExtrusionFilter. \n
+/// This creates an extrusion terminating in a circle.
 //------------------------------------------------------------------------------
 class VTK_vtkMAF_EXPORT vtkMEDExtrudeToCircle : public vtkPolyDataToPolyDataFilter
 {
@@ -33,8 +34,8 @@ public:
   // Public methods
   //----------------------------------------------------------------------------
   vtkTypeRevisionMacro(vtkMEDExtrudeToCircle, vtkPolyDataToPolyDataFilter);
-  static vtkMEDExtrudeToCircle *New();                                                   ///< New() method
-  void PrintSelf(ostream& os, vtkIndent indent) const ;                            ///< print self
+  static vtkMEDExtrudeToCircle *New();                  ///< New() method
+  void PrintSelf(ostream& os, vtkIndent indent) const ; ///< print self
 
   void SetLength(double len) ;                        ///< Set the length of the extrusion
   void SetDirection(const double *direc) ;            ///< Set the direction of extrusion (does not have to be normalised)
@@ -43,24 +44,24 @@ public:
   void SetExtrusionVector(const double *extrVector) ; ///< Set the extrusion vector
   void SetMinNumberofEndPoints(int minNumEndPoints) ; ///< set min no. of vertices at end of extrusion
 
-  /** Reset the extrusion direction to the default, which is normal to the hole.
-  Use this to reverse the direction if the extrusion goes the wrong way.
-  Argument is +1 or -1 to select forward or reverse direction relative to the hole. */
+  /// Reset the extrusion direction to the default, which is normal to the hole. \n
+  /// Use this to reverse the direction if the extrusion goes the wrong way. \n
+  /// Argument is +1 or -1 to select forward or reverse direction relative to the hole.
   void SetDirectionToDefault(int directionSign) ;      
 
-  double GetLength() const {return Length ; }
-  void GetDirection(double *direc) const {CopyVector(Direction, direc) ;}
-  void GetExtrusionPoint(double *extrPt) const {CopyVector(ExtrusionPoint, extrPt) ;}
-  void GetExtrusionVector(double *extrVec) const {CopyVector(ExtrusionVector, extrVec) ;}
+  double GetLength() const {return m_Length ; }
+  void GetDirection(double *direc) const {CopyVector(m_Direction, direc) ;}
+  void GetExtrusionPoint(double *extrPt) const {CopyVector(m_ExtrusionPoint, extrPt) ;}
+  void GetExtrusionVector(double *extrVec) const {CopyVector(m_ExtrusionVector, extrVec) ;}
 
-  void GetHoleCentre(double *centre) const {CopyVector(HoleCentre, centre) ;}          ///< Get centre of input hole
-  void GetHoleNormal(double *normal) const {CopyVector(HoleNormal, normal) ;}          ///< Get normal of input hole
-  double GetHoleRadius() const {return HoleRadius ;}                                   ///< Get radius of input hole
-  int GetHoleNumVerts() const {return HoleNumVerts ;}                                        ///< Get number of points around hole
+  void GetHoleCentre(double *centre) const {CopyVector(m_HoleCentre, centre) ;}          ///< Get centre of input hole
+  void GetHoleNormal(double *normal) const {CopyVector(m_HoleNormal, normal) ;}          ///< Get normal of input hole
+  double GetHoleRadius() const {return m_HoleRadius ;}                                   ///< Get radius of input hole
+  int GetHoleNumVerts() const {return m_HoleNumVerts ;}                                  ///< Get number of points around hole
 
-  double GetEndRadius() const {return EndRadius ;}  ///< Get end radius of extrusion
+  double Getm_EndRadius() const {return m_EndRadius ;}  ///< Get end radius of extrusion
 
-  /** Get matrix reqd to rotate arrow (x axis) to vector direction u */
+  /// Get matrix reqd to rotate arrow (x axis) to vector direction u
   void GetMatRotArrowToAxis(vtkMatrix4x4 *mat, const double *u) const ;
 
 protected:
@@ -74,98 +75,98 @@ protected:
 
   void Initialize() ;   ///< initialize filter (clear old data out for clean start)
 
-  /** Calculate Centre, normal and radius of hole, and no. of vertices */
+  /// Calculate Centre, normal and radius of hole, and no. of vertices
   void CalcHoleParameters(vtkPolyData *hole) ;
 
-  /** Calculate "up" vector which defines phi = 0 in cylindrical coords
-  It is the direction from the centre of the hole to the first vertex.
-  This is not necessarily normal to the cylinder axis. 
-  holepts is the list of point ids on the hole. */
-  void CalcUpVector(vtkIdList *holepts) ;
+  /// Calculate "up" vector which defines phi = 0 in cylindrical coords. \n
+  /// It is the direction from the centre of the hole to the first vertex. \n
+  /// This is not necessarily normal to the cylinder axis.  \n
+  /// holepts is the list of point ids on the hole. \n
+  void Calcm_UpVector(vtkIdList *holepts) ;
 
-  /** Calculate vertex rings (z position and no. of vertices) along extrusion 
-  Allocates memory for mesh structure */
+  /// Calculate vertex rings (z position and no. of vertices) along extrusion.  \n
+  /// Allocates memory for mesh structure
   void CalcExtrusionRings() ;
 
-  /** Calculate cylindrical and cartesian coords of each mesh vertex */
+  /// Calculate cylindrical and cartesian coords of each mesh vertex
   void CalcExtrusionVertices() ;
 
-  /** Transfer vertices to vtkPoints */
+  /// Transfer vertices to vtkPoints
   void VerticesToVtkPoints(vtkPoints *pts) const ;
 
-  /** Sort vertices into vtk triangles */
+  /// Sort vertices into vtk triangles
   void VerticesToVtkTriangles(vtkCellArray *triangles) const ;
 
-  /** Calculate the extrusion vector, once we know the centre and normal of the hole.
-  This also calculates the length, direction and extrusion point.
-  This pulls together all the possible routes for setting the extrusion vector.
-  The default length is 1.0 and the default direction is the hole normal, if they have not been set. */
+  /// Calculate the extrusion vector, once we know the centre and normal of the hole. \n
+  /// This also calculates the length, direction and extrusion point. \n
+  /// This pulls together all the possible routes for setting the extrusion vector. \n
+  /// The default length is 1.0 and the default direction is the hole normal, if they have not been set.
   void CalculateExtrusionVector() ;
 
-  /** Get cylindrical coords (r, phi, z) of point x.
-  The cylinder system is defined by the central axis and an "up" vector, which defines phi = 0
-  cylAxis and upVector do not have to be normalised.
-  upVector does not have to be exactly normal to cylAxis.
-  phi is in the range 0 to 2pi. */
+  /// Get cylindrical coords (r, phi, z) of point x. \n
+  /// The cylinder system is defined by the central axis and an "up" vector, which defines phi = 0. \n
+  /// cylAxis and upVector do not have to be normalised. \n
+  /// upVector does not have to be exactly normal to cylAxis. \n
+  /// phi is in the range 0 to 2pi.
   void CalcCylinderCoords(const double *x, const double *centre, const double *cylAxis, const double *upVector, double *r, double *phi, double *z) const ;
 
-  /** Get cartesian coords x given cylindrical coords (r, phi, z)
-  The cylinder system is defined by the central axis and an "up" vector, which defines phi = 0
-  cylAxis and upVector do not have to be normalised.
-  upVector does not have to be exactly normal to cylAxis. */
+  /// Get cartesian coords x given cylindrical coords (r, phi, z). \n
+  /// The cylinder system is defined by the central axis and an "up" vector, which defines phi = 0. \n
+  /// cylAxis and upVector do not have to be normalised. \n
+  /// upVector does not have to be exactly normal to cylAxis.
   void CalcCartesianCoords(double r, double phi, double z, const double *centre, const double *cylAxis, const double *upVector, double *x) const ;
 
-  /** Get points in order around hole */
+  /// Get points in order around hole
   void GetPointsAroundHole(vtkPolyData *hole, vtkIdList *pts) const ;
 
-  /** Checks sense of points as calculated by GetPointsAroundHole()
-  Returns 1 if phi increases with index
-  Returns -1 if phi decreases with index */
+  /// Checks sense of points as calculated by GetPointsAroundHole(). \n
+  /// Returns 1 if phi increases with index. \n
+  /// Returns -1 if phi decreases with index.
   int CalcSenseOfPointsAroundHole(vtkIdList *pts, const double *centre, const double *cylAxis, const double *upVector) const ;
 
-  /** This makes sure that the values of phi on the first ring
-  monotonically increase from near zero
-  Otherwise we get can serious problems with 2pi when interpolating. */
+  /// This makes sure that the values of phi on the first ring \n
+  /// monotonically increase from near zero, \n
+  /// otherwise we get can serious problems with 2pi when interpolating.
   void Remove2PiArtefactsFromFirstRing() ;
 
-  /** Reverse id list */
+  /// Reverse id list
   void ReverseIdList(vtkIdList *pts) const ;
 
-  /** Circular shift id list */
+  /// Circular shift id list
   void CircularShiftIdList(vtkIdList *pts, int shift) const ;
 
-  /** Modulo operator, same as % but works correctly on negative values of n as well */
+  /// Modulo operator, same as % but works correctly on negative values of n as well
   inline int Modulo(int n, int m) const ;
 
-  /** Copy vector b = a */
+  /// Copy vector b = a
   void CopyVector(const double *a, double *b) const ;
 
-  /** Set vector */
+  /// Set vector
   void SetVector(double *vec, double x, double y, double z) const ;
 
-  /** Add vector */
+  /// Add vector
   void AddVector(const double *vin, const double *x, double *vout) const ;
 
-  /** Subtract vector */
+  /// Subtract vector
   void SubtractVector(const double *vin, const double *x, double *vout) const ;
 
-  /** Multiply vector by scalar */
+  /// Multiply vector by scalar
   void MultVectorByScalar(double s, const double *vin, double *vout) const ;
 
-  /** Get norm of vector */
+  /// Get norm of vector
   double GetNorm(const double *vec) const ;
 
-  /** Normalize vector */
+  /// Normalize vector
   void Normalize(const double *vin, double *vout) const ;
 
-  /** Cross product of vectors a ^ b = c */
+  /// Cross product of vectors a ^ b = c
   void CrossProduct(const double *a, const double *b, double *c) const ;
 
-  /** Dot product of vectors a.b */
+  /// Dot product of vectors a.b
   double DotProduct(const double *a, const double *b) const ;
 
-  /** Inverse solution of equation x' = Mx, where M = row vectors (u, v and w)
-  Find x given M and x' */
+  /// Inverse solution of equation x' = Mx, where M = row vectors (u, v and w).  \n
+  /// Find x given M and x'.
   void InverseSolveTransform(const double *u, const double *v, const double *w, const double *y, double *x) const ;
 
 
@@ -180,70 +181,72 @@ protected:
   //----------------------------------------------------------------------------
   // Member variables
   //----------------------------------------------------------------------------
-  vtkPolyData *Input ;
-  vtkPolyData *Output ;
+  vtkPolyData *m_Input ;
+  vtkPolyData *m_Output ;
 
-  bool DefinedLength ;          // Is length defined
-  bool DefinedDirection ;       // Is direction defined
-  bool DefinedVector ;          // Is vector defined
-  bool DefinedExtrusionPoint ;  // Is extrusion point defined
-  bool DefinedMinNumEndPts ;    // Is no. of end points defined
-  bool BuiltCells ;             // Are polydata cell links built
+  bool m_DefinedLength ;          // Is length defined
+  bool m_DefinedDirection ;       // Is direction defined
+  bool m_DefinedVector ;          // Is vector defined
+  bool m_DefinedExtrusionPoint ;  // Is extrusion point defined
+  bool m_Definedm_MinNumEndPts ;    // Is no. of end points defined
+  bool m_BuiltCells ;             // Are polydata cell links built
 
-  double Length ;             // length of extrusion
-  double Direction[3] ;       // direction of extrusion
-  double ExtrusionPoint[3] ;  // target point of extrusion
-  double ExtrusionVector[3] ; // extrusion vector (length and direction of extrusion)
-  int MinNumEndPts ;          // user requested min no. of vertices at end of extrusion
-  int DefaultDirectionSign ;  // default direction: 1 for forwards, -1 for reverse
+  double m_Length ;             // length of extrusion
+  double m_Direction[3] ;       // direction of extrusion
+  double m_ExtrusionPoint[3] ;  // target point of extrusion
+  double m_ExtrusionVector[3] ; // extrusion vector (length and direction of extrusion)
+  int m_MinNumEndPts ;          // user requested min no. of vertices at end of extrusion
+  int m_DefaultDirectionSign ;  // default direction: 1 for forwards, -1 for reverse
 
-  double HoleCentre[3] ;      // centre of hole
-  double HoleNormal[3] ;      // normal of plane of hole
-  double HoleRadius ;         // r.m.s. radius of hole
-  int HoleNumVerts ;          // no. of vertices around hole
-  double UpVector[3] ;        // direction from centre of hole to first point
+  double m_HoleCentre[3] ;      // centre of hole
+  double m_HoleNormal[3] ;      // normal of plane of hole
+  double m_HoleRadius ;         // r.m.s. radius of hole
+  int m_HoleNumVerts ;          // no. of vertices around hole
+  double m_UpVector[3] ;        // direction from centre of hole to first point
 
-  double EndRadius ;          // end radius of extrusion
+  double m_EndRadius ;          // end radius of extrusion
 
-  MeshData* Mesh ; // mesh structure consisting of rings of vertices
+  MeshData* m_Mesh ; // mesh structure consisting of rings of vertices
 
 } ;
 
 
 
 //------------------------------------------------------------------------------
-// subclass for vertex position and index in polydata
+/// vtkMEDExtrudeToCircle::VertexData. \n
+/// Private subclass for vertex position and index in polydata.
 //------------------------------------------------------------------------------
 class vtkMEDExtrudeToCircle::VertexData{
 public:
   void PrintSelf(ostream& os, vtkIndent indent) const ;
 
-  void SetCylCoords(const double *cyl) {for (int i=0 ; i<3 ; i++){Cylcoord[i]=cyl[i] ;}}
-  void SetCylCoords(double r, double phi, double z) {Cylcoord[0]=r; Cylcoord[1]=phi; Cylcoord[2]=z;}
-  void SetCylR(double r) {Cylcoord[0]=r;}
-  void SetCylPhi(double phi) {Cylcoord[1]=phi;}
-  void SetCylZ(double z) {Cylcoord[2]=z;}
-  void SetCartCoords(const double *x) {for (int i=0 ; i<3 ; i++){Cartcoord[i]=x[i];}}
-  void SetCartCoords(double x, double y, double z) {Cartcoord[0]=x; Cartcoord[1]=y; Cartcoord[2]=z;}
-  void SetId(vtkIdType id) {PolydataId = id;}
+  void SetCylCoords(const double *cyl) {for (int i=0 ; i<3 ; i++){m_Cylcoord[i]=cyl[i] ;}}
+  void SetCylCoords(double r, double phi, double z) {m_Cylcoord[0]=r; m_Cylcoord[1]=phi; m_Cylcoord[2]=z;}
+  void SetCylR(double r) {m_Cylcoord[0]=r;}
+  void SetCylPhi(double phi) {m_Cylcoord[1]=phi;}
+  void SetCylZ(double z) {m_Cylcoord[2]=z;}
+  void SetCartCoords(const double *x) {for (int i=0 ; i<3 ; i++){m_Cartcoord[i]=x[i];}}
+  void SetCartCoords(double x, double y, double z) {m_Cartcoord[0]=x; m_Cartcoord[1]=y; m_Cartcoord[2]=z;}
+  void SetId(vtkIdType id) {m_PolydataId = id;}
 
-  void GetCylCoords(double *cyl) const {for (int i=0 ; i<3 ; i++){cyl[i]=Cylcoord[i];}}
-  void GetCylCoords(double *r, double *phi, double *z) const {*r=Cylcoord[0]; *phi=Cylcoord[1]; *z=Cylcoord[2];}
-  double GetCylR() const {return Cylcoord[0];}
-  double GetCylPhi() const {return Cylcoord[1];}
-  double GetCylZ() const {return Cylcoord[2];}
-  void GetCartCoords(double *x) const {for (int i=0 ; i<3 ; i++){x[i]=Cartcoord[i] ;}}
-  vtkIdType GetId() const {return PolydataId;}
+  void GetCylCoords(double *cyl) const {for (int i=0 ; i<3 ; i++){cyl[i]=m_Cylcoord[i];}}
+  void GetCylCoords(double *r, double *phi, double *z) const {*r=m_Cylcoord[0]; *phi=m_Cylcoord[1]; *z=m_Cylcoord[2];}
+  double GetCylR() const {return m_Cylcoord[0];}
+  double GetCylPhi() const {return m_Cylcoord[1];}
+  double GetCylZ() const {return m_Cylcoord[2];}
+  void GetCartCoords(double *x) const {for (int i=0 ; i<3 ; i++){x[i]=m_Cartcoord[i] ;}}
+  vtkIdType GetId() const {return m_PolydataId;}
 
 private:
-  double Cylcoord[3] ;
-  double Cartcoord[3] ;
-  vtkIdType PolydataId ;
+  double m_Cylcoord[3] ;
+  double m_Cartcoord[3] ;
+  vtkIdType m_PolydataId ;
 } ;
 
 
 //------------------------------------------------------------------------------
-// subclass for ring of vertices
+/// vtkMEDExtrudeToCircle::RingData.
+/// Private subclass for ring of vertices.
 //------------------------------------------------------------------------------
 class vtkMEDExtrudeToCircle::RingData{
 public:
@@ -251,14 +254,15 @@ public:
   void AllocateVertices(int n) {NumVerts = n ;  Vertex = new VertexData[n] ;}
   void PrintSelf(ostream& os, vtkIndent indent) const ;
 
-  double Z ;                        // position in cylindrical coords
-  int NumVerts ;                    // no. of vertices in ring
-  VertexData *Vertex ;              // array of vertices
+  double Z ;                        ///< position in cylindrical coords
+  int NumVerts ;                    ///< no. of vertices in ring
+  VertexData *Vertex ;              ///< array of vertices
 } ;
 
 
 //------------------------------------------------------------------------------
-// subclass for extrusion mesh
+/// vtkMEDExtrudeToCircle::MeshData.
+/// Private subclass for extrusion mesh
 //------------------------------------------------------------------------------
 class vtkMEDExtrudeToCircle::MeshData{
 public:
@@ -266,8 +270,8 @@ public:
   void AllocateRings(int n) {NumRings = n ;  Ring = new RingData[n] ;}
   void PrintSelf(ostream& os, vtkIndent indent) const ;
 
-  int NumRings ;              // no. of rings in mesh
-  RingData *Ring ;            // array of rings
+  int NumRings ;              ///< no. of rings in mesh
+  RingData *Ring ;            ///< array of rings
 } ;
 
 #endif
