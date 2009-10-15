@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-10-15 07:51:33 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -65,17 +65,20 @@ void mafOpValidateTree::OpRun()
 //----------------------------------------------------------------------------
 {
   int result = ValidateTree();
-  if (result == mafOpValidateTree::VALIDATE_SUCCESS)
+  if(m_TestMode == false)
   {
-    wxMessageBox(_("Tree validation terminated succesfully!!."), _("Info"));
-  }
-  else if (result == mafOpValidateTree::VALIDATE_WARNING)
-  {
-    wxMessageBox(_("Tree Patched!! In log area you can find details."), _("Warning"));
-  }
-  else
-  {
-    wxMessageBox(_("Tree invalid!! In log area you can find details."), _("Warning"));
+    if (result == mafOpValidateTree::VALIDATE_SUCCESS)
+    {
+      wxMessageBox(_("Tree validation terminated succesfully!!."), _("Info"));
+    }
+    else if (result == mafOpValidateTree::VALIDATE_WARNING)
+    {
+      wxMessageBox(_("Tree Patched!! In log area you can find details."), _("Warning"));
+    }
+    else
+    {
+      wxMessageBox(_("Tree invalid!! In log area you can find details."), _("Warning"));
+    }
   }
   mafEventMacro(mafEvent(this,OP_RUN_OK));
 }
@@ -228,7 +231,7 @@ void mafOpValidateTree::ErrorLog(int error_num, const char *node_name, const cha
   switch(error_num)
   {
     case mafOpValidateTree::INVALID_NODE:
-      mafLogMessage(_("Patched Node '%s' with an invalid ID!!"), node_name);
+      (m_TestMode==false)?mafLogMessage(_("Patched Node '%s' with an invalid ID!!"), node_name):printf(_("Patched Node '%s' with an invalid ID!!"), node_name);
     break;
     case mafOpValidateTree::LINK_NOT_PRESENT:
       mafLogMessage(_("Link node '%s' is not present into the tree"), node_name);
