@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-14 11:05:08 $
-Version:   $Revision: 1.1.2.61 $
+Date:      $Date: 2009-10-15 08:43:11 $
+Version:   $Revision: 1.1.2.62 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1922,7 +1922,10 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
     case ID_SERIES:
       {
         m_VectorSelected.at(0) = m_StudyListbox->GetString(m_StudyListbox->GetSelection());
-        m_VectorSelected.at(2) = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+        wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+        m_VolumeName = seriesName;
+
+        m_VectorSelected.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
         std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
         for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
         {
@@ -1935,7 +1938,6 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
             }
           }
         }
-        m_VolumeName = m_VectorSelected.at(2);
         if(!this->m_TestMode)
         {
           m_BuildGuiLeft->Update();
@@ -2476,7 +2478,18 @@ void medOpImporterDicomOffis::FillSeriesListBox()
         m_VectorSelected.at(2) = (*it).first.at(2);
         if (m_DicomMap.find(m_VectorSelected) != m_DicomMap.end())
         {
-          m_SeriesListbox->Append(m_VectorSelected.at(2).GetCStr());
+          m_ListSelected = m_DicomMap[m_VectorSelected];
+          int numberOfImages = 0;
+
+          int numberOfTimeFrames = ((medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
+          if(numberOfTimeFrames > 1) //If cMRI
+            numberOfImages = m_ListSelected->GetCount() / numberOfTimeFrames;
+          else
+            numberOfImages = m_ListSelected->GetCount();
+          
+          mafString seriesName = m_VectorSelected.at(2);
+          seriesName.Append(wxString::Format("x%i", numberOfImages));
+          m_SeriesListbox->Append(seriesName.GetCStr());
           m_SeriesListbox->SetClientData(counter,(void *)m_DicomMap[m_VectorSelected]/*filesList*/);
           counter++;
         }
@@ -3160,10 +3173,10 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 
   m_ListSelected = m_DicomMap[m_VectorSelected];
 
-	medImporterDICOMListElements *element0;
-	element0 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
+  medImporterDICOMListElements *element0;
+  element0 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
 
-	int numberOfImages =  element0->GetNumberOfImages();
+  int numberOfImages =  element0->GetNumberOfImages();
 
 	int numberOfDicomSlices = m_ListSelected->GetCount();
   int numSlicesPerTS;
