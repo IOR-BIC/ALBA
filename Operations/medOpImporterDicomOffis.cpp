@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-15 08:43:11 $
-Version:   $Revision: 1.1.2.62 $
+Date:      $Date: 2009-10-15 13:25:49 $
+Version:   $Revision: 1.1.2.63 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1245,15 +1245,16 @@ int medOpImporterDicomOffis::BuildMesh()
 
   int counter= 0;
   int total = dim[0]*dim[1];
-  for ( int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+  int sourceVolumeSliceId = m_ZCropBounds[0]; // ac fixed compilation error: vs2005
+  for ( ; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
   { 
     if(!this->m_TestMode)
     {
       progress = sourceVolumeSliceId * 100 / m_NumberOfSlices;
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
     }
-
-    if (sourceVolumeSliceId+1>=m_NumberOfSlices)
+    
+    if (sourceVolumeSliceId+1>=m_NumberOfSlices)// compilation error: vs2005: sourceVolumeSliceId defined in the for loop
       break;
     int lineCounter = 1;
     for(int n = 0; n < poly1->GetNumberOfPoints()-dim[0]-1; n++)
@@ -1366,7 +1367,8 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
     int counter= 0;
     int total = dim[0]*dim[1];
-    for (int sourceVolumeSliceId = m_ZCropBounds[0]; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
+    int sourceVolumeSliceId = m_ZCropBounds[0];// ac: compilation error (vs2005)
+    for (; sourceVolumeSliceId <m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
     { 
       if(!this->m_TestMode)
       {
@@ -1374,7 +1376,7 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
         mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
       }
 
-       if (sourceVolumeSliceId+1>=m_NumberOfSlices)
+       if (sourceVolumeSliceId+1>=m_NumberOfSlices)// ac: compilation error (vs2005): sourceVolumeSliceId defined in the for loop
          break;
       int lineCounter = 1;
       for(int n = 0; n < poly1->GetNumberOfPoints()-dim[0]-1; n++)
@@ -2571,7 +2573,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       DJDecoderRegistration::cleanup(); // deregister JPEG codecs
       DcmRLEDecoderRegistration::cleanup();
 
-      if (!error.good())
+      if (!sou.good())
       {
           wxMessageBox("Error decoding the image");
           return false;
