@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-08 13:41:38 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-16 13:52:06 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -100,6 +100,32 @@ void medOpMatrixVectorMath::NormalizeVector(const double *a, double *b) const
 }
 
 
+
+//------------------------------------------------------------------------------
+// Invert vector (multiply by -1)
+void medOpMatrixVectorMath::InvertVector(double *a) const
+//------------------------------------------------------------------------------
+{
+  for (int i = 0 ;  i < 3 ;  i++)
+    a[i] *= -1.0 ;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Invert vector (multiply by -1)
+void medOpMatrixVectorMath::InvertVector(const double *a, double *b) const
+//------------------------------------------------------------------------------
+{
+  for (int i = 0 ;  i < 3 ;  i++)
+    b[i] = -a[i] ;
+
+  if (m_homogeneous)
+    b[3] = 1.0 ;
+}
+
+
+
 //------------------------------------------------------------------------------
 // Multiply vector by scalar
 void medOpMatrixVectorMath::MultiplyVectorByScalar(double s, const double *a, double *b) const
@@ -149,6 +175,33 @@ void medOpMatrixVectorMath::SubtractVectors(const double *a, const double *b, do
     c[3] = 1.0 ;
 }
 
+
+
+
+//------------------------------------------------------------------------------
+// Add multiple of vector: a + s*b = c
+void medOpMatrixVectorMath::AddMultipleOfVector(const double *a, double s, double *b, double *c)
+//------------------------------------------------------------------------------
+{
+  for (int i = 0 ;  i < 3 ;  i++)
+    c[i] = a[i] + s*b[i] ;
+
+  if (m_homogeneous)
+    c[3] = 1.0 ;
+}
+
+
+//------------------------------------------------------------------------------
+// Subtract multiple of vector: a - s*b = c
+void medOpMatrixVectorMath::SubtractMultipleOfVector(const double *a, double s, double *b, double *c)
+//------------------------------------------------------------------------------
+{
+  for (int i = 0 ;  i < 3 ;  i++)
+    c[i] = a[i] - s*b[i] ;
+
+  if (m_homogeneous)
+    c[3] = 1.0 ;
+}
 
 
 //------------------------------------------------------------------------------

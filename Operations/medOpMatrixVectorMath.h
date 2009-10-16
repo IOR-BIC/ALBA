@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2009-10-08 13:41:38 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-10-16 13:52:06 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -62,19 +62,31 @@ public:
   void NormalizeVector(double *a) const ;                 
 
   /// Normalize vector
-  void NormalizeVector(const double *a, double *b) const ;                 
+  void NormalizeVector(const double *a, double *b) const ; 
 
-  /// Multiply vector by scalar.
+  /// Invert vector (multiply by -1)
+  void InvertVector(double *a) const ;                 
+
+  /// Invert vector (multiply by -1)
+  void InvertVector(const double *a, double *b) const ;                 
+
+  /// Multiply vector by scalar: s*a = b
   void MultiplyVectorByScalar(double s, const double *a, double *b) const ;   
 
-  /// Divide vector by scalar.
-  void DivideVectorByScalar(double s, const double *a, double *b) const ;     
+  /// Divide vector by scalar: a/s = b
+  void DivideVectorByScalar(double k, const double *a, double *b) const ;     
 
   /// Add vectors: a + b = c
   void AddVectors(const double *a, const double *b, double *c) const ;              
 
   /// Subtract vectors: a - b = c
-  void SubtractVectors(const double *a, const double *b, double *c) const ;         
+  void SubtractVectors(const double *a, const double *b, double *c) const ;   
+
+  /// Add multiple of vector: a + s*b = c
+  void AddMultipleOfVector(const double *a, double s, double *b, double *c) ;
+
+  /// Subtract multiple of vector: a - s*b = c
+  void SubtractMultipleOfVector(const double *a, double s, double *b, double *c) ;
 
   /// Dot product a.b
   double DotProduct(const double *a, const double *b) const ;   
