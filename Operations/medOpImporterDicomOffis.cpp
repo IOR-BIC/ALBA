@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-15 13:25:49 $
-Version:   $Revision: 1.1.2.63 $
+Date:      $Date: 2009-10-17 17:14:30 $
+Version:   $Revision: 1.1.2.64 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2573,7 +2573,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       DJDecoderRegistration::cleanup(); // deregister JPEG codecs
       DcmRLEDecoderRegistration::cleanup();
 
-      if (!sou.good())
+      if (!error.good())
       {
           wxMessageBox("Error decoding the image");
           return false;
