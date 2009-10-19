@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-08 14:21:41 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2009-10-19 14:51:39 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -59,8 +59,6 @@ medVMEMaps::medVMEMaps()
   m_Volume          = NULL;
   m_PolyData        = NULL;
   m_Table           = NULL;
-  
-  m_ColorTransferFunction = NULL;
 
   mafNEW(m_Transform);
   vtkNEW(m_Normals);
@@ -96,8 +94,6 @@ medVMEMaps::~medVMEMaps()
   mafDEL(m_Transform);
   vtkDEL(m_PolyData);
 
-  if(m_ColorTransferFunction)
-    vtkDEL(m_ColorTransferFunction);
   if(m_Table)
     vtkDEL(m_Table);
 
@@ -438,12 +434,9 @@ mmaMaterial *medVMEMaps::GetMaterial()
 void medVMEMaps::SetDensityDistance(int densityDistance)
 //-------------------------------------------------------------------------
 {
-  //mafEvent ev1(this, VME_SHOW, this, false);
-  //ForwardUpEvent(ev1);
   m_DensityDistance = densityDistance;
   GetOutput()->Update();
-  //mafEvent ev2(this, VME_SHOW, this, true);
-  //ForwardUpEvent(ev2);
+  UpdateFilter();
 }
 
 //-------------------------------------------------------------------------
@@ -451,6 +444,9 @@ void medVMEMaps::SetFirstThreshold(int firstThreshold)
 //-------------------------------------------------------------------------
 {
   m_FirstThreshold = firstThreshold;
+  UpdateFilter();
+  //InternalPreUpdate();
+  //InternalUpdate();
 }
 
 //-------------------------------------------------------------------------
@@ -458,6 +454,9 @@ void medVMEMaps::SetSecondThreshold(int secondThreshold)
 //-------------------------------------------------------------------------
 {
   m_SecondThreshold = secondThreshold;
+  UpdateFilter();
+  //InternalPreUpdate();
+  //InternalUpdate();
 }
 
 //-------------------------------------------------------------------------
@@ -465,6 +464,10 @@ void medVMEMaps::SetMaxDistance(int maxDistance)
 //-------------------------------------------------------------------------
 {
   m_MaxDistance = maxDistance;
+  UpdateFilter();
+  //InternalPreUpdate();
+  //InternalUpdate();
+
 }
 
 //-----------------------------------------------------------------------
@@ -530,14 +533,6 @@ vtkLookupTable *medVMEMaps::CreateTable()
     double range[2];
     ((mafVME*)m_Volume)->GetOutput()->GetVTKData()->GetScalarRange(range);
 
-    /*int i;
-    for (i=range[0];i<m_SecondThreshold;i++)
-      m_Table->SetTableValue(i,m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
-    for (i=m_SecondThreshold;i<m_FirstThreshold;i++)
-      m_Table->SetTableValue(i,m_MidColour.Red()/255.0, m_MidColour.Green()/255.0,	m_MidColour.Blue()/255.0);
-    for (i=m_FirstThreshold;i<=range[1];i++)
-      m_Table->SetTableValue(i,m_HiColour.Red()/255.0, m_HiColour.Green()/255.0,	m_HiColour.Blue()/255.0);*/
-
     m_Table->SetTableValue(range[0],m_LowColour.Red()/255.0, m_LowColour.Green()/255.0,	m_LowColour.Blue()/255.0);
     m_Table->SetTableValue(m_SecondThreshold,m_MidColour1.Red()/255.0, m_MidColour1.Green()/255.0,	m_MidColour1.Blue()/255.0);
     m_Table->SetTableValue(m_FirstThreshold,m_MidColour2.Red()/255.0, m_MidColour2.Green()/255.0,	m_MidColour2.Blue()/255.0);
@@ -562,17 +557,69 @@ void medVMEMaps::GetScalarRange(double range[2])
 }
 
 //-----------------------------------------------------------------------
-void medVMEMaps::SetColorTransferFunction(vtkColorTransferFunction *ctf)
+void medVMEMaps::UpdateFilter()
 //-----------------------------------------------------------------------
 {
-  m_ColorTransferFunction = ctf;
-}
 
-//-----------------------------------------------------------------------
-vtkColorTransferFunction *medVMEMaps::GetColorTransferFunction()
-//-----------------------------------------------------------------------
-{
-  if(!m_ColorTransferFunction)
-    vtkNEW(m_ColorTransferFunction);
-  return m_ColorTransferFunction;
+  mafVME *vme = mafVME::SafeDownCast(GetMappedVMELink());
+  if(!vme)
+    return;
+  vtkPolyData *data = (vtkPolyData *)vme->GetOutput()->GetVTKData();
+  data->Update();
+
+  //m_Normals->SetInput(data);
+  //m_Normals->ComputePointNormalsOn();
+  //m_Normals->SplittingOff();
+  m_Normals->Update();
+
+  if(m_Volume==NULL)
+  {
+    SetVolume(mafVMEVolume::SafeDownCast(GetSourceVMELink()));
+  }
+
+  if (m_Volume)
+  {
+    if(m_DensityDistance == 0)
+    {
+      m_DistanceFilter->SetFilterModeToDistance();
+    }
+    if(m_DensityDistance == 1)
+    {
+      m_DistanceFilter->SetFilterModeToDensity();
+    }
+
+    vtkDataSet *datasetvol = ((mafVME*)m_Volume)->GetOutput()->GetVTKData();
+    datasetvol->Update();
+    m_DistanceFilter->SetDistanceModeToScalar();
+    m_DistanceFilter->SetSource(datasetvol);
+    m_DistanceFilter->SetInput((vtkDataSet::SafeDownCast(m_Normals->GetOutput())));
+    m_DistanceFilter->SetMaxDistance(m_MaxDistance);
+    m_DistanceFilter->SetThreshold(m_FirstThreshold);
+    m_DistanceFilter->SetInputMatrix(vme->GetOutput()->GetAbsMatrix()->GetVTKMatrix());
+    m_DistanceFilter->Update(); 
+
+    vtkPolyData *polyout;
+    vtkMAFSmartPointer<vtkFloatArray> scalars;
+
+    if(polyout = m_DistanceFilter->GetPolyDataOutput())
+    {
+      polyout->Update();
+
+      scalars->DeepCopy(polyout->GetPointData()->GetScalars());
+
+      scalars->SetName("Distance_density");
+      scalars->Modified();
+
+      m_PolyData->DeepCopy(data);
+      m_PolyData->GetPointData()->AddArray(scalars);
+      m_PolyData->GetPointData()->SetActiveScalars("Distance_density");
+
+      m_PolyData->Modified();
+      m_PolyData->Update();
+    }
+  }
+
+  //mafVME *vol = mafVME::SafeDownCast(GetMappedVMELink());
+  //m_MappedName = vol ? vol->GetName() : _("none");
+
 }
