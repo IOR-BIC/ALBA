@@ -59,6 +59,10 @@ ADD_TEST(mafPipeSurfaceSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSurfaceSl
 ADD_EXECUTABLE(medVMEMapsTest medVMEMapsTest.h medVMEMapsTest.cpp)
 ADD_TEST(medVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEMapsTest)
 
+ADD_EXECUTABLE(medPipeTrajectoriesTest medPipeTrajectoriesTest.h medPipeTrajectoriesTest.cpp)
+ADD_TEST(medPipeTrajectoriesTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTrajectoriesTest)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
