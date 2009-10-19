@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFRulerActor2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-02-26 11:33:37 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2009-10-19 14:33:02 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -34,7 +34,7 @@
 #include "vtkProperty2D.h"
 #include "vtkPolyDataMapper2D.h"
 
-vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.5.2.1 $");
+vtkCxxRevisionMacro(vtkMAFRulerActor2D, "$Revision: 1.5.2.2 $");
 vtkStandardNewMacro(vtkMAFRulerActor2D);
 //------------------------------------------------------------------------------
 vtkMAFRulerActor2D::vtkMAFRulerActor2D()
@@ -96,6 +96,17 @@ vtkMAFRulerActor2D::~vtkMAFRulerActor2D()
   if(ScaleLabel)  ScaleLabel->Delete();
   if(HorizontalAxesLabel) HorizontalAxesLabel->Delete();
   if(VerticalAxesLabel) VerticalAxesLabel->Delete();
+
+  // Added by Losi 10.19.2009 to elimnate leaks
+  if(Points)  Points->Delete();
+
+  for(int i = 0; i < NUM_LAB; i++)
+  {
+    if(Labx[i]) Labx[i]->Delete();
+    if(Laby[i]) Laby[i]->Delete();
+  }
+  if(this->Legend)  delete [] this->Legend; 
+  // 
 }
 //------------------------------------------------------------------------------
 void vtkMAFRulerActor2D::PrintSelf(ostream& os, vtkIndent indent)
@@ -286,6 +297,10 @@ void vtkMAFRulerActor2D::RulerCreate()
   axis_cell->Delete();
   axis_pd->Delete();
   axis_pdm->Delete();
+
+  // Added by Losi 10.19.2009 to elimnate leaks
+  axis_p->Delete();
+  //
 
   //Label //////////////////////////
   ScaleLabel = vtkTextActor::New();
