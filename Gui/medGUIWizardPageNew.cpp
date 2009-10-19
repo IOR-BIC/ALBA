@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-08 08:22:05 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-10-19 08:39:37 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -96,6 +96,7 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
   m_GuiLowerLeft = NULL;
   m_GuiLowerCenter = NULL;
   m_GuiLowerUnderLeft = NULL;
+  m_GuiLowerUnderCenter = NULL;
 
 	if(style & medUSERWI)
   {
@@ -139,10 +140,15 @@ medGUIWizardPageNew::medGUIWizardPageNew(medGUIWizard *wizardParent,long style, 
     m_GuiLowerUnderLeft->FitGui();
     m_GuiLowerUnderLeft->Reparent(this);
 
+    m_GuiLowerUnderCenter = new mafGUI(this);
+    m_GuiLowerUnderCenter->FitGui();
+    m_GuiLowerUnderCenter->Reparent(this);
+
 		m_GUISizer->Add(m_GuiLowerLeft,0,wxEXPAND);
     m_GUISizer->Add(m_GuiLowerCenter,0,wxEXPAND);
 
     m_GUIUnderSizer->Add(m_GuiLowerUnderLeft,1,wxALL);
+    m_GUIUnderSizer->Add(m_GuiLowerUnderCenter,1,wxALL);
   
     m_SizerAll->Add(m_GUISizer,0,wxEXPAND|wxALL);
     m_SizerAll->Add(m_GUIUnderSizer,0,wxEXPAND|wxALL);
@@ -232,6 +238,15 @@ void medGUIWizardPageNew::AddGuiLowerCenter(mafGUI *gui)
   m_GuiLowerCenter->AddGui(gui);
   m_GuiLowerCenter->FitGui();
   m_GuiLowerCenter->Update();
+}
+
+//--------------------------------------------------------------------------------
+void medGUIWizardPageNew::AddGuiLowerUnderCenter(mafGUI *gui)
+//--------------------------------------------------------------------------------
+{
+  m_GuiLowerUnderCenter->AddGui(gui);
+  m_GuiLowerUnderCenter->FitGui();
+  m_GuiLowerUnderCenter->Update();
 }
 
 //--------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizardPageNew.h,v $
 Language:  C++
-Date:      $Date: 2009-10-08 08:22:05 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-10-19 08:39:37 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -102,6 +102,11 @@ public:
   /** Add in wizard gui, another gui in lower center bottom position. */
   void AddGuiLowerUnderLeft(mafGUI *gui);
 
+  /** Add in wizard gui, another gui in lower center bottom position. */
+  void AddGuiLowerUnderCenter(mafGUI *gui);
+
+  
+
   /** Remove in wizard gui, another gui in lower left position. */
   void RemoveGuiLowerLeft(mafGUI *gui);
 
@@ -137,6 +142,7 @@ private:
 
   mafGUI     *m_GuiLowerLeft; ///< Gui variable used to plug custom widgets localized in LOWER LEFT
   mafGUI     *m_GuiLowerCenter; ///< Gui variable used to plug custom widgets localized in LOWER CENTER
+  mafGUI     *m_GuiLowerUnderCenter; ///< Gui variable used to plug custom widgets localized under LOWER CENTER
   mafGUI     *m_GuiLowerUnderLeft; ///< Gui variable used to plug custom widgets localized under LOWER LEFT
   mafGUI     *m_GuiView;
 
