@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-17 17:14:30 $
-Version:   $Revision: 1.1.2.64 $
+Date:      $Date: 2009-10-19 08:39:08 $
+Version:   $Revision: 1.1.2.65 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1508,6 +1508,7 @@ void medOpImporterDicomOffis::CreateLoadPage()
 	m_LoadPage = new medGUIWizardPageNew(m_Wizard,medUSEGUI|medUSERWI);
 	m_LoadGuiLeft = new mafGUI(this);
   m_LoadGuiUnderLeft = new mafGUI(this);
+  m_LoadGuiCenter = new mafGUI(this);
 
 	m_SliceScannerLoadPage=m_LoadGuiLeft->Slider(ID_SCAN_SLICE,_("slice #"),&m_CurrentSlice,0,m_CurrentSlice,"",((medGUIDicomSettings*)GetSetting())->EnableNumberOfSlice());
   m_SliceScannerLoadPage->SetPageSize(1);
@@ -1517,13 +1518,15 @@ void medOpImporterDicomOffis::CreateLoadPage()
     m_TimeScannerLoadPage->SetPageSize(1);
   }
 
-  m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY,_("study id"),70,"",wxLB_HSCROLL,300);
-  m_SeriesListbox = m_LoadGuiUnderLeft->ListBox(ID_SERIES,_("series id"),70,"",wxLB_HSCROLL|wxLB_SORT,300);
+  m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY,_("study"),80,"",wxLB_HSCROLL,190);
+  m_SeriesListbox = m_LoadGuiCenter->ListBox(ID_SERIES,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
   
   m_LoadGuiLeft->FitGui();
   m_LoadGuiUnderLeft->FitGui();
+  m_LoadGuiCenter->FitGui();
   m_LoadPage->AddGuiLowerLeft(m_LoadGuiLeft);
   m_LoadPage->AddGuiLowerUnderLeft(m_LoadGuiUnderLeft);
+  m_LoadPage->AddGuiLowerUnderCenter(m_LoadGuiCenter);
   
 	m_LoadPage->GetRWI()->m_RwiBase->SetMouse(m_Mouse);
   m_LoadPage->GetRWI()->m_RenFront->AddActor(m_SliceActor);
@@ -1641,6 +1644,7 @@ bool medOpImporterDicomOffis::OpenDir()
     if(m_NumberOfStudy>0)
     {
       m_StudyListbox->SetSelection(FIRST_SELECTION);
+      UpdateStudyListBox();
       OnEvent(&mafEvent(this, ID_STUDY));
      /* if(m_NumberOfStudy == 1)
       {
@@ -1911,22 +1915,22 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 			break;
 		case ID_STUDY:
 			{
+        mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+        m_VectorSelected.at(0) = st->GetCStr();
         if (m_VectorSelected.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
         {
-          m_VectorSelected.at(0) = m_StudyListbox->GetString(m_StudyListbox->GetSelection());
           FillSeriesListBox();
           m_SeriesListbox->SetSelection(FIRST_SELECTION);
-          
           OnEvent(&mafEvent(this, ID_SERIES));
         }
  			}
 			break;
     case ID_SERIES:
       {
-        m_VectorSelected.at(0) = m_StudyListbox->GetString(m_StudyListbox->GetSelection());
+        mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+        m_VectorSelected.at(0) = st->GetCStr();
         wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
         m_VolumeName = seriesName;
-
         m_VectorSelected.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
         std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
         for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
@@ -2455,22 +2459,41 @@ void medOpImporterDicomOffis::CreatePipeline()
 void medOpImporterDicomOffis::FillStudyListBox(std::vector<mafString> studyAndSeriesVec)
 //----------------------------------------------------------------------------
 {
-  int studyRow = m_StudyListbox->FindString(studyAndSeriesVec.at(0).GetCStr());
-  if (studyRow == -1)
+  bool newStudy = true;
+  int studyConuter = m_StudyListbox->GetCount();
+  mafString studyName = "study_";
+  studyName.Append(wxString::Format("%i", studyConuter));
+  for (int n = 0; n < m_StudyListbox->GetCount(); n++)
+  {
+    mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
+    m_VectorSelected.at(0) = st->GetCStr();
+    if (m_VectorSelected.at(0).Compare(studyAndSeriesVec.at(0)) == 0)
+    {
+      newStudy = false;
+      break;
+    }
+  }
+  if (newStudy)
   { 
-    m_StudyListbox->Append(studyAndSeriesVec.at(0).GetCStr());
+    m_StudyListbox->Append(studyName.GetCStr());
+    mafString *ms = new mafString((studyAndSeriesVec.at(0)).GetCStr());
+    m_StudyListbox->SetClientData(studyConuter, (void *) ms);
   }
 }
 
 //----------------------------------------------------------------------------
-void medOpImporterDicomOffis::FillSeriesListBox()
+void medOpImporterDicomOffis::UpdateStudyListBox()
 //----------------------------------------------------------------------------
 {
-  int studyRow = m_StudyListbox->FindString(m_VectorSelected.at(0).GetCStr());
-  if (studyRow != -1)
-  { 
+  for (int n = 0; n < m_StudyListbox->GetCount(); n++)
+  {
     int counter = 0;
-    m_SeriesListbox->Clear();
+    mafString study = m_StudyListbox->GetString(n);
+    mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
+    m_VectorSelected.at(0) = st->GetCStr();
+    //wxString  studyName = st->GetCStr();
+    //m_VectorSelected.at(0) = studyName.SubString(0, studyName.find_last_of("_")-1);
+
     std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
     for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
     {
@@ -2480,21 +2503,43 @@ void medOpImporterDicomOffis::FillSeriesListBox()
         m_VectorSelected.at(2) = (*it).first.at(2);
         if (m_DicomMap.find(m_VectorSelected) != m_DicomMap.end())
         {
-          m_ListSelected = m_DicomMap[m_VectorSelected];
-          int numberOfImages = 0;
-
-          int numberOfTimeFrames = ((medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
-          if(numberOfTimeFrames > 1) //If cMRI
-            numberOfImages = m_ListSelected->GetCount() / numberOfTimeFrames;
-          else
-            numberOfImages = m_ListSelected->GetCount();
-          
-          mafString seriesName = m_VectorSelected.at(2);
-          seriesName.Append(wxString::Format("x%i", numberOfImages));
-          m_SeriesListbox->Append(seriesName.GetCStr());
-          m_SeriesListbox->SetClientData(counter,(void *)m_DicomMap[m_VectorSelected]/*filesList*/);
           counter++;
         }
+      }
+    }
+    m_StudyListbox->SetString(n, study.Append(wxString::Format("_%i", counter)).GetCStr());
+  }
+}
+
+//----------------------------------------------------------------------------
+void medOpImporterDicomOffis::FillSeriesListBox()
+//----------------------------------------------------------------------------
+{
+  int counter = 0;
+  m_SeriesListbox->Clear();
+  std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
+  for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+  {
+    if ((*it).first.at(0).Compare(m_VectorSelected.at(0)) == 0)
+    { 
+      m_VectorSelected.at(1) = (*it).first.at(1);
+      m_VectorSelected.at(2) = (*it).first.at(2);
+      if (m_DicomMap.find(m_VectorSelected) != m_DicomMap.end())
+      {
+        m_ListSelected = m_DicomMap[m_VectorSelected];
+        int numberOfImages = 0;
+
+        int numberOfTimeFrames = ((medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
+        if(numberOfTimeFrames > 1) //If cMRI
+          numberOfImages = m_ListSelected->GetCount() / numberOfTimeFrames;
+        else
+          numberOfImages = m_ListSelected->GetCount();
+        
+        mafString seriesName = m_VectorSelected.at(2);
+        seriesName.Append(wxString::Format("x%i", numberOfImages));
+        m_SeriesListbox->Append(seriesName.GetCStr());
+        m_SeriesListbox->SetClientData(counter,(void *)m_DicomMap[m_VectorSelected]/*filesList*/);
+        counter++;
       }
     }
   }
@@ -2893,7 +2938,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           {
             FillStudyListBox(studyAndSeriesVec);
           }
-					
 				}
 				else 
 				{

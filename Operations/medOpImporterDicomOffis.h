@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-10-14 11:05:08 $
-Version:   $Revision: 1.1.2.22 $
+Date:      $Date: 2009-10-19 08:39:08 $
+Version:   $Revision: 1.1.2.23 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -191,6 +191,9 @@ protected:
   /** Fill Study listbox. */
   void FillStudyListBox(std::vector<mafString> StudyAndSeriesVec);
 
+  /** Update Study listbox. */
+  void UpdateStudyListBox();
+
   /** Fill Series listbox. */
   void FillSeriesListBox();
 
@@ -270,6 +273,8 @@ protected:
 	mafGUI	*m_BuildGuiLeft;
   mafGUI	*m_BuildGuiUnderLeft;
   mafGUI	*m_BuildGuiCenter;
+
+  mafGUI  *m_LoadGuiCenter;
 
   int       m_OutputType;
 	mafString	m_DicomDirectory;
