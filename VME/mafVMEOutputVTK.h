@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputVTK.h,v $
   Language:  C++
-  Date:      $Date: 2005-07-22 13:51:11 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2009-10-20 10:27:26 $
+  Version:   $Revision: 1.5.22.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -27,6 +27,7 @@ class mafVMEGerericVTK;
 class MAF_EXPORT mafVMEOutputVTK : public mafVMEOutput
 {
 public:
+  /** RTTI Macro. */
   mafTypeMacro(mafVMEOutputVTK,mafVMEOutput);
 
   /**
@@ -44,12 +45,18 @@ public:
   //virtual void Update();
     
 protected:
-  mafVMEOutputVTK(); // to be allocated with New()
-  virtual ~mafVMEOutputVTK(); // to be deleted with Delete()
+  /** constructor: protected method. To be allocated with New(). */
+  mafVMEOutputVTK(); 
+
+  /** destructor protected method. To be deleted with delete(). */
+  virtual ~mafVMEOutputVTK(); 
 
 private:
-  mafVMEOutputVTK(const mafVMEOutputVTK&); // Not implemented
-  void operator=(const mafVMEOutputVTK&); // Not implemented
+  /** constructor: not implemented. */
+  mafVMEOutputVTK(const mafVMEOutputVTK&); 
+
+  /** Overloaded = operator: not implemented. */
+  void operator=(const mafVMEOutputVTK&); 
 };
 
 #endif
