@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeTrajectories.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2009-10-20 07:00:46 $
+  Version:   $Revision: 1.10.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -199,6 +199,7 @@ void medPipeTrajectories::OnEvent(mafEventBase *maf_event)
     UpdateProperty();
   }
 }
+
 //----------------------------------------------------------------------------
 void medPipeTrajectories::UpdateProperty(bool fromTag)
 //----------------------------------------------------------------------------
