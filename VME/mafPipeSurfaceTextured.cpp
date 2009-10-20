@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceTextured.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-20 15:23:24 $
-  Version:   $Revision: 1.11.2.1 $
+  Date:      $Date: 2009-10-20 10:28:09 $
+  Version:   $Revision: 1.11.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -184,6 +184,7 @@ void mafPipeSurfaceTextured::Create(mafSceneNode *n/*, bool use_axes*/)
   if (m_SurfaceMaterial->m_MaterialType == mmaMaterial::USE_TEXTURE)
   {
     m_UseLookupTable = 1;
+    m_Texture->MapColorScalarsThroughLookupTableOn();
     m_Texture->SetLookupTable(m_SurfaceMaterial->m_ColorLut);
     m_Actor->SetTexture(m_Texture);
   }
