@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFProfilingActorTest.h,v $
 Language:  C++
-Date:      $Date: 2009-09-09 08:16:31 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-21 10:57:58 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 
 ================================================================================
@@ -75,9 +75,7 @@ class vtkMAFProfilingActorTest : public CPPUNIT_NS::TestFixture
     /** Render data in vtk render window.*/
     void PrepareToRender(vtkRenderer *renderer, vtkRenderWindow *renderWindow);
     /** After saving images from render window, compare them in order to find difference between test sessions. */
-    void CompareImages(vtkRenderWindow * renwin);
-
-    int m_TestNumber;
+    void CompareImages(vtkRenderWindow * renwin, int indexTest);
 };
 
 int main( int argc, char* argv[] )

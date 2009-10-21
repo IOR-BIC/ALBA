@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFProfilingActorTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-21 08:27:33 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-10-21 10:57:58 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Alberto Losi
 
 ================================================================================
@@ -119,7 +119,7 @@ void vtkMAFProfilingActorTest::TestRenderOverlay()
   profActor->FPSUpdate(renderer);
   renderWindow->Render();
 
-  CompareImages(renderWindow);
+  CompareImages(renderWindow, 0);
   mafSleep(2000);
   profActor->Delete();
 
@@ -147,7 +147,7 @@ void vtkMAFProfilingActorTest::TestRenderOpaqueGeometry()
   profActor->FPSUpdate(renderer);
   renderWindow->Render();
 
-  CompareImages(renderWindow);
+  CompareImages(renderWindow, 1);
   mafSleep(2000);
   profActor->Delete();
 
@@ -182,7 +182,7 @@ void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
   vtkDEL(renderWindow);
 }
 //----------------------------------------------------------------------------
-void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin)
+void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin, int indexTest)
 //----------------------------------------------------------------------------
 {
   char *file = __FILE__;
@@ -205,7 +205,7 @@ void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin)
   controlOriginFile<<name.c_str();
   controlOriginFile<<"_";
   controlOriginFile<<"image";
-  controlOriginFile<<m_TestNumber;
+  controlOriginFile<<indexTest;
   controlOriginFile<<".jpg";
 
   fstream controlStream;
@@ -243,7 +243,7 @@ void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin)
     imageFile<<"comp";
   }
 
-  imageFile<<m_TestNumber;
+  imageFile<<indexTest;
   imageFile<<".jpg";
   w->SetFileName(imageFile.GetCStr());
   w->Write();
@@ -266,7 +266,7 @@ void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin)
   imageFileOrig<<name.c_str();
   imageFileOrig<<"_";
   imageFileOrig<<"image";
-  imageFileOrig<<m_TestNumber;
+  imageFileOrig<<indexTest;
   imageFileOrig<<".jpg";
   rO->SetFileName(imageFileOrig.GetCStr());
   rO->Update();
