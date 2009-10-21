@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-21 11:55:58 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-21 12:59:55 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -73,7 +73,7 @@ mafOp(label)
 {
   m_OpType  = OPTYPE_OP;
   m_Canundo = true;
-  m_InputPreserving = false;
+  m_InputPreserving = true;
 
   m_LowerThreshold = 10000;
   m_UpperThreshold = 50000;
