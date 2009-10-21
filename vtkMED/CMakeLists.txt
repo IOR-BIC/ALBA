@@ -34,6 +34,8 @@ SET(vtkMED_SRCS
   vtkMEDImageUnsharpFilter.h
   vtkMEDFillingHole.cxx
   vtkMEDFillingHole.h
+  vtkMEDRegionGrowingLocalGlobalThreshold.cxx
+  vtkMEDRegionGrowingLocalGlobalThreshold.h
   
   ########## Should be committed down ###########
   vtkMAFVolumeRayCastMapper.cxx
