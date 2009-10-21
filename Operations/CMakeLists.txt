@@ -138,6 +138,8 @@ SET(PROJECT_SRCS
   mafOpImporterRAWVolume_BES.cpp
   mafOpImporterRAWVolume_BES.h  
   ###############################################
+  medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp
+  medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
 )
   
 IF (MED_USE_Offis)
