@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFProfilingActorTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-09 08:16:31 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-10-21 08:27:33 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Alberto Losi
 
 ================================================================================
@@ -39,8 +39,32 @@
 #include "vtkJPEGWriter.h"
 #include "vtkJPEGReader.h"
 #include "vtkPointData.h"
+#include "vtkObjectFactory.h"
 
 #include "mafString.h"
+
+class vtkMAFProfilingActorDummy : public vtkMAFProfilingActor
+{
+  public:
+    //vtkTypeRevisionMacro(vtkMAFProfilingActorDummy,vtkMAFProfilingActor);
+    
+    static vtkMAFProfilingActorDummy *New()
+    {
+      vtkObject* ret = vtkObjectFactory::CreateInstance("vtkMAFProfilingActorDummy");
+      if(ret)
+      { 
+      return static_cast<vtkMAFProfilingActorDummy*>(ret); 
+      } 
+      return new vtkMAFProfilingActorDummy;
+    };
+
+    void FPSUpdate(vtkRenderer *ren)
+    {
+      sprintf(TextBuff,"fps: %.1f \nrender time: %.3f s",0, 0);
+      TextFPS->SetInput(this->TextBuff);
+    };
+
+};
 
 //------------------------------------------------------------
 void vtkMAFProfilingActorTest::setUp()
@@ -62,13 +86,10 @@ void vtkMAFProfilingActorTest::PrepareToRender(vtkRenderer *renderer, vtkRenderW
   camera->ParallelProjectionOn();
   camera->Modified();
 
-  //vtkMAFSmartPointer<vtkRenderWindow> renderWindow;
   renderWindow->AddRenderer(renderer);
   renderWindow->SetSize(640, 480);
   renderWindow->SetPosition(100,0);
 
-  vtkMAFSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
-  renderWindowInteractor->SetRenderWindow(renderWindow);
 }
 //------------------------------------------------------------
 void vtkMAFProfilingActorTest::TestDynamicAllocation()
@@ -81,50 +102,68 @@ void vtkMAFProfilingActorTest::TestDynamicAllocation()
 void vtkMAFProfilingActorTest::TestRenderOverlay()
 //--------------------------------------------
 {
-  vtkMAFSmartPointer<vtkRenderer> renderer;
-  vtkMAFSmartPointer<vtkRenderWindow> renderWindow;
+  vtkRenderer *renderer;
+  vtkRenderWindow *renderWindow;
+
+  vtkNEW(renderer);
+  vtkNEW(renderWindow);
+
   PrepareToRender(renderer,renderWindow);
   
-  vtkMAFProfilingActor *profActor = vtkMAFProfilingActor::New();
+  vtkMAFProfilingActorDummy *profActor = vtkMAFProfilingActorDummy::New();
   
   renderer->AddActor(profActor);
   renderWindow->Render();
 
   CPPUNIT_ASSERT(profActor->RenderOverlay((vtkViewport*)renderer) == 1);
-
+  profActor->FPSUpdate(renderer);
   renderWindow->Render();
 
   CompareImages(renderWindow);
   mafSleep(2000);
-  mafDEL(profActor);
+  profActor->Delete();
+
+  vtkDEL(renderer);
+  vtkDEL(renderWindow);
 }
 //--------------------------------------------
 void vtkMAFProfilingActorTest::TestRenderOpaqueGeometry()
 //--------------------------------------------
 {
-  vtkMAFSmartPointer<vtkRenderer> renderer;
-  vtkMAFSmartPointer<vtkRenderWindow> renderWindow;
+  vtkRenderer *renderer;
+  vtkRenderWindow *renderWindow;
+
+  vtkNEW(renderer);
+  vtkNEW(renderWindow);
+
   PrepareToRender(renderer,renderWindow);
 
-  vtkMAFProfilingActor *profActor = vtkMAFProfilingActor::New();
+  vtkMAFProfilingActorDummy *profActor = vtkMAFProfilingActorDummy::New();
 
   renderer->AddActor(profActor);
   renderWindow->Render();
 
   CPPUNIT_ASSERT(profActor->RenderOpaqueGeometry((vtkViewport*)renderer) == 0);
-
+  profActor->FPSUpdate(renderer);
   renderWindow->Render();
 
   CompareImages(renderWindow);
   mafSleep(2000);
-  mafDEL(profActor);
+  profActor->Delete();
+
+  vtkDEL(renderer);
+  vtkDEL(renderWindow);
 }
 //--------------------------------------------
 void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
 //--------------------------------------------
 {
-  vtkMAFSmartPointer<vtkRenderer> renderer;
-  vtkMAFSmartPointer<vtkRenderWindow> renderWindow;
+  vtkRenderer *renderer;
+  vtkRenderWindow *renderWindow;
+
+  vtkNEW(renderer);
+  vtkNEW(renderWindow);
+
   PrepareToRender(renderer,renderWindow);
 
   vtkMAFProfilingActor *profActor = vtkMAFProfilingActor::New();
@@ -133,11 +172,14 @@ void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
 
   CPPUNIT_ASSERT(profActor->RenderTranslucentGeometry((vtkViewport*)renderer) == 0); //This method only returns 0
 
-  mafDEL(profActor);
+  profActor->Delete();
   //renderWindow->Render();
 
   //CompareImages(renderWindow);
   //mafSleep(2000);
+
+  vtkDEL(renderer);
+  vtkDEL(renderWindow);
 }
 //----------------------------------------------------------------------------
 void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin)
