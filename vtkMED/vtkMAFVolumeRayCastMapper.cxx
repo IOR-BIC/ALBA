@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMAFVolumeRayCastMapper.cxx,v $ 
 Language: C++ 
-Date: $Date: 2009-05-12 16:22:27 $ 
-Version: $Revision: 1.1.2.1 $ 
+Date: $Date: 2009-10-21 11:54:14 $ 
+Version: $Revision: 1.1.2.2 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -28,7 +28,7 @@ See the COPYINGS file for license details
 #include "vtkVolumeProperty.h"
 #include "gl/gl.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeRayCastMapper, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFVolumeRayCastMapper, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFVolumeRayCastMapper);
 
 #include "mafMemDbg.h"
@@ -282,9 +282,9 @@ vtkStandardNewMacro(vtkMAFVolumeRayCastMapper);
     unsigned char* pVolMatrix = (unsigned char*)&cam->GetViewTransformMatrix()->Element[0];
     checksum += CalculateChecksum(pVolMatrix, 16*sizeof(double));
 
-    if (checksum != m_LastCheckSum)
+    if (checksum != LastCheckSum)
     {
-      m_LastCheckSum = checksum;
+      LastCheckSum = checksum;
 #pragma region VTK Code (Ray casting, i.e., texture computation)
       // Set the number of threads to use for ray casting,
       // then set the execution method and do it.
