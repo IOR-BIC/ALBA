@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-20 10:27:48 $
-  Version:   $Revision: 1.1.24.2 $
+  Date:      $Date: 2009-10-21 08:58:23 $
+  Version:   $Revision: 1.1.24.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -44,8 +44,11 @@ mafVMEOutputImage::mafVMEOutputImage()
 mafVMEOutputImage::~mafVMEOutputImage()
 //-------------------------------------------------------------------------
 {
-  vtkDEL(m_Material->m_ColorLut);
-  delete m_Material;
+  if(m_Material)
+  {
+    vtkDEL(m_Material->m_ColorLut);
+    delete m_Material;
+  }
 }
 
 //-------------------------------------------------------------------------
