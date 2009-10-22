@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-16 13:52:06 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-10-22 08:07:08 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ void medOpMatrixVectorMath::SetVectorToZero(double *a) const
   for (int i = 0 ;  i < 3 ;  i++)
     a[i] = 0.0 ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     a[3] = 1.0 ;
 }
 
@@ -95,7 +95,7 @@ void medOpMatrixVectorMath::NormalizeVector(const double *a, double *b) const
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = a[i] / norm ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -134,7 +134,7 @@ void medOpMatrixVectorMath::MultiplyVectorByScalar(double s, const double *a, do
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = s*a[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -147,7 +147,7 @@ void medOpMatrixVectorMath::DivideVectorByScalar(double s, const double *a, doub
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = a[i] / s ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -159,7 +159,7 @@ void medOpMatrixVectorMath::AddVectors(const double *a, const double *b, double 
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] + b[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -171,7 +171,7 @@ void medOpMatrixVectorMath::SubtractVectors(const double *a, const double *b, do
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] - b[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -228,7 +228,7 @@ void medOpMatrixVectorMath::VectorProduct(const double *a, const double *b, doub
   c[1] = -(a[0]*b[2] - a[2]*b[0]) ;
   c[2] =   a[0]*b[1] - a[1]*b[0] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -241,7 +241,7 @@ void medOpMatrixVectorMath::CopyVector(const double *a, double *b) const
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = a[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -305,7 +305,7 @@ void medOpMatrixVectorMath::CalculateNormalsToU(const double *u,  double *v,  do
   w[2] = u[0]*v[1] - u[1]*v[0] ;
 
 
-  if (m_homogeneous){
+  if (m_Homogeneous){
     v[3] = 1.0 ;
     w[3] = 1.0 ;
   }
@@ -358,7 +358,7 @@ void medOpMatrixVectorMath::CalculateNormalsToV(double *u,  const double *v,  do
   w[2] = u[0]*v[1] - u[1]*v[0] ;
 
 
-  if (m_homogeneous){
+  if (m_Homogeneous){
     u[3] = 1.0 ;
     w[3] = 1.0 ;
   }
@@ -411,7 +411,7 @@ void medOpMatrixVectorMath::CalculateNormalsToW(double *u,  double *v,  const do
   u[2] = v[0]*w[1] - v[1]*w[0] ;
 
 
-  if (m_homogeneous){
+  if (m_Homogeneous){
     u[3] = 1.0 ;
     v[3] = 1.0 ;
   }
@@ -451,7 +451,7 @@ double medOpMatrixVectorMath::DistanceSquared(const double *a,  const double *b)
 void medOpMatrixVectorMath::PrintVector(std::ostream& os, const double *a) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     os << a[0] << "\t" << a[1] << "\t" << a[2] << "\t" << a[3] << std::endl ;
   }
   else{
@@ -477,7 +477,7 @@ void medOpMatrixVectorMath::DivideMatrixByHomoCoord(double *A) const
 void medOpMatrixVectorMath::SetMatrixToZero(double *A) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int k = 0 ;  k < 16 ;  k++)
       A[k] = 0.0 ;
     A[15] = 1.0 ;
@@ -494,7 +494,7 @@ void medOpMatrixVectorMath::SetMatrixToZero(double *A) const
 void medOpMatrixVectorMath::SetMatrixToIdentity(double *A) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int k = 0 ;  k < 16 ;  k++)
       A[k] = 0.0 ;
     A[0] = 1.0 ;
@@ -518,7 +518,7 @@ void medOpMatrixVectorMath::SetMatrixToIdentity(double *A) const
 void medOpMatrixVectorMath::MultiplyMatrixByScalar(double s, const double *A, double *B) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int k = 0 ;  k < 15 ;  k++)
       B[k] = s*A[k] ;
     B[15] = 1.0 ;
@@ -536,7 +536,7 @@ void medOpMatrixVectorMath::MultiplyMatrixByScalar(double s, const double *A, do
 void medOpMatrixVectorMath::DivideMatrixByScalar(double s, const double *A, double *B) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int k = 0 ;  k < 15 ;  k++)
       B[k] = A[k]/s ;
     B[15] = 1.0 ;
@@ -558,7 +558,7 @@ void medOpMatrixVectorMath::MultiplyColumnsByScalars(const double *s, const doub
 {
   int k = 0 ;
 
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int j = 0 ;  j < 4 ;  j++)
       for (int i = 0 ;  i < 4 ;  i++, k++)
         B[k] = s[j]*A[k] ;
@@ -579,7 +579,7 @@ void medOpMatrixVectorMath::MultiplyRowsByScalars(const double *s, const double 
 //------------------------------------------------------------------------------
 {
   int k = 0 ;
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int j = 0 ;  j < 4 ;  j++)
       for (int i = 0 ;  i < 4 ;  i++, k++)
         B[k] = s[i]*A[k] ;
@@ -598,7 +598,7 @@ void medOpMatrixVectorMath::MultiplyRowsByScalars(const double *s, const double 
 void medOpMatrixVectorMath::MultiplyMatrixByVector(const double *A, const double *v, double *Av) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     Av[0] = A[0]*v[0] + A[4]*v[1] + A[8]*v[2] + A[12]*v[3] ;
     Av[1] = A[1]*v[0] + A[5]*v[1] + A[9]*v[2] + A[13]*v[3] ;
     Av[2] = A[2]*v[0] + A[6]*v[1] + A[10]*v[2] + A[14]*v[3] ;
@@ -618,7 +618,7 @@ void medOpMatrixVectorMath::MultiplyMatrixByVector(const double *A, const double
 void medOpMatrixVectorMath::MultiplyMatrixByMatrix(const double *A, const double *B, double *AB) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     AB[0] =  A[0]*B[0] + A[4]*B[1] + A[8]*B[2] + A[12]*B[3] ;
     AB[1] =  A[1]*B[0] + A[5]*B[1] + A[9]*B[2] + A[13]*B[3] ;
     AB[2] =  A[2]*B[0] + A[6]*B[1] + A[10]*B[2] + A[14]*B[3] ;
@@ -664,7 +664,7 @@ void medOpMatrixVectorMath::Transpose(const double *A,  double *AT) const
   int k = 0 ;
   double temp[16] ;
 
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int j = 0 ;  j < 4 ;  j++)
       for (int i = 0 ;  i < 4 ;  i++, k++)
         temp[k] = A[j+4*i] ;
@@ -687,7 +687,7 @@ void medOpMatrixVectorMath::Transpose(const double *A,  double *AT) const
 double *medOpMatrixVectorMath::GetColumn(double *A, int col) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous)
+  if (m_Homogeneous)
     return A + 3*col ;
   else
     return A + 4*col ;
@@ -699,7 +699,7 @@ double *medOpMatrixVectorMath::GetColumn(double *A, int col) const
 void medOpMatrixVectorMath::PrintMatrix(std::ostream& os, const double *A) const
 //------------------------------------------------------------------------------
 {
-  if (m_homogeneous){
+  if (m_Homogeneous){
     os << A[0] << "\t" << A[4] << "\t" << A[8] << "\t" << A[12] << std::endl ;
     os << A[1] << "\t" << A[5] << "\t" << A[9] << "\t" << A[13] << std::endl ;
     os << A[2] << "\t" << A[6] << "\t" << A[10] << "\t" << A[14] << std::endl ;
@@ -723,7 +723,7 @@ void medOpMatrixVectorMath::Transpose2DArray(const double arr1[3][3], double arr
 {
   double temp[4][4] ;
 
-  if (m_homogeneous){
+  if (m_Homogeneous){
     for (int i = 0 ;  i < 4 ;  i++)
       for (int j = 0 ;  j < 4 ;  j++)
         temp[i][j] = arr1[j][i] ;
