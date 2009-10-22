@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-10-22 08:25:28 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2009-10-22 08:35:56 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Alexander Savenko, Josef Kohout (major change)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.6 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.7 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
 
 #include "mafMemDbg.h"
@@ -65,7 +65,7 @@ vtkMAFVolumeSlicer_BES::vtkMAFVolumeSlicer_BES()
   this->Level  = 0.5f;
 
   this->AutoSpacing = 1;    //Autospacing is enabled by the default
-  this->m_LastGPUEnabled = this->GPUEnabled = 1;     //GPU is enabled by the default
+  this->LastGPUEnabled = this->GPUEnabled = 1;     //GPU is enabled by the default
 
   for (int i = 0; i < 3; i++)
   {
@@ -73,8 +73,8 @@ vtkMAFVolumeSlicer_BES::vtkMAFVolumeSlicer_BES()
     this->StOffsets[i] = NULL;
   }  
 
-  m_LastPreprocessedInput = NULL; 
-  m_bNoIntersection = false;
+  LastPreprocessedInput = NULL; 
+  BNoIntersection = false;
 
 #ifdef _WIN32
   m_pGPUProvider = NULL;
@@ -360,7 +360,7 @@ void vtkMAFVolumeSlicer_BES::ComputeInputUpdateExtents(vtkDataObject *output)
 
         //RELEASE NOTE: we have 3 numberOfPoints if the plane cuts or touches one corner. The latter one
         //is not considered to be an intersection, however, it is a singular case that we will not distinguish
-        if (m_bNoIntersection = (numberOfPoints <= 2))
+        if (BNoIntersection = (numberOfPoints <= 2))
           output->SetSpacing(spacing);  //spacing will be 1:1:1
         else
         {
@@ -425,7 +425,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
     output->GetWholeExtent(extent);
     output->SetExtent(extent);
 
-    m_LastPreprocessedInput = NULL; //to force PrepareVolume to reexecute
+    LastPreprocessedInput = NULL; //to force PrepareVolume to reexecute
     vtkMAFVolumeSlicer_BES::ExecuteInformation();                  
   }
 }
@@ -685,7 +685,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
   outputObject->SetNumberOfScalarComponents(this->NumComponents);
   outputObject->AllocateScalars();  
  
-  if (m_bNoIntersection)
+  if (BNoIntersection)
   {
     //there is no intersection with data => black texture
     void *outputPointer = outputObject->GetPointData()->GetScalars()->GetVoidPointer(0);
@@ -735,11 +735,11 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
 /*virtual*/ void vtkMAFVolumeSlicer_BES::PrepareVolume(vtkDataSet* input, vtkImageData* output) 
 //----------------------------------------------------------------------------
 {
-  if (m_LastPreprocessedInput == input && PreprocessingTime > input->GetMTime() && 
-    m_LastGPUEnabled == GPUEnabled)
+  if (LastPreprocessedInput == input && PreprocessingTime > input->GetMTime() && 
+    LastGPUEnabled == GPUEnabled)
     return; //input is the same (and also kind of output) => return now
 
-  m_LastGPUEnabled = GPUEnabled;
+  LastGPUEnabled = GPUEnabled;
   
   //compute coordinates in x, y and z-axis for the volume (defined as 
   //a regular grid - vtkImageData or rectilinear grid - vtkRectilinearGrid  
@@ -750,7 +750,7 @@ void vtkMAFVolumeSlicer_BES::ExecuteDataHotFix(vtkDataObject *outputData)
   else
     PrepareVolume(gridData, output);
 
-  m_LastPreprocessedInput = input;
+  LastPreprocessedInput = input;
   this->PreprocessingTime.Modified();
 }
 

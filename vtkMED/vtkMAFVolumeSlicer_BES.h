@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: vtkMAFVolumeSlicer_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-10-22 08:25:28 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-22 08:35:56 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alexander Savenko, Josef Kohout
 Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -276,10 +276,10 @@ protected:
   float* StOffsets[3];
 
   //last data set processed in PrepareVolume  
-  vtkDataSet* m_LastPreprocessedInput;  
-  bool m_bNoIntersection;       //<true, if there is no intersection of the data bounding box and cutting plane
+  vtkDataSet* LastPreprocessedInput;  
+  bool BNoIntersection;       //<true, if there is no intersection of the data bounding box and cutting plane
 
-  int m_LastGPUEnabled; //<to reflect GPU Enable/Disable change
+  int LastGPUEnabled; //<to reflect GPU Enable/Disable change
 
 #ifdef _WIN32
   bool m_bGPUProcessing;        //<true, if GPU processing will be used in ExecuteData
