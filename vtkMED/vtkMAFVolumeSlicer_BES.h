@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: vtkMAFVolumeSlicer_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-05-13 15:51:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-22 08:25:28 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alexander Savenko, Josef Kohout
 Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -272,8 +272,8 @@ protected:
   double SamplingTableMultiplier[3];  
 
   //look-up table that maps fine samples to voxel indices - see CreateImage  
-  int* m_StIndices[3];
-  float* m_StOffsets[3];
+  int* StIndices[3];
+  float* StOffsets[3];
 
   //last data set processed in PrepareVolume  
   vtkDataSet* m_LastPreprocessedInput;  

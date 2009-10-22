@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-07-15 13:05:02 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2009-10-22 08:25:28 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Alexander Savenko, Josef Kohout (major change)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.5 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.6 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
 
 #include "mafMemDbg.h"
@@ -69,8 +69,8 @@ vtkMAFVolumeSlicer_BES::vtkMAFVolumeSlicer_BES()
 
   for (int i = 0; i < 3; i++)
   {
-    this->m_StIndices[i] = NULL;
-    this->m_StOffsets[i] = NULL;
+    this->StIndices[i] = NULL;
+    this->StOffsets[i] = NULL;
   }  
 
   m_LastPreprocessedInput = NULL; 
@@ -88,8 +88,8 @@ vtkMAFVolumeSlicer_BES::~vtkMAFVolumeSlicer_BES()
 {
   for (int i = 0; i < 3; i++)
   {
-    delete[] this->m_StIndices[i];
-    delete[] this->m_StOffsets[i];
+    delete[] this->StIndices[i];
+    delete[] this->StOffsets[i];
   }
 
 #ifdef _WIN32
@@ -983,12 +983,12 @@ void vtkMAFVolumeSlicer_BES::CreateSamplingTable(float* voxelcoords[3])
   //prepare sampling table
   //the volume is sampled using a very fine sample rate (to avoid aliasing)
   //we will prepare tables to map sample index to voxel data
-  if (m_StIndices[0] == NULL)
+  if (StIndices[0] == NULL)
   {
     for (int i = 0; i < 3; i++)
     {
-      m_StIndices[i] = new int   [SamplingTableSize + 1];
-      m_StOffsets[i] = new float [SamplingTableSize + 1];
+      StIndices[i] = new int   [SamplingTableSize + 1];
+      StOffsets[i] = new float [SamplingTableSize + 1];
     }
   }
 
@@ -1017,8 +1017,8 @@ void vtkMAFVolumeSlicer_BES::CreateSamplingTable(float* voxelcoords[3])
       int nRange = ti1 - ti0;
       float fDist = 1.0f / nRange;
 
-      int* stIndices = &m_StIndices[c][ti0];
-      float* stOffsets = &m_StOffsets[c][ti0];
+      int* stIndices = &StIndices[c][ti0];
+      float* stOffsets = &StOffsets[c][ti0];
 
       for (int j = 0; j <= nRange; j++) 
       {
@@ -1165,20 +1165,20 @@ void vtkMAFVolumeSlicer_BES::CreateImage(const InputDataType *input, OutputDataT
         continue;   //point is outside the volume
 
       //get the voxel where the current pixel lies
-      int index = m_StIndices[0][pi[0]] + m_StIndices[1][pi[1]] + m_StIndices[2][pi[2]];
+      int index = StIndices[0][pi[0]] + StIndices[1][pi[1]] + StIndices[2][pi[2]];
       for (int comp = 0; comp < numComp; comp++) 
       {
         // tri-linear interpolation
         double sample = 0.0;
         for (int z = 0, si = 0; z < 2; z++) 
         {
-          const double zweight = z ? 1.f - m_StOffsets[2][pi[2]] : m_StOffsets[2][pi[2]];
+          const double zweight = z ? 1.f - StOffsets[2][pi[2]] : StOffsets[2][pi[2]];
           for (int y = 0; y < 2; y++) 
           {
-            const double yzweight = (y ? 1.f - m_StOffsets[1][pi[1]] : m_StOffsets[1][pi[1]]) * zweight;
+            const double yzweight = (y ? 1.f - StOffsets[1][pi[1]] : StOffsets[1][pi[1]]) * zweight;
             for (int x = 0; x < 2; x++, si++)
               sample += input[samplingOffs[si] + index + comp] * 
-              (x ? 1.f - m_StOffsets[0][pi[0]] : m_StOffsets[0][pi[0]]) * yzweight;
+              (x ? 1.f - StOffsets[0][pi[0]] : StOffsets[0][pi[0]]) * yzweight;
 	        }          
         }
 
