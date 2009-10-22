@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMakeVMETimevarying.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-22 11:51:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-22 08:07:08 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -171,12 +171,12 @@ void medOpMakeVMETimevarying::CreateGui()
   m_Gui->Radio(ID_TIMESTAMP_MODALITY_RADIO,_("Timestamp Modality"),&m_CurrentVMETimestampModality,2,radioChoice);
   m_Gui->Double(ID_TIMESTAMP_TEXTBOX,_("User input"),&m_CurrentVMETimeStamp);
   wxBoxSizer * hszVMETimeStampFromVME = new wxBoxSizer(wxHORIZONTAL);
-  m_lblVMETimeStampFromVME = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL,_("From VME"),wxDefaultPosition,wxSize(55,17),wxALIGN_RIGHT);
-  m_lblVMETimeStampFromVMEData = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL_DATA,wxString::Format("%f",m_CurrentVMETimeStampFromVME),wxDefaultPosition,wxSize(100,17));
-  m_lblVMETimeStampFromVME->Enable(false);
-  m_lblVMETimeStampFromVMEData->Enable(false);
-	hszVMETimeStampFromVME->Add(m_lblVMETimeStampFromVME,0,wxRIGHT, 5);
-	hszVMETimeStampFromVME->Add(m_lblVMETimeStampFromVMEData,0,wxEXPAND || wxLEFT);
+  m_LblVMETimeStampFromVME = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL,_("From VME"),wxDefaultPosition,wxSize(55,17),wxALIGN_RIGHT);
+  m_LblVMETimeStampFromVMEData = new wxStaticText(m_Gui,ID_TIMESTAMP_FROM_VME_LABEL_DATA,wxString::Format("%f",m_CurrentVMETimeStampFromVME),wxDefaultPosition,wxSize(100,17));
+  m_LblVMETimeStampFromVME->Enable(false);
+  m_LblVMETimeStampFromVMEData->Enable(false);
+	hszVMETimeStampFromVME->Add(m_LblVMETimeStampFromVME,0,wxRIGHT, 5);
+	hszVMETimeStampFromVME->Add(m_LblVMETimeStampFromVMEData,0,wxEXPAND || wxLEFT);
   m_Gui->Add(hszVMETimeStampFromVME);
   m_Gui->Double(ID_TIMESTAMP_AUTOINCREMENT_TEXTBOX,_("Increment"),&m_VMETimestampIncrement);
   m_Gui->Divider();
@@ -253,20 +253,20 @@ void medOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)
             else
               m_CurrentVMETimeStampFromVME = 0;
             //m_Gui->Update();
-            m_lblVMETimeStampFromVMEData->SetLabel(wxString::Format("%f",m_CurrentVMETimeStampFromVME));
+            m_LblVMETimeStampFromVMEData->SetLabel(wxString::Format("%f",m_CurrentVMETimeStampFromVME));
             //TransferDataToWindow(); //Manually forces GUI update for custom created control
             //Update GUI
             if(0 == m_CurrentVMETimestampModality)
             {
               m_Gui->Enable(ID_TIMESTAMP_TEXTBOX,true);
-              m_lblVMETimeStampFromVME->Enable(false);
-              m_lblVMETimeStampFromVMEData->Enable(false);
+              m_LblVMETimeStampFromVME->Enable(false);
+              m_LblVMETimeStampFromVMEData->Enable(false);
             }
             else if (1 == m_CurrentVMETimestampModality)
             {
               m_Gui->Enable(ID_TIMESTAMP_TEXTBOX,false);
-              m_lblVMETimeStampFromVME->Enable(true);
-              m_lblVMETimeStampFromVMEData->Enable(true);
+              m_LblVMETimeStampFromVME->Enable(true);
+              m_LblVMETimeStampFromVMEData->Enable(true);
             }
             m_Gui->Enable(ID_ADD_VME_BUTTON,false);
             m_Gui->Enable(ID_DELETE_VME_BUTTON,false);
@@ -293,14 +293,14 @@ void medOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)
         if(0 == m_CurrentVMETimestampModality)
         {
           m_Gui->Enable(ID_TIMESTAMP_TEXTBOX,true);
-          m_lblVMETimeStampFromVME->Enable(false);
-          m_lblVMETimeStampFromVMEData->Enable(false);
+          m_LblVMETimeStampFromVME->Enable(false);
+          m_LblVMETimeStampFromVMEData->Enable(false);
         }
         else if (1 == m_CurrentVMETimestampModality)
         {
           m_Gui->Enable(ID_TIMESTAMP_TEXTBOX,false);
-          m_lblVMETimeStampFromVME->Enable(true);
-          m_lblVMETimeStampFromVMEData->Enable(true);
+          m_LblVMETimeStampFromVME->Enable(true);
+          m_LblVMETimeStampFromVMEData->Enable(true);
         }
         break;
       }
@@ -332,8 +332,8 @@ void medOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)
           m_Gui->Enable(ID_RESET_BUTTON,true);
           m_CurrentVMETimeStamp = m_CurrentVMETimeStamp + m_VMETimestampIncrement; //Autoincrease current timestamp
           m_Gui->Enable(ID_TIMESTAMP_TEXTBOX,false);
-          m_lblVMETimeStampFromVME->Enable(false);
-          m_lblVMETimeStampFromVMEData->Enable(false);
+          m_LblVMETimeStampFromVME->Enable(false);
+          m_LblVMETimeStampFromVMEData->Enable(false);
           m_Gui->Enable(ID_TIMESTAMP_AUTOINCREMENT_TEXTBOX,false);
           m_Gui->Enable(ID_TIMESTAMP_MODALITY_RADIO,false);
           m_Gui->Enable(ID_ADD_VME_OK_BUTTON,false);
@@ -353,8 +353,8 @@ void medOpMakeVMETimevarying::OnEvent(mafEventBase *maf_event)
         m_CurrentVMEName = _("");
         //Update GUI
         m_Gui->Enable(ID_TIMESTAMP_TEXTBOX,false);
-        m_lblVMETimeStampFromVME->Enable(false);
-        m_lblVMETimeStampFromVMEData->Enable(false);
+        m_LblVMETimeStampFromVME->Enable(false);
+        m_LblVMETimeStampFromVMEData->Enable(false);
         m_Gui->Enable(ID_TIMESTAMP_AUTOINCREMENT_TEXTBOX,false);
         m_Gui->Enable(ID_TIMESTAMP_MODALITY_RADIO,false);
         m_Gui->Enable(ID_ADD_VME_OK_BUTTON,false);

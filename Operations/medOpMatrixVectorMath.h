@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.h,v $
 Language:  C++
-Date:      $Date: 2009-10-16 13:52:06 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-10-22 08:07:08 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,10 +40,10 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class medOpMatrixVectorMath{
 public:
   /// Constructor.
-  medOpMatrixVectorMath(bool homogeneous = false) : m_homogeneous(homogeneous) {}
+  medOpMatrixVectorMath(bool homogeneous = false) : m_Homogeneous(homogeneous) {}
 
   /// Set to false for dims = 3, set to true for homogeneous dims = 4
-  void SetHomogeneous(bool homogeneous) {m_homogeneous = homogeneous ;}
+  void SetHomogeneous(bool homogeneous) {m_Homogeneous = homogeneous ;}
 
   //----------------------------------------------------------------------------
   /// Vector methods
@@ -195,7 +195,7 @@ public:
   void CopyMatrixTo2DArray4x4(const double *A,  double arr2d[4][4]) const ;
 
 private:
-  bool m_homogeneous ;  ///< flag which switches homogeneous mode on or off
+  bool m_Homogeneous ;  ///< flag which switches homogeneous mode on or off
 
 } ;
 

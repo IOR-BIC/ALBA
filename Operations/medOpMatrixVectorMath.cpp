@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-22 08:07:08 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-10-22 08:09:05 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -120,7 +120,7 @@ void medOpMatrixVectorMath::InvertVector(const double *a, double *b) const
   for (int i = 0 ;  i < 3 ;  i++)
     b[i] = -a[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     b[3] = 1.0 ;
 }
 
@@ -186,7 +186,7 @@ void medOpMatrixVectorMath::AddMultipleOfVector(const double *a, double s, doubl
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] + s*b[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     c[3] = 1.0 ;
 }
 
@@ -199,7 +199,7 @@ void medOpMatrixVectorMath::SubtractMultipleOfVector(const double *a, double s, 
   for (int i = 0 ;  i < 3 ;  i++)
     c[i] = a[i] - s*b[i] ;
 
-  if (m_homogeneous)
+  if (m_Homogeneous)
     c[3] = 1.0 ;
 }
 

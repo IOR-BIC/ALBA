@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMakeVMETimevarying.h,v $
 Language:  C++
-Date:      $Date: 2009-07-22 11:51:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-22 08:07:08 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -103,8 +103,8 @@ protected:
   double m_VMETimestampIncrement;                 //< Define the increment of the timestamps
   int m_CurrentVMETimestampModality;              //< Define when the operation use the m_CurrentVMETimeStamp or m_CurrentVMETimeStampFromVME
 
-  wxStaticText * m_lblVMETimeStampFromVME;
-  wxStaticText * m_lblVMETimeStampFromVMEData;    //< Label showing m_CurrentVMETimeStampFromVME
+  wxStaticText * m_LblVMETimeStampFromVME;
+  wxStaticText * m_LblVMETimeStampFromVMEData;    //< Label showing m_CurrentVMETimeStampFromVME
 
   std::vector <VmeTimevaryingItem *> m_AddedVMEs; //< Vector containing the added VMEs with the associated TimeStamps
 };
