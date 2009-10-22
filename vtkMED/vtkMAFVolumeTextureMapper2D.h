@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFVolumeTextureMapper2D.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-12 16:22:27 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-10-22 08:17:54 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -26,7 +26,7 @@ class vtkVolume;
 class VTK_RENDERING_EXPORT vtkMAFVolumeTextureMapper2D : public vtkOpenGLVolumeTextureMapper2D
 {
 protected:
-  unsigned long m_LastCheckSum;   //<Here is stored CheckSum used to detect if Casting needs to be reexecuted
+  unsigned long LastCheckSum;   //<Here is stored CheckSum used to detect if Casting needs to be reexecuted
 
 public:
   static vtkMAFVolumeTextureMapper2D *New();
@@ -50,7 +50,7 @@ protected:
 
 protected:
   vtkMAFVolumeTextureMapper2D() {
-    m_LastCheckSum = 0;
+    LastCheckSum = 0;
   }
   ~vtkMAFVolumeTextureMapper2D() {}
 
