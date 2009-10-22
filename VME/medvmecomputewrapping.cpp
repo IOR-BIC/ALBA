@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-09 14:43:49 $
-Version:   $Revision: 1.1.2.21 $
+Date:      $Date: 2009-10-22 07:49:12 $
+Version:   $Revision: 1.1.2.22 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -151,7 +151,6 @@ medVMEComputeWrapping::~medVMEComputeWrapping()
 	m_LineSourceList.clear();
 
 	m_OrderMiddlePointsVMEList.clear();
-
 
 	SetOutput(NULL);
 }
@@ -3104,6 +3103,9 @@ bool medVMEComputeWrapping::checkAlign(){
 	m_Goniometer->AddInput(cAxis->GetOutput());
 	m_Goniometer->AddInput(centerline->GetOutput());
 	//-------------------test over---------------------------
+
+  vtkDEL(cAxis);
+  vtkDEL(centerline);
 	return rtn;
 
 }
