@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpExporterMeters.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-22 11:54:14 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-10-23 16:34:48 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -76,8 +76,19 @@ mafOp* medOpExporterMeters::Copy()
 //----------------------------------------------------------------------------
 bool medOpExporterMeters::Accept(mafNode *node)
 //----------------------------------------------------------------------------
-{
-  return true;
+{ 
+  bool inputVMEAccepted = false;
+
+  if (node->IsA("medVMEWrappedMeter"))
+  {
+    inputVMEAccepted = true;
+  }
+  else
+  {
+    inputVMEAccepted = false;
+  }
+
+  return inputVMEAccepted;
 }
 //----------------------------------------------------------------------------
 // constants
