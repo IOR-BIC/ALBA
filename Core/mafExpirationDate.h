@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.h,v $
   Language:  C++
-  Date:      $Date: 2009-08-21 14:23:59 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-10-23 16:33:39 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -48,6 +48,9 @@ public:
   /** set version of application*/
   void SetApplicationVersion(const char* version){m_ApplicationVersion = version;}
 
+  /** set demo version flag*/
+  void SetDemoVersion(bool enable){m_DemoVersionFlag = enable;}
+
   /** destructor. */
 	virtual ~mafExpirationDate();
 
@@ -66,6 +69,8 @@ private:
   void Obfuscate(std::string &toObfuscate);
   /** Check version application, if different remove all time check  files */
   void CheckApplicationVersion();
+  /** Check if application is a demo */
+  bool CheckDemoVersion();
   /** Giving a string as parameter and a vector of strings, it clean the vector and fill it with splitted substring controlling the separator.
   It returns the number of elements*/
   static int SplitString(std::string input, const char separator, std::vector<std::string> &outputSubStrings);
@@ -85,6 +90,8 @@ private:
   std::string m_ApplicationVersionFileName;
 
   std::string m_PermanentExpirationFileName;
+
+  bool m_DemoVersionFlag;
 	
 };
 #endif // mafExpirationDate

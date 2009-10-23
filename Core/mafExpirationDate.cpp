@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-31 17:24:44 $
-  Version:   $Revision: 1.1.2.6 $
+  Date:      $Date: 2009-10-23 16:33:39 $
+  Version:   $Revision: 1.1.2.7 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,8 @@ mafExpirationDate::mafExpirationDate(int trialNumberOfDays)
 m_CurrentDateTime(NULL),
 m_LastDateTime(NULL),
 m_FirstAccessDateTime(NULL),
-m_ExpirationDate(NULL)
+m_ExpirationDate(NULL),
+m_DemoVersionFlag(false)
 //----------------------------------------------------------------------------
 {	
  
@@ -48,7 +49,8 @@ mafExpirationDate::mafExpirationDate(int year, unsigned short month, unsigned sh
 m_CurrentDateTime(NULL),
 m_LastDateTime(NULL),
 m_FirstAccessDateTime(NULL),
-m_ExpirationDate(NULL)
+m_ExpirationDate(NULL),
+m_DemoVersionFlag(false)
 //----------------------------------------------------------------------------
 {	
   m_ExpirationDate = new wxDateTime(wxDateTime::UNow());
@@ -65,7 +67,8 @@ mafExpirationDate::mafExpirationDate(const char *dateString)
 m_CurrentDateTime(NULL),
 m_LastDateTime(NULL),
 m_FirstAccessDateTime(NULL),
-m_ExpirationDate(NULL)
+m_ExpirationDate(NULL),
+m_DemoVersionFlag(false)
 //----------------------------------------------------------------------------
 {
   std::string check = dateString;
@@ -284,6 +287,12 @@ void mafExpirationDate::CheckFile()
   os2.close();*/
 }
 //----------------------------------------------------------------------------
+bool mafExpirationDate::CheckDemoVersion()
+//----------------------------------------------------------------------------
+{
+  return m_DemoVersionFlag;
+}
+//----------------------------------------------------------------------------
 void mafExpirationDate::CheckApplicationVersion()
 //----------------------------------------------------------------------------
 {
@@ -332,11 +341,36 @@ void mafExpirationDate::CheckApplicationVersion()
   }
 
   //build revision format bind to parabuild and cmake
-  if(substringsOld[APP_BUILD_TIMESTAMP].compare(substringsCurrent[APP_BUILD_TIMESTAMP]) < 0)
+  if(substringsOld[APP_MAJOR_VERSION].compare(substringsCurrent[APP_MAJOR_VERSION]) < 0)
   {
     //remove all files of directory
-    ::wxRemoveFile(m_ControlFileName.c_str());
-    ::wxRemoveFile(m_PermanentExpirationFileName.c_str());
+    if(CheckDemoVersion() == false)
+    {
+      ::wxRemoveFile(m_ControlFileName.c_str());
+      ::wxRemoveFile(m_PermanentExpirationFileName.c_str());
+    }
+    
+    ::wxRemoveFile(m_ApplicationVersionFileName.c_str());
+
+    if(!::wxFileExists(m_ApplicationVersionFileName.c_str()))
+    {
+      //create it
+      std::string toEncrypt;
+      toEncrypt.append(m_ApplicationVersion);
+
+      mafEncryptFileFromMemory(toEncrypt.c_str(),toEncrypt.length(),m_ApplicationVersionFileName.c_str(), "fattinonfostepervivercomebruti");
+    }
+  }
+  else if(substringsOld[APP_MAJOR_VERSION].compare(substringsCurrent[APP_MAJOR_VERSION]) == 0 &&
+          substringsOld[APP_MINOR_VERSION].compare(substringsCurrent[APP_MINOR_VERSION]) < 0)
+  {
+    //remove all files of directory
+    if(CheckDemoVersion() == false)
+    {
+      ::wxRemoveFile(m_ControlFileName.c_str());
+      ::wxRemoveFile(m_PermanentExpirationFileName.c_str());
+    }
+
     ::wxRemoveFile(m_ApplicationVersionFileName.c_str());
 
     if(!::wxFileExists(m_ApplicationVersionFileName.c_str()))
