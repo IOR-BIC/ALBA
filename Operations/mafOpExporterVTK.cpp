@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExporterVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-21 12:56:43 $
-  Version:   $Revision: 1.2.2.3 $
+  Date:      $Date: 2009-10-23 16:34:12 $
+  Version:   $Revision: 1.2.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -37,7 +37,7 @@
 #include "vtkImageData.h"
 #include "vtkStructuredPoints.h"
 #include "vtkPolyData.h"
-
+#include "mafVMEGroup.h"
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafOpExporterVTK);
 //----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ mafOpExporterVTK::~mafOpExporterVTK()
 bool mafOpExporterVTK::Accept(mafNode *node)
 //----------------------------------------------------------------------------
 { 
-  return (node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot));
+  return (node->IsMAFType(mafVME) && !node->IsMAFType(mafVMERoot) && !node->IsMAFType(mafVMEGroup));
 }
 //----------------------------------------------------------------------------
 mafOp* mafOpExporterVTK::Copy()   
