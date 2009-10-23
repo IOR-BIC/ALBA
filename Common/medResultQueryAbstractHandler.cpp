@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medResultQueryAbstractHandler.cpp,v $
 Language:  C++
-Date:      $Date: 2009-09-22 07:33:45 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-23 14:56:40 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2007
@@ -40,21 +40,22 @@ medResultQueryAbstractHandler::~medResultQueryAbstractHandler()
 void medResultQueryAbstractHandler::InternalResultReset()
 //----------------------------------------------------------------------------
 {
-  int i = 0;
-  for(;i<m_MatrixStringResult.size();i++)
+  int i;
+  for(i = 0;i<m_MatrixStringResult.size();i++)
   {
     m_MatrixStringResult[i].clear();
+  }
+  m_MatrixStringResult.clear();
 
-    /*int j=0;
-    for(;j<m_ColumnsTypeInformation.size();j++)
+  for(i = 0;i<m_MatrixObjectResult.size();i++)
+  {
+    for (int j=0;j<m_MatrixObjectResult[i].size();++j)
     {
       delete m_MatrixObjectResult[i][j];
     }
-    m_MatrixObjectResult[i].clear();*/
-    
+    m_MatrixObjectResult[i].clear();
   }
-  m_MatrixStringResult.clear();
-  //m_MatrixObjectResult.clear();
+  m_MatrixObjectResult.clear();
   
   m_ColumnsTypeInformation.clear();
   m_ColumnsNameInformation.clear();
