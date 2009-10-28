@@ -12,6 +12,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "medDefines.h"
 #include "vtkMEDRegionGrowingLocalGlobalThreshold.h"
 
 #include "vtkImageData.h"
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #define APLHA 1.0
 
-vtkCxxRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDRegionGrowingLocalGlobalThreshold);
 
 //----------------------------------------------------------------------------
@@ -45,7 +46,7 @@ vtkMEDRegionGrowingLocalGlobalThreshold::vtkMEDRegionGrowingLocalGlobalThreshold
 
   Output = vtkImageData::New();
 
-  OutputScalarType = VTK_UNSIGNED_SHORT;
+  OutputScalarType = VTK_UNSIGNED_CHAR;
 }
 
 //----------------------------------------------------------------------------
@@ -93,12 +94,26 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int index
   vtkDataArray *scalars = image->GetPointData()->GetScalars();
 
   int z = (int)index/(dims[1]*dims[0]);
-  int y = (int)(index%(dims[1]*dims[0]))/dims[1];
-  int x = (int)((index%(dims[1]*dims[0]))%dims[1]);
+  int y = (int)(index%(dims[1]*dims[0]))/dims[0];
+  int x = (int)(index%(dims[1]*dims[0]))%dims[0];
+
+  if( x>dims[0] || y>dims[1] || z>dims[2] )
+  {
+    error = TRUE;
+    mafLogMessage("Error in the computing of the coordinates!");
+    return;
+  }
 
   int zBordered = z+1;
   int yBordered = y+1;
   int xBordered = x+1;
+
+  if( xBordered>dims[0] || yBordered>dims[1] || zBordered>dims[2] )
+  {
+    error = TRUE;
+    mafLogMessage("Error in the computing of the coordinates!");
+    return;
+  }
 
   //Check if the index isn't a point at the border of the ImBordered
   if (zBordered==0 || zBordered==dimsBordered[2]-1 || yBordered==0 || yBordered==dimsBordered[1]-1 || xBordered==0 || xBordered==dimsBordered[0]-1)
@@ -107,34 +122,38 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::ComputeIndexNearstPoints(int index
     return;
   }
 
-  indexNearest[0] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered-1;
-  indexNearest[1] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered+1;
-  indexNearest[2] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered;
-  indexNearest[3] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered;
-  indexNearest[4] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered-1;
-  indexNearest[5] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered+1;
-  indexNearest[6] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered-1;
-  indexNearest[7] = zBordered*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered+1;
+  int dimSliceBordered = dimsBordered[1]*dimsBordered[0];
+  int value = zBordered*dimSliceBordered;
+  indexNearest[0] = value+(dimsBordered[0]*yBordered)+xBordered-1;
+  indexNearest[1] = value+(dimsBordered[0]*yBordered)+xBordered+1;
+  indexNearest[2] = value+(dimsBordered[0]*(yBordered+1))+xBordered;
+  indexNearest[3] = value+(dimsBordered[0]*(yBordered-1))+xBordered;
+  indexNearest[4] = value+(dimsBordered[0]*(yBordered-1))+xBordered-1;
+  indexNearest[5] = value+(dimsBordered[0]*(yBordered+1))+xBordered+1;
+  indexNearest[6] = value+(dimsBordered[0]*(yBordered+1))+xBordered-1;
+  indexNearest[7] = value+(dimsBordered[0]*(yBordered-1))+xBordered+1;
 
-  indexNearest[8] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered;  
-  indexNearest[9] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered-1;  
-  indexNearest[10] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered+1;  
-  indexNearest[11] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered;
-  indexNearest[12] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered;
-  indexNearest[13] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered-1;
-  indexNearest[14] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered+1;
-  indexNearest[15] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered-1;
-  indexNearest[16] = (zBordered-1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered+1;
+  value = (zBordered-1)*dimSliceBordered;
+  indexNearest[8] = value+(dimsBordered[0]*yBordered)+xBordered;  
+  indexNearest[9] = value+(dimsBordered[0]*yBordered)+xBordered-1;  
+  indexNearest[10] = value+(dimsBordered[0]*yBordered)+xBordered+1;  
+  indexNearest[11] = value+(dimsBordered[0]*(yBordered+1))+xBordered;
+  indexNearest[12] = value+(dimsBordered[0]*(yBordered-1))+xBordered;
+  indexNearest[13] = value+(dimsBordered[0]*(yBordered-1))+xBordered-1;
+  indexNearest[14] = value+(dimsBordered[0]*(yBordered+1))+xBordered+1;
+  indexNearest[15] = value+(dimsBordered[0]*(yBordered+1))+xBordered-1;
+  indexNearest[16] = value+(dimsBordered[0]*(yBordered-1))+xBordered+1;
 
-  indexNearest[17] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered;
-  indexNearest[18] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered-1;
-  indexNearest[19] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*yBordered)+xBordered+1;
-  indexNearest[20] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered;
-  indexNearest[21] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered;
-  indexNearest[22] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered-1;
-  indexNearest[23] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered+1;
-  indexNearest[24] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered+1))+xBordered-1;
-  indexNearest[25] = (zBordered+1)*((dimsBordered[1]*dimsBordered[0]))+(dimsBordered[0]*(yBordered-1))+xBordered+1;
+  value = (zBordered+1)*dimSliceBordered;
+  indexNearest[17] = value+(dimsBordered[0]*yBordered)+xBordered;
+  indexNearest[18] = value+(dimsBordered[0]*yBordered)+xBordered-1;
+  indexNearest[19] = value+(dimsBordered[0]*yBordered)+xBordered+1;
+  indexNearest[20] = value+(dimsBordered[0]*(yBordered+1))+xBordered;
+  indexNearest[21] = value+(dimsBordered[0]*(yBordered-1))+xBordered;
+  indexNearest[22] = value+(dimsBordered[0]*(yBordered-1))+xBordered-1;
+  indexNearest[23] = value+(dimsBordered[0]*(yBordered+1))+xBordered+1;
+  indexNearest[24] = value+(dimsBordered[0]*(yBordered+1))+xBordered-1;
+  indexNearest[25] = value+(dimsBordered[0]*(yBordered-1))+xBordered+1;
 
   error = FALSE;
 }
@@ -281,6 +300,8 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::BorderCreate(vtkImageData *imToApp
   int sliceDimBordered = dimsBordered[0]*dimsBordered[1];
   int sliceDim = dims[0]*dims[1];
 
+  int indexBordered = 0;
+
   for (izBordered = 0;izBordered<dimsBordered[2];izBordered++)
   {
     for (iyBordered = 0;iyBordered<dimsBordered[1];iyBordered++)
@@ -300,6 +321,9 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::BorderCreate(vtkImageData *imToApp
         value = scalars->GetTuple1((iz*sliceDim)+(dims[0]*iy)+ix);
 
         scalarsBordered->SetTuple1((izBordered*sliceDimBordered)+(dimsBordered[0]*iyBordered)+ixBordered,value);
+        //scalarsBordered->SetTuple1(indexBordered,value);
+
+        indexBordered++;
       }
     }
   }
@@ -331,31 +355,37 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::Update()
     {
     case VTK_DOUBLE:
       {
+        Output->SetScalarTypeToDouble();
         scalarsOutput = vtkDoubleArray::New();
       }
       break;
     case VTK_FLOAT:
       {
+        Output->SetScalarTypeToFloat();
         scalarsOutput = vtkFloatArray::New();
       }
       break;
     case VTK_UNSIGNED_SHORT:
       {
+        Output->SetScalarTypeToUnsignedShort();
         scalarsOutput = vtkUnsignedShortArray::New();
       }
       break;
     case VTK_SHORT:
       {
+        Output->SetScalarTypeToShort();
         scalarsOutput = vtkShortArray::New();
       }
       break;
     case VTK_CHAR:
       {
+        Output->SetScalarTypeToChar();
         scalarsOutput = vtkCharArray::New();
       }
       break;
     case VTK_UNSIGNED_CHAR:
       {
+        Output->SetScalarTypeToUnsignedChar();
         scalarsOutput = vtkUnsignedCharArray::New();
       }
       break;
@@ -376,27 +406,36 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::Update()
       {
         int error = FALSE;
         int indexNearest[26];
+        double mean = 0.0;
+        double stdDev = 0.0;
         ComputeIndexNearstPoints(i,indexNearest,error,imBordered);
-        double mean = ComputeMeanValue(i,indexNearest,error,imBordered);
         if (error == TRUE)
         {
           return;
         }
-        double stdDev = ComputeStandardDeviation(i,indexNearest,mean,error,imBordered);
+        mean = ComputeMeanValue(i,indexNearest,error,imBordered);
+        if (error == TRUE)
+        {
+          return;
+        }
+        stdDev = ComputeStandardDeviation(i,indexNearest,mean,error,imBordered);
         if (error == TRUE)
         {
           return;
         }
 
         //Condition of region growing
-        if ( scalarValue < (mean - ( APLHA*stdDev )) )
-        {
-          scalarsOutput->SetTuple1(i,(double)LowerLabel);
-        }
-        else if( scalarValue >= (mean - ( APLHA*stdDev )) )
-        {
-          scalarsOutput->SetTuple1(i,(double)UpperLabel);
-        }
+        double valueLabel = scalarValue < (mean - ( APLHA*stdDev )) ? LowerLabel : UpperLabel;
+        scalarsOutput->SetTuple1(i,(double)valueLabel);
+
+//         if ( scalarValue < (mean - ( APLHA*stdDev )) )
+//         {
+//           scalarsOutput->SetTuple1(i,(double)LowerLabel);
+//         }
+//         else if( scalarValue >= (mean - ( APLHA*stdDev )) )
+//         {
+//           scalarsOutput->SetTuple1(i,(double)UpperLabel);
+//         }
       }
       else if (scalarValue <= LowerThreshold)
       {
