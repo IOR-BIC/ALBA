@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-29 14:08:33 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -30,8 +30,11 @@
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
+#include "vtkActor.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
 
-vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFHistogram);
 //------------------------------------------------------------------------------
 vtkMAFHistogram::vtkMAFHistogram()
@@ -39,7 +42,12 @@ vtkMAFHistogram::vtkMAFHistogram()
 {
   TextMapper  = NULL;
   TextActor   = NULL;
+  HistActor   = NULL;
+  Line1Actor  = NULL;
+  Line2Actor  = NULL;
 
+  Line1       = NULL;
+  Line2       = NULL;
   Accumulate  = NULL;
   ChangeInfo  = NULL;
   LogScale    = NULL;
@@ -64,6 +72,7 @@ vtkMAFHistogram::vtkMAFHistogram()
   LabelVisibility     = 1;
 
   AutoscaleCalculated = false;
+  ShowLines = FALSE;
 
   HistogramCreate();
 }
@@ -73,6 +82,10 @@ vtkMAFHistogram::~vtkMAFHistogram()
 {
   if(TextMapper)  TextMapper->Delete();
   if(TextActor)   TextActor->Delete();
+  if(Line1Actor)  Line1Actor->Delete();
+  if(Line2Actor)  Line2Actor->Delete();
+  if(Line1)       Line1->Delete();
+  if(Line2)       Line2->Delete();
   if(ImageData)   ImageData->Delete();
   if(Accumulate)  Accumulate->Delete();
   if(ChangeInfo)  ChangeInfo->Delete();
@@ -81,6 +94,7 @@ vtkMAFHistogram::~vtkMAFHistogram()
   if(HistActor)   HistActor->Delete();
   if(PointsRepresentation) PointsRepresentation->Delete();
   if(LineRepresentation)   LineRepresentation->Delete();
+  if (InputData) InputData->UnRegister(this);
 }
 //------------------------------------------------------------------------------
 void vtkMAFHistogram::SetInputData(vtkDataArray* inputData)
@@ -92,6 +106,12 @@ void vtkMAFHistogram::SetInputData(vtkDataArray* inputData)
     this->InputData = inputData;
     if (this->InputData != NULL) { this->InputData->Register(this); }
     this->Modified();
+
+    double sr[2];
+    InputData->GetRange(sr);
+    MinLinePosition = sr[0];
+    MaxLinePoistion = sr[1];
+
     AutoscaleCalculated = false;
   }
 }
@@ -125,8 +145,14 @@ int vtkMAFHistogram::RenderOverlay(vtkViewport *viewport)
   HistogramUpdate(ren);
   this->Modified();
 
-  HistActor->RenderOverlay(viewport);  
+  HistActor->RenderOverlay(viewport);
   if (LabelVisibility) TextActor->RenderOverlay(viewport);
+
+  if (ShowLines == TRUE)
+  {
+	  Line1Actor->RenderOverlay(viewport);
+	  Line2Actor->RenderOverlay(viewport);
+  }
   return 1;
 }
 //----------------------------------------------------------------------------
@@ -209,6 +235,34 @@ void vtkMAFHistogram::HistogramCreate()
 
   HistActor = vtkActor2D::New();
   HistActor->SetMapper(mapper2d);
+
+  Line1 = vtkLineSource::New();
+  Line1->SetPoint1(0,0,0);
+  Line1->SetPoint2(0,1,0);
+  Line1->Update();
+
+  vtkPolyDataMapper2D *mapperLine1 = vtkPolyDataMapper2D::New();
+  mapperLine1->SetInput(Line1->GetOutput());
+
+  Line1Actor = vtkActor2D::New();
+  Line1Actor->SetMapper(mapperLine1);
+  Line1Actor->GetProperty()->SetColor(1,0,0);
+
+  Line2 = vtkLineSource::New();
+  Line2->SetPoint1(0,0,0);
+  Line2->SetPoint2(0,1,0);
+  Line2->Update();
+
+  vtkPolyDataMapper2D *mapperLine2 = vtkPolyDataMapper2D::New();
+  mapperLine2->SetInput(Line2->GetOutput());
+
+  Line2Actor = vtkActor2D::New();
+  Line2Actor->SetMapper(mapperLine2);
+  Line2Actor->GetProperty()->SetColor(1,0,0);
+
+  mapperLine1->Delete();
+  mapperLine2->Delete();
+
 }
 //----------------------------------------------------------------------------
 void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
@@ -313,6 +367,51 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
 
   Glyph->Modified();
   Glyph->Update();
+
+  RenderH = ren->GetSize()[1];
+  OriginX = ren->GetOrigin()[0];
+  OriginY = ren->GetOrigin()[1];
+
+  InputData->GetRange(sr);
+
+  int shiftLine = sr[0]>=0 ? 0 : -sr[0];
+  Line1X = ((MinLinePosition+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
+  Line2X = ((MaxLinePoistion+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
+
+  Line1->SetPoint1(Line1X,OriginY,0);
+  Line1->SetPoint2(Line1X,OriginY+RenderH,0);
+  Line1->Modified();
+  Line1->Update();
+
+  Line2->SetPoint1(Line2X,OriginY,0);
+  Line2->SetPoint2(Line2X,OriginY+RenderH,0);
+  Line2->Modified();
+  Line2->Update();
+}
+//----------------------------------------------------------------------------
+void vtkMAFHistogram::UpdateLines(int min, int max)
+//----------------------------------------------------------------------------
+{
+  double sr[2];
+  InputData->GetRange(sr);
+  
+  MinLinePosition = min;
+  MaxLinePoistion = max;
+
+  int shiftLine = sr[0]>=0 ? 0 : -sr[0];
+  Line1X = ((MinLinePosition+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
+  Line2X = ((MaxLinePoistion+shiftLine) * (RenderWidth-1))/(sr[1]-sr[0]);
+
+  Line1->SetPoint1(Line1X,OriginY,0);
+  Line1->SetPoint2(Line1X,OriginY+RenderH,0);
+  Line1->Modified();
+  Line1->Update();
+
+  Line2->SetPoint1(Line1X,OriginY,0);
+  Line2->SetPoint2(Line2X,OriginY+RenderH,0);
+  Line2->Modified();
+  Line2->Update();
+
 }
 //----------------------------------------------------------------------------
 long int vtkMAFHistogram::GetHistogramValue(int x, int y)
@@ -320,6 +419,10 @@ long int vtkMAFHistogram::GetHistogramValue(int x, int y)
 {
   long int hisctogramValue = 0;
   int idx = (x /(RenderWidth *1.0)) * NumberOfBins;
+  if (idx>Accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples())
+  {
+  	return 0;
+  }
   hisctogramValue = Accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(idx);
   return hisctogramValue;
 }

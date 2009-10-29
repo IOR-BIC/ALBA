@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-29 14:08:33 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -97,6 +97,14 @@ class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
   /** Get the state of the logarithmic scale flag.*/
   vtkGetMacro(LogHistogram,int);
 
+  /** Turn on/off show lines.*/
+  vtkSetMacro(ShowLines,int);
+  /** Turn on/off show lines.*/
+  vtkBooleanMacro(ShowLines,int);
+
+  /** Update the position of the gizmos */
+  void UpdateLines(int min,int max);
+
   long int GetHistogramValue(int x, int y);
 
   void SetLabel(const char *lab);
@@ -125,12 +133,24 @@ protected:
   int    LabelVisibility;
   int    HisctogramRepresentation;
   int    RenderWidth;
+  int    RenderH;
+  int    Line1X;
+  int    Line2X;
+  int    OriginY;
+  int    OriginX;
+  int    MinLinePosition;
+  int    MaxLinePoistion;
+  int    ShowLines;
   bool   AutoscaleCalculated;
 
   vtkTextMapper	*TextMapper;
   vtkActor2D    *TextActor;
   vtkActor2D    *HistActor;
+  vtkActor2D    *Line1Actor;
+  vtkActor2D    *Line2Actor;
 
+  vtkLineSource             *Line1;
+  vtkLineSource             *Line2;
   vtkPolyData               *PointsRepresentation;
   vtkLineSource             *LineRepresentation;
   vtkImageAccumulate        *Accumulate;
