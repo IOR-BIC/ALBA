@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeMeshSlice_BESTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-05 14:23:15 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-29 08:55:36 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -76,9 +76,9 @@ void mafPipeMeshSlice_BESTest::setUp()
 void mafPipeMeshSlice_BESTest::tearDown()
 //----------------------------------------------------------------------------
 {
-  vtkDEL(m_Renderer);
-  vtkDEL(m_RenderWindow);
   vtkDEL(m_RenderWindowInteractor);
+  vtkDEL(m_RenderWindow);
+  vtkDEL(m_Renderer);
 }
 
 enum ID_TEST
@@ -1045,6 +1045,8 @@ void mafPipeMeshSlice_BESTest::CompareImages(int scalarIndex)
   if(!controlStream)
   {
     controlStream.close();
+    vtkDEL(w);
+    vtkDEL(w2i);
     return;
   }
   controlStream.close();
