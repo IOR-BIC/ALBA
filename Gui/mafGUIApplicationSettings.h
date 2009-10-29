@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-06-03 15:28:47 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-29 14:11:30 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -57,6 +57,7 @@ public:
 	{
 		JPG = 0,
 		BMP,
+    PNG,
 	};
 
   /** Answer to the messages coming from interface. */
@@ -95,6 +96,9 @@ public:
 
   /** Set the custom passphrase to encrypt data.*/
   void SetPassPhrase(mafString pass_phrase);
+
+  /** Select image type during saving of the views*/
+  int SetImageTypeId(int imageTypeId){m_ImageTypeId = imageTypeId;}
 
 	/** Select image type during saving of the views*/
 	int GetImageTypeId(){return m_ImageTypeId;};

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-02-03 15:26:42 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-29 14:11:30 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -35,7 +35,7 @@ mafGUISettings(Listener, label)
   m_VerboseLog  = 0;
   m_LogFolder = wxGetCwd().c_str();
 
-	m_ImageTypeId = 1;
+	m_ImageTypeId = PNG;
 
   m_WarnUserFlag = true;
   
@@ -71,8 +71,8 @@ void mafGUIApplicationSettings::CreateGui()
   EnableItems();
   m_Gui->Label(_("changes will take effect when the \napplication restart"),false,true);
   m_Gui->Label("");
-  wxString id_array[2] = {_("JPG") , _("BMP")};
-  m_Gui->Combo(IMAGE_TYPE_ID,_("image type"), &m_ImageTypeId,2,id_array);
+  wxString id_array[3] = {_("JPG") , _("BMP"), _("PNG")};
+  m_Gui->Combo(IMAGE_TYPE_ID,_("image type"), &m_ImageTypeId,3,id_array);
   m_Gui->Divider(2);
 }
 //----------------------------------------------------------------------------
