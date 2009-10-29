@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:13 $
-  Version:   $Revision: 1.33.2.2 $
+  Date:      $Date: 2009-10-29 14:11:52 $
+  Version:   $Revision: 1.33.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -70,6 +70,7 @@
 #include "vtkImageData.h"
 #include "vtkImageExport.h"
 #include "vtkImageAppend.h"
+#include "vtkBMPReader.h"
 #include "vtkMath.h"
 
 #include <fstream>
@@ -692,7 +693,7 @@ wxBitmap *mafRWIBase::GetImage(int magnification)
 
   //translate to a wxBitmap
   wxImage  *img = new wxImage(dim[0],dim[1],buffer,TRUE);
-  wxBitmap *bmp = new wxBitmap(img);
+  wxBitmap *bmp = new wxBitmap(img,24);
   delete img;
   delete buffer;
   return bmp;
@@ -715,6 +716,9 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
       break;
       case mafGUIApplicationSettings::BMP:
         wildc = "Image (*.bmp)|*.bmp";
+        break;
+      case mafGUIApplicationSettings::PNG:
+        wildc = "Image (*.png)|*.png";
       break;
     }
 /*
@@ -744,6 +748,10 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
     case mafGUIApplicationSettings::BMP:
     if(temporary != _("bmp"))
       filename += _(".bmp");
+    break;
+    case mafGUIApplicationSettings::PNG:
+      if(temporary != _("png"))
+        filename += _(".png");
     break;
   }
 
@@ -912,6 +920,9 @@ void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int m
     case mafGUIApplicationSettings::BMP:
       wildc = "Image (*.bmp)|*.bmp";
       break;
+    case mafGUIApplicationSettings::PNG:
+      wildc = "Image (*.png)|*.png";
+      break;
     }
     //mafString file ;
     if(!wxDirExists(path))
@@ -940,6 +951,10 @@ void mafRWIBase::SaveImageRecursive(mafString filename, mafViewCompound *v,int m
   case mafGUIApplicationSettings::BMP:
     if(temporary != _("bmp"))
       filename += _(".bmp");
+    break;
+  case mafGUIApplicationSettings::PNG:
+    if(temporary != _("png"))
+      filename += _(".png");
     break;
   }
 
@@ -1143,7 +1158,7 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
   wxSplitPath(filename,&path,&name,&ext);
   if (filename.IsEmpty() || ext.IsEmpty())
   {
-    mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp";
+    mafString wildc = "Image (*.jpg)|*.jpg|Image (*.bmp)|*.bmp|Image (*.png)|*.png";
     switch(forceExtension)
     {
     case mafGUIApplicationSettings::JPG :
@@ -1151,6 +1166,9 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
       break;
     case mafGUIApplicationSettings::BMP:
       wildc = "Image (*.bmp)|*.bmp";
+      break;
+    case mafGUIApplicationSettings::PNG:
+      wildc = "Image (*.png)|*.png";
       break;
     }
     mafString file;
@@ -1179,6 +1197,10 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
   case mafGUIApplicationSettings::BMP:
     if(mafString(temporary) != _("bmp"))
       filename += _(".bmp");
+    break;
+  case mafGUIApplicationSettings::PNG:
+    if(mafString(temporary) != _("png"))
+      filename += _(".png");
     break;
   }
 
@@ -1209,9 +1231,39 @@ void mafRWIBase::SaveAllImages(mafString filename, mafViewCompound *v, int force
     image.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_JPEG);
     wxImage::RemoveHandler("JPEGHANDLER");
   }
+  else if (ext == "png")
+  {
+    /*wxPNGHandler *pngHandler = new wxPNGHandler();
+    pngHandler->SetName("PNGHANDLER");
+    wxImage::AddHandler(pngHandler);
+    wxImage image = imageBitmap.ConvertToImage();
+    image.SetOption(_("quality"), 100);
+    image.SaveFile(filename.GetCStr(), wxBITMAP_TYPE_PNG);
+    wxImage::RemoveHandler("PNGHANDLER");*/
+    
+    std::string fn = filename.GetCStr();
+    fn = fn.substr(0,fn.size()-3);
+    fn.append("bmp");
+    //imageBitmap.SetDepth(24);
+    imageBitmap.SaveFile(fn.c_str(), wxBITMAP_TYPE_BMP);
+    
+    vtkBMPReader *r = vtkBMPReader::New();
+    r->SetFileName(fn.c_str());
+    r->Update();
+
+    vtkPNGWriter *w = vtkPNGWriter::New();
+    w->SetInput(r->GetOutput());
+    w->SetFileName(filename.GetCStr());
+    w->Write();
+
+    r->Delete();
+    w->Delete();
+
+    wxRemoveFile(fn.c_str());
+  }
   else
   {
-    wxMessageBox("Must save with JPG or BMP extension");
+    wxMessageBox("Must save with JPG, BMP of PNG extension");
   }
   ::wxEndBusyCursor();
 }
