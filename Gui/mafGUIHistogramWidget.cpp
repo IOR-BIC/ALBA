@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2009-06-12 14:57:56 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-10-29 14:09:00 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -24,6 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafRWI.h"
 #include "mafGUI.h"
 #include "mafGUIRangeSlider.h"
+#include "mafGUILutSlider.h"
 
 #include "mafDeviceButtonsPad.h"
 #include "mafDeviceButtonsPadMouse.h"
@@ -37,11 +38,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkDataArray.h"
 #include "vtkPointData.h"
 #include "vtkLookupTable.h"
+#include "vtkLineSource.h"
+#include "vtkProperty.h"
+#include "vtkPolyDataMapper.h"
 
 MAF_ID_IMP(mafGUIHistogramWidget::RANGE_MODIFIED);
 
 //----------------------------------------------------------------------------
-mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id /* = -1 */, const wxPoint& pos /* = wxDefaultPosition */, const wxSize& size /* = wxSize */,long style /* = wxTAB_TRAVERSAL */, bool showThresholds /* = false */)
 :mafGUIPanel(parent,id,pos,size,style)
 //----------------------------------------------------------------------------
 {
@@ -52,6 +56,7 @@ mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id, co
   m_Data        = NULL;
   m_Lut         = NULL;
   m_Slider      = NULL;
+  m_SliderThresholds = NULL;
 
   m_SelectedRange[0] = 0.0;
   m_SelectedRange[1] = 1.0;
@@ -60,19 +65,25 @@ mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id, co
   m_LogScaleConstant= 10.0;
   m_DragStart       = 0;
   m_Representation  = 1;
+
+  m_LowerThreshold = 0;
+  m_UpperThreshold = 1;
   
   m_AutoscaleHistogram = true;
   m_LogHistogramFlag   = false;
   m_Dragging           = false;
   //////////////////////////////////////////////////////////////////////////
-  
+
   vtkNEW(m_Histogram);
   m_Histogram->SetColor(1,1,1);
   m_Histogram->SetHisctogramRepresentation(vtkMAFHistogram::LINE_REPRESENTATION);
 
+  wxBoxSizer *sizerV = new wxBoxSizer(wxVERTICAL);
+
   m_HistogramRWI = new mafRWI(mafGetFrame());
   m_HistogramRWI->SetListener(this);
   m_HistogramRWI->m_RenFront->AddActor2D(m_Histogram);
+  //m_HistogramRWI->m_RenFront->AddActor2D(actor);
   m_HistogramRWI->m_RenFront->SetBackground(0.28,0.28,0.28);
   m_HistogramRWI->SetSize(pos.x,pos.y,size.GetWidth(),size.GetHeight());
   ((wxWindow *)m_HistogramRWI->m_RwiBase)->SetSize(size.GetWidth(),size.GetHeight());
@@ -82,21 +93,37 @@ mafGUIHistogramWidget::mafGUIHistogramWidget(wxWindow* parent, wxWindowID id, co
   m_HistogramRWI->m_RwiBase->SetListener(this);
   m_HistogramRWI->m_RwiBase->Show(true);
 
+  if (showThresholds)
+  {
+	  wxBoxSizer *sizerH1 = new wxBoxSizer(wxHORIZONTAL);
+	  m_SliderThresholds = new mafGUILutSlider(this,ID_SLIDER_THRESHOLD ,wxPoint(0,0),wxSize(10,24), 0, "Thresholds");
+	  m_SliderThresholds->SetListener(this);
+	  m_SliderThresholds->SetSize(5,24);
+	  m_SliderThresholds->SetMinSize(wxSize(5,24));
+	  m_SliderThresholds->SetRange(m_LowerThreshold,m_UpperThreshold);
+	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
+	  sizerH1->Add(m_SliderThresholds,wxEXPAND);
+	  sizerV->Add(sizerH1, 0,wxEXPAND);
+
+    m_Histogram->ShowLinesOn();
+  }
+
   wxStaticText *foo_l = new wxStaticText(this,-1, "");
   wxStaticText *foo_r = new wxStaticText(this,-1, "");
 
-  wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-  sizer->Add(foo_l, 0, wxLEFT, 5);
-  sizer->Add(m_HistogramRWI->m_RwiBase, 1, wxEXPAND, 5);
-  sizer->Add(foo_r, 0, wxLEFT, 5);
+  wxBoxSizer *sizerH2 = new wxBoxSizer(wxHORIZONTAL);
+  sizerH2->Add(foo_l, 0, wxLEFT, 5);
+  sizerH2->Add(m_HistogramRWI->m_RwiBase, 1, wxEXPAND, 5);
+  sizerH2->Add(foo_r, 0, wxLEFT, 5);
+  sizerV->Add(sizerH2, 0,wxEXPAND);
 
-  SetSizer(sizer);
+  SetSizer(sizerV);
 
-  sizer->Layout();           // resize & fit the contents
-  sizer->SetSizeHints(this); // resize the dialog accordingly 
+  sizerV->Layout();           // resize & fit the contents
+  sizerV->SetSizeHints(this); // resize the dialog accordingly 
 
   SetAutoLayout(TRUE);
-  sizer->Fit(this);
+  sizerV->Fit(this);
 
 //  CreateGui();
 
@@ -112,6 +139,13 @@ mafGUIHistogramWidget::~mafGUIHistogramWidget()
   cppDEL(m_HistogramRWI);
 }
 //----------------------------------------------------------------------------
+void mafGUIHistogramWidget::UpdateLines(int min,int max)
+//----------------------------------------------------------------------------
+{
+  m_Histogram->UpdateLines(min,max);
+  m_HistogramRWI->CameraUpdate();
+}
+//----------------------------------------------------------------------------
 mafGUI *mafGUIHistogramWidget::GetGui()
 //----------------------------------------------------------------------------
 {
@@ -120,6 +154,15 @@ mafGUI *mafGUIHistogramWidget::GetGui()
     CreateGui();
   }
   return m_Gui;
+}
+//----------------------------------------------------------------------------
+void mafGUIHistogramWidget::GetThresholds(double *lower, double *upper)
+//----------------------------------------------------------------------------
+{
+  if (m_SliderThresholds != NULL)
+  {
+    m_SliderThresholds->GetSubRange(lower,upper);
+  }
 }
 //----------------------------------------------------------------------------
 void mafGUIHistogramWidget::CreateGui()
@@ -165,6 +208,12 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
   {
     switch(e->GetId())
     {
+    case ID_RANGE_MODIFIED:
+      {
+        m_SliderThresholds->GetSubRange(&m_LowerThreshold,&m_UpperThreshold);
+        m_Histogram->UpdateLines(m_LowerThreshold,m_UpperThreshold);
+      }
+      break;
       case ID_REPRESENTATION:
         SetRepresentation(m_Representation);
       break;
@@ -264,6 +313,15 @@ void mafGUIHistogramWidget::SetData(vtkDataArray *data)
 {
   m_Data = data;
   m_Histogram->SetInputData(m_Data);
+  double sr[2];
+  m_Data->GetRange(sr);
+  m_LowerThreshold = sr[0];
+  m_UpperThreshold = sr[1];
+  if (m_SliderThresholds != NULL)
+  {
+	  m_SliderThresholds->SetRange(m_LowerThreshold,m_UpperThreshold);
+	  m_SliderThresholds->SetSubRange(m_LowerThreshold,m_UpperThreshold);
+  }
   /*m_Data->GetRange(m_SelectedRange);
   m_Slider->SetRange(m_SelectedRange);
   m_Slider->SetValue(0, m_SelectedRange[0]);

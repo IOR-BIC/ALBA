@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-10-29 14:09:00 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,6 +30,7 @@ class vtkDataArray;
 class mafGUI;
 class vtkImageData;
 class mafGUIRangeSlider;
+class mafGUILutSlider;
 class vtkLookupTable;
 
 //----------------------------------------------------------------------------
@@ -38,7 +39,7 @@ class mafGUIHistogramWidget: public mafGUIPanel, public mafObserver
 {
 public:
   mafGUIHistogramWidget(wxWindow* parent, wxWindowID id = -1, const wxPoint& pos = wxDefaultPosition, 
-           const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL /*| wxSUNKEN_BORDER */);
+           const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL /*| wxSUNKEN_BORDER */, bool showThresholds = false);
   virtual ~mafGUIHistogramWidget();
 
   virtual void SetListener(mafObserver *Listener) {m_Listener = Listener;};
@@ -56,6 +57,7 @@ public:
     ID_REPRESENTATION,
     ID_RESET,
     ID_RANGE_SLICER,
+    ID_SLIDER_THRESHOLD,
   };
 
 	/** Set a pre-calculated histogram, just visualize it instead calculate. It is used like a cache.*/
@@ -114,7 +116,13 @@ public:
   /** Return a reference to the UI.*/
   mafGUI *GetGui();
 
+  void GetThresholds(double *lower, double *upper);
+
 protected:
+
+  /** Update position of the gizmo lines */
+  void UpdateLines(int min,int max);
+
   /** Create GUI for histogram widget.*/
   void CreateGui();
 
@@ -137,10 +145,13 @@ protected:
   int            m_LogHistogramFlag;
   bool           m_Dragging;
   int            m_DragStart;
+  double         m_LowerThreshold;
+  double         m_UpperThreshold;
 
   mafGUI        *m_Gui;
 
   mafGUIRangeSlider *m_Slider;
+  mafGUILutSlider *m_SliderThresholds;
   double m_SelectedRange[2];
   
   vtkLookupTable*m_Lut;
