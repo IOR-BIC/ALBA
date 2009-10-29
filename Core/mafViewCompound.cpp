@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:13 $
-  Version:   $Revision: 1.32.2.1 $
+  Date:      $Date: 2009-10-29 14:12:07 $
+  Version:   $Revision: 1.32.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -561,7 +561,7 @@ void mafViewCompound::GetImage(wxBitmap &bmp, int magnification)
 //----------------------------------------------------------------------------
 {
   wxSize vsz = this->GetWindow()->GetSize();
-  wxBitmap compoundImage = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight());
+  wxBitmap compoundImage = wxBitmap(magnification*vsz.GetWidth(),magnification*vsz.GetHeight(),24);
   wxMemoryDC compoundDC;
   compoundDC.SelectObject(compoundImage);
   compoundDC.SetBackground(*wxWHITE_BRUSH);
