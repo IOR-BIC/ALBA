@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAction.h,v $
   Language:  C++
-  Date:      $Date: 2007-06-18 07:08:01 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-10-29 10:22:45 $
+  Version:   $Revision: 1.4.4.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mafAction_h
 #define __mafAction_h
 
-#include "mafAction.h"
+#include "mafAgent.h"
 #include "mafStorable.h"
 #include "mafSmartPointer.h"
 #include <list>
@@ -26,9 +26,7 @@ class mafDevice;
 class mafInteractor;
 class vtkRenderer;
 
-/** this class routes events from devices to interactors.
-    Detailed description not yet written...
- */
+/** Class used to route events from devices to interactors */
 class mafAction : public mafAgent, public mafStorable
 {
 public:
@@ -49,15 +47,11 @@ public:
   
   mafTypeMacro(mafAction,mafAgent);
 
-  /** 
-    Set the type of action. semantic to be defined... */
+  /** Set the type of action*/
   int GetType() {return m_Type;}
   void SetType(int t) {if (t==SHARED_ACTION||t==EXCLUSIVE_ACTION) m_Type=t;}
   void SetTypeToShared() {SetType(SHARED_ACTION);}
   void SetTypeToExclusive() {SetType(EXCLUSIVE_ACTION);}
-
-  /** To be called when a new renderer is selected to update all interactors */
-  //void SelectRenderer(vtkRenderer *view)
   
   /** Bind/Unbind a device to this action */
   void BindDevice(mafDevice *device);
