@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2009-02-10 19:32:45 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2009-10-30 10:50:12 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -82,6 +82,8 @@ public:
   Perform resample in test mode*/
   void Resample();
 
+  void AutoSpacing();
+
 protected:
   
   /** Test facilities */
@@ -138,8 +140,6 @@ protected:
   void SetBoundsToVMEBounds();
   void SetBoundsToVME4DBounds();
   void SetBoundsToVMELocalBounds();
-
-  void AutoSpacing();
 
   void InternalUpdateBounds(double bounds[6],bool center);
 

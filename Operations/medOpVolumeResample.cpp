@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-02-10 19:32:45 $
-  Version:   $Revision: 1.12.2.5 $
+  Date:      $Date: 2009-10-30 10:50:11 $
+  Version:   $Revision: 1.12.2.6 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -246,21 +246,21 @@ void medOpVolumeResample::AutoSpacing()
     for (int xi = 1; xi < rgrid->GetXCoordinates()->GetNumberOfTuples (); xi++)
     {
       double spcx = rgrid->GetXCoordinates()->GetTuple1(xi)-rgrid->GetXCoordinates()->GetTuple1(xi-1);
-      if (m_VolumeSpacing[0] > spcx)
+      if (m_VolumeSpacing[0] > spcx && spcx != 0.0)
         m_VolumeSpacing[0] = spcx;
     }
     
     for (int yi = 1; yi < rgrid->GetYCoordinates()->GetNumberOfTuples (); yi++)
     {
       double spcy = rgrid->GetYCoordinates()->GetTuple1(yi)-rgrid->GetYCoordinates()->GetTuple1(yi-1);
-      if (m_VolumeSpacing[1] > spcy)
+      if (m_VolumeSpacing[1] > spcy && spcy != 0.0)
         m_VolumeSpacing[1] = spcy;
     }
 
     for (int zi = 1; zi < rgrid->GetZCoordinates()->GetNumberOfTuples (); zi++)
     {
       double spcz = rgrid->GetZCoordinates()->GetTuple1(zi)-rgrid->GetZCoordinates()->GetTuple1(zi-1);
-      if (m_VolumeSpacing[2] > spcz)
+      if (m_VolumeSpacing[2] > spcz && spcz != 0.0)
         m_VolumeSpacing[2] = spcz;
     }
   }
