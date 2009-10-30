@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafDataChecksumTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-23 17:00:34 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-30 07:25:31 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,32 +56,42 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class vtkPolyData;
 
-//------------------------------------------------------------------------------
-// Test class for mafPolylineGraph
-//------------------------------------------------------------------------------
+/** 
+class name: mafDataChecksumTest
+  Test class for mafDataChecksum
+*/
 class mafDataChecksumTest : public CPPUNIT_NS::TestFixture
 {
 public:
 
-	// CPPUNIT fixture: executed before each test
+	/** CPPUNIT fixture: executed before each test */
 	void setUp();
 
-	// CPPUNIT fixture: executed after each test
+	/** CPPUNIT fixture: executed after each test */
 	void tearDown();
 
+  /** Start test suite macro */
 	CPPUNIT_TEST_SUITE( mafDataChecksumTest );
+  /** macro for test TestDynamicAllocation */
 	CPPUNIT_TEST( TestDynamicAllocation );
+  /** macro for test TestStaticAllocation */
 	CPPUNIT_TEST( TestStaticAllocation );
+  /** macro for test TestAdler32Checksum */
 	CPPUNIT_TEST( TestAdler32Checksum );
+  /** macro for test TestCombineAdler32Checksums */
 	CPPUNIT_TEST( TestCombineAdler32Checksums );
+  /** End test suite macro */
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
 
-	void TestFixture();
+  /** Dynamic allocation test */
 	void TestDynamicAllocation();
+  /** Static allocation test */
 	void TestStaticAllocation();
+  /** Test for check Adler Checksum */
 	void TestAdler32Checksum();
+  /** Test for check combination of Adler Checksum */
 	void TestCombineAdler32Checksums();
 };
 

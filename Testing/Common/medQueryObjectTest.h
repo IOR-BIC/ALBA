@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medQueryObjectTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-23 17:00:34 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-30 07:25:31 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,39 +56,53 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class vtkPolyData;
 
-//------------------------------------------------------------------------------
-// Test class for mafPolylineGraph
-//------------------------------------------------------------------------------
+/**
+class name : medQueryObjectTest
+      Test class for medQueryObject
+*/
 class medQueryObjectTest : public CPPUNIT_NS::TestFixture
 {
 public:
 
-	// CPPUNIT fixture: executed before each test
+	/** CPPUNIT fixture: executed before each test */
 	void setUp();
 
-	// CPPUNIT fixture: executed after each test
+	/** CPPUNIT fixture: executed after each test */
 	void tearDown();
 
+  /** Start test suite macro */
 	CPPUNIT_TEST_SUITE( medQueryObjectTest );
+  /** macro for test TestDynamicAllocation */
 	CPPUNIT_TEST( TestDynamicAllocation );
+  /** macro for test TestStaticAllocation */
 	CPPUNIT_TEST( TestStaticAllocation );
+  /** macro for test TestGetValueAsString */
 	CPPUNIT_TEST( TestGetValueAsString );
+  /** macro for test TestGetValueAsInt */
 	CPPUNIT_TEST( TestGetValueAsInt );
+  /** macro for test TestGetValueAsLong */
   CPPUNIT_TEST( TestGetValueAsLong );
+  /** macro for test TestGetValueAsFloat */
   CPPUNIT_TEST( TestGetValueAsFloat );
+  /** macro for test TestGetValueAsDouble */
   CPPUNIT_TEST( TestGetValueAsDouble );
-  
+  /** End test suite macro */
 	CPPUNIT_TEST_SUITE_END();
 
 protected:
-
-	void TestFixture();
+	/** Dynamic allocation test */
 	void TestDynamicAllocation();
+  /** Static allocation test */
 	void TestStaticAllocation();
+  /** Test if value is a string */
 	void TestGetValueAsString();
+  /** Test if value is a int */
   void TestGetValueAsInt();
+  /** Test if value is a long */
   void TestGetValueAsLong();
+  /** Test if value is a float */
   void TestGetValueAsFloat();
+  /** Test if value is a double */
 	void TestGetValueAsDouble();
 };
 

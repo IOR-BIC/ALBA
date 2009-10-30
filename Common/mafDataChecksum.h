@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafDataChecksum.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 11:42:25 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-10-30 07:24:41 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -21,7 +21,11 @@
 
 #ifndef mafDataChecksum_h__
 #define mafDataChecksum_h__
-
+/**
+class name: mafDataChecksum
+  Can compute Adler checksum for a given data, and combine two adler checksums in order to
+  obtain a third checksum
+*/
 class mafDataChecksum
 {
 public:
