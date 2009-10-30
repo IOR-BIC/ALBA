@@ -56,6 +56,9 @@ ADD_TEST(mafPipeMeshSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeMeshSlice_BE
 ADD_EXECUTABLE(mafPipeSurfaceSlice_BESTest mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp)
 ADD_TEST(mafPipeSurfaceSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSurfaceSlice_BESTest)
 
+ADD_EXECUTABLE(mafPipeVolumeSlice_BESTest mafPipeVolumeSlice_BESTest.h mafPipeVolumeSlice_BESTest.cpp)
+ADD_TEST(mafPipeVolumeSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeSlice_BESTest)
+
 ADD_EXECUTABLE(medVMEMapsTest medVMEMapsTest.h medVMEMapsTest.cpp)
 ADD_TEST(medVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEMapsTest)
 
