@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-10-21 11:55:58 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-10-30 10:49:38 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -51,6 +51,8 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 class mafVMEVolumeGray;
 class mafGUILutSlider;
+class mafGUIHistogramWidget;
+class vtkImageData;
 
 //----------------------------------------------------------------------------
 // medOpSegmentationRegionGrowingLocalAndGlobalThreshold :
@@ -77,6 +79,12 @@ public:
   /** Builds operation's interface by calling CreateOpDialog() method. */
   /*virtual*/ void OpRun();
 
+  /** Execute the operation. */
+  /*virtual*/ void OpDo();
+
+  /** Makes the undo for the operation. */
+  /*virtual*/ void OpUndo();
+
 protected:
   
   /** Create the operation gui */
@@ -85,17 +93,27 @@ protected:
   /** Perform the local segmentation */
   void LocalSegmentation();
 
+  void MorphologicalMathematics();
+
+  /** Update progress bar value */
+  void UpdateProgressBar();
+
   //GUI Stuff
-  double m_LowerThreshold;
-  double m_UpperThreshold;
   double m_LowerLabel;
   double m_UpperLabel;
+  int m_SphereRadius;
   mafGUILutSlider *m_SliderLabels;
   mafGUILutSlider *m_SliderThresholds;
   mafGUI *m_GuiLabels;
 
-  mafVMEVolumeGray *m_Volume; //<<<Input volume
-  mafVMEVolumeGray *m_VolumeOutput; //<<<Output volume
+  mafGUIHistogramWidget *m_Histogram;
+
+  mafVMEVolumeGray *m_VolumeInput; //<<<Input volume
+  mafVMEVolumeGray *m_VolumeOutputMorpho; //<<<Output volume
+  mafVMEVolumeGray *m_VolumeOutputRegionGrowing; //<<<Output volume
+
+  vtkImageData *m_SegmentedImage;
+  vtkImageData *m_MorphoImage;
 
 };
 #endif
