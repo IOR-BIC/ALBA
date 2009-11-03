@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIApplicationSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-10-29 14:11:30 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-11-03 14:49:31 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -98,7 +98,7 @@ public:
   void SetPassPhrase(mafString pass_phrase);
 
   /** Select image type during saving of the views*/
-  int SetImageTypeId(int imageTypeId){m_ImageTypeId = imageTypeId;}
+  void SetImageTypeId(int imageTypeId){m_ImageTypeId = imageTypeId;}
 
 	/** Select image type during saving of the views*/
 	int GetImageTypeId(){return m_ImageTypeId;};
