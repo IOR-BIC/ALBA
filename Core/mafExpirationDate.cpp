@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafExpirationDate.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-23 16:33:39 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2009-11-03 14:48:55 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -54,6 +54,7 @@ m_DemoVersionFlag(false)
 //----------------------------------------------------------------------------
 {	
   m_ExpirationDate = new wxDateTime(wxDateTime::UNow());
+  m_ExpirationDate->SetMonth(wxDateTime::Month::Jan);//january has 31 days, workaround to avoid asserts
   m_ExpirationDate->SetDay(day);
   m_ExpirationDate->SetMonth((wxDateTime::Month)(month-1)); //need to handle the correct array range of wxDateTime (0-11)
   m_ExpirationDate->SetYear(year);
@@ -108,6 +109,7 @@ m_DemoVersionFlag(false)
     ss >> yearInt;
     
     m_ExpirationDate = new wxDateTime(wxDateTime::UNow());
+    m_ExpirationDate->SetMonth(wxDateTime::Month::Jan);//january has 31 days, workaround to avoid asserts
     m_ExpirationDate->SetDay(dayInt);
     m_ExpirationDate->SetMonth((wxDateTime::Month)(monthEnum-1));//need to handle the correct array range of wxDateTime (0-11)
     m_ExpirationDate->SetYear(yearInt);
