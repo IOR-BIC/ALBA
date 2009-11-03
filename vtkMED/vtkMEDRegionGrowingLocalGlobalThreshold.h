@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notice for more information.
 
 class vtkImageData;
 
-#include "vtkObject.h"
+#include "vtkProcessObject.h"
 #include "vtkMAFConfigure.h"
 
-class VTK_vtkMAF_EXPORT vtkMEDRegionGrowingLocalGlobalThreshold : public vtkObject
+class VTK_vtkMAF_EXPORT vtkMEDRegionGrowingLocalGlobalThreshold : public vtkProcessObject
 {
 public:
-  vtkTypeRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold,vtkObject);
+  vtkTypeRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold,vtkProcessObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #define APLHA 1.0
 
-vtkCxxRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDRegionGrowingLocalGlobalThreshold, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMEDRegionGrowingLocalGlobalThreshold);
 
 //----------------------------------------------------------------------------
@@ -398,8 +398,16 @@ void vtkMEDRegionGrowingLocalGlobalThreshold::Update()
 
     BorderCreate(imBordered);
     
+    double progress = 0;
     for (int i=0;i<inputIM->GetPointData()->GetScalars()->GetNumberOfTuples();i++)//For each scalar
     {
+      double newProgress = (double)i/inputIM->GetPointData()->GetScalars()->GetNumberOfTuples();
+      if (newProgress > progress + 0.01)
+      {
+      	this->UpdateProgress(newProgress);
+        progress = newProgress;
+      }
+
       double scalarValue = inputIM->GetPointData()->GetScalars()->GetTuple1(i);
 
       if (scalarValue > LowerThreshold && scalarValue < UpperThreshold)
