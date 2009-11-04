@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFMultiFileDataProvider.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 15:55:39 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-11-04 10:36:29 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -35,23 +35,23 @@ protected:
     FILE_DESC *pLast, *pNext;   //<links 
   } FILE_DESC;
 
-  FILE_DESC* m_PFDHead;       //<header of list of file descriptors
-  FILE_DESC* m_PFDTail;       //<tail of list of file descriptors
-  FILE_DESC* m_PFDLastUsed;   //<last used file descriptor
+  FILE_DESC* PFDHead;       //<header of list of file descriptors
+  FILE_DESC* PFDTail;       //<tail of list of file descriptors
+  FILE_DESC* PFDLastUsed;   //<last used file descriptor
 
   //the size of header in bytes for the 2nd+ file
   //the header for the first file is in HeaderSize  
-  vtkIdType64 m_HeaderSize2;
+  vtkIdType64 HeaderSize2;
   
   //global offsets
-  vtkTimeStamp m_OffsetsComputeTime;
+  vtkTimeStamp OffsetsComputeTime;
 
-  char* m_InternalFileName;     //<Internal name
-  char* m_FilePattern;          //<pattern used to create file names
-  int m_FileNameSliceOffset;    //<the initial slice number
-  int m_FileNameSliceSpacing;   //<the spacing in numbering
+  char* InternalFileName;     //<Internal name
+  char* FilePattern;          //<pattern used to create file names
+  int FileNameSliceOffset;    //<the initial slice number
+  int FileNameSliceSpacing;   //<the spacing in numbering
    
-  bool m_ReadOnly;            //<true, if files should be opened in RO mode
+  bool ReadOnly;            //<true, if files should be opened in RO mode
   bool DeleteOnClose;			  //<true, if files should be deleted when closed
  
 //getter/setters
@@ -60,13 +60,13 @@ public:
   //N.B. unlike HeaderSize, the value set to HeaderSize
   //is applied even if DefaultLayout is turned off  
   inline virtual vtkIdType64 GetHeaderSize2() {
-    return m_HeaderSize2;
+    return HeaderSize2;
   }
 
   inline virtual void SetHeaderSize2(vtkIdType64 header) 
   {
-    if (m_HeaderSize2 != header) {
-      m_HeaderSize2 = header;
+    if (HeaderSize2 != header) {
+      HeaderSize2 = header;
       this->Modified();
     }
   }
