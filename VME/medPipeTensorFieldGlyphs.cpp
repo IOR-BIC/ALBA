@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeTensorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-10-12 12:35:34 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2009-11-04 16:16:13 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -677,7 +677,7 @@ void medPipeTensorFieldGlyphs::OnShowFilter(int mode){
 		double valueRange[2];
 		valueRange[0] = pItem->value[0] ;
 		valueRange[1] = pItem->value[1];
-		doFilter(mode,valueRange,NULL);
+		DoFilter(mode,valueRange,NULL);
 	}else if (mode ==2 )
 	{
 		nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
@@ -686,7 +686,7 @@ void medPipeTensorFieldGlyphs::OnShowFilter(int mode){
 			double valueRange[2];
 			valueRange[0] = pItem->value[0] ;
 			valueRange[1] = pItem->value[1];
-			doFilter(mode,NULL,valueRange);		
+			DoFilter(mode,NULL,valueRange);		
 		}
 	}else if (mode ==3 && nIndex1>=0 )
 	{
@@ -700,7 +700,7 @@ void medPipeTensorFieldGlyphs::OnShowFilter(int mode){
 			FILTER_ITEM* pItem2 = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
 			valueRange2[0] = pItem2->value[0];
 			valueRange2[1] = pItem2->value[1];
-			doFilter(mode,valueRange1,valueRange2);	
+			DoFilter(mode,valueRange1,valueRange2);	
 		}
 	}
 }
@@ -709,7 +709,7 @@ void medPipeTensorFieldGlyphs::OnShowFilter(int mode){
 void medPipeTensorFieldGlyphs::OnAddItem(int idx){
 	//-----------------------------------------------------------------------
 
-	createAddItemDlg(idx);
+	CreateAddItemDlg(idx);
 
 }
 //-----------------------------------------------------------------------
@@ -831,7 +831,7 @@ bool medPipeTensorFieldGlyphs::AddItem(){
 }
 //-----------------------------------------------------------------------
 //create dialog ,same as vector
-void medPipeTensorFieldGlyphs::createAddItemDlg(int idx){
+void medPipeTensorFieldGlyphs::CreateAddItemDlg(int idx){
 	//-----------------------------------------------------------------------
 	/*vtkDataArray *dataArr = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	double range[2];
@@ -947,7 +947,7 @@ void medPipeTensorFieldGlyphs::createAddItemDlg(int idx){
 
 
 }
-bool medPipeTensorFieldGlyphs::doCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2){
+bool medPipeTensorFieldGlyphs::DoCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2){
 	bool rtn = false;
 	bool tensorFlag;
 	bool scaleFlag;
@@ -977,7 +977,7 @@ bool medPipeTensorFieldGlyphs::doCondition(int mode,double tensorScaleValue,doub
 	return rtn;
 
 }
-void medPipeTensorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *rangeValue2){
+void medPipeTensorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *rangeValue2){
 	
 
 	double origin[3],spacing[3];
@@ -1072,7 +1072,7 @@ void medPipeTensorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 									pointScale = pointScalarArray->GetTuple1(idxPoints);
 								}
 								//if (scaleValue>=rangeValue[0] && scaleValue<=rangeValue[1])//in range
-								if (doCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//doCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2)
+								if (DoCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//DoCondition(int mode,double tensorScaleValue,double scaleValue,double *rangeValue1,double *rangeValue2)
 								{
 									pCoord = allPoints->GetTuple(idx);//only init
 
@@ -1129,7 +1129,7 @@ void medPipeTensorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 								{
 									pointScale = pointScalarArray->GetTuple1(idxPoints);
 								}
-								if (doCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//in range
+								if (DoCondition(mode,tensorScale,pointScale,rangeValue,rangeValue2))//in range
 								{
 									pCoord = allPoints->GetTuple(idxPoints);
 
