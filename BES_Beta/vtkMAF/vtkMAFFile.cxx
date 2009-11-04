@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFFile.cxx,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-14 15:55:39 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-11-04 10:55:17 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -25,10 +25,10 @@
   #include <share.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMAFFile, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFFile, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFFile);
 
-vtkCxxRevisionMacro(vtkMAFFile2, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFFile2, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFFile2);
 
 //creates a new file
@@ -43,8 +43,8 @@ bool vtkMAFFile::Create(const char* fname) throw(...)
     OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
   return (m_HFile != INVALID_HANDLE_VALUE);
 #else
-  m_PFile = fopen(fname, "wb+");
-  return (m_PFile != NULL);
+  PFile = fopen(fname, "wb+");
+  return (PFile != NULL);
 #endif  
 }
 
@@ -61,8 +61,8 @@ bool vtkMAFFile::Open(const char* fname, bool bRO) throw(...)
     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
   return (m_HFile != INVALID_HANDLE_VALUE);
 #else
-  m_PFile = fopen(fname, (bRO ? "rb" : "rb+"));
-  return (m_PFile != NULL);
+  PFile = fopen(fname, (bRO ? "rb" : "rb+"));
+  return (PFile != NULL);
 #endif  
 }
 

@@ -3,7 +3,7 @@
   File:    	 vtkMAFFile.h
   Language:  C++
   Date:      11:2:2008   12:36
-  Version:   $Revision: 1.1.2.2 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout (Josef.Kohout@beds.ac.uk)
   
   Copyright (c) 2008
@@ -34,7 +34,7 @@ protected:
 #ifdef _WIN32
   HANDLE m_HFile;   //associated file HANDLE
 #else
-  FILE* m_PFile;    //associated FILE
+  FILE* PFile;    //associated FILE
 #endif // _WIN32
 
 public:
@@ -46,7 +46,7 @@ protected:
 #ifdef _WIN32
     m_HFile = INVALID_HANDLE_VALUE;
 #else
-    m_PFile = NULL;
+    PFile = NULL;
 #endif // _WIN32
   }
 
@@ -109,10 +109,10 @@ inline void vtkMAFFile::Close()
     m_HFile = INVALID_HANDLE_VALUE;
   }
 #else
- if (m_PFile != NULL)
+ if (PFile != NULL)
   {
-    fclose(m_PFile);
-    m_PFile = NULL;
+    fclose(PFile);
+    PFile = NULL;
   }
 #endif // _WIN32
 }
@@ -128,7 +128,7 @@ inline int vtkMAFFile::Read(void* buffer, int count)
 
   return (int)dwRead;
 #else
-  return fread(buffer, 1, count, m_PFile);
+  return fread(buffer, 1, count, PFile);
 #endif // _WIN32
 }
 
@@ -141,7 +141,7 @@ inline int vtkMAFFile::Write(void* buffer, int count)
   WriteFile(m_HFile, buffer, (DWORD)count, &dwWritten, NULL);
   return (int)dwWritten;
 #else
-  return fwrite(buffer, 1, count, m_PFile);
+  return fwrite(buffer, 1, count, PFile);
 #endif // _WIN32
 }
 
@@ -152,7 +152,7 @@ inline bool vtkMAFFile::Seek(long long pos, int origin)
   return FALSE != SetFilePointerEx(m_HFile, 
       *((LARGE_INTEGER*)&pos), NULL, (DWORD)origin);  
 #else
-  return fseeko64( m_PFile, (off64_t)pos, origin ) >= 0;  
+  return fseeko64( PFile, (off64_t)pos, origin ) >= 0;  
 #endif  
 }
 
@@ -169,7 +169,7 @@ inline long long vtkMAFFile::GetCurrentPos() throw(...)
 //  __int64 res = _ftelli64( m_pFile);  
 #else
   fpos64_t res;  
-  if (fgetpos64(m_PFile, &res) < 0)  
+  if (fgetpos64(PFile, &res) < 0)  
     res = (fpos64_t)-1;
 
   return (long long)res;
@@ -190,7 +190,7 @@ protected:
 #ifdef _WIN32
     m_HFile = INVALID_HANDLE_VALUE;
 #else
-    m_PFile = NULL;
+    PFile = NULL;
 #endif // _WIN32
   }
 
@@ -244,7 +244,7 @@ inline void vtkMAFFile2::Write(void* buffer, int count) throw(...)
   DWORD dwWritten;
   if (!WriteFile(m_HFile, buffer, (DWORD)count, &dwWritten, NULL))
 #else
-  if (fwrite(buffer, 1, count, m_PFile) != count)
+  if (fwrite(buffer, 1, count, PFile) != count)
 #endif // _WIN32	
 	{
 		throw std::ios::failure(
@@ -272,10 +272,10 @@ inline void vtkMAFFile2::Read(void* buffer, int count) throw(...)
   if (dwRead != (DWORD)count)
     throw std::ios::failure(("Reached the end of the file (EOF). The file is corrupted and unreadable."));  
 #else
-	int r = fread(buffer, 1, count, m_PFile);
+	int r = fread(buffer, 1, count, PFile);
 	if (r != count)
 	{
-		throw std::ios::failure((feof(m_PFile) ?
+		throw std::ios::failure((feof(PFile) ?
 			("Reached the end of the file (EOF). The file is corrupted and unreadable.") :
       ("Unspecified I/O error while reading data."))
 			);	
