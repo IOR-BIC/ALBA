@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpCreateLabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2007-10-24 08:48:16 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-11-04 16:39:43 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,20 +24,32 @@ class mafEvent;
 //----------------------------------------------------------------------------
 // medOpCreateLabeledVolume :
 //----------------------------------------------------------------------------
-/** */
+/** 
+class name medOpCreateLabeledVolume
+Create a medVMELabeledVolume.
+*/
 class medOpCreateLabeledVolume: public mafOp
 {
 public:
+  /** constructor */
   medOpCreateLabeledVolume(const wxString &label = "Create labeled volume");
+  /** destructor */
   ~medOpCreateLabeledVolume(); 
 
+  /** RTTI macro */
   mafTypeMacro(medOpCreateLabeledVolume, mafOp);
 
-  mafOp* Copy();
+  /** Return a copy of itself, this needs to put the operation into the undo stack. */
+  /*virtual*/  mafOp* Copy();
 
-  bool Accept(mafNode *node);
-  void OpRun();
-  void OpDo();
+  /** Return true for the acceptable vme type. */
+  /*virtual*/ bool Accept(mafNode *node);
+
+  /** Builds operation's interface. */
+  /*virtual*/ void OpRun();
+  
+  /** Execute the operation. */
+  /*virtual*/ void OpDo();
 
 protected: 
   medVMELabeledVolume *m_LabeledVolume;

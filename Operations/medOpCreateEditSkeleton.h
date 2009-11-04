@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCreateEditSkeleton.h,v $
 Language:  C++
-Date:      $Date: 2008-02-04 14:52:40 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-11-04 16:39:43 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -54,20 +54,25 @@ class medVMEPolylineGraph;
 class medGeometryEditorPolylineGraph;
 class vtkPolyData;
 
-//----------------------------------------------------------------------------
-// medOpCreateEditSkeleton :
-//----------------------------------------------------------------------------
+/**
+class name: medOpCreateEditSkeleton
+Class for creating and editing the skeleton polyline.
+*/
 class medOpCreateEditSkeleton: public mafOp
 {
 public:
-
+  /** constructor */
 	medOpCreateEditSkeleton(wxString label = "Create/Edit Skeleton");
+  /** destructor */
 	~medOpCreateEditSkeleton(); 
 
+  /** RTTI macro */
 	mafTypeMacro(medOpCreateEditSkeleton, mafOp);
 
+  /** Return a copy of itself, this needs to put the operation into the undo stack. */
 	mafOp* Copy();
 
+  /** Precess events coming from other objects */
 	virtual void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
@@ -83,9 +88,10 @@ public:
 	virtual void OpUndo();
 
 protected:
-	
+	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	virtual void OpStop(int result);
 
+  /** Internally used to create a new instance of the GUI.*/
 	void CreateGui();
 
 	medVMEPolylineGraph	*m_Skeleton;
