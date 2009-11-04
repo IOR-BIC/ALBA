@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-30 10:49:38 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-11-04 09:17:14 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -62,6 +62,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkImageData.h"
 #include "vtkPointData.h"
 #include "vtkStructuredPoints.h"
+#include "vtkImageToStructuredPoints.h"
 #include "vtkMAFHistogram.h"
 
 #include "itkVTKImageToImageFilter.h"
@@ -330,17 +331,19 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
         LocalSegmentation();
         MorphologicalMathematics();
 
-        m_VolumeOutputRegionGrowing->SetData(m_SegmentedImage,m_VolumeInput->GetTimeStamp());
+        vtkMAFSmartPointer<vtkImageToStructuredPoints> filter;
+        filter->SetInput(m_SegmentedImage);
+        filter->Update();
+
+        m_VolumeOutputRegionGrowing->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
         m_VolumeOutputRegionGrowing->SetName(_("Segmentation Output - first step"));
         m_VolumeOutputRegionGrowing->Update();
 
-        //m_VolumeOutputRegionGrowing->ReparentTo(m_Input);
-
-        m_VolumeOutputMorpho->SetData(m_MorphoImage,m_VolumeInput->GetTimeStamp());
+        filter->SetInput(m_MorphoImage);
+        filter->Update();
+        m_VolumeOutputMorpho->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
         m_VolumeOutputMorpho->SetName(_("Segmentation Output - second step"));
         m_VolumeOutputMorpho->Update();
-
-        //m_VolumeOutputMorpho->ReparentTo(m_Input);
 
         this->OpStop(OP_RUN_OK);
         return;
