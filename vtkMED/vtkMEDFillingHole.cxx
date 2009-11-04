@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.cxx,v $
 Language:  C++
-Date:      $Date: 2009-05-29 08:38:43 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-04 13:39:57 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <float.h>
 
 
-vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDFillingHole);
 
 #include "mafMemDbg.h"
@@ -50,11 +50,11 @@ vtkStandardNewMacro(vtkMEDFillingHole);
 vtkMEDFillingHole::CVertex::CVertex(double *pCoord)
 //----------------------------------------------------------------------------
 {
-  dCoord[0] = pCoord[0];
-  dCoord[1] = pCoord[1];
-  dCoord[2] = pCoord[2];
-  dWeight = dOneRingEdgeLength = 0;
-  bBoundary = bMarked = false;
+  DCoord[0] = pCoord[0];
+  DCoord[1] = pCoord[1];
+  DCoord[2] = pCoord[2];
+  DWeight = DOneRingEdgeLength = 0;
+  BBoundary = BMarked = false;
 }
 
 //----------------------------------------------------------------------------
@@ -402,10 +402,10 @@ void vtkMEDFillingHole::BuildPatch()
       pVertex1->OneRingEdge.push_back(NumOfPatchEdge);
       pVertex2->OneRingEdge.push_back(NumOfPatchEdge);
 
-      dLength = VEC3_SQUAREDIST(pVertex1->dCoord,pVertex2->dCoord);
+      dLength = VEC3_SQUAREDIST(pVertex1->DCoord,pVertex2->DCoord);
       dLength = sqrt(dLength);
-      pVertex1->dOneRingEdgeLength += dLength;
-      pVertex2->dOneRingEdgeLength += dLength;
+      pVertex1->DOneRingEdgeLength += dLength;
+      pVertex2->DOneRingEdgeLength += dLength;
 
       pEdge = new CEdge(sv1,sv2);
       pEdge->id = NumOfPatchEdge;
@@ -545,16 +545,16 @@ void vtkMEDFillingHole::CreatePatch()
     //record the relative position in the boundary polygon
     Lambda[i][i+2] = i+1;
     //computing the area of the triangle(i,i+1,i+2);    
-    pCoordv0 = Vertexes[Lambda[i][i]]->dCoord;    
-    pCoordv1 = Vertexes[Lambda[i+1][i+1]]->dCoord;
-    pCoordv2 = Vertexes[Lambda[i+2][i+2]]->dCoord;
+    pCoordv0 = Vertexes[Lambda[i][i]]->DCoord;    
+    pCoordv1 = Vertexes[Lambda[i+1][i+1]]->DCoord;
+    pCoordv2 = Vertexes[Lambda[i+2][i+2]]->DCoord;
     weight[i][i+2] = TriangleArea(pCoordv0,pCoordv2,pCoordv1);
 
     //compute max dihedral angle for both adjacent triangles
     //having edge i,i+1 and i+1,i+2    
     ComputeNormal(pCoordv0,pCoordv2,pCoordv1, n1);
     
-    pCoordv3 = Vertexes[Lambda[i][i+1]]->dCoord;
+    pCoordv3 = Vertexes[Lambda[i][i+1]]->DCoord;
     ComputeNormal(pCoordv0,pCoordv1,pCoordv3, n2);
 
     //if the mesh is CCW oriented, the dihedral angle cannot be larger 
@@ -566,7 +566,7 @@ void vtkMEDFillingHole::CreatePatch()
     weight_angle[i][i+2] = ComputeDihedralAngleF(n1, n2);
       //-(n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2]);
 
-    pCoordv3 = Vertexes[Lambda[i+1][i+2]]->dCoord;
+    pCoordv3 = Vertexes[Lambda[i+1][i+2]]->DCoord;
     ComputeNormal(pCoordv1,pCoordv2,pCoordv3, n2);
     temp = ComputeDihedralAngleF(n1, n2);
       //-(n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2]);
@@ -587,15 +587,15 @@ void vtkMEDFillingHole::CreatePatch()
       weight[i][k] = 0x7fffffff;        //max double value;
       weight_angle[i][k] = 0x7fffffff;  //max double value;
 
-      pCoordv0 = Vertexes[Lambda[i][i]]->dCoord;
-      pCoordv2 = Vertexes[Lambda[k][k]]->dCoord;
+      pCoordv0 = Vertexes[Lambda[i][i]]->DCoord;
+      pCoordv2 = Vertexes[Lambda[k][k]]->DCoord;
 
       //for every vertex between i and k
       for(m=i+1; m<k; m++)
       {
         //compute wa[i][m] + wa[m][k] + weight_a(vi, vm, vk);
         //compute maximal dihedral angle
-        pCoordv1 = Vertexes[Lambda[m][m]]->dCoord;        
+        pCoordv1 = Vertexes[Lambda[m][m]]->DCoord;        
         ComputeNormal(pCoordv0,pCoordv2,pCoordv1, n1);
 
         //get the coordinate for Lambda[i][m], if m==i+1, then it
@@ -604,18 +604,18 @@ void vtkMEDFillingHole::CreatePatch()
         //otherwise we have in Lambda[i][m] only relative index RI and
         //the absolute index is stored at Lambda[RI][RI]
         if (m == i + 1)        
-          pCoordv3 = Vertexes[Lambda[i][m]]->dCoord;
+          pCoordv3 = Vertexes[Lambda[i][m]]->DCoord;
         else
-          pCoordv3 = Vertexes[Lambda[Lambda[i][m]][Lambda[i][m]]]->dCoord;
+          pCoordv3 = Vertexes[Lambda[Lambda[i][m]][Lambda[i][m]]]->DCoord;
 
         ComputeNormal(pCoordv0,pCoordv1,pCoordv3, n2);
         temp = ComputeDihedralAngleF(n1, n2);
         //-(n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2]);        
 
         if (m + 1 == k)
-          pCoordv3 = Vertexes[Lambda[m][k]]->dCoord;
+          pCoordv3 = Vertexes[Lambda[m][k]]->DCoord;
         else
-          pCoordv3 = Vertexes[Lambda[Lambda[m][k]][Lambda[m][k]]]->dCoord;
+          pCoordv3 = Vertexes[Lambda[Lambda[m][k]][Lambda[m][k]]]->DCoord;
         ComputeNormal(pCoordv1,pCoordv2,pCoordv3, n2);        
         temp2 = ComputeDihedralAngleF(n1, n2);
         //-(n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2]);
@@ -626,7 +626,7 @@ void vtkMEDFillingHole::CreatePatch()
         {
           //we need to take into account also the triangle
           //adjacent to edge v0,vn-1
-          pCoordv3 = Vertexes[Lambda[NumOfPatchVertex-1][NumOfPatchVertex]]->dCoord;
+          pCoordv3 = Vertexes[Lambda[NumOfPatchVertex-1][NumOfPatchVertex]]->DCoord;
           ComputeNormal(pCoordv2,pCoordv0,pCoordv3, n2);        
           temp2 = ComputeDihedralAngleF(n1, n2);
           //-(n1[0]*n2[0] + n1[1]*n2[1] + n1[2]*n2[2]);
@@ -666,12 +666,12 @@ void vtkMEDFillingHole::CreatePatch()
   {
     j = Lambda[i][i];
     //compute the weight of vertex j
-    pVertex = new CVertex(Vertexes[j]->dCoord);
-    pVertex->id = j;    //record vertex id of original mesh.
-    pVertex->bMarked = true;
+    pVertex = new CVertex(Vertexes[j]->DCoord);
+    pVertex->Id = j;    //record vertex id of original mesh.
+    pVertex->BMarked = true;
 
     m = Vertexes[j]->OneRingEdge.size();
-    pVertex->dWeight = Vertexes[j]->dOneRingEdgeLength/m;
+    pVertex->DWeight = Vertexes[j]->DOneRingEdgeLength/m;
 
     PatchVertexes.push_back(pVertex);      
   }
@@ -712,7 +712,7 @@ vtkMEDFillingHole::CVertex* vtkMEDFillingHole::AddOnePointToTriangle(double *pCo
 
   //add a new vertex
   pNewVertex = new CVertex(pCoord);
-  pNewVertex->id = NumOfPatchVertex;
+  pNewVertex->Id = NumOfPatchVertex;
   PatchVertexes.push_back(pNewVertex);
 
   //old triangle
@@ -797,7 +797,7 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   for(i=0; i<4; i++)
   {
     pVertexIndex[i] = edgevertex[i];
-    pCoord[i] = PatchVertexes[edgevertex[i]]->dCoord;
+    pCoord[i] = PatchVertexes[edgevertex[i]]->DCoord;
   }
 
   if (CircumCircleTest(pCoord[0], pCoord[1], pCoord[2], pCoord[3]))
@@ -1123,8 +1123,8 @@ void vtkMEDFillingHole::RefinePatch()
       for( j=0; j<3; j++)
       {
         pVertex = PatchVertexes[pVertexIndex[j]];
-        pCoord[j] = pVertex->dCoord;
-        dWeight[j] = pVertex->dWeight;
+        pCoord[j] = pVertex->DCoord;
+        dWeight[j] = pVertex->DWeight;
       }
       dTotalWeight = (dWeight[0] + dWeight[1] + dWeight[2] )/ 3.0;
       dCentroid[0] = (pCoord[0][0] + pCoord[1][0] + pCoord[2][0])/3.0;
@@ -1147,7 +1147,7 @@ void vtkMEDFillingHole::RefinePatch()
       if(bFlag == true)
       {
         pNewVertex = AddOnePointToTriangle(dCentroid,pTriangle);
-        pNewVertex->dWeight = dTotalWeight;	
+        pNewVertex->DWeight = dTotalWeight;	
         //relax three edges of the old triangle.	
         pEdgeIndex = pTriangle->aEdge;
         for(j=0; j<3; j++)
@@ -1241,9 +1241,9 @@ void vtkMEDFillingHole::RefinePatch()
   for(i=0; i<NumOfPatchVertex; i++)
   {
     pVertex = PatchVertexes[i];
-    pVertex->dOneRingEdgeLength = 0;
-    pVertex->dWeight = 0;
-    pVertex->bBoundary = false;
+    pVertex->DOneRingEdgeLength = 0;
+    pVertex->DWeight = 0;
+    pVertex->BBoundary = false;
     pVertex->OneRingTriangle.clear();
     pVertex->OneRingEdge.clear();
     pVertex->OneRingVertex.clear();
@@ -1273,11 +1273,11 @@ void vtkMEDFillingHole::ExtendPatch()
     start = HolePointIDs[i];
     surroundvertexes.push_back(start);
     pVertex = Vertexes[start];
-    pVertex->bMarked = true;
+    pVertex->BMarked = true;
 
     //temporary changing for recording mapping relationship between 
     //patch mesh vertex id and original mesh vertex id.
-    pVertex->id = i;
+    pVertex->Id = i;
   }
   start = 0;
 
@@ -1330,8 +1330,8 @@ void vtkMEDFillingHole::ExtendPatch()
       for(;onering!=oneringend;onering++)
       {				
         id = *onering;
-        if( Vertexes[id]->bMarked == true ) continue;
-        Vertexes[id]->bMarked = true;
+        if( Vertexes[id]->BMarked == true ) continue;
+        Vertexes[id]->BMarked = true;
         surroundvertexes.push_back(id);
       }
     }
@@ -1347,15 +1347,15 @@ void vtkMEDFillingHole::ExtendPatch()
   {
     id = surroundvertexes[i];
     pVertex = Vertexes[id];
-    pNewVertex = new CVertex(pVertex->dCoord);
-    pNewVertex->bMarked = true; //it is vertex in surround mesh
-    pNewVertex->id = id;
+    pNewVertex = new CVertex(pVertex->DCoord);
+    pNewVertex->BMarked = true; //it is vertex in surround mesh
+    pNewVertex->Id = id;
 
     PatchVertexes.push_back(pNewVertex);
 
     //temporary changing for recording mapping relationship between 
     //patch mesh vertex id and original mesh vertex id.
-    pVertex->id = NumOfPatchVertex++;
+    pVertex->Id = NumOfPatchVertex++;
   }
 
   //extend the patch mesh triangle
@@ -1373,9 +1373,9 @@ void vtkMEDFillingHole::ExtendPatch()
 
     //using the recorded mapping relationship
     //computing the vertex position of the new triangle.
-    pNewVertexIndex[0] = Vertexes[pVertexIndex[0]]->id;
-    pNewVertexIndex[1] = Vertexes[pVertexIndex[1]]->id;
-    pNewVertexIndex[2] = Vertexes[pVertexIndex[2]]->id;
+    pNewVertexIndex[0] = Vertexes[pVertexIndex[0]]->Id;
+    pNewVertexIndex[1] = Vertexes[pVertexIndex[1]]->Id;
+    pNewVertexIndex[2] = Vertexes[pVertexIndex[2]]->Id;
 
     PatchTriangles.push_back(pNewTriangle);
   }
@@ -1384,10 +1384,10 @@ void vtkMEDFillingHole::ExtendPatch()
   for(i=0;i<NumOfPatchVertex;i++)
   {
     pNewVertex = PatchVertexes[i];
-    if( pNewVertex->bMarked == false )  continue;
-    pVertex = Vertexes[pNewVertex->id];
-    pVertex->id = pNewVertex->id;
-    pVertex->bMarked = false;
+    if( pNewVertex->BMarked == false )  continue;
+    pVertex = Vertexes[pNewVertex->Id];
+    pVertex->Id = pNewVertex->Id;
+    pVertex->BMarked = false;
   }
 
   surroundtriangles.clear();
@@ -1818,7 +1818,7 @@ void vtkMEDFillingHole::MembraneSmoothing()
   for(int i = 0; i < NumOfPatchVertex; i++)
   {    
     pVertex = PatchVertexes[i];
-    if( pVertex->bMarked == false)  
+    if( pVertex->BMarked == false)  
       continue; //not fixed one
 
     A[i*NumOfPatchVertex+i] += Wp*Wp;
@@ -1836,7 +1836,7 @@ void vtkMEDFillingHole::MembraneSmoothing()
       //BES: 18.6.2008 - currently dLaplacianCoord is always 0
       //but this may change in the future, so I leave it heare
       b_temp[i] = PatchLaplacian[i]->dLaplacianCoord[index];
-      xyz[i] = PatchVertexes[i]->dCoord[index];
+      xyz[i] = PatchVertexes[i]->DCoord[index];
     }
 
     //first, compute b = L^T*b_temp, i.e., the first sum
@@ -1849,10 +1849,10 @@ void vtkMEDFillingHole::MembraneSmoothing()
     for(int i=0;i<NumOfPatchVertex;i++)
     {
       pVertex = PatchVertexes[i];
-      if( pVertex->bMarked == false)
+      if( pVertex->BMarked == false)
         continue;
 
-      b[i] += Wp*(pVertex->dCoord[index]*Wp);     
+      b[i] += Wp*(pVertex->DCoord[index]*Wp);     
     }
 
     //solve the value of x,y,z for the system of linear equations A*xyz = b
@@ -1862,7 +1862,7 @@ void vtkMEDFillingHole::MembraneSmoothing()
     //save the coordinate of each vertex.
     for(int i=0;i<NumOfPatchVertex;i++)
     {
-      PatchVertexes[i]->dCoord[index] = xyz[i];			
+      PatchVertexes[i]->DCoord[index] = xyz[i];			
     }
   }
 
@@ -1891,7 +1891,7 @@ void vtkMEDFillingHole::ThinPlateSmoothing()
   for (int i = 0; i < NumOfPatchVertex; i++)
   {
     CVertex* pi = PatchVertexes[i];
-    if (pi->bMarked)
+    if (pi->BMarked)
       continue; //vertex is on the boundary => it has known coordinates
 
     int nCount = (int)pi->OneRingVertex.size();
@@ -1913,7 +1913,7 @@ void vtkMEDFillingHole::ThinPlateSmoothing()
     for (int i = 0; i < NumOfPatchVertex; i++)
     {
       CVertex* pi = PatchVertexes[i];
-      if (pi->bMarked)  
+      if (pi->BMarked)  
         continue; //vertex is on the boundary => it has known coordinates
       
       double U_pi[3] = {0, 0, 0};
@@ -1924,7 +1924,7 @@ void vtkMEDFillingHole::ThinPlateSmoothing()
       {        
         CVertex* pj = PatchVertexes[pi->OneRingVertex[m]];
         for (int k = 0; k < 3; k++){ 
-          U_pi[k] += pj->dCoord[k];
+          U_pi[k] += pj->DCoord[k];
         }
 
         double U_pj[3] = {0, 0, 0};
@@ -1933,23 +1933,23 @@ void vtkMEDFillingHole::ThinPlateSmoothing()
         {            
           CVertex* pk = PatchVertexes[pj->OneRingVertex[n]];
           for (int k = 0; k < 3; k++){ 
-            U_pj[k] += pk->dCoord[k];
+            U_pj[k] += pk->DCoord[k];
           }            
         }
 
         for (int k = 0; k < 3; k++)
         { 
-          U_pj[k] = -pj->dCoord[k] + U_pj[k] / nCount2;
+          U_pj[k] = -pj->DCoord[k] + U_pj[k] / nCount2;
           U2_pi[k] += U_pj[k];
         }
       }//end for m
 
       for (int k = 0; k < 3; k++)
       { 
-        U_pi[k] = -pi->dCoord[k] + U_pi[k] / nCount;
+        U_pi[k] = -pi->DCoord[k] + U_pi[k] / nCount;
         U2_pi[k] = -U_pi[k] + U2_pi[k] / nCount;
 
-        pi->dCoord[k] -= valences[i]*U2_pi[k];
+        pi->DCoord[k] -= valences[i]*U2_pi[k];
       }    
     }
   }
@@ -2055,15 +2055,15 @@ void vtkMEDFillingHole::MergePatch()
   for(vertex=vertexstart;vertex!=vertexend;vertex++)
   {
     pVertex = *vertex;
-    if( pVertex->bMarked == true) continue;
+    if( pVertex->BMarked == true) continue;
 
     //record the changing for merge triangle 
-    pVertex->id = NumOfVertex;	
+    pVertex->Id = NumOfVertex;	
 
     // the vertex in patch mesh is n't in original mesh
     // create a new vertex for the original mesh.
-    pNewVertex = new CVertex(pVertex->dCoord);
-    pNewVertex->id = NumOfVertex++;
+    pNewVertex = new CVertex(pVertex->DCoord);
+    pNewVertex->Id = NumOfVertex++;
     Vertexes.push_back(pNewVertex);
   }
 
@@ -2075,9 +2075,9 @@ void vtkMEDFillingHole::MergePatch()
     if( (*triangle)->bMarked == true )  continue;
     pVertexIndex = (*triangle)->aVertex;
 
-    v0 = vertexstart[pVertexIndex[0]]->id;
-    v1 = vertexstart[pVertexIndex[1]]->id;
-    v2 = vertexstart[pVertexIndex[2]]->id;
+    v0 = vertexstart[pVertexIndex[0]]->Id;
+    v1 = vertexstart[pVertexIndex[1]]->Id;
+    v2 = vertexstart[pVertexIndex[2]]->Id;
 
     pNewTriangle = new CTriangle(v0,v1,v2);
     pNewTriangle->id = NumOfTriangle++;
@@ -2477,10 +2477,10 @@ void vtkMEDFillingHole::BuildMesh()
       pVertex1->OneRingEdge.push_back(NumOfEdge);
       pVertex2->OneRingEdge.push_back(NumOfEdge);
 
-      dLength = VEC3_SQUAREDIST(pVertex1->dCoord,pVertex2->dCoord);
+      dLength = VEC3_SQUAREDIST(pVertex1->DCoord,pVertex2->DCoord);
       dLength = sqrt(dLength);
-      pVertex1->dOneRingEdgeLength += dLength;
-      pVertex2->dOneRingEdgeLength += dLength;
+      pVertex1->DOneRingEdgeLength += dLength;
+      pVertex2->DOneRingEdgeLength += dLength;
 
       pEdge = new CEdge(sv1,sv2);
       pEdge->id = NumOfEdge;
@@ -2546,8 +2546,8 @@ void vtkMEDFillingHole::BuildMesh()
       {
         //find a boundary edge and vertex
         pEdge->bBoundary = true;
-        pVertex1->bBoundary = true;
-        pVertex2->bBoundary = true;
+        pVertex1->BBoundary = true;
+        pVertex2->BBoundary = true;
       }
 
       NumOfEdge++;
@@ -2645,10 +2645,10 @@ void vtkMEDFillingHole::UpdateMesh(int id)
         pVertex1->OneRingEdge.push_back(NumOfEdge);
         pVertex2->OneRingEdge.push_back(NumOfEdge);
 
-        dLength = VEC3_SQUAREDIST(pVertex1->dCoord,pVertex2->dCoord);
+        dLength = VEC3_SQUAREDIST(pVertex1->DCoord,pVertex2->DCoord);
         dLength = sqrt(dLength);
-        pVertex1->dOneRingEdgeLength += dLength;
-        pVertex2->dOneRingEdgeLength += dLength;
+        pVertex1->DOneRingEdgeLength += dLength;
+        pVertex2->DOneRingEdgeLength += dLength;
 
         pEdge->id = NumOfEdge;
         pEdge->aVertex[2] = pVertexIndex[(i+2)%3];
@@ -2672,8 +2672,8 @@ void vtkMEDFillingHole::UpdateMesh(int id)
           //find a boundary edge and vertex in original mesh
           //now change it as an internal edge and vertex
           pEdge->bBoundary = false;
-          pVertex1->bBoundary = false;
-          pVertex2->bBoundary = false;
+          pVertex1->BBoundary = false;
+          pVertex2->BBoundary = false;
         }
       }
     }
@@ -2711,9 +2711,9 @@ bool vtkMEDFillingHole::FindAHole()
   if( BorderPointID >= NumOfVertex) 
     return false;
   pVertex = Vertexes[BorderPointID];
-  if(pVertex->bBoundary == false)	
+  if(pVertex->BBoundary == false)	
     return false;	//it is a interior vertex or a alone vertex
-  if(pVertex->bMarked == true )   
+  if(pVertex->BMarked == true )   
     return false;
 
   pStartVertex = pVertex;
@@ -2727,14 +2727,14 @@ bool vtkMEDFillingHole::FindAHole()
       if( pEdge->bBoundary == false)	continue;	
       pEdgeVertex = pEdge->aVertex;
       //only the edge is (pStartVertex,nextVertex).
-      if( pEdgeVertex[0] == pStartVertex->id ) 
+      if( pEdgeVertex[0] == pStartVertex->Id ) 
       {
         //find the next vertex, if it was marked, the boundary isn't correct.
-        if( pStartVertex->bMarked == true ) 
+        if( pStartVertex->BMarked == true ) 
           break;
-        HolePointIDs.push_back(pStartVertex->id);
+        HolePointIDs.push_back(pStartVertex->Id);
         HoleEdgeIDs.push_back(pEdge->id);
-        pStartVertex->bMarked = true;
+        pStartVertex->BMarked = true;
 
         pStartVertex = Vertexes[pEdgeVertex[1]];
         bFlag = true;
@@ -2743,7 +2743,7 @@ bool vtkMEDFillingHole::FindAHole()
     }
     //when the mesh isn't a manifold,we can't find the next vertex.
     //should stop the cycle.
-  }while(pStartVertex->id != pVertex->id && bFlag == true);
+  }while(pStartVertex->Id != pVertex->Id && bFlag == true);
   if( bFlag == false )
   {
     //encounter a single vertex.
@@ -2763,7 +2763,7 @@ bool vtkMEDFillingHole::FindNextHole()
   for(i=BorderPointID; i<NumOfVertex; i++)
   {
     pVertex = Vertexes[i];
-    if(pVertex->bBoundary == false)	continue;	//it is a interior vertex or a alone vertex
+    if(pVertex->BBoundary == false)	continue;	//it is a interior vertex or a alone vertex
     BorderPointID = i;
 
     HoleEdgeIDs.clear();
@@ -2801,7 +2801,7 @@ void vtkMEDFillingHole::InitMesh()
   {
     InputMesh->GetPoint(i,pCoord);
     pVertex = new CVertex(pCoord);
-    pVertex->id = i;
+    pVertex->Id = i;
 
     //BES: 31.7.2008 - the vertex degree is usually 6 => avoid reallocate
     //in push_back (it is very slow)
@@ -2839,7 +2839,7 @@ void vtkMEDFillingHole::DoneMesh()
   // InsertPoint() can allocate its own memory if not enough pre-allocated
   points->Allocate(NumOfVertex) ;       
   for (i = 0 ;  i < NumOfVertex ;  i++)
-    points->InsertPoint(i, Vertexes[i]->dCoord) ; 
+    points->InsertPoint(i, Vertexes[i]->DCoord) ; 
 
   // insert data into cell array
   triangles->Allocate(NumOfTriangle) ;   

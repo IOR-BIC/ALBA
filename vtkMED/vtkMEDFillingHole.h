@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2009-05-29 08:38:43 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-04 13:39:57 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -42,11 +42,11 @@ public:
   class CVertex
     {
     public:
-      double  dCoord[3];
-      int     id;
-      double  dWeight,dOneRingEdgeLength;
-      bool    bMarked;
-      bool    bBoundary;
+      double  DCoord[3];
+      int     Id;
+      double  DWeight,DOneRingEdgeLength;
+      bool    BMarked;
+      bool    BBoundary;
       vtkstd::vector<int> OneRingTriangle;
       vtkstd::vector<int> OneRingEdge;
       vtkstd::vector<int> OneRingVertex;
