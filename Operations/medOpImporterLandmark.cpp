@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpImporterLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 12:54:22 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-11-04 16:45:35 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -200,9 +200,12 @@ void medOpImporterLandmark::Read()
   std::ifstream  landmarkFileStream(m_File);
   char name[20];
   char time[6] = "0";
-  char x[10];
-  char y[10];
-  char z[10];
+
+  // Alberto Losi 11.4.2009
+  // Increase size of x,y and z array in order to avoid "Run-Time Check Failure #2 - Stack around the variable was corrupted" error.
+  char x[20];
+  char y[20];
+  char z[20];
 
   if (!m_TestMode)
   {
@@ -295,9 +298,11 @@ void medOpImporterLandmark::ReadWithoutTag()
 
   std::ifstream  landmarkFileStream(m_File);
 
-  char x[10];
-  char y[10];
-  char z[10];
+  // Alberto Losi 11.4.2009
+  // Increase size of x,y and z array in order to avoid "Run-Time Check Failure #2 - Stack around the variable was corrupted" error.
+  char x[20]; 
+  char y[20];
+  char z[20];
   
   long counter = 0; 
   long progress = 0;
