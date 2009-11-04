@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOp2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2007-12-05 09:17:12 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-11-04 16:07:49 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,31 +24,35 @@ class medInteractor2DAngle;
 class medInteractor2DIndicator;
 class mafEvent;
 
-//----------------------------------------------------------------------------
-// medOp2DMeasure :
-//----------------------------------------------------------------------------
-/** */
+/**
+class name : medOp2DMeasure
+*/
 class medOp2DMeasure: public mafOp
 {
 public:
+  /** constructor. */
 	medOp2DMeasure(const wxString &label = "2DMeasure");
+  /** destructor. */
 	~medOp2DMeasure(); 
-	virtual void OnEvent(mafEventBase *maf_event);
+
+  /** Precess events coming from other objects */
+	/*virtual*/ void OnEvent(mafEventBase *maf_event);
   
+  /** RTTI macro */
   mafTypeMacro(medOp2DMeasure, mafOp);
 
   /** Return a copy of itself, this needs to put the operation into the undo stack. */
-	mafOp* Copy();
+	/*virtual*/ mafOp* Copy();
 	
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode *node);
+  /*virtual*/ bool Accept(mafNode *node);
 
 	/** Set the input vme for the operation. */
-	void OpRun();
+	/*virtual*/ void OpRun();
 
 protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
-  void OpStop(int result);
+  /*virtual*/ void OpStop(int result);
 
   medInteractor2DDistance *m_2DDistanceInteractor;
   medInteractor2DAngle *m_2DAngleInteractor;

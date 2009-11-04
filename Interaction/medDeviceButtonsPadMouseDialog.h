@@ -2,8 +2,8 @@
 Program:   VPH2
 Module:    $RCSfile: medDeviceButtonsPadMouseDialog.h,v $
 Language:  C++
-Date:      $Date: 2009-07-15 15:23:35 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-04 16:07:43 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2008
@@ -21,6 +21,7 @@ class mafDeviceButtonsPadMouse;
 class mafView;
 
 /**
+class name : medDeviceButtonsPadMouseDialog
 Add SetView method to mafDeviceButtonsPadMouse class to directly set a view to a mouse object.
 This class avoid the following problem that occurs trying to use a mafDeviceButtonsPadMouse to
 interact with a view plugged inside a modal dialog:
@@ -37,13 +38,16 @@ set the desired view.
 class medDeviceButtonsPadMouseDialog : public  mafDeviceButtonsPadMouse
 //----------------------------------------------------------------------------
 {
+  /** RTTI macro */
   mafTypeMacro(medDeviceButtonsPadMouseDialog,mafDeviceButtonsPadMouse); 
 public:
   /** Set the selected view. */
   void SetView(mafView *view);
 
 protected:
+  /** constructor. */
   medDeviceButtonsPadMouseDialog();
+  /** destructor. */
   virtual ~medDeviceButtonsPadMouseDialog();
 };
 #endif

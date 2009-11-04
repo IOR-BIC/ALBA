@@ -12,10 +12,9 @@
 class mafNode;
 class mafVMEVolumeLarge;
 
-//----------------------------------------------------------------------------
-// mafOpImporterBBF :
-//----------------------------------------------------------------------------
-/** Import operation that try to read bbf data file and set it into the corresponding VME 
+/** 
+class name : mafOpImporterBBF
+Import operation that try to read bbf data file and set it into the corresponding VME 
 that accept the bbf data format. If no VME can accept the format a message box will be shown 
 to the user and no data will be imported.
 bbf files come from a raw volume file .By using importe ->images->RAW VOLUME can generate bbf files .
@@ -23,18 +22,22 @@ bbf files come from a raw volume file .By using importe ->images->RAW VOLUME can
 class mafOpImporterBBF: public mafOp 
 {
 public:
+  /** constructor. */
   mafOpImporterBBF(const wxString &label = "BBFImporter");
+  /** destructor. */
  ~mafOpImporterBBF(); 
   
+  /** RTTI macro */
   mafTypeMacro(mafOpImporterBBF, mafOp);
 
-  mafOp* Copy();
+  /** Return a copy of itself, this needs to put the operation into the undo stack. */
+  /*virtual*/ mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
-  bool Accept(mafNode* node) {return true;};
+  /*virtual*/ bool Accept(mafNode* node) {return true;};
 
 	/** Builds operation's interface. */
-  void OpRun();
+  /*virtual*/ void OpRun();
 
 	/** Import bbf data, return MAF_OK on success. */
   virtual int ImportBBF();

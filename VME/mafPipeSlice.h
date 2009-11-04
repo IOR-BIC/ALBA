@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafPipeSlice.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-12 16:21:24 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-11-04 16:07:54 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -29,15 +29,18 @@
 class vtkPolyDataMapper;
 class vtkActor;
 
-//----------------------------------------------------------------------------
-// mafPipeSlice :
-//----------------------------------------------------------------------------
+/**
+class name : mafPipeSlice
+*/
 class mafPipeSlice : public mafPipe
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(mafPipeSlice, mafPipe);
 
+  /** constructor. */
   mafPipeSlice();
+  /** destructor. */
   virtual ~mafPipeSlice();
 
 protected: 
