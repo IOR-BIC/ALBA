@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.cxx,v $
 Language:  C++
-Date:      $Date: 2009-10-14 12:29:32 $
-Version:   $Revision: 1.4.2.3 $
+Date:      $Date: 2009-11-04 10:46:59 $
+Version:   $Revision: 1.4.2.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -35,7 +35,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.3 $");
+vtkCxxRevisionMacro(vtkMEDExtrudeToCircle, "$Revision: 1.4.2.4 $");
 vtkStandardNewMacro(vtkMEDExtrudeToCircle);
 //------------------------------------------------------------------------------
 
@@ -1292,6 +1292,6 @@ void vtkMEDExtrudeToCircle::RingData::PrintSelf(ostream& os, vtkIndent indent) c
 void vtkMEDExtrudeToCircle::VertexData::PrintSelf(ostream& os, vtkIndent indent) const
 //------------------------------------------------------------------------------
 {
-  os << indent << "cyl " << m_Cylcoord[0] << "\t" << m_Cylcoord[1] << "\t" << m_Cylcoord[2] << "\t"
-    << "cart " << m_Cartcoord[0] << "\t" << m_Cartcoord[1] << "\t" << m_Cartcoord[2] << std::endl ;
+  os << indent << "cyl " << Cylcoord[0] << "\t" << Cylcoord[1] << "\t" << Cylcoord[2] << "\t"
+    << "cart " << Cartcoord[0] << "\t" << Cartcoord[1] << "\t" << Cartcoord[2] << std::endl ;
 }

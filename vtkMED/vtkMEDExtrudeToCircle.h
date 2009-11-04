@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDExtrudeToCircle.h,v $
 Language:  C++
-Date:      $Date: 2009-10-14 12:29:32 $
-Version:   $Revision: 1.4.2.3 $
+Date:      $Date: 2009-11-04 10:46:59 $
+Version:   $Revision: 1.4.2.4 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -220,27 +220,27 @@ class vtkMEDExtrudeToCircle::VertexData{
 public:
   void PrintSelf(ostream& os, vtkIndent indent) const ;
 
-  void SetCylCoords(const double *cyl) {for (int i=0 ; i<3 ; i++){m_Cylcoord[i]=cyl[i] ;}}
-  void SetCylCoords(double r, double phi, double z) {m_Cylcoord[0]=r; m_Cylcoord[1]=phi; m_Cylcoord[2]=z;}
-  void SetCylR(double r) {m_Cylcoord[0]=r;}
-  void SetCylPhi(double phi) {m_Cylcoord[1]=phi;}
-  void SetCylZ(double z) {m_Cylcoord[2]=z;}
-  void SetCartCoords(const double *x) {for (int i=0 ; i<3 ; i++){m_Cartcoord[i]=x[i];}}
-  void SetCartCoords(double x, double y, double z) {m_Cartcoord[0]=x; m_Cartcoord[1]=y; m_Cartcoord[2]=z;}
-  void SetId(vtkIdType id) {m_PolydataId = id;}
+  void SetCylCoords(const double *cyl) {for (int i=0 ; i<3 ; i++){Cylcoord[i]=cyl[i] ;}}
+  void SetCylCoords(double r, double phi, double z) {Cylcoord[0]=r; Cylcoord[1]=phi; Cylcoord[2]=z;}
+  void SetCylR(double r) {Cylcoord[0]=r;}
+  void SetCylPhi(double phi) {Cylcoord[1]=phi;}
+  void SetCylZ(double z) {Cylcoord[2]=z;}
+  void SetCartCoords(const double *x) {for (int i=0 ; i<3 ; i++){Cartcoord[i]=x[i];}}
+  void SetCartCoords(double x, double y, double z) {Cartcoord[0]=x; Cartcoord[1]=y; Cartcoord[2]=z;}
+  void SetId(vtkIdType id) {PolydataId = id;}
 
-  void GetCylCoords(double *cyl) const {for (int i=0 ; i<3 ; i++){cyl[i]=m_Cylcoord[i];}}
-  void GetCylCoords(double *r, double *phi, double *z) const {*r=m_Cylcoord[0]; *phi=m_Cylcoord[1]; *z=m_Cylcoord[2];}
-  double GetCylR() const {return m_Cylcoord[0];}
-  double GetCylPhi() const {return m_Cylcoord[1];}
-  double GetCylZ() const {return m_Cylcoord[2];}
-  void GetCartCoords(double *x) const {for (int i=0 ; i<3 ; i++){x[i]=m_Cartcoord[i] ;}}
-  vtkIdType GetId() const {return m_PolydataId;}
+  void GetCylCoords(double *cyl) const {for (int i=0 ; i<3 ; i++){cyl[i]=Cylcoord[i];}}
+  void GetCylCoords(double *r, double *phi, double *z) const {*r=Cylcoord[0]; *phi=Cylcoord[1]; *z=Cylcoord[2];}
+  double GetCylR() const {return Cylcoord[0];}
+  double GetCylPhi() const {return Cylcoord[1];}
+  double GetCylZ() const {return Cylcoord[2];}
+  void GetCartCoords(double *x) const {for (int i=0 ; i<3 ; i++){x[i]=Cartcoord[i] ;}}
+  vtkIdType GetId() const {return PolydataId;}
 
 private:
-  double m_Cylcoord[3] ;
-  double m_Cartcoord[3] ;
-  vtkIdType m_PolydataId ;
+  double Cylcoord[3] ;
+  double Cartcoord[3] ;
+  vtkIdType PolydataId ;
 } ;
 
 
