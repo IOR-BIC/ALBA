@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMapsTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-08 14:22:18 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-09 15:37:05 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -27,39 +27,29 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "medVMEMaps.h"
 
 #include "mafVMEVolumeGray.h"
+#include "mafVMEVolume.h"
 
-#include "vtkActor.h"
-#include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkDataSetMapper.h"
 #include "vtkSphereSource.h"
+#include "mafVMERoot.h"
+#include "vtkRectilinearGridReader.h"
+#include "vtkDataSetReader.h"
 
 #include <vnl\vnl_matrix.h>
 
-#define TEST_RESULT CPPUNIT_ASSERT(m_Result)
 
 //----------------------------------------------------------------------------
 void medVMEMapsTest::setUp()
 //----------------------------------------------------------------------------
-{
-  m_Result = false;
-  
+{  
+  m_Root          = NULL;
   m_Maps          = NULL;
   m_SurfaceToMap  = NULL;
   m_Volume        = NULL;
-
-  rectilinearGrid = NULL; 
-  imageData = NULL;
-  xCoordinates = NULL;
-  yCoordinates = NULL;
-  zCoordinates = NULL;
 
   polydata   = NULL;
   sphere = NULL;
@@ -72,12 +62,7 @@ void medVMEMapsTest::setUp()
   mafNEW(m_Maps);
   mafNEW(m_SurfaceToMap);
   mafNEW(m_Volume);
-
-  rectilinearGrid = vtkRectilinearGrid::New();
-  imageData = vtkImageData::New();
-  xCoordinates = vtkFloatArray::New();
-  yCoordinates = vtkFloatArray::New();
-  zCoordinates = vtkFloatArray::New();
+  mafNEW(m_Root);
 
   vtkNEW(sphere);
 }
@@ -88,14 +73,9 @@ void medVMEMapsTest::tearDown()
   mafDEL(m_Maps);
   mafDEL(m_SurfaceToMap);
   mafDEL(m_Volume);
-
+  mafDEL(m_Root);
+  
   vtkDEL(sphere);
-
-  vtkDEL(rectilinearGrid);
-  vtkDEL(imageData);
-  vtkDEL(xCoordinates);
-  vtkDEL(yCoordinates);
-  vtkDEL(zCoordinates);
 }
 
 //---------------------------------------------------------
@@ -110,66 +90,32 @@ void medVMEMapsTest::TestDynamicAllocation()
 void medVMEMapsTest::TestPrint()
 //---------------------------------------------------------
 {
-  medVMEMaps *maps = NULL;
-  mafNEW(maps);
   //only print
-  maps->Print(std::cout);
-  mafDEL(maps);
-}
-
-//---------------------------------------------------------
-void medVMEMapsTest::TestGetLocalTimeStamps()
-//---------------------------------------------------------
-{
-  //actually this method invokes TestGetLocalTimeBounds, so it determines the same results
-  
-  /*medVMEMaps *analog = NULL;
-  vnl_matrix<double> emgMatrix;
-  int rows = 5;
-  int nTimeStamps = 3;
-  emgMatrix.set_size(rows-1 , nTimeStamps);
-
-  int i=0;
-  int j=0;
-  int count = 0;
-  for(;i<=rows;i++)
-  {
-    for(;j<nTimeStamps;j++)
-    {
-      emgMatrix.put(i,j,count++);  //timeStamp is the first line-> 0 1 2
-    }
-  }
-
-  mafNEW(analog);
-  analog->SetData(emgMatrix,0);
-  analog->Update();
-
-  std::vector<double> timeVector;
-  analog->GetLocalTimeStamps(timeVector);
-
-  //control time vector
-  m_Result = timeVector.size() == 3 &&\
-    timeVector[0] == 0 &&\
-    timeVector[1] == 1 &&\
-    timeVector[2] == 2;
-
-  TEST_RESULT;
-
-  mafDEL(analog);*/
+  m_Maps->Print(std::cout);
 }
 
 //---------------------------------------------------------
 void medVMEMapsTest::CreateVMEMaps()
 //---------------------------------------------------------
 {
+  vtkDataSetReader *Importer;
+  vtkNEW(Importer);
+  mafString filename=MED_DATA_ROOT;
+  filename<<"/VTK_Volumes/volume.vtk";
+  Importer->SetFileName(filename);
+  Importer->Update();
+
+  m_Volume->SetData((vtkImageData*)Importer->GetOutput(),0.0);
+  m_Volume->ReparentTo(m_Root);
+  m_Volume->GetOutput()->Update();
+  m_Volume->Update();
 
   sphere->SetCenter(0,0,0);
   sphere->SetRadius(10);
   polydata = sphere->GetOutput();
-  
-  m_SurfaceToMap->SetData(polydata, 0.0);
 
-  CreateVMEVolume();
+  m_SurfaceToMap->SetData(polydata, 0.0);
+  m_SurfaceToMap->ReparentTo(m_Root);
 
   m_Maps->SetSourceVMELink(m_Volume);
   m_Maps->SetMappedVMELink(m_SurfaceToMap);
@@ -177,64 +123,13 @@ void medVMEMapsTest::CreateVMEMaps()
   m_Maps->SetDensityDistance(m_DensityDistance);
   m_Maps->SetFirstThreshold(m_FirstThreshold);
   m_Maps->SetSecondThreshold(m_SecondThreshold);
-}
 
-//---------------------------------------------------------
-void medVMEMapsTest::CreateVMEVolume()
-//---------------------------------------------------------
-{
-
-  // create some VTK data
-
-  vtkMAFSmartPointer<vtkFloatArray> scalars;
-  scalars->SetNumberOfComponents(1);
-  for (int s = 0; s < 25; s++)
-  {
-    scalars->InsertNextValue(s * 1.0);
-  }
-
-  // create structured data
-  imageData->SetDimensions(5, 5, 5);
-  imageData->SetOrigin(-1, -1, -1);
-  imageData->SetSpacing(1,1,1);
-
-  // create rectilinear grid data
-  xCoordinates->SetNumberOfValues(5);
-  xCoordinates->SetValue(0, 0.f);
-  xCoordinates->SetValue(1, 1.f);
-  xCoordinates->SetValue(2, 2.f);
-  xCoordinates->SetValue(3, 1.f);
-  xCoordinates->SetValue(4, 0.f); 
-
-  yCoordinates->SetNumberOfValues(5);
-  yCoordinates->SetValue(0, 0.f);
-  yCoordinates->SetValue(1, 1.f);
-  yCoordinates->SetValue(2, 2.f);
-  yCoordinates->SetValue(3, 1.f);
-  yCoordinates->SetValue(4, 0.f); 
-
-  zCoordinates->SetNumberOfValues(5);
-  zCoordinates->SetValue(0, 0.f);
-  zCoordinates->SetValue(1, 1.f);
-  zCoordinates->SetValue(2, 2.f);
-  zCoordinates->SetValue(3, 1.f);
-  zCoordinates->SetValue(4, 0.f); 
-
-  rectilinearGrid->SetDimensions(5,5,5);
-  rectilinearGrid->SetXCoordinates(xCoordinates);
-  rectilinearGrid->SetYCoordinates(yCoordinates);
-  rectilinearGrid->SetZCoordinates(zCoordinates);
-
-  // try to set this data to the volume
-  int returnValue = -1;
-
-  imageData->GetPointData()->SetScalars(scalars);
-  m_Volume->SetData(imageData, 0);
+  vtkDEL(Importer);
 }
 
 //---------------------------------------------------------
 void medVMEMapsTest::TestGetDensityDistance()
-//---------------------------------------------------------ù
+//---------------------------------------------------------
 {
 
   CreateVMEMaps();
@@ -297,7 +192,7 @@ void medVMEMapsTest::TestGetSourceVMELink()
 
   mafNode *sourceVME = m_Maps->GetSourceVMELink();
 
-  CPPUNIT_ASSERT(mafVMEVolumeGray::SafeDownCast(sourceVME));
+  CPPUNIT_ASSERT(mafVMEVolume::SafeDownCast(sourceVME));
   CPPUNIT_ASSERT(sourceVME == m_Volume);
 
 }
@@ -308,4 +203,63 @@ void medVMEMapsTest::TestGetVisualPipe()
 {
 
   CPPUNIT_ASSERT(strcmp(m_Maps->GetVisualPipe(), "mafPipeSurface") == 0);
+}
+
+//---------------------------------------------------------
+void medVMEMapsTest::TestDeepCopy()
+//---------------------------------------------------------
+{
+  CreateVMEMaps();
+
+  medVMEMaps *maps;
+  mafNEW(maps);
+
+  maps->DeepCopy(m_Maps);
+
+  CPPUNIT_ASSERT(maps->GetDensityDistance() == m_DensityDistance);
+  CPPUNIT_ASSERT(maps->GetFirstThreshold() == m_FirstThreshold);
+  CPPUNIT_ASSERT(maps->GetSecondThreshold() == m_SecondThreshold);
+  CPPUNIT_ASSERT(maps->GetMaxDistance() == m_MaxDistance);
+
+  mafDEL(maps);
+
+}
+
+//---------------------------------------------------------
+void medVMEMapsTest::TestEquals()
+//---------------------------------------------------------
+{
+  CreateVMEMaps();
+
+  medVMEMaps *maps;
+  mafNEW(maps);
+
+  maps->DeepCopy(m_Maps);
+
+  CPPUNIT_ASSERT(maps->Equals(m_Maps));
+
+  m_Maps->SetSecondThreshold(m_SecondThreshold - 30);
+
+  CPPUNIT_ASSERT(!maps->Equals(m_Maps));
+
+  mafDEL(maps);
+}
+
+//---------------------------------------------------------
+void medVMEMapsTest::TestGetVolume()
+//---------------------------------------------------------
+{
+  CreateVMEMaps();
+
+  CPPUNIT_ASSERT( (m_Maps->GetVolume())->Equals(m_Volume) );
+}
+
+//---------------------------------------------------------
+void medVMEMapsTest::TestGetSurfaceOutput()
+//---------------------------------------------------------
+{
+  CreateVMEMaps();
+
+  CPPUNIT_ASSERT( mafVMEOutputSurface::SafeDownCast(m_Maps->GetSurfaceOutput()) );
+
 }

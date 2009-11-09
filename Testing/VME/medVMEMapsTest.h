@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMapsTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-08 14:22:18 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-09 15:37:05 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -23,6 +23,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 class mafVMESurface;
 class mafVMEVolumeGray;
+class mafVMERoot;
 class medVMEMaps;
 
 class vtkRectilinearGrid;
@@ -43,21 +44,21 @@ public:
   CPPUNIT_TEST_SUITE( medVMEMapsTest );
   CPPUNIT_TEST( TestDynamicAllocation );
   CPPUNIT_TEST( TestPrint );
-  CPPUNIT_TEST( TestGetLocalTimeStamps );
+  CPPUNIT_TEST( TestDeepCopy );
+  CPPUNIT_TEST( TestEquals );
   CPPUNIT_TEST( TestGetDensityDistance );
   CPPUNIT_TEST( TestGetFirstThreshold );
   CPPUNIT_TEST( TestGetSecondThreshold );
   CPPUNIT_TEST( TestGetMaxDistance );
   CPPUNIT_TEST( TestGetVisualPipe );
+  CPPUNIT_TEST( TestGetVolume );
+  CPPUNIT_TEST( TestGetSurfaceOutput );
+  CPPUNIT_TEST( TestGetSourceVMELink );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
   void TestDynamicAllocation();
   void TestPrint();
-  void TestGetLocalTimeBounds();
-  void TestIsAnimated();
-  void TestGetLocalTimeStamps();
-
   void TestGetDensityDistance();
   void TestGetFirstThreshold();
   void TestGetSecondThreshold();
@@ -65,22 +66,19 @@ protected:
   void TestGetMappedVMELink();
   void TestGetSourceVMELink();
   void TestGetVisualPipe();
-
+  void TestGetVolume();
+  void TestGetSurfaceOutput();
+  void TestDeepCopy();
+  void TestEquals();
 
   void CreateVMEMaps();
-  void CreateVMEVolume();
 
   bool m_Result;
 
+  mafVMERoot        *m_Root;
   mafVMEVolumeGray  *m_Volume;
   mafVMESurface     *m_SurfaceToMap;
   medVMEMaps        *m_Maps;
-
-  vtkRectilinearGrid *rectilinearGrid;
-  vtkImageData *imageData;
-  vtkFloatArray *xCoordinates;
-  vtkFloatArray *yCoordinates;
-  vtkFloatArray *zCoordinates;
 
   vtkPolyData       *polydata;
   vtkSphereSource   *sphere;
