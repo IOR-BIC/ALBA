@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-16 13:32:13 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-11-09 12:47:19 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -293,10 +293,6 @@ void mafGUITransformMouse::CreateISA()
   m_IsaRotate->GetPivotRefSys()->SetTypeToView();
   m_IsaRotate->GetPivotRefSys()->SetMatrix(m_RefSysVME->GetOutput()->GetMatrix());
   
-  //m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
-	//Modified by Matteo 30-05-2006
-	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
-  //End Matteo
   m_IsaRotate->EnableRotation(true);
   
 	//----------------------------------------------------------------------------
