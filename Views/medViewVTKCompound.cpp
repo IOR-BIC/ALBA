@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewVTKCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-20 11:30:45 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-11-09 08:39:36 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,7 +96,10 @@ mafGUI* medViewVTKCompound::CreateGui()
 {
 	assert(m_Gui == NULL);
 	m_Gui = new mafGUI(this);
-  //m_Gui->AddGui(((mafViewVTK*)m_ChildViewList[ID_VIEW_VTK])->GetGui());
+  if( mafViewVTK::SafeDownCast(m_ChildViewList[ID_VIEW_VTK]) && mafViewVTK::SafeDownCast(m_ChildViewList[ID_VIEW_VTK])->GetGui())
+  {
+     m_Gui->AddGui(((mafViewVTK*)m_ChildViewList[ID_VIEW_VTK])->GetGui());
+  }
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_LutWidget->Enable(false);
 	m_Gui->Divider();
