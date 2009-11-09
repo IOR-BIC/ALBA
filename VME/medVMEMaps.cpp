@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEMaps.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-19 14:51:39 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-11-09 15:34:08 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -118,6 +118,15 @@ int medVMEMaps::DeepCopy(mafNode *a)
     m_MappedName      = maps->m_MappedName;
     GetMaterial()->m_MaterialType = mmaMaterial::USE_LOOKUPTABLE;
 
+    m_FirstThreshold          = maps->GetFirstThreshold();
+    m_SecondThreshold         = maps->GetSecondThreshold();
+    m_MaxDistance             = maps->GetMaxDistance();
+
+    if(maps->GetSourceVMELink())
+      SetSourceVMELink(maps->GetSourceVMELink());
+    if(maps->GetMappedVMELink())
+      SetMappedVMELink(maps->GetMappedVMELink());
+
     return MAF_OK;
   }  
   return MAF_ERROR;
@@ -131,7 +140,7 @@ bool medVMEMaps::Equals(mafVME *vme)
   if (Superclass::Equals(vme))
   {
     return ret = (m_Transform->GetMatrix()  ==  ((medVMEMaps *)vme)->m_Transform->GetMatrix() &&
-                  m_Volume                  ==  ((medVMEMaps *)vme)->GetVolume() &&
+                  //m_Volume                  ==  ((medVMEMaps *)vme)->GetVolume() &&
                   m_FirstThreshold          ==  ((medVMEMaps *)vme)->GetFirstThreshold() &&
                   m_SecondThreshold         ==  ((medVMEMaps *)vme)->GetSecondThreshold() &&
                   m_MaxDistance             ==  ((medVMEMaps *)vme)->GetMaxDistance() &&
@@ -337,6 +346,10 @@ void medVMEMaps::SetVolume(mafVMEVolume *volume)
 mafVMEVolume *medVMEMaps::GetVolume()
 //-------------------------------------------------------------------------
 {
+  if(m_Volume == NULL)
+  {
+    m_Volume = mafVMEVolume::SafeDownCast(GetSourceVMELink());
+  }
   return m_Volume;
 }
 
@@ -474,7 +487,7 @@ void medVMEMaps::SetMaxDistance(int maxDistance)
 mafNode *medVMEMaps::GetMappedVMELink()
 //-----------------------------------------------------------------------
 {
-  return GetLink("MappedVME");
+  return mafNode::SafeDownCast(GetLink("MappedVME"));
 }
 //-----------------------------------------------------------------------
 void medVMEMaps::SetMappedVMELink(mafNode *node)
@@ -488,7 +501,7 @@ void medVMEMaps::SetMappedVMELink(mafNode *node)
 mafNode *medVMEMaps::GetSourceVMELink()
 //-----------------------------------------------------------------------
 {
-  return GetLink("SourceVME");
+  return mafNode::SafeDownCast(GetLink("SourceVME"));
 }
 
 //-----------------------------------------------------------------------
