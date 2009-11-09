@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-09 09:54:20 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-09 12:24:05 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -121,7 +121,7 @@ void mafGUISaveRestorePose::OnEvent(mafEventBase *maf_event)
         if (sel_pose == -1)
           return;
         EnableWidgets(true);
-        RestorePoseHelper(sel_pose);
+        RestorePose(sel_pose);
       }
       break;
       default:
