@@ -65,6 +65,9 @@ ADD_TEST(medVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEMapsTest)
 ADD_EXECUTABLE(medPipeTrajectoriesTest medPipeTrajectoriesTest.h medPipeTrajectoriesTest.cpp)
 ADD_TEST(medPipeTrajectoriesTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTrajectoriesTest)
 
+ADD_EXECUTABLE(mafPipeSliceTest mafPipeSliceTest.h mafPipeSliceTest.cpp)
+ADD_TEST(mafPipeSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSliceTest)
+
 
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
