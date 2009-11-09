@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-10-30 10:49:38 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-09 11:12:59 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -50,28 +50,31 @@ MafMedical is partially based on OpenMAF.
 // forward references :
 //----------------------------------------------------------------------------
 class mafVMEVolumeGray;
+class mafVMESurface;
 class mafGUILutSlider;
 class mafGUIHistogramWidget;
 class vtkImageData;
 
-//----------------------------------------------------------------------------
-// medOpSegmentationRegionGrowingLocalAndGlobalThreshold :
-//----------------------------------------------------------------------------
 /** 
-
+class name : medOpSegmentationRegionGrowingLocalAndGlobalThreshold
 */
 class medOpSegmentationRegionGrowingLocalAndGlobalThreshold: public mafOp
 {
 public:
 
+  /** constructor. */
   medOpSegmentationRegionGrowingLocalAndGlobalThreshold(wxString label = "Region Growing");
+  /** destructor. */
   ~medOpSegmentationRegionGrowingLocalAndGlobalThreshold(); 
 
+  /** RTTI macro */
   mafTypeMacro(medOpSegmentationRegionGrowingLocalAndGlobalThreshold, mafOp);
 
-  mafOp* Copy();
+  /** Return a copy of itself, this needs to put the operation into the undo stack. */
+  /*virtual*/ mafOp* Copy();
 
-  void OnEvent(mafEventBase *maf_event);
+  /** Precess events coming from other objects */
+  /*virtual*/ void OnEvent(mafEventBase *maf_event);
 
   /** Return true for the acceptable vme type. */
   /*virtual*/ bool Accept(mafNode* vme);
@@ -87,21 +90,23 @@ public:
 
 protected:
   
+  /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
+  /*virtual*/ void OpStop(int result);
+
   /** Create the operation gui */
   void CreateGui();
 
-  /** Perform the local segmentation */
-  void LocalSegmentation();
+  /** Perform the region growing */
+  void RegionGrowing();
 
+  /** Perform the morphological closing operation */
   void MorphologicalMathematics();
-
-  /** Update progress bar value */
-  void UpdateProgressBar();
 
   //GUI Stuff
   double m_LowerLabel;
   double m_UpperLabel;
   int m_SphereRadius;
+  int m_ApplyConnectivityFilter;
   mafGUILutSlider *m_SliderLabels;
   mafGUILutSlider *m_SliderThresholds;
   mafGUI *m_GuiLabels;
@@ -109,8 +114,9 @@ protected:
   mafGUIHistogramWidget *m_Histogram;
 
   mafVMEVolumeGray *m_VolumeInput; //<<<Input volume
-  mafVMEVolumeGray *m_VolumeOutputMorpho; //<<<Output volume
-  mafVMEVolumeGray *m_VolumeOutputRegionGrowing; //<<<Output volume
+  mafVMEVolumeGray *m_VolumeOutputMorpho; //<<<Output volume after morphological mathematics operation
+  mafVMEVolumeGray *m_VolumeOutputRegionGrowing; //<<<Output volume after region growing operation
+  mafVMESurface *m_SurfaceOutput; //<<<Output surface extracted from m_VolumeOutputMorpho
 
   vtkImageData *m_SegmentedImage;
   vtkImageData *m_MorphoImage;

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-04 09:17:14 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-11-09 11:12:59 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -53,6 +53,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafGUI.h"
 #include "mafNode.h"
 #include "mafVMEVolumeGray.h"
+#include "mafVMESurface.h"
 #include "mafGUILutSlider.h"
 #include "mafGUIHistogramWidget.h"
 #include "medOpVolumeResample.h"
@@ -63,6 +64,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkPointData.h"
 #include "vtkStructuredPoints.h"
 #include "vtkImageToStructuredPoints.h"
+#include "vtkPolyDataConnectivityFilter.h"
+#include "vtkMAFContourVolumeMapper.h"
 #include "vtkMAFHistogram.h"
 
 #include "itkVTKImageToImageFilter.h"
@@ -100,9 +103,11 @@ mafOp(label)
   m_LowerLabel = -1;
   m_UpperLabel = 1;
   m_SphereRadius = 1;
+  m_ApplyConnectivityFilter = FALSE;
 
   m_VolumeOutputMorpho = NULL;
   m_VolumeOutputRegionGrowing = NULL;
+  m_SurfaceOutput = NULL;
 
   m_SegmentedImage = NULL;
   m_MorphoImage = NULL;
@@ -116,6 +121,7 @@ medOpSegmentationRegionGrowingLocalAndGlobalThreshold::~medOpSegmentationRegionG
 {
   mafDEL(m_VolumeOutputMorpho);
   mafDEL(m_VolumeOutputRegionGrowing);
+  mafDEL(m_SurfaceOutput);
   vtkDEL(m_SegmentedImage);
   vtkDEL(m_MorphoImage);
 }
@@ -167,6 +173,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 
   mafNEW(m_VolumeOutputMorpho);
   mafNEW(m_VolumeOutputRegionGrowing);
+  mafNEW(m_SurfaceOutput);
 
   vtkNEW(m_SegmentedImage);
   vtkNEW(m_MorphoImage);
@@ -177,6 +184,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathematics()
 //----------------------------------------------------------------------------
 {
+  //Perform the morphological closing operation
   wxBusyInfo wait("Please wait, morphological mathematics...");
 
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
@@ -186,6 +194,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathema
   vtkTOitk->Update();
   mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,(long)10));
 
+  //Structuring element is a sphere
   StructuringElementType  structuringElement;
   structuringElement.SetRadius( m_SphereRadius );  // 3x3 structuring element
   structuringElement.CreateStructuringElement(); 
@@ -217,28 +226,21 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathema
 
 }
 //----------------------------------------------------------------------------
-void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::UpdateProgressBar()
-//----------------------------------------------------------------------------
-{
-
-}
-//----------------------------------------------------------------------------
-void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::LocalSegmentation()
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 //----------------------------------------------------------------------------
 {
   wxBusyInfo wait("Please wait, region growing...");
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
 
+  //Get the vtk data from the input
   vtkImageData *imageData = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   imageData->Update();
-  int dims[3];
-  double spacing[3];
-  imageData->GetDimensions(dims);
-  imageData->GetSpacing(spacing);
 
+  //Get the thresholds values selected by the user
   double lower,upper;
   m_Histogram->GetThresholds(&lower,&upper);
   
+  //Apply the region growing filter
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   vtkMAFSmartPointer<vtkMEDRegionGrowingLocalGlobalThreshold> localFilter;
   localFilter->SetInput(imageData);
@@ -249,6 +251,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::LocalSegmentation()
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,localFilter));
   localFilter->Update();
 
+  //Save the result of the region growing
   m_SegmentedImage->DeepCopy(localFilter->GetOutput());
   m_SegmentedImage->Update();
 
@@ -264,6 +267,9 @@ enum REGION_GROWING_ID
   ID_SLIDER_LABELS,
   ID_ROLLOUT_LABELS,
   ID_SPHERE_RADIUS,
+  ID_APPLY_CONNECTIVITY_FILTER,
+  ID_REGION_GROWING,
+  ID_MORPHOLOGICAL,
 };
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
@@ -304,7 +310,16 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
 
   m_Gui->Divider(1);
   m_Gui->Integer(ID_SPHERE_RADIUS,_("Radius"),&m_SphereRadius);
+  m_Gui->Enable(ID_SPHERE_RADIUS,false);
+  m_Gui->Divider(1);
+  m_Gui->Bool(ID_APPLY_CONNECTIVITY_FILTER,_("Extract biggest region"),&m_ApplyConnectivityFilter,1);
+  m_Gui->Enable(ID_APPLY_CONNECTIVITY_FILTER,false);
+  m_Gui->Divider(1);
+  m_Gui->Button(ID_REGION_GROWING,_("Region growing"));
+  m_Gui->Button(ID_MORPHOLOGICAL,_("Morphological closing"));
+  m_Gui->Enable(ID_MORPHOLOGICAL,false);
   m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,false);
   m_Gui->Divider(1);
 
   m_Gui->FitGui();
@@ -318,33 +333,96 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
   {
     switch(e->GetId())
     {
+    case ID_REGION_GROWING:
+      {
+        RegionGrowing();
+
+        //Convert the output of the region growing into structured points
+        vtkMAFSmartPointer<vtkImageToStructuredPoints> filter;
+        filter->SetInput(m_SegmentedImage);
+        filter->Update();
+
+        //Generate the vme output of the region growing
+        m_VolumeOutputRegionGrowing->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
+        m_VolumeOutputRegionGrowing->SetName(_("Segmentation Output - first step"));
+        m_VolumeOutputRegionGrowing->ReparentTo(m_VolumeInput);
+        m_VolumeOutputRegionGrowing->Update();
+
+        mafEventMacro(mafEvent(this,VME_SHOW,m_VolumeOutputRegionGrowing,true));
+
+        if (m_SegmentedImage != NULL)
+        {
+          m_Gui->Enable(ID_SPHERE_RADIUS,true);
+          m_Gui->Enable(ID_APPLY_CONNECTIVITY_FILTER,true);
+          m_Gui->Enable(ID_MORPHOLOGICAL,true);
+          m_Gui->Update();
+        }
+      }
+      break;
+    case ID_MORPHOLOGICAL:
+      {
+        MorphologicalMathematics();
+
+        //Convert the output of the region growing into structured points
+        vtkMAFSmartPointer<vtkImageToStructuredPoints> filter;
+        filter->SetInput(m_MorphoImage);
+        filter->Update();
+
+        //Generate the vme output of the morphological closing
+        m_VolumeOutputMorpho->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
+        m_VolumeOutputMorpho->SetName(_("Segmentation Output - second step"));
+        m_VolumeOutputMorpho->ReparentTo(m_VolumeInput);
+        m_VolumeOutputMorpho->Update();
+
+        vtkMAFSmartPointer<vtkMAFContourVolumeMapper> extractIsosurface;
+        extractIsosurface->SetInput(filter->GetOutput());
+        extractIsosurface->SetContourValue(m_UpperLabel);
+        extractIsosurface->Update();
+
+        vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+        int result = MAF_OK;
+        if (m_ApplyConnectivityFilter == TRUE)
+        {
+          connectivityFilter->SetInput(extractIsosurface->GetOutput());
+          connectivityFilter->SetExtractionModeToLargestRegion();
+          connectivityFilter->Update();
+
+          result = m_SurfaceOutput->SetData(connectivityFilter->GetOutput(),m_VolumeInput->GetTimeStamp());
+        }
+        else
+        {
+          result = m_SurfaceOutput->SetData(extractIsosurface->GetOutput(),m_VolumeInput->GetTimeStamp());
+        }
+
+        if (result == MAF_ERROR)
+        {
+          wxMessageBox("There was an error during extracting the surface!");
+          m_Gui->Enable(wxOK,false);
+        }
+        else
+        {
+        	m_SurfaceOutput->SetName(_("Segmentation Output - extract isosurface"));
+        	m_SurfaceOutput->ReparentTo(m_VolumeInput);
+        	m_SurfaceOutput->Update();
+  
+        	mafEventMacro(mafEvent(this,VME_SHOW,m_VolumeOutputMorpho,true));
+          m_Gui->Enable(wxOK,true);
+        }
+
+
+      }
+      break;
     case ID_RANGE_MODIFIED:
       {
         if (e->GetSender() == m_SliderLabels)
         {
+          //Get the label values modified by the user
           m_SliderLabels->GetSubRange(&m_LowerLabel,&m_UpperLabel);
         }
       }
       break;
     case wxOK:
       {
-        LocalSegmentation();
-        MorphologicalMathematics();
-
-        vtkMAFSmartPointer<vtkImageToStructuredPoints> filter;
-        filter->SetInput(m_SegmentedImage);
-        filter->Update();
-
-        m_VolumeOutputRegionGrowing->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
-        m_VolumeOutputRegionGrowing->SetName(_("Segmentation Output - first step"));
-        m_VolumeOutputRegionGrowing->Update();
-
-        filter->SetInput(m_MorphoImage);
-        filter->Update();
-        m_VolumeOutputMorpho->SetData(filter->GetOutput(),m_VolumeInput->GetTimeStamp());
-        m_VolumeOutputMorpho->SetName(_("Segmentation Output - second step"));
-        m_VolumeOutputMorpho->Update();
-
         this->OpStop(OP_RUN_OK);
         return;
       }
@@ -362,6 +440,31 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
   }
 }
 //----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpStop(int result)
+//----------------------------------------------------------------------------
+{
+  if (result == OP_RUN_CANCEL)
+  {
+	  if (m_VolumeOutputRegionGrowing)
+	  {
+	    m_VolumeOutputRegionGrowing->ReparentTo(NULL);
+	  }
+	  if (m_VolumeOutputMorpho)
+	  {
+	    m_VolumeOutputMorpho->ReparentTo(NULL);
+	  }
+	  if (m_SurfaceOutput)
+	  {
+	    m_SurfaceOutput->ReparentTo(NULL);
+	  }
+
+    mafEventMacro(mafEvent(this,CAMERA_UPDATE));
+  }
+
+  HideGui();
+  mafEventMacro(mafEvent(this,result));        
+}
+//----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
 //----------------------------------------------------------------------------
 {
@@ -373,8 +476,12 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpDo()
   {
     m_VolumeOutputMorpho->ReparentTo(m_Input);
   }
+  if (m_SurfaceOutput)
+  {
+    m_SurfaceOutput->ReparentTo(m_Input);
+  }
 
-  if (m_VolumeOutputMorpho == NULL && m_VolumeOutputRegionGrowing == NULL)
+  if (m_VolumeOutputMorpho == NULL && m_VolumeOutputRegionGrowing == NULL && m_SurfaceOutput == NULL)
   {
     return;
   }
@@ -392,8 +499,12 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpUndo()
   {
     mafEventMacro(mafEvent(this, VME_REMOVE, m_VolumeOutputMorpho));
   }
+  if (m_SurfaceOutput)
+  {
+    mafEventMacro(mafEvent(this, VME_REMOVE, m_SurfaceOutput));
+  }
 
-  if (m_VolumeOutputMorpho == NULL && m_VolumeOutputRegionGrowing == NULL)
+  if (m_VolumeOutputMorpho == NULL && m_VolumeOutputRegionGrowing == NULL && m_SurfaceOutput == NULL)
   {
     return;
   }
