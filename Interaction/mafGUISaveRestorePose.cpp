@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUISaveRestorePose.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:44:32 $
-  Version:   $Revision: 1.1 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2009-11-09 09:54:20 $
+  Version:   $Revision: 1.1.2.1 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -34,8 +34,10 @@
 
 #include "vtkMatrix4x4.h"
 
+mafString dummyPoseNameUsedForTesting = "dummyPoseNameUsedForTesting";
+
 //----------------------------------------------------------------------------
-mafGUISaveRestorePose::mafGUISaveRestorePose(mafVME *input, mafObserver *listener, int typeGui)
+mafGUISaveRestorePose::mafGUISaveRestorePose(mafVME *input, mafObserver *listener, int typeGui, bool testMode)
 //----------------------------------------------------------------------------
 {
   assert(input);
@@ -45,7 +47,12 @@ mafGUISaveRestorePose::mafGUISaveRestorePose(mafVME *input, mafObserver *listene
   m_Gui = NULL;
   m_TypeGui = typeGui;
   
-  CreateGui();
+  m_TestMode = testMode;
+  
+  if (m_TestMode == false)
+  {
+    CreateGui();
+  }
 }
 //----------------------------------------------------------------------------
 mafGUISaveRestorePose::~mafGUISaveRestorePose() 
@@ -78,7 +85,7 @@ void mafGUISaveRestorePose::CreateGui()
   }
   
   m_PositionsList->Clear();
-  ReadSavedPoses();
+  FillListBoxWithABSPosesStoredInInputVME();
 
   EnableWidgets(true);
 
@@ -96,7 +103,7 @@ void mafGUISaveRestorePose::OnEvent(mafEventBase *maf_event)
     switch(e->GetId())
     {
       case ID_SAVE:
-        SavePose(m_InputVME->GetOutput()->GetAbsMatrix());
+        StorePose();
         m_Gui->Enable(ID_APPLY, true);
       break;
       case ID_REMOVE:
@@ -114,7 +121,7 @@ void mafGUISaveRestorePose::OnEvent(mafEventBase *maf_event)
         if (sel_pose == -1)
           return;
         EnableWidgets(true);
-        RestorePose(sel_pose);
+        RestorePoseHelper(sel_pose);
       }
       break;
       default:
@@ -135,7 +142,7 @@ void mafGUISaveRestorePose::EnableWidgets(bool enable)
   m_Gui->Enable(ID_APPLY, enable && num_stored_poses > 0);
 }
 //----------------------------------------------------------------------------
-void mafGUISaveRestorePose::ReadSavedPoses()
+void mafGUISaveRestorePose::FillListBoxWithABSPosesStoredInInputVME()
 //----------------------------------------------------------------------------
 {
 	mafTagArray *tag_array = m_InputVME->GetTagArray();
@@ -157,14 +164,26 @@ void mafGUISaveRestorePose::ReadSavedPoses()
 	}
 }
 //----------------------------------------------------------------------------
-void mafGUISaveRestorePose::SavePose(mafMatrix *abs_pose)
-//----------------------------------------------------------------------------
+void mafGUISaveRestorePose::StorePose()
 {
+  assert(m_InputVME);
+
+  mafMatrix *absPose = m_InputVME->GetOutput()->GetAbsMatrix();
+
   wxString pose_name = "";
   
-  do {
-  	pose_name = wxGetTextFromUser("Enter the pose name","Save position","Saved pose", m_Gui);
-  } while(m_PositionsList->FindString(pose_name) != wxNOT_FOUND);
+  if (m_TestMode == false)
+  {
+    do 
+    {
+  	  pose_name = wxGetTextFromUser("Enter the pose name","Save position","Saved pose", m_Gui);
+    } 
+    while(m_PositionsList->FindString(pose_name) != wxNOT_FOUND);
+  }
+  else if (m_TestMode == true)
+  {
+    pose_name = dummyPoseNameUsedForTesting;
+  }
   
   pose_name.Trim();
   pose_name.Trim(FALSE);
@@ -174,7 +193,7 @@ void mafGUISaveRestorePose::SavePose(mafMatrix *abs_pose)
   mafTagArray *tagArray = m_InputVME->GetTagArray();
   if(tagArray->IsTagPresent(AbsPos_tagName.c_str())) 
   {
-		wxString msg = "this name is already used, do you want to to overwrite it ?";
+		wxString msg = "this name is already used, do you want to overwrite it ?";
 		int res = wxMessageBox(msg,"Store Position", wxOK|wxCANCEL|wxICON_QUESTION, NULL);
 		if(res == wxCANCEL) return;
 
@@ -182,45 +201,58 @@ void mafGUISaveRestorePose::SavePose(mafMatrix *abs_pose)
 		tagArray->DeleteTag(AbsPos_tagName.c_str());
 	}
 	
-  mafTagItem item;
-	//item.SetName(m_selected.c_str());
-	item.SetName(AbsPos_tagName.c_str());
-	item.SetNumberOfComponents(16);
-	item.SetComponent(abs_pose->GetElement(0,0),0);
-	item.SetComponent(abs_pose->GetElement(0,1),1);
-	item.SetComponent(abs_pose->GetElement(0,2),2);
-	item.SetComponent(abs_pose->GetElement(0,3),3);
-	item.SetComponent(abs_pose->GetElement(1,0),4);
-	item.SetComponent(abs_pose->GetElement(1,1),5);
-	item.SetComponent(abs_pose->GetElement(1,2),6);
-	item.SetComponent(abs_pose->GetElement(1,3),7);
-	item.SetComponent(abs_pose->GetElement(2,0),8);
-	item.SetComponent(abs_pose->GetElement(2,1),9);
-	item.SetComponent(abs_pose->GetElement(2,2),10);
-	item.SetComponent(abs_pose->GetElement(2,3),11);
-	item.SetComponent(abs_pose->GetElement(3,0),12);
-	item.SetComponent(abs_pose->GetElement(3,1),13);
-	item.SetComponent(abs_pose->GetElement(3,2),14);
-	item.SetComponent(abs_pose->GetElement(3,3),15);
-	tagArray->SetTag(item);
+  StorePoseHelper(AbsPos_tagName);
   
-  m_PositionsList->Append(pose_name);
+  if (m_TestMode == false)
+  {
+    m_PositionsList->Append(pose_name);
+  }
 }
 //----------------------------------------------------------------------------
-void mafGUISaveRestorePose::RemovePose(int sel_pose)
-//----------------------------------------------------------------------------
+void mafGUISaveRestorePose::RemovePose( int absPoseListBoxID )
 {
-  wxString pose_name = m_PositionsList->GetString(sel_pose);
+  wxString pose_name;
+
+  if (m_TestMode == false)
+  {
+    pose_name = m_PositionsList->GetString(absPoseListBoxID);
+  }
+  else if (m_TestMode == true)
+  {
+    pose_name = dummyPoseNameUsedForTesting.GetCStr();
+  }
+  
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
-  if (m_InputVME->GetTagArray()->IsTagPresent(AbsPos_tagName.c_str()))
-    m_InputVME->GetTagArray()->DeleteTag(AbsPos_tagName.c_str());
-  m_PositionsList->Delete(sel_pose);
+
+  RemovePoseHelper(AbsPos_tagName);
+  
+  if (m_TestMode == false)
+  {
+    m_PositionsList->Delete(absPoseListBoxID);
+  }
 }
 //----------------------------------------------------------------------------
-void mafGUISaveRestorePose::RestorePose(int sel_pose)
-//----------------------------------------------------------------------------
+void mafGUISaveRestorePose::RestorePose( int absPoseListBoxID )
 {
-  wxString pose_name = m_PositionsList->GetString(sel_pose);
+  wxString pose_name;
+
+  if (m_TestMode == false)
+  {
+    pose_name = m_PositionsList->GetString(absPoseListBoxID);
+  }
+  else if (m_TestMode == true)
+  {
+    pose_name = dummyPoseNameUsedForTesting.GetCStr();
+  }
+
+  RestorePoseHelper(pose_name);
+  return;
+}
+
+void mafGUISaveRestorePose::RestorePoseHelper( mafString pose_name )
+{
+  assert(m_InputVME);
+
   wxString AbsPos_tagName = "STORED_ABS_POS_" + pose_name;
   int comp = 0;
   mafMatrix abs_pose;
@@ -243,6 +275,36 @@ void mafGUISaveRestorePose::RestorePose(int sel_pose)
   e2s.SetMatrix(&abs_pose);
   e2s.SetId(ID_TRANSFORM);
   mafEventMacro(e2s);
-  
-//  mafEventMacro(mafEvent(this, CAMERA_UPDATE));  // Paolo 20-07-2005
+}
+void mafGUISaveRestorePose::StorePoseHelper( mafString absPoseTagName )
+{
+  assert(m_InputVME);
+  mafMatrix *absPose = m_InputVME->GetOutput()->GetAbsMatrix();
+  mafTagItem item;
+  item.SetName(absPoseTagName);
+  item.SetNumberOfComponents(16);
+  item.SetComponent(absPose->GetElement(0,0),0);
+  item.SetComponent(absPose->GetElement(0,1),1);
+  item.SetComponent(absPose->GetElement(0,2),2);
+  item.SetComponent(absPose->GetElement(0,3),3);
+  item.SetComponent(absPose->GetElement(1,0),4);
+  item.SetComponent(absPose->GetElement(1,1),5);
+  item.SetComponent(absPose->GetElement(1,2),6);
+  item.SetComponent(absPose->GetElement(1,3),7);
+  item.SetComponent(absPose->GetElement(2,0),8);
+  item.SetComponent(absPose->GetElement(2,1),9);
+  item.SetComponent(absPose->GetElement(2,2),10);
+  item.SetComponent(absPose->GetElement(2,3),11);
+  item.SetComponent(absPose->GetElement(3,0),12);
+  item.SetComponent(absPose->GetElement(3,1),13);
+  item.SetComponent(absPose->GetElement(3,2),14);
+  item.SetComponent(absPose->GetElement(3,3),15);
+  m_InputVME->GetTagArray()->SetTag(item);
+}
+
+void mafGUISaveRestorePose::RemovePoseHelper( mafString absPoseTagName )
+{
+  assert(m_InputVME);
+  if (m_InputVME->GetTagArray()->IsTagPresent(absPoseTagName.GetCStr()))
+    m_InputVME->GetTagArray()->DeleteTag(absPoseTagName.GetCStr());
 }
