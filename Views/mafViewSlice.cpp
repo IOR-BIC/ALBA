@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-01 12:37:12 $
-  Version:   $Revision: 1.51.2.7 $
+  Date:      $Date: 2009-11-10 16:23:07 $
+  Version:   $Revision: 1.51.2.8 $
   Authors:   Paolo Quadrani,Stefano Perticoni, modified by Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -858,7 +858,7 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     //CameraReset(node);
     //m_Rwi->CameraUpdate();
   }
-	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud") /*|| node->IsA("mafVMEMeter")*/)
+	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh") /*|| node->IsA("mafVMEMeter")*/)
 	{
 		this->UpdateSurfacesList(node);
 	}
