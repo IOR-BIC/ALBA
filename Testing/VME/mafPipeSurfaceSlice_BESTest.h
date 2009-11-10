@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipeSurfaceSlice_BESTest.h,v $
 Language:  C++
-Date:      $Date: 2009-10-06 08:13:49 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-10 10:13:17 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2008
@@ -42,8 +42,8 @@ public:
   CPPUNIT_TEST( TestSurfacePipeCreation );
   CPPUNIT_TEST( TestSetGetThickness );
   CPPUNIT_TEST( TestSurfacePipeExecution );
-  CPPUNIT_TEST( TestCloudClosePipeExecution );
-  CPPUNIT_TEST( TestCloudOpenPipeExecution );
+  //CPPUNIT_TEST( TestCloudClosePipeExecution );
+  //CPPUNIT_TEST( TestCloudOpenPipeExecution );
 
   CPPUNIT_TEST_SUITE_END();
 
