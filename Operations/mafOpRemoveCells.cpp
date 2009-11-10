@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 14:49:29 $
-Version:   $Revision: 1.3.2.3 $
+Date:      $Date: 2009-11-10 12:47:39 $
+Version:   $Revision: 1.3.2.4 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -91,6 +91,10 @@ mafOp(label)
 
   m_ResultPolydata	  = NULL;
   m_OriginalPolydata  = NULL;
+  m_PolydataMapper    = NULL;
+  m_PolydataActor     = NULL;
+  m_Rcf               = NULL;
+
 
   m_TriangeCentreComputationList = NULL;
   m_AutoClip = 1;
@@ -99,6 +103,18 @@ mafOp(label)
 mafOpRemoveCells::~mafOpRemoveCells()
 //----------------------------------------------------------------------------
 {
+  if (m_Mesh)
+    DestroyHelperStructures();
+
+  if (m_PolydataMapper)
+    vtkDEL(m_PolydataMapper);
+  
+  if (m_PolydataActor)
+    vtkDEL(m_PolydataActor);
+
+  if (m_Rcf)
+    vtkDEL(m_Rcf);
+
   vtkDEL(m_Mesh);
   vtkDEL(m_ResultPolydata);
   vtkDEL(m_OriginalPolydata);
@@ -156,9 +172,9 @@ void mafOpRemoveCells::OpRun()
 
     DeleteOpDialog();
 
-    DestroyHelperStructures();
     mafEventMacro(mafEvent(this,result));
   }
+  
 }
 //----------------------------------------------------------------------------
 void mafOpRemoveCells::OpDo()
@@ -309,10 +325,6 @@ void mafOpRemoveCells::DeleteOpDialog()
   m_Mouse->RemoveObserver(m_SelectCellInteractor);
 
   mafDEL(m_SelectCellInteractor);
-
-  vtkDEL(m_PolydataMapper);
-  vtkDEL(m_PolydataActor);
-  vtkDEL(m_Rcf);
 
   cppDEL(m_Rwi); 
   cppDEL(m_Dialog);
