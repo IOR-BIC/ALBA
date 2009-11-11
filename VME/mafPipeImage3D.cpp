@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeImage3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-16 14:18:46 $
-  Version:   $Revision: 1.6.6.1 $
+  Date:      $Date: 2009-11-11 13:09:38 $
+  Version:   $Revision: 1.6.6.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -100,16 +100,16 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   w = range[1] - range[0];
   l = (range[1] + range[0]) * .5;
 
-//m_ImageLUT = vtkWindowLevelLookupTable::New();
-//m_ImageLUT->SetWindow(w);
-//m_ImageLUT->SetLevel(l);
-////m_ImageLUT->InverseVideoOn();
-//m_ImageLUT->Build();
-
-  mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
-  m_ImageLUT = (vtkWindowLevelLookupTable *)output->GetMaterial()->m_ColorLut;
+  /*m_ImageLUT = vtkWindowLevelLookupTable::New();
   m_ImageLUT->SetWindow(w);
   m_ImageLUT->SetLevel(l);
+  m_ImageLUT->InverseVideoOn();
+  m_ImageLUT->Build();*/
+
+  /*mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
+  m_ImageLUT = (vtkWindowLevelLookupTable *)output->GetMaterial()->m_ColorLut;
+  m_ImageLUT->SetWindow(w);
+  m_ImageLUT->SetLevel(l);*/
 
   m_ImageTexture = vtkTexture::New();
   m_ImageTexture->RepeatOff();
@@ -119,6 +119,10 @@ void mafPipeImage3D::Create(mafSceneNode *n)
   
   if(IsGrayImage())
   {
+    mafVMEOutputImage *output = (mafVMEOutputImage *)m_Vme->GetOutput();
+    m_ImageLUT = (vtkWindowLevelLookupTable *)output->GetMaterial()->m_ColorLut;
+    m_ImageLUT->SetWindow(w);
+    m_ImageLUT->SetLevel(l);
     m_ImageTexture->SetLookupTable(m_ImageLUT);
     m_ImageTexture->MapColorScalarsThroughLookupTableOn();
   }
@@ -188,10 +192,11 @@ mafPipeImage3D::~mafPipeImage3D()
     m_AssemblyFront->RemovePart(m_GhostActor);
 
   vtkDEL(m_ImagePlane);
-  //vtkDEL(m_ImageLUT);
+  //vtkDEL(m_ImageLUT);  
   vtkDEL(m_ImageTexture);
   vtkDEL(m_ImageMapper);
   vtkDEL(m_ImageActor);
+  
 
   vtkDEL(m_SelectionFilter);
   vtkDEL(m_SelectionMapper);
@@ -199,6 +204,7 @@ mafPipeImage3D::~mafPipeImage3D()
   vtkDEL(m_SelectionActor);
 
   vtkDEL(m_GhostActor);
+
 }
 //----------------------------------------------------------------------------
 void mafPipeImage3D::Select(bool sel)
