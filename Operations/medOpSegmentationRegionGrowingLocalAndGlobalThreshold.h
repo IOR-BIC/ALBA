@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-11-09 11:12:59 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-11-11 09:32:47 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -111,6 +111,7 @@ protected:
   mafGUILutSlider *m_SliderThresholds;
   mafGUI *m_GuiLabels;
 
+  bool m_ComputedMedianFilter;
   mafGUIHistogramWidget *m_Histogram;
 
   mafVMEVolumeGray *m_VolumeInput; //<<<Input volume

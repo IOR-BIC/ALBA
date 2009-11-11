@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-09 11:12:59 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-11-11 09:32:47 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -65,6 +65,7 @@ MafMedical is partially based on OpenMAF.
 #include "vtkStructuredPoints.h"
 #include "vtkImageToStructuredPoints.h"
 #include "vtkPolyDataConnectivityFilter.h"
+#include "vtkImageMedian3D.h"
 #include "vtkMAFContourVolumeMapper.h"
 #include "vtkMAFHistogram.h"
 
@@ -113,6 +114,8 @@ mafOp(label)
   m_MorphoImage = NULL;
 
   m_Histogram = NULL;
+
+  m_ComputedMedianFilter = false;
   
 }
 //----------------------------------------------------------------------------
@@ -124,6 +127,11 @@ medOpSegmentationRegionGrowingLocalAndGlobalThreshold::~medOpSegmentationRegionG
   mafDEL(m_SurfaceOutput);
   vtkDEL(m_SegmentedImage);
   vtkDEL(m_MorphoImage);
+
+  if (m_ComputedMedianFilter)
+  {
+    mafDEL(m_VolumeInput);
+  }
 }
 //----------------------------------------------------------------------------
 mafOp* medOpSegmentationRegionGrowingLocalAndGlobalThreshold::Copy()
@@ -170,6 +178,33 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
   }
 
   m_VolumeInput->Update();
+
+  int answer = wxMessageBox(_("Would you like to apply median filter to the data?"),_("Confirm"), wxYES_NO|wxICON_EXCLAMATION , NULL);
+  if(answer == wxYES)
+  {
+    m_ComputedMedianFilter = true;
+
+    vtkMAFSmartPointer<vtkImageMedian3D> median;
+    median->SetInput(vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData()));
+    median->SetKernelSize(3,3,3);
+    median->Update();
+
+    mafVMEVolumeGray *volMediano;
+    mafNEW(volMediano);
+    vtkDataSet *d = median->GetOutput();
+    d->Update();
+    int k = d->GetNumberOfPoints();
+    double sr[2];
+    d->GetPointData()->GetScalars()->GetRange(sr);
+    mafString name = m_Input->GetName();
+    name<<" - Applied Median Filter";
+    volMediano->SetName(name);
+    volMediano->SetData(median->GetOutput(),m_VolumeInput->GetTimeStamp());
+    volMediano->ReparentTo(m_VolumeInput);
+    volMediano->Update();
+
+    m_VolumeInput = volMediano;
+  }
 
   mafNEW(m_VolumeOutputMorpho);
   mafNEW(m_VolumeOutputRegionGrowing);
@@ -270,6 +305,7 @@ enum REGION_GROWING_ID
   ID_APPLY_CONNECTIVITY_FILTER,
   ID_REGION_GROWING,
   ID_MORPHOLOGICAL,
+  ID_APPLY_MEDIAN_FILTER,
 };
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
@@ -282,6 +318,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Histogram->SetListener(m_Gui);
   m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  hd->Update();
   m_Histogram->SetData(hd->GetPointData()->GetScalars());
 
   sizer3->Add(m_Histogram,wxALIGN_CENTER|wxRIGHT);
