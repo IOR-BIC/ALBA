@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-11 09:32:47 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-11-13 10:15:17 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -153,7 +153,8 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
   m_VolumeInput = mafVMEVolumeGray::SafeDownCast(m_Input);
 
   vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  if (sp == NULL)
+  vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  if (sp == NULL || im == NULL)
   {
     int answer = wxMessageBox(_("The data will be resampled! Proceed?"),_("Confirm"), wxYES_NO|wxICON_EXCLAMATION , NULL);
     if(answer == wxNO)
@@ -199,7 +200,10 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
     mafString name = m_Input->GetName();
     name<<" - Applied Median Filter";
     volMediano->SetName(name);
-    volMediano->SetData(median->GetOutput(),m_VolumeInput->GetTimeStamp());
+    vtkMAFSmartPointer<vtkImageToStructuredPoints> f;
+    f->SetInput(median->GetOutput());
+    f->Update();
+    volMediano->SetData(f->GetOutput(),m_VolumeInput->GetTimeStamp());
     volMediano->ReparentTo(m_VolumeInput);
     volMediano->Update();
 
