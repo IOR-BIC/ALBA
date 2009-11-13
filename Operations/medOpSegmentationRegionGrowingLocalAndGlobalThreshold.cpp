@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-13 10:15:17 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2009-11-13 14:26:35 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -56,6 +56,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafVMESurface.h"
 #include "mafGUILutSlider.h"
 #include "mafGUIHistogramWidget.h"
+#include "mafGUIDialog.h"
 #include "medOpVolumeResample.h"
 
 #include "vtkMAFSmartPointer.h"
@@ -114,6 +115,7 @@ mafOp(label)
   m_MorphoImage = NULL;
 
   m_Histogram = NULL;
+  m_Dialog = NULL;
 
   m_ComputedMedianFilter = false;
   
@@ -132,6 +134,8 @@ medOpSegmentationRegionGrowingLocalAndGlobalThreshold::~medOpSegmentationRegionG
   {
     mafDEL(m_VolumeInput);
   }
+
+  cppDEL(m_Dialog);
 }
 //----------------------------------------------------------------------------
 mafOp* medOpSegmentationRegionGrowingLocalAndGlobalThreshold::Copy()
@@ -218,6 +222,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
   vtkNEW(m_MorphoImage);
 
   CreateGui();
+  CreateHistogramDialog();
 }
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::MorphologicalMathematics()
@@ -310,6 +315,7 @@ enum REGION_GROWING_ID
   ID_REGION_GROWING,
   ID_MORPHOLOGICAL,
   ID_APPLY_MEDIAN_FILTER,
+  ID_DIALOG_HISTOGRAM,
 };
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
@@ -317,16 +323,18 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
 {
   m_Gui = new mafGUI(this);
 
-  wxBoxSizer *sizer3 = new wxBoxSizer(wxHORIZONTAL);
-  m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(20,200),wxTAB_TRAVERSAL,true);
-  m_Histogram->SetListener(m_Gui);
-  m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
-  vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  hd->Update();
-  m_Histogram->SetData(hd->GetPointData()->GetScalars());
+//   wxBoxSizer *sizer3 = new wxBoxSizer(wxHORIZONTAL);
+//   m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(20,200),wxTAB_TRAVERSAL,true);
+//   m_Histogram->SetListener(m_Gui);
+//   m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
+//   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+//   hd->Update();
+//   m_Histogram->SetData(hd->GetPointData()->GetScalars());
+// 
+//   sizer3->Add(m_Histogram,wxALIGN_CENTER|wxRIGHT);
+//   m_Gui->Add(sizer3,1);
 
-  sizer3->Add(m_Histogram,wxALIGN_CENTER|wxRIGHT);
-  m_Gui->Add(sizer3,1);
+  m_Gui->Button(ID_DIALOG_HISTOGRAM,_("Select points"));
 
   m_Gui->Divider(1);
 
@@ -367,6 +375,28 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   ShowGui();
 }
 //----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialog()
+//----------------------------------------------------------------------------
+{
+  m_Dialog = new mafGUIDialog("Histogram", mafCLOSEWINDOW | mafRESIZABLE);
+
+  m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL,true);
+  m_Histogram->SetListener(m_Gui);
+  m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
+  vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  hd->Update();
+  m_Histogram->SetData(hd->GetPointData()->GetScalars());
+
+  mafGUI *gui = new mafGUI(this);
+  gui->Add(m_Histogram,1);
+  gui->AddGui(m_Histogram->GetGui());
+  gui->FitGui();
+  gui->Update();
+
+  m_Dialog->Add(gui,1);
+  m_Dialog->SetMinSize(wxSize(600,600));
+}
+//----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
@@ -374,6 +404,11 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
   {
     switch(e->GetId())
     {
+    case ID_DIALOG_HISTOGRAM:
+      {
+        m_Dialog->ShowModal();
+      }
+      break;
     case ID_REGION_GROWING:
       {
         RegionGrowing();

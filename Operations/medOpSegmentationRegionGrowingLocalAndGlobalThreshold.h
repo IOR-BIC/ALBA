@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-11-11 09:32:47 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-11-13 14:26:35 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -53,6 +53,7 @@ class mafVMEVolumeGray;
 class mafVMESurface;
 class mafGUILutSlider;
 class mafGUIHistogramWidget;
+class mafGUIDialog;
 class vtkImageData;
 
 /** 
@@ -93,6 +94,9 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   /*virtual*/ void OpStop(int result);
 
+  /** Create and initialize the dialog where the user could see the histogram */
+  void CreateHistogramDialog();
+
   /** Create the operation gui */
   void CreateGui();
 
@@ -113,6 +117,7 @@ protected:
 
   bool m_ComputedMedianFilter;
   mafGUIHistogramWidget *m_Histogram;
+  mafGUIDialog *m_Dialog;
 
   mafVMEVolumeGray *m_VolumeInput; //<<<Input volume
   mafVMEVolumeGray *m_VolumeOutputMorpho; //<<<Output volume after morphological mathematics operation
