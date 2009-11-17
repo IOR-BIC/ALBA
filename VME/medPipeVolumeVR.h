@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeVolumeVR.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-12 16:21:46 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2009-11-17 13:11:08 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -55,8 +55,13 @@ public:
     ID_LAST
   };
 
+  /** Create. */
   virtual void Create(mafSceneNode *n);
+
+  /** Show. */
   void Show(bool show); 
+
+  /** Select. */
   virtual void Select(bool select);  
   
   /** Get color transfer function of the volume. */
@@ -93,7 +98,10 @@ public:
 	/** Set ShadeOff HiRes prop. */
 	void VolumePropertyHighShadeOff(void);
 
+  /** Set resample factor. */
 	void SetResampleFactor(double value);
+
+  /** get resample factor. */
 	double GetResampleFactor();
 
 protected:
