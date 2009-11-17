@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFDOFMatrix.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-25 15:01:56 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-17 09:32:20 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni (perticoni@tecno.ior.it)
   Project:   Multimod Project (http://www.ior.it/multimod/)
 
@@ -102,6 +102,18 @@ DIAGNOSTIC TOOL.
 
 class vtkDoubleArray;
 
+/**
+  class name: vtkMAFDOFMatrix
+  vtkMAFDOFMatrix holds informations on constrains to be applied on an
+actor during interaction. Information for the single dof
+(ie an element of the internal DOFMatrix[3][3]) is stored in 
+the element struct. The single dof can have different states:
+LOCK:       no interaction is allowed  
+FREE:       free movement 
+BOUNDS:     free movement in a given interval
+SNAP_STEP:  snap by a given step
+SNAP_ARRAY: snap on a given array of positions
+*/
 class VTK_vtkMAF_EXPORT vtkMAFDOFMatrix : public vtkObject
 {
   
@@ -142,103 +154,89 @@ public:
    };
    
   
-  /**
-  Construct a vtkMAFDOFMatrix */
+  /**  Construct a vtkMAFDOFMatrix */
   static vtkMAFDOFMatrix *New();
-
+  /** RTTI Macro */
   vtkTypeRevisionMacro(vtkMAFDOFMatrix,vtkObject);
+  /** Print Object Information */
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  /**
-  DeepCopy the source matrix into the target. The target is the object
+  /** DeepCopy the source matrix into the target. The target is the object
   invoking the DeepCopy method*/
   void DeepCopy(vtkMAFDOFMatrix *source); 
     
-  /**
-  All dof matrix element states are set to LOCK, all values of the element
+  /** All dof matrix element states are set to LOCK, all values of the element
   struct are set to 0 and pointers to snap_array are set to NULL.*/
   void Reset();
    
-  /**
-  Set the state of the constrain for the given dof; allowed state are:
+  /** Set the state of the constrain for the given dof; allowed state are:
   LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY.*/
   void SetState(int transformType, int axis, int state);
 
-  /** 
-  Get the state of the constrain for the given dof*/
+  /**  Get the state of the constrain for the given dof*/
   int GetState(int transformType, int axis);
 
-  /**
-  Set the lower bound for bound constrain type for the given dof*/
+  /** Set the lower bound for bound constrain type for the given dof*/
   void SetLowerBound(int transformType, int axis, double lbound);
 
-  /**
-  Get the lower bound for bound constrain type for the given dof*/
+  /** Get the lower bound for bound constrain type for the given dof*/
   double GetLowerBound(int transformType, int axis);
 
-  /**
-  Set the upper bound for bound constrain type for the given dof*/
+  /** Set the upper bound for bound constrain type for the given dof*/
   void SetUpperBound(int transformType, int axis, double ubound);
 
-  /**
-  Get the upper bound for bound constrain type for the given dof*/
+  /** Get the upper bound for bound constrain type for the given dof*/
   double GetUpperBound(int transformType, int axis);
 
-  /** 
-  Set the min value for snap step constrain type for the given dof*/
+  /**  Set the min value for snap step constrain type for the given dof*/
   void SetMin(int transformType, int axis, double min);
       
-  /**      
-  Get the min value for snap step constrain type for the given dof*/
+  /**  Get the min value for snap step constrain type for the given dof*/
   double GetMin(int transformType, int axis);
 
-  /**
-  Set the max value for snap step constrain type for the given dof*/
+  /**Set the max value for snap step constrain type for the given dof*/
   void SetMax(int transformType, int axis, double min);
       
-  /** 
-  Get the max value for snap step constrain type for the given dof*/
+  /** Get the max value for snap step constrain type for the given dof*/
   double GetMax(int transformType, int axis);
     
-  /** 
-  Set the step value for snap step constrain type for the given dof*/
+  /** Set the step value for snap step constrain type for the given dof*/
   void SetStep(int transformType, int axis, double step);
       
-  /**      
-  Get the step value for snap step constrain type for the given dof*/
+  /** Get the step value for snap step constrain type for the given dof*/
   double GetStep(int transformType, int axis);
  
-  /**   
-  Set the array which contains the allowed positions for snap.
+  /** Set the array which contains the allowed positions for snap.
   The array is not copied, only the pointer is stored*/
   void SetArray(int transformType, int axis, vtkDoubleArray *array);
        
-  /**      
-  Get the array which contains the allowed positions for snap.*/
+  /** Get the array which contains the allowed positions for snap.*/
   vtkDoubleArray *GetArray(int transformType, int axis);
 
-  /**
-  Get the number of axis on which movement is allowed (ie unlocked
+  /** Get the number of axis on which movement is allowed (ie unlocked
   axis) for the given transform type (ROTATE, TRANSLATE or SCALE)*/
   int GetDOFNumber(int transformType);
   
-  /**
-  Return constrain axis when there is only one degree of freedom for the
+  /** Return constrain axis when there is only one degree of freedom for the
   given transform type. If there is more than one dof returns -1.*/
   int GetConstrainAxis(int transformType);  
     
-  /**
-  Return the constrain plane ie an integer from the enum {XY= 0, XZ, YZ} 
+  /** Return the constrain plane ie an integer from the enum {XY= 0, XZ, YZ} 
   when there are two degree of freedom for the given transform type. Returns 
   -1 if dof number is different from 2.*/
   int GetConstrainPlane(int transformType);
 
 protected:
+  /** constructor */
   vtkMAFDOFMatrix();
+  /** destructor */
   ~vtkMAFDOFMatrix();
   
-  // The single element of the internal dof matrix.
-  // Holds informations for the different states of the constrain
+  /**
+       struct name :  element
+      The single element of the internal dof matrix.
+      Holds informations for the different states of the constrain
+     */
   typedef struct 
   {
     int state;
@@ -253,15 +251,16 @@ protected:
      vtkDoubleArray *farray;
   } element;   
  
-  // element access
+  /** element access */
   element GetElement(int transformType, int axis)  {return DOFMatrix[transformType][axis];}
 
   // The DOF Matrix
   element DOFMatrix[3][3];
 
 private:
-  
-  vtkMAFDOFMatrix(const vtkMAFDOFMatrix&);  // Not implemented
-  void operator= (const vtkMAFDOFMatrix&);  // Not implemented
+  /** Copy Constructor , not implemented */
+  vtkMAFDOFMatrix(const vtkMAFDOFMatrix&);
+  /** operator =, not implemented */
+  void operator= (const vtkMAFDOFMatrix&);
 };
 #endif

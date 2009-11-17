@@ -3,7 +3,7 @@
   Program:   Visualization Toolkit
   Module:    vtkMAFCellsFilter.h
   Language:  C++
-  RCS:   $Id: vtkMAFCellsFilter.h,v 1.1.2.1 2009-06-16 09:12:31 aqd0 Exp $
+  RCS:   $Id: vtkMAFCellsFilter.h,v 1.1.2.2 2009-11-17 09:32:20 aqd0 Exp $
 
   Copyright (c) Goodwin Lawlor 2004
   All rights reserved.
@@ -29,6 +29,7 @@
 class vtkLookupTable;
 
 /** 
+class name : vtkMAFCellsFilter.
  vtkMAFCellsFilter- superclass for selecting cells.
  
  vtkMAFCellsFilter is a superclass for classes to perform operations on selected cells.
@@ -36,14 +37,15 @@ class vtkLookupTable;
  @sa
  vtkMAFRemoveCellsFilter
 */ 
-
-
 class VTK_vtkMAF_EXPORT vtkMAFCellsFilter : public vtkPolyDataToPolyDataFilter
 {
 
 public:
+  /** create an instance of the object */
   static vtkMAFCellsFilter *New();
+  /** RTTI Macro */
   vtkTypeRevisionMacro(vtkMAFCellsFilter, vtkPolyDataToPolyDataFilter);
+  /** Print Object Information */
   void PrintSelf(ostream& os, vtkIndent indent);
    
  /** Mark a cell */ 
@@ -58,20 +60,28 @@ public:
  /** Undo all the marks made on cells */
  void UndoMarks(){this->InitializeScalars(); this->MarkedCellIdList->Reset(); this->Scalars->Modified();}
 
-  /** Set/Get the marked color... default is red */
+  /** Set the marked color... default is red */
   void SetMarkedColor(double r, double g, double b);
+  /** Set the marked color... default is red */
   void SetMarkedColor(double rgb[3]) {this->SetMarkedColor(rgb[0], rgb[1], rgb[2]);};
+  /** Get the marked color... default is red */
   vtkGetVector3Macro(MarkedColor, double);
 
-  /** Set/Get the umarked color... default is white. You could set this to the same color as the vtkProperty
+  /** Set the umarked color... default is white. You could set this to the same color as the vtkProperty
   and users won't know they are seeing scalars */
   void SetUnmarkedColor(double r, double g, double b);
+/** Set the umarked color... default is white. You could set this to the same color as the vtkProperty
+  and users won't know they are seeing scalars */
   void SetUnmarkedColor(double rgb[3]) {this->SetUnmarkedColor(rgb[0], rgb[1], rgb[2]);};
+/** Get the umarked color... default is white. You could set this to the same color as the vtkProperty
+  and users won't know they are seeing scalars */
   vtkGetVector3Macro(UnmarkedColor, double);
 
-  /** Set/Get the marked opacity... default is 1.0 By setting this to 0.0 you can temporally remove the cells
+  /** Set the marked opacity... default is 1.0 By setting this to 0.0 you can temporally remove the cells
   and then permanently remove them with RemoveMarkedCells */
   void SetMarkedOpacity(double opacity);
+/** Get the marked opacity... default is 1.0 By setting this to 0.0 you can temporally remove the cells
+  and then permanently remove them with RemoveMarkedCells */
   vtkGetMacro(MarkedOpacity, double);
   
   /** Get the number of marked cells */
@@ -82,7 +92,9 @@ public:
 
 
 protected:
+  /** constructor */
   vtkMAFCellsFilter();
+  /** destructor */
   ~vtkMAFCellsFilter();
   
   vtkIdList *CellIdList;
@@ -104,8 +116,10 @@ protected:
   void Execute();
 
 private:
-  vtkMAFCellsFilter(const vtkMAFCellsFilter&);  // Not implemented.
-  void operator=(const vtkMAFCellsFilter&);  // Not implemented.
+  /** Copy Constructor , not implemented.*/
+  vtkMAFCellsFilter(const vtkMAFCellsFilter&);
+  /** operator =, not implemented */
+  void operator=(const vtkMAFCellsFilter&);
 };
 
 #endif

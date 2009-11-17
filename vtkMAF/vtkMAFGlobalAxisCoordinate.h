@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFGlobalAxisCoordinate.h,v $
   Language:  C++
-  Date:      $Date: 2009-02-12 10:53:24 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2009-11-17 09:32:20 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -60,19 +60,23 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkCamera;
 
-//----------------------------------------------------------------------------
+/**
+class name: vtkMAFGlobalAxisCoordinate.
+*/
 class VTK_vtkMAF_EXPORT  vtkMAFGlobalAxisCoordinate : public vtkCoordinate
-//----------------------------------------------------------------------------
 {
 public:
   //vtkTypeRevisionMacro(vtkMAFGlobalAxisCoordinate,vtkCoordinate);
+  /** destructor */
   virtual ~vtkMAFGlobalAxisCoordinate();
-
+  /** create an instance of the object */
   static vtkMAFGlobalAxisCoordinate* New();
 
+  /** used only when the coordinate system is VTK_USERDEFINED  */
   virtual double *GetComputedUserDefinedValue(vtkViewport *viewport);
 
 protected:
+  /** constructor */
   vtkMAFGlobalAxisCoordinate();
 
 private:
@@ -80,8 +84,10 @@ private:
 	vtkRenderer *Renderer;
 	vtkCamera *Camera;
 
-	vtkMAFGlobalAxisCoordinate(const vtkMAFGlobalAxisCoordinate&);  // Not implemented.
-  void operator=(const vtkMAFGlobalAxisCoordinate&);     // Not implemented.
+  /** Copy Constructor , not implemented */
+  vtkMAFGlobalAxisCoordinate(const vtkMAFGlobalAxisCoordinate&);
+  /** operator =, not implemented */
+  void operator=(const vtkMAFGlobalAxisCoordinate&);
 };
 #endif
 

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFLocalAxisCoordinate.h,v $
   Language:  C++
-  Date:      $Date: 2008-08-26 15:04:54 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-11-17 09:32:20 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -55,32 +55,43 @@ POSSIBILITY OF SUCH DAMAGES.
 #include "vtkDataSet.h"
 
 class vtkViewport;
-//----------------------------------------------------------------------------
+
+/**
+class name: vtkMAFLocalAxisCoordinate.
+*/
 class VTK_vtkMAF_EXPORT vtkMAFLocalAxisCoordinate : public vtkCoordinate
-//----------------------------------------------------------------------------
 {
 public:
   //vtkTypeRevisionMacro(vtkMAFLocalAxisCoordinate,vtkCoordinate);
+  /** destructor */
   virtual ~vtkMAFLocalAxisCoordinate();
-
+  /** create an instance of the object */
   static vtkMAFLocalAxisCoordinate* New();
 
+  /** macro Set for DataSet member */
   vtkSetObjectMacro(DataSet,vtkDataSet);
+  /** macro Get for DataSet member */
   vtkGetObjectMacro(DataSet,vtkDataSet);
 
+  /** macro Set for Mactrix member */
   vtkSetObjectMacro(Matrix,vtkMatrix4x4);
+  /** macro Get for Mactrix member */
   vtkGetObjectMacro(Matrix,vtkMatrix4x4);
 
+  /** used only when the coordinate system is VTK_USERDEFINED  */
   virtual double *GetComputedUserDefinedValue(vtkViewport *viewport);
 
 protected:
+  /** constructor */
   vtkMAFLocalAxisCoordinate();
 
 private:
   vtkDataSet *DataSet;
   vtkMatrix4x4 *Matrix;
-	
-	vtkMAFLocalAxisCoordinate(const vtkMAFLocalAxisCoordinate&);  // Not implemented.
-  void operator=(const vtkMAFLocalAxisCoordinate&);     // Not implemented.
+  
+  /** Copy Constructor , not implemented */
+  vtkMAFLocalAxisCoordinate(const vtkMAFLocalAxisCoordinate&);
+  /** operator =, not implemented */
+  void operator=(const vtkMAFLocalAxisCoordinate&);
 };
 #endif

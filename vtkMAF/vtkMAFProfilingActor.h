@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFProfilingActor.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-29 11:17:14 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-17 09:32:20 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -31,28 +31,35 @@ class vtkTimerLog;
 class vtkMapper;
 
 /**
+class name: vtkMAFProfilingActor
 an actor displaying the frame per second value and the time elapsed between
 last render and previous render.
 */
-
-//-----------------------------------------------------------------------------
 class VTK_vtkMAF_EXPORT vtkMAFProfilingActor : public vtkActor2D
-//-----------------------------------------------------------------------------
 {
  public:
+  /** RTTI Macro */
   vtkTypeRevisionMacro(vtkMAFProfilingActor,vtkActor2D);
+  /** Print Object Information */
   void PrintSelf(ostream& os, vtkIndent indent);
+  /** create an instance of the object */
   static	vtkMAFProfilingActor *New();
   
+  /** Draw the object to the screen */
   int	 RenderOverlay(vtkViewport *viewport);
-  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
+  /** Draw the object to the screen */
+  int	 RenderOpaqueGeometry(vtkViewport *viewport);
+  /** Draw the object to the screen */
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;}
  
 protected:
+    /** constructor */
 					vtkMAFProfilingActor();
+    /** destructor */
 					~vtkMAFProfilingActor();
-	//methods
-	void			FPSCreate();	
+	/** Create FPS Actor */
+	void			FPSCreate();
+    /** Update FPS Actor */
 	void			FPSUpdate(vtkRenderer *ren);
    //variables
   vtkTextActor *TextFPS;
@@ -63,10 +70,12 @@ protected:
 	char TextBuff[128];
 	
 private:
-  // hide the two paraOrientator Render() method from the user and the compiler.
+  /** hide the two paraOrientator Render() method from the user and the compiler. */
   virtual void Render(vtkRenderer *, vtkMapper *) {};
 private:
-  vtkMAFProfilingActor(const vtkMAFProfilingActor&);  	// Not implemented.
+  /** Copy Constructor , not implemented */
+  vtkMAFProfilingActor(const vtkMAFProfilingActor&);
+  /** operator =, not implemented */
   void operator=(const vtkMAFProfilingActor&);  // Not implemented.
 };
 #endif

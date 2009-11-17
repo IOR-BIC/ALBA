@@ -3,8 +3,8 @@
 Program:   Multimod Application framework RELOADED
 Module:    $RCSfile: vtkMAFContourVolumeMapperGPU.h,v $
 Language:  C++
-Date:      $Date: 2009-07-16 14:19:55 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-17 09:32:20 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alexander Savenko, Nigel McFarlane, Baoquan Liu (GPU)
 
 ================================================================================
@@ -62,6 +62,9 @@ Then Render()
 #endif
 
 #include "vtkMAFConfigure.h"
+/**
+namespace name: Baoquan
+*/
 namespace Baoquan
 {
 
@@ -73,8 +76,9 @@ namespace Baoquan
   class ListOfPolyline2D;
 
 
-  //------------------------------------------------------------------------------
-  // namespace for vtkMAFContourVolumeMapperGPU and related classes
+  /**
+        namespace name: vtkMAFContourVolumeMapperGPU
+    */
   //------------------------------------------------------------------------------
   namespace vtkMAFContourVolumeMapperNamespace 
   {
@@ -113,12 +117,16 @@ namespace Baoquan
   };
 
 
-  // container type for sorting depth values
+/*
+Class Name: Idepth.
+  Container type for sorting depth values
+*/
   class Idepth
   {
   public:
     float depth ;
     int index ;
+    /** redefine < operator in order to check depth variable. */
     bool operator < (const Idepth &b) const {return this->depth < b.depth ;}
   };
 
@@ -126,10 +134,9 @@ namespace Baoquan
 
   using namespace vtkMAFContourVolumeMapperNamespace ;
 
-
-  //------------------------------------------------------------------------------
-  // class vtkMAFContourVolumeMapperGPU
-  //------------------------------------------------------------------------------
+/**
+class name: vtkMAFContourVolumeMapperGPU.
+*/
   class VTK_vtkMAF_EXPORT vtkMAFContourVolumeMapperGPU : public vtkVolumeMapper 
   {
   public:
@@ -199,25 +206,33 @@ namespace Baoquan
 
     GLint m_old_drawbuffer;
 
-
+    /** create GPU context */
     bool CreateGPU_Context();
+    /** Delete Texture */
     void DeleteTexture();
+    /** Create Textures for Isosurface */
     int CreateTexturesForIsosurface(const void *dataPointer);
+    /** build  Histopyramid and slice sorting */
     int buildHistopyramid_SliceSorting();
+    /** Render isosurface on GPU */
     template <typename DataType> void  RenderIsoSurfaceOnGPU(vtkRenderer *renderer, vtkVolume *volume, const DataType *dataPointer);
-
+    /** pad memory */
     template <typename DataType> void PaddingMem( DataType *dataPointer);
     void * pPading;
 
+    /** initialize isosurface render */
     void InitializeIsosurfaceRender(bool setup, vtkRenderer *renderer = NULL, vtkVolume *volume = NULL);
 
 
 
-    /** Set/get whether GPU should be used for visualization. 
+    /** Set whether GPU should be used for visualization. 
     If GPU processing is enabled and it is available for the given input/output on the 
     current computer platform, it will be used instead of CPU. GPU processing is enabled by the default.  */
     //vtkSetMacro( GPUEnabled, int );
     virtual void SetGPUEnabled(int newMode);
+/** Get whether GPU should be used for visualization. 
+    If GPU processing is enabled and it is available for the given input/output on the 
+    current computer platform, it will be used instead of CPU. GPU processing is enabled by the default.  */
     vtkGetMacro( GPUEnabled, int );
 
     int m_bGPU_isosurfaceSupported;//test to see if GPU_isosurface is supported or not on current hardware
@@ -225,17 +240,15 @@ namespace Baoquan
     //int bCreated_texture;
 
     //end lbq
-
-
-
-
-
+    /** create an instance of the object */
     static vtkMAFContourVolumeMapperGPU *New();
+    /** RTTI Macro */
     vtkTypeRevisionMacro(vtkMAFContourVolumeMapperGPU, vtkVolumeMapper);
     
 
     /** The input should be either vtkImageData or vtkRectilinearGrid */
     void  SetInput(vtkDataSet *input);
+    /** Get current input*/
     vtkDataSet*  GetInput() { return (vtkDataSet*)vtkVolumeMapper::GetInput(); }
 
     /** 
@@ -244,26 +257,35 @@ namespace Baoquan
     Else calls PrepareAccelerationDataTemplate() and RenderMCubes() */
     void Render(vtkRenderer *ren, vtkVolume *vol);
 
-    /** Enable or disable multi-resolution feature. By default it is enabled  */
-    vtkGetMacro(AutoLODRender, int);    
+    /** get multi-resolution feature. By default it is enabled  */
+    vtkGetMacro(AutoLODRender, int);
+    /** set multi-resolution feature. By default it is enabled  */
     void SetAutoLODRender(int val) { this->AutoLODRender = val; }
+    /** bool macro,Enable or disable multi-resolution feature. By default it is enabled  */
     vtkBooleanMacro(AutoLODRender, int);
 
-    /** Enable or disable multi-resolution feature. By default it is enabled  */
-    vtkGetMacro(AutoLODCreate, int);    
+    /** get multi-resolution feature. By default it is enabled  */
+    vtkGetMacro(AutoLODCreate, int);
+    /** set multi-resolution feature. By default it is enabled  */ 
     void SetAutoLODCreate(int val) { this->AutoLODCreate = val; }
+    /** bool macro, Enable or disable multi-resolution feature. By default it is enabled  */
     vtkBooleanMacro(AutoLODCreate, int);
 
-    /** Enable or disables optimization of produced polydata by eliminating 
+    /** get optimization of produced polydata by eliminating 
     "non-visible" enclosed surfaces from the output.*/
-    vtkGetMacro(EnableContourAnalysis, int);    
+    vtkGetMacro(EnableContourAnalysis, int);
+    /** set optimization of produced polydata by eliminating 
+    "non-visible" enclosed surfaces from the output.*/   
     void SetEnableContourAnalysis(int val) { this->EnableContourAnalysis = val; }
+    /** bool macro, Enable or disables optimization of produced polydata by eliminating 
+    "non-visible" enclosed surfaces from the output.*/
     vtkBooleanMacro(EnableContourAnalysis, int);
 
-    /** Set/get the threshold for Marching cubes algorithm */
-    vtkGetMacro(ContourValue, float);    
+    /** get the threshold for Marching cubes algorithm */
+    vtkGetMacro(ContourValue, float);   
+    /** set the threshold for Marching cubes algorithm */ 
     void SetContourValue(float val) { if (this->ContourValue != val) { this->ContourValue = val; this->CacheCreated = false; } }
-
+    /** Update Mapper*/
     void Update();
 
     /** Checks if the input data is supported */
@@ -291,7 +313,7 @@ namespace Baoquan
 
     /** To set the value of transparency */
     void SetAlpha(double alpha){m_Alpha=alpha;};
-
+    /** set maximum value of sclar*/
     void SetMaxScalar(double scalar){m_MAXScalar=scalar;};
 
     /** Return the index increments in xy and z given the lod index
@@ -301,7 +323,9 @@ namespace Baoquan
     void CalculateLodIncrements(int lod, int *lodxy, int *lodz) const ;
 
   protected:
+    /** constructor */
     vtkMAFContourVolumeMapperGPU();
+    /** destructor */
     ~vtkMAFContourVolumeMapperGPU();
 
     /** Marching cubes algorithm - calculate triangles, cache and render */
@@ -328,7 +352,9 @@ namespace Baoquan
     Divides volume into 8x8x8 blocks and calculates the min and max of each block. */
     template <typename DataType> bool PrepareAccelerationDataTemplate(const DataType *dataPointer);
 
+    /** prepare contours */
     template <typename DataType> void PrepareContoursTemplate(const int slice, const DataType *imageData);
+    /** call prepare contours template */
     void PrepareContours(const int slice, const void *imageData, ListOfPolyline2D&);
 
     /** Initialize OpenGL rendering */
@@ -336,11 +362,12 @@ namespace Baoquan
 
     /** OpenGL code to render the triangles */
     void DrawCache(vtkRenderer *renderer, vtkVolume *volume, int lod);
-
+    /** enable/disable clipping planes */
     void EnableClipPlanes(bool enable);
+    /** Return datatype of input scalars */
+    int  GetDataType();
 
-    int  GetDataType();    ///< Return datatype of input scalars
-
+    /** Delete allocated data */
     void ReleaseData();
 
 
@@ -403,12 +430,15 @@ namespace Baoquan
 
     vtkTimeStamp   BuildTime;
 
-    // statistics
+    /** Get Statistic: Percentage of Skipped Voxels */
     int            GetPercentageOfSkippedVoxels() const { return 100.f * this->VoxelsSkipped / (this->VoxelsRendered + this->VoxelsSkipped); }
+    /** Get Statistic: Percentage of Skipped Blocks */
     float          GetPercentageOfSkippedBlocks() const { return this->SkippedVoxelBlocks; }
 
   private:
-    vtkMAFContourVolumeMapperGPU(const vtkMAFContourVolumeMapperGPU&);  // Not implemented.
+    /** Copy Constructor , not implemented.*/
+    vtkMAFContourVolumeMapperGPU(const vtkMAFContourVolumeMapperGPU&);
+    /** operator =, not implemented. */
     void operator=(const vtkMAFContourVolumeMapperGPU&);          // Not implemented.
 
     // min-max block structure
@@ -466,17 +496,21 @@ namespace Baoquan
   };
 
 
-  //------------------------------------------------------------------------------
-  // class Polyline2D
-  // these classes are used for optimizing the surface by analyzing 2D contours
-  //------------------------------------------------------------------------------
+/**
+class name: Polyline2D
+these classes are used for optimizing the surface by analyzing 2D contours
+*/
   class Polyline2D 
   {
   public:
-    /// 2D point with operators for ==, [], const [] and ()
+     /**
+                struct name:  Point
+               2D point with operators for ==, [], const [] and ()
+            */
     struct Point 
     {
       short xy[2];
+      /** redefine operator== */
       bool operator ==(const Point& operand) const 
       {
 #ifdef WIN32
@@ -485,8 +519,11 @@ namespace Baoquan
         return xy[0] == operand.xy[0] && xy[1] == operand.xy[1];
 #endif
       }
+      /** redefine operator[] */
       short& operator[](int index) { return xy[index]; }
+      /** redefine operator[] const*/
       const short& operator[](int index) const { return xy[index]; }
+      /** redefine operator() */
       const short* operator()() const { return this->xy; }
     };
 
@@ -502,30 +539,43 @@ namespace Baoquan
     int   closestPolyline[2];
 
   public:
+    /** constructor */
     Polyline2D(const Point *line);
+    /** destructor */
     ~Polyline2D() { if (this->vertices != this->verticesBuffer) delete [] vertices; }
 
+    /** get length*/
     int  Length() const   { return this->end -this->start + 1; }
+    /** check if polyline is closed  */
     bool IsClosed() const { return (this->vertices[this->start] == this->vertices[this->end]); }
 
-    // modifying polyline
+    /** Add point and create next line*/
     bool AddNextLine(const Point *line);
+    /** merge two polylines */
     bool Merge(Polyline2D &polyline);
+    /** close polyline */
     void Close();
 
+    /** update current bounding box */
     void UpdateBoundingBox() const;
-
+    
+    /** check if one polyline is inside another  */
     bool IsInsideOf(const Polyline2D *polyline) const;
+    /** find the closest polyline */
     void FindClosestPolyline(int index, int numOfPolylines, Polyline2D* polylines);
+    /** compare polylines and find the best match */
     int  FindSubPolyline(int numOfPolylines, Polyline2D* polylines, float &minDistance);
+    /** create two polylines splitting the original*/
     bool SplitPolyline(Polyline2D& subpoly, Polyline2D& newpoly);
 
+    /** if vertices are different, copy all members from parameter polyline */
     void Move(Polyline2D &polyline);
 
   protected:
     int size;
-
+    /** allocation of polyline vertices*/
     void Allocate(int newsize);
+    /** reallocation of polyline vertices*/
     void Reallocate();
 
 #define VERTICES_BUFFER_SIZE 64

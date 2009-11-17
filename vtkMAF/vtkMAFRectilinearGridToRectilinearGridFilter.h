@@ -53,22 +53,32 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMAFConfigure.h"
 #include "vtkRectilinearGridSource.h"
 #include "vtkRectilinearGrid.h"
-
+/**
+class name: vtkMAFRectilinearGridToRectilinearGridFilter
+ vtkMAFRectilinearGridToRectilinearGridFilter is a filter whose subclasses take as
+ input rectilinear grid datasets and generate polygonal data on output.
+*/
 class VTK_vtkMAF_EXPORT vtkMAFRectilinearGridToRectilinearGridFilter : public vtkRectilinearGridSource
 {
 public:
+  /** create an instance of the object */
   static vtkMAFRectilinearGridToRectilinearGridFilter *New();
+  /** RTTI Macro */
   vtkTypeRevisionMacro(vtkMAFRectilinearGridToRectilinearGridFilter,vtkRectilinearGridSource);
 
-  /**
-  Set / get the input data or filter.*/
+  /**  Set  the input data or filter.*/
   virtual void SetInput(vtkRectilinearGrid *input);
+  /**  Get  the input data or filter.*/
   vtkRectilinearGrid *GetInput();
 
 protected:
+  /** constructor */
   vtkMAFRectilinearGridToRectilinearGridFilter() {this->NumberOfRequiredInputs = 1;};
-  ~vtkMAFRectilinearGridToRectilinearGridFilter() {this->SetInput(NULL);}; 
+  /** destructor */
+  ~vtkMAFRectilinearGridToRectilinearGridFilter() {this->SetInput(NULL);};
+  /** operator =, not implemented */
   void operator=(const vtkMAFRectilinearGridToRectilinearGridFilter&) {};
+  /** Copy Constructor , not implemented */
   vtkMAFRectilinearGridToRectilinearGridFilter(const vtkMAFRectilinearGridToRectilinearGridFilter&) {};
 
 };

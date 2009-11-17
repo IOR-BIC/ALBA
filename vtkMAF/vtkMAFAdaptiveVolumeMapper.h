@@ -67,7 +67,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GL/gl.h>
 #endif
 
-// constants
+/**
+name space name: namespace vtkMAFAdaptiveVolumeMapperNamespace
+*/
 namespace vtkMAFAdaptiveVolumeMapperNamespace 
 {
   const int VoxelBlockSizeLog = 3;
@@ -87,10 +89,13 @@ namespace vtkMAFAdaptiveVolumeMapperNamespace
 //------------------------------------------------------------------------------
 class vtkMatrix4x4;
 class vtkVolumeProperty;
-
+/**
+class name: vtkMAFAdaptiveVolumeMapper.
+*/
 class VTK_vtkMAF_EXPORT vtkMAFAdaptiveVolumeMapper : public vtkVolumeMapper 
 {
 public:
+  /** create an instance of the object */
   static vtkMAFAdaptiveVolumeMapper *New();
   
   /** Input should be either structured points or rectilinear grid*/
@@ -101,15 +106,19 @@ public:
   call RenderServer that distributes render portions between rendering threads.*/
   void Render(vtkRenderer *ren, vtkVolume *vol);
   
-  /** Allow or disable optimizations that can affect picture quality*/
-  vtkGetMacro(EnableAutoLOD, int);    
+  /** Get optimizations that can affect picture quality*/
+  vtkGetMacro(EnableAutoLOD, int);
+  /** Set optimizations that can affect picture quality*/   
   void SetEnableAutoLOD(int val) { this->EnableAutoLOD = val; }
+  /** On/Off MAcro for optimizations that can affect picture quality*/   
   vtkBooleanMacro(EnableAutoLOD, int)
 
-  /** Allow or disable optimizations that can affect picture quality*/
+  /** Retrieve interpolation of the volume mapper */
   static bool GetInterpolation() { return vtkMAFAdaptiveVolumeMapper::Interpolation; }
+  /** Set interpolation of the volume mapper */
   static void SetInterpolation(bool val) { vtkMAFAdaptiveVolumeMapper::Interpolation = val; }
 
+  /** Update the mapper */
   void Update();
 
   /** Check weather the input data can be rendered. The renderer supports regular and rectilinear 
@@ -118,11 +127,15 @@ public:
 
   /** get range of the input data*/
   const int   *GetDataRange();
+  /** get range of the gradient*/
   const double *GetGradientRange();
 
+  /**  Pick object  */
   bool  Pick(int x, int y, vtkRenderer *renderer, vtkVolume *volume, double opacityThreshold = 0.05f);
 protected:
+  /** constructor */
   vtkMAFAdaptiveVolumeMapper();
+  /** destructor */
   ~vtkMAFAdaptiveVolumeMapper();
 
   /**
@@ -131,9 +144,12 @@ protected:
   performing ray casting with sub-sampling. When rendering has finished the image is copied to frame buffer
   by DrawFrameBuffer method.*/
   void RenderServer(vtkRenderer *ren, vtkVolume *vol);
+  /** RenderRegion performs Actual rendering*/
   void RenderRegion(const int viewportBBox[4]);
+  /**  When rendering has finished the image is copied to frame buffer  by this method*/
   void DrawFrameBuffer();
   
+  /** Used by Pick in order to trace ray */
   template<typename DataType> void TraceRay(const double vxyz[3], unsigned char pixel[4], const DataType *dataPointer);
 
   /** Execute all initialization routines.*/
@@ -142,6 +158,7 @@ protected:
   /** This method creates acceleration structures, defines volume-specific variables such as DataBounds
   and calculate gradients.*/
   virtual bool PrepareVolumeForRendering();
+  /** create acceleration structures and compute gradients */
   template <typename DataType> void PrepareMinMaxDataTemplate(const DataType *dataPointer);
 
   /** Sample the transfer function into array*/
@@ -152,6 +169,7 @@ protected:
 
   /** Compute Level-of-detail for each block. Transparent blocks are assigned lowest LOD, blocks with high gradients are assigned high LOD, etc.*/
   virtual void PrepareBlockLOD();
+  /** analyze the blocks and set their LOD */
   template <typename DataType> void PrepareBlockLODTemplate(const DataType *dataPointer);
 
   /** Draw all non-transparent blocks to stencil buffer. This buffer is than used to skip tracing rays that does not hit visible cells.*/
@@ -163,17 +181,23 @@ protected:
   /** Call this method to make cached data invalid. This does not affect volume-related caches (min-max blocks, etc).*/
   virtual void ClearCaches() { this->ViewportAndTransformationChecksum = 0; }
   
-  /** Transformation-related routines*/
+  /** Transformation-related routine*/
   bool IsDataInViewport(double multiplier) const;
+  /** Transformation-related routine*/
   bool TransformBlockToViewportCoord(int x, int y, int z, double minMaxViewportCoordinates[6]) const;
+  /** Transformation-related routine*/
   bool TransformBlockToViewportCoord(const double blockDims[6], double minMaxViewportCoordinates[6]) const;
+  /** Transformation-related routine*/
   double *TransformPointByTransformMatrix(const double xyz[3], double xyzCamera[3]) const;
+  /** Transformation-related routine*/
   int   CalculateViewportAndTransformationChecksum(vtkRenderer *renderer, vtkVolume *volume) const;
+  /** Transformation-related routine*/
   double CalculateRay(const double vxyz[3], double ray[3], double xyz[3], double dxyz[3]);
 
   /** This method can be used for debugging or special purposes*/
   void DrawBlock(int blockid, bool wireframe); 
 
+  /** Get the amount of time this renderer is allowed to spend rendering its scene  */
   static double GetAllocatedRenderTime(vtkRenderer *renderer);
 
   /** Get data type id (VTK_CHAR, VTK_SHORT, etc).*/
@@ -307,6 +331,9 @@ protected:
 
   // lighting
   int   NumOfLights;
+  /**
+    struct name : LightStructure
+    */
   struct LightStructure 
   {
     // type
@@ -332,11 +359,13 @@ protected:
   vtkCriticalSection    *RenderingQueueCS;
   vtkCriticalSection    *ThreadLockCS;
 
+  /** Render Process handling multithread */
   static VTK_THREAD_RETURN_TYPE RenderProcess(void *pThreadInfoStruct);
 
 private:
-  // dummy
-  vtkMAFAdaptiveVolumeMapper(const vtkMAFAdaptiveVolumeMapper&);  // Not implemented.
-  void operator=(const vtkMAFAdaptiveVolumeMapper&);  // Not implemented.
+  /** Copy Constructor , not implemented.*/
+  vtkMAFAdaptiveVolumeMapper(const vtkMAFAdaptiveVolumeMapper&);
+  /** operator =, not implemented */
+  void operator=(const vtkMAFAdaptiveVolumeMapper&);
 };
 #endif

@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFFixedCutter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-11-17 09:32:20 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -51,22 +51,30 @@ POSSIBILITY OF SUCH DAMAGES.
 
 #include "vtkMAFConfigure.h"
 #include "vtkCutter.h"
-//----------------------------------------------------------------------------
+/**
+class name:  vtkMAFFixedCutter
+specialization of vtkCutter in which after execution if the number of points is zero, it will added one point
+that is the center of the input.
+*/
 class VTK_vtkMAF_EXPORT vtkMAFFixedCutter : public vtkCutter
-//----------------------------------------------------------------------------
 {
 public:
   //vtkTypeRevisionMacro(vtkMAFFixedCutter,vtkCutter);
-
+  /** constructor */
            vtkMAFFixedCutter();
+  /** destructor */
   virtual ~vtkMAFFixedCutter();
+  /** create an instance of the object */
   static vtkMAFFixedCutter* New();
 
 protected:
+  /** reimplement execute fixing the algorithm when the number of points of the cutter output is zero.*/
   void Execute();
 
 private:
-	vtkMAFFixedCutter(const vtkMAFFixedCutter&);  // Not implemented.
-  void operator=(const vtkMAFFixedCutter&);  // Not implemented.
+    /** Copy Constructor , not implemented */
+	vtkMAFFixedCutter(const vtkMAFFixedCutter&);
+  /** operator =, not implemented */
+  void operator=(const vtkMAFFixedCutter&);
 };
 #endif

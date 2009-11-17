@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFDistanceFilter.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-11-17 09:32:20 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Roberto Gori (Cineca), Alexander Savenko (Luton University)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -64,82 +64,104 @@ POSSIBILITY OF SUCH DAMAGES.
 
 #include "vtkMAFConfigure.h"
 
+/**
+Class Name:vtkMAFDistanceFilter.
+vtkMAFDistanceFilter is a filter that computes distance vectors
+at specified point positions from isosurfaces. The filter has two inputs:
+the Input and Source. The Input geometric structure is passed through the
+filter. The vector distances are computed along normals at the Input point positions
+from isosurfaces of defined value obtained by interpolating into the source data using a search step. 
+For example, we can compute distances on a geometry
+(specified as Input) from an isosurface in a volume (Source).
+*/
 class VTK_vtkMAF_EXPORT vtkMAFDistanceFilter : public vtkDataSetToDataSetFilter {
   public:
+    /** create an instance of the object */
     static vtkMAFDistanceFilter *New();
+    /** RTTI Macro */
     vtkTypeRevisionMacro(vtkMAFDistanceFilter, vtkDataSetToDataSetFilter);
     
-    /**
-    Specify the point locations used to Distance input. Any geometry
-    can be used.*/
+    /**   Specify the point locations used to Distance input. Any geometry  can be used.*/
     void SetSource(vtkDataSet *data);
+    /** Retireve the Source pointer */
     vtkDataSet *GetSource();
     
-    /**
-    Specify the transformation matrix that should be applied to input points prior to rendering*/
+    /**   Set Macro, Specify the transformation matrix that should be applied to input points prior to rendering*/
     vtkSetObjectMacro(InputMatrix, vtkMatrix4x4);
+    /**  Get Macro,Specify the transformation matrix that should be applied to input points prior to rendering*/
     vtkGetObjectMacro(InputMatrix, vtkMatrix4x4);
 
-    /**
-    Specify the transformation that should be applied to input points prior to rendering*/
+    /**  Set Macro, Specify the transformation matrix that should be applied to input points prior to rendering*/
     vtkSetObjectMacro(InputTransform, vtkTransform);
+    /**  Get Macro,Specify the transformation matrix that should be applied to input points prior to rendering*/
     vtkGetObjectMacro(InputTransform, vtkTransform);
 
-    /**
-    Set/Get an isosurface value  */
+    /**  Set an isosurface value  */
     vtkSetMacro(Threshold,float);
+    /**  Get an isosurface value  */
     vtkGetMacro(Threshold,float);
     
-    /**
-    Set/Get maximum traverse distance. If it is set to VTK_FLOAT_MAX each ray will be traversed unitl it leaves the bounding box of the volume */
+    /**  Set maximum traverse distance. If it is set to VTK_FLOAT_MAX each ray will be traversed unitl it leaves the bounding box of the volume */
     vtkSetMacro(MaxDistance,float);
+    /**  Set maximum traverse distance. If it is set to VTK_FLOAT_MAX each ray will be traversed unitl it leaves the bounding box of the volume */
     vtkGetMacro(MaxDistance,float);
     
-    /**
-    Set/Get the density for outside points. The default is VTK_FLOAT_MIN*/
+    /** Set the density for outside points. The default is VTK_FLOAT_MIN*/
     vtkSetMacro(OutOfBoundsDensity,float);
+    /** Get the density for outside points. The default is VTK_FLOAT_MIN*/
     vtkGetMacro(OutOfBoundsDensity,float);
     
 #define VTK_SCALAR 1
 #define VTK_VECTOR 2
     
-    /**
-    Control the distance mode. If the filter is in density mode than this option is ignored.*/
+    /**SetClamp macro, Control the distance mode. If the filter is in density mode than this option is ignored.*/
     vtkSetClampMacro(DistanceMode, int, VTK_SCALAR, VTK_VECTOR);
+    /**Get macro, Control the distance mode. If the filter is in density mode than this option is ignored.*/
     vtkGetMacro(DistanceMode, int);
+    /** set distance mode to scalar type */
     void SetDistanceModeToScalar() { this->SetDistanceMode(VTK_SCALAR); };
+    /** set distance mode to vector type */
     void SetDistanceModeToVector() { this->SetDistanceMode(VTK_VECTOR); };
+    /** get distance mode as string */
     char *GetDistanceModeAsString() const { if (this->DistanceMode == VTK_SCALAR) return "Scalar"; else return "Vector"; }
 
 #define VTK_DISTANCE_MODE 1
 #define VTK_DENSITY_MODE  2
 
-    /**
-    Switch between density and distance modes (Distance is the default one)*/
+    /**SetClamp macro,   Switch between density and distance modes (Distance is the default one)*/
     vtkSetClampMacro(FilterMode, int, VTK_DISTANCE_MODE, VTK_DENSITY_MODE);
+    /**Getmacro,   Switch between density and distance modes (Distance is the default one)*/
     vtkGetMacro(FilterMode, int);
+    /** set filter mode to distance */
     void SetFilterModeToDistance() { this->SetFilterMode(VTK_DISTANCE_MODE); };
+    /** set filter mode to density */
     void SetFilterModeToDensity()  { this->SetFilterMode(VTK_DENSITY_MODE); };
+    /** get filter mode as string*/
     char *GetFilterModeAsString() const { if (this->FilterMode == VTK_DISTANCE_MODE) return "Distance"; else return "Density"; }
 
   protected:
+    /** constructor */
     vtkMAFDistanceFilter();
+    /** destructor */
     ~vtkMAFDistanceFilter();
 
+    /** get modified time*/
     unsigned long int GetMTime();
 
+    /** execute information*/
     void ExecuteInformation();
+    /** execute data*/
     void ExecuteData(vtkDataObject *output);
+    /** compute and update extents */
     void ComputeInputUpdateExtents(vtkDataObject *output);
 
-    /**
-    Prepare special data fast traversing in the volume*/
+    /**  Prepare special data fast traversing in the volume*/
     void PrepareVolume();
 
-    /**
-    This is the main function. It traces a ray from a given point until the ray hits the voxel that exceeds Threshold 
+    /**  This is the main function. It traces a ray from a given point until the ray hits the voxel that exceeds Threshold 
     or the traversed distance exceeds MaxDistance values.*/
     template<typename DataType> double TraceRay(const double origin[3], const double ray[3], const DataType *dataPointer);
+    /** find density in specific point */
     template<typename DataType> double FindDensity(const double point[3], const DataType *dataPointer);
 
     // parameters
@@ -165,8 +187,10 @@ class VTK_vtkMAF_EXPORT vtkMAFDistanceFilter : public vtkDataSetToDataSetFilter 
     float          UniformToRectGridMultiplier[3];
   
   private:
-    vtkMAFDistanceFilter(const vtkMAFDistanceFilter&); // not implemented
-    void operator=(const vtkMAFDistanceFilter&);    // not implemented
+    /** Copy Constructor , not implemented */
+    vtkMAFDistanceFilter(const vtkMAFDistanceFilter&);
+    /** operator =, not implemented */
+    void operator=(const vtkMAFDistanceFilter&);
   };
 
 #endif
