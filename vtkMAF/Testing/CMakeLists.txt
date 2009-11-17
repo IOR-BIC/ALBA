@@ -163,3 +163,12 @@ ADD_TEST(vtkMAFRulerActor2DTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFRulerActor2DTest
 IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFRulerActor2DTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
+
+############ vtkMAFSimpleRulerActor2DTest
+ADD_EXECUTABLE(vtkMAFSimpleRulerActor2DTest vtkMAFSimpleRulerActor2DTest.h vtkMAFSimpleRulerActor2DTest.cpp)
+ADD_TEST(vtkMAFSimpleRulerActor2DTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFSimpleRulerActor2DTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFSimpleRulerActor2DTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+
