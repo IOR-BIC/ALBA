@@ -30,6 +30,8 @@ ADD_EXECUTABLE(vtkMEDImageUnsharpFilterTest vtkMEDImageUnsharpFilterTest.h vtkME
 ADD_TEST(vtkMEDImageUnsharpFilterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDImageUnsharpFilterTest)
 ADD_EXECUTABLE(vtkMEDRegionGrowingLocalGlobalThresholdTest vtkMEDRegionGrowingLocalGlobalThresholdTest.h vtkMEDRegionGrowingLocalGlobalThresholdTest.cpp)
 ADD_TEST(vtkMEDRegionGrowingLocalGlobalThresholdTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDRegionGrowingLocalGlobalThresholdTest)
+ADD_EXECUTABLE(vtkImageUnPackerTest vtkImageUnPackerTest.h vtkImageUnPackerTest.cpp)
+ADD_TEST(vtkImageUnPackerTest ${EXECUTABLE_OUTPUT_PATH}/vtkImageUnPackerTest)
 
 
 
