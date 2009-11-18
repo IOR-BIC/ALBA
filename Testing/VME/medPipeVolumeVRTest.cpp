@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeVRTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-17 13:12:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-18 14:04:52 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2008
@@ -128,7 +128,7 @@ void medPipeVolumeVRTest::TestPipeExecution()
   CPPUNIT_ASSERT(volumeActor != NULL);
 
   m_RenderWindow->Render();
-  mafSleep(800);
+  mafSleep(5000);
   CompareImages(0);
   
   delete pipeVolume;
