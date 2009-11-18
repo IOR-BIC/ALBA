@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-10-07 09:55:06 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2009-11-18 17:01:26 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -427,131 +427,131 @@ protected:
 		double *versorY, double *versorZ, int nControl);
 
 	void AvoidWrapping(double *local_start, double *local_end);
-	void eventWraped(mafEvent *e);
+	void EventWraped(mafEvent *e);
 
 	//-------------------new functions begin------------------
-	void dispatch();
-	int prepareData(int wrappedFlag,double *local_start,double *local_end,double *local_wrapped_center, vtkOBBTree *locator);
-	bool prepareData2();
-	void singleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator);
-	void getTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2);
-	double detValue(double *col1,double *col2,double *col3);
-	void doubleWrap(double *local_start,double *local_end,double *local_wrapped_center1,double *local_wrapped_center2,vtkOBBTree *locator1,vtkOBBTree *locator2,vtkTransformPolyDataFilter *transformFirstData);
-	bool getAcoordinateInLocal(double *Ap,double *Ap2,double *olCoord,double R,double angle);
-	void getUVWT(double *Ap,double *oCoord,double *iCoord,double & u,double & v,double & w,double & t);
-	bool getBcoordinate(double *Ap,double *oCoord,double *iCoord,double *mCoord,double Rm,double R,double *bCoord1,double *bCoord2);
-	bool getBcoordinateUpdate(double *cCoord ,double *bCoord1,double *bCoord2);
-	bool getCcoordinate(double *cCoord1,double *cCoord2);
-	void getTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat);
-	void getAngleAandB(double & cosA,double & sinA,double & cosB,double & sinB);
-	double getPi();
-	void getGlobalSphereCenter(double *sphCoord);
-	void getGlobalCylinderCenter(double *cylCoord);
-	void getGlobalCylinderCenter(double *cylCoord,int objIdx);
-	double goldenSectionSearch(double a,double b,double x,double accuracy);
+	void Dispatch();
+	int PrepareData(int wrappedFlag,double *local_start,double *local_end,double *local_wrapped_center, vtkOBBTree *locator);
+	bool PrepareData2();
+	void SingleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator);
+	void GetTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2);
+	double DetValue(double *col1,double *col2,double *col3);
+	void DoubleWrap(double *local_start,double *local_end,double *local_wrapped_center1,double *local_wrapped_center2,vtkOBBTree *locator1,vtkOBBTree *locator2,vtkTransformPolyDataFilter *transformFirstData);
+	bool GetAcoordinateInLocal(double *Ap,double *Ap2,double *olCoord,double R,double angle);
+	void GetUVWT(double *Ap,double *oCoord,double *iCoord,double & u,double & v,double & w,double & t);
+	bool GetBcoordinate(double *Ap,double *oCoord,double *iCoord,double *mCoord,double Rm,double R,double *bCoord1,double *bCoord2);
+	bool GetBcoordinateUpdate(double *cCoord ,double *bCoord1,double *bCoord2);
+	bool GetCcoordinate(double *cCoord1,double *cCoord2);
+	void GetTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat);
+	void GetAngleAandB(double & cosA,double & sinA,double & cosB,double & sinB);
+	double GetPi();
+	void GetGlobalSphereCenter(double *sphCoord);
+	void GetGlobalCylinderCenter(double *cylCoord);
+	void GetGlobalCylinderCenter(double *cylCoord,int objIdx);
+	double GoldenSectionSearch(double a,double b,double x,double accuracy);
 	//double getFunctionValue(double x,double *aCoord,double *bCoord);
-	double computeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm);
-	double computeDistanceOfLm2(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double rm);
-	void getLocalCenterCoord(double *newCoord,double *oldCoord);
-	void getGlobalCenterCoord(double *globalCoord,double *localCoord);
-	void getLocalTransformedCoord(double *newCoord,double *oldCoord,mafMatrix3x3 *mat);
-	void getIntersectCircle(double *Ap,double *oCoord,double *iCoord,double *mCoord,double & Rm);
-	void getGlobalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *mat);
-	double getCutPlane();
-	double getSphereRadius();
-	double getCylinderRadius();
-	double getCylinderRadius(int objIdx);
+	double ComputeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm);
+	double ComputeDistanceOfLm2(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double rm);
+	void GetLocalCenterCoord(double *newCoord,double *oldCoord);
+	void GetGlobalCenterCoord(double *globalCoord,double *localCoord);
+	void GetLocalTransformedCoord(double *newCoord,double *oldCoord,mafMatrix3x3 *mat);
+	void GetIntersectCircle(double *Ap,double *oCoord,double *iCoord,double *mCoord,double & Rm);
+	void GetGlobalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *mat);
+	double GetCutPlane();
+	double GetSphereRadius();
+	double GetCylinderRadius();
+	double GetCylinderRadius(int objIdx);
 	//double caculateHelix(vtkPolyData * hCurve);
 	//double computeHelixCost(double tc,double to,double c,double k);
 	//void changeXZ(double *dCoord ,double *scoord);
-	double drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag);
-	double drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx);
-	void getSphereCylinderWrap(const int step,double *viaPoint);
-	void getCylinderCylinderWrap(const int step);
-	double getPointLineDistance(double *point,double *Lpoint1,double *Lpoint2);
+	double DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag);
+	double DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx);
+	void GetSphereCylinderWrap(const int step,double *viaPoint);
+	void GetCylinderCylinderWrap(const int step);
+	double GetPointLineDistance(double *point,double *Lpoint1,double *Lpoint2);
 
-	double getFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm);
-	double getCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *outCurve);
-	double caculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag);
-	double caculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx);
-	bool getCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2);
-		bool getCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2,int objIdx);
-	bool getBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2);
-	double testPlane(double *a,double *b,double *c,double *d);
-	double computeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord);
-	double computeDistanceOfWholePath(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double *rCoord,double CIcurve,double rm);
-	void formatParameterForHelix(double  tc,double  to,double  Zc,double Zo,double & c ,double & k,double & tcRtn,double & toRtn);
+	double GetFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm);
+	double GetCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *outCurve);
+	double CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag);
+	double CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx);
+	bool GetCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2);
+  bool GetCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2,int objIdx);
+	bool GetBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2);
+	double TestPlane(double *a,double *b,double *c,double *d);
+	double ComputeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord);
+	double ComputeDistanceOfWholePath(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double *rCoord,double CIcurve,double rm);
+	void FormatParameterForHelix(double  tc,double  to,double  Zc,double Zo,double & c ,double & k,double & tcRtn,double & toRtn);
 
-	double getCutPlaneForCI(double *bCoord,double *cCoord,vtkClipPolyData *clipData);
+	double GetCutPlaneForCI(double *bCoord,double *cCoord,vtkClipPolyData *clipData);
 	//double getCutPlaneForCI(double *bCoord,double *cCoord,vtkCutter *clipData);
 
 
-	void processViaPoint();
+	void ProcessViaPoint();
 
-	void getWrapLocalTransform(double *inCoord,double *outCoord);
-	void getWrapLocalTransform(double *inCoord,double *outCoord,int objIdx);
-	void getWrapGlobalTransform(double *inCoord,double *outCoord);
-	void getWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx);
-	void getWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB);
+	void GetWrapLocalTransform(double *inCoord,double *outCoord);
+	void GetWrapLocalTransform(double *inCoord,double *outCoord,int objIdx);
+	void GetWrapGlobalTransform(double *inCoord,double *outCoord);
+	void GetWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx);
+	void GetWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB);
 	// void getWrapMatrix(mafMatrix *inMx,mafMatrix *inMy);
-	void getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy);
-	void getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx);
+	void GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy);
+	void GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx);
 
 	int GetViaPoint(double *viaPoint,bool isNearEndflag);
-	void computeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord);
-	void directConnectSE();
-	void get90DegreePointOnCylinder(double *firstPoint,double *sphereCenter,double *secondPoint);
-	double getFilterFlag(double *outFilterPlaneNormal);
-	void copyPointValue(double *srcPoint,double *aimPoint);
-	double computeCurveLength(double *aCoord,double *bCoord,double rm);
-	void wrapCylinderOnly(const int step);
-	void wrapSingleCylinder(double vId);//for double wrap cylinder
-	void wrapSphereOnly(const int step,bool allowIntersectFlag);//allowIntersectFlag if allow intersect with cylinder
+	void ComputeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord);
+	void DirectConnectSE();
+	void Get90DegreePointOnCylinder(double *firstPoint,double *sphereCenter,double *secondPoint);
+	double GetFilterFlag(double *outFilterPlaneNormal);
+	void CopyPointValue(double *srcPoint,double *aimPoint);
+	double ComputeCurveLength(double *aCoord,double *bCoord,double rm);
+	void WrapCylinderOnly(const int step);
+	void WrapSingleCylinder(double vId);//for double wrap cylinder
+	void WrapSphereOnly(const int step,bool allowIntersectFlag);//allowIntersectFlag if allow intersect with cylinder
 
 	//void wrapSphereCylinderSeparately(const int step,bool allowIntersectFlag);
 	
-	double computeDistanceOfLm3(double *start,double *cCoord,double *iCoord);
-	double getCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData);
-	double goldenSectionSearch2(double a,double b,double x,double accuracy);
-	void getCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx);
-	bool isEndPonintOnCylinder(double tolerance,double *endWrapLocal);
-	bool isLineInterSectObject(mafVME *wrapVME,double *point1,double *point2);
+	double ComputeDistanceOfLm3(double *start,double *cCoord,double *iCoord);
+	double GetCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData);
+	double GoldenSectionSearch2(double a,double b,double x,double accuracy);
+	void GetCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx);
+	bool IsEndPonintOnCylinder(double tolerance,double *endWrapLocal);
+	bool IsLineInterSectObject(mafVME *wrapVME,double *point1,double *point2);
 
-	double goldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *firstC,int type);
-	double getAngleValue(double *A ,double *b,double *c);
-	double getPlaneValue(double *a,double *b,double *c,double *d);
+	double GoldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *firstC,int type);
+	double GetAngleValue(double *A ,double *b,double *c);
+	double GetPlaneValue(double *a,double *b,double *c,double *d);
 	double getDistanceValue(double *start,double *cCoord,double *end);
 	double getDistanceSumValue(double *start,double *cCoord,double *end);
-	void getSphereCylinderWrapAdvance(const int step);
-	void transformOutput(vtkPolyData *pData );
-	void transformOutputPoint( double *point);
-	void transformOutputClipData(vtkPolyData *clipData);
-	bool checkAlign();
-	bool checkTwoRadius();
-	bool checkNearEnough(double *firstPoint,double *secondPoint);
+	void GetSphereCylinderWrapAdvance(const int step);
+	void TransformOutput(vtkPolyData *pData );
+	void TransformOutputPoint( double *point);
+	void TransformOutputClipData(vtkPolyData *clipData);
+	bool CheckAlign();
+	bool CheckTwoRadius();
+	bool CheckNearEnough(double *firstPoint,double *secondPoint);
 
 	mafGUI* CreateGuiForNewMeter( mafGUI *gui );
 	mafGUI* CreateGuiForOldMeter( mafGUI *gui );
-	void getCylinderAxis(mafVME *wrapped_vme,int objIdx);
-	void chooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint);
+	void GetCylinderAxis(mafVME *wrapped_vme,int objIdx);
+	void ChooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint);
 
-	void getOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal);
+	void GetOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal);
 	                                  
-	void getOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global);
+	void GetOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global);
 	
 
 	//------------------new function -------------------
 //--------------test another way----------
-	void wrapCylinderOnlyObstacleSet(int idx);
-	double getQTsegment(double R,double *Q,double *T);
-	bool wrapCondition(double *Q,double *T);
-	void computeTangentXYQ(double *P,double R,double *rtn);
-	void computeTangentXYT(double *S,double R, double *rtn);
-	double computeQTLength(double *Q,double *T,double R);
-	void computeQz(double *P,double *S,double *Q,double *T,double QTlength);
-	void computeTz(double *P,double *S,double *Q,double *T,double QTlength);
-	void wrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout);
-	void wrapCylinderCylinderObstacleSet();
+	void WrapCylinderOnlyObstacleSet(int idx);
+	double GetQTsegment(double R,double *Q,double *T);
+	bool WrapCondition(double *Q,double *T);
+	void ComputeTangentXYQ(double *P,double R,double *rtn);
+	void ComputeTangentXYT(double *S,double R, double *rtn);
+	double ComputeQTLength(double *Q,double *T,double R);
+	void ComputeQz(double *P,double *S,double *Q,double *T,double QTlength);
+	void ComputeTz(double *P,double *S,double *Q,double *T,double QTlength);
+	void WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout);
+	void WrapCylinderCylinderObstacleSet();
 //--------------test over----------------
 
 

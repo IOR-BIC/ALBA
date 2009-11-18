@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-06 11:43:52 $
-Version:   $Revision: 1.1.2.23 $
+Date:      $Date: 2009-11-18 17:01:26 $
+Version:   $Revision: 1.1.2.24 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -91,7 +91,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	m_Idx = 0;
 	m_PathNum = 36;
 
-	//m_Tolerance = getCylinderRadius()/4.0;
+	//m_Tolerance = GetCylinderRadius()/4.0;
 
 	mafNEW(m_Transform);
 	mafNEW(m_TmpTransform2);
@@ -282,7 +282,7 @@ void medVMEComputeWrapping::InternalUpdate()
 			invokeFlag = true;
 		}
 		if(invokeFlag){
-			dispatch(); 
+			Dispatch(); 
 
 		}
 	}else if (m_WrappedClass == OLD_METER)//old method
@@ -305,7 +305,7 @@ void medVMEComputeWrapping::InternalUpdate()
 }
 //main method
 //dispatch different cases to different methods
-void medVMEComputeWrapping::dispatch(){
+void medVMEComputeWrapping::Dispatch(){
 	int obbtreeFlag = 0;
 	int obbtreeFlag1 = 0;
 	int obbtreeFlag2 = 0;
@@ -324,7 +324,7 @@ void medVMEComputeWrapping::dispatch(){
 
 	m_Goniometer->RemoveAllInputs();
 
-	bool prepareflag = prepareData2();
+	bool prepareflag = PrepareData2();
 
 	m_ExportPointList.clear();
 	//---------------------test code----------------------------
@@ -357,14 +357,14 @@ void medVMEComputeWrapping::dispatch(){
 		//-------------prepare i point
 
 
-		getWrapMatrix(m_InMx2,m_InMy2,2);//second cylinder vme
+		GetWrapMatrix(m_InMx2,m_InMy2,2);//second cylinder vme
 		mafMatrix::Invert(m_InMy2,m_OutMy2);
 		mafMatrix::Invert(m_InMx2,m_OutMx2);
 
 
 		int vFlag ;
-		bool alignFlag = checkAlign();
-		bool radiusFlag = checkTwoRadius();
+		bool alignFlag = CheckAlign();
+		bool radiusFlag = CheckTwoRadius();
 
 		//if (alignFlag && radiusFlag)//center of two object align
 		if (radiusFlag)
@@ -372,7 +372,7 @@ void medVMEComputeWrapping::dispatch(){
 			vFlag = GetViaPoint(m_ViaPoint,true);
 			if (vFlag ==NON_WRAP || vFlag == INSIDE_FLAG)
 			{
-				directConnectSE();
+				DirectConnectSE();
 				if (vFlag ==  INSIDE_FLAG)
 				{
 					mafMessage(_("start point or end point is inside surface vme"));
@@ -386,47 +386,47 @@ void medVMEComputeWrapping::dispatch(){
 					//------------prepare matrix--------------
 					cosA=0;sinA=0;cosB=0;sinB=0;
 					//step1
-					getAngleAandB(cosA,sinA,cosB,sinB);
+					GetAngleAandB(cosA,sinA,cosB,sinB);
 					//step2
-					getTransFormMatrix(cosA,sinA,cosB,sinB,m_Mat);//after this function mat has element value
+					GetTransFormMatrix(cosA,sinA,cosB,sinB,m_Mat);//after this function mat has element value
 					mafMatrix3x3::Invert(m_Mat->GetElements(),m_Imat->GetElements());//imat->Invert();
 				}
 
 
 				if (vFlag == WRAP_SPHERE_CYLINDER)
 				{
-					getSphereCylinderWrap(m_PathNum,m_EndPoint);
+					GetSphereCylinderWrap(m_PathNum,m_EndPoint);
 
-					outputFile<<"---------after getSphereCylinderWrap:length="<<m_Distance<<std::endl;
+					outputFile<<"---------after GetSphereCylinderWrap:length="<<m_Distance<<std::endl;
 					outputFile.close();
 
 
 				}else if (vFlag == WRAP_SPHERE_CYLINDER_2)
 				{
-					getSphereCylinderWrapAdvance(m_PathNum);
+					GetSphereCylinderWrapAdvance(m_PathNum);
 				}else if (vFlag == CYLINDER_CYLINDER )//double cylinder
 				{
-					getWrapMatrix(m_InMx1,m_InMy1,1);// need to prepare first cylinder vme
+					GetWrapMatrix(m_InMx1,m_InMy1,1);// need to prepare first cylinder vme
 					mafMatrix::Invert(m_InMy1,m_OutMy1);
 					mafMatrix::Invert(m_InMx1,m_OutMx1);
 
 					//getCylinderCylinderWrap(m_PathNum);
-					wrapCylinderCylinderObstacleSet();
+					WrapCylinderCylinderObstacleSet();
 				}
 				else if (vFlag == SINGLE_CYLINDER){
-					//wrapCylinderOnly(0);
-					wrapCylinderOnly(m_PathNum);
-					//wrapCylinderOnlyObstacleSet(2);//second cylinder
-					outputFile<<"---------after wrapCylinderOnly:length="<<m_Distance<<std::endl;
+					//WrapCylinderOnly(0);
+					WrapCylinderOnly(m_PathNum);
+					//WrapCylinderOnlyObstacleSet(2);//second cylinder
+					outputFile<<"---------after WrapCylinderOnly:length="<<m_Distance<<std::endl;
 					outputFile.close();
 				}else if (vFlag == SINGLE_SPHERE)
 				{
-					wrapSphereOnly(m_PathNum,false);
+					WrapSphereOnly(m_PathNum,false);
 					outputFile<<"---------after wrapSphereOnly:length="<<m_Distance<<std::endl;
 					outputFile.close();
 				}else if (vFlag == SINGLE_SPHERE2)
 				{
-					wrapSphereOnly(m_PathNum,true);
+					WrapSphereOnly(m_PathNum,true);
 				}
 			}
 		}/*else if(radiusFlag){//two object do not align
@@ -456,9 +456,9 @@ double dist1,dist2;
 double sphereCenter[3],cylinderCenter[3];
 //wrapSphereOnly(m_PathNum,false);
 //put point B as start point 
-//wrapCylinderOnly(m_PathNum,false);
+//WrapCylinderOnly(m_PathNum,false);
 getGlobalSphereCenter(sphereCenter);
-getGlobalCylinderCenter(cylinderCenter);
+GetGlobalCylinderCenter(cylinderCenter);
 
 dist1 = sqrt(vtkMath::Distance2BetweenPoints(m_StartPoint,sphereCenter));
 dist2 = sqrt(vtkMath::Distance2BetweenPoints(m_StartPoint,cylinderCenter));
@@ -467,13 +467,13 @@ if (dist1<dist2)//if start point is near sphere center,wrap sphere first
 wrapSphereOnly(m_PathNum,true);
 
 }else{//if start point is near cylinder center, wrap cylinder first
-wrapCylinderOnly(m_PathNum);
+WrapCylinderOnly(m_PathNum);
 }
 //exchange start point to new point
 }
 */
 //transform clip data which has many points
-void medVMEComputeWrapping::transformOutputClipData(vtkPolyData *clipData){
+void medVMEComputeWrapping::TransformOutputClipData(vtkPolyData *clipData){
 	mafTransform* transform;
 	mafNEW(transform);
 	transform->SetMatrix(GetOutput()->GetAbsTransform()->GetMatrix());
@@ -494,7 +494,7 @@ void medVMEComputeWrapping::transformOutputClipData(vtkPolyData *clipData){
 
 }
 //transform one point
-void medVMEComputeWrapping::transformOutputPoint( double *point){
+void medVMEComputeWrapping::TransformOutputPoint( double *point){
 	mafTransform* transform;
 	mafNEW(transform);
 	transform->SetMatrix(GetOutput()->GetAbsTransform()->GetMatrix());
@@ -503,7 +503,7 @@ void medVMEComputeWrapping::transformOutputPoint( double *point){
 	mafDEL(transform);
 }
 //transform polydata
-void medVMEComputeWrapping::transformOutput(vtkPolyData *pData ){
+void medVMEComputeWrapping::TransformOutput(vtkPolyData *pData ){
 
 	mafTransform* transform;
 	mafNEW(transform);
@@ -523,14 +523,14 @@ void medVMEComputeWrapping::transformOutput(vtkPolyData *pData ){
 
 }
 //draw a straight line
-void medVMEComputeWrapping::directConnectSE(){
+void medVMEComputeWrapping::DirectConnectSE(){
 	double d0;
 	vtkLineSource *SE;
 	vtkNEW(SE);
 	m_Goniometer->RemoveAllInputs();
 
-	transformOutputPoint(m_StartPoint);
-	transformOutputPoint(m_EndPoint);
+	TransformOutputPoint(m_StartPoint);
+	TransformOutputPoint(m_EndPoint);
 
 	SE->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 	SE->SetPoint2(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
@@ -546,7 +546,7 @@ void medVMEComputeWrapping::directConnectSE(){
 //c is output,cCoord is input
 //this method is to get a minimum value
 //type 1 angleValue ,2 in one plane,3 distance,4 distanceSum 
-double medVMEComputeWrapping::goldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *cCoord,int type){
+double medVMEComputeWrapping::GoldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *cCoord,int type){
 	double y1,y2;
 	double r = 0.618;
 	double x1,x2;
@@ -570,10 +570,10 @@ double medVMEComputeWrapping::goldenSectionSearch(double low,double high,double 
 
 		if (type==1 && cCoord==NULL)//first time invoke
 		{
-			y1 = getAngleValue(A,b,c);
+			y1 = GetAngleValue(A,b,c);
 		}else if (type==2)
 		{
-			y1 = getPlaneValue(A,b,cCoord,c);
+			y1 = GetPlaneValue(A,b,cCoord,c);
 		}else if (type==3)
 		{
 			y1 = getDistanceValue(A,c,b);
@@ -586,10 +586,10 @@ double medVMEComputeWrapping::goldenSectionSearch(double low,double high,double 
 
 		if (type==1 && cCoord==NULL)
 		{
-			y2 = getAngleValue(A,b,c);
+			y2 = GetAngleValue(A,b,c);
 		}else if(type==2){
 
-			y2 = getPlaneValue(A,b,cCoord,c);
+			y2 = GetPlaneValue(A,b,cCoord,c);
 		}else if (type==3)
 		{
 			y2 = getDistanceValue(A,c,b);
@@ -639,7 +639,7 @@ double medVMEComputeWrapping::getDistanceSumValue(double *A,double *b ,double *c
 	return rtn;
 }
 //get angle between two vector
-double medVMEComputeWrapping::getAngleValue(double *A ,double *b,double *c){
+double medVMEComputeWrapping::GetAngleValue(double *A ,double *b,double *c){
 	double oa[3],ob[3];
 	double doa,dob;
 	double rtn;
@@ -662,7 +662,7 @@ double medVMEComputeWrapping::getAngleValue(double *A ,double *b,double *c){
 	return rtn;
 }
 //to test if three point in one plane
-double medVMEComputeWrapping::getPlaneValue(double *a,double *b,double *c,double *d){
+double medVMEComputeWrapping::GetPlaneValue(double *a,double *b,double *c,double *d){
 	double ab[3],ac[3],cd[3],normalTmp[3];
 	ab[0] = a[0]-b[0];
 	ab[1] = a[1]-b[1];
@@ -688,7 +688,7 @@ double medVMEComputeWrapping::getDistanceValue(double *start,double *cCoord,doub
 
 	double curveLength,rtn;
 
-	curveLength = caculateHelix2(NULL,cCoord,end,false);
+	curveLength = CaculateHelix2(NULL,cCoord,end,false);
 
 	rtn = sqrt(vtkMath::Distance2BetweenPoints(start,cCoord));
 	rtn += curveLength;
@@ -698,7 +698,7 @@ double medVMEComputeWrapping::getDistanceValue(double *start,double *cCoord,doub
 //S-T~H-G~Q-P
 //The obstacle-set Method for Representing Muscle Paths in Musculoskeletal Models
 //Author: BrIAN A.Garner and MARCUS G.Pandy
-void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
+void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	double segLength1,segLength2;
 	int idx1,idx2;
 	double d1,d2;
@@ -715,15 +715,15 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 
 	m_Goniometer->RemoveAllInputs();
 
-	copyPointValue(m_StartPoint,S);
-	copyPointValue(m_EndPoint,P);
+	CopyPointValue(m_StartPoint,S);
+	CopyPointValue(m_EndPoint,P);
 
 	idx1 = 1;//by default first cylinder should near start point
 	idx2 = 2;
-	getGlobalCylinderCenter(center1,1);
-	getGlobalCylinderCenter(center2,2);
-	d1 = getPointLineDistance(S,center1,m_CylinderAxis1);//distance from start point to cylinder axis1
-	d2 = getPointLineDistance(S,center2,m_CylinderAxis2);//distance from start point to cylinder axis2
+	GetGlobalCylinderCenter(center1,1);
+	GetGlobalCylinderCenter(center2,2);
+	d1 = GetPointLineDistance(S,center1,m_CylinderAxis1);//distance from start point to cylinder axis1
+	d2 = GetPointLineDistance(S,center2,m_CylinderAxis2);//distance from start point to cylinder axis2
 	if (d1>d2)//start point is near cylinder1
 	{
 		idx1=2;
@@ -739,26 +739,26 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 	*/
 
 	//use S ,P get H first
-	wrapCylinderOnlyObstacleSetBasic(S,P,idx1,segLength1,T,H);
+	WrapCylinderOnlyObstacleSetBasic(S,P,idx1,segLength1,T,H);
 	//------transform it to global------------
-	getWrapGlobalTransform(T,Tg,idx1);
-	getWrapGlobalTransform(H,Hg,idx1);
+	GetWrapGlobalTransform(T,Tg,idx1);
+	GetWrapGlobalTransform(H,Hg,idx1);
 	//outputFile<<" H coord: 0"<<"   "<< H[0]<<"  "<<H[1]<<"  "<<H[2]<<std::endl;	//for debug
 
 	//loop this paragraph
 	for (int i=0;i<step;i++)
 	{
 		//use H ,P get G,Q
-		wrapCylinderOnlyObstacleSetBasic(Hg,P,idx2,segLength1,G,Q);
-		getWrapGlobalTransform(G,Gg,idx2);
+		WrapCylinderOnlyObstacleSetBasic(Hg,P,idx2,segLength1,G,Q);
+		GetWrapGlobalTransform(G,Gg,idx2);
 
 		//use S, G get T,H
-		wrapCylinderOnlyObstacleSetBasic(S,Gg,idx1,segLength1,T,H);
-		getWrapGlobalTransform(H,Hg,idx1);
+		WrapCylinderOnlyObstacleSetBasic(S,Gg,idx1,segLength1,T,H);
+		GetWrapGlobalTransform(H,Hg,idx1);
 		if (i==step-1)
 		{
-			getWrapGlobalTransform(T,Tg,idx1);
-			getWrapGlobalTransform(Q,Qg,idx2);
+			GetWrapGlobalTransform(T,Tg,idx1);
+			GetWrapGlobalTransform(Q,Qg,idx2);
 		}
 		//outputFile<<" H coord: "<<i<<"   "<< H[0]<<"  "<<H[1]<<"  "<<H[2]<<std::endl;	//for debug
 	} 
@@ -774,12 +774,12 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 
 	//vtkNEW(Line4);
 
-	bool wrapObj1 = wrapCondition(T,H);
-	bool wrapObj2 = wrapCondition(G,Q);
+	bool wrapObj1 = WrapCondition(T,H);
+	bool wrapObj2 = WrapCondition(G,Q);
 	if (wrapObj1 && wrapObj2)
 	{
-		curveLength1 = caculateHelix2(hCurve1,T,H,true,idx1);
-		curveLength2 = caculateHelix2(hCurve2,G,Q,true,idx2);
+		curveLength1 = CaculateHelix2(hCurve1,T,H,true,idx1);
+		curveLength2 = CaculateHelix2(hCurve2,G,Q,true,idx2);
 		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Tg));
 		m_Distance += curveLength1;
 		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Hg,Gg));
@@ -799,16 +799,16 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 		//Line4->SetPoint2(Hg);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Tg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Tg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Hg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Hg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Gg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Gg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Qg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Qg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_Goniometer->AddInput(Line1->GetOutput());
 		m_Goniometer->AddInput(Line2->GetOutput());
@@ -820,7 +820,7 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 	}
 	else if (wrapObj1 && !wrapObj2)
 	{
-		curveLength1 = caculateHelix2(hCurve1,T,H,true,idx1);
+		curveLength1 = CaculateHelix2(hCurve1,T,H,true,idx1);
 		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Tg));
 		m_Distance += curveLength1;
 		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Hg,P));
@@ -832,10 +832,10 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 		Line2->SetPoint2(P);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Tg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Tg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Hg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Hg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_Goniometer->AddInput(Line1->GetOutput());
 		m_Goniometer->AddInput(hCurve1);
@@ -843,7 +843,7 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 
 	}else if ( !wrapObj1 && wrapObj2)
 	{	
-		curveLength2 = caculateHelix2(hCurve2,G,Q,true,idx2);
+		curveLength2 = CaculateHelix2(hCurve2,G,Q,true,idx2);
 		m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Gg));
 		m_Distance += curveLength2;
 		m_Distance += sqrt(vtkMath::Distance2BetweenPoints(Qg,P));
@@ -855,10 +855,10 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 		Line2->SetPoint2(P);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Gg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Gg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(Qg ,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(Qg ,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_Goniometer->AddInput(Line1->GetOutput());
 		m_Goniometer->AddInput(hCurve2);
@@ -883,31 +883,31 @@ void medVMEComputeWrapping::wrapCylinderCylinderObstacleSet(){
 	GetWrappedMeterOutput()->Update(); 
 }
 // S-T~Q-P 
-void medVMEComputeWrapping::wrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout){
+void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout){
 	double P[3],S[3],Q[3],T[3];
 	//express P and S in cylinder frame
-	getWrapLocalTransform(Pg,P,idx);
-	getWrapLocalTransform(Sg,S,idx);
-	double R = getCylinderRadius(idx);
+	GetWrapLocalTransform(Pg,P,idx);
+	GetWrapLocalTransform(Sg,S,idx);
+	double R = GetCylinderRadius(idx);
 
 
 	//1.compute xy Coordinate of Q
-	computeTangentXYQ(P,R,Q);
+	ComputeTangentXYQ(P,R,Q);
 	// compute xy coordinate of T
-	computeTangentXYT(S,R,T);
+	ComputeTangentXYT(S,R,T);
 	//2.compute xy coordinate of segment lengths in xy plane
-	segLength = getQTsegment(R,Q,T);
+	segLength = GetQTsegment(R,Q,T);
 	//3.compute z coordinates of Q
-	computeQz(P,S,Q,T,segLength);
+	ComputeQz(P,S,Q,T,segLength);
 	//compute zcoordinates of T
-	computeTz(P,S,Q,T,segLength);
+	ComputeTz(P,S,Q,T,segLength);
 	//---------we already get Q and T------------
-	copyPointValue(T,Tout);
-	copyPointValue(Q,Qout);
+	CopyPointValue(T,Tout);
+	CopyPointValue(Q,Qout);
 
 }
 
-void medVMEComputeWrapping::wrapCylinderOnlyObstacleSet(int idx){
+void medVMEComputeWrapping::WrapCylinderOnlyObstacleSet(int idx){
 	//P-Q~T-S
 	double P[3],S[3],Q[3],T[3];
 	double Qg[3],Tg[3];
@@ -916,36 +916,36 @@ void medVMEComputeWrapping::wrapCylinderOnlyObstacleSet(int idx){
 	vtkLineSource *Line1,*Line2;
 	vtkNEW(Line1);
 	vtkNEW(Line2);
-	copyPointValue(m_StartPoint,S);
-	copyPointValue(m_EndPoint,P);
-	wrapCylinderOnlyObstacleSetBasic(m_StartPoint,m_EndPoint,idx,segLength,T,Q);
+	CopyPointValue(m_StartPoint,S);
+	CopyPointValue(m_EndPoint,P);
+	WrapCylinderOnlyObstacleSetBasic(m_StartPoint,m_EndPoint,idx,segLength,T,Q);
 	//------transform it to global------------
-	getWrapGlobalTransform(Q,Qg,idx);
-	getWrapGlobalTransform(T,Tg,idx);
+	GetWrapGlobalTransform(Q,Qg,idx);
+	GetWrapGlobalTransform(T,Tg,idx);
 	/*
 	//express P and S in cylinder frame
-	getWrapLocalTransform(m_EndPoint,P,idx);
-	getWrapLocalTransform(m_StartPoint,S,idx);
-	double R = getCylinderRadius(idx);
+	GetWrapLocalTransform(m_EndPoint,P,idx);
+	GetWrapLocalTransform(m_StartPoint,S,idx);
+	double R = GetCylinderRadius(idx);
 
 	//1.compute xy Coordinate of Q
-	computeTangentXYQ(P,R,Q);
+	ComputeTangentXYQ(P,R,Q);
 	// compute xy coordinate of T
-	computeTangentXYT(S,R,T);
+	ComputeTangentXYT(S,R,T);
 	//2.compute xy coordinate of segment lengths in xy plane
-	segLength = getQTsegment(R,Q,T);
+	segLength = GetQTsegment(R,Q,T);
 	//3.compute z coordinates of Q
-	computeQz(P,S,Q,T,segLength);
+	ComputeQz(P,S,Q,T,segLength);
 	//compute zcoordinates of T
-	computeTz(P,S,Q,T,segLength);
+	ComputeTz(P,S,Q,T,segLength);
 	//---------we already get Q and T------------
 	//------transform it to global------------
-	getWrapGlobalTransform(Q,Qg,idx);
-	getWrapGlobalTransform(T,Tg,idx);
+	GetWrapGlobalTransform(Q,Qg,idx);
+	GetWrapGlobalTransform(T,Tg,idx);
 	*/
 	//---------------------------------------
 	vtkNEW(hCurve);
-	curveLength = caculateHelix2(hCurve,Q,T,true,idx);
+	curveLength = CaculateHelix2(hCurve,Q,T,true,idx);
 
 	m_Distance = sqrt(vtkMath::Distance2BetweenPoints(S,Tg));
 	m_Distance += curveLength;
@@ -954,8 +954,8 @@ void medVMEComputeWrapping::wrapCylinderOnlyObstacleSet(int idx){
 	Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
 	Line1->SetPoint2(Qg[0],Qg[1],Qg[2]);
 
-	//transformOutputPoint( m_StartPoint);
-	//transformOutputPoint(cCoordGlobal4);
+	//TransformOutputPoint( m_StartPoint);
+	//TransformOutputPoint(cCoordGlobal4);
 	Line2->SetPoint1(Tg[0],Tg[1],Tg[2]);
 	Line2->SetPoint2(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 	//--------------------------------------
@@ -970,7 +970,7 @@ void medVMEComputeWrapping::wrapCylinderOnlyObstacleSet(int idx){
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 }
-double medVMEComputeWrapping::getQTsegment(double R,double *Q,double *T){
+double medVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
 	double rtn = 0;
 	double value = 0;
 	value = (1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R));
@@ -985,7 +985,7 @@ double medVMEComputeWrapping::getQTsegment(double R,double *Q,double *T){
 /* so det = Qx*Ty-Qy*Tx
 /************************************************************************/
 
-bool medVMEComputeWrapping::wrapCondition(double *Q,double *T){
+bool medVMEComputeWrapping::WrapCondition(double *Q,double *T){
 	bool rtn = true;
 	double det = Q[0]*T[1]- Q[1]*T[0];
 	if (det<0)
@@ -1000,18 +1000,18 @@ bool medVMEComputeWrapping::wrapCondition(double *Q,double *T){
 /* R cylinder radius
 /* rtn return point with x,y value
 /************************************************************************/
-void medVMEComputeWrapping::computeTangentXYQ(double *P,double R,double *rtn){
+void medVMEComputeWrapping::ComputeTangentXYQ(double *P,double R,double *rtn){
 
 	rtn[0] = ( P[0] * R*R + R * P[1] * sqrt( P[0]*P[0] + P[1]*P[1] - R*R ))/( P[0]*P[0] + P[1]*P[1]);
 	rtn[1] = ( P[1] * R*R - R * P[0] * sqrt( P[0]*P[0] + P[1]*P[1] - R*R ))/( P[0]*P[0] + P[1]*P[1]);
 
 }
-void medVMEComputeWrapping::computeTangentXYT(double *S,double R, double *rtn){
+void medVMEComputeWrapping::ComputeTangentXYT(double *S,double R, double *rtn){
 	rtn[0] = ( S[0] * R*R - R * S[1] * sqrt( S[0]*S[0] + S[1]*S[1] - R*R ))/( S[0]*S[0] + S[1]*S[1]);
 	rtn[1] = ( S[1] * R*R + R * S[0] * sqrt( S[0]*S[0] + S[1]*S[1] - R*R ))/( S[0]*S[0] + S[1]*S[1]);
 
 }
-double medVMEComputeWrapping::computeQTLength(double *Q,double *T,double R){
+double medVMEComputeWrapping::ComputeQTLength(double *Q,double *T,double R){
 	double rtn = 0;
 	rtn = R * acos( 1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R) );
 	rtn = fabs(rtn);
@@ -1020,7 +1020,7 @@ double medVMEComputeWrapping::computeQTLength(double *Q,double *T,double R){
 /************************************************************************/
 /* point Q and T only has x,y value                                                                     */
 /************************************************************************/
-void medVMEComputeWrapping::computeQz(double *P,double *S,double *Q,double *T,double QTlength){
+void medVMEComputeWrapping::ComputeQz(double *P,double *S,double *Q,double *T,double QTlength){
 
 	double PQxy = 0;
 	double TSxy = 0;
@@ -1030,7 +1030,7 @@ void medVMEComputeWrapping::computeQz(double *P,double *S,double *Q,double *T,do
 	Q[2] = P[2]+ ( (S[2] - P[2])*PQxy / (PQxy + QTlength+ TSxy));
 
 }
-void medVMEComputeWrapping::computeTz(double *P,double *S,double *Q,double *T,double QTlength){
+void medVMEComputeWrapping::ComputeTz(double *P,double *S,double *Q,double *T,double QTlength){
 
 	double PQxy = 0;
 	double TSxy = 0;
@@ -1044,7 +1044,7 @@ void medVMEComputeWrapping::computeTz(double *P,double *S,double *Q,double *T,do
 
 //suppose local end z value is smaller than local start value
 //if it doesnt ,exchange these two points.
-void medVMEComputeWrapping::wrapCylinderOnly(int step){
+void medVMEComputeWrapping::WrapCylinderOnly(int step){
 	double viaLocal[3],startLocal[3],endLocal[3],cCoord1[3],cCoord2[3],cCoord3[3],cCoord4[3],tmpCoord[3];
 	double Zi,Zo,Zl,Zh;
 
@@ -1064,22 +1064,22 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 	outputFile.clear();
 	m_Goniometer->RemoveAllInputs();
 
-	getWrapLocalTransform(m_EndPoint,endLocal);
-	getWrapLocalTransform(m_StartPoint,startLocal);
+	GetWrapLocalTransform(m_EndPoint,endLocal);
+	GetWrapLocalTransform(m_StartPoint,startLocal);
 
-	//m_Tolerance = getCylinderRadius()/4.0;
+	//m_Tolerance = GetCylinderRadius()/4.0;
 
-	if (isEndPonintOnCylinder(m_Tolerance,endLocal) && isEndPonintOnCylinder(m_Tolerance,startLocal))//both on surface
+	if (IsEndPonintOnCylinder(m_Tolerance,endLocal) && IsEndPonintOnCylinder(m_Tolerance,startLocal))//both on surface
 	{
 		//draw helix directly
 		vtkNEW(hCurve);
-		CIcurve = caculateHelix2(hCurve,endLocal,startLocal,true);
+		CIcurve = CaculateHelix2(hCurve,endLocal,startLocal,true);
 		m_Distance = CIcurve;
-		transformOutput(hCurve);
+		TransformOutput(hCurve);
 		m_Goniometer->AddInput(hCurve);
 		vtkDEL(hCurve);
 
-	}else if (isEndPonintOnCylinder(m_Tolerance,startLocal) || isEndPonintOnCylinder(m_Tolerance,endLocal) )//start on surface or end on surface
+	}else if (IsEndPonintOnCylinder(m_Tolerance,startLocal) || IsEndPonintOnCylinder(m_Tolerance,endLocal) )//start on surface or end on surface
 	{
 
 		//get c from end
@@ -1096,83 +1096,83 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 		vtkNEW(hCurve);
 		//vtkNEW(hCurve2);
 
-		if (isEndPonintOnCylinder(m_Tolerance,endLocal) )//end on surface
+		if (IsEndPonintOnCylinder(m_Tolerance,endLocal) )//end on surface
 		{
-			getCcoordinateForCylinder(startLocal,cCoord1,cCoord2,2);
+			GetCcoordinateForCylinder(startLocal,cCoord1,cCoord2,2);
 
-			goldenSectionSearch(Zl,Zh,0.001,startLocal,endLocal,cCoord1,NULL,3);
-			goldenSectionSearch(Zl,Zh,0.001,startLocal,endLocal,cCoord2,NULL,3);
+			GoldenSectionSearch(Zl,Zh,0.001,startLocal,endLocal,cCoord1,NULL,3);
+			GoldenSectionSearch(Zl,Zh,0.001,startLocal,endLocal,cCoord2,NULL,3);
 
-			CIcurve1 = caculateHelix2(NULL,cCoord1,endLocal,false);
-			CIcurve2 = caculateHelix2(NULL,cCoord2,endLocal,false);
+			CIcurve1 = CaculateHelix2(NULL,cCoord1,endLocal,false);
+			CIcurve2 = CaculateHelix2(NULL,cCoord2,endLocal,false);
 
-			getWrapGlobalTransform(cCoord1,cCoordGlobal1);
-			getWrapGlobalTransform(cCoord2,cCoordGlobal2);
+			GetWrapGlobalTransform(cCoord1,cCoordGlobal1);
+			GetWrapGlobalTransform(cCoord2,cCoordGlobal2);
 
 			d1 = CIcurve1 + sqrt(vtkMath::Distance2BetweenPoints(m_StartPoint,cCoordGlobal1));
 			d2 = CIcurve2 + sqrt(vtkMath::Distance2BetweenPoints(m_StartPoint,cCoordGlobal2));
 
 			if (d1<d2)
 			{
-				transformOutputPoint( m_StartPoint);
-				transformOutputPoint(cCoordGlobal1);
+				TransformOutputPoint( m_StartPoint);
+				TransformOutputPoint(cCoordGlobal1);
 
 				m_ExportPointList.push_back(new double[3]);
-				copyPointValue(cCoordGlobal1,m_ExportPointList[m_ExportPointList.size()-1]);
+				CopyPointValue(cCoordGlobal1,m_ExportPointList[m_ExportPointList.size()-1]);
 
 				Line1->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 				Line1->SetPoint2(cCoordGlobal1[0],cCoordGlobal1[1],cCoordGlobal1[2]);
-				CIcurve1 = caculateHelix2(hCurve,cCoord1,endLocal,true);
+				CIcurve1 = CaculateHelix2(hCurve,cCoord1,endLocal,true);
 				m_Distance = d1;
 			}else{
-				transformOutputPoint( m_StartPoint);
-				transformOutputPoint(cCoordGlobal2);
+				TransformOutputPoint( m_StartPoint);
+				TransformOutputPoint(cCoordGlobal2);
 
 				m_ExportPointList.push_back(new double[3]);
-				copyPointValue(cCoordGlobal2,m_ExportPointList[m_ExportPointList.size()-1]);
+				CopyPointValue(cCoordGlobal2,m_ExportPointList[m_ExportPointList.size()-1]);
 
 				Line1->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 				Line1->SetPoint2(cCoordGlobal2[0],cCoordGlobal2[1],cCoordGlobal2[2]);
-				CIcurve1 = caculateHelix2(hCurve,cCoord2,endLocal,true);
+				CIcurve1 = CaculateHelix2(hCurve,cCoord2,endLocal,true);
 				m_Distance = d2;
 			}
 
 		}
-		else if (isEndPonintOnCylinder(m_Tolerance,startLocal) )//start on surface
+		else if (IsEndPonintOnCylinder(m_Tolerance,startLocal) )//start on surface
 		{
-			getCcoordinateForCylinder(endLocal,cCoord3,cCoord4,2);
+			GetCcoordinateForCylinder(endLocal,cCoord3,cCoord4,2);
 
-			goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord3,NULL,3);
-			goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4,NULL,3);
+			GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord3,NULL,3);
+			GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord4,NULL,3);
 
-			CIcurve1 = caculateHelix2(NULL,cCoord3,startLocal,false);
-			CIcurve2 = caculateHelix2(NULL,cCoord4,startLocal,false);
+			CIcurve1 = CaculateHelix2(NULL,cCoord3,startLocal,false);
+			CIcurve2 = CaculateHelix2(NULL,cCoord4,startLocal,false);
 
-			getWrapGlobalTransform(cCoord3,cCoordGlobal3);
-			getWrapGlobalTransform(cCoord4,cCoordGlobal4);
+			GetWrapGlobalTransform(cCoord3,cCoordGlobal3);
+			GetWrapGlobalTransform(cCoord4,cCoordGlobal4);
 
 			d1 = CIcurve1 + sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,cCoordGlobal3));
 			d2 = CIcurve2 + sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,cCoordGlobal4));
 
 			if (d1<d2)
 			{
-				transformOutputPoint( m_EndPoint);
-				transformOutputPoint(cCoordGlobal3);
+				TransformOutputPoint( m_EndPoint);
+				TransformOutputPoint(cCoordGlobal3);
 				m_ExportPointList.push_back(new double[3]);
-				copyPointValue(cCoordGlobal3,m_ExportPointList[m_ExportPointList.size()-1]);
+				CopyPointValue(cCoordGlobal3,m_ExportPointList[m_ExportPointList.size()-1]);
 				Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
 				Line1->SetPoint2(cCoordGlobal3[0],cCoordGlobal3[1],cCoordGlobal3[2]);
-				CIcurve1 = caculateHelix2(hCurve,cCoord3,startLocal,true);
+				CIcurve1 = CaculateHelix2(hCurve,cCoord3,startLocal,true);
 				m_Distance = d1;
 			}else{
-				transformOutputPoint( m_EndPoint);
-				transformOutputPoint(cCoordGlobal4);
+				TransformOutputPoint( m_EndPoint);
+				TransformOutputPoint(cCoordGlobal4);
 				m_ExportPointList.push_back(new double[3]);
-				copyPointValue(cCoordGlobal4,m_ExportPointList[m_ExportPointList.size()-1]);
+				CopyPointValue(cCoordGlobal4,m_ExportPointList[m_ExportPointList.size()-1]);
 
 				Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
 				Line1->SetPoint2(cCoordGlobal4[0],cCoordGlobal4[1],cCoordGlobal4[2]);
-				CIcurve1 = caculateHelix2(hCurve,cCoord4,startLocal,true);
+				CIcurve1 = CaculateHelix2(hCurve,cCoord4,startLocal,true);
 				m_Distance = d2;
 			}
 
@@ -1180,7 +1180,7 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 		}
 
 
-		transformOutput(hCurve);
+		TransformOutput(hCurve);
 		m_Goniometer->AddInput(Line1->GetOutput());
 		//m_Goniometer->AddInput(L2);
 		m_Goniometer->AddInput(hCurve);
@@ -1197,27 +1197,27 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 
 		if (endLocal[2]>startLocal[2])//if end point high than start point needs exchanging,
 		{
-			copyPointValue(m_StartPoint,tmpCoord);
-			copyPointValue(m_EndPoint,m_StartPoint);
-			copyPointValue(tmpCoord,m_EndPoint);
-			getWrapLocalTransform(m_EndPoint,endLocal);
-			getWrapLocalTransform(m_StartPoint,startLocal);
+			CopyPointValue(m_StartPoint,tmpCoord);
+			CopyPointValue(m_EndPoint,m_StartPoint);
+			CopyPointValue(tmpCoord,m_EndPoint);
+			GetWrapLocalTransform(m_EndPoint,endLocal);
+			GetWrapLocalTransform(m_StartPoint,startLocal);
 			GetViaPoint(m_ViaPoint,true);
 		}
 
-		getWrapLocalTransform(m_ViaPoint,viaLocal);//by default via point computed near end point
+		GetWrapLocalTransform(m_ViaPoint,viaLocal);//by default via point computed near end point
 
 		//get C coord x,y value
 		//----------------from end point-----------------------
-		getCcoordinateForCylinder(endLocal,cCoord1,cCoord2,2);
+		GetCcoordinateForCylinder(endLocal,cCoord1,cCoord2,2);
 
 		Zh = startLocal[2];
 		Zl = endLocal[2];
-		goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1,NULL,4);//use distanceSum 4 or angleValue 1
-		goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2,NULL,4);
+		GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1,NULL,4);//use distanceSum 4 or angleValue 1
+		GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2,NULL,4);
 
-		getWrapGlobalTransform(cCoord1,cCoordGlobal1);
-		getWrapGlobalTransform(cCoord2,cCoordGlobal2);
+		GetWrapGlobalTransform(cCoord1,cCoordGlobal1);
+		GetWrapGlobalTransform(cCoord2,cCoordGlobal2);
 
 
 		d1 =  sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,cCoordGlobal1));
@@ -1226,17 +1226,17 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 		//outputFile<<"-------------from start point----------------"<<std::endl;
 		//-----------get first points through start
 		GetViaPoint(m_ViaPoint,false);//get second via point near start point
-		getWrapLocalTransform(m_ViaPoint,viaLocal);
-		getCcoordinateForCylinder(startLocal,cCoord3,cCoord4,2);
+		GetWrapLocalTransform(m_ViaPoint,viaLocal);
+		GetCcoordinateForCylinder(startLocal,cCoord3,cCoord4,2);
 		//--------- which two points would pair ,only judge x,y value-------------
 		double testD1 = sqrt( (cCoord1[0]-cCoord3[0])*(cCoord1[0]-cCoord3[0])+(cCoord1[1]-cCoord3[1])*(cCoord1[1]-cCoord3[1]) );
 		double testD2 = sqrt((cCoord2[0]-cCoord3[0])*(cCoord2[0]-cCoord3[0])+(cCoord2[1]-cCoord3[1])*(cCoord2[1]-cCoord3[1]) );
 
 		if (testD1>testD2)//it means c1--c4,needs changing 
 		{
-			copyPointValue(cCoord1,tmpCoord);//change global value
-			copyPointValue(cCoord2,cCoord1);
-			copyPointValue(tmpCoord,cCoord2);
+			CopyPointValue(cCoord1,tmpCoord);//change global value
+			CopyPointValue(cCoord2,cCoord1);
+			CopyPointValue(tmpCoord,cCoord2);
 		}
 		//then c1--c3,c2--c4
 
@@ -1244,18 +1244,18 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 		Zi = endLocal[2];
 		Zo = startLocal[2];
 		//note c coord is local value;
-		goldenSectionSearch(Zi,Zo,0.001,startLocal,endLocal,cCoord3,cCoord1,2);
-		goldenSectionSearch(Zi,Zo,0.001,startLocal,endLocal,cCoord4,cCoord2,2);
+		GoldenSectionSearch(Zi,Zo,0.001,startLocal,endLocal,cCoord3,cCoord1,2);
+		GoldenSectionSearch(Zi,Zo,0.001,startLocal,endLocal,cCoord4,cCoord2,2);
 
 
-		getWrapGlobalTransform(cCoord1,cCoordGlobal1);
-		getWrapGlobalTransform(cCoord3,cCoordGlobal3);
-		getWrapGlobalTransform(cCoord2,cCoordGlobal2);
-		getWrapGlobalTransform(cCoord4,cCoordGlobal4);
+		GetWrapGlobalTransform(cCoord1,cCoordGlobal1);
+		GetWrapGlobalTransform(cCoord3,cCoordGlobal3);
+		GetWrapGlobalTransform(cCoord2,cCoordGlobal2);
+		GetWrapGlobalTransform(cCoord4,cCoordGlobal4);
 
 		vtkNEW(hCurve);
-		CIcurve1 = caculateHelix2(NULL,cCoord1,cCoord3,false);
-		CIcurve2 = caculateHelix2(NULL,cCoord2,cCoord4,false);
+		CIcurve1 = CaculateHelix2(NULL,cCoord1,cCoord3,false);
+		CIcurve2 = CaculateHelix2(NULL,cCoord2,cCoord4,false);
 
 		d1 += CIcurve1;
 		d2 += CIcurve2;
@@ -1269,50 +1269,50 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 		if (d1<d2)
 		{
 
-			transformOutputPoint( m_EndPoint);
-			transformOutputPoint(cCoordGlobal1);
+			TransformOutputPoint( m_EndPoint);
+			TransformOutputPoint(cCoordGlobal1);
 
 			Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
 			Line1->SetPoint2(cCoordGlobal1[0],cCoordGlobal1[1],cCoordGlobal1[2]);
 
-			transformOutputPoint( m_StartPoint);
-			transformOutputPoint(cCoordGlobal3);
+			TransformOutputPoint( m_StartPoint);
+			TransformOutputPoint(cCoordGlobal3);
 
 			Line2->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 			Line2->SetPoint2(cCoordGlobal3[0],cCoordGlobal3[1],cCoordGlobal3[2]);
 
 			m_ExportPointList.push_back(new double[3]);
-			copyPointValue(cCoordGlobal1,m_ExportPointList[m_ExportPointList.size()-1]);
+			CopyPointValue(cCoordGlobal1,m_ExportPointList[m_ExportPointList.size()-1]);
 
 			m_ExportPointList.push_back(new double[3]);
-			copyPointValue(cCoordGlobal3,m_ExportPointList[m_ExportPointList.size()-1]);
+			CopyPointValue(cCoordGlobal3,m_ExportPointList[m_ExportPointList.size()-1]);
 
 
-			CIcurve1 = caculateHelix2(hCurve,cCoord1,cCoord3,true);
+			CIcurve1 = CaculateHelix2(hCurve,cCoord1,cCoord3,true);
 			m_Distance = d1;
 		}else{
 
-			transformOutputPoint( m_EndPoint);
-			transformOutputPoint(cCoordGlobal2);
+			TransformOutputPoint( m_EndPoint);
+			TransformOutputPoint(cCoordGlobal2);
 			Line1->SetPoint1(m_EndPoint[0],m_EndPoint[1],m_EndPoint[2]);
 			Line1->SetPoint2(cCoordGlobal2[0],cCoordGlobal2[1],cCoordGlobal2[2]);
 
-			transformOutputPoint( m_StartPoint);
-			transformOutputPoint(cCoordGlobal4);
+			TransformOutputPoint( m_StartPoint);
+			TransformOutputPoint(cCoordGlobal4);
 			Line2->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 			Line2->SetPoint2(cCoordGlobal4[0],cCoordGlobal4[1],cCoordGlobal4[2]);
 
 			m_ExportPointList.push_back(new double[3]);
-			copyPointValue(cCoordGlobal2,m_ExportPointList[m_ExportPointList.size()-1]);
+			CopyPointValue(cCoordGlobal2,m_ExportPointList[m_ExportPointList.size()-1]);
 			m_ExportPointList.push_back(new double[3]);
-			copyPointValue(cCoordGlobal4,m_ExportPointList[m_ExportPointList.size()-1]);
+			CopyPointValue(cCoordGlobal4,m_ExportPointList[m_ExportPointList.size()-1]);
 
-			CIcurve1 = caculateHelix2(hCurve,cCoord2,cCoord4,true);
+			CIcurve1 = CaculateHelix2(hCurve,cCoord2,cCoord4,true);
 			m_Distance = d2;
 		}
 
 
-		transformOutput(hCurve);
+		TransformOutput(hCurve);
 
 		m_Goniometer->AddInput(Line1->GetOutput());
 		m_Goniometer->AddInput(Line2->GetOutput());
@@ -1330,8 +1330,8 @@ void medVMEComputeWrapping::wrapCylinderOnly(int step){
 }
 
 //compute X,Y value of a coordinate,do not compute Z value
-void medVMEComputeWrapping::getCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx){
-	double r = getCylinderRadius(objIdx);
+void medVMEComputeWrapping::GetCcoordinateForCylinder(double *oCoord,double *outC1,double *outC2,int objIdx){
+	double r = GetCylinderRadius(objIdx);
 	double D,Xo,Yo,Zo;
 	Xo = oCoord[0];
 	Yo = oCoord[1];
@@ -1345,7 +1345,7 @@ void medVMEComputeWrapping::getCcoordinateForCylinder(double *oCoord,double *out
 
 }
 //use old method to get tangent
-void medVMEComputeWrapping::wrapSingleCylinder(double vId){
+void medVMEComputeWrapping::WrapSingleCylinder(double vId){
 
 	vtkLineSource *SC,*CE,*SCL,*CEL;
 	vtkNEW(SC);
@@ -1398,7 +1398,7 @@ void medVMEComputeWrapping::wrapSingleCylinder(double vId){
 	locator->SetGlobalWarningDisplay(0);
 	locator->BuildLocator();
 
-	singleWrapAutomatedIOR(wrapped_vme1,local_start,local_end,local_wrapped_center,locator);
+	SingleWrapAutomatedIOR(wrapped_vme1,local_start,local_end,local_wrapped_center,locator);
 	vtkDEL(SC);
 	vtkDEL(CE);
 	vtkDEL(SCL);
@@ -1406,7 +1406,7 @@ void medVMEComputeWrapping::wrapSingleCylinder(double vId){
 
 }
 //test if these three point in one plane
-double medVMEComputeWrapping::testPlane(double *a,double *b,double *c,double *d){
+double medVMEComputeWrapping::TestPlane(double *a,double *b,double *c,double *d){
 	double ab[3],ac[3],cd[3],normalTmp[3];
 	ab[0] = a[0]-b[0];
 	ab[1] = a[1]-b[1];
@@ -1428,12 +1428,12 @@ double medVMEComputeWrapping::testPlane(double *a,double *b,double *c,double *d)
 
 }
 //fixed value
-double medVMEComputeWrapping::getPi(){
+double medVMEComputeWrapping::GetPi(){
 
 	return 3.1415926;
 }
 //sphere radius
-double medVMEComputeWrapping::getSphereRadius(){
+double medVMEComputeWrapping::GetSphereRadius(){
 	double rtn = 0;
 	mafVMESurfaceParametric *sphere = mafVMESurfaceParametric::SafeDownCast(GetWrappedVME1());
 	rtn = sphere->GetSphereRadius();
@@ -1441,13 +1441,13 @@ double medVMEComputeWrapping::getSphereRadius(){
 
 }
 //cylinder radius
-double medVMEComputeWrapping::getCylinderRadius(){
+double medVMEComputeWrapping::GetCylinderRadius(){
 	double rtn = 0;
-	rtn = getCylinderRadius(2);
+	rtn = GetCylinderRadius(2);
 	return rtn;
 
 }
-double medVMEComputeWrapping::getCylinderRadius(int objIdx){
+double medVMEComputeWrapping::GetCylinderRadius(int objIdx){
 	double rtn = 0;
 	mafVMESurfaceParametric *cylinder ;
 	if (objIdx==1)
@@ -1465,7 +1465,7 @@ double medVMEComputeWrapping::getCylinderRadius(int objIdx){
 }
 
 //compute C point
-bool medVMEComputeWrapping::getCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2){
+bool medVMEComputeWrapping::GetCcoordinate2(double *bCoord,double *cCoord1,double *cCoord2){
 	double a,b,c,r;//r is radius of cylinder
 	double Yc,Xc,Zc,Yc2,Xc2,Zc2;
 	double Xb,Yb,Zb;
@@ -1474,8 +1474,8 @@ bool medVMEComputeWrapping::getCcoordinate2(double *bCoord,double *cCoord1,doubl
 	bool rtn = true;
 	double testValue1,testValue2;
 
-	r = getCylinderRadius();
-	R = getSphereRadius();
+	r = GetCylinderRadius();
+	R = GetSphereRadius();
 
 	//getGlobalSphereCenter(RCoord);//coordinate of sphere center;
 
@@ -1514,7 +1514,7 @@ bool medVMEComputeWrapping::getCcoordinate2(double *bCoord,double *cCoord1,doubl
 
 }
 //get point A and point B ,then Use A and start ,end point can get a plane ,so get a curve on sphere surface
-double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm){
+double medVMEComputeWrapping::GetFunctionValue2(double x,double filterFlag,double *filterPlaneNormal,double *endPoint,double *outAPoint,double *outBPoint,double *outMPoint,double & Rm){
 	double rtn = 0,rtn1 = 0,rtn2 = 0,rtn3 = 0,rtn4 = 0;
 
 	//double oCoordTransform[3];
@@ -1525,7 +1525,7 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 	double bCoordR1[3],bCoordR2[3],bCoordR3[3],bCoordR4[3],bgCoord1[3],bgCoord2[3],bgCoord3[3],bgCoord4[3];
 
 	double Rm1,Rm2;
-	sphereR = getSphereRadius();
+	sphereR = GetSphereRadius();
 	//-----get o global coord---------
 	ogCoord[0]=m_StartWrapLocal[0];
 	ogCoord[1]=m_StartWrapLocal[1];
@@ -1542,18 +1542,18 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 
 
 	//step3 o global --> o local so we can use equation(10)
-	getLocalTransformedCoord(olCoord,ogCoord,m_Imat);
+	GetLocalTransformedCoord(olCoord,ogCoord,m_Imat);
 	//step4 get A point local coordinate;
-	bool aFlag = getAcoordinateInLocal(alCoord1,alCoord2,olCoord,sphereR,x);
+	bool aFlag = GetAcoordinateInLocal(alCoord1,alCoord2,olCoord,sphereR,x);
 	if (aFlag)
 	{
 
 		//step5 a local --> a global
 		double agCoord1[3],agCoord2[3],aGcoord1[3],aGcoord2[3],sphereCenter[3];
 
-		getGlobalTransformedCoord(alCoord1,agCoord1,m_Mat);
-		getGlobalTransformedCoord(alCoord2,agCoord2,m_Mat);
-		getGlobalSphereCenter(sphereCenter);
+		GetGlobalTransformedCoord(alCoord1,agCoord1,m_Mat);
+		GetGlobalTransformedCoord(alCoord2,agCoord2,m_Mat);
+		GetGlobalSphereCenter(sphereCenter);
 
 		//----------------check if OA is tangent to sphere----------------
 		double aD,aD12,aD13,aD22,aD23;
@@ -1571,8 +1571,8 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 		testValue2 = fabs(aD22 + aD23 - aD);
 
 
-		getWrapGlobalTransform(agCoord1,aGcoord1);
-		getWrapGlobalTransform(agCoord2,aGcoord2);
+		GetWrapGlobalTransform(agCoord1,aGcoord1);
+		GetWrapGlobalTransform(agCoord2,aGcoord2);
 
 
 		aD12 = vtkMath::Distance2BetweenPoints(aGcoord1,m_StartPoint);
@@ -1592,13 +1592,13 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 				filterFlag2 = vtkMath::Dot(filterPlaneNormal,filterVector2);
 				if ( (m_WrapSide==WRAP_FRONT && filterFlag2*filterFlag>0) || (m_WrapSide==WRAP_BACK && filterFlag2*filterFlag<0) )
 				{
-					copyPointValue(agCoord1,agCoord);
+					CopyPointValue(agCoord1,agCoord);
 					aFlag1 = true;
 				}
 
 			}else if (m_WrapSide==WRAP_SHOREST)
 			{
-				copyPointValue(agCoord1,agCoord);
+				CopyPointValue(agCoord1,agCoord);
 				aFlag1 = true;
 			}
 		} 
@@ -1613,19 +1613,19 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 				filterFlag2 = vtkMath::Dot(filterPlaneNormal,filterVector2);
 				if ( (m_WrapSide==WRAP_FRONT && filterFlag2*filterFlag>0) || (m_WrapSide==WRAP_BACK && filterFlag2*filterFlag<0) )
 				{
-					copyPointValue(agCoord2,agCoord);
+					CopyPointValue(agCoord2,agCoord);
 					aFlag2 = true;
 				}
 			}else if (m_WrapSide==WRAP_SHOREST)
 			{
-				copyPointValue(agCoord2,agCoord);
+				CopyPointValue(agCoord2,agCoord);
 				aFlag2 = true;
 			}
 		}
 
 		//step6 o,i,a global --> sphere center based local
-		getLocalCenterCoord(oCoordR,m_StartWrapLocal);
-		getLocalCenterCoord(iCoordR,endPoint);
+		GetLocalCenterCoord(oCoordR,m_StartWrapLocal);
+		GetLocalCenterCoord(iCoordR,endPoint);
 
 		int ibflag = 1;
 		if ( !aFlag2 && !aFlag1)
@@ -1633,24 +1633,24 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 			return -1;
 		}else if (aFlag2 && aFlag1)
 		{	//----------first a-----------
-			getLocalCenterCoord(aCoordR1,agCoord1);
+			GetLocalCenterCoord(aCoordR1,agCoord1);
 			//step7 get circle which intersect with sphere ,appendix D
-			getIntersectCircle(aCoordR1,oCoordR,iCoordR,mCoordR1,Rm1);//Rm is computed by global coord
-			bool bFlag1 =getBcoordinate(aCoordR1,oCoordR,iCoordR,mCoordR1,Rm1,sphereR,bCoordR1,bCoordR2);
+			GetIntersectCircle(aCoordR1,oCoordR,iCoordR,mCoordR1,Rm1);//Rm is computed by global coord
+			bool bFlag1 =GetBcoordinate(aCoordR1,oCoordR,iCoordR,mCoordR1,Rm1,sphereR,bCoordR1,bCoordR2);
 
 			//-----------second a---------
-			getLocalCenterCoord(aCoordR2,agCoord2);
-			getIntersectCircle(aCoordR2,oCoordR,iCoordR,mCoordR2,Rm2);//Rm is computed by global coord
-			bool bFlag2 =getBcoordinate(aCoordR2,oCoordR,iCoordR,mCoordR2,Rm2,sphereR,bCoordR3,bCoordR4);			
+			GetLocalCenterCoord(aCoordR2,agCoord2);
+			GetIntersectCircle(aCoordR2,oCoordR,iCoordR,mCoordR2,Rm2);//Rm is computed by global coord
+			bool bFlag2 =GetBcoordinate(aCoordR2,oCoordR,iCoordR,mCoordR2,Rm2,sphereR,bCoordR3,bCoordR4);			
 
 			if (bFlag1)
 			{
-				getGlobalCenterCoord(bgCoord1,bCoordR1);
-				getGlobalCenterCoord(bgCoord2,bCoordR2);
-				getGlobalCenterCoord(mgCoord1,mCoordR1);
+				GetGlobalCenterCoord(bgCoord1,bCoordR1);
+				GetGlobalCenterCoord(bgCoord2,bCoordR2);
+				GetGlobalCenterCoord(mgCoord1,mCoordR1);
 
-				rtn1 = computeDistanceOfLm(ogCoord,igCoord,agCoord1,bgCoord1,mgCoord1,Rm1);
-				rtn2 = computeDistanceOfLm(ogCoord,igCoord,agCoord1,bgCoord2,mgCoord1,Rm1);
+				rtn1 = ComputeDistanceOfLm(ogCoord,igCoord,agCoord1,bgCoord1,mgCoord1,Rm1);
+				rtn2 = ComputeDistanceOfLm(ogCoord,igCoord,agCoord1,bgCoord2,mgCoord1,Rm1);
 			}else{
 				rtn1 = 0;
 				rtn2 = 0;
@@ -1658,12 +1658,12 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 
 			if (bFlag2)
 			{
-				getGlobalCenterCoord(bgCoord3,bCoordR3);
-				getGlobalCenterCoord(bgCoord4,bCoordR4);
-				getGlobalCenterCoord(mgCoord2,mCoordR2);
+				GetGlobalCenterCoord(bgCoord3,bCoordR3);
+				GetGlobalCenterCoord(bgCoord4,bCoordR4);
+				GetGlobalCenterCoord(mgCoord2,mCoordR2);
 
-				rtn3 = computeDistanceOfLm(ogCoord,igCoord,agCoord2,bgCoord3,mgCoord2,Rm2);
-				rtn4 = computeDistanceOfLm(ogCoord,igCoord,agCoord2,bgCoord4,mgCoord2,Rm2);
+				rtn3 = ComputeDistanceOfLm(ogCoord,igCoord,agCoord2,bgCoord3,mgCoord2,Rm2);
+				rtn4 = ComputeDistanceOfLm(ogCoord,igCoord,agCoord2,bgCoord4,mgCoord2,Rm2);
 			}else{
 				rtn3 = 0;
 				rtn4 = 0;
@@ -1672,38 +1672,38 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 			if (rtn1!=0 && rtn1<rtn2 && rtn1<rtn3 && rtn1<rtn4)
 			{
 				Rm = Rm1;
-				copyPointValue(agCoord1,m_APoint);
-				copyPointValue(agCoord1,outAPoint);
-				copyPointValue(bgCoord1,m_BPoint);
-				copyPointValue(bgCoord1,outBPoint);
-				getGlobalCenterCoord(outMPoint,mCoordR1);
+				CopyPointValue(agCoord1,m_APoint);
+				CopyPointValue(agCoord1,outAPoint);
+				CopyPointValue(bgCoord1,m_BPoint);
+				CopyPointValue(bgCoord1,outBPoint);
+				GetGlobalCenterCoord(outMPoint,mCoordR1);
 				rtn = rtn1;
 			}else if (rtn2!=0 && rtn2<rtn1 && rtn2<rtn3 && rtn2<rtn4)
 			{
 				Rm = Rm1;
-				copyPointValue(agCoord1,m_APoint);
-				copyPointValue(agCoord1,outAPoint);
-				copyPointValue(bgCoord2,m_BPoint);
-				copyPointValue(bgCoord2,outBPoint);
-				getGlobalCenterCoord(outMPoint,mCoordR1);
+				CopyPointValue(agCoord1,m_APoint);
+				CopyPointValue(agCoord1,outAPoint);
+				CopyPointValue(bgCoord2,m_BPoint);
+				CopyPointValue(bgCoord2,outBPoint);
+				GetGlobalCenterCoord(outMPoint,mCoordR1);
 				rtn = rtn2;
 			}else if (rtn3!=0 && rtn3<rtn1 && rtn3<rtn2 && rtn3<rtn4)
 			{
 				Rm = Rm2;
-				copyPointValue(agCoord2,m_APoint);
-				copyPointValue(agCoord2,outAPoint);
-				copyPointValue(bgCoord3,m_BPoint);
-				copyPointValue(bgCoord3,outBPoint);
-				getGlobalCenterCoord(outMPoint,mCoordR2);
+				CopyPointValue(agCoord2,m_APoint);
+				CopyPointValue(agCoord2,outAPoint);
+				CopyPointValue(bgCoord3,m_BPoint);
+				CopyPointValue(bgCoord3,outBPoint);
+				GetGlobalCenterCoord(outMPoint,mCoordR2);
 				rtn = rtn3;
 			}else if (rtn4!=0 && rtn4<rtn1 && rtn4<rtn2 && rtn4<rtn3)
 			{
 				Rm = Rm2;
-				copyPointValue(agCoord2,m_APoint);
-				copyPointValue(agCoord2,outAPoint);
-				copyPointValue(bgCoord4,m_BPoint);
-				copyPointValue(bgCoord4,outBPoint);
-				getGlobalCenterCoord(outMPoint,mCoordR2);
+				CopyPointValue(agCoord2,m_APoint);
+				CopyPointValue(agCoord2,outAPoint);
+				CopyPointValue(bgCoord4,m_BPoint);
+				CopyPointValue(bgCoord4,outBPoint);
+				GetGlobalCenterCoord(outMPoint,mCoordR2);
 				rtn = rtn4;
 			}else{
 
@@ -1711,30 +1711,30 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 			}
 
 		}else if( aFlag1 || aFlag2){
-			getLocalCenterCoord(aCoordR,agCoord);
+			GetLocalCenterCoord(aCoordR,agCoord);
 			//step7 get circle which intersect with sphere ,appendix D
-			getIntersectCircle(aCoordR,oCoordR,iCoordR,mCoordR,Rm);//Rm is computed by global coord
+			GetIntersectCircle(aCoordR,oCoordR,iCoordR,mCoordR,Rm);//Rm is computed by global coord
 			//step8 get B coord,there are 2 point ,test which one is the shortest.use appendix E,use the same translation as in step7
-			getGlobalCenterCoord(outMPoint,mCoordR);
-			bool bFlag =getBcoordinate(aCoordR,oCoordR,iCoordR,mCoordR,Rm,sphereR,bCoordR1,bCoordR2);
+			GetGlobalCenterCoord(outMPoint,mCoordR);
+			bool bFlag =GetBcoordinate(aCoordR,oCoordR,iCoordR,mCoordR,Rm,sphereR,bCoordR1,bCoordR2);
 			if (bFlag)
 			{
-				copyPointValue(agCoord,m_APoint);
-				copyPointValue(agCoord,outAPoint);
+				CopyPointValue(agCoord,m_APoint);
+				CopyPointValue(agCoord,outAPoint);
 
-				getGlobalCenterCoord(bgCoord1,bCoordR1);
-				getGlobalCenterCoord(bgCoord2,bCoordR2);
-				getGlobalCenterCoord(mgCoord,mCoordR);
+				GetGlobalCenterCoord(bgCoord1,bCoordR1);
+				GetGlobalCenterCoord(bgCoord2,bCoordR2);
+				GetGlobalCenterCoord(mgCoord,mCoordR);
 
-				rtn1 = computeDistanceOfLm(ogCoord,igCoord,agCoord,bgCoord1,mgCoord,Rm);
-				rtn2 = computeDistanceOfLm(ogCoord,igCoord,agCoord,bgCoord2,mgCoord,Rm);
+				rtn1 = ComputeDistanceOfLm(ogCoord,igCoord,agCoord,bgCoord1,mgCoord,Rm);
+				rtn2 = ComputeDistanceOfLm(ogCoord,igCoord,agCoord,bgCoord2,mgCoord,Rm);
 				if (rtn1<rtn2)
 				{
-					copyPointValue(bgCoord1,m_BPoint);
-					copyPointValue(bgCoord1,outBPoint);
+					CopyPointValue(bgCoord1,m_BPoint);
+					CopyPointValue(bgCoord1,outBPoint);
 				}else{
-					copyPointValue(bgCoord2,m_BPoint);
-					copyPointValue(bgCoord2,outBPoint);
+					CopyPointValue(bgCoord2,m_BPoint);
+					CopyPointValue(bgCoord2,outBPoint);
 				}
 
 			}else{
@@ -1751,7 +1751,7 @@ double medVMEComputeWrapping::getFunctionValue2(double x,double filterFlag,doubl
 
 }
 //compute angle for point B 
-void medVMEComputeWrapping::computeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord){
+void medVMEComputeWrapping::ComputeAngleForB(double *aCoord,double *bCoord1,double *bCoord2,double *bCoord){
 	double oa[3],ba1[3],ba2[3];
 	double cosA1,cosA2;
 	oa[0] = m_StartWrapLocal[0] - aCoord[0];
@@ -1785,31 +1785,31 @@ void medVMEComputeWrapping::computeAngleForB(double *aCoord,double *bCoord1,doub
 	}
 }
 //get B point on the surface
-bool medVMEComputeWrapping::getBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2){
+bool medVMEComputeWrapping::GetBcoordinateUpdate2(double *aCoord,double *bCoord,double *cCoord ,double *bCoord1,double *bCoord2){
 	double blCoord[3];
-	getLocalCenterCoord(blCoord,bCoord);
-	double Rm = getCylinderRadius();
-	double sphereR = getSphereRadius();
+	GetLocalCenterCoord(blCoord,bCoord);
+	double Rm = GetCylinderRadius();
+	double sphereR = GetSphereRadius();
 	double bCoordR1[3],bCoordR2[3];
 	double aCoordR[3],oCoordR[3],cCoordR[3],mCoordR[3];
 
-	getLocalCenterCoord(aCoordR,aCoord);
-	getLocalCenterCoord(oCoordR,m_StartWrapLocal);
-	getLocalCenterCoord(cCoordR,cCoord);
-	getIntersectCircle(aCoordR,oCoordR,cCoordR,mCoordR,Rm);//Rm is computed by global coord
+	GetLocalCenterCoord(aCoordR,aCoord);
+	GetLocalCenterCoord(oCoordR,m_StartWrapLocal);
+	GetLocalCenterCoord(cCoordR,cCoord);
+	GetIntersectCircle(aCoordR,oCoordR,cCoordR,mCoordR,Rm);//Rm is computed by global coord
 
-	bool rtn =getBcoordinate(aCoordR,oCoordR,cCoordR,mCoordR,Rm,sphereR,bCoordR1,bCoordR2);
+	bool rtn =GetBcoordinate(aCoordR,oCoordR,cCoordR,mCoordR,Rm,sphereR,bCoordR1,bCoordR2);
 
-	getGlobalCenterCoord(bCoord1,bCoordR1);
-	getGlobalCenterCoord(bCoord2,bCoordR2);
+	GetGlobalCenterCoord(bCoord1,bCoordR1);
+	GetGlobalCenterCoord(bCoord2,bCoordR2);
 	return rtn;
 }
 
 
 
 //let point on the surface
-void medVMEComputeWrapping::processViaPoint(){
-	double r = getCylinderRadius();
+void medVMEComputeWrapping::ProcessViaPoint(){
+	double r = GetCylinderRadius();
 	double x,y,distX,distY;
 	double newX[3],newY[3];
 
@@ -1842,13 +1842,13 @@ void medVMEComputeWrapping::processViaPoint(){
 
 }
 //only copy value of a point,do not create it
-void medVMEComputeWrapping::copyPointValue(double *srcPoint,double *aimPoint){
+void medVMEComputeWrapping::CopyPointValue(double *srcPoint,double *aimPoint){
 	aimPoint[0] =	srcPoint[0] ;
 	aimPoint[1] =	srcPoint[1] ;
 	aimPoint[2] =	srcPoint[2] ;
 }
 //process direction of helix
-void medVMEComputeWrapping::formatParameterForHelix(double  tc,double  to,double  Zc,double Zo,double & c ,double & k,double & tcRtn,double & toRtn){
+void medVMEComputeWrapping::FormatParameterForHelix(double  tc,double  to,double  Zc,double Zo,double & c ,double & k,double & tcRtn,double & toRtn){
 
 	double dif1,dif2,tmp;
 
@@ -1857,22 +1857,22 @@ void medVMEComputeWrapping::formatParameterForHelix(double  tc,double  to,double
 	if (tc <to)
 	{
 		dif1 = (to-tc);
-		dif2 = (tc+2*getPi())-to;
+		dif2 = (tc+2*GetPi())-to;
 		if (dif1>dif2)
 		{
 			tmp = tc;
 			tcRtn = to;
-			toRtn = tmp + 2*getPi();
+			toRtn = tmp + 2*GetPi();
 		}
 	}else if (to <tc)
 	{
 		dif1 = (tc-to);
-		dif2 = (to+2*getPi())-tc;
+		dif2 = (to+2*GetPi())-tc;
 		if (dif1>dif2)
 		{
 			tmp = to;
 			toRtn = tc;
-			tcRtn = tmp + 2*getPi();
+			tcRtn = tmp + 2*GetPi();
 		}
 	}
 
@@ -1880,7 +1880,7 @@ void medVMEComputeWrapping::formatParameterForHelix(double  tc,double  to,double
 	k = Zc - ( c * tcRtn );
 	k = Zo - ( c * toRtn );
 }
-double medVMEComputeWrapping::caculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx){
+double medVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag,int objIdx){
 	vtkMAFSmartPointer<vtkCellArray> cells;
 	vtkPoints *pts = vtkPoints::New();
 	double Xc,Yc,Zc,Xo,Yo,Zo;
@@ -1895,7 +1895,7 @@ double medVMEComputeWrapping::caculateHelix2(vtkPolyData * hCurve,double *cCoord
 	Xc = cCoord[0];Yc = cCoord[1];Zc = cCoord[2];
 	Xo = vCoord[0];Yo = vCoord[1];Zo = vCoord[2];
 
-	r = getCylinderRadius(objIdx);//sqrt( Xc*Xc + Yc*Yc );
+	r = GetCylinderRadius(objIdx);//sqrt( Xc*Xc + Yc*Yc );
 
 	cosTc = Xc/r;
 	sinTc = Yc/r;
@@ -1903,39 +1903,39 @@ double medVMEComputeWrapping::caculateHelix2(vtkPolyData * hCurve,double *cCoord
 	//if ( (cosTc>0 && sinTc>0) || (cosTc<0 && sinTc>0) ) use the same value that means :angle<90 or  180>angle>90
 	if ( (cosTc<=0 && sinTc<0) || (cosTc>0 && sinTc<0))// 270>angle>180 or 360>angle>270
 	{
-		tc = 2*getPi() -tc;
+		tc = 2*GetPi() -tc;
 	}
 	cosTo = Xo/r;
 	sinTo = Yo/r;
 	to = acos(cosTo);
 	if ( (cosTo<=0 && sinTo<0) || (cosTo>0 && sinTo<0))// 270>angle>180 or 360>angle>270
 	{
-		to = 2*getPi() -to;
+		to = 2*GetPi() -to;
 	}
 
 	//we compute from small angle to big angle
 	if(tc<to){
 		diff1 = to-tc;
-		diff2 = (tc+2*getPi()) -to;
+		diff2 = (tc+2*GetPi()) -to;
 		if (diff2<diff1)
 		{
-			tc = tc +2*getPi();
+			tc = tc +2*GetPi();
 
 		}
 	}else if (to<tc)
 	{
 		diff1 = tc -to;
-		diff2 = (to + 2*getPi()) -tc;
+		diff2 = (to + 2*GetPi()) -tc;
 		if (diff2<diff1)
 		{
-			to = to + 2*getPi();
+			to = to + 2*GetPi();
 		}
 	}
 
 	c = (Zc-Zo) /(tc-to);
 	k = Zc - c*tc;
 
-	rtn = drawHelix(tc,to,c,k, cells,pts,drawFlag,objIdx);
+	rtn = DrawHelix(tc,to,c,k, cells,pts,drawFlag,objIdx);
 
 	if (drawFlag)
 	{
@@ -1945,18 +1945,18 @@ double medVMEComputeWrapping::caculateHelix2(vtkPolyData * hCurve,double *cCoord
 	return rtn;
 }
 //compute helix formula and then draw curve
-double medVMEComputeWrapping::caculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag){
+double medVMEComputeWrapping::CaculateHelix2(vtkPolyData * hCurve,double *cCoord,double *vCoord,double drawFlag){
 	double rtn;
-	rtn = caculateHelix2(hCurve,cCoord,vCoord,drawFlag,2);
+	rtn = CaculateHelix2(hCurve,cCoord,vCoord,drawFlag,2);
 	return rtn;
 
 }
 
-double medVMEComputeWrapping::computeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord){
+double medVMEComputeWrapping::ComputeHelixCost2(double tc,double to,double c,double k,double *cCoord,double *vCoord){
 	double firstPoint[3],lastPoint[3],firstPoint2[3],lastPoint2[3];
 	double rtnArr[4],rtn;
 	double r;
-	r = getCylinderRadius();
+	r = GetCylinderRadius();
 	firstPoint[0] = r * cos(tc);
 	firstPoint[1] = r * sin(tc);
 	firstPoint[2] = c * tc + k;
@@ -1994,7 +1994,7 @@ double medVMEComputeWrapping::computeHelixCost2(double tc,double to,double c,dou
 	}
 	return rtn;
 }
-double medVMEComputeWrapping::drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx){
+double medVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag, int objIdx){
 
 	int j=0;
 	double i = 0;
@@ -2005,7 +2005,7 @@ double medVMEComputeWrapping::drawHelix(double tc,double to,double c,double k,vt
 	double dstep;
 	int step = 10;
 
-	r = getCylinderRadius(objIdx);//sqrt( Xc*Xc + Yc*Yc );
+	r = GetCylinderRadius(objIdx);//sqrt( Xc*Xc + Yc*Yc );
 
 	dMin = tc;
 	dMax = to;
@@ -2029,7 +2029,7 @@ double medVMEComputeWrapping::drawHelix(double tc,double to,double c,double k,vt
 
 		if (drawFlag)
 		{
-			getWrapGlobalTransform(nextPoint,gPoint,objIdx);
+			GetWrapGlobalTransform(nextPoint,gPoint,objIdx);
 			pts->InsertPoint( j, gPoint[0], gPoint[1], gPoint[2] );
 		}
 
@@ -2056,14 +2056,14 @@ double medVMEComputeWrapping::drawHelix(double tc,double to,double c,double k,vt
 
 }
 //compute points for helix
-double medVMEComputeWrapping::drawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag){
+double medVMEComputeWrapping::DrawHelix(double tc,double to,double c,double k,vtkCellArray * cells,vtkPoints *pts,bool drawFlag){
 	double rtn;
-	rtn = drawHelix(tc,to,c,k, cells,pts,drawFlag ,2);
+	rtn = DrawHelix(tc,to,c,k, cells,pts,drawFlag ,2);
 	return rtn;
 
 }
 //compute curve length YUxuan DingLi
-double medVMEComputeWrapping::computeCurveLength(double *aCoord,double *bCoord,double rm){
+double medVMEComputeWrapping::ComputeCurveLength(double *aCoord,double *bCoord,double rm){
 	double rtn = 0;
 	double disAB2 ;
 	disAB2 = vtkMath::Distance2BetweenPoints(aCoord,bCoord);
@@ -2072,17 +2072,17 @@ double medVMEComputeWrapping::computeCurveLength(double *aCoord,double *bCoord,d
 
 }
 
-double medVMEComputeWrapping::computeDistanceOfLm3(double *start,double *cCoord,double *iCoord){
+double medVMEComputeWrapping::ComputeDistanceOfLm3(double *start,double *cCoord,double *iCoord){
 	double rtn = 0;
 	double oc,ci;
 	oc = sqrt(vtkMath::Distance2BetweenPoints(start,cCoord));
-	ci = caculateHelix2(NULL,cCoord,m_ViaWrapLocal,false);//only compute length
+	ci = CaculateHelix2(NULL,cCoord,m_ViaWrapLocal,false);//only compute length
 	rtn = oc + ci;
 	return rtn;
 }
 
 //wrap sphere
-void medVMEComputeWrapping::wrapSphereOnly(const int step,bool allowIntersectFlag){
+void medVMEComputeWrapping::WrapSphereOnly(const int step,bool allowIntersectFlag){
 	double low,high;
 	double cylinderR;
 	double dstep,y1,rm = 0;
@@ -2100,42 +2100,42 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step,bool allowIntersectFla
 	m_WrapSide=WRAP_SHOREST;//only compute shorest
 
 	low = 0;
-	high = 2 * getPi();
-	cylinderR = getCylinderRadius();
+	high = 2 * GetPi();
+	cylinderR = GetCylinderRadius();
 
 	dstep = (high-low)/step;
-	getGlobalSphereCenter(sphereCenter);
-	getGlobalCylinderCenter(cylinderCenter);
+	GetGlobalSphereCenter(sphereCenter);
+	GetGlobalCylinderCenter(cylinderCenter);
 
-	getWrapLocalTransform(sphereCenter,m_SphereWrapLocal);
-	getWrapLocalTransform(m_StartPoint,m_StartWrapLocal);
-	getWrapLocalTransform(m_EndPoint,m_EndWrapLocal);
+	GetWrapLocalTransform(sphereCenter,m_SphereWrapLocal);
+	GetWrapLocalTransform(m_StartPoint,m_StartWrapLocal);
+	GetWrapLocalTransform(m_EndPoint,m_EndWrapLocal);
 
 	if (m_WrapSide==WRAP_FRONT || m_WrapSide == WRAP_BACK)
 	{
-		filterFlag = getFilterFlag(filterPlaneNormal);
+		filterFlag = GetFilterFlag(filterPlaneNormal);
 	}
 	filterFlag = 0;
 	for (double j=low;j<high;j = j+dstep)
 	{
 
-		y1 = getFunctionValue2(j,filterFlag,filterPlaneNormal,m_EndWrapLocal,aCoord,bCoord,mCoord,rm);//m is global
+		y1 = GetFunctionValue2(j,filterFlag,filterPlaneNormal,m_EndWrapLocal,aCoord,bCoord,mCoord,rm);//m is global
 
 		if (y1 != -1)
 		{
 
 			OAlength = sqrt(vtkMath::Distance2BetweenPoints(aCoord,m_SphereWrapLocal));
-			ABcurve = computeCurveLength(aCoord,bCoord,rm);
+			ABcurve = ComputeCurveLength(aCoord,bCoord,rm);
 			BElength = sqrt(vtkMath::Distance2BetweenPoints(bCoord,m_EndWrapLocal));
 			tmpLm = OAlength + ABcurve + BElength;
 
-			getWrapGlobalTransform(bCoord,bGcoord);
+			GetWrapGlobalTransform(bCoord,bGcoord);
 
 
 			bool intersectFlag = false;
 			if (!allowIntersectFlag)
 			{
-				intersectFlag = isLineInterSectObject(GetWrappedVME2(),bGcoord,m_EndPoint);
+				intersectFlag = IsLineInterSectObject(GetWrappedVME2(),bGcoord,m_EndPoint);
 			}
 
 			if (!intersectFlag && (idx==0 || (tmpLm<LmFinal) ) )//first time
@@ -2164,9 +2164,9 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step,bool allowIntersectFla
 
 
 
-		getWrapGlobalTransform(aCoordFinal,aGcoord);
-		getWrapGlobalTransform(bCoordFinal,bGcoord);
-		getWrapGlobalTransform(mCoordFinal,mGcoord);
+		GetWrapGlobalTransform(aCoordFinal,aGcoord);
+		GetWrapGlobalTransform(bCoordFinal,bGcoord);
+		GetWrapGlobalTransform(mCoordFinal,mGcoord);
 
 
 
@@ -2182,21 +2182,21 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step,bool allowIntersectFla
 		m_Goniometer->AddInput(L1->GetOutput());
 		m_Goniometer->AddInput(L2->GetOutput());*/
 		//-------------------------------------------------
-		ABcurve = getCutPlane2(aGcoord,bGcoord,mGcoord,clipData);//AB curve
+		ABcurve = GetCutPlane2(aGcoord,bGcoord,mGcoord,clipData);//AB curve
 		clipData->Update();
 
 
-		transformOutputPoint(m_EndPoint);
-		transformOutputPoint(m_StartPoint);
-		transformOutputPoint(aGcoord);
-		transformOutputPoint(bGcoord);
-		transformOutputPoint(mGcoord);
+		TransformOutputPoint(m_EndPoint);
+		TransformOutputPoint(m_StartPoint);
+		TransformOutputPoint(aGcoord);
+		TransformOutputPoint(bGcoord);
+		TransformOutputPoint(mGcoord);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(aGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(aGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(bGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(bGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		OA->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);//OA
 		OA->SetPoint2(aGcoord[0],aGcoord[1],aGcoord[2]);
@@ -2207,7 +2207,7 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step,bool allowIntersectFla
 
 		m_Goniometer->AddInput(OA->GetOutput());
 
-		transformOutputClipData(clipData->GetOutput());
+		TransformOutputClipData(clipData->GetOutput());
 		m_Goniometer->AddInput(clipData->GetOutput());
 		clipData->SetOutput(NULL);
 
@@ -2222,14 +2222,14 @@ void medVMEComputeWrapping::wrapSphereOnly(const int step,bool allowIntersectFla
 		m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 		GetWrappedMeterOutput()->Update(); 
 	}else{
-		directConnectSE();
+		DirectConnectSE();
 
 	}
 
 
 }
 
-void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
+void medVMEComputeWrapping::GetSphereCylinderWrapAdvance(const int step){
 
 
 	double filterFlag;
@@ -2240,14 +2240,14 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 
 
 
-	getGlobalSphereCenter(sphereCenter);
-	getWrapLocalTransform(sphereCenter,sphereCenterLocal);
-	getWrapLocalTransform(m_EndPoint,endLocal);
-	getWrapLocalTransform(m_StartPoint,startLocal);
+	GetGlobalSphereCenter(sphereCenter);
+	GetWrapLocalTransform(sphereCenter,sphereCenterLocal);
+	GetWrapLocalTransform(m_EndPoint,endLocal);
+	GetWrapLocalTransform(m_StartPoint,startLocal);
 
 	filterFlag = 1;//getFilterFlag(filterPlaneNormal);
 
-	Zh = sphereCenterLocal[2]-getSphereRadius();
+	Zh = sphereCenterLocal[2]-GetSphereRadius();
 	Zl = endLocal[2];
 	dstep = (Zh-Zl)/10;
 	//------------------compute insertion point---------------------
@@ -2256,19 +2256,19 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 		//----------wrap sphere only
 	}else if (filterFlag == WRAP_BACK)
 	{
-		getCcoordinateForCylinder(endLocal,cCoord1,cCoord2,2);
+		GetCcoordinateForCylinder(endLocal,cCoord1,cCoord2,2);
 
-		goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1,NULL,1);
-		goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2,NULL,1);
+		GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1,NULL,1);
+		GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2,NULL,1);
 
-		getWrapGlobalTransform(cCoord1,tangVia1);
-		getWrapGlobalTransform(cCoord2,tangVia2);
+		GetWrapGlobalTransform(cCoord1,tangVia1);
+		GetWrapGlobalTransform(cCoord2,tangVia2);
 
-		getSphereCylinderWrap(m_PathNum,tangVia1);
-		transformOutputPoint(tangVia1);
+		GetSphereCylinderWrap(m_PathNum,tangVia1);
+		TransformOutputPoint(tangVia1);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(tangVia1,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(tangVia1,m_ExportPointList[m_ExportPointList.size()-1]);
 
 	}
 }
@@ -2276,7 +2276,7 @@ void medVMEComputeWrapping::getSphereCylinderWrapAdvance(const int step){
 //we get two point,if mode is 1,use distance,if mode is 2, use same side to choose a point from these two
 //if mode is 2,need p2Global.
 //pointGlobal is return parameter.
-void medVMEComputeWrapping::getOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal){
+void medVMEComputeWrapping::GetOneSideTangentPointOnCylinder(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal){
 
 
 	double Zl,Zh;//Zi,Zo,
@@ -2284,7 +2284,7 @@ void medVMEComputeWrapping::getOneSideTangentPointOnCylinder(double *startLocal,
 	double d1,d2;
 
 
-	getCcoordinateForCylinder(endLocal,cCoord1_1,cCoord1_2,vmeIdx);//last parameter shows which vme object
+	GetCcoordinateForCylinder(endLocal,cCoord1_1,cCoord1_2,vmeIdx);//last parameter shows which vme object
 
 	Zh = startLocal[2];
 	Zl = endLocal[2];
@@ -2294,11 +2294,11 @@ void medVMEComputeWrapping::getOneSideTangentPointOnCylinder(double *startLocal,
 		Zl = startLocal[2];
 	}
 
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_1,NULL,4);//use distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_2,NULL,4);
+	GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_1,NULL,4);//use distanceSum 4 or angleValue 1
+	GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord1_2,NULL,4);
 
-	//getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,vmeIdx);
-	//getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,vmeIdx);
+	//GetWrapGlobalTransform(cCoord1_1,cCoordGlobal1,vmeIdx);
+	//GetWrapGlobalTransform(cCoord1_2,cCoordGlobal2,vmeIdx);
 	if (mode ==1 && p1Global==NULL)//use distance to choose
 	{
 		d1 =  sqrt(vtkMath::Distance2BetweenPoints(endLocal,cCoord1_1));
@@ -2307,25 +2307,25 @@ void medVMEComputeWrapping::getOneSideTangentPointOnCylinder(double *startLocal,
 		d2 += sqrt(vtkMath::Distance2BetweenPoints(cCoord1_2,startLocal));//obj 2
 		if (d1<d2)
 		{
-			copyPointValue(cCoord1_1,pointLocal);
+			CopyPointValue(cCoord1_1,pointLocal);
 		}else{
-			copyPointValue(cCoord1_2,pointLocal);
+			CopyPointValue(cCoord1_2,pointLocal);
 		}
-		getWrapGlobalTransform(pointLocal,pointGlobal,vmeIdx);
+		GetWrapGlobalTransform(pointLocal,pointGlobal,vmeIdx);
 	}else if (mode ==2 && p1Global != NULL)//use plane to choose
 	{
 
-		getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,vmeIdx);
-		getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,vmeIdx);
-		chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,vmeIdx,pointGlobal);
+		GetWrapGlobalTransform(cCoord1_1,cCoordGlobal1,vmeIdx);
+		GetWrapGlobalTransform(cCoord1_2,cCoordGlobal2,vmeIdx);
+		ChooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,vmeIdx,pointGlobal);
 	}
 
 
-	//getWrapGlobalTransform(point,pointGlobal,vmeIdx);
+	//GetWrapGlobalTransform(point,pointGlobal,vmeIdx);
 }
 //--we want to get p2,because p1 and p2 is on same vme so use local value
 //-get tangent point from start ,and with the same plane of p1
-void medVMEComputeWrapping::getOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global)
+void medVMEComputeWrapping::GetOneSideTangentPointOnCylinderWithSamePlane(double *startLocal,double *endLocal,double *p1,int vmeIdx,double *p2Global)
 {
 	double Zl,Zh;//Zi,Zo,
 	double cCoord2_1[3],cCoord2_2[3],cCoordGlobal1[3],cCoordGlobal2[3],p1Global[3];
@@ -2338,16 +2338,16 @@ void medVMEComputeWrapping::getOneSideTangentPointOnCylinderWithSamePlane(double
 		Zl = startLocal[2];
 	}
 
-	getCcoordinateForCylinder(startLocal,cCoord2_1,cCoord2_2,vmeIdx);
+	GetCcoordinateForCylinder(startLocal,cCoord2_1,cCoord2_2,vmeIdx);
 
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_1,p1,2);//last parameter use distanceSum 4 or angleValue 1
-	goldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_2,p1,2);//use plane 2
+	GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_1,p1,2);//last parameter use distanceSum 4 or angleValue 1
+	GoldenSectionSearch(Zl,Zh,0.001,endLocal,startLocal,cCoord2_2,p1,2);//use plane 2
 
-	getWrapGlobalTransform(p1,p1Global,vmeIdx);
-	getWrapGlobalTransform(cCoord2_1,cCoordGlobal1,vmeIdx);
-	getWrapGlobalTransform(cCoord2_2,cCoordGlobal2,vmeIdx);
+	GetWrapGlobalTransform(p1,p1Global,vmeIdx);
+	GetWrapGlobalTransform(cCoord2_1,cCoordGlobal1,vmeIdx);
+	GetWrapGlobalTransform(cCoord2_2,cCoordGlobal2,vmeIdx);
 
-	chooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,vmeIdx,p2Global);
+	ChooseSameSidePoint(m_EndPoint,p1Global,cCoordGlobal1,cCoordGlobal2,vmeIdx,p2Global);
 }
 /************************************************************************/
 /* to test if need wrap double cylinder.
@@ -2367,7 +2367,7 @@ void medVMEComputeWrapping::getOneSideTangentPointOnCylinderWithSamePlane(double
 //then from point 2 as start point to get another tangent line of second cylinder we get point 3 .
 //from point 3 get point 2 and from point 2 get point 3 iteratively.
 //util these two point has nothing different from last one.
-void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
+void medVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 
 
 	double viaLocal[3],startLocal[3],endLocal[3];//,tmpCoord[3],cCoord4[3],cCoord3[3]
@@ -2389,14 +2389,14 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 	int idx1,idx2;
 	double lineLength=0.00;
 	//--------------check distance between end point and center of object--------------
-	getGlobalCylinderCenter(center1,1);
-	getGlobalCylinderCenter(center2,2);
+	GetGlobalCylinderCenter(center1,1);
+	GetGlobalCylinderCenter(center2,2);
 
 	idx1=1;//by default end is near obj2
 	idx2=2;
 
-	d1 = getPointLineDistance(m_EndPoint,center1,m_CylinderAxis1);//distance from end point to cylinder axis
-	d2 = getPointLineDistance(m_EndPoint,center2,m_CylinderAxis2);
+	d1 = GetPointLineDistance(m_EndPoint,center1,m_CylinderAxis1);//distance from end point to cylinder axis
+	d2 = GetPointLineDistance(m_EndPoint,center2,m_CylinderAxis2);
 	if (d1<d2)//end point is near cylinder1
 	{
 		idx1=2;
@@ -2409,18 +2409,18 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 
 	m_Goniometer->RemoveAllInputs();
 
-	getWrapLocalTransform(m_EndPoint,endLocal,idx2);//relative to vme2
-	getWrapLocalTransform(m_StartPoint,startLocal,idx2);
-	getWrapLocalTransform(m_ViaPoint,viaLocal,idx2);//by default via point computed near end point
+	GetWrapLocalTransform(m_EndPoint,endLocal,idx2);//relative to vme2
+	GetWrapLocalTransform(m_StartPoint,startLocal,idx2);
+	GetWrapLocalTransform(m_ViaPoint,viaLocal,idx2);//by default via point computed near end point
 
 	//get C coord x,y value
 	//-------------*get p1 from end point vme 2*--------------------------
 
-	getOneSideTangentPointOnCylinder(startLocal,endLocal,idx2,1,NULL,p1Global);//choose by distance,mode 1 .parameter :(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal)
-	getWrapLocalTransform(p1Global,p1,idx2);
+	GetOneSideTangentPointOnCylinder(startLocal,endLocal,idx2,1,NULL,p1Global);//choose by distance,mode 1 .parameter :(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal)
+	GetWrapLocalTransform(p1Global,p1,idx2);
 
 	//-------------*get p2 from start point vme2*------------------------
-	getOneSideTangentPointOnCylinderWithSamePlane(startLocal,endLocal,p1,idx2,p2Global);//
+	GetOneSideTangentPointOnCylinderWithSamePlane(startLocal,endLocal,p1,idx2,p2Global);//
 	//----------check if line p2-start intersect with vme1
 
 	vtkNEW(Line1);
@@ -2429,18 +2429,18 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 	bool intersectFlag = false;
 	if (exchangeFlag)
 	{
-		intersectFlag = isLineInterSectObject(GetWrappedVME2(),p2Global,m_StartPoint);
+		intersectFlag = IsLineInterSectObject(GetWrappedVME2(),p2Global,m_StartPoint);
 	}else{
-		intersectFlag = isLineInterSectObject(GetWrappedVME1(),p2Global,m_StartPoint);
+		intersectFlag = IsLineInterSectObject(GetWrappedVME1(),p2Global,m_StartPoint);
 	}
 
 	if (intersectFlag)//if line p2-start intersect vme1 go on
 	{
 		//-------------*get p4 from start point to vme 1*--------------------------
 
-		getWrapLocalTransform(m_EndPoint,endLocal,idx1);//last parameter means object index
-		getWrapLocalTransform(m_StartPoint,startLocal,idx1);//last parameter means object index
-		getOneSideTangentPointOnCylinder(endLocal,startLocal,idx1,2,p1Global,p4Global);//choose by same side ,parameter :(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal)
+		GetWrapLocalTransform(m_EndPoint,endLocal,idx1);//last parameter means object index
+		GetWrapLocalTransform(m_StartPoint,startLocal,idx1);//last parameter means object index
+		GetOneSideTangentPointOnCylinder(endLocal,startLocal,idx1,2,p1Global,p4Global);//choose by same side ,parameter :(double *startLocal,double *endLocal,int vmeIdx,int mode,double *p1Global,double *pointGlobal)
 
 		vtkNEW(Line3);
 
@@ -2451,34 +2451,34 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 			vtkNEW(tmpLine);
 
 
-			copyPointValue(p2Global,flagP2);
+			CopyPointValue(p2Global,flagP2);
 
 			//-------*get p3 from p2*------------------- 
 
-			getWrapLocalTransform(p2Global,p2_1,idx1);// relative to vme 1
-			getWrapLocalTransform(p1Global,p1,idx1);
-			getWrapLocalTransform(m_StartPoint,startLocal,idx1);
-			getWrapLocalTransform(m_EndPoint,endLocal,idx1);
-			getWrapLocalTransform(p4Global,p4,idx1);
-			getOneSideTangentPointOnCylinderWithSamePlane(p2_1,startLocal,p1,idx1,p3Global);
+			GetWrapLocalTransform(p2Global,p2_1,idx1);// relative to vme 1
+			GetWrapLocalTransform(p1Global,p1,idx1);
+			GetWrapLocalTransform(m_StartPoint,startLocal,idx1);
+			GetWrapLocalTransform(m_EndPoint,endLocal,idx1);
+			GetWrapLocalTransform(p4Global,p4,idx1);
+			GetOneSideTangentPointOnCylinderWithSamePlane(p2_1,startLocal,p1,idx1,p3Global);
 
 			//-----------*get p2 from p3  relative vme 2*-------------------
-			getWrapLocalTransform(p3Global,p3_2,idx2);//
-			getWrapLocalTransform(p1Global,p1,idx2);//p1 relative vme2
-			getWrapLocalTransform(m_EndPoint,endLocal,idx2);
-			getWrapLocalTransform(m_StartPoint,startLocal,idx2);
-			getWrapLocalTransform(p4Global,p4,idx2);
-			getOneSideTangentPointOnCylinderWithSamePlane(p3_2,endLocal,p4,idx2,p2Global);
+			GetWrapLocalTransform(p3Global,p3_2,idx2);//
+			GetWrapLocalTransform(p1Global,p1,idx2);//p1 relative vme2
+			GetWrapLocalTransform(m_EndPoint,endLocal,idx2);
+			GetWrapLocalTransform(m_StartPoint,startLocal,idx2);
+			GetWrapLocalTransform(p4Global,p4,idx2);
+			GetOneSideTangentPointOnCylinderWithSamePlane(p3_2,endLocal,p4,idx2,p2Global);
 
-			stopFlag = checkNearEnough(flagP2,p2Global);//@to do check two points
+			stopFlag = CheckNearEnough(flagP2,p2Global);//@to do check two points
 
 		}
 
 		//-----------------get P1 from end point idx2-------------
-		getWrapLocalTransform(m_EndPoint,endLocal,idx2);
-		getWrapLocalTransform(p2Global,p22,idx2);
-		getWrapLocalTransform(m_StartPoint,startLocal,idx2);
-		getWrapLocalTransform(p3Global,p3_2,idx2);
+		GetWrapLocalTransform(m_EndPoint,endLocal,idx2);
+		GetWrapLocalTransform(p2Global,p22,idx2);
+		GetWrapLocalTransform(m_StartPoint,startLocal,idx2);
+		GetWrapLocalTransform(p3Global,p3_2,idx2);
 
 		Zh = startLocal[2];
 		Zl = endLocal[2];
@@ -2490,57 +2490,57 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 		testValue = getPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_1);
 		testValue = getPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_2);
 
-		getWrapGlobalTransform(cCoord1_1,cCoordGlobal1,idx2);
-		getWrapGlobalTransform(cCoord1_2,cCoordGlobal2,idx2);
+		GetWrapGlobalTransform(cCoord1_1,cCoordGlobal1,idx2);
+		GetWrapGlobalTransform(cCoord1_2,cCoordGlobal2,idx2);
 
 		//---------------choose one point witch at same side as p1--------------------------
-		chooseSameSidePoint(m_EndPoint,p2Global,cCoordGlobal1,cCoordGlobal2,idx2,p1Global);
+		ChooseSameSidePoint(m_EndPoint,p2Global,cCoordGlobal1,cCoordGlobal2,idx2,p1Global);
 		//-----------------get P4 from start point idx------------
 
-		getWrapLocalTransform(m_EndPoint,endLocal,idx1);
-		getWrapLocalTransform(p3Global,p13,idx1);
-		getWrapLocalTransform(p2Global,p2_1,idx1);
-		getWrapLocalTransform(m_StartPoint,startLocal,idx1);
+		GetWrapLocalTransform(m_EndPoint,endLocal,idx1);
+		GetWrapLocalTransform(p3Global,p13,idx1);
+		GetWrapLocalTransform(p2Global,p2_1,idx1);
+		GetWrapLocalTransform(m_StartPoint,startLocal,idx1);
 
 
 		testValue = getPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_1);
 		testValue = getPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_2);
 
-		getWrapGlobalTransform(cCoord4_1,cCoordGlobal1,idx1);
-		getWrapGlobalTransform(cCoord4_2,cCoordGlobal2,idx1);
+		GetWrapGlobalTransform(cCoord4_1,cCoordGlobal1,idx1);
+		GetWrapGlobalTransform(cCoord4_2,cCoordGlobal2,idx1);
 
-		chooseSameSidePoint(m_StartPoint,p3Global,cCoordGlobal1,cCoordGlobal2,idx1,p4Global);	
+		ChooseSameSidePoint(m_StartPoint,p3Global,cCoordGlobal1,cCoordGlobal2,idx1,p4Global);	
 		//--------------------------------------------------------
-		getWrapLocalTransform(p1Global,p1,idx2);
-		getWrapLocalTransform(p2Global,p22,idx2);
-		getWrapLocalTransform(p3Global,p13,idx1);
-		getWrapLocalTransform(p4Global,p4,idx1);
+		GetWrapLocalTransform(p1Global,p1,idx2);
+		GetWrapLocalTransform(p2Global,p22,idx2);
+		GetWrapLocalTransform(p3Global,p13,idx1);
+		GetWrapLocalTransform(p4Global,p4,idx1);
 		vtkNEW(hCurve12);
-		dCurve12 = caculateHelix2(hCurve12,p1,p22,true,idx2);
+		dCurve12 = CaculateHelix2(hCurve12,p1,p22,true,idx2);
 		//finally, connect with start point
 		vtkNEW(hCurve34);
-		dCurve34 = caculateHelix2(hCurve34,p13,p4,true,idx1);//do transform inside
+		dCurve34 = CaculateHelix2(hCurve34,p13,p4,true,idx1);//do transform inside
 		//----------------------draw line---------------
-		transformOutputPoint(m_EndPoint);
-		transformOutputPoint(p1Global);
-		transformOutputPoint(p2Global);
-		transformOutputPoint(p3Global);
-		transformOutputPoint(p4Global);
-		transformOutputPoint(m_StartPoint);
-		transformOutput(hCurve12);
-		transformOutput(hCurve34);
+		TransformOutputPoint(m_EndPoint);
+		TransformOutputPoint(p1Global);
+		TransformOutputPoint(p2Global);
+		TransformOutputPoint(p3Global);
+		TransformOutputPoint(p4Global);
+		TransformOutputPoint(m_StartPoint);
+		TransformOutput(hCurve12);
+		TransformOutput(hCurve34);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(p3Global,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(p3Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(p4Global,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(p4Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		lineLength += sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,p1Global));  //end--p1
 		lineLength += sqrt(vtkMath::Distance2BetweenPoints(p2Global,p3Global));    //p2--p3
@@ -2561,21 +2561,21 @@ void medVMEComputeWrapping::getCylinderCylinderWrap(const int step){
 		m_Goniometer->AddInput(hCurve12);
 		m_Goniometer->AddInput(hCurve34);
 	}else{//only connect end-p1-p2-start
-		transformOutputPoint(m_EndPoint);
-		transformOutputPoint(p1Global);
-		transformOutputPoint(p2Global);
-		transformOutputPoint(m_StartPoint);
-		getWrapLocalTransform(p1Global,p1,idx2);
-		getWrapLocalTransform(p2Global,p22,idx2);
+		TransformOutputPoint(m_EndPoint);
+		TransformOutputPoint(p1Global);
+		TransformOutputPoint(p2Global);
+		TransformOutputPoint(m_StartPoint);
+		GetWrapLocalTransform(p1Global,p1,idx2);
+		GetWrapLocalTransform(p2Global,p22,idx2);
 
 		vtkNEW(hCurve12);
-		dCurve12 = caculateHelix2(hCurve12,p1,p22,true,idx2);
+		dCurve12 = CaculateHelix2(hCurve12,p1,p22,true,idx2);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(p1Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(p2Global,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		lineLength += sqrt(vtkMath::Distance2BetweenPoints(m_EndPoint,p1Global));  //end--p1
 		lineLength += dCurve12;
@@ -2613,7 +2613,7 @@ double medVMEComputeWrapping::getPointOnPlane(double zL ,double zH,double *point
 	while (zL<zH)
 	{
 		output[2] = zL;
-		tmpValue = getPlaneValue(point1,point2,point3,output);
+		tmpValue = GetPlaneValue(point1,point2,point3,output);
 		if (idx ==0)
 		{
 			rtn = tmpValue;
@@ -2632,7 +2632,7 @@ double medVMEComputeWrapping::getPointOnPlane(double zL ,double zH,double *point
 }
 //distance between point and line
 //use area formula
-double medVMEComputeWrapping::getPointLineDistance(double *point,double *Lpoint1,double *Lpoint2){
+double medVMEComputeWrapping::GetPointLineDistance(double *point,double *Lpoint1,double *Lpoint2){
 	/*a=sqrt£¨(x1-x2)^2+(y1-y2)^2+(z1-z2)^2£©
 	b=sqrt£¨(x2-x3)^2+(y2-y3)^2+(z2-z3)^2£©
 	c=sqrt£¨(x3-x1)^2+(y3-y1)^2+(z3-z1)^2)
@@ -2652,9 +2652,9 @@ double medVMEComputeWrapping::getPointLineDistance(double *point,double *Lpoint1
 	return rtn;
 
 }
-void medVMEComputeWrapping::chooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint){
+void medVMEComputeWrapping::ChooseSameSidePoint(double *planePoint1,double *filterPoint,double *inputPoint1,double *inputPoint2,int cylinderIdx,double *rtnPoint){
 	double cylinderCenter[3],filterPlaneNormal[3];
-	getGlobalCylinderCenter(cylinderCenter,cylinderIdx);
+	GetGlobalCylinderCenter(cylinderCenter,cylinderIdx);
 
 	vtkPlaneSource *planeSource;
 	vtkNEW(planeSource);
@@ -2690,10 +2690,10 @@ void medVMEComputeWrapping::chooseSameSidePoint(double *planePoint1,double *filt
 	filterFlag2 = vtkMath::Dot(endP4_2,filterPlaneNormal);
 	if ( director*filterFlag1>0 && director*filterFlag2<0)
 	{
-		copyPointValue(inputPoint1,rtnPoint);
+		CopyPointValue(inputPoint1,rtnPoint);
 	}else if ( director*filterFlag2>0 && director*filterFlag1<0)
 	{
-		copyPointValue(inputPoint2,rtnPoint);
+		CopyPointValue(inputPoint2,rtnPoint);
 	}else if (director*filterFlag2>0 && director*filterFlag1>0) //same director
 	{
 
@@ -2701,7 +2701,7 @@ void medVMEComputeWrapping::chooseSameSidePoint(double *planePoint1,double *filt
 
 }
 
-bool medVMEComputeWrapping::checkNearEnough(double *firstPoint,double *secondPoint){
+bool medVMEComputeWrapping::CheckNearEnough(double *firstPoint,double *secondPoint){
 	bool rtn = false;
 	double distance;
 	distance = (firstPoint[0]-secondPoint[0])*(firstPoint[0]-secondPoint[0]) +(firstPoint[1]-secondPoint[1])*(firstPoint[1]-secondPoint[1])+(firstPoint[2]-secondPoint[2])*(firstPoint[2]-secondPoint[2]);
@@ -2713,7 +2713,7 @@ bool medVMEComputeWrapping::checkNearEnough(double *firstPoint,double *secondPoi
 }
 //-------------
 //viaPoint is a point on the cylinder surface
-void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoint){
+void medVMEComputeWrapping::GetSphereCylinderWrap(const int step,double *viaPoint){
 	//const int step = 36;
 	clock_t startTime,finishTime;
 	double totalTime;
@@ -2749,10 +2749,10 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 	//outputFile2<<"write log for every angle and path length for OA-ABcurve-BI"<<std::endl;
 	outputFile.clear();
 	low = 0;
-	high = 2 * getPi();
+	high = 2 * GetPi();
 	m_Goniometer->RemoveAllInputs();
 
-	cylinderR = getCylinderRadius();
+	cylinderR = GetCylinderRadius();
 	vtkClipPolyData *clipData; 
 
 	vtkClipPolyData *clipDataCI;
@@ -2760,20 +2760,20 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 	dstep = (high-low)/step;
 
 
-	getGlobalSphereCenter(sphereCenter);
-	getGlobalCylinderCenter(cylinderCenter);
+	GetGlobalSphereCenter(sphereCenter);
+	GetGlobalCylinderCenter(cylinderCenter);
 
-	getWrapLocalTransform(sphereCenter,m_SphereWrapLocal);
+	GetWrapLocalTransform(sphereCenter,m_SphereWrapLocal);
 
-	getWrapLocalTransform(m_StartPoint,m_StartWrapLocal);
+	GetWrapLocalTransform(m_StartPoint,m_StartWrapLocal);
 
-	getWrapLocalTransform(viaPoint,viaWrapLocal);
+	GetWrapLocalTransform(viaPoint,viaWrapLocal);
 
 	//------------transform start ,sphere center,insertion 
 
 	if (m_WrapSide==WRAP_FRONT || m_WrapSide == WRAP_BACK)
 	{
-		filterFlag = getFilterFlag(filterPlaneNormal);
+		filterFlag = GetFilterFlag(filterPlaneNormal);
 	}
 
 
@@ -2785,17 +2785,17 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 		vtkNEW(clipData);
 		vtkNEW(clipDataCI);
 
-		y1 = getFunctionValue2(j,filterFlag,filterPlaneNormal,viaWrapLocal,aCoord,bCoord,mCoord,rm);//m is global
+		y1 = GetFunctionValue2(j,filterFlag,filterPlaneNormal,viaWrapLocal,aCoord,bCoord,mCoord,rm);//m is global
 
 		if (y1 != -1)
 		{
-			testValue = testPlane(aCoord,bCoord,m_StartWrapLocal,viaWrapLocal);
+			testValue = TestPlane(aCoord,bCoord,m_StartWrapLocal,viaWrapLocal);
 
 			for (int i=0;i<10;i++)
 			{
-				cflag = getCcoordinate2(bCoord,cCoord1,cCoord2);
-				d1 = computeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord,cCoord1,rm);
-				d2 = computeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord,cCoord2,rm);
+				cflag = GetCcoordinate2(bCoord,cCoord1,cCoord2);
+				d1 = ComputeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord,cCoord1,rm);
+				d2 = ComputeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord,cCoord2,rm);
 				cCoord[0] = cCoord1[0];cCoord[1] = cCoord1[1];cCoord[2] = cCoord1[2];
 				if (d1>d2)
 				{
@@ -2806,7 +2806,7 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 					testValue1 = cCoord[0]*cCoord[0]+cCoord[1]*cCoord[1];//Xc*Xc +Yc*Yc = r*r
 					testValue2 = bCoord[0]*cCoord[0]+bCoord[1]*cCoord[1];//Xc*Xb + Yc*Yb = r*r;
 
-					getBcoordinateUpdate2(aCoord,bCoord,cCoord,bCoord1,bCoord2);
+					GetBcoordinateUpdate2(aCoord,bCoord,cCoord,bCoord1,bCoord2);
 
 					testValue1 = cCoord[0]*cCoord[0]+cCoord[1]*cCoord[1];//Xc*Xc +Yc*Yc = r*r
 					testValue2 = bCoord[0]*cCoord[0]+bCoord[1]*cCoord[1];//Xc*Xb + Yc*Yb = r*r;
@@ -2817,8 +2817,8 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 					tanCost1 = fabs(tanValue1-(cylinderR*cylinderR));
 					tanCost2 = fabs(tanValue2 - (cylinderR*cylinderR));
 
-					d1 = computeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord1,cCoord,rm);
-					d2 = computeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord2,cCoord,rm);
+					d1 = ComputeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord1,cCoord,rm);
+					d2 = ComputeDistanceOfLm2(m_StartWrapLocal,viaWrapLocal,aCoord,bCoord2,cCoord,rm);
 					if (fabs((d2-d1)/d2)<0.01 )
 					{
 						if (tanCost1<tanCost2)
@@ -2848,8 +2848,8 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 					testValue1 = cCoord[0]*cCoord[0]+cCoord[1]*cCoord[1];//Xc*Xc +Yc*Yc = r*r
 					testValue2 = bCoord[0]*cCoord[0]+bCoord[1]*cCoord[1];//Xc*Xb + Yc*Yb = r*r;
 				}
-				testValue = testPlane(aCoord,bCoord,m_StartWrapLocal,cCoord1);
-				testValue = testPlane(aCoord,bCoord,m_StartWrapLocal,cCoord2);
+				testValue = TestPlane(aCoord,bCoord,m_StartWrapLocal,cCoord1);
+				testValue = TestPlane(aCoord,bCoord,m_StartWrapLocal,cCoord2);
 			}//end of for
 
 			testValue1 = cCoord[0]*cCoord[0]+cCoord[1]*cCoord[1];//Xc*Xc +Yc*Yc = r*r
@@ -2858,9 +2858,9 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 			OAlength = sqrt(vtkMath::Distance2BetweenPoints(aCoord,m_StartWrapLocal));
 			//ABcurve = getCutPlane2(aGcoord,bGcoord,mGcoord,clipData);//AB curve tmp
 
-			ABcurve = computeCurveLength(aCoord,bCoord,rm);
+			ABcurve = ComputeCurveLength(aCoord,bCoord,rm);
 			BClength = sqrt(vtkMath::Distance2BetweenPoints(bCoord,cCoord));
-			CIcurve = caculateHelix2(NULL,cCoord,viaWrapLocal,false);//@todo weih
+			CIcurve = CaculateHelix2(NULL,cCoord,viaWrapLocal,false);//@todo weih
 			tmpLm = OAlength + ABcurve + BClength + CIcurve;
 
 			if (idx==0 || (tmpLm<LmFinal) )//first time
@@ -2895,32 +2895,32 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 		vtkNEW(clipDataCI);
 		vtkNEW(hcurve);
 
-		getWrapGlobalTransform(aCoordFinal,aGcoord);
-		getWrapGlobalTransform(bCoordFinal,bGcoord);
-		getWrapGlobalTransform(cCoordFinal,cGcoord);
-		getWrapGlobalTransform(mCoordFinal,mGcoord);
+		GetWrapGlobalTransform(aCoordFinal,aGcoord);
+		GetWrapGlobalTransform(bCoordFinal,bGcoord);
+		GetWrapGlobalTransform(cCoordFinal,cGcoord);
+		GetWrapGlobalTransform(mCoordFinal,mGcoord);
 
 
-		ABcurve = getCutPlane2(aGcoord,bGcoord,mGcoord,clipData);//AB curve
+		ABcurve = GetCutPlane2(aGcoord,bGcoord,mGcoord,clipData);//AB curve
 		clipData->Update();
 
-		transformOutputClipData(clipData->GetOutput());
+		TransformOutputClipData(clipData->GetOutput());
 		m_Goniometer->AddInput(clipData->GetOutput());
 		clipData->SetOutput(NULL);
 
-		transformOutputPoint(m_StartPoint);
-		transformOutputPoint(aGcoord);
-		transformOutputPoint(bGcoord);
-		transformOutputPoint(cGcoord);
+		TransformOutputPoint(m_StartPoint);
+		TransformOutputPoint(aGcoord);
+		TransformOutputPoint(bGcoord);
+		TransformOutputPoint(cGcoord);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(aGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(aGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(bGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(bGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		m_ExportPointList.push_back(new double[3]);
-		copyPointValue(cGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
+		CopyPointValue(cGcoord,m_ExportPointList[m_ExportPointList.size()-1]);
 
 		OA->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);//OA
 		OA->SetPoint2(aGcoord[0],aGcoord[1],aGcoord[2]);
@@ -2928,8 +2928,8 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 		BC->SetPoint1(bGcoord[0],bGcoord[1],bGcoord[2]);
 		BC->SetPoint2(cGcoord[0],cGcoord[1],cGcoord[2]);
 
-		CIcurve = caculateHelix2(hcurve,cCoordFinal,viaWrapLocal,true);//do transform inside
-		transformOutput(hcurve);
+		CIcurve = CaculateHelix2(hcurve,cCoordFinal,viaWrapLocal,true);//do transform inside
+		TransformOutput(hcurve);
 
 
 		m_Goniometer->AddInput(OA->GetOutput());
@@ -2948,7 +2948,7 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 		outputFile.close();
 
 		m_Distance = LmFinal;
-		angleFinal = angleFinal *180.0 /getPi();
+		angleFinal = angleFinal *180.0 /GetPi();
 
 		finishTime = clock();
 		totalTime = (double) (finishTime - startTime) / CLOCKS_PER_SEC;
@@ -2967,22 +2967,22 @@ void medVMEComputeWrapping::getSphereCylinderWrap(const int step,double *viaPoin
 		GetWrappedMeterOutput()->Update(); 
 
 	}else{
-		directConnectSE();
+		DirectConnectSE();
 	}
 
 
 
 }
 
-double medVMEComputeWrapping::getFilterFlag(double *filterPlaneNormal){
+double medVMEComputeWrapping::GetFilterFlag(double *filterPlaneNormal){
 	double viaProjectWrapLocal[3],viaProject90WrapLocal[3];//viaPoint with sphere z coord
 	double cylinderCenterWrapLocal[3],filterVector1[3],startWrapLocal[3];
 	double rtn = 0;
 	cylinderCenterWrapLocal[0] = 0;cylinderCenterWrapLocal[1] = 0;cylinderCenterWrapLocal[2] = 0;
-	copyPointValue(m_ViaWrapLocal,viaProjectWrapLocal);
+	CopyPointValue(m_ViaWrapLocal,viaProjectWrapLocal);
 	viaProjectWrapLocal[2] = m_SphereWrapLocal[2];
-	get90DegreePointOnCylinder(viaProjectWrapLocal,m_SphereWrapLocal,viaProject90WrapLocal);
-	getWrapLocalTransform(m_StartPoint,startWrapLocal);
+	Get90DegreePointOnCylinder(viaProjectWrapLocal,m_SphereWrapLocal,viaProject90WrapLocal);
+	GetWrapLocalTransform(m_StartPoint,startWrapLocal);
 	vtkPlaneSource *planeSource;
 	vtkNEW(planeSource);
 	planeSource->SetOrigin(viaProject90WrapLocal);
@@ -3000,7 +3000,7 @@ double medVMEComputeWrapping::getFilterFlag(double *filterPlaneNormal){
 
 }
 
-bool medVMEComputeWrapping::isLineInterSectObject(mafVME *wrapVME,double *point1,double *point2){
+bool medVMEComputeWrapping::IsLineInterSectObject(mafVME *wrapVME,double *point1,double *point2){
 	double startPoint[3],endPoint[3];
 
 	bool rtn = false;
@@ -3052,7 +3052,7 @@ bool medVMEComputeWrapping::isLineInterSectObject(mafVME *wrapVME,double *point1
 
 }
 //if correct return true
-bool medVMEComputeWrapping::checkTwoRadius(){
+bool medVMEComputeWrapping::CheckTwoRadius(){
 	bool rtn = true;
 	double cylinderRadius ;
 	double sphereRadius;
@@ -3069,8 +3069,8 @@ bool medVMEComputeWrapping::checkTwoRadius(){
 		type2 = surface2->GetGeometryType();
 
 		if (type1 == mafVMESurfaceParametric::PARAMETRIC_SPHERE && type2 == mafVMESurfaceParametric::PARAMETRIC_CYLINDER){
-			cylinderRadius = getCylinderRadius();
-			sphereRadius = getSphereRadius();
+			cylinderRadius = GetCylinderRadius();
+			sphereRadius = GetSphereRadius();
 			if (sphereRadius <= cylinderRadius)
 			{
 				rtn = false;
@@ -3083,7 +3083,7 @@ bool medVMEComputeWrapping::checkTwoRadius(){
 	return rtn;
 }
 //if correct return true
-bool medVMEComputeWrapping::checkAlign(){
+bool medVMEComputeWrapping::CheckAlign(){
 	bool rtn =false;
 	vtkLineSource *cAxis,*centerline;
 	vtkNEW(cAxis);
@@ -3092,10 +3092,10 @@ bool medVMEComputeWrapping::checkAlign(){
 	double sphereCenter[3];
 	double sphereCylinderVector[3],axisVector[3];
 	double axis[3];
-	copyPointValue(m_CylinderAxis2,axis);
+	CopyPointValue(m_CylinderAxis2,axis);
 
-	getGlobalCylinderCenter(cylinderCenter);
-	getGlobalSphereCenter(sphereCenter);
+	GetGlobalCylinderCenter(cylinderCenter);
+	GetGlobalSphereCenter(sphereCenter);
 
 	sphereCylinderVector[0] = sphereCenter[0]-cylinderCenter[0];
 	sphereCylinderVector[1] = sphereCenter[1]-cylinderCenter[1];
@@ -3119,7 +3119,7 @@ bool medVMEComputeWrapping::checkAlign(){
 				rtn =true;
 			}
 		}
-		else if ( fabs(fabs(value) - 1.0) < getCylinderRadius()/1000)
+		else if ( fabs(fabs(value) - 1.0) < GetCylinderRadius()/1000)
 		{
 			rtn = true;
 
@@ -3170,20 +3170,20 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 	bool nearFlagEnd,nearFlagStart;
 	if (m_WrappedMode1 == SPHERE_CYLINDER || m_WrappedMode1 == SINGLE_CYLINDER || m_WrappedMode1 == CYLINDER_CYLINDER)
 	{
-		getWrapLocalTransform(m_EndPoint,endWrapLocal,2);//relative to second vme
-		getWrapLocalTransform(m_StartPoint,startWrapLocal,2);
+		GetWrapLocalTransform(m_EndPoint,endWrapLocal,2);//relative to second vme
+		GetWrapLocalTransform(m_StartPoint,startWrapLocal,2);
 
-		//m_Tolerance = getCylinderRadius()/4.0; // choose a suitable value
-		nearFlagEnd = isEndPonintOnCylinder(m_Tolerance,endWrapLocal);
-		nearFlagStart = isEndPonintOnCylinder(m_Tolerance,startWrapLocal);
+		//m_Tolerance = GetCylinderRadius()/4.0; // choose a suitable value
+		nearFlagEnd = IsEndPonintOnCylinder(m_Tolerance,endWrapLocal);
+		nearFlagStart = IsEndPonintOnCylinder(m_Tolerance,startWrapLocal);
 
 		if (nearFlagEnd)
 		{
-			getWrapGlobalTransform(endWrapLocal,m_EndPoint,2);//change end Point,adjusted value
+			GetWrapGlobalTransform(endWrapLocal,m_EndPoint,2);//change end Point,adjusted value
 		}
 		if (nearFlagStart)
 		{
-			getWrapGlobalTransform(startWrapLocal,m_StartPoint,2);//change end Point
+			GetWrapGlobalTransform(startWrapLocal,m_StartPoint,2);//change end Point
 		}
 
 	}
@@ -3272,13 +3272,13 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 			//x = endWrapLocal[0];//note:here
 			//y = endWrapLocal[1];
 
-			getWrapLocalTransform(tmpIntersect1,tmpIntersectLocal1);
-			getWrapLocalTransform(tmpIntersect2,tmpIntersectLocal2);
+			GetWrapLocalTransform(tmpIntersect1,tmpIntersectLocal1);
+			GetWrapLocalTransform(tmpIntersect2,tmpIntersectLocal2);
 
 			x = tmpIntersectLocal1[0];
 			y = tmpIntersectLocal1[1];
 
-			r = getCylinderRadius();
+			r = GetCylinderRadius();
 			if ( fabs(x*x +y*y - r*r)<m_Tolerance)
 			{
 				//x = startWrapLocal[0];
@@ -3321,12 +3321,12 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 					{
 						if (nearFlagStart)//exchange start and end
 						{
-							getWrapGlobalTransform(startWrapLocal,startWrapGlobal);//change start end Point
-							copyPointValue(m_EndPoint,m_StartPoint);
-							copyPointValue(startWrapGlobal,m_EndPoint);
+							GetWrapGlobalTransform(startWrapLocal,startWrapGlobal);//change start end Point
+							CopyPointValue(m_EndPoint,m_StartPoint);
+							CopyPointValue(startWrapGlobal,m_EndPoint);
 						}else if (nearFlagEnd)
 						{
-							getWrapGlobalTransform(endWrapLocal,m_EndPoint);//change end Point
+							GetWrapGlobalTransform(endWrapLocal,m_EndPoint);//change end Point
 						}
 						rtn = WRAP_SPHERE_CYLINDER;
 					}else{
@@ -3395,17 +3395,17 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 	if (isNearEndflag)//near end point
 	{
 		if(d1<d2 ){
-			copyPointValue(tmpIntersect1,viaPoint);
+			CopyPointValue(tmpIntersect1,viaPoint);
 		}else{
-			copyPointValue(tmpIntersect2,viaPoint);
+			CopyPointValue(tmpIntersect2,viaPoint);
 		}
 	}else{//near start point
 
 		if (d1>d2)
 		{
-			copyPointValue(tmpIntersect1,viaPoint);
+			CopyPointValue(tmpIntersect1,viaPoint);
 		}else{
-			copyPointValue(tmpIntersect2,viaPoint);
+			CopyPointValue(tmpIntersect2,viaPoint);
 		}
 	}
 
@@ -3417,10 +3417,10 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 }
 
 
-void medVMEComputeWrapping::get90DegreePointOnCylinder(double *firstPoint,double *sphereCenter,double *secondPoint){
+void medVMEComputeWrapping::Get90DegreePointOnCylinder(double *firstPoint,double *sphereCenter,double *secondPoint){
 	double Px,Py,Cx,Cy,r;
 	double A,B,C,a,b,c;
-	r = getCylinderRadius();
+	r = GetCylinderRadius();
 	//X*X + Y*Y = r*r;
 	//(X-Cx)2 +(Y-Cy)2 +(Px-Cx)2+(Py-Cy)2=(X-Px)2 +(Y-Py)2;
 	Px = firstPoint[0];
@@ -3440,7 +3440,7 @@ void medVMEComputeWrapping::get90DegreePointOnCylinder(double *firstPoint,double
 	secondPoint[2] = firstPoint[2];
 }
 
-double medVMEComputeWrapping::getCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData){
+double medVMEComputeWrapping::GetCutPlaneForCylinder(double *center,double *t1,double *t2,mafVME *wrapped_vme,vtkClipPolyData *clipData){
 
 	double rtn = 0;
 
@@ -3509,7 +3509,7 @@ double medVMEComputeWrapping::getCutPlaneForCylinder(double *center,double *t1,d
 
 
 //get ellipse
-double medVMEComputeWrapping::getCutPlaneForCI(double *bCoord,double *cCoord,vtkClipPolyData *clipData){
+double medVMEComputeWrapping::GetCutPlaneForCI(double *bCoord,double *cCoord,vtkClipPolyData *clipData){
 
 	double rtn = 0;
 
@@ -3576,7 +3576,7 @@ double medVMEComputeWrapping::getCutPlaneForCI(double *bCoord,double *cCoord,vtk
 }
 
 
-double medVMEComputeWrapping::getCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *clipData){
+double medVMEComputeWrapping::GetCutPlane2(double *aPoint,double *bPoint,double *mPoint,vtkClipPolyData *clipData){
 
 	double rtn = 0;
 	double midPoint[3];
@@ -3650,7 +3650,7 @@ double medVMEComputeWrapping::getCutPlane2(double *aPoint,double *bPoint,double 
 
 
 //equation (14)
-double medVMEComputeWrapping::computeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm){
+double medVMEComputeWrapping::ComputeDistanceOfLm(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *rCoord,double rm){
 	//Lm = OA + ABcurve +BI
 	double OA,AB,BI,ABcurve,tmp,rtn=0,angle ;
 	//a dot b = |a|*|b|cosA
@@ -3682,7 +3682,7 @@ double medVMEComputeWrapping::computeDistanceOfLm(double *oCoord,double *iCoord,
 	return rtn;
 }
 //Lm = OA + ABcurve +BC + CI
-double medVMEComputeWrapping::computeDistanceOfLm2(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double rm){
+double medVMEComputeWrapping::ComputeDistanceOfLm2(double *oCoord,double *iCoord,double *aCoord,double *bCoord,double *cCoord,double rm){
 
 	double OA,AB2,BC,CI,rtn=0 ;
 
@@ -3697,37 +3697,37 @@ double medVMEComputeWrapping::computeDistanceOfLm2(double *oCoord,double *iCoord
 	return rtn;
 }
 
-void medVMEComputeWrapping::getLocalCenterCoord(double *localCoord,double *globalCoord){
+void medVMEComputeWrapping::GetLocalCenterCoord(double *localCoord,double *globalCoord){
 	localCoord[0] = globalCoord[0] - m_SphereWrapLocal[0];
 	localCoord[1] = globalCoord[1] - m_SphereWrapLocal[1];
 	localCoord[2] = globalCoord[2] - m_SphereWrapLocal[2];
 
 }
-void medVMEComputeWrapping::getGlobalCenterCoord(double *globalCoord,double *localCoord){
+void medVMEComputeWrapping::GetGlobalCenterCoord(double *globalCoord,double *localCoord){
 
 	globalCoord[0] = localCoord[0] + m_SphereWrapLocal[0];
 	globalCoord[1] = localCoord[1] + m_SphereWrapLocal[1];
 	globalCoord[2] = localCoord[2] + m_SphereWrapLocal[2];
 
 }
-void medVMEComputeWrapping::getGlobalSphereCenter(double *sphCoord){
+void medVMEComputeWrapping::GetGlobalSphereCenter(double *sphCoord){
 	sphCoord[0] = m_WrappedVMECenter1[0];
 	sphCoord[1] = m_WrappedVMECenter1[1];
 	sphCoord[2] = m_WrappedVMECenter1[2];
 }
-void medVMEComputeWrapping::getGlobalCylinderCenter(double *cylCoord){
+void medVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord){
 
 	/*cylCoord[0] = m_WrappedVMECenter2[0];
 	cylCoord[1] = m_WrappedVMECenter2[1];
 	cylCoord[2] = m_WrappedVMECenter2[2];*/
-	getGlobalCylinderCenter(cylCoord,2);
+	GetGlobalCylinderCenter(cylCoord,2);
 }
-void medVMEComputeWrapping::getGlobalCylinderCenter(double *cylCoord,int objIdx){
+void medVMEComputeWrapping::GetGlobalCylinderCenter(double *cylCoord,int objIdx){
 	if (objIdx == 2)
 	{
-		copyPointValue(m_WrappedVMECenter2,cylCoord);
+		CopyPointValue(m_WrappedVMECenter2,cylCoord);
 	}else{
-		copyPointValue(m_WrappedVMECenter1,cylCoord);
+		CopyPointValue(m_WrappedVMECenter1,cylCoord);
 	}
 }
 // |x''|    -1 |x-Xr |
@@ -3735,7 +3735,7 @@ void medVMEComputeWrapping::getGlobalCylinderCenter(double *cylCoord,int objIdx)
 // |z''|       |z-Zr |
 //from global get local
 //imat is invert matrix
-void medVMEComputeWrapping::getLocalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *imat){
+void medVMEComputeWrapping::GetLocalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *imat){
 	double ele0,ele1,ele2;
 	for (int i=0;i<3;i++)
 	{
@@ -3748,7 +3748,7 @@ void medVMEComputeWrapping::getLocalTransformedCoord(double *localCoord,double *
 //|x|     |x''|  |Xr|
 //|y| = T |y''| +|Yr|
 //|z|     |z''|  |Zr|
-void medVMEComputeWrapping::getGlobalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *mat){
+void medVMEComputeWrapping::GetGlobalTransformedCoord(double *localCoord,double *globalCoord,mafMatrix3x3 *mat){
 	double ele0,ele1,ele2;
 	for (int i=0;i<3;i++)
 	{
@@ -3758,7 +3758,7 @@ void medVMEComputeWrapping::getGlobalTransformedCoord(double *localCoord,double 
 		globalCoord[i] = ele0*localCoord[0] + ele1*localCoord[1] + ele2*localCoord[2] + m_SphereWrapLocal[i];
 	}
 }
-void medVMEComputeWrapping::getTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat){
+void medVMEComputeWrapping::GetTransFormMatrix(double cosA,double sinA,double cosB,double sinB,mafMatrix3x3 *mat){
 
 	// i is row and j is column 
 	mat->SetElement(0,0,cosB);
@@ -3774,7 +3774,7 @@ void medVMEComputeWrapping::getTransFormMatrix(double cosA,double sinA,double co
 	mat->SetElement(2,2,cosA);	
 }
 //by default objIdx means 2.it means second vme
-void medVMEComputeWrapping::getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx){
+void medVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int objIdx){
 	double axisLocal[3],cylinderCenter[3],cylinderCenterLocal[3],normal1[3];
 	double a,b,c,d;
 	double cosA,sinA;
@@ -3825,7 +3825,7 @@ void medVMEComputeWrapping::getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int ob
 
 	}else{
 		//step1 move to origin
-		getGlobalCylinderCenter(cylinderCenter,objIdx);
+		GetGlobalCylinderCenter(cylinderCenter,objIdx);
 		if (objIdx==1)
 		{
 			axisLocal[0] = m_CylinderAxis1[0]-cylinderCenter[0];
@@ -3842,7 +3842,7 @@ void medVMEComputeWrapping::getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int ob
 		cylinderCenterLocal[1] = cylinderCenter[1]-cylinderCenter[1];
 		cylinderCenterLocal[2] = cylinderCenter[2]-cylinderCenter[2];
 
-		copyPointValue(axisLocal,normal1);
+		CopyPointValue(axisLocal,normal1);
 
 		vtkMath::Normalize(normal1);
 		a = normal1[0];b = normal1[1];c = normal1[2];
@@ -3892,21 +3892,21 @@ void medVMEComputeWrapping::getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy,int ob
 
 	}
 }
-void medVMEComputeWrapping::getWrapMatrix(mafMatrix &inMx,mafMatrix &inMy){
-	getWrapMatrix(inMx,inMy,2);
+void medVMEComputeWrapping::GetWrapMatrix(mafMatrix &inMx,mafMatrix &inMy){
+	GetWrapMatrix(inMx,inMy,2);
 
 }
-void medVMEComputeWrapping::getWrapLocalTransform(double *inCoord,double *outCoord){
-	getWrapLocalTransform(inCoord,outCoord,2);
+void medVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoord){
+	GetWrapLocalTransform(inCoord,outCoord,2);
 }
 //transform coord from abs coord to a system defined by cylinder center and line (cylinder center and sphere center) as z axis
-void medVMEComputeWrapping::getWrapLocalTransform(double *inCoord,double *outCoord,int objIdx){
+void medVMEComputeWrapping::GetWrapLocalTransform(double *inCoord,double *outCoord,int objIdx){
 
 	double inCoordLocal[3],cylinderCenter[3];
 
 	double xInCoordLocal[3];
 
-	getGlobalCylinderCenter(cylinderCenter,objIdx);
+	GetGlobalCylinderCenter(cylinderCenter,objIdx);
 
 	if (!GetWrappedVME2())
 	{
@@ -3949,23 +3949,23 @@ void medVMEComputeWrapping::getWrapLocalTransform(double *inCoord,double *outCoo
 
 }
 //if start or end point near cylinder surface,project it on the cylinder
-bool medVMEComputeWrapping::isEndPonintOnCylinder(double tolerance,double *endWrapLocal){
+bool medVMEComputeWrapping::IsEndPonintOnCylinder(double tolerance,double *endWrapLocal){
 	//double endWrapLocal[3];
 	bool rtn = false;
 	double x,y,distX,distY;
 	double newX[3],newY[3];	
 	double testValue ;
-	double r = getCylinderRadius();
+	double r = GetCylinderRadius();
 	double d1,d2;
 	double sphereCenter[3],cylinderCenter[3],cylinderCenterLocal[3],sphereCenterLocal[3];
 
 	testValue = endWrapLocal[0] *endWrapLocal[0] + endWrapLocal[1]*endWrapLocal[1];
-	getGlobalCylinderCenter(cylinderCenter);
-	getGlobalSphereCenter(sphereCenter);
-	getWrapLocalTransform(sphereCenter,sphereCenterLocal);
-	getWrapLocalTransform(cylinderCenter,cylinderCenterLocal);
+	GetGlobalCylinderCenter(cylinderCenter);
+	GetGlobalSphereCenter(sphereCenter);
+	GetWrapLocalTransform(sphereCenter,sphereCenterLocal);
+	GetWrapLocalTransform(cylinderCenter,cylinderCenterLocal);
 
-	//getWrapGlobalTransform(endWrapLocal,endWrapLocal);
+	//GetWrapGlobalTransform(endWrapLocal,endWrapLocal);
 
 	d1 = vtkMath::Distance2BetweenPoints(sphereCenterLocal,endWrapLocal);
 	d2 = vtkMath::Distance2BetweenPoints(cylinderCenterLocal,endWrapLocal);
@@ -4003,12 +4003,12 @@ bool medVMEComputeWrapping::isEndPonintOnCylinder(double tolerance,double *endWr
 	}
 	return rtn;
 }
-void medVMEComputeWrapping::getWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx){
+void medVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCoord,int objIdx){
 
 	double cylinderCenter[3];
 	double yInCoordLocal[3],xyInCoordLocal[3];
 
-	getGlobalCylinderCenter(cylinderCenter,objIdx);
+	GetGlobalCylinderCenter(cylinderCenter,objIdx);
 
 	if (!GetWrappedVME2())
 	{
@@ -4048,18 +4048,18 @@ void medVMEComputeWrapping::getWrapGlobalTransform(double *inCoord,double *outCo
 		outCoord[2] = xyInCoordLocal[2] + cylinderCenter[2];
 	}
 }
-void medVMEComputeWrapping::getWrapGlobalTransform(double *inCoord,double *outCoord){
-	getWrapGlobalTransform(inCoord,outCoord,2);
+void medVMEComputeWrapping::GetWrapGlobalTransform(double *inCoord,double *outCoord){
+	GetWrapGlobalTransform(inCoord,outCoord,2);
 }
 
 
-void medVMEComputeWrapping::getWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB){
+void medVMEComputeWrapping::GetWrapAngleAandB(double &cosA,double &sinA,double &cosB,double &sinB){
 	double paraA[3],paraB[3],center[3],normal1[3],normal2[3];
 	double cCcoord[3],sCcoord[3],orientation[3],sCcoord1[3],sCpcoord[3];
 	double distance;
 	//---------get angle a----------
-	getGlobalCylinderCenter(cCcoord);
-	getGlobalSphereCenter(sCcoord);
+	GetGlobalCylinderCenter(cCcoord);
+	GetGlobalSphereCenter(sCcoord);
 	GetWrappedVME2()->GetOutput()->GetAbsPose(cCcoord,orientation);//cylinder center
 	GetWrappedVME1()->GetOutput()->GetAbsPose(sCcoord,orientation);//sphere center
 
@@ -4091,7 +4091,7 @@ void medVMEComputeWrapping::getWrapAngleAandB(double &cosA,double &sinA,double &
 
 //these parameters as return parameters;
 //A,B means angle in fig5
-void medVMEComputeWrapping::getAngleAandB(double & cosA,double & sinA,double & cosB,double & sinB){
+void medVMEComputeWrapping::GetAngleAandB(double & cosA,double & sinA,double & cosB,double & sinB){
 
 	double olCoord[3],olprojectCoord[3];
 	double center[3];
@@ -4099,7 +4099,7 @@ void medVMEComputeWrapping::getAngleAandB(double & cosA,double & sinA,double & c
 	double paraA[3],paraB[3];
 	double distance;
 	double sphereCenter[3];
-	getGlobalSphereCenter(sphereCenter);
+	GetGlobalSphereCenter(sphereCenter);
 
 	olCoord[0] =  m_StartPoint[0] -sphereCenter[0];//m_StartWrapLocal[0] - m_SphereWrapLocal[0];
 	olCoord[1] =  m_StartPoint[1] -sphereCenter[1];//m_StartWrapLocal[1] - m_SphereWrapLocal[1];
@@ -4128,7 +4128,7 @@ void medVMEComputeWrapping::getAngleAandB(double & cosA,double & sinA,double & c
 //olCoord is o'' coord point o local coordinate.
 //x is a global and unique variable
 //R is radius of sphere
-bool medVMEComputeWrapping::getAcoordinateInLocal(double *Ap1,double *Ap2,double *olCoord,double R,double x){
+bool medVMEComputeWrapping::GetAcoordinateInLocal(double *Ap1,double *Ap2,double *olCoord,double R,double x){
 	double A,B;
 	double sinA1 ,sinA2,cosA1,cosA2;
 
@@ -4181,57 +4181,57 @@ bool medVMEComputeWrapping::getAcoordinateInLocal(double *Ap1,double *Ap2,double
 }
 
 //apppendix D
-void medVMEComputeWrapping::getIntersectCircle(double *Ap,double *oCoord,double *iCoord,double *mCoord,double & Rm){
+void medVMEComputeWrapping::GetIntersectCircle(double *Ap,double *oCoord,double *iCoord,double *mCoord,double & Rm){
 	//ux +vy +wz +t = 0;
 	double u,v,w,t,tmp ;
 	double mgCoord[3];
 	double agCoord[3];
 	double testValue;
 
-	getUVWT(Ap,oCoord,iCoord,u,v,w,t);//plane
+	GetUVWT(Ap,oCoord,iCoord,u,v,w,t);//plane
 
 	tmp = (-t)/( u*u + v*v + w*w ) ;
 	mCoord[0] = u * tmp;
 	mCoord[1] = v * tmp;
 	mCoord[2] = w * tmp;
-	testValue = testPlane(Ap,oCoord,iCoord,mCoord);
-	testValue = testPlane(Ap,oCoord,iCoord,Ap);
+	testValue = TestPlane(Ap,oCoord,iCoord,mCoord);
+	testValue = TestPlane(Ap,oCoord,iCoord,Ap);
 	//------------------------
-	getGlobalCenterCoord(mgCoord,mCoord);
+	GetGlobalCenterCoord(mgCoord,mCoord);
 	m_Mpoint[0] = mgCoord[0];m_Mpoint[1] = mgCoord[1];m_Mpoint[2] = mgCoord[2];
-	getGlobalCenterCoord(agCoord,Ap);
+	GetGlobalCenterCoord(agCoord,Ap);
 	Rm = sqrt(vtkMath::Distance2BetweenPoints(agCoord,  mgCoord)) ;
 	Rm = sqrt( (mgCoord[0]-agCoord[0])*(mgCoord[0]-agCoord[0]) + (mgCoord[1]-agCoord[1])*(mgCoord[1]-agCoord[1]) + (mgCoord[2]-agCoord[2])*(mgCoord[2]-agCoord[2]) );
-	testValue = testPlane(Ap,oCoord,iCoord,mCoord);
+	testValue = TestPlane(Ap,oCoord,iCoord,mCoord);
 }
 
-void medVMEComputeWrapping::getUVWT(double *Ap,double *oCoord,double *iCoord,double & u,double & v,double & w,double & t){
+void medVMEComputeWrapping::GetUVWT(double *Ap,double *oCoord,double *iCoord,double & u,double & v,double & w,double & t){
 	double col1[3],col2[3],col3[3];
 	//-------------------u----
 	col1[0] = oCoord[1];  col2[0] = oCoord[2];  col3[0] = 1;
 	col1[1] = iCoord[1];  col2[1] = iCoord[2];  col3[1] = 1;
 	col1[2] = Ap[1];      col2[2] = Ap[2];      col3[2] = 1;
 
-	u = detValue(col1,col2,col3);
+	u = DetValue(col1,col2,col3);
 	//-------------------v----
 	col1[0] = oCoord[0];  col2[0] = oCoord[2];  col3[0] = 1;
 	col1[1] = iCoord[0];  col2[1] = iCoord[2];  col3[1] = 1;
 	col1[2] = Ap[0];      col2[2] = Ap[2];      col3[2] = 1;
-	v = -detValue(col1,col2,col3);
+	v = -DetValue(col1,col2,col3);
 	//-------------------w----
 	col1[0] = oCoord[0];  col2[0] = oCoord[1];  col3[0] = 1;
 	col1[1] = iCoord[0];  col2[1] = iCoord[1];  col3[1] = 1;
 	col1[2] = Ap[0];      col2[2] = Ap[1];      col3[2] = 1;
-	w = detValue(col1,col2,col3);
+	w = DetValue(col1,col2,col3);
 	//-------------------t----
 	col1[0] = oCoord[0];  col2[0] = oCoord[1];  col3[0] = oCoord[2];
 	col1[1] = iCoord[0];  col2[1] = iCoord[1];  col3[1] = iCoord[2];
 	col1[2] = Ap[0];      col2[2] = Ap[1];      col3[2] = Ap[2];
-	t = -detValue(col1,col2,col3);
+	t = -DetValue(col1,col2,col3);
 	//------------------------
 
 }
-double medVMEComputeWrapping::detValue(double *col1,double *col2,double *col3){
+double medVMEComputeWrapping::DetValue(double *col1,double *col2,double *col3){
 	double rtn = 0;
 	double pRtn = col1[0]*col2[1]*col3[2] + col1[1]*col2[2]*col3[0] + col2[0]*col3[1]*col1[2];
 	double nRtn = col3[0]*col2[1]*col1[2] + col3[1]*col2[2]*col1[0] + col2[0]*col1[1]*col3[2];
@@ -4239,7 +4239,7 @@ double medVMEComputeWrapping::detValue(double *col1,double *col2,double *col3){
 	return rtn;
 }
 //appendix E
-bool medVMEComputeWrapping::getBcoordinate(double *Ap,double *oCoord,double *iCoord,double *mCoord,double Rm,double R,double *bCoord1,double *bCoord2){
+bool medVMEComputeWrapping::GetBcoordinate(double *Ap,double *oCoord,double *iCoord,double *mCoord,double Rm,double R,double *bCoord1,double *bCoord2){
 	// B on plane
 	//( Xb-Xr)2+(Yb-Yr)2+(Zb-Zr)2 = R2
 	//( Xb-Xi)2+(Yb-Yi)2+(Zb-Zi)2+rm2 = (Xm-Xi)2+(Ym-Yi)2+(Zm-Zi)2
@@ -4250,8 +4250,8 @@ bool medVMEComputeWrapping::getBcoordinate(double *Ap,double *oCoord,double *iCo
 	bool rtn = true;
 	double testValue;
 
-	testValue = testPlane(Ap,oCoord,iCoord,mCoord);
-	getUVWT(Ap,oCoord,iCoord,u,v,w,t);//plane
+	testValue = TestPlane(Ap,oCoord,iCoord,mCoord);
+	GetUVWT(Ap,oCoord,iCoord,u,v,w,t);//plane
 
 	A = 2*iCoord[0];
 	B = 2*iCoord[1];
@@ -4285,33 +4285,33 @@ bool medVMEComputeWrapping::getBcoordinate(double *Ap,double *oCoord,double *iCo
 	}else{
 		rtn = false ;
 	}
-	testValue = testPlane(Ap,oCoord,iCoord,bCoord1);
-	testValue = testPlane(Ap,oCoord,iCoord,bCoord2);
+	testValue = TestPlane(Ap,oCoord,iCoord,bCoord1);
+	testValue = TestPlane(Ap,oCoord,iCoord,bCoord2);
 	return rtn;
 
 }
-bool medVMEComputeWrapping::getBcoordinateUpdate(double *cCoord ,double *bCoord1,double *bCoord2){
+bool medVMEComputeWrapping::GetBcoordinateUpdate(double *cCoord ,double *bCoord1,double *bCoord2){
 	double blCoord[3];
-	getLocalCenterCoord(blCoord,m_BPoint);
-	double Rm = getCylinderRadius();
-	double sphereR = getSphereRadius();
+	GetLocalCenterCoord(blCoord,m_BPoint);
+	double Rm = GetCylinderRadius();
+	double sphereR = GetSphereRadius();
 	double bCoordR1[3],bCoordR2[3];
 	double aCoordR[3],oCoordR[3],cCoordR[3],mCoordR[3];
 
-	getLocalCenterCoord(aCoordR,m_APoint);
-	getLocalCenterCoord(oCoordR,m_StartPoint);
-	getLocalCenterCoord(cCoordR,cCoord);
+	GetLocalCenterCoord(aCoordR,m_APoint);
+	GetLocalCenterCoord(oCoordR,m_StartPoint);
+	GetLocalCenterCoord(cCoordR,cCoord);
 
-	getIntersectCircle(aCoordR,oCoordR,cCoordR,mCoordR,Rm);//Rm is computed by global coord
+	GetIntersectCircle(aCoordR,oCoordR,cCoordR,mCoordR,Rm);//Rm is computed by global coord
 
-	bool rtn =getBcoordinate(aCoordR,oCoordR,cCoordR,mCoordR,Rm,sphereR,bCoordR1,bCoordR2);
+	bool rtn =GetBcoordinate(aCoordR,oCoordR,cCoordR,mCoordR,Rm,sphereR,bCoordR1,bCoordR2);
 
-	getGlobalCenterCoord(bCoord1,bCoordR1);
-	getGlobalCenterCoord(bCoord2,bCoordR2);
+	GetGlobalCenterCoord(bCoord1,bCoordR1);
+	GetGlobalCenterCoord(bCoord2,bCoordR2);
 	return rtn;
 }
 //appendix F
-bool medVMEComputeWrapping::getCcoordinate(double *cCoord1,double *cCoord2){
+bool medVMEComputeWrapping::GetCcoordinate(double *cCoord1,double *cCoord2){
 	double a,b,c,r;//r is radius of cylinder
 	double Yc,Xc,Zc,Yc2,Xc2,Zc2;
 	double Xb,Yb,Zb;
@@ -4319,10 +4319,10 @@ bool medVMEComputeWrapping::getCcoordinate(double *cCoord1,double *cCoord2){
 	double A,B,C,D;
 	bool rtn = true;
 
-	r = getCylinderRadius();
-	R = getSphereRadius();
+	r = GetCylinderRadius();
+	R = GetSphereRadius();
 
-	getGlobalSphereCenter(RCoord);//coordinate of sphere center;
+	GetGlobalSphereCenter(RCoord);//coordinate of sphere center;
 
 	Xb = m_BPoint[0];Yb = m_BPoint[1];Zb = m_BPoint[2];
 	Xr = RCoord[0];Yr = RCoord[1];Zr = RCoord[2];
@@ -4357,7 +4357,7 @@ bool medVMEComputeWrapping::getCcoordinate(double *cCoord1,double *cCoord2){
 	return rtn;
 }
 
-bool medVMEComputeWrapping::prepareData2(){
+bool medVMEComputeWrapping::PrepareData2(){
 	mafVME *start_vme = GetStartVME();
 	mafVME *end_vme   = GetEnd1VME();
 	mafVME *wrapped_vme = GetWrappedVME1();
@@ -4433,10 +4433,10 @@ bool medVMEComputeWrapping::prepareData2(){
 				pointOnAxis[0]=10;pointOnAxis[1]=0;pointOnAxis[2]=0;
 				m_TmpTransform->SetMatrix(*wrapped_vme->GetOutput()->GetAbsMatrix());
 				m_TmpTransform->TransformPoint(pointOnAxis,pointOnAxis);
-				copyPointValue(pointOnAxis,m_SphereAxis);
+				CopyPointValue(pointOnAxis,m_SphereAxis);
 			}else if ( type1 == mafVMESurfaceParametric::PARAMETRIC_CYLINDER)
 			{
-				getCylinderAxis(wrapped_vme,1);
+				GetCylinderAxis(wrapped_vme,1);
 			}
 
 		}
@@ -4464,7 +4464,7 @@ bool medVMEComputeWrapping::prepareData2(){
 			m_TmpTransform->TransformPoint(m_WrappedVMECenter2,m_WrappedVMECenter2);
 
 			//------------------------get cylinder axis-----------------
-			getCylinderAxis(wrapped_vme2,2);
+			GetCylinderAxis(wrapped_vme2,2);
 			//------------------------over------------------------------
 
 		}
@@ -4472,14 +4472,14 @@ bool medVMEComputeWrapping::prepareData2(){
 
 	if (m_WrappedMode1 == SPHERE_CYLINDER || m_WrappedMode1 == SINGLE_CYLINDER)
 	{
-		m_Tolerance = getCylinderRadius()/4.0 ;
+		m_Tolerance = GetCylinderRadius()/4.0 ;
 	}
 	rtn = true;
 
 	return rtn;
 
 }
-void medVMEComputeWrapping::getCylinderAxis(mafVME *wrapped_vme,int objIdx){
+void medVMEComputeWrapping::GetCylinderAxis(mafVME *wrapped_vme,int objIdx){
 
 	double x[3] = {0,0,1};
 	double pointOnAxis[3] ;
@@ -4491,30 +4491,30 @@ void medVMEComputeWrapping::getCylinderAxis(mafVME *wrapped_vme,int objIdx){
 		pointOnAxis[0]=10;pointOnAxis[1]=0;pointOnAxis[2]=0;
 		m_TmpTransform->SetMatrix(*wrapped_vme->GetOutput()->GetAbsMatrix());
 		m_TmpTransform->TransformPoint(pointOnAxis,pointOnAxis);
-		//copyPointValue(pointOnAxis,m_CylinderAxis);
+		//CopyPointValue(pointOnAxis,m_CylinderAxis);
 	}else if (cylinderAxisD ==1)//y
 	{
 		pointOnAxis[0]=0;pointOnAxis[1]=10;pointOnAxis[2]=0;
 		m_TmpTransform->SetMatrix(*wrapped_vme->GetOutput()->GetAbsMatrix());
 		m_TmpTransform->TransformPoint(pointOnAxis,pointOnAxis);
-		//copyPointValue(pointOnAxis,m_CylinderAxis);		
+		//CopyPointValue(pointOnAxis,m_CylinderAxis);		
 
 	}else if (cylinderAxisD == 2)//z
 	{
 		pointOnAxis[0]=0;pointOnAxis[1]=0;pointOnAxis[2]=10;
 		m_TmpTransform->SetMatrix(*wrapped_vme->GetOutput()->GetAbsMatrix());
 		m_TmpTransform->TransformPoint(pointOnAxis,pointOnAxis);
-		//copyPointValue(pointOnAxis,m_CylinderAxis);
+		//CopyPointValue(pointOnAxis,m_CylinderAxis);
 	}
 	if (objIdx ==1)
 	{
-		copyPointValue(pointOnAxis,m_CylinderAxis1);
+		CopyPointValue(pointOnAxis,m_CylinderAxis1);
 	}else if (objIdx ==2)
 	{
-		copyPointValue(pointOnAxis,m_CylinderAxis2);
+		CopyPointValue(pointOnAxis,m_CylinderAxis2);
 	}
 }
-int medVMEComputeWrapping::prepareData(int wrappedFlag,double *local_start,double *local_via,double *local_wrapped_center, vtkOBBTree *locator)
+int medVMEComputeWrapping::PrepareData(int wrappedFlag,double *local_start,double *local_via,double *local_wrapped_center, vtkOBBTree *locator)
 {
 	int obbtreeFlag = 0;
 	mafVME *start_vme = GetStartVME();
@@ -4669,7 +4669,7 @@ int medVMEComputeWrapping::prepareData(int wrappedFlag,double *local_start,doubl
 
 }
 
-void medVMEComputeWrapping::singleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator){
+void medVMEComputeWrapping::SingleWrapAutomatedIOR(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator){
 
 	vtkMAFSmartPointer<vtkPoints> pointsIntersection1;
 	vtkMAFSmartPointer<vtkPoints> pointsIntersection2;
@@ -4685,7 +4685,7 @@ void medVMEComputeWrapping::singleWrapAutomatedIOR(mafVME * wrapped_vme,double *
 
 	vtkMAFSmartPointer<vtkTransformPolyDataFilter> transformFirstData;
 
-	getTwoTangentPoint(wrapped_vme,local_start,local_end,local_wrapped_center,locator,transformFirstData,pointsIntersection1,pointsIntersection2);
+	GetTwoTangentPoint(wrapped_vme,local_start,local_end,local_wrapped_center,locator,transformFirstData,pointsIntersection1,pointsIntersection2);
 
 	if(pointsIntersection1->GetNumberOfPoints() == 0 || pointsIntersection2->GetNumberOfPoints() == 0) return;
 
@@ -4709,7 +4709,7 @@ void medVMEComputeWrapping::singleWrapAutomatedIOR(mafVME * wrapped_vme,double *
 	m_Goniometer->AddInput(ST1->GetOutput());
 	m_Goniometer->AddInput(ET2->GetOutput());
 
-	curveLength = getCutPlaneForCylinder(local_wrapped_center,pointTangent1,pointTangent2,GetWrappedVME1(),clipData);
+	curveLength = GetCutPlaneForCylinder(local_wrapped_center,pointTangent1,pointTangent2,GetWrappedVME1(),clipData);
 	m_Goniometer->AddInput(clipData->GetOutput());
 	//---------------over--------------------------
 
@@ -4719,7 +4719,7 @@ void medVMEComputeWrapping::singleWrapAutomatedIOR(mafVME * wrapped_vme,double *
 
 }
 
-void medVMEComputeWrapping::getTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2){
+void medVMEComputeWrapping::GetTwoTangentPoint(mafVME * wrapped_vme,double *local_start,double *local_end,double *local_wrapped_center,vtkOBBTree *locator,vtkTransformPolyDataFilter *transformFirstData ,vtkPoints *pointsIntersection1,vtkPoints *pointsIntersection2){
 
 	vtkMAFSmartPointer<vtkPoints> temporaryIntersection;
 	bool aligned = false;
@@ -5278,7 +5278,7 @@ mafGUI* medVMEComputeWrapping::CreateGui(){
 	return m_Gui;
 }
 
-void medVMEComputeWrapping::eventWraped(mafEvent *e){
+void medVMEComputeWrapping::EventWraped(mafEvent *e){
 
 	mafID button_id = e->GetId();
 	mafString title = _("Choose meter vme link");
@@ -5396,7 +5396,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 		case ID_WRAPPED_METER_LINK:
 		case ID_VIA_POINT:
 			{
-				eventWraped(e);
+				EventWraped(e);
 			}
 			break;
 		case ID_WRAPPED_METER_CLASS:
