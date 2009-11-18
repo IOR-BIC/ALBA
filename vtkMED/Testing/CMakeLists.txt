@@ -32,8 +32,8 @@ ADD_EXECUTABLE(vtkMEDRegionGrowingLocalGlobalThresholdTest vtkMEDRegionGrowingLo
 ADD_TEST(vtkMEDRegionGrowingLocalGlobalThresholdTest ${EXECUTABLE_OUTPUT_PATH}/vtkMEDRegionGrowingLocalGlobalThresholdTest)
 ADD_EXECUTABLE(vtkImageUnPackerTest vtkImageUnPackerTest.h vtkImageUnPackerTest.cpp)
 ADD_TEST(vtkImageUnPackerTest ${EXECUTABLE_OUTPUT_PATH}/vtkImageUnPackerTest)
-
-
+ADD_EXECUTABLE(vtkPackedImageTest vtkPackedImageTest.h vtkPackedImageTest.cpp)
+ADD_TEST(vtkPackedImageTest ${EXECUTABLE_OUTPUT_PATH}/vtkPackedImageTest)
 
 
 # wxWidgets specific classes
