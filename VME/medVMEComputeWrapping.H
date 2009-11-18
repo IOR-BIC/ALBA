@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-11-18 17:01:26 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2009-11-18 17:18:20 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -369,7 +369,7 @@ public:
 	double *GetExportPointCoordinate(int index);
 	/**Return Number of export points*/
 	int GetNumberExportPoints(){return m_ExportPointList.size();};
-	double getPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output);
+	double GetPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output);
 
 protected:
 	medVMEComputeWrapping();
@@ -520,8 +520,8 @@ protected:
 	double GoldenSectionSearch(double low,double high,double accuracy,double *A,double *b,double *c,double *firstC,int type);
 	double GetAngleValue(double *A ,double *b,double *c);
 	double GetPlaneValue(double *a,double *b,double *c,double *d);
-	double getDistanceValue(double *start,double *cCoord,double *end);
-	double getDistanceSumValue(double *start,double *cCoord,double *end);
+	double GetDistanceValue(double *start,double *cCoord,double *end);
+	double GetDistanceSumValue(double *start,double *cCoord,double *end);
 	void GetSphereCylinderWrapAdvance(const int step);
 	void TransformOutput(vtkPolyData *pData );
 	void TransformOutputPoint( double *point);

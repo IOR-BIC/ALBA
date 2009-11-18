@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-18 17:01:26 $
-Version:   $Revision: 1.1.2.24 $
+Date:      $Date: 2009-11-18 17:18:20 $
+Version:   $Revision: 1.1.2.25 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -576,10 +576,10 @@ double medVMEComputeWrapping::GoldenSectionSearch(double low,double high,double 
 			y1 = GetPlaneValue(A,b,cCoord,c);
 		}else if (type==3)
 		{
-			y1 = getDistanceValue(A,c,b);
+			y1 = GetDistanceValue(A,c,b);
 		}else if (type==4 && cCoord==NULL)
 		{
-			y1 = getDistanceSumValue(A,b,c);
+			y1 = GetDistanceSumValue(A,b,c);
 		}
 
 		c[2]=x2;
@@ -592,11 +592,11 @@ double medVMEComputeWrapping::GoldenSectionSearch(double low,double high,double 
 			y2 = GetPlaneValue(A,b,cCoord,c);
 		}else if (type==3)
 		{
-			y2 = getDistanceValue(A,c,b);
+			y2 = GetDistanceValue(A,c,b);
 		}
 		else if (type==4 && cCoord==NULL)
 		{
-			y2 = getDistanceSumValue(A,b,c);
+			y2 = GetDistanceSumValue(A,b,c);
 		}
 
 		if (fabs(y1)> fabs(y2))
@@ -627,7 +627,7 @@ double medVMEComputeWrapping::GoldenSectionSearch(double low,double high,double 
 	return rtn;
 }
 //distance sum of three point
-double medVMEComputeWrapping::getDistanceSumValue(double *A,double *b ,double *c){
+double medVMEComputeWrapping::GetDistanceSumValue(double *A,double *b ,double *c){
 
 	double dac,dcb;
 	double rtn;
@@ -684,7 +684,7 @@ double medVMEComputeWrapping::GetPlaneValue(double *a,double *b,double *c,double
 
 }
 //all parameters use local value
-double medVMEComputeWrapping::getDistanceValue(double *start,double *cCoord,double *end){
+double medVMEComputeWrapping::GetDistanceValue(double *start,double *cCoord,double *end){
 
 	double curveLength,rtn;
 
@@ -2487,8 +2487,8 @@ void medVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 			Zh = endLocal[2];
 			Zl = startLocal[2];
 		}
-		testValue = getPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_1);
-		testValue = getPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_2);
+		testValue = GetPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_1);
+		testValue = GetPointOnPlane(Zl,Zh,endLocal,p3_2,p22,cCoord1_2);
 
 		GetWrapGlobalTransform(cCoord1_1,cCoordGlobal1,idx2);
 		GetWrapGlobalTransform(cCoord1_2,cCoordGlobal2,idx2);
@@ -2503,8 +2503,8 @@ void medVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 		GetWrapLocalTransform(m_StartPoint,startLocal,idx1);
 
 
-		testValue = getPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_1);
-		testValue = getPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_2);
+		testValue = GetPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_1);
+		testValue = GetPointOnPlane(Zl,Zh,startLocal,p13,p2_1,cCoord4_2);
 
 		GetWrapGlobalTransform(cCoord4_1,cCoordGlobal1,idx1);
 		GetWrapGlobalTransform(cCoord4_2,cCoordGlobal2,idx1);
@@ -2604,7 +2604,7 @@ void medVMEComputeWrapping::GetCylinderCylinderWrap(const int step){
 // output point is input parameter as well,it with x and y value.
 // this method will get z value,which is the nearest point with plane
 /************************************************************************/
-double medVMEComputeWrapping::getPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output){
+double medVMEComputeWrapping::GetPointOnPlane(double zL ,double zH,double *point1,double *point2,double *point3,double *output){
 	int step = 100;
 	double factor = (zH -zL)/100;
 	double rtn,tmpValue,zValue;
