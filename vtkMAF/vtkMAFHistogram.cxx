@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-10-29 14:08:33 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-18 15:01:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -34,7 +34,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFHistogram);
 //------------------------------------------------------------------------------
 vtkMAFHistogram::vtkMAFHistogram()
@@ -276,7 +276,7 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
   ImageData->GetPointData()->SetScalars(InputData);
   ImageData->Update();
   ImageData->GetScalarRange(sr);
-  double srw = sr[1]-sr[0];
+  double srw = sr[1]-sr[0]+1;
 
   if (ImageData->GetScalarType() == VTK_CHAR || ImageData->GetScalarType() == VTK_UNSIGNED_CHAR )
   {
@@ -411,6 +411,21 @@ void vtkMAFHistogram::UpdateLines(int min, int max)
   Line2->SetPoint2(Line2X,OriginY+RenderH,0);
   Line2->Modified();
   Line2->Update();
+
+}
+//----------------------------------------------------------------------------
+double vtkMAFHistogram::GetScalarValue(int x, int y)
+//----------------------------------------------------------------------------
+{
+  int idx = (x /(RenderWidth *1.0)) * NumberOfBins;
+  double sr[2];
+  InputData->GetRange(sr);
+
+  double value = (double)idx*(sr[1]-sr[0])/NumberOfBins;
+  double shift = sr[0]>=0 ? 0 : -sr[0];
+  value -= shift;
+
+  return value;
 
 }
 //----------------------------------------------------------------------------

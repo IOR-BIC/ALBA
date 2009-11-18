@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-29 14:08:33 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-18 15:01:23 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -106,6 +106,8 @@ class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
   void UpdateLines(int min,int max);
 
   long int GetHistogramValue(int x, int y);
+
+  double GetScalarValue(int x, int y);
 
   void SetLabel(const char *lab);
 
