@@ -140,6 +140,8 @@ SET(PROJECT_SRCS
   ###############################################
   medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp
   medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h
+  medOpEqualizeHistogram.cpp
+  medOpEqualizeHistogram.h
 )
   
 IF (MED_USE_Offis)
