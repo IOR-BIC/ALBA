@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-10-12 12:40:10 $ 
-  Version: $Revision: 1.1.2.7 $ 
+  Date: $Date: 2009-11-18 15:37:49 $ 
+  Version: $Revision: 1.1.2.8 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   modify: Hui Wei (beds.ac.uk)
   ========================================================================== 
@@ -814,7 +814,7 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 		double valueRange[2];
 		valueRange[0] = pItem->value[0] ;
 		valueRange[1] = pItem->value[1];
-		doFilter(mode,valueRange,NULL);
+		DoFilter(mode,valueRange,NULL);
 	}else if (mode ==2 )
 	{
 		nIndex2 = m_RangeCtrl2->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); 
@@ -823,7 +823,7 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 			double valueRange[2];
 			valueRange[0] = pItem->value[0] ;
 			valueRange[1] = pItem->value[1];
-			doFilter(mode,NULL,valueRange);		
+			DoFilter(mode,NULL,valueRange);		
 		}
 	}else if (mode ==3 && nIndex1>=0 )
 	{
@@ -837,7 +837,7 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 			FILTER_ITEM* pItem2 = (FILTER_ITEM*)m_RangeCtrl2->GetItemData(nIndex2);
 			valueRange2[0] = pItem2->value[0];
 			valueRange2[1] = pItem2->value[1];
-			doFilter(mode,valueRange1,valueRange2);	
+			DoFilter(mode,valueRange1,valueRange2);	
 		}
 	}
 }
@@ -846,7 +846,7 @@ void medPipeVectorFieldGlyphs::OnShowFilter(int mode){
 void medPipeVectorFieldGlyphs::OnAddItem(int idx){
 //-----------------------------------------------------------------------
 
-	createAddItemDlg(idx);
+	CreateAddItemDlg(idx);
 	
 }
 //-----------------------------------------------------------------------
@@ -969,7 +969,7 @@ bool medPipeVectorFieldGlyphs::AddItem(){
 }
 //-----------------------------------------------------------------------
 //create dialog
-void medPipeVectorFieldGlyphs::createAddItemDlg(int idx){
+void medPipeVectorFieldGlyphs::CreateAddItemDlg(int idx){
 //-----------------------------------------------------------------------
 	/*vtkDataArray *dataArr = m_Vme->GetOutput()->GetVTKData()->GetPointData()->GetScalars();
 	double range[2];
@@ -1104,7 +1104,7 @@ void medPipeVectorFieldGlyphs::createAddItemDlg(int idx){
     m_Gui->Update();
   }
 }
-bool medPipeVectorFieldGlyphs::doCondition(int mode,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2){
+bool medPipeVectorFieldGlyphs::DoCondition(int mode,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2){
 	bool rtn = false;
 	bool vectorFlag;
 	bool scaleFlag;
@@ -1138,7 +1138,7 @@ bool medPipeVectorFieldGlyphs::doCondition(int mode,double vectorValue,double sc
 //--------------------------------------------------------------------------
 //filter begin
 //--------------------------------------------------------------------------
-void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *rangeValue2){
+void medPipeVectorFieldGlyphs::DoFilter(int mode ,double *rangeValue,double *rangeValue2){
 
 	
 
@@ -1220,7 +1220,7 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 						double tmpVectorValue = sqrt(xDvalue*xDvalue + yDvalue*yDvalue + zDvalue*zDvalue);
 						double tmpScaleValue = old_scalars->GetTuple1(idx);
 
-						if (doCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))//tmpScale>=dMin && tmpScale<=dMax
+						if (DoCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))//tmpScale>=dMin && tmpScale<=dMax
 						{
 
 							pCoord = allPoints->GetTuple(idx);
@@ -1280,7 +1280,7 @@ void medPipeVectorFieldGlyphs::doFilter(int mode ,double *rangeValue,double *ran
 							tmpScaleValue = old_scalars->GetTuple1(idx);
 						}
 
-						if (doCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))
+						if (DoCondition(mode,tmpVectorValue,tmpScaleValue,rangeValue,rangeValue2))
 						{
 							pCoord[0] = origin[0]  + ix * spacing[0];
 							pCoord[1] = origin[1]  + iy * spacing[1];

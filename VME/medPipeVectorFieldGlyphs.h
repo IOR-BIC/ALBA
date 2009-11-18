@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeVectorFieldGlyphs.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-18 18:29:19 $ 
-  Version: $Revision: 1.1.2.5 $ 
+  Date: $Date: 2009-11-18 15:37:49 $ 
+  Version: $Revision: 1.1.2.6 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -185,7 +185,7 @@ protected:
   /** Add an item in the list */
   void OnAddItem(int idx);
   /** create a dialog*/
-  void createAddItemDlg(int idx);
+  void CreateAddItemDlg(int idx);
   /** insert an item into list if values are valid */
   bool AddItem();
   bool AddItem2();
@@ -195,14 +195,14 @@ protected:
   void OnRemoveItem();
   void OnRemoveItem2();
   /** use filter */
-  void doFilter(int mode ,double *rangeValue,double *rangeValue2);
+  void DoFilter(int mode ,double *rangeValue,double *rangeValue2);
   /** store filter data */
   void StoreFilterLinks();
   void StoreFilterLinks2();
   /** init filter list  */
   void InitFilterList(int nScalars);
   /** to test if this point in range */
-  bool doCondition(int mode ,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2);
+  bool DoCondition(int mode ,double vectorValue,double scaleValue,double *rangeValue1,double *rangeValue2);
   /** Handles change of material. */
   virtual void OnChangeMaterial(); 
 
