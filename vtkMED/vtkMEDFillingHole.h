@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2009-11-04 13:39:57 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-19 10:02:15 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -65,10 +65,10 @@ public:
     {
     public:
       bool  bDeleted;
-      bool  bMarked;
-      int   aVertex[3];
-      int   aEdge[3];
-      int   id;
+      bool  BMarked;
+      int   AVertex[3];
+      int   AEdge[3];
+      int   Id;
     public:
       CTriangle();
       CTriangle(int v0,int v1,int v2);
@@ -82,12 +82,12 @@ public:
   class CEdge
     {
     public:
-      bool  bBoundary;
-      bool  bMarked;
-      double  dLength;
-      int   aVertex[4];       //first second, left right
-      int   aTriangle[2];     //left right
-      int   id;
+      bool  BBoundary;
+      bool  BMarked;
+      double  DLength;
+      int   AVertex[4];       //first second, left right
+      int   ATriangle[2];     //left right
+      int   Id;
       CEdge(); 
       CEdge(int v0,int v1);
       CEdge(int v0,int v1,int v2,int v3);
@@ -101,9 +101,9 @@ public:
   class CLaplacian
     {
     public:
-      double  *aLaplacian;
-      double  dLaplacian;
-      double  dLaplacianCoord[3];
+      double  *ALaplacian;
+      double  DLaplacian;
+      double  DLaplacianCoord[3];
       CLaplacian(int size);  
       ~CLaplacian();
     };

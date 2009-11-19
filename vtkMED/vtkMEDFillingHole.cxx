@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.cxx,v $
 Language:  C++
-Date:      $Date: 2009-11-04 13:39:57 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-19 10:02:15 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <float.h>
 
 
-vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMEDFillingHole);
 
 #include "mafMemDbg.h"
@@ -82,87 +82,87 @@ bool vtkMEDFillingHole::CVertex::IsTwoRingVertex(int id)
 vtkMEDFillingHole::CTriangle::CTriangle()
 //----------------------------------------------------------------------------
 {
-  aEdge[0]=aEdge[1]=aEdge[2]=-1;
-  bDeleted = bMarked = false;
+  AEdge[0]=AEdge[1]=AEdge[2]=-1;
+  bDeleted = BMarked = false;
 }
 
 //----------------------------------------------------------------------------
 vtkMEDFillingHole::CTriangle::CTriangle(int v0,int v1,int v2)
 //----------------------------------------------------------------------------
 {
-  aVertex[0]=v0;
-  aVertex[1]=v1;
-  aVertex[2]=v2;
+  AVertex[0]=v0;
+  AVertex[1]=v1;
+  AVertex[2]=v2;
 
-  aEdge[0]=aEdge[1]=aEdge[2]=-1;
-  bDeleted = bMarked = false;
+  AEdge[0]=AEdge[1]=AEdge[2]=-1;
+  bDeleted = BMarked = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkMEDFillingHole::CTriangle::SetEdge(int e0,int e1,int e2)
 //----------------------------------------------------------------------------
 {
-  aEdge[0]=e0;
-  aEdge[1]=e1;
-  aEdge[2]=e2; 
+  AEdge[0]=e0;
+  AEdge[1]=e1;
+  AEdge[2]=e2; 
 }
 
 //----------------------------------------------------------------------------
 vtkMEDFillingHole::CEdge::CEdge()
 //----------------------------------------------------------------------------
 {
-  aVertex[0]=aVertex[1]=aVertex[2]=aVertex[3]=-1;
-  aTriangle[0]=aTriangle[1]=-1;
-  bMarked = bBoundary = false;
+  AVertex[0]=AVertex[1]=AVertex[2]=AVertex[3]=-1;
+  ATriangle[0]=ATriangle[1]=-1;
+  BMarked = BBoundary = false;
 }
 
 //----------------------------------------------------------------------------
 vtkMEDFillingHole::CEdge::CEdge(int v0,int v1)
 //----------------------------------------------------------------------------
 {
-  aVertex[0] = v0;
-  aVertex[1] = v1;
-  aVertex[2] = aVertex[3] = -1;
-  aTriangle[0]=aTriangle[1]=-1;
-  bMarked = bBoundary = false;
+  AVertex[0] = v0;
+  AVertex[1] = v1;
+  AVertex[2] = AVertex[3] = -1;
+  ATriangle[0]=ATriangle[1]=-1;
+  BMarked = BBoundary = false;
 }
 
 //----------------------------------------------------------------------------
 vtkMEDFillingHole::CEdge::CEdge(int v0,int v1,int v2,int v3)
 //----------------------------------------------------------------------------
 {
-  aVertex[0] = v0;
-  aVertex[1] = v1;
-  aVertex[2] = v2;
-  aVertex[3] = v3;
-  aTriangle[0]=aTriangle[1]=-1;
-  bMarked = bBoundary = false;
+  AVertex[0] = v0;
+  AVertex[1] = v1;
+  AVertex[2] = v2;
+  AVertex[3] = v3;
+  ATriangle[0]=ATriangle[1]=-1;
+  BMarked = BBoundary = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkMEDFillingHole::CEdge::SetTriangle(int t0,int t1)
 //----------------------------------------------------------------------------
 {
-  aTriangle[0]=t0;
-  aTriangle[1]=t1;
+  ATriangle[0]=t0;
+  ATriangle[1]=t1;
 }
 
 //----------------------------------------------------------------------------
 vtkMEDFillingHole::CLaplacian::CLaplacian(int size)
 //----------------------------------------------------------------------------
 {
-  dLaplacian = 0;
-  dLaplacianCoord[0] = 0;
-  dLaplacianCoord[1] = 0;
-  dLaplacianCoord[2] = 0;
-  aLaplacian = new double[size];
+  DLaplacian = 0;
+  DLaplacianCoord[0] = 0;
+  DLaplacianCoord[1] = 0;
+  DLaplacianCoord[2] = 0;
+  ALaplacian = new double[size];
 }
 
 //----------------------------------------------------------------------------
 vtkMEDFillingHole::CLaplacian::~CLaplacian()
 //----------------------------------------------------------------------------
 {
-  delete aLaplacian;
+  delete ALaplacian;
 }
 #pragma endregion Nested classes
 
@@ -354,7 +354,7 @@ void vtkMEDFillingHole::BuildPatch()
   start = PatchTriangles.begin();
   for( t=0,triangle=start; t<NumOfPatchTriangle; t++,triangle++)
   {
-    pVertexIndex = (*triangle)->aVertex;
+    pVertexIndex = (*triangle)->AVertex;
 
     //each triangle has three vertex;
     for(i=0;i<3;i++)
@@ -369,8 +369,8 @@ void vtkMEDFillingHole::BuildPatch()
   for( t=0,triangle=start; t<NumOfPatchTriangle; t++,triangle++)
   {
     pTriangle = *triangle;		
-    pVertexIndex = pTriangle->aVertex;
-    pEdgeIndex = pTriangle->aEdge;
+    pVertexIndex = pTriangle->AVertex;
+    pEdgeIndex = pTriangle->AEdge;
     //each triangle has three vertex;
     for(i=0;i<3;i++)
     {
@@ -408,9 +408,9 @@ void vtkMEDFillingHole::BuildPatch()
       pVertex2->DOneRingEdgeLength += dLength;
 
       pEdge = new CEdge(sv1,sv2);
-      pEdge->id = NumOfPatchEdge;
-      pEdge->aVertex[2] = pVertexIndex[(i+2)%3];
-      pEdge->aTriangle[0] = t;
+      pEdge->Id = NumOfPatchEdge;
+      pEdge->AVertex[2] = pVertexIndex[(i+2)%3];
+      pEdge->ATriangle[0] = t;
       PatchEdges[NumOfPatchEdge] = pEdge;
 
       bflag = false;
@@ -420,22 +420,22 @@ void vtkMEDFillingHole::BuildPatch()
       {
         if( *neight <= t) continue;
         pNeighTriangle = PatchTriangles[*neight];	
-        pVertexIndex2 = pNeighTriangle->aVertex;
+        pVertexIndex2 = pNeighTriangle->AVertex;
 
         for(j=0; j<3; j++)
         {
           // when find the edge of the neighbor triangle was computed, continue find 
           // next edge of the neighbor triangle.
-          if( pNeighTriangle->aEdge[j] >=0 ) continue;	
+          if( pNeighTriangle->AEdge[j] >=0 ) continue;	
 
           dv1 = pVertexIndex2[j];
           dv2 = pVertexIndex2[(j+1)%3];
           if( sv2 == dv1 && sv1==dv2 )
           {
-            pNeighTriangle->aEdge[j] = NumOfPatchEdge;
+            pNeighTriangle->AEdge[j] = NumOfPatchEdge;
             // if the mesh is manifold, each edge only have two adjacent triangles.
-            pEdge->aVertex[3] = pVertexIndex2[(j+2)%3];
-            pEdge->aTriangle[1] = *neight;
+            pEdge->AVertex[3] = pVertexIndex2[(j+2)%3];
+            pEdge->ATriangle[1] = *neight;
             bflag = true;
             break;						
           }
@@ -444,7 +444,7 @@ void vtkMEDFillingHole::BuildPatch()
       if( bflag == false )
       {
         //find a boundary edge and vertex
-        pEdge->bBoundary = true;
+        pEdge->BBoundary = true;
       }
       NumOfPatchEdge++;
     }
@@ -467,7 +467,7 @@ void vtkMEDFillingHole::Trace(int i,int k)
     //triangles[] = triangles[] + triangle(vi, vi+1, vk);
     //the triangle must be count-clock-wise.
     pTriangle = new CTriangle(i,k,i+1);
-    pTriangle->id = NumOfPatchTriangle++;
+    pTriangle->Id = NumOfPatchTriangle++;
     PatchTriangles.push_back(pTriangle);
   }
   else
@@ -478,7 +478,7 @@ void vtkMEDFillingHole::Trace(int i,int k)
     //triangles[] = triangles[] + triangle(vi, vj, vk); 
     //the triangle must be count-clock-wise.
     pTriangle = new CTriangle(i,k,j);
-    pTriangle->id = NumOfPatchTriangle++;
+    pTriangle->Id = NumOfPatchTriangle++;
     PatchTriangles.push_back(pTriangle);
 
     if( j != k-1 )  Trace(j,k);
@@ -532,7 +532,7 @@ void vtkMEDFillingHole::CreatePatch()
     Lambda[i][i] = HolePointIDs[i];  
 
     //the absolute position of the vertex of edge(i,i+1) oppsite in surrounding mesh
-    Lambda[i][i+1] = Edges[HoleEdgeIDs[i]]->aVertex[2];	
+    Lambda[i][i+1] = Edges[HoleEdgeIDs[i]]->AVertex[2];	
 
     weight[i][i] = weight_angle[i][i] = 0;
     weight[i][i+1]=	weight_angle[i][i+1] = 0;
@@ -716,59 +716,59 @@ vtkMEDFillingHole::CVertex* vtkMEDFillingHole::AddOnePointToTriangle(double *pCo
   PatchVertexes.push_back(pNewVertex);
 
   //old triangle
-  pVertexIndex = pTriangle->aVertex;
-  pEdgeIndex = pTriangle->aEdge;
+  pVertexIndex = pTriangle->AVertex;
+  pEdgeIndex = pTriangle->AEdge;
 
   //add three new triangles
   pNewTriangle = new CTriangle(pVertexIndex[0],pVertexIndex[1],NumOfPatchVertex);
   pNewTriangle->SetEdge(pEdgeIndex[0],NumOfPatchEdge,NumOfPatchEdge+1);
-  pNewTriangle->id = NumOfPatchTriangle;
+  pNewTriangle->Id = NumOfPatchTriangle;
   PatchTriangles.push_back(pNewTriangle);
 
   pNewTriangle = new CTriangle(NumOfPatchVertex,pVertexIndex[1],pVertexIndex[2]);
   pNewTriangle->SetEdge(NumOfPatchEdge,pEdgeIndex[1],NumOfPatchEdge+2);
-  pNewTriangle->id = NumOfPatchTriangle+1;
+  pNewTriangle->Id = NumOfPatchTriangle+1;
   PatchTriangles.push_back(pNewTriangle);
 
   pNewTriangle = new CTriangle(pVertexIndex[0],NumOfPatchVertex,pVertexIndex[2]);
   pNewTriangle->SetEdge(NumOfPatchEdge+1,NumOfPatchEdge+2,pEdgeIndex[2]);
-  pNewTriangle->id = NumOfPatchTriangle+2;
+  pNewTriangle->Id = NumOfPatchTriangle+2;
   PatchTriangles.push_back(pNewTriangle);
 
   //add three new edges
   pNewEdge = new CEdge(pVertexIndex[1],NumOfPatchVertex,pVertexIndex[0],pVertexIndex[2]);
-  pNewEdge->aTriangle[0] = NumOfPatchTriangle;
-  pNewEdge->aTriangle[1] = NumOfPatchTriangle+1;
-  pNewEdge->id = NumOfPatchEdge;
+  pNewEdge->ATriangle[0] = NumOfPatchTriangle;
+  pNewEdge->ATriangle[1] = NumOfPatchTriangle+1;
+  pNewEdge->Id = NumOfPatchEdge;
   PatchEdges.push_back(pNewEdge);
 
   pNewEdge = new CEdge(NumOfPatchVertex,pVertexIndex[0],pVertexIndex[1],pVertexIndex[2]);
-  pNewEdge->aTriangle[0] = NumOfPatchTriangle;
-  pNewEdge->aTriangle[1] = NumOfPatchTriangle+2;
-  pNewEdge->id = NumOfPatchEdge+1;
+  pNewEdge->ATriangle[0] = NumOfPatchTriangle;
+  pNewEdge->ATriangle[1] = NumOfPatchTriangle+2;
+  pNewEdge->Id = NumOfPatchEdge+1;
   PatchEdges.push_back(pNewEdge);
 
   pNewEdge = new CEdge(pVertexIndex[2],NumOfPatchVertex,pVertexIndex[1],pVertexIndex[0]);
-  pNewEdge->aTriangle[0] = NumOfPatchTriangle+1;
-  pNewEdge->aTriangle[1] = NumOfPatchTriangle+2;
-  pNewEdge->id = NumOfPatchEdge+2;
+  pNewEdge->ATriangle[0] = NumOfPatchTriangle+1;
+  pNewEdge->ATriangle[1] = NumOfPatchTriangle+2;
+  pNewEdge->Id = NumOfPatchEdge+2;
   PatchEdges.push_back(pNewEdge);
 
   //modify three edges of old triangle
   for(int i=0; i<3; i++)
   {
     pEdge = PatchEdges[pEdgeIndex[i]];
-    if( pEdge->aVertex[0] == pVertexIndex[i] )
+    if( pEdge->AVertex[0] == pVertexIndex[i] )
     {
-      pEdge->aVertex[2] = NumOfPatchVertex;
-      pEdge->aTriangle[0] = NumOfPatchTriangle+i;
+      pEdge->AVertex[2] = NumOfPatchVertex;
+      pEdge->ATriangle[0] = NumOfPatchTriangle+i;
     }
     else
     {
-      pEdge->aVertex[3] = NumOfPatchVertex;
-      pEdge->aTriangle[1] = NumOfPatchTriangle+i;
+      pEdge->AVertex[3] = NumOfPatchVertex;
+      pEdge->ATriangle[1] = NumOfPatchTriangle+i;
     }
-    pEdge->bMarked = false;
+    pEdge->BMarked = false;
   }
 
   NumOfPatchVertex += 1;
@@ -793,7 +793,7 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   int *edgevertex;	
   int *edgetriangle;	
 
-  edgevertex = pEdge->aVertex;
+  edgevertex = pEdge->AVertex;
   for(i=0; i<4; i++)
   {
     pVertexIndex[i] = edgevertex[i];
@@ -814,16 +814,16 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
     int V1 = HolePointIDs[pVertexIndex[3]];
 
     CEdge* pCheckEdge = Edges[HoleEdgeIDs[pVertexIndex[2]]];    
-    if (pCheckEdge->aVertex[2] == V1 || pCheckEdge->aVertex[3] == V1)
+    if (pCheckEdge->AVertex[2] == V1 || pCheckEdge->AVertex[3] == V1)
       return false; //the edge already exists
 
     pCheckEdge = Edges[HoleEdgeIDs[pVertexIndex[3]]];    
-    if (pCheckEdge->aVertex[2] == V0 || pCheckEdge->aVertex[3] == V0)
+    if (pCheckEdge->AVertex[2] == V0 || pCheckEdge->AVertex[3] == V0)
       return false; //the edge already exists
   }
   
 
-  edgetriangle = pEdge->aTriangle;
+  edgetriangle = pEdge->ATriangle;
 
   CTriangle	*pLeftTriangle,*pRightTriangle;
   CTriangle	*pTopTriangle,*pBottomTriangle;
@@ -836,11 +836,11 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   pTopTriangle = new CTriangle(pVertexIndex[3],pVertexIndex[1],pVertexIndex[2]);
   pBottomTriangle = new CTriangle(pVertexIndex[0],pVertexIndex[3],pVertexIndex[2]);
 
-  pTopTriangle->id = pLeftTriangle->id;
-  pBottomTriangle->id = pRightTriangle->id;
+  pTopTriangle->Id = pLeftTriangle->Id;
+  pBottomTriangle->Id = pRightTriangle->Id;
 
-  pTopTriangle->aEdge[2] = pEdge->id;
-  pBottomTriangle->aEdge[1] = pEdge->id;
+  pTopTriangle->AEdge[2] = pEdge->Id;
+  pBottomTriangle->AEdge[1] = pEdge->Id;
 
 #if 0
 #if defined(_FILLING_DBG) && defined(_MSC_VER)
@@ -911,22 +911,22 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   //modify left triangle
   for(i=0;i<3;i++)
   {
-    if( pLeftTriangle->aVertex[i] != pVertexIndex[0] )	continue;
+    if( pLeftTriangle->AVertex[i] != pVertexIndex[0] )	continue;
 
-    j = pLeftTriangle->aEdge[(i+1)%3];		
-    pTopTriangle->aEdge[1] = j;
+    j = pLeftTriangle->AEdge[(i+1)%3];		
+    pTopTriangle->AEdge[1] = j;
     changeEdges[0] = pOldEdge = PatchEdges[j];
     changeNewVal[0] = pVertexIndex[3];
-    if( pOldEdge->aVertex[0] == pVertexIndex[1] )
+    if( pOldEdge->AVertex[0] == pVertexIndex[1] )
       changePos[0] = 2;      
     else
       changePos[0] = 3;         
 
-    j = pLeftTriangle->aEdge[(i+2)%3];
-    pBottomTriangle->aEdge[2] = j;
+    j = pLeftTriangle->AEdge[(i+2)%3];
+    pBottomTriangle->AEdge[2] = j;
     changeEdges[2] = pOldEdge = PatchEdges[j];
     changeNewVal[2] = pVertexIndex[3];
-    if( pOldEdge->aVertex[0] == pVertexIndex[2] )
+    if( pOldEdge->AVertex[0] == pVertexIndex[2] )
       changePos[2] = 2;
     else
       changePos[2] = 3;
@@ -936,23 +936,23 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   //modify right triangle
   for(i=0;i<3;i++)
   {
-    if( pRightTriangle->aVertex[i] != pVertexIndex[0] )	continue;
+    if( pRightTriangle->AVertex[i] != pVertexIndex[0] )	continue;
 
-    j = pRightTriangle->aEdge[(i+1)%3];
-    pTopTriangle->aEdge[0] = j;
+    j = pRightTriangle->AEdge[(i+1)%3];
+    pTopTriangle->AEdge[0] = j;
     changeEdges[3] = pOldEdge = PatchEdges[j];
     changeNewVal[3] = pVertexIndex[2];
-    if( pOldEdge->aVertex[0] == pVertexIndex[3] )
+    if( pOldEdge->AVertex[0] == pVertexIndex[3] )
       changePos[3] = 2;
     else
       changePos[3] = 3;
 
 
-    j = pRightTriangle->aEdge[i];
-    pBottomTriangle->aEdge[0] = j;
+    j = pRightTriangle->AEdge[i];
+    pBottomTriangle->AEdge[0] = j;
     changeEdges[1] = pOldEdge = PatchEdges[j];
     changeNewVal[1] = pVertexIndex[2];
-    if( pOldEdge->aVertex[0] == pVertexIndex[0] )
+    if( pOldEdge->AVertex[0] == pVertexIndex[0] )
       changePos[1] = 2;
     else
       changePos[1] = 3;
@@ -966,10 +966,10 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   {
     for (int j = 0; j < 4; j++)
     {
-      if (changeEdges[i]->aVertex[j] == changeNewVal[i])
+      if (changeEdges[i]->AVertex[j] == changeNewVal[i])
       {
 #if defined(_DEBUG) && defined(_MSC_VER)
-        _RPT1(_CRT_WARN, "Invalid swap operation for edge #%d\n", pEdge->id);
+        _RPT1(_CRT_WARN, "Invalid swap operation for edge #%d\n", pEdge->Id);
 #endif //_DEBUG        
 
         //swap is illegal
@@ -983,13 +983,13 @@ bool vtkMEDFillingHole::RelaxOneEdge(CEdge *pEdge)
   //and finally perform the change
   for (i = 0; i < 4; i++)
   {
-    changeEdges[i]->aVertex[changePos[i]] = changeNewVal[i];
-    changeEdges[i]->bMarked = false;
+    changeEdges[i]->AVertex[changePos[i]] = changeNewVal[i];
+    changeEdges[i]->BMarked = false;
   }
   
   //changePos is 2 or 3
-  changeEdges[2]->aTriangle[changePos[2] - 2] = pBottomTriangle->id;
-  changeEdges[3]->aTriangle[changePos[3] - 2] = pTopTriangle->id;  
+  changeEdges[2]->ATriangle[changePos[2] - 2] = pBottomTriangle->Id;
+  changeEdges[3]->ATriangle[changePos[3] - 2] = pTopTriangle->Id;  
 
   PatchTriangles[edgetriangle[0]] = pTopTriangle;
   PatchTriangles[edgetriangle[1]] = pBottomTriangle;
@@ -1117,9 +1117,9 @@ void vtkMEDFillingHole::RefinePatch()
     {
       pTriangle = PatchTriangles[i];
       if(pTriangle->bDeleted == true ) continue;
-      if(pTriangle->bMarked == true )	continue;   //confirm subdiving isn't necessary.
+      if(pTriangle->BMarked == true )	continue;   //confirm subdiving isn't necessary.
 
-      pVertexIndex = pTriangle->aVertex;
+      pVertexIndex = pTriangle->AVertex;
       for( j=0; j<3; j++)
       {
         pVertex = PatchVertexes[pVertexIndex[j]];
@@ -1149,11 +1149,11 @@ void vtkMEDFillingHole::RefinePatch()
         pNewVertex = AddOnePointToTriangle(dCentroid,pTriangle);
         pNewVertex->DWeight = dTotalWeight;	
         //relax three edges of the old triangle.	
-        pEdgeIndex = pTriangle->aEdge;
+        pEdgeIndex = pTriangle->AEdge;
         for(j=0; j<3; j++)
         {
           pEdge = PatchEdges[pEdgeIndex[j]];
-          if(pEdge->bBoundary == true)	continue;					
+          if(pEdge->BBoundary == true)	continue;					
           RelaxOneEdge(pEdge);
         }
 
@@ -1164,7 +1164,7 @@ void vtkMEDFillingHole::RefinePatch()
       else
       {
         //the triangle wasn't need to subdivided.
-        pTriangle->bMarked = true;	
+        pTriangle->BMarked = true;	
       }		
     }//for triangle
 
@@ -1182,11 +1182,11 @@ void vtkMEDFillingHole::RefinePatch()
       for( j=0; j<NumOfPatchEdge; j++)
       {
         pEdge  = PatchEdges[j];				
-        if(pEdge->bBoundary == true)	continue;
-        if(pEdge->bMarked == true)		continue;   //confirm the swapping edge isn't necessary.
+        if(pEdge->BBoundary == true)	continue;
+        if(pEdge->BMarked == true)		continue;   //confirm the swapping edge isn't necessary.
 
         if( RelaxOneEdge(pEdge) == false ) {
-          pEdge->bMarked = true;
+          pEdge->BMarked = true;
         }
         else
           bFlag = true;        
@@ -1212,12 +1212,12 @@ void vtkMEDFillingHole::RefinePatch()
   for(NumOfPatchTriangle=0,i=0; i<nTriangle; i++,oldtriangle++)
   {
     pTriangle = *oldtriangle;
-    pEdgeIndex = pTriangle->aEdge;
+    pEdgeIndex = pTriangle->AEdge;
     if( pTriangle->bDeleted != true )
     {
-      pTriangle->id = NumOfPatchTriangle++;
+      pTriangle->Id = NumOfPatchTriangle++;
       pEdgeIndex[0] = pEdgeIndex[1] = pEdgeIndex[2] = -1;
-      pTriangle->bMarked = false;
+      pTriangle->BMarked = false;
 
       *newtriangle = pTriangle;
       newtriangle++;
@@ -1320,8 +1320,8 @@ void vtkMEDFillingHole::ExtendPatch()
       for(;onering!=oneringend;onering++)
       {				
         id = *onering;
-        if( Triangles[id]->bMarked == true ) continue;
-        Triangles[id]->bMarked = true;
+        if( Triangles[id]->BMarked == true ) continue;
+        Triangles[id]->BMarked = true;
         surroundtriangles.push_back(id);
       }
 
@@ -1364,12 +1364,12 @@ void vtkMEDFillingHole::ExtendPatch()
   {
     pTriangle = Triangles[surroundtriangles[i]];
     pNewTriangle = new CTriangle();
-    pNewTriangle->id = NumOfPatchTriangle++;
-    pNewTriangle->bMarked = true;   //it is triangle in surround mesh
-    pTriangle->bMarked = false;     //restore the original marked value.
+    pNewTriangle->Id = NumOfPatchTriangle++;
+    pNewTriangle->BMarked = true;   //it is triangle in surround mesh
+    pTriangle->BMarked = false;     //restore the original marked value.
 
-    pVertexIndex = pTriangle->aVertex;
-    pNewVertexIndex = pNewTriangle->aVertex;
+    pVertexIndex = pTriangle->AVertex;
+    pNewVertexIndex = pNewTriangle->AVertex;
 
     //using the recorded mapping relationship
     //computing the vertex position of the new triangle.
@@ -1449,12 +1449,12 @@ void vtkMEDFillingHole::BuildPatchLaplacian()
     for(j=0; j<nOneRingNum; j++)
     {
       int iEdge = PatchVertexes[i]->OneRingEdge[j];      
-      pVertexLaplaican->aLaplacian[j] = Edges[iEdge]->dLength;
-      dblLenTotal += Edges[iEdge]->dLength;
+      pVertexLaplaican->ALaplacian[j] = Edges[iEdge]->DLength;
+      dblLenTotal += Edges[iEdge]->DLength;
     }
 
     for(j=0; j<nOneRingNum; j++){
-      pVertexLaplaican->aLaplacian[j] /= dblLenTotal;
+      pVertexLaplaican->ALaplacian[j] /= dblLenTotal;
     }
         
     ////Uniform laplacian
@@ -1464,7 +1464,7 @@ void vtkMEDFillingHole::BuildPatchLaplacian()
     //  pVertexLaplaican->aLaplacian[j] = omega;
     //}	
     
-    pVertexLaplaican->dLaplacian = -1;
+    pVertexLaplaican->DLaplacian = -1;
     PatchLaplacian[i] = pVertexLaplaican;
   }
 }
@@ -1496,8 +1496,8 @@ void vtkMEDFillingHole::ComputeLTransposeLMatrix(double *A)
     //load one row L[index,*]
     pVertex = PatchVertexes[index];
     pVertexLaplaican = PatchLaplacian[index];
-    pLaplacian = pVertexLaplaican->aLaplacian;
-    diagonal = pVertexLaplaican->dLaplacian;
+    pLaplacian = pVertexLaplaican->ALaplacian;
+    diagonal = pVertexLaplaican->DLaplacian;
 
     start = pVertex->OneRingVertex.begin();
     end = pVertex->OneRingVertex.end();
@@ -1562,7 +1562,7 @@ void vtkMEDFillingHole::LTransposeMatrixVector( double *source,double *result )
   for(i=0;i<NumOfPatchVertex;i++)
   {
     pVertex = PatchVertexes[i];
-    pLaplacian = PatchLaplacian[i]->aLaplacian;
+    pLaplacian = PatchLaplacian[i]->ALaplacian;
     dSource = source[i];
 
     onering = pVertex->OneRingVertex.begin();
@@ -1578,7 +1578,7 @@ void vtkMEDFillingHole::LTransposeMatrixVector( double *source,double *result )
       result[*onering] += pLaplacian[j]*dSource;
     }	
     // L[i,i] * source[i]
-    result[i] += PatchLaplacian[i]->dLaplacian * dSource;
+    result[i] += PatchLaplacian[i]->DLaplacian * dSource;
   }
 }
 
@@ -1835,7 +1835,7 @@ void vtkMEDFillingHole::MembraneSmoothing()
     {
       //BES: 18.6.2008 - currently dLaplacianCoord is always 0
       //but this may change in the future, so I leave it heare
-      b_temp[i] = PatchLaplacian[i]->dLaplacianCoord[index];
+      b_temp[i] = PatchLaplacian[i]->DLaplacianCoord[index];
       xyz[i] = PatchVertexes[i]->DCoord[index];
     }
 
@@ -2072,15 +2072,15 @@ void vtkMEDFillingHole::MergePatch()
   NumOfNewTriangle = 0;
   for(;triangle!=triangleend;triangle++)
   {
-    if( (*triangle)->bMarked == true )  continue;
-    pVertexIndex = (*triangle)->aVertex;
+    if( (*triangle)->BMarked == true )  continue;
+    pVertexIndex = (*triangle)->AVertex;
 
     v0 = vertexstart[pVertexIndex[0]]->Id;
     v1 = vertexstart[pVertexIndex[1]]->Id;
     v2 = vertexstart[pVertexIndex[2]]->Id;
 
     pNewTriangle = new CTriangle(v0,v1,v2);
-    pNewTriangle->id = NumOfTriangle++;
+    pNewTriangle->Id = NumOfTriangle++;
     NumOfNewTriangle++;
     Triangles.push_back(pNewTriangle);
   }
@@ -2212,7 +2212,7 @@ void vtkMEDFillingHole::InitManifoldMesh()
     for (int k = 0; k < nTriCount; k++) 
     {
       pTriangle = Triangles[pVertex->OneRingTriangle[k]];            
-      if (false == (pTriangle->bMarked = pTriangle->bDeleted))
+      if (false == (pTriangle->BMarked = pTriangle->bDeleted))
         nToProcess++; //increment number of valid triangles around the current vertex
     }
 
@@ -2225,7 +2225,7 @@ void vtkMEDFillingHole::InitManifoldMesh()
       for (int k = 0; k < nTriCount; k++) 
       {
         pTriangle = Triangles[pVertex->OneRingTriangle[k]];
-        if (!pTriangle->bMarked)
+        if (!pTriangle->BMarked)
           break;  //we found it       
       }
 
@@ -2249,7 +2249,7 @@ void vtkMEDFillingHole::InitManifoldMesh()
         {
           neight = pVertex->OneRingTriangle[k];
           pTriangle = Triangles[neight];      
-          if (!pTriangle->bMarked)
+          if (!pTriangle->BMarked)
           {
             //we have a valid triangle
             for (j = 0; j < 3; j++) 
@@ -2310,7 +2310,7 @@ void vtkMEDFillingHole::InitManifoldMesh()
               FansIdx[nFanPos + FansCounts[nFans]] = neight; //triangle ID
               FansCounts[nFans] += 1;
 
-              pTriangle->bMarked = true;
+              pTriangle->BMarked = true;
               nToProcess--;
               break;
             }
@@ -2325,7 +2325,7 @@ void vtkMEDFillingHole::InitManifoldMesh()
             FansIdx[nFanPos + FansCounts[nFans] + 1] = dv2;
             FansCounts[nFans] += 2;
 
-            pTriangle->bMarked = true;
+            pTriangle->BMarked = true;
             nToProcess--;
             sv2 = dv2;
             continue;
@@ -2409,7 +2409,7 @@ void vtkMEDFillingHole::InitManifoldMesh()
         delete pTriangle;
       else
       {
-        pTriangle->bMarked = false;
+        pTriangle->BMarked = false;
         pTriangle->id = nNewNumOfTriangle++;
         
         newTriangles[pTriangle->id] = pTriangle;
@@ -2442,7 +2442,7 @@ void vtkMEDFillingHole::BuildMesh()
   
   for( t=0; t<NumOfTriangle; t++)
   {
-    pVertexIndex = Triangles[t]->aVertex;
+    pVertexIndex = Triangles[t]->AVertex;
     //each triangle has three vertex;
     for(i=0;i<3;i++)
     {
@@ -2457,8 +2457,8 @@ void vtkMEDFillingHole::BuildMesh()
   for( t=0; t<NumOfTriangle; t++)
   {
     pTriangle = Triangles[t];		
-    pVertexIndex = pTriangle->aVertex;
-    pEdgeIndex = pTriangle->aEdge;
+    pVertexIndex = pTriangle->AVertex;
+    pEdgeIndex = pTriangle->AEdge;
     //each triangle has three vertex;
     for(i=0;i<3;i++)
     {
@@ -2483,10 +2483,10 @@ void vtkMEDFillingHole::BuildMesh()
       pVertex2->DOneRingEdgeLength += dLength;
 
       pEdge = new CEdge(sv1,sv2);
-      pEdge->id = NumOfEdge;
-      pEdge->aVertex[2] = pVertexIndex[(i+2)%3];
-      pEdge->aTriangle[0] = t;
-      pEdge->dLength = dLength;
+      pEdge->Id = NumOfEdge;
+      pEdge->AVertex[2] = pVertexIndex[(i+2)%3];
+      pEdge->ATriangle[0] = t;
+      pEdge->DLength = dLength;
       Edges[NumOfEdge] = pEdge;
 
       bflag = false;
@@ -2499,13 +2499,13 @@ void vtkMEDFillingHole::BuildMesh()
         //having lower id was already processed previously
         if( neight <= t) continue;
         pNeighTriangle = Triangles[neight];	
-        pVertexIndex2 = pNeighTriangle->aVertex;
+        pVertexIndex2 = pNeighTriangle->AVertex;
 
         for(j=0; j<3; j++)
         {
           // when find the edge of the neighbor triangle was computed, continue find 
           // next edge of the neighbor triangle.
-          if( pNeighTriangle->aEdge[j] >=0 ) continue;	
+          if( pNeighTriangle->AEdge[j] >=0 ) continue;	
 
           //N.B. orientation of triangles should be consistent
           dv1 = pVertexIndex2[j];
@@ -2523,12 +2523,12 @@ void vtkMEDFillingHole::BuildMesh()
 
           if( sv2 == dv1 && sv1==dv2 )
           {
-            pNeighTriangle->aEdge[j] = NumOfEdge;
-            if( pEdge->aTriangle[1] < 0 )
+            pNeighTriangle->AEdge[j] = NumOfEdge;
+            if( pEdge->ATriangle[1] < 0 )
             {
               // if the mesh is manifold, each edge only have two adjacent triangles.
-              pEdge->aVertex[3] = pVertexIndex2[(j+2)%3];
-              pEdge->aTriangle[1] = neight;
+              pEdge->AVertex[3] = pVertexIndex2[(j+2)%3];
+              pEdge->ATriangle[1] = neight;
             }
             else
             {
@@ -2545,7 +2545,7 @@ void vtkMEDFillingHole::BuildMesh()
       if( bflag == false )
       {
         //find a boundary edge and vertex
-        pEdge->bBoundary = true;
+        pEdge->BBoundary = true;
         pVertex1->BBoundary = true;
         pVertex2->BBoundary = true;
       }
@@ -2579,7 +2579,7 @@ void vtkMEDFillingHole::UpdateMesh(int id)
   for(t=id; t<NumOfTriangle; t++)
   {
     pTriangle = Triangles[t];		
-    pVertexIndex = pTriangle->aVertex;
+    pVertexIndex = pTriangle->AVertex;
     //each triangle has three vertex;
     for(i=0;i<3;i++)
     {
@@ -2594,11 +2594,11 @@ void vtkMEDFillingHole::UpdateMesh(int id)
   for(t=id; t<NumOfTriangle; t++)
   {
     pTriangle = Triangles[t];		
-    pVertexIndex = pTriangle->aVertex;
+    pVertexIndex = pTriangle->AVertex;
     //each triangle has three vertex;
     for(i=0;i<3;i++)
     {
-      if( pTriangle->aEdge[i] >= 0 )				continue;
+      if( pTriangle->AEdge[i] >= 0 )				continue;
 
       sv1 = pVertexIndex[i];
       sv2 = pVertexIndex[(i+1)%3];
@@ -2616,7 +2616,7 @@ void vtkMEDFillingHole::UpdateMesh(int id)
       {
         if( *neight == t) continue;
         pNeighTriangle = Triangles[*neight];	
-        pVertexIndex2 = pNeighTriangle->aVertex;
+        pVertexIndex2 = pNeighTriangle->AVertex;
 
         for(j=0; j<3; j++)
         {
@@ -2624,12 +2624,12 @@ void vtkMEDFillingHole::UpdateMesh(int id)
           dv2 = pVertexIndex2[(j+1)%3];
           if( sv2 == dv1 && sv1==dv2 )
           {
-            nEdge = pNeighTriangle->aEdge[j];
+            nEdge = pNeighTriangle->AEdge[j];
             if( nEdge<0 )
             {
-              pNeighTriangle->aEdge[j] = NumOfEdge;
-              pEdge->aVertex[3] = pVertexIndex2[(j+2)%3];
-              pEdge->aTriangle[1] = *neight;
+              pNeighTriangle->AEdge[j] = NumOfEdge;
+              pEdge->AVertex[3] = pVertexIndex2[(j+2)%3];
+              pEdge->ATriangle[1] = *neight;
             }
             bflag = true;
             break;						
@@ -2638,7 +2638,7 @@ void vtkMEDFillingHole::UpdateMesh(int id)
       }
       if( nEdge < 0 )
       {		
-        pTriangle->aEdge[i] = NumOfEdge;
+        pTriangle->AEdge[i] = NumOfEdge;
 
         pVertex1->OneRingVertex.push_back(sv2);
         pVertex2->OneRingVertex.push_back(sv1);			
@@ -2650,10 +2650,10 @@ void vtkMEDFillingHole::UpdateMesh(int id)
         pVertex1->DOneRingEdgeLength += dLength;
         pVertex2->DOneRingEdgeLength += dLength;
 
-        pEdge->id = NumOfEdge;
-        pEdge->aVertex[2] = pVertexIndex[(i+2)%3];
-        pEdge->aTriangle[0] = t;
-        pEdge->dLength = dLength;
+        pEdge->Id = NumOfEdge;
+        pEdge->AVertex[2] = pVertexIndex[(i+2)%3];
+        pEdge->ATriangle[0] = t;
+        pEdge->DLength = dLength;
         Edges.push_back(pEdge);
 
         NumOfEdge++;
@@ -2662,16 +2662,16 @@ void vtkMEDFillingHole::UpdateMesh(int id)
       {
         delete pEdge;
 
-        pTriangle->aEdge[i] = nEdge;
+        pTriangle->AEdge[i] = nEdge;
         pEdge = Edges[nEdge];
         // if the mesh is manifold, each edge only have two adjacent triangles.
-        pEdge->aVertex[3] = pVertexIndex[(i+2)%3];
-        pEdge->aTriangle[1] = t;
-        if( pEdge->bBoundary==true )
+        pEdge->AVertex[3] = pVertexIndex[(i+2)%3];
+        pEdge->ATriangle[1] = t;
+        if( pEdge->BBoundary==true )
         {
           //find a boundary edge and vertex in original mesh
           //now change it as an internal edge and vertex
-          pEdge->bBoundary = false;
+          pEdge->BBoundary = false;
           pVertex1->BBoundary = false;
           pVertex2->BBoundary = false;
         }
@@ -2724,8 +2724,8 @@ bool vtkMEDFillingHole::FindAHole()
     for( ringedge = pStartVertex->OneRingEdge.begin(); ringedge != pStartVertex->OneRingEdge.end(); ringedge++ )
     {
       pEdge = Edges[*ringedge];
-      if( pEdge->bBoundary == false)	continue;	
-      pEdgeVertex = pEdge->aVertex;
+      if( pEdge->BBoundary == false)	continue;	
+      pEdgeVertex = pEdge->AVertex;
       //only the edge is (pStartVertex,nextVertex).
       if( pEdgeVertex[0] == pStartVertex->Id ) 
       {
@@ -2733,7 +2733,7 @@ bool vtkMEDFillingHole::FindAHole()
         if( pStartVertex->BMarked == true ) 
           break;
         HolePointIDs.push_back(pStartVertex->Id);
-        HoleEdgeIDs.push_back(pEdge->id);
+        HoleEdgeIDs.push_back(pEdge->Id);
         pStartVertex->BMarked = true;
 
         pStartVertex = Vertexes[pEdgeVertex[1]];
@@ -2820,7 +2820,7 @@ void vtkMEDFillingHole::InitMesh()
     v1 = ptids->GetId(1);            
     v2 = ptids->GetId(2);            
     pTriangle = new CTriangle(v0,v1,v2);
-    pTriangle->id = i;
+    pTriangle->Id = i;
     Triangles[i] = pTriangle;
   }
 }
@@ -2844,7 +2844,7 @@ void vtkMEDFillingHole::DoneMesh()
   // insert data into cell array
   triangles->Allocate(NumOfTriangle) ;   
   for (i = 0 ;  i < NumOfTriangle ;  i++)
-    triangles->InsertNextCell(3, Triangles[i]->aVertex) ;
+    triangles->InsertNextCell(3, Triangles[i]->AVertex) ;
 
   OutputMesh->SetPoints(points) ;
   OutputMesh->SetPolys(triangles) ;
