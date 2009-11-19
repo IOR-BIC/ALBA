@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMEDPolyDataDeformation_M1.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-05-29 08:38:43 $ 
-Version: $Revision: 1.1.2.1 $ 
+Date: $Date: 2009-11-19 11:16:49 $ 
+Version: $Revision: 1.1.2.2 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -20,7 +20,7 @@ See the COPYINGS file for license details
 #include "vtkCellLocator.h"
 #include "vtkGenericCell.h"
 
-vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M1, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation_M1, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDPolyDataDeformation_M1);
 
 #include "mafMemDbg.h"
@@ -185,7 +185,7 @@ vtkMEDPolyDataDeformation_M1::CMatrix<T>::~CMatrix()
 #define Z_STAR 1
 #define Z_PRIME 2
 
-int vtkMEDPolyDataDeformation_M1::CMunkres::step1(void) 
+int vtkMEDPolyDataDeformation_M1::CMunkres::Step1(void) 
 {
   for ( int row = 0 ; row < (*matrix).GetNumberOfRows() ; row++ )
     for ( int col = 0 ; col < (*matrix).GetNumberOfColumns() ; col++ )
@@ -209,7 +209,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step1(void)
       return 2;
 }
 
-int vtkMEDPolyDataDeformation_M1::CMunkres::step2(void) 
+int vtkMEDPolyDataDeformation_M1::CMunkres::Step2(void) 
 {
   int covercount = 0;
   for ( int row = 0 ; row < (*matrix).GetNumberOfRows() ; row++ )
@@ -227,7 +227,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step2(void)
       return 3;
 }
 
-int vtkMEDPolyDataDeformation_M1::CMunkres::step3(void) 
+int vtkMEDPolyDataDeformation_M1::CMunkres::Step3(void) 
 {
   /*
   Main Zero Search
@@ -236,7 +236,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step3(void)
   2. If No Z* exists in the row of the Z', go to Step 4.
   3. If a Z* exists, cover this row and uncover the column of the Z*. Return to Step 3.1 to find a new Z
   */
-  if ( find_uncovered_in_matrix(0, saverow, savecol) ) {
+  if ( FindUncoveredInMatrix(0, saverow, savecol) ) {
     (*mask_matrix)(saverow,savecol) = Z_PRIME; // prime it.
   } else {
     return 5;
@@ -252,7 +252,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step3(void)
     return 4; // no starred zero in the row containing this primed zero
 }
 
-int vtkMEDPolyDataDeformation_M1::CMunkres::step4(void) 
+int vtkMEDPolyDataDeformation_M1::CMunkres::Step4(void) 
 {
   std::list<std::pair<int,int> > seq;
   // use saverow, savecol from step 3.
@@ -280,7 +280,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step4(void)
       if ( (*mask_matrix)(row,col) == Z_STAR ) {
         z1.first = row;
         z1.second = col;
-        if ( pair_in_list(z1, seq) )
+        if ( PairInList(z1, seq) )
           continue;
 
         madepair = true;
@@ -297,7 +297,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step4(void)
         if ( (*mask_matrix)(row,col) == Z_PRIME ) {
           z2n.first = row;
           z2n.second = col;
-          if ( pair_in_list(z2n, seq) )
+          if ( PairInList(z2n, seq) )
             continue;
           madepair = true;
           seq.insert(seq.end(), z2n);
@@ -336,7 +336,7 @@ int vtkMEDPolyDataDeformation_M1::CMunkres::step4(void)
   return 2;
 }
 
-int vtkMEDPolyDataDeformation_M1::CMunkres::step5(void) {
+int vtkMEDPolyDataDeformation_M1::CMunkres::Step5(void) {
   /*
   New Zero Manufactures
 
@@ -402,19 +402,19 @@ void vtkMEDPolyDataDeformation_M1::CMunkres::Solve( CMatrix< double >* m, CMatri
         notdone = false;
         break;
       case 1:
-        step = step1();
+        step = Step1();
         break;
       case 2:
-        step = step2();
+        step = Step2();
         break;
       case 3:
-        step = step3();
+        step = Step3();
         break;
       case 4:
-        step = step4();
+        step = Step4();
         break;
       case 5:
-        step = step5();
+        step = Step5();
         break;
     }
   }

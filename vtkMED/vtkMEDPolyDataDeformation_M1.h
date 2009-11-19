@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation_M1.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-29 08:38:43 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-11-19 11:16:49 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -267,14 +267,14 @@ protected:
     void Solve(CMatrix< double >* matrix, CMatrix< int >* matches);
 
   private:
-    inline bool find_uncovered_in_matrix(double,int&,int&);
-    inline bool pair_in_list(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
-    int step1(void);
-    int step2(void);
-    int step3(void);
-    int step4(void);
-    int step5(void);
-    int step6(void);
+    inline bool FindUncoveredInMatrix(double,int&,int&);
+    inline bool PairInList(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
+    int Step1(void);
+    int Step2(void);
+    int Step3(void);
+    int Step4(void);
+    int Step5(void);
+    int Step6(void);
 
     CMatrix<int>* mask_matrix;
     CMatrix<double>* matrix;
@@ -578,7 +578,7 @@ protected:
 
 #pragma region //Munkres INLINES
 inline bool vtkMEDPolyDataDeformation_M1::
-CMunkres::find_uncovered_in_matrix(double item, int &row, int &col) 
+CMunkres::FindUncoveredInMatrix(double item, int &row, int &col) 
 {
   for ( row = 0 ; row < matrix->GetNumberOfRows() ; row++ )
   {
@@ -596,7 +596,7 @@ CMunkres::find_uncovered_in_matrix(double item, int &row, int &col)
 }
 
 inline bool vtkMEDPolyDataDeformation_M1::
-CMunkres::pair_in_list(const vtkstd::pair<int,int> &needle, 
+CMunkres::PairInList(const vtkstd::pair<int,int> &needle, 
                        const vtkstd::list<std::pair<int,int> > &haystack) 
 {
   for (std::list<std::pair<int,int> >::const_iterator i = haystack.begin(); i != haystack.end() ; i++)

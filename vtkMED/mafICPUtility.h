@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafICPUtility.h,v $
   Language:  C++
-  Date:      $Date: 2007-03-30 10:52:50 $
-  Version:   $Revision: 1.4 $
+  Date:      $Date: 2009-11-19 11:16:49 $
+  Version:   $Revision: 1.4.2.1 $
   Authors:   Andrea Cutti porting Matteo Giacomoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -61,23 +61,23 @@ public:
   //method that allow to make the registration
   //vtkTransform *RegisterClouds(mflVME *source, mflVME *target, float varThreshold, int swap, int maxCycleNumber, wxString knownMinLocalFile = "");
   inline vnl_matrix<double> PolyData2VnlFilter(vtkPolyData* Shape);
-  inline void vtk2vnl(vtkPolyData* Shape, double* MatrixData);
+  inline void Vtk2Vnl(vtkPolyData* Shape, double* MatrixData);
   inline RegResult SVD_Registration(vnl_matrix<double>& MS, vnl_matrix<double>& DS);
   inline void Vnl2PolyDataFilter(vnl_matrix<double> M, vtkPolyData* Shape);
-  inline void rows_randperm(vnl_matrix<double>& M);
-  inline vnl_matrix_fixed<double,3,3> theta2R(const vnl_vector_fixed<double,3>& th);
+  inline void Rows_randperm(vnl_matrix<double>& M);
+  inline vnl_matrix_fixed<double,3,3> Theta2R(const vnl_vector_fixed<double,3>& th);
   inline vnl_matrix_fixed<double,4,4> R_t_2_Tr(const vnl_matrix_fixed<double,3,3>& R,const vnl_vector_fixed<double,3>& t);
-  inline void findPointLocator(vtkPoints *MS_vtkpoints, vtkPointLocator *pointLocator, double* DS_data, int DScols, vnl_matrix<double> &closest_pts);
+  inline void FindPointLocator(vtkPoints *MS_vtkpoints, vtkPointLocator *pointLocator, double* DS_data, int DScols, vnl_matrix<double> &closest_pts);
   inline RegResult ICP_vtkPointLocator(vnl_matrix<double>& MS, vnl_matrix<double> & DS, int cycle_lim);
   inline RegResult ICP_vtkPointLocator(vnl_matrix<double>& MS, vnl_matrix<double> & DS, vcl_ifstream& ml_read_file, float var_threshold, int cycle_lim);
   inline RegResult ICP_vtkPointLocator(vnl_matrix<double>& MS, vnl_matrix<double> & DS, vcl_multimap<double,int>& mm, const char* ml_filepath, float var_threshold, int cycle_lim);
-  inline vnl_matrix_fixed<double,3,3> rpy2R(const vnl_vector_fixed<double,3> v);
-  inline vnl_matrix_fixed<double,3,3> rpy2R(const double* row);
-  inline vnl_matrix<double> rpyOnShape(const vnl_matrix<double>& Shape, const double* row);
-  inline vnl_vector_fixed<double,3> centroid(const vnl_matrix<double> & S);
-  inline vnl_vector<double> center(const vnl_matrix<double>& S);
-  inline void neg_translation(vnl_matrix<double>& S, const vnl_vector<double> c);
-  inline void pos_translation(vnl_matrix<double>& S, const vnl_vector<double> c);
+  inline vnl_matrix_fixed<double,3,3> Rpy2R(const vnl_vector_fixed<double,3> v);
+  inline vnl_matrix_fixed<double,3,3> Rpy2R(const double* row);
+  inline vnl_matrix<double> RpyOnShape(const vnl_matrix<double>& Shape, const double* row);
+  inline vnl_vector_fixed<double,3> Centroid(const vnl_matrix<double> & S);
+  inline vnl_vector<double> Center(const vnl_matrix<double>& S);
+  inline void Neg_translation(vnl_matrix<double>& S, const vnl_vector<double> c);
+  inline void Pos_translation(vnl_matrix<double>& S, const vnl_vector<double> c);
   inline void Rotation_classif(vcl_multimap<double,int>& mm,const vnl_matrix<double>& DS, vnl_matrix<double>& MS);
   inline RegResult FFRegistration( vnl_matrix<double>& MS, vnl_matrix<double>& DS, const char* knownMinLocalFile, float VarianceThrshold, int MaximumNumberOfIterations);
   inline void Target_on_Source(vnl_matrix_fixed<double,3,3>& R, vnl_vector_fixed<double,3>& p);
@@ -95,20 +95,20 @@ protected:
   ~mafICPUtility() {};
 };
 
-vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4 $");
+vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4.2.1 $");
   vtkStandardNewMacro(mafICPUtility);
 //----------------------------------------------------------------------------
 inline vnl_matrix<double> mafICPUtility::PolyData2VnlFilter(vtkPolyData* Shape)
 //----------------------------------------------------------------------------
 {
 	double* MatrixData=new double[(Shape->GetNumberOfPoints())*3];
-	vtk2vnl(Shape, MatrixData);
+	Vtk2Vnl(Shape, MatrixData);
 	vnl_matrix<double> M(MatrixData, Shape->GetNumberOfPoints() , 3);
 	delete[] MatrixData;
 	return M;
 }
 //----------------------------------------------------------------------------
-inline void mafICPUtility::vtk2vnl(vtkPolyData* Shape, double* MatrixData)
+inline void mafICPUtility::Vtk2Vnl(vtkPolyData* Shape, double* MatrixData)
 //----------------------------------------------------------------------------
 {
 	double coord[3];
@@ -130,14 +130,14 @@ inline mafICPUtility::RegResult mafICPUtility::SVD_Registration(vnl_matrix<doubl
 {
 	////vcl_cout << DS << '\n';
 
-	vnl_vector_fixed<double,3> MS_centroid=centroid(MS);
-	vnl_vector_fixed<double,3> DS_centroid=centroid(DS);
+	vnl_vector_fixed<double,3> MS_centroid=Centroid(MS);
+	vnl_vector_fixed<double,3> DS_centroid=Centroid(DS);
 
 	//vcl_cout << "Dentro SVD il centroide di MS vale: " << MS_centroid << '\n';
 	//vcl_cout << "Dentro SVD il centroide di DS vale: " << DS_centroid << '\n';
 
-	neg_translation(MS, MS_centroid);
-	neg_translation(DS, DS_centroid);
+	Neg_translation(MS, MS_centroid);
+	Neg_translation(DS, DS_centroid);
 
 	vnl_matrix<double> MSt=MS.transpose();
 	vnl_matrix_fixed<double,3,3> Z=MSt*DS; //MS deve essere 3xn mentre DS una nx3
@@ -157,8 +157,8 @@ inline mafICPUtility::RegResult mafICPUtility::SVD_Registration(vnl_matrix<doubl
 	//vcl_cout << "Entro SVD R finale vale: \n" << registrazione_S_V_D.R << '\n';
 	//vcl_cout << "Entro SVD t finale vale: \n" << registrazione_S_V_D.t << '\n';
 
-	pos_translation(MS,MS_centroid); //Se le matrici sono passate per riferimento questo serve! se no commentare
-	pos_translation(DS,DS_centroid); //Se le matrici sono passate per riferimento questo serve! se no commentare
+	Pos_translation(MS,MS_centroid); //Se le matrici sono passate per riferimento questo serve! se no commentare
+	Pos_translation(DS,DS_centroid); //Se le matrici sono passate per riferimento questo serve! se no commentare
 	
 	return registrazione_S_V_D;
 }
@@ -172,7 +172,7 @@ inline void mafICPUtility::Vnl2PolyDataFilter(vnl_matrix<double> M, vtkPolyData*
 	points->Delete();
 }
 //----------------------------------------------------------------------------
-inline void mafICPUtility::rows_randperm(vnl_matrix<double>& M)
+inline void mafICPUtility::Rows_randperm(vnl_matrix<double>& M)
 //----------------------------------------------------------------------------
 {
 	const int nrows=M.rows();
@@ -187,7 +187,7 @@ inline void mafICPUtility::rows_randperm(vnl_matrix<double>& M)
 	M=temp;
 }
 //----------------------------------------------------------------------------
-inline vnl_matrix_fixed<double,3,3> mafICPUtility::theta2R(const vnl_vector_fixed<double,3>& th)
+inline vnl_matrix_fixed<double,3,3> mafICPUtility::Theta2R(const vnl_vector_fixed<double,3>& th)
 //----------------------------------------------------------------------------
 {
 	double fi=th.magnitude();
@@ -219,7 +219,7 @@ inline vnl_matrix_fixed<double,4,4> mafICPUtility::R_t_2_Tr(const vnl_matrix_fix
 	return Tr;
 }
 //----------------------------------------------------------------------------
-inline void mafICPUtility::findPointLocator(vtkPoints *MS_vtkpoints, vtkPointLocator *pointLocator, double* DS_data, int DScols, vnl_matrix<double> &closest_pts)
+inline void mafICPUtility::FindPointLocator(vtkPoints *MS_vtkpoints, vtkPointLocator *pointLocator, double* DS_data, int DScols, vnl_matrix<double> &closest_pts)
 //----------------------------------------------------------------------------
 {
 	//NB: DS è una 3 x n
@@ -281,9 +281,9 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	vnl_matrix<double> dy(DSrows, DScols);
 	vnl_vector_fixed<double,3> th_a;					//es: th.*[a 1 1]
 	vnl_vector_fixed<double,3> t_a;						//es: t.*[a 1 1]
-	vnl_matrix<double> R_DS(DSrows, DScols);			//es: theta2R(th)*DS
+	vnl_matrix<double> R_DS(DSrows, DScols);			//es: Theta2R(th)*DS
 	vnl_matrix<double> translation(DSrows, DScols);		//es: t*ones(1,n)
-	vnl_matrix<double> DS_move(DSrows, DScols);			//es: theta2R(th)*DS+t*ones(1,n)
+	vnl_matrix<double> DS_move(DSrows, DScols);			//es: Theta2R(th)*DS+t*ones(1,n)
 	vnl_matrix<double> S(DSrows*DScols, 6);
 	vnl_matrix<double> St(6,DSrows*DScols);
 	
@@ -298,7 +298,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 		if(cycle>8) b=1E-5; //era 8 metto 1
 
 		//Caricamente strutture parziali
-		R_DS=theta2R(th)*DS;
+		R_DS=Theta2R(th)*DS;
 		for (int i=0; i< DScols; i++) translation.set_column(i,t);
 		DS_move=R_DS+translation;
 
@@ -308,7 +308,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 			th_a.put(j, th[j]*a);
 			
 
-			dy=( (theta2R(th_a)*DS)+translation-DS_move ) / ( th[j]*b );
+			dy=( (Theta2R(th_a)*DS)+translation-DS_move ) / ( th[j]*b );
 			S.set_column(j,dy.data_block());
 		}
 
@@ -322,7 +322,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 			S.set_column(j+3,dy.data_block());
 		}
 
-		findPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
+		FindPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
 
 		em=closest_pts-DS_move;
 		e.set(em.data_block());
@@ -347,7 +347,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	DS.inplace_transpose();
 
 	mafICPUtility::RegResult res;
-	res.R=theta2R(th);
+	res.R=Theta2R(th);
 	res.t=t;
 	res.err= err;
 	res.var = var_err;
@@ -368,7 +368,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	return res;
 }
 //----------------------------------------------------------------------------
-inline vnl_matrix_fixed<double,3,3> mafICPUtility::rpy2R(const vnl_vector_fixed<double,3> v)
+inline vnl_matrix_fixed<double,3,3> mafICPUtility::Rpy2R(const vnl_vector_fixed<double,3> v)
 //----------------------------------------------------------------------------
 {
 	double pi=3.14159265358979323846;
@@ -394,7 +394,7 @@ inline vnl_matrix_fixed<double,3,3> mafICPUtility::rpy2R(const vnl_vector_fixed<
 	return R;
 }
 //----------------------------------------------------------------------------
-inline vnl_matrix_fixed<double,3,3> mafICPUtility::rpy2R(const double* row)
+inline vnl_matrix_fixed<double,3,3> mafICPUtility::Rpy2R(const double* row)
 //----------------------------------------------------------------------------
 {
 	double pi=3.14159265358979323846;
@@ -420,7 +420,7 @@ inline vnl_matrix_fixed<double,3,3> mafICPUtility::rpy2R(const double* row)
 	return R;
 }
 //----------------------------------------------------------------------------
-inline vnl_matrix<double> mafICPUtility::rpyOnShape(const vnl_matrix<double>& Shape, const double* row)
+inline vnl_matrix<double> mafICPUtility::RpyOnShape(const vnl_matrix<double>& Shape, const double* row)
 //----------------------------------------------------------------------------
 {
 //NB Shape DEVE essere già 3xn!!!
@@ -508,13 +508,13 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	int cycle=0;			//int cycle_lim=28;NOW GIVEN from the User Interface
 		
 	//Initialization of partial result needed to compute dy
-	vnl_matrix<double> DS_move(DSrows, DScols);			//es: theta2R(th)*DS+t*ones(1,n)
+	vnl_matrix<double> DS_move(DSrows, DScols);			//es: Theta2R(th)*DS+t*ones(1,n)
 	
 	//-------
 	vnl_matrix<double> dy(DSrows, DScols);
 	vnl_vector_fixed<double,3> th_a;					//es: th.*[a 1 1]
 	vnl_vector_fixed<double,3> t_a;						//es: t.*[a 1 1]
-	vnl_matrix<double> R_DS(DSrows, DScols);			//es: theta2R(th)*DS
+	vnl_matrix<double> R_DS(DSrows, DScols);			//es: Theta2R(th)*DS
 	vnl_matrix<double> translation(DSrows, DScols);		//es: t*ones(1,n)
 	vnl_matrix<double> S(DSrows*DScols, 6);
 	vnl_matrix<double> St(6,DSrows*DScols);
@@ -528,7 +528,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	int ind=0; //Necessario se, fuori dal for, voglio capire qual'è stata l'ultima RAR applicata
 
 	for(ind=0; ind<Min.rows() && var_err >var_threshold; ind++){
-		DS_R=rpyOnShape(DS, Min[ind]);//3xn
+		DS_R=RpyOnShape(DS, Min[ind]);//3xn
 		
 		b=2E-5;
 
@@ -551,7 +551,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 			if(cycle>18) b=1E-5; 
 
 			//Caricamente strutture parziali
-			R_DS=theta2R(th)*DS_R;
+			R_DS=Theta2R(th)*DS_R;
 			for (int i=0; i< DScols; i++) translation.set_column(i,t);
 			DS_move=R_DS+translation;
 
@@ -559,7 +559,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 				th_a=th;
 				th_a.put(j, th[j]*a);
 
-				dy=( (theta2R(th_a)*DS_R)+translation-DS_move ) / ( th[j]*b );
+				dy=( (Theta2R(th_a)*DS_R)+translation-DS_move ) / ( th[j]*b );
 				S.set_column(j,dy.data_block());
 			}
 
@@ -573,7 +573,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 				S.set_column(j+3,dy.data_block());
 			}
 
-			findPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
+			FindPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
 
 			em=closest_pts-DS_move;
 			e.set(em.data_block());
@@ -606,8 +606,8 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	//vcl_cout << "Ind vale: " << ind << '\n';
 	//for(int p=0;p<3;p++) //vcl_cout << Min[ind-1][p] << '\t';
 	//vcl_cout << '\n';
-	R_rar=rpy2R(Min[ind-1]);
-	R_icp=theta2R(th);
+	R_rar=Rpy2R(Min[ind-1]);
+	R_icp=Theta2R(th);
 	R_reg=R_icp*R_rar;
 
 	mafICPUtility::RegResult res;
@@ -633,7 +633,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	return res;
 }
 //----------------------------------------------------------------------------
-inline vnl_vector_fixed<double,3> mafICPUtility::centroid(const vnl_matrix<double> & S)
+inline vnl_vector_fixed<double,3> mafICPUtility::Centroid(const vnl_matrix<double> & S)
 //----------------------------------------------------------------------------
 {
 	vnl_vector_fixed<double,3> c(0.);
@@ -648,7 +648,7 @@ inline vnl_vector_fixed<double,3> mafICPUtility::centroid(const vnl_matrix<doubl
 	return c;
 }
 //----------------------------------------------------------------------------
-inline vnl_vector<double> mafICPUtility::center(const vnl_matrix<double>& S)
+inline vnl_vector<double> mafICPUtility::Center(const vnl_matrix<double>& S)
 //----------------------------------------------------------------------------
 {
 	vnl_vector<double> aux(S.rows());
@@ -662,7 +662,7 @@ inline vnl_vector<double> mafICPUtility::center(const vnl_matrix<double>& S)
 	return c;
 }
 //----------------------------------------------------------------------------
-inline void mafICPUtility::neg_translation(vnl_matrix<double>& S, const vnl_vector<double> c)
+inline void mafICPUtility::Neg_translation(vnl_matrix<double>& S, const vnl_vector<double> c)
 //----------------------------------------------------------------------------
 {
 	vnl_matrix<double> aux(S.rows(),S.columns());
@@ -673,7 +673,7 @@ inline void mafICPUtility::neg_translation(vnl_matrix<double>& S, const vnl_vect
 	S -= aux;
 }
 //----------------------------------------------------------------------------
-inline void mafICPUtility::pos_translation(vnl_matrix<double>& S, const vnl_vector<double> c)
+inline void mafICPUtility::Pos_translation(vnl_matrix<double>& S, const vnl_vector<double> c)
 //----------------------------------------------------------------------------
 {
 	vnl_matrix<double> aux(S.rows(),S.columns());
@@ -719,9 +719,9 @@ inline void mafICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const v
 	vnl_vector_fixed<double,3> y45(0,45,0);
 	vnl_vector_fixed<double,3> z45(0,0,45);
 	
-	vnl_matrix_fixed<double,3,3> Rx=rpy2R(x45);
-	vnl_matrix_fixed<double,3,3> Ry=rpy2R(y45);
-	vnl_matrix_fixed<double,3,3> Rz=rpy2R(z45);
+	vnl_matrix_fixed<double,3,3> Rx=Rpy2R(x45);
+	vnl_matrix_fixed<double,3,3> Ry=Rpy2R(y45);
+	vnl_matrix_fixed<double,3,3> Rz=Rpy2R(z45);
 
 	vnl_matrix<double> closest_pts(DS_temp_rows, DS_temp_cols);		
 	vnl_matrix<double> em(DS_temp_rows, DS_temp_cols);		
@@ -736,7 +736,7 @@ inline void mafICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const v
 		switch(index[i]){
 		case 1:
 			DS_temp=Rz*DS_temp;
-			findPointLocator(MS_vtkpoints, p_locator, DS_temp.data_block(), DS_temp_cols, closest_pts);
+			FindPointLocator(MS_vtkpoints, p_locator, DS_temp.data_block(), DS_temp_cols, closest_pts);
 			em=closest_pts-DS_temp;
 			e.set(em.data_block());
 			costo=e.squared_magnitude();
@@ -744,7 +744,7 @@ inline void mafICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const v
 			break;
 		case 2:
 			DS_temp=Ry*DS_temp;
-			findPointLocator(MS_vtkpoints, p_locator, DS_temp.data_block(), DS_temp_cols, closest_pts);
+			FindPointLocator(MS_vtkpoints, p_locator, DS_temp.data_block(), DS_temp_cols, closest_pts);
 			em=closest_pts-DS_temp;
 			e.set(em.data_block());
 			costo=e.squared_magnitude();
@@ -752,7 +752,7 @@ inline void mafICPUtility::Rotation_classif(vcl_multimap<double,int>& mm,const v
 			break;
 		case 3:
 			DS_temp=Rx*DS_temp;
-			findPointLocator(MS_vtkpoints, p_locator, DS_temp.data_block(), DS_temp_cols, closest_pts);
+			FindPointLocator(MS_vtkpoints, p_locator, DS_temp.data_block(), DS_temp_cols, closest_pts);
 			em=closest_pts-DS_temp;
 			e.set(em.data_block());
 			costo=e.squared_magnitude();
@@ -844,12 +844,12 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	double var_err=1E+3;	double var_err_lim=1E-12;
 	int cycle=0;			//int cycle_lim=28;NOW GIVEN from the User Interface
 		
-	vnl_matrix<double> DS_move(DSrows, DScols);			//es: theta2R(th)*DS+t*ones(1,n)
+	vnl_matrix<double> DS_move(DSrows, DScols);			//es: Theta2R(th)*DS+t*ones(1,n)
 	//----------
 	vnl_matrix<double> dy(DSrows, DScols);
 	vnl_vector_fixed<double,3> th_a;					//es: th.*[a 1 1]
 	vnl_vector_fixed<double,3> t_a;						//es: t.*[a 1 1]
-	vnl_matrix<double> R_DS(DSrows, DScols);			//es: theta2R(th)*DS
+	vnl_matrix<double> R_DS(DSrows, DScols);			//es: Theta2R(th)*DS
 	vnl_matrix<double> translation(DSrows, DScols);		//es: t*ones(1,n)
 	vnl_matrix<double> S(DSrows*DScols, 6);
 	vnl_matrix<double> St(6,DSrows*DScols);
@@ -865,7 +865,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 	//-----------------------------------------------------------------
 	for(mm_it=mm.begin(); (mm_it !=mm.end()) && (var_err >var_threshold); mm_it++){
 	
-		DS_R=rpyOnShape(DS, Min[mm_it->second]);//3xn
+		DS_R=RpyOnShape(DS, Min[mm_it->second]);//3xn
 	
 		//ver_index << mm_it->second << "    " << Min.get_row(mm_it->second) << '\n';
 
@@ -889,7 +889,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 			if(cycle>18) b=1E-5;
 
 			//Caricamente strutture parziali
-			R_DS=theta2R(th)*DS_R;
+			R_DS=Theta2R(th)*DS_R;
 			for (int i=0; i< DScols; i++) translation.set_column(i,t);
 			DS_move=R_DS+translation;
 
@@ -898,7 +898,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 				th_a=th;
 				th_a.put(j, th[j]*a);
 			
-				dy=( (theta2R(th_a)*DS_R)+translation-DS_move ) / ( th[j]*b );
+				dy=( (Theta2R(th_a)*DS_R)+translation-DS_move ) / ( th[j]*b );
 				S.set_column(j,dy.data_block());
 			}
 
@@ -913,7 +913,7 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 				S.set_column(j+3,dy.data_block());
 			}
 
-			findPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
+			FindPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
 
 			em=closest_pts-DS_move;
 			e.set(em.data_block());
@@ -947,8 +947,8 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 
 	vnl_matrix_fixed<double,3,3> R_rar, R_icp, R_reg;
 
-	R_rar=rpy2R(Min[id_RAR2_fin]);
-	R_icp=theta2R(th);
+	R_rar=Rpy2R(Min[id_RAR2_fin]);
+	R_icp=Theta2R(th);
 	R_reg=R_icp*R_rar;
 
 	mafICPUtility::RegResult res;
@@ -978,13 +978,13 @@ inline mafICPUtility::RegResult mafICPUtility::ICP_vtkPointLocator(vnl_matrix<do
 inline mafICPUtility::RegResult mafICPUtility::FFRegistration( vnl_matrix<double>& MS, vnl_matrix<double>& DS, const char* knownMinLocalFile, float VarianceThrshold, int MaximumNumberOfIterations)
 //----------------------------------------------------------------------------
 {
-	vnl_vector<double> MS_centroid=centroid(MS);
-	vnl_vector<double> DS_centroid=centroid(DS);
+	vnl_vector<double> MS_centroid=Centroid(MS);
+	vnl_vector<double> DS_centroid=Centroid(DS);
 	//vcl_cout << "centro di MS:" << MS_center << '\n';
 	//vcl_cout << "centro di DS:" << DS_center << '\n';
 
-	neg_translation(MS, MS_centroid);
-	neg_translation(DS, DS_centroid);
+	Neg_translation(MS, MS_centroid);
+	Neg_translation(DS, DS_centroid);
 	
 	mafICPUtility::RegResult res=ICP_vtkPointLocator(MS, DS, MaximumNumberOfIterations);	//Copy by reference; finally DS is the registered one
 	
@@ -1034,8 +1034,8 @@ inline mafICPUtility::RegResult mafICPUtility::FFRegistration( vnl_matrix<double
 		res.cov_matrix=res2.cov_matrix;
 	}
 	
-	pos_translation(DS, MS_centroid);
-	pos_translation(MS, MS_centroid); //Aggiunta, in modo che l'MS in input alla funzione non subisca variazioni
+	Pos_translation(DS, MS_centroid);
+	Pos_translation(MS, MS_centroid); //Aggiunta, in modo che l'MS in input alla funzione non subisca variazioni
 	
 	return res;
 }
@@ -1103,11 +1103,11 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 	
 	vnl_vector_fixed<double,3> th_a;					//es: th.*[a 1 1]
 	vnl_vector_fixed<double,3> t_a;						//es: t.*[a 1 1]
-	vnl_matrix<double> R_DS(DSrows, DScols);			//es: theta2R(th)*DS
+	vnl_matrix<double> R_DS(DSrows, DScols);			//es: Theta2R(th)*DS
 
 	vnl_matrix<double> translation(DSrows, DScols);		//es: t*ones(1,n)
 
-	vnl_matrix<double> DS_move(DSrows, DScols);			//es: theta2R(th)*DS+t*ones(1,n)
+	vnl_matrix<double> DS_move(DSrows, DScols);			//es: Theta2R(th)*DS+t*ones(1,n)
 	vnl_matrix<double> S(DSrows*DScols, 6);
 	vnl_matrix<double> St(6,DSrows*DScols);
 	
@@ -1121,7 +1121,7 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 
 	while(test > test_lim)
   {
-		R_DS=theta2R(th)*DS;
+		R_DS=Theta2R(th)*DS;
 
 		for (i = 0; i < DScols; i++) 
       translation.set_column(i, t);
@@ -1132,7 +1132,7 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
     {
 			th_a = th;
 			th_a.put(j, th[j]*a);
-			dy = ((theta2R(th_a) * DS) + translation - DS_move) / (th[j] * b);
+			dy = ((Theta2R(th_a) * DS) + translation - DS_move) / (th[j] * b);
 			S.set_column(j,dy.data_block());
 		}
 
@@ -1145,7 +1145,7 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 			dy = (R_DS + translation - DS_move) / (t[j] * b);
 			S.set_column(j + 3, dy.data_block());
 		}
-		findPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
+		FindPointLocator(MS_vtkpoints, p_locator, DS_move.data_block(), DScols, closest_pts);
 
 		em = closest_pts - DS_move;
 		e.set(em.data_block());
@@ -1168,7 +1168,7 @@ inline mafICPUtility::RegResult mafICPUtility::StandardRegistration( vnl_matrix<
 	}
 
 	mafICPUtility::RegResult res;
-	res.R = theta2R(th);
+	res.R = Theta2R(th);
 	res.t = t;
 	res.err = err;
 	res.test = test;

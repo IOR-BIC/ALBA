@@ -99,7 +99,7 @@ protected:
 
   /**
   UnPacks the image into the output buffer. */
-  virtual int vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data) {return 0;};
+  virtual int VtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data) {return 0;};
  
   void Execute(vtkImageData *data);
 };

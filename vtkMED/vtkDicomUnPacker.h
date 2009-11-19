@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    vtkDicomUnPacker.h
   Language:  C++
-  Date:      $Date: 2008-11-06 10:22:50 $
-  Version:   $Revision: 1.3.4.2 $
+  Date:      $Date: 2009-11-19 11:16:49 $
+  Version:   $Revision: 1.3.4.3 $
   Authors:   Marco Petrone m.petrone@cineca.it, Paolo Quadrani p.quadrani@cineca.it
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -179,7 +179,7 @@ public:
   const DICOM *GetTag(unsigned int n) {if (n<TAGNumbers) return &RESULT[n]; else return NULL;};
   const VALUE *GetTagElement(unsigned int n) {if (n<TAGNumbers) return &VALUES[n]; else return NULL;};
   const DICOM *GetFromDictionary(int pos) {return (pos<DICT_line?&this->DICT[pos]:NULL);};
-  int FindInDictionary(int group, int element) {return this->find(group,element,DICT,DICT_line);};
+  int FindInDictionary(int group, int element) {return this->Find(group,element,DICT,DICT_line);};
 
   int GetNumberOfTags() {return this->TAGNumbers;};
 
@@ -254,19 +254,19 @@ protected:
 
 	/**
 	UnPacks the image into the output buffer. */
-	int vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data);
+	int VtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data);
 //	int read_dicom_string_image(uint16 *IMAGE, double slope_value, double intercept_value);
-	int read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
+	int ReadDicomHeader(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
 
 protected:
 /****************************************************************************
                             F U N C T I O N S
 ****************************************************************************/
-int load_dictionary(DICOM DICT[]);
-int load_dictionary_from_file(DICOM DICT[]);
+int LoadDictionary(DICOM DICT[]);
+int LoadDictionaryFromFile(DICOM DICT[]);
 
 /* FROM (Group, Element)  returns the m_Position of rispective pattern into Dictionary */ 
-long find (long Group, long Element , DICOM DICT[], long n_line);
+long Find (long Group, long Element , DICOM DICT[], long n_line);
 
 //uint16 read16 (FILE* fp, char little_endian) ;
 //uint32 read32 (FILE* fp, char little_endian);
@@ -285,7 +285,7 @@ double Spacing[2];
 double Position[3];
 double Orientation[3];
 
-void  read_dicom_header(char * input, DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
-void  parser_multepl(tipo str , FILE * fp, long Length, VALUE * VALUES);
+void  ReadDicomHeader(char * input, DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line);
+void  ParserMultepl(tipo str , FILE * fp, long Length, VALUE * VALUES);
 };
 #endif

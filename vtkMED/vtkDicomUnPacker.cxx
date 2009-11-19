@@ -11,7 +11,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.3 $");
+vtkCxxRevisionMacro(vtkDicomUnPacker, "$Revision: 1.9.2.4 $");
 vtkStandardNewMacro(vtkDicomUnPacker);
 
 //----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ void vtkDicomUnPacker::PrintSelf(ostream& os, vtkIndent indent)
   vtkImageUnPacker::PrintSelf(os,indent);
 }
 //----------------------------------------------------------------------------
-void vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE * VAL)
+void vtkDicomUnPacker::ParserMultepl(tipo str , FILE * fp, long Length, VALUE * VAL)
 //----------------------------------------------------------------------------
 {
   long p,r;
@@ -100,7 +100,7 @@ void vtkDicomUnPacker::parser_multepl(tipo str , FILE * fp, long Length, VALUE *
 	}
 }
 //----------------------------------------------------------------------------
-long vtkDicomUnPacker::find (long Group, long Element , DICOM DICT[], long n_line)
+long vtkDicomUnPacker::Find (long Group, long Element , DICOM DICT[], long n_line)
 //----------------------------------------------------------------------------
 {
 	/* FROM (Group, Element)  returns the Position of rispective pattern into Dictionary */ 
@@ -120,7 +120,7 @@ void vtkDicomUnPacker::SetDictionaryFileName(const char *filename)
    this->Modified();
  }
 //----------------------------------------------------------------------------
-int vtkDicomUnPacker::load_dictionary_from_file(DICOM DICT[])
+int vtkDicomUnPacker::LoadDictionaryFromFile(DICOM DICT[])
 //----------------------------------------------------------------------------
 {   /* return  N_line and structure DICOM */ 
   char pre=' ', cur=' ';
@@ -233,7 +233,7 @@ int vtkDicomUnPacker::load_dictionary_from_file(DICOM DICT[])
   return p_line;
 }
 //----------------------------------------------------------------------------
-int vtkDicomUnPacker::load_dictionary(DICOM DICT[])
+int vtkDicomUnPacker::LoadDictionary(DICOM DICT[])
 //----------------------------------------------------------------------------
 {
 /*  int num_elem = sizeof(DICOMDefaultDictionary)/sizeof(DICOMDefaultDictionary[0]);
@@ -304,7 +304,7 @@ void read (FILE* fp, char little_endian, long &value)
 	value = read32(fp, little_endian);
 }
 //----------------------------------------------------------------------------
-int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line)
+int vtkDicomUnPacker::ReadDicomHeader(DICOM RESULT[], VALUE VALUES[], uint32 *size_image, uint32 *result_line)
 //----------------------------------------------------------------------------
 {
 	bool   time_to_exit = false;
@@ -339,11 +339,11 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
 	{
     if (UseDefaultDictionary)
     {
-      DICT_line = load_dictionary(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
+      DICT_line = LoadDictionary(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
     }
     else
     {
-      DICT_line = load_dictionary_from_file(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
+      DICT_line = LoadDictionaryFromFile(DICT);  /* LOAD DICTIONARY dict_line = lines number of dictionary DICT */
     }
 	}
 	if (DICT_line < 0) 
@@ -452,7 +452,7 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
         elementLength >>= 16;      
       }
 		}
-		pos = find(groupWord, elementWord, DICT, DICT_line);
+		pos = Find(groupWord, elementWord, DICT, DICT_line);
 		if(((long)elementLength)==-1) 
 			elementLength=0;
 		if (pos<0) 
@@ -496,12 +496,12 @@ int vtkDicomUnPacker::read_dicom_header(DICOM RESULT[], VALUE VALUES[], uint32 *
           (vr0=='T') && (vr1=='M') || /* string of characters without numerical meaning    TIME        */
           (vr0=='U') && (vr1=='I') )  /* string of characters without numerical meaning    UNIQUE IDENTIFIER */
 			{
-				parser_multepl(string, fp, elementLength, &VALUES[RESULT_line]);
+				ParserMultepl(string, fp, elementLength, &VALUES[RESULT_line]);
 			}
 			else if( (vr0=='D') && (vr1=='S') || /* string of characters representing floating number */ 
                (vr0=='I') && (vr1=='S') )  /* string of characters representing integer  number */ 
 			{
-				parser_multepl(num, fp, elementLength,& VALUES[RESULT_line]);
+				ParserMultepl(num, fp, elementLength,& VALUES[RESULT_line]);
 			}
 			else if( (vr0=='U') && (vr1=='S') ) 
 			{ /* unsigned short */ 
@@ -742,7 +742,7 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 		}
 
 		// Read image parameters from FILE
-		if (read_dicom_header(RESULT,VALUES, &ImageSize, &TAGNumbers) < 0) 
+		if (ReadDicomHeader(RESULT,VALUES, &ImageSize, &TAGNumbers) < 0) 
 			return -1;
 	}
 	else
@@ -921,7 +921,7 @@ int vtkDicomUnPacker::ReadImageInformation(vtkPackedImage *packed)
 }
 //----------------------------------------------------------------------------
 // This function does nothing is only an example of unpacking function
-int vtkDicomUnPacker::vtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data)
+int vtkDicomUnPacker::VtkImageUnPackerUpdate(vtkPackedImage *packed, vtkImageData *data)
 //----------------------------------------------------------------------------
 {
 	int ret;

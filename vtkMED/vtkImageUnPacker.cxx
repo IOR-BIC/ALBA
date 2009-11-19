@@ -15,7 +15,7 @@
 #include "vtkImageUnPacker.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkImageUnPacker, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkImageUnPacker, "$Revision: 1.1.1.1.8.1 $");
 vtkStandardNewMacro(vtkImageUnPacker);
 
 //----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void vtkImageUnPacker::ExecuteInformation()
 void vtkImageUnPacker::Execute(vtkImageData *data)
 //----------------------------------------------------------------------------
 {
-	if (vtkImageUnPackerUpdate(this->Input,data))
+	if (VtkImageUnPackerUpdate(this->Input,data))
 	{
 		vtkErrorMacro("Cannot Unpack Image!");
 	}
