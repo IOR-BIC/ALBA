@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2009-11-19 10:02:15 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-11-19 10:43:53 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -64,7 +64,7 @@ public:
   class  CTriangle
     {
     public:
-      bool  bDeleted;
+      bool  BDeleted;
       bool  BMarked;
       int   AVertex[3];
       int   AEdge[3];

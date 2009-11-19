@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.cxx,v $
 Language:  C++
-Date:      $Date: 2009-11-19 10:02:15 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-11-19 10:43:53 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <float.h>
 
 
-vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMEDFillingHole);
 
 #include "mafMemDbg.h"
@@ -83,7 +83,7 @@ vtkMEDFillingHole::CTriangle::CTriangle()
 //----------------------------------------------------------------------------
 {
   AEdge[0]=AEdge[1]=AEdge[2]=-1;
-  bDeleted = BMarked = false;
+  BDeleted = BMarked = false;
 }
 
 //----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ vtkMEDFillingHole::CTriangle::CTriangle(int v0,int v1,int v2)
   AVertex[2]=v2;
 
   AEdge[0]=AEdge[1]=AEdge[2]=-1;
-  bDeleted = BMarked = false;
+  BDeleted = BMarked = false;
 }
 
 //----------------------------------------------------------------------------
@@ -774,7 +774,7 @@ vtkMEDFillingHole::CVertex* vtkMEDFillingHole::AddOnePointToTriangle(double *pCo
   NumOfPatchVertex += 1;
   NumOfPatchTriangle += 3;
   NumOfPatchEdge += 3;
-  pTriangle->bDeleted = true;
+  pTriangle->BDeleted = true;
 
   return pNewVertex;
 }
@@ -1116,7 +1116,7 @@ void vtkMEDFillingHole::RefinePatch()
     for(i=0; i<nTriangle; i++)
     {
       pTriangle = PatchTriangles[i];
-      if(pTriangle->bDeleted == true ) continue;
+      if(pTriangle->BDeleted == true ) continue;
       if(pTriangle->BMarked == true )	continue;   //confirm subdiving isn't necessary.
 
       pVertexIndex = pTriangle->AVertex;
@@ -1213,7 +1213,7 @@ void vtkMEDFillingHole::RefinePatch()
   {
     pTriangle = *oldtriangle;
     pEdgeIndex = pTriangle->AEdge;
-    if( pTriangle->bDeleted != true )
+    if( pTriangle->BDeleted != true )
     {
       pTriangle->Id = NumOfPatchTriangle++;
       pEdgeIndex[0] = pEdgeIndex[1] = pEdgeIndex[2] = -1;

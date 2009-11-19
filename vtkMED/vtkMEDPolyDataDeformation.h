@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-19 10:26:32 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2009-11-19 10:43:53 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -275,14 +275,14 @@ protected:
     void Solve(CMatrix< double >* matrix, CMatrix< int >* matches);
 
   private:
-    inline bool find_uncovered_in_matrix(double,int&,int&);
-    inline bool pair_in_list(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
-    int step1(void);
-    int step2(void);
-    int step3(void);
-    int step4(void);
-    int step5(void);
-    int step6(void);
+    inline bool FindUncoveredInMatrix(double,int&,int&);
+    inline bool PairInList(const vtkstd::pair<int,int> &, const vtkstd::list<std::pair<int,int> > &);
+    int Step1(void);
+    int Step2(void);
+    int Step3(void);
+    int Step4(void);
+    int Step5(void);
+    int Step6(void);
 
     CMatrix<int>* MaskMatrix;
     CMatrix<double>* Matrix;
@@ -304,10 +304,10 @@ protected:
     double RSO[2][3];              //<RSO point
   } CONTROL_SKELETON;
 
-  CONTROL_SKELETON* m_Skeletons;   //<input array of skeletons
-  int m_NumberOfSkeletons;         //<number of skeletons in this array
+  CONTROL_SKELETON* Skeletons;   //<input array of skeletons
+  int NumberOfSkeletons;         //<number of skeletons in this array
 
-  CSuperSkeleton* m_SuperSkeleton;  //<dynamical data structure describing super skeleton
+  CSuperSkeleton* SuperSkeleton;  //<dynamical data structure describing super skeleton
 
   double MatchGeometryWeight;       //<weight (0-1) for geometry matching of skeletons
   double MatchTopologyWeight;       //<weight (0-1) for topology matching of skeletons
@@ -316,7 +316,7 @@ protected:
   int DivideSkeletonEdges;          //<1 if large skeleton edges should be divided  
   int PreserveVolume;               //<1, if volume should be preserved
 
-  CMeshVertex* m_MeshVertices;      //<internal data structure describing the mesh  
+  CMeshVertex* MeshVertices;      //<internal data structure describing the mesh  
 
 public:  
   /** Gets the weight using to match geometry of skeletons */
@@ -362,7 +362,7 @@ public:
 
   /** Get the number of control curves. */
   inline virtual int GetNumberOfSkeletons() {
-    return m_NumberOfSkeletons;
+    return NumberOfSkeletons;
   }
 
   /** Sets the number of control skeletons.  
@@ -404,8 +404,8 @@ protected:
 
   /** Destroys the super skeleton */
   inline void DestroySuperSkeleton() {
-    delete m_SuperSkeleton;
-    m_SuperSkeleton = NULL;
+    delete SuperSkeleton;
+    SuperSkeleton = NULL;
   }
 
   /** Creates a single super skeleton for the given control skeleton.
@@ -588,7 +588,7 @@ protected:
 
 #pragma region //Munkres INLINES
 inline bool vtkMEDPolyDataDeformation::
-CMunkres::find_uncovered_in_matrix(double item, int &row, int &col) 
+CMunkres::FindUncoveredInMatrix(double item, int &row, int &col) 
 {
   for ( row = 0 ; row < Matrix->GetNumberOfRows() ; row++ )
   {
@@ -606,7 +606,7 @@ CMunkres::find_uncovered_in_matrix(double item, int &row, int &col)
 }
 
 inline bool vtkMEDPolyDataDeformation::
-CMunkres::pair_in_list(const vtkstd::pair<int,int> &needle, 
+CMunkres::PairInList(const vtkstd::pair<int,int> &needle, 
                        const vtkstd::list<std::pair<int,int> > &haystack) 
 {
   for (std::list<std::pair<int,int> >::const_iterator i = haystack.begin(); i != haystack.end() ; i++)

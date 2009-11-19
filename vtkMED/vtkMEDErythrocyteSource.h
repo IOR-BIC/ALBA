@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDErythrocyteSource.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-28 11:37:35 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-11-19 10:43:53 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -67,7 +67,7 @@ protected:
   /** Computes Jacobi elliptic functions sn(u,k), cn(u,k) and dn(u,k).
   In order to speedup the computation, parameters are uu = u, emmc = 1-k^2.
   N.B. routine was adopted from Numerical Recipes in C (3rd edition) */
-  void sncndn(const double uu, const double emmc, double &sn, double &cn, double &dn);
+  void Sncndn(const double uu, const double emmc, double &sn, double &cn, double &dn);
 
 private:
   vtkMEDErythrocyteSource(const vtkMEDErythrocyteSource&);  // Not implemented.

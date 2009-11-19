@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDErythrocyteSource.cpp,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-28 11:37:35 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-11-19 10:43:53 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -21,7 +21,7 @@
 #include "mafDbg.h"
 
 
-vtkCxxRevisionMacro(vtkMEDErythrocyteSource, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMEDErythrocyteSource, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMEDErythrocyteSource);
 
 vtkMEDErythrocyteSource::vtkMEDErythrocyteSource(void)
@@ -90,10 +90,10 @@ vtkMEDErythrocyteSource::vtkMEDErythrocyteSource(void)
   
   double sn, dn;
   SAMPLE_PT* us = new SAMPLE_PT[this->PhiResolution];    
-  sncndn(us[0].u = U, emmc, sn, us[0].cn, dn);
+  Sncndn(us[0].u = U, emmc, sn, us[0].cn, dn);
   us[0].sn_dn = sn*dn; us[0].pNext = &us[1];     
 
-  sncndn(us[1].u = 0, emmc, sn, us[1].cn, dn);
+  Sncndn(us[1].u = 0, emmc, sn, us[1].cn, dn);
   us[1].sn_dn = sn*dn; us[1].pNext = NULL;
 
   int nSamples = 2;
@@ -118,7 +118,7 @@ vtkMEDErythrocyteSource::vtkMEDErythrocyteSource(void)
     //split the interval in the mid point
     SAMPLE_PT* pNew = &us[nSamples++];    
     pNew->u = (pA->u + pA->pNext->u) / 2;
-    sncndn(pNew->u, emmc, sn, pNew->cn, dn);
+    Sncndn(pNew->u, emmc, sn, pNew->cn, dn);
     pNew->sn_dn = sn*dn;
 
     pNew->pNext = pA->pNext;
@@ -297,7 +297,7 @@ vtkMEDErythrocyteSource::vtkMEDErythrocyteSource(void)
 //In order to speedup the computation, parameters are uu = u, emmc = 1-k^2.
 //N.B. routine was adopted from Numerical Recipes in C (3rd edition)
 #define SNCNDN_DIGITS 13
-void vtkMEDErythrocyteSource::sncndn(const double uu, const double emmc, 
+void vtkMEDErythrocyteSource::Sncndn(const double uu, const double emmc, 
                                       double &sn, double &cn, double &dn)
 //------------------------------------------------------------------------
 {
