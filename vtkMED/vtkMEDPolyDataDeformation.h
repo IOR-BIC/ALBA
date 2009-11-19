@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-29 08:38:43 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-11-19 10:26:32 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -197,8 +197,8 @@ protected:
   class CSkeleton
   {
   public:
-    vtkstd::vector< CSkeletonVertex* > m_Vertices;
-    vtkstd::vector< CSkeletonEdge* > m_Edges;
+    vtkstd::vector< CSkeletonVertex* > Vertices;
+    vtkstd::vector< CSkeletonEdge* > Edges;
 
   public:
     ~CSkeleton();
@@ -246,25 +246,25 @@ protected:
     ~CMatrix();
         
     inline int GetMinSize() {
-      return ((m_NumOfRows < m_nNumOfCols) ? m_NumOfRows : m_nNumOfCols);
+      return ((NumOfRows < NNumOfCols) ? NumOfRows : NNumOfCols);
     }
 
     inline int GetNumberOfColumns() {
-      return m_nNumOfCols;
+      return NNumOfCols;
     }
 
     inline int GetNumberOfRows() {
-      return m_NumOfRows;
+      return NumOfRows;
     }
     
     inline T& operator ()(int x, int y) {  
-        return m_Matrix[x][y];
+        return Matrix[x][y];
     }
 
   private:
-    T** m_Matrix;
-    int m_NumOfRows;
-    int m_nNumOfCols;
+    T** Matrix;
+    int NumOfRows;
+    int NNumOfCols;
   };
 
   /*
@@ -284,12 +284,12 @@ protected:
     int step5(void);
     int step6(void);
 
-    CMatrix<int>* mask_matrix;
-    CMatrix<double>* matrix;
+    CMatrix<int>* MaskMatrix;
+    CMatrix<double>* Matrix;
 
-    bool *row_mask;
-    bool *col_mask;
-    int saverow, savecol;
+    bool *RowMask;
+    bool *ColMask;
+    int Saverow, Savecol;
   };
 #pragma endregion //Munkres
 #pragma endregion //Nested Classes    
@@ -590,13 +590,13 @@ protected:
 inline bool vtkMEDPolyDataDeformation::
 CMunkres::find_uncovered_in_matrix(double item, int &row, int &col) 
 {
-  for ( row = 0 ; row < matrix->GetNumberOfRows() ; row++ )
+  for ( row = 0 ; row < Matrix->GetNumberOfRows() ; row++ )
   {
-    if ( !row_mask[row] )
+    if ( !RowMask[row] )
     {
-      for ( col = 0 ; col < matrix->GetNumberOfColumns() ; col++ )
+      for ( col = 0 ; col < Matrix->GetNumberOfColumns() ; col++ )
       {
-        if ( !col_mask[col] && (*matrix)(row,col) == item )
+        if ( !ColMask[col] && (*Matrix)(row,col) == item )
           return true;
       }
     }
