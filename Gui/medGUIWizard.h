@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIWizard.h,v $
 Language:  C++
-Date:      $Date: 2009-07-01 13:07:00 $
-Version:   $Revision: 1.4.2.1 $
+Date:      $Date: 2009-11-19 09:18:09 $
+Version:   $Revision: 1.4.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -102,9 +102,9 @@ private:
 	bool m_EnableChangePage;
 
   /** event handler function for closing the window. */
-	void nvOnCloseWindow(wxCloseEvent &event) {OnCloseWindow(event);};
+	void OnCloseWindow(wxCloseEvent &event) {OnCloseWindow(event);};
   /** event handler function for close the dialog that call nvOnCloseWindow. */
-	void nvOnClose(wxCommandEvent &event)     {wxDialog::Close();};
+	void OnClose(wxCommandEvent &event)     {wxDialog::Close();};
   /** event handler function for changing page in the wizard. */
 	void OnWizardPageChanging(wxWizardEvent& event);
 
