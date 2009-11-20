@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeVolumeVRTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-18 14:04:52 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-11-20 11:06:28 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2008
@@ -220,7 +220,6 @@ void medPipeVolumeVRTest::CompareImages(int scalarIndex)
   imageFileOrig<<".jpg";
   rO->SetFileName(imageFileOrig.GetCStr());
   rO->Update();
-
   vtkImageData *imDataOrig = rO->GetOutput();
 
   //read compared image
@@ -228,15 +227,14 @@ void medPipeVolumeVRTest::CompareImages(int scalarIndex)
   vtkNEW(rC);
   rC->SetFileName(imageFile.GetCStr());
   rC->Update();
-
   vtkImageData *imDataComp = rC->GetOutput();
-
 
   vtkImageMathematics *imageMath = vtkImageMathematics::New();
   imageMath->SetInput1(imDataOrig);
   imageMath->SetInput2(imDataComp);
   imageMath->SetOperationToSubtract();
   imageMath->Update();
+  imageMath->GetOutput()->Update();
 
   double srR[2] = {-1,1};
   imageMath->GetOutput()->GetPointData()->GetScalars()->GetRange(srR);
