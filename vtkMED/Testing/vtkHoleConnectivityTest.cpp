@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkHoleConnectivityTest.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-20 16:43:25 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-23 10:35:18 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -22,70 +22,114 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <cppunit/config/SourcePrefix.h>
 #include "vtkHoleConnectivity.h"
 #include "vtkHoleConnectivityTest.h"
+#include "mafString.h"
 
+#include "vtkMAFSmartPointer.h"
+#include "vtkPolyDataReader.h"
+#include "vtkPolyDataConnectivityFilter.h"
+#include "vtkPolyData.h"
 
 //-------------------------------------------------------------------------
-void vtkHoleConnectivityTest::ReadTest()
+void vtkHoleConnectivityTest::TestDynamicAllocation()
 //-------------------------------------------------------------------------
 {
-	//Inizialize DICOM DIRECTORY
-	/*vtkMAFSmartPointer<vtkDirectory> DicomDirectory;
-	mafString DicomPath=MED_DATA_ROOT;
-	DicomPath<<"/DicomUnpacker/TestDicomUnpacker";
-	DicomDirectory->Open(DicomPath);
-  mafString DictonaryFilename=MED_DATA_ROOT;  
-	DictonaryFilename<<"/Dictionaries/dicom3.dic";
-	int NumberOfImage = 0;
-	double MinScalar = 9999.0;
-	double MaxScalar = -9999.0;
-	double MinZ = 9999.0;
-	double MaxZ = -9999.0;
-	for (int i=0; i < DicomDirectory->GetNumberOfFiles(); i++)
-	{
-		if ((strcmp(DicomDirectory->GetFile(i),".") == 0) || (strcmp(DicomDirectory->GetFile(i),"..") == 0) || (strcmp(DicomDirectory->GetFile(i),"CVS") == 0)) 
-		{
-			continue;
-		}
-		else
-		{
-			//Count the images
-			NumberOfImage++;
-			// Append of the path at the dicom file
-			mafString CurrentFile = DicomDirectory->GetFile(i);
-			mafString FilePath=DicomPath;
-			FilePath<<"/";
-			FilePath<<CurrentFile;
-			
-			//Inizialize DICOM READER
-			vtkMAFSmartPointer<vtkHoleConnectivity> DicomReader;
-			DicomReader->SetFileName(FilePath);
-			DicomReader->UseDefaultDictionaryOff();
-			DicomReader->SetDictionaryFileName(DictonaryFilename);
-			DicomReader->UpdateInformation();
-			DicomReader->Update();
-			double DicomRange[2];
-			DicomReader->GetOutput()->GetScalarRange(DicomRange);
-			MinScalar = min(MinScalar,DicomRange[0]);
-			MaxScalar = max(MaxScalar,DicomRange[1]);
-			double Bounds[6];
-			DicomReader->GetOutput()->GetBounds(Bounds);
-			//Check dimensions XY
-			CPPUNIT_ASSERT(Bounds[0]+DELTA>0 && Bounds[0]-DELTA<0);
-			CPPUNIT_ASSERT(Bounds[1]+DELTA>379.26 && Bounds[1]-DELTA<379.26);
-			CPPUNIT_ASSERT(Bounds[2]+DELTA>0 && Bounds[2]-DELTA<0);
-			CPPUNIT_ASSERT(Bounds[3]+DELTA>379.26 && Bounds[3]-DELTA<379.26);
-			MaxZ=max(MaxZ,Bounds[5]);
-			MinZ=min(MinZ,Bounds[4]);
+	vtkMAFSmartPointer<vtkHoleConnectivity> hc;
 
-			//Check modality
-			CPPUNIT_ASSERT(strcmp( DicomReader->GetModality(), "CT" ) == 0);
-		}
-	}
-	//Check dimension Z
-	CPPUNIT_ASSERT(MinZ+DELTA>-40.5 && MinZ-DELTA<-40.5);
-	CPPUNIT_ASSERT(MaxZ+DELTA>-36.5 && MaxZ-DELTA<-36.5);
-	//Chcek scalar range
-	CPPUNIT_ASSERT(MinScalar==-3024 && MaxScalar==1699);
-	//Check the reader has read all images
-	CPPUNIT_ASSERT(NumberOfImage==3);*/
+  vtkHoleConnectivity *hc2 = vtkHoleConnectivity::New();
+
+  vtkDEL(hc2);
+}
+//-------------------------------------------------------------------------
+void vtkHoleConnectivityTest::TestPrintSelf()
+//-------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkHoleConnectivity> hc;  
+  hc->PrintSelf(std::cout, 5);
+}
+//-------------------------------------------------------------------------
+void vtkHoleConnectivityTest::TestGetClassName()
+//-------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkHoleConnectivity> hc;
+  mafString check = hc->GetClassName();
+  CPPUNIT_ASSERT(check.Equals("vtkHoleConnectivity"));
+}
+//-------------------------------------------------------------------------
+void vtkHoleConnectivityTest::TestSetGetPointID()
+//-------------------------------------------------------------------------
+{
+  vtkMAFSmartPointer<vtkHoleConnectivity> hc;
+  hc->SetPointID(5);
+  CPPUNIT_ASSERT(hc->GetPointID() == 5);
+}
+//-------------------------------------------------------------------------
+void vtkHoleConnectivityTest::TestSetGetPoint()
+//-------------------------------------------------------------------------
+{
+  double point[3] = {1.,2.,3.};
+  vtkMAFSmartPointer<vtkHoleConnectivity> hc;
+  hc->SetPoint(point);
+  CPPUNIT_ASSERT(hc->GetPoint()[0] == point[0] &&
+                 hc->GetPoint()[1] == point[1] &&
+                 hc->GetPoint()[2] == point[2]);
+
+}
+//-------------------------------------------------------------------------
+void vtkHoleConnectivityTest::TestExecution()
+//-------------------------------------------------------------------------
+{
+  mafString surfaceFile=MED_DATA_ROOT;
+  surfaceFile<<"/Test_HoleConnectivity/test.vtk";
+
+  vtkMAFSmartPointer<vtkPolyDataReader> preader;
+  preader->SetFileName(surfaceFile);
+  preader->Update();
+
+
+  vtkMAFSmartPointer<vtkHoleConnectivity> hc;
+  hc->SetInput(preader->GetOutput());
+  double point[3] = {0.,0.,0.};
+  hc->SetPoint(point);
+
+  hc->Update();
+
+  vtkMAFSmartPointer<vtkPolyDataConnectivityFilter> connectivityFilter;
+  connectivityFilter->SetInput(preader->GetOutput());
+  connectivityFilter->SetExtractionModeToClosestPointRegion ();
+  connectivityFilter->SetClosestPoint(point);
+  connectivityFilter->Modified();
+  connectivityFilter->Update();
+
+  //check
+  int num1 = connectivityFilter->GetOutput()->GetNumberOfPoints();
+  int num2 = hc->GetOutput()->GetNumberOfPoints();
+
+  CPPUNIT_ASSERT(num1 == num2);
+
+  num1 = connectivityFilter->GetOutput()->GetNumberOfCells();
+  num2 = hc->GetOutput()->GetNumberOfCells();
+
+  CPPUNIT_ASSERT(num1 == num2);
+
+  int i = 0, size = connectivityFilter->GetOutput()->GetNumberOfPoints();
+  bool result = true;
+  for(;i<size; i++)
+  {
+    double point1[3], point2[3];
+    connectivityFilter->GetOutput()->GetPoint(i, point1);
+    hc->GetOutput()->GetPoint(i, point2);
+
+    if(point1[0] == point2[0] && point1[1] == point2[1] && point1[2] == point2[2])
+    {
+      //equal
+    }
+    else
+    {
+      //not equal, exit from cycle
+      result = false;
+      break;
+    }
+  }
+
+  CPPUNIT_ASSERT(result);
 }

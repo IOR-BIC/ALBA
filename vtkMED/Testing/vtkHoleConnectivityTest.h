@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkHoleConnectivityTest.h,v $
 Language:  C++
-Date:      $Date: 2009-11-20 16:43:25 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-11-23 10:35:18 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -26,11 +26,22 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class vtkHoleConnectivityTest : public CPPUNIT_NS::TestFixture
 {
   CPPUNIT_TEST_SUITE( vtkHoleConnectivityTest );
-  CPPUNIT_TEST( ReadTest );
+  CPPUNIT_TEST( TestDynamicAllocation );
+  CPPUNIT_TEST( TestPrintSelf );
+  CPPUNIT_TEST( TestGetClassName );
+  CPPUNIT_TEST( TestSetGetPointID );
+  CPPUNIT_TEST( TestSetGetPoint );
+  CPPUNIT_TEST( TestExecution );
   CPPUNIT_TEST_SUITE_END();
 
-  protected:
-    void ReadTest();
+protected:
+  void TestDynamicAllocation();
+  void TestPrintSelf();
+  void TestGetClassName();
+  void TestSetGetPointID();
+  void TestSetGetPoint();
+  void TestExecution();
+  
 };
 
 
