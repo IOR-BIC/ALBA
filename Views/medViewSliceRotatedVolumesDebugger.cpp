@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceRotatedVolumesDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 13:03:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-23 15:11:24 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -1039,22 +1039,25 @@ void medViewSliceRotatedVolumesDebugger::CameraUpdateForRotatedVolumes()
     if (m_CurrentVolume != NULL)
     {
       SetCameraParallelToDataSetLocalAxis(mafTransform::X); 
+      this->CameraReset(m_CurrentVolume->m_Vme);
     }    
   }
   else if (m_CameraPositionId == CAMERA_OS_Y)
   {
     if (m_CurrentVolume != NULL)
     {
-      SetCameraParallelToDataSetLocalAxis(mafTransform::Y); 
+      SetCameraParallelToDataSetLocalAxis(mafTransform::Y);
+      this->CameraReset(m_CurrentVolume->m_Vme);
     }    
   }
   else if (m_CameraPositionId == CAMERA_OS_Z  || m_CameraPositionId == CAMERA_CT)
   {
     if (m_CurrentVolume != NULL)
     {
-      SetCameraParallelToDataSetLocalAxis(mafTransform::Z); 
+      SetCameraParallelToDataSetLocalAxis(mafTransform::Z);
+      this->CameraReset(m_CurrentVolume->m_Vme);
     }    
   }
-
+  
   Superclass::CameraUpdate();
 }
