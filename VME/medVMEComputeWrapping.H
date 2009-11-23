@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMEComputeWrapping.H,v $
 Language:  C++
-Date:      $Date: 2009-11-18 17:18:20 $
-Version:   $Revision: 1.1.2.15 $
+Date:      $Date: 2009-11-23 14:26:16 $
+Version:   $Revision: 1.1.2.16 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -72,6 +72,8 @@ public:
 		WRAP_SPHERE_CYLINDER_2 = 6,
 		SINGLE_SPHERE2=7,
 		CYLINDER_CYLINDER=8,
+		CYLINDER_CYLINDER_1=9,
+		CYLINDER_CYLINDER_2=10,
 		INSIDE_FLAG = -1
 	};
 	enum WRAP_MODE_ID{
@@ -143,6 +145,7 @@ public:
 		ID_WRAPPED_METER_CLASS,
 		ID_WRAPPED_METER_NUM,
 		ID_WRAPPED_SIDE,
+		ID_WRAPPED_SIDE_NEW,
 		ID_WRAPPED_REVERSE,
 		ID_LISTBOX,
 		ID_ADD_POINT,
@@ -544,13 +547,14 @@ protected:
 //--------------test another way----------
 	void WrapCylinderOnlyObstacleSet(int idx);
 	double GetQTsegment(double R,double *Q,double *T);
-	bool WrapCondition(double *Q,double *T);
+	bool WrapCondition(double *Q,double *T,boolean reverseFlag);
 	void ComputeTangentXYQ(double *P,double R,double *rtn);
 	void ComputeTangentXYT(double *S,double R, double *rtn);
 	double ComputeQTLength(double *Q,double *T,double R);
 	void ComputeQz(double *P,double *S,double *Q,double *T,double QTlength);
 	void ComputeTz(double *P,double *S,double *Q,double *T,double QTlength);
-	void WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout);
+//	void WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout);
+	void WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,boolean reverseFlag,double &segLength,double *Tout,double *Qout);
 	void WrapCylinderCylinderObstacleSet();
 //--------------test over----------------
 
@@ -640,6 +644,7 @@ protected:
 	int        m_WrappedMode2;
 	int      m_WrappedClass;
 	int        m_WrapSide;
+	int			m_WrapReverseNew;
 	int        m_WrapReverse;
 	//---------------interface -------------
 	wxBoxSizer* m_BSizer;

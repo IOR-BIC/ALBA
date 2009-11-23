@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medvmecomputewrapping.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-18 17:18:20 $
-Version:   $Revision: 1.1.2.25 $
+Date:      $Date: 2009-11-23 14:26:16 $
+Version:   $Revision: 1.1.2.26 $
 Authors:   Anupam Agrawal and Hui Wei
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -74,6 +74,7 @@ medVMEComputeWrapping::medVMEComputeWrapping()
 	m_WrappedMode2  = IOR_AUTOMATED_WRAP;
 	m_WrapSide      = 0;
 	m_WrapReverse   = 0;
+	m_WrapReverseNew = 0;
 	m_WrappedClass = NEW_METER;
 
 	m_StartVmeName  = "";
@@ -412,6 +413,12 @@ void medVMEComputeWrapping::Dispatch(){
 
 					//getCylinderCylinderWrap(m_PathNum);
 					WrapCylinderCylinderObstacleSet();
+				}else if (vFlag == CYLINDER_CYLINDER_1)
+				{
+					WrapCylinderOnlyObstacleSet(1);
+				}else if (vFlag == CYLINDER_CYLINDER_2)
+				{
+					WrapCylinderOnlyObstacleSet(2);
 				}
 				else if (vFlag == SINGLE_CYLINDER){
 					//WrapCylinderOnly(0);
@@ -711,6 +718,11 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	vtkPolyData *hCurve1,*hCurve2;
 	double curveLength1=0,curveLength2=0;
 	vtkLineSource *Line1,*Line2,*Line3;
+	boolean reverseFlag = false;
+	if (m_WrapReverseNew)
+	{
+		reverseFlag = true;
+	}
 	//vtkLineSource *Line4;
 
 	m_Goniometer->RemoveAllInputs();
@@ -739,7 +751,7 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	*/
 
 	//use S ,P get H first
-	WrapCylinderOnlyObstacleSetBasic(S,P,idx1,segLength1,T,H);
+	WrapCylinderOnlyObstacleSetBasic2(S,P,idx1,reverseFlag,segLength1,T,H);
 	//------transform it to global------------
 	GetWrapGlobalTransform(T,Tg,idx1);
 	GetWrapGlobalTransform(H,Hg,idx1);
@@ -749,11 +761,11 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	for (int i=0;i<step;i++)
 	{
 		//use H ,P get G,Q
-		WrapCylinderOnlyObstacleSetBasic(Hg,P,idx2,segLength1,G,Q);
+		WrapCylinderOnlyObstacleSetBasic2(Hg,P,idx2,reverseFlag,segLength1,G,Q);
 		GetWrapGlobalTransform(G,Gg,idx2);
 
 		//use S, G get T,H
-		WrapCylinderOnlyObstacleSetBasic(S,Gg,idx1,segLength1,T,H);
+		WrapCylinderOnlyObstacleSetBasic2(S,Gg,idx1,reverseFlag,segLength1,T,H);
 		GetWrapGlobalTransform(H,Hg,idx1);
 		if (i==step-1)
 		{
@@ -765,6 +777,8 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	//outputFile.close();	//for debug
 
 	//------------out put result----------------
+	bool wrapObj1 = WrapCondition(T,H,reverseFlag);
+	bool wrapObj2 = WrapCondition(G,Q,reverseFlag);
 
 	vtkNEW(Line1);
 	vtkNEW(Line2);
@@ -774,8 +788,6 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 
 	//vtkNEW(Line4);
 
-	bool wrapObj1 = WrapCondition(T,H);
-	bool wrapObj2 = WrapCondition(G,Q);
 	if (wrapObj1 && wrapObj2)
 	{
 		curveLength1 = CaculateHelix2(hCurve1,T,H,true,idx1);
@@ -882,8 +894,39 @@ void medVMEComputeWrapping::WrapCylinderCylinderObstacleSet(){
 	m_EventSource->InvokeEvent(this, VME_OUTPUT_DATA_UPDATE);
 	GetWrappedMeterOutput()->Update(); 
 }
+void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic2(double *Sg,double *Pg,int idx,boolean reverseFlag,double &segLength,double *Tout,double *Qout){
+	double P[3],S[3],Q[3],T[3];
+	//express P and S in cylinder frame
+	GetWrapLocalTransform(Pg,P,idx);
+	GetWrapLocalTransform(Sg,S,idx);
+	
+	double R = GetCylinderRadius(idx);
+	double r = R;
+	if (reverseFlag)
+	{
+		r = -R;
+	}
+
+	//1.compute xy Coordinate of Q
+	ComputeTangentXYQ(P,r,Q);
+	// compute xy coordinate of T
+	ComputeTangentXYT(S,r,T);
+	//2.compute xy coordinate of segment lengths in xy plane
+	segLength = GetQTsegment(R,Q,T);
+	//3.compute z coordinates of Q
+	ComputeQz(P,S,Q,T,segLength);
+	//compute zcoordinates of T
+	ComputeTz(P,S,Q,T,segLength);
+	//---------we already get Q and T------------
+	CopyPointValue(T,Tout);
+	CopyPointValue(Q,Qout);
+
+}
+
+
+
 // S-T~Q-P 
-void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout){
+/*void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic(double *Sg,double *Pg,int idx,double &segLength,double *Tout,double *Qout){
 	double P[3],S[3],Q[3],T[3];
 	//express P and S in cylinder frame
 	GetWrapLocalTransform(Pg,P,idx);
@@ -905,7 +948,7 @@ void medVMEComputeWrapping::WrapCylinderOnlyObstacleSetBasic(double *Sg,double *
 	CopyPointValue(T,Tout);
 	CopyPointValue(Q,Qout);
 
-}
+}*/
 
 void medVMEComputeWrapping::WrapCylinderOnlyObstacleSet(int idx){
 	//P-Q~T-S
@@ -918,7 +961,13 @@ void medVMEComputeWrapping::WrapCylinderOnlyObstacleSet(int idx){
 	vtkNEW(Line2);
 	CopyPointValue(m_StartPoint,S);
 	CopyPointValue(m_EndPoint,P);
-	WrapCylinderOnlyObstacleSetBasic(m_StartPoint,m_EndPoint,idx,segLength,T,Q);
+	boolean reverseFlag = false;
+	if (m_WrapReverseNew)
+	{
+		reverseFlag = true;
+	}
+//WrapCylinderOnlyObstacleSetBasic(m_StartPoint,m_EndPoint,idx,segLength,T,Q);
+	WrapCylinderOnlyObstacleSetBasic2(m_StartPoint,m_EndPoint,idx,reverseFlag,segLength,T,Q);
 	//------transform it to global------------
 	GetWrapGlobalTransform(Q,Qg,idx);
 	GetWrapGlobalTransform(T,Tg,idx);
@@ -975,6 +1024,7 @@ double medVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
 	double value = 0;
 	value = (1.0 - ( (Q[0]-T[0])*(Q[0]-T[0]) + (Q[1]-T[1])*(Q[1]-T[1]) )/(2*R*R));
 	rtn = R *  acos(value);
+	//rtn = fabs(rtn);
 	return rtn;
 }
 /************************************************************************/
@@ -985,10 +1035,15 @@ double medVMEComputeWrapping::GetQTsegment(double R,double *Q,double *T){
 /* so det = Qx*Ty-Qy*Tx
 /************************************************************************/
 
-bool medVMEComputeWrapping::WrapCondition(double *Q,double *T){
+bool medVMEComputeWrapping::WrapCondition(double *Q,double *T,boolean reverseFlag){
 	bool rtn = true;
 	double det = Q[0]*T[1]- Q[1]*T[0];
-	if (det<0)
+	int flag = 1;
+	if (reverseFlag)
+	{
+		flag = -1;
+	}
+	if ( flag * det<0)
 	{
 		rtn = false;
 	}
@@ -1364,7 +1419,7 @@ void medVMEComputeWrapping::WrapSingleCylinder(double vId){
 	m_TmpTransform->TransformPoint(m_EndPoint,local_end);
 	m_TmpTransform->TransformPoint(m_WrappedVMECenter1,local_wrapped_center);
 	//--------------test code----------------------
-	SC->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
+/*	SC->SetPoint1(m_StartPoint[0],m_StartPoint[1],m_StartPoint[2]);
 	SC->SetPoint2(m_WrappedVMECenter1[0],m_WrappedVMECenter1[1],m_WrappedVMECenter1[2]);
 
 	CE->SetPoint1(m_WrappedVMECenter1[0],m_WrappedVMECenter1[1],m_WrappedVMECenter1[2]);
@@ -1378,7 +1433,7 @@ void medVMEComputeWrapping::WrapSingleCylinder(double vId){
 
 	m_Goniometer->AddInput(SCL->GetOutput());
 	m_Goniometer->AddInput(CEL->GetOutput());
-
+*/
 	//---------------over--------------------------
 
 	// create ordered list of tangent point (2) real algorithm
@@ -3130,13 +3185,13 @@ bool medVMEComputeWrapping::CheckAlign(){
 	}
 
 	//-------------------test code---------------------------
-	cAxis->SetPoint1(cylinderCenter[0],cylinderCenter[1],cylinderCenter[2]);
+	/*cAxis->SetPoint1(cylinderCenter[0],cylinderCenter[1],cylinderCenter[2]);
 	cAxis->SetPoint2(m_CylinderAxis2[0],m_CylinderAxis2[1],m_CylinderAxis2[2]);
 	centerline->SetPoint1(cylinderCenter[0],cylinderCenter[1],cylinderCenter[2]);
 	centerline->SetPoint2(sphereCenter[0],sphereCenter[1],sphereCenter[2]);
 
 	m_Goniometer->AddInput(cAxis->GetOutput());
-	m_Goniometer->AddInput(centerline->GetOutput());
+	m_Goniometer->AddInput(centerline->GetOutput());*/
 	//-------------------test over---------------------------
 	vtkDEL(cAxis);
 	vtkDEL(centerline);
@@ -3384,7 +3439,14 @@ int medVMEComputeWrapping::GetViaPoint(double *viaPoint,bool isNearEndflag){
 			if (objFlag1 && objFlag2)
 			{
 				rtn = CYLINDER_CYLINDER;
-			}else{
+			}else if (objFlag1 )
+			{
+				rtn = CYLINDER_CYLINDER_1;
+			}else if (objFlag2)
+			{
+				rtn = CYLINDER_CYLINDER_2;
+			}
+			else{
 				rtn = NON_WRAP;
 			}
 
@@ -5109,7 +5171,7 @@ mafGUI* medVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
 
 	gui->Button(ID_WRAPPED_METER_LINK1,&m_WrappedVmeName1,_("Wrapped object1"), _("Select the vme representing Vme to be wrapped1"));
 	gui->Button(ID_WRAPPED_METER_LINK2,&m_WrappedVmeName2,_("Wrapped object2"), _("Select the vme representing Vme to be wrapped2"));
-
+	gui->Bool(ID_WRAPPED_SIDE_NEW,"reverse", &m_WrapReverseNew ,0);
 	gui->Divider();
 	gui->Divider();
 	gui->Divider(2);
@@ -5118,7 +5180,7 @@ mafGUI* medVMEComputeWrapping::CreateGuiForNewMeter( mafGUI *gui ){
 
 	gui->Enable(ID_WRAPPED_METER_LINK1, m_WrappedMode1==SPHERE_CYLINDER || m_WrappedMode1 == SPHERE_ONLY || m_WrappedMode1 ==DOUBLE_CYLINDER  );//sphere
 	gui->Enable(ID_WRAPPED_METER_LINK2, m_WrappedMode1 ==SPHERE_CYLINDER || m_WrappedMode1 ==DOUBLE_CYLINDER || m_WrappedMode1 == CYLINDER_ONLY );//cylinder
-
+	gui->Enable(ID_WRAPPED_SIDE_NEW,m_WrappedMode1==DOUBLE_CYLINDER);
 	gui->Update();
 
 	InternalUpdate();
@@ -5452,7 +5514,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 						{
 							m_WrappedVmeName2 = _("cylinder");
 						}
-
+						m_GuiNewMeter->Enable(ID_WRAPPED_SIDE_NEW,true);
 
 					}else if (m_WrappedMode1 ==SPHERE_CYLINDER )
 					{
@@ -5463,8 +5525,10 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 						{
 							m_WrappedVmeName2 = _("cylinder");
 						}
+						m_GuiNewMeter->Enable(ID_WRAPPED_SIDE_NEW,false);
 
-
+					}else{
+						m_GuiNewMeter->Enable(ID_WRAPPED_SIDE_NEW,false);
 					}
 
 				}else if (m_WrappedClass == OLD_METER)
@@ -5487,6 +5551,7 @@ void medVMEComputeWrapping::OnEvent(mafEventBase *maf_event)
 			InternalUpdate();
 			ForwardUpEvent(&mafEvent(this,CAMERA_UPDATE));
 			break;
+		case ID_WRAPPED_SIDE_NEW:
 		case ID_WRAPPED_SIDE:
 		case ID_WRAPPED_REVERSE:
 			InternalUpdate();
