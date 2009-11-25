@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewRXCTRotatedVolumesDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 13:03:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-25 14:51:07 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -315,6 +315,7 @@ void medViewRXCTRotatedVolumesDebugger::VmeShow(mafNode *node, bool show)
         int i=0;
         while (j!=m_Sort[i]) i++;
         double pos[3]={0.0,0.0,m_Pos[m_Sort[i]]};
+        ((medViewSliceRotatedVolumesDebugger *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(pos);
         ((medViewSliceRotatedVolumesDebugger *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
       }
       mafPipe *p=((medViewSliceRotatedVolumesDebugger *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);

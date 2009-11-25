@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceRotatedVolumesDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-23 15:11:24 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-11-25 14:51:07 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,6 +67,8 @@ mafCxxTypeMacro(medViewSliceRotatedVolumesDebugger);
 
 #include "mafMemDbg.h"
 
+const int LAST_SLICE_ORIGIN_VALUE_NOT_INITIALIZED = 0;
+
 //----------------------------------------------------------------------------
 medViewSliceRotatedVolumesDebugger::medViewSliceRotatedVolumesDebugger(wxString label, int camera_position, bool show_axes, bool show_grid, bool show_ruler, int stereo,bool showTICKs)
 :mafViewVTK(label,camera_position,show_axes,show_grid, show_ruler, stereo)
@@ -91,6 +93,9 @@ medViewSliceRotatedVolumesDebugger::medViewSliceRotatedVolumesDebugger(wxString 
   m_CurrentMesh.clear();
 
 	m_ShowVolumeTICKs = showTICKs;
+
+  m_LastSliceOrigin[0] = m_LastSliceOrigin[1] = m_LastSliceOrigin[2] = LAST_SLICE_ORIGIN_VALUE_NOT_INITIALIZED;
+  m_LastSliceNormal[0] = m_LastSliceNormal[1] = m_LastSliceNormal[2] = 0.0;
 }
 //----------------------------------------------------------------------------
 medViewSliceRotatedVolumesDebugger::~medViewSliceRotatedVolumesDebugger()
@@ -249,6 +254,7 @@ void medViewSliceRotatedVolumesDebugger::InitializeSlice(double* Origin, double*
 void medViewSliceRotatedVolumesDebugger::VmeCreatePipe(mafNode *vme)
 //----------------------------------------------------------------------------
 {
+  
   mafString pipe_name = "";
   GetVisualPipeName(vme, pipe_name);
 
@@ -275,6 +281,7 @@ void medViewSliceRotatedVolumesDebugger::VmeCreatePipe(mafNode *vme)
       if (pipe->IsA("mafPipeVolumeSlice_BES"))  //BES: 3.4.2009 - changed to support inheritance
       {
         m_CurrentVolume = n;
+
         if (m_AttachCamera)
           m_AttachCamera->SetVme(m_CurrentVolume->m_Vme);
         int slice_mode;
@@ -580,13 +587,25 @@ void medViewSliceRotatedVolumesDebugger::SetLutRange(double low_val, double high
 void medViewSliceRotatedVolumesDebugger::SetSlice(double* Origin, double* Normal)
 //----------------------------------------------------------------------------
 {
+  
   //set slice origin and normal
   if (Origin != NULL)
+  {
     memcpy(m_Slice,Origin,sizeof(m_Slice));
+    m_LastSliceOrigin[0] = m_Slice[0];
+    m_LastSliceOrigin[1] = m_Slice[1];
+    m_LastSliceOrigin[2] = m_Slice[2];
 
+  }
+  
   if (Normal != NULL)
+  {
     memcpy(m_SliceNormal,Normal,sizeof(m_Slice));
-
+    m_LastSliceNormal[0] = m_SliceNormal[0];
+    m_LastSliceNormal[1] = m_SliceNormal[1];
+    m_LastSliceNormal[2] = m_SliceNormal[2];
+  }
+  
   //and now set it for every VME
   if (m_CurrentVolume)
 	{
@@ -599,7 +618,7 @@ void medViewSliceRotatedVolumesDebugger::SetSlice(double* Origin, double* Normal
 			this->UpdateText();
 		}
 	}
-  
+        
   //BES 1.5.2008 - I don't understand why GetViewPlaneNormal is used
   //so I leave it untouched
   double normal[3];
@@ -1039,6 +1058,13 @@ void medViewSliceRotatedVolumesDebugger::CameraUpdateForRotatedVolumes()
     if (m_CurrentVolume != NULL)
     {
       SetCameraParallelToDataSetLocalAxis(mafTransform::X); 
+      
+      // needed to update surface slices during camera rotation
+      if (m_CurrentSurface.size()  != 0)
+      {
+        SetSlice(m_LastSliceOrigin, NULL);    
+      }
+
       this->CameraReset(m_CurrentVolume->m_Vme);
     }    
   }
@@ -1047,6 +1073,13 @@ void medViewSliceRotatedVolumesDebugger::CameraUpdateForRotatedVolumes()
     if (m_CurrentVolume != NULL)
     {
       SetCameraParallelToDataSetLocalAxis(mafTransform::Y);
+
+      // needed to update surface slices during camera rotation
+      if (m_CurrentSurface.size()  != 0)
+      {
+        SetSlice(m_LastSliceOrigin, NULL);    
+      }
+      
       this->CameraReset(m_CurrentVolume->m_Vme);
     }    
   }
@@ -1055,6 +1088,13 @@ void medViewSliceRotatedVolumesDebugger::CameraUpdateForRotatedVolumes()
     if (m_CurrentVolume != NULL)
     {
       SetCameraParallelToDataSetLocalAxis(mafTransform::Z);
+     
+      // needed to update surface slices during camera rotation
+      if (m_CurrentSurface.size()  != 0)
+      {
+        SetSlice(m_LastSliceOrigin, NULL);    
+      }
+
       this->CameraReset(m_CurrentVolume->m_Vme);
     }    
   }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSliceRotatedVolumesDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 13:03:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-11-25 14:51:07 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -201,6 +201,9 @@ protected:
   
   mafMatrix m_OldABSPose;
   mafMatrix m_NewABSPose;
+
+  double m_LastSliceOrigin[3];
+  double m_LastSliceNormal[3];
 
 };
 #endif
