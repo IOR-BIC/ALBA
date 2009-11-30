@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafReferenceCounted.cpp,v $
   Language:  C++
-  Date:      $Date: 2005-04-21 13:56:38 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-11-30 14:10:05 $
+  Version:   $Revision: 1.3.22.1 $
   Authors:   based on vtkObjectBase (www.vtk.org), adapted Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -24,11 +24,11 @@ void mafReferenceCounted::Delete()
 }
 
 //------------------------------------------------------------------------------
-// Create an object with Debug turned off and modified time initialized 
-// to zero.
 mafReferenceCounted::mafReferenceCounted()
 //------------------------------------------------------------------------------
 {
+  // Create an object with Debug turned off and modified time initialized 
+  // to zero.
   // objects not created with New() cannot be reference counted...
   m_HeapFlag=0;
 
@@ -51,18 +51,18 @@ mafReferenceCounted::~mafReferenceCounted()
 }
 
 //------------------------------------------------------------------------------
-// Sets the reference count (use with care)
 void mafReferenceCounted::SetReferenceCount(int ref)
 //------------------------------------------------------------------------------
 {
+  // Sets the reference count (use with care)
   m_ReferenceCount = ref;
 }
 
 //------------------------------------------------------------------------------
-// Increase the reference count (mark as used by another object).
 void mafReferenceCounted::Register(void *obj)
 //------------------------------------------------------------------------------
 {
+  // Increase the reference count (mark as used by another object).
   if (!m_HeapFlag)
   {
     mafErrorMacro(<< "Trying to Register a non-dynamically allocated object.");
@@ -78,10 +78,10 @@ void mafReferenceCounted::Register(void *obj)
 }
 
 //------------------------------------------------------------------------------
-// Decrease the reference count (release by another object).
 void mafReferenceCounted::UnRegister(void *obj)
 //------------------------------------------------------------------------------
 {
+  // Decrease the reference count (release by another object).
   if (!m_HeapFlag)
   {
     mafErrorMacro("Trying to UnRegister a non-dynamically allocated object.");

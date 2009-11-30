@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEStorage.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-12-11 11:25:50 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-11-30 14:10:26 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -75,7 +75,7 @@ mafVMEStorage::~mafVMEStorage()
 //------------------------------------------------------------------------------
 {
   cppDEL(m_Document); // delete the document object
-  mafDEL(m_Root);
+  mafDEL(m_Root); // delete the root
 }
 
 //------------------------------------------------------------------------------
@@ -85,15 +85,16 @@ void mafVMEStorage::SetRoot(mafVMERoot *root)
   if (root == m_Root)
     return;
   
-  cppDEL(m_Document);
-  mafDEL(m_Root);
+  cppDEL(m_Document); // delete the old msf document
+  mafDEL(m_Root); // delete the old root
+  // assign the new root
   m_Root = root;
   m_Root->Register(this);
   m_Root->SetName("Root");
   m_Root->SetListener(this);
   m_Root->Initialize();
   
-  SetDocument(new mmuMSFDocument(m_Root));
+  SetDocument(new mmuMSFDocument(m_Root)); // assign the new document
 }
 //------------------------------------------------------------------------------
 mafVMERoot *mafVMEStorage::GetRoot()
@@ -109,6 +110,7 @@ void mafVMEStorage::SetURL(const char *name)
   if (m_URL!=name)
   {
     Superclass::SetURL(name);
+    // forward down the event informing that msf file name is changed
     mafEventBase e(this,MSF_FILENAME_CHANGED);
     GetRoot()->ForwardDownEvent(e);
   }
