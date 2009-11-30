@@ -3,8 +3,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: vtkMAFProfilingActorTest.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-21 10:57:58 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-11-30 14:11:01 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Alberto Losi
 
 ================================================================================
@@ -60,6 +60,9 @@ class vtkMAFProfilingActorDummy : public vtkMAFProfilingActor
 
     void FPSUpdate(vtkRenderer *ren)
     {
+      int *size = ren->GetSize();
+      TextFPS->SetPosition(10,size[1]-40);
+      TextFPS->Modified();
       sprintf(TextBuff,"fps: %.1f \nrender time: %.3f s",0, 0);
       TextFPS->SetInput(this->TextBuff);
     };
@@ -116,9 +119,8 @@ void vtkMAFProfilingActorTest::TestRenderOverlay()
   renderWindow->Render();
 
   CPPUNIT_ASSERT(profActor->RenderOverlay((vtkViewport*)renderer) == 1);
-  profActor->FPSUpdate(renderer);
   renderWindow->Render();
-
+  profActor->FPSUpdate(renderer);
   CompareImages(renderWindow, 0);
   mafSleep(2000);
   profActor->Delete();
@@ -144,9 +146,8 @@ void vtkMAFProfilingActorTest::TestRenderOpaqueGeometry()
   renderWindow->Render();
 
   CPPUNIT_ASSERT(profActor->RenderOpaqueGeometry((vtkViewport*)renderer) == 0);
-  profActor->FPSUpdate(renderer);
   renderWindow->Render();
-
+  profActor->FPSUpdate(renderer);
   CompareImages(renderWindow, 1);
   mafSleep(2000);
   profActor->Delete();
@@ -185,6 +186,7 @@ void vtkMAFProfilingActorTest::TestRenderTranslucentGeometry()
 void vtkMAFProfilingActorTest::CompareImages(vtkRenderWindow * renwin, int indexTest)
 //----------------------------------------------------------------------------
 {
+  printf("Comparing images...\n");
   char *file = __FILE__;
   std::string name(file);
   std::string path(file);
