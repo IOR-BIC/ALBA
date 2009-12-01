@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIViewWin.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-12-01 14:36:33 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -18,12 +18,14 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafView;
 
-//----------------------------------------------------------------------------
-// mafGUIViewWin - This class is used only to trap the OnSize event
-//----------------------------------------------------------------------------
+/**
+  class name: mafGUIViewWin 
+  This class is used only to trap the OnSize event.
+*/
 class mafGUIViewWin : public wxPanel
 {
 public:
+  /** constructor */
   mafGUIViewWin(
         wxWindow *parent, 
         wxWindowID id,
@@ -32,8 +34,10 @@ public:
         long style = 0
         );
   
+  /** called when resizing the object */
 	void OnSize(wxSizeEvent &event);
   mafView  *m_Owner;
+/** Event table declaration macro  */
 DECLARE_EVENT_TABLE()
 };
 #endif

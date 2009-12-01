@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDictionaryWidget.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:38 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-12-01 14:36:33 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,16 +28,21 @@ class mafEvent;
 class mafObserver;
 
 
-//----------------------------------------------------------------------------
-// mafGUIDictionaryWidget :
-//----------------------------------------------------------------------------
+/**
+  class name : mafGUIDictionaryWidget
+  Widget that handle a dictionary object. 
+*/
 class mafGUIDictionaryWidget : public mafObserver
 {
 
 public:
+  /** constructor*/
             mafGUIDictionaryWidget(wxWindow *parent, int id);
+  /** destructor */
            ~mafGUIDictionaryWidget();
+  /** Set the listener of the events launched */
   void			SetListener(mafObserver *Listener) {m_Listener = Listener;};
+  /** Answer to the messages coming from interface. */
   void      OnEvent(mafEventBase *event);
 
   /** Set the reference cloud. */
@@ -73,15 +78,22 @@ protected:
   mafVME      *m_Vme;
 };
 
-//------------------------------------------------------------------------------
+/**
+ class name: mafStorableDictionary
+  Utility object that supply the  InternalStore  and InternalRestore method for serialization.
+*/
 class mafStorableDictionary: public mafObject, public mafStorable
-//------------------------------------------------------------------------------
 {
 public:
+  /** RTTI macro*/
   mafTypeMacro(mafStorableDictionary,mafObject);
+  /** constructor */
   mafStorableDictionary();
+  /** destructor */
   ~mafStorableDictionary();
+  /** serialize  object attributes */
   virtual int InternalStore(mafStorageElement *parent){return MAF_OK;}
+  /** restore  object attributes */
   virtual int InternalRestore(mafStorageElement *node);
   std::vector<mafString> m_StrVector;
 };

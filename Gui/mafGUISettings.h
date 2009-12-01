@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettings.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:23 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-12-01 14:36:33 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -21,20 +21,23 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 class mafGUI;
 
-//----------------------------------------------------------------------------
-// mafGUISettings :
-//----------------------------------------------------------------------------
 /**
+ class name: mafGUISettings
+  base class for more complex specified classes regarding the setting of application.
+  It returns a gui and generally can access to registry keys.
 */
 class mafGUISettings : public mafObserver
 {
 public:
+  /** constructor */
 	mafGUISettings(mafObserver *Listener, const mafString &label = _("Settings"));
+  /** destructor */
 	~mafGUISettings(); 
 
   /** Answer to the messages coming from interface. */
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Set the listener of the events launched*/
   void SetListener(mafObserver *Listener) {m_Listener = Listener;};
 
   /** Return the GUI of the setting panel.*/

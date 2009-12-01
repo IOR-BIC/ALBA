@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIPanelStack.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-12-01 14:36:33 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,14 +16,17 @@
 //----------------------------------------------------------------------------
 #include <wx/laywin.h>
 #include "mafGUIPanel.h"
-//----------------------------------------------------------------------------
-// mafGUIPanelStack :
-//----------------------------------------------------------------------------
+/**
+  class name:  mafGUIPanelStack
+   Panel with the same behaviour of a stack container (push and pop methods)
+*/
 class mafGUIPanelStack: public mafGUIPanel
 {
 public:
+  /** constructor */
   mafGUIPanelStack(wxWindow* parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, 
            const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL, const wxString& name = "panel");
+  /** destructor */
   virtual ~mafGUIPanelStack(); 
 
   /** Put the panel on the panel stack removing the previous panel. */
@@ -47,7 +50,7 @@ protected:
 
   wxBoxSizer   *m_Sizer;
   mafGUIPanel     *m_CurrentPanel;
-
+/** Event table declaration macro  */
 DECLARE_EVENT_TABLE()
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIHolder.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 08:55:49 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-12-01 14:36:33 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,13 +19,17 @@
 #include "mafGUIScrolledPanel.h"
 #include "mafGUI.h"
 
-//----------------------------------------------------------------------------
-// mafGUIHolder :
-//----------------------------------------------------------------------------
+
+/**
+  class name: mafGUIHolder
+  Secialized panel in which a developer can put a mafGUI.
+*/
 class mafGUIHolder: public mafGUINamedPanel
 {
 public:
+  /** constructor */
            mafGUIHolder(wxWindow* parent,wxWindowID id, bool CloseButton=false, bool HideTitle = false );
+  /** destructor */
   virtual ~mafGUIHolder();
   
 	/** Return the panel that held the gui. */
@@ -37,11 +41,13 @@ public:
 	/** Remove the current gui. */
   bool RemoveCurrentGui();
 
+  /** retrieve the current gui */
   wxWindow *GetCurrentGui();
 
 protected:
   mafGUIScrolledPanel *m_Panel;
-  
+
+/** Event table declaration macro  */
 DECLARE_EVENT_TABLE()
 };
 #endif
