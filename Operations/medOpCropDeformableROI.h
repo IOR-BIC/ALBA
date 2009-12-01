@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCropDeformableROI.h,v $
 Language:  C++
-Date:      $Date: 2008-06-06 10:27:21 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-12-01 16:31:42 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -56,19 +56,26 @@ class mafVMESurface;
 //----------------------------------------------------------------------------
 // medOpCropDeformableROI :
 //----------------------------------------------------------------------------
-/** */
+/**
+  class name: medOpCropDeformableROI
+   Operation that use m_MaskPolydataFilter, cropping  a volume with a output surface of a vme.
+*/
 class medOpCropDeformableROI: public mafOp
 {
 public:
+  /** construct */
 	medOpCropDeformableROI(const wxString &label = "CropDeformableROI");
+  /** destructor */
 	~medOpCropDeformableROI(); 
-
+  /** process events coming from other components */
 	virtual void OnEvent(mafEventBase *maf_event);
-
+  /** RTTI Macro */
 	mafTypeMacro(medOpCropDeformableROI, mafOp);
 
+  /** acceptance static function */
 	static bool OutputSurfaceAccept(mafNode *node) {return(node != NULL && ((mafVME*)node)->GetOutput()->IsA("mafVMEOutputSurface"));};
 
+  /** Return a copy of the operation.*/
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -87,6 +94,7 @@ protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 
+  /** use  vtkMaskPolydataFilter to  achieve the output */
 	void Algorithm(mafVME *vme);
 
 	vtkMaskPolyDataFilter *m_MaskPolydataFilter;

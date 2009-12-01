@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpCleanSurface.h,v $
 Language:  C++
-Date:      $Date: 2007-12-17 19:07:40 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2009-12-01 16:31:42 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -50,19 +50,24 @@ MafMedical is partially based on OpenMAF.
 class vtkPolyData;
 class mafEvent;
 
-//----------------------------------------------------------------------------
-// medOpSmoothSurface :
-//----------------------------------------------------------------------------
-/** */
+/**
+  class name: medOpCleanSurface
+    Operation that apply cvtkCleanPolyData Filter to the input surface.  
+*/
 class medOpCleanSurface: public mafOp
 {
 public:
+  /** constructor */
 	medOpCleanSurface(const wxString &label = "CleanSurface");
-	~medOpCleanSurface(); 
+  /** destructor */
+	~medOpCleanSurface();
+  /** Answer to the messages coming from interface. */ 
 	virtual void OnEvent(mafEventBase *maf_event);
 
+  /** RTTI macro */
 	mafTypeMacro(medOpCleanSurface, mafOp);
 
+  /** Return a copy of the operation.*/
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -84,6 +89,7 @@ protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
 
+  /** Create the dialog interface for the importer. */
   void CreateGui();
 
 
