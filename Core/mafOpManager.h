@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpManager.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:13 $
-  Version:   $Revision: 1.16.2.3 $
+  Date:      $Date: 2009-12-01 10:21:26 $
+  Version:   $Revision: 1.16.2.4 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -134,6 +134,9 @@ public:
   /** Set MafUser */
   void SetMafUser(mafUser *user);
 
+  /** Return the current maf user */
+  mafUser* GetMafUser(){return m_User;};
+
 protected:
 	/** Execute the current operation. */
   virtual void OpDo(mafOp *op);
@@ -197,5 +200,8 @@ protected:
 
   mafObserver       *m_Listener;
   mafObserver       *m_RemoteListener; ///< Listener used to send messages to remote applications
+
+  /** test friend */
+  friend class mafOpManagerTest;
 };
 #endif
