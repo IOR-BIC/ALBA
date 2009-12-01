@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:13 $
-  Version:   $Revision: 1.24.2.2 $
+  Date:      $Date: 2009-12-01 10:20:58 $
+  Version:   $Revision: 1.24.2.3 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -138,6 +138,9 @@ public:
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status);
+
+  /** Return the collaborate status */
+  bool GetCollaborateStatus(){return m_CollaborateStatus;};
 
   /** Turn On m_TestMode flag. 
   The m_TestMode flag is used to exclude the execution of splash screen or wxBusyInfo that conflicts with test machine.*/
