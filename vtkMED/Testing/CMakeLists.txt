@@ -14,6 +14,8 @@ ENDIF (CPPUNIT_FOUND)
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
+ADD_EXECUTABLE(vtkHoleConnectivityTest vtkHoleConnectivityTest.h vtkHoleConnectivityTest.cpp)
+ADD_TEST(vtkHoleConnectivityTest ${EXECUTABLE_OUTPUT_PATH}/vtkHoleConnectivityTest)
 ADD_EXECUTABLE(vtkDicomUnPackerTest vtkDicomUnPackerTest.h vtkDicomUnPackerTest.cpp)
 ADD_TEST(vtkDicomUnPackerTest ${EXECUTABLE_OUTPUT_PATH}/vtkDicomUnPackerTest)
 ADD_EXECUTABLE(vtkTriangleQualityRatioTest vtkTriangleQualityRatioTest.h vtkTriangleQualityRatioTest.cpp)
