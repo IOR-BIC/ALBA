@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-14 12:29:20 $
-Version:   $Revision: 1.7.2.7 $
+Date:      $Date: 2009-12-02 14:55:31 $
+Version:   $Revision: 1.7.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -30,7 +30,7 @@ medGUIDicomSettings::medGUIDicomSettings(mafObserver *Listener, const mafString 
 mafGUISettings(Listener, label)
 //----------------------------------------------------------------------------
 {
-	m_Dictionary = "";
+	// m_Dictionary = "";
 
 	m_CheckOnOff[0] = m_CheckOnOff[1] = m_CheckOnOff[2] = m_CheckOnOff[3] = m_CheckOnOff[4] = m_CheckOnOff[5] = true;
 
@@ -48,6 +48,7 @@ mafGUISettings(Listener, label)
 
   m_Step = ID_1X;
 
+  m_Config->SetPath("Importer Dicom"); // Regiser key path Added by Losi 15.11.2009
 	InitializeSettings();
 }
 //----------------------------------------------------------------------------
@@ -60,7 +61,7 @@ void medGUIDicomSettings::CreateGui()
 //----------------------------------------------------------------------------
 {
 	m_Gui = new mafGUI(this);
-	m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary);
+	// m_Gui->FileOpen(ID_DICTONARY,_("Dictionary"),&m_Dictionary); Remove dictionary selection (Losi 25.11.2009)
 	m_Gui->Bool(ID_AUTO_POS_CROP,_("Auto Crop"),&m_AutoCropPos,1);
   m_Gui->Bool(ID_ENALBLE_TIME_BAR,_("Enable Time Bar"),&m_EnableNumberOfTime,1);
 	m_Gui->Bool(ID_ENALBLE_NUMBER_OF_SLICE,_("Enable Number of Slice"),&m_EnableNumberOfSlice,1);
@@ -94,7 +95,7 @@ void medGUIDicomSettings::CreateGui()
 void medGUIDicomSettings::EnableItems()
 //----------------------------------------------------------------------------
 {
-	m_Gui->Enable(ID_DICTONARY,true);
+	//m_Gui->Enable(ID_DICTONARY,true); Remove dictionary selection (Losi 25.11.2009)
   m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
 }
 //----------------------------------------------------------------------------
@@ -103,11 +104,12 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
 {
 	switch(maf_event->GetId())
 	{
-	case ID_DICTONARY:
-		{
-			m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
-		}
-		break;
+//  Remove dictionary selection (Losi 25.11.2009)
+// 	case ID_DICTONARY:
+// 		{
+// 			m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
+// 		}
+// 		break;
 	case ID_TYPE_DICOM:
 		{
 			m_Config->Write("EnableReadCT",m_DicomModalityListBox->IsItemChecked(ID_CT_MODALITY));
@@ -257,14 +259,14 @@ void medGUIDicomSettings::InitializeSettings()
     m_Config->Write("StepOfBuild",m_Step);
   }
 
-	if(m_Config->Read("DicomDictionary", &string_item))
-	{
-		m_Dictionary=string_item.c_str();
-	}
-	else
-	{
-		m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
-	}
+// 	if(m_Config->Read("DicomDictionary", &string_item))
+// 	{
+// 		m_Dictionary=string_item.c_str();
+// 	}
+// 	else
+// 	{
+// 		m_Config->Write("DicomDictionary",m_Dictionary.GetCStr());
+// 	}
 
 	if(m_Config->Read("EnableReadCT", &long_item))
 	{

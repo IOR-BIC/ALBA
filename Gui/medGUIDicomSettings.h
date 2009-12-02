@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-10-14 12:29:20 $
-Version:   $Revision: 1.5.2.7 $
+Date:      $Date: 2009-12-02 14:55:31 $
+Version:   $Revision: 1.5.2.8 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -96,7 +96,7 @@ public:
 	void OnEvent(mafEventBase *maf_event);
 
   /** Retrieve Dictionary path name. */
-	mafString GetDictionary(){return m_Dictionary;};
+	mafString GetDictionary(){return "";}; // Left for backward compatibility. Always return the empty string
 
   /** Retrieve Automatic Crop Position Flag. */
 	int AutoCropPosition(){return m_AutoCropPos;};
@@ -137,7 +137,7 @@ protected:
 	/** Used to enable/disable items according to the current widgets state.*/
 	void EnableItems();
 
-	mafString m_Dictionary;
+	// mafString m_Dictionary;
 	mafGUICheckListBox *m_DicomModalityListBox;
 
 	int m_CheckOnOff[6];
