@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-14 11:18:45 $
-  Version:   $Revision: 1.26.2.3 $
+  Date:      $Date: 2009-12-02 09:18:45 $
+  Version:   $Revision: 1.26.2.4 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,6 +63,7 @@ public:
   enum VIEW_SLICE_WIDGET_ID
   {
     ID_NONE = Superclass::ID_LAST,
+    ID_ENABLE_GPU,
     ID_LAST
   };
 
@@ -190,5 +191,7 @@ protected:
 	std::vector<mafSceneNode*> m_CurrentPolylineGraphEditor;
   std::vector<mafSceneNode*> m_CurrentMesh;
 
+  // Added by Losi 11.25.2009
+  int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-11-10 16:23:07 $
-  Version:   $Revision: 1.51.2.8 $
+  Date:      $Date: 2009-12-02 09:18:45 $
+  Version:   $Revision: 1.51.2.9 $
   Authors:   Paolo Quadrani,Stefano Perticoni, modified by Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -88,6 +88,9 @@ mafViewSlice::mafViewSlice(wxString label, int camera_position, bool show_axes, 
   m_CurrentMesh.clear();
 
 	m_ShowVolumeTICKs = showTICKs;
+
+  // Added by Losi 11.25.2009
+  m_EnableGPU=1;
 }
 //----------------------------------------------------------------------------
 mafViewSlice::~mafViewSlice()
@@ -551,6 +554,20 @@ mafGUI *mafViewSlice::CreateGui()
   m_Gui = new mafGUI(this);
   m_AttachCamera = new mafAttachCamera(m_Gui, m_Rwi, this);
   m_Gui->AddGui(m_AttachCamera->GetGui());
+
+  // Added by Losi 11.25.2009
+  if (m_CurrentVolume)
+  {
+    mafPipeVolumeSlice_BES *p = NULL;
+    p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->m_Vme)); // m_CurrentVolume->m_Pipe is better?
+    if (p) // Is this required?
+    {
+      p->SetEnableGPU(m_EnableGPU);
+    }
+  };
+   m_Gui->Divider(1);
+  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+
 	m_Gui->Divider();
   return m_Gui;
 }
@@ -558,6 +575,28 @@ mafGUI *mafViewSlice::CreateGui()
 void mafViewSlice::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
+  // Added by Losi 11.25.2009
+  if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
+  {
+    switch(maf_event->GetId()) 
+    {
+      case ID_ENABLE_GPU:
+        {
+          if (m_CurrentVolume)
+          {
+            mafPipeVolumeSlice_BES *p = NULL;
+            p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume->m_Vme));
+            if(p)
+            {
+              p->SetEnableGPU(m_EnableGPU);
+              this->CameraUpdate();
+            }
+          }
+        }
+        break;
+    }
+  }
+
   mafEventMacro(*maf_event);
 }
 
@@ -858,7 +897,7 @@ void mafViewSlice::VmeShow(mafNode *node, bool show)
     //CameraReset(node);
     //m_Rwi->CameraUpdate();
   }
-	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh") /*|| node->IsA("mafVMEMeter")*/)
+	else if(node->IsA("mafVMEPolyline")||node->IsA("mafVMESurface")||node->IsA("medVMEPolylineEditor")||node->IsA("mafVMEMesh") || node->IsA("mafVMELandmark") || node->IsA("mafVMELandmarkCloud") /*|| node->IsA("mafVMEMeter")*/)
 	{
 		this->UpdateSurfacesList(node);
 	}

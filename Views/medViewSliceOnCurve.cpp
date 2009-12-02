@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurve.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-05-29 08:37:18 $ 
-Version: $Revision: 1.1.2.1 $ 
+Date: $Date: 2009-12-02 09:18:45 $ 
+Version: $Revision: 1.1.2.2 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -63,6 +63,8 @@ See the COPYINGS file for license details
 
 #include "mafVMEGizmo.h"
 
+#include "mafPipeVolumeSlice_BES.h"
+
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medViewSliceOnCurve);
 //----------------------------------------------------------------------------
@@ -114,6 +116,9 @@ medViewSliceOnCurve::medViewSliceOnCurve(wxString label) : mafViewCompound(label
   m_TextMapper = NULL;
   m_TextActor = NULL;
   m_OldPos[0] = m_OldPos[1] = m_OldPos[2] = 0.;
+
+  // Added by Losi 11.25.2009
+  m_EnableGPU=1;
 }
 
 #include "mafVMERoot.h"
@@ -378,6 +383,21 @@ mafGUI* medViewSliceOnCurve::CreateGui()
 	  _("Toggles automatic navigation in the 3D view"));
 
   m_Gui->Divider();
+
+  // Added by Losi 11.25.2009
+  if (m_CurrentVolume)
+  {
+    mafPipeVolumeSlice_BES *p = NULL;
+    p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+    if (p) // Is this required?
+    {
+      p->SetEnableGPU(m_EnableGPU);
+    }
+  };
+  m_Gui->Divider(1);
+  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+  m_Gui->Divider();
+
   return m_Gui;
 }
 
@@ -481,6 +501,22 @@ void medViewSliceOnCurve::OnEvent(mafEventBase *maf_event)
     case ID_SHOW_GIZMOCOORDS:
       OnShowGizmoCoords();
       m_ChildViewList[POLYLINE_VIEW]->CameraUpdate();
+      break;
+
+    // Added by Losi 11.25.2009 
+    case ID_ENABLE_GPU:
+      {
+        if (m_CurrentVolume)
+        {
+          mafPipeVolumeSlice_BES *p = NULL;
+          p = mafPipeVolumeSlice_BES::SafeDownCast(this->GetNodePipe(m_CurrentVolume));
+          if(p)
+          {
+            p->SetEnableGPU(m_EnableGPU);
+            this->CameraUpdate();
+          }
+        }
+      }
       break;
 
     default:

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2009-12-02 09:18:45 $
+  Version:   $Revision: 1.23.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -72,6 +72,7 @@ void CreateOrthoslicesAndGizmos( mafNode * node );
     ID_RESET_SLICES,
 		ID_ALL_SURFACE,
 		ID_BORDER_CHANGE,
+    ID_ENABLE_GPU,
     ID_LAST
   };
 
@@ -124,6 +125,8 @@ protected:
   mafViewSlice *m_Views[4]; ///< Child views
   int	m_Side; ///< change Azimuth of the camera
 	int m_Snap; ///<change modality of gizmo to snap on grid
+
+  int m_EnableGPU;
 
 };
 #endif

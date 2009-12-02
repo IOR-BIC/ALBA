@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 15:48:46 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-12-02 09:18:04 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -123,6 +123,18 @@ public:
 
 	void HideSlider();
 	void ShowSlider();
+
+  /* Added by Losi 12.02.2009
+  This methods are added to allow views access m_EnableGPU member of mafPipeVolumeSlice_BES:
+  This is done in order to change the location of the enable GPU flag check box from the visual props panel to the view panel.
+  An alternative, and less invasive, way to do this is to implement a GetGUI method. But this method generate duplicate check boxes in compound views.
+  */
+
+  /** Set the flag that enable/disable GPU */
+  void SetEnableGPU(int enable);
+
+  /** Get the flag that enable/disable GPU */
+  int GetEnableGPU();
 
 protected:
 	/** Create the slicer pipeline. */

@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: medViewSliceOnCurveCompound.h,v $ 
 Language: C++ 
-Date: $Date: 2009-10-06 09:28:37 $ 
-Version: $Revision: 1.1.2.1 $ 
+Date: $Date: 2009-12-02 09:18:45 $ 
+Version: $Revision: 1.1.2.2 $ 
 Authors: Eleonora Mambrini
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -66,6 +66,7 @@ public:
     ID_SLICECAMERA_AUTOFOCUS,
     ID_SLICECAMERA_AUTOROTATE,
     ID_SLICECAMERA_NAVIGATE_3D,
+    ID_ENABLE_GPU,
     ID_LAST
   };
 
@@ -129,6 +130,9 @@ protected:
   // text stuff
   vtkActor2D    *m_TextActor;
   vtkTextMapper	*m_TextMapper;  
+
+  // Added by Losi 11.25.2009
+  int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
 
 public:
   /*virtual*/ mafView *Copy(mafObserver *Listener);
@@ -251,5 +255,6 @@ protected:
 
   /** handles the change of the visibility of gizmo status text */
   virtual void OnShowGizmoCoords();
+
 };
 #endif

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-22 17:52:38 $
-  Version:   $Revision: 1.17.2.1 $
+  Date:      $Date: 2009-12-02 09:18:45 $
+  Version:   $Revision: 1.17.2.2 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -67,6 +67,7 @@ public:
     ID_BORDER_CHANGE,
     ID_ALL_SURFACE,
     ID_RESET_SLICES,
+    ID_ENABLE_GPU,
     ID_LAST
   };
 
@@ -152,5 +153,8 @@ protected:
   vtkLookupTable  *m_Lut; 
 
   mafGUILutSwatch    *m_LutWidget;
+
+  // Added by Losi 11.25.2009
+  int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
 };
 #endif

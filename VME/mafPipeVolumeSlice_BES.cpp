@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 15:48:46 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-12-02 09:18:04 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -695,8 +695,8 @@ mafGUI *mafPipeVolumeSlice_BES::CreateGui()
 		}
 	}
 	m_Gui->Divider();
-  m_Gui->Bool(ID_ENABLE_GPU, "Enable GPU", &m_EnableGPU, 1, 
-    _("Enables / disables GPU support for slicing. GPU slicing is typically faster but may produce wrong results on some hardware."));
+//   m_Gui->Bool(ID_ENABLE_GPU, "Enable GPU", &m_EnableGPU, 1, 
+//     _("Enables / disables GPU support for slicing. GPU slicing is typically faster but may produce wrong results on some hardware."));
   return m_Gui;
 }
 //----------------------------------------------------------------------------
@@ -817,3 +817,18 @@ void mafPipeVolumeSlice_BES::UpdateSlice()
     }
   }    
 }
+
+//------------------------------------------------------------------------
+void mafPipeVolumeSlice_BES::SetEnableGPU(int enable)
+//------------------------------------------------------------------------
+{
+  m_EnableGPU = enable;
+  UpdateSlice();
+};
+
+//------------------------------------------------------------------------
+int mafPipeVolumeSlice_BES::GetEnableGPU()
+//------------------------------------------------------------------------
+{
+  return m_EnableGPU;
+};

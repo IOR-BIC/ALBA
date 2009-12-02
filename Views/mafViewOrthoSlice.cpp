@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-03 12:01:11 $
-  Version:   $Revision: 1.61.2.10 $
+  Date:      $Date: 2009-12-02 09:18:45 $
+  Version:   $Revision: 1.61.2.11 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -108,6 +108,9 @@ mafViewOrthoSlice::mafViewOrthoSlice(wxString label)
 
 	m_AllSurface=0;
 	m_Border=1;
+
+  // Added by Losi 11.25.2009
+  m_EnableGPU=1;
 }
 //----------------------------------------------------------------------------
 mafViewOrthoSlice::~mafViewOrthoSlice()
@@ -369,7 +372,24 @@ void mafViewOrthoSlice::OnEvent(mafEventBase *maf_event)
         this->ResetSlicesPosition(m_CurrentVolume);
       }
       break;
-
+      // Added by Losi 11.25.2009
+      case ID_ENABLE_GPU:
+        {
+          if (m_CurrentVolume)
+          {
+            for(int i=0; i<m_NumOfChildView; i++)
+            {
+              mafPipeVolumeSlice_BES *p = NULL;
+              p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+              if (p)
+              {
+                p->SetEnableGPU(m_EnableGPU);
+              }
+            }
+            this->CameraUpdate();
+          }
+        }
+        break;
       default:
         mafViewCompound::OnEvent(maf_event);
     }
@@ -408,6 +428,22 @@ mafGUI* mafViewOrthoSlice::CreateGui()
   {
     m_ChildViewList[i]->GetGui();
   }
+
+  // Added by Losi 11.25.2009
+  if (m_CurrentVolume)
+  {
+    for (int i=0; i<m_NumOfChildView; i++)
+    {
+      mafPipeVolumeSlice_BES *p = NULL;
+      p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume));
+      if (p)
+      {
+        p->SetEnableGPU(m_EnableGPU);
+      }
+    }
+  }
+  m_Gui->Divider(1);
+  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
 
   m_Gui->Divider();
   return m_Gui;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-11 15:03:54 $
-  Version:   $Revision: 1.45.2.6 $
+  Date:      $Date: 2009-12-02 09:18:45 $
+  Version:   $Revision: 1.45.2.7 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -99,6 +99,8 @@ mafViewRXCT::mafViewRXCT(wxString label)
   m_AllSurface=0;
   m_Border=1;
 
+  // Added by Losi 11.25.2009
+  m_EnableGPU=1;
 }
 //----------------------------------------------------------------------------
 mafViewRXCT::~mafViewRXCT()
@@ -635,7 +637,25 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
           this->ResetSlicesPosition(m_CurrentVolume);
         }
         break;
-      
+      // Added by Losi 11.25.2009
+      case ID_ENABLE_GPU:
+        {
+          if (m_CurrentVolume)
+          {
+            for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+            {
+              mafPipeVolumeSlice_BES *p = NULL;
+              p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(m_CurrentVolume));
+              if (p)
+              {
+                p->SetEnableGPU(m_EnableGPU);
+              }
+            }
+            this->CameraUpdate();
+          }
+        }
+        break;
+
       case ID_ALL_SURFACE:
       {
         if(m_AllSurface)
@@ -646,7 +666,6 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
           SetThicknessForAllSurfaceSlices(root);
         }
       }
-
       default:
       mafViewCompound::OnEvent(maf_event);
     }
@@ -700,7 +719,23 @@ mafGUI* mafViewRXCT::CreateGui()
 		(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetGui());
 
   m_Gui->Button(ID_RESET_SLICES,"reset slices","");
-	m_Gui->Divider();
+
+  // Added by Losi 11.25.2009
+  if (((mafVME *)node)->GetOutput()->IsA("mafVMEOutputVolume"))
+  {
+    for(int i=0; i<CT_CHILD_VIEWS_NUMBER; i++)
+    {
+      mafPipeVolumeSlice_BES *p = NULL;
+      p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
+      if (p)
+      {
+        p->SetEnableGPU(m_EnableGPU);
+      }
+    }
+  }
+  m_Gui->Divider(1);
+  m_Gui->Bool(ID_ENABLE_GPU,"Enable GPU",&m_EnableGPU,1);
+
   EnableWidgets(m_CurrentVolume != NULL);
 
   return m_Gui;
