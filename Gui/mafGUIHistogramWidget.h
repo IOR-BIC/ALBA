@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIHistogramWidget.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-29 14:09:00 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-12-11 11:38:57 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -117,6 +117,10 @@ public:
   mafGUI *GetGui();
 
   void GetThresholds(double *lower, double *upper);
+
+  long int GetHistogramValue(int x, int y);
+
+  double GetHistogramScalarValue(int x, int y);
 
 protected:
 

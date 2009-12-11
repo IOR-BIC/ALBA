@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUIHistogramWidget.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-29 14:09:00 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2009-12-11 11:38:57 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -270,7 +270,19 @@ void mafGUIHistogramWidget::OnEvent( mafEventBase *event )
     }
     else if (ei->GetId() == mafDeviceButtonsPad::BUTTON_DOWN)
     {
-      if (ei->GetButton() == MAF_RIGHT_BUTTON)
+      if (ei->GetButton() == MAF_LEFT_BUTTON && ei->GetModifier(MAF_CTRL_KEY))
+      {
+//         if(m_Histogram->GetInputData() == NULL) return;
+//         double pos[2];
+//         ei->Get2DPosition(pos);
+//         m_HisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
+//         double scalar = m_Histogram->GetScalarValue(pos[0],pos[1]);
+// 
+//         m_HistogramRWI->CameraUpdate();
+
+        mafEventMacro(*event);
+      }
+      else if (ei->GetButton() == MAF_RIGHT_BUTTON)
       {
         double pos[2];
         m_Dragging = true;
@@ -413,4 +425,16 @@ void mafGUIHistogramWidget::ResetHistogram()
   }
 
   UpdateGui();
+}
+//----------------------------------------------------------------------------
+double mafGUIHistogramWidget::GetHistogramScalarValue(int x, int y)
+//----------------------------------------------------------------------------
+{
+  return m_Histogram->GetScalarValue(x,y);
+}
+//----------------------------------------------------------------------------
+long int mafGUIHistogramWidget::GetHistogramValue(int x, int y)
+//----------------------------------------------------------------------------
+{
+  return m_Histogram->GetHistogramValue(x,y);
 }
