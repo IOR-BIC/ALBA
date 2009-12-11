@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-13 14:26:35 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2009-12-11 10:05:52 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -58,7 +58,10 @@ MafMedical is partially based on OpenMAF.
 #include "mafGUIHistogramWidget.h"
 #include "mafGUIDialog.h"
 #include "medOpVolumeResample.h"
+#include "mafDeviceButtonsPad.h"
+#include "mafEventInteraction.h"
 
+#include "vtkMath.h"
 #include "vtkMAFSmartPointer.h"
 #include "vtkMEDRegionGrowingLocalGlobalThreshold.h"
 #include "vtkImageData.h"
@@ -67,6 +70,8 @@ MafMedical is partially based on OpenMAF.
 #include "vtkImageToStructuredPoints.h"
 #include "vtkPolyDataConnectivityFilter.h"
 #include "vtkImageMedian3D.h"
+#include "vtkImageAccumulate.h"
+#include "vtkImageCast.h"
 #include "vtkMAFContourVolumeMapper.h"
 #include "vtkMAFHistogram.h"
 
@@ -75,19 +80,24 @@ MafMedical is partially based on OpenMAF.
 #include "itkBinaryErodeImageFilter.h"
 #include "itkBinaryDilateImageFilter.h"
 #include "itkBinaryBallStructuringElement.h"
+#include "itkAdaptiveHistogramEqualizationImageFilter.h"
 
 const unsigned int Dimension = 3;
 
-typedef unsigned char   InputPixelType;
-typedef unsigned char   OutputPixelType;
+typedef unsigned char InputPixelType;
+typedef unsigned char OutputPixelType;
+typedef float InputPixelTypeFloat;
 
 typedef itk::Image< InputPixelType,  Dimension >   InputImageType;
+typedef itk::Image< InputPixelTypeFloat,  Dimension >   InputImageTypeFloat;
 typedef itk::Image< OutputPixelType, Dimension >   OutputImageType;
 
 typedef itk::BinaryBallStructuringElement< InputPixelType,Dimension  > StructuringElementType;
 
 typedef itk::BinaryDilateImageFilter< InputImageType,OutputImageType,StructuringElementType >  DilateFilterType;
 typedef itk::BinaryErodeImageFilter< InputImageType,OutputImageType,StructuringElementType >  ErodeFilterType;
+
+typedef itk::AdaptiveHistogramEqualizationImageFilter<InputImageTypeFloat> HistogramEqualizationType;
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpSegmentationRegionGrowingLocalAndGlobalThreshold);
@@ -118,6 +128,13 @@ mafOp(label)
   m_Dialog = NULL;
 
   m_ComputedMedianFilter = false;
+
+  m_Point1 = _("Point 1");
+  m_Point2 = _("Point 2");
+  m_Point3 = _("Point 3");
+  m_Point4 = _("Point 4");
+
+  m_CurrentPoint = 0;
   
 }
 //----------------------------------------------------------------------------
@@ -158,7 +175,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 
   vtkStructuredPoints *sp = vtkStructuredPoints::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
-  if (sp == NULL || im == NULL)
+  if (sp == NULL && im == NULL)
   {
     int answer = wxMessageBox(_("The data will be resampled! Proceed?"),_("Confirm"), wxYES_NO|wxICON_EXCLAMATION , NULL);
     if(answer == wxNO)
@@ -220,7 +237,8 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OpRun()
 
   vtkNEW(m_SegmentedImage);
   vtkNEW(m_MorphoImage);
-
+  
+  //HistogramEqualization();
   CreateGui();
   CreateHistogramDialog();
 }
@@ -316,6 +334,8 @@ enum REGION_GROWING_ID
   ID_MORPHOLOGICAL,
   ID_APPLY_MEDIAN_FILTER,
   ID_DIALOG_HISTOGRAM,
+  ID_FITTING,
+  ID_DIALOG_OK,
 };
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
@@ -335,7 +355,23 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
 //   m_Gui->Add(sizer3,1);
 
   m_Gui->Button(ID_DIALOG_HISTOGRAM,_("Select points"));
-
+  m_Gui->Label(&m_Point1,false,true);
+  m_Gui->Label(&m_Point2,false,true);
+  m_Gui->Label(&m_Point3,false,true);
+  m_Gui->Label(&m_Point4,false,true);
+  m_SoftParam1 = "";
+  m_SoftParam2 = "";
+  m_SoftParam3 = "";
+  m_Gui->Label(&m_SoftParam1,false,true);
+  m_Gui->Label(&m_SoftParam2,false,true);
+  m_Gui->Label(&m_SoftParam3,false,true);
+  m_BoneParam1 = "";
+  m_BoneParam2 = "";
+  m_BoneParam3 = "";
+  m_Gui->Label(&m_BoneParam1,false,true);
+  m_Gui->Label(&m_BoneParam2,false,true);
+  m_Gui->Label(&m_BoneParam3,false,true);
+  //m_Gui->Button(ID_FITTING,_("Fitting"));
   m_Gui->Divider(1);
 
   m_GuiLabels = new mafGUI(this);
@@ -375,13 +411,67 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   ShowGui();
 }
 //----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::HistogramEqualization()
+//----------------------------------------------------------------------------
+{
+  vtkImageData *im = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  im->Update();
+
+  vtkMAFSmartPointer<vtkImageCast> vtkImageToFloat;
+  vtkImageToFloat->SetOutputScalarTypeToFloat ();
+  vtkImageToFloat->SetInput(im);
+  vtkImageToFloat->Modified();
+  vtkImageToFloat->Update();
+
+  typedef itk::VTKImageToImageFilter< InputImageTypeFloat > ConvertervtkTOitk;
+  ConvertervtkTOitk::Pointer vtkTOitk = ConvertervtkTOitk::New();
+  vtkTOitk->SetInput( vtkImageToFloat->GetOutput() );
+  vtkTOitk->Update();
+
+  HistogramEqualizationType::Pointer histeqFilter = HistogramEqualizationType::New();
+
+  //provide minimum info
+  histeqFilter->GetOutput()->ReleaseDataFlagOn(); 
+  HistogramEqualizationType::ImageSizeType radius;
+  radius[0] = 100;
+  radius[1] = 100;
+  radius[2] = 100;
+  radius.Fill(0);
+  histeqFilter->SetRadius(radius);   
+  histeqFilter->SetAlpha(0);
+//   histeqFilter->SetBeta(0); 
+  histeqFilter->SetInput(vtkTOitk->GetOutput());
+  histeqFilter->Update();
+  //   rescaleFilter->SetInput(histeqFilter->GetOutput());
+  //   rescaleFilter->Update();
+
+  typedef itk::ImageToVTKImageFilter< InputImageTypeFloat > ConverteritkTOvtk;
+  ConverteritkTOvtk::Pointer itkTOvtk = ConverteritkTOvtk::New();
+  itkTOvtk->SetInput( histeqFilter->GetOutput() );
+  itkTOvtk->Update();
+
+  vtkImageData *imout;
+  vtkNEW(imout);
+  imout->DeepCopy(itkTOvtk->GetOutput());
+  imout->Update();
+
+  mafVMEVolumeGray *v;
+  mafNEW(v);
+  v->SetData(imout,0.0);
+  v->ReparentTo(m_VolumeInput);
+  v->Update();
+
+//   m_VolumeInput->SetData(itkTOvtk->GetOutput(),0.0);
+//   m_VolumeInput->Update();
+}
+//----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialog()
 //----------------------------------------------------------------------------
 {
   m_Dialog = new mafGUIDialog("Histogram", mafCLOSEWINDOW | mafRESIZABLE);
 
   m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL,true);
-  m_Histogram->SetListener(m_Gui);
+  m_Histogram->SetListener(this);
   m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   hd->Update();
@@ -390,6 +480,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialo
   mafGUI *gui = new mafGUI(this);
   gui->Add(m_Histogram,1);
   gui->AddGui(m_Histogram->GetGui());
+  gui->Button(ID_DIALOG_OK,_("OK"));
   gui->FitGui();
   gui->Update();
 
@@ -397,13 +488,218 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialo
   m_Dialog->SetMinSize(wxSize(600,600));
 }
 //----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::ComputeParam()
+//----------------------------------------------------------------------------
+{
+  double boneParameters[3],softIssueParameters[3];
+  double boneStDev = (double)(m_Point1Value-m_Point2Value)/3;
+  double boneMean = (double)m_Point1Value;
+  double softIssueStDev = (double)(m_Point3Value-m_Point4Value)/3;
+  double softIssueMean = (double)m_Point3Value;
+  boneParameters[0] = 1/(boneStDev*sqrt(2*vtkMath::Pi()));
+  boneParameters[1] = boneMean;
+  boneParameters[2] = sqrt(2.0)*boneStDev;
+
+  softIssueParameters[0] = 1/(softIssueStDev*sqrt(2*vtkMath::Pi()));
+  softIssueParameters[1] = softIssueMean;
+  softIssueParameters[2] = sqrt(2.0)*softIssueStDev;
+
+  m_BoneParam1 = "bone " + mafString(boneParameters[0]);
+  m_BoneParam2 = "bone " + mafString(boneParameters[1]);
+  m_BoneParam3 = "bone " + mafString(boneParameters[2]);
+
+  m_SoftParam1 = "soft " + mafString(softIssueParameters[0]);
+  m_SoftParam2 = "soft " + mafString(softIssueParameters[1]);
+  m_SoftParam3 = "soft " + mafString(softIssueParameters[2]);
+
+  m_Gui->Update();
+}
+//----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles()
+//----------------------------------------------------------------------------
+{
+  vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  hd->Update();
+  double sr[2];
+  hd->GetScalarRange(sr);
+  double srw = sr[1]-sr[0];
+
+  vtkMAFSmartPointer<vtkImageData> imageData;
+  imageData->SetDimensions(hd->GetPointData()->GetScalars()->GetNumberOfTuples(),1,1);
+  imageData->SetScalarType(hd->GetPointData()->GetScalars()->GetDataType());
+  imageData->GetPointData()->SetScalars(hd->GetPointData()->GetScalars());
+  imageData->Update();
+  imageData->GetScalarRange(sr);
+
+  vtkMAFSmartPointer<vtkImageAccumulate> accumulate;
+  accumulate->SetInput(imageData);
+  accumulate->SetComponentOrigin(sr[0],0,0);  
+  accumulate->SetComponentExtent(0,srw,0,0,0,0);
+  accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
+  accumulate->Update();
+
+  wxString newDir = (mafGetApplicationDirectory()).c_str();
+  wxString oldDir = wxGetCwd();
+  wxSetWorkingDirectory(newDir);
+
+  double *x = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
+  double *y = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
+
+  ofstream xFile;
+  xFile.open("x.txt");
+  ofstream yFile;
+  yFile.open("y.txt");
+  xFile<<"[";
+  yFile<<"[";
+  for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
+  {
+    x[i] = i + sr[0];
+    y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
+
+    xFile<<x[i];
+    yFile<<y[i];
+    if (i != accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()-1)
+    {
+      xFile<<",";
+      yFile<<",";
+    }
+  }
+
+  xFile<<"]";
+  xFile.close();
+
+  yFile<<"]";
+  yFile.close();
+
+  wxSetWorkingDirectory(oldDir);
+}
+//----------------------------------------------------------------------------
+void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::FittingLM()
+//----------------------------------------------------------------------------
+{
+  double boneParameters[3],softIssueParameters[3];
+  double boneStDev = (double)(m_Point1Value-m_Point2Value)/3;
+  double boneMean = (double)m_Point1Value;
+  double softIssueStDev = (double)(m_Point3Value-m_Point4Value)/3;
+  double softIssueMean = (double)m_Point3Value;
+  boneParameters[0] = 1/(boneStDev*sqrt(2*vtkMath::Pi()));
+  boneParameters[1] = boneMean;
+  boneParameters[2] = sqrt(2.0)*boneStDev;
+
+  softIssueParameters[0] = 1/(softIssueStDev*sqrt(2*vtkMath::Pi()));
+  softIssueParameters[1] = softIssueMean;
+  softIssueParameters[2] = sqrt(2.0)*softIssueStDev;
+
+  vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
+  hd->Update();
+  double sr[2];
+  hd->GetScalarRange(sr);
+  double srw = sr[1]-sr[0];
+
+  vtkMAFSmartPointer<vtkImageData> imageData;
+  imageData->SetDimensions(hd->GetPointData()->GetScalars()->GetNumberOfTuples(),1,1);
+  imageData->SetScalarType(hd->GetPointData()->GetScalars()->GetDataType());
+  imageData->GetPointData()->SetScalars(hd->GetPointData()->GetScalars());
+  imageData->Update();
+  imageData->GetScalarRange(sr);
+
+  vtkMAFSmartPointer<vtkImageAccumulate> accumulate;
+  accumulate->SetInput(imageData);
+  accumulate->SetComponentOrigin(sr[0],0,0);  
+  accumulate->SetComponentExtent(0,srw,0,0,0,0);
+  accumulate->SetComponentSpacing(1,0,0); // bins maps all the Scalars Range
+  accumulate->Update();
+
+  wxString newDir = (mafGetApplicationDirectory()).c_str();
+  wxString oldDir = wxGetCwd();
+  wxSetWorkingDirectory(newDir);
+
+  wxString command = "python.exe lm.py";
+  command.Append(" ");
+  command.Append(wxString::Format("%.3f",boneParameters[0]));
+  command.Append(" ");
+  command.Append(wxString::Format("%.3f",boneParameters[1]));
+  command.Append(" ");
+  command.Append(wxString::Format("%.3f",boneParameters[2]));
+  
+  WriteHistogramFiles();
+
+  mafLogMessage(command.c_str());
+  wxExecute(command,wxEXEC_SYNC);
+
+  command = "python.exe lm.py";
+  command.Append(" ");
+  command.Append(wxString::Format("%.3f",softIssueParameters[0]));
+  command.Append(" ");
+  command.Append(wxString::Format("%.3f",softIssueParameters[1]));
+  command.Append(" ");
+  command.Append(wxString::Format("%.3f",softIssueParameters[2]));
+
+  mafLogMessage(command.c_str());
+  //wxExecute(command,wxEXEC_SYNC);
+
+  wxSetWorkingDirectory(oldDir);
+}
+//----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
 {
+  if (mafEventInteraction *ei = mafEventInteraction::SafeDownCast(maf_event))
+  {
+    if (ei->GetId() == mafDeviceButtonsPad::BUTTON_DOWN && ei->GetButton() == MAF_LEFT_BUTTON && ei->GetModifier(MAF_CTRL_KEY))
+    {
+      //         if(m_Histogram->GetInputData() == NULL) return;
+      double pos[2];
+      ei->Get2DPosition(pos);
+      int hisctogramValue = m_Histogram->GetHistogramValue(pos[0],pos[1]);
+      double scalar = m_Histogram->GetHistogramScalarValue(pos[0],pos[1]);
+
+      if (m_CurrentPoint % 4 == 0)
+      {
+        m_Point1 = wxString::Format("Point 1 (bone median): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point1Value = scalar;
+      }
+      if (m_CurrentPoint % 4 == 1)
+      {
+        m_Point2 = wxString::Format("Point 2 (bone dev): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point2Value = scalar;
+      }
+      if (m_CurrentPoint % 4 == 2)
+      {
+        m_Point3 = wxString::Format("Point 3 (soft median): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point3Value = scalar;
+      }
+      if (m_CurrentPoint % 4 == 3)
+      {
+        m_Point4 = wxString::Format("Point 4 (soft dev): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point4Value = scalar;
+
+        ComputeParam();
+        WriteHistogramFiles();
+      }
+
+      m_CurrentPoint++;
+
+      m_Gui->Update();
+
+      return;
+    }
+  }
+
   if (mafEvent *e = mafEvent::SafeDownCast(maf_event))
   {
     switch(e->GetId())
     {
+    case ID_DIALOG_OK:
+      {
+        m_Dialog->EndModal(wxID_OK);
+      }
+      break;
+    case ID_FITTING:
+      {
+        FittingLM();
+      }
+      break;
     case ID_DIALOG_HISTOGRAM:
       {
         m_Dialog->ShowModal();

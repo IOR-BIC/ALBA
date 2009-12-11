@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-11-13 14:26:35 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2009-12-11 10:05:52 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -106,7 +106,25 @@ protected:
   /** Perform the morphological closing operation */
   void MorphologicalMathematics();
 
+  /** Execute the fitting with Levenberg-Marquet algorithm */
+  void FittingLM();
+
+  void HistogramEqualization();
+
+  void ComputeParam();
+
+  void WriteHistogramFiles();
+
   //GUI Stuff
+  mafString m_Point1;
+  double m_Point1Value;
+  mafString m_Point2;
+  double m_Point2Value;
+  mafString m_Point3;
+  double m_Point3Value;
+  mafString m_Point4;
+  double m_Point4Value;
+  int m_CurrentPoint;
   double m_LowerLabel;
   double m_UpperLabel;
   int m_SphereRadius;
@@ -114,6 +132,15 @@ protected:
   mafGUILutSlider *m_SliderLabels;
   mafGUILutSlider *m_SliderThresholds;
   mafGUI *m_GuiLabels;
+  int m_SoftParam1Value;
+  int m_SoftParam2Value;
+  int m_SoftParam3Value;
+  mafString m_SoftParam1;
+  mafString m_SoftParam2;
+  mafString m_SoftParam3;
+  mafString m_BoneParam1;
+  mafString m_BoneParam2;
+  mafString m_BoneParam3;
 
   bool m_ComputedMedianFilter;
   mafGUIHistogramWidget *m_Histogram;
