@@ -88,6 +88,10 @@ ENDIF (MED_USE_Offis)
 ADD_EXECUTABLE(itkRawMotionImporterUtilityTest itkRawMotionImporterUtilityTest.h itkRawMotionImporterUtilityTest.cpp)
 ADD_TEST(itkRawMotionImporterUtilityTest ${EXECUTABLE_OUTPUT_PATH}/itkRawMotionImporterUtilityTest)
 
+ADD_EXECUTABLE(medOpMakeVMETimevaryingTest medOpMakeVMETimevaryingTest.h medOpMakeVMETimevaryingTest.cpp)
+ADD_TEST(medOpMakeVMETimevaryingTest ${EXECUTABLE_OUTPUT_PATH}/medOpMakeVMETimevaryingTest)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
