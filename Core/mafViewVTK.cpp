@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewVTK.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:14 $
-  Version:   $Revision: 1.79.2.1 $
+  Date:      $Date: 2009-12-16 09:52:51 $
+  Version:   $Revision: 1.79.2.2 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -511,4 +511,11 @@ void mafViewVTK::Print(std::ostream& os, const int tabs)// const
   
   m_Sg->Print(os, 1);
   os << std::endl;
+}
+
+//-------------------------------------------------------------------------
+int mafViewVTK::GetCameraPosition()
+//-------------------------------------------------------------------------
+{
+   return m_CameraPositionId;
 }
