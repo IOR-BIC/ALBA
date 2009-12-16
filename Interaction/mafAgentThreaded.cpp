@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAgentThreaded.cpp,v $
   Language:  C++
-  Date:      $Date: 2007-03-09 11:35:13 $
-  Version:   $Revision: 1.10 $
+  Date:      $Date: 2009-12-16 09:51:22 $
+  Version:   $Revision: 1.10.6.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -204,6 +204,7 @@ void mafAgentThreaded::AsyncInvokeEvent(mafEventBase *event, mafID channel)
   copy_of_event->DeepCopy(event);
   copy_of_event->SetChannel(channel);
   PushEvent(AGENT_ASYNC_DISPATCH,this,copy_of_event); // this make a copy of the event
+  mafDEL(copy_of_event);
 }
 
 //------------------------------------------------------------------------------
