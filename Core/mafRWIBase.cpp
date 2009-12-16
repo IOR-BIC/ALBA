@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafRWIBase.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-29 14:11:52 $
-  Version:   $Revision: 1.33.2.3 $
+  Date:      $Date: 2009-12-16 09:48:55 $
+  Version:   $Revision: 1.33.2.4 $
   Authors:   Silvano Imboden - Paolo Quadrani - Daniele Giunchi (Save Image)
 ==========================================================================
   Copyright (c) 2002/2004
@@ -890,6 +890,8 @@ void mafRWIBase::SaveImage(mafString filename, int magnification , int forceExte
   {
     vtkMAFSmartPointer<vtkPNGWriter> w;
     w->SetInput(w2i->GetOutput());
+    w->SetPixelPerMeterX(pixelXMeterX);
+    w->SetPixelPerMeterY(pixelXMeterY);
     w->SetFileName(filename.GetCStr());
     w->Write();
   }
@@ -1134,6 +1136,8 @@ void mafRWIBase::RecursiveSaving(mafString filename, mafViewCompound *v,int magn
       {
         vtkMAFSmartPointer<vtkPNGWriter> w;
         w->SetInput(w2i->GetOutput());
+        w->SetPixelPerMeterX(pixelXMeterX);
+        w->SetPixelPerMeterY(pixelXMeterY);
         w->SetFileName(temp.c_str());
         w->Write();
       }
