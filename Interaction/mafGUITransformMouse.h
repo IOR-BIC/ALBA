@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-16 13:32:13 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2009-12-16 09:52:27 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -40,6 +40,7 @@ class mafVME;
 class mafGUITransformMouse : public mafGUITransformInterface
 {
 public:
+
   mafGUITransformMouse(mafVME *input, mafObserver *listener = NULL);
 	~mafGUITransformMouse(); 
 
@@ -58,7 +59,7 @@ public:
     NORMAL_SURFACE,
   };
 
-  void OnEvent(mafEventBase *maf_event);
+  virtual void OnEvent(mafEventBase *maf_event);
 
   /** Override superclass */
 	void EnableWidgets(bool enable);
@@ -84,6 +85,7 @@ public:
   mmiGenericMouse* CreateBehavior(MMI_ACTIVATOR activator);
 
 protected:  
+
   mafInteractor* m_OldInteractor;
    
   /** Create interactors */
