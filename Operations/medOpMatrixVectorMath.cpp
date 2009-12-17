@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMatrixVectorMath.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-22 08:09:05 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2009-12-17 12:31:15 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Nigel McFarlane
 ==========================================================================
 Copyright (c) 2002/2004
@@ -724,20 +724,20 @@ void medOpMatrixVectorMath::Transpose2DArray(const double arr1[3][3], double arr
   double temp[4][4] ;
 
   if (m_Homogeneous){
+    /*for (int i = 0 ;  i < 4 ;  i++)
+      for (int j = 0 ;  j < 4 ;  j++)
+        temp[i][j] = arr1[j][i] ;*/
     for (int i = 0 ;  i < 4 ;  i++)
       for (int j = 0 ;  j < 4 ;  j++)
-        temp[i][j] = arr1[j][i] ;
-    for (int i = 0 ;  i < 4 ;  i++)
-      for (int j = 0 ;  j < 4 ;  j++)
-        arr2[i][j] = temp[j][i] ;
+        arr2[i][j] = arr1[j][i] ;
   }
   else{
+    /*for (int i = 0 ;  i < 3 ;  i++)
+      for (int j = 0 ;  j < 3 ;  j++)
+        temp[i][j] = arr1[j][i] ;*/
     for (int i = 0 ;  i < 3 ;  i++)
       for (int j = 0 ;  j < 3 ;  j++)
-        temp[i][j] = arr1[j][i] ;
-    for (int i = 0 ;  i < 3 ;  i++)
-      for (int j = 0 ;  j < 3 ;  j++)
-        arr2[i][j] = temp[j][i] ;
+        arr2[i][j] = arr1[j][i] ;
   }
 }
 
