@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 10:32:50 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2009-12-17 12:30:11 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -54,7 +54,7 @@ MafMedical is partially based on OpenMAF.
 class mafRWI;
 class mafNode;
 class mafGUIDialog;
-class mmiSelectCell;
+class mafInteractorSelectCell;
 
 class vtkActor;
 class vtkPolyData;
@@ -143,7 +143,7 @@ protected:
 	mafRWI							*m_Rwi;
 	vtkPolyDataMapper		*m_PolydataMapper;
 	vtkActor						*m_PolydataActor;
-	mmiSelectCell				*m_SelectCellInteractor;
+	mafInteractorSelectCell				*m_SelectCellInteractor;
 	vtkMAFCellsFilter			*m_CellFilter;
 	vtkPolyData					*m_Mesh;
 

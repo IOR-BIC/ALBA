@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:12:22 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-12-17 12:30:11 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -51,7 +51,7 @@ MafMedical is partially based on OpenMAF.
 class vtkMeshQuality;
 class mafGUIDialog;
 class mafRWI;
-class mmiCameraMove;
+class mafInteractorCameraMove;
 class vtkPolyDataMapper;
 class vtkActor;
 class vtkScalarBarActor;
@@ -91,7 +91,7 @@ protected:
 
 	mafGUIDialog								*m_Dialog;
 	mafRWI									*m_Rwi;
-	mmiCameraMove						*m_Picker;
+	mafInteractorCameraMove						*m_Picker;
 	vtkPolyDataMapper				*m_Mapper;
 	vtkActor								*m_Actor;
 	vtkScalarBarActor				*m_BarActor;

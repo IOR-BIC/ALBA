@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpMove.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-11 09:47:55 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2009-12-17 12:30:11 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,7 @@
 #include "mafGUITransformTextEntries.h"
 #include "mafVMELandmark.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafSmartPointer.h"
 #include "mafTransform.h"
@@ -303,27 +303,27 @@ void medOpMove::OnEventThis(mafEventBase *maf_event)
     case ID_ENABLE_STEP:
       if (m_EnableStep != 0)
       {
-        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,mmiConstraint::SNAP_STEP);
-        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,mmiConstraint::SNAP_STEP);
-        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,mmiConstraint::SNAP_STEP);
+        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,mafInteractorConstraint::SNAP_STEP);
+        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,mafInteractorConstraint::SNAP_STEP);
+        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,mafInteractorConstraint::SNAP_STEP);
         m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetStep(0,m_RotationStep);
         m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetStep(1,m_RotationStep);
         m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetStep(2,m_RotationStep);
-        m_GizmoTranslate->SetConstraintModality(0,mmiConstraint::SNAP_STEP);
-        m_GizmoTranslate->SetConstraintModality(1,mmiConstraint::SNAP_STEP);
-        m_GizmoTranslate->SetConstraintModality(2,mmiConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(0,mafInteractorConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(1,mafInteractorConstraint::SNAP_STEP);
+        m_GizmoTranslate->SetConstraintModality(2,mafInteractorConstraint::SNAP_STEP);
         m_GizmoTranslate->SetStep(0,m_TranslationStep);
         m_GizmoTranslate->SetStep(1,m_TranslationStep);
         m_GizmoTranslate->SetStep(2,m_TranslationStep);
       }
       else
       {
-        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,mmiConstraint::FREE);
-        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,mmiConstraint::FREE);
-        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,mmiConstraint::FREE);
-        m_GizmoTranslate->SetConstraintModality(0,mmiConstraint::FREE);
-        m_GizmoTranslate->SetConstraintModality(1,mmiConstraint::FREE);
-        m_GizmoTranslate->SetConstraintModality(2,mmiConstraint::FREE);
+        m_GizmoRotate->GetInteractor(0)->GetRotationConstraint()->SetConstraintModality(0,mafInteractorConstraint::FREE);
+        m_GizmoRotate->GetInteractor(1)->GetRotationConstraint()->SetConstraintModality(1,mafInteractorConstraint::FREE);
+        m_GizmoRotate->GetInteractor(2)->GetRotationConstraint()->SetConstraintModality(2,mafInteractorConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(0,mafInteractorConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(1,mafInteractorConstraint::FREE);
+        m_GizmoTranslate->SetConstraintModality(2,mafInteractorConstraint::FREE);
       }
     break;
     // move this to opgui; both gizmos and gui should know ref sys

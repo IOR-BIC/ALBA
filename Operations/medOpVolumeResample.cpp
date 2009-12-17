@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-30 10:50:11 $
-  Version:   $Revision: 1.12.2.6 $
+  Date:      $Date: 2009-12-17 12:30:11 $
+  Version:   $Revision: 1.12.2.7 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafTransform.h"
 #include "mafTransformFrame.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkMAFVolumeResample.h"

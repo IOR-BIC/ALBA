@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-05 11:50:42 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2009-12-17 12:27:54 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -14,7 +14,7 @@
 #ifndef mmiVTKPicker_h__
 #define mmiVTKPicker_h__
 
-#include "mmiCameraMove.h"
+#include "mafInteractorCameraMove.h"
 
 class vtkCellPicker;
 
@@ -43,10 +43,10 @@ Bool = true
 VtkObj = reference to vtkPoints containing the new position of
 point picked during CTRL + left mouse down  
 */
-class mmiVTKPicker : public mmiCameraMove
+class mmiVTKPicker : public mafInteractorCameraMove
 {
 public:
-  mafTypeMacro(mmiVTKPicker,mmiCameraMove);
+  mafTypeMacro(mmiVTKPicker,mafInteractorCameraMove);
 
   /** Enables/disables continuous picking */
   inline void SetContinuousPicking(bool bValue) {

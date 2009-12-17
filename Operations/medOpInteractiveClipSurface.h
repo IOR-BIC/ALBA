@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-31 09:25:26 $
-  Version:   $Revision: 1.7 $
+  Date:      $Date: 2009-12-17 12:30:11 $
+  Version:   $Revision: 1.7.2.1 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,8 +26,8 @@
 // forward references :
 //----------------------------------------------------------------------------
 class mafEvent;
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 class mafVMESurface;
 class mafVMEGizmo;
 class mafVME;
@@ -156,13 +156,13 @@ protected:
 	vtkMAFClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
-  mmiCompositorMouse *m_IsaCompositor;
-  mmiGenericMouse    *m_IsaTranslate;
-	mmiGenericMouse		 *m_IsaChangeArrowWithoutGizmo;
-	mmiGenericMouse		 *m_IsaClipWithoutGizmo;
-	mmiCompositorMouse *m_IsaCompositorWithArrowGizmo;
-	mmiGenericMouse		 *m_IsaChangeArrowWithGizmo;
-	mmiGenericMouse		 *m_IsaClipWithGizmo;
+  mafInteractorCompositorMouse *m_IsaCompositor;
+  mafInteractorGenericMouse    *m_IsaTranslate;
+	mafInteractorGenericMouse		 *m_IsaChangeArrowWithoutGizmo;
+	mafInteractorGenericMouse		 *m_IsaClipWithoutGizmo;
+	mafInteractorCompositorMouse *m_IsaCompositorWithArrowGizmo;
+	mafInteractorGenericMouse		 *m_IsaChangeArrowWithGizmo;
+	mafInteractorGenericMouse		 *m_IsaClipWithGizmo;
 
   vtkPolyData *m_OldSurface;
 	std::vector<vtkPolyData*> m_ResultPolyData;

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiDICOMImporterInteractor.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:41:18 $
-  Version:   $Revision: 1.1.1.1.8.1 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.1.1.1.8.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -13,7 +13,7 @@
 #ifndef __mmiDICOMImporterInteractor_h
 #define __mmiDICOMImporterInteractor_h
 
-#include "mmiCameraMove.h"
+#include "mafInteractorCameraMove.h"
 #include "mafMTime.h"
 
 //----------------------------------------------------------------------------
@@ -25,10 +25,10 @@ class vtkCamera;
   This class implements a mouse move of the renderer camera in the scene. The interaction
   modality is a mouse manipulation, where movements of the mouse are mapped
   into movements of the camera. More details to be written...*/
-class mmiDICOMImporterInteractor : public mmiCameraMove
+class mmiDICOMImporterInteractor : public mafInteractorCameraMove
 {
 public:
-  mafTypeMacro(mmiDICOMImporterInteractor,mmiCameraMove);
+  mafTypeMacro(mmiDICOMImporterInteractor,mafInteractorCameraMove);
 
   /** Start the interaction with the selected object */
   virtual int StartInteraction(mafDeviceButtonsPadMouse *mouse);

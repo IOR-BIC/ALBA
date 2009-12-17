@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:19:42 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2009-12-17 12:31:39 $
+  Version:   $Revision: 1.13.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,7 +22,7 @@ class mafGUICheckListBox;
 class mafGUIFloatSlider;
 class mafGUIDialogPreview;
 class mafRWI;
-class mmiExtractIsosurface;
+class mafInteractorExtractIsosurface;
 class mafVMEVolumeGray;
 class mafDataPipeCustom;
 

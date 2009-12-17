@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMELabeledVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-08 15:48:15 $
-  Version:   $Revision: 1.23 $
+  Date:      $Date: 2009-12-17 12:31:39 $
+  Version:   $Revision: 1.23.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005
@@ -32,7 +32,7 @@
 #include "mafGUIButton.h"
 #include "mafGUIValidator.h"
 #include "mafGUICheckListBox.h"
-#include "mmiExtractIsosurface.h"
+#include "mafInteractorExtractIsosurface.h"
 #include "mafRWIBase.h"
 #include "mafRWI.h"
 #include "mafGUIFloatSlider.h"

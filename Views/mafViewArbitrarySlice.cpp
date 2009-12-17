@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewArbitrarySlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-08-24 12:14:22 $
-  Version:   $Revision: 1.38.2.6 $
+  Date:      $Date: 2009-12-17 12:31:02 $
+  Version:   $Revision: 1.38.2.7 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
 #include "mafEvent.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafAttachCamera.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafVMESlicer.h"
 #include "mafTagArray.h"
 #include "mmaMaterial.h"
@@ -867,7 +867,7 @@ void mafViewArbitrarySlice::PostMultiplyEventMatrix(mafEventBase *maf_event)
     absPose.DeepCopy(tr->GetMatrix());
     absPose.SetTimeStamp(m_Slicer->GetTimeStamp());
 
-    if (arg == mmiGenericMouse::MOUSE_MOVE)
+    if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
     {
       // move vme
       ((mafVME *)m_Slicer)->SetAbsMatrix(absPose);

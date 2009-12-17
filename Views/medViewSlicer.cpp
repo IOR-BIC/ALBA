@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medViewSlicer.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-07-23 07:10:38 $
-  Version:   $Revision: 1.14.2.2 $
+  Date:      $Date: 2009-12-17 12:31:02 $
+  Version:   $Revision: 1.14.2.3 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -39,7 +39,7 @@
 #include "mafEvent.h"
 #include "mafAbsMatrixPipe.h"
 #include "mafAttachCamera.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafVMESlicer.h"
 #include "mafTagArray.h"
 #include "mmaMaterial.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGUILandmark.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-15 14:11:22 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2009-12-17 12:25:30 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,9 +24,9 @@
 //----------------------------------------------------------------------------
 class mafGUI;
 class mafGUIButton;
-class mmiGenericMouse;
-class mmiCompositorMouse;
-class mmiPicker;
+class mafInteractorGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorPicker;
 class mafInteractor;
 class mafVMELandmark;
 class mafVMELandmarkCloud;
@@ -133,10 +133,10 @@ protected:
 //  double m_LMPosition[3];
   
   mafInteractor* m_OldInteractor;
-  mmiPicker  *m_PickerInteractor;
-  mmiCompositorMouse *m_IsaCompositor;
-  mmiGenericMouse *m_IsaTranslate;
-  mmiGenericMouse *m_IsaTranslateSnap;
+  mafInteractorPicker *m_PickerInteractor;
+  mafInteractorCompositorMouse *m_IsaCompositor;
+  mafInteractorGenericMouse *m_IsaTranslate;
+  mafInteractorGenericMouse *m_IsaTranslateSnap;
   mafInteractor *m_OldInputVMEBehavior;
 
   mafObserver *m_Listener;

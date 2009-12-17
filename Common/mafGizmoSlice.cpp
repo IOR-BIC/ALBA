@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-07 09:38:55 $
-  Version:   $Revision: 1.21.2.4 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.21.2.5 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,8 +25,8 @@
 #include "mmaMaterial.h"
 #include "mafGUIMaterialButton.h"
 
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafTransform.h"
 #include "mafSmartPointer.h"
@@ -194,7 +194,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 
 	  this->InitSnapArray(m_InputVME,axis);
     m_MouseBH->GetTranslationConstraint()->SetSnapArray(axis, m_SnapArray);
-    m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, mmiConstraint::BOUNDS);
+    m_MouseBH->GetTranslationConstraint()->SetConstraintModality(axis, mafInteractorConstraint::BOUNDS);
 
 	  switch(axis)
 	  {
@@ -206,7 +206,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 				if(wy<0.00001) wy=-10;
 			  ps->SetPoint1(0,inversion * (wy + borderCube /2),0);
 			  ps->SetPoint2(0,0,inversion *(wz + borderCube /2));
-        m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::X, interval[0]);
+        m_MouseBH->GetTranslationConstraint()->SetBounds(mafInteractorConstraint::X, interval[0]);
       }
 		  break;
 		  case GIZMO_SLICE_Y:
@@ -216,7 +216,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
         cubeHandleLocalPosition[2] -= inversion *borderCube /2;
 			  ps->SetPoint1(inversion *(wx+ borderCube /2),0,0);
 			  ps->SetPoint2(0,0,inversion *(wz+ borderCube /2)); 
-        m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Y, interval[1]);
+        m_MouseBH->GetTranslationConstraint()->SetBounds(mafInteractorConstraint::Y, interval[1]);
       } 
 		  break;
 		  case GIZMO_SLICE_Z:
@@ -228,7 +228,7 @@ void mafGizmoSlice::CreateGizmoSliceInLocalPositionOnAxis(int gizmoSliceId, int 
 			  ps->SetPoint1(inversion *(wx+ borderCube /2),0,0);
 				if(wy<0.00001) wy=-10;
 			  ps->SetPoint2(0,inversion *(wy+ borderCube /2),0);
-        m_MouseBH->GetTranslationConstraint()->SetBounds(mmiConstraint::Z, interval[2]);
+        m_MouseBH->GetTranslationConstraint()->SetBounds(mafInteractorConstraint::Z, interval[2]);
       }
 		  break;
 	  }
@@ -503,17 +503,17 @@ void mafGizmoSlice::SetGizmoMovingModalityToBound()
   {
     case GIZMO_SLICE_X:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::BOUNDS, mmiConstraint::LOCK, mmiConstraint::LOCK);   
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::BOUNDS, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);   
     }    
 	  break;
     case GIZMO_SLICE_Y:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::BOUNDS, mmiConstraint::LOCK);    
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::BOUNDS, mafInteractorConstraint::LOCK);    
     }
     break;   
     case GIZMO_SLICE_Z:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::BOUNDS);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK, mafInteractorConstraint::BOUNDS);  
     }
 	  break;
   }
@@ -529,17 +529,17 @@ void mafGizmoSlice::SetGizmoMovingModalityToSnap()
   {
     case GIZMO_SLICE_X:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::SNAP_ARRAY, mmiConstraint::LOCK, mmiConstraint::LOCK);   
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::SNAP_ARRAY, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);   
     }    
 	  break;
     case GIZMO_SLICE_Y:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::SNAP_ARRAY, mmiConstraint::LOCK);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::SNAP_ARRAY, mafInteractorConstraint::LOCK);  
     }
     break;   
     case GIZMO_SLICE_Z:
     {
-      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::SNAP_ARRAY);  
+      m_MouseBH->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK, mafInteractorConstraint::SNAP_ARRAY);  
     }
 	  break;
   }

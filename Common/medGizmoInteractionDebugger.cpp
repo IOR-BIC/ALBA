@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 11:11:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,8 +25,8 @@ const bool DEBUG_MODE = true;
 #include "mafEvent.h"
 #include "mmaMaterial.h"
 #include "mafGUIMaterialButton.h"
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafSmartPointer.h"
 #include "mafVME.h"
 #include "mafVMEGizmo.h"
@@ -74,7 +74,7 @@ void medGizmoInteractionDebugger::CreateInteractor()
 
   m_LeftMouseInteractor->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
 
-  m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_LeftMouseInteractor->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   m_LeftMouseInteractor->EnableTranslation(true);    
 
   m_VmeGizmo->SetBehavior(m_GizmoInteractor);
@@ -257,13 +257,13 @@ void medGizmoInteractionDebugger::LogTransformEvent( mafEvent *e )
   mafString mouseActionString;
   switch(mouseAction)
   {
-  case mmiGenericMouse::MOUSE_DOWN:
+  case mafInteractorGenericMouse::MOUSE_DOWN:
     mouseActionString.Append("MOUSE DOWN");
     break;
-  case mmiGenericMouse::MOUSE_MOVE:
+  case mafInteractorGenericMouse::MOUSE_MOVE:
     mouseActionString.Append("MOUSE MOVE");
     break;
-  case mmiGenericMouse::MOUSE_UP:
+  case mafInteractorGenericMouse::MOUSE_UP:
     mouseActionString.Append("MOUSE UP");
     break;
   default:

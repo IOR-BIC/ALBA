@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpSplitSurface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 12:03:55 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-12-17 12:30:11 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,8 +25,8 @@
 //----------------------------------------------------------------------------
 class mafEvent;
 
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 class mafVMESurface;
 class mafVMEGizmo;
 class mafGizmoTranslate;
@@ -138,9 +138,9 @@ protected:
 	vtkMAFClipSurfaceBoundingBox	*m_ClipperBoundingBox;
   vtkGlyph3D      *m_Arrow;
 
-  mmiCompositorMouse *m_IsaCompositor;
-  mmiGenericMouse    *m_IsaTranslate;
-  mmiGenericMouse    *m_IsaRotate;
+  mafInteractorCompositorMouse *m_IsaCompositor;
+  mafInteractorGenericMouse    *m_IsaTranslate;
+  mafInteractorGenericMouse    *m_IsaRotate;
 
   vtkPolyData *m_OldSurface;
 	vtkPolyData *m_ResultPolyData;

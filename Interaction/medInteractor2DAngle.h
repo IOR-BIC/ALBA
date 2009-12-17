@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medInteractor2DAngle.h,v $
 Language:  C++
-Date:      $Date: 2009-05-25 15:41:38 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2009-12-17 12:27:54 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -13,7 +13,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #ifndef __medInteractor2DAngle_h
 #define __medInteractor2DAngle_h
 
-#include "mmiPER.h"
+#include "mafInteractorPER.h"
 #include "mafEvent.h"
 #include "vtkMAFTextActorMeter.h"
 
@@ -42,11 +42,11 @@ the histogram of the probed points on VME. This interactor works in renderwindow
 maintaining measure persistence at button up
 */
 //----------------------------------------------------------------------------
-class medInteractor2DAngle : public mmiPER
+class medInteractor2DAngle : public mafInteractorPER
 	//----------------------------------------------------------------------------
 {
 public:
-	mafTypeMacro(medInteractor2DAngle, mmiPER);
+	mafTypeMacro(medInteractor2DAngle, mafInteractorPER);
 
 	enum METER_2D_MODALITY
 	{

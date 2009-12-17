@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 11:12:22 $
-Version:   $Revision: 1.12 $
+Date:      $Date: 2009-12-17 12:30:11 $
+Version:   $Revision: 1.12.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -50,8 +50,8 @@ MafMedical is partially based on OpenMAF.
 #include "mafGUI.h"
 #include "mmaMaterial.h"
 #include "mafAbsMatrixPipe.h"
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafGizmoTranslate.h"
 #include "mafGizmoRotate.h"
 #include "mafGizmoScale.h"
@@ -303,7 +303,7 @@ void medOpLabelizeSurface::AttachInteraction()
 	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_IsaRotate->GetPivotRefSys()->SetTypeToView();
 	m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
 	m_IsaRotate->EnableRotation(true);
 
 	m_IsaTranslate = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_MIDDLE);
@@ -313,7 +313,7 @@ void medOpLabelizeSurface::AttachInteraction()
 	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
 	m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
 	m_IsaTranslate->EnableTranslation(true);
 
 	m_IsaChangeArrowWithoutGizmo = m_IsaCompositorWithoutGizmo->CreateBehavior(MOUSE_LEFT_SHIFT);
@@ -546,7 +546,7 @@ void medOpLabelizeSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				{
 					if(m_Arrow) 
 					{
-						if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
+						if(e->GetArg()==mafInteractorGenericMouse::MOUSE_DOWN)
 						{
 							m_LabelInside= m_LabelInside ? 0 : 1;
 							m_Gui->Update();
@@ -557,7 +557,7 @@ void medOpLabelizeSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				}
 				else if(e->GetSender()==m_IsaLabelizeWithGizmo || e->GetSender()==m_IsaLabelizeWithoutGizmo)
 				{
-					if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
+					if(e->GetArg()==mafInteractorGenericMouse::MOUSE_DOWN)
 					{
 						Labelize();
 						mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -816,7 +816,7 @@ void medOpLabelizeSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == mmiGenericMouse::MOUSE_MOVE)
+		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
 			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);

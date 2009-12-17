@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpLabelizeSurface.h,v $
 Language:  C++
-Date:      $Date: 2008-07-03 12:03:55 $
-Version:   $Revision: 1.6 $
+Date:      $Date: 2009-12-17 12:30:11 $
+Version:   $Revision: 1.6.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -55,8 +55,8 @@ class mafGizmoRotate;
 class mafGizmoScale;
 class mafVMESurface;
 class medVMESurfaceEditor;
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 class vtkPlane;
 class vtkPlaneSource;
 class vtkArrowSource;
@@ -123,14 +123,14 @@ protected:
 
 	void SetPlaneDimension();
 
-	mmiCompositorMouse *m_IsaCompositorWithoutGizmo;
-	mmiCompositorMouse *m_IsaCompositorWithGizmo;
-	mmiGenericMouse    *m_IsaTranslate;
-	mmiGenericMouse    *m_IsaRotate;
-	mmiGenericMouse		 *m_IsaChangeArrowWithGizmo;
-	mmiGenericMouse		 *m_IsaChangeArrowWithoutGizmo;	
-	mmiGenericMouse		 *m_IsaLabelizeWithGizmo;
-	mmiGenericMouse		 *m_IsaLabelizeWithoutGizmo;
+	mafInteractorCompositorMouse *m_IsaCompositorWithoutGizmo;
+	mafInteractorCompositorMouse *m_IsaCompositorWithGizmo;
+	mafInteractorGenericMouse    *m_IsaTranslate;
+	mafInteractorGenericMouse    *m_IsaRotate;
+	mafInteractorGenericMouse		 *m_IsaChangeArrowWithGizmo;
+	mafInteractorGenericMouse		 *m_IsaChangeArrowWithoutGizmo;	
+	mafInteractorGenericMouse		 *m_IsaLabelizeWithGizmo;
+	mafInteractorGenericMouse		 *m_IsaLabelizeWithoutGizmo;
 
 	int		m_LabelInside;
 

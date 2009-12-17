@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2009-01-14 16:43:34 $
-Version:   $Revision: 1.11.2.1 $
+Date:      $Date: 2009-12-17 12:24:37 $
+Version:   $Revision: 1.11.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -56,7 +56,7 @@ class medVMEPolylineEditor;
 class medVMEPolylineGraph;
 class mafPolylineGraph;
 class mafGUI;
-class mmiPicker;
+class mafInteractorPicker;
 class mafInteractor;
 class vtkSphereSource;
 class vtkGlyph3D;
@@ -179,8 +179,8 @@ protected:
 	Register the event receiver object*/
 	mafObserver *m_Listener;
 
-	mmiPicker					*m_Picker;
-	mafInteractor			*m_OldBehavior;
+	mafInteractorPicker *m_Picker;
+	mafInteractor *m_OldBehavior;
 
 	medVMEPolylineEditor			*m_VMEPolylineEditor;
 	medVMEPolylineEditor			*m_VMEPolylineSelection;///<VME that show the selection

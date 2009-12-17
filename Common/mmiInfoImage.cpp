@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 15:41:18 $
-  Version:   $Revision: 1.7.8.1 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.7.8.2 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,8 +27,8 @@
 #include "mafDeviceButtonsPadTracker.h"
 #include "mafDeviceButtonsPadMouse.h"
 #include "mafAvatar3D.h"
-#include "mmi6DOFCameraMove.h"
-#include "mmiCameraMove.h"
+#include "mafInteractor6DOFCameraMove.h"
+#include "mafInteractorCameraMove.h"
 
 #include "mafEventBase.h"
 #include "mafEventInteraction.h"

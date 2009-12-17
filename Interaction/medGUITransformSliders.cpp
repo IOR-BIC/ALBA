@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUITransformSliders.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-07 10:39:55 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2009-12-17 12:27:54 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -29,8 +29,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafGUIButton.h"
 #include "mafGUIFloatSlider.h"
 
-#include "mmiGenericMouse.h"
-#include "mmiCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
 
 #include "mafMatrix.h"
 #include "mafTransform.h"

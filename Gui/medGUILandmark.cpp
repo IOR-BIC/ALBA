@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUILandmark.cpp,v $
 Language:  C++
-Date:      $Date: 2009-04-15 14:11:22 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2009-12-17 12:25:30 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Stefano Perticoni - porting Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -26,9 +26,9 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 
 #include "mafGUI.h"
 #include "mafGUIButton.h"
-#include "mmiGenericMouse.h"
-#include "mmiCompositorMouse.h"
-#include "mmiPicker.h"            
+#include "mafInteractorGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorPicker.h"            
 #include "mafMatrix.h"
 #include "mafTransform.h"
 #include "mafVME.h"
@@ -75,7 +75,7 @@ medGUILandmark::medGUILandmark(mafNode *inputVME, mafObserver *listener)
 
   m_OldInputVMEBehavior = NULL;
 
-  m_PickerInteractor = mmiPicker::New();
+  m_PickerInteractor = mafInteractorPicker::New();
   //m_PickerInteractor->SetMListener(this);
   m_PickerInteractor->SetListener(this);
 
@@ -234,7 +234,7 @@ void medGUILandmark::CreateTranslateISACompositor()
   assert(m_Landmark);
 
   // Create the isa compositor:
-  m_IsaCompositor = mmiCompositorMouse::New();
+  m_IsaCompositor = mafInteractorCompositorMouse::New();
 
   // default aux ref sys is the vme ref sys
   m_RefSysVME = m_InputVME;
@@ -251,7 +251,7 @@ void medGUILandmark::CreateTranslateISACompositor()
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaTranslate->GetPivotRefSys()->SetTypeToCustom(m_Landmark->GetOutput()->GetAbsMatrix());
 
-  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   m_IsaTranslate->SurfaceSnapOff(); 
   m_IsaTranslate->EnableTranslation(true);
   
@@ -267,7 +267,7 @@ void medGUILandmark::CreateTranslateISACompositor()
   m_IsaTranslateSnap->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_RefSysVME->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaTranslateSnap->GetPivotRefSys()->SetTypeToCustom(m_Landmark->GetOutput()->GetAbsMatrix());
 
-  m_IsaTranslateSnap->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaTranslateSnap->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   m_IsaTranslateSnap->SurfaceSnapOn(); 
   m_IsaTranslateSnap->EnableTranslation(true);  
 }

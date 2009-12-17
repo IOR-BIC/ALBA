@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROI_BES.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-14 15:04:09 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2009-12-17 12:27:53 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2002/2004
@@ -24,7 +24,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafDecl.h"
 #include "mafGizmoBoundingBox.h"
 #include "mafGizmoHandle.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafGizmoHandle.h"
 
 #include "mafMatrix.h"
@@ -179,14 +179,14 @@ void mafGizmoROI_BES::OnEventGizmoComponents(mafEventBase *maf_event)
 				long arg = e->GetArg();
 
 				// if a gizmo has been picked highlight the gizmo and register the active component
-				if (arg == mmiGenericMouse::MOUSE_DOWN)
+				if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
 				{
 					int component = FindGizmoComponent(sender);
 
 					this->Highlight(component);
 					m_ActiveGizmoComponent = component;					
 				}
-				else if (arg == mmiGenericMouse::MOUSE_MOVE)
+				else if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 				{     
 					 mafSmartPointer<mafMatrix> tr;
 					if (this->m_Modality == G_LOCAL)
@@ -230,7 +230,7 @@ void mafGizmoROI_BES::OnEventGizmoComponents(mafEventBase *maf_event)
 						// not yet implemented...						
 					}
 				}
-				else if (arg == mmiGenericMouse::MOUSE_UP)
+				else if (arg == mafInteractorGenericMouse::MOUSE_UP)
 				{
 				}
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 11:11:58 $
-  Version:   $Revision: 1.9 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.9.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -28,8 +28,8 @@ const bool DEBUG_MODE = true;
 #include "mafEvent.h"
 #include "mmaMaterial.h"
 #include "mafGUIMaterialButton.h"
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafSmartPointer.h"
 #include "mafVME.h"
 #include "mafVMEGizmo.h"

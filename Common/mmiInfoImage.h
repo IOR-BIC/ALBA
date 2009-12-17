@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmiInfoImage.h,v $
   Language:  C++
-  Date:      $Date: 2005-11-02 11:07:18 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.1.8.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -12,7 +12,7 @@
 #ifndef __mmiInfoImage_h
 #define __mmiInfoImage_h
 
-#include "mmiPER.h"
+#include "mafInteractorPER.h"
 
 //----------------------------------------------------------------------------
 // forward declarations
@@ -20,10 +20,10 @@
 
 /** Class implementing image info reporting on status bar when not interacting.
 */
-class mmiInfoImage : public mmiPER
+class mmiInfoImage : public mafInteractorPER
 {
 public: 
-  mafTypeMacro(mmiInfoImage,mmiPER);
+  mafTypeMacro(mmiInfoImage,mafInteractorPER);
 
   virtual void OnEvent(mafEventBase *event);
 

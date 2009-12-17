@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoPolylineGraph.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 08:27:28 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2009-12-17 12:27:54 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,14 +15,14 @@
 
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "medCurvilinearAbscissaOnSkeletonHelper.h"
 
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 
 
 class mafEvent;
@@ -133,8 +133,8 @@ protected:
   mafString           m_Name;
   mafVMEGizmo        *m_VmeGizmo;     //<VME gizmo (this is used by medCurvilinearAbscisaHelper)
 
-  mmiCompositorMouse *m_GizmoInteractor;
-  mmiGenericMouse    *m_LeftMouseInteractor;
+  mafInteractorCompositorMouse *m_GizmoInteractor;
+  mafInteractorGenericMouse *m_LeftMouseInteractor;
     
   vtkSphereSource  *m_SphereSource;   //<sphere denoting the position  
   vtkArrowSource* m_AxisSource[3];          //<source for axis

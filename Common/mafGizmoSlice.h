@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-09-07 09:38:55 $
-  Version:   $Revision: 1.11.2.3 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.11.2.4 $
   Authors:   Paolo Quadrani, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,8 +19,8 @@
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 class mafVME;
 class mafVMEGizmo;
 class vtkPoints;
@@ -98,7 +98,7 @@ protected:
   mafString           m_Name;
   long                m_Id;
   mafVMEGizmo        *m_VmeGizmo;
-  mmiCompositorMouse *m_GizmoBehavior;
+  mafInteractorCompositorMouse *m_GizmoBehavior;
 	vtkDoubleArray     *m_SnapArray;
 
   mafMatrix     *m_GizmoHandleCenterMatrix;
@@ -121,7 +121,7 @@ protected:
     SNAP,
     MOVING_MODALITY_NUMBERS,
   };
-  mmiGenericMouse *m_MouseBH;
+  mafInteractorGenericMouse *m_MouseBH;
 
   bool m_InverseHandle;
 

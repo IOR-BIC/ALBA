@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoInteractionDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 11:11:58 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2009-12-17 12:24:37 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,14 +15,14 @@
 
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "medCurvilinearAbscissaOnSkeletonHelper.h"
 
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 
 
 class mafEvent;
@@ -97,8 +97,8 @@ protected:
 
   mafString           m_Name;
   mafVMEGizmo        *m_VmeGizmo;
-  mmiCompositorMouse *m_GizmoInteractor;
-  mmiGenericMouse    *m_LeftMouseInteractor;
+  mafInteractorCompositorMouse *m_GizmoInteractor;
+  mafInteractorGenericMouse *m_LeftMouseInteractor;
   
   vtkLineSource *m_LineSource;
   vtkSphereSource  *m_SphereSource;

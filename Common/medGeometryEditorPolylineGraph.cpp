@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2009-01-14 16:43:34 $
-Version:   $Revision: 1.19.2.1 $
+Date:      $Date: 2009-12-17 12:24:37 $
+Version:   $Revision: 1.19.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -53,8 +53,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafGUI.h"
 #include "medVMEPolylineEditor.h"
 #include "medVMEPolylineGraph.h"
-#include "mmiPicker.h"
-#include "mafInteractor.h"
+#include "mafInteractorPicker.h"
 
 #include "vtkMAFSmartPointer.h"
 #include "vtkPolyData.h"
@@ -438,7 +437,7 @@ void medGeometryEditorPolylineGraph::CreateISA()
 {
 	m_OldBehavior = m_InputVME->GetBehavior();
 
-	m_Picker = mmiPicker::New();
+	m_Picker = mafInteractorPicker::New();
 	m_Picker->SetListener(this);
 
 	m_InputVME->SetBehavior(m_Picker);

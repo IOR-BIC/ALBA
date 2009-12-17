@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpInteractiveClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 11:12:35 $
-  Version:   $Revision: 1.13 $
+  Date:      $Date: 2009-12-17 12:30:11 $
+  Version:   $Revision: 1.13.2.1 $
   Authors:   Paolo Quadrani, Stefano Perticoni , Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,8 +29,8 @@ bool DEBUG_MODE = true;
 #include "mafGUI.h"
 
 #include "mmaMaterial.h"
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafSmartPointer.h"
 #include "mafVMEGizmo.h"
@@ -518,7 +518,7 @@ void medOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				{
 					if(m_Arrow) 
 					{
-						if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
+						if(e->GetArg()==mafInteractorGenericMouse::MOUSE_DOWN)
 						{
 							m_ClipInside= m_ClipInside ? 0 : 1;
 							m_Gui->Update();
@@ -529,7 +529,7 @@ void medOpInteractiveClipSurface::OnEventGizmoPlane(mafEventBase *maf_event)
 				}
 				else if(e->GetSender()==m_IsaClipWithoutGizmo || e->GetSender()==m_IsaClipWithGizmo)
 				{
-					if(e->GetArg()==mmiGenericMouse::MOUSE_DOWN)
+					if(e->GetArg()==mafInteractorGenericMouse::MOUSE_DOWN)
 					{
 						Clip();
 						mafEventMacro(mafEvent(this, CAMERA_UPDATE));
@@ -807,7 +807,7 @@ void medOpInteractiveClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_even
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == mmiGenericMouse::MOUSE_MOVE)
+		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
 			((mafVME *)m_ImplicitPlaneVMEGizmo)->SetAbsMatrix(absPose);
@@ -932,7 +932,7 @@ void medOpInteractiveClipSurface::AttachInteraction()
   m_IsaTranslate->SetListener(this);
   m_IsaTranslate->SetVME(m_ImplicitPlaneVMEGizmo);
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
-  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   m_IsaTranslate->EnableTranslation(true);
   
 	m_IsaChangeArrowWithoutGizmo = m_IsaCompositor->CreateBehavior(MOUSE_LEFT_SHIFT);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-11 09:47:55 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-12-17 12:30:11 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,7 @@
 #include "mafGUISaveRestorePose.h"
 #include "mafGUITransformTextEntries.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafSmartPointer.h"
 #include "mafTransform.h"
