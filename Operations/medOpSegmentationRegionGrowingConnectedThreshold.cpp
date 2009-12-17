@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpSegmentationRegionGrowingConnectedThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-12 13:39:49 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2009-12-17 15:13:15 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Matteo Giacomoni, Alessandro Chiarini
 ==========================================================================
 Copyright (c) 2008
@@ -26,7 +26,7 @@ SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
 #include "mafVME.h"
 #include "mafVMEVolumeGray.h"
 #include "mafVMESurface.h"
-#include "mmiPicker.h"
+#include "mafInteractorPicker.h"
 #include "mafTagArray.h"
 
 #include "vtkDataSet.h"
@@ -113,7 +113,7 @@ void medOpSegmentationRegionGrowingConnectedThreshold::OpRun()
 
 	m_OldBehavior = mafVME::SafeDownCast(m_Input)->GetBehavior();
 
-	m_Picker = mmiPicker::New();
+	m_Picker = mafInteractorPicker::New();
 	m_Picker->SetListener(this);
 	mafVME::SafeDownCast(m_Input)->SetBehavior(m_Picker);
 
