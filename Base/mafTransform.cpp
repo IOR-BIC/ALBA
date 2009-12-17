@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 13:00:54 $
-  Version:   $Revision: 1.9.2.1 $
+  Date:      $Date: 2009-12-17 11:44:00 $
+  Version:   $Revision: 1.9.2.2 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -1822,17 +1822,17 @@ void mafTransform::BuildVector(double coeff, const double *inVector, double *out
       outVector[0] = outVector[1] = outVector[2];
       switch (localAxis)
       {
-      case (mmiConstraint::X):
+      case (mafInteractorConstraint::X):
         {
           outVector[0] = coeff;
         }
         break;
-      case (mmiConstraint::Y):
+      case (mafInteractorConstraint::Y):
         {
           outVector[1] = coeff;
         }
         break;
-      case (mmiConstraint::Z):
+      case (mafInteractorConstraint::Z):
         {
           outVector[2] = coeff;
         }

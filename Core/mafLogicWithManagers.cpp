@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafLogicWithManagers.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:13 $
-  Version:   $Revision: 1.139.2.1 $
+  Date:      $Date: 2009-12-17 11:44:31 $
+  Version:   $Revision: 1.139.2.2 $
   Authors:   Silvano Imboden, Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -45,8 +45,7 @@
   #include "mafAction.h"
   #include "mafDeviceButtonsPadMouse.h"
   #include "mafDeviceClientMAF.h"
-  #include "mmiPER.h"
-  #include "mmiPER.h"
+  #include "mafInteractorPER.h"
   #include "mafGUITreeContextualMenu.h"
   #include "mafGUIContextualMenu.h"
   #include "vtkCamera.h"
@@ -961,7 +960,7 @@ void mafLogicWithManagers::OnEvent(mafEventBase *maf_event)
 #ifdef MAF_USE_VTK
         if(m_InteractionManager)
         {
-          mmiPER *per = mmiPER::SafeDownCast(e->GetMafObject());
+          mafInteractorPER *per = mafInteractorPER::SafeDownCast(e->GetMafObject());
           assert(per);
           m_InteractionManager->PushPER(per);
         }

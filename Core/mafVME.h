@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVME.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:56:04 $
-  Version:   $Revision: 1.37 $
+  Date:      $Date: 2009-12-17 11:44:31 $
+  Version:   $Revision: 1.37.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -219,7 +219,7 @@ public:
   /** 
     return the interactor assigned as a behavior to this VME. This is the 
     interactor to which events coming from input devices are sent when 
-    user pick this VME. Responsible of this routing is the PER (@sa mmiPER) */
+    user pick this VME. Responsible of this routing is the PER (@sa mafInteractorPER) */
   mafInteractor *GetBehavior() {return m_Behavior;}
 
   /** set the interactor representing the behavior of this VME. @sa GetBehavior() */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafTransform.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 13:00:55 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2009-12-17 11:44:00 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Marco Petrone, Stefano Perticoni,Stefania Paperini
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -16,7 +16,7 @@
 #include "mafRefSys.h"
 #include "mafTransformBase.h"
 
-#include "mmiConstraint.h"
+#include "mafInteractorConstraint.h"
 
 #include "mmuUtility.h"
 
@@ -232,7 +232,7 @@ class MAF_EXPORT mafTransform : public mafTransformBase
   static void BuildVector(double *p1, double *p2, double *out_vector);
 
   /** Build vector [coeff * inVector] */
-  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mmiConstraint::X);
+  static void BuildVector(double coeff, const double *inVector, double *outVector, int refSysType = mafRefSys::LOCAL, int localAxis = mafInteractorConstraint::X);
 
   /** Project in_vector on in_axis direction; in_axis does not need to be 
   normalised. The projection signed value is returned */
