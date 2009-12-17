@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpBooleanSurface.cpp,v $
 Language:  C++
-Date:      $Date: 2008-07-25 07:03:51 $
-Version:   $Revision: 1.3 $
+Date:      $Date: 2009-12-17 11:45:06 $
+Version:   $Revision: 1.3.2.1 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -27,8 +27,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMEGizmo.h"
 #include "mafTransform.h"
 #include "mmaMaterial.h"
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "vtkMAFSmartPointer.h"
 
 #include "vtkPolyData.h"
@@ -632,7 +632,7 @@ void mafOpBooleanSurface::AttachInteraction()
 	m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_IsaRotate->GetPivotRefSys()->SetTypeToView();
 	m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+	m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
 	m_IsaRotate->EnableRotation(true);
 
 	m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
@@ -642,7 +642,7 @@ void mafOpBooleanSurface::AttachInteraction()
 	m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
 	m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
 	m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+	m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
 	m_IsaTranslate->EnableTranslation(true);
 
 	m_ImplicitPlaneGizmo->SetBehavior(m_IsaCompositor);

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpRemoveCells.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:30 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -37,7 +37,7 @@ class vtkPolyData;
 class vtkMAFRemoveCellsFilter;
 class vtkTriangle;
 
-class mmiSelectCell;
+class mafInteractorSelectCell;
 
 //----------------------------------------------------------------------------
 // mafOpRemoveCells :
@@ -120,7 +120,7 @@ protected:
 	mafRWI      *m_Rwi;
   vtkPolyDataMapper *m_PolydataMapper;
   vtkActor          *m_PolydataActor;
-  mmiSelectCell *m_SelectCellInteractor;
+  mafInteractorSelectCell *m_SelectCellInteractor;
   vtkMAFRemoveCellsFilter *m_Rcf;
   vtkPolyData *m_Mesh;
   

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:30 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,9 +24,9 @@
 #include "mafNode.h"
 #include "mafTagItem.h"
 #include "mafTagArray.h"
-#include "mmi2DDistance.h"
-#include "mmi2DAngle.h"
-#include "mmi2DIndicator.h"
+#include "mafInteractor2DDistance.h"
+#include "mafInteractor2DAngle.h"
+#include "mafInteractor2DIndicator.h"
 #include <wx/busyinfo.h>
 
 #include "mafDecl.h"
@@ -104,21 +104,21 @@ enum MEASURE2D_ID
 void mafOp2DMeasure::OpRun()   
 //----------------------------------------------------------------------------
 {
-  m_DistanceInteractor2D = mmi2DDistance::New();
+  m_DistanceInteractor2D = mafInteractor2DDistance::New();
   mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_DistanceInteractor2D));
   m_DistanceInteractor2D->SetListener(this);
 
-	m_AngleInteractor2D = mmi2DAngle::New();
+	m_AngleInteractor2D = mafInteractor2DAngle::New();
 	//mafEventMacro(mafEvent(this,PER_PUSH,(mafObject *)m_2DAngleInteractor));
 	//m_2DAngleInteractor->SetListener(this);
-  m_IndicatorInteractor2D = mmi2DIndicator::New();
+  m_IndicatorInteractor2D = mafInteractor2DIndicator::New();
   
   wxString measure[5] = {_("points"), _("lines"), _("angle by lines"), _("angle by points"), _("indicator")};
   
   //in this vector put the measure index that starts a new intercator type.
-  m_FirstPositionInteractor.push_back(0); // mmi2DDistance (in this iterator there are 2 kind of measures)
-  m_FirstPositionInteractor.push_back(2); // mmi2DAngle (in this iterator there are 2 kind of measures)
-  m_FirstPositionInteractor.push_back(4);	// mmi2DIndicator
+  m_FirstPositionInteractor.push_back(0); // mafInteractor2DDistance (in this iterator there are 2 kind of measures)
+  m_FirstPositionInteractor.push_back(2); // mafInteractor2DAngle (in this iterator there are 2 kind of measures)
+  m_FirstPositionInteractor.push_back(4);	// mafInteractor2DIndicator
                                           // eventually next value will be "5"
 
   // setup Gui
@@ -515,7 +515,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
     {
       switch(e->GetId())
       {
-        case mmi2DDistance::ID_RESULT_MEASURE:
+        case mafInteractor2DDistance::ID_RESULT_MEASURE:
         {
           double measure = RoundValue(e->GetDouble());
           m_DistanceMeasure = wxString::Format("%g", measure);
@@ -533,7 +533,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           m_Gui->Update();
         }
         break;
-        case mmi2DAngle::ID_RESULT_ANGLE:
+        case mafInteractor2DAngle::ID_RESULT_ANGLE:
         {
           double measure = RoundValue(e->GetDouble());
           m_DistanceMeasure = "0";
@@ -551,7 +551,7 @@ void mafOp2DMeasure::OnEvent(mafEventBase *maf_event)
           m_Gui->Update();
         }
         break;
-        case mmi2DIndicator::ID_RESULT_INDICATOR:
+        case mafInteractor2DIndicator::ID_RESULT_INDICATOR:
         {
           m_Gui->Enable(ID_MANUAL_ANGLE, false);
           m_Gui->Enable(ID_MANUAL_DISTANCE, false);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpBooleanSurface.h,v $
 Language:  C++
-Date:      $Date: 2008-03-06 11:55:06 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2009-12-17 11:45:06 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Daniele Giunchi - Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -28,8 +28,8 @@ class vtkPlane;
 class vtkGlyph3D;
 class vtkPlaneSource;
 class mafVMEGizmo;
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 
 //----------------------------------------------------------------------------
 // mafOpBooleanSurface :
@@ -90,9 +90,9 @@ protected:
 	mafVMEGizmo			*m_ImplicitPlaneGizmo;
 	bool						m_PlaneCreated;
 
-	mmiCompositorMouse *m_IsaCompositor;
-	mmiGenericMouse    *m_IsaTranslate;
-	mmiGenericMouse    *m_IsaRotate;
+	mafInteractorCompositorMouse *m_IsaCompositor;
+	mafInteractorGenericMouse    *m_IsaTranslate;
+	mafInteractorGenericMouse    *m_IsaRotate;
 
 	mafVMESurface *m_SecondOperatorVME;
 	mafVMESurface *m_FirstOperatorVME;

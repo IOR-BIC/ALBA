@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpInteractionOp.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:00:43 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-12-17 11:45:27 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -22,8 +22,8 @@
 #include "mafOpInteractionOp.h"
 #include "mafGUI.h"
 
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafVMEGizmo.h"
 
@@ -96,7 +96,7 @@ void mafOpInteractionOp::OpRun()
 	//----------------------------------------------------------------------------
 	// translate
 	//----------------------------------------------------------------------------
-  mmiGenericMouse *mmi_translate = m_MouseInteractor->CreateBehavior(MOUSE_LEFT);
+  mafInteractorGenericMouse *mmi_translate = m_MouseInteractor->CreateBehavior(MOUSE_LEFT);
   
   // set to send transform matrix for the gizmo to the operation
   mmi_translate->SetVME(m_Gizmo);

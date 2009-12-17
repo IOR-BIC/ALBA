@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,8 +27,8 @@ class mafGizmoTranslate;
 class mafGizmoRotate;
 class mafGUITransformMouse;
 class mafInteractor;
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 class mafVME;
 class mafNode;
 class mafTransform;

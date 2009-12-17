@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpExtractIsosurface.cpp,v $
 Language:  C++
-Date:      $Date: 2009-08-20 10:17:39 $
-Version:   $Revision: 1.5.2.6 $
+Date:      $Date: 2009-12-17 11:45:06 $
+Version:   $Revision: 1.5.2.7 $
 Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -40,7 +40,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVMESurface.h"
 #include "mafVMEGroup.h"
 #include "mafVMEOutput.h"
-#include "mmiExtractIsosurface.h"
+#include "mafInteractorExtractIsosurface.h"
 #include "mmaVolumeMaterial.h"
 
 #include "vtkLight.h"

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOp2DMeasure.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:30 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,9 +19,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmi2DDistance;
-class mmi2DAngle;
-class mmi2DIndicator;
+class mafInteractor2DDistance;
+class mafInteractor2DAngle;
+class mafInteractor2DIndicator;
 class mafEvent;
 
 //----------------------------------------------------------------------------
@@ -50,9 +50,9 @@ protected:
   /** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
   void OpStop(int result);
 
-	mmi2DDistance *m_DistanceInteractor2D;
-  mmi2DAngle *m_AngleInteractor2D;
-  mmi2DIndicator *m_IndicatorInteractor2D;
+	mafInteractor2DDistance *m_DistanceInteractor2D;
+  mafInteractor2DAngle *m_AngleInteractor2D;
+  mafInteractor2DIndicator *m_IndicatorInteractor2D;
 
   mafString m_DistanceMeasure;
   mafString m_AcuteAngle;

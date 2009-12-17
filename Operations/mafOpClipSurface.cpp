@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpClipSurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:30 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,8 +27,8 @@
 #include "mafGUI.h"
 
 #include "mmaMaterial.h"
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafSmartPointer.h"
 #include "mafVMEGizmo.h"
@@ -679,7 +679,7 @@ void mafOpClipSurface::PostMultiplyEventMatrix(mafEventBase *maf_event)
 		absPose.DeepCopy(tr->GetMatrix());
 		absPose.SetTimeStamp(0.0);
 
-		if (arg == mmiGenericMouse::MOUSE_MOVE)
+		if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
 		{
 			// move vme
 			((mafVME *)m_ImplicitPlaneGizmo)->SetAbsMatrix(absPose);
@@ -792,7 +792,7 @@ void mafOpClipSurface::AttachInteraction()
   m_IsaRotate->GetRotationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaRotate->GetPivotRefSys()->SetTypeToView();
   m_IsaRotate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaRotate->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   m_IsaRotate->EnableRotation(true);
 
   m_IsaTranslate = m_IsaCompositor->CreateBehavior(MOUSE_MIDDLE);
@@ -802,7 +802,7 @@ void mafOpClipSurface::AttachInteraction()
   m_IsaTranslate->GetTranslationConstraint()->GetRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
   m_IsaTranslate->GetPivotRefSys()->SetTypeToView();
   m_IsaTranslate->GetPivotRefSys()->SetMatrix(m_ImplicitPlaneGizmo->GetAbsMatrixPipe()->GetMatrixPointer());
-  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+  m_IsaTranslate->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   m_IsaTranslate->EnableTranslation(true);
 
 	if(!m_UseGizmo)

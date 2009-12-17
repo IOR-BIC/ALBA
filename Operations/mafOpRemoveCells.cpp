@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafOpRemoveCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-11-10 12:47:39 $
-Version:   $Revision: 1.3.2.4 $
+Date:      $Date: 2009-12-17 11:45:06 $
+Version:   $Revision: 1.3.2.5 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -38,7 +38,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "mafVME.h"
 #include "mafVMESurface.h"
 #include "mafVMEOutput.h"
-#include "mmiSelectCell.h"
+#include "mafInteractorSelectCell.h"
 
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"

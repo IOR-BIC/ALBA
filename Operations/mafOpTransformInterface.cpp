@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-06-11 09:47:23 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -29,7 +29,7 @@
 #include "mafGizmoRotate.h"
 #include "mafGUITransformMouse.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafSmartPointer.h"
 #include "mafTransform.h"
@@ -97,7 +97,7 @@ void mafOpTransformInterface::PostMultiplyEventMatrix(mafEventBase *maf_event)
     absPose.DeepCopy(tr->GetMatrix());
     absPose.SetTimeStamp(m_CurrentTime);
 
-    if (arg == mmiGenericMouse::MOUSE_MOVE)
+    if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
     {
       // move vme
       ((mafVME *)m_Input)->SetAbsMatrix(absPose);

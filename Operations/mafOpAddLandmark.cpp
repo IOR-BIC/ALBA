@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpAddLandmark.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-10 11:54:02 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -14,7 +14,7 @@
 
 #include "mafDecl.h"
 
-#include "mmiPicker.h"
+#include "mafInteractorPicker.h"
 #include "mafInteractor.h"
 #include "mafGUI.h"
 
@@ -161,7 +161,7 @@ void mafOpAddLandmark::OpRun()
 			assert(false); 
 		}
 		// customize m_PickedVme behavior
-		m_LandmarkPicker = mmiPicker::New();
+		m_LandmarkPicker = mafInteractorPicker::New();
 		m_LandmarkPicker->SetListener(this);
 
 		m_OldBehavior = m_PickedVme->GetBehavior();

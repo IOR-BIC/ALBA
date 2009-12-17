@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-08-20 10:17:29 $
-  Version:   $Revision: 1.5.2.3 $
+  Date:      $Date: 2009-12-17 11:45:06 $
+  Version:   $Revision: 1.5.2.4 $
   Authors:   Paolo Quadrani     Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,7 +35,7 @@ class vtkPolyDataMapper;
 class vtkOutlineCornerFilter;
 class vtkRenderer;
 
-class mmiExtractIsosurface;
+class mafInteractorExtractIsosurface;
 class vtkImageData;
 class vtkTexture;
 class vtkPolyData;
@@ -143,7 +143,7 @@ protected:
   vtkPlane          *m_CutterPlane;
   vtkMAFFixedCutter    *m_IsosurfaceCutter;
 
-  mmiExtractIsosurface *m_DensityPicker;
+  mafInteractorExtractIsosurface *m_DensityPicker;
 
 	/** Builds operation's interface and visualization pipeline. */
   void CreateOpDialog();
