@@ -171,4 +171,10 @@ IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFSimpleRulerActor2DTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ vtkMAFFixedCutterTest
+ADD_EXECUTABLE(vtkMAFFixedCutterTest vtkMAFFixedCutterTest.h vtkMAFFixedCutterTest.cpp)
+ADD_TEST(vtkMAFFixedCutterTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFFixedCutterTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFFixedCutterTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
 
