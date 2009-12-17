@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-04 18:03:33 $
-  Version:   $Revision: 1.2.22.2 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.2.22.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,9 +23,9 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmiGenericInterface;
-class mmiGenericMouse;
-class mmiCompositorMouse;
+class mafInteractorGenericInterface;
+class mafInteractorGenericMouse;
+class mafInteractorCompositorMouse;
 class mafVMEGizmo;
 class mafMatrix;
 class mafVME;
@@ -108,7 +108,7 @@ public:
 
   /**
   Get the gizmo interactor*/
-  mmiGenericInterface *GetInteractor();
+  mafInteractorGenericInterface *GetInteractor();
 
 protected:
 
@@ -164,10 +164,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *m_IsaComp;
+  mafInteractorCompositorMouse *m_IsaComp;
 
   /** isa generic*/
-  mmiGenericMouse *m_IsaGen;
+  mafInteractorGenericMouse *m_IsaGen;
 
   /** Gizmo color setting facilities for gizmo segments;*/
   void SetColor(double col[3]);

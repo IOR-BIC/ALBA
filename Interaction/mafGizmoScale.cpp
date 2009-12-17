@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-02-10 11:33:01 $
-  Version:   $Revision: 1.9.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.9.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,7 @@
 #include "mafSmartPointer.h"
 #include "vtkMAFSmartPointer.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafMatrix.h"
 #include "mafTransform.h"
@@ -128,7 +128,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
       {
         // if a gizmo has been picked register the active component; the sender is the component
         // to be activated
-        if (arg == mmiGenericMouse::MOUSE_DOWN)
+        if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
         {
           if (sender == m_GSAxis[X])
           {
@@ -175,7 +175,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
 
           m_RefSysVMEAbsMatrixAtMouseDown->DeepCopy(m_RefSysVME->GetOutput()->GetAbsMatrix());
         }
-        else if (arg == mmiGenericMouse::MOUSE_MOVE)
+        else if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
         {               
           if (m_ActiveGizmoComponent == X_AXIS || m_ActiveGizmoComponent == Y_AXIS || m_ActiveGizmoComponent == Z_AXIS)
           {
@@ -311,7 +311,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
 
           m_GuiGizmoScale->SetAbsScaling(scaleMat);
         }
-        else if (arg == mmiGenericMouse::MOUSE_UP)
+        else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
           // put the gizmo back in the initial pose  
           SetAbsPose(m_InitialGizmoPose);
@@ -517,7 +517,7 @@ void mafGizmoScale::SendTransformMatrixFromGui(mafEventBase *maf_event)
   m_InputVME->Modified();
 
   // notify the listener about changed vme pose
-  SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);   
+  SendTransformMatrix(M, ID_TRANSFORM, mafInteractorGenericMouse::MOUSE_MOVE);   
 
   mafSmartPointer<mafMatrix> identity;
   identity->Identity();

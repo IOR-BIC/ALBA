@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,7 +15,7 @@
 
 // interactors & devices
 #include "mafDeviceButtonsPadTracker.h"
-//#include "mmi6DOFMove.h"
+//#include "mafInteractor6DOFMove.h"
 
 // events
 #include "mafEventInteraction.h"

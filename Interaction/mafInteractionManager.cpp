@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.35.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.35.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -40,8 +40,8 @@
 #include "mafViewVTK.h"
 #include "mafRWIBase.h"
 
-#include "mmiPER.h"
-#include "mmiSER.h"
+#include "mafInteractorPER.h"
+#include "mafInteractorSER.h"
 
 #include "mafEventBase.h"
 
@@ -149,7 +149,7 @@ mafInteractionManager::~mafInteractionManager()
 {
   while(!m_PERList.empty())
   {
-    mafAutoPointer<mmiPER> old_per=*(m_PERList.rbegin());
+    mafAutoPointer<mafInteractorPER> old_per=*(m_PERList.rbegin());
     m_PERList.pop_back();
     assert(old_per);
     SetPER(old_per);
@@ -165,7 +165,7 @@ mafInteractionManager::~mafInteractionManager()
 }
 
 //------------------------------------------------------------------------------
-void mafInteractionManager::SetPER(mmiPER *per)
+void mafInteractionManager::SetPER(mafInteractorPER *per)
 //------------------------------------------------------------------------------
 {
   mafAction *pointing_action = m_StaticEventRouter->GetAction("PointAndManipulate");
@@ -187,10 +187,10 @@ void mafInteractionManager::SetPER(mmiPER *per)
 }
 
 //----------------------------------------------------------------------------
-void mafInteractionManager::PushPER(mmiPER *per)
+void mafInteractionManager::PushPER(mafInteractorPER *per)
 //----------------------------------------------------------------------------
 {
-  mmiPER *old_per=GetPER();
+  mafInteractorPER *old_per=GetPER();
   m_PERList.push_back(old_per);
   SetPER(per);
 }
@@ -199,7 +199,7 @@ bool mafInteractionManager::PopPER()
 //----------------------------------------------------------------------------
 {
   // retrieve and delete last item
-  mafAutoPointer<mmiPER> old_per=*(m_PERList.rbegin());
+  mafAutoPointer<mafInteractorPER> old_per=*(m_PERList.rbegin());
   m_PERList.pop_back(); 
 
   assert(old_per); // should always be != NULL
@@ -949,10 +949,10 @@ void mafInteractionManager::UpdateBindings()
     /* Fill in actions' list */
     m_ActionsList->Clear();
     
-    const mmiSER::mmuActionsMap *actions=GetSER()->GetActions();
+    const mafInteractorSER::mmuActionsMap *actions=GetSER()->GetActions();
 
     int i=0;
-    for (mmiSER::mmuActionsMap::const_iterator it=actions->begin();it!=actions->end();it++)
+    for (mafInteractorSER::mmuActionsMap::const_iterator it=actions->begin();it!=actions->end();it++)
     {
       mafAction *action = it->second;
       bool found=false;

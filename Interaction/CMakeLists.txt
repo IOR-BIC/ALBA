@@ -104,39 +104,39 @@ SET(PROJECT_SRCS
   mafDeviceButtonsPadTracker.cpp
   mafDeviceButtonsPadTracker.h
   
-  mmi2DAngle.cpp
-  mmi2DAngle.h
-  mmi2DDistance.cpp
-  mmi2DDistance.h
-  mmi2DIndicator.cpp
-  mmi2DIndicator.h
+  mafInteractor2DAngle.cpp
+  mafInteractor2DAngle.h
+  mafInteractor2DDistance.cpp
+  mafInteractor2DDistance.h
+  mafInteractor2DIndicator.cpp
+  mafInteractor2DIndicator.h
 
-  mmi6DOF.cpp
-  mmi6DOF.h
-  mmi6DOFCameraMove.cpp
-  mmi6DOFCameraMove.h
-  mmiCameraMove.cpp
-  mmiCameraMove.h
-  mmiCompositorMouse.cpp
-  mmiCompositorMouse.h
-  mmiConstraint.cpp
-  mmiConstraint.h
-  mmiExtractIsosurface.cpp
-  mmiExtractIsosurface.h
-  mmiGeneric6DOF.cpp
-  mmiGeneric6DOF.h
-  mmiGenericInterface.cpp
-  mmiGenericInterface.h
-  mmiGenericMouse.cpp
-  mmiGenericMouse.h
-  mmiPER.cpp
-  mmiPER.h
-  mmiPicker.cpp
-  mmiPicker.h
-  mmiSelectCell.cpp
-  mmiSelectCell.h
-  mmiSER.cpp
-  mmiSER.h
+  mafInteractor6DOF.cpp
+  mafInteractor6DOF.h
+  mafInteractor6DOFCameraMove.cpp
+  mafInteractor6DOFCameraMove.h
+  mafInteractorCameraMove.cpp
+  mafInteractorCameraMove.h
+  mafInteractorCompositorMouse.cpp
+  mafInteractorCompositorMouse.h
+  mafInteractorConstraint.cpp
+  mafInteractorConstraint.h
+  mafInteractorExtractIsosurface.cpp
+  mafInteractorExtractIsosurface.h
+  mafInteractorGeneric6DOF.cpp
+  mafInteractorGeneric6DOF.h
+  mafInteractorGenericInterface.cpp
+  mafInteractorGenericInterface.h
+  mafInteractorGenericMouse.cpp
+  mafInteractorGenericMouse.h
+  mafInteractorPER.cpp
+  mafInteractorPER.h
+  mafInteractorPicker.cpp
+  mafInteractorPicker.h
+  mafInteractorSelectCell.cpp
+  mafInteractorSelectCell.h
+  mafInteractorSER.cpp
+  mafInteractorSER.h
 )
 
 ## SIL == removed under Linux - since it requires mafDrivers - which seems to be Win32 only

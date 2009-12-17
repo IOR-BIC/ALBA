@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.h,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:11:45 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -117,7 +117,7 @@ public:
 
   /**
   Set the constraint modality for the given axis; allowed constraint modality are:
-  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY defined in mmiConstraint*/
+  LOCK, FREE, BOUNDS, SNAP_STEP, SNAP_ARRAY defined in mafInteractorConstraint*/
   void SetConstraintModality(int axis, int constrainModality);
   int GetConstraintModality(int axis);
 

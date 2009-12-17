@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2009-01-22 18:16:53 $
-  Version:   $Revision: 1.6.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.6.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,8 +24,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmiGenericMouse;
-class mmiCompositorMouse;
+class mafInteractorGenericMouse;
+class mafInteractorCompositorMouse;
 class mafVME;
 class vtkCubeSource;
 class vtkCylinderSource;
@@ -214,9 +214,9 @@ protected:
   /** Create vtk objects needed*/
   void CreatePipeline();
 
-  mmiCompositorMouse *m_IsaComp; ///< Interactor style compositor
+  mafInteractorCompositorMouse *m_IsaComp; ///< Interactor style compositor
 
-  mmiGenericMouse *m_IsaGen; ///< Generic Interactor style
+  mafInteractorGenericMouse *m_IsaGen; ///< Generic Interactor style
 
   /** Set the gizmo color */
   void SetColor(double col[3]);

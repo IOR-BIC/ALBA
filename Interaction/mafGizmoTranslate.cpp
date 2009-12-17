@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-10-21 15:11:45 $
-  Version:   $Revision: 1.8.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.8.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,13 +22,13 @@
 
 #include "mafGizmoTranslate.h"
 #include "mafDecl.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafGizmoTranslateAxis.h"
 #include "mafGizmoTranslatePlane.h"
 #include "mafGUIGizmoTranslate.h"
 #include "mafSmartPointer.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafMatrix.h"
 #include "mafTransform.h"
@@ -50,9 +50,9 @@ mafGizmoTranslate::mafGizmoTranslate(mafVME* input, mafObserver *listener, bool 
   m_GTPlane[XNORMAL] = m_GTPlane[YNORMAL] = m_GTPlane[ZNORMAL] = NULL;
   m_GuiGizmoTranslate = NULL;
   
-  m_ConstraintModality[X] = mmiConstraint::FREE;
-  m_ConstraintModality[Y] = mmiConstraint::FREE;
-  m_ConstraintModality[Z] = mmiConstraint::FREE;
+  m_ConstraintModality[X] = mafInteractorConstraint::FREE;
+  m_ConstraintModality[Y] = mafInteractorConstraint::FREE;
+  m_ConstraintModality[Z] = mafInteractorConstraint::FREE;
 
   m_Step[X] = 1;
   m_Step[Y] = 1;
@@ -136,7 +136,7 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
       {
         // if a gizmo has been picked register the active component; the sender is the component
         // to be activated
-        if (arg == mmiGenericMouse::MOUSE_DOWN)
+        if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
         {
           if (sender == m_GTAxis[X])
           {
@@ -171,7 +171,7 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
           // Store pivot position
           m_PivotPose->DeepCopy(m_GTAxis[m_ActiveGizmoComponent]->GetAbsPose());
         }
-        else if (arg == mmiGenericMouse::MOUSE_MOVE)
+        else if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
         {     
           // matrix holding abs pose after mouse move event
           mafSmartPointer<mafMatrix> newAbsMatr;
@@ -232,7 +232,7 @@ void mafGizmoTranslate::OnEventGizmoComponents(mafEventBase *maf_event)
           // update only gui with gizmo abs position
           if (m_BuildGUI) m_GuiGizmoTranslate->SetAbsPosition(newAbsMatr);
         }
-        else if (arg == mmiGenericMouse::MOUSE_UP)
+        else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
           if (this->m_Modality == G_GLOBAL)
           {
@@ -396,7 +396,7 @@ void mafGizmoTranslate::SendTransformMatrixFromGui(mafEventBase *maf_event)
     // update gizmo abs pose
     this->SetAbsPose(newAbsPose, m_InputVME->GetTimeStamp());
     // send transfrom to postmultiply to the listener. Events is sent as a transform event
-    SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);
+    SendTransformMatrix(M, ID_TRANSFORM, mafInteractorGenericMouse::MOUSE_MOVE);
   }
 }
 //----------------------------------------------------------------------------  

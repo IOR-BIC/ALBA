@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateCircle.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-04 18:03:33 $
-  Version:   $Revision: 1.8.4.2 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.8.4.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,8 +27,8 @@
 #include "mafDecl.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -161,13 +161,13 @@ void mafGizmoRotateCircle::CreateISA()
 {
   // Create isa compositor and assign behaviors to IsaGen ivar.
   // Default isa constrain rotation around X axis.
-  m_IsaComp = mmiCompositorMouse::New();
+  m_IsaComp = mafInteractorCompositorMouse::New();
 
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
   m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
   m_IsaGen->SetVME(m_InputVme);
-  m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK); 
+  m_IsaGen->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK); 
   m_IsaGen->GetRotationConstraint()->GetRefSys()->SetTypeToCustom(m_AbsInputMatrix);
   m_IsaGen->GetPivotRefSys()->SetTypeToCustom(m_AbsInputMatrix);
   m_IsaGen->EnableRotation(true);
@@ -196,7 +196,7 @@ void mafGizmoRotateCircle::SetAxis(int axis)
     this->SetColor(1, 0, 0);
 
      // change the axis constrain  
-    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);
   }
   else if (m_ActiveAxis == Y)
   {
@@ -208,7 +208,7 @@ void mafGizmoRotateCircle::SetAxis(int axis)
     this->SetColor(0, 1, 0);
 
     // change the Gizmo constrain
-    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
+    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
   }
   else if (m_ActiveAxis == Z)
   {
@@ -219,7 +219,7 @@ void mafGizmoRotateCircle::SetAxis(int axis)
     this->SetColor(0, 0, 1);
    
     // change the Gizmo constrain
-    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+    m_IsaGen->GetRotationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);
   }    
 }
 //----------------------------------------------------------------------------
@@ -268,7 +268,7 @@ void mafGizmoRotateCircle::OnEvent(mafEventBase *maf_event)
   {
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == mmiGenericMouse::MOUSE_DOWN)
+      if (e->GetArg() == mafInteractorGenericMouse::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }
@@ -333,7 +333,7 @@ void mafGizmoRotateCircle::SetInput(mafVME *vme)
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
 }
 //---------------------------------------------------------------------------
-mmiGenericInterface *mafGizmoRotateCircle::GetInteractor()
+mafInteractorGenericInterface *mafGizmoRotateCircle::GetInteractor()
 //----------------------------------------------------------------------------
 {
   return m_IsaGen;

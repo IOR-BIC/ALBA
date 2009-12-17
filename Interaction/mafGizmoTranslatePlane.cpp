@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:43 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,8 +24,8 @@
 #include "mafDecl.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -231,13 +231,13 @@ void mafGizmoTranslatePlane::CreateISA()
   // Default isa is constrained to plane XZ.
   for (int i = 0; i < SQ; i++)
   {
-    m_IsaComp[i] = mmiCompositorMouse::New();
+    m_IsaComp[i] = mafInteractorCompositorMouse::New();
 
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
     m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
     m_IsaGen[i]->SetVME(m_InputVme);
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);     
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);     
     
     //isa will send events to this
     m_IsaGen[i]->SetListener(this);
@@ -267,7 +267,7 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE, mafInteractorConstraint::FREE);
     }
   }
   else if (m_ActivePlane == XZ)
@@ -283,7 +283,7 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);
     }
   }  
   else if (m_ActivePlane == XY)
@@ -299,7 +299,7 @@ void mafGizmoTranslatePlane::SetPlane(int plane)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::FREE, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
     }
   }  
 }
@@ -386,7 +386,7 @@ void mafGizmoTranslatePlane::OnEvent(mafEventBase *maf_event)
     // mouse down change gizmo selection status
     if (e->GetId() == ID_TRANSFORM)
     {
-      if (e->GetArg() == mmiGenericMouse::MOUSE_DOWN)
+      if (e->GetArg() == mafInteractorGenericMouse::MOUSE_DOWN)
       {
         this->SetIsActive(true);
       }

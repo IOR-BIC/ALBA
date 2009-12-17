@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformTextEntries.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-02 08:55:43 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,8 +28,8 @@
 #include "mafGUI.h"
 #include "mafGUIButton.h"
 
-#include "mmiGenericMouse.h"
-#include "mmiCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
 
 #include "mafMatrix.h"
 #include "mafTransform.h"

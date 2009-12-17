@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-04 18:03:33 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 class mafGizmoRotateCircle;
 class mafGizmoRotateFan;
-class mmiGenericInterface;
+class mafInteractorGenericInterface;
 class mafMatrix;
 
 //----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public:
 
   /**
   Get the Interactor asscociated to each axis*/
-  mmiGenericInterface *GetInteractor(int axis);
+  mafInteractorGenericInterface *GetInteractor(int axis);
 
   //----------------------------------------------------------------------------
   // RefSys

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoROI.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-06 10:59:10 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,7 +24,7 @@
 #include "mafDecl.h"
 #include "mafGizmoBoundingBox.h"
 #include "mafGizmoHandle.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mafGizmoHandle.h"
 
 #include "mafMatrix.h"
@@ -121,7 +121,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
         long arg = e->GetArg();
 
         // if a gizmo has been picked highlight the gizmo and register the active component
-        if (arg == mmiGenericMouse::MOUSE_DOWN)
+        if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
         {
           m_Accumulator = 0.;
           if (sender == m_GHandle[0])
@@ -155,7 +155,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
             m_ActiveGizmoComponent = 5;
           }
         }
-        else if (arg == mmiGenericMouse::MOUSE_MOVE)
+        else if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
         {     
           if (this->m_Modality == G_LOCAL)
           {
@@ -325,7 +325,7 @@ void mafGizmoROI::OnEventGizmoComponents(mafEventBase *maf_event)
             // not yet implemented...
           }
         }
-        else if (arg == mmiGenericMouse::MOUSE_UP)
+        else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
         }
         mafEventMacro(mafEvent(this, CAMERA_UPDATE));

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslateAxis.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:43 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmiGenericMouse;
-class mmiCompositorMouse;
+class mafInteractorGenericMouse;
+class mafInteractorCompositorMouse;
 class mafVMEGizmo;
 class mafMatrix;
 class mafVME;
@@ -160,10 +160,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *m_IsaComp[2];
+  mafInteractorCompositorMouse *m_IsaComp[2];
 
   /** isa generic*/
-  mmiGenericMouse *m_IsaGen[2];
+  mafInteractorGenericMouse *m_IsaGen[2];
 
   /** Gizmo color setting facilities; part can be CYLINDER or CONE*/
   void SetColor(int part, double col[3]);

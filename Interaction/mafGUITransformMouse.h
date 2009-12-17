@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUITransformMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-16 09:52:27 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -18,14 +18,14 @@
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
 #include "mafGUITransformInterface.h"
-#include "mmiCompositorMouse.h"
+#include "mafInteractorCompositorMouse.h"
 
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
 class mafGUI;
 class mafGUIButton;
-class mmiGenericMouse;
+class mafInteractorGenericMouse;
 class mafInteractor;
 class mafVME;
 
@@ -40,7 +40,6 @@ class mafVME;
 class mafGUITransformMouse : public mafGUITransformInterface
 {
 public:
-
   mafGUITransformMouse(mafVME *input, mafObserver *listener = NULL);
 	~mafGUITransformMouse(); 
 
@@ -59,7 +58,7 @@ public:
     NORMAL_SURFACE,
   };
 
-  virtual void OnEvent(mafEventBase *maf_event);
+  void OnEvent(mafEventBase *maf_event);
 
   /** Override superclass */
 	void EnableWidgets(bool enable);
@@ -82,10 +81,9 @@ public:
   void SetRotationConstraintId(int value){m_RotationConstraintId = value;};
   void SetTranslationConstraintId(int value){m_TranslationConstraintId = value;};
 
-  mmiGenericMouse* CreateBehavior(MMI_ACTIVATOR activator);
+  mafInteractorGenericMouse* CreateBehavior(MMI_ACTIVATOR activator);
 
 protected:  
-
   mafInteractor* m_OldInteractor;
    
   /** Create interactors */
@@ -94,11 +92,11 @@ protected:
   /** Override superclass */
   void CreateGui();
 
-  mmiCompositorMouse *m_IsaCompositor;
+  mafInteractorCompositorMouse *m_IsaCompositor;
 
-  mmiGenericMouse *m_IsaRotate;
-  mmiGenericMouse *m_IsaTranslate;
-  mmiGenericMouse *m_IsaRoll;
+  mafInteractorGenericMouse *m_IsaRotate;
+  mafInteractorGenericMouse *m_IsaTranslate;
+  mafInteractorGenericMouse *m_IsaRoll;
 
   int m_RotationConstraintId;
 	int m_TranslationConstraintId;

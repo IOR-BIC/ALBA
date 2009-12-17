@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:57 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmiGenericMouse;
-class mmiCompositorMouse;
+class mafInteractorGenericMouse;
+class mafInteractorCompositorMouse;
 class mafVMEGizmo;
 class mafMatrix;
 class mafVME;
@@ -106,10 +106,10 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *m_IsaComp;
+  mafInteractorCompositorMouse *m_IsaComp;
 
   /** isa generic*/
-  mmiGenericMouse *m_IsaGen;
+  mafInteractorGenericMouse *m_IsaGen;
 
   /** Gizmo color setting facilities*/
   void SetColor(double col[3]);

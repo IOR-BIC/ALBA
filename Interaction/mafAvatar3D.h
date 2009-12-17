@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar3D.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -19,7 +19,7 @@
 //----------------------------------------------------------------------------
 // forward declarations :
 //----------------------------------------------------------------------------
-class mmi6DOF;
+class mafInteractor6DOF;
 class mafDeviceButtonsPadTracker;
 class mafTransform;
 class mafCameraTransform;

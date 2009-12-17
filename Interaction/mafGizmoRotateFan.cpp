@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotateFan.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-06-12 11:15:42 $
-  Version:   $Revision: 1.11 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.11.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,8 +27,8 @@
 #include "mafDecl.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -222,7 +222,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
     {
       case ID_TRANSFORM:
       {
-        if (e->GetArg() == mmiGenericMouse::MOUSE_DOWN)
+        if (e->GetArg() == mafInteractorGenericMouse::MOUSE_DOWN)
         {
           //----------------------------------------
           // compute start theta for the sphere
@@ -254,7 +254,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           e->SetSender(this);
           mafEventMacro(*e);
         }
-        else if (e->GetArg() == mmiGenericMouse::MOUSE_MOVE)
+        else if (e->GetArg() == mafInteractorGenericMouse::MOUSE_MOVE)
         {
           double dTheta = e->GetDouble();
           if (m_MirrorStatus == ON)
@@ -295,7 +295,7 @@ void mafGizmoRotateFan::OnEvent(mafEventBase *maf_event)
           e->SetSender(this);
           mafEventMacro(*e);
         }
-        else if (e->GetArg() == mmiGenericMouse::MOUSE_UP)
+        else if (e->GetArg() == mafInteractorGenericMouse::MOUSE_UP)
         {
 
           // reset m_StartTheta and m_EndTheta

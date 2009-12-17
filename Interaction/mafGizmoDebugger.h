@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoDebugger.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:38 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -15,12 +15,12 @@
 
 #include "mafGizmoInterface.h"
 #include "mafMatrix.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 //---------------------------------------------------------------------------
 // forward refs:
 //---------------------------------------------------------------------------
-class mmiCompositorMouse;
-class mmiGenericMouse;
+class mafInteractorCompositorMouse;
+class mafInteractorGenericMouse;
 class mafVME;
 class mafVMEGizmo;
 class vtkPoints;
@@ -49,7 +49,7 @@ public:
 
   virtual	~mafGizmoDebugger();
   
-  enum SentPoseID {ABS_POSE = mmiGenericMouse::MOUSE_UP+1};
+  enum SentPoseID {ABS_POSE = mafInteractorGenericMouse::MOUSE_UP+1};
 
   /** Set position along constraint polyline*/
   void SetCurvilinearAbscissa(double s);
@@ -118,8 +118,8 @@ protected:
 
   mafString           m_Name;
   mafVMEGizmo        *m_VmeGizmoDebugger;
-  mmiCompositorMouse *m_GizmoInteractor;
-  mmiGenericMouse    *m_LeftMouseInteractor;
+  mafInteractorCompositorMouse *m_GizmoInteractor;
+  mafInteractorGenericMouse    *m_LeftMouseInteractor;
   mafGUIGui             *m_GizmoGui;
 
 

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoRotate.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-11-04 18:03:33 $
-  Version:   $Revision: 1.7.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.7.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -27,7 +27,7 @@
 #include "mafGUIGizmoRotate.h"
 #include "mafSmartPointer.h"
 
-#include "mmiGenericMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 #include "mafMatrix.h"
 #include "mafTransform.h"
@@ -124,7 +124,7 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
         long arg = e->GetArg();
 
         // if a gizmo circle has been picked
-        if (arg == mmiGenericMouse::MOUSE_DOWN)
+        if (arg == mafInteractorGenericMouse::MOUSE_DOWN)
         {
           if (sender == m_GRFan[X])
           {
@@ -139,7 +139,7 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
             this->Highlight(Z);
           }
         }  
-        else if (arg == mmiGenericMouse::MOUSE_MOVE)
+        else if (arg == mafInteractorGenericMouse::MOUSE_MOVE)
         {
           // gizmo mode == local; gizmo is rotating during mouse move events
           if (m_Modality == G_LOCAL)
@@ -160,7 +160,7 @@ void mafGizmoRotate::OnEventGizmoComponents(mafEventBase *maf_event)
             currTr->Delete();
           }
         }
-        else if (arg == mmiGenericMouse::MOUSE_UP)
+        else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
           // gizmo mode == local
           if (m_Modality == G_LOCAL)
@@ -317,7 +317,7 @@ void mafGizmoRotate::SetInput(mafVME *input)
 }
 
 //----------------------------------------------------------------------------  
-mmiGenericInterface *mafGizmoRotate::GetInteractor(int axis)
+mafInteractorGenericInterface *mafGizmoRotate::GetInteractor(int axis)
 //----------------------------------------------------------------------------  
 {
   return m_GRCircle[axis]->GetInteractor();
@@ -352,7 +352,7 @@ void mafGizmoRotate::SendTransformMatrixFromGui(mafEventBase *maf_event)
     this->SetAbsPose(newAbsPose, true);
 
     // send transfrom to postmultiply to the listener. Events is sent as a transform event
-    SendTransformMatrix(M, ID_TRANSFORM, mmiGenericMouse::MOUSE_MOVE);
+    SendTransformMatrix(M, ID_TRANSFORM, mafInteractorGenericMouse::MOUSE_MOVE);
   }
 }
 

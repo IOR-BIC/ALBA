@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoTranslatePlane.h,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:43 $
-  Version:   $Revision: 1.3.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.3.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -22,8 +22,8 @@
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class mmiGenericMouse;
-class mmiCompositorMouse;
+class mafInteractorGenericMouse;
+class mafInteractorCompositorMouse;
 class mafVME;
 class mafVMEGizmo;
 class mafMatrix;
@@ -179,12 +179,12 @@ protected:
   void CreateISA();
 
   /** isa compositor*/
-  mmiCompositorMouse *m_IsaComp[2];
+  mafInteractorCompositorMouse *m_IsaComp[2];
 
   /** isa generic*/
-  mmiGenericMouse *m_IsaGen[2];
+  mafInteractorGenericMouse *m_IsaGen[2];
 
-  /** Used by mmiGenericMouse */
+  /** Used by mafInteractorGenericMouse */
   vtkTransform *m_PivotTransform;
 
   /** Gizmo color setting facilities for gizmo segments;*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-01-22 18:16:53 $
-  Version:   $Revision: 1.12.2.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.12.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,8 +26,8 @@
 #include "mmaMaterial.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericInterface.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericInterface.h"
 
 // vme stuff
 #include "mafVME.h"
@@ -119,7 +119,7 @@ mafGizmoHandle::mafGizmoHandle(mafVME *input, mafObserver *listener /* = NULL */
   // create isa stuff
   //-----------------
   // create isa compositor and assign behaviors to m_IsaGen ivar
-  m_IsaComp  = mmiCompositorMouse::New();
+  m_IsaComp  = mafInteractorCompositorMouse::New();
 
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix

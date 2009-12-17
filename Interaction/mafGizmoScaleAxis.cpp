@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-22 09:42:43 $
-  Version:   $Revision: 1.7.4.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.7.4.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,8 +24,8 @@
 #include "mafDecl.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -237,14 +237,14 @@ void mafGizmoScaleAxis::CreateISA()
   // create isa compositor and assign behaviors to IsaGen ivar
   for (int i = 0; i < 2; i++)
   {
-    m_IsaComp[i] = mmiCompositorMouse::New();
+    m_IsaComp[i] = mafInteractorCompositorMouse::New();
 
     // default behavior is activated by mouse left and is constrained to X axis,
     // default ref sys is input vme abs matrix
     m_IsaGen[i] = m_IsaComp[i]->CreateBehavior(MOUSE_LEFT);
 
     m_IsaGen[i]->SetVME(m_InputVme);
-    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+    m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);
   	m_IsaGen[i]->GetTranslationConstraint()->GetRefSys()->SetTypeToLocal();
       
     //isa will send events to this
@@ -274,7 +274,7 @@ void mafGizmoScaleAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);
     }
   }
   else if (axis == Y)
@@ -289,7 +289,7 @@ void mafGizmoScaleAxis::SetAxis(int axis)
     // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::FREE, mmiConstraint::LOCK);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK);
     }
   }  
   else if (axis == Z)
@@ -304,7 +304,7 @@ void mafGizmoScaleAxis::SetAxis(int axis)
      // change the axis constrain
     for (int i = 0; i < 2; i++)
     {
-      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::LOCK, mmiConstraint::LOCK, mmiConstraint::FREE);
+      m_IsaGen[i]->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK, mafInteractorConstraint::FREE);
     }
   }  
 }

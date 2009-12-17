@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleIsotropic.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:57 $
-  Version:   $Revision: 1.7.4.1 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.7.4.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -24,8 +24,8 @@
 #include "mafDecl.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 
 // vme stuff
 #include "mmaMaterial.h"
@@ -123,14 +123,14 @@ void mafGizmoScaleIsotropic::CreateISA()
 {
   
   // create isa compositor and assign behaviors to m_IsaGen ivar
-  m_IsaComp = mmiCompositorMouse::New();
+  m_IsaComp = mafInteractorCompositorMouse::New();
 
   // default behavior is activated by mouse left and is constrained to X axis,
   // default ref sys is input vme abs matrix
   m_IsaGen = m_IsaComp->CreateBehavior(MOUSE_LEFT);
 
   m_IsaGen->SetVME(m_InputVme);
-  m_IsaGen->GetTranslationConstraint()->SetConstraintModality(mmiConstraint::FREE, mmiConstraint::LOCK, mmiConstraint::LOCK);
+  m_IsaGen->GetTranslationConstraint()->SetConstraintModality(mafInteractorConstraint::FREE, mafInteractorConstraint::LOCK, mafInteractorConstraint::LOCK);
   m_IsaGen->GetTranslationConstraint()->GetRefSys()->SetTypeToView();
     
   //isa will send events to this

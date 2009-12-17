@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 13:49:33 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2009-12-17 11:47:18 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -24,8 +24,8 @@
 #include "mafDecl.h"
 
 // isa stuff
-#include "mmiCompositorMouse.h"
-#include "mmiGenericMouse.h"
+#include "mafInteractorCompositorMouse.h"
+#include "mafInteractorGenericMouse.h"
 #include "mmaMaterial.h"
 
 // vme stuff

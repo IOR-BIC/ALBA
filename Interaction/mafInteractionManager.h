@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractionManager.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2009-12-17 11:47:19 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -43,8 +43,8 @@ class mafView;
 class mflXMLWriter;
 class vtkXMLDataElement;
 class vtkXMLDataParser;
-class mmiSER;
-class mmiPER;
+class mafInteractorSER;
+class mafInteractorPER;
 class mafNode;
 class mafGUIDialog;
 class mafGUI;
@@ -63,7 +63,7 @@ class mafDeviceClientMAF;
   picked VME is delegated to PER (positional event router) object, and low level 
   routing from devices to actions is delegated to the SER (static event router) 
   object.
-  @sa mafDeviceManager mmiPER mmiSER 
+  @sa mafDeviceManager mafInteractorPER mafInteractorSER 
   
   @todo
   - check the renderer to be RenFront
@@ -171,19 +171,19 @@ public:
 
 
   /** return the positional event router */
-  mmiPER *GetPER() {return m_PositionalEventRouter;}
+  mafInteractorPER *GetPER() {return m_PositionalEventRouter;}
 
   /** used to override the default PER. To be called before initializations */
-  void SetPER(mmiPER *per);
+  void SetPER(mafInteractorPER *per);
 
   /** set a new PER and keep the old one in a list */
-  void PushPER(mmiPER *per);
+  void PushPER(mafInteractorPER *per);
   
   /** restore previous PER instance */
   bool PopPER();
 
   /** return the static event router */
-  mmiSER *GetSER() {return m_StaticEventRouter;}
+  mafInteractorSER *GetSER() {return m_StaticEventRouter;}
 
   /** Set the FlyTo mode for the selected view. */
   void CameraFlyToMode();
@@ -213,7 +213,7 @@ public:
   //bool ShowModal(); //SIL. 07-jun-2006 : 
   mafGUI* GetGui();  //SIL. 07-jun-2006 : 
 
-  mmiSER *GetStaticEventRouter() {return m_StaticEventRouter;}
+  mafInteractorSER *GetStaticEventRouter() {return m_StaticEventRouter;}
 
 protected:
   /** This is called by Store() to store information of this object.  */
@@ -250,13 +250,13 @@ protected:
   mafString			          m_SettingFileName;
   
   mafDeviceManager*       m_DeviceManager; 
-  mmiPER*                 m_PositionalEventRouter;
-  mmiSER*                 m_StaticEventRouter;
+  mafInteractorPER*                 m_PositionalEventRouter;
+  mafInteractorSER*                 m_StaticEventRouter;
   
   mafDeviceClientMAF           *m_ClientDevice;
   
   mmuAvatarsMap                       m_Avatars; ///< keeps a list of visible avatars
-  std::list<mafAutoPointer<mmiPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing
+  std::list<mafAutoPointer<mafInteractorPER> >  m_PERList; ///< the interactor devoted to Positional Event Routing
 
   std::set<mafView *>                 m_CameraUpdateRequests; ///< requests for Camera update of single views
   
