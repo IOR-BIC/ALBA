@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2009-12-17 15:15:05 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -473,7 +473,6 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialo
   m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL,true);
   m_Histogram->SetListener(this);
   m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
-  m_Histogram->SetRealNumberOfBinsOn();
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
   hd->Update();
   m_Histogram->SetData(hd->GetPointData()->GetScalars());
@@ -543,41 +542,23 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
   wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
-  int *x = new int[10];
-  int *y = new int[10];
+  double *x = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
+  double *y = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
 
-  for (int i=0;i<10;i++)
-  {
-    y[i] = 0;
-    x[i] = i-5;
-  }
-
-  for (int j=0;j<hd->GetNumberOfPoints();j++)
-  {
-    int value2 = hd->GetPointData()->GetScalars()->GetTuple1(j);
-    if (value2>=-5 && value2<10)
-    {
-    	y[value2-(int)-5]++;
-    }
-  }
-
-//   double *x = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
-//   double *y = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
-// 
   ofstream xFile;
   xFile.open("x.txt");
   ofstream yFile;
   yFile.open("y.txt");
   xFile<<"[";
   yFile<<"[";
-  for (int i=0;i<10;i++)
+  for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
   {
-//     x[i] = i + sr[0];
-//     y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
+    x[i] = i + sr[0];
+    y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
 
     xFile<<x[i];
     yFile<<y[i];
-    if (i != 10-1)
+    if (i != accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()-1)
     {
       xFile<<",";
       yFile<<",";
