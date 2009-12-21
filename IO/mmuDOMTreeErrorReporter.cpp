@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mmuDOMTreeErrorReporter.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-02-23 14:47:48 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2009-12-21 15:40:04 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone m.petrone@cineca.it
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -30,22 +30,28 @@ void mmuDOMTreeErrorReporter::error(const XERCES_CPP_NAMESPACE_QUALIFIER SAXPars
 //------------------------------------------------------------------------------
 {
   m_SawErrors = true;
-  mafErrorMessageMacro("Error at file \"" << toCatch.getSystemId() \
-	 << "\", line " << toCatch.getLineNumber() \
-	 << ", column " << toCatch.getColumnNumber() \
-   << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
-  );
+  if(m_TestFlag == false)
+  {
+    mafErrorMessageMacro("Error at file \"" << toCatch.getSystemId() \
+      << "\", line " << toCatch.getLineNumber() \
+      << ", column " << toCatch.getColumnNumber() \
+      << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
+      );
+  }
 }
 //------------------------------------------------------------------------------
 void mmuDOMTreeErrorReporter::fatalError(const XERCES_CPP_NAMESPACE_QUALIFIER SAXParseException& toCatch)
 //------------------------------------------------------------------------------
 {
   m_SawErrors = true;
-  mafErrorMessageMacro("Fatal Error at file \"" << mafXMLString(toCatch.getSystemId()) \
-	 << "\", line " << toCatch.getLineNumber() \
-	 << ", column " << toCatch.getColumnNumber() \
-   << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
-  );
+  if(m_TestFlag == false)
+  {
+    mafErrorMessageMacro("Fatal Error at file \"" << mafXMLString(toCatch.getSystemId()) \
+	  << "\", line " << toCatch.getLineNumber() \
+	  << ", column " << toCatch.getColumnNumber() \
+    << "\n   Message: " << mafXMLString(toCatch.getMessage()) \
+    );
+  }
   
 }
 //------------------------------------------------------------------------------
