@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:45 $
-  Version:   $Revision: 1.17.2.2 $
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.17.2.3 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -32,11 +32,14 @@ class mafGUILutSlider;
 // mafViewRXCT :
 //----------------------------------------------------------------------------
 /** 
-This view features two Rx views and one compound view made of six CT slices.*/
+This view features two Rx views and one compound view made of six CT slices.
+This is an experimental component with rotated volumes interaction
+and visualization enabled.*/
+
 class mafViewRXCT : public mafViewCompound
 {
 public:
-  mafViewRXCT(wxString label = "View RXCT");
+  mafViewRXCT(wxString label = "View RXCT Rotated Volumes Debugger");
   virtual ~mafViewRXCT(); 
 
   mafTypeMacro(mafViewRXCT, mafViewCompound);

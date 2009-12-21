@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:45 $
-  Version:   $Revision: 1.45.2.7 $
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.45.2.8 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -212,9 +212,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         }*/
         
         
-        
-
-
+       
         ((mafViewRX *)m_ChildViewList[childID])->SetLutRange(advLow,advHigh);
 
       }
@@ -319,6 +317,7 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         int i=0;
         while (j!=m_Sort[i]) i++;
         double pos[3]={0.0,0.0,m_Pos[m_Sort[i]]};
+        ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetSliceLocalOrigin(pos);
         ((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->CameraUpdate();
       }
       mafPipe *p=((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(0))->GetNodePipe(node);
@@ -666,6 +665,7 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
           SetThicknessForAllSurfaceSlices(root);
         }
       }
+
       default:
       mafViewCompound::OnEvent(maf_event);
     }

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:45 $
-  Version:   $Revision: 1.61.2.11 $
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.61.2.12 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004

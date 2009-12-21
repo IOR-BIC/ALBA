@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.7 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.7.2.1 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
@@ -16,6 +16,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafViewVTK.h"
+#include "mafMatrix.h"
 
 //----------------------------------------------------------------------------
 // forward references :
@@ -78,9 +79,20 @@ public:
   Return true if a there is a volume inside the view.*/
   bool VolumeIsVisible() {return m_CurrentVolume != NULL;};
 
-protected:
-  virtual mafGUI *CreateGui();
+  void CameraUpdate();
 
+protected:
+
+  void CameraUpdateForRotatedVolumes();
+  
+  void SetCameraParallelToDataSetLocalAxis( int axis );
+
+  virtual mafGUI *CreateGui();  
   mafSceneNode *m_CurrentVolume; ///< Current visualized volume
+  
+  mafMatrix m_OldABSPose;
+  mafMatrix m_NewABSPose;
+
+
 };
 #endif

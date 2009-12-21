@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:45 $
-  Version:   $Revision: 1.23.2.1 $
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.23.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,7 +34,10 @@ class vtkPoints;
 // mafViewOrthoSlice :
 //----------------------------------------------------------------------------
 /** 
-  This compound view is made of four child views used to analyze different orthogonal slices of the volume*/
+This compound view is made of four child views used to analyze different orthogonal 
+slices of the volume. This is an experimental component with rotated volumes interaction
+and visualization enabled.*/
+
 class mafViewOrthoSlice: public mafViewCompound
 {
 public:

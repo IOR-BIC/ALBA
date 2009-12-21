@@ -2,14 +2,15 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:25:10 $
-  Version:   $Revision: 1.19 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.19.2.1 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
   CINECA - Interuniversity Consortium (www.cineca.it) 
 =========================================================================*/
 
+const bool DEBUG_MODE = false;
 
 #include "mafDefines.h" 
 //----------------------------------------------------------------------------
@@ -35,10 +36,13 @@
 #include "mafPipeSurfaceSlice.h"
 #include "medVisualPipeSlicerSlice.h"
 #include "mafVMEVolumeGray.h"
+#include "mafAbsMatrixPipe.h"
+#include "mafTransform.h"
 
 #include "vtkDataSet.h"
 #include "vtkMAFRayCast3DPicker.h"
 #include "vtkCellPicker.h"
+#include "vtkCamera.h"
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(mafViewRX);
@@ -345,4 +349,136 @@ void mafViewRX::GetLutRange(double minMax[2])
     mafPipeVolumeProjected *pipe = (mafPipeVolumeProjected *)m_CurrentVolume->m_Pipe;
     pipe->GetLutRange(minMax); 
   }
+}
+
+
+void mafViewRX::CameraUpdate()
+{
+  if (m_CurrentVolume)
+  {
+    mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme);
+
+    std::ostringstream stringStream;
+    stringStream << "VME " << volume->GetName() << " ABS matrix:" << std::endl;
+
+    volume->GetAbsMatrixPipe()->GetMatrixPointer()->Print(stringStream);
+
+    m_NewABSPose = volume->GetAbsMatrixPipe()->GetMatrix();
+
+    if (DEBUG_MODE == true)
+      mafLogMessage(stringStream.str().c_str());
+
+    if (m_NewABSPose.Equals(&m_OldABSPose))
+    { 
+      if (DEBUG_MODE == true)
+        mafLogMessage("Calling Superclass Camera Update ");
+
+      Superclass::CameraUpdate();
+    }
+    else
+    {
+      if (DEBUG_MODE == true)
+        mafLogMessage("Calling Rotated Volumes Camera Update ");
+      m_OldABSPose = m_NewABSPose;
+      CameraUpdateForRotatedVolumes();
+    }
+  }
+  else
+  {
+
+    if (DEBUG_MODE == true)
+      mafLogMessage("Calling Superclass Camera Update ");
+    
+    Superclass::CameraUpdate();
+  
+  }
+}
+
+void mafViewRX::SetCameraParallelToDataSetLocalAxis( int axis )
+{
+  double oldCameraPosition[3] = {0,0,0};
+  double oldCameraFocalPoint[3] = {0,0,0};
+  double *oldCameraOrientation;
+
+
+  this->GetRWI()->GetCamera()->GetFocalPoint(oldCameraFocalPoint);
+  this->GetRWI()->GetCamera()->GetPosition(oldCameraPosition);
+  oldCameraOrientation = this->GetRWI()->GetCamera()->GetOrientation();
+
+  mafVME *currentVMEVolume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
+  assert(currentVMEVolume);
+
+  assert(m_CurrentVolume);
+  vtkDataSet *vmeVTKData = currentVMEVolume->GetOutput()->GetVTKData();
+  vtkMatrix4x4 *vmeABSMatrix = currentVMEVolume->GetAbsMatrixPipe()->GetMatrix().GetVTKMatrix();
+
+  double absDataBounds[6] = {0,0,0,0,0,0};
+
+  currentVMEVolume->GetOutput()->GetBounds(absDataBounds);
+
+  double newCameraFocalPoint[3] = {0,0,0};
+
+  newCameraFocalPoint[0] = (absDataBounds[0] + absDataBounds[1]) / 2;
+  newCameraFocalPoint[1] = (absDataBounds[2] + absDataBounds[3]) / 2;
+  newCameraFocalPoint[2] = (absDataBounds[4] + absDataBounds[5]) / 2;
+
+  double newCameraViewUp[3] = {0,0,0};
+  double newCameraPosition[3] = {0,0,0};
+
+  if (axis  == mafTransform::X)
+  {
+    mafTransform::GetVersor(mafTransform::Z,mafMatrix(vmeABSMatrix),newCameraViewUp );
+
+    double xVersor[3] = {0,0,0};
+
+    mafTransform::GetVersor(mafTransform::X,mafMatrix(vmeABSMatrix),xVersor );
+    mafTransform::MultiplyVectorByScalar(100, xVersor, xVersor);
+    mafTransform::AddVectors(newCameraFocalPoint, xVersor, newCameraPosition);
+  }
+  else if (axis == mafTransform::Y)
+  {
+    mafTransform::GetVersor(mafTransform::Z,mafMatrix(vmeABSMatrix),newCameraViewUp );
+
+    double yVersor[3] = {0,0,0};  
+
+    mafTransform::GetVersor(mafTransform::Y,mafMatrix(vmeABSMatrix),yVersor );
+    mafTransform::MultiplyVectorByScalar(-100, yVersor, yVersor);
+    mafTransform::AddVectors(newCameraFocalPoint, yVersor, newCameraPosition);
+  }
+  else if (axis == mafTransform::Z)
+  {
+    mafTransform::GetVersor(mafTransform::Y,mafMatrix(vmeABSMatrix),newCameraViewUp );
+    mafTransform::MultiplyVectorByScalar(-1, newCameraViewUp, newCameraViewUp);
+
+    double zVersor[3] = {0,0,0};
+
+    mafTransform::GetVersor(mafTransform::Z,mafMatrix(vmeABSMatrix),zVersor );
+    mafTransform::MultiplyVectorByScalar(-100, zVersor, zVersor);
+    mafTransform::AddVectors(newCameraFocalPoint, zVersor, newCameraPosition);
+  }
+
+  vtkCamera *camera = this->GetRWI()->GetCamera();
+  camera->SetFocalPoint(newCameraFocalPoint);
+  camera->SetPosition(newCameraPosition);
+  camera->SetViewUp(newCameraViewUp);
+  camera->SetClippingRange(0.1,1000);
+
+}
+
+
+void mafViewRX::CameraUpdateForRotatedVolumes()
+{
+  if (m_CurrentVolume != NULL)
+  {
+    if (m_CameraPositionId == CAMERA_RX_FRONT)
+    {
+      SetCameraParallelToDataSetLocalAxis(mafTransform::Y);
+    } 
+    else if (m_CameraPositionId == CAMERA_RX_LEFT)
+    {
+      SetCameraParallelToDataSetLocalAxis(mafTransform::X);
+    }
+  }
+
+  Superclass::CameraUpdate();
 }

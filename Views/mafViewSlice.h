@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:45 $
-  Version:   $Revision: 1.26.2.4 $
+  Date:      $Date: 2009-12-21 15:12:32 $
+  Version:   $Revision: 1.26.2.5 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,6 +16,7 @@
 // Include:
 //----------------------------------------------------------------------------
 #include "mafViewVTK.h"
+#include "mafMatrix.h"
 #include <vector>
 
 #if defined(DEPRECATE_SUPPORTED) && _MSC_VER >= 1400
@@ -31,6 +32,7 @@
 //----------------------------------------------------------------------------
 class mafVME;
 class mafSceneNode;
+
 class vtkActor2D;
 class vtkTextMapper;
 
@@ -39,9 +41,11 @@ class vtkTextMapper;
 //----------------------------------------------------------------------------
 /** 
 mafViewSlice is a View that visualize volume as slices and 
-initialize the visual pipe according to the camera position that is passed through constructor
-\sa mafViewVTK
+initialize the visual pipe according to the camera position that is passed through constructor.
+This is an experimental component with rotated volumes interaction
+and visualization enabled.
 */
+
 class mafViewSlice: public mafViewVTK
 {
 public:
@@ -170,9 +174,14 @@ public:
   /* Set the opacity of the border if exist */
   void SetBorderOpacity(double value);
 
+  void CameraUpdate();
+
 protected:
   virtual mafGUI *CreateGui();
 
+  void CameraUpdateForRotatedVolumes();
+  void SetCameraParallelToDataSetLocalAxis( int axis );
+ 
   mafSceneNode    *m_CurrentVolume; ///< Current visualized volume
   vtkActor2D      *m_Border;
   double           m_Slice[3];        //<Slice origin
@@ -181,7 +190,7 @@ protected:
 
 	bool						 m_ShowVolumeTICKs;
   double           m_BorderColor[3];
-  // text stuff
+
   vtkActor2D    *m_TextActor;
   vtkTextMapper	*m_TextMapper;
   wxString m_Text;
@@ -190,6 +199,12 @@ protected:
 	std::vector<mafSceneNode*> m_CurrentPolyline;
 	std::vector<mafSceneNode*> m_CurrentPolylineGraphEditor;
   std::vector<mafSceneNode*> m_CurrentMesh;
+  
+  mafMatrix m_OldABSPose;
+  mafMatrix m_NewABSPose;
+
+  double m_LastSliceOrigin[3];
+  double m_LastSliceNormal[3];
 
   // Added by Losi 11.25.2009
   int m_EnableGPU; ///<Non-zero, if the GPU support for slicing is used (default)
