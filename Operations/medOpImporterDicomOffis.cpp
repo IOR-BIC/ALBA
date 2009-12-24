@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-19 08:39:08 $
-Version:   $Revision: 1.1.2.65 $
+Date:      $Date: 2009-12-24 10:33:53 $
+Version:   $Revision: 1.1.2.66 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2311,12 +2311,13 @@ void medOpImporterDicomOffis::Crop()
 	double diffx,diffy,boundsCamera[6];
 	diffx=m_DicomBounds[1]-m_DicomBounds[0];
 	diffy=m_DicomBounds[3]-m_DicomBounds[2];
-	boundsCamera[0]=0.0;
-	boundsCamera[1]=diffx;
-	boundsCamera[2]=0.0;
-	boundsCamera[3]=diffy;
-	boundsCamera[4]=0.0;
-	boundsCamera[5]=0.0;
+
+   boundsCamera[0]=0.0;
+   boundsCamera[1]=diffx;
+   boundsCamera[2]=0.0;
+   boundsCamera[3]=diffy;
+   boundsCamera[4]=0.0;
+   boundsCamera[5]=0.0;
 
 	m_CropPage->GetRWI()->CameraReset(boundsCamera);
 	m_CropPage->GetRWI()->CameraUpdate();
@@ -3256,8 +3257,6 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
   m_Text = "";
 
 	m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
-  //m_ListSelected->Item(slice_num)->GetData()->GetFileName();
-
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
 	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
 
@@ -3290,8 +3289,23 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 		if(crop_bounds[3] > m_DicomBounds[3]) 
 			crop_bounds[3] = m_DicomBounds[3];
 
-		double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0])));
-		double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1])));
+    /*int k = 0;
+    while(k * spacing[0] +Origin[0]<crop_bounds[0])
+    {
+      k++;
+    }
+    crop_bounds[0] = (k-1) * spacing[0] +Origin[0];
+
+    k=0;
+    while(k * spacing[1] +Origin[1]<crop_bounds[2])
+    {
+      k++;
+    }
+    crop_bounds[2] = (k-1) * spacing[1] +Origin[1];
+*/
+
+    double dim_x_clip = ceil((double)(((crop_bounds[1] - crop_bounds[0]) / spacing[0]) + 1));
+    double dim_y_clip = ceil((double)(((crop_bounds[3] - crop_bounds[2]) / spacing[1]) + 1));
 
 		vtkMAFSmartPointer<vtkStructuredPoints> clip;
 		clip->SetOrigin(crop_bounds[0], crop_bounds[2], loc[m_SortAxes]);// Origin[m_SortAxes]);	
