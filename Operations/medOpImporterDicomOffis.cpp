@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-24 10:33:53 $
-Version:   $Revision: 1.1.2.66 $
+Date:      $Date: 2009-12-29 09:50:05 $
+Version:   $Revision: 1.1.2.67 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3473,7 +3473,7 @@ void medOpImporterDicomOffis::ResampleVolume()
   mafSmartPointer<mafTransform> box_pose;
   box_pose->SetOrientation(m_VolumeOrientation);
   box_pose->SetPosition(m_VolumePosition);
-  //box_pose->SetPosition(m_VolumePosition);
+
 
   mafSmartPointer<mafTransformFrame> local_pose;
   local_pose->SetInput(box_pose);
@@ -3547,16 +3547,12 @@ void medOpImporterDicomOffis::ResampleVolume()
 
         mafSmartPointer<mafMatrix> output_abs_pose;
         m_Volume->GetOutput()->GetAbsMatrix(*output_abs_pose.GetPointer(),input_item->GetTimeStamp());
-        output_to_input->SetInputFrame(output_abs_pose);
+        output_to_input->SetInputFrame(box_pose->GetMatrixPointer());
 
         mafSmartPointer<mafMatrix> input_abs_pose;
         ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
         output_to_input->SetTargetFrame(input_abs_pose);
         output_to_input->Update();
-
-        double orient_input[3],orient_target[3];
-        mafTransform::GetOrientation(*output_abs_pose.GetPointer(),orient_target);
-        mafTransform::GetOrientation(*input_abs_pose.GetPointer(),orient_input);
 
         double origin[3];
         origin[0] = volumeBounds[0];
@@ -3566,9 +3562,6 @@ void medOpImporterDicomOffis::ResampleVolume()
         output_to_input->TransformPoint(origin,origin);
         resampler->SetVolumeOrigin(origin[0],origin[1],origin[2]);
         vtkMatrix4x4 *mat = output_to_input->GetMatrix().GetVTKMatrix();
-        double local_orient[3],local_position[3];
-        mafTransform::GetOrientation(output_to_input->GetMatrix(),local_orient);
-        mafTransform::GetPosition(output_to_input->GetMatrix(),local_position);
 
         // extract versors
         double x_axis[3],y_axis[3];
