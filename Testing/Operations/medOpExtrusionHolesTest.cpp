@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHolesTest.cpp,v $
 Language:  C++
-Date:      $Date: 2008-05-06 10:19:28 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2010-01-07 14:00:25 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#include "mafDefines.h"
 #include "medDefines.h"
 //----------------------------------------------------------------------------
 // NOTE: Every CPP file in the MAF must include "mafDefines.h" as first.
