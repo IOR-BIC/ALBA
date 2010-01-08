@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 10:29:46 $
-  Version:   $Revision: 1.3 $
+  Date:      $Date: 2010-01-08 13:57:39 $
+  Version:   $Revision: 1.3.2.1 $
   Authors:   Stefania Paperini, Stefano Perticoni, porting Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -25,15 +25,23 @@ class mafVME;
 class mafVMESurface;
 class mafString;
 
-//----------------------------------------------------------------------------
-// medOpClassicICPRegistration :
-//----------------------------------------------------------------------------
+
+/**
+  class name: medOpClassicICPRegistration 
+  Operation that use mafClassicICPRegistration, for matching two 
+  surfaces using the iterative closest point (ICP) algorithm.
+*/
+
 class medOpClassicICPRegistration: public mafOp
 {
 public:
+  /** constructor */
 	medOpClassicICPRegistration(wxString label);
-	~medOpClassicICPRegistration(); 
+  /** destructor */
+	~medOpClassicICPRegistration();
+  /** method allows to handle events from other objects*/
 	void   OnEvent(mafEventBase *maf_event);
+  /** clone the object and retrieve a copy*/
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */

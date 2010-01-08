@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicom.h,v $
 Language:  C++
-Date:      $Date: 2009-03-06 09:47:14 $
-Version:   $Revision: 1.12.2.3 $
+Date:      $Date: 2010-01-08 13:57:39 $
+Version:   $Revision: 1.12.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -78,10 +78,13 @@ From a DICOM dataset return a VME Volume.
 class medOpImporterDicom : public mafOp
 {
 public:
+  /** constructor */
 	medOpImporterDicom(wxString label = "Importer DICOM");
 
+  /** RTTI macro */
 	mafTypeMacro(medOpImporterDicom, mafOp);
 
+  /** clone the operations */
 	mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -154,16 +157,22 @@ protected:
 	/** Perform update of guis of 3 pages of the wizard */
 	void GuiUpdate();
 
+  /** enable/disable slice slider */
 	void EnableSliceSlider(bool enable);
 
+  /** enable/disable time slider */
 	void EnableTimeSlider(bool enable);
 
+  /** camera update */
 	void CameraUpdate();
 
+  /** reset camera */
 	void CameraReset();
 
+  /** open directory of the data */
   bool OpenDir();
 
+  /** event for wizard page changing*/
 	void OnWizardPageChanging(){};
 
 	/** Auto position of the crop plane in way of Volume side */
@@ -257,15 +266,17 @@ protected:
 
 	mafGUICheckListBox *m_DicomModalityListBox;
 
+  /** destructor */
 	~medOpImporterDicom();
 };
-
-//----------------------------------------------------------------------------
-// medImporterDICOMListElement :
-//----------------------------------------------------------------------------
+/**
+  class name: medImporterDICOMListElement
+  It represents a single element of the list of dicom images.
+*/
 class medImporterDICOMListElement
 {
 public:
+  /** constructor*/
 	medImporterDICOMListElement() 
 	{
 		m_SliceFilename = "";
@@ -277,6 +288,7 @@ public:
 		m_NumberOfImages = -1;
 	};
 
+  /** overloaded constructor */
 	medImporterDICOMListElement(mafString filename,double coord[3], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceFilename = filename;
@@ -290,6 +302,7 @@ public:
 		m_Data->DeepCopy(data);
 	};
 
+  /** destructor*/
 	~medImporterDICOMListElement() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
@@ -319,8 +332,10 @@ public:
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
 
+  /** retrieve image data*/
 	vtkImageData* GetOutput(){return m_Data;};
 
+  /** retrieve slice position*/
 	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};
 
 protected:

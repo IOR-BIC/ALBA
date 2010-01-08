@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medGUIDynamicVP.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-07-02 08:18:15 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2010-01-08 13:55:59 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -76,6 +76,10 @@ public:
 
 protected:
 #pragma region Register of Pipes
+  /**
+    class name: medPipeRegister
+    This class registe the pipes. It handle a pipe vector container.
+  */
   class medPipeRegister
   {
   protected:    
@@ -123,13 +127,16 @@ protected:
   bool m_BGUIThisShown;      ///<true, if the GUIThis is shown
 
 protected:
+  /** declare event table macro */
   DECLARE_EVENT_TABLE();
 
 public:
+  /** constructor */
   medGUIDynamicVP(wxWindow* parent, wxWindowID id, 
     long GUIstyle =  GS_DEFAULT, 
     const wxPoint& pos = wxDefaultPosition, 
-    const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL); 
+    const wxSize& size = wxDefaultSize, long style = wxTAB_TRAVERSAL);
+  /** destructor */
   virtual ~medGUIDynamicVP();    
 
   /** Gets the listener that will be notified when any control changes. */

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafICPUtility.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-19 11:16:49 $
-  Version:   $Revision: 1.4.2.1 $
+  Date:      $Date: 2010-01-08 13:59:39 $
+  Version:   $Revision: 1.4.2.2 $
   Authors:   Andrea Cutti porting Matteo Giacomoni    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,9 +36,11 @@
 #include <vnl/algo/vnl_svd.h>
 #include <vnl/algo/vnl_determinant.h>
 
-//----------------------------------------------------------------------------
+/**
+  class name: mafICPUtility
+  Implementation of the ICP algorithm utility.
+*/
 class VTK_vtkMAF_EXPORT mafICPUtility : public vtkObject
-//----------------------------------------------------------------------------
 {
 public:
   static mafICPUtility *New();
@@ -95,7 +97,7 @@ protected:
   ~mafICPUtility() {};
 };
 
-vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4.2.1 $");
+vtkCxxRevisionMacro(mafICPUtility, "$Revision: 1.4.2.2 $");
   vtkStandardNewMacro(mafICPUtility);
 //----------------------------------------------------------------------------
 inline vnl_matrix<double> mafICPUtility::PolyData2VnlFilter(vtkPolyData* Shape)

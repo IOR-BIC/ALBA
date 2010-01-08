@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpCreateWrappedMeter.h,v $
   Language:  C++
-  Date:      $Date: 2007-08-20 13:49:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-01-08 13:57:39 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -21,22 +21,30 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 class medVMEWrappedMeter;
 class mafGui;
 class mafEvent;
-//----------------------------------------------------------------------------
-// medOpCreateWrappedMeter :
-//----------------------------------------------------------------------------
-/** */
+
+/** 
+  class name: medOpCreateWrappedMeter
+  Operation that create a medVMEWrappedMeter for wrap muscle action lines.
+*/
 class medOpCreateWrappedMeter: public mafOp
 {
 public:
+  /** constructor */
   medOpCreateWrappedMeter(const wxString &label = "CreateWrappedMeter");
+  /** destructor */
   ~medOpCreateWrappedMeter(); 
 
+  /** RTTI macro*/
   mafTypeMacro(medOpCreateWrappedMeter, mafOp);
 
+  /** clone the object and retrieve a copy*/
   mafOp* Copy();
 
+  /** Return true for the acceptable vme type. */
   bool Accept(mafNode *node);
+  /** Builds operation's interface. */
   void OpRun();
+  /** Execute the operation. */
   void OpDo();
 
 protected: 

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mafVMEVolumeLargeUtils.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-05-14 15:05:19 $ 
-  Version: $Revision: 1.1.2.1 $ 
+  Date: $Date: 2010-01-08 13:58:03 $ 
+  Version: $Revision: 1.1.2.2 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -19,7 +19,10 @@
 class mafObject;
 class mafObserver;
 class mafString;
-
+/**
+  class name: mafVMEVolumeLargeUtils
+  the class that gather several static methods usefull for import a large volume dataset.
+*/
 class mafVMEVolumeLargeUtils
 {
 public:

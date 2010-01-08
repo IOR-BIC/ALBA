@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2009-10-19 08:39:08 $
-Version:   $Revision: 1.1.2.23 $
+Date:      $Date: 2010-01-08 13:57:39 $
+Version:   $Revision: 1.1.2.24 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -86,8 +86,9 @@ From a DICOM dataset return a VME Volume, a VME Image or a VME Mesh.
 class medOpImporterDicomOffis : public mafOp
 {
 public:
+  /** constructor */
 	medOpImporterDicomOffis(wxString label = "Importer DICOM");
-
+  /** RTTI macro */
 	mafTypeMacro(medOpImporterDicomOffis, mafOp);
 
   /** Copy. */
@@ -117,7 +118,7 @@ public:
   /** Return the directory name which contains DICOM slices to import. */
   const char *GetDirName() const {return m_DicomDirectory.GetCStr();};
 
-  /** OnEvent. */
+  /** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
 
   /** Assign the dicom directory*/
@@ -341,15 +342,18 @@ protected:
 
 	mafGUICheckListBox *m_DicomModalityListBox;
 
+  /** destructor */
 	~medOpImporterDicomOffis();
 };
 
-//----------------------------------------------------------------------------
-// medOpImporterDicomOffis :
-//----------------------------------------------------------------------------
+/**
+  class name: medOpImporterDicomOffis
+  It represents an element of the dicom list.
+*/
 class medImporterDICOMListElements
 {
 public:
+  /** constructor */
 	medImporterDICOMListElements() 
 	{
 		m_SliceFilename = "";
@@ -369,7 +373,7 @@ public:
 		m_TriggerTime = -1.0;
 		m_NumberOfImages = -1;
 	};
-
+  /** overloaded constructor */
 	medImporterDICOMListElements(mafString filename,double coord[3], double orientation[9], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceFilename = filename;
@@ -392,6 +396,7 @@ public:
 		m_Data->DeepCopy(data);
 	};
 
+  /** destructor */
 	~medImporterDICOMListElements() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
@@ -430,8 +435,7 @@ public:
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
 
-  
-
+  /** Retrieve image data*/
 	vtkImageData* GetOutput(){return m_Data;};
 
   /** Return the position of a slice*/

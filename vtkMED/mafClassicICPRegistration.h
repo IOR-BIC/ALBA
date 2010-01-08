@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: mafClassicICPRegistration.h,v $
   Language:  C++
-  Date:      $Date: 2006-12-11 09:13:36 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-01-08 13:59:39 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Stefania Paperini paperini@tecno.ior.it 
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -83,9 +83,15 @@ POSSIBILITY OF SUCH DAMAGES.
 class vtkCellLocator;
 class vtkDataSet;
 class mafICPUtility;
-//----------------------------------------------------------------------------
-// mafClassicICPRegistration :
-//----------------------------------------------------------------------------
+
+/** 
+  class name: mafClassicICPRegistration
+  Match two surfaces using the iterative closest point (ICP) algorithm.
+  The core of the algorithm is to match each vertex in one surface with 
+  the closest surface point on the other, then apply the transformation
+  that modify one surface to best match the other (in a least square sense).
+  This has to be iterated to get proper convergence of the surfaces.
+*/
 class VTK_vtkMAF_EXPORT mafClassicICPRegistration : public vtkIterativeClosestPointTransform
 {
 public:

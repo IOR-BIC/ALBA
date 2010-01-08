@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGeometryEditorPolylineGraph.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:24:37 $
-Version:   $Revision: 1.11.2.2 $
+Date:      $Date: 2010-01-08 13:54:52 $
+Version:   $Revision: 1.11.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -66,10 +66,16 @@ class vtkPolyData;
 
 #define UNDEFINED_POINT_ID -1
 #define UNDEFINED_BRANCH_ID -1
-
+/**
+  class name: medGeometryEditorPolylineGraph
+  This class allows the editing of a polylinegraph (class created by BES).
+  It creates ISA, can add, insert, remove, move point in the polyline graph,
+  it can also add, remove branch in which points are.
+*/
 class medGeometryEditorPolylineGraph: public mafObserver 
 {
 public:
+  /** contructor*/
 	medGeometryEditorPolylineGraph(mafVME *input=NULL, mafObserver *listener = NULL, medVMEPolylineGraph *polyline=NULL,bool testMode=false);
 	virtual ~medGeometryEditorPolylineGraph(); 
 
@@ -151,20 +157,25 @@ public:
 	/** Insert a point defined by position between two points selected before */
 	int InsertPoint(double position[3]);
 
+  /** Enable Test Mode*/
 	void SetTestModeOn(){m_TestMode=true;};
+  /** Disable Test Mode*/
 	void SetTestModeOff(){m_TestMode=false;};
 
+  /** set radius dimension */
   void SetRadius(double radius){m_SphereRadius = radius; OnEvent(&mafEvent(this,ID_SPHERE_RADIUS));}
 
 protected:
-
+  /** create gui */
 	void CreateGui();
 
 	/** Create isa stuff */
 	void CreateISA();
 
+  /** create pipe*/
 	void CreatePipe();
 
+  /** update dataset inside vme */
 	int UpdateVMEEditorData(vtkPolyData *polydata);
 
 	/** Manage if a VME is picked in the view */
@@ -173,6 +184,7 @@ protected:
 	/** Update VME Editor behavior and VME Input behavior */
 	void BehaviorUpdate();
 
+  /** compute distance to polyline */
   double ComputeDistancePointLine(double lineP0[3],double lineP1[3],double point[3]);
 
 	/**
