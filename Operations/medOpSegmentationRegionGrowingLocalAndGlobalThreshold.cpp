@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 15:15:05 $
-Version:   $Revision: 1.1.2.11 $
+Date:      $Date: 2010-01-11 09:27:59 $
+Version:   $Revision: 1.1.2.12 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -554,7 +554,15 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
   for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
   {
     x[i] = i + sr[0];
-    y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
+    if (x[i] == 0 && (i>0 && i+1<i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()))//To delete a peak in the zero value
+    {
+      y[i] = (y[i-1] + accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i+1))/2;
+    }
+    else
+    {
+      y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
+    }
+    
 
     xFile<<x[i];
     yFile<<y[i];
