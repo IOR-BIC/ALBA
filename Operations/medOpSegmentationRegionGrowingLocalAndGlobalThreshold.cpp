@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2010-01-11 09:27:59 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2010-01-11 14:17:29 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -135,6 +135,9 @@ mafOp(label)
   m_Point4 = _("Point 4");
 
   m_CurrentPoint = 0;
+
+  m_EliminateHistogramValues = TRUE;
+  m_ValuesToEliminate = -500;
   
 }
 //----------------------------------------------------------------------------
@@ -336,6 +339,8 @@ enum REGION_GROWING_ID
   ID_DIALOG_HISTOGRAM,
   ID_FITTING,
   ID_DIALOG_OK,
+  ID_ELIMINATE_HISTOGRAM_VALUES,
+  ID_VALUES_TO_ELIMINATE,
 };
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
@@ -371,6 +376,9 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Label(&m_BoneParam1,false,true);
   m_Gui->Label(&m_BoneParam2,false,true);
   m_Gui->Label(&m_BoneParam3,false,true);
+  m_Gui->Bool(ID_ELIMINATE_HISTOGRAM_VALUES,_("Eliminate Values"),&m_EliminateHistogramValues,1);
+  m_Gui->Double(ID_VALUES_TO_ELIMINATE,_(""),&m_ValuesToEliminate);
+  m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
   //m_Gui->Button(ID_FITTING,_("Fitting"));
   m_Gui->Divider(1);
 
@@ -542,8 +550,31 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
   wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
-  double *x = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
-  double *y = new double[accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()];
+  int numOfValues = 0;
+  int startIndex = -1;
+  int numOfTuples = accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();
+  double step = (double)(srw+1)/numOfTuples;
+  if (m_EliminateHistogramValues == TRUE)
+  {
+    for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
+    {
+      if (((step*i) + sr[0])>m_ValuesToEliminate)
+      {
+        if (startIndex == -1)
+        {
+          startIndex = i;
+        }
+        numOfValues++;
+      }
+    }
+  }
+  else
+  {
+    startIndex = 0;
+    numOfValues = accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();
+  }
+  double *x = new double[numOfValues];
+  double *y = new double[numOfValues];
 
   ofstream xFile;
   xFile.open("x.txt");
@@ -551,22 +582,22 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
   yFile.open("y.txt");
   xFile<<"[";
   yFile<<"[";
-  for (int i=0;i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();i++)
+  for (int j=startIndex, i=0;j<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();j++,i++)
   {
-    x[i] = i + sr[0];
-    if (x[i] == 0 && (i>0 && i+1<i<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()))//To delete a peak in the zero value
+    x[i] = floor((step*j) + sr[0]);
+    if (x[i] == 0) //&& (i>0 && j+1<accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()))//To delete a peak in the zero value
     {
-      y[i] = (y[i-1] + accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i+1))/2;
+      y[i] = (y[i-1] + accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(j+1))/2;
     }
     else
     {
-      y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
+      y[i] = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(j);
     }
     
 
     xFile<<x[i];
     yFile<<y[i];
-    if (i != accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples()-1)
+    if (i != numOfValues-1)
     {
       xFile<<",";
       yFile<<",";
@@ -698,6 +729,11 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
   {
     switch(e->GetId())
     {
+    case ID_ELIMINATE_HISTOGRAM_VALUES:
+      {
+        m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
+      }
+      break;
     case ID_DIALOG_OK:
       {
         m_Dialog->EndModal(wxID_OK);

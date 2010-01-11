@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.h,v $
 Language:  C++
-Date:      $Date: 2009-12-11 10:05:52 $
-Version:   $Revision: 1.1.2.6 $
+Date:      $Date: 2010-01-11 14:17:29 $
+Version:   $Revision: 1.1.2.7 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -141,6 +141,8 @@ protected:
   mafString m_BoneParam1;
   mafString m_BoneParam2;
   mafString m_BoneParam3;
+  int m_EliminateHistogramValues;
+  double m_ValuesToEliminate;
 
   bool m_ComputedMedianFilter;
   mafGUIHistogramWidget *m_Histogram;
