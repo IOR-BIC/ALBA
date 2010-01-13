@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.4.2.2 $
+  Date:      $Date: 2010-01-13 12:02:35 $
+  Version:   $Revision: 1.4.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -187,8 +187,11 @@ void mafOpTransformInterface::OpDo()
       tPDF->SetTransform(scaleTransform);
 
       // progress bar stuff
-      wxString progress_string("Applying scaling to data...");
-      wxBusyInfo wait(progress_string.c_str());
+      if (!m_TestMode)
+      {
+        wxString progress_string("Applying scaling to data...");
+        wxBusyInfo wait(progress_string.c_str());
+      }
 
       mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,tPDF.GetPointer()));
       tPDF->Update();
@@ -218,7 +221,10 @@ void mafOpTransformInterface::OpDo()
     }
     else if (dataSet->IsA("vtkStructuredPoints"))
     {
-      wxBusyInfo wait_info("Applying scaling to data...");
+      if (!m_TestMode)
+      {
+      	wxBusyInfo wait_info("Applying scaling to data...");
+      }
 
       vtkStructuredPoints *currentSP = vtkStructuredPoints::SafeDownCast(((mafVME *)m_Input)->GetOutput()->GetVTKData());
       assert(currentSP);
@@ -240,7 +246,10 @@ void mafOpTransformInterface::OpDo()
     }
     else if (dataSet->IsA("vtkRectilinearGrid"))
     {
-	    wxBusyInfo wait_info("Applying scaling to data...");
+	    if (!m_TestMode)
+	    {
+	    	wxBusyInfo wait_info("Applying scaling to data...");
+	    }
   
       //mafProgressBarShowMacro();
       //mafProgressBarSetTextMacro("Applying scaling to data...");
