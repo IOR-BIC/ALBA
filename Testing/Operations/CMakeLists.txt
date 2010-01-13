@@ -80,8 +80,8 @@ ADD_TEST(medOpVolumeResampleTest ${EXECUTABLE_OUTPUT_PATH}/medOpVolumeResampleTe
 ADD_EXECUTABLE(medOpSegmentationRegionGrowingConnectedThresholdTest medOpSegmentationRegionGrowingConnectedThresholdTest.h medOpSegmentationRegionGrowingConnectedThresholdTest.cpp)
 ADD_TEST(medOpSegmentationRegionGrowingConnectedThresholdTest ${EXECUTABLE_OUTPUT_PATH}/medOpSegmentationRegionGrowingConnectedThresholdTest)
 
-
-
+ADD_EXECUTABLE(medOpScaleDatasetTest medOpScaleDatasetTest.h medOpScaleDatasetTest.cpp)
+ADD_TEST(medOpScaleDatasetTest ${EXECUTABLE_OUTPUT_PATH}/medOpScaleDatasetTest)
 
 IF (MED_USE_Offis)
 ADD_EXECUTABLE(medOpImporterDicomOffisTest medOpImporterDicomOffisTest.h medOpImporterDicomOffisTest.cpp)
