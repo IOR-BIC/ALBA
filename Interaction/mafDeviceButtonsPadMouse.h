@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafDeviceButtonsPadMouse.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:48:12 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-01-13 12:04:24 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -71,7 +71,7 @@ public:
 
   /** Used to set the flag for updating the m_SelectedRWI during mouse motion and not only on ViewSelected event.*/
   void SetUpdateRWIDuringMotion(bool update_on_motion) {m_UpdateRwiInOnMoveFlag = update_on_motion;};
-  void UpdateRWIDuringMotionOff() {m_UpdateRwiInOnMoveFlag = true;};
+  void UpdateRWIDuringMotionOff() {m_UpdateRwiInOnMoveFlag = false;};
   void UpdateRWIDuringMotionOn() {m_UpdateRwiInOnMoveFlag = true;};
 
   /** Return the status of the m_UpdateRwiInOnMoveFlag flag.*/
@@ -82,6 +82,9 @@ public:
 
   /** Turn On/Off the collaboration status. */
   void Collaborate(bool status) {m_CollaborateStatus = status;};
+  
+  /** Get the collaboration status*/
+  bool GetCollaborate() {return m_CollaborateStatus;};
 
   bool m_FromRemote;  ///< Flag used from RemoteLogic to avoid loop
 
