@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-12-02 15:06:44 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-01-13 12:01:20 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Benjamin I. Williams
 ==========================================================================
   Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
@@ -101,11 +101,15 @@ extern wxPaneInfo wxNullPaneInfo;
 
 
 
-
+/**
+  class name: wxPaneInfo
+  This class define properties of a pane. That is a panel that can be floating, dockable with a proper side.
+*/
 class WXDLLEXPORT wxPaneInfo
 {
 public:
 
+    /** constructor */
     wxPaneInfo()
     {
         window = NULL;
@@ -125,6 +129,7 @@ public:
         DefaultPane();
     }
 
+    /** copy constructor */
     wxPaneInfo(const wxPaneInfo& c)
     {
         name = c.name;
@@ -146,6 +151,7 @@ public:
         rect = c.rect;
     }
 
+    /** assignment operator */
     wxPaneInfo& operator=(const wxPaneInfo& c)
     {
         name = c.name;
@@ -168,75 +174,140 @@ public:
         return *this;
     }
 
+    /** retrive if the pane exist */
     bool IsOk() const { return (window != NULL) ? true : false; }
+    /** check flag optionResizable */
     bool IsFixed() const { return !HasFlag(optionResizable); }
+    /** check flag optionResizable */
     bool IsResizable() const { return HasFlag(optionResizable); }
+    /** check flag optionHidden */
     bool IsShown() const { return !HasFlag(optionHidden); }
+    /** check flag optionFloating */
     bool IsFloating() const { return HasFlag(optionFloating); }
+    /** check flag optionFloating */
     bool IsDocked() const { return !HasFlag(optionFloating); }
+    /** check flag optionToolbar */
     bool IsToolbar() const { return HasFlag(optionToolbar); }
+    /** check flag optionTopDockable */
     bool IsTopDockable() const { return HasFlag(optionTopDockable); }
+    /** check flag optionBottomDockable */
     bool IsBottomDockable() const { return HasFlag(optionBottomDockable); }
+    /** check flag optionLeftDockable */
     bool IsLeftDockable() const { return HasFlag(optionLeftDockable); }
+    /** check flag optionRightDockable */
     bool IsRightDockable() const { return HasFlag(optionRightDockable); }
+    /** check flag optionFloatable */
     bool IsFloatable() const { return HasFlag(optionFloatable); }
+    /** check flag optionMovable */
     bool IsMovable() const { return HasFlag(optionMovable); }
+    /** check flag optionCaption */
     bool HasCaption() const { return HasFlag(optionCaption); }
+    /** check flag optionGripper */
     bool HasGripper() const { return HasFlag(optionGripper); }
+    /** check flag optionPaneBorder */
     bool HasBorder() const { return HasFlag(optionPaneBorder); }
+    /** check flag buttonClose */
     bool HasCloseButton() const { return HasFlag(buttonClose); }
+    /** check flag buttonMaximize */
     bool HasMaximizeButton() const { return HasFlag(buttonMaximize); }
+    /** check flag buttonMinimize */
     bool HasMinimizeButton() const { return HasFlag(buttonMinimize); }
+    /** check flag buttonPin */
     bool HasPinButton() const { return HasFlag(buttonPin); }
     
+    /** set window and retrieve this pointer */
     wxPaneInfo& Window(wxWindow* w) { window = w; return *this; }
+    /** set name and retrieve this pointer */
     wxPaneInfo& Name(const wxString& n) { name = n; return *this; }
+    /** set caption and retrieve this pointer */
     wxPaneInfo& Caption(const wxString& c) { caption = c; return *this; }
+    /** set dock direction to left and retrieve this pointer */
     wxPaneInfo& Left() { dock_direction = wxAUI_DOCK_LEFT; return *this; }
+    /** set dock direction to right and retrieve this pointer */
     wxPaneInfo& Right() { dock_direction = wxAUI_DOCK_RIGHT; return *this; }
+    /** set dock direction to top and retrieve this pointer */
     wxPaneInfo& Top() { dock_direction = wxAUI_DOCK_TOP; return *this; }
+    /** set dock direction to bottom and retrieve this pointer */
     wxPaneInfo& Bottom() { dock_direction = wxAUI_DOCK_BOTTOM; return *this; }
+    /** set dock direction to center and retrieve this pointer */
     wxPaneInfo& Center() { dock_direction = wxAUI_DOCK_CENTER; return *this; }
+    /** set dock direction to center and retrieve this pointer */
     wxPaneInfo& Centre() { dock_direction = wxAUI_DOCK_CENTRE; return *this; }
+    /** set dock direction and retrieve this pointer */
     wxPaneInfo& Direction(int direction) { dock_direction = direction; return *this; }
+    /** set layer and retrieve this pointer */
     wxPaneInfo& Layer(int layer) { dock_layer = layer; return *this; }
+    /** set row and retrieve this pointer */
     wxPaneInfo& Row(int row) { dock_row = row; return *this; }
+    /** set position and retrieve this pointer */
     wxPaneInfo& Position(int pos) { dock_pos = pos; return *this; }
+    /** set best size and retrieve this pointer */
     wxPaneInfo& BestSize(const wxSize& size) { best_size = size; return *this; }
+    /** set min size and retrieve this pointer */
     wxPaneInfo& MinSize(const wxSize& size) { min_size = size; return *this; }
+    /** set max size and retrieve this pointer */
     wxPaneInfo& MaxSize(const wxSize& size) { max_size = size; return *this; }
+    /** set best size and retrieve this pointer */
     wxPaneInfo& BestSize(int x, int y) { best_size.Set(x,y); return *this; }
+    /** set min size and retrieve this pointer */
     wxPaneInfo& MinSize(int x, int y) { min_size.Set(x,y); return *this; }
+    /** set max size and retrieve this pointer */
     wxPaneInfo& MaxSize(int x, int y) { max_size.Set(x,y); return *this; }
+    /** set floating position and retrieve this pointer */
     wxPaneInfo& FloatingPosition(const wxPoint& pos) { floating_pos = pos; return *this; }
+    /** set floating position and retrieve this pointer */
     wxPaneInfo& FloatingPosition(int x, int y) { floating_pos.x = x; floating_pos.y = y; return *this; }
+    /** set floating size and retrieve this pointer */
     wxPaneInfo& FloatingSize(const wxSize& size) { floating_size = size; return *this; }
+    /** set floating size and retrieve this pointer */
     wxPaneInfo& FloatingSize(int x, int y) { floating_size.Set(x,y); return *this; }
+    /** set flag optionResizable and retrieve this pointer */
     wxPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
+    /** set flag optionResizable and retrieve this pointer */
     wxPaneInfo& Resizable(bool resizable = true) { return SetFlag(optionResizable, resizable); }
+    /** set flag optionFloating and retrieve this pointer */
     wxPaneInfo& Dock() { return SetFlag(optionFloating, false); }
+    /** set flag optionFloating and retrieve this pointer */
     wxPaneInfo& Float() { return SetFlag(optionFloating, true); }
+    /** set flag optionHidden and retrieve this pointer */
     wxPaneInfo& Hide() { return SetFlag(optionHidden, true); }
+    /** set flag optionHidden and retrieve this pointer */
     wxPaneInfo& Show(bool show = true) { return SetFlag(optionHidden, !show); }
+    /** set flag optionCaption and retrieve this pointer */
     wxPaneInfo& CaptionVisible(bool visible = true) { return SetFlag(optionCaption, visible); }
+    /** set flag optionPaneBorder and retrieve this pointer */
     wxPaneInfo& PaneBorder(bool visible = true) { return SetFlag(optionPaneBorder, visible); }
+    /** set flag optionGripper and retrieve this pointer */
     wxPaneInfo& Gripper(bool visible = true) { return SetFlag(optionGripper, visible); }
-    wxPaneInfo& CloseButton(bool visible = true) { return SetFlag(buttonClose, visible); }  
+    /** set flag buttonClose and retrieve this pointer */
+    wxPaneInfo& CloseButton(bool visible = true) { return SetFlag(buttonClose, visible); }
+    /** set flag buttonMaximize and retrieve this pointer */
     wxPaneInfo& MaximizeButton(bool visible = true) { return SetFlag(buttonMaximize, visible); }
+    /** set flag buttonMinimize and retrieve this pointer */
     wxPaneInfo& MinimizeButton(bool visible = true) { return SetFlag(buttonMinimize, visible); }
+    /** set flag buttonPin and retrieve this pointer */
     wxPaneInfo& PinButton(bool visible = true) { return SetFlag(buttonPin, visible); }
+    /** set flag optionDestroyOnClose and retrieve this pointer */
     wxPaneInfo& DestroyOnClose(bool b = true) { return SetFlag(optionDestroyOnClose, b); }
+    /** set flag optionTopDockable and retrieve this pointer */
     wxPaneInfo& TopDockable(bool b = true) { return SetFlag(optionTopDockable, b); }
+    /** set flag optionBottomDockable and retrieve this pointer */
     wxPaneInfo& BottomDockable(bool b = true) { return SetFlag(optionBottomDockable, b); }
+    /** set flag optionLeftDockable and retrieve this pointer */
     wxPaneInfo& LeftDockable(bool b = true) { return SetFlag(optionLeftDockable, b); }
+    /** set flag optionRightDockable and retrieve this pointer */
     wxPaneInfo& RightDockable(bool b = true) { return SetFlag(optionRightDockable, b); } 
+    /** set flag optionFloatable and retrieve this pointer */
     wxPaneInfo& Floatable(bool b = true) { return SetFlag(optionFloatable, b); }
+    /** set flag optionMovable and retrieve this pointer */
     wxPaneInfo& Movable(bool b = true) { return SetFlag(optionMovable, b); }
+    /** set TopDockable BottomDockable LeftDockable RightDockable and retrieve this pointer */
     wxPaneInfo& Dockable(bool b = true)
     {
         return TopDockable(b).BottomDockable(b).LeftDockable(b).RightDockable(b);
     }
 
+    /** initialize pane flags and retrieve this pointer */
     wxPaneInfo& DefaultPane()
     {
         state |= optionTopDockable | optionBottomDockable |
@@ -246,13 +317,16 @@ public:
         return *this;
     }
     
+    /** set Center PaneBorder Resizable and retrieve this pointer */
     wxPaneInfo& CentrePane() { return CenterPane(); }
+    /** set Center PaneBorder Resizable and retrieve this pointer */
     wxPaneInfo& CenterPane()
     {
         state = 0;
         return Center().PaneBorder().Resizable();
     }
-     
+    
+    /** set optionToolbar optionGripper , remove optionResizable and optionCaption and retrieve this pointer */
     wxPaneInfo& ToolbarPane()
     {
         DefaultPane();
@@ -263,6 +337,7 @@ public:
         return *this;
     }
 
+    /** set generic flag and retrieve this pointer */
     wxPaneInfo& SetFlag(unsigned int flag, bool option_state)
     {
         if (option_state)
@@ -272,6 +347,7 @@ public:
         return *this;
     }
     
+    /** check if flag is active */
     bool HasFlag(unsigned int flag) const
     {
         return (state & flag) ? true:false;
@@ -336,117 +412,177 @@ public:
 
 
 
-
+/**
+class name: wxFrameManager
+Manager for dockabale panels; it can manage flags, attach/detach panes.
+*/
 class WXDLLEXPORT wxFrameManager : public wxEvtHandler
 {
 friend class wxFloatingPane;
 
 public:
 
+    /** constructor */
     wxFrameManager(wxFrame* frame = NULL,
                    unsigned int flags = wxAUI_MGR_DEFAULT);
+    /** destructor */
     virtual ~wxFrameManager();
+    /** remove event handler */
     void UnInit();
     
+    /** set flags */
     void SetFlags(unsigned int flags);
+    /** retrieve flags */
     unsigned int GetFlags() const;
     
+    /** set frame */
     void SetFrame(wxFrame* frame);
+    /** retrieve frame */
     wxFrame* GetFrame() const;
     
+    /** set art provider */
     void SetArtProvider(wxDockArt* art_provider);
+    /** retrieve art provider */
     wxDockArt* GetArtProvider() const;
 
+    /** retrieve pane from window */
     wxPaneInfo& GetPane(wxWindow* window);
+    /** retrieve pane from name */
     wxPaneInfo& GetPane(const wxString& name);
+    /** retrieve all panes */
     wxPaneInfoArray& GetAllPanes();
 
+    /** add pane */
     virtual bool AddPane(wxWindow* window,
                  const wxPaneInfo& pane_info);
-                 
+    
+    /** add pane */
     virtual bool AddPane(wxWindow* window,
                  int direction = wxLEFT,
                  const wxString& caption = wxEmptyString);
-                 
+    /** insert pane, shifting the panes around, depending on the insert level*/             
     bool InsertPane(wxWindow* window,
                  const wxPaneInfo& pane_info,
                  int insert_level = wxAUI_INSERT_PANE);
-                 
+              
+    /** detach pane */
     bool DetachPane(wxWindow* window);
 
+    /** saves all pane information as a single string */
     wxString SavePerspective();
     
+    /** load perspective from a string*/
     bool LoadPerspective(const wxString& perspective,
                  bool update = true);
     
+    /** update */
     virtual void Update();
 
 private:
-
+    /** draws a drop hint rectangle, */
     void DrawHintRect(wxWindow* pane_window,
                        const wxPoint& pt,
                        const wxPoint& offset);
-
+    /** is an internal function which invokes wxSizer::Layout
+        on the frame's main sizer, then measures all the various UI items
+        and updates their internal rectangles.  This should always be called
+        instead of calling m_Frame->Layout() directly
+    */
     void DoFrameLayout();
 
+    /** add pane */
     void LayoutAddPane(wxSizer* container,
                        wxDockInfo& dock,
                        wxPaneInfo& pane,
                        wxDockUIPartArray& uiparts,
                        bool spacer_only);
-
+    /** add each pane to the dock */
     void LayoutAddDock(wxSizer* container,
                        wxDockInfo& dock,
                        wxDockUIPartArray& uiparts,
                        bool spacer_only);
-
+    /** after emptying all docks out iterate through all known panes, 
+    filing each of them into the appropriate dock.*/
     wxSizer* LayoutAll(wxPaneInfoArray& panes,
                        wxDockInfoArray& docks,
                        wxDockUIPartArray& uiparts,
                        bool spacer_only = false);
-
+    /** determines where the pane's new position would be. */
     bool DoDrop(wxDockInfoArray& docks,
                 wxPaneInfoArray& panes,
                 wxPaneInfo& drop,
                 const wxPoint& pt,
                 const wxPoint& action_offset = wxPoint(0,0));
 
+    /** function not implemented */
     wxPaneInfo& LookupPane(wxWindow* window);
+    /** function not implemented */
     wxPaneInfo& LookupPane(const wxString& name);
+    /** an internal function which determines
+    which UI item the specified coordinates are over
+    (x,y) specify a position in client coordinates */
     wxDockUIPart* HitTest(int x, int y);
+    /** looks up the pane border UI part  */
     wxDockUIPart* GetPanePart(wxWindow* pane);
+    /** returns a dock's offset in pixels from the left side of the window
+       (for horizontal docks) or from the top of the window (for
+        vertical docks)*/
     int GetDockPixelOffset(wxPaneInfo& test);
+    /** called when starting to move pane */
     void OnFloatingPaneMoveStart(wxWindow* window);
+    /** called when moving pane */
     void OnFloatingPaneMoving(wxWindow* window);
+    /** called when pane has been moved */
     void OnFloatingPaneMoved(wxWindow* window);
+    /** called when pane has been activated */
     void OnFloatingPaneActivated(wxWindow* window);
+    /** called when pane has been closed */
     void OnFloatingPaneClosed(wxWindow* window);
+    /** called when pane has been resized */
     void OnFloatingPaneResized(wxWindow* window, const wxSize& size);
+    /** renders the entire user interface */
     void Render(wxDC* dc);
+    /** calls render */
     void Repaint(wxDC* dc = NULL);
+    /** process event */
     void ProcessMgrEvent(wxFrameManagerEvent& event);
+    /** update button status */
     void UpdateButtonOnScreen(wxDockUIPart* button_ui_part,
                               const wxMouseEvent& event);
+    /** retrieve pane positions and sizes*/
     void GetPanePositionsAndSizes(wxDockInfo& dock,
                               wxArrayInt& positions,
                               wxArrayInt& sizes);
+    /** show hint */
     void ShowHint(const wxRect& rect);
+    /** hide hint */
     void HideHint();
+    /** remove hint */
     void RemoveHint();
 
 private:
 
-    // events
+    /** OnPaint event */
     void OnPaint(wxPaintEvent& event);
+    /** OnEraseBackground event */
     void OnEraseBackground(wxEraseEvent& event);
+    /** OnSize event */
     void OnSize(wxSizeEvent& event);
+    /** OnSetCursor event */
     void OnSetCursor(wxSetCursorEvent& event);
+    /** OnLeftDown event */
     void OnLeftDown(wxMouseEvent& event);
+    /** OnLeftUp event */
     void OnLeftUp(wxMouseEvent& event);
+    /** OnMotion event */
     void OnMotion(wxMouseEvent& event);
+    /** OnLeaveWindow event */
     void OnLeaveWindow(wxMouseEvent& event);
+    /** OnPaneButton event */
     virtual void OnPaneButton(wxFrameManagerEvent& event);
+    /** OnChildFocus event */
     void OnChildFocus(wxChildFocusEvent& event);
+    /** OnHintFadeTimer event */
     void OnHintFadeTimer(wxTimerEvent& event);
 
 private:
@@ -485,33 +621,42 @@ protected:
     wxTimer m_HintFadeTimer;    // transparent fade timer (for now, only msw)
     int m_HintFadeAmount;          // transparent fade amount (for now, only msw)
     
+    /** event table declaration macro */
     DECLARE_EVENT_TABLE()
 };
 
 
-
-// event declarations/classes
-
+/**
+  class name: wxFrameManagerEvent
+  Event handled by frame manager
+*/
 class WXDLLEXPORT wxFrameManagerEvent : public wxEvent
 {
 public:
+    /** constructor */
     wxFrameManagerEvent(wxEventType type) : wxEvent(0, type)
     {
         pane = NULL;
         button = 0;
     }
 
+    /** constructor */
     wxFrameManagerEvent(const wxFrameManagerEvent& c) : wxEvent(c)
     {
         pane = c.pane;
         button = c.button;
     }
 
+    /** clone the event and retrieve the new instance */
     wxEvent *Clone() const { return new wxFrameManagerEvent(*this); }
 
+    /** set pane member */
     void SetPane(wxPaneInfo* p) { pane = p; }
+    /** set button member */
     void SetButton(int b) { button = b; }
+    /** retrieve pane*/
     wxPaneInfo* GetPane() { return pane; }
+    /** retrieve button */
     int GetButton() { return button; }
 
 public:
@@ -522,47 +667,60 @@ public:
 
 
 
-// dock art provider code - a dock provider provides all drawing
-// functionality to the wxAui dock manager.  This allows the dock
-// manager to have pluggable look-and-feels
-
+/**
+  class name: wxDockArt
+  dock art provider code - a dock provider provides all drawing
+  functionality to the wxAui dock manager.  This allows the dock
+  manager to have pluggable look-and-feels.
+*/
 class wxDockArt
 {
 public:
-
+    /** constructor */
     wxDockArt() { }
+    /** destructor */
     virtual ~wxDockArt() { }
 
+    /** get metric */
     virtual int GetMetric(int id) = 0;
+    /** set metric */
     virtual void SetMetric(int id, int new_val) = 0;
+    /** set font */
     virtual void SetFont(int id, const wxFont& font) = 0;
+    /** get font */
     virtual wxFont GetFont(int id) = 0;
+    /** get colour */
     virtual wxColour GetColour(int id) = 0;
+    /** set colour */
     virtual void SetColour(int id, const wxColor& colour) = 0;
+    /** get colour */
     wxColor GetColor(int id) { return GetColour(id); }
+    /** set colour */
     void SetColor(int id, const wxColor& color) { SetColour(id, color); }
     
+    /** draw sash */
     virtual void DrawSash(wxDC& dc,
                           int orientation,
                           const wxRect& rect) = 0;
-
+    /** draw background */
     virtual void DrawBackground(wxDC& dc,
                           int orientation,
                           const wxRect& rect) = 0;
-
+    /** draw caption */
     virtual void DrawCaption(wxDC& dc,
                           const wxString& text,
                           const wxRect& rect,
                           wxPaneInfo& pane) = 0;
-
+    /** draw gripper */
     virtual void DrawGripper(wxDC& dc,
                           const wxRect& rect,
                           wxPaneInfo& pane) = 0;
-
+    /** draw border */
     virtual void DrawBorder(wxDC& dc,
                           const wxRect& rect,
                           wxPaneInfo& pane) = 0;
 
+    /** draw pane button */
     virtual void DrawPaneButton(wxDC& dc,
                           int button,
                           int button_state,
@@ -571,44 +729,54 @@ public:
 };
 
 
-// this is the default art provider for wxFrameManager.  Dock art
-// can be customized by creating a class derived from this one,
-// or replacing this class entirely
-
+/**
+class name: wxDefaultDockArt
+  this is the default art provider for wxFrameManager.  Dock art
+  can be customized by creating a class derived from this one,
+  or replacing this class entirely
+*/
 class wxDefaultDockArt : public wxDockArt
 {
 public:
-
+    /** constructor */
     wxDefaultDockArt();
 
+    /** get metric */
     int GetMetric(int metric_id);
+    /** set metric */
     void SetMetric(int metric_id, int new_val);
+    /** get colour */
     wxColour GetColour(int id);
+    /** set colour */
     void SetColour(int id, const wxColor& colour);
+    /** set font */
     void SetFont(int id, const wxFont& font);
+    /** get font */
     wxFont GetFont(int id);
 
+    /** Draw Sash*/
     void DrawSash(wxDC& dc,
                   int orientation,
                   const wxRect& rect);
-
+    /** Draw Background*/
     void DrawBackground(wxDC& dc,
                   int orientation,
                   const wxRect& rect);
-
+    /** Draw Caption*/
     void DrawCaption(wxDC& dc,
                   const wxString& text,
                   const wxRect& rect,
                   wxPaneInfo& pane);
-
+    /** Draw Gripper*/
     void DrawGripper(wxDC& dc,
                   const wxRect& rect,
                   wxPaneInfo& pane);
 
+    /** Draw Border*/
     void DrawBorder(wxDC& dc,
                   const wxRect& rect,
                   wxPaneInfo& pane);
-
+    /** Draw Pane Button*/
     void DrawPaneButton(wxDC& dc,
                   int button,
                   int button_state,
@@ -616,7 +784,7 @@ public:
                   wxPaneInfo& pane);
 
 protected:
-
+    /** Draw Caption Background*/
     void DrawCaptionBackground(wxDC& dc, const wxRect& rect, bool active);
 
 protected:
@@ -647,10 +815,14 @@ protected:
     int m_GradientType;
 };
 
-
+/**
+class name: wxDockInfo
+This class define properties of a dock. That contains an array of panes.
+*/
 class wxDockInfo
 {
 public:
+    /** constructor */
     wxDockInfo()
     {
         dock_direction = 0;
@@ -662,7 +834,7 @@ public:
         fixed = false;
         toolbar = false;
     }
-
+    /** copy constructor */
     wxDockInfo(const wxDockInfo& c)
     {
         dock_direction = c.dock_direction;
@@ -676,7 +848,7 @@ public:
         panes = c.panes;
         rect = c.rect;
     }
-
+    /** assignment operator */
     wxDockInfo& operator=(const wxDockInfo& c)
     {
         dock_direction = c.dock_direction;
@@ -691,10 +863,12 @@ public:
         rect = c.rect;
         return *this;
     }
-
+    /** retrieve if dock direction is active */
     bool IsOk() const { return (dock_direction != 0) ? true : false; }
+    /** retrieve if dock direction is top or bottom */
     bool IsHorizontal() const { return (dock_direction == wxAUI_DOCK_TOP ||
                              dock_direction == wxAUI_DOCK_BOTTOM) ? true:false; }
+    /** retrieve if dock direction is left , rigth or center */
     bool IsVertical() const { return (dock_direction == wxAUI_DOCK_LEFT ||
                              dock_direction == wxAUI_DOCK_RIGHT ||
                              dock_direction == wxAUI_DOCK_CENTER) ? true:false; }
@@ -712,7 +886,10 @@ public:
                               // absolute coordinates as opposed to proportional
 };
 
-
+/**
+class name: wxDockUIPart
+This class define a UI part of a dock.
+*/
 class wxDockUIPart
 {
 public:
@@ -739,7 +916,10 @@ public:
     wxRect rect;             // client coord rectangle of the part itself
 };
 
-
+/**
+class name: wxPaneButton
+This class define a button of a pane.
+*/
 class wxPaneButton
 {
 public:
@@ -771,22 +951,23 @@ typedef void (wxEvtHandler::*wxFrameManagerEventFunction)(wxFrameManagerEvent&);
 
 
 
-
-
-
-
-
-
-//---------------------------------------------------------------------------
+/**
+  class name: mafGUIDockManager
+  Represent a frame manager for gui dock elements.
+*/
 class WXDLLEXPORT mafGUIDockManager : public wxFrameManager 
-//---------------------------------------------------------------------------
 {
 public:
+  /** add pane */
   virtual bool AddPane(wxWindow* window,const wxPaneInfo& pane_info, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString);
+  /** add pane overload*/
   virtual bool AddPane(wxWindow* window,int direction = wxLEFT,const wxString& caption = wxEmptyString);	
+  /** update */
   virtual void Update();
 protected:
+  /** add menu item */
 	void AddMenuItem(wxWindow* window,const wxString& caption = wxEmptyString, const wxString &menu = _("&View"), const wxString &subMenu = wxEmptyString );
+  /** update menu items */
   void UpdateMenuItems();
 };  
 
