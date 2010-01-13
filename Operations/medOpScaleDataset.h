@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 11:14:48 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2010-01-13 14:48:12 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Daniele Giunchi , Stefano Perticoni  
 ==========================================================================
   Copyright (c) 2002/2004
@@ -60,6 +60,9 @@ public:
   void OpUndo();
 	
   void Reset();
+
+  void SetNewAbsMatrix(mafMatrix matrix){m_NewAbsMatrix = matrix;};
+  void SetOldAbsMatrix(mafMatrix matrix){m_OldAbsMatrix = matrix;};
 
 protected:
 

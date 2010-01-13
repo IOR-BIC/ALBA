@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpScaleDataset.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:30:11 $
-  Version:   $Revision: 1.3.2.2 $
+  Date:      $Date: 2010-01-13 14:48:12 $
+  Version:   $Revision: 1.3.2.3 $
   Authors:   Daniele Giunchi , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,7 +91,10 @@ mafOp* medOpScaleDataset::Copy()
 void medOpScaleDataset::OpRun()
 //----------------------------------------------------------------------------
 {
-  wxBusyInfo wait("creating gui...");
+  if (!m_TestMode)
+  {
+    wxBusyInfo wait("creating gui...");
+  }
 
   assert(m_Input);
   m_CurrentTime = ((mafVME *)m_Input)->GetTimeStamp();
@@ -99,10 +102,12 @@ void medOpScaleDataset::OpRun()
   m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
   m_OldAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
 
-  CreateGui();
-  ShowGui();
+  if (!m_TestMode)
+  {
+    CreateGui();
+    ShowGui();
+  }
 }
-
 //----------------------------------------------------------------------------
 void medOpScaleDataset::OnEvent(mafEventBase *maf_event)
 //----------------------------------------------------------------------------
@@ -297,10 +302,16 @@ void medOpScaleDataset::RefSysVmeChanged()
   SetRefSys on mafGUITransformInterface pointer
   */
   
-  // change gscale refsys
-  m_GizmoScale->SetRefSys(m_RefSysVME);  
+  if (!m_TestMode)
+  {
+	  // change gscale refsys
+	  m_GizmoScale->SetRefSys(m_RefSysVME);  
+  }
 
   m_RefSysVMEName = m_RefSysVME->GetName();
-  assert(m_Gui);
-  m_Gui->Update();
+  if (!m_TestMode)
+  {
+	  assert(m_Gui);
+	  m_Gui->Update();
+  }
 }
