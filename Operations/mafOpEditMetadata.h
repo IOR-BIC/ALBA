@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpEditMetadata.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-01-13 16:12:18 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -46,6 +46,12 @@ public:
 
   /** Select the tag into the tag array and initialize the variables associated with the gui.*/
   void SelectTag(const char *tag_name);
+
+  /** Set the name of the selected mafTagItem.*/
+  void SetTagName(const char *name);
+
+  /** Remove the selected mafTagItem.*/
+  void RemoveTag();
 
   /** Create a new mafTagItem and initialize it with standard parameters.*/
   void AddNewTag(mafString &name);

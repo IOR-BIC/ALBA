@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpEditMetadata.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-01-13 16:12:18 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani    
 ==========================================================================
   Copyright (c) 2002/2004
@@ -96,35 +96,38 @@ void mafOpEditMetadata::OpRun()
   std::vector<std::string> tag_list;
   m_TagArray->GetTagList(tag_list);
 
-  m_Gui = new mafGUI(this);
-  m_MetadataList = m_Gui->ListBox(ID_METADATA_LIST,"",120);
-  for (int t=0; t<tag_list.size();t++)
-    m_MetadataList->Insert(tag_list[t].c_str(),0);
-
-  if (!m_MetadataList->IsEmpty())
+  if(!m_TestMode)
   {
-    m_MetadataList->SetSelection(0,true);
-    SelectTag(m_MetadataList->GetString(0).c_str());
+    m_Gui = new mafGUI(this);
+    m_MetadataList = m_Gui->ListBox(ID_METADATA_LIST,"",120);
+    for (int t=0; t<tag_list.size();t++)
+      m_MetadataList->Insert(tag_list[t].c_str(),0);
+
+    if (!m_MetadataList->IsEmpty())
+    {
+      m_MetadataList->SetSelection(0,true);//
+      SelectTag(m_MetadataList->GetString(0).c_str());
+    }
+
+    wxString tag_type[2] = {_("numeric"),_("string")};
+
+    m_Gui->Button(ID_ADD_METADATA,_("Add"));
+    m_Gui->Button(ID_REMOVE_METADATA,_("Remove"));
+    m_Gui->Divider(2);
+    m_Gui->String(ID_TAG_NAME,_("name"),&m_TagName);
+    m_Gui->Combo(ID_TAG_TYPE,_("type"),&m_TagType,2,tag_type);
+    m_Gui->Integer(ID_TAG_MULTEPLICITY,_("multep."),&m_TagMulteplicity,1);
+    m_Gui->Integer(ID_TAG_COMPONENT,_("comp"),&m_TagComponent,0);
+    m_Gui->Double(ID_TAG_DOUBLE_VALUE,_("num. value"),&m_TagValueAsDouble);
+    m_Gui->String(ID_TAG_STRING_VALUE,_("string value"),&m_TagValueAsString);
+
+    EnableWidgets();
+    m_Gui->OkCancel();
+    
+	  m_Gui->Divider();
+
+    ShowGui();
   }
-
-  wxString tag_type[2] = {_("numeric"),_("string")};
-
-  m_Gui->Button(ID_ADD_METADATA,_("Add"));
-  m_Gui->Button(ID_REMOVE_METADATA,_("Remove"));
-  m_Gui->Divider(2);
-  m_Gui->String(ID_TAG_NAME,_("name"),&m_TagName);
-  m_Gui->Combo(ID_TAG_TYPE,_("type"),&m_TagType,2,tag_type);
-  m_Gui->Integer(ID_TAG_MULTEPLICITY,_("multep."),&m_TagMulteplicity,1);
-  m_Gui->Integer(ID_TAG_COMPONENT,_("comp"),&m_TagComponent,0);
-  m_Gui->Double(ID_TAG_DOUBLE_VALUE,_("num. value"),&m_TagValueAsDouble);
-  m_Gui->String(ID_TAG_STRING_VALUE,_("string value"),&m_TagValueAsString);
-
-  EnableWidgets();
-  m_Gui->OkCancel();
-  
-	m_Gui->Divider();
-
-  ShowGui();
 }
 //----------------------------------------------------------------------------
 void mafOpEditMetadata::SelectTag(const char *tag_name)
@@ -143,7 +146,8 @@ void mafOpEditMetadata::SelectTag(const char *tag_name)
   m_TagValueAsString = m_SelectedTag->GetComponent(m_TagComponent);
   m_TagValueAsDouble = m_SelectedTag->GetComponentAsDouble(m_TagComponent);
 
-  EnableWidgets();
+  if(!m_TestMode)
+    EnableWidgets();
 }
 //----------------------------------------------------------------------------
 void mafOpEditMetadata::EnableWidgets()
@@ -186,15 +190,7 @@ void mafOpEditMetadata::OnEvent(mafEventBase *maf_event)
       break;
       case ID_TAG_NAME:
       {
-        mafTagItem new_named_tag;
-        new_named_tag = *m_SelectedTag;
-        new_named_tag.SetName(m_TagName.GetCStr());
-        m_TagArray->DeleteTag(m_SelectedTag->GetName());
-        m_TagArray->SetTag(new_named_tag);
-        m_SelectedTag = m_TagArray->GetTag(m_TagName.GetCStr());
-        int sel = m_MetadataList->GetSelection();
-        m_MetadataList->SetString(sel,m_TagName.GetCStr());
-        m_Gui->Update();
+        SetTagName(m_TagName.GetCStr());
       }
       break;
       case ID_TAG_TYPE:
@@ -241,18 +237,7 @@ void mafOpEditMetadata::OnEvent(mafEventBase *maf_event)
       break;
       case ID_REMOVE_METADATA:
       {
-        int sel = m_MetadataList->GetSelection();
-        m_MetadataList->Delete(sel);
-        m_TagArray->DeleteTag(m_SelectedTag->GetName());
-        m_SelectedTag = NULL;
-        sel = sel > 0 ? sel-1 : 0;
-        if (m_MetadataList->GetCount() == 0)
-        {
-          EnableWidgets();
-          return;
-        }
-        m_MetadataList->SetSelection(sel,true);
-        OnEvent(&mafEvent(m_Gui,ID_METADATA_LIST));
+        RemoveTag();
       }
       break;
       case wxOK:
@@ -266,6 +251,52 @@ void mafOpEditMetadata::OnEvent(mafEventBase *maf_event)
         mafEventMacro(*e);
       break; 
     }
+  }
+}
+//----------------------------------------------------------------------------
+void mafOpEditMetadata::SetTagName(const char *name)
+//----------------------------------------------------------------------------
+{
+  mafTagItem new_named_tag;
+  new_named_tag = *m_SelectedTag;
+  new_named_tag.SetName(name);
+  m_TagArray->DeleteTag(m_SelectedTag->GetName());
+  m_TagArray->SetTag(new_named_tag);
+  if(!m_TestMode)
+  {
+    m_SelectedTag = m_TagArray->GetTag(name);
+    int sel = m_MetadataList->GetSelection();
+    m_MetadataList->SetString(sel,name);
+
+    if(!m_TestMode)
+      m_Gui->Update();
+}
+}
+
+//----------------------------------------------------------------------------
+void mafOpEditMetadata::RemoveTag()
+//----------------------------------------------------------------------------
+{
+  m_TagArray->DeleteTag(m_SelectedTag->GetName());
+  m_SelectedTag = NULL;
+  
+  if(!m_TestMode)
+  {
+    int sel = m_MetadataList->GetSelection();
+    m_MetadataList->Delete(sel);
+
+    if (m_MetadataList->GetCount() == 0)
+    {
+      EnableWidgets();
+      return;
+    }
+    else
+    {
+      sel = sel > 0 ? sel-1 : 0;
+      m_MetadataList->SetSelection(sel,true);
+    }
+    
+    OnEvent(&mafEvent(m_Gui,ID_METADATA_LIST));
   }
 }
 //----------------------------------------------------------------------------
@@ -303,13 +334,15 @@ void mafOpEditMetadata::AddNewTag(mafString &name)
     msg <<" because already exists!";
     wxMessageBox(msg, _("Warning"));
   }
-  m_MetadataList->Insert(new_name, m_MetadataList->GetCount());
+  if(!m_TestMode)
+    m_MetadataList->Insert(new_name, m_MetadataList->GetCount());
   m_TagName = new_name;
   m_SelectedTag->SetName(m_TagName.GetCStr());
   m_TagArray->SetTag(*m_SelectedTag);
   cppDEL(m_SelectedTag);
   SelectTag(m_TagName.GetCStr());
-  m_MetadataList->SetSelection(m_MetadataList->GetCount()-1,true);
+  if(!m_TestMode)
+    m_MetadataList->SetSelection(m_MetadataList->GetCount()-1,true);
 }
 //----------------------------------------------------------------------------
 void mafOpEditMetadata::OpUndo()
