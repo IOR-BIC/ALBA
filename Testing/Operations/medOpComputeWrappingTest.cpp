@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: medOpCreateLabeledVolumeTest.cpp,v $
+Module:    $RCSfile: medOpComputeWrappingTest.cpp,v $
 Language:  C++
 Date:      $Date: 2010-01-19 12:44:42 $
-Version:   $Revision: 1.1.2.2 $
-Authors:   Alessandro Chiarini , Matteo Giacomoni
+Version:   $Revision: 1.1.2.1 $
+Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2007
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -47,66 +47,48 @@ MafMedical is partially based on OpenMAF.
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
 
-#include "medOpCreateLabeledVolumeTest.h"
-#include "medOpCreateLabeledVolume.h"
+#include "medOpComputeWrappingTest.h"
+#include "medOpComputeWrapping.h"
 
 #include "mafVMEVolumeGray.h"
-#include "medVMELabeledVolume.h"
+#include "medVMEComputeWrapping.h"
 #include "vtkMAFSmartPointer.h"
 #include "mafSmartPointer.h"
-
-#include "vtkCharArray.h"
-#include "vtkPointData.h"
-#include "vtkImageData.h"
 
 #include <string>
 #include <assert.h>
 
 //-----------------------------------------------------------
-void medOpCreateLabeledVolumeTest::TestDynamicAllocation() 
+void medOpComputeWrappingTest::TestDynamicAllocation() 
 //-----------------------------------------------------------
 {
-  medOpCreateLabeledVolume *create=new medOpCreateLabeledVolume();
+  medOpComputeWrapping *create=new medOpComputeWrapping();
   mafDEL(create);
 }
 //-----------------------------------------------------------
-void medOpCreateLabeledVolumeTest::TestOpRun() 
+void medOpComputeWrappingTest::TestOpRun() 
 //-----------------------------------------------------------
 {
-  vtkMAFSmartPointer<vtkImageData> data;
-  data->SetSpacing(1.0,1.0,1.0);
-  data->SetDimensions(10,10,10);
-  
-
-  vtkMAFSmartPointer<vtkCharArray> array;
-  array->Allocate(10*10*10);
-
-  data->GetPointData()->AddArray(array);
-  data->Update();
-
   mafSmartPointer<mafVMEVolumeGray> volume;
-  volume->SetData(data.GetPointer(), 0.0);
-  volume->Modified();
-  volume->Update();
 
-  medOpCreateLabeledVolume *create=new medOpCreateLabeledVolume();
+  medOpComputeWrapping *create=new medOpComputeWrapping();
   create->TestModeOn();
   create->SetInput(volume);
   create->OpRun();
 
-  medVMELabeledVolume *labeledvolume = NULL;
-	labeledvolume = medVMELabeledVolume::SafeDownCast(create->GetOutput());
+  medVMEComputeWrapping *labeledvolume = NULL;
+	labeledvolume = medVMEComputeWrapping::SafeDownCast(create->GetOutput());
   
   CPPUNIT_ASSERT(labeledvolume != NULL);
 
   mafDEL(create);
 }
 //-----------------------------------------------------------
-void medOpCreateLabeledVolumeTest::TestCopy() 
+void medOpComputeWrappingTest::TestCopy() 
 //-----------------------------------------------------------
 {
-  medOpCreateLabeledVolume *create=new medOpCreateLabeledVolume();
-  medOpCreateLabeledVolume *create2 = medOpCreateLabeledVolume::SafeDownCast(create->Copy());
+  medOpComputeWrapping *create=new medOpComputeWrapping();
+  medOpComputeWrapping *create2 = medOpComputeWrapping::SafeDownCast(create->Copy());
 
   CPPUNIT_ASSERT(create2 != NULL);
 
@@ -114,47 +96,33 @@ void medOpCreateLabeledVolumeTest::TestCopy()
   mafDEL(create);
 }
 //-----------------------------------------------------------
-void medOpCreateLabeledVolumeTest::TestAccept() 
+void medOpComputeWrappingTest::TestAccept() 
 //-----------------------------------------------------------
 {
   mafSmartPointer<mafVMEVolumeGray> volume;
 
-  medOpCreateLabeledVolume *create=new medOpCreateLabeledVolume();
+  medOpComputeWrapping *create=new medOpComputeWrapping();
   CPPUNIT_ASSERT(create->Accept(volume));
   CPPUNIT_ASSERT(!create->Accept(NULL));
 
   mafDEL(create);
 }
 //-----------------------------------------------------------
-void medOpCreateLabeledVolumeTest::TestOpDo() 
+void medOpComputeWrappingTest::TestOpDo() 
 //-----------------------------------------------------------
 {
-  vtkMAFSmartPointer<vtkImageData> data;
-  data->SetSpacing(1.0,1.0,1.0);
-  data->SetDimensions(10,10,10);
-
-
-  vtkMAFSmartPointer<vtkCharArray> array;
-  array->Allocate(10*10*10);
-
-  data->GetPointData()->AddArray(array);
-  data->Update();
-
   mafSmartPointer<mafVMEVolumeGray> volume;
-  volume->SetData(data.GetPointer(), 0.0);
-  volume->Modified();
-  volume->Update();
-
   int numOfChildren = volume->GetNumberOfChildren();
   CPPUNIT_ASSERT(numOfChildren == 0);
 
-  medOpCreateLabeledVolume *create=new medOpCreateLabeledVolume();
+  medOpComputeWrapping *create=new medOpComputeWrapping();
   create->TestModeOn();
   create->SetInput(volume);
   create->OpRun();
 
   create->OpDo();
   numOfChildren = volume->GetNumberOfChildren();
+
   CPPUNIT_ASSERT(numOfChildren == 1);
   mafDEL(create);
 }

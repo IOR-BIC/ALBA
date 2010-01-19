@@ -83,6 +83,12 @@ ADD_TEST(medOpSegmentationRegionGrowingConnectedThresholdTest ${EXECUTABLE_OUTPU
 ADD_EXECUTABLE(medOpScaleDatasetTest medOpScaleDatasetTest.h medOpScaleDatasetTest.cpp)
 ADD_TEST(medOpScaleDatasetTest ${EXECUTABLE_OUTPUT_PATH}/medOpScaleDatasetTest)
 
+ADD_EXECUTABLE(medOpCreateLabeledVolumeTest medOpCreateLabeledVolumeTest.h medOpCreateLabeledVolumeTest.cpp)
+ADD_TEST(medOpCreateLabeledVolumeTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateLabeledVolumeTest)
+
+ADD_EXECUTABLE(medOpComputeWrappingTest medOpComputeWrappingTest.h medOpComputeWrappingTest.cpp)
+ADD_TEST(medOpComputeWrappingTest ${EXECUTABLE_OUTPUT_PATH}/medOpComputeWrappingTest)
+
 IF (MED_USE_Offis)
 ADD_EXECUTABLE(medOpImporterDicomOffisTest medOpImporterDicomOffisTest.h medOpImporterDicomOffisTest.cpp)
 ADD_TEST(medOpImporterDicomOffisTest ${EXECUTABLE_OUTPUT_PATH}/medOpImporterDicomOffisTest)
