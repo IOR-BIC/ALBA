@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-05 11:48:31 $
-  Version:   $Revision: 1.16.2.3 $
+  Date:      $Date: 2010-01-20 16:45:36 $
+  Version:   $Revision: 1.16.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -467,6 +467,12 @@ void mafPipePolylineSlice::UpdateProperty()
 
   m_Mapper->Update();
 
+  if(m_Actor)
+  {
+    m_Actor->GetProperty()->SetColor(((mafVMEOutputPolyline *)((mafVME *)m_Vme)->GetOutput())->GetMaterial()->m_Diffuse);
+    m_Actor->Modified();
+  }
+  
 }
 //----------------------------------------------------------------------------
 vtkPolyData *mafPipePolylineSlice::SplineProcess(vtkPolyData *polyData)
