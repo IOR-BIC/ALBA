@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafPipePolyline.cpp,v $
 Language:  C++
-Date:      $Date: 2009-07-16 14:17:19 $
-Version:   $Revision: 1.20.2.4 $
+Date:      $Date: 2010-01-20 16:44:49 $
+Version:   $Revision: 1.20.2.5 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -576,6 +576,12 @@ void mafPipePolyline::UpdateData()
 
 	if(m_Representation == TUBE || m_Representation == GLYPH || m_Representation == GLYPH_UNCONNECTED)
 	{
+    if(m_Vme->GetTagArray()->GetTag("TUBE_RADIUS"))
+    {
+      m_TubeRadius = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS")->GetValueAsDouble();
+      m_Tube->SetRadius(m_TubeRadius);
+    }
+
 		m_Tube->SetInput(data);
 		m_Tube->Update();
 		m_Glyph->SetInput(data);
@@ -676,6 +682,7 @@ void mafPipePolyline::UpdateProperty(bool fromTag)
       for(int j=0;j<m_CaptionActorList.size();j++)
       {
         m_CaptionActorList[j]->SetVisibility(false);
+        m_CaptionActorList[j]->Modified();
       }
     }
     else
@@ -811,6 +818,8 @@ void mafPipePolyline::SetRadius(double radius)
 	m_Sphere->SetRadius(m_SphereRadius);
 	mafTagItem *item = m_Vme->GetTagArray()->GetTag("SPHERE_RADIUS");
 	item->SetValue(m_SphereRadius);
+  item = m_Vme->GetTagArray()->GetTag("TUBE_RADIUS");
+  item->SetValue(m_TubeRadius);
 
 	mafEventMacro(mafEvent(this,CAMERA_UPDATE));
 }
