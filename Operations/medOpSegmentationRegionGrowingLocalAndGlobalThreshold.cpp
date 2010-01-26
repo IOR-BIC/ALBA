@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2010-01-11 14:17:29 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2010-01-26 08:22:31 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -129,10 +129,10 @@ mafOp(label)
 
   m_ComputedMedianFilter = false;
 
-  m_Point1 = _("Point 1");
-  m_Point2 = _("Point 2");
-  m_Point3 = _("Point 3");
-  m_Point4 = _("Point 4");
+  m_Point1 = _("Bone Peak ");
+  m_Point2 = _("Soft Peak ");
+  m_Point3 = _("Bone Base ");
+  m_Point4 = _("Soft Base ");
 
   m_CurrentPoint = 0;
 
@@ -364,18 +364,18 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Label(&m_Point2,false,true);
   m_Gui->Label(&m_Point3,false,true);
   m_Gui->Label(&m_Point4,false,true);
-  m_SoftParam1 = "";
-  m_SoftParam2 = "";
-  m_SoftParam3 = "";
-  m_Gui->Label(&m_SoftParam1,false,true);
-  m_Gui->Label(&m_SoftParam2,false,true);
-  m_Gui->Label(&m_SoftParam3,false,true);
   m_BoneParam1 = "";
   m_BoneParam2 = "";
   m_BoneParam3 = "";
   m_Gui->Label(&m_BoneParam1,false,true);
   m_Gui->Label(&m_BoneParam2,false,true);
   m_Gui->Label(&m_BoneParam3,false,true);
+  m_SoftParam1 = "";
+  m_SoftParam2 = "";
+  m_SoftParam3 = "";
+  m_Gui->Label(&m_SoftParam1,false,true);
+  m_Gui->Label(&m_SoftParam2,false,true);
+  m_Gui->Label(&m_SoftParam3,false,true);
   m_Gui->Bool(ID_ELIMINATE_HISTOGRAM_VALUES,_("Eliminate Values"),&m_EliminateHistogramValues,1);
   m_Gui->Double(ID_VALUES_TO_ELIMINATE,_(""),&m_ValuesToEliminate);
   m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
@@ -500,17 +500,19 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::ComputeParam()
 //----------------------------------------------------------------------------
 {
   double boneParameters[3],softIssueParameters[3];
-  double boneStDev = (double)(m_Point1Value-m_Point2Value)/3;
   double boneMean = (double)m_Point1Value;
-  double softIssueStDev = (double)(m_Point3Value-m_Point4Value)/3;
-  double softIssueMean = (double)m_Point3Value;
-  boneParameters[0] = 1/(boneStDev*sqrt(2*vtkMath::Pi()));
-  boneParameters[1] = boneMean;
-  boneParameters[2] = sqrt(2.0)*boneStDev;
+  //double boneStDev = (double)abs(m_Point3Value-boneMean)/3;
+  //double boneStDev = (double)1/(m_Point1HistogramValue*sqrt(vtkMath::DoublePi()));
+  //double softIssueStDev = (double)1/(m_Point2HistogramValue*sqrt(vtkMath::DoublePi()));
+  double softIssueMean = (double)m_Point2Value;
+  //double softIssueStDev = (double)abs(m_Point4Value-softIssueMean)/3;
+  boneParameters[0] = (double)m_Point1HistogramValue;
+  boneParameters[1] = (double)boneMean;
+  boneParameters[2] = (double)abs(m_Point3Value-boneMean)/3;
 
-  softIssueParameters[0] = 1/(softIssueStDev*sqrt(2*vtkMath::Pi()));
-  softIssueParameters[1] = softIssueMean;
-  softIssueParameters[2] = sqrt(2.0)*softIssueStDev;
+  softIssueParameters[0] = (double)m_Point2HistogramValue;
+  softIssueParameters[1] = (double)softIssueMean;
+  softIssueParameters[2] = (double)abs(m_Point4Value-softIssueMean)/3;
 
   m_BoneParam1 = "bone " + mafString(boneParameters[0]);
   m_BoneParam2 = "bone " + mafString(boneParameters[1]);
@@ -550,6 +552,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::WriteHistogramFiles(
   wxString oldDir = wxGetCwd();
   wxSetWorkingDirectory(newDir);
 
+  double val = accumulate->GetOutput()->GetPointData()->GetScalars()->GetTuple1(178);
   int numOfValues = 0;
   int startIndex = -1;
   int numOfTuples = accumulate->GetOutput()->GetPointData()->GetScalars()->GetNumberOfTuples();
@@ -695,22 +698,26 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::OnEvent(mafEventBase
 
       if (m_CurrentPoint % 4 == 0)
       {
-        m_Point1 = wxString::Format("Point 1 (bone median): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point1 = wxString::Format("Bone Peak : %d",hisctogramValue);
         m_Point1Value = scalar;
+        m_Point1HistogramValue = hisctogramValue;
       }
       if (m_CurrentPoint % 4 == 1)
       {
-        m_Point2 = wxString::Format("Point 2 (bone dev): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point2 = wxString::Format("Soft Peak : %d",hisctogramValue);
         m_Point2Value = scalar;
+        m_Point2HistogramValue = hisctogramValue;
+        //ComputeParam();
+        //WriteHistogramFiles();
       }
       if (m_CurrentPoint % 4 == 2)
       {
-        m_Point3 = wxString::Format("Point 3 (soft median): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point3 = wxString::Format("Bone Base : %.2f",scalar);
         m_Point3Value = scalar;
       }
       if (m_CurrentPoint % 4 == 3)
       {
-        m_Point4 = wxString::Format("Point 4 (soft dev): Scalar %.2f Histogram %d",scalar,hisctogramValue);
+        m_Point4 = wxString::Format("Soft Base : %.2f",scalar);
         m_Point4Value = scalar;
 
         ComputeParam();
