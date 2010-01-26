@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSegmentationRegionGrowingLocalAndGlobalThreshold.cpp,v $
 Language:  C++
-Date:      $Date: 2010-01-26 08:22:31 $
-Version:   $Revision: 1.1.2.14 $
+Date:      $Date: 2010-01-26 16:38:28 $
+Version:   $Revision: 1.1.2.15 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2009
@@ -138,6 +138,8 @@ mafOp(label)
 
   m_EliminateHistogramValues = TRUE;
   m_ValuesToEliminate = -500;
+
+  m_Threshold = 0.0;
   
 }
 //----------------------------------------------------------------------------
@@ -303,16 +305,16 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::RegionGrowing()
 
   //Get the thresholds values selected by the user
   double lower,upper;
-  m_Histogram->GetThresholds(&lower,&upper);
+  //m_Histogram->GetThresholds(&lower,&upper);
   
   //Apply the region growing filter
   mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
   vtkMAFSmartPointer<vtkMEDRegionGrowingLocalGlobalThreshold> localFilter;
   localFilter->SetInput(imageData);
   localFilter->SetLowerLabel(m_LowerLabel);
-  localFilter->SetLowerThreshold(lower);
+  localFilter->SetLowerThreshold(m_Threshold);
   localFilter->SetUpperLabel(m_UpperLabel);
-  localFilter->SetUpperThreshold(upper);
+  localFilter->SetUpperThreshold(m_Threshold+400);
   mafEventMacro(mafEvent(this,BIND_TO_PROGRESSBAR,localFilter));
   localFilter->Update();
 
@@ -341,6 +343,7 @@ enum REGION_GROWING_ID
   ID_DIALOG_OK,
   ID_ELIMINATE_HISTOGRAM_VALUES,
   ID_VALUES_TO_ELIMINATE,
+  ID_THRESHOLD,
 };
 //----------------------------------------------------------------------------
 void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
@@ -381,6 +384,8 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateGui()
   m_Gui->Enable(ID_VALUES_TO_ELIMINATE,m_EliminateHistogramValues == TRUE);
   //m_Gui->Button(ID_FITTING,_("Fitting"));
   m_Gui->Divider(1);
+
+  m_Gui->Double(ID_THRESHOLD,_("Threshold"),&m_Threshold);
 
   m_GuiLabels = new mafGUI(this);
   m_Gui->RollOut(ID_ROLLOUT_LABELS, _("Labels"), m_GuiLabels, false);
@@ -478,7 +483,7 @@ void medOpSegmentationRegionGrowingLocalAndGlobalThreshold::CreateHistogramDialo
 {
   m_Dialog = new mafGUIDialog("Histogram", mafCLOSEWINDOW | mafRESIZABLE);
 
-  m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL,true);
+  m_Histogram = new mafGUIHistogramWidget(m_Gui,-1,wxPoint(0,0),wxSize(400,500),wxTAB_TRAVERSAL);
   m_Histogram->SetListener(this);
   m_Histogram->SetRepresentation(vtkMAFHistogram::BAR_REPRESENTATION);
   vtkImageData *hd = vtkImageData::SafeDownCast(m_VolumeInput->GetOutput()->GetVTKData());
