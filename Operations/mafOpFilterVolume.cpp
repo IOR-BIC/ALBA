@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterVolume.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-01-26 11:43:12 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -98,21 +98,34 @@ void mafOpFilterVolume::OpRun()
 //----------------------------------------------------------------------------
 { 
   m_InputData = (vtkImageData*)((mafVME *)m_Input)->GetOutput()->GetVTKData();
-  vtkNEW(m_ResultImageData);
-	m_ResultImageData->DeepCopy(m_InputData);
+  if (!m_ApplyDirectlyOnInput)
+  {
+	  vtkNEW(m_ResultImageData);
+		m_ResultImageData->DeepCopy(m_InputData);
+		
+		vtkNEW(m_OriginalImageData);
+		m_OriginalImageData->DeepCopy(m_InputData);
+  }
 	
-	vtkNEW(m_OriginalImageData);
-	m_OriginalImageData->DeepCopy(m_InputData);
-	
-	// interface:
-	m_Gui = new mafGUI(this);
+	if (!m_TestMode)
+	{
+		CreateGui();
+	  ShowGui();
+	}
+}
+//----------------------------------------------------------------------------
+void mafOpFilterVolume::CreateGui()
+//----------------------------------------------------------------------------
+{
+  // interface:
+  m_Gui = new mafGUI(this);
 
   m_Gui->Bool(ID_APPLY_ON_INPUT,_("apply on input"),&m_ApplyDirectlyOnInput,0,_("Check this flag for big volumes to save memory"));
-	m_Gui->Label("");
-	m_Gui->Label(_("smooth"),true);
-	m_Gui->Vector(ID_STANDARD_DEVIATION,_("sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
+  m_Gui->Label("");
+  m_Gui->Label(_("smooth"),true);
+  m_Gui->Vector(ID_STANDARD_DEVIATION,_("sd: "),m_StandardDeviation,0.1,100,2,_("standard deviation for smooth filter"));
   m_Gui->Vector(ID_RADIUS_FACTOR,_("radius: "),m_SmoothRadius,1,10,2,_("radius for smooth filter"));
-	m_Gui->Button(ID_SMOOTH,_("apply smooth"));
+  m_Gui->Button(ID_SMOOTH,_("apply smooth"));
 
   m_Gui->Label("");
   m_Gui->Label(_("median"),true);
@@ -120,17 +133,15 @@ void mafOpFilterVolume::OpRun()
   m_Gui->Button(ID_MEDIAN,_("apply median"));
 
   m_Gui->Divider(2);
-	m_Gui->Button(ID_PREVIEW,_("preview"));
-	m_Gui->Button(ID_CLEAR,_("clear"));
-	m_Gui->OkCancel();
-	m_Gui->Enable(wxOK,false);
+  m_Gui->Button(ID_PREVIEW,_("preview"));
+  m_Gui->Button(ID_CLEAR,_("clear"));
+  m_Gui->OkCancel();
+  m_Gui->Enable(wxOK,false);
 
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
+  m_Gui->Enable(ID_PREVIEW,false);
+  m_Gui->Enable(ID_CLEAR,false);
 
-	m_Gui->Divider();
-
-	ShowGui();
+  m_Gui->Divider();
 }
 //----------------------------------------------------------------------------
 void mafOpFilterVolume::OpDo()
@@ -213,11 +224,14 @@ void mafOpFilterVolume::OpStop(int result)
 void mafOpFilterVolume::OnSmooth()
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
-	m_Gui->Enable(ID_SMOOTH,false);
-  m_Gui->Enable(ID_RADIUS_FACTOR,false);
-  m_Gui->Enable(ID_RADIUS_FACTOR,false);
-	m_Gui->Update();
+	if (!m_TestMode)
+	{
+		wxBusyCursor wait;
+		m_Gui->Enable(ID_SMOOTH,false);
+	  m_Gui->Enable(ID_RADIUS_FACTOR,false);
+	  m_Gui->Enable(ID_RADIUS_FACTOR,false);
+		m_Gui->Update();
+	}
 
   vtkMAFSmartPointer<vtkImageGaussianSmooth> smoothFilter;
 	if (m_ApplyDirectlyOnInput)
@@ -239,23 +253,29 @@ void mafOpFilterVolume::OnSmooth()
 
   m_PreviewResultFlag = !m_ApplyDirectlyOnInput;
 
-  m_Gui->Enable(ID_SMOOTH,true);
-	m_Gui->Enable(ID_RADIUS_FACTOR,true);
-  m_Gui->Enable(ID_RADIUS_FACTOR,true);
-
-	m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-	m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
-	m_Gui->Enable(wxOK,true);
-  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
+  if (!m_TestMode)
+  {
+	  m_Gui->Enable(ID_SMOOTH,true);
+		m_Gui->Enable(ID_RADIUS_FACTOR,true);
+	  m_Gui->Enable(ID_RADIUS_FACTOR,true);
+	
+		m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
+		m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
+		m_Gui->Enable(wxOK,true);
+	  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpFilterVolume::OnMedian()
 //----------------------------------------------------------------------------
 {
-  wxBusyCursor wait;
-  m_Gui->Enable(ID_MEDIAN,false);
-  m_Gui->Enable(ID_KERNEL_SIZE,false);
-  m_Gui->Update();
+  if (!m_TestMode)
+  {
+	  wxBusyCursor wait;
+	  m_Gui->Enable(ID_MEDIAN,false);
+	  m_Gui->Enable(ID_KERNEL_SIZE,false);
+	  m_Gui->Update();
+  }
 
   vtkMAFSmartPointer<vtkImageMedian3D> medianFilter;
   if (m_ApplyDirectlyOnInput)
@@ -275,13 +295,16 @@ void mafOpFilterVolume::OnMedian()
 
   m_PreviewResultFlag = !m_ApplyDirectlyOnInput;
 
-  m_Gui->Enable(ID_MEDIAN,true);
-  m_Gui->Enable(ID_KERNEL_SIZE,true);
-
-  m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
-  m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
-  m_Gui->Enable(wxOK,true);
-  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
+  if (!m_TestMode)
+  {
+	  m_Gui->Enable(ID_MEDIAN,true);
+	  m_Gui->Enable(ID_KERNEL_SIZE,true);
+	
+	  m_Gui->Enable(ID_PREVIEW,m_PreviewResultFlag);
+	  m_Gui->Enable(ID_CLEAR,m_PreviewResultFlag);
+	  m_Gui->Enable(wxOK,true);
+	  m_Gui->Enable(wxCANCEL,m_PreviewResultFlag);
+  }
 }
 //----------------------------------------------------------------------------
 void mafOpFilterVolume::OnPreview()
@@ -304,7 +327,10 @@ void mafOpFilterVolume::OnPreview()
 void mafOpFilterVolume::OnClear()
 //----------------------------------------------------------------------------
 {
-	wxBusyCursor wait;
+	if (!m_TestMode)
+	{
+		wxBusyCursor wait;
+	}
 
   ((mafVMEVolumeGray *)m_Input)->SetData(m_OriginalImageData,((mafVME *)m_Input)->GetTimeStamp());
 	
@@ -313,14 +339,17 @@ void mafOpFilterVolume::OnClear()
     m_ResultImageData->DeepCopy(m_OriginalImageData);
   }
 
-	m_Gui->Enable(ID_SMOOTH,true);
-	m_Gui->Enable(ID_RADIUS_FACTOR,true);
-  m_Gui->Enable(ID_STANDARD_DEVIATION,true);
-
-	m_Gui->Enable(ID_PREVIEW,false);
-	m_Gui->Enable(ID_CLEAR,false);
-	m_Gui->Enable(wxOK,false);
-	m_Gui->Update();
+	if (!m_TestMode)
+	{
+		m_Gui->Enable(ID_SMOOTH,true);
+		m_Gui->Enable(ID_RADIUS_FACTOR,true);
+	  m_Gui->Enable(ID_STANDARD_DEVIATION,true);
+	
+		m_Gui->Enable(ID_PREVIEW,false);
+		m_Gui->Enable(ID_CLEAR,false);
+		m_Gui->Enable(wxOK,false);
+		m_Gui->Update();
+	}
 
 	m_PreviewResultFlag = false;
 	m_ClearInterfaceFlag= false;

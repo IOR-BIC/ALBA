@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpFilterVolume.h,v $
   Language:  C++
-  Date:      $Date: 2008-03-06 11:55:06 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-01-26 11:43:12 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -54,9 +54,30 @@ public:
 
   void ApplyFiltersToInputDataOff() {ApplyFiltersToInputData(false);};
 
+  /** Set the Standard Deviation for the smooth filter */
+  void SetStandardDeviation(double stDev[3]){m_StandardDeviation[0] = stDev[0];m_StandardDeviation[1] = stDev[1];m_StandardDeviation[2] = stDev[2];};
+
+  /** Set the Standard Deviation that use the smooth filter */
+  void GetStandardDeviation(double stDev[3]){stDev[0] = m_StandardDeviation[0];stDev[1] = m_StandardDeviation[1];stDev[2] = m_StandardDeviation[2];};
+
+  /** Set the Smooth Radius */
+  void SetSmoothRadius(double radius[3]){m_SmoothRadius[0] = radius[0];m_SmoothRadius[1] = radius[1];m_SmoothRadius[2] = radius[2];};
+
+  /** Get the Smooth Radius */
+  void GetSmoothRadius(double radius[3]){radius[0] = m_SmoothRadius[0];radius[1] = m_SmoothRadius[1];radius[2] = m_SmoothRadius[2];};
+
+  /** Set the Kernel Size for Median Filter */
+  void SetKernelSize(int size[3]){m_KernelSize[0] = size[0];m_KernelSize[1] = size[1];m_KernelSize[2] = size[2];};
+
+  /** Get the Kernel Size for Median Filter */
+  void GetKernelSize(int size[3]){size[0] = m_KernelSize[0];size[1] = m_KernelSize[1];size[2] = m_KernelSize[2];};
+
 protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	void OpStop(int result);
+
+  /** Create the Operation GUI */
+  void CreateGui();
 	
 	bool m_ClearInterfaceFlag;
 	bool m_PreviewResultFlag;
@@ -84,5 +105,8 @@ protected:
 
 	/** Clear all the surface applied filtering. */
 	void OnClear();
+
+  /** friend test class */
+  friend class mafOpFilterVolumeTest;
 };
 #endif
