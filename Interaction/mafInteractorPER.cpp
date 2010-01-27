@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorPER.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-01-27 09:41:16 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone 
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -70,14 +70,6 @@ mafInteractorPER::~mafInteractorPER()
 {
   vtkDEL(m_CameraBehavior);
   vtkDEL(m_CameraMouseBehavior);
-}
-
-//----------------------------------------------------------------------------
-void mafInteractorPER::SetAutoAdjustCameraClippingRange( int value )
-//----------------------------------------------------------------------------
-{
-  // TODO: to be implemented
-  //m_CameraBehavior->SetAutoAdjustCameraClippingRange( value );
 }
 
 //----------------------------------------------------------------------------

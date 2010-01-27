@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorPER.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:40 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-01-27 09:41:16 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone, originally by Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -41,9 +41,6 @@ public:
 
   /** Enable fly to mode: next click will select where to fly to */
   virtual void FlyToMode() {m_FlyToFlag = true;};
-
-  /** Waiter to auto adjust camera clipping range */
-  virtual void SetAutoAdjustCameraClippingRange( int value );
 
   /** 
    return true if device is in the set of devices currently interacting
@@ -148,6 +145,9 @@ protected:
 private:
   mafInteractorPER(const mafInteractorPER&);  // Not implemented.
   void operator=(const mafInteractorPER&);  // Not implemented.
+
+  /** test friend */
+  friend class mafInteractorPERTest;
 };
 
 #endif 
