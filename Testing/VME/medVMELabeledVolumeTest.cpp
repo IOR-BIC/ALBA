@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMELabeledVolumeTest.cpp,v $
 Language:  C++
-Date:      $Date: 2007-11-21 08:20:05 $
-Version:   $Revision: 1.4 $
+Date:      $Date: 2010-01-28 09:58:18 $
+Version:   $Revision: 1.4.2.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -92,7 +92,7 @@ void medVMELabeledVolumeTest::TestVolumeCopy()
   labelScalars = recGrid->GetPointData()->GetScalars();
   labelScalars->Modified();
 
-  //Check if the medVMELabeledVolume without labels has all the scalars setted to 0.
+  //Check if the medVMELabeledVolume without labels has all the scalars set to 0.
   int not = labelScalars->GetNumberOfTuples();
   for ( int i = 0; i < not; i++ )
   {
@@ -115,7 +115,6 @@ void medVMELabeledVolumeTest::TestGenerateLabeledVolume()
   volumeReader->Update();
 
   mafSmartPointer<mafVMEVolumeGray> volume;
-  mafNEW(volume);
   volume->SetData(volumeReader->GetOutput(), 0);
   volume->GetOutput()->GetVTKData()->Update();
   volume->ReparentTo(root);
@@ -351,5 +350,3 @@ void medVMELabeledVolumeTest::TestDeepCopy()
     CPPUNIT_ASSERT(labelValue == labelCopiedValue);
   }
 }
-
-

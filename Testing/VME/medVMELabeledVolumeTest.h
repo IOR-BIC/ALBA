@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMELabeledVolumeTest.h,v $
 Language:  C++
-Date:      $Date: 2007-11-08 16:52:05 $
-Version:   $Revision: 1.2 $
+Date:      $Date: 2010-01-28 09:58:18 $
+Version:   $Revision: 1.2.2.1 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
