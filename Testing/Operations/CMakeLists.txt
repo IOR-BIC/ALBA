@@ -103,6 +103,9 @@ ADD_TEST(medOpMakeVMETimevaryingTest ${EXECUTABLE_OUTPUT_PATH}/medOpMakeVMETimev
 ADD_EXECUTABLE(medOpEqualizeHistogramTest medOpEqualizeHistogramTest.h medOpEqualizeHistogramTest.cpp)
 ADD_TEST(medOpEqualizeHistogramTest ${EXECUTABLE_OUTPUT_PATH}/medOpEqualizeHistogramTest)
 
+ADD_EXECUTABLE(medOpCreateWrappedMeterTest medOpCreateWrappedMeterTest.h medOpCreateWrappedMeterTest.cpp)
+ADD_TEST(medOpCreateWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateWrappedMeterTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
