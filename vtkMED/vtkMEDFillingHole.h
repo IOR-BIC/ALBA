@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2009-11-19 10:43:53 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-02-01 17:37:16 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -156,6 +156,9 @@ public:
   inline void SetSmoothThinPlateSteps(int nSteps) {
     SmoothThinPlateSteps = nSteps;
   }
+  /**Get the latest created patch*/
+vtkPolyData*  GetLastPatch(){return LastPatch;};  
+
 
 protected:
   vtkMEDFillingHole();           
@@ -189,6 +192,8 @@ protected:
   void    RefinePatch();
   void    Trace(int i,int k);
   bool    RelaxOneEdge(CEdge *pEdge);
+  void    BuildPatchOutput();
+
   CVertex* AddOnePointToTriangle(double *pCoord, CTriangle *pTriangle);
 
   /** Multiplies L transpose matrix and L matrix, i.e., A =  L^T*L */
@@ -251,7 +256,7 @@ protected:
   int FillingHoles;             /// filling all holes or one specific hole
   int BorderPointID;            /// if filling one hole, input a vertex id on the border of the hole
 
-  vtkPolyData *InputMesh,*OutputMesh;
+  vtkPolyData *InputMesh,*OutputMesh, *LastPatch;
 
   ///** Build internal mesh structure filtering out invalid, non-manifold triangles */
   //void InitManifoldMesh();

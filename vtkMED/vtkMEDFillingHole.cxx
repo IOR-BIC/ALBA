@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.cxx,v $
 Language:  C++
-Date:      $Date: 2009-11-19 10:43:53 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-02-01 17:37:16 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -33,7 +33,7 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include <float.h>
 
 
-vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.4 $");
+vtkCxxRevisionMacro(vtkMEDFillingHole, "$Revision: 1.1.2.5 $");
 vtkStandardNewMacro(vtkMEDFillingHole);
 
 #include "mafMemDbg.h"
@@ -273,6 +273,8 @@ vtkMEDFillingHole::vtkMEDFillingHole()
   FillingHoles = -1;      //filling all holes or a hole. -1 means no filling.
   BorderPointID = 0;
   SmoothThinPlateSteps = 500; //large number of steps
+  LastPatch = vtkPolyData::New();
+
 }
 
 //----------------------------------------------------------------------------
@@ -285,6 +287,12 @@ vtkMEDFillingHole::~vtkMEDFillingHole()
 
   ClearPatch();
   ClearMesh();
+ if (LastPatch!=NULL)
+  {
+    LastPatch->Delete();
+    LastPatch = NULL;
+  }
+
 }
 
 //----------------------------------------------------------------------------
@@ -2852,6 +2860,36 @@ void vtkMEDFillingHole::DoneMesh()
   points->Delete();
   triangles->Delete();
 }
+void vtkMEDFillingHole::BuildPatchOutput()
+//----------------------------------------------------------------------------
+{
+  int i;
+
+  LastPatch->Initialize();
+  // set up polydata object and data arrays
+  vtkPoints *points = vtkPoints::New() ;
+  vtkCellArray *triangles = vtkCellArray::New() ;
+
+  // insert data into point array
+  // InsertPoint() can allocate its own memory if not enough pre-allocated
+  int NumOfVertexPatch = PatchVertexes.size();
+  points->Allocate(NumOfVertexPatch) ;       
+  for (i = 0 ;  i < NumOfVertexPatch ;  i++)
+    points->InsertPoint(i, PatchVertexes[i]->DCoord) ; 
+
+  // insert data into cell array
+  int PatchNumOfTriangle = PatchTriangles.size();
+  triangles->Allocate(PatchNumOfTriangle) ;   
+  for (i = 0 ;  i < PatchNumOfTriangle ;  i++)
+    triangles->InsertNextCell(3, PatchTriangles[i]->AVertex) ;
+
+  LastPatch->SetPoints(points) ;
+  LastPatch->SetPolys(triangles) ;
+
+  points->Delete();
+  triangles->Delete();
+}
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkMEDFillingHole::Execute()
@@ -2886,7 +2924,8 @@ void vtkMEDFillingHole::Execute()
         CreatePatch();
         RefinePatch();
         SmoothPatch();
-        MergePatch();      
+        MergePatch();  
+        BuildPatchOutput();
     }
 #if defined(_DEBUG) && defined(_MSC_VER)
     else
