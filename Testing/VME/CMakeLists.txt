@@ -6,70 +6,75 @@ LINK_LIBRARIES(medOperations)
 #-----------------------------------------------------------------------------
 # tests using cppunit testing framework
 #-----------------------------------------------------------------------------
-IF (MAF_USE_ITK)
-  ADD_EXECUTABLE(mafVMERawMotionDataTest mafVMERawMotionDataTest.h mafVMERawMotionDataTest.cpp)
-  ADD_TEST(mafVMERawMotionDataTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMERawMotionDataTest)
-ENDIF (MAF_USE_ITK)
+# IF (MAF_USE_ITK)
+  # ADD_EXECUTABLE(mafVMERawMotionDataTest mafVMERawMotionDataTest.h mafVMERawMotionDataTest.cpp)
+  # ADD_TEST(mafVMERawMotionDataTest  ${EXECUTABLE_OUTPUT_PATH}/mafVMERawMotionDataTest)
+# ENDIF (MAF_USE_ITK)
 
-ADD_EXECUTABLE(mafPolylineGraphTest mafPolylineGraphTest.h mafPolylineGraphTest.cpp)
-ADD_TEST(mafPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphTest)
+# ADD_EXECUTABLE(mafPolylineGraphTest mafPolylineGraphTest.h mafPolylineGraphTest.cpp)
+# ADD_TEST(mafPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/mafPolylineGraphTest)
 
-ADD_EXECUTABLE(medVMEWrappedMeterTest medVMEWrappedMeterTest.h medVMEWrappedMeterTest.cpp)
-ADD_TEST(medVMEWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEWrappedMeterTest)
+# ADD_EXECUTABLE(medVMEWrappedMeterTest medVMEWrappedMeterTest.h medVMEWrappedMeterTest.cpp)
+# ADD_TEST(medVMEWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEWrappedMeterTest)
 
-ADD_EXECUTABLE(medVMELabeledVolumeTest medVMELabeledVolumeTest.h medVMELabeledVolumeTest.cpp)
-ADD_TEST(medVMELabeledVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medVMELabeledVolumeTest)
+# ADD_EXECUTABLE(medVMELabeledVolumeTest medVMELabeledVolumeTest.h medVMELabeledVolumeTest.cpp)
+# ADD_TEST(medVMELabeledVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medVMELabeledVolumeTest)
 
-ADD_EXECUTABLE(medPipeVolumeMIPTest medPipeVolumeMIPTest.h medPipeVolumeMIPTest.cpp)
-ADD_TEST(medPipeVolumeMIPTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeMIPTest)
+# ADD_EXECUTABLE(medPipeVolumeMIPTest medPipeVolumeMIPTest.h medPipeVolumeMIPTest.cpp)
+# ADD_TEST(medPipeVolumeMIPTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeMIPTest)
 
-ADD_EXECUTABLE(medPipeFactoryVMETest medPipeFactoryVMETest.h medPipeFactoryVMETest.cpp)
-ADD_TEST(medPipeFactoryVMETest  ${EXECUTABLE_OUTPUT_PATH}/medPipeFactoryVMETest)
+# ADD_EXECUTABLE(medPipeFactoryVMETest medPipeFactoryVMETest.h medPipeFactoryVMETest.cpp)
+# ADD_TEST(medPipeFactoryVMETest  ${EXECUTABLE_OUTPUT_PATH}/medPipeFactoryVMETest)
 
-ADD_EXECUTABLE(medPipeVolumeDRRTest medPipeVolumeDRRTest.h medPipeVolumeDRRTest.cpp)
-ADD_TEST(medPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeDRRTest)
+# ADD_EXECUTABLE(medPipeVolumeDRRTest medPipeVolumeDRRTest.h medPipeVolumeDRRTest.cpp)
+# ADD_TEST(medPipeVolumeDRRTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeVolumeDRRTest)
 
-ADD_EXECUTABLE(medVMEAnalogTest medVMEAnalogTest.h medVMEAnalogTest.cpp)
-ADD_TEST(medVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEAnalogTest)
+# ADD_EXECUTABLE(medVMEAnalogTest medVMEAnalogTest.h medVMEAnalogTest.cpp)
+# ADD_TEST(medVMEAnalogTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEAnalogTest)
 
-ADD_EXECUTABLE(medVMEFactoryTest medVMEFactoryTest.h medVMEFactoryTest.cpp)
-ADD_TEST(medVMEFactoryTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEFactoryTest)
+# ADD_EXECUTABLE(medVMEFactoryTest medVMEFactoryTest.h medVMEFactoryTest.cpp)
+# ADD_TEST(medVMEFactoryTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEFactoryTest)
 
-ADD_EXECUTABLE(medVMEOutputSurfaceEditorTest medVMEOutputSurfaceEditorTest.h medVMEOutputSurfaceEditorTest.cpp)
-ADD_TEST(medVMEOutputSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputSurfaceEditorTest)
+# ADD_EXECUTABLE(medVMEOutputSurfaceEditorTest medVMEOutputSurfaceEditorTest.h medVMEOutputSurfaceEditorTest.cpp)
+# ADD_TEST(medVMEOutputSurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputSurfaceEditorTest)
 
-ADD_EXECUTABLE(medVMEOutputPolylineEditorTest medVMEOutputPolylineEditorTest.h medVMEOutputPolylineEditorTest.cpp)
-ADD_TEST(medVMEOutputPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputPolylineEditorTest)
+# ADD_EXECUTABLE(medVMEOutputPolylineEditorTest medVMEOutputPolylineEditorTest.h medVMEOutputPolylineEditorTest.cpp)
+# ADD_TEST(medVMEOutputPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEOutputPolylineEditorTest)
 
-ADD_EXECUTABLE(medVMESurfaceEditorTest medVMESurfaceEditorTest.h medVMESurfaceEditorTest.cpp)
-ADD_TEST(medVMESurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMESurfaceEditorTest)
+# ADD_EXECUTABLE(medVMESurfaceEditorTest medVMESurfaceEditorTest.h medVMESurfaceEditorTest.cpp)
+# ADD_TEST(medVMESurfaceEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMESurfaceEditorTest)
 
-ADD_EXECUTABLE(medPipePolylineGraphEditorTest medPipePolylineGraphEditorTest.h medPipePolylineGraphEditorTest.cpp)
-ADD_TEST(medPipePolylineGraphEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipePolylineGraphEditorTest)
+# ADD_EXECUTABLE(medPipePolylineGraphEditorTest medPipePolylineGraphEditorTest.h medPipePolylineGraphEditorTest.cpp)
+# ADD_TEST(medPipePolylineGraphEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medPipePolylineGraphEditorTest)
 
-ADD_EXECUTABLE(medVMEPolylineEditorTest medVMEPolylineEditorTest.h medVMEPolylineEditorTest.cpp)
-ADD_TEST(medVMEPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineEditorTest)
+# ADD_EXECUTABLE(medVMEPolylineEditorTest medVMEPolylineEditorTest.h medVMEPolylineEditorTest.cpp)
+# ADD_TEST(medVMEPolylineEditorTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineEditorTest)
 
-ADD_EXECUTABLE(mafPipeMeshSlice_BESTest mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp)
-ADD_TEST(mafPipeMeshSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeMeshSlice_BESTest)
+# ADD_EXECUTABLE(mafPipeMeshSlice_BESTest mafPipeMeshSlice_BESTest.h mafPipeMeshSlice_BESTest.cpp)
+# ADD_TEST(mafPipeMeshSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeMeshSlice_BESTest)
 
-ADD_EXECUTABLE(mafPipeSurfaceSlice_BESTest mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp)
-ADD_TEST(mafPipeSurfaceSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSurfaceSlice_BESTest)
+# ADD_EXECUTABLE(mafPipeSurfaceSlice_BESTest mafPipeSurfaceSlice_BESTest.h mafPipeSurfaceSlice_BESTest.cpp)
+# ADD_TEST(mafPipeSurfaceSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSurfaceSlice_BESTest)
 
-ADD_EXECUTABLE(mafPipeVolumeSlice_BESTest mafPipeVolumeSlice_BESTest.h mafPipeVolumeSlice_BESTest.cpp)
-ADD_TEST(mafPipeVolumeSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeSlice_BESTest)
+# ADD_EXECUTABLE(mafPipeVolumeSlice_BESTest mafPipeVolumeSlice_BESTest.h mafPipeVolumeSlice_BESTest.cpp)
+# ADD_TEST(mafPipeVolumeSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeVolumeSlice_BESTest)
 
-ADD_EXECUTABLE(medVMEMapsTest medVMEMapsTest.h medVMEMapsTest.cpp)
-ADD_TEST(medVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEMapsTest)
+# ADD_EXECUTABLE(medVMEMapsTest medVMEMapsTest.h medVMEMapsTest.cpp)
+# ADD_TEST(medVMEMapsTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEMapsTest)
 
-ADD_EXECUTABLE(medPipeTrajectoriesTest medPipeTrajectoriesTest.h medPipeTrajectoriesTest.cpp)
-ADD_TEST(medPipeTrajectoriesTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTrajectoriesTest)
+# ADD_EXECUTABLE(medPipeTrajectoriesTest medPipeTrajectoriesTest.h medPipeTrajectoriesTest.cpp)
+# ADD_TEST(medPipeTrajectoriesTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeTrajectoriesTest)
 
-ADD_EXECUTABLE(mafPipeSliceTest mafPipeSliceTest.h mafPipeSliceTest.cpp)
-ADD_TEST(mafPipeSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSliceTest)
+# ADD_EXECUTABLE(mafPipeSliceTest mafPipeSliceTest.h mafPipeSliceTest.cpp)
+# ADD_TEST(mafPipeSliceTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipeSliceTest)
 
-ADD_EXECUTABLE(mafPipePolylineSlice_BESTest mafPipePolylineSlice_BESTest.h mafPipePolylineSlice_BESTest.cpp)
-ADD_TEST(mafPipePolylineSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipePolylineSlice_BESTest)
+# ADD_EXECUTABLE(mafPipePolylineSlice_BESTest mafPipePolylineSlice_BESTest.h mafPipePolylineSlice_BESTest.cpp)
+# ADD_TEST(mafPipePolylineSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipePolylineSlice_BESTest)
+
+
+ADD_EXECUTABLE(medPipeWrappedMeterTest medPipeWrappedMeterTest.h medPipeWrappedMeterTest.cpp)
+ADD_TEST(medPipeWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeWrappedMeterTest)
+
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
