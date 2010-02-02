@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-02-02 09:06:52 $
-Version:   $Revision: 1.1.2.68 $
+Date:      $Date: 2010-02-02 10:22:09 $
+Version:   $Revision: 1.1.2.69 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -303,7 +303,7 @@ medOpImporterDicomOffis::~medOpImporterDicomOffis()
 {
 	vtkDEL(m_SliceActor);
 
-	cppDEL(m_Wizard);
+	//cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
 	mafDEL(m_Image);
   mafDEL(m_Mesh);
@@ -543,9 +543,20 @@ void medOpImporterDicomOffis::Destroy()
   mafDEL(m_TagArray);
   mafDEL(m_DicomInteractor);
 
+  cppDEL(m_LoadGuiLeft);
+  cppDEL(m_LoadGuiUnderLeft);
+  cppDEL(m_LoadGuiCenter);
+  cppDEL(m_CropGuiLeft);
+  cppDEL(m_CropGuiCenter);
+  cppDEL(m_BuildGuiLeft); 
+  cppDEL(m_BuildGuiUnderLeft);
+  cppDEL(m_BuildGuiCenter);
+
+
   cppDEL(m_LoadPage);
   cppDEL(m_CropPage);
   cppDEL(m_BuildPage);
+  cppDEL(m_Wizard);
 
 }
 
