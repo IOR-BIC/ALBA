@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-02-02 10:22:09 $
-Version:   $Revision: 1.1.2.69 $
+Date:      $Date: 2010-02-02 15:42:03 $
+Version:   $Revision: 1.1.2.70 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -543,21 +543,21 @@ void medOpImporterDicomOffis::Destroy()
   mafDEL(m_TagArray);
   mafDEL(m_DicomInteractor);
 
-  cppDEL(m_LoadGuiLeft);
-  cppDEL(m_LoadGuiUnderLeft);
-  cppDEL(m_LoadGuiCenter);
-  cppDEL(m_CropGuiLeft);
-  cppDEL(m_CropGuiCenter);
-  cppDEL(m_BuildGuiLeft); 
-  cppDEL(m_BuildGuiUnderLeft);
-  cppDEL(m_BuildGuiCenter);
-
-
-  cppDEL(m_LoadPage);
-  cppDEL(m_CropPage);
-  cppDEL(m_BuildPage);
-  cppDEL(m_Wizard);
-
+  if(!this->m_TestMode)
+  {
+    cppDEL(m_LoadGuiLeft);
+    cppDEL(m_LoadGuiUnderLeft);
+    cppDEL(m_LoadGuiCenter);
+    cppDEL(m_CropGuiLeft);
+    cppDEL(m_CropGuiCenter);
+    cppDEL(m_BuildGuiLeft); 
+    cppDEL(m_BuildGuiUnderLeft);
+    cppDEL(m_BuildGuiCenter);
+    cppDEL(m_LoadPage);
+    cppDEL(m_CropPage);
+    cppDEL(m_BuildPage);
+    cppDEL(m_Wizard);
+  }
 }
 
 //----------------------------------------------------------------------------
