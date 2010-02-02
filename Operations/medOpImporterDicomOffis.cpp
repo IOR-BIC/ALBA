@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-29 09:50:05 $
-Version:   $Revision: 1.1.2.67 $
+Date:      $Date: 2010-02-02 09:06:52 $
+Version:   $Revision: 1.1.2.68 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2560,6 +2560,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
   double imageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
   double imagePositionPatient[3] = {0.0,0.0,0.0};
   bool enableToRead = true; //true for test mode
+  bool errorOccurred = false;
 	m_DicomTypeRead = -1;
   DcmFileFormat dicomImg;    
 
@@ -2603,7 +2604,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       {
         if(!this->m_TestMode)
         {
-          wxMessageBox(wxString::Format("File <%s> can not be opened",file),"Warning!!");
+          wxLogMessage(wxString::Format("File <%s> can not be opened",file));
+          errorOccurred = true;
         }
         continue;
       }
@@ -2621,8 +2623,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       if (!error.good())
       {
-          wxMessageBox("Error decoding the image");
-          return false;
+          wxLogMessage(wxString::Format("Error decoding the image <%s>",file));
+          errorOccurred = true;
+          //return false;
+          continue;
       }
 
       const char *option = "?";
@@ -2692,15 +2696,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       fabs(imageOrientationPatient[1] - imageOrientationPatient[5]) < 0.0001 \
       );
 
-      /*for (int i = 0;(sliceNum == 0) && i < 6; i++)
-        {
-            firstImageOrientationPatient[i] = imageOrientationPatient[i];
-        }
-
-      for (int i = 0; (sliceNum > 0) && m_ConstantRotation && (i < 6); i++)
-        {
-            m_ConstantRotation = (firstImageOrientationPatient[i] == imageOrientationPatient[i]);
-        }*/
       double spacing[3];
       spacing[2] = 0;
   
@@ -2758,33 +2753,43 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       ds->findAndGetLongInt(DCM_SmallestImagePixelValue, pixel_min);
       ds->findAndGetLongInt(DCM_LargestImagePixelValue, pixel_max);
 
+      if (pixel_min == pixel_max)
+        intercept = 0;
 
-      if(val_long==16 && pixel_rep == 0)
+      if(val_long==16 && pixel_rep == 0 )
       {
-        if(pixel_min*slope+intercept >= VTK_UNSIGNED_SHORT_MIN || pixel_max*slope+intercept >= VTK_UNSIGNED_SHORT_MAX)
+        if(pixel_min*slope+intercept >= VTK_UNSIGNED_SHORT_MIN && pixel_max*slope+intercept <= VTK_UNSIGNED_SHORT_MAX)
         {
           imageData->SetScalarType(VTK_UNSIGNED_SHORT);
         }
-        else if (pixel_min*slope+intercept >= VTK_SHORT_MIN || pixel_max*slope+intercept >= VTK_SHORT_MAX)
-        {
-          imageData->SetScalarType(VTK_SHORT);;
-        }
-        else
-        {
-          wxMessageBox("Inconsistent scalar values. Can not import file.","Error!!");
-          return false;
-        }
-      }
-      else if(val_long==16 && pixel_rep == 1 )
-      {
-        if (pixel_min*slope+intercept >= VTK_SHORT_MIN || pixel_max*slope+intercept >= VTK_SHORT_MAX)
+        else if (pixel_min*slope+intercept >= VTK_SHORT_MIN && pixel_max*slope+intercept <= VTK_SHORT_MAX)
         {
           imageData->SetScalarType(VTK_SHORT);
         }
         else
         {
-          wxMessageBox("Inconsistent scalar values. Can not import file.","Error!!");
-          return false;
+          if(!this->m_TestMode)
+          {
+            wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",file));
+            errorOccurred = true;
+            continue;
+          }
+        }
+      }
+      else if(val_long==16 && pixel_rep == 1)
+      {
+        if (pixel_min*slope+intercept >= VTK_SHORT_MIN && pixel_max*slope+intercept <= VTK_SHORT_MAX)
+        {
+          imageData->SetScalarType(VTK_SHORT);
+        }
+        else
+        {
+          if(!this->m_TestMode)
+          {
+            wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",file));
+            errorOccurred = true;
+            continue;
+          }
         }
       }
       else if(val_long==16 && pixel_rep == 0)
@@ -3010,9 +3015,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
               m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
             else if(m_DicomTypeRead!=medGUIDicomSettings::ID_CMRI_MODALITY)
             {
-              wxString msg = _("cMRI damaged !");
-              wxMessageBox(msg,"Confirm", wxOK , NULL);
-              return false;
+              if(!this->m_TestMode)
+              {
+                wxString msg = _("cMRI damaged !");
+                wxMessageBox(msg,"Confirm", wxOK , NULL);
+                return false;
+              }
             }
           }
           else
@@ -3021,9 +3029,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
               m_DicomTypeRead=medGUIDicomSettings::ID_MRI_MODALITY;
             else if(m_DicomTypeRead!=medGUIDicomSettings::ID_MRI_MODALITY)
             {
-              wxString msg = _("cMRI damaged !");
-              wxMessageBox(msg,"Confirm", wxOK , NULL);
-              return false;
+              if(!this->m_TestMode)
+              {
+                wxString msg = _("cMRI damaged !");
+                wxMessageBox(msg,"Confirm", wxOK , NULL);
+                return false;
+              }
             }
           }
 
@@ -3036,8 +3047,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           if (!this->m_TestMode)
           {
             FillStudyListBox(studyAndSeriesVec);
-          }
-					
+          }	
 				}
 				else 
 				{
@@ -3087,6 +3097,13 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 	}
   else
   {
+    if (errorOccurred)
+    {
+      if(!this->m_TestMode)
+      {
+        wxMessageBox("Some errors occurred while importing data. Please check the log area for details.");
+      }
+    }
     return true;
   }
 }
