@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGizmoROI_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-05-14 15:04:09 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-02-04 16:53:16 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2002/2004
@@ -216,6 +216,9 @@ protected:
 
 	//The gizmo bounding box
 	mafGizmoBoundingBox* m_OutlineGizmo;
+
+  /** friend test class */
+  friend class mafGizmoROI_BESTest;
 };
 
 #endif
