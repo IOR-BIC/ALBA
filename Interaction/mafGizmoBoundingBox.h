@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoBoundingBox.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-01 13:47:19 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2010-02-04 16:50:23 $
+  Version:   $Revision: 1.5.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -106,6 +106,7 @@ protected:
   /** test friends */
   friend class mafGizmoBoundingBoxTest;
   friend class mafGizmoROITest;
+  friend class mafGizmoROI_BESTest;
 
 };
 #endif

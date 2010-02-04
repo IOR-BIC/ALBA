@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoHandle.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.6.2.2 $
+  Date:      $Date: 2010-02-04 16:50:23 $
+  Version:   $Revision: 1.6.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -248,16 +248,18 @@ protected:
   vtkPlane *m_ShadingPlane;
 
   double m_ShadingPlaneDimension[3];
-
-  /** friend test */
-  friend class mafGizmoROITest;
   
   double m_Color[3];
   
   bool m_Show;
-
-  friend class mafGizmoHandleTest;
   
   double m_Bounds[6];
+
+
+  /** friend test */
+  friend class mafGizmoROITest;
+  friend class mafGizmoROI_BESTest;
+  friend class mafGizmoHandleTest;
+
 };
 #endif
