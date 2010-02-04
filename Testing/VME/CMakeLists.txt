@@ -74,6 +74,9 @@ ADD_TEST(mafPipePolylineSlice_BESTest  ${EXECUTABLE_OUTPUT_PATH}/mafPipePolyline
 ADD_EXECUTABLE(medPipeWrappedMeterTest medPipeWrappedMeterTest.h medPipeWrappedMeterTest.cpp)
 ADD_TEST(medPipeWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeWrappedMeterTest)
 
+ADD_EXECUTABLE(medPipeDensityDistanceTest medPipeDensityDistanceTest.h medPipeDensityDistanceTest.cpp)
+ADD_TEST(medPipeDensityDistanceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeDensityDistanceTest)
+
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
