@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-06-03 15:59:26 $
-  Version:   $Revision: 1.9.2.1 $
+  Date:      $Date: 2010-02-08 15:41:03 $
+  Version:   $Revision: 1.9.2.2 $
   Authors:   Matteo Giacomoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -83,10 +83,10 @@ public:
 	virtual void VmeSelect(mafNode *node, bool select);
 
 	/** Set slicer parameter to generate the slice. */
-  void SetSlice(double origin[3], float xVect[3], float yVect[3]);
+  virtual void SetSlice(double origin[3], float xVect[3], float yVect[3]);
 	
 	/** Set slicer parameter to generate the slice. */
-	void SetSlice(double origin[3], double dn = 0.0);
+	virtual void SetSlice(double origin[3], double dn = 0.0);
 
 	/** Show/Hide VMEs into plugged sub-views*/
   virtual void VmeShow(mafNode *node, bool show);
@@ -96,15 +96,15 @@ public:
 
 protected:
   /** Force the updating of several slice parameters like origin, vectors and gui components. */
-	void UpdateSliceParameters();
+	virtual void UpdateSliceParameters();
   /** Calculate for every actor the correct slice. */
-	void UpdateSlice();
+	virtual void UpdateSlice();
   /** Update the correct value corresponding to specific slice; this value is visualized with an actor.*/
-	void UpdateText();
+	virtual void UpdateText();
   /** Initialize position of the plane and actor properties.*/
-	void InizializePlane();
+	virtual void InizializePlane();
   /** Update origin, point1 and point2 of the vtkPlaneSource. */
-	void UpdatePlane();
+	virtual void UpdatePlane();
 
   /** Create gui widgets that will be attached in view settings tab in side bar.*/
 	virtual mafGUI  *CreateGui();
