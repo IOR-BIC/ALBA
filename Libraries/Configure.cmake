@@ -2,8 +2,8 @@
 # Program:   MULTIMOD APPLICATION FRAMEWORK (MAF)
 # Module:    $RCSfile: Configure.cmake,v $
 # Language:  CMake 1.2
-# Date:      $Date: 2009-05-22 08:36:51 $
-# Version:   $Revision: 1.2.2.8 $
+# Date:      $Date: 2010-02-09 14:05:38 $
+# Version:   $Revision: 1.2.2.9 $
 #
 # Description:
 # Project file for configuring the the Multimod Fundation Layer.
@@ -14,6 +14,11 @@ SET (DEBUG FALSE)
 
 # options for configuring MedFL libraries
 OPTION(MED_USE_Offis "Find and Link the Offis library." ON)
+IF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
+  OPTION(MED_USE_BTK "Find and Link the BTK library." ON)
+ELSE (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
+  SET(MED_USE_BTK OFF)
+ENDIF (${CMAKE_GENERATOR} STREQUAL "Visual Studio 9 2008")
 
 #
 # configure CMake modules for MedFL
@@ -26,6 +31,13 @@ MedFL_SUBPROJECT (MedFL_MODULES modules)
 IF (MED_USE_Offis)
   MedFL_SUBPROJECT(Offis Offis)
 ENDIF(MED_USE_Offis)
+
+#
+# BTK Library
+#
+IF (MED_USE_BTK)
+  MedFL_SUBPROJECT(BTK BTK)
+ENDIF(MED_USE_BTK)
 
 
 # Create module files in build directory
