@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.1.22.2 $
+  Date:      $Date: 2010-02-10 16:52:48 $
+  Version:   $Revision: 1.1.22.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -161,5 +161,16 @@ protected:
   /**
   Register the event receiver object*/
   mafObserver *m_Listener;
+
+  /** 
+  Register the highlight status */
+  bool m_Highlight;
+
+  /** 
+  register the show status */
+  bool m_Show;
+
+  /** Test friend */
+  friend class mafGizmoScaleAxisTest;
 };
 #endif

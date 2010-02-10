@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScaleAxis.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.7.4.2 $
+  Date:      $Date: 2010-02-10 16:52:48 $
+  Version:   $Revision: 1.7.4.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -87,6 +87,9 @@ mafGizmoScaleAxis::mafGizmoScaleAxis(mafVME *input, mafObserver *listener)
 
   m_CylGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
   m_CubeGizmo->ReparentTo(mafVME::SafeDownCast(m_InputVme->GetRoot()));
+
+  m_Highlight = false;
+  m_Show = false;
 }
 //----------------------------------------------------------------------------
 mafGizmoScaleAxis::~mafGizmoScaleAxis() 
@@ -313,6 +316,8 @@ void mafGizmoScaleAxis::SetAxis(int axis)
 void mafGizmoScaleAxis::Highlight(bool highlight)
 //----------------------------------------------------------------------------
 {
+  m_Highlight = highlight;
+
   if (highlight == true)
   {
    // Highlight the cylinder by setting its color to yellow 
@@ -467,6 +472,7 @@ void mafGizmoScaleAxis::SetColor(double cylR, double cylG, double cylB, double c
 void mafGizmoScaleAxis::Show(bool show)
 //----------------------------------------------------------------------------
 {
+  m_Show = show;
   mafEventMacro(mafEvent(this,VME_SHOW,m_CylGizmo,show));
   mafEventMacro(mafEvent(this,VME_SHOW,m_CubeGizmo,show));
 }
@@ -505,4 +511,9 @@ void mafGizmoScaleAxis::SetInput(mafVME *vme)
   this->m_InputVme = vme; 
   SetAbsPose(vme->GetOutput()->GetAbsMatrix()); 
   SetRefSysMatrix(vme->GetOutput()->GetAbsMatrix());
+}
+
+int mafGizmoScaleAxis::GetAxis() const
+{
+  return m_Axis;
 }
