@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:14 $
-  Version:   $Revision: 1.33.2.1 $
+  Date:      $Date: 2010-02-10 12:47:16 $
+  Version:   $Revision: 1.33.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,15 +78,15 @@ mafViewManager::~mafViewManager()
 	
 	mafView *v = NULL;
 
-  while(m_ViewList)
+  while(m_ViewList) // destroy all created views
   {
     v = m_ViewList;
     m_ViewList = v->m_Next;
-    v->SetMouse(NULL);
+    v->SetMouse(NULL); // dereference the mouse before destroy the view
     cppDEL(v);
   }
 
-  for(int i=0; i<m_TemplateNum; i++)
+  for(int i=0; i<m_TemplateNum; i++) // destroy all template views
     cppDEL(m_ViewTemplate[i]);
 }
 
@@ -96,7 +96,7 @@ void mafViewManager::SetMouse(mafDeviceButtonsPadMouse *mouse)
 {
   m_Mouse = mouse;
   if(m_SelectedView && m_Mouse)
-    m_Mouse->OnEvent(&mafEvent(this,VIEW_SELECT,m_SelectedView));
+    m_Mouse->OnEvent(&mafEvent(this,VIEW_SELECT,m_SelectedView)); // Update the mouse for the selected view
 }
 
 //----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
         ViewSelected(view/*, rwi*/);
 
         if(notifylogic)
-          mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); 
+          mafEventMacro(mafEvent(this,VIEW_SELECT,(long)e->GetSender())); // forward the view selection event to logic
 
         if(m_CollaborateStatus && m_RemoteListener && !m_FromRemote)
         {
@@ -136,7 +136,7 @@ void mafViewManager::OnEvent(mafEventBase *maf_event)
       }
       break;
       default:
-        mafEventMacro(*e);
+        mafEventMacro(*e); // forward up the event
       break; 
     }
 	}
@@ -146,16 +146,17 @@ void mafViewManager::ViewAdd(mafView *view, bool visibleInMenu)
 //----------------------------------------------------------------------------
 {
   m_ViewTemplate[m_TemplateNum] = view;
+  // Update the view ID (starting from VIEW_START)
 	view->m_Id = m_TemplateNum + VIEW_START;
-  view->m_Mult = 0;
+  view->m_Mult = 0; // template views multiplicity is always 0
   view->SetListener(this);
 
   if (!visibleInMenu)
   {
-    m_IdInvisibleMenuList.push_back(view->m_Id);
+    m_IdInvisibleMenuList.push_back(view->m_Id); // update the invisible to menu views vector
   }
 
-  m_TemplateNum++;    
+  m_TemplateNum++;
 }
 //----------------------------------------------------------------------------
 void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
@@ -171,7 +172,7 @@ void mafViewManager::ViewSelected(mafView *view/*, mafRWIBase *rwi*/)
   {
     mafEvent e(this,VIEW_SELECT,m_SelectedView);
     e.SetChannel(MCH_OUTPUT);
-    m_Mouse->OnEvent(&e);
+    m_Mouse->OnEvent(&e); // update the mouse
   }
 }
 //----------------------------------------------------------------------------
@@ -179,14 +180,14 @@ void mafViewManager::VmeAdd(mafNode *n)
 //----------------------------------------------------------------------------
 {
   for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeAdd(n);
+    v->VmeAdd(n); // Add the VME in all the views
 
   wxString s;
   s = n->GetTypeName();
-  if(s == "mafVMERoot") 
+  if(s == "mafVMERoot") // Add a root means add a new tree
   {
     m_RootVme     = (mafVMERoot*)n;
-    m_SelectedVme = n;     // Adding new tree, selected vme must be initialized at the root.
+    m_SelectedVme = n; // Adding new tree, selected vme must be initialized at the root.
   }
 }
 //----------------------------------------------------------------------------
@@ -194,10 +195,10 @@ void mafViewManager::VmeRemove(mafNode *n)
 //----------------------------------------------------------------------------
 {
   for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeRemove(n);
+    v->VmeRemove(n); // Remove the VME in all the views
 
 	wxString s(n->GetTypeName());
-	if(s == "mafVMERoot") 
+	if(s == "mafVMERoot") // Remove the root means remove the tree
   {
     m_RootVme     = NULL;
     m_SelectedVme = NULL;   // Removing the tree, selected vme must be set to NULL.
@@ -219,10 +220,10 @@ void mafViewManager::VmeSelect(mafNode *n)
 		if(m_SelectedVme)
 			for(mafView* v = m_ViewList; v; v=v->m_Next) 
 				v->VmeSelect(m_SelectedVme,false); //deselect the previous selected vme
-		m_SelectedVme = n;
+		m_SelectedVme = n; // set the new selected vme
 	}
 	for(mafView* v = m_ViewList; v; v=v->m_Next) 
-    v->VmeSelect(n,true); //select the new one
+    v->VmeSelect(n,true); // select the new one in the views
 	CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -231,13 +232,15 @@ void mafViewManager::VmeShow(mafNode *n, bool show)
 {
  if(m_ViewBeingCreated) // Important - test m_ViewBeingCreated first
  {
+   // show the vme in the view that has been created but
+   // is not already inside the views' list (if exists)
    m_ViewBeingCreated->VmeShow(n,show);
  }
  else
  {
 	 if(m_SelectedView)
 	 {
-     m_SelectedView->VmeShow(n,show);
+     m_SelectedView->VmeShow(n,show); // show the vme in the selected view
 	 }
  }
 }
@@ -246,20 +249,20 @@ void mafViewManager::PropertyUpdate(bool fromTag)
 //----------------------------------------------------------------------------
 {
   for(mafView* v = m_ViewList; v; v=v->m_Next) 
-		v->VmeUpdateProperty(this->m_SelectedVme, fromTag);
+		v->VmeUpdateProperty(this->m_SelectedVme, fromTag); // update the vme properties in all views
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(bool sel)   
 //----------------------------------------------------------------------------
 {
-  if(m_SelectedView) m_SelectedView->CameraReset(sel ? m_SelectedVme : NULL);
+  if(m_SelectedView) m_SelectedView->CameraReset(sel ? m_SelectedVme : NULL); // reset the camera in the selected view
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraReset(mafNode *vme)   
 //----------------------------------------------------------------------------
 {
   //@@@ if(m_SelectedView) m_SelectedView->CameraReset(vme);
-  if(m_SelectedView) m_SelectedView->CameraReset();
+  if(m_SelectedView) m_SelectedView->CameraReset(); // reset the camera in the selected view
 }
 //----------------------------------------------------------------------------
 void mafViewManager::CameraUpdate(bool only_selected)   
@@ -267,10 +270,10 @@ void mafViewManager::CameraUpdate(bool only_selected)
 {
   if (only_selected && m_SelectedView != NULL)
   {
-    m_SelectedView->CameraUpdate();
+    m_SelectedView->CameraUpdate(); // Update only the selected view
     return;
   }
-  for(mafView* v = m_ViewList; v; v=v->m_Next) 
+  for(mafView* v = m_ViewList; v; v=v->m_Next) // Update all views
     v->CameraUpdate();
 }
 //----------------------------------------------------------------------------
@@ -294,14 +297,14 @@ void mafViewManager::FillMenu(wxMenu* menu)
     mafView* v = m_ViewTemplate[i];
     s = wxString::Format("%s",v->GetLabel().c_str());
     if(IsVisibleInMenu(v))
-	    menu->Append(v->m_Id, s, (wxMenu *)NULL, s );
+	    menu->Append(v->m_Id, s, (wxMenu *)NULL, s ); // Fill the menu with the labels of the template views
   }
 }
 //----------------------------------------------------------------------------
 bool mafViewManager::IsVisibleInMenu(mafView* v)
 //----------------------------------------------------------------------------
 {
-  for(int i=0; i<m_IdInvisibleMenuList.size(); i++)
+  for(int i=0; i<m_IdInvisibleMenuList.size(); i++) // Search the specified view
   {
     if(m_IdInvisibleMenuList[i] == v->m_Id) return false;
   }
@@ -316,9 +319,9 @@ mafView *mafViewManager::ViewCreate(int id)
 	mafView* view = NULL;
   int index = id - VIEW_START;
 
-	if( index <0 || index > m_TemplateNum) 
+	if( index <0 || index > m_TemplateNum) // the specified template id is out of bound
 	{
-    assert(false); 
+    assert(false);
 		return NULL;
   }
 	view = m_ViewTemplate[index];
@@ -326,14 +329,14 @@ mafView *mafViewManager::ViewCreate(int id)
 
   // Paolo 2005-04-22
   int view_mult = 0;
-  new_view = view->Copy(this);
+  new_view = view->Copy(this); // the crated view is a copy of the specified template view
 
-  for(;view_mult < MAXVIEW; view_mult++)
+  for(;view_mult < MAXVIEW; view_mult++) // iterate over view matrix to calculate the multiplicity
     if(m_ViewMatrixID[index][view_mult] == NULL)
       break;
   new_view->m_Mult = view_mult;
 
-  //update the matrix containing all created view
+  //update the matrix containing all created views
   m_ViewMatrixID[index][view_mult] = new_view;
   
 	// during ViewInsert the View may send Events that will not be forwarded because 
@@ -344,7 +347,7 @@ mafView *mafViewManager::ViewCreate(int id)
 
   mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
 	
-	new_view->GetFrame()->Show(true);
+	new_view->GetFrame()->Show(true); // show the view's frame
 
 	return new_view;
 }
@@ -358,6 +361,7 @@ mafView *mafViewManager::ViewCreate(wxString type)
 	int index = 0;
   for(; index<m_TemplateNum; index++)
 	{
+    // find the template view of the specified type
     wxString t = typeid(*m_ViewTemplate[index]).name();
 		if(t == type )
 		{
@@ -369,12 +373,12 @@ mafView *mafViewManager::ViewCreate(wxString type)
 
   // Paolo 2005-04-22
   int view_mult = 0;
-	new_view = view->Copy(this);
+	new_view = view->Copy(this); // the crated view is a copy of the specified template view
 
   for(;view_mult < MAXVIEW; view_mult++)
     if(m_ViewMatrixID[index][view_mult] == NULL)
       break;
-  view->m_Mult = view_mult;
+  view->m_Mult = view_mult; // update the view multiplicity
 
   //update the matrix containing all created view
   m_ViewMatrixID[index][view_mult] = new_view;
@@ -383,7 +387,8 @@ mafView *mafViewManager::ViewCreate(wxString type)
 	ViewInsert(new_view);
 	m_ViewBeingCreated = NULL;
 
-  mafEventMacro(mafEvent(this,VIEW_CREATED,new_view));
+  mafEventMacro(mafEvent(this,VIEW_CREATED,new_view)); // ask Logic to create the frame
+  // don't show the frame
 
 	return new_view;
 }
@@ -392,17 +397,17 @@ void mafViewManager::ViewInsert(mafView *view)
 //----------------------------------------------------------------------------
 {
 	view->SetListener(this);
-  view->SetMouse(m_Mouse);
+  view->SetMouse(m_Mouse); // set the mouse for the specified view
   if(m_RootVme != NULL)
   {
-    mafNodeIterator *iter = m_RootVme->NewIterator();
+    mafNodeIterator *iter = m_RootVme->NewIterator(); // iterate over inserted vme
     for(mafNode *vme = iter->GetFirstNode(); vme; vme = iter->GetNextNode())
-			view->VmeAdd(vme);
+			view->VmeAdd(vme); // Add them in the specified view
     iter->Delete();
   }
 
   if(m_SelectedVme)
-    view->VmeSelect(m_SelectedVme,true);
+    view->VmeSelect(m_SelectedVme,true); // select the vme in the inserted view
 
   if(!m_ViewList)
     m_ViewList = view;
@@ -427,8 +432,8 @@ void mafViewManager::ViewDelete(mafView *view)
 
   if(m_SelectedView)
   {
-    if(m_SelectedRWI) 
-      m_SelectedRWI->SetMouse(NULL);
+    if(m_SelectedRWI)
+      m_SelectedRWI->SetMouse(NULL); // update the selected view rwi
     m_SelectedRWI = NULL;
     m_SelectedView = NULL;
   }
@@ -442,6 +447,8 @@ void mafViewManager::ViewDelete(mafView *view)
   m_ViewMatrixID[index][view->m_Mult] = NULL;
 
   if(!m_ViewList) return;
+
+  // Remove the specified view from the views' list
   if(m_ViewList == view)
   {
     m_ViewList = view->m_Next;
@@ -472,7 +479,7 @@ void mafViewManager::ViewDeleteAll()
     m_SelectedView = NULL;
   }
 
-  while(m_ViewList)
+  while(m_ViewList) // Close all views' frames
   {
     m_ViewList->GetFrame()->Show(false);
     m_ViewList->GetFrame()->Close();
@@ -489,10 +496,12 @@ void mafViewManager::Activate(mafView *view)
 //----------------------------------------------------------------------------
 {
   bool externalViewFlag;
+  // Determine if is an external view
   wxConfig *config = new wxConfig(wxEmptyString);
   config->Read("ExternalViewFlag", &externalViewFlag, false);
   cppDEL(config);
 
+  // Set the focus to the frame of the specified view
   if(externalViewFlag)
     ((mafGUIViewFrame *)view->GetFrame())->SetFocus();
   else

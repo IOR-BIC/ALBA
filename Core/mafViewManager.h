@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewManager.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:51:14 $
-  Version:   $Revision: 1.16.2.1 $
+  Date:      $Date: 2010-02-10 12:47:16 $
+  Version:   $Revision: 1.16.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -147,5 +147,8 @@ protected:
   std::vector<long> m_IdInvisibleMenuList; ///< List of views that are no visible into the 'View' menu item.
 
   bool m_CollaborateStatus;
+
+  /** test friend */
+  friend class mafViewManagerTest;
 };
 #endif
