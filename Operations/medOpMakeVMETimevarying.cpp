@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMakeVMETimevarying.cpp,v $
 Language:  C++
-Date:      $Date: 2009-10-22 08:07:08 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-02-10 13:27:40 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Alberto Losi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -108,6 +108,12 @@ medOpMakeVMETimevarying::medOpMakeVMETimevarying(const wxString &label /* = "Mak
 medOpMakeVMETimevarying::~medOpMakeVMETimevarying()
 //----------------------------------------------------------------------------
 {
+  for(int i = 0; i < m_AddedVMEs.size(); i++)
+  {
+    free(m_AddedVMEs.at(i)); // Remove leaks (with free: space allocated with malloc)
+  }
+  m_AddedVMEs.clear();
+  mafDEL(m_VMETimevarying);
 }
 //----------------------------------------------------------------------------
 bool medOpMakeVMETimevarying::Accept(mafNode* vme) 
@@ -650,6 +656,7 @@ void medOpMakeVMETimevarying::Execute()
          lastVmeItem->DeepCopy(vmeItem);
       }
     }
+    mafDEL(vmeItem); // remove leaks
 
     //Matrix changes
     mafMatrix * vmeMatrix;
@@ -671,7 +678,11 @@ void medOpMakeVMETimevarying::Execute()
          lastVmeMatrix->DeepCopy(vmeMatrix);
       }
     }
+    mafDEL(vmeMatrix); // remove leaks
   }
+  mafDEL(lastVmeItem); // remove leaks
+  mafDEL(lastVmeMatrix);
+
   //Update VME's DataPipe and MatrixPipe
   m_VMETimevarying->SetName(m_VMETimevaryingName);
   m_VMETimevarying->GetAbsMatrixPipe()->Update();
@@ -679,5 +690,7 @@ void medOpMakeVMETimevarying::Execute()
   m_VMETimevarying->GetDataPipe()->Update();
 
   mafEventMacro(mafEvent(this,VME_ADD,m_VMETimevarying));
+
   m_Output = m_VMETimevarying;
+
 }
