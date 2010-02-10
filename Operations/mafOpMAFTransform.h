@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpMAFTransform.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 07:03:51 $
-  Version:   $Revision: 1.2 $
+  Date:      $Date: 2010-02-10 14:25:14 $
+  Version:   $Revision: 1.2.2.1 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -91,6 +91,9 @@ protected:
   /** 
   Override superclass*/
   void RefSysVmeChanged();
+
+  /** test friend */
+  friend class mafOpMAFTransformTest;
 };
 #endif
   
