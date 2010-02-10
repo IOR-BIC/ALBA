@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpMAFTransform.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2010-02-10 14:25:48 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -119,7 +119,10 @@ void mafOpMAFTransform::OpRun()
 //----------------------------------------------------------------------------
 {
   // progress bar stuff
-  wxBusyInfo wait("creating gui...");
+  if (!m_TestMode)
+  {
+  	wxBusyInfo wait("creating gui...");
+  }
 
   assert(m_Input);
   m_CurrentTime = ((mafVME *)m_Input)->GetTimeStamp();
@@ -127,8 +130,11 @@ void mafOpMAFTransform::OpRun()
   m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
   m_OldAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
 
-  CreateGui();
-  ShowGui();
+  if (!m_TestMode)
+  {
+	  CreateGui();
+	  ShowGui();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -383,8 +389,11 @@ void mafOpMAFTransform::OnEventGizmoTranslate(mafEventBase *maf_event)
       // gizmo does not set vme pose  since they cannot scale
       PostMultiplyEventMatrix(maf_event);
       
-      // update gui 
-      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+      if (!m_TestMode)
+      {
+	      // update gui 
+	      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+      }
 	  }
     break;
   
@@ -408,8 +417,11 @@ void mafOpMAFTransform::OnEventGizmoRotate(mafEventBase *maf_event)
       // gizmo does not set vme pose  since they cannot scale
       PostMultiplyEventMatrix(maf_event);
 
-      // update gui 
-      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+      if (!m_TestMode)
+      {
+	      // update gui 
+	      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+      }
 	  }
     break;
 
@@ -429,9 +441,12 @@ void mafOpMAFTransform::OnEventGizmoScale(mafEventBase *maf_event)
     case ID_TRANSFORM:
   	{ 
       m_NewAbsMatrix = *((mafVME *)m_Input)->GetOutput()->GetAbsMatrix();
-      // update gui 
-      m_GuiTransformTextEntries->SetAbsPose(&m_NewAbsMatrix);
-      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      if (!m_TestMode)
+      {
+	      // update gui 
+	      m_GuiTransformTextEntries->SetAbsPose(&m_NewAbsMatrix);
+	      mafEventMacro(mafEvent(this, CAMERA_UPDATE));
+      }
 	  }
     break;
 
@@ -458,8 +473,11 @@ void mafOpMAFTransform::OnEventGuiTransform(mafEventBase *maf_event)
       if (m_GizmoRotate) m_GizmoRotate->SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
       if (m_GizmoScale) m_GizmoScale->SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
-      m_GuiTransform->SetRefSys(m_RefSysVME);      
-      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+      if (!m_TestMode)
+      {
+	      m_GuiTransform->SetRefSys(m_RefSysVME);      
+	      m_GuiTransformTextEntries->SetAbsPose(((mafVME *)m_Input)->GetOutput()->GetAbsMatrix());
+      }
     }
     break;
     default:
@@ -653,8 +671,12 @@ void mafOpMAFTransform::Reset()
 //----------------------------------------------------------------------------
 {
   ((mafVME *)m_Input)->SetAbsMatrix(m_OldAbsMatrix);  
-  m_GuiTransformTextEntries->Reset();
-  SetRefSysVME(mafVME::SafeDownCast(m_Input)); 
+  if (!m_TestMode)
+  {
+  	m_GuiTransformTextEntries->Reset();
+    SetRefSysVME(mafVME::SafeDownCast(m_Input)); 
+  }
+  m_NewAbsMatrix = m_OldAbsMatrix;
   mafEventMacro(mafEvent(this, CAMERA_UPDATE));
 }
 
