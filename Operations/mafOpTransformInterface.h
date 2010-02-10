@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpTransformInterface.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:45:06 $
-  Version:   $Revision: 1.2.2.1 $
+  Date:      $Date: 2010-02-10 14:24:34 $
+  Version:   $Revision: 1.2.2.2 $
   Authors:   Stefano Perticoni        
 ==========================================================================
   Copyright (c) 2002/2004
@@ -78,6 +78,9 @@ public:
   while scaling is discarded (default is enable)*/
   void EnableScalingOn(int enable) {m_EnableScaling = enable;};
   int GetEnableScaling() {return m_EnableScaling;};
+
+  virtual void SetNewAbsMatrix(mafMatrix matrix){m_NewAbsMatrix = matrix;};
+  virtual void SetOldAbsMatrix(mafMatrix matrix){m_OldAbsMatrix = matrix;};
 
 protected:
   /** Create the gui */
