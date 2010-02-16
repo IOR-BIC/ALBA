@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.26.2.5 $
+  Date:      $Date: 2010-02-16 15:45:47 $
+  Version:   $Revision: 1.26.2.6 $
   Authors:   Paolo Quadrani,Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -153,12 +153,12 @@ public:
   void SetTextColor(double color[3]);
 
   /** Refresh text in CT View**/
-  void UpdateText(int ID = 1);
+  virtual void UpdateText(int ID = 1);
   
   /** Update list of surfaces vme */
   void UpdateSurfacesList(mafNode *node);
 
-  void VmeShow(mafNode *node, bool show);
+  virtual void VmeShow(mafNode *node, bool show);
 
   void VmeRemove(mafNode *vme);
 
@@ -174,7 +174,7 @@ public:
   /* Set the opacity of the border if exist */
   void SetBorderOpacity(double value);
 
-  void CameraUpdate();
+  virtual void CameraUpdate();
 
 protected:
   virtual mafGUI *CreateGui();
