@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-02-16 10:48:54 $
-Version:   $Revision: 1.1.2.71 $
+Date:      $Date: 2010-02-16 14:35:25 $
+Version:   $Revision: 1.1.2.72 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -881,11 +881,12 @@ int medOpImporterDicomOffis::BuildVolume()
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   }
   
-  ImportDicomTags(); 
-  //Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
   mafNEW(m_Volume);
-  m_Volume->GetTagArray()->DeepCopy(m_TagArray);
-  mafDEL(m_TagArray);
+
+//   ImportDicomTags(); 
+//   //Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
+//   m_Volume->GetTagArray()->DeepCopy(m_TagArray);
+//   mafDEL(m_TagArray);
   
   accumulate->Update();
 
@@ -967,6 +968,10 @@ int medOpImporterDicomOffis::BuildVolume()
     ResampleVolume();
   }
 
+  ImportDicomTags(); 
+  //Copy inside the first VME item of m_Volume the CT volume and Dicom's tags
+  m_Volume->GetTagArray()->DeepCopy(m_TagArray);
+  mafDEL(m_TagArray);
   mafTagItem tag_Nature;
   tag_Nature.SetName("VME_NATURE");
   tag_Nature.SetValue("NATURAL");
