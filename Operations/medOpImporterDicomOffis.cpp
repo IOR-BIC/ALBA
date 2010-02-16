@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-02-02 15:42:03 $
-Version:   $Revision: 1.1.2.70 $
+Date:      $Date: 2010-02-16 10:48:54 $
+Version:   $Revision: 1.1.2.71 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -3510,7 +3510,7 @@ void medOpImporterDicomOffis::ResampleVolume()
 
   // In a future version if not a "Natural" data the filter should operate in place.
   mafString new_vme_name = "resampled_";
-  new_vme_name += m_Input->GetName();
+  new_vme_name += m_VolumeName;
 
   vrg->SetMatrix(box_pose->GetMatrix());
 
@@ -3569,7 +3569,7 @@ void medOpImporterDicomOffis::ResampleVolume()
         local_pose->SetInputFrame(output_parent_abs_pose);
 
         mafSmartPointer<mafMatrix> input_parent_abs_pose;
-        ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        mafVME::SafeDownCast(m_Input)->GetOutput()->GetAbsMatrix(*input_parent_abs_pose.GetPointer(),input_item->GetTimeStamp());
         local_pose->SetTargetFrame(input_parent_abs_pose);
         local_pose->Update();
 
@@ -3578,7 +3578,7 @@ void medOpImporterDicomOffis::ResampleVolume()
         output_to_input->SetInputFrame(box_pose->GetMatrixPointer());
 
         mafSmartPointer<mafMatrix> input_abs_pose;
-        ((mafVME *)m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
+        mafVME::SafeDownCast(m_Input)->GetOutput()->GetAbsMatrix(*input_abs_pose.GetPointer(),input_item->GetTimeStamp());
         output_to_input->SetTargetFrame(input_abs_pose);
         output_to_input->Update();
 
