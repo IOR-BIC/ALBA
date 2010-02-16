@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpExtrusionHoles.cpp,v $
 Language:  C++
-Date:      $Date: 2009-05-25 15:42:01 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2010-02-16 10:29:39 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2002/2004
@@ -245,6 +245,7 @@ void medOpExtrusionHoles::OnEvent(mafEventBase *maf_event)
 				int pointID = e->GetArg();
 				if(pointID>=0)
 				{
+          m_ExtrusionFilter->SetDirectionToDefault(1);
 					SelectHole(pointID);
 					Extrude();
 				}
