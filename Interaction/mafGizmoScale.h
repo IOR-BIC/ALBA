@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.h,v $
   Language:  C++
-  Date:      $Date: 2009-02-10 11:33:01 $
-  Version:   $Revision: 1.5.2.1 $
+  Date:      $Date: 2010-02-17 09:35:47 $
+  Version:   $Revision: 1.5.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -63,7 +63,7 @@ class mafGUI;
 class mafGizmoScale: public mafGizmoInterface 
 {
 public:
-           mafGizmoScale(mafVME *input, mafObserver* listener = NULL);
+  mafGizmoScale(mafVME *input, mafObserver* listener = NULL , bool buildGUI = true);
   virtual ~mafGizmoScale(); 
 
   /** 
@@ -141,6 +141,10 @@ protected:
 private:
   
   /**
+  Register if the gizmo gui has to be built at startup*/
+  bool m_BuildGUI;
+
+  /**
   Scaling gizmo initial pose; used to restore scale gizmo axis pose after a gizmo drag event*/
   mafMatrix *m_InitialGizmoPose;
   
@@ -168,6 +172,11 @@ private:
         vec[2] = p2[2] - p1[2];
     }
   }
+
+  /**
+  test friend*/
+  friend class mafGizmoScaleTest;
+
 };
 #endif
 

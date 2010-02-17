@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoScale.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.9.2.2 $
+  Date:      $Date: 2010-02-17 09:35:47 $
+  Version:   $Revision: 1.9.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,17 +39,18 @@
 #include "vtkMath.h"
 
 //----------------------------------------------------------------------------
-mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
+mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener , bool buildGUI)
 //----------------------------------------------------------------------------
 {
   assert(input);
+
   m_InputVME = input;
   m_Listener = listener;
-  
+  m_BuildGUI = buildGUI;
+
   m_GSAxis[X] = m_GSAxis[Y] = m_GSAxis[Z] = NULL;
   m_GSIsotropic = NULL;
-  m_GuiGizmoScale = NULL;
-
+  
   //no gizmo component is active at construction
   this->m_ActiveGizmoComponent = NONE;
   this->SetModalityToLocal();
@@ -69,13 +70,19 @@ mafGizmoScale::mafGizmoScale(mafVME* input, mafObserver *listener)
   
   m_GSIsotropic = new mafGizmoScaleIsotropic(input, this);
 
-  // create the gizmo gui
-  // gui is sending events to this
-  m_GuiGizmoScale = new mafGUIGizmoScale(this);
+  m_GuiGizmoScale = NULL;
 
-  // initialize gizmo gui
-  m_GuiGizmoScale->SetAbsScaling(m_InputVME->GetOutput()->GetAbsMatrix());
-  m_GuiGizmoScale->EnableWidgets(true);
+  if (m_BuildGUI)
+  {
+    // create the gizmo gui
+    // gui is sending events to this
+    m_GuiGizmoScale = new mafGUIGizmoScale(this);
+
+    // initialize gizmo gui
+    m_GuiGizmoScale->SetAbsScaling(m_InputVME->GetOutput()->GetAbsMatrix());
+    m_GuiGizmoScale->EnableWidgets(true);
+  }
+
 }
 //----------------------------------------------------------------------------
 mafGizmoScale::~mafGizmoScale() 
@@ -309,7 +316,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
           mafSmartPointer<mafMatrix> scaleMat;
           scaleMat->DeepCopy(absScaleTrans->GetMatrix());
 
-          m_GuiGizmoScale->SetAbsScaling(scaleMat);
+          if (m_BuildGUI) m_GuiGizmoScale->SetAbsScaling(scaleMat);
         }
         else if (arg == mafInteractorGenericMouse::MOUSE_UP)
         {
@@ -319,7 +326,7 @@ void mafGizmoScale::OnEventGizmoComponents(mafEventBase *maf_event)
           // Update scale gizmo gui 
           mafSmartPointer<mafMatrix> identity;
           identity->Identity();
-          m_GuiGizmoScale->SetAbsScaling(identity);
+          if (m_BuildGUI) m_GuiGizmoScale->SetAbsScaling(identity);
         }
 
         // forward event to the listener ie the operation
@@ -521,7 +528,7 @@ void mafGizmoScale::SendTransformMatrixFromGui(mafEventBase *maf_event)
 
   mafSmartPointer<mafMatrix> identity;
   identity->Identity();
-  m_GuiGizmoScale->SetAbsScaling(identity);
+  if (m_BuildGUI) m_GuiGizmoScale->SetAbsScaling(identity);
 
 
   // clean up
@@ -554,7 +561,7 @@ void mafGizmoScale::SetAbsPose(mafMatrix *absPose, mafTimeStamp ts)
   }
 
   m_GSIsotropic->SetAbsPose(tmpMatr);
-  m_GuiGizmoScale->SetAbsScaling(tmpMatr);
+  if (m_BuildGUI) m_GuiGizmoScale->SetAbsScaling(tmpMatr);
 }
 
 //----------------------------------------------------------------------------
@@ -562,13 +569,14 @@ void mafGizmoScale::SetRefSys(mafVME *refSys)
 //----------------------------------------------------------------------------
 {
   assert(m_InputVME);  
-  assert(m_GuiGizmoScale);
-
+  
   m_RefSysVME = refSys;
   SetAbsPose(m_RefSysVME->GetOutput()->GetAbsMatrix());
 
   // m_GuiGizmoScale not keyable for the moment to not confuse the user  
   /*
+
+  assert(m_GuiGizmoScale);
 
   if (RefSysVME == InputVME)
   {
@@ -629,4 +637,9 @@ double mafGizmoScale::GetScalingValue() const
   // scale to be applied
   scale =  fabs(1 + dist / gizmoLength);
   return scale;
+}
+
+mafVME* mafGizmoScale::GetRefSys()
+{
+  return m_RefSysVME;
 }
