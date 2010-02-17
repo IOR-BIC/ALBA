@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:30:11 $
-  Version:   $Revision: 1.12.2.7 $
+  Date:      $Date: 2010-02-17 10:03:50 $
+  Version:   $Revision: 1.12.2.8 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -57,6 +57,8 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include <vector>
 #include <algorithm>
+
+#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
 
 using namespace std;
 
@@ -427,11 +429,11 @@ void medOpVolumeResample::Resample()
 
   int outputSPExtent[6];
   outputSPExtent[0] = 0;
-  outputSPExtent[1] = (m_VolumeBounds[1] - m_VolumeBounds[0]) / m_VolumeSpacing[0];
+  outputSPExtent[1] = round((m_VolumeBounds[1] - m_VolumeBounds[0]) / m_VolumeSpacing[0]);
   outputSPExtent[2] = 0;
-  outputSPExtent[3] = (m_VolumeBounds[3] - m_VolumeBounds[2]) / m_VolumeSpacing[1];
+  outputSPExtent[3] = round((m_VolumeBounds[3] - m_VolumeBounds[2]) / m_VolumeSpacing[1]);
   outputSPExtent[4] = 0;
-  outputSPExtent[5] = (m_VolumeBounds[5] - m_VolumeBounds[4]) / m_VolumeSpacing[2];
+  outputSPExtent[5] = round((m_VolumeBounds[5] - m_VolumeBounds[4]) / m_VolumeSpacing[2]);
 
   double w,l,sr[2];
   for (int i = 0; i < ((mafVMEGenericAbstract *)m_Input)->GetDataVector()->GetNumberOfItems(); i++)
@@ -1036,8 +1038,9 @@ void medOpVolumeResample::SetSpacing(double spacing[3])
 	m_VolumeSpacing[1] = spacing[1];
 	m_VolumeSpacing[2] = spacing[2];
 }
-
+//----------------------------------------------------------------------------
 void medOpVolumeResample::GetSpacing( double spacing[3] )
+//----------------------------------------------------------------------------
 {
   spacing[0] = m_VolumeSpacing[0];
   spacing[1] = m_VolumeSpacing[1];
