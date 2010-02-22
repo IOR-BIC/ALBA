@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.4.2.1 $
+Date:      $Date: 2010-02-22 10:09:26 $
+Version:   $Revision: 1.4.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -64,10 +64,9 @@ class vtkArrowSource;
 class vtkPolyDataMapper;
 class vtkGlyph3D;
 
-//----------------------------------------------------------------------------
-// medOpFlipNormals :
-//----------------------------------------------------------------------------
-/** 
+/**
+class name : medOpFlipNormals
+
 Perform cells selection and flip of the normals.
 CTRL modifier must be used in order to select cells in render window while
 performing mouse dragging.
@@ -77,32 +76,43 @@ class medOpFlipNormals: public mafOp
 {
 public:
 
+  /** constructor. */
 	medOpFlipNormals(wxString label = "Flip Normals");
+
+  /** destructor. */
 	~medOpFlipNormals(); 
 
+  /** RTTI macro */
 	mafTypeMacro(medOpFlipNormals, mafOp);
 
-	mafOp* Copy();
+	/*virtual*/ mafOp* Copy();
 
-	void OnEvent(mafEventBase *maf_event);
+  /** Precess events coming from other objects */
+	/*virtual*/ void OnEvent(mafEventBase *maf_event);
 
 	/** Return true for the acceptable vme type. */
-	bool Accept(mafNode* vme);
+	/*virtual*/ bool Accept(mafNode* vme);
 
 	/** Builds operation's interface by calling CreateOpDialog() method. */
-	void OpRun();
+	/*virtual*/ void OpRun();
 
 	/** Execute the operation. */
-	void OpDo();
+	/*virtual*/ void OpDo();
 
 	/** Makes the undo for the operation. */
-	void OpUndo();
+	/*virtual*/ void OpUndo();
 
 	/** set the seed ie the cell originating the selection area */
 	void SetSeed(vtkIdType cellSeed);
 
+
+  /** get the seed ie the cell originating the selection area */
+  vtkIdType GetSeed(){return m_CellSeed;};
+
 	/** Set the selection region radius */
 	double GetDiameter() const { return m_Diameter; };
+
+  /** Get the selection region radius */
 	void SetDiameter(double val) {m_Diameter = val;};
 
 	/** Mark cells */
@@ -164,6 +174,8 @@ protected:
 	void MarkCellsInRadius(double radius);
 	void InitializeMesh();
 	void ModifyAllNormal();
+
+  friend class medOpFlipNormalsTest;
 
 };
 #endif

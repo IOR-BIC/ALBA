@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpFlipNormals.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2010-02-22 10:09:26 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -122,6 +122,8 @@ mafOp(label)
 medOpFlipNormals::~medOpFlipNormals()
 //----------------------------------------------------------------------------
 {
+  vtkDEL(m_CellFilter);
+
 	vtkDEL(m_Mesh);
 	vtkDEL(m_ResultPolydata);
 	vtkDEL(m_OriginalPolydata);
@@ -171,11 +173,12 @@ void medOpFlipNormals::OpRun()
 
 	int result = OP_RUN_CANCEL;
 
-	CreateSurfacePipeline();
-	CreateNormalsPipe();
+  CreateSurfacePipeline();
+  CreateNormalsPipe();
+
 	InitializeMesh();
 
-	if (m_TestMode == false)
+	if (!m_TestMode)
 	{
 		CreateOpDialog();
 
@@ -326,12 +329,15 @@ void medOpFlipNormals::CreateSurfacePipeline()
 	m_CellFilter->SetInput(m_ResultPolydata);
 	m_CellFilter->Update();
 
-	m_PolydataMapper	= vtkPolyDataMapper::New();
-	m_PolydataMapper->SetInput(m_CellFilter->GetOutput());
-	m_PolydataMapper->ScalarVisibilityOn();
-
-	m_PolydataActor = vtkActor::New();
-	m_PolydataActor->SetMapper(m_PolydataMapper);
+	if (!m_TestMode)
+	{
+		m_PolydataMapper	= vtkPolyDataMapper::New();
+		m_PolydataMapper->SetInput(m_CellFilter->GetOutput());
+		m_PolydataMapper->ScalarVisibilityOn();
+	
+		m_PolydataActor = vtkActor::New();
+		m_PolydataActor->SetMapper(m_PolydataMapper);
+	}
 
 }
 //----------------------------------------------------------------------------
@@ -347,34 +353,37 @@ void medOpFlipNormals::CreateNormalsPipe()
 	m_Centers->GetPointData()->SetNormals(m_ResultPolydata->GetCellData()->GetNormals());
 	m_Centers->Update();
 
-	double bounds[6];
-	m_ResultPolydata->GetBounds(bounds);
-	double maxBounds = (bounds[1]-bounds[0] < bounds[3]-bounds[2])?bounds[1]-bounds[0]:bounds[3]-bounds[2];
-	maxBounds = (maxBounds<bounds[5]-bounds[4])?maxBounds:bounds[5]-bounds[4];
-
-	vtkNEW(m_NormalArrow);
-	m_NormalArrow->SetTipLength(0.0);
-	m_NormalArrow->SetTipRadius(0.0);
-	m_NormalArrow->SetShaftRadius(0.005*maxBounds);
-	m_NormalArrow->SetTipResolution(16);
-	m_NormalArrow->SetShaftResolution(16);
-	m_NormalArrow->Update();
-
-	vtkNEW(m_NormalGlyph);
-	m_NormalGlyph->SetInput(m_Centers);
-	m_NormalGlyph->SetSource(m_NormalArrow->GetOutput());
-	m_NormalGlyph->SetVectorModeToUseNormal();
-	m_NormalGlyph->Update();
-
-	vtkNEW(m_NormalMapper);
-	m_NormalMapper->SetInput(m_NormalGlyph->GetOutput());
-	m_NormalMapper->Update();
-
-	vtkNEW(m_NormalActor);
-	m_NormalActor->SetMapper(m_NormalMapper);
-	m_NormalActor->SetVisibility(true);
-	m_NormalActor->PickableOff();
-	m_NormalActor->Modified();
+	if (!m_TestMode)
+  {
+	  double bounds[6];
+		m_ResultPolydata->GetBounds(bounds);
+		double maxBounds = (bounds[1]-bounds[0] < bounds[3]-bounds[2])?bounds[1]-bounds[0]:bounds[3]-bounds[2];
+		maxBounds = (maxBounds<bounds[5]-bounds[4])?maxBounds:bounds[5]-bounds[4];
+	
+		vtkNEW(m_NormalArrow);
+		m_NormalArrow->SetTipLength(0.0);
+		m_NormalArrow->SetTipRadius(0.0);
+		m_NormalArrow->SetShaftRadius(0.005*maxBounds);
+		m_NormalArrow->SetTipResolution(16);
+		m_NormalArrow->SetShaftResolution(16);
+		m_NormalArrow->Update();
+	
+		vtkNEW(m_NormalGlyph);
+		m_NormalGlyph->SetInput(m_Centers);
+		m_NormalGlyph->SetSource(m_NormalArrow->GetOutput());
+		m_NormalGlyph->SetVectorModeToUseNormal();
+		m_NormalGlyph->Update();
+	
+		vtkNEW(m_NormalMapper);
+		m_NormalMapper->SetInput(m_NormalGlyph->GetOutput());
+		m_NormalMapper->Update();
+	
+		vtkNEW(m_NormalActor);
+		m_NormalActor->SetMapper(m_NormalMapper);
+		m_NormalActor->SetVisibility(true);
+		m_NormalActor->PickableOff();
+		m_NormalActor->Modified();
+}
 }
 //----------------------------------------------------------------------------
 void medOpFlipNormals::DeleteOpDialog()
@@ -489,8 +498,7 @@ void medOpFlipNormals::OnEvent(mafEventBase *maf_event)
 void medOpFlipNormals::ModifyAllNormal()
 //----------------------------------------------------------------------------
 {
-	vtkOBBTree *OBBFilter;
-	vtkNEW(OBBFilter);
+	vtkMAFSmartPointer<vtkOBBTree> OBBFilter;
 	OBBFilter->SetDataSet(m_ResultPolydata);
 	OBBFilter->CacheCellBoundsOn();
 	OBBFilter->BuildLocator();
