@@ -77,6 +77,9 @@ ADD_TEST(medPipeWrappedMeterTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeWrappedMeterT
 ADD_EXECUTABLE(medPipeDensityDistanceTest medPipeDensityDistanceTest.h medPipeDensityDistanceTest.cpp)
 ADD_TEST(medPipeDensityDistanceTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeDensityDistanceTest)
 
+ADD_EXECUTABLE(medVMEPolylineGraphTest medVMEPolylineGraphTest.h medVMEPolylineGraphTest.cpp)
+ADD_TEST(medVMEPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineGraphTest)
+
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
