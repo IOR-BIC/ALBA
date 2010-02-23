@@ -8,4 +8,6 @@
 //--------------------------------------------------------------------------
 #define MED_DATA_ROOT "@MED_DATA_ROOT@"
 
+#cmakedefine MED_USE_BTK
+
 #endif // __medDefines_h
