@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.h,v $
   Language:  C++
-  Date:      $Date: 2009-11-18 15:01:23 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-02-23 14:13:54 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -34,15 +34,23 @@ class vtkMapper;
 class vtkPolyData;
 class vtkLineSource;
 
-//-----------------------------------------------------------------------------
+/**
+class Name: vtkMAFHistogram
+This class handles a group of actors in order to generate an histogram.
+There are three representation: POINT, LINE, BAR.
+*/
 class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
-//-----------------------------------------------------------------------------
+
 {
  public:
+  /** RTTI macro */
   vtkTypeRevisionMacro(vtkMAFHistogram, vtkActor2D);
+  /** Print Object Information*/
   void PrintSelf(ostream& os, vtkIndent indent);
+  /** Function that create an instance of the object*/
   static	vtkMAFHistogram *New();
 
+  /** visual representations of the histogram*/
   enum HISTOGRAM_VISUAL_REPRESENTATION
   {
     POINT_REPRESENTATION,
@@ -105,19 +113,29 @@ class VTK_vtkMAF_EXPORT vtkMAFHistogram : public vtkActor2D
   /** Update the position of the gizmos */
   void UpdateLines(int min,int max);
 
+  /** retrieve histogram value (count) from x*/
   long int GetHistogramValue(int x, int y);
 
+  /** retrieve scalar value from x*/
   double GetScalarValue(int x, int y);
 
+  /** Change text label actor*/
   void SetLabel(const char *lab);
 
+
+  /** Draw the object to the screen */
   int	 RenderOverlay(vtkViewport *viewport);
-  int	 RenderOpaqueGeometry(vtkViewport *viewport);      
+  /** Method is intended for rendering Opaque Geometry.*/
+  int	 RenderOpaqueGeometry(vtkViewport *viewport);
+  /** Method is intended for rendering Translucent Geometry. */
   int	 RenderTranslucentGeometry(vtkViewport *viewport)  {return 0;};
+  /** Adjust the clipping range (this method is empty).*/
   void AdjustClippingRange(vtkViewport *viewport)        {};
 
 protected:
+  /** constructor */
 	vtkMAFHistogram();
+  /** destructor */
 	~vtkMAFHistogram();
 
   /** Create the Histogram pipeline.*/
@@ -166,7 +184,9 @@ private:
   // hide the two parameter Render() method from the user and the compiler.
   virtual void Render(vtkRenderer *, vtkMapper *) {};
 private:
-  vtkMAFHistogram(const vtkMAFHistogram&);  	// Not implemented.
-  void operator=(const vtkMAFHistogram&);  // Not implemented.
+  /** copy constructor, not implemented */
+  vtkMAFHistogram(const vtkMAFHistogram&);
+  /** operator =, not implemented */
+  void operator=(const vtkMAFHistogram&);
 };
 #endif
