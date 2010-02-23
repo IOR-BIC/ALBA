@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.51.2.10 $
+  Date:      $Date: 2010-02-23 16:09:13 $
+  Version:   $Revision: 1.51.2.11 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -174,6 +174,8 @@ void mafViewSlice::SetTextColor(double color[3])
 void mafViewSlice::UpdateText(int ID)
 //----------------------------------------------------------------------------
 {
+  m_Text = "";
+
   if (ID==1)
   {
     int slice_mode;
