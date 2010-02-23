@@ -3,8 +3,8 @@
   Program:   Multimod Fundation Library
   Module:    $RCSfile: vtkMAFHistogram.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-11-18 15:01:23 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-02-23 14:14:08 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
   Project:   MultiMod Project
 
@@ -34,7 +34,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.2 $");
+vtkCxxRevisionMacro(vtkMAFHistogram, "$Revision: 1.1.2.3 $");
 vtkStandardNewMacro(vtkMAFHistogram);
 //------------------------------------------------------------------------------
 vtkMAFHistogram::vtkMAFHistogram()
@@ -345,7 +345,9 @@ void vtkMAFHistogram::HistogramUpdate(vtkRenderer *ren)
   Glyph->SetScaleFactor(ScaleFactor);
 
   GetProperty()->SetColor(Color);
+  HistActor->GetProperty()->SetColor(Color);
   TextActor->GetProperty()->SetColor(Color);
+  TextMapper->GetTextProperty()->SetColor(Color);
   RenderWidth = ren->GetSize()[0];
 
   if (HisctogramRepresentation == BAR_REPRESENTATION) 
