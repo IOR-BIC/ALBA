@@ -178,3 +178,10 @@ IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFFixedCutterTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ vtkMAFHistogramTest
+ADD_EXECUTABLE(vtkMAFHistogramTest vtkMAFHistogramTest.h vtkMAFHistogramTest.cpp)
+ADD_TEST(vtkMAFHistogramTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFHistogramTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFHistogramTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
