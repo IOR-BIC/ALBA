@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUISettingsTimeBar.h,v $
 Language:  C++
-Date:      $Date: 2008-05-15 15:19:03 $
-Version:   $Revision: 1.5 $
+Date:      $Date: 2010-02-24 09:36:52 $
+Version:   $Revision: 1.5.2.1 $
 Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -19,15 +19,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward reference
 //----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-// mafGUISettingsTimeBar :
-//----------------------------------------------------------------------------
 /**
+  class name: mafGUISettingsTimeBar
+  Gui class for handling time bar properties inside application settings panel.
 */
 class mafGUISettingsTimeBar : public mafGUISettings
 {
 public:
+  /** constructor */
 	mafGUISettingsTimeBar(mafObserver *Listener, const mafString &label = _("Time Bar"));
+  /** destructor */
 	~mafGUISettingsTimeBar(); 
 
   enum STORAGE_SETTINGS_WIDGET_ID

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: mafGUILocaleSettings.h,v $
 Language:  C++
-Date:      $Date: 2008-07-25 06:53:38 $
-Version:   $Revision: 1.1 $
+Date:      $Date: 2010-02-24 09:36:52 $
+Version:   $Revision: 1.1.2.1 $
 Authors:   Paolo Quadrani - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -19,15 +19,16 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 // forward reference
 //----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-// mafGUILocaleSettings :
-//----------------------------------------------------------------------------
 /**
+  class name :mafGUILocaleSettings 
+  class that handle gui panel for locale settings inside application settings.
 */
 class mafGUILocaleSettings : public mafGUISettings
 {
 public:
+  /** constructor */
 	mafGUILocaleSettings(mafObserver *Listener, const mafString &label = _("Interface language"));
+  /** destructor */
 	~mafGUILocaleSettings(); 
 
   enum LOCALE_WIDGET_ID
@@ -38,10 +39,13 @@ public:
   /** Answer to the messages coming from interface. */
   void OnEvent(mafEventBase *maf_event);
 
-  /** Functions that handle if in Gui, the language is Enable or Disable */
+  /** Setter for Language Flag  */
   void SetEnableLanguage(bool flag){m_EnableLanguage = flag;};
+  /** Getter for Language Flag  */
   bool GetEnableLanguage(){return m_EnableLanguage;};
+  /** Enable Language Flag */
   void EnableLanguageOn(){m_EnableLanguage = true;};
+  /** Disable Language Flag */
   void EnableLanguageOff(){m_EnableLanguage = false;};
 
   /*Function for set language directory*/

@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIDockSettings.h,v $
   Language:  C++
-  Date:      $Date: 2009-03-26 16:52:47 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-02-24 09:36:52 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -22,15 +22,19 @@
 //----------------------------------------------------------------------------
 class wxFrameManager;
 
-//----------------------------------------------------------------------------
-// mafGUIDockSettings :
-//----------------------------------------------------------------------------
+/**
+  class name: mafGUIDockSettings
+  class that handle the dock settings panel.
+*/
 class mafGUIDockSettings: public mafGUISettings
 {
 public:
+ /** constructor */
  mafGUIDockSettings(wxFrameManager& mgr, const mafString &label = _("User Interface Preferences"));
+ /** destructor */
  virtual ~mafGUIDockSettings();
 
+  /** Answer to the messages coming from interface. */
  void OnEvent(mafEventBase *evt);
 
 protected:

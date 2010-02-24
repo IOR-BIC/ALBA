@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUIRangeSlider.h,v $
   Language:  C++
-  Date:      $Date: 2008-07-25 06:53:39 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-02-24 09:36:52 $
+  Version:   $Revision: 1.1.2.1 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -16,14 +16,17 @@
 //----------------------------------------------------------------------------
 #include "mafObserver.h"
 
-//----------------------------------------------------------------------------
-// mafGUIRangeSlider :
-//----------------------------------------------------------------------------
+/**
+  class name: mafGUIRangeSlider 
+  Class that handles a slider for visualising or changing range.
+*/
 class mafGUIRangeSlider : public wxControl 
 {
 public:
+  /** constructor */
   mafGUIRangeSlider(wxWindow *parent, wxWindowID id, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0, const wxString& name = wxPanelNameStr);
 
+  /** function for setting the listener of events coming from another object*/
   void SetListener(mafObserver *listener) {m_Listener = listener;}
 
   /** Get the 'min', 'max' or 'mid' value according to 'i'. */
@@ -95,7 +98,7 @@ private:
   int     m_SelectedRangeWidget;
   wxString m_ValueString;
   wxStaticText *m_RangeValueLabel;
-  
-DECLARE_EVENT_TABLE()
+  /** declaring event table macro */
+  DECLARE_EVENT_TABLE()
 };
 #endif // _mafGUIRangeSlider_H_
