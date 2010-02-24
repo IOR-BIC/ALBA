@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDFillingHole.h,v $
 Language:  C++
-Date:      $Date: 2010-02-01 17:37:16 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-02-24 11:12:41 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Fuli Wu, Josef Kohout
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -28,17 +28,18 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 //----------------------------------------------------------------------------
 //#define _FILLING_DBG
 
-//----------------------------------------------------------------------------
-// vtkMEDFillingHole class 
-//----------------------------------------------------------------------------
+/**
+  class name: vtkMEDFillingHole
+  Filter which fill holes of a vtkPolydata
+*/
 class VTK_GRAPHICS_EXPORT vtkMEDFillingHole : public vtkPolyDataToPolyDataFilter
 {
 public:
 #pragma region Nested classes
-  //----------------------------------------------------------------------------
-  /** Nested Vertex class 
-  This is a list of the triangles, edges and vertices which are joined to this vertex.*/
-  //----------------------------------------------------------------------------
+  /** 
+    class name: CVertex 
+    Nested Vertex class 
+    This is a list of the triangles, edges and vertices which are joined to this vertex.*/
   class CVertex
     {
     public:
@@ -52,15 +53,19 @@ public:
       vtkstd::vector<int> OneRingVertex;
       vtkstd::vector<int> TwoRingVertex;
 
+      /** constructor */
       CVertex(double *pCoord);
+      /** destructor */
       ~CVertex();
+      /** check if the vertex is two ring vertex */
       bool IsTwoRingVertex(int id);
     };
 
-  //----------------------------------------------------------------------------
-  /** Nested Triangle class 
-  Each triangle has three edges and three vertices.*/
-  //----------------------------------------------------------------------------
+  /** 
+    class name: CTriangle
+    Nested Triangle class 
+    Each triangle has three edges and three vertices.
+    */
   class  CTriangle
     {
     public:
@@ -70,15 +75,20 @@ public:
       int   AEdge[3];
       int   Id;
     public:
+      /** constructor */
       CTriangle();
+      /** destructor */
       CTriangle(int v0,int v1,int v2);
+      /** set the edge */
       void SetEdge(int e0,int e1,int e2);
     };
 
-  //----------------------------------------------------------------------------
-  /** Nested Edge class 
-  Normally, each edge has two neighbor triangles. Two vertices consist of an edge.*/
-  //----------------------------------------------------------------------------
+  
+  /**  
+  class name: CEdge
+  Nested Edge class 
+  Normally, each edge has two neighbor triangles. Two vertices consist of an edge.
+  */
   class CEdge
     {
     public:
@@ -88,23 +98,32 @@ public:
       int   AVertex[4];       //first second, left right
       int   ATriangle[2];     //left right
       int   Id;
-      CEdge(); 
+      /** constructor */
+      CEdge();
+      /** overloaded constructor */ 
       CEdge(int v0,int v1);
+      /** verloaded constructor */
       CEdge(int v0,int v1,int v2,int v3);
+      /** Set Triangle to the edge */
       void SetTriangle(int t0,int t1);
     };
 
-  //----------------------------------------------------------------------------
-  /** Nested Laplacian class
-  Each vertex has a Laplacian. There is a Laplaican between the vertex and each neighbor vertices*/
-  //----------------------------------------------------------------------------
+  
+  /** 
+  class name : CLaplacian
+  Nested Laplacian class
+  Each vertex has a Laplacian. There is a Laplaican between the vertex and each neighbor vertices
+  */
+  
   class CLaplacian
     {
     public:
       double  *ALaplacian;
       double  DLaplacian;
       double  DLaplacianCoord[3];
+      /** constructor */
       CLaplacian(int size);  
+      /** destructor */
       ~CLaplacian();
     };
 #pragma endregion Nested classes
@@ -118,19 +137,18 @@ public:
   };
 
 public:
-  //-----------------------------------------------------------------------------
-  // public methods
-  //-----------------------------------------------------------------------------
+  /** retrieve instance of the class */
   static vtkMEDFillingHole *New();
 
+  /** RTTI macro */
   vtkTypeRevisionMacro(vtkMEDFillingHole,vtkPolyDataToPolyDataFilter);
+  /** print information of the class */
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void SetFillAllHole();      ///< Set filling all holes on the mesh.
+  /** Set filling all holes on the mesh. */
+  void SetFillAllHole();      
 
-  /** Set filling a specific hole on the mesh. 
-  The id is a vertex id on the border of the hole.
-  */
+  /** Set filling a specific hole on the mesh.  The id is a vertex id on the border of the hole. */
   void SetFillAHole(int id);  
 
 
@@ -161,7 +179,9 @@ vtkPolyData*  GetLastPatch(){return LastPatch;};
 
 
 protected:
+  /** constructor */
   vtkMEDFillingHole();           
+  /** destructor */
   ~vtkMEDFillingHole();
 
   int		**Lambda;
@@ -188,12 +208,19 @@ protected:
 
   int SmoothThinPlateSteps;     ///< the number of smoothing steps
 
+  /** Build a patch for the hole on the surface */
   void    CreatePatch();
+  /** divide all large triangles to smaller triangles
+     then, relax all interior edges of the patching mesh */
   void    RefinePatch();
+  /** Filling Gaps in the Boundary of a Polyhedron */
   void    Trace(int i,int k);
+  /** swap the edge to two non-mutual vertices of the triangles */
   bool    RelaxOneEdge(CEdge *pEdge);
+  /** build the patch */
   void    BuildPatchOutput();
 
+  /** add one point to a trinagle*/
   CVertex* AddOnePointToTriangle(double *pCoord, CTriangle *pTriangle);
 
   /** Multiplies L transpose matrix and L matrix, i.e., A =  L^T*L */
@@ -205,6 +232,7 @@ protected:
   
   /** Multiplies transpose L matrix and vector, i.e., result = L^T*source */
   void LTransposeMatrixVector(double *source,double *result);
+  /** Solves system of linear equations A*x = b using iterative conjugate gradient */
   void  LTransposeLConjugateGradient(double *A,double *xyz,double *b);
 
   /** Computes the normalized normal of the triangle. 
@@ -217,6 +245,7 @@ protected:
   that is proportional to this angle */
   double ComputeDihedralAngleF(const double* n1, const double* n2);
 
+  /** calculate triangle area*/
   double TriangleArea(double *pCoordv0,double *pCoordv1,double *pCoordv2);
 
   /** 
@@ -225,16 +254,25 @@ protected:
   N.B. points v2, v1 and v4 must form the adjacent triangle */
   bool CircumCircleTest(double *v1,double *v2,double *v3, double *v4);  
 
-protected:  
+protected:
+  /** build mesh */
   void  BuildMesh();
+  /** update mesh */
   void  UpdateMesh(int id);
+  /** clear mesh */
   void  ClearMesh();
+  /** merge patch */
   void  MergePatch();
 
+  /** build patch */
   void  BuildPatch();
+  /** Build a scale laplacian mesh for the patch */
   void BuildPatchLaplacian();
+  /** clear patch */
   void  ClearPatch();
+  /**  extend the patch and include some surrounding vertices and triangles */
   void  ExtendPatch();
+  /** smooth a patch and make its curvature match the surrounding mesh */
   void  SmoothPatch();
 
   /** The core of smoothing by the minimization of membrane energy */
@@ -242,11 +280,13 @@ protected:
 
   /** The core of smoothing by the minimization of thin plate energy */
   void ThinPlateSmoothing();
-
-  bool FindNextHole();          ///< detect next hole on the surface
-  bool FindAHole();             ///< detect a hole on the surface
+  /** detect next hole on the surface */
+  bool FindNextHole();
+  /**detect a hole on the surface */      
+  bool FindAHole();
 
 #if defined(_FILLING_DBG)
+  /** check patch edges*/
   void CheckPatchEdges(int& nStartEdgeId);
 #endif //_DEBUG
 
@@ -263,12 +303,16 @@ protected:
 
   /** Build internal mesh. It suppose that the input mesh is manifold */
   void InitMesh();
+  /** filter execution */
   void Execute();
+  /** mesh allocation */
   void DoneMesh();
 
 private:
-  vtkMEDFillingHole(const vtkMEDFillingHole&);  // Not implemented.
-  void operator=(const vtkMEDFillingHole&);  // Not implemented.
+  /** copy constructor not implemented */
+  vtkMEDFillingHole(const vtkMEDFillingHole&); 
+  /** operator= not implemented */
+  void operator=(const vtkMEDFillingHole&);  
 };
 
 #endif

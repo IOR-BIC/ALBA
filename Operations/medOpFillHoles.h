@@ -2,8 +2,8 @@
 Program:   @neufuse
 Module:    $RCSfile: medOpFillHoles.h,v $
 Language:  C++
-Date:      $Date: 2009-07-02 08:15:31 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-02-24 11:12:17 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni, Josef Kohout
 ==========================================================================
 Copyright (c) 2007
@@ -33,20 +33,25 @@ class vtkSphereSource;
 class vtkPolyData;
 class vtkGlyph3D;
 
-//----------------------------------------------------------------------------
-// medOpFillHoles :
-//----------------------------------------------------------------------------
-/** */
+/**
+   class name: medOpFillHoles
+   Operation which takes in input a polydata and retrieve the same polydata with filled hole.
+*/
 class medOpFillHoles: public mafOp
 {
 public:
+  /** constructor*/
 	medOpFillHoles(const wxString &label = "Fill Holes");
+  /** destructor */
 	~medOpFillHoles(); 
 
+  /** Precess events coming from other objects */
 	/*virtual*/ void OnEvent(mafEventBase *maf_event);
 
+  /** RTTI macro */
 	mafTypeMacro(medOpFillHoles, mafOp);
 
+  /** copy the  object */
 	/*virtual*/ mafOp* Copy();
 
 	/** Return true for the acceptable vme type. */
@@ -65,10 +70,15 @@ protected:
 	/** This method is called at the end of the operation and result contain the wxOK or wxCANCEL. */
 	/*virtual*/ void OpStop(int result);
 
+  /** create external dialog */
 	void CreateOpDialog();
+  /** delete external dialog */
 	void DeleteOpDialog();
+  /** create visual pipeline */
 	void CreatePolydataPipeline();
+  /** fill holes */
 	void Fill();
+  /** select a hole in the data structure*/
 	void SelectHole(int pointID);
 
 	vtkPolyData							*m_OriginalPolydata;
