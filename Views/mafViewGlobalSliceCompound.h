@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-20 11:45:43 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2010-02-24 16:59:59 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -63,7 +63,7 @@ protected:
   /** Function for enable/disable all gui widgets. */
 	//void EnableWidgets(bool enable);
 
-	mafViewGlobalSlice	*m_ViewGlobalSlice;
+  mafViewGlobalSlice	*m_ViewGlobalSlice;
 
 };
 #endif
