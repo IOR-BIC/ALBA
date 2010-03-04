@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGizmoPathRuler.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:47:18 $
-  Version:   $Revision: 1.6.2.4 $
+  Date:      $Date: 2010-03-04 16:06:25 $
+  Version:   $Revision: 1.6.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -330,6 +330,6 @@ void mafGizmoPathRuler::ResetLabelsVisibility()
 
 void mafGizmoPathRuler::CustomIndexLabelVisibility(int index, int flag)
 {
-  if(index >= 0 || index <=m_GizmoPathVector.size()-1)
+  if(index >= 0 && index <=m_GizmoPathVector.size()-1)
     m_GizmoPathVector[index]->GetOutput()->SetTextVisibility(flag);
 }
