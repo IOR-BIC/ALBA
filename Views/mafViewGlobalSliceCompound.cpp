@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewGlobalSliceCompound.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-02-24 16:59:59 $
-  Version:   $Revision: 1.16.2.2 $
+  Date:      $Date: 2010-03-04 08:24:58 $
+  Version:   $Revision: 1.16.2.3 $
   Authors:   Eleonora Mambrini
 ==========================================================================
   Copyright (c) 2002/2004
@@ -20,7 +20,6 @@
 //----------------------------------------------------------------------------
 
 #include "mafViewGlobalSliceCompound.h"
-
 #include "mafViewGlobalSlice.h"
 #include "mafViewVTK.h"
 #include "mafRWI.h"
@@ -94,7 +93,7 @@ mafGUI* mafViewGlobalSliceCompound::CreateGui()
 {
 	assert(m_Gui == NULL);
   m_Gui = new mafGUI(this);
-  m_Gui->AddGui(((mafViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
+	m_Gui->AddGui(((mafViewGlobalSlice*)m_ChildViewList[ID_VIEW_GLOBAL_SLICE])->GetGui());
 	m_LutWidget = m_Gui->Lut(ID_LUT_CHOOSER,"lut",m_ColorLUT);
 	m_LutWidget->Enable(false);
 	m_Gui->Divider(0);
@@ -106,13 +105,12 @@ mafGUI* mafViewGlobalSliceCompound::CreateGui()
 void mafViewGlobalSliceCompound::PackageView()
 //-------------------------------------------------------------------------
 {
-	//m_ViewGlobalSlice = new mafViewGlobalSlice("",CAMERA_ARB);
-  m_ViewGlobalSlice = new mafViewGlobalSlice("",CAMERA_PERSPECTIVE);
-	m_ViewGlobalSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice_BES");
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice_BES");
-	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice_BES");
-  m_ViewGlobalSlice->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice_BES");
-  m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice_BES");
+	m_ViewGlobalSlice = new mafViewGlobalSlice("",CAMERA_OS_P);
+	m_ViewGlobalSlice->PlugVisualPipe("mafVMESurface", "mafPipeSurfaceSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMESurfaceParametric", "mafPipeSurfaceSlice");
+	m_ViewGlobalSlice->PlugVisualPipe("mafVMEVolumeGray", "mafPipeVolumeSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeSlice");
+  m_ViewGlobalSlice->PlugVisualPipe("mafVMEMesh", "mafPipeMeshSlice");
   m_ViewGlobalSlice->PlugVisualPipe("medVMEAnalog", "mafPipeBox", NON_VISIBLE);
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmark", "mafPipeSurfaceSlice");
   m_ViewGlobalSlice->PlugVisualPipe("mafVMELandmarkCloud", "mafPipeSurfaceSlice");
