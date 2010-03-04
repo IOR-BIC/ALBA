@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEManager.h,v $
   Language:  C++
-  Date:      $Date: 2008-11-25 14:47:32 $
-  Version:   $Revision: 1.20.2.1 $
+  Date:      $Date: 2010-03-04 15:58:59 $
+  Version:   $Revision: 1.20.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -27,20 +27,30 @@ class mafVMEStorage;
 class wxZipFSHandler;
 class wxFileSystem;
 
-//----------------------------------------------------------------------------
-// mafVMEManager :
+/** mafVMEManager : Class managing VMEs inside a MAF application.
+
+This class is responsible for managing the VME in a MAF application:
+It can add or remove VME to the current tree, add a new tree, load and save a tree from or to an msf (zmsf) file.
+
+*/
 //----------------------------------------------------------------------------
 class mafVMEManager: public mafObserver
+//----------------------------------------------------------------------------
 {
 public:
-       mafVMEManager();
-      ~mafVMEManager(); 
+  /** constructor */
+  mafVMEManager();
 
+  /** destructor */
+  ~mafVMEManager(); 
+
+  /** Set the event receiver object*/
   void SetListener(mafObserver *listener) {m_Listener = listener;};
+
+  /** Process events coming from other components */
   void OnEvent(mafEventBase *e);
  
-  /** 
-  Destroy all nodes (also the root), for each destroyed node the manager send 
+  /** Destroy all nodes (also the root), for each destroyed node the manager send 
   an event VME_REMOVING, then search the root and select it. */ 
   void MSFNew(bool notify_root_creation = true);
   
@@ -140,6 +150,9 @@ public:
   /** Set the flag for saving binary files associated to time varying VMEs.*/
   void SetSingleBinaryFile(bool singleFile);
 
+  /** Set the flag for test mode without GUI */
+  void SetTestMode(bool testmode){m_TestMode = testmode;}; // Losi 02/16/2010 for test class
+
 protected:
   /** Create a compressed msf file: zmsf.*/
   bool MakeZip(const mafString &zipname, wxArrayString *files);
@@ -147,30 +160,34 @@ protected:
   /** Set tag with creation date for the node passed as argument.*/
   void AddCreationDate(mafNode *vme);
 
-  bool              m_Modified;     ///< Used to known when the tree has been modified...
+  bool                m_Modified;         ///< Used to known when the tree has been modified...
 
-  mafObserver*      m_Listener;
-  wxConfigBase*     m_Config;
-  wxZipFSHandler    *m_ZipHandler;
-  wxFileSystem      *m_FileSystem;
-  mafGUIFileHistory	  m_FileHistory;
-  int               m_FileHistoryIdx;
+  mafObserver*        m_Listener;         ///< Register the event receiver object
+  wxConfigBase*       m_Config;           ///< Application configuration for file history management
+  wxZipFSHandler      *m_ZipHandler;      ///< Handler for zip archive (used to open zmsf files)
+  wxFileSystem        *m_FileSystem;      ///< File system manager
+  mafGUIFileHistory	  m_FileHistory;      ///< Used to hold recently opened files
+  int                 m_FileHistoryIdx;   ///< Identifier of the file to open
 
-  bool              m_MakeBakFile; ///< Flag used to create or not the backup file of the saved msf.
-  mafString         m_MSFDir; ///< Directory name in which is present the msf file.
-  mafString         m_AppStamp; ///< Application stamp for our application.
-  mafString         m_MSFFile; ///< File name of the data associated to the tree.
-  mafString         m_ZipFile; ///< File name of compressed archive in which save the data associated to the tree.
-  mafString         m_TmpDir;
+  bool                m_MakeBakFile;      ///< Flag used to create or not the backup file of the saved msf.
+  mafString           m_MSFDir;           ///< Directory name in which is present the msf file.
+  mafString           m_AppStamp;         ///< Application stamp for our application.
+  mafString           m_MSFFile;          ///< File name of the data associated to the tree.
+  mafString           m_ZipFile;          ///< File name of compressed archive in which save the data associated to the tree.
+  mafString           m_TmpDir;           ///< Temporary directory for zmsf extraction
 
-  mafString         m_Host;
-  mafString         m_User;
-  mafString         m_Pwd;
-  int               m_Port;
+  mafString           m_Host;             ///< Host name for remote storage
+  mafString           m_User;             ///< User name for remote storage
+  mafString           m_Pwd;              ///< Password for remote storage
+  int                 m_Port;             ///< Port number for remote storage
   
-  bool              m_LoadingFlag;  ///< used when an MSF is being loaded
-  bool              m_Crypting;     ///< used to enable the Encryption for the MSF
-  bool              m_SingleBinaryFile; ///< used to store binary files associated to time varying VMEs as multiple files or not.
-  mafVMEStorage*    m_Storage;      
+  bool                m_LoadingFlag;      ///< used when an MSF is being loaded
+  bool                m_Crypting;         ///< used to enable the Encryption for the MSF
+  bool                m_SingleBinaryFile; ///< used to store binary files associated to time varying VMEs as multiple files or not.
+  mafVMEStorage*      m_Storage;          ///< Associated storage
+  bool                m_TestMode;         ///< set true for test mode without GUI
+
+  /** friend test class */
+  friend class mafVMEManagerTest; // Losi 02/16/2010 for test class
 };
 #endif
