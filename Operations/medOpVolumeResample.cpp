@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-02-17 10:03:50 $
-  Version:   $Revision: 1.12.2.8 $
+  Date:      $Date: 2010-03-05 12:25:52 $
+  Version:   $Revision: 1.12.2.9 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -53,12 +53,15 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 #include "vtkTransform.h"
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkCubeSource.h"
+#include "vtkDoubleArray.h"
 
 
 #include <vector>
 #include <algorithm>
 
 #define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
+
+#define SPACING_PERCENTAGE_BOUNDS 0.1
 
 using namespace std;
 
@@ -491,6 +494,8 @@ void medOpVolumeResample::Resample()
         outputSPVtkData->SetScalarType(inputData->GetPointData()->GetScalars()->GetDataType());
         outputSPVtkData->SetExtent(outputSPExtent);
         outputSPVtkData->SetUpdateExtent(outputSPExtent);
+
+        vtkDoubleArray *scalar = vtkDoubleArray::SafeDownCast(outputSPVtkData->GetPointData()->GetScalars());
         
         inputData->GetScalarRange(sr);
 
@@ -875,6 +880,14 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
         UpdateGui();
       break;
       case wxOK:
+        if (!CheckSpacing())
+        {
+          int answer = wxMessageBox( "Spacing values are too little and could generate memory problems - Continue?", "Warning", wxYES_NO, NULL);
+          if (answer == wxNO)
+          {
+            break;
+          }
+        }
 				Resample();
         GizmoDelete();
 				OpStop(OP_RUN_OK);
@@ -927,6 +940,25 @@ void medOpVolumeResample::OnEventThis(mafEventBase *maf_event)
       break;
     }	
   }
+}
+//----------------------------------------------------------------------------
+bool medOpVolumeResample::CheckSpacing()
+//----------------------------------------------------------------------------
+{
+  if ((m_VolumeSpacing[0]/(m_VolumeBounds[1] - m_VolumeBounds[0]))*100 < SPACING_PERCENTAGE_BOUNDS)
+  {
+    return false;
+  }
+  if ((m_VolumeSpacing[1]/(m_VolumeBounds[3] - m_VolumeBounds[2]))*100 < SPACING_PERCENTAGE_BOUNDS)
+  {
+    return false;
+  }
+  if ((m_VolumeSpacing[2]/(m_VolumeBounds[5] - m_VolumeBounds[4]))*100 < SPACING_PERCENTAGE_BOUNDS)
+  {
+    return false;
+  }
+  
+  return true;
 }
 //----------------------------------------------------------------------------
 void medOpVolumeResample::OnEventGizmoTranslate(mafEventBase *maf_event)

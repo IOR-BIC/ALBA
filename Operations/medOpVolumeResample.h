@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medOpVolumeResample.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-30 10:50:12 $
-  Version:   $Revision: 1.3.2.3 $
+  Date:      $Date: 2010-03-05 12:25:52 $
+  Version:   $Revision: 1.3.2.4 $
   Authors:   Marco Petrone
 ==========================================================================
 Copyright (c) 2002/2004
@@ -111,6 +111,9 @@ protected:
 	void OnEventGizmoROI(mafEventBase *maf_event);
 
 	void PostMultiplyEventMatrix(mafEventBase *maf_event);
+
+  /** Check the spacing and if is too little and could create some memory problems return false */
+  bool CheckSpacing();
 
   mafVMEVolumeGray *m_ResampledVme;
 
