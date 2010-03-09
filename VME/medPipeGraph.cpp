@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-04-16 13:32:22 $
-  Version:   $Revision: 1.37.2.1 $
+  Date:      $Date: 2010-03-09 15:37:03 $
+  Version:   $Revision: 1.37.2.2 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -19,6 +19,7 @@
 //----------------------------------------------------------------------------
 
 #include <vnl/vnl_vector.h>
+
 
 #include "medPipeGraph.h"
 #include "mafDecl.h"
@@ -56,6 +57,7 @@ medPipeGraph::medPipeGraph()
   m_PlotActor	= NULL;
   m_PlotTimeLineActor	= NULL;
   m_CheckBox  = NULL;
+  m_CheckedVector.clear();
 
   m_Xlabel		= 50;
   m_Ylabel		= 50;
@@ -101,6 +103,7 @@ medPipeGraph::~medPipeGraph()
     vtkDEL(m_ScalarArray[i]);
   }
   m_ScalarArray.clear();
+  m_CheckedVector.clear();
 
   vtkDEL(m_TimeArray);
   m_PlotActor->RemoveAllInputs();
@@ -126,6 +129,7 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_DataManualRange[0] = m_DataMin; //Initialize max data range 
   m_DataManualRange[1] = m_DataMax;
 
+  m_CheckedVector.resize(m_NumberOfSignals,false);
   
   m_EmgPlot->Update();
   m_TimeArray = vtkDoubleArray::New();
@@ -260,7 +264,6 @@ void medPipeGraph::Create(mafSceneNode *n)
   m_RenFront->GetBackground(m_OldColour); // Save the old Color so we can restore it
   m_RenFront->SetBackground(1,1,1);  
 
-  CreateGui();
 }
 
 //----------------------------------------------------------------------------
@@ -295,9 +298,8 @@ void medPipeGraph::UpdateGraph()
    //cycle to get a fake scalar value
    for (int c = 0; c < m_NumberOfSignals ; c++)
    {
-     if (m_CheckBox->IsItemChecked(c)) //fill the vector with vtkDoubleArray of signals checked
+     if (m_CheckedVector.at(c)) //fill the vector with vtkDoubleArray of signals checked
      {
-
        scalar = vtkDoubleArray::New();
        row = m_EmgPlot->GetScalarOutput()->GetScalarData().get_row(c+1); //skip first row with time information
 
@@ -315,7 +317,7 @@ void medPipeGraph::UpdateGraph()
 
   for (int c = 0; c < m_NumberOfSignals ; c++)
   {
-    if (m_CheckBox->IsItemChecked(c)) //fill the vector with vtkDoubleArray of signals checked
+    if (m_CheckedVector.at(c)) //fill the vector with vtkDoubleArray of signals checked
     {
       int counter = 0;
       scalar = vtkDoubleArray::New();
@@ -427,7 +429,6 @@ void medPipeGraph::UpdateGraph()
   scalarArrayLine->InsertNextTuple1(scalarRange[0]);
   scalarArrayLine->InsertNextTuple1(scalarRange[1]);
 
-  //vtkDEL(m_TimeLine);
   vtkNEW(m_TimeLine);
   m_TimeLine->SetDimensions(2, 1, 1);
   m_TimeLine->SetXCoordinates(lineArray);
@@ -441,9 +442,8 @@ void medPipeGraph::UpdateGraph()
   m_PlotTimeLineActor->AddInput((vtkDataSet*)m_TimeLine);
 
   m_RenFront->AddActor2D(m_PlotActor);
-  m_RenFront->AddActor2D(m_PlotTimeLineActor);
-  
-  CreateLegend();
+  //m_RenFront->AddActor2D(m_PlotTimeLineActor);
+   
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::CreateLegend()
@@ -594,6 +594,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         }
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        CreateLegend();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
@@ -603,6 +604,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         m_Gui->Enable(ID_RANGE_Y, !m_FitPlot);
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        CreateLegend();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
@@ -614,6 +616,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         ChangeSignalColor();
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        CreateLegend();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
@@ -621,6 +624,7 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
       {
         m_PlotActor->RemoveAllInputs();
         UpdateGraph();
+        CreateLegend();
         mafEventMacro(mafEvent(this,CAMERA_UPDATE));
       }
       break;
@@ -666,6 +670,14 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
         m_ItemId = e->GetArg();
         m_ItemName = m_CheckBox->GetItemLabel(m_ItemId);
         m_Gui->Update();
+        for (int i = 0; i < m_CheckedVector.size(); i++)
+        {
+          if (m_CheckedVector.at(i) != m_CheckBox->IsItemChecked(i))
+          {
+            m_CheckedVector[i] = m_CheckBox->IsItemChecked(i);
+            break;
+          }
+        } 
       }
       break;
     default:
@@ -739,7 +751,12 @@ void medPipeGraph::OnEvent(mafEventBase *maf_event)
 void medPipeGraph::SetSignalToPlot(int index,bool plot)
 //----------------------------------------------------------------------------
 {
-  m_CheckBox->CheckItem(index,plot);
+  //m_CheckBox->CheckItem(index,plot);
+  if (index < m_CheckedVector.size())
+  {
+    //m_CheckedVector.assign(index, plot);
+    m_CheckedVector.at(index) = plot;
+  }
 }
 //----------------------------------------------------------------------------
 void medPipeGraph::SetTitleX(mafString title)
