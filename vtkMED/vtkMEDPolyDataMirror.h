@@ -21,9 +21,11 @@ class vtkDoubleArray;
 class vtkIdList;
 class vtkPolyData;
 
-//----------------------------------------------------------------------------
+/**
+  class name: vtkMEDPolyDataMirror
+  Mirror the polydata over one or more axises.
+*/
 class VTK_vtkMAF_EXPORT vtkMEDPolyDataMirror : public vtkPolyDataToPolyDataFilter
-//----------------------------------------------------------------------------
 {
 public:
   vtkTypeRevisionMacro(vtkMEDPolyDataMirror,vtkPolyDataToPolyDataFilter);

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMEDPastValuesList.h,v $
 Language:  C++
-Date:      $Date: 2008-11-06 09:27:28 $
-Version:   $Revision: 1.2.2.1 $
+Date:      $Date: 2010-03-10 11:32:59 $
+Version:   $Revision: 1.2.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -17,28 +17,39 @@ All rights reserved.
 #include "vtkMAFConfigure.h"
 
 
-//------------------------------------------------------------------------------
-/** vtkMEDPastValuesList.
+
+/** 
+class name: vtkMEDPastValuesList.
 Used for saving the last n values of a variable.
 It is a push-only stack with a maxiumum of n values.
 Values are pushed onto the top of the list.  
-Values which fall of the bottom of the list are lost */
-//------------------------------------------------------------------------------
+Values which fall of the bottom of the list are lost 
+*/
 class VTK_vtkMAF_EXPORT vtkMEDPastValuesList
 {
 public:
-  explicit vtkMEDPastValuesList(int NumberOfvtkMEDPastValues) ;   ///< construct class with max no. of past values
+  /** construct class with max no. of past values */
+  explicit vtkMEDPastValuesList(int NumberOfvtkMEDPastValues) ;
+  /** destructor */
   ~vtkMEDPastValuesList() ;
+  /** copy constructor */
   vtkMEDPastValuesList(const vtkMEDPastValuesList& stats) ;
 
-  void Clear() ;                                    ///< reset to empty
-  void AddNewValue(double newValue) ;               ///< add new value to saved list
-  double GetValue(int i) const ;                    ///< get ith value
-  double GetMin() const ;                           ///< get min of saved values
-  double GetMax() const ;                           ///< get max of saved values
-  double GetMean() const ;                          ///< get mean of saved values
-  double GetMedian() const ;                        ///< get median of saved values
-
+  /** reset to empty */
+  void Clear() ;
+  /** add new value to saved list */
+  void AddNewValue(double newValue) ;              
+  /** get ith value */
+  double GetValue(int i) const ;                    
+  /** get min of saved values */
+  double GetMin() const ;                          
+  /** get max of saved values */
+  double GetMax() const ;                          
+  /** get mean of saved values */
+  double GetMean() const ;                         
+  /** get median of saved values */
+  double GetMedian() const ;                       
+  /** print object information */
   void PrintSelf(std::ostream& os) const ;
 
 private:

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.3.2.1 $
+Date:      $Date: 2010-03-10 11:32:13 $
+Version:   $Revision: 1.3.2.2 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -59,10 +59,12 @@ class vtkTriangleQualityRatio;
 class vtkFeatureEdges;
 class vtkTubeFilter;
 
-//----------------------------------------------------------------------------
-// medOpMeshQuality :
-//----------------------------------------------------------------------------
-/** */
+
+/**
+class name: medOpMeshQuality
+
+Check the quality of the mesh, using an algorithm for checking the ratio of each triangle and then giving statistics about that.
+ */
 class medOpMeshQuality: public mafOp
 {
 public:

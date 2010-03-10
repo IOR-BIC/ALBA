@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-05-13 15:51:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-03-10 11:32:58 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -33,7 +33,10 @@ All rights reserved.
 class vtkIdList;
 class vtkCell;
 
-/** vtkMAFMeshCutter_BES - vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
+/** 
+
+ class name: vtkMAFMeshCutter_BES
+vtk filter which cuts a finite element mesh (unstructured grid) with a plane.
 This is very similar to vtkCutter().
 
 Differences from vtkCutter():
@@ -55,16 +58,21 @@ polydata will contain the points, but no cell will be created.*/
 class VTK_vtkMAF_EXPORT vtkMAFMeshCutter_BES : public vtkUnstructuredGridToPolyDataFilter
 {
 public:
+  /** RTTI macro*/
   vtkTypeRevisionMacro(vtkMAFMeshCutter_BES,vtkUnstructuredGridToPolyDataFilter);
+  /** return object instance */
   static vtkMAFMeshCutter_BES *New() ;
+  /** print object information */
   void PrintSelf(ostream& os, vtkIndent indent);                                ///< print self
 
    /** Overload standard modified time function. If cut function is modified,
   then this object is modified as well. */
   unsigned long GetMTime();
 
-  void SetCutFunction(vtkPlane *P) ;                                            ///< Set the cutting plane (but does not register the object)
-  vtkPlane* GetCutFunction() ;                                                  ///< Get the cutting plane
+  /** Set the cutting plane (but does not register the object) */
+  void SetCutFunction(vtkPlane *P) ;
+  /** Get the cutting plane */
+  vtkPlane* GetCutFunction();
 
   /** Get the output point idout corresponding to the input edge (id0,id1). 
   Lambda returns the fractional distance between id0 and id1. 
@@ -95,10 +103,13 @@ public:
   void Initialize() ;
 
 protected:
-  vtkMAFMeshCutter_BES() ;                                                              ///< constructor
-  ~vtkMAFMeshCutter_BES() ;                                                             ///< destructor
+  /** constructor */
+  vtkMAFMeshCutter_BES() ;   
+  /** destructor */                                                           
+  ~vtkMAFMeshCutter_BES() ;                                                             
 
-  void Execute();                                                               ///< execute method
+  /** execute method */
+  void Execute();
 
 
   // edge described by id's of endpoints
@@ -123,7 +134,7 @@ protected:
     POINT_TO_POINT
   } ;
 
-  // constant for undefined id's
+  /**constant for undefined id's*/
   static const vtkIdType undefinedId = -1 ;
 
   /** Computes a unique key for the given edge */

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: mmiVTKPicker.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-12-17 12:27:54 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2010-03-10 11:31:54 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2009 University of Bedfordshire (www.beds.ac.uk)
@@ -18,7 +18,9 @@
 
 class vtkCellPicker;
 
-/** Implements mouse move of camera in the scene or perform continuous
+/** 
+class name: mmiVTKPicker
+Implements mouse move of camera in the scene or perform continuous
 cell picking when using CTRL modifier.
 
 If CTRL modifier is pressed a pick is performed, which according to the
@@ -46,6 +48,7 @@ point picked during CTRL + left mouse down
 class mmiVTKPicker : public mafInteractorCameraMove
 {
 public:
+  /** RTTI macro */
   mafTypeMacro(mmiVTKPicker,mafInteractorCameraMove);
 
   /** Enables/disables continuous picking */
@@ -68,10 +71,12 @@ public:
   virtual void OnLeftButtonUp();
 
 protected:
+  /** constructor */
   mmiVTKPicker() {      
     m_ContinuousPicking = false;
     m_Picker = NULL;
   }
+  /** destructor */
   virtual ~mmiVTKPicker();          
 
 protected:
