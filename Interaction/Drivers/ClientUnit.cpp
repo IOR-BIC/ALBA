@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: ClientUnit.cpp,v $
   Language:  C++
-  Date:      $Date: 2006-06-05 09:24:24 $
-  Version:   $Revision: 1.5 $
+  Date:      $Date: 2010-03-10 11:23:35 $
+  Version:   $Revision: 1.5.12.1 $
   Authors:   Paolo Quadrani
 ==========================================================================
 Copyright (c) 2002/2004
@@ -66,7 +66,7 @@ bool ClientUnit::ConnectClient(wxIPV4address &addr)
   {
     m_sock->Close();
     mafLogMessage(_("Failed ! Unable to connect\n"));
-    wxMessageBox(_("Can't connect to the specified host"), _("Alert !"));
+    mafLogMessage(_("Can't connect to the specified host"));
   }
 
   return status;
