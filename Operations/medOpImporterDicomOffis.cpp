@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-02-16 14:35:25 $
-Version:   $Revision: 1.1.2.72 $
+Date:      $Date: 2010-03-11 09:11:57 $
+Version:   $Revision: 1.1.2.73 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -407,11 +407,10 @@ int medOpImporterDicomOffis::RunWizard()
       {
         if(!this->m_TestMode)
         {
-          int answer = wxMessageBox( "Dicom dataset contains rotated images - Continue?", "Warning", wxYES_NO, NULL);
+          int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
           if (answer == wxNO)
           {
-            result = OP_RUN_CANCEL;
-            break;
+            m_IsRotated = false;
           }
         }
       }
