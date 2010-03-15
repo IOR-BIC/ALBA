@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2009-12-02 14:55:31 $
-Version:   $Revision: 1.5.2.8 $
+Date:      $Date: 2010-03-15 14:09:10 $
+Version:   $Revision: 1.5.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -61,6 +61,10 @@ public:
     ID_SETTING_VME_TYPE,
     ID_Z_CROP,
     ID_ENABLE_POS_INFO,
+    ID_SCALAR_DISTANCE_TOLERANCE,
+    ID_SCALAR_TOLERANCE,
+    ID_PERCENTAGE_DISTANCE_TOLERANCE,
+    ID_PERCENTAGE_TOLERANCE,
 	};
 
   /** Modality IDs*/
@@ -118,6 +122,17 @@ public:
   int EnableVisualizationPosition(){return m_VisualizePosition;};
   /** EnableZ-direction crop. */
   int EnableZCrop(){return m_EnableZCrop;};
+  /** Enable scalar tolerance. */
+  int EnableScalarTolerance(){return m_ScalarTolerance;};
+  /** GReturn scalar tolerance. */
+  double GetScalarTolerance(){return m_ScalarDistanceTolerance;};
+  /** Enable Pprcentage tolerance. */
+  int EnablePercentageTolerance(){return m_PercentageTolerance;};
+  /** Get percetnage tolerance. */
+  double GetPercetnageTolerance(){return m_PercentageDistanceTolerance;};
+
+
+
   /** Retrive auto VME type flag. */
   int AutoVMEType(){return m_AutoVMEType;};
   /** Retrive VME type. */
@@ -153,7 +168,12 @@ protected:
   int m_EnableResampleVolume;
   int m_EnableRescaleTo16Bit;
   int m_EnableZCrop;
+  int m_ScalarTolerance;
+  int m_PercentageTolerance;
   int m_AutoVMEType;
   int m_VisualizePosition;
+
+  double m_ScalarDistanceTolerance;
+  double m_PercentageDistanceTolerance;
 };
 #endif

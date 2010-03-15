@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-02 14:55:31 $
-Version:   $Revision: 1.7.2.8 $
+Date:      $Date: 2010-03-15 14:09:10 $
+Version:   $Revision: 1.7.2.9 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -44,7 +44,11 @@ mafGUISettings(Listener, label)
   m_VisualizePosition = false;
   m_EnableZCrop =  true;
   m_AutoVMEType = false;
+  m_PercentageTolerance = false;
+  m_ScalarTolerance = false;
   m_OutputType = 0;
+  m_ScalarDistanceTolerance = 0.3;
+  m_PercentageDistanceTolerance = 88;
 
   m_Step = ID_1X;
 
@@ -72,6 +76,12 @@ void medGUIDicomSettings::CreateGui()
   m_Gui->Bool(ID_Z_CROP,_("Enable Z-direction Crop"),&m_EnableZCrop,1);
   m_Gui->Bool(ID_ENABLE_POS_INFO,_("Visualize Position and Orientation"),&m_VisualizePosition,1);
 
+  m_Gui->Bool(ID_SCALAR_DISTANCE_TOLERANCE,_("Scalar distance tolerance"),&m_ScalarTolerance,1);
+  m_Gui->Double(ID_SCALAR_TOLERANCE,_("Value"),&m_ScalarDistanceTolerance,0,MAXDOUBLE,-1,"Value in millimeter");
+
+  m_Gui->Bool(ID_PERCENTAGE_DISTANCE_TOLERANCE,_("Percentage distance tolerance"),&m_PercentageTolerance,1);
+  m_Gui->Double(ID_PERCENTAGE_TOLERANCE,_("Value"),&m_PercentageDistanceTolerance,0,100,-1,"Value in percentage");
+
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
   wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
   m_Gui->Radio(ID_SETTING_VME_TYPE, "VME output", &m_OutputType, 3, typeArray, 1, ""/*, wxRA_SPECIFY_ROWS*/);
@@ -90,6 +100,8 @@ void medGUIDicomSettings::CreateGui()
 
 	m_Gui->Update();
   m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
+  m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
+  m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
 }
 //----------------------------------------------------------------------------
 void medGUIDicomSettings::EnableItems()
@@ -97,6 +109,10 @@ void medGUIDicomSettings::EnableItems()
 {
 	//m_Gui->Enable(ID_DICTONARY,true); Remove dictionary selection (Losi 25.11.2009)
   m_Gui->Enable(ID_SETTING_VME_TYPE,m_AutoVMEType);
+
+   m_Gui->Enable(ID_SCALAR_TOLERANCE,m_ScalarTolerance);
+   m_Gui->Enable(ID_PERCENTAGE_TOLERANCE,m_PercentageTolerance);
+   m_Gui->Update();
 }
 //----------------------------------------------------------------------------
 void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
@@ -181,6 +197,28 @@ void medGUIDicomSettings::OnEvent(mafEventBase *maf_event)
       m_Config->Write("VMEType",m_OutputType);
     }
     break;
+  case ID_SCALAR_DISTANCE_TOLERANCE:
+    {
+      m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
+      m_PercentageTolerance = false;
+    }
+    break;
+  case ID_SCALAR_TOLERANCE:
+    {
+      m_Config->Write("ScalarDistance",m_ScalarDistanceTolerance);
+    }
+    break;
+  case ID_PERCENTAGE_DISTANCE_TOLERANCE:
+    {
+      m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
+      m_ScalarTolerance = false;
+    }
+    break;
+  case ID_PERCENTAGE_TOLERANCE:
+    {
+      m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
+    }
+    break;
 	default:
 		mafEventMacro(*maf_event);
 		break; 
@@ -194,6 +232,7 @@ void medGUIDicomSettings::InitializeSettings()
 {
 	wxString string_item;
 	long long_item;
+  double double_item;
 
   if(m_Config->Read("EnableSide", &long_item))
   {
@@ -366,6 +405,42 @@ void medGUIDicomSettings::InitializeSettings()
 	{
 		m_Config->Write("EnableNumberOfSlice",m_EnableNumberOfSlice);
 	}
+
+  if(m_Config->Read("EnableScalarDistance", &long_item))
+  {
+    m_ScalarTolerance=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnableScalarDistance",m_ScalarTolerance);
+  }
+
+  if(m_Config->Read("ScalarDistance", &double_item))
+  {
+    m_ScalarDistanceTolerance=double_item;
+  }
+  else
+  {
+    m_Config->Write("ScalarDistance",m_ScalarDistanceTolerance);
+  }
+
+  if(m_Config->Read("EnablePercentageDistance", &long_item))
+  {
+    m_PercentageTolerance=long_item;
+  }
+  else
+  {
+    m_Config->Write("EnablePercentageDistance",m_PercentageTolerance);
+  }
+
+  if(m_Config->Read("PercentageDistance", &double_item))
+  {
+    m_PercentageDistanceTolerance=double_item;
+  }
+  else
+  {
+    m_Config->Write("PercentageDistance",m_PercentageDistanceTolerance);
+  }
 
 
 	m_Config->Flush();
