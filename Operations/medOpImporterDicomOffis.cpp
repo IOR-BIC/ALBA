@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-11 09:11:57 $
-Version:   $Revision: 1.1.2.73 $
+Date:      $Date: 2010-03-15 14:09:49 $
+Version:   $Revision: 1.1.2.74 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -210,7 +210,7 @@ mafOp(label)
 
   m_ZCropBounds[0] = 0;
   m_ZCropBounds[1] = 0;
-  
+    
   m_PatientPosition = "";
 
   m_VectorSelected.clear();
@@ -370,6 +370,11 @@ void medOpImporterDicomOffis::OpRun()
 		    m_DicomDirectory = path.c_str();
 		    GuiUpdate();
 		    result = OpenDir();
+        if (!result)
+        {
+          OpStop(OP_RUN_CANCEL);
+          return;
+        }
 		  }
 	    else
 	    {
@@ -2569,6 +2574,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
   int sliceNum = -1;
   int i;
 	double slice_pos[3];
+  double lastZPos = 0;
 	long int imageNumber = -1;
 	long int numberOfImages = -1;
 	double trigTime = -1.0;
@@ -2576,6 +2582,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
   double imagePositionPatient[3] = {0.0,0.0,0.0};
   bool enableToRead = true; //true for test mode
   bool errorOccurred = false;
+  double lastDistance = 0;
+  mafString lastFileName = "";
+
+  double percentageTolerance = 0;
+  double scalarTolerance = 0;
+  bool enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance();
+  bool enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance();
+
+  if (enableScalarTolerance)
+    scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
+
+  if (enablePercentageTolerance)
+    percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercetnageTolerance();
+
 	m_DicomTypeRead = -1;
   DcmFileFormat dicomImg;    
 
@@ -2621,11 +2641,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         {
           wxLogMessage(wxString::Format("File <%s> can not be opened",file));
           errorOccurred = true;
+          sliceNum--;
         }
         continue;
       }
       m_FileName = file; 
-
+      
       DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
  
       // decompress data set if compressed
@@ -2912,7 +2933,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				{
 					continue;
 				}
-        
+
         //if(m_DicomMap.find(studyAndSeriesVec) == m_DicomMap.end()) 
         std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
         for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
@@ -2949,6 +2970,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
           }
+          lastZPos = slice_pos[2];
 
           seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, height, width));
           studyAndSeriesVec.push_back(seriesName);
@@ -2975,6 +2997,34 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
           }
+          
+          if  (sliceNum > 1)
+          {
+            double distancePercentage = ((lastDistance - (fabs(lastZPos - slice_pos[2])))*100)/lastDistance;
+
+            // Check if slices are under tolerance distance
+            if ((enableScalarTolerance && (fabs(lastZPos - slice_pos[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
+            {
+              wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",file.GetCStr(),lastFileName.GetCStr()));
+              int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
+              if (answer == wxNO)
+              {
+                if (!this->m_TestMode)
+                {
+                  mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+                }
+                return false;
+              }
+
+            }
+            else
+            {
+              lastDistance = fabs(lastZPos - slice_pos[2]);
+            }           
+          }
+
+          lastZPos = slice_pos[2];
+          
 
           m_DicomMap[studyAndSeriesVec]->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
 				}
@@ -2983,7 +3033,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 			{
         seriesExist = false;
         seriesCounter = 0;
-        //if(m_DicomMap.find(studyAndSeriesVec) == m_DicomMap.end()) 
         std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
         for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
         {
@@ -3018,11 +3067,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
             ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
           }
+          
 
           ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
-
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
+          lastZPos = slice_pos[2];
 
           if(numberOfImages>1)
           {
@@ -3084,7 +3134,35 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
           ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
 
-           m_DicomMap[studyAndSeriesVec]->Append(new medImporterDICOMListElements(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
+          // Check if slices are under tolerance distance
+          // Commented because the problem is present in TAC dataset which are not time varying
+          /*if (imageNumber % numberOfImages == 1)
+          {
+            double distancePercentage = ((lastDistance - (fabs(lastZPos - slice_pos[2])))*100)/lastDistance;
+
+            // Check if slices are under tolerance distance
+            if ((enableScalarTolerance && (fabs(lastZPos - slice_pos[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
+            {
+            wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",file.GetCStr(),lastFileName.GetCStr()));
+            int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
+            if (answer == wxNO)
+            {
+            if (!this->m_TestMode)
+            {
+            mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+            }
+            return false;
+            }
+
+            }
+            else
+            {
+            lastDistance = fabs(lastZPos - slice_pos[2]);
+            }  
+            lastZPos = slice_pos[2];
+          }*/
+
+          m_DicomMap[studyAndSeriesVec]->Append(new medImporterDICOMListElements(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
 				}
 			}
       if (!this->m_TestMode)
@@ -3095,6 +3173,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       dicomImg.clear();
       studyAndSeriesVec.clear();
 		}
+    lastFileName = m_FileName;
 	}
   
   if (!this->m_TestMode)
