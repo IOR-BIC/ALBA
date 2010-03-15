@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-15 14:09:49 $
-Version:   $Revision: 1.1.2.74 $
+Date:      $Date: 2010-03-15 16:25:12 $
+Version:   $Revision: 1.1.2.75 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2587,14 +2587,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
   double percentageTolerance = 0;
   double scalarTolerance = 0;
-  bool enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance();
-  bool enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance();
+  bool enableScalarTolerance = false;
+  bool enablePercentageTolerance = false;
 
-  if (enableScalarTolerance)
-    scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
+  if(!this->m_TestMode)
+  {
+    enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance();
+    bool enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance();
 
-  if (enablePercentageTolerance)
-    percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercetnageTolerance();
+    if (enableScalarTolerance)
+      scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
+
+    if (enablePercentageTolerance)
+      percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercetnageTolerance();
+  }
 
 	m_DicomTypeRead = -1;
   DcmFileFormat dicomImg;    
