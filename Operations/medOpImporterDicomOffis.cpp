@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-15 16:25:12 $
-Version:   $Revision: 1.1.2.75 $
+Date:      $Date: 2010-03-16 08:54:57 $
+Version:   $Revision: 1.1.2.76 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2593,7 +2593,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
   if(!this->m_TestMode)
   {
     enableScalarTolerance = ((medGUIDicomSettings*)GetSetting())->EnableScalarTolerance();
-    bool enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance();
+    enablePercentageTolerance = ((medGUIDicomSettings*)GetSetting())->EnablePercentageTolerance();
 
     if (enableScalarTolerance)
       scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
