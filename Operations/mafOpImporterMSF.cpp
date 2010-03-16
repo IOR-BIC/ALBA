@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpImporterMSF.cpp,v $
   Language:  C++
-  Date:      $Date: 2008-05-05 15:32:44 $
-  Version:   $Revision: 1.8 $
+  Date:      $Date: 2010-03-16 10:23:27 $
+  Version:   $Revision: 1.8.2.1 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -28,6 +28,8 @@
 #include "mafVMEStorage.h"
 #include "mafVMERoot.h"
 #include "mafVMEGroup.h"
+#include "mafVMEGeneric.h"
+#include "mafDataVector.h"
 
 #include "vtkMAFSmartPointer.h"
 
@@ -140,6 +142,18 @@ int mafOpImporterMSF::ImportMSF()
   while (mafNode *node = root->GetFirstChild())
   {
     node->ReparentTo(m_Group);
+
+    // Losi 03/16/2010 Bug #2049 fix
+    mafVMEGeneric *vme = mafVMEGeneric::SafeDownCast(node);
+    if(vme)
+    {
+      // Update data vector id to avoid duplicates
+      mafDataVector *dataVector = vme->GetDataVector();
+      if(dataVector)
+      {
+        dataVector->UpdateVectorId();
+      }
+    }
   }
   m_Group->Update();
   m_Output = m_Group;
