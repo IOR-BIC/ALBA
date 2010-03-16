@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorExtractIsosurface.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-03-16 09:43:54 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -55,5 +55,8 @@ protected:
 private:
   mafInteractorExtractIsosurface(const mafInteractorExtractIsosurface&);  // Not implemented.
   void operator=(const mafInteractorExtractIsosurface&);  // Not implemented.
+
+  /** test friend */
+  friend class mafInteractorExtractIsosurfaceTest;
 };
 #endif 

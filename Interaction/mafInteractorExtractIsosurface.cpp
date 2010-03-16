@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractorExtractIsosurface.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-03-16 09:43:54 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Paolo Quadrani & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -59,6 +59,15 @@ int mafInteractorExtractIsosurface::StartInteraction(mafDeviceButtonsPadMouse *m
 void mafInteractorExtractIsosurface::OnMouseMove() 
 //----------------------------------------------------------------------------
 { 
+  if (m_Renderer == NULL)
+  {
+    std::ostringstream stringStream;
+    stringStream << "No vtkRenderer defined for mafInteractorExtractIsosurface" << std::endl;
+    stringStream << "Skipping mafInteractorExtractIsosurface::OnMouseMove()" << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    return;
+  }
+
   m_PickValue = false;
   Superclass::OnMouseMove();
 }
@@ -73,6 +82,15 @@ void mafInteractorExtractIsosurface::OnLeftButtonDown(mafEventInteraction *e)
 void mafInteractorExtractIsosurface::OnButtonUp(mafEventInteraction *e)
 //----------------------------------------------------------------------------
 {
+  if (m_Renderer == NULL)
+  {
+    std::ostringstream stringStream;
+    stringStream << "No vtkRenderer defined for mafInteractorExtractIsosurface" << std::endl;
+    stringStream << "Skipping mafInteractorExtractIsosurface::OnButtonUp()" << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    return;
+  }
+
   m_ButtonPressed = e->GetButton();
 
   switch(m_ButtonPressed) 
@@ -112,5 +130,30 @@ void mafInteractorExtractIsosurface::PickIsoValue(mafDevice *device)
       mafEventMacro(mafEvent(this,VME_PICKED,(vtkObject *)p));
       p->Delete();
     }
+  }
+  else if (m_Renderer == NULL && mouse != NULL)
+  {
+    std::ostringstream stringStream;
+    stringStream << "No vtkRenderer defined for mafInteractorExtractIsosurface" << std::endl;
+    stringStream << "Skipping mafInteractorExtractIsosurface::PickIsoValue()" << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    return;
+  } 
+  else if (m_Renderer != NULL && mouse == NULL)
+  {
+    std::ostringstream stringStream;
+    stringStream << "No device available for picking" << std::endl;
+    stringStream << "Skipping mafInteractorExtractIsosurface::PickIsoValue()" << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    return;
+  }
+  else
+  {
+    std::ostringstream stringStream;
+    stringStream << "No vtkRenderer defined for mafInteractorExtractIsosurface" << std::endl;
+    stringStream << "and no picking device available." << std::endl;
+    stringStream << "Skipping mafInteractorExtractIsosurface::PickIsoValue()" << std::endl;
+    mafLogMessage(stringStream.str().c_str());
+    return;
   }
 }
