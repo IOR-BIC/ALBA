@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-15 14:09:10 $
-Version:   $Revision: 1.7.2.9 $
+Date:      $Date: 2010-03-16 08:55:35 $
+Version:   $Revision: 1.7.2.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -77,10 +77,10 @@ void medGUIDicomSettings::CreateGui()
   m_Gui->Bool(ID_ENABLE_POS_INFO,_("Visualize Position and Orientation"),&m_VisualizePosition,1);
 
   m_Gui->Bool(ID_SCALAR_DISTANCE_TOLERANCE,_("Scalar distance tolerance"),&m_ScalarTolerance,1);
-  m_Gui->Double(ID_SCALAR_TOLERANCE,_("Value"),&m_ScalarDistanceTolerance,0,MAXDOUBLE,-1,"Value in millimeter");
+  m_Gui->Double(ID_SCALAR_TOLERANCE,_("Value"),&m_ScalarDistanceTolerance,0,MAXDOUBLE,5,"Value in millimeter");
 
   m_Gui->Bool(ID_PERCENTAGE_DISTANCE_TOLERANCE,_("Percentage distance tolerance"),&m_PercentageTolerance,1);
-  m_Gui->Double(ID_PERCENTAGE_TOLERANCE,_("Value"),&m_PercentageDistanceTolerance,0,100,-1,"Value in percentage");
+  m_Gui->Double(ID_PERCENTAGE_TOLERANCE,_("Value"),&m_PercentageDistanceTolerance,0,MAXDOUBLE,2,"Value in percentage");
 
   m_Gui->Bool(ID_AUTO_VME_TYPE,_("Auto VME Type"),&m_AutoVMEType,1);
   wxString typeArray[3] = {_("Volume"),_("Mesh"),_("Image")};
