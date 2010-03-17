@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGizmoPolylineGraph.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:27:54 $
-Version:   $Revision: 1.1.2.4 $
+Date:      $Date: 2010-03-17 15:43:44 $
+Version:   $Revision: 1.1.2.5 $
 Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -52,11 +52,12 @@ CINECA - Interuniversity Consortium (www.cineca.it)
 
 #include "mafMemDbg.h"
 
-medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *listener, const char* name, bool showOnlyDirectionAxis) 
+medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *listener, const char* name, bool showOnlyDirectionAxis, bool testMode) 
 { 
   m_Name = name;
   m_InputVME = mafVME::SafeDownCast(imputVme);
   m_Listener = listener;
+  m_TestMode = testMode;
   
   m_VmeGizmo = NULL;
   m_CurvilinearAbscissaHelper = NULL;
@@ -80,7 +81,7 @@ medGizmoPolylineGraph::medGizmoPolylineGraph(mafNode* imputVme, mafObserver *lis
   CreateVMEGizmo();
   CreateInteractor();
 
-  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo );
+  m_CurvilinearAbscissaHelper = new medCurvilinearAbscissaOnSkeletonHelper( m_VmeGizmo, NULL, m_TestMode);
 }
 
 //------------------------------------------------------------------------

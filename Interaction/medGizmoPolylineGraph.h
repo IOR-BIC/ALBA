@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medGizmoPolylineGraph.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:27:54 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-03-17 15:43:44 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Josef Kohout, Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -47,9 +47,9 @@ class medGizmoPolylineGraph : public mafGizmoInterface
 public:
   /** The only way to construct correctly the instance */
   inline static medGizmoPolylineGraph* New(mafNode* inputVme, 
-    mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false)
+    mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false, bool testMode = false)
   {
-    medGizmoPolylineGraph* pThis = new medGizmoPolylineGraph(inputVme,Listener, name, showOnlyDirectionAxis);
+    medGizmoPolylineGraph* pThis = new medGizmoPolylineGraph(inputVme,Listener, name, showOnlyDirectionAxis, testMode);
     pThis->InternalInitInstance();
     return pThis;
   }
@@ -65,7 +65,7 @@ public:
   }
 
 protected:
-  medGizmoPolylineGraph(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false);
+  medGizmoPolylineGraph(mafNode* inputVme, mafObserver *Listener = NULL, const char *name = "GizmoPath", bool showOnlyDirectionAxis = false, bool testMode = false);
   
   /** Initializes the object. May not be called twice (unless Done method was called).  */
   virtual void InternalInitInstance();
@@ -103,7 +103,7 @@ public:
   virtual void SetColor(double col[3]);
 
   inline mafVMEGizmo* GetOutput() {
-    return m_VmeGizmo;
+    return m_VmeGizmo; 
   }
 
 protected:
@@ -143,7 +143,9 @@ protected:
   vtkPlaneSource *m_PlaneSource;
   vtkAppendPolyData *m_AppendPolyData;
 
-  bool                m_ShowOnlyDirectionAxis; //< if true visualize only directional arrow source and hides the perpendiculars
+  bool m_ShowOnlyDirectionAxis; //< if true visualize only directional arrow source and hides the perpendiculars
+  bool m_TestMode; //< if true don't visualize gui
+ 
   
   medCurvilinearAbscissaOnSkeletonHelper *m_CurvilinearAbscissaHelper;
 

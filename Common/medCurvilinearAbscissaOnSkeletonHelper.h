@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.h,v $
   Language:  C++
-  Date:      $Date: 2008-09-05 11:11:58 $
-  Version:   $Revision: 1.6 $
+  Date:      $Date: 2010-03-17 15:43:16 $
+  Version:   $Revision: 1.6.2.1 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -26,7 +26,7 @@ class medCurvilinearAbscissaOnSkeletonHelper : mafObserver
 public:
 
   /** Pass the vme you want to decorate with curvilinear abscissa interface */
-  medCurvilinearAbscissaOnSkeletonHelper(mafVME *inputVME, mafObserver *listener = NULL);
+  medCurvilinearAbscissaOnSkeletonHelper(mafVME *inputVME, mafObserver *listener = NULL, bool testMode = false);
  
   /** Set the polyline graph constraint */
   void SetConstraintPolylineGraph(medVMEPolylineGraph* constraintPolylineGraph);
@@ -97,6 +97,7 @@ private:
 
   int m_GUIActiveBranchId;
   double m_GUICurvilinearAbscissa;
+  bool m_TestMode;
 
   mafObserver *m_Listener;
   mafGUI      *m_Gui;    

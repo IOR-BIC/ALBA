@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medCurvilinearAbscissaOnSkeletonHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 12:24:37 $
-  Version:   $Revision: 1.9.2.1 $
+  Date:      $Date: 2010-03-17 15:43:16 $
+  Version:   $Revision: 1.9.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -351,10 +351,11 @@ vtkIdType &outputVertexId, vtkIdType &outputEdgeID, vtkIdType &outputBranchId)
 }
   
 
-medCurvilinearAbscissaOnSkeletonHelper::medCurvilinearAbscissaOnSkeletonHelper( mafVME *inputVME, mafObserver *listener )
+medCurvilinearAbscissaOnSkeletonHelper::medCurvilinearAbscissaOnSkeletonHelper( mafVME *inputVME, mafObserver *listener, bool testMode)
 {
   m_InputVME = inputVME;
   m_ConstraintVMEPolylineGraph = NULL;
+  m_TestMode = testMode;
   
   m_ConstraintPolylineGraph = NULL; 
   m_ConstraintPolylineGraph = new mafPolylineGraph();
@@ -368,8 +369,10 @@ medCurvilinearAbscissaOnSkeletonHelper::medCurvilinearAbscissaOnSkeletonHelper( 
   m_Listener = listener;
   m_Gui = NULL;
 
-  CreateGui();
-
+  if (!m_TestMode)
+  {
+    CreateGui();
+  }
 }
 
 medCurvilinearAbscissaOnSkeletonHelper::~medCurvilinearAbscissaOnSkeletonHelper()
