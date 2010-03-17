@@ -38,6 +38,8 @@ ADD_EXECUTABLE(vtkPackedImageTest vtkPackedImageTest.h vtkPackedImageTest.cpp)
 ADD_TEST(vtkPackedImageTest ${EXECUTABLE_OUTPUT_PATH}/vtkPackedImageTest)
 ADD_EXECUTABLE(vtkMAFVolumeRayCastMapperTest vtkMAFVolumeRayCastMapperTest.h vtkMAFVolumeRayCastMapperTest.cpp)
 ADD_TEST(vtkMAFVolumeRayCastMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFVolumeRayCastMapperTest)
+ADD_EXECUTABLE(vtkXRayVolumeMapperTest vtkXRayVolumeMapperTest.h vtkXRayVolumeMapperTest.cpp)
+ADD_TEST(vtkXRayVolumeMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkXRayVolumeMapperTest)
 
 
 # wxWidgets specific classes
