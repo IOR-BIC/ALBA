@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-16 08:54:57 $
-Version:   $Revision: 1.1.2.76 $
+Date:      $Date: 2010-03-19 09:55:37 $
+Version:   $Revision: 1.1.2.77 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -577,9 +577,10 @@ int medOpImporterDicomOffis::BuildImages()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]) / step;
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
+  int n_slices = cropInterval / step;
 
-  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
+  if(cropInterval % step != 0)
   {
     n_slices+=1;
   }
@@ -594,6 +595,13 @@ int medOpImporterDicomOffis::BuildImages()
   long progress = 0;
   int count,s_count;
   mafNEW(m_ImagesGroup);
+
+  //Modify name of the image group
+  wxString oldName = m_VolumeName;
+  int pos = oldName.find_last_of('x');
+  m_VolumeName = oldName.Mid(0,pos);
+  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
+
   m_ImagesGroup->SetName(wxString::Format("%s images",m_VolumeName));
   m_ImagesGroup->ReparentTo(m_Input);
   
@@ -694,9 +702,10 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]) / step;
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
+  int n_slices = cropInterval / step;
 
-  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
+  if(cropInterval % step != 0)
   {
     n_slices+=1;
   }
@@ -709,6 +718,13 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
   ImportDicomTags();
 
   mafNEW(m_ImagesGroup);
+
+  //Modify name of the image group
+  wxString oldName = m_VolumeName;
+  int pos = oldName.find_last_of('x');
+  m_VolumeName = oldName.Mid(0,pos);
+  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
+
   m_ImagesGroup->SetName(wxString::Format("%s images",m_VolumeName));
   m_ImagesGroup->ReparentTo(m_Input);
 
@@ -849,8 +865,10 @@ int medOpImporterDicomOffis::BuildVolume()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0])/ step;
-  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
+
+  int n_slices = cropInterval/ step;
+  if(cropInterval % step != 0)
   {
     n_slices+=1;
   }
@@ -1002,6 +1020,12 @@ int medOpImporterDicomOffis::BuildVolume()
     }
   }
 
+  //Modify name of the volume
+  wxString oldName = m_VolumeName;
+  int pos = oldName.find_last_of('x');
+  m_VolumeName = oldName.Mid(0,pos);
+  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
+
   m_Volume->SetName(m_VolumeName);  
 
   if(m_Volume != NULL)
@@ -1023,8 +1047,9 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
   else
     step = m_BuildStepValue + 1;
 
-  int n_slices = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]) / step;
-  if((m_ZCropBounds[1]+1 - m_ZCropBounds[0]) % step != 0)
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
+  int n_slices = cropInterval / step;
+  if(cropInterval % step != 0)
   {
     n_slices+=1;
   }
@@ -1200,6 +1225,12 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     }
   }
 
+  //Modify name of the volume
+  wxString oldName = m_VolumeName;
+  int pos = oldName.find_last_of('x');
+  m_VolumeName = oldName.Mid(0,pos);
+  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
+
   m_Volume->SetName(m_VolumeName);
 
   if(m_Volume != NULL)
@@ -1225,6 +1256,7 @@ int medOpImporterDicomOffis::BuildMesh()
 
   int dim[3];
   m_SliceTexture->GetInput()->GetDimensions(dim);
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
 
   if(!this->m_TestMode)
   {
@@ -1321,6 +1353,12 @@ int medOpImporterDicomOffis::BuildMesh()
   points->Delete();
   grid->Delete();
 
+  //Modify name of the mesh
+  wxString oldName = m_VolumeName;
+  int pos = oldName.find_last_of('x');
+  m_VolumeName = oldName.Mid(0,pos);
+  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
+
   m_Mesh->SetName(m_VolumeName);
 
 
@@ -1342,6 +1380,9 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
   int dim[3];
   m_SliceTexture->GetInput()->GetDimensions(dim);
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
+
+
 
   if(!this->m_TestMode)
   {
@@ -1443,6 +1484,12 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   }
  
+  //Modify name of the mesh
+  wxString oldName = m_VolumeName;
+  int pos = oldName.find_last_of('x');
+  m_VolumeName = oldName.Mid(0,pos);
+  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
+
   m_Mesh->SetName(m_VolumeName);
 
   m_Output = m_Mesh;
