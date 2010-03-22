@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-02-23 16:09:13 $
-  Version:   $Revision: 1.51.2.11 $
+  Date:      $Date: 2010-03-22 11:51:47 $
+  Version:   $Revision: 1.51.2.12 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -325,7 +325,7 @@ void mafViewSlice::VmeCreatePipe(mafNode *vme)
           ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOn();
         else
           ((mafPipeVolumeSlice_BES *)pipe)->ShowTICKsOff();
-
+        ((mafPipeVolumeSlice_BES *)pipe)->SetEnableGPU(m_EnableGPU);
         UpdateText();
       }
       else 

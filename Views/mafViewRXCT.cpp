@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.45.2.8 $
+  Date:      $Date: 2010-03-22 11:48:45 $
+  Version:   $Revision: 1.45.2.9 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -271,6 +271,9 @@ void mafViewRXCT::VmeShow(mafNode *node, bool show)
         mafPipeVolumeSlice_BES *p = NULL;
         // set pipe lookup table
         p = mafPipeVolumeSlice_BES::SafeDownCast(((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->GetNodePipe(node));
+
+        p->SetEnableGPU(m_EnableGPU);
+
         //p->SetColorLookupTable(m_vtkLUT[CT_COMPOUND_VIEW]);
         p->SetColorLookupTable(m_Lut);
         m_Pos[i] = b[5]-step*(i+1);

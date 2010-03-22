@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewOrthoSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.61.2.12 $
+  Date:      $Date: 2010-03-22 11:48:45 $
+  Version:   $Revision: 1.61.2.13 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -728,6 +728,7 @@ void mafViewOrthoSlice::CreateOrthoslicesAndGizmos( mafNode * node )
 	for(int i=0; i<m_NumOfChildView; i++)
 	{
 		mafPipeVolumeSlice_BES *p = (mafPipeVolumeSlice_BES *)((mafViewSlice *)m_ChildViewList[i])->GetNodePipe(m_CurrentVolume);
+    p->SetEnableGPU(m_EnableGPU);
 		p->SetColorLookupTable(m_ColorLUT);
 	}
 	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CHILD_XN_VIEW]))->SetSliceLocalOrigin(m_GizmoHandlePosition);
