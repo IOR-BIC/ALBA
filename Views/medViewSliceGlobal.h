@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medViewSliceGlobal.h,v $
 Language:  C++
-Date:      $Date: 2010-03-04 08:17:30 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-03-22 09:48:42 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2004
@@ -45,6 +45,10 @@ public:
 
   //void Create();
 
+  /** 
+  Set the visualization status for the node (visible, not visible, mutex, ...) \sa mafSceneGraph mafView*/
+  virtual int GetNodeStatus(mafNode *vme);
+
   /** IDs for the view GUI */
   enum VIEW_NEW_GLOBAL_SLICE_WIDGET_ID
   {
@@ -71,7 +75,7 @@ public:
 
   /** Set the origin and normal of the slice 
   Both, Origin and Normal may be NULL, if the current value is to be preserved */
-  virtual void SetSlice(double* Origin, double* Normal = NULL) {Superclass::SetSlice(Origin, Normal);};
+  virtual void SetSlice(double* Origin, double* Normal = NULL);
 
   /** Calculate for every actor the correct slice. */
   virtual void UpdateSlice();
