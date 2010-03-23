@@ -109,6 +109,9 @@ ADD_TEST(medOpCreateWrappedMeterTest ${EXECUTABLE_OUTPUT_PATH}/medOpCreateWrappe
 ADD_EXECUTABLE(medOpFlipNormalsTest medOpFlipNormalsTest.h medOpFlipNormalsTest.cpp)
 ADD_TEST(medOpFlipNormalsTest ${EXECUTABLE_OUTPUT_PATH}/medOpFlipNormalsTest)
 
+ADD_EXECUTABLE(medOpSmoothSurfaceCellsTest medOpSmoothSurfaceCellsTest.h medOpSmoothSurfaceCellsTest.cpp)
+ADD_TEST(medOpSmoothSurfaceCellsTest ${EXECUTABLE_OUTPUT_PATH}/medOpSmoothSurfaceCellsTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
