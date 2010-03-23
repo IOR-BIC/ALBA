@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.h,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.4.2.2 $
+Date:      $Date: 2010-03-23 16:39:05 $
+Version:   $Revision: 1.4.2.3 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -103,8 +103,13 @@ public:
 	/** set the seed ie the cell originating the selection area */
 	void SetSeed(vtkIdType cellSeed);
 
-	/** Set the selection region radius */
+  /** get the seed ie the cell originating the selection area */
+  vtkIdType GetSeed();
+
+	/** Get the selection region radius */
 	double GetDiameter() const { return m_Diameter; };
+  
+  /** Set the selection region radius */
 	void SetDiameter(double val) {m_Diameter = val;};
 
 	/** Mark cells */
@@ -112,6 +117,15 @@ public:
 
 	/** performs flip normals */
 	void SmoothCells();
+
+  /** return true is the i-th cell is selected otherwise return false */
+  bool CellIsSelected(int i);
+
+  /** return the number of interactions for the smooth filter */
+  int GetNumberOfInteractions(){return m_SmoothParameterNumberOfInteractions;};
+
+  /** return the feature angle for the smooth filter */
+  double GetFeatureAngle(){return m_SmoothParameterFeatureAngle;};
 
 protected:
 

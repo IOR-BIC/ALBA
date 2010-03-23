@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpSmoothSurfaceCells.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.3.2.6 $
+Date:      $Date: 2010-03-23 16:39:05 $
+Version:   $Revision: 1.3.2.7 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2007
@@ -390,16 +390,19 @@ void medOpSmoothSurfaceCells::CreateSurfacePipeline()
 {
 	CreateCellFilters();
 
-  if(m_PolydataMapper	==NULL)
-	  m_PolydataMapper	= vtkPolyDataMapper::New();
+  if (!m_TestMode)
+  {
+	  if(m_PolydataMapper	==NULL)
+		  m_PolydataMapper	= vtkPolyDataMapper::New();
+		
+	  m_PolydataMapper->SetInput(m_CellFilter->GetOutput());
+		m_PolydataMapper->ScalarVisibilityOn();
 	
-  m_PolydataMapper->SetInput(m_CellFilter->GetOutput());
-	m_PolydataMapper->ScalarVisibilityOn();
-
-  if(m_PolydataActor == NULL)
-	  m_PolydataActor = vtkActor::New();
-
-	m_PolydataActor->SetMapper(m_PolydataMapper);
+	  if(m_PolydataActor == NULL)
+		  m_PolydataActor = vtkActor::New();
+	
+		m_PolydataActor->SetMapper(m_PolydataMapper);
+  }
 
 }
 //----------------------------------------------------------------------------
@@ -667,6 +670,12 @@ void medOpSmoothSurfaceCells::SetSeed( vtkIdType cellSeed )
 	m_CellSeed = cellSeed;
 }
 //----------------------------------------------------------------------------
+vtkIdType medOpSmoothSurfaceCells::GetSeed()
+//----------------------------------------------------------------------------
+{
+  return m_CellSeed;
+}
+//----------------------------------------------------------------------------
 void medOpSmoothSurfaceCells::FindTriangleCellCenter(vtkIdType id, double center[3])
 //----------------------------------------------------------------------------
 {
@@ -695,6 +704,11 @@ void medOpSmoothSurfaceCells::InitializeMesh()
 {
 	// Build cell structure
 	//
+
+  if (m_Mesh != NULL)
+  {
+    vtkDEL(m_Mesh);
+  }
 	vtkNEW(m_Mesh);
 	vtkPolyData *polydata = m_ResultPolydata;
 	assert(polydata);
@@ -764,6 +778,10 @@ void medOpSmoothSurfaceCells::SmoothCells()
   InitializeMesh();
   // reset structures
   int maxVisitedCells = m_OriginalPolydata->GetNumberOfCells();
+  if (m_VisitedCells != NULL)
+  {
+    delete []m_VisitedCells;
+  }
   m_VisitedCells = new int[maxVisitedCells];
 	for ( int i=0; i < maxVisitedCells; i++ )
 	{
@@ -776,4 +794,18 @@ void medOpSmoothSurfaceCells::MarkCells()
 //----------------------------------------------------------------------------
 {
 	MarkCellsInRadius(m_Diameter/2);  
+}
+//----------------------------------------------------------------------------
+bool medOpSmoothSurfaceCells::CellIsSelected(int i)
+//----------------------------------------------------------------------------
+{
+  if (m_CellFilter->GetOutput()->GetCellData()->GetScalars())
+  {
+    return m_CellFilter->GetOutput()->GetCellData()->GetScalars()->GetTuple1(i)==1;
+  }
+  else
+  {
+    return false;
+  }
+  
 }
