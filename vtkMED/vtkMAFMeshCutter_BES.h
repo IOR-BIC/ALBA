@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter_BES.h,v $
 Language:  C++
-Date:      $Date: 2010-03-10 11:32:58 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-03-24 09:52:16 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -226,45 +226,45 @@ protected:
     vtkIdType id1 ;     
     double lambda ;      // fractional distance of interpolated point along edge
     mapping_type mtype ; // mapping is point-to-edge or point-to-point
-  } EdgeMapping ;
-  std::vector<EdgeMapping> m_edgeMapping ;
+  } EdgeMappingType ;
+  std::vector<EdgeMappingType> EdgeMapping ;
   
-  typedef std::map<unsigned long long, int> InvEdgeMapping;
-  InvEdgeMapping m_invEdgeMapping;    //<maps edges keys to index of edge in m_edgeMapping
+  typedef std::map<unsigned long long, int> InvEdgeMappingType;
+  InvEdgeMappingType InvEdgeMapping;    //<maps edges keys to index of edge in EdgeMapping
   
 
   // This is a list of the input cells which have been touched by the plane.
   // NB this includes some grazing incidence cells which do not create any output polygons,
   // so don't use it to map input and output cells.
-  std::vector<vtkIdType> m_intersectedCells ;
+  std::vector<vtkIdType> IntersectedCells ;
 
   // This is a list of the output point id's in EVERY input cell, including all the empty ones.
   // It is a list of lists.
   //typedef std::vector<vtkIdType> IdList;
-  std::vector<vtkIdType>* m_pointsInCells ;
+  std::vector<vtkIdType>* PointsInCells ;
 
   // This is a mapping from the output cells to the input cells: 
-  // cellid_in = m_cellMapping[cellid_out]
+  // cellid_in = CellMapping[cellid_out]
   // It is set in CreateSlice()
-  std::vector<vtkIdType>m_cellMapping ;
+  std::vector<vtkIdType>CellMapping ;
 
   // cutting function
-  vtkPlane *m_cutFunction ;
+  vtkPlane *CutFunction ;
 
   // input and output
-  vtkUnstructuredGrid *m_unstructGrid ;
-  vtkPolyData *m_polydata ;
+  vtkUnstructuredGrid *UnstructGrid ;
+  vtkPolyData *Polydata ;
 
   //points coordinates (to speed up the processing)
-  double* m_PointsCoords;       //<data of points (in doubles)  
-  bool m_bReleasePointsCoords;  //<false if the array m_PointsData may not be released
+  double* PointsCoords;       //<data of points (in doubles)  
+  bool BReleasePointsCoords;  //<false if the array m_PointsData may not be released
 
-  vtkUnstructuredGrid* m_LastInput;     //<stored last processed input
-  unsigned long m_LastInputTimeStamp;   //<timestamp for last input
+  vtkUnstructuredGrid* LastInput;     //<stored last processed input
+  unsigned long LastInputTimeStamp;   //<timestamp for last input
 
-  vtkIdList* m_idlist0;   //<GetCellNeighboursOfEdge list
-  vtkIdList* m_idlist1;   //<GetCellNeighboursOfEdge list
-  vtkIdList* m_ptlist;    //<ConstructCellSlicePolygon list
+  vtkIdList* Idlist0;   //<GetCellNeighboursOfEdge list
+  vtkIdList* Idlist1;   //<GetCellNeighboursOfEdge list
+  vtkIdList* Ptlist;    //<ConstructCellSlicePolygon list
 } ;
 
 //------------------------------------------------------------------------------
@@ -274,10 +274,10 @@ protected:
 inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, const Edge& edge, double lambda)
 //------------------------------------------------------------------------------
 {
-  EdgeMapping em = {idout, edge.id0, edge.id1, lambda, POINT_TO_EDGE} ;
-  m_edgeMapping.push_back(em);
+  EdgeMappingType em = {idout, edge.id0, edge.id1, lambda, POINT_TO_EDGE} ;
+  EdgeMapping.push_back(em);
 
-  m_invEdgeMapping.insert(InvEdgeMapping::value_type(GetEdgeKey(edge), m_edgeMapping.size() - 1));
+  InvEdgeMapping.insert(InvEdgeMappingType::value_type(GetEdgeKey(edge), EdgeMapping.size() - 1));
 }
 
 //------------------------------------------------------------------------------
@@ -287,10 +287,10 @@ inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, const Edge& edge, 
 inline void vtkMAFMeshCutter_BES::AddMapping(vtkIdType idout, vtkIdType id0, double lambda)
 //------------------------------------------------------------------------------
 {  
-  EdgeMapping em = {idout, id0, undefinedId, lambda, POINT_TO_POINT} ;
-  m_edgeMapping.push_back(em) ;
+  EdgeMappingType em = {idout, id0, undefinedId, lambda, POINT_TO_POINT} ;
+  EdgeMapping.push_back(em) ;
   
-  m_invEdgeMapping.insert(InvEdgeMapping::value_type(id0, m_edgeMapping.size() - 1));
+  InvEdgeMapping.insert(InvEdgeMappingType::value_type(id0, EdgeMapping.size() - 1));
 }
 
 //------------------------------------------------------------------------
@@ -317,9 +317,9 @@ inline bool vtkMAFMeshCutter_BES::GetInputEdgeCutByPoint(vtkIdType idout, vtkIdT
 //------------------------------------------------------------------------------
 {
   //RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
-  //idout is the index into m_edgeMapping, thus we do not need search for it
-  assert(idout >= 0 && idout < (int)m_edgeMapping.size());
-  const EdgeMapping& edge = m_edgeMapping[idout];
+  //idout is the index into EdgeMapping, thus we do not need search for it
+  assert(idout >= 0 && idout < (int)EdgeMapping.size());
+  const EdgeMappingType& edge = EdgeMapping[idout];
   if (edge.mtype != POINT_TO_EDGE)
     return false;
 
@@ -338,9 +338,9 @@ inline bool vtkMAFMeshCutter_BES::GetInputPointCutByPoint(vtkIdType idout, vtkId
 //------------------------------------------------------------------------------
 {
   //RELEASE NOTE: as AddMapping is called in a pair with InsertNextPoint in the current version,
-  //idout is the index into m_edgeMapping, thus we do not need search for it
-  assert(idout >= 0 && idout < (int)m_edgeMapping.size());
-  const EdgeMapping& edge = m_edgeMapping[idout];
+  //idout is the index into EdgeMapping, thus we do not need search for it
+  assert(idout >= 0 && idout < (int)EdgeMapping.size());
+  const EdgeMappingType& edge = EdgeMapping[idout];
   if (edge.mtype != POINT_TO_POINT)
     return false;
 
@@ -356,8 +356,8 @@ inline bool vtkMAFMeshCutter_BES::GetInputPointCutByPoint(vtkIdType idout, vtkId
 inline vtkIdType vtkMAFMeshCutter_BES::GetInputCellCutByOutputCell(vtkIdType idout)
 //------------------------------------------------------------------------------
 {  
-  assert(idout >= 0 && idout < (int)m_cellMapping.size());
-  return m_cellMapping[idout] ;
+  assert(idout >= 0 && idout < (int)CellMapping.size());
+  return CellMapping[idout] ;
 }
 
 //------------------------------------------------------------------------------
@@ -369,9 +369,9 @@ inline vtkIdType vtkMAFMeshCutter_BES::GetInputCellCutByOutputCell(vtkIdType ido
 inline int vtkMAFMeshCutter_BES::GetIntersectionOfEdgeWithPlane(const Edge& edge, double *coords, double *lambda) const
 //------------------------------------------------------------------------------
 {
-  return GetIntersectionOfLineWithPlane(&m_PointsCoords[3*edge.id0], 
-    &m_PointsCoords[3*edge.id1], m_cutFunction->GetOrigin(), 
-    m_cutFunction->GetNormal(), coords, lambda) ;
+  return GetIntersectionOfLineWithPlane(&PointsCoords[3*edge.id0], 
+    &PointsCoords[3*edge.id1], CutFunction->GetOrigin(), 
+    CutFunction->GetNormal(), coords, lambda) ;
 }
 
 //------------------------------------------------------------------------------

@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-11-19 10:43:53 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2010-03-24 09:53:28 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -78,11 +78,11 @@ protected:
   class CMeshVertexParametrization
   {
   public:
-    CSkeletonEdge* m_pEdge;   //<the governing edge      
-    double m_PCoords[3];      //<a,b,c parametric coordinates
-    int m_nOriginPos;         //<0 or 1 to define the origin of LF
-    double m_dblRm;           //<elongation factor, 0.0, if there is no elongation    
-    double m_dblWeight;       //<weighting factor
+    CSkeletonEdge* PEdge;   //<the governing edge      
+    double PCoords[3];      //<a,b,c parametric coordinates
+    int NOriginPos;         //<0 or 1 to define the origin of LF
+    double DblRm;           //<elongation factor, 0.0, if there is no elongation    
+    double DblWeight;       //<weighting factor
 
   public:
     CMeshVertexParametrization() {

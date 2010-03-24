@@ -2,8 +2,8 @@
 Program: Multimod Application Framework RELOADED 
 Module: $RCSfile: vtkMEDPolyDataDeformation.cpp,v $ 
 Language: C++ 
-Date: $Date: 2009-11-19 10:43:53 $ 
-Version: $Revision: 1.1.2.3 $ 
+Date: $Date: 2010-03-24 09:53:28 $ 
+Version: $Revision: 1.1.2.4 $ 
 Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
 ========================================================================== 
 Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -35,7 +35,7 @@ See the COPYINGS file for license details
 
 
 
-vtkCxxRevisionMacro(vtkMEDPolyDataDeformation, "$Revision: 1.1.2.3 $");
+vtkCxxRevisionMacro(vtkMEDPolyDataDeformation, "$Revision: 1.1.2.4 $");
 vtkStandardNewMacro(vtkMEDPolyDataDeformation);
 
 #include "mafMemDbg.h"
@@ -2085,8 +2085,8 @@ void vtkMEDPolyDataDeformation::ComputeMeshParametrization()
       CSkeletonEdge* pEdge = SuperSkeleton->m_pOC_Skel->Edges[i];        
       CMeshVertexParametrization* pParams = &(MeshVertices[nPtId][i]);
       
-      pParams->m_pEdge = pEdge;
-      pParams->m_nOriginPos = 0;
+      pParams->PEdge = pEdge;
+      pParams->NOriginPos = 0;
 
       //detect the edge configuration        
       bool bInfEdge = true;
@@ -2096,7 +2096,7 @@ void vtkMEDPolyDataDeformation::ComputeMeshParametrization()
       else if (pEdge->m_Verts[0] == NULL)
       {
         pSkelVerts[0] = pSkelVerts[1] = pEdge->m_Verts[1];
-        pParams->m_nOriginPos = 1;
+        pParams->NOriginPos = 1;
       }
       else
       {      
@@ -2105,7 +2105,7 @@ void vtkMEDPolyDataDeformation::ComputeMeshParametrization()
         bInfEdge = false;
       }           
 
-      CSkeletonVertex* pSkelVert = pSkelVerts[pParams->m_nOriginPos];
+      CSkeletonVertex* pSkelVert = pSkelVerts[pParams->NOriginPos];
 
       //compute a, b, c parametrization for pVertex such that
       //pcoords = pSkelVert->coords + a*LF.u + b*LF.v + c*LF.w
@@ -2154,10 +2154,10 @@ void vtkMEDPolyDataDeformation::ComputeMeshParametrization()
         }
       }
 
-      pParams->m_PCoords[2] = M[2][3] / M[2][2];
-      pParams->m_PCoords[1] = (M[1][3] - pParams->m_PCoords[2]*M[1][2]) / M[1][1];
-      pParams->m_PCoords[0] = (M[0][3] - pParams->m_PCoords[2]*M[0][2] - 
-        pParams->m_PCoords[1]*M[0][1]) / M[0][0];
+      pParams->PCoords[2] = M[2][3] / M[2][2];
+      pParams->PCoords[1] = (M[1][3] - pParams->PCoords[2]*M[1][2]) / M[1][1];
+      pParams->PCoords[0] = (M[0][3] - pParams->PCoords[2]*M[0][2] - 
+        pParams->PCoords[1]*M[0][1]) / M[0][0];
 
 #ifdef DEBUG_vtkMEDPolyDataDeformation
       double backprj[3];
@@ -2165,9 +2165,9 @@ void vtkMEDPolyDataDeformation::ComputeMeshParametrization()
       {
         //pSkelVert->coords + a*LF.u + b*LF.v + c*LF.w
         backprj[k] = pSkelVert->m_Coords[k] + 
-          pParams->m_PCoords[0]*pSkelVert->m_LF.u[k] + 
-          pParams->m_PCoords[1]*pSkelVert->m_LF.v[k] + 
-          pParams->m_PCoords[2]*pSkelVert->m_LF.w[k];
+          pParams->PCoords[0]*pSkelVert->m_LF.u[k] + 
+          pParams->PCoords[1]*pSkelVert->m_LF.v[k] + 
+          pParams->PCoords[2]*pSkelVert->m_LF.w[k];
 
         _ASSERT(fabs(backprj[k] - pcoords[k]) <= 1e-5);
       }
@@ -2194,33 +2194,33 @@ void vtkMEDPolyDataDeformation::ComputeMeshParametrization()
       if (w <= 0.0)  
       { //we are before the edge => the first node is the closest one
         lw = /*dblDiag +*/ vtkMath::Distance2BetweenPoints(ptEnd, 
-          pSkelVerts[pParams->m_nOriginPos]->m_Coords);
-        pParams->m_dblRm = 0.0;          
+          pSkelVerts[pParams->NOriginPos]->m_Coords);
+        pParams->DblRm = 0.0;          
       }
       else if (w >= EdgeLengths[i]) 
       {
         //we are after the edge => the other node is the closest one
         lw = /*dblDiag +*/ vtkMath::Distance2BetweenPoints(ptEnd, 
-          pSkelVerts[1 - pParams->m_nOriginPos]->m_Coords);
+          pSkelVerts[1 - pParams->NOriginPos]->m_Coords);
         
-        pParams->m_dblRm = 1.0;          
+        pParams->DblRm = 1.0;          
       }
       else
       {
         //closest point lies on the edge
         lw = 0.0;
-        pParams->m_dblRm = w / EdgeLengths[i];
+        pParams->DblRm = w / EdgeLengths[i];
       }        
           
       //weight decreases with the square (typical physical behavior)
-      pParams->m_dblWeight = 1.0 / (0.0001 + lw + rw/*((1.0 + lw)*rw)*/);  //0.0001 is here if any point lies on the edge
-      dblWSum += pParams->m_dblWeight;
+      pParams->DblWeight = 1.0 / (0.0001 + lw + rw/*((1.0 + lw)*rw)*/);  //0.0001 is here if any point lies on the edge
+      dblWSum += pParams->DblWeight;
     } //end for i (edges)
 
     for (int i = 0; i < nCount; i++)
     {
       CMeshVertexParametrization* pParams = &(MeshVertices[nPtId][i]);
-      pParams->m_dblWeight /= dblWSum;
+      pParams->DblWeight /= dblWSum;
     }
   } //end for (points)
 
@@ -2266,13 +2266,13 @@ void vtkMEDPolyDataDeformation::DeformMesh(vtkPolyData* output)
     for (int j = 0; j < nCount; j++)
     {
       CMeshVertexParametrization* pParam = &(MeshVertices[i][j]);    
-      CSkeletonVertex* pSkelVert = pParam->m_pEdge->m_pMatch->
-        m_Verts[pParam->m_nOriginPos];
+      CSkeletonVertex* pSkelVert = pParam->PEdge->m_pMatch->
+        m_Verts[pParam->NOriginPos];
 
       double thisCoords[3];
-      if (pParam->m_dblRm <= 0.0 || 
-        pParam->m_pEdge->m_pMatch->m_Verts[0] == NULL ||
-        pParam->m_pEdge->m_pMatch->m_Verts[1] == NULL
+      if (pParam->DblRm <= 0.0 || 
+        pParam->PEdge->m_pMatch->m_Verts[0] == NULL ||
+        pParam->PEdge->m_pMatch->m_Verts[1] == NULL
         //pParam->m_dblRm >= 1.0)
         )
       {
@@ -2281,22 +2281,22 @@ void vtkMEDPolyDataDeformation::DeformMesh(vtkPolyData* output)
         for (int k = 0; k < 3; k++) 
         {
           thisCoords[k] = (pSkelVert->m_Coords[k] + 
-            pParam->m_PCoords[0]*pSkelVert->m_LF.u[k] + 
-            pParam->m_PCoords[1]*pSkelVert->m_LF.v[k] + 
-            pParam->m_PCoords[2]*pSkelVert->m_LF.w[k]);            
+            pParam->PCoords[0]*pSkelVert->m_LF.u[k] + 
+            pParam->PCoords[1]*pSkelVert->m_LF.v[k] + 
+            pParam->PCoords[2]*pSkelVert->m_LF.w[k]);            
         }
       }
       else
       {     
         //the control edge is well defined => we need to incorporate elongation of edge                    
-        double w = pParam->m_dblRm * EdgeLengths[j];
+        double w = pParam->DblRm * EdgeLengths[j];
         for (int k = 0; k < 3; k++)
         {
           //vmo = Pk1 + b*v1 + c*w1
           thisCoords[k] = (pSkelVert->m_Coords[k] + 
             pSkelVert->m_LF.u[k]*w + 
-            pParam->m_PCoords[1]*pSkelVert->m_LF.v[k] + 
-            pParam->m_PCoords[2]*pSkelVert->m_LF.w[k]);            
+            pParam->PCoords[1]*pSkelVert->m_LF.v[k] + 
+            pParam->PCoords[2]*pSkelVert->m_LF.w[k]);            
         }
 
         if (this->PreserveVolume)
@@ -2329,7 +2329,7 @@ void vtkMEDPolyDataDeformation::DeformMesh(vtkPolyData* output)
       } //end else both vertices exist
 
       for (int k = 0; k < 3; k++){
-        newCoords[k] += thisCoords[k]*pParam->m_dblWeight;
+        newCoords[k] += thisCoords[k]*pParam->DblWeight;
       }
     }
 

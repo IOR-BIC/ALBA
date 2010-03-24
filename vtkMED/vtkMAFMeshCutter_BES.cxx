@@ -3,8 +3,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFMeshCutter_BES.cxx,v $
 Language:  C++
-Date:      $Date: 2009-05-13 15:51:38 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-03-24 09:52:16 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Nigel McFarlane
 
 ================================================================================
@@ -35,7 +35,7 @@ All rights reserved.
 
 //------------------------------------------------------------------------------
 // standard macros
-vtkCxxRevisionMacro(vtkMAFMeshCutter_BES, "$Revision: 1.1.2.1 $");
+vtkCxxRevisionMacro(vtkMAFMeshCutter_BES, "$Revision: 1.1.2.2 $");
 vtkStandardNewMacro(vtkMAFMeshCutter_BES);
 //------------------------------------------------------------------------------
 #include "mafMemDbg.h"
@@ -51,20 +51,20 @@ vtkStandardNewMacro(vtkMAFMeshCutter_BES);
 vtkMAFMeshCutter_BES::vtkMAFMeshCutter_BES()
 //------------------------------------------------------------------------------
 {
-  m_cutFunction = NULL ;
-  m_unstructGrid = vtkUnstructuredGrid::New() ;
+  CutFunction = NULL ;
+  UnstructGrid = vtkUnstructuredGrid::New() ;
 
-  m_PointsCoords = NULL;
-  m_bReleasePointsCoords = false;
+  PointsCoords = NULL;
+  BReleasePointsCoords = false;
 
-  m_LastInput = NULL;
-  m_LastInputTimeStamp = 0;
+  LastInput = NULL;
+  LastInputTimeStamp = 0;
 
-  m_idlist0 = vtkIdList::New() ;
-  m_idlist1 = vtkIdList::New() ;
-  m_ptlist = vtkIdList::New();
+  Idlist0 = vtkIdList::New() ;
+  Idlist1 = vtkIdList::New() ;
+  Ptlist = vtkIdList::New();
 
-  m_pointsInCells = NULL;
+  PointsInCells = NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -72,17 +72,17 @@ vtkMAFMeshCutter_BES::vtkMAFMeshCutter_BES()
 vtkMAFMeshCutter_BES::~vtkMAFMeshCutter_BES()
 //------------------------------------------------------------------------------
 {
-  m_unstructGrid->Delete() ;
-  m_idlist0->Delete();
-  m_idlist1->Delete();
-  m_ptlist->Delete();
+  UnstructGrid->Delete() ;
+  Idlist0->Delete();
+  Idlist1->Delete();
+  Ptlist->Delete();
 
-  if (m_bReleasePointsCoords) {
-    delete[] m_PointsCoords;
-    m_PointsCoords = NULL;
+  if (BReleasePointsCoords) {
+    delete[] PointsCoords;
+    PointsCoords = NULL;
   }
 
-  delete[] m_pointsInCells; 
+  delete[] PointsInCells; 
 }
 
 //------------------------------------------------------------------------------
@@ -94,9 +94,9 @@ unsigned long vtkMAFMeshCutter_BES::GetMTime()
   unsigned long mTime = this->vtkUnstructuredGridToPolyDataFilter::GetMTime();
   unsigned long time;
 
-  if (m_cutFunction != NULL )
+  if (CutFunction != NULL )
   {
-    time = m_cutFunction->GetMTime();
+    time = CutFunction->GetMTime();
     mTime = ( time > mTime ? time : mTime );
   }
 
@@ -109,37 +109,37 @@ void vtkMAFMeshCutter_BES::Execute()
 //------------------------------------------------------------------------------
 {
   vtkUnstructuredGrid* input = this->GetInput();
-  if (m_LastInput != input || m_LastInputTimeStamp != input->GetMTime())
+  if (LastInput != input || LastInputTimeStamp != input->GetMTime())
   {
     // Make a copy of the input data and build links
     // Can't just set a pointer because BuildLinks() would change the input.
-    m_unstructGrid->Initialize() ;
-    m_unstructGrid->DeepCopy(input) ;
-    m_unstructGrid->BuildLinks() ;
+    UnstructGrid->Initialize() ;
+    UnstructGrid->DeepCopy(input) ;
+    UnstructGrid->BuildLinks() ;
 
     //and now get points (so we can avoid calling slow GetPoint later)
-    if (m_bReleasePointsCoords) {
-      delete[] m_PointsCoords;
-      m_PointsCoords = NULL;
+    if (BReleasePointsCoords) {
+      delete[] PointsCoords;
+      PointsCoords = NULL;
     }
 
-    vtkDataArray* pda = m_unstructGrid->GetPoints()->GetData();
+    vtkDataArray* pda = UnstructGrid->GetPoints()->GetData();
     if (pda->GetDataType() == VTK_DOUBLE && pda->GetNumberOfComponents() == 3)
     {
-      m_PointsCoords = (double*)pda->GetVoidPointer(0);
-      m_bReleasePointsCoords = false;
+      PointsCoords = (double*)pda->GetVoidPointer(0);
+      BReleasePointsCoords = false;
     }
     else
     {
       //allocate buffer, NB. if the number of components is larger than 3, we need to allocate more
       //as GetTuple expect that the buffer is capable to hold NumberOfComponents elements
       vtkIdType nCount = pda->GetNumberOfTuples();
-      m_PointsCoords = new double[(nCount - 1)* 3 + pda->GetNumberOfComponents()];
-      memset(m_PointsCoords, 0, nCount*3*sizeof(double));
-      m_bReleasePointsCoords = true;
+      PointsCoords = new double[(nCount - 1)* 3 + pda->GetNumberOfComponents()];
+      memset(PointsCoords, 0, nCount*3*sizeof(double));
+      BReleasePointsCoords = true;
 
       //get coordinates (in doubles)
-      double* pCurPt = m_PointsCoords;
+      double* pCurPt = PointsCoords;
       for (vtkIdType i = 0; i < nCount; i++)
       {
         pda->GetTuple(i, pCurPt);
@@ -147,18 +147,18 @@ void vtkMAFMeshCutter_BES::Execute()
       }
     }    
 
-    m_LastInput = input;
-    m_LastInputTimeStamp = input->GetMTime();
+    LastInput = input;
+    LastInputTimeStamp = input->GetMTime();
   }
 
   // Set pointer to output
-  m_polydata = this->GetOutput() ;
+  Polydata = this->GetOutput() ;
 
   // Make sure the cutter is cleared of previous data before you run it !
   Initialize() ;
 
   // make sure the output is empty
-  m_polydata->Initialize() ;
+  Polydata->Initialize() ;
   
   // Run the cutter
   CreateSlice() ;  
@@ -170,7 +170,7 @@ void vtkMAFMeshCutter_BES::Execute()
 void vtkMAFMeshCutter_BES::SetCutFunction(vtkPlane *P)
 //------------------------------------------------------------------------------
 {
-  m_cutFunction = P ;
+  CutFunction = P ;
 }
 
 //------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ void vtkMAFMeshCutter_BES::SetCutFunction(vtkPlane *P)
 vtkPlane* vtkMAFMeshCutter_BES::GetCutFunction()
 //------------------------------------------------------------------------------
 {
-  return m_cutFunction ;
+  return CutFunction ;
 }
 
 //------------------------------------------------------------------------------
@@ -188,11 +188,11 @@ bool vtkMAFMeshCutter_BES::GetOutputPointWhichCutsEdge(vtkIdType id0, vtkIdType 
 //------------------------------------------------------------------------------
 {
   unsigned long long key = GetEdgeKey(id0, id1);
-  InvEdgeMapping::const_iterator it = m_invEdgeMapping.find(key);
-  if (it == m_invEdgeMapping.end())
+  InvEdgeMappingType::const_iterator it = InvEdgeMapping.find(key);
+  if (it == InvEdgeMapping.end())
     return false; //not found
 
-  const EdgeMapping& edge = m_edgeMapping[it->second];
+  const EdgeMappingType& edge = EdgeMapping[it->second];
   assert(edge.mtype == POINT_TO_EDGE);
   *idout = edge.idout;
   *lambda = edge.lambda;
@@ -206,11 +206,11 @@ bool vtkMAFMeshCutter_BES::GetOutputPointWhichCutsPoint(vtkIdType id0, vtkIdType
 //------------------------------------------------------------------------------
 {    
   unsigned long long key = id0;
-  InvEdgeMapping::const_iterator it = m_invEdgeMapping.find(key);
-  if (it == m_invEdgeMapping.end())
+  InvEdgeMappingType::const_iterator it = InvEdgeMapping.find(key);
+  if (it == InvEdgeMapping.end())
     return false; //not found
 
-  const EdgeMapping& edge = m_edgeMapping[it->second];
+  const EdgeMappingType& edge = EdgeMapping[it->second];
   assert(edge.mtype == POINT_TO_POINT);
   *idout = edge.idout;  
   return true;
@@ -226,8 +226,8 @@ bool vtkMAFMeshCutter_BES::GetOutputCellWhichCutsInputCell(vtkIdType idin, vtkId
   unsigned int i ;
   bool found ;
 
-  for (i = 0, found = false ;  i < m_cellMapping.size() ;  i++){
-    if (m_cellMapping[i] == idin){
+  for (i = 0, found = false ;  i < CellMapping.size() ;  i++){
+    if (CellMapping[i] == idin){
       found = true ;
       *idout = i ;
     }
@@ -292,7 +292,7 @@ void vtkMAFMeshCutter_BES::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *i
 //-----------------------------------------------------------------------------
 {
   // get cell neighbours of point
-  vtkCellLinks::Link& lnk = m_unstructGrid->GetCellLinks()->GetLink(idpt);
+  vtkCellLinks::Link& lnk = UnstructGrid->GetCellLinks()->GetLink(idpt);
   vtkIdType* dstList = idlist->WritePointer(0, lnk.ncells);
   
   // copy cell id's to idlist
@@ -304,18 +304,18 @@ void vtkMAFMeshCutter_BES::GetCellNeighboursOfPoint(vtkIdType idpt, vtkIdList *i
 void vtkMAFMeshCutter_BES::GetCellNeighboursOfEdge(const Edge& edge, vtkIdList *idlist) const
 //-----------------------------------------------------------------------------
 {
-  m_idlist0->Reset();
-  m_idlist1->Reset();  
+  Idlist0->Reset();
+  Idlist1->Reset();  
   
   // list cell neighbours of both endpoints of edge 
-  GetCellNeighboursOfPoint(edge.id0, m_idlist0) ;
-  GetCellNeighboursOfPoint(edge.id1, m_idlist1) ;
+  GetCellNeighboursOfPoint(edge.id0, Idlist0) ;
+  GetCellNeighboursOfPoint(edge.id1, Idlist1) ;
   
   // copy cell id's to idlist if they are in both lists
-  vtkIdType* pList0 = m_idlist0->GetPointer(0);
-  vtkIdType* pList1 = m_idlist1->GetPointer(0);
-  int n0 = m_idlist0->GetNumberOfIds();
-  int n1 = m_idlist1->GetNumberOfIds();
+  vtkIdType* pList0 = Idlist0->GetPointer(0);
+  vtkIdType* pList1 = Idlist1->GetPointer(0);
+  int n0 = Idlist0->GetNumberOfIds();
+  int n1 = Idlist1->GetNumberOfIds();
 
   vtkIdType* pListOut = idlist->WritePointer(0, n0 + n1);
   int nCount = 0; //number of items in output list
@@ -349,7 +349,7 @@ bool vtkMAFMeshCutter_BES::GetIntersectionOfBoundsWithPlane(const double *origin
 //------------------------------------------------------------------------
 {
   double DataBounds[3][2];
-  m_unstructGrid->GetBounds(&DataBounds[0][0]);  
+  UnstructGrid->GetBounds(&DataBounds[0][0]);  
 
   //intersect the cutting plane ax + by + cz + d = 0, where (a,b,c) is normal GlobalPlaneAxisZ
   //and d can is computed so the plane goes through GlobalPlaneOrigin with the bounding box
@@ -397,8 +397,8 @@ bool vtkMAFMeshCutter_BES::GetIntersectionOfBoundsWithPlane(const double *origin
 vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
 //------------------------------------------------------------------------
 {
-  double* origin = m_cutFunction->GetOrigin();
-  double* normal = m_cutFunction->GetNormal();
+  double* origin = CutFunction->GetOrigin();
+  double* normal = CutFunction->GetNormal();
 
   vtkIdList* cellIds = vtkIdList::New();
   cellIds->Allocate(8);  
@@ -406,7 +406,7 @@ vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
   //we need to check every point in the worst case 
   //so prepare a stack capable to hold ids of every point
   //and bit array where nonzero bits mean that the point was already checked 
-  int np = m_unstructGrid->GetNumberOfPoints();
+  int np = UnstructGrid->GetNumberOfPoints();
   vtkIdType* stckTocheck = new vtkIdType[np];
   int SP = 0; //stack to be used for points
 
@@ -424,14 +424,14 @@ vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
     vtkIdType ptsCellId = stckTocheck[--SP];    //get the point to be checked    
 
     //get list of cells around the current point
-    m_unstructGrid->GetPointCells(ptsCellId, cellIds);
+    UnstructGrid->GetPointCells(ptsCellId, cellIds);
     int nc = cellIds->GetNumberOfIds();
     
     vtkIdType* pCellIdsPtr = cellIds->GetPointer(0);
     for (int i = 0; i < nc; i++)
     {
       vtkIdType cellId = pCellIdsPtr[i];
-      vtkCell* cell = m_unstructGrid->GetCell(cellId);
+      vtkCell* cell = UnstructGrid->GetCell(cellId);
 
       //check every edge, if it is not intersected
       int ne = cell->GetNumberOfEdges() ;
@@ -444,8 +444,8 @@ vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
 
         // find if and where edge crosses plane
         double coords[3], lambda;    
-        int itype = GetIntersectionOfLineWithPlane(&m_PointsCoords[3*ids[0]], 
-          &m_PointsCoords[3*ids[1]], origin, normal, coords, &lambda);   
+        int itype = GetIntersectionOfLineWithPlane(&PointsCoords[3*ids[0]], 
+          &PointsCoords[3*ids[1]], origin, normal, coords, &lambda);   
 
         if (itype != NO_INTERSECTION)
         {
@@ -480,18 +480,18 @@ vtkIdType vtkMAFMeshCutter_BES::GetFirstIntersectedCell(vtkIdType ptId)
 
 //------------------------------------------------------------------------------
 // Find where the edges cross the plane and create polydata points
-// It creates the table m_edgeMapping which maps output points to the input mesh.
-// It also creates m_intersectedCells, which is a list of the input cells which were intersected.
+// It creates the table EdgeMapping which maps output points to the input mesh.
+// It also creates IntersectedCells, which is a list of the input cells which were intersected.
 void vtkMAFMeshCutter_BES::FindPointsInPlane()
 //------------------------------------------------------------------------------
 {
-  double* origin = m_cutFunction->GetOrigin();
-  double* normal = m_cutFunction->GetNormal();
+  double* origin = CutFunction->GetOrigin();
+  double* normal = CutFunction->GetNormal();
 
   //we need to check every cell in the worst case 
   //so prepare a stack capable to hold ids of every cell
   //and bit array where nonzero bits mean that the cell was already checked 
-  int nc = m_unstructGrid->GetNumberOfCells();
+  int nc = UnstructGrid->GetNumberOfCells();
   vtkIdType* stckTocheck = new vtkIdType[nc];
   int SP = 0; //stack to be used for cells
 
@@ -510,7 +510,7 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
   //if points are uniformly distributed, then there is N^(2/3) points in one slice
   //sqrt is, however, more easy to calculate
   vtkPoints *points = vtkPoints::New();  
-  points->Allocate((int)sqrt((float)m_unstructGrid->GetNumberOfPoints()));
+  points->Allocate((int)sqrt((float)UnstructGrid->GetNumberOfPoints()));
 
   //check if the plane cuts the bounding box
   double ptsInter[3];
@@ -525,7 +525,7 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
     //long as it returns >= 0 (and we need to mark cells that were processed) 
 
     //get the closest mesh point and find the first intersected cell searching from that point
-    vtkIdType ptsCellId = m_unstructGrid->FindPoint(ptsInter);
+    vtkIdType ptsCellId = UnstructGrid->FindPoint(ptsInter);
     vtkIdType cellId = GetFirstIntersectedCell(ptsCellId >= 0 ? ptsCellId : 0);            
     if (cellId >= 0)
     {        
@@ -540,7 +540,7 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
         cellId = stckTocheck[--SP];      
         bool found = false;
 
-        vtkCell* cell = m_unstructGrid->GetCell(cellId);
+        vtkCell* cell = UnstructGrid->GetCell(cellId);
         int ne = cell->GetNumberOfEdges() ;
         for (int j = 0; j < ne ; j++)
         {
@@ -552,8 +552,8 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
           double coords[3], lambda ;
           vtkIdType idout, idtemp ;
           double lamtemp ;
-          int itype = GetIntersectionOfLineWithPlane(&m_PointsCoords[3*id0], 
-            &m_PointsCoords[3*id1], origin, normal, coords, &lambda);
+          int itype = GetIntersectionOfLineWithPlane(&PointsCoords[3*id0], 
+            &PointsCoords[3*id1], origin, normal, coords, &lambda);
 
           if (itype != NO_INTERSECTION)
           {
@@ -590,11 +590,11 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
           // This means that the edge only touches the plane at the endpoints.
           // Here we add both the endpoints to the array and map them to the ends of the edge.
           if (!GetOutputPointWhichCutsPoint(id0, &idtemp)){
-            idout = points->InsertNextPoint(&m_PointsCoords[3*id0]);              
+            idout = points->InsertNextPoint(&PointsCoords[3*id0]);              
             AddMapping(idout, id0, 1.0) ;
           }
           if (!GetOutputPointWhichCutsPoint(id1, &idtemp)){
-            idout = points->InsertNextPoint(&m_PointsCoords[3*id1]) ;
+            idout = points->InsertNextPoint(&PointsCoords[3*id1]) ;
             AddMapping(idout, id1, 1.0) ;
           }
           found = true ;
@@ -606,7 +606,7 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
             edgesIdsPtr[0] = id0;
             edgesIdsPtr[1] = id1;
 
-            m_unstructGrid->GetCellNeighbors(cellId, edgeIds, cellsIds);
+            UnstructGrid->GetCellNeighbors(cellId, edgeIds, cellsIds);
             int nac = cellsIds->GetNumberOfIds();
             vtkIdType* pCellIdsPtr = cellsIds->GetPointer(0);
             for (int k = 0; k < nac; k++)
@@ -626,14 +626,14 @@ void vtkMAFMeshCutter_BES::FindPointsInPlane()
 
         if (found){
           // note that cell i has been intersected
-          m_intersectedCells.push_back(cellId) ;
+          IntersectedCells.push_back(cellId) ;
         }
       } //end while
     }
   }
 
   points->Squeeze();
-  m_polydata->SetPoints(points) ;
+  Polydata->SetPoints(points) ;
   points->Delete();
 
   edgeIds->Delete();
@@ -664,7 +664,7 @@ void vtkMAFMeshCutter_BES::GetInputCellsOnOutputPoint(vtkIdType idout, vtkIdList
 }
 
 //------------------------------------------------------------------------------
-// Create and fill table of cells, m_pointsInCells.
+// Create and fill table of cells, PointsInCells.
 // There is an entry for every input cell.
 // Entry i is the list of output points in input cell i.
 void vtkMAFMeshCutter_BES::AssignPointsToCells()
@@ -674,7 +674,7 @@ void vtkMAFMeshCutter_BES::AssignPointsToCells()
   vtkIdList *cellids = vtkIdList::New() ;
 
   // loop through all the points in the output polydata
-  for (i = 0; i < m_polydata->GetNumberOfPoints();  i++)
+  for (i = 0; i < Polydata->GetNumberOfPoints();  i++)
   {
     // get the input cells associated with this point
     cellids->Reset() ;    //Reset is faster than Initialize
@@ -685,7 +685,7 @@ void vtkMAFMeshCutter_BES::AssignPointsToCells()
     for (j = 0;  j < nids;  j++){
       // get the cell id and its list of points
       // add point i to the list of points
-      std::vector<vtkIdType>& pointslistref = m_pointsInCells[cellidPtr[j]] ;
+      std::vector<vtkIdType>& pointslistref = PointsInCells[cellidPtr[j]] ;
       pointslistref.push_back(i) ;
     }
   }
@@ -756,13 +756,13 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
   bool sameface = false ;
   double lamtemp ;
 
-  vtkCell* cell = m_unstructGrid->GetCell(cellid);
+  vtkCell* cell = UnstructGrid->GetCell(cellid);
 
   // clear list
   polygon->Reset() ;  //reset is faster than Initialize
 
   // create a convenient reference for the list of output points on this cell
-  const std::vector<vtkIdType>& pointslistref = m_pointsInCells[cellid] ;
+  const std::vector<vtkIdType>& pointslistref = PointsInCells[cellid] ;
   int npts = pointslistref.size() ;
 
   if (npts == 0){
@@ -772,7 +772,7 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
   }
   else if (npts < 3){
     // Ignore cells with less than 3 points.
-    // NB this means that not every cell in m_intersectedCells corresponds to an output polygon !
+    // NB this means that not every cell in IntersectedCells corresponds to an output polygon !
     return false ;
   }
   else if (npts > 8){
@@ -807,8 +807,8 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
     // where all the points are in one face.
 
     // Construct a list of the intersected points
-    m_ptlist->Reset();
-    vtkIdType* ptListPtr = m_ptlist->WritePointer(0, npts);
+    Ptlist->Reset();
+    vtkIdType* ptListPtr = Ptlist->WritePointer(0, npts);
     int nValidPts = 0;
 
     for (i = 0 ;  i < npts ;  i++){
@@ -816,10 +816,10 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
         ptListPtr[nValidPts++] = (edgepts[i][0]) ;
     }
     
-    m_ptlist->SetNumberOfIds(nValidPts);
+    Ptlist->SetNumberOfIds(nValidPts);
 
     // search for a face which contains all the points
-    sameface = FindFaceContainingAllIds(cell, m_ptlist, &f) ;
+    sameface = FindFaceContainingAllIds(cell, Ptlist, &f) ;
   } //end if (foundPtMapping && !foundEdgeMapping){
 
   if (sameface){
@@ -838,7 +838,7 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
     for (i = 0 ;  i < npts ;  i++)
       connected[i][i] = false;    
     
-    vtkIdType* ptListPtr = m_ptlist->WritePointer(0, 4);
+    vtkIdType* ptListPtr = Ptlist->WritePointer(0, 4);
     for (i = 0 ;  i < npts-1 ;  i++)
     {
       // construct list of input point id's - first two entries
@@ -852,7 +852,7 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
         ptListPtr[3] = (edgepts[j][1]) ;
 
         // points are connected if they share a face
-        connected[i][j] = FindFaceContainingAllIds(cell, m_ptlist, &f);           
+        connected[i][j] = FindFaceContainingAllIds(cell, Ptlist, &f);           
         connected[j][i] = connected[i][j];        
       }
     }    
@@ -905,7 +905,7 @@ bool vtkMAFMeshCutter_BES::ConstructCellSlicePolygon(vtkIdType cellid, vtkIdList
   // find the normal and compare it with the normal of the cutting plane
   double normply[3], normpln[3] ;
   CalculatePolygonNormal(polygon, normply) ;
-  m_cutFunction->GetNormal(normpln) ;
+  CutFunction->GetNormal(normpln) ;
   double dotprod = normply[0]*normpln[0] + normply[1]*normpln[1] + normply[2]*normpln[2] ;
 
   if (dotprod < 0.0)
@@ -938,7 +938,7 @@ void vtkMAFMeshCutter_BES::CalculatePolygonNormal(vtkIdList *idlist, double *nor
 
   // get the x of the points
   vtkIdType* idsPtr = idlist->GetPointer(0);
-  vtkPoints* pts = m_polydata->GetPoints();
+  vtkPoints* pts = Polydata->GetPoints();
   for (i = 0 ;  i < npts ;  i++)
     pts->GetPoint(idsPtr[i], x[i]) ;
 
@@ -984,62 +984,62 @@ void vtkMAFMeshCutter_BES::TransferScalars()
   int ncomp[100], dtype[100] ;
 
   // copy the structure of the point scalar arrays
-  m_polydata->GetPointData()->CopyStructure(m_unstructGrid->GetPointData()) ;
+  Polydata->GetPointData()->CopyStructure(UnstructGrid->GetPointData()) ;
 
   // allocate tuples for every point
-  int npts = m_polydata->GetPoints()->GetNumberOfPoints() ;
-  m_polydata->GetPointData()->SetNumberOfTuples(npts) ;
+  int npts = Polydata->GetPoints()->GetNumberOfPoints() ;
+  Polydata->GetPointData()->SetNumberOfTuples(npts) ;
 
   // get no. of arrays, components and types
-  int narrays = m_polydata->GetPointData()->GetNumberOfArrays() ;
+  int narrays = Polydata->GetPointData()->GetNumberOfArrays() ;
   for (i = 0 ;  i < narrays ;  i++){
-    ncomp[i] = m_polydata->GetPointData()->GetArray(i)->GetNumberOfComponents() ;
-    dtype[i] = m_polydata->GetPointData()->GetArray(i)->GetDataType() ;
+    ncomp[i] = Polydata->GetPointData()->GetArray(i)->GetNumberOfComponents() ;
+    dtype[i] = Polydata->GetPointData()->GetArray(i)->GetDataType() ;
   }
 
   // interpolate the scalars for every point
-  for (i = 0 ;  i < (int)m_edgeMapping.size() ;  i++){
-    vtkIdType idout = m_edgeMapping[i].idout ;
-    vtkIdType id0 = m_edgeMapping[i].id0 ;
-    vtkIdType id1 = m_edgeMapping[i].id1 ;
-    double lambda = m_edgeMapping[i].lambda ;
+  for (i = 0 ;  i < (int)EdgeMapping.size() ;  i++){
+    vtkIdType idout = EdgeMapping[i].idout ;
+    vtkIdType id0 = EdgeMapping[i].id0 ;
+    vtkIdType id1 = EdgeMapping[i].id1 ;
+    double lambda = EdgeMapping[i].lambda ;
 
     // loop over all scalar arrays
     for (j = 0 ;  j < narrays ;  j++){
       // get the scalars for the input points
-      if (m_edgeMapping[i].mtype == POINT_TO_POINT){
+      if (EdgeMapping[i].mtype == POINT_TO_POINT){
         // the output point corresponds to only one input point - just copy the scalars
-        m_unstructGrid->GetPointData()->GetArray(j)->GetTuple(id0, tuple0) ;
-        m_polydata->GetPointData()->GetArray(j)->SetTuple(idout, tuple0) ;
+        UnstructGrid->GetPointData()->GetArray(j)->GetTuple(id0, tuple0) ;
+        Polydata->GetPointData()->GetArray(j)->SetTuple(idout, tuple0) ;
       }
       else{
         // the output point corresponds to an input edge, so get scalars at both ends and interpolate
-        m_unstructGrid->GetPointData()->GetArray(j)->GetTuple(id0, tuple0) ;
-        m_unstructGrid->GetPointData()->GetArray(j)->GetTuple(id1, tuple1) ;
+        UnstructGrid->GetPointData()->GetArray(j)->GetTuple(id0, tuple0) ;
+        UnstructGrid->GetPointData()->GetArray(j)->GetTuple(id1, tuple1) ;
         InterpolateScalars(tuple0, tuple1, tuple_interp, lambda, ncomp[j], dtype[j]) ;
-        m_polydata->GetPointData()->GetArray(j)->SetTuple(idout, tuple_interp) ;
+        Polydata->GetPointData()->GetArray(j)->SetTuple(idout, tuple_interp) ;
       }
     }
   }
 
   // copy the structure of the cell scalar arrays
-  m_polydata->GetCellData()->CopyStructure(m_unstructGrid->GetCellData()) ;
+  Polydata->GetCellData()->CopyStructure(UnstructGrid->GetCellData()) ;
 
   // allocate tuples for every cell
-  int ncells = m_polydata->GetNumberOfCells() ;
-  m_polydata->GetCellData()->SetNumberOfTuples(ncells) ;
+  int ncells = Polydata->GetNumberOfCells() ;
+  Polydata->GetCellData()->SetNumberOfTuples(ncells) ;
 
   // get no. of arrays, components and types
-  int ncellarrays = m_polydata->GetCellData()->GetNumberOfArrays() ;
+  int ncellarrays = Polydata->GetCellData()->GetNumberOfArrays() ;
 
   // copy the scalars for every output cell
-  for (i = 0 ;  i < (int)m_cellMapping.size() ;  i++){
+  for (i = 0 ;  i < (int)CellMapping.size() ;  i++){
     vtkIdType idin = GetInputCellCutByOutputCell(i) ;
 
     // loop over all scalar arrays
     for (j = 0 ;  j < ncellarrays ;  j++){
-      m_unstructGrid->GetCellData()->GetArray(j)->GetTuple(idin, tuple0) ;
-      m_polydata->GetCellData()->GetArray(j)->SetTuple(i, tuple0) ;
+      UnstructGrid->GetCellData()->GetArray(j)->GetTuple(idin, tuple0) ;
+      Polydata->GetCellData()->GetArray(j)->SetTuple(i, tuple0) ;
     }
   }
 }
@@ -1051,21 +1051,21 @@ void vtkMAFMeshCutter_BES::TransferScalars()
 void vtkMAFMeshCutter_BES::Initialize()
 //------------------------------------------------------------------------------
 {
-  m_edgeMapping.clear();
-  m_invEdgeMapping.clear();
-  m_intersectedCells.clear();
-  //m_pointsInCells.clear();
-  m_cellMapping.clear(); 
+  EdgeMapping.clear();
+  InvEdgeMapping.clear();
+  IntersectedCells.clear();
+  //PointsInCells.clear();
+  CellMapping.clear(); 
 
   // allocate the table with empty lists  
-  delete[] m_pointsInCells;  
-  m_pointsInCells = new std::vector<vtkIdType>[m_unstructGrid->GetNumberOfCells()];  
+  delete[] PointsInCells;  
+  PointsInCells = new std::vector<vtkIdType>[UnstructGrid->GetNumberOfCells()];  
 }
 
 
 //------------------------------------------------------------------------------
 // Create the polydata slice
-// There must have been a call to m_unstructGrid->BuildLinks() for this to work
+// There must have been a call to UnstructGrid->BuildLinks() for this to work
 void vtkMAFMeshCutter_BES::CreateSlice()
 //------------------------------------------------------------------------------
 {
@@ -1078,15 +1078,15 @@ void vtkMAFMeshCutter_BES::CreateSlice()
   AssignPointsToCells() ;         // this lists the intersection points for each mesh cell
 
   // construct the polygons for all the intersected cells
-  int ncells = m_intersectedCells.size() ;
+  int ncells = IntersectedCells.size() ;
   cells->Allocate(4*ncells) ;
   for (i = 0 ;  i < ncells ;  i++){
-    if (ConstructCellSlicePolygon(m_intersectedCells[i], polygon)){
+    if (ConstructCellSlicePolygon(IntersectedCells[i], polygon)){
       // if the polygon was created, insert it as a new output cell
       cells->InsertNextCell(polygon) ;
 
       // note mapping from new output cell to input cell
-      m_cellMapping.push_back(m_intersectedCells[i]) ;
+      CellMapping.push_back(IntersectedCells[i]) ;
     }
   }
 
@@ -1094,7 +1094,7 @@ void vtkMAFMeshCutter_BES::CreateSlice()
   cells->Squeeze() ;
 
   // add to polydata
-  m_polydata->SetPolys(cells) ;
+  Polydata->SetPolys(cells) ;
 
   // interpolate the scalars
   TransferScalars() ;
@@ -1113,17 +1113,17 @@ void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
 
   // print cutting plane
   os << indent << "cutting plane..." << std::endl ;
-  double *po = m_cutFunction->GetOrigin() ;
-  double *pn = m_cutFunction->GetNormal() ;
+  double *po = CutFunction->GetOrigin() ;
+  double *pn = CutFunction->GetNormal() ;
   os << indent << "origin: " << po[0] << " " << po[1] << " " << po[2] << std::endl ;
   os << indent << "normal: " << pn[0] << " " << pn[1] << " " << pn[2] << std::endl ;
   os << indent << std::endl ;
 
   // print table mapping output points to input mesh
   os << indent << "mapping output points to input mesh..." << std::endl ;
-  os << indent << "no. of output points = " << m_edgeMapping.size() << std::endl ;
-  for (i = 0 ;  i < (int)m_edgeMapping.size() ;  i++){
-    EdgeMapping em = m_edgeMapping.at(i) ;
+  os << indent << "no. of output points = " << EdgeMapping.size() << std::endl ;
+  for (i = 0 ;  i < (int)EdgeMapping.size() ;  i++){
+    EdgeMappingType em = EdgeMapping.at(i) ;
     if (em.mtype == POINT_TO_EDGE)
       os << indent << "mapping " << i << " point " << em.idout << " = input edge " << em.id0 << " " << em.id1 << " lambda " << em.lambda << std::endl ;
     else
@@ -1133,16 +1133,16 @@ void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
 
   // print id's of intersected cells
   os <<  indent << "list of intersected cells..." << std::endl ;
-  os << indent << "no. of intersected cells = " << m_intersectedCells.size() << std::endl ;
-  for (i = 0 ;  i < (int)m_intersectedCells.size() ;  i++)
-    os << indent <<"cut cell " << i << " cell id " << m_intersectedCells.at(i) << std::endl ;
+  os << indent << "no. of intersected cells = " << IntersectedCells.size() << std::endl ;
+  for (i = 0 ;  i < (int)IntersectedCells.size() ;  i++)
+    os << indent <<"cut cell " << i << " cell id " << IntersectedCells.at(i) << std::endl ;
   os <<  indent <<std::endl ;
 
   // print list of output points in each input cell
   os << indent << "list of output points created in each input cell..." << std::endl ;
-  for (i = 0, ni = 0 ;  i < (int)m_unstructGrid->GetNumberOfCells()  ;  i++){
+  for (i = 0, ni = 0 ;  i < (int)UnstructGrid->GetNumberOfCells()  ;  i++){
     // get the list for cell i
-    std::vector<vtkIdType> &v = m_pointsInCells[i];
+    std::vector<vtkIdType> &v = PointsInCells[i];
 
     if (v.size() > 0){
       // print the list of points if the cell is not empty
@@ -1160,6 +1160,6 @@ void vtkMAFMeshCutter_BES::PrintSelf(ostream& os, vtkIndent indent)
 
   // print output polydata
   os << "polydata..." << std::endl ;
-  m_polydata->PrintSelf(os, indent) ;
+  Polydata->PrintSelf(os, indent) ;
 
 }
