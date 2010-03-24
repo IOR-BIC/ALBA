@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMEDPolyDataDeformation.h,v $ 
   Language: C++ 
-  Date: $Date: 2010-03-24 09:53:28 $ 
-  Version: $Revision: 1.1.2.4 $ 
+  Date: $Date: 2010-03-24 10:33:14 $ 
+  Version: $Revision: 1.1.2.5 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -96,8 +96,8 @@ protected:
   class CSkeletonVertex
   {
   public:
-    int m_Id;             //<ID of this point
-    double m_Coords[3];   //<coordinates
+    int Id;             //<ID of this point
+    double Coords[3];   //<coordinates
   
     typedef struct LOCAL_FRAME
     {      
@@ -106,49 +106,49 @@ protected:
       double w[3];      //<base vector 3  
     } LOCAL_FRAME;
 
-    LOCAL_FRAME m_LF;             //<local frame system
-    CSkeletonVertex* m_pMatch;    //<matched vertex
+    LOCAL_FRAME LF;             //<local frame system
+    CSkeletonVertex* PMatch;    //<matched vertex
     
-    vtkstd::vector< CSkeletonEdge* > m_OneRingEdges;    //<edges around this vertex
-    vtkstd::vector< CSkeletonVertex* > m_JoinedVertices;//<vertices of other curves with the same coordinates   
+    vtkstd::vector< CSkeletonEdge* > OneRingEdges;    //<edges around this vertex
+    vtkstd::vector< CSkeletonVertex* > JoinedVertices;//<vertices of other curves with the same coordinates   
 
-    double m_WT;          //<topology weight
-    int m_nMark;          //<vertex tag for internal use
+    double WT;          //<topology weight
+    int NMark;          //<vertex tag for internal use
   public:
   public:
     CSkeletonVertex() 
     {
       memset(this, 0, sizeof(CSkeletonVertex));
-      m_Id = -1;
+      Id = -1;
     }
 
     CSkeletonVertex(double coords[3]) 
     {      
       memset(this, 0, sizeof(CSkeletonVertex));
-      m_Id = -1;
+      Id = -1;
 
-      m_Coords[0] = coords[0];
-      m_Coords[1] = coords[1];
-      m_Coords[2] = coords[2];
+      Coords[0] = coords[0];
+      Coords[1] = coords[1];
+      Coords[2] = coords[2];
     }    
 
     /** Gets the degree of this vertex */
     inline int GetDegree() {
-      return (int)m_OneRingEdges.size();
+      return (int)OneRingEdges.size();
     }
 
     /** Gets the number of vertices having the same coordinate */
     inline int GetNumberOfJoinedVertices() {
-      return (int)m_JoinedVertices.size();
+      return (int)JoinedVertices.size();
     }
 
     /** 
     Returns true, if the given point lies in the direction LF.u of
     the half-space defined by the LF.v, LF.w and m_Coords  */
     inline bool IsInPositiveHalfspace(double coords[3]) {
-      return m_LF.u[0]*(coords[0] - m_Coords[0]) +
-        m_LF.u[1]*(coords[1] - m_Coords[1]) + 
-        m_LF.u[2]*(coords[2] - m_Coords[2]) >= 0;      
+      return LF.u[0]*(coords[0] - Coords[0]) +
+        LF.u[1]*(coords[1] - Coords[1]) + 
+        LF.u[2]*(coords[2] - Coords[2]) >= 0;      
     }
   };
   
@@ -156,36 +156,36 @@ protected:
   class CSkeletonEdge
   {
   public:
-    int m_Id;                     //<ID of this edge
-    CSkeletonVertex* m_Verts[2];  //<end points (may be NULL)
+    int Id;                     //<ID of this edge
+    CSkeletonVertex* Verts[2];  //<end points (may be NULL)
 
-    CSkeletonEdge* m_pMatch;      //<matched edge
-    int m_nMark;                  //<edge tag for internal use        
+    CSkeletonEdge* PMatch;      //<matched edge
+    int NMark;                  //<edge tag for internal use        
 
   public:
     CSkeletonEdge() 
     {
       memset(this, 0, sizeof(CSkeletonEdge));
-      m_Id = -1;       
+      Id = -1;       
     }
 
     CSkeletonEdge(CSkeletonVertex* pV1, CSkeletonVertex* pV2)
     {
       memset(this, 0, sizeof(CSkeletonEdge));
-      m_Id = -1; 
+      Id = -1; 
 
-      m_Verts[0] = pV1; m_Verts[1] = pV2;
+      Verts[0] = pV1; Verts[1] = pV2;
     }
 
   public:
     /** Returns the number of edges connected to one of end points of this edge */
     inline int GetNumberOfConnectedEdges() {
-      return m_Verts[0]->GetDegree() + m_Verts[1]->GetDegree() - 2;
+      return Verts[0]->GetDegree() + Verts[1]->GetDegree() - 2;
     }
 
     /** Returns true, if the edge is internal */
     inline bool IsInternal() {
-      return m_Verts[0]->GetDegree() != 1 && m_Verts[1]->GetDegree() != 1;
+      return Verts[0]->GetDegree() != 1 && Verts[1]->GetDegree() != 1;
     }    
 
     /** Returns length of the edge. 
@@ -218,21 +218,21 @@ protected:
   class CSuperSkeleton
   {
   public:
-    CSkeleton* m_pOC_Skel;    //<original skeleton (it is linked to deformed)
-    CSkeleton* m_pDC_Skel;    //<deformed skeleton (it is linked to original)
+    CSkeleton* POCSkel;    //<original skeleton (it is linked to deformed)
+    CSkeleton* PDCSkel;    //<deformed skeleton (it is linked to original)
 
-    int* m_pSkelPositions;    //<stores where in m_pxC_Skel starts next skeleton (not curves)
+    int* PSkelPositions;    //<stores where in m_pxC_Skel starts next skeleton (not curves)
   public:
     CSuperSkeleton() {
-      m_pOC_Skel = new CSkeleton();
-      m_pDC_Skel = new CSkeleton();
-      m_pSkelPositions = NULL;
+      POCSkel = new CSkeleton();
+      PDCSkel = new CSkeleton();
+      PSkelPositions = NULL;
     }
 
     ~CSuperSkeleton() {
-      delete m_pOC_Skel;
-      delete m_pDC_Skel;
-      delete m_pSkelPositions;
+      delete POCSkel;
+      delete PDCSkel;
+      delete PSkelPositions;
     }
   };
 
@@ -478,14 +478,14 @@ protected:
   Returns NULL, if the given vertex is the first one. */
   inline CSkeletonVertex* GetPreviousCurveVertex(CSkeletonVertex* pCurve) {
     return (pCurve->GetDegree() == 1) ? NULL : 
-      pCurve->m_OneRingEdges[1]->m_Verts[0];      
+      pCurve->OneRingEdges[1]->Verts[0];      
   }
 
   /** Gets the next vertex on the curve.
   Returns NULL, if the given vertex is the last one. */
   inline CSkeletonVertex* GetNextCurveVertex(CSkeletonVertex* pCurve) 
   {
-    CSkeletonVertex* pRet = pCurve->m_OneRingEdges[0]->m_Verts[1]; 
+    CSkeletonVertex* pRet = pCurve->OneRingEdges[0]->Verts[1]; 
     return (pRet == pCurve) ? NULL : pRet;
   }
 
@@ -493,20 +493,20 @@ protected:
   Returns NULL, if the given vertex is the first one. */
   inline CSkeletonEdge* GetPreviousCurveEdge(CSkeletonEdge* pCurve) 
   {
-    if (pCurve->m_Verts[0] == NULL || pCurve->m_Verts[0]->GetDegree() == 1)
+    if (pCurve->Verts[0] == NULL || pCurve->Verts[0]->GetDegree() == 1)
       return NULL;  //there is no previous edge    
 
-    return pCurve->m_Verts[0]->m_OneRingEdges[1];
+    return pCurve->Verts[0]->OneRingEdges[1];
   }
 
   /** Gets the next edge on the curve.
   Returns NULL, if the given vertex is the last one. */
   inline CSkeletonEdge* GetNextCurveEdge(CSkeletonEdge* pCurve) 
   {
-    if (pCurve->m_Verts[1] == NULL || pCurve->m_Verts[1]->GetDegree() == 1)
+    if (pCurve->Verts[1] == NULL || pCurve->Verts[1]->GetDegree() == 1)
       return NULL;  //there is no next edge
 
-    return pCurve->m_Verts[1]->m_OneRingEdges[0];    
+    return pCurve->Verts[1]->OneRingEdges[0];    
   }
 
   /** Computes the local frame systems for both curves.  
