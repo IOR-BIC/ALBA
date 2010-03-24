@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.h,v $
 Language:  C++
-Date:      $Date: 2009-05-13 12:56:59 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-03-24 15:41:01 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -50,6 +50,7 @@ MafMedical is partially based on OpenMAF.
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 
+  
 
 class medOpImporterDicomOffisTest : public CPPUNIT_NS::TestFixture
 {
@@ -62,11 +63,12 @@ public:
   void tearDown();
 
   CPPUNIT_TEST_SUITE( medOpImporterDicomOffisTest );
-  CPPUNIT_TEST( TestDynamicAllocation );
-  CPPUNIT_TEST( TestAccept );
-  CPPUNIT_TEST( TestSetDirName );
-  CPPUNIT_TEST( TestCreateVolume );
-  CPPUNIT_TEST( TestCompareDicomImage );
+    CPPUNIT_TEST( TestDynamicAllocation );
+    CPPUNIT_TEST( TestAccept );
+    CPPUNIT_TEST( TestSetDirName );
+    CPPUNIT_TEST( TestCreateVolume );
+    CPPUNIT_TEST( TestCompareDicomImage );
+    //CPPUNIT_TEST( TestMatlabScriptConverter() );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -76,6 +78,8 @@ protected:
   void TestCompareDicomImage();
   void TestCreateVolume();
 
+  // TO BE REFACTORED AND EXTRACTED AS A STANDALONE CLASS:
+  void TestMatlabScriptConverter();
 };
 
 int main( int argc, char* argv[] )
