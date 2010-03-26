@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-19 09:55:37 $
-Version:   $Revision: 1.1.2.77 $
+Date:      $Date: 2010-03-26 15:27:43 $
+Version:   $Revision: 1.1.2.78 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -596,12 +596,6 @@ int medOpImporterDicomOffis::BuildImages()
   int count,s_count;
   mafNEW(m_ImagesGroup);
 
-  //Modify name of the image group
-  wxString oldName = m_VolumeName;
-  int pos = oldName.find_last_of('x');
-  m_VolumeName = oldName.Mid(0,pos);
-  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
-
   m_ImagesGroup->SetName(wxString::Format("%s images",m_VolumeName));
   m_ImagesGroup->ReparentTo(m_Input);
   
@@ -718,12 +712,6 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
   ImportDicomTags();
 
   mafNEW(m_ImagesGroup);
-
-  //Modify name of the image group
-  wxString oldName = m_VolumeName;
-  int pos = oldName.find_last_of('x');
-  m_VolumeName = oldName.Mid(0,pos);
-  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
 
   m_ImagesGroup->SetName(wxString::Format("%s images",m_VolumeName));
   m_ImagesGroup->ReparentTo(m_Input);
@@ -1020,12 +1008,6 @@ int medOpImporterDicomOffis::BuildVolume()
     }
   }
 
-  //Modify name of the volume
-  wxString oldName = m_VolumeName;
-  int pos = oldName.find_last_of('x');
-  m_VolumeName = oldName.Mid(0,pos);
-  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
-
   m_Volume->SetName(m_VolumeName);  
 
   if(m_Volume != NULL)
@@ -1225,12 +1207,6 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     }
   }
 
-  //Modify name of the volume
-  wxString oldName = m_VolumeName;
-  int pos = oldName.find_last_of('x');
-  m_VolumeName = oldName.Mid(0,pos);
-  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
-
   m_Volume->SetName(m_VolumeName);
 
   if(m_Volume != NULL)
@@ -1353,14 +1329,7 @@ int medOpImporterDicomOffis::BuildMesh()
   points->Delete();
   grid->Delete();
 
-  //Modify name of the mesh
-  wxString oldName = m_VolumeName;
-  int pos = oldName.find_last_of('x');
-  m_VolumeName = oldName.Mid(0,pos);
-  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
-
   m_Mesh->SetName(m_VolumeName);
-
 
   m_Output = m_Mesh;
   return OP_RUN_OK;
@@ -1483,12 +1452,6 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
   {
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
   }
- 
-  //Modify name of the mesh
-  wxString oldName = m_VolumeName;
-  int pos = oldName.find_last_of('x');
-  m_VolumeName = oldName.Mid(0,pos);
-  m_VolumeName.Append(wxString::Format("x%i", cropInterval));
 
   m_Mesh->SetName(m_VolumeName);
 
@@ -1997,7 +1960,6 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
         mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
         m_VectorSelected.at(0) = st->GetCStr();
         wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
-        m_VolumeName = seriesName;
         m_VectorSelected.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
         std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
         for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
@@ -2393,6 +2355,18 @@ void medOpImporterDicomOffis::Crop()
 	m_LoadPage->GetRWI()->CameraUpdate();
 	m_BuildPage->GetRWI()->CameraReset(boundsCamera);
 	m_BuildPage->GetRWI()->CameraUpdate();
+
+  //Modify name
+  double spacing[3];
+  int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
+  m_ListSelected->Item(currImageId)->GetData()->GetOutput()->GetSpacing(spacing);
+  double pixelDimX = diffx/spacing[0] + 1;
+  double pixelDimY = diffy/spacing[0] + 1;
+
+
+  wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+  m_VolumeName = seriesName.Mid(0,seriesName.find_last_of('_'));
+  m_VolumeName.Append(wxString::Format("_%ix%ix%i", (int)pixelDimX, (int)pixelDimY, cropInterval));
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::AutoPositionCropPlane()
@@ -2814,7 +2788,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         highBit = 0;
       } 
       m_HighBit = highBit;
-      
+            
       if(ds->findAndGetFloat64(DCM_RescaleIntercept,intercept).bad())
       {
         //Unable to get element: DCM_RescaleIntercept[0];
