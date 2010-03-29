@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: vtkMAFVolumeTextureMapper2DTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-29 08:34:35 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-03-29 11:23:14 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2008
@@ -168,7 +168,7 @@ void vtkMAFVolumeTextureMapper2DTest::TestPipeExecution()
 
   m_RenderWindow->Render();
 
-  m_RenderWindowInteractor->Start();
+  //m_RenderWindowInteractor->Start();
   CompareImages(0);
 
   vtkDEL(volumeProperty);
