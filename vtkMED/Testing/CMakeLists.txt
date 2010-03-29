@@ -40,6 +40,8 @@ ADD_EXECUTABLE(vtkMAFVolumeRayCastMapperTest vtkMAFVolumeRayCastMapperTest.h vtk
 ADD_TEST(vtkMAFVolumeRayCastMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFVolumeRayCastMapperTest)
 ADD_EXECUTABLE(vtkXRayVolumeMapperTest vtkXRayVolumeMapperTest.h vtkXRayVolumeMapperTest.cpp)
 ADD_TEST(vtkXRayVolumeMapperTest ${EXECUTABLE_OUTPUT_PATH}/vtkXRayVolumeMapperTest)
+ADD_EXECUTABLE(vtkMAFVolumeTextureMapper2DTest vtkMAFVolumeTextureMapper2DTest.h vtkMAFVolumeTextureMapper2DTest.cpp)
+ADD_TEST(vtkMAFVolumeTextureMapper2DTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFVolumeTextureMapper2DTest)
 
 
 # wxWidgets specific classes
