@@ -112,6 +112,9 @@ ADD_TEST(medOpFlipNormalsTest ${EXECUTABLE_OUTPUT_PATH}/medOpFlipNormalsTest)
 ADD_EXECUTABLE(medOpSmoothSurfaceCellsTest medOpSmoothSurfaceCellsTest.h medOpSmoothSurfaceCellsTest.cpp)
 ADD_TEST(medOpSmoothSurfaceCellsTest ${EXECUTABLE_OUTPUT_PATH}/medOpSmoothSurfaceCellsTest)
 
+ADD_EXECUTABLE(medOpMeshQualityTest medOpMeshQualityTest.h medOpMeshQualityTest.cpp)
+ADD_TEST(medOpMeshQualityTest ${EXECUTABLE_OUTPUT_PATH}/medOpMeshQualityTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
