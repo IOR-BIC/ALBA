@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpMeshQuality.cpp,v $
 Language:  C++
-Date:      $Date: 2009-12-17 12:30:11 $
-Version:   $Revision: 1.3.2.2 $
+Date:      $Date: 2010-03-29 08:53:23 $
+Version:   $Revision: 1.3.2.3 $
 Authors:   Matteo Giacomoni - Daniele Giunchi
 ==========================================================================
 Copyright (c) 2002/2004
@@ -281,75 +281,81 @@ void medOpMeshQuality::CreatePolydataPipeline()
 	double averageRatio=m_CheckMeshQuality->GetMeanRatio();
 	double maxRatio=m_CheckMeshQuality->GetMaxRatio();
 	double minRatio=m_CheckMeshQuality->GetMinRatio();
-	m_LabelAverageAspectRatio->SetLabel(wxString::Format(" average : %.3lf",averageRatio));
-	m_LabelMaxAspectRatio->SetLabel(wxString::Format(" max : %.3lf",maxRatio));
-	m_LabelMinAspectRatio->SetLabel(wxString::Format(" min : %.3lf",minRatio));
 
-	double BoundingBox[6];
-	dataset->GetBounds(BoundingBox);
-	vtkNEW(m_Mapper);
-	m_Mapper->SetInput(((vtkPolyData*)m_CheckMeshQuality->GetOutput()));
+  if(!m_TestMode)
+  {
+	  m_LabelAverageAspectRatio->SetLabel(wxString::Format(" average : %.3lf",averageRatio));
+	  m_LabelMaxAspectRatio->SetLabel(wxString::Format(" max : %.3lf",maxRatio));
+	  m_LabelMinAspectRatio->SetLabel(wxString::Format(" min : %.3lf",minRatio));
+  
 
-	//vtkDataArray *scalars=((vtkPolyData*)m_CheckMeshQuality->GetOutput())->GetCellData()->GetArray("quality");
+	  double BoundingBox[6];
+	  dataset->GetBounds(BoundingBox);
+	  vtkNEW(m_Mapper);
+	  m_Mapper->SetInput(((vtkPolyData*)m_CheckMeshQuality->GetOutput()));
 
-	double sr[2];
-	m_CheckMeshQuality->GetOutput()->GetCellData()->GetScalars()->GetRange(sr);
-	vtkLookupTable *lut;
-	vtkNEW(lut);
-	lut->SetTableRange(sr);
-	lut->Build();
-	m_Mapper->SetScalarRange(sr);
-	m_Mapper->SetLookupTable(lut);
-	//m_Mapper->SetColorModeToMapScalars();
-	m_Mapper->ScalarVisibilityOn();
+	  //vtkDataArray *scalars=((vtkPolyData*)m_CheckMeshQuality->GetOutput())->GetCellData()->GetArray("quality");
 
-	vtkNEW(m_Actor);
-	m_Actor->SetMapper(m_Mapper);
-	//m_Actor->PickableOff();
+	  double sr[2];
+	  m_CheckMeshQuality->GetOutput()->GetCellData()->GetScalars()->GetRange(sr);
+	  vtkLookupTable *lut;
+	  vtkNEW(lut);
+	  lut->SetTableRange(sr);
+	  lut->Build();
+	  m_Mapper->SetScalarRange(sr);
+	  m_Mapper->SetLookupTable(lut);
+	  //m_Mapper->SetColorModeToMapScalars();
+	  m_Mapper->ScalarVisibilityOn();
 
-	m_Mapper->Modified();
-	m_Mapper->Update();
+	  vtkNEW(m_Actor);
+	  m_Actor->SetMapper(m_Mapper);
+	  //m_Actor->PickableOff();
 
-	vtkNEW(m_BarActor);
-	m_BarActor->SetLookupTable(lut);
+	  m_Mapper->Modified();
+	  m_Mapper->Update();
 
-	m_Rwi->m_RenFront->AddActor(m_Actor);
-	m_Rwi->m_RenFront->AddActor(m_BarActor);
+	  vtkNEW(m_BarActor);
+	  m_BarActor->SetLookupTable(lut);
 
-  vtkNEW(m_FeatureEdgeFilter);
-  m_FeatureEdgeFilter->SetInput(dataset);
-  m_FeatureEdgeFilter->FeatureEdgesOn();
-  m_FeatureEdgeFilter->NonManifoldEdgesOn();
-  m_FeatureEdgeFilter->BoundaryEdgesOff();
-  m_FeatureEdgeFilter->ManifoldEdgesOff();
-  m_FeatureEdgeFilter->SetFeatureAngle(m_Angle);
-  m_FeatureEdgeFilter->Update();
+	  m_Rwi->m_RenFront->AddActor(m_Actor);
+	  m_Rwi->m_RenFront->AddActor(m_BarActor);
 
-  double boundingBox[6];
-  dataset->GetBounds(boundingBox);
+    vtkNEW(m_FeatureEdgeFilter);
+    m_FeatureEdgeFilter->SetInput(dataset);
+    m_FeatureEdgeFilter->FeatureEdgesOn();
+    m_FeatureEdgeFilter->NonManifoldEdgesOn();
+    m_FeatureEdgeFilter->BoundaryEdgesOff();
+    m_FeatureEdgeFilter->ManifoldEdgesOff();
+    m_FeatureEdgeFilter->SetFeatureAngle(m_Angle);
+    m_FeatureEdgeFilter->Update();
 
-  //Compute Max bound
-  double dimX, dimY, dimZ;
-  dimX = (boundingBox[1] - boundingBox[0]);
-  dimY = (boundingBox[3] - boundingBox[2]);
-  dimZ = (boundingBox[5] - boundingBox[4]);
-  double maxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
-  double radius = maxBounds / 100;
+    double boundingBox[6];
+    dataset->GetBounds(boundingBox);
 
-  vtkNEW(m_TubeFilter);
-  m_TubeFilter->SetInput(m_FeatureEdgeFilter->GetOutput());
-  m_TubeFilter->SetNumberOfSides(10);
-  m_TubeFilter->SetRadius(radius);
-  m_TubeFilter->Update();
+    //Compute Max bound
+    double dimX, dimY, dimZ;
+    dimX = (boundingBox[1] - boundingBox[0]);
+    dimY = (boundingBox[3] - boundingBox[2]);
+    dimZ = (boundingBox[5] - boundingBox[4]);
+    double maxBounds = (dimX >= dimY) ? (dimX >= dimZ ? dimX : dimZ) : (dimY >= dimZ ? dimY : dimZ); 
+    double radius = maxBounds / 100;
 
-  vtkNEW(m_MapperFeatureEdge);
-  m_MapperFeatureEdge->SetInput(m_TubeFilter->GetOutput());
-  m_MapperFeatureEdge->Update();
+    vtkNEW(m_TubeFilter);
+    m_TubeFilter->SetInput(m_FeatureEdgeFilter->GetOutput());
+    m_TubeFilter->SetNumberOfSides(10);
+    m_TubeFilter->SetRadius(radius);
+    m_TubeFilter->Update();
 
-  vtkNEW(m_ActorFeatureEdge);
-  m_ActorFeatureEdge->SetMapper(m_MapperFeatureEdge);
+    vtkNEW(m_MapperFeatureEdge);
+    m_MapperFeatureEdge->SetInput(m_TubeFilter->GetOutput());
+    m_MapperFeatureEdge->Update();
 
-  m_Rwi->m_RenFront->AddActor(m_ActorFeatureEdge);
+    vtkNEW(m_ActorFeatureEdge);
+    m_ActorFeatureEdge->SetMapper(m_MapperFeatureEdge);
 
-	m_Rwi->m_RenFront->ResetCamera(BoundingBox);
+    m_Rwi->m_RenFront->AddActor(m_ActorFeatureEdge);
+
+	  m_Rwi->m_RenFront->ResetCamera(BoundingBox);
+  
+  }
 }
