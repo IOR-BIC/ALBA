@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-30 15:05:10 $
-Version:   $Revision: 1.1.2.7 $
+Date:      $Date: 2010-03-30 15:08:25 $
+Version:   $Revision: 1.1.2.8 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -331,9 +331,11 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
   importer->TestModeOn();
 
-  // wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
+  // SIEMENS NIGUARDA
+  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
   
-  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
+  // GE PISA
+  // wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
 
   CPPUNIT_ASSERT(wxDirExists(dicomDir));
   vtkDirectory *directoryReader = vtkDirectory::New();
