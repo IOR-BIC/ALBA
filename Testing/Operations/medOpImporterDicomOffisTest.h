@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.h,v $
 Language:  C++
-Date:      $Date: 2010-03-24 15:41:01 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-03-30 15:05:10 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -49,9 +49,10 @@ MafMedical is partially based on OpenMAF.
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
-
-  
-
+#include "vnl/vnl_matrix.h"
+#include <vector>
+using namespace std;
+ 
 class medOpImporterDicomOffisTest : public CPPUNIT_NS::TestFixture
 {
 
@@ -68,7 +69,7 @@ public:
     CPPUNIT_TEST( TestSetDirName );
     CPPUNIT_TEST( TestCreateVolume );
     CPPUNIT_TEST( TestCompareDicomImage );
-    //CPPUNIT_TEST( TestMatlabScriptConverter() );
+ //   CPPUNIT_TEST( TestMatlabScriptConverter );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -80,6 +81,9 @@ protected:
 
   // TO BE REFACTORED AND EXTRACTED AS A STANDALONE CLASS:
   void TestMatlabScriptConverter();
+
+  void RemoveRows( vnl_matrix<double> &inputMatrix, vector<int> &rowsToRemoveVector, \
+    vnl_matrix<double> &outputMatrix );
 };
 
 int main( int argc, char* argv[] )
