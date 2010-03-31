@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.h,v $
 Language:  C++
-Date:      $Date: 2010-03-31 11:30:27 $
-Version:   $Revision: 1.1.2.5 $
+Date:      $Date: 2010-03-31 15:23:18 $
+Version:   $Revision: 1.1.2.6 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -69,7 +69,7 @@ public:
     CPPUNIT_TEST( TestSetDirName );
     CPPUNIT_TEST( TestCreateVolume );
     CPPUNIT_TEST( TestCompareDicomImage );
-//    CPPUNIT_TEST( TestMatlabScriptConverter );
+    //CPPUNIT_TEST( TestMatlabScriptConverter );
   CPPUNIT_TEST_SUITE_END();
 
 protected:
@@ -82,7 +82,13 @@ protected:
   // TO BE REFACTORED AND EXTRACTED AS A STANDALONE CLASS:
   void TestMatlabScriptConverter();
 
-  void RemoveRows( vnl_matrix<double> &inputMatrix, vector<int> &rowsToRemoveVector, \
+  void RemoveRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToRemoveVector, \
+    vnl_matrix<double> &outputMatrix );
+ 
+  void ExtractRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToExtractVector, \
+    vnl_matrix<double> &outputMatrix );
+
+  void ExtractRows( vnl_matrix<double> &inputMatrix, vnl_vector<double> &rowsToExtractVector, \
     vnl_matrix<double> &outputMatrix );
 };
 

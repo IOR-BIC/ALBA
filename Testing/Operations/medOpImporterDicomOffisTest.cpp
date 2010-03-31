@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-31 11:30:27 $
-Version:   $Revision: 1.1.2.9 $
+Date:      $Date: 2010-03-31 15:23:18 $
+Version:   $Revision: 1.1.2.10 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -563,7 +563,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //     flag_img = zeros(S,N);
   // 
 
-  vnl_matrix<int> flag_img(S,N,0);
+  vnl_matrix<double> flag_img(S,N,0);
 
   const char *dcmManufacturer = "?";
   dicomDataset->findAndGetString(DCM_Manufacturer, dcmManufacturer);
@@ -705,7 +705,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
     cout << std::endl;
 
-    vector<int> idFramePlane;
+    vector<double> idFramePlane;
 
     for(mapIterator = idFramePlane_Dummy_Map.begin() ; mapIterator!=idFramePlane_Dummy_Map.end(); 
     mapIterator++)
@@ -717,7 +717,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
 
     // 1 3 5 6 8 10
-    vnl_matrix<int> flag_img_transpose(N,S);
+    vnl_matrix<double> flag_img_transpose(N,S);
                         
     for (int j = 0; j < S; j++) 
     {
@@ -758,7 +758,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //   P  = P(flag_img(:,1),:);
   //   s  = s(flag_img(:,1),:);
 
-  vnl_vector<int> c0 = flag_img.get_column(0);
+  vnl_vector<double> c0 = flag_img.get_column(0);
 
   vnl_matrix<double> VxSingleFrame(S,3);
   vnl_matrix<double> VySingleFrame(S,3);
@@ -856,8 +856,8 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //     end
   // 
 
-  vector<int> idx;
-  vector<int> idy;
+  vector<double> idx;
+  vector<double> idy;
   
   vnl_vector<double> project(2);
 
@@ -937,7 +937,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   vnl_matrix<double> Pp(PSingleFrame.rows(), PSingleFrame.cols(), 0);
   vnl_matrix<double> Vxx(VxSingleFrame.rows(), VxSingleFrame.cols(), 0);
   vnl_matrix<double> Vyy(VySingleFrame.rows(), VySingleFrame.cols(), 0);
-  vnl_matrix<int> ss(S, 2, 0);
+  vnl_matrix<double> ss(S, 2, 0);
   ss.fill(0.0);
 
   cout << ss;
@@ -1107,7 +1107,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //     Vidx = [V(id_theta(1),:); Vidx; V(id_theta(2),:)];
   //   end
  
-  vector<int> id_theta;
+  vector<double> id_theta;
 
   for (int i = 0; i < theta.size(); i++) 
   {
@@ -1149,7 +1149,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
   //   V(id_theta,:)=[] (START);
   vnl_matrix<double> inputMatrix = V;
-  vector<int> rowsToRemoveVector = id_theta;
+  vector<double> rowsToRemoveVector = id_theta;
   vnl_matrix<double> outputMatrix;
 
   RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
@@ -1322,7 +1322,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
         
            vnl_matrix<double> inputMatrix = V;
-           vector<int> rowsToRemoveVector = id_theta;
+           vector<double> rowsToRemoveVector = id_theta;
            vnl_matrix<double> outputMatrix;
 
            RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
@@ -1359,19 +1359,63 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 //       clear theta
 //   end
 
+  vnl_vector<double> id_plane = Vidx.get_column(0);
+
   cout << std::endl;
-  cout << Vidx;
+
+  // order variables following planes order
+  ExtractRows(flag_img, id_plane, flag_img);
+  cout << flag_img;
   cout << std::endl;
-  cout << ss;
+
+  // original dicom parameters
+  ExtractRows(PSingleFrame, id_plane, PSingleFrame);
+  cout << PSingleFrame;
+  cout << std::endl;
+
+  ExtractRows(VxSingleFrame, id_plane, VxSingleFrame);
+  cout << VxSingleFrame;
+  cout << std::endl;
+
+  ExtractRows(VySingleFrame, id_plane, VySingleFrame);
+  cout << VySingleFrame;
+  cout << std::endl;
+
+  ExtractRows(sSingleFrame, id_plane, sSingleFrame);
+  cout << sSingleFrame;
+  cout << std::endl;
+
+  // updated dicom parameters
+  ExtractRows(Pp, id_plane, Pp);
   cout << Pp;
-  cout << rot; // ok
   cout << std::endl;
+
+  ExtractRows(Vxx, id_plane, Vxx);
   cout << Vxx;
   cout << std::endl;
+
+  ExtractRows(Vyy, id_plane, Vyy);
   cout << Vyy;
   cout << std::endl;
-  cout <<fliplr_flag;
+
+  ExtractRows(ss, id_plane, ss);
+  cout << ss;
   cout << std::endl;
+
+
+  // rotations and flip flags
+  ExtractRows(rot, id_plane, rot);
+  cout << rot;
+  cout << std::endl;
+
+  ExtractRows(fliplr_flag, id_plane, fliplr_flag);
+  cout << fliplr_flag;
+  cout << std::endl;
+
+  ExtractRows(flipud_flag, id_plane, flipud_flag);
+  cout << flipud_flag;
+  cout << std::endl;
+
   mafDEL(importer);
   vtkDEL(directoryReader);
 
@@ -1452,13 +1496,13 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 }
 
 void medOpImporterDicomOffisTest::RemoveRows\
-( vnl_matrix<double> &inputMatrix, vector<int> &rowsToRemoveVector, vnl_matrix<double> &outputMatrix )
+( vnl_matrix<double> &inputMatrix, vector<double> &rowsToRemoveVector, vnl_matrix<double> &outputMatrix )
 {
   int rowsToRemove = 0;
 
   for (int i = 0; i < inputMatrix.rows(); i++) 
   { 
-    vector<int>::iterator result;
+    vector<double>::iterator result;
     result = find( rowsToRemoveVector.begin(), rowsToRemoveVector.end(), i );
 
     if( result != rowsToRemoveVector.end() ) 
@@ -1474,7 +1518,7 @@ void medOpImporterDicomOffisTest::RemoveRows\
   int idTmpRow = 0;
   for (int i = 0; i < inputMatrix.rows(); i++) 
   { 
-    vector<int>::iterator result;
+    vector<double>::iterator result;
     result = find( rowsToRemoveVector.begin(), rowsToRemoveVector.end(), i );
 
     if( result == rowsToRemoveVector.end() ) 
@@ -1491,4 +1535,39 @@ void medOpImporterDicomOffisTest::RemoveRows\
   }
 
   outputMatrix = tmpMatrix;
+}
+
+
+void medOpImporterDicomOffisTest::ExtractRows\
+( vnl_matrix<double> &inputMatrix, vector<double> &rowsToExtractVector,\
+  vnl_matrix<double> &outputMatrix )
+{
+  int numRowsToExtract = -1;
+  numRowsToExtract = rowsToExtractVector.size();
+  
+  vnl_matrix<double> tmpMatrix(numRowsToExtract, inputMatrix.cols());
+  
+  int idTmpRow = 0;
+
+  for (int i = 0; i < rowsToExtractVector.size(); i++) 
+  {   
+    tmpMatrix.set_row(i, inputMatrix.get_row(rowsToExtractVector[i]) );
+  }
+
+  outputMatrix = tmpMatrix;
+}
+
+void medOpImporterDicomOffisTest::ExtractRows( vnl_matrix<double> &inputMatrix,\
+ vnl_vector<double> &rowsToExtractVector, vnl_matrix<double> &outputMatrix )
+{
+  vnl_vector<double> rowsToExtractVNLVector = rowsToExtractVector;
+  
+  vector<double> rowsToExtractSTDVector;
+ 
+  for (int i = 0; i < rowsToExtractVNLVector.size(); i++) 
+  {
+    rowsToExtractSTDVector.push_back(rowsToExtractVNLVector[i]);   
+  }  
+
+  ExtractRows(inputMatrix, rowsToExtractSTDVector, outputMatrix);
 }
