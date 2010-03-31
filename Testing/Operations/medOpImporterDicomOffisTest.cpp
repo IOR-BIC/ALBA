@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-30 15:08:25 $
-Version:   $Revision: 1.1.2.8 $
+Date:      $Date: 2010-03-31 11:30:27 $
+Version:   $Revision: 1.1.2.9 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -95,6 +95,7 @@ MafMedical is partially based on OpenMAF.
 #include "vnl/vnl_vector.h"
 #include "vnl/vnl_math.h"
 #include <algorithm>
+#include <map>
 //-----------------------------------------------------------
 void medOpImporterDicomOffisTest::setUp() 
 //-----------------------------------------------------------
@@ -332,10 +333,10 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   importer->TestModeOn();
 
   // SIEMENS NIGUARDA
-  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
+//  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
   
   // GE PISA
-  // wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
+  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
 
   CPPUNIT_ASSERT(wxDirExists(dicomDir));
   vtkDirectory *directoryReader = vtkDirectory::New();
@@ -567,6 +568,12 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   const char *dcmManufacturer = "?";
   dicomDataset->findAndGetString(DCM_Manufacturer, dcmManufacturer);
 
+  cout << std::endl;
+  cout << f;
+  cout << std::endl;
+
+  // QUI
+
   // SIEMENS for P20
   cout<<dcmManufacturer<<std::endl;
 
@@ -677,6 +684,60 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
       assert(true);
     } //end for (int i = 0; i < S; i++) 
   } //end if SIEMENS
+  else
+  {
+
+    //   %GE MEDICAL SYSTEMS - PISA    
+    //   else 
+    //   [dummy id_frameplane] = sort(f);
+    //   flag_img = reshape(id_frameplane,[N S]);
+    //   flag_img = flag_img';
+    //     end
+    
+    std::map<int,int> idFramePlane_Dummy_Map;
+
+    for (int i = 0; i < f.rows() ; i++) 
+    {
+      idFramePlane_Dummy_Map[f(i,0)] = i;
+    }
+
+    std::map<int,int>::iterator mapIterator;
+
+    cout << std::endl;
+
+    vector<int> idFramePlane;
+
+    for(mapIterator = idFramePlane_Dummy_Map.begin() ; mapIterator!=idFramePlane_Dummy_Map.end(); 
+    mapIterator++)
+    {
+      cout << std::endl;
+      idFramePlane.push_back(mapIterator->second);
+//      cout << idFramePlane; //sorted
+    }
+
+
+    // 1 3 5 6 8 10
+    vnl_matrix<int> flag_img_transpose(N,S);
+                        
+    for (int j = 0; j < S; j++) 
+    {
+      for (int i = 0; i < N; i++) 
+      {
+        cout<<"i: "<<i<<"    j: "<<j<<"  " << "    value: " << idFramePlane[i + j*N];
+        cout << std::endl;
+        flag_img_transpose(i,j) = idFramePlane[i + j*N];
+      }
+    }
+
+    cout << std::endl;
+    cout << flag_img_transpose;
+    cout << std::endl;
+    
+    // ok fin qui
+
+    flag_img = flag_img_transpose.transpose();
+
+  }
 
   cout << flag_img << std::endl;
   assert(true);
@@ -1175,8 +1236,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
            theta.clear();
 
-      // fin qui ok           
-      //     cout << V;
+           //     cout << V;
            //   V(id_theta,:)=[] (END);
 
          }
@@ -1223,7 +1283,6 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
            cout << theta[i] << std::endl;
          }
          
-         // ok fin qui 
          id_theta.clear();
 
          for (int i = 0; i < theta.size(); i++) 
