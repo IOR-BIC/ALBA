@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-31 15:23:18 $
-Version:   $Revision: 1.1.2.10 $
+Date:      $Date: 2010-04-01 16:16:16 $
+Version:   $Revision: 1.1.2.11 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -47,6 +47,7 @@ MafMedical is partially based on OpenMAF.
 // Failing in doing this will result in a run-time error saying:
 // "Failure#0: The value of ESP was not properly saved across a function call"
 //----------------------------------------------------------------------------
+
 
 
 #include <cppunit/config/SourcePrefix.h>
@@ -283,66 +284,23 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
 void medOpImporterDicomOffisTest::TestMatlabScriptConverter() 
 //-----------------------------------------------------------
 {
-//   % script per la mappatura e il calcolo delle traformazioni per allineare le
-//     % immagini CMR
-//     % 
-//     % INPUT directory contente solo le immagini
-//     % 
-//     % OUTPUT 
-//     % 
-//     % mappatura immagini
-//     % - N: numero frame nell'acquisizione
-//     % - numero piani nell'acquisizione
-//     % - filelist: struct array contente nel campo name il nome di ciascuna
-//     %   immagine apprtentente all'acquisizione
-//     % - flag_img: contiene l'indice dell'immagine per ogni coordinata
-//     %   piano-frame (eg: se flag_img(i,j) == num_img, allora
-//     %   filelist(num_img).name è il nome file che contiente l'immagine del piano i nel frame j
-//     % 
-//     % parametri di posizione/orientamento originali da DICOM
-//     % - P patient position (da DICOM)
-//     % - Vx, Vy versori immagine (da DICOM)
-//     % - s dimensione immagine (da DICOM)
-//     % 
-//     % parametri di posizione/orientamento originali da DICOM
-//     % - Pp patient position (da DICOM)
-//     % - Vxx, Vyy versori immagine (da DICOM)
-//     % - ss dimensione immagine (da DICOM)
-//     % 
-//     % parametrui di rotazione da applicare alle immagini acquisite per ottenere
-//     % immagini tra loro coerenti
-//     % - rot: contiene la rotazione da effettuare
-//     % - fliplr_flag: se 1 l'immagine deve essere specchiata in orizzontale
-//     % - fliplr_flag: se 1 l'immagine deve essere specchiata in verticale
-// 
-//     clear all
-//     close all
-// 
-//     % carico la directory contentente le immagini e creo la list delle immagini
-//     path = uigetdir('Select patient directory');
-//   filelist = dir(path);
-//   filelist(1:2) = [];
-// 
-//   % calcolo numero frame N e piani S dal numero totale di file e dal
-//     % dicominfo della prima immagine
-//     info = dicominfo([path '\' filelist(1).name]);
-//     N = info.CardiacNumberOfImages;
-//   S = numel(filelist)/N;
 
   medOpImporterDicomOffis *importer=new medOpImporterDicomOffis();
   importer->TestModeOn();
 
   // SIEMENS NIGUARDA
-//  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
+  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
   
   // GE PISA
-  wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
+  //wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
 
   CPPUNIT_ASSERT(wxDirExists(dicomDir));
   vtkDirectory *directoryReader = vtkDirectory::New();
   directoryReader->Open(dicomDir);
  
-  wxString file1 = "UNSET";
+  wxString fileName = "UNSET";
+
+  vector<string> dicomLocalFileNamesVector;
 
   int firstDicomSliceFileIndex = -1;
 
@@ -355,19 +313,25 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 		}
 		else
 		{
-      file1 = directoryReader->GetFile(i);
-      firstDicomSliceFileIndex = i;
-      break;
+      fileName = directoryReader->GetFile(i);
+      dicomLocalFileNamesVector.push_back(fileName.c_str());
     }
   }
  
+//   for (int i = 0; i < dicomLocalFileNamesVector.size(); i++) 
+//   {
+//     cout << std::endl;
+//     cout << dicomLocalFileNamesVector[i];
+//   }
+//   
   //CPPUNIT_ASSERT(file1.compare("25292865") == 0);
 
   int numberOfFiles = directoryReader->GetNumberOfFiles();
   
   DcmFileFormat dicomFileHandler;    
 
-  wxString file1ABSFileName = dicomDir + file1;
+  wxString dicomFileName1 = dicomLocalFileNamesVector[0].c_str();
+  wxString file1ABSFileName = dicomDir + dicomFileName1; 
 
   CPPUNIT_ASSERT(wxFileExists(file1ABSFileName));
 
@@ -383,10 +347,10 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //CPPUNIT_ASSERT(dcmCardiacNumberOfImages == 40);
 
   // N
-  long int N = dcmCardiacNumberOfImages;
+  long int timeFrames = dcmCardiacNumberOfImages;
 
   // S
-  int S = directoryReader->GetNumberOfFiles() / N;
+  int planesPerFrame = directoryReader->GetNumberOfFiles() / timeFrames;
 
   //CPPUNIT_ASSERT(S == 18);
 
@@ -416,30 +380,18 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //   s  = zeros(N*S,2);
   //   f  = zeros(N*S,1);
 
-  vnl_matrix<double> Vx(N*S, 3, 0.0);
-  vnl_matrix<double> Vy(N*S, 3, 0.0);
-  vnl_matrix<double> P(N*S, 3, 0.0);
-  vnl_matrix<double> s(N*S, 2, 0.0);
-  vnl_matrix<double> f(N*S, 1, 0.0);
+  vnl_matrix<double> xVersors(timeFrames*planesPerFrame, 3, 0.0);
+  vnl_matrix<double> yVersors(timeFrames*planesPerFrame, 3, 0.0);
+  vnl_matrix<double> positions(timeFrames*planesPerFrame, 3, 0.0);
+  vnl_matrix<double> imageSize(timeFrames*planesPerFrame, 2, 0.0);
+  vnl_matrix<double> frame(timeFrames*planesPerFrame, 1, 0.0);
 
-  // 
-  //   % dall'infodicom di ciascuna immagine recupero le info necessarie
-  //     h = waitbar(0,'Mapping DICOM folder ...');
-  //   for i = 1:N*S
-  //     info = dicominfo([path '\' filelist(i).name]);
-  //     P(i,:)  = info.ImagePositionPatient;
-  //   Vx(i,:) = info.ImageOrientationPatient(1:3);
-  //   Vy(i,:) = info.ImageOrientationPatient(4:6);
-  //   s(i,:)  = [info.Columns info.Rows]; 
-  //   f(i) = info.InstanceNumber;
-  //   waitbar(i/(N*S));
-  //   end
-  //     close(h);
 
-  for (int i = 0; i < N*S; i++) 
+  for (int i = 0; i < timeFrames*planesPerFrame; i++) 
   {
 
-    wxString currentDicomSliceFileName = directoryReader->GetFile(i+firstDicomSliceFileIndex);
+    wxString currentDicomSliceFileName = dicomLocalFileNamesVector[i].c_str();
+
     wxString currentSliceABSFileName = dicomDir + currentDicomSliceFileName;
 
     CPPUNIT_ASSERT(wxFileExists(currentSliceABSFileName));
@@ -470,91 +422,78 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
     long int dcmInstanceNumber;
     dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
 
-    //     P(i,:)  = info.ImagePositionPatient;
-    //   Vx(i,:) = info.ImageOrientationPatient(1:3);
-    //   Vy(i,:) = info.ImageOrientationPatient(4:6);
-    //   s(i,:)  = [info.Columns info.Rows]; 
-    //   f(i) = info.InstanceNumber;
-    //   waitbar(i/(N*S));
-    //   end
-
-
     for (int j = 0; j < 3; j++) 
     {
-      P(i,j) = dcmImagePositionPatient[j];
-      Vx(i,j) = dcmImageOrientationPatient[j];
-      Vy(i,j) = dcmImageOrientationPatient[j+3];
+      positions(i,j) = dcmImagePositionPatient[j];
+      xVersors(i,j) = dcmImageOrientationPatient[j];
+      yVersors(i,j) = dcmImageOrientationPatient[j+3];
     }
     
-    s(i, 0) = dcmColumns;
-    s(i, 1) = dcmRows;
+    imageSize(i, 0) = dcmColumns;
+    imageSize(i, 1) = dcmRows;
 
-    f(i,0) = dcmInstanceNumber;
+    frame(i,0) = dcmInstanceNumber;
   }
   
-  cout<< P(0,0);
+  cout<< positions(0,0);
 
-  double diff = fabs(P(0,0) - 191.8841);
+  double diff = fabs(positions(0,0) - 191.8841);
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(P(0,1) - (- 195.6752));
+  diff = fabs(positions(0,1) - (- 195.6752));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(P(0,2) - (75.2316));
+  diff = fabs(positions(0,2) - (75.2316));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  cout << P(719,0);
-  diff = fabs(P(719,0) - ( -7.5477));
+  cout << positions(719,0);
+  diff = fabs(positions(719,0) - ( -7.5477));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(P(719,1) - (136.5524));
+  diff = fabs(positions(719,1) - (136.5524));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(P(719,2) - (204.6599));
+  diff = fabs(positions(719,2) - (204.6599));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vx(0,0) - (-0.6247));
+  diff = fabs(xVersors(0,0) - (-0.6247));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vx(0,1) - (0.6782));
+  diff = fabs(xVersors(0,1) - (0.6782));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vx(0,2) - (0.3871));
+  diff = fabs(xVersors(0,2) - (0.3871));
   //CPPUNIT_ASSERT(diff<.0001);
 
   // 0.6255   -0.6768   -0.3881
-  diff = fabs(Vx(719,0) - (0.6255));
+  diff = fabs(xVersors(719,0) - (0.6255));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vx(719,1) - (-0.6768));
+  diff = fabs(xVersors(719,1) - (-0.6768));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vx(719,2) - (-0.3881));
+  diff = fabs(xVersors(719,2) - (-0.3881));
   //CPPUNIT_ASSERT(diff<.0001);
 
   // -0.3197    0.2301   -0.9191
-  diff = fabs(Vy(0,0) - (-0.3197));
+  diff = fabs(yVersors(0,0) - (-0.3197));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vy(0,1) - (0.2301));
+  diff = fabs(yVersors(0,1) - (0.2301));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vy(0,2) - (-0.9191));
+  diff = fabs(yVersors(0,2) - (-0.9191));
   //CPPUNIT_ASSERT(diff<.0001);
 
   //  -0.6312   -0.1467   -0.7616
-  diff = fabs(Vy(719,0) - ( -0.6312));
+  diff = fabs(yVersors(719,0) - ( -0.6312));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vy(719,1) - (-0.1467));
+  diff = fabs(yVersors(719,1) - (-0.1467));
   //CPPUNIT_ASSERT(diff<.0001);
 
-  diff = fabs(Vy(719,2) - (-0.7616));
+  diff = fabs(yVersors(719,2) - (-0.7616));
   //CPPUNIT_ASSERT(diff<.0001);
-
-  cout << std::endl;
-  cout << s(0,0) << std::endl;
-  cout << s(0,1) << std::endl;
 
 
   //   %% MAPPING PIANO-FRAME
@@ -563,13 +502,16 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //     flag_img = zeros(S,N);
   // 
 
-  vnl_matrix<double> flag_img(S,N,0);
+//   % - flag_img: contiene l'indice dell'immagine per ogni coordinata
+//     %   piano-frame (eg: se flag_img(i,j) == num_img, allora
+//     %   filelist(num_img).name è il nome file che contiente l'immagine del piano i nel frame j
+  vnl_matrix<double> fileNumberForPlaneIFrameJ(planesPerFrame,timeFrames,0);
 
   const char *dcmManufacturer = "?";
   dicomDataset->findAndGetString(DCM_Manufacturer, dcmManufacturer);
 
   cout << std::endl;
-  cout << f;
+  cout << frame;
   cout << std::endl;
 
   // QUI
@@ -590,9 +532,9 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
     // 1 x 18 double
     vector<double> id_frame;
 
-    for (int i = 0; i < f.rows(); i++) 
+    for (int i = 0; i < frame.rows(); i++) 
     {
-      if (f(i,0) == 1)
+      if (frame(i,0) == 1)
       {
         id_frame.push_back(i);
       }
@@ -601,9 +543,9 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
     //CPPUNIT_ASSERT(id_frame.size() == 18);
     //CPPUNIT_ASSERT(id_frame[0] == 655);
 
-    for (int i = 0; i < flag_img.rows(); i++) 
+    for (int i = 0; i < fileNumberForPlaneIFrameJ.rows(); i++) 
     {
-      flag_img(i,0) = id_frame[i];
+      fileNumberForPlaneIFrameJ(i,0) = id_frame[i];
     }
 
     //CPPUNIT_ASSERT(flag_img(0,0)==655);
@@ -630,34 +572,34 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
     //     ....
 
     // build VxVy
-    vnl_matrix<double> VxVy(N*S, 6);
-    for (int i = 0; i < N*S; i++) 
+    vnl_matrix<double> VxVy(timeFrames*planesPerFrame, 6);
+    for (int i = 0; i < timeFrames*planesPerFrame; i++) 
     {
       for (int j = 0; j < 3; j++) 
       {
-        VxVy(i,j) = Vx(i,j);
-        VxVy(i,j+3) = Vy(i,j);
+        VxVy(i,j) = xVersors(i,j);
+        VxVy(i,j+3) = yVersors(i,j);
       }
     }
     
     // cout << VxVy;
 
-    for (int i = 0; i < S; i++) 
+    for (int i = 0; i < planesPerFrame; i++) 
     {
       // build Vtemp(i)
-      vnl_matrix<double> Vtemp(N*S, 6);
-      for (int row = 0; row < N*S; row++) 
+      vnl_matrix<double> Vtemp(timeFrames*planesPerFrame, 6);
+      for (int row = 0; row < timeFrames*planesPerFrame; row++) 
       {
         for (int col = 0; col < 3; col++) 
         {
-          Vtemp(row, col) = Vx(id_frame[i],col);
-          Vtemp(row, col +3) = Vy(id_frame[i],col);
+          Vtemp(row, col) = xVersors(id_frame[i],col);
+          Vtemp(row, col +3) = yVersors(id_frame[i],col);
         }      
       }
 
       vector<double> id_plane;
 
-      for (int a = 0; a < N*S; a++) 
+      for (int a = 0; a < timeFrames*planesPerFrame; a++) 
       {
         if (Vtemp.get_row(a) == VxVy.get_row(a))
         {
@@ -678,7 +620,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 //         cout << "i: " << i << std::endl;
 //         cout << "f(k,0): " << f(k,0) << std::endl;
 
-        flag_img(i, f(k,0) - 1 ) = k;
+        fileNumberForPlaneIFrameJ(i, frame(k,0) - 1 ) = k;
         assert(true);
       }
       assert(true);
@@ -696,9 +638,9 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
     
     std::map<int,int> idFramePlane_Dummy_Map;
 
-    for (int i = 0; i < f.rows() ; i++) 
+    for (int i = 0; i < frame.rows() ; i++) 
     {
-      idFramePlane_Dummy_Map[f(i,0)] = i;
+      idFramePlane_Dummy_Map[frame(i,0)] = i;
     }
 
     std::map<int,int>::iterator mapIterator;
@@ -717,15 +659,15 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
 
     // 1 3 5 6 8 10
-    vnl_matrix<double> flag_img_transpose(N,S);
+    vnl_matrix<double> flag_img_transpose(timeFrames,planesPerFrame);
                         
-    for (int j = 0; j < S; j++) 
+    for (int j = 0; j < planesPerFrame; j++) 
     {
-      for (int i = 0; i < N; i++) 
+      for (int i = 0; i < timeFrames; i++) 
       {
-        cout<<"i: "<<i<<"    j: "<<j<<"  " << "    value: " << idFramePlane[i + j*N];
+        cout<<"i: "<<i<<"    j: "<<j<<"  " << "    value: " << idFramePlane[i + j*timeFrames];
         cout << std::endl;
-        flag_img_transpose(i,j) = idFramePlane[i + j*N];
+        flag_img_transpose(i,j) = idFramePlane[i + j*timeFrames];
       }
     }
 
@@ -735,11 +677,11 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
     
     // ok fin qui
 
-    flag_img = flag_img_transpose.transpose();
+    fileNumberForPlaneIFrameJ = flag_img_transpose.transpose();
 
   }
 
-  cout << flag_img << std::endl;
+  cout << fileNumberForPlaneIFrameJ << std::endl;
   assert(true);
 //   %GE MEDICAL SYSTEMS - PISA    
 //   else 
@@ -758,13 +700,13 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //   P  = P(flag_img(:,1),:);
   //   s  = s(flag_img(:,1),:);
 
-  vnl_vector<double> c0 = flag_img.get_column(0);
+  vnl_vector<double> c0 = fileNumberForPlaneIFrameJ.get_column(0);
 
-  vnl_matrix<double> VxSingleFrame(S,3);
-  vnl_matrix<double> VySingleFrame(S,3);
+  vnl_matrix<double> xVersorsSingleFrame(planesPerFrame,3);
+  vnl_matrix<double> yVersorsSingleFrame(planesPerFrame,3);
 
-  vnl_matrix<double> PSingleFrame(S, 3);
-  vnl_matrix<double> sSingleFrame(S, 2);
+  vnl_matrix<double> positionSingleFrame(planesPerFrame, 3);
+  vnl_matrix<double> imageSizeSingleFrame(planesPerFrame, 2);
 
   
   // for all the id in the first column
@@ -772,13 +714,13 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   {
     for (int j = 0; j < 3; j++) 
     {
-      VxSingleFrame(i, j) = Vx(c0(i), j);
-      VySingleFrame(i, j) = Vy(c0(i), j);
-      PSingleFrame(i, j) = P(c0(i), j);
+      xVersorsSingleFrame(i, j) = xVersors(c0(i), j);
+      yVersorsSingleFrame(i, j) = yVersors(c0(i), j);
+      positionSingleFrame(i, j) = positions(c0(i), j);
 
       if (j != 2)
       {
-        sSingleFrame(i, j) = s(c0(i), j);
+        imageSizeSingleFrame(i, j) = imageSize(c0(i), j);
       }
     }     
   }
@@ -796,10 +738,10 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
   
   vnl_vector<double> proj(4);
-  proj(0) = abs(dot_product(VxSingleFrame.get_row(0), VxSingleFrame.get_row(1)));
-  proj(1) = abs(dot_product(VxSingleFrame.get_row(0), VySingleFrame.get_row(1)));
-  proj(2) = abs(dot_product(VySingleFrame.get_row(0), VxSingleFrame.get_row(1)));
-  proj(3) = abs(dot_product(VySingleFrame.get_row(0), VySingleFrame.get_row(1)));
+  proj(0) = abs(dot_product(xVersorsSingleFrame.get_row(0), xVersorsSingleFrame.get_row(1)));
+  proj(1) = abs(dot_product(xVersorsSingleFrame.get_row(0), yVersorsSingleFrame.get_row(1)));
+  proj(2) = abs(dot_product(yVersorsSingleFrame.get_row(0), xVersorsSingleFrame.get_row(1)));
+  proj(3) = abs(dot_product(yVersorsSingleFrame.get_row(0), yVersorsSingleFrame.get_row(1)));
 
   cout << proj;
 
@@ -832,11 +774,11 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
   if (idx_mode == 0 || idx_mode ==1)
   {
-     Vmode = VxSingleFrame.get_row(0);
+     Vmode = xVersorsSingleFrame.get_row(0);
   } 
   else
   {
-    Vmode = VySingleFrame.get_row(0);
+    Vmode = yVersorsSingleFrame.get_row(0);
   }
   
   cout << Vmode;
@@ -861,10 +803,10 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   
   vnl_vector<double> project(2);
 
-  for (int i = 0; i < S; i++) 
+  for (int i = 0; i < planesPerFrame; i++) 
   {
-    project(0) = abs(dot_product(Vmode, VxSingleFrame.get_row(i)));
-    project(1) = abs(dot_product(Vmode, VySingleFrame.get_row(i)));
+    project(0) = abs(dot_product(Vmode, xVersorsSingleFrame.get_row(i)));
+    project(1) = abs(dot_product(Vmode, yVersorsSingleFrame.get_row(i)));
 
     double p0 = project(0);
     double p1 = project(1);
@@ -934,54 +876,54 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   end
  */
 
-  vnl_matrix<double> Pp(PSingleFrame.rows(), PSingleFrame.cols(), 0);
-  vnl_matrix<double> Vxx(VxSingleFrame.rows(), VxSingleFrame.cols(), 0);
-  vnl_matrix<double> Vyy(VySingleFrame.rows(), VySingleFrame.cols(), 0);
-  vnl_matrix<double> ss(S, 2, 0);
-  ss.fill(0.0);
+  vnl_matrix<double> newPositionSingleFrame(positionSingleFrame.rows(), positionSingleFrame.cols(), 0);
+  vnl_matrix<double> newXVersorsSingleFrame(xVersorsSingleFrame.rows(), xVersorsSingleFrame.cols(), 0);
+  vnl_matrix<double> newYVersorsSingleFrame(yVersorsSingleFrame.rows(), yVersorsSingleFrame.cols(), 0);
+  vnl_matrix<double> newImageSizeSingleFrame(planesPerFrame, 2, 0);
+  newImageSizeSingleFrame.fill(0.0);
 
-  cout << ss;
+  cout << newImageSizeSingleFrame;
 
-  vnl_matrix<double> rot(S,1,0.0);
-  vnl_matrix<double> fliplr_flag(S,1,0.0);
-  vnl_matrix<double> flipud_flag(S,1,0.0);
+  vnl_matrix<double> rotateFlag(planesPerFrame,1,0.0);
+  vnl_matrix<double> flipLeftRightFlag(planesPerFrame,1,0.0);
+  vnl_matrix<double> flipUpDownFlag(planesPerFrame,1,0.0);
 
   for (int index = 0; index < idx.size(); index++) 
   {
     int idx_ith_value = idx[index];
     
-    ss(idx_ith_value,0) = sSingleFrame(idx_ith_value, 1);
-    ss(idx_ith_value,1) = sSingleFrame(idx_ith_value, 0);
+    newImageSizeSingleFrame(idx_ith_value,0) = imageSizeSingleFrame(idx_ith_value, 1);
+    newImageSizeSingleFrame(idx_ith_value,1) = imageSizeSingleFrame(idx_ith_value, 0);
     
-    cout << ss;
+    cout << newImageSizeSingleFrame;
     
-    if (VxSingleFrame(idx_ith_value,0) > 0)
+    if (xVersorsSingleFrame(idx_ith_value,0) > 0)
     {
 //       //S 3
       for (int col = 0; col < 3; col++) 
       {
-        Pp(idx_ith_value,col) = PSingleFrame(idx_ith_value,col) + \
-          sSingleFrame(idx_ith_value,0) * \
-          spacing[0] * VxSingleFrame(idx_ith_value,col);
+        newPositionSingleFrame(idx_ith_value,col) = positionSingleFrame(idx_ith_value,col) + \
+          imageSizeSingleFrame(idx_ith_value,0) * \
+          spacing[0] * xVersorsSingleFrame(idx_ith_value,col);
 
-        cout << idx_ith_value << " " << col << " " << Pp(idx_ith_value, col) << std::endl;
+        cout << idx_ith_value << " " << col << " " << newPositionSingleFrame(idx_ith_value, col) << std::endl;
       }
         
-      Vxx.set_row(idx_ith_value , VySingleFrame.get_row(idx_ith_value));
-      Vyy.set_row(idx_ith_value , -VxSingleFrame.get_row(idx_ith_value));
-      rot(idx_ith_value,0) = 90;
+      newXVersorsSingleFrame.set_row(idx_ith_value , yVersorsSingleFrame.get_row(idx_ith_value));
+      newYVersorsSingleFrame.set_row(idx_ith_value , -xVersorsSingleFrame.get_row(idx_ith_value));
+      rotateFlag(idx_ith_value,0) = 90;
 //       
    } 
    else
    {
-      Pp.set_row(idx_ith_value , PSingleFrame.get_row(idx_ith_value));
-      Vxx.set_row(idx_ith_value , VySingleFrame.get_row(idx_ith_value));
-      Vyy.set_row(idx_ith_value , VxSingleFrame.get_row(idx_ith_value));
-      rot(idx_ith_value,0) = 90;
-      fliplr_flag(idx_ith_value,0) = 1;
+      newPositionSingleFrame.set_row(idx_ith_value , positionSingleFrame.get_row(idx_ith_value));
+      newXVersorsSingleFrame.set_row(idx_ith_value , yVersorsSingleFrame.get_row(idx_ith_value));
+      newYVersorsSingleFrame.set_row(idx_ith_value , xVersorsSingleFrame.get_row(idx_ith_value));
+      rotateFlag(idx_ith_value,0) = 90;
+      flipLeftRightFlag(idx_ith_value,0) = 1;
     }
     
-    cout << Pp;
+    cout << newPositionSingleFrame;
   }
 
 
@@ -1009,29 +951,29 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   {
     int idy_ith_value = idy[index];
 
-    ss(idy_ith_value,0) = sSingleFrame(idy_ith_value, 0);
-    ss(idy_ith_value,1) = sSingleFrame(idy_ith_value, 1);
+    newImageSizeSingleFrame(idy_ith_value,0) = imageSizeSingleFrame(idy_ith_value, 0);
+    newImageSizeSingleFrame(idy_ith_value,1) = imageSizeSingleFrame(idy_ith_value, 1);
 
-    if (VySingleFrame(idy_ith_value,0) > 0)
+    if (yVersorsSingleFrame(idy_ith_value,0) > 0)
     {
       //       //S 3
       for (int col = 0; col < 3; col++) 
       {
-        Pp(idy_ith_value,col) = PSingleFrame(idy_ith_value,col) + \
-          sSingleFrame(idy_ith_value,1) * \
-          spacing[1] * VySingleFrame(idy_ith_value,col);
+        newPositionSingleFrame(idy_ith_value,col) = positionSingleFrame(idy_ith_value,col) + \
+          imageSizeSingleFrame(idy_ith_value,1) * \
+          spacing[1] * yVersorsSingleFrame(idy_ith_value,col);
       }
 
-      Vxx.set_row(idy_ith_value , VxSingleFrame.get_row(idy_ith_value));
-      Vyy.set_row(idy_ith_value , -VySingleFrame.get_row(idy_ith_value));
-      flipud_flag(idy_ith_value,0) = 1;
+      newXVersorsSingleFrame.set_row(idy_ith_value , xVersorsSingleFrame.get_row(idy_ith_value));
+      newYVersorsSingleFrame.set_row(idy_ith_value , -yVersorsSingleFrame.get_row(idy_ith_value));
+      flipUpDownFlag(idy_ith_value,0) = 1;
       //       
     } 
     else
     {
-      Pp.set_row(idy_ith_value , PSingleFrame.get_row(idy_ith_value));
-      Vxx.set_row(idy_ith_value , VxSingleFrame.get_row(idy_ith_value));
-      Vyy.set_row(idy_ith_value , VySingleFrame.get_row(idy_ith_value));
+      newPositionSingleFrame.set_row(idy_ith_value , positionSingleFrame.get_row(idy_ith_value));
+      newXVersorsSingleFrame.set_row(idy_ith_value , xVersorsSingleFrame.get_row(idy_ith_value));
+      newYVersorsSingleFrame.set_row(idy_ith_value , yVersorsSingleFrame.get_row(idy_ith_value));
     }
   }
 
@@ -1046,14 +988,14 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
   //   Vidx(1,:) = V(1,:);
   // 
 
-  vnl_matrix<double> V(S,4);
+  vnl_matrix<double> V(planesPerFrame,4);
 
   for (int i = 0; i < V.rows() ; i++) 
   {
     V(i, 0) = i;
     for (int j = 1; j < V.cols(); j++) 
     {
-      V(i,j) = Vxx(i, j-1);
+      V(i,j) = newXVersorsSingleFrame(i, j-1);
     }    
   }
   
@@ -1111,7 +1053,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
   for (int i = 0; i < theta.size(); i++) 
   {
-    if (theta[i] < 1.1 * (vnl_math::pi/S))
+    if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
     {
       id_theta.push_back(i);
     }
@@ -1197,7 +1139,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
          for (int i = 0; i < theta.size(); i++) 
          {
-           if (theta[i] < 1.1 * (vnl_math::pi/S))
+           if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
            {
              id_theta.push_back(i);
            }
@@ -1236,20 +1178,8 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
            theta.clear();
 
-           //     cout << V;
-           //   V(id_theta,:)=[] (END);
-
          }
          
-//          cout << std::endl;
-//          cout << Vidx;
-//          cout << std::endl;
-//          cout << V;
-//          cout << std::endl;
-
-         //////////////// second FOR
-         
-// 
 //          % calcolo l'angolo tra primo piano indicizzato e gli altri piani
 //            for i = 1:size(V,1)
 //              theta(i) = acos(dot(Vidx(1,2:4),V(i,2:4)));
@@ -1276,8 +1206,6 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
          //  id_theta = find(theta<1.1*(pi/S));
 
-         cout << std::endl;
-
          for (int i = 0; i < theta.size(); i++) 
          {
            cout << theta[i] << std::endl;
@@ -1287,7 +1215,7 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
 
          for (int i = 0; i < theta.size(); i++) 
          {
-           if (theta[i] < 1.1 * (vnl_math::pi/S))
+           if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
            {
              id_theta.push_back(i);
              cout << std::endl;
@@ -1339,81 +1267,106 @@ void medOpImporterDicomOffisTest::TestMatlabScriptConverter()
          cout << std::endl;
 
   }
-//       if ~isempty(id_theta)
-//         Vidx = [Vidx; V(id_theta,:)];
-//         V(id_theta,:)=[];
-//       end
-//       clear theta
-//  
-
-//       % calcolo l'angolo tra primo piano indicizzato e gli altri piani
-//       for i = 1:size(V,1)
-//           theta(i) = acos(dot(Vidx(1,2:4),V(i,2:4)));
-//       end
-
-//       id_theta = find(theta<1.1*(pi/S));
-//       if ~isempty(id_theta)
-//           Vidx = [V(id_theta,:); Vidx];
-//           V(id_theta,:)=[];
-//       end
-//       clear theta
-//   end
 
   vnl_vector<double> id_plane = Vidx.get_column(0);
 
   cout << std::endl;
 
   // order variables following planes order
-  ExtractRows(flag_img, id_plane, flag_img);
-  cout << flag_img;
+  ExtractRows(fileNumberForPlaneIFrameJ, id_plane, fileNumberForPlaneIFrameJ);
+  cout << fileNumberForPlaneIFrameJ;
   cout << std::endl;
+
+// 
+//   % parametri di posizione/orientamento originali da DICOM
+//     % - P patient position (da DICOM)
+//     % - Vx, Vy versori immagine (da DICOM)
+//     % - s dimensione immagine (da DICOM)
+//     % 
 
   // original dicom parameters
-  ExtractRows(PSingleFrame, id_plane, PSingleFrame);
-  cout << PSingleFrame;
+  ExtractRows(positionSingleFrame, id_plane, positionSingleFrame);
+  cout << positionSingleFrame;
   cout << std::endl;
 
-  ExtractRows(VxSingleFrame, id_plane, VxSingleFrame);
-  cout << VxSingleFrame;
+  ExtractRows(xVersorsSingleFrame, id_plane, xVersorsSingleFrame);
+  cout << xVersorsSingleFrame;
   cout << std::endl;
 
-  ExtractRows(VySingleFrame, id_plane, VySingleFrame);
-  cout << VySingleFrame;
+  ExtractRows(yVersorsSingleFrame, id_plane, yVersorsSingleFrame);
+  cout << yVersorsSingleFrame;
   cout << std::endl;
 
-  ExtractRows(sSingleFrame, id_plane, sSingleFrame);
-  cout << sSingleFrame;
+  ExtractRows(imageSizeSingleFrame, id_plane, imageSizeSingleFrame);
+  cout << imageSizeSingleFrame;
   cout << std::endl;
 
-  // updated dicom parameters
-  ExtractRows(Pp, id_plane, Pp);
-  cout << Pp;
+// 
+//   % parametri di posizione/orientamento originali da DICOM
+//     % - Pp patient position (da DICOM)
+//     % - Vxx, Vyy versori immagine (da DICOM)
+//     % - ss dimensione immagine (da DICOM)
+//     % 
+
+  /////////////////////////////
+  // updated (output) dicom parameters:
+  /////////////////////////////
+
+  
+  ExtractRows(newPositionSingleFrame, id_plane, newPositionSingleFrame);
+  cout << newPositionSingleFrame;
   cout << std::endl;
 
-  ExtractRows(Vxx, id_plane, Vxx);
-  cout << Vxx;
+  ExtractRows(newXVersorsSingleFrame, id_plane, newXVersorsSingleFrame);
+  cout << newXVersorsSingleFrame;
   cout << std::endl;
 
-  ExtractRows(Vyy, id_plane, Vyy);
-  cout << Vyy;
+  ExtractRows(newYVersorsSingleFrame, id_plane, newYVersorsSingleFrame);
+  cout << newYVersorsSingleFrame;
   cout << std::endl;
 
-  ExtractRows(ss, id_plane, ss);
-  cout << ss;
+  ExtractRows(newImageSizeSingleFrame, id_plane, newImageSizeSingleFrame);
+  cout << newImageSizeSingleFrame;
   cout << std::endl;
 
+// 
+//   % mappatura immagini
+//     % - N: numero frame nell'acquisizione
+//     % - numero piani nell'acquisizione
+//     % - filelist: struct array contente nel campo name il nome di ciascuna
+//     %   immagine apprtentente all'acquisizione
+//     % - flag_img: contiene l'indice dell'immagine per ogni coordinata
+//     %   piano-frame (eg: se flag_img(i,j) == num_img, allora
+//     %   filelist(num_img).name è il nome file che contiente l'immagine del piano i nel frame j
+//     % 
+
+     // fileNumberForPlaneIFrameJ
+     // dicomLocalFileNamesVector
+
+//   % parametrui di rotazione da applicare alle immagini acquisite per ottenere
+//     % immagini tra loro coerenti
+//     % - rot: contiene la rotazione da effettuare
+//     % - fliplr_flag: se 1 l'immagine deve essere specchiata in orizzontale
+//     % - fliplr_flag: se 1 l'immagine deve essere specchiata in verticale
 
   // rotations and flip flags
-  ExtractRows(rot, id_plane, rot);
-  cout << rot;
+
+  for (int i = 0; i < id_plane.size(); i++) 
+  {
+    cout << std::endl;
+    cout << id_plane[i];
+  }
+
+  ExtractRows(rotateFlag, id_plane, rotateFlag);
+  cout << rotateFlag;
   cout << std::endl;
 
-  ExtractRows(fliplr_flag, id_plane, fliplr_flag);
-  cout << fliplr_flag;
+  ExtractRows(flipLeftRightFlag, id_plane, flipLeftRightFlag);
+  cout << flipLeftRightFlag;
   cout << std::endl;
 
-  ExtractRows(flipud_flag, id_plane, flipud_flag);
-  cout << flipud_flag;
+  ExtractRows(flipUpDownFlag, id_plane, flipUpDownFlag);
+  cout << flipUpDownFlag;
   cout << std::endl;
 
   mafDEL(importer);

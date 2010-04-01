@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-03-15 14:09:50 $
-Version:   $Revision: 1.1.2.25 $
+Date:      $Date: 2010-04-01 16:16:57 $
+Version:   $Revision: 1.1.2.26 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -73,9 +73,9 @@ class vtkPolyData;
 class vtkTextMapper;
 class mafVMEGroup;
 
+class medImporterDICOMListElements;
+class medListDICOMFiles;
 
-
-WX_DECLARE_LIST(medImporterDICOMListElements, medListDICOMFiles);
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
 //----------------------------------------------------------------------------

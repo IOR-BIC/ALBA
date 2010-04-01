@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-03-26 15:27:43 $
-Version:   $Revision: 1.1.2.78 $
+Date:      $Date: 2010-04-01 16:16:57 $
+Version:   $Revision: 1.1.2.79 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -145,6 +145,25 @@ MafMedical is partially based on OpenMAF.
 #define INCLUDE_CSTRING
 #include "dcmtk/ofstd/ofstdinc.h"
 
+
+// copied from wx/list.h : needed to make Visual Assist X work correctly 
+// with this class (al least in version 10.5.1711)
+#define WX_DECLARE_LIST_3(T, Tbase, name, nodetype, classexp)               \
+  WX_DECLARE_LIST_4(T, Tbase, name, nodetype, classexp, WX_LIST_PTROP_NONE)
+#define WX_DECLARE_LIST_PTR_3(T, Tbase, name, nodetype, classexp)        \
+  WX_DECLARE_LIST_4(T, Tbase, name, nodetype, classexp, WX_LIST_PTROP)
+
+#define WX_DECLARE_LIST_2(elementtype, listname, nodename, classexp)        \
+  WX_DECLARE_LIST_3(elementtype, elementtype, listname, nodename, classexp)
+#define WX_DECLARE_LIST_PTR_2(elementtype, listname, nodename, classexp)        \
+  WX_DECLARE_LIST_PTR_3(elementtype, elementtype, listname, nodename, classexp)
+
+#define WX_DECLARE_LIST(elementtype, listname)                              \
+  typedef elementtype _WX_LIST_ITEM_TYPE_##listname;                      \
+  WX_DECLARE_LIST_2(elementtype, listname, wx##listname##Node, class)
+// end copy
+
+WX_DECLARE_LIST(medImporterDICOMListElements, medListDICOMFiles);
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicomOffis);
