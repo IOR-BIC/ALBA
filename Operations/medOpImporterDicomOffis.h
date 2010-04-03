@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-01 16:16:57 $
-Version:   $Revision: 1.1.2.26 $
+Date:      $Date: 2010-04-03 13:30:55 $
+Version:   $Revision: 1.1.2.27 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -52,7 +52,7 @@ MafMedical is partially based on OpenMAF.
 //----------------------------------------------------------------------------
 // forward references :
 //----------------------------------------------------------------------------
-class medImporterDICOMListElements;
+class medDICOMListElement;
 class mmiDICOMImporterInteractor;
 class medGUIWizard;
 class medGUIWizardPageNew;
@@ -73,8 +73,8 @@ class vtkPolyData;
 class vtkTextMapper;
 class mafVMEGroup;
 
-class medImporterDICOMListElements;
-class medListDICOMFiles;
+class medDICOMListElement;
+class medDicomStudyFilesList;
 
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
@@ -113,16 +113,13 @@ public:
 	virtual void CreateGui();
 
   /** Set the directory name which contains DICOM slices to import. */
-  void SetDirName(const char *dirName){m_DicomDirectory = dirName;};
+  void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
 
   /** Return the directory name which contains DICOM slices to import. */
-  const char *GetDirName() const {return m_DicomDirectory.GetCStr();};
+  const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
 
   /** method allows to handle events from other objects*/
 	virtual void OnEvent(mafEventBase *maf_event);
-
-  /** Assign the dicom directory*/
-  void SetDicomDirectory(const char *directory){m_DicomDirectory = directory;}
 
   /** Set if output must be in imagedata(resampled) or original rectilinear grid. */
   void SetResampleFlag(int enable){m_ResampleFlag = enable;}
@@ -134,7 +131,7 @@ public:
   void ReadDicom();
 
   /** Create the slice slice_num. */
-  void CreateSlice(int slice_num);
+  void GenerateSliceTexture(int slice_num);
 
   /** Return vtkImageData of the selected slice */
   vtkImageData* GetFirstSlice(mafString sliceName);
@@ -243,7 +240,7 @@ protected:
   /** Rescale to 16 Bit */
   void RescaleTo16Bit(vtkImageData *dataSet);
 
-	vtkDirectory			*m_DirectoryReader; ///<Filter to get DICOM file from DICOM directory
+	vtkDirectory			*m_DICOMDirectoryReader; ///<Filter to get DICOM file from DICOM directory
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
 	vtkPolyDataMapper	*m_SliceMapper;
@@ -278,7 +275,7 @@ protected:
   mafGUI  *m_LoadGuiCenter;
 
   int       m_OutputType;
-	mafString	m_DicomDirectory;
+	mafString	m_DicomDirectoryABSFileName;
 	mafString m_PatientName;
 	mafString m_SurgeonName;
 	mafString	m_Identifier;
@@ -292,12 +289,12 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medListDICOMFiles	*m_ListSelected;
+	medDicomStudyFilesList	*m_SelectedDICOMList;
 
-  std::vector<mafString> m_VectorSelected;
-  std::map<std::vector<mafString>,medListDICOMFiles*> m_DicomMap;
+  std::vector<mafString> m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector;
+  std::map<std::vector<mafString>,medDicomStudyFilesList*> m_StudyIUIDSeriesIUIDVectorToDICOMListMap;
 
-	mafString	m_CurrentSliceName;
+	mafString	m_CurrentSliceABSFileName;
 	mafString	m_VolumeName;
   wxString  m_FileName;
 	int				m_VolumeSide;
@@ -346,16 +343,16 @@ protected:
 };
 
 /**
-  class name: medOpImporterDicomOffis
+  class name: medDICOMListElement
   It represents an element of the dicom list.
 */
-class medImporterDICOMListElements
+class medDICOMListElement
 {
 public:
   /** constructor */
-	medImporterDICOMListElements() 
+	medDICOMListElement() 
 	{
-		m_SliceFilename = "";
+		m_SliceABSFileName = "";
 		m_Pos[0] = -9999;
 		m_Pos[1] = -9999;
 		m_Pos[2] = -9999;
@@ -373,9 +370,9 @@ public:
 		m_NumberOfImages = -1;
 	};
   /** overloaded constructor */
-	medImporterDICOMListElements(mafString filename,double coord[3], double orientation[9], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
+	medDICOMListElement(mafString filename,double coord[3], double orientation[9], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
-		m_SliceFilename = filename;
+		m_SliceABSFileName = filename;
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
@@ -396,12 +393,12 @@ public:
 	};
 
   /** destructor */
-	~medImporterDICOMListElements() {vtkDEL(m_Data);};
+	~medDICOMListElement() {vtkDEL(m_Data);};
 
 	/** Add the filename and the image coordinates to the list. */
 	void SetListElement(mafString filename,double coord[3], double orientation[9], int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0) 
 	{
-		m_SliceFilename = filename; 
+		m_SliceABSFileName = filename; 
 		m_Pos[0] = coord[0];
 		m_Pos[1] = coord[1];
 		m_Pos[2] = coord[2];
@@ -420,7 +417,7 @@ public:
 	};
 
 	/** Return the filename of the corresponding dicom slice. */
-	const char *GetFileName() const {return m_SliceFilename.GetCStr();};
+	const char *GetFileName() const {return m_SliceABSFileName.GetCStr();};
 
 	/**	Return the Coordinate along a specified axes of the dicom slice	*/
 	double	GetCoordinate(int i) const {return m_Pos[i];};
@@ -455,7 +452,7 @@ public:
 protected:
 	double m_Pos[3];
   double m_Orientation[9];
-	mafString m_SliceFilename;
+	mafString m_SliceABSFileName;
 
 	double m_TriggerTime;
 	int m_ImageNumber;

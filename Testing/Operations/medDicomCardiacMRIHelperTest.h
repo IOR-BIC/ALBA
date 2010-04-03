@@ -1,10 +1,10 @@
 /*=========================================================================
 Program:   Multimod Application Framework
-Module:    $RCSfile: medOpImporterDicomOffisTest.h,v $
+Module:    $RCSfile: medDicomCardiacMRIHelperTest.h,v $
 Language:  C++
 Date:      $Date: 2010-04-03 13:31:17 $
-Version:   $Revision: 1.1.2.8 $
-Authors:   Roberto Mucci
+Version:   $Revision: 1.1.2.1 $
+Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
 CINECA - Interuniversity Consortium (www.cineca.it)
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MafMedical is partially based on OpenMAF.
 =========================================================================*/
 
-#ifndef CPP_UNIT_medOpImporterDicomOffisTest_H
-#define CPP_UNIT_medOpImporterDicomOffisTest_H
+#ifndef CPP_UNIT_medDicomCardiacMRIHelperTest_H
+#define CPP_UNIT_medDicomCardiacMRIHelperTest_H
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/BriefTestProgressListener.h>
@@ -49,9 +49,10 @@ MafMedical is partially based on OpenMAF.
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
+
 using namespace std;
  
-class medOpImporterDicomOffisTest : public CPPUNIT_NS::TestFixture
+class medDicomCardiacMRIHelperTest : public CPPUNIT_NS::TestFixture
 {
 
 public:
@@ -61,21 +62,34 @@ public:
   // CPPUNIT fixture: executed after each test
   void tearDown();
 
-  CPPUNIT_TEST_SUITE( medOpImporterDicomOffisTest );
-    CPPUNIT_TEST( TestDynamicAllocation );
-    CPPUNIT_TEST( TestAccept );
-    CPPUNIT_TEST( TestSetDirName );
-    CPPUNIT_TEST( TestCreateVolume );
-    CPPUNIT_TEST( TestCompareDicomImage );
+  CPPUNIT_TEST_SUITE( medDicomCardiacMRIHelperTest );
+
+    CPPUNIT_TEST(TestConstructorDestructor);
+    CPPUNIT_TEST(TestSetGetInputDicomDirectoryABSPath);
+
+  /**
+  
+  For the moment the following two test cases must be validated manually 
+  against filemapp.m output (copy/paste filemapp.m matlab code from medDicomCardiacMRIHelper.h) 
+  Execute matlab code and compare with test outputs
+  */
+  //  CPPUNIT_TEST(TestDicomGeneralElectricPisa);
+  //  CPPUNIT_TEST(TestDicomSiemensNiguarda);
+  
   CPPUNIT_TEST_SUITE_END();
 
 protected:
-  void TestDynamicAllocation();
-  void TestAccept();
-  void TestSetDirName();
-  void TestCompareDicomImage();
-  void TestCreateVolume();
+  void TestConstructorDestructor();
 
+  void TestSetGetInputDicomDirectoryABSPath();
+
+  /**
+  Validate this code against filemapp.m matlab code from medDicomCardiacMRIHelper.h */
+  void TestDicomGeneralElectricPisa();
+  
+   /**
+  Validate this code against filemapp.m matlab code from medDicomCardiacMRIHelper.h */
+  void TestDicomSiemensNiguarda();
 };
 
 int main( int argc, char* argv[] )
@@ -93,7 +107,7 @@ int main( int argc, char* argv[] )
 
   // Add the top suite to the test runner
   CPPUNIT_NS::TestRunner runner;
-  runner.addTest( medOpImporterDicomOffisTest::suite());
+  runner.addTest( medDicomCardiacMRIHelperTest::suite());
   runner.run( controller );
 
   // Print test in a compiler compatible format.

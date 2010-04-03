@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-01 16:16:57 $
-Version:   $Revision: 1.1.2.79 $
+Date:      $Date: 2010-04-03 13:30:55 $
+Version:   $Revision: 1.1.2.80 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -163,7 +163,7 @@ MafMedical is partially based on OpenMAF.
   WX_DECLARE_LIST_2(elementtype, listname, wx##listname##Node, class)
 // end copy
 
-WX_DECLARE_LIST(medImporterDICOMListElements, medListDICOMFiles);
+WX_DECLARE_LIST(medDICOMListElement, medDicomStudyFilesList);
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicomOffis);
@@ -209,13 +209,13 @@ enum DICOM_IMPORTER_MODALITY
 	GIZMO_DONE
 };
 
-int CompareX(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2);
-int CompareY(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2);
-int CompareZ(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2);
-int CompareTriggerTime(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2);
-int CompareImageNumber(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2);
+int CompareX(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
+int CompareY(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
+int CompareZ(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
+int CompareTriggerTime(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
+int CompareImageNumber(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
 
-WX_DEFINE_LIST(medListDICOMFiles);
+WX_DEFINE_LIST(medDicomStudyFilesList);
 //----------------------------------------------------------------------------
 medOpImporterDicomOffis::medOpImporterDicomOffis(wxString label):
 mafOp(label)
@@ -232,8 +232,8 @@ mafOp(label)
     
   m_PatientPosition = "";
 
-  m_VectorSelected.clear();
-  m_VectorSelected.resize(3);
+  m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.clear();
+  m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.resize(3);
 
 	m_Wizard = NULL;
 	m_LoadPage = NULL;
@@ -252,7 +252,7 @@ mafOp(label)
   m_TimeScannerCropPage = NULL;
   m_TimeScannerBuildPage = NULL;
 
-	m_DirectoryReader = NULL;
+	m_DICOMDirectoryReader = NULL;
 	m_SliceLookupTable = NULL;
 	m_SlicePlane = NULL;
 	m_SliceMapper = NULL;
@@ -268,9 +268,9 @@ mafOp(label)
   m_NumberOfSlices = -1;
 	m_StudyListbox = NULL;
   m_SeriesListbox = NULL;
-  m_ListSelected = NULL;
+  m_SelectedDICOMList = NULL;
 
-  m_DicomDirectory = "";
+  m_DicomDirectoryABSFileName = "";
 	m_DicomTypeRead = -1;
 
   m_HighBit = 0;
@@ -339,7 +339,7 @@ mafOp *medOpImporterDicomOffis::Copy()
 {
   medOpImporterDicomOffis *importer = new medOpImporterDicomOffis(m_Label);
   importer->m_ResampleFlag = m_ResampleFlag;
-  importer->m_DicomDirectory = m_DicomDirectory;
+  importer->m_DicomDirectoryABSFileName = m_DicomDirectoryABSFileName;
   importer->m_DiscardPosition = m_DiscardPosition;
   importer->m_RescaleTo16Bit = m_RescaleTo16Bit;
   
@@ -376,7 +376,7 @@ void medOpImporterDicomOffis::OpRun()
   bool firstTime = true;
   do 
   {
-	  if (m_DicomDirectory == "")
+	  if (m_DicomDirectoryABSFileName == "")
 	  {
 		  wxString path = (mafGetApplicationDirectory()+"/data/external/").c_str();
 		  wxDirDialog dialog(m_Wizard->GetParent(),"", path,wxRESIZE_BORDER, m_Wizard->GetPosition());
@@ -386,7 +386,7 @@ void medOpImporterDicomOffis::OpRun()
 		  if (ret_code == wxID_OK)
 		  {
 		    path = dialog.GetPath();
-		    m_DicomDirectory = path.c_str();
+		    m_DicomDirectoryABSFileName = path.c_str();
 		    GuiUpdate();
 		    result = OpenDir();
         if (!result)
@@ -408,7 +408,7 @@ void medOpImporterDicomOffis::OpRun()
       result = OpenDir();
       if (result == false)
       {
-        m_DicomDirectory = "";
+        m_DicomDirectoryABSFileName = "";
       }
     }
   } while(!result);
@@ -442,7 +442,7 @@ int medOpImporterDicomOffis::RunWizard()
       //rescale to 16 bit all the rest of the dataset
       if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
       {
-        int i=0, size = m_ListSelected->size();
+        int i=0, size = m_SelectedDICOMList->size();
 
         wxBusyInfo *wait = NULL;
         if(!this->m_TestMode)
@@ -454,7 +454,7 @@ int medOpImporterDicomOffis::RunWizard()
         long progress = 0;
         for(int slice_num=0;slice_num<size;slice_num++)
         {
-          RescaleTo16Bit(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+          RescaleTo16Bit(m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput());
           if(!this->m_TestMode)
           {
             progress = slice_num * 100 / (double)size;
@@ -515,14 +515,14 @@ void medOpImporterDicomOffis::Destroy()
   if(!this->m_TestMode)
     m_SeriesListbox->Clear();
 
-  std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-  for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+  std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+  for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
   {
-    m_DicomMap[(*it).first]->DeleteContents(TRUE);
-    m_DicomMap[(*it).first]->Clear();
+    m_StudyIUIDSeriesIUIDVectorToDICOMListMap[(*it).first]->DeleteContents(TRUE);
+    m_StudyIUIDSeriesIUIDVectorToDICOMListMap[(*it).first]->Clear();
   }
 
-  m_DicomMap.clear();
+  m_StudyIUIDSeriesIUIDVectorToDICOMListMap.clear();
 
   if(m_LoadPage)
   {
@@ -552,7 +552,7 @@ void medOpImporterDicomOffis::Destroy()
   }
 
   vtkDEL(m_SliceTexture);
-  vtkDEL(m_DirectoryReader);
+  vtkDEL(m_DICOMDirectoryReader);
   vtkDEL(m_SliceLookupTable);
   vtkDEL(m_SlicePlane);
   vtkDEL(m_SliceMapper);
@@ -621,7 +621,7 @@ int medOpImporterDicomOffis::BuildImages()
   for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
   {
     if (s_count == n_slices) {break;}
-    CreateSlice(count);
+    GenerateSliceTexture(count);
     
     double spacing[3];
     vtkMAFSmartPointer<vtkImageData> im;
@@ -685,7 +685,7 @@ int medOpImporterDicomOffis::BuildImages()
 
     if(!this->m_TestMode)
     {
-      progress = count * 100 / m_DirectoryReader->GetNumberOfFiles();
+      progress = count * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
     }
   }
@@ -767,8 +767,8 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
       assert(FALSE);
     }
 
-    medImporterDICOMListElements *element0;
-    element0 = (medImporterDICOMListElements *)m_ListSelected->Item(tsImageId)->GetData();
+    medDICOMListElement *element0;
+    element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(tsImageId)->GetData();
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
     for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
@@ -786,7 +786,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
       if (currImageId != -1) 
       {
         // update v_texture ivar
-        CreateSlice(currImageId);
+        GenerateSliceTexture(currImageId);
       }
 
       double spacing[3];
@@ -895,13 +895,13 @@ int medOpImporterDicomOffis::BuildVolume()
   for (count = m_ZCropBounds[0], s_count = 0; count < m_ZCropBounds[1]+1; count += step)
   {
     if (s_count == n_slices) {break;}
-    CreateSlice(count);
+    GenerateSliceTexture(count);
     accumulate->SetSlice(s_count,m_SliceTexture->GetInput());
     s_count++;
 
     if(!this->m_TestMode)
     {
-      progress = count * 100 / m_DirectoryReader->GetNumberOfFiles();
+      progress = count * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
       mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
     }
   }
@@ -956,7 +956,7 @@ int medOpImporterDicomOffis::BuildVolume()
   if (m_IsRotated)
   {
     double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-    m_ListSelected->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
+    m_SelectedDICOMList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
 
 
     //transform direction cosines to be used to set vtkMatrix
@@ -1085,8 +1085,8 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     {
       assert(FALSE);
     }
-    medImporterDICOMListElements *element0;
-    element0 = (medImporterDICOMListElements *)m_ListSelected->Item(tsImageId)->GetData();
+    medDICOMListElement *element0;
+    element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(tsImageId)->GetData();
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
     for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
@@ -1103,7 +1103,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
       if (currImageId != -1) 
       {
         // update v_texture ivar
-        CreateSlice(currImageId);
+        GenerateSliceTexture(currImageId);
       }
       accumulate->SetSlice(targetVolumeSliceId, m_SliceTexture->GetInput());
       targetVolumeSliceId++;
@@ -1155,7 +1155,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
     if (m_IsRotated)
     {
       double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-      m_ListSelected->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
+      m_SelectedDICOMList->Item(m_ZCropBounds[0])->GetData()->GetSliceOrientation(orientation);
   
       //transform direction cosines to be used to set vtkMatrix
    /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -1341,8 +1341,8 @@ int medOpImporterDicomOffis::BuildMesh()
 
 
   int currImageId = GetImageId(0, sourceVolumeSliceId);
-  medImporterDICOMListElements *element0;
-  element0 = (medImporterDICOMListElements *)m_ListSelected->Item(currImageId)->GetData();
+  medDICOMListElement *element0;
+  element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(currImageId)->GetData();
   mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
   m_Mesh->SetData(grid, 0);
   points->Delete();
@@ -1460,8 +1460,8 @@ int medOpImporterDicomOffis::BuildMeshCineMRI()
 
 
     int currImageId = GetImageId(ts, sourceVolumeSliceId);
-    medImporterDICOMListElements *element0;
-    element0 = (medImporterDICOMListElements *)m_ListSelected->Item(currImageId)->GetData();
+    medDICOMListElement *element0;
+    element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(currImageId)->GetData();
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
     m_Mesh->SetData(grid, tsDouble);
     points->Delete();
@@ -1487,7 +1487,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
   if (currImageId != -1) 
   {
     // update v_texture ivar
-    CreateSlice(currImageId);
+    GenerateSliceTexture(currImageId);
   }
 
   vtkMAFSmartPointer<vtkImageData> imageData;
@@ -1503,7 +1503,7 @@ vtkPolyData* medOpImporterDicomOffis::ExtractPolyData(int ts, int silceId)
   if (m_IsRotated)
   {
   double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  m_ListSelected->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
+  m_SelectedDICOMList->Item(currImageId)->GetData()->GetSliceOrientation(orientation);
 
     //transform direction cosines to be used to set vtkMatrix
  /* [ orientation[0]  orientation[1]  orientation[2]  -dst_pos_x ] 
@@ -1684,7 +1684,7 @@ bool medOpImporterDicomOffis::OpenDir()
 {
   ResetStructure();
   // scan dicom directory
-  if (!BuildDicomFileList(m_DicomDirectory.GetCStr()))
+  if (!BuildDicomFileList(m_DicomDirectoryABSFileName.GetCStr()))
   {
     return false;
   }
@@ -1725,19 +1725,19 @@ void medOpImporterDicomOffis::ReadDicom()
 {
   if (this->m_TestMode)
   {
-    m_VectorSelected = m_DicomMap.begin()->first;
+    m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector = m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin()->first;
   }
 
-  m_ListSelected = m_DicomMap[m_VectorSelected];
+  m_SelectedDICOMList = m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector];
 
   // sort dicom slices
-  if(m_ListSelected->GetCount() > 1)
+  if(m_SelectedDICOMList->GetCount() > 1)
   {
     double item1_pos[3],item2_pos[3],d[3];
-    medImporterDICOMListElements *element1;
-    medImporterDICOMListElements *element2;
-    element1 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
-    element2 = (medImporterDICOMListElements *)m_ListSelected->Item(1)->GetData();
+    medDICOMListElement *element1;
+    medDICOMListElement *element2;
+    element1 = (medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData();
+    element2 = (medDICOMListElement *)m_SelectedDICOMList->Item(1)->GetData();
     item1_pos[0] = element1->GetCoordinate(0);
     item1_pos[1] = element1->GetCoordinate(1);
     item1_pos[2] = element1->GetCoordinate(2);
@@ -1758,24 +1758,24 @@ void medOpImporterDicomOffis::ReadDicom()
    switch (m_SortAxes)
    {
    case 0:
-     m_ListSelected->Sort(CompareX);
+     m_SelectedDICOMList->Sort(CompareX);
      break;
    case 1:
-     m_ListSelected->Sort(CompareY);
+     m_SelectedDICOMList->Sort(CompareY);
      break;
    case 2:
-     m_ListSelected->Sort(CompareZ);
+     m_SelectedDICOMList->Sort(CompareZ);
      break;
    }
 
    //Build a wrong volume with this line!!!
    //m_ListSelected->Sort(CompareImageNumber);
 
-  m_NumberOfTimeFrames = ((medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
+  m_NumberOfTimeFrames = ((medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData())->GetNumberOfImages();
   if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
-    m_NumberOfSlices = m_ListSelected->GetCount() / m_NumberOfTimeFrames;
+    m_NumberOfSlices = m_SelectedDICOMList->GetCount() / m_NumberOfTimeFrames;
   else
-    m_NumberOfSlices = m_ListSelected->GetCount();
+    m_NumberOfSlices = m_SelectedDICOMList->GetCount();
 
   //Set bounds of ZCrop slider widget
   m_ZCropBounds[1] = m_NumberOfSlices-1;
@@ -1796,7 +1796,7 @@ void medOpImporterDicomOffis::ReadDicom()
     if (currImageId != -1) 
     {
       // show the selected slice
-      CreateSlice(currImageId);
+      GenerateSliceTexture(currImageId);
       ShowSlice();
       CameraReset();
       ResetSliders();
@@ -1873,7 +1873,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
           int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
           if (currImageId != -1) 
           {
-            CreateSlice(currImageId);
+            GenerateSliceTexture(currImageId);
             ShowSlice();
             CameraUpdate();
           }
@@ -1965,8 +1965,8 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 		case ID_STUDY:
 			{
         mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
-        m_VectorSelected.at(0) = st->GetCStr();
-        if (m_VectorSelected.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
+        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
+        if (m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
         {
           FillSeriesListBox();
           m_SeriesListbox->SetSelection(FIRST_SELECTION);
@@ -1977,17 +1977,17 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
     case ID_SERIES:
       {
         mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
-        m_VectorSelected.at(0) = st->GetCStr();
+        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
         wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
-        m_VectorSelected.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
-        std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-        for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
+        std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+        for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
         {
-          if ((*it).first.at(0).Compare(m_VectorSelected.at(0)) == 0)
+          if ((*it).first.at(0).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0)) == 0)
           { 
-            if ((*it).first.at(2).Compare(m_VectorSelected.at(2)) == 0)
+            if ((*it).first.at(2).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2)) == 0)
             {
-              m_VectorSelected.at(1) = (*it).first.at(1);
+              m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(1) = (*it).first.at(1);
               break;
             }
           }
@@ -1997,10 +1997,10 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
           m_BuildGuiLeft->Update();
           EnableSliceSlider(true);
 
-          m_ListSelected = m_DicomMap[m_VectorSelected];
+          m_SelectedDICOMList = m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector];
 
-          medImporterDICOMListElements *element0;
-          element0 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
+          medDICOMListElement *element0;
+          element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData();
 
           int numberOfImages =  element0->GetNumberOfImages();
           m_DicomTypeRead=-1;
@@ -2265,7 +2265,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
 					if (currImageId != -1) 
 					{
-            CreateSlice(currImageId);
+            GenerateSliceTexture(currImageId);
 						ShowSlice();
 						CameraUpdate();
 					}
@@ -2286,7 +2286,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
 					if (currImageId != -1) 
 					{
-            CreateSlice(currImageId);
+            GenerateSliceTexture(currImageId);
             ShowSlice();
 						CameraUpdate();
 					}
@@ -2316,7 +2316,7 @@ void medOpImporterDicomOffis::UndoCrop()
   int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
   if (currImageId != -1) 
   {
-    CreateSlice(currImageId);
+    GenerateSliceTexture(currImageId);
     ShowSlice();
   }
   double diffx,diffy,boundsCamera[6];
@@ -2351,7 +2351,7 @@ void medOpImporterDicomOffis::Crop()
   int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
   if (currImageId != -1) 
   {
-    CreateSlice(currImageId);
+    GenerateSliceTexture(currImageId);
     ShowSlice();
   }
 	m_CropActor->VisibilityOff();
@@ -2378,7 +2378,7 @@ void medOpImporterDicomOffis::Crop()
   //Modify name
   double spacing[3];
   int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-  m_ListSelected->Item(currImageId)->GetData()->GetOutput()->GetSpacing(spacing);
+  m_SelectedDICOMList->Item(currImageId)->GetData()->GetOutput()->GetSpacing(spacing);
   double pixelDimX = diffx/spacing[0] + 1;
   double pixelDimY = diffy/spacing[0] + 1;
 
@@ -2393,8 +2393,8 @@ void medOpImporterDicomOffis::AutoPositionCropPlane()
 {
 	int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
 
-	m_ListSelected->Item(currImageId)->GetData()->GetOutput()->Update();
-	m_ListSelected->Item(currImageId)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
+	m_SelectedDICOMList->Item(currImageId)->GetData()->GetOutput()->Update();
+	m_SelectedDICOMList->Item(currImageId)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
 
 	double diffY,diffX;
 	diffY=m_DicomBounds[3]-m_DicomBounds[2];
@@ -2466,7 +2466,7 @@ void medOpImporterDicomOffis::EnableTimeSlider(bool enable)
 void medOpImporterDicomOffis::CreatePipeline()
 //----------------------------------------------------------------------------
 {
-	vtkNEW(m_DirectoryReader);
+	vtkNEW(m_DICOMDirectoryReader);
 
 	vtkNEW(m_SliceLookupTable);
 
@@ -2527,8 +2527,8 @@ void medOpImporterDicomOffis::FillStudyListBox(std::vector<mafString> studyAndSe
   for (int n = 0; n < m_StudyListbox->GetCount(); n++)
   {
     mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
-    m_VectorSelected.at(0) = st->GetCStr();
-    if (m_VectorSelected.at(0).Compare(studyAndSeriesVec.at(0)) == 0)
+    m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
+    if (m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0).Compare(studyAndSeriesVec.at(0)) == 0)
     {
       newStudy = false;
       break;
@@ -2551,18 +2551,18 @@ void medOpImporterDicomOffis::UpdateStudyListBox()
     int counter = 0;
     mafString study = m_StudyListbox->GetString(n);
     mafString *st = (mafString *)m_StudyListbox->GetClientData(n);
-    m_VectorSelected.at(0) = st->GetCStr();
+    m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
     //wxString  studyName = st->GetCStr();
     //m_VectorSelected.at(0) = studyName.SubString(0, studyName.find_last_of("_")-1);
 
-    std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-    for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+    std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+    for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
     {
-      if ((*it).first.at(0).Compare(m_VectorSelected.at(0)) == 0)
+      if ((*it).first.at(0).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0)) == 0)
       { 
-        m_VectorSelected.at(1) = (*it).first.at(1);
-        m_VectorSelected.at(2) = (*it).first.at(2);
-        if (m_DicomMap.find(m_VectorSelected) != m_DicomMap.end())
+        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(1) = (*it).first.at(1);
+        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2) = (*it).first.at(2);
+        if (m_StudyIUIDSeriesIUIDVectorToDICOMListMap.find(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector) != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end())
         {
           counter++;
         }
@@ -2578,28 +2578,28 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 {
   int counter = 0;
   m_SeriesListbox->Clear();
-  std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-  for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+  std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+  for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
   {
-    if ((*it).first.at(0).Compare(m_VectorSelected.at(0)) == 0)
+    if ((*it).first.at(0).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0)) == 0)
     { 
-      m_VectorSelected.at(1) = (*it).first.at(1);
-      m_VectorSelected.at(2) = (*it).first.at(2);
-      if (m_DicomMap.find(m_VectorSelected) != m_DicomMap.end())
+      m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(1) = (*it).first.at(1);
+      m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2) = (*it).first.at(2);
+      if (m_StudyIUIDSeriesIUIDVectorToDICOMListMap.find(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector) != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end())
       {
-        m_ListSelected = m_DicomMap[m_VectorSelected];
+        m_SelectedDICOMList = m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector];
         int numberOfImages = 0;
 
-        int numberOfTimeFrames = ((medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData())->GetNumberOfImages();
+        int numberOfTimeFrames = ((medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData())->GetNumberOfImages();
         if(numberOfTimeFrames > 1) //If cMRI
-          numberOfImages = m_ListSelected->GetCount() / numberOfTimeFrames;
+          numberOfImages = m_SelectedDICOMList->GetCount() / numberOfTimeFrames;
         else
-          numberOfImages = m_ListSelected->GetCount();
+          numberOfImages = m_SelectedDICOMList->GetCount();
         
-        mafString seriesName = m_VectorSelected.at(2);
+        mafString seriesName = m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2);
         seriesName.Append(wxString::Format("x%i", numberOfImages));
         m_SeriesListbox->Append(seriesName.GetCStr());
-        m_SeriesListbox->SetClientData(counter,(void *)m_DicomMap[m_VectorSelected]/*filesList*/);
+        m_SeriesListbox->SetClientData(counter,(void *)m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector]/*filesList*/);
         counter++;
       }
     }
@@ -2645,7 +2645,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 	m_DicomTypeRead = -1;
   DcmFileFormat dicomImg;    
 
-	if (m_DirectoryReader->Open(dir) == 0)
+	if (m_DICOMDirectoryReader->Open(dir) == 0)
 	{
     if(!this->m_TestMode)
     {
@@ -2661,9 +2661,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
     wxBusyInfo wait_info("Reading DICOM directory: please wait");
   }
 
-	for (i=0; i < m_DirectoryReader->GetNumberOfFiles(); i++)
+	for (i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++)
 	{
-		if ((strcmp(m_DirectoryReader->GetFile(i),".") == 0) || (strcmp(m_DirectoryReader->GetFile(i),"..") == 0)) 
+		if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) || (strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
 		{
 			continue;
 		}
@@ -2671,11 +2671,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 		{
       sliceNum++;
       mafString file = "";
-			m_CurrentSliceName = m_DirectoryReader->GetFile(i);
+			m_CurrentSliceABSFileName = m_DICOMDirectoryReader->GetFile(i);
 			// Append of the path at the dicom file
 			file.Append(dir);
 			file.Append("\\");
-			file.Append(m_CurrentSliceName);
+			file.Append(m_CurrentSliceABSFileName);
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
       DcmRLEDecoderRegistration ::registerCodecs(OFFalse, OFFalse,OFFalse); // register RLE codecs
@@ -2981,8 +2981,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				}
 
         //if(m_DicomMap.find(studyAndSeriesVec) == m_DicomMap.end()) 
-        std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-        for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+        std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+        for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
         {
           if(studyAndSeriesVec.at(0) == (*it).first.at(0))
           {
@@ -3000,7 +3000,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           m_NumberOfStudy++;
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
-          medListDICOMFiles *filesList = new medListDICOMFiles;
+          medDicomStudyFilesList *filesList = new medDicomStudyFilesList;
           m_DicomTypeRead=-1;
 
           if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
@@ -3021,8 +3021,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, height, width));
           studyAndSeriesVec.push_back(seriesName);
 
-          filesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
-          m_DicomMap.insert(std::pair<std::vector<mafString>,medListDICOMFiles*>(studyAndSeriesVec,filesList));
+          filesList->Append(new medDICOMListElement(m_FileName,slice_pos, imageOrientationPatient, imageData));
+          m_StudyIUIDSeriesIUIDVectorToDICOMListMap.insert(std::pair<std::vector<mafString>,medDicomStudyFilesList*>(studyAndSeriesVec,filesList));
           if (!this->m_TestMode)
           {
             FillStudyListBox(studyAndSeriesVec);
@@ -3072,15 +3072,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           lastZPos = slice_pos[2];
           
 
-          m_DicomMap[studyAndSeriesVec]->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData));
+          m_StudyIUIDSeriesIUIDVectorToDICOMListMap[studyAndSeriesVec]->Append(new medDICOMListElement(m_FileName,slice_pos, imageOrientationPatient, imageData));
 				}
 			}
 			else if ( enableToRead && strcmp( (char *)mode, "MR" ) == 0)
 			{
         seriesExist = false;
         seriesCounter = 0;
-        std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-        for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+        std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+        for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
         {
           if(studyAndSeriesVec.at(0) == (*it).first.at(0))
           {
@@ -3098,7 +3098,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           m_NumberOfStudy++;
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
-					medListDICOMFiles *filesList = new medListDICOMFiles;
+					medDicomStudyFilesList *filesList = new medDicomStudyFilesList;
           m_DicomTypeRead=-1;
           if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
           {
@@ -3152,9 +3152,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, height, width));
           studyAndSeriesVec.push_back(seriesName);
          
-          filesList->Append(new medImporterDICOMListElements(m_FileName,slice_pos, imageOrientationPatient, imageData, imageNumber, numberOfImages, trigTime));
+          filesList->Append(new medDICOMListElement(m_FileName,slice_pos, imageOrientationPatient, imageData, imageNumber, numberOfImages, trigTime));
 
-          m_DicomMap.insert(std::pair<std::vector<mafString>,medListDICOMFiles*>(studyAndSeriesVec,filesList));
+          m_StudyIUIDSeriesIUIDVectorToDICOMListMap.insert(std::pair<std::vector<mafString>,medDicomStudyFilesList*>(studyAndSeriesVec,filesList));
           if (!this->m_TestMode)
           {
             FillStudyListBox(studyAndSeriesVec);
@@ -3208,12 +3208,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             lastZPos = slice_pos[2];
           }*/
 
-          m_DicomMap[studyAndSeriesVec]->Append(new medImporterDICOMListElements(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
+          m_StudyIUIDSeriesIUIDVectorToDICOMListMap[studyAndSeriesVec]->Append(new medDICOMListElement(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
 				}
 			}
       if (!this->m_TestMode)
       {
-        progress = i * 100 / m_DirectoryReader->GetNumberOfFiles();
+        progress = i * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
 			  mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
       }
       dicomImg.clear();
@@ -3258,14 +3258,14 @@ void medOpImporterDicomOffis::ResetStructure()
     m_SeriesListbox->Clear();
   }
   
-  std::map<std::vector<mafString>,medListDICOMFiles*>::iterator it;
-  for ( it=m_DicomMap.begin() ; it != m_DicomMap.end(); it++ )
+  std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+  for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
   {
-    m_DicomMap[(*it).first]->DeleteContents(TRUE);
-    m_DicomMap[(*it).first]->Clear();
+    m_StudyIUIDSeriesIUIDVectorToDICOMListMap[(*it).first]->DeleteContents(TRUE);
+    m_StudyIUIDSeriesIUIDVectorToDICOMListMap[(*it).first]->Clear();
   }
 
-  m_DicomMap.clear();
+  m_StudyIUIDSeriesIUIDVectorToDICOMListMap.clear();
 
   if(!this->m_TestMode)
   {
@@ -3372,17 +3372,17 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 
   if (this->m_TestMode)
   {
-    m_VectorSelected = m_DicomMap.begin()->first;
+    m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector = m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin()->first;
   }
 
-  m_ListSelected = m_DicomMap[m_VectorSelected];
+  m_SelectedDICOMList = m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector];
 
-  medImporterDICOMListElements *element0;
-  element0 = (medImporterDICOMListElements *)m_ListSelected->Item(0)->GetData();
+  medDICOMListElement *element0;
+  element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData();
 
   int numberOfImages =  element0->GetNumberOfImages();
 
-	int numberOfDicomSlices = m_ListSelected->GetCount();
+	int numberOfDicomSlices = m_SelectedDICOMList->GetCount();
   int numSlicesPerTS;
   if (numberOfDicomSlices >= numberOfImages)
   {
@@ -3405,7 +3405,7 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 	return (heigthId * numberOfImages + timeId); 
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicomOffis::CreateSlice(int slice_num)
+void medOpImporterDicomOffis::GenerateSliceTexture(int slice_num)
 //----------------------------------------------------------------------------
 {
 	// Description:
@@ -3413,22 +3413,22 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 	double spacing[3], crop_bounds[6], range[2], loc[3];
   m_Text = "";
 
-	m_ListSelected->Item(slice_num)->GetData()->GetSliceLocation(loc);
-	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->Update();
-	m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
+	m_SelectedDICOMList->Item(slice_num)->GetData()->GetSliceLocation(loc);
+	m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput()->Update();
+	m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_DicomBounds);
 
   double Origin[3];
-  m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetOrigin(Origin);
+  m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput()->GetOrigin(Origin);
 
   double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  m_ListSelected->Item(slice_num)->GetData()->GetSliceOrientation(orientation);
+  m_SelectedDICOMList->Item(slice_num)->GetData()->GetSliceOrientation(orientation);
   m_Text.append(wxString::Format("Orientaion: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
   m_TextMapper->SetInput(m_Text.c_str());
   m_TextMapper->Modified();
 
 	if (m_CropFlag) 
 	{
-		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetSpacing(spacing);
+		m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput()->GetSpacing(spacing);
 
 		m_CropPlane->Update();
 		m_CropPlane->GetOutput()->GetBounds(crop_bounds);
@@ -3472,14 +3472,14 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
 
 		vtkMAFSmartPointer<vtkProbeFilter> probe;
 		probe->SetInput(clip);
-		probe->SetSource(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+		probe->SetSource(m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput());
     probe->Update();
     probe->GetOutput()->GetBounds(m_DicomBounds);
 
     //rescale to 16 bit
     if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
     {
-      RescaleTo16Bit(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+      RescaleTo16Bit(m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput());
     }
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
@@ -3488,11 +3488,11 @@ void medOpImporterDicomOffis::CreateSlice(int slice_num)
     //rescale to 16 bit
     if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
     {
-      RescaleTo16Bit(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+      RescaleTo16Bit(m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput());
     }
 
-		m_ListSelected->Item(slice_num)->GetData()->GetOutput()->GetScalarRange(range);
-		m_SliceTexture->SetInput(m_ListSelected->Item(slice_num)->GetData()->GetOutput());
+		m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput()->GetScalarRange(range);
+		m_SliceTexture->SetInput(m_SelectedDICOMList->Item(slice_num)->GetData()->GetOutput());
 	}
 
 	m_SliceTexture->Modified();
@@ -3523,14 +3523,14 @@ vtkImageData* medOpImporterDicomOffis::GetFirstSlice(mafString sliceName)
 //----------------------------------------------------------------------------
 {
   wxString name, path, short_name, ext;
-  for (int i = 0; i < m_ListSelected->GetCount(); i++)
+  for (int i = 0; i < m_SelectedDICOMList->GetCount(); i++)
   {
-    name = m_ListSelected->Item(i)->GetData()->GetFileName();
+    name = m_SelectedDICOMList->Item(i)->GetData()->GetFileName();
     wxSplitPath(name, &path, &short_name, &ext);
     if (sliceName.Compare(short_name) == 0)
     {
-      m_ListSelected->Item(i)->GetData()->GetOutput()->Update();
-      return m_ListSelected->Item(i)->GetData()->GetOutput();
+      m_SelectedDICOMList->Item(i)->GetData()->GetOutput()->Update();
+      return m_SelectedDICOMList->Item(i)->GetData()->GetOutput();
     }
     else 
     {
@@ -3538,8 +3538,8 @@ vtkImageData* medOpImporterDicomOffis::GetFirstSlice(mafString sliceName)
       short_name = short_name + "." + ext;
       if (sliceName.Compare(short_name) == 0)
       {
-        m_ListSelected->Item(i)->GetData()->GetOutput()->Update();
-        return m_ListSelected->Item(i)->GetData()->GetOutput();
+        m_SelectedDICOMList->Item(i)->GetData()->GetOutput()->Update();
+        return m_SelectedDICOMList->Item(i)->GetData()->GetOutput();
       }
     }
   }
@@ -3787,13 +3787,13 @@ void medOpImporterDicomOffis::RescaleTo16Bit(vtkImageData *dataSet)
 
 }
 //----------------------------------------------------------------------------
-int CompareX(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2)
+int CompareX(const medDICOMListElement **arg1,const medDICOMListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the x coordinate of both arguments
 	// return:
-	double x1 = (*(medImporterDICOMListElements **)arg1)->GetCoordinate(0);
-	double x2 = (*(medImporterDICOMListElements **)arg2)->GetCoordinate(0);
+	double x1 = (*(medDICOMListElement **)arg1)->GetCoordinate(0);
+	double x2 = (*(medDICOMListElement **)arg2)->GetCoordinate(0);
 	if (x1 > x2)
 		return 1;
 	if (x1 < x2)
@@ -3802,13 +3802,13 @@ int CompareX(const medImporterDICOMListElements **arg1,const medImporterDICOMLis
 		return 0;
 }
 //----------------------------------------------------------------------------
-int CompareY(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2)
+int CompareY(const medDICOMListElement **arg1,const medDICOMListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the y coordinate of both arguments
 	// return:
-	double y1 = (*(medImporterDICOMListElements **)arg1)->GetCoordinate(1);
-	double y2 = (*(medImporterDICOMListElements **)arg2)->GetCoordinate(1);
+	double y1 = (*(medDICOMListElement **)arg1)->GetCoordinate(1);
+	double y2 = (*(medDICOMListElement **)arg2)->GetCoordinate(1);
 	if (y1 > y2)
 		return 1;
 	if (y1 < y2)
@@ -3817,13 +3817,13 @@ int CompareY(const medImporterDICOMListElements **arg1,const medImporterDICOMLis
 		return 0;
 }
 //----------------------------------------------------------------------------
-int CompareZ(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2)
+int CompareZ(const medDICOMListElement **arg1,const medDICOMListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the z coordinate of both arguments
 	// return:
-	double z1 = (*(medImporterDICOMListElements **)arg1)->GetCoordinate(2);
-	double z2 = (*(medImporterDICOMListElements **)arg2)->GetCoordinate(2);
+	double z1 = (*(medDICOMListElement **)arg1)->GetCoordinate(2);
+	double z2 = (*(medDICOMListElement **)arg2)->GetCoordinate(2);
 	if (z1 > z2)
 		return 1;
 	if (z1 < z2)
@@ -3832,13 +3832,13 @@ int CompareZ(const medImporterDICOMListElements **arg1,const medImporterDICOMLis
 		return 0;
 }
 //----------------------------------------------------------------------------
-int CompareTriggerTime(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2)
+int CompareTriggerTime(const medDICOMListElement **arg1,const medDICOMListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
-	float t1 = (*(medImporterDICOMListElements **)arg1)->GetTriggerTime();
-	float t2 = (*(medImporterDICOMListElements **)arg2)->GetTriggerTime();;
+	float t1 = (*(medDICOMListElement **)arg1)->GetTriggerTime();
+	float t2 = (*(medDICOMListElement **)arg2)->GetTriggerTime();;
 	if (t1 > t2)
 		return 1;
 	if (t1 < t2)
@@ -3848,13 +3848,13 @@ int CompareTriggerTime(const medImporterDICOMListElements **arg1,const medImport
 }
 
 //----------------------------------------------------------------------------
-int CompareImageNumber(const medImporterDICOMListElements **arg1,const medImporterDICOMListElements **arg2)
+int CompareImageNumber(const medDICOMListElement **arg1,const medDICOMListElement **arg2)
 //----------------------------------------------------------------------------
 {
 	// compare the trigger time of both arguments
 	// return:
-	float i1 = (*(medImporterDICOMListElements **)arg1)->GetImageNumber();
-	float i2 = (*(medImporterDICOMListElements **)arg2)->GetImageNumber();;
+	float i1 = (*(medDICOMListElement **)arg1)->GetImageNumber();
+	float i2 = (*(medDICOMListElement **)arg2)->GetImageNumber();;
 	if (i1 > i2)
 		return 1;
 	if (i1 < i2)
