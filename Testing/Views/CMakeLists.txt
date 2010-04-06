@@ -57,6 +57,9 @@ ADD_TEST(medViewSlicerTest ${EXECUTABLE_OUTPUT_PATH}/medViewSlicerTest)
 ADD_EXECUTABLE(medViewVTKCompoundTest medViewVTKCompoundTest.h medViewVTKCompoundTest.cpp)
 ADD_TEST(medViewVTKCompoundTest ${EXECUTABLE_OUTPUT_PATH}/medViewVTKCompoundTest)
 
+ADD_EXECUTABLE(medViewSliceOnCurveCompoundTest medViewSliceOnCurveCompoundTest.h medViewSliceOnCurveCompoundTest.cpp)
+ADD_TEST(medViewSliceOnCurveCompoundTest ${EXECUTABLE_OUTPUT_PATH}/medViewSliceOnCurveCompoundTest)
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
