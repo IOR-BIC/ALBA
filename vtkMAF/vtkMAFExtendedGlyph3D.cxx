@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFExtendedGlyph3D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-04-06 15:06:49 $
+  Version:   $Revision: 1.1.2.1 $
 
   Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
   All rights reserved.
@@ -29,7 +29,7 @@
 #include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkMAFExtendedGlyph3D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFExtendedGlyph3D, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFExtendedGlyph3D);
 
 // Construct object with scaling on, scaling mode is by scalar value,
@@ -575,6 +575,10 @@ void vtkMAFExtendedGlyph3D::Execute()
     outputPD->SetNormals(newNormals);
     newNormals->Delete();
     }
+  if (pointIds)
+  {
+    pointIds->Delete();
+  }
 
   output->Squeeze();
   trans->Delete();
