@@ -185,3 +185,13 @@ IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFHistogramTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
+############ vtkMAFExtendedGlyph3DTest
+ADD_EXECUTABLE(vtkMAFExtendedGlyph3DTest vtkMAFExtendedGlyph3DTest.h vtkMAFExtendedGlyph3DTest.cpp)
+ADD_TEST(vtkMAFExtendedGlyph3DTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFExtendedGlyph3DTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFExtendedGlyph3DTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
+
+
+
+
