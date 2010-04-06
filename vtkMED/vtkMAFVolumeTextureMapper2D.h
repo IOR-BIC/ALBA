@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: vtkMAFVolumeTextureMapper2D.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-10-22 08:17:54 $ 
-  Version: $Revision: 1.1.2.2 $ 
+  Date: $Date: 2010-04-06 06:37:50 $ 
+  Version: $Revision: 1.1.2.3 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -22,19 +22,23 @@
 
 class vtkRenderer;
 class vtkVolume;
-
+/**
+    class name: vtkMAFVolumeTextureMapper2D
+    Mapper class used by texture 2D volume pipe.
+*/
 class VTK_RENDERING_EXPORT vtkMAFVolumeTextureMapper2D : public vtkOpenGLVolumeTextureMapper2D
 {
 protected:
-  unsigned long LastCheckSum;   //<Here is stored CheckSum used to detect if Casting needs to be reexecuted
+  unsigned long LastCheckSum;   ///<Here is stored CheckSum used to detect if Casting needs to be reexecuted
 
 public:
+  /** create object  instance. */
   static vtkMAFVolumeTextureMapper2D *New();
+  /**  RTTI Macro. */
   vtkTypeRevisionMacro(vtkMAFVolumeTextureMapper2D, vtkOpenGLVolumeTextureMapper2D);	
 
 public:
-  // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
-  // Initialize rendering for this volume.
+  /** WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE. Initialize rendering for this volume. */
   virtual void Render( vtkRenderer *ren, vtkVolume *vol );
 
 protected:
@@ -49,14 +53,18 @@ protected:
   }
 
 protected:
+  /** constructor */
   vtkMAFVolumeTextureMapper2D() {
     LastCheckSum = 0;
   }
+  /** destructor. */
   ~vtkMAFVolumeTextureMapper2D() {}
 
 private:
-  vtkMAFVolumeTextureMapper2D(const vtkMAFVolumeTextureMapper2D&);  // Not implemented.
-  void operator=(const vtkMAFVolumeTextureMapper2D&);  // Not implemented.
+  /** copy constructor, not implemented. */
+  vtkMAFVolumeTextureMapper2D(const vtkMAFVolumeTextureMapper2D&);
+  /** assignment operator, not implemented. */
+  void operator=(const vtkMAFVolumeTextureMapper2D&);
 };
 
 #endif // vtkMAFVolumeTextureMapper2D_h__
