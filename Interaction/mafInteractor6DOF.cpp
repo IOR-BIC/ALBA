@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor6DOF.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-09 07:01:11 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -39,6 +39,7 @@ mafInteractor6DOF::mafInteractor6DOF()
   vtkNEW(m_TmpTransform);
   vtkNEW(m_DeltaTransform);
     
+  m_Avatar = NULL;
 }
 
 //------------------------------------------------------------------------------
