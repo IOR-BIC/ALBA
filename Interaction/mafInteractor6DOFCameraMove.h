@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafInteractor6DOFCameraMove.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-17 11:46:39 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-09 07:00:44 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Michele Diegoli & Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -58,6 +58,10 @@ protected:
 private:
   mafInteractor6DOFCameraMove(const mafInteractor6DOFCameraMove&);  // Not implemented.
   void operator=(const mafInteractor6DOFCameraMove&);  // Not implemented.
+
+  /** Test friend */
+  friend class mafInteractor6DOFCameraMoveTest;
+
 };
 
 #endif 
