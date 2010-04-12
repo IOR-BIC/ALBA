@@ -124,6 +124,10 @@ ADD_TEST(medOpMeshQualityTest ${EXECUTABLE_OUTPUT_PATH}/medOpMeshQualityTest)
 ADD_EXECUTABLE(mafOpImporterBBFTest mafOpImporterBBFTest.h mafOpImporterBBFTest.cpp)
 ADD_TEST(mafOpImporterBBFTest ${EXECUTABLE_OUTPUT_PATH}/mafOpImporterBBFTest)
 
+ADD_EXECUTABLE(medOpCropDeformableROITest medOpCropDeformableROITest.h medOpCropDeformableROITest.cpp)
+ADD_TEST(medOpCropDeformableROITest ${EXECUTABLE_OUTPUT_PATH}/medOpCropDeformableROITest)
+
+
 # wxWidgets specific classes
 #IF (MAF_USE_WX)
 #ENDIF (MAF_USE_WX)
