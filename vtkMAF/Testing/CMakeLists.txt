@@ -192,6 +192,11 @@ IF (WIN32)
  SET_TARGET_PROPERTIES(vtkMAFExtendedGlyph3DTest PROPERTIES LINK_FLAGS "/MANIFEST")
 ENDIF (WIN32)
 
-
+############ vtkMAFTransferFunction2DTest
+ADD_EXECUTABLE(vtkMAFTransferFunction2DTest vtkMAFTransferFunction2DTest.h vtkMAFTransferFunction2DTest.cpp)
+ADD_TEST(vtkMAFTransferFunction2DTest ${EXECUTABLE_OUTPUT_PATH}/vtkMAFTransferFunction2DTest)
+IF (WIN32)
+ SET_TARGET_PROPERTIES(vtkMAFTransferFunction2DTest PROPERTIES LINK_FLAGS "/MANIFEST")
+ENDIF (WIN32)
 
 
