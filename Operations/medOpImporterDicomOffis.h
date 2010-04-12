@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-12 13:59:13 $
-Version:   $Revision: 1.1.2.28 $
-Authors:   Matteo Giacomoni, Roberto Mucci 
+Date:      $Date: 2010-04-12 16:18:19 $
+Version:   $Revision: 1.1.2.29 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -116,10 +116,6 @@ public:
   void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
   const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
 
-  /** Set if output must be imagedata(resampled) or original rectilinear grid. */
-  void SetResampleFlag(int enable){m_ResampleFlag = enable;}
-  int GetResampleFlag(){return m_ResampleFlag;};
-
   /** Read Dicom file */
   void ReadDicom();
 
@@ -129,23 +125,28 @@ public:
   /** Get dicom slice vtkImageData from its local file name */
   vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
 
-  /** Build a mesh from the list of dicom files. */
-  int BuildMesh();
-
-  /** Build a mesh from the list of CineMRI files. */
-  int BuildMeshCineMRI();
+  /** Apply only to BuildVolume and BuildVolumeCineMRI: 
+  Set if output will be imagedata (by resampling) or original rectilinear grid (default) */
+  void SetResampleFlag(int enable){m_ResampleFlag = enable;}
+  int GetResampleFlag(){return m_ResampleFlag;};
 
   /** Build a volume from the list of dicom files. */
-  int BuildVolume();
+  int BuildOutputVMEGrayVolumeFromDicom();
 
   /** Build a volume from the list of CineMRI files. */
-  int BuildVolumeCineMRI();
-  
+  int BuildOutputVMEGrayVolumeFromDicomCineMRI();
+
+  /** Build a mesh from the list of dicom files. */
+  int BuildOutputVMEMeshFromDicom();
+
+  /** Build a mesh from the list of CineMRI files. */
+  int BuildOutputVMEMeshFromDicomCineMRI();
+
   /** Build images starting from the list of dicom files. */
-  int BuildImages();
+  int BuildOutputVMEImagesFromDicom();
 
   /** Build images starting from the list of CineMRI files. */
-  int BuildImagesCineMRI();
+  int BuildOutputVMEImagesFromDicomCineMRI();
 
   /** Create the pipeline to read the images. */
 	virtual void CreateSliceVTKPipeline();
@@ -206,7 +207,7 @@ protected:
 	/** Import dicom tags into vme tags. */
 	void ImportDicomTags();
 
-	/** Perform update of guis of 3 pages of the wizard */
+	/** Perform gui update in several wizard pages */
 	void GuiUpdate();
 	
   /** Enable slice slider. */

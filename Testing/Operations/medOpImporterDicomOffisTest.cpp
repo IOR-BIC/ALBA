@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-12 13:59:35 $
-Version:   $Revision: 1.1.2.13 $
+Date:      $Date: 2010-04-12 16:18:35 $
+Version:   $Revision: 1.1.2.14 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -162,7 +162,7 @@ void medOpImporterDicomOffisTest::TestCreateVolume()
     importer->OpenDir();
     importer->ReadDicom();
     importer->GenerateSliceTexture(0);
-    importer->BuildVolume();
+    importer->BuildOutputVMEGrayVolumeFromDicom();
 
     mafVME *VME=mafVME::SafeDownCast(importer->GetOutput());
     VME->Update();

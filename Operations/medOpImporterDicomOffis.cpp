@@ -2,9 +2,9 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-12 13:59:13 $
-Version:   $Revision: 1.1.2.81 $
-Authors:   Matteo Giacomoni, Roberto Mucci 
+Date:      $Date: 2010-04-12 16:18:19 $
+Version:   $Revision: 1.1.2.82 $
+Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
 SCS s.r.l. - BioComputing Competence Centre (www.scsolutions.it - www.b3c.it)
@@ -383,7 +383,8 @@ void medOpImporterDicomOffis::OpRun()
       
 		  dialog.SetReturnCode(wxID_OK);
 		  int ret_code = dialog.ShowModal();
-		  if (ret_code == wxID_OK)
+		 
+      if (ret_code == wxID_OK)
 		  {
 		    path = dialog.GetPath();
 		    m_DicomDirectoryABSFileName = path.c_str();
@@ -466,21 +467,21 @@ int medOpImporterDicomOffis::RunWizard()
       }
 
       if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-        result = BuildVolume();
+        result = BuildOutputVMEGrayVolumeFromDicom();
       else
-        result = BuildVolumeCineMRI();
+        result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
       break;
     case 1:
       if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-        result = BuildMesh();
+        result = BuildOutputVMEMeshFromDicom();
       else
-        result = BuildMeshCineMRI();
+        result = BuildOutputVMEMeshFromDicomCineMRI();
       break;
     case 2:
       if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-        result = BuildImages();
+        result = BuildOutputVMEImagesFromDicom();
       else
-        result = BuildImagesCineMRI();
+        result = BuildOutputVMEImagesFromDicomCineMRI();
       break;
     }
     return result;
@@ -584,7 +585,7 @@ void medOpImporterDicomOffis::Destroy()
 }
 
 //----------------------------------------------------------------------------
-int medOpImporterDicomOffis::BuildImages()
+int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicom()
 //----------------------------------------------------------------------------
 {
   int step;
@@ -703,7 +704,7 @@ int medOpImporterDicomOffis::BuildImages()
 }
 
 //----------------------------------------------------------------------------
-int medOpImporterDicomOffis::BuildImagesCineMRI()
+int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
 //----------------------------------------------------------------------------
 {
   int step;
@@ -861,7 +862,7 @@ int medOpImporterDicomOffis::BuildImagesCineMRI()
 }
 
 //----------------------------------------------------------------------------
-int medOpImporterDicomOffis::BuildVolume()
+int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicom()
 //----------------------------------------------------------------------------
 {
   int step;
@@ -1037,7 +1038,7 @@ int medOpImporterDicomOffis::BuildVolume()
 }
 
 //----------------------------------------------------------------------------
-int medOpImporterDicomOffis::BuildVolumeCineMRI()
+int medOpImporterDicomOffis::BuildOutputVMEGrayVolumeFromDicomCineMRI()
 //----------------------------------------------------------------------------
 {
   int step;
@@ -1236,7 +1237,7 @@ int medOpImporterDicomOffis::BuildVolumeCineMRI()
 }
 
 //----------------------------------------------------------------------------
-int medOpImporterDicomOffis::BuildMesh()
+int medOpImporterDicomOffis::BuildOutputVMEMeshFromDicom()
 //----------------------------------------------------------------------------
 {
   long progress = 0;
@@ -1354,7 +1355,7 @@ int medOpImporterDicomOffis::BuildMesh()
   return OP_RUN_OK;
 }
 //----------------------------------------------------------------------------
-int medOpImporterDicomOffis::BuildMeshCineMRI()
+int medOpImporterDicomOffis::BuildOutputVMEMeshFromDicomCineMRI()
 //----------------------------------------------------------------------------
 {
   int step;
@@ -1768,10 +1769,10 @@ void medOpImporterDicomOffis::ReadDicom()
      break;
    }
 
-   //Build a wrong volume with this line!!!
-   //m_ListSelected->Sort(CompareImageNumber);
 
-  m_NumberOfTimeFrames = ((medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData())->GetNumberOfImages();
+  m_NumberOfTimeFrames = ((medDICOMListElement *)m_SelectedDICOMList->\
+    Item(0)->GetData())->GetNumberOfImages();
+  
   if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
     m_NumberOfSlices = m_SelectedDICOMList->GetCount() / m_NumberOfTimeFrames;
   else
@@ -3236,13 +3237,12 @@ void medOpImporterDicomOffis::ResampleVolume()
   m_VolumePosition[0]    = m_VolumePosition[1]    = m_VolumePosition[2]    = 0;
   m_VolumeOrientation[0] = m_VolumeOrientation[1] = m_VolumeOrientation[2] = 0;
 
-  mafVMEVolumeGray *vrg;
-  mafNEW(vrg);
+  mafVMEVolumeGray *tmpVmeVolumeGray;
+  mafNEW(tmpVmeVolumeGray);
 
   mafSmartPointer<mafTransform> box_pose;
   box_pose->SetOrientation(m_VolumeOrientation);
   box_pose->SetPosition(m_VolumePosition);
-
 
   mafSmartPointer<mafTransformFrame> local_pose;
   local_pose->SetInput(box_pose);
@@ -3253,7 +3253,7 @@ void medOpImporterDicomOffis::ResampleVolume()
   mafString new_vme_name = "resampled_";
   new_vme_name += m_VolumeName;
 
-  vrg->SetMatrix(box_pose->GetMatrix());
+  tmpVmeVolumeGray->SetMatrix(box_pose->GetMatrix());
 
   double volumeBounds[6];
   vtkRectilinearGrid *rgrid;
@@ -3341,12 +3341,12 @@ void medOpImporterDicomOffis::ResampleVolume()
         resampler->SetVolumeAxisX(x_axis);
         resampler->SetVolumeAxisY(y_axis);
 
-        vtkMAFSmartPointer<vtkStructuredPoints> output_data;
-        output_data->SetSpacing(m_VolumeSpacing);
+        vtkMAFSmartPointer<vtkStructuredPoints> outputSPData;
+        outputSPData->SetSpacing(m_VolumeSpacing);
         // TODO: here I probably should allow a data type casting... i.e. a GUI widget
-        output_data->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
-        output_data->SetExtent(output_extent);
-        output_data->SetUpdateExtent(output_extent);
+        outputSPData->SetScalarType(input_data->GetPointData()->GetScalars()->GetDataType());
+        outputSPData->SetExtent(output_extent);
+        outputSPData->SetUpdateExtent(output_extent);
 
         input_data->GetScalarRange(sr);
 
@@ -3356,28 +3356,28 @@ void medOpImporterDicomOffis::ResampleVolume()
         resampler->SetWindow(w);
         resampler->SetLevel(l);
         resampler->SetInput(input_data);
-        resampler->SetOutput(output_data);
+        resampler->SetOutput(outputSPData);
         resampler->AutoSpacingOff();
         resampler->Update();
 
-        output_data->SetSource(NULL);
+        outputSPData->SetSource(NULL);
         if(m_DiscardPosition == TRUE)
         {
-          output_data->SetOrigin(0,0,0);
+          outputSPData->SetOrigin(0,0,0);
         }
         else
         {
-          output_data->SetOrigin(volumeBounds[0],volumeBounds[2],volumeBounds[4]);
+          outputSPData->SetOrigin(volumeBounds[0],volumeBounds[2],volumeBounds[4]);
         }
-        vrg->SetDataByDetaching(output_data, input_item->GetTimeStamp());
-        vrg->Update();
+        tmpVmeVolumeGray->SetDataByDetaching(outputSPData, input_item->GetTimeStamp());
+        tmpVmeVolumeGray->Update();
       }
     }
   }
-  m_Volume->DeepCopy(vrg);
+  m_Volume->DeepCopy(tmpVmeVolumeGray);
   m_Volume->Update();
 
-  mafDEL(vrg);
+  mafDEL(tmpVmeVolumeGray);
 }
 //----------------------------------------------------------------------------
 void medOpImporterDicomOffis::RescaleTo16Bit(vtkImageData *dataSet)
