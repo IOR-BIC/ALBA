@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffisTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-03 13:31:17 $
-Version:   $Revision: 1.1.2.12 $
+Date:      $Date: 2010-04-12 13:59:35 $
+Version:   $Revision: 1.1.2.13 $
 Authors:   Roberto Mucci
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -158,7 +158,7 @@ void medOpImporterDicomOffisTest::TestCreateVolume()
 
     wxString dicomPath = dirName + dicomDir;
     importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
-    importer->CreatePipeline();
+    importer->CreateSliceVTKPipeline();
     importer->OpenDir();
     importer->ReadDicom();
     importer->GenerateSliceTexture(0);
@@ -228,13 +228,13 @@ void medOpImporterDicomOffisTest::TestCompareDicomImage()
     importer->TestModeOn();
     
     importer->SetDicomDirectoryABSFileName(dicomPath.c_str());
-    importer->CreatePipeline();
+    importer->CreateSliceVTKPipeline();
     importer->OpenDir();
     importer->ReadDicom();
     importer->GenerateSliceTexture(0);
 
     wxSplitPath(txtFilePath, &path, &short_name, &ext);
-    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetFirstSlice(short_name);
+    vtkMAFSmartPointer<vtkImageData> imageImported = importer->GetSliceImageDataFromLocalDicomFileName(short_name);
    
     wxFileInputStream inputFile( txtFilePath );
     wxTextInputStream text( inputFile );

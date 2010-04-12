@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-03 13:30:55 $
-Version:   $Revision: 1.1.2.27 $
+Date:      $Date: 2010-04-12 13:59:13 $
+Version:   $Revision: 1.1.2.28 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -112,40 +112,33 @@ public:
 	/** Create the dialog interface for the importer. */
 	virtual void CreateGui();
 
-  /** Set the directory name which contains DICOM slices to import. */
+  /** Set the abs file name of the directory containing DICOM slices to import */
   void SetDicomDirectoryABSFileName(const char *dirName){m_DicomDirectoryABSFileName = dirName;};
-
-  /** Return the directory name which contains DICOM slices to import. */
   const char *GetDicomDirectoryABSFileName() const {return m_DicomDirectoryABSFileName.GetCStr();};
 
-  /** method allows to handle events from other objects*/
-	virtual void OnEvent(mafEventBase *maf_event);
-
-  /** Set if output must be in imagedata(resampled) or original rectilinear grid. */
+  /** Set if output must be imagedata(resampled) or original rectilinear grid. */
   void SetResampleFlag(int enable){m_ResampleFlag = enable;}
-
-  /** Retrieve resample flag. */
   int GetResampleFlag(){return m_ResampleFlag;};
 
   /** Read Dicom file */
   void ReadDicom();
 
-  /** Create the slice slice_num. */
+  /** Create the vtkTexture for slice_num dicom slice */
   void GenerateSliceTexture(int slice_num);
 
-  /** Return vtkImageData of the selected slice */
-  vtkImageData* GetFirstSlice(mafString sliceName);
+  /** Get dicom slice vtkImageData from its local file name */
+  vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
 
-  /** Build teh mesh starting from the list of dicom files. */
+  /** Build a mesh from the list of dicom files. */
   int BuildMesh();
 
-  /** Build the mesh starting from the list of CineMRI files. */
+  /** Build a mesh from the list of CineMRI files. */
   int BuildMeshCineMRI();
 
-  /** Build the volume starting from the list of dicom files. */
+  /** Build a volume from the list of dicom files. */
   int BuildVolume();
 
-  /** Build the volume starting from the list of CineMRI files. */
+  /** Build a volume from the list of CineMRI files. */
   int BuildVolumeCineMRI();
   
   /** Build images starting from the list of dicom files. */
@@ -155,12 +148,27 @@ public:
   int BuildImagesCineMRI();
 
   /** Create the pipeline to read the images. */
-	virtual void CreatePipeline();
+	virtual void CreateSliceVTKPipeline();
 
   /** Open dir containing Dicom images. */
   bool OpenDir();
 
+  /** method allows to handle events from other objects*/
+  virtual void OnEvent(mafEventBase *maf_event);
+
+
 protected:
+
+  /** OnEvent helper functions */
+  void OnScanTime();
+  void OnScanSlice();
+  void OnRangeModified();
+  void OnMouseDown( mafEvent * e );
+  void OnMouseMove( mafEvent * e );
+  void OnMouseUp();
+  void OnWizardChangePage( mafEvent * e );
+  void OnSeriesSelect();
+  void OnStudySelect();
 
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
@@ -226,7 +234,7 @@ protected:
 	void Crop();
   
   /** Performe Undo crop of dicom data. */
-  void UndoCrop();
+  void OnUndoCrop();
 
   /** Delete all istances of used objects. */
   void Destroy();

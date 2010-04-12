@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-03 13:30:55 $
-Version:   $Revision: 1.1.2.80 $
+Date:      $Date: 2010-04-12 13:59:13 $
+Version:   $Revision: 1.1.2.81 $
 Authors:   Matteo Giacomoni, Roberto Mucci 
 ==========================================================================
 Copyright (c) 2002/2007
@@ -355,7 +355,7 @@ void medOpImporterDicomOffis::OpRun()
   m_RescaleTo16Bit = ((medGUIDicomSettings*)GetSetting())->EnableRescaleTo16Bit();
 
 	CreateGui();
-	CreatePipeline();
+	CreateSliceVTKPipeline();
 
 	m_Wizard = new medGUIWizard(_("DICOM IMPORTER"));
 	m_Wizard->SetListener(this);
@@ -1853,451 +1853,61 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
     case ID_RANGE_MODIFIED:
       {
         //ZCrop slider
-        double fractpart, intpart;
-        double minMax[2];
-        m_CropPage->GetZCropBounds(minMax);
+        OnRangeModified();
 
-        //approximate form int to double
-        fractpart = modf (minMax[0] , &intpart);
-        fractpart >= 0.5 ?  m_ZCropBounds[0] = ceil(minMax[0]) : m_ZCropBounds[0] = floor(minMax[0]);
-        fractpart = modf (minMax[1] , &intpart);
-        fractpart >= 0.5 ?  m_ZCropBounds[1] = ceil(minMax[1]) : m_ZCropBounds[1] = floor(minMax[1]);
-
-        m_SliceScannerBuildPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
-
-        if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
-        {
-          m_CurrentSlice = m_ZCropBounds[0];
-          m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-          // show the current slice
-          int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
-          if (currImageId != -1) 
-          {
-            GenerateSliceTexture(currImageId);
-            ShowSlice();
-            CameraUpdate();
-          }
-          m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
-          m_SliceScannerLoadPage->Update();
-          m_SliceScannerCropPage->SetValue(m_CurrentSlice);
-          m_SliceScannerCropPage->Update();
-          m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-          m_SliceScannerBuildPage->Update();
-        }
-        GuiUpdate();
       }
       break;
 		case medGUIWizard::MED_WIZARD_CHANGE_PAGE:
 			{
-				if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
-				{
-          if(m_NumberOfStudy<1)
-          {
-					  m_Wizard->EnableChangePageOff();
-					  wxMessageBox(_("No study found!"));
-					  return;
-          }
-          else
-          {
-            m_Wizard->SetButtonString("Build >");
-            m_Wizard->EnableChangePageOn();
-            m_CropPage->UpdateActor();
-          }
-        }
+        OnWizardChangePage(e);
+        return;
 
-        if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to build page
-        {
-          if (e->GetBool())
-          {
-            if(m_CropPage)
-            Crop();
-            m_Wizard->SetButtonString("Import >"); 
-            m_BuildPage->UpdateActor();
-            if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
-            {
-              m_CurrentSlice = m_ZCropBounds[0];
-            }
-            m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-            //if only 1 slice, disable radio widget and create a VMEImage
-            if (m_ZCropBounds[1]+1 - m_ZCropBounds[0] >1 )
-            {
-              m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
-              m_BuildPage->Update();
-              GuiUpdate();
-            }
-            else
-              m_OutputType = 2;
-          } 
-          else
-          {
-            m_Wizard->SetButtonString("Crop >"); 
-            m_LoadPage->UpdateActor();
-          }
-        }
-
-        if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))//From build page to crop page
-        {
-          UndoCrop();
-          m_Wizard->SetButtonString("Build >");
-          m_BuildPage->RemoveGuiLowerUnderLeft(m_BuildGuiCenter);
-          m_CropPage->UpdateActor();
-        }
-
-				if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to any other
-				{
-						m_CropActor->VisibilityOff();
-				}
-				else
-				{
-					if(!m_CroppedExetuted)
-						m_CropActor->VisibilityOn();
-					else
-						m_CropActor->VisibilityOff();
-				}
-        GuiUpdate();
 			}
 			break;
 		case ID_UNDO_CROP_BUTTON:
 			{
-				UndoCrop();
+				OnUndoCrop();
 			}
 			break;
 		case ID_STUDY:
 			{
-        mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
-        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
-        if (m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
-        {
-          FillSeriesListBox();
-          m_SeriesListbox->SetSelection(FIRST_SELECTION);
-          OnEvent(&mafEvent(this, ID_SERIES));
-        }
+        OnStudySelect();
+
  			}
 			break;
     case ID_SERIES:
       {
-        mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
-        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
-        wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
-        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
-        std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
-        for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
-        {
-          if ((*it).first.at(0).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0)) == 0)
-          { 
-            if ((*it).first.at(2).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2)) == 0)
-            {
-              m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(1) = (*it).first.at(1);
-              break;
-            }
-          }
-        }
-        if(!this->m_TestMode)
-        {
-          m_BuildGuiLeft->Update();
-          EnableSliceSlider(true);
-
-          m_SelectedDICOMList = m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector];
-
-          medDICOMListElement *element0;
-          element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData();
-
-          int numberOfImages =  element0->GetNumberOfImages();
-          m_DicomTypeRead=-1;
-          if(numberOfImages>1)
-          {
-            m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
-            EnableTimeSlider(true);
-          }
-        }
-        ReadDicom();
-        if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
-        {
-          AutoPositionCropPlane();
-        }
-        else
-        {
-          m_CropPlane->SetOrigin(0.0,0.0,0.0);
-          m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
-          m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
-          m_CropPage->GetRWI()->CameraReset();
-        }
+        OnSeriesSelect();
       }
       break;
 			case MOUSE_DOWN:
-				{
-					if(m_CroppedExetuted==false)
-					{
-						if (m_Wizard->GetCurrentPage()==m_CropPage)
-					{
-						//long handle_id = e->GetArg();
-						double pos[3];
-						vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-						p->GetPoint(0,pos);
-
-						//calcola altezza rettangolo
-						double b[6];
-						m_CropPlane->GetOutput()->GetBounds(b);
-						double dx = (b[1] - b[0]) / 5;
-						double dy = (b[3] - b[2]) / 5;
-
-						double O[3], P1[3], P2[3];
-						//Modified by Matteo 21/07/2006
-						//Caso di default P1 in alto a SX e P2 in basso a DX
-						m_CropPlane->GetOrigin(O);
-						m_CropPlane->GetPoint1(P1);
-						m_CropPlane->GetPoint2(P2);
-						//Se non siamo nel caso di default modifichiamo in modo da ritornare in quel caso
-						if(P2[0]<P1[0] && P2[1]<P1[1])//Caso P1 in basso a DX e P2 in alto a SX
-						{
-							O[0] = P2[0];
-							O[1] = P1[1];
-							double tempx=P1[0];
-							double tempy=P1[1];
-							P1[0] = P2[0];
-							P1[1] = P2[1];
-							P2[0] = tempx;
-							P2[1] = tempy;
-							m_CropPlane->SetOrigin(O);
-							m_CropPlane->SetPoint1(P1);
-							m_CropPlane->SetPoint2(P2);
-						}
-						else if(P1[0]<P2[0] && P1[1]>P2[1])//Caso P1 in basso a SX e P2 in alto a DX
-						{
-							O[0] = P1[0];
-							O[1] = P1[1];
-							double tempy=P1[1];
-							P1[1] = P2[1];
-							P2[1] = tempy;
-							m_CropPlane->SetOrigin(O);
-							m_CropPlane->SetPoint1(P1);
-							m_CropPlane->SetPoint2(P2);
-						}
-						else if(P1[0]>P2[0] && P1[1]<P2[1])//Caso P1 in alto a DX e P2 in basso a SX
-						{
-							O[0] = P2[0];
-							O[1] = P2[1];
-							double tempx=P1[0];
-							P1[0] = P2[0];
-							P2[0] = tempx;
-							m_CropPlane->SetOrigin(O);
-							m_CropPlane->SetPoint1(P1);
-							m_CropPlane->SetPoint2(P2);
-						}
-						//End Matteo
-						if (m_GizmoStatus == GIZMO_NOT_EXIST)
-						{
-							m_GizmoStatus = GIZMO_RESIZING;
-							m_CropActor->VisibilityOn();
-
-							pos[2] = 0;
-							m_CropPlane->SetOrigin(pos);
-							m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
-							m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
-						}
-						else if (m_GizmoStatus == GIZMO_DONE)
-						{
-							//	  8------------1----------2--->x
-							//		|												|
-							//		7												3
-							//		|												|
-							//		6------------5----------4
-							//		|
-							//	  v y
-
-							if (P1[0] + dx/2 <= pos[0] &&  pos[0] <= P2[0] - dx/2 &&
-								P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-							{
-								m_SideToBeDragged = 1;
-							}
-							else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-								P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-							{
-								m_SideToBeDragged = 2;
-							}
-							else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-								P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
-							{
-								m_SideToBeDragged = 3;
-							}
-							else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
-								P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
-							{
-								m_SideToBeDragged = 4;
-							}
-							else if (P1[0] + dx/2 <= pos[0] && pos[0] <= P2[0] - dx/2 &&
-								P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
-							{
-								m_SideToBeDragged = 5;
-							}
-							else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-								P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] +dy/2)
-							{
-								m_SideToBeDragged = 6;
-							}
-							else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-								P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
-							{
-								m_SideToBeDragged = 7;
-							}
-							else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
-								P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
-							{
-								m_SideToBeDragged = 8;
-							}	
-							else
-								//hai pickato in un punto che non corrisponde a nessun lato
-								// => crea un nuovo gizmo
-							{
-								m_GizmoStatus = GIZMO_RESIZING;
-								m_CropActor->VisibilityOn();
-
-								pos[2] = 0;
-								m_CropPlane->SetOrigin(pos);
-								m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
-								m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
-								m_CropPlane->SetXResolution(10);
-							}
-						}
-            m_CropPage->UpdateActor();
-            m_CropPage->GetRWI()->CameraUpdate();
-					}
-					}
+        {
+          OnMouseDown(e);
 				}
 				break;
 			case MOUSE_MOVE:  //resize gizmo
 				{
-					if(m_CroppedExetuted==false)
-					{
-						if (m_Wizard->GetCurrentPage()==m_CropPage)
-					{
-						double pos[3], oldO[3], oldP1[3], oldP2[3];
-						vtkPoints *p = (vtkPoints *)e->GetVtkObj();
-						p->GetPoint(0,pos);
+          OnMouseMove(e);
 
-						m_CropPlane->GetOrigin(oldO);
-						m_CropPlane->GetPoint1(oldP1);
-						m_CropPlane->GetPoint2(oldP2);
-
-						if (m_GizmoStatus == GIZMO_RESIZING)
-						{
-							m_CropPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
-							m_CropPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
-						}
-						else if (m_GizmoStatus == GIZMO_DONE)
-						{
-							if (m_SideToBeDragged == 0)
-							{
-							}
-							else if (m_SideToBeDragged == 1)
-								m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-							else if (m_SideToBeDragged == 2)
-							{
-								m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
-								m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-							}
-							else if (m_SideToBeDragged == 3)
-								m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
-							else if (m_SideToBeDragged == 4)
-							{
-								m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-								m_CropPlane->SetPoint2(pos[0], pos[1], oldP2[2]);
-							}
-							else if (m_SideToBeDragged == 5)
-							{
-								m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
-								m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-							}
-							else if (m_SideToBeDragged == 6)
-							{
-								m_CropPlane->SetOrigin(pos[0], pos[1], oldO[2]);
-								m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP2[2]);
-								m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
-							}
-							else if (m_SideToBeDragged == 7)
-							{
-								m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-								m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP1[2]);
-							}
-							else if (m_SideToBeDragged == 8)
-							{
-								m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
-								m_CropPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
-							}
-						}
-            m_CropPage->GetRWI()->CameraUpdate();
-					}
-					}
 				}
 				break;
 			case MOUSE_UP:  //block gizmo
 				{
-					if(m_CroppedExetuted==false)
-					{
-						if (m_Wizard->GetCurrentPage()==m_CropPage)
-					{
-						if (m_GizmoStatus == GIZMO_RESIZING)
-							m_GizmoStatus = 	GIZMO_DONE;
-						else if (m_GizmoStatus == GIZMO_DONE)
-							m_SideToBeDragged = 0;
+          OnMouseUp();
 
-						double p1[3], p2[3], origin[3];
-						m_CropPlane->GetPoint1(p1);
-						m_CropPlane->GetPoint2(p2);
-						m_CropPlane->GetOrigin(origin);
-
-						if( (p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2])  ||
-							(p1[0] == origin[0] && p1[1] == origin[1] && p1[2] == origin[2]) ||
-							(p2[0] == origin[0] && p2[1] == origin[1] && p2[2] == origin[2])
-							)
-						{
-							m_BoxCorrect = false;
-						}
-						else
-							m_BoxCorrect = true;   
-					}
-					}
 				}
 				break; 
 			case ID_SCAN_SLICE:
 				{
-					// show the current slice
-					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
-					if (currImageId != -1) 
-					{
-            GenerateSliceTexture(currImageId);
-						ShowSlice();
-						CameraUpdate();
-					}
+          OnScanSlice();
 
-					m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
-					m_SliceScannerLoadPage->Update();
-					m_SliceScannerCropPage->SetValue(m_CurrentSlice);
-					m_SliceScannerCropPage->Update();
-					m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
-					m_SliceScannerBuildPage->Update();
-
-					GuiUpdate();
 				}
 				break;
 			case ID_SCAN_TIME:
 				{
 					// show the current slice
-					int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
-					if (currImageId != -1) 
-					{
-            GenerateSliceTexture(currImageId);
-            ShowSlice();
-						CameraUpdate();
-					}
-					m_TimeScannerLoadPage->SetValue(m_CurrentTime);
-					m_TimeScannerLoadPage->Update();
-					m_TimeScannerCropPage->SetValue(m_CurrentTime);
-					m_TimeScannerCropPage->Update();
-					m_TimeScannerBuildPage->SetValue(m_CurrentTime);
-					m_TimeScannerBuildPage->Update();
+          OnScanTime();
 
-					GuiUpdate();
 				}
 				break;
 			case ID_CROP_BUTTON:
@@ -2309,7 +1919,7 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 	}
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicomOffis::UndoCrop()
+void medOpImporterDicomOffis::OnUndoCrop()
 //----------------------------------------------------------------------------
 {
   m_CropFlag = false;
@@ -2463,7 +2073,7 @@ void medOpImporterDicomOffis::EnableTimeSlider(bool enable)
   }
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicomOffis::CreatePipeline()
+void medOpImporterDicomOffis::CreateSliceVTKPipeline()
 //----------------------------------------------------------------------------
 {
 	vtkNEW(m_DICOMDirectoryReader);
@@ -2602,7 +2212,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
         m_SeriesListbox->SetClientData(counter,(void *)m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector]/*filesList*/);
         counter++;
       }
-    }
+    } 
   }
 }
 
@@ -3519,9 +3129,11 @@ void medOpImporterDicomOffis::ShowSlice()
 	m_SliceActor->VisibilityOn();
 }
 //----------------------------------------------------------------------------
-vtkImageData* medOpImporterDicomOffis::GetFirstSlice(mafString sliceName)
+vtkImageData* medOpImporterDicomOffis::GetSliceImageDataFromLocalDicomFileName(mafString sliceName)
 //----------------------------------------------------------------------------
 {
+  assert(m_SelectedDICOMList);
+
   wxString name, path, short_name, ext;
   for (int i = 0; i < m_SelectedDICOMList->GetCount(); i++)
   {
@@ -3861,4 +3473,447 @@ int CompareImageNumber(const medDICOMListElement **arg1,const medDICOMListElemen
 		return -1;
 	else
 		return 0;
+}
+
+void medOpImporterDicomOffis::OnStudySelect()
+{
+  mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+  m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
+  if (m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0).Compare(m_StudyListbox->GetString(m_StudyListbox->GetSelection())) != 0)
+  {
+    FillSeriesListBox();
+    m_SeriesListbox->SetSelection(FIRST_SELECTION);
+    OnEvent(&mafEvent(this, ID_SERIES));
+  }
+}
+
+void medOpImporterDicomOffis::OnSeriesSelect()
+{
+  mafString *st = (mafString *)m_StudyListbox->GetClientData(m_StudyListbox->GetSelection());
+  m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0) = st->GetCStr();
+  wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
+  m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
+  std::map<std::vector<mafString>,medDicomStudyFilesList*>::iterator it;
+  for ( it=m_StudyIUIDSeriesIUIDVectorToDICOMListMap.begin() ; it != m_StudyIUIDSeriesIUIDVectorToDICOMListMap.end(); it++ )
+  {
+    if ((*it).first.at(0).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(0)) == 0)
+    { 
+      if ((*it).first.at(2).Compare(m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(2)) == 0)
+      {
+        m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector.at(1) = (*it).first.at(1);
+        break;
+      }
+    }
+  }
+  if(!this->m_TestMode)
+  {
+    m_BuildGuiLeft->Update();
+    EnableSliceSlider(true);
+
+    m_SelectedDICOMList = m_StudyIUIDSeriesIUIDVectorToDICOMListMap[m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector];
+
+    medDICOMListElement *element0;
+    element0 = (medDICOMListElement *)m_SelectedDICOMList->Item(0)->GetData();
+
+    int numberOfImages =  element0->GetNumberOfImages();
+    m_DicomTypeRead=-1;
+    if(numberOfImages>1)
+    {
+      m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
+      EnableTimeSlider(true);
+    }
+  }
+  ReadDicom();
+  if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
+  {
+    AutoPositionCropPlane();
+  }
+  else
+  {
+    m_CropPlane->SetOrigin(0.0,0.0,0.0);
+    m_CropPlane->SetPoint1(m_DicomBounds[1]-m_DicomBounds[0],0.0,0.0);
+    m_CropPlane->SetPoint2(0.0,m_DicomBounds[3]-m_DicomBounds[2],0.0);
+    m_CropPage->GetRWI()->CameraReset();
+  }
+}
+
+void medOpImporterDicomOffis::OnWizardChangePage( mafEvent * e )
+{
+  if(m_Wizard->GetCurrentPage()==m_LoadPage)//From Load page to Crop Page
+  {
+    if(m_NumberOfStudy<1)
+    {
+      m_Wizard->EnableChangePageOff();
+      wxMessageBox(_("No study found!"));
+      return;
+    }
+    else
+    {
+      m_Wizard->SetButtonString("Build >");
+      m_Wizard->EnableChangePageOn();
+      m_CropPage->UpdateActor();
+    }
+  }
+
+  if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to build page
+  {
+    if (e->GetBool())
+    {
+      if(m_CropPage)
+        Crop();
+      m_Wizard->SetButtonString("Import >"); 
+      m_BuildPage->UpdateActor();
+      if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
+      {
+        m_CurrentSlice = m_ZCropBounds[0];
+      }
+      m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+      //if only 1 slice, disable radio widget and create a VMEImage
+      if (m_ZCropBounds[1]+1 - m_ZCropBounds[0] >1 )
+      {
+        m_BuildPage->AddGuiLowerUnderLeft(m_BuildGuiCenter);
+        m_BuildPage->Update();
+        GuiUpdate();
+      }
+      else
+        m_OutputType = 2;
+    } 
+    else
+    {
+      m_Wizard->SetButtonString("Crop >"); 
+      m_LoadPage->UpdateActor();
+    }
+  }
+
+  if (m_Wizard->GetCurrentPage()==m_BuildPage && (!e->GetBool()))//From build page to crop page
+  {
+    OnUndoCrop();
+    m_Wizard->SetButtonString("Build >");
+    m_BuildPage->RemoveGuiLowerUnderLeft(m_BuildGuiCenter);
+    m_CropPage->UpdateActor();
+  }
+
+  if (m_Wizard->GetCurrentPage()==m_CropPage)//From Crop page to any other
+  {
+    m_CropActor->VisibilityOff();
+  }
+  else
+  {
+    if(!m_CroppedExetuted)
+      m_CropActor->VisibilityOn();
+    else
+      m_CropActor->VisibilityOff();
+  }
+  GuiUpdate();
+}
+
+void medOpImporterDicomOffis::OnMouseDown( mafEvent * e )
+{
+  if(m_CroppedExetuted==false)
+  {
+    if (m_Wizard->GetCurrentPage()==m_CropPage)
+    {
+      //long handle_id = e->GetArg();
+      double pos[3];
+      vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+      p->GetPoint(0,pos);
+
+      //calcola altezza rettangolo
+      double b[6];
+      m_CropPlane->GetOutput()->GetBounds(b);
+      double dx = (b[1] - b[0]) / 5;
+      double dy = (b[3] - b[2]) / 5;
+
+      double O[3], P1[3], P2[3];
+      //Modified by Matteo 21/07/2006
+      //Caso di default P1 in alto a SX e P2 in basso a DX
+      m_CropPlane->GetOrigin(O);
+      m_CropPlane->GetPoint1(P1);
+      m_CropPlane->GetPoint2(P2);
+      //Se non siamo nel caso di default modifichiamo in modo da ritornare in quel caso
+      if(P2[0]<P1[0] && P2[1]<P1[1])//Caso P1 in basso a DX e P2 in alto a SX
+      {
+        O[0] = P2[0];
+        O[1] = P1[1];
+        double tempx=P1[0];
+        double tempy=P1[1];
+        P1[0] = P2[0];
+        P1[1] = P2[1];
+        P2[0] = tempx;
+        P2[1] = tempy;
+        m_CropPlane->SetOrigin(O);
+        m_CropPlane->SetPoint1(P1);
+        m_CropPlane->SetPoint2(P2);
+      }
+      else if(P1[0]<P2[0] && P1[1]>P2[1])//Caso P1 in basso a SX e P2 in alto a DX
+      {
+        O[0] = P1[0];
+        O[1] = P1[1];
+        double tempy=P1[1];
+        P1[1] = P2[1];
+        P2[1] = tempy;
+        m_CropPlane->SetOrigin(O);
+        m_CropPlane->SetPoint1(P1);
+        m_CropPlane->SetPoint2(P2);
+      }
+      else if(P1[0]>P2[0] && P1[1]<P2[1])//Caso P1 in alto a DX e P2 in basso a SX
+      {
+        O[0] = P2[0];
+        O[1] = P2[1];
+        double tempx=P1[0];
+        P1[0] = P2[0];
+        P2[0] = tempx;
+        m_CropPlane->SetOrigin(O);
+        m_CropPlane->SetPoint1(P1);
+        m_CropPlane->SetPoint2(P2);
+      }
+      //End Matteo
+      if (m_GizmoStatus == GIZMO_NOT_EXIST)
+      {
+        m_GizmoStatus = GIZMO_RESIZING;
+        m_CropActor->VisibilityOn();
+
+        pos[2] = 0;
+        m_CropPlane->SetOrigin(pos);
+        m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
+        m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
+      }
+      else if (m_GizmoStatus == GIZMO_DONE)
+      {
+        //	  8------------1----------2--->x
+        //		|												|
+        //		7												3
+        //		|												|
+        //		6------------5----------4
+        //		|
+        //	  v y
+
+        if (P1[0] + dx/2 <= pos[0] &&  pos[0] <= P2[0] - dx/2 &&
+          P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
+        {
+          m_SideToBeDragged = 1;
+        }
+        else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
+          P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
+        {
+          m_SideToBeDragged = 2;
+        }
+        else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
+          P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
+        {
+          m_SideToBeDragged = 3;
+        }
+        else if (P2[0] - dx/2 <= pos[0] && pos[0] <= P2[0] + dx/2 &&
+          P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
+        {
+          m_SideToBeDragged = 4;
+        }
+        else if (P1[0] + dx/2 <= pos[0] && pos[0] <= P2[0] - dx/2 &&
+          P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] + dy/2)
+        {
+          m_SideToBeDragged = 5;
+        }
+        else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
+          P2[1] - dy/2 <= pos[1] && pos[1] <= P2[1] +dy/2)
+        {
+          m_SideToBeDragged = 6;
+        }
+        else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
+          P2[1] - dy/2 >= pos[1] && pos[1] >= P1[1] + dy/2)
+        {
+          m_SideToBeDragged = 7;
+        }
+        else if (P1[0] - dx/2 <= pos[0] && pos[0] <= P1[0] + dx/2 &&
+          P1[1] - dy/2 <= pos[1] && pos[1] <= P1[1] + dy/2)
+        {
+          m_SideToBeDragged = 8;
+        }	
+        else
+          //hai pickato in un punto che non corrisponde a nessun lato
+          // => crea un nuovo gizmo
+        {
+          m_GizmoStatus = GIZMO_RESIZING;
+          m_CropActor->VisibilityOn();
+
+          pos[2] = 0;
+          m_CropPlane->SetOrigin(pos);
+          m_CropPlane->SetPoint1(pos[0], pos[1], pos[2]);
+          m_CropPlane->SetPoint2(pos[0], pos[1], pos[2]);
+          m_CropPlane->SetXResolution(10);
+        }
+      }
+      m_CropPage->UpdateActor();
+      m_CropPage->GetRWI()->CameraUpdate();
+    }
+  }
+}
+
+void medOpImporterDicomOffis::OnMouseMove( mafEvent * e )
+{
+  if(m_CroppedExetuted==false)
+  {
+    if (m_Wizard->GetCurrentPage()==m_CropPage)
+    {
+      double pos[3], oldO[3], oldP1[3], oldP2[3];
+      vtkPoints *p = (vtkPoints *)e->GetVtkObj();
+      p->GetPoint(0,pos);
+
+      m_CropPlane->GetOrigin(oldO);
+      m_CropPlane->GetPoint1(oldP1);
+      m_CropPlane->GetPoint2(oldP2);
+
+      if (m_GizmoStatus == GIZMO_RESIZING)
+      {
+        m_CropPlane->SetPoint1(oldO[0], pos[1], oldP1[2]);
+        m_CropPlane->SetPoint2(pos[0], oldO[1], oldP1[2]);
+      }
+      else if (m_GizmoStatus == GIZMO_DONE)
+      {
+        if (m_SideToBeDragged == 0)
+        {
+        }
+        else if (m_SideToBeDragged == 1)
+          m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
+        else if (m_SideToBeDragged == 2)
+        {
+          m_CropPlane->SetPoint1(oldP1[0], pos[1], oldP1[2]);
+          m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
+        }
+        else if (m_SideToBeDragged == 3)
+          m_CropPlane->SetPoint2(pos[0], oldP2[1], oldP2[2]);
+        else if (m_SideToBeDragged == 4)
+        {
+          m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
+          m_CropPlane->SetPoint2(pos[0], pos[1], oldP2[2]);
+        }
+        else if (m_SideToBeDragged == 5)
+        {
+          m_CropPlane->SetOrigin(oldO[0], pos[1], oldO[2]);
+          m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
+        }
+        else if (m_SideToBeDragged == 6)
+        {
+          m_CropPlane->SetOrigin(pos[0], pos[1], oldO[2]);
+          m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP2[2]);
+          m_CropPlane->SetPoint2(oldP2[0], pos[1], oldP2[2]);
+        }
+        else if (m_SideToBeDragged == 7)
+        {
+          m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
+          m_CropPlane->SetPoint1(pos[0], oldP1[1], oldP1[2]);
+        }
+        else if (m_SideToBeDragged == 8)
+        {
+          m_CropPlane->SetOrigin(pos[0], oldO[1], oldO[2]);
+          m_CropPlane->SetPoint1(pos[0], pos[1], oldP1[2]);
+        }
+      }
+      m_CropPage->GetRWI()->CameraUpdate();
+    }
+  }
+}
+
+void medOpImporterDicomOffis::OnRangeModified()
+{
+  double fractpart, intpart;
+  double minMax[2];
+  m_CropPage->GetZCropBounds(minMax);
+
+  //approximate form int to double
+  fractpart = modf (minMax[0] , &intpart);
+  fractpart >= 0.5 ?  m_ZCropBounds[0] = ceil(minMax[0]) : m_ZCropBounds[0] = floor(minMax[0]);
+  fractpart = modf (minMax[1] , &intpart);
+  fractpart >= 0.5 ?  m_ZCropBounds[1] = ceil(minMax[1]) : m_ZCropBounds[1] = floor(minMax[1]);
+
+  m_SliceScannerBuildPage->SetRange(m_ZCropBounds[0], m_ZCropBounds[1]);
+
+  if(m_ZCropBounds[0] > m_CurrentSlice || m_CurrentSlice > m_ZCropBounds[1])
+  {
+    m_CurrentSlice = m_ZCropBounds[0];
+    m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+    // show the current slice
+    int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+    if (currImageId != -1) 
+    {
+      GenerateSliceTexture(currImageId);
+      ShowSlice();
+      CameraUpdate();
+    }
+    m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
+    m_SliceScannerLoadPage->Update();
+    m_SliceScannerCropPage->SetValue(m_CurrentSlice);
+    m_SliceScannerCropPage->Update();
+    m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+    m_SliceScannerBuildPage->Update();
+  }
+  GuiUpdate();
+}
+
+void medOpImporterDicomOffis::OnMouseUp()
+{
+  if(m_CroppedExetuted==false)
+  {
+    if (m_Wizard->GetCurrentPage()==m_CropPage)
+    {
+      if (m_GizmoStatus == GIZMO_RESIZING)
+        m_GizmoStatus = 	GIZMO_DONE;
+      else if (m_GizmoStatus == GIZMO_DONE)
+        m_SideToBeDragged = 0;
+
+      double p1[3], p2[3], origin[3];
+      m_CropPlane->GetPoint1(p1);
+      m_CropPlane->GetPoint2(p2);
+      m_CropPlane->GetOrigin(origin);
+
+      if( (p1[0] == p2[0] && p1[1] == p2[1] && p1[2] == p2[2])  ||
+        (p1[0] == origin[0] && p1[1] == origin[1] && p1[2] == origin[2]) ||
+        (p2[0] == origin[0] && p2[1] == origin[1] && p2[2] == origin[2])
+        )
+      {
+        m_BoxCorrect = false;
+      }
+      else
+        m_BoxCorrect = true;   
+    }
+  }
+}
+
+void medOpImporterDicomOffis::OnScanSlice()
+{
+  // show the current slice
+  int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+  if (currImageId != -1) 
+  {
+    GenerateSliceTexture(currImageId);
+    ShowSlice();
+    CameraUpdate();
+  }
+
+  m_SliceScannerLoadPage->SetValue(m_CurrentSlice);
+  m_SliceScannerLoadPage->Update();
+  m_SliceScannerCropPage->SetValue(m_CurrentSlice);
+  m_SliceScannerCropPage->Update();
+  m_SliceScannerBuildPage->SetValue(m_CurrentSlice);
+  m_SliceScannerBuildPage->Update();
+
+  GuiUpdate();
+}
+
+void medOpImporterDicomOffis::OnScanTime()
+{
+  int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
+  if (currImageId != -1) 
+  {
+    GenerateSliceTexture(currImageId);
+    ShowSlice();
+    CameraUpdate();
+  }
+  m_TimeScannerLoadPage->SetValue(m_CurrentTime);
+  m_TimeScannerLoadPage->Update();
+  m_TimeScannerCropPage->SetValue(m_CurrentTime);
+  m_TimeScannerCropPage->Update();
+  m_TimeScannerBuildPage->SetValue(m_CurrentTime);
+  m_TimeScannerBuildPage->Update();
+
+  GuiUpdate();
 }
