@@ -3,17 +3,17 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFTransferFunction2D.cxx,v $
   Language:  C++
-  Date:      $Date: 2008-07-03 11:27:45 $
-  Version:   $Revision: 1.1 $
+  Date:      $Date: 2010-04-12 10:07:06 $
+  Version:   $Revision: 1.1.2.1 $
 
 =========================================================================*/
 #include "vtkObjectFactory.h"
 
 #include "vtkMAFTransferFunction2D.h"
 
-vtkCxxRevisionMacro(vtkMAFTransferFunction2D, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkMAFTransferFunction2D, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkMAFTransferFunction2D);
-vtkCxxRevisionMacro(vtkVolumeProperty2, "$Revision: 1.1 $");
+vtkCxxRevisionMacro(vtkVolumeProperty2, "$Revision: 1.1.2.1 $");
 vtkStandardNewMacro(vtkVolumeProperty2);
 
 typedef unsigned char u_char;
@@ -655,10 +655,10 @@ char *vtkMAFTransferFunction2D::SaveToString()
   {
     const tfWidget &w = this->GetWidget(wi);
     stream << "  widget '" << w.Name << "'\n";
-    stream << "    color:   " << w.Color[0] << ", " << w.Color[1] << ", " << w.Color[2] << "\n";
-    stream << "    range:   " << w.Range[0][0] << ", " << w.Range[0][1] << ", " << w.Range[0][2] << "   " << w.Range[1][0] << ", " << w.Range[1][1] << ", " << w.Range[1][2] << "\n";
-    stream << "    ratio:   " << w.Ratio << "\n";
-    stream << "    ginterpolation:   " << w.GradientInterpolationOrder << "\n";
+    stream << "    color: " << w.Color[0] << ", " << w.Color[1] << ", " << w.Color[2] << "\n";
+    stream << "    range: " << w.Range[0][0] << ", " << w.Range[0][1] << ", " << w.Range[0][2] << "   " << w.Range[1][0] << ", " << w.Range[1][1] << ", " << w.Range[1][2] << "\n";
+    stream << "    ratio: " << w.Ratio << "\n";
+    stream << "    ginterpolation: " << w.GradientInterpolationOrder << "\n";
     stream << "    opacity: " << w.Opacity << "\n";
     stream << "    diffuse: " << w.Diffuse << "\n";
     stream << "    visible: " << (w.Visible ? 1 : 0) << "\n";
@@ -708,12 +708,13 @@ bool vtkMAFTransferFunction2D::LoadFromString(const char *string)
       if (this->AddWidget(widget) < 0)
         return false;
     }
-    else if (sscanf(string, "color: %f, %f, %f", widget.Color, widget.Color + 1, widget.Color + 2) != 3 &&
-      sscanf(string, "range: %f, %f, %f %f, %f, %f", widget.Range[0], widget.Range[0] + 1, widget.Range[0] + 2, widget.Range[1], widget.Range[1] + 1, widget.Range[1] + 2) != 6 &&
-      sscanf(string, "ratio: %f", &widget.Ratio) != 1 &&
+    // Changed from %f to %lf to read double values instead of a float. Losi 04/12/2010
+    else if (sscanf(string, "color: %lf, %lf, %lf", widget.Color, widget.Color + 1, widget.Color + 2) != 3 &&
+      sscanf(string, "range: %lf, %lf, %lf %lf, %lf, %lf", widget.Range[0], widget.Range[0] + 1, widget.Range[0] + 2, widget.Range[1], widget.Range[1] + 1, widget.Range[1] + 2) != 6 &&
+      sscanf(string, "ratio: %lf", &widget.Ratio) != 1 &&
       sscanf(string, "ginterpolation: %d", &widget.GradientInterpolationOrder) != 1 &&
-      sscanf(string, "opacity: %f", &widget.Opacity) != 1 &&
-      sscanf(string, "diffuse: %f", &widget.Diffuse) != 1 &&
+      sscanf(string, "opacity: %lf", &widget.Opacity) != 1 &&
+      sscanf(string, "diffuse: %lf", &widget.Diffuse) != 1 &&
       sscanf(string, "visible: %d", &visible) != 1)
       return false;
     widget.Visible = visible != 0;
