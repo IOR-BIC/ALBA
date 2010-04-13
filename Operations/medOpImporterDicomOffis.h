@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-12 16:18:19 $
-Version:   $Revision: 1.1.2.29 $
+Date:      $Date: 2010-04-13 10:32:48 $
+Version:   $Revision: 1.1.2.30 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -74,7 +74,7 @@ class vtkTextMapper;
 class mafVMEGroup;
 
 class medDICOMListElement;
-class medDicomStudyFilesList;
+class medDicomFilesList;
 
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
@@ -196,7 +196,7 @@ protected:
 	void ShowSlice();
 
   /** Fill Study listbox. */
-  void FillStudyListBox(std::vector<mafString> StudyAndSeriesVec);
+  void FillStudyListBox(mafString studyUID);
 
   /** Update Study listbox. */
   void UpdateStudyListBox();
@@ -249,7 +249,7 @@ protected:
   /** Rescale to 16 Bit */
   void RescaleTo16Bit(vtkImageData *dataSet);
 
-	vtkDirectory			*m_DICOMDirectoryReader; ///<Filter to get DICOM file from DICOM directory
+	vtkDirectory			*m_DICOMDirectoryReader; 
 	vtkWindowLevelLookupTable	*m_SliceLookupTable;
 	vtkPlaneSource		*m_SlicePlane;
 	vtkPolyDataMapper	*m_SliceMapper;
@@ -298,10 +298,10 @@ protected:
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medDicomStudyFilesList	*m_SelectedDICOMList;
+	medDicomFilesList	*m_SelectedStudyUIDSeriesUIDPairFilesList;
 
-  std::vector<mafString> m_Selected_dcmStudyInstanceUID_dcmSeriesInstanceUID_Vector;
-  std::map<std::vector<mafString>,medDicomStudyFilesList*> m_StudyIUIDSeriesIUIDVectorToDICOMListMap;
+  std::vector<mafString> m_SelectedStudyUIDSeriesUIDPair;
+  std::map<std::vector<mafString>,medDicomFilesList*> m_StudyUIDSeriesUIDPairToDICOMListMap;
 
 	mafString	m_CurrentSliceABSFileName;
 	mafString	m_VolumeName;
