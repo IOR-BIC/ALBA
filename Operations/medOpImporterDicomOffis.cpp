@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-13 10:32:47 $
-Version:   $Revision: 1.1.2.83 $
+Date:      $Date: 2010-04-13 16:15:17 $
+Version:   $Revision: 1.1.2.84 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -163,7 +163,7 @@ MafMedical is partially based on OpenMAF.
   WX_DECLARE_LIST_2(elementtype, listname, wx##listname##Node, class)
 // end copy
 
-WX_DECLARE_LIST(medDICOMListElement, medDicomFilesList);
+WX_DECLARE_LIST(medDICOMListElement, medDicomList);
 
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicomOffis);
@@ -178,10 +178,10 @@ mafCxxTypeMacro(medOpImporterDicomOffis);
 enum DICOM_IMPORTER_GUI_ID
 {
 	ID_FIRST = medGUIWizard::ID_LAST,
-	ID_STUDY,
-  ID_SERIES,
-	ID_CROP_BUTTON,
-	ID_UNDO_CROP_BUTTON,
+	ID_STUDY_SELECT,
+  ID_SERIES_SELECT,
+	ID_CROP,
+	ID_UNDO_CROP,
 	ID_BUILD_STEP,
 	ID_BUILD_BUTTON,
 	ID_CANCEL,
@@ -215,7 +215,7 @@ int CompareZ(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
 int CompareTriggerTime(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
 int CompareImageNumber(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
 
-WX_DEFINE_LIST(medDicomFilesList);
+WX_DEFINE_LIST(medDicomList);
 //----------------------------------------------------------------------------
 medOpImporterDicomOffis::medOpImporterDicomOffis(wxString label):
 mafOp(label)
@@ -271,7 +271,7 @@ mafOp(label)
   m_SelectedStudyUIDSeriesUIDPairFilesList = NULL;
 
   m_DicomDirectoryABSFileName = "";
-	m_DicomTypeRead = -1;
+	m_DicomReaderModality = -1;
 
   m_HighBit = 0;
   m_RescaleIntercept = 0;
@@ -427,62 +427,69 @@ int medOpImporterDicomOffis::RunWizard()
     int result;
     switch (m_OutputType)
     {
-    case 0: 
-      if (m_IsRotated)
-      {
-        if(!this->m_TestMode)
-        {
-          int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
-          if (answer == wxNO)
-          {
-            m_IsRotated = false;
-          }
-        }
-      }
+      case 0: 
 
-      //rescale to 16 bit all the rest of the dataset
-      if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
-      {
-        int i=0, size = m_SelectedStudyUIDSeriesUIDPairFilesList->size();
-
-        wxBusyInfo *wait = NULL;
-        if(!this->m_TestMode)
+        if (m_IsRotated)
         {
-          wait = new wxBusyInfo("Conversion to Unsigned Short: please wait...");
-          mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
-        }
-
-        long progress = 0;
-        for(int slice_num=0;slice_num<size;slice_num++)
-        {
-          RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
           if(!this->m_TestMode)
           {
-            progress = slice_num * 100 / (double)size;
-            mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+            int answer = wxMessageBox( "Dicom dataset contains rotated images - Apply rotation?", "Warning", wxYES_NO, NULL);
+            if (answer == wxNO)
+            {
+              m_IsRotated = false;
+            }
           }
         }
-        mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-        if(wait) delete wait;
-      }
 
-      if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-        result = BuildOutputVMEGrayVolumeFromDicom();
-      else
-        result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
-      break;
-    case 1:
-      if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-        result = BuildOutputVMEMeshFromDicom();
-      else
-        result = BuildOutputVMEMeshFromDicomCineMRI();
-      break;
-    case 2:
-      if(m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
-        result = BuildOutputVMEImagesFromDicom();
-      else
-        result = BuildOutputVMEImagesFromDicomCineMRI();
-      break;
+        //rescale to 16 bit all the rest of the dataset
+        if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
+        {
+          int i=0, size = m_SelectedStudyUIDSeriesUIDPairFilesList->size();
+
+          wxBusyInfo *wait = NULL;
+          if(!this->m_TestMode)
+          {
+            wait = new wxBusyInfo("Conversion to Unsigned Short: please wait...");
+            mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
+          }
+
+          long progress = 0;
+          for(int slice_num=0;slice_num<size;slice_num++)
+          {
+            RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
+            if(!this->m_TestMode)
+            {
+              progress = slice_num * 100 / (double)size;
+              mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
+            }
+          }
+          mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+          if(wait) delete wait;
+        }
+
+        if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+          result = BuildOutputVMEGrayVolumeFromDicom();
+        else
+          result = BuildOutputVMEGrayVolumeFromDicomCineMRI();
+
+        break;
+
+      case 1:
+
+        if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+          result = BuildOutputVMEMeshFromDicom();
+        else
+          result = BuildOutputVMEMeshFromDicomCineMRI();
+        break;
+
+      case 2:
+
+        if(m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+          result = BuildOutputVMEImagesFromDicom();
+        else
+          result = BuildOutputVMEImagesFromDicomCineMRI();
+        break;
+
     }
     return result;
   }
@@ -516,7 +523,7 @@ void medOpImporterDicomOffis::Destroy()
   if(!this->m_TestMode)
     m_SeriesListbox->Clear();
 
-  std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+  std::map<std::vector<mafString>,medDicomList*>::iterator it;
   for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
   {
     m_StudyUIDSeriesUIDPairToDICOMListMap[(*it).first]->DeleteContents(TRUE);
@@ -1568,8 +1575,8 @@ void medOpImporterDicomOffis::CreateLoadPage()
     m_TimeScannerLoadPage->SetPageSize(1);
   }
 
-  m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY,_("study"),80,"",wxLB_HSCROLL,190);
-  m_SeriesListbox = m_LoadGuiCenter->ListBox(ID_SERIES,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
+  m_StudyListbox = m_LoadGuiUnderLeft->ListBox(ID_STUDY_SELECT,_("study"),80,"",wxLB_HSCROLL,190);
+  m_SeriesListbox = m_LoadGuiCenter->ListBox(ID_SERIES_SELECT,_("series"),80,"",wxLB_HSCROLL|wxLB_SORT,190);
   
   m_LoadGuiLeft->FitGui();
   m_LoadGuiUnderLeft->FitGui();
@@ -1685,22 +1692,21 @@ bool medOpImporterDicomOffis::OpenDir()
 {
   ResetStructure();
 
-  // scan dicom directory
   if (!BuildDicomFileList(m_DicomDirectoryABSFileName.GetCStr()))
   {
     return false;
   }
+
   if(!this->m_TestMode)
   {
     if(m_NumberOfStudy>0)
     {
       m_StudyListbox->SetSelection(FIRST_SELECTION);
+      
       UpdateStudyListBox();
-      OnEvent(&mafEvent(this, ID_STUDY));
-     /* if(m_NumberOfStudy == 1)
-      {
-        OnEvent(&mafEvent(this, ID_STUDY));
-      }*/
+
+      OnEvent(&mafEvent(this, ID_STUDY_SELECT));
+    
       if(((medGUIDicomSettings*)GetSetting())->AutoCropPosition())
       {
         AutoPositionCropPlane();
@@ -1774,7 +1780,7 @@ void medOpImporterDicomOffis::ReadDicom()
   m_NumberOfTimeFrames = ((medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->\
     Item(0)->GetData())->GetNumberOfImages();
   
-  if(m_DicomTypeRead == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
+  if(m_DicomReaderModality == medGUIDicomSettings::ID_CMRI_MODALITY) //If cMRI
     m_NumberOfSlices = m_SelectedStudyUIDSeriesUIDPairFilesList->GetCount() / m_NumberOfTimeFrames;
   else
     m_NumberOfSlices = m_SelectedStudyUIDSeriesUIDPairFilesList->GetCount();
@@ -1866,18 +1872,18 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 
 			}
 			break;
-		case ID_UNDO_CROP_BUTTON:
+		case ID_UNDO_CROP:
 			{
 				OnUndoCrop();
 			}
 			break;
-		case ID_STUDY:
+		case ID_STUDY_SELECT:
 			{
         OnStudySelect();
 
  			}
 			break;
-    case ID_SERIES:
+    case ID_SERIES_SELECT:
       {
         OnSeriesSelect();
       }
@@ -1912,12 +1918,12 @@ void medOpImporterDicomOffis::OnEvent(mafEventBase *maf_event)
 
 				}
 				break;
-			case ID_CROP_BUTTON:
-				{     
-					Crop();
-				}
-				break;
-		}
+      case ID_CROP:
+        {     
+          Crop();
+        }
+        break;
+    }
 	}
 }
 //----------------------------------------------------------------------------
@@ -2167,7 +2173,7 @@ void medOpImporterDicomOffis::UpdateStudyListBox()
     //wxString  studyName = st->GetCStr();
     //m_VectorSelected.at(0) = studyName.SubString(0, studyName.find_last_of("_")-1);
 
-    std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+    std::map<std::vector<mafString>,medDicomList*>::iterator it;
     for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
     {
       if ((*it).first.at(0).Compare(m_SelectedStudyUIDSeriesUIDPair.at(0)) == 0)
@@ -2190,7 +2196,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 {
   int counter = 0;
   m_SeriesListbox->Clear();
-  std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+  std::map<std::vector<mafString>,medDicomList*>::iterator it;
   for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
   {
     if ((*it).first.at(0).Compare(m_SelectedStudyUIDSeriesUIDPair.at(0)) == 0)
@@ -2219,19 +2225,19 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 }
 
 //----------------------------------------------------------------------------
-bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
+bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 //----------------------------------------------------------------------------
 {
   long progress;
   int sliceNum = -1;
   int i;
-	double slice_pos[3];
+	double dcmSliceLocation[3];
   double lastZPos = 0;
-	long int imageNumber = -1;
-	long int numberOfImages = -1;
-	double trigTime = -1.0;
-  double imageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  double imagePositionPatient[3] = {0.0,0.0,0.0};
+	long int dcmInstanceNumber = -1;
+	long int dcmCardiacNumberOfImages = -1;
+	double dcmTriggerTime = -1.0;
+  double dcmImageOrientationPatient[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+  double dcmImagePositionPatient[3] = {0.0,0.0,0.0};
   bool enableToRead = true; //true for test mode
   bool errorOccurred = false;
   double lastDistance = 0;
@@ -2254,14 +2260,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercetnageTolerance();
   }
 
-	m_DicomTypeRead = -1;
+	m_DicomReaderModality = -1;
   DcmFileFormat dicomImg;    
 
-	if (m_DICOMDirectoryReader->Open(dir) == 0)
+	if (m_DICOMDirectoryReader->Open(dicomDirABSPath) == 0)
 	{
     if(!this->m_TestMode)
     {
-      wxMessageBox(wxString::Format("Directory <%s> can not be opened",dir),"Warning!!");
+      wxMessageBox(wxString::Format("Directory <%s> can not be opened",dicomDirABSPath),"Warning!!");
     }
 		return false;
 	}
@@ -2275,41 +2281,43 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
 	for (i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++)
 	{
-		if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) || (strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
+		if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) ||\
+        (strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
 		{
 			continue;
 		}
 		else
 		{
       sliceNum++;
-      mafString file = "";
-			m_CurrentSliceABSFileName = m_DICOMDirectoryReader->GetFile(i);
-			// Append of the path at the dicom file
-			file.Append(dir);
-			file.Append("\\");
-			file.Append(m_CurrentSliceABSFileName);
+      mafString currentSliceABSFileName = "";
+			mafString currentSliceLocalFileName = m_DICOMDirectoryReader->GetFile(i);
+			
+      currentSliceABSFileName.Append(dicomDirABSPath);
+			currentSliceABSFileName.Append("\\");
+			currentSliceABSFileName.Append(currentSliceLocalFileName);
 
       DJDecoderRegistration::registerCodecs(); // register JPEG codecs
       DcmRLEDecoderRegistration ::registerCodecs(OFFalse, OFFalse,OFFalse); // register RLE codecs
-      OFCondition status = dicomImg.loadFile(file);//load data into offis structure
+      OFCondition status = dicomImg.loadFile(currentSliceABSFileName);//load data into offis structure
 
       if (!status.good())
       {
         if(!this->m_TestMode)
         {
-          wxLogMessage(wxString::Format("File <%s> can not be opened",file));
+          wxLogMessage(wxString::Format("File <%s> can not be opened",currentSliceABSFileName));
           errorOccurred = true;
           sliceNum--;
         }
         continue;
       }
-      m_FileName = file; 
+
+      m_CurrentSliceABSFileName = currentSliceABSFileName; 
       
-      DcmDataset *ds = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
+      DcmDataset *dicomDataset = dicomImg.getDataset();//obtain dataset information from dicom file (loaded into memory)
  
       // decompress data set if compressed
       //ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-      OFCondition error = ds->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+      OFCondition error = dicomDataset->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
 
 
       DJDecoderRegistration::cleanup(); // deregister JPEG codecs
@@ -2317,14 +2325,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       if (!error.good())
       {
-          wxLogMessage(wxString::Format("Error decoding the image <%s>",file));
+          wxLogMessage(wxString::Format("Error decoding the image <%s>",currentSliceABSFileName));
           errorOccurred = true;
           //return false;
           continue;
       }
 
       const char *option = "?";
-      ds->findAndGetString(DCM_ScanOptions,option);
+      dicomDataset->findAndGetString(DCM_ScanOptions,option);
       wxString scanOption = option;
 
       if (scanOption.Find("SCOUT") != -1)//check if it is a scout image
@@ -2334,21 +2342,26 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       //now are used findAndGet* method to get dicom information
       long int val_long;
-      ds->findAndGetLongInt(DCM_Columns, val_long);
-      int width = val_long;
-      ds->findAndGetLongInt(DCM_Rows, val_long);
-      int height = val_long;
+      dicomDataset->findAndGetLongInt(DCM_Columns, val_long); 
       
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[0],0);
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[1],1);
-      ds->findAndGetFloat64(DCM_ImagePositionPatient,imagePositionPatient[2],2);
+      // width
+      int dcmColumns = val_long;
+      
+      dicomDataset->findAndGetLongInt(DCM_Rows, val_long);
 
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[0],0);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[1],1);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[2],2);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[3],3);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[4],4);
-      ds->findAndGetFloat64(DCM_ImageOrientationPatient,imageOrientationPatient[5],5);
+      // height
+      int dcmRows = val_long;
+      
+      dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[0],0);
+      dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[1],1);
+      dicomDataset->findAndGetFloat64(DCM_ImagePositionPatient,dcmImagePositionPatient[2],2);
+
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[0],0);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[1],1);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[2],2);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[3],3);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[4],4);
+      dicomDataset->findAndGetFloat64(DCM_ImageOrientationPatient,dcmImageOrientationPatient[5],5);
 
      /* if (sliceNum == 1)
       {
@@ -2382,81 +2395,81 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       positive y-axis is equal to a unit vector along the positive z-axis." */
 
       m_IsRotated  =  m_IsRotated || !( \
-      fabs(imageOrientationPatient[0] - 1.0) < 0.0001 && \
-      fabs(imageOrientationPatient[4] - imageOrientationPatient[0]) < 0.0001 &&\
-      fabs(imageOrientationPatient[1] - 0.0) < 0.0001 &&\
-      fabs(imageOrientationPatient[1] - imageOrientationPatient[2]) < 0.0001 &&\
-      fabs(imageOrientationPatient[1] - imageOrientationPatient[3]) < 0.0001 &&\
-      fabs(imageOrientationPatient[1] - imageOrientationPatient[5]) < 0.0001 \
+      fabs(dcmImageOrientationPatient[0] - 1.0) < 0.0001 && \
+      fabs(dcmImageOrientationPatient[4] - dcmImageOrientationPatient[0]) < 0.0001 &&\
+      fabs(dcmImageOrientationPatient[1] - 0.0) < 0.0001 &&\
+      fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[2]) < 0.0001 &&\
+      fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[3]) < 0.0001 &&\
+      fabs(dcmImageOrientationPatient[1] - dcmImageOrientationPatient[5]) < 0.0001 \
       );
 
-      double spacing[3];
-      spacing[2] = 0;
+      double dcmPixelSpacing[3];
+      dcmPixelSpacing[2] = 0;
   
-      if(ds->findAndGetFloat64(DCM_PixelSpacing,spacing[0],0).bad())
+      if(dicomDataset->findAndGetFloat64(DCM_PixelSpacing,dcmPixelSpacing[0],0).bad())
       {
         //Unable to get element: DCM_PixelSpacing[0];
-        spacing[0] = 1.0;// for RGB??
+        dcmPixelSpacing[0] = 1.0;// for RGB??
       } 
-      if(ds->findAndGetFloat64(DCM_PixelSpacing,spacing[1],1).bad())
+      if(dicomDataset->findAndGetFloat64(DCM_PixelSpacing,dcmPixelSpacing[1],1).bad())
       {
         //Unable to get element: DCM_PixelSpacing[0];
-        spacing[1] = 1.0;// for RGB??
+        dcmPixelSpacing[1] = 1.0;// for RGB??
       } 
       
-      double slope;
-      if(ds->findAndGetFloat64(DCM_RescaleSlope,slope).bad())
+      double dcmRescaleSlope;
+      if(dicomDataset->findAndGetFloat64(DCM_RescaleSlope,dcmRescaleSlope).bad())
       {
         //Unable to get element: DCM_RescaleSlope[0];
-        slope = 1;
+        dcmRescaleSlope = 1;
       } 
       
-      long highBit; 
-      double intercept;
-      if(ds->findAndGetLongInt(DCM_HighBit,highBit).bad())
+      long dcmHighBit; 
+      double dcmRescaleIntercept;
+      if(dicomDataset->findAndGetLongInt(DCM_HighBit,dcmHighBit).bad())
       {
         //Unable to get element: DCM_RescaleIntercept[0];
-        highBit = 0;
+        dcmHighBit = 0;
       } 
-      m_HighBit = highBit;
+      m_HighBit = dcmHighBit;
             
-      if(ds->findAndGetFloat64(DCM_RescaleIntercept,intercept).bad())
+      if(dicomDataset->findAndGetFloat64(DCM_RescaleIntercept,dcmRescaleIntercept).bad())
       {
         //Unable to get element: DCM_RescaleIntercept[0];
-        intercept = 0;
+        dcmRescaleIntercept = 0;
       }
-      m_RescaleIntercept = intercept;
+      m_RescaleIntercept = dcmRescaleIntercept;
 
 ///////////////////CREATE VTKIMAGEDATA////////////////////////////
       //initialize vtkImageData
       vtkMAFSmartPointer<vtkImageData> imageData;
-      imageData->SetDimensions(height, width,1);
-      imageData->SetWholeExtent(0,width-1,0,height-1,0,0);
-      imageData->SetUpdateExtent(0,width-1,0,height-1,0,0);
+      imageData->SetDimensions(dcmRows, dcmColumns,1);
+      imageData->SetWholeExtent(0,dcmColumns-1,0,dcmRows-1,0,0);
+      imageData->SetUpdateExtent(0,dcmColumns-1,0,dcmRows-1,0,0);
       imageData->SetExtent(imageData->GetUpdateExtent());
       imageData->SetNumberOfScalarComponents(1);
-      imageData->SetOrigin(imagePositionPatient);
-      imageData->SetSpacing(spacing);
+      imageData->SetOrigin(dcmImagePositionPatient);
+      imageData->SetSpacing(dcmPixelSpacing);
 
-      long pixel_rep;
-      ds->findAndGetLongInt(DCM_PixelRepresentation,pixel_rep);
-      ds->findAndGetLongInt(DCM_BitsAllocated,val_long);
+      long dcmPixelRepresentation;
+      dicomDataset->findAndGetLongInt(DCM_PixelRepresentation,dcmPixelRepresentation);
+      dicomDataset->findAndGetLongInt(DCM_BitsAllocated,val_long);
 
-      long pixel_max;
-      long pixel_min;
-      ds->findAndGetLongInt(DCM_SmallestImagePixelValue, pixel_min);
-      ds->findAndGetLongInt(DCM_LargestImagePixelValue, pixel_max);
+      long dcmLargestImagePixelValue;
+      long dcmSmallestImagePixelValue;
+      dicomDataset->findAndGetLongInt(DCM_SmallestImagePixelValue, dcmSmallestImagePixelValue);
+      dicomDataset->findAndGetLongInt(DCM_LargestImagePixelValue, dcmLargestImagePixelValue);
 
-      if (pixel_min == pixel_max)
-        intercept = 0;
+      if (dcmSmallestImagePixelValue == dcmLargestImagePixelValue)
+        dcmRescaleIntercept = 0;
 
-      if(val_long==16 && pixel_rep == 0 )
+      if(val_long==16 && dcmPixelRepresentation == 0 )
       {
-        if(pixel_min*slope+intercept >= VTK_UNSIGNED_SHORT_MIN && pixel_max*slope+intercept <= VTK_UNSIGNED_SHORT_MAX)
+        if(dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept >= VTK_UNSIGNED_SHORT_MIN && dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept <= VTK_UNSIGNED_SHORT_MAX)
         {
           imageData->SetScalarType(VTK_UNSIGNED_SHORT);
         }
-        else if (pixel_min*slope+intercept >= VTK_SHORT_MIN && pixel_max*slope+intercept <= VTK_SHORT_MAX)
+        else if (dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept >= VTK_SHORT_MIN && dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept <= VTK_SHORT_MAX)
         {
           imageData->SetScalarType(VTK_SHORT);
         }
@@ -2464,15 +2477,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         {
           if(!this->m_TestMode)
           {
-            wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",file));
+            wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",currentSliceABSFileName));
             errorOccurred = true;
             continue;
           }
         }
       }
-      else if(val_long==16 && pixel_rep == 1)
+      else if(val_long==16 && dcmPixelRepresentation == 1)
       {
-        if (pixel_min*slope+intercept >= VTK_SHORT_MIN && pixel_max*slope+intercept <= VTK_SHORT_MAX)
+        if (dcmSmallestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept >= VTK_SHORT_MIN && dcmLargestImagePixelValue*dcmRescaleSlope+dcmRescaleIntercept <= VTK_SHORT_MAX)
         {
           imageData->SetScalarType(VTK_SHORT);
         }
@@ -2480,13 +2493,13 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
         {
           if(!this->m_TestMode)
           {
-            wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",file));
+            wxLogMessage(wxString::Format("Inconsistent scalar values. Can not import file <%s>",currentSliceABSFileName));
             errorOccurred = true;
             continue;
           }
         }
       }
-      else if(val_long==16 && pixel_rep == 0)
+      else if(val_long==16 && dcmPixelRepresentation == 0)
       {
         imageData->SetScalarType(VTK_UNSIGNED_SHORT);
       }
@@ -2503,32 +2516,32 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       const Uint8* dicom_buf_char = NULL;
       if (val_long==16)
       {
-        ds->findAndGetUint16Array(DCM_PixelData, dicom_buf_short);
+        dicomDataset->findAndGetUint16Array(DCM_PixelData, dicom_buf_short);
       }
       else
       {
-        ds->findAndGetUint8Array(DCM_PixelData, dicom_buf_char);
+        dicomDataset->findAndGetUint8Array(DCM_PixelData, dicom_buf_char);
       }
 
       int counter=0;
-      for(int y=0;y<height;y++)
+      for(int y=0;y<dcmRows;y++)
       {
-        for(int x=0;x<width;x++)
+        for(int x=0;x<dcmColumns;x++)
         {
-          imageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[width*y+x]);
+          imageData->GetPointData()->GetScalars()->SetTuple1(counter, dicom_buf_short[dcmColumns*y+x]);
           counter++;
         }
       }
       imageData->Update();
 
-      if (slope != 1 || intercept != 0)
+      if (dcmRescaleSlope != 1 || dcmRescaleIntercept != 0)
       {
         if (imageData->GetScalarType() == VTK_UNSIGNED_SHORT)
         {
           vtkUnsignedShortArray *scalars=vtkUnsignedShortArray::SafeDownCast(imageData->GetPointData()->GetScalars());
           for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
           {
-            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
+            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
           }
         }
         else if (imageData->GetScalarType() == VTK_SHORT)
@@ -2536,7 +2549,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           vtkShortArray *scalars=vtkShortArray::SafeDownCast(imageData->GetPointData()->GetScalars());
           for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
           {
-            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
+            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
           }
         }
         else if (imageData->GetScalarType() == VTK_CHAR)
@@ -2544,7 +2557,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           vtkCharArray *scalars=vtkCharArray::SafeDownCast(imageData->GetPointData()->GetScalars());
           for(int indexScalar=0;indexScalar<imageData->GetPointData()->GetScalars()->GetNumberOfTuples();indexScalar++)
           {
-            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*slope+intercept);//modify scalars using slope and intercept
+            scalars->SetTuple1(indexScalar,scalars->GetTuple1(indexScalar)*dcmRescaleSlope+dcmRescaleIntercept);//modify scalars using slope and intercept
           }
         }
         
@@ -2552,28 +2565,28 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       }
 ////////////////////////////////////////////////////   
 
-      const char *mode = "?";
-      ds->findAndGetString(DCM_Modality,mode);
+      const char *dcmModality = "?";
+      dicomDataset->findAndGetString(DCM_Modality,dcmModality);
 
-      const char *patPos = "?";
-      ds->findAndGetString(DCM_PatientPosition,patPos);
-      m_PatientPosition = patPos;
+      const char *dcmPatientPosition = "?";
+      dicomDataset->findAndGetString(DCM_PatientPosition,dcmPatientPosition);
+      m_PatientPosition = dcmPatientPosition;
 
-      const char *studyUID = "?";
-      ds->findAndGetString(DCM_StudyInstanceUID,studyUID);
+      const char *dcmStudyInstanceUID = "?";
+      dicomDataset->findAndGetString(DCM_StudyInstanceUID,dcmStudyInstanceUID);
 
-      const char *seriesUID = "?";
-      ds->findAndGetString(DCM_SeriesInstanceUID,seriesUID);
+      const char *dcmSeriesInstanceUID = "?";
+      dicomDataset->findAndGetString(DCM_SeriesInstanceUID,dcmSeriesInstanceUID);
 
       //vector of string composed by:
       //-studyUID
       //-seriesUID
       //-name to applied to the "seriers listbox"
       std::vector<mafString> studyAndSeriesPair;
-      studyAndSeriesPair.push_back(studyUID);
-      studyAndSeriesPair.push_back(seriesUID);
+      studyAndSeriesPair.push_back(dcmStudyInstanceUID);
+      studyAndSeriesPair.push_back(dcmSeriesInstanceUID);
       mafString seriesName = "series_";
-      seriesName.Append(mode);
+      seriesName.Append(dcmModality);
       seriesName.Append("_");
 
       bool seriesExist = false;
@@ -2581,18 +2594,18 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 
       if (!this->m_TestMode)
       {
-        enableToRead = ((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)mode);
+        enableToRead = ((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)dcmModality);
       }
-      if (enableToRead && strcmp((char *)mode, "MR" ) != 0)
+      if (enableToRead && strcmp((char *)dcmModality, "MR" ) != 0)
 			{
-        wxString stringMode = mode;
+        wxString stringMode = dcmModality;
 				if(stringMode.Find("SCOUT") != -1)
 				{
 					continue;
 				}
 
         //if(m_DicomMap.find(studyAndSeriesVec) == m_DicomMap.end()) 
-        std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+        std::map<std::vector<mafString>,medDicomList*>::iterator it;
         for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
         {
           if(studyAndSeriesPair.at(0) == (*it).first.at(0))
@@ -2611,30 +2624,32 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           m_NumberOfStudy++;
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
-          medDicomFilesList *filesList = new medDicomFilesList;
-          m_DicomTypeRead=-1;
+          medDicomList *filesList = new medDicomList;
+          m_DicomReaderModality=-1;
 
-          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
-            slice_pos[0] = imagePositionPatient[0];
-            slice_pos[1] = imagePositionPatient[1];
-            slice_pos[2] = imagePositionPatient[2];
+            dcmSliceLocation[0] = dcmImagePositionPatient[0];
+            dcmSliceLocation[1] = dcmImagePositionPatient[1];
+            dcmSliceLocation[2] = dcmImagePositionPatient[2];
           } 
           else
           {
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
-          lastZPos = slice_pos[2];
+          lastZPos = dcmSliceLocation[2];
 
-          seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, height, width));
+          seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
           studyAndSeriesPair.push_back(seriesName);
 
-          filesList->Append(new medDICOMListElement(m_FileName,slice_pos, imageOrientationPatient, imageData));
+          filesList->Append(new medDICOMListElement\
+            (m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, imageData));
+
           m_StudyUIDSeriesUIDPairToDICOMListMap.insert\
-            (std::pair<std::vector<mafString>,medDicomFilesList*>\
+            (std::pair<std::vector<mafString>,medDicomList*>\
             (studyAndSeriesPair,filesList));
 
           if (!this->m_TestMode)
@@ -2644,28 +2659,28 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				}
 				else 
 				{
-          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
-            slice_pos[0] = imagePositionPatient[0];
-            slice_pos[1] = imagePositionPatient[1];
-            slice_pos[2] = imagePositionPatient[2];
+            dcmSliceLocation[0] = dcmImagePositionPatient[0];
+            dcmSliceLocation[1] = dcmImagePositionPatient[1];
+            dcmSliceLocation[2] = dcmImagePositionPatient[2];
           } 
           else
           {
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
           
           if  (sliceNum > 1)
           {
-            double distancePercentage = ((lastDistance - (fabs(lastZPos - slice_pos[2])))*100)/lastDistance;
+            double distancePercentage = ((lastDistance - (fabs(lastZPos - dcmSliceLocation[2])))*100)/lastDistance;
 
             // Check if slices are under tolerance distance
-            if ((enableScalarTolerance && (fabs(lastZPos - slice_pos[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
+            if ((enableScalarTolerance && (fabs(lastZPos - dcmSliceLocation[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
             {
-              wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",file.GetCStr(),lastFileName.GetCStr()));
+              wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",currentSliceABSFileName.GetCStr(),lastFileName.GetCStr()));
               int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
               if (answer == wxNO)
               {
@@ -2679,21 +2694,23 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             }
             else
             {
-              lastDistance = fabs(lastZPos - slice_pos[2]);
+              lastDistance = fabs(lastZPos - dcmSliceLocation[2]);
             }           
           }
 
-          lastZPos = slice_pos[2];
+          lastZPos = dcmSliceLocation[2];
           
 
-          m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append(new medDICOMListElement(m_FileName,slice_pos, imageOrientationPatient, imageData));
+          m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append(\
+            new medDICOMListElement(m_CurrentSliceABSFileName,dcmSliceLocation, \
+            dcmImageOrientationPatient, imageData));
 				}
 			}
-			else if ( enableToRead && strcmp( (char *)mode, "MR" ) == 0)
+			else if ( enableToRead && strcmp( (char *)dcmModality, "MR" ) == 0)
 			{
         seriesExist = false;
         seriesCounter = 0;
-        std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+        std::map<std::vector<mafString>,medDicomList*>::iterator it;
         for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
         {
           if(studyAndSeriesPair.at(0) == (*it).first.at(0))
@@ -2712,33 +2729,33 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           m_NumberOfStudy++;
 					// the study is not present into the listbox, so need to create new
 					// list of files related to the new studyID
-					medDicomFilesList *dicomFilesList = new medDicomFilesList;
-          m_DicomTypeRead=-1;
-          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+					medDicomList *dicomFilesList = new medDicomList;
+          m_DicomReaderModality=-1;
+          if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
-            slice_pos[0] = imagePositionPatient[0];
-            slice_pos[1] = imagePositionPatient[1];
-            slice_pos[2] = imagePositionPatient[2];
+            dcmSliceLocation[0] = dcmImagePositionPatient[0];
+            dcmSliceLocation[1] = dcmImagePositionPatient[1];
+            dcmSliceLocation[2] = dcmImagePositionPatient[2];
           } 
           else
           {
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
           
 
-          ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
-          ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
-          ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
-          lastZPos = slice_pos[2];
+          dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
+          dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
+          dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
+          lastZPos = dcmSliceLocation[2];
 
-          if(numberOfImages>1)
+          if(dcmCardiacNumberOfImages>1)
           {
-            if (m_DicomTypeRead==-1)
-              m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
-            else if(m_DicomTypeRead!=medGUIDicomSettings::ID_CMRI_MODALITY)
+            if (m_DicomReaderModality==-1)
+              m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;
+            else if(m_DicomReaderModality!=medGUIDicomSettings::ID_CMRI_MODALITY)
             {
               if(!this->m_TestMode)
               {
@@ -2750,9 +2767,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
           }
           else
           {
-            if (m_DicomTypeRead==-1)
-              m_DicomTypeRead=medGUIDicomSettings::ID_MRI_MODALITY;
-            else if(m_DicomTypeRead!=medGUIDicomSettings::ID_MRI_MODALITY)
+            if (m_DicomReaderModality==-1)
+              m_DicomReaderModality=medGUIDicomSettings::ID_MRI_MODALITY;
+            else if(m_DicomReaderModality!=medGUIDicomSettings::ID_MRI_MODALITY)
             {
               if(!this->m_TestMode)
               {
@@ -2763,13 +2780,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             }
           }
 
-          seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, height, width));
+          seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
           studyAndSeriesPair.push_back(seriesName);
          
-          dicomFilesList->Append(new medDICOMListElement(m_FileName,slice_pos, imageOrientationPatient, imageData, imageNumber, numberOfImages, trigTime));
+          dicomFilesList->Append(new medDICOMListElement\
+            (m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, imageData, dcmInstanceNumber, \
+            dcmCardiacNumberOfImages, dcmTriggerTime));
 
           m_StudyUIDSeriesUIDPairToDICOMListMap.insert\
-            (std::pair<std::vector<mafString>,medDicomFilesList*>\
+            (std::pair<std::vector<mafString>,medDicomList*>\
             (studyAndSeriesPair,dicomFilesList));
           if (!this->m_TestMode)
           {
@@ -2778,23 +2797,23 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
 				}
 				else 
 				{
-          if(ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2]).bad())
+          if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
             //Unable to get element: DCM_SliceLocation;
-            slice_pos[0] = imagePositionPatient[0];
-            slice_pos[1] = imagePositionPatient[1];
-            slice_pos[2] = imagePositionPatient[2];
+            dcmSliceLocation[0] = dcmImagePositionPatient[0];
+            dcmSliceLocation[1] = dcmImagePositionPatient[1];
+            dcmSliceLocation[2] = dcmImagePositionPatient[2];
           } 
           else
           {
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[2],0);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[1],1);
-            ds->findAndGetFloat64(DCM_SliceLocation,slice_pos[0],2);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2],0);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
+            dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
 
-          ds->findAndGetLongInt(DCM_InstanceNumber,imageNumber);
-          ds->findAndGetLongInt(DCM_CardiacNumberOfImages,numberOfImages);
-          ds->findAndGetFloat64(DCM_TriggerTime,trigTime);
+          dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
+          dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
+          dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 
           // Check if slices are under tolerance distance
           // Commented because the problem is present in TAC dataset which are not time varying
@@ -2824,7 +2843,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
             lastZPos = slice_pos[2];
           }*/
 
-          m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append(new medDICOMListElement(m_FileName,slice_pos,imageOrientationPatient ,imageData,imageNumber,numberOfImages,trigTime));
+          m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append\
+            (new medDICOMListElement(m_CurrentSliceABSFileName,dcmSliceLocation,dcmImageOrientationPatient ,\
+            imageData,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
 				}
 			}
       if (!this->m_TestMode)
@@ -2835,7 +2856,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dir)
       dicomImg.clear();
       studyAndSeriesPair.clear();
 		}
-    lastFileName = m_FileName;
+    lastFileName = m_CurrentSliceABSFileName;
 	}
   
   if (!this->m_TestMode)
@@ -2874,7 +2895,7 @@ void medOpImporterDicomOffis::ResetStructure()
     m_SeriesListbox->Clear();
   }
   
-  std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+  std::map<std::vector<mafString>,medDicomList*>::iterator it;
   for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
   {
     m_StudyUIDSeriesUIDPairToDICOMListMap[(*it).first]->DeleteContents(TRUE);
@@ -2893,7 +2914,7 @@ void medOpImporterDicomOffis::ResetStructure()
 	m_CurrentSlice		= 0;
 	m_NumberOfTimeFrames = 0;
 	m_CurrentTime				= 0; 
-	m_DicomTypeRead			= -1;
+	m_DicomReaderModality			= -1;
 
 	m_CropFlag				= false;
 
@@ -2982,7 +3003,7 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 	*/
 
 
-	if (m_DicomTypeRead != medGUIDicomSettings::ID_CMRI_MODALITY)
+	if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
 
 
@@ -2991,7 +3012,8 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
     m_SelectedStudyUIDSeriesUIDPair = m_StudyUIDSeriesUIDPairToDICOMListMap.begin()->first;
   }
 
-  m_SelectedStudyUIDSeriesUIDPairFilesList = m_StudyUIDSeriesUIDPairToDICOMListMap[m_SelectedStudyUIDSeriesUIDPair];
+  m_SelectedStudyUIDSeriesUIDPairFilesList = m_StudyUIDSeriesUIDPairToDICOMListMap\
+    [m_SelectedStudyUIDSeriesUIDPair];
 
   medDICOMListElement *element0;
   element0 = (medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->Item(0)->GetData();
@@ -2999,7 +3021,9 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
   int numberOfImages =  element0->GetNumberOfImages();
 
 	int numberOfDicomSlices = m_SelectedStudyUIDSeriesUIDPairFilesList->GetCount();
+
   int numSlicesPerTS;
+
   if (numberOfDicomSlices >= numberOfImages)
   {
      numSlicesPerTS = numberOfDicomSlices / numberOfImages;
@@ -3175,13 +3199,13 @@ void medOpImporterDicomOffis::ImportDicomTags()
   DcmFileFormat dicomImg;  
   DJDecoderRegistration::registerCodecs(); // register JPEG codecs
   DcmRLEDecoderRegistration::registerCodecs();
-  OFCondition status = dicomImg.loadFile(m_FileName);//load data into offis structure
+  OFCondition status = dicomImg.loadFile(m_CurrentSliceABSFileName);//load data into offis structure
 
   if (!status.good()) 
   {
     if(!this->m_TestMode)
     {
-      mafLogMessage(wxString::Format("File <%s> can not be opened",m_FileName),"Warning!!");
+      mafLogMessage(wxString::Format("File <%s> can not be opened",m_CurrentSliceABSFileName),"Warning!!");
     }
     return;
   }
@@ -3488,7 +3512,7 @@ void medOpImporterDicomOffis::OnStudySelect()
   {
     FillSeriesListBox();
     m_SeriesListbox->SetSelection(FIRST_SELECTION);
-    OnEvent(&mafEvent(this, ID_SERIES));
+    OnEvent(&mafEvent(this, ID_SERIES_SELECT));
   }
 }
 
@@ -3498,7 +3522,7 @@ void medOpImporterDicomOffis::OnSeriesSelect()
   m_SelectedStudyUIDSeriesUIDPair.at(0) = st->GetCStr();
   wxString  seriesName = m_SeriesListbox->GetString(m_SeriesListbox->GetSelection());
   m_SelectedStudyUIDSeriesUIDPair.at(2) = seriesName.SubString(0, seriesName.find_last_of("x")-1);
-  std::map<std::vector<mafString>,medDicomFilesList*>::iterator it;
+  std::map<std::vector<mafString>,medDicomList*>::iterator it;
   for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
   {
     if ((*it).first.at(0).Compare(m_SelectedStudyUIDSeriesUIDPair.at(0)) == 0)
@@ -3521,10 +3545,10 @@ void medOpImporterDicomOffis::OnSeriesSelect()
     element0 = (medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->Item(0)->GetData();
 
     int numberOfImages =  element0->GetNumberOfImages();
-    m_DicomTypeRead=-1;
+    m_DicomReaderModality=-1;
     if(numberOfImages>1)
     {
-      m_DicomTypeRead=medGUIDicomSettings::ID_CMRI_MODALITY;
+      m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;
       EnableTimeSlider(true);
     }
   }

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-13 10:32:48 $
-Version:   $Revision: 1.1.2.30 $
+Date:      $Date: 2010-04-13 16:15:17 $
+Version:   $Revision: 1.1.2.31 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -74,7 +74,7 @@ class vtkTextMapper;
 class mafVMEGroup;
 
 class medDICOMListElement;
-class medDicomFilesList;
+class medDicomList;
 
 //----------------------------------------------------------------------------
 // medOpImporterDicomOffis :
@@ -187,7 +187,7 @@ protected:
 	void ResetSliders();
 
 	/** Build the list of dicom filer recognized. */
-	bool BuildDicomFileList(const char *dir);
+	bool BuildDicomFileList(const char *dicomDirABSPath);
 
 	/** Return the slice number from the heightId and sliceId*/
 	int GetImageId(int heightId, int timeId);
@@ -292,20 +292,19 @@ protected:
   mafString m_PatientPosition;
 
 	int				m_BuildStepValue;
-	int				m_DicomTypeRead; ///<Type DICOM Read from file
+	int				m_DicomReaderModality; ///<Type DICOM Read from file
   long		  m_HighBit; ///<High bit DICOM Read from file
   double	  m_RescaleIntercept; ///<Rescale Intercept DICOM Read from file
 	int				m_SortAxes;
 	int				m_NumberOfTimeFrames;
 
-	medDicomFilesList	*m_SelectedStudyUIDSeriesUIDPairFilesList;
+	medDicomList	*m_SelectedStudyUIDSeriesUIDPairFilesList;
 
   std::vector<mafString> m_SelectedStudyUIDSeriesUIDPair;
-  std::map<std::vector<mafString>,medDicomFilesList*> m_StudyUIDSeriesUIDPairToDICOMListMap;
+  std::map<std::vector<mafString>,medDicomList*> m_StudyUIDSeriesUIDPairToDICOMListMap;
 
-	mafString	m_CurrentSliceABSFileName;
 	mafString	m_VolumeName;
-  wxString  m_FileName;
+  wxString  m_CurrentSliceABSFileName;
 	int				m_VolumeSide;
 
 	int				 m_NumberOfStudy; ///<Number of study present in the DICOM directory
@@ -379,7 +378,8 @@ public:
 		m_NumberOfImages = -1;
 	};
   /** overloaded constructor */
-	medDICOMListElement(mafString filename,double coord[3], double orientation[9], vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
+	medDICOMListElement(mafString filename,double coord[3], double orientation[9],\
+    vtkImageData *data ,int imageNumber=-1, int numberOfImages=-1, double trigTime=-1.0)  
 	{
 		m_SliceABSFileName = filename;
 		m_Pos[0] = coord[0];
