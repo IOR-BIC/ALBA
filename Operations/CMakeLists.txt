@@ -8,12 +8,6 @@ PROJECT(medOperations)
 SET(PROJECT_SRCS
   medOpCreateLabeledVolume.cpp
   medOpCreateLabeledVolume.h
-  mmoDICOMImporter.cpp
-  mmoDICOMImporter.h
-  medOpImporterCTA.cpp
-  medOpImporterCTA.h
-  medOpImporterCTMRI.cpp
-  medOpImporterCTMRI.h
   medOpImporterLandmark.cpp
   medOpImporterLandmark.h
   medOpImporterLandmarkTXT.cpp
@@ -99,9 +93,6 @@ SET(PROJECT_SRCS
   medOpIterativeRegistration.cpp
   medOpIterativeRegistration.h
   
-  medOpImporterDicom.cpp
-  medOpImporterDicom.h
-  
   medOpSmoothSurface.cpp
   medOpSmoothSurface.h
   
@@ -119,10 +110,7 @@ SET(PROJECT_SRCS
 
   medOpSubdivide.cpp
   medOpSubdivide.h
-  
-  medOpImporterDicomXA.cpp
-  medOpImporterDicomXA.h
-  
+    
   medOpFillHoles.cpp
   medOpFillHoles.h
   medOpMeshDeformation.cpp
