@@ -132,14 +132,15 @@ SET(PROJECT_SRCS
   medOpEqualizeHistogram.cpp
   medOpEqualizeHistogram.h
   
-  medDicomCardiacMRIHelper.cpp
-  medDicomCardiacMRIHelper.h
 )
   
 IF (MED_USE_Offis)
 SET(PROJECT_SRCS ${PROJECT_SRCS}
-  medOpImporterDicomOffis.h
-  medOpImporterDicomOffis.cpp
+    medOpImporterDicomOffis.h
+    medOpImporterDicomOffis.cpp
+  
+    medDicomCardiacMRIHelper.cpp
+    medDicomCardiacMRIHelper.h
    )
 ENDIF (MED_USE_Offis)
 
