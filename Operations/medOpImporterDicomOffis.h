@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-13 16:15:17 $
-Version:   $Revision: 1.1.2.31 $
+Date:      $Date: 2010-04-14 08:02:20 $
+Version:   $Revision: 1.1.2.32 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -307,7 +307,7 @@ protected:
   wxString  m_CurrentSliceABSFileName;
 	int				m_VolumeSide;
 
-	int				 m_NumberOfStudy; ///<Number of study present in the DICOM directory
+	int				 m_NumberOfStudies; ///<Number of study present in the DICOM directory
 	int				 m_NumberOfSlices;
   wxListBox	*m_StudyListbox;
   wxListBox	*m_SeriesListbox;
@@ -325,7 +325,7 @@ protected:
 
 	mafTagArray	*m_TagArray;
 
-	double	m_DicomBounds[6];
+	double	m_SliceBounds[6];
   
 	int	m_GizmoStatus;
 	int	m_SideToBeDragged;
@@ -435,7 +435,7 @@ public:
 	int GetImageNumber() const {return m_ImageNumber;};
 
 	/** Return the image number of the dicom slice*/
-	int GetNumberOfImages() const {return m_NumberOfImages;};
+	int GetTimeFramesNumber() const {return m_NumberOfImages;};
 
 	/** Return the trigger time of the dicom slice*/
 	int GetTriggerTime() const {return m_TriggerTime;};
