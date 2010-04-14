@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-03 13:30:55 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-14 16:47:35 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -131,10 +131,7 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
   dicomDataset->findAndGetFloat64(DCM_PixelSpacing,spacing[0],0);
    
-
   dicomDataset->findAndGetFloat64(DCM_PixelSpacing,spacing[1],1);
-   
-
 
   //   % initialization
   //     % xVersors = x versors

@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-14 08:02:20 $
-Version:   $Revision: 1.1.2.85 $
+Date:      $Date: 2010-04-14 16:47:35 $
+Version:   $Revision: 1.1.2.86 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -144,6 +144,8 @@ MafMedical is partially based on OpenMAF.
 #define INCLUDE_CSTDLIB
 #define INCLUDE_CSTRING
 #include "dcmtk/ofstd/ofstdinc.h"
+#include "medDicomCardiacMRIHelper.h"
+#include "vnl/vnl_vector.h"
 
 
 // copied from wx/list.h : needed to make Visual Assist X work correctly 
@@ -165,6 +167,18 @@ MafMedical is partially based on OpenMAF.
 
 WX_DECLARE_LIST(medDICOMListElement, medDicomList);
 
+void medOpImporterDicomOffis::PrintDicomList(medDicomList *dicomList)
+{
+  std::ostringstream stringStream;
+          
+  for (int i = 0; i < dicomList->GetCount(); i++) 
+  {
+    stringStream << "i: " << i << "  absFilName: "  << \
+      dicomList->Item(i)->GetData()->GetFileName() << std::endl;    
+  }
+  
+  mafLogMessage(stringStream.str().c_str());
+}
 //----------------------------------------------------------------------------
 mafCxxTypeMacro(medOpImporterDicomOffis);
 //----------------------------------------------------------------------------
@@ -315,22 +329,22 @@ mafOp(label)
   m_DiscardPosition = FALSE;
 
   m_RescaleTo16Bit = FALSE;
+
+  m_CardiacMRIHelper = NULL;
 }
 //----------------------------------------------------------------------------
 medOpImporterDicomOffis::~medOpImporterDicomOffis()
 //----------------------------------------------------------------------------
 {
+  cppDEL(m_CardiacMRIHelper);
 	vtkDEL(m_SliceActor);
 
-	//cppDEL(m_Wizard);
 	mafDEL(m_TagArray);
 	mafDEL(m_Image);
   mafDEL(m_Mesh);
   mafDEL(m_Volume);
 
   m_ImagesGroup = NULL;
-
-  //mafDEL(m_Output);  //achiarini(giaco): removed because useless and potentially dangerous
 
 }
 //----------------------------------------------------------------------------
@@ -456,7 +470,8 @@ int medOpImporterDicomOffis::RunWizard()
           long progress = 0;
           for(int slice_num=0;slice_num<size;slice_num++)
           {
-            RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
+            RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()\
+              ->GetVTKImageData());
             if(!this->m_TestMode)
             {
               progress = slice_num * 100 / (double)size;
@@ -776,7 +791,8 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
     }
 
     medDICOMListElement *element0;
-    element0 = (medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->Item(tsImageId)->GetData();
+    element0 = (medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->\
+      Item(tsImageId)->GetData();
     mafTimeStamp tsDouble = (mafTimeStamp)(element0->GetTriggerTime());
 
     for (int sourceVolumeSliceId = m_ZCropBounds[0], targetVolumeSliceId = 0; sourceVolumeSliceId < m_ZCropBounds[1]+1; sourceVolumeSliceId += step)
@@ -1762,19 +1778,20 @@ void medOpImporterDicomOffis::ReadDicom()
     else if(d[2] > d[0] && d[2] > d[1])
       m_SortAxes = 2;
   }
-  //need this?
-   switch (m_SortAxes)
-   {
-   case 0:
-     m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareX);
-     break;
-   case 1:
-     m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareY);
-     break;
-   case 2:
-     m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareZ);
-     break;
-   }
+
+  // hope this is unuseful: commenting since its braking CineMRI reading
+//    switch (m_SortAxes)
+//    {
+//    case 0:
+//      m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareX);
+//      break;
+//    case 1:
+//      m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareY);
+//      break;
+//    case 2:
+//      m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareZ);
+//      break;
+//    }
 
 
   m_NumberOfTimeFrames = ((medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->\
@@ -1996,7 +2013,7 @@ void medOpImporterDicomOffis::Crop()
   //Modify name
   double spacing[3];
   int cropInterval = (m_ZCropBounds[1]+1 - m_ZCropBounds[0]);
-  m_SelectedStudyUIDSeriesUIDPairFilesList->Item(currImageId)->GetData()->GetOutput()->GetSpacing(spacing);
+  m_SelectedStudyUIDSeriesUIDPairFilesList->Item(currImageId)->GetData()->GetVTKImageData()->GetSpacing(spacing);
   double pixelDimX = diffx/spacing[0] + 1;
   double pixelDimY = diffy/spacing[0] + 1;
 
@@ -2011,8 +2028,8 @@ void medOpImporterDicomOffis::AutoPositionCropPlane()
 {
 	int currImageId = GetImageId(m_CurrentTime, m_CurrentSlice);
 
-	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(currImageId)->GetData()->GetOutput()->Update();
-	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(currImageId)->GetData()->GetOutput()->GetBounds(m_SliceBounds);
+	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(currImageId)->GetData()->GetVTKImageData()->Update();
+	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(currImageId)->GetData()->GetVTKImageData()->GetBounds(m_SliceBounds);
 
 	double diffY,diffX;
 	diffY=m_SliceBounds[3]-m_SliceBounds[2];
@@ -2228,9 +2245,14 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 //----------------------------------------------------------------------------
 {
+// 
+//   // DEBUG
+//   std::ostringstream stringStream;
+//   stringStream << std::endl << m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJ() << std::endl;
+//   mafLogMessage(stringStream.str().c_str());
+        
   long progress;
   int sliceNum = -1;
-  int i;
   double dcmSliceLocation[3];
   double lastZPos = 0;
   long int dcmInstanceNumber = -1;
@@ -2257,7 +2279,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       scalarTolerance = ((medGUIDicomSettings*)GetSetting())->GetScalarTolerance();
 
     if (enablePercentageTolerance)
-      percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercetnageTolerance();
+      percentageTolerance = ((medGUIDicomSettings*)GetSetting())->GetPercentageTolerance();
   }
 
   m_DicomReaderModality = -1;
@@ -2279,11 +2301,15 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
     wxBusyInfo wait_info("Reading DICOM directory: please wait");
   }
 
+  int i = -1;
+  
+  // foreach dicom directory file
   for (i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++)
   {
     if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) ||\
       (strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
     {
+      // skip non dicom files
       continue;
     }
     else
@@ -2592,6 +2618,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       {
         enableToRead = ((medGUIDicomSettings*)GetSetting())->EnableToRead((char*)dcmModality);
       }
+     
+      //If not MR
       if (enableToRead && strcmp((char *)dcmModality, "MR" ) != 0)
       {
         wxString stringMode = dcmModality;
@@ -2600,9 +2628,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           continue;
         }
 
-        //if(m_DicomMap.find(studyAndSeriesVec) == m_DicomMap.end()) 
         std::map<std::vector<mafString>,medDicomList*>::iterator it;
-        for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
+        for ( it=m_StudyUIDSeriesUIDPairToDICOMListMap.begin() ; \
+          it != m_StudyUIDSeriesUIDPairToDICOMListMap.end(); it++ )
         {
           if(studyAndSeriesPair.at(0) == (*it).first.at(0))
           {
@@ -2615,6 +2643,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             }
           }
         }
+
         if (!seriesExist)
         {
           m_NumberOfStudies++;
@@ -2654,7 +2683,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             FillStudyListBox(studyAndSeriesPair.at(0));
           }
         }
-        else 
+        else // series exists already
         {
           if(dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[2]).bad())
           {
@@ -2701,10 +2730,14 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append(\
             new medDICOMListElement(m_CurrentSliceABSFileName,dcmSliceLocation, \
             dcmImageOrientationPatient, dicomSliceVTKImageData));
+
+                  
         }
       }
+      // else if MR or CineMRI
       else if ( enableToRead && strcmp( (char *)dcmModality, "MR" ) == 0)
       {
+        // MR and CineMRHandling
         seriesExist = false;
         seriesCounter = 0;
         std::map<std::vector<mafString>,medDicomList*>::iterator it;
@@ -2722,6 +2755,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             }
           }
         }
+
         if (!seriesExist)
         {
           m_NumberOfStudies++;
@@ -2754,7 +2788,20 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           if(dcmCardiacNumberOfImages>1)
           {
             if (m_DicomReaderModality==-1)
+            {  
               m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;
+              
+              if (m_CardiacMRIHelper == NULL)
+              {
+                wxBusyInfo *bi = new wxBusyInfo("Cardiac MRI Found, please wait for reader initialization...");
+                m_CardiacMRIHelper = new medDicomCardiacMRIHelper;
+                mafString helperInputDir = mafString(dicomDirABSPath).Append("/");
+
+                m_CardiacMRIHelper->SetInputDicomDirectoryABSPath(helperInputDir);
+                m_CardiacMRIHelper->ParseDicomDirectory();
+                cppDEL(bi);
+              }
+            }
             else if(m_DicomReaderModality!=medGUIDicomSettings::ID_CMRI_MODALITY)
             {
               if(!this->m_TestMode)
@@ -2786,6 +2833,11 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           dicomFilesList->Append(new medDICOMListElement\
             (m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, \
             dicomSliceVTKImageData, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
+// 
+//           // DEBUG
+//           std::ostringstream stringStream;
+//           stringStream << "Appending: " << m_CurrentSliceABSFileName.c_str() << std::endl;
+//           mafLogMessage(stringStream.str().c_str());
 
           m_StudyUIDSeriesUIDPairToDICOMListMap.insert\
             (std::pair<std::vector<mafString>,medDicomList*>\
@@ -2815,47 +2867,28 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
           dicomDataset->findAndGetFloat64(DCM_TriggerTime,dcmTriggerTime);
 
-          // Check if slices are under tolerance distance
-          // Commented because the problem is present in TAC dataset which are not time varying
-          /*if (imageNumber % numberOfImages == 1)
-          {
-          double distancePercentage = ((lastDistance - (fabs(lastZPos - slice_pos[2])))*100)/lastDistance;
-
-          // Check if slices are under tolerance distance
-          if ((enableScalarTolerance && (fabs(lastZPos - slice_pos[2]) < scalarTolerance)) || (enablePercentageTolerance) && (distancePercentage > percentageTolerance))
-          {
-          wxLogMessage(wxString::Format("Warning: file <%s> and <%s> are under distance tolerance.",file.GetCStr(),lastFileName.GetCStr()));
-          int answer = wxMessageBox(wxString::Format("Found 2 slices under distance tolerance. Please check the log area for details. Continue?"),"Warning!!", wxYES_NO, NULL);
-          if (answer == wxNO)
-          {
-          if (!this->m_TestMode)
-          {
-          mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
-          }
-          return false;
-          }
-
-          }
-          else
-          {
-          lastDistance = fabs(lastZPos - slice_pos[2]);
-          }  
-          lastZPos = slice_pos[2];
-          }*/
-
           m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append\
             (new medDICOMListElement(m_CurrentSliceABSFileName,dcmSliceLocation,dcmImageOrientationPatient ,\
             dicomSliceVTKImageData,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
+// 
+//           // DEBUG
+//           std::ostringstream stringStream;
+//           stringStream << "Appending: " << m_CurrentSliceABSFileName.c_str() << std::endl;
+//           mafLogMessage(stringStream.str().c_str());
+
         }
       }
+      
       if (!this->m_TestMode)
       {
         progress = i * 100 / m_DICOMDirectoryReader->GetNumberOfFiles();
         mafEventMacro(mafEvent(this,PROGRESSBAR_SET_VALUE,progress));
       }
+
       dicomImg.clear();
       studyAndSeriesPair.clear();
     }
+
     lastFileName = m_CurrentSliceABSFileName;
   }
 
@@ -2974,38 +3007,9 @@ void medOpImporterDicomOffis::ResetSliders()
 int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 //----------------------------------------------------------------------------
 {
-	/* 
-
-	test:
-	ListDicomCineMRIFiles: [0 .. 11] : 12 elements
-
-	heightId
-
-	^
-	2 | 8 9 10 11
-	1 | 4 5  6  7
-	0 | 0 1  2  3
-	--------------> timeId
-	| 0 1  2  3  
-
-	numberOfImages = 4 (from wxList element);
-	maxTimeId = numberOfImages - 1 = 3;
-
-	numberOfDicomSlices = 12 (from wxList);
-
-	numSlicesPerTS = numberOfDicomSlices / numberOfImages = 12 / 4 = 3;
-	maxHeigthId = numSlicesPerTS - 1;    
-
-	test:                
-	GetImageId(3,2) =    4 * hId + tId = 4*2 + 3 = 11 :) 
-	GetImageId(1,2) =    4 * 2 + 1 = 9 :)
-
-	*/
-
 
 	if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
 		return heigthId;
-
 
   if (this->m_TestMode)
   {
@@ -3016,7 +3020,8 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
     [m_SelectedStudyUIDSeriesUIDPair];
 
   medDICOMListElement *firstDicomListElement;
-  firstDicomListElement = (medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->Item(0)->GetData();
+  firstDicomListElement = (medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->\
+    Item(0)->GetData();
 
   int timeFrames =  firstDicomListElement->GetTimeFramesNumber();
 
@@ -3041,10 +3046,14 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 		return -1;
 	}
 
-	return (heigthId * timeFrames + timeId); 
+	//return (heigthId * timeFrames + timeId); 
+  vnl_matrix<double> planeIFrameJFileNumberMatrix = m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJ();
+  vector<string> localFileNamesMatrix = m_CardiacMRIHelper->GetDicomLocalFileNamesVector();
+       
+  return (planeIFrameJFileNumberMatrix(heigthId, timeId)); 
 }
 //----------------------------------------------------------------------------
-void medOpImporterDicomOffis::GenerateSliceTexture(int slice_num)
+void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 //----------------------------------------------------------------------------
 {
 	// Description:
@@ -3052,22 +3061,28 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int slice_num)
 	double spacing[3], crop_bounds[6], range[2], loc[3];
   m_Text = "";
 
-	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetSliceLocation(loc);
-	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput()->Update();
-	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput()->GetBounds(m_SliceBounds);
+	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetSliceLocation(loc);
+	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->Update();
+	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->GetBounds(m_SliceBounds);
 
+  // DEBUG
+  std::ostringstream stringStream;
+  stringStream << "Current rendered image name: " <<\
+    m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetFileName() << std::endl;
+  mafLogMessage(stringStream.str().c_str());
+          
   double Origin[3];
-  m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput()->GetOrigin(Origin);
+  m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->GetOrigin(Origin);
 
   double orientation[9] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-  m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetSliceOrientation(orientation);
+  m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetSliceOrientation(orientation);
   m_Text.append(wxString::Format("Orientaion: %f, %f, %f, %f, %f, %f \nPosition: %f, %f, %f",orientation[0], orientation[1], orientation[2], orientation[3], orientation[4], orientation[5], Origin[0], Origin[1], Origin[2]));
   m_TextMapper->SetInput(m_Text.c_str());
   m_TextMapper->Modified();
 
 	if (m_CropFlag) 
 	{
-		m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput()->GetSpacing(spacing);
+		m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->GetSpacing(spacing);
 
 		m_CropPlane->Update();
 		m_CropPlane->GetOutput()->GetBounds(crop_bounds);
@@ -3111,14 +3126,14 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int slice_num)
 
 		vtkMAFSmartPointer<vtkProbeFilter> probe;
 		probe->SetInput(clip);
-		probe->SetSource(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
+		probe->SetSource(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData());
     probe->Update();
     probe->GetOutput()->GetBounds(m_SliceBounds);
 
     //rescale to 16 bit
     if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
     {
-      RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
+      RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData());
     }
 		m_SliceTexture->SetInput((vtkImageData *)probe->GetOutput());
 	} 
@@ -3127,11 +3142,11 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int slice_num)
     //rescale to 16 bit
     if(m_RescaleTo16Bit == TRUE && m_HighBit == 11)
     {
-      RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
+      RescaleTo16Bit(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData());
     }
 
-		m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput()->GetScalarRange(range);
-		m_SliceTexture->SetInput(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(slice_num)->GetData()->GetOutput());
+		m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->GetScalarRange(range);
+		m_SliceTexture->SetInput(m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData());
 	}
 
 	m_SliceTexture->Modified();
@@ -3170,8 +3185,8 @@ vtkImageData* medOpImporterDicomOffis::GetSliceImageDataFromLocalDicomFileName(m
     wxSplitPath(name, &path, &short_name, &ext);
     if (sliceName.Compare(short_name) == 0)
     {
-      m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetOutput()->Update();
-      return m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetOutput();
+      m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetVTKImageData()->Update();
+      return m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetVTKImageData();
     }
     else 
     {
@@ -3179,8 +3194,8 @@ vtkImageData* medOpImporterDicomOffis::GetSliceImageDataFromLocalDicomFileName(m
       short_name = short_name + "." + ext;
       if (sliceName.Compare(short_name) == 0)
       {
-        m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetOutput()->Update();
-        return m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetOutput();
+        m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetVTKImageData()->Update();
+        return m_SelectedStudyUIDSeriesUIDPairFilesList->Item(i)->GetData()->GetVTKImageData();
       }
     }
   }

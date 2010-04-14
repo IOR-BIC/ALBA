@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-03 13:30:55 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-14 16:47:35 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -57,7 +57,7 @@ public:
   ~medDicomCardiacMRIHelper();
   
   /** 
-  Set dicom input dir*/
+  Set dicom input dir: path must end with / or \ */
   void SetInputDicomDirectoryABSPath(mafString inputDicomDirectoryABSPath);
   mafString GetInputDicomDirectoryABSPath();
   
@@ -75,6 +75,8 @@ public:
   long int GetTimeFrames() {return m_TimeFrames;};
   int GetPlanesPerFrame() {return m_PlanesPerFrame;};
   vnl_vector<double> GetSpacing() {return m_Spacing;};
+
+  // DicomLocalFileNamesVector[FileNumberForPlaneIFrameJ] == fileName for plane I frame J
 
   vnl_matrix<double> GetFileNumberForPlaneIFrameJ() {return m_FileNumberForPlaneIFrameJ;};
   vnl_matrix<double> GetFileNumberForPlaneIFrameJIdPlane() {return m_FileNumberForPlaneIFrameJIdPlane;};

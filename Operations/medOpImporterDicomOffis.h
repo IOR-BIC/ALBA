@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-14 08:02:20 $
-Version:   $Revision: 1.1.2.32 $
+Date:      $Date: 2010-04-14 16:47:35 $
+Version:   $Revision: 1.1.2.33 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -47,6 +47,7 @@ MafMedical is partially based on OpenMAF.
 #include "mafOp.h"
 #include "vtkImageData.h"
 #include <map>
+#include "medDicomCardiacMRIHelper.h"
 
 
 //----------------------------------------------------------------------------
@@ -120,7 +121,7 @@ public:
   void ReadDicom();
 
   /** Create the vtkTexture for slice_num dicom slice */
-  void GenerateSliceTexture(int slice_num);
+  void GenerateSliceTexture(int imageID);
 
   /** Get dicom slice vtkImageData from its local file name */
   vtkImageData* GetSliceImageDataFromLocalDicomFileName(mafString sliceName);
@@ -157,6 +158,8 @@ public:
   /** method allows to handle events from other objects*/
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Print the dicom list to the log area */
+  void PrintDicomList(medDicomList *dicomList);
 
 protected:
 
@@ -174,7 +177,7 @@ protected:
 	/** Create load page and his GUI for the wizard. */
 	void CreateLoadPage();
 	
-	/** Create crop page and his GUI for the wizard. */
+	/** Create crop page and   his GUI for the wizard. */
 	void CreateCropPage();
 
 	/** Create build page and his GUI for the wizard. */
@@ -344,10 +347,13 @@ protected:
 	mafVMEImage				*m_Image;
 	mafVMEVolumeGray	*m_Volume;
 
+  medDicomCardiacMRIHelper *m_CardiacMRIHelper;
+
 	mafGUICheckListBox *m_DicomModalityListBox;
 
   /** destructor */
 	~medOpImporterDicomOffis();
+
 };
 
 /**
@@ -441,7 +447,7 @@ public:
 	int GetTriggerTime() const {return m_TriggerTime;};
 
   /** Retrieve image data*/
-	vtkImageData* GetOutput(){return m_Data;};
+	vtkImageData* GetVTKImageData(){return m_Data;};
 
   /** Return the position of a slice*/
 	void GetSliceLocation(double pos[3]){pos[0]=m_Pos[0];pos[1]=m_Pos[1];pos[2]=m_Pos[2];};
