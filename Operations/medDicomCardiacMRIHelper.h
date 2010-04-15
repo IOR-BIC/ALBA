@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-14 16:47:35 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-04-15 11:20:13 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -71,37 +71,41 @@ public:
   some rotated dicom stuff. For the moment I can only guarantee that the output of this
   component is the same as the matlab one... */
 
+  /** DicomLocalFileNamesVector[FileNumberForPlaneIFrameJ] == fileName for plane I frame J*/
   vector<string> GetDicomLocalFileNamesVector() {return m_DicomLocalFileNamesVector;};
+
   long int GetTimeFrames() {return m_TimeFrames;};
   int GetPlanesPerFrame() {return m_PlanesPerFrame;};
-  vnl_vector<double> GetSpacing() {return m_Spacing;};
 
-  // DicomLocalFileNamesVector[FileNumberForPlaneIFrameJ] == fileName for plane I frame J
+  vnl_vector<double> GetSpacingVector() {return m_Spacing;};
 
-  vnl_matrix<double> GetFileNumberForPlaneIFrameJ() {return m_FileNumberForPlaneIFrameJ;};
-  vnl_matrix<double> GetFileNumberForPlaneIFrameJIdPlane() {return m_FileNumberForPlaneIFrameJIdPlane;};
+  vnl_matrix<double> GetFileNumberForPlaneIFrameJMatrix() {return m_FileNumberForPlaneIFrameJ;};
+  vnl_matrix<double> GetFileNumberForPlaneIFrameJIdPlaneMatrix() {return m_FileNumberForPlaneIFrameJIdPlane;};
  
-  vnl_matrix<double> GetPositionSingleFrameIdPlane() {return m_PositionSingleFrameIdPlane;};
-  vnl_matrix<double> GetXVersorsSingleFrameIdPlane() {return m_XVersorsSingleFrameIdPlane;};
-  vnl_matrix<double> GetYVersorsSingleFrameIdPlane() {return m_YVersorsSingleFrameIdPlane;};
-  vnl_matrix<double> GetImageSizeSingleFrameIdPlane() {return m_ImageSizeSingleFrameIdPlane;}; 
+  vnl_matrix<double> GetPositionSingleFrameIdPlaneMatrix() {return m_PositionSingleFrameIdPlane;};
+  vnl_matrix<double> GetXVersorsSingleFrameIdPlaneMatrix() {return m_XVersorsSingleFrameIdPlane;};
+  vnl_matrix<double> GetYVersorsSingleFrameIdPlaneMatrix() {return m_YVersorsSingleFrameIdPlane;};
+  vnl_matrix<double> GetImageSizeSingleFrameIdPlaneMatrix() {return m_ImageSizeSingleFrameIdPlane;}; 
 
-  vnl_matrix<double> GetNewPositionSingleFrameIdPlane() {return m_NewPositionSingleFrameIdPlane;};
-  vnl_matrix<double> GetNewXVersorsSingleFrameIdPlane() {return m_NewXVersorsSingleFrameIdPlane;};
-  vnl_matrix<double> GetNewYVersorsSingleFrameIdPlane() {return m_NewYVersorsSingleFrameIdPlane;}; 
-  vnl_matrix<double> GetNewImageSizeSingleFrameIdPlane() {return m_NewImageSizeSingleFrameIdPlane;};
+  vnl_matrix<double> GetNewPositionSingleFrameIdPlaneMatrix() {return m_NewPositionSingleFrameIdPlane;};
+  vnl_matrix<double> GetNewXVersorsSingleFrameIdPlaneMatrix() {return m_NewXVersorsSingleFrameIdPlane;};
+  vnl_matrix<double> GetNewYVersorsSingleFrameIdPlaneMatrix() {return m_NewYVersorsSingleFrameIdPlane;}; 
+  vnl_matrix<double> GetNewImageSizeSingleFrameIdPlaneMatrix() {return m_NewImageSizeSingleFrameIdPlane;};
 
-  vnl_matrix<double> GetRotateFlagIdPlane() {return m_RotateFlagIdPlane;};
-  vnl_matrix<double> GetFlipLeftRightFlagIdPlane() {return m_FlipLeftRightFlagIdPlane;};
-  vnl_matrix<double> GetFlipUpDownFlagIdPlane() {return m_FlipUpDownFlagIdPlane;};
+  vnl_matrix<double> GetRotateFlagIdPlaneMatrix() {return m_RotateFlagIdPlane;};
+  vnl_matrix<double> GetFlipLeftRightFlagIdPlaneMatrix() {return m_FlipLeftRightFlagIdPlane;};
+  vnl_matrix<double> GetFlipUpDownFlagIdPlaneMatrix() {return m_FlipUpDownFlagIdPlane;};
 
-  static void ExtractRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToExtractVector,
+  /** Extract rows as matrix given their id */
+  static void ExtractRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToExtractIdVector,
     vnl_matrix<double> &outputMatrix );
 
+  /** Extract rows as matrix given their id */
   static void ExtractRows( vnl_matrix<double> &inputMatrix,
-    vnl_vector<double> &rowsToExtractVector, vnl_matrix<double> &outputMatrix );
+    vnl_vector<double> &rowsToExtractIdVector, vnl_matrix<double> &outputMatrix );
 
-  static void RemoveRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToRemoveVector,
+  /** Remove rows from matrix given their id */
+  static void RemoveRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToRemoveIdVector,
     vnl_matrix<double> &outputMatrix );
 
 private:

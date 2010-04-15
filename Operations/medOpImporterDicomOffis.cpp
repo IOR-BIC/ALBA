@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-14 16:47:35 $
-Version:   $Revision: 1.1.2.86 $
+Date:      $Date: 2010-04-15 11:20:13 $
+Version:   $Revision: 1.1.2.87 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -223,6 +223,7 @@ enum DICOM_IMPORTER_MODALITY
 	GIZMO_DONE
 };
 
+/** methods used to sort medDICOMListElement based on custom criteria */
 int CompareX(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
 int CompareY(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
 int CompareZ(const medDICOMListElement **arg1,const medDICOMListElement **arg2);
@@ -2244,13 +2245,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 //----------------------------------------------------------------------------
 bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 //----------------------------------------------------------------------------
-{
-// 
-//   // DEBUG
-//   std::ostringstream stringStream;
-//   stringStream << std::endl << m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJ() << std::endl;
-//   mafLogMessage(stringStream.str().c_str());
-        
+{       
   long progress;
   int sliceNum = -1;
   double dcmSliceLocation[3];
@@ -2799,6 +2794,7 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 
                 m_CardiacMRIHelper->SetInputDicomDirectoryABSPath(helperInputDir);
                 m_CardiacMRIHelper->ParseDicomDirectory();
+                
                 cppDEL(bi);
               }
             }
@@ -2833,11 +2829,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           dicomFilesList->Append(new medDICOMListElement\
             (m_CurrentSliceABSFileName,dcmSliceLocation, dcmImageOrientationPatient, \
             dicomSliceVTKImageData, dcmInstanceNumber, dcmCardiacNumberOfImages, dcmTriggerTime));
-// 
-//           // DEBUG
-//           std::ostringstream stringStream;
-//           stringStream << "Appending: " << m_CurrentSliceABSFileName.c_str() << std::endl;
-//           mafLogMessage(stringStream.str().c_str());
 
           m_StudyUIDSeriesUIDPairToDICOMListMap.insert\
             (std::pair<std::vector<mafString>,medDicomList*>\
@@ -2870,11 +2861,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append\
             (new medDICOMListElement(m_CurrentSliceABSFileName,dcmSliceLocation,dcmImageOrientationPatient ,\
             dicomSliceVTKImageData,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
-// 
-//           // DEBUG
-//           std::ostringstream stringStream;
-//           stringStream << "Appending: " << m_CurrentSliceABSFileName.c_str() << std::endl;
-//           mafLogMessage(stringStream.str().c_str());
 
         }
       }
@@ -3047,7 +3033,7 @@ int medOpImporterDicomOffis::GetImageId(int timeId, int heigthId)
 	}
 
 	//return (heigthId * timeFrames + timeId); 
-  vnl_matrix<double> planeIFrameJFileNumberMatrix = m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJ();
+  vnl_matrix<double> planeIFrameJFileNumberMatrix = m_CardiacMRIHelper->GetFileNumberForPlaneIFrameJMatrix();
   vector<string> localFileNamesMatrix = m_CardiacMRIHelper->GetDicomLocalFileNamesVector();
        
   return (planeIFrameJFileNumberMatrix(heigthId, timeId)); 
@@ -3064,12 +3050,6 @@ void medOpImporterDicomOffis::GenerateSliceTexture(int imageID)
 	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetSliceLocation(loc);
 	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->Update();
 	m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->GetBounds(m_SliceBounds);
-
-  // DEBUG
-  std::ostringstream stringStream;
-  stringStream << "Current rendered image name: " <<\
-    m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetFileName() << std::endl;
-  mafLogMessage(stringStream.str().c_str());
           
   double Origin[3];
   m_SelectedStudyUIDSeriesUIDPairFilesList->Item(imageID)->GetData()->GetVTKImageData()->GetOrigin(Origin);

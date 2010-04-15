@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDicomCardiacMRIHelperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-03 13:31:17 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-04-15 11:20:30 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -86,43 +86,43 @@ void medDicomCardiacMRIHelperTest::TestDicomGeneralElectricPisa()
   helper->SetInputDicomDirectoryABSPath(dicomDir.c_str());
   helper->ParseDicomDirectory();
 
-  cout << helper->GetFileNumberForPlaneIFrameJ();
+  cout << helper->GetFileNumberForPlaneIFrameJMatrix();
   cout << std::endl;
 
-  cout << helper->GetFileNumberForPlaneIFrameJIdPlane();
+  cout << helper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetPositionSingleFrameIdPlane();
+  cout << helper->GetPositionSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetXVersorsSingleFrameIdPlane();
+  cout << helper->GetXVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetYVersorsSingleFrameIdPlane();
+  cout << helper->GetYVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetImageSizeSingleFrameIdPlane();
+  cout << helper->GetImageSizeSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewPositionSingleFrameIdPlane();
+  cout << helper->GetNewPositionSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewXVersorsSingleFrameIdPlane();
+  cout << helper->GetNewXVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewYVersorsSingleFrameIdPlane();
+  cout << helper->GetNewYVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewImageSizeSingleFrameIdPlane();
+  cout << helper->GetNewImageSizeSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetRotateFlagIdPlane();
+  cout << helper->GetRotateFlagIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetFlipLeftRightFlagIdPlane();
+  cout << helper->GetFlipLeftRightFlagIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetFlipUpDownFlagIdPlane();
+  cout << helper->GetFlipUpDownFlagIdPlaneMatrix();
   cout << std::endl;
   
   cppDEL(helper);
@@ -141,43 +141,43 @@ void medDicomCardiacMRIHelperTest::TestDicomSiemensNiguarda()
   helper->SetInputDicomDirectoryABSPath(dicomDir.c_str());
   helper->ParseDicomDirectory();
 
-  cout << helper->GetFileNumberForPlaneIFrameJ();
+  cout << helper->GetFileNumberForPlaneIFrameJMatrix();
   cout << std::endl;
 
-  cout << helper->GetFileNumberForPlaneIFrameJIdPlane();
+  cout << helper->GetFileNumberForPlaneIFrameJIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetPositionSingleFrameIdPlane();
+  cout << helper->GetPositionSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetXVersorsSingleFrameIdPlane();
+  cout << helper->GetXVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetYVersorsSingleFrameIdPlane();
+  cout << helper->GetYVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetImageSizeSingleFrameIdPlane();
+  cout << helper->GetImageSizeSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewPositionSingleFrameIdPlane();
+  cout << helper->GetNewPositionSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewXVersorsSingleFrameIdPlane();
+  cout << helper->GetNewXVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewYVersorsSingleFrameIdPlane();
+  cout << helper->GetNewYVersorsSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetNewImageSizeSingleFrameIdPlane();
+  cout << helper->GetNewImageSizeSingleFrameIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetRotateFlagIdPlane();
+  cout << helper->GetRotateFlagIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetFlipLeftRightFlagIdPlane();
+  cout << helper->GetFlipLeftRightFlagIdPlaneMatrix();
   cout << std::endl;
 
-  cout << helper->GetFlipUpDownFlagIdPlane();
+  cout << helper->GetFlipUpDownFlagIdPlaneMatrix();
   cout << std::endl;
 
   cppDEL(helper);
