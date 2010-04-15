@@ -86,6 +86,8 @@ ADD_TEST(medVMEPolylineGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medVMEPolylineGraphT
 ADD_EXECUTABLE(medPipeGraphTest medPipeGraphTest.h medPipeGraphTest.cpp)
 ADD_TEST(medPipeGraphTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeGraphTest)
 
+ADD_EXECUTABLE(medPipeCompoundTest medPipeCompoundTest.h medPipeCompoundTest.cpp)
+ADD_TEST(medPipeCompoundTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundTest)
 
 #to be checked
 #ADD_EXECUTABLE(medPipeVolumeVRTest medPipeVolumeVRTest.h medPipeVolumeVRTest.cpp)
