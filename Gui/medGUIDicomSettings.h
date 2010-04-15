@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medGUIDicomSettings.h,v $
 Language:  C++
-Date:      $Date: 2010-03-15 14:09:10 $
-Version:   $Revision: 1.5.2.9 $
+Date:      $Date: 2010-04-15 08:54:56 $
+Version:   $Revision: 1.5.2.10 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2001/2005 
@@ -129,7 +129,7 @@ public:
   /** Enable Pprcentage tolerance. */
   int EnablePercentageTolerance(){return m_PercentageTolerance;};
   /** Get percetnage tolerance. */
-  double GetPercetnageTolerance(){return m_PercentageDistanceTolerance;};
+  double GetPercentageTolerance(){return m_PercentageDistanceTolerance;};
 
 
 
