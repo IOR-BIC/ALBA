@@ -2,9 +2,9 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafOpValidateTree.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-15 07:51:33 $
-  Version:   $Revision: 1.5.2.1 $
-  Authors:   Paolo Quadrani
+  Date:      $Date: 2010-04-19 10:51:10 $
+  Version:   $Revision: 1.5.2.2 $
+  Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2001/2005 
   CINECA - Interuniversity Consortium (www.cineca.it)
@@ -31,6 +31,8 @@
 #include "mafVMEGenericAbstract.h"
 #include "mafVMERoot.h"
 #include "mafNodeIterator.h"
+#include "mafVMEExternalData.h"
+#include "vtkDirectory.h"
 
 //----------------------------------------------------------------------------
 // Constants :
@@ -86,6 +88,9 @@ void mafOpValidateTree::OpRun()
 int mafOpValidateTree::ValidateTree()
 //----------------------------------------------------------------------------
 {
+  m_MSFTreeAbsFileNamesSet.clear();
+  assert(m_MSFTreeAbsFileNamesSet.size() == 0);
+
   int result = mafOpValidateTree::VALIDATE_SUCCESS;
 
   mafNode *node;
@@ -141,12 +146,48 @@ int mafOpValidateTree::ValidateTree()
       // have the DataVector => inherit from mafVMEGenericAbstract
       mafString urlString = "";
       mafString archiveFilename = "";
-      mafString absFilename = "";
+      wxString absFilename = "";
       mafVMEItem *item = NULL;
       bool singleFileMode = false;
       mafVMEGenericAbstract *vme = mafVMEGenericAbstract::SafeDownCast(node);
-      if (vme)
+
+      if (vme != NULL && vme->IsA("mafVMEExternalData"))
       {
+        mafVMEExternalData *ed = mafVMEExternalData::SafeDownCast(vme);
+        mafString fileName = ed->GetFileName();
+        mafString extension = ed->GetExtension();
+
+        if (m_MSFPath.IsEmpty())
+        {
+          mafEventIO e(this,NODE_GET_STORAGE);
+          vme->ForwardUpEvent(e);
+          mafStorage *storage = e.GetStorage();
+          if (storage != NULL)
+          {
+            m_MSFPath = storage->GetURL();
+            m_MSFPath.ExtractPathName();
+          }
+        }
+
+        wxString absFilename = m_MSFPath;
+        absFilename << "\\";
+        absFilename << fileName;
+        absFilename << ".";
+        absFilename << extension;
+        absFilename.Replace("/","\\");
+
+        if (!wxFileExists(absFilename.c_str()))
+        {
+          ErrorLog(mafOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.c_str());
+          result = mafOpValidateTree::VALIDATE_ERROR;
+        }
+        else
+        {
+          m_MSFTreeAbsFileNamesSet.insert(absFilename.c_str());
+        }
+      }
+      else if (vme != NULL) // any other vme type
+      {         
         mafDataVector *dv = vme->GetDataVector();
         if (dv)
         {
@@ -197,19 +238,26 @@ int mafOpValidateTree::ValidateTree()
                 result = mafOpValidateTree::VALIDATE_ERROR;
               }
               absFilename = m_MSFPath;
-              absFilename << "/";
+              absFilename << "\\";
+              absFilename.Replace("/","\\");
+
               if (singleFileMode)
               {
-                absFilename << archiveFilename;
+                absFilename << archiveFilename;                
               }
               else
               {
                 absFilename << urlString;
               }
-              if (!wxFileExists(absFilename.GetCStr()))
+
+              if (!wxFileExists(absFilename.c_str()))
               {
-                ErrorLog(mafOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.GetCStr());
+                ErrorLog(mafOpValidateTree::BINARY_FILE_NOT_PRESENT, absFilename.c_str());
                 result = mafOpValidateTree::VALIDATE_ERROR;
+              }
+              else
+              {
+                m_MSFTreeAbsFileNamesSet.insert(absFilename.c_str());
               }
             } // item != NULL
           } // for() on items
@@ -222,6 +270,7 @@ int mafOpValidateTree::ValidateTree()
     ErrorLog(mafOpValidateTree::EXCEPTION_ON_ITERATOR, iter->GetCurrentNode()->GetName());
   }
   iter->Delete();
+ 
   return result;
 }
 //----------------------------------------------------------------------------
@@ -258,4 +307,20 @@ void mafOpValidateTree::ErrorLog(int error_num, const char *node_name, const cha
       mafLogMessage(_("Archive data file not present for node '%s'"), node_name);
     break;
   }
+}
+
+int mafOpValidateTree::GetMSFTreeABSFileNamesSet( set<string> &fileNamesSet )
+{
+  int result = this->ValidateTree(); // needed to fill m_MSFTreeBinaryFilesSet ivar
+  
+  if (result != mafOpValidateTree::VALIDATE_SUCCESS)
+  {
+    fileNamesSet.clear();
+    mafLogMessage("MSF Tree is invalid: GetMSFTreeABSFileNamesSet returning an empty set");
+    return MAF_ERROR;
+  }
+ 
+  fileNamesSet = m_MSFTreeAbsFileNamesSet;
+  return MAF_OK;
+ 
 }

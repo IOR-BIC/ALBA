@@ -105,6 +105,8 @@ IF (MAF_USE_VTK)
     mafOpEditNormals.h
     mafOpApplyTrajectory.cpp
     mafOpApplyTrajectory.h
+	mafOpGarbageCollectMSFDir.cpp
+	mafOpGarbageCollectMSFDir.h
   )
 ENDIF (MAF_USE_VTK)
 
