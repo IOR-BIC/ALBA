@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medVMEFactory.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-10 08:38:05 $
-  Version:   $Revision: 1.13.2.3 $
+  Date:      $Date: 2010-04-19 14:22:17 $
+  Version:   $Revision: 1.13.2.4 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -29,6 +29,8 @@
 
 #include "medVMESurfaceEditor.h"
 #include "medVMELabeledVolume.h"
+#include "medVMESegmentationVolume.h"
+#include "medAttributeSegmentationVolume.h"
 
 #ifdef MAF_USE_ITK
   #include "mafVMERawMotionData.h"
@@ -80,6 +82,7 @@ medVMEFactory::medVMEFactory()
   
 #endif
   //mafPlugObjectMacro(mmaObject,"Object attributes");
+  mafPlugObjectMacro(medAttributeSegmentationVolume,"Segmentation Volume attributes");
 
   mafPlugNodeMacro(medVMEWrappedMeter,"Generalized VME Meter with wrapping geometry");
   mafPlugNodeMacro(medVMEPolylineGraph,"VME for Graph and Polyline");
@@ -87,6 +90,7 @@ medVMEFactory::medVMEFactory()
  	mafPlugNodeMacro(medVMESurfaceEditor,"VME for Editing Surface");
   mafPlugNodeMacro(medVMELabeledVolume,"VME representing a label put on a volume");
   mafPlugNodeMacro(medVMEMaps, "VME representing density-distace surface scalars");
+  mafPlugNodeMacro(medVMESegmentationVolume, "VME for Segmented Volume");
 
 #ifdef MAF_USE_ITK
   mafPlugNodeMacro(mafVMERawMotionData,"VME that is a group for RawMotionData");

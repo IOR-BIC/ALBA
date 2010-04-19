@@ -86,6 +86,12 @@ SET(PROJECT_SRCS
   medPipeCompoundVolume.h
   medPipeCompoundVolumeFixedScalars.cpp
   medPipeCompoundVolumeFixedScalars.h
+  medVMESegmentationVolume.cpp
+  medVMESegmentationVolume.h
+  medDataPipeCustomSegmentationVolume.cpp
+  medDataPipeCustomSegmentationVolume.h
+  medAttributeSegmentationVolume.cpp
+  medAttributeSegmentationVolume.h
   
   
   ### TO BE COMMITTED DOWN ###
