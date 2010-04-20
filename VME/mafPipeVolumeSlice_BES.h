@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:04 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-04-20 09:51:56 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004

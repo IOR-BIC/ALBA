@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-02 09:18:04 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-04-20 09:51:56 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -446,6 +446,7 @@ void mafPipeVolumeSlice_BES::CreateSlice(int direction)
 	m_Image[direction]->SetSpacing(xspc, yspc, zspc);
 
 	m_SlicerImage[direction]->SetOutput(m_Image[direction]);
+  m_SlicerImage[direction]->SetGPUEnabled(m_EnableGPU);
   m_SlicerImage[direction]->Update();
 
 	vtkNEW(m_Texture[direction]);
@@ -459,6 +460,7 @@ void mafPipeVolumeSlice_BES::CreateSlice(int direction)
   vtkNEW(m_SlicePolydata[direction]);
 	m_SlicerPolygonal[direction]->SetOutput(m_SlicePolydata[direction]);
 	m_SlicerPolygonal[direction]->SetTexture(m_Image[direction]);
+  m_SlicerPolygonal[direction]->SetGPUEnabled(m_EnableGPU);
 	m_SlicerPolygonal[direction]->Update();
 
 	vtkNEW(m_SliceMapper[direction]);
