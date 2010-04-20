@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRX.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-12-21 15:12:32 $
-  Version:   $Revision: 1.19.2.1 $
+  Date:      $Date: 2010-04-20 09:47:57 $
+  Version:   $Revision: 1.19.2.2 $
   Authors:   Paolo Quadrani , Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004
@@ -195,9 +195,10 @@ void mafViewRX::VmeCreatePipe(mafNode *vme)
         double positionSlice1[3],positionSlice2[3];
         double b[6];
 
-        mafSmartPointer<mafVMEVolumeGray> volume;
+        //mafSmartPointer<mafVMEVolumeGray> volume;
+        mafVME *volume;
 
-        volume->DeepCopy(mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme));
+        volume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
         volume->GetOutput()->GetBounds(b);
  
         double value1; 
@@ -356,7 +357,7 @@ void mafViewRX::CameraUpdate()
 {
   if (m_CurrentVolume)
   {
-    mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme);
+    mafVME *volume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
 
     std::ostringstream stringStream;
     stringStream << "VME " << volume->GetName() << " ABS matrix:" << std::endl;

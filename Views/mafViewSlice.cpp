@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewSlice.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-03-22 11:51:47 $
-  Version:   $Revision: 1.51.2.12 $
+  Date:      $Date: 2010-04-20 09:47:31 $
+  Version:   $Revision: 1.51.2.13 $
   Authors:   Paolo Quadrani , Stefano Perticoni , Josef Kohout
 ==========================================================================
   Copyright (c) 2002/2004
@@ -31,7 +31,6 @@ const bool DEBUG_MODE = false;
 #include "mafPipePolylineSlice.h"
 #include "mafPipeMeshSlice.h"
 
-#include "mafVMEVolumeGray.h"
 #include "mafVME.h"
 #include "mafVMEVolume.h"
 #include "mafVMESlicer.h"
@@ -983,7 +982,7 @@ void mafViewSlice::CameraUpdate()
   
   if (m_CurrentVolume)
   {
-    mafVMEVolumeGray *volume = mafVMEVolumeGray::SafeDownCast(m_CurrentVolume->m_Vme);
+    mafVME *volume = mafVME::SafeDownCast(m_CurrentVolume->m_Vme);
     
     std::ostringstream stringStream;
     stringStream << "VME " << volume->GetName() << " ABS matrix:" << std::endl;
