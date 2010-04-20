@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medAttributeSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-19 14:19:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-04-20 16:02:27 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -213,6 +213,19 @@ int medAttributeSegmentationVolume::UpdateRange(int index,int &startSlice, int &
   m_AutomaticSegmentationRanges[index][0] = startSlice;
   m_AutomaticSegmentationRanges[index][1] = endSlice;
   m_AutomaticSegmentationThresholds[index] = threshold;
+
+  return MAF_OK;
+}
+//----------------------------------------------------------------------------
+int medAttributeSegmentationVolume::RemoveAllRanges()
+//----------------------------------------------------------------------------
+{
+  for (int i=0;i<m_AutomaticSegmentationRanges.size();i++)
+  {
+    delete []m_AutomaticSegmentationRanges[i];
+  }
+  m_AutomaticSegmentationRanges.clear();
+  m_AutomaticSegmentationThresholds.clear();
 
   return MAF_OK;
 }

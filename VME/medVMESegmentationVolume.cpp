@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-20 13:18:04 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-04-20 16:02:27 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -323,6 +323,23 @@ int medVMESegmentationVolume::UpdateRange(int index,int startSlice, int endSlice
   return MAF_ERROR;  
 }
 //-----------------------------------------------------------------------
+int medVMESegmentationVolume::RemoveAllRanges()
+//-----------------------------------------------------------------------
+{
+  int result = m_SegmentingDataPipe->RemoveAllRanges();
+  if (result == MAF_OK)
+  {
+    result = m_VolumeAttribute->RemoveAllRanges();
+    if (result == MAF_OK)
+    {
+      Modified();
+      return MAF_OK;
+    }
+  }
+
+  return MAF_ERROR;
+}
+//-----------------------------------------------------------------------
 int medVMESegmentationVolume::DeleteRange(int index)
 //-----------------------------------------------------------------------
 {
@@ -432,6 +449,6 @@ mafVMEOutput *medVMESegmentationVolume::GetOutput()
 char** medVMESegmentationVolume::GetIcon() 
 //-------------------------------------------------------------------------
 {
-#include "mafVMEProber.xpm"
-  return mafVMEProber_xpm;
+#include "mafVMEVolume.xpm"
+  return mafVMEVolume_xpm;
 }

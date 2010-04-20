@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-20 13:18:04 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-04-20 16:02:27 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -119,6 +119,9 @@ public:
 
   /** Delete the range of the position index */
   int DeleteRange(int index);
+
+  /** Remove all ranges */
+  int RemoveAllRanges();
 
   /** Return the number of ranges */
   int GetNumberOfRanges();
