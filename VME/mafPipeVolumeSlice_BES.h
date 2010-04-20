@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeVolumeSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-20 09:51:56 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-04-20 12:33:55 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -36,19 +36,22 @@ class vtkOutlineSource;
 class mafLODActor;
 class mafVMEOutputVolume;
 
-//----------------------------------------------------------------------------
-// mafPipeVolumeSlice_BES :
-//----------------------------------------------------------------------------
-/** This visual pipe allows to represent a volume data as a slice according to the 
-position of a plane representing the cutter. The default position of the slice is the center 
-of the volume data. The visual pipe can also render 3 different slices centered in a origin point
-and oriented along 3 different axes.*/
+
+/** 
+class name: mafPipeVolumeSlice_BES
+  This visual pipe allows to represent a volume data as a slice according to the 
+  position of a plane representing the cutter. The default position of the slice is the center 
+  of the volume data. The visual pipe can also render 3 different slices centered in a origin point
+  and oriented along 3 different axes.
+*/
 class mafPipeVolumeSlice_BES : public mafPipeSlice
 {
 public:
+  /** RTTI Macro */
   mafTypeMacro(mafPipeVolumeSlice_BES,mafPipeSlice);
-
+  /** Constructor */
 	mafPipeVolumeSlice_BES();
+  /** Destructor */
   virtual ~mafPipeVolumeSlice_BES();
 	
   /** process events coming from Gui */
@@ -118,10 +121,14 @@ public:
 	/** Manage the actor selection by showing the corner box around the actor when the corresponding VME is selected.*/
   virtual void Select(bool select); 
 
+  /** Show ticks in the rendering window */
 	void ShowTICKsOn();
+  /** Hide ticks in the rendering window */
 	void ShowTICKsOff();
 
+  /** Hide slider  */
 	void HideSlider();
+  /** Show slider */
 	void ShowSlider();
 
   /* Added by Losi 12.02.2009
@@ -140,6 +147,7 @@ protected:
 	/** Create the slicer pipeline. */
 	void CreateSlice(int direction);
 
+  /** Create all ticks */
 	void CreateTICKs();
 
   /** Create the Gui for the visual pipe that allow the user to change the pipe's parameters.*/

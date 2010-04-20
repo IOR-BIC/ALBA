@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipeSurfaceSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2009-10-07 10:37:27 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-04-20 12:33:55 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Silvano Imboden - Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -34,18 +34,19 @@ class vtkPlane;
 class vtkSphereSource;
 class vtkMAFToLinearTransform;
 
-//----------------------------------------------------------------------------
-// mafPipeSurfaceSlice_BES :
-//----------------------------------------------------------------------------
-/** Visual pipe that allow to visualize a surface polydata sliced according to 
-a slicing plain. The result effect is the contour of the surface cut by the plain.*/
+/** 
+  class name: mafPipeSurfaceSlice_BES 
+  Visual pipe that allow to visualize a surface polydata sliced according to 
+  a slicing plain. The result effect is the contour of the surface cut by the plain.
+*/
 class mafPipeSurfaceSlice_BES : public mafPipeSlice
 {
 public:
+  /** RTTI Macro */
   mafTypeMacro(mafPipeSurfaceSlice_BES,mafPipeSlice);
 
   /** Constructor. */
-               mafPipeSurfaceSlice_BES();
+  mafPipeSurfaceSlice_BES();
 
   /** Destructor. */
   virtual     ~mafPipeSurfaceSlice_BES ();
@@ -93,8 +94,9 @@ public:
   };
 
   //bool ImageAccept(mafNode *node) {return(node != NULL && node->IsMAFType(mafVMEImage));};
-
+  /** creation of gui */
   virtual mafGUI  *CreateGui();
+
 protected:
   vtkTexture              *m_Texture;
   vtkPolyDataMapper	      *m_Mapper;
@@ -120,8 +122,7 @@ protected:
 
 //@@@  bool                    m_use_axes; //SIL. 22-5-2003 added line - 
 
-  /** 
-  Generate texture coordinate for polydata according to the mapping mode*/
+  /**  Generate texture coordinate for polydata according to the mapping mode*/
   void GenerateTextureMapCoordinate();
 
 };  

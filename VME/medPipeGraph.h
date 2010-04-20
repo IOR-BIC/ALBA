@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medPipeGraph.h,v $
   Language:  C++
-  Date:      $Date: 2010-03-09 15:37:03 $
-  Version:   $Revision: 1.19.2.2 $
+  Date:      $Date: 2010-04-20 12:33:55 $
+  Version:   $Revision: 1.19.2.3 $
   Authors:   Roberto Mucci
 ==========================================================================
   Copyright (c) 2002/2004
@@ -26,43 +26,51 @@ class vtkXYPlotActor;
 class vtkDoubleArray;
 class vtkRectilinearGrid;
 
-//----------------------------------------------------------------------------
-// medPipeGraph :
-//----------------------------------------------------------------------------
+
 /** 
-Visual pipe to visualize graphs of analog signals. */
+class name medPipeGraph.
+Visual pipe to visualize graphs of analog signals. 
+*/
 class medPipeGraph : public mafPipe
 {
 public:
+  /** RTTI Macro */
   mafTypeMacro(medPipeGraph,mafPipe);
-
+  /** Constructor. */
   medPipeGraph();
+  /** Destructor. */
   virtual     ~medPipeGraph ();
 
+  /** process events that comes from  other objects*/
   void medPipeGraph::OnEvent(mafEventBase *maf_event); 
 
+  /** visual pipe creation */
   /*virtual*/ void Create(mafSceneNode *n);
 
-  //Create plots of scalar data
+  /** Create plots of scalar data*/
   void UpdateGraph();
 
-  //Change the name of the selected item in the legend box
+  /**Change the name of the selected item in the legend box*/
   void ChangeItemName();
 
-  //Change the title of the axis
+  /**Change the title of the axis*/
   void ChangeAxisTitle();
 
-  //Change signal color
+  /**Change signal color*/
   void ChangeSignalColor();
 
   /** Set if visualize or not a particular signal */
   void SetSignalToPlot(int index,bool plot);
 
+  /** set title on x axis */
   void SetTitleX(mafString title);
+  /** set title on Y axis */
   void SetTitleY(mafString title);
+  /** set title  */
   void SetTitle(mafString title);
   
 protected:
+  /** creation of the gui */
   mafGUI* CreateGui();
 
   enum PIPE_GRAPH_GUI_WIDGETS
@@ -86,7 +94,7 @@ protected:
   vtkLegendBoxActor *m_LegendBoxTimeLine_Actor;
 
 private:
-  //create the legend
+  /**create the legend*/
   void CreateLegend();
 
   double m_OldColour[3];

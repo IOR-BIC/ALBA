@@ -2,8 +2,8 @@
   Program: Multimod Application Framework RELOADED 
   Module: $RCSfile: medPipeCompound.h,v $ 
   Language: C++ 
-  Date: $Date: 2009-09-04 10:30:19 $ 
-  Version: $Revision: 1.1.2.3 $ 
+  Date: $Date: 2010-04-20 12:33:55 $ 
+  Version: $Revision: 1.1.2.4 $ 
   Authors: Josef Kohout (Josef.Kohout *AT* beds.ac.uk)
   ========================================================================== 
   Copyright (c) 2008 University of Bedfordshire (www.beds.ac.uk)
@@ -26,12 +26,16 @@ class vtkVolume;
 class vtkLookupTable;
 class vtkImageResample;
 class mafGUIFloatSlider;
-//----------------------------------------------------------------------------
-// medPipeCompound :
-//----------------------------------------------------------------------------
+
+/**
+    class name: medPipeCompound
+    Pipe which works as a container of other pipes.
+*/
+
 class medPipeCompound : public mafPipe
 {
 public:
+  /** RTTI Macro */
   mafAbstractTypeMacro(medPipeCompound, mafPipe);
 
 protected:
@@ -68,8 +72,10 @@ protected:
   medGUIDynamicVP* m_FirstPage; ///<reference to the only one page (if not included in the notebook)
   wxString m_FirstPageName;     ///<name of the only page (if not included in the notebook)
 
-public:	
+public:
+  /** constructor */
 	medPipeCompound();
+  /** destructor */
 	virtual ~medPipeCompound ();
 
 public:
@@ -80,6 +86,7 @@ public:
 	/*virtual*/ void OnEvent(mafEventBase *maf_event);
 
 protected:
+  /** creation of the gui */
   /*virtual*/ mafGUI  *CreateGui();
   
   /** Creates page groups. The inherited classes must override this method.

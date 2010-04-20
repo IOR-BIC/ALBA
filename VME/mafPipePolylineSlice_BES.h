@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafPipePolylineSlice_BES.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-13 15:48:46 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-20 12:33:55 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Daniele Giunchi
 ==========================================================================
   Copyright (c) 2002/2004
@@ -35,15 +35,19 @@ class vtkMAFToLinearTransform;
 class vtkClipPolyData;
 class vtkAppendPolyData;
 
-//----------------------------------------------------------------------------
-// mafPipePolylineSlice_BES :
-//----------------------------------------------------------------------------
+/**
+  class name: mafPipePolylineSlice_BES.
+  Pipe which manage the visualisation of the section of a polyline.
+*/
 class mafPipePolylineSlice_BES : public mafPipeSlice
 {
 public:
+  /** RTTI Macro*/
   mafTypeMacro(mafPipePolylineSlice_BES,mafPipeSlice);
 
+  /** Constructor. */
                mafPipePolylineSlice_BES();
+  /** Destructor. */
   virtual     ~mafPipePolylineSlice_BES ();
 
   /**Return the thickness of the border*/	
@@ -61,7 +65,9 @@ public:
   /** process events coming from gui */
   virtual void OnEvent(mafEventBase *maf_event);
 
+  /** Pipe creation */
   virtual void Create(mafSceneNode *n /*,bool use_axes = true*/ ); //Can't add parameters - is Virtual
+  /** called if vme is selected  */
   virtual void Select(bool select); 
   
   /** Set the origin and normal of the slice.
@@ -70,16 +76,22 @@ public:
 
   /** Set spline mode of the polyline */
   void SetSplineMode(int flag){m_SplineMode = flag;};
+  /** Get spline mode of the polyline */
   int GetSplineMode(){return m_SplineMode;};
 
+  /** Set spline mode of the polyline  to ON */
   void SplineModeOn(){SetSplineMode(1);UpdateProperty();};
+  /** Set spline mode of the polyline  to OFF*/
   void SplineModeOff(){SetSplineMode(0);UpdateProperty();};
 
-  /** Set spline mode of the polyline */
+  /** Set fill variable of the polyline */
   void SetFill(int flag){m_Fill = flag;};
+  /** Get fill variable of the polyline */
   int GetFill(){return m_Fill;};
-
+  
+  /** Set fill variable of the polyline to ON */
   void FillOn(){SetFill(1);UpdateProperty();};
+  /** Set fill variable of the polyline to OFF*/
   void FillOff(){SetFill(0);UpdateProperty();};
 
   /** Function that retrieve a spline polyline when  input is a polyline */ 
@@ -105,17 +117,24 @@ public:
     ID_LAST,
   };
 
+  /** gui creation */
   virtual mafGUI  *CreateGui();
+  /** update all properties of the pipe */
   void UpdateProperty();
 
+  /** enable the check on a region of interest */
   void ROIEnable(bool enable){m_RoiEnable = enable;}
+  /** define a region of interest  in which the section is visible */
   void SetROI(double bounds[6]);
+  /** set region of interests as maximum */
   void SetMaximumROI();
 
 protected:
-
+  /** cap the regions*/
   vtkPolyData *RegionsCapping(vtkPolyData* inputCutters);
+  /** apply a capping filter  */
   vtkPolyData *CappingFilter(vtkPolyData* inputBorder);
+  /** execute filter which apply region of interest*/
   vtkPolyData *ExecuteROI(vtkPolyData *polydata);
 
   vtkPolyDataMapper	      *m_Mapper;
