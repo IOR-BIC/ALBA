@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-19 14:19:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-04-20 13:18:04 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -77,7 +77,25 @@ mmaVolumeMaterial *medVMESegmentationVolume::GetMaterial()
   }
   return material;
 }
+//-------------------------------------------------------------------------
+medAttributeSegmentationVolume *medVMESegmentationVolume::GetVolumeAttribute()
+//-------------------------------------------------------------------------
+{
+  if (this->GetAttribute("SegmentationVolumeData") != NULL)
+  {
+    m_VolumeAttribute = medAttributeSegmentationVolume::SafeDownCast(this->GetAttribute("SegmentationVolumeData"));
+  }
+  else
+  {
+    m_VolumeAttribute = medAttributeSegmentationVolume::New();
+    this->SetAttribute("SegmentationVolumeData",m_VolumeAttribute);
 
+    m_VolumeAttribute = medAttributeSegmentationVolume::SafeDownCast(this->GetAttribute("SegmentationVolumeData"));
+  }
+
+  return m_VolumeAttribute;
+
+}
 //-------------------------------------------------------------------------
 int medVMESegmentationVolume::InternalInitialize()
 //-------------------------------------------------------------------------
@@ -86,21 +104,9 @@ int medVMESegmentationVolume::InternalInitialize()
   {
     // force material allocation
     GetMaterial();
-
-    medAttributeSegmentationVolume::SafeDownCast(this->GetAttribute("SegmentationVolumeData"));
-
-    if (this->GetAttribute("SegmentationVolumeData") != NULL)
-    {
-      m_VolumeAttribute = medAttributeSegmentationVolume::SafeDownCast(this->GetAttribute("SegmentationVolumeData"));
-    }
-    else
-    {
-      m_VolumeAttribute = medAttributeSegmentationVolume::New();
-      this->SetAttribute("SegmentationVolumeData",m_VolumeAttribute);
-
-      m_VolumeAttribute = medAttributeSegmentationVolume::SafeDownCast(this->GetAttribute("SegmentationVolumeData"));
-    }
-
+    
+    m_VolumeAttribute = GetVolumeAttribute();
+    
     // attach a data pipe which creates a bridge between VTK and MAF
     m_SegmentingDataPipe->SetVolume(this->GetVolumeLink());
     m_SegmentingDataPipe->SetManualVolumeMask(this->GetManualVolumeMask());
@@ -377,6 +383,11 @@ int medVMESegmentationVolume::GetNumberOfRanges()
 void medVMESegmentationVolume::SetAutomaticSegmentationThresholdModality(int modality)
 //-----------------------------------------------------------------------
 {
+  if (m_VolumeAttribute == NULL)// force attribute reading
+  {
+    GetVolumeAttribute();
+  }
+
   m_VolumeAttribute->SetAutomaticSegmentationThresholdModality(modality);
   m_SegmentingDataPipe->SetAutomaticSegmentationThresholdModality(modality);
   Modified();
@@ -391,6 +402,11 @@ int medVMESegmentationVolume::GetAutomaticSegmentationThresholdModality()
 void medVMESegmentationVolume::SetAutomaticSegmentationGlobalThreshold(double threshold)
 //-----------------------------------------------------------------------
 {
+  if (m_VolumeAttribute == NULL)// force attribute reading
+  {
+    GetVolumeAttribute();
+  }
+
   m_VolumeAttribute->SetAutomaticSegmentationGlobalThreshold(threshold);
   m_SegmentingDataPipe->SetAutomaticSegmentationGlobalThreshold(threshold);
   Modified();

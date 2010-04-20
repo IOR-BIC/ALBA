@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-19 14:19:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-04-20 13:18:04 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -158,6 +158,9 @@ protected:
 
   /** called to prepare the update of the output */
   /*virtual*/ void InternalPreUpdate();
+
+  /** Return the segmentation volume attribute */
+  medAttributeSegmentationVolume *GetVolumeAttribute();
 
   mafString m_VolumeName;
 
