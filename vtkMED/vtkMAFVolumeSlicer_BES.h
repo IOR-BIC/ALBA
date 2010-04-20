@@ -3,8 +3,8 @@
 Program:   Multimod Fundation Library
 Module:    $RCSfile: vtkMAFVolumeSlicer_BES.h,v $
 Language:  C++
-Date:      $Date: 2009-10-22 08:35:56 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-04-20 09:44:20 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Alexander Savenko, Josef Kohout
 Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -133,7 +133,8 @@ public:
   and RGB regular grids (vtkImageData) inputs/outputs are supported.
   GPU processing is enabled by the default. 
   NB. GPU processing is faster but may introduce some errors due to single precision */
-  vtkSetMacro( GPUEnabled, int );
+  //vtkSetMacro( GPUEnabled, int );
+  void SetGPUEnabled(int enable);
   vtkGetMacro( GPUEnabled, int );
 #pragma endregion Attributes
 

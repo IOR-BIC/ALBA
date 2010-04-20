@@ -3,8 +3,8 @@
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkMAFVolumeSlicer_BES.cxx,v $
   Language:  C++
-  Date:      $Date: 2009-10-22 08:35:56 $
-  Version:   $Revision: 1.1.2.7 $
+  Date:      $Date: 2010-04-20 09:44:20 $
+  Version:   $Revision: 1.1.2.8 $
   Authors:   Alexander Savenko, Josef Kohout (major change)
   Project:   MultiMod Project (www.ior.it/multimod)
 
@@ -27,7 +27,7 @@
 
 #include "assert.h"
 
-vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.7 $");
+vtkCxxRevisionMacro(vtkMAFVolumeSlicer_BES, "$Revision: 1.1.2.8 $");
 vtkStandardNewMacro(vtkMAFVolumeSlicer_BES);
 
 #include "mafMemDbg.h"
@@ -1367,5 +1367,31 @@ void vtkMAFVolumeSlicer_BES::CreateImageGPU(OutputDataType* output, vtkImageData
     m_pGPUProvider->GetResult(output, numComp > 1);
   }
 }
-
 #endif
+//----------------------------------------------------------------------------
+void vtkMAFVolumeSlicer_BES::SetGPUEnabled(int enable)
+//----------------------------------------------------------------------------
+{
+  GPUEnabled = enable;
+  if (!enable)
+  {
+#ifdef _WIN32
+    if (m_pGPUProvider != NULL)
+    {
+      if (m_TextureId != 0)
+      {
+        m_pGPUProvider->EnableRenderingContext();    
+        glDeleteTextures(1, (GLuint*)&m_TextureId);
+        m_pGPUProvider->DisableRenderingContext();
+      }
+
+      delete m_pGPUProvider;    //destroy GPU provider
+
+      m_pGPUProvider = NULL;
+    }
+#endif
+  }
+
+  Modified();
+
+}
