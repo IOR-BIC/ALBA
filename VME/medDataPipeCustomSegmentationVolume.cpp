@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-19 14:19:18 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-04-20 13:18:21 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -175,7 +175,7 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
   mafEvent e(this,PROGRESSBAR_SHOW);
   this->GetVME()->ForwardUpEvent(&e);
 
-  int step = round(maskScalar->GetNumberOfTuples()/100);
+  int step = ceil((double)maskScalar->GetNumberOfTuples()/100);
   double invStep = (double)1/step;
   for (int i=0;i<maskScalar->GetNumberOfTuples();i++)
   {
@@ -263,7 +263,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
   newScalars->SetName("SCALARS");
   newScalars->SetNumberOfTuples(volumeDimensions[0]*volumeDimensions[1]*volumeDimensions[2]);
 
-  int step = round(volumeDimensions[2]/100);
+  int step = ceil((double)volumeDimensions[2]/100);
   double invStep = (double)1/step;
 
   for (int i=0;i<volumeDimensions[2];i++)
@@ -446,7 +446,7 @@ void medDataPipeCustomSegmentationVolume::PreExecute()
       {
         ApplyAutomaticSegmentation();
       }
-      if (m_ChangedAutomaticData || m_ChangedManualData)
+      if ((m_ChangedAutomaticData && CheckNumberOfThresholds()) || m_ChangedManualData)
       {
         ApplyManualSegmentation();
       }
