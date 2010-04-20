@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafViewRXCT.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-03-22 11:48:45 $
-  Version:   $Revision: 1.45.2.9 $
+  Date:      $Date: 2010-04-20 09:46:08 $
+  Version:   $Revision: 1.45.2.10 $
   Authors:   Stefano Perticoni , Paolo Quadrani
 ==========================================================================
   Copyright (c) 2002/2004
@@ -655,6 +655,11 @@ void mafViewRXCT::OnEvent(mafEventBase *maf_event)
             }
             this->CameraUpdate();
           }
+
+          for (int i=0;i<CT_CHILD_VIEWS_NUMBER;i++)
+          {
+          	((mafViewSlice *)((mafViewCompound *)m_ChildViewList[CT_COMPOUND_VIEW])->GetSubView(i))->SetEnableGPU(m_EnableGPU);
+          }
         }
         break;
 
@@ -778,6 +783,7 @@ void mafViewRXCT::PackageView()
     m_ViewsRX[v]->PlugVisualPipe("medVMELabeledVolume", "mafPipeVolumeProjected",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMESlicer", "medVisualPipeSlicerSlice",MUTEX);
     m_ViewsRX[v]->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeProjected",MUTEX);
+    m_ViewsRX[v]->PlugVisualPipe("medVMESegmentationVolume", "mafPipeVolumeProjected",MUTEX);
     
     PlugChildView(m_ViewsRX[v]);
   }
@@ -796,6 +802,7 @@ void mafViewRXCT::PackageView()
   vs->PlugVisualPipe("mafVMEMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEWrappedMeter", "mafPipePolylineSlice",MUTEX);
   vs->PlugVisualPipe("mafVMEVolumeLarge", "mafPipeVolumeSlice_BES",MUTEX);
+  vs->PlugVisualPipe("medVMESegmentationVolume", "mafPipeVolumeSlice_BES",MUTEX);
  
   m_ViewCTCompound->PlugChildView(vs);
   PlugChildView(m_ViewCTCompound);
