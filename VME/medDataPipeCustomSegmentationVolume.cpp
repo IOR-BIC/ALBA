@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-20 16:02:27 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-04-21 10:41:15 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -156,7 +156,7 @@ void medDataPipeCustomSegmentationVolume::ApplyManualSegmentation()
     }
     automaticScalar = m_AutomaticRG->GetPointData()->GetScalars();
   }
-  else if (maskVolumeData->IsA("vtkImageData"))
+  else if (maskVolumeData->IsA("vtkStructuredPoints"))
   {
     m_AutomaticSP->Update();
     if (m_AutomaticSP->GetPointData()->GetScalars()->GetNumberOfTuples() != maskScalar->GetNumberOfTuples())
@@ -249,8 +249,8 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     vtkRectilinearGrid *rectilinearGrid=vtkRectilinearGrid::SafeDownCast(volumeData);
     rectilinearGrid->GetDimensions(volumeDimensions);
   }
-  else if (volumeData->IsA("vtkImageData")) {
-    vtkImageData *imageData=vtkImageData::SafeDownCast(volumeData);
+  else if (volumeData->IsA("vtkStructuredPoints")) {
+    vtkStructuredPoints *imageData=vtkStructuredPoints::SafeDownCast(volumeData);
     imageData->GetDimensions(volumeDimensions);
   }
 
@@ -401,7 +401,7 @@ void medDataPipeCustomSegmentationVolume::ApplyAutomaticSegmentation()
     newSP->Update();
     newSP->GetPointData()->AddArray(newScalars);
     newSP->GetPointData()->SetActiveScalars("SCALARS");
-    newSP->SetScalarTypeToShort();
+    //newSP->SetScalarTypeToShort();
     newSP->Update();
 
     m_AutomaticSP->DeepCopy(newSP);
@@ -588,9 +588,9 @@ bool medDataPipeCustomSegmentationVolume::CheckNumberOfThresholds()
         vtkRectilinearGrid *rectilinearGrid=vtkRectilinearGrid::SafeDownCast(volumeData);
         rectilinearGrid->GetDimensions(volumeDimensions);
       }
-      else if (volumeData->IsA("vtkImageData")) {
-        vtkImageData *imageData=vtkImageData::SafeDownCast(volumeData);
-        imageData->GetDimensions(volumeDimensions);
+      else if (volumeData->IsA("vtkStructuredPoints")) {
+        vtkStructuredPoints *sp=vtkStructuredPoints::SafeDownCast(volumeData);
+        sp->GetDimensions(volumeDimensions);
       }
 
       for (int i=0;i<volumeDimensions[2];i++)
