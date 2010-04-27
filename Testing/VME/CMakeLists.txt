@@ -92,6 +92,9 @@ ADD_TEST(medVMESegmentationVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medVMESegmentat
 ADD_EXECUTABLE(medPipeCompoundTest medPipeCompoundTest.h medPipeCompoundTest.cpp)
 ADD_TEST(medPipeCompoundTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundTest)
 
+ADD_EXECUTABLE(medPipeCompoundVolumeTest medPipeCompoundVolumeTest.h medPipeCompoundVolumeTest.cpp)
+ADD_TEST(medPipeCompoundVolumeTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeTest)
+
 ADD_EXECUTABLE(medPipeCompoundVolumeFixedScalarsTest medPipeCompoundVolumefixedScalarsTest.h medPipeCompoundVolumeFixedScalarsTest.cpp)
 ADD_TEST(medPipeCompoundVolumeFixedScalarsTest  ${EXECUTABLE_OUTPUT_PATH}/medPipeCompoundVolumeFixedScalarsTest)
 
