@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.h,v $
 Language:  C++
-Date:      $Date: 2010-04-14 16:47:35 $
-Version:   $Revision: 1.1.2.33 $
+Date:      $Date: 2010-04-27 15:22:40 $
+Version:   $Revision: 1.1.2.34 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -120,7 +120,7 @@ public:
   /** Read Dicom file */
   void ReadDicom();
 
-  /** Create the vtkTexture for slice_num dicom slice */
+  /** Create the vtkTexture for slice_num dicom slice: this will be written to m_SliceTexture ivar*/
   void GenerateSliceTexture(int imageID);
 
   /** Get dicom slice vtkImageData from its local file name */

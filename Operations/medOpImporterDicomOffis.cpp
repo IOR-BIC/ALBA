@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-15 11:20:13 $
-Version:   $Revision: 1.1.2.87 $
+Date:      $Date: 2010-04-27 15:22:30 $
+Version:   $Revision: 1.1.2.88 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -2465,7 +2465,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
       dicomSliceVTKImageData->SetUpdateExtent(0,dcmColumns-1,0,dcmRows-1,0,0);
       dicomSliceVTKImageData->SetExtent(dicomSliceVTKImageData->GetUpdateExtent());
       dicomSliceVTKImageData->SetNumberOfScalarComponents(1);
-      dicomSliceVTKImageData->SetOrigin(dcmImagePositionPatient);
       dicomSliceVTKImageData->SetSpacing(dcmPixelSpacing);
 
       long dcmPixelRepresentation;
@@ -2660,7 +2659,10 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
+
           lastZPos = dcmSliceLocation[2];
+          dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+          dicomSliceVTKImageData->Update();
 
           seriesName.Append(wxString::Format("%i_%ix%i",seriesCounter, dcmRows, dcmColumns));
           studyAndSeriesPair.push_back(seriesName);
@@ -2693,6 +2695,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
+          
+          dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+          dicomSliceVTKImageData->Update();
 
           if  (sliceNum > 1)
           {
@@ -2774,6 +2779,8 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
 
+          dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+          dicomSliceVTKImageData->Update();
 
           dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
           dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
@@ -2853,6 +2860,9 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[1],1);
             dicomDataset->findAndGetFloat64(DCM_SliceLocation,dcmSliceLocation[0],2);
           }
+
+          dicomSliceVTKImageData->SetOrigin(dcmSliceLocation);
+          dicomSliceVTKImageData->Update();
 
           dicomDataset->findAndGetLongInt(DCM_InstanceNumber,dcmInstanceNumber);
           dicomDataset->findAndGetLongInt(DCM_CardiacNumberOfImages,dcmCardiacNumberOfImages);
