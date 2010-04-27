@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-20 16:02:27 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-04-27 13:47:46 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -379,10 +379,30 @@ mafNode *medVMESegmentationVolume::GetManualVolumeMask()
   return GetLink("ManualVolumeMask");
 }
 //-----------------------------------------------------------------------
+void medVMESegmentationVolume::SetRefinementVolumeMask(mafNode *volume)
+//-----------------------------------------------------------------------
+{
+  SetLink("RefinementVolumeMask", volume);
+  m_SegmentingDataPipe->SetRefinementVolumeMask(volume);
+  Modified();
+}
+//-----------------------------------------------------------------------
+mafNode *medVMESegmentationVolume::GetRefinementVolumeMask()
+//-----------------------------------------------------------------------
+{
+  return GetLink("RefinementVolumeMask");
+}
+//-----------------------------------------------------------------------
 vtkDataSet *medVMESegmentationVolume::GetAutomaticOutput()
 //-----------------------------------------------------------------------
 {
   return m_SegmentingDataPipe->GetAutomaticOutput();
+}
+//-----------------------------------------------------------------------
+vtkDataSet *medVMESegmentationVolume::GetManualOutput()
+//-----------------------------------------------------------------------
+{
+  return m_SegmentingDataPipe->GetManualOutput();
 }
 //-----------------------------------------------------------------------
 mafNode *medVMESegmentationVolume::GetVolumeLink()

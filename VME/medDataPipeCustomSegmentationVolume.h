@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDataPipeCustomSegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-20 16:02:27 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-04-27 13:47:18 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -78,8 +78,17 @@ public:
   /** Get the volume mask for the manual segmentation */
   mafNode *GetManualVolumeMask(){return m_ManualVolumeMask;};
 
+  /** Set the volume mask for the refinement segmentation */
+  void SetRefinementVolumeMask(mafNode *volume);
+
+  /** Get the volume mask for the refinement segmentation */
+  mafNode *GetRefinementVolumeMask();
+
   /** Return the vtkDataSet of the automatic segmentation */
   vtkDataSet *GetAutomaticOutput();
+
+  /** Return the vtkDataSet of the manual segmentation */
+  vtkDataSet *GetManualOutput();
 
 protected:
   medDataPipeCustomSegmentationVolume();
@@ -97,6 +106,9 @@ protected:
   /** Apply the manual segmentation */
   void ApplyManualSegmentation();
 
+  /** Apply the refinement segmentation */
+  void ApplyRefinementSegmentation();
+
   /** function called to updated the data pipe output */
   /*virtual*/ void Execute();
 
@@ -107,12 +119,16 @@ protected:
   vtkStructuredPoints *m_AutomaticSP;
   vtkRectilinearGrid *m_ManualRG;
   vtkStructuredPoints *m_ManualSP;
+  vtkStructuredPoints *m_RefinementRG;
+  vtkStructuredPoints *m_RefinementSP;
 
   bool m_ChangedManualData;
   bool m_ChangedAutomaticData;
+  bool m_ChangedRefinementData;
 
   mafNode *m_Volume;
   mafNode *m_ManualVolumeMask;
+  mafNode *m_RefinementVolumeMask;
 
   //Stuff for automatic threshold
   int m_AutomaticSegmentationThresholdModality;

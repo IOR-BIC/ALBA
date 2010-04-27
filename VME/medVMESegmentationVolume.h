@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medVMESegmentationVolume.h,v $
 Language:  C++
-Date:      $Date: 2010-04-20 16:02:27 $
-Version:   $Revision: 1.1.2.3 $
+Date:      $Date: 2010-04-27 13:47:46 $
+Version:   $Revision: 1.1.2.4 $
 Authors:   Matteo Giacomoni
 ==========================================================================
 Copyright (c) 2010
@@ -102,11 +102,20 @@ public:
   /** Return the vtkDataSet of the automatic segmentation */
   vtkDataSet *GetAutomaticOutput();
 
+  /** Return the vtkDataSet of the manual segmentation */
+  vtkDataSet *GetManualOutput();
+
   /** Set the volume mask for the manual segmentation */
   void SetManualVolumeMask(mafNode *volume);
 
   /** Get the volume mask for the manual segmentation */
   mafNode *GetManualVolumeMask();
+
+  /** Set the volume mask for the refinement segmentation */
+  void SetRefinementVolumeMask(mafNode *volume);
+
+  /** Get the volume mask for the refinement segmentation */
+  mafNode *GetRefinementVolumeMask();
 
   /** Add a new range with a particular threshold */
   int AddRange(int startSlice,int endSlice,double threshold);
