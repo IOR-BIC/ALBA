@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-14 16:47:35 $
-  Version:   $Revision: 1.1.2.2 $
+  Date:      $Date: 2010-04-27 10:14:03 $
+  Version:   $Revision: 1.1.2.3 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -401,534 +401,557 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   //     [dummy, idx_mode] = maxValue(proj);
   //
   
-  vnl_vector<double> proj(4);
-  proj(0) = abs(dot_product(xVersorsSingleFrame.get_row(0), xVersorsSingleFrame.get_row(1)));
-  proj(1) = abs(dot_product(xVersorsSingleFrame.get_row(0), yVersorsSingleFrame.get_row(1)));
-  proj(2) = abs(dot_product(yVersorsSingleFrame.get_row(0), xVersorsSingleFrame.get_row(1)));
-  proj(3) = abs(dot_product(yVersorsSingleFrame.get_row(0), yVersorsSingleFrame.get_row(1)));
-
-  
-
-  double maxValue = -1;
-  int maxId = -1; 
-  for (int i = 0; i < proj.size(); i++) 
+  if (planesPerFrame == 1)
   {
-    double currValue = proj(i);
-    if (currValue > maxValue)
-    {
-      maxValue = currValue;
-      maxId = i;
-    }
-  }
-
-
-  //     % store in idx and idy planes with versor parallel to the rotation 
-  //     axis in xVersors or yVersors
-  //     if( idx_mode==1 || idx_mode==2)
-  //       Vmode = xVersors(1,:);
-  //     else
-  //       Vmode = yVersors(1,:);
-  //   end
-  // 
-
-  double dummy = maxValue;
-  int idx_mode = maxId;
-
-  vnl_vector<double> Vmode;
-
-  if (idx_mode == 0 || idx_mode ==1)
-  {
-     Vmode = xVersorsSingleFrame.get_row(0);
+    // just one timevarying plane: skip correction
   } 
   else
   {
-    Vmode = yVersorsSingleFrame.get_row(0);
-  }
-  
-   
-  //   %  for each plane verify which versor is almost parallel to the Vmode versor
-  //   %  and store the index in idx or idy
-  // 
-  //   idy = [];
-  //   for i = 1:planesPerFrame
-  //     proj = abs([dot(Vmode,xVersors(i,:)); dot(Vmode,yVersors(i,:))]);
-  //   [dummy, idx_mode] = maxValue(proj);
-  //   if idx_mode == 1
-  //     idx(end+1) = i;
-  //   else
-  //     idy(end+1) = i;
-  //   end
-  //     end
-  // 
+    // correction 
 
-  vector<double> idx;
-  vector<double> idy;
-  
-  vnl_vector<double> project(2);
+    vnl_vector<double> proj(4);
+    proj(0) = abs(dot_product(xVersorsSingleFrame.get_row(0), xVersorsSingleFrame.get_row(1)));
+    proj(1) = abs(dot_product(xVersorsSingleFrame.get_row(0), yVersorsSingleFrame.get_row(1)));
+    proj(2) = abs(dot_product(yVersorsSingleFrame.get_row(0), xVersorsSingleFrame.get_row(1)));
+    proj(3) = abs(dot_product(yVersorsSingleFrame.get_row(0), yVersorsSingleFrame.get_row(1)));
 
-  for (int i = 0; i < planesPerFrame; i++) 
-  {
-    project(0) = abs(dot_product(Vmode, xVersorsSingleFrame.get_row(i)));
-    project(1) = abs(dot_product(Vmode, yVersorsSingleFrame.get_row(i)));
-
-    double p0 = project(0);
-    double p1 = project(1);
-
-    maxValue = -1;
-    maxId = -1;
-
-    for (int j = 0; j < project.size(); j++) 
+    double maxValue = -1;
+    int maxId = -1; 
+    for (int i = 0; i < proj.size(); i++) 
     {
-      double currValue = project(j);
+      double currValue = proj(i);
       if (currValue > maxValue)
       {
         maxValue = currValue;
-        maxId = j;
+        maxId = i;
       }
     }
 
-    dummy = maxValue;
-    idx_mode = maxId;
 
-    if (idx_mode == 0)
+    //     % store in idx and idy planes with versor parallel to the rotation 
+    //     axis in xVersors or yVersors
+    //     if( idx_mode==1 || idx_mode==2)
+    //       Vmode = xVersors(1,:);
+    //     else
+    //       Vmode = yVersors(1,:);
+    //   end
+    // 
+
+    double dummy = maxValue;
+    int idx_mode = maxId;
+
+    vnl_vector<double> Vmode;
+
+    if (idx_mode == 0 || idx_mode ==1)
     {
-      idx.push_back(i);      
+      Vmode = xVersorsSingleFrame.get_row(0);
     } 
     else
     {
-      idy.push_back(i);  
+      Vmode = yVersorsSingleFrame.get_row(0);
     }
-   }
-  
-  //   % initializing new coordinates ImagePositionPatient and
-  //   % ImageOrientationPatient
-  //   newPositionSingleFrame  = zeros(size(positions));
-  //   newXVersorsSingleFrame = zeros(size(xVersors));
-  //   newYVersorsSingleFrame = zeros(size(yVersors));
-  //   newImageSizeSingleFrame  = zeros(size(imageSize));
-  // 
-  //   % variables 
-  //   rotateFlag = zeros([planesPerFrame 1]);
-  //   fliplr_flag = zeros([planesPerFrame 1]);
-  //   flipud_flag = zeros([planesPerFrame 1]);
-  // 
-
-
-  /*
-  % correction
-  for i = idx
-    newImageSizeSingleFrame(i,:) = [imageSize(i,2) imageSize(i,1)];
-    if xVersors(i,1)>0
-  %         rimg(:,:,i) = imrotate(img,90);
-        newPositionSingleFrame(i,:) = positions(i,:) + imageSize(i,1)*spacing(1)*xVersors(i,:);
-        newXVersorsSingleFrame(i,:) = yVersors(i,:);
-        newYVersorsSingleFrame(i,:) = -xVersors(i,:);
-        rotateFlag(i) = 90;
-    else
-  %         rimg(:,:,i) = imrotate(fliplr(img),90);
-        newPositionSingleFrame(i,:) = positions(i,:);
-        newXVersorsSingleFrame(i,:) = yVersors(i,:);
-        newYVersorsSingleFrame(i,:) = xVersors(i,:);
-        rotateFlag(i) = 90;
-        fliplr_flag(i) = 1;
-    end
-    clear img
-  end
- */
-
-  vnl_matrix<double> newPositionSingleFrame(positionSingleFrame.rows(), positionSingleFrame.cols(), 0);
-  vnl_matrix<double> newXVersorsSingleFrame(xVersorsSingleFrame.rows(), xVersorsSingleFrame.cols(), 0);
-  vnl_matrix<double> newYVersorsSingleFrame(yVersorsSingleFrame.rows(), yVersorsSingleFrame.cols(), 0);
-  vnl_matrix<double> newImageSizeSingleFrame(planesPerFrame, 2, 0);
-  newImageSizeSingleFrame.fill(0.0);
-
-  vnl_matrix<double> rotateFlag(planesPerFrame,1,0.0);
-  vnl_matrix<double> flipLeftRightFlag(planesPerFrame,1,0.0);
-  vnl_matrix<double> flipUpDownFlag(planesPerFrame,1,0.0);
-
-  for (int index = 0; index < idx.size(); index++) 
-  {
-    int idx_ith_value = idx[index];
     
-    newImageSizeSingleFrame(idx_ith_value,0) = imageSizeSingleFrame(idx_ith_value, 1);
-    newImageSizeSingleFrame(idx_ith_value,1) = imageSizeSingleFrame(idx_ith_value, 0);
-       
-    if (xVersorsSingleFrame(idx_ith_value,0) > 0)
-    {
-      for (int col = 0; col < 3; col++) 
-      {
-        newPositionSingleFrame(idx_ith_value,col) = positionSingleFrame(idx_ith_value,col) + \
-          imageSizeSingleFrame(idx_ith_value,0) * \
-          spacing[0] * xVersorsSingleFrame(idx_ith_value,col);
-      }
-        
-      newXVersorsSingleFrame.set_row(idx_ith_value , yVersorsSingleFrame.get_row(idx_ith_value));
-      newYVersorsSingleFrame.set_row(idx_ith_value , -xVersorsSingleFrame.get_row(idx_ith_value));
-      rotateFlag(idx_ith_value,0) = 90;
-   } 
-   else
-   {
-      newPositionSingleFrame.set_row(idx_ith_value , positionSingleFrame.get_row(idx_ith_value));
-      newXVersorsSingleFrame.set_row(idx_ith_value , yVersorsSingleFrame.get_row(idx_ith_value));
-      newYVersorsSingleFrame.set_row(idx_ith_value , xVersorsSingleFrame.get_row(idx_ith_value));
-      rotateFlag(idx_ith_value,0) = 90;
-      flipLeftRightFlag(idx_ith_value,0) = 1;
-   }
-  }
+     
+    //   %  for each plane verify which versor is almost parallel to the Vmode versor
+    //   %  and store the index in idx or idy
+    // 
+    //   idy = [];
+    //   for i = 1:planesPerFrame
+    //     proj = abs([dot(Vmode,xVersors(i,:)); dot(Vmode,yVersors(i,:))]);
+    //   [dummy, idx_mode] = maxValue(proj);
+    //   if idx_mode == 1
+    //     idx(end+1) = i;
+    //   else
+    //     idy(end+1) = i;
+    //   end
+    //     end
+    // 
 
-  /*
-  for i = idy
-    newImageSizeSingleFrame(i,:) = imageSize(i,:);
-    if yVersors(i,1)>0
-    %         rimg(:,:,i) = flipud(img);
-      newPositionSingleFrame(i,:) = positions(i,:) + imageSize(i,2)*spacing(2)*yVersors(i,:);
-      newXVersorsSingleFrame(i,:) = xVersors(i,:);
-      newYVersorsSingleFrame(i,:) = -yVersors(i,:);
-      flipud_flag(i) = 1;
-    else
-  %         rimg(:,:,i) = img;
-      newPositionSingleFrame(i,:) = positions(i,:);
-      newXVersorsSingleFrame(i,:) = xVersors(i,:);
-      newYVersorsSingleFrame(i,:) = yVersors(i,:);
+    vector<double> idx;
+    vector<double> idy;
+    
+    vnl_vector<double> project(2);
+
+    for (int i = 0; i < planesPerFrame; i++) 
+    {
+      project(0) = abs(dot_product(Vmode, xVersorsSingleFrame.get_row(i)));
+      project(1) = abs(dot_product(Vmode, yVersorsSingleFrame.get_row(i)));
+
+      double p0 = project(0);
+      double p1 = project(1);
+
+      maxValue = -1;
+      maxId = -1;
+
+      for (int j = 0; j < project.size(); j++) 
+      {
+        double currValue = project(j);
+        if (currValue > maxValue)
+        {
+          maxValue = currValue;
+          maxId = j;
+        }
+      }
+
+      dummy = maxValue;
+      idx_mode = maxId;
+
+      if (idx_mode == 0)
+      {
+        idx.push_back(i);      
+      } 
+      else
+      {
+        idy.push_back(i);  
+      }
+    }
+    
+    //   % initializing new coordinates ImagePositionPatient and
+    //   % ImageOrientationPatient
+    //   newPositionSingleFrame  = zeros(size(positions));
+    //   newXVersorsSingleFrame = zeros(size(xVersors));
+    //   newYVersorsSingleFrame = zeros(size(yVersors));
+    //   newImageSizeSingleFrame  = zeros(size(imageSize));
+    // 
+    //   % variables 
+    //   rotateFlag = zeros([planesPerFrame 1]);
+    //   fliplr_flag = zeros([planesPerFrame 1]);
+    //   flipud_flag = zeros([planesPerFrame 1]);
+    // 
+
+
+    /*
+    % correction
+    for i = idx
+      newImageSizeSingleFrame(i,:) = [imageSize(i,2) imageSize(i,1)];
+      if xVersors(i,1)>0
+    %         rimg(:,:,i) = imrotate(img,90);
+          newPositionSingleFrame(i,:) = positions(i,:) + imageSize(i,1)*spacing(1)*xVersors(i,:);
+          newXVersorsSingleFrame(i,:) = yVersors(i,:);
+          newYVersorsSingleFrame(i,:) = -xVersors(i,:);
+          rotateFlag(i) = 90;
+      else
+    %         rimg(:,:,i) = imrotate(fliplr(img),90);
+          newPositionSingleFrame(i,:) = positions(i,:);
+          newXVersorsSingleFrame(i,:) = yVersors(i,:);
+          newYVersorsSingleFrame(i,:) = xVersors(i,:);
+          rotateFlag(i) = 90;
+          fliplr_flag(i) = 1;
+      end
+      clear img
     end
-  end
   */
 
-  for (int index = 0; index < idy.size(); index++) 
-  {
-    int idy_ith_value = idy[index];
+    vnl_matrix<double> newPositionSingleFrame(positionSingleFrame.rows(), positionSingleFrame.cols(), 0);
+    vnl_matrix<double> newXVersorsSingleFrame(xVersorsSingleFrame.rows(), xVersorsSingleFrame.cols(), 0);
+    vnl_matrix<double> newYVersorsSingleFrame(yVersorsSingleFrame.rows(), yVersorsSingleFrame.cols(), 0);
+    vnl_matrix<double> newImageSizeSingleFrame(planesPerFrame, 2, 0);
+    newImageSizeSingleFrame.fill(0.0);
 
-    newImageSizeSingleFrame(idy_ith_value,0) = imageSizeSingleFrame(idy_ith_value, 0);
-    newImageSizeSingleFrame(idy_ith_value,1) = imageSizeSingleFrame(idy_ith_value, 1);
+    vnl_matrix<double> rotateFlag(planesPerFrame,1,0.0);
+    vnl_matrix<double> flipLeftRightFlag(planesPerFrame,1,0.0);
+    vnl_matrix<double> flipUpDownFlag(planesPerFrame,1,0.0);
 
-    if (yVersorsSingleFrame(idy_ith_value,0) > 0)
+    for (int index = 0; index < idx.size(); index++) 
     {
-      for (int col = 0; col < 3; col++) 
+      int idx_ith_value = idx[index];
+      
+      newImageSizeSingleFrame(idx_ith_value,0) = imageSizeSingleFrame(idx_ith_value, 1);
+      newImageSizeSingleFrame(idx_ith_value,1) = imageSizeSingleFrame(idx_ith_value, 0);
+         
+      if (xVersorsSingleFrame(idx_ith_value,0) > 0)
       {
-        newPositionSingleFrame(idy_ith_value,col) = positionSingleFrame(idy_ith_value,col) + \
-          imageSizeSingleFrame(idy_ith_value,1) * \
-          spacing[1] * yVersorsSingleFrame(idy_ith_value,col);
-      }
-
-      newXVersorsSingleFrame.set_row(idy_ith_value , xVersorsSingleFrame.get_row(idy_ith_value));
-      newYVersorsSingleFrame.set_row(idy_ith_value , -yVersorsSingleFrame.get_row(idy_ith_value));
-      flipUpDownFlag(idy_ith_value,0) = 1;
+        for (int col = 0; col < 3; col++) 
+        {
+          newPositionSingleFrame(idx_ith_value,col) = positionSingleFrame(idx_ith_value,col) + \
+            imageSizeSingleFrame(idx_ith_value,0) * \
+            spacing[0] * xVersorsSingleFrame(idx_ith_value,col);
+        }
+          
+        newXVersorsSingleFrame.set_row(idx_ith_value , yVersorsSingleFrame.get_row(idx_ith_value));
+        newYVersorsSingleFrame.set_row(idx_ith_value , -xVersorsSingleFrame.get_row(idx_ith_value));
+        rotateFlag(idx_ith_value,0) = 90;
     } 
     else
     {
-      newPositionSingleFrame.set_row(idy_ith_value , positionSingleFrame.get_row(idy_ith_value));
-      newXVersorsSingleFrame.set_row(idy_ith_value , xVersorsSingleFrame.get_row(idy_ith_value));
-      newYVersorsSingleFrame.set_row(idy_ith_value , yVersorsSingleFrame.get_row(idy_ith_value));
+        newPositionSingleFrame.set_row(idx_ith_value , positionSingleFrame.get_row(idx_ith_value));
+        newXVersorsSingleFrame.set_row(idx_ith_value , yVersorsSingleFrame.get_row(idx_ith_value));
+        newYVersorsSingleFrame.set_row(idx_ith_value , xVersorsSingleFrame.get_row(idx_ith_value));
+        rotateFlag(idx_ith_value,0) = 90;
+        flipLeftRightFlag(idx_ith_value,0) = 1;
     }
-  }
+    }
 
-  //   %% PLANES ORDERING
-  // 
-  //   % relationship between adjacent planes
-  //   V = [(1:planesPerFrame)' newXVersorsSingleFrame];
-  // 
-  //   % choose plane 1 as tentative solution
-  //   Vidx(1,:) = V(1,:);
-  // 
+    /*
+    for i = idy
+      newImageSizeSingleFrame(i,:) = imageSize(i,:);
+      if yVersors(i,1)>0
+      %         rimg(:,:,i) = flipud(img);
+        newPositionSingleFrame(i,:) = positions(i,:) + imageSize(i,2)*spacing(2)*yVersors(i,:);
+        newXVersorsSingleFrame(i,:) = xVersors(i,:);
+        newYVersorsSingleFrame(i,:) = -yVersors(i,:);
+        flipud_flag(i) = 1;
+      else
+    %         rimg(:,:,i) = img;
+        newPositionSingleFrame(i,:) = positions(i,:);
+        newXVersorsSingleFrame(i,:) = xVersors(i,:);
+        newYVersorsSingleFrame(i,:) = yVersors(i,:);
+      end
+    end
+    */
 
-  vnl_matrix<double> V(planesPerFrame,4);
-
-  for (int i = 0; i < V.rows() ; i++) 
-  {
-    V(i, 0) = i;
-    for (int j = 1; j < V.cols(); j++) 
+    for (int index = 0; index < idy.size(); index++) 
     {
-      V(i,j) = newXVersorsSingleFrame(i, j-1);
-    }    
-  }
-  
-  vnl_matrix<double> Vidx(1,4);
-  Vidx.set_row(0, V.get_row(0));
+      int idy_ith_value = idy[index];
 
-  vnl_matrix<double> tmp = V.extract(V.rows() -1 , V.cols(), 1,0);
-  
-  vector<double> theta;
+      newImageSizeSingleFrame(idy_ith_value,0) = imageSizeSingleFrame(idy_ith_value, 0);
+      newImageSizeSingleFrame(idy_ith_value,1) = imageSizeSingleFrame(idy_ith_value, 1);
 
-  V = tmp;
+      if (yVersorsSingleFrame(idy_ith_value,0) > 0)
+      {
+        for (int col = 0; col < 3; col++) 
+        {
+          newPositionSingleFrame(idy_ith_value,col) = positionSingleFrame(idy_ith_value,col) + \
+            imageSizeSingleFrame(idy_ith_value,1) * \
+            spacing[1] * yVersorsSingleFrame(idy_ith_value,col);
+        }
 
-   
-   
-   
+        newXVersorsSingleFrame.set_row(idy_ith_value , xVersorsSingleFrame.get_row(idy_ith_value));
+        newYVersorsSingleFrame.set_row(idy_ith_value , -yVersorsSingleFrame.get_row(idy_ith_value));
+        flipUpDownFlag(idy_ith_value,0) = 1;
+      } 
+      else
+      {
+        newPositionSingleFrame.set_row(idy_ith_value , positionSingleFrame.get_row(idy_ith_value));
+        newXVersorsSingleFrame.set_row(idy_ith_value , xVersorsSingleFrame.get_row(idy_ith_value));
+        newYVersorsSingleFrame.set_row(idy_ith_value , yVersorsSingleFrame.get_row(idy_ith_value));
+      }
+    }
 
-  // % compute angle between plane 1 and other planes
-  for (int i = 0; i < V.rows(); i++) 
-  { 
-    vnl_vector<double> v0(3,0);
-    vnl_vector<double> v1(3,0);
-    for (int j = 1; j < 4; j++) 
+    //   %% PLANES ORDERING
+    // 
+    //   % relationship between adjacent planes
+    //   V = [(1:planesPerFrame)' newXVersorsSingleFrame];
+    // 
+    //   % choose plane 1 as tentative solution
+    //   Vidx(1,:) = V(1,:);
+    // 
+
+    vnl_matrix<double> V(planesPerFrame,4);
+
+    for (int i = 0; i < V.rows() ; i++) 
     {
-      v0.put(j-1, Vidx(0, j));
-      v1.put(j-1, V(i, j));
+      V(i, 0) = i;
+      for (int j = 1; j < V.cols(); j++) 
+      {
+        V(i,j) = newXVersorsSingleFrame(i, j-1);
+      }    
     }
     
-    double dot = dot_product(v0,v1);
-    theta.push_back(acos(dot_product(v0,v1)));
-  }
-  
-  assert(true);
+    vnl_matrix<double> Vidx(1,4);
+    Vidx.set_row(0, V.get_row(0));
 
-//   % find planes adjacent to plane 1 with a 10% tolerance with respect to the 
-//   % theoretical angle. Adjacent plane is unique when plane 1 is an extreme plane
-//   id_theta = find(theta<1.1*(pi/planesPerFrame));
-//   if numel(id_theta)==1
-//     Vidx = [Vidx; V(id_theta,:)];
-//   else
-//     Vidx = [V(id_theta(1),:); Vidx; V(id_theta(2),:)];
-//   end
+    vnl_matrix<double> tmp = V.extract(V.rows() -1 , V.cols(), 1,0);
+    
+    vector<double> theta;
 
-  vector<double> id_theta;
+    V = tmp;
 
-  for (int i = 0; i < theta.size(); i++) 
-  {
-    if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
-    {
-      id_theta.push_back(i);
-    }
-  }
-
-  for (int i = 0; i < id_theta.size(); i++) 
-  {
      
-  }
+     
+     
 
-  if (id_theta.size() == 1)
-  {
-    // Vidx = [Vidx; V(id_theta,:)];
-  } 
-  else
-  {
-    vnl_vector<double> row0 = V.get_row(id_theta[0]);
-    vnl_vector<double> row1 = Vidx.get_row(0);
-    vnl_vector<double> row2 = V.get_row(id_theta[1]);
-
-    vnl_matrix<double> tmp(3, Vidx.cols());
-    tmp.set_row(0, row0);
-    tmp.set_row(1, row1);
-    tmp.set_row(2, row2);
-
-    Vidx=tmp;
-  }
-
-   
-   
-
-
-   
-   
-
-  //   V(id_theta,:)=[] (START);
-  vnl_matrix<double> inputMatrix = V;
-  vector<double> rowsToRemoveVector = id_theta;
-  vnl_matrix<double> outputMatrix;
-
-  RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
-  
-  V = outputMatrix;
-   
-  theta.clear();
-
-// % find planes adjacent to first and last plane in V 
-// while ~isempty(V)
-//       % compute the angle between the last indexed plane and the others
-//       for i = 1:size(V,1)
-//         theta(i) = acos(dot(Vidx(end,2:4),V(i,2:4)));
-//       end
-
-  while (V.rows() != 0 && V.cols() != 0)
-  {
-         for (int i = 0; i < V.rows(); i++) 
-         {
-           vnl_vector<double> v0(3,0);
-           vnl_vector<double> v1(3,0);
-           for (int j = 1; j < 4; j++) 
-           {
-             v0.put(j-1, Vidx(Vidx.rows() - 1, j));
-             v1.put(j-1, V(i, j));
-           }
-
-            
-            
-           double dot = dot_product(v0,v1);
-           theta.push_back(acos(dot_product(v0,v1)));
-         }
-         
-
-         // id_theta = find(theta<1.1*(pi/planesPerFrame));         
-         id_theta.clear();
-
-         for (int i = 0; i < theta.size(); i++) 
-         {
-           if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
-           {
-             id_theta.push_back(i);
-           }
-         }
-
-         if (id_theta.size() != 0) 
-         {
-
-           //  Vidx = [Vidx; V(id_theta,:)];
-           vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
-           for (int i = 0; i < Vidx.rows(); i++) 
-           {
-             tmp3.set_row(i, Vidx.get_row(i));
-           }
-
-           for (int i = Vidx.rows(); i < Vidx.rows() + id_theta.size(); i++) 
-           {
-             tmp3.set_row(i, V.get_row(id_theta[i - Vidx.rows()]));
-           }
-           
-           Vidx = tmp3;
-           
-  
-           //   V(id_theta,:)=[];
-           inputMatrix = V;
-           rowsToRemoveVector = id_theta;
-           
-           RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
-
-           V = outputMatrix;
-            
-
-            
-            
-            
-
-           theta.clear();
-
-         }
-         
-//          % compute the angle between first indexed plane and the others
-//            for i = 1:size(V,1)
-//              theta(i) = acos(dot(Vidx(1,2:4),V(i,2:4)));
-//            end
-         
-         theta.clear();
-        
-         for (int i = 0; i < V.rows(); i++) 
-         {
-           vnl_vector<double> v0(3,0);
-           vnl_vector<double> v1(3,0);
-           
-           for (int j = 1; j < 4; j++) 
-           {
-             v0.put(j-1, Vidx(0, j));
-             v1.put(j-1, V(i, j));
-           }
-
-            
-            
-           double dot = dot_product(v0,v1);
-           theta.push_back(acos(dot_product(v0,v1)));
-         }
-
-         //  id_theta = find(theta<1.1*(pi/planesPerFrame));
-
-         for (int i = 0; i < theta.size(); i++) 
-         {
-            
-         }
-         
-         id_theta.clear();
-
-         for (int i = 0; i < theta.size(); i++) 
-         {
-           if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
-           {
-             id_theta.push_back(i);
-           }
-         }
-
-
-         if (id_theta.size() != 0) 
-         {
-           vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
-           
-           int size = id_theta.size();
-
-           for (int i = 0; i < id_theta.size(); i++) 
-           {
-             int id_theta_i = id_theta[i];
-             tmp3.set_row(i, V.get_row(id_theta[i]));
-           }
-
-           for (int i = id_theta.size(); i < id_theta.size() + Vidx.rows(); i++) 
-           {
-             tmp3.set_row(i, Vidx.get_row(i-id_theta.size()));
-           }
-
-           Vidx = tmp3;
-
-           vnl_matrix<double> inputMatrix = V;
-           vector<double> rowsToRemoveVector = id_theta;
-           vnl_matrix<double> outputMatrix;
-
-           RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
-
-           V = outputMatrix;
-            
-           theta.clear();
-         }
-  }
-
-  vnl_vector<double> id_plane = Vidx.get_column(0);
-
-  vnl_matrix<double> fileNumberForPlaneIFrameJIdPlane;
-
-  // order variables following planes order
-  ExtractRows(fileNumberForPlaneIFrameJ, id_plane, fileNumberForPlaneIFrameJIdPlane);
+    // % compute angle between plane 1 and other planes
+    for (int i = 0; i < V.rows(); i++) 
+    { 
+      vnl_vector<double> v0(3,0);
+      vnl_vector<double> v1(3,0);
+      for (int j = 1; j < 4; j++) 
+      {
+        v0.put(j-1, Vidx(0, j));
+        v1.put(j-1, V(i, j));
+      }
+      
+      double dot = dot_product(v0,v1);
+      theta.push_back(acos(dot_product(v0,v1)));
+    }
     
-//     % original DICOM positions/orientations
-//     % - positions: patient position (from DICOM)
-//     % - xVersors, yVersors: image versors (from DICOM)
-//     % - imageSize: image size (from DICOM)
-//     
+    assert(true);
 
-  vnl_matrix<double> xVersorsSingleFrameIdPlane;
-  vnl_matrix<double> yVersorsSingleFrameIdPlane;
-  vnl_matrix<double> positionSingleFrameIdPlane;
-  vnl_matrix<double> imageSizeSingleFrameIdPlane;
+  //   % find planes adjacent to plane 1 with a 10% tolerance with respect to the 
+  //   % theoretical angle. Adjacent plane is unique when plane 1 is an extreme plane
+  //   id_theta = find(theta<1.1*(pi/planesPerFrame));
+  //   if numel(id_theta)==1
+  //     Vidx = [Vidx; V(id_theta,:)];
+  //   else
+  //     Vidx = [V(id_theta(1),:); Vidx; V(id_theta(2),:)];
+  //   end
 
-  ExtractRows(positionSingleFrame, id_plane, positionSingleFrameIdPlane);
+    vector<double> id_theta;
+
+    for (int i = 0; i < theta.size(); i++) 
+    {
+      if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
+      {
+        id_theta.push_back(i);
+      }
+    }
+
+    for (int i = 0; i < id_theta.size(); i++) 
+    {
+       
+    }
+
+    if (id_theta.size() == 1)
+    {
+      // Vidx = [Vidx; V(id_theta,:)];
+    } 
+    else
+    {
+      vnl_vector<double> row0 = V.get_row(id_theta[0]);
+      vnl_vector<double> row1 = Vidx.get_row(0);
+      vnl_vector<double> row2 = V.get_row(id_theta[1]);
+
+      vnl_matrix<double> tmp(3, Vidx.cols());
+      tmp.set_row(0, row0);
+      tmp.set_row(1, row1);
+      tmp.set_row(2, row2);
+
+      Vidx=tmp;
+    }
+
+     
+     
+
+
+     
+     
+
+    //   V(id_theta,:)=[] (START);
+    vnl_matrix<double> inputMatrix = V;
+    vector<double> rowsToRemoveVector = id_theta;
+    vnl_matrix<double> outputMatrix;
+
+    RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
+    
+    V = outputMatrix;
+     
+    theta.clear();
+
+  // % find planes adjacent to first and last plane in V 
+  // while ~isempty(V)
+  //       % compute the angle between the last indexed plane and the others
+  //       for i = 1:size(V,1)
+  //         theta(i) = acos(dot(Vidx(end,2:4),V(i,2:4)));
+  //       end
+
+    while (V.rows() != 0 && V.cols() != 0)
+    {
+          for (int i = 0; i < V.rows(); i++) 
+          {
+            vnl_vector<double> v0(3,0);
+            vnl_vector<double> v1(3,0);
+            for (int j = 1; j < 4; j++) 
+            {
+              v0.put(j-1, Vidx(Vidx.rows() - 1, j));
+              v1.put(j-1, V(i, j));
+            }
+
+              
+              
+            double dot = dot_product(v0,v1);
+            theta.push_back(acos(dot_product(v0,v1)));
+          }
+           
+
+          // id_theta = find(theta<1.1*(pi/planesPerFrame));         
+          id_theta.clear();
+
+          for (int i = 0; i < theta.size(); i++) 
+          {
+            if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
+            {
+              id_theta.push_back(i);
+            }
+          }
+
+          if (id_theta.size() != 0) 
+          {
+
+            //  Vidx = [Vidx; V(id_theta,:)];
+            vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
+            for (int i = 0; i < Vidx.rows(); i++) 
+            {
+              tmp3.set_row(i, Vidx.get_row(i));
+            }
+
+            for (int i = Vidx.rows(); i < Vidx.rows() + id_theta.size(); i++) 
+            {
+              tmp3.set_row(i, V.get_row(id_theta[i - Vidx.rows()]));
+            }
+             
+            Vidx = tmp3;
+             
+    
+            //   V(id_theta,:)=[];
+            inputMatrix = V;
+            rowsToRemoveVector = id_theta;
+             
+            RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
+
+            V = outputMatrix;
+              
+
+              
+              
+              
+
+            theta.clear();
+
+          }
+           
+  //          % compute the angle between first indexed plane and the others
+  //            for i = 1:size(V,1)
+  //              theta(i) = acos(dot(Vidx(1,2:4),V(i,2:4)));
+  //            end
+           
+          theta.clear();
+          
+          for (int i = 0; i < V.rows(); i++) 
+          {
+            vnl_vector<double> v0(3,0);
+            vnl_vector<double> v1(3,0);
+             
+            for (int j = 1; j < 4; j++) 
+            {
+              v0.put(j-1, Vidx(0, j));
+              v1.put(j-1, V(i, j));
+            }
+
+              
+              
+            double dot = dot_product(v0,v1);
+            theta.push_back(acos(dot_product(v0,v1)));
+          }
+
+          //  id_theta = find(theta<1.1*(pi/planesPerFrame));
+
+          for (int i = 0; i < theta.size(); i++) 
+          {
+              
+          }
+           
+          id_theta.clear();
+
+          for (int i = 0; i < theta.size(); i++) 
+          {
+            if (theta[i] < 1.1 * (vnl_math::pi/planesPerFrame))
+            {
+              id_theta.push_back(i);
+            }
+          }
+
+
+          if (id_theta.size() != 0) 
+          {
+            vnl_matrix<double> tmp3(Vidx.rows() + id_theta.size(), Vidx.cols());
+             
+            int size = id_theta.size();
+
+            for (int i = 0; i < id_theta.size(); i++) 
+            {
+              int id_theta_i = id_theta[i];
+              tmp3.set_row(i, V.get_row(id_theta[i]));
+            }
+
+            for (int i = id_theta.size(); i < id_theta.size() + Vidx.rows(); i++) 
+            {
+              tmp3.set_row(i, Vidx.get_row(i-id_theta.size()));
+            }
+
+            Vidx = tmp3;
+
+            vnl_matrix<double> inputMatrix = V;
+            vector<double> rowsToRemoveVector = id_theta;
+            vnl_matrix<double> outputMatrix;
+
+            RemoveRows(inputMatrix, rowsToRemoveVector, outputMatrix);
+
+            V = outputMatrix;
+              
+            theta.clear();
+          }
+    }
+
+    vnl_vector<double> id_plane = Vidx.get_column(0);
+
+    vnl_matrix<double> fileNumberForPlaneIFrameJIdPlane;
+
+    // order variables following planes order
+    ExtractRows(fileNumberForPlaneIFrameJ, id_plane, fileNumberForPlaneIFrameJIdPlane);
+      
+  //     % original DICOM positions/orientations
+  //     % - positions: patient position (from DICOM)
+  //     % - xVersors, yVersors: image versors (from DICOM)
+  //     % - imageSize: image size (from DICOM)
+  //     
+
+    vnl_matrix<double> xVersorsSingleFrameIdPlane;
+    vnl_matrix<double> yVersorsSingleFrameIdPlane;
+    vnl_matrix<double> positionSingleFrameIdPlane;
+    vnl_matrix<double> imageSizeSingleFrameIdPlane;
+
+    ExtractRows(positionSingleFrame, id_plane, positionSingleFrameIdPlane);
+    
+    ExtractRows(xVersorsSingleFrame, id_plane, xVersorsSingleFrameIdPlane);
+
+    ExtractRows(yVersorsSingleFrame, id_plane, yVersorsSingleFrameIdPlane);
+     
+    ExtractRows(imageSizeSingleFrame, id_plane, imageSizeSingleFrameIdPlane);
+     
+    
+    // Output (updated) dicom parameters 
+    
+    vnl_matrix<double> newXVersorsSingleFrameIdPlane;
+    vnl_matrix<double> newYVersorsSingleFrameIdPlane;
+    vnl_matrix<double> newPositionSingleFrameIdPlane;
+    vnl_matrix<double> newImageSizeSingleFrameIdPlane;
+
+    ExtractRows(newPositionSingleFrame, id_plane, newPositionSingleFrameIdPlane);
+     
+    ExtractRows(newXVersorsSingleFrame, id_plane, newXVersorsSingleFrameIdPlane);
+     
+    ExtractRows(newYVersorsSingleFrame, id_plane, newYVersorsSingleFrameIdPlane);
+     
+    ExtractRows(newImageSizeSingleFrame, id_plane, newImageSizeSingleFrameIdPlane);
+     
+    vnl_matrix<double> rotateFlagIdPlane;
+    vnl_matrix<double> flipLeftRightFlagIdPlane;
+    vnl_matrix<double> flipUpDownFlagIdPlane;
+   
+    ExtractRows(rotateFlag, id_plane, rotateFlagIdPlane);
+     
+    ExtractRows(flipLeftRightFlag, id_plane, flipLeftRightFlagIdPlane);
+     
+    ExtractRows(flipUpDownFlag, id_plane, flipUpDownFlagIdPlane);
+    
+    m_FileNumberForPlaneIFrameJIdPlane = fileNumberForPlaneIFrameJIdPlane;
+    m_PositionSingleFrameIdPlane = positionSingleFrameIdPlane;
+    m_XVersorsSingleFrameIdPlane = xVersorsSingleFrameIdPlane;
+    m_YVersorsSingleFrameIdPlane = yVersorsSingleFrameIdPlane;
+    m_ImageSizeSingleFrameIdPlane = imageSizeSingleFrameIdPlane;
+
+    m_NewPositionSingleFrameIdPlane = newImageSizeSingleFrameIdPlane;
+    m_NewXVersorsSingleFrameIdPlane = newXVersorsSingleFrameIdPlane;
+    m_NewYVersorsSingleFrameIdPlane = newYVersorsSingleFrameIdPlane;
+    m_NewImageSizeSingleFrameIdPlane = newImageSizeSingleFrameIdPlane;
+
+    m_RotateFlagIdPlane = rotateFlagIdPlane;
+    m_FlipLeftRightFlagIdPlane = flipLeftRightFlagIdPlane;
+    m_FlipUpDownFlagIdPlane = flipUpDownFlagIdPlane;
+
+  }
   
-  ExtractRows(xVersorsSingleFrame, id_plane, xVersorsSingleFrameIdPlane);
-
-  ExtractRows(yVersorsSingleFrame, id_plane, yVersorsSingleFrameIdPlane);
-   
-  ExtractRows(imageSizeSingleFrame, id_plane, imageSizeSingleFrameIdPlane);
-   
-  
-  // Output (updated) dicom parameters 
-  
-  vnl_matrix<double> newXVersorsSingleFrameIdPlane;
-  vnl_matrix<double> newYVersorsSingleFrameIdPlane;
-  vnl_matrix<double> newPositionSingleFrameIdPlane;
-  vnl_matrix<double> newImageSizeSingleFrameIdPlane;
-
-  ExtractRows(newPositionSingleFrame, id_plane, newPositionSingleFrameIdPlane);
-   
-  ExtractRows(newXVersorsSingleFrame, id_plane, newXVersorsSingleFrameIdPlane);
-   
-  ExtractRows(newYVersorsSingleFrame, id_plane, newYVersorsSingleFrameIdPlane);
-   
-  ExtractRows(newImageSizeSingleFrame, id_plane, newImageSizeSingleFrameIdPlane);
-   
-  vnl_matrix<double> rotateFlagIdPlane;
-  vnl_matrix<double> flipLeftRightFlagIdPlane;
-  vnl_matrix<double> flipUpDownFlagIdPlane;
- 
-  ExtractRows(rotateFlag, id_plane, rotateFlagIdPlane);
-   
-  ExtractRows(flipLeftRightFlag, id_plane, flipLeftRightFlagIdPlane);
-   
-  ExtractRows(flipUpDownFlag, id_plane, flipUpDownFlagIdPlane);
-   
   m_DicomLocalFileNamesVector = dicomLocalFileNamesVector;
   m_TimeFrames = timeFrames;
   m_PlanesPerFrame = planesPerFrame;
@@ -943,20 +966,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   m_Spacing = tmpSpacing;
 
   m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
-  m_FileNumberForPlaneIFrameJIdPlane = fileNumberForPlaneIFrameJIdPlane;
-  m_PositionSingleFrameIdPlane = positionSingleFrameIdPlane;
-  m_XVersorsSingleFrameIdPlane = xVersorsSingleFrameIdPlane;
-  m_YVersorsSingleFrameIdPlane = yVersorsSingleFrameIdPlane;
-  m_ImageSizeSingleFrameIdPlane = imageSizeSingleFrameIdPlane;
-
-  m_NewPositionSingleFrameIdPlane = newImageSizeSingleFrameIdPlane;
-  m_NewXVersorsSingleFrameIdPlane = newXVersorsSingleFrameIdPlane;
-  m_NewYVersorsSingleFrameIdPlane = newYVersorsSingleFrameIdPlane;
-  m_NewImageSizeSingleFrameIdPlane = newImageSizeSingleFrameIdPlane;
-
-  m_RotateFlagIdPlane = rotateFlagIdPlane;
-  m_FlipLeftRightFlagIdPlane = flipLeftRightFlagIdPlane;
-  m_FlipUpDownFlagIdPlane = flipUpDownFlagIdPlane;
 
   vtkDEL(directoryReader);
 }
