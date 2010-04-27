@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafAvatar2D.h,v $
   Language:  C++
-  Date:      $Date: 2009-05-25 14:49:03 $
-  Version:   $Revision: 1.3.22.1 $
+  Date:      $Date: 2010-04-27 07:05:34 $
+  Version:   $Revision: 1.3.22.2 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -23,22 +23,12 @@ class mafDeviceButtonsPadMouse;
 /**
   Avatars are entities moving in the virtual world according to user's 
   movements, and thus representing their presence in the virtual world.
-  Currently Avatar2D are empty classes used only to store the renderer...
+  Currently Avatar2D are empty classes used only to store the renderer.
  */
 class MAF_EXPORT mafAvatar2D : public mafInteractor
 {
 public:
   mafTypeMacro(mafAvatar2D,mafInteractor);
-
-  /**  
-    Hide the 3D cursor, i.e. remove actor from renderer's list. This is
-    usually used to compute bounding box without considering avatars */
-  //void Hide();
-
-  /**  
-    Show the 3D cursor. This function is conditional, in the 
-    sense the old visibility state is retained when showing back. */
-  //void Show();
 
   /**  Process events coming from tracker */
   virtual void OnEvent(mafEventBase *event);
@@ -53,15 +43,14 @@ protected:
   mafAvatar2D();
   virtual ~mafAvatar2D();
 
-  /** redefined to add the Cursor actor into the selected renderer */
-  //virtual int InternalInitialize();
-
-  /** redefined to remove Cursor from renderer */
-  //virtual void InternalShutdown();
-
 private:
   mafAvatar2D(const mafAvatar2D&) {}  // Not implemented.
   void operator=(const mafAvatar2D&) {}  // Not implemented.
+
+  /**
+  Test friend */
+  friend class mafAvatar2DTest;
+
 };
 
 #endif 
