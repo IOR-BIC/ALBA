@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medPipeCompoundVolumeFixedScalarsTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-26 14:34:19 $
-Version:   $Revision: 1.1.2.1 $
+Date:      $Date: 2010-04-27 08:39:02 $
+Version:   $Revision: 1.1.2.2 $
 Authors:   Eleonora Mambrini
 ==========================================================================
 Copyright (c) 2002/2008
@@ -38,6 +38,7 @@ public:
 protected:
   // redefinition for avoiding gui components
   mafGUI *CreateGui() {return NULL;}
+  void    UpdateGUILayout(bool bForce){}
   void    CreatePageGroups(){}
 };
 
