@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-28 12:23:01 $
-  Version:   $Revision: 1.1.2.4 $
+  Date:      $Date: 2010-04-28 14:26:07 $
+  Version:   $Revision: 1.1.2.5 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -165,7 +165,10 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
 
     if (!m_TestMode)
     {
-      busyInfo = new wxBusyInfo(busyMessage);
+      if (busyInfo == NULL)
+      {
+        busyInfo = new wxBusyInfo(busyMessage);
+      }
     }
   
     wxString currentDicomSliceFileName = dicomLocalFileNamesVector[i].c_str();
