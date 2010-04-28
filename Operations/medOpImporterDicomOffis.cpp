@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-28 12:23:03 $
-Version:   $Revision: 1.1.2.90 $
+Date:      $Date: 2010-04-28 15:39:12 $
+Version:   $Revision: 1.1.2.91 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -764,7 +764,7 @@ int medOpImporterDicomOffis::BuildOutputVMEImagesFromDicomCineMRI()
   {
     mafSmartPointer<mafVMEImage> image;
     wxString name = m_VolumeName;
-    name.Append(wxString::Format("_%d", i));
+    name.Append(wxString::Format("_%d_%d", i, m_NumberOfTimeFrames));
     image->SetName(name.c_str());
     m_ImagesGroup->AddChild(image);
   }
