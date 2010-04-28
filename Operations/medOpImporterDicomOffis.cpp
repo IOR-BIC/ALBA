@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-27 15:22:30 $
-Version:   $Revision: 1.1.2.88 $
+Date:      $Date: 2010-04-28 08:48:18 $
+Version:   $Revision: 1.1.2.89 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1780,20 +1780,27 @@ void medOpImporterDicomOffis::ReadDicom()
       m_SortAxes = 2;
   }
 
-  // hope this is unuseful: commenting since its braking CineMRI reading
-//    switch (m_SortAxes)
-//    {
-//    case 0:
-//      m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareX);
-//      break;
-//    case 1:
-//      m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareY);
-//      break;
-//    case 2:
-//      m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareZ);
-//      break;
-//    }
-
+  // REFACTOR TODO:
+  // this is needed in order for regression test data:
+  // \Medical_Parabuild\Testing\unittestData\DicomUnpacker\TestDicomUnpacker\
+  // to work
+  // but it is braking CineMRI p09 p20 and SE10 CineMRI reading so i set it to
+  // enable for modality other than cine MRI
+  if (m_DicomReaderModality != medGUIDicomSettings::ID_CMRI_MODALITY)
+  {
+   switch (m_SortAxes)
+   {
+     case 0:
+       m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareX);
+     break;
+     case 1:
+       m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareY);
+     break;
+     case 2:
+       m_SelectedStudyUIDSeriesUIDPairFilesList->Sort(CompareZ);
+     break;
+   }
+  }
 
   m_NumberOfTimeFrames = ((medDICOMListElement *)m_SelectedStudyUIDSeriesUIDPairFilesList->\
     Item(0)->GetData())->GetTimeFramesNumber();
@@ -2871,7 +2878,6 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
           m_StudyUIDSeriesUIDPairToDICOMListMap[studyAndSeriesPair]->Append\
             (new medDICOMListElement(m_CurrentSliceABSFileName,dcmSliceLocation,dcmImageOrientationPatient ,\
             dicomSliceVTKImageData,dcmInstanceNumber,dcmCardiacNumberOfImages,dcmTriggerTime));
-
         }
       }
       
