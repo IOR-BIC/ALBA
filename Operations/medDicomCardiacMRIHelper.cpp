@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-27 10:14:03 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-04-28 12:23:01 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -51,10 +51,12 @@ const bool DEBUG_MODE = true;
 #include <map>
 #include "medOpImporterDicomOffis.h"
 #include "vtkDirectory.h"
+#include "wx/busyinfo.h"
 
 medDicomCardiacMRIHelper::medDicomCardiacMRIHelper()
 {
   m_InputDicomDirectoryABSPath = "UNDEFINED_m_InputDicomDirectoryABSPath";
+  m_TestMode = false;
 }
 
 medDicomCardiacMRIHelper::~medDicomCardiacMRIHelper()
@@ -153,10 +155,19 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   vnl_matrix<double> imageSize(timeFrames*planesPerFrame, 2, 0.0);
   vnl_matrix<double> frame(timeFrames*planesPerFrame, 1, 0.0);
 
+  wxBusyInfo *busyInfo = NULL;
+  wxString busyMessage = "Cardiac MRI Found, please wait for reader initialization...";
+  time_t start,end;
 
   for (int i = 0; i < timeFrames*planesPerFrame; i++) 
   {
+    time(&start);
 
+    if (!m_TestMode)
+    {
+      busyInfo = new wxBusyInfo(busyMessage);
+    }
+  
     wxString currentDicomSliceFileName = dicomLocalFileNamesVector[i].c_str();
 
     wxString currentSliceABSFileName = dicomDir + currentDicomSliceFileName;
@@ -200,7 +211,23 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
     imageSize(i, 1) = dcmRows;
 
     frame(i,0) = dcmInstanceNumber;
+
+    time(&end);
+
+    double elapsedTime = difftime(end, start);
+
+    // needed to refresh the busy info
+    if (elapsedTime > 0.5)
+    {
+      if (!m_TestMode)
+      {
+        cppDEL(busyInfo);
+        busyInfo = new wxBusyInfo(busyMessage);
+      }
+    }
   }
+
+  cppDEL(busyInfo);
   
 // FILE TO PLANE-FRAME MAPPING
 // 

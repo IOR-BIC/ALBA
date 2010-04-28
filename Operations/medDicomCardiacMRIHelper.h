@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.h,v $
   Language:  C++
-  Date:      $Date: 2010-04-15 11:20:13 $
-  Version:   $Revision: 1.1.2.3 $
+  Date:      $Date: 2010-04-28 12:23:03 $
+  Version:   $Revision: 1.1.2.4 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -108,6 +108,11 @@ public:
   static void RemoveRows( vnl_matrix<double> &inputMatrix, vector<double> &rowsToRemoveIdVector,
     vnl_matrix<double> &outputMatrix );
 
+  /** 
+  Set/get test (guiless) mode */
+  void SetTestMode(bool val) { m_TestMode = val; };
+  bool GetTestMode() { return m_TestMode; };
+
 private:
 
   mafString m_InputDicomDirectoryABSPath;
@@ -134,6 +139,7 @@ private:
   vnl_matrix<double> m_FlipLeftRightFlagIdPlane;
   vnl_matrix<double> m_FlipUpDownFlagIdPlane;
 
+  bool m_TestMode;
 };
  
 #endif

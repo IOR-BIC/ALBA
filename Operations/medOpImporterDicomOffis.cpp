@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-28 08:48:18 $
-Version:   $Revision: 1.1.2.89 $
+Date:      $Date: 2010-04-28 12:23:03 $
+Version:   $Revision: 1.1.2.90 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -146,7 +146,7 @@ MafMedical is partially based on OpenMAF.
 #include "dcmtk/ofstd/ofstdinc.h"
 #include "medDicomCardiacMRIHelper.h"
 #include "vnl/vnl_vector.h"
-
+#include "time.h"
 
 // copied from wx/list.h : needed to make Visual Assist X work correctly 
 // with this class (al least in version 10.5.1711)
@@ -2252,7 +2252,7 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 //----------------------------------------------------------------------------
 bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 //----------------------------------------------------------------------------
-{       
+{   
   long progress;
   int sliceNum = -1;
   double dcmSliceLocation[3];
@@ -2300,14 +2300,26 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
   {
     mafEventMacro(mafEvent(this,PROGRESSBAR_SHOW));
     progress = START_PROGRESS_BAR;
-    wxBusyInfo wait_info("Reading DICOM directory: please wait");
   }
 
   int i = -1;
   
+  time_t start,end;
+
+  wxBusyInfo *busyInfo = NULL;
+
+  wxString busyMessage = "Reading DICOM directory: please wait";
+
+  if (!m_TestMode)
+  {
+    busyInfo = new wxBusyInfo(busyMessage);
+  }
+
   // foreach dicom directory file
   for (i=0; i < m_DICOMDirectoryReader->GetNumberOfFiles(); i++)
   {
+    time(&start);
+  
     if ((strcmp(m_DICOMDirectoryReader->GetFile(i),".") == 0) ||\
       (strcmp(m_DICOMDirectoryReader->GetFile(i),"..") == 0)) 
     {
@@ -2801,15 +2813,12 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
               m_DicomReaderModality=medGUIDicomSettings::ID_CMRI_MODALITY;
               
               if (m_CardiacMRIHelper == NULL)
-              {
-                wxBusyInfo *bi = new wxBusyInfo("Cardiac MRI Found, please wait for reader initialization...");
-                m_CardiacMRIHelper = new medDicomCardiacMRIHelper;
+              { m_CardiacMRIHelper = new medDicomCardiacMRIHelper;
                 mafString helperInputDir = mafString(dicomDirABSPath).Append("/");
 
                 m_CardiacMRIHelper->SetInputDicomDirectoryABSPath(helperInputDir);
                 m_CardiacMRIHelper->ParseDicomDirectory();
                 
-                cppDEL(bi);
               }
             }
             else if(m_DicomReaderModality!=medGUIDicomSettings::ID_CMRI_MODALITY)
@@ -2892,11 +2901,26 @@ bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
     }
 
     lastFileName = m_CurrentSliceABSFileName;
+    
+    time(&end);
+
+    double elapsedTime = difftime(end, start);
+    
+    // needed to refresh the busy info
+    if (elapsedTime > 0.5)
+    {
+      if (!m_TestMode)
+      {
+        cppDEL(busyInfo);
+        busyInfo = new wxBusyInfo(busyMessage);
+      }
+    }
   }
 
   if (!this->m_TestMode)
   {
     mafEventMacro(mafEvent(this,PROGRESSBAR_HIDE));
+    cppDEL(busyInfo);
   }
   if(m_NumberOfStudies == 0)
   {
