@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medDicomCardiacMRIHelperTest.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-15 11:20:30 $
-Version:   $Revision: 1.1.2.2 $
+Date:      $Date: 2010-04-28 12:28:03 $
+Version:   $Revision: 1.1.2.3 $
 Authors:   Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2004 
@@ -84,8 +84,9 @@ void medDicomCardiacMRIHelperTest::TestDicomGeneralElectricPisa()
   wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p09\\";
 
   helper->SetInputDicomDirectoryABSPath(dicomDir.c_str());
+  helper->SetTestMode(true);
   helper->ParseDicomDirectory();
-
+  
   cout << helper->GetFileNumberForPlaneIFrameJMatrix();
   cout << std::endl;
 
@@ -139,6 +140,7 @@ void medDicomCardiacMRIHelperTest::TestDicomSiemensNiguarda()
   wxString dicomDir = "d:\\wip\\DicomConFetteAlContrario\\p20\\";
 
   helper->SetInputDicomDirectoryABSPath(dicomDir.c_str());
+  helper->SetTestMode(true);
   helper->ParseDicomDirectory();
 
   cout << helper->GetFileNumberForPlaneIFrameJMatrix();
