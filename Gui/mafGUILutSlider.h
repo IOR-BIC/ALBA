@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSlider.h,v $
   Language:  C++
-  Date:      $Date: 2009-09-14 12:01:10 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-29 07:40:00 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
 Copyright (c) 2002/2004
@@ -49,6 +49,14 @@ public:
  {
    ID_MOUSE_RELEASE = 0,
    ID_MOUSE_MOVE,
+   ID_MOUSE_D_CLICK_LEFT,
+ };
+
+ enum ID_BUTTON
+ {
+   MIN_BUTTON = 1,
+   MAX_BUTTON,
+   MIDDLE_BUTTON,
  };
 
   void SetListener(mafObserver *listener)   {m_Listener=listener;}; 
@@ -104,6 +112,9 @@ public:
 
   /** Enable/Disable min button */
   void EnableMinButton(bool enable);
+
+  /** */
+  void DoubleLeftButton(int id);
 
 protected:  
   /** Update slider's cursors. */

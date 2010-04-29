@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafGUILutSlider.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-09-14 12:01:10 $
-  Version:   $Revision: 1.1.2.1 $
+  Date:      $Date: 2010-04-29 07:40:00 $
+  Version:   $Revision: 1.1.2.2 $
   Authors:   Silvano Imboden
 ==========================================================================
   Copyright (c) 2002/2004
@@ -28,6 +28,8 @@
 #define BUTT_H 18
 #define BUTT_W 5 // min size of mid button
 
+#define round(x) (x<0?ceil((x)-0.5):floor((x)+0.5))
+
 //----------------------------------------------------------------------------
 // mafGUILutButt 
 //----------------------------------------------------------------------------
@@ -44,12 +46,14 @@ public:
   {
     Create(parent, id, label, pos, size, style);
     m_X0 = 0;
+    m_EnableIgnoreLeftDown = false;
   };
 
 protected:  
   void OnMouse(wxMouseEvent &event);
   void OnSetFocus(wxFocusEvent& event) {}; 
   int m_X0;
+  bool m_EnableIgnoreLeftDown;
 
 DECLARE_EVENT_TABLE()
 };
@@ -64,6 +68,7 @@ BEGIN_EVENT_TABLE(mafGUILutButt,wxButton)
   EVT_RIGHT_DOWN(mafGUILutButt::OnMouse)
   EVT_MOTION(mafGUILutButt::OnMouse)
   EVT_SET_FOCUS(mafGUILutButt::OnSetFocus) 
+  EVT_LEFT_DCLICK(mafGUILutButt::OnMouse)
 END_EVENT_TABLE()
 //----------------------------------------------------------------------------
 void mafGUILutButt::OnMouse(wxMouseEvent &event)
@@ -93,9 +98,17 @@ void mafGUILutButt::OnMouse(wxMouseEvent &event)
     }
 		return;
 	}
-
   
-  if(event.LeftIsDown())
+  if (event.ButtonDClick(wxMOUSE_BTN_LEFT))
+  {
+    //mafLogMessage("--DCLICK--");
+    ((mafGUILutSlider*)GetParent())->DoubleLeftButton(GetId());
+    ReleaseMouse();
+    m_EnableIgnoreLeftDown = true;
+    return;
+  }
+
+  if(event.LeftIsDown()&& !m_EnableIgnoreLeftDown)
 	{
 		int sx = event.GetX() - m_X0,sy = 0;
 		ClientToScreen(&sx,&sy);
@@ -104,6 +117,7 @@ void mafGUILutButt::OnMouse(wxMouseEvent &event)
 	}
   else
   {
+    m_EnableIgnoreLeftDown = m_EnableIgnoreLeftDown ? false : true;
     if( GetCapture() == this )
     {
       //the mouse is captured and the button isn't pressed anymore -- so we lost a LeftMouseUp
@@ -147,6 +161,15 @@ mafGUILutSlider::~mafGUILutSlider()
 {
 }
 //----------------------------------------------------------------------------
+void mafGUILutSlider::DoubleLeftButton(int id)
+//----------------------------------------------------------------------------
+{
+  mafEvent event;
+  event = mafEvent(this,ID_MOUSE_D_CLICK_LEFT);
+  event.SetArg(id);
+  mafEventMacro(event);
+}
+//----------------------------------------------------------------------------
 void mafGUILutSlider::MoveButton(int id, int pos)
 //----------------------------------------------------------------------------
 {
@@ -165,7 +188,7 @@ void mafGUILutSlider::MoveButton(int id, int pos)
    
   switch(id)
   {
-		case 1: //min
+		case MIN_BUTTON: //min
 		{
 			pos = (pos<0) ? 0 : pos;  
 			pos = (pos>x2-w1-BUTT_W) ? x2-w1-BUTT_W : pos;  
@@ -183,7 +206,7 @@ void mafGUILutSlider::MoveButton(int id, int pos)
       Refresh(false);
 		}
 		break;
-		case 2: //max
+		case MAX_BUTTON: //max
 		{
 			pos = (pos<x1+w1+BUTT_W) ? x1+w1+BUTT_W : pos;  
 			pos = (pos>w-w2) ? w-w2 : pos;  
@@ -201,7 +224,7 @@ void mafGUILutSlider::MoveButton(int id, int pos)
       Refresh(false);
 		}
 		break;
-		case 3: //mid
+		case MIDDLE_BUTTON: //mid
 		{
 			pos = (pos<w1) ? w1 : pos;  
 			pos = (pos>w-w2-w3) ? w-w2-w3 : pos;  
