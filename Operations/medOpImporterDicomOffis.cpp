@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-30 09:51:30 $
-Version:   $Revision: 1.1.2.92 $
+Date:      $Date: 2010-04-30 09:59:52 $
+Version:   $Revision: 1.1.2.93 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1715,11 +1715,11 @@ bool medOpImporterDicomOffis::OpenDir()
     busyCursor = new wxBusyCursor();
   }
 
-  bool result = BuildDicomFileList(m_DicomDirectoryABSFileName.GetCStr());
+  bool successful = BuildDicomFileList(m_DicomDirectoryABSFileName.GetCStr());
 
   cppDEL(busyCursor);
 
-  if (!result)
+  if (!successful)
   {
     return false;
   }
