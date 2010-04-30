@@ -2,8 +2,8 @@
 Program:   Multimod Application Framework
 Module:    $RCSfile: medOpImporterDicomOffis.cpp,v $
 Language:  C++
-Date:      $Date: 2010-04-28 15:39:12 $
-Version:   $Revision: 1.1.2.91 $
+Date:      $Date: 2010-04-30 09:51:30 $
+Version:   $Revision: 1.1.2.92 $
 Authors:   Matteo Giacomoni, Roberto Mucci , Stefano Perticoni
 ==========================================================================
 Copyright (c) 2002/2007
@@ -1709,7 +1709,17 @@ bool medOpImporterDicomOffis::OpenDir()
 {
   ResetStructure();
 
-  if (!BuildDicomFileList(m_DicomDirectoryABSFileName.GetCStr()))
+  wxBusyCursor *busyCursor = NULL; 
+  if (!m_TestMode)
+  {
+    busyCursor = new wxBusyCursor();
+  }
+
+  bool result = BuildDicomFileList(m_DicomDirectoryABSFileName.GetCStr());
+
+  cppDEL(busyCursor);
+
+  if (!result)
   {
     return false;
   }
@@ -2253,6 +2263,8 @@ void medOpImporterDicomOffis::FillSeriesListBox()
 bool medOpImporterDicomOffis::BuildDicomFileList(const char *dicomDirABSPath)
 //----------------------------------------------------------------------------
 {   
+  
+ 
   long progress;
   int sliceNum = -1;
   double dcmSliceLocation[3];

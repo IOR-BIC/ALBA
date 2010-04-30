@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: medDicomCardiacMRIHelper.cpp,v $
   Language:  C++
-  Date:      $Date: 2010-04-28 14:26:07 $
-  Version:   $Revision: 1.1.2.5 $
+  Date:      $Date: 2010-04-30 09:51:30 $
+  Version:   $Revision: 1.1.2.6 $
   Authors:   Stefano Perticoni
 ==========================================================================
   Copyright (c) 2002/2004 
@@ -158,6 +158,12 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   wxBusyInfo *busyInfo = NULL;
   wxString busyMessage = "Cardiac MRI Found, please wait for reader initialization...";
   time_t start,end;
+  
+  wxBusyCursor *busyCursor = NULL; 
+  if (!m_TestMode)
+  {
+    busyCursor = new wxBusyCursor();
+  }
 
   for (int i = 0; i < timeFrames*planesPerFrame; i++) 
   {
@@ -230,7 +236,6 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
     }
   }
 
-  cppDEL(busyInfo);
   
 // FILE TO PLANE-FRAME MAPPING
 // 
@@ -998,6 +1003,10 @@ void medDicomCardiacMRIHelper::ParseDicomDirectory()
   m_FileNumberForPlaneIFrameJ = fileNumberForPlaneIFrameJ;
 
   vtkDEL(directoryReader);
+
+  cppDEL(busyCursor);
+  cppDEL(busyInfo);
+
 }
 
 void medDicomCardiacMRIHelper::RemoveRows\
