@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputImage.cpp,v $
   Language:  C++
-  Date:      $Date: 2009-10-21 08:58:23 $
-  Version:   $Revision: 1.1.24.3 $
+  Date:      $Date: 2010-05-03 15:07:21 $
+  Version:   $Revision: 1.1.24.4 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -23,6 +23,7 @@
 #include "mafVMEOutputImage.h"
 #include "mafVME.h"
 #include "mmaMaterial.h"
+#include "mafDataPipe.h"
 
 #include "vtkImageData.h"
 #include "vtkWindowLevelLookupTable.h"
@@ -87,4 +88,21 @@ void mafVMEOutputImage::SetMaterial(mmaMaterial *material)
 //-------------------------------------------------------------------------
 {
   m_Material = material;
+}
+
+//-------------------------------------------------------------------------
+mafGUI* mafVMEOutputImage::CreateGui()
+//-------------------------------------------------------------------------
+{
+  //This method is used only to load data
+  assert(m_Gui == NULL);
+  m_Gui = mafVMEOutput::CreateGui();
+
+  wxBusyCursor wait;
+
+  if (m_VME && m_VME->GetDataPipe() && m_VME->GetDataPipe()->GetVTKData())
+  {
+    this->Update();
+  }
+   return m_Gui;
 }

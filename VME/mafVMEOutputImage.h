@@ -2,8 +2,8 @@
   Program:   Multimod Application Framework
   Module:    $RCSfile: mafVMEOutputImage.h,v $
   Language:  C++
-  Date:      $Date: 2009-07-20 14:38:40 $
-  Version:   $Revision: 1.2.22.2 $
+  Date:      $Date: 2010-05-03 15:07:21 $
+  Version:   $Revision: 1.2.22.3 $
   Authors:   Marco Petrone
 ==========================================================================
   Copyright (c) 2001/2005 
@@ -58,6 +58,9 @@ public:
 
 protected:
   mmaMaterial *m_Material;
+
+  mafGUI *CreateGui();
+
   int test;
 
 private:
